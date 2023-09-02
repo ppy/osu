@@ -46,10 +46,8 @@ namespace osu.Game.Screens.Select.Details
 
         private IBeatmapInfo beatmapInfo;
 
-#nullable enable
-        [Resolved]
-        private Bindable<BeatmapInfo>? adjustedInfo { get; set; } = null;
-#nullable disable
+        [Resolved(canBeNull: true)]
+        private Bindable<BeatmapShortInfo> adjustedInfo { get; set; } = null;
 
         public IBeatmapInfo BeatmapInfo
         {
@@ -104,19 +102,30 @@ namespace osu.Game.Screens.Select.Details
         private ModSettingChangeTracker modSettingChangeTracker;
         private ScheduledDelegate debouncedStatisticsUpdate;
 
+        private StarDifficulty latestStarDifficulty = new StarDifficulty();
         private void updateBindedInfo()
         {
             if (adjustedInfo == null) return;
 
-            BeatmapInfo adjusted = (BeatmapInfo)beatmapInfo;
-            adjusted.Difficulty.CircleSize = FirstValue.Value.adjustedValue ?? 0;
-            adjusted.Difficulty.DrainRate = HpDrain.Value.adjustedValue ?? 0;
-            adjusted.Difficulty.ApproachRate = ApproachRate.Value.adjustedValue ?? 5;
-            adjusted.Difficulty.OverallDifficulty = Accuracy.Value.adjustedValue ?? 0;
-            adjusted.StarRating = starDifficulty.Value.adjustedValue ?? 0;
+            // sadly need to calculate this to prevent additional data transportation
+            double rate = 1;
+            foreach (var mod in mods.Value.OfType<IApplicableToRate>())
+                rate = mod.ApplyToRate(0, rate);
+
+            double bpm = 0;
+            if (beatmapInfo != null) bpm = beatmapInfo.BPM * rate;
+
+            BeatmapShortInfo adjusted = new BeatmapShortInfo()
+            {
+                CircleSize = FirstValue.Value.adjustedValue ?? FirstValue.Value.baseValue,
+                DrainRate = HpDrain.Value.adjustedValue ?? HpDrain.Value.baseValue,
+                ApproachRate = ApproachRate.Value.adjustedValue ?? ApproachRate.Value.baseValue,
+                OverallDifficulty = Accuracy.Value.adjustedValue ?? Accuracy.Value.baseValue,
+                BPM = bpm,
+                StarDifficulty = latestStarDifficulty
+            };
 
             adjustedInfo.Value = adjusted;
-            adjustedInfo.TriggerChange();
         }
 
         private void modsChanged(ValueChangedEvent<IReadOnlyList<Mod>> mods)
@@ -165,6 +174,7 @@ namespace osu.Game.Screens.Select.Details
             Accuracy.Value = (baseDifficulty?.OverallDifficulty ?? 0, adjustedDifficulty?.OverallDifficulty);
             ApproachRate.Value = (baseDifficulty?.ApproachRate ?? 0, adjustedDifficulty?.ApproachRate);
 
+            updateBindedInfo(); // to faster UI response (without SR calculation)
             updateStarDifficulty();
 
         }
@@ -199,6 +209,7 @@ namespace osu.Game.Screens.Select.Details
                     return;
 
                 starDifficulty.Value = ((float)normalDifficulty.Value.Stars, (float)moddedDifficulty.Value.Stars);
+                latestStarDifficulty = moddedDifficulty ?? default;
                 updateBindedInfo();
 
             }), starDifficultyCancellationSource.Token, TaskContinuationOptions.OnlyOnRanToCompletion, TaskScheduler.Current);
