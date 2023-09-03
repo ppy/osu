@@ -12,7 +12,6 @@ using osu.Game.Graphics.Sprites;
 using osu.Game.Graphics.UserInterface;
 using osuTK;
 
-
 namespace osu.Game.Overlays.Mods
 {
     public partial class VerticalAttributeDisplay : Container, IHasCurrentValue<double>
