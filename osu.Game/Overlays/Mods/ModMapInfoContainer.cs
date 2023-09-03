@@ -50,6 +50,7 @@ namespace osu.Game.Overlays.Mods
             const float corner_radius = 7;
             const float border_thickness = 2;
 
+            AutoSizeAxes = Axes.Both;
             InternalChild = content = new InputBlockingContainer
             {
                 Origin = Anchor.BottomRight,
