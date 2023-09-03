@@ -353,7 +353,6 @@ namespace osu.Game.Online.Multiplayer
                 return;
 
 
-            Logger.Log($"User in State {localUser.State}");
             switch (localUser.State)
             {
                 case MultiplayerUserState.Idle:
