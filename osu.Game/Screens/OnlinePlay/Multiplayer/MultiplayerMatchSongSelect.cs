@@ -51,6 +51,8 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
         {
             base.LoadComplete();
 
+            client.ToggleChoosingMap().FireAndForget();
+
             operationInProgress.BindTo(operationTracker.InProgress);
             operationInProgress.BindValueChanged(_ => updateLoadingLayer(), true);
         }
@@ -108,6 +110,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
                         Carousel.AllowSelection = true;
                     });
                 });
+                client.ToggleChoosingMap().FireAndForget();
             }
             else
             {

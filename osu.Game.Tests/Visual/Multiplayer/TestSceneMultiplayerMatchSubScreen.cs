@@ -286,6 +286,27 @@ namespace osu.Game.Tests.Visual.Multiplayer
             });
         }
 
+        [Test]
+        [FlakyTest] // See above
+        public void TestMapChoosingState()
+        {
+            AddStep("add playlist item with no allowed mods", () =>
+            {
+                SelectedRoom.Value.Playlist.Add(new PlaylistItem(new TestBeatmap(new OsuRuleset().RulesetInfo).BeatmapInfo)
+                {
+                    RulesetID = new OsuRuleset().RulesetInfo.OnlineID,
+                });
+            });
+
+            ClickButtonWhenEnabled<MultiplayerMatchSettingsOverlay.CreateOrUpdateButton>();
+
+            AddUntilStep("wait for join", () => RoomJoined);
+
+            ClickButtonWhenEnabled<MultiplayerMatchSubScreen.AddItemButton>();
+
+            AddUntilStep("wait for state", () => MultiplayerClient.LocalUser?.State == MultiplayerUserState.ChoosingMap);
+        }
+
         private partial class TestMultiplayerMatchSubScreen : MultiplayerMatchSubScreen
         {
             [Resolved(canBeNull: true)]

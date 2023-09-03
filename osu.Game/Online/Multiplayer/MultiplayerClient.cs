@@ -342,6 +342,34 @@ namespace osu.Game.Online.Multiplayer
             }
         }
 
+        /// <summary>
+        /// Toggles the <see cref="LocalUser"/>'s map choosing state.
+        /// </summary>
+        public async Task ToggleChoosingMap()
+        {
+            var localUser = LocalUser;
+
+            if (localUser == null)
+                return;
+
+
+            Logger.Log($"User in State {localUser.State}");
+            switch (localUser.State)
+            {
+                case MultiplayerUserState.Idle:
+                case MultiplayerUserState.Ready:
+                    await ChangeState(MultiplayerUserState.ChoosingMap).ConfigureAwait(false);
+                    return;
+
+                case MultiplayerUserState.ChoosingMap:
+                    await ChangeState(MultiplayerUserState.Idle).ConfigureAwait(false);
+                    return;
+
+                default:
+                    throw new InvalidOperationException($"Cannot toggle choosing map when in {localUser.State}");
+            }
+        }
+
         public abstract Task TransferHost(int userId);
 
         public abstract Task KickUser(int userId);

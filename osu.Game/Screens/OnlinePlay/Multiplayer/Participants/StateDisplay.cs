@@ -141,6 +141,12 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Participants
                     icon.Colour = colours.BlueLight;
                     break;
 
+                case MultiplayerUserState.ChoosingMap:
+                    text.Text = "choosing map";
+                    icon.Icon = FontAwesome.Solid.Music;
+                    icon.Colour = colours.PurpleLight;
+                    break;
+
                 default:
                     throw new ArgumentOutOfRangeException(nameof(state), state, null);
             }

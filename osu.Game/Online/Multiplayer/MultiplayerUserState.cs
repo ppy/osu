@@ -65,6 +65,11 @@ namespace osu.Game.Online.Multiplayer
         /// <summary>
         /// The user is currently spectating this room.
         /// </summary>
-        Spectating
+        Spectating,
+
+        /// <summary>
+        /// The user is currently choosing a map.
+        /// </summary>
+        ChoosingMap
     }
 }
