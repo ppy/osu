@@ -505,6 +505,54 @@ namespace osu.Game.Rulesets.Osu.Tests
             addClickActionAssert(0, ClickAction.Shake);
         }
 
+        [Test]
+        public void TestInputDoesNotFallThroughOverlappingSliders()
+        {
+            const double time_first_slider = 1000;
+            const double time_second_slider = 1250;
+            Vector2 positionFirstSlider = new Vector2(100, 50);
+            Vector2 positionSecondSlider = new Vector2(100, 80);
+            var midpoint = (positionFirstSlider + positionSecondSlider) / 2;
+
+            var hitObjects = new List<OsuHitObject>
+            {
+                new Slider
+                {
+                    StartTime = time_first_slider,
+                    Position = positionFirstSlider,
+                    Path = new SliderPath(PathType.Linear, new[]
+                    {
+                        Vector2.Zero,
+                        new Vector2(25, 0),
+                    })
+                },
+                new Slider
+                {
+                    StartTime = time_second_slider,
+                    Position = positionSecondSlider,
+                    Path = new SliderPath(PathType.Linear, new[]
+                    {
+                        Vector2.Zero,
+                        new Vector2(25, 0),
+                    })
+                }
+            };
+
+            performTest(hitObjects, new List<ReplayFrame>
+            {
+                new OsuReplayFrame { Time = time_first_slider, Position = midpoint, Actions = { OsuAction.RightButton } },
+                new OsuReplayFrame { Time = time_first_slider + 25, Position = midpoint, Actions = { OsuAction.LeftButton } },
+                new OsuReplayFrame { Time = time_first_slider + 50, Position = midpoint },
+            });
+
+            addJudgementAssert(hitObjects[0], HitResult.Ok);
+            addJudgementOffsetAssert("first slider head", () => ((Slider)hitObjects[0]).HeadCircle, 0);
+            addJudgementAssert(hitObjects[1], HitResult.Miss);
+            // the slider head of the first slider prevents the second slider's head from being hit, so the judgement offset should be very late.
+            addJudgementOffsetAssert("second slider head", () => ((Slider)hitObjects[1]).HeadCircle, referenceHitWindows.WindowFor(HitResult.Meh));
+            addClickActionAssert(0, ClickAction.Hit);
+        }
+
         private void addJudgementAssert(OsuHitObject hitObject, HitResult result)
         {
             AddAssert($"({hitObject.GetType().ReadableName()} @ {hitObject.StartTime}) judgement is {result}",
@@ -521,6 +569,12 @@ namespace osu.Game.Rulesets.Osu.Tests
         {
             AddAssert($"({hitObject.GetType().ReadableName()} @ {hitObject.StartTime}) judged at {offset}",
                 () => judgementResults.Single(r => r.HitObject == hitObject).TimeOffset, () => Is.EqualTo(offset).Within(50));
+        }
+
+        private void addJudgementOffsetAssert(string name, Func<OsuHitObject?> hitObject, double offset)
+        {
+            AddAssert($"{name} @ judged at {offset}",
+                () => judgementResults.Single(r => r.HitObject == hitObject()).TimeOffset, () => Is.EqualTo(offset).Within(50));
         }
 
         private void addClickActionAssert(int inputIndex, ClickAction action)
