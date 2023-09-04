@@ -280,15 +280,14 @@ namespace osu.Game.Screens.Select
                         RelativeSizeAxes = Axes.X,
                         Children = new Drawable[]
                         {
-                            TitleLabel = new OsuSpriteText
+                            TitleLabel = new TruncatingSpriteText
                             {
                                 Shadow = true,
                                 Current = { BindTarget = titleBinding },
                                 Font = OsuFont.TorusAlternate.With(size: 40, weight: FontWeight.SemiBold),
                                 RelativeSizeAxes = Axes.X,
-                                Truncate = true
                             },
-                            ArtistLabel = new OsuSpriteText
+                            ArtistLabel = new TruncatingSpriteText
                             {
                                 // TODO : figma design has a diffused shadow, instead of the solid one present here, not possible currently as far as i'm aware.
                                 Shadow = true,
@@ -296,7 +295,6 @@ namespace osu.Game.Screens.Select
                                 // Not sure if this should be semi bold or medium
                                 Font = OsuFont.Torus.With(size: 20, weight: FontWeight.SemiBold),
                                 RelativeSizeAxes = Axes.X,
-                                Truncate = true
                             }
                         }
                     }
