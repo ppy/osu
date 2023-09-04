@@ -4,6 +4,7 @@
     <OutputType>Library</OutputType>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
     <Description>click the circles. to the beat.</Description>
+    <LangVersion>10</LangVersion>
   </PropertyGroup>
 
   <PropertyGroup Label="Nuget">

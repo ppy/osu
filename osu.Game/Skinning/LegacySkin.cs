@@ -22,6 +22,7 @@ using osu.Game.Rulesets.Objects.Types;
 using osu.Game.Rulesets.Scoring;
 using osu.Game.Screens.Play.HUD;
 using osu.Game.Screens.Play.HUD.HitErrorMeters;
+using osuTK;
 using osuTK.Graphics;
 
 namespace osu.Game.Skinning
@@ -138,6 +139,10 @@ namespace osu.Game.Skinning
                     Debug.Assert(maniaLookup.ColumnIndex != null);
                     return SkinUtils.As<TValue>(new Bindable<float>(existing.ColumnWidth[maniaLookup.ColumnIndex.Value]));
 
+                case LegacyManiaSkinConfigurationLookups.WidthForNoteHeightScale:
+                    Debug.Assert(maniaLookup.ColumnIndex != null);
+                    return SkinUtils.As<TValue>(new Bindable<float>(existing.WidthForNoteHeightScale));
+
                 case LegacyManiaSkinConfigurationLookups.ColumnSpacing:
                     Debug.Assert(maniaLookup.ColumnIndex != null);
                     return SkinUtils.As<TValue>(new Bindable<float>(existing.ColumnSpacing[maniaLookup.ColumnIndex.Value]));
@@ -184,6 +189,16 @@ namespace osu.Game.Skinning
 
                 case LegacyManiaSkinConfigurationLookups.MinimumColumnWidth:
                     return SkinUtils.As<TValue>(new Bindable<float>(existing.MinimumColumnWidth));
+
+                case LegacyManiaSkinConfigurationLookups.NoteBodyStyle:
+
+                    if (existing.NoteBodyStyle != null)
+                        return SkinUtils.As<TValue>(new Bindable<LegacyNoteBodyStyle>(existing.NoteBodyStyle.Value));
+
+                    if (GetConfig<SkinConfiguration.LegacySetting, decimal>(SkinConfiguration.LegacySetting.Version)?.Value < 2.5m)
+                        return SkinUtils.As<TValue>(new Bindable<LegacyNoteBodyStyle>(LegacyNoteBodyStyle.Stretch));
+
+                    return SkinUtils.As<TValue>(new Bindable<LegacyNoteBodyStyle>(LegacyNoteBodyStyle.RepeatBottom));
 
                 case LegacyManiaSkinConfigurationLookups.NoteImage:
                     Debug.Assert(maniaLookup.ColumnIndex != null);
@@ -329,11 +344,15 @@ namespace osu.Game.Skinning
 
             switch (lookup)
             {
-                case GlobalSkinComponentLookup target:
-                    switch (target.Lookup)
+                case SkinComponentsContainerLookup containerLookup:
+                    // Only handle global level defaults for now.
+                    if (containerLookup.Ruleset != null)
+                        return null;
+
+                    switch (containerLookup.Target)
                     {
-                        case GlobalSkinComponentLookup.LookupType.MainHUDComponents:
-                            var skinnableTargetWrapper = new SkinnableTargetComponentsContainer(container =>
+                        case SkinComponentsContainerLookup.TargetArea.MainHUDComponents:
+                            return new DefaultSkinComponentsContainer(container =>
                             {
                                 var score = container.OfType<LegacyScoreCounter>().FirstOrDefault();
                                 var accuracy = container.OfType<GameplayAccuracyCounter>().FirstOrDefault();
@@ -349,17 +368,27 @@ namespace osu.Game.Skinning
                                 {
                                     songProgress.Anchor = Anchor.TopRight;
                                     songProgress.Origin = Anchor.CentreRight;
-                                    songProgress.X = -accuracy.ScreenSpaceDeltaToParentSpace(accuracy.ScreenSpaceDrawQuad.Size).X - 10;
+                                    songProgress.X = -accuracy.ScreenSpaceDeltaToParentSpace(accuracy.ScreenSpaceDrawQuad.Size).X - 18;
                                     songProgress.Y = container.ToLocalSpace(accuracy.ScreenSpaceDrawQuad.TopLeft).Y + (accuracy.ScreenSpaceDeltaToParentSpace(accuracy.ScreenSpaceDrawQuad.Size).Y / 2);
                                 }
 
                                 var hitError = container.OfType<HitErrorMeter>().FirstOrDefault();
+                                var keyCounter = container.OfType<DefaultKeyCounterDisplay>().FirstOrDefault();
 
                                 if (hitError != null)
                                 {
                                     hitError.Anchor = Anchor.BottomCentre;
                                     hitError.Origin = Anchor.CentreLeft;
                                     hitError.Rotation = -90;
+
+                                    if (keyCounter != null)
+                                    {
+                                        const float padding = 10;
+
+                                        keyCounter.Anchor = Anchor.BottomRight;
+                                        keyCounter.Origin = Anchor.BottomRight;
+                                        keyCounter.Position = new Vector2(-padding, -(padding + hitError.Width));
+                                    }
                                 }
                             })
                             {
@@ -368,13 +397,12 @@ namespace osu.Game.Skinning
                                     new LegacyComboCounter(),
                                     new LegacyScoreCounter(),
                                     new LegacyAccuracyCounter(),
-                                    new LegacyHealthDisplay(),
                                     new LegacySongProgress(),
+                                    new LegacyHealthDisplay(),
                                     new BarHitErrorMeter(),
+                                    new DefaultKeyCounterDisplay()
                                 }
                             };
-
-                            return skinnableTargetWrapper;
                     }
 
                     return null;
@@ -440,6 +468,13 @@ namespace osu.Game.Skinning
 
         public override Texture? GetTexture(string componentName, WrapMode wrapModeS, WrapMode wrapModeT)
         {
+            switch (componentName)
+            {
+                case "Menu/fountain-star":
+                    componentName = "star2";
+                    break;
+            }
+
             foreach (string name in getFallbackNames(componentName))
             {
                 // some component names (especially user-controlled ones, like `HitX` in mania)

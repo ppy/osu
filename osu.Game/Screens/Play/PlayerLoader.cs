@@ -15,15 +15,18 @@ using osu.Framework.Graphics.Transforms;
 using osu.Framework.Input;
 using osu.Framework.Screens;
 using osu.Framework.Threading;
+using osu.Game.Audio;
 using osu.Game.Audio.Effects;
 using osu.Game.Configuration;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
 using osu.Game.Input;
+using osu.Game.Localisation;
 using osu.Game.Overlays;
 using osu.Game.Overlays.Notifications;
 using osu.Game.Screens.Menu;
 using osu.Game.Screens.Play.PlayerSettings;
+using osu.Game.Skinning;
 using osu.Game.Users;
 using osu.Game.Utils;
 using osuTK;
@@ -42,6 +45,8 @@ namespace osu.Game.Screens.Play
         public override bool HideOverlaysOnEnter => hideOverlays;
 
         public override bool DisallowExternalBeatmapRulesetChanges => true;
+
+        public override bool? AllowGlobalTrackControl => false;
 
         // Here because IsHovered will not update unless we do so.
         public override bool HandlePositionalInput => true;
@@ -66,12 +71,16 @@ namespace osu.Game.Screens.Play
 
         private OsuScrollContainer settingsScroll = null!;
 
+        private Bindable<bool> showStoryboards = null!;
+
         private bool backgroundBrightnessReduction;
 
         private readonly BindableDouble volumeAdjustment = new BindableDouble(1);
 
         private AudioFilter lowPassFilter = null!;
         private AudioFilter highPassFilter = null!;
+
+        private SkinnableSound sampleRestart = null!;
 
         [Cached]
         private OverlayColourProvider colourProvider = new OverlayColourProvider(OverlayColourScheme.Purple);
@@ -130,16 +139,16 @@ namespace osu.Game.Screens.Play
 
         private bool quickRestart;
 
-        [Resolved(CanBeNull = true)]
+        [Resolved]
         private INotificationOverlay? notificationOverlay { get; set; }
 
-        [Resolved(CanBeNull = true)]
+        [Resolved]
         private VolumeOverlay? volumeOverlay { get; set; }
 
         [Resolved]
         private AudioManager audioManager { get; set; } = null!;
 
-        [Resolved(CanBeNull = true)]
+        [Resolved]
         private BatteryInfo? batteryInfo { get; set; }
 
         public PlayerLoader(Func<Player> createPlayer)
@@ -148,10 +157,11 @@ namespace osu.Game.Screens.Play
         }
 
         [BackgroundDependencyLoader]
-        private void load(SessionStatics sessionStatics, AudioManager audio)
+        private void load(SessionStatics sessionStatics, AudioManager audio, OsuConfigManager config)
         {
             muteWarningShownOnce = sessionStatics.GetBindable<bool>(Static.MutedAudioNotificationShownOnce);
             batteryWarningShownOnce = sessionStatics.GetBindable<bool>(Static.LowBatteryNotificationShownOnce);
+            showStoryboards = config.GetBindable<bool>(OsuSetting.ShowStoryboard);
 
             const float padding = 25;
 
@@ -195,7 +205,8 @@ namespace osu.Game.Screens.Play
                 },
                 idleTracker = new IdleTracker(750),
                 lowPassFilter = new AudioFilter(audio.TrackMixer),
-                highPassFilter = new AudioFilter(audio.TrackMixer, BQFType.HighPass)
+                highPassFilter = new AudioFilter(audio.TrackMixer, BQFType.HighPass),
+                sampleRestart = new SkinnableSound(new SampleInfo(@"Gameplay/restart", @"pause-retry-click"))
             };
 
             if (Beatmap.Value.BeatmapInfo.EpilepsyWarning)
@@ -260,6 +271,8 @@ namespace osu.Game.Screens.Play
             CurrentPlayer = null;
             playerConsumed = false;
             cancelLoad();
+
+            sampleRestart.Play();
 
             contentIn();
         }
@@ -416,7 +429,7 @@ namespace osu.Game.Screens.Play
             lowPassFilter.CutoffTo(1000, 650, Easing.OutQuint);
             highPassFilter.CutoffTo(300).Then().CutoffTo(0, 1250); // 1250 is to line up with the appearance of MetadataInfo (750 delay + 500 fade-in)
 
-            ApplyToBackground(b => b?.FadeColour(Color4.White, 800, Easing.OutQuint));
+            ApplyToBackground(b => b.FadeColour(Color4.White, 800, Easing.OutQuint));
         }
 
         protected virtual void ContentOut()
@@ -462,7 +475,10 @@ namespace osu.Game.Screens.Play
 
                 // only show if the warning was created (i.e. the beatmap needs it)
                 // and this is not a restart of the map (the warning expires after first load).
-                if (epilepsyWarning?.IsAlive == true)
+                //
+                // note the late check of storyboard enable as the user may have just changed it
+                // from the settings on the loader screen.
+                if (epilepsyWarning?.IsAlive == true && showStoryboards.Value)
                 {
                     const double epilepsy_display_length = 3000;
 
@@ -482,6 +498,7 @@ namespace osu.Game.Screens.Play
                 {
                     // This goes hand-in-hand with the restoration of low pass filter in contentOut().
                     this.TransformBindableTo(volumeAdjustment, 0, CONTENT_OUT_DURATION, Easing.OutCubic);
+                    epilepsyWarning?.Expire();
                 }
 
                 pushSequence.Schedule(() =>
@@ -550,7 +567,7 @@ namespace osu.Game.Screens.Play
 
             public MutedNotification()
             {
-                Text = "Your game volume is too low to hear anything! Click here to restore it.";
+                Text = NotificationsStrings.GameVolumeTooLow;
             }
 
             [BackgroundDependencyLoader]
@@ -605,7 +622,7 @@ namespace osu.Game.Screens.Play
 
             public BatteryWarningNotification()
             {
-                Text = "Your battery level is low! Charge your device to prevent interruptions during gameplay.";
+                Text = NotificationsStrings.BatteryLow;
             }
 
             [BackgroundDependencyLoader]

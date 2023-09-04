@@ -7,6 +7,5 @@ namespace osu.Game.Rulesets.Osu.Mods
 {
     public class OsuModHalfTime : ModHalfTime
     {
-        public override double ScoreMultiplier => 0.3;
     }
 }

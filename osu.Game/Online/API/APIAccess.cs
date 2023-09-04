@@ -18,6 +18,7 @@ using osu.Framework.Extensions.ObjectExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Logging;
 using osu.Game.Configuration;
+using osu.Game.Localisation;
 using osu.Game.Online.API.Requests;
 using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Online.Notifications;
@@ -28,6 +29,7 @@ namespace osu.Game.Online.API
 {
     public partial class APIAccess : Component, IAPIProvider
     {
+        private readonly OsuGameBase game;
         private readonly OsuConfigManager config;
 
         private readonly string versionHash;
@@ -52,6 +54,8 @@ namespace osu.Game.Online.API
         public IBindableList<APIUser> Friends => friends;
         public IBindable<UserActivity> Activity => activity;
 
+        public Language Language => game.CurrentLanguage.Value;
+
         private Bindable<APIUser> localUser { get; } = new Bindable<APIUser>(createGuestUser());
 
         private BindableList<APIUser> friends { get; } = new BindableList<APIUser>();
@@ -64,8 +68,9 @@ namespace osu.Game.Online.API
 
         private readonly Logger log;
 
-        public APIAccess(OsuConfigManager config, EndpointConfiguration endpointConfiguration, string versionHash)
+        public APIAccess(OsuGameBase game, OsuConfigManager config, EndpointConfiguration endpointConfiguration, string versionHash)
         {
+            this.game = game;
             this.config = config;
             this.versionHash = versionHash;
 
@@ -329,12 +334,35 @@ namespace osu.Game.Online.API
             {
                 try
                 {
-                    return JObject.Parse(req.GetResponseString().AsNonNull()).SelectToken("form_error", true).AsNonNull().ToObject<RegistrationRequest.RegistrationRequestErrors>();
+                    return JObject.Parse(req.GetResponseString().AsNonNull()).SelectToken(@"form_error", true).AsNonNull().ToObject<RegistrationRequest.RegistrationRequestErrors>();
                 }
                 catch
                 {
-                    // if we couldn't deserialize the error message let's throw the original exception outwards.
-                    e.Rethrow();
+                    try
+                    {
+                        // attempt to parse a non-form error message
+                        var response = JObject.Parse(req.GetResponseString().AsNonNull());
+
+                        string redirect = (string)response.SelectToken(@"url", true);
+                        string message = (string)response.SelectToken(@"error", false);
+
+                        if (!string.IsNullOrEmpty(redirect))
+                        {
+                            return new RegistrationRequest.RegistrationRequestErrors
+                            {
+                                Redirect = redirect,
+                                Message = message,
+                            };
+                        }
+
+                        // if we couldn't deserialize the error message let's throw the original exception outwards.
+                        e.Rethrow();
+                    }
+                    catch
+                    {
+                        // if we couldn't deserialize the error message let's throw the original exception outwards.
+                        e.Rethrow();
+                    }
                 }
             }
 

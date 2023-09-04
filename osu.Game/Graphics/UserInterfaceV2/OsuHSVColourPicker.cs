@@ -1,9 +1,6 @@
-// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
-using JetBrains.Annotations;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
@@ -26,7 +23,7 @@ namespace osu.Game.Graphics.UserInterfaceV2
         protected override SaturationValueSelector CreateSaturationValueSelector() => new OsuSaturationValueSelector();
 
         [BackgroundDependencyLoader(true)]
-        private void load([CanBeNull] OverlayColourProvider colourProvider, OsuColour osuColour)
+        private void load(OverlayColourProvider? colourProvider, OsuColour osuColour)
         {
             Background.Colour = colourProvider?.Dark5 ?? osuColour.GreySeaFoamDark;
 

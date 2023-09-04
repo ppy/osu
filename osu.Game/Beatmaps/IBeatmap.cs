@@ -1,7 +1,5 @@
-// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
-
-#nullable disable
 
 using System.Collections.Generic;
 using System.Linq;
@@ -105,6 +103,24 @@ namespace osu.Game.Beatmaps
         }
 
         /// <summary>
+        /// Find the total milliseconds between the first and last hittable objects.
+        /// </summary>
+        /// <remarks>
+        /// This is cached to <see cref="BeatmapInfo.Length"/>, so using that is preferable when available.
+        /// </remarks>
+        public static double CalculatePlayableLength(this IBeatmap beatmap) => CalculatePlayableLength(beatmap.HitObjects);
+
+        /// <summary>
+        /// Find the total milliseconds between the first and last hittable objects, excluding any break time.
+        /// </summary>
+        public static double CalculateDrainLength(this IBeatmap beatmap) => CalculatePlayableLength(beatmap.HitObjects) - beatmap.TotalBreakTime;
+
+        /// <summary>
+        /// Find the timestamps in milliseconds of the start and end of the playable region.
+        /// </summary>
+        public static (double start, double end) CalculatePlayableBounds(this IBeatmap beatmap) => CalculatePlayableBounds(beatmap.HitObjects);
+
+        /// <summary>
         /// Find the absolute end time of the latest <see cref="HitObject"/> in a beatmap. Will throw if beatmap contains no objects.
         /// </summary>
         /// <remarks>
@@ -114,5 +130,36 @@ namespace osu.Game.Beatmaps
         /// It's not super efficient so calls should be kept to a minimum.
         /// </remarks>
         public static double GetLastObjectTime(this IBeatmap beatmap) => beatmap.HitObjects.Max(h => h.GetEndTime());
+
+        #region Helper methods
+
+        /// <summary>
+        /// Find the total milliseconds between the first and last hittable objects.
+        /// </summary>
+        /// <remarks>
+        /// This is cached to <see cref="BeatmapInfo.Length"/>, so using that is preferable when available.
+        /// </remarks>
+        public static double CalculatePlayableLength(IEnumerable<HitObject> objects)
+        {
+            (double start, double end) = CalculatePlayableBounds(objects);
+
+            return end - start;
+        }
+
+        /// <summary>
+        /// Find the timestamps in milliseconds of the start and end of the playable region.
+        /// </summary>
+        public static (double start, double end) CalculatePlayableBounds(IEnumerable<HitObject> objects)
+        {
+            if (!objects.Any())
+                return (0, 0);
+
+            double lastObjectTime = objects.Max(o => o.GetEndTime());
+            double firstObjectTime = objects.First().StartTime;
+
+            return (firstObjectTime, lastObjectTime);
+        }
+
+        #endregion
     }
 }

@@ -1,7 +1,5 @@
-// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
-
-#nullable disable
 
 using System;
 using System.Collections.Generic;
@@ -45,6 +43,9 @@ namespace osu.Game.Rulesets.Objects
         private readonly Cached pathCache = new Cached();
 
         private double calculatedLength;
+
+        private readonly List<int> segmentEnds = new List<int>();
+        private double[] segmentEndDistances = Array.Empty<double>();
 
         /// <summary>
         /// Creates a new <see cref="SliderPath"/>.
@@ -196,6 +197,31 @@ namespace osu.Game.Rulesets.Objects
             return pointsInCurrentSegment;
         }
 
+        /// <summary>
+        /// Returns the progress values at which (control point) segments of the path end.
+        /// Ranges from 0 (beginning of the path) to 1 (end of the path) to infinity (beyond the end of the path).
+        /// </summary>
+        /// <remarks>
+        /// <see cref="PositionAt"/> truncates the progression values to [0,1],
+        /// so you can't use this method in conjunction with that one to retrieve the positions of segment ends beyond the end of the path.
+        /// </remarks>
+        /// <example>
+        /// <para>
+        /// In case <see cref="Distance"/> is less than <see cref="CalculatedDistance"/>,
+        /// the last segment ends after the end of the path, hence it returns a value greater than 1.
+        /// </para>
+        /// <para>
+        /// In case <see cref="Distance"/> is greater than <see cref="CalculatedDistance"/>,
+        /// the last segment ends before the end of the path, hence it returns a value less than 1.
+        /// </para>
+        /// </example>
+        public IEnumerable<double> GetSegmentEnds()
+        {
+            ensureValid();
+
+            return segmentEndDistances.Select(d => d / Distance);
+        }
+
         private void invalidate()
         {
             pathCache.Invalidate();
@@ -216,6 +242,7 @@ namespace osu.Game.Rulesets.Objects
         private void calculatePath()
         {
             calculatedPath.Clear();
+            segmentEnds.Clear();
 
             if (ControlPoints.Count == 0)
                 return;
@@ -239,6 +266,12 @@ namespace osu.Game.Rulesets.Objects
                 {
                     if (calculatedPath.Count == 0 || calculatedPath.Last() != t)
                         calculatedPath.Add(t);
+                }
+
+                if (i > 0)
+                {
+                    // Remember the index of the segment end
+                    segmentEnds.Add(calculatedPath.Count - 1);
                 }
 
                 // Start the new segment at the current vertex
@@ -283,6 +316,14 @@ namespace osu.Game.Rulesets.Objects
                 Vector2 diff = calculatedPath[i + 1] - calculatedPath[i];
                 calculatedLength += diff.Length;
                 cumulativeLength.Add(calculatedLength);
+            }
+
+            // Store the distances of the segment ends now, because after shortening the indices may be out of range
+            segmentEndDistances = new double[segmentEnds.Count];
+
+            for (int i = 0; i < segmentEnds.Count; i++)
+            {
+                segmentEndDistances[i] = cumulativeLength[segmentEnds[i]];
             }
 
             if (ExpectedDistance.Value is double expectedDistance && calculatedLength != expectedDistance)

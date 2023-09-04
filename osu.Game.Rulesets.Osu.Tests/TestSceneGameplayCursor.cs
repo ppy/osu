@@ -8,6 +8,7 @@ using NUnit.Framework;
 using osu.Framework.Allocation;
 using osu.Framework.Audio.Sample;
 using osu.Framework.Bindables;
+using osu.Framework.Extensions.ObjectExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
@@ -18,6 +19,7 @@ using osu.Framework.Testing.Input;
 using osu.Framework.Utils;
 using osu.Game.Audio;
 using osu.Game.Configuration;
+using osu.Game.Rulesets.Osu.Configuration;
 using osu.Game.Rulesets.Osu.Skinning;
 using osu.Game.Rulesets.Osu.UI.Cursor;
 using osu.Game.Screens.Play;
@@ -40,6 +42,8 @@ namespace osu.Game.Rulesets.Osu.Tests
 
         private Drawable background;
 
+        private readonly Bindable<bool> ripples = new Bindable<bool>();
+
         public TestSceneGameplayCursor()
         {
             var ruleset = new OsuRuleset();
@@ -57,6 +61,8 @@ namespace osu.Game.Rulesets.Osu.Tests
                 });
             });
 
+            AddToggleStep("ripples", v => ripples.Value = v);
+
             AddSliderStep("circle size", 0f, 10f, 0f, val =>
             {
                 config.SetValue(OsuSetting.AutoCursorSize, true);
@@ -65,6 +71,13 @@ namespace osu.Game.Rulesets.Osu.Tests
             });
 
             AddStep("test cursor container", () => loadContent(false));
+        }
+
+        [BackgroundDependencyLoader]
+        private void load()
+        {
+            var rulesetConfig = (OsuRulesetConfigManager)RulesetConfigs.GetConfigFor(Ruleset.Value.CreateInstance()).AsNonNull();
+            rulesetConfig.BindWith(OsuRulesetSetting.ShowCursorRipples, ripples);
         }
 
         [TestCase(1, 1)]

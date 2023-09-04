@@ -1,8 +1,6 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
 using osu.Framework.Graphics.Containers;
 using osu.Game.Overlays;
 using osu.Framework.Graphics;
@@ -108,7 +106,7 @@ namespace osu.Game.Tests.Visual.UserInterface
 
             protected override OverlayTitle CreateTitle() => new TestTitle();
 
-            protected override Drawable CreateTitleContent() => new OverlayRulesetSelector();
+            protected override Drawable CreateTabControlContent() => new OverlayRulesetSelector();
 
             public TestStringTabControlHeader()
             {

@@ -234,6 +234,10 @@ namespace osu.Game.Online.API.Requests.Responses
             set => Statistics.RankHistory = value;
         }
 
+        [JsonProperty(@"active_tournament_banner")]
+        [CanBeNull]
+        public TournamentBanner TournamentBanner;
+
         [JsonProperty("badges")]
         public Badge[] Badges;
 
@@ -254,6 +258,9 @@ namespace osu.Game.Online.API.Requests.Responses
         [JsonProperty("statistics_rulesets")]
         [CanBeNull]
         public Dictionary<string, UserStatistics> RulesetsStatistics { get; set; }
+
+        [JsonProperty("groups")]
+        public APIUserGroup[] Groups;
 
         public override string ToString() => Username;
 

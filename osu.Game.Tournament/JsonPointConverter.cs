@@ -1,8 +1,6 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
 using System;
 using System.Diagnostics;
 using System.Drawing;
@@ -28,7 +26,7 @@ namespace osu.Game.Tournament
             if (reader.TokenType != JsonToken.StartObject)
             {
                 // if there's no object present then this is using string representation (System.Drawing.Point serializes to "x,y")
-                string str = (string)reader.Value;
+                string? str = (string?)reader.Value;
 
                 Debug.Assert(str != null);
 
@@ -45,8 +43,11 @@ namespace osu.Game.Tournament
 
                 if (reader.TokenType == JsonToken.PropertyName)
                 {
-                    string name = reader.Value?.ToString();
+                    string? name = reader.Value?.ToString();
                     int? val = reader.ReadAsInt32();
+
+                    if (name == null)
+                        continue;
 
                     if (val == null)
                         continue;

@@ -1,7 +1,5 @@
-// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
-
-#nullable disable
 
 using System;
 using System.Collections.Generic;
@@ -27,9 +25,12 @@ namespace osu.Game.Rulesets.Taiko.Difficulty
 
         public override int Version => 20220902;
 
+        private readonly IWorkingBeatmap workingBeatmap;
+
         public TaikoDifficultyCalculator(IRulesetInfo ruleset, IWorkingBeatmap beatmap)
             : base(ruleset, beatmap)
         {
+            workingBeatmap = beatmap;
         }
 
         protected override Skill[] CreateSkills(IBeatmap beatmap, Mod[] mods, double clockRate)
@@ -86,7 +87,7 @@ namespace osu.Game.Rulesets.Taiko.Difficulty
             HitWindows hitWindows = new TaikoHitWindows();
             hitWindows.SetDifficulty(beatmap.Difficulty.OverallDifficulty);
 
-            return new TaikoDifficultyAttributes
+            TaikoDifficultyAttributes attributes = new TaikoDifficultyAttributes
             {
                 StarRating = starRating,
                 Mods = mods,
@@ -97,6 +98,17 @@ namespace osu.Game.Rulesets.Taiko.Difficulty
                 GreatHitWindow = hitWindows.WindowFor(HitResult.Great) / clockRate,
                 MaxCombo = beatmap.HitObjects.Count(h => h is Hit),
             };
+
+            if (ComputeLegacyScoringValues)
+            {
+                TaikoLegacyScoreSimulator sv1Simulator = new TaikoLegacyScoreSimulator();
+                sv1Simulator.Simulate(workingBeatmap, beatmap, mods);
+                attributes.LegacyAccuracyScore = sv1Simulator.AccuracyScore;
+                attributes.LegacyComboScore = sv1Simulator.ComboScore;
+                attributes.LegacyBonusScoreRatio = sv1Simulator.BonusScoreRatio;
+            }
+
+            return attributes;
         }
 
         /// <summary>

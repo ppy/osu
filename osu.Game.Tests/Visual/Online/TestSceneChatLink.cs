@@ -89,6 +89,7 @@ namespace osu.Game.Tests.Visual.Online
             addMessageWithChecks($"Join my {OsuGameBase.OSU_PROTOCOL}chan/#english.", 1, expectedActions: LinkAction.OpenChannel);
             addMessageWithChecks("Join my #english or #japanese channels.", 2, expectedActions: new[] { LinkAction.OpenChannel, LinkAction.OpenChannel });
             addMessageWithChecks("Join my #english or #nonexistent #hashtag channels.", 1, expectedActions: LinkAction.OpenChannel);
+            addMessageWithChecks("Hello world\uD83D\uDE12(<--This is an emoji). There are more:\uD83D\uDE10\uD83D\uDE00,\uD83D\uDE20");
 
             void addMessageWithChecks(string text, int linkAmount = 0, bool isAction = false, bool isImportant = false, params LinkAction[] expectedActions)
             {

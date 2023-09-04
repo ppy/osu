@@ -91,8 +91,9 @@ namespace osu.Game.Rulesets.Taiko.Tests.Skinning
         {
             prepareDrawableRulesetAndBeatmap(false);
 
-            assertStateAfterResult(new JudgementResult(new Hit(), new TaikoJudgement()) { Type = HitResult.Great }, TaikoMascotAnimationState.Idle);
-            assertStateAfterResult(new JudgementResult(new Hit.StrongNestedHit(), new TaikoStrongJudgement()) { Type = HitResult.IgnoreMiss }, TaikoMascotAnimationState.Idle);
+            var hit = new Hit();
+            assertStateAfterResult(new JudgementResult(hit, new TaikoJudgement()) { Type = HitResult.Great }, TaikoMascotAnimationState.Idle);
+            assertStateAfterResult(new JudgementResult(new Hit.StrongNestedHit(hit), new TaikoStrongJudgement()) { Type = HitResult.IgnoreMiss }, TaikoMascotAnimationState.Idle);
         }
 
         [Test]

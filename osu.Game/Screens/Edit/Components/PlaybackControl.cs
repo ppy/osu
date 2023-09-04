@@ -1,8 +1,6 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
 using System.Linq;
 using osuTK;
 using osuTK.Graphics;
@@ -18,6 +16,7 @@ using osu.Framework.Input.Events;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Graphics.UserInterface;
+using osu.Game.Localisation;
 using osu.Game.Overlays;
 using osuTK.Input;
 
@@ -25,10 +24,10 @@ namespace osu.Game.Screens.Edit.Components
 {
     public partial class PlaybackControl : BottomBarContainer
     {
-        private IconButton playButton;
+        private IconButton playButton = null!;
 
         [Resolved]
-        private EditorClock editorClock { get; set; }
+        private EditorClock editorClock { get; set; } = null!;
 
         private readonly BindableNumber<double> freqAdjust = new BindableDouble(1);
 
@@ -49,7 +48,7 @@ namespace osu.Game.Screens.Edit.Components
                 new OsuSpriteText
                 {
                     Origin = Anchor.BottomLeft,
-                    Text = "Playback speed",
+                    Text = EditorStrings.PlaybackSpeed,
                     RelativePositionAxes = Axes.Y,
                     Y = 0.5f,
                     Padding = new MarginPadding { Left = 45 }
@@ -77,6 +76,9 @@ namespace osu.Game.Screens.Edit.Components
 
         protected override bool OnKeyDown(KeyDownEvent e)
         {
+            if (e.Repeat)
+                return false;
+
             switch (e.Key)
             {
                 case Key.Space:
@@ -108,7 +110,7 @@ namespace osu.Game.Screens.Edit.Components
 
             protected override TabItem<double> CreateTabItem(double value) => new PlaybackTabItem(value);
 
-            protected override Dropdown<double> CreateDropdown() => null;
+            protected override Dropdown<double> CreateDropdown() => null!;
 
             public PlaybackTabControl()
             {

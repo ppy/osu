@@ -86,6 +86,7 @@ namespace osu.Game.Collections
                                 RelativeSizeAxes = Axes.Both,
                                 Size = Vector2.One,
                                 CornerRadius = item_height / 2,
+                                CommitOnFocusLost = true,
                                 PlaceholderText = collection.IsManaged ? string.Empty : "Create a new collection"
                             },
                         }
@@ -196,7 +197,7 @@ namespace osu.Game.Collections
                 return true;
             }
 
-            private void deleteCollection() => collection.PerformWrite(c => c.Realm.Remove(c));
+            private void deleteCollection() => collection.PerformWrite(c => c.Realm!.Remove(c));
         }
     }
 }

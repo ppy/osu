@@ -1,7 +1,5 @@
-// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
-
-#nullable disable
 
 using System;
 using System.Diagnostics;
@@ -21,19 +19,19 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
     public partial class TimelineTickDisplay : TimelinePart<PointVisualisation>
     {
         [Resolved]
-        private EditorBeatmap beatmap { get; set; }
+        private EditorBeatmap beatmap { get; set; } = null!;
 
         [Resolved]
-        private Bindable<WorkingBeatmap> working { get; set; }
+        private Bindable<WorkingBeatmap> working { get; set; } = null!;
 
         [Resolved]
-        private BindableBeatDivisor beatDivisor { get; set; }
-
-        [Resolved(CanBeNull = true)]
-        private IEditorChangeHandler changeHandler { get; set; }
+        private BindableBeatDivisor beatDivisor { get; set; } = null!;
 
         [Resolved]
-        private OsuColour colours { get; set; }
+        private IEditorChangeHandler? changeHandler { get; set; }
+
+        [Resolved]
+        private OsuColour colours { get; set; } = null!;
 
         public TimelineTickDisplay()
         {
@@ -72,8 +70,8 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
         /// </summary>
         private float? nextMaxTick;
 
-        [Resolved(canBeNull: true)]
-        private Timeline timeline { get; set; }
+        [Resolved]
+        private Timeline? timeline { get; set; }
 
         protected override void Update()
         {

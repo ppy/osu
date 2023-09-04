@@ -2,7 +2,6 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
-using System.Diagnostics;
 using osu.Framework.Allocation;
 using osu.Framework.Audio.Track;
 using osu.Framework.Graphics.Containers;
@@ -86,14 +85,12 @@ namespace osu.Game.Graphics.Containers
             TimingControlPoint timingPoint;
             EffectControlPoint effectPoint;
 
-            IsBeatSyncedWithTrack = BeatSyncSource.CheckBeatSyncAvailable() && BeatSyncSource.Clock?.IsRunning == true;
+            IsBeatSyncedWithTrack = BeatSyncSource.Clock.IsRunning;
 
             double currentTrackTime;
 
             if (IsBeatSyncedWithTrack)
             {
-                Debug.Assert(BeatSyncSource.Clock != null);
-
                 currentTrackTime = BeatSyncSource.Clock.CurrentTime + EarlyActivationMilliseconds;
 
                 timingPoint = BeatSyncSource.ControlPoints?.TimingPointAt(currentTrackTime) ?? TimingControlPoint.DEFAULT;
@@ -114,7 +111,7 @@ namespace osu.Game.Graphics.Containers
             while (beatLength < MinimumBeatLength)
                 beatLength *= 2;
 
-            int beatIndex = (int)((currentTrackTime - timingPoint.Time) / beatLength) - (effectPoint.OmitFirstBarLine ? 1 : 0);
+            int beatIndex = (int)((currentTrackTime - timingPoint.Time) / beatLength) - (timingPoint.OmitFirstBarLine ? 1 : 0);
 
             // The beats before the start of the first control point are off by 1, this should do the trick
             if (currentTrackTime < timingPoint.Time)

@@ -1,12 +1,9 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
+using System;
 using osu.Game.Rulesets.Judgements;
-using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Osu.Judgements;
-using osu.Game.Rulesets.Osu.Objects;
 using osu.Game.Rulesets.Scoring;
 
 namespace osu.Game.Rulesets.Osu.Scoring
@@ -18,21 +15,14 @@ namespace osu.Game.Rulesets.Osu.Scoring
         {
         }
 
-        protected override double ClassicScoreMultiplier => 36;
-
         protected override HitEvent CreateHitEvent(JudgementResult result)
             => base.CreateHitEvent(result).With((result as OsuHitCircleJudgementResult)?.CursorPositionAtHit);
 
-        protected override JudgementResult CreateResult(HitObject hitObject, Judgement judgement)
+        protected override double ComputeTotalScore(double comboProgress, double accuracyProgress, double bonusPortion)
         {
-            switch (hitObject)
-            {
-                case HitCircle:
-                    return new OsuHitCircleJudgementResult(hitObject, judgement);
-
-                default:
-                    return new OsuJudgementResult(hitObject, judgement);
-            }
+            return 700000 * comboProgress
+                   + 300000 * Math.Pow(Accuracy.Value, 10) * accuracyProgress
+                   + bonusPortion;
         }
     }
 }

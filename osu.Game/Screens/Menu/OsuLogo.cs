@@ -35,6 +35,12 @@ namespace osu.Game.Screens.Menu
 
         private const double transition_length = 300;
 
+        /// <summary>
+        /// The osu! logo sprite has a shadow included in its texture.
+        /// This adjustment vector is used to match the precise edge of the border of the logo.
+        /// </summary>
+        public static readonly Vector2 SCALE_ADJUST = new Vector2(0.96f);
+
         private readonly Sprite logo;
         private readonly CircularContainer logoContainer;
         private readonly Container logoBounceContainer;
@@ -150,7 +156,7 @@ namespace osu.Game.Screens.Menu
                                                     Origin = Anchor.Centre,
                                                     Anchor = Anchor.Centre,
                                                     Alpha = visualizer_default_alpha,
-                                                    Size = new Vector2(0.96f)
+                                                    Size = SCALE_ADJUST
                                                 },
                                                 new Container
                                                 {
@@ -162,7 +168,7 @@ namespace osu.Game.Screens.Menu
                                                             Anchor = Anchor.Centre,
                                                             Origin = Anchor.Centre,
                                                             RelativeSizeAxes = Axes.Both,
-                                                            Scale = new Vector2(0.88f),
+                                                            Scale = SCALE_ADJUST,
                                                             Masking = true,
                                                             Children = new Drawable[]
                                                             {
@@ -406,7 +412,7 @@ namespace osu.Game.Screens.Menu
         public void Impact()
         {
             impactContainer.FadeOutFromOne(250, Easing.In);
-            impactContainer.ScaleTo(0.96f);
+            impactContainer.ScaleTo(SCALE_ADJUST);
             impactContainer.ScaleTo(1.12f, 250);
         }
 
@@ -428,6 +434,47 @@ namespace osu.Game.Screens.Menu
         {
             logoBounceContainer.MoveTo(Vector2.Zero, 800, Easing.OutElastic);
             base.OnDragEnd(e);
+        }
+
+        private Container defaultProxyTarget;
+        private Container currentProxyTarget;
+        private Drawable proxy;
+
+        public Drawable ProxyToContainer(Container c)
+        {
+            if (currentProxyTarget != null)
+                throw new InvalidOperationException("Previous proxy usage was not returned");
+
+            if (defaultProxyTarget == null)
+                throw new InvalidOperationException($"{nameof(SetupDefaultContainer)} must be called first");
+
+            currentProxyTarget = c;
+
+            defaultProxyTarget.Remove(proxy, false);
+            currentProxyTarget.Add(proxy);
+            return proxy;
+        }
+
+        public void ReturnProxy()
+        {
+            if (currentProxyTarget == null)
+                throw new InvalidOperationException("No usage to return");
+
+            if (defaultProxyTarget == null)
+                throw new InvalidOperationException($"{nameof(SetupDefaultContainer)} must be called first");
+
+            currentProxyTarget.Remove(proxy, false);
+            currentProxyTarget = null;
+
+            defaultProxyTarget.Add(proxy);
+        }
+
+        public void SetupDefaultContainer(Container container)
+        {
+            defaultProxyTarget = container;
+
+            defaultProxyTarget.Add(this);
+            defaultProxyTarget.Add(proxy = CreateProxy());
         }
     }
 }

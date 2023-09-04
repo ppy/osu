@@ -66,7 +66,7 @@ namespace osu.Game.Tests.Visual
             protected override bool CheckModsAllowFailure() => allowFail;
 
             public ModTestPlayer(ModTestData data, bool allowFail)
-                : base(false, false)
+                : base(true, false)
             {
                 this.allowFail = allowFail;
                 currentTestData = data;

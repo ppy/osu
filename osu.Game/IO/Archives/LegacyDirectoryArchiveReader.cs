@@ -1,8 +1,6 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -23,7 +21,9 @@ namespace osu.Game.IO.Archives
             this.path = Path.GetFullPath(path);
         }
 
-        public override Stream GetStream(string name) => File.OpenRead(Path.Combine(path, name));
+        public override Stream GetStream(string name) => File.OpenRead(GetFullPath(name));
+
+        public string GetFullPath(string filename) => Path.Combine(path, filename);
 
         public override void Dispose()
         {

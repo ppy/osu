@@ -1,10 +1,9 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -24,10 +23,10 @@ namespace osu.Game.Tests.Visual.SongSelect
 {
     public partial class TestSceneBeatmapMetadataDisplay : OsuTestScene
     {
-        private BeatmapMetadataDisplay display;
+        private BeatmapMetadataDisplay display = null!;
 
         [Resolved]
-        private BeatmapManager manager { get; set; }
+        private BeatmapManager manager { get; set; } = null!;
 
         [Cached(typeof(BeatmapDifficultyCache))]
         private readonly TestBeatmapDifficultyCache testDifficultyCache = new TestBeatmapDifficultyCache();
@@ -121,7 +120,7 @@ namespace osu.Game.Tests.Visual.SongSelect
 
         private partial class TestBeatmapDifficultyCache : BeatmapDifficultyCache
         {
-            private TaskCompletionSource<bool> calculationBlocker;
+            private TaskCompletionSource<bool>? calculationBlocker;
 
             private bool blockCalculation;
 
@@ -142,10 +141,13 @@ namespace osu.Game.Tests.Visual.SongSelect
                 }
             }
 
-            public override async Task<StarDifficulty?> GetDifficultyAsync(IBeatmapInfo beatmapInfo, IRulesetInfo rulesetInfo = null, IEnumerable<Mod> mods = null, CancellationToken cancellationToken = default)
+            public override async Task<StarDifficulty?> GetDifficultyAsync(IBeatmapInfo beatmapInfo, IRulesetInfo? rulesetInfo = null, IEnumerable<Mod>? mods = null, CancellationToken cancellationToken = default)
             {
                 if (blockCalculation)
+                {
+                    Debug.Assert(calculationBlocker != null);
                     await calculationBlocker.Task.ConfigureAwait(false);
+                }
 
                 return await base.GetDifficultyAsync(beatmapInfo, rulesetInfo, mods, cancellationToken).ConfigureAwait(false);
             }
