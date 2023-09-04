@@ -6,6 +6,7 @@ using NUnit.Framework;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
+using osu.Framework.Graphics.Cursor;
 using osu.Framework.Testing;
 using osu.Game.Overlays;
 using osu.Game.Overlays.Mods;
@@ -37,10 +38,10 @@ namespace osu.Game.Tests.Visual.SongSelect
 
             Children = new Drawable[]
             {
-                footer = new FooterV2
+                new PopoverContainer
                 {
-                    Anchor = Anchor.Centre,
-                    Origin = Anchor.Centre
+                    RelativeSizeAxes = Axes.Both,
+                    Child = footer = new FooterV2(),
                 },
                 overlay = new DummyOverlay()
             };
