@@ -549,6 +549,8 @@ namespace osu.Game.Rulesets.Osu.Tests
             addJudgementOffsetAssert("first slider head", () => ((Slider)hitObjects[0]).HeadCircle, 0);
             addJudgementAssert(hitObjects[1], HitResult.Miss);
             // the slider head of the first slider prevents the second slider's head from being hit, so the judgement offset should be very late.
+            // this is not strictly done by the hit policy implementation itself (see `OsuModClassic.blockInputToUnderlyingObjects()`),
+            // but we're testing this here anyways to just keep everything related to input handling and note lock in one place.
             addJudgementOffsetAssert("second slider head", () => ((Slider)hitObjects[1]).HeadCircle, referenceHitWindows.WindowFor(HitResult.Meh));
             addClickActionAssert(0, ClickAction.Hit);
         }
