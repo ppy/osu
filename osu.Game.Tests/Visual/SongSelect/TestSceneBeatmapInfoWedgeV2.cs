@@ -56,7 +56,6 @@ namespace osu.Game.Tests.Visual.SongSelect
                     Padding = new MarginPadding { Top = 20 },
                     Child = infoWedge = new TestBeatmapInfoWedgeV2
                     {
-                        State = { Value = Visibility.Visible },
                         Width = 0.6f,
                         RelativeSizeAxes = Axes.X,
                     },
@@ -165,6 +164,7 @@ namespace osu.Game.Tests.Visual.SongSelect
             {
                 containerBefore = infoWedge.DisplayedContent;
                 infoWedge.Beatmap = Beatmap.Value = b == null ? Beatmap.Default : CreateWorkingBeatmap(b);
+                infoWedge.Show();
             });
 
             AddUntilStep("wait for async load", () => infoWedge.DisplayedContent != containerBefore);
