@@ -155,18 +155,21 @@ namespace osu.Game.Screens.Select
 
                 LoadComponentAsync(loadingInfo = new Container
                 {
-                    Masking = true,
-                    // We offset this by the portion of the colour bar underneath we wish to show
-                    X = -colour_bar_width,
-                    CornerRadius = corner_radius,
+                    Padding = new MarginPadding { Right = colour_bar_width },
                     RelativeSizeAxes = Axes.Both,
                     Depth = DisplayedContent?.Depth + 1 ?? 0,
-                    Children = new Drawable[]
+                    Child = new Container
                     {
-                        // TODO: New wedge design uses a coloured horizontal gradient for its background, however this lacks implementation information in the figma draft.
-                        // pending https://www.figma.com/file/DXKwqZhD5yyb1igc3mKo1P?node-id=2980:3361#340801912 being answered.
-                        new BeatmapInfoWedgeBackground(beatmap) { Shear = -Shear },
-                        Info = new WedgeInfoText(beatmap) { Shear = -Shear }
+                        Masking = true,
+                        CornerRadius = corner_radius,
+                        RelativeSizeAxes = Axes.Both,
+                        Children = new Drawable[]
+                        {
+                            // TODO: New wedge design uses a coloured horizontal gradient for its background, however this lacks implementation information in the figma draft.
+                            // pending https://www.figma.com/file/DXKwqZhD5yyb1igc3mKo1P?node-id=2980:3361#340801912 being answered.
+                            new BeatmapInfoWedgeBackground(beatmap) { Shear = -Shear },
+                            Info = new WedgeInfoText(beatmap) { Shear = -Shear }
+                        }
                     }
                 }, loaded =>
                 {
