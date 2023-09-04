@@ -2,34 +2,27 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
-using System.Collections.Generic;
 using System.Linq;
 using osu.Game.Beatmaps;
 using osu.Game.Rulesets.Judgements;
-using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Objects.Types;
 using osu.Game.Rulesets.Osu.Objects;
 using osu.Game.Rulesets.Scoring;
+using osu.Game.Rulesets.Scoring.Legacy;
 
 namespace osu.Game.Rulesets.Osu.Difficulty
 {
     internal class OsuLegacyScoreSimulator : ILegacyScoreSimulator
     {
-        public int AccuracyScore { get; private set; }
-
-        public int ComboScore { get; private set; }
-
-        public double BonusScoreRatio => legacyBonusScore == 0 ? 0 : (double)modernBonusScore / legacyBonusScore;
-
         private int legacyBonusScore;
-        private int modernBonusScore;
+        private int standardisedBonusScore;
         private int combo;
 
         private double scoreMultiplier;
         private IBeatmap playableBeatmap = null!;
 
-        public void Simulate(IWorkingBeatmap workingBeatmap, IBeatmap playableBeatmap, IReadOnlyList<Mod> mods)
+        public LegacyScoreAttributes Simulate(IWorkingBeatmap workingBeatmap, IBeatmap playableBeatmap)
         {
             this.playableBeatmap = playableBeatmap;
 
@@ -73,13 +66,19 @@ namespace osu.Game.Rulesets.Osu.Difficulty
                  + baseBeatmap.Difficulty.CircleSize
                  + Math.Clamp((float)objectCount / drainLength * 8, 0, 16)) / 38 * 5);
 
-            scoreMultiplier = difficultyPeppyStars * mods.Aggregate(1.0, (current, mod) => current * mod.ScoreMultiplier);
+            scoreMultiplier = difficultyPeppyStars;
+
+            LegacyScoreAttributes attributes = new LegacyScoreAttributes();
 
             foreach (var obj in playableBeatmap.HitObjects)
-                simulateHit(obj);
+                simulateHit(obj, ref attributes);
+
+            attributes.BonusScoreRatio = legacyBonusScore == 0 ? 0 : (double)standardisedBonusScore / legacyBonusScore;
+
+            return attributes;
         }
 
-        private void simulateHit(HitObject hitObject)
+        private void simulateHit(HitObject hitObject, ref LegacyScoreAttributes attributes)
         {
             bool increaseCombo = true;
             bool addScoreComboMultiplier = false;
@@ -122,7 +121,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
 
                 case Slider:
                     foreach (var nested in hitObject.NestedHitObjects)
-                        simulateHit(nested);
+                        simulateHit(nested, ref attributes);
 
                     scoreIncrease = 300;
                     increaseCombo = false;
@@ -146,9 +145,9 @@ namespace osu.Game.Rulesets.Osu.Difficulty
                     for (int i = 0; i <= totalHalfSpinsPossible; i++)
                     {
                         if (i > halfSpinsRequiredBeforeBonus && (i - halfSpinsRequiredBeforeBonus) % 2 == 0)
-                            simulateHit(new SpinnerBonusTick());
+                            simulateHit(new SpinnerBonusTick(), ref attributes);
                         else if (i > 1 && i % 2 == 0)
-                            simulateHit(new SpinnerTick());
+                            simulateHit(new SpinnerTick(), ref attributes);
                     }
 
                     scoreIncrease = 300;
@@ -159,16 +158,16 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             if (addScoreComboMultiplier)
             {
                 // ReSharper disable once PossibleLossOfFraction (intentional to match osu-stable...)
-                ComboScore += (int)(Math.Max(0, combo - 1) * (scoreIncrease / 25 * scoreMultiplier));
+                attributes.ComboScore += (int)(Math.Max(0, combo - 1) * (scoreIncrease / 25 * scoreMultiplier));
             }
 
             if (isBonus)
             {
                 legacyBonusScore += scoreIncrease;
-                modernBonusScore += Judgement.ToNumericResult(bonusResult);
+                standardisedBonusScore += Judgement.ToNumericResult(bonusResult);
             }
             else
-                AccuracyScore += scoreIncrease;
+                attributes.AccuracyScore += scoreIncrease;
 
             if (increaseCombo)
                 combo++;
