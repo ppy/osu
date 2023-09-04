@@ -7,6 +7,7 @@ using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
+using osu.Framework.Graphics.UserInterface;
 using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.Drawables;
 using osu.Game.Configuration;
@@ -30,21 +31,12 @@ namespace osu.Game.Database
         [Resolved]
         private ScoreManager scoreManager { get; set; } = null!;
 
-        [Cached]
-        private OverlayColourProvider colourProvider = new OverlayColourProvider(OverlayColourScheme.Purple);
-
-        [Resolved]
-        private BeatmapSetOverlay? beatmapSetOverlay { get; set; }
-
-        private Container beatmapPanelContainer = null!;
-
         private readonly MemoryStream scoreStream;
 
         private readonly APIBeatmapSet beatmapSetInfo;
 
-        private BeatmapDownloadTracker? downloadTracker;
-
         private Bindable<bool> autodownloadConfig = null!;
+        private Bindable<bool> noVideoSetting = null!;
 
         public MissingBeatmapNotification(APIBeatmap beatmap, MemoryStream scoreStream)
         {
@@ -54,35 +46,25 @@ namespace osu.Game.Database
         }
 
         [BackgroundDependencyLoader]
-        private void load(OsuColour colours, OsuConfigManager config)
+        private void load(OsuConfigManager config, BeatmapSetOverlay? beatmapSetOverlay)
         {
+            BeatmapDownloadTracker downloadTracker = new BeatmapDownloadTracker(beatmapSetInfo);
+            downloadTracker.State.BindValueChanged(downloadStatusChanged);
+
             autodownloadConfig = config.GetBindable<bool>(OsuSetting.AutomaticallyDownloadWhenSpectating);
+            noVideoSetting = config.GetBindable<bool>(OsuSetting.PreferNoVideo);
 
             Text = "You do not have the required beatmap for this replay";
 
-            Content.Add(beatmapPanelContainer = new ClickableContainer
+            Content.Add(new ClickableContainer
             {
                 RelativeSizeAxes = Axes.X,
                 Height = 70,
                 Anchor = Anchor.CentreLeft,
                 Origin = Anchor.TopLeft,
-                Action = () => beatmapSetOverlay?.FetchAndShowBeatmapSet(beatmapSetInfo.OnlineID)
-            });
-        }
-
-        protected override void LoadComplete()
-        {
-            base.LoadComplete();
-
-            downloadTracker = new BeatmapDownloadTracker(beatmapSetInfo);
-            downloadTracker.State.BindValueChanged(downloadStatusChanged, true);
-
-            beatmapPanelContainer.Clear();
-            beatmapPanelContainer.Child = new Container
-            {
-                RelativeSizeAxes = Axes.Both,
-                Masking = true,
                 CornerRadius = 4,
+                Masking = true,
+                Action = () => beatmapSetOverlay?.FetchAndShowBeatmapSet(beatmapSetInfo.OnlineID),
                 Children = new Drawable[]
                 {
                     downloadTracker,
@@ -125,7 +107,7 @@ namespace osu.Game.Database
                             }
                         }
                     },
-                    new DownloadButton
+                    new BeatmapDownloadButton(beatmapSetInfo)
                     {
                         Anchor = Anchor.BottomCentre,
                         Origin = Anchor.BottomCentre,
@@ -134,15 +116,18 @@ namespace osu.Game.Database
                         Margin = new MarginPadding
                         {
                             Bottom = 1f
-                        },
-                        Action = () => beatmapDownloader.Download(beatmapSetInfo),
-                        State = { BindTarget = downloadTracker.State }
+                        }
                     }
                 }
-            };
+            });
+        }
+
+        protected override void LoadComplete()
+        {
+            base.LoadComplete();
 
             if (autodownloadConfig.Value)
-                beatmapDownloader.Download(beatmapSetInfo);
+                beatmapDownloader.Download(beatmapSetInfo, noVideoSetting.Value);
         }
 
         private void downloadStatusChanged(ValueChangedEvent<DownloadState> status)
