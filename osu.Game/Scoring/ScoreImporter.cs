@@ -10,7 +10,6 @@ using System.Threading;
 using Newtonsoft.Json;
 using osu.Framework.Logging;
 using osu.Framework.Platform;
-using osu.Framework.Screens;
 using osu.Game.Beatmaps;
 using osu.Game.Database;
 using osu.Game.IO.Archives;
@@ -21,8 +20,6 @@ using osu.Game.Online.API.Requests;
 using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Rulesets.Judgements;
 using osu.Game.Rulesets.Scoring;
-using osu.Game.Screens;
-using osu.Game.Screens.Import;
 using Realms;
 
 namespace osu.Game.Scoring
@@ -30,8 +27,6 @@ namespace osu.Game.Scoring
     public class ScoreImporter : RealmArchiveModelImporter<ScoreInfo>
     {
         public override IEnumerable<string> HandledExtensions => new[] { ".osr" };
-
-        public IPerformFromScreenRunner? Performer { get; set; }
 
         protected override string[] HashableFileTypes => new[] { ".osr" };
 
@@ -69,9 +64,6 @@ namespace osu.Game.Scoring
 
         private void onMissingBeatmap(LegacyScoreDecoder.BeatmapNotFoundException e, ArchiveReader archive, string name)
         {
-            if (Performer == null)
-                return;
-
             var stream = new MemoryStream();
 
             // stream will close after exception throw, so fetch the stream again.
@@ -87,7 +79,7 @@ namespace osu.Game.Scoring
 
             req.Success += res =>
             {
-                Performer.PerformFromScreen(screen => screen.Push(new ReplayMissingBeatmapScreen(res, stream)));
+                PostNotification?.Invoke(new MissingBeatmapNotification(res, stream));
             };
 
             api.Queue(req);

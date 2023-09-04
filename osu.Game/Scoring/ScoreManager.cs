@@ -21,7 +21,6 @@ using osu.Game.Rulesets;
 using osu.Game.Rulesets.Scoring;
 using osu.Game.Online.API;
 using osu.Game.Scoring.Legacy;
-using osu.Game.Screens;
 
 namespace osu.Game.Scoring
 {
@@ -30,12 +29,6 @@ namespace osu.Game.Scoring
         private readonly OsuConfigManager configManager;
         private readonly ScoreImporter scoreImporter;
         private readonly LegacyScoreExporter scoreExporter;
-
-        [CanBeNull]
-        public IPerformFromScreenRunner Performer
-        {
-            set => scoreImporter.Performer = value;
-        }
 
         public override bool PauseImports
         {

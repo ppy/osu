@@ -1,13 +1,15 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System.Linq;
 using System.Net;
 using NUnit.Framework;
+using osu.Framework.Testing;
+using osu.Game.Beatmaps;
 using osu.Game.Database;
 using osu.Game.Online.API;
 using osu.Game.Online.API.Requests;
 using osu.Game.Online.API.Requests.Responses;
-using osu.Game.Screens.Import;
 using osu.Game.Tests.Resources;
 
 namespace osu.Game.Tests.Visual.Online
@@ -24,6 +26,12 @@ namespace osu.Game.Tests.Visual.Online
                 OnlineBeatmapSetID = 173612,
                 BeatmapSet = new APIBeatmapSet
                 {
+                    Title = "FREEDOM Dive",
+                    Artist = "xi",
+                    Covers = new BeatmapSetOnlineCovers
+                    {
+                        Card = "https://assets.ppy.sh/beatmaps/173612/covers/card@2x.jpg"
+                    },
                     OnlineID = 173612
                 }
             };
@@ -40,7 +48,7 @@ namespace osu.Game.Tests.Visual.Online
                 }
             });
 
-            AddUntilStep("Replay missing screen show", () => Game.ScreenStack.CurrentScreen.GetType() == typeof(ReplayMissingBeatmapScreen));
+            AddUntilStep("Replay missing notification show", () => Game.Notifications.ChildrenOfType<MissingBeatmapNotification>().Any());
         }
 
         [Test]
@@ -58,7 +66,7 @@ namespace osu.Game.Tests.Visual.Online
                 }
             });
 
-            AddUntilStep("Replay missing screen not show", () => Game.ScreenStack.CurrentScreen.GetType() != typeof(ReplayMissingBeatmapScreen));
+            AddUntilStep("Replay missing notification not show", () => !Game.Notifications.ChildrenOfType<MissingBeatmapNotification>().Any());
         }
 
         private void setupBeatmapResponse(APIBeatmap b)
