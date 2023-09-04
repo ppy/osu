@@ -24,6 +24,8 @@ namespace osu.Game.Scoring
 
         bool HasReplay { get; }
 
+        long LegacyOnlineID { get; }
+
         DateTimeOffset Date { get; }
 
         double? PP { get; }
