@@ -314,7 +314,7 @@ namespace osu.Game.Screens.Select
                     starRatingDisplay.Current.Value = s.NewValue ?? default;
 
                     // Don't roll the counter on initial display (but still allow it to roll on applying mods etc.)
-                    if (starRatingDisplay.Alpha > 0)
+                    if (!starRatingDisplay.IsPresent)
                         starRatingDisplay.FinishTransforms(true);
 
                     starRatingDisplay.FadeIn(transition_duration);
