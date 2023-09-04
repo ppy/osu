@@ -46,9 +46,9 @@ namespace osu.Game.Screens.Select
 
         protected WedgeInfoText? Info { get; private set; }
 
-        private readonly Container difficultyColourBar;
-        private readonly StarCounter starCounter;
-        private readonly BufferedContainer bufferedContent;
+        private Container difficultyColourBar = null!;
+        private StarCounter starCounter = null!;
+        private BufferedContainer bufferedContent = null!;
 
         public BeatmapInfoWedgeV2()
         {
@@ -63,7 +63,11 @@ namespace osu.Game.Screens.Select
                 Radius = 3,
             };
             CornerRadius = corner_radius;
+        }
 
+        [BackgroundDependencyLoader]
+        private void load()
+        {
             // We want to buffer the wedge to avoid weird transparency overlaps between the colour bar and the background.
             Child = bufferedContent = new BufferedContainer(pixelSnapping: true)
             {
@@ -107,9 +111,10 @@ namespace osu.Game.Screens.Select
             };
         }
 
-        [BackgroundDependencyLoader]
-        private void load()
+        protected override void LoadComplete()
         {
+            base.LoadComplete();
+
             ruleset.BindValueChanged(_ => updateDisplay());
         }
 
@@ -228,6 +233,8 @@ namespace osu.Game.Screens.Select
             public WedgeInfoText(WorkingBeatmap working)
             {
                 this.working = working;
+
+                RelativeSizeAxes = Axes.Both;
             }
 
             [BackgroundDependencyLoader]
@@ -235,8 +242,6 @@ namespace osu.Game.Screens.Select
             {
                 var beatmapInfo = working.BeatmapInfo;
                 var metadata = working.Metadata;
-
-                RelativeSizeAxes = Axes.Both;
 
                 titleBinding = localisation.GetLocalisedBindableString(new RomanisableString(metadata.TitleUnicode, metadata.Title));
                 artistBinding = localisation.GetLocalisedBindableString(new RomanisableString(metadata.ArtistUnicode, metadata.Artist));
