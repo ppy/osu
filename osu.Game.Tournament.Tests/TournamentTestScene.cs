@@ -40,10 +40,10 @@ namespace osu.Game.Tournament.Tests
 
             match = CreateSampleMatch();
 
-            Ladder.Rounds.Add(match.Round.Value);
+            Ladder.Rounds.Add(match.Round.Value!);
             Ladder.Matches.Add(match);
-            Ladder.Teams.Add(match.Team1.Value);
-            Ladder.Teams.Add(match.Team2.Value);
+            Ladder.Teams.Add(match.Team1.Value!);
+            Ladder.Teams.Add(match.Team2.Value!);
 
             Ruleset.BindTo(Ladder.Ruleset);
             Dependencies.CacheAs(new StableInfo(storage));
@@ -152,7 +152,7 @@ namespace osu.Game.Tournament.Tests
             },
             Round =
             {
-                Value = new TournamentRound { Name = { Value = "Quarterfinals" } }
+                Value = new TournamentRound { Name = { Value = "Quarterfinals" } },
             }
         };
 

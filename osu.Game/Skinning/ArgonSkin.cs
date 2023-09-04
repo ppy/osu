@@ -232,6 +232,6 @@ namespace osu.Game.Skinning
         }
 
         private static Color4 getComboColour(IHasComboColours source, int colourIndex)
-            => source.ComboColours[colourIndex % source.ComboColours.Count];
+            => source.ComboColours![colourIndex % source.ComboColours.Count];
     }
 }

@@ -31,6 +31,8 @@ namespace osu.Game.Overlays
         public LocalisableString Title => NotificationsStrings.HeaderTitle;
         public LocalisableString Description => NotificationsStrings.HeaderDescription;
 
+        protected override double PopInOutSampleBalance => OsuGameBase.SFX_STEREO_STRENGTH;
+
         public const float WIDTH = 320;
 
         public const float TRANSITION_LENGTH = 600;
@@ -42,6 +44,9 @@ namespace osu.Game.Overlays
 
         [Resolved]
         private AudioManager audio { get; set; } = null!;
+
+        [Resolved]
+        private OsuGame? game { get; set; }
 
         [Cached]
         private OverlayColourProvider colourProvider = new OverlayColourProvider(OverlayColourScheme.Purple);
@@ -175,6 +180,12 @@ namespace osu.Game.Overlays
                 hasCompletionTarget.CompletionTarget = Post;
 
             playDebouncedSample(notification.PopInSampleName);
+
+            if (notification.IsImportant)
+            {
+                game?.Window?.Flash();
+                notification.Closed += () => game?.Window?.CancelFlash();
+            }
 
             if (State.Value == Visibility.Hidden)
             {
