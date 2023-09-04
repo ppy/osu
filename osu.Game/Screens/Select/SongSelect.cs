@@ -916,6 +916,9 @@ namespace osu.Game.Screens.Select
             return true;
         }
 
+        /// <summary>
+        /// Request to delete the current beatmap.
+        /// </summary>
         public void DeleteBeatmap()
         {
             if (Beatmap.Value.BeatmapSetInfo == null) return;
@@ -923,6 +926,9 @@ namespace osu.Game.Screens.Select
             dialogOverlay?.Push(new BeatmapDeleteDialog(Beatmap.Value.BeatmapSetInfo));
         }
 
+        /// <summary>
+        /// Request to clear the scores of the current beatmap.
+        /// </summary>
         public void ClearScores()
         {
             if (Beatmap.Value.BeatmapInfo == null) return;
