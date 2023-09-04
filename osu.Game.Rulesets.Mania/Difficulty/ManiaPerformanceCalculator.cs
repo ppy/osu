@@ -6,8 +6,6 @@ using System.Collections.Generic;
 using System.Linq;
 using MathNet.Numerics;
 using MathNet.Numerics.Distributions;
-using osu.Framework.Audio.Track;
-using osu.Framework.Extensions.IEnumerableExtensions;
 using osu.Game.Rulesets.Difficulty;
 using osu.Game.Rulesets.Mania.Mods;
 using osu.Game.Rulesets.Mods;
@@ -189,12 +187,7 @@ namespace osu.Game.Rulesets.Mania.Difficulty
         {
             double[] lazerHitWindows = new double[5];
 
-            // Create a new track of arbitrary length, and apply the total rate change of every mod to the track (i.e. DT = 1.01-2x, HT = 0.5-0.99x)
-            var track = new TrackVirtual(10000);
-            mods.OfType<IApplicableToTrack>().ForEach(m => m.ApplyToTrack(track));
-            double clockRate = track.Rate;
-
-            double windowMultiplier = 1 / clockRate;
+            double windowMultiplier = 1;
 
             if (mods.Any(m => m is ModHardRock))
                 windowMultiplier *= 1 / 1.4;

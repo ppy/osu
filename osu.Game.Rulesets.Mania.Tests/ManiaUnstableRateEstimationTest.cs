@@ -33,9 +33,9 @@ namespace osu.Game.Rulesets.Mania.Tests
 
         public static IEnumerable<TestCaseData> TestCaseSourceData()
         {
-            yield return new TestCaseData(691.640625d, new[] { 3, 3, 3, 3, 3, 3 }, SpeedMod.DoubleTime);
+            yield return new TestCaseData(1037.4609375d, new[] { 3, 3, 3, 3, 3, 3 }, SpeedMod.DoubleTime);
             yield return new TestCaseData(1037.4609375d, new[] { 3, 3, 3, 3, 3, 3 }, SpeedMod.NormalTime);
-            yield return new TestCaseData(1383.28125d, new[] { 3, 3, 3, 3, 3, 3 }, SpeedMod.HalfTime);
+            yield return new TestCaseData(1037.4609375d, new[] { 3, 3, 3, 3, 3, 3 }, SpeedMod.HalfTime);
         }
 
         /// <summary>
