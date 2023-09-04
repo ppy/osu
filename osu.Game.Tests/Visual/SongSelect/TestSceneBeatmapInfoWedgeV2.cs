@@ -7,7 +7,6 @@ using NUnit.Framework;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
-using osu.Framework.Graphics.Effects;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.UserInterface;
 using osu.Framework.Testing;
@@ -94,17 +93,6 @@ namespace osu.Game.Tests.Visual.SongSelect
         [Test]
         public void TestWedgeVisibility()
         {
-            // Mostly just in case someone runs this test before others,
-            // leading to the shadow being very hard to see if it is black
-            AddStep("make shadow red for test visibility", () =>
-            {
-                infoWedge.EdgeEffect = new EdgeEffectParameters
-                {
-                    Colour = Colour4.Red,
-                    Type = EdgeEffectType.Shadow,
-                    Radius = 5,
-                };
-            });
             AddStep("hide", () => { infoWedge.Hide(); });
             AddWaitStep("wait for hide", 3);
             AddAssert("check visibility", () => infoWedge.Alpha == 0);
