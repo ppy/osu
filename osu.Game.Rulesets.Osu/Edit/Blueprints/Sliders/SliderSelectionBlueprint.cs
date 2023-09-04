@@ -196,6 +196,7 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders
             {
                 var result = snapProvider?.FindSnappedPositionAndTime(ToScreenSpace(e.MousePosition));
                 placementControlPoint.Position = ToLocalSpace(result?.ScreenSpacePosition ?? ToScreenSpace(e.MousePosition)) - HitObject.Position;
+                HitObject.SnapTo(snapProvider);
             }
         }
 
