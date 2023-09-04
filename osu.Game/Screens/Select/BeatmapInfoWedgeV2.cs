@@ -212,9 +212,6 @@ namespace osu.Game.Screens.Select
 
             private StarRatingDisplay starRatingDisplay = null!;
 
-            private ILocalisedBindableString titleBinding = null!;
-            private ILocalisedBindableString artistBinding = null!;
-
             private readonly WorkingBeatmap working;
 
             public IBindable<double> DisplayedStars => starRatingDisplay.DisplayedStars;
@@ -238,13 +235,10 @@ namespace osu.Game.Screens.Select
             }
 
             [BackgroundDependencyLoader]
-            private void load(LocalisationManager localisation)
+            private void load()
             {
                 var beatmapInfo = working.BeatmapInfo;
                 var metadata = working.Metadata;
-
-                titleBinding = localisation.GetLocalisedBindableString(new RomanisableString(metadata.TitleUnicode, metadata.Title));
-                artistBinding = localisation.GetLocalisedBindableString(new RomanisableString(metadata.ArtistUnicode, metadata.Artist));
 
                 Children = new Drawable[]
                 {
@@ -292,7 +286,7 @@ namespace osu.Game.Screens.Select
                             TitleLabel = new TruncatingSpriteText
                             {
                                 Shadow = true,
-                                Current = { BindTarget = titleBinding },
+                                Text = new RomanisableString(metadata.TitleUnicode, metadata.Title),
                                 Font = OsuFont.TorusAlternate.With(size: 40, weight: FontWeight.SemiBold),
                                 RelativeSizeAxes = Axes.X,
                             },
@@ -300,7 +294,7 @@ namespace osu.Game.Screens.Select
                             {
                                 // TODO : figma design has a diffused shadow, instead of the solid one present here, not possible currently as far as i'm aware.
                                 Shadow = true,
-                                Current = { BindTarget = artistBinding },
+                                Text = new RomanisableString(metadata.ArtistUnicode, metadata.Artist),
                                 // Not sure if this should be semi bold or medium
                                 Font = OsuFont.Torus.With(size: 20, weight: FontWeight.SemiBold),
                                 RelativeSizeAxes = Axes.X,
