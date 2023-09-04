@@ -79,7 +79,7 @@ namespace osu.Game.Scoring
 
             req.Success += res =>
             {
-                PostNotification?.Invoke(new MissingBeatmapNotification(res, stream));
+                PostNotification?.Invoke(new MissingBeatmapNotification(res, stream, e.Hash));
             };
 
             api.Queue(req);
