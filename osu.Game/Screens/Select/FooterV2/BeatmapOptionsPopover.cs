@@ -97,7 +97,6 @@ namespace osu.Game.Screens.Select.FooterV2
 
                 Add(new SpriteIcon
                 {
-                    Blending = BlendingParameters.Additive,
                     Anchor = Anchor.CentreLeft,
                     Origin = Anchor.CentreLeft,
                     Size = new Vector2(17),
