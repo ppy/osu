@@ -154,5 +154,11 @@ namespace osu.Game.Database
                 realmSubscription?.Dispose();
             }
         }
+
+        protected override void Dispose(bool isDisposing)
+        {
+            base.Dispose(isDisposing);
+            realmSubscription?.Dispose();
+        }
     }
 }
