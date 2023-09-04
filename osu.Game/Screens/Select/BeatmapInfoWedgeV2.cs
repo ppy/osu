@@ -55,6 +55,7 @@ namespace osu.Game.Screens.Select
             Height = WEDGE_HEIGHT;
             Shear = wedged_container_shear;
             Masking = true;
+            Margin = new MarginPadding { Left = -corner_radius };
             EdgeEffect = new EdgeEffectParameters
             {
                 Colour = Colour4.Black.Opacity(0.2f),

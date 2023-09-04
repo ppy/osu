@@ -50,13 +50,17 @@ namespace osu.Game.Tests.Visual.SongSelect
                     RelativeSizeAxes = Axes.X,
                     Margin = new MarginPadding { Top = 20, Left = -10 }
                 },
-                infoWedge = new TestBeatmapInfoWedgeV2
+                new Container
                 {
-                    State = { Value = Visibility.Visible },
-                    Width = 0.6f,
-                    RelativeSizeAxes = Axes.X,
-                    Margin = new MarginPadding { Top = 20, Left = -10 }
-                },
+                    RelativeSizeAxes = Axes.Both,
+                    Padding = new MarginPadding { Top = 20 },
+                    Child = infoWedge = new TestBeatmapInfoWedgeV2
+                    {
+                        State = { Value = Visibility.Visible },
+                        Width = 0.6f,
+                        RelativeSizeAxes = Axes.X,
+                    },
+                }
             });
 
             AddSliderStep("change star difficulty", 0, 11.9, 5.55, v =>
