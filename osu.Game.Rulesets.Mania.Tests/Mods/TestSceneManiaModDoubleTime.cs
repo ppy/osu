@@ -7,7 +7,6 @@ using osu.Game.Beatmaps;
 using osu.Game.Rulesets.Mania.Mods;
 using osu.Game.Rulesets.Mania.Objects;
 using osu.Game.Rulesets.Mania.Replays;
-using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Replays;
 using osu.Game.Tests.Visual;
@@ -23,7 +22,6 @@ namespace osu.Game.Rulesets.Mania.Tests.Mods
         [Test]
         public void TestHitWindowWithoutDoubleTime() => CreateModTest(new ModTestData
         {
-            Mod = new ModNoMod(),
             PassCondition = () => Player.ScoreProcessor.JudgedHits > 0 && Player.ScoreProcessor.Accuracy.Value != 1,
             Autoplay = false,
             Beatmap = new Beatmap
