@@ -2,18 +2,17 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System.IO;
+using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
-using osu.Framework.Graphics.UserInterface;
 using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.Drawables;
 using osu.Game.Configuration;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
-using osu.Game.Graphics.UserInterface;
 using osu.Game.Online;
 using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Overlays;
@@ -31,30 +30,42 @@ namespace osu.Game.Database
         [Resolved]
         private ScoreManager scoreManager { get; set; } = null!;
 
-        private readonly MemoryStream scoreStream;
+        [Resolved]
+        private RealmAccess realm { get; set; } = null!;
 
+        private readonly MemoryStream scoreStream;
         private readonly APIBeatmapSet beatmapSetInfo;
+        private readonly string beatmapHash;
 
         private Bindable<bool> autodownloadConfig = null!;
         private Bindable<bool> noVideoSetting = null!;
 
-        public MissingBeatmapNotification(APIBeatmap beatmap, MemoryStream scoreStream)
+        public MissingBeatmapNotification(APIBeatmap beatmap, MemoryStream scoreStream, string beatmapHash)
         {
             beatmapSetInfo = beatmap.BeatmapSet!;
 
+            this.beatmapHash = beatmapHash;
             this.scoreStream = scoreStream;
         }
 
         [BackgroundDependencyLoader]
         private void load(OsuConfigManager config, BeatmapSetOverlay? beatmapSetOverlay)
         {
+            Text = "You do not have the required beatmap for this replay";
+
+            realm.Run(r =>
+            {
+                if (r.All<BeatmapSetInfo>().Any(s => s.OnlineID == beatmapSetInfo.OnlineID))
+                {
+                    Text = "You have the corresponding beatmapset but no beatmap, you may need to update the beatmap.";
+                }
+            });
+
             BeatmapDownloadTracker downloadTracker = new BeatmapDownloadTracker(beatmapSetInfo);
             downloadTracker.State.BindValueChanged(downloadStatusChanged);
 
             autodownloadConfig = config.GetBindable<bool>(OsuSetting.AutomaticallyDownloadWhenSpectating);
             noVideoSetting = config.GetBindable<bool>(OsuSetting.PreferNoVideo);
-
-            Text = "You do not have the required beatmap for this replay";
 
             Content.Add(new ClickableContainer
             {
@@ -135,8 +146,14 @@ namespace osu.Game.Database
             if (status.NewValue != DownloadState.LocallyAvailable)
                 return;
 
-            var importTask = new ImportTask(scoreStream, "score.osr");
-            scoreManager.Import(this, new[] { importTask });
+            realm.Run(r =>
+            {
+                if (r.All<BeatmapInfo>().Any(s => s.MD5Hash == beatmapHash))
+                {
+                    var importTask = new ImportTask(scoreStream, "score.osr");
+                    scoreManager.Import(this, new[] { importTask });
+                }
+            });
         }
     }
 }
