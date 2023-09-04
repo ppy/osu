@@ -3,6 +3,7 @@
 
 #nullable disable
 
+using System.ComponentModel;
 using osu.Framework.Graphics.Sprites;
 
 namespace osu.Game.Graphics
@@ -115,6 +116,8 @@ namespace osu.Game.Graphics
     {
         Venera,
         Torus,
+
+        [Description("Torus (alternate)")]
         TorusAlternate,
         Inter,
     }

@@ -2,27 +2,24 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using osu.Framework.Bindables;
-using osuTK;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
-using osu.Framework.Graphics.Shapes;
 using osu.Framework.Input.Events;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.Sprites;
-using osu.Framework.Allocation;
 using osu.Framework.Extensions.LocalisationExtensions;
 using osu.Game.Resources.Localisation.Web;
 using osu.Framework.Localisation;
-using osu.Game.Online.API.Requests.Responses;
+using osu.Game.Online.Chat;
 
 namespace osu.Game.Overlays.Profile.Sections.Kudosu
 {
     public partial class KudosuInfo : Container
     {
-        private readonly Bindable<APIUser?> user = new Bindable<APIUser?>();
+        private readonly Bindable<UserProfileData?> user = new Bindable<UserProfileData?>();
 
-        public KudosuInfo(Bindable<APIUser?> user)
+        public KudosuInfo(Bindable<UserProfileData?> user)
         {
             this.user.BindTo(user);
             CountSection total;
@@ -32,7 +29,7 @@ namespace osu.Game.Overlays.Profile.Sections.Kudosu
             CornerRadius = 3;
             Child = total = new CountTotal();
 
-            this.user.ValueChanged += u => total.Count = u.NewValue?.Kudosu.Total ?? 0;
+            this.user.ValueChanged += u => total.Count = u.NewValue?.User.Kudosu.Total ?? 0;
         }
 
         protected override bool OnClick(ClickEvent e) => true;
@@ -43,7 +40,7 @@ namespace osu.Game.Overlays.Profile.Sections.Kudosu
                 : base(UsersStrings.ShowExtraKudosuTotal)
             {
                 DescriptionText.AddText("Based on how much of a contribution the user has made to beatmap moderation. See ");
-                DescriptionText.AddLink("this page", "https://osu.ppy.sh/wiki/Kudosu");
+                DescriptionText.AddLink("this page", LinkAction.OpenWiki, @"Modding/Kudosu");
                 DescriptionText.AddText(" for more information.");
             }
         }
@@ -52,36 +49,24 @@ namespace osu.Game.Overlays.Profile.Sections.Kudosu
         {
             private readonly OsuSpriteText valueText;
             protected readonly LinkFlowContainer DescriptionText;
-            private readonly Box lineBackground;
 
             public new int Count
             {
                 set => valueText.Text = value.ToLocalisableString("N0");
             }
 
-            public CountSection(LocalisableString header)
+            protected CountSection(LocalisableString header)
             {
                 RelativeSizeAxes = Axes.X;
                 AutoSizeAxes = Axes.Y;
-                Padding = new MarginPadding { Top = 10, Bottom = 20 };
+                Padding = new MarginPadding { Bottom = 20 };
                 Child = new FillFlowContainer
                 {
                     AutoSizeAxes = Axes.Y,
                     RelativeSizeAxes = Axes.X,
                     Direction = FillDirection.Vertical,
-                    Spacing = new Vector2(0, 5),
                     Children = new Drawable[]
                     {
-                        new CircularContainer
-                        {
-                            Masking = true,
-                            RelativeSizeAxes = Axes.X,
-                            Height = 2,
-                            Child = lineBackground = new Box
-                            {
-                                RelativeSizeAxes = Axes.Both,
-                            }
-                        },
                         new OsuSpriteText
                         {
                             Text = header,
@@ -91,7 +76,6 @@ namespace osu.Game.Overlays.Profile.Sections.Kudosu
                         {
                             Text = "0",
                             Font = OsuFont.GetFont(size: 40, weight: FontWeight.Light),
-                            UseFullGlyphHeight = false,
                         },
                         DescriptionText = new LinkFlowContainer(t => t.Font = t.Font.With(size: 14))
                         {
@@ -100,12 +84,6 @@ namespace osu.Game.Overlays.Profile.Sections.Kudosu
                         }
                     }
                 };
-            }
-
-            [BackgroundDependencyLoader]
-            private void load(OverlayColourProvider colourProvider)
-            {
-                lineBackground.Colour = colourProvider.Highlight1;
             }
         }
     }

@@ -47,9 +47,21 @@ namespace osu.Game.Scoring.Legacy
 
                 int version = sr.ReadInt32();
 
-                workingBeatmap = GetBeatmap(sr.ReadString());
+                scoreInfo.IsLegacyScore = version < LegacyScoreEncoder.FIRST_LAZER_VERSION;
+
+                // TotalScoreVersion gets initialised to LATEST_VERSION.
+                // In the case where the incoming score has either an osu!stable or old lazer version, we need
+                // to mark it with the correct version increment to trigger reprocessing to new standardised scoring.
+                //
+                // See StandardisedScoreMigrationTools.ShouldMigrateToNewStandardised().
+                scoreInfo.TotalScoreVersion = version < 30000002 ? 30000001 : LegacyScoreEncoder.LATEST_VERSION;
+
+                string beatmapHash = sr.ReadString();
+
+                workingBeatmap = GetBeatmap(beatmapHash);
+
                 if (workingBeatmap is DummyWorkingBeatmap)
-                    throw new BeatmapNotFoundException();
+                    throw new BeatmapNotFoundException(beatmapHash);
 
                 scoreInfo.User = new APIUser { Username = sr.ReadString() };
 
@@ -121,6 +133,7 @@ namespace osu.Game.Scoring.Legacy
             // before returning for database import, we must restore the database-sourced BeatmapInfo.
             // if not, the clone operation in GetPlayableBeatmap will cause a dereference and subsequent database exception.
             score.ScoreInfo.BeatmapInfo = workingBeatmap.BeatmapInfo;
+            score.ScoreInfo.BeatmapHash = workingBeatmap.BeatmapInfo.Hash;
 
             return score;
         }
@@ -334,9 +347,11 @@ namespace osu.Game.Scoring.Legacy
 
         public class BeatmapNotFoundException : Exception
         {
-            public BeatmapNotFoundException()
-                : base("No corresponding beatmap for the score could be found.")
+            public string Hash { get; }
+
+            public BeatmapNotFoundException(string hash)
             {
+                Hash = hash;
             }
         }
     }

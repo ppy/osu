@@ -101,7 +101,8 @@ namespace osu.Game.Skinning
                 // In both of these cases, the expectation from the user is that the filename or folder name is displayed somewhere to identify the skin.
                 if (archiveName != item.Name
                     // lazer exports use this format
-                    && archiveName != item.GetDisplayString())
+                    // GetValidFilename accounts for skins with non-ASCII characters in the name that have been exported by lazer.
+                    && archiveName != item.GetDisplayString().GetValidFilename())
                     item.Name = @$"{item.Name} [{archiveName}]";
             }
 
@@ -179,8 +180,14 @@ namespace osu.Game.Skinning
 
         private Skin createInstance(SkinInfo item) => item.CreateInstance(skinResources);
 
-        public void Save(Skin skin)
+        /// <summary>
+        /// Save a skin, serialising any changes to skin layouts to relevant JSON structures.
+        /// </summary>
+        /// <returns>Whether any change actually occurred.</returns>
+        public bool Save(Skin skin)
         {
+            bool hadChanges = false;
+
             skin.SkinInfo.PerformWrite(s =>
             {
                 // Update for safety
@@ -191,11 +198,11 @@ namespace osu.Game.Skinning
 
                 using (var streamContent = new MemoryStream(Encoding.UTF8.GetBytes(skinInfoJson)))
                 {
-                    modelManager.AddFile(s, streamContent, skin_info_file, s.Realm);
+                    modelManager.AddFile(s, streamContent, skin_info_file, s.Realm!);
                 }
 
                 // Then serialise each of the drawable component groups into respective files.
-                foreach (var drawableInfo in skin.DrawableComponentInfo)
+                foreach (var drawableInfo in skin.LayoutInfos)
                 {
                     string json = JsonConvert.SerializeObject(drawableInfo.Value, new JsonSerializerSettings { Formatting = Formatting.Indented });
 
@@ -206,14 +213,20 @@ namespace osu.Game.Skinning
                         var oldFile = s.GetFile(filename);
 
                         if (oldFile != null)
-                            modelManager.ReplaceFile(oldFile, streamContent, s.Realm);
+                            modelManager.ReplaceFile(oldFile, streamContent, s.Realm!);
                         else
-                            modelManager.AddFile(s, streamContent, filename, s.Realm);
+                            modelManager.AddFile(s, streamContent, filename, s.Realm!);
                     }
                 }
 
-                s.Hash = ComputeHash(s);
+                string newHash = ComputeHash(s);
+
+                hadChanges = newHash != s.Hash;
+
+                s.Hash = newHash;
             });
+
+            return hadChanges;
         }
     }
 }

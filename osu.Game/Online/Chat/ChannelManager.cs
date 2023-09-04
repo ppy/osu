@@ -64,6 +64,11 @@ namespace osu.Game.Online.Chat
         /// </summary>
         public IBindableList<Channel> AvailableChannels => availableChannels;
 
+        /// <summary>
+        /// Whether the client responsible for channel notifications is connected.
+        /// </summary>
+        public bool NotificationsConnected => connector.IsConnected.Value;
+
         private readonly IAPIProvider api;
         private readonly NotificationsClientConnector connector;
 
@@ -90,7 +95,7 @@ namespace osu.Game.Online.Chat
         {
             connector.ChannelJoined += ch => Schedule(() => joinChannel(ch));
 
-            connector.ChannelParted += ch => Schedule(() => LeaveChannel(getChannel(ch)));
+            connector.ChannelParted += ch => Schedule(() => leaveChannel(getChannel(ch), false));
 
             connector.NewMessages += msgs => Schedule(() => addMessages(msgs));
 
@@ -553,7 +558,9 @@ namespace osu.Game.Online.Chat
         /// Leave the specified channel. Can be called from any thread.
         /// </summary>
         /// <param name="channel">The channel to leave.</param>
-        public void LeaveChannel(Channel channel) => Schedule(() =>
+        public void LeaveChannel(Channel channel) => Schedule(() => leaveChannel(channel, true));
+
+        private void leaveChannel(Channel channel, bool sendLeaveRequest)
         {
             if (channel == null) return;
 
@@ -576,10 +583,11 @@ namespace osu.Game.Online.Chat
 
             if (channel.Joined.Value)
             {
-                api.Queue(new LeaveChannelRequest(channel));
+                if (sendLeaveRequest)
+                    api.Queue(new LeaveChannelRequest(channel));
                 channel.Joined.Value = false;
             }
-        });
+        }
 
         /// <summary>
         /// Opens the most recently closed channel that has not already been reopened,

@@ -13,6 +13,7 @@ using osu.Framework.Graphics.Primitives;
 using osu.Framework.Graphics.Rendering;
 using osu.Framework.Graphics.Rendering.Vertices;
 using osu.Framework.Graphics.Shaders;
+using osu.Framework.Graphics.Shaders.Types;
 using osu.Framework.Graphics.Textures;
 using osu.Framework.Input;
 using osu.Framework.Input.Events;
@@ -255,15 +256,23 @@ namespace osu.Game.Rulesets.Osu.UI.Cursor
                 Source.parts.CopyTo(parts, 0);
             }
 
+            private IUniformBuffer<CursorTrailParameters> cursorTrailParameters;
+
             public override void Draw(IRenderer renderer)
             {
                 base.Draw(renderer);
 
                 vertexBatch ??= renderer.CreateQuadBatch<TexturedTrailVertex>(max_sprites, 1);
 
+                cursorTrailParameters ??= renderer.CreateUniformBuffer<CursorTrailParameters>();
+                cursorTrailParameters.Data = cursorTrailParameters.Data with
+                {
+                    FadeClock = time,
+                    FadeExponent = fadeExponent
+                };
+
                 shader.Bind();
-                shader.GetUniform<float>("g_FadeClock").UpdateValue(ref time);
-                shader.GetUniform<float>("g_FadeExponent").UpdateValue(ref fadeExponent);
+                shader.BindUniformBlock("m_CursorTrailParameters", cursorTrailParameters);
 
                 texture.Bind();
 
@@ -277,7 +286,7 @@ namespace osu.Game.Rulesets.Osu.UI.Cursor
                     if (time - part.Time >= 1)
                         continue;
 
-                    vertexBatch.Add(new TexturedTrailVertex
+                    vertexBatch.Add(new TexturedTrailVertex(renderer)
                     {
                         Position = new Vector2(part.Position.X - size.X * originPosition.X, part.Position.Y + size.Y * (1 - originPosition.Y)),
                         TexturePosition = textureRect.BottomLeft,
@@ -286,7 +295,7 @@ namespace osu.Game.Rulesets.Osu.UI.Cursor
                         Time = part.Time
                     });
 
-                    vertexBatch.Add(new TexturedTrailVertex
+                    vertexBatch.Add(new TexturedTrailVertex(renderer)
                     {
                         Position = new Vector2(part.Position.X + size.X * (1 - originPosition.X), part.Position.Y + size.Y * (1 - originPosition.Y)),
                         TexturePosition = textureRect.BottomRight,
@@ -295,7 +304,7 @@ namespace osu.Game.Rulesets.Osu.UI.Cursor
                         Time = part.Time
                     });
 
-                    vertexBatch.Add(new TexturedTrailVertex
+                    vertexBatch.Add(new TexturedTrailVertex(renderer)
                     {
                         Position = new Vector2(part.Position.X + size.X * (1 - originPosition.X), part.Position.Y - size.Y * originPosition.Y),
                         TexturePosition = textureRect.TopRight,
@@ -304,7 +313,7 @@ namespace osu.Game.Rulesets.Osu.UI.Cursor
                         Time = part.Time
                     });
 
-                    vertexBatch.Add(new TexturedTrailVertex
+                    vertexBatch.Add(new TexturedTrailVertex(renderer)
                     {
                         Position = new Vector2(part.Position.X - size.X * originPosition.X, part.Position.Y - size.Y * originPosition.Y),
                         TexturePosition = textureRect.TopLeft,
@@ -323,6 +332,15 @@ namespace osu.Game.Rulesets.Osu.UI.Cursor
                 base.Dispose(isDisposing);
 
                 vertexBatch?.Dispose();
+                cursorTrailParameters?.Dispose();
+            }
+
+            [StructLayout(LayoutKind.Sequential, Pack = 1)]
+            private record struct CursorTrailParameters
+            {
+                public UniformFloat FadeClock;
+                public UniformFloat FadeExponent;
+                private readonly UniformPadding8 pad1;
             }
         }
 
@@ -344,12 +362,22 @@ namespace osu.Game.Rulesets.Osu.UI.Cursor
             [VertexMember(1, VertexAttribPointerType.Float)]
             public float Time;
 
+            [VertexMember(1, VertexAttribPointerType.Int)]
+            private readonly int maskingIndex;
+
+            public TexturedTrailVertex(IRenderer renderer)
+            {
+                this = default;
+                maskingIndex = renderer.CurrentMaskingIndex;
+            }
+
             public bool Equals(TexturedTrailVertex other)
             {
                 return Position.Equals(other.Position)
                        && TexturePosition.Equals(other.TexturePosition)
                        && Colour.Equals(other.Colour)
-                       && Time.Equals(other.Time);
+                       && Time.Equals(other.Time)
+                       && maskingIndex == other.maskingIndex;
             }
         }
     }

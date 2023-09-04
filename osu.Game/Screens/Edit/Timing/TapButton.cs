@@ -37,10 +37,10 @@ namespace osu.Game.Screens.Edit.Timing
         [Resolved]
         private OverlayColourProvider colourProvider { get; set; } = null!;
 
-        [Resolved(canBeNull: true)]
+        [Resolved]
         private Bindable<ControlPointGroup>? selectedGroup { get; set; }
 
-        [Resolved(canBeNull: true)]
+        [Resolved]
         private IBeatSyncProvider? beatSyncSource { get; set; }
 
         private Circle hoverLayer = null!;
@@ -310,7 +310,7 @@ namespace osu.Game.Screens.Edit.Timing
             }
 
             double averageBeatLength = (tapTimings.Last() - tapTimings.Skip(initial_taps_to_ignore).First()) / (tapTimings.Count - initial_taps_to_ignore - 1);
-            double clockRate = beatSyncSource?.Clock?.Rate ?? 1;
+            double clockRate = beatSyncSource?.Clock.Rate ?? 1;
 
             double bpm = Math.Round(60000 / averageBeatLength / clockRate);
 

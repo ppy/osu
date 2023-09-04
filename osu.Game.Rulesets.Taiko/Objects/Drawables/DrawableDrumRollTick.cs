@@ -37,8 +37,6 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
 
         protected override SkinnableDrawable CreateMainPiece() => new SkinnableDrawable(new TaikoSkinComponentLookup(TaikoSkinComponents.DrumRollTick), _ => new TickPiece());
 
-        public override double MaximumJudgementOffset => HitObject.HitWindow;
-
         protected override void OnApply()
         {
             base.OnApply();
@@ -108,14 +106,6 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
                     return;
 
                 ApplyResult(r => r.Type = ParentHitObject.IsHit ? r.Judgement.MaxResult : r.Judgement.MinResult);
-            }
-
-            public override void OnKilled()
-            {
-                base.OnKilled();
-
-                if (Time.Current > ParentHitObject.HitObject.GetEndTime() && !Judged)
-                    ApplyResult(r => r.Type = r.Judgement.MinResult);
             }
 
             public override bool OnPressed(KeyBindingPressEvent<TaikoAction> e) => false;

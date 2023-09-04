@@ -23,7 +23,7 @@ namespace osu.Game.Overlays.Profile.Header
 {
     public partial class BottomHeaderContainer : CompositeDrawable
     {
-        public readonly Bindable<APIUser?> User = new Bindable<APIUser?>();
+        public readonly Bindable<UserProfileData?> User = new Bindable<UserProfileData?>();
 
         private LinkFlowContainer topLinkContainer = null!;
         private LinkFlowContainer bottomLinkContainer = null!;
@@ -55,7 +55,7 @@ namespace osu.Game.Overlays.Profile.Header
                     RelativeSizeAxes = Axes.X,
                     AutoSizeAxes = Axes.Y,
                     Direction = FillDirection.Vertical,
-                    Padding = new MarginPadding { Horizontal = UserProfileOverlay.CONTENT_X_MARGIN, Vertical = 10 },
+                    Padding = new MarginPadding { Horizontal = WaveOverlayContainer.HORIZONTAL_PADDING, Vertical = 10 },
                     Spacing = new Vector2(0, 10),
                     Children = new Drawable[]
                     {
@@ -73,7 +73,7 @@ namespace osu.Game.Overlays.Profile.Header
                 }
             };
 
-            User.BindValueChanged(user => updateDisplay(user.NewValue));
+            User.BindValueChanged(user => updateDisplay(user.NewValue?.User));
         }
 
         private void updateDisplay(APIUser? user)

@@ -68,24 +68,30 @@ namespace osu.Game.Skinning
 
             switch (lookup)
             {
-                case GlobalSkinComponentLookup target:
-                    switch (target.Lookup)
+                case SkinComponentsContainerLookup containerLookup:
+                    // Only handle global level defaults for now.
+                    if (containerLookup.Ruleset != null)
+                        return null;
+
+                    switch (containerLookup.Target)
                     {
-                        case GlobalSkinComponentLookup.LookupType.SongSelect:
-                            var songSelectComponents = new SkinnableTargetComponentsContainer(_ =>
+                        case SkinComponentsContainerLookup.TargetArea.SongSelect:
+                            var songSelectComponents = new DefaultSkinComponentsContainer(_ =>
                             {
                                 // do stuff when we need to.
                             });
 
                             return songSelectComponents;
 
-                        case GlobalSkinComponentLookup.LookupType.MainHUDComponents:
-                            var skinnableTargetWrapper = new SkinnableTargetComponentsContainer(container =>
+                        case SkinComponentsContainerLookup.TargetArea.MainHUDComponents:
+                            var skinnableTargetWrapper = new DefaultSkinComponentsContainer(container =>
                             {
                                 var score = container.OfType<DefaultScoreCounter>().FirstOrDefault();
                                 var accuracy = container.OfType<DefaultAccuracyCounter>().FirstOrDefault();
                                 var combo = container.OfType<DefaultComboCounter>().FirstOrDefault();
                                 var ppCounter = container.OfType<PerformancePointsCounter>().FirstOrDefault();
+                                var songProgress = container.OfType<DefaultSongProgress>().FirstOrDefault();
+                                var keyCounter = container.OfType<DefaultKeyCounterDisplay>().FirstOrDefault();
 
                                 if (score != null)
                                 {
@@ -137,6 +143,18 @@ namespace osu.Game.Skinning
                                         hitError2.Origin = Anchor.CentreLeft;
                                     }
                                 }
+
+                                if (songProgress != null && keyCounter != null)
+                                {
+                                    const float padding = 10;
+
+                                    // Hard to find this at runtime, so taken from the most expanded state during replay.
+                                    const float song_progress_offset_height = 73;
+
+                                    keyCounter.Anchor = Anchor.BottomRight;
+                                    keyCounter.Origin = Anchor.BottomRight;
+                                    keyCounter.Position = new Vector2(-padding, -(song_progress_offset_height + padding));
+                                }
                             })
                             {
                                 Children = new Drawable[]
@@ -146,6 +164,7 @@ namespace osu.Game.Skinning
                                     new DefaultAccuracyCounter(),
                                     new DefaultHealthDisplay(),
                                     new DefaultSongProgress(),
+                                    new DefaultKeyCounterDisplay(),
                                     new BarHitErrorMeter(),
                                     new BarHitErrorMeter(),
                                     new PerformancePointsCounter()
@@ -184,6 +203,6 @@ namespace osu.Game.Skinning
         }
 
         private static Color4 getComboColour(IHasComboColours source, int colourIndex)
-            => source.ComboColours[colourIndex % source.ComboColours.Count];
+            => source.ComboColours![colourIndex % source.ComboColours.Count];
     }
 }

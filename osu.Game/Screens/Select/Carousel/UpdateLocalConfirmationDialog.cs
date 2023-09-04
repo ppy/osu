@@ -8,14 +8,14 @@ using osu.Game.Localisation;
 
 namespace osu.Game.Screens.Select.Carousel
 {
-    public partial class UpdateLocalConfirmationDialog : DeleteConfirmationDialog
+    public partial class UpdateLocalConfirmationDialog : DangerousActionDialog
     {
         public UpdateLocalConfirmationDialog(Action onConfirm)
         {
             HeaderText = PopupDialogStrings.UpdateLocallyModifiedText;
             BodyText = PopupDialogStrings.UpdateLocallyModifiedDescription;
             Icon = FontAwesome.Solid.ExclamationTriangle;
-            DeleteAction = onConfirm;
+            DangerousAction = onConfirm;
         }
     }
 }

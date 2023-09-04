@@ -125,6 +125,9 @@ namespace osu.Game.Online.API.Requests.Responses
         [JsonProperty(@"beatmaps")]
         public APIBeatmap[] Beatmaps { get; set; } = Array.Empty<APIBeatmap>();
 
+        [JsonProperty(@"converts")]
+        public APIBeatmap[]? Converts { get; set; }
+
         private BeatmapMetadata metadata => new BeatmapMetadata
         {
             Title = Title,
