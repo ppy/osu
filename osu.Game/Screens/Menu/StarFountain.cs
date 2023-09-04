@@ -23,7 +23,7 @@ namespace osu.Game.Screens.Menu
             InternalChild = spewer = new StarFountainSpewer();
         }
 
-        public void Shoot() => spewer.Shoot();
+        public void Shoot(int direction) => spewer.Shoot(direction);
 
         protected override void SkinChanged(ISkinSource skin)
         {
@@ -81,10 +81,10 @@ namespace osu.Game.Screens.Menu
                 return lastShootDirection * x_velocity_from_direction * (float)(1 - 2 * (Clock.CurrentTime - lastShootTime!.Value) / shoot_duration) + getRandomVariance(x_velocity_random_variance);
             }
 
-            public void Shoot()
+            public void Shoot(int direction)
             {
                 lastShootTime = Clock.CurrentTime;
-                lastShootDirection = RNG.Next(-1, 2);
+                lastShootDirection = direction;
             }
 
             private static float getRandomVariance(float variance) => RNG.NextSingle(-variance, variance);

@@ -199,6 +199,8 @@ namespace osu.Game.Screens.Edit
 
             if (loadableBeatmap is DummyWorkingBeatmap)
             {
+                Logger.Log("Editor was loaded without a valid beatmap; creating a new beatmap.");
+
                 isNewBeatmap = true;
 
                 loadableBeatmap = beatmapManager.CreateNew(Ruleset.Value, api.LocalUser.Value);
@@ -425,7 +427,8 @@ namespace osu.Game.Screens.Edit
             {
                 dialogOverlay.Push(new SaveBeforeGameplayTestDialog(() =>
                 {
-                    Save();
+                    if (!Save()) return;
+
                     pushEditorPlayer();
                 }));
             }
@@ -764,7 +767,7 @@ namespace osu.Game.Screens.Edit
 
         private void confirmExitWithSave()
         {
-            Save();
+            if (!Save()) return;
 
             ExitConfirmed = true;
             this.Exit();
@@ -1021,13 +1024,15 @@ namespace osu.Game.Screens.Edit
 
         private void exportBeatmap()
         {
-            Save();
+            if (!Save()) return;
+
             beatmapManager.Export(Beatmap.Value.BeatmapSetInfo);
         }
 
         private void exportLegacyBeatmap()
         {
-            Save();
+            if (!Save()) return;
+
             beatmapManager.ExportLegacy(Beatmap.Value.BeatmapSetInfo);
         }
 
