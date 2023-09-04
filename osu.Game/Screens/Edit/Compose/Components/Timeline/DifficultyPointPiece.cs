@@ -177,7 +177,11 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
             AddHeader("Final velocity");
             AddValue($"{beatmapVelocity * current.Value:#,0.00}x");
 
-            if (sliderVelocities.Length == 0) return;
+            if (sliderVelocities.Length == 0)
+            {
+                return;
+            }
+
             if (sliderVelocities.First() != sliderVelocities.Last())
             {
                 AddHeader("Beatmap velocity range");
