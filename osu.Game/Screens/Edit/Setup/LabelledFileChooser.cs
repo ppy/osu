@@ -114,6 +114,9 @@ namespace osu.Game.Screens.Edit.Setup
 
         private partial class FileChooserPopover : OsuPopover
         {
+            protected override string PopInSampleName => "UI/overlay-big-pop-in";
+            protected override string PopOutSampleName => "UI/overlay-big-pop-out";
+
             public FileChooserPopover(string[] handledExtensions, Bindable<FileInfo?> currentFile, string? chooserPath)
             {
                 Child = new Container

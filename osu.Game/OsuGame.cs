@@ -1027,7 +1027,7 @@ namespace osu.Game
 
             loadComponentSingleFile(CreateHighPerformanceSession(), Add);
 
-            loadComponentSingleFile(new BackgroundBeatmapProcessor(), Add);
+            loadComponentSingleFile(new BackgroundDataStoreProcessor(), Add);
 
             Add(difficultyRecommender);
             Add(externalLinkOpener = new ExternalLinkOpener());

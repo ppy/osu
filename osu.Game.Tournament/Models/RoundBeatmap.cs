@@ -8,7 +8,6 @@ namespace osu.Game.Tournament.Models
     public class RoundBeatmap
     {
         public int ID;
-
         public string Mods = string.Empty;
 
         [JsonProperty("BeatmapInfo")]
