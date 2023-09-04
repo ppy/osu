@@ -1,6 +1,7 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System;
 using System.IO;
 using System.Linq;
 using osu.Framework.Allocation;
@@ -13,12 +14,12 @@ using osu.Game.Beatmaps.Drawables;
 using osu.Game.Configuration;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
-using osu.Game.Online;
 using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Overlays;
 using osu.Game.Overlays.Notifications;
 using osu.Game.Scoring;
 using osuTK.Graphics;
+using Realms;
 
 namespace osu.Game.Database
 {
@@ -40,6 +41,8 @@ namespace osu.Game.Database
         private Bindable<bool> autodownloadConfig = null!;
         private Bindable<bool> noVideoSetting = null!;
 
+        private IDisposable? realmSubscription;
+
         public MissingBeatmapNotification(APIBeatmap beatmap, MemoryStream scoreStream, string beatmapHash)
         {
             beatmapSetInfo = beatmap.BeatmapSet!;
@@ -53,16 +56,16 @@ namespace osu.Game.Database
         {
             Text = "You do not have the required beatmap for this replay";
 
+            realmSubscription = realm.RegisterForNotifications(
+                realm => realm.All<BeatmapSetInfo>().Where(s => !s.DeletePending), beatmapsChanged);
+
             realm.Run(r =>
             {
-                if (r.All<BeatmapSetInfo>().Any(s => s.OnlineID == beatmapSetInfo.OnlineID))
+                if (r.All<BeatmapSetInfo>().Any(s => !s.DeletePending && s.OnlineID == beatmapSetInfo.OnlineID))
                 {
-                    Text = "You have the corresponding beatmapset but no beatmap, you may need to update the beatmap.";
+                    Text = "You have the corresponding beatmapset but no beatmap, you may need to update the beatmapset.";
                 }
             });
-
-            BeatmapDownloadTracker downloadTracker = new BeatmapDownloadTracker(beatmapSetInfo);
-            downloadTracker.State.BindValueChanged(downloadStatusChanged);
 
             autodownloadConfig = config.GetBindable<bool>(OsuSetting.AutomaticallyDownloadWhenSpectating);
             noVideoSetting = config.GetBindable<bool>(OsuSetting.PreferNoVideo);
@@ -78,7 +81,6 @@ namespace osu.Game.Database
                 Action = () => beatmapSetOverlay?.FetchAndShowBeatmapSet(beatmapSetInfo.OnlineID),
                 Children = new Drawable[]
                 {
-                    downloadTracker,
                     new DelayedLoadWrapper(() => new UpdateableOnlineBeatmapSetCover(BeatmapSetCoverType.Card)
                     {
                         OnlineInfo = beatmapSetInfo,
@@ -141,19 +143,16 @@ namespace osu.Game.Database
                 beatmapDownloader.Download(beatmapSetInfo, noVideoSetting.Value);
         }
 
-        private void downloadStatusChanged(ValueChangedEvent<DownloadState> status)
+        private void beatmapsChanged(IRealmCollection<BeatmapSetInfo> sender, ChangeSet? changes)
         {
-            if (status.NewValue != DownloadState.LocallyAvailable)
-                return;
+            if (changes?.InsertedIndices == null) return;
 
-            realm.Run(r =>
+            if (sender.Any(s => s.Beatmaps.Any(b => b.MD5Hash == beatmapHash)))
             {
-                if (r.All<BeatmapInfo>().Any(s => s.MD5Hash == beatmapHash))
-                {
-                    var importTask = new ImportTask(scoreStream, "score.osr");
-                    scoreManager.Import(this, new[] { importTask });
-                }
-            });
+                var importTask = new ImportTask(scoreStream, "score.osr");
+                scoreManager.Import(this, new[] { importTask });
+                realmSubscription?.Dispose();
+            }
         }
     }
 }
