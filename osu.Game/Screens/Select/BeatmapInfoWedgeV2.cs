@@ -187,11 +187,16 @@ namespace osu.Game.Screens.Select
 
                     Info.DisplayedStars.BindValueChanged(s =>
                     {
-                        starCounter.Current = (float)s.NewValue;
                         starCounter.Colour = s.NewValue >= 6.5 ? colours.Orange1 : Colour4.Black.Opacity(0.75f);
 
                         difficultyColourBar.FadeColour(colours.ForStarDifficulty(s.NewValue));
                     }, true);
+
+                    Info.ActualStars.BindValueChanged(s =>
+                    {
+                        // use actual stars as star counter has its own animation
+                        starCounter.Current = (float)s.NewValue;
+                    });
                 });
             });
 
@@ -215,6 +220,7 @@ namespace osu.Game.Screens.Select
             private readonly WorkingBeatmap working;
 
             public IBindable<double> DisplayedStars => starRatingDisplay.DisplayedStars;
+            public Bindable<double> ActualStars = new Bindable<double>();
 
             [Resolved]
             private IBindable<IReadOnlyList<Mod>> mods { get; set; } = null!;
@@ -312,6 +318,7 @@ namespace osu.Game.Screens.Select
                 starDifficulty.BindValueChanged(s =>
                 {
                     starRatingDisplay.Current.Value = s.NewValue ?? default;
+                    ActualStars.Value = s.NewValue?.Stars ?? 0;
 
                     // Don't roll the counter on initial display (but still allow it to roll on applying mods etc.)
                     if (!starRatingDisplay.IsPresent)
