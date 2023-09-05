@@ -22,6 +22,7 @@ using osu.Game.IO;
 using osu.Game.Skinning;
 using osu.Game.Tests.Resources;
 using osu.Game.Tests.Visual;
+using osuTK;
 
 namespace osu.Game.Tests.Skins
 {
@@ -100,7 +101,7 @@ namespace osu.Game.Tests.Skins
             {
             }
 
-            public override Texture GetTexture(string componentName, WrapMode wrapModeS, WrapMode wrapModeT) => throw new NotImplementedException();
+            public override Texture GetTexture(string componentName, Vector2? maxSize = null, WrapMode wrapModeS = default, WrapMode wrapModeT = default) => throw new NotImplementedException();
 
             public override IBindable<TValue> GetConfig<TLookup, TValue>(TLookup lookup) => throw new NotImplementedException();
 

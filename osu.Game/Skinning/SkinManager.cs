@@ -25,6 +25,7 @@ using osu.Game.Database;
 using osu.Game.IO;
 using osu.Game.Overlays.Notifications;
 using osu.Game.Utils;
+using osuTK;
 
 namespace osu.Game.Skinning
 {
@@ -223,7 +224,8 @@ namespace osu.Game.Skinning
 
         public Drawable GetDrawableComponent(ISkinComponentLookup lookup) => lookupWithFallback(s => s.GetDrawableComponent(lookup));
 
-        public Texture GetTexture(string componentName, WrapMode wrapModeS, WrapMode wrapModeT) => lookupWithFallback(s => s.GetTexture(componentName, wrapModeS, wrapModeT));
+        public Texture GetTexture(string componentName, Vector2? maxSize = null, WrapMode wrapModeS = default, WrapMode wrapModeT = default) =>
+            lookupWithFallback(s => s.GetTexture(componentName, maxSize, wrapModeS, wrapModeT));
 
         public ISample GetSample(ISampleInfo sampleInfo) => lookupWithFallback(s => s.GetSample(sampleInfo));
 

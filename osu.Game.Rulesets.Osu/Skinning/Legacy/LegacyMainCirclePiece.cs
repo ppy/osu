@@ -70,7 +70,7 @@ namespace osu.Game.Rulesets.Osu.Skinning.Legacy
             // expected behaviour in this scenario is not showing the overlay, rather than using hitcircleoverlay.png.
             InternalChildren = new[]
             {
-                CircleSprite = new LegacyKiaiFlashingDrawable(() => new Sprite { Texture = skin.GetTextureWithMaxSize(circleName, circle_piece_size) })
+                CircleSprite = new LegacyKiaiFlashingDrawable(() => new Sprite { Texture = skin.GetTexture(circleName, circle_piece_size) })
                 {
                     Anchor = Anchor.Centre,
                     Origin = Anchor.Centre,

@@ -20,6 +20,7 @@ using osu.Game.Rulesets.Objects.Legacy;
 using osu.Game.Rulesets.Objects.Types;
 using osu.Game.Skinning;
 using osu.Game.Tests.Visual;
+using osuTK;
 using osuTK.Graphics;
 
 namespace osu.Game.Tests.Gameplay
@@ -140,7 +141,7 @@ namespace osu.Game.Tests.Gameplay
 
             public Drawable GetDrawableComponent(ISkinComponentLookup lookup) => throw new NotImplementedException();
 
-            public Texture GetTexture(string componentName, WrapMode wrapModeS, WrapMode wrapModeT) => throw new NotImplementedException();
+            public Texture GetTexture(string componentName, Vector2? maxSize = null, WrapMode wrapModeS = default, WrapMode wrapModeT = default) => throw new NotImplementedException();
 
             public ISample GetSample(ISampleInfo sampleInfo) => throw new NotImplementedException();
 

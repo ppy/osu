@@ -67,7 +67,8 @@ namespace osu.Game.Skinning
             };
         }
 
-        public override Texture? GetTexture(string componentName, WrapMode wrapModeS, WrapMode wrapModeT) => Textures?.Get(componentName, wrapModeS, wrapModeT);
+        public override Texture? GetTexture(string componentName, Vector2? maxSize = null, WrapMode wrapModeS = default, WrapMode wrapModeT = default) =>
+            Textures?.Get(componentName, wrapModeS, wrapModeT).WithMaximumSize(maxSize);
 
         public override ISample? GetSample(ISampleInfo sampleInfo)
         {

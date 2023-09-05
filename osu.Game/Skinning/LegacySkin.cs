@@ -466,7 +466,7 @@ namespace osu.Game.Skinning
             return null;
         }
 
-        public override Texture? GetTexture(string componentName, WrapMode wrapModeS, WrapMode wrapModeT)
+        public override Texture? GetTexture(string componentName, Vector2? maxSize = null, WrapMode wrapModeS = default, WrapMode wrapModeT = default)
         {
             switch (componentName)
             {
@@ -497,7 +497,8 @@ namespace osu.Game.Skinning
                     continue;
 
                 texture.ScaleAdjust = ratio;
-                return texture;
+
+                return texture.WithMaximumSize(maxSize);
             }
 
             return null;

@@ -130,7 +130,7 @@ namespace osu.Game.Rulesets.Osu.Tests
         private class TopLeftCursorSkin : ISkin
         {
             public Drawable GetDrawableComponent(ISkinComponentLookup lookup) => null;
-            public Texture GetTexture(string componentName, WrapMode wrapModeS, WrapMode wrapModeT) => null;
+            public Texture GetTexture(string componentName, Vector2? maxSize = null, WrapMode wrapModeS = default, WrapMode wrapModeT = default) => null;
             public ISample GetSample(ISampleInfo sampleInfo) => null;
 
             public IBindable<TValue> GetConfig<TLookup, TValue>(TLookup lookup)
