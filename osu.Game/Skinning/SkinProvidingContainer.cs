@@ -11,6 +11,7 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Textures;
 using osu.Game.Audio;
+using osuTK;
 
 namespace osu.Game.Skinning
 {
@@ -127,19 +128,19 @@ namespace osu.Game.Skinning
             return ParentSource?.GetDrawableComponent(lookup);
         }
 
-        public Texture? GetTexture(string componentName, WrapMode wrapModeS, WrapMode wrapModeT)
+        public Texture? GetTexture(string componentName, Vector2? maxSize = null, WrapMode wrapModeS = default, WrapMode wrapModeT = default)
         {
             foreach (var (_, lookupWrapper) in skinSources)
             {
                 Texture? sourceTexture;
-                if ((sourceTexture = lookupWrapper.GetTexture(componentName, wrapModeS, wrapModeT)) != null)
+                if ((sourceTexture = lookupWrapper.GetTexture(componentName, maxSize, wrapModeS, wrapModeT)) != null)
                     return sourceTexture;
             }
 
             if (!AllowFallingBackToParent)
                 return null;
 
-            return ParentSource?.GetTexture(componentName, wrapModeS, wrapModeT);
+            return ParentSource?.GetTexture(componentName, maxSize, wrapModeS, wrapModeT);
         }
 
         public ISample? GetSample(ISampleInfo sampleInfo)
@@ -251,10 +252,10 @@ namespace osu.Game.Skinning
                 return null;
             }
 
-            public Texture? GetTexture(string componentName, WrapMode wrapModeS, WrapMode wrapModeT)
+            public Texture? GetTexture(string componentName, Vector2? maxSize = null, WrapMode wrapModeS = default, WrapMode wrapModeT = default)
             {
                 if (provider.AllowTextureLookup(componentName))
-                    return skin.GetTexture(componentName, wrapModeS, wrapModeT);
+                    return skin.GetTexture(componentName, maxSize, wrapModeS, wrapModeT);
 
                 return null;
             }

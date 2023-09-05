@@ -67,7 +67,7 @@ namespace osu.Game.Skinning
                 if (animatable && s.GetTexture(getFrameName(0)) != null)
                     return true;
 
-                return s.GetTexture(componentName, wrapModeS, wrapModeT) != null;
+                return s.GetTexture(componentName, maxSize, wrapModeS, wrapModeT) != null;
             }) ?? source;
 
             if (animatable)
@@ -79,21 +79,15 @@ namespace osu.Game.Skinning
             }
 
             // if an animation was not allowed or not found, fall back to a sprite retrieval.
-            var singleTexture = maxSize != null
-                ? retrievalSource.GetTextureWithMaxSize(componentName, maxSize.Value, wrapModeS, wrapModeT)
-                : retrievalSource.GetTexture(componentName, wrapModeS, wrapModeT);
+            var singleTexture = retrievalSource.GetTexture(componentName, maxSize, wrapModeS, wrapModeT);
 
-            return singleTexture != null
-                ? new[] { singleTexture }
-                : Array.Empty<Texture>();
+            return singleTexture != null ? new[] { singleTexture } : Array.Empty<Texture>();
 
             IEnumerable<Texture> getTextures(ISkin skin)
             {
                 for (int i = 0; true; i++)
                 {
-                    var texture = maxSize != null
-                        ? skin.GetTextureWithMaxSize(getFrameName(i), maxSize.Value, wrapModeS, wrapModeT)
-                        : skin.GetTexture(getFrameName(i), wrapModeS, wrapModeT);
+                    var texture = skin.GetTexture(getFrameName(i), maxSize, wrapModeS, wrapModeT);
 
                     if (texture == null)
                         break;
@@ -105,17 +99,16 @@ namespace osu.Game.Skinning
             string getFrameName(int frameIndex) => $"{componentName}{animationSeparator}{frameIndex}";
         }
 
-        public static Texture? GetTextureWithMaxSize(this ISkin source, string componentName, Vector2 maxSize, WrapMode wrapModeS = WrapMode.None, WrapMode wrapModeT = WrapMode.None)
+        public static Texture? WithMaximumSize(this Texture? texture, Vector2? maxSize)
         {
-            var texture = source.GetTexture(componentName, wrapModeS, wrapModeT);
-            if (texture == null)
+            if (texture == null || maxSize == null)
                 return texture;
 
-            if (texture.DisplayWidth <= maxSize.X && texture.DisplayHeight <= maxSize.Y)
+            if (texture.DisplayWidth <= maxSize.Value.X && texture.DisplayHeight <= maxSize.Value.Y)
                 return texture;
 
             // use scale adjust property for downscaling the texture in order to meet the specified maximum dimensions.
-            texture.ScaleAdjust *= Math.Max(texture.DisplayWidth / maxSize.X, texture.DisplayHeight / maxSize.Y);
+            texture.ScaleAdjust *= Math.Max(texture.DisplayWidth / maxSize.Value.X, texture.DisplayHeight / maxSize.Value.Y);
             return texture;
         }
 

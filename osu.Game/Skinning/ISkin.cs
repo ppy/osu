@@ -6,6 +6,7 @@ using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Textures;
 using osu.Game.Audio;
+using osuTK;
 
 namespace osu.Game.Skinning
 {
@@ -25,17 +26,11 @@ namespace osu.Game.Skinning
         /// Retrieve a <see cref="Texture"/>.
         /// </summary>
         /// <param name="componentName">The requested texture.</param>
-        /// <returns>A matching texture, or null if unavailable.</returns>
-        Texture? GetTexture(string componentName) => GetTexture(componentName, default, default);
-
-        /// <summary>
-        /// Retrieve a <see cref="Texture"/>.
-        /// </summary>
-        /// <param name="componentName">The requested texture.</param>
+        /// <param name="maxSize">The maximum dimensions that the texture should be.</param>
         /// <param name="wrapModeS">The texture wrap mode in horizontal direction.</param>
         /// <param name="wrapModeT">The texture wrap mode in vertical direction.</param>
         /// <returns>A matching texture, or null if unavailable.</returns>
-        Texture? GetTexture(string componentName, WrapMode wrapModeS, WrapMode wrapModeT);
+        Texture? GetTexture(string componentName, Vector2? maxSize = null, WrapMode wrapModeS = default, WrapMode wrapModeT = default);
 
         /// <summary>
         /// Retrieve a <see cref="SampleChannel"/>.

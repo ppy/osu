@@ -297,7 +297,7 @@ namespace osu.Game.Tests.Visual.Gameplay
                     }
                     : null;
 
-            public Texture GetTexture(string componentName, WrapMode wrapModeS, WrapMode wrapModeT) => throw new NotImplementedException();
+            public Texture GetTexture(string componentName, Vector2? maxSize = null, WrapMode wrapModeS = default, WrapMode wrapModeT = default) => throw new NotImplementedException();
 
             public ISample GetSample(ISampleInfo sampleInfo) => throw new NotImplementedException();
 
@@ -308,7 +308,7 @@ namespace osu.Game.Tests.Visual.Gameplay
         {
             public Drawable GetDrawableComponent(ISkinComponentLookup componentLookupName) => new SecondarySourceBox();
 
-            public Texture GetTexture(string componentName, WrapMode wrapModeS, WrapMode wrapModeT) => throw new NotImplementedException();
+            public Texture GetTexture(string componentName, Vector2? maxSize = null, WrapMode wrapModeS = default, WrapMode wrapModeT = default) => throw new NotImplementedException();
 
             public ISample GetSample(ISampleInfo sampleInfo) => throw new NotImplementedException();
 
@@ -320,7 +320,7 @@ namespace osu.Game.Tests.Visual.Gameplay
         {
             public Drawable GetDrawableComponent(ISkinComponentLookup componentLookupName) => new BaseSourceBox();
 
-            public Texture GetTexture(string componentName, WrapMode wrapModeS, WrapMode wrapModeT) => throw new NotImplementedException();
+            public Texture GetTexture(string componentName, Vector2? maxSize = null, WrapMode wrapModeS = default, WrapMode wrapModeT = default) => throw new NotImplementedException();
 
             public ISample GetSample(ISampleInfo sampleInfo) => throw new NotImplementedException();
 

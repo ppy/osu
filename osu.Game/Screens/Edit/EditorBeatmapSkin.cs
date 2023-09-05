@@ -11,6 +11,7 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Textures;
 using osu.Game.Audio;
 using osu.Game.Skinning;
+using osuTK;
 using osuTK.Graphics;
 
 namespace osu.Game.Screens.Edit
@@ -54,7 +55,10 @@ namespace osu.Game.Screens.Edit
         #region Delegated ISkin implementation
 
         public Drawable GetDrawableComponent(ISkinComponentLookup lookup) => Skin.GetDrawableComponent(lookup);
-        public Texture GetTexture(string componentName, WrapMode wrapModeS, WrapMode wrapModeT) => Skin.GetTexture(componentName, wrapModeS, wrapModeT);
+
+        public Texture GetTexture(string componentName, Vector2? maxSize = null, WrapMode wrapModeS = default, WrapMode wrapModeT = default) =>
+            Skin.GetTexture(componentName, maxSize, wrapModeS, wrapModeT);
+
         public ISample GetSample(ISampleInfo sampleInfo) => Skin.GetSample(sampleInfo);
         public IBindable<TValue> GetConfig<TLookup, TValue>(TLookup lookup) => Skin.GetConfig<TLookup, TValue>(lookup);
 

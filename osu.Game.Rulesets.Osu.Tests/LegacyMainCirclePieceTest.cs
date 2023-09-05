@@ -14,6 +14,7 @@ using osu.Framework.Testing;
 using osu.Game.Rulesets.Osu.Skinning.Legacy;
 using osu.Game.Skinning;
 using osu.Game.Tests.Visual;
+using osuTK;
 
 namespace osu.Game.Rulesets.Osu.Tests
 {
@@ -77,9 +78,9 @@ namespace osu.Game.Rulesets.Osu.Tests
                 // shouldn't be required as GetTexture(string) calls GetTexture(string, WrapMode, WrapMode) by default,
                 // but moq doesn't handle that well, therefore explicitly requiring to use `CallBase`:
                 // https://github.com/moq/moq4/issues/972
-                skin.Setup(s => s.GetTexture(It.IsAny<string>())).CallBase();
+                skin.Setup(s => s.GetTexture(It.IsAny<string>(), It.IsAny<Vector2>(), It.IsAny<WrapMode>(), It.IsAny<WrapMode>())).CallBase();
 
-                skin.Setup(s => s.GetTexture(It.IsIn(textureFilenames), It.IsAny<WrapMode>(), It.IsAny<WrapMode>()))
+                skin.Setup(s => s.GetTexture(It.IsIn(textureFilenames), It.IsAny<Vector2>(), It.IsAny<WrapMode>(), It.IsAny<WrapMode>()))
                     .Returns((string componentName, WrapMode _, WrapMode _) =>
                     {
                         var tex = renderer.CreateTexture(1, 1);
