@@ -48,7 +48,7 @@ namespace osu.Game.Screens.Select
 
         private Container difficultyColourBar = null!;
         private StarCounter starCounter = null!;
-        private BufferedContainer bufferedContent = null!;
+        private Container content = null!;
 
         public BeatmapInfoWedgeV2()
         {
@@ -69,7 +69,7 @@ namespace osu.Game.Screens.Select
         private void load()
         {
             // We want to buffer the wedge to avoid weird transparency overlaps between the colour bar and the background.
-            Child = bufferedContent = new BufferedContainer(pixelSnapping: true)
+            Child = content = new Container
             {
                 RelativeSizeAxes = Axes.Both,
                 Children = new Drawable[]
@@ -177,13 +177,13 @@ namespace osu.Game.Screens.Select
                             Info = new WedgeInfoText(beatmap) { Shear = -Shear }
                         }
                     }
-                }, loaded =>
+                }, d =>
                 {
                     // Ensure we are the most recent loaded wedge.
-                    if (loaded != loadingInfo) return;
+                    if (d != loadingInfo) return;
 
                     removeOldInfo();
-                    bufferedContent.Add(DisplayedContent = loaded);
+                    content.Add(DisplayedContent = d);
 
                     Info.DisplayedStars.BindValueChanged(s =>
                     {
