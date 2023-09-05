@@ -39,13 +39,21 @@ namespace osu.Game.Screens.Select
         [Resolved]
         private OsuColour colours { get; set; } = null!;
 
+        [Resolved]
+        private BeatmapDifficultyCache difficultyCache { get; set; } = null!;
+
         protected Container? DisplayedContent { get; private set; }
 
         protected WedgeInfoText? Info { get; private set; }
 
         private Container difficultyColourBar = null!;
         private StarCounter starCounter = null!;
+        private StarRatingDisplay starRatingDisplay = null!;
+        private BeatmapSetOnlineStatusPill statusPill = null!;
         private Container content = null!;
+
+        private IBindable<StarDifficulty?>? starDifficulty;
+        private CancellationTokenSource? cancellationSource;
 
         public BeatmapInfoWedgeV2()
         {
@@ -102,7 +110,38 @@ namespace osu.Game.Screens.Select
                             Scale = new Vector2(0.35f),
                             Direction = FillDirection.Vertical
                         }
-                    }
+                    },
+                    new FillFlowContainer
+                    {
+                        Name = "Topright-aligned metadata",
+                        Anchor = Anchor.TopRight,
+                        Origin = Anchor.TopRight,
+                        Direction = FillDirection.Vertical,
+                        Padding = new MarginPadding { Top = 3, Right = colour_bar_width + 8 },
+                        AutoSizeAxes = Axes.Both,
+                        Spacing = new Vector2(0, 5),
+                        Depth = float.MinValue,
+                        Children = new Drawable[]
+                        {
+                            starRatingDisplay = new StarRatingDisplay(default, animated: true)
+                            {
+                                Anchor = Anchor.TopRight,
+                                Origin = Anchor.TopRight,
+                                Shear = -wedged_container_shear,
+                                Alpha = 0,
+                            },
+                            statusPill = new BeatmapSetOnlineStatusPill
+                            {
+                                AutoSizeAxes = Axes.Both,
+                                Anchor = Anchor.TopRight,
+                                Origin = Anchor.TopRight,
+                                Shear = -wedged_container_shear,
+                                TextSize = 11,
+                                TextPadding = new MarginPadding { Horizontal = 8, Vertical = 2 },
+                                Alpha = 0,
+                            }
+                        }
+                    },
                 }
             };
         }
@@ -112,6 +151,19 @@ namespace osu.Game.Screens.Select
             base.LoadComplete();
 
             ruleset.BindValueChanged(_ => updateDisplay());
+
+            starRatingDisplay.Current.BindValueChanged(s =>
+            {
+                // use actual stars as star counter has its own animation
+                starCounter.Current = (float)s.NewValue.Stars;
+            }, true);
+
+            starRatingDisplay.DisplayedStars.BindValueChanged(s =>
+            {
+                // sync color with star rating display
+                starCounter.Colour = s.NewValue >= 6.5 ? colours.Orange1 : Colour4.Black.Opacity(0.75f);
+                difficultyColourBar.FadeColour(colours.ForStarDifficulty(s.NewValue));
+            }, true);
         }
 
         private const double animation_duration = 600;
@@ -147,6 +199,17 @@ namespace osu.Game.Screens.Select
 
         private void updateDisplay()
         {
+            statusPill.Status = beatmap.BeatmapInfo.Status;
+
+            starDifficulty = difficultyCache.GetBindableDifficulty(beatmap.BeatmapInfo, (cancellationSource = new CancellationTokenSource()).Token);
+
+            starDifficulty.BindValueChanged(s =>
+            {
+                starRatingDisplay.Current.Value = s.NewValue ?? default;
+
+                starRatingDisplay.FadeIn(transition_duration);
+            });
+
             Scheduler.AddOnce(() =>
             {
                 LoadComponentAsync(loadingInfo = new Container
@@ -174,19 +237,6 @@ namespace osu.Game.Screens.Select
 
                     removeOldInfo();
                     content.Add(DisplayedContent = d);
-
-                    Info.DisplayedStars.BindValueChanged(s =>
-                    {
-                        starCounter.Colour = s.NewValue >= 6.5 ? colours.Orange1 : Colour4.Black.Opacity(0.75f);
-
-                        difficultyColourBar.FadeColour(colours.ForStarDifficulty(s.NewValue));
-                    }, true);
-
-                    Info.ActualStars.BindValueChanged(s =>
-                    {
-                        // use actual stars as star counter has its own animation
-                        starCounter.Current = (float)s.NewValue;
-                    }, true);
                 });
             });
 
@@ -198,23 +248,19 @@ namespace osu.Game.Screens.Select
             }
         }
 
+        protected override void Dispose(bool isDisposing)
+        {
+            base.Dispose(isDisposing);
+
+            cancellationSource?.Cancel();
+        }
+
         public partial class WedgeInfoText : Container
         {
             public OsuSpriteText TitleLabel { get; private set; } = null!;
             public OsuSpriteText ArtistLabel { get; private set; } = null!;
 
-            private StarRatingDisplay starRatingDisplay = null!;
-
             private readonly WorkingBeatmap working;
-
-            public IBindable<double> DisplayedStars => starRatingDisplay.DisplayedStars;
-            public Bindable<double> ActualStars = new Bindable<double>();
-
-            [Resolved]
-            private BeatmapDifficultyCache difficultyCache { get; set; } = null!;
-
-            private IBindable<StarDifficulty?>? starDifficulty;
-            private CancellationTokenSource? cancellationSource;
 
             public WedgeInfoText(WorkingBeatmap working)
             {
@@ -226,100 +272,35 @@ namespace osu.Game.Screens.Select
             [BackgroundDependencyLoader]
             private void load()
             {
-                var beatmapInfo = working.BeatmapInfo;
                 var metadata = working.Metadata;
 
-                Children = new Drawable[]
+                Child = new FillFlowContainer
                 {
-                    new FillFlowContainer
+                    Name = "Top-left aligned metadata",
+                    Direction = FillDirection.Vertical,
+                    Padding = new MarginPadding { Horizontal = text_margin + shear_width, Top = 12 },
+                    AutoSizeAxes = Axes.Y,
+                    RelativeSizeAxes = Axes.X,
+                    Children = new Drawable[]
                     {
-                        Name = "Topright-aligned metadata",
-                        Anchor = Anchor.TopRight,
-                        Origin = Anchor.TopRight,
-                        Direction = FillDirection.Vertical,
-                        Padding = new MarginPadding { Top = 3, Right = 8 },
-                        AutoSizeAxes = Axes.Both,
-                        Shear = wedged_container_shear,
-                        Spacing = new Vector2(0f, 5f),
-                        Children = new Drawable[]
+                        TitleLabel = new TruncatingSpriteText
                         {
-                            starRatingDisplay = new StarRatingDisplay(default, animated: true)
-                            {
-                                Anchor = Anchor.TopRight,
-                                Origin = Anchor.TopRight,
-                                Shear = -wedged_container_shear,
-                                Alpha = 0f,
-                            },
-                            new BeatmapSetOnlineStatusPill
-                            {
-                                AutoSizeAxes = Axes.Both,
-                                Anchor = Anchor.TopRight,
-                                Origin = Anchor.TopRight,
-                                Shear = -wedged_container_shear,
-                                TextSize = 11,
-                                TextPadding = new MarginPadding { Horizontal = 8, Vertical = 2 },
-                                Status = beatmapInfo.Status,
-                                Alpha = string.IsNullOrEmpty(beatmapInfo.DifficultyName) ? 0 : 1
-                            }
-                        }
-                    },
-                    new FillFlowContainer
-                    {
-                        Name = "Top-left aligned metadata",
-                        Direction = FillDirection.Vertical,
-                        Padding = new MarginPadding { Horizontal = text_margin + shear_width, Top = 12 },
-                        AutoSizeAxes = Axes.Y,
-                        RelativeSizeAxes = Axes.X,
-                        Children = new Drawable[]
+                            Shadow = true,
+                            Text = new RomanisableString(metadata.TitleUnicode, metadata.Title),
+                            Font = OsuFont.TorusAlternate.With(size: 40, weight: FontWeight.SemiBold),
+                            RelativeSizeAxes = Axes.X,
+                        },
+                        ArtistLabel = new TruncatingSpriteText
                         {
-                            TitleLabel = new TruncatingSpriteText
-                            {
-                                Shadow = true,
-                                Text = new RomanisableString(metadata.TitleUnicode, metadata.Title),
-                                Font = OsuFont.TorusAlternate.With(size: 40, weight: FontWeight.SemiBold),
-                                RelativeSizeAxes = Axes.X,
-                            },
-                            ArtistLabel = new TruncatingSpriteText
-                            {
-                                // TODO : figma design has a diffused shadow, instead of the solid one present here, not possible currently as far as i'm aware.
-                                Shadow = true,
-                                Text = new RomanisableString(metadata.ArtistUnicode, metadata.Artist),
-                                // Not sure if this should be semi bold or medium
-                                Font = OsuFont.Torus.With(size: 20, weight: FontWeight.SemiBold),
-                                RelativeSizeAxes = Axes.X,
-                            }
+                            // TODO : figma design has a diffused shadow, instead of the solid one present here, not possible currently as far as i'm aware.
+                            Shadow = true,
+                            Text = new RomanisableString(metadata.ArtistUnicode, metadata.Artist),
+                            // Not sure if this should be semi bold or medium
+                            Font = OsuFont.Torus.With(size: 20, weight: FontWeight.SemiBold),
+                            RelativeSizeAxes = Axes.X,
                         }
                     }
                 };
-            }
-
-            protected override void LoadComplete()
-            {
-                base.LoadComplete();
-
-                starDifficulty = difficultyCache.GetBindableDifficulty(working.BeatmapInfo, (cancellationSource = new CancellationTokenSource()).Token);
-                starDifficulty.BindValueChanged(s =>
-                {
-                    starRatingDisplay.Current.Value = s.NewValue ?? default;
-
-                    // Don't roll the counter on initial display (but still allow it to roll on applying mods etc.)
-                    if (!starRatingDisplay.IsPresent)
-                        starRatingDisplay.FinishTransforms(true);
-
-                    starRatingDisplay.FadeIn(transition_duration);
-                });
-
-                starRatingDisplay.Current.BindValueChanged(s =>
-                {
-                    ActualStars.Value = s.NewValue.Stars;
-                });
-            }
-
-            protected override void Dispose(bool isDisposing)
-            {
-                base.Dispose(isDisposing);
-
-                cancellationSource?.Cancel();
             }
         }
     }
