@@ -120,7 +120,7 @@ namespace osu.Game.Tests.Visual.SongSelect
         }
 
         [Test]
-        public void TestNullBeatmap()
+        public void TestNullBeatmapWithBackground()
         {
             selectBeatmap(null);
             AddAssert("check default title", () => infoWedge.Info!.TitleLabel.Current.Value == Beatmap.Default.BeatmapInfo.Metadata.Title);
