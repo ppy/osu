@@ -16,7 +16,6 @@ using osu.Game.Online;
 using osu.Game.Online.API;
 using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Online.Multiplayer;
-using osu.Game.Online.Rooms;
 using osu.Game.Online.Spectator;
 using osu.Game.Rulesets.Scoring;
 using osu.Game.Scoring;
@@ -185,7 +184,7 @@ namespace osu.Game.Screens.Play
         /// </summary>
         /// <param name="score">The score to be submitted.</param>
         /// <param name="token">The submission token.</param>
-        protected abstract APIRequest<MultiplayerScore> CreateSubmissionRequest(Score score, ScoreToken token);
+        protected abstract IAPIRequest<IAPISubmittedScore> CreateSubmissionRequest(Score score, ScoreToken token);
 
         private Task submitScore(Score score)
         {
@@ -205,7 +204,7 @@ namespace osu.Game.Screens.Play
 
             request.Success += s =>
             {
-                score.ScoreInfo.OnlineID = s.ID;
+                score.ScoreInfo.OnlineID = (long?)s.SoloScoreID ?? -1;
                 score.ScoreInfo.Position = s.Position;
 
                 scoreSubmissionSource.SetResult(true);

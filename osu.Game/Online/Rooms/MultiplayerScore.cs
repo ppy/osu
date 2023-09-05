@@ -19,10 +19,13 @@ using osu.Game.Scoring;
 
 namespace osu.Game.Online.Rooms
 {
-    public class MultiplayerScore
+    public class MultiplayerScore : IAPISubmittedScore
     {
         [JsonProperty("id")]
         public long ID { get; set; }
+
+        [JsonProperty("solo_score_id")]
+        public ulong? SoloScoreID { get; set; }
 
         [JsonProperty("user")]
         public APIUser User { get; set; }

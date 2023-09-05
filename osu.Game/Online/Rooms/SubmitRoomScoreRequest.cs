@@ -6,7 +6,7 @@ using osu.Game.Scoring;
 
 namespace osu.Game.Online.Rooms
 {
-    public class SubmitRoomScoreRequest : SubmitScoreRequest
+    public class SubmitRoomScoreRequest : SubmitScoreRequest<MultiplayerScore>
     {
         private readonly long roomId;
         private readonly long playlistItemId;

@@ -16,7 +16,7 @@ using osu.Game.Scoring;
 namespace osu.Game.Online.API.Requests.Responses
 {
     [Serializable]
-    public class SoloScoreInfo : IHasOnlineID<long>
+    public class SoloScoreInfo : IHasOnlineID<long>, IAPISubmittedScore
     {
         [JsonProperty("beatmap_id")]
         public int BeatmapID { get; set; }
@@ -224,6 +224,17 @@ namespace osu.Game.Online.API.Requests.Responses
             MaximumStatistics = score.MaximumStatistics.Where(kvp => kvp.Value != 0).ToDictionary(kvp => kvp.Key, kvp => kvp.Value),
         };
 
+        #region IHasOnlineID<long>
+
         public long OnlineID => (long?)ID ?? -1;
+
+        #endregion
+
+        #region IAPIScore
+
+        ulong? IAPISubmittedScore.SoloScoreID => ID;
+        int? IAPISubmittedScore.Position => null;
+
+        #endregion
     }
 }

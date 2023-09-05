@@ -2,12 +2,13 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
+using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Online.Rooms;
 using osu.Game.Scoring;
 
 namespace osu.Game.Online.Solo
 {
-    public class SubmitSoloScoreRequest : SubmitScoreRequest
+    public class SubmitSoloScoreRequest : SubmitScoreRequest<SoloScoreInfo>
     {
         private readonly int beatmapId;
 

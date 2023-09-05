@@ -12,7 +12,6 @@ using osu.Framework.Screens;
 using osu.Game.Online;
 using osu.Game.Online.API;
 using osu.Game.Online.API.Requests.Responses;
-using osu.Game.Online.Rooms;
 using osu.Game.Online.Spectator;
 using osu.Game.Rulesets.Judgements;
 using osu.Game.Rulesets.Mods;
@@ -71,7 +70,7 @@ namespace osu.Game.Tests.Visual
             return base.CreateTokenRequest();
         }
 
-        protected override APIRequest<MultiplayerScore> CreateSubmissionRequest(Score score, ScoreToken token)
+        protected override IAPIRequest<IAPISubmittedScore> CreateSubmissionRequest(Score score, ScoreToken token)
         {
             SubmittedScore = score;
             return base.CreateSubmissionRequest(score, token);

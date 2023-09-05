@@ -12,7 +12,6 @@ using osu.Framework.Screens;
 using osu.Game.Beatmaps;
 using osu.Game.Online.API;
 using osu.Game.Online.API.Requests.Responses;
-using osu.Game.Online.Rooms;
 using osu.Game.Online.Solo;
 using osu.Game.Rulesets;
 using osu.Game.Rulesets.Mania;
@@ -309,7 +308,7 @@ namespace osu.Game.Tests.Visual.Gameplay
                             {
                                 var requestScore = submissionRequest.Score;
 
-                                submissionRequest.TriggerSuccess(new MultiplayerScore
+                                submissionRequest.TriggerSuccess(new SoloScoreInfo
                                 {
                                     ID = 1234,
                                     User = dummyAPI.LocalUser.Value,
@@ -321,7 +320,6 @@ namespace osu.Game.Tests.Visual.Gameplay
                                     Statistics = requestScore.Statistics,
                                     Passed = requestScore.Passed,
                                     EndedAt = DateTimeOffset.Now,
-                                    Position = 1
                                 });
 
                                 return true;

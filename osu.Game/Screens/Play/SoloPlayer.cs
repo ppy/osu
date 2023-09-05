@@ -12,7 +12,6 @@ using osu.Game.Extensions;
 using osu.Game.Online;
 using osu.Game.Online.API;
 using osu.Game.Online.API.Requests.Responses;
-using osu.Game.Online.Rooms;
 using osu.Game.Online.Solo;
 using osu.Game.Scoring;
 using osu.Game.Screens.Play.HUD;
@@ -66,7 +65,7 @@ namespace osu.Game.Screens.Play
             return base.ImportScore(score);
         }
 
-        protected override APIRequest<MultiplayerScore> CreateSubmissionRequest(Score score, ScoreToken token)
+        protected override IAPIRequest<IAPISubmittedScore> CreateSubmissionRequest(Score score, ScoreToken token)
         {
             IBeatmapInfo beatmap = score.ScoreInfo.BeatmapInfo;
 
