@@ -10,6 +10,7 @@ using osu.Framework.Graphics.Cursor;
 using osu.Framework.Testing;
 using osu.Game.Overlays;
 using osu.Game.Overlays.Mods;
+using osu.Game.Rulesets.Osu;
 using osu.Game.Screens.Select.FooterV2;
 using osuTK.Input;
 
@@ -56,6 +57,24 @@ namespace osu.Game.Tests.Visual.SongSelect
 
             overlay.Hide();
         });
+
+        [SetUpSteps]
+        public void SetUpSteps()
+        {
+            AddStep("set beatmap", () => Beatmap.Value = CreateWorkingBeatmap(CreateBeatmap(new OsuRuleset().RulesetInfo)));
+        }
+
+        [Test]
+        public void TestShowOptions()
+        {
+            AddStep("enable options", () =>
+            {
+                var optionsButton = this.ChildrenOfType<FooterButtonV2>().Last();
+
+                optionsButton.Enabled.Value = true;
+                optionsButton.TriggerClick();
+            });
+        }
 
         [Test]
         public void TestState()
