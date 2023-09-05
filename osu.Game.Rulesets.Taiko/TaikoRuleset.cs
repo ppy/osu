@@ -232,17 +232,14 @@ namespace osu.Game.Rulesets.Taiko
                         break;
 
                     case TaikoModHidden:
-                        multiplier *= 1.06;
-                        break;
-
                     case TaikoModHardRock:
-                    case TaikoModFlashlight:
-                        multiplier *= 1.12;
+                        multiplier *= 1.06;
                         break;
 
                     case TaikoModDoubleTime:
                     case TaikoModNightcore:
-                        multiplier *= 1.06;
+                    case TaikoModFlashlight:
+                        multiplier *= 1.12;
                         break;
 
                     case TaikoModRelax:
