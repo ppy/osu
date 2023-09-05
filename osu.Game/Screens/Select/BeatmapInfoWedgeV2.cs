@@ -128,9 +128,9 @@ namespace osu.Game.Screens.Select
             this.FadeOut(200, Easing.OutQuint);
         }
 
-        private WorkingBeatmap? beatmap;
+        private WorkingBeatmap beatmap = null!;
 
-        public WorkingBeatmap? Beatmap
+        public WorkingBeatmap Beatmap
         {
             get => beatmap;
             set
@@ -149,12 +149,6 @@ namespace osu.Game.Screens.Select
         {
             Scheduler.AddOnce(() =>
             {
-                if (beatmap == null)
-                {
-                    removeOldInfo();
-                    return;
-                }
-
                 LoadComponentAsync(loadingInfo = new Container
                 {
                     Padding = new MarginPadding { Right = colour_bar_width },
@@ -198,8 +192,6 @@ namespace osu.Game.Screens.Select
 
             void removeOldInfo()
             {
-                State.Value = beatmap == null ? Visibility.Hidden : Visibility.Visible;
-
                 DisplayedContent?.FadeOut(transition_duration);
                 DisplayedContent?.Expire();
                 DisplayedContent = null;
