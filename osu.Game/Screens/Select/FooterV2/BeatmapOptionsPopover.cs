@@ -10,8 +10,10 @@ using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Input.Events;
 using osu.Framework.Localisation;
+using osu.Game.Beatmaps;
 using osu.Game.Collections;
 using osu.Game.Graphics;
+using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Graphics.UserInterfaceV2;
@@ -24,8 +26,10 @@ namespace osu.Game.Screens.Select.FooterV2
 {
     public partial class BeatmapOptionsPopover : OsuPopover
     {
-        private FillFlowContainer<OptionButton> buttonFlow = null!;
+        private FillFlowContainer buttonFlow = null!;
         private readonly FooterButtonOptionsV2 footerButton;
+
+        private WorkingBeatmap beatmapWhenOpening = null!;
 
         public BeatmapOptionsPopover(FooterButtonOptionsV2 footerButton)
         {
@@ -33,24 +37,37 @@ namespace osu.Game.Screens.Select.FooterV2
         }
 
         [BackgroundDependencyLoader]
-        private void load(ManageCollectionsDialog? manageCollectionsDialog, SongSelect? songSelect, OsuColour colours)
+        private void load(ManageCollectionsDialog? manageCollectionsDialog, SongSelect? songSelect, OsuColour colours, IBindable<WorkingBeatmap> beatmap)
         {
             Content.Padding = new MarginPadding(5);
 
-            Child = buttonFlow = new FillFlowContainer<OptionButton>
+            Child = buttonFlow = new FillFlowContainer
             {
                 AutoSizeAxes = Axes.Both,
                 Direction = FillDirection.Vertical,
                 Spacing = new Vector2(3),
             };
 
-            addButton(@"Manage collections", FontAwesome.Solid.Book, () => manageCollectionsDialog?.Show());
-            addButton(@"Delete all difficulties", FontAwesome.Solid.Trash, () => songSelect?.DeleteBeatmap(), colours.Red);
-            addButton(@"Remove from unplayed", FontAwesome.Regular.TimesCircle, null);
-            addButton(@"Clear local scores", FontAwesome.Solid.Eraser, () => songSelect?.ClearScores());
+            beatmapWhenOpening = beatmap.Value;
+
+            addHeader("For all difficulties", beatmapWhenOpening.BeatmapSetInfo.ToString());
+
+            addButton(@"Delete beatmap", FontAwesome.Solid.Trash, () => songSelect?.DeleteBeatmap(), colours.Red1);
+
+            addHeader("For selected difficulty", beatmapWhenOpening.BeatmapInfo.DifficultyName);
+
+            // TODO: make work, and make show "unplayed" or "played" based on status.
+            addButton(@"Mark as played", FontAwesome.Regular.TimesCircle, null);
+
+            addButton(@"Hide", FontAwesome.Solid.Magic, null);
+            addButton(@"Clear all local scores", FontAwesome.Solid.Eraser, () => songSelect?.ClearScores(), colours.Red1);
 
             if (songSelect != null && songSelect.AllowEditing)
                 addButton(@"Edit beatmap", FontAwesome.Solid.PencilAlt, () => songSelect.Edit());
+
+            addHeader("General");
+
+            addButton(@"Manage collections", FontAwesome.Solid.Book, () => manageCollectionsDialog?.Show());
         }
 
         protected override void LoadComplete()
@@ -58,6 +75,33 @@ namespace osu.Game.Screens.Select.FooterV2
             base.LoadComplete();
 
             ScheduleAfterChildren(() => GetContainingInputManager().ChangeFocus(this));
+        }
+
+        [Resolved]
+        private OverlayColourProvider overlayColourProvider { get; set; } = null!;
+
+        private void addHeader(string text, string? context = null)
+        {
+            var textFlow = new OsuTextFlowContainer
+            {
+                AutoSizeAxes = Axes.Y,
+                RelativeSizeAxes = Axes.X,
+                Padding = new MarginPadding(10),
+            };
+
+            textFlow.AddText(text, t => t.Font = OsuFont.Default.With(weight: FontWeight.SemiBold));
+
+            if (context != null)
+            {
+                textFlow.NewLine();
+                textFlow.AddText(context, t =>
+                {
+                    t.Colour = overlayColourProvider.Content2;
+                    t.Font = t.Font.With(size: 13);
+                });
+            }
+
+            buttonFlow.Add(textFlow);
         }
 
         private void addButton(LocalisableString text, IconUsage icon, Action? action, Color4? colour = null)
@@ -124,7 +168,7 @@ namespace osu.Game.Screens.Select.FooterV2
             {
                 int requested = e.Key - Key.Number1;
 
-                OptionButton? found = buttonFlow.Children.ElementAtOrDefault(requested);
+                OptionButton? found = buttonFlow.Children.OfType<OptionButton>().ElementAtOrDefault(requested);
 
                 if (found != null)
                 {
