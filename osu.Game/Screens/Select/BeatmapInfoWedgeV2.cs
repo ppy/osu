@@ -68,7 +68,6 @@ namespace osu.Game.Screens.Select
         [BackgroundDependencyLoader]
         private void load()
         {
-            // We want to buffer the wedge to avoid weird transparency overlaps between the colour bar and the background.
             Child = content = new Container
             {
                 RelativeSizeAxes = Axes.Both,
