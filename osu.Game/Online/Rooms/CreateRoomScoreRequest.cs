@@ -4,10 +4,11 @@
 using System.Net.Http;
 using osu.Framework.IO.Network;
 using osu.Game.Online.API;
+using osu.Game.Online.API.Requests.Responses;
 
 namespace osu.Game.Online.Rooms
 {
-    public class CreateRoomScoreRequest : APIRequest<APIScoreToken>
+    public class CreateRoomScoreRequest : APIRequest<APIMultiplayerScoreLink>
     {
         private readonly long roomId;
         private readonly long playlistItemId;

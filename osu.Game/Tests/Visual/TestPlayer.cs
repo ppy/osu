@@ -11,6 +11,7 @@ using osu.Framework.Bindables;
 using osu.Framework.Screens;
 using osu.Game.Online;
 using osu.Game.Online.API;
+using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Online.Rooms;
 using osu.Game.Online.Spectator;
 using osu.Game.Rulesets.Judgements;
@@ -64,7 +65,7 @@ namespace osu.Game.Tests.Visual
 
         protected override bool HandleTokenRetrievalFailure(Exception exception) => false;
 
-        protected override APIRequest<APIScoreToken> CreateTokenRequest()
+        protected override IAPIRequest<IAPIScoreToken> CreateTokenRequest()
         {
             TokenCreationRequested = true;
             return base.CreateTokenRequest();

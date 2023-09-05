@@ -11,6 +11,7 @@ using osu.Game.Beatmaps;
 using osu.Game.Extensions;
 using osu.Game.Online;
 using osu.Game.Online.API;
+using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Online.Rooms;
 using osu.Game.Online.Solo;
 using osu.Game.Scoring;
@@ -30,7 +31,7 @@ namespace osu.Game.Screens.Play
         {
         }
 
-        protected override APIRequest<APIScoreToken> CreateTokenRequest()
+        protected override IAPIRequest<IAPIScoreToken> CreateTokenRequest()
         {
             int beatmapId = Beatmap.Value.BeatmapInfo.OnlineID;
             int rulesetId = Ruleset.Value.OnlineID;
@@ -54,8 +55,6 @@ namespace osu.Game.Screens.Play
             };
 
         protected override bool HandleTokenRetrievalFailure(Exception exception) => false;
-
-        protected override ScoreToken RetrieveScoreToken(APIScoreToken token) => new ScoreToken(token.ID, ScoreTokenType.Solo);
 
         protected override Task ImportScore(Score score)
         {

@@ -14,6 +14,7 @@ using osu.Game.Beatmaps;
 using osu.Game.Database;
 using osu.Game.Online;
 using osu.Game.Online.API;
+using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Online.Multiplayer;
 using osu.Game.Online.Rooms;
 using osu.Game.Online.Spectator;
@@ -79,7 +80,7 @@ namespace osu.Game.Screens.Play
 
             req.Success += r =>
             {
-                token = RetrieveScoreToken(r);
+                token = new ScoreToken(r);
                 Logger.Log($"Score submission token retrieved ({token})");
                 tcs.SetResult(true);
             };
@@ -176,13 +177,7 @@ namespace osu.Game.Screens.Play
         /// Can return null, at which point <see cref="HandleTokenRetrievalFailure"/> will be fired.
         /// </summary>
         [CanBeNull]
-        protected abstract APIRequest<APIScoreToken> CreateTokenRequest();
-
-        /// <summary>
-        /// Constructs a <see cref="ScoreToken"/> for later use
-        /// from the <see cref="APIScoreToken"/> returned by web.
-        /// </summary>
-        protected abstract ScoreToken RetrieveScoreToken(APIScoreToken token);
+        protected abstract IAPIRequest<IAPIScoreToken> CreateTokenRequest();
 
         /// <summary>
         /// Construct a request to submit the score.

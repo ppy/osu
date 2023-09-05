@@ -6,6 +6,7 @@
 using System.Diagnostics;
 using osu.Game.Online;
 using osu.Game.Online.API;
+using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Online.Rooms;
 using osu.Game.Scoring;
 
@@ -26,15 +27,13 @@ namespace osu.Game.Screens.Play
             PlaylistItem = playlistItem;
         }
 
-        protected override APIRequest<APIScoreToken> CreateTokenRequest()
+        protected override IAPIRequest<IAPIScoreToken> CreateTokenRequest()
         {
             if (!(Room.RoomID.Value is long roomId))
                 return null;
 
             return new CreateRoomScoreRequest(roomId, PlaylistItem.ID, Game.VersionHash);
         }
-
-        protected override ScoreToken RetrieveScoreToken(APIScoreToken token) => new ScoreToken(token.ID, ScoreTokenType.Multiplayer);
 
         protected override APIRequest<MultiplayerScore> CreateSubmissionRequest(Score score, ScoreToken token)
         {

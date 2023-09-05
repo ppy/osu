@@ -6,11 +6,11 @@ using System.Net.Http;
 using osu.Framework.IO.Network;
 using osu.Game.Beatmaps;
 using osu.Game.Online.API;
-using osu.Game.Online.Rooms;
+using osu.Game.Online.API.Requests.Responses;
 
 namespace osu.Game.Online.Solo
 {
-    public class CreateSoloScoreRequest : APIRequest<APIScoreToken>
+    public class CreateSoloScoreRequest : APIRequest<APISoloScoreToken>
     {
         private readonly BeatmapInfo beatmapInfo;
         private readonly int rulesetId;

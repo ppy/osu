@@ -3,6 +3,7 @@
 
 using System;
 using MessagePack;
+using osu.Game.Online.API.Requests.Responses;
 
 namespace osu.Game.Online
 {
@@ -16,7 +17,13 @@ namespace osu.Game.Online
     [MessagePackObject]
     public record ScoreToken(
         [property: Key(0)] long ID,
-        [property: Key(1)] ScoreTokenType Type);
+        [property: Key(1)] ScoreTokenType Type)
+    {
+        public ScoreToken(IAPIScoreToken scoreToken)
+            : this(scoreToken.ID, scoreToken.Type)
+        {
+        }
+    }
 
     public enum ScoreTokenType
     {

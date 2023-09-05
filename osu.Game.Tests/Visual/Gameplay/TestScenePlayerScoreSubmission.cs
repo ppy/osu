@@ -11,6 +11,7 @@ using NUnit.Framework;
 using osu.Framework.Screens;
 using osu.Game.Beatmaps;
 using osu.Game.Online.API;
+using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Online.Rooms;
 using osu.Game.Online.Solo;
 using osu.Game.Rulesets;
@@ -298,7 +299,7 @@ namespace osu.Game.Tests.Visual.Gameplay
                     {
                         case CreateSoloScoreRequest tokenRequest:
                             if (validToken)
-                                tokenRequest.TriggerSuccess(new APIScoreToken { ID = 1234 });
+                                tokenRequest.TriggerSuccess(new APISoloScoreToken { ID = 1234 });
                             else
                                 request.TriggerFailure(new APIException("something went wrong!", null));
                             return true;
