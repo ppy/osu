@@ -278,7 +278,7 @@ namespace osu.Game.Screens.Select
                 {
                     Name = "Top-left aligned metadata",
                     Direction = FillDirection.Vertical,
-                    Padding = new MarginPadding { Horizontal = text_margin + shear_width, Top = 12 },
+                    Padding = new MarginPadding { Left = text_margin, Right = text_margin + shear_width, Top = 12 },
                     AutoSizeAxes = Axes.Y,
                     RelativeSizeAxes = Axes.X,
                     Children = new Drawable[]
