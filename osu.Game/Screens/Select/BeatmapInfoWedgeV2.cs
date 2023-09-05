@@ -186,7 +186,7 @@ namespace osu.Game.Screens.Select
                     {
                         // use actual stars as star counter has its own animation
                         starCounter.Current = (float)s.NewValue;
-                    });
+                    }, true);
                 });
             });
 
@@ -301,13 +301,17 @@ namespace osu.Game.Screens.Select
                 starDifficulty.BindValueChanged(s =>
                 {
                     starRatingDisplay.Current.Value = s.NewValue ?? default;
-                    ActualStars.Value = s.NewValue?.Stars ?? 0;
 
                     // Don't roll the counter on initial display (but still allow it to roll on applying mods etc.)
                     if (!starRatingDisplay.IsPresent)
                         starRatingDisplay.FinishTransforms(true);
 
                     starRatingDisplay.FadeIn(transition_duration);
+                });
+
+                starRatingDisplay.Current.BindValueChanged(s =>
+                {
+                    ActualStars.Value = s.NewValue.Stars;
                 });
             }
 
