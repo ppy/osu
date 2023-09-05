@@ -2,7 +2,6 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
-using System.Collections.Generic;
 using System.Threading;
 using osuTK;
 using osu.Framework.Allocation;
@@ -16,10 +15,8 @@ using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Localisation;
-using osu.Game.Configuration;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Rulesets;
-using osu.Game.Rulesets.Mods;
 
 namespace osu.Game.Screens.Select
 {
@@ -222,12 +219,7 @@ namespace osu.Game.Screens.Select
             public Bindable<double> ActualStars = new Bindable<double>();
 
             [Resolved]
-            private IBindable<IReadOnlyList<Mod>> mods { get; set; } = null!;
-
-            [Resolved]
             private BeatmapDifficultyCache difficultyCache { get; set; } = null!;
-
-            private ModSettingChangeTracker? settingChangeTracker;
 
             private IBindable<StarDifficulty?>? starDifficulty;
             private CancellationTokenSource? cancellationSource;
@@ -325,13 +317,6 @@ namespace osu.Game.Screens.Select
 
                     starRatingDisplay.FadeIn(transition_duration);
                 });
-
-                mods.BindValueChanged(m =>
-                {
-                    settingChangeTracker?.Dispose();
-
-                    settingChangeTracker = new ModSettingChangeTracker(m.NewValue);
-                }, true);
             }
 
             protected override void Dispose(bool isDisposing)
@@ -339,7 +324,6 @@ namespace osu.Game.Screens.Select
                 base.Dispose(isDisposing);
 
                 cancellationSource?.Cancel();
-                settingChangeTracker?.Dispose();
             }
         }
     }
