@@ -69,7 +69,7 @@ namespace osu.Game.Screens.Select.FooterV2
                 TextColour = colour,
                 Action = () =>
                 {
-                    Hide();
+                    Scheduler.AddDelayed(Hide, 50);
                     action?.Invoke();
                 },
             };
