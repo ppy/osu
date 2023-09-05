@@ -63,6 +63,12 @@ namespace osu.Game.Tests.Visual.SongSelect
 
             AddSliderStep("change star difficulty", 0, 11.9, 5.55, v =>
             {
+                // Difficulty cache lookup is a pain in the ass to work with.
+                // This logic is ugly and needs to be reconsidered.
+
+                if (infoWedge.Info != null)
+                    infoWedge.Info!.ActualStars.Value = v;
+
                 foreach (var hasCurrentValue in infoWedge.Info.ChildrenOfType<IHasCurrentValue<StarDifficulty>>())
                     hasCurrentValue.Current.Value = new StarDifficulty(v, 0);
             });
