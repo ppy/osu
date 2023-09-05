@@ -98,16 +98,16 @@ namespace osu.Game.Tests.Visual.Online
                             });
                             return true;
 
-                        case GetUpdatesRequest getUpdates:
-                            getUpdates.TriggerFailure(new WebException());
+                        case GetUpdatesRequest:
+                            req.TriggerFailure(new WebException());
                             return true;
 
-                        case JoinChannelRequest joinChannel:
-                            joinChannel.TriggerSuccess();
+                        case JoinChannelRequest:
+                            req.TriggerSuccess();
                             return true;
 
-                        case LeaveChannelRequest leaveChannel:
-                            leaveChannel.TriggerSuccess();
+                        case LeaveChannelRequest:
+                            req.TriggerSuccess();
                             return true;
 
                         case GetMessagesRequest getMessages:
@@ -118,7 +118,7 @@ namespace osu.Game.Tests.Visual.Online
                             if (getUser.Lookup == testUser.Username)
                                 getUser.TriggerSuccess(testUser);
                             else
-                                getUser.TriggerFailure(new WebException());
+                                req.TriggerFailure(new WebException());
                             return true;
 
                         case PostMessageRequest postMessage:
@@ -609,7 +609,7 @@ namespace osu.Game.Tests.Visual.Online
                     {
                         request = req;
                         requestLock.Wait(10000);
-                        req.TriggerSuccess();
+                        r.TriggerSuccess();
                     });
 
                     return true;

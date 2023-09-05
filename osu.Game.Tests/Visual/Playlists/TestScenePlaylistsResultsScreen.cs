@@ -234,7 +234,7 @@ namespace osu.Game.Tests.Visual.Playlists
             req.TriggerSuccess(result);
         }
 
-        private void triggerFail(APIRequest req)
+        private void triggerFail(IAPIRequest req)
         {
             requestComplete = true;
             req.TriggerFailure(new WebException("Failed."));

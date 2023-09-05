@@ -101,7 +101,7 @@ namespace osu.Game.Tests.Visual.Online
                         getWikiRequest.TriggerSuccess(r);
                     }
                     else
-                        getWikiRequest.TriggerFailure(new WebException());
+                        request.TriggerFailure(new WebException());
 
                     return true;
                 };

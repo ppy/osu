@@ -23,8 +23,8 @@ namespace osu.Game.Tests.Visual.Online
             {
                 switch (req)
                 {
-                    case CommentReportRequest report:
-                        Scheduler.AddDelayed(report.TriggerSuccess, 1000);
+                    case CommentReportRequest:
+                        Scheduler.AddDelayed(req.TriggerSuccess, 1000);
                         return true;
                 }
 

@@ -110,8 +110,8 @@ namespace osu.Game.Tests.Online
             {
                 switch (req)
                 {
-                    case LeaveChannelRequest cRequest:
-                        cRequest.TriggerSuccess();
+                    case LeaveChannelRequest:
+                        req.TriggerSuccess();
                         return true;
                 }
 

@@ -43,7 +43,7 @@ namespace osu.Game.Online.API
 
             this.filename = filename;
 
-            TriggerSuccess();
+            ((IAPIRequest)this).TriggerSuccess();
         }
 
         public event APIProgressHandler Progressed;

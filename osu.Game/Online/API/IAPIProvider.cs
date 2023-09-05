@@ -79,7 +79,7 @@ namespace osu.Game.Online.API
         /// Queue a new request.
         /// </summary>
         /// <param name="request">The request to perform.</param>
-        void Queue(APIRequest request);
+        void Queue(IAPIRequest request);
 
         /// <summary>
         /// Perform a request immediately, bypassing any API state checks.
@@ -88,7 +88,7 @@ namespace osu.Game.Online.API
         /// Can be used to run requests as a guest user.
         /// </remarks>
         /// <param name="request">The request to perform.</param>
-        void Perform(APIRequest request);
+        void Perform(IAPIRequest request);
 
         /// <summary>
         /// Perform a request immediately, bypassing any API state checks.
@@ -97,7 +97,7 @@ namespace osu.Game.Online.API
         /// Can be used to run requests as a guest user.
         /// </remarks>
         /// <param name="request">The request to perform.</param>
-        Task PerformAsync(APIRequest request);
+        Task PerformAsync(IAPIRequest request);
 
         /// <summary>
         /// Attempt to login using the provided credentials. This is a non-blocking operation.

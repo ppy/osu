@@ -36,7 +36,7 @@ namespace osu.Game.Online.API
 
         private readonly OAuth authentication;
 
-        private readonly Queue<APIRequest> queue = new Queue<APIRequest>();
+        private readonly Queue<IAPIRequest> queue = new Queue<IAPIRequest>();
 
         public string APIEndpointUrl { get; }
 
@@ -165,7 +165,7 @@ namespace osu.Game.Online.API
         {
             while (true)
             {
-                APIRequest req;
+                IAPIRequest req;
 
                 lock (queue)
                 {
@@ -283,7 +283,7 @@ namespace osu.Game.Online.API
                 Thread.Sleep(500);
         }
 
-        public void Perform(APIRequest request)
+        public void Perform(IAPIRequest request)
         {
             try
             {
@@ -296,7 +296,7 @@ namespace osu.Game.Online.API
             }
         }
 
-        public Task PerformAsync(APIRequest request) =>
+        public Task PerformAsync(IAPIRequest request) =>
             Task.Factory.StartNew(() => Perform(request), TaskCreationOptions.LongRunning);
 
         public void Login(string username, string password)
@@ -375,7 +375,7 @@ namespace osu.Game.Online.API
         /// </summary>
         /// <param name="req">The request.</param>
         /// <returns>true if the request succeeded.</returns>
-        private bool handleRequest(APIRequest req)
+        private bool handleRequest(IAPIRequest req)
         {
             try
             {
@@ -460,7 +460,7 @@ namespace osu.Game.Online.API
 
         public bool IsLoggedIn => State.Value > APIState.Offline;
 
-        public void Queue(APIRequest request)
+        public void Queue(IAPIRequest request)
         {
             lock (queue)
             {

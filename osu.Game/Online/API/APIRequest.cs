@@ -5,7 +5,6 @@
 
 using System;
 using System.Globalization;
-using JetBrains.Annotations;
 using Newtonsoft.Json;
 using osu.Framework.IO.Network;
 using osu.Framework.Logging;
@@ -14,24 +13,16 @@ using osu.Game.Online.API.Requests.Responses;
 
 namespace osu.Game.Online.API
 {
-    /// <summary>
-    /// An API request with a well-defined response type.
-    /// </summary>
-    /// <typeparam name="T">Type of the response (used for deserialisation).</typeparam>
-    public abstract class APIRequest<T> : APIRequest where T : class
+    /// <inheritdoc cref="IAPIRequest{TResponse}"/>
+    public abstract class APIRequest<T> : APIRequest, IAPIRequest<T>
+        where T : class
     {
         protected override WebRequest CreateWebRequest() => new OsuJsonWebRequest<T>(Uri);
 
-        /// <summary>
-        /// The deserialised response object. May be null if the request or deserialisation failed.
-        /// </summary>
-        [CanBeNull]
+        /// <inheritdoc />
         public T Response { get; private set; }
 
-        /// <summary>
-        /// Invoked on successful completion of an API request.
-        /// This will be scheduled to the API's internal scheduler (run on update thread automatically).
-        /// </summary>
+        /// <inheritdoc />
         public new event APISuccessHandler<T> Success;
 
         protected APIRequest()
@@ -57,14 +48,12 @@ namespace osu.Game.Online.API
 
             Response = result;
 
-            TriggerSuccess();
+            ((IAPIRequest)this).TriggerSuccess();
         }
     }
 
-    /// <summary>
-    /// AN API request with no specified response type.
-    /// </summary>
-    public abstract class APIRequest
+    /// <inheritdoc />
+    public abstract class APIRequest : IAPIRequest
     {
         protected abstract string Target { get; }
 
@@ -80,16 +69,10 @@ namespace osu.Game.Online.API
         /// </summary>
         protected APIUser User { get; private set; }
 
-        /// <summary>
-        /// Invoked on successful completion of an API request.
-        /// This will be scheduled to the API's internal scheduler (run on update thread automatically).
-        /// </summary>
+        /// <inheritdoc />
         public event APISuccessHandler Success;
 
-        /// <summary>
-        /// Invoked on failure to complete an API request.
-        /// This will be scheduled to the API's internal scheduler (run on update thread automatically).
-        /// </summary>
+        /// <inheritdoc />
         public event APIFailureHandler Failure;
 
         private readonly object completionStateLock = new object();
@@ -140,7 +123,7 @@ namespace osu.Game.Online.API
 
             PostProcess();
 
-            TriggerSuccess();
+            ((IAPIRequest)this).TriggerSuccess();
         }
 
         /// <summary>
@@ -150,7 +133,7 @@ namespace osu.Game.Online.API
         {
         }
 
-        internal void TriggerSuccess()
+        void IAPIRequest.TriggerSuccess()
         {
             lock (completionStateLock)
             {
@@ -166,7 +149,7 @@ namespace osu.Game.Online.API
                 API.Schedule(() => Success?.Invoke());
         }
 
-        internal void TriggerFailure(Exception e)
+        void IAPIRequest.TriggerFailure(Exception e)
         {
             lock (completionStateLock)
             {
@@ -215,7 +198,7 @@ namespace osu.Game.Online.API
                 }
 
                 Logger.Log($@"Failing request {this} ({e})", LoggingTarget.Network);
-                TriggerFailure(e);
+                ((IAPIRequest)this).TriggerFailure(e);
             }
         }
 

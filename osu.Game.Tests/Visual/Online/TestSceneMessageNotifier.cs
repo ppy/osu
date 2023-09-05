@@ -55,7 +55,7 @@ namespace osu.Game.Tests.Visual.Online
             });
         });
 
-        private bool dummyAPIHandleRequest(APIRequest request)
+        private bool dummyAPIHandleRequest(IAPIRequest request)
         {
             switch (request)
             {
@@ -84,8 +84,8 @@ namespace osu.Game.Tests.Visual.Online
                     });
                     return true;
 
-                case JoinChannelRequest joinChannelRequest:
-                    joinChannelRequest.TriggerSuccess();
+                case JoinChannelRequest:
+                    request.TriggerSuccess();
                     return true;
 
                 default:

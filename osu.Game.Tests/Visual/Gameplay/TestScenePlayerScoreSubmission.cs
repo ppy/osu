@@ -300,7 +300,7 @@ namespace osu.Game.Tests.Visual.Gameplay
                             if (validToken)
                                 tokenRequest.TriggerSuccess(new APIScoreToken { ID = 1234 });
                             else
-                                tokenRequest.TriggerFailure(new APIException("something went wrong!", null));
+                                request.TriggerFailure(new APIException("something went wrong!", null));
                             return true;
 
                         case SubmitSoloScoreRequest submissionRequest:

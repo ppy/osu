@@ -43,7 +43,7 @@ namespace osu.Game.Tests.Visual.OnlinePlay
         /// <param name="localUser">The local user to store in responses where required.</param>
         /// <param name="beatmapManager">The beatmap manager to attempt to retrieve beatmaps from, prior to returning dummy beatmaps.</param>
         /// <returns>Whether the request was successfully handled.</returns>
-        public bool HandleRequest(APIRequest request, APIUser localUser, BeatmapManager beatmapManager)
+        public bool HandleRequest(IAPIRequest request, APIUser localUser, BeatmapManager beatmapManager)
         {
             switch (request)
             {
@@ -68,11 +68,11 @@ namespace osu.Game.Tests.Visual.OnlinePlay
 
                     if (joinRoomRequest.Password != room.Password.Value)
                     {
-                        joinRoomRequest.TriggerFailure(new InvalidOperationException("Invalid password."));
+                        request.TriggerFailure(new InvalidOperationException("Invalid password."));
                         return true;
                     }
 
-                    joinRoomRequest.TriggerSuccess();
+                    request.TriggerSuccess();
                     return true;
                 }
 
@@ -99,8 +99,8 @@ namespace osu.Game.Tests.Visual.OnlinePlay
                     });
                     return true;
 
-                case PartRoomRequest partRoomRequest:
-                    partRoomRequest.TriggerSuccess();
+                case PartRoomRequest:
+                    request.TriggerSuccess();
                     return true;
 
                 case GetRoomsRequest getRoomsRequest:
@@ -117,7 +117,7 @@ namespace osu.Game.Tests.Visual.OnlinePlay
                     return true;
 
                 case CreateRoomScoreRequest createRoomScoreRequest:
-                    createRoomScoreRequest.TriggerSuccess(new APIScoreToken { ID = 1 });
+                    createRoomScoreRequest.TriggerSuccess(new APIMultiplayerScoreLink { ID = 1 });
                     return true;
 
                 case SubmitRoomScoreRequest submitRoomScoreRequest:

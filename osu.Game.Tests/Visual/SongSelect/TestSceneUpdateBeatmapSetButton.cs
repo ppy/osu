@@ -87,7 +87,7 @@ namespace osu.Game.Tests.Visual.SongSelect
 
                     if (testRequest.Progress >= 1)
                     {
-                        testRequest.TriggerSuccess();
+                        ((IAPIRequest)testRequest).TriggerSuccess();
 
                         // usually this would be done by the import process.
                         testBeatmapSetInfo.Beatmaps.First().MD5Hash = "different hash";
@@ -137,7 +137,7 @@ namespace osu.Game.Tests.Visual.SongSelect
 
                     if (testRequest.Progress >= 0.5f)
                     {
-                        testRequest.TriggerFailure(new InvalidOperationException());
+                        ((IAPIRequest)testRequest).TriggerFailure(new InvalidOperationException());
                         return true;
                     }
                 }
@@ -228,7 +228,7 @@ namespace osu.Game.Tests.Visual.SongSelect
 
                     if (testRequest.Progress >= 1)
                     {
-                        testRequest.TriggerSuccess();
+                        ((IAPIRequest)testRequest).TriggerSuccess();
 
                         // usually this would be done by the import process.
                         testBeatmapSetInfo.Beatmaps.First().MD5Hash = "different hash";

@@ -46,8 +46,8 @@ namespace osu.Game.Tests.Chat
                 {
                     switch (req)
                     {
-                        case JoinChannelRequest joinChannel:
-                            joinChannel.TriggerSuccess();
+                        case JoinChannelRequest:
+                            req.TriggerSuccess();
                             return true;
 
                         case PostMessageRequest postMessage:
@@ -168,11 +168,11 @@ namespace osu.Game.Tests.Chat
             // only accept messages that were sent through the API
             if (sentMessages.Contains(request.Message))
             {
-                request.TriggerSuccess();
+                ((IAPIRequest)request).TriggerSuccess();
             }
             else
             {
-                request.TriggerFailure(new APIException("unknown message!", null));
+                ((IAPIRequest)request).TriggerFailure(new APIException("unknown message!", null));
             }
         }
 

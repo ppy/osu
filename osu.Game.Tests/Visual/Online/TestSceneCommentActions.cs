@@ -189,10 +189,10 @@ namespace osu.Game.Tests.Visual.Online
             {
                 dummyAPI.HandleRequest = request =>
                 {
-                    if (request is not CommentDeleteRequest req)
+                    if (request is not CommentDeleteRequest)
                         return false;
 
-                    req.TriggerFailure(new InvalidOperationException());
+                    request.TriggerFailure(new InvalidOperationException());
                     delete = true;
                     return false;
                 };
@@ -240,7 +240,7 @@ namespace osu.Game.Tests.Visual.Online
                     {
                         request = req;
                         requestLock.Wait(10000);
-                        req.TriggerSuccess();
+                        r.TriggerSuccess();
                     });
 
                     return true;

@@ -49,7 +49,7 @@ namespace osu.Game.Online.API
         /// Provide handling logic for an arbitrary API request.
         /// Should return true is a request was handled. If null or false return, the request will be failed with a <see cref="NotSupportedException"/>.
         /// </summary>
-        public Func<APIRequest, bool>? HandleRequest;
+        public Func<IAPIRequest, bool>? HandleRequest;
 
         private readonly Bindable<APIState> state = new Bindable<APIState>(APIState.Online);
 
@@ -70,7 +70,7 @@ namespace osu.Game.Online.API
             }, true);
         }
 
-        public virtual void Queue(APIRequest request)
+        public virtual void Queue(IAPIRequest request)
         {
             Schedule(() =>
             {
@@ -81,9 +81,9 @@ namespace osu.Game.Online.API
             });
         }
 
-        public void Perform(APIRequest request) => HandleRequest?.Invoke(request);
+        public void Perform(IAPIRequest request) => HandleRequest?.Invoke(request);
 
-        public Task PerformAsync(APIRequest request)
+        public Task PerformAsync(IAPIRequest request)
         {
             HandleRequest?.Invoke(request);
             return Task.CompletedTask;
