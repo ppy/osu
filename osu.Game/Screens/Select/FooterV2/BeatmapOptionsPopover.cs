@@ -50,24 +50,20 @@ namespace osu.Game.Screens.Select.FooterV2
 
             beatmapWhenOpening = beatmap.Value;
 
-            addHeader("For all difficulties", beatmapWhenOpening.BeatmapSetInfo.ToString());
+            addHeader("General");
+            addButton(@"Manage collections", FontAwesome.Solid.Book, () => manageCollectionsDialog?.Show());
 
+            addHeader("For all difficulties", beatmapWhenOpening.BeatmapSetInfo.ToString());
             addButton(@"Delete beatmap", FontAwesome.Solid.Trash, () => songSelect?.DeleteBeatmap(), colours.Red1);
 
             addHeader("For selected difficulty", beatmapWhenOpening.BeatmapInfo.DifficultyName);
-
             // TODO: make work, and make show "unplayed" or "played" based on status.
             addButton(@"Mark as played", FontAwesome.Regular.TimesCircle, null);
-
             addButton(@"Hide", FontAwesome.Solid.Magic, null);
             addButton(@"Clear all local scores", FontAwesome.Solid.Eraser, () => songSelect?.ClearScores(), colours.Red1);
 
             if (songSelect != null && songSelect.AllowEditing)
                 addButton(@"Edit beatmap", FontAwesome.Solid.PencilAlt, () => songSelect.Edit());
-
-            addHeader("General");
-
-            addButton(@"Manage collections", FontAwesome.Solid.Book, () => manageCollectionsDialog?.Show());
         }
 
         protected override void LoadComplete()
