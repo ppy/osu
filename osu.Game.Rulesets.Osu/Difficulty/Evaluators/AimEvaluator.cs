@@ -5,6 +5,7 @@ using System;
 using osu.Game.Rulesets.Difficulty.Preprocessing;
 using osu.Game.Rulesets.Osu.Difficulty.Preprocessing;
 using osu.Game.Rulesets.Osu.Objects;
+using osuTK;
 
 namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
 {
@@ -112,10 +113,11 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
                 velocityChangeBonus *= Math.Pow(Math.Min(osuCurrObj.StrainTime, osuLastObj.StrainTime) / Math.Max(osuCurrObj.StrainTime, osuLastObj.StrainTime), 2);
             }
 
-            if (osuLastObj.BaseObject is Slider)
+            if (osuLastObj.BaseObject is Slider slider)
             {
                 // Reward sliders based on velocity.
                 sliderBonus = osuLastObj.TravelDistance / osuLastObj.TravelTime;
+                sliderBonus *= (1 + calculateSliderReadingDifficulty(slider));
             }
 
             // Add in acute angle bonus or wide angle bonus + velocity change bonus, whichever is larger.
@@ -126,6 +128,49 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
                 aimStrain += sliderBonus * slider_multiplier;
 
             return aimStrain;
+        }
+
+        private static float calculateSliderReadingDifficulty(Slider slider)
+        {
+            double result = 0;
+
+            var followPath = slider.NestedHitObjects;
+
+            double minFollowRadiusSquared = slider.Radius;
+            double maxFollowRadiusSquared = slider.Radius * 2.4;
+            double deltaFollowRadius = maxFollowRadiusSquared - minFollowRadiusSquared;
+
+            int nestedObjectIndex = 0;
+
+            for (double deltaTime = 0; deltaTime <= slider.SpanDuration; deltaTime++)
+            {
+                double absoluteTime = deltaTime + slider.StartTime;
+
+                while (followPath[nestedObjectIndex].StartTime > absoluteTime)
+                {
+                    if (nestedObjectIndex >= followPath.Count - 1) break; // if already out of range - don't change anything
+                    nestedObjectIndex += 1; // search for right lazy path segment
+                }
+
+                // calculating position of the normal path
+                double progress = deltaTime / slider.SpanDuration;
+                Vector2 ballPosition = slider.Position + slider.Path.PositionAt(progress);
+
+                // calculation position of the lazy path
+                var currentObject = (OsuHitObject)followPath[nestedObjectIndex];
+                var nextObject = (OsuHitObject)((nestedObjectIndex >= followPath.Count) ? slider.TailCircle : followPath[nestedObjectIndex + 1]);
+
+                float localProgress = (float)((absoluteTime - currentObject.StartTime) / (nextObject.StartTime - currentObject.StartTime));
+                localProgress = Math.Clamp(localProgress, 0, 1);
+                Vector2 lazyPosition = currentObject.Position + (nextObject.Position - currentObject.Position) * localProgress; // interpolation
+
+                // buff scales from 0 to 1 when slider follow distance is changing from 1.0x to 2.4x
+                double continousBuff = (Vector2.Distance(ballPosition, lazyPosition) - minFollowRadiusSquared) / deltaFollowRadius;
+                continousBuff = Math.Clamp(continousBuff, 0, 1);
+                result += (float)continousBuff;
+            }
+
+            return (float)(result / (slider.SpanDuration + 1));
         }
 
         private static double calcWideAngleBonus(double angle) => Math.Pow(Math.Sin(3.0 / 4 * (Math.Min(5.0 / 6 * Math.PI, Math.Max(Math.PI / 6, angle)) - Math.PI / 6)), 2);
