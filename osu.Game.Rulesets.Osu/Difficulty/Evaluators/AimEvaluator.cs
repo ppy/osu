@@ -136,9 +136,9 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
 
             var followPath = slider.NestedHitObjects;
 
-            double minFollowRadiusSquared = slider.Radius;
-            double maxFollowRadiusSquared = slider.Radius * 2.4;
-            double deltaFollowRadius = maxFollowRadiusSquared - minFollowRadiusSquared;
+            double minFollowRadius = slider.Radius;
+            double maxFollowRadius = slider.Radius * 2.4;
+            double deltaFollowRadius = maxFollowRadius - minFollowRadius;
 
             int nestedObjectIndex = 0;
 
@@ -165,7 +165,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
                 Vector2 lazyPosition = currentObject.Position + (nextObject.Position - currentObject.Position) * localProgress; // interpolation
 
                 // buff scales from 0 to 1 when slider follow distance is changing from 1.0x to 2.4x
-                double continousBuff = (Vector2.Distance(ballPosition, lazyPosition) - minFollowRadiusSquared) / deltaFollowRadius;
+                double continousBuff = (Vector2.Distance(ballPosition, lazyPosition) - minFollowRadius) / deltaFollowRadius;
                 continousBuff = Math.Clamp(continousBuff, 0, 1);
                 result += (float)continousBuff;
             }
