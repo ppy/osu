@@ -113,7 +113,7 @@ namespace osu.Game.Rulesets.Osu.Objects
         public double SpanDuration => Duration / this.SpanCount();
 
         /// <summary>
-        /// Velocity of this <see cref="Slider"/>.
+        /// The computed velocity of this <see cref="Slider"/>. This is the amount of path distance travelled in 1 ms.
         /// </summary>
         public double Velocity { get; private set; }
 
