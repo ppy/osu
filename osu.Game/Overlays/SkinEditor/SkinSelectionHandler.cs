@@ -309,7 +309,7 @@ namespace osu.Game.Overlays.SkinEditor
             if (parent == null)
                 return drawable.Anchor;
 
-            var screenPosition = getScreenPosition();
+            var screenPosition = drawable.ToScreenSpace(drawable.OriginPosition);
 
             var absolutePosition = parent.ToLocalSpace(screenPosition);
             var factor = parent.RelativeToAbsoluteFactor;
@@ -331,26 +331,6 @@ namespace osu.Game.Overlays.SkinEditor
             result |= getAnchorFromPosition(absolutePosition.Y / factor.Y, Anchor.y0, Anchor.y1, Anchor.y2);
 
             return result;
-
-            Vector2 getScreenPosition()
-            {
-                var quad = drawable.ScreenSpaceDrawQuad;
-                var origin = drawable.Origin;
-
-                var pos = quad.TopLeft;
-
-                if (origin.HasFlagFast(Anchor.x2))
-                    pos.X += quad.Width;
-                else if (origin.HasFlagFast(Anchor.x1))
-                    pos.X += quad.Width / 2f;
-
-                if (origin.HasFlagFast(Anchor.y2))
-                    pos.Y += quad.Height;
-                else if (origin.HasFlagFast(Anchor.y1))
-                    pos.Y += quad.Height / 2f;
-
-                return pos;
-            }
         }
 
         private static void applyAnchor(Drawable drawable, Anchor anchor)
