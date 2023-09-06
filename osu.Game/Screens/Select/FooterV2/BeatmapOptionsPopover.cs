@@ -31,13 +31,16 @@ namespace osu.Game.Screens.Select.FooterV2
 
         private WorkingBeatmap beatmapWhenOpening = null!;
 
+        [Resolved]
+        private IBindable<WorkingBeatmap> beatmap { get; set; } = null!;
+
         public BeatmapOptionsPopover(FooterButtonOptionsV2 footerButton)
         {
             this.footerButton = footerButton;
         }
 
         [BackgroundDependencyLoader]
-        private void load(ManageCollectionsDialog? manageCollectionsDialog, SongSelect? songSelect, OsuColour colours, IBindable<WorkingBeatmap> beatmap)
+        private void load(ManageCollectionsDialog? manageCollectionsDialog, SongSelect? songSelect, OsuColour colours)
         {
             Content.Padding = new MarginPadding(5);
 
@@ -71,6 +74,8 @@ namespace osu.Game.Screens.Select.FooterV2
             base.LoadComplete();
 
             ScheduleAfterChildren(() => GetContainingInputManager().ChangeFocus(this));
+
+            beatmap.BindValueChanged(_ => Hide());
         }
 
         [Resolved]
