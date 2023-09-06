@@ -5,6 +5,7 @@ using System;
 using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
+using osu.Framework.Extensions.LocalisationExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Sprites;
@@ -21,6 +22,8 @@ using osu.Game.Overlays;
 using osuTK;
 using osuTK.Graphics;
 using osuTK.Input;
+using osu.Game.Localisation;
+using CommonStrings = osu.Game.Resources.Localisation.Web.CommonStrings;
 
 namespace osu.Game.Screens.Select.FooterV2
 {
@@ -53,20 +56,20 @@ namespace osu.Game.Screens.Select.FooterV2
 
             beatmapWhenOpening = beatmap.Value;
 
-            addHeader("General");
-            addButton(@"Manage collections", FontAwesome.Solid.Book, () => manageCollectionsDialog?.Show());
+            addHeader(SongSelectStrings.General);
+            addButton(SongSelectStrings.ManageCollections, FontAwesome.Solid.Book, () => manageCollectionsDialog?.Show());
 
-            addHeader("For all difficulties", beatmapWhenOpening.BeatmapSetInfo.ToString());
-            addButton(@"Delete beatmap", FontAwesome.Solid.Trash, () => songSelect?.DeleteBeatmap(beatmapWhenOpening.BeatmapSetInfo), colours.Red1);
+            addHeader(SongSelectStrings.ForAllDifficulties, beatmapWhenOpening.BeatmapSetInfo.ToString());
+            addButton(SongSelectStrings.DeleteBeatmap, FontAwesome.Solid.Trash, () => songSelect?.DeleteBeatmap(beatmapWhenOpening.BeatmapSetInfo), colours.Red1);
 
-            addHeader("For selected difficulty", beatmapWhenOpening.BeatmapInfo.DifficultyName);
+            addHeader(SongSelectStrings.ForSelectedDifficulty, beatmapWhenOpening.BeatmapInfo.DifficultyName);
             // TODO: make work, and make show "unplayed" or "played" based on status.
-            addButton(@"Mark as played", FontAwesome.Regular.TimesCircle, null);
-            addButton(@"Hide", FontAwesome.Solid.Magic, null);
-            addButton(@"Clear all local scores", FontAwesome.Solid.Eraser, () => songSelect?.ClearScores(beatmapWhenOpening.BeatmapInfo), colours.Red1);
+            addButton(SongSelectStrings.MarkAsPlayed, FontAwesome.Regular.TimesCircle, null);
+            addButton(CommonStrings.ButtonsHide.ToSentence(), FontAwesome.Solid.Magic, null);
+            addButton(SongSelectStrings.ClearAllLocalScores, FontAwesome.Solid.Eraser, () => songSelect?.ClearScores(beatmapWhenOpening.BeatmapInfo), colours.Red1);
 
             if (songSelect != null && songSelect.AllowEditing)
-                addButton(@"Edit beatmap", FontAwesome.Solid.PencilAlt, () => songSelect.Edit(beatmapWhenOpening.BeatmapInfo));
+                addButton(SongSelectStrings.EditBeatmap, FontAwesome.Solid.PencilAlt, () => songSelect.Edit(beatmapWhenOpening.BeatmapInfo));
         }
 
         protected override void LoadComplete()
@@ -81,7 +84,7 @@ namespace osu.Game.Screens.Select.FooterV2
         [Resolved]
         private OverlayColourProvider overlayColourProvider { get; set; } = null!;
 
-        private void addHeader(string text, string? context = null)
+        private void addHeader(LocalisableString text, string? context = null)
         {
             var textFlow = new OsuTextFlowContainer
             {
