@@ -34,9 +34,18 @@ namespace osu.Game.Rulesets.Mods
             set => CurrentNumber.Precision = value;
         }
 
+        private float minValue;
+
         public float MinValue
         {
-            set => CurrentNumber.MinValue = value;
+            set
+            {
+                if (value == minValue)
+                    return;
+
+                minValue = value;
+                updateMinValue();
+            }
         }
 
         private float maxValue;
@@ -50,6 +59,23 @@ namespace osu.Game.Rulesets.Mods
 
                 maxValue = value;
                 updateMaxValue();
+            }
+        }
+
+        private float? extendedMinValue;
+
+        /// <summary>
+        /// The minimum value to be used when extended limits are applied.
+        /// </summary>
+        public float? ExtendedMinValue
+        {
+            set
+            {
+                if (value == extendedMinValue)
+                    return;
+
+                extendedMinValue = value;
+                updateMinValue();
             }
         }
 
@@ -78,6 +104,7 @@ namespace osu.Game.Rulesets.Mods
         public DifficultyBindable(float? defaultValue = null)
             : base(defaultValue)
         {
+            ExtendedLimits.BindValueChanged(_ => updateMinValue());
             ExtendedLimits.BindValueChanged(_ => updateMaxValue());
         }
 
@@ -92,6 +119,11 @@ namespace osu.Game.Rulesets.Mods
 
                 base.Value = value;
             }
+        }
+
+        private void updateMinValue()
+        {
+            CurrentNumber.MinValue = ExtendedLimits.Value && extendedMinValue != null ? extendedMinValue.Value : minValue;
         }
 
         private void updateMaxValue()
