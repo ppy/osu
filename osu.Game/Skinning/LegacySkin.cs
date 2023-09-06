@@ -84,6 +84,7 @@ namespace osu.Game.Skinning
 
         public override IBindable<TValue>? GetConfig<TLookup, TValue>(TLookup lookup)
         {
+            // ReSharper disable once RedundantAssignment (used in `finally` debug logic)
             bool wasHit = true;
 
             try
