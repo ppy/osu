@@ -4,6 +4,7 @@
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Linq;
 using JetBrains.Annotations;
@@ -82,50 +83,61 @@ namespace osu.Game.Skinning
             }
         }
 
+        [SuppressMessage("ReSharper", "RedundantAssignment")] // for `wasHit` assignments used in `finally` debug logic
         public override IBindable<TValue>? GetConfig<TLookup, TValue>(TLookup lookup)
         {
-            switch (lookup)
+            bool wasHit = true;
+
+            try
             {
-                case GlobalSkinColours colour:
-                    switch (colour)
-                    {
-                        case GlobalSkinColours.ComboColours:
-                            var comboColours = Configuration.ComboColours;
-                            if (comboColours != null)
-                                return SkinUtils.As<TValue>(new Bindable<IReadOnlyList<Color4>>(comboColours));
+                switch (lookup)
+                {
+                    case GlobalSkinColours colour:
+                        switch (colour)
+                        {
+                            case GlobalSkinColours.ComboColours:
+                                var comboColours = Configuration.ComboColours;
+                                if (comboColours != null)
+                                    return SkinUtils.As<TValue>(new Bindable<IReadOnlyList<Color4>>(comboColours));
 
-                            break;
+                                break;
 
-                        default:
-                            return SkinUtils.As<TValue>(getCustomColour(Configuration, colour.ToString()));
-                    }
+                            default:
+                                return SkinUtils.As<TValue>(getCustomColour(Configuration, colour.ToString()));
+                        }
 
-                    break;
-
-                case SkinComboColourLookup comboColour:
-                    return SkinUtils.As<TValue>(GetComboColour(Configuration, comboColour.ColourIndex, comboColour.Combo));
-
-                case SkinCustomColourLookup customColour:
-                    return SkinUtils.As<TValue>(getCustomColour(Configuration, customColour.Lookup.ToString() ?? string.Empty));
-
-                case LegacyManiaSkinConfigurationLookup maniaLookup:
-                    if (!AllowManiaSkin)
                         break;
 
-                    var result = lookupForMania<TValue>(maniaLookup);
-                    if (result != null)
-                        return result;
+                    case SkinComboColourLookup comboColour:
+                        return SkinUtils.As<TValue>(GetComboColour(Configuration, comboColour.ColourIndex, comboColour.Combo));
 
-                    break;
+                    case SkinCustomColourLookup customColour:
+                        return SkinUtils.As<TValue>(getCustomColour(Configuration, customColour.Lookup.ToString() ?? string.Empty));
 
-                case SkinConfiguration.LegacySetting legacy:
-                    return legacySettingLookup<TValue>(legacy);
+                    case LegacyManiaSkinConfigurationLookup maniaLookup:
+                        if (!AllowManiaSkin)
+                            break;
 
-                default:
-                    return genericLookup<TLookup, TValue>(lookup);
+                        var result = lookupForMania<TValue>(maniaLookup);
+                        if (result != null)
+                            return result;
+
+                        break;
+
+                    case SkinConfiguration.LegacySetting legacy:
+                        return legacySettingLookup<TValue>(legacy);
+
+                    default:
+                        return genericLookup<TLookup, TValue>(lookup);
+                }
+
+                wasHit = false;
+                return null;
             }
-
-            return null;
+            finally
+            {
+                LogLookupDebug(this, lookup, wasHit ? LookupDebugType.Hit : LookupDebugType.Miss);
+            }
         }
 
         private IBindable<TValue>? lookupForMania<TValue>(LegacyManiaSkinConfigurationLookup maniaLookup)
