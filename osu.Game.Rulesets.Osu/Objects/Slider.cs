@@ -134,17 +134,17 @@ namespace osu.Game.Rulesets.Osu.Objects
         /// </summary>
         public bool OnlyJudgeNestedObjects = true;
 
-        public BindableNumber<double> SliderVelocityBindable { get; } = new BindableDouble(1)
+        public BindableNumber<double> SliderVelocityMultiplierBindable { get; } = new BindableDouble(1)
         {
             Precision = 0.01,
             MinValue = 0.1,
             MaxValue = 10
         };
 
-        public double SliderVelocity
+        public double SliderVelocityMultiplier
         {
-            get => SliderVelocityBindable.Value;
-            set => SliderVelocityBindable.Value = value;
+            get => SliderVelocityMultiplierBindable.Value;
+            set => SliderVelocityMultiplierBindable.Value = value;
         }
 
         public bool GenerateTicks { get; set; } = true;
@@ -167,7 +167,7 @@ namespace osu.Game.Rulesets.Osu.Objects
 
             TimingControlPoint timingPoint = controlPointInfo.TimingPointAt(StartTime);
 
-            double scoringDistance = BASE_SCORING_DISTANCE * difficulty.SliderMultiplier * SliderVelocity;
+            double scoringDistance = BASE_SCORING_DISTANCE * difficulty.SliderMultiplier * SliderVelocityMultiplier;
 
             Velocity = scoringDistance / timingPoint.BeatLength;
             TickDistance = GenerateTicks ? (scoringDistance / difficulty.SliderTickRate * TickDistanceMultiplier) : double.PositiveInfinity;
