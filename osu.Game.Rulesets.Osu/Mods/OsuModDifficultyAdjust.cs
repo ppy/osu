@@ -20,7 +20,7 @@ namespace osu.Game.Rulesets.Osu.Mods
             ReadCurrentFromDifficulty = diff => diff.CircleSize,
         };
 
-        [SettingSource("Approach Rate", "Override a beatmap's set AR.", LAST_SETTING_ORDER + 1, SettingControlType = typeof(DifficultyAdjustSettingsControl))]
+        [SettingSource("Approach Rate", "Override a beatmap's set AR.", LAST_SETTING_ORDER + 1, SettingControlType = typeof(ApproachRateDifficultyAdjustSettingsControl))]
         public DifficultyBindable ApproachRate { get; } = new DifficultyBindable
         {
             Precision = 0.1f,
