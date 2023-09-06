@@ -311,9 +311,9 @@ namespace osu.Game.Screens.Select
                     Footer.AddButton(button, overlay);
 
                 BeatmapOptions.AddButton(@"Manage", @"collections", FontAwesome.Solid.Book, colours.Green, () => manageCollectionsDialog?.Show());
-                BeatmapOptions.AddButton(@"Delete", @"all difficulties", FontAwesome.Solid.Trash, colours.Pink, () => delete(Beatmap.Value.BeatmapSetInfo));
+                BeatmapOptions.AddButton(@"Delete", @"all difficulties", FontAwesome.Solid.Trash, colours.Pink, () => DeleteBeatmap(Beatmap.Value.BeatmapSetInfo));
                 BeatmapOptions.AddButton(@"Remove", @"from unplayed", FontAwesome.Regular.TimesCircle, colours.Purple, null);
-                BeatmapOptions.AddButton(@"Clear", @"local scores", FontAwesome.Solid.Eraser, colours.Purple, () => clearScores(Beatmap.Value.BeatmapInfo));
+                BeatmapOptions.AddButton(@"Clear", @"local scores", FontAwesome.Solid.Eraser, colours.Purple, () => ClearScores(Beatmap.Value.BeatmapInfo));
             }
 
             sampleChangeDifficulty = audio.Samples.Get(@"SongSelect/select-difficulty");
@@ -916,14 +916,20 @@ namespace osu.Game.Screens.Select
             return true;
         }
 
-        private void delete(BeatmapSetInfo? beatmap)
+        /// <summary>
+        /// Request to delete a specific beatmap.
+        /// </summary>
+        public void DeleteBeatmap(BeatmapSetInfo? beatmap)
         {
             if (beatmap == null) return;
 
             dialogOverlay?.Push(new BeatmapDeleteDialog(beatmap));
         }
 
-        private void clearScores(BeatmapInfo? beatmapInfo)
+        /// <summary>
+        /// Request to clear the scores of a specific beatmap.
+        /// </summary>
+        public void ClearScores(BeatmapInfo? beatmapInfo)
         {
             if (beatmapInfo == null) return;
 
@@ -963,7 +969,7 @@ namespace osu.Game.Screens.Select
                     if (e.ShiftPressed)
                     {
                         if (!Beatmap.IsDefault)
-                            delete(Beatmap.Value.BeatmapSetInfo);
+                            DeleteBeatmap(Beatmap.Value.BeatmapSetInfo);
                         return true;
                     }
 
