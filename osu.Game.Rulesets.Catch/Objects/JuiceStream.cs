@@ -28,17 +28,17 @@ namespace osu.Game.Rulesets.Catch.Objects
 
         public int RepeatCount { get; set; }
 
-        public BindableNumber<double> SliderVelocityBindable { get; } = new BindableDouble(1)
+        public BindableNumber<double> SliderVelocityMultiplierBindable { get; } = new BindableDouble(1)
         {
             Precision = 0.01,
             MinValue = 0.1,
             MaxValue = 10
         };
 
-        public double SliderVelocity
+        public double SliderVelocityMultiplier
         {
-            get => SliderVelocityBindable.Value;
-            set => SliderVelocityBindable.Value = value;
+            get => SliderVelocityMultiplierBindable.Value;
+            set => SliderVelocityMultiplierBindable.Value = value;
         }
 
         [JsonIgnore]
@@ -48,10 +48,10 @@ namespace osu.Game.Rulesets.Catch.Objects
         private double tickDistanceFactor;
 
         [JsonIgnore]
-        public double Velocity => velocityFactor * SliderVelocity;
+        public double Velocity => velocityFactor * SliderVelocityMultiplier;
 
         [JsonIgnore]
-        public double TickDistance => tickDistanceFactor * SliderVelocity;
+        public double TickDistance => tickDistanceFactor * SliderVelocityMultiplier;
 
         /// <summary>
         /// The length of one span of this <see cref="JuiceStream"/>.

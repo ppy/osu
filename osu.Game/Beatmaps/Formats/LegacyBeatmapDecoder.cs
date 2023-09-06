@@ -111,7 +111,7 @@ namespace osu.Game.Beatmaps.Formats
             }
 
             if (hitObject is IHasSliderVelocity hasSliderVelocity)
-                hasSliderVelocity.SliderVelocity = difficultyControlPoint.SliderVelocity;
+                hasSliderVelocity.SliderVelocityMultiplier = difficultyControlPoint.SliderVelocity;
 
             hitObject.ApplyDefaults(beatmap.ControlPointInfo, beatmap.Difficulty);
         }
