@@ -2,6 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
+using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Extensions.Color4Extensions;
@@ -11,6 +12,8 @@ using osu.Framework.Graphics.Shapes;
 using osu.Game.Configuration;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
+using osu.Game.Online.API;
+using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Rulesets.Scoring;
 using osu.Game.Users;
 using osu.Game.Users.Drawables;
@@ -107,6 +110,8 @@ namespace osu.Game.Screens.Play.HUD
 
         private IBindable<ScoringMode> scoreDisplayMode = null!;
 
+        private readonly IBindableList<APIUser> apiFriends = new BindableList<APIUser>();
+
         /// <summary>
         /// Creates a new <see cref="GameplayLeaderboardScore"/>.
         /// </summary>
@@ -124,7 +129,7 @@ namespace osu.Game.Screens.Play.HUD
         }
 
         [BackgroundDependencyLoader]
-        private void load(OsuColour colours, OsuConfigManager osuConfigManager)
+        private void load(OsuColour colours, OsuConfigManager osuConfigManager, IAPIProvider api)
         {
             Container avatarContainer;
 
@@ -311,6 +316,9 @@ namespace osu.Game.Screens.Play.HUD
             }, true);
 
             HasQuit.BindValueChanged(_ => updateState());
+
+            apiFriends.BindTo(api.Friends);
+            apiFriends.BindCollectionChanged((_, _) => updateState());
         }
 
         protected override void LoadComplete()
@@ -388,6 +396,11 @@ namespace osu.Game.Screens.Play.HUD
                 widthExtension = true;
                 panelColour = BackgroundColour ?? Color4Extensions.FromHex("ffd966");
                 textColour = TextColour ?? Color4Extensions.FromHex("2e576b");
+            }
+            else if (apiFriends.Any(f => User?.Equals(f) == true))
+            {
+                panelColour = BackgroundColour ?? Color4Extensions.FromHex("ff549a");
+                textColour = TextColour ?? Color4.White;
             }
             else
             {

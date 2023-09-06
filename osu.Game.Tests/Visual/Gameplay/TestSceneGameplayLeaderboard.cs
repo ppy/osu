@@ -6,11 +6,14 @@
 using System.Linq;
 using NUnit.Framework;
 using osu.Framework.Bindables;
+using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Extensions.PolygonExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
+using osu.Framework.Graphics.Shapes;
 using osu.Framework.Testing;
 using osu.Framework.Utils;
+using osu.Game.Online.API;
 using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Screens.Play.HUD;
 using osuTK;
@@ -139,6 +142,29 @@ namespace osu.Game.Tests.Visual.Gameplay
                 => AddAssert($"leaderboard height is {panelCount} panels high", () => leaderboard.DrawHeight == (GameplayLeaderboardScore.PANEL_HEIGHT + leaderboard.Spacing) * panelCount);
         }
 
+        [Test]
+        public void TestFriendScore()
+        {
+            APIUser friend = new APIUser { Username = "my friend", Id = 10000 };
+
+            createLeaderboard();
+            addLocalPlayer();
+
+            AddStep("initialize api", () =>
+            {
+                var api = (DummyAPIAccess)API;
+
+                api.Friends.Add(friend);
+            });
+
+            int playerNumber = 1;
+            AddRepeatStep("add 3 other players", () => createRandomScore(new APIUser { Username = $"Player {playerNumber++}" }), 3);
+            AddUntilStep("there are no pink color score", () => leaderboard.ChildrenOfType<Box>().All(b => b.Colour != Color4Extensions.FromHex("ff549a")));
+
+            AddRepeatStep("add 3 friend score", () => createRandomScore(friend), 3);
+            AddUntilStep("there are pink color for friend score", () => leaderboard.GetScoreByUsername("my friend").ChildrenOfType<Box>().Any(b => b.Colour == Color4Extensions.FromHex("ff549a")));
+        }
+
         private void addLocalPlayer()
         {
             AddStep("add local player", () =>
@@ -178,6 +204,11 @@ namespace osu.Game.Tests.Visual.Gameplay
                 var scoreItem = Flow.FirstOrDefault(i => i.User?.Username == username);
 
                 return scoreItem != null && scoreItem.ScorePosition == expectedPosition;
+            }
+
+            public GameplayLeaderboardScore GetScoreByUsername(string username)
+            {
+                return Flow.FirstOrDefault(i => i.User?.Username == username);
             }
         }
     }
