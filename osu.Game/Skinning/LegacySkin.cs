@@ -4,6 +4,7 @@
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Linq;
 using JetBrains.Annotations;
@@ -72,9 +73,9 @@ namespace osu.Game.Skinning
             }
         }
 
+        [SuppressMessage("ReSharper", "RedundantAssignment")] // for `wasHit` assignments used in `finally` debug logic
         public override IBindable<TValue>? GetConfig<TLookup, TValue>(TLookup lookup)
         {
-            // ReSharper disable once RedundantAssignment (used in `finally` debug logic)
             bool wasHit = true;
 
             try

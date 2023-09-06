@@ -247,7 +247,7 @@ namespace osu.Game.Skinning
 
         #endregion
 
-        public override string ToString() => $"{GetType().ReadableName()}{{ Name: {Name} }}";
+        public override string ToString() => $"{GetType().ReadableName()} {{ Name: {Name} }}";
 
         private static readonly ThreadLocal<int> nested_level = new ThreadLocal<int>(() => 0);
 
@@ -260,11 +260,11 @@ namespace osu.Game.Skinning
             switch (type)
             {
                 case LookupDebugType.Hit:
-                    icon = "🟢";
+                    icon = "🟢 hit";
                     break;
 
                 case LookupDebugType.Miss:
-                    icon = "🔴";
+                    icon = "🔴 miss";
                     break;
 
                 case LookupDebugType.Enter:
