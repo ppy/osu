@@ -142,6 +142,7 @@ namespace osu.Game.Rulesets.Osu.Tests
 
             drawableHitCircle.Scale = new Vector2(2f);
 
+            LoadComponent(drawableHitCircle);
             foreach (var mod in SelectedMods.Value.OfType<IApplicableToDrawableHitObject>())
                 mod.ApplyToDrawableHitObject(drawableHitCircle);
 
