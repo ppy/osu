@@ -310,7 +310,7 @@ namespace osu.Game.Skinning
                 }
             }
 
-            public override string ToString() => $"{GetType().ReadableName()}{{ skin: {skin} }}";
+            public override string ToString() => $"{GetType().ReadableName()} {{ Skin: {skin} }}";
         }
     }
 }

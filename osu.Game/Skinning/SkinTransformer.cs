@@ -47,6 +47,6 @@ namespace osu.Game.Skinning
             }
         }
 
-        public override string ToString() => $"{nameof(SkinTransformer)}{{ Skin: {Skin} }}";
+        public override string ToString() => $"{nameof(SkinTransformer)} {{ Skin: {Skin} }}";
     }
 }

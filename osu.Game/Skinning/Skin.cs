@@ -247,7 +247,7 @@ namespace osu.Game.Skinning
 
         #endregion
 
-        public override string ToString() => $"{GetType().ReadableName()}{{ Name: {Name} }}";
+        public override string ToString() => $"{GetType().ReadableName()} {{ Name: {Name} }}";
 
         private static readonly ThreadLocal<int> nested_level = new ThreadLocal<int>(() => 0);
 
