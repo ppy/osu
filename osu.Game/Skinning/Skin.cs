@@ -260,11 +260,11 @@ namespace osu.Game.Skinning
             switch (type)
             {
                 case LookupDebugType.Hit:
-                    icon = "🟢";
+                    icon = "🟢 hit";
                     break;
 
                 case LookupDebugType.Miss:
-                    icon = "🔴";
+                    icon = "🔴 miss";
                     break;
 
                 case LookupDebugType.Enter:
