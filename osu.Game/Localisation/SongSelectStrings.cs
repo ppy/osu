@@ -20,11 +20,6 @@ namespace osu.Game.Localisation
         public static LocalisableString LocallyModifiedTooltip => new TranslatableString(getKey(@"locally_modified_tooltip"), @"Has been locally modified");
 
         /// <summary>
-        /// "General"
-        /// </summary>
-        public static LocalisableString General => new TranslatableString(getKey(@"general"), @"General");
-
-        /// <summary>
         /// "Manage collections"
         /// </summary>
         public static LocalisableString ManageCollections => new TranslatableString(getKey(@"manage_collections"), @"Manage collections");
