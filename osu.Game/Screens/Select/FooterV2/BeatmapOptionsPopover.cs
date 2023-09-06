@@ -66,7 +66,7 @@ namespace osu.Game.Screens.Select.FooterV2
             addButton(@"Clear all local scores", FontAwesome.Solid.Eraser, () => songSelect?.ClearScores(beatmapWhenOpening.BeatmapInfo), colours.Red1);
 
             if (songSelect != null && songSelect.AllowEditing)
-                addButton(@"Edit beatmap", FontAwesome.Solid.PencilAlt, () => songSelect.Edit());
+                addButton(@"Edit beatmap", FontAwesome.Solid.PencilAlt, () => songSelect.Edit(beatmapWhenOpening.BeatmapInfo));
         }
 
         protected override void LoadComplete()
