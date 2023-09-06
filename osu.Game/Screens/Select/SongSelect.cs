@@ -311,9 +311,9 @@ namespace osu.Game.Screens.Select
                     Footer.AddButton(button, overlay);
 
                 BeatmapOptions.AddButton(@"Manage", @"collections", FontAwesome.Solid.Book, colours.Green, () => manageCollectionsDialog?.Show());
-                BeatmapOptions.AddButton(@"Delete", @"all difficulties", FontAwesome.Solid.Trash, colours.Pink, DeleteBeatmap);
+                BeatmapOptions.AddButton(@"Delete", @"all difficulties", FontAwesome.Solid.Trash, colours.Pink, () => DeleteBeatmap(Beatmap.Value.BeatmapSetInfo));
                 BeatmapOptions.AddButton(@"Remove", @"from unplayed", FontAwesome.Regular.TimesCircle, colours.Purple, null);
-                BeatmapOptions.AddButton(@"Clear", @"local scores", FontAwesome.Solid.Eraser, colours.Purple, ClearScores);
+                BeatmapOptions.AddButton(@"Clear", @"local scores", FontAwesome.Solid.Eraser, colours.Purple, () => ClearScores(Beatmap.Value.BeatmapInfo));
             }
 
             sampleChangeDifficulty = audio.Samples.Get(@"SongSelect/select-difficulty");
@@ -917,23 +917,23 @@ namespace osu.Game.Screens.Select
         }
 
         /// <summary>
-        /// Request to delete the current beatmap.
+        /// Request to delete a specific beatmap.
         /// </summary>
-        public void DeleteBeatmap()
+        public void DeleteBeatmap(BeatmapSetInfo? beatmap)
         {
-            if (Beatmap.Value.BeatmapSetInfo == null) return;
+            if (beatmap == null) return;
 
-            dialogOverlay?.Push(new BeatmapDeleteDialog(Beatmap.Value.BeatmapSetInfo));
+            dialogOverlay?.Push(new BeatmapDeleteDialog(beatmap));
         }
 
         /// <summary>
-        /// Request to clear the scores of the current beatmap.
+        /// Request to clear the scores of a specific beatmap.
         /// </summary>
-        public void ClearScores()
+        public void ClearScores(BeatmapInfo? beatmapInfo)
         {
-            if (Beatmap.Value.BeatmapInfo == null) return;
+            if (beatmapInfo == null) return;
 
-            dialogOverlay?.Push(new BeatmapClearScoresDialog(Beatmap.Value.BeatmapInfo, () =>
+            dialogOverlay?.Push(new BeatmapClearScoresDialog(beatmapInfo, () =>
                 // schedule done here rather than inside the dialog as the dialog may fade out and never callback.
                 Schedule(() => BeatmapDetails.Refresh())));
         }
@@ -969,7 +969,7 @@ namespace osu.Game.Screens.Select
                     if (e.ShiftPressed)
                     {
                         if (!Beatmap.IsDefault)
-                            DeleteBeatmap();
+                            DeleteBeatmap(Beatmap.Value.BeatmapSetInfo);
                         return true;
                     }
 
