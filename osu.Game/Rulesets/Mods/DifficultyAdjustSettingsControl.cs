@@ -27,9 +27,16 @@ namespace osu.Game.Rulesets.Mods
         /// When the mod is overriding a default, this will match the value of <see cref="Current"/>.
         /// When there is no override (ie. <see cref="Current"/> is null), this value will match the beatmap provided default via <see cref="updateCurrentFromSlider"/>.
         /// </remarks>
-        private readonly BindableNumber<float> sliderDisplayCurrent = new BindableNumber<float>();
+        protected readonly BindableNumber<float> sliderDisplayCurrent = new BindableNumber<float>();
 
-        protected override Drawable CreateControl() => new SliderControl(sliderDisplayCurrent);
+        protected override Drawable CreateControl() => new SliderControl(sliderDisplayCurrent,
+            new RoundedSliderBar<float>
+            {
+                RelativeSizeAxes = Axes.X,
+                Current = sliderDisplayCurrent,
+                KeyboardStep = 0.1f,
+            }
+        );
 
         /// <summary>
         /// Guards against beatmap values displayed on slider bars being transferred to user override.
@@ -88,7 +95,7 @@ namespace osu.Game.Rulesets.Mods
             isInternalChange = false;
         }
 
-        private partial class SliderControl : CompositeDrawable, IHasCurrentValue<float?>
+        protected partial class SliderControl : CompositeDrawable, IHasCurrentValue<float?>
         {
             // This is required as SettingsItem relies heavily on this bindable for internal use.
             // The actual update flow is done via the bindable provided in the constructor.
@@ -100,16 +107,11 @@ namespace osu.Game.Rulesets.Mods
                 set => current.Current = value;
             }
 
-            public SliderControl(BindableNumber<float> currentNumber)
+            public SliderControl(BindableNumber<float> currentNumber, RoundedSliderBar<float> slider)
             {
                 InternalChildren = new Drawable[]
                 {
-                    new RoundedSliderBar<float>
-                    {
-                        RelativeSizeAxes = Axes.X,
-                        Current = currentNumber,
-                        KeyboardStep = 0.1f,
-                    }
+                    slider
                 };
 
                 AutoSizeAxes = Axes.Y;
