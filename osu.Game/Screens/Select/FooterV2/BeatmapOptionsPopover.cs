@@ -43,7 +43,7 @@ namespace osu.Game.Screens.Select.FooterV2
         }
 
         [BackgroundDependencyLoader]
-        private void load(ManageCollectionsDialog? manageCollectionsDialog, SongSelect? songSelect, OsuColour colours)
+        private void load(ManageCollectionsDialog? manageCollectionsDialog, SongSelect? songSelect, OsuColour colours, BeatmapManager? beatmapManager)
         {
             Content.Padding = new MarginPadding(5);
 
@@ -65,11 +65,12 @@ namespace osu.Game.Screens.Select.FooterV2
             addHeader(SongSelectStrings.ForSelectedDifficulty, beatmapWhenOpening.BeatmapInfo.DifficultyName);
             // TODO: make work, and make show "unplayed" or "played" based on status.
             addButton(SongSelectStrings.MarkAsPlayed, FontAwesome.Regular.TimesCircle, null);
-            addButton(CommonStrings.ButtonsHide.ToSentence(), FontAwesome.Solid.Magic, null);
             addButton(SongSelectStrings.ClearAllLocalScores, FontAwesome.Solid.Eraser, () => songSelect?.ClearScores(beatmapWhenOpening.BeatmapInfo), colours.Red1);
 
             if (songSelect != null && songSelect.AllowEditing)
                 addButton(SongSelectStrings.EditBeatmap, FontAwesome.Solid.PencilAlt, () => songSelect.Edit(beatmapWhenOpening.BeatmapInfo));
+
+            addButton(CommonStrings.ButtonsHide.ToSentence(), FontAwesome.Solid.Magic, () => beatmapManager?.Hide(beatmapWhenOpening.BeatmapInfo));
         }
 
         protected override void LoadComplete()
