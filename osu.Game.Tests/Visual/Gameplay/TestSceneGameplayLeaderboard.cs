@@ -150,14 +150,16 @@ namespace osu.Game.Tests.Visual.Gameplay
             createLeaderboard();
             addLocalPlayer();
 
-            AddStep("initialize api", () =>
+            AddStep("Add friend to API", () =>
             {
                 var api = (DummyAPIAccess)API;
 
+                api.Friends.Clear();
                 api.Friends.Add(friend);
             });
 
             int playerNumber = 1;
+
             AddRepeatStep("add 3 other players", () => createRandomScore(new APIUser { Username = $"Player {playerNumber++}" }), 3);
             AddUntilStep("there are no pink color score", () => leaderboard.ChildrenOfType<Box>().All(b => b.Colour != Color4Extensions.FromHex("ff549a")));
 
