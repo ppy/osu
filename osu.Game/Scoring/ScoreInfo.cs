@@ -94,7 +94,10 @@ namespace osu.Game.Scoring
 
         public double Accuracy { get; set; }
 
-        public bool HasReplay => !string.IsNullOrEmpty(Hash);
+        public bool HasReplay => !string.IsNullOrEmpty(Hash) || HasOnlineReplay;
+
+        [Ignored]
+        public bool HasOnlineReplay { get; set; }
 
         public DateTimeOffset Date { get; set; }
 
