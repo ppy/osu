@@ -44,7 +44,7 @@ namespace osu.Game.Rulesets.Mods
                     return;
 
                 minValue = value;
-                updateMinValue();
+                updateExtents();
             }
         }
 
@@ -58,7 +58,7 @@ namespace osu.Game.Rulesets.Mods
                     return;
 
                 maxValue = value;
-                updateMaxValue();
+                updateExtents();
             }
         }
 
@@ -75,7 +75,7 @@ namespace osu.Game.Rulesets.Mods
                     return;
 
                 extendedMinValue = value;
-                updateMinValue();
+                updateExtents();
             }
         }
 
@@ -92,7 +92,7 @@ namespace osu.Game.Rulesets.Mods
                     return;
 
                 extendedMaxValue = value;
-                updateMaxValue();
+                updateExtents();
             }
         }
 
@@ -104,8 +104,7 @@ namespace osu.Game.Rulesets.Mods
         public DifficultyBindable(float? defaultValue = null)
             : base(defaultValue)
         {
-            ExtendedLimits.BindValueChanged(_ => updateMinValue());
-            ExtendedLimits.BindValueChanged(_ => updateMaxValue());
+            ExtendedLimits.BindValueChanged(_ => updateExtents());
         }
 
         public override float? Value
@@ -121,13 +120,9 @@ namespace osu.Game.Rulesets.Mods
             }
         }
 
-        private void updateMinValue()
+        private void updateExtents()
         {
             CurrentNumber.MinValue = ExtendedLimits.Value && extendedMinValue != null ? extendedMinValue.Value : minValue;
-        }
-
-        private void updateMaxValue()
-        {
             CurrentNumber.MaxValue = ExtendedLimits.Value && extendedMaxValue != null ? extendedMaxValue.Value : maxValue;
         }
 

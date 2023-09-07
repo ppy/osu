@@ -82,7 +82,7 @@ namespace osu.Game.Graphics.UserInterface
             channel.Play();
         }
 
-        protected LocalisableString getTooltipText(T value)
+        private LocalisableString getTooltipText(T value)
         {
             if (CurrentNumber.IsInteger)
                 return value.ToInt32(NumberFormatInfo.InvariantInfo).ToString("N0");
