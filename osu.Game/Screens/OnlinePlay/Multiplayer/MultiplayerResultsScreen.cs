@@ -10,7 +10,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
     public partial class MultiplayerResultsScreen : PlaylistsResultsScreen
     {
         public MultiplayerResultsScreen(ScoreInfo score, long roomId, PlaylistItem playlistItem)
-            : base(score, roomId, playlistItem, false, false)
+            : base(score, roomId, playlistItem, false)
         {
         }
     }

@@ -189,7 +189,7 @@ namespace osu.Game.Online.API.Requests.Responses
                 Statistics = Statistics,
                 MaximumStatistics = MaximumStatistics,
                 Date = EndedAt,
-                Hash = HasReplay ? "online" : string.Empty, // TODO: temporary?
+                HasOnlineReplay = HasReplay,
                 Mods = mods,
                 PP = PP,
             };
