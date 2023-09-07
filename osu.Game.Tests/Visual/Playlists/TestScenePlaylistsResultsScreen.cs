@@ -245,6 +245,7 @@ namespace osu.Game.Tests.Visual.Playlists
             var multiplayerUserScore = new MultiplayerScore
             {
                 ID = highestScoreId,
+                SoloScoreID = (ulong?)highestScoreId,
                 Accuracy = userScore.Accuracy,
                 Passed = userScore.Passed,
                 Rank = userScore.Rank,
@@ -262,9 +263,11 @@ namespace osu.Game.Tests.Visual.Playlists
 
             for (int i = 1; i <= scores_per_result; i++)
             {
+                int nextLowest = getNextLowestScoreId();
                 multiplayerUserScore.ScoresAround.Lower.Scores.Add(new MultiplayerScore
                 {
-                    ID = getNextLowestScoreId(),
+                    ID = nextLowest,
+                    SoloScoreID = (ulong?)nextLowest,
                     Accuracy = userScore.Accuracy,
                     Passed = true,
                     Rank = userScore.Rank,
@@ -277,9 +280,11 @@ namespace osu.Game.Tests.Visual.Playlists
                     },
                 });
 
+                int nextHighest = getNextHighestScoreId();
                 multiplayerUserScore.ScoresAround.Higher.Scores.Add(new MultiplayerScore
                 {
-                    ID = getNextHighestScoreId(),
+                    ID = nextHighest,
+                    SoloScoreID = (ulong?)nextHighest,
                     Accuracy = userScore.Accuracy,
                     Passed = true,
                     Rank = userScore.Rank,
@@ -309,9 +314,11 @@ namespace osu.Game.Tests.Visual.Playlists
 
             for (int i = 1; i <= scores_per_result; i++)
             {
+                int id = sort == "score_asc" ? getNextHighestScoreId() : getNextLowestScoreId();
                 result.Scores.Add(new MultiplayerScore
                 {
-                    ID = sort == "score_asc" ? getNextHighestScoreId() : getNextLowestScoreId(),
+                    ID = id,
+                    SoloScoreID = (ulong?)id,
                     Accuracy = 1,
                     Passed = true,
                     Rank = ScoreRank.X,
