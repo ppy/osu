@@ -1,14 +1,18 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System;
 using System.Linq;
+using osu.Framework.Graphics;
+using osu.Framework.Localisation;
 using osu.Game.Beatmaps;
 using osu.Game.Configuration;
+using osu.Game.Graphics.UserInterface;
 using osu.Game.Rulesets.Mods;
 
 namespace osu.Game.Rulesets.Osu.Mods
 {
-    public class OsuModDifficultyAdjust : ModDifficultyAdjust
+    public partial class OsuModDifficultyAdjust : ModDifficultyAdjust
     {
         [SettingSource("Circle Size", "Override a beatmap's set CS.", FIRST_SETTING_ORDER - 1, SettingControlType = typeof(DifficultyAdjustSettingsControl))]
         public DifficultyBindable CircleSize { get; } = new DifficultyBindable
@@ -20,7 +24,7 @@ namespace osu.Game.Rulesets.Osu.Mods
             ReadCurrentFromDifficulty = diff => diff.CircleSize,
         };
 
-        [SettingSource("Approach Rate", "Override a beatmap's set AR.", LAST_SETTING_ORDER + 1, SettingControlType = typeof(ApproachRateDifficultyAdjustSettingsControl))]
+        [SettingSource("Approach Rate", "Override a beatmap's set AR.", LAST_SETTING_ORDER + 1, SettingControlType = typeof(ApproachRateSettingsControl))]
         public DifficultyBindable ApproachRate { get; } = new DifficultyBindable
         {
             Precision = 0.1f,
@@ -53,6 +57,32 @@ namespace osu.Game.Rulesets.Osu.Mods
 
             if (CircleSize.Value != null) difficulty.CircleSize = CircleSize.Value.Value;
             if (ApproachRate.Value != null) difficulty.ApproachRate = ApproachRate.Value.Value;
+        }
+
+        private partial class ApproachRateSettingsControl : DifficultyAdjustSettingsControl
+        {
+            protected override Drawable CreateControl() => new SliderControl(SliderDisplayCurrent,
+                new ApproachRateSlider
+                {
+                    RelativeSizeAxes = Axes.X,
+                    Current = SliderDisplayCurrent,
+                    KeyboardStep = 0.1f,
+                }
+            );
+
+            /// <summary>
+            /// A slider bar with more detailed approach rate info for its given value
+            /// </summary>
+            public partial class ApproachRateSlider : RoundedSliderBar<float>
+            {
+                public override LocalisableString TooltipText =>
+                    $"{base.TooltipText} ({millisecondsFromApproachRate(Current.Value, 1.0f)} ms)";
+
+                private double millisecondsFromApproachRate(float value, float clockRate)
+                {
+                    return Math.Round(1800 - Math.Min(value, 5) * 120 - (value >= 5 ? (value - 5) * 150 : 0) / clockRate);
+                }
+            }
         }
     }
 }

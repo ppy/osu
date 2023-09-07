@@ -27,13 +27,13 @@ namespace osu.Game.Rulesets.Mods
         /// When the mod is overriding a default, this will match the value of <see cref="Current"/>.
         /// When there is no override (ie. <see cref="Current"/> is null), this value will match the beatmap provided default via <see cref="updateCurrentFromSlider"/>.
         /// </remarks>
-        protected readonly BindableNumber<float> sliderDisplayCurrent = new BindableNumber<float>();
+        protected readonly BindableNumber<float> SliderDisplayCurrent = new BindableNumber<float>();
 
-        protected override Drawable CreateControl() => new SliderControl(sliderDisplayCurrent,
+        protected override Drawable CreateControl() => new SliderControl(SliderDisplayCurrent,
             new RoundedSliderBar<float>
             {
                 RelativeSizeAxes = Axes.X,
-                Current = sliderDisplayCurrent,
+                Current = SliderDisplayCurrent,
                 KeyboardStep = 0.1f,
             }
         );
@@ -53,7 +53,7 @@ namespace osu.Game.Rulesets.Mods
                 // Intercept and extract the internal number bindable from DifficultyBindable.
                 // This will provide bounds and precision specifications for the slider bar.
                 difficultyBindable = (DifficultyBindable)value.GetBoundCopy();
-                sliderDisplayCurrent.BindTo(difficultyBindable.CurrentNumber);
+                SliderDisplayCurrent.BindTo(difficultyBindable.CurrentNumber);
 
                 base.Current = difficultyBindable;
             }
@@ -66,7 +66,7 @@ namespace osu.Game.Rulesets.Mods
             Current.BindValueChanged(_ => updateCurrentFromSlider());
             beatmap.BindValueChanged(_ => updateCurrentFromSlider(), true);
 
-            sliderDisplayCurrent.BindValueChanged(number =>
+            SliderDisplayCurrent.BindValueChanged(number =>
             {
                 // this handles the transfer of the slider value to the main bindable.
                 // as such, should be skipped if the slider is being updated via updateFromDifficulty().
@@ -80,7 +80,7 @@ namespace osu.Game.Rulesets.Mods
             if (Current.Value != null)
             {
                 // a user override has been added or updated.
-                sliderDisplayCurrent.Value = Current.Value.Value;
+                SliderDisplayCurrent.Value = Current.Value.Value;
                 return;
             }
 
@@ -91,7 +91,7 @@ namespace osu.Game.Rulesets.Mods
                 return;
 
             isInternalChange = true;
-            sliderDisplayCurrent.Value = difficultyBindable.ReadCurrentFromDifficulty(difficulty);
+            SliderDisplayCurrent.Value = difficultyBindable.ReadCurrentFromDifficulty(difficulty);
             isInternalChange = false;
         }
 
