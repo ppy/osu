@@ -64,7 +64,7 @@ namespace osu.Game.Overlays.Profile.Header
                 new Box
                 {
                     RelativeSizeAxes = Axes.Both,
-                    Colour = colourProvider.Background4,
+                    Colour = colourProvider.Background3,
                 },
                 new FillFlowContainer
                 {
