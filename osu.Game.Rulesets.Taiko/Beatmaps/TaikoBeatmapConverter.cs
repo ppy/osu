@@ -186,10 +186,9 @@ namespace osu.Game.Rulesets.Taiko.Beatmaps
             TimingControlPoint timingPoint = beatmap.ControlPointInfo.TimingPointAt(obj.StartTime);
 
             double beatLength;
-            if (obj.LegacyBpmMultiplier.HasValue)
-                beatLength = timingPoint.BeatLength * obj.LegacyBpmMultiplier.Value;
-            else if (obj is IHasSliderVelocity hasSliderVelocity)
-                beatLength = timingPoint.BeatLength / hasSliderVelocity.SliderVelocityMultiplier;
+
+            if (obj is IHasSliderVelocity hasSliderVelocity)
+                beatLength = timingPoint.BeatLength / hasSliderVelocity.GetPrecisionAdjustedSliderVelocityMultiplier(TaikoRuleset.SHORT_NAME);
             else
                 beatLength = timingPoint.BeatLength;
 

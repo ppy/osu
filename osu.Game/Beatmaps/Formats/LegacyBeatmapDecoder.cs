@@ -103,12 +103,8 @@ namespace osu.Game.Beatmaps.Formats
         {
             DifficultyControlPoint difficultyControlPoint = (beatmap.ControlPointInfo as LegacyControlPointInfo)?.DifficultyPointAt(hitObject.StartTime) ?? DifficultyControlPoint.DEFAULT;
 
-            if (difficultyControlPoint is LegacyDifficultyControlPoint legacyDifficultyControlPoint)
-            {
-                hitObject.LegacyBpmMultiplier = legacyDifficultyControlPoint.BpmMultiplier;
-                if (hitObject is IHasGenerateTicks hasGenerateTicks)
-                    hasGenerateTicks.GenerateTicks = legacyDifficultyControlPoint.GenerateTicks;
-            }
+            if (hitObject is IHasGenerateTicks hasGenerateTicks)
+                hasGenerateTicks.GenerateTicks = difficultyControlPoint.GenerateTicks;
 
             if (hitObject is IHasSliderVelocity hasSliderVelocity)
                 hasSliderVelocity.SliderVelocityMultiplier = difficultyControlPoint.SliderVelocity;
@@ -497,8 +493,9 @@ namespace osu.Game.Beatmaps.Formats
 
             int onlineRulesetID = beatmap.BeatmapInfo.Ruleset.OnlineID;
 
-            addControlPoint(time, new LegacyDifficultyControlPoint(onlineRulesetID, beatLength)
+            addControlPoint(time, new DifficultyControlPoint
             {
+                GenerateTicks = !double.IsNaN(beatLength),
                 SliderVelocity = speedMultiplier,
             }, timingChange);
 
