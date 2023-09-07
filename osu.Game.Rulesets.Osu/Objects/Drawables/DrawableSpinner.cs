@@ -120,6 +120,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
             base.OnFree();
 
             spinningSample.ClearSamples();
+            RotationTracker.Reset();
         }
 
         protected override void LoadSamples()
@@ -295,28 +296,28 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
 
             int spins = (int)(Result.RateAdjustedRotation / 360);
 
+            if (wholeSpins == spins)
+                return;
+
             if (spins < wholeSpins)
             {
                 // rewinding, silently handle
                 wholeSpins = spins;
-                return;
             }
-
-            while (wholeSpins != spins)
+            else
             {
-                var tick = ticks.FirstOrDefault(t => !t.Result.HasResult);
-
-                // tick may be null if we've hit the spin limit.
-                if (tick != null)
+                while (wholeSpins < spins)
                 {
-                    tick.TriggerResult(true);
+                    var tick = ticks.FirstOrDefault(t => !t.Result.HasResult);
 
-                    if (tick is DrawableSpinnerBonusTick)
-                        gainedBonus.Value = score_per_tick * (spins - HitObject.SpinsRequired);
+                    // tick may be null if we've hit the spin limit.
+                    tick?.TriggerResult(true);
+
+                    wholeSpins++;
                 }
-
-                wholeSpins++;
             }
+
+            gainedBonus.Value = Math.Max(0, score_per_tick * (spins - HitObject.SpinsRequired));
         }
     }
 }
