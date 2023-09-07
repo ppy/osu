@@ -1,15 +1,16 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using System;
 using System.Linq;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Localisation;
 using osu.Game.Beatmaps;
+using osu.Game.Beatmaps.ControlPoints;
 using osu.Game.Configuration;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Rulesets.Mods;
+using osu.Game.Rulesets.Osu.Objects;
 
 namespace osu.Game.Rulesets.Osu.Mods
 {
@@ -76,11 +77,13 @@ namespace osu.Game.Rulesets.Osu.Mods
             public partial class ApproachRateSlider : RoundedSliderBar<float>
             {
                 public override LocalisableString TooltipText =>
-                    $"{base.TooltipText} ({millisecondsFromApproachRate(Current.Value, 1.0f)} ms)";
+                    $"{base.TooltipText} ({getPreemptTime(Current.Value):0} ms)";
 
-                private double millisecondsFromApproachRate(float value, float clockRate)
+                private double getPreemptTime(float approachRate)
                 {
-                    return Math.Round(1800 - Math.Min(value, 5) * 120 - (value >= 5 ? (value - 5) * 150 : 0) / clockRate);
+                    var hitCircle = new HitCircle();
+                    hitCircle.ApplyDefaults(new ControlPointInfo(), new BeatmapDifficulty { ApproachRate = approachRate });
+                    return hitCircle.TimePreempt;
                 }
             }
         }
