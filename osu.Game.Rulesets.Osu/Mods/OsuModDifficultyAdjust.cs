@@ -77,7 +77,9 @@ namespace osu.Game.Rulesets.Osu.Mods
             public partial class ApproachRateSlider : RoundedSliderBar<float>
             {
                 public override LocalisableString TooltipText =>
-                    $"{base.TooltipText} ({getPreemptTime(Current.Value):0} ms)";
+                    (Current as BindableNumber<float>)?.MinValue < 0
+                        ? $"{base.TooltipText} ({getPreemptTime(Current.Value):0} ms)"
+                        : base.TooltipText;
 
                 private double getPreemptTime(float approachRate)
                 {
