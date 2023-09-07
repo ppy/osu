@@ -27,16 +27,16 @@ namespace osu.Game.Rulesets.Mods
         /// When the mod is overriding a default, this will match the value of <see cref="Current"/>.
         /// When there is no override (ie. <see cref="Current"/> is null), this value will match the beatmap provided default via <see cref="updateCurrentFromSlider"/>.
         /// </remarks>
-        protected readonly BindableNumber<float> SliderDisplayCurrent = new BindableNumber<float>();
+        private readonly BindableNumber<float> sliderDisplayCurrent = new BindableNumber<float>();
 
-        protected override Drawable CreateControl() => new SliderControl(SliderDisplayCurrent,
-            new RoundedSliderBar<float>
-            {
-                RelativeSizeAxes = Axes.X,
-                Current = SliderDisplayCurrent,
-                KeyboardStep = 0.1f,
-            }
-        );
+        protected sealed override Drawable CreateControl() => new SliderControl(sliderDisplayCurrent, CreateSlider);
+
+        protected virtual RoundedSliderBar<float> CreateSlider(BindableNumber<float> current) => new RoundedSliderBar<float>
+        {
+            RelativeSizeAxes = Axes.X,
+            Current = current,
+            KeyboardStep = 0.1f,
+        };
 
         /// <summary>
         /// Guards against beatmap values displayed on slider bars being transferred to user override.
@@ -53,7 +53,7 @@ namespace osu.Game.Rulesets.Mods
                 // Intercept and extract the internal number bindable from DifficultyBindable.
                 // This will provide bounds and precision specifications for the slider bar.
                 difficultyBindable = (DifficultyBindable)value.GetBoundCopy();
-                SliderDisplayCurrent.BindTo(difficultyBindable.CurrentNumber);
+                sliderDisplayCurrent.BindTo(difficultyBindable.CurrentNumber);
 
                 base.Current = difficultyBindable;
             }
@@ -66,7 +66,7 @@ namespace osu.Game.Rulesets.Mods
             Current.BindValueChanged(_ => updateCurrentFromSlider());
             beatmap.BindValueChanged(_ => updateCurrentFromSlider(), true);
 
-            SliderDisplayCurrent.BindValueChanged(number =>
+            sliderDisplayCurrent.BindValueChanged(number =>
             {
                 // this handles the transfer of the slider value to the main bindable.
                 // as such, should be skipped if the slider is being updated via updateFromDifficulty().
@@ -80,7 +80,7 @@ namespace osu.Game.Rulesets.Mods
             if (Current.Value != null)
             {
                 // a user override has been added or updated.
-                SliderDisplayCurrent.Value = Current.Value.Value;
+                sliderDisplayCurrent.Value = Current.Value.Value;
                 return;
             }
 
@@ -91,11 +91,11 @@ namespace osu.Game.Rulesets.Mods
                 return;
 
             isInternalChange = true;
-            SliderDisplayCurrent.Value = difficultyBindable.ReadCurrentFromDifficulty(difficulty);
+            sliderDisplayCurrent.Value = difficultyBindable.ReadCurrentFromDifficulty(difficulty);
             isInternalChange = false;
         }
 
-        protected partial class SliderControl : CompositeDrawable, IHasCurrentValue<float?>
+        private partial class SliderControl : CompositeDrawable, IHasCurrentValue<float?>
         {
             // This is required as SettingsItem relies heavily on this bindable for internal use.
             // The actual update flow is done via the bindable provided in the constructor.
@@ -107,11 +107,11 @@ namespace osu.Game.Rulesets.Mods
                 set => current.Current = value;
             }
 
-            public SliderControl(BindableNumber<float> currentNumber, RoundedSliderBar<float> slider)
+            public SliderControl(BindableNumber<float> currentNumber, Func<BindableNumber<float>, RoundedSliderBar<float>> createSlider)
             {
                 InternalChildren = new Drawable[]
                 {
-                    slider
+                    createSlider(currentNumber)
                 };
 
                 AutoSizeAxes = Axes.Y;
