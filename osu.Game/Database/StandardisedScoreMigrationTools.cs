@@ -246,11 +246,11 @@ namespace osu.Game.Database
             double modMultiplier = score.Mods.Select(m => m.ScoreMultiplier).Aggregate(1.0, (c, n) => c * n);
 
             int maximumLegacyAccuracyScore = attributes.AccuracyScore;
-            int maximumLegacyComboScore = (int)Math.Round(attributes.ComboScore * modMultiplier);
+            long maximumLegacyComboScore = (long)Math.Round(attributes.ComboScore * modMultiplier);
             double maximumLegacyBonusRatio = attributes.BonusScoreRatio;
 
             // The part of total score that doesn't include bonus.
-            int maximumLegacyBaseScore = maximumLegacyAccuracyScore + maximumLegacyComboScore;
+            long maximumLegacyBaseScore = maximumLegacyAccuracyScore + maximumLegacyComboScore;
 
             // The combo proportion is calculated as a proportion of maximumLegacyBaseScore.
             double comboProportion = Math.Min(1, (double)score.LegacyTotalScore / maximumLegacyBaseScore);
