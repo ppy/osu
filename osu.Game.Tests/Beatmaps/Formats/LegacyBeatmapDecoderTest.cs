@@ -1024,10 +1024,8 @@ namespace osu.Game.Tests.Beatmaps.Formats
                 Assert.That(controlPoints.DifficultyPointAt(2000).SliderVelocity, Is.EqualTo(1));
                 Assert.That(controlPoints.DifficultyPointAt(3000).SliderVelocity, Is.EqualTo(1));
 
-#pragma warning disable 618
                 Assert.That(controlPoints.DifficultyPointAt(2000).GenerateTicks, Is.False);
                 Assert.That(controlPoints.DifficultyPointAt(3000).GenerateTicks, Is.True);
-#pragma warning restore 618
             }
         }
     }
