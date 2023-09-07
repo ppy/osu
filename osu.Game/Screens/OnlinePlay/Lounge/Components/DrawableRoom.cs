@@ -1,8 +1,6 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
 using System.Collections.Generic;
 using System.Threading;
 using osu.Framework.Allocation;
@@ -36,18 +34,18 @@ namespace osu.Game.Screens.OnlinePlay.Lounge.Components
 
         public readonly Room Room;
 
-        protected Container ButtonsContainer { get; private set; }
+        protected Container ButtonsContainer { get; private set; } = null!;
 
         private readonly Bindable<MatchType> roomType = new Bindable<MatchType>();
         private readonly Bindable<RoomCategory> roomCategory = new Bindable<RoomCategory>();
         private readonly Bindable<bool> hasPassword = new Bindable<bool>();
 
-        private DrawableRoomParticipantsList drawableRoomParticipantsList;
-        private RoomSpecialCategoryPill specialCategoryPill;
-        private PasswordProtectedIcon passwordIcon;
-        private EndDateInfo endDateInfo;
+        private DrawableRoomParticipantsList? drawableRoomParticipantsList;
+        private RoomSpecialCategoryPill specialCategoryPill = null!;
+        private PasswordProtectedIcon passwordIcon = null!;
+        private EndDateInfo endDateInfo = null!;
 
-        private DelayedLoadWrapper wrapper;
+        private DelayedLoadWrapper wrapper = null!;
 
         public DrawableRoom(Room room)
         {
@@ -325,13 +323,13 @@ namespace osu.Game.Screens.OnlinePlay.Lounge.Components
         private partial class RoomStatusText : OnlinePlayComposite
         {
             [Resolved]
-            private OsuColour colours { get; set; }
+            private OsuColour colours { get; set; } = null!;
 
             [Resolved]
-            private BeatmapLookupCache beatmapLookupCache { get; set; }
+            private BeatmapLookupCache beatmapLookupCache { get; set; } = null!;
 
-            private SpriteText statusText;
-            private LinkFlowContainer beatmapText;
+            private SpriteText statusText = null!;
+            private LinkFlowContainer beatmapText = null!;
 
             public RoomStatusText()
             {
@@ -386,7 +384,7 @@ namespace osu.Game.Screens.OnlinePlay.Lounge.Components
                 CurrentPlaylistItem.BindValueChanged(onSelectedItemChanged, true);
             }
 
-            private CancellationTokenSource beatmapLookupCancellation;
+            private CancellationTokenSource? beatmapLookupCancellation;
 
             private void onSelectedItemChanged(ValueChangedEvent<PlaylistItem> item)
             {
