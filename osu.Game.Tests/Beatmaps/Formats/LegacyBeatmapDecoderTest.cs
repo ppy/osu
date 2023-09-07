@@ -1025,8 +1025,8 @@ namespace osu.Game.Tests.Beatmaps.Formats
                 Assert.That(controlPoints.DifficultyPointAt(3000).SliderVelocity, Is.EqualTo(1));
 
 #pragma warning disable 618
-                Assert.That(((LegacyBeatmapDecoder.LegacyDifficultyControlPoint)controlPoints.DifficultyPointAt(2000)).GenerateTicks, Is.False);
-                Assert.That(((LegacyBeatmapDecoder.LegacyDifficultyControlPoint)controlPoints.DifficultyPointAt(3000)).GenerateTicks, Is.True);
+                Assert.That(controlPoints.DifficultyPointAt(2000).GenerateTicks, Is.False);
+                Assert.That(controlPoints.DifficultyPointAt(3000).GenerateTicks, Is.True);
 #pragma warning restore 618
             }
         }
