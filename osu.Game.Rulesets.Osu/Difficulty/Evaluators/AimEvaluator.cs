@@ -146,20 +146,19 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
             {
                 double absoluteTime = deltaTime + slider.StartTime;
 
-                while (followPath[nestedObjectIndex].StartTime > absoluteTime)
+                while (nestedObjectIndex < followPath.Count - 2 && followPath[nestedObjectIndex + 1].StartTime < absoluteTime)
                 {
-                    if (nestedObjectIndex >= followPath.Count - 1) break; // if already out of range - don't change anything
                     nestedObjectIndex += 1; // search for right lazy path segment
                 }
+
+                var currentObject = (OsuHitObject)followPath[nestedObjectIndex];
+                var nextObject = (OsuHitObject)followPath[nestedObjectIndex + 1];
 
                 // calculating position of the normal path
                 double progress = deltaTime / slider.SpanDuration;
                 Vector2 ballPosition = slider.Position + slider.Path.PositionAt(progress);
 
                 // calculation position of the lazy path
-                var currentObject = (OsuHitObject)followPath[nestedObjectIndex];
-                var nextObject = (OsuHitObject)((nestedObjectIndex >= followPath.Count) ? slider.TailCircle : followPath[nestedObjectIndex + 1]);
-
                 float localProgress = (float)((absoluteTime - currentObject.StartTime) / (nextObject.StartTime - currentObject.StartTime));
                 localProgress = Math.Clamp(localProgress, 0, 1);
                 Vector2 lazyPosition = currentObject.Position + (nextObject.Position - currentObject.Position) * localProgress; // interpolation
