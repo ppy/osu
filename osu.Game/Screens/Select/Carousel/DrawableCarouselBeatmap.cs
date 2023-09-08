@@ -7,8 +7,10 @@ using System.Linq;
 using System.Threading;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
+using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Extensions.LocalisationExtensions;
 using osu.Framework.Graphics;
+using osu.Framework.Graphics.Colour;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Cursor;
 using osu.Framework.Graphics.Effects;
@@ -77,6 +79,7 @@ namespace osu.Game.Screens.Select.Carousel
         private IBindable<StarDifficulty?> starDifficultyBindable = null!;
         private CancellationTokenSource? starDifficultyCancellationSource;
         private Container rightContainer = null!;
+        private Box starRatingGradient = null!;
 
         public DrawableCarouselBeatmap(CarouselBeatmap panel)
         {
@@ -123,9 +126,20 @@ namespace osu.Game.Screens.Select.Carousel
                             // We don't want to match the header's size when its selected, hence no relative sizing.
                             Height = height,
                             X = colour_box_width,
-                            Colour = colourProvider.Background3,
-                            Child = new Box { RelativeSizeAxes = Axes.Both },
-                        }
+                            Children = new Drawable[]
+                            {
+                                new Box
+                                {
+                                    RelativeSizeAxes = Axes.Both,
+                                    Colour = ColourInfo.GradientHorizontal(colourProvider.Background3, colourProvider.Background4),
+                                },
+                                starRatingGradient = new Box
+                                {
+                                    RelativeSizeAxes = Axes.Both,
+                                    Alpha = 0,
+                                },
+                            },
+                        },
                     }
                 },
                 iconContainer = new ConstrainedIconContainer
@@ -263,8 +277,11 @@ namespace osu.Game.Screens.Select.Carousel
                     // Every other element in song select that uses this cut off uses yellow for the upper range but the designs use white here for whatever reason.
                     iconContainer.Colour = s.NewValue.Stars > 6.5f ? Colour4.White : colourProvider.Background5;
 
-                    starCounter.Colour = colourBox.Colour =
-                        colours.ForStarDifficulty(s.NewValue.Stars);
+                    var starRatingColour = colours.ForStarDifficulty(s.NewValue.Stars);
+
+                    starCounter.Colour = colourBox.Colour = starRatingColour;
+                    starRatingGradient.Colour = ColourInfo.GradientHorizontal(starRatingColour.Opacity(0.25f), starRatingColour.Opacity(0));
+                    starRatingGradient.Show();
 
                     if (Item!.State.Value == CarouselItemState.NotSelected) return;
 
