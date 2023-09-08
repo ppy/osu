@@ -121,6 +121,7 @@ namespace osu.Game.Screens.Select.Carousel
                             Origin = Anchor.BottomLeft,
                             RelativeSizeAxes = Axes.X,
                             Height = 3,
+                            Colour = colours.ForStarDifficulty(0),
                         },
                         new Container
                         {
