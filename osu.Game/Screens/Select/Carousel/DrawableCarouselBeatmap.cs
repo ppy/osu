@@ -38,7 +38,7 @@ namespace osu.Game.Screens.Select.Carousel
         /// </summary>
         public const float HEIGHT = height + CAROUSEL_BEATMAP_SPACING;
 
-        private const float height = MAX_HEIGHT * 0.6f;
+        private const float height = MAX_HEIGHT * 0.625f;
         private const float colour_box_width = 30;
         private const float corner_radius = 10;
 
@@ -53,8 +53,6 @@ namespace osu.Game.Screens.Select.Carousel
         private ConstrainedIconContainer iconContainer = null!;
 
         private Box colourBox = null!;
-
-        private Box colourUnderline = null!;
 
         private StarRatingDisplay starRatingDisplay = null!;
 
@@ -78,6 +76,7 @@ namespace osu.Game.Screens.Select.Carousel
 
         private IBindable<StarDifficulty?> starDifficultyBindable = null!;
         private CancellationTokenSource? starDifficultyCancellationSource;
+        private Container rightContainer = null!;
 
         public DrawableCarouselBeatmap(CarouselBeatmap panel)
         {
@@ -114,17 +113,10 @@ namespace osu.Game.Screens.Select.Carousel
                             RelativeSizeAxes = Axes.Y,
                             Colour = colours.ForStarDifficulty(0),
                         },
-                        colourUnderline = new Box
+                        rightContainer = new Container
                         {
-                            Alpha = 0,
-                            Anchor = Anchor.BottomLeft,
-                            Origin = Anchor.BottomLeft,
-                            RelativeSizeAxes = Axes.X,
-                            Height = 3,
-                            Colour = colours.ForStarDifficulty(0),
-                        },
-                        new Container
-                        {
+                            Anchor = Anchor.CentreLeft,
+                            Origin = Anchor.CentreLeft,
                             Masking = true,
                             CornerRadius = corner_radius,
                             RelativeSizeAxes = Axes.X,
@@ -213,9 +205,10 @@ namespace osu.Game.Screens.Select.Carousel
 
             MovementContainer.MoveToX(-50, 500, Easing.OutExpo);
 
-            Header.Height = height + 2;
+            rightContainer.Height = height - 2;
 
-            colourUnderline.Show();
+            colourBox.RelativeSizeAxes = Axes.Both;
+            colourBox.Width = 1;
         }
 
         protected override void Deselected()
@@ -224,7 +217,7 @@ namespace osu.Game.Screens.Select.Carousel
 
             MovementContainer.MoveToX(0, 500, Easing.OutExpo);
 
-            Header.Height = height;
+            rightContainer.Height = height;
 
             Header.EffectContainer.EdgeEffect = new EdgeEffectParameters
             {
@@ -234,7 +227,8 @@ namespace osu.Game.Screens.Select.Carousel
                 Colour = Colour4.Black.Opacity(100),
             };
 
-            colourUnderline.Hide();
+            colourBox.RelativeSizeAxes = Axes.Y;
+            colourBox.Width = colour_box_width + corner_radius;
         }
 
         protected override bool OnClick(ClickEvent e)
@@ -269,7 +263,7 @@ namespace osu.Game.Screens.Select.Carousel
                     // Every other element in song select that uses this cut off uses yellow for the upper range but the designs use white here for whatever reason.
                     iconContainer.Colour = s.NewValue.Stars > 6.5f ? Colour4.White : colourProvider.Background5;
 
-                    starCounter.Colour = colourBox.Colour = colourUnderline.Colour =
+                    starCounter.Colour = colourBox.Colour =
                         colours.ForStarDifficulty(s.NewValue.Stars);
 
                     if (Item!.State.Value == CarouselItemState.NotSelected) return;
