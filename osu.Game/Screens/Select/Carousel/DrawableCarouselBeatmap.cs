@@ -108,7 +108,11 @@ namespace osu.Game.Screens.Select.Carousel
                         {
                             RelativeSizeAxes = Axes.Both,
                             Padding = new MarginPadding { Vertical = 0.5f },
-                            Child = colourBox = new Box { RelativeSizeAxes = Axes.Both }
+                            Child = colourBox = new Box
+                            {
+                                RelativeSizeAxes = Axes.Both,
+                                Colour = colours.ForStarDifficulty(0),
+                            }
                         },
 
                         new Container
@@ -131,7 +135,8 @@ namespace osu.Game.Screens.Select.Carousel
                     Origin = Anchor.Centre,
                     Anchor = Anchor.CentreLeft,
                     Icon = beatmapInfo.Ruleset.CreateInstance().CreateIcon(),
-                    Size = new Vector2(20)
+                    Size = new Vector2(20),
+                    Colour = colourProvider.Background5,
                 },
                 new FillFlowContainer
                 {
@@ -251,7 +256,7 @@ namespace osu.Game.Screens.Select.Carousel
                     starCounter.Current = (float)s.NewValue.Stars;
 
                     // Every other element in song select that uses this cut off uses yellow for the upper range but the designs use white here for whatever reason.
-                    iconContainer.Colour = s.NewValue.Stars > 6.5f ? Colour4.White : colours.B5;
+                    iconContainer.Colour = s.NewValue.Stars > 6.5f ? Colour4.White : colourProvider.Background5;
 
                     starCounter.Colour = colourBox.Colour =
                         colours.ForStarDifficulty(s.NewValue.Stars);
