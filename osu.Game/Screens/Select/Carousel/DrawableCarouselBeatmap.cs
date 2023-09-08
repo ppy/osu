@@ -154,57 +154,49 @@ namespace osu.Game.Screens.Select.Carousel
                 new FillFlowContainer
                 {
                     Padding = new MarginPadding { Top = 8, Left = colour_box_width + corner_radius },
-                    Direction = FillDirection.Horizontal,
+                    Direction = FillDirection.Vertical,
                     AutoSizeAxes = Axes.Both,
                     Children = new Drawable[]
                     {
                         new FillFlowContainer
                         {
-                            Direction = FillDirection.Vertical,
+                            Direction = FillDirection.Horizontal,
+                            Spacing = new Vector2(3, 0),
                             AutoSizeAxes = Axes.Both,
                             Children = new Drawable[]
                             {
-                                new FillFlowContainer
-                                {
-                                    Direction = FillDirection.Horizontal,
-                                    Spacing = new Vector2(3, 0),
-                                    AutoSizeAxes = Axes.Both,
-                                    Children = new Drawable[]
-                                    {
-                                        starRatingDisplay = new StarRatingDisplay(default, StarRatingDisplaySize.Small),
+                                starRatingDisplay = new StarRatingDisplay(default, StarRatingDisplaySize.Small),
 
-                                        //Scaling is applied to size match components of row
-                                        new TopLocalRank(beatmapInfo) { Scale = new Vector2(8f / 11) },
-                                        starCounter = new StarCounter
-                                        {
-                                            Margin = new MarginPadding { Top = 8 }, // Better aligns the stars with the star rating display
-                                            Scale = new Vector2(8 / 20f)
-                                        }
-                                    }
-                                },
-                                new FillFlowContainer
+                                //Scaling is applied to size match components of row
+                                new TopLocalRank(beatmapInfo) { Scale = new Vector2(8f / 11) },
+                                starCounter = new StarCounter
                                 {
-                                    Direction = FillDirection.Horizontal,
-                                    Spacing = new Vector2(11, 0),
-                                    AutoSizeAxes = Axes.Both,
-                                    Children = new[]
-                                    {
-                                        new OsuSpriteText
-                                        {
-                                            Text = beatmapInfo.DifficultyName,
-                                            Font = OsuFont.GetFont(size: 18, weight: FontWeight.SemiBold),
-                                            Anchor = Anchor.BottomLeft,
-                                            Origin = Anchor.BottomLeft
-                                        },
-                                        new OsuSpriteText
-                                        {
-                                            Colour = colourProvider.Content2,
-                                            Font = OsuFont.GetFont(weight: FontWeight.SemiBold),
-                                            Text = BeatmapsetsStrings.ShowDetailsMappedBy(beatmapInfo.Metadata.Author.Username),
-                                            Anchor = Anchor.BottomLeft,
-                                            Origin = Anchor.BottomLeft
-                                        }
-                                    }
+                                    Margin = new MarginPadding { Top = 8 }, // Better aligns the stars with the star rating display
+                                    Scale = new Vector2(8 / 20f)
+                                }
+                            }
+                        },
+                        new FillFlowContainer
+                        {
+                            Direction = FillDirection.Horizontal,
+                            Spacing = new Vector2(11, 0),
+                            AutoSizeAxes = Axes.Both,
+                            Children = new[]
+                            {
+                                new OsuSpriteText
+                                {
+                                    Text = beatmapInfo.DifficultyName,
+                                    Font = OsuFont.GetFont(size: 18, weight: FontWeight.SemiBold),
+                                    Anchor = Anchor.BottomLeft,
+                                    Origin = Anchor.BottomLeft
+                                },
+                                new OsuSpriteText
+                                {
+                                    Colour = colourProvider.Content2,
+                                    Font = OsuFont.GetFont(weight: FontWeight.SemiBold),
+                                    Text = BeatmapsetsStrings.ShowDetailsMappedBy(beatmapInfo.Metadata.Author.Username),
+                                    Anchor = Anchor.BottomLeft,
+                                    Origin = Anchor.BottomLeft
                                 }
                             }
                         }
