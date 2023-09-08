@@ -103,16 +103,16 @@ namespace osu.Game.Rulesets.Taiko.Difficulty
                 case Swell swell:
                     // The taiko swell generally does not match the osu-stable implementation in any way.
                     // We'll redo the calculations to match osu-stable here...
-                    double minimumRotationsPerSecond = IBeatmapDifficultyInfo.DifficultyRange(playableBeatmap.Difficulty.OverallDifficulty, 3, 5, 7.5);
-                    double secondsDuration = swell.Duration / 1000;
+
+                    // Normally, this value depends on the final overall difficulty. For simplicity, we'll only consider the worst case that maximises rotations.
+                    const double minimum_rotations_per_second = 7.5;
 
                     // The amount of half spins that are required to successfully complete the spinner (i.e. get a 300).
-                    int halfSpinsRequiredForCompletion = (int)(secondsDuration * minimumRotationsPerSecond);
-
+                    int halfSpinsRequiredForCompletion = (int)(swell.Duration / 1000 * minimum_rotations_per_second);
                     halfSpinsRequiredForCompletion = (int)Math.Max(1, halfSpinsRequiredForCompletion * 1.65f);
 
                     //
-                    // Normally, this multiplier depends on the active mods (DT = 0.75, HT = 1.5). For simplicity, however, we'll only consider the worst case.
+                    // Normally, this multiplier depends on the active mods (DT = 0.75, HT = 1.5). For simplicity, we'll only consider the worst case that maximises rotations.
                     // This way, scores remain beatable at the cost of the conversion being slightly inaccurate.
                     //   - A perfect DT/NM score will have less than 1M total score (excluding bonus).
                     //   - A perfect HT score will have 1M total score (excluding bonus).
