@@ -30,6 +30,10 @@ namespace osu.Desktop
         [STAThread]
         public static void Main(string[] args)
         {
+            // Too many performance issues reported. We're going to have to do more testing before pushing this out.
+            // See https://github.com/ppy/osu/issues/24751.
+            Environment.SetEnvironmentVariable("OSU_GRAPHICS_NO_SSBO", "1");
+
             // run Squirrel first, as the app may exit after these run
             if (OperatingSystem.IsWindows())
             {
