@@ -555,6 +555,54 @@ namespace osu.Game.Rulesets.Osu.Tests
             addClickActionAssert(0, ClickAction.Hit);
         }
 
+        [Test]
+        public void TestOverlappingObjectsDontBlockEachOtherWhenFullyFadedOut()
+        {
+            const double time_first_circle = 1000;
+            const double time_second_circle = 1200;
+            const double time_third_circle = 1400;
+            Vector2 positionFirstCircle = new Vector2(100);
+            Vector2 positionSecondCircle = new Vector2(200);
+
+            var hitObjects = new List<OsuHitObject>
+            {
+                new HitCircle
+                {
+                    StartTime = time_first_circle,
+                    Position = positionFirstCircle,
+                },
+                new HitCircle
+                {
+                    StartTime = time_second_circle,
+                    Position = positionSecondCircle,
+                },
+                new HitCircle
+                {
+                    StartTime = time_third_circle,
+                    Position = positionFirstCircle,
+                },
+            };
+
+            performTest(hitObjects, new List<ReplayFrame>
+            {
+                new OsuReplayFrame { Time = time_first_circle, Position = positionFirstCircle, Actions = { OsuAction.LeftButton } },
+                new OsuReplayFrame { Time = time_first_circle + 50, Position = positionFirstCircle },
+                new OsuReplayFrame { Time = time_second_circle, Position = positionSecondCircle, Actions = { OsuAction.LeftButton } },
+                new OsuReplayFrame { Time = time_second_circle + 50, Position = positionSecondCircle },
+                new OsuReplayFrame { Time = time_third_circle, Position = positionFirstCircle, Actions = { OsuAction.LeftButton } },
+                new OsuReplayFrame { Time = time_third_circle + 50, Position = positionFirstCircle },
+            });
+
+            addJudgementAssert(hitObjects[0], HitResult.Great);
+            addJudgementOffsetAssert(hitObjects[0], 0);
+
+            addJudgementAssert(hitObjects[1], HitResult.Great);
+            addJudgementOffsetAssert(hitObjects[1], 0);
+
+            addJudgementAssert(hitObjects[2], HitResult.Great);
+            addJudgementOffsetAssert(hitObjects[2], 0);
+        }
+
         private void addJudgementAssert(OsuHitObject hitObject, HitResult result)
         {
             AddAssert($"({hitObject.GetType().ReadableName()} @ {hitObject.StartTime}) judgement is {result}",
