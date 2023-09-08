@@ -99,9 +99,6 @@ namespace osu.Game.Screens.Select
         [Resolved]
         private Bindable<IReadOnlyList<Mod>> selectedMods { get; set; } = null!;
 
-        [Cached]
-        private Bindable<BeatmapShortInfo> adjustedInfo { get; set; } = new Bindable<BeatmapShortInfo>();
-
         protected BeatmapCarousel Carousel { get; private set; } = null!;
 
         private ParallaxContainer wedgeBackground = null!;
@@ -785,6 +782,8 @@ namespace osu.Game.Screens.Select
             beatmapInfoWedge.Beatmap = beatmap;
 
             BeatmapDetails.Beatmap = beatmap;
+
+            ModSelect.Beatmap = beatmap;
 
             bool beatmapSelected = beatmap is not DummyWorkingBeatmap;
 

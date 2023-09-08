@@ -46,9 +46,6 @@ namespace osu.Game.Screens.Select.Details
 
         private IBeatmapInfo beatmapInfo;
 
-        [Resolved(canBeNull: true)]
-        private Bindable<BeatmapShortInfo> adjustedInfo { get; set; } = null;
-
         public IBeatmapInfo BeatmapInfo
         {
             get => beatmapInfo;
@@ -101,33 +98,6 @@ namespace osu.Game.Screens.Select.Details
 
         private ModSettingChangeTracker modSettingChangeTracker;
         private ScheduledDelegate debouncedStatisticsUpdate;
-
-        private StarDifficulty latestStarDifficulty = new StarDifficulty();
-        private void updateBindedInfo()
-        {
-            if (adjustedInfo == null) return;
-
-            // sadly need to calculate this to prevent additional data transportation
-            double rate = 1;
-            foreach (var mod in mods.Value.OfType<IApplicableToRate>())
-                rate = mod.ApplyToRate(0, rate);
-
-            double bpm = 0;
-            if (beatmapInfo != null) bpm = beatmapInfo.BPM * rate;
-
-            BeatmapShortInfo adjusted = new BeatmapShortInfo()
-            {
-                CircleSize = FirstValue.Value.adjustedValue ?? FirstValue.Value.baseValue,
-                DrainRate = HpDrain.Value.adjustedValue ?? HpDrain.Value.baseValue,
-                ApproachRate = ApproachRate.Value.adjustedValue ?? ApproachRate.Value.baseValue,
-                OverallDifficulty = Accuracy.Value.adjustedValue ?? Accuracy.Value.baseValue,
-                BPM = bpm,
-                StarDifficulty = latestStarDifficulty
-            };
-
-            adjustedInfo.Value = adjusted;
-        }
-
         private void modsChanged(ValueChangedEvent<IReadOnlyList<Mod>> mods)
         {
             modSettingChangeTracker?.Dispose();
@@ -174,7 +144,6 @@ namespace osu.Game.Screens.Select.Details
             Accuracy.Value = (baseDifficulty?.OverallDifficulty ?? 0, adjustedDifficulty?.OverallDifficulty);
             ApproachRate.Value = (baseDifficulty?.ApproachRate ?? 0, adjustedDifficulty?.ApproachRate);
 
-            updateBindedInfo(); // to faster UI response (without SR calculation)
             updateStarDifficulty();
         }
 
@@ -208,8 +177,6 @@ namespace osu.Game.Screens.Select.Details
                     return;
 
                 starDifficulty.Value = ((float)normalDifficulty.Value.Stars, (float)moddedDifficulty.Value.Stars);
-                latestStarDifficulty = moddedDifficulty ?? default;
-                updateBindedInfo();
 
             }), starDifficultyCancellationSource.Token, TaskContinuationOptions.OnlyOnRanToCompletion, TaskScheduler.Current);
         });
