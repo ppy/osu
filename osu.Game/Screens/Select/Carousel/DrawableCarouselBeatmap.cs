@@ -52,6 +52,8 @@ namespace osu.Game.Screens.Select.Carousel
 
         private Box colourBox = null!;
 
+        private Box colourUnderline = null!;
+
         private StarRatingDisplay starRatingDisplay = null!;
 
         [Resolved]
@@ -106,15 +108,22 @@ namespace osu.Game.Screens.Select.Carousel
                     {
                         new Container
                         {
-                            RelativeSizeAxes = Axes.Both,
-                            Padding = new MarginPadding { Vertical = 0.5f },
+                            Width = 40,
+                            RelativeSizeAxes = Axes.Y,
                             Child = colourBox = new Box
                             {
                                 RelativeSizeAxes = Axes.Both,
                                 Colour = colours.ForStarDifficulty(0),
                             }
                         },
-
+                        colourUnderline = new Box
+                        {
+                            Alpha = 0,
+                            Anchor = Anchor.BottomLeft,
+                            Origin = Anchor.BottomLeft,
+                            RelativeSizeAxes = Axes.X,
+                            Height = 3,
+                        },
                         new Container
                         {
                             Masking = true,
@@ -207,6 +216,8 @@ namespace osu.Game.Screens.Select.Carousel
             MovementContainer.MoveToX(-50, 500, Easing.OutExpo);
 
             Header.Height = height + 2;
+
+            colourUnderline.Show();
         }
 
         protected override void Deselected()
@@ -224,6 +235,8 @@ namespace osu.Game.Screens.Select.Carousel
                 Radius = 10,
                 Colour = Colour4.Black.Opacity(100),
             };
+
+            colourUnderline.Hide();
         }
 
         protected override bool OnClick(ClickEvent e)
@@ -258,7 +271,7 @@ namespace osu.Game.Screens.Select.Carousel
                     // Every other element in song select that uses this cut off uses yellow for the upper range but the designs use white here for whatever reason.
                     iconContainer.Colour = s.NewValue.Stars > 6.5f ? Colour4.White : colourProvider.Background5;
 
-                    starCounter.Colour = colourBox.Colour =
+                    starCounter.Colour = colourBox.Colour = colourUnderline.Colour =
                         colours.ForStarDifficulty(s.NewValue.Stars);
 
                     if (Item!.State.Value == CarouselItemState.NotSelected) return;
