@@ -39,6 +39,8 @@ namespace osu.Game.Screens.Select.Carousel
         public const float HEIGHT = height + CAROUSEL_BEATMAP_SPACING;
 
         private const float height = MAX_HEIGHT * 0.6f;
+        private const float colour_box_width = 30;
+        private const float corner_radius = 10;
 
         private readonly BeatmapInfo beatmapInfo;
 
@@ -106,15 +108,11 @@ namespace osu.Game.Screens.Select.Carousel
                     RelativeSizeAxes = Axes.Both,
                     Children = new Drawable[]
                     {
-                        new Container
+                        colourBox = new Box
                         {
-                            Width = 40,
+                            Width = colour_box_width + corner_radius,
                             RelativeSizeAxes = Axes.Y,
-                            Child = colourBox = new Box
-                            {
-                                RelativeSizeAxes = Axes.Both,
-                                Colour = colours.ForStarDifficulty(0),
-                            }
+                            Colour = colours.ForStarDifficulty(0),
                         },
                         colourUnderline = new Box
                         {
@@ -127,20 +125,19 @@ namespace osu.Game.Screens.Select.Carousel
                         new Container
                         {
                             Masking = true,
-                            CornerRadius = 10,
+                            CornerRadius = corner_radius,
                             RelativeSizeAxes = Axes.X,
                             // We don't want to match the header's size when its selected, hence no relative sizing.
                             Height = height,
-                            X = 30,
+                            X = colour_box_width,
                             Colour = colourProvider.Background3,
                             Child = new Box { RelativeSizeAxes = Axes.Both },
                         }
                     }
                 },
-
                 iconContainer = new ConstrainedIconContainer
                 {
-                    X = 15,
+                    X = colour_box_width / 2,
                     Origin = Anchor.Centre,
                     Anchor = Anchor.CentreLeft,
                     Icon = beatmapInfo.Ruleset.CreateInstance().CreateIcon(),
@@ -149,7 +146,7 @@ namespace osu.Game.Screens.Select.Carousel
                 },
                 new FillFlowContainer
                 {
-                    Padding = new MarginPadding { Top = 8, Left = 40 },
+                    Padding = new MarginPadding { Top = 8, Left = colour_box_width + corner_radius },
                     Direction = FillDirection.Horizontal,
                     AutoSizeAxes = Axes.Both,
                     Children = new Drawable[]
