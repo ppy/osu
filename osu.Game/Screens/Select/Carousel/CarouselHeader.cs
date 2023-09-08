@@ -22,11 +22,11 @@ namespace osu.Game.Screens.Select.Carousel
 {
     public partial class CarouselHeader : Container
     {
+        public Container AlphaContainer;
+        public Container EffectContainer;
         public Container BorderContainer;
 
         public readonly Bindable<CarouselItemState> State = new Bindable<CarouselItemState>(CarouselItemState.NotSelected);
-
-        private readonly HoverLayer hoverLayer;
 
         protected override Container<Drawable> Content { get; } = new Container { RelativeSizeAxes = Axes.Both };
 
@@ -40,18 +40,36 @@ namespace osu.Game.Screens.Select.Carousel
             RelativeSizeAxes = Axes.X;
             Height = DrawableCarouselItem.MAX_HEIGHT;
 
-            InternalChild = BorderContainer = new Container
+            InternalChild = AlphaContainer = new Container
             {
                 RelativeSizeAxes = Axes.Both,
-                Masking = true,
-                CornerRadius = corner_radius,
-                BorderColour = ColourInfo.GradientVertical(Colour4.Transparent, new Color4(221, 255, 255, 255)),
                 Children = new Drawable[]
                 {
-                    Content,
-                    hoverLayer = new HoverLayer(),
-                    new HeaderSounds(),
-                }
+                    EffectContainer = new Container
+                    {
+                        RelativeSizeAxes = Axes.Both,
+                        Masking = true,
+                        CornerRadius = corner_radius,
+                        Children = new Drawable[]
+                        {
+                            Content,
+                            new HoverLayer(),
+                            new HeaderSounds(),
+                        }
+                    },
+                    BorderContainer = new Container
+                    {
+                        RelativeSizeAxes = Axes.Both,
+                        Masking = true,
+                        CornerRadius = corner_radius,
+                        BorderColour = ColourInfo.GradientVertical(Colour4.Transparent, new Color4(221, 255, 255, 255)),
+                        Child = new Box
+                        {
+                            RelativeSizeAxes = Axes.Both,
+                            Colour = Colour4.Transparent,
+                        }
+                    },
+                },
             };
         }
 
@@ -68,10 +86,8 @@ namespace osu.Game.Screens.Select.Carousel
             {
                 case CarouselItemState.Collapsed:
                 case CarouselItemState.NotSelected:
-                    hoverLayer.InsetForBorder = false;
-
                     BorderContainer.BorderThickness = 0;
-                    BorderContainer.EdgeEffect = new EdgeEffectParameters
+                    EffectContainer.EdgeEffect = new EdgeEffectParameters
                     {
                         Type = EdgeEffectType.Shadow,
                         Offset = new Vector2(1),
@@ -83,10 +99,8 @@ namespace osu.Game.Screens.Select.Carousel
                 case CarouselItemState.Selected:
                     if (!HasBorder) return;
 
-                    hoverLayer.InsetForBorder = true;
-
                     BorderContainer.BorderThickness = border_thickness;
-                    BorderContainer.EdgeEffect = new EdgeEffectParameters
+                    EffectContainer.EdgeEffect = new EdgeEffectParameters
                     {
                         Type = EdgeEffectType.Glow,
                         Colour = new Color4(130, 204, 255, 150),
@@ -116,26 +130,6 @@ namespace osu.Game.Screens.Select.Carousel
                     Blending = BlendingParameters.Additive,
                     RelativeSizeAxes = Axes.Both,
                 };
-            }
-
-            public bool InsetForBorder
-            {
-                set
-                {
-                    if (value)
-                    {
-                        // apply same border as above to avoid applying additive overlay to it (and blowing out the colour).
-                        Masking = true;
-                        CornerRadius = corner_radius;
-                        BorderThickness = border_thickness;
-                    }
-                    else
-                    {
-                        BorderThickness = 0;
-                        CornerRadius = 0;
-                        Masking = false;
-                    }
-                }
             }
 
             protected override bool OnHover(HoverEvent e)

@@ -228,7 +228,7 @@ namespace osu.Game.Screens.Select.Carousel
 
             Header.Height = height;
 
-            Header.BorderContainer.EdgeEffect = new EdgeEffectParameters
+            Header.EffectContainer.EdgeEffect = new EdgeEffectParameters
             {
                 Type = EdgeEffectType.Shadow,
                 Offset = new Vector2(1),
@@ -277,7 +277,7 @@ namespace osu.Game.Screens.Select.Carousel
                     if (Item!.State.Value == CarouselItemState.NotSelected) return;
 
                     // We want to update the EdgeEffect here instead of in selected() to make sure the colours are correct
-                    Header.BorderContainer.EdgeEffect = new EdgeEffectParameters
+                    Header.EffectContainer.EdgeEffect = new EdgeEffectParameters
                     {
                         Type = EdgeEffectType.Shadow,
                         Colour = starCounter.Colour.MultiplyAlpha(.3f),
