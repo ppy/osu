@@ -17,6 +17,7 @@ using osu.Framework.Input.Bindings;
 using osu.Framework.Input.Events;
 using osu.Framework.Utils;
 using osu.Game.Audio;
+using osu.Game.Beatmaps;
 using osu.Game.Configuration;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
@@ -27,7 +28,6 @@ using osu.Game.Localisation;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Utils;
 using osuTK;
-using osuTK.Graphics;
 using osuTK.Input;
 
 namespace osu.Game.Overlays.Mods
@@ -125,13 +125,27 @@ namespace osu.Game.Overlays.Mods
         private Container aboveColumnsContent = null!;
         private DifficultyMultiplierDisplay? multiplierDisplay;
 
-        private ModMapInfoContainer mapInfoContainer = null!;
+        private ModEffectPreviewPanel modEffectPreviewPanel = null!;
 
         protected ShearedButton BackButton { get; private set; } = null!;
         protected ShearedToggleButton? CustomisationButton { get; private set; }
         protected SelectAllModsButton? SelectAllModsButton { get; set; }
 
         private Sample? columnAppearSample;
+
+        private WorkingBeatmap beatmap = null!;
+
+        public WorkingBeatmap Beatmap
+        {
+            get => beatmap;
+            set
+            {
+                if (beatmap == value) return;
+
+                beatmap = value;
+                modEffectPreviewPanel.BeatmapInfo = beatmap.BeatmapInfo;
+            }
+        }
 
         protected ModSelectOverlay(OverlayColourScheme colourScheme = OverlayColourScheme.Green)
             : base(colourScheme)
@@ -224,11 +238,11 @@ namespace osu.Game.Overlays.Mods
 
             FooterContent.Children = new Drawable[]
             {
-                mapInfoContainer = new ModMapInfoContainer
+                modEffectPreviewPanel = new ModEffectPreviewPanel
                 {
                     Anchor = Anchor.BottomRight,
                     Origin = Anchor.BottomRight,
-                    Padding = new MarginPadding
+                    Margin = new MarginPadding
                     {
                         Vertical = PADDING,
                         Horizontal = 70
@@ -286,7 +300,7 @@ namespace osu.Game.Overlays.Mods
 
             SelectedMods.BindValueChanged(_ =>
             {
-                updateMapInfo();
+                modEffectPreviewPanel.UpdateValues();
                 updateMultiplier();
                 updateFromExternalSelection();
                 updateCustomisation();
@@ -300,7 +314,11 @@ namespace osu.Game.Overlays.Mods
                     //
                     // See https://github.com/ppy/osu/pull/23284#issuecomment-1529056988
                     modSettingChangeTracker = new ModSettingChangeTracker(SelectedMods.Value);
-                    modSettingChangeTracker.SettingChanged += _ => updateMultiplier();
+                    modSettingChangeTracker.SettingChanged += _ =>
+                    {
+                        modEffectPreviewPanel.UpdateValues();
+                        updateMultiplier();
+                    };
                 }
             }, true);
 
@@ -414,14 +432,6 @@ namespace osu.Game.Overlays.Mods
                 multiplier *= mod.ScoreMultiplier;
 
             multiplierDisplay.Current.Value = multiplier;
-        }
-
-        private void updateMapInfo()
-        {
-            if (mapInfoContainer == null)
-                return;
-
-            mapInfoContainer.UpdateValues();
         }
 
         private void updateCustomisation()
