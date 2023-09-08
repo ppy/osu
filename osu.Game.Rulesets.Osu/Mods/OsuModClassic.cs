@@ -74,10 +74,6 @@ namespace osu.Game.Rulesets.Osu.Mods
                     head.TrackFollowCircle = !NoSliderHeadMovement.Value;
                     if (FadeHitCircleEarly.Value && !usingHiddenFading)
                         applyEarlyFading(head);
-
-                    if (ClassicNoteLock.Value)
-                        blockInputToUnderlyingObjects(head);
-
                     break;
 
                 case DrawableSliderTail tail:
@@ -87,27 +83,8 @@ namespace osu.Game.Rulesets.Osu.Mods
                 case DrawableHitCircle circle:
                     if (FadeHitCircleEarly.Value && !usingHiddenFading)
                         applyEarlyFading(circle);
-
-                    if (ClassicNoteLock.Value)
-                        blockInputToUnderlyingObjects(circle);
-
                     break;
             }
-        }
-
-        /// <summary>
-        /// On stable, hitcircles that have already been hit block input from reaching objects that may be underneath them.
-        /// The purpose of this method is to restore that behaviour.
-        /// In order to avoid introducing yet another confusing config option, this behaviour is roped into the general notion of "note lock".
-        /// </summary>
-        private static void blockInputToUnderlyingObjects(DrawableHitCircle circle)
-        {
-            var oldHitAction = circle.HitArea.Hit;
-            circle.HitArea.Hit = () =>
-            {
-                oldHitAction?.Invoke();
-                return true;
-            };
         }
 
         private void applyEarlyFading(DrawableHitCircle circle)
