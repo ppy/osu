@@ -159,10 +159,10 @@ namespace osu.Game.Overlays.Mods
                                 Direction = FillDirection.Horizontal,
                                 Children = new[]
                                 {
-                                    circleSizeDisplay = new VerticalAttributeDisplay("CS"),
-                                    drainRateDisplay = new VerticalAttributeDisplay("HP"),
-                                    approachRateDisplay = new VerticalAttributeDisplay("AR"),
-                                    overallDifficultyDisplay = new VerticalAttributeDisplay("OD"),
+                                    circleSizeDisplay = new VerticalAttributeDisplay("CS", "0.#"),
+                                    drainRateDisplay = new VerticalAttributeDisplay("HP", "0.#"),
+                                    approachRateDisplay = new VerticalAttributeDisplay("AR", "0.##"),
+                                    overallDifficultyDisplay = new VerticalAttributeDisplay("OD", "0.##"),
                                 }
                             }
                         }
