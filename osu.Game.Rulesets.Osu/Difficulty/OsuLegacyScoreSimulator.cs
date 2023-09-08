@@ -20,12 +20,9 @@ namespace osu.Game.Rulesets.Osu.Difficulty
         private int combo;
 
         private double scoreMultiplier;
-        private IBeatmap playableBeatmap = null!;
 
         public LegacyScoreAttributes Simulate(IWorkingBeatmap workingBeatmap, IBeatmap playableBeatmap)
         {
-            this.playableBeatmap = playableBeatmap;
-
             IBeatmap baseBeatmap = workingBeatmap.Beatmap;
 
             int countNormal = 0;
@@ -132,13 +129,16 @@ namespace osu.Game.Rulesets.Osu.Difficulty
                     // The spinner object applies a lenience because gameplay mechanics differ from osu-stable.
                     // We'll redo the calculations to match osu-stable here...
                     const double maximum_rotations_per_second = 477.0 / 60;
-                    double minimumRotationsPerSecond = IBeatmapDifficultyInfo.DifficultyRange(playableBeatmap.Difficulty.OverallDifficulty, 3, 5, 7.5);
+
+                    // Normally, this value depends on the final overall difficulty. For simplicity, we'll only consider the worst case that maximises rotations.
+                    const double minimum_rotations_per_second = 7.5;
+
                     double secondsDuration = spinner.Duration / 1000;
 
                     // The total amount of half spins possible for the entire spinner.
                     int totalHalfSpinsPossible = (int)(secondsDuration * maximum_rotations_per_second * 2);
                     // The amount of half spins that are required to successfully complete the spinner (i.e. get a 300).
-                    int halfSpinsRequiredForCompletion = (int)(secondsDuration * minimumRotationsPerSecond);
+                    int halfSpinsRequiredForCompletion = (int)(secondsDuration * minimum_rotations_per_second);
                     // To be able to receive bonus points, the spinner must be rotated another 1.5 times.
                     int halfSpinsRequiredBeforeBonus = halfSpinsRequiredForCompletion + 3;
 
