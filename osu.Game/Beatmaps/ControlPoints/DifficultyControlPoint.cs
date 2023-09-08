@@ -24,7 +24,7 @@ namespace osu.Game.Beatmaps.ControlPoints
         public readonly BindableDouble SliderVelocityBindable = new BindableDouble(1)
         {
             Precision = 0.01,
-            MinValue = 0.1,
+            MinValue = 0.01,
             MaxValue = 10
         };
 

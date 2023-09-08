@@ -169,6 +169,8 @@ namespace osu.Game.Beatmaps.Formats
             /// <summary>
             /// Legacy BPM multiplier that introduces floating-point errors for rulesets that depend on it.
             /// DO NOT USE THIS UNLESS 100% SURE.
+            ///
+            /// This is the inverse of slider velocity.
             /// </summary>
             public double BpmMultiplier { get; private set; }
 
@@ -182,10 +184,7 @@ namespace osu.Game.Beatmaps.Formats
                 : this()
             {
                 // Note: In stable, the division occurs on floats, but with compiler optimisations turned on actually seems to occur on doubles via some .NET black magic (possibly inlining?).
-                if (rulesetId == 1 || rulesetId == 3)
-                    BpmMultiplier = beatLength < 0 ? Math.Clamp((float)-beatLength, 10, 10000) / 100.0 : 1;
-                else
-                    BpmMultiplier = beatLength < 0 ? Math.Clamp((float)-beatLength, 10, 1000) / 100.0 : 1;
+                BpmMultiplier = beatLength < 0 ? Math.Clamp((float)-beatLength, 1, 10000) / 100.0 : 1;
 
                 GenerateTicks = !double.IsNaN(beatLength);
             }
