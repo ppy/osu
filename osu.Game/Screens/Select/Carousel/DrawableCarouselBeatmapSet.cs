@@ -10,6 +10,8 @@ using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Cursor;
+using osu.Framework.Graphics.Shapes;
+using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.UserInterface;
 using osu.Framework.Utils;
 using osu.Game.Beatmaps;
@@ -17,6 +19,7 @@ using osu.Game.Collections;
 using osu.Game.Database;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Overlays;
+using osuTK;
 
 namespace osu.Game.Screens.Select.Carousel
 {
@@ -36,6 +39,9 @@ namespace osu.Game.Screens.Select.Carousel
         [Resolved]
         private RealmAccess realm { get; set; } = null!;
 
+        [Resolved]
+        private OverlayColourProvider colourProvider { get; set; } = null!;
+
         public IEnumerable<DrawableCarouselItem> DrawableBeatmaps => beatmapContainer?.IsLoaded != true ? Enumerable.Empty<DrawableCarouselItem>() : beatmapContainer.AliveChildren;
 
         private Container<DrawableCarouselItem>? beatmapContainer;
@@ -43,6 +49,12 @@ namespace osu.Game.Screens.Select.Carousel
         private BeatmapSetInfo beatmapSet = null!;
 
         private Task? beatmapsLoadTask;
+        private Box colourBox = null!;
+        private Container backgroundContainer = null!;
+        private SpriteIcon rightArrow = null!;
+        private const float colour_box_width_expanded = 20;
+        private const float corner_radius = 10;
+        private DelayedLoadWrapper mainFlow = null!;
 
         [Resolved]
         private BeatmapManager manager { get; set; } = null!;
@@ -104,20 +116,52 @@ namespace osu.Game.Screens.Select.Carousel
             beatmapSet = ((CarouselBeatmapSet)Item).BeatmapSet;
 
             DelayedLoadWrapper background;
-            DelayedLoadWrapper mainFlow;
 
             Header.Children = new Drawable[]
             {
-                // Choice of background image matches BSS implementation (always uses the lowest `beatmap_id` from the set).
-                background = new DelayedLoadWrapper(() => new SetPanelBackground(manager.GetWorkingBeatmap(beatmapSet.Beatmaps.MinBy(b => b.OnlineID)))
+                new BufferedContainer
                 {
                     RelativeSizeAxes = Axes.Both,
-                }, 200)
+                    Children = new Drawable[]
+                    {
+                        colourBox = new Box
+                        {
+                            Width = colour_box_width_expanded + corner_radius,
+                            RelativeSizeAxes = Axes.Y,
+                            Alpha = 0,
+                        },
+                        backgroundContainer = new Container
+                        {
+                            Masking = true,
+                            CornerRadius = corner_radius,
+                            RelativeSizeAxes = Axes.Both,
+                            Children = new Drawable[]
+                            {
+                                // Choice of background image matches BSS implementation (always uses the lowest `beatmap_id` from the set).
+                                background = new DelayedLoadWrapper(() => new SetPanelBackground(manager.GetWorkingBeatmap(beatmapSet.Beatmaps.MinBy(b => b.OnlineID)))
+                                {
+                                    RelativeSizeAxes = Axes.Both,
+                                }, 200)
+                                {
+                                    RelativeSizeAxes = Axes.Both,
+                                    Shear = -CarouselHeader.SHEAR,
+                                    Anchor = Anchor.BottomLeft,
+                                    Origin = Anchor.BottomLeft,
+                                },
+                            },
+                        },
+                    }
+                },
+                rightArrow = new SpriteIcon
                 {
-                    RelativeSizeAxes = Axes.Both,
+                    X = colour_box_width_expanded / 2,
+                    Origin = Anchor.Centre,
+                    Anchor = Anchor.CentreLeft,
+                    Icon = FontAwesome.Solid.ChevronRight,
+                    Size = new Vector2(12),
+                    Colour = colourProvider.Background5,
                     Shear = -CarouselHeader.SHEAR,
-                    Anchor = Anchor.BottomLeft,
-                    Origin = Anchor.BottomLeft,
+                    Alpha = 0,
                 },
                 mainFlow = new DelayedLoadWrapper(() => new SetPanelContent((CarouselBeatmapSet)Item), 50)
                 {
@@ -138,6 +182,10 @@ namespace osu.Game.Screens.Select.Carousel
             MovementContainer.MoveToX(0, 500, Easing.OutExpo);
 
             updateBeatmapYPositions();
+
+            backgroundContainer.X = mainFlow.X = 0;
+            colourBox.Hide();
+            rightArrow.Hide();
         }
 
         protected override void Selected()
@@ -147,6 +195,12 @@ namespace osu.Game.Screens.Select.Carousel
             MovementContainer.MoveToX(-100, 500, Easing.OutExpo);
 
             updateBeatmapDifficulties();
+
+            backgroundContainer.X = mainFlow.X = colour_box_width_expanded;
+
+            // TODO: find way to sync delayed load background fade in with right arrow
+            colourBox.Show();
+            rightArrow.Show();
         }
 
         private void updateBeatmapDifficulties()

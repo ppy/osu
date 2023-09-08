@@ -64,7 +64,7 @@ namespace osu.Game.Screens.Select.Carousel
                         RelativeSizeAxes = Axes.Both,
                         Masking = true,
                         CornerRadius = corner_radius,
-                        BorderColour = ColourInfo.GradientHorizontal(new Color4(221, 255, 255, 255), Colour4.Transparent),
+                        BorderColour = ColourInfo.GradientHorizontal(Colour4.White, Colour4.White.Opacity(0)),
                         Child = new Box
                         {
                             RelativeSizeAxes = Axes.Both,
