@@ -27,6 +27,7 @@ namespace osu.Game.Screens.Select.Carousel
         public Container BorderContainer;
 
         public readonly Bindable<CarouselItemState> State = new Bindable<CarouselItemState>(CarouselItemState.NotSelected);
+        public static readonly Vector2 SHEAR = new Vector2(0.15f, 0);
 
         protected override Container<Drawable> Content { get; } = new Container { RelativeSizeAxes = Axes.Both };
 
@@ -39,6 +40,7 @@ namespace osu.Game.Screens.Select.Carousel
         {
             RelativeSizeAxes = Axes.X;
             Height = DrawableCarouselItem.MAX_HEIGHT;
+            Shear = SHEAR;
 
             InternalChild = AlphaContainer = new Container
             {

@@ -45,12 +45,14 @@ namespace osu.Game.Screens.Select.Carousel
                         Text = new RomanisableString(beatmapSet.Metadata.TitleUnicode, beatmapSet.Metadata.Title),
                         Font = OsuFont.GetFont(weight: FontWeight.Bold, size: 22, italics: true),
                         Shadow = true,
+                        Shear = -CarouselHeader.SHEAR,
                     },
                     new OsuSpriteText
                     {
                         Text = new RomanisableString(beatmapSet.Metadata.ArtistUnicode, beatmapSet.Metadata.Artist),
                         Font = OsuFont.GetFont(weight: FontWeight.SemiBold, size: 17, italics: true),
                         Shadow = true,
+                        Shear = -CarouselHeader.SHEAR,
                     },
                     new FillFlowContainer
                     {
@@ -58,6 +60,7 @@ namespace osu.Game.Screens.Select.Carousel
                         AutoSizeAxes = Axes.Both,
                         Margin = new MarginPadding { Top = 5 },
                         Spacing = new Vector2(0, 5),
+                        Shear = -CarouselHeader.SHEAR,
                         Children = new[]
                         {
                             beatmapSet.AllBeatmapsUpToDate

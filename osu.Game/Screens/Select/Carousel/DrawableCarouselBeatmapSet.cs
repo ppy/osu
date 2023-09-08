@@ -114,7 +114,10 @@ namespace osu.Game.Screens.Select.Carousel
                     RelativeSizeAxes = Axes.Both,
                 }, 200)
                 {
-                    RelativeSizeAxes = Axes.Both
+                    RelativeSizeAxes = Axes.Both,
+                    Shear = -CarouselHeader.SHEAR,
+                    Anchor = Anchor.BottomLeft,
+                    Origin = Anchor.BottomLeft,
                 },
                 mainFlow = new DelayedLoadWrapper(() => new SetPanelContent((CarouselBeatmapSet)Item), 50)
                 {

@@ -150,6 +150,7 @@ namespace osu.Game.Screens.Select.Carousel
                     Icon = beatmapInfo.Ruleset.CreateInstance().CreateIcon(),
                     Size = new Vector2(20),
                     Colour = colourProvider.Background5,
+                    Shear = -CarouselHeader.SHEAR,
                 },
                 new FillFlowContainer
                 {
@@ -163,6 +164,7 @@ namespace osu.Game.Screens.Select.Carousel
                             Direction = FillDirection.Horizontal,
                             Spacing = new Vector2(3, 0),
                             AutoSizeAxes = Axes.Both,
+                            Shear = -CarouselHeader.SHEAR,
                             Children = new Drawable[]
                             {
                                 starRatingDisplay = new StarRatingDisplay(default, StarRatingDisplaySize.Small),
@@ -181,6 +183,7 @@ namespace osu.Game.Screens.Select.Carousel
                             Direction = FillDirection.Horizontal,
                             Spacing = new Vector2(11, 0),
                             AutoSizeAxes = Axes.Both,
+                            Shear = -CarouselHeader.SHEAR,
                             Children = new[]
                             {
                                 new OsuSpriteText
