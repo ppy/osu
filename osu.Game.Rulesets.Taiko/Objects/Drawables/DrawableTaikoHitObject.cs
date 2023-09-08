@@ -118,6 +118,9 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
         {
             public override bool RemoveWhenNotAlive => false;
         }
+
+        // osu!taiko hitsounds are managed by the drum (see DrumSampleTriggerSource).
+        public sealed override IEnumerable<HitSampleInfo> GetSamples() => Enumerable.Empty<HitSampleInfo>();
     }
 
     public abstract partial class DrawableTaikoHitObject<TObject> : DrawableTaikoHitObject
@@ -156,9 +159,6 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
 
             Content.Add(MainPiece = CreateMainPiece());
         }
-
-        // Most osu!taiko hitsounds are managed by the drum (see DrumSampleMapping).
-        public override IEnumerable<HitSampleInfo> GetSamples() => Enumerable.Empty<HitSampleInfo>();
 
         protected abstract SkinnableDrawable CreateMainPiece();
     }

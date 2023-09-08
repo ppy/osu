@@ -64,7 +64,7 @@ namespace osu.Game.Tests.Beatmaps
         [Test]
         public void TestCachedRetrievalWithFiles() => AddStep("run test", () =>
         {
-            var beatmap = Realm.Run(r => r.Find<BeatmapInfo>(importedSet.Beatmaps.First().ID).Detach());
+            var beatmap = Realm.Run(r => r.Find<BeatmapInfo>(importedSet.Beatmaps.First().ID)!.Detach());
 
             Assert.That(beatmap.BeatmapSet?.Files, Has.Count.GreaterThan(0));
 
@@ -90,7 +90,7 @@ namespace osu.Game.Tests.Beatmaps
         [Test]
         public void TestForcedRefetchRetrievalWithFiles() => AddStep("run test", () =>
         {
-            var beatmap = Realm.Run(r => r.Find<BeatmapInfo>(importedSet.Beatmaps.First().ID).Detach());
+            var beatmap = Realm.Run(r => r.Find<BeatmapInfo>(importedSet.Beatmaps.First().ID)!.Detach());
 
             Assert.That(beatmap.BeatmapSet?.Files, Has.Count.GreaterThan(0));
 
@@ -102,7 +102,7 @@ namespace osu.Game.Tests.Beatmaps
         [Test]
         public void TestSavePreservesCollections() => AddStep("run test", () =>
         {
-            var beatmap = Realm.Run(r => r.Find<BeatmapInfo>(importedSet.Beatmaps.First().ID).Detach());
+            var beatmap = Realm.Run(r => r.Find<BeatmapInfo>(importedSet.Beatmaps.First().ID)!.Detach());
 
             var working = beatmaps.GetWorkingBeatmap(beatmap);
 

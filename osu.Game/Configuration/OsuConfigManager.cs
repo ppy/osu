@@ -1,7 +1,5 @@
-// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
-
-#nullable disable
 
 using System;
 using System.Diagnostics;
@@ -12,7 +10,6 @@ using osu.Framework.Extensions;
 using osu.Framework.Extensions.LocalisationExtensions;
 using osu.Framework.Localisation;
 using osu.Framework.Platform;
-using osu.Framework.Testing;
 using osu.Game.Beatmaps.Drawables.Cards;
 using osu.Game.Input;
 using osu.Game.Input.Bindings;
@@ -26,7 +23,6 @@ using osu.Game.Skinning;
 
 namespace osu.Game.Configuration
 {
-    [ExcludeFromDynamicCompile]
     public class OsuConfigManager : IniConfigManager<OsuSetting>, IGameplaySettings
     {
         public OsuConfigManager(Storage storage)
@@ -133,6 +129,7 @@ namespace osu.Game.Configuration
             SetDefault(OsuSetting.ShowHealthDisplayWhenCantFail, true);
             SetDefault(OsuSetting.FadePlayfieldWhenHealthLow, true);
             SetDefault(OsuSetting.KeyOverlay, false);
+            SetDefault(OsuSetting.ReplaySettingsOverlay, true);
             SetDefault(OsuSetting.GameplayLeaderboard, true);
             SetDefault(OsuSetting.AlwaysPlayFirstComboBreak, true);
 
@@ -157,6 +154,7 @@ namespace osu.Game.Configuration
 
             SetDefault(OsuSetting.Scaling, ScalingMode.Off);
             SetDefault(OsuSetting.SafeAreaConsiderations, true);
+            SetDefault(OsuSetting.ScalingBackgroundDim, 0.9f, 0.5f, 1f);
 
             SetDefault(OsuSetting.ScalingSizeX, 0.8f, 0.2f, 1f);
             SetDefault(OsuSetting.ScalingSizeY, 0.8f, 0.2f, 1f);
@@ -179,6 +177,7 @@ namespace osu.Game.Configuration
             SetDefault(OsuSetting.EditorWaveformOpacity, 0.25f, 0f, 1f, 0.25f);
             SetDefault(OsuSetting.EditorShowHitMarkers, true);
             SetDefault(OsuSetting.EditorAutoSeekOnPlacement, true);
+            SetDefault(OsuSetting.EditorLimitedDistanceSnap, false);
 
             SetDefault(OsuSetting.LastProcessedMetadataId, -1);
 
@@ -238,6 +237,12 @@ namespace osu.Game.Configuration
                     value: disabledState ? CommonStrings.Disabled.ToLower() : CommonStrings.Enabled.ToLower(),
                     shortcut: LookupKeyBindings(GlobalAction.ToggleGameplayMouseButtons))
                 ),
+                new TrackedSetting<bool>(OsuSetting.GameplayLeaderboard, state => new SettingDescription(
+                    rawValue: state,
+                    name: GlobalActionKeyBindingStrings.ToggleInGameLeaderboard,
+                    value: state ? CommonStrings.Enabled.ToLower() : CommonStrings.Disabled.ToLower(),
+                    shortcut: LookupKeyBindings(GlobalAction.ToggleInGameLeaderboard))
+                ),
                 new TrackedSetting<HUDVisibilityMode>(OsuSetting.HUDVisibilityMode, visibilityMode => new SettingDescription(
                     rawValue: visibilityMode,
                     name: GameplaySettingsStrings.HUDVisibilityMode,
@@ -259,7 +264,7 @@ namespace osu.Game.Configuration
                     string skinName = string.Empty;
 
                     if (Guid.TryParse(skin, out var id))
-                        skinName = LookupSkinName(id) ?? string.Empty;
+                        skinName = LookupSkinName(id);
 
                     return new SettingDescription(
                         rawValue: skinName,
@@ -364,6 +369,7 @@ namespace osu.Game.Configuration
         ScalingPositionY,
         ScalingSizeX,
         ScalingSizeY,
+        ScalingBackgroundDim,
         UIScale,
         IntroSequence,
         NotifyOnUsernameMentioned,
@@ -383,5 +389,7 @@ namespace osu.Game.Configuration
         SafeAreaConsiderations,
         ComboColourNormalisationAmount,
         ProfileCoverExpanded,
+        EditorLimitedDistanceSnap,
+        ReplaySettingsOverlay
     }
 }

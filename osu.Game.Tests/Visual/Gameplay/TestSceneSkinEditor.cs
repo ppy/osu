@@ -2,12 +2,15 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using NUnit.Framework;
 using osu.Framework.Allocation;
+using osu.Framework.Extensions.IEnumerableExtensions;
 using osu.Framework.Extensions.ObjectExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.UserInterface;
+using osu.Framework.Input;
 using osu.Framework.Testing;
 using osu.Game.Overlays;
 using osu.Game.Overlays.Settings;
@@ -17,6 +20,8 @@ using osu.Game.Rulesets.Osu;
 using osu.Game.Screens.Edit;
 using osu.Game.Screens.Play.HUD.HitErrorMeters;
 using osu.Game.Skinning;
+using osu.Game.Skinning.Components;
+using osuTK;
 using osuTK.Input;
 
 namespace osu.Game.Tests.Visual.Gameplay
@@ -50,6 +55,196 @@ namespace osu.Game.Tests.Visual.Gameplay
                 LoadComponentAsync(skinEditor = new SkinEditor(Player), Add);
             });
             AddUntilStep("wait for loaded", () => skinEditor.IsLoaded);
+        }
+
+        [Test]
+        public void TestDragSelection()
+        {
+            BigBlackBox box1 = null!;
+            BigBlackBox box2 = null!;
+            BigBlackBox box3 = null!;
+
+            AddStep("Add big black boxes", () =>
+            {
+                var target = Player.ChildrenOfType<SkinComponentsContainer>().First();
+                target.Add(box1 = new BigBlackBox
+                {
+                    Position = new Vector2(-90),
+                    Anchor = Anchor.Centre,
+                    Origin = Anchor.Centre,
+                });
+                target.Add(box2 = new BigBlackBox
+                {
+                    Anchor = Anchor.Centre,
+                    Origin = Anchor.Centre,
+                });
+                target.Add(box3 = new BigBlackBox
+                {
+                    Position = new Vector2(90),
+                    Anchor = Anchor.Centre,
+                    Origin = Anchor.Centre,
+                });
+            });
+
+            // This step is specifically added to reproduce an edge case which was found during cyclic selection development.
+            // If everything is working as expected it should not affect the subsequent drag selections.
+            AddRepeatStep("Select top left", () =>
+            {
+                InputManager.MoveMouseTo(box1.ScreenSpaceDrawQuad.TopLeft + new Vector2(box1.ScreenSpaceDrawQuad.Width / 8));
+                InputManager.Click(MouseButton.Left);
+            }, 2);
+
+            AddStep("Begin drag top left", () =>
+            {
+                InputManager.MoveMouseTo(box1.ScreenSpaceDrawQuad.TopLeft - new Vector2(box1.ScreenSpaceDrawQuad.Width / 4));
+                InputManager.PressButton(MouseButton.Left);
+            });
+
+            AddStep("Drag to bottom right", () =>
+            {
+                InputManager.MoveMouseTo(box3.ScreenSpaceDrawQuad.TopRight + new Vector2(-box3.ScreenSpaceDrawQuad.Width / 8, box3.ScreenSpaceDrawQuad.Height / 4));
+            });
+
+            AddStep("Release button", () =>
+            {
+                InputManager.ReleaseButton(MouseButton.Left);
+            });
+
+            AddAssert("First two boxes selected", () => skinEditor.SelectedComponents, () => Is.EqualTo(new[] { box1, box2 }));
+
+            AddStep("Begin drag bottom right", () =>
+            {
+                InputManager.MoveMouseTo(box3.ScreenSpaceDrawQuad.BottomRight + new Vector2(box3.ScreenSpaceDrawQuad.Width / 4));
+                InputManager.PressButton(MouseButton.Left);
+            });
+
+            AddStep("Drag to top left", () =>
+            {
+                InputManager.MoveMouseTo(box2.ScreenSpaceDrawQuad.Centre - new Vector2(box2.ScreenSpaceDrawQuad.Width / 4));
+            });
+
+            AddStep("Release button", () =>
+            {
+                InputManager.ReleaseButton(MouseButton.Left);
+            });
+
+            AddAssert("Last two boxes selected", () => skinEditor.SelectedComponents, () => Is.EqualTo(new[] { box2, box3 }));
+
+            // Test cyclic selection doesn't trigger in this state.
+            AddStep("click on black box stack", () => InputManager.Click(MouseButton.Left));
+            AddAssert("Last two boxes still selected", () => skinEditor.SelectedComponents, () => Is.EqualTo(new[] { box2, box3 }));
+        }
+
+        [Test]
+        public void TestCyclicSelection()
+        {
+            List<SkinBlueprint> blueprints = new List<SkinBlueprint>();
+
+            AddStep("clear list", () => blueprints.Clear());
+
+            for (int i = 0; i < 3; i++)
+            {
+                AddStep("Add big black box", () =>
+                {
+                    InputManager.MoveMouseTo(skinEditor.ChildrenOfType<BigBlackBox>().First());
+                    InputManager.Click(MouseButton.Left);
+                });
+
+                AddStep("store box", () =>
+                {
+                    // Add blueprints one-by-one so we have a stable order for testing reverse cyclic selection against.
+                    blueprints.Add(skinEditor.ChildrenOfType<SkinBlueprint>().Single(s => s.IsSelected));
+                });
+            }
+
+            AddAssert("Three black boxes added", () => targetContainer.Components.OfType<BigBlackBox>().Count(), () => Is.EqualTo(3));
+
+            AddAssert("Selection is last", () => skinEditor.SelectedComponents.Single(), () => Is.EqualTo(blueprints[2].Item));
+
+            AddStep("move cursor to black box", () =>
+            {
+                // Slightly offset from centre to avoid random failures (see https://github.com/ppy/osu-framework/issues/5669).
+                InputManager.MoveMouseTo(((Drawable)blueprints[0].Item).ScreenSpaceDrawQuad.Centre + new Vector2(1));
+            });
+
+            AddStep("click on black box stack", () => InputManager.Click(MouseButton.Left));
+            AddAssert("Selection is second last", () => skinEditor.SelectedComponents.Single(), () => Is.EqualTo(blueprints[1].Item));
+
+            AddStep("click on black box stack", () => InputManager.Click(MouseButton.Left));
+            AddAssert("Selection is last", () => skinEditor.SelectedComponents.Single(), () => Is.EqualTo(blueprints[0].Item));
+
+            AddStep("click on black box stack", () => InputManager.Click(MouseButton.Left));
+            AddAssert("Selection is first", () => skinEditor.SelectedComponents.Single(), () => Is.EqualTo(blueprints[2].Item));
+
+            AddStep("select all boxes", () =>
+            {
+                skinEditor.SelectedComponents.Clear();
+                skinEditor.SelectedComponents.AddRange(targetContainer.Components.OfType<BigBlackBox>().Skip(1));
+            });
+
+            AddAssert("all boxes selected", () => skinEditor.SelectedComponents, () => Has.Count.EqualTo(2));
+            AddStep("click on black box stack", () => InputManager.Click(MouseButton.Left));
+            AddStep("click on black box stack", () => InputManager.Click(MouseButton.Left));
+            AddStep("click on black box stack", () => InputManager.Click(MouseButton.Left));
+            AddAssert("all boxes still selected", () => skinEditor.SelectedComponents, () => Has.Count.EqualTo(2));
+        }
+
+        [Test]
+        public void TestUndoEditHistory()
+        {
+            SkinComponentsContainer firstTarget = null!;
+            TestSkinEditorChangeHandler changeHandler = null!;
+            byte[] defaultState = null!;
+            IEnumerable<ISerialisableDrawable> testComponents = null!;
+
+            AddStep("Load necessary things", () =>
+            {
+                firstTarget = Player.ChildrenOfType<SkinComponentsContainer>().First();
+                changeHandler = new TestSkinEditorChangeHandler(firstTarget);
+
+                changeHandler.SaveState();
+                defaultState = changeHandler.GetCurrentState();
+
+                testComponents = new[]
+                {
+                    targetContainer.Components.First(),
+                    targetContainer.Components[targetContainer.Components.Count / 2],
+                    targetContainer.Components.Last()
+                };
+            });
+
+            AddStep("Press undo", () => InputManager.Keys(PlatformAction.Undo));
+            AddAssert("Nothing changed", () => defaultState.SequenceEqual(changeHandler.GetCurrentState()));
+
+            AddStep("Add components", () =>
+            {
+                InputManager.MoveMouseTo(skinEditor.ChildrenOfType<BigBlackBox>().First());
+                InputManager.Click(MouseButton.Left);
+                InputManager.Click(MouseButton.Left);
+                InputManager.Click(MouseButton.Left);
+            });
+            revertAndCheckUnchanged();
+
+            AddStep("Move components", () =>
+            {
+                changeHandler.BeginChange();
+                testComponents.ForEach(c => ((Drawable)c).Position += Vector2.One);
+                changeHandler.EndChange();
+            });
+            revertAndCheckUnchanged();
+
+            AddStep("Select components", () => skinEditor.SelectedComponents.AddRange(testComponents));
+            AddStep("Bring to front", () => skinEditor.BringSelectionToFront());
+            revertAndCheckUnchanged();
+
+            AddStep("Remove components", () => testComponents.ForEach(c => firstTarget.Remove(c, false)));
+            revertAndCheckUnchanged();
+
+            void revertAndCheckUnchanged()
+            {
+                AddStep("Revert changes", () => changeHandler.RestoreState(int.MinValue));
+                AddAssert("Current state is same as default", () => defaultState.SequenceEqual(changeHandler.GetCurrentState()));
+            }
         }
 
         [TestCase(false)]
@@ -139,5 +334,23 @@ namespace osu.Game.Tests.Visual.Gameplay
         }
 
         protected override Ruleset CreatePlayerRuleset() => new OsuRuleset();
+
+        private partial class TestSkinEditorChangeHandler : SkinEditorChangeHandler
+        {
+            public TestSkinEditorChangeHandler(Drawable targetScreen)
+                : base(targetScreen)
+            {
+            }
+
+            public byte[] GetCurrentState()
+            {
+                using var stream = new MemoryStream();
+
+                WriteCurrentStateToStream(stream);
+                byte[] newState = stream.ToArray();
+
+                return newState;
+            }
+        }
     }
 }

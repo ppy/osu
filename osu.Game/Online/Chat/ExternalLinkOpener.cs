@@ -18,6 +18,9 @@ namespace osu.Game.Online.Chat
         [Resolved]
         private GameHost host { get; set; } = null!;
 
+        [Resolved]
+        private Clipboard clipboard { get; set; } = null!;
+
         [Resolved(CanBeNull = true)]
         private IDialogOverlay? dialogOverlay { get; set; }
 
@@ -32,7 +35,7 @@ namespace osu.Game.Online.Chat
         public void OpenUrlExternally(string url, bool bypassWarning = false)
         {
             if (!bypassWarning && externalLinkWarning.Value && dialogOverlay != null)
-                dialogOverlay.Push(new ExternalLinkDialog(url, () => host.OpenUrlExternally(url), () => host.GetClipboard()?.SetText(url)));
+                dialogOverlay.Push(new ExternalLinkDialog(url, () => host.OpenUrlExternally(url), () => clipboard.SetText(url)));
             else
                 host.OpenUrlExternally(url);
         }

@@ -19,6 +19,7 @@ using osu.Framework.Platform;
 using osu.Framework.Threading;
 using osu.Game.Configuration;
 using osu.Game.Input.Bindings;
+using osu.Game.Online.Multiplayer;
 using osu.Game.Overlays;
 using osu.Game.Overlays.Notifications;
 using SixLabors.ImageSharp;
@@ -41,6 +42,9 @@ namespace osu.Game.Graphics
 
         [Resolved]
         private GameHost host { get; set; }
+
+        [Resolved]
+        private Clipboard clipboard { get; set; }
 
         private Storage storage;
 
@@ -69,7 +73,7 @@ namespace osu.Game.Graphics
             {
                 case GlobalAction.TakeScreenshot:
                     shutter.Play();
-                    TakeScreenshotAsync();
+                    TakeScreenshotAsync().FireAndForget();
                     return true;
             }
 
@@ -86,70 +90,75 @@ namespace osu.Game.Graphics
         {
             Interlocked.Increment(ref screenShotTasks);
 
-            if (!captureMenuCursor.Value)
+            try
             {
-                cursorVisibility.Value = false;
-
-                // We need to wait for at most 3 draw nodes to be drawn, following which we can be assured at least one DrawNode has been generated/drawn with the set value
-                const int frames_to_wait = 3;
-
-                int framesWaited = 0;
-
-                using (var framesWaitedEvent = new ManualResetEventSlim(false))
+                if (!captureMenuCursor.Value)
                 {
-                    ScheduledDelegate waitDelegate = host.DrawThread.Scheduler.AddDelayed(() =>
+                    cursorVisibility.Value = false;
+
+                    // We need to wait for at most 3 draw nodes to be drawn, following which we can be assured at least one DrawNode has been generated/drawn with the set value
+                    const int frames_to_wait = 3;
+
+                    int framesWaited = 0;
+
+                    using (var framesWaitedEvent = new ManualResetEventSlim(false))
                     {
-                        if (framesWaited++ >= frames_to_wait)
-                            // ReSharper disable once AccessToDisposedClosure
-                            framesWaitedEvent.Set();
-                    }, 10, true);
+                        ScheduledDelegate waitDelegate = host.DrawThread.Scheduler.AddDelayed(() =>
+                        {
+                            if (framesWaited++ >= frames_to_wait)
+                                // ReSharper disable once AccessToDisposedClosure
+                                framesWaitedEvent.Set();
+                        }, 10, true);
 
-                    if (!framesWaitedEvent.Wait(1000))
-                        throw new TimeoutException("Screenshot data did not arrive in a timely fashion");
+                        if (!framesWaitedEvent.Wait(1000))
+                            throw new TimeoutException("Screenshot data did not arrive in a timely fashion");
 
-                    waitDelegate.Cancel();
+                        waitDelegate.Cancel();
+                    }
+                }
+
+                using (var image = await host.TakeScreenshotAsync().ConfigureAwait(false))
+                {
+                    clipboard.SetImage(image);
+
+                    (string filename, var stream) = getWritableStream();
+
+                    if (filename == null) return;
+
+                    using (stream)
+                    {
+                        switch (screenshotFormat.Value)
+                        {
+                            case ScreenshotFormat.Png:
+                                await image.SaveAsPngAsync(stream).ConfigureAwait(false);
+                                break;
+
+                            case ScreenshotFormat.Jpg:
+                                const int jpeg_quality = 92;
+
+                                await image.SaveAsJpegAsync(stream, new JpegEncoder { Quality = jpeg_quality }).ConfigureAwait(false);
+                                break;
+
+                            default:
+                                throw new InvalidOperationException($"Unknown enum member {nameof(ScreenshotFormat)} {screenshotFormat.Value}.");
+                        }
+                    }
+
+                    notificationOverlay.Post(new SimpleNotification
+                    {
+                        Text = $"Screenshot {filename} saved!",
+                        Activated = () =>
+                        {
+                            storage.PresentFileExternally(filename);
+                            return true;
+                        }
+                    });
                 }
             }
-
-            using (var image = await host.TakeScreenshotAsync().ConfigureAwait(false))
+            finally
             {
-                if (Interlocked.Decrement(ref screenShotTasks) == 0 && cursorVisibility.Value == false)
+                if (Interlocked.Decrement(ref screenShotTasks) == 0)
                     cursorVisibility.Value = true;
-
-                host.GetClipboard()?.SetImage(image);
-
-                (string filename, var stream) = getWritableStream();
-
-                if (filename == null) return;
-
-                using (stream)
-                {
-                    switch (screenshotFormat.Value)
-                    {
-                        case ScreenshotFormat.Png:
-                            await image.SaveAsPngAsync(stream).ConfigureAwait(false);
-                            break;
-
-                        case ScreenshotFormat.Jpg:
-                            const int jpeg_quality = 92;
-
-                            await image.SaveAsJpegAsync(stream, new JpegEncoder { Quality = jpeg_quality }).ConfigureAwait(false);
-                            break;
-
-                        default:
-                            throw new InvalidOperationException($"Unknown enum member {nameof(ScreenshotFormat)} {screenshotFormat.Value}.");
-                    }
-                }
-
-                notificationOverlay.Post(new SimpleNotification
-                {
-                    Text = $"Screenshot {filename} saved!",
-                    Activated = () =>
-                    {
-                        storage.PresentFileExternally(filename);
-                        return true;
-                    }
-                });
             }
         });
 

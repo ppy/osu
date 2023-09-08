@@ -52,6 +52,9 @@ namespace osu.Game.Rulesets.Taiko.Skinning.Legacy
 
                         return null;
 
+                    case TaikoSkinComponents.DrumSamplePlayer:
+                        return null;
+
                     case TaikoSkinComponents.CentreHit:
                     case TaikoSkinComponents.RimHit:
                         if (hasHitCircle)

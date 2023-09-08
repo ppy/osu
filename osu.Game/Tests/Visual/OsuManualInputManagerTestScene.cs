@@ -1,8 +1,6 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
 using System.Linq;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
@@ -10,6 +8,7 @@ using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.UserInterface;
 using osu.Framework.Testing;
 using osu.Framework.Testing.Input;
+using osu.Game.Graphics;
 using osu.Game.Graphics.Cursor;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Graphics.UserInterfaceV2;
@@ -27,8 +26,7 @@ namespace osu.Game.Tests.Visual
 
         protected readonly ManualInputManager InputManager;
 
-        private readonly RoundedButton buttonTest;
-        private readonly RoundedButton buttonLocal;
+        private readonly Container takeControlOverlay;
 
         /// <summary>
         /// Whether to create a nested container to handle <see cref="GlobalAction"/>s that result from local (manual) test input.
@@ -59,7 +57,13 @@ namespace osu.Game.Tests.Visual
             }
 
             if (CreateNestedActionContainer)
-                mainContent.Add(new GlobalActionContainer(null));
+            {
+                var globalActionContainer = new GlobalActionContainer(null)
+                {
+                    Child = mainContent
+                };
+                mainContent = globalActionContainer;
+            }
 
             base.Content.AddRange(new Drawable[]
             {
@@ -68,12 +72,12 @@ namespace osu.Game.Tests.Visual
                     UseParentInput = true,
                     Child = mainContent
                 },
-                new Container
+                takeControlOverlay = new Container
                 {
                     AutoSizeAxes = Axes.Both,
-                    Anchor = Anchor.TopRight,
-                    Origin = Anchor.TopRight,
-                    Margin = new MarginPadding(5),
+                    Anchor = Anchor.BottomCentre,
+                    Origin = Anchor.BottomCentre,
+                    Margin = new MarginPadding(40),
                     CornerRadius = 5,
                     Masking = true,
                     Children = new Drawable[]
@@ -82,44 +86,38 @@ namespace osu.Game.Tests.Visual
                         {
                             Colour = Color4.Black,
                             RelativeSizeAxes = Axes.Both,
-                            Alpha = 0.5f,
+                            Alpha = 0.4f,
                         },
                         new FillFlowContainer
                         {
                             AutoSizeAxes = Axes.Both,
                             Direction = FillDirection.Vertical,
-                            Margin = new MarginPadding(5),
-                            Spacing = new Vector2(5),
+                            Margin = new MarginPadding(10),
+                            Spacing = new Vector2(10),
                             Children = new Drawable[]
                             {
                                 new OsuSpriteText
                                 {
                                     Anchor = Anchor.TopCentre,
                                     Origin = Anchor.TopCentre,
-                                    Text = "Input Priority"
+                                    Font = OsuFont.Default.With(weight: FontWeight.Bold),
+                                    Text = "The test is currently overriding local input",
                                 },
                                 new FillFlowContainer
                                 {
                                     AutoSizeAxes = Axes.Both,
                                     Anchor = Anchor.TopCentre,
                                     Origin = Anchor.TopCentre,
-                                    Margin = new MarginPadding(5),
                                     Spacing = new Vector2(5),
                                     Direction = FillDirection.Horizontal,
 
                                     Children = new Drawable[]
                                     {
-                                        buttonLocal = new RoundedButton
+                                        new RoundedButton
                                         {
-                                            Text = "local",
-                                            Size = new Vector2(50, 30),
-                                            Action = returnUserInput
-                                        },
-                                        buttonTest = new RoundedButton
-                                        {
-                                            Text = "test",
-                                            Size = new Vector2(50, 30),
-                                            Action = returnTestInput
+                                            Text = "Take control back",
+                                            Size = new Vector2(180, 30),
+                                            Action = () => InputManager.UseParentInput = true
                                         },
                                     }
                                 },
@@ -128,6 +126,13 @@ namespace osu.Game.Tests.Visual
                     }
                 },
             });
+        }
+
+        protected override void Update()
+        {
+            base.Update();
+
+            takeControlOverlay.Alpha = InputManager.UseParentInput ? 0 : 1;
         }
 
         /// <summary>
@@ -148,19 +153,5 @@ namespace osu.Game.Tests.Visual
                 InputManager.Click(MouseButton.Left);
             });
         }
-
-        protected override void Update()
-        {
-            base.Update();
-
-            buttonTest.Enabled.Value = InputManager.UseParentInput;
-            buttonLocal.Enabled.Value = !InputManager.UseParentInput;
-        }
-
-        private void returnUserInput() =>
-            InputManager.UseParentInput = true;
-
-        private void returnTestInput() =>
-            InputManager.UseParentInput = false;
     }
 }

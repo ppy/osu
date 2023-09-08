@@ -45,6 +45,9 @@ namespace osu.Game.Tests.Visual.Gameplay
         [Resolved]
         private SessionStatics sessionStatics { get; set; }
 
+        [Resolved]
+        private OsuConfigManager config { get; set; }
+
         [Cached(typeof(INotificationOverlay))]
         private readonly NotificationOverlay notificationOverlay;
 
@@ -317,6 +320,7 @@ namespace osu.Game.Tests.Visual.Gameplay
             saveVolumes();
             setFullVolume();
 
+            AddStep("enable storyboards", () => config.SetValue(OsuSetting.ShowStoryboard, true));
             AddStep("change epilepsy warning", () => epilepsyWarning = warning);
             AddStep("load dummy beatmap", () => resetPlayer(false));
 
@@ -334,11 +338,29 @@ namespace osu.Game.Tests.Visual.Gameplay
         }
 
         [Test]
+        public void TestEpilepsyWarningWithDisabledStoryboard()
+        {
+            saveVolumes();
+            setFullVolume();
+
+            AddStep("disable storyboards", () => config.SetValue(OsuSetting.ShowStoryboard, false));
+            AddStep("change epilepsy warning", () => epilepsyWarning = true);
+            AddStep("load dummy beatmap", () => resetPlayer(false));
+
+            AddUntilStep("wait for current", () => loader.IsCurrentScreen());
+
+            AddUntilStep("epilepsy warning absent", () => getWarning() == null);
+
+            restoreVolumes();
+        }
+
+        [Test]
         public void TestEpilepsyWarningEarlyExit()
         {
             saveVolumes();
             setFullVolume();
 
+            AddStep("enable storyboards", () => config.SetValue(OsuSetting.ShowStoryboard, true));
             AddStep("set epilepsy warning", () => epilepsyWarning = true);
             AddStep("load dummy beatmap", () => resetPlayer(false));
 
@@ -449,7 +471,7 @@ namespace osu.Game.Tests.Visual.Gameplay
             AddStep("click notification", () => notification.TriggerClick());
         }
 
-        private EpilepsyWarning getWarning() => loader.ChildrenOfType<EpilepsyWarning>().SingleOrDefault();
+        private EpilepsyWarning getWarning() => loader.ChildrenOfType<EpilepsyWarning>().SingleOrDefault(w => w.IsAlive);
 
         private partial class TestPlayerLoader : PlayerLoader
         {
