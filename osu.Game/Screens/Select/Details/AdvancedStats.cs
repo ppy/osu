@@ -98,6 +98,7 @@ namespace osu.Game.Screens.Select.Details
 
         private ModSettingChangeTracker modSettingChangeTracker;
         private ScheduledDelegate debouncedStatisticsUpdate;
+
         private void modsChanged(ValueChangedEvent<IReadOnlyList<Mod>> mods)
         {
             modSettingChangeTracker?.Dispose();
@@ -175,7 +176,6 @@ namespace osu.Game.Screens.Select.Details
 
                 if (normalDifficulty == null || moddedDifficulty == null)
                     return;
-
                 starDifficulty.Value = ((float)normalDifficulty.Value.Stars, (float)moddedDifficulty.Value.Stars);
 
             }), starDifficultyCancellationSource.Token, TaskContinuationOptions.OnlyOnRanToCompletion, TaskScheduler.Current);
