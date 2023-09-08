@@ -15,6 +15,7 @@ using osu.Framework.Testing;
 using osu.Framework.Utils;
 using osu.Game.Beatmaps;
 using osu.Game.Configuration;
+using osu.Game.Overlays;
 using osu.Game.Rulesets;
 using osu.Game.Rulesets.Catch;
 using osu.Game.Rulesets.Osu;
@@ -30,6 +31,9 @@ namespace osu.Game.Tests.Visual.SongSelect
     [TestFixture]
     public partial class TestSceneBeatmapCarousel : OsuManualInputManagerTestScene
     {
+        [Cached]
+        private OverlayColourProvider colourProvider = new OverlayColourProvider(OverlayColourScheme.Aquamarine);
+
         private TestBeatmapCarousel carousel;
         private RulesetStore rulesets;
 

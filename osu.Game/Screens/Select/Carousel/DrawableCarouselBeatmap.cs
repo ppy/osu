@@ -54,8 +54,8 @@ namespace osu.Game.Screens.Select.Carousel
 
         private StarRatingDisplay starRatingDisplay = null!;
 
-        [Cached]
-        private OverlayColourProvider colourProvider = new OverlayColourProvider(OverlayColourScheme.Aquamarine);
+        [Resolved]
+        private OverlayColourProvider colourProvider { get; set; } = null!;
 
         [Resolved]
         private OsuColour colours { get; set; } = null!;

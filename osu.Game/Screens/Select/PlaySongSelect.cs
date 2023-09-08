@@ -29,6 +29,10 @@ namespace osu.Game.Screens.Select
     {
         private OsuScreen? playerLoader;
 
+        // TODO: change test colour to a more unique one
+        [Cached]
+        private OverlayColourProvider colourProvider = new OverlayColourProvider(OverlayColourScheme.Aquamarine);
+
         [Resolved]
         private INotificationOverlay? notifications { get; set; }
 
