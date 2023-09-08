@@ -28,7 +28,7 @@ namespace osu.Game.Overlays.Mods
         /// </summary>
         public LocalisableString Label { get; protected set; }
 
-        public VerticalAttributeDisplay(LocalisableString label)
+        public VerticalAttributeDisplay(LocalisableString label, string format = "0.#")
         {
             Label = label;
             AutoSizeAxes = Axes.X;
@@ -54,7 +54,8 @@ namespace osu.Game.Overlays.Mods
                     {
                         Origin = Anchor.Centre,
                         Anchor = Anchor.Centre,
-                        Current = { BindTarget = Current }
+                        Current = { BindTarget = Current },
+                        Format = format
                     }
                 }
             };
@@ -64,7 +65,9 @@ namespace osu.Game.Overlays.Mods
         {
             protected override double RollingDuration => 500;
 
-            protected override LocalisableString FormatCount(double count) => count.ToLocalisableString("0.##");
+            public string Format = "0.#";
+
+            protected override LocalisableString FormatCount(double count) => count.ToLocalisableString(Format);
 
             protected override OsuSpriteText CreateSpriteText() => new OsuSpriteText
             {
