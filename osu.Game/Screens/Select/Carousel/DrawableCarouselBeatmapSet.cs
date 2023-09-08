@@ -26,6 +26,7 @@ namespace osu.Game.Screens.Select.Carousel
     public partial class DrawableCarouselBeatmapSet : DrawableCarouselItem, IHasContextMenu
     {
         public const float HEIGHT = MAX_HEIGHT;
+        private const float movement_duration = 500;
 
         private Action<BeatmapSetInfo> restoreHiddenRequested = null!;
         private Action<int>? viewDetails;
@@ -179,28 +180,30 @@ namespace osu.Game.Screens.Select.Carousel
         {
             base.Deselected();
 
-            MovementContainer.MoveToX(0, 500, Easing.OutExpo);
+            MovementContainer.MoveToX(0, movement_duration, Easing.OutExpo);
 
             updateBeatmapYPositions();
 
-            backgroundContainer.X = mainFlow.X = 0;
-            colourBox.Hide();
-            rightArrow.Hide();
+            backgroundContainer.MoveToX(0, movement_duration, Easing.OutExpo);
+            mainFlow.MoveToX(0, movement_duration, Easing.OutExpo);
+
+            colourBox.FadeOut(movement_duration, Easing.OutExpo);
+            rightArrow.FadeOut(movement_duration, Easing.OutExpo);
         }
 
         protected override void Selected()
         {
             base.Selected();
 
-            MovementContainer.MoveToX(-100, 500, Easing.OutExpo);
+            MovementContainer.MoveToX(-100, movement_duration, Easing.OutExpo);
 
             updateBeatmapDifficulties();
 
-            backgroundContainer.X = mainFlow.X = colour_box_width_expanded;
+            backgroundContainer.MoveToX(colour_box_width_expanded, movement_duration, Easing.InExpo);
+            mainFlow.MoveToX(colour_box_width_expanded, movement_duration, Easing.InExpo);
 
-            // TODO: find way to sync delayed load background fade in with right arrow
-            colourBox.Show();
-            rightArrow.Show();
+            colourBox.FadeIn(movement_duration, Easing.InExpo);
+            rightArrow.FadeIn(movement_duration, Easing.InExpo);
         }
 
         private void updateBeatmapDifficulties()
