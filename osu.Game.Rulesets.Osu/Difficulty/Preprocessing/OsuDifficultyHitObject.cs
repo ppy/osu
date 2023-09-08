@@ -78,6 +78,11 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Preprocessing
         public double? Angle { get; private set; }
 
         /// <summary>
+        /// The duration of the spinner associated with this <see cref="OsuDifficultyHitObject"/> for <see cref="Spinner"/> objects, accounted for clockrate.
+        /// </summary>
+        public double? SpinnerDuration { get; private set; }
+
+        /// <summary>
         /// Retrieves the full hit window for a Great <see cref="HitResult"/>.
         /// </summary>
         public double HitWindowGreat { get; private set; }
@@ -102,6 +107,9 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Preprocessing
             {
                 HitWindowGreat = 2 * BaseObject.HitWindows.WindowFor(HitResult.Great) / clockRate;
             }
+
+            if (BaseObject is Spinner spinner)
+                SpinnerDuration = spinner.Duration / clockRate;
 
             setDistances(clockRate);
         }
@@ -146,7 +154,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Preprocessing
             }
 
             // We don't need to calculate either angle or distance when one of the last->curr objects is a spinner
-            if (BaseObject is Spinner || lastObject is Spinner)
+            if (BaseObject is Spinner || (lastObject is Spinner spinner && spinner.DifficultySpinsRequired <= 0))
                 return;
 
             // We will scale distances by this factor, so we can assume a uniform CircleSize among beatmaps.
