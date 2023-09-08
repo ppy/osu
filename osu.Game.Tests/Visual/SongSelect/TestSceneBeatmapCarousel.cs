@@ -11,6 +11,7 @@ using osu.Framework.Allocation;
 using osu.Framework.Extensions.IEnumerableExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
+using osu.Framework.Graphics.UserInterface;
 using osu.Framework.Testing;
 using osu.Framework.Utils;
 using osu.Game.Beatmaps;
@@ -55,6 +56,12 @@ namespace osu.Game.Tests.Visual.SongSelect
         public void TestBasic()
         {
             loadBeatmaps(setCount: 10, randomDifficulties: true);
+
+            AddSliderStep("change star difficulty", 0, 11.9, 5.55, v =>
+            {
+                foreach (var hasCurrentValue in carousel.ChildrenOfType<IHasCurrentValue<StarDifficulty>>())
+                    hasCurrentValue.Current.Value = new StarDifficulty(v, 0);
+            });
         }
 
         [Test]

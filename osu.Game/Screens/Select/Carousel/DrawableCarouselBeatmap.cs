@@ -243,16 +243,18 @@ namespace osu.Game.Screens.Select.Carousel
                 starDifficultyBindable = difficultyCache.GetBindableDifficulty(beatmapInfo, (starDifficultyCancellationSource = new CancellationTokenSource()).Token);
                 starDifficultyBindable.BindValueChanged(d =>
                 {
-                    starCounter.Current = (float)(d.NewValue?.Stars ?? 0);
                     starRatingDisplay.Current.Value = d.NewValue ?? default;
+                }, true);
 
-                    if (d.NewValue == null) return;
+                starRatingDisplay.Current.BindValueChanged(s =>
+                {
+                    starCounter.Current = (float)s.NewValue.Stars;
 
                     // Every other element in song select that uses this cut off uses yellow for the upper range but the designs use white here for whatever reason.
-                    iconContainer.Colour = d.NewValue.Value.Stars > 6.5f ? Colour4.White : colours.B5;
+                    iconContainer.Colour = s.NewValue.Stars > 6.5f ? Colour4.White : colours.B5;
 
                     starCounter.Colour = colourBox.Colour =
-                        colours.ForStarDifficulty(d.NewValue.Value.Stars);
+                        colours.ForStarDifficulty(s.NewValue.Stars);
 
                     if (Item!.State.Value == CarouselItemState.NotSelected) return;
 
@@ -263,7 +265,7 @@ namespace osu.Game.Screens.Select.Carousel
                         Colour = starCounter.Colour.MultiplyAlpha(.3f),
                         Radius = 20
                     };
-                }, true);
+                });
             }
 
             base.ApplyState();
