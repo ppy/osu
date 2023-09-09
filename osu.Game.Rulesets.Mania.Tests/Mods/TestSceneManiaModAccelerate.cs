@@ -1,9 +1,14 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System.Linq;
 using NUnit.Framework;
+using osu.Framework.Allocation;
+using osu.Framework.Testing;
 using osu.Game.Rulesets.Mania.Mods;
+using osu.Game.Rulesets.Mania.Objects.Drawables;
 using osu.Game.Rulesets.Mania.UI;
+using osu.Game.Rulesets.UI.Scrolling;
 using osu.Game.Tests.Visual;
 
 namespace osu.Game.Rulesets.Mania.Tests.Mods
@@ -17,15 +22,13 @@ namespace osu.Game.Rulesets.Mania.Tests.Mods
         {
             Mod = new ManiaModAccelerate
             {
-                MaxComboCount = { Value = 2 },
+                MaxComboCount = { Value = 10 },
                 MaxScrollSpeed = { Value = 35 }
             },
             PassCondition = () =>
             {
-                var drawableRuleset = (DrawableManiaRuleset)Player.DrawableRuleset;
-
-                // CustomSmoothTimeRange cannot reach targetScrollTime because interpolates handle, so check this faster then speed 34.
-                return !drawableRuleset.CustomSmoothTimeRange.Disabled && drawableRuleset.CustomSmoothTimeRange.Value <= DrawableManiaRuleset.ComputeScrollTime(34);
+                var hitObject = Player.ChildrenOfType<DrawableManiaHitObject>().FirstOrDefault();
+                return hitObject?.Dependencies.Get<IScrollingInfo>().TimeRange.Value <= DrawableManiaRuleset.ComputeScrollTime(34);
             }
         });
     }
