@@ -1,7 +1,6 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using System;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Localisation;
@@ -19,8 +18,6 @@ namespace osu.Game.Rulesets.Mania.Mods
         public override string Name => "Accelerate";
         public override string Acronym => "AL";
         public override LocalisableString Description => @"Key will become faster..., until you miss";
-
-        public override Type[] IncompatibleMods => new[] { typeof(ManiaModConstantSpeed) };
         public override double ScoreMultiplier => 1;
         public override IconUsage? Icon => null;
         public override ModType Type => ModType.Fun;
