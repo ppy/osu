@@ -34,9 +34,18 @@ namespace osu.Game.Rulesets.Mods
             set => CurrentNumber.Precision = value;
         }
 
+        private float minValue;
+
         public float MinValue
         {
-            set => CurrentNumber.MinValue = value;
+            set
+            {
+                if (value == minValue)
+                    return;
+
+                minValue = value;
+                updateExtents();
+            }
         }
 
         private float maxValue;
@@ -49,7 +58,24 @@ namespace osu.Game.Rulesets.Mods
                     return;
 
                 maxValue = value;
-                updateMaxValue();
+                updateExtents();
+            }
+        }
+
+        private float? extendedMinValue;
+
+        /// <summary>
+        /// The minimum value to be used when extended limits are applied.
+        /// </summary>
+        public float? ExtendedMinValue
+        {
+            set
+            {
+                if (value == extendedMinValue)
+                    return;
+
+                extendedMinValue = value;
+                updateExtents();
             }
         }
 
@@ -66,7 +92,7 @@ namespace osu.Game.Rulesets.Mods
                     return;
 
                 extendedMaxValue = value;
-                updateMaxValue();
+                updateExtents();
             }
         }
 
@@ -78,7 +104,7 @@ namespace osu.Game.Rulesets.Mods
         public DifficultyBindable(float? defaultValue = null)
             : base(defaultValue)
         {
-            ExtendedLimits.BindValueChanged(_ => updateMaxValue());
+            ExtendedLimits.BindValueChanged(_ => updateExtents());
         }
 
         public override float? Value
@@ -94,8 +120,9 @@ namespace osu.Game.Rulesets.Mods
             }
         }
 
-        private void updateMaxValue()
+        private void updateExtents()
         {
+            CurrentNumber.MinValue = ExtendedLimits.Value && extendedMinValue != null ? extendedMinValue.Value : minValue;
             CurrentNumber.MaxValue = ExtendedLimits.Value && extendedMaxValue != null ? extendedMaxValue.Value : maxValue;
         }
 

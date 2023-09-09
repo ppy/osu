@@ -8,6 +8,7 @@ using System.Diagnostics;
 using JetBrains.Annotations;
 using osu.Framework.Bindables;
 using osu.Game.Rulesets.Objects.Types;
+using osu.Game.Rulesets.Osu.UI;
 using osu.Game.Rulesets.Scoring;
 
 namespace osu.Game.Rulesets.Osu.Objects.Drawables
@@ -60,7 +61,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
 
             pathVersion.BindTo(DrawableSlider.PathVersion);
 
-            CheckHittable = (d, t) => DrawableSlider.CheckHittable?.Invoke(d, t) ?? true;
+            CheckHittable = (d, t, r) => DrawableSlider.CheckHittable?.Invoke(d, t, r) ?? ClickAction.Hit;
         }
 
         protected override void Update()
