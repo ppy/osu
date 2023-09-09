@@ -31,7 +31,7 @@ namespace osu.Game.Screens.Select.Carousel
 
         protected override Container<Drawable> Content { get; } = new Container { RelativeSizeAxes = Axes.Both };
 
-        public bool HasBorder = true;
+        public bool HasCustomBorder;
 
         private const float corner_radius = 10;
         private const float border_thickness = 2.5f;
@@ -101,7 +101,7 @@ namespace osu.Game.Screens.Select.Carousel
                     break;
 
                 case CarouselItemState.Selected:
-                    if (!HasBorder) return;
+                    if (HasCustomBorder) return;
 
                     BorderContainer.BorderThickness = border_thickness;
                     EffectContainer.EdgeEffect = new EdgeEffectParameters

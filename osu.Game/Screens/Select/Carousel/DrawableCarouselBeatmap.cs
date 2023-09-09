@@ -91,7 +91,7 @@ namespace osu.Game.Screens.Select.Carousel
         private void load(BeatmapManager? manager, SongSelect? songSelect)
         {
             Header.Height = height;
-            Header.HasBorder = false;
+            Header.HasCustomBorder = true;
             Header.BorderContainer.EdgeEffect = new EdgeEffectParameters();
 
             if (songSelect != null)
