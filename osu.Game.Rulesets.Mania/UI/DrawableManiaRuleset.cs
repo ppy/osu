@@ -19,6 +19,7 @@ using osu.Game.Input.Handlers;
 using osu.Game.Replays;
 using osu.Game.Rulesets.Mania.Beatmaps;
 using osu.Game.Rulesets.Mania.Configuration;
+using osu.Game.Rulesets.Mania.Mods;
 using osu.Game.Rulesets.Mania.Objects;
 using osu.Game.Rulesets.Mania.Replays;
 using osu.Game.Rulesets.Mods;
@@ -70,15 +71,7 @@ namespace osu.Game.Rulesets.Mania.UI
 
         private readonly Bindable<ManiaScrollingDirection> configDirection = new Bindable<ManiaScrollingDirection>();
         private readonly BindableInt configScrollSpeed = new BindableInt();
-        private double configSmoothTimeRange;
-
-        // Enable it only when need, it overrides configSmoothTimeRange
-        public BindableDouble CustomSmoothTimeRange = new BindableDouble
-        {
-            Disabled = true
-        };
-
-        private double smoothTimeRange => CustomSmoothTimeRange.Disabled ? configSmoothTimeRange : CustomSmoothTimeRange.Value;
+        private double smoothTimeRange;
 
         // Stores the current speed adjustment active in gameplay.
         private readonly Track speedAdjustmentTrack = new TrackVirtual(0);
@@ -116,10 +109,21 @@ namespace osu.Game.Rulesets.Mania.UI
             Config.BindWith(ManiaRulesetSetting.ScrollDirection, configDirection);
             configDirection.BindValueChanged(direction => Direction.Value = (ScrollingDirection)direction.NewValue, true);
 
-            Config.BindWith(ManiaRulesetSetting.ScrollSpeed, configScrollSpeed);
-            configScrollSpeed.BindValueChanged(speed => this.TransformTo(nameof(configSmoothTimeRange), ComputeScrollTime(speed.NewValue), 200, Easing.OutQuint));
+            if (Mods.Any(m => m is IManiaAdjustScrollSpeed))
+            {
+                foreach (var mod in Mods.OfType<IManiaAdjustScrollSpeed>())
+                {
+                    mod.ScrollSpeed.BindValueChanged(speed => this.TransformTo(nameof(smoothTimeRange), ComputeScrollTime(speed.NewValue), 200, Easing.OutQuint));
+                    TimeRange.Value = smoothTimeRange = ComputeScrollTime(mod.ScrollSpeed.Value);
+                }
 
-            TimeRange.Value = configSmoothTimeRange = ComputeScrollTime(configScrollSpeed.Value);
+                return;
+            }
+
+            Config.BindWith(ManiaRulesetSetting.ScrollSpeed, configScrollSpeed);
+            configScrollSpeed.BindValueChanged(speed => this.TransformTo(nameof(smoothTimeRange), ComputeScrollTime(speed.NewValue), 200, Easing.OutQuint));
+
+            TimeRange.Value = smoothTimeRange = ComputeScrollTime(configScrollSpeed.Value);
         }
 
         protected override void AdjustScrollSpeed(int amount) => configScrollSpeed.Value += amount;
