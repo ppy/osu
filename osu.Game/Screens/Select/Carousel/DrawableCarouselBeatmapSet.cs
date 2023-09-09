@@ -27,6 +27,8 @@ namespace osu.Game.Screens.Select.Carousel
     {
         public const float HEIGHT = MAX_HEIGHT;
         private const float movement_duration = 500;
+        private const float colour_box_width_expanded = 20;
+        private const float corner_radius = 10;
 
         private Action<BeatmapSetInfo> restoreHiddenRequested = null!;
         private Action<int>? viewDetails;
@@ -53,8 +55,6 @@ namespace osu.Game.Screens.Select.Carousel
         private Box colourBox = null!;
         private Container backgroundContainer = null!;
         private SpriteIcon rightArrow = null!;
-        private const float colour_box_width_expanded = 20;
-        private const float corner_radius = 10;
         private DelayedLoadWrapper mainFlow = null!;
 
         [Resolved]
