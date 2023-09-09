@@ -96,6 +96,8 @@ namespace osu.Game.Screens.Select.Carousel
                         Radius = 10,
                         Colour = Color4.Black.Opacity(100),
                     };
+
+                    BorderContainer.EdgeEffect = new EdgeEffectParameters();
                     break;
 
                 case CarouselItemState.Selected:
@@ -104,10 +106,17 @@ namespace osu.Game.Screens.Select.Carousel
                     BorderContainer.BorderThickness = border_thickness;
                     EffectContainer.EdgeEffect = new EdgeEffectParameters
                     {
-                        Type = EdgeEffectType.Glow,
-                        Colour = new Color4(130, 204, 255, 150),
-                        Radius = 20,
-                        Roundness = 10,
+                        Type = EdgeEffectType.Shadow,
+                        Colour = Color4Extensions.FromHex(@"4EBFFF").Opacity(0.5f),
+                        Radius = 50,
+                    };
+
+                    BorderContainer.EdgeEffect = new EdgeEffectParameters
+                    {
+                        Type = EdgeEffectType.Shadow,
+                        Colour = Color4Extensions.FromHex(@"4EBFFF").Opacity(0.5f),
+                        Radius = 15,
+                        Hollow = true,
                     };
                     break;
             }
