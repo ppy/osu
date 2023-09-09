@@ -5,21 +5,16 @@ using System;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Localisation;
-using osu.Framework.Utils;
 using osu.Game.Configuration;
 using osu.Game.Overlays.Settings;
-using osu.Game.Rulesets.Mania.Objects;
-using osu.Game.Rulesets.Mania.UI;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Scoring;
-using osu.Game.Rulesets.UI;
 using osu.Game.Scoring;
-using osu.Game.Screens.Play;
 using static osu.Game.Rulesets.Mania.ManiaSettingsSubsection;
 
 namespace osu.Game.Rulesets.Mania.Mods
 {
-    public class ManiaModAccelerate : Mod, IApplicableToDrawableRuleset<ManiaHitObject>, IApplicableToScoreProcessor, IApplicableToPlayer, IUpdatableByPlayfield
+    public class ManiaModAccelerate : Mod, IApplicableToScoreProcessor, IManiaAdjustScrollSpeed
     {
         public override string Name => "Accelerate";
         public override string Acronym => "AL";
@@ -30,11 +25,7 @@ namespace osu.Game.Rulesets.Mania.Mods
         public override IconUsage? Icon => null;
         public override ModType Type => ModType.Fun;
 
-        private DrawableManiaRuleset drawableRuleset = null!;
-
-        private readonly BindableDouble scrollTime = new BindableDouble();
-
-        private readonly BindableDouble targetScrollTime = new BindableDouble();
+        public BindableInt ScrollSpeed { get; set; } = new BindableInt();
 
         [SettingSource("Base Combo", "The combo count to start changing speed.")]
         public BindableInt BaseComboCount { get; } = new BindableInt
@@ -100,24 +91,11 @@ namespace osu.Game.Rulesets.Mania.Mods
             });
         }
 
-        public void ApplyToDrawableRuleset(DrawableRuleset<ManiaHitObject> drawableRuleset)
-        {
-            this.drawableRuleset = (DrawableManiaRuleset)drawableRuleset;
-        }
-
-        public void ApplyToPlayer(Player player)
-        {
-            drawableRuleset.CustomSmoothTimeRange.Disabled = false;
-            scrollTime.BindTo(drawableRuleset.CustomSmoothTimeRange);
-            scrollTime.Value = DrawableManiaRuleset.ComputeScrollTime(MinScrollSpeed.Value);
-            targetScrollTime.Value = DrawableManiaRuleset.ComputeScrollTime(MinScrollSpeed.Value);
-        }
-
         public void ApplyToScoreProcessor(ScoreProcessor scoreProcessor)
         {
             scoreProcessor.Combo.BindValueChanged(s =>
             {
-                targetScrollTime.Value = DrawableManiaRuleset.ComputeScrollTime(targetScrollSpeed(s.NewValue));
+                ScrollSpeed.Value = targetScrollSpeed(s.NewValue);
             }, true);
         }
 
@@ -133,10 +111,5 @@ namespace osu.Game.Rulesets.Mania.Mods
         }
 
         public ScoreRank AdjustRank(ScoreRank rank, double accuracy) => rank;
-
-        public void Update(Playfield playfield)
-        {
-            scrollTime.Value = Interpolation.DampContinuously(scrollTime.Value, targetScrollTime.Value, 250, Math.Abs(playfield.Clock.ElapsedFrameTime));
-        }
     }
 }
