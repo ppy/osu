@@ -236,6 +236,8 @@ namespace osu.Game.Screens.Select.Carousel
                 Colour = Colour4.Black.Opacity(100),
             };
 
+            Header.BorderContainer.EdgeEffect = new EdgeEffectParameters();
+
             colourBox.RelativeSizeAxes = Axes.Y;
             colourBox.Width = colour_box_width + corner_radius;
         }
@@ -284,8 +286,16 @@ namespace osu.Game.Screens.Select.Carousel
                     Header.EffectContainer.EdgeEffect = new EdgeEffectParameters
                     {
                         Type = EdgeEffectType.Shadow,
-                        Colour = starCounter.Colour.MultiplyAlpha(.3f),
-                        Radius = 20
+                        Colour = starCounter.Colour.MultiplyAlpha(0.5f),
+                        Radius = 50
+                    };
+
+                    Header.BorderContainer.EdgeEffect = new EdgeEffectParameters
+                    {
+                        Type = EdgeEffectType.Shadow,
+                        Colour = starCounter.Colour.MultiplyAlpha(0.5f),
+                        Radius = 10,
+                        Hollow = true,
                     };
                 });
             }
