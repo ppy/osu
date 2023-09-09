@@ -160,6 +160,7 @@ namespace osu.Game.Screens.Select.Carousel
                     Anchor = Anchor.CentreLeft,
                     Icon = FontAwesome.Solid.ChevronRight,
                     Size = new Vector2(12),
+                    // TODO: implement colour sampling of beatmap background
                     Colour = colourProvider.Background5,
                     Shear = -CarouselHeader.SHEAR,
                     Alpha = 0,
@@ -184,6 +185,7 @@ namespace osu.Game.Screens.Select.Carousel
 
             updateBeatmapYPositions();
 
+            // TODO: implement colour sampling of beatmap background for colour box and offset this by 10, hide for now
             backgroundContainer.MoveToX(0, movement_duration, Easing.OutExpo);
             mainFlow.MoveToX(0, movement_duration, Easing.OutExpo);
 
