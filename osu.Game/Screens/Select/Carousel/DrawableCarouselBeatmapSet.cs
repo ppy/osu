@@ -26,7 +26,6 @@ namespace osu.Game.Screens.Select.Carousel
     public partial class DrawableCarouselBeatmapSet : DrawableCarouselItem, IHasContextMenu
     {
         public const float HEIGHT = MAX_HEIGHT;
-        private const float movement_duration = 500;
         private const float colour_box_width_expanded = 20;
         private const float corner_radius = 10;
 
@@ -179,33 +178,37 @@ namespace osu.Game.Screens.Select.Carousel
 
         protected override void Deselected()
         {
+            const float duration = 500;
+
             base.Deselected();
 
-            MovementContainer.MoveToX(0, movement_duration, Easing.OutExpo);
+            MovementContainer.MoveToX(0, duration, Easing.OutQuint);
 
             updateBeatmapYPositions();
 
             // TODO: implement colour sampling of beatmap background for colour box and offset this by 10, hide for now
-            backgroundContainer.MoveToX(0, movement_duration, Easing.OutExpo);
-            mainFlow.MoveToX(0, movement_duration, Easing.OutExpo);
+            backgroundContainer.MoveToX(0, duration, Easing.OutQuint);
+            mainFlow.MoveToX(0, duration, Easing.OutQuint);
 
-            colourBox.FadeOut(movement_duration, Easing.OutExpo);
-            rightArrow.FadeOut(movement_duration, Easing.OutExpo);
+            colourBox.FadeOut(duration, Easing.OutQuint);
+            rightArrow.FadeOut(duration, Easing.OutQuint);
         }
 
         protected override void Selected()
         {
+            const float duration = 500;
+
             base.Selected();
 
-            MovementContainer.MoveToX(-100, movement_duration, Easing.OutExpo);
+            MovementContainer.MoveToX(-100, duration, Easing.OutQuint);
 
             updateBeatmapDifficulties();
 
-            backgroundContainer.MoveToX(colour_box_width_expanded, movement_duration, Easing.InExpo);
-            mainFlow.MoveToX(colour_box_width_expanded, movement_duration, Easing.InExpo);
+            backgroundContainer.MoveToX(colour_box_width_expanded, duration, Easing.OutQuint);
+            mainFlow.MoveToX(colour_box_width_expanded, duration, Easing.OutQuint);
 
-            colourBox.FadeIn(movement_duration, Easing.InExpo);
-            rightArrow.FadeIn(movement_duration, Easing.InExpo);
+            colourBox.FadeIn(duration, Easing.OutQuint);
+            rightArrow.FadeIn(duration, Easing.OutQuint);
         }
 
         private void updateBeatmapDifficulties()
