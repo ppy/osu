@@ -20,6 +20,7 @@ using osu.Game.Rulesets.Mods;
 using osuTK;
 using osuTK.Graphics;
 using System.Threading;
+using osu.Game.Configuration;
 
 namespace osu.Game.Overlays.Mods
 {
@@ -41,23 +42,12 @@ namespace osu.Game.Overlays.Mods
 
         private const float transition_duration = 250;
 
-        private IBeatmapInfo? beatmapInfo;
-
-        public IBeatmapInfo? BeatmapInfo
-        {
-            get => beatmapInfo;
-            set
-            {
-                if (value == beatmapInfo) return;
-
-                beatmapInfo = value;
-                updateStarDifficultyBind();
-                UpdateValues();
-            }
-        }
+        public Bindable<IBeatmapInfo?> BeatmapInfo { get; } = new Bindable<IBeatmapInfo?>();
 
         [Resolved]
         private Bindable<IReadOnlyList<Mod>> mods { get; set; } = null!;
+
+        private ModSettingChangeTracker? modSettingChangeTracker;
 
         [Resolved]
         private OverlayColourProvider colourProvider { get; set; } = null!;
@@ -178,16 +168,25 @@ namespace osu.Game.Overlays.Mods
             content.BorderColour = ColourInfo.GradientVertical(background.Colour, glowColour);
             innerContent.BorderColour = ColourInfo.GradientVertical(innerBackground.Colour, glowColour);
 
-            updateStarDifficultyBind();
+            BeatmapInfo.BindValueChanged(_ => updateValues(), true);
+
+            mods.BindValueChanged(_ =>
+            {
+                modSettingChangeTracker?.Dispose();
+
+                modSettingChangeTracker = new ModSettingChangeTracker(mods.Value);
+                modSettingChangeTracker.SettingChanged += _ => updateValues();
+                updateValues();
+            });
         }
 
-        private void updateStarDifficultyBind()
+        private void updateValues() => Scheduler.AddOnce(() =>
         {
-            if (beatmapInfo == null)
+            if (BeatmapInfo.Value == null)
                 return;
 
             cancellationSource?.Cancel();
-            starDifficulty = difficultyCache.GetBindableDifficulty(beatmapInfo, (cancellationSource = new CancellationTokenSource()).Token);
+            starDifficulty = difficultyCache.GetBindableDifficulty(BeatmapInfo.Value, (cancellationSource = new CancellationTokenSource()).Token);
             starDifficulty.BindValueChanged(s =>
             {
                 starRatingDisplay.Current.Value = s.NewValue ?? default;
@@ -197,20 +196,14 @@ namespace osu.Game.Overlays.Mods
 
                 starRatingDisplay.FadeIn(transition_duration);
             });
-        }
-
-        public void UpdateValues()
-        {
-            if (beatmapInfo == null)
-                return;
 
             double rate = 1;
             foreach (var mod in mods.Value.OfType<IApplicableToRate>())
                 rate = mod.ApplyToRate(0, rate);
 
-            bpmDisplay.Current.Value = beatmapInfo.BPM * rate;
+            bpmDisplay.Current.Value = BeatmapInfo.Value.BPM * rate;
 
-            BeatmapDifficulty adjustedDifficulty = new BeatmapDifficulty(beatmapInfo.Difficulty);
+            BeatmapDifficulty adjustedDifficulty = new BeatmapDifficulty(BeatmapInfo.Value.Difficulty);
             foreach (var mod in mods.Value.OfType<IApplicableToDifficulty>())
                 mod.ApplyToDifficulty(adjustedDifficulty);
 
@@ -218,7 +211,7 @@ namespace osu.Game.Overlays.Mods
             drainRateDisplay.Current.Value = adjustedDifficulty.DrainRate;
             approachRateDisplay.Current.Value = adjustedDifficulty.ApproachRate;
             overallDifficultyDisplay.Current.Value = adjustedDifficulty.OverallDifficulty;
-        }
+        });
 
         private partial class BPMDisplay : RollingCounter<double>
         {

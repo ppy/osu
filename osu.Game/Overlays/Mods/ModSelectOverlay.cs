@@ -143,7 +143,7 @@ namespace osu.Game.Overlays.Mods
                 if (beatmap == value) return;
 
                 beatmap = value;
-                modEffectPreviewPanel.BeatmapInfo = beatmap.BeatmapInfo;
+                modEffectPreviewPanel.BeatmapInfo.Value = beatmap.BeatmapInfo;
             }
         }
 
@@ -300,7 +300,6 @@ namespace osu.Game.Overlays.Mods
 
             SelectedMods.BindValueChanged(_ =>
             {
-                modEffectPreviewPanel.UpdateValues();
                 updateMultiplier();
                 updateFromExternalSelection();
                 updateCustomisation();
@@ -314,11 +313,7 @@ namespace osu.Game.Overlays.Mods
                     //
                     // See https://github.com/ppy/osu/pull/23284#issuecomment-1529056988
                     modSettingChangeTracker = new ModSettingChangeTracker(SelectedMods.Value);
-                    modSettingChangeTracker.SettingChanged += _ =>
-                    {
-                        modEffectPreviewPanel.UpdateValues();
-                        updateMultiplier();
-                    };
+                    modSettingChangeTracker.SettingChanged += _ => updateMultiplier();
                 }
             }, true);
 
