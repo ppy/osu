@@ -69,9 +69,6 @@ namespace osu.Game.Storyboards.Drawables
 
         public override bool RemoveWhenNotAlive => false;
 
-        protected override Vector2 DrawScale
-            => new Vector2(FlipH ? -base.DrawScale.X : base.DrawScale.X, FlipV ? -base.DrawScale.Y : base.DrawScale.Y) * VectorScale;
-
         public override Anchor Origin => StoryboardExtensions.AdjustOrigin(base.Origin, VectorScale, FlipH, FlipV);
 
         public override bool IsPresent
@@ -129,6 +126,13 @@ namespace osu.Game.Storyboards.Drawables
             // In the case of storyboard animations, we want to synchronise with game time perfectly
             // so let's get a correct time based on gameplay clock and earliest transform.
             PlaybackPosition = beatSyncProvider.Clock.CurrentTime - Animation.EarliestTransformTime;
+        }
+
+        protected override void Update()
+        {
+            base.Update();
+
+            InternalChild.Scale = new Vector2(FlipH ? -base.DrawScale.X : base.DrawScale.X, FlipV ? -base.DrawScale.Y : base.DrawScale.Y) * VectorScale;
         }
 
         private void skinSourceChanged()
