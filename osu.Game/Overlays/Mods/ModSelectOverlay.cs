@@ -133,9 +133,9 @@ namespace osu.Game.Overlays.Mods
 
         private Sample? columnAppearSample;
 
-        private WorkingBeatmap beatmap = null!;
+        private WorkingBeatmap? beatmap;
 
-        public WorkingBeatmap Beatmap
+        public WorkingBeatmap? Beatmap
         {
             get => beatmap;
             set
@@ -143,7 +143,8 @@ namespace osu.Game.Overlays.Mods
                 if (beatmap == value) return;
 
                 beatmap = value;
-                modEffectPreviewPanel.BeatmapInfo.Value = beatmap.BeatmapInfo;
+                if (IsLoaded)
+                    modEffectPreviewPanel.BeatmapInfo.Value = beatmap?.BeatmapInfo;
             }
         }
 
@@ -246,7 +247,8 @@ namespace osu.Game.Overlays.Mods
                     {
                         Vertical = PADDING,
                         Horizontal = 70
-                    }
+                    },
+                    BeatmapInfo = { Value = beatmap?.BeatmapInfo }
                 },
                 footerButtonFlow = new FillFlowContainer<ShearedButton>
                 {
