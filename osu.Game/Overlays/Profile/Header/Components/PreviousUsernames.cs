@@ -84,6 +84,7 @@ namespace osu.Game.Overlays.Profile.Header.Components
                                 RelativeSizeAxes = Axes.X,
                                 AutoSizeAxes = Axes.Y,
                                 Direction = FillDirection.Full,
+                                AlwaysPresent = true,
                                 Margin = new MarginPadding { Bottom = margin, Top = margin / 2f }
                             }
                         }
