@@ -130,7 +130,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
                     // We'll redo the calculations to match osu-stable here...
                     const double maximum_rotations_per_second = 477.0 / 60;
 
-                    // Normally, this value depends on the final overall difficulty. For simplicity, we'll only consider the worst case that maximises rotations.
+                    // Normally, this value depends on the final overall difficulty. For simplicity, we'll only consider the worst case that minimises bonus score.
                     const double minimum_rotations_per_second = 7.5;
 
                     double secondsDuration = spinner.Duration / 1000;
