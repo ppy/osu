@@ -108,6 +108,8 @@ namespace osu.Game.Tests.Visual.UserInterface
                 if (panel.IsNotNull())
                     doubleTime.SpeedChange.Value = rate;
             });
+
+            AddToggleStep("toggle collapsed", collapsed => panel.Collapsed.Value = collapsed);
         }
 
         private void previewStarRating(double stars)

@@ -35,6 +35,7 @@ namespace osu.Game.Overlays.Mods
         private StarRatingDisplay starRatingDisplay = null!;
         private BPMDisplay bpmDisplay = null!;
 
+        private FillFlowContainer<VerticalAttributeDisplay> outerContent = null!;
         private VerticalAttributeDisplay circleSizeDisplay = null!;
         private VerticalAttributeDisplay drainRateDisplay = null!;
         private VerticalAttributeDisplay approachRateDisplay = null!;
@@ -43,6 +44,8 @@ namespace osu.Game.Overlays.Mods
         private const float transition_duration = 250;
 
         public Bindable<IBeatmapInfo?> BeatmapInfo { get; } = new Bindable<IBeatmapInfo?>();
+
+        public BindableBool Collapsed { get; } = new BindableBool();
 
         [Resolved]
         private Bindable<IReadOnlyList<Mod>> mods { get; set; } = null!;
@@ -69,6 +72,8 @@ namespace osu.Game.Overlays.Mods
                 Origin = Anchor.BottomRight,
                 Anchor = Anchor.BottomRight,
                 AutoSizeAxes = Axes.X,
+                AutoSizeEasing = Easing.OutQuint,
+                AutoSizeDuration = transition_duration,
                 Height = ShearedButton.HEIGHT,
                 Shear = new Vector2(shear, 0),
                 CornerRadius = ShearedButton.CORNER_RADIUS,
@@ -127,7 +132,7 @@ namespace osu.Game.Overlays.Mods
                                     }
                                 }
                             },
-                            new FillFlowContainer<VerticalAttributeDisplay> // outer content
+                            outerContent = new FillFlowContainer<VerticalAttributeDisplay>
                             {
                                 Origin = Anchor.CentreLeft,
                                 Anchor = Anchor.CentreLeft,
@@ -166,6 +171,8 @@ namespace osu.Game.Overlays.Mods
                 modSettingChangeTracker.SettingChanged += _ => updateValues();
                 updateValues();
             }, true);
+
+            Collapsed.BindValueChanged(collapsed => outerContent.FadeTo(collapsed.NewValue ? 0 : 1, transition_duration, Easing.OutQuint), true);
         }
 
         private void updateValues() => Scheduler.AddOnce(() =>
