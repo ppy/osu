@@ -227,27 +227,6 @@ namespace osu.Game.Overlays.Mods
                 }
             });
 
-            if (ShowModEffects)
-            {
-                aboveColumnsContent.Add(multiplierDisplay = new DifficultyMultiplierDisplay
-                {
-                    Anchor = Anchor.TopRight,
-                    Origin = Anchor.TopRight
-                });
-
-                FooterContent.Add(modEffectPreviewPanel = new ModEffectPreviewPanel
-                {
-                    Anchor = Anchor.BottomRight,
-                    Origin = Anchor.BottomRight,
-                    Margin = new MarginPadding
-                    {
-                        Vertical = PADDING,
-                        Horizontal = 70
-                    },
-                    BeatmapInfo = { Value = beatmap?.BeatmapInfo }
-                });
-            }
-
             FooterContent.Add(footerButtonFlow = new FillFlowContainer<ShearedButton>
             {
                 RelativeSizeAxes = Axes.X,
@@ -269,6 +248,27 @@ namespace osu.Game.Overlays.Mods
                     LighterColour = colours.Pink1
                 })
             });
+
+            if (ShowModEffects)
+            {
+                aboveColumnsContent.Add(multiplierDisplay = new DifficultyMultiplierDisplay
+                {
+                    Anchor = Anchor.TopRight,
+                    Origin = Anchor.TopRight
+                });
+
+                FooterContent.Add(modEffectPreviewPanel = new ModEffectPreviewPanel
+                {
+                    Anchor = Anchor.BottomRight,
+                    Origin = Anchor.BottomRight,
+                    Margin = new MarginPadding
+                    {
+                        Vertical = PADDING,
+                        Horizontal = 70
+                    },
+                    BeatmapInfo = { Value = beatmap?.BeatmapInfo }
+                });
+            }
 
             globalAvailableMods.BindTo(game.AvailableMods);
         }
