@@ -22,6 +22,8 @@ namespace osu.Game.Storyboards.Drawables
 {
     public partial class DrawableStoryboard : Container<DrawableStoryboardLayer>
     {
+        public Vector2 AppliedScale { get; private set; }
+
         [Cached]
         public Storyboard Storyboard { get; }
 
@@ -33,8 +35,6 @@ namespace osu.Game.Storyboards.Drawables
         private readonly BindableBool hasStoryboardEnded = new BindableBool(true);
 
         protected override Container<DrawableStoryboardLayer> Content { get; }
-
-        protected override Vector2 DrawScale => new Vector2(Parent.DrawHeight / 480);
 
         private bool passing = true;
 
@@ -106,6 +106,8 @@ namespace osu.Game.Storyboards.Drawables
         {
             base.Update();
             hasStoryboardEnded.Value = lastEventEndTime == null || Time.Current >= lastEventEndTime;
+
+            Content.Scale = AppliedScale = new Vector2(Parent.DrawHeight / 480);
         }
 
         public DrawableStoryboardLayer OverlayLayer => Children.Single(layer => layer.Name == "Overlay");
