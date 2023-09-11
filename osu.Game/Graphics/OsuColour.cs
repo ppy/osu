@@ -383,7 +383,6 @@ namespace osu.Game.Graphics
 
         // Content Background
         public readonly Color4 B5 = Color4Extensions.FromHex(@"222a28");
-        public readonly Color4 B6 = Color4Extensions.FromHex(@"1c1719"); // hsl(333,10%,10%)
 
         public readonly Color4 RedLighter = Color4Extensions.FromHex(@"ffeded");
         public readonly Color4 RedLight = Color4Extensions.FromHex(@"ed7787");
