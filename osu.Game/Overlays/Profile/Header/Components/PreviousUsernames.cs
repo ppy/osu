@@ -22,8 +22,9 @@ namespace osu.Game.Overlays.Profile.Header.Components
     {
         private const int duration = 200;
         private const int margin = 10;
-        private const int width = 310;
+        private const int width = 300;
         private const int move_offset = 15;
+        private const int base_y_offset = -3; // eye balled to make it look good
 
         public readonly Bindable<APIUser?> User = new Bindable<APIUser?>();
 
@@ -39,6 +40,7 @@ namespace osu.Game.Overlays.Profile.Header.Components
             Width = width;
             Masking = true;
             CornerRadius = 6;
+            Y = base_y_offset;
 
             AddRangeInternal(new Drawable[]
             {
@@ -135,7 +137,7 @@ namespace osu.Game.Overlays.Profile.Header.Components
             text.FadeIn(duration, Easing.OutQuint);
             header.FadeIn(duration, Easing.OutQuint);
             background.FadeIn(duration, Easing.OutQuint);
-            this.MoveToY(-move_offset, duration, Easing.OutQuint);
+            this.MoveToY(base_y_offset - move_offset, duration, Easing.OutQuint);
         }
 
         private void hideContent()
@@ -143,7 +145,7 @@ namespace osu.Game.Overlays.Profile.Header.Components
             text.FadeOut(duration, Easing.OutQuint);
             header.FadeOut(duration, Easing.OutQuint);
             background.FadeOut(duration, Easing.OutQuint);
-            this.MoveToY(0, duration, Easing.OutQuint);
+            this.MoveToY(base_y_offset, duration, Easing.OutQuint);
         }
 
         private partial class HoverIconContainer : Container
