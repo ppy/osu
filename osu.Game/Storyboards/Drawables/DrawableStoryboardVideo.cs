@@ -8,6 +8,8 @@ using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Textures;
 using osu.Framework.Graphics.Video;
 using osu.Game.Beatmaps;
+using osu.Game.Screens.Play;
+using osuTK;
 
 namespace osu.Game.Storyboards.Drawables
 {
@@ -41,13 +43,14 @@ namespace osu.Game.Storyboards.Drawables
 
             InternalChild = drawableVideo = new Video(stream, false)
             {
-                RelativeSizeAxes = Axes.Both,
-                FillMode = FillMode.Fill,
                 Anchor = Anchor.Centre,
                 Origin = Anchor.Centre,
                 Alpha = 0,
             };
         }
+
+        private ScreenWithBeatmapBackground? parentScreen;
+        private DrawableStoryboard? parentStoryboard;
 
         protected override void LoadComplete()
         {
@@ -63,6 +66,26 @@ namespace osu.Game.Storyboards.Drawables
 
                 using (drawableVideo.BeginDelayedSequence(drawableVideo.Duration - 500))
                     drawableVideo.FadeOut(500);
+            }
+
+            parentScreen = this.FindClosestParent<ScreenWithBeatmapBackground>();
+            parentStoryboard = this.FindClosestParent<DrawableStoryboard>();
+        }
+
+        protected override void Update()
+        {
+            base.Update();
+
+            if (drawableVideo != null)
+            {
+                // Stable fits storyboard videos to always take up the full window width.
+                // Since we're inside `DrawableStoryboard`, we have to do a bit of messy stuff to make this happen.
+                //
+                // A future refactor could see videos moved out of the storyboard hierarchy, although that may come with other consequences.
+                Vector2 fittableSize = parentScreen?.DrawSize ?? DrawSize;
+                float storyboardScale = parentStoryboard?.AppliedScale.X ?? 1;
+
+                drawableVideo.Size = new Vector2(fittableSize.X, fittableSize.X / drawableVideo.FillAspectRatio) / storyboardScale;
             }
         }
     }
