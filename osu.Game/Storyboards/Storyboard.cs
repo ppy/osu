@@ -92,7 +92,7 @@ namespace osu.Game.Storyboards
 
         private static readonly string[] image_extensions = { @".png", @".jpg" };
 
-        public Texture? GetTextureFromPath(string path, TextureStore textureStore)
+        public virtual Texture? GetTextureFromPath(string path, TextureStore textureStore)
         {
             string? resolvedPath = null;
 
