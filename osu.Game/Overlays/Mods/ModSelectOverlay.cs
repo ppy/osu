@@ -124,8 +124,7 @@ namespace osu.Game.Overlays.Mods
 
         private Container aboveColumnsContent = null!;
         private DifficultyMultiplierDisplay? multiplierDisplay;
-
-        private ModEffectPreviewPanel modEffectPreviewPanel = null!;
+        private ModEffectPreviewPanel? modEffectPreviewPanel;
 
         protected ShearedButton BackButton { get; private set; } = null!;
         protected ShearedToggleButton? CustomisationButton { get; private set; }
@@ -143,7 +142,7 @@ namespace osu.Game.Overlays.Mods
                 if (beatmap == value) return;
 
                 beatmap = value;
-                if (IsLoaded)
+                if (IsLoaded && modEffectPreviewPanel != null)
                     modEffectPreviewPanel.BeatmapInfo.Value = beatmap?.BeatmapInfo;
             }
         }
