@@ -46,6 +46,7 @@ namespace osu.Game.Overlays.Profile.Header
         private OsuSpriteText userCountryText = null!;
         private GroupBadgeFlow groupBadgeFlow = null!;
         private ToggleCoverButton coverToggle = null!;
+        private PreviousUsernames previousUsernames = null!;
 
         private Bindable<bool> coverExpanded = null!;
 
@@ -143,6 +144,18 @@ namespace osu.Game.Overlays.Profile.Header
                                                             Anchor = Anchor.CentreLeft,
                                                             Origin = Anchor.CentreLeft,
                                                         },
+                                                        new Container
+                                                        {
+                                                            Child = previousUsernames = new PreviousUsernames
+                                                            {
+                                                                Anchor = Anchor.TopLeft,
+                                                                Origin = Anchor.TopLeft,
+                                                            },
+                                                            Anchor = Anchor.TopLeft,
+                                                            Origin = Anchor.TopLeft,
+                                                            Size = new Vector2(0),
+                                                            Position = new Vector2(10)
+                                                        }
                                                     }
                                                 },
                                                 titleText = new OsuSpriteText
@@ -216,6 +229,7 @@ namespace osu.Game.Overlays.Profile.Header
             titleText.Text = user?.Title ?? string.Empty;
             titleText.Colour = Color4Extensions.FromHex(user?.Colour ?? "fff");
             groupBadgeFlow.User.Value = user;
+            previousUsernames.User.Value = user;
         }
 
         private void updateCoverState()
