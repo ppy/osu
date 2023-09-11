@@ -924,6 +924,9 @@ namespace osu.Game.Overlays.Mods
                         OnClicked?.Invoke();
                         return true;
 
+                    case HoverEvent:
+                        return false;
+
                     case MouseEvent:
                         return true;
                 }

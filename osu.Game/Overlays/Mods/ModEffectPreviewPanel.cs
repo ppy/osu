@@ -20,6 +20,7 @@ using osu.Game.Rulesets.Mods;
 using osuTK;
 using osuTK.Graphics;
 using System.Threading;
+using osu.Framework.Input.Events;
 using osu.Game.Configuration;
 
 namespace osu.Game.Overlays.Mods
@@ -67,7 +68,7 @@ namespace osu.Game.Overlays.Mods
             const float shear = ShearedOverlayContainer.SHEAR;
 
             AutoSizeAxes = Axes.Both;
-            InternalChild = content = new InputBlockingContainer
+            InternalChild = content = new Container
             {
                 Origin = Anchor.BottomRight,
                 Anchor = Anchor.BottomRight,
@@ -172,9 +173,25 @@ namespace osu.Game.Overlays.Mods
                 updateValues();
             }, true);
 
-            Collapsed.BindValueChanged(collapsed => outerContent.FadeTo(collapsed.NewValue ? 0 : 1, transition_duration, Easing.OutQuint), true);
+            Collapsed.BindValueChanged(_ => updateCollapsedState(), true);
             FinishTransforms(true);
         }
+
+        protected override bool OnHover(HoverEvent e)
+        {
+            updateCollapsedState();
+            return true;
+        }
+
+        protected override void OnHoverLost(HoverLostEvent e)
+        {
+            updateCollapsedState();
+            base.OnHoverLost(e);
+        }
+
+        protected override bool OnMouseDown(MouseDownEvent e) => true;
+
+        protected override bool OnClick(ClickEvent e) => true;
 
         private void updateValues() => Scheduler.AddOnce(() =>
         {
@@ -206,6 +223,11 @@ namespace osu.Game.Overlays.Mods
             approachRateDisplay.Current.Value = adjustedDifficulty.ApproachRate;
             overallDifficultyDisplay.Current.Value = adjustedDifficulty.OverallDifficulty;
         });
+
+        private void updateCollapsedState()
+        {
+            outerContent.FadeTo(Collapsed.Value && !IsHovered ? 0 : 1, transition_duration, Easing.OutQuint);
+        }
 
         private partial class BPMDisplay : RollingCounter<double>
         {
