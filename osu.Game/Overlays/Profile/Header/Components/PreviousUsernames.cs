@@ -99,9 +99,9 @@ namespace osu.Game.Overlays.Profile.Header.Components
         }
 
         [BackgroundDependencyLoader]
-        private void load(OsuColour colours)
+        private void load(OverlayColourProvider colours)
         {
-            background.Colour = colours.B6;
+            background.Colour = colours.Background6;
         }
 
         protected override void LoadComplete()
