@@ -5,6 +5,7 @@ using System;
 using NUnit.Framework;
 using osu.Framework.Graphics;
 using osu.Game.Online.API.Requests.Responses;
+using osu.Game.Overlays;
 using osu.Game.Overlays.Profile.Header.Components;
 
 namespace osu.Game.Tests.Visual.Online
@@ -13,12 +14,20 @@ namespace osu.Game.Tests.Visual.Online
     public partial class TestSceneUserProfilePreviousUsernames : OsuTestScene
     {
         private PreviousUsernames container = null!;
+        private OverlayColourProvider colourProvider = null!;
 
         [SetUp]
         public void SetUp() => Schedule(() =>
         {
-            Child = container = new PreviousUsernames
+            colourProvider = new OverlayColourProvider(OverlayColourScheme.Pink);
+            Child = new DependencyProvidingContainer
             {
+                Child = container = new PreviousUsernames
+                {
+                    Anchor = Anchor.Centre,
+                    Origin = Anchor.Centre,
+                },
+                CachedDependencies = new (Type, object)[] { (typeof(OverlayColourProvider), colourProvider) },
                 Anchor = Anchor.Centre,
                 Origin = Anchor.Centre,
             };
