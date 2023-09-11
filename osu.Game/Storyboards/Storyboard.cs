@@ -86,7 +86,7 @@ namespace osu.Game.Storyboards
             }
         }
 
-        public DrawableStoryboard CreateDrawable(IReadOnlyList<Mod>? mods = null) =>
+        public virtual DrawableStoryboard CreateDrawable(IReadOnlyList<Mod>? mods = null) =>
             new DrawableStoryboard(this, mods);
 
         private static readonly string[] image_extensions = { @".png", @".jpg" };
