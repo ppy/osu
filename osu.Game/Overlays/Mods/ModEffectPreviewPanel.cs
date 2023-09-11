@@ -182,8 +182,6 @@ namespace osu.Game.Overlays.Mods
 
                 if (!starRatingDisplay.IsPresent)
                     starRatingDisplay.FinishTransforms(true);
-
-                starRatingDisplay.FadeIn(transition_duration);
             });
 
             double rate = 1;
