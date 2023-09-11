@@ -38,7 +38,7 @@ namespace osu.Game.Overlays.Profile.Header.Components
             AutoSizeAxes = Axes.Y;
             Width = width;
             Masking = true;
-            CornerRadius = 5;
+            CornerRadius = 6;
 
             AddRangeInternal(new Drawable[]
             {
@@ -99,7 +99,7 @@ namespace osu.Game.Overlays.Profile.Header.Components
         [BackgroundDependencyLoader]
         private void load(OsuColour colours)
         {
-            background.Colour = colours.GreySeaFoamDarker;
+            background.Colour = colours.B6;
         }
 
         protected override void LoadComplete()
@@ -157,7 +157,7 @@ namespace osu.Game.Overlays.Profile.Header.Components
                 {
                     Margin = new MarginPadding { Top = 6, Left = margin, Right = margin * 2 },
                     Size = new Vector2(15),
-                    Icon = FontAwesome.Solid.IdCard,
+                    Icon = FontAwesome.Solid.AddressCard,
                 };
             }
 
