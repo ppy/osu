@@ -45,7 +45,7 @@ namespace osu.Game.Overlays.Mods
 
         public Bindable<IBeatmapInfo?> BeatmapInfo { get; } = new Bindable<IBeatmapInfo?>();
 
-        public BindableBool Collapsed { get; } = new BindableBool();
+        public BindableBool Collapsed { get; } = new BindableBool(true);
 
         [Resolved]
         private Bindable<IReadOnlyList<Mod>> mods { get; set; } = null!;
@@ -173,6 +173,7 @@ namespace osu.Game.Overlays.Mods
             }, true);
 
             Collapsed.BindValueChanged(collapsed => outerContent.FadeTo(collapsed.NewValue ? 0 : 1, transition_duration, Easing.OutQuint), true);
+            FinishTransforms(true);
         }
 
         private void updateValues() => Scheduler.AddOnce(() =>
