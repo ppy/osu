@@ -154,7 +154,6 @@ namespace osu.Game.Overlays.Profile.Header
                                                             Anchor = Anchor.TopLeft,
                                                             Origin = Anchor.TopLeft,
                                                             Size = new Vector2(0),
-                                                            Position = new Vector2(10)
                                                         }
                                                     }
                                                 },
