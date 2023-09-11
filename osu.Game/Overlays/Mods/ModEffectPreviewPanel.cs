@@ -25,26 +25,26 @@ namespace osu.Game.Overlays.Mods
 {
     public partial class ModEffectPreviewPanel : CompositeDrawable
     {
-        private Container content;
-        private Container innerContent;
+        private Container content = null!;
+        private Container innerContent = null!;
 
-        private Box background;
-        private Box innerBackground;
+        private Box background = null!;
+        private Box innerBackground = null!;
 
-        private StarRatingDisplay starRatingDisplay;
-        private BPMDisplay bpmDisplay;
+        private StarRatingDisplay starRatingDisplay = null!;
+        private BPMDisplay bpmDisplay = null!;
 
-        private VerticalAttributeDisplay circleSizeDisplay;
-        private VerticalAttributeDisplay drainRateDisplay;
-        private VerticalAttributeDisplay approachRateDisplay;
-        private VerticalAttributeDisplay overallDifficultyDisplay;
+        private VerticalAttributeDisplay circleSizeDisplay = null!;
+        private VerticalAttributeDisplay drainRateDisplay = null!;
+        private VerticalAttributeDisplay approachRateDisplay = null!;
+        private VerticalAttributeDisplay overallDifficultyDisplay = null!;
 
         public const float HEIGHT = 50; // as ModSelectOverlay footer buttons
         private const float transition_duration = 250;
 
-        private IBeatmapInfo beatmapInfo = null!;
+        private IBeatmapInfo? beatmapInfo;
 
-        public IBeatmapInfo BeatmapInfo
+        public IBeatmapInfo? BeatmapInfo
         {
             get => beatmapInfo;
             set
@@ -66,10 +66,11 @@ namespace osu.Game.Overlays.Mods
         [Resolved]
         private BeatmapDifficultyCache difficultyCache { get; set; } = null!;
 
-        private CancellationTokenSource cancellationSource = null!;
+        private CancellationTokenSource? cancellationSource;
         private IBindable<StarDifficulty?> starDifficulty = null!;
 
-        public ModEffectPreviewPanel()
+        [BackgroundDependencyLoader]
+        private void load()
         {
             // values as ModSelectOverlay footer buttons
             const float shear = ShearedOverlayContainer.SHEAR;
@@ -170,20 +171,25 @@ namespace osu.Game.Overlays.Mods
                 }
             };
         }
+
         protected override void LoadComplete()
         {
             background.Colour = colourProvider.Background4;
             innerBackground.Colour = colourProvider.Background3;
-            Color4 glow_colour = colourProvider.Background1;
+            Color4 glowColour = colourProvider.Background1;
 
-            content.BorderColour = ColourInfo.GradientVertical(background.Colour, glow_colour);
-            innerContent.BorderColour = ColourInfo.GradientVertical(innerBackground.Colour, glow_colour);
+            content.BorderColour = ColourInfo.GradientVertical(background.Colour, glowColour);
+            innerContent.BorderColour = ColourInfo.GradientVertical(innerBackground.Colour, glowColour);
 
             updateStarDifficultyBind();
         }
+
         private void updateStarDifficultyBind()
         {
-            if (cancellationSource != null) cancellationSource.Cancel();
+            if (beatmapInfo == null)
+                return;
+
+            cancellationSource?.Cancel();
             starDifficulty = difficultyCache.GetBindableDifficulty(beatmapInfo, (cancellationSource = new CancellationTokenSource()).Token);
             starDifficulty.BindValueChanged(s =>
             {
@@ -195,9 +201,11 @@ namespace osu.Game.Overlays.Mods
                 starRatingDisplay.FadeIn(transition_duration);
             });
         }
+
         public void UpdateValues()
         {
-            if (beatmapInfo == null) return;
+            if (beatmapInfo == null)
+                return;
 
             double rate = 1;
             foreach (var mod in mods.Value.OfType<IApplicableToRate>())
@@ -205,7 +213,7 @@ namespace osu.Game.Overlays.Mods
 
             bpmDisplay.Current.Value = beatmapInfo.BPM * rate;
 
-            BeatmapDifficulty adjustedDifficulty = new BeatmapDifficulty(BeatmapInfo.Difficulty);
+            BeatmapDifficulty adjustedDifficulty = new BeatmapDifficulty(beatmapInfo.Difficulty);
             foreach (var mod in mods.Value.OfType<IApplicableToDifficulty>())
                 mod.ApplyToDifficulty(adjustedDifficulty);
 
