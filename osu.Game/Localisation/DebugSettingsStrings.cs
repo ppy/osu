@@ -15,11 +15,6 @@ namespace osu.Game.Localisation
         public static LocalisableString DebugSectionHeader => new TranslatableString(getKey(@"debug_section_header"), @"Debug");
 
         /// <summary>
-        /// "General"
-        /// </summary>
-        public static LocalisableString GeneralHeader => new TranslatableString(getKey(@"general_header"), @"General");
-
-        /// <summary>
         /// "Show log overlay"
         /// </summary>
         public static LocalisableString ShowLogOverlay => new TranslatableString(getKey(@"show_log_overlay"), @"Show log overlay");

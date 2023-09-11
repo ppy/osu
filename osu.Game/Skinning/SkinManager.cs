@@ -261,13 +261,22 @@ namespace osu.Game.Skinning
         private T lookupWithFallback<T>(Func<ISkin, T> lookupFunction)
             where T : class
         {
-            foreach (var source in AllSources)
+            try
             {
-                if (lookupFunction(source) is T skinSourced)
-                    return skinSourced;
-            }
+                Skin.LogLookupDebug(this, lookupFunction, Skin.LookupDebugType.Enter);
 
-            return null;
+                foreach (var source in AllSources)
+                {
+                    if (lookupFunction(source) is T skinSourced)
+                        return skinSourced;
+                }
+
+                return null;
+            }
+            finally
+            {
+                Skin.LogLookupDebug(this, lookupFunction, Skin.LookupDebugType.Exit);
+            }
         }
 
         #region IResourceStorageProvider
