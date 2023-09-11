@@ -21,6 +21,7 @@ namespace osu.Game.Overlays.Mods
             get => current.Current;
             set => current.Current = value;
         }
+
         private readonly BindableWithCurrent<double> current = new BindableWithCurrent<double>();
 
         /// <summary>
@@ -28,7 +29,7 @@ namespace osu.Game.Overlays.Mods
         /// </summary>
         public LocalisableString Label { get; protected set; }
 
-        public VerticalAttributeDisplay(LocalisableString label, string format = "0.#")
+        public VerticalAttributeDisplay(LocalisableString label)
         {
             Label = label;
             AutoSizeAxes = Axes.X;
@@ -50,12 +51,11 @@ namespace osu.Game.Overlays.Mods
                         Margin = new MarginPadding { Horizontal = 15 }, // to reserve space for 0.XX value
                         Font = OsuFont.Default.With(size: 20, weight: FontWeight.Bold)
                     },
-                    new EffectCounter()
+                    new EffectCounter
                     {
                         Origin = Anchor.Centre,
                         Anchor = Anchor.Centre,
                         Current = { BindTarget = Current },
-                        Format = format
                     }
                 }
             };
@@ -65,9 +65,7 @@ namespace osu.Game.Overlays.Mods
         {
             protected override double RollingDuration => 500;
 
-            public string Format = "0.#";
-
-            protected override LocalisableString FormatCount(double count) => count.ToLocalisableString(Format);
+            protected override LocalisableString FormatCount(double count) => count.ToLocalisableString("0.0");
 
             protected override OsuSpriteText CreateSpriteText() => new OsuSpriteText
             {

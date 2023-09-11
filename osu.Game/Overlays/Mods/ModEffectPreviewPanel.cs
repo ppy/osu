@@ -61,7 +61,6 @@ namespace osu.Game.Overlays.Mods
         [BackgroundDependencyLoader]
         private void load()
         {
-            // values as ModSelectOverlay footer buttons
             const float shear = ShearedOverlayContainer.SHEAR;
 
             AutoSizeAxes = Axes.Both;
@@ -103,36 +102,26 @@ namespace osu.Game.Overlays.Mods
                                     {
                                         RelativeSizeAxes = Axes.Both
                                     },
-                                    new FillFlowContainer // actual inner content
+                                    new Container // actual inner content
                                     {
-                                        Origin = Anchor.CentreLeft,
-                                        Anchor = Anchor.CentreLeft,
-                                        AutoSizeAxes = Axes.X,
-                                        Direction = FillDirection.Horizontal,
+                                        Origin = Anchor.Centre,
+                                        Anchor = Anchor.Centre,
+                                        Width = 140,
+                                        RelativeSizeAxes = Axes.Y,
                                         Margin = new MarginPadding { Horizontal = 15 },
                                         Children = new Drawable[]
                                         {
-                                            new Container // wrap to reserve space for StarRatingDisplay
-                                            {
-                                                Width = 70, // can be up to 70px on extra high SR
-                                                Child = starRatingDisplay = new StarRatingDisplay(default, animated: true)
-                                                {
-                                                    Origin = Anchor.CentreLeft,
-                                                    Anchor = Anchor.CentreLeft,
-                                                    Shear = new Vector2(-shear, 0),
-                                                }
-                                            },
-                                            new Container // wrap to reserve space for BPM
+                                            starRatingDisplay = new StarRatingDisplay(default, animated: true)
                                             {
                                                 Origin = Anchor.CentreLeft,
                                                 Anchor = Anchor.CentreLeft,
-                                                Width = 70,
-                                                Child = bpmDisplay = new BPMDisplay
-                                                {
-                                                    Origin = Anchor.CentreLeft,
-                                                    Anchor = Anchor.CentreLeft,
-                                                    Shear = new Vector2(-shear, 0),
-                                                }
+                                                Shear = new Vector2(-shear, 0),
+                                            },
+                                            bpmDisplay = new BPMDisplay
+                                            {
+                                                Origin = Anchor.CentreRight,
+                                                Anchor = Anchor.CentreRight,
+                                                Shear = new Vector2(-shear, 0),
                                             }
                                         }
                                     }
@@ -147,10 +136,10 @@ namespace osu.Game.Overlays.Mods
                                 Direction = FillDirection.Horizontal,
                                 Children = new[]
                                 {
-                                    circleSizeDisplay = new VerticalAttributeDisplay("CS", "0.#"),
-                                    drainRateDisplay = new VerticalAttributeDisplay("HP", "0.#"),
-                                    approachRateDisplay = new VerticalAttributeDisplay("AR", "0.##"),
-                                    overallDifficultyDisplay = new VerticalAttributeDisplay("OD", "0.##"),
+                                    circleSizeDisplay = new VerticalAttributeDisplay("CS"),
+                                    drainRateDisplay = new VerticalAttributeDisplay("HP"),
+                                    approachRateDisplay = new VerticalAttributeDisplay("AR"),
+                                    overallDifficultyDisplay = new VerticalAttributeDisplay("OD"),
                                 }
                             }
                         }
@@ -221,7 +210,8 @@ namespace osu.Game.Overlays.Mods
 
             protected override OsuSpriteText CreateSpriteText() => new OsuSpriteText
             {
-                Font = OsuFont.Default.With(size: 20, weight: FontWeight.SemiBold)
+                Font = OsuFont.Default.With(size: 20, weight: FontWeight.SemiBold),
+                UseFullGlyphHeight = false,
             };
         }
     }
