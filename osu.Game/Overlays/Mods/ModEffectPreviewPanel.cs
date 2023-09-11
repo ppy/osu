@@ -39,7 +39,6 @@ namespace osu.Game.Overlays.Mods
         private VerticalAttributeDisplay approachRateDisplay = null!;
         private VerticalAttributeDisplay overallDifficultyDisplay = null!;
 
-        public const float HEIGHT = 50; // as ModSelectOverlay footer buttons
         private const float transition_duration = 250;
 
         private IBeatmapInfo? beatmapInfo;
@@ -74,8 +73,6 @@ namespace osu.Game.Overlays.Mods
         {
             // values as ModSelectOverlay footer buttons
             const float shear = ShearedOverlayContainer.SHEAR;
-            const float corner_radius = 7;
-            const float border_thickness = 2;
 
             AutoSizeAxes = Axes.Both;
             InternalChild = content = new InputBlockingContainer
@@ -83,10 +80,10 @@ namespace osu.Game.Overlays.Mods
                 Origin = Anchor.BottomRight,
                 Anchor = Anchor.BottomRight,
                 AutoSizeAxes = Axes.X,
-                Height = HEIGHT,
+                Height = ShearedButton.HEIGHT,
                 Shear = new Vector2(shear, 0),
-                CornerRadius = corner_radius,
-                BorderThickness = border_thickness,
+                CornerRadius = ShearedButton.CORNER_RADIUS,
+                BorderThickness = ShearedButton.BORDER_THICKNESS,
                 Masking = true,
                 Children = new Drawable[]
                 {
@@ -107,8 +104,8 @@ namespace osu.Game.Overlays.Mods
                             {
                                 AutoSizeAxes = Axes.X,
                                 RelativeSizeAxes = Axes.Y,
-                                BorderThickness = border_thickness,
-                                CornerRadius = corner_radius,
+                                BorderThickness = ShearedButton.BORDER_THICKNESS,
+                                CornerRadius = ShearedButton.CORNER_RADIUS,
                                 Masking = true,
                                 Children = new Drawable[]
                                 {
