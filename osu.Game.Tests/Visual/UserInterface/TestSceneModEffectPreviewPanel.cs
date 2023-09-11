@@ -9,7 +9,6 @@ using osu.Framework.Allocation;
 using osu.Framework.Extensions.ObjectExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
-using osu.Framework.Testing;
 using osu.Game.Beatmaps;
 using osu.Game.Overlays;
 using osu.Game.Overlays.Mods;
@@ -31,12 +30,14 @@ namespace osu.Game.Tests.Visual.UserInterface
         private OverlayColourProvider colourProvider = new OverlayColourProvider(OverlayColourScheme.Aquamarine);
 
         private Container content = null!;
+        protected override Container<Drawable> Content => content;
+
         private ModEffectPreviewPanel panel = null!;
 
-        [SetUpSteps]
-        public void SetUpSteps()
+        [BackgroundDependencyLoader]
+        private void load()
         {
-            AddStep("set up cache", () => Children = new Drawable[]
+            base.Content.AddRange(new Drawable[]
             {
                 difficultyCache,
                 content = new Container
@@ -52,7 +53,7 @@ namespace osu.Game.Tests.Visual.UserInterface
             OsuModDifficultyAdjust difficultyAdjust = new OsuModDifficultyAdjust();
             OsuModDoubleTime doubleTime = new OsuModDoubleTime();
 
-            AddStep("create display", () => content.Child = panel = new ModEffectPreviewPanel
+            AddStep("create display", () => Child = panel = new ModEffectPreviewPanel
             {
                 Anchor = Anchor.Centre,
                 Origin = Anchor.Centre,
