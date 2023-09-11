@@ -5,6 +5,7 @@ using System;
 using osu.Framework.Allocation;
 using osu.Framework.Extensions.ObjectExtensions;
 using osu.Framework.Graphics;
+using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.Textures;
 using osu.Framework.Utils;
@@ -13,66 +14,11 @@ using osuTK;
 
 namespace osu.Game.Storyboards.Drawables
 {
-    public partial class DrawableStoryboardSprite : Sprite, IFlippable, IVectorScalable
+    public partial class DrawableStoryboardSprite : CompositeDrawable, IFlippable, IVectorScalable
     {
         public StoryboardSprite Sprite { get; }
 
-        private bool flipH;
-
-        public bool FlipH
-        {
-            get => flipH;
-            set
-            {
-                if (flipH == value)
-                    return;
-
-                flipH = value;
-                Invalidate(Invalidation.MiscGeometry);
-            }
-        }
-
-        private bool flipV;
-
-        public bool FlipV
-        {
-            get => flipV;
-            set
-            {
-                if (flipV == value)
-                    return;
-
-                flipV = value;
-                Invalidate(Invalidation.MiscGeometry);
-            }
-        }
-
-        private Vector2 vectorScale = Vector2.One;
-
-        public Vector2 VectorScale
-        {
-            get => vectorScale;
-            set
-            {
-                if (vectorScale == value)
-                    return;
-
-                if (!Validation.IsFinite(value)) throw new ArgumentException($@"{nameof(VectorScale)} must be finite, but is {value}.");
-
-                vectorScale = value;
-                Invalidate(Invalidation.MiscGeometry);
-            }
-        }
-
-        public override bool RemoveWhenNotAlive => false;
-
-        protected override Vector2 DrawScale
-            => new Vector2(FlipH ? -base.DrawScale.X : base.DrawScale.X, FlipV ? -base.DrawScale.Y : base.DrawScale.Y) * VectorScale;
-
-        public override Anchor Origin => StoryboardExtensions.AdjustOrigin(base.Origin, VectorScale, FlipH, FlipV);
-
-        public override bool IsPresent
-            => !float.IsNaN(DrawPosition.X) && !float.IsNaN(DrawPosition.Y) && base.IsPresent;
+        private Sprite sprite = null!;
 
         public DrawableStoryboardSprite(StoryboardSprite sprite)
         {
@@ -90,9 +36,12 @@ namespace osu.Game.Storyboards.Drawables
         [BackgroundDependencyLoader]
         private void load(TextureStore textureStore, Storyboard storyboard)
         {
-            Texture = storyboard.GetTextureFromPath(Sprite.Path, textureStore);
+            InternalChild = sprite = new Sprite
+            {
+                Texture = storyboard.GetTextureFromPath(Sprite.Path, textureStore)
+            };
 
-            if (Texture == null && storyboard.UseSkinSprites)
+            if (sprite.Texture == null && storyboard.UseSkinSprites)
             {
                 skin.SourceChanged += skinSourceChanged;
                 skinSourceChanged();
@@ -101,7 +50,93 @@ namespace osu.Game.Storyboards.Drawables
             Sprite.ApplyTransforms(this);
         }
 
-        private void skinSourceChanged() => Texture = skin.GetTexture(Sprite.Path);
+        protected override void LoadComplete()
+        {
+            base.LoadComplete();
+
+            updateMetrics();
+        }
+
+        #region Storyboard element shared code (copy paste until we refactor)
+
+        private bool flipH;
+
+        public bool FlipH
+        {
+            get => flipH;
+            set
+            {
+                if (flipH == value)
+                    return;
+
+                flipH = value;
+                updateMetrics();
+            }
+        }
+
+        private bool flipV;
+
+        public bool FlipV
+        {
+            get => flipV;
+            set
+            {
+                if (flipV == value)
+                    return;
+
+                flipV = value;
+                updateMetrics();
+            }
+        }
+
+        private Vector2 vectorScale = Vector2.One;
+
+        public Vector2 VectorScale
+        {
+            get => vectorScale;
+            set
+            {
+                if (vectorScale == value)
+                    return;
+
+                if (!Validation.IsFinite(value)) throw new ArgumentException($@"{nameof(VectorScale)} must be finite, but is {value}.");
+
+                vectorScale = value;
+                updateMetrics();
+            }
+        }
+
+        public override bool RemoveWhenNotAlive => false;
+
+        private Anchor customOrigin;
+
+        public override Anchor Origin
+        {
+            get => base.Origin;
+            set
+            {
+                customOrigin = value;
+
+                // actual origin update will be handled by the following method call.
+                updateMetrics();
+            }
+        }
+
+        public override bool IsPresent
+            => !float.IsNaN(DrawPosition.X) && !float.IsNaN(DrawPosition.Y) && base.IsPresent;
+
+        private void updateMetrics()
+        {
+            if (!IsLoaded)
+                return;
+
+            InternalChild.Scale = new Vector2(FlipH ? -base.DrawScale.X : base.DrawScale.X, FlipV ? -base.DrawScale.Y : base.DrawScale.Y) * VectorScale;
+            base.Origin = InternalChild.Origin = StoryboardExtensions.AdjustOrigin(customOrigin, VectorScale, FlipH, FlipV);
+        }
+
+        #endregion
+
+        private void skinSourceChanged() => sprite.Texture = skin.GetTexture(Sprite.Path);
 
         protected override void Dispose(bool isDisposing)
         {
