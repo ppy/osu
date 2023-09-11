@@ -157,8 +157,7 @@ namespace osu.Game.Overlays.Mods
             content.BorderColour = ColourInfo.GradientVertical(background.Colour, glowColour);
             innerContent.BorderColour = ColourInfo.GradientVertical(innerBackground.Colour, glowColour);
 
-            BeatmapInfo.BindValueChanged(_ => updateValues(), true);
-
+            BeatmapInfo.BindValueChanged(_ => updateValues());
             mods.BindValueChanged(_ =>
             {
                 modSettingChangeTracker?.Dispose();
@@ -166,7 +165,7 @@ namespace osu.Game.Overlays.Mods
                 modSettingChangeTracker = new ModSettingChangeTracker(mods.Value);
                 modSettingChangeTracker.SettingChanged += _ => updateValues();
                 updateValues();
-            });
+            }, true);
         }
 
         private void updateValues() => Scheduler.AddOnce(() =>
