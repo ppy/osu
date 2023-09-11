@@ -78,9 +78,9 @@ namespace osu.Game.Overlays.Mods
         public ShearedSearchTextBox SearchTextBox { get; private set; } = null!;
 
         /// <summary>
-        /// Whether the total score multiplier calculated from the current selected set of mods should be shown.
+        /// Whether the effects (on score multiplier, on or beatmap difficulty) of the current selected set of mods should be shown.
         /// </summary>
-        protected virtual bool ShowTotalMultiplier => true;
+        protected virtual bool ShowModEffects => true;
 
         /// <summary>
         /// Whether per-mod customisation controls are visible.
@@ -228,18 +228,15 @@ namespace osu.Game.Overlays.Mods
                 }
             });
 
-            if (ShowTotalMultiplier)
+            if (ShowModEffects)
             {
                 aboveColumnsContent.Add(multiplierDisplay = new DifficultyMultiplierDisplay
                 {
                     Anchor = Anchor.TopRight,
                     Origin = Anchor.TopRight
                 });
-            }
 
-            FooterContent.Children = new Drawable[]
-            {
-                modEffectPreviewPanel = new ModEffectPreviewPanel
+                FooterContent.Add(modEffectPreviewPanel = new ModEffectPreviewPanel
                 {
                     Anchor = Anchor.BottomRight,
                     Origin = Anchor.BottomRight,
@@ -249,29 +246,30 @@ namespace osu.Game.Overlays.Mods
                         Horizontal = 70
                     },
                     BeatmapInfo = { Value = beatmap?.BeatmapInfo }
-                },
-                footerButtonFlow = new FillFlowContainer<ShearedButton>
+                });
+            }
+
+            FooterContent.Add(footerButtonFlow = new FillFlowContainer<ShearedButton>
+            {
+                RelativeSizeAxes = Axes.X,
+                AutoSizeAxes = Axes.Y,
+                Direction = FillDirection.Horizontal,
+                Anchor = Anchor.BottomLeft,
+                Origin = Anchor.BottomLeft,
+                Padding = new MarginPadding
                 {
-                    RelativeSizeAxes = Axes.X,
-                    AutoSizeAxes = Axes.Y,
-                    Direction = FillDirection.Horizontal,
-                    Anchor = Anchor.BottomLeft,
-                    Origin = Anchor.BottomLeft,
-                    Padding = new MarginPadding
-                    {
-                        Vertical = PADDING,
-                        Horizontal = 70
-                    },
-                    Spacing = new Vector2(10),
-                    ChildrenEnumerable = CreateFooterButtons().Prepend(BackButton = new ShearedButton(BUTTON_WIDTH)
-                    {
-                        Text = CommonStrings.Back,
-                        Action = Hide,
-                        DarkerColour = colours.Pink2,
-                        LighterColour = colours.Pink1
-                    })
-                }
-            };
+                    Vertical = PADDING,
+                    Horizontal = 70
+                },
+                Spacing = new Vector2(10),
+                ChildrenEnumerable = CreateFooterButtons().Prepend(BackButton = new ShearedButton(BUTTON_WIDTH)
+                {
+                    Text = CommonStrings.Back,
+                    Action = Hide,
+                    DarkerColour = colours.Pink2,
+                    LighterColour = colours.Pink1
+                })
+            });
 
             globalAvailableMods.BindTo(game.AvailableMods);
         }
