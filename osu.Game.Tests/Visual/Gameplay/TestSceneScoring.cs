@@ -7,6 +7,7 @@ using System.Linq;
 using NUnit.Framework;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
+using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Cursor;
@@ -75,7 +76,7 @@ namespace osu.Game.Tests.Visual.Gameplay
                                 legend = new FillFlowContainer
                                 {
                                     Padding = new MarginPadding(20),
-                                    Direction = FillDirection.Full,
+                                    Direction = FillDirection.Vertical,
                                     RelativeSizeAxes = Axes.X,
                                     AutoSizeAxes = Axes.Y,
                                 },
@@ -263,7 +264,8 @@ namespace osu.Game.Tests.Visual.Gameplay
                 results.Add(getTotalScore());
             }
 
-            graphs.Add(new LineGraph
+            LineGraph graph;
+            graphs.Add(graph = new LineGraph
             {
                 Name = name,
                 RelativeSizeAxes = Axes.Both,
@@ -271,20 +273,9 @@ namespace osu.Game.Tests.Visual.Gameplay
                 Values = results
             });
 
-            legend.Add(new OsuSpriteText
+            legend.Add(new LegendEntry(name, getTotalScore(), graph)
             {
-                Colour = colour,
-                RelativeSizeAxes = Axes.X,
-                Width = 0.5f,
-                Text = $"{FontAwesome.Solid.Circle.Icon} {name}"
-            });
-
-            legend.Add(new OsuSpriteText
-            {
-                Colour = colour,
-                RelativeSizeAxes = Axes.X,
-                Width = 0.5f,
-                Text = $"final score {getTotalScore():#,0}"
+                AccentColour = colour
             });
         }
     }
@@ -503,6 +494,77 @@ namespace osu.Game.Tests.Visual.Gameplay
             }
 
             public void Move(Vector2 pos) => this.MoveTo(pos);
+        }
+    }
+
+    public partial class LegendEntry : OsuClickableContainer, IHasAccentColour
+    {
+        public Color4 AccentColour { get; set; }
+
+        public BindableBool Visible { get; } = new BindableBool(true);
+
+        private readonly string description;
+        private readonly long finalScore;
+        private readonly LineGraph lineGraph;
+
+        private OsuSpriteText descriptionText = null!;
+        private OsuSpriteText finalScoreText = null!;
+
+        public LegendEntry(string description, long finalScore, LineGraph lineGraph)
+        {
+            this.description = description;
+            this.finalScore = finalScore;
+            this.lineGraph = lineGraph;
+        }
+
+        [BackgroundDependencyLoader]
+        private void load()
+        {
+            RelativeSizeAxes = Content.RelativeSizeAxes = Axes.X;
+            AutoSizeAxes = Content.AutoSizeAxes = Axes.Y;
+
+            Children = new Drawable[]
+            {
+                descriptionText = new OsuSpriteText
+                {
+                    Anchor = Anchor.CentreLeft,
+                    Origin = Anchor.CentreLeft,
+                },
+                finalScoreText = new OsuSpriteText
+                {
+                    Anchor = Anchor.CentreRight,
+                    Origin = Anchor.CentreRight,
+                    Font = OsuFont.Default.With(fixedWidth: true)
+                }
+            };
+        }
+
+        protected override void LoadComplete()
+        {
+            base.LoadComplete();
+            Visible.BindValueChanged(_ => updateState(), true);
+            Action = Visible.Toggle;
+        }
+
+        protected override bool OnHover(HoverEvent e)
+        {
+            updateState();
+            return true;
+        }
+
+        protected override void OnHoverLost(HoverLostEvent e)
+        {
+            updateState();
+            base.OnHoverLost(e);
+        }
+
+        private void updateState()
+        {
+            Colour = IsHovered ? AccentColour.Lighten(0.2f) : AccentColour;
+
+            descriptionText.Text = $"{(Visible.Value ? FontAwesome.Solid.CheckCircle.Icon : FontAwesome.Solid.Circle.Icon)} {description}";
+            finalScoreText.Text = finalScore.ToString("#,0");
+            lineGraph.Alpha = Visible.Value ? 1 : 0;
         }
     }
 }
