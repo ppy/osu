@@ -5,6 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using NUnit.Framework;
+using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
@@ -36,6 +37,9 @@ namespace osu.Game.Tests.Visual.Gameplay
 
         private FillFlowContainer legend = null!;
 
+        [Resolved]
+        private OsuColour colours { get; set; } = null!;
+
         [Test]
         public void TestBasic()
         {
@@ -43,6 +47,11 @@ namespace osu.Game.Tests.Visual.Gameplay
             {
                 Children = new Drawable[]
                 {
+                    new Box
+                    {
+                        RelativeSizeAxes = Axes.Both,
+                        Colour = Colour4.Black
+                    },
                     new GridContainer
                     {
                         RelativeSizeAxes = Axes.Both,
@@ -125,8 +134,8 @@ namespace osu.Game.Tests.Visual.Gameplay
             graphs.Clear();
             legend.Clear();
 
-            runForProcessor("lazer-standardised", Color4.YellowGreen, new OsuScoreProcessor(), ScoringMode.Standardised);
-            runForProcessor("lazer-classic", Color4.MediumPurple, new OsuScoreProcessor(), ScoringMode.Classic);
+            runForProcessor("lazer-standardised", colours.Green1, new OsuScoreProcessor(), ScoringMode.Standardised);
+            runForProcessor("lazer-classic", colours.Blue1, new OsuScoreProcessor(), ScoringMode.Classic);
 
             runScoreV1();
             runScoreV2();
@@ -156,7 +165,7 @@ namespace osu.Game.Tests.Visual.Gameplay
                 currentCombo++;
             }
 
-            runForAlgorithm("ScoreV1 (classic)", Color4.Purple,
+            runForAlgorithm("ScoreV1 (classic)", colours.Purple1,
                 () => applyHitV1(base_great),
                 () => applyHitV1(base_ok),
                 () => applyHitV1(0),
@@ -199,7 +208,7 @@ namespace osu.Game.Tests.Visual.Gameplay
                 currentHits++;
             }
 
-            runForAlgorithm("ScoreV2", Color4.OrangeRed,
+            runForAlgorithm("ScoreV2", colours.Red1,
                 () => applyHitV2(base_great),
                 () => applyHitV2(base_ok),
                 () =>
