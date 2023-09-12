@@ -5,7 +5,9 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using NUnit.Framework;
+using osu.Framework.Allocation;
 using osu.Framework.Bindables;
+using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Cursor;
@@ -33,8 +35,17 @@ namespace osu.Game.Tests.Visual.Gameplay
     {
         private GraphContainer graphs = null!;
         private SettingsSlider<int> sliderMaxCombo = null!;
+        private SettingsCheckbox scaleToMax = null!;
 
-        private FillFlowContainer legend = null!;
+        private FillFlowContainer<LegendEntry> legend = null!;
+
+        private readonly BindableBool standardisedVisible = new BindableBool(true);
+        private readonly BindableBool classicVisible = new BindableBool(true);
+        private readonly BindableBool scoreV1Visible = new BindableBool(true);
+        private readonly BindableBool scoreV2Visible = new BindableBool(true);
+
+        [Resolved]
+        private OsuColour colours { get; set; } = null!;
 
         [Test]
         public void TestBasic()
@@ -43,6 +54,11 @@ namespace osu.Game.Tests.Visual.Gameplay
             {
                 Children = new Drawable[]
                 {
+                    new Box
+                    {
+                        RelativeSizeAxes = Axes.Both,
+                        Colour = Colour4.Black
+                    },
                     new GridContainer
                     {
                         RelativeSizeAxes = Axes.Both,
@@ -63,10 +79,10 @@ namespace osu.Game.Tests.Visual.Gameplay
                             },
                             new Drawable[]
                             {
-                                legend = new FillFlowContainer
+                                legend = new FillFlowContainer<LegendEntry>
                                 {
                                     Padding = new MarginPadding(20),
-                                    Direction = FillDirection.Full,
+                                    Direction = FillDirection.Vertical,
                                     RelativeSizeAxes = Axes.X,
                                     AutoSizeAxes = Axes.Y,
                                 },
@@ -78,26 +94,31 @@ namespace osu.Game.Tests.Visual.Gameplay
                                     Padding = new MarginPadding(20),
                                     RelativeSizeAxes = Axes.X,
                                     AutoSizeAxes = Axes.Y,
-                                    Direction = FillDirection.Full,
+                                    Direction = FillDirection.Vertical,
+                                    Spacing = new Vector2(10),
                                     Children = new Drawable[]
                                     {
                                         sliderMaxCombo = new SettingsSlider<int>
                                         {
-                                            Width = 0.5f,
                                             TransferValueOnCommit = true,
                                             Current = new BindableInt(1024)
                                             {
                                                 MinValue = 96,
                                                 MaxValue = 8192,
                                             },
-                                            LabelText = "max combo",
+                                            LabelText = "Max combo",
+                                        },
+                                        scaleToMax = new SettingsCheckbox
+                                        {
+                                            LabelText = "Rescale plots to 100%",
+                                            Current = { Value = true, Default = true }
                                         },
                                         new OsuTextFlowContainer
                                         {
                                             RelativeSizeAxes = Axes.X,
-                                            Width = 0.5f,
                                             AutoSizeAxes = Axes.Y,
-                                            Text = $"Left click to add miss\nRight click to add OK/{base_ok}"
+                                            Text = $"Left click to add miss\nRight click to add OK/{base_ok}",
+                                            Margin = new MarginPadding { Top = 20 }
                                         }
                                     }
                                 },
@@ -107,6 +128,12 @@ namespace osu.Game.Tests.Visual.Gameplay
                 };
 
                 sliderMaxCombo.Current.BindValueChanged(_ => rerun());
+                scaleToMax.Current.BindValueChanged(_ => rerun());
+
+                standardisedVisible.BindValueChanged(_ => rescalePlots());
+                classicVisible.BindValueChanged(_ => rescalePlots());
+                scoreV1Visible.BindValueChanged(_ => rescalePlots());
+                scoreV2Visible.BindValueChanged(_ => rescalePlots());
 
                 graphs.MissLocations.BindCollectionChanged((_, __) => rerun());
                 graphs.NonPerfectLocations.BindCollectionChanged((_, __) => rerun());
@@ -125,11 +152,29 @@ namespace osu.Game.Tests.Visual.Gameplay
             graphs.Clear();
             legend.Clear();
 
-            runForProcessor("lazer-standardised", Color4.YellowGreen, new OsuScoreProcessor(), ScoringMode.Standardised);
-            runForProcessor("lazer-classic", Color4.MediumPurple, new OsuScoreProcessor(), ScoringMode.Classic);
+            runForProcessor("lazer-standardised", colours.Green1, new OsuScoreProcessor(), ScoringMode.Standardised, standardisedVisible);
+            runForProcessor("lazer-classic", colours.Blue1, new OsuScoreProcessor(), ScoringMode.Classic, classicVisible);
 
             runScoreV1();
             runScoreV2();
+
+            rescalePlots();
+        }
+
+        private void rescalePlots()
+        {
+            if (!scaleToMax.Current.Value && legend.Any(entry => entry.Visible.Value))
+            {
+                long maxScore = legend.Where(entry => entry.Visible.Value).Max(entry => entry.FinalScore);
+
+                foreach (var graph in graphs)
+                    graph.Height = graph.Values.Max() / maxScore;
+            }
+            else
+            {
+                foreach (var graph in graphs)
+                    graph.Height = 1;
+            }
         }
 
         private void runScoreV1()
@@ -156,17 +201,22 @@ namespace osu.Game.Tests.Visual.Gameplay
                 currentCombo++;
             }
 
-            runForAlgorithm("ScoreV1 (classic)", Color4.Purple,
-                () => applyHitV1(base_great),
-                () => applyHitV1(base_ok),
-                () => applyHitV1(0),
-                () =>
+            runForAlgorithm(new ScoringAlgorithm
+            {
+                Name = "ScoreV1 (classic)",
+                Colour = colours.Purple1,
+                ApplyHit = () => applyHitV1(base_great),
+                ApplyNonPerfect = () => applyHitV1(base_ok),
+                ApplyMiss = () => applyHitV1(0),
+                GetTotalScore = () =>
                 {
                     // Arbitrary value chosen towards the upper range.
                     const double score_multiplier = 4;
 
                     return (int)(totalScore * score_multiplier);
-                });
+                },
+                Visible = scoreV1Visible
+            });
         }
 
         private void runScoreV2()
@@ -199,15 +249,19 @@ namespace osu.Game.Tests.Visual.Gameplay
                 currentHits++;
             }
 
-            runForAlgorithm("ScoreV2", Color4.OrangeRed,
-                () => applyHitV2(base_great),
-                () => applyHitV2(base_ok),
-                () =>
+            runForAlgorithm(new ScoringAlgorithm
+            {
+                Name = "ScoreV2",
+                Colour = colours.Red1,
+                ApplyHit = () => applyHitV2(base_great),
+                ApplyNonPerfect = () => applyHitV2(base_ok),
+                ApplyMiss = () =>
                 {
                     currentHits++;
                     maxBaseScore += base_great;
                     currentCombo = 0;
-                }, () =>
+                },
+                GetTotalScore = () =>
                 {
                     double accuracy = currentBaseScore / maxBaseScore;
 
@@ -216,10 +270,12 @@ namespace osu.Game.Tests.Visual.Gameplay
                         700000 * comboPortion / comboPortionMax +
                         300000 * Math.Pow(accuracy, 10) * ((double)currentHits / maxCombo)
                     );
-                });
+                },
+                Visible = scoreV2Visible
+            });
         }
 
-        private void runForProcessor(string name, Color4 colour, ScoreProcessor processor, ScoringMode mode)
+        private void runForProcessor(string name, Color4 colour, ScoreProcessor processor, ScoringMode mode, BindableBool visibility)
         {
             int maxCombo = sliderMaxCombo.Current.Value;
 
@@ -229,14 +285,19 @@ namespace osu.Game.Tests.Visual.Gameplay
 
             processor.ApplyBeatmap(beatmap);
 
-            runForAlgorithm(name, colour,
-                () => processor.ApplyResult(new OsuJudgementResult(new HitCircle(), new OsuJudgement()) { Type = HitResult.Great }),
-                () => processor.ApplyResult(new OsuJudgementResult(new HitCircle(), new OsuJudgement()) { Type = HitResult.Ok }),
-                () => processor.ApplyResult(new OsuJudgementResult(new HitCircle(), new OsuJudgement()) { Type = HitResult.Miss }),
-                () => processor.GetDisplayScore(mode));
+            runForAlgorithm(new ScoringAlgorithm
+            {
+                Name = name,
+                Colour = colour,
+                ApplyHit = () => processor.ApplyResult(new OsuJudgementResult(new HitCircle(), new OsuJudgement()) { Type = HitResult.Great }),
+                ApplyNonPerfect = () => processor.ApplyResult(new OsuJudgementResult(new HitCircle(), new OsuJudgement()) { Type = HitResult.Ok }),
+                ApplyMiss = () => processor.ApplyResult(new OsuJudgementResult(new HitCircle(), new OsuJudgement()) { Type = HitResult.Miss }),
+                GetTotalScore = () => processor.GetDisplayScore(mode),
+                Visible = visibility
+            });
         }
 
-        private void runForAlgorithm(string name, Color4 colour, Action applyHit, Action applyNonPerfect, Action applyMiss, Func<long> getTotalScore)
+        private void runForAlgorithm(ScoringAlgorithm scoringAlgorithm)
         {
             int maxCombo = sliderMaxCombo.Current.Value;
 
@@ -245,49 +306,52 @@ namespace osu.Game.Tests.Visual.Gameplay
             for (int i = 0; i < maxCombo; i++)
             {
                 if (graphs.MissLocations.Contains(i))
-                    applyMiss();
+                    scoringAlgorithm.ApplyMiss();
                 else if (graphs.NonPerfectLocations.Contains(i))
-                    applyNonPerfect();
+                    scoringAlgorithm.ApplyNonPerfect();
                 else
-                    applyHit();
+                    scoringAlgorithm.ApplyHit();
 
-                results.Add(getTotalScore());
+                results.Add(scoringAlgorithm.GetTotalScore());
             }
 
-            graphs.Add(new LineGraph
+            LineGraph graph;
+            graphs.Add(graph = new LineGraph
             {
-                Name = name,
+                Name = scoringAlgorithm.Name,
+                Anchor = Anchor.BottomLeft,
+                Origin = Anchor.BottomLeft,
                 RelativeSizeAxes = Axes.Both,
-                LineColour = colour,
+                LineColour = scoringAlgorithm.Colour,
                 Values = results
             });
 
-            legend.Add(new OsuSpriteText
+            legend.Add(new LegendEntry(scoringAlgorithm, graph)
             {
-                Colour = colour,
-                RelativeSizeAxes = Axes.X,
-                Width = 0.5f,
-                Text = $"{FontAwesome.Solid.Circle.Icon} {name}"
-            });
-
-            legend.Add(new OsuSpriteText
-            {
-                Colour = colour,
-                RelativeSizeAxes = Axes.X,
-                Width = 0.5f,
-                Text = $"final score {getTotalScore():#,0}"
+                AccentColour = scoringAlgorithm.Colour,
             });
         }
     }
 
-    public partial class GraphContainer : Container, IHasCustomTooltip<IEnumerable<LineGraph>>
+    public class ScoringAlgorithm
+    {
+        public string Name { get; init; } = null!;
+        public Color4 Colour { get; init; }
+        public Action ApplyHit { get; init; } = () => { };
+        public Action ApplyNonPerfect { get; init; } = () => { };
+        public Action ApplyMiss { get; init; } = () => { };
+        public Func<long> GetTotalScore { get; init; } = null!;
+        public BindableBool Visible { get; init; } = null!;
+    }
+
+    public partial class GraphContainer : Container<LineGraph>, IHasCustomTooltip<IEnumerable<LineGraph>>
     {
         public readonly BindableList<double> MissLocations = new BindableList<double>();
         public readonly BindableList<double> NonPerfectLocations = new BindableList<double>();
 
         public Bindable<int> MaxCombo = new Bindable<int>();
 
-        protected override Container<Drawable> Content { get; } = new Container { RelativeSizeAxes = Axes.Both };
+        protected override Container<LineGraph> Content { get; } = new Container<LineGraph> { RelativeSizeAxes = Axes.Both };
 
         private readonly Box hoverLine;
 
@@ -438,7 +502,7 @@ namespace osu.Game.Tests.Visual.Gameplay
 
         public ITooltip<IEnumerable<LineGraph>> GetCustomTooltip() => tooltip ??= new GraphTooltip(this);
 
-        public IEnumerable<LineGraph> TooltipContent => Content.OfType<LineGraph>();
+        public IEnumerable<LineGraph> TooltipContent => Content;
 
         public partial class GraphTooltip : CompositeDrawable, ITooltip<IEnumerable<LineGraph>>
         {
@@ -486,6 +550,8 @@ namespace osu.Game.Tests.Visual.Gameplay
 
                 foreach (var graph in content)
                 {
+                    if (graph.Alpha == 0) continue;
+
                     float valueAtHover = graph.Values.ElementAt(relevantCombo);
                     float ofTotal = valueAtHover / graph.Values.Last();
 
@@ -494,6 +560,81 @@ namespace osu.Game.Tests.Visual.Gameplay
             }
 
             public void Move(Vector2 pos) => this.MoveTo(pos);
+        }
+    }
+
+    public partial class LegendEntry : OsuClickableContainer, IHasAccentColour
+    {
+        public Color4 AccentColour { get; set; }
+
+        public BindableBool Visible { get; } = new BindableBool(true);
+
+        public readonly long FinalScore;
+
+        private readonly string description;
+        private readonly LineGraph lineGraph;
+
+        private OsuSpriteText descriptionText = null!;
+        private OsuSpriteText finalScoreText = null!;
+
+        public LegendEntry(ScoringAlgorithm scoringAlgorithm, LineGraph lineGraph)
+        {
+            description = scoringAlgorithm.Name;
+            FinalScore = scoringAlgorithm.GetTotalScore();
+            AccentColour = scoringAlgorithm.Colour;
+            Visible.BindTo(scoringAlgorithm.Visible);
+
+            this.lineGraph = lineGraph;
+        }
+
+        [BackgroundDependencyLoader]
+        private void load()
+        {
+            RelativeSizeAxes = Content.RelativeSizeAxes = Axes.X;
+            AutoSizeAxes = Content.AutoSizeAxes = Axes.Y;
+
+            Children = new Drawable[]
+            {
+                descriptionText = new OsuSpriteText
+                {
+                    Anchor = Anchor.CentreLeft,
+                    Origin = Anchor.CentreLeft,
+                },
+                finalScoreText = new OsuSpriteText
+                {
+                    Anchor = Anchor.CentreRight,
+                    Origin = Anchor.CentreRight,
+                    Font = OsuFont.Default.With(fixedWidth: true)
+                }
+            };
+        }
+
+        protected override void LoadComplete()
+        {
+            base.LoadComplete();
+            Visible.BindValueChanged(_ => updateState(), true);
+            Action = Visible.Toggle;
+        }
+
+        protected override bool OnHover(HoverEvent e)
+        {
+            updateState();
+            return true;
+        }
+
+        protected override void OnHoverLost(HoverLostEvent e)
+        {
+            updateState();
+            base.OnHoverLost(e);
+        }
+
+        private void updateState()
+        {
+            Colour = IsHovered ? AccentColour.Lighten(0.2f) : AccentColour;
+
+            descriptionText.Text = $"{(Visible.Value ? FontAwesome.Solid.CheckCircle.Icon : FontAwesome.Solid.Circle.Icon)} {description}";
+            finalScoreText.Text = FinalScore.ToString("#,0");
+            lineGraph.Alpha = Visible.Value ? 1 : 0;
         }
     }
 }
