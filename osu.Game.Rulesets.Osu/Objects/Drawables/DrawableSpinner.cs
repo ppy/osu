@@ -312,7 +312,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
                     tick.TriggerResult(true);
 
                     if (tick is DrawableSpinnerBonusTick)
-                        gainedBonus.Value = score_per_tick * (spins - HitObject.SpinsRequired);
+                        gainedBonus.Value = score_per_tick * (spins - HitObject.SpinsRequiredForBonus);
                 }
 
                 completedFullSpins++;
