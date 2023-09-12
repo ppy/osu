@@ -11,7 +11,7 @@ namespace osu.Game.Rulesets.Scoring.Legacy
     public interface ILegacyScoreSimulator
     {
         /// <summary>
-        /// Performs the simulation, scoring values achievable for the given beatmap.
+        /// Performs the simulation, computing the maximum scoring values achievable for the given beatmap.
         /// </summary>
         /// <param name="workingBeatmap">The working beatmap.</param>
         /// <param name="playableBeatmap">A playable version of the beatmap for the ruleset.</param>
