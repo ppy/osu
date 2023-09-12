@@ -51,6 +51,7 @@ namespace osu.Game.Tests.Visual.UserInterface
             AddStep("clear contents", Clear);
             AddStep("reset ruleset", () => Ruleset.Value = rulesetStore.GetRuleset(0));
             AddStep("reset mods", () => SelectedMods.SetDefault());
+            AddStep("set beatmap", () => Beatmap.Value = CreateWorkingBeatmap(new OsuRuleset().RulesetInfo));
             AddStep("set up presets", () =>
             {
                 Realm.Write(r =>
@@ -92,6 +93,7 @@ namespace osu.Game.Tests.Visual.UserInterface
             {
                 RelativeSizeAxes = Axes.Both,
                 State = { Value = Visibility.Visible },
+                Beatmap = Beatmap.Value,
                 SelectedMods = { BindTarget = SelectedMods }
             });
             waitForColumnLoad();
