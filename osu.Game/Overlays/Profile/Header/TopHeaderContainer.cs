@@ -146,14 +146,8 @@ namespace osu.Game.Overlays.Profile.Header
                                                         },
                                                         new Container
                                                         {
-                                                            Child = previousUsernamesDisplay = new PreviousUsernamesDisplay
-                                                            {
-                                                                Anchor = Anchor.TopLeft,
-                                                                Origin = Anchor.TopLeft,
-                                                            },
-                                                            Anchor = Anchor.TopLeft,
-                                                            Origin = Anchor.TopLeft,
-                                                            Size = new Vector2(0),
+                                                            // Intentionally use a zero-size container, else the fill flow will adjust to (and cancel) the upwards animation.
+                                                            Child = previousUsernamesDisplay = new PreviousUsernamesDisplay(),
                                                         }
                                                     }
                                                 },
