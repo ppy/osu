@@ -269,7 +269,7 @@ namespace osu.Game.Beatmaps.Formats
                 foreach (var hitObject in hitObjects)
                 {
                     if (hitObject is IHasSliderVelocity hasSliderVelocity)
-                        yield return new DifficultyControlPoint { Time = hitObject.StartTime, SliderVelocity = hasSliderVelocity.SliderVelocity };
+                        yield return new DifficultyControlPoint { Time = hitObject.StartTime, SliderVelocity = hasSliderVelocity.SliderVelocityMultiplier };
                 }
             }
 
