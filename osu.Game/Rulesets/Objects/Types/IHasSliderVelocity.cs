@@ -3,6 +3,7 @@
 
 using System;
 using osu.Framework.Bindables;
+using osu.Game.Beatmaps.ControlPoints;
 
 namespace osu.Game.Rulesets.Objects.Types
 {
@@ -19,21 +20,28 @@ namespace osu.Game.Rulesets.Objects.Types
         BindableNumber<double> SliderVelocityMultiplierBindable { get; }
 
         /// <summary>
-        /// Introduces floating-point errors for rulesets that depend on it.
+        /// Introduces floating-point errors to post-multiplied beat length for rulesets that depend on it.
         /// </summary>
-        public double GetPrecisionAdjustedSliderVelocityMultiplier(string rulesetShortName)
+        public double GetPrecisionAdjustedBeatLength(TimingControlPoint timingControlPoint, string rulesetShortName)
         {
-            double beatLength = -100 / SliderVelocityMultiplier;
+            double sliderVelocityAsBeatLength = -100 / SliderVelocityMultiplier;
+
+            // Note: In stable, the division occurs on floats, but with compiler optimisations turned on actually seems to occur on doubles via some .NET black magic (possibly inlining?).
+            double bpmMultiplier;
 
             switch (rulesetShortName)
             {
                 case "taiko":
                 case "mania":
-                    return 1 / (beatLength < 0 ? Math.Clamp((float)-beatLength, 10, 10000) / 100.0 : 1);
+                    bpmMultiplier = sliderVelocityAsBeatLength < 0 ? Math.Clamp((float)-sliderVelocityAsBeatLength, 10, 10000) / 100.0 : 1;
+                    break;
 
                 default:
-                    return 1 / (beatLength < 0 ? Math.Clamp((float)-beatLength, 10, 1000) / 100.0 : 1);
+                    bpmMultiplier = sliderVelocityAsBeatLength < 0 ? Math.Clamp((float)-sliderVelocityAsBeatLength, 10, 1000) / 100.0 : 1;
+                    break;
             }
+
+            return timingControlPoint.BeatLength * bpmMultiplier;
         }
     }
 }
