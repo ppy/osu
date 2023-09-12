@@ -38,6 +38,11 @@ namespace osu.Game.Tests.Visual.Gameplay
 
         private FillFlowContainer legend = null!;
 
+        private readonly BindableBool standardisedVisible = new BindableBool(true);
+        private readonly BindableBool classicVisible = new BindableBool(true);
+        private readonly BindableBool scoreV1Visible = new BindableBool(true);
+        private readonly BindableBool scoreV2Visible = new BindableBool(true);
+
         [Resolved]
         private OsuColour colours { get; set; } = null!;
 
@@ -135,8 +140,8 @@ namespace osu.Game.Tests.Visual.Gameplay
             graphs.Clear();
             legend.Clear();
 
-            runForProcessor("lazer-standardised", colours.Green1, new OsuScoreProcessor(), ScoringMode.Standardised);
-            runForProcessor("lazer-classic", colours.Blue1, new OsuScoreProcessor(), ScoringMode.Classic);
+            runForProcessor("lazer-standardised", colours.Green1, new OsuScoreProcessor(), ScoringMode.Standardised, standardisedVisible);
+            runForProcessor("lazer-classic", colours.Blue1, new OsuScoreProcessor(), ScoringMode.Classic, classicVisible);
 
             runScoreV1();
             runScoreV2();
@@ -166,17 +171,22 @@ namespace osu.Game.Tests.Visual.Gameplay
                 currentCombo++;
             }
 
-            runForAlgorithm("ScoreV1 (classic)", colours.Purple1,
-                () => applyHitV1(base_great),
-                () => applyHitV1(base_ok),
-                () => applyHitV1(0),
-                () =>
+            runForAlgorithm(new ScoringAlgorithm
+            {
+                Name = "ScoreV1 (classic)",
+                Colour = colours.Purple1,
+                ApplyHit = () => applyHitV1(base_great),
+                ApplyNonPerfect = () => applyHitV1(base_ok),
+                ApplyMiss = () => applyHitV1(0),
+                GetTotalScore = () =>
                 {
                     // Arbitrary value chosen towards the upper range.
                     const double score_multiplier = 4;
 
                     return (int)(totalScore * score_multiplier);
-                });
+                },
+                Visible = scoreV1Visible
+            });
         }
 
         private void runScoreV2()
@@ -209,15 +219,19 @@ namespace osu.Game.Tests.Visual.Gameplay
                 currentHits++;
             }
 
-            runForAlgorithm("ScoreV2", colours.Red1,
-                () => applyHitV2(base_great),
-                () => applyHitV2(base_ok),
-                () =>
+            runForAlgorithm(new ScoringAlgorithm
+            {
+                Name = "ScoreV2",
+                Colour = colours.Red1,
+                ApplyHit = () => applyHitV2(base_great),
+                ApplyNonPerfect = () => applyHitV2(base_ok),
+                ApplyMiss = () =>
                 {
                     currentHits++;
                     maxBaseScore += base_great;
                     currentCombo = 0;
-                }, () =>
+                },
+                GetTotalScore = () =>
                 {
                     double accuracy = currentBaseScore / maxBaseScore;
 
@@ -226,10 +240,12 @@ namespace osu.Game.Tests.Visual.Gameplay
                         700000 * comboPortion / comboPortionMax +
                         300000 * Math.Pow(accuracy, 10) * ((double)currentHits / maxCombo)
                     );
-                });
+                },
+                Visible = scoreV2Visible
+            });
         }
 
-        private void runForProcessor(string name, Color4 colour, ScoreProcessor processor, ScoringMode mode)
+        private void runForProcessor(string name, Color4 colour, ScoreProcessor processor, ScoringMode mode, BindableBool visibility)
         {
             int maxCombo = sliderMaxCombo.Current.Value;
 
@@ -239,14 +255,19 @@ namespace osu.Game.Tests.Visual.Gameplay
 
             processor.ApplyBeatmap(beatmap);
 
-            runForAlgorithm(name, colour,
-                () => processor.ApplyResult(new OsuJudgementResult(new HitCircle(), new OsuJudgement()) { Type = HitResult.Great }),
-                () => processor.ApplyResult(new OsuJudgementResult(new HitCircle(), new OsuJudgement()) { Type = HitResult.Ok }),
-                () => processor.ApplyResult(new OsuJudgementResult(new HitCircle(), new OsuJudgement()) { Type = HitResult.Miss }),
-                () => processor.GetDisplayScore(mode));
+            runForAlgorithm(new ScoringAlgorithm
+            {
+                Name = name,
+                Colour = colour,
+                ApplyHit = () => processor.ApplyResult(new OsuJudgementResult(new HitCircle(), new OsuJudgement()) { Type = HitResult.Great }),
+                ApplyNonPerfect = () => processor.ApplyResult(new OsuJudgementResult(new HitCircle(), new OsuJudgement()) { Type = HitResult.Ok }),
+                ApplyMiss = () => processor.ApplyResult(new OsuJudgementResult(new HitCircle(), new OsuJudgement()) { Type = HitResult.Miss }),
+                GetTotalScore = () => processor.GetDisplayScore(mode),
+                Visible = visibility
+            });
         }
 
-        private void runForAlgorithm(string name, Color4 colour, Action applyHit, Action applyNonPerfect, Action applyMiss, Func<long> getTotalScore)
+        private void runForAlgorithm(ScoringAlgorithm scoringAlgorithm)
         {
             int maxCombo = sliderMaxCombo.Current.Value;
 
@@ -255,29 +276,40 @@ namespace osu.Game.Tests.Visual.Gameplay
             for (int i = 0; i < maxCombo; i++)
             {
                 if (graphs.MissLocations.Contains(i))
-                    applyMiss();
+                    scoringAlgorithm.ApplyMiss();
                 else if (graphs.NonPerfectLocations.Contains(i))
-                    applyNonPerfect();
+                    scoringAlgorithm.ApplyNonPerfect();
                 else
-                    applyHit();
+                    scoringAlgorithm.ApplyHit();
 
-                results.Add(getTotalScore());
+                results.Add(scoringAlgorithm.GetTotalScore());
             }
 
             LineGraph graph;
             graphs.Add(graph = new LineGraph
             {
-                Name = name,
+                Name = scoringAlgorithm.Name,
                 RelativeSizeAxes = Axes.Both,
-                LineColour = colour,
+                LineColour = scoringAlgorithm.Colour,
                 Values = results
             });
 
-            legend.Add(new LegendEntry(name, getTotalScore(), graph)
+            legend.Add(new LegendEntry(scoringAlgorithm, graph)
             {
-                AccentColour = colour
+                AccentColour = scoringAlgorithm.Colour,
             });
         }
+    }
+
+    public class ScoringAlgorithm
+    {
+        public string Name { get; init; } = null!;
+        public Color4 Colour { get; init; }
+        public Action ApplyHit { get; init; } = () => { };
+        public Action ApplyNonPerfect { get; init; } = () => { };
+        public Action ApplyMiss { get; init; } = () => { };
+        public Func<long> GetTotalScore { get; init; } = null!;
+        public BindableBool Visible { get; init; } = null!;
     }
 
     public partial class GraphContainer : Container, IHasCustomTooltip<IEnumerable<LineGraph>>
@@ -510,10 +542,13 @@ namespace osu.Game.Tests.Visual.Gameplay
         private OsuSpriteText descriptionText = null!;
         private OsuSpriteText finalScoreText = null!;
 
-        public LegendEntry(string description, long finalScore, LineGraph lineGraph)
+        public LegendEntry(ScoringAlgorithm scoringAlgorithm, LineGraph lineGraph)
         {
-            this.description = description;
-            this.finalScore = finalScore;
+            description = scoringAlgorithm.Name;
+            finalScore = scoringAlgorithm.GetTotalScore();
+            AccentColour = scoringAlgorithm.Colour;
+            Visible.BindTo(scoringAlgorithm.Visible);
+
             this.lineGraph = lineGraph;
         }
 
