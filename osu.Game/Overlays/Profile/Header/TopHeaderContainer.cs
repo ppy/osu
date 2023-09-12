@@ -46,7 +46,7 @@ namespace osu.Game.Overlays.Profile.Header
         private OsuSpriteText userCountryText = null!;
         private GroupBadgeFlow groupBadgeFlow = null!;
         private ToggleCoverButton coverToggle = null!;
-        private PreviousUsernames previousUsernames = null!;
+        private PreviousUsernamesDisplay previousUsernamesDisplay = null!;
 
         private Bindable<bool> coverExpanded = null!;
 
@@ -146,7 +146,7 @@ namespace osu.Game.Overlays.Profile.Header
                                                         },
                                                         new Container
                                                         {
-                                                            Child = previousUsernames = new PreviousUsernames
+                                                            Child = previousUsernamesDisplay = new PreviousUsernamesDisplay
                                                             {
                                                                 Anchor = Anchor.TopLeft,
                                                                 Origin = Anchor.TopLeft,
@@ -228,7 +228,7 @@ namespace osu.Game.Overlays.Profile.Header
             titleText.Text = user?.Title ?? string.Empty;
             titleText.Colour = Color4Extensions.FromHex(user?.Colour ?? "fff");
             groupBadgeFlow.User.Value = user;
-            previousUsernames.User.Value = user;
+            previousUsernamesDisplay.User.Value = user;
         }
 
         private void updateCoverState()

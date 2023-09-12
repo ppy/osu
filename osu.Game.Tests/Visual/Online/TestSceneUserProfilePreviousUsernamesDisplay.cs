@@ -11,9 +11,9 @@ using osu.Game.Overlays.Profile.Header.Components;
 namespace osu.Game.Tests.Visual.Online
 {
     [TestFixture]
-    public partial class TestSceneUserProfilePreviousUsernames : OsuTestScene
+    public partial class TestSceneUserProfilePreviousUsernamesDisplay : OsuTestScene
     {
-        private PreviousUsernames container = null!;
+        private PreviousUsernamesDisplay container = null!;
         private OverlayColourProvider colourProvider = null!;
 
         [SetUp]
@@ -22,7 +22,7 @@ namespace osu.Game.Tests.Visual.Online
             colourProvider = new OverlayColourProvider(OverlayColourScheme.Pink);
             Child = new DependencyProvidingContainer
             {
-                Child = container = new PreviousUsernames
+                Child = container = new PreviousUsernamesDisplay
                 {
                     Anchor = Anchor.Centre,
                     Origin = Anchor.Centre,
