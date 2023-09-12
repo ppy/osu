@@ -16,6 +16,7 @@ using osu.Game.Beatmaps.Drawables;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Graphics.UserInterface;
+using osu.Game.Rulesets;
 using osu.Game.Rulesets.Mods;
 using osuTK;
 using osuTK.Graphics;
@@ -62,6 +63,10 @@ namespace osu.Game.Overlays.Mods
 
         [Resolved]
         private BeatmapDifficultyCache difficultyCache { get; set; } = null!;
+
+        [Resolved]
+        private OsuGameBase game { get; set; } = null!;
+        private IBindable<RulesetInfo> gameRuleset = null!;
 
         private CancellationTokenSource? cancellationSource;
         private IBindable<StarDifficulty?> starDifficulty = null!;
@@ -195,6 +200,9 @@ namespace osu.Game.Overlays.Mods
                 updateCollapsedState();
             });
 
+            gameRuleset = game.Ruleset.GetBoundCopy();
+            gameRuleset.BindValueChanged(_ => updateValues());
+
             BeatmapInfo.BindValueChanged(_ => updateValues(), true);
         }
 
@@ -243,9 +251,12 @@ namespace osu.Game.Overlays.Mods
 
             bpmDisplay.Current.Value = BeatmapInfo.Value.BPM * rate;
 
-            BeatmapDifficulty adjustedDifficulty = new BeatmapDifficulty(BeatmapInfo.Value.Difficulty);
-            foreach (var mod in mods.Value.OfType<IApplicableToDifficulty>())
-                mod.ApplyToDifficulty(adjustedDifficulty);
+            (Ruleset.RateAdjustType AR, Ruleset.RateAdjustType OD) rateAdjustType = (Ruleset.RateAdjustType.NotChanged, Ruleset.RateAdjustType.NotChanged);
+
+            Ruleset ruleset = gameRuleset.Value.CreateInstance();
+            BeatmapDifficulty adjustedDifficulty = ruleset.GetEffectiveDifficulty(BeatmapInfo.Value.Difficulty, mods.Value, ref rateAdjustType);
+            approachRateDisplay.RateChangeType.Value = rateAdjustType.AR;
+            overallDifficultyDisplay.RateChangeType.Value = rateAdjustType.OD;
 
             circleSizeDisplay.Current.Value = adjustedDifficulty.CircleSize;
             drainRateDisplay.Current.Value = adjustedDifficulty.DrainRate;

@@ -266,10 +266,10 @@ namespace osu.Game.Rulesets.Taiko
         public double HitwindowFromOd(float OD) => 35.0 - 15.0 * (OD - 5) / 5;
         public float OdFromHitwindow(double hitwindow300) => (float)(5 * (35 - hitwindow300) / 15 + 5);
         public float ChangeOdFromRate(float OD, double rate) => OdFromHitwindow(HitwindowFromOd(OD) / rate);
-        public override BeatmapDifficulty GetEffectiveDifficulty(IBeatmapDifficultyInfo baseDifficulty, IReadOnlyList<Mod> mods, ref (bool AR, bool OD) isRateAdjusted)
+        public override BeatmapDifficulty GetEffectiveDifficulty(IBeatmapDifficultyInfo baseDifficulty, IReadOnlyList<Mod> mods, ref (RateAdjustType AR, RateAdjustType OD) rateAdjustedInfo)
         {
             BeatmapDifficulty? adjustedDifficulty = null;
-            isRateAdjusted = (false, false);
+            rateAdjustedInfo = (RateAdjustType.NotChanged, RateAdjustType.NotChanged);
 
             if (mods.Any(m => m is IApplicableToDifficulty))
             {
@@ -291,7 +291,7 @@ namespace osu.Game.Rulesets.Taiko
 
                     adjustedDifficulty.OverallDifficulty = ChangeOdFromRate(od, speedChange);
 
-                    if (adjustedDifficulty.OverallDifficulty != od) isRateAdjusted.OD = true;
+                    rateAdjustedInfo.OD = GetRateAdjustType(od, adjustedDifficulty.OverallDifficulty);
                 }
             }
 

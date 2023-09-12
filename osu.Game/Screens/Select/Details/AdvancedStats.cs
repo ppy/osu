@@ -116,12 +116,12 @@ namespace osu.Game.Screens.Select.Details
         {
             IBeatmapDifficultyInfo baseDifficulty = BeatmapInfo?.Difficulty;
             BeatmapDifficulty adjustedDifficulty = null;
-            (bool AR, bool OD) isRateAdjusted = (false, false);
+            (Ruleset.RateAdjustType AR, Ruleset.RateAdjustType OD) rateAdjustInfo = (Ruleset.RateAdjustType.NotChanged, Ruleset.RateAdjustType.NotChanged);
 
             if (baseDifficulty != null)
             {
                 Ruleset ruleset = gameRuleset.Value.CreateInstance();
-                adjustedDifficulty = ruleset.GetEffectiveDifficulty(baseDifficulty, mods.Value, ref isRateAdjusted);
+                adjustedDifficulty = ruleset.GetEffectiveDifficulty(baseDifficulty, mods.Value, ref rateAdjustInfo);
             }
 
             switch (BeatmapInfo?.Ruleset.OnlineID)
@@ -140,8 +140,8 @@ namespace osu.Game.Screens.Select.Details
             }
 
             HpDrain.Value = (baseDifficulty?.DrainRate ?? 0, adjustedDifficulty?.DrainRate, false);
-            Accuracy.Value = (baseDifficulty?.OverallDifficulty ?? 0, adjustedDifficulty?.OverallDifficulty, isRateAdjusted.OD);
-            ApproachRate.Value = (baseDifficulty?.ApproachRate ?? 0, adjustedDifficulty?.ApproachRate, isRateAdjusted.AR);
+            Accuracy.Value = (baseDifficulty?.OverallDifficulty ?? 0, adjustedDifficulty?.OverallDifficulty, rateAdjustInfo.OD != Ruleset.RateAdjustType.NotChanged);
+            ApproachRate.Value = (baseDifficulty?.ApproachRate ?? 0, adjustedDifficulty?.ApproachRate, rateAdjustInfo.OD != Ruleset.RateAdjustType.NotChanged);
 
             updateStarDifficulty();
         }

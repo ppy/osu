@@ -238,10 +238,10 @@ namespace osu.Game.Rulesets.Catch
         public float ArFromPreempt(double preempt) => (float)(preempt > 1200 ? ((1800 - preempt) / 120) : ((1200 - preempt) / 150)) + 5;
         public float ChangeArFromRate(float AR, double rate) => ArFromPreempt(PreemptFromAr(AR) / rate);
 
-        public override BeatmapDifficulty GetEffectiveDifficulty(IBeatmapDifficultyInfo baseDifficulty, IReadOnlyList<Mod> mods, ref (bool AR, bool OD) isRateAdjusted)
+        public override BeatmapDifficulty GetEffectiveDifficulty(IBeatmapDifficultyInfo baseDifficulty, IReadOnlyList<Mod> mods, ref (RateAdjustType AR, RateAdjustType OD) rateAdjustedInfo)
         {
             BeatmapDifficulty? adjustedDifficulty = null;
-            isRateAdjusted = (false, false);
+            rateAdjustedInfo = (RateAdjustType.NotChanged, RateAdjustType.NotChanged);
 
             if (mods.Any(m => m is IApplicableToDifficulty))
             {
@@ -264,7 +264,7 @@ namespace osu.Game.Rulesets.Catch
 
                     adjustedDifficulty.ApproachRate = ChangeArFromRate(ar, speedChange);
 
-                    if (adjustedDifficulty.ApproachRate != ar) isRateAdjusted.AR = true;
+                    rateAdjustedInfo.AR = GetRateAdjustType(ar, adjustedDifficulty.ApproachRate);
                 }
             }
 

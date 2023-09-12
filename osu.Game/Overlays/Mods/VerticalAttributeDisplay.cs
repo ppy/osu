@@ -1,6 +1,8 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System;
+using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Extensions.LocalisationExtensions;
 using osu.Framework.Graphics;
@@ -10,6 +12,9 @@ using osu.Framework.Localisation;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Graphics.UserInterface;
+using osu.Game.Rulesets;
+using osu.Game.Rulesets.Mods;
+using osuTK.Graphics;
 
 namespace osu.Game.Overlays.Mods
 {
@@ -23,10 +28,42 @@ namespace osu.Game.Overlays.Mods
 
         private readonly BindableWithCurrent<double> current = new BindableWithCurrent<double>();
 
+        public Bindable<Ruleset.RateAdjustType> RateChangeType = new Bindable<Ruleset.RateAdjustType>(Ruleset.RateAdjustType.NotChanged);
+
         /// <summary>
         /// Text to display in the top area of the display.
         /// </summary>
         public LocalisableString Label { get; protected set; }
+
+        private EffectCounter counter;
+        private OsuSpriteText text;
+
+        [Resolved]
+        private OsuColour colours { get; set; } = null!;
+        private void updateTextColor()
+        {
+            Color4 newColor;
+            switch (RateChangeType.Value)
+            {
+                case Ruleset.RateAdjustType.NotChanged:
+                    newColor = Color4.White;
+                    break;
+
+                case Ruleset.RateAdjustType.DifficultyReduction:
+                    newColor = colours.ForModType(ModType.DifficultyReduction);
+                    break;
+
+                case Ruleset.RateAdjustType.DifficultyIncrease:
+                    newColor = colours.ForModType(ModType.DifficultyIncrease);
+                    break;
+
+                default:
+                    throw new ArgumentOutOfRangeException(nameof(RateChangeType.Value));
+            }
+
+            text.Colour = newColor;
+            counter.Colour = newColor;
+        }
 
         public VerticalAttributeDisplay(LocalisableString label)
         {
@@ -37,6 +74,8 @@ namespace osu.Game.Overlays.Mods
             Origin = Anchor.CentreLeft;
             Anchor = Anchor.CentreLeft;
 
+            RateChangeType.BindValueChanged(_ => updateTextColor());
+
             InternalChild = new FillFlowContainer
             {
                 Origin = Anchor.CentreLeft,
@@ -45,7 +84,7 @@ namespace osu.Game.Overlays.Mods
                 Direction = FillDirection.Vertical,
                 Children = new Drawable[]
                 {
-                    new OsuSpriteText
+                    text = new OsuSpriteText
                     {
                         Origin = Anchor.Centre,
                         Anchor = Anchor.Centre,
@@ -53,7 +92,7 @@ namespace osu.Game.Overlays.Mods
                         Margin = new MarginPadding { Horizontal = 15 }, // to reserve space for 0.XX value
                         Font = OsuFont.Default.With(size: 20, weight: FontWeight.Bold)
                     },
-                    new EffectCounter
+                    counter = new EffectCounter
                     {
                         Origin = Anchor.Centre,
                         Anchor = Anchor.Centre,
@@ -62,12 +101,11 @@ namespace osu.Game.Overlays.Mods
                 }
             };
         }
-
         private partial class EffectCounter : RollingCounter<double>
         {
             protected override double RollingDuration => 500;
 
-            protected override LocalisableString FormatCount(double count) => count.ToLocalisableString("0.0");
+            protected override LocalisableString FormatCount(double count) => count.ToLocalisableString("0.0#");
 
             protected override OsuSpriteText CreateSpriteText() => new OsuSpriteText
             {
