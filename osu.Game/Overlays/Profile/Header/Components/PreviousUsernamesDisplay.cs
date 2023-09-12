@@ -86,9 +86,8 @@ namespace osu.Game.Overlays.Profile.Header.Components
                                 RelativeSizeAxes = Axes.X,
                                 AutoSizeAxes = Axes.Y,
                                 Direction = FillDirection.Full,
-                                // Prevents the tooltip of having a sudden size reduction
-                                // and flickering when the text is being faded out.
-                                // Also prevents a potential OnHover/HoverLost infinite loop
+                                // Prevents the tooltip of having a sudden size reduction and flickering when the text is being faded out.
+                                // Also prevents a potential OnHover/HoverLost feedback loop.
                                 AlwaysPresent = true,
                                 Margin = new MarginPadding { Bottom = margin, Top = margin / 2f }
                             }
