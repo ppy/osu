@@ -550,6 +550,8 @@ namespace osu.Game.Tests.Visual.Gameplay
 
                 foreach (var graph in content)
                 {
+                    if (graph.Alpha == 0) continue;
+
                     float valueAtHover = graph.Values.ElementAt(relevantCombo);
                     float ofTotal = valueAtHover / graph.Values.Last();
 
