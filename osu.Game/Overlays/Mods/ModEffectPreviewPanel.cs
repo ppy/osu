@@ -141,10 +141,22 @@ namespace osu.Game.Overlays.Mods
                                 Direction = FillDirection.Horizontal,
                                 Children = new[]
                                 {
-                                    circleSizeDisplay = new VerticalAttributeDisplay("CS"),
-                                    drainRateDisplay = new VerticalAttributeDisplay("HP"),
-                                    approachRateDisplay = new VerticalAttributeDisplay("AR"),
-                                    overallDifficultyDisplay = new VerticalAttributeDisplay("OD"),
+                                    circleSizeDisplay = new VerticalAttributeDisplay("CS")
+                                    {
+                                        Shear = new Vector2(-ShearedOverlayContainer.SHEAR, 0),
+                                    },
+                                    drainRateDisplay = new VerticalAttributeDisplay("HP")
+                                    {
+                                        Shear = new Vector2(-ShearedOverlayContainer.SHEAR, 0),
+                                    },
+                                    approachRateDisplay = new VerticalAttributeDisplay("AR")
+                                    {
+                                        Shear = new Vector2(-ShearedOverlayContainer.SHEAR, 0),
+                                    },
+                                    overallDifficultyDisplay = new VerticalAttributeDisplay("OD")
+                                    {
+                                        Shear = new Vector2(-ShearedOverlayContainer.SHEAR, 0),
+                                    },
                                 }
                             }
                         }
