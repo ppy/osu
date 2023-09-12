@@ -15,7 +15,7 @@ namespace osu.Game.Overlays.Settings.Sections.DebugSettings
 {
     public partial class GeneralSettings : SettingsSubsection
     {
-        protected override LocalisableString Header => DebugSettingsStrings.GeneralHeader;
+        protected override LocalisableString Header => CommonStrings.General;
 
         [BackgroundDependencyLoader]
         private void load(FrameworkDebugConfigManager config, FrameworkConfigManager frameworkConfig, IPerformFromScreenRunner? performer)
