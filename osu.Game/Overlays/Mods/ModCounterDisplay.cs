@@ -19,9 +19,9 @@ using osuTK;
 namespace osu.Game.Overlays.Mods
 {
     /// <summary>
-    /// Base class for displays of mods effects.
+    /// Base class for displays of singular counters. Not to be confused with <see cref="BeatmapAttributesDisplay"/> which aggregates multiple attributes.
     /// </summary>
-    public abstract partial class ModsEffectDisplay : Container, IHasCurrentValue<double>
+    public abstract partial class ModCounterDisplay : Container, IHasCurrentValue<double>
     {
         public const float HEIGHT = 42;
         private const float transition_duration = 200;
@@ -57,7 +57,7 @@ namespace osu.Game.Overlays.Mods
 
         protected readonly RollingCounter<double> Counter;
 
-        protected ModsEffectDisplay()
+        protected ModCounterDisplay()
         {
             Height = HEIGHT;
             AutoSizeAxes = Axes.X;

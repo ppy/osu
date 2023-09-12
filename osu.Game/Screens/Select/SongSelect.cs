@@ -792,6 +792,8 @@ namespace osu.Game.Screens.Select
 
             BeatmapDetails.Beatmap = beatmap;
 
+            ModSelect.Beatmap = beatmap;
+
             bool beatmapSelected = beatmap is not DummyWorkingBeatmap;
 
             if (beatmapSelected)
