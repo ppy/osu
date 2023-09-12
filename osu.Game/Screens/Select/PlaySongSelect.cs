@@ -29,7 +29,7 @@ namespace osu.Game.Screens.Select
     {
         private OsuScreen? playerLoader;
 
-        // TODO: change test colour to a more unique one
+        // TODO: pick a different colour as this is using the same colour used in all figma designs
         [Cached]
         private OverlayColourProvider colourProvider = new OverlayColourProvider(OverlayColourScheme.Aquamarine);
 
