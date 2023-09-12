@@ -130,12 +130,14 @@ namespace osu.Game.Screens.Select.Carousel
                             Width = colour_box_width_expanded + corner_radius,
                             RelativeSizeAxes = Axes.Y,
                             Alpha = 0,
+                            EdgeSmoothness = new Vector2(2, 0),
                         },
                         backgroundContainer = new Container
                         {
                             Masking = true,
                             CornerRadius = corner_radius,
                             RelativeSizeAxes = Axes.Both,
+                            MaskingSmoothness = 2,
                             Children = new Drawable[]
                             {
                                 backgroundPlaceholder = new Box

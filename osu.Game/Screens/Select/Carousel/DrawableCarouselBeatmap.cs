@@ -115,6 +115,7 @@ namespace osu.Game.Screens.Select.Carousel
                             Width = colour_box_width + corner_radius,
                             RelativeSizeAxes = Axes.Y,
                             Colour = colours.ForStarDifficulty(0),
+                            EdgeSmoothness = new Vector2(2, 0),
                         },
                         rightContainer = new Container
                         {
