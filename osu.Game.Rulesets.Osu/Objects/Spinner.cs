@@ -32,6 +32,11 @@ namespace osu.Game.Rulesets.Osu.Objects
         public int SpinsRequired { get; protected set; } = 1;
 
         /// <summary>
+        /// The number of spins required to start receiving bonus score. The first bonus is awarded on this spin count.
+        /// </summary>
+        public int SpinsRequiredForBonus => SpinsRequired + bonus_spins_gap;
+
+        /// <summary>
         /// The gap between spinner completion and the first bonus-awarding spin.
         /// </summary>
         private const int bonus_spins_gap = 2;
@@ -40,11 +45,6 @@ namespace osu.Game.Rulesets.Osu.Objects
         /// Number of spins available to give bonus, beyond <see cref="SpinsRequired"/>.
         /// </summary>
         public int MaximumBonusSpins { get; protected set; } = 1;
-
-        /// <summary>
-        /// The first spin awarding bonus score.
-        /// </summary>
-        public int FirstBonusSpin => SpinsRequired + bonus_spins_gap;
 
         public override Vector2 StackOffset => Vector2.Zero;
 
@@ -73,7 +73,7 @@ namespace osu.Game.Rulesets.Osu.Objects
 
                 double startTime = StartTime + (float)(i + 1) / totalSpins * Duration;
 
-                AddNested(i < FirstBonusSpin
+                AddNested(i < SpinsRequiredForBonus
                     ? new SpinnerTick { StartTime = startTime, SpinnerDuration = Duration }
                     : new SpinnerBonusTick { StartTime = startTime, SpinnerDuration = Duration, Samples = new[] { CreateHitSampleInfo("spinnerbonus") } });
             }
