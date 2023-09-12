@@ -32,7 +32,7 @@ namespace osu.Game.Tests.Visual.UserInterface
         private Container content = null!;
         protected override Container<Drawable> Content => content;
 
-        private ModEffectPreviewPanel panel = null!;
+        private BeatmapAttributesDisplay panel = null!;
 
         [BackgroundDependencyLoader]
         private void load()
@@ -53,7 +53,7 @@ namespace osu.Game.Tests.Visual.UserInterface
             OsuModDifficultyAdjust difficultyAdjust = new OsuModDifficultyAdjust();
             OsuModDoubleTime doubleTime = new OsuModDoubleTime();
 
-            AddStep("create display", () => Child = panel = new ModEffectPreviewPanel
+            AddStep("create display", () => Child = panel = new BeatmapAttributesDisplay
             {
                 Anchor = Anchor.Centre,
                 Origin = Anchor.Centre,
