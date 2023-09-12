@@ -64,7 +64,7 @@ namespace osu.Game.Rulesets.Taiko.Beatmaps
                 {
                     if (hitObject is not IHasSliderVelocity hasSliderVelocity) continue;
 
-                    double nextScrollSpeed = hasSliderVelocity.SliderVelocity;
+                    double nextScrollSpeed = hasSliderVelocity.SliderVelocityMultiplier;
                     EffectControlPoint currentEffectPoint = converted.ControlPointInfo.EffectPointAt(hitObject.StartTime);
 
                     if (!Precision.AlmostEquals(lastScrollSpeed, nextScrollSpeed, acceptableDifference: currentEffectPoint.ScrollSpeedBindable.Precision))
@@ -189,7 +189,7 @@ namespace osu.Game.Rulesets.Taiko.Beatmaps
             if (obj.LegacyBpmMultiplier.HasValue)
                 beatLength = timingPoint.BeatLength * obj.LegacyBpmMultiplier.Value;
             else if (obj is IHasSliderVelocity hasSliderVelocity)
-                beatLength = timingPoint.BeatLength / hasSliderVelocity.SliderVelocity;
+                beatLength = timingPoint.BeatLength / hasSliderVelocity.SliderVelocityMultiplier;
             else
                 beatLength = timingPoint.BeatLength;
 
