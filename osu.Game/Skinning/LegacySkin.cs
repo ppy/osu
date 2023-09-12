@@ -30,13 +30,7 @@ namespace osu.Game.Skinning
 {
     public class LegacySkin : Skin
     {
-        /// <summary>
-        /// Whether texture for the keys exists.
-        /// Used to determine if the mania ruleset is skinned.
-        /// </summary>
-        private readonly Lazy<bool> hasKeyTexture;
-
-        protected virtual bool AllowManiaSkin => hasKeyTexture.Value;
+        protected virtual bool AllowManiaConfigLookups => true;
 
         /// <summary>
         /// Whether this skin can use samples with a custom bank (custom sample set in stable terminology).
@@ -62,10 +56,6 @@ namespace osu.Game.Skinning
         protected LegacySkin(SkinInfo skin, IStorageResourceProvider? resources, IResourceStore<byte[]>? storage, string configurationFilename = @"skin.ini")
             : base(skin, resources, storage, configurationFilename)
         {
-            // todo: this shouldn't really be duplicated here (from ManiaLegacySkinTransformer). we need to come up with a better solution.
-            hasKeyTexture = new Lazy<bool>(() => this.GetAnimation(
-                lookupForMania<string>(new LegacyManiaSkinConfigurationLookup(4, LegacyManiaSkinConfigurationLookups.KeyImage, 0))?.Value ?? "mania-key1", true,
-                true) != null);
         }
 
         protected override void ParseConfigurationStream(Stream stream)
@@ -115,7 +105,7 @@ namespace osu.Game.Skinning
                         return SkinUtils.As<TValue>(getCustomColour(Configuration, customColour.Lookup.ToString() ?? string.Empty));
 
                     case LegacyManiaSkinConfigurationLookup maniaLookup:
-                        if (!AllowManiaSkin)
+                        if (!AllowManiaConfigLookups)
                             break;
 
                         var result = lookupForMania<TValue>(maniaLookup);
