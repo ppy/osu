@@ -34,7 +34,7 @@ namespace osu.Game.Screens.Select.Carousel
         public bool HasCustomBorder;
 
         private const float corner_radius = 10;
-        private const float border_thickness = 2.5f;
+        private const float border_thickness = 2;
 
         public CarouselHeader()
         {

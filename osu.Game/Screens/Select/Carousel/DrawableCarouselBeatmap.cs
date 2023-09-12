@@ -214,7 +214,7 @@ namespace osu.Game.Screens.Select.Carousel
 
             MovementContainer.MoveToX(-50, 500, Easing.OutExpo);
 
-            rightContainer.Height = height - 2;
+            rightContainer.Height = height - 4;
 
             colourBox.RelativeSizeAxes = Axes.Both;
             colourBox.Width = 1;
