@@ -18,7 +18,7 @@ using osuTK;
 
 namespace osu.Game.Overlays.Profile.Header.Components
 {
-    public partial class PreviousUsernames : CompositeDrawable
+    public partial class PreviousUsernamesDisplay : CompositeDrawable
     {
         private const int duration = 200;
         private const int margin = 10;
@@ -32,7 +32,7 @@ namespace osu.Game.Overlays.Profile.Header.Components
         private readonly Box background;
         private readonly SpriteText header;
 
-        public PreviousUsernames()
+        public PreviousUsernamesDisplay()
         {
             HoverIconContainer hoverIcon;
 
