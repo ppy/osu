@@ -188,7 +188,7 @@ namespace osu.Game.Rulesets.Taiko.Beatmaps
             double beatLength;
 
             if (obj is IHasSliderVelocity hasSliderVelocity)
-                beatLength = timingPoint.BeatLength / hasSliderVelocity.GetPrecisionAdjustedSliderVelocityMultiplier(TaikoRuleset.SHORT_NAME);
+                beatLength = hasSliderVelocity.GetPrecisionAdjustedBeatLength(timingPoint, TaikoRuleset.SHORT_NAME);
             else
                 beatLength = timingPoint.BeatLength;
 
