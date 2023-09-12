@@ -10,7 +10,6 @@ using osu.Framework.Localisation;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Graphics.UserInterface;
-using osuTK;
 
 namespace osu.Game.Overlays.Mods
 {
@@ -32,9 +31,12 @@ namespace osu.Game.Overlays.Mods
         public VerticalAttributeDisplay(LocalisableString label)
         {
             Label = label;
+
             AutoSizeAxes = Axes.X;
-            Origin = Anchor = Anchor.CentreLeft;
-            Shear = new Vector2(-ShearedOverlayContainer.SHEAR, 0);
+
+            Origin = Anchor.CentreLeft;
+            Anchor = Anchor.CentreLeft;
+
             InternalChild = new FillFlowContainer
             {
                 Origin = Anchor.CentreLeft,
