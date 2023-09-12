@@ -25,7 +25,11 @@ using osu.Game.Configuration;
 
 namespace osu.Game.Overlays.Mods
 {
-    public partial class ModEffectPreviewPanel : CompositeDrawable
+    /// <summary>
+    /// On the mod select overlay, this provides a local updating view of BPM, star rating and other
+    /// difficulty attributes so the user can have a better insight into what mods are changing.
+    /// </summary>
+    public partial class BeatmapAttributesDisplay : CompositeDrawable
     {
         private Container content = null!;
         private Container innerContent = null!;

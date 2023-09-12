@@ -124,7 +124,7 @@ namespace osu.Game.Overlays.Mods
 
         private Container aboveColumnsContent = null!;
         private DifficultyMultiplierDisplay? multiplierDisplay;
-        private ModEffectPreviewPanel? modEffectPreviewPanel;
+        private BeatmapAttributesDisplay? modEffectPreviewPanel;
 
         protected ShearedButton BackButton { get; private set; } = null!;
         protected ShearedToggleButton? CustomisationButton { get; private set; }
@@ -181,7 +181,7 @@ namespace osu.Game.Overlays.Mods
                 aboveColumnsContent = new Container
                 {
                     RelativeSizeAxes = Axes.X,
-                    Height = ModsEffectDisplay.HEIGHT,
+                    Height = ModCounterDisplay.HEIGHT,
                     Padding = new MarginPadding { Horizontal = 100 },
                     Child = SearchTextBox = new ShearedSearchTextBox
                     {
@@ -196,7 +196,7 @@ namespace osu.Game.Overlays.Mods
                     {
                         Padding = new MarginPadding
                         {
-                            Top = ModsEffectDisplay.HEIGHT + PADDING,
+                            Top = ModCounterDisplay.HEIGHT + PADDING,
                             Bottom = PADDING
                         },
                         RelativeSizeAxes = Axes.Both,
@@ -257,7 +257,7 @@ namespace osu.Game.Overlays.Mods
                     Origin = Anchor.TopRight
                 });
 
-                FooterContent.Add(modEffectPreviewPanel = new ModEffectPreviewPanel
+                FooterContent.Add(modEffectPreviewPanel = new BeatmapAttributesDisplay
                 {
                     Anchor = Anchor.BottomRight,
                     Origin = Anchor.BottomRight,

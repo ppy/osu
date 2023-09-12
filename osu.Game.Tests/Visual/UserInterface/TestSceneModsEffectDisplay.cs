@@ -53,7 +53,7 @@ namespace osu.Game.Tests.Visual.UserInterface
             AddUntilStep("colours are correct", () => testDisplay.Container.Colour == colourProvider.Background5 && background.Colour == colours.ForModType(ModType.DifficultyIncrease));
         }
 
-        private partial class TestDisplay : ModsEffectDisplay
+        private partial class TestDisplay : ModCounterDisplay
         {
             public Container<Drawable> Container => Content;
 
