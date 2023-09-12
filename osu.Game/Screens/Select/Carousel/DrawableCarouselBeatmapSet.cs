@@ -55,6 +55,7 @@ namespace osu.Game.Screens.Select.Carousel
         private Container backgroundContainer = null!;
         private SpriteIcon rightArrow = null!;
         private DelayedLoadWrapper mainFlow = null!;
+        private Box backgroundPlaceholder = null!;
 
         [Resolved]
         private BeatmapManager manager { get; set; } = null!;
@@ -137,6 +138,12 @@ namespace osu.Game.Screens.Select.Carousel
                             RelativeSizeAxes = Axes.Both,
                             Children = new Drawable[]
                             {
+                                backgroundPlaceholder = new Box
+                                {
+                                    RelativeSizeAxes = Axes.Both,
+                                    Colour = colourProvider.Background5,
+                                    Alpha = 0,
+                                },
                                 // Choice of background image matches BSS implementation (always uses the lowest `beatmap_id` from the set).
                                 background = new DelayedLoadWrapper(() => new SetPanelBackground(manager.GetWorkingBeatmap(beatmapSet.Beatmaps.MinBy(b => b.OnlineID)))
                                 {
@@ -192,6 +199,7 @@ namespace osu.Game.Screens.Select.Carousel
 
             colourBox.FadeOut(duration, Easing.OutQuint);
             rightArrow.FadeOut(duration, Easing.OutQuint);
+            backgroundPlaceholder.FadeOut(duration, Easing.OutQuint);
         }
 
         protected override void Selected()
@@ -209,6 +217,7 @@ namespace osu.Game.Screens.Select.Carousel
 
             colourBox.FadeIn(duration, Easing.OutQuint);
             rightArrow.FadeIn(duration, Easing.OutQuint);
+            backgroundPlaceholder.FadeIn(duration, Easing.OutQuint);
         }
 
         private void updateBeatmapDifficulties()
