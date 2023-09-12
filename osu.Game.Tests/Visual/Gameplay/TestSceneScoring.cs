@@ -190,7 +190,9 @@ namespace osu.Game.Tests.Visual.Gameplay
                     return;
                 }
 
-                const float score_multiplier = 1;
+                // this corresponds to stable's `ScoreMultiplier`.
+                // value is chosen arbitrarily, towards the upper range.
+                const float score_multiplier = 4;
 
                 totalScore += baseScore;
 
@@ -208,13 +210,7 @@ namespace osu.Game.Tests.Visual.Gameplay
                 ApplyHit = () => applyHitV1(base_great),
                 ApplyNonPerfect = () => applyHitV1(base_ok),
                 ApplyMiss = () => applyHitV1(0),
-                GetTotalScore = () =>
-                {
-                    // Arbitrary value chosen towards the upper range.
-                    const double score_multiplier = 4;
-
-                    return (int)(totalScore * score_multiplier);
-                },
+                GetTotalScore = () => totalScore,
                 Visible = scoreV1Visible
             });
         }
