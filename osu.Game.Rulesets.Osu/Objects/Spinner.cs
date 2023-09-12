@@ -32,6 +32,16 @@ namespace osu.Game.Rulesets.Osu.Objects
         public int SpinsRequired { get; protected set; } = 1;
 
         /// <summary>
+        /// The number of spins required to start receiving bonus score. The first bonus is awarded on this spin count.
+        /// </summary>
+        public int SpinsRequiredForBonus => SpinsRequired + bonus_spins_gap;
+
+        /// <summary>
+        /// The gap between spinner completion and the first bonus-awarding spin.
+        /// </summary>
+        private const int bonus_spins_gap = 2;
+
+        /// <summary>
         /// Number of spins available to give bonus, beyond <see cref="SpinsRequired"/>.
         /// </summary>
         public int MaximumBonusSpins { get; protected set; } = 1;
@@ -48,14 +58,14 @@ namespace osu.Game.Rulesets.Osu.Objects
             double minimumRotationsPerSecond = IBeatmapDifficultyInfo.DifficultyRange(difficulty.OverallDifficulty, 1.5, 2.5, 3.75);
 
             SpinsRequired = (int)(secondsDuration * minimumRotationsPerSecond);
-            MaximumBonusSpins = (int)((maximum_rotations_per_second - minimumRotationsPerSecond) * secondsDuration);
+            MaximumBonusSpins = (int)((maximum_rotations_per_second - minimumRotationsPerSecond) * secondsDuration) - bonus_spins_gap;
         }
 
         protected override void CreateNestedHitObjects(CancellationToken cancellationToken)
         {
             base.CreateNestedHitObjects(cancellationToken);
 
-            int totalSpins = MaximumBonusSpins + SpinsRequired;
+            int totalSpins = MaximumBonusSpins + SpinsRequired + bonus_spins_gap;
 
             for (int i = 0; i < totalSpins; i++)
             {
@@ -63,7 +73,7 @@ namespace osu.Game.Rulesets.Osu.Objects
 
                 double startTime = StartTime + (float)(i + 1) / totalSpins * Duration;
 
-                AddNested(i < SpinsRequired
+                AddNested(i < SpinsRequiredForBonus
                     ? new SpinnerTick { StartTime = startTime, SpinnerDuration = Duration }
                     : new SpinnerBonusTick { StartTime = startTime, SpinnerDuration = Duration, Samples = new[] { CreateHitSampleInfo("spinnerbonus") } });
             }
