@@ -35,8 +35,9 @@ namespace osu.Game.Tests.Visual.Gameplay
     {
         private GraphContainer graphs = null!;
         private SettingsSlider<int> sliderMaxCombo = null!;
+        private SettingsCheckbox scaleToMax = null!;
 
-        private FillFlowContainer legend = null!;
+        private FillFlowContainer<LegendEntry> legend = null!;
 
         private readonly BindableBool standardisedVisible = new BindableBool(true);
         private readonly BindableBool classicVisible = new BindableBool(true);
@@ -78,7 +79,7 @@ namespace osu.Game.Tests.Visual.Gameplay
                             },
                             new Drawable[]
                             {
-                                legend = new FillFlowContainer
+                                legend = new FillFlowContainer<LegendEntry>
                                 {
                                     Padding = new MarginPadding(20),
                                     Direction = FillDirection.Vertical,
@@ -93,26 +94,31 @@ namespace osu.Game.Tests.Visual.Gameplay
                                     Padding = new MarginPadding(20),
                                     RelativeSizeAxes = Axes.X,
                                     AutoSizeAxes = Axes.Y,
-                                    Direction = FillDirection.Full,
+                                    Direction = FillDirection.Vertical,
+                                    Spacing = new Vector2(10),
                                     Children = new Drawable[]
                                     {
                                         sliderMaxCombo = new SettingsSlider<int>
                                         {
-                                            Width = 0.5f,
                                             TransferValueOnCommit = true,
                                             Current = new BindableInt(1024)
                                             {
                                                 MinValue = 96,
                                                 MaxValue = 8192,
                                             },
-                                            LabelText = "max combo",
+                                            LabelText = "Max combo",
+                                        },
+                                        scaleToMax = new SettingsCheckbox
+                                        {
+                                            LabelText = "Rescale plots to 100%",
+                                            Current = { Value = true, Default = true }
                                         },
                                         new OsuTextFlowContainer
                                         {
                                             RelativeSizeAxes = Axes.X,
-                                            Width = 0.5f,
                                             AutoSizeAxes = Axes.Y,
-                                            Text = $"Left click to add miss\nRight click to add OK/{base_ok}"
+                                            Text = $"Left click to add miss\nRight click to add OK/{base_ok}",
+                                            Margin = new MarginPadding { Top = 20 }
                                         }
                                     }
                                 },
@@ -122,6 +128,12 @@ namespace osu.Game.Tests.Visual.Gameplay
                 };
 
                 sliderMaxCombo.Current.BindValueChanged(_ => rerun());
+                scaleToMax.Current.BindValueChanged(_ => rerun());
+
+                standardisedVisible.BindValueChanged(_ => rescalePlots());
+                classicVisible.BindValueChanged(_ => rescalePlots());
+                scoreV1Visible.BindValueChanged(_ => rescalePlots());
+                scoreV2Visible.BindValueChanged(_ => rescalePlots());
 
                 graphs.MissLocations.BindCollectionChanged((_, __) => rerun());
                 graphs.NonPerfectLocations.BindCollectionChanged((_, __) => rerun());
@@ -145,6 +157,24 @@ namespace osu.Game.Tests.Visual.Gameplay
 
             runScoreV1();
             runScoreV2();
+
+            rescalePlots();
+        }
+
+        private void rescalePlots()
+        {
+            if (!scaleToMax.Current.Value && legend.Any(entry => entry.Visible.Value))
+            {
+                long maxScore = legend.Where(entry => entry.Visible.Value).Max(entry => entry.FinalScore);
+
+                foreach (var graph in graphs)
+                    graph.Height = graph.Values.Max() / maxScore;
+            }
+            else
+            {
+                foreach (var graph in graphs)
+                    graph.Height = 1;
+            }
         }
 
         private void runScoreV1()
@@ -289,6 +319,8 @@ namespace osu.Game.Tests.Visual.Gameplay
             graphs.Add(graph = new LineGraph
             {
                 Name = scoringAlgorithm.Name,
+                Anchor = Anchor.BottomLeft,
+                Origin = Anchor.BottomLeft,
                 RelativeSizeAxes = Axes.Both,
                 LineColour = scoringAlgorithm.Colour,
                 Values = results
@@ -312,14 +344,14 @@ namespace osu.Game.Tests.Visual.Gameplay
         public BindableBool Visible { get; init; } = null!;
     }
 
-    public partial class GraphContainer : Container, IHasCustomTooltip<IEnumerable<LineGraph>>
+    public partial class GraphContainer : Container<LineGraph>, IHasCustomTooltip<IEnumerable<LineGraph>>
     {
         public readonly BindableList<double> MissLocations = new BindableList<double>();
         public readonly BindableList<double> NonPerfectLocations = new BindableList<double>();
 
         public Bindable<int> MaxCombo = new Bindable<int>();
 
-        protected override Container<Drawable> Content { get; } = new Container { RelativeSizeAxes = Axes.Both };
+        protected override Container<LineGraph> Content { get; } = new Container<LineGraph> { RelativeSizeAxes = Axes.Both };
 
         private readonly Box hoverLine;
 
@@ -470,7 +502,7 @@ namespace osu.Game.Tests.Visual.Gameplay
 
         public ITooltip<IEnumerable<LineGraph>> GetCustomTooltip() => tooltip ??= new GraphTooltip(this);
 
-        public IEnumerable<LineGraph> TooltipContent => Content.OfType<LineGraph>();
+        public IEnumerable<LineGraph> TooltipContent => Content;
 
         public partial class GraphTooltip : CompositeDrawable, ITooltip<IEnumerable<LineGraph>>
         {
@@ -535,8 +567,9 @@ namespace osu.Game.Tests.Visual.Gameplay
 
         public BindableBool Visible { get; } = new BindableBool(true);
 
+        public readonly long FinalScore;
+
         private readonly string description;
-        private readonly long finalScore;
         private readonly LineGraph lineGraph;
 
         private OsuSpriteText descriptionText = null!;
@@ -545,7 +578,7 @@ namespace osu.Game.Tests.Visual.Gameplay
         public LegendEntry(ScoringAlgorithm scoringAlgorithm, LineGraph lineGraph)
         {
             description = scoringAlgorithm.Name;
-            finalScore = scoringAlgorithm.GetTotalScore();
+            FinalScore = scoringAlgorithm.GetTotalScore();
             AccentColour = scoringAlgorithm.Colour;
             Visible.BindTo(scoringAlgorithm.Visible);
 
@@ -598,7 +631,7 @@ namespace osu.Game.Tests.Visual.Gameplay
             Colour = IsHovered ? AccentColour.Lighten(0.2f) : AccentColour;
 
             descriptionText.Text = $"{(Visible.Value ? FontAwesome.Solid.CheckCircle.Icon : FontAwesome.Solid.Circle.Icon)} {description}";
-            finalScoreText.Text = finalScore.ToString("#,0");
+            finalScoreText.Text = FinalScore.ToString("#,0");
             lineGraph.Alpha = Visible.Value ? 1 : 0;
         }
     }
