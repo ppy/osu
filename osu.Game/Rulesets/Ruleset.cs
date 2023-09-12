@@ -389,6 +389,21 @@ namespace osu.Game.Rulesets
         /// Can be overridden to alter the difficulty section to the editor beatmap setup screen.
         /// </summary>
         public virtual DifficultySection? CreateEditorDifficultySection() => null;
-        public virtual BeatmapDifficulty GetEffectiveDifficulty(IBeatmapDifficultyInfo baseDifficulty, IReadOnlyList<Mod> mods, ref (bool AR, bool OD) isRateAdjusted) => (BeatmapDifficulty)baseDifficulty;
+        public virtual BeatmapDifficulty GetEffectiveDifficulty(IBeatmapDifficultyInfo baseDifficulty, IReadOnlyList<Mod> mods, ref (RateAdjustType AR, RateAdjustType OD) rateAdjustedInfo) => (BeatmapDifficulty)baseDifficulty;
+        public enum RateAdjustType
+        {
+            NotChanged,
+            DifficultyReduction,
+            DifficultyIncrease
+        }
+
+        protected RateAdjustType GetRateAdjustType(float baseValue, float adjustedValue)
+        {
+            if (adjustedValue > baseValue)
+                return RateAdjustType.DifficultyIncrease;
+            if (adjustedValue < baseValue)
+                return RateAdjustType.DifficultyReduction;
+            return RateAdjustType.NotChanged;
+        }
     }
 }

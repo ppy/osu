@@ -335,10 +335,10 @@ namespace osu.Game.Rulesets.Osu
         public float OdFromHitwindow(double hitwindow300) => (float)(80.0 - hitwindow300) / 6;
         public float ChangeArFromRate(float AR, double rate) => ArFromPreempt(PreemptFromAr(AR) / rate);
         public float ChangeOdFromRate(float OD, double rate) => OdFromHitwindow(HitwindowFromOd(OD) / rate);
-        public override BeatmapDifficulty GetEffectiveDifficulty(IBeatmapDifficultyInfo baseDifficulty, IReadOnlyList<Mod> mods, ref (bool AR, bool OD) isRateAdjusted)
+        public override BeatmapDifficulty GetEffectiveDifficulty(IBeatmapDifficultyInfo baseDifficulty, IReadOnlyList<Mod> mods, ref (RateAdjustType AR, RateAdjustType OD) rateAdjustedInfo)
         {
             BeatmapDifficulty? adjustedDifficulty = null;
-            isRateAdjusted = (false, false);
+            rateAdjustedInfo = (RateAdjustType.NotChanged, RateAdjustType.NotChanged);
 
             if (mods.Any(m => m is IApplicableToDifficulty))
             {
@@ -362,8 +362,8 @@ namespace osu.Game.Rulesets.Osu
                     adjustedDifficulty.ApproachRate = ChangeArFromRate(ar, speedChange);
                     adjustedDifficulty.OverallDifficulty = ChangeOdFromRate(od, speedChange);
 
-                    if (adjustedDifficulty.ApproachRate != ar) isRateAdjusted.AR = true;
-                    if (adjustedDifficulty.OverallDifficulty != od) isRateAdjusted.OD = true;
+                    rateAdjustedInfo.AR = GetRateAdjustType(ar, adjustedDifficulty.ApproachRate);
+                    rateAdjustedInfo.OD = GetRateAdjustType(od, adjustedDifficulty.OverallDifficulty);
                 }
             }
 
