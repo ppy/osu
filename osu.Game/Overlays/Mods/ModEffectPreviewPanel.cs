@@ -73,8 +73,6 @@ namespace osu.Game.Overlays.Mods
                 Origin = Anchor.BottomRight,
                 Anchor = Anchor.BottomRight,
                 AutoSizeAxes = Axes.X,
-                AutoSizeEasing = Easing.OutQuint,
-                AutoSizeDuration = transition_duration,
                 Height = ShearedButton.HEIGHT,
                 Shear = new Vector2(shear, 0),
                 CornerRadius = ShearedButton.CORNER_RADIUS,
@@ -135,6 +133,7 @@ namespace osu.Game.Overlays.Mods
                             },
                             outerContent = new FillFlowContainer<VerticalAttributeDisplay>
                             {
+                                Alpha = 0,
                                 Origin = Anchor.CentreLeft,
                                 Anchor = Anchor.CentreLeft,
                                 AutoSizeAxes = Axes.X,
@@ -163,7 +162,6 @@ namespace osu.Game.Overlays.Mods
             content.BorderColour = ColourInfo.GradientVertical(background.Colour, glowColour);
             innerContent.BorderColour = ColourInfo.GradientVertical(innerBackground.Colour, glowColour);
 
-            BeatmapInfo.BindValueChanged(_ => updateValues());
             mods.BindValueChanged(_ =>
             {
                 modSettingChangeTracker?.Dispose();
@@ -173,12 +171,20 @@ namespace osu.Game.Overlays.Mods
                 updateValues();
             }, true);
 
-            Collapsed.BindValueChanged(_ => updateCollapsedState(), true);
-            FinishTransforms(true);
+            Collapsed.BindValueChanged(_ =>
+            {
+                // Only start autosize animations on first collapse toggle. This avoids an ugly initial presentation.
+                startAnimating();
+
+                updateCollapsedState();
+            });
+
+            BeatmapInfo.BindValueChanged(_ => updateValues(), true);
         }
 
         protected override bool OnHover(HoverEvent e)
         {
+            startAnimating();
             updateCollapsedState();
             return true;
         }
@@ -193,12 +199,19 @@ namespace osu.Game.Overlays.Mods
 
         protected override bool OnClick(ClickEvent e) => true;
 
+        private void startAnimating()
+        {
+            content.AutoSizeEasing = Easing.OutQuint;
+            content.AutoSizeDuration = transition_duration;
+        }
+
         private void updateValues() => Scheduler.AddOnce(() =>
         {
             if (BeatmapInfo.Value == null)
                 return;
 
             cancellationSource?.Cancel();
+
             starDifficulty = difficultyCache.GetBindableDifficulty(BeatmapInfo.Value, (cancellationSource = new CancellationTokenSource()).Token);
             starDifficulty.BindValueChanged(s =>
             {

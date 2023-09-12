@@ -339,9 +339,11 @@ namespace osu.Game.Overlays.Mods
 
             SearchTextBox.PlaceholderText = SearchTextBox.HasFocus ? Resources.Localisation.Web.CommonStrings.InputSearch : ModSelectOverlayStrings.TabToSearch;
 
-            if (modEffectPreviewPanel != null)
+            // only update preview panel's collapsed state after we are fully visible, to ensure all the buttons are where we expect them to be.
+            if (modEffectPreviewPanel != null && Alpha == 1)
             {
                 float rightEdgeOfLastButton = footerButtonFlow.Last().ScreenSpaceDrawQuad.TopRight.X;
+
                 // this is cheating a bit; the 375 value is hardcoded based on how wide the expanded panel _generally_ is.
                 // due to the transition applied, the raw screenspace quad of the panel cannot be used, as it will trigger an ugly feedback cycle of expanding and collapsing.
                 float projectedLeftEdgeOfExpandedModEffectPreviewPanel = footerButtonFlow.ToScreenSpace(footerButtonFlow.DrawSize - new Vector2(375 + 70, 0)).X;
