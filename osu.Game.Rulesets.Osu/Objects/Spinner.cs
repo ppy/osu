@@ -42,15 +42,10 @@ namespace osu.Game.Rulesets.Osu.Objects
         {
             base.ApplyDefaultsToSelf(controlPointInfo, difficulty);
 
-            // spinning doesn't match 1:1 with stable, so let's fudge them easier for the time being.
-            const double stable_matching_fudge = 0.6;
-
-            // close to 477rpm
-            const double maximum_rotations_per_second = 8;
+            const double maximum_rotations_per_second = 477f / 60f;
 
             double secondsDuration = Duration / 1000;
-
-            double minimumRotationsPerSecond = stable_matching_fudge * IBeatmapDifficultyInfo.DifficultyRange(difficulty.OverallDifficulty, 3, 5, 7.5);
+            double minimumRotationsPerSecond = IBeatmapDifficultyInfo.DifficultyRange(difficulty.OverallDifficulty, 1.5, 2.5, 3.75);
 
             SpinsRequired = (int)(secondsDuration * minimumRotationsPerSecond);
             MaximumBonusSpins = (int)((maximum_rotations_per_second - minimumRotationsPerSecond) * secondsDuration);
