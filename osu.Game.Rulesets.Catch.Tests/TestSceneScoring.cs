@@ -17,6 +17,11 @@ namespace osu.Game.Rulesets.Catch.Tests
     [TestFixture]
     public partial class TestSceneScoring : ScoringTestScene
     {
+        public TestSceneScoring()
+            : base(supportsNonPerfectJudgements: false)
+        {
+        }
+
         protected override IBeatmap CreateBeatmap(int maxCombo)
         {
             var beatmap = new CatchBeatmap();
