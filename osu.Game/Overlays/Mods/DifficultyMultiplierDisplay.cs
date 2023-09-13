@@ -1,10 +1,7 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using osu.Framework.Graphics;
-using osu.Framework.Graphics.Sprites;
 using osu.Framework.Localisation;
-using osuTK;
 using osu.Game.Localisation;
 
 namespace osu.Game.Overlays.Mods
@@ -13,21 +10,12 @@ namespace osu.Game.Overlays.Mods
     {
         protected override LocalisableString Label => DifficultyMultiplierDisplayStrings.DifficultyMultiplier;
 
-        protected override string CounterFormat => @"N2";
+        protected override string CounterFormat => @"0.0x";
 
         public DifficultyMultiplierDisplay()
         {
             Current.Default = 1d;
             Current.Value = 1d;
-
-            Add(new SpriteIcon
-            {
-                Anchor = Anchor.CentreLeft,
-                Origin = Anchor.CentreLeft,
-                Icon = FontAwesome.Solid.Times,
-                Size = new Vector2(7),
-                Margin = new MarginPadding { Top = 1 }
-            });
         }
 
         protected override void LoadComplete()
