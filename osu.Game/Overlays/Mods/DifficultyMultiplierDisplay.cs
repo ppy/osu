@@ -6,9 +6,6 @@ using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Extensions.LocalisationExtensions;
 using osu.Framework.Graphics;
-using osu.Framework.Graphics.Colour;
-using osu.Framework.Graphics.Containers;
-using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.UserInterface;
 using osu.Framework.Localisation;
 using osu.Game.Graphics;
@@ -23,14 +20,9 @@ namespace osu.Game.Overlays.Mods
     /// <summary>
     /// On the mod select overlay, this provides a local updating view of the aggregate score multiplier coming from mods.
     /// </summary>
-    public partial class DifficultyMultiplierDisplay : Container, IHasCurrentValue<double>
+    public partial class DifficultyMultiplierDisplay : ModFooterInformationDisplay, IHasCurrentValue<double>
     {
         public const float HEIGHT = 42;
-        private const float transition_duration = 200;
-
-        private readonly Box background;
-        private readonly Box labelBackground;
-        private readonly FillFlowContainer content;
 
         public Bindable<double> Current
         {
@@ -40,110 +32,53 @@ namespace osu.Game.Overlays.Mods
 
         private readonly BindableWithCurrent<double> current = new BindableWithCurrent<double>();
 
+        private const float transition_duration = 200;
+
+        private RollingCounter<double> counter = null!;
+
         [Resolved]
         private OsuColour colours { get; set; } = null!;
 
         [Resolved]
         private OverlayColourProvider colourProvider { get; set; } = null!;
 
-        private readonly RollingCounter<double> counter;
-
-        private readonly InputBlockingContainer topContent;
-
         public DifficultyMultiplierDisplay()
         {
             Current.Default = 1d;
             Current.Value = 1d;
-
-            const float shear = ShearedOverlayContainer.SHEAR;
-
-            AutoSizeAxes = Axes.Both;
-
-            InternalChild = topContent = new InputBlockingContainer
-            {
-                Origin = Anchor.BottomRight,
-                Anchor = Anchor.BottomRight,
-                AutoSizeAxes = Axes.X,
-                Height = ShearedButton.HEIGHT,
-                Shear = new Vector2(shear, 0),
-                CornerRadius = ShearedButton.CORNER_RADIUS,
-                BorderThickness = ShearedButton.BORDER_THICKNESS,
-                Masking = true,
-                Children = new Drawable[]
-                {
-                    background = new Box
-                    {
-                        RelativeSizeAxes = Axes.Both,
-                    },
-                    new GridContainer
-                    {
-                        RelativeSizeAxes = Axes.Y,
-                        AutoSizeAxes = Axes.X,
-                        ColumnDimensions = new[]
-                        {
-                            new Dimension(GridSizeMode.AutoSize),
-                            new Dimension(GridSizeMode.Absolute, 56)
-                        },
-                        Content = new[]
-                        {
-                            new Drawable[]
-                            {
-                                new Container
-                                {
-                                    RelativeSizeAxes = Axes.Y,
-                                    AutoSizeAxes = Axes.X,
-                                    Masking = true,
-                                    CornerRadius = ModSelectPanel.CORNER_RADIUS,
-                                    Children = new Drawable[]
-                                    {
-                                        labelBackground = new Box
-                                        {
-                                            RelativeSizeAxes = Axes.Both
-                                        },
-                                        new OsuSpriteText
-                                        {
-                                            Anchor = Anchor.Centre,
-                                            Origin = Anchor.Centre,
-                                            Margin = new MarginPadding { Horizontal = 18 },
-                                            Shear = new Vector2(-shear, 0),
-                                            Text = DifficultyMultiplierDisplayStrings.DifficultyMultiplier,
-                                            Font = OsuFont.Default.With(size: 17, weight: FontWeight.SemiBold)
-                                        }
-                                    }
-                                },
-                                content = new FillFlowContainer
-                                {
-                                    AutoSizeAxes = Axes.Both,
-                                    Anchor = Anchor.Centre,
-                                    Origin = Anchor.Centre,
-                                    Direction = FillDirection.Horizontal,
-                                    Shear = new Vector2(-shear, 0),
-                                    Spacing = new Vector2(2, 0),
-                                    Child = counter = new EffectCounter(@"0.0x")
-                                    {
-                                        Anchor = Anchor.CentreLeft,
-                                        Origin = Anchor.CentreLeft,
-                                        Current = { BindTarget = Current }
-                                    }
-                                }
-                            }
-                        }
-                    }
-                }
-            };
         }
 
         [BackgroundDependencyLoader]
         private void load()
         {
-            background.Colour = colourProvider.Background4;
-            topContent.BorderColour = ColourInfo.GradientVertical(background.Colour, colourProvider.Background1);
+            LeftContent.AddRange(new Drawable[]
+            {
+                new OsuSpriteText
+                {
+                    Anchor = Anchor.Centre,
+                    Origin = Anchor.Centre,
+                    Shear = new Vector2(-ShearedOverlayContainer.SHEAR, 0),
+                    Text = DifficultyMultiplierDisplayStrings.DifficultyMultiplier,
+                    Font = OsuFont.Default.With(size: 17, weight: FontWeight.SemiBold)
+                }
+            });
 
-            labelBackground.Colour = colourProvider.Background4;
+            RightContent.Add(counter = new EffectCounter
+            {
+                Margin = new MarginPadding(10),
+                AutoSizeAxes = Axes.Y,
+                Width = 40,
+                Shear = new Vector2(-ShearedOverlayContainer.SHEAR, 0),
+                Anchor = Anchor.Centre,
+                Origin = Anchor.Centre,
+                Current = { BindTarget = Current }
+            });
         }
 
         protected override void LoadComplete()
         {
+            base.LoadComplete();
+
             Current.BindValueChanged(e =>
             {
                 var effect = calculateEffectForComparison(e.NewValue.CompareTo(Current.Default));
@@ -164,18 +99,18 @@ namespace osu.Game.Overlays.Mods
             switch (effect)
             {
                 case ModEffect.NotChanged:
-                    background.FadeColour(colourProvider.Background3, transition_duration, Easing.OutQuint);
-                    content.FadeColour(Colour4.White, transition_duration, Easing.OutQuint);
+                    MainBackground.FadeColour(colourProvider.Background4, transition_duration, Easing.OutQuint);
+                    counter.FadeColour(Colour4.White, transition_duration, Easing.OutQuint);
                     break;
 
                 case ModEffect.DifficultyReduction:
-                    background.FadeColour(colours.ForModType(ModType.DifficultyReduction), transition_duration, Easing.OutQuint);
-                    content.FadeColour(colourProvider.Background5, transition_duration, Easing.OutQuint);
+                    MainBackground.FadeColour(colours.ForModType(ModType.DifficultyReduction), transition_duration, Easing.OutQuint);
+                    counter.FadeColour(colourProvider.Background5, transition_duration, Easing.OutQuint);
                     break;
 
                 case ModEffect.DifficultyIncrease:
-                    background.FadeColour(colours.ForModType(ModType.DifficultyIncrease), transition_duration, Easing.OutQuint);
-                    content.FadeColour(colourProvider.Background5, transition_duration, Easing.OutQuint);
+                    MainBackground.FadeColour(colours.ForModType(ModType.DifficultyIncrease), transition_duration, Easing.OutQuint);
+                    counter.FadeColour(colourProvider.Background5, transition_duration, Easing.OutQuint);
                     break;
 
                 default:
@@ -207,19 +142,14 @@ namespace osu.Game.Overlays.Mods
 
         private partial class EffectCounter : RollingCounter<double>
         {
-            private readonly string? format;
-
-            public EffectCounter(string? format)
-            {
-                this.format = format;
-            }
-
             protected override double RollingDuration => 500;
 
-            protected override LocalisableString FormatCount(double count) => count.ToLocalisableString(format);
+            protected override LocalisableString FormatCount(double count) => count.ToLocalisableString(@"0.00x");
 
             protected override OsuSpriteText CreateSpriteText() => new OsuSpriteText
             {
+                Anchor = Anchor.Centre,
+                Origin = Anchor.Centre,
                 Font = OsuFont.Default.With(size: 17, weight: FontWeight.SemiBold)
             };
         }
