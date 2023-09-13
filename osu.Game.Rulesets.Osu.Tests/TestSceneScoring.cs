@@ -3,6 +3,7 @@
 
 using System;
 using NUnit.Framework;
+using osu.Framework.Bindables;
 using osu.Game.Beatmaps;
 using osu.Game.Rulesets.Judgements;
 using osu.Game.Rulesets.Osu.Beatmaps;
@@ -17,6 +18,12 @@ namespace osu.Game.Rulesets.Osu.Tests
     [TestFixture]
     public partial class TestSceneScoring : ScoringTestScene
     {
+        private Bindable<double> scoreMultiplier { get; } = new BindableDouble
+        {
+            Default = 4,
+            Value = 4
+        };
+
         protected override IBeatmap CreateBeatmap(int maxCombo)
         {
             var beatmap = new OsuBeatmap();
@@ -25,9 +32,39 @@ namespace osu.Game.Rulesets.Osu.Tests
             return beatmap;
         }
 
-        protected override IScoringAlgorithm CreateScoreV1() => new ScoreV1();
+        protected override IScoringAlgorithm CreateScoreV1() => new ScoreV1 { ScoreMultiplier = { BindTarget = scoreMultiplier } };
         protected override IScoringAlgorithm CreateScoreV2(int maxCombo) => new ScoreV2(maxCombo);
         protected override ProcessorBasedScoringAlgorithm CreateScoreAlgorithm(IBeatmap beatmap, ScoringMode mode) => new OsuProcessorBasedScoringAlgorithm(beatmap, mode);
+
+        [Test]
+        public void TestBasicScenarios()
+        {
+            AddStep("set up score multiplier", () =>
+            {
+                scoreMultiplier.BindValueChanged(_ => Rerun());
+            });
+            AddStep("set max combo to 100", () => MaxCombo.Value = 100);
+            AddStep("set perfect score", () =>
+            {
+                NonPerfectLocations.Clear();
+                MissLocations.Clear();
+            });
+            AddStep("set score with misses", () =>
+            {
+                NonPerfectLocations.Clear();
+                MissLocations.Clear();
+                MissLocations.AddRange(new[] { 24d, 49 });
+            });
+            AddStep("set score with misses and OKs", () =>
+            {
+                NonPerfectLocations.Clear();
+                MissLocations.Clear();
+
+                NonPerfectLocations.AddRange(new[] { 9d, 19, 29, 39, 59, 69, 79, 89, 99 });
+                MissLocations.AddRange(new[] { 24d, 49 });
+            });
+            AddSliderStep("adjust score multiplier", 0, 10, (int)scoreMultiplier.Default, multiplier => scoreMultiplier.Value = multiplier);
+        }
 
         private const int base_great = 300;
         private const int base_ok = 100;
@@ -36,9 +73,7 @@ namespace osu.Game.Rulesets.Osu.Tests
         {
             private int currentCombo;
 
-            // this corresponds to stable's `ScoreMultiplier`.
-            // value is chosen arbitrarily, towards the upper range.
-            private const float score_multiplier = 4;
+            public BindableDouble ScoreMultiplier { get; } = new BindableDouble();
 
             public void ApplyHit() => applyHitV1(base_great);
             public void ApplyNonPerfect() => applyHitV1(base_ok);
@@ -56,7 +91,7 @@ namespace osu.Game.Rulesets.Osu.Tests
 
                 // combo multiplier
                 // ReSharper disable once PossibleLossOfFraction
-                TotalScore += (int)(Math.Max(0, currentCombo - 1) * (baseScore / 25 * score_multiplier));
+                TotalScore += (int)(Math.Max(0, currentCombo - 1) * (baseScore / 25 * ScoreMultiplier.Value));
 
                 currentCombo++;
             }
