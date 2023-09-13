@@ -120,11 +120,12 @@ namespace osu.Game.Overlays.Mods
         private ColumnScrollContainer columnScroll = null!;
         private ColumnFlowContainer columnFlow = null!;
         private FillFlowContainer<ShearedButton> footerButtonFlow = null!;
+        private FillFlowContainer footerContentFlow = null!;
         private DeselectAllModsButton deselectAllModsButton = null!;
 
         private Container aboveColumnsContent = null!;
         private DifficultyMultiplierDisplay? multiplierDisplay;
-        private BeatmapAttributesDisplay? modEffectPreviewPanel;
+        private BeatmapAttributesDisplay? beatmapAttributesDisplay;
 
         protected ShearedButton BackButton { get; private set; } = null!;
         protected ShearedToggleButton? CustomisationButton { get; private set; }
@@ -142,8 +143,8 @@ namespace osu.Game.Overlays.Mods
                 if (beatmap == value) return;
 
                 beatmap = value;
-                if (IsLoaded && modEffectPreviewPanel != null)
-                    modEffectPreviewPanel.BeatmapInfo.Value = beatmap?.BeatmapInfo;
+                if (IsLoaded && beatmapAttributesDisplay != null)
+                    beatmapAttributesDisplay.BeatmapInfo.Value = beatmap?.BeatmapInfo;
             }
         }
 
@@ -251,22 +252,32 @@ namespace osu.Game.Overlays.Mods
 
             if (ShowModEffects)
             {
-                aboveColumnsContent.Add(multiplierDisplay = new DifficultyMultiplierDisplay
+                FooterContent.Add(footerContentFlow = new FillFlowContainer
                 {
-                    Anchor = Anchor.TopRight,
-                    Origin = Anchor.TopRight
-                });
-
-                FooterContent.Add(modEffectPreviewPanel = new BeatmapAttributesDisplay
-                {
+                    AutoSizeAxes = Axes.Both,
+                    Direction = FillDirection.Vertical,
+                    Spacing = new Vector2(30, 10),
                     Anchor = Anchor.BottomRight,
                     Origin = Anchor.BottomRight,
                     Margin = new MarginPadding
                     {
                         Vertical = PADDING,
-                        Horizontal = 70
+                        Horizontal = 20
                     },
-                    BeatmapInfo = { Value = beatmap?.BeatmapInfo }
+                    Children = new Drawable[]
+                    {
+                        beatmapAttributesDisplay = new BeatmapAttributesDisplay
+                        {
+                            Anchor = Anchor.TopRight,
+                            Origin = Anchor.TopRight,
+                            BeatmapInfo = { Value = beatmap?.BeatmapInfo }
+                        },
+                        multiplierDisplay = new DifficultyMultiplierDisplay
+                        {
+                            Anchor = Anchor.TopRight,
+                            Origin = Anchor.TopRight
+                        },
+                    }
                 });
             }
 
@@ -340,14 +351,22 @@ namespace osu.Game.Overlays.Mods
             SearchTextBox.PlaceholderText = SearchTextBox.HasFocus ? Resources.Localisation.Web.CommonStrings.InputSearch : ModSelectOverlayStrings.TabToSearch;
 
             // only update preview panel's collapsed state after we are fully visible, to ensure all the buttons are where we expect them to be.
-            if (modEffectPreviewPanel != null && Alpha == 1)
+            if (beatmapAttributesDisplay != null && Alpha == 1)
             {
                 float rightEdgeOfLastButton = footerButtonFlow.Last().ScreenSpaceDrawQuad.TopRight.X;
 
                 // this is cheating a bit; the 375 value is hardcoded based on how wide the expanded panel _generally_ is.
                 // due to the transition applied, the raw screenspace quad of the panel cannot be used, as it will trigger an ugly feedback cycle of expanding and collapsing.
                 float projectedLeftEdgeOfExpandedModEffectPreviewPanel = footerButtonFlow.ToScreenSpace(footerButtonFlow.DrawSize - new Vector2(375 + 70, 0)).X;
-                modEffectPreviewPanel.Collapsed.Value = rightEdgeOfLastButton > projectedLeftEdgeOfExpandedModEffectPreviewPanel;
+
+                bool screenIsntWideEnough = rightEdgeOfLastButton > projectedLeftEdgeOfExpandedModEffectPreviewPanel;
+
+                beatmapAttributesDisplay.Collapsed.Value = screenIsntWideEnough;
+                footerContentFlow.Direction = screenIsntWideEnough ? FillDirection.Vertical : FillDirection.Horizontal;
+
+                int layout = screenIsntWideEnough ? -1 : 1;
+                if (footerContentFlow.GetLayoutPosition(beatmapAttributesDisplay) != layout)
+                    footerContentFlow.SetLayoutPosition(beatmapAttributesDisplay, layout);
             }
         }
 
