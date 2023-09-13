@@ -3,7 +3,6 @@
 
 using System.Collections.Generic;
 using System.Linq;
-using NUnit.Framework;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Extensions.Color4Extensions;
@@ -13,6 +12,7 @@ using osu.Framework.Graphics.Cursor;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Input.Events;
+using osu.Framework.Testing;
 using osu.Game.Beatmaps;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
@@ -36,6 +36,10 @@ namespace osu.Game.Tests.Visual.Gameplay
         protected abstract IScoringAlgorithm CreateScoreV2(int maxCombo);
         protected abstract ProcessorBasedScoringAlgorithm CreateScoreAlgorithm(IBeatmap beatmap, ScoringMode mode);
 
+        protected Bindable<int> MaxCombo => sliderMaxCombo.Current;
+        protected BindableList<double> NonPerfectLocations => graphs.NonPerfectLocations;
+        protected BindableList<double> MissLocations => graphs.MissLocations;
+
         private GraphContainer graphs = null!;
         private SettingsSlider<int> sliderMaxCombo = null!;
         private SettingsCheckbox scaleToMax = null!;
@@ -50,8 +54,8 @@ namespace osu.Game.Tests.Visual.Gameplay
         [Resolved]
         private OsuColour colours { get; set; } = null!;
 
-        [Test]
-        public void TestBasic()
+        [SetUpSteps]
+        public void SetUpSteps()
         {
             AddStep("setup tests", () =>
             {
@@ -130,24 +134,24 @@ namespace osu.Game.Tests.Visual.Gameplay
                     }
                 };
 
-                sliderMaxCombo.Current.BindValueChanged(_ => rerun());
-                scaleToMax.Current.BindValueChanged(_ => rerun());
+                sliderMaxCombo.Current.BindValueChanged(_ => Rerun());
+                scaleToMax.Current.BindValueChanged(_ => Rerun());
 
                 standardisedVisible.BindValueChanged(_ => rescalePlots());
                 classicVisible.BindValueChanged(_ => rescalePlots());
                 scoreV1Visible.BindValueChanged(_ => rescalePlots());
                 scoreV2Visible.BindValueChanged(_ => rescalePlots());
 
-                graphs.MissLocations.BindCollectionChanged((_, __) => rerun());
-                graphs.NonPerfectLocations.BindCollectionChanged((_, __) => rerun());
+                graphs.MissLocations.BindCollectionChanged((_, __) => Rerun());
+                graphs.NonPerfectLocations.BindCollectionChanged((_, __) => Rerun());
 
                 graphs.MaxCombo.BindTo(sliderMaxCombo.Current);
 
-                rerun();
+                Rerun();
             });
         }
 
-        private void rerun()
+        protected void Rerun()
         {
             graphs.Clear();
             legend.Clear();
