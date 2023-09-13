@@ -19,6 +19,7 @@ namespace osu.Game.Overlays.Mods
         {
             Current.Default = 1d;
             Current.Value = 1d;
+
             Add(new SpriteIcon
             {
                 Anchor = Anchor.CentreLeft,
