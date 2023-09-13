@@ -193,10 +193,10 @@ namespace osu.Game.Rulesets.Objects.Legacy
             var addBank = (LegacySampleBank)Parsing.ParseInt(split[1]);
 
             string stringBank = bank.ToString().ToLowerInvariant();
-            if (stringBank == @"none")
+            if (stringBank == @"none" || !Enum.IsDefined(bank))
                 stringBank = null;
             string stringAddBank = addBank.ToString().ToLowerInvariant();
-            if (stringAddBank == @"none")
+            if (stringAddBank == @"none" || !Enum.IsDefined(addBank))
                 stringAddBank = null;
 
             bankInfo.BankForNormal = stringBank;
