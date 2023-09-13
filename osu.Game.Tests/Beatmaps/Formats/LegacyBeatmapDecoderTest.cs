@@ -622,6 +622,33 @@ namespace osu.Game.Tests.Beatmaps.Formats
         }
 
         [Test]
+        public void TestInvalidBankDefaultsToNone()
+        {
+            var decoder = new LegacyBeatmapDecoder { ApplyOffsets = false };
+
+            using (var resStream = TestResources.OpenResource("invalid-bank.osu"))
+            using (var stream = new LineBufferedReader(resStream))
+            {
+                var hitObjects = decoder.Decode(stream).HitObjects;
+
+                Assert.AreEqual(HitSampleInfo.BANK_NORMAL, hitObjects[0].Samples[0].Bank);
+                Assert.AreEqual(HitSampleInfo.BANK_NORMAL, hitObjects[0].Samples[1].Bank);
+
+                Assert.AreEqual(HitSampleInfo.BANK_NORMAL, hitObjects[1].Samples[0].Bank);
+                Assert.AreEqual(HitSampleInfo.BANK_SOFT, hitObjects[1].Samples[1].Bank);
+
+                Assert.AreEqual(HitSampleInfo.BANK_SOFT, hitObjects[2].Samples[0].Bank);
+                Assert.AreEqual(HitSampleInfo.BANK_SOFT, hitObjects[2].Samples[1].Bank);
+
+                Assert.AreEqual(HitSampleInfo.BANK_NORMAL, hitObjects[3].Samples[0].Bank);
+                Assert.AreEqual(HitSampleInfo.BANK_SOFT, hitObjects[3].Samples[1].Bank);
+
+                Assert.AreEqual(HitSampleInfo.BANK_NORMAL, hitObjects[4].Samples[0].Bank);
+                Assert.AreEqual(HitSampleInfo.BANK_NORMAL, hitObjects[4].Samples[1].Bank);
+            }
+        }
+
+        [Test]
         public void TestFallbackDecoderForCorruptedHeader()
         {
             Decoder<Beatmap> decoder = null!;
