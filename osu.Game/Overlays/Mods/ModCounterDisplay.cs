@@ -67,6 +67,8 @@ namespace osu.Game.Overlays.Mods
                 Masking = true,
                 CornerRadius = ModSelectPanel.CORNER_RADIUS,
                 Shear = new Vector2(ShearedOverlayContainer.SHEAR, 0),
+                Anchor = Anchor.BottomRight,
+                Origin = Anchor.BottomRight,
                 Children = new Drawable[]
                 {
                     contentBackground = new Box
