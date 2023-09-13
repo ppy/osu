@@ -21,7 +21,7 @@ using osuTK;
 namespace osu.Game.Overlays.Mods
 {
     /// <summary>
-    /// Base class for displays of singular counters. Not to be confused with <see cref="BeatmapAttributesDisplay"/> which aggregates multiple attributes.
+    /// On the mod select overlay, this provides a local updating view of the aggregate score multiplier coming from mods.
     /// </summary>
     public partial class DifficultyMultiplierDisplay : Container, IHasCurrentValue<double>
     {
@@ -46,16 +46,7 @@ namespace osu.Game.Overlays.Mods
         [Resolved]
         private OverlayColourProvider colourProvider { get; set; } = null!;
 
-        /// <summary>
-        /// Text to display in the left area of the display.
-        /// </summary>
-        protected LocalisableString Label => DifficultyMultiplierDisplayStrings.DifficultyMultiplier;
-
-        protected virtual string CounterFormat => @"0.0x";
-
-        protected override Container<Drawable> Content => content;
-
-        protected readonly RollingCounter<double> Counter;
+        private readonly RollingCounter<double> counter;
 
         private readonly InputBlockingContainer topContent;
 
@@ -115,7 +106,7 @@ namespace osu.Game.Overlays.Mods
                                             Origin = Anchor.Centre,
                                             Margin = new MarginPadding { Horizontal = 18 },
                                             Shear = new Vector2(-shear, 0),
-                                            Text = Label,
+                                            Text = DifficultyMultiplierDisplayStrings.DifficultyMultiplier,
                                             Font = OsuFont.Default.With(size: 17, weight: FontWeight.SemiBold)
                                         }
                                     }
@@ -128,7 +119,7 @@ namespace osu.Game.Overlays.Mods
                                     Direction = FillDirection.Horizontal,
                                     Shear = new Vector2(-shear, 0),
                                     Spacing = new Vector2(2, 0),
-                                    Child = Counter = new EffectCounter(CounterFormat)
+                                    Child = counter = new EffectCounter(@"0.0x")
                                     {
                                         Anchor = Anchor.CentreLeft,
                                         Origin = Anchor.CentreLeft,
@@ -155,13 +146,13 @@ namespace osu.Game.Overlays.Mods
         {
             Current.BindValueChanged(e =>
             {
-                var effect = CalculateEffectForComparison(e.NewValue.CompareTo(Current.Default));
+                var effect = calculateEffectForComparison(e.NewValue.CompareTo(Current.Default));
                 setColours(effect);
             }, true);
 
             // required to prevent the counter initially rolling up from 0 to 1
             // due to `Current.Value` having a nonstandard default value of 1.
-            Counter.SetCountWithoutRolling(Current.Value);
+            counter.SetCountWithoutRolling(Current.Value);
         }
 
         /// <summary>
@@ -197,7 +188,7 @@ namespace osu.Game.Overlays.Mods
         /// </summary>
         /// <param name="comparison">Value to convert. Will arrive from comparison between <see cref="Current"/> bindable once it changes and it's <see cref="Bindable{T}.Default"/>.</param>
         /// <returns>Effect of the value.</returns>
-        protected virtual ModEffect CalculateEffectForComparison(int comparison)
+        private static ModEffect calculateEffectForComparison(int comparison)
         {
             if (comparison == 0)
                 return ModEffect.NotChanged;
