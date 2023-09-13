@@ -7,9 +7,6 @@ using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Extensions.LocalisationExtensions;
 using osu.Framework.Graphics;
-using osu.Framework.Graphics.Containers;
-using osu.Framework.Graphics.Colour;
-using osu.Framework.Graphics.Shapes;
 using osu.Framework.Localisation;
 using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.Drawables;
@@ -18,9 +15,7 @@ using osu.Game.Graphics.Sprites;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Rulesets.Mods;
 using osuTK;
-using osuTK.Graphics;
 using System.Threading;
-using osu.Framework.Input.Events;
 using osu.Game.Configuration;
 
 namespace osu.Game.Overlays.Mods
@@ -29,28 +24,17 @@ namespace osu.Game.Overlays.Mods
     /// On the mod select overlay, this provides a local updating view of BPM, star rating and other
     /// difficulty attributes so the user can have a better insight into what mods are changing.
     /// </summary>
-    public partial class BeatmapAttributesDisplay : CompositeDrawable
+    public partial class BeatmapAttributesDisplay : ModFooterInformationDisplay
     {
-        private Container content = null!;
-        private Container innerContent = null!;
-
-        private Box background = null!;
-        private Box innerBackground = null!;
-
         private StarRatingDisplay starRatingDisplay = null!;
         private BPMDisplay bpmDisplay = null!;
 
-        private FillFlowContainer<VerticalAttributeDisplay> outerContent = null!;
         private VerticalAttributeDisplay circleSizeDisplay = null!;
         private VerticalAttributeDisplay drainRateDisplay = null!;
         private VerticalAttributeDisplay approachRateDisplay = null!;
         private VerticalAttributeDisplay overallDifficultyDisplay = null!;
 
-        private const float transition_duration = 250;
-
         public Bindable<IBeatmapInfo?> BeatmapInfo { get; } = new Bindable<IBeatmapInfo?>();
-
-        public BindableBool Collapsed { get; } = new BindableBool(true);
 
         [Resolved]
         private Bindable<IReadOnlyList<Mod>> mods { get; set; } = null!;
@@ -58,114 +42,51 @@ namespace osu.Game.Overlays.Mods
         private ModSettingChangeTracker? modSettingChangeTracker;
 
         [Resolved]
-        private OverlayColourProvider colourProvider { get; set; } = null!;
-
-        [Resolved]
         private BeatmapDifficultyCache difficultyCache { get; set; } = null!;
 
         private CancellationTokenSource? cancellationSource;
         private IBindable<StarDifficulty?> starDifficulty = null!;
+
+        public BeatmapAttributesDisplay()
+        {
+            Collapsed.Value = true;
+        }
 
         [BackgroundDependencyLoader]
         private void load()
         {
             const float shear = ShearedOverlayContainer.SHEAR;
 
-            AutoSizeAxes = Axes.Both;
-
-            InternalChild = content = new Container
+            LeftContent.AddRange(new Drawable[]
             {
-                Origin = Anchor.BottomRight,
-                Anchor = Anchor.BottomRight,
-                AutoSizeAxes = Axes.X,
-                Height = ShearedButton.HEIGHT,
-                Shear = new Vector2(shear, 0),
-                CornerRadius = ShearedButton.CORNER_RADIUS,
-                BorderThickness = ShearedButton.BORDER_THICKNESS,
-                Masking = true,
-                Children = new Drawable[]
+                starRatingDisplay = new StarRatingDisplay(default, animated: true)
                 {
-                    background = new Box
-                    {
-                        RelativeSizeAxes = Axes.Both
-                    },
-                    new FillFlowContainer // divide inner and outer content
-                    {
-                        Origin = Anchor.BottomLeft,
-                        Anchor = Anchor.BottomLeft,
-                        AutoSizeAxes = Axes.X,
-                        RelativeSizeAxes = Axes.Y,
-                        Direction = FillDirection.Horizontal,
-                        Children = new Drawable[]
-                        {
-                            innerContent = new Container
-                            {
-                                AutoSizeAxes = Axes.X,
-                                RelativeSizeAxes = Axes.Y,
-                                BorderThickness = ShearedButton.BORDER_THICKNESS,
-                                CornerRadius = ShearedButton.CORNER_RADIUS,
-                                Masking = true,
-                                Children = new Drawable[]
-                                {
-                                    innerBackground = new Box
-                                    {
-                                        RelativeSizeAxes = Axes.Both
-                                    },
-                                    new Container // actual inner content
-                                    {
-                                        Origin = Anchor.Centre,
-                                        Anchor = Anchor.Centre,
-                                        Width = 140,
-                                        RelativeSizeAxes = Axes.Y,
-                                        Margin = new MarginPadding { Horizontal = 15 },
-                                        Children = new Drawable[]
-                                        {
-                                            starRatingDisplay = new StarRatingDisplay(default, animated: true)
-                                            {
-                                                Origin = Anchor.CentreLeft,
-                                                Anchor = Anchor.CentreLeft,
-                                                Shear = new Vector2(-shear, 0),
-                                            },
-                                            bpmDisplay = new BPMDisplay
-                                            {
-                                                Origin = Anchor.CentreRight,
-                                                Anchor = Anchor.CentreRight,
-                                                Shear = new Vector2(-shear, 0),
-                                            }
-                                        }
-                                    }
-                                }
-                            },
-                            outerContent = new FillFlowContainer<VerticalAttributeDisplay>
-                            {
-                                Alpha = 0,
-                                Origin = Anchor.CentreLeft,
-                                Anchor = Anchor.CentreLeft,
-                                AutoSizeAxes = Axes.X,
-                                RelativeSizeAxes = Axes.Y,
-                                Direction = FillDirection.Horizontal,
-                                Children = new[]
-                                {
-                                    circleSizeDisplay = new VerticalAttributeDisplay("CS") { Shear = new Vector2(-shear, 0), },
-                                    drainRateDisplay = new VerticalAttributeDisplay("HP") { Shear = new Vector2(-shear, 0), },
-                                    approachRateDisplay = new VerticalAttributeDisplay("AR") { Shear = new Vector2(-shear, 0), },
-                                    overallDifficultyDisplay = new VerticalAttributeDisplay("OD") { Shear = new Vector2(-shear, 0), },
-                                }
-                            }
-                        }
-                    }
+                    Origin = Anchor.CentreLeft,
+                    Anchor = Anchor.CentreLeft,
+                    Shear = new Vector2(-shear, 0),
+                },
+                bpmDisplay = new BPMDisplay
+                {
+                    Origin = Anchor.CentreLeft,
+                    Anchor = Anchor.CentreLeft,
+                    Shear = new Vector2(-shear, 0),
+                    AutoSizeAxes = Axes.Y,
+                    Width = 75,
                 }
-            };
+            });
+
+            RightContent.AddRange(new Drawable[]
+            {
+                circleSizeDisplay = new VerticalAttributeDisplay("CS") { Shear = new Vector2(-shear, 0), },
+                drainRateDisplay = new VerticalAttributeDisplay("HP") { Shear = new Vector2(-shear, 0), },
+                approachRateDisplay = new VerticalAttributeDisplay("AR") { Shear = new Vector2(-shear, 0), },
+                overallDifficultyDisplay = new VerticalAttributeDisplay("OD") { Shear = new Vector2(-shear, 0), },
+            });
         }
 
         protected override void LoadComplete()
         {
-            background.Colour = colourProvider.Background4;
-            innerBackground.Colour = colourProvider.Background3;
-            Color4 glowColour = colourProvider.Background1;
-
-            content.BorderColour = ColourInfo.GradientVertical(background.Colour, glowColour);
-            innerContent.BorderColour = ColourInfo.GradientVertical(innerBackground.Colour, glowColour);
+            base.LoadComplete();
 
             mods.BindValueChanged(_ =>
             {
@@ -176,38 +97,7 @@ namespace osu.Game.Overlays.Mods
                 updateValues();
             }, true);
 
-            Collapsed.BindValueChanged(_ =>
-            {
-                // Only start autosize animations on first collapse toggle. This avoids an ugly initial presentation.
-                startAnimating();
-
-                updateCollapsedState();
-            });
-
             BeatmapInfo.BindValueChanged(_ => updateValues(), true);
-        }
-
-        protected override bool OnHover(HoverEvent e)
-        {
-            startAnimating();
-            updateCollapsedState();
-            return true;
-        }
-
-        protected override void OnHoverLost(HoverLostEvent e)
-        {
-            updateCollapsedState();
-            base.OnHoverLost(e);
-        }
-
-        protected override bool OnMouseDown(MouseDownEvent e) => true;
-
-        protected override bool OnClick(ClickEvent e) => true;
-
-        private void startAnimating()
-        {
-            content.AutoSizeEasing = Easing.OutQuint;
-            content.AutoSizeDuration = transition_duration;
         }
 
         private void updateValues() => Scheduler.AddOnce(() =>
@@ -242,11 +132,6 @@ namespace osu.Game.Overlays.Mods
             overallDifficultyDisplay.Current.Value = adjustedDifficulty.OverallDifficulty;
         });
 
-        private void updateCollapsedState()
-        {
-            outerContent.FadeTo(Collapsed.Value && !IsHovered ? 0 : 1, transition_duration, Easing.OutQuint);
-        }
-
         private partial class BPMDisplay : RollingCounter<double>
         {
             protected override double RollingDuration => 500;
@@ -255,6 +140,8 @@ namespace osu.Game.Overlays.Mods
 
             protected override OsuSpriteText CreateSpriteText() => new OsuSpriteText
             {
+                Anchor = Anchor.CentreRight,
+                Origin = Anchor.CentreRight,
                 Font = OsuFont.Default.With(size: 20, weight: FontWeight.SemiBold),
                 UseFullGlyphHeight = false,
             };
