@@ -1,6 +1,7 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System;
 using NUnit.Framework;
 using osu.Game.Beatmaps;
 using osu.Game.Rulesets.Judgements;
@@ -16,8 +17,6 @@ namespace osu.Game.Rulesets.Osu.Tests
     [TestFixture]
     public partial class TestSceneScoring : ScoringTestScene
     {
-        protected override ScoreProcessor CreateScoreProcessor() => new OsuScoreProcessor();
-
         protected override IBeatmap CreateBeatmap(int maxCombo)
         {
             var beatmap = new OsuBeatmap();
@@ -26,8 +25,117 @@ namespace osu.Game.Rulesets.Osu.Tests
             return beatmap;
         }
 
-        protected override JudgementResult CreatePerfectJudgementResult() => new OsuJudgementResult(new HitCircle(), new OsuJudgement()) { Type = HitResult.Great };
-        protected override JudgementResult CreateNonPerfectJudgementResult() => new OsuJudgementResult(new HitCircle(), new OsuJudgement()) { Type = HitResult.Ok };
-        protected override JudgementResult CreateMissJudgementResult() => new OsuJudgementResult(new HitCircle(), new OsuJudgement()) { Type = HitResult.Miss };
+        protected override IScoringAlgorithm CreateScoreV1() => new ScoreV1();
+        protected override IScoringAlgorithm CreateScoreV2(int maxCombo) => new ScoreV2(maxCombo);
+        protected override ProcessorBasedScoringAlgorithm CreateScoreAlgorithm(IBeatmap beatmap, ScoringMode mode) => new OsuProcessorBasedScoringAlgorithm(beatmap, mode);
+
+        private const int base_great = 300;
+        private const int base_ok = 100;
+
+        private class ScoreV1 : IScoringAlgorithm
+        {
+            private int currentCombo;
+
+            // this corresponds to stable's `ScoreMultiplier`.
+            // value is chosen arbitrarily, towards the upper range.
+            private const float score_multiplier = 4;
+
+            public void ApplyHit() => applyHitV1(base_great);
+            public void ApplyNonPerfect() => applyHitV1(base_ok);
+            public void ApplyMiss() => applyHitV1(0);
+
+            private void applyHitV1(int baseScore)
+            {
+                if (baseScore == 0)
+                {
+                    currentCombo = 0;
+                    return;
+                }
+
+                TotalScore += baseScore;
+
+                // combo multiplier
+                // ReSharper disable once PossibleLossOfFraction
+                TotalScore += (int)(Math.Max(0, currentCombo - 1) * (baseScore / 25 * score_multiplier));
+
+                currentCombo++;
+            }
+
+            public long TotalScore { get; private set; }
+        }
+
+        private class ScoreV2 : IScoringAlgorithm
+        {
+            private int currentCombo;
+            private double comboPortion;
+            private double currentBaseScore;
+            private double maxBaseScore;
+            private int currentHits;
+
+            private readonly double comboPortionMax;
+            private readonly int maxCombo;
+
+            public ScoreV2(int maxCombo)
+            {
+                this.maxCombo = maxCombo;
+
+                for (int i = 0; i < this.maxCombo; i++)
+                    ApplyHit();
+
+                comboPortionMax = comboPortion;
+
+                currentCombo = 0;
+                comboPortion = 0;
+                currentBaseScore = 0;
+                maxBaseScore = 0;
+                currentHits = 0;
+            }
+
+            public void ApplyHit() => applyHitV2(base_great);
+            public void ApplyNonPerfect() => applyHitV2(base_ok);
+
+            private void applyHitV2(int baseScore)
+            {
+                maxBaseScore += base_great;
+                currentBaseScore += baseScore;
+                comboPortion += baseScore * (1 + ++currentCombo / 10.0);
+
+                currentHits++;
+            }
+
+            public void ApplyMiss()
+            {
+                currentHits++;
+                maxBaseScore += base_great;
+                currentCombo = 0;
+            }
+
+            public long TotalScore
+            {
+                get
+                {
+                    double accuracy = currentBaseScore / maxBaseScore;
+
+                    return (int)Math.Round
+                    (
+                        700000 * comboPortion / comboPortionMax +
+                        300000 * Math.Pow(accuracy, 10) * ((double)currentHits / maxCombo)
+                    );
+                }
+            }
+        }
+
+        private class OsuProcessorBasedScoringAlgorithm : ProcessorBasedScoringAlgorithm
+        {
+            public OsuProcessorBasedScoringAlgorithm(IBeatmap beatmap, ScoringMode mode)
+                : base(beatmap, mode)
+            {
+            }
+
+            protected override ScoreProcessor CreateScoreProcessor() => new OsuScoreProcessor();
+            protected override JudgementResult CreatePerfectJudgementResult() => new OsuJudgementResult(new HitCircle(), new OsuJudgement()) { Type = HitResult.Great };
+            protected override JudgementResult CreateNonPerfectJudgementResult() => new OsuJudgementResult(new HitCircle(), new OsuJudgement()) { Type = HitResult.Ok };
+            protected override JudgementResult CreateMissJudgementResult() => new OsuJudgementResult(new HitCircle(), new OsuJudgement()) { Type = HitResult.Miss };
+        }
     }
 }

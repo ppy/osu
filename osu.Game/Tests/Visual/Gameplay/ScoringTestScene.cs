@@ -1,7 +1,6 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using System;
 using System.Collections.Generic;
 using System.Linq;
 using NUnit.Framework;
@@ -31,11 +30,11 @@ namespace osu.Game.Tests.Visual.Gameplay
 {
     public abstract partial class ScoringTestScene : OsuTestScene
     {
-        protected abstract ScoreProcessor CreateScoreProcessor();
         protected abstract IBeatmap CreateBeatmap(int maxCombo);
-        protected abstract JudgementResult CreatePerfectJudgementResult();
-        protected abstract JudgementResult CreateNonPerfectJudgementResult();
-        protected abstract JudgementResult CreateMissJudgementResult();
+
+        protected abstract IScoringAlgorithm CreateScoreV1();
+        protected abstract IScoringAlgorithm CreateScoreV2(int maxCombo);
+        protected abstract ProcessorBasedScoringAlgorithm CreateScoreAlgorithm(IBeatmap beatmap, ScoringMode mode);
 
         private GraphContainer graphs = null!;
         private SettingsSlider<int> sliderMaxCombo = null!;
@@ -121,7 +120,7 @@ namespace osu.Game.Tests.Visual.Gameplay
                                         {
                                             RelativeSizeAxes = Axes.X,
                                             AutoSizeAxes = Axes.Y,
-                                            Text = $"Left click to add miss\nRight click to add OK/{base_ok}",
+                                            Text = "Left click to add miss\nRight click to add OK",
                                             Margin = new MarginPadding { Top = 20 }
                                         }
                                     }
@@ -148,19 +147,28 @@ namespace osu.Game.Tests.Visual.Gameplay
             });
         }
 
-        private const int base_great = 300;
-        private const int base_ok = 100;
-
         private void rerun()
         {
             graphs.Clear();
             legend.Clear();
 
-            runForProcessor("lazer-standardised", colours.Green1, CreateScoreProcessor(), ScoringMode.Standardised, standardisedVisible);
-            runForProcessor("lazer-classic", colours.Blue1, CreateScoreProcessor(), ScoringMode.Classic, classicVisible);
+            runForProcessor("lazer-standardised", colours.Green1, ScoringMode.Standardised, standardisedVisible);
+            runForProcessor("lazer-classic", colours.Blue1, ScoringMode.Classic, classicVisible);
 
-            runScoreV1();
-            runScoreV2();
+            runForAlgorithm(new ScoringAlgorithmInfo
+            {
+                Name = "ScoreV1 (classic)",
+                Colour = colours.Purple1,
+                Algorithm = CreateScoreV1(),
+                Visible = scoreV1Visible
+            });
+            runForAlgorithm(new ScoringAlgorithmInfo
+            {
+                Name = "ScoreV2",
+                Colour = colours.Red1,
+                Algorithm = CreateScoreV2(sliderMaxCombo.Current.Value),
+                Visible = scoreV2Visible
+            });
 
             rescalePlots();
         }
@@ -181,119 +189,22 @@ namespace osu.Game.Tests.Visual.Gameplay
             }
         }
 
-        private void runScoreV1()
-        {
-            int totalScore = 0;
-            int currentCombo = 0;
-
-            void applyHitV1(int baseScore)
-            {
-                if (baseScore == 0)
-                {
-                    currentCombo = 0;
-                    return;
-                }
-
-                // this corresponds to stable's `ScoreMultiplier`.
-                // value is chosen arbitrarily, towards the upper range.
-                const float score_multiplier = 4;
-
-                totalScore += baseScore;
-
-                // combo multiplier
-                // ReSharper disable once PossibleLossOfFraction
-                totalScore += (int)(Math.Max(0, currentCombo - 1) * (baseScore / 25 * score_multiplier));
-
-                currentCombo++;
-            }
-
-            runForAlgorithm(new ScoringAlgorithm
-            {
-                Name = "ScoreV1 (classic)",
-                Colour = colours.Purple1,
-                ApplyHit = () => applyHitV1(base_great),
-                ApplyNonPerfect = () => applyHitV1(base_ok),
-                ApplyMiss = () => applyHitV1(0),
-                GetTotalScore = () => totalScore,
-                Visible = scoreV1Visible
-            });
-        }
-
-        private void runScoreV2()
-        {
-            int maxCombo = sliderMaxCombo.Current.Value;
-
-            int currentCombo = 0;
-            double comboPortion = 0;
-            double currentBaseScore = 0;
-            double maxBaseScore = 0;
-            int currentHits = 0;
-
-            for (int i = 0; i < maxCombo; i++)
-                applyHitV2(base_great);
-
-            double comboPortionMax = comboPortion;
-
-            currentCombo = 0;
-            comboPortion = 0;
-            currentBaseScore = 0;
-            maxBaseScore = 0;
-            currentHits = 0;
-
-            void applyHitV2(int baseScore)
-            {
-                maxBaseScore += base_great;
-                currentBaseScore += baseScore;
-                comboPortion += baseScore * (1 + ++currentCombo / 10.0);
-
-                currentHits++;
-            }
-
-            runForAlgorithm(new ScoringAlgorithm
-            {
-                Name = "ScoreV2",
-                Colour = colours.Red1,
-                ApplyHit = () => applyHitV2(base_great),
-                ApplyNonPerfect = () => applyHitV2(base_ok),
-                ApplyMiss = () =>
-                {
-                    currentHits++;
-                    maxBaseScore += base_great;
-                    currentCombo = 0;
-                },
-                GetTotalScore = () =>
-                {
-                    double accuracy = currentBaseScore / maxBaseScore;
-
-                    return (int)Math.Round
-                    (
-                        700000 * comboPortion / comboPortionMax +
-                        300000 * Math.Pow(accuracy, 10) * ((double)currentHits / maxCombo)
-                    );
-                },
-                Visible = scoreV2Visible
-            });
-        }
-
-        private void runForProcessor(string name, Color4 colour, ScoreProcessor processor, ScoringMode mode, BindableBool visibility)
+        private void runForProcessor(string name, Color4 colour, ScoringMode scoringMode, BindableBool visibility)
         {
             int maxCombo = sliderMaxCombo.Current.Value;
             var beatmap = CreateBeatmap(maxCombo);
-            processor.ApplyBeatmap(beatmap);
+            var algorithm = CreateScoreAlgorithm(beatmap, scoringMode);
 
-            runForAlgorithm(new ScoringAlgorithm
+            runForAlgorithm(new ScoringAlgorithmInfo
             {
                 Name = name,
                 Colour = colour,
-                ApplyHit = () => processor.ApplyResult(CreatePerfectJudgementResult()),
-                ApplyNonPerfect = () => processor.ApplyResult(CreateNonPerfectJudgementResult()),
-                ApplyMiss = () => processor.ApplyResult(CreateMissJudgementResult()),
-                GetTotalScore = () => processor.GetDisplayScore(mode),
+                Algorithm = algorithm,
                 Visible = visibility
             });
         }
 
-        private void runForAlgorithm(ScoringAlgorithm scoringAlgorithm)
+        private void runForAlgorithm(ScoringAlgorithmInfo algorithmInfo)
         {
             int maxCombo = sliderMaxCombo.Current.Value;
 
@@ -302,41 +213,71 @@ namespace osu.Game.Tests.Visual.Gameplay
             for (int i = 0; i < maxCombo; i++)
             {
                 if (graphs.MissLocations.Contains(i))
-                    scoringAlgorithm.ApplyMiss();
+                    algorithmInfo.Algorithm.ApplyMiss();
                 else if (graphs.NonPerfectLocations.Contains(i))
-                    scoringAlgorithm.ApplyNonPerfect();
+                    algorithmInfo.Algorithm.ApplyNonPerfect();
                 else
-                    scoringAlgorithm.ApplyHit();
+                    algorithmInfo.Algorithm.ApplyHit();
 
-                results.Add(scoringAlgorithm.GetTotalScore());
+                results.Add(algorithmInfo.Algorithm.TotalScore);
             }
 
             LineGraph graph;
             graphs.Add(graph = new LineGraph
             {
-                Name = scoringAlgorithm.Name,
+                Name = algorithmInfo.Name,
                 Anchor = Anchor.BottomLeft,
                 Origin = Anchor.BottomLeft,
                 RelativeSizeAxes = Axes.Both,
-                LineColour = scoringAlgorithm.Colour,
+                LineColour = algorithmInfo.Colour,
                 Values = results
             });
 
-            legend.Add(new LegendEntry(scoringAlgorithm, graph)
+            legend.Add(new LegendEntry(algorithmInfo, graph)
             {
-                AccentColour = scoringAlgorithm.Colour,
+                AccentColour = algorithmInfo.Colour,
             });
         }
 
-        private class ScoringAlgorithm
+        private class ScoringAlgorithmInfo
         {
             public string Name { get; init; } = null!;
             public Color4 Colour { get; init; }
-            public Action ApplyHit { get; init; } = () => { };
-            public Action ApplyNonPerfect { get; init; } = () => { };
-            public Action ApplyMiss { get; init; } = () => { };
-            public Func<long> GetTotalScore { get; init; } = null!;
+            public IScoringAlgorithm Algorithm { get; init; } = null!;
             public BindableBool Visible { get; init; } = null!;
+        }
+
+        protected interface IScoringAlgorithm
+        {
+            void ApplyHit();
+            void ApplyNonPerfect();
+            void ApplyMiss();
+
+            long TotalScore { get; }
+        }
+
+        protected abstract class ProcessorBasedScoringAlgorithm : IScoringAlgorithm
+        {
+            protected abstract ScoreProcessor CreateScoreProcessor();
+            protected abstract JudgementResult CreatePerfectJudgementResult();
+            protected abstract JudgementResult CreateNonPerfectJudgementResult();
+            protected abstract JudgementResult CreateMissJudgementResult();
+
+            private readonly ScoreProcessor scoreProcessor;
+            private readonly ScoringMode mode;
+
+            protected ProcessorBasedScoringAlgorithm(IBeatmap beatmap, ScoringMode mode)
+            {
+                this.mode = mode;
+                scoreProcessor = CreateScoreProcessor();
+                scoreProcessor.ApplyBeatmap(beatmap);
+            }
+
+            public void ApplyHit() => scoreProcessor.ApplyResult(CreatePerfectJudgementResult());
+            public void ApplyNonPerfect() => scoreProcessor.ApplyResult(CreateNonPerfectJudgementResult());
+            public void ApplyMiss() => scoreProcessor.ApplyResult(CreateMissJudgementResult());
+
+            public long TotalScore => scoreProcessor.GetDisplayScore(mode);
         }
 
         public partial class GraphContainer : Container<LineGraph>, IHasCustomTooltip<IEnumerable<LineGraph>>
@@ -572,12 +513,12 @@ namespace osu.Game.Tests.Visual.Gameplay
             private OsuSpriteText descriptionText = null!;
             private OsuSpriteText finalScoreText = null!;
 
-            public LegendEntry(ScoringAlgorithm scoringAlgorithm, LineGraph lineGraph)
+            public LegendEntry(ScoringAlgorithmInfo scoringAlgorithmInfo, LineGraph lineGraph)
             {
-                description = scoringAlgorithm.Name;
-                FinalScore = scoringAlgorithm.GetTotalScore();
-                AccentColour = scoringAlgorithm.Colour;
-                Visible.BindTo(scoringAlgorithm.Visible);
+                description = scoringAlgorithmInfo.Name;
+                FinalScore = scoringAlgorithmInfo.Algorithm.TotalScore;
+                AccentColour = scoringAlgorithmInfo.Colour;
+                Visible.BindTo(scoringAlgorithmInfo.Visible);
 
                 this.lineGraph = lineGraph;
             }
