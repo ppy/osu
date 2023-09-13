@@ -266,16 +266,16 @@ namespace osu.Game.Overlays.Mods
                     },
                     Children = new Drawable[]
                     {
-                        beatmapAttributesDisplay = new BeatmapAttributesDisplay
-                        {
-                            Anchor = Anchor.TopRight,
-                            Origin = Anchor.TopRight,
-                            BeatmapInfo = { Value = beatmap?.BeatmapInfo }
-                        },
                         multiplierDisplay = new DifficultyMultiplierDisplay
                         {
-                            Anchor = Anchor.TopRight,
-                            Origin = Anchor.TopRight
+                            Anchor = Anchor.BottomRight,
+                            Origin = Anchor.BottomRight
+                        },
+                        beatmapAttributesDisplay = new BeatmapAttributesDisplay
+                        {
+                            Anchor = Anchor.BottomRight,
+                            Origin = Anchor.BottomRight,
+                            BeatmapInfo = { Value = beatmap?.BeatmapInfo }
                         },
                     }
                 });
@@ -350,8 +350,7 @@ namespace osu.Game.Overlays.Mods
 
             SearchTextBox.PlaceholderText = SearchTextBox.HasFocus ? Resources.Localisation.Web.CommonStrings.InputSearch : ModSelectOverlayStrings.TabToSearch;
 
-            // only update preview panel's collapsed state after we are fully visible, to ensure all the buttons are where we expect them to be.
-            if (beatmapAttributesDisplay != null && Alpha == 1)
+            if (beatmapAttributesDisplay != null)
             {
                 float rightEdgeOfLastButton = footerButtonFlow.Last().ScreenSpaceDrawQuad.TopRight.X;
 
@@ -361,12 +360,13 @@ namespace osu.Game.Overlays.Mods
 
                 bool screenIsntWideEnough = rightEdgeOfLastButton > projectedLeftEdgeOfExpandedModEffectPreviewPanel;
 
-                beatmapAttributesDisplay.Collapsed.Value = screenIsntWideEnough;
-                footerContentFlow.Direction = screenIsntWideEnough ? FillDirection.Vertical : FillDirection.Horizontal;
+                // only update preview panel's collapsed state after we are fully visible, to ensure all the buttons are where we expect them to be.
+                if (Alpha == 1)
+                    beatmapAttributesDisplay.Collapsed.Value = screenIsntWideEnough;
 
-                int layout = screenIsntWideEnough ? -1 : 1;
-                if (footerContentFlow.GetLayoutPosition(beatmapAttributesDisplay) != layout)
-                    footerContentFlow.SetLayoutPosition(beatmapAttributesDisplay, layout);
+                footerContentFlow.LayoutDuration = 200;
+                footerContentFlow.LayoutEasing = Easing.OutQuint;
+                footerContentFlow.Direction = screenIsntWideEnough ? FillDirection.Vertical : FillDirection.Horizontal;
             }
         }
 
