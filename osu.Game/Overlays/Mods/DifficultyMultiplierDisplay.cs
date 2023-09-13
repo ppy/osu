@@ -6,6 +6,7 @@ using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Extensions.LocalisationExtensions;
 using osu.Framework.Graphics;
+using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.UserInterface;
 using osu.Framework.Localisation;
 using osu.Game.Graphics;
@@ -14,6 +15,7 @@ using osu.Game.Graphics.UserInterface;
 using osu.Game.Localisation;
 using osu.Game.Rulesets.Mods;
 using osuTK;
+using osuTK.Graphics;
 
 namespace osu.Game.Overlays.Mods
 {
@@ -63,15 +65,20 @@ namespace osu.Game.Overlays.Mods
                 }
             });
 
-            RightContent.Add(counter = new EffectCounter
+            RightContent.Add(new Container
             {
-                Margin = new MarginPadding(10),
-                AutoSizeAxes = Axes.Y,
                 Width = 40,
-                Shear = new Vector2(-ShearedOverlayContainer.SHEAR, 0),
+                RelativeSizeAxes = Axes.Y,
+                Margin = new MarginPadding(10),
                 Anchor = Anchor.Centre,
                 Origin = Anchor.Centre,
-                Current = { BindTarget = Current }
+                Child = counter = new EffectCounter
+                {
+                    Shear = new Vector2(-ShearedOverlayContainer.SHEAR, 0),
+                    Anchor = Anchor.Centre,
+                    Origin = Anchor.Centre,
+                    Current = { BindTarget = Current }
+                }
             });
         }
 
@@ -81,63 +88,37 @@ namespace osu.Game.Overlays.Mods
 
             Current.BindValueChanged(e =>
             {
-                var effect = calculateEffectForComparison(e.NewValue.CompareTo(Current.Default));
-                setColours(effect);
+                if (e.NewValue > Current.Default)
+                {
+                    MainBackground
+                        .FadeColour(colours.ForModType(ModType.DifficultyIncrease), transition_duration, Easing.OutQuint);
+                    counter.FadeColour(colourProvider.Background5, transition_duration, Easing.OutQuint);
+                }
+                else if (e.NewValue < Current.Default)
+                {
+                    MainBackground
+                        .FadeColour(colours.ForModType(ModType.DifficultyReduction), transition_duration, Easing.OutQuint);
+                    counter.FadeColour(colourProvider.Background5, transition_duration, Easing.OutQuint);
+                }
+                else
+                {
+                    MainBackground.FadeColour(colourProvider.Background4, transition_duration, Easing.OutQuint);
+                    counter.FadeColour(Colour4.White, transition_duration, Easing.OutQuint);
+                }
+
+                if (e.NewValue != Current.Default)
+                    MainBackground.FlashColour(Color4.White, 500, Easing.OutQuint);
+
+                const float move_amount = 4;
+                if (e.NewValue > e.OldValue)
+                    counter.MoveToY(Math.Max(-move_amount * 2, counter.Y - move_amount)).Then().MoveToY(0, transition_duration * 2, Easing.OutQuint);
+                else
+                    counter.MoveToY(Math.Min(move_amount * 2, counter.Y + move_amount)).Then().MoveToY(0, transition_duration * 2, Easing.OutQuint);
             }, true);
 
             // required to prevent the counter initially rolling up from 0 to 1
             // due to `Current.Value` having a nonstandard default value of 1.
             counter.SetCountWithoutRolling(Current.Value);
-        }
-
-        /// <summary>
-        /// Fades colours of text and its background according to displayed value.
-        /// </summary>
-        /// <param name="effect">Effect of the value.</param>
-        private void setColours(ModEffect effect)
-        {
-            switch (effect)
-            {
-                case ModEffect.NotChanged:
-                    MainBackground.FadeColour(colourProvider.Background4, transition_duration, Easing.OutQuint);
-                    counter.FadeColour(Colour4.White, transition_duration, Easing.OutQuint);
-                    break;
-
-                case ModEffect.DifficultyReduction:
-                    MainBackground.FadeColour(colours.ForModType(ModType.DifficultyReduction), transition_duration, Easing.OutQuint);
-                    counter.FadeColour(colourProvider.Background5, transition_duration, Easing.OutQuint);
-                    break;
-
-                case ModEffect.DifficultyIncrease:
-                    MainBackground.FadeColour(colours.ForModType(ModType.DifficultyIncrease), transition_duration, Easing.OutQuint);
-                    counter.FadeColour(colourProvider.Background5, transition_duration, Easing.OutQuint);
-                    break;
-
-                default:
-                    throw new ArgumentOutOfRangeException(nameof(effect));
-            }
-        }
-
-        /// <summary>
-        /// Converts signed integer into <see cref="ModEffect"/>. Negative values are counted as difficulty reduction, positive as increase.
-        /// </summary>
-        /// <param name="comparison">Value to convert. Will arrive from comparison between <see cref="Current"/> bindable once it changes and it's <see cref="Bindable{T}.Default"/>.</param>
-        /// <returns>Effect of the value.</returns>
-        private static ModEffect calculateEffectForComparison(int comparison)
-        {
-            if (comparison == 0)
-                return ModEffect.NotChanged;
-            if (comparison < 0)
-                return ModEffect.DifficultyReduction;
-
-            return ModEffect.DifficultyIncrease;
-        }
-
-        protected enum ModEffect
-        {
-            NotChanged,
-            DifficultyReduction,
-            DifficultyIncrease
         }
 
         private partial class EffectCounter : RollingCounter<double>
