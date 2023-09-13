@@ -124,7 +124,7 @@ namespace osu.Game.Overlays.Mods
         private DeselectAllModsButton deselectAllModsButton = null!;
 
         private Container aboveColumnsContent = null!;
-        private DifficultyMultiplierDisplay? multiplierDisplay;
+        private ScoreMultiplierDisplay? multiplierDisplay;
         private BeatmapAttributesDisplay? beatmapAttributesDisplay;
 
         protected ShearedButton BackButton { get; private set; } = null!;
@@ -182,7 +182,7 @@ namespace osu.Game.Overlays.Mods
                 aboveColumnsContent = new Container
                 {
                     RelativeSizeAxes = Axes.X,
-                    Height = DifficultyMultiplierDisplay.HEIGHT,
+                    Height = ScoreMultiplierDisplay.HEIGHT,
                     Padding = new MarginPadding { Horizontal = 100 },
                     Child = SearchTextBox = new ShearedSearchTextBox
                     {
@@ -197,7 +197,7 @@ namespace osu.Game.Overlays.Mods
                     {
                         Padding = new MarginPadding
                         {
-                            Top = DifficultyMultiplierDisplay.HEIGHT + PADDING,
+                            Top = ScoreMultiplierDisplay.HEIGHT + PADDING,
                             Bottom = PADDING
                         },
                         RelativeSizeAxes = Axes.Both,
@@ -266,7 +266,7 @@ namespace osu.Game.Overlays.Mods
                     },
                     Children = new Drawable[]
                     {
-                        multiplierDisplay = new DifficultyMultiplierDisplay
+                        multiplierDisplay = new ScoreMultiplierDisplay
                         {
                             Anchor = Anchor.BottomRight,
                             Origin = Anchor.BottomRight

@@ -22,7 +22,7 @@ namespace osu.Game.Overlays.Mods
     /// <summary>
     /// On the mod select overlay, this provides a local updating view of the aggregate score multiplier coming from mods.
     /// </summary>
-    public partial class DifficultyMultiplierDisplay : ModFooterInformationDisplay, IHasCurrentValue<double>
+    public partial class ScoreMultiplierDisplay : ModFooterInformationDisplay, IHasCurrentValue<double>
     {
         public const float HEIGHT = 42;
 
@@ -44,7 +44,7 @@ namespace osu.Game.Overlays.Mods
         [Resolved]
         private OverlayColourProvider colourProvider { get; set; } = null!;
 
-        public DifficultyMultiplierDisplay()
+        public ScoreMultiplierDisplay()
         {
             Current.Default = 1d;
             Current.Value = 1d;
@@ -60,7 +60,7 @@ namespace osu.Game.Overlays.Mods
                     Anchor = Anchor.Centre,
                     Origin = Anchor.Centre,
                     Shear = new Vector2(-ShearedOverlayContainer.SHEAR, 0),
-                    Text = DifficultyMultiplierDisplayStrings.DifficultyMultiplier,
+                    Text = ModSelectOverlayStrings.ScoreMultiplier,
                     Font = OsuFont.Default.With(size: 17, weight: FontWeight.SemiBold)
                 }
             });
