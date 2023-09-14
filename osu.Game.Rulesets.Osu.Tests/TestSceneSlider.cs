@@ -19,7 +19,6 @@ using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Extensions.ObjectExtensions;
 using osu.Framework.Testing;
-using osu.Game.Beatmaps.Legacy;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Rulesets.Judgements;
@@ -206,7 +205,7 @@ namespace osu.Game.Rulesets.Osu.Tests
                 StackHeight = 10
             };
 
-            return createDrawable(slider, 2, 2);
+            return createDrawable(slider, 2);
         }
 
         private Drawable testSimpleMedium(int repeats = 0) => createSlider(5, repeats: repeats);
@@ -229,6 +228,7 @@ namespace osu.Game.Rulesets.Osu.Tests
         {
             var slider = new Slider
             {
+                SliderVelocityMultiplier = speedMultiplier,
                 StartTime = Time.Current + time_offset,
                 Position = new Vector2(0, -(distance / 2)),
                 Path = new SliderPath(PathType.PerfectCurve, new[]
@@ -240,7 +240,7 @@ namespace osu.Game.Rulesets.Osu.Tests
                 StackHeight = stackHeight
             };
 
-            return createDrawable(slider, circleSize, speedMultiplier);
+            return createDrawable(slider, circleSize);
         }
 
         private Drawable testPerfect(int repeats = 0)
@@ -258,7 +258,7 @@ namespace osu.Game.Rulesets.Osu.Tests
                 RepeatCount = repeats,
             };
 
-            return createDrawable(slider, 2, 3);
+            return createDrawable(slider, 2);
         }
 
         private Drawable testLinear(int repeats = 0) => createLinear(repeats);
@@ -281,7 +281,7 @@ namespace osu.Game.Rulesets.Osu.Tests
                 RepeatCount = repeats,
             };
 
-            return createDrawable(slider, 2, 3);
+            return createDrawable(slider, 2);
         }
 
         private Drawable testBezier(int repeats = 0) => createBezier(repeats);
@@ -303,7 +303,7 @@ namespace osu.Game.Rulesets.Osu.Tests
                 RepeatCount = repeats,
             };
 
-            return createDrawable(slider, 2, 3);
+            return createDrawable(slider, 2);
         }
 
         private Drawable testLinearOverlapping(int repeats = 0) => createOverlapping(repeats);
@@ -326,7 +326,7 @@ namespace osu.Game.Rulesets.Osu.Tests
                 RepeatCount = repeats,
             };
 
-            return createDrawable(slider, 2, 3);
+            return createDrawable(slider, 2);
         }
 
         private Drawable testCatmull(int repeats = 0) => createCatmull(repeats);
@@ -352,15 +352,12 @@ namespace osu.Game.Rulesets.Osu.Tests
                 NodeSamples = repeatSamples
             };
 
-            return createDrawable(slider, 3, 1);
+            return createDrawable(slider, 3);
         }
 
-        private Drawable createDrawable(Slider slider, float circleSize, double speedMultiplier)
+        private Drawable createDrawable(Slider slider, float circleSize)
         {
-            var cpi = new LegacyControlPointInfo();
-            cpi.Add(0, new DifficultyControlPoint { SliderVelocity = speedMultiplier });
-
-            slider.ApplyDefaults(cpi, new BeatmapDifficulty
+            slider.ApplyDefaults(new ControlPointInfo(), new BeatmapDifficulty
             {
                 CircleSize = circleSize,
                 SliderTickRate = 3
