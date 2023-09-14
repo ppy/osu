@@ -16,6 +16,7 @@ using osu.Game.Graphics.UserInterface;
 using osu.Game.Rulesets.Mods;
 using osuTK;
 using System.Threading;
+using osu.Framework.Input.Events;
 using osu.Game.Configuration;
 
 namespace osu.Game.Overlays.Mods
@@ -39,6 +40,8 @@ namespace osu.Game.Overlays.Mods
         [Resolved]
         private Bindable<IReadOnlyList<Mod>> mods { get; set; } = null!;
 
+        public BindableBool Collapsed { get; } = new BindableBool(true);
+
         private ModSettingChangeTracker? modSettingChangeTracker;
 
         [Resolved]
@@ -47,10 +50,7 @@ namespace osu.Game.Overlays.Mods
         private CancellationTokenSource? cancellationSource;
         private IBindable<StarDifficulty?> starDifficulty = null!;
 
-        public BeatmapAttributesDisplay()
-        {
-            Collapsed.Value = true;
-        }
+        private const float transition_duration = 250;
 
         [BackgroundDependencyLoader]
         private void load()
@@ -75,6 +75,7 @@ namespace osu.Game.Overlays.Mods
                 }
             });
 
+            RightContent.Alpha = 0;
             RightContent.AddRange(new Drawable[]
             {
                 circleSizeDisplay = new VerticalAttributeDisplay("CS") { Shear = new Vector2(-shear, 0), },
@@ -98,6 +99,43 @@ namespace osu.Game.Overlays.Mods
             }, true);
 
             BeatmapInfo.BindValueChanged(_ => updateValues(), true);
+
+            Collapsed.BindValueChanged(_ =>
+            {
+                // Only start autosize animations on first collapse toggle. This avoids an ugly initial presentation.
+                startAnimating();
+                updateCollapsedState();
+            });
+
+            updateCollapsedState();
+        }
+
+        protected override bool OnHover(HoverEvent e)
+        {
+            startAnimating();
+            updateCollapsedState();
+            return true;
+        }
+
+        protected override void OnHoverLost(HoverLostEvent e)
+        {
+            updateCollapsedState();
+            base.OnHoverLost(e);
+        }
+
+        protected override bool OnMouseDown(MouseDownEvent e) => true;
+
+        protected override bool OnClick(ClickEvent e) => true;
+
+        private void startAnimating()
+        {
+            Content.AutoSizeEasing = Easing.OutQuint;
+            Content.AutoSizeDuration = transition_duration;
+        }
+
+        private void updateCollapsedState()
+        {
+            RightContent.FadeTo(Collapsed.Value && !IsHovered ? 0 : 1, transition_duration, Easing.OutQuint);
         }
 
         private void updateValues() => Scheduler.AddOnce(() =>
