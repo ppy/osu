@@ -1,11 +1,15 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System;
+using System.Linq;
 using NUnit.Framework;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Textures;
 using osu.Framework.Testing;
+using osu.Framework.Timing;
+using osu.Game.Beatmaps;
 using osu.Game.Rulesets.Osu;
 using osu.Game.Storyboards;
 using osu.Game.Storyboards.Drawables;
@@ -22,31 +26,43 @@ namespace osu.Game.Tests.Visual.Gameplay
         [Cached(typeof(Storyboard))]
         private TestStoryboard storyboard = new TestStoryboard();
 
-        [SetUpSteps]
-        public void SetUpSteps()
+        private void createStoryboard(Func<IStoryboardElement> createElement)
         {
             AddStep("create storyboard", () =>
             {
                 storyboard.BeatmapInfo = CreateBeatmap(new OsuRuleset().RulesetInfo).BeatmapInfo;
 
-                var background = storyboard.GetLayer("Background");
+                var videoLayer = storyboard.GetLayer("Video");
+                var backgroundLayer = storyboard.GetLayer("Background");
 
-                background.Elements.Clear();
+                // We need to cache the storyboard, so rather than faffing around with re-caching each
+                // reconstruction, just clear old elements between tests.
+                videoLayer.Elements.Clear();
+                backgroundLayer.Elements.Clear();
 
-                var sprite = new StoryboardSprite("Resources/Textures/test-image.png", Anchor.Centre, new Vector2(320, 240));
-                sprite.AddLoop(Time.Current, 100).Alpha.Add(Easing.None, 0, 10000, 1, 1);
-                background.Add(sprite);
+                var element = createElement();
 
-                var video = new StoryboardVideo("Resources/Videos/test-video.mp4", Time.Current);
-                storyboard.GetLayer("Video").Add(video);
+                if (element is StoryboardVideo video)
+                {
+                    videoLayer.Add(video);
+                }
+                else if (element is StoryboardSprite sprite)
+                {
+                    sprite.AddLoop(0, 100).Alpha.Add(Easing.None, 0, 10000, 1, 1);
+                    backgroundLayer.Add(sprite);
+                }
 
-                Child = drawableStoryboard = new DrawableStoryboard(storyboard);
+                Child = drawableStoryboard = new DrawableStoryboard(storyboard)
+                {
+                    Clock = new FramedClock()
+                };
             });
         }
 
-        [Test]
-        public void TestBasic()
+        protected override void LoadComplete()
         {
+            base.LoadComplete();
+
             AddStep("Change origin to centre", () =>
             {
                 foreach (var layer in drawableStoryboard.ChildrenOfType<DrawableStoryboardLayer.LayerElementContainer>())
@@ -73,6 +89,46 @@ namespace osu.Game.Tests.Visual.Gameplay
                         d.Origin = Anchor.TopLeft;
                 }
             });
+
+            AddToggleStep("Toggle flipH", val =>
+            {
+                foreach (var layer in drawableStoryboard.ChildrenOfType<DrawableStoryboardLayer.LayerElementContainer>())
+                {
+                    foreach (var d in layer.Elements.OfType<DrawableStoryboardAnimation>())
+                        d.FlipH = val;
+                    foreach (var d in layer.Elements.OfType<DrawableStoryboardSprite>())
+                        d.FlipH = val;
+                }
+            });
+
+            AddToggleStep("Toggle flipV", val =>
+            {
+                foreach (var layer in drawableStoryboard.ChildrenOfType<DrawableStoryboardLayer.LayerElementContainer>())
+                {
+                    foreach (var d in layer.Elements.OfType<DrawableStoryboardAnimation>())
+                        d.FlipV = val;
+                    foreach (var d in layer.Elements.OfType<DrawableStoryboardSprite>())
+                        d.FlipV = val;
+                }
+            });
+        }
+
+        [Test]
+        public void TestSprite()
+        {
+            createStoryboard(() => new StoryboardSprite("Resources/Textures/sample-texture.png", Anchor.Centre, new Vector2(320, 240)));
+        }
+
+        [Test]
+        public void TestAnimation()
+        {
+            createStoryboard(() => new StoryboardAnimation("Resources/Textures/sample-animation.png", Anchor.Centre, new Vector2(320, 240), 2, 100, AnimationLoopType.LoopForever));
+        }
+
+        [Test]
+        public void TestVideo()
+        {
+            createStoryboard(() => new StoryboardVideo("Resources/Videos/test-video.mp4", 0));
         }
 
         public class TestStoryboard : Storyboard
