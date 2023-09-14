@@ -72,6 +72,7 @@ namespace osu.Game.Overlays.Mods
             const float shear = ShearedOverlayContainer.SHEAR;
 
             AutoSizeAxes = Axes.Both;
+
             InternalChild = content = new Container
             {
                 Origin = Anchor.BottomRight,
@@ -145,22 +146,10 @@ namespace osu.Game.Overlays.Mods
                                 Direction = FillDirection.Horizontal,
                                 Children = new[]
                                 {
-                                    circleSizeDisplay = new VerticalAttributeDisplay("CS")
-                                    {
-                                        Shear = new Vector2(-ShearedOverlayContainer.SHEAR, 0),
-                                    },
-                                    drainRateDisplay = new VerticalAttributeDisplay("HP")
-                                    {
-                                        Shear = new Vector2(-ShearedOverlayContainer.SHEAR, 0),
-                                    },
-                                    approachRateDisplay = new VerticalAttributeDisplay("AR")
-                                    {
-                                        Shear = new Vector2(-ShearedOverlayContainer.SHEAR, 0),
-                                    },
-                                    overallDifficultyDisplay = new VerticalAttributeDisplay("OD")
-                                    {
-                                        Shear = new Vector2(-ShearedOverlayContainer.SHEAR, 0),
-                                    },
+                                    circleSizeDisplay = new VerticalAttributeDisplay("CS") { Shear = new Vector2(-shear, 0), },
+                                    drainRateDisplay = new VerticalAttributeDisplay("HP") { Shear = new Vector2(-shear, 0), },
+                                    approachRateDisplay = new VerticalAttributeDisplay("AR") { Shear = new Vector2(-shear, 0), },
+                                    overallDifficultyDisplay = new VerticalAttributeDisplay("OD") { Shear = new Vector2(-shear, 0), },
                                 }
                             }
                         }
