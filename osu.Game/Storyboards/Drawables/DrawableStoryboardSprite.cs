@@ -40,7 +40,7 @@ namespace osu.Game.Storyboards.Drawables
         {
             InternalChild = sprite = new Sprite
             {
-                Texture = storyboard.GetTextureFromPath(Sprite.Path, textureStore)
+                Texture = textureStore.Get(Sprite.Path)
             };
 
             if (sprite.Texture == null && storyboard.UseSkinSprites)

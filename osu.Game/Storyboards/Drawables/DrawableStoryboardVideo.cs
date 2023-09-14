@@ -2,12 +2,10 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using osu.Framework.Allocation;
-using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Textures;
 using osu.Framework.Graphics.Video;
-using osu.Game.Beatmaps;
 using osu.Game.Screens.Play;
 using osuTK;
 
@@ -29,14 +27,9 @@ namespace osu.Game.Storyboards.Drawables
         }
 
         [BackgroundDependencyLoader(true)]
-        private void load(IBindable<WorkingBeatmap> beatmap, TextureStore textureStore)
+        private void load(TextureStore textureStore)
         {
-            string? path = beatmap.Value.BeatmapSetInfo?.GetPathForFile(Video.Path);
-
-            if (path == null)
-                return;
-
-            var stream = textureStore.GetStream(path);
+            var stream = textureStore.GetStream(Video.Path);
 
             if (stream == null)
                 return;

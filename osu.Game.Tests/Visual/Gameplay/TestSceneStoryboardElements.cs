@@ -2,12 +2,14 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using NUnit.Framework;
 using osu.Framework.Graphics;
-using osu.Framework.Graphics.Textures;
+using osu.Framework.IO.Stores;
 using osu.Framework.Testing;
 using osu.Framework.Timing;
+using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Osu;
 using osu.Game.Storyboards;
 using osu.Game.Storyboards.Drawables;
@@ -45,7 +47,7 @@ namespace osu.Game.Tests.Visual.Gameplay
                     backgroundLayer.Add(sprite);
                 }
 
-                Child = drawableStoryboard = new DrawableStoryboard(storyboard)
+                Child = drawableStoryboard = new TestDrawableStoryboard(storyboard)
                 {
                     Clock = new FramedClock()
                 };
@@ -124,14 +126,19 @@ namespace osu.Game.Tests.Visual.Gameplay
             createStoryboard(() => new StoryboardVideo("Resources/Videos/test-video.mp4", 0));
         }
 
+        public partial class TestDrawableStoryboard : DrawableStoryboard
+        {
+            public TestDrawableStoryboard(Storyboard storyboard, IReadOnlyList<Mod>? mods = null)
+                : base(storyboard, mods)
+            {
+            }
+
+            protected override IResourceStore<byte[]> CreateResourceLookupStore() => TestResources.GetStore();
+        }
+
         public class TestStoryboard : Storyboard
         {
-            public override Texture? GetTextureFromPath(string path, TextureStore textureStore)
-            {
-                textureStore.AddTextureSource(new TextureLoaderStore(TestResources.GetStore()));
-
-                return textureStore.Get(path);
-            }
+            public override string GetStoragePathFromStoryboardPath(string path) => path;
         }
     }
 }
