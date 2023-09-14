@@ -4,12 +4,10 @@
 using System;
 using System.Linq;
 using NUnit.Framework;
-using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Textures;
 using osu.Framework.Testing;
 using osu.Framework.Timing;
-using osu.Game.Beatmaps;
 using osu.Game.Rulesets.Osu;
 using osu.Game.Storyboards;
 using osu.Game.Storyboards.Drawables;
@@ -23,22 +21,17 @@ namespace osu.Game.Tests.Visual.Gameplay
     {
         private DrawableStoryboard drawableStoryboard = null!;
 
-        [Cached(typeof(Storyboard))]
-        private TestStoryboard storyboard = new TestStoryboard();
-
         private void createStoryboard(Func<IStoryboardElement> createElement)
         {
             AddStep("create storyboard", () =>
             {
-                storyboard.BeatmapInfo = CreateBeatmap(new OsuRuleset().RulesetInfo).BeatmapInfo;
+                TestStoryboard storyboard = new TestStoryboard
+                {
+                    BeatmapInfo = CreateBeatmap(new OsuRuleset().RulesetInfo).BeatmapInfo
+                };
 
                 var videoLayer = storyboard.GetLayer("Video");
                 var backgroundLayer = storyboard.GetLayer("Background");
-
-                // We need to cache the storyboard, so rather than faffing around with re-caching each
-                // reconstruction, just clear old elements between tests.
-                videoLayer.Elements.Clear();
-                backgroundLayer.Elements.Clear();
 
                 var element = createElement();
 

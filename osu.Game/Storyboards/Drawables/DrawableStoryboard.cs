@@ -24,7 +24,7 @@ namespace osu.Game.Storyboards.Drawables
     {
         public Vector2 AppliedScale { get; private set; }
 
-        [Cached]
+        [Cached(typeof(Storyboard))]
         public Storyboard Storyboard { get; }
 
         /// <summary>
