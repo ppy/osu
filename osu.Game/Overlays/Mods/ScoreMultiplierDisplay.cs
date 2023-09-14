@@ -7,6 +7,7 @@ using osu.Framework.Bindables;
 using osu.Framework.Extensions.LocalisationExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
+using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.UserInterface;
 using osu.Framework.Localisation;
 using osu.Game.Graphics;
@@ -15,7 +16,6 @@ using osu.Game.Graphics.UserInterface;
 using osu.Game.Localisation;
 using osu.Game.Rulesets.Mods;
 using osuTK;
-using osuTK.Graphics;
 
 namespace osu.Game.Overlays.Mods
 {
@@ -38,11 +38,10 @@ namespace osu.Game.Overlays.Mods
 
         private RollingCounter<double> counter = null!;
 
-        [Resolved]
-        private OsuColour colours { get; set; } = null!;
+        private Box flashLayer = null!;
 
         [Resolved]
-        private OverlayColourProvider colourProvider { get; set; } = null!;
+        private OsuColour colours { get; set; } = null!;
 
         public ScoreMultiplierDisplay()
         {
@@ -53,6 +52,27 @@ namespace osu.Game.Overlays.Mods
         [BackgroundDependencyLoader]
         private void load()
         {
+            // You would think that we could add this to `Content`, but borders don't mix well
+            // with additive blending children elements.
+            AddInternal(new Container
+            {
+                Anchor = Anchor.BottomRight,
+                Origin = Anchor.BottomRight,
+                RelativeSizeAxes = Axes.Both,
+                Shear = new Vector2(ShearedOverlayContainer.SHEAR, 0),
+                CornerRadius = ShearedButton.CORNER_RADIUS,
+                Masking = true,
+                Children = new Drawable[]
+                {
+                    flashLayer = new Box
+                    {
+                        Alpha = 0,
+                        Blending = BlendingParameters.Additive,
+                        RelativeSizeAxes = Axes.Both,
+                    }
+                }
+            });
+
             LeftContent.AddRange(new Drawable[]
             {
                 new OsuSpriteText
@@ -92,22 +112,24 @@ namespace osu.Game.Overlays.Mods
                 {
                     MainBackground
                         .FadeColour(colours.ForModType(ModType.DifficultyIncrease), transition_duration, Easing.OutQuint);
-                    counter.FadeColour(colourProvider.Background5, transition_duration, Easing.OutQuint);
+                    counter.FadeColour(ColourProvider.Background5, transition_duration, Easing.OutQuint);
                 }
                 else if (e.NewValue < Current.Default)
                 {
                     MainBackground
                         .FadeColour(colours.ForModType(ModType.DifficultyReduction), transition_duration, Easing.OutQuint);
-                    counter.FadeColour(colourProvider.Background5, transition_duration, Easing.OutQuint);
+                    counter.FadeColour(ColourProvider.Background5, transition_duration, Easing.OutQuint);
                 }
                 else
                 {
-                    MainBackground.FadeColour(colourProvider.Background4, transition_duration, Easing.OutQuint);
+                    MainBackground.FadeColour(ColourProvider.Background4, transition_duration, Easing.OutQuint);
                     counter.FadeColour(Colour4.White, transition_duration, Easing.OutQuint);
                 }
 
-                if (e.NewValue != Current.Default)
-                    MainBackground.FlashColour(Color4.White, 500, Easing.OutQuint);
+                flashLayer
+                    .FadeOutFromOne()
+                    .FadeTo(0.15f, 60, Easing.OutQuint)
+                    .Then().FadeOut(500, Easing.OutQuint);
 
                 const float move_amount = 4;
                 if (e.NewValue > e.OldValue)
