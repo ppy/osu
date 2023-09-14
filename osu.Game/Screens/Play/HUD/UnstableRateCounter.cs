@@ -2,6 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
+using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Extensions.ObjectExtensions;
@@ -9,11 +10,14 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Localisation;
+using osu.Game.Configuration;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Rulesets.Judgements;
+using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Scoring;
+using osu.Game.Localisation.HUD;
 using osu.Game.Skinning;
 using osuTK;
 
@@ -23,10 +27,14 @@ namespace osu.Game.Screens.Play.HUD
     {
         public bool UsesFixedAnchor { get; set; }
 
+        [SettingSource(typeof(UnstableRateCounterStrings), nameof(UnstableRateCounterStrings.ConvertUnstableRate), nameof(UnstableRateCounterStrings.ConvertUnstableRateDescription))]
+        public Bindable<bool> Convert { get; } = new BindableBool(true);
+
         protected override double RollingDuration => 750;
 
         private const float alpha_when_invalid = 0.3f;
         private readonly Bindable<bool> valid = new Bindable<bool>();
+        private double rateChange = 1d;
 
         [Resolved]
         private ScoreProcessor scoreProcessor { get; set; } = null!;
@@ -39,6 +47,22 @@ namespace osu.Game.Screens.Play.HUD
         [BackgroundDependencyLoader]
         private void load(OsuColour colours)
         {
+            if (Convert.Value)
+            {
+                var rateAdjustMod = scoreProcessor.Mods.Value
+                    .Where(sp => sp is ModRateAdjust)
+                    .FirstOrDefault() as ModRateAdjust;
+
+                if (rateAdjustMod is not null)
+                {
+                    rateChange = rateAdjustMod.SpeedChange.Value;
+                }
+                else
+                {
+                    rateChange = 1d;
+                }
+            }
+
             Colour = colours.BlueLighter;
             valid.BindValueChanged(e =>
                 DrawableCount.FadeTo(e.NewValue ? 1 : alpha_when_invalid, 1000, Easing.OutQuint));
@@ -64,7 +88,14 @@ namespace osu.Game.Screens.Play.HUD
 
             valid.Value = unstableRate != null;
             if (unstableRate != null)
+            {
+                if (Convert.Value && rateChange != 1d)
+                {
+                    Current.Value = (int)Math.Round(unstableRate.Value / rateChange);
+                    return;
+                }
                 Current.Value = (int)Math.Round(unstableRate.Value);
+            }
         }
 
         protected override IHasText CreateText() => new TextComponent
