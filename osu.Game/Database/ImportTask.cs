@@ -58,16 +58,14 @@ namespace osu.Game.Database
                 throw new InvalidFormatException($"{Path} is not a valid archive");
             }
 
-            if (Stream is MemoryStream memoryStream)
-            {
-                if (ZipUtils.IsZipArchive(memoryStream))
-                    return new ZipArchiveReader(memoryStream, Path);
+            if (Stream is not MemoryStream memoryStream)
+                // Path used primarily in tests (converting `ManifestResourceStream`s to `MemoryStream`s).
+                memoryStream = new MemoryStream(Stream.ReadAllBytesToArray());
 
-                return new MemoryStreamArchiveReader(memoryStream, Path);
-            }
+            if (ZipUtils.IsZipArchive(memoryStream))
+                return new ZipArchiveReader(memoryStream, Path);
 
-            // This isn't used in any current path. May need to reconsider for performance reasons (ie. if we don't expect the incoming stream to be copied out).
-            return new ByteArrayArchiveReader(Stream.ReadAllBytesToArray(), Path);
+            return new MemoryStreamArchiveReader(memoryStream, Path);
         }
 
         /// <summary>
