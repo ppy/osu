@@ -49,8 +49,6 @@ namespace osu.Game.Overlays.Mods
         /// </summary>
         protected abstract LocalisableString Label { get; }
 
-        protected virtual float ValueAreaWidth => 56;
-
         protected virtual string CounterFormat => @"N0";
 
         protected override Container<Drawable> Content => content;
@@ -59,7 +57,7 @@ namespace osu.Game.Overlays.Mods
 
         protected ModCounterDisplay()
         {
-            Height = HEIGHT;
+            Height = ShearedButton.HEIGHT;
             AutoSizeAxes = Axes.X;
 
             InternalChild = new InputBlockingContainer
@@ -69,14 +67,15 @@ namespace osu.Game.Overlays.Mods
                 Masking = true,
                 CornerRadius = ModSelectPanel.CORNER_RADIUS,
                 Shear = new Vector2(ShearedOverlayContainer.SHEAR, 0),
+                Anchor = Anchor.BottomRight,
+                Origin = Anchor.BottomRight,
                 Children = new Drawable[]
                 {
                     contentBackground = new Box
                     {
                         Anchor = Anchor.CentreRight,
                         Origin = Anchor.CentreRight,
-                        RelativeSizeAxes = Axes.Y,
-                        Width = ValueAreaWidth + ModSelectPanel.CORNER_RADIUS
+                        RelativeSizeAxes = Axes.Both,
                     },
                     new GridContainer
                     {
@@ -85,7 +84,7 @@ namespace osu.Game.Overlays.Mods
                         ColumnDimensions = new[]
                         {
                             new Dimension(GridSizeMode.AutoSize),
-                            new Dimension(GridSizeMode.Absolute, ValueAreaWidth)
+                            new Dimension(GridSizeMode.Absolute, 56)
                         },
                         Content = new[]
                         {
