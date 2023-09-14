@@ -46,9 +46,19 @@ namespace osu.Game.Database
         /// </summary>
         public ArchiveReader GetReader()
         {
-            return Stream != null
-                ? getReaderFrom(Stream)
-                : getReaderFrom(Path);
+            if (Stream == null)
+                return getReaderFromPath(Path);
+
+            if (Stream is MemoryStream memoryStream)
+            {
+                if (ZipUtils.IsZipArchive(memoryStream))
+                    return new ZipArchiveReader(memoryStream, Path);
+
+                return new LegacyByteArrayReader(memoryStream.ToArray(), Path);
+            }
+
+            // This isn't used in any current path. May need to reconsider for performance reasons (ie. if we don't expect the incoming stream to be copied out).
+            return new LegacyByteArrayReader(Stream.ReadAllBytesToArray(), Path);
         }
 
         /// <summary>
@@ -61,31 +71,11 @@ namespace osu.Game.Database
         }
 
         /// <summary>
-        /// Creates an <see cref="ArchiveReader"/> from a stream.
-        /// </summary>
-        /// <param name="stream">A seekable stream containing the archive content.</param>
-        /// <returns>A reader giving access to the archive's content.</returns>
-        private ArchiveReader getReaderFrom(Stream stream)
-        {
-            if (!(stream is MemoryStream memoryStream))
-            {
-                // This isn't used in any current path. May need to reconsider for performance reasons (ie. if we don't expect the incoming stream to be copied out).
-                memoryStream = new MemoryStream(stream.ReadAllBytesToArray());
-                stream.Dispose();
-            }
-
-            if (ZipUtils.IsZipArchive(memoryStream))
-                return new ZipArchiveReader(memoryStream, Path);
-
-            return new LegacyByteArrayReader(memoryStream.ToArray(), Path);
-        }
-
-        /// <summary>
         /// Creates an <see cref="ArchiveReader"/> from a valid storage path.
         /// </summary>
         /// <param name="path">A file or folder path resolving the archive content.</param>
         /// <returns>A reader giving access to the archive's content.</returns>
-        private ArchiveReader getReaderFrom(string path)
+        private ArchiveReader getReaderFromPath(string path)
         {
             if (ZipUtils.IsZipArchive(path))
                 return new ZipArchiveReader(File.Open(path, FileMode.Open, FileAccess.Read, FileShare.Read), System.IO.Path.GetFileName(path));
