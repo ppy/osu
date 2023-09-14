@@ -149,8 +149,17 @@ namespace osu.Game.Storyboards.Drawables
             if (!IsLoaded)
                 return;
 
-            InternalChild.Scale = new Vector2(FlipH ? -Scale.X : Scale.X, FlipV ? -Scale.Y : Scale.Y) * VectorScale;
-            base.Origin = InternalChild.Origin = StoryboardExtensions.AdjustOrigin(customOrigin, VectorScale, FlipH, FlipV);
+            // Vector scale and flip is applied to our child to isolate it from external Scale (that can be applied by the storyboard itself).
+            InternalChild.Scale = new Vector2(FlipH ? -1 : 1, FlipV ? -1 : 1) * VectorScale;
+
+            Anchor resolvedOrigin = StoryboardExtensions.AdjustOrigin(customOrigin, VectorScale, FlipH, FlipV);
+
+            // Likewise, origin has to be adjusted based on flip and vector scale usage.
+            // The original "storyboard" origin is stored in customOrigin.
+            base.Origin = resolvedOrigin;
+
+            InternalChild.Anchor = resolvedOrigin;
+            InternalChild.Origin = resolvedOrigin;
         }
 
         #endregion

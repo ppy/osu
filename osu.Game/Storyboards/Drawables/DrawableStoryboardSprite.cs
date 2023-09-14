@@ -22,6 +22,8 @@ namespace osu.Game.Storyboards.Drawables
 
         public DrawableStoryboardSprite(StoryboardSprite sprite)
         {
+            AutoSizeAxes = Axes.Both;
+
             Sprite = sprite;
             Origin = sprite.Origin;
             Position = sprite.InitialPosition;
@@ -53,7 +55,6 @@ namespace osu.Game.Storyboards.Drawables
         protected override void LoadComplete()
         {
             base.LoadComplete();
-
             updateMetrics();
         }
 
@@ -130,8 +131,17 @@ namespace osu.Game.Storyboards.Drawables
             if (!IsLoaded)
                 return;
 
-            InternalChild.Scale = new Vector2(FlipH ? -base.DrawScale.X : base.DrawScale.X, FlipV ? -base.DrawScale.Y : base.DrawScale.Y) * VectorScale;
-            base.Origin = InternalChild.Origin = StoryboardExtensions.AdjustOrigin(customOrigin, VectorScale, FlipH, FlipV);
+            // Vector scale and flip is applied to our child to isolate it from external Scale (that can be applied by the storyboard itself).
+            InternalChild.Scale = new Vector2(FlipH ? -1 : 1, FlipV ? -1 : 1) * VectorScale;
+
+            Anchor resolvedOrigin = StoryboardExtensions.AdjustOrigin(customOrigin, VectorScale, FlipH, FlipV);
+
+            // Likewise, origin has to be adjusted based on flip and vector scale usage.
+            // The original "storyboard" origin is stored in customOrigin.
+            base.Origin = resolvedOrigin;
+
+            InternalChild.Anchor = resolvedOrigin;
+            InternalChild.Origin = resolvedOrigin;
         }
 
         #endregion
