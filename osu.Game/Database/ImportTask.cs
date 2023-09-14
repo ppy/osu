@@ -59,8 +59,11 @@ namespace osu.Game.Database
             }
 
             if (Stream is not MemoryStream memoryStream)
+            {
                 // Path used primarily in tests (converting `ManifestResourceStream`s to `MemoryStream`s).
                 memoryStream = new MemoryStream(Stream.ReadAllBytesToArray());
+                Stream.Dispose();
+            }
 
             if (ZipUtils.IsZipArchive(memoryStream))
                 return new ZipArchiveReader(memoryStream, Path);
