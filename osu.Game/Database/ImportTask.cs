@@ -58,7 +58,7 @@ namespace osu.Game.Database
             }
 
             // This isn't used in any current path. May need to reconsider for performance reasons (ie. if we don't expect the incoming stream to be copied out).
-            return new LegacyByteArrayReader(Stream.ReadAllBytesToArray(), Path);
+            return new ByteArrayArchiveReader(Stream.ReadAllBytesToArray(), Path);
         }
 
         /// <summary>
@@ -80,9 +80,9 @@ namespace osu.Game.Database
             if (ZipUtils.IsZipArchive(path))
                 return new ZipArchiveReader(File.Open(path, FileMode.Open, FileAccess.Read, FileShare.Read), System.IO.Path.GetFileName(path));
             if (Directory.Exists(path))
-                return new LegacyDirectoryArchiveReader(path);
+                return new DirectoryArchiveReader(path);
             if (File.Exists(path))
-                return new LegacyFileArchiveReader(path);
+                return new SingleFileArchiveReader(path);
 
             throw new InvalidFormatException($"{path} is not a valid archive");
         }

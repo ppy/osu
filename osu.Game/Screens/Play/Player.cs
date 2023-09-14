@@ -1144,14 +1144,14 @@ namespace osu.Game.Screens.Play
             if (DrawableRuleset.ReplayScore != null)
                 return Task.CompletedTask;
 
-            LegacyByteArrayReader replayReader = null;
+            ByteArrayArchiveReader replayReader = null;
 
             if (score.ScoreInfo.Ruleset.IsLegacyRuleset())
             {
                 using (var stream = new MemoryStream())
                 {
                     new LegacyScoreEncoder(score, GameplayState.Beatmap).Encode(stream);
-                    replayReader = new LegacyByteArrayReader(stream.ToArray(), "replay.osr");
+                    replayReader = new ByteArrayArchiveReader(stream.ToArray(), "replay.osr");
                 }
             }
 
