@@ -3,6 +3,7 @@
 
 #nullable disable
 
+using System;
 using System.Collections.Generic;
 using osu.Framework.Graphics;
 using osu.Game.Audio;
@@ -37,13 +38,21 @@ namespace osu.Game.Rulesets.Osu.Tests
         private readonly BindableBool snakingIn = new BindableBool(true);
         private readonly BindableBool snakingOut = new BindableBool(true);
 
-        [SetUpSteps]
-        public void SetUpSteps()
+        private float progressToHit;
+
+        protected override void LoadComplete()
         {
+            base.LoadComplete();
+
             AddToggleStep("disable snaking", v =>
             {
                 snakingIn.Value = !v;
                 snakingOut.Value = !v;
+            });
+
+            AddSliderStep("hit at", 0f, 1f, 0f, v =>
+            {
+                progressToHit = v;
             });
         }
 
@@ -53,6 +62,18 @@ namespace osu.Game.Rulesets.Osu.Tests
             var config = (OsuRulesetConfigManager)RulesetConfigs.GetConfigFor(Ruleset.Value.CreateInstance()).AsNonNull();
             config.BindWith(OsuRulesetSetting.SnakingInSliders, snakingIn);
             config.BindWith(OsuRulesetSetting.SnakingOutSliders, snakingOut);
+        }
+
+        protected override void Update()
+        {
+            base.Update();
+
+            foreach (var slider in this.ChildrenOfType<DrawableSlider>())
+            {
+                double completionProgress = Math.Clamp((Time.Current - slider.HitObject.StartTime) / slider.HitObject.Duration, 0, 1);
+                if (completionProgress > progressToHit && !slider.IsHit)
+                    slider.HeadCircle.HitArea.Hit();
+            }
         }
 
         [Test]
