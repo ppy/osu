@@ -34,16 +34,16 @@ namespace osu.Game.Rulesets.Osu.Tests
     {
         private int depthIndex;
 
-        private readonly BindableBool snakingIn = new BindableBool();
-        private readonly BindableBool snakingOut = new BindableBool();
+        private readonly BindableBool snakingIn = new BindableBool(true);
+        private readonly BindableBool snakingOut = new BindableBool(true);
 
         [SetUpSteps]
         public void SetUpSteps()
         {
-            AddToggleStep("toggle snaking", v =>
+            AddToggleStep("disable snaking", v =>
             {
-                snakingIn.Value = v;
-                snakingOut.Value = v;
+                snakingIn.Value = !v;
+                snakingOut.Value = !v;
             });
         }
 
