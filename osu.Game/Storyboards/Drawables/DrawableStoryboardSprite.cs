@@ -124,7 +124,7 @@ namespace osu.Game.Storyboards.Drawables
         }
 
         public override bool IsPresent
-            => !float.IsNaN(DrawPosition.X) && !float.IsNaN(DrawPosition.Y) && base.IsPresent;
+            => !float.IsNaN(DrawPosition.X) && !float.IsNaN(DrawPosition.Y) && sprite.IsPresent && base.IsPresent;
 
         private void updateMetrics()
         {
