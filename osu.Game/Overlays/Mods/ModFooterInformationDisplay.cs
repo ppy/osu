@@ -24,7 +24,7 @@ namespace osu.Game.Overlays.Mods
         protected Box FrontBackground { get; private set; } = null!;
 
         [Resolved]
-        private OverlayColourProvider colourProvider { get; set; } = null!;
+        protected OverlayColourProvider ColourProvider { get; private set; } = null!;
 
         [BackgroundDependencyLoader]
         private void load()
@@ -98,9 +98,9 @@ namespace osu.Game.Overlays.Mods
         {
             base.LoadComplete();
 
-            MainBackground.Colour = colourProvider.Background4;
-            FrontBackground.Colour = colourProvider.Background3;
-            Color4 glowColour = colourProvider.Background1;
+            MainBackground.Colour = ColourProvider.Background4;
+            FrontBackground.Colour = ColourProvider.Background3;
+            Color4 glowColour = ColourProvider.Background1;
 
             Content.BorderColour = ColourInfo.GradientVertical(MainBackground.Colour, glowColour);
             innerContent.BorderColour = ColourInfo.GradientVertical(FrontBackground.Colour, glowColour);
