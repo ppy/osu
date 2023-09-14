@@ -228,7 +228,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
             double completionProgress = Math.Clamp((Time.Current - HitObject.StartTime) / HitObject.Duration, 0, 1);
 
             Ball.UpdateProgress(completionProgress);
-            SliderBody?.UpdateProgress(completionProgress);
+            SliderBody?.UpdateProgress(HeadCircle.IsHit ? completionProgress : 0);
 
             foreach (DrawableHitObject hitObject in NestedHitObjects)
             {
