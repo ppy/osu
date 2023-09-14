@@ -47,7 +47,16 @@ namespace osu.Game.Database
         public ArchiveReader GetReader()
         {
             if (Stream == null)
-                return getReaderFromPath(Path);
+            {
+                if (ZipUtils.IsZipArchive(Path))
+                    return new ZipArchiveReader(File.Open(Path, FileMode.Open, FileAccess.Read, FileShare.Read), System.IO.Path.GetFileName(Path));
+                if (Directory.Exists(Path))
+                    return new DirectoryArchiveReader(Path);
+                if (File.Exists(Path))
+                    return new SingleFileArchiveReader(Path);
+
+                throw new InvalidFormatException($"{Path} is not a valid archive");
+            }
 
             if (Stream is MemoryStream memoryStream)
             {
@@ -68,23 +77,6 @@ namespace osu.Game.Database
         {
             if (File.Exists(Path))
                 File.Delete(Path);
-        }
-
-        /// <summary>
-        /// Creates an <see cref="ArchiveReader"/> from a valid storage path.
-        /// </summary>
-        /// <param name="path">A file or folder path resolving the archive content.</param>
-        /// <returns>A reader giving access to the archive's content.</returns>
-        private ArchiveReader getReaderFromPath(string path)
-        {
-            if (ZipUtils.IsZipArchive(path))
-                return new ZipArchiveReader(File.Open(path, FileMode.Open, FileAccess.Read, FileShare.Read), System.IO.Path.GetFileName(path));
-            if (Directory.Exists(path))
-                return new DirectoryArchiveReader(path);
-            if (File.Exists(path))
-                return new SingleFileArchiveReader(path);
-
-            throw new InvalidFormatException($"{path} is not a valid archive");
         }
 
         public override string ToString() => System.IO.Path.GetFileName(Path);
