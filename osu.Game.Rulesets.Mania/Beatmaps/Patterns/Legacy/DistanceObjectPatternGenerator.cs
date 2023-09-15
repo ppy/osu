@@ -10,10 +10,11 @@ using System.Linq;
 using osu.Framework.Extensions.EnumExtensions;
 using osu.Game.Audio;
 using osu.Game.Beatmaps;
-using osu.Game.Rulesets.Objects;
-using osu.Game.Rulesets.Objects.Types;
-using osu.Game.Rulesets.Mania.Objects;
 using osu.Game.Beatmaps.ControlPoints;
+using osu.Game.Rulesets.Mania.Objects;
+using osu.Game.Rulesets.Objects;
+using osu.Game.Rulesets.Objects.Legacy;
+using osu.Game.Rulesets.Objects.Types;
 using osu.Game.Utils;
 
 namespace osu.Game.Rulesets.Mania.Beatmaps.Patterns.Legacy
@@ -50,10 +51,9 @@ namespace osu.Game.Rulesets.Mania.Beatmaps.Patterns.Legacy
             TimingControlPoint timingPoint = beatmap.ControlPointInfo.TimingPointAt(hitObject.StartTime);
 
             double beatLength;
-            if (hitObject.LegacyBpmMultiplier.HasValue)
-                beatLength = timingPoint.BeatLength * hitObject.LegacyBpmMultiplier.Value;
-            else if (hitObject is IHasSliderVelocity hasSliderVelocity)
-                beatLength = timingPoint.BeatLength / hasSliderVelocity.SliderVelocityMultiplier;
+
+            if (hitObject is IHasSliderVelocity hasSliderVelocity)
+                beatLength = LegacyRulesetExtensions.GetPrecisionAdjustedBeatLength(hasSliderVelocity, timingPoint, ManiaRuleset.SHORT_NAME);
             else
                 beatLength = timingPoint.BeatLength;
 
