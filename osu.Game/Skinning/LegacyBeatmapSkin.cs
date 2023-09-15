@@ -19,7 +19,7 @@ namespace osu.Game.Skinning
 {
     public class LegacyBeatmapSkin : LegacySkin
     {
-        protected override bool AllowManiaSkin => false;
+        protected override bool AllowManiaConfigLookups => false;
         protected override bool UseCustomSampleBanks => true;
 
         /// <summary>
