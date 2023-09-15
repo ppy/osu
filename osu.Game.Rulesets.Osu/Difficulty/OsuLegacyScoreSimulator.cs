@@ -131,6 +131,8 @@ namespace osu.Game.Rulesets.Osu.Difficulty
                     const double maximum_rotations_per_second = 477.0 / 60;
 
                     // Normally, this value depends on the final overall difficulty. For simplicity, we'll only consider the worst case that maximises bonus score.
+                    // As we're primarily concerned with computing the maximum theoretical final score,
+                    // this will have the final effect of slightly underestimating bonus score achieved on stable when converting from score V1.
                     const double minimum_rotations_per_second = 3;
 
                     double secondsDuration = spinner.Duration / 1000;
