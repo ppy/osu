@@ -14,6 +14,7 @@ using JetBrains.Annotations;
 using osu.Game.Audio;
 using osu.Game.Beatmaps.ControlPoints;
 using osu.Game.Beatmaps.Formats;
+using osu.Game.Rulesets.Objects.Legacy;
 
 namespace osu.Game.Rulesets.Taiko.Beatmaps
 {
@@ -188,7 +189,7 @@ namespace osu.Game.Rulesets.Taiko.Beatmaps
             double beatLength;
 
             if (obj is IHasSliderVelocity hasSliderVelocity)
-                beatLength = timingPoint.BeatLength / hasSliderVelocity.GetPrecisionAdjustedSliderVelocityMultiplier(TaikoRuleset.SHORT_NAME);
+                beatLength = LegacyRulesetExtensions.GetPrecisionAdjustedBeatLength(hasSliderVelocity, timingPoint, TaikoRuleset.SHORT_NAME);
             else
                 beatLength = timingPoint.BeatLength;
 

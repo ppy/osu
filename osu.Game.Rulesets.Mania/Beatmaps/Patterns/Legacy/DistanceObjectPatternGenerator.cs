@@ -13,6 +13,7 @@ using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.ControlPoints;
 using osu.Game.Rulesets.Mania.Objects;
 using osu.Game.Rulesets.Objects;
+using osu.Game.Rulesets.Objects.Legacy;
 using osu.Game.Rulesets.Objects.Types;
 using osu.Game.Utils;
 
@@ -52,9 +53,7 @@ namespace osu.Game.Rulesets.Mania.Beatmaps.Patterns.Legacy
             double beatLength;
 
             if (hitObject is IHasSliderVelocity hasSliderVelocity)
-            {
-                beatLength = timingPoint.BeatLength / hasSliderVelocity.GetPrecisionAdjustedSliderVelocityMultiplier(ManiaRuleset.SHORT_NAME);
-            }
+                beatLength = LegacyRulesetExtensions.GetPrecisionAdjustedBeatLength(hasSliderVelocity, timingPoint, ManiaRuleset.SHORT_NAME);
             else
                 beatLength = timingPoint.BeatLength;
 
