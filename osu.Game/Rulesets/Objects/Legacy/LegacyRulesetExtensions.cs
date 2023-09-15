@@ -13,7 +13,7 @@ namespace osu.Game.Rulesets.Objects.Legacy
         /// Introduces floating-point errors to post-multiplied beat length for legacy rulesets that depend on it.
         /// You should definitely not use this unless you know exactly what you're doing.
         /// </summary>
-        public static double GetPrecisionAdjustedBeatLength(this IHasSliderVelocity hasSliderVelocity, TimingControlPoint timingControlPoint, string rulesetShortName)
+        public static double GetPrecisionAdjustedBeatLength(IHasSliderVelocity hasSliderVelocity, TimingControlPoint timingControlPoint, string rulesetShortName)
         {
             double sliderVelocityAsBeatLength = -100 / hasSliderVelocity.SliderVelocityMultiplier;
 

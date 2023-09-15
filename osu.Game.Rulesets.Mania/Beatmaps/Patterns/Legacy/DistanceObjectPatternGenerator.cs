@@ -53,7 +53,7 @@ namespace osu.Game.Rulesets.Mania.Beatmaps.Patterns.Legacy
             double beatLength;
 
             if (hitObject is IHasSliderVelocity hasSliderVelocity)
-                beatLength = hasSliderVelocity.GetPrecisionAdjustedBeatLength(timingPoint, ManiaRuleset.SHORT_NAME);
+                beatLength = LegacyRulesetExtensions.GetPrecisionAdjustedBeatLength(hasSliderVelocity, timingPoint, ManiaRuleset.SHORT_NAME);
             else
                 beatLength = timingPoint.BeatLength;
 
