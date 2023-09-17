@@ -24,6 +24,7 @@ using osu.Game.Audio;
 using osu.Game.Database;
 using osu.Game.IO;
 using osu.Game.Overlays.Notifications;
+using osu.Game.Rulesets;
 using osu.Game.Utils;
 
 namespace osu.Game.Skinning
@@ -54,6 +55,12 @@ namespace osu.Game.Skinning
 
         public readonly Bindable<Live<SkinInfo>> CurrentSkinInfo = new Bindable<Live<SkinInfo>>(ArgonSkin.CreateInfo().ToLiveUnmanaged());
 
+        public readonly Bindable<bool> DifferentSkinPerRuleset = new BindableBool(false);
+
+        public readonly Dictionary<RulesetInfo, Bindable<Live<SkinInfo>>> RulesetSkins = new Dictionary<RulesetInfo, Bindable<Live<SkinInfo>>>();
+
+        public readonly Bindable<string> SerializedDict = new Bindable<string>("");
+
         private readonly SkinImporter skinImporter;
 
         private readonly LegacySkinExporter skinExporter;
@@ -74,13 +81,26 @@ namespace osu.Game.Skinning
             }
         }
 
-        public SkinManager(Storage storage, RealmAccess realm, GameHost host, IResourceStore<byte[]> resources, AudioManager audio, Scheduler scheduler)
+        public SkinManager(Storage storage, RealmAccess realm, GameHost host, IResourceStore<byte[]> resources, AudioManager audio, Scheduler scheduler, RulesetStore rulesetStore, Bindable<RulesetInfo> activeRuleset)
             : base(storage, realm)
         {
             this.audio = audio;
             this.scheduler = scheduler;
             this.host = host;
             this.resources = resources;
+
+            foreach (var ruleset in rulesetStore.AvailableRulesets)
+            {
+                Bindable<Live<SkinInfo>> rulesetSkin = new Bindable<Live<SkinInfo>>(ArgonSkin.CreateInfo().ToLiveUnmanaged());
+                rulesetSkin.ValueChanged += skin =>
+                {
+                    if (activeRuleset.Value.Equals(ruleset))
+                        SetSkinFromRuleset(ruleset);
+
+                    serializeDict();
+                };
+                RulesetSkins.Add(ruleset, rulesetSkin);
+            }
 
             userFiles = new StorageBackedResourceStore(storage.GetStorageForDirectory("files"));
 
@@ -109,7 +129,21 @@ namespace osu.Game.Skinning
 
             CurrentSkinInfo.ValueChanged += skin =>
             {
+                if (DifferentSkinPerRuleset.Value && RulesetSkins.ContainsKey(activeRuleset.Value))
+                    RulesetSkins[activeRuleset.Value].Value = skin.NewValue;
+
                 CurrentSkin.Value = skin.NewValue.PerformRead(GetSkin);
+            };
+
+            DifferentSkinPerRuleset.ValueChanged += newBool =>
+            {
+                if (newBool.NewValue)
+                    SetSkinFromRuleset(activeRuleset.Value);
+            };
+
+            activeRuleset.ValueChanged += ruleset =>
+            {
+                SetSkinFromRuleset(ruleset.NewValue);
             };
 
             CurrentSkin.Value = argonSkin;
@@ -125,6 +159,15 @@ namespace osu.Game.Skinning
             {
                 PostNotification = obj => PostNotification?.Invoke(obj)
             };
+        }
+
+        public void SetSkinFromRuleset(RulesetInfo ruleset)
+        {
+            if (!DifferentSkinPerRuleset.Value) return;
+
+            if (!RulesetSkins.ContainsKey(ruleset)) return;
+
+            CurrentSkinInfo.Value = RulesetSkins[ruleset].Value;
         }
 
         public void SelectRandomSkin()
@@ -351,6 +394,49 @@ namespace osu.Game.Skinning
             }
 
             CurrentSkinInfo.Value = skinInfo ?? trianglesSkin.SkinInfo;
+        }
+
+        private void serializeDict()
+        {
+            string result = "";
+            foreach (var (ruleset, skin) in RulesetSkins)
+                result += $"[{ruleset.ShortName},{skin.Value.ID}]:";
+            SerializedDict.Value = result;
+        }
+
+        private void deserializeString(string serializedDict)
+        {
+            foreach (string rulesetSkin in serializedDict.Split(":"))
+            {
+                if (rulesetSkin.Length == 0 || !rulesetSkin.Contains(',')) continue;
+
+                int splitIndex = rulesetSkin.IndexOf(',');
+                string rulesetShortName = rulesetSkin.Substring(1, splitIndex - 1);
+                string guidString = rulesetSkin.Substring(splitIndex + 1, rulesetSkin.Length - splitIndex - 2);
+
+                Live<SkinInfo> skinInfo = null;
+
+                if (Guid.TryParse(guidString, out var guid))
+                    skinInfo = Query(s => s.ID == guid);
+
+                if (skinInfo == null)
+                {
+                    if (guid == SkinInfo.CLASSIC_SKIN)
+                        skinInfo = DefaultClassicSkin.SkinInfo;
+                }
+
+                // The Equals operator only uses the short name
+                RulesetInfo ruleset = new RulesetInfo(rulesetShortName, "", "", -1);
+
+                if (RulesetSkins.ContainsKey(ruleset))
+                    RulesetSkins[ruleset].Value = skinInfo ?? trianglesSkin.SkinInfo;
+            }
+        }
+
+        public void SetRulesetSkinsFromConfiguration(bool diffEachRuleset, string serializedDict)
+        {
+            DifferentSkinPerRuleset.Value = diffEachRuleset;
+            deserializeString(serializedDict);
         }
     }
 }

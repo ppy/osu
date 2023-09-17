@@ -10,6 +10,7 @@ using JetBrains.Annotations;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
+using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Localisation;
 using osu.Framework.Logging;
@@ -19,6 +20,7 @@ using osu.Game.Localisation;
 using osu.Game.Overlays.SkinEditor;
 using osu.Game.Screens.Select;
 using osu.Game.Skinning;
+using osuTK;
 using Realms;
 
 namespace osu.Game.Overlays.Settings.Sections
@@ -26,6 +28,10 @@ namespace osu.Game.Overlays.Settings.Sections
     public partial class SkinSection : SettingsSection
     {
         private SkinSettingsDropdown skinDropdown;
+
+        private readonly List<SkinSettingsDropdown> rulesetSkinDropdowns = new List<SkinSettingsDropdown>();
+
+        private FillFlowContainer rulesetSkins;
 
         public override LocalisableString Header => SkinSettingsStrings.SkinSectionHeader;
 
@@ -53,6 +59,18 @@ namespace osu.Game.Overlays.Settings.Sections
         [BackgroundDependencyLoader(permitNulls: true)]
         private void load([CanBeNull] SkinEditorOverlay skinEditor)
         {
+            foreach (var (ruleset, skin) in skins.RulesetSkins)
+            {
+                rulesetSkinDropdowns.Add(
+                    new SkinSettingsDropdown
+                    {
+                        LabelText = ruleset.Name,
+                        Current = skin,
+                        Keywords = new[] { @"skins" },
+                    }
+                );
+            }
+
             Children = new Drawable[]
             {
                 skinDropdown = new SkinSettingsDropdown
@@ -68,12 +86,30 @@ namespace osu.Game.Overlays.Settings.Sections
                 },
                 new ExportSkinButton(),
                 new DeleteSkinButton(),
+                new SettingsCheckbox
+                {
+                    LabelText = SkinSettingsStrings.DifferentSkinPerRuleset,
+                    Current = skins.DifferentSkinPerRuleset,
+                },
+                rulesetSkins = new FillFlowContainer
+                {
+                    Alpha = 0,
+                    RelativeSizeAxes = Axes.X,
+                    AutoSizeAxes = Axes.Y,
+                    Spacing = new Vector2(0, 8),
+                    Direction = FillDirection.Vertical,
+                    Children = rulesetSkinDropdowns,
+                },
             };
+
+            updateVisibility();
         }
 
         protected override void LoadComplete()
         {
             base.LoadComplete();
+
+            skins.DifferentSkinPerRuleset.BindValueChanged(_ => Scheduler.AddOnce(updateVisibility));
 
             realmSubscription = realm.RegisterForNotifications(_ => realm.Realm.All<SkinInfo>()
                                                                          .Where(s => !s.DeletePending)
@@ -90,6 +126,14 @@ namespace osu.Game.Overlays.Settings.Sections
                     skins.SelectRandomSkin();
                 }
             });
+        }
+
+        private void updateVisibility()
+        {
+            rulesetSkins.Hide();
+
+            if (skins.DifferentSkinPerRuleset.Value)
+                rulesetSkins.Show();
         }
 
         private void skinsChanged(IRealmCollection<SkinInfo> sender, ChangeSet changes)
@@ -114,6 +158,9 @@ namespace osu.Game.Overlays.Settings.Sections
                 dropdownItems.Add(skin.ToLive(realm));
 
             Schedule(() => skinDropdown.Items = dropdownItems);
+
+            foreach (var dropdown in rulesetSkinDropdowns)
+                Schedule(() => dropdown.Items = dropdownItems);
         }
 
         protected override void Dispose(bool isDisposing)

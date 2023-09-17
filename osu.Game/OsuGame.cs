@@ -189,6 +189,10 @@ namespace osu.Game
 
         private Bindable<string> configSkin;
 
+        private Bindable<bool> configDiffSkinRuleset;
+
+        private Bindable<string> configRulesetSkins;
+
         private readonly string[] args;
 
         private readonly List<OsuFocusedOverlayContainer> focusedOverlays = new List<OsuFocusedOverlayContainer>();
@@ -359,8 +363,15 @@ namespace osu.Game
             // Transfer skin from config to realm instance once on startup.
             SkinManager.SetSkinFromConfiguration(configSkin.Value);
 
+            configDiffSkinRuleset = LocalConfig.GetBindable<bool>(OsuSetting.DifferentSkinPerRuleset);
+            configRulesetSkins = LocalConfig.GetBindable<string>(OsuSetting.SerializedRulesetSkinsDict);
+
+            SkinManager.SetRulesetSkinsFromConfiguration(configDiffSkinRuleset.Value, configRulesetSkins.Value);
+
             // Transfer any runtime changes back to configuration file.
             SkinManager.CurrentSkinInfo.ValueChanged += skin => configSkin.Value = skin.NewValue.ID.ToString();
+            SkinManager.DifferentSkinPerRuleset.ValueChanged += newBool => configDiffSkinRuleset.Value = newBool.NewValue;
+            SkinManager.SerializedDict.ValueChanged += dict => configRulesetSkins.Value = dict.NewValue;
 
             LocalUserPlaying.BindValueChanged(p =>
             {

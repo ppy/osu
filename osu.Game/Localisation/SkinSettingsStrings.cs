@@ -64,6 +64,11 @@ namespace osu.Game.Localisation
         /// </summary>
         public static LocalisableString DeleteSkinButton => new TranslatableString(getKey(@"delete_skin_button"), @"Delete selected skin");
 
+        /// <summary>
+        /// "Use different skin for each ruleset"
+        /// </summary>
+        public static LocalisableString DifferentSkinPerRuleset => new TranslatableString(getKey(@"different_skin_per_ruleset"), @"Use different skin for each ruleset");
+
         private static string getKey(string key) => $"{prefix}:{key}";
     }
 }
