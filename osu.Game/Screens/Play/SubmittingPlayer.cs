@@ -8,6 +8,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using JetBrains.Annotations;
 using osu.Framework.Allocation;
+using osu.Framework.Graphics.Containers;
 using osu.Framework.Logging;
 using osu.Framework.Screens;
 using osu.Game.Beatmaps;
@@ -155,6 +156,20 @@ namespace osu.Game.Screens.Play
 
         public override bool OnExiting(ScreenExitEvent e)
         {
+            // If an exit is requested and some objects have already been hit, show the pause screen as a method of
+            // confirming the exit operation.
+            if (PausingSupportedByCurrentState)
+            {
+                bool isValuableScore = Score.ScoreInfo.Statistics.Any(s => s.Key.IsHit() && s.Value > 0);
+                bool hasConfirmed = PauseOverlay?.State.Value == Visibility.Visible;
+
+                if (isValuableScore && !hasConfirmed)
+                {
+                    Pause();
+                    return true;
+                }
+            }
+
             bool exiting = base.OnExiting(e);
 
             if (LoadedBeatmapSuccessfully)
