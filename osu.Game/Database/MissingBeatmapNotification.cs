@@ -95,6 +95,7 @@ namespace osu.Game.Database
                 var importTask = new ImportTask(scoreStream, "score.osr");
                 scoreManager.Import(new[] { importTask });
                 realmSubscription?.Dispose();
+                Close(false);
             }
         }
 
