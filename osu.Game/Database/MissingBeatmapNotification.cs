@@ -6,19 +6,13 @@ using System.IO;
 using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
-using osu.Framework.Graphics;
-using osu.Framework.Graphics.Containers;
-using osu.Framework.Graphics.Shapes;
+using osu.Framework.Input.Events;
 using osu.Game.Beatmaps;
-using osu.Game.Beatmaps.Drawables;
+using osu.Game.Beatmaps.Drawables.Cards;
 using osu.Game.Configuration;
-using osu.Game.Graphics;
-using osu.Game.Graphics.Sprites;
 using osu.Game.Online.API.Requests.Responses;
-using osu.Game.Overlays;
 using osu.Game.Overlays.Notifications;
 using osu.Game.Scoring;
-using osuTK.Graphics;
 using Realms;
 
 namespace osu.Game.Database
@@ -40,6 +34,7 @@ namespace osu.Game.Database
 
         private Bindable<bool> autodownloadConfig = null!;
         private Bindable<bool> noVideoSetting = null!;
+        private BeatmapCardNano card = null!;
 
         private IDisposable? realmSubscription;
 
@@ -52,7 +47,7 @@ namespace osu.Game.Database
         }
 
         [BackgroundDependencyLoader]
-        private void load(OsuConfigManager config, BeatmapSetOverlay? beatmapSetOverlay)
+        private void load(OsuConfigManager config)
         {
             Text = "You do not have the required beatmap for this replay";
 
@@ -70,69 +65,7 @@ namespace osu.Game.Database
             autodownloadConfig = config.GetBindable<bool>(OsuSetting.AutomaticallyDownloadWhenSpectating);
             noVideoSetting = config.GetBindable<bool>(OsuSetting.PreferNoVideo);
 
-            Content.Add(new ClickableContainer
-            {
-                RelativeSizeAxes = Axes.X,
-                Height = 70,
-                Anchor = Anchor.CentreLeft,
-                Origin = Anchor.TopLeft,
-                CornerRadius = 4,
-                Masking = true,
-                Action = () => beatmapSetOverlay?.FetchAndShowBeatmapSet(beatmapSetInfo.OnlineID),
-                Children = new Drawable[]
-                {
-                    new DelayedLoadWrapper(() => new UpdateableOnlineBeatmapSetCover(BeatmapSetCoverType.Card)
-                    {
-                        OnlineInfo = beatmapSetInfo,
-                        RelativeSizeAxes = Axes.Both
-                    })
-                    {
-                        RelativeSizeAxes = Axes.Both
-                    },
-                    new Box
-                    {
-                        RelativeSizeAxes = Axes.Both,
-                        Colour = Color4.Black,
-                        Alpha = 0.4f
-                    },
-                    new FillFlowContainer
-                    {
-                        RelativeSizeAxes = Axes.Both,
-                        Direction = FillDirection.Vertical,
-                        Padding = new MarginPadding
-                        {
-                            Left = 10f,
-                            Top = 5f
-                        },
-                        Children = new Drawable[]
-                        {
-                            new TruncatingSpriteText
-                            {
-                                Text = beatmapSetInfo.Title,
-                                Font = OsuFont.GetFont(weight: FontWeight.SemiBold, size: 17, italics: true),
-                                RelativeSizeAxes = Axes.X,
-                            },
-                            new TruncatingSpriteText
-                            {
-                                Text = beatmapSetInfo.Artist,
-                                Font = OsuFont.GetFont(weight: FontWeight.SemiBold, size: 12, italics: true),
-                                RelativeSizeAxes = Axes.X,
-                            }
-                        }
-                    },
-                    new BeatmapDownloadButton(beatmapSetInfo)
-                    {
-                        Anchor = Anchor.BottomCentre,
-                        Origin = Anchor.BottomCentre,
-                        Width = 50,
-                        Height = 30,
-                        Margin = new MarginPadding
-                        {
-                            Bottom = 1f
-                        }
-                    }
-                }
-            });
+            Content.Add(card = new BeatmapCardNano(beatmapSetInfo));
         }
 
         protected override void LoadComplete()
@@ -142,6 +75,15 @@ namespace osu.Game.Database
             if (autodownloadConfig.Value)
                 beatmapDownloader.Download(beatmapSetInfo, noVideoSetting.Value);
         }
+
+        protected override void Update()
+        {
+            base.Update();
+            card.Width = Content.DrawWidth;
+        }
+
+        protected override bool OnHover(HoverEvent e) => false;
+        protected override void OnHoverLost(HoverLostEvent e) { }
 
         private void beatmapsChanged(IRealmCollection<BeatmapSetInfo> sender, ChangeSet? changes)
         {
