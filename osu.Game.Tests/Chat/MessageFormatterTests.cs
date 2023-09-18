@@ -36,6 +36,15 @@ namespace osu.Game.Tests.Chat
         }
 
         [Test]
+        public void TestFakeProtocolLink()
+        {
+            Message result = MessageFormatter.FormatMessage(new Message { Content = "This is a osunotarealprotocol://completely-made-up-protocol we don't support." });
+
+            Assert.AreEqual(result.Content, result.DisplayContent);
+            Assert.AreEqual(0, result.Links.Count);
+        }
+
+        [Test]
         public void TestSupportedProtocolLinkParsing()
         {
             Message result = MessageFormatter.FormatMessage(new Message { Content = "forgotspacehttps://dev.ppy.sh joinmyosump://12345 jointheosu://chan/#english" });
