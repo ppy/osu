@@ -99,6 +99,11 @@ Please try changing your audio device to a working setting.");
         public static LocalisableString MissingBeatmapForReplay => new TranslatableString(getKey(@"missing_beatmap_for_replay"), @"You do not have the beatmap for this replay.");
 
         /// <summary>
+        /// "Downloading missing beatmap for this replay..."
+        /// </summary>
+        public static LocalisableString DownloadingBeatmapForReplay => new TranslatableString(getKey(@"downloading_beatmap_for_replay"), @"Downloading missing beatmap for this replay...");
+
+        /// <summary>
         /// "Your local copy of the beatmap for this replay appears to be different than expected. You may need to update or re-download it."
         /// </summary>
         public static LocalisableString MismatchingBeatmapForReplay => new TranslatableString(getKey(@"mismatching_beatmap_for_replay"), @"Your local copy of the beatmap for this replay appears to be different than expected. You may need to update or re-download it.");
