@@ -64,7 +64,7 @@ namespace osu.Game.Configuration
             SetDefault(OsuSetting.Username, string.Empty);
             SetDefault(OsuSetting.Token, string.Empty);
 
-            SetDefault(OsuSetting.AutomaticallyDownloadWhenSpectating, false);
+            SetDefault(OsuSetting.AutomaticallyDownloadMissingBeatmaps, false);
 
             SetDefault(OsuSetting.SavePassword, false).ValueChanged += enabled =>
             {
@@ -215,6 +215,12 @@ namespace osu.Game.Configuration
 
             // migrations can be added here using a condition like:
             // if (combined < 20220103) { performMigration() }
+            if (combined < 20230918)
+            {
+#pragma warning disable CS0618 // Type or member is obsolete
+                SetValue(OsuSetting.AutomaticallyDownloadMissingBeatmaps, Get<OsuSetting>(OsuSetting.AutomaticallyDownloadWhenSpectating)); // can be removed 20240618
+#pragma warning restore CS0618 // Type or member is obsolete
+            }
         }
 
         public override TrackedSettings CreateTrackedSettings()
@@ -383,13 +389,17 @@ namespace osu.Game.Configuration
         EditorShowHitMarkers,
         EditorAutoSeekOnPlacement,
         DiscordRichPresence,
+
+        [Obsolete($"Use {nameof(AutomaticallyDownloadMissingBeatmaps)} instead.")] // can be removed 20240318
         AutomaticallyDownloadWhenSpectating,
+
         ShowOnlineExplicitContent,
         LastProcessedMetadataId,
         SafeAreaConsiderations,
         ComboColourNormalisationAmount,
         ProfileCoverExpanded,
         EditorLimitedDistanceSnap,
-        ReplaySettingsOverlay
+        ReplaySettingsOverlay,
+        AutomaticallyDownloadMissingBeatmaps,
     }
 }
