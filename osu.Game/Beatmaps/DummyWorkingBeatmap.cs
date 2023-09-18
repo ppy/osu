@@ -36,9 +36,10 @@ namespace osu.Game.Beatmaps
                 BeatmapSet = new BeatmapSetInfo(),
                 Difficulty = new BeatmapDifficulty
                 {
-                    DrainRate = 0,
                     CircleSize = 0,
+                    DrainRate = 0,
                     OverallDifficulty = 0,
+                    ApproachRate = 0,
                 },
                 Ruleset = new DummyRuleset().RulesetInfo
             }, audio)

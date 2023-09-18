@@ -89,6 +89,9 @@ namespace osu.Game.Beatmaps.Drawables.Cards
         {
             switch (size)
             {
+                case BeatmapCardSize.Nano:
+                    return new BeatmapCardNano(beatmapSet);
+
                 case BeatmapCardSize.Normal:
                     return new BeatmapCardNormal(beatmapSet, allowExpansion);
 
