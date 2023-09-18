@@ -1,10 +1,9 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
 using NUnit.Framework;
 using osu.Framework.Allocation;
+using osu.Framework.Extensions.ObjectExtensions;
 using osu.Framework.Graphics;
 using osu.Game.Overlays;
 using osu.Game.Overlays.Mods;
@@ -12,17 +11,17 @@ using osu.Game.Overlays.Mods;
 namespace osu.Game.Tests.Visual.UserInterface
 {
     [TestFixture]
-    public partial class TestSceneDifficultyMultiplierDisplay : OsuTestScene
+    public partial class TestSceneScoreMultiplierDisplay : OsuTestScene
     {
         [Cached]
         private OverlayColourProvider colourProvider = new OverlayColourProvider(OverlayColourScheme.Green);
 
         [Test]
-        public void TestDifficultyMultiplierDisplay()
+        public void TestBasic()
         {
-            DifficultyMultiplierDisplay multiplierDisplay = null;
+            ScoreMultiplierDisplay multiplierDisplay = null!;
 
-            AddStep("create content", () => Child = multiplierDisplay = new DifficultyMultiplierDisplay
+            AddStep("create content", () => Child = multiplierDisplay = new ScoreMultiplierDisplay
             {
                 Anchor = Anchor.Centre,
                 Origin = Anchor.Centre
@@ -34,7 +33,7 @@ namespace osu.Game.Tests.Visual.UserInterface
 
             AddSliderStep("set multiplier", 0, 2, 1d, multiplier =>
             {
-                if (multiplierDisplay != null)
+                if (multiplierDisplay.IsNotNull())
                     multiplierDisplay.Current.Value = multiplier;
             });
         }
