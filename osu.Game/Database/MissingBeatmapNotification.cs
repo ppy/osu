@@ -50,8 +50,6 @@ namespace osu.Game.Database
         [BackgroundDependencyLoader]
         private void load(OsuConfigManager config)
         {
-            Text = NotificationsStrings.MissingBeatmapForReplay;
-
             realmSubscription = realm.RegisterForNotifications(
                 realm => realm.All<BeatmapSetInfo>().Where(s => !s.DeletePending), beatmapsChanged);
 
@@ -75,6 +73,8 @@ namespace osu.Game.Database
 
             if (autoDownloadConfig.Value)
                 beatmapDownloader.Download(beatmapSetInfo, noVideoSetting.Value);
+
+            Text = autoDownloadConfig.Value ? NotificationsStrings.DownloadingBeatmapForReplay : NotificationsStrings.MissingBeatmapForReplay;
         }
 
         protected override void Update()
