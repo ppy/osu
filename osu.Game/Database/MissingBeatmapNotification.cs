@@ -18,7 +18,7 @@ using osu.Game.Localisation;
 
 namespace osu.Game.Database
 {
-    public partial class MissingBeatmapNotification : ProgressNotification
+    public partial class MissingBeatmapNotification : SimpleNotification
     {
         [Resolved]
         private BeatmapModelDownloader beatmapDownloader { get; set; } = null!;
@@ -93,7 +93,7 @@ namespace osu.Game.Database
             if (sender.Any(s => s.Beatmaps.Any(b => b.MD5Hash == beatmapHash)))
             {
                 var importTask = new ImportTask(scoreStream, "score.osr");
-                scoreManager.Import(this, new[] { importTask });
+                scoreManager.Import(new[] { importTask });
                 realmSubscription?.Dispose();
             }
         }
