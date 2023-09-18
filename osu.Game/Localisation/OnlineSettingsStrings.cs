@@ -60,6 +60,11 @@ namespace osu.Game.Localisation
         public static LocalisableString AutomaticallyDownloadWhenSpectating => new TranslatableString(getKey(@"automatically_download_when_spectating"), @"Automatically download beatmaps when spectating");
 
         /// <summary>
+        /// "Automatically download missing beatmaps"
+        /// </summary>
+        public static LocalisableString AutomaticallyDownloadMissingBeatmaps => new TranslatableString(getKey(@"automatically_download_missing_beatmaps"), @"Automatically download missing beatmaps");
+
+        /// <summary>
         /// "Show explicit content in search results"
         /// </summary>
         public static LocalisableString ShowExplicitContent => new TranslatableString(getKey(@"show_explicit_content"), @"Show explicit content in search results");

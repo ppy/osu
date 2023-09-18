@@ -33,7 +33,7 @@ namespace osu.Game.Database
         private readonly APIBeatmapSet beatmapSetInfo;
         private readonly string beatmapHash;
 
-        private Bindable<bool> autodownloadConfig = null!;
+        private Bindable<bool> autoDownloadConfig = null!;
         private Bindable<bool> noVideoSetting = null!;
         private BeatmapCardNano card = null!;
 
@@ -63,7 +63,7 @@ namespace osu.Game.Database
                 }
             });
 
-            autodownloadConfig = config.GetBindable<bool>(OsuSetting.AutomaticallyDownloadWhenSpectating);
+            autoDownloadConfig = config.GetBindable<bool>(OsuSetting.AutomaticallyDownloadMissingBeatmaps);
             noVideoSetting = config.GetBindable<bool>(OsuSetting.PreferNoVideo);
 
             Content.Add(card = new BeatmapCardNano(beatmapSetInfo));
@@ -73,7 +73,7 @@ namespace osu.Game.Database
         {
             base.LoadComplete();
 
-            if (autodownloadConfig.Value)
+            if (autoDownloadConfig.Value)
                 beatmapDownloader.Download(beatmapSetInfo, noVideoSetting.Value);
         }
 
