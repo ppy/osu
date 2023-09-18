@@ -20,6 +20,7 @@ namespace osu.Game.Rulesets.Osu.Tests
         [TestCase("colinear-perfect-curve")]
         [TestCase("slider-ticks")]
         [TestCase("slider-ticks-edge-case")]
+        [TestCase("slider-paths-edge-case")]
         [TestCase("repeat-slider")]
         [TestCase("uneven-repeat-slider")]
         [TestCase("old-stacking")]
