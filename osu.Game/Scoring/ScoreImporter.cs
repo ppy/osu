@@ -66,7 +66,7 @@ namespace osu.Game.Scoring
         {
             var stream = new MemoryStream();
 
-            // stream will close after exception throw, so fetch the stream again.
+            // stream will be closed after the exception was thrown, so fetch the stream again.
             using (var scoreStream = archive.GetStream(name))
             {
                 scoreStream.CopyTo(stream);
