@@ -328,8 +328,8 @@ namespace osu.Game.Rulesets.Objects
 
             if (ExpectedDistance.Value is double expectedDistance && calculatedLength != expectedDistance)
             {
-                // In osu-stable, if the last two control points of a slider are equal, extension is not performed.
-                if (ControlPoints.Count >= 2 && ControlPoints[^1].Position == ControlPoints[^2].Position && expectedDistance > calculatedLength)
+                // In osu-stable, if the last two path points of a slider are equal, extension is not performed.
+                if (calculatedPath.Count >= 2 && calculatedPath[^1] == calculatedPath[^2] && expectedDistance > calculatedLength)
                 {
                     cumulativeLength.Add(calculatedLength);
                     return;
