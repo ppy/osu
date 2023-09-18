@@ -14,6 +14,7 @@ using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Overlays.Notifications;
 using osu.Game.Scoring;
 using Realms;
+using osu.Game.Localisation;
 
 namespace osu.Game.Database
 {
@@ -49,7 +50,7 @@ namespace osu.Game.Database
         [BackgroundDependencyLoader]
         private void load(OsuConfigManager config)
         {
-            Text = "You do not have the required beatmap for this replay";
+            Text = NotificationsStrings.MissingBeatmapForReplay;
 
             realmSubscription = realm.RegisterForNotifications(
                 realm => realm.All<BeatmapSetInfo>().Where(s => !s.DeletePending), beatmapsChanged);
@@ -58,7 +59,7 @@ namespace osu.Game.Database
             {
                 if (r.All<BeatmapSetInfo>().Any(s => !s.DeletePending && s.OnlineID == beatmapSetInfo.OnlineID))
                 {
-                    Text = "You have the corresponding beatmapset but no beatmap, you may need to update the beatmapset.";
+                    Text = NotificationsStrings.MismatchingBeatmapForReplay;
                 }
             });
 
