@@ -8,6 +8,7 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.Sprites;
+using osu.Framework.Input.Events;
 using osu.Game.Configuration;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
@@ -17,10 +18,11 @@ using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Overlays;
 using osu.Game.Resources.Localisation.Web;
 using osuTK;
+using osuTK.Graphics;
 
 namespace osu.Game.Beatmaps.Drawables.Cards
 {
-    public partial class CollapsibleButtonContainerSlim : OsuClickableContainer
+    public partial class CollapsibleButtonContainerSlim : Container
     {
         public Bindable<bool> ShowDetails = new Bindable<bool>();
         public Bindable<BeatmapSetFavouriteState> FavouriteState = new Bindable<BeatmapSetFavouriteState>();
@@ -56,29 +58,14 @@ namespace osu.Game.Beatmaps.Drawables.Cards
 
         protected override Container<Drawable> Content => mainContent;
 
-        private readonly APIBeatmapSet beatmapSet;
-
         private readonly Container background;
 
-        private readonly Container buttonArea;
+        private readonly OsuClickableContainer buttonArea;
 
         private readonly Container mainArea;
         private readonly Container mainContent;
 
-        private readonly Container icons;
-        private readonly SpriteIcon downloadIcon;
-        private readonly LoadingSpinner spinner;
-        private readonly SpriteIcon goToBeatmapIcon;
-
         private const int icon_size = 12;
-
-        private Bindable<bool> preferNoVideo = null!;
-
-        [Resolved]
-        private BeatmapModelDownloader beatmaps { get; set; } = null!;
-
-        [Resolved]
-        private OsuGame? game { get; set; }
 
         [Resolved]
         private OsuColour colours { get; set; } = null!;
@@ -88,15 +75,13 @@ namespace osu.Game.Beatmaps.Drawables.Cards
 
         public CollapsibleButtonContainerSlim(APIBeatmapSet beatmapSet)
         {
-            this.beatmapSet = beatmapSet;
-
             downloadTracker = new BeatmapDownloadTracker(beatmapSet);
 
             RelativeSizeAxes = Axes.Y;
             Masking = true;
             CornerRadius = BeatmapCard.CORNER_RADIUS;
 
-            base.Content.AddRange(new Drawable[]
+            InternalChildren = new Drawable[]
             {
                 downloadTracker,
                 background = new Container
@@ -110,39 +95,10 @@ namespace osu.Game.Beatmaps.Drawables.Cards
                         Colour = Colour4.White
                     },
                 },
-                buttonArea = new Container
+                buttonArea = new ButtonArea(beatmapSet)
                 {
                     Name = @"Right (button) area",
-                    RelativeSizeAxes = Axes.Y,
-                    Origin = Anchor.TopRight,
-                    Anchor = Anchor.TopRight,
-                    Child = icons = new Container
-                    {
-                        RelativeSizeAxes = Axes.Both,
-                        Children = new Drawable[]
-                        {
-                            downloadIcon = new SpriteIcon
-                            {
-                                Anchor = Anchor.Centre,
-                                Origin = Anchor.Centre,
-                                Size = new Vector2(icon_size),
-                                Icon = FontAwesome.Solid.Download
-                            },
-                            spinner = new LoadingSpinner
-                            {
-                                Anchor = Anchor.Centre,
-                                Origin = Anchor.Centre,
-                                Size = new Vector2(icon_size)
-                            },
-                            goToBeatmapIcon = new SpriteIcon
-                            {
-                                Anchor = Anchor.Centre,
-                                Origin = Anchor.Centre,
-                                Size = new Vector2(icon_size),
-                                Icon = FontAwesome.Solid.AngleDoubleRight
-                            },
-                        }
-                    }
+                    State = { BindTarget = downloadTracker.State }
                 },
                 mainArea = new Container
                 {
@@ -168,23 +124,13 @@ namespace osu.Game.Beatmaps.Drawables.Cards
                         }
                     }
                 }
-            });
-        }
-
-        [BackgroundDependencyLoader]
-        private void load(OsuConfigManager config)
-        {
-            preferNoVideo = config.GetBindable<bool>(OsuSetting.PreferNoVideo);
-
-            downloadIcon.Colour = spinner.Colour = colourProvider.Content1;
-            goToBeatmapIcon.Colour = colourProvider.Foreground1;
+            };
         }
 
         protected override void LoadComplete()
         {
             base.LoadComplete();
 
-            preferNoVideo.BindValueChanged(_ => updateState());
             downloadTracker.State.BindValueChanged(_ => updateState());
             ShowDetails.BindValueChanged(_ => updateState(), true);
             FinishTransforms(true);
@@ -195,51 +141,152 @@ namespace osu.Game.Beatmaps.Drawables.Cards
             float targetWidth = Width - (ShowDetails.Value ? ButtonsExpandedWidth : ButtonsCollapsedWidth);
 
             mainArea.ResizeWidthTo(targetWidth, BeatmapCard.TRANSITION_DURATION, Easing.OutQuint);
+            background.FadeColour(downloadTracker.State.Value == DownloadState.LocallyAvailable ? colours.Lime0 : colourProvider.Background3, BeatmapCard.TRANSITION_DURATION, Easing.OutQuint);
+            buttonArea.FadeTo(ShowDetails.Value ? 1 : 0, BeatmapCard.TRANSITION_DURATION, Easing.OutQuint);
+        }
 
-            var backgroundColour = downloadTracker.State.Value == DownloadState.LocallyAvailable ? colours.Lime0 : colourProvider.Background3;
-            if (ShowDetails.Value)
-                backgroundColour = backgroundColour.Lighten(0.2f);
+        private partial class ButtonArea : OsuClickableContainer
+        {
+            public Bindable<DownloadState> State { get; } = new Bindable<DownloadState>();
 
-            background.FadeColour(backgroundColour, BeatmapCard.TRANSITION_DURATION, Easing.OutQuint);
-            icons.FadeTo(ShowDetails.Value ? 1 : 0, BeatmapCard.TRANSITION_DURATION, Easing.OutQuint);
+            private readonly APIBeatmapSet beatmapSet;
 
-            if (beatmapSet.Availability.DownloadDisabled)
+            private Box hoverLayer = null!;
+            private SpriteIcon downloadIcon = null!;
+            private LoadingSpinner spinner = null!;
+            private SpriteIcon goToBeatmapIcon = null!;
+
+            private Bindable<bool> preferNoVideo = null!;
+
+            [Resolved]
+            private OverlayColourProvider colourProvider { get; set; } = null!;
+
+            [Resolved]
+            private BeatmapModelDownloader beatmaps { get; set; } = null!;
+
+            [Resolved]
+            private OsuGame? game { get; set; }
+
+            public ButtonArea(APIBeatmapSet beatmapSet)
             {
-                Enabled.Value = false;
-                TooltipText = BeatmapsetsStrings.AvailabilityDisabled;
-                return;
+                this.beatmapSet = beatmapSet;
             }
 
-            switch (downloadTracker.State.Value)
+            [BackgroundDependencyLoader]
+            private void load(OsuConfigManager config)
             {
-                case DownloadState.NotDownloaded:
-                    Action = () => beatmaps.Download(beatmapSet, preferNoVideo.Value);
-                    break;
+                RelativeSizeAxes = Axes.Y;
+                Origin = Anchor.TopRight;
+                Anchor = Anchor.TopRight;
+                Child = new Container
+                {
+                    RelativeSizeAxes = Axes.Both,
+                    Children = new Drawable[]
+                    {
+                        new Container
+                        {
+                            RelativeSizeAxes = Axes.Both,
+                            Padding = new MarginPadding { Left = -BeatmapCard.CORNER_RADIUS },
+                            Child = hoverLayer = new Box
+                            {
+                                RelativeSizeAxes = Axes.Both,
+                                Colour = Colour4.White.Opacity(0.1f),
+                                Blending = BlendingParameters.Additive
+                            }
+                        },
+                        downloadIcon = new SpriteIcon
+                        {
+                            Anchor = Anchor.Centre,
+                            Origin = Anchor.Centre,
+                            Size = new Vector2(icon_size),
+                            Icon = FontAwesome.Solid.Download
+                        },
+                        spinner = new LoadingSpinner
+                        {
+                            Anchor = Anchor.Centre,
+                            Origin = Anchor.Centre,
+                            Size = new Vector2(icon_size)
+                        },
+                        goToBeatmapIcon = new SpriteIcon
+                        {
+                            Anchor = Anchor.Centre,
+                            Origin = Anchor.Centre,
+                            Size = new Vector2(icon_size),
+                            Icon = FontAwesome.Solid.AngleDoubleRight
+                        },
+                    }
+                };
 
-                case DownloadState.LocallyAvailable:
-                    Action = () => game?.PresentBeatmap(beatmapSet);
-                    break;
-
-                default:
-                    Action = null;
-                    break;
+                preferNoVideo = config.GetBindable<bool>(OsuSetting.PreferNoVideo);
             }
 
-            downloadIcon.FadeTo(downloadTracker.State.Value == DownloadState.NotDownloaded ? 1 : 0, BeatmapCard.TRANSITION_DURATION, Easing.OutQuint);
-            spinner.FadeTo(downloadTracker.State.Value == DownloadState.Downloading || downloadTracker.State.Value == DownloadState.Importing ? 1 : 0,
-                BeatmapCard.TRANSITION_DURATION, Easing.OutQuint);
-            goToBeatmapIcon.FadeTo(downloadTracker.State.Value == DownloadState.LocallyAvailable ? 1 : 0, BeatmapCard.TRANSITION_DURATION, Easing.OutQuint);
-
-            if (downloadTracker.State.Value == DownloadState.NotDownloaded)
+            protected override void LoadComplete()
             {
-                if (!beatmapSet.HasVideo)
-                    TooltipText = BeatmapsetsStrings.PanelDownloadAll;
+                base.LoadComplete();
+
+                State.BindValueChanged(_ => updateState(), true);
+                FinishTransforms(true);
+            }
+
+            protected override bool OnHover(HoverEvent e)
+            {
+                updateState();
+                return base.OnHover(e);
+            }
+
+            protected override void OnHoverLost(HoverLostEvent e)
+            {
+                updateState();
+                base.OnHoverLost(e);
+            }
+
+            private void updateState()
+            {
+                hoverLayer.FadeTo(IsHovered ? 1 : 0, BeatmapCard.TRANSITION_DURATION, Easing.OutQuint);
+
+                downloadIcon.FadeTo(State.Value == DownloadState.NotDownloaded ? 1 : 0, BeatmapCard.TRANSITION_DURATION, Easing.OutQuint);
+                downloadIcon.FadeColour(IsHovered ? colourProvider.Content1 : colourProvider.Light1, BeatmapCard.TRANSITION_DURATION, Easing.OutQuint);
+
+                spinner.FadeTo(State.Value == DownloadState.Downloading || State.Value == DownloadState.Importing ? 1 : 0,
+                    BeatmapCard.TRANSITION_DURATION, Easing.OutQuint);
+                spinner.FadeColour(IsHovered ? colourProvider.Content1 : colourProvider.Light1, BeatmapCard.TRANSITION_DURATION, Easing.OutQuint);
+
+                goToBeatmapIcon.FadeTo(State.Value == DownloadState.LocallyAvailable ? 1 : 0, BeatmapCard.TRANSITION_DURATION, Easing.OutQuint);
+                goToBeatmapIcon.FadeColour(IsHovered ? colourProvider.Foreground1 : colourProvider.Background3, BeatmapCard.TRANSITION_DURATION, Easing.OutQuint);
+
+                switch (State.Value)
+                {
+                    case DownloadState.NotDownloaded:
+                        Action = () => beatmaps.Download(beatmapSet, preferNoVideo.Value);
+                        break;
+
+                    case DownloadState.LocallyAvailable:
+                        Action = () => game?.PresentBeatmap(beatmapSet);
+                        break;
+
+                    default:
+                        Action = null;
+                        break;
+                }
+
+                if (beatmapSet.Availability.DownloadDisabled)
+                {
+                    Enabled.Value = false;
+                    TooltipText = BeatmapsetsStrings.AvailabilityDisabled;
+                    return;
+                }
+
+                if (State.Value == DownloadState.NotDownloaded)
+                {
+                    if (!beatmapSet.HasVideo)
+                        TooltipText = BeatmapsetsStrings.PanelDownloadAll;
+                    else
+                        TooltipText = preferNoVideo.Value ? BeatmapsetsStrings.PanelDownloadNoVideo : BeatmapsetsStrings.PanelDownloadVideo;
+                }
                 else
-                    TooltipText = preferNoVideo.Value ? BeatmapsetsStrings.PanelDownloadNoVideo : BeatmapsetsStrings.PanelDownloadVideo;
-            }
-            else
-            {
-                TooltipText = default;
+                {
+                    TooltipText = default;
+                }
             }
         }
     }
