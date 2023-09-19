@@ -190,7 +190,7 @@ namespace osu.Game.Skinning
             {
                 // This fallback is important for user skins which use SkinnableSprites.
                 case SkinnableSprite.SpriteComponentLookup sprite:
-                    return this.GetAnimation(sprite.LookupName, false, false);
+                    return this.GetAnimation(sprite.LookupName, false, false, maxSize: sprite.MaxSize);
 
                 case SkinComponentsContainerLookup containerLookup:
 
