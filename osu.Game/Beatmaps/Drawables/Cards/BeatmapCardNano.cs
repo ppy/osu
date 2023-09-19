@@ -149,8 +149,6 @@ namespace osu.Game.Beatmaps.Drawables.Cards
                 };
                 c.Expanded.BindTarget = Expanded;
             });
-
-            Action = () => buttonContainer.TriggerClick();
         }
 
         private LocalisableString createArtistText()
