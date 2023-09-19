@@ -2,6 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
+using System.ComponentModel;
 using osu.Framework.Allocation;
 using osu.Framework.Extensions.ObjectExtensions;
 using osu.Framework.Graphics;
@@ -74,6 +75,15 @@ namespace osu.Game.Storyboards.Drawables
         public override bool IsPresent
             => !float.IsNaN(DrawPosition.X) && !float.IsNaN(DrawPosition.Y) && base.IsPresent;
 
+        [Resolved]
+        private ISkinSource skin { get; set; } = null!;
+
+        [Resolved]
+        private Storyboard storyboard { get; set; } = null!;
+
+        [Resolved]
+        private TextureStore textureStore { get; set; } = null!;
+
         public DrawableStoryboardSprite(StoryboardSprite sprite)
         {
             Sprite = sprite;
@@ -84,24 +94,21 @@ namespace osu.Game.Storyboards.Drawables
             LifetimeEnd = sprite.EndTimeForDisplay;
         }
 
-        [Resolved]
-        private ISkinSource skin { get; set; } = null!;
-
         [BackgroundDependencyLoader]
-        private void load(TextureStore textureStore, Storyboard storyboard)
+        private void load()
         {
-            Texture = textureStore.Get(Sprite.Path);
-
-            if (Texture == null && storyboard.UseSkinSprites)
+            if (storyboard.UseSkinSprites)
             {
                 skin.SourceChanged += skinSourceChanged;
                 skinSourceChanged();
             }
+            else
+                Texture = textureStore.Get(Sprite.Path);
 
             Sprite.ApplyTransforms(this);
         }
 
-        private void skinSourceChanged() => Texture = skin.GetTexture(Sprite.Path);
+        private void skinSourceChanged() => Texture = skin.GetTexture(Sprite.Path) ?? textureStore.Get(Sprite.Path);
 
         protected override void Dispose(bool isDisposing)
         {

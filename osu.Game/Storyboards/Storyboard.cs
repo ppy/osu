@@ -18,7 +18,7 @@ namespace osu.Game.Storyboards
         public BeatmapInfo BeatmapInfo = new BeatmapInfo();
 
         /// <summary>
-        /// Whether the storyboard can fall back to skin sprites in case no matching storyboard sprites are found.
+        /// Whether the storyboard should prefer textures from the current skin before using local storyboard textures.
         /// </summary>
         public bool UseSkinSprites { get; set; }
 
