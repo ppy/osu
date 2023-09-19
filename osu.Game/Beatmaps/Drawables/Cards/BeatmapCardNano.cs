@@ -38,7 +38,7 @@ namespace osu.Game.Beatmaps.Drawables.Cards
         [Cached]
         private readonly BeatmapCardContent content;
 
-        private CollapsibleButtonContainerSlim buttonContainer = null!;
+        private CollapsibleButtonContainer buttonContainer = null!;
 
         private FillFlowContainer idleBottomContent = null!;
         private BeatmapCardDownloadProgressBar downloadProgressBar = null!;
@@ -66,12 +66,12 @@ namespace osu.Game.Beatmaps.Drawables.Cards
                     Height = height,
                     Children = new Drawable[]
                     {
-                        buttonContainer = new CollapsibleButtonContainerSlim(BeatmapSet)
+                        buttonContainer = new CollapsibleButtonContainer(BeatmapSet)
                         {
                             Width = Width,
                             FavouriteState = { BindTarget = FavouriteState },
                             ButtonsCollapsedWidth = 5,
-                            ButtonsExpandedWidth = 20,
+                            ButtonsExpandedWidth = 30,
                             Children = new Drawable[]
                             {
                                 new FillFlowContainer
