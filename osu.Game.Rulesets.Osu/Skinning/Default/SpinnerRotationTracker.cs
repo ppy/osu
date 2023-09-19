@@ -181,10 +181,8 @@ namespace osu.Game.Rulesets.Osu.Skinning.Default
                 float excess = (totalAfter % 360) * Math.Sign(delta);
 
                 curAngle = excess;
-                maxAngle = 0;
-                maxAngle = Math.Max(maxAngle, curAngle);
-                minAngle = 0;
-                minAngle = Math.Min(minAngle, curAngle);
+                maxAngle = Math.Max(0, curAngle);
+                minAngle = Math.Min(0, curAngle);
             }
         }
 
