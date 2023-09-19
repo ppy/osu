@@ -40,6 +40,8 @@ namespace osu.Game.Tests.Visual.Gameplay
         protected BindableList<double> NonPerfectLocations => graphs.NonPerfectLocations;
         protected BindableList<double> MissLocations => graphs.MissLocations;
 
+        private readonly bool supportsNonPerfectJudgements;
+
         private GraphContainer graphs = null!;
         private SettingsSlider<int> sliderMaxCombo = null!;
         private SettingsCheckbox scaleToMax = null!;
@@ -54,11 +56,18 @@ namespace osu.Game.Tests.Visual.Gameplay
         [Resolved]
         private OsuColour colours { get; set; } = null!;
 
+        protected ScoringTestScene(bool supportsNonPerfectJudgements = true)
+        {
+            this.supportsNonPerfectJudgements = supportsNonPerfectJudgements;
+        }
+
         [SetUpSteps]
         public void SetUpSteps()
         {
             AddStep("setup tests", () =>
             {
+                OsuTextFlowContainer clickExplainer;
+
                 Children = new Drawable[]
                 {
                     new Box
@@ -79,7 +88,7 @@ namespace osu.Game.Tests.Visual.Gameplay
                         {
                             new Drawable[]
                             {
-                                graphs = new GraphContainer
+                                graphs = new GraphContainer(supportsNonPerfectJudgements)
                                 {
                                     RelativeSizeAxes = Axes.Both,
                                 },
@@ -120,11 +129,10 @@ namespace osu.Game.Tests.Visual.Gameplay
                                             LabelText = "Rescale plots to 100%",
                                             Current = { Value = true, Default = true }
                                         },
-                                        new OsuTextFlowContainer
+                                        clickExplainer = new OsuTextFlowContainer
                                         {
                                             RelativeSizeAxes = Axes.X,
                                             AutoSizeAxes = Axes.Y,
-                                            Text = "Left click to add miss\nRight click to add OK",
                                             Margin = new MarginPadding { Top = 20 }
                                         }
                                     }
@@ -133,6 +141,10 @@ namespace osu.Game.Tests.Visual.Gameplay
                         }
                     }
                 };
+
+                clickExplainer.AddParagraph("Left click to add miss");
+                if (supportsNonPerfectJudgements)
+                    clickExplainer.AddParagraph("Right click to add OK");
 
                 sliderMaxCombo.Current.BindValueChanged(_ => Rerun());
                 scaleToMax.Current.BindValueChanged(_ => Rerun());
@@ -286,6 +298,8 @@ namespace osu.Game.Tests.Visual.Gameplay
 
         public partial class GraphContainer : Container<LineGraph>, IHasCustomTooltip<IEnumerable<LineGraph>>
         {
+            private readonly bool supportsNonPerfectJudgements;
+
             public readonly BindableList<double> MissLocations = new BindableList<double>();
             public readonly BindableList<double> NonPerfectLocations = new BindableList<double>();
 
@@ -300,8 +314,9 @@ namespace osu.Game.Tests.Visual.Gameplay
 
             public int CurrentHoverCombo { get; private set; }
 
-            public GraphContainer()
+            public GraphContainer(bool supportsNonPerfectJudgements)
             {
+                this.supportsNonPerfectJudgements = supportsNonPerfectJudgements;
                 InternalChild = new Container
                 {
                     RelativeSizeAxes = Axes.Both,
@@ -432,7 +447,7 @@ namespace osu.Game.Tests.Visual.Gameplay
             {
                 if (e.Button == MouseButton.Left)
                     MissLocations.Add(CurrentHoverCombo);
-                else
+                else if (supportsNonPerfectJudgements)
                     NonPerfectLocations.Add(CurrentHoverCombo);
 
                 return true;
