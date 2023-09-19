@@ -7,7 +7,6 @@ using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Textures;
 using osu.Game.Audio;
-using osuTK;
 
 namespace osu.Game.Skinning
 {
@@ -29,7 +28,9 @@ namespace osu.Game.Skinning
 
         public virtual Drawable? GetDrawableComponent(ISkinComponentLookup lookup) => Skin.GetDrawableComponent(lookup);
 
-        public virtual Texture? GetTexture(string componentName, Vector2? maxSize = null, WrapMode wrapModeS = default, WrapMode wrapModeT = default) => Skin.GetTexture(componentName, maxSize, wrapModeS, wrapModeT);
+        public virtual Texture? GetTexture(string componentName) => GetTexture(componentName, default, default);
+
+        public virtual Texture? GetTexture(string componentName, WrapMode wrapModeS, WrapMode wrapModeT) => Skin.GetTexture(componentName, wrapModeS, wrapModeT);
 
         public virtual ISample? GetSample(ISampleInfo sampleInfo) => Skin.GetSample(sampleInfo);
 

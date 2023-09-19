@@ -18,7 +18,6 @@ using osu.Framework.Timing;
 using osu.Game.Audio;
 using osu.Game.Skinning;
 using osu.Game.Tests.Visual;
-using osuTK;
 
 namespace osu.Game.Tests.NonVisual.Skinning
 {
@@ -69,7 +68,7 @@ namespace osu.Game.Tests.NonVisual.Skinning
                 this.renderer = renderer;
             }
 
-            public Texture GetTexture(string componentName, Vector2? maxSize = null, WrapMode wrapModeS = default, WrapMode wrapModeT = default)
+            public Texture GetTexture(string componentName, WrapMode wrapModeS, WrapMode wrapModeT)
             {
                 return lookup_names.Contains(componentName) ? renderer.WhitePixel : null;
             }
