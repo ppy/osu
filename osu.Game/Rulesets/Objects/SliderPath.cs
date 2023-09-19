@@ -261,10 +261,14 @@ namespace osu.Game.Rulesets.Objects
                 // The current vertex ends the segment
                 var segmentVertices = vertices.AsSpan().Slice(start, i - start + 1);
                 var segmentType = ControlPoints[start].Type ?? PathType.Linear;
-
-                foreach (Vector2 t in calculateSubPath(segmentVertices, segmentType))
+                // No need to calculate path when there is only 1 vertex
+                if (segmentVertices.Length == 1)
+                    calculatedPath.Add(segmentVertices[0]);
+                else if (segmentVertices.Length > 1)
                 {
-                    if (calculatedPath.Count == 0 || calculatedPath.Last() != t)
+                    // Skip the first vertex if it is the same as the last vertex from the previous segment
+                    int skipFirst = calculatedPath.Last() == segmentVertices[0] ? 1 : 0;
+                    foreach (Vector2 t in calculateSubPath(segmentVertices, segmentType).Skip(skipFirst))
                         calculatedPath.Add(t);
                 }
 
