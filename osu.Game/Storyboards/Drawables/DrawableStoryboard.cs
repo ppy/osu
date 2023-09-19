@@ -142,14 +142,32 @@ namespace osu.Game.Storyboards.Drawables
             public void Dispose() =>
                 realmFileStore.Dispose();
 
-            public byte[] Get(string name) =>
-                realmFileStore.Get(storyboard.GetStoragePathFromStoryboardPath(name));
+            public byte[] Get(string name)
+            {
+                string? storagePath = storyboard.GetStoragePathFromStoryboardPath(name);
 
-            public Task<byte[]> GetAsync(string name, CancellationToken cancellationToken = new CancellationToken()) =>
-                realmFileStore.GetAsync(storyboard.GetStoragePathFromStoryboardPath(name), cancellationToken);
+                return string.IsNullOrEmpty(storagePath)
+                    ? null!
+                    : realmFileStore.Get(storagePath);
+            }
 
-            public Stream GetStream(string name) =>
-                realmFileStore.GetStream(storyboard.GetStoragePathFromStoryboardPath(name));
+            public Task<byte[]> GetAsync(string name, CancellationToken cancellationToken = new CancellationToken())
+            {
+                string? storagePath = storyboard.GetStoragePathFromStoryboardPath(name);
+
+                return string.IsNullOrEmpty(storagePath)
+                    ? Task.FromResult<byte[]>(null!)
+                    : realmFileStore.GetAsync(storagePath, cancellationToken);
+            }
+
+            public Stream? GetStream(string name)
+            {
+                string? storagePath = storyboard.GetStoragePathFromStoryboardPath(name);
+
+                return string.IsNullOrEmpty(storagePath)
+                    ? null
+                    : realmFileStore.GetStream(storagePath);
+            }
 
             public IEnumerable<string> GetAvailableResources() =>
                 realmFileStore.GetAvailableResources();
