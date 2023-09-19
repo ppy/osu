@@ -28,6 +28,9 @@ namespace osu.Game.Graphics.UserInterface
         private GameHost host { get; set; } = null!;
 
         [Resolved]
+        private Clipboard clipboard { get; set; } = null!;
+
+        [Resolved]
         private OnScreenDisplay? onScreenDisplay { get; set; }
 
         private readonly SpriteIcon linkIcon;
@@ -92,8 +95,11 @@ namespace osu.Game.Graphics.UserInterface
 
         private void copyUrl()
         {
-            host.GetClipboard()?.SetText(Link);
-            onScreenDisplay?.Display(new CopyUrlToast());
+            if (Link != null)
+            {
+                clipboard.SetText(Link);
+                onScreenDisplay?.Display(new CopyUrlToast());
+            }
         }
     }
 }

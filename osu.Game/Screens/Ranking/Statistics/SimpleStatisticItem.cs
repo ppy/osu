@@ -44,13 +44,13 @@ namespace osu.Game.Screens.Ranking.Statistics
                     Text = Name,
                     Anchor = Anchor.CentreLeft,
                     Origin = Anchor.CentreLeft,
-                    Font = OsuFont.GetFont(size: 14)
+                    Font = OsuFont.GetFont(size: StatisticItem.FONT_SIZE)
                 },
                 value = new OsuSpriteText
                 {
                     Anchor = Anchor.CentreRight,
                     Origin = Anchor.CentreRight,
-                    Font = OsuFont.GetFont(size: 14, weight: FontWeight.Bold)
+                    Font = OsuFont.GetFont(size: StatisticItem.FONT_SIZE, weight: FontWeight.Bold)
                 }
             });
         }

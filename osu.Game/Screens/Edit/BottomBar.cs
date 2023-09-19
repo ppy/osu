@@ -10,6 +10,7 @@ using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Effects;
 using osu.Framework.Graphics.Shapes;
 using osu.Game.Overlays;
+using osu.Game.Rulesets.Edit;
 using osu.Game.Screens.Edit.Components;
 using osu.Game.Screens.Edit.Components.Timelines.Summary;
 using osuTK;
@@ -57,7 +58,7 @@ namespace osu.Game.Screens.Edit
                             new Dimension(GridSizeMode.Absolute, 170),
                             new Dimension(),
                             new Dimension(GridSizeMode.Absolute, 220),
-                            new Dimension(GridSizeMode.Absolute, 120),
+                            new Dimension(GridSizeMode.Absolute, HitObjectComposer.TOOLBOX_CONTRACTED_SIZE_RIGHT),
                         },
                         Content = new[]
                         {
@@ -69,7 +70,6 @@ namespace osu.Game.Screens.Edit
                                 TestGameplayButton = new TestGameplayButton
                                 {
                                     RelativeSizeAxes = Axes.Both,
-                                    Padding = new MarginPadding { Left = 10 },
                                     Size = new Vector2(1),
                                     Action = editor.TestGameplay,
                                 }

@@ -46,6 +46,16 @@ namespace osu.Game.Scoring.Legacy
                 score.ScoreInfo = scoreInfo;
 
                 int version = sr.ReadInt32();
+
+                scoreInfo.IsLegacyScore = version < LegacyScoreEncoder.FIRST_LAZER_VERSION;
+
+                // TotalScoreVersion gets initialised to LATEST_VERSION.
+                // In the case where the incoming score has either an osu!stable or old lazer version, we need
+                // to mark it with the correct version increment to trigger reprocessing to new standardised scoring.
+                //
+                // See StandardisedScoreMigrationTools.ShouldMigrateToNewStandardised().
+                scoreInfo.TotalScoreVersion = version < 30000002 ? 30000001 : LegacyScoreEncoder.LATEST_VERSION;
+
                 string beatmapHash = sr.ReadString();
 
                 workingBeatmap = GetBeatmap(beatmapHash);
@@ -123,6 +133,7 @@ namespace osu.Game.Scoring.Legacy
             // before returning for database import, we must restore the database-sourced BeatmapInfo.
             // if not, the clone operation in GetPlayableBeatmap will cause a dereference and subsequent database exception.
             score.ScoreInfo.BeatmapInfo = workingBeatmap.BeatmapInfo;
+            score.ScoreInfo.BeatmapHash = workingBeatmap.BeatmapInfo.Hash;
 
             return score;
         }

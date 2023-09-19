@@ -11,7 +11,7 @@ namespace osu.Game.Rulesets.Mods
 {
     public abstract class ModFailCondition : Mod, IApplicableToHealthProcessor, IApplicableFailOverride
     {
-        public override Type[] IncompatibleMods => new[] { typeof(ModNoFail), typeof(ModRelax), typeof(ModAutoplay) };
+        public override Type[] IncompatibleMods => new[] { typeof(ModNoFail), typeof(ModRelax) };
 
         [SettingSource("Restart on fail", "Automatically restarts when failed.")]
         public BindableBool Restart { get; } = new BindableBool();
@@ -20,11 +20,31 @@ namespace osu.Game.Rulesets.Mods
 
         public virtual bool RestartOnFail => Restart.Value;
 
+        private Action? triggerFailureDelegate;
+
         public void ApplyToHealthProcessor(HealthProcessor healthProcessor)
         {
+            triggerFailureDelegate = healthProcessor.TriggerFailure;
             healthProcessor.FailConditions += FailCondition;
         }
 
+        /// <summary>
+        /// Immediately triggers a failure on the loaded <see cref="HealthProcessor"/>.
+        /// </summary>
+        protected void TriggerFailure() => triggerFailureDelegate?.Invoke();
+
+        /// <summary>
+        /// Determines whether <paramref name="result"/> should trigger a failure. Called every time a
+        /// judgement is applied to <paramref name="healthProcessor"/>.
+        /// </summary>
+        /// <param name="healthProcessor">The loaded <see cref="HealthProcessor"/>.</param>
+        /// <param name="result">The latest <see cref="JudgementResult"/>.</param>
+        /// <returns>Whether the fail condition has been met.</returns>
+        /// <remarks>
+        /// This method should only be used to trigger failures based on <paramref name="result"/>.
+        /// Using outside values to evaluate failure may introduce event ordering discrepancies, use
+        /// an <see cref="IApplicableMod"/> with <see cref="TriggerFailure"/> instead.
+        /// </remarks>
         protected abstract bool FailCondition(HealthProcessor healthProcessor, JudgementResult result);
     }
 }

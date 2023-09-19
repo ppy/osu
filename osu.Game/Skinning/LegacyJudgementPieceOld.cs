@@ -1,15 +1,15 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
 using System;
+using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Animations;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Utils;
 using osu.Game.Rulesets.Judgements;
 using osu.Game.Rulesets.Scoring;
+using osuTK;
 
 namespace osu.Game.Skinning
 {
@@ -19,6 +19,9 @@ namespace osu.Game.Skinning
 
         private readonly float finalScale;
         private readonly bool forceTransforms;
+
+        [Resolved]
+        private ISkinSource skin { get; set; } = null!;
 
         public LegacyJudgementPieceOld(HitResult result, Func<Drawable> createMainDrawable, float finalScale = 1f, bool forceTransforms = false)
         {
@@ -54,6 +57,14 @@ namespace osu.Game.Skinning
                 case HitResult.Miss:
                     this.ScaleTo(1.6f);
                     this.ScaleTo(1, 100, Easing.In);
+
+                    decimal? legacyVersion = skin.GetConfig<SkinConfiguration.LegacySetting, decimal>(SkinConfiguration.LegacySetting.Version)?.Value;
+
+                    if (legacyVersion >= 2.0m)
+                    {
+                        this.MoveTo(new Vector2(0, -5));
+                        this.MoveToOffset(new Vector2(0, 80), fade_out_delay + fade_out_length, Easing.In);
+                    }
 
                     float rotation = RNG.NextSingle(-8.6f, 8.6f);
 

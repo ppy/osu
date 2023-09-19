@@ -12,6 +12,7 @@ namespace osu.Game.Screens.Edit.Timing
     internal partial class TimingSection : Section<TimingControlPoint>
     {
         private LabelledTimeSignature timeSignature = null!;
+        private LabelledSwitchButton omitBarLine = null!;
         private BPMTextBox bpmTextEntry = null!;
 
         [BackgroundDependencyLoader]
@@ -24,7 +25,8 @@ namespace osu.Game.Screens.Edit.Timing
                 timeSignature = new LabelledTimeSignature
                 {
                     Label = "Time Signature"
-                }
+                },
+                omitBarLine = new LabelledSwitchButton { Label = "Skip Bar Line" },
             });
         }
 
@@ -33,6 +35,7 @@ namespace osu.Game.Screens.Edit.Timing
             base.LoadComplete();
 
             bpmTextEntry.Current.BindValueChanged(_ => saveChanges());
+            omitBarLine.Current.BindValueChanged(_ => saveChanges());
             timeSignature.Current.BindValueChanged(_ => saveChanges());
 
             void saveChanges()
@@ -51,6 +54,7 @@ namespace osu.Game.Screens.Edit.Timing
 
                 bpmTextEntry.Bindable = point.NewValue.BeatLengthBindable;
                 timeSignature.Current = point.NewValue.TimeSignatureBindable;
+                omitBarLine.Current = point.NewValue.OmitFirstBarLineBindable;
 
                 isRebinding = false;
             }
@@ -63,7 +67,8 @@ namespace osu.Game.Screens.Edit.Timing
             return new TimingControlPoint
             {
                 BeatLength = reference.BeatLength,
-                TimeSignature = reference.TimeSignature
+                TimeSignature = reference.TimeSignature,
+                OmitFirstBarLine = reference.OmitFirstBarLine,
             };
         }
 

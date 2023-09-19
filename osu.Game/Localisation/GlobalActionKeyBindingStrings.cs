@@ -220,6 +220,11 @@ namespace osu.Game.Localisation
         public static LocalisableString ToggleInGameInterface => new TranslatableString(getKey(@"toggle_in_game_interface"), @"Toggle in-game interface");
 
         /// <summary>
+        /// "Toggle in-game leaderboard"
+        /// </summary>
+        public static LocalisableString ToggleInGameLeaderboard => new TranslatableString(getKey(@"toggle_in_game_leaderboard"), @"Toggle in-game leaderboard");
+
+        /// <summary>
         /// "Toggle mod select"
         /// </summary>
         public static LocalisableString ToggleModSelection => new TranslatableString(getKey(@"toggle_mod_selection"), @"Toggle mod select");
@@ -280,6 +285,16 @@ namespace osu.Game.Localisation
         public static LocalisableString EditorDecreaseDistanceSpacing => new TranslatableString(getKey(@"editor_decrease_distance_spacing"), @"Decrease distance spacing");
 
         /// <summary>
+        /// "Cycle previous beat snap divisor"
+        /// </summary>
+        public static LocalisableString EditorCyclePreviousBeatSnapDivisor => new TranslatableString(getKey(@"editor_cycle_previous_beat_snap_divisor"), @"Cycle previous beat snap divisor");
+
+        /// <summary>
+        /// "Cycle next beat snap divisor"
+        /// </summary>
+        public static LocalisableString EditorCycleNextBeatSnapDivisor => new TranslatableString(getKey(@"editor_cycle_next_snap_divisor"), @"Cycle next beat snap divisor");
+
+        /// <summary>
         /// "Toggle skin editor"
         /// </summary>
         public static LocalisableString ToggleSkinEditor => new TranslatableString(getKey(@"toggle_skin_editor"), @"Toggle skin editor");
@@ -313,6 +328,26 @@ namespace osu.Game.Localisation
         /// "Toggle chat focus"
         /// </summary>
         public static LocalisableString ToggleChatFocus => new TranslatableString(getKey(@"toggle_chat_focus"), @"Toggle chat focus");
+
+        /// <summary>
+        /// "Toggle replay settings"
+        /// </summary>
+        public static LocalisableString ToggleReplaySettings => new TranslatableString(getKey(@"toggle_replay_settings"), @"Toggle replay settings");
+
+        /// <summary>
+        /// "Save replay"
+        /// </summary>
+        public static LocalisableString SaveReplay => new TranslatableString(getKey(@"save_replay"), @"Save replay");
+
+        /// <summary>
+        /// "Export replay"
+        /// </summary>
+        public static LocalisableString ExportReplay => new TranslatableString(getKey(@"export_replay"), @"Export replay");
+
+        /// <summary>
+        /// "Toggle rotate control"
+        /// </summary>
+        public static LocalisableString EditorToggleRotateControl => new TranslatableString(getKey(@"editor_toggle_rotate_control"), @"Toggle rotate control");
 
         private static string getKey(string key) => $@"{prefix}:{key}";
     }

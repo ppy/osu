@@ -18,6 +18,8 @@ namespace osu.Game.Screens.Edit.Components
     {
         public const float WIDTH = 250;
 
+        public const float PADDING = 3;
+
         private readonly Box background;
 
         protected override Container<EditorSidebarSection> Content { get; }
@@ -35,13 +37,13 @@ namespace osu.Game.Screens.Edit.Components
                 },
                 new OsuScrollContainer
                 {
-                    Padding = new MarginPadding { Left = 20 },
                     ScrollbarOverlapsContent = false,
                     RelativeSizeAxes = Axes.Both,
                     Child = Content = new FillFlowContainer<EditorSidebarSection>
                     {
                         RelativeSizeAxes = Axes.X,
                         AutoSizeAxes = Axes.Y,
+                        Padding = new MarginPadding(PADDING),
                         Direction = FillDirection.Vertical,
                     },
                 }

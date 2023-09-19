@@ -5,6 +5,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using osu.Framework.Bindables;
 using osu.Framework.Input.Bindings;
@@ -15,6 +16,7 @@ using osu.Game.Rulesets.Mods;
 using osu.Game.Scoring;
 using osu.Game.Screens.Play.HUD;
 using osu.Game.Screens.Ranking;
+using osu.Game.Users;
 
 namespace osu.Game.Screens.Play
 {
@@ -24,10 +26,12 @@ namespace osu.Game.Screens.Play
 
         private readonly bool replayIsFailedScore;
 
+        protected override UserActivity InitialActivity => new UserActivity.WatchingReplay(Score.ScoreInfo);
+
         // Disallow replays from failing. (see https://github.com/ppy/osu/issues/6108)
         protected override bool CheckModsAllowFailure()
         {
-            if (!replayIsFailedScore)
+            if (!replayIsFailedScore && !GameplayState.Mods.OfType<ModAutoplay>().Any())
                 return false;
 
             return base.CheckModsAllowFailure();

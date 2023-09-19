@@ -13,14 +13,8 @@ namespace osu.Game.Beatmaps.ControlPoints
         public static readonly EffectControlPoint DEFAULT = new EffectControlPoint
         {
             KiaiModeBindable = { Disabled = true },
-            OmitFirstBarLineBindable = { Disabled = true },
             ScrollSpeedBindable = { Disabled = true }
         };
-
-        /// <summary>
-        /// Whether the first bar line of this control point is ignored.
-        /// </summary>
-        public readonly BindableBool OmitFirstBarLineBindable = new BindableBool();
 
         /// <summary>
         /// The relative scroll speed at this control point.
@@ -44,15 +38,6 @@ namespace osu.Game.Beatmaps.ControlPoints
         public override Color4 GetRepresentingColour(OsuColour colours) => colours.Purple;
 
         /// <summary>
-        /// Whether the first bar line of this control point is ignored.
-        /// </summary>
-        public bool OmitFirstBarLine
-        {
-            get => OmitFirstBarLineBindable.Value;
-            set => OmitFirstBarLineBindable.Value = value;
-        }
-
-        /// <summary>
         /// Whether this control point enables Kiai mode.
         /// </summary>
         public readonly BindableBool KiaiModeBindable = new BindableBool();
@@ -67,16 +52,13 @@ namespace osu.Game.Beatmaps.ControlPoints
         }
 
         public override bool IsRedundant(ControlPoint? existing)
-            => !OmitFirstBarLine
-               && existing is EffectControlPoint existingEffect
+            => existing is EffectControlPoint existingEffect
                && KiaiMode == existingEffect.KiaiMode
-               && OmitFirstBarLine == existingEffect.OmitFirstBarLine
                && ScrollSpeed == existingEffect.ScrollSpeed;
 
         public override void CopyFrom(ControlPoint other)
         {
             KiaiMode = ((EffectControlPoint)other).KiaiMode;
-            OmitFirstBarLine = ((EffectControlPoint)other).OmitFirstBarLine;
             ScrollSpeed = ((EffectControlPoint)other).ScrollSpeed;
 
             base.CopyFrom(other);
@@ -88,10 +70,9 @@ namespace osu.Game.Beatmaps.ControlPoints
 
         public bool Equals(EffectControlPoint? other)
             => base.Equals(other)
-               && OmitFirstBarLine == other.OmitFirstBarLine
                && ScrollSpeed == other.ScrollSpeed
                && KiaiMode == other.KiaiMode;
 
-        public override int GetHashCode() => HashCode.Combine(base.GetHashCode(), OmitFirstBarLine, ScrollSpeed, KiaiMode);
+        public override int GetHashCode() => HashCode.Combine(base.GetHashCode(), ScrollSpeed, KiaiMode);
     }
 }
