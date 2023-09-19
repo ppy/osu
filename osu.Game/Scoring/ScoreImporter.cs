@@ -4,7 +4,6 @@
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
-using System.IO;
 using System.Linq;
 using System.Threading;
 using Newtonsoft.Json;
@@ -55,34 +54,15 @@ namespace osu.Game.Scoring
                 }
                 catch (LegacyScoreDecoder.BeatmapNotFoundException e)
                 {
-                    onMissingBeatmap(e, archive, name);
                     Logger.Log($@"Score '{archive.Name}' failed to import: no corresponding beatmap with the hash '{e.Hash}' could be found.", LoggingTarget.Database);
+
+                    // In the case of a missing beatmap, let's attempt to resolve it and show a prompt to the user to download the required beatmap.
+                    var req = new GetBeatmapRequest(new BeatmapInfo { MD5Hash = e.Hash });
+                    req.Success += res => PostNotification?.Invoke(new MissingBeatmapNotification(res, archive, e.Hash));
+                    api.Queue(req);
                     return null;
                 }
             }
-        }
-
-        private void onMissingBeatmap(LegacyScoreDecoder.BeatmapNotFoundException e, ArchiveReader archive, string name)
-        {
-            var stream = new MemoryStream();
-
-            // stream will be closed after the exception was thrown, so fetch the stream again.
-            using (var scoreStream = archive.GetStream(name))
-            {
-                scoreStream.CopyTo(stream);
-            }
-
-            var req = new GetBeatmapRequest(new BeatmapInfo
-            {
-                MD5Hash = e.Hash
-            });
-
-            req.Success += res =>
-            {
-                PostNotification?.Invoke(new MissingBeatmapNotification(res, stream, e.Hash));
-            };
-
-            api.Queue(req);
         }
 
         public Score GetScore(ScoreInfo score) => new LegacyDatabasedScore(score, rulesets, beatmaps(), Files.Store);
