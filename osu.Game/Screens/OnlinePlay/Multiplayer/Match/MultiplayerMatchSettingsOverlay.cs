@@ -73,11 +73,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Match
             private OsuSpriteText typeLabel = null!;
             private LoadingLayer loadingLayer = null!;
 
-            public void SelectBeatmap()
-            {
-                if (matchSubScreen.IsCurrentScreen())
-                    matchSubScreen.Push(new MultiplayerMatchSongSelect(matchSubScreen.Room));
-            }
+            public void SelectBeatmap() => selectBeatmapButton.TriggerClick();
 
             [Resolved]
             private MultiplayerMatchSubScreen matchSubScreen { get; set; } = null!;
@@ -97,6 +93,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Match
             private IDisposable? applyingSettingsOperation;
             private Drawable playlistContainer = null!;
             private DrawableRoomPlaylist drawablePlaylist = null!;
+            private RoundedButton selectBeatmapButton = null!;
 
             public MatchSettings(Room room)
             {
@@ -275,12 +272,16 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Match
                                                             RelativeSizeAxes = Axes.X,
                                                             Height = DrawableRoomPlaylistItem.HEIGHT
                                                         },
-                                                        new RoundedButton
+                                                        selectBeatmapButton = new RoundedButton
                                                         {
                                                             RelativeSizeAxes = Axes.X,
                                                             Height = 40,
                                                             Text = "Select beatmap",
-                                                            Action = SelectBeatmap
+                                                            Action = () =>
+                                                            {
+                                                                if (matchSubScreen.IsCurrentScreen())
+                                                                    matchSubScreen.Push(new MultiplayerMatchSongSelect(matchSubScreen.Room));
+                                                            }
                                                         }
                                                     }
                                                 }

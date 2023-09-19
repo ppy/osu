@@ -1,7 +1,5 @@
-// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
-
-#nullable disable
 
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
@@ -41,7 +39,7 @@ namespace osu.Game.Screens.Ranking.Expanded.Accuracy
                     Origin = Anchor.TopCentre,
                     RelativeSizeAxes = Axes.Y,
                     Height = AccuracyCircle.RANK_CIRCLE_RADIUS,
-                    Width = 1f,
+                    Width = (float)AccuracyCircle.NOTCH_WIDTH_PERCENTAGE * 360f,
                     Colour = OsuColour.Gray(0.3f),
                     EdgeSmoothness = new Vector2(1f)
                 }

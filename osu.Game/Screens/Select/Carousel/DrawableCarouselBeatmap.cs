@@ -47,8 +47,9 @@ namespace osu.Game.Screens.Select.Carousel
 
         private Sprite background = null!;
 
-        private Action<BeatmapInfo>? startRequested;
-        private Action<BeatmapInfo>? editRequested;
+        private MenuItem[]? mainMenuItems;
+
+        private Action<BeatmapInfo>? selectRequested;
         private Action<BeatmapInfo>? hideRequested;
 
         private Triangles triangles = null!;
@@ -84,9 +85,8 @@ namespace osu.Game.Screens.Select.Carousel
 
             if (songSelect != null)
             {
-                startRequested = b => songSelect.FinaliseSelection(b);
-                if (songSelect.AllowEditing)
-                    editRequested = songSelect.Edit;
+                mainMenuItems = songSelect.CreateForwardNavigationMenuItemsForBeatmap(beatmapInfo);
+                selectRequested = b => songSelect.FinaliseSelection(b);
             }
 
             if (manager != null)
@@ -193,7 +193,7 @@ namespace osu.Game.Screens.Select.Carousel
         protected override bool OnClick(ClickEvent e)
         {
             if (Item?.State.Value == CarouselItemState.Selected)
-                startRequested?.Invoke(beatmapInfo);
+                selectRequested?.Invoke(beatmapInfo);
 
             return base.OnClick(e);
         }
@@ -227,11 +227,8 @@ namespace osu.Game.Screens.Select.Carousel
             {
                 List<MenuItem> items = new List<MenuItem>();
 
-                if (startRequested != null)
-                    items.Add(new OsuMenuItem("Play", MenuItemType.Highlighted, () => startRequested(beatmapInfo)));
-
-                if (editRequested != null)
-                    items.Add(new OsuMenuItem(CommonStrings.ButtonsEdit, MenuItemType.Standard, () => editRequested(beatmapInfo)));
+                if (mainMenuItems != null)
+                    items.AddRange(mainMenuItems);
 
                 if (beatmapInfo.OnlineID > 0 && beatmapOverlay != null)
                     items.Add(new OsuMenuItem("Details...", MenuItemType.Standard, () => beatmapOverlay.FetchAndShowBeatmap(beatmapInfo.OnlineID)));

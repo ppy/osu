@@ -1,7 +1,5 @@
-// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
-
-#nullable disable
 
 using System;
 using System.Collections.Generic;
@@ -12,11 +10,14 @@ using osu.Framework.Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
+using osu.Framework.Localisation;
 using osu.Game.Graphics;
-using osu.Game.Online.API;
+using osu.Game.Graphics.UserInterface;
+using osu.Game.Overlays;
 using osu.Game.Overlays.Settings;
-using osu.Game.Tournament.Components;
 using osu.Game.Tournament.Models;
+using osu.Game.Tournament.Screens.Editors.Components;
+using osu.Game.Tournament.Screens.Drawings.Components;
 using osu.Game.Users;
 using osuTK;
 
@@ -61,13 +62,14 @@ namespace osu.Game.Tournament.Screens.Editors
         {
             public TournamentTeam Model { get; }
 
-            private readonly Container drawableContainer;
-
-            [Resolved(canBeNull: true)]
-            private TournamentSceneManager sceneManager { get; set; }
+            [Resolved]
+            private TournamentSceneManager? sceneManager { get; set; }
 
             [Resolved]
-            private LadderInfo ladderInfo { get; set; }
+            private IDialogOverlay? dialogOverlay { get; set; }
+
+            [Resolved]
+            private LadderInfo ladderInfo { get; set; } = null!;
 
             public TeamRow(TournamentTeam team, TournamentScreen parent)
             {
@@ -76,10 +78,10 @@ namespace osu.Game.Tournament.Screens.Editors
                 Masking = true;
                 CornerRadius = 10;
 
-                PlayerEditor playerEditor = new PlayerEditor(Model)
-                {
-                    Width = 0.95f
-                };
+                RelativeSizeAxes = Axes.X;
+                AutoSizeAxes = Axes.Y;
+
+                PlayerEditor playerEditor = new PlayerEditor(Model);
 
                 InternalChildren = new Drawable[]
                 {
@@ -88,17 +90,17 @@ namespace osu.Game.Tournament.Screens.Editors
                         Colour = OsuColour.Gray(0.1f),
                         RelativeSizeAxes = Axes.Both,
                     },
-                    drawableContainer = new Container
+                    new GroupTeam(team)
                     {
-                        Size = new Vector2(100, 50),
-                        Margin = new MarginPadding(10),
+                        Margin = new MarginPadding(16),
+                        Scale = new Vector2(2),
                         Anchor = Anchor.TopRight,
                         Origin = Anchor.TopRight,
                     },
                     new FillFlowContainer
                     {
-                        Margin = new MarginPadding(5),
                         Spacing = new Vector2(5),
+                        Padding = new MarginPadding(10),
                         Direction = FillDirection.Full,
                         RelativeSizeAxes = Axes.X,
                         AutoSizeAxes = Axes.Y,
@@ -128,31 +130,12 @@ namespace osu.Game.Tournament.Screens.Editors
                                 Width = 0.2f,
                                 Current = Model.Seed
                             },
-                            new SettingsSlider<int>
+                            new SettingsSlider<int, LastYearPlacementSlider>
                             {
                                 LabelText = "Last Year Placement",
                                 Width = 0.33f,
                                 Current = Model.LastYearPlacing
                             },
-                            new SettingsButton
-                            {
-                                Width = 0.11f,
-                                Margin = new MarginPadding(10),
-                                Text = "Add player",
-                                Action = () => playerEditor.CreateNew()
-                            },
-                            new DangerousSettingsButton
-                            {
-                                Width = 0.11f,
-                                Text = "Delete Team",
-                                Margin = new MarginPadding(10),
-                                Action = () =>
-                                {
-                                    Expire();
-                                    ladderInfo.Teams.Remove(Model);
-                                },
-                            },
-                            playerEditor,
                             new SettingsButton
                             {
                                 Width = 0.2f,
@@ -163,19 +146,40 @@ namespace osu.Game.Tournament.Screens.Editors
                                     sceneManager?.SetScreen(new SeedingEditorScreen(team, parent));
                                 }
                             },
+                            playerEditor,
+                            new SettingsButton
+                            {
+                                Text = "Add player",
+                                Action = () => playerEditor.CreateNew()
+                            },
+                            new Container
+                            {
+                                RelativeSizeAxes = Axes.X,
+                                AutoSizeAxes = Axes.Y,
+                                Children = new Drawable[]
+                                {
+                                    new DangerousSettingsButton
+                                    {
+                                        Width = 0.2f,
+                                        Text = "Delete Team",
+                                        Anchor = Anchor.TopRight,
+                                        Origin = Anchor.TopRight,
+                                        Action = () => dialogOverlay?.Push(new DeleteTeamDialog(Model, () =>
+                                        {
+                                            Expire();
+                                            ladderInfo.Teams.Remove(Model);
+                                        })),
+                                    },
+                                }
+                            },
                         }
                     },
                 };
-
-                RelativeSizeAxes = Axes.X;
-                AutoSizeAxes = Axes.Y;
-
-                Model.FlagName.BindValueChanged(updateDrawable, true);
             }
 
-            private void updateDrawable(ValueChangedEvent<string> flag)
+            private partial class LastYearPlacementSlider : RoundedSliderBar<int>
             {
-                drawableContainer.Child = new DrawableTeamFlag(Model);
+                public override LocalisableString TooltipText => Current.Value == 0 ? "N/A" : base.TooltipText;
             }
 
             public partial class PlayerEditor : CompositeDrawable
@@ -195,6 +199,8 @@ namespace osu.Game.Tournament.Screens.Editors
                         RelativeSizeAxes = Axes.X,
                         AutoSizeAxes = Axes.Y,
                         Direction = FillDirection.Vertical,
+                        Padding = new MarginPadding(5),
+                        Spacing = new Vector2(5),
                         ChildrenEnumerable = team.Players.Select(p => new PlayerRow(team, p))
                     };
                 }
@@ -211,26 +217,21 @@ namespace osu.Game.Tournament.Screens.Editors
                     private readonly TournamentUser user;
 
                     [Resolved]
-                    protected IAPIProvider API { get; private set; }
-
-                    [Resolved]
-                    private TournamentGameBase game { get; set; }
+                    private TournamentGameBase game { get; set; } = null!;
 
                     private readonly Bindable<int?> playerId = new Bindable<int?>();
 
-                    private readonly Container drawableContainer;
+                    private readonly Container userPanelContainer;
 
                     public PlayerRow(TournamentTeam team, TournamentUser user)
                     {
                         this.user = user;
 
-                        Margin = new MarginPadding(10);
-
                         RelativeSizeAxes = Axes.X;
                         AutoSizeAxes = Axes.Y;
 
                         Masking = true;
-                        CornerRadius = 5;
+                        CornerRadius = 10;
 
                         InternalChildren = new Drawable[]
                         {
@@ -242,10 +243,11 @@ namespace osu.Game.Tournament.Screens.Editors
                             new FillFlowContainer
                             {
                                 Margin = new MarginPadding(5),
-                                Padding = new MarginPadding { Right = 160 },
+                                Padding = new MarginPadding { Right = 60 },
                                 Spacing = new Vector2(5),
                                 Direction = FillDirection.Horizontal,
-                                AutoSizeAxes = Axes.Both,
+                                RelativeSizeAxes = Axes.X,
+                                AutoSizeAxes = Axes.Y,
                                 Children = new Drawable[]
                                 {
                                     new SettingsNumberBox
@@ -255,9 +257,10 @@ namespace osu.Game.Tournament.Screens.Editors
                                         Width = 200,
                                         Current = playerId,
                                     },
-                                    drawableContainer = new Container
+                                    userPanelContainer = new Container
                                     {
-                                        Size = new Vector2(100, 70),
+                                        Width = 400,
+                                        RelativeSizeAxes = Axes.Y,
                                     },
                                 }
                             },
@@ -300,7 +303,12 @@ namespace osu.Game.Tournament.Screens.Editors
 
                     private void updatePanel() => Scheduler.AddOnce(() =>
                     {
-                        drawableContainer.Child = new UserGridPanel(user.ToAPIUser()) { Width = 300 };
+                        userPanelContainer.Child = new UserListPanel(user.ToAPIUser())
+                        {
+                            Anchor = Anchor.BottomLeft,
+                            Origin = Anchor.BottomLeft,
+                            Scale = new Vector2(1f),
+                        };
                     });
                 }
             }

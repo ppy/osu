@@ -7,7 +7,6 @@ using NUnit.Framework;
 using osu.Framework.Screens;
 using osu.Framework.Testing;
 using osu.Game.Beatmaps;
-using osu.Game.Beatmaps.ControlPoints;
 using osu.Game.Replays;
 using osu.Game.Rulesets.Judgements;
 using osu.Game.Rulesets.Objects;
@@ -47,7 +46,7 @@ namespace osu.Game.Rulesets.Osu.Tests
                     {
                         StartTime = time_slider_start,
                         Position = new Vector2(0, 0),
-                        DifficultyControlPoint = new DifficultyControlPoint { SliderVelocity = velocity },
+                        SliderVelocityMultiplier = velocity,
                         Path = new SliderPath(PathType.Linear, new[]
                         {
                             Vector2.Zero,

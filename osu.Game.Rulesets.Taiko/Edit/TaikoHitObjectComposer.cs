@@ -11,6 +11,8 @@ namespace osu.Game.Rulesets.Taiko.Edit
 {
     public partial class TaikoHitObjectComposer : HitObjectComposer<TaikoHitObject>
     {
+        protected override bool ApplyHorizontalCentering => false;
+
         public TaikoHitObjectComposer(TaikoRuleset ruleset)
             : base(ruleset)
         {

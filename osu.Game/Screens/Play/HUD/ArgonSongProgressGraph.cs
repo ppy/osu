@@ -4,7 +4,10 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
+using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
+using osu.Game.Beatmaps;
+using osu.Game.Graphics;
 using osu.Game.Rulesets.Objects;
 using osu.Game.Graphics.UserInterface;
 
@@ -12,6 +15,10 @@ namespace osu.Game.Screens.Play.HUD
 {
     public partial class ArgonSongProgressGraph : SegmentedGraph<int>
     {
+        private const int tier_count = 5;
+
+        private const int display_granularity = 200;
+
         private IEnumerable<HitObject>? objects;
 
         public IEnumerable<HitObject> Objects
@@ -20,19 +27,17 @@ namespace osu.Game.Screens.Play.HUD
             {
                 objects = value;
 
-                const int granularity = 200;
-                int[] values = new int[granularity];
+                int[] values = new int[display_granularity];
 
                 if (!objects.Any())
                     return;
 
-                double firstHit = objects.First().StartTime;
-                double lastHit = objects.Max(o => o.GetEndTime());
+                (double firstHit, double lastHit) = BeatmapExtensions.CalculatePlayableBounds(objects);
 
                 if (lastHit == 0)
                     lastHit = objects.Last().StartTime;
 
-                double interval = (lastHit - firstHit + 1) / granularity;
+                double interval = (lastHit - firstHit + 1) / display_granularity;
 
                 foreach (var h in objects)
                 {
@@ -51,12 +56,12 @@ namespace osu.Game.Screens.Play.HUD
         }
 
         public ArgonSongProgressGraph()
-            : base(5)
+            : base(tier_count)
         {
             var colours = new List<Colour4>();
 
-            for (int i = 0; i < 5; i++)
-                colours.Add(Colour4.White.Darken(1 + 1 / 5f).Opacity(1 / 5f));
+            for (int i = 0; i < tier_count; i++)
+                colours.Add(OsuColour.Gray(0.2f).Opacity(0.1f));
 
             TierColours = colours;
         }

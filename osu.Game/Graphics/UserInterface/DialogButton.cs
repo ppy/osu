@@ -1,8 +1,6 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
 using System;
 using osu.Framework;
 using osu.Framework.Extensions.Color4Extensions;
@@ -30,7 +28,7 @@ namespace osu.Game.Graphics.UserInterface
         private const float hover_duration = 500;
         private const float click_duration = 200;
 
-        public event Action<SelectionState> StateChanged;
+        public event Action<SelectionState>? StateChanged;
 
         private SelectionState state;
 

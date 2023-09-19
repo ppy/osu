@@ -9,6 +9,9 @@ indent_style = space
 indent_size = 2
 trim_trailing_whitespace = true
 
+[g_*.cs]
+generated_code = true
+
 [*.cs]
 end_of_line = crlf
 insert_final_newline = true
@@ -190,6 +193,8 @@ csharp_prefer_simple_using_statement = true:silent
 csharp_style_prefer_index_operator = false:silent
 csharp_style_prefer_range_operator = false:silent
 csharp_style_prefer_switch_expression = false:none
+
+csharp_style_namespace_declarations = block_scoped:warning
 
 [*.{yaml,yml}]
 insert_final_newline = true

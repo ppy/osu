@@ -1,8 +1,6 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
 using System;
 using System.Collections.Generic;
 using NUnit.Framework;
@@ -21,10 +19,12 @@ namespace osu.Game.Rulesets.Osu.Tests
         [TestCase("basic")]
         [TestCase("colinear-perfect-curve")]
         [TestCase("slider-ticks")]
+        [TestCase("slider-ticks-edge-case")]
         [TestCase("repeat-slider")]
         [TestCase("uneven-repeat-slider")]
         [TestCase("old-stacking")]
         [TestCase("multi-segment-slider")]
+        [TestCase("nan-slider")]
         public void Test(string name) => base.Test(name);
 
         protected override IEnumerable<ConvertValue> CreateConvertValue(HitObject hitObject)

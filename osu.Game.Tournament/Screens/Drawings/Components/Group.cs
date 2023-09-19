@@ -1,8 +1,6 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -86,7 +84,7 @@ namespace osu.Game.Tournament.Screens.Drawings.Components
 
         public bool ContainsTeam(string fullName)
         {
-            return allTeams.Any(t => t.Team.FullName.Value == fullName);
+            return allTeams.Any(t => t.Team?.FullName.Value == fullName);
         }
 
         public bool RemoveTeam(TournamentTeam team)
@@ -114,7 +112,7 @@ namespace osu.Game.Tournament.Screens.Drawings.Components
         {
             StringBuilder sb = new StringBuilder();
             foreach (GroupTeam gt in allTeams)
-                sb.AppendLine(gt.Team.FullName.Value);
+                sb.AppendLine(gt.Team?.FullName.Value);
             return sb.ToString();
         }
     }

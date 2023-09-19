@@ -1,8 +1,6 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
 using osuTK;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
@@ -31,6 +29,11 @@ namespace osu.Game.Graphics.UserInterface
         protected virtual double AnimationDelay => 80;
 
         private const float star_spacing = 4;
+
+        public virtual FillDirection Direction
+        {
+            set => stars.Direction = value;
+        }
 
         private float current;
 
@@ -66,7 +69,6 @@ namespace osu.Game.Graphics.UserInterface
                 stars = new FillFlowContainer<Star>
                 {
                     AutoSizeAxes = Axes.Both,
-                    Direction = FillDirection.Horizontal,
                     Spacing = new Vector2(star_spacing),
                     ChildrenEnumerable = Enumerable.Range(0, StarCount).Select(_ => CreateStar())
                 }

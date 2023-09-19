@@ -21,9 +21,11 @@ using osu.Game.Rulesets.Osu;
 using osu.Game.Rulesets.Osu.Mods;
 using osu.Game.Rulesets.Scoring;
 using osu.Game.Scoring;
+using osu.Game.Screens;
 using osu.Game.Screens.Play;
 using osu.Game.Screens.Ranking;
 using osu.Game.Tests.Resources;
+using osuTK.Input;
 
 namespace osu.Game.Tests.Visual.Gameplay
 {
@@ -131,7 +133,7 @@ namespace osu.Game.Tests.Visual.Gameplay
             AddAssert("results screen score has matching", () => (Player.GetChildScreen() as ResultsScreen)?.Score.Mods.First(), () => Is.EqualTo(playerMods.First()));
 
             AddUntilStep("score in database", () => Realm.Run(r => r.Find<ScoreInfo>(Player.Score.ScoreInfo.ID) != null));
-            AddUntilStep("databased score has correct mods", () => Realm.Run(r => r.Find<ScoreInfo>(Player.Score.ScoreInfo.ID)).Mods.First(), () => Is.EqualTo(playerMods.First()));
+            AddUntilStep("databased score has correct mods", () => Realm.Run(r => r.Find<ScoreInfo>(Player.Score.ScoreInfo.ID))!.Mods.First(), () => Is.EqualTo(playerMods.First()));
         }
 
         [Test]
@@ -145,6 +147,38 @@ namespace osu.Game.Tests.Visual.Gameplay
 
             AddUntilStep("results displayed", () => Player.GetChildScreen() is ResultsScreen);
             AddUntilStep("score in database", () => Realm.Run(r => r.Find<ScoreInfo>(Player.Score.ScoreInfo.ID) != null));
+        }
+
+        [Test]
+        public void TestReplayExport()
+        {
+            CreateTest();
+
+            AddUntilStep("wait for track to start running", () => Beatmap.Value.Track.IsRunning);
+
+            AddStep("seek to completion", () => Player.GameplayClockContainer.Seek(Player.DrawableRuleset.Objects.Last().GetEndTime()));
+
+            AddUntilStep("results displayed", () => (Player.GetChildScreen() as ResultsScreen)?.IsLoaded == true);
+            AddUntilStep("score in database", () => Realm.Run(r => r.Find<ScoreInfo>(Player.Score.ScoreInfo.ID) != null));
+
+            AddUntilStep("wait for button clickable", () => ((OsuScreen)Player.GetChildScreen())
+                                                            .ChildrenOfType<ReplayDownloadButton>().FirstOrDefault()?
+                                                            .ChildrenOfType<OsuClickableContainer>().FirstOrDefault()?
+                                                            .Enabled.Value == true);
+
+            AddAssert("no export files", () => !LocalStorage.GetFiles("exports").Any());
+
+            AddStep("Export replay", () => InputManager.PressKey(Key.F2));
+
+            string? filePath = null;
+
+            // Files starting with _ are temporary, created by CreateFileSafely call.
+            AddUntilStep("wait for export file", () => filePath = LocalStorage.GetFiles("exports").SingleOrDefault(f => !f.StartsWith("_", StringComparison.Ordinal)), () => Is.Not.Null);
+            AddAssert("filesize is non-zero", () =>
+            {
+                using (var stream = LocalStorage.GetStream(filePath))
+                    return stream.Length;
+            }, () => Is.Not.Zero);
         }
 
         [Test]

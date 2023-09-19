@@ -18,6 +18,7 @@ using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Localisation;
 using osu.Game.Overlays.Settings;
+using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Scoring;
 using osu.Game.Scoring;
 using osu.Game.Screens.Ranking.Statistics;
@@ -161,17 +162,20 @@ namespace osu.Game.Screens.Play.PlayerSettings
 
                 realmWriteTask = realm.WriteAsync(r =>
                 {
-                    var settings = r.Find<BeatmapInfo>(beatmap.Value.BeatmapInfo.ID)?.UserSettings;
+                    var setInfo = r.Find<BeatmapSetInfo>(beatmap.Value.BeatmapSetInfo.ID);
 
-                    if (settings == null) // only the case for tests.
+                    if (setInfo == null) // only the case for tests.
                         return;
 
-                    double val = Current.Value;
+                    // Apply to all difficulties in a beatmap set for now (they generally always share timing).
+                    foreach (var b in setInfo.Beatmaps)
+                    {
+                        BeatmapUserSettings settings = b.UserSettings;
+                        double val = Current.Value;
 
-                    if (settings.Offset == val)
-                        return;
-
-                    settings.Offset = val;
+                        if (settings.Offset != val)
+                            settings.Offset = val;
+                    }
                 });
             }
         }
@@ -183,7 +187,7 @@ namespace osu.Game.Screens.Play.PlayerSettings
             if (score.NewValue == null)
                 return;
 
-            if (score.NewValue.Mods.Any(m => !m.UserPlayable))
+            if (score.NewValue.Mods.Any(m => !m.UserPlayable || m is IHasNoTimedInputs))
                 return;
 
             var hitEvents = score.NewValue.HitEvents;

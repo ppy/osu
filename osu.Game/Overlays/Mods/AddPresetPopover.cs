@@ -8,11 +8,12 @@ using osu.Framework.Bindables;
 using osu.Framework.Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
+using osu.Framework.Input.Events;
 using osu.Game.Database;
-using osu.Game.Extensions;
 using osu.Game.Graphics;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Graphics.UserInterfaceV2;
+using osu.Game.Input.Bindings;
 using osu.Game.Localisation;
 using osu.Game.Rulesets;
 using osu.Game.Rulesets.Mods;
@@ -67,7 +68,7 @@ namespace osu.Game.Overlays.Mods
                         Anchor = Anchor.TopCentre,
                         Origin = Anchor.TopCentre,
                         Text = ModSelectOverlayStrings.AddPreset,
-                        Action = tryCreatePreset
+                        Action = createPreset
                     }
                 }
             };
@@ -89,22 +90,33 @@ namespace osu.Game.Overlays.Mods
             base.LoadComplete();
 
             ScheduleAfterChildren(() => GetContainingInputManager().ChangeFocus(nameTextBox));
+
+            nameTextBox.Current.BindValueChanged(s =>
+            {
+                createButton.Enabled.Value = !string.IsNullOrWhiteSpace(s.NewValue);
+            }, true);
         }
 
-        private void tryCreatePreset()
+        public override bool OnPressed(KeyBindingPressEvent<GlobalAction> e)
         {
-            if (string.IsNullOrWhiteSpace(nameTextBox.Current.Value))
+            switch (e.Action)
             {
-                Body.Shake();
-                return;
+                case GlobalAction.Select:
+                    createButton.TriggerClick();
+                    return true;
             }
 
+            return base.OnPressed(e);
+        }
+
+        private void createPreset()
+        {
             realm.Write(r => r.Add(new ModPreset
             {
                 Name = nameTextBox.Current.Value,
                 Description = descriptionTextBox.Current.Value,
                 Mods = selectedMods.Value.ToArray(),
-                Ruleset = r.Find<RulesetInfo>(ruleset.Value.ShortName)
+                Ruleset = r.Find<RulesetInfo>(ruleset.Value.ShortName)!
             }));
 
             this.HidePopover();

@@ -109,12 +109,12 @@ namespace osu.Game.Screens.Play
                                 new Sprite
                                 {
                                     RelativeSizeAxes = Axes.Both,
-                                    Texture = beatmap.Background,
+                                    Texture = beatmap.GetBackground(),
                                     Origin = Anchor.Centre,
                                     Anchor = Anchor.Centre,
                                     FillMode = FillMode.Fill,
                                 },
-                                loading = new LoadingLayer(true)
+                                loading = new LoadingLayer(dimBackground: true, blockInput: false)
                             }
                         },
                         versionFlow = new FillFlowContainer

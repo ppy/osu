@@ -286,7 +286,7 @@ namespace osu.Game.Tests.Visual.Background
                 this.renderer = renderer;
             }
 
-            protected override Texture GetBackground() => renderer.CreateTexture(1, 1);
+            public override Texture GetBackground() => renderer.CreateTexture(1, 1);
         }
 
         private partial class TestWorkingBeatmapWithStoryboard : TestWorkingBeatmap
@@ -311,6 +311,7 @@ namespace osu.Game.Tests.Visual.Background
                 public bool IsDrawable => true;
                 public double StartTime => double.MinValue;
                 public double EndTime => double.MaxValue;
+                public double EndTimeForDisplay => double.MaxValue;
 
                 public Drawable CreateDrawable() => new DrawableTestStoryboardElement();
             }

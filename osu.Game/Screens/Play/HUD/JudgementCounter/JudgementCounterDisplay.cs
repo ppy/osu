@@ -6,33 +6,35 @@ using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
+using osu.Framework.Localisation;
 using osu.Game.Configuration;
+using osu.Game.Localisation.HUD;
 using osu.Game.Rulesets.Scoring;
 using osu.Game.Skinning;
 using osuTK;
 
 namespace osu.Game.Screens.Play.HUD.JudgementCounter
 {
-    public partial class JudgementCounterDisplay : CompositeDrawable, ISkinnableDrawable
+    public partial class JudgementCounterDisplay : CompositeDrawable, ISerialisableDrawable
     {
         public const int TRANSFORM_DURATION = 250;
 
         public bool UsesFixedAnchor { get; set; }
 
-        [SettingSource("Display mode")]
+        [SettingSource(typeof(JudgementCounterDisplayStrings), nameof(JudgementCounterDisplayStrings.JudgementDisplayMode))]
         public Bindable<DisplayMode> Mode { get; set; } = new Bindable<DisplayMode>();
 
-        [SettingSource("Counter direction")]
+        [SettingSource(typeof(JudgementCounterDisplayStrings), nameof(JudgementCounterDisplayStrings.FlowDirection))]
         public Bindable<Direction> FlowDirection { get; set; } = new Bindable<Direction>();
 
-        [SettingSource("Show judgement names")]
+        [SettingSource(typeof(JudgementCounterDisplayStrings), nameof(JudgementCounterDisplayStrings.ShowJudgementNames))]
         public BindableBool ShowJudgementNames { get; set; } = new BindableBool(true);
 
-        [SettingSource("Show max judgement")]
+        [SettingSource(typeof(JudgementCounterDisplayStrings), nameof(JudgementCounterDisplayStrings.ShowMaxJudgement))]
         public BindableBool ShowMaxJudgement { get; set; } = new BindableBool(true);
 
         [Resolved]
-        private JudgementTally tally { get; set; } = null!;
+        private JudgementCountController judgementCountController { get; set; } = null!;
 
         protected FillFlowContainer<JudgementCounter> CounterFlow = null!;
 
@@ -47,7 +49,7 @@ namespace osu.Game.Screens.Play.HUD.JudgementCounter
                 AutoSizeAxes = Axes.Both
             };
 
-            foreach (var result in tally.Results)
+            foreach (var result in judgementCountController.Results)
                 CounterFlow.Add(createCounter(result));
         }
 
@@ -121,7 +123,7 @@ namespace osu.Game.Screens.Play.HUD.JudgementCounter
             }
         }
 
-        private JudgementCounter createCounter(JudgementTally.JudgementCount info) =>
+        private JudgementCounter createCounter(JudgementCountController.JudgementCount info) =>
             new JudgementCounter(info)
             {
                 State = { Value = Visibility.Hidden },
@@ -130,8 +132,13 @@ namespace osu.Game.Screens.Play.HUD.JudgementCounter
 
         public enum DisplayMode
         {
+            [LocalisableDescription(typeof(JudgementCounterDisplayStrings), nameof(JudgementCounterDisplayStrings.JudgementDisplayModeSimple))]
             Simple,
+
+            [LocalisableDescription(typeof(JudgementCounterDisplayStrings), nameof(JudgementCounterDisplayStrings.JudgementDisplayModeNormal))]
             Normal,
+
+            [LocalisableDescription(typeof(JudgementCounterDisplayStrings), nameof(JudgementCounterDisplayStrings.JudgementDisplayModeAll))]
             All
         }
     }

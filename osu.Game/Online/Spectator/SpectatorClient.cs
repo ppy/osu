@@ -16,6 +16,7 @@ using osu.Game.Online.API;
 using osu.Game.Replays.Legacy;
 using osu.Game.Rulesets.Replays;
 using osu.Game.Rulesets.Replays.Types;
+using osu.Game.Rulesets.Scoring;
 using osu.Game.Scoring;
 using osu.Game.Screens.Play;
 
@@ -82,6 +83,7 @@ namespace osu.Game.Online.Spectator
         private IBeatmap? currentBeatmap;
         private Score? currentScore;
         private long? currentScoreToken;
+        private ScoreProcessor? currentScoreProcessor;
 
         private readonly Queue<FrameDataBundle> pendingFrameBundles = new Queue<FrameDataBundle>();
 
@@ -183,7 +185,7 @@ namespace osu.Game.Online.Spectator
                 IsPlaying = true;
 
                 // transfer state at point of beginning play
-                currentState.BeatmapID = score.ScoreInfo.BeatmapInfo.OnlineID;
+                currentState.BeatmapID = score.ScoreInfo.BeatmapInfo!.OnlineID;
                 currentState.RulesetID = score.ScoreInfo.RulesetID;
                 currentState.Mods = score.ScoreInfo.Mods.Select(m => new APIMod(m)).ToArray();
                 currentState.State = SpectatedUserState.Playing;
@@ -192,6 +194,7 @@ namespace osu.Game.Online.Spectator
                 currentBeatmap = state.Beatmap;
                 currentScore = score;
                 currentScoreToken = scoreToken;
+                currentScoreProcessor = state.ScoreProcessor;
 
                 BeginPlayingInternal(currentScoreToken, currentState);
             });
@@ -302,9 +305,10 @@ namespace osu.Game.Online.Spectator
                 return;
 
             Debug.Assert(currentScore != null);
+            Debug.Assert(currentScoreProcessor != null);
 
             var frames = pendingFrames.ToArray();
-            var bundle = new FrameDataBundle(currentScore.ScoreInfo, frames);
+            var bundle = new FrameDataBundle(currentScore.ScoreInfo, currentScoreProcessor, frames);
 
             pendingFrames.Clear();
             lastPurgeTime = Time.Current;

@@ -19,10 +19,9 @@ namespace osu.Game.Screens.Play
     [Cached(typeof(IGameplayClock))]
     public partial class GameplayClockContainer : Container, IAdjustableClock, IGameplayClock
     {
-        /// <summary>
-        /// Whether gameplay is paused.
-        /// </summary>
         public IBindable<bool> IsPaused => isPaused;
+
+        public bool IsRewinding => GameplayClock.IsRewinding;
 
         /// <summary>
         /// The source clock. Should generally not be used for any timekeeping purposes.
@@ -160,6 +159,21 @@ namespace osu.Game.Screens.Play
                 StartTime = time.Value;
 
             Seek(StartTime);
+
+            // This is a workaround for the fact that DecoupleableInterpolatingFramedClock doesn't seek the source
+            // if the source is not IsRunning. (see https://github.com/ppy/osu-framework/blob/2102638056dfcf85d21b4d85266d53b5dd018767/osu.Framework/Timing/DecoupleableInterpolatingFramedClock.cs#L209-L210)
+            // I hope to remove this once we knock some sense into clocks in general.
+            //
+            // Without this seek, the multiplayer spectator start sequence breaks:
+            // - Individual clients' clocks are never updated to their expected time
+            // - The sync manager thinks they are running behind
+            // - Gameplay doesn't start when it should (until a timeout occurs because nothing is happening for 10+ seconds)
+            //
+            // In addition, we use `CurrentTime` for this seek instead of `StartTime` as the above seek may have applied inherent
+            // offsets which need to be accounted for (ie. FramedBeatmapClock.TotalAppliedOffset).
+            //
+            // See https://github.com/ppy/osu/pull/24451/files/87fee001c786b29db34063ef3350e9a9f024d3ab#diff-28ca02979641e2d98a15fe5d5e806f56acf60ac100258a059fa72503b6cc54e8.
+            (SourceClock as IAdjustableClock)?.Seek(CurrentTime);
 
             if (!wasPaused || startClock)
                 Start();

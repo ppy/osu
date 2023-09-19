@@ -90,7 +90,9 @@ namespace osu.Game.Tests.Visual.Online
             {
                 new APIUserGroup { Colour = "#EB47D0", ShortName = "DEV", Name = "Developers" },
                 new APIUserGroup { Colour = "#A347EB", ShortName = "BN", Name = "Beatmap Nominators", Playmodes = new[] { "mania" } },
-                new APIUserGroup { Colour = "#A347EB", ShortName = "BN", Name = "Beatmap Nominators", Playmodes = new[] { "osu", "taiko" } }
+                new APIUserGroup { Colour = "#A347EB", ShortName = "BN", Name = "Beatmap Nominators", Playmodes = new[] { "osu", "taiko" } },
+                new APIUserGroup { Colour = "#A347EB", ShortName = "BN", Name = "Beatmap Nominators", Playmodes = new[] { "osu", "taiko", "fruits", "mania" } },
+                new APIUserGroup { Colour = "#A347EB", ShortName = "BN", Name = "Beatmap Nominators (Probationary)", Playmodes = new[] { "osu", "taiko", "fruits", "mania" }, IsProbationary = true }
             },
             ProfileOrder = new[]
             {
@@ -119,20 +121,29 @@ namespace osu.Game.Tests.Visual.Online
                     Data = Enumerable.Range(2345, 45).Concat(Enumerable.Range(2109, 40)).ToArray()
                 },
             },
+            TournamentBanner = new TournamentBanner
+            {
+                Id = 13926,
+                TournamentId = 35,
+                ImageLowRes = "https://assets.ppy.sh/tournament-banners/official/owc2022/profile/winner_US.jpg",
+                Image = "https://assets.ppy.sh/tournament-banners/official/owc2022/profile/winner_US@2x.jpg",
+            },
             Badges = new[]
             {
                 new Badge
                 {
                     AwardedAt = DateTimeOffset.FromUnixTimeSeconds(1505741569),
                     Description = "Outstanding help by being a voluntary test subject.",
-                    ImageUrl = "https://assets.ppy.sh/profile-badges/contributor.jpg",
+                    ImageUrl = "https://assets.ppy.sh/profile-badges/contributor-new@2x.png",
+                    ImageUrlLowRes = "https://assets.ppy.sh/profile-badges/contributor-new.png",
                     Url = "https://osu.ppy.sh/wiki/en/People/Community_Contributors",
                 },
                 new Badge
                 {
                     AwardedAt = DateTimeOffset.FromUnixTimeSeconds(1505741569),
                     Description = "Badge without a url.",
-                    ImageUrl = "https://assets.ppy.sh/profile-badges/contributor.jpg",
+                    ImageUrl = "https://assets.ppy.sh/profile-badges/contributor@2x.png",
+                    ImageUrlLowRes = "https://assets.ppy.sh/profile-badges/contributor.png",
                 },
             },
             Title = "osu!volunteer",

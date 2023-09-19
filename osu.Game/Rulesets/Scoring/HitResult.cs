@@ -150,7 +150,7 @@ namespace osu.Game.Rulesets.Scoring
             => AffectsCombo(result) && !IsHit(result);
 
         /// <summary>
-        /// Whether a <see cref="HitResult"/> increases/breaks the combo, and affects the combo portion of the score.
+        /// Whether a <see cref="HitResult"/> increases or breaks the combo.
         /// </summary>
         public static bool AffectsCombo(this HitResult result)
         {

@@ -1,30 +1,34 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
+using osu.Framework.Input.Bindings;
+using osu.Framework.Input.Events;
 using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.UserInterface;
+using osu.Game.Input.Bindings;
 using osu.Game.Online;
 using osu.Game.Scoring;
 using osuTK;
 
 namespace osu.Game.Screens.Ranking
 {
-    public partial class ReplayDownloadButton : CompositeDrawable
+    public partial class ReplayDownloadButton : CompositeDrawable, IKeyBindingHandler<GlobalAction>
     {
         public readonly Bindable<ScoreInfo> Score = new Bindable<ScoreInfo>();
 
         protected readonly Bindable<DownloadState> State = new Bindable<DownloadState>();
 
-        private DownloadButton button;
-        private ShakeContainer shakeContainer;
+        private DownloadButton button = null!;
+        private ShakeContainer shakeContainer = null!;
 
-        private ScoreDownloadTracker downloadTracker;
+        private ScoreDownloadTracker? downloadTracker;
+
+        [Resolved]
+        private ScoreManager scoreManager { get; set; } = null!;
 
         private ReplayAvailability replayAvailability
         {
@@ -46,8 +50,8 @@ namespace osu.Game.Screens.Ranking
             Size = new Vector2(50, 30);
         }
 
-        [BackgroundDependencyLoader(true)]
-        private void load(OsuGame game, ScoreModelDownloader scores)
+        [BackgroundDependencyLoader]
+        private void load(OsuGame? game, ScoreModelDownloader scoreDownloader)
         {
             InternalChild = shakeContainer = new ShakeContainer
             {
@@ -67,7 +71,7 @@ namespace osu.Game.Screens.Ranking
                         break;
 
                     case DownloadState.NotDownloaded:
-                        scores.Download(Score.Value);
+                        scoreDownloader.Download(Score.Value);
                         break;
 
                     case DownloadState.Importing:
@@ -79,6 +83,10 @@ namespace osu.Game.Screens.Ranking
 
             Score.BindValueChanged(score =>
             {
+                // An export may be pending from the last score.
+                // Reset this to meet user expectations (a new score which has just been switched to shouldn't export)
+                State.ValueChanged -= exportWhenReady;
+
                 downloadTracker?.RemoveAndDisposeImmediately();
 
                 if (score.NewValue != null)
@@ -98,6 +106,53 @@ namespace osu.Game.Screens.Ranking
                 updateState();
             }, true);
         }
+
+        #region Export via hotkey logic (also in SaveFailedScoreButton)
+
+        public bool OnPressed(KeyBindingPressEvent<GlobalAction> e)
+        {
+            if (e.Repeat)
+                return false;
+
+            switch (e.Action)
+            {
+                case GlobalAction.SaveReplay:
+                    button.TriggerClick();
+                    return true;
+
+                case GlobalAction.ExportReplay:
+                    if (State.Value == DownloadState.LocallyAvailable)
+                    {
+                        State.BindValueChanged(exportWhenReady, true);
+                    }
+                    else
+                    {
+                        // A download needs to be performed before we can export this replay.
+                        button.TriggerClick();
+                        if (button.Enabled.Value)
+                            State.BindValueChanged(exportWhenReady, true);
+                    }
+
+                    return true;
+            }
+
+            return false;
+        }
+
+        public void OnReleased(KeyBindingReleaseEvent<GlobalAction> e)
+        {
+        }
+
+        private void exportWhenReady(ValueChangedEvent<DownloadState> state)
+        {
+            if (state.NewValue != DownloadState.LocallyAvailable) return;
+
+            scoreManager.Export(Score.Value);
+
+            State.ValueChanged -= exportWhenReady;
+        }
+
+        #endregion
 
         private void updateState()
         {

@@ -21,7 +21,7 @@ using osu.Game.Configuration;
 using osu.Game.Rulesets.Osu.Objects;
 using osu.Game.Rulesets.Osu.Objects.Drawables;
 using osu.Game.Rulesets.Osu.UI.Cursor;
-using osu.Game.Screens.Play;
+using osu.Game.Screens.Play.HUD;
 using osu.Game.Tests.Visual;
 using osuTK;
 using osuTK.Graphics;
@@ -34,9 +34,9 @@ namespace osu.Game.Rulesets.Osu.Tests
         [Resolved]
         private OsuConfigManager config { get; set; } = null!;
 
-        private TestActionKeyCounter leftKeyCounter = null!;
+        private DefaultKeyCounter leftKeyCounter = null!;
 
-        private TestActionKeyCounter rightKeyCounter = null!;
+        private DefaultKeyCounter rightKeyCounter = null!;
 
         private OsuInputManager osuInputManager = null!;
 
@@ -49,6 +49,9 @@ namespace osu.Game.Rulesets.Osu.Tests
 
             AddStep("Create tests", () =>
             {
+                InputTrigger triggerLeft;
+                InputTrigger triggerRight;
+
                 Children = new Drawable[]
                 {
                     osuInputManager = new OsuInputManager(new OsuRuleset().RulesetInfo)
@@ -59,29 +62,39 @@ namespace osu.Game.Rulesets.Osu.Tests
                             Origin = Anchor.Centre,
                             Children = new Drawable[]
                             {
-                                leftKeyCounter = new TestActionKeyCounter(OsuAction.LeftButton)
-                                {
-                                    Anchor = Anchor.Centre,
-                                    Origin = Anchor.CentreRight,
-                                    Depth = float.MinValue,
-                                    X = -100,
-                                },
-                                rightKeyCounter = new TestActionKeyCounter(OsuAction.RightButton)
-                                {
-                                    Anchor = Anchor.Centre,
-                                    Origin = Anchor.CentreLeft,
-                                    Depth = float.MinValue,
-                                    X = 100,
-                                },
                                 new OsuCursorContainer
                                 {
                                     Depth = float.MinValue,
+                                },
+                                triggerLeft = new TestActionKeyCounterTrigger(OsuAction.LeftButton)
+                                {
+                                    Depth = float.MinValue
+                                },
+                                triggerRight = new TestActionKeyCounterTrigger(OsuAction.RightButton)
+                                {
+                                    Depth = float.MinValue
                                 }
                             },
-                        }
+                        },
                     },
                     new TouchVisualiser(),
                 };
+
+                mainContent.AddRange(new[]
+                {
+                    leftKeyCounter = new DefaultKeyCounter(triggerLeft)
+                    {
+                        Anchor = Anchor.Centre,
+                        Origin = Anchor.CentreRight,
+                        X = -100,
+                    },
+                    rightKeyCounter = new DefaultKeyCounter(triggerRight)
+                    {
+                        Anchor = Anchor.Centre,
+                        Origin = Anchor.CentreLeft,
+                        X = 100,
+                    },
+                });
             });
         }
 
@@ -148,6 +161,42 @@ namespace osu.Game.Rulesets.Osu.Tests
             checkPressed(OsuAction.RightButton);
 
             assertKeyCounter(1, 1);
+        }
+
+        [Test]
+        public void TestPositionalTrackingAfterLongDistanceTravelled()
+        {
+            // When a single touch has already travelled enough distance on screen, it should remain as the positional
+            // tracking touch until released (unless a direct touch occurs).
+
+            beginTouch(TouchSource.Touch1);
+
+            assertKeyCounter(1, 0);
+            checkPressed(OsuAction.LeftButton);
+            checkPosition(TouchSource.Touch1);
+
+            // cover some distance
+            beginTouch(TouchSource.Touch1, new Vector2(0));
+            beginTouch(TouchSource.Touch1, new Vector2(9999));
+            beginTouch(TouchSource.Touch1, new Vector2(0));
+            beginTouch(TouchSource.Touch1, new Vector2(9999));
+            beginTouch(TouchSource.Touch1);
+
+            beginTouch(TouchSource.Touch2);
+
+            assertKeyCounter(1, 1);
+            checkNotPressed(OsuAction.LeftButton);
+            checkPressed(OsuAction.RightButton);
+            // in this case, touch 2 should not become the positional tracking touch.
+            checkPosition(TouchSource.Touch1);
+
+            // even if the second touch moves on the screen, the original tracking touch is retained.
+            beginTouch(TouchSource.Touch2, new Vector2(0));
+            beginTouch(TouchSource.Touch2, new Vector2(9999));
+            beginTouch(TouchSource.Touch2, new Vector2(0));
+            beginTouch(TouchSource.Touch2, new Vector2(9999));
+
+            checkPosition(TouchSource.Touch1);
         }
 
         [Test]
@@ -562,8 +611,8 @@ namespace osu.Game.Rulesets.Osu.Tests
 
         private void assertKeyCounter(int left, int right)
         {
-            AddAssert($"The left key was pressed {left} times", () => leftKeyCounter.CountPresses, () => Is.EqualTo(left));
-            AddAssert($"The right key was pressed {right} times", () => rightKeyCounter.CountPresses, () => Is.EqualTo(right));
+            AddAssert($"The left key was pressed {left} times", () => leftKeyCounter.CountPresses.Value, () => Is.EqualTo(left));
+            AddAssert($"The right key was pressed {right} times", () => rightKeyCounter.CountPresses.Value, () => Is.EqualTo(right));
         }
 
         private void releaseAllTouches()
@@ -579,11 +628,11 @@ namespace osu.Game.Rulesets.Osu.Tests
         private void checkNotPressed(OsuAction action) => AddAssert($"Not pressing {action}", () => !osuInputManager.PressedActions.Contains(action));
         private void checkPressed(OsuAction action) => AddAssert($"Is pressing {action}", () => osuInputManager.PressedActions.Contains(action));
 
-        public partial class TestActionKeyCounter : KeyCounter, IKeyBindingHandler<OsuAction>
+        public partial class TestActionKeyCounterTrigger : InputTrigger, IKeyBindingHandler<OsuAction>
         {
             public OsuAction Action { get; }
 
-            public TestActionKeyCounter(OsuAction action)
+            public TestActionKeyCounterTrigger(OsuAction action)
                 : base(action.ToString())
             {
                 Action = action;
@@ -593,8 +642,7 @@ namespace osu.Game.Rulesets.Osu.Tests
             {
                 if (e.Action == Action)
                 {
-                    IsLit = true;
-                    Increment();
+                    Activate();
                 }
 
                 return false;
@@ -602,7 +650,8 @@ namespace osu.Game.Rulesets.Osu.Tests
 
             public void OnReleased(KeyBindingReleaseEvent<OsuAction> e)
             {
-                if (e.Action == Action) IsLit = false;
+                if (e.Action == Action)
+                    Deactivate();
             }
         }
 

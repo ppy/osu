@@ -104,10 +104,10 @@ namespace osu.Game.Overlays.FirstRunSetup
         {
             protected override bool ControlGlobalMusic => false;
 
-            public override bool? AllowTrackAdjustments => false;
+            public override bool? ApplyModTrackAdjustments => false;
         }
 
-        private partial class UIScaleSlider : OsuSliderBar<float>
+        private partial class UIScaleSlider : RoundedSliderBar<float>
         {
             public override LocalisableString TooltipText => base.TooltipText + "x";
         }

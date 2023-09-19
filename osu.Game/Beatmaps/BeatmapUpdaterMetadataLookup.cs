@@ -13,7 +13,6 @@ using osu.Framework.Development;
 using osu.Framework.IO.Network;
 using osu.Framework.Logging;
 using osu.Framework.Platform;
-using osu.Framework.Testing;
 using osu.Game.Database;
 using osu.Game.Online.API;
 using osu.Game.Online.API.Requests;
@@ -30,7 +29,6 @@ namespace osu.Game.Beatmaps
     /// On creating the component, a copy of a database containing metadata for a large subset of beatmaps (stored to <see cref="cache_database_name"/>) will be downloaded if not already present locally.
     /// This will always be checked before doing a second online query to get required metadata.
     /// </remarks>
-    [ExcludeFromDynamicCompile]
     public class BeatmapUpdaterMetadataLookup : IDisposable
     {
         private readonly IAPIProvider api;

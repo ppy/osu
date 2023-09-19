@@ -64,6 +64,8 @@ namespace osu.Game.Beatmaps
         [Resolved]
         private IBindable<WorkingBeatmap> beatmap { get; set; } = null!;
 
+        public bool IsRewinding { get; private set; }
+
         public bool IsCoupled
         {
             get => decoupledClock.IsCoupled;
@@ -122,7 +124,7 @@ namespace osu.Game.Beatmaps
         {
             base.Update();
 
-            if (Source != null && Source is not IAdjustableClock && Source.CurrentTime < decoupledClock.CurrentTime)
+            if (Source != null && Source is not IAdjustableClock && Source.CurrentTime < decoupledClock.CurrentTime - 100)
             {
                 // InterpolatingFramedClock won't interpolate backwards unless its source has an ElapsedFrameTime.
                 // See https://github.com/ppy/osu-framework/blob/ba1385330cc501f34937e08257e586c84e35d772/osu.Framework/Timing/InterpolatingFramedClock.cs#L91-L93
@@ -133,6 +135,9 @@ namespace osu.Game.Beatmaps
             }
             else
                 finalClockSource.ProcessFrame();
+
+            if (Clock.ElapsedFrameTime != 0)
+                IsRewinding = Clock.ElapsedFrameTime < 0;
         }
 
         public double TotalAppliedOffset

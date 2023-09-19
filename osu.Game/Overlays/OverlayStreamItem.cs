@@ -39,12 +39,14 @@ namespace osu.Game.Overlays
         private FillFlowContainer<SpriteText> text;
         private ExpandingBar expandingBar;
 
+        public const float PADDING = 5;
+
         protected OverlayStreamItem(T value)
             : base(value)
         {
             Height = 50;
             Width = 90;
-            Margin = new MarginPadding(5);
+            Margin = new MarginPadding(PADDING);
         }
 
         [BackgroundDependencyLoader]

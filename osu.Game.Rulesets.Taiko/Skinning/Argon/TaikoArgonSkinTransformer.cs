@@ -60,6 +60,9 @@ namespace osu.Game.Rulesets.Taiko.Skinning.Argon
                             // the drawable needs to expire as soon as possible to avoid accumulating empty drawables on the playfield.
                             return Drawable.Empty().With(d => d.Expire());
 
+                        case TaikoSkinComponents.DrumSamplePlayer:
+                            return new ArgonDrumSamplePlayer();
+
                         case TaikoSkinComponents.TaikoExplosionGreat:
                         case TaikoSkinComponents.TaikoExplosionMiss:
                         case TaikoSkinComponents.TaikoExplosionOk:

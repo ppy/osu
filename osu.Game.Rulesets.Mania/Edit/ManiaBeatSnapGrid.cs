@@ -1,7 +1,5 @@
-// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
-
-#nullable disable
 
 using System;
 using System.Collections.Generic;
@@ -45,13 +43,13 @@ namespace osu.Game.Rulesets.Mania.Edit
         }
 
         [Resolved]
-        private EditorBeatmap beatmap { get; set; }
+        private EditorBeatmap beatmap { get; set; } = null!;
 
         [Resolved]
-        private OsuColour colours { get; set; }
+        private OsuColour colours { get; set; } = null!;
 
         [Resolved]
-        private BindableBeatDivisor beatDivisor { get; set; }
+        private BindableBeatDivisor beatDivisor { get; set; } = null!;
 
         private readonly List<ScrollingHitObjectContainer> grids = new List<ScrollingHitObjectContainer>();
 
@@ -129,7 +127,7 @@ namespace osu.Game.Rulesets.Mania.Edit
                 }
 
                 Color4 colour = BindableBeatDivisor.GetColourFor(
-                    BindableBeatDivisor.GetDivisorForBeatIndex(Math.Max(1, beat), beatDivisor.Value), colours);
+                    BindableBeatDivisor.GetDivisorForBeatIndex(beat, beatDivisor.Value), colours);
 
                 foreach (var grid in grids)
                 {
@@ -169,7 +167,7 @@ namespace osu.Game.Rulesets.Mania.Edit
         private partial class DrawableGridLine : DrawableHitObject
         {
             [Resolved]
-            private IScrollingInfo scrollingInfo { get; set; }
+            private IScrollingInfo scrollingInfo { get; set; } = null!;
 
             private readonly IBindable<ScrollingDirection> direction = new Bindable<ScrollingDirection>();
 

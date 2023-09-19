@@ -91,7 +91,7 @@ namespace osu.Game.Rulesets.Catch.Edit.Blueprints.Components
         public void UpdateHitObjectFromPath(JuiceStream hitObject)
         {
             // The SV setting may need to be changed for the current path.
-            var svBindable = hitObject.DifficultyControlPoint.SliderVelocityBindable;
+            var svBindable = hitObject.SliderVelocityMultiplierBindable;
             double svToVelocityFactor = hitObject.Velocity / svBindable.Value;
             double requiredVelocity = path.ComputeRequiredVelocity();
 

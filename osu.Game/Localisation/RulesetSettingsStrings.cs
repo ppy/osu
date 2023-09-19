@@ -30,6 +30,11 @@ namespace osu.Game.Localisation
         public static LocalisableString CursorTrail => new TranslatableString(getKey(@"cursor_trail"), @"Cursor trail");
 
         /// <summary>
+        /// "Cursor ripples"
+        /// </summary>
+        public static LocalisableString CursorRipples => new TranslatableString(getKey(@"cursor_ripples"), @"Cursor ripples");
+
+        /// <summary>
         /// "Playfield border style"
         /// </summary>
         public static LocalisableString PlayfieldBorderStyle => new TranslatableString(getKey(@"playfield_border_style"), @"Playfield border style");
@@ -77,7 +82,7 @@ namespace osu.Game.Localisation
         /// <summary>
         /// "{0}ms (speed {1})"
         /// </summary>
-        public static LocalisableString ScrollSpeedTooltip(double arg0, int arg1) => new TranslatableString(getKey(@"ruleset"), @"{0}ms (speed {1})", arg0, arg1);
+        public static LocalisableString ScrollSpeedTooltip(int scrollTime, int scrollSpeed) => new TranslatableString(getKey(@"ruleset"), @"{0}ms (speed {1})", scrollTime, scrollSpeed);
 
         private static string getKey(string key) => $@"{prefix}:{key}";
     }

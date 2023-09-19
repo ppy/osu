@@ -1,30 +1,35 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
 using osu.Game.Beatmaps;
 using osu.Game.Graphics;
 using osu.Game.Online.Rooms;
 using osu.Game.Rulesets;
+using osu.Game.Scoring;
 using osuTK.Graphics;
 
 namespace osu.Game.Users
 {
     public abstract class UserActivity
     {
-        public abstract string Status { get; }
+        public abstract string GetStatus(bool hideIdentifiableInformation = false);
+
         public virtual Color4 GetAppropriateColour(OsuColour colours) => colours.GreenDarker;
 
-        public class Modding : UserActivity
+        public class ModdingBeatmap : EditingBeatmap
         {
-            public override string Status => "Modding a map";
+            public override string GetStatus(bool hideIdentifiableInformation = false) => "Modding a beatmap";
             public override Color4 GetAppropriateColour(OsuColour colours) => colours.PurpleDark;
+
+            public ModdingBeatmap(IBeatmapInfo info)
+                : base(info)
+            {
+            }
         }
 
         public class ChoosingBeatmap : UserActivity
         {
-            public override string Status => "Choosing a beatmap";
+            public override string GetStatus(bool hideIdentifiableInformation = false) => "Choosing a beatmap";
         }
 
         public abstract class InGame : UserActivity
@@ -39,7 +44,7 @@ namespace osu.Game.Users
                 Ruleset = ruleset;
             }
 
-            public override string Status => Ruleset.CreateInstance().PlayingVerb;
+            public override string GetStatus(bool hideIdentifiableInformation = false) => Ruleset.CreateInstance().PlayingVerb;
         }
 
         public class InMultiplayerGame : InGame
@@ -49,7 +54,7 @@ namespace osu.Game.Users
             {
             }
 
-            public override string Status => $@"{base.Status} with others";
+            public override string GetStatus(bool hideIdentifiableInformation = false) => $@"{base.GetStatus(hideIdentifiableInformation)} with others";
         }
 
         public class SpectatingMultiplayerGame : InGame
@@ -59,7 +64,7 @@ namespace osu.Game.Users
             {
             }
 
-            public override string Status => $"Watching others {base.Status.ToLowerInvariant()}";
+            public override string GetStatus(bool hideIdentifiableInformation = false) => $"Watching others {base.GetStatus(hideIdentifiableInformation).ToLowerInvariant()}";
         }
 
         public class InPlaylistGame : InGame
@@ -78,31 +83,62 @@ namespace osu.Game.Users
             }
         }
 
-        public class Editing : UserActivity
+        public class TestingBeatmap : InGame
+        {
+            public override string GetStatus(bool hideIdentifiableInformation = false) => "Testing a beatmap";
+
+            public TestingBeatmap(IBeatmapInfo beatmapInfo, IRulesetInfo ruleset)
+                : base(beatmapInfo, ruleset)
+            {
+            }
+        }
+
+        public class EditingBeatmap : UserActivity
         {
             public IBeatmapInfo BeatmapInfo { get; }
 
-            public Editing(IBeatmapInfo info)
+            public EditingBeatmap(IBeatmapInfo info)
             {
                 BeatmapInfo = info;
             }
 
-            public override string Status => @"Editing a beatmap";
+            public override string GetStatus(bool hideIdentifiableInformation = false) => @"Editing a beatmap";
         }
 
-        public class Spectating : UserActivity
+        public class WatchingReplay : UserActivity
         {
-            public override string Status => @"Spectating a game";
+            private readonly ScoreInfo score;
+
+            protected string Username => score.User.Username;
+
+            public BeatmapInfo? BeatmapInfo => score.BeatmapInfo;
+
+            public WatchingReplay(ScoreInfo score)
+            {
+                this.score = score;
+            }
+
+            public override string GetStatus(bool hideIdentifiableInformation = false) => hideIdentifiableInformation ? @"Watching a replay" : $@"Watching {Username}'s replay";
+        }
+
+        public class SpectatingUser : WatchingReplay
+        {
+            public override string GetStatus(bool hideIdentifiableInformation = false) => hideIdentifiableInformation ? @"Spectating a user" : $@"Spectating {Username}";
+
+            public SpectatingUser(ScoreInfo score)
+                : base(score)
+            {
+            }
         }
 
         public class SearchingForLobby : UserActivity
         {
-            public override string Status => @"Looking for a lobby";
+            public override string GetStatus(bool hideIdentifiableInformation = false) => @"Looking for a lobby";
         }
 
         public class InLobby : UserActivity
         {
-            public override string Status => @"In a lobby";
+            public override string GetStatus(bool hideIdentifiableInformation = false) => @"In a lobby";
 
             public readonly Room Room;
 

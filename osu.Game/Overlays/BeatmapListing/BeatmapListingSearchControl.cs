@@ -107,7 +107,7 @@ namespace osu.Game.Overlays.BeatmapListing
                     Padding = new MarginPadding
                     {
                         Vertical = 20,
-                        Horizontal = 40,
+                        Horizontal = WaveOverlayContainer.HORIZONTAL_PADDING,
                     },
                     Child = new FillFlowContainer
                     {

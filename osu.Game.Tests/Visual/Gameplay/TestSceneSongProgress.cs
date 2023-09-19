@@ -7,12 +7,15 @@ using NUnit.Framework;
 using osu.Framework.Allocation;
 using osu.Framework.Extensions.IEnumerableExtensions;
 using osu.Framework.Graphics;
+using osu.Framework.Graphics.Shapes;
 using osu.Framework.Testing;
+using osu.Framework.Utils;
 using osu.Game.Rulesets.Osu;
 using osu.Game.Rulesets.UI;
 using osu.Game.Screens.Play;
 using osu.Game.Screens.Play.HUD;
 using osu.Game.Skinning;
+using osuTK.Graphics;
 
 namespace osu.Game.Tests.Visual.Gameplay
 {
@@ -20,6 +23,8 @@ namespace osu.Game.Tests.Visual.Gameplay
     public partial class TestSceneSongProgress : SkinnableHUDComponentTestScene
     {
         private GameplayClockContainer gameplayClockContainer = null!;
+
+        private Box background = null!;
 
         private const double skip_target_time = -2000;
 
@@ -30,11 +35,20 @@ namespace osu.Game.Tests.Visual.Gameplay
 
             FrameStabilityContainer frameStabilityContainer;
 
-            Add(gameplayClockContainer = new MasterGameplayClockContainer(Beatmap.Value, skip_target_time)
+            AddRange(new Drawable[]
             {
-                Child = frameStabilityContainer = new FrameStabilityContainer
+                background = new Box
                 {
-                    MaxCatchUpFrames = 1
+                    Colour = Color4.Black,
+                    RelativeSizeAxes = Axes.Both,
+                    Depth = float.MaxValue
+                },
+                gameplayClockContainer = new MasterGameplayClockContainer(Beatmap.Value, skip_target_time)
+                {
+                    Child = frameStabilityContainer = new FrameStabilityContainer
+                    {
+                        MaxCatchUpFrames = 1
+                    }
                 }
             });
 
@@ -71,7 +85,18 @@ namespace osu.Game.Tests.Visual.Gameplay
                 applyToArgonProgress(s => s.ShowGraph.Value = b);
             });
 
+            AddStep("set white background", () => background.FadeColour(Color4.White, 200, Easing.OutQuint));
+            AddStep("randomise background colour", () => background.FadeColour(new Colour4(RNG.NextSingle(), RNG.NextSingle(), RNG.NextSingle(), 1), 200, Easing.OutQuint));
+
             AddStep("stop", gameplayClockContainer.Stop);
+        }
+
+        [Test]
+        public void TestSeekToKnownTime()
+        {
+            AddStep("seek to known time", () => gameplayClockContainer.Seek(60000));
+            AddWaitStep("wait some for seek", 15);
+            AddStep("stop", () => gameplayClockContainer.Stop());
         }
 
         private void applyToArgonProgress(Action<ArgonSongProgress> action) =>
