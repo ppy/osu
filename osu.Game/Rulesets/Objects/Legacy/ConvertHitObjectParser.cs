@@ -190,13 +190,18 @@ namespace osu.Game.Rulesets.Objects.Legacy
             string[] split = str.Split(':');
 
             var bank = (LegacySampleBank)Parsing.ParseInt(split[0]);
+            if (!Enum.IsDefined(bank))
+                bank = LegacySampleBank.Normal;
+
             var addBank = (LegacySampleBank)Parsing.ParseInt(split[1]);
+            if (!Enum.IsDefined(addBank))
+                addBank = LegacySampleBank.Normal;
 
             string stringBank = bank.ToString().ToLowerInvariant();
-            if (stringBank == @"none" || !Enum.IsDefined(bank))
+            if (stringBank == @"none")
                 stringBank = null;
             string stringAddBank = addBank.ToString().ToLowerInvariant();
-            if (stringAddBank == @"none" || !Enum.IsDefined(addBank))
+            if (stringAddBank == @"none")
                 stringAddBank = null;
 
             bankInfo.BankForNormal = stringBank;
