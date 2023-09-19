@@ -1,8 +1,6 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -29,7 +27,9 @@ namespace osu.Game.Rulesets.Osu.Tests
         private const double time_spinner_start = 1500;
         private const double time_spinner_end = 4000;
 
-        private List<JudgementResult> judgementResults;
+        private readonly List<JudgementResult> judgementResults = new List<JudgementResult>();
+
+        private ScoreAccessibleReplayPlayer currentPlayer = null!;
 
         /// <summary>
         /// While off-centre, vibrates backwards and forwards on the x-axis, from centre-50 to centre+50, every 50ms.
@@ -132,8 +132,6 @@ namespace osu.Game.Rulesets.Osu.Tests
             }
         }
 
-        private ScoreAccessibleReplayPlayer currentPlayer;
-
         private void performTest(List<ReplayFrame> frames)
         {
             AddStep("load player", () =>
@@ -167,7 +165,7 @@ namespace osu.Game.Rulesets.Osu.Tests
                 };
 
                 LoadScreen(currentPlayer = p);
-                judgementResults = new List<JudgementResult>();
+                judgementResults.Clear();
             });
 
             AddUntilStep("Beatmap at 0", () => Beatmap.Value.Track.CurrentTime == 0);

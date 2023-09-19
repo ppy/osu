@@ -3,6 +3,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Extensions.ObjectExtensions;
@@ -142,7 +143,7 @@ namespace osu.Game.Rulesets.Osu.Skinning.Default
             currentDelta += rateAdjustedRotation;
             drawableSpinner.Result.RateAdjustedRotation = computeEffectiveRotation();
 
-            Logger.Log(currentDelta.ToString());
+            Logger.Log(currentDelta.ToString(CultureInfo.InvariantCulture));
         }
 
         private float computeEffectiveRotation()
