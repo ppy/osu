@@ -15,8 +15,8 @@ namespace osu.Game.Rulesets.Catch.Skinning.Legacy
         {
             base.LoadComplete();
 
-            Texture? texture = Skin.GetTextureWithMaxSize("fruit-bananas", banana_max_size);
-            Texture? overlayTexture = Skin.GetTextureWithMaxSize("fruit-bananas-overlay", banana_max_size);
+            Texture? texture = Skin.GetTexture("fruit-bananas")?.WithMaximumSize(banana_max_size);
+            Texture? overlayTexture = Skin.GetTexture("fruit-bananas-overlay")?.WithMaximumSize(banana_max_size);
 
             SetTexture(texture, overlayTexture);
         }

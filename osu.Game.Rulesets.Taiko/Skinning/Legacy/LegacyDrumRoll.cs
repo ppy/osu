@@ -48,13 +48,13 @@ namespace osu.Game.Rulesets.Taiko.Skinning.Legacy
                     Anchor = Anchor.CentreRight,
                     Origin = Anchor.CentreLeft,
                     RelativeSizeAxes = Axes.Both,
-                    Texture = skin.GetTexture("taiko-roll-end", new Vector2(128, 256), WrapMode.ClampToEdge, WrapMode.ClampToEdge),
+                    Texture = skin.GetTexture("taiko-roll-end", WrapMode.ClampToEdge, WrapMode.ClampToEdge)?.WithMaximumSize(new Vector2(128, 256)),
                     FillMode = FillMode.Fit,
                 },
                 body = new Sprite
                 {
                     RelativeSizeAxes = Axes.Both,
-                    Texture = skin.GetTexture("taiko-roll-middle", new Vector2(2, 256), WrapMode.ClampToEdge, WrapMode.ClampToEdge),
+                    Texture = skin.GetTexture("taiko-roll-middle", WrapMode.ClampToEdge, WrapMode.ClampToEdge)?.WithMaximumSize(new Vector2(2, 256)),
                 },
                 headCircle = new LegacyCirclePiece
                 {

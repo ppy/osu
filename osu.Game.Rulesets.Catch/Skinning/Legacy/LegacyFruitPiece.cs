@@ -26,19 +26,19 @@ namespace osu.Game.Rulesets.Catch.Skinning.Legacy
             switch (visualRepresentation)
             {
                 case FruitVisualRepresentation.Pear:
-                    SetTexture(Skin.GetTextureWithMaxSize("fruit-pear", fruit_max_size), Skin.GetTextureWithMaxSize("fruit-pear-overlay", fruit_max_size));
+                    SetTexture(Skin.GetTexture("fruit-pear")?.WithMaximumSize(fruit_max_size), Skin.GetTexture("fruit-pear-overlay")?.WithMaximumSize(fruit_max_size));
                     break;
 
                 case FruitVisualRepresentation.Grape:
-                    SetTexture(Skin.GetTextureWithMaxSize("fruit-grapes", fruit_max_size), Skin.GetTextureWithMaxSize("fruit-grapes-overlay", fruit_max_size));
+                    SetTexture(Skin.GetTexture("fruit-grapes")?.WithMaximumSize(fruit_max_size), Skin.GetTexture("fruit-grapes-overlay")?.WithMaximumSize(fruit_max_size));
                     break;
 
                 case FruitVisualRepresentation.Pineapple:
-                    SetTexture(Skin.GetTextureWithMaxSize("fruit-apple", fruit_max_size), Skin.GetTextureWithMaxSize("fruit-apple-overlay", fruit_max_size));
+                    SetTexture(Skin.GetTexture("fruit-apple")?.WithMaximumSize(fruit_max_size), Skin.GetTexture("fruit-apple-overlay")?.WithMaximumSize(fruit_max_size));
                     break;
 
                 case FruitVisualRepresentation.Raspberry:
-                    SetTexture(Skin.GetTextureWithMaxSize("fruit-orange", fruit_max_size), Skin.GetTextureWithMaxSize("fruit-orange-overlay", fruit_max_size));
+                    SetTexture(Skin.GetTexture("fruit-orange")?.WithMaximumSize(fruit_max_size), Skin.GetTexture("fruit-orange-overlay")?.WithMaximumSize(fruit_max_size));
                     break;
             }
         }
