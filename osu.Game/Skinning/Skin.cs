@@ -18,7 +18,6 @@ using osu.Framework.Logging;
 using osu.Game.Audio;
 using osu.Game.Database;
 using osu.Game.IO;
-using osuTK;
 
 namespace osu.Game.Skinning
 {
@@ -45,7 +44,9 @@ namespace osu.Game.Skinning
 
         public abstract ISample? GetSample(ISampleInfo sampleInfo);
 
-        public abstract Texture? GetTexture(string componentName, Vector2? maxSize = null, WrapMode wrapModeS = default, WrapMode wrapModeT = default);
+        public Texture? GetTexture(string componentName) => GetTexture(componentName, default, default);
+
+        public abstract Texture? GetTexture(string componentName, WrapMode wrapModeS, WrapMode wrapModeT);
 
         public abstract IBindable<TValue>? GetConfig<TLookup, TValue>(TLookup lookup)
             where TLookup : notnull

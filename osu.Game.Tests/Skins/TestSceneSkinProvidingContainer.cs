@@ -16,7 +16,6 @@ using osu.Framework.Testing;
 using osu.Game.Audio;
 using osu.Game.Skinning;
 using osu.Game.Tests.Visual;
-using osuTK;
 
 namespace osu.Game.Tests.Skins
 {
@@ -90,7 +89,7 @@ namespace osu.Game.Tests.Skins
 
             public Drawable GetDrawableComponent(ISkinComponentLookup lookup) => throw new System.NotImplementedException();
 
-            public Texture GetTexture(string componentName, Vector2? maxSize = null, WrapMode wrapModeS = default, WrapMode wrapModeT = default)
+            public Texture GetTexture(string componentName, WrapMode wrapModeS, WrapMode wrapModeT)
             {
                 if (componentName == TEXTURE_NAME)
                     return renderer.WhitePixel;

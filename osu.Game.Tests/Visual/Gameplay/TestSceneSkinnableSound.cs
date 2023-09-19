@@ -15,7 +15,6 @@ using osu.Framework.Graphics.Textures;
 using osu.Framework.Testing;
 using osu.Game.Audio;
 using osu.Game.Skinning;
-using osuTK;
 
 namespace osu.Game.Tests.Visual.Gameplay
 {
@@ -164,10 +163,7 @@ namespace osu.Game.Tests.Visual.Gameplay
             IBindable<bool> ISamplePlaybackDisabler.SamplePlaybackDisabled => SamplePlaybackDisabled;
 
             public Drawable? GetDrawableComponent(ISkinComponentLookup lookup) => source.GetDrawableComponent(lookup);
-
-            public Texture? GetTexture(string componentName, Vector2? maxSize = null, WrapMode wrapModeS = default, WrapMode wrapModeT = default) =>
-                source.GetTexture(componentName, maxSize, wrapModeS, wrapModeT);
-
+            public Texture? GetTexture(string componentName, WrapMode wrapModeS, WrapMode wrapModeT) => source.GetTexture(componentName, wrapModeS, wrapModeT);
             public ISample? GetSample(ISampleInfo sampleInfo) => OverridingSample ?? source.GetSample(sampleInfo);
 
             public IBindable<TValue>? GetConfig<TLookup, TValue>(TLookup lookup)

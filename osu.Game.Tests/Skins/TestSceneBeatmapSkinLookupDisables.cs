@@ -18,7 +18,6 @@ using osu.Game.Rulesets.Osu;
 using osu.Game.Skinning;
 using osu.Game.Tests.Beatmaps;
 using osu.Game.Tests.Visual;
-using osuTK;
 
 namespace osu.Game.Tests.Skins
 {
@@ -101,8 +100,7 @@ namespace osu.Game.Tests.Skins
 
             public Drawable GetDrawableComponent(ISkinComponentLookup lookup) => skin.GetDrawableComponent(lookup);
 
-            public Texture GetTexture(string componentName, Vector2? maxSize = null, WrapMode wrapModeS = default, WrapMode wrapModeT = default) =>
-                skin.GetTexture(componentName, maxSize, wrapModeS, wrapModeT);
+            public Texture GetTexture(string componentName, WrapMode wrapModeS, WrapMode wrapModeT) => skin.GetTexture(componentName, wrapModeS, wrapModeT);
 
             public ISample GetSample(ISampleInfo sampleInfo) => skin.GetSample(sampleInfo);
 

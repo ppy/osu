@@ -25,7 +25,6 @@ using osu.Game.Rulesets.Osu.Skinning.Default;
 using osu.Game.Skinning;
 using osu.Game.Storyboards;
 using osu.Game.Tests.Visual;
-using osuTK;
 
 namespace osu.Game.Rulesets.Osu.Tests
 {
@@ -164,7 +163,7 @@ namespace osu.Game.Rulesets.Osu.Tests
                 };
             }
 
-            public Texture GetTexture(string componentName, Vector2? maxSize = null, WrapMode wrapModeS = default, WrapMode wrapModeT = default) => null;
+            public Texture GetTexture(string componentName, WrapMode wrapModeS, WrapMode wrapModeT) => null;
 
             public ISample GetSample(ISampleInfo sampleInfo) => null;
 
