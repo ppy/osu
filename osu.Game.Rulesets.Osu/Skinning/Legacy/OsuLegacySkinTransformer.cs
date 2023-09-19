@@ -42,7 +42,7 @@ namespace osu.Game.Rulesets.Osu.Skinning.Legacy
                         return this.GetAnimation("sliderscorepoint", false, false);
 
                     case OsuSkinComponents.SliderFollowCircle:
-                        var followCircleContent = this.GetAnimation("sliderfollowcircle", true, true, true);
+                        var followCircleContent = this.GetAnimation("sliderfollowcircle", true, true, true, maxSize: new Vector2(308f));
                         if (followCircleContent != null)
                             return new LegacyFollowCircle(followCircleContent);
 
