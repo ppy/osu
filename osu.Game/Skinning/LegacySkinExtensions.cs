@@ -79,9 +79,10 @@ namespace osu.Game.Skinning
             }
 
             // if an animation was not allowed or not found, fall back to a sprite retrieval.
-            var singleTexture = maxSize != null
-                ? retrievalSource.GetTextureWithMaxSize(componentName, maxSize.Value, wrapModeS, wrapModeT)
-                : retrievalSource.GetTexture(componentName, wrapModeS, wrapModeT);
+            var singleTexture = retrievalSource.GetTexture(componentName, wrapModeS, wrapModeT);
+
+            if (singleTexture != null && maxSize != null)
+                singleTexture = singleTexture.WithMaximumSize(maxSize.Value);
 
             return singleTexture != null
                 ? new[] { singleTexture }
@@ -91,12 +92,13 @@ namespace osu.Game.Skinning
             {
                 for (int i = 0; true; i++)
                 {
-                    var texture = maxSize != null
-                        ? skin.GetTextureWithMaxSize(getFrameName(i), maxSize.Value, wrapModeS, wrapModeT)
-                        : skin.GetTexture(getFrameName(i), wrapModeS, wrapModeT);
+                    var texture = skin.GetTexture(getFrameName(i), wrapModeS, wrapModeT);
 
                     if (texture == null)
                         break;
+
+                    if (maxSize != null)
+                        texture = texture.WithMaximumSize(maxSize.Value);
 
                     yield return texture;
                 }
@@ -105,12 +107,8 @@ namespace osu.Game.Skinning
             string getFrameName(int frameIndex) => $"{componentName}{animationSeparator}{frameIndex}";
         }
 
-        public static Texture? GetTextureWithMaxSize(this ISkin source, string componentName, Vector2 maxSize, WrapMode wrapModeS = WrapMode.None, WrapMode wrapModeT = WrapMode.None)
+        public static Texture WithMaximumSize(this Texture texture, Vector2 maxSize)
         {
-            var texture = source.GetTexture(componentName, wrapModeS, wrapModeT);
-            if (texture == null)
-                return texture;
-
             if (texture.DisplayWidth <= maxSize.X && texture.DisplayHeight <= maxSize.Y)
                 return texture;
 
