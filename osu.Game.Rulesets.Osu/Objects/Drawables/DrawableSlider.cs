@@ -228,7 +228,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
             double completionProgress = Math.Clamp((Time.Current - HitObject.StartTime) / HitObject.Duration, 0, 1);
 
             Ball.UpdateProgress(completionProgress);
-            SliderBody?.UpdateProgress(completionProgress);
+            SliderBody?.UpdateProgress(HeadCircle.IsHit ? completionProgress : 0);
 
             foreach (DrawableHitObject hitObject in NestedHitObjects)
             {
@@ -317,7 +317,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
             switch (state)
             {
                 case ArmedState.Hit:
-                    if (SliderBody?.SnakingOut.Value == true)
+                    if (HeadCircle.IsHit && SliderBody?.SnakingOut.Value == true)
                         Body.FadeOut(40); // short fade to allow for any body colour to smoothly disappear.
                     break;
             }
