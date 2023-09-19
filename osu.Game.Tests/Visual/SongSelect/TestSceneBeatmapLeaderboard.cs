@@ -191,7 +191,7 @@ namespace osu.Game.Tests.Visual.SongSelect
         {
             leaderboard.SetScores(leaderboard.Scores, new ScoreInfo
             {
-                Rank = ScoreRank.XH,
+                Grade = Grade.XH,
                 Accuracy = 1,
                 MaxCombo = 244,
                 TotalScore = 1707827,
@@ -211,7 +211,7 @@ namespace osu.Game.Tests.Visual.SongSelect
             leaderboard.SetScores(leaderboard.Scores, new ScoreInfo
             {
                 Position = 999,
-                Rank = ScoreRank.XH,
+                Grade = Grade.XH,
                 Accuracy = 1,
                 MaxCombo = 244,
                 TotalScore = 1707827,
@@ -252,7 +252,7 @@ namespace osu.Game.Tests.Visual.SongSelect
             {
                 new ScoreInfo
                 {
-                    Rank = ScoreRank.XH,
+                    Grade = Grade.XH,
                     Accuracy = 1,
                     MaxCombo = 244,
                     TotalScore = 1707827,
@@ -287,7 +287,7 @@ namespace osu.Game.Tests.Visual.SongSelect
                 },
                 new ScoreInfo
                 {
-                    Rank = ScoreRank.X,
+                    Grade = Grade.X,
                     Accuracy = 1,
                     MaxCombo = 244,
                     TotalScore = 1707827,
@@ -305,7 +305,7 @@ namespace osu.Game.Tests.Visual.SongSelect
                 },
                 new ScoreInfo
                 {
-                    Rank = ScoreRank.SH,
+                    Grade = Grade.SH,
                     Accuracy = 1,
                     MaxCombo = 244,
                     TotalScore = 1707827,
@@ -324,7 +324,7 @@ namespace osu.Game.Tests.Visual.SongSelect
                 },
                 new ScoreInfo
                 {
-                    Rank = ScoreRank.S,
+                    Grade = Grade.S,
                     Accuracy = 1,
                     MaxCombo = 244,
                     TotalScore = 1707827,
@@ -343,7 +343,7 @@ namespace osu.Game.Tests.Visual.SongSelect
                 },
                 new ScoreInfo
                 {
-                    Rank = ScoreRank.A,
+                    Grade = Grade.A,
                     Accuracy = 1,
                     MaxCombo = 244,
                     TotalScore = 1707827,
@@ -362,7 +362,7 @@ namespace osu.Game.Tests.Visual.SongSelect
                 },
                 new ScoreInfo
                 {
-                    Rank = ScoreRank.B,
+                    Grade = Grade.B,
                     Accuracy = 0.9826,
                     MaxCombo = 244,
                     TotalScore = 1707827,
@@ -381,7 +381,7 @@ namespace osu.Game.Tests.Visual.SongSelect
                 },
                 new ScoreInfo
                 {
-                    Rank = ScoreRank.C,
+                    Grade = Grade.C,
                     Accuracy = 0.9654,
                     MaxCombo = 244,
                     TotalScore = 1707827,
@@ -400,7 +400,7 @@ namespace osu.Game.Tests.Visual.SongSelect
                 },
                 new ScoreInfo
                 {
-                    Rank = ScoreRank.D,
+                    Grade = Grade.D,
                     Accuracy = 0.6025,
                     MaxCombo = 244,
                     TotalScore = 1707827,
@@ -419,7 +419,7 @@ namespace osu.Game.Tests.Visual.SongSelect
                 },
                 new ScoreInfo
                 {
-                    Rank = ScoreRank.D,
+                    Grade = Grade.D,
                     Accuracy = 0.5140,
                     MaxCombo = 244,
                     TotalScore = 1707827,
@@ -438,7 +438,7 @@ namespace osu.Game.Tests.Visual.SongSelect
                 },
                 new ScoreInfo
                 {
-                    Rank = ScoreRank.D,
+                    Grade = Grade.D,
                     Accuracy = 0.4222,
                     MaxCombo = 244,
                     TotalScore = 1707827,

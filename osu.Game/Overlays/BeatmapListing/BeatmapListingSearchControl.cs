@@ -45,7 +45,7 @@ namespace osu.Game.Overlays.BeatmapListing
 
         public BindableList<SearchExtra> Extra => extraFilter.Current;
 
-        public BindableList<ScoreRank> Ranks => ranksFilter.Current;
+        public BindableList<Grade> Ranks => ranksFilter.Current;
 
         public Bindable<SearchPlayed> Played => playedFilter.Current;
 

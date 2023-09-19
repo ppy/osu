@@ -70,7 +70,7 @@ namespace osu.Game.Rulesets.Mods
             });
         }
 
-        public ScoreRank AdjustRank(ScoreRank rank, double accuracy) => rank;
+        public Grade AdjustGrade(Grade grade, double accuracy) => grade;
 
         protected override bool FailCondition(HealthProcessor healthProcessor, JudgementResult result) => false;
 

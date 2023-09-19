@@ -18,21 +18,21 @@ namespace osu.Game.Rulesets.Mods
         public void ApplyToScoreProcessor(ScoreProcessor scoreProcessor)
         {
             // Default value of ScoreProcessor's Rank in Hidden Mod should be SS+
-            scoreProcessor.Rank.Value = ScoreRank.XH;
+            scoreProcessor.Rank.Value = Grade.XH;
         }
 
-        public ScoreRank AdjustRank(ScoreRank rank, double accuracy)
+        public Grade AdjustGrade(Grade grade, double accuracy)
         {
-            switch (rank)
+            switch (grade)
             {
-                case ScoreRank.X:
-                    return ScoreRank.XH;
+                case Grade.X:
+                    return Grade.XH;
 
-                case ScoreRank.S:
-                    return ScoreRank.SH;
+                case Grade.S:
+                    return Grade.SH;
 
                 default:
-                    return rank;
+                    return grade;
             }
         }
     }

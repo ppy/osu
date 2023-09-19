@@ -20,7 +20,7 @@ namespace osu.Game.Screens.Select
         [BackgroundDependencyLoader]
         private void load(ScoreManager scoreManager)
         {
-            BodyText = $"{score.User} ({score.DisplayAccuracy}, {score.Rank})";
+            BodyText = $"{score.User} ({score.DisplayAccuracy}, {score.Grade})";
 
             Icon = FontAwesome.Regular.TrashAlt;
             DangerousAction = () => scoreManager.Delete(score);

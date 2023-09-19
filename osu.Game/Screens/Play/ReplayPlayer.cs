@@ -40,7 +40,7 @@ namespace osu.Game.Screens.Play
         public ReplayPlayer(Score score, PlayerConfiguration configuration = null)
             : this((_, _) => score, configuration)
         {
-            replayIsFailedScore = score.ScoreInfo.Rank == ScoreRank.F;
+            replayIsFailedScore = score.ScoreInfo.Grade == Grade.F;
         }
 
         public ReplayPlayer(Func<IBeatmap, IReadOnlyList<Mod>, Score> createScore, PlayerConfiguration configuration = null)

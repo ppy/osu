@@ -156,13 +156,13 @@ namespace osu.Game.Scoring
         }
 
         [Ignored]
-        public ScoreRank Rank
+        public Grade Grade
         {
-            get => (ScoreRank)RankInt;
+            get => (Grade)RankInt;
             set => RankInt = (int)value;
         }
 
-        [MapTo(nameof(Rank))]
+        [MapTo("Rank")]
         public int RankInt { get; set; }
 
         IRulesetInfo IScoreInfo.Ruleset => Ruleset;

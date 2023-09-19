@@ -43,7 +43,7 @@ namespace osu.Game.Rulesets.Mods
         )]
         public abstract BindableInt HiddenComboCount { get; }
 
-        public ScoreRank AdjustRank(ScoreRank rank, double accuracy) => rank;
+        public Grade AdjustGrade(Grade grade, double accuracy) => grade;
 
         public void ApplyToPlayer(Player player)
         {

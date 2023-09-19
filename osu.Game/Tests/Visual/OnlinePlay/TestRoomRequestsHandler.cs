@@ -127,7 +127,7 @@ namespace osu.Game.Tests.Visual.OnlinePlay
                         Accuracy = 1,
                         EndedAt = DateTimeOffset.Now,
                         Passed = true,
-                        Rank = ScoreRank.S,
+                        Grade = Grade.S,
                         MaxCombo = 1000,
                         TotalScore = 1000000,
                         User = localUser,

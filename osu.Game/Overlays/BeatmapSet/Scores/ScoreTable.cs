@@ -141,7 +141,7 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
                     Text = (index + 1).ToLocalisableString(@"\##"),
                     Font = OsuFont.GetFont(size: text_size, weight: FontWeight.Bold)
                 },
-                new UpdateableRank(score.Rank)
+                new UpdateableRank(score.Grade)
                 {
                     Size = new Vector2(28, 14)
                 },

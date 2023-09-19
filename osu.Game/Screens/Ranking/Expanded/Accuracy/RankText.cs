@@ -21,15 +21,15 @@ namespace osu.Game.Screens.Ranking.Expanded.Accuracy
     /// </summary>
     public partial class RankText : CompositeDrawable
     {
-        private readonly ScoreRank rank;
+        private readonly Grade grade;
 
         private BufferedContainer flash;
         private BufferedContainer superFlash;
         private GlowingSpriteText rankText;
 
-        public RankText(ScoreRank rank)
+        public RankText(Grade grade)
         {
-            this.rank = rank;
+            this.grade = grade;
 
             Anchor = Anchor.Centre;
             Origin = Anchor.Centre;
@@ -47,9 +47,9 @@ namespace osu.Game.Screens.Ranking.Expanded.Accuracy
                 {
                     Anchor = Anchor.Centre,
                     Origin = Anchor.Centre,
-                    GlowColour = OsuColour.ForRank(rank),
+                    GlowColour = OsuColour.ForRank(grade),
                     Spacing = new Vector2(-15, 0),
-                    Text = DrawableRank.GetRankName(rank),
+                    Text = DrawableGrade.GetGradeName(grade),
                     Font = OsuFont.Numeric.With(size: 76),
                     UseFullGlyphHeight = false
                 },
@@ -89,7 +89,7 @@ namespace osu.Game.Screens.Ranking.Expanded.Accuracy
                             Anchor = Anchor.Centre,
                             Origin = Anchor.Centre,
                             Spacing = new Vector2(-15, 0),
-                            Text = DrawableRank.GetRankName(rank),
+                            Text = DrawableGrade.GetGradeName(grade),
                             Font = OsuFont.Numeric.With(size: 76),
                             UseFullGlyphHeight = false,
                             Shadow = false
@@ -103,13 +103,13 @@ namespace osu.Game.Screens.Ranking.Expanded.Accuracy
         {
             this.FadeIn();
 
-            if (rank < ScoreRank.A)
+            if (grade < Grade.A)
             {
                 this
                     .MoveToOffset(new Vector2(0, -20))
                     .MoveToOffset(new Vector2(0, 20), 200, Easing.OutBounce);
 
-                if (rank <= ScoreRank.D)
+                if (grade <= Grade.D)
                 {
                     this.Delay(700)
                         .RotateTo(5, 150, Easing.In)
@@ -120,12 +120,12 @@ namespace osu.Game.Screens.Ranking.Expanded.Accuracy
                 return;
             }
 
-            flash.Colour = OsuColour.ForRank(rank);
+            flash.Colour = OsuColour.ForRank(grade);
 
-            if (rank >= ScoreRank.S)
+            if (grade >= Grade.S)
                 rankText.ScaleTo(1.05f).ScaleTo(1, 3000, Easing.OutQuint);
 
-            if (rank >= ScoreRank.X)
+            if (grade >= Grade.X)
             {
                 flash.FadeOutFromOne(3000);
                 superFlash.FadeOutFromOne(800, Easing.OutQuint);

@@ -192,17 +192,17 @@ namespace osu.Game.Scoring.Legacy
                     float ratio50 = (float)count50 / totalHits;
 
                     if (ratio300 == 1)
-                        score.Rank = score.Mods.Any(m => m is ModHidden || m is ModFlashlight) ? ScoreRank.XH : ScoreRank.X;
+                        score.Grade = score.Mods.Any(m => m is ModHidden || m is ModFlashlight) ? Grade.XH : Grade.X;
                     else if (ratio300 > 0.9 && ratio50 <= 0.01 && countMiss == 0)
-                        score.Rank = score.Mods.Any(m => m is ModHidden || m is ModFlashlight) ? ScoreRank.SH : ScoreRank.S;
+                        score.Grade = score.Mods.Any(m => m is ModHidden || m is ModFlashlight) ? Grade.SH : Grade.S;
                     else if ((ratio300 > 0.8 && countMiss == 0) || ratio300 > 0.9)
-                        score.Rank = ScoreRank.A;
+                        score.Grade = Grade.A;
                     else if ((ratio300 > 0.7 && countMiss == 0) || ratio300 > 0.8)
-                        score.Rank = ScoreRank.B;
+                        score.Grade = Grade.B;
                     else if (ratio300 > 0.6)
-                        score.Rank = ScoreRank.C;
+                        score.Grade = Grade.C;
                     else
-                        score.Rank = ScoreRank.D;
+                        score.Grade = Grade.D;
                     break;
                 }
 
@@ -215,17 +215,17 @@ namespace osu.Game.Scoring.Legacy
                     float ratio50 = (float)count50 / totalHits;
 
                     if (ratio300 == 1)
-                        score.Rank = score.Mods.Any(m => m is ModHidden || m is ModFlashlight) ? ScoreRank.XH : ScoreRank.X;
+                        score.Grade = score.Mods.Any(m => m is ModHidden || m is ModFlashlight) ? Grade.XH : Grade.X;
                     else if (ratio300 > 0.9 && ratio50 <= 0.01 && countMiss == 0)
-                        score.Rank = score.Mods.Any(m => m is ModHidden || m is ModFlashlight) ? ScoreRank.SH : ScoreRank.S;
+                        score.Grade = score.Mods.Any(m => m is ModHidden || m is ModFlashlight) ? Grade.SH : Grade.S;
                     else if ((ratio300 > 0.8 && countMiss == 0) || ratio300 > 0.9)
-                        score.Rank = ScoreRank.A;
+                        score.Grade = Grade.A;
                     else if ((ratio300 > 0.7 && countMiss == 0) || ratio300 > 0.8)
-                        score.Rank = ScoreRank.B;
+                        score.Grade = Grade.B;
                     else if (ratio300 > 0.6)
-                        score.Rank = ScoreRank.C;
+                        score.Grade = Grade.C;
                     else
-                        score.Rank = ScoreRank.D;
+                        score.Grade = Grade.D;
                     break;
                 }
 
@@ -235,17 +235,17 @@ namespace osu.Game.Scoring.Legacy
                     score.Accuracy = totalHits > 0 ? (double)(count50 + count100 + count300) / totalHits : 1;
 
                     if (score.Accuracy == 1)
-                        score.Rank = score.Mods.Any(m => m is ModHidden || m is ModFlashlight) ? ScoreRank.XH : ScoreRank.X;
+                        score.Grade = score.Mods.Any(m => m is ModHidden || m is ModFlashlight) ? Grade.XH : Grade.X;
                     else if (score.Accuracy > 0.98)
-                        score.Rank = score.Mods.Any(m => m is ModHidden || m is ModFlashlight) ? ScoreRank.SH : ScoreRank.S;
+                        score.Grade = score.Mods.Any(m => m is ModHidden || m is ModFlashlight) ? Grade.SH : Grade.S;
                     else if (score.Accuracy > 0.94)
-                        score.Rank = ScoreRank.A;
+                        score.Grade = Grade.A;
                     else if (score.Accuracy > 0.9)
-                        score.Rank = ScoreRank.B;
+                        score.Grade = Grade.B;
                     else if (score.Accuracy > 0.85)
-                        score.Rank = ScoreRank.C;
+                        score.Grade = Grade.C;
                     else
-                        score.Rank = ScoreRank.D;
+                        score.Grade = Grade.D;
                     break;
                 }
 
@@ -255,17 +255,17 @@ namespace osu.Game.Scoring.Legacy
                     score.Accuracy = totalHits > 0 ? (double)(count50 * 50 + count100 * 100 + countKatu * 200 + (count300 + countGeki) * 300) / (totalHits * 300) : 1;
 
                     if (score.Accuracy == 1)
-                        score.Rank = score.Mods.Any(m => m is ModHidden || m is ModFlashlight) ? ScoreRank.XH : ScoreRank.X;
+                        score.Grade = score.Mods.Any(m => m is ModHidden || m is ModFlashlight) ? Grade.XH : Grade.X;
                     else if (score.Accuracy > 0.95)
-                        score.Rank = score.Mods.Any(m => m is ModHidden || m is ModFlashlight) ? ScoreRank.SH : ScoreRank.S;
+                        score.Grade = score.Mods.Any(m => m is ModHidden || m is ModFlashlight) ? Grade.SH : Grade.S;
                     else if (score.Accuracy > 0.9)
-                        score.Rank = ScoreRank.A;
+                        score.Grade = Grade.A;
                     else if (score.Accuracy > 0.8)
-                        score.Rank = ScoreRank.B;
+                        score.Grade = Grade.B;
                     else if (score.Accuracy > 0.7)
-                        score.Rank = ScoreRank.C;
+                        score.Grade = Grade.C;
                     else
-                        score.Rank = ScoreRank.D;
+                        score.Grade = Grade.D;
                     break;
                 }
             }

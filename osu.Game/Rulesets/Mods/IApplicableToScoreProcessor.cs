@@ -19,6 +19,6 @@ namespace osu.Game.Rulesets.Mods
         /// <summary>
         /// Called every time a rank calculation is requested. Allows mods to adjust the final rank.
         /// </summary>
-        ScoreRank AdjustRank(ScoreRank rank, double accuracy);
+        Grade AdjustGrade(Grade grade, double accuracy);
     }
 }

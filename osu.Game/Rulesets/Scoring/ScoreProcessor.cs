@@ -78,7 +78,7 @@ namespace osu.Game.Rulesets.Scoring
         /// <summary>
         /// The current rank.
         /// </summary>
-        public readonly Bindable<ScoreRank> Rank = new Bindable<ScoreRank>(ScoreRank.X);
+        public readonly Bindable<Grade> Rank = new Bindable<Grade>(Grade.X);
 
         /// <summary>
         /// The highest combo achieved by this score.
@@ -178,9 +178,9 @@ namespace osu.Game.Rulesets.Scoring
             Combo.ValueChanged += combo => HighestCombo.Value = Math.Max(HighestCombo.Value, combo.NewValue);
             Accuracy.ValueChanged += accuracy =>
             {
-                Rank.Value = RankFromAccuracy(accuracy.NewValue);
+                Rank.Value = GradeFromAccuracy(accuracy.NewValue);
                 foreach (var mod in Mods.Value.OfType<IApplicableToScoreProcessor>())
-                    Rank.Value = mod.AdjustRank(Rank.Value, accuracy.NewValue);
+                    Rank.Value = mod.AdjustGrade(Rank.Value, accuracy.NewValue);
             };
 
             Mods.ValueChanged += mods =>
@@ -361,7 +361,7 @@ namespace osu.Game.Rulesets.Scoring
             Accuracy.Value = 1;
             Combo.Value = 0;
             Rank.Disabled = false;
-            Rank.Value = ScoreRank.X;
+            Rank.Value = Grade.X;
             HighestCombo.Value = 0;
         }
 
@@ -373,7 +373,7 @@ namespace osu.Game.Rulesets.Scoring
             score.Combo = Combo.Value;
             score.MaxCombo = HighestCombo.Value;
             score.Accuracy = Accuracy.Value;
-            score.Rank = Rank.Value;
+            score.Grade = Rank.Value;
             score.HitEvents = hitEvents;
             score.Statistics.Clear();
             score.MaximumStatistics.Clear();
@@ -389,15 +389,15 @@ namespace osu.Game.Rulesets.Scoring
         }
 
         /// <summary>
-        /// Populates a failed score, marking it with the <see cref="ScoreRank.F"/> rank.
+        /// Populates a failed score, marking it with the <see cref="Grade.F"/> rank.
         /// </summary>
         public void FailScore(ScoreInfo score)
         {
-            if (Rank.Value == ScoreRank.F)
+            if (Rank.Value == Grade.F)
                 return;
 
             score.Passed = false;
-            Rank.Value = ScoreRank.F;
+            Rank.Value = Grade.F;
 
             PopulateScore(score);
         }
@@ -444,54 +444,54 @@ namespace osu.Game.Rulesets.Scoring
         #region Static helper methods
 
         /// <summary>
-        /// Given an accuracy (0..1), return the correct <see cref="ScoreRank"/>.
+        /// Given an accuracy (0..1), return the correct <see cref="Grade"/>.
         /// </summary>
-        public static ScoreRank RankFromAccuracy(double accuracy)
+        public static Grade GradeFromAccuracy(double accuracy)
         {
             if (accuracy == accuracy_cutoff_x)
-                return ScoreRank.X;
+                return Grade.X;
             if (accuracy >= accuracy_cutoff_s)
-                return ScoreRank.S;
+                return Grade.S;
             if (accuracy >= accuracy_cutoff_a)
-                return ScoreRank.A;
+                return Grade.A;
             if (accuracy >= accuracy_cutoff_b)
-                return ScoreRank.B;
+                return Grade.B;
             if (accuracy >= accuracy_cutoff_c)
-                return ScoreRank.C;
+                return Grade.C;
 
-            return ScoreRank.D;
+            return Grade.D;
         }
 
         /// <summary>
-        /// Given a <see cref="ScoreRank"/>, return the cutoff accuracy (0..1).
-        /// Accuracy must be greater than or equal to the cutoff to qualify for the provided rank.
+        /// Given a <see cref="Grade"/>, return the cutoff accuracy (0..1).
+        /// Accuracy must be greater than or equal to the cutoff to qualify for the provided grade.
         /// </summary>
-        public static double AccuracyCutoffFromRank(ScoreRank rank)
+        public static double AccuracyCutoffFromRank(Grade grade)
         {
-            switch (rank)
+            switch (grade)
             {
-                case ScoreRank.X:
-                case ScoreRank.XH:
+                case Grade.X:
+                case Grade.XH:
                     return accuracy_cutoff_x;
 
-                case ScoreRank.S:
-                case ScoreRank.SH:
+                case Grade.S:
+                case Grade.SH:
                     return accuracy_cutoff_s;
 
-                case ScoreRank.A:
+                case Grade.A:
                     return accuracy_cutoff_a;
 
-                case ScoreRank.B:
+                case Grade.B:
                     return accuracy_cutoff_b;
 
-                case ScoreRank.C:
+                case Grade.C:
                     return accuracy_cutoff_c;
 
-                case ScoreRank.D:
+                case Grade.D:
                     return accuracy_cutoff_d;
 
                 default:
-                    throw new ArgumentOutOfRangeException(nameof(rank), rank, null);
+                    throw new ArgumentOutOfRangeException(nameof(grade), grade, null);
             }
         }
 

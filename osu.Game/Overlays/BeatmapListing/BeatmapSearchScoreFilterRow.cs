@@ -10,7 +10,7 @@ using osu.Game.Scoring;
 
 namespace osu.Game.Overlays.BeatmapListing
 {
-    public partial class BeatmapSearchScoreFilterRow : BeatmapSearchMultipleSelectionFilterRow<ScoreRank>
+    public partial class BeatmapSearchScoreFilterRow : BeatmapSearchMultipleSelectionFilterRow<Grade>
     {
         public BeatmapSearchScoreFilterRow()
             : base(BeatmapsStrings.ListingSearchFiltersRank)
@@ -21,19 +21,19 @@ namespace osu.Game.Overlays.BeatmapListing
 
         private partial class RankFilter : MultipleSelectionFilter
         {
-            protected override MultipleSelectionFilterTabItem CreateTabItem(ScoreRank value) => new RankItem(value);
+            protected override MultipleSelectionFilterTabItem CreateTabItem(Grade value) => new RankItem(value);
 
-            protected override IEnumerable<ScoreRank> GetValues() => base.GetValues().Where(r => r > ScoreRank.F).Reverse();
+            protected override IEnumerable<Grade> GetValues() => base.GetValues().Where(r => r > Grade.F).Reverse();
         }
 
         private partial class RankItem : MultipleSelectionFilterTabItem
         {
-            public RankItem(ScoreRank value)
+            public RankItem(Grade value)
                 : base(value)
             {
             }
 
-            protected override LocalisableString LabelFor(ScoreRank value) => value.GetLocalisableDescription();
+            protected override LocalisableString LabelFor(Grade value) => value.GetLocalisableDescription();
         }
     }
 }

@@ -73,11 +73,11 @@ namespace osu.Game.Rulesets.Difficulty
 
                 // compute rank achieved
                 // default to SS, then adjust the rank with mods
-                perfectPlay.Rank = ScoreRank.X;
+                perfectPlay.Grade = Grade.X;
 
                 foreach (IApplicableToScoreProcessor mod in perfectPlay.Mods.OfType<IApplicableToScoreProcessor>())
                 {
-                    perfectPlay.Rank = mod.AdjustRank(perfectPlay.Rank, 1);
+                    perfectPlay.Grade = mod.AdjustGrade(perfectPlay.Grade, 1);
                 }
 
                 // calculate performance for this perfect score

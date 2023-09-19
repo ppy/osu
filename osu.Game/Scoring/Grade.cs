@@ -7,7 +7,7 @@ using osu.Game.Resources.Localisation.Web;
 
 namespace osu.Game.Scoring
 {
-    public enum ScoreRank
+    public enum Grade
     {
         // TODO: Localisable?
         [Description(@"F")]

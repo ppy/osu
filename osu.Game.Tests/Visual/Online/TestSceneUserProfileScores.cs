@@ -23,7 +23,7 @@ namespace osu.Game.Tests.Visual.Online
             var firstScore = new SoloScoreInfo
             {
                 PP = 1047.21,
-                Rank = ScoreRank.SH,
+                Grade = Grade.SH,
                 Beatmap = new APIBeatmap
                 {
                     BeatmapSet = new APIBeatmapSet
@@ -46,7 +46,7 @@ namespace osu.Game.Tests.Visual.Online
             var secondScore = new SoloScoreInfo
             {
                 PP = 134.32,
-                Rank = ScoreRank.A,
+                Grade = Grade.A,
                 Beatmap = new APIBeatmap
                 {
                     BeatmapSet = new APIBeatmapSet
@@ -68,7 +68,7 @@ namespace osu.Game.Tests.Visual.Online
             var thirdScore = new SoloScoreInfo
             {
                 PP = 96.83,
-                Rank = ScoreRank.S,
+                Grade = Grade.S,
                 Beatmap = new APIBeatmap
                 {
                     BeatmapSet = new APIBeatmapSet
@@ -84,7 +84,7 @@ namespace osu.Game.Tests.Visual.Online
 
             var noPPScore = new SoloScoreInfo
             {
-                Rank = ScoreRank.B,
+                Grade = Grade.B,
                 Beatmap = new APIBeatmap
                 {
                     BeatmapSet = new APIBeatmapSet
@@ -100,7 +100,7 @@ namespace osu.Game.Tests.Visual.Online
 
             var unprocessedPPScore = new SoloScoreInfo
             {
-                Rank = ScoreRank.B,
+                Grade = Grade.B,
                 Beatmap = new APIBeatmap
                 {
                     BeatmapSet = new APIBeatmapSet

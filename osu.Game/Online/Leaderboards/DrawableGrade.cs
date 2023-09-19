@@ -16,19 +16,19 @@ using osuTK.Graphics;
 
 namespace osu.Game.Online.Leaderboards
 {
-    public partial class DrawableRank : CompositeDrawable
+    public partial class DrawableGrade : CompositeDrawable
     {
-        private readonly ScoreRank rank;
+        private readonly Grade grade;
 
-        public DrawableRank(ScoreRank rank)
+        public DrawableGrade(Grade grade)
         {
-            this.rank = rank;
+            this.grade = grade;
 
             RelativeSizeAxes = Axes.Both;
             FillMode = FillMode.Fit;
             FillAspectRatio = 2;
 
-            var rankColour = OsuColour.ForRank(rank);
+            var rankColour = OsuColour.ForRank(grade);
             InternalChild = new DrawSizePreservingFillContainer
             {
                 TargetDrawSize = new Vector2(64, 32),
@@ -59,7 +59,7 @@ namespace osu.Game.Online.Leaderboards
                             Padding = new MarginPadding { Top = 5 },
                             Colour = getRankNameColour(),
                             Font = OsuFont.Numeric.With(size: 25),
-                            Text = GetRankName(rank),
+                            Text = GetGradeName(grade),
                             ShadowColour = Color4.Black.Opacity(0.3f),
                             ShadowOffset = new Vector2(0, 0.08f),
                             Shadow = true,
@@ -69,30 +69,30 @@ namespace osu.Game.Online.Leaderboards
             };
         }
 
-        public static string GetRankName(ScoreRank rank) => rank.GetDescription().TrimEnd('+');
+        public static string GetGradeName(Grade grade) => grade.GetDescription().TrimEnd('+');
 
         /// <summary>
         ///  Retrieves the grade text colour.
         /// </summary>
         private ColourInfo getRankNameColour()
         {
-            switch (rank)
+            switch (grade)
             {
-                case ScoreRank.XH:
-                case ScoreRank.SH:
+                case Grade.XH:
+                case Grade.SH:
                     return ColourInfo.GradientVertical(Color4.White, Color4Extensions.FromHex("afdff0"));
 
-                case ScoreRank.X:
-                case ScoreRank.S:
+                case Grade.X:
+                case Grade.S:
                     return ColourInfo.GradientVertical(Color4Extensions.FromHex(@"ffe7a8"), Color4Extensions.FromHex(@"ffb800"));
 
-                case ScoreRank.A:
+                case Grade.A:
                     return Color4Extensions.FromHex(@"275227");
 
-                case ScoreRank.B:
+                case Grade.B:
                     return Color4Extensions.FromHex(@"553a2b");
 
-                case ScoreRank.C:
+                case Grade.C:
                     return Color4Extensions.FromHex(@"473625");
 
                 default:

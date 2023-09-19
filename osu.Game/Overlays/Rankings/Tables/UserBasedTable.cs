@@ -79,9 +79,9 @@ namespace osu.Game.Overlays.Rankings.Tables
             new ColouredRowText { Text = item.PlayCount.ToLocalisableString(@"N0") },
         }.Concat(CreateUniqueContent(item)).Concat(new[]
         {
-            new ColouredRowText { Text = (item.GradesCount[ScoreRank.XH] + item.GradesCount[ScoreRank.X]).ToLocalisableString(@"N0"), },
-            new ColouredRowText { Text = (item.GradesCount[ScoreRank.SH] + item.GradesCount[ScoreRank.S]).ToLocalisableString(@"N0"), },
-            new ColouredRowText { Text = item.GradesCount[ScoreRank.A].ToLocalisableString(@"N0"), }
+            new ColouredRowText { Text = (item.GradesCount[Grade.XH] + item.GradesCount[Grade.X]).ToLocalisableString(@"N0"), },
+            new ColouredRowText { Text = (item.GradesCount[Grade.SH] + item.GradesCount[Grade.S]).ToLocalisableString(@"N0"), },
+            new ColouredRowText { Text = item.GradesCount[Grade.A].ToLocalisableString(@"N0"), }
         }).ToArray();
 
         protected abstract RankingsTableColumn[] CreateUniqueHeaders();

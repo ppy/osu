@@ -18,12 +18,12 @@ using osuTK;
 namespace osu.Game.Screens.Ranking.Expanded.Accuracy
 {
     /// <summary>
-    /// Contains a <see cref="DrawableRank"/> that is positioned around the <see cref="AccuracyCircle"/>.
+    /// Contains a <see cref="DrawableGrade"/> that is positioned around the <see cref="AccuracyCircle"/>.
     /// </summary>
-    public partial class RankBadge : CompositeDrawable
+    public partial class GradeBadge : CompositeDrawable
     {
         /// <summary>
-        /// The accuracy value corresponding to the <see cref="ScoreRank"/> displayed by this badge.
+        /// The accuracy value corresponding to the <see cref="Grade"/> displayed by this badge.
         /// </summary>
         public readonly double Accuracy;
 
@@ -32,22 +32,22 @@ namespace osu.Game.Screens.Ranking.Expanded.Accuracy
         /// </summary>
         private readonly double displayPosition;
 
-        private readonly ScoreRank rank;
+        private readonly Grade grade;
 
         private Drawable rankContainer;
         private Drawable overlay;
 
         /// <summary>
-        /// Creates a new <see cref="RankBadge"/>.
+        /// Creates a new <see cref="GradeBadge"/>.
         /// </summary>
-        /// <param name="accuracy">The accuracy value corresponding to <paramref name="rank"/>.</param>
+        /// <param name="accuracy">The accuracy value corresponding to <paramref name="grade"/>.</param>
         /// <param name="position">The position around the <see cref="AccuracyCircle"/> to display this badge.</param>
-        /// <param name="rank">The <see cref="ScoreRank"/> to be displayed in this <see cref="RankBadge"/>.</param>
-        public RankBadge(double accuracy, double position, ScoreRank rank)
+        /// <param name="grade">The <see cref="Grade"/> to be displayed in this <see cref="GradeBadge"/>.</param>
+        public GradeBadge(double accuracy, double position, Grade grade)
         {
             Accuracy = accuracy;
             displayPosition = position;
-            this.rank = rank;
+            this.grade = grade;
 
             RelativeSizeAxes = Axes.Both;
             Alpha = 0;
@@ -62,7 +62,7 @@ namespace osu.Game.Screens.Ranking.Expanded.Accuracy
                 Size = new Vector2(28, 14),
                 Children = new[]
                 {
-                    new DrawableRank(rank),
+                    new DrawableGrade(grade),
                     overlay = new CircularContainer
                     {
                         RelativeSizeAxes = Axes.Both,
@@ -71,7 +71,7 @@ namespace osu.Game.Screens.Ranking.Expanded.Accuracy
                         EdgeEffect = new EdgeEffectParameters
                         {
                             Type = EdgeEffectType.Glow,
-                            Colour = OsuColour.ForRank(rank).Opacity(0.2f),
+                            Colour = OsuColour.ForRank(grade).Opacity(0.2f),
                             Radius = 10,
                         },
                         Child = new Box
@@ -86,7 +86,7 @@ namespace osu.Game.Screens.Ranking.Expanded.Accuracy
         }
 
         /// <summary>
-        /// Shows this <see cref="RankBadge"/>.
+        /// Shows this <see cref="GradeBadge"/>.
         /// </summary>
         public void Appear()
         {

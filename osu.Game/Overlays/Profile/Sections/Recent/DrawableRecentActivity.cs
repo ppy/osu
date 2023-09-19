@@ -96,7 +96,7 @@ namespace osu.Game.Overlays.Profile.Sections.Recent
             switch (activity.Type)
             {
                 case RecentActivityType.Rank:
-                    return new UpdateableRank(activity.ScoreRank)
+                    return new UpdateableRank(activity.Grade)
                     {
                         RelativeSizeAxes = Axes.X,
                         Height = 11,

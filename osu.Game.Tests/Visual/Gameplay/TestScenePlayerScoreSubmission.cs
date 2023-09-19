@@ -312,7 +312,7 @@ namespace osu.Game.Tests.Visual.Gameplay
                                 {
                                     ID = 1234,
                                     User = dummyAPI.LocalUser.Value,
-                                    Rank = requestScore.Rank,
+                                    Grade = requestScore.Grade,
                                     TotalScore = requestScore.TotalScore,
                                     Accuracy = requestScore.Accuracy,
                                     MaxCombo = requestScore.MaxCombo,

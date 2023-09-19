@@ -67,7 +67,7 @@ namespace osu.Game.Overlays.Profile.Sections.Ranks
                                 Spacing = new Vector2(10, 0),
                                 Children = new Drawable[]
                                 {
-                                    new UpdateableRank(Score.Rank)
+                                    new UpdateableRank(Score.Grade)
                                     {
                                         Anchor = Anchor.CentreLeft,
                                         Origin = Anchor.CentreLeft,

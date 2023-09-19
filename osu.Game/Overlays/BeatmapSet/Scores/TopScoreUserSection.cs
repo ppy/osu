@@ -54,7 +54,7 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
                                 Origin = Anchor.Centre,
                                 Font = OsuFont.GetFont(size: 18, weight: FontWeight.Bold)
                             },
-                            rank = new UpdateableRank(ScoreRank.D)
+                            rank = new UpdateableRank(Grade.D)
                             {
                                 Anchor = Anchor.Centre,
                                 Origin = Anchor.Centre,
@@ -145,7 +145,7 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
                 usernameText.Clear();
                 usernameText.AddUserLink(value.User);
 
-                rank.Rank = value.Rank;
+                rank.Rank = value.Grade;
             }
         }
     }

@@ -41,7 +41,7 @@ namespace osu.Game.Tests.Visual.Ranking
         [TestCase(1)]
         public void TestRank(double accuracy)
         {
-            var score = createScore(accuracy, ScoreProcessor.RankFromAccuracy(accuracy));
+            var score = createScore(accuracy, ScoreProcessor.GradeFromAccuracy(accuracy));
 
             addCircleStep(score);
         }
@@ -73,7 +73,7 @@ namespace osu.Game.Tests.Visual.Ranking
             };
         });
 
-        private ScoreInfo createScore(double accuracy, ScoreRank rank) => new ScoreInfo
+        private ScoreInfo createScore(double accuracy, Grade grade) => new ScoreInfo
         {
             User = new APIUser
             {
@@ -86,7 +86,7 @@ namespace osu.Game.Tests.Visual.Ranking
             TotalScore = 2845370,
             Accuracy = accuracy,
             MaxCombo = 999,
-            Rank = rank,
+            Grade = grade,
             Date = DateTimeOffset.Now,
             Statistics =
             {

@@ -17,7 +17,7 @@ namespace osu.Game.Screens.Play.Break
 
         // Currently unused but may be revisited in a future design update (see https://github.com/ppy/osu/discussions/15185)
         // public BreakInfoLine<int> RankDisplay;
-        public BreakInfoLine<ScoreRank> GradeDisplay;
+        public BreakInfoLine<Grade> GradeDisplay;
 
         public BreakInfo()
         {
@@ -46,7 +46,7 @@ namespace osu.Game.Screens.Play.Break
                             AccuracyDisplay = new PercentageBreakInfoLine(BeatmapsetsStrings.ShowScoreboardHeadersAccuracy),
                             // See https://github.com/ppy/osu/discussions/15185
                             // RankDisplay = new BreakInfoLine<int>("Rank"),
-                            GradeDisplay = new BreakInfoLine<ScoreRank>("Grade"),
+                            GradeDisplay = new BreakInfoLine<Grade>("Grade"),
                         },
                     }
                 },

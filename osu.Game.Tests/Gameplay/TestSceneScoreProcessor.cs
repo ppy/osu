@@ -137,7 +137,7 @@ namespace osu.Game.Tests.Gameplay
             var score = new ScoreInfo { Ruleset = new OsuRuleset().RulesetInfo };
             scoreProcessor.FailScore(score);
 
-            Assert.That(score.Rank, Is.EqualTo(ScoreRank.F));
+            Assert.That(score.Grade, Is.EqualTo(Grade.F));
             Assert.That(score.Passed, Is.False);
             Assert.That(score.Statistics.Sum(kvp => kvp.Value), Is.EqualTo(4));
             Assert.That(score.MaximumStatistics.Sum(kvp => kvp.Value), Is.EqualTo(8));

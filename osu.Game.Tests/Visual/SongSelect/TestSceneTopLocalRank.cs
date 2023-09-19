@@ -66,12 +66,12 @@ namespace osu.Game.Tests.Visual.SongSelect
                 testScoreInfo = TestResources.CreateTestScoreInfo(importedBeatmap);
 
                 testScoreInfo.User = API.LocalUser.Value;
-                testScoreInfo.Rank = ScoreRank.B;
+                testScoreInfo.Grade = Grade.B;
 
                 scoreManager.Import(testScoreInfo);
             });
 
-            AddUntilStep("B rank displayed", () => topLocalRank.DisplayedRank == ScoreRank.B);
+            AddUntilStep("B rank displayed", () => topLocalRank.DisplayedRank == Grade.B);
 
             AddStep("Delete score", () => scoreManager.Delete(testScoreInfo));
 
@@ -86,18 +86,18 @@ namespace osu.Game.Tests.Visual.SongSelect
                 var testScoreInfo = TestResources.CreateTestScoreInfo(importedBeatmap);
 
                 testScoreInfo.User = API.LocalUser.Value;
-                testScoreInfo.Rank = ScoreRank.B;
+                testScoreInfo.Grade = Grade.B;
 
                 scoreManager.Import(testScoreInfo);
             });
 
-            AddUntilStep("Wait for initial display", () => topLocalRank.DisplayedRank == ScoreRank.B);
+            AddUntilStep("Wait for initial display", () => topLocalRank.DisplayedRank == Grade.B);
 
             AddStep("Change ruleset", () => Ruleset.Value = rulesets.GetRuleset("fruits"));
             AddUntilStep("No rank displayed", () => topLocalRank.DisplayedRank == null);
 
             AddStep("Change ruleset back", () => Ruleset.Value = rulesets.GetRuleset("osu"));
-            AddUntilStep("B rank displayed", () => topLocalRank.DisplayedRank == ScoreRank.B);
+            AddUntilStep("B rank displayed", () => topLocalRank.DisplayedRank == Grade.B);
         }
 
         [Test]
@@ -108,26 +108,26 @@ namespace osu.Game.Tests.Visual.SongSelect
                 var testScoreInfo = TestResources.CreateTestScoreInfo(importedBeatmap);
 
                 testScoreInfo.User = API.LocalUser.Value;
-                testScoreInfo.Rank = ScoreRank.B;
+                testScoreInfo.Grade = Grade.B;
 
                 scoreManager.Import(testScoreInfo);
             });
 
-            AddUntilStep("B rank displayed", () => topLocalRank.DisplayedRank == ScoreRank.B);
+            AddUntilStep("B rank displayed", () => topLocalRank.DisplayedRank == Grade.B);
 
             AddStep("Add higher score for current user", () =>
             {
                 var testScoreInfo2 = TestResources.CreateTestScoreInfo(importedBeatmap);
 
                 testScoreInfo2.User = API.LocalUser.Value;
-                testScoreInfo2.Rank = ScoreRank.X;
+                testScoreInfo2.Grade = Grade.X;
                 testScoreInfo2.TotalScore = 1000000;
                 testScoreInfo2.Statistics = testScoreInfo2.MaximumStatistics;
 
                 scoreManager.Import(testScoreInfo2);
             });
 
-            AddUntilStep("SS rank displayed", () => topLocalRank.DisplayedRank == ScoreRank.X);
+            AddUntilStep("SS rank displayed", () => topLocalRank.DisplayedRank == Grade.X);
         }
 
         [Test]
@@ -140,26 +140,26 @@ namespace osu.Game.Tests.Visual.SongSelect
                 testScoreInfo = TestResources.CreateTestScoreInfo(importedBeatmap);
 
                 testScoreInfo.User = API.LocalUser.Value;
-                testScoreInfo.Rank = ScoreRank.B;
+                testScoreInfo.Grade = Grade.B;
 
                 scoreManager.Import(testScoreInfo);
             });
 
-            AddUntilStep("B rank displayed", () => topLocalRank.DisplayedRank == ScoreRank.B);
+            AddUntilStep("B rank displayed", () => topLocalRank.DisplayedRank == Grade.B);
 
             AddStep("Add higher-graded score for current user", () =>
             {
                 var testScoreInfo2 = TestResources.CreateTestScoreInfo(importedBeatmap);
 
                 testScoreInfo2.User = API.LocalUser.Value;
-                testScoreInfo2.Rank = ScoreRank.X;
+                testScoreInfo2.Grade = Grade.X;
                 testScoreInfo2.Statistics = testScoreInfo2.MaximumStatistics;
                 testScoreInfo2.TotalScore = testScoreInfo.TotalScore + 1;
 
                 scoreManager.Import(testScoreInfo2);
             });
 
-            AddUntilStep("SS rank displayed", () => topLocalRank.DisplayedRank == ScoreRank.X);
+            AddUntilStep("SS rank displayed", () => topLocalRank.DisplayedRank == Grade.X);
         }
     }
 }

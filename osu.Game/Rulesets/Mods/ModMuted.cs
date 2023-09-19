@@ -92,7 +92,7 @@ namespace osu.Game.Rulesets.Mods
             }, true);
         }
 
-        public ScoreRank AdjustRank(ScoreRank rank, double accuracy) => rank;
+        public Grade AdjustGrade(Grade grade, double accuracy) => grade;
     }
 
     public partial class MuteComboSlider : RoundedSliderBar<int>

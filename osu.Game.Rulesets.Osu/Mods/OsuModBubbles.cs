@@ -50,7 +50,7 @@ namespace osu.Game.Rulesets.Osu.Mods
         private float bubbleSize;
         private double bubbleFade;
 
-        public ScoreRank AdjustRank(ScoreRank rank, double accuracy) => rank;
+        public Grade AdjustGrade(Grade grade, double accuracy) => grade;
 
         public void ApplyToScoreProcessor(ScoreProcessor scoreProcessor)
         {

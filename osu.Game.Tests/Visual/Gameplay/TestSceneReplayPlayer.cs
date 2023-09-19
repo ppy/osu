@@ -52,10 +52,10 @@ namespace osu.Game.Tests.Visual.Gameplay
             loadPlayerWithBeatmap();
 
             AddUntilStep("wait for first hit", () => Player.ScoreProcessor.TotalScore.Value > 0);
-            AddAssert("ensure rank is not fail", () => Player.ScoreProcessor.Rank.Value, () => Is.Not.EqualTo(ScoreRank.F));
+            AddAssert("ensure rank is not fail", () => Player.ScoreProcessor.Rank.Value, () => Is.Not.EqualTo(Grade.F));
             AddStep("exit player", () => Player.Exit());
             AddUntilStep("wait for exit", () => Player.Parent == null);
-            AddAssert("ensure rank is not fail", () => Player.ScoreProcessor.Rank.Value, () => Is.Not.EqualTo(ScoreRank.F));
+            AddAssert("ensure rank is not fail", () => Player.ScoreProcessor.Rank.Value, () => Is.Not.EqualTo(Grade.F));
         }
 
         [Test]

@@ -40,27 +40,27 @@ namespace osu.Game.Graphics
         }, (float)Math.Round(starDifficulty, 2, MidpointRounding.AwayFromZero));
 
         /// <summary>
-        /// Retrieves the colour for a <see cref="ScoreRank"/>.
+        /// Retrieves the colour for a <see cref="Grade"/>.
         /// </summary>
-        public static Color4 ForRank(ScoreRank rank)
+        public static Color4 ForRank(Grade grade)
         {
-            switch (rank)
+            switch (grade)
             {
-                case ScoreRank.XH:
-                case ScoreRank.X:
+                case Grade.XH:
+                case Grade.X:
                     return Color4Extensions.FromHex(@"de31ae");
 
-                case ScoreRank.SH:
-                case ScoreRank.S:
+                case Grade.SH:
+                case Grade.S:
                     return Color4Extensions.FromHex(@"02b5c3");
 
-                case ScoreRank.A:
+                case Grade.A:
                     return Color4Extensions.FromHex(@"88da20");
 
-                case ScoreRank.B:
+                case Grade.B:
                     return Color4Extensions.FromHex(@"e3b130");
 
-                case ScoreRank.C:
+                case Grade.C:
                     return Color4Extensions.FromHex(@"ff8e5d");
 
                 default:

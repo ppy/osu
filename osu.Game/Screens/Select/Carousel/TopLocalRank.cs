@@ -36,7 +36,7 @@ namespace osu.Game.Screens.Select.Carousel
 
         private readonly UpdateableRank updateable;
 
-        public ScoreRank? DisplayedRank => updateable.Rank;
+        public Grade? DisplayedRank => updateable.Rank;
 
         public TopLocalRank(BeatmapInfo beatmapInfo)
         {
@@ -76,7 +76,7 @@ namespace osu.Game.Screens.Select.Carousel
                     return;
 
                 ScoreInfo? topScore = sender.MaxBy(info => (info.TotalScore, -info.Date.UtcDateTime.Ticks));
-                updateable.Rank = topScore?.Rank;
+                updateable.Rank = topScore?.Grade;
                 updateable.Alpha = topScore != null ? 1 : 0;
             }
         }

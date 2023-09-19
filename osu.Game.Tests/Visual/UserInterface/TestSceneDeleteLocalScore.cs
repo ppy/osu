@@ -98,7 +98,7 @@ namespace osu.Game.Tests.Visual.UserInterface
                         Accuracy = RNG.NextDouble(),
                         TotalScore = RNG.Next(1, 1000000),
                         MaxCombo = RNG.Next(1, 1000),
-                        Rank = ScoreRank.XH,
+                        Grade = Grade.XH,
                         User = new APIUser { Username = "TestUser" },
                         Ruleset = new OsuRuleset().RulesetInfo,
                         Files = { new RealmNamedFileUsage(new RealmFile { Hash = $"{i}" }, string.Empty) }

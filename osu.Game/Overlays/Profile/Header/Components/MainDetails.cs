@@ -19,7 +19,7 @@ namespace osu.Game.Overlays.Profile.Header.Components
 {
     public partial class MainDetails : CompositeDrawable
     {
-        private readonly Dictionary<ScoreRank, ScoreRankInfo> scoreRankInfos = new Dictionary<ScoreRank, ScoreRankInfo>();
+        private readonly Dictionary<Grade, ScoreRankInfo> scoreRankInfos = new Dictionary<Grade, ScoreRankInfo>();
         private ProfileValueDisplay medalInfo = null!;
         private ProfileValueDisplay ppInfo = null!;
         private ProfileValueDisplay detailGlobalRank = null!;
@@ -112,11 +112,11 @@ namespace osu.Game.Overlays.Profile.Header.Components
                                 Spacing = new Vector2(5),
                                 Children = new[]
                                 {
-                                    scoreRankInfos[ScoreRank.XH] = new ScoreRankInfo(ScoreRank.XH),
-                                    scoreRankInfos[ScoreRank.X] = new ScoreRankInfo(ScoreRank.X),
-                                    scoreRankInfos[ScoreRank.SH] = new ScoreRankInfo(ScoreRank.SH),
-                                    scoreRankInfos[ScoreRank.S] = new ScoreRankInfo(ScoreRank.S),
-                                    scoreRankInfos[ScoreRank.A] = new ScoreRankInfo(ScoreRank.A),
+                                    scoreRankInfos[Grade.XH] = new ScoreRankInfo(Grade.XH),
+                                    scoreRankInfos[Grade.X] = new ScoreRankInfo(Grade.X),
+                                    scoreRankInfos[Grade.SH] = new ScoreRankInfo(Grade.SH),
+                                    scoreRankInfos[Grade.S] = new ScoreRankInfo(Grade.S),
+                                    scoreRankInfos[Grade.A] = new ScoreRankInfo(Grade.A),
                                 }
                             }
                         }
@@ -157,7 +157,7 @@ namespace osu.Game.Overlays.Profile.Header.Components
                 set => rankCount.Text = value.ToLocalisableString("#,##0");
             }
 
-            public ScoreRankInfo(ScoreRank rank)
+            public ScoreRankInfo(Grade grade)
             {
                 AutoSizeAxes = Axes.Both;
                 InternalChild = new FillFlowContainer
@@ -167,7 +167,7 @@ namespace osu.Game.Overlays.Profile.Header.Components
                     Direction = FillDirection.Vertical,
                     Children = new Drawable[]
                     {
-                        new DrawableRank(rank)
+                        new DrawableGrade(grade)
                         {
                             RelativeSizeAxes = Axes.X,
                             Height = 22,

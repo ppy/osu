@@ -29,7 +29,7 @@ namespace osu.Game.Online.Rooms
 
         [JsonProperty("rank")]
         [JsonConverter(typeof(StringEnumConverter))]
-        public ScoreRank Rank { get; set; }
+        public Grade Grade { get; set; }
 
         [JsonProperty("total_score")]
         public long TotalScore { get; set; }
@@ -85,7 +85,7 @@ namespace osu.Game.Online.Rooms
                 Accuracy = Accuracy,
                 Date = EndedAt,
                 Hash = string.Empty, // todo: temporary?
-                Rank = Rank,
+                Grade = Grade,
                 Mods = Mods?.Select(m => m.ToMod(rulesetInstance)).ToArray() ?? Array.Empty<Mod>(),
                 Position = Position,
             };

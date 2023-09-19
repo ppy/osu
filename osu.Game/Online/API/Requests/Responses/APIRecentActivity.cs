@@ -29,10 +29,10 @@ namespace osu.Game.Online.API.Requests.Responses
         [JsonProperty]
         private string scoreRank
         {
-            set => ScoreRank = Enum.Parse<ScoreRank>(value);
+            set => Grade = Enum.Parse<Grade>(value);
         }
 
-        public ScoreRank ScoreRank;
+        public Grade Grade;
 
         [JsonProperty("rank")]
         public int Rank;

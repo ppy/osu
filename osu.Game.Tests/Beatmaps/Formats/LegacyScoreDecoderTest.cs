@@ -63,7 +63,7 @@ namespace osu.Game.Tests.Beatmaps.Formats
                 Assert.IsTrue(score.ScoreInfo.ModsJson.Contains("CL"));
 
                 Assert.IsTrue(Precision.AlmostEquals(0.8889, score.ScoreInfo.Accuracy, 0.0001));
-                Assert.AreEqual(ScoreRank.B, score.ScoreInfo.Rank);
+                Assert.AreEqual(Grade.B, score.ScoreInfo.Grade);
 
                 Assert.That(score.Replay.Frames, Is.Not.Empty);
             }

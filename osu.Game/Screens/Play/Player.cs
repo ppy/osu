@@ -783,7 +783,7 @@ namespace osu.Game.Screens.Play
                     // This player instance may already be in the process of exiting.
                     return;
 
-                Debug.Assert(ScoreProcessor.Rank.Value != ScoreRank.F);
+                Debug.Assert(ScoreProcessor.Rank.Value != Grade.F);
 
                 this.Push(CreateResults(prepareScoreForDisplayTask.GetResultSafely()));
             }, Time.Current + delay, 50);

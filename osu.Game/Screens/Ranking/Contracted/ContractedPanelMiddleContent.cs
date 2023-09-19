@@ -176,7 +176,7 @@ namespace osu.Game.Screens.Ranking.Contracted
                                         {
                                             RelativeSizeAxes = Axes.Both,
                                             Padding = new MarginPadding { Top = 2 },
-                                            Child = new DrawableRank(score.Rank)
+                                            Child = new DrawableGrade(score.Grade)
                                             {
                                                 Anchor = Anchor.Centre,
                                                 Origin = Anchor.Centre,

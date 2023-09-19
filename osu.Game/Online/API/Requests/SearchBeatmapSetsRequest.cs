@@ -38,7 +38,7 @@ namespace osu.Game.Online.API.Requests
         public SearchExplicit ExplicitContent { get; }
 
         [CanBeNull]
-        public IReadOnlyCollection<ScoreRank> Ranks { get; }
+        public IReadOnlyCollection<Grade> Ranks { get; }
 
         private readonly string query;
         private readonly RulesetInfo ruleset;
@@ -57,7 +57,7 @@ namespace osu.Game.Online.API.Requests
             SearchGenre genre = SearchGenre.Any,
             SearchLanguage language = SearchLanguage.Any,
             IReadOnlyCollection<SearchExtra> extra = null,
-            IReadOnlyCollection<ScoreRank> ranks = null,
+            IReadOnlyCollection<Grade> ranks = null,
             SearchPlayed played = SearchPlayed.Any,
             SearchExplicit explicitContent = SearchExplicit.Hide)
         {

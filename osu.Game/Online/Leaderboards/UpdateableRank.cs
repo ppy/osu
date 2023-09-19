@@ -9,24 +9,24 @@ using osu.Game.Scoring;
 
 namespace osu.Game.Online.Leaderboards
 {
-    public partial class UpdateableRank : ModelBackedDrawable<ScoreRank?>
+    public partial class UpdateableRank : ModelBackedDrawable<Grade?>
     {
-        public ScoreRank? Rank
+        public Grade? Rank
         {
             get => Model;
             set => Model = value;
         }
 
-        public UpdateableRank(ScoreRank? rank = null)
+        public UpdateableRank(Grade? rank = null)
         {
             Rank = rank;
         }
 
-        protected override Drawable CreateDrawable(ScoreRank? rank)
+        protected override Drawable CreateDrawable(Grade? rank)
         {
             if (rank.HasValue)
             {
-                return new DrawableRank(rank.Value)
+                return new DrawableGrade(rank.Value)
                 {
                     Anchor = Anchor.Centre,
                     Origin = Anchor.Centre,

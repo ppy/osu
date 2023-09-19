@@ -501,7 +501,7 @@ namespace osu.Game.Tests.Visual.Gameplay
                 Applied = true;
             }
 
-            public ScoreRank AdjustRank(ScoreRank rank, double accuracy) => rank;
+            public Grade AdjustGrade(Grade grade, double accuracy) => grade;
         }
 
         protected partial class SlowLoadPlayer : TestPlayer

@@ -32,7 +32,7 @@ namespace osu.Game.Scoring
 
         IRulesetInfo Ruleset { get; }
 
-        ScoreRank Rank { get; }
+        Grade Grade { get; }
 
         // Mods is currently missing from this interface as the `IMod` class has properties which can't be fulfilled by `APIMod`,
         // but also doesn't expose `Settings`. We can consider how to implement this in the future if required.

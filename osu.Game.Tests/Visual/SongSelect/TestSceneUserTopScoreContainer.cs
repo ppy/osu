@@ -57,7 +57,7 @@ namespace osu.Game.Tests.Visual.SongSelect
                 new ScoreInfo
                 {
                     Position = 999,
-                    Rank = ScoreRank.XH,
+                    Grade = Grade.XH,
                     Accuracy = 1,
                     MaxCombo = 244,
                     TotalScore = 1707827,
@@ -73,7 +73,7 @@ namespace osu.Game.Tests.Visual.SongSelect
                 new ScoreInfo
                 {
                     Position = 110000,
-                    Rank = ScoreRank.X,
+                    Grade = Grade.X,
                     Accuracy = 1,
                     MaxCombo = 244,
                     TotalScore = 1707827,
@@ -88,7 +88,7 @@ namespace osu.Game.Tests.Visual.SongSelect
                 new ScoreInfo
                 {
                     Position = 22333,
-                    Rank = ScoreRank.S,
+                    Grade = Grade.S,
                     Accuracy = 1,
                     MaxCombo = 244,
                     TotalScore = 1707827,

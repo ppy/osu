@@ -71,15 +71,15 @@ namespace osu.Game.Tests.Visual.Ranking
 
         private int onlineScoreID = 1;
 
-        [TestCase(1, ScoreRank.X)]
-        [TestCase(0.9999, ScoreRank.S)]
-        [TestCase(0.975, ScoreRank.S)]
-        [TestCase(0.925, ScoreRank.A)]
-        [TestCase(0.85, ScoreRank.B)]
-        [TestCase(0.75, ScoreRank.C)]
-        [TestCase(0.5, ScoreRank.D)]
-        [TestCase(0.2, ScoreRank.D)]
-        public void TestResultsWithPlayer(double accuracy, ScoreRank rank)
+        [TestCase(1, Grade.X)]
+        [TestCase(0.9999, Grade.S)]
+        [TestCase(0.975, Grade.S)]
+        [TestCase(0.925, Grade.A)]
+        [TestCase(0.85, Grade.B)]
+        [TestCase(0.75, Grade.C)]
+        [TestCase(0.5, Grade.D)]
+        [TestCase(0.2, Grade.D)]
+        public void TestResultsWithPlayer(double accuracy, Grade grade)
         {
             TestResultsScreen screen = null;
 
@@ -90,7 +90,7 @@ namespace osu.Game.Tests.Visual.Ranking
                 score.OnlineID = onlineScoreID++;
                 score.HitEvents = TestSceneStatisticsPanel.CreatePositionDistributedHitEvents();
                 score.Accuracy = accuracy;
-                score.Rank = rank;
+                score.Grade = grade;
 
                 return screen = createResultsScreen(score);
             });

@@ -21,7 +21,7 @@ namespace osu.Game.Tests.Visual.Ranking
         {
             var score = TestResources.CreateTestScoreInfo();
             score.Accuracy = 0.5;
-            score.Rank = ScoreRank.D;
+            score.Grade = Grade.D;
 
             addPanelStep(score);
         }
@@ -31,7 +31,7 @@ namespace osu.Game.Tests.Visual.Ranking
         {
             var score = TestResources.CreateTestScoreInfo();
             score.Accuracy = 0.75;
-            score.Rank = ScoreRank.C;
+            score.Grade = Grade.C;
 
             addPanelStep(score);
         }
@@ -41,7 +41,7 @@ namespace osu.Game.Tests.Visual.Ranking
         {
             var score = TestResources.CreateTestScoreInfo();
             score.Accuracy = 0.85;
-            score.Rank = ScoreRank.B;
+            score.Grade = Grade.B;
 
             addPanelStep(score);
         }
@@ -51,7 +51,7 @@ namespace osu.Game.Tests.Visual.Ranking
         {
             var score = TestResources.CreateTestScoreInfo();
             score.Accuracy = 0.925;
-            score.Rank = ScoreRank.A;
+            score.Grade = Grade.A;
 
             addPanelStep(score);
         }
@@ -61,7 +61,7 @@ namespace osu.Game.Tests.Visual.Ranking
         {
             var score = TestResources.CreateTestScoreInfo();
             score.Accuracy = 0.975;
-            score.Rank = ScoreRank.S;
+            score.Grade = Grade.S;
 
             addPanelStep(score);
         }
@@ -71,7 +71,7 @@ namespace osu.Game.Tests.Visual.Ranking
         {
             var score = TestResources.CreateTestScoreInfo();
             score.Accuracy = 0.9999;
-            score.Rank = ScoreRank.S;
+            score.Grade = Grade.S;
 
             addPanelStep(score);
         }
@@ -81,7 +81,7 @@ namespace osu.Game.Tests.Visual.Ranking
         {
             var score = TestResources.CreateTestScoreInfo();
             score.Accuracy = 1;
-            score.Rank = ScoreRank.X;
+            score.Grade = Grade.X;
 
             addPanelStep(score);
         }
@@ -101,7 +101,7 @@ namespace osu.Game.Tests.Visual.Ranking
         {
             var score = TestResources.CreateTestScoreInfo();
             score.Accuracy = 0.925;
-            score.Rank = ScoreRank.A;
+            score.Grade = Grade.A;
 
             addPanelStep(score, PanelState.Contracted);
         }
@@ -111,7 +111,7 @@ namespace osu.Game.Tests.Visual.Ranking
         {
             var score = TestResources.CreateTestScoreInfo();
             score.Accuracy = 0.925;
-            score.Rank = ScoreRank.A;
+            score.Grade = Grade.A;
 
             addPanelStep(score, PanelState.Contracted);
             AddWaitStep("wait for transition", 10);

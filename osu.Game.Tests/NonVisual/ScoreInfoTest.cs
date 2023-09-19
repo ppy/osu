@@ -20,19 +20,19 @@ namespace osu.Game.Tests.NonVisual
             var score = new ScoreInfo();
 
             score.Statistics.Add(HitResult.Good, 10);
-            score.Rank = ScoreRank.B;
+            score.Grade = Grade.B;
 
             var scoreCopy = score.DeepClone();
 
             score.Statistics[HitResult.Good]++;
-            score.Rank = ScoreRank.X;
+            score.Grade = Grade.X;
             score.RealmUser.Username = "test";
 
             Assert.That(scoreCopy.Statistics[HitResult.Good], Is.EqualTo(10));
             Assert.That(score.Statistics[HitResult.Good], Is.EqualTo(11));
 
-            Assert.That(scoreCopy.Rank, Is.EqualTo(ScoreRank.B));
-            Assert.That(score.Rank, Is.EqualTo(ScoreRank.X));
+            Assert.That(scoreCopy.Grade, Is.EqualTo(Grade.B));
+            Assert.That(score.Grade, Is.EqualTo(Grade.X));
 
             Assert.That(scoreCopy.RealmUser.Username, Is.Empty);
             Assert.That(score.RealmUser.Username, Is.EqualTo("test"));

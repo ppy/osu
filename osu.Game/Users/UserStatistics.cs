@@ -91,29 +91,29 @@ namespace osu.Game.Users
             [JsonProperty(@"a")]
             public int A;
 
-            public int this[ScoreRank rank]
+            public int this[Grade grade]
             {
                 get
                 {
-                    switch (rank)
+                    switch (grade)
                     {
-                        case ScoreRank.XH:
+                        case Grade.XH:
                             return SSPlus ?? 0;
 
-                        case ScoreRank.X:
+                        case Grade.X:
                             return SS;
 
-                        case ScoreRank.SH:
+                        case Grade.SH:
                             return SPlus ?? 0;
 
-                        case ScoreRank.S:
+                        case Grade.S:
                             return S;
 
-                        case ScoreRank.A:
+                        case Grade.A:
                             return A;
 
                         default:
-                            throw new ArgumentException($"API does not return {rank.ToString()}");
+                            throw new ArgumentException($"API does not return {grade.ToString()}");
                     }
                 }
             }

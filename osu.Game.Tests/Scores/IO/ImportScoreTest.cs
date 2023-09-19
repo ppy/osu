@@ -38,7 +38,7 @@ namespace osu.Game.Tests.Scores.IO
 
                     var toImport = new ScoreInfo
                     {
-                        Rank = ScoreRank.B,
+                        Grade = Grade.B,
                         TotalScore = 987654,
                         Accuracy = 0.8,
                         MaxCombo = 500,
@@ -52,7 +52,7 @@ namespace osu.Game.Tests.Scores.IO
 
                     var imported = LoadScoreIntoOsu(osu, toImport);
 
-                    Assert.AreEqual(toImport.Rank, imported.Rank);
+                    Assert.AreEqual(toImport.Grade, imported.Grade);
                     Assert.AreEqual(toImport.TotalScore, imported.TotalScore);
                     Assert.AreEqual(toImport.Accuracy, imported.Accuracy);
                     Assert.AreEqual(toImport.MaxCombo, imported.MaxCombo);

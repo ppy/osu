@@ -46,7 +46,7 @@ namespace osu.Game.Online.API.Requests.Responses
         [JsonConverter(typeof(StringEnumConverter))]
         // ScoreRank is aligned to make 0 equal D. We still want to serialise this (even when DefaultValueHandling.Ignore is used).
         [JsonProperty("rank", DefaultValueHandling = DefaultValueHandling.Include)]
-        public ScoreRank Rank { get; set; }
+        public Grade Grade { get; set; }
 
         [JsonProperty("started_at")]
         public DateTimeOffset? StartedAt { get; set; }
@@ -185,7 +185,7 @@ namespace osu.Game.Online.API.Requests.Responses
                 TotalScore = TotalScore,
                 Accuracy = Accuracy,
                 MaxCombo = MaxCombo,
-                Rank = Rank,
+                Grade = Grade,
                 Statistics = Statistics,
                 MaximumStatistics = MaximumStatistics,
                 Date = EndedAt,
@@ -212,7 +212,7 @@ namespace osu.Game.Online.API.Requests.Responses
         /// <param name="score">The local score.</param>
         public static SoloScoreInfo ForSubmission(ScoreInfo score) => new SoloScoreInfo
         {
-            Rank = score.Rank,
+            Grade = score.Grade,
             TotalScore = score.TotalScore,
             Accuracy = score.Accuracy,
             PP = score.PP,
