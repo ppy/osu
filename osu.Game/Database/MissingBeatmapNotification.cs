@@ -83,6 +83,7 @@ namespace osu.Game.Database
             card.Width = Content.DrawWidth;
         }
 
+        // Disable hover so we don't have silly colour conflicts with the nested beatmap card.
         protected override bool OnHover(HoverEvent e) => false;
         protected override void OnHoverLost(HoverLostEvent e) { }
 
