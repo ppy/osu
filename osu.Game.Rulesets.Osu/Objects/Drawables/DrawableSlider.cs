@@ -317,7 +317,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
             switch (state)
             {
                 case ArmedState.Hit:
-                    if (SliderBody?.SnakingOut.Value == true)
+                    if (HeadCircle.IsHit && SliderBody?.SnakingOut.Value == true)
                         Body.FadeOut(40); // short fade to allow for any body colour to smoothly disappear.
                     break;
             }
