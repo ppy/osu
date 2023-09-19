@@ -4,7 +4,6 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using osu.Framework.Graphics.Textures;
 using osu.Game.Beatmaps;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Storyboards.Drawables;
@@ -51,7 +50,7 @@ namespace osu.Game.Storyboards
 
         public Storyboard()
         {
-            layers.Add("Video", new StoryboardVideoLayer("Video", 4, false));
+            layers.Add("Video", new StoryboardLayer("Video", 4, false));
             layers.Add("Background", new StoryboardLayer("Background", 3));
             layers.Add("Fail", new StoryboardLayer("Fail", 2) { VisibleWhenPassing = false, });
             layers.Add("Pass", new StoryboardLayer("Pass", 1) { VisibleWhenFailing = false, });
@@ -92,7 +91,7 @@ namespace osu.Game.Storyboards
 
         private static readonly string[] image_extensions = { @".png", @".jpg" };
 
-        public Texture? GetTextureFromPath(string path, TextureStore textureStore)
+        public virtual string? GetStoragePathFromStoryboardPath(string path)
         {
             string? resolvedPath = null;
 
@@ -102,10 +101,7 @@ namespace osu.Game.Storyboards
             }
             else
             {
-                // Just doing this extension logic locally here for simplicity.
-                //
-                // A more "sane" path may be to use the ISkinSource.GetTexture path (which will use the extensions of the underlying TextureStore),
-                // but comes with potential complexity (what happens if the user has beatmap skins disabled?).
+                // Some old storyboards don't include a file extension, so let's best guess at one.
                 foreach (string ext in image_extensions)
                 {
                     if ((resolvedPath = BeatmapInfo.BeatmapSet?.GetPathForFile($"{path}{ext}")) != null)
@@ -113,10 +109,7 @@ namespace osu.Game.Storyboards
                 }
             }
 
-            if (!string.IsNullOrEmpty(resolvedPath))
-                return textureStore.Get(resolvedPath);
-
-            return null;
+            return resolvedPath;
         }
     }
 }

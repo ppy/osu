@@ -20,63 +20,6 @@ namespace osu.Game.Storyboards.Drawables
     {
         public StoryboardAnimation Animation { get; }
 
-        private bool flipH;
-
-        public bool FlipH
-        {
-            get => flipH;
-            set
-            {
-                if (flipH == value)
-                    return;
-
-                flipH = value;
-                Invalidate(Invalidation.MiscGeometry);
-            }
-        }
-
-        private bool flipV;
-
-        public bool FlipV
-        {
-            get => flipV;
-            set
-            {
-                if (flipV == value)
-                    return;
-
-                flipV = value;
-                Invalidate(Invalidation.MiscGeometry);
-            }
-        }
-
-        private Vector2 vectorScale = Vector2.One;
-
-        public Vector2 VectorScale
-        {
-            get => vectorScale;
-            set
-            {
-                if (vectorScale == value)
-                    return;
-
-                if (!Validation.IsFinite(value)) throw new ArgumentException($@"{nameof(VectorScale)} must be finite, but is {value}.");
-
-                vectorScale = value;
-                Invalidate(Invalidation.MiscGeometry);
-            }
-        }
-
-        public override bool RemoveWhenNotAlive => false;
-
-        protected override Vector2 DrawScale
-            => new Vector2(FlipH ? -base.DrawScale.X : base.DrawScale.X, FlipV ? -base.DrawScale.Y : base.DrawScale.Y) * VectorScale;
-
-        public override Anchor Origin => StoryboardExtensions.AdjustOrigin(base.Origin, VectorScale, FlipH, FlipV);
-
-        public override bool IsPresent
-            => !float.IsNaN(DrawPosition.X) && !float.IsNaN(DrawPosition.Y) && base.IsPresent;
-
         public DrawableStoryboardAnimation(StoryboardAnimation animation)
         {
             Animation = animation;
@@ -99,15 +42,13 @@ namespace osu.Game.Storyboards.Drawables
         {
             int frameIndex = 0;
 
-            Texture frameTexture = storyboard.GetTextureFromPath(getFramePath(frameIndex), textureStore);
+            Texture frameTexture = textureStore.Get(getFramePath(frameIndex));
 
             if (frameTexture != null)
             {
                 // sourcing from storyboard.
                 for (frameIndex = 0; frameIndex < Animation.FrameCount; frameIndex++)
-                {
-                    AddFrame(storyboard.GetTextureFromPath(getFramePath(frameIndex), textureStore), Animation.FrameDelay);
-                }
+                    AddFrame(textureStore.Get(getFramePath(frameIndex)), Animation.FrameDelay);
             }
             else if (storyboard.UseSkinSprites)
             {
@@ -129,7 +70,97 @@ namespace osu.Game.Storyboards.Drawables
             // In the case of storyboard animations, we want to synchronise with game time perfectly
             // so let's get a correct time based on gameplay clock and earliest transform.
             PlaybackPosition = beatSyncProvider.Clock.CurrentTime - Animation.EarliestTransformTime;
+
+            updateMetrics();
         }
+
+        #region Storyboard element shared code (copy paste until we refactor)
+
+        private bool flipH;
+
+        public bool FlipH
+        {
+            get => flipH;
+            set
+            {
+                if (flipH == value)
+                    return;
+
+                flipH = value;
+                updateMetrics();
+            }
+        }
+
+        private bool flipV;
+
+        public bool FlipV
+        {
+            get => flipV;
+            set
+            {
+                if (flipV == value)
+                    return;
+
+                flipV = value;
+                updateMetrics();
+            }
+        }
+
+        private Vector2 vectorScale = Vector2.One;
+
+        public Vector2 VectorScale
+        {
+            get => vectorScale;
+            set
+            {
+                if (vectorScale == value)
+                    return;
+
+                if (!Validation.IsFinite(value)) throw new ArgumentException($@"{nameof(VectorScale)} must be finite, but is {value}.");
+
+                vectorScale = value;
+                updateMetrics();
+            }
+        }
+
+        public override bool RemoveWhenNotAlive => false;
+
+        private Anchor customOrigin;
+
+        public override Anchor Origin
+        {
+            get => base.Origin;
+            set
+            {
+                customOrigin = value;
+
+                // actual origin update will be handled by the following method call.
+                updateMetrics();
+            }
+        }
+
+        public override bool IsPresent
+            => !float.IsNaN(DrawPosition.X) && !float.IsNaN(DrawPosition.Y) && InternalChild.IsPresent && base.IsPresent;
+
+        private void updateMetrics()
+        {
+            if (!IsLoaded)
+                return;
+
+            // Vector scale and flip is applied to our child to isolate it from external Scale (that can be applied by the storyboard itself).
+            InternalChild.Scale = new Vector2(FlipH ? -1 : 1, FlipV ? -1 : 1) * VectorScale;
+
+            Anchor resolvedOrigin = StoryboardExtensions.AdjustOrigin(customOrigin, VectorScale, FlipH, FlipV);
+
+            // Likewise, origin has to be adjusted based on flip and vector scale usage.
+            // The original "storyboard" origin is stored in customOrigin.
+            base.Origin = resolvedOrigin;
+
+            InternalChild.Anchor = resolvedOrigin;
+            InternalChild.Origin = resolvedOrigin;
+        }
+
+        #endregion
 
         private void skinSourceChanged()
         {
