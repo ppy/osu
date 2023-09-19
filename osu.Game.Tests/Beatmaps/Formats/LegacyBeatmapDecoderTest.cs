@@ -622,7 +622,7 @@ namespace osu.Game.Tests.Beatmaps.Formats
         }
 
         [Test]
-        public void TestInvalidBankDefaultsToNone()
+        public void TestInvalidBankDefaultsToNormal()
         {
             var decoder = new LegacyBeatmapDecoder { ApplyOffsets = false };
 
@@ -631,20 +631,25 @@ namespace osu.Game.Tests.Beatmaps.Formats
             {
                 var hitObjects = decoder.Decode(stream).HitObjects;
 
-                Assert.AreEqual(HitSampleInfo.BANK_NORMAL, hitObjects[0].Samples[0].Bank);
-                Assert.AreEqual(HitSampleInfo.BANK_NORMAL, hitObjects[0].Samples[1].Bank);
+                assertObjectHasBanks(hitObjects[0], HitSampleInfo.BANK_DRUM);
+                assertObjectHasBanks(hitObjects[1], HitSampleInfo.BANK_NORMAL);
+                assertObjectHasBanks(hitObjects[2], HitSampleInfo.BANK_SOFT);
+                assertObjectHasBanks(hitObjects[3], HitSampleInfo.BANK_DRUM);
+                assertObjectHasBanks(hitObjects[4], HitSampleInfo.BANK_NORMAL);
 
-                Assert.AreEqual(HitSampleInfo.BANK_NORMAL, hitObjects[1].Samples[0].Bank);
-                Assert.AreEqual(HitSampleInfo.BANK_SOFT, hitObjects[1].Samples[1].Bank);
+                assertObjectHasBanks(hitObjects[5], HitSampleInfo.BANK_DRUM, HitSampleInfo.BANK_DRUM);
+                assertObjectHasBanks(hitObjects[6], HitSampleInfo.BANK_DRUM, HitSampleInfo.BANK_NORMAL);
+                assertObjectHasBanks(hitObjects[7], HitSampleInfo.BANK_DRUM, HitSampleInfo.BANK_SOFT);
+                assertObjectHasBanks(hitObjects[8], HitSampleInfo.BANK_DRUM, HitSampleInfo.BANK_DRUM);
+                assertObjectHasBanks(hitObjects[9], HitSampleInfo.BANK_DRUM, HitSampleInfo.BANK_NORMAL);
+            }
 
-                Assert.AreEqual(HitSampleInfo.BANK_SOFT, hitObjects[2].Samples[0].Bank);
-                Assert.AreEqual(HitSampleInfo.BANK_SOFT, hitObjects[2].Samples[1].Bank);
+            void assertObjectHasBanks(HitObject hitObject, string normalBank, string? additionsBank = null)
+            {
+                Assert.AreEqual(normalBank, hitObject.Samples[0].Bank);
 
-                Assert.AreEqual(HitSampleInfo.BANK_NORMAL, hitObjects[3].Samples[0].Bank);
-                Assert.AreEqual(HitSampleInfo.BANK_SOFT, hitObjects[3].Samples[1].Bank);
-
-                Assert.AreEqual(HitSampleInfo.BANK_NORMAL, hitObjects[4].Samples[0].Bank);
-                Assert.AreEqual(HitSampleInfo.BANK_NORMAL, hitObjects[4].Samples[1].Bank);
+                if (additionsBank != null)
+                    Assert.AreEqual(additionsBank, hitObject.Samples[1].Bank);
             }
         }
 
