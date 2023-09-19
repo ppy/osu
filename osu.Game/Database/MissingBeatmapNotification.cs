@@ -2,19 +2,18 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
-using System.IO;
 using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
-using osu.Framework.Input.Events;
 using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.Drawables.Cards;
 using osu.Game.Configuration;
+using osu.Game.IO.Archives;
+using osu.Game.Localisation;
 using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Overlays.Notifications;
 using osu.Game.Scoring;
 using Realms;
-using osu.Game.Localisation;
 
 namespace osu.Game.Database
 {
@@ -29,7 +28,7 @@ namespace osu.Game.Database
         [Resolved]
         private RealmAccess realm { get; set; } = null!;
 
-        private readonly MemoryStream scoreStream;
+        private readonly ArchiveReader scoreArchive;
         private readonly APIBeatmapSet beatmapSetInfo;
         private readonly string beatmapHash;
 
@@ -39,12 +38,12 @@ namespace osu.Game.Database
 
         private IDisposable? realmSubscription;
 
-        public MissingBeatmapNotification(APIBeatmap beatmap, MemoryStream scoreStream, string beatmapHash)
+        public MissingBeatmapNotification(APIBeatmap beatmap, ArchiveReader scoreArchive, string beatmapHash)
         {
             beatmapSetInfo = beatmap.BeatmapSet!;
 
             this.beatmapHash = beatmapHash;
-            this.scoreStream = scoreStream;
+            this.scoreArchive = scoreArchive;
         }
 
         [BackgroundDependencyLoader]
@@ -89,7 +88,8 @@ namespace osu.Game.Database
 
             if (sender.Any(s => s.Beatmaps.Any(b => b.MD5Hash == beatmapHash)))
             {
-                var importTask = new ImportTask(scoreStream, "score.osr");
+                string name = scoreArchive.Filenames.First(f => f.EndsWith(".osr", StringComparison.OrdinalIgnoreCase));
+                var importTask = new ImportTask(scoreArchive.GetStream(name), name);
                 scoreManager.Import(new[] { importTask });
                 realmSubscription?.Dispose();
                 Close(false);
