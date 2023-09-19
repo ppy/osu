@@ -135,23 +135,14 @@ namespace osu.Game.Rulesets.Osu.Tests
         }
 
         [Test]
-        public void TestRepeatArrowDoesNotMoveWhenHit()
+        public void TestRepeatArrowDoesNotMove([Values] bool useAutoplay)
         {
-            AddStep("enable autoplay", () => autoplay = true);
+            AddStep($"set autoplay to {useAutoplay}", () => autoplay = useAutoplay);
             setSnaking(true);
             CreateTest();
             // repeat might have a chance to update its position depending on where in the frame its hit,
             // so some leniency is allowed here instead of checking strict equality
             addCheckPositionChangeSteps(() => 16600, getSliderRepeat, positionAlmostSame);
-        }
-
-        [Test]
-        public void TestRepeatArrowMovesWhenNotHit()
-        {
-            AddStep("disable autoplay", () => autoplay = false);
-            setSnaking(true);
-            CreateTest();
-            addCheckPositionChangeSteps(() => 16600, getSliderRepeat, positionDecreased);
         }
 
         private void retrieveSlider(int index)
