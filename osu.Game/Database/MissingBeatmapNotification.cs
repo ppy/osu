@@ -52,14 +52,6 @@ namespace osu.Game.Database
             realmSubscription = realm.RegisterForNotifications(
                 realm => realm.All<BeatmapSetInfo>().Where(s => !s.DeletePending), beatmapsChanged);
 
-            realm.Run(r =>
-            {
-                if (r.All<BeatmapSetInfo>().Any(s => !s.DeletePending && s.OnlineID == beatmapSetInfo.OnlineID))
-                {
-                    Text = NotificationsStrings.MismatchingBeatmapForReplay;
-                }
-            });
-
             autoDownloadConfig = config.GetBindable<bool>(OsuSetting.AutomaticallyDownloadMissingBeatmaps);
             noVideoSetting = config.GetBindable<bool>(OsuSetting.PreferNoVideo);
 
@@ -71,9 +63,15 @@ namespace osu.Game.Database
             base.LoadComplete();
 
             if (autoDownloadConfig.Value)
+            {
+                Text = NotificationsStrings.DownloadingBeatmapForReplay;
                 beatmapDownloader.Download(beatmapSetInfo, noVideoSetting.Value);
-
-            Text = autoDownloadConfig.Value ? NotificationsStrings.DownloadingBeatmapForReplay : NotificationsStrings.MissingBeatmapForReplay;
+            }
+            else
+            {
+                bool missingSetMatchesExistingOnlineId = realm.Run(r => r.All<BeatmapSetInfo>().Any(s => !s.DeletePending && s.OnlineID == beatmapSetInfo.OnlineID));
+                Text = missingSetMatchesExistingOnlineId ? NotificationsStrings.MismatchingBeatmapForReplay : NotificationsStrings.MissingBeatmapForReplay;
+            }
         }
 
         protected override void Update()
