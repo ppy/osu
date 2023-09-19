@@ -4,6 +4,7 @@
 using System;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
+using osu.Game.Rulesets.Osu.Objects;
 using osu.Game.Skinning;
 using osuTK;
 
@@ -20,7 +21,7 @@ namespace osu.Game.Rulesets.Osu.Skinning.Legacy
         /// Their hittable area is 128px, but the actual circle portion is 118px.
         /// We must account for some gameplay elements such as slider bodies, where this padding is not present.
         /// </summary>
-        public const float LEGACY_CIRCLE_RADIUS = 64 - 5;
+        public const float LEGACY_CIRCLE_RADIUS = OsuHitObject.OBJECT_RADIUS - 5;
 
         public OsuLegacySkinTransformer(ISkin skin)
             : base(skin)
@@ -48,7 +49,7 @@ namespace osu.Game.Rulesets.Osu.Skinning.Legacy
                         return null;
 
                     case OsuSkinComponents.SliderBall:
-                        var sliderBallContent = this.GetAnimation("sliderb", true, true, animationSeparator: "");
+                        var sliderBallContent = this.GetAnimation("sliderb", true, true, animationSeparator: "", maxSize: new Vector2(OsuHitObject.OBJECT_RADIUS * 2));
 
                         // todo: slider ball has a custom frame delay based on velocity
                         // Math.Max((150 / Velocity) * GameBase.SIXTY_FRAME_TIME, GameBase.SIXTY_FRAME_TIME);
