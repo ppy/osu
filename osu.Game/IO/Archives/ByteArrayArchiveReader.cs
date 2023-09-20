@@ -9,11 +9,11 @@ namespace osu.Game.IO.Archives
     /// <summary>
     /// Allows reading a single file from the provided byte array.
     /// </summary>
-    public class LegacyByteArrayReader : ArchiveReader
+    public class ByteArrayArchiveReader : ArchiveReader
     {
         private readonly byte[] content;
 
-        public LegacyByteArrayReader(byte[] content, string filename)
+        public ByteArrayArchiveReader(byte[] content, string filename)
             : base(filename)
         {
             this.content = content;

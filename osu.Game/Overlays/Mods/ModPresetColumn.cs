@@ -26,6 +26,8 @@ namespace osu.Game.Overlays.Mods
         [Resolved]
         private IBindable<RulesetInfo> ruleset { get; set; } = null!;
 
+        private const float contracted_width = WIDTH - 120;
+
         [BackgroundDependencyLoader]
         private void load(OsuColour colours)
         {
@@ -42,6 +44,8 @@ namespace osu.Game.Overlays.Mods
             base.LoadComplete();
 
             ruleset.BindValueChanged(_ => rulesetChanged(), true);
+
+            Width = contracted_width;
         }
 
         private IDisposable? presetSubscription;
@@ -65,7 +69,11 @@ namespace osu.Game.Overlays.Mods
         {
             cancellationTokenSource?.Cancel();
 
-            if (!presets.Any())
+            bool hasPresets = presets.Any();
+
+            this.ResizeWidthTo(hasPresets ? WIDTH : contracted_width, 200, Easing.OutQuint);
+
+            if (!hasPresets)
             {
                 removeAndDisposePresetPanels();
                 return;

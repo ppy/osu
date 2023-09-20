@@ -261,7 +261,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
                     case OsuAction.RightButton:
                         if (IsHovered && (Hit?.Invoke() ?? false))
                         {
-                            HitAction = e.Action;
+                            HitAction ??= e.Action;
                             return true;
                         }
 
