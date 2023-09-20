@@ -57,7 +57,7 @@ namespace osu.Game.Rulesets.Mania.Edit
         protected override Playfield PlayfieldAtScreenSpacePosition(Vector2 screenSpacePosition) =>
             Playfield.GetColumnByPosition(screenSpacePosition);
 
-        protected override DrawableRuleset<ManiaHitObject> CreateDrawableRuleset(Ruleset ruleset, IBeatmap beatmap, IReadOnlyList<Mod> mods = null)
+        protected override DrawableRuleset<ManiaHitObject> CreateDrawableRuleset(Ruleset ruleset, IBeatmap beatmap, IReadOnlyList<Mod> mods)
         {
             drawableRuleset = new DrawableManiaEditorRuleset(ruleset, beatmap, mods);
 

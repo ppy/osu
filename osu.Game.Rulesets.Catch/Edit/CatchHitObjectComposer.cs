@@ -141,7 +141,7 @@ namespace osu.Game.Rulesets.Catch.Edit
             return base.OnPressed(e);
         }
 
-        protected override DrawableRuleset<CatchHitObject> CreateDrawableRuleset(Ruleset ruleset, IBeatmap beatmap, IReadOnlyList<Mod>? mods = null) =>
+        protected override DrawableRuleset<CatchHitObject> CreateDrawableRuleset(Ruleset ruleset, IBeatmap beatmap, IReadOnlyList<Mod> mods) =>
             new DrawableCatchEditorRuleset(ruleset, beatmap, mods)
             {
                 TimeRangeMultiplier = { BindTarget = timeRangeMultiplier, }
