@@ -23,8 +23,6 @@ namespace osu.Game.Storyboards.Drawables
 {
     public partial class DrawableStoryboard : Container<DrawableStoryboardLayer>
     {
-        public Vector2 AppliedScale { get; private set; }
-
         [Cached(typeof(Storyboard))]
         public Storyboard Storyboard { get; }
 
