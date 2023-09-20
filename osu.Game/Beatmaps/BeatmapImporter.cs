@@ -319,7 +319,7 @@ namespace osu.Game.Beatmaps
         {
             DateTimeOffset dateAdded = DateTimeOffset.UtcNow;
 
-            if (reader is LegacyDirectoryArchiveReader legacyReader)
+            if (reader is DirectoryArchiveReader legacyReader)
             {
                 var beatmaps = reader.Filenames.Where(f => f.EndsWith(".osu", StringComparison.OrdinalIgnoreCase));
 

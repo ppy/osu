@@ -349,7 +349,7 @@ namespace osu.Game.Rulesets.Osu.Tests
                         {
                             StartTime = time_slider_start,
                             Position = new Vector2(0, 0),
-                            SliderVelocity = 0.1f,
+                            SliderVelocityMultiplier = 0.1f,
                             Path = new SliderPath(PathType.PerfectCurve, new[]
                             {
                                 Vector2.Zero,

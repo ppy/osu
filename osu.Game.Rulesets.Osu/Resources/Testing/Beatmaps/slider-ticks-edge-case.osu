@@ -1,0 +1,31 @@
+osu file format v14
+
+[General]
+StackLeniency: 0.7
+
+[Difficulty]
+HPDrainRate:3
+CircleSize:3.4
+OverallDifficulty:4
+ApproachRate:5.5
+SliderMultiplier:1.1
+SliderTickRate:1
+
+[Events]
+//Background and Video events
+0,0,"aa.jpg",0,0
+//Break Periods
+//Storyboard Layer 0 (Background)
+//Storyboard Layer 1 (Fail)
+//Storyboard Layer 2 (Pass)
+//Storyboard Layer 3 (Foreground)
+//Storyboard Layer 4 (Overlay)
+//Storyboard Sound Samples
+
+[TimingPoints]
+6967,350.877192982456,6,2,1,55,1,0
+6967,-100,3,2,1,55,0,0
+7493,-111.111111111111,3,2,1,55,0,0
+
+[HitObjects]
+130,232,7493,6,0,P|78:218|28:208,1,101.82149697876,0|0,3:2|2:0,2:0:0:0:
