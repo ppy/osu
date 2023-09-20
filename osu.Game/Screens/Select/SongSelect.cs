@@ -391,6 +391,15 @@ namespace osu.Game.Screens.Select
         }
 
         /// <summary>
+        /// Set the query to the search text box.
+        /// </summary>
+        /// <param name="query">The string to search.</param>
+        public void Search(string query)
+        {
+            FilterControl.CurrentTextSearch.Value = query;
+        }
+
+        /// <summary>
         /// Call to make a selection and perform the default action for this SongSelect.
         /// </summary>
         /// <param name="beatmapInfo">An optional beatmap to override the current carousel selection.</param>
@@ -782,6 +791,8 @@ namespace osu.Game.Screens.Select
             beatmapInfoWedge.Beatmap = beatmap;
 
             BeatmapDetails.Beatmap = beatmap;
+
+            ModSelect.Beatmap = beatmap;
 
             bool beatmapSelected = beatmap is not DummyWorkingBeatmap;
 

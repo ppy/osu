@@ -25,9 +25,6 @@ namespace osu.Game.Rulesets.Osu.Mods
         [SettingSource("No slider head accuracy requirement", "Scores sliders proportionally to the number of ticks hit.")]
         public Bindable<bool> NoSliderHeadAccuracy { get; } = new BindableBool(true);
 
-        [SettingSource("No slider head movement", "Pins slider heads at their starting position, regardless of time.")]
-        public Bindable<bool> NoSliderHeadMovement { get; } = new BindableBool(true);
-
         [SettingSource("Apply classic note lock", "Applies note lock to the full hit window.")]
         public Bindable<bool> ClassicNoteLock { get; } = new BindableBool(true);
 
@@ -71,12 +68,11 @@ namespace osu.Game.Rulesets.Osu.Mods
             switch (obj)
             {
                 case DrawableSliderHead head:
-                    head.TrackFollowCircle = !NoSliderHeadMovement.Value;
                     if (FadeHitCircleEarly.Value && !usingHiddenFading)
                         applyEarlyFading(head);
 
                     if (ClassicNoteLock.Value)
-                        blockInputToUnderlyingObjects(head);
+                        blockInputToObjectsUnderSliderHead(head);
 
                     break;
 
@@ -88,25 +84,23 @@ namespace osu.Game.Rulesets.Osu.Mods
                     if (FadeHitCircleEarly.Value && !usingHiddenFading)
                         applyEarlyFading(circle);
 
-                    if (ClassicNoteLock.Value)
-                        blockInputToUnderlyingObjects(circle);
-
                     break;
             }
         }
 
         /// <summary>
-        /// On stable, hitcircles that have already been hit block input from reaching objects that may be underneath them.
+        /// On stable, slider heads that have already been hit block input from reaching objects that may be underneath them
+        /// until the sliders they're part of have been fully judged.
         /// The purpose of this method is to restore that behaviour.
         /// In order to avoid introducing yet another confusing config option, this behaviour is roped into the general notion of "note lock".
         /// </summary>
-        private static void blockInputToUnderlyingObjects(DrawableHitCircle circle)
+        private static void blockInputToObjectsUnderSliderHead(DrawableSliderHead slider)
         {
-            var oldHitAction = circle.HitArea.Hit;
-            circle.HitArea.Hit = () =>
+            var oldHitAction = slider.HitArea.Hit;
+            slider.HitArea.Hit = () =>
             {
                 oldHitAction?.Invoke();
-                return true;
+                return !slider.DrawableSlider.AllJudged;
             };
         }
 

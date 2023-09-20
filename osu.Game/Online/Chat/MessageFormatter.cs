@@ -28,7 +28,7 @@ namespace osu.Game.Online.Chat
         //      http[s]://<domain>.<tld>[:port][/path][?query][#fragment]
         private static readonly Regex advanced_link_regex = new Regex(
             // protocol
-            @"(?<link>[a-z]*?:\/\/" +
+            @"(?<link>(https?|osu(mp)?):\/\/" +
             // domain + tld
             @"(?<domain>(?:[a-z0-9]\.|[a-z0-9][a-z0-9-]*[a-z0-9]\.)*[a-z0-9-]*[a-z0-9]" +
             // port (optional)
