@@ -49,7 +49,7 @@ namespace osu.Game.Rulesets.Osu.Skinning.Legacy
                         return null;
 
                     case OsuSkinComponents.SliderBall:
-                        var sliderBallContent = this.GetAnimation("sliderb", true, true, animationSeparator: "", maxSize: new Vector2(OsuHitObject.OBJECT_RADIUS * 2));
+                        var sliderBallContent = this.GetAnimation("sliderb", true, true, animationSeparator: "", maxSize: OsuHitObject.OBJECT_DIMENSIONS);
 
                         // todo: slider ball has a custom frame delay based on velocity
                         // Math.Max((150 / Velocity) * GameBase.SIXTY_FRAME_TIME, GameBase.SIXTY_FRAME_TIME);
@@ -139,7 +139,7 @@ namespace osu.Game.Rulesets.Osu.Skinning.Legacy
                         if (!this.HasFont(LegacyFont.HitCircle))
                             return null;
 
-                        return new LegacySpriteText(LegacyFont.HitCircle, new Vector2(OsuHitObject.OBJECT_RADIUS * 2))
+                        return new LegacySpriteText(LegacyFont.HitCircle, OsuHitObject.OBJECT_DIMENSIONS)
                         {
                             // stable applies a blanket 0.8x scale to hitcircle fonts
                             Scale = new Vector2(0.8f),

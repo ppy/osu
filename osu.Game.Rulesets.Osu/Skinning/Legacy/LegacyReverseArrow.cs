@@ -10,7 +10,6 @@ using osu.Game.Rulesets.Objects.Drawables;
 using osu.Game.Rulesets.Osu.Objects;
 using osu.Game.Rulesets.Osu.Objects.Drawables;
 using osu.Game.Skinning;
-using osuTK;
 using osuTK.Graphics;
 
 namespace osu.Game.Rulesets.Osu.Skinning.Legacy
@@ -37,7 +36,7 @@ namespace osu.Game.Rulesets.Osu.Skinning.Legacy
 
             var skin = skinSource.FindProvider(s => s.GetTexture(lookupName) != null);
 
-            InternalChild = arrow = (skin?.GetAnimation(lookupName, true, true, maxSize: new Vector2(OsuHitObject.OBJECT_RADIUS * 2)) ?? Empty());
+            InternalChild = arrow = (skin?.GetAnimation(lookupName, true, true, maxSize: OsuHitObject.OBJECT_DIMENSIONS) ?? Empty());
             textureIsDefaultSkin = skin is ISkinTransformer transformer && transformer.Skin is DefaultLegacySkin;
         }
 

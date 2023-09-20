@@ -14,15 +14,12 @@ using osu.Game.Rulesets.Objects.Drawables;
 using osu.Game.Rulesets.Osu.Objects;
 using osu.Game.Rulesets.Osu.Objects.Drawables;
 using osu.Game.Skinning;
-using osuTK;
 using osuTK.Graphics;
 
 namespace osu.Game.Rulesets.Osu.Skinning.Legacy
 {
     public partial class LegacyMainCirclePiece : CompositeDrawable
     {
-        private static readonly Vector2 circle_piece_size = new Vector2(OsuHitObject.OBJECT_RADIUS * 2);
-
         public override bool RemoveCompletedTransforms => false;
 
         /// <summary>
@@ -53,7 +50,7 @@ namespace osu.Game.Rulesets.Osu.Skinning.Legacy
             this.priorityLookupPrefix = priorityLookupPrefix;
             this.hasNumber = hasNumber;
 
-            Size = circle_piece_size;
+            Size = OsuHitObject.OBJECT_DIMENSIONS;
         }
 
         [BackgroundDependencyLoader]
@@ -70,7 +67,7 @@ namespace osu.Game.Rulesets.Osu.Skinning.Legacy
             // expected behaviour in this scenario is not showing the overlay, rather than using hitcircleoverlay.png.
             InternalChildren = new[]
             {
-                CircleSprite = new LegacyKiaiFlashingDrawable(() => new Sprite { Texture = skin.GetTexture(circleName)?.WithMaximumSize(circle_piece_size) })
+                CircleSprite = new LegacyKiaiFlashingDrawable(() => new Sprite { Texture = skin.GetTexture(circleName)?.WithMaximumSize(OsuHitObject.OBJECT_DIMENSIONS) })
                 {
                     Anchor = Anchor.Centre,
                     Origin = Anchor.Centre,
@@ -79,7 +76,7 @@ namespace osu.Game.Rulesets.Osu.Skinning.Legacy
                 {
                     Anchor = Anchor.Centre,
                     Origin = Anchor.Centre,
-                    Child = OverlaySprite = new LegacyKiaiFlashingDrawable(() => skin.GetAnimation(@$"{circleName}overlay", true, true, frameLength: 1000 / 2d, maxSize: circle_piece_size))
+                    Child = OverlaySprite = new LegacyKiaiFlashingDrawable(() => skin.GetAnimation(@$"{circleName}overlay", true, true, frameLength: 1000 / 2d, maxSize: OsuHitObject.OBJECT_DIMENSIONS))
                     {
                         Anchor = Anchor.Centre,
                         Origin = Anchor.Centre,
