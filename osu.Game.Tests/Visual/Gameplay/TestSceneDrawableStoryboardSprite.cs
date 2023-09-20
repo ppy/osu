@@ -180,7 +180,7 @@ namespace osu.Game.Tests.Visual.Gameplay
             layer.Elements.Clear();
             layer.Add(sprite);
 
-            return storyboard.CreateDrawable();
+            return storyboard.CreateDrawable().With(s => s.RelativeSizeAxes = Axes.Both);
         }
 
         private void assertStoryboardSourced()
