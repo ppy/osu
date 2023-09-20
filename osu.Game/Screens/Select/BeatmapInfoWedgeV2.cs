@@ -15,6 +15,7 @@ using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Localisation;
+using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Rulesets;
 
@@ -270,37 +271,58 @@ namespace osu.Game.Screens.Select
             }
 
             [BackgroundDependencyLoader]
-            private void load()
+            private void load(SongSelect? songSelect, LocalisationManager localisation)
             {
                 var metadata = working.Metadata;
+
+                var titleText = new RomanisableString(metadata.TitleUnicode, metadata.Title);
+                var artistText = new RomanisableString(metadata.ArtistUnicode, metadata.Artist);
 
                 Child = new FillFlowContainer
                 {
                     Name = "Top-left aligned metadata",
                     Direction = FillDirection.Vertical,
-                    Padding = new MarginPadding { Left = text_margin, Right = text_margin + shear_width, Top = 12 },
+                    Padding = new MarginPadding { Left = text_margin, Top = 12 },
                     AutoSizeAxes = Axes.Y,
                     RelativeSizeAxes = Axes.X,
                     Children = new Drawable[]
                     {
-                        TitleLabel = new TruncatingSpriteText
+                        new OsuHoverContainer
                         {
-                            Shadow = true,
-                            Text = new RomanisableString(metadata.TitleUnicode, metadata.Title),
-                            Font = OsuFont.TorusAlternate.With(size: 40, weight: FontWeight.SemiBold),
-                            RelativeSizeAxes = Axes.X,
+                            AutoSizeAxes = Axes.Both,
+                            Action = () => songSelect?.Search(titleText.GetPreferred(localisation.CurrentParameters.Value.PreferOriginalScript)),
+                            Child = TitleLabel = new TruncatingSpriteText
+                            {
+                                Shadow = true,
+                                Text = titleText,
+                                Font = OsuFont.TorusAlternate.With(size: 40, weight: FontWeight.SemiBold),
+                            },
                         },
-                        ArtistLabel = new TruncatingSpriteText
+                        new OsuHoverContainer
                         {
-                            // TODO : figma design has a diffused shadow, instead of the solid one present here, not possible currently as far as i'm aware.
-                            Shadow = true,
-                            Text = new RomanisableString(metadata.ArtistUnicode, metadata.Artist),
-                            // Not sure if this should be semi bold or medium
-                            Font = OsuFont.Torus.With(size: 20, weight: FontWeight.SemiBold),
-                            RelativeSizeAxes = Axes.X,
-                        }
+                            AutoSizeAxes = Axes.Both,
+                            Action = () => songSelect?.Search(artistText.GetPreferred(localisation.CurrentParameters.Value.PreferOriginalScript)),
+                            Child = ArtistLabel = new TruncatingSpriteText
+                            {
+                                // TODO : figma design has a diffused shadow, instead of the solid one present here, not possible currently as far as i'm aware.
+                                Shadow = true,
+                                Text = artistText,
+                                // Not sure if this should be semi bold or medium
+                                Font = OsuFont.Torus.With(size: 20, weight: FontWeight.SemiBold),
+                            },
+                        },
                     }
                 };
+            }
+
+            protected override void UpdateAfterChildren()
+            {
+                base.UpdateAfterChildren();
+
+                // best effort to confine the auto-sized text to wedge bounds
+                // the artist label doesn't have an extra text_margin as it doesn't touch the right metadata
+                TitleLabel.MaxWidth = DrawWidth - text_margin * 2 - shear_width;
+                ArtistLabel.MaxWidth = DrawWidth - text_margin - shear_width;
             }
         }
     }

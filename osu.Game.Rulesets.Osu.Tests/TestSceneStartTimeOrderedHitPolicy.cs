@@ -451,7 +451,7 @@ namespace osu.Game.Rulesets.Osu.Tests
         {
             public TestSlider()
             {
-                SliderVelocity = 0.1f;
+                SliderVelocityMultiplier = 0.1f;
 
                 DefaultsApplied += _ =>
                 {
