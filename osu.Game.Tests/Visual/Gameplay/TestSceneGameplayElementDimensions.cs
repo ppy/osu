@@ -66,7 +66,7 @@ namespace osu.Game.Tests.Visual.Gameplay
                 return texture;
             }
 
-            public ISkin? FindProvider(Func<ISkin, bool> lookupFunction) => this;
+            public ISkin FindProvider(Func<ISkin, bool> lookupFunction) => this;
             public IEnumerable<ISkin> AllSources => new[] { this };
         }
     }
