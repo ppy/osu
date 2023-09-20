@@ -59,7 +59,7 @@ namespace osu.Game.Overlays.Notifications
 
         public bool WasClosed { get; private set; }
 
-        private readonly Container content;
+        private readonly FillFlowContainer content;
 
         protected override Container<Drawable> Content => content;
 
@@ -166,11 +166,13 @@ namespace osu.Game.Overlays.Notifications
                                         Padding = new MarginPadding(10),
                                         Children = new Drawable[]
                                         {
-                                            content = new Container
+                                            content = new FillFlowContainer
                                             {
                                                 Masking = true,
                                                 RelativeSizeAxes = Axes.X,
                                                 AutoSizeAxes = Axes.Y,
+                                                Direction = FillDirection.Vertical,
+                                                Spacing = new Vector2(15)
                                             },
                                         }
                                     },
