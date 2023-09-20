@@ -25,8 +25,8 @@ using osuTK;
 
 namespace osu.Game.Rulesets.Catch.Edit
 {
+    // we're also a ScrollingHitObjectComposer candidate, but can't be everything can we?
     public partial class CatchHitObjectComposer : DistancedHitObjectComposer<CatchHitObject>
-        // we're also a ScrollingHitObjectComposer candidate, but can't be everything can we?
     {
         private const float distance_snap_radius = 50;
 
