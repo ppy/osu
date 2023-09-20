@@ -13,7 +13,6 @@ using osu.Game.Configuration;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Online.API;
-using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Rulesets.Scoring;
 using osu.Game.Users;
 using osu.Game.Users.Drawables;
@@ -110,7 +109,7 @@ namespace osu.Game.Screens.Play.HUD
 
         private IBindable<ScoringMode> scoreDisplayMode = null!;
 
-        private readonly IBindableList<APIUser> apiFriends = new BindableList<APIUser>();
+        private bool isFriend;
 
         /// <summary>
         /// Creates a new <see cref="GameplayLeaderboardScore"/>.
@@ -317,8 +316,7 @@ namespace osu.Game.Screens.Play.HUD
 
             HasQuit.BindValueChanged(_ => updateState());
 
-            apiFriends.BindTo(api.Friends);
-            apiFriends.BindCollectionChanged((_, _) => updateState());
+            isFriend = User != null && api.Friends.Any(u => User.OnlineID == u.Id);
         }
 
         protected override void LoadComplete()
@@ -397,7 +395,7 @@ namespace osu.Game.Screens.Play.HUD
                 panelColour = BackgroundColour ?? Color4Extensions.FromHex("ffd966");
                 textColour = TextColour ?? Color4Extensions.FromHex("2e576b");
             }
-            else if (apiFriends.Any(f => User?.Equals(f) == true))
+            else if (isFriend)
             {
                 panelColour = BackgroundColour ?? Color4Extensions.FromHex("ff549a");
                 textColour = TextColour ?? Color4.White;
