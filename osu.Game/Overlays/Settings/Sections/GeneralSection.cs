@@ -19,7 +19,7 @@ namespace osu.Game.Overlays.Settings.Sections
         [Resolved(CanBeNull = true)]
         private OsuGame? game { get; set; }
 
-        public override LocalisableString Header => GeneralSettingsStrings.GeneralSectionHeader;
+        public override LocalisableString Header => CommonStrings.General;
 
         public override Drawable CreateIcon() => new SpriteIcon
         {
