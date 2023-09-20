@@ -6,7 +6,6 @@ using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Sprites;
-using osu.Game.Configuration;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.UI.Scrolling;
@@ -28,34 +27,24 @@ namespace osu.Game.Rulesets.Edit
         [BackgroundDependencyLoader]
         private void load()
         {
-            if (DrawableRuleset is DrawableScrollingRuleset<TObject> drawableScrollingRuleset)
+            if (DrawableRuleset is ISupportConstantAlgorithmToggle toggleRuleset)
             {
-                var originalVisualisationMethod = drawableScrollingRuleset.VisualisationMethod;
-
-                if (originalVisualisationMethod != ScrollVisualisationMethod.Constant)
+                LeftToolbox.Add(new EditorToolboxGroup("playfield")
                 {
-                    LeftToolbox.Add(new EditorToolboxGroup("playfield")
+                    Child = new FillFlowContainer
                     {
-                        Child = new FillFlowContainer
+                        RelativeSizeAxes = Axes.X,
+                        AutoSizeAxes = Axes.Y,
+                        Direction = FillDirection.Vertical,
+                        Spacing = new Vector2(0, 5),
+                        Children = new[]
                         {
-                            RelativeSizeAxes = Axes.X,
-                            AutoSizeAxes = Axes.Y,
-                            Direction = FillDirection.Vertical,
-                            Spacing = new Vector2(0, 5),
-                            Children = new[]
-                            {
-                                new DrawableTernaryButton(new TernaryButton(showSpeedChanges, "Show speed changes", () => new SpriteIcon { Icon = FontAwesome.Solid.TachometerAlt }))
-                            }
-                        },
-                    });
+                            new DrawableTernaryButton(new TernaryButton(showSpeedChanges, "Show speed changes", () => new SpriteIcon { Icon = FontAwesome.Solid.TachometerAlt }))
+                        }
+                    },
+                });
 
-                    showSpeedChanges.BindValueChanged(state =>
-                    {
-                        drawableScrollingRuleset.VisualisationMethod = state.NewValue == TernaryState.True
-                            ? originalVisualisationMethod
-                            : ScrollVisualisationMethod.Constant;
-                    }, true);
-                }
+                showSpeedChanges.BindValueChanged(state => toggleRuleset.ShowSpeedChanges.Value = state.NewValue == TernaryState.True, true);
             }
         }
     }
