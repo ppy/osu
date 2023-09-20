@@ -26,21 +26,26 @@ namespace osu.Game.Rulesets.Catch.Skinning.Legacy
             switch (visualRepresentation)
             {
                 case FruitVisualRepresentation.Pear:
-                    SetTexture(Skin.GetTexture("fruit-pear")?.WithMaximumSize(fruit_max_size), Skin.GetTexture("fruit-pear-overlay")?.WithMaximumSize(fruit_max_size));
+                    setTextures("pear");
                     break;
 
                 case FruitVisualRepresentation.Grape:
-                    SetTexture(Skin.GetTexture("fruit-grapes")?.WithMaximumSize(fruit_max_size), Skin.GetTexture("fruit-grapes-overlay")?.WithMaximumSize(fruit_max_size));
+                    setTextures("grapes");
                     break;
 
                 case FruitVisualRepresentation.Pineapple:
-                    SetTexture(Skin.GetTexture("fruit-apple")?.WithMaximumSize(fruit_max_size), Skin.GetTexture("fruit-apple-overlay")?.WithMaximumSize(fruit_max_size));
+                    setTextures("apple");
                     break;
 
                 case FruitVisualRepresentation.Raspberry:
-                    SetTexture(Skin.GetTexture("fruit-orange")?.WithMaximumSize(fruit_max_size), Skin.GetTexture("fruit-orange-overlay")?.WithMaximumSize(fruit_max_size));
+                    setTextures("orange");
                     break;
             }
+
+            void setTextures(string fruitName) => SetTexture(
+                Skin.GetTexture($"fruit-{fruitName}")?.WithMaximumSize(fruit_max_size),
+                Skin.GetTexture($"fruit-{fruitName}-overlay")?.WithMaximumSize(fruit_max_size)
+            );
         }
     }
 }
