@@ -2,7 +2,6 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
-using System.ComponentModel;
 using osu.Framework.Allocation;
 using osu.Framework.Extensions.ObjectExtensions;
 using osu.Framework.Graphics;
@@ -79,9 +78,6 @@ namespace osu.Game.Storyboards.Drawables
         private ISkinSource skin { get; set; } = null!;
 
         [Resolved]
-        private Storyboard storyboard { get; set; } = null!;
-
-        [Resolved]
         private TextureStore textureStore { get; set; } = null!;
 
         public DrawableStoryboardSprite(StoryboardSprite sprite)
@@ -95,7 +91,7 @@ namespace osu.Game.Storyboards.Drawables
         }
 
         [BackgroundDependencyLoader]
-        private void load()
+        private void load(Storyboard storyboard)
         {
             if (storyboard.UseSkinSprites)
             {
