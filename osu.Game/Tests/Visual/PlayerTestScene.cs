@@ -12,6 +12,7 @@ using osu.Framework.Testing;
 using osu.Game.Configuration;
 using osu.Game.Rulesets;
 using osu.Game.Rulesets.Mods;
+using osu.Game.Screens.Play;
 
 namespace osu.Game.Tests.Visual
 {
@@ -79,6 +80,11 @@ namespace osu.Game.Tests.Visual
 
         protected void LoadPlayer(Mod[] mods)
         {
+            // if a player screen is present already, we must exit that before loading another one,
+            // otherwise it'll crash on SpectatorClient.BeginPlaying being called while client is in "playing" state already.
+            if (Stack.CurrentScreen is Player)
+                Stack.Exit();
+
             var ruleset = CreatePlayerRuleset();
             Ruleset.Value = ruleset.RulesetInfo;
 
