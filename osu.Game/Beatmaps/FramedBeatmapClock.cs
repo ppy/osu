@@ -74,11 +74,13 @@ namespace osu.Game.Beatmaps
             // high precision times (on windows there's generally only 5-10ms reporting intervals, as an example).
             decoupledTrack = new DecouplingClock();
 
+            var interpolatedTrack = new InterpolatingFramedClock(decoupledTrack);
+
             if (applyOffsets)
             {
                 // Audio timings in general with newer BASS versions don't match stable.
                 // This only seems to be required on windows. We need to eventually figure out why, with a bit of luck.
-                platformOffsetClock = new OffsetCorrectionClock(decoupledTrack, ExternalPauseFrequencyAdjust) { Offset = RuntimeInfo.OS == RuntimeInfo.Platform.Windows ? 15 : 0 };
+                platformOffsetClock = new OffsetCorrectionClock(interpolatedTrack, ExternalPauseFrequencyAdjust) { Offset = RuntimeInfo.OS == RuntimeInfo.Platform.Windows ? 15 : 0 };
 
                 // User global offset (set in settings) should also be applied.
                 userGlobalOffsetClock = new OffsetCorrectionClock(platformOffsetClock, ExternalPauseFrequencyAdjust);
@@ -88,7 +90,7 @@ namespace osu.Game.Beatmaps
             }
             else
             {
-                finalClockSource = new InterpolatingFramedClock(decoupledTrack);
+                finalClockSource = new InterpolatingFramedClock(interpolatedTrack);
             }
         }
 
