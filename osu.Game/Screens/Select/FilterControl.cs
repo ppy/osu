@@ -254,6 +254,8 @@ namespace osu.Game.Screens.Select
 
             public OsuSpriteText FilterText { get; private set; }
 
+            protected override bool AllowClipboardExport => false;
+
             public FilterControlTextBox()
             {
                 Height += filter_text_size;
