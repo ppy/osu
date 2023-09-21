@@ -13,8 +13,6 @@ using osu.Game.Configuration;
 using osu.Game.Database;
 using osu.Game.Screens.Play;
 
-#pragma warning disable CS0618
-
 namespace osu.Game.Beatmaps
 {
     /// <summary>
@@ -55,7 +53,7 @@ namespace osu.Game.Beatmaps
 
         private IDisposable? beatmapOffsetSubscription;
 
-        private readonly DecoupleableInterpolatingFramedClock decoupledClock;
+        private readonly DecouplingClock decoupledTrack;
 
         [Resolved]
         private OsuConfigManager config { get; set; } = null!;
@@ -74,13 +72,13 @@ namespace osu.Game.Beatmaps
 
             // A decoupled clock is used to ensure precise time values even when the host audio subsystem is not reporting
             // high precision times (on windows there's generally only 5-10ms reporting intervals, as an example).
-            decoupledClock = new DecoupleableInterpolatingFramedClock { IsCoupled = false };
+            decoupledTrack = new DecouplingClock();
 
             if (applyOffsets)
             {
                 // Audio timings in general with newer BASS versions don't match stable.
                 // This only seems to be required on windows. We need to eventually figure out why, with a bit of luck.
-                platformOffsetClock = new OffsetCorrectionClock(decoupledClock, ExternalPauseFrequencyAdjust) { Offset = RuntimeInfo.OS == RuntimeInfo.Platform.Windows ? 15 : 0 };
+                platformOffsetClock = new OffsetCorrectionClock(decoupledTrack, ExternalPauseFrequencyAdjust) { Offset = RuntimeInfo.OS == RuntimeInfo.Platform.Windows ? 15 : 0 };
 
                 // User global offset (set in settings) should also be applied.
                 userGlobalOffsetClock = new OffsetCorrectionClock(platformOffsetClock, ExternalPauseFrequencyAdjust);
@@ -90,7 +88,7 @@ namespace osu.Game.Beatmaps
             }
             else
             {
-                finalClockSource = decoupledClock;
+                finalClockSource = new InterpolatingFramedClock(decoupledTrack);
             }
         }
 
@@ -120,13 +118,12 @@ namespace osu.Game.Beatmaps
         {
             base.Update();
 
-            if (Source != null && Source is not IAdjustableClock && Source.CurrentTime < decoupledClock.CurrentTime - 100)
+            // TODO: necessary?
+            if (Source.CurrentTime < decoupledTrack.CurrentTime - 100)
             {
                 // InterpolatingFramedClock won't interpolate backwards unless its source has an ElapsedFrameTime.
                 // See https://github.com/ppy/osu-framework/blob/ba1385330cc501f34937e08257e586c84e35d772/osu.Framework/Timing/InterpolatingFramedClock.cs#L91-L93
                 // This is not always the case here when doing large seeks.
-                // (Of note, this is not an issue if the source is adjustable, as the source is seeked to be in time by DecoupleableInterpolatingFramedClock).
-                // Rather than trying to get around this by fixing the framework clock stack, let's work around it for now.
                 Seek(Source.CurrentTime);
             }
             else
@@ -156,43 +153,43 @@ namespace osu.Game.Beatmaps
         public void ChangeSource(IClock? source)
         {
             Track = source as Track ?? new TrackVirtual(60000);
-            decoupledClock.ChangeSource(source);
+            decoupledTrack.ChangeSource(Track);
         }
 
-        public IClock? Source => decoupledClock.Source;
+        public IClock Source => decoupledTrack.Source;
 
         public void Reset()
         {
-            decoupledClock.Reset();
+            decoupledTrack.Reset();
             finalClockSource.ProcessFrame();
         }
 
         public void Start()
         {
-            decoupledClock.Start();
+            decoupledTrack.Start();
             finalClockSource.ProcessFrame();
         }
 
         public void Stop()
         {
-            decoupledClock.Stop();
+            decoupledTrack.Stop();
             finalClockSource.ProcessFrame();
         }
 
         public bool Seek(double position)
         {
-            bool success = decoupledClock.Seek(position - TotalAppliedOffset);
+            bool success = decoupledTrack.Seek(position - TotalAppliedOffset);
             finalClockSource.ProcessFrame();
 
             return success;
         }
 
-        public void ResetSpeedAdjustments() => decoupledClock.ResetSpeedAdjustments();
+        public void ResetSpeedAdjustments() => decoupledTrack.ResetSpeedAdjustments();
 
         public double Rate
         {
-            get => decoupledClock.Rate;
-            set => decoupledClock.Rate = value;
+            get => decoupledTrack.Rate;
+            set => decoupledTrack.Rate = value;
         }
 
         #endregion

@@ -194,7 +194,8 @@ namespace osu.Game.Screens.Play
         /// </summary>
         private void ensureSourceClockSet()
         {
-            if (GameplayClock.Source == null)
+            // TODO: does this need to exist?
+            if (GameplayClock.Source != SourceClock)
                 ChangeSource(SourceClock);
         }
 
