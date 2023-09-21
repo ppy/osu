@@ -12,7 +12,7 @@
 
 A free-to-win rhythm game. Rhythm is just a *click* away!
 
-This is the future – and final – iteration of the [osu!](https://osu.ppy.sh) game client and marks the beginning of an open era! Currently known by and released under the release codename "*lazer*". As in sharper than cutting-edge.
+This is the future – and final – iteration of the [osu!](https://osu.ppy.sh) game client which marks the beginning of an open era! Currently known by and released under the release codename "*lazer*". As in sharper than cutting-edge.
 
 ## Status
 
