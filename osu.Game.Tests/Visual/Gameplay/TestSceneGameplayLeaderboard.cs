@@ -3,6 +3,7 @@
 
 #nullable disable
 
+using System.Collections.Generic;
 using System.Linq;
 using NUnit.Framework;
 using osu.Framework.Bindables;
@@ -165,8 +166,10 @@ namespace osu.Game.Tests.Visual.Gameplay
                 () => Does.Not.Contain("#FF549A"));
 
             AddRepeatStep("add 3 friend score", () => createRandomScore(friend), 3);
-            AddUntilStep("friend score is pink",
-                () => leaderboard.GetScoreByUsername("my friend").ChildrenOfType<Box>().Select(b => ((Colour4)b.Colour).ToHex()),
+            AddUntilStep("at least one friend score is pink",
+                () => leaderboard.GetAllScoresForUsername("my friend")
+                                 .SelectMany(score => score.ChildrenOfType<Box>())
+                                 .Select(b => ((Colour4)b.Colour).ToHex()),
                 () => Does.Contain("#FF549A"));
         }
 
@@ -211,10 +214,8 @@ namespace osu.Game.Tests.Visual.Gameplay
                 return scoreItem != null && scoreItem.ScorePosition == expectedPosition;
             }
 
-            public GameplayLeaderboardScore GetScoreByUsername(string username)
-            {
-                return Flow.FirstOrDefault(i => i.User?.Username == username);
-            }
+            public IEnumerable<GameplayLeaderboardScore> GetAllScoresForUsername(string username)
+                => Flow.Where(i => i.User?.Username == username);
         }
     }
 }
