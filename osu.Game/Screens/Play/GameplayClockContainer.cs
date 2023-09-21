@@ -68,7 +68,7 @@ namespace osu.Game.Screens.Play
 
             InternalChildren = new Drawable[]
             {
-                GameplayClock = new FramedBeatmapClock(applyOffsets),
+                GameplayClock = new FramedBeatmapClock(applyOffsets, requireDecoupling: true),
                 Content
             };
         }

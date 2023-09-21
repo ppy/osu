@@ -56,14 +56,14 @@ namespace osu.Game.Beatmaps
 
         public bool IsRewinding { get; private set; }
 
-        public FramedBeatmapClock(bool applyOffsets = false)
+        public FramedBeatmapClock(bool applyOffsets, bool requireDecoupling)
         {
             this.applyOffsets = applyOffsets;
 
-            // A decoupled clock is used to ensure precise time values even when the host audio subsystem is not reporting
-            // high precision times (on windows there's generally only 5-10ms reporting intervals, as an example).
-            decoupledTrack = new DecouplingClock();
+            decoupledTrack = new DecouplingClock { AllowDecoupling = requireDecoupling };
 
+            // An interpolating clock is used to ensure precise time values even when the host audio subsystem is not reporting
+            // high precision times (on windows there's generally only 5-10ms reporting intervals, as an example).
             var interpolatedTrack = new InterpolatingFramedClock(decoupledTrack);
 
             if (applyOffsets)
