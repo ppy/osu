@@ -84,8 +84,6 @@ If you are not interested in debugging *osu!*, you can add `-c Release` to gain 
 
 If the build fails, try to restore NuGet packages with `dotnet restore`.
 
-_Due to a historical feature gap between .NET Core and Xamarin, running `dotnet` CLI from the root directory will not work for most commands. This can be resolved by specifying a target `.csproj` or the helper project at `build/Desktop.proj`. Configurations have been provided to work around this issue for all supported IDEs mentioned above._
-
 ### Testing with resource/framework modifications
 
 Sometimes it may be necessary to cross-test changes in [osu-resources](https://github.com/ppy/osu-resources) or [osu-framework](https://github.com/ppy/osu-framework). This can be quickly achieved using included commands:
