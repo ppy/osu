@@ -188,6 +188,8 @@ namespace osu.Game.Tests.OnlinePlay
 
             public void Reset()
             {
+                IsRunning = false;
+                CurrentTime = 0;
             }
 
             public void ResetSpeedAdjustments()
