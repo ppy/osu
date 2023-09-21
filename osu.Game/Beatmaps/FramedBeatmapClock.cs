@@ -5,7 +5,6 @@ using System;
 using System.Diagnostics;
 using osu.Framework;
 using osu.Framework.Allocation;
-using osu.Framework.Audio.Track;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Timing;
@@ -110,16 +109,7 @@ namespace osu.Game.Beatmaps
         {
             base.Update();
 
-            // TODO: necessary?
-            if (Source.CurrentTime < decoupledTrack.CurrentTime - 100)
-            {
-                // InterpolatingFramedClock won't interpolate backwards unless its source has an ElapsedFrameTime.
-                // See https://github.com/ppy/osu-framework/blob/ba1385330cc501f34937e08257e586c84e35d772/osu.Framework/Timing/InterpolatingFramedClock.cs#L91-L93
-                // This is not always the case here when doing large seeks.
-                Seek(Source.CurrentTime);
-            }
-            else
-                finalClockSource.ProcessFrame();
+            finalClockSource.ProcessFrame();
 
             if (Clock.ElapsedFrameTime != 0)
                 IsRewinding = Clock.ElapsedFrameTime < 0;
