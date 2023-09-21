@@ -29,16 +29,6 @@ namespace osu.Game.Beatmaps
         private readonly bool applyOffsets;
 
         /// <summary>
-        /// The length of the underlying beatmap track. Will default to 60 seconds if unavailable.
-        /// </summary>
-        public double TrackLength => Track.Length;
-
-        /// <summary>
-        /// The underlying beatmap track, if available.
-        /// </summary>
-        public Track Track { get; private set; } = new TrackVirtual(60000);
-
-        /// <summary>
         /// The total frequency adjustment from pause transforms. Should eventually be handled in a better way.
         /// </summary>
         public readonly BindableDouble ExternalPauseFrequencyAdjust = new BindableDouble(1);
@@ -154,8 +144,7 @@ namespace osu.Game.Beatmaps
 
         public void ChangeSource(IClock? source)
         {
-            Track = source as Track ?? new TrackVirtual(60000);
-            decoupledTrack.ChangeSource(Track);
+            decoupledTrack.ChangeSource(source as Track ?? new TrackVirtual(60000));
         }
 
         public IClock Source => decoupledTrack.Source;
