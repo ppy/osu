@@ -54,7 +54,7 @@ namespace osu.Game.Screens.Edit
 
             this.beatDivisor = beatDivisor ?? new BindableBeatDivisor();
 
-            underlyingClock = new FramedBeatmapClock(applyOffsets: true) { IsCoupled = false };
+            underlyingClock = new FramedBeatmapClock(applyOffsets: true);
             AddInternal(underlyingClock);
         }
 
