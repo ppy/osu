@@ -13,6 +13,8 @@ using osu.Game.Configuration;
 using osu.Game.Database;
 using osu.Game.Screens.Play;
 
+#pragma warning disable CS0618
+
 namespace osu.Game.Beatmaps
 {
     /// <summary>
@@ -66,19 +68,13 @@ namespace osu.Game.Beatmaps
 
         public bool IsRewinding { get; private set; }
 
-        public bool IsCoupled
-        {
-            get => decoupledClock.IsCoupled;
-            set => decoupledClock.IsCoupled = value;
-        }
-
         public FramedBeatmapClock(bool applyOffsets = false)
         {
             this.applyOffsets = applyOffsets;
 
             // A decoupled clock is used to ensure precise time values even when the host audio subsystem is not reporting
             // high precision times (on windows there's generally only 5-10ms reporting intervals, as an example).
-            decoupledClock = new DecoupleableInterpolatingFramedClock { IsCoupled = true };
+            decoupledClock = new DecoupleableInterpolatingFramedClock { IsCoupled = false };
 
             if (applyOffsets)
             {
