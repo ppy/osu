@@ -92,7 +92,7 @@ You can also build and run *osu!* from the command-line with a single command:
 dotnet run --project osu.Desktop
 ```
 
-If you are not interested in debugging *osu!*, you can add `-c Release` to gain performance. In this case, you must replace `Debug` with `Release` in any commands mentioned in this document.
+When running locally to do any kind of performance testing, make sure to add `-c Release` to the build command, as the overhead of running with the default `Debug` configuration can be large (especially when testing with local framework modifications as below).
 
 If the build fails, try to restore NuGet packages with `dotnet restore`.
 
