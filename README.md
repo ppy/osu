@@ -47,6 +47,8 @@ You can see some examples of custom rulesets by visiting the [custom ruleset dir
 
 ## Developing osu!
 
+### Prerequisites
+
 Please make sure you have the following prerequisites:
 
 - A desktop platform with the [.NET 6.0 SDK](https://dotnet.microsoft.com/download) installed.
@@ -70,9 +72,19 @@ git pull
 
 ### Building
 
-Build configurations for the recommended IDEs (listed above) are included. You should use the provided Build/Run functionality of your IDE to get things going. When testing or building new components, it's highly encouraged you use the `VisualTests` project/configuration. More information on this is provided [below](#contributing).
+#### From an IDE
 
-- Visual Studio / Rider users should load the project via one of the platform-specific `.slnf` files, rather than the main `.sln`. This will allow access to template run configurations.
+You should load the solution via one of the platform-specific `.slnf` files, rather than the main `.sln`. This will reduce dependencies and hide platforms that you don't care about. Valid `.slnf` files are:
+
+- `osu.Desktop.slnf` (most common)
+- `osu.Android.slnf`
+- `osu.iOS.slnf`
+
+Run configurations for the recommended IDEs (listed above) are included. You should use the provided Build/Run functionality of your IDE to get things going. When testing or building new components, it's highly encouraged you use the `VisualTests` project/configuration. More information on this is provided [below](#contributing).
+
+To build for mobile platforms, you will likely need to run `sudo dotnet workload restore` if you haven't done so previously. This will install android/iOS tooling required to complete the build.
+
+#### From CLI
 
 You can also build and run *osu!* from the command-line with a single command:
 
