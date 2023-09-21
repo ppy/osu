@@ -6,7 +6,6 @@
 using System.Linq;
 using NUnit.Framework;
 using osu.Framework.Bindables;
-using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Extensions.PolygonExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
@@ -161,10 +160,14 @@ namespace osu.Game.Tests.Visual.Gameplay
             int playerNumber = 1;
 
             AddRepeatStep("add 3 other players", () => createRandomScore(new APIUser { Username = $"Player {playerNumber++}" }), 3);
-            AddUntilStep("there are no pink color score", () => leaderboard.ChildrenOfType<Box>().All(b => b.Colour != Color4Extensions.FromHex("ff549a")));
+            AddUntilStep("no pink color scores",
+                () => leaderboard.ChildrenOfType<Box>().Select(b => ((Colour4)b.Colour).ToHex()),
+                () => Does.Not.Contain("#FF549A"));
 
             AddRepeatStep("add 3 friend score", () => createRandomScore(friend), 3);
-            AddUntilStep("there are pink color for friend score", () => leaderboard.GetScoreByUsername("my friend").ChildrenOfType<Box>().Any(b => b.Colour == Color4Extensions.FromHex("ff549a")));
+            AddUntilStep("friend score is pink",
+                () => leaderboard.GetScoreByUsername("my friend").ChildrenOfType<Box>().Select(b => ((Colour4)b.Colour).ToHex()),
+                () => Does.Contain("#FF549A"));
         }
 
         private void addLocalPlayer()
