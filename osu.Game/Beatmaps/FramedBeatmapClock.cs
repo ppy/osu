@@ -142,10 +142,7 @@ namespace osu.Game.Beatmaps
 
         #region Delegation of IAdjustableClock / ISourceChangeableClock to decoupled clock.
 
-        public void ChangeSource(IClock? source)
-        {
-            decoupledTrack.ChangeSource(source as Track ?? new TrackVirtual(60000));
-        }
+        public void ChangeSource(IClock? source) => decoupledTrack.ChangeSource(source);
 
         public IClock Source => decoupledTrack.Source;
 
