@@ -86,6 +86,10 @@ namespace osu.Game.Online.Leaderboards
             this.score = score;
             this.rank = rank;
             this.isPersonalBest = isPersonalBest;
+
+            Shear = shear;
+            RelativeSizeAxes = Axes.X;
+            Height = height;
         }
 
         [BackgroundDependencyLoader]
@@ -98,9 +102,6 @@ namespace osu.Game.Online.Leaderboards
 
             statisticsLabels = GetStatistics(score).Select(s => new ScoreComponentLabel(s, score)).ToList();
 
-            Shear = shear;
-            RelativeSizeAxes = Axes.X;
-            Height = height;
             Child = content = new Container
             {
                 Masking = true,
