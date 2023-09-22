@@ -14,8 +14,6 @@ using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.UserInterface;
 using osu.Framework.Input.Events;
 using osu.Framework.Localisation;
-using osu.Framework.Platform;
-using osu.Game.Database;
 using osu.Game.Extensions;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
@@ -62,7 +60,7 @@ namespace osu.Game.Online.Leaderboards
         private IDialogOverlay? dialogOverlay { get; set; }
 
         [Resolved]
-        private Storage storage { get; set; } = null!;
+        private ScoreManager scoreManager { get; set; } = null!;
 
         private Container content = null!;
         private Box background = null!;
@@ -92,7 +90,7 @@ namespace osu.Game.Online.Leaderboards
         }
 
         [BackgroundDependencyLoader]
-        private void load(ScoreManager scoreManager)
+        private void load()
         {
             var user = score.User;
 
@@ -138,7 +136,7 @@ namespace osu.Game.Online.Leaderboards
                                     Width = 35
                                 },
                                 createCentreContent(user),
-                                createRightSideContent(scoreManager)
+                                createRightSideContent()
                             }
                         }
                     }
@@ -230,7 +228,7 @@ namespace osu.Game.Online.Leaderboards
                 }
             };
 
-        private FillFlowContainer createRightSideContent(ScoreManager scoreManager) =>
+        private FillFlowContainer createRightSideContent() =>
             new FillFlowContainer
             {
                 Padding = new MarginPadding { Left = 11, Right = 15 },
@@ -482,7 +480,7 @@ namespace osu.Game.Online.Leaderboards
 
                 if (score.Files.Count <= 0) return items.ToArray();
 
-                items.Add(new OsuMenuItem("Export", MenuItemType.Standard, () => new LegacyScoreExporter(storage).Export(score)));
+                items.Add(new OsuMenuItem("Export", MenuItemType.Standard, () => scoreManager.Export(score)));
                 items.Add(new OsuMenuItem(CommonStrings.ButtonsDelete, MenuItemType.Destructive, () => dialogOverlay?.Push(new LocalScoreDeleteDialog(score))));
 
                 return items.ToArray();
