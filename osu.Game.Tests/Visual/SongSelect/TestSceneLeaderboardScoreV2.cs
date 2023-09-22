@@ -18,6 +18,8 @@ namespace osu.Game.Tests.Visual.SongSelect
 {
     public partial class TestSceneLeaderboardScoreV2 : OsuTestScene
     {
+        private FillFlowContainer fillFlow = null!;
+
         [BackgroundDependencyLoader]
         private void load()
         {
@@ -73,12 +75,12 @@ namespace osu.Game.Tests.Visual.SongSelect
                 },
             };
 
-            Child = new FillFlowContainer
+            Child = fillFlow = new FillFlowContainer
             {
-                Width = 900,
                 Anchor = Anchor.Centre,
                 Origin = Anchor.Centre,
                 Spacing = new Vector2(0, 10),
+                RelativeSizeAxes = Axes.X,
                 AutoSizeAxes = Axes.Y,
                 Children = new Drawable[]
                 {
@@ -87,6 +89,11 @@ namespace osu.Game.Tests.Visual.SongSelect
                     new LeaderboardScoreV2(scores[2], null, true)
                 }
             };
+
+            AddSliderStep("change relative width", 0, 1f, 0.6f, v =>
+            {
+                fillFlow.Width = v;
+            });
         }
     }
 }
