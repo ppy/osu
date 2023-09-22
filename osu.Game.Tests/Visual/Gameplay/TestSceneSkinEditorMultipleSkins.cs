@@ -32,7 +32,7 @@ namespace osu.Game.Tests.Visual.Gameplay
         private GameplayState gameplayState = TestGameplayState.Create(new OsuRuleset());
 
         [Cached(typeof(IGameplayClock))]
-        private readonly IGameplayClock gameplayClock = new GameplayClockContainer(new FramedClock());
+        private readonly IGameplayClock gameplayClock = new GameplayClockContainer(new FramedClock(), false, false);
 
         [Cached]
         public readonly EditorClipboard Clipboard = new EditorClipboard();

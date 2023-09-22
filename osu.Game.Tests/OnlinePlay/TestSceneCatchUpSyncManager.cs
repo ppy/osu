@@ -31,7 +31,7 @@ namespace osu.Game.Tests.OnlinePlay
         [SetUp]
         public void Setup()
         {
-            syncManager = new SpectatorSyncManager(master = new GameplayClockContainer(new TestManualClock()));
+            syncManager = new SpectatorSyncManager(master = new GameplayClockContainer(new TestManualClock(), false, false));
             player1 = syncManager.CreateManagedClock();
             player2 = syncManager.CreateManagedClock();
 
