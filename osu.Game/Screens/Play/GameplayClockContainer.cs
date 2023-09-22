@@ -24,11 +24,6 @@ namespace osu.Game.Screens.Play
         public bool IsRewinding => GameplayClock.IsRewinding;
 
         /// <summary>
-        /// The source clock. Should generally not be used for any timekeeping purposes.
-        /// </summary>
-        public IClock SourceClock { get; private set; }
-
-        /// <summary>
         /// Invoked when a seek has been performed via <see cref="Seek"/>
         /// </summary>
         public event Action? OnSeek;
@@ -62,8 +57,6 @@ namespace osu.Game.Screens.Play
         /// <param name="applyOffsets">Whether to apply platform, user and beatmap offsets to the mix.</param>
         public GameplayClockContainer(IClock sourceClock, bool applyOffsets = false)
         {
-            SourceClock = sourceClock;
-
             RelativeSizeAxes = Axes.Both;
 
             InternalChildren = new Drawable[]
@@ -71,6 +64,8 @@ namespace osu.Game.Screens.Play
                 GameplayClock = new FramedBeatmapClock(applyOffsets, requireDecoupling: true),
                 Content
             };
+
+            GameplayClock.ChangeSource(sourceClock);
         }
 
         /// <summary>
@@ -82,8 +77,6 @@ namespace osu.Game.Screens.Play
                 return;
 
             isPaused.Value = false;
-
-            ensureSourceClockSet();
 
             PrepareStart();
 
@@ -153,8 +146,6 @@ namespace osu.Game.Screens.Play
 
             Stop();
 
-            ensureSourceClockSet();
-
             if (time != null)
                 StartTime = time.Value;
 
@@ -168,21 +159,7 @@ namespace osu.Game.Screens.Play
         /// Changes the source clock.
         /// </summary>
         /// <param name="sourceClock">The new source.</param>
-        protected void ChangeSource(IClock sourceClock) => GameplayClock.ChangeSource(SourceClock = sourceClock);
-
-        /// <summary>
-        /// Ensures that the <see cref="GameplayClock"/> is set to <see cref="SourceClock"/>, if it hasn't been given a source yet.
-        /// This is usually done before a seek to avoid accidentally seeking only the adjustable source in decoupled mode,
-        /// but not the actual source clock.
-        /// That will pretty much only happen on the very first call of this method, as the source clock is passed in the constructor,
-        /// but it is not yet set on the adjustable source there.
-        /// </summary>
-        private void ensureSourceClockSet()
-        {
-            // TODO: does this need to exist?
-            if (GameplayClock.Source != SourceClock)
-                ChangeSource(SourceClock);
-        }
+        protected void ChangeSource(IClock sourceClock) => GameplayClock.ChangeSource(sourceClock);
 
         #region IAdjustableClock
 
