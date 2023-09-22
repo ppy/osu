@@ -49,7 +49,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Spectate
         protected override void Update()
         {
             // The player clock's running state is controlled externally, but the local pausing state needs to be updated to start/stop gameplay.
-            if (GameplayClockContainer.SourceClock.IsRunning)
+            if (GameplayClockContainer.IsRunning)
                 GameplayClockContainer.Start();
             else
                 GameplayClockContainer.Stop();
