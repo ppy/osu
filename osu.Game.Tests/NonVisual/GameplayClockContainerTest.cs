@@ -3,6 +3,7 @@
 
 using NUnit.Framework;
 using osu.Framework.Audio;
+using osu.Framework.Audio.Track;
 using osu.Framework.Bindables;
 using osu.Framework.Timing;
 using osu.Game.Screens.Play;
@@ -16,7 +17,7 @@ namespace osu.Game.Tests.NonVisual
         [TestCase(1)]
         public void TestTrueGameplayRateWithGameplayAdjustment(double underlyingClockRate)
         {
-            var framedClock = new FramedClock(new ManualClock { Rate = underlyingClockRate });
+            var framedClock = new TrackVirtual(60000) { Frequency = { Value = underlyingClockRate } };
             var gameplayClock = new TestGameplayClockContainer(framedClock);
 
             Assert.That(gameplayClock.GetTrueGameplayRate(), Is.EqualTo(2));
@@ -24,7 +25,7 @@ namespace osu.Game.Tests.NonVisual
 
         private partial class TestGameplayClockContainer : GameplayClockContainer
         {
-            public TestGameplayClockContainer(IFrameBasedClock underlyingClock)
+            public TestGameplayClockContainer(IClock underlyingClock)
                 : base(underlyingClock, false, false)
             {
                 AdjustmentsFromMods.AddAdjustment(AdjustableProperty.Frequency, new BindableDouble(2.0));
