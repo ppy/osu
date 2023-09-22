@@ -23,7 +23,6 @@ using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Overlays;
 using osu.Game.Resources.Localisation.Web;
 using osu.Game.Rulesets.Mods;
-using osu.Game.Rulesets.Scoring;
 using osu.Game.Rulesets.UI;
 using osu.Game.Scoring;
 using osu.Game.Screens.Select;
@@ -289,7 +288,6 @@ namespace osu.Game.Online.Leaderboards
         {
             (BeatmapsetsStrings.ShowScoreboardHeadersCombo.ToUpper(), model.MaxCombo.ToString().Insert(model.MaxCombo.ToString().Length, "x")),
             (BeatmapsetsStrings.ShowScoreboardHeadersAccuracy.ToUpper(), model.DisplayAccuracy),
-            (getResultNames(score).ToUpper(), getResults(score).ToUpper())
         };
 
         public override void Show()
@@ -485,26 +483,6 @@ namespace osu.Game.Online.Leaderboards
 
                 return items.ToArray();
             }
-        }
-
-        private LocalisableString getResults(ScoreInfo score)
-        {
-            string resultString = score.GetStatisticsForDisplay()
-                                       .Where(s => s.Result.IsBasic())
-                                       .Aggregate(string.Empty, (current, result) =>
-                                           current.Insert(current.Length, $"{result.Count}/"));
-
-            return resultString.Remove(resultString.Length - 1);
-        }
-
-        private LocalisableString getResultNames(ScoreInfo score)
-        {
-            string resultName = score.GetStatisticsForDisplay()
-                                     .Where(s => s.Result.IsBasic())
-                                     .Aggregate(string.Empty, (current, hitResult) =>
-                                         current.Insert(current.Length, $"{hitResult.DisplayName.ToString().ToUpperInvariant()}/"));
-
-            return resultName.Remove(resultName.Length - 1);
         }
     }
 }
