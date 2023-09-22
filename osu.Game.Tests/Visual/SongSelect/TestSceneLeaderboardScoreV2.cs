@@ -39,6 +39,7 @@ namespace osu.Game.Tests.Visual.SongSelect
                         Id = 6602580,
                         Username = @"waaiiru",
                         CountryCode = CountryCode.ES,
+                        CoverUrl = @"https://osu.ppy.sh/images/headers/profile-covers/c1.jpg",
                     },
                 },
                 new ScoreInfo
@@ -55,6 +56,7 @@ namespace osu.Game.Tests.Visual.SongSelect
                         Id = 1541390,
                         Username = @"Toukai",
                         CountryCode = CountryCode.CA,
+                        CoverUrl = @"https://osu.ppy.sh/images/headers/profile-covers/c2.jpg",
                     },
                 },
 
@@ -68,8 +70,7 @@ namespace osu.Game.Tests.Visual.SongSelect
                     Ruleset = new ManiaRuleset().RulesetInfo,
                     User = new APIUser
                     {
-                        Id = 4608074,
-                        Username = @"Skycries",
+                        Username = @"No cover",
                         CountryCode = CountryCode.BR,
                     },
                 },
@@ -86,7 +87,8 @@ namespace osu.Game.Tests.Visual.SongSelect
                 {
                     new LeaderboardScoreV2(scores[0], 1),
                     new LeaderboardScoreV2(scores[1], null, true),
-                    new LeaderboardScoreV2(scores[2], null, true)
+                    new LeaderboardScoreV2(scores[2], null, true),
+                    new LeaderboardScoreV2(scores[2], null),
                 }
             };
 
