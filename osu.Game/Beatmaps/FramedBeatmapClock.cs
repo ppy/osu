@@ -110,6 +110,9 @@ namespace osu.Game.Beatmaps
         {
             base.Update();
 
+            if (decoupledTrack.Source is IFrameBasedClock framedClock)
+                framedClock.ProcessFrame();
+
             finalClockSource.ProcessFrame();
 
             if (Clock.ElapsedFrameTime != 0)
