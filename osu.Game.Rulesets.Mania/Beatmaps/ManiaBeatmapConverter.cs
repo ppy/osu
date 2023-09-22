@@ -119,14 +119,12 @@ namespace osu.Game.Rulesets.Mania.Beatmaps
                 yield return obj;
         }
 
-        private readonly List<double> prevNoteTimes = new List<double>(max_notes_for_density);
+        private readonly LimitedCapacityQueue<double> prevNoteTimes = new LimitedCapacityQueue<double>(max_notes_for_density);
         private double density = int.MaxValue;
 
         private void computeDensity(double newNoteTime)
         {
-            if (prevNoteTimes.Count == max_notes_for_density)
-                prevNoteTimes.RemoveAt(0);
-            prevNoteTimes.Add(newNoteTime);
+            prevNoteTimes.Enqueue(newNoteTime);
 
             if (prevNoteTimes.Count >= 2)
                 density = (prevNoteTimes[^1] - prevNoteTimes[0]) / prevNoteTimes.Count;

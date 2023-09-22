@@ -80,7 +80,7 @@ namespace osu.Game.Tests.Rulesets
 
                 dependencies.CacheAs<TextureStore>(ParentTextureStore = new TestTextureStore(parent.Get<GameHost>().Renderer));
                 dependencies.CacheAs<ISampleStore>(ParentSampleStore = new TestSampleStore());
-                dependencies.CacheAs<ShaderManager>(ParentShaderManager = new TestShaderManager(parent.Get<GameHost>().Renderer));
+                dependencies.CacheAs<ShaderManager>(ParentShaderManager = new TestShaderManager(parent.Get<GameHost>().Renderer, parent.Get<ShaderManager>()));
 
                 return new DrawableRulesetDependencies(new OsuRuleset(), dependencies);
             }
@@ -150,16 +150,21 @@ namespace osu.Game.Tests.Rulesets
             public IBindable<double> AggregateTempo => throw new NotImplementedException();
 
             public int PlaybackConcurrency { get; set; }
+
+            public void AddExtension(string extension) => throw new NotImplementedException();
         }
 
         private class TestShaderManager : ShaderManager
         {
-            public TestShaderManager(IRenderer renderer)
+            private readonly ShaderManager parentManager;
+
+            public TestShaderManager(IRenderer renderer, ShaderManager parentManager)
                 : base(renderer, new ResourceStore<byte[]>())
             {
+                this.parentManager = parentManager;
             }
 
-            public override byte[] LoadRaw(string name) => null;
+            public override byte[] GetRawData(string fileName) => parentManager.GetRawData(fileName);
 
             public bool IsDisposed { get; private set; }
 

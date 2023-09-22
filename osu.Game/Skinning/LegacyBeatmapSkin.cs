@@ -19,7 +19,7 @@ namespace osu.Game.Skinning
 {
     public class LegacyBeatmapSkin : LegacySkin
     {
-        protected override bool AllowManiaSkin => false;
+        protected override bool AllowManiaConfigLookups => false;
         protected override bool UseCustomSampleBanks => true;
 
         /// <summary>
@@ -45,11 +45,11 @@ namespace osu.Game.Skinning
 
         public override Drawable? GetDrawableComponent(ISkinComponentLookup lookup)
         {
-            if (lookup is GlobalSkinComponentLookup targetComponent)
+            if (lookup is SkinComponentsContainerLookup containerLookup)
             {
-                switch (targetComponent.Lookup)
+                switch (containerLookup.Target)
                 {
-                    case GlobalSkinComponentLookup.LookupType.MainHUDComponents:
+                    case SkinComponentsContainerLookup.TargetArea.MainHUDComponents:
                         // this should exist in LegacySkin instead, but there isn't a fallback skin for LegacySkins yet.
                         // therefore keep the check here until fallback default legacy skin is supported.
                         if (!this.HasFont(LegacyFont.Score))
@@ -72,6 +72,8 @@ namespace osu.Game.Skinning
                     // If it is decided that we need this due to beatmaps somehow using it, the default (1.0 specified in LegacySkinDecoder.CreateTemplateObject)
                     // needs to be removed else it will cause incorrect skin behaviours. This is due to the config lookup having no context of which skin
                     // it should be returning the version for.
+
+                    Skin.LogLookupDebug(this, lookup, Skin.LookupDebugType.Miss);
                     return null;
             }
 

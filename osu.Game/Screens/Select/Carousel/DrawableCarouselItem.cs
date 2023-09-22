@@ -58,7 +58,7 @@ namespace osu.Game.Screens.Select.Carousel
 
                 item = value;
 
-                if (IsLoaded)
+                if (IsLoaded && !IsDisposed)
                     UpdateItem();
             }
         }
@@ -164,6 +164,14 @@ namespace osu.Game.Screens.Select.Carousel
 
             Item.State.Value = CarouselItemState.Selected;
             return true;
+        }
+
+        protected override void Dispose(bool isDisposing)
+        {
+            base.Dispose(isDisposing);
+
+            // This is important to clean up event subscriptions.
+            Item = null;
         }
     }
 }

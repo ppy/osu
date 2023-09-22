@@ -34,7 +34,8 @@ namespace osu.Game.Beatmaps
         float ApproachRate { get; }
 
         /// <summary>
-        /// The slider multiplier of the associated beatmap.
+        /// The base slider velocity of the associated beatmap.
+        /// This was known as "SliderMultiplier" in the .osu format and stable editor.
         /// </summary>
         double SliderMultiplier { get; }
 

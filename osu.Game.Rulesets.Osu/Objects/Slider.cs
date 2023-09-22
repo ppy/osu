@@ -10,18 +10,19 @@ using osu.Game.Rulesets.Objects;
 using System.Linq;
 using System.Threading;
 using Newtonsoft.Json;
+using osu.Framework.Bindables;
 using osu.Framework.Caching;
 using osu.Game.Audio;
 using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.ControlPoints;
-using osu.Game.Beatmaps.Formats;
 using osu.Game.Rulesets.Judgements;
+using osu.Game.Rulesets.Objects.Legacy;
 using osu.Game.Rulesets.Osu.Judgements;
 using osu.Game.Rulesets.Scoring;
 
 namespace osu.Game.Rulesets.Osu.Objects
 {
-    public class Slider : OsuHitObject, IHasPathWithRepeats
+    public class Slider : OsuHitObject, IHasPathWithRepeats, IHasSliderVelocity, IHasGenerateTicks
     {
         public double EndTime => StartTime + this.SpanCount() * Path.Distance / Velocity;
 
@@ -113,7 +114,7 @@ namespace osu.Game.Rulesets.Osu.Objects
         public double SpanDuration => Duration / this.SpanCount();
 
         /// <summary>
-        /// Velocity of this <see cref="Slider"/>.
+        /// The computed velocity of this <see cref="Slider"/>. This is the amount of path distance travelled in 1 ms.
         /// </summary>
         public double Velocity { get; private set; }
 
@@ -134,6 +135,20 @@ namespace osu.Game.Rulesets.Osu.Objects
         /// </summary>
         public bool OnlyJudgeNestedObjects = true;
 
+        public BindableNumber<double> SliderVelocityMultiplierBindable { get; } = new BindableDouble(1)
+        {
+            MinValue = 0.1,
+            MaxValue = 10
+        };
+
+        public double SliderVelocityMultiplier
+        {
+            get => SliderVelocityMultiplierBindable.Value;
+            set => SliderVelocityMultiplierBindable.Value = value;
+        }
+
+        public bool GenerateTicks { get; set; } = true;
+
         [JsonIgnore]
         public SliderHeadCircle HeadCircle { get; protected set; }
 
@@ -151,15 +166,13 @@ namespace osu.Game.Rulesets.Osu.Objects
             base.ApplyDefaultsToSelf(controlPointInfo, difficulty);
 
             TimingControlPoint timingPoint = controlPointInfo.TimingPointAt(StartTime);
-#pragma warning disable 618
-            var legacyDifficultyPoint = DifficultyControlPoint as LegacyBeatmapDecoder.LegacyDifficultyControlPoint;
-#pragma warning restore 618
 
-            double scoringDistance = BASE_SCORING_DISTANCE * difficulty.SliderMultiplier * DifficultyControlPoint.SliderVelocity;
-            bool generateTicks = legacyDifficultyPoint?.GenerateTicks ?? true;
+            Velocity = BASE_SCORING_DISTANCE * difficulty.SliderMultiplier / LegacyRulesetExtensions.GetPrecisionAdjustedBeatLength(this, timingPoint, OsuRuleset.SHORT_NAME);
+            // WARNING: this is intentionally not computed as `BASE_SCORING_DISTANCE * difficulty.SliderMultiplier`
+            // for backwards compatibility reasons (intentionally introducing floating point errors to match stable).
+            double scoringDistance = Velocity * timingPoint.BeatLength;
 
-            Velocity = scoringDistance / timingPoint.BeatLength;
-            TickDistance = generateTicks ? (scoringDistance / difficulty.SliderTickRate * TickDistanceMultiplier) : double.PositiveInfinity;
+            TickDistance = GenerateTicks ? (scoringDistance / difficulty.SliderTickRate * TickDistanceMultiplier) : double.PositiveInfinity;
         }
 
         protected override void CreateNestedHitObjects(CancellationToken cancellationToken)

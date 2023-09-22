@@ -5,7 +5,7 @@
 	<key>CFBundleName</key>
 	<string>osu.Game.Rulesets.Osu.Tests.iOS</string>
 	<key>CFBundleIdentifier</key>
-	<string>ppy.osu-Game-Rulesets-Osu-Tests-iOS</string>
+	<string>sh.ppy.osu-ruleset-tests</string>
 	<key>CFBundleShortVersionString</key>
 	<string>1.0</string>
 	<key>CFBundleVersion</key>

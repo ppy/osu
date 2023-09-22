@@ -90,7 +90,6 @@ namespace osu.Game.Overlays
 
         protected override void PopIn()
         {
-            base.PopIn();
             this.FadeIn(transition_time, Easing.OutQuint);
 
             if (welcomeScreen.GetChildScreen() != null)

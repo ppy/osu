@@ -10,7 +10,7 @@ using osu.Game.Audio;
 namespace osu.Game.Skinning
 {
     /// <summary>
-    /// Provides access to skinnable elements.
+    /// Provides access to various elements contained by a skin.
     /// </summary>
     public interface ISkin
     {

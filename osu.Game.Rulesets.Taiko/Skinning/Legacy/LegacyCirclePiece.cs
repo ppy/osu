@@ -1,6 +1,7 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
@@ -8,6 +9,7 @@ using osu.Framework.Graphics.Animations;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Primitives;
 using osu.Game.Beatmaps;
+using osu.Game.Beatmaps.ControlPoints;
 using osu.Game.Graphics;
 using osu.Game.Rulesets.Objects.Drawables;
 using osu.Game.Rulesets.Taiko.Objects;
@@ -26,10 +28,11 @@ namespace osu.Game.Rulesets.Taiko.Skinning.Legacy
         private Bindable<int> currentCombo { get; } = new BindableInt();
 
         private int animationFrame;
-        private double beatLength;
 
         // required for editor blueprints (not sure why these circle pieces are zero size).
         public override Quad ScreenSpaceDrawQuad => backgroundLayer.ScreenSpaceDrawQuad;
+
+        private TimingControlPoint timingPoint = TimingControlPoint.DEFAULT;
 
         public LegacyCirclePiece()
         {
@@ -39,11 +42,8 @@ namespace osu.Game.Rulesets.Taiko.Skinning.Legacy
         [Resolved(canBeNull: true)]
         private GameplayState? gameplayState { get; set; }
 
-        [Resolved(canBeNull: true)]
-        private IBeatSyncProvider? beatSyncProvider { get; set; }
-
         [BackgroundDependencyLoader]
-        private void load(ISkinSource skin, DrawableHitObject drawableHitObject)
+        private void load(ISkinSource skin, DrawableHitObject drawableHitObject, IBeatSyncProvider? beatSyncProvider)
         {
             Drawable? getDrawableFor(string lookup)
             {
@@ -63,6 +63,11 @@ namespace osu.Game.Rulesets.Taiko.Skinning.Legacy
             foregroundLayer = getDrawableFor("circleoverlay");
             if (foregroundLayer != null)
                 AddInternal(foregroundLayer);
+
+            drawableHitObject.StartTimeBindable.BindValueChanged(startTime =>
+            {
+                timingPoint = beatSyncProvider?.ControlPoints?.TimingPointAt(startTime.NewValue) ?? TimingControlPoint.DEFAULT;
+            }, true);
 
             // Animations in taiko skins are used in a custom way (>150 combo and animating in time with beat).
             // For now just stop at first frame for sanity.
@@ -115,14 +120,8 @@ namespace osu.Game.Rulesets.Taiko.Skinning.Legacy
                 return;
             }
 
-            if (beatSyncProvider?.ControlPoints != null)
-            {
-                beatLength = beatSyncProvider.ControlPoints.TimingPointAt(Time.Current).BeatLength;
-
-                animationFrame = Time.Current % ((beatLength * 2) / multiplier) >= beatLength / multiplier ? 0 : 1;
-
-                animatableForegroundLayer.GotoFrame(animationFrame);
-            }
+            animationFrame = Math.Abs(Time.Current - timingPoint.Time) % ((timingPoint.BeatLength * 2) / multiplier) >= timingPoint.BeatLength / multiplier ? 0 : 1;
+            animatableForegroundLayer.GotoFrame(animationFrame);
         }
 
         private Color4 accentColour;

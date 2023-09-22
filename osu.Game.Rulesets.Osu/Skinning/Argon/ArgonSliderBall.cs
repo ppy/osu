@@ -98,7 +98,8 @@ namespace osu.Game.Rulesets.Osu.Skinning.Argon
 
             using (BeginAbsoluteSequence(drawableObject.HitStateUpdateTime))
             {
-                this.FadeOut(duration, Easing.OutQuint);
+                // intentionally pile on an extra FadeOut to make it happen much faster
+                this.FadeOut(duration / 4, Easing.OutQuint);
                 icon.ScaleTo(defaultIconScale * icon_scale, duration, Easing.OutQuint);
             }
         }

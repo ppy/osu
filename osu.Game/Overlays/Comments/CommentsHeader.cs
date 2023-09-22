@@ -41,7 +41,7 @@ namespace osu.Game.Overlays.Comments
                 new Container
                 {
                     RelativeSizeAxes = Axes.Both,
-                    Padding = new MarginPadding { Horizontal = 50 },
+                    Padding = new MarginPadding { Horizontal = WaveOverlayContainer.HORIZONTAL_PADDING },
                     Children = new Drawable[]
                     {
                         new OverlaySortTabControl<CommentsSortCriteria>

@@ -1,0 +1,53 @@
+name: Update osu-web mod definitions
+on:
+  push:
+    tags:
+      - '*'
+
+permissions:
+  contents: read # to fetch code (actions/checkout)
+
+jobs:
+  update-mod-definitions:
+    name: Update osu-web mod definitions
+    runs-on: ubuntu-latest
+    steps:
+    - name: Install .NET 6.0.x
+      uses: actions/setup-dotnet@v3
+      with:
+        dotnet-version: "6.0.x"
+
+    - name: Checkout ppy/osu
+      uses: actions/checkout@v3
+      with:
+        path: osu
+
+    - name: Checkout ppy/osu-tools
+      uses: actions/checkout@v3
+      with:
+        repository: ppy/osu-tools
+        path: osu-tools
+
+    - name: Checkout ppy/osu-web
+      uses: actions/checkout@v3
+      with:
+        repository: ppy/osu-web
+        path: osu-web
+
+    - name: Setup local game checkout for tools
+      run: ./UseLocalOsu.sh
+      working-directory: ./osu-tools
+
+    - name: Regenerate mod definitions
+      run: dotnet run --project PerformanceCalculator -- mods > ../osu-web/database/mods.json
+      working-directory: ./osu-tools
+
+    - name: Create pull request with changes
+      uses: peter-evans/create-pull-request@v5
+      with:
+        title: Update mod definitions
+        body: "This PR has been auto-generated to update the mod definitions to match ppy/osu@${{ github.ref_name }}."
+        branch: update-mod-definitions
+        commit-message: Update mod definitions
+        path: osu-web
+        token: ${{ secrets.OSU_WEB_PULL_REQUEST_PAT }}

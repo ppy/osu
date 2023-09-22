@@ -122,19 +122,9 @@ namespace osu.Game.Tests.Visual.Editing
 
             AddAssert("Beatmap has correct timing point", () => EditorBeatmap.ControlPointInfo.TimingPoints.Single().Time == 500);
 
-            // After placement these must be non-default as defaults are read-only.
-            AddAssert("Placed object has non-default control points", () =>
-                !ReferenceEquals(EditorBeatmap.HitObjects[0].SampleControlPoint, SampleControlPoint.DEFAULT) &&
-                !ReferenceEquals(EditorBeatmap.HitObjects[0].DifficultyControlPoint, DifficultyControlPoint.DEFAULT));
-
             ReloadEditorToSameBeatmap();
 
             AddAssert("Beatmap still has correct timing point", () => EditorBeatmap.ControlPointInfo.TimingPoints.Single().Time == 500);
-
-            // After placement these must be non-default as defaults are read-only.
-            AddAssert("Placed object still has non-default control points", () =>
-                !ReferenceEquals(EditorBeatmap.HitObjects[0].SampleControlPoint, SampleControlPoint.DEFAULT) &&
-                !ReferenceEquals(EditorBeatmap.HitObjects[0].DifficultyControlPoint, DifficultyControlPoint.DEFAULT));
         }
 
         [Test]
@@ -144,7 +134,7 @@ namespace osu.Game.Tests.Visual.Editing
             double lastStarRating = 0;
             double lastLength = 0;
 
-            AddStep("Add timing point", () => EditorBeatmap.ControlPointInfo.Add(500, new TimingControlPoint()));
+            AddStep("Add timing point", () => EditorBeatmap.ControlPointInfo.Add(200, new TimingControlPoint { BeatLength = 600 }));
             AddStep("Change to placement mode", () => InputManager.Key(Key.Number2));
             AddStep("Move to playfield", () => InputManager.MoveMouseTo(Game.ScreenSpaceDrawQuad.Centre));
             AddStep("Place single hitcircle", () => InputManager.Click(MouseButton.Left));

@@ -20,7 +20,7 @@ using System.Diagnostics;
 using osu.Framework.Audio;
 using osu.Framework.Audio.Sample;
 using osu.Framework.Extensions.LocalisationExtensions;
-using osu.Framework.Platform;
+using osu.Game.Online.Chat;
 
 namespace osu.Game.Overlays.News.Sidebar
 {
@@ -59,7 +59,7 @@ namespace osu.Game.Overlays.News.Sidebar
                     new PostsContainer
                     {
                         Expanded = { BindTarget = Expanded },
-                        Children = posts.Select(p => new PostButton(p)).ToArray()
+                        Children = posts.Select(p => new PostLink(p)).ToArray()
                     }
                 }
             };
@@ -123,35 +123,14 @@ namespace osu.Game.Overlays.News.Sidebar
             }
         }
 
-        private partial class PostButton : OsuHoverContainer
+        private partial class PostLink : LinkFlowContainer
         {
-            protected override IEnumerable<Drawable> EffectTargets => new[] { text };
-
-            private readonly TextFlowContainer text;
-            private readonly APINewsPost post;
-
-            public PostButton(APINewsPost post)
+            public PostLink(APINewsPost post)
+                : base(t => t.Font = OsuFont.GetFont(size: 12))
             {
-                this.post = post;
-
                 RelativeSizeAxes = Axes.X;
                 AutoSizeAxes = Axes.Y;
-                Child = text = new TextFlowContainer(t => t.Font = OsuFont.GetFont(size: 12))
-                {
-                    RelativeSizeAxes = Axes.X,
-                    AutoSizeAxes = Axes.Y,
-                    Text = post.Title
-                };
-            }
-
-            [BackgroundDependencyLoader]
-            private void load(OverlayColourProvider overlayColours, GameHost host)
-            {
-                IdleColour = overlayColours.Light2;
-                HoverColour = overlayColours.Light1;
-
-                TooltipText = "view in browser";
-                Action = () => host.OpenUrlExternally("https://osu.ppy.sh/home/news/" + post.Slug);
+                AddLink(post.Title, LinkAction.External, @"/home/news/" + post.Slug, "view in browser");
             }
         }
 

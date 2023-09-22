@@ -25,7 +25,6 @@ namespace osu.Game.Overlays
 {
     public partial class BeatmapSetOverlay : OnlineOverlay<BeatmapSetHeader>
     {
-        public const float X_PADDING = 40;
         public const float Y_PADDING = 25;
         public const float RIGHT_WIDTH = 275;
 

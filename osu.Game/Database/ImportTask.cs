@@ -46,46 +46,38 @@ namespace osu.Game.Database
         /// </summary>
         public ArchiveReader GetReader()
         {
-            return Stream != null
-                ? getReaderFrom(Stream)
-                : getReaderFrom(Path);
-        }
-
-        /// <summary>
-        /// Creates an <see cref="ArchiveReader"/> from a stream.
-        /// </summary>
-        /// <param name="stream">A seekable stream containing the archive content.</param>
-        /// <returns>A reader giving access to the archive's content.</returns>
-        private ArchiveReader getReaderFrom(Stream stream)
-        {
-            if (!(stream is MemoryStream memoryStream))
+            if (Stream == null)
             {
-                // This isn't used in any current path. May need to reconsider for performance reasons (ie. if we don't expect the incoming stream to be copied out).
-                memoryStream = new MemoryStream(stream.ReadAllBytesToArray());
-                stream.Dispose();
+                if (ZipUtils.IsZipArchive(Path))
+                    return new ZipArchiveReader(File.Open(Path, FileMode.Open, FileAccess.Read, FileShare.Read), System.IO.Path.GetFileName(Path));
+                if (Directory.Exists(Path))
+                    return new DirectoryArchiveReader(Path);
+                if (File.Exists(Path))
+                    return new SingleFileArchiveReader(Path);
+
+                throw new InvalidFormatException($"{Path} is not a valid archive");
+            }
+
+            if (Stream is not MemoryStream memoryStream)
+            {
+                // Path used primarily in tests (converting `ManifestResourceStream`s to `MemoryStream`s).
+                memoryStream = new MemoryStream(Stream.ReadAllBytesToArray());
+                Stream.Dispose();
             }
 
             if (ZipUtils.IsZipArchive(memoryStream))
                 return new ZipArchiveReader(memoryStream, Path);
 
-            return new LegacyByteArrayReader(memoryStream.ToArray(), Path);
+            return new MemoryStreamArchiveReader(memoryStream, Path);
         }
 
         /// <summary>
-        /// Creates an <see cref="ArchiveReader"/> from a valid storage path.
+        /// Deletes the file that is encapsulated by this <see cref="ImportTask"/>.
         /// </summary>
-        /// <param name="path">A file or folder path resolving the archive content.</param>
-        /// <returns>A reader giving access to the archive's content.</returns>
-        private ArchiveReader getReaderFrom(string path)
+        public virtual void DeleteFile()
         {
-            if (ZipUtils.IsZipArchive(path))
-                return new ZipArchiveReader(File.Open(path, FileMode.Open, FileAccess.Read, FileShare.Read), System.IO.Path.GetFileName(path));
-            if (Directory.Exists(path))
-                return new LegacyDirectoryArchiveReader(path);
-            if (File.Exists(path))
-                return new LegacyFileArchiveReader(path);
-
-            throw new InvalidFormatException($"{path} is not a valid archive");
+            if (File.Exists(Path))
+                File.Delete(Path);
         }
 
         public override string ToString() => System.IO.Path.GetFileName(Path);

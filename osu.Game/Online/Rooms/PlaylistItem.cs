@@ -91,7 +91,7 @@ namespace osu.Game.Online.Rooms
         }
 
         public PlaylistItem(MultiplayerPlaylistItem item)
-            : this(new APIBeatmap { OnlineID = item.BeatmapID })
+            : this(new APIBeatmap { OnlineID = item.BeatmapID, StarRating = item.StarRating })
         {
             ID = item.ID;
             OwnerID = item.OwnerID;

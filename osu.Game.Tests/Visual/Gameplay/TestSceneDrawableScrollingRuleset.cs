@@ -311,14 +311,13 @@ namespace osu.Game.Tests.Visual.Gameplay
 
             protected override bool RelativeScaleBeatLengths => RelativeScaleBeatLengthsOverride;
 
-            protected override ScrollVisualisationMethod VisualisationMethod => ScrollVisualisationMethod.Overlapping;
-
             public new Bindable<double> TimeRange => base.TimeRange;
 
             public TestDrawableScrollingRuleset(Ruleset ruleset, IBeatmap beatmap, IReadOnlyList<Mod> mods = null)
                 : base(ruleset, beatmap, mods)
             {
                 TimeRange.Value = time_range;
+                VisualisationMethod = ScrollVisualisationMethod.Overlapping;
             }
 
             public override DrawableHitObject<TestHitObject> CreateDrawableRepresentation(TestHitObject h)

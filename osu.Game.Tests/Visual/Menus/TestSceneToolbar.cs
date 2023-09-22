@@ -3,6 +3,7 @@
 
 #nullable disable
 
+using System.Collections.Generic;
 using System.Linq;
 using JetBrains.Annotations;
 using Moq;
@@ -112,6 +113,19 @@ namespace osu.Game.Tests.Visual.Menus
 
                 AddUntilStep("ruleset switched", () => rulesetSelector.Current.Value.Equals(expected));
             }
+        }
+
+        [TestCase(OverlayActivation.All)]
+        [TestCase(OverlayActivation.Disabled)]
+        public void TestButtonKeyboardInputRespectsOverlayActivation(OverlayActivation mode)
+        {
+            AddStep($"set activation mode to {mode}", () => toolbar.OverlayActivationMode.Value = mode);
+            AddStep("hide toolbar", () => toolbar.Hide());
+
+            if (mode == OverlayActivation.Disabled)
+                AddAssert("check buttons not accepting input", () => InputManager.NonPositionalInputQueue.OfType<ToolbarButton>().Count(), () => Is.Zero);
+            else
+                AddAssert("check buttons accepting input", () => InputManager.NonPositionalInputQueue.OfType<ToolbarButton>().Count(), () => Is.Not.Zero);
         }
 
         [TestCase(OverlayActivation.All)]
@@ -237,6 +251,8 @@ namespace osu.Game.Tests.Visual.Menus
             }
 
             public virtual IBindable<int> UnreadCount => null;
+
+            public IEnumerable<Notification> AllNotifications => Enumerable.Empty<Notification>();
         }
     }
 }

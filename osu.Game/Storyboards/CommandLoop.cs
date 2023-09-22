@@ -1,8 +1,6 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
 using System;
 using System.Collections.Generic;
 
@@ -18,7 +16,12 @@ namespace osu.Game.Storyboards
         public readonly int TotalIterations;
 
         public override double StartTime => LoopStartTime + CommandsStartTime;
-        public override double EndTime => StartTime + CommandsDuration * TotalIterations;
+
+        public override double EndTime =>
+            // In an ideal world, we would multiply the command duration by TotalIterations here.
+            // Unfortunately this would clash with how stable handled end times, and results in some storyboards playing outro
+            // sequences for minutes or hours.
+            StartTime + CommandsDuration;
 
         /// <summary>
         /// Construct a new command loop.

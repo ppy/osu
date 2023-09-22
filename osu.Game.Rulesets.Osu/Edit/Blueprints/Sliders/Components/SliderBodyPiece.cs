@@ -1,7 +1,5 @@
-// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
-
-#nullable disable
 
 using System.Collections.Generic;
 using osu.Framework.Allocation;
@@ -21,6 +19,11 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders.Components
         /// Offset in absolute (local) coordinates from the start of the curve.
         /// </summary>
         public Vector2 PathStartLocation => body.PathOffset;
+
+        /// <summary>
+        /// Offset in absolute (local) coordinates from the end of the curve.
+        /// </summary>
+        public Vector2 PathEndLocation => body.PathEndOffset;
 
         public SliderBodyPiece()
         {
