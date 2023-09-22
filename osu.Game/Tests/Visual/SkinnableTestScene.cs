@@ -91,7 +91,7 @@ namespace osu.Game.Tests.Visual
             {
                 RelativeSizeAxes = Axes.Both,
                 BorderColour = Color4.White,
-                BorderThickness = 5,
+                BorderThickness = 3,
                 Masking = true,
 
                 Children = new Drawable[]
@@ -142,8 +142,15 @@ namespace osu.Game.Tests.Visual
                     c.AutoSizeAxes = Axes.None;
                     c.Size = Vector2.Zero;
 
-                    c.RelativeSizeAxes = !autoSize ? Axes.Both : Axes.None;
-                    c.AutoSizeAxes = autoSize ? Axes.Both : Axes.None;
+                    if (autoSize)
+                        c.AutoSizeAxes = Axes.Both;
+                    else
+                    {
+                        c.RelativeSizeAxes = Axes.Both;
+                        c.Anchor = Anchor.Centre;
+                        c.Origin = Anchor.Centre;
+                        c.Size = new Vector2(0.97f);
+                    }
                 }
 
                 outlineBox.Alpha = autoSize ? 1 : 0;

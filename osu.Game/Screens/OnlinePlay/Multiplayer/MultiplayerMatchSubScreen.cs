@@ -49,6 +49,9 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
         [Resolved]
         private MultiplayerClient client { get; set; }
 
+        [Resolved(canBeNull: true)]
+        private OsuGame game { get; set; }
+
         private AddItemButton addItemButton;
 
         public MultiplayerMatchSubScreen(Room room)
@@ -71,6 +74,8 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
             if (!client.IsConnected.Value)
                 handleRoomLost();
         }
+
+        protected override bool IsConnected => base.IsConnected && client.IsConnected.Value;
 
         protected override Drawable CreateMainContent() => new Container
         {
@@ -247,13 +252,9 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
 
         public override bool OnExiting(ScreenExitEvent e)
         {
-            // the room may not be left immediately after a disconnection due to async flow,
-            // so checking the IsConnected status is also required.
-            if (client.Room == null || !client.IsConnected.Value)
-            {
-                // room has not been created yet; exit immediately.
+            // room has not been created yet or we're offline; exit immediately.
+            if (client.Room == null || !IsConnected)
                 return base.OnExiting(e);
-            }
 
             if (!exitConfirmed && dialogOverlay != null)
             {
@@ -264,7 +265,8 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
                     dialogOverlay.Push(new ConfirmDialog("Are you sure you want to leave this multiplayer match?", () =>
                     {
                         exitConfirmed = true;
-                        this.Exit();
+                        if (this.IsCurrentScreen())
+                            this.Exit();
                     }));
                 }
 
@@ -310,16 +312,26 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
 
             client.ChangeBeatmapAvailability(availability.NewValue).FireAndForget();
 
-            if (availability.NewValue.State != DownloadState.LocallyAvailable)
+            switch (availability.NewValue.State)
             {
-                // while this flow is handled server-side, this covers the edge case of the local user being in a ready state and then deleting the current beatmap.
-                if (client.LocalUser?.State == MultiplayerUserState.Ready)
-                    client.ChangeState(MultiplayerUserState.Idle);
-            }
-            else if (client.LocalUser?.State == MultiplayerUserState.Spectating
-                     && (client.Room?.State == MultiplayerRoomState.WaitingForLoad || client.Room?.State == MultiplayerRoomState.Playing))
-            {
-                onLoadRequested();
+                case DownloadState.LocallyAvailable:
+                    if (client.LocalUser?.State == MultiplayerUserState.Spectating
+                        && (client.Room?.State == MultiplayerRoomState.WaitingForLoad || client.Room?.State == MultiplayerRoomState.Playing))
+                    {
+                        onLoadRequested();
+                    }
+
+                    break;
+
+                case DownloadState.Unknown:
+                    // Don't do anything rash in an unknown state.
+                    break;
+
+                default:
+                    // while this flow is handled server-side, this covers the edge case of the local user being in a ready state and then deleting the current beatmap.
+                    if (client.LocalUser?.State == MultiplayerUserState.Ready)
+                        client.ChangeState(MultiplayerUserState.Idle);
+                    break;
             }
         }
 
@@ -334,10 +346,12 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
 
             updateCurrentItem();
 
-            addItemButton.Alpha = client.IsHost || Room.QueueMode.Value != QueueMode.HostOnly ? 1 : 0;
+            addItemButton.Alpha = localUserCanAddItem ? 1 : 0;
 
             Scheduler.AddOnce(UpdateMods);
         }
+
+        private bool localUserCanAddItem => client.IsHost || Room.QueueMode.Value != QueueMode.HostOnly;
 
         private void updateCurrentItem()
         {
@@ -357,9 +371,6 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
 
         private void onLoadRequested()
         {
-            if (BeatmapAvailability.Value.State != DownloadState.LocallyAvailable)
-                return;
-
             // In the case of spectating, IMultiplayerClient.LoadRequested can be fired while the game is still spectating a previous session.
             // For now, we want to game to switch to the new game so need to request exiting from the play screen.
             if (!ParentScreen.IsCurrentScreen())
@@ -375,6 +386,9 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
             // even when it is not truly ready (i.e. the beatmap hasn't been selected by the client yet). For the time being, a simple fix to this is to ignore the callback.
             // Note that spectator will be entered automatically when the client is capable of doing so via beatmap availability callbacks (see: updateBeatmapAvailability()).
             if (client.LocalUser?.State == MultiplayerUserState.Spectating && (SelectedItem.Value == null || Beatmap.IsDefault))
+                return;
+
+            if (BeatmapAvailability.Value.State != DownloadState.LocallyAvailable)
                 return;
 
             StartPlay();
@@ -403,18 +417,16 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
             if (!this.IsCurrentScreen())
                 return;
 
-            if (client.Room == null)
+            if (!localUserCanAddItem)
                 return;
 
-            if (!client.IsHost)
-            {
-                // todo: should handle this when the request queue is implemented.
-                // if we decide that the presentation should exit the user from the multiplayer game, the PresentBeatmap
-                // flow may need to change to support an "unable to present" return value.
-                return;
-            }
+            // If there's only one playlist item and we are the host, assume we want to change it. Else add a new one.
+            PlaylistItem itemToEdit = client.IsHost && Room.Playlist.Count == 1 ? Room.Playlist.Single() : null;
 
-            this.Push(new MultiplayerMatchSongSelect(Room, Room.Playlist.Single(item => item.ID == client.Room.Settings.PlaylistItemId)));
+            OpenSongSelection(itemToEdit);
+
+            // Re-run PresentBeatmap now that we've pushed a song select that can handle it.
+            game?.PresentBeatmap(beatmap.BeatmapSetInfo, b => b.ID == beatmap.BeatmapInfo.ID);
         }
 
         protected override void Dispose(bool isDisposing)

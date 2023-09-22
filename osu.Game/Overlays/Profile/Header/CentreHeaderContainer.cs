@@ -6,6 +6,7 @@ using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
+using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Overlays.Profile.Header.Components;
 using osuTK;
 
@@ -14,6 +15,8 @@ namespace osu.Game.Overlays.Profile.Header
     public partial class CentreHeaderContainer : CompositeDrawable
     {
         public readonly Bindable<UserProfileData?> User = new Bindable<UserProfileData?>();
+
+        private LevelBadge levelBadge = null!;
 
         public CentreHeaderContainer()
         {
@@ -36,7 +39,7 @@ namespace osu.Game.Overlays.Profile.Header
                     RelativeSizeAxes = Axes.Y,
                     Direction = FillDirection.Horizontal,
                     Padding = new MarginPadding { Vertical = 10 },
-                    Margin = new MarginPadding { Left = UserProfileOverlay.CONTENT_X_MARGIN },
+                    Margin = new MarginPadding { Left = WaveOverlayContainer.HORIZONTAL_PADDING },
                     Spacing = new Vector2(10, 0),
                     Children = new Drawable[]
                     {
@@ -59,15 +62,14 @@ namespace osu.Game.Overlays.Profile.Header
                     Anchor = Anchor.CentreRight,
                     Origin = Anchor.CentreRight,
                     AutoSizeAxes = Axes.Both,
-                    Margin = new MarginPadding { Right = UserProfileOverlay.CONTENT_X_MARGIN },
+                    Margin = new MarginPadding { Right = WaveOverlayContainer.HORIZONTAL_PADDING },
                     Children = new Drawable[]
                     {
-                        new LevelBadge
+                        levelBadge = new LevelBadge
                         {
                             Anchor = Anchor.CentreRight,
                             Origin = Anchor.CentreRight,
-                            Size = new Vector2(40),
-                            User = { BindTarget = User }
+                            Size = new Vector2(40)
                         },
                         new Container
                         {
@@ -75,7 +77,7 @@ namespace osu.Game.Overlays.Profile.Header
                             Origin = Anchor.CentreRight,
                             Width = 200,
                             Height = 6,
-                            Margin = new MarginPadding { Right = 50 },
+                            Margin = new MarginPadding { Right = WaveOverlayContainer.HORIZONTAL_PADDING },
                             Child = new LevelProgressBar
                             {
                                 RelativeSizeAxes = Axes.Both,
@@ -85,6 +87,18 @@ namespace osu.Game.Overlays.Profile.Header
                     }
                 }
             };
+        }
+
+        protected override void LoadComplete()
+        {
+            base.LoadComplete();
+
+            User.BindValueChanged(user => updateDisplay(user.NewValue?.User), true);
+        }
+
+        private void updateDisplay(APIUser? user)
+        {
+            levelBadge.LevelInfo.Value = user?.Statistics?.Level;
         }
     }
 }

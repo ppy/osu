@@ -21,10 +21,10 @@ namespace osu.Game.Rulesets.Catch.Mods
 
         public void ApplyToDrawableRuleset(DrawableRuleset<CatchHitObject> drawableRuleset)
         {
-            drawableRuleset.Anchor = Anchor.Centre;
-            drawableRuleset.Origin = Anchor.Centre;
+            drawableRuleset.PlayfieldAdjustmentContainer.Anchor = Anchor.Centre;
+            drawableRuleset.PlayfieldAdjustmentContainer.Origin = Anchor.Centre;
 
-            drawableRuleset.Scale = new Vector2(1, -1);
+            drawableRuleset.PlayfieldAdjustmentContainer.Scale = new Vector2(1, -1);
         }
     }
 }

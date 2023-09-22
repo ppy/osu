@@ -44,7 +44,7 @@ namespace osu.Game.Tests.Visual.Online
 
                 selector.BeatmapSet = new APIBeatmapSet
                 {
-                    Beatmaps = selector.BeatmapSet.Beatmaps
+                    Beatmaps = selector.BeatmapSet!.Beatmaps
                                        .Where(b => b.Ruleset.OnlineID != ruleset)
                                        .Concat(Enumerable.Range(0, count).Select(_ => new APIBeatmap { RulesetID = ruleset }))
                                        .ToArray(),

@@ -6,6 +6,8 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using osu.Framework.Graphics;
+using osu.Framework.Graphics.Colour;
+using osu.Game.Beatmaps;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Osu;
@@ -52,7 +54,7 @@ namespace osu.Game.Tests.Visual.UserInterface
             AddStep("beatmap density with granularity of 200", () => beatmapDensity());
             AddStep("beatmap density with granularity of 300", () => beatmapDensity(300));
             AddStep("reversed values from 1-10", () => graph.Values = Enumerable.Range(1, 10).Reverse().ToArray());
-            AddStep("change colour", () =>
+            AddStep("change tier colours", () =>
             {
                 graph.TierColours = new[]
                 {
@@ -62,7 +64,7 @@ namespace osu.Game.Tests.Visual.UserInterface
                     Colour4.Blue
                 };
             });
-            AddStep("reset colour", () =>
+            AddStep("reset tier colours", () =>
             {
                 graph.TierColours = new[]
                 {
@@ -74,6 +76,12 @@ namespace osu.Game.Tests.Visual.UserInterface
                     Colour4.Green
                 };
             });
+
+            AddStep("set graph colour to blue", () => graph.Colour = Colour4.Blue);
+            AddStep("set graph colour to transparent", () => graph.Colour = Colour4.Transparent);
+            AddStep("set graph colour to vertical gradient", () => graph.Colour = ColourInfo.GradientVertical(Colour4.White, Colour4.Black));
+            AddStep("set graph colour to horizontal gradient", () => graph.Colour = ColourInfo.GradientHorizontal(Colour4.White, Colour4.Black));
+            AddStep("reset graph colour", () => graph.Colour = Colour4.White);
         }
 
         private void sinFunction(int size = 100)
@@ -130,8 +138,7 @@ namespace osu.Game.Tests.Visual.UserInterface
             if (!objects.Any())
                 return;
 
-            double firstHit = objects.First().StartTime;
-            double lastHit = objects.Max(o => o.GetEndTime());
+            (double firstHit, double lastHit) = BeatmapExtensions.CalculatePlayableBounds(objects);
 
             if (lastHit == 0)
                 lastHit = objects.Last().StartTime;

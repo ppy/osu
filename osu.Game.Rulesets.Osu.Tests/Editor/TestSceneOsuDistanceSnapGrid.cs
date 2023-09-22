@@ -9,6 +9,7 @@ using NUnit.Framework;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
+using osu.Framework.Graphics.Cursor;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.UserInterface;
 using osu.Framework.Input;
@@ -70,12 +71,12 @@ namespace osu.Game.Rulesets.Osu.Tests.Editor
             base.Content.Children = new Drawable[]
             {
                 editorClock = new EditorClock(editorBeatmap),
-                snapProvider,
+                new PopoverContainer { Child = snapProvider },
                 Content
             };
         }
 
-        protected override Container<Drawable> Content { get; } = new Container { RelativeSizeAxes = Axes.Both };
+        protected override Container<Drawable> Content { get; } = new PopoverContainer { RelativeSizeAxes = Axes.Both };
 
         [SetUp]
         public void Setup() => Schedule(() =>
@@ -185,7 +186,18 @@ namespace osu.Game.Rulesets.Osu.Tests.Editor
 
             AddAssert("Ensure cursor is on a grid line", () =>
             {
-                return grid.ChildrenOfType<CircularProgress>().Any(p => Precision.AlmostEquals(p.ScreenSpaceDrawQuad.TopRight.X, grid.ToScreenSpace(cursor.LastSnappedPosition).X));
+                return grid.ChildrenOfType<CircularProgress>().Any(ring =>
+                {
+                    // the grid rings are actually slightly _larger_ than the snapping radii.
+                    // this is done such that the snapping radius falls right in the middle of each grid ring thickness-wise,
+                    // but it does however complicate the following calculations slightly.
+
+                    // we want to calculate the coordinates of the rightmost point on the grid line, which is in the exact middle of the ring thickness-wise.
+                    // for the X component, we take the entire width of the ring, minus one half of the inner radius (since we want the middle of the line on the right side).
+                    // for the Y component, we just take 0.5f.
+                    var rightMiddleOfGridLine = ring.ToScreenSpace(ring.DrawSize * new Vector2(1 - ring.InnerRadius / 2, 0.5f));
+                    return Precision.AlmostEquals(rightMiddleOfGridLine.X, grid.ToScreenSpace(cursor.LastSnappedPosition).X);
+                });
             });
         }
 

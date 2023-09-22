@@ -1,8 +1,6 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
 using System;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.UserInterface;
@@ -10,14 +8,14 @@ using osu.Game.Graphics.UserInterface;
 
 namespace osu.Game.Overlays.Settings
 {
-    public partial class SettingsSlider<T> : SettingsSlider<T, OsuSliderBar<T>>
+    public partial class SettingsSlider<T> : SettingsSlider<T, RoundedSliderBar<T>>
         where T : struct, IEquatable<T>, IComparable<T>, IConvertible
     {
     }
 
     public partial class SettingsSlider<TValue, TSlider> : SettingsItem<TValue>
         where TValue : struct, IEquatable<TValue>, IComparable<TValue>, IConvertible
-        where TSlider : OsuSliderBar<TValue>, new()
+        where TSlider : RoundedSliderBar<TValue>, new()
     {
         protected override Drawable CreateControl() => new TSlider
         {

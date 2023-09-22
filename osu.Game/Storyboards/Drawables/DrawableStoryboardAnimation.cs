@@ -85,7 +85,7 @@ namespace osu.Game.Storyboards.Drawables
             Loop = animation.LoopType == AnimationLoopType.LoopForever;
 
             LifetimeStart = animation.StartTime;
-            LifetimeEnd = animation.EndTime;
+            LifetimeEnd = animation.EndTimeForDisplay;
         }
 
         [Resolved]
@@ -99,15 +99,13 @@ namespace osu.Game.Storyboards.Drawables
         {
             int frameIndex = 0;
 
-            Texture frameTexture = storyboard.GetTextureFromPath(getFramePath(frameIndex), textureStore);
+            Texture frameTexture = textureStore.Get(getFramePath(frameIndex));
 
             if (frameTexture != null)
             {
                 // sourcing from storyboard.
                 for (frameIndex = 0; frameIndex < Animation.FrameCount; frameIndex++)
-                {
-                    AddFrame(storyboard.GetTextureFromPath(getFramePath(frameIndex), textureStore), Animation.FrameDelay);
-                }
+                    AddFrame(textureStore.Get(getFramePath(frameIndex)), Animation.FrameDelay);
             }
             else if (storyboard.UseSkinSprites)
             {
@@ -128,7 +126,7 @@ namespace osu.Game.Storyboards.Drawables
             //
             // In the case of storyboard animations, we want to synchronise with game time perfectly
             // so let's get a correct time based on gameplay clock and earliest transform.
-            PlaybackPosition = (beatSyncProvider.Clock?.CurrentTime ?? Clock.CurrentTime) - Animation.EarliestTransformTime;
+            PlaybackPosition = beatSyncProvider.Clock.CurrentTime - Animation.EarliestTransformTime;
         }
 
         private void skinSourceChanged()

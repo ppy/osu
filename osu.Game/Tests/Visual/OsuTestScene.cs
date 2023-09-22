@@ -36,7 +36,6 @@ using osu.Game.Tests.Rulesets;
 
 namespace osu.Game.Tests.Visual
 {
-    [ExcludeFromDynamicCompile]
     public abstract partial class OsuTestScene : TestScene
     {
         [Cached]
@@ -266,7 +265,7 @@ namespace osu.Game.Tests.Visual
         {
             Debug.Assert(original.BeatmapSet != null);
 
-            return new APIBeatmapSet
+            var result = new APIBeatmapSet
             {
                 OnlineID = original.BeatmapSet.OnlineID,
                 Status = BeatmapOnlineStatus.Ranked,
@@ -302,6 +301,11 @@ namespace osu.Game.Tests.Visual
                     }
                 }
             };
+
+            foreach (var beatmap in result.Beatmaps)
+                beatmap.BeatmapSet = result;
+
+            return result;
         }
 
         protected WorkingBeatmap CreateWorkingBeatmap(RulesetInfo ruleset) =>

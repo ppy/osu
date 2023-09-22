@@ -6,6 +6,7 @@ using osu.Framework.Graphics.Sprites;
 using osu.Framework.Localisation;
 using osu.Game.Configuration;
 using osu.Game.Graphics;
+using osu.Game.Overlays.Settings;
 
 namespace osu.Game.Rulesets.Mods
 {
@@ -17,12 +18,26 @@ namespace osu.Game.Rulesets.Mods
         public override ModType Type => ModType.DifficultyReduction;
         public override LocalisableString Description => "Less zoom...";
 
-        [SettingSource("Speed decrease", "The actual decrease to apply")]
+        [SettingSource("Speed decrease", "The actual decrease to apply", SettingControlType = typeof(MultiplierSettingsSlider))]
         public override BindableNumber<double> SpeedChange { get; } = new BindableDouble(0.75)
         {
             MinValue = 0.5,
             MaxValue = 0.99,
             Precision = 0.01,
         };
+
+        public override double ScoreMultiplier
+        {
+            get
+            {
+                // Round to the nearest multiple of 0.1.
+                double value = (int)(SpeedChange.Value * 10) / 10.0;
+
+                // Offset back to 0.
+                value -= 1;
+
+                return 1 + value;
+            }
+        }
     }
 }

@@ -135,12 +135,14 @@ namespace osu.Game.Overlays
         protected override bool OnHover(HoverEvent e)
         {
             updateFadeState();
+            updateExpandedState(true);
             return false;
         }
 
         protected override void OnHoverLost(HoverLostEvent e)
         {
             updateFadeState();
+            updateExpandedState(true);
             base.OnHoverLost(e);
         }
 
@@ -168,7 +170,7 @@ namespace osu.Game.Overlays
             // potentially continuing to get processed while content has changed to autosize.
             content.ClearTransforms();
 
-            if (Expanded.Value)
+            if (Expanded.Value || IsHovered)
             {
                 content.AutoSizeAxes = Axes.Y;
                 content.AutoSizeDuration = animate ? transition_duration : 0;
