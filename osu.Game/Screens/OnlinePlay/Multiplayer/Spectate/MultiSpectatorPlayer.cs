@@ -67,7 +67,10 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Spectate
 
         protected override GameplayClockContainer CreateGameplayClockContainer(WorkingBeatmap beatmap, double gameplayStart)
         {
-            var gameplayClockContainer = new GameplayClockContainer(spectatorPlayerClock);
+            // Importantly, we don't want to apply decoupling because SpectatorPlayerClock updates its IsRunning directly.
+            // If we applied decoupling, this state change wouldn't actually cause the clock to stop.
+            // TODO: Can we just use Start/Stop rather than this workaround, now that DecouplingClock is more sane?
+            var gameplayClockContainer = new GameplayClockContainer(spectatorPlayerClock, applyOffsets: false, requireDecoupling: false);
             clockAdjustmentsFromMods.BindAdjustments(gameplayClockContainer.AdjustmentsFromMods);
             return gameplayClockContainer;
         }

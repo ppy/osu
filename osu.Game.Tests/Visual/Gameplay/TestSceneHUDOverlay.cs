@@ -41,7 +41,7 @@ namespace osu.Game.Tests.Visual.Gameplay
         private GameplayState gameplayState = TestGameplayState.Create(new OsuRuleset());
 
         [Cached(typeof(IGameplayClock))]
-        private readonly IGameplayClock gameplayClock = new GameplayClockContainer(new FramedClock());
+        private readonly IGameplayClock gameplayClock = new GameplayClockContainer(new FramedClock(), false, false);
 
         // best way to check without exposing.
         private Drawable hideTarget => hudOverlay.ChildrenOfType<SkinComponentsContainer>().First();
