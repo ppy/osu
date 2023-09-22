@@ -187,7 +187,13 @@ namespace osu.Game.Screens.Play
         public void StopUsingBeatmapClock()
         {
             removeSourceClockAdjustments();
-            ChangeSource(new TrackVirtual(beatmap.Track.Length));
+
+            var virtualTrack = new TrackVirtual(beatmap.Track.Length);
+            virtualTrack.Seek(CurrentTime);
+            if (IsRunning)
+                virtualTrack.Start();
+            ChangeSource(virtualTrack);
+
             addSourceClockAdjustments();
         }
 
