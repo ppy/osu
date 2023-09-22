@@ -58,7 +58,7 @@ namespace osu.Game.Screens.Menu
             {
                 PrepareMenuLoad();
 
-                var decouplingClock = new DecouplingClock(UsingThemedIntro ? Track : null);
+                var decouplingClock = new DecouplingFramedClock(UsingThemedIntro ? Track : null);
 
                 LoadComponentAsync(intro = new TrianglesIntroSequence(logo, () => FadeInBackground())
                 {

@@ -42,7 +42,7 @@ namespace osu.Game.Beatmaps
 
         private IDisposable? beatmapOffsetSubscription;
 
-        private readonly DecouplingClock decoupledTrack;
+        private readonly DecouplingFramedClock decoupledTrack;
 
         [Resolved]
         private OsuConfigManager config { get; set; } = null!;
@@ -59,7 +59,7 @@ namespace osu.Game.Beatmaps
         {
             this.applyOffsets = applyOffsets;
 
-            decoupledTrack = new DecouplingClock(source) { AllowDecoupling = requireDecoupling };
+            decoupledTrack = new DecouplingFramedClock(source) { AllowDecoupling = requireDecoupling };
 
             // An interpolating clock is used to ensure precise time values even when the host audio subsystem is not reporting
             // high precision times (on windows there's generally only 5-10ms reporting intervals, as an example).
@@ -109,9 +109,6 @@ namespace osu.Game.Beatmaps
         protected override void Update()
         {
             base.Update();
-
-            if (decoupledTrack.Source is IFrameBasedClock framedClock)
-                framedClock.ProcessFrame();
 
             finalClockSource.ProcessFrame();
 
