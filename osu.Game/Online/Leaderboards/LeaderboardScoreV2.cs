@@ -7,6 +7,7 @@ using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Extensions.LocalisationExtensions;
 using osu.Framework.Graphics;
+using osu.Framework.Graphics.Colour;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Cursor;
 using osu.Framework.Graphics.Effects;
@@ -26,6 +27,7 @@ using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.UI;
 using osu.Game.Scoring;
 using osu.Game.Screens.Select;
+using osu.Game.Users;
 using osu.Game.Users.Drawables;
 using osu.Game.Utils;
 using osuTK;
@@ -163,6 +165,12 @@ namespace osu.Game.Online.Leaderboards
                     {
                         RelativeSizeAxes = Axes.Both,
                         Colour = foregroundColour
+                    },
+                    new UserCoverBackground
+                    {
+                        RelativeSizeAxes = Axes.Both,
+                        User = score.User,
+                        Colour = ColourInfo.GradientHorizontal(Colour4.White.Opacity(0.5f), Colour4.White.Opacity(0)),
                     },
                     avatar = new MaskedWrapper(
                         innerAvatar = new ClickableAvatar(user)
