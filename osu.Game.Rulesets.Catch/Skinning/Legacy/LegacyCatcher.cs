@@ -13,7 +13,13 @@ namespace osu.Game.Rulesets.Catch.Skinning.Legacy
         {
             Anchor = Anchor.TopCentre;
             Origin = Anchor.TopCentre;
-            RelativeSizeAxes = Axes.Both;
+
+            // in stable, catcher sprites are displayed in their raw size. stable also has catcher sprites displayed with the following scale factors applied:
+            //  1. 0.5x, affecting all sprites in the playfield, computed here based on lazer's catch playfield dimensions (see WIDTH/HEIGHT constants in CatchPlayfield),
+            //           source: https://github.com/peppy/osu-stable-reference/blob/1531237b63392e82c003c712faa028406073aa8f/osu!/GameplayElements/HitObjectManager.cs#L483-L494
+            //  2. 0.7x, a constant scale applied to all catcher sprites on construction.
+            AutoSizeAxes = Axes.Both;
+            Scale = new Vector2(0.5f * 0.7f);
         }
 
         protected override void Update()
