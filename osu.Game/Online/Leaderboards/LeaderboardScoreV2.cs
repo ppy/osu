@@ -48,6 +48,7 @@ namespace osu.Game.Online.Leaderboards
 
         private Colour4 foregroundColour;
         private Colour4 backgroundColour;
+        private Colour4 shadowColour;
 
         private static readonly Vector2 shear = new Vector2(0.15f, 0);
 
@@ -101,6 +102,7 @@ namespace osu.Game.Online.Leaderboards
 
             foregroundColour = isPersonalBest ? colourProvider.Background1 : colourProvider.Background5;
             backgroundColour = isPersonalBest ? colourProvider.Background2 : colourProvider.Background4;
+            shadowColour = isPersonalBest ? colourProvider.Background3 : colourProvider.Background6;
 
             statisticsLabels = GetStatistics(score).Select(s => new ScoreComponentLabel(s, score)).ToList();
 
@@ -154,86 +156,103 @@ namespace osu.Game.Online.Leaderboards
         private Container createCentreContent(APIUser user) =>
             new Container
             {
-                Anchor = Anchor.CentreLeft,
-                Origin = Anchor.CentreLeft,
                 Masking = true,
                 CornerRadius = corner_radius,
                 RelativeSizeAxes = Axes.Both,
-                Children = new[]
+                Children = new Drawable[]
                 {
-                    foreground = new Box
+                    new Box
                     {
                         RelativeSizeAxes = Axes.Both,
-                        Colour = foregroundColour
+                        Colour = shadowColour,
                     },
-                    new UserCoverBackground
+                    new Container
                     {
                         RelativeSizeAxes = Axes.Both,
-                        User = score.User,
-                        Colour = ColourInfo.GradientHorizontal(Colour4.White.Opacity(0.5f), Colour4.White.Opacity(0)),
-                    },
-                    avatar = new MaskedWrapper(
-                        innerAvatar = new ClickableAvatar(user)
+                        Padding = new MarginPadding { Right = 5 },
+                        Child = new Container
                         {
-                            Anchor = Anchor.Centre,
-                            Origin = Anchor.Centre,
-                            Scale = new Vector2(1.1f),
-                            Shear = -shear,
+                            Masking = true,
+                            CornerRadius = corner_radius,
                             RelativeSizeAxes = Axes.Both,
-                        })
-                    {
-                        RelativeSizeAxes = Axes.None,
-                        Size = new Vector2(height)
-                    },
-                    new FillFlowContainer
-                    {
-                        Position = new Vector2(height + 9, 9),
-                        AutoSizeAxes = Axes.Both,
-                        Direction = FillDirection.Vertical,
-                        Children = new Drawable[]
-                        {
-                            flagBadgeAndDateContainer = new FillFlowContainer
+                            Children = new[]
                             {
-                                Shear = -shear,
-                                Direction = FillDirection.Horizontal,
-                                Spacing = new Vector2(5f, 0f),
-                                Size = new Vector2(87, 16),
-                                Masking = true,
-                                Children = new Drawable[]
+                                foreground = new Box
                                 {
-                                    new UpdateableFlag(user.CountryCode)
+                                    RelativeSizeAxes = Axes.Both,
+                                    Colour = foregroundColour
+                                },
+                                new UserCoverBackground
+                                {
+                                    RelativeSizeAxes = Axes.Both,
+                                    User = score.User,
+                                    Colour = ColourInfo.GradientHorizontal(Colour4.White.Opacity(0.5f), Colour4.White.Opacity(0)),
+                                },
+                                avatar = new MaskedWrapper(
+                                    innerAvatar = new ClickableAvatar(user)
                                     {
-                                        Anchor = Anchor.CentreLeft,
-                                        Origin = Anchor.CentreLeft,
-                                        Size = new Vector2(24, 16),
-                                    },
-                                    new DateLabel(score.Date)
+                                        Anchor = Anchor.Centre,
+                                        Origin = Anchor.Centre,
+                                        Scale = new Vector2(1.1f),
+                                        Shear = -shear,
+                                        RelativeSizeAxes = Axes.Both,
+                                    })
+                                {
+                                    RelativeSizeAxes = Axes.None,
+                                    Size = new Vector2(height)
+                                },
+                                new FillFlowContainer
+                                {
+                                    Position = new Vector2(height + 9, 9),
+                                    AutoSizeAxes = Axes.Both,
+                                    Direction = FillDirection.Vertical,
+                                    Children = new Drawable[]
                                     {
-                                        Anchor = Anchor.CentreLeft,
-                                        Origin = Anchor.CentreLeft,
+                                        flagBadgeAndDateContainer = new FillFlowContainer
+                                        {
+                                            Shear = -shear,
+                                            Direction = FillDirection.Horizontal,
+                                            Spacing = new Vector2(5f, 0f),
+                                            Size = new Vector2(87, 16),
+                                            Masking = true,
+                                            Children = new Drawable[]
+                                            {
+                                                new UpdateableFlag(user.CountryCode)
+                                                {
+                                                    Anchor = Anchor.CentreLeft,
+                                                    Origin = Anchor.CentreLeft,
+                                                    Size = new Vector2(24, 16),
+                                                },
+                                                new DateLabel(score.Date)
+                                                {
+                                                    Anchor = Anchor.CentreLeft,
+                                                    Origin = Anchor.CentreLeft,
+                                                }
+                                            }
+                                        },
+                                        nameLabel = new OsuSpriteText
+                                        {
+                                            Shear = -shear,
+                                            Text = user.Username,
+                                            Font = OsuFont.GetFont(size: 24, weight: FontWeight.SemiBold)
+                                        }
                                     }
+                                },
+                                new FillFlowContainer
+                                {
+                                    Margin = new MarginPadding { Right = 40 },
+                                    Spacing = new Vector2(25, 0),
+                                    Shear = -shear,
+                                    Anchor = Anchor.CentreRight,
+                                    Origin = Anchor.CentreRight,
+                                    AutoSizeAxes = Axes.Both,
+                                    Direction = FillDirection.Horizontal,
+                                    Children = statisticsLabels
                                 }
-                            },
-                            nameLabel = new OsuSpriteText
-                            {
-                                Shear = -shear,
-                                Text = user.Username,
-                                Font = OsuFont.GetFont(size: 24, weight: FontWeight.SemiBold)
                             }
-                        }
+                        },
                     },
-                    new FillFlowContainer
-                    {
-                        Margin = new MarginPadding { Right = 40 },
-                        Spacing = new Vector2(25, 0),
-                        Shear = -shear,
-                        Anchor = Anchor.CentreRight,
-                        Origin = Anchor.CentreRight,
-                        AutoSizeAxes = Axes.Both,
-                        Direction = FillDirection.Horizontal,
-                        Children = statisticsLabels
-                    }
-                }
+                },
             };
 
         private FillFlowContainer createRightSideContent() =>
