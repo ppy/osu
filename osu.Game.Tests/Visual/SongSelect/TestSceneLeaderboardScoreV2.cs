@@ -1,6 +1,7 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
@@ -41,6 +42,7 @@ namespace osu.Game.Tests.Visual.SongSelect
                         CountryCode = CountryCode.ES,
                         CoverUrl = @"https://osu.ppy.sh/images/headers/profile-covers/c1.jpg",
                     },
+                    Date = DateTimeOffset.Now.AddYears(-2),
                 },
                 new ScoreInfo
                 {
@@ -58,6 +60,7 @@ namespace osu.Game.Tests.Visual.SongSelect
                         CountryCode = CountryCode.CA,
                         CoverUrl = @"https://osu.ppy.sh/images/headers/profile-covers/c2.jpg",
                     },
+                    Date = DateTimeOffset.Now.AddMonths(-6),
                 },
 
                 new ScoreInfo
@@ -73,6 +76,7 @@ namespace osu.Game.Tests.Visual.SongSelect
                         Username = @"No cover",
                         CountryCode = CountryCode.BR,
                     },
+                    Date = DateTimeOffset.Now,
                 },
             };
 
@@ -91,6 +95,9 @@ namespace osu.Game.Tests.Visual.SongSelect
                     new LeaderboardScoreV2(scores[2], null),
                 }
             };
+
+            foreach (var score in fillFlow.Children)
+                score.Show();
 
             AddSliderStep("change relative width", 0, 1f, 0.6f, v =>
             {
