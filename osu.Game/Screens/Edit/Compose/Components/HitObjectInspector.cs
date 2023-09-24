@@ -73,7 +73,7 @@ namespace osu.Game.Screens.Edit.Compose.Components
                     if (selected is IHasSliderVelocity sliderVelocity)
                     {
                         AddHeader("Slider Velocity");
-                        AddValue($"{sliderVelocity.SliderVelocity:#,0.00}x ({sliderVelocity.SliderVelocity * EditorBeatmap.Difficulty.SliderMultiplier:#,0.00}x)");
+                        AddValue($"{sliderVelocity.SliderVelocityMultiplier:#,0.00}x ({sliderVelocity.SliderVelocityMultiplier * EditorBeatmap.Difficulty.SliderMultiplier:#,0.00}x)");
                     }
 
                     if (selected is IHasRepeats repeats)

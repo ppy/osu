@@ -143,7 +143,7 @@ namespace osu.Game.Screens.Play
                             automaticDownload = new SettingsCheckbox
                             {
                                 LabelText = "Automatically download beatmaps",
-                                Current = config.GetBindable<bool>(OsuSetting.AutomaticallyDownloadWhenSpectating),
+                                Current = config.GetBindable<bool>(OsuSetting.AutomaticallyDownloadMissingBeatmaps),
                                 Anchor = Anchor.Centre,
                                 Origin = Anchor.Centre,
                             },

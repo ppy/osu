@@ -34,7 +34,7 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
         {
             HitObject = hitObject;
 
-            speedMultiplier = (hitObject as IHasSliderVelocity)?.SliderVelocityBindable.GetBoundCopy();
+            speedMultiplier = (hitObject as IHasSliderVelocity)?.SliderVelocityMultiplierBindable.GetBoundCopy();
         }
 
         protected override Color4 GetRepresentingColour(OsuColour colours) => colours.Lime1;
@@ -106,8 +106,8 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
                 var relevantObjects = (beatmap.SelectedHitObjects.Contains(hitObject) ? beatmap.SelectedHitObjects : hitObject.Yield()).Where(o => o is IHasSliderVelocity).ToArray();
 
                 // even if there are multiple objects selected, we can still display a value if they all have the same value.
-                var selectedPointBindable = relevantObjects.Select(point => ((IHasSliderVelocity)point).SliderVelocity).Distinct().Count() == 1
-                    ? ((IHasSliderVelocity)relevantObjects.First()).SliderVelocityBindable
+                var selectedPointBindable = relevantObjects.Select(point => ((IHasSliderVelocity)point).SliderVelocityMultiplier).Distinct().Count() == 1
+                    ? ((IHasSliderVelocity)relevantObjects.First()).SliderVelocityMultiplierBindable
                     : null;
 
                 if (selectedPointBindable != null)
@@ -127,7 +127,7 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
 
                     foreach (var h in relevantObjects)
                     {
-                        ((IHasSliderVelocity)h).SliderVelocity = val.NewValue.Value;
+                        ((IHasSliderVelocity)h).SliderVelocityMultiplier = val.NewValue.Value;
                         beatmap.Update(h);
                     }
 
@@ -169,7 +169,7 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
 
             InspectorText.Clear();
 
-            double[] sliderVelocities = EditorBeatmap.HitObjects.OfType<IHasSliderVelocity>().Select(sv => sv.SliderVelocity).OrderBy(v => v).ToArray();
+            double[] sliderVelocities = EditorBeatmap.HitObjects.OfType<IHasSliderVelocity>().Select(sv => sv.SliderVelocityMultiplier).OrderBy(v => v).ToArray();
 
             AddHeader("Base velocity (from beatmap setup)");
             AddValue($"{beatmapVelocity:#,0.00}x");

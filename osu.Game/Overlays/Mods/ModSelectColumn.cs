@@ -61,9 +61,11 @@ namespace osu.Game.Overlays.Mods
 
         private const float header_height = 42;
 
+        protected const float WIDTH = 320;
+
         protected ModSelectColumn()
         {
-            Width = 320;
+            Width = WIDTH;
             RelativeSizeAxes = Axes.Y;
             Shear = new Vector2(ShearedOverlayContainer.SHEAR, 0);
 

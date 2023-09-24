@@ -18,12 +18,13 @@ using osuTK;
 
 namespace osu.Game.Overlays.Profile.Header.Components
 {
-    public partial class PreviousUsernames : CompositeDrawable
+    public partial class PreviousUsernamesDisplay : CompositeDrawable
     {
         private const int duration = 200;
         private const int margin = 10;
-        private const int width = 310;
+        private const int width = 300;
         private const int move_offset = 15;
+        private const int base_y_offset = -3; // eye balled to make it look good
 
         public readonly Bindable<APIUser?> User = new Bindable<APIUser?>();
 
@@ -31,14 +32,15 @@ namespace osu.Game.Overlays.Profile.Header.Components
         private readonly Box background;
         private readonly SpriteText header;
 
-        public PreviousUsernames()
+        public PreviousUsernamesDisplay()
         {
             HoverIconContainer hoverIcon;
 
             AutoSizeAxes = Axes.Y;
             Width = width;
             Masking = true;
-            CornerRadius = 5;
+            CornerRadius = 6;
+            Y = base_y_offset;
 
             AddRangeInternal(new Drawable[]
             {
@@ -84,6 +86,9 @@ namespace osu.Game.Overlays.Profile.Header.Components
                                 RelativeSizeAxes = Axes.X,
                                 AutoSizeAxes = Axes.Y,
                                 Direction = FillDirection.Full,
+                                // Prevents the tooltip of having a sudden size reduction and flickering when the text is being faded out.
+                                // Also prevents a potential OnHover/HoverLost feedback loop.
+                                AlwaysPresent = true,
                                 Margin = new MarginPadding { Bottom = margin, Top = margin / 2f }
                             }
                         }
@@ -96,9 +101,9 @@ namespace osu.Game.Overlays.Profile.Header.Components
         }
 
         [BackgroundDependencyLoader]
-        private void load(OsuColour colours)
+        private void load(OverlayColourProvider colours)
         {
-            background.Colour = colours.GreySeaFoamDarker;
+            background.Colour = colours.Background6;
         }
 
         protected override void LoadComplete()
@@ -134,7 +139,7 @@ namespace osu.Game.Overlays.Profile.Header.Components
             text.FadeIn(duration, Easing.OutQuint);
             header.FadeIn(duration, Easing.OutQuint);
             background.FadeIn(duration, Easing.OutQuint);
-            this.MoveToY(-move_offset, duration, Easing.OutQuint);
+            this.MoveToY(base_y_offset - move_offset, duration, Easing.OutQuint);
         }
 
         private void hideContent()
@@ -142,7 +147,7 @@ namespace osu.Game.Overlays.Profile.Header.Components
             text.FadeOut(duration, Easing.OutQuint);
             header.FadeOut(duration, Easing.OutQuint);
             background.FadeOut(duration, Easing.OutQuint);
-            this.MoveToY(0, duration, Easing.OutQuint);
+            this.MoveToY(base_y_offset, duration, Easing.OutQuint);
         }
 
         private partial class HoverIconContainer : Container
@@ -156,7 +161,7 @@ namespace osu.Game.Overlays.Profile.Header.Components
                 {
                     Margin = new MarginPadding { Top = 6, Left = margin, Right = margin * 2 },
                     Size = new Vector2(15),
-                    Icon = FontAwesome.Solid.IdCard,
+                    Icon = FontAwesome.Solid.AddressCard,
                 };
             }
 

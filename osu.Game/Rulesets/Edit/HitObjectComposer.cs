@@ -87,6 +87,8 @@ namespace osu.Game.Rulesets.Edit
         private IBindable<bool> hasTiming;
         private Bindable<bool> autoSeekOnPlacement;
 
+        protected DrawableRuleset<TObject> DrawableRuleset { get; private set; }
+
         protected HitObjectComposer(Ruleset ruleset)
             : base(ruleset)
         {
@@ -104,7 +106,8 @@ namespace osu.Game.Rulesets.Edit
 
             try
             {
-                drawableRulesetWrapper = new DrawableEditorRulesetWrapper<TObject>(CreateDrawableRuleset(Ruleset, EditorBeatmap.PlayableBeatmap, new[] { Ruleset.GetAutoplayMod() }))
+                DrawableRuleset = CreateDrawableRuleset(Ruleset, EditorBeatmap.PlayableBeatmap, new[] { Ruleset.GetAutoplayMod() });
+                drawableRulesetWrapper = new DrawableEditorRulesetWrapper<TObject>(DrawableRuleset)
                 {
                     Clock = EditorClock,
                     ProcessCustomClock = false
@@ -304,7 +307,7 @@ namespace osu.Game.Rulesets.Edit
         /// <param name="beatmap">The loaded beatmap.</param>
         /// <param name="mods">The mods to be applied.</param>
         /// <returns>An editor-relevant <see cref="DrawableRuleset{TObject}"/>.</returns>
-        protected virtual DrawableRuleset<TObject> CreateDrawableRuleset(Ruleset ruleset, IBeatmap beatmap, IReadOnlyList<Mod> mods = null)
+        protected virtual DrawableRuleset<TObject> CreateDrawableRuleset(Ruleset ruleset, IBeatmap beatmap, IReadOnlyList<Mod> mods)
             => (DrawableRuleset<TObject>)ruleset.CreateDrawableRulesetWith(beatmap, mods);
 
         #region Tool selection logic

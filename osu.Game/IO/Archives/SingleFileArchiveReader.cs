@@ -7,14 +7,14 @@ using System.IO;
 namespace osu.Game.IO.Archives
 {
     /// <summary>
-    /// Reads a file on disk as an archive.
+    /// Reads a single file on disk as an archive.
     /// Note: In this case, the file is not an extractable archive, use <see cref="ZipArchiveReader"/> instead.
     /// </summary>
-    public class LegacyFileArchiveReader : ArchiveReader
+    public class SingleFileArchiveReader : ArchiveReader
     {
         private readonly string path;
 
-        public LegacyFileArchiveReader(string path)
+        public SingleFileArchiveReader(string path)
             : base(Path.GetFileName(path))
         {
             // re-get full path to standardise
