@@ -7,6 +7,7 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Online.Leaderboards;
+using osu.Game.Overlays;
 using osu.Game.Rulesets.Mania;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Osu;
@@ -19,6 +20,9 @@ namespace osu.Game.Tests.Visual.SongSelect
 {
     public partial class TestSceneLeaderboardScoreV2 : OsuTestScene
     {
+        [Cached]
+        private OverlayColourProvider colourProvider { get; set; } = new OverlayColourProvider(OverlayColourScheme.Aquamarine);
+
         private FillFlowContainer fillFlow = null!;
 
         [BackgroundDependencyLoader]

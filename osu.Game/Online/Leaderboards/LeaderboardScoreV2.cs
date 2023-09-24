@@ -52,8 +52,8 @@ namespace osu.Game.Online.Leaderboards
 
         private static readonly Vector2 shear = new Vector2(0.15f, 0);
 
-        [Cached]
-        private OverlayColourProvider colourProvider { get; set; } = new OverlayColourProvider(OverlayColourScheme.Aquamarine);
+        [Resolved]
+        private OverlayColourProvider colourProvider { get; set; } = null!;
 
         [Resolved]
         private SongSelect? songSelect { get; set; }
