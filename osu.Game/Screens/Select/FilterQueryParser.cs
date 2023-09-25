@@ -25,8 +25,12 @@ namespace osu.Game.Screens.Select
 
         internal static void ApplyQueries(FilterCriteria criteria, string query)
         {
-            foreach (Match match in difficulty_query_syntax_regex.Matches(query))
+            while (true)
             {
+                var match = difficulty_query_syntax_regex.Matches(query).FirstOrDefault();
+
+                if (match is null) break;
+
                 // Trim the first character because it's always '[' (ignoring spaces)
                 string cleanDifficultyQuery = match.Value.Trim(' ')[1..];
 
