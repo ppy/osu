@@ -32,7 +32,6 @@ using osu.Game.Rulesets.Mods;
 using osu.Game.Screens.Menu;
 using osu.Game.Screens.OnlinePlay.Match.Components;
 using osu.Game.Screens.OnlinePlay.Multiplayer;
-using osuTK;
 
 namespace osu.Game.Screens.OnlinePlay.Match
 {
