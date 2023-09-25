@@ -19,8 +19,27 @@ namespace osu.Game.Screens.Select
             @"\b(?<key>\w+)(?<op>(:|=|(>|<)(:|=)?))(?<value>("".*""[!]?)|(\S*))",
             RegexOptions.Compiled | RegexOptions.IgnoreCase);
 
+        private static readonly Regex difficulty_query_syntax_regex = new Regex(
+            @"(\s|^)((\[(?>\[(?<level>)|[^[\]]+|\](?<-level>))*(?(level)(?!))\](\s|$))|(\[.*))",
+            RegexOptions.Compiled);
+
         internal static void ApplyQueries(FilterCriteria criteria, string query)
         {
+            foreach (Match match in difficulty_query_syntax_regex.Matches(query))
+            {
+                // Trim the first character because it's always '[' (ignoring spaces)
+                string cleanDifficultyQuery = match.Value.Trim(' ')[1..];
+
+                if (cleanDifficultyQuery.EndsWith(']'))
+                    cleanDifficultyQuery = cleanDifficultyQuery[..^1];
+
+                criteria.DifficultySearchText = cleanDifficultyQuery;
+
+                // Insert whitespace if necessary so that the words before and after the difficulty query aren't joined together.
+                bool insertWhitespace = match.Value.StartsWith(' ') && match.Value.EndsWith(' ');
+                query = query.Replace(match.Value, insertWhitespace ? " " : "");
+            }
+
             foreach (Match match in query_syntax_regex.Matches(query))
             {
                 string key = match.Groups["key"].Value.ToLowerInvariant();

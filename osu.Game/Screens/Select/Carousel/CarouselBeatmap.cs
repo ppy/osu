@@ -64,6 +64,8 @@ namespace osu.Game.Screens.Select.Carousel
 
             if (!match) return false;
 
+            match &= criteria.DifficultySearchTerms.All(term => term.Matches(BeatmapInfo.DifficultyName));
+
             if (criteria.SearchTerms.Length > 0)
             {
                 var searchableTerms = BeatmapInfo.GetSearchableTerms();

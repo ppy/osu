@@ -46,6 +46,7 @@ namespace osu.Game.Screens.Select
         };
 
         public OptionalTextFilter[] SearchTerms = Array.Empty<OptionalTextFilter>();
+        public OptionalTextFilter[] DifficultySearchTerms = Array.Empty<OptionalTextFilter>();
 
         public RulesetInfo? Ruleset;
         public bool AllowConvertedBeatmaps;
@@ -64,24 +65,7 @@ namespace osu.Game.Screens.Select
             {
                 searchText = value;
 
-                List<OptionalTextFilter> terms = new List<OptionalTextFilter>();
-
-                string remainingText = value;
-
-                // First handle quoted segments to ensure we keep inline spaces in exact matches.
-                foreach (Match quotedSegment in Regex.Matches(searchText, "(\"[^\"]+\"[!]?)"))
-                {
-                    terms.Add(new OptionalTextFilter { SearchTerm = quotedSegment.Value });
-                    remainingText = remainingText.Replace(quotedSegment.Value, string.Empty);
-                }
-
-                // Then handle the rest splitting on any spaces.
-                terms.AddRange(remainingText.Split(' ', StringSplitOptions.RemoveEmptyEntries).Select(s => new OptionalTextFilter
-                {
-                    SearchTerm = s
-                }));
-
-                SearchTerms = terms.ToArray();
+                SearchTerms = getTermsFromSearchText(value);
 
                 SearchNumber = null;
 
@@ -90,12 +74,39 @@ namespace osu.Game.Screens.Select
             }
         }
 
+        public string DifficultySearchText
+        {
+            set => DifficultySearchTerms = getTermsFromSearchText(value);
+        }
+
         /// <summary>
         /// Hashes from the <see cref="BeatmapCollection"/> to filter to.
         /// </summary>
         public IEnumerable<string>? CollectionBeatmapMD5Hashes { get; set; }
 
         public IRulesetFilterCriteria? RulesetCriteria { get; set; }
+
+        private static OptionalTextFilter[] getTermsFromSearchText(string searchText)
+        {
+            List<OptionalTextFilter> terms = new List<OptionalTextFilter>();
+
+            string remainingText = searchText;
+
+            // First handle quoted segments to ensure we keep inline spaces in exact matches.
+            foreach (Match quotedSegment in Regex.Matches(searchText, "(\"[^\"]+\"[!]?)"))
+            {
+                terms.Add(new OptionalTextFilter { SearchTerm = quotedSegment.Value });
+                remainingText = remainingText.Replace(quotedSegment.Value, string.Empty);
+            }
+
+            // Then handle the rest splitting on any spaces.
+            terms.AddRange(remainingText.Split(' ', StringSplitOptions.RemoveEmptyEntries).Select(s => new OptionalTextFilter
+            {
+                SearchTerm = s
+            }));
+
+            return terms.ToArray();
+        }
 
         public struct OptionalRange<T> : IEquatable<OptionalRange<T>>
             where T : struct
