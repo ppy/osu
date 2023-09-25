@@ -32,6 +32,7 @@ using osu.Game.Rulesets.Mods;
 using osu.Game.Screens.Menu;
 using osu.Game.Screens.OnlinePlay.Match.Components;
 using osu.Game.Screens.OnlinePlay.Multiplayer;
+using osuTK;
 
 namespace osu.Game.Screens.OnlinePlay.Match
 {
@@ -437,6 +438,8 @@ namespace osu.Game.Screens.OnlinePlay.Match
             }
             else
             {
+                var localBeatmap = selected.Beatmap == null ? null : beatmapManager.QueryBeatmap(b => b.OnlineID == selected.Beatmap.OnlineID);
+                UserModsSelectOverlay.Beatmap = beatmapManager.GetWorkingBeatmap(localBeatmap);
                 UserModsSection?.Show();
                 UserModsSelectOverlay.IsValidMod = m => allowedMods.Any(a => a.GetType() == m.GetType());
             }
