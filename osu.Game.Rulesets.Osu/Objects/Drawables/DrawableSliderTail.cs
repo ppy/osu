@@ -55,7 +55,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
         private void load()
         {
             Origin = Anchor.Centre;
-            Size = new Vector2(OsuHitObject.OBJECT_RADIUS * 2);
+            Size = OsuHitObject.OBJECT_DIMENSIONS;
 
             AddRangeInternal(new Drawable[]
             {
