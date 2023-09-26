@@ -32,6 +32,16 @@ namespace osu.Game.Rulesets.Osu.Objects
         public int SpinsRequired { get; protected set; } = 1;
 
         /// <summary>
+        /// The number of spins required to start receiving bonus score. The first bonus is awarded on this spin count.
+        /// </summary>
+        public int SpinsRequiredForBonus => SpinsRequired + bonus_spins_gap;
+
+        /// <summary>
+        /// The gap between spinner completion and the first bonus-awarding spin.
+        /// </summary>
+        private const int bonus_spins_gap = 2;
+
+        /// <summary>
         /// Number of spins available to give bonus, beyond <see cref="SpinsRequired"/>.
         /// </summary>
         public int MaximumBonusSpins { get; protected set; } = 1;
@@ -42,25 +52,20 @@ namespace osu.Game.Rulesets.Osu.Objects
         {
             base.ApplyDefaultsToSelf(controlPointInfo, difficulty);
 
-            // spinning doesn't match 1:1 with stable, so let's fudge them easier for the time being.
-            const double stable_matching_fudge = 0.6;
-
-            // close to 477rpm
-            const double maximum_rotations_per_second = 8;
+            const double maximum_rotations_per_second = 477f / 60f;
 
             double secondsDuration = Duration / 1000;
-
-            double minimumRotationsPerSecond = stable_matching_fudge * IBeatmapDifficultyInfo.DifficultyRange(difficulty.OverallDifficulty, 3, 5, 7.5);
+            double minimumRotationsPerSecond = IBeatmapDifficultyInfo.DifficultyRange(difficulty.OverallDifficulty, 1.5, 2.5, 3.75);
 
             SpinsRequired = (int)(secondsDuration * minimumRotationsPerSecond);
-            MaximumBonusSpins = (int)((maximum_rotations_per_second - minimumRotationsPerSecond) * secondsDuration);
+            MaximumBonusSpins = (int)((maximum_rotations_per_second - minimumRotationsPerSecond) * secondsDuration) - bonus_spins_gap;
         }
 
         protected override void CreateNestedHitObjects(CancellationToken cancellationToken)
         {
             base.CreateNestedHitObjects(cancellationToken);
 
-            int totalSpins = MaximumBonusSpins + SpinsRequired;
+            int totalSpins = MaximumBonusSpins + SpinsRequired + bonus_spins_gap;
 
             for (int i = 0; i < totalSpins; i++)
             {
@@ -68,7 +73,7 @@ namespace osu.Game.Rulesets.Osu.Objects
 
                 double startTime = StartTime + (float)(i + 1) / totalSpins * Duration;
 
-                AddNested(i < SpinsRequired
+                AddNested(i < SpinsRequiredForBonus
                     ? new SpinnerTick { StartTime = startTime, SpinnerDuration = Duration }
                     : new SpinnerBonusTick { StartTime = startTime, SpinnerDuration = Duration, Samples = new[] { CreateHitSampleInfo("spinnerbonus") } });
             }

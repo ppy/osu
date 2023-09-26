@@ -78,7 +78,7 @@ namespace osu.Game.Tests.Editing
         {
             assertSnapDistance(100, new Slider
             {
-                SliderVelocity = multiplier
+                SliderVelocityMultiplier = multiplier
             }, false);
         }
 
@@ -88,7 +88,7 @@ namespace osu.Game.Tests.Editing
         {
             assertSnapDistance(100 * multiplier, new Slider
             {
-                SliderVelocity = multiplier
+                SliderVelocityMultiplier = multiplier
             }, true);
         }
 
@@ -112,7 +112,7 @@ namespace osu.Game.Tests.Editing
 
             var referenceObject = new Slider
             {
-                SliderVelocity = slider_velocity
+                SliderVelocityMultiplier = slider_velocity
             };
 
             assertSnapDistance(base_distance * slider_velocity, referenceObject, true);

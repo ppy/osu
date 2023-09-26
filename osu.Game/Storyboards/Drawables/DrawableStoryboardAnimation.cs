@@ -99,15 +99,13 @@ namespace osu.Game.Storyboards.Drawables
         {
             int frameIndex = 0;
 
-            Texture frameTexture = storyboard.GetTextureFromPath(getFramePath(frameIndex), textureStore);
+            Texture frameTexture = textureStore.Get(getFramePath(frameIndex));
 
             if (frameTexture != null)
             {
                 // sourcing from storyboard.
                 for (frameIndex = 0; frameIndex < Animation.FrameCount; frameIndex++)
-                {
-                    AddFrame(storyboard.GetTextureFromPath(getFramePath(frameIndex), textureStore), Animation.FrameDelay);
-                }
+                    AddFrame(textureStore.Get(getFramePath(frameIndex)), Animation.FrameDelay);
             }
             else if (storyboard.UseSkinSprites)
             {

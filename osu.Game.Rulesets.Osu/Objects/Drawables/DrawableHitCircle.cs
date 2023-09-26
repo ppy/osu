@@ -18,6 +18,7 @@ using osu.Game.Rulesets.Objects.Drawables;
 using osu.Game.Rulesets.Osu.Judgements;
 using osu.Game.Rulesets.Osu.Skinning;
 using osu.Game.Rulesets.Osu.Skinning.Default;
+using osu.Game.Rulesets.Osu.UI;
 using osu.Game.Rulesets.Scoring;
 using osu.Game.Skinning;
 using osuTK;
@@ -154,12 +155,13 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
             }
 
             var result = ResultFor(timeOffset);
+            var clickAction = CheckHittable?.Invoke(this, Time.Current, result);
 
-            if (result == HitResult.None || CheckHittable?.Invoke(this, Time.Current) == false)
-            {
+            if (clickAction == ClickAction.Shake)
                 Shake();
+
+            if (result == HitResult.None || clickAction != ClickAction.Hit)
                 return;
-            }
 
             ApplyResult(r =>
             {
@@ -259,7 +261,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
                     case OsuAction.RightButton:
                         if (IsHovered && (Hit?.Invoke() ?? false))
                         {
-                            HitAction = e.Action;
+                            HitAction ??= e.Action;
                             return true;
                         }
 

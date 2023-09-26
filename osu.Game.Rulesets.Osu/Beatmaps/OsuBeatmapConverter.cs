@@ -49,7 +49,7 @@ namespace osu.Game.Rulesets.Osu.Beatmaps
                         // this results in more (or less) ticks being generated in <v8 maps for the same time duration.
                         TickDistanceMultiplier = beatmap.BeatmapInfo.BeatmapVersion < 8 ? 1f / ((LegacyControlPointInfo)beatmap.ControlPointInfo).DifficultyPointAt(original.StartTime).SliderVelocity : 1,
                         GenerateTicks = generateTicksData?.GenerateTicks ?? true,
-                        SliderVelocity = sliderVelocityData?.SliderVelocity ?? 1,
+                        SliderVelocityMultiplier = sliderVelocityData?.SliderVelocityMultiplier ?? 1,
                     }.Yield();
 
                 case IHasDuration endTimeData:
