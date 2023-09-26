@@ -68,7 +68,7 @@ namespace osu.Game.Tests.Visual.Gameplay
                 var texture = base.GetTexture(componentName, wrapModeS, wrapModeT);
 
                 if (texture != null)
-                    texture.ScaleAdjust /= 40f;
+                    texture.ScaleAdjust /= 8f;
 
                 return texture;
             }
