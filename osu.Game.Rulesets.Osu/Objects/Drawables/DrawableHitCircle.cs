@@ -244,7 +244,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
 
             public HitReceptor()
             {
-                Size = new Vector2(OsuHitObject.OBJECT_RADIUS * 2);
+                Size = OsuHitObject.OBJECT_DIMENSIONS;
 
                 Anchor = Anchor.Centre;
                 Origin = Anchor.Centre;

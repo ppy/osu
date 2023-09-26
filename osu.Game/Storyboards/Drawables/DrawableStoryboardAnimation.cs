@@ -135,7 +135,7 @@ namespace osu.Game.Storyboards.Drawables
 
             // When reading from a skin, we match stables weird behaviour where `FrameCount` is ignored
             // and resources are retrieved until the end of the animation.
-            foreach (var texture in skin.GetTextures(Path.GetFileNameWithoutExtension(Animation.Path)!, default, default, true, string.Empty, out _))
+            foreach (var texture in skin.GetTextures(Path.GetFileNameWithoutExtension(Animation.Path)!, default, default, true, string.Empty, null, out _))
                 AddFrame(texture, Animation.FrameDelay);
         }
 
