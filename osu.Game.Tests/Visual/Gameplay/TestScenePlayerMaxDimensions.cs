@@ -14,7 +14,14 @@ using osu.Game.Skinning;
 
 namespace osu.Game.Tests.Visual.Gameplay
 {
-    public partial class TestSceneGameplayElementDimensions : TestSceneAllRulesetPlayers
+    /// <summary>
+    /// Upscales all gameplay sprites by a huge amount, to aid in manually checking skin texture size limits
+    /// on individual elements.
+    /// </summary>
+    /// <remarks>
+    /// The HUD is hidden as it does't really affect game balance if HUD elements are larger than they should be.
+    /// </remarks>
+    public partial class TestScenePlayerMaxDimensions : TestSceneAllRulesetPlayers
     {
         protected override IReadOnlyDependencyContainer CreateChildDependencies(IReadOnlyDependencyContainer parent)
         {
@@ -61,7 +68,7 @@ namespace osu.Game.Tests.Visual.Gameplay
                 var texture = base.GetTexture(componentName, wrapModeS, wrapModeT);
 
                 if (texture != null)
-                    texture.ScaleAdjust /= 5f;
+                    texture.ScaleAdjust /= 40f;
 
                 return texture;
             }
