@@ -13,7 +13,7 @@ layout(location = 4) out mediump vec2 v_BlendRange;
 void main(void)
 {
 	// Transform from screen space to masking space.
-	highp vec3 maskingPos = g_MaskingInfo.ToMaskingSpace * vec3(m_Position, 1.0);
+	highp vec3 maskingPos = g_ToMaskingSpace * vec3(m_Position, 1.0);
 	v_MaskingPosition = maskingPos.xy / maskingPos.z;
 
 	v_Colour = m_Colour;

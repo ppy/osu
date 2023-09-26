@@ -622,6 +622,38 @@ namespace osu.Game.Tests.Beatmaps.Formats
         }
 
         [Test]
+        public void TestInvalidBankDefaultsToNormal()
+        {
+            var decoder = new LegacyBeatmapDecoder { ApplyOffsets = false };
+
+            using (var resStream = TestResources.OpenResource("invalid-bank.osu"))
+            using (var stream = new LineBufferedReader(resStream))
+            {
+                var hitObjects = decoder.Decode(stream).HitObjects;
+
+                assertObjectHasBanks(hitObjects[0], HitSampleInfo.BANK_DRUM);
+                assertObjectHasBanks(hitObjects[1], HitSampleInfo.BANK_NORMAL);
+                assertObjectHasBanks(hitObjects[2], HitSampleInfo.BANK_SOFT);
+                assertObjectHasBanks(hitObjects[3], HitSampleInfo.BANK_DRUM);
+                assertObjectHasBanks(hitObjects[4], HitSampleInfo.BANK_NORMAL);
+
+                assertObjectHasBanks(hitObjects[5], HitSampleInfo.BANK_DRUM, HitSampleInfo.BANK_DRUM);
+                assertObjectHasBanks(hitObjects[6], HitSampleInfo.BANK_DRUM, HitSampleInfo.BANK_NORMAL);
+                assertObjectHasBanks(hitObjects[7], HitSampleInfo.BANK_DRUM, HitSampleInfo.BANK_SOFT);
+                assertObjectHasBanks(hitObjects[8], HitSampleInfo.BANK_DRUM, HitSampleInfo.BANK_DRUM);
+                assertObjectHasBanks(hitObjects[9], HitSampleInfo.BANK_DRUM, HitSampleInfo.BANK_NORMAL);
+            }
+
+            void assertObjectHasBanks(HitObject hitObject, string normalBank, string? additionsBank = null)
+            {
+                Assert.AreEqual(normalBank, hitObject.Samples[0].Bank);
+
+                if (additionsBank != null)
+                    Assert.AreEqual(additionsBank, hitObject.Samples[1].Bank);
+            }
+        }
+
+        [Test]
         public void TestFallbackDecoderForCorruptedHeader()
         {
             Decoder<Beatmap> decoder = null!;
@@ -1024,10 +1056,8 @@ namespace osu.Game.Tests.Beatmaps.Formats
                 Assert.That(controlPoints.DifficultyPointAt(2000).SliderVelocity, Is.EqualTo(1));
                 Assert.That(controlPoints.DifficultyPointAt(3000).SliderVelocity, Is.EqualTo(1));
 
-#pragma warning disable 618
-                Assert.That(((LegacyBeatmapDecoder.LegacyDifficultyControlPoint)controlPoints.DifficultyPointAt(2000)).GenerateTicks, Is.False);
-                Assert.That(((LegacyBeatmapDecoder.LegacyDifficultyControlPoint)controlPoints.DifficultyPointAt(3000)).GenerateTicks, Is.True);
-#pragma warning restore 618
+                Assert.That(controlPoints.DifficultyPointAt(2000).GenerateTicks, Is.False);
+                Assert.That(controlPoints.DifficultyPointAt(3000).GenerateTicks, Is.True);
             }
         }
     }

@@ -15,11 +15,6 @@ namespace osu.Game.Localisation
         public static LocalisableString UserInterfaceSectionHeader => new TranslatableString(getKey(@"user_interface_section_header"), @"User Interface");
 
         /// <summary>
-        /// "General"
-        /// </summary>
-        public static LocalisableString GeneralHeader => new TranslatableString(getKey(@"general_header"), @"General");
-
-        /// <summary>
         /// "Rotate cursor when dragging"
         /// </summary>
         public static LocalisableString CursorRotation => new TranslatableString(getKey(@"cursor_rotation"), @"Rotate cursor when dragging");

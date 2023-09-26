@@ -54,7 +54,12 @@ namespace osu.Game.Scoring
                 }
                 catch (LegacyScoreDecoder.BeatmapNotFoundException e)
                 {
-                    Logger.Log($@"Score '{name}' failed to import: no corresponding beatmap with the hash '{e.Hash}' could be found.", LoggingTarget.Database);
+                    Logger.Log($@"Score '{archive.Name}' failed to import: no corresponding beatmap with the hash '{e.Hash}' could be found.", LoggingTarget.Database);
+
+                    // In the case of a missing beatmap, let's attempt to resolve it and show a prompt to the user to download the required beatmap.
+                    var req = new GetBeatmapRequest(new BeatmapInfo { MD5Hash = e.Hash });
+                    req.Success += res => PostNotification?.Invoke(new MissingBeatmapNotification(res, archive, e.Hash));
+                    api.Queue(req);
                     return null;
                 }
             }

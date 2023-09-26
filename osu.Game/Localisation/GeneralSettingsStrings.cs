@@ -10,11 +10,6 @@ namespace osu.Game.Localisation
         private const string prefix = @"osu.Game.Resources.Localisation.GeneralSettings";
 
         /// <summary>
-        /// "General"
-        /// </summary>
-        public static LocalisableString GeneralSectionHeader => new TranslatableString(getKey(@"general_section_header"), @"General");
-
-        /// <summary>
         /// "Language"
         /// </summary>
         public static LocalisableString LanguageHeader => new TranslatableString(getKey(@"language_header"), @"Language");

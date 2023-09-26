@@ -6,10 +6,13 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using System.Text;
+using System.Threading;
 using Newtonsoft.Json;
 using osu.Framework.Audio.Sample;
 using osu.Framework.Bindables;
+using osu.Framework.Extensions.TypeExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Textures;
@@ -54,6 +57,8 @@ namespace osu.Game.Skinning
 
         private readonly RealmBackedResourceStore<SkinInfo>? realmBackedStorage;
 
+        public string Name { get; }
+
         /// <summary>
         /// Construct a new skin.
         /// </summary>
@@ -63,6 +68,8 @@ namespace osu.Game.Skinning
         /// <param name="configurationFilename">An optional filename to read the skin configuration from. If not provided, the configuration will be retrieved from the storage using "skin.ini".</param>
         protected Skin(SkinInfo skin, IStorageResourceProvider? resources, IResourceStore<byte[]>? storage = null, string configurationFilename = @"skin.ini")
         {
+            Name = skin.Name;
+
             if (resources != null)
             {
                 SkinInfo = skin.ToLive(resources.RealmAccess);
@@ -239,5 +246,50 @@ namespace osu.Game.Skinning
         }
 
         #endregion
+
+        public override string ToString() => $"{GetType().ReadableName()} {{ Name: {Name} }}";
+
+        private static readonly ThreadLocal<int> nested_level = new ThreadLocal<int>(() => 0);
+
+        [Conditional("SKIN_LOOKUP_DEBUG")]
+        internal static void LogLookupDebug(object callingClass, object lookup, LookupDebugType type, [CallerMemberName] string callerMethod = "")
+        {
+            string icon = string.Empty;
+            int level = nested_level.Value;
+
+            switch (type)
+            {
+                case LookupDebugType.Hit:
+                    icon = "🟢 hit";
+                    break;
+
+                case LookupDebugType.Miss:
+                    icon = "🔴 miss";
+                    break;
+
+                case LookupDebugType.Enter:
+                    nested_level.Value++;
+                    break;
+
+                case LookupDebugType.Exit:
+                    nested_level.Value--;
+                    if (nested_level.Value == 0)
+                        Logger.Log(string.Empty);
+                    return;
+            }
+
+            string lookupString = lookup.ToString() ?? string.Empty;
+            string callingClassString = callingClass.ToString() ?? string.Empty;
+
+            Logger.Log($"{string.Join(null, Enumerable.Repeat("|-", level))}{callingClassString}.{callerMethod}(lookup: {lookupString}) {icon}");
+        }
+
+        internal enum LookupDebugType
+        {
+            Hit,
+            Miss,
+            Enter,
+            Exit
+        }
     }
 }

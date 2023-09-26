@@ -8,13 +8,13 @@ using System.Linq;
 namespace osu.Game.IO.Archives
 {
     /// <summary>
-    /// Reads an archive from a directory on disk.
+    /// Reads an archive directly from a directory on disk.
     /// </summary>
-    public class LegacyDirectoryArchiveReader : ArchiveReader
+    public class DirectoryArchiveReader : ArchiveReader
     {
         private readonly string path;
 
-        public LegacyDirectoryArchiveReader(string path)
+        public DirectoryArchiveReader(string path)
             : base(Path.GetFileName(path))
         {
             // re-get full path to standardise with Directory.GetFiles return values below.
