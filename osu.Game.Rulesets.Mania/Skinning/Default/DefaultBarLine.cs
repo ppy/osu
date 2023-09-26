@@ -4,6 +4,7 @@
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
+using osu.Framework.Graphics.Colour;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Game.Rulesets.Mania.Objects.Drawables;
@@ -33,25 +34,28 @@ namespace osu.Game.Rulesets.Mania.Skinning.Default
                 RelativeSizeAxes = Axes.Both,
             });
 
-            Vector2 size = new Vector2(22, 6);
-            const float line_offset = 4;
+            const float major_extension = 10;
 
-            AddInternal(leftAnchor = new Circle
+            AddInternal(leftAnchor = new Box
             {
                 Name = "Left anchor",
+                Blending = BlendingParameters.Additive,
                 Anchor = Anchor.CentreLeft,
                 Origin = Anchor.CentreRight,
-                Size = size,
-                X = -line_offset,
+                Width = major_extension,
+                RelativeSizeAxes = Axes.Y,
+                Colour = ColourInfo.GradientHorizontal(Colour4.Transparent, Colour4.White),
             });
 
-            AddInternal(rightAnchor = new Circle
+            AddInternal(rightAnchor = new Box
             {
                 Name = "Right anchor",
+                Blending = BlendingParameters.Additive,
                 Anchor = Anchor.CentreRight,
                 Origin = Anchor.CentreLeft,
-                Size = size,
-                X = line_offset,
+                Width = major_extension,
+                RelativeSizeAxes = Axes.Y,
+                Colour = ColourInfo.GradientHorizontal(Colour4.White, Colour4.Transparent),
             });
 
             major = ((DrawableBarLine)drawableHitObject).Major.GetBoundCopy();
@@ -66,7 +70,7 @@ namespace osu.Game.Rulesets.Mania.Skinning.Default
         private void updateMajor(ValueChangedEvent<bool> major)
         {
             mainLine.Alpha = major.NewValue ? 0.5f : 0.2f;
-            leftAnchor.Alpha = rightAnchor.Alpha = major.NewValue ? 1 : 0;
+            leftAnchor.Alpha = rightAnchor.Alpha = major.NewValue ? mainLine.Alpha * 0.3f : 0;
         }
     }
 }
