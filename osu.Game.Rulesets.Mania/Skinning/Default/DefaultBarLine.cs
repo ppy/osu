@@ -26,9 +26,13 @@ namespace osu.Game.Rulesets.Mania.Skinning.Default
         {
             RelativeSizeAxes = Axes.Both;
 
+            // Avoid flickering due to no anti-aliasing of boxes by default.
+            var edgeSmoothness = new Vector2(0.3f);
+
             AddInternal(mainLine = new Box
             {
                 Name = "Bar line",
+                EdgeSmoothness = edgeSmoothness,
                 Anchor = Anchor.BottomCentre,
                 Origin = Anchor.BottomCentre,
                 RelativeSizeAxes = Axes.Both,
@@ -39,6 +43,7 @@ namespace osu.Game.Rulesets.Mania.Skinning.Default
             AddInternal(leftAnchor = new Box
             {
                 Name = "Left anchor",
+                EdgeSmoothness = edgeSmoothness,
                 Blending = BlendingParameters.Additive,
                 Anchor = Anchor.CentreLeft,
                 Origin = Anchor.CentreRight,
@@ -50,6 +55,7 @@ namespace osu.Game.Rulesets.Mania.Skinning.Default
             AddInternal(rightAnchor = new Box
             {
                 Name = "Right anchor",
+                EdgeSmoothness = edgeSmoothness,
                 Blending = BlendingParameters.Additive,
                 Anchor = Anchor.CentreRight,
                 Origin = Anchor.CentreLeft,
