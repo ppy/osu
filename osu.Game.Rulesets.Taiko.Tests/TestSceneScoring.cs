@@ -2,10 +2,12 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
+using System.Collections.Generic;
 using NUnit.Framework;
 using osu.Framework.Bindables;
 using osu.Game.Beatmaps;
 using osu.Game.Rulesets.Judgements;
+using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Scoring;
 using osu.Game.Rulesets.Taiko.Beatmaps;
 using osu.Game.Rulesets.Taiko.Judgements;
@@ -35,7 +37,8 @@ namespace osu.Game.Rulesets.Taiko.Tests
         protected override IScoringAlgorithm CreateScoreV1() => new ScoreV1 { ScoreMultiplier = { BindTarget = scoreMultiplier } };
         protected override IScoringAlgorithm CreateScoreV2(int maxCombo) => new ScoreV2(maxCombo);
 
-        protected override ProcessorBasedScoringAlgorithm CreateScoreAlgorithm(IBeatmap beatmap, ScoringMode mode) => new TaikoProcessorBasedScoringAlgorithm(beatmap, mode);
+        protected override ProcessorBasedScoringAlgorithm CreateScoreAlgorithm(IBeatmap beatmap, ScoringMode mode, IReadOnlyList<Mod> selectedMods)
+            => new TaikoProcessorBasedScoringAlgorithm(beatmap, mode, selectedMods);
 
         [Test]
         public void TestBasicScenarios()
@@ -171,8 +174,8 @@ namespace osu.Game.Rulesets.Taiko.Tests
 
         private class TaikoProcessorBasedScoringAlgorithm : ProcessorBasedScoringAlgorithm
         {
-            public TaikoProcessorBasedScoringAlgorithm(IBeatmap beatmap, ScoringMode mode)
-                : base(beatmap, mode)
+            public TaikoProcessorBasedScoringAlgorithm(IBeatmap beatmap, ScoringMode mode, IReadOnlyList<Mod> selectedMods)
+                : base(beatmap, mode, selectedMods)
             {
             }
 

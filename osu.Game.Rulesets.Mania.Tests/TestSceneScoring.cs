@@ -2,6 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
+using System.Collections.Generic;
 using NUnit.Framework;
 using osu.Game.Beatmaps;
 using osu.Game.Rulesets.Judgements;
@@ -9,6 +10,7 @@ using osu.Game.Rulesets.Mania.Beatmaps;
 using osu.Game.Rulesets.Mania.Judgements;
 using osu.Game.Rulesets.Mania.Objects;
 using osu.Game.Rulesets.Mania.Scoring;
+using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Scoring;
 using osu.Game.Tests.Visual.Gameplay;
 
@@ -27,7 +29,9 @@ namespace osu.Game.Rulesets.Mania.Tests
 
         protected override IScoringAlgorithm CreateScoreV1() => new ScoreV1(MaxCombo.Value);
         protected override IScoringAlgorithm CreateScoreV2(int maxCombo) => new ScoreV2(maxCombo);
-        protected override ProcessorBasedScoringAlgorithm CreateScoreAlgorithm(IBeatmap beatmap, ScoringMode mode) => new ManiaProcessorBasedScoringAlgorithm(beatmap, mode);
+
+        protected override ProcessorBasedScoringAlgorithm CreateScoreAlgorithm(IBeatmap beatmap, ScoringMode mode, IReadOnlyList<Mod> selectedMods)
+            => new ManiaProcessorBasedScoringAlgorithm(beatmap, mode, selectedMods);
 
         [Test]
         public void TestBasicScenarios()
@@ -158,8 +162,8 @@ namespace osu.Game.Rulesets.Mania.Tests
 
         private class ManiaProcessorBasedScoringAlgorithm : ProcessorBasedScoringAlgorithm
         {
-            public ManiaProcessorBasedScoringAlgorithm(IBeatmap beatmap, ScoringMode mode)
-                : base(beatmap, mode)
+            public ManiaProcessorBasedScoringAlgorithm(IBeatmap beatmap, ScoringMode mode, IReadOnlyList<Mod> selectedMods)
+                : base(beatmap, mode, selectedMods)
             {
             }
 

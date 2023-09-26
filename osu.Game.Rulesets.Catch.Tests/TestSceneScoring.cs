@@ -2,6 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
+using System.Collections.Generic;
 using NUnit.Framework;
 using osu.Framework.Bindables;
 using osu.Game.Beatmaps;
@@ -10,6 +11,7 @@ using osu.Game.Rulesets.Catch.Judgements;
 using osu.Game.Rulesets.Catch.Objects;
 using osu.Game.Rulesets.Catch.Scoring;
 using osu.Game.Rulesets.Judgements;
+using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Scoring;
 using osu.Game.Tests.Visual.Gameplay;
 
@@ -41,7 +43,8 @@ namespace osu.Game.Rulesets.Catch.Tests
 
         protected override IScoringAlgorithm CreateScoreV2(int maxCombo) => new ScoreV2(maxCombo);
 
-        protected override ProcessorBasedScoringAlgorithm CreateScoreAlgorithm(IBeatmap beatmap, ScoringMode mode) => new CatchProcessorBasedScoringAlgorithm(beatmap, mode);
+        protected override ProcessorBasedScoringAlgorithm CreateScoreAlgorithm(IBeatmap beatmap, ScoringMode mode, IReadOnlyList<Mod> selectedMods)
+            => new CatchProcessorBasedScoringAlgorithm(beatmap, mode, selectedMods);
 
         [Test]
         public void TestBasicScenarios()
@@ -140,8 +143,8 @@ namespace osu.Game.Rulesets.Catch.Tests
 
         private class CatchProcessorBasedScoringAlgorithm : ProcessorBasedScoringAlgorithm
         {
-            public CatchProcessorBasedScoringAlgorithm(IBeatmap beatmap, ScoringMode mode)
-                : base(beatmap, mode)
+            public CatchProcessorBasedScoringAlgorithm(IBeatmap beatmap, ScoringMode mode, IReadOnlyList<Mod> selectedMods)
+                : base(beatmap, mode, selectedMods)
             {
             }
 

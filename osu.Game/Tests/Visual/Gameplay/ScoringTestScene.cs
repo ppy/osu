@@ -23,6 +23,7 @@ using osu.Game.Overlays;
 using osu.Game.Overlays.Mods;
 using osu.Game.Overlays.Settings;
 using osu.Game.Rulesets.Judgements;
+using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Scoring;
 using osu.Game.Scoring.Legacy;
 using osuTK;
@@ -37,7 +38,7 @@ namespace osu.Game.Tests.Visual.Gameplay
 
         protected abstract IScoringAlgorithm CreateScoreV1();
         protected abstract IScoringAlgorithm CreateScoreV2(int maxCombo);
-        protected abstract ProcessorBasedScoringAlgorithm CreateScoreAlgorithm(IBeatmap beatmap, ScoringMode mode);
+        protected abstract ProcessorBasedScoringAlgorithm CreateScoreAlgorithm(IBeatmap beatmap, ScoringMode mode, IReadOnlyList<Mod> mods);
 
         protected Bindable<int> MaxCombo => sliderMaxCombo.Current;
         protected BindableList<double> NonPerfectLocations => graphs.NonPerfectLocations;
@@ -270,7 +271,7 @@ namespace osu.Game.Tests.Visual.Gameplay
         {
             int maxCombo = sliderMaxCombo.Current.Value;
             var beatmap = CreateBeatmap(maxCombo);
-            var algorithm = CreateScoreAlgorithm(beatmap, scoringMode);
+            var algorithm = CreateScoreAlgorithm(beatmap, scoringMode, SelectedMods.Value);
 
             runForAlgorithm(new ScoringAlgorithmInfo
             {
@@ -343,11 +344,12 @@ namespace osu.Game.Tests.Visual.Gameplay
             private readonly ScoreProcessor scoreProcessor;
             private readonly ScoringMode mode;
 
-            protected ProcessorBasedScoringAlgorithm(IBeatmap beatmap, ScoringMode mode)
+            protected ProcessorBasedScoringAlgorithm(IBeatmap beatmap, ScoringMode mode, IReadOnlyList<Mod> selectedMods)
             {
                 this.mode = mode;
                 scoreProcessor = CreateScoreProcessor();
                 scoreProcessor.ApplyBeatmap(beatmap);
+                scoreProcessor.Mods.Value = selectedMods;
             }
 
             public void ApplyHit() => scoreProcessor.ApplyResult(CreatePerfectJudgementResult());
