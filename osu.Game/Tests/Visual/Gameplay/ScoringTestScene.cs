@@ -18,6 +18,9 @@ using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Graphics.UserInterface;
+using osu.Game.Graphics.UserInterfaceV2;
+using osu.Game.Overlays;
+using osu.Game.Overlays.Mods;
 using osu.Game.Overlays.Settings;
 using osu.Game.Rulesets.Judgements;
 using osu.Game.Rulesets.Scoring;
@@ -53,6 +56,10 @@ namespace osu.Game.Tests.Visual.Gameplay
         private readonly BindableBool scoreV1Visible = new BindableBool(true);
         private readonly BindableBool scoreV2Visible = new BindableBool(true);
 
+        private RoundedButton changeModsButton = null!;
+        private OsuSpriteText modsText = null!;
+        private TestModSelectOverlay modSelect = null!;
+
         [Resolved]
         private OsuColour colours { get; set; } = null!;
 
@@ -83,6 +90,7 @@ namespace osu.Game.Tests.Visual.Gameplay
                             new Dimension(),
                             new Dimension(GridSizeMode.AutoSize),
                             new Dimension(GridSizeMode.AutoSize),
+                            new Dimension(GridSizeMode.AutoSize),
                         },
                         Content = new[]
                         {
@@ -102,6 +110,47 @@ namespace osu.Game.Tests.Visual.Gameplay
                                     RelativeSizeAxes = Axes.X,
                                     AutoSizeAxes = Axes.Y,
                                 },
+                            },
+                            new Drawable[]
+                            {
+                                new Container
+                                {
+                                    RelativeSizeAxes = Axes.X,
+                                    AutoSizeAxes = Axes.Y,
+                                    Padding = new MarginPadding { Horizontal = 20 },
+                                    Children = new Drawable[]
+                                    {
+                                        new OsuSpriteText
+                                        {
+                                            Text = "Selected mods",
+                                            Anchor = Anchor.CentreLeft,
+                                            Origin = Anchor.CentreLeft,
+                                        },
+                                        new FillFlowContainer
+                                        {
+                                            Anchor = Anchor.TopRight,
+                                            Origin = Anchor.TopRight,
+                                            AutoSizeAxes = Axes.Both,
+                                            Direction = FillDirection.Horizontal,
+                                            Spacing = new Vector2(10),
+                                            Children = new Drawable[]
+                                            {
+                                                changeModsButton = new RoundedButton
+                                                {
+                                                    Text = "Change",
+                                                    Width = 100,
+                                                    Anchor = Anchor.CentreRight,
+                                                    Origin = Anchor.CentreRight,
+                                                },
+                                                modsText = new OsuSpriteText
+                                                {
+                                                    Anchor = Anchor.CentreRight,
+                                                    Origin = Anchor.CentreRight,
+                                                },
+                                            }
+                                        }
+                                    }
+                                }
                             },
                             new Drawable[]
                             {
@@ -139,6 +188,11 @@ namespace osu.Game.Tests.Visual.Gameplay
                                 },
                             },
                         }
+                    },
+                    modSelect = new TestModSelectOverlay
+                    {
+                        RelativeSizeAxes = Axes.Both,
+                        SelectedMods = { BindTarget = SelectedMods }
                     }
                 };
 
@@ -159,6 +213,9 @@ namespace osu.Game.Tests.Visual.Gameplay
 
                 graphs.MaxCombo.BindTo(sliderMaxCombo.Current);
 
+                changeModsButton.Action = () => modSelect.Show();
+                SelectedMods.BindValueChanged(mods => Rerun());
+
                 Rerun();
             });
         }
@@ -167,6 +224,10 @@ namespace osu.Game.Tests.Visual.Gameplay
         {
             graphs.Clear();
             legend.Clear();
+
+            modsText.Text = SelectedMods.Value.Any()
+                ? string.Join(", ", SelectedMods.Value.Select(mod => mod.Acronym))
+                : "(none)";
 
             runForProcessor("lazer-standardised", colours.Green1, ScoringMode.Standardised, standardisedVisible);
             runForProcessor("lazer-classic", colours.Blue1, ScoringMode.Classic, classicVisible);
@@ -590,6 +651,17 @@ namespace osu.Game.Tests.Visual.Gameplay
                 descriptionText.Text = $"{(Visible.Value ? FontAwesome.Solid.CheckCircle.Icon : FontAwesome.Solid.Circle.Icon)} {description}";
                 finalScoreText.Text = FinalScore.ToString("#,0");
                 lineGraph.Alpha = Visible.Value ? 1 : 0;
+            }
+        }
+
+        private partial class TestModSelectOverlay : UserModSelectOverlay
+        {
+            protected override bool ShowModEffects => true;
+            protected override bool ShowPresets => false;
+
+            public TestModSelectOverlay()
+                : base(OverlayColourScheme.Aquamarine)
+            {
             }
         }
     }
