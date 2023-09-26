@@ -43,7 +43,8 @@ namespace osu.Game.Rulesets.Osu.Tests
             AddUntilStep("Pitch starts low", () => getSpinningSample().Frequency.Value < 0.8);
             AddUntilStep("Pitch increases", () => getSpinningSample().Frequency.Value > 0.8);
 
-            PausableSkinnableSound getSpinningSample() => drawableSpinner.ChildrenOfType<PausableSkinnableSound>().FirstOrDefault(s => s.Samples.Any(i => i.LookupNames.Any(l => l.Contains("spinnerspin"))));
+            PausableSkinnableSound getSpinningSample() =>
+                drawableSpinner.ChildrenOfType<PausableSkinnableSound>().FirstOrDefault(s => s.Samples.Any(i => i.LookupNames.Any(l => l.Contains("spinnerspin"))));
         }
 
         [TestCase(false)]
@@ -62,6 +63,39 @@ namespace osu.Game.Rulesets.Osu.Tests
             AddStep("Very short spinner", () => SetContents(_ => testSingle(5, autoplay, 200)));
             AddUntilStep("Wait for completion", () => drawableSpinner.Result.HasResult);
             AddUntilStep("Short spinner implicitly completes", () => drawableSpinner.Progress == 1);
+        }
+
+        [TestCase(0, 4, 6)]
+        [TestCase(5, 7, 10)]
+        [TestCase(10, 11, 8)]
+        public void TestSpinnerSpinRequirements(int od, int normalTicks, int bonusTicks)
+        {
+            Spinner spinner = null;
+
+            AddStep("add spinner", () => SetContents(_ =>
+            {
+                spinner = new Spinner
+                {
+                    StartTime = Time.Current,
+                    EndTime = Time.Current + 3000,
+                    Samples = new List<HitSampleInfo>
+                    {
+                        new HitSampleInfo(HitSampleInfo.HIT_NORMAL)
+                    }
+                };
+
+                spinner.ApplyDefaults(new ControlPointInfo(), new BeatmapDifficulty { OverallDifficulty = od });
+
+                return drawableSpinner = new TestDrawableSpinner(spinner, true)
+                {
+                    Anchor = Anchor.Centre,
+                    Depth = depthIndex++,
+                    Scale = new Vector2(0.75f)
+                };
+            }));
+
+            AddAssert("number of normal ticks matches", () => spinner.SpinsRequired, () => Is.EqualTo(normalTicks));
+            AddAssert("number of bonus ticks matches", () => spinner.MaximumBonusSpins, () => Is.EqualTo(bonusTicks));
         }
 
         private Drawable testSingle(float circleSize, bool auto = false, double length = 3000)
