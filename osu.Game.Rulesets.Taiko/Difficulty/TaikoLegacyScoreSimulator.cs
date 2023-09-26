@@ -156,7 +156,7 @@ namespace osu.Game.Rulesets.Taiko.Difficulty
             {
                 int oldScoreIncrease = scoreIncrease;
 
-                scoreIncrease += (int)(scoreIncrease / 35f * 2 * (difficultyPeppyStars + 1)) * (Math.Min(100, combo) / 10);
+                scoreIncrease += scoreIncrease / 35 * 2 * (difficultyPeppyStars + 1) * (Math.Min(100, combo) / 10);
 
                 if (hitObject is Swell)
                 {
