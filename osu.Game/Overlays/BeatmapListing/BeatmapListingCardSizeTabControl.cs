@@ -22,7 +22,11 @@ namespace osu.Game.Overlays.BeatmapListing
         public BeatmapListingCardSizeTabControl()
         {
             AutoSizeAxes = Axes.Both;
+
+            Items = new[] { BeatmapCardSize.Normal, BeatmapCardSize.Extra };
         }
+
+        protected override bool AddEnumEntriesAutomatically => false;
 
         protected override TabFillFlowContainer CreateTabFlow() => new TabFillFlowContainer
         {
