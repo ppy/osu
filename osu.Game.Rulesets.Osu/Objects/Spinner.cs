@@ -71,7 +71,7 @@ namespace osu.Game.Rulesets.Osu.Objects
             double secondsDuration = Duration / 1000;
 
             SpinsRequired = (int)(minRps * secondsDuration);
-            MaximumBonusSpins = (int)(maxRps * secondsDuration) - bonus_spins_gap;
+            MaximumBonusSpins = Math.Max(0, (int)(maxRps * secondsDuration) - SpinsRequired - bonus_spins_gap);
         }
 
         protected override void CreateNestedHitObjects(CancellationToken cancellationToken)
