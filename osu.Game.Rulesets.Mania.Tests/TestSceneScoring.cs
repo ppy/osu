@@ -3,6 +3,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using NUnit.Framework;
 using osu.Game.Beatmaps;
 using osu.Game.Rulesets.Judgements;
@@ -12,6 +13,7 @@ using osu.Game.Rulesets.Mania.Objects;
 using osu.Game.Rulesets.Mania.Scoring;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Scoring;
+using osu.Game.Rulesets.Scoring.Legacy;
 using osu.Game.Tests.Visual.Gameplay;
 
 namespace osu.Game.Rulesets.Mania.Tests
@@ -27,8 +29,8 @@ namespace osu.Game.Rulesets.Mania.Tests
             return beatmap;
         }
 
-        protected override IScoringAlgorithm CreateScoreV1() => new ScoreV1(MaxCombo.Value);
-        protected override IScoringAlgorithm CreateScoreV2(int maxCombo) => new ScoreV2(maxCombo);
+        protected override IScoringAlgorithm CreateScoreV1(IReadOnlyList<Mod> selectedMods) => new ScoreV1(MaxCombo.Value, selectedMods);
+        protected override IScoringAlgorithm CreateScoreV2(int maxCombo, IReadOnlyList<Mod> selectedMods) => new ScoreV2(maxCombo, selectedMods);
 
         protected override ProcessorBasedScoringAlgorithm CreateScoreAlgorithm(IBeatmap beatmap, ScoringMode mode, IReadOnlyList<Mod> selectedMods)
             => new ManiaProcessorBasedScoringAlgorithm(beatmap, mode, selectedMods);
@@ -63,11 +65,17 @@ namespace osu.Game.Rulesets.Mania.Tests
             private int currentCombo;
             private double comboAddition = 100;
             private double totalScoreDouble;
+
             private readonly double scoreMultiplier;
 
-            public ScoreV1(int maxCombo)
+            public ScoreV1(int maxCombo, IReadOnlyList<Mod> selectedMods)
             {
-                scoreMultiplier = 500000d / maxCombo;
+                var ruleset = new ManiaRuleset();
+
+                scoreMultiplier = 500000d / maxCombo * ruleset.CreateLegacyScoreSimulator().GetLegacyScoreMultiplier(selectedMods, new LegacyBeatmapConversionDifficultyInfo
+                {
+                    SourceRuleset = ruleset.RulesetInfo
+                });
             }
 
             public void ApplyHit() => applyHitV1(320, add => add + 2, 32);
@@ -107,12 +115,21 @@ namespace osu.Game.Rulesets.Mania.Tests
 
             private readonly double comboPortionMax;
             private readonly int maxCombo;
+            private readonly double modMultiplier;
 
             private const double combo_base = 4;
 
-            public ScoreV2(int maxCombo)
+            public ScoreV2(int maxCombo, IReadOnlyList<Mod> selectedMods)
             {
                 this.maxCombo = maxCombo;
+
+                var ruleset = new ManiaRuleset();
+                modMultiplier = new ManiaRuleset().CreateLegacyScoreSimulator().GetLegacyScoreMultiplier(
+                    selectedMods.Append(new ModScoreV2()).ToArray(),
+                    new LegacyBeatmapConversionDifficultyInfo
+                    {
+                        SourceRuleset = ruleset.RulesetInfo
+                    });
 
                 for (int i = 0; i < this.maxCombo; i++)
                     ApplyHit();
@@ -152,10 +169,10 @@ namespace osu.Game.Rulesets.Mania.Tests
                     float accuracy = (float)(currentBaseScore / maxBaseScore);
 
                     return (int)Math.Round
-                    (
+                    ((
                         200000 * comboPortion / comboPortionMax +
                         800000 * Math.Pow(accuracy, 2 + 2 * accuracy) * ((double)currentHits / maxCombo)
-                    );
+                    ) * modMultiplier);
                 }
             }
         }
