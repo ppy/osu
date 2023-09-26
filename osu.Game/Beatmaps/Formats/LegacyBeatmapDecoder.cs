@@ -1,8 +1,6 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#pragma warning disable 618
-
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -103,15 +101,11 @@ namespace osu.Game.Beatmaps.Formats
         {
             DifficultyControlPoint difficultyControlPoint = (beatmap.ControlPointInfo as LegacyControlPointInfo)?.DifficultyPointAt(hitObject.StartTime) ?? DifficultyControlPoint.DEFAULT;
 
-            if (difficultyControlPoint is LegacyDifficultyControlPoint legacyDifficultyControlPoint)
-            {
-                hitObject.LegacyBpmMultiplier = legacyDifficultyControlPoint.BpmMultiplier;
-                if (hitObject is IHasGenerateTicks hasGenerateTicks)
-                    hasGenerateTicks.GenerateTicks = legacyDifficultyControlPoint.GenerateTicks;
-            }
+            if (hitObject is IHasGenerateTicks hasGenerateTicks)
+                hasGenerateTicks.GenerateTicks = difficultyControlPoint.GenerateTicks;
 
             if (hitObject is IHasSliderVelocity hasSliderVelocity)
-                hasSliderVelocity.SliderVelocity = difficultyControlPoint.SliderVelocity;
+                hasSliderVelocity.SliderVelocityMultiplier = difficultyControlPoint.SliderVelocity;
 
             hitObject.ApplyDefaults(beatmap.ControlPointInfo, beatmap.Difficulty);
         }
@@ -497,8 +491,9 @@ namespace osu.Game.Beatmaps.Formats
 
             int onlineRulesetID = beatmap.BeatmapInfo.Ruleset.OnlineID;
 
-            addControlPoint(time, new LegacyDifficultyControlPoint(onlineRulesetID, beatLength)
+            addControlPoint(time, new DifficultyControlPoint
             {
+                GenerateTicks = !double.IsNaN(beatLength),
                 SliderVelocity = speedMultiplier,
             }, timingChange);
 

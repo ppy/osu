@@ -62,7 +62,7 @@ namespace osu.Game.Rulesets.Edit
         }
 
         [BackgroundDependencyLoader]
-        private void load(OverlayColourProvider colourProvider)
+        private void load()
         {
             RightToolbox.Add(new EditorToolboxGroup("snapping")
             {
@@ -244,7 +244,7 @@ namespace osu.Game.Rulesets.Edit
 
         public virtual float GetBeatSnapDistanceAt(HitObject referenceObject, bool useReferenceSliderVelocity = true)
         {
-            return (float)(100 * (useReferenceSliderVelocity && referenceObject is IHasSliderVelocity hasSliderVelocity ? hasSliderVelocity.SliderVelocity : 1) * EditorBeatmap.Difficulty.SliderMultiplier * 1
+            return (float)(100 * (useReferenceSliderVelocity && referenceObject is IHasSliderVelocity hasSliderVelocity ? hasSliderVelocity.SliderVelocityMultiplier : 1) * EditorBeatmap.Difficulty.SliderMultiplier * 1
                            / BeatSnapProvider.BeatDivisor);
         }
 

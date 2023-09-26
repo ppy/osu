@@ -90,7 +90,7 @@ namespace osu.Game.Storyboards.Drawables
         [BackgroundDependencyLoader]
         private void load(TextureStore textureStore, Storyboard storyboard)
         {
-            Texture = storyboard.GetTextureFromPath(Sprite.Path, textureStore);
+            Texture = textureStore.Get(Sprite.Path);
 
             if (Texture == null && storyboard.UseSkinSprites)
             {
