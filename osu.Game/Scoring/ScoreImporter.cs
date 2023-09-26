@@ -62,6 +62,11 @@ namespace osu.Game.Scoring
                     api.Queue(req);
                     return null;
                 }
+                catch (Exception)
+                {
+                    Logger.Log($@"Score '{archive.Name}' failed to import: failed to parse replay headers.", LoggingTarget.Database);
+                    return null;
+                }
             }
         }
 
