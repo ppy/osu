@@ -244,12 +244,12 @@ namespace osu.Game.Rulesets.Catch
                         break;
 
                     case CatchModHardRock:
-                        multiplier *= scoreV2 ? 1.0 : 1.12;
+                        multiplier *= 1.12;
                         break;
 
                     case CatchModDoubleTime:
                     case CatchModNightcore:
-                        multiplier *= scoreV2 ? 1.0 : 1.06;
+                        multiplier *= 1.06;
                         break;
 
                     case CatchModFlashlight:
