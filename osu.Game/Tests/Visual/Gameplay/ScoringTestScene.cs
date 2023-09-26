@@ -36,8 +36,8 @@ namespace osu.Game.Tests.Visual.Gameplay
     {
         protected abstract IBeatmap CreateBeatmap(int maxCombo);
 
-        protected abstract IScoringAlgorithm CreateScoreV1();
-        protected abstract IScoringAlgorithm CreateScoreV2(int maxCombo);
+        protected abstract IScoringAlgorithm CreateScoreV1(IReadOnlyList<Mod> selectedMods);
+        protected abstract IScoringAlgorithm CreateScoreV2(int maxCombo, IReadOnlyList<Mod> selectedMods);
         protected abstract ProcessorBasedScoringAlgorithm CreateScoreAlgorithm(IBeatmap beatmap, ScoringMode mode, IReadOnlyList<Mod> mods);
 
         protected Bindable<int> MaxCombo => sliderMaxCombo.Current;
@@ -237,14 +237,14 @@ namespace osu.Game.Tests.Visual.Gameplay
             {
                 Name = "ScoreV1 (classic)",
                 Colour = colours.Purple1,
-                Algorithm = CreateScoreV1(),
+                Algorithm = CreateScoreV1(SelectedMods.Value),
                 Visible = scoreV1Visible
             });
             runForAlgorithm(new ScoringAlgorithmInfo
             {
                 Name = "ScoreV2",
                 Colour = colours.Red1,
-                Algorithm = CreateScoreV2(sliderMaxCombo.Current.Value),
+                Algorithm = CreateScoreV2(sliderMaxCombo.Current.Value, SelectedMods.Value),
                 Visible = scoreV2Visible
             });
 
