@@ -104,7 +104,14 @@ namespace osu.Game.Storyboards.Drawables
             Sprite.ApplyTransforms(this);
         }
 
-        private void skinSourceChanged() => Texture = skin.GetTexture(Sprite.Path) ?? textureStore.Get(Sprite.Path);
+        private void skinSourceChanged()
+        {
+            // Setting texture will only update the size if it's zero.
+            // So let's force an update by setting to zero.
+            Size = Vector2.Zero;
+
+            Texture = skin.GetTexture(Sprite.Path) ?? textureStore.Get(Sprite.Path);
+        }
 
         protected override void Dispose(bool isDisposing)
         {
