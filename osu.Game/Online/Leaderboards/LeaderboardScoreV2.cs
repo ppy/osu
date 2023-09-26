@@ -213,7 +213,7 @@ namespace osu.Game.Online.Leaderboards
                                             Shear = -shear,
                                             Direction = FillDirection.Horizontal,
                                             Spacing = new Vector2(5f, 0f),
-                                            Size = new Vector2(87, 16),
+                                            AutoSizeAxes = Axes.Both,
                                             Masking = true,
                                             Children = new Drawable[]
                                             {
