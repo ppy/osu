@@ -22,6 +22,8 @@ namespace osu.Game.Rulesets.Taiko.Skinning.Legacy
 {
     public partial class LegacyCirclePiece : CompositeDrawable, IHasAccentColour
     {
+        private static readonly Vector2 circle_piece_size = new Vector2(128);
+
         private Drawable backgroundLayer = null!;
         private Drawable? foregroundLayer;
 
@@ -52,9 +54,9 @@ namespace osu.Game.Rulesets.Taiko.Skinning.Legacy
 
                 string prefix = ((drawableHitObject.HitObject as TaikoStrongableHitObject)?.IsStrong ?? false) ? big_hit : normal_hit;
 
-                return skin.GetAnimation($"{prefix}{lookup}", true, false) ??
+                return skin.GetAnimation($"{prefix}{lookup}", true, false, maxSize: circle_piece_size) ??
                        // fallback to regular size if "big" version doesn't exist.
-                       skin.GetAnimation($"{normal_hit}{lookup}", true, false);
+                       skin.GetAnimation($"{normal_hit}{lookup}", true, false, maxSize: circle_piece_size);
             }
 
             // backgroundLayer is guaranteed to exist due to the pre-check in TaikoLegacySkinTransformer.
@@ -96,7 +98,7 @@ namespace osu.Game.Rulesets.Taiko.Skinning.Legacy
             // Not all skins (including the default osu-stable) have similar sizes for "hitcircle" and "hitcircleoverlay".
             // This ensures they are scaled relative to each other but also match the expected DrawableHit size.
             foreach (var c in InternalChildren)
-                c.Scale = new Vector2(DrawHeight / 128);
+                c.Scale = new Vector2(DrawHeight / circle_piece_size.Y);
 
             if (foregroundLayer is IFramedAnimation animatableForegroundLayer)
                 animateForegroundLayer(animatableForegroundLayer);
