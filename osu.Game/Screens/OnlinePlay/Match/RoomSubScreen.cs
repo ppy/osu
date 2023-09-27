@@ -437,8 +437,7 @@ namespace osu.Game.Screens.OnlinePlay.Match
             }
             else
             {
-                var localBeatmap = beatmapManager.QueryBeatmap(b => b.OnlineID == selected.Beatmap.OnlineID);
-                UserModsSelectOverlay.Beatmap = beatmapManager.GetWorkingBeatmap(localBeatmap);
+                UserModsSelectOverlay.Beatmap = Beatmap.Value;
                 UserModsSection?.Show();
                 UserModsSelectOverlay.IsValidMod = m => allowedMods.Any(a => a.GetType() == m.GetType());
             }
