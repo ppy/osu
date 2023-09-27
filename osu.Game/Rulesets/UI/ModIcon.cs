@@ -18,6 +18,7 @@ using osu.Framework.Bindables;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics.Textures;
 using osu.Framework.Localisation;
+using osu.Game.Configuration;
 
 namespace osu.Game.Rulesets.UI
 {
@@ -44,6 +45,9 @@ namespace osu.Game.Rulesets.UI
             get => mod;
             set
             {
+                if (mod == value)
+                    return;
+
                 mod = value;
 
                 if (IsLoaded)
@@ -61,6 +65,8 @@ namespace osu.Game.Rulesets.UI
         private OsuSpriteText extendedText;
 
         private Container extendedContent;
+
+        private ModSettingChangeTracker modSettingsChangeTracker;
 
         /// <summary>
         /// Construct a new instance.
@@ -123,7 +129,7 @@ namespace osu.Game.Rulesets.UI
                     Anchor = Anchor.CentreLeft,
                     Origin = Anchor.CentreLeft,
                     Size = new Vector2(120, 55),
-                    X = size - 23,
+                    X = size - 22,
                     Children = new Drawable[]
                     {
                         extendedBackground = new Sprite
@@ -156,6 +162,14 @@ namespace osu.Game.Rulesets.UI
 
         private void updateMod(IMod value)
         {
+            modSettingsChangeTracker?.Dispose();
+
+            if (value is Mod actualMod)
+            {
+                modSettingsChangeTracker = new ModSettingChangeTracker(new[] { actualMod });
+                modSettingsChangeTracker.SettingChanged = _ => updateMod(actualMod);
+            }
+
             modAcronym.Text = value.Acronym;
             modIcon.Icon = value.Icon ?? FontAwesome.Solid.Question;
 
@@ -184,6 +198,12 @@ namespace osu.Game.Rulesets.UI
         {
             extendedText.Colour = background.Colour = Selected.Value ? backgroundColour.Lighten(0.2f) : backgroundColour;
             extendedBackground.Colour = Selected.Value ? backgroundColour.Darken(2.4f) : backgroundColour.Darken(2.8f);
+        }
+
+        protected override void Dispose(bool isDisposing)
+        {
+            base.Dispose(isDisposing);
+            modSettingsChangeTracker?.Dispose();
         }
     }
 }
