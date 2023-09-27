@@ -16,6 +16,7 @@ using osu.Game.Rulesets.Mods;
 using osuTK;
 using osu.Framework.Bindables;
 using osu.Framework.Extensions.Color4Extensions;
+using osu.Framework.Graphics.Textures;
 using osu.Framework.Localisation;
 
 namespace osu.Game.Rulesets.UI
@@ -27,9 +28,9 @@ namespace osu.Game.Rulesets.UI
     {
         public readonly BindableBool Selected = new BindableBool();
 
-        private readonly SpriteIcon modIcon;
-        private readonly SpriteText modAcronym;
-        private readonly SpriteIcon background;
+        private SpriteIcon modIcon;
+        private SpriteText modAcronym;
+        private SpriteIcon background;
 
         private const float size = 80;
 
@@ -55,6 +56,10 @@ namespace osu.Game.Rulesets.UI
 
         private Color4 backgroundColour;
 
+        private Sprite extendedBackground;
+
+        private OsuSpriteText extendedText;
+
         /// <summary>
         /// Construct a new instance.
         /// </summary>
@@ -64,8 +69,12 @@ namespace osu.Game.Rulesets.UI
         {
             this.mod = mod ?? throw new ArgumentNullException(nameof(mod));
             this.showTooltip = showTooltip;
+        }
 
-            Size = new Vector2(size);
+        [BackgroundDependencyLoader]
+        private void load(TextureStore textures)
+        {
+            AutoSizeAxes = Axes.Both;
 
             Children = new Drawable[]
             {
@@ -76,6 +85,23 @@ namespace osu.Game.Rulesets.UI
                     Size = new Vector2(size),
                     Icon = OsuIcon.ModBg,
                     Shadow = true,
+                },
+                extendedBackground = new Sprite
+                {
+                    Anchor = Anchor.Centre,
+                    Origin = Anchor.Centre,
+                    Texture = textures.Get("Icons/BeatmapDetails/mod-icon-extender"),
+                    X = size - 3,
+                    Size = new Vector2(120, 55),
+                },
+                extendedText = new OsuSpriteText
+                {
+                    Origin = Anchor.Centre,
+                    Anchor = Anchor.Centre,
+                    Font = OsuFont.Default.With(size: 30f, weight: FontWeight.Bold),
+                    UseFullGlyphHeight = false,
+                    X = size,
+                    Text = mod.ExtendedIconInformation,
                 },
                 modAcronym = new OsuSpriteText
                 {
@@ -129,7 +155,8 @@ namespace osu.Game.Rulesets.UI
 
         private void updateColour()
         {
-            background.Colour = Selected.Value ? backgroundColour.Lighten(0.2f) : backgroundColour;
+            extendedText.Colour = background.Colour = Selected.Value ? backgroundColour.Lighten(0.2f) : backgroundColour;
+            extendedBackground.Colour = Selected.Value ? backgroundColour.Darken(2.4f) : backgroundColour.Darken(2.8f);
         }
     }
 }

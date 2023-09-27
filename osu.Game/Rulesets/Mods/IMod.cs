@@ -20,6 +20,12 @@ namespace osu.Game.Rulesets.Mods
         string Name { get; }
 
         /// <summary>
+        /// Short import information to display on the mod icon. For example, a rate adjust mod's rate
+        /// or similarly important setting.
+        /// </summary>
+        string ExtendedIconInformation { get; }
+
+        /// <summary>
         /// The user readable description of this mod.
         /// </summary>
         LocalisableString Description { get; }
