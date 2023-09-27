@@ -27,7 +27,7 @@ namespace osu.Game.Rulesets.Osu.Skinning.Argon
             Anchor = Anchor.Centre;
             Origin = Anchor.Centre;
 
-            Size = new Vector2(OsuHitObject.OBJECT_RADIUS * 2);
+            Size = OsuHitObject.OBJECT_DIMENSIONS;
 
             InternalChildren = new Drawable[]
             {
