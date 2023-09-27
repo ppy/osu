@@ -42,7 +42,7 @@ namespace osu.Game.Scoring
             this.api = api;
         }
 
-        protected override ScoreInfo? CreateModel(ArchiveReader archive)
+        protected override ScoreInfo? CreateModel(ArchiveReader archive, ImportParameters parameters)
         {
             string name = archive.Filenames.First(f => f.EndsWith(".osr", StringComparison.OrdinalIgnoreCase));
 
@@ -56,10 +56,14 @@ namespace osu.Game.Scoring
                 {
                     Logger.Log($@"Score '{archive.Name}' failed to import: no corresponding beatmap with the hash '{notFound.Hash}' could be found.", LoggingTarget.Database);
 
-                    // In the case of a missing beatmap, let's attempt to resolve it and show a prompt to the user to download the required beatmap.
-                    var req = new GetBeatmapRequest(new BeatmapInfo { MD5Hash = notFound.Hash });
-                    req.Success += res => PostNotification?.Invoke(new MissingBeatmapNotification(res, archive, notFound.Hash));
-                    api.Queue(req);
+                    if (!parameters.Batch)
+                    {
+                        // In the case of a missing beatmap, let's attempt to resolve it and show a prompt to the user to download the required beatmap.
+                        var req = new GetBeatmapRequest(new BeatmapInfo { MD5Hash = notFound.Hash });
+                        req.Success += res => PostNotification?.Invoke(new MissingBeatmapNotification(res, archive, notFound.Hash));
+                        api.Queue(req);
+                    }
+
                     return null;
                 }
                 catch (Exception e)
