@@ -27,9 +27,6 @@ namespace osu.Game.Rulesets.Difficulty
         protected const int ATTRIB_ID_FLASHLIGHT = 17;
         protected const int ATTRIB_ID_SLIDER_FACTOR = 19;
         protected const int ATTRIB_ID_SPEED_NOTE_COUNT = 21;
-        protected const int ATTRIB_ID_LEGACY_ACCURACY_SCORE = 23;
-        protected const int ATTRIB_ID_LEGACY_COMBO_SCORE = 25;
-        protected const int ATTRIB_ID_LEGACY_BONUS_SCORE_RATIO = 27;
 
         /// <summary>
         /// The mods which were applied to the beatmap.
@@ -91,9 +88,6 @@ namespace osu.Game.Rulesets.Difficulty
         public virtual IEnumerable<(int attributeId, object value)> ToDatabaseAttributes()
         {
             yield return (ATTRIB_ID_MAX_COMBO, MaxCombo);
-            yield return (ATTRIB_ID_LEGACY_ACCURACY_SCORE, LegacyAccuracyScore);
-            yield return (ATTRIB_ID_LEGACY_COMBO_SCORE, LegacyComboScore);
-            yield return (ATTRIB_ID_LEGACY_BONUS_SCORE_RATIO, LegacyBonusScoreRatio);
         }
 
         /// <summary>
@@ -104,11 +98,6 @@ namespace osu.Game.Rulesets.Difficulty
         public virtual void FromDatabaseAttributes(IReadOnlyDictionary<int, double> values, IBeatmapOnlineInfo onlineInfo)
         {
             MaxCombo = (int)values[ATTRIB_ID_MAX_COMBO];
-
-            // Temporarily allow these attributes to not exist so as to not block releases of server-side components while these attributes aren't populated/used yet.
-            LegacyAccuracyScore = (int)values.GetValueOrDefault(ATTRIB_ID_LEGACY_ACCURACY_SCORE);
-            LegacyComboScore = (int)values.GetValueOrDefault(ATTRIB_ID_LEGACY_COMBO_SCORE);
-            LegacyBonusScoreRatio = values.GetValueOrDefault(ATTRIB_ID_LEGACY_BONUS_SCORE_RATIO);
         }
     }
 }
