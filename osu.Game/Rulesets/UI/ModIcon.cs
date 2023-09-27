@@ -38,7 +38,9 @@ namespace osu.Game.Rulesets.UI
         public virtual LocalisableString TooltipText => showTooltip ? ((mod as Mod)?.IconTooltip ?? mod.Name) : null;
 
         private IMod mod;
+
         private readonly bool showTooltip;
+        private readonly bool showExtendedInformation;
 
         public IMod Mod
         {
@@ -73,13 +75,15 @@ namespace osu.Game.Rulesets.UI
         /// </summary>
         /// <param name="mod">The mod to be displayed</param>
         /// <param name="showTooltip">Whether a tooltip describing the mod should display on hover.</param>
-        public ModIcon(IMod mod, bool showTooltip = true)
+        /// <param name="showExtendedInformation">Whether to display a mod's extended information, if available.</param>
+        public ModIcon(IMod mod, bool showTooltip = true, bool showExtendedInformation = true)
         {
             AutoSizeAxes = Axes.X;
             Height = size;
 
             this.mod = mod ?? throw new ArgumentNullException(nameof(mod));
             this.showTooltip = showTooltip;
+            this.showExtendedInformation = showExtendedInformation;
         }
 
         [BackgroundDependencyLoader]
@@ -187,9 +191,9 @@ namespace osu.Game.Rulesets.UI
             backgroundColour = colours.ForModType(value.Type);
             updateColour();
 
-            bool hasExtended = !string.IsNullOrEmpty(mod.ExtendedIconInformation);
+            bool showExtended = showExtendedInformation && !string.IsNullOrEmpty(mod.ExtendedIconInformation);
 
-            extendedContent.Alpha = hasExtended ? 1 : 0;
+            extendedContent.Alpha = showExtended ? 1 : 0;
 
             extendedText.Text = mod.ExtendedIconInformation;
         }
