@@ -137,6 +137,7 @@ namespace osu.Game.Configuration
             SetDefault(OsuSetting.KeyOverlay, false);
             SetDefault(OsuSetting.ReplaySettingsOverlay, true);
             SetDefault(OsuSetting.GameplayLeaderboard, true);
+            SetDefault(OsuSetting.ExpandGameplayLeaderboard, false);
             SetDefault(OsuSetting.AlwaysPlayFirstComboBreak, true);
 
             SetDefault(OsuSetting.FloatingComments, false);
@@ -322,6 +323,7 @@ namespace osu.Game.Configuration
         ShowStoryboard,
         KeyOverlay,
         GameplayLeaderboard,
+        ExpandGameplayLeaderboard,
         PositionalHitsoundsLevel,
         AlwaysPlayFirstComboBreak,
         FloatingComments,
