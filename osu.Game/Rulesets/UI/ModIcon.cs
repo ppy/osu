@@ -60,6 +60,8 @@ namespace osu.Game.Rulesets.UI
 
         private OsuSpriteText extendedText;
 
+        private Container extendedContent;
+
         /// <summary>
         /// Construct a new instance.
         /// </summary>
@@ -67,6 +69,9 @@ namespace osu.Game.Rulesets.UI
         /// <param name="showTooltip">Whether a tooltip describing the mod should display on hover.</param>
         public ModIcon(IMod mod, bool showTooltip = true)
         {
+            AutoSizeAxes = Axes.X;
+            Height = size;
+
             this.mod = mod ?? throw new ArgumentNullException(nameof(mod));
             this.showTooltip = showTooltip;
         }
@@ -74,52 +79,68 @@ namespace osu.Game.Rulesets.UI
         [BackgroundDependencyLoader]
         private void load(TextureStore textures)
         {
-            AutoSizeAxes = Axes.Both;
-
             Children = new Drawable[]
             {
-                background = new SpriteIcon
+                new Container
                 {
-                    Origin = Anchor.Centre,
-                    Anchor = Anchor.Centre,
+                    Anchor = Anchor.CentreLeft,
+                    Origin = Anchor.CentreLeft,
+                    Name = "main content",
                     Size = new Vector2(size),
-                    Icon = OsuIcon.ModBg,
-                    Shadow = true,
+                    Children = new Drawable[]
+                    {
+                        background = new SpriteIcon
+                        {
+                            Origin = Anchor.Centre,
+                            Anchor = Anchor.Centre,
+                            Size = new Vector2(size),
+                            Icon = OsuIcon.ModBg,
+                            Shadow = true,
+                        },
+                        modAcronym = new OsuSpriteText
+                        {
+                            Origin = Anchor.Centre,
+                            Anchor = Anchor.Centre,
+                            Colour = OsuColour.Gray(84),
+                            Alpha = 0,
+                            Font = OsuFont.Numeric.With(null, 22f),
+                            UseFullGlyphHeight = false,
+                            Text = mod.Acronym
+                        },
+                        modIcon = new SpriteIcon
+                        {
+                            Origin = Anchor.Centre,
+                            Anchor = Anchor.Centre,
+                            Colour = OsuColour.Gray(84),
+                            Size = new Vector2(45),
+                            Icon = FontAwesome.Solid.Question
+                        },
+                    }
                 },
-                extendedBackground = new Sprite
+                extendedContent = new Container
                 {
-                    Anchor = Anchor.Centre,
-                    Origin = Anchor.Centre,
-                    Texture = textures.Get("Icons/BeatmapDetails/mod-icon-extender"),
-                    X = size - 3,
+                    Name = "extended content",
+                    Anchor = Anchor.CentreLeft,
+                    Origin = Anchor.CentreLeft,
                     Size = new Vector2(120, 55),
-                },
-                extendedText = new OsuSpriteText
-                {
-                    Origin = Anchor.Centre,
-                    Anchor = Anchor.Centre,
-                    Font = OsuFont.Default.With(size: 30f, weight: FontWeight.Bold),
-                    UseFullGlyphHeight = false,
-                    X = size,
-                    Text = mod.ExtendedIconInformation,
-                },
-                modAcronym = new OsuSpriteText
-                {
-                    Origin = Anchor.Centre,
-                    Anchor = Anchor.Centre,
-                    Colour = OsuColour.Gray(84),
-                    Alpha = 0,
-                    Font = OsuFont.Numeric.With(null, 22f),
-                    UseFullGlyphHeight = false,
-                    Text = mod.Acronym
-                },
-                modIcon = new SpriteIcon
-                {
-                    Origin = Anchor.Centre,
-                    Anchor = Anchor.Centre,
-                    Colour = OsuColour.Gray(84),
-                    Size = new Vector2(45),
-                    Icon = FontAwesome.Solid.Question
+                    X = size - 23,
+                    Children = new Drawable[]
+                    {
+                        extendedBackground = new Sprite
+                        {
+                            Texture = textures.Get("Icons/BeatmapDetails/mod-icon-extender"),
+                            Size = new Vector2(120, 55),
+                        },
+                        extendedText = new OsuSpriteText
+                        {
+                            Font = OsuFont.Default.With(size: 30f, weight: FontWeight.Bold),
+                            UseFullGlyphHeight = false,
+                            Text = mod.ExtendedIconInformation,
+                            X = 5,
+                            Anchor = Anchor.Centre,
+                            Origin = Anchor.Centre,
+                        },
+                    }
                 },
             };
         }
@@ -151,6 +172,12 @@ namespace osu.Game.Rulesets.UI
 
             backgroundColour = colours.ForModType(value.Type);
             updateColour();
+
+            bool hasExtended = !string.IsNullOrEmpty(mod.ExtendedIconInformation);
+
+            extendedContent.Alpha = hasExtended ? 1 : 0;
+
+            extendedText.Text = mod.ExtendedIconInformation;
         }
 
         private void updateColour()
