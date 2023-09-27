@@ -27,7 +27,7 @@ namespace osu.Game.Rulesets.Osu.Skinning.Default
             Anchor = Anchor.Centre;
             Origin = Anchor.Centre;
 
-            Size = new Vector2(OsuHitObject.OBJECT_RADIUS * 2);
+            Size = OsuHitObject.OBJECT_DIMENSIONS;
 
             Child = new SkinnableDrawable(new OsuSkinComponentLookup(OsuSkinComponents.ReverseArrow), _ => new SpriteIcon
             {

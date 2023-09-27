@@ -23,7 +23,7 @@ namespace osu.Game.Storyboards.Drawables
 {
     public partial class DrawableStoryboard : Container<DrawableStoryboardLayer>
     {
-        [Cached]
+        [Cached(typeof(Storyboard))]
         public Storyboard Storyboard { get; }
 
         /// <summary>
