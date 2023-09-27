@@ -37,7 +37,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
 
             Origin = Anchor.Centre;
 
-            Size = new Vector2(OsuHitObject.OBJECT_RADIUS * 2);
+            Size = OsuHitObject.OBJECT_DIMENSIONS;
 
             Children = new[]
             {
