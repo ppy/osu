@@ -106,11 +106,11 @@ namespace osu.Game.Storyboards.Drawables
 
         private void skinSourceChanged()
         {
-            // Setting texture will only update the size if it's zero.
-            // So let's force an update by setting to zero.
-            Size = Vector2.Zero;
-
             Texture = skin.GetTexture(Sprite.Path) ?? textureStore.Get(Sprite.Path);
+
+            // Setting texture will only update the size if it's zero.
+            // So let's force an explicit update.
+            Size = new Vector2(Texture.DisplayWidth, Texture.DisplayHeight);
         }
 
         protected override void Dispose(bool isDisposing)
