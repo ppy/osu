@@ -149,7 +149,7 @@ namespace osu.Game.Database
                     return imported;
                 }
 
-                notification.Text = $"{HumanisedModelName.Humanize(LetterCasing.Title)} import failed!";
+                notification.Text = $"{HumanisedModelName.Humanize(LetterCasing.Title)} import failed! Check logs for more information.";
                 notification.State = ProgressNotificationState.Cancelled;
             }
             else
