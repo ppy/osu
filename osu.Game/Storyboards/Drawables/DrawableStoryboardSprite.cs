@@ -110,7 +110,7 @@ namespace osu.Game.Storyboards.Drawables
 
             // Setting texture will only update the size if it's zero.
             // So let's force an explicit update.
-            Size = new Vector2(Texture.DisplayWidth, Texture.DisplayHeight);
+            Size = new Vector2(Texture?.DisplayWidth ?? 0, Texture?.DisplayHeight ?? 0);
         }
 
         protected override void Dispose(bool isDisposing)
