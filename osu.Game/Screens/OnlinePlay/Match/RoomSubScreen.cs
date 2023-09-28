@@ -371,8 +371,11 @@ namespace osu.Game.Screens.OnlinePlay.Match
                 return true;
 
             // if the dialog is already displayed, block exiting until the user explicitly makes a decision.
-            if (dialogOverlay.CurrentDialog is ConfirmDiscardChangesDialog)
+            if (dialogOverlay.CurrentDialog is ConfirmDiscardChangesDialog discardChangesDialog)
+            {
+                discardChangesDialog.Flash();
                 return false;
+            }
 
             dialogOverlay.Push(new ConfirmDiscardChangesDialog(() =>
             {
