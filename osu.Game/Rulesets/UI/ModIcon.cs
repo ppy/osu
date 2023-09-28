@@ -173,7 +173,7 @@ namespace osu.Game.Rulesets.UI
             if (value is Mod actualMod)
             {
                 modSettingsChangeTracker = new ModSettingChangeTracker(new[] { actualMod });
-                modSettingsChangeTracker.SettingChanged = _ => updateMod(actualMod);
+                modSettingsChangeTracker.SettingChanged = _ => updateExtendedInformation();
             }
 
             modAcronym.Text = value.Acronym;
@@ -193,10 +193,14 @@ namespace osu.Game.Rulesets.UI
             backgroundColour = colours.ForModType(value.Type);
             updateColour();
 
+            updateExtendedInformation();
+        }
+
+        private void updateExtendedInformation()
+        {
             bool showExtended = showExtendedInformation && !string.IsNullOrEmpty(mod.ExtendedIconInformation);
 
             extendedContent.Alpha = showExtended ? 1 : 0;
-
             extendedText.Text = mod.ExtendedIconInformation;
         }
 
