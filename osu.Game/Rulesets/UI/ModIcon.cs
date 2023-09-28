@@ -106,7 +106,6 @@ namespace osu.Game.Rulesets.UI
                             Texture = textures.Get("Icons/BeatmapDetails/mod-icon-extender"),
                             Anchor = Anchor.Centre,
                             Origin = Anchor.Centre,
-                            //Scale = SHADOW_FUDGE
                         },
                         extendedText = new OsuSpriteText
                         {
