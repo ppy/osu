@@ -1,8 +1,6 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
 using System;
 using osuTK.Graphics;
 using osu.Framework.Allocation;
@@ -29,13 +27,13 @@ namespace osu.Game.Rulesets.UI
     {
         public readonly BindableBool Selected = new BindableBool();
 
-        private SpriteIcon modIcon;
-        private SpriteText modAcronym;
-        private SpriteIcon background;
+        private SpriteIcon modIcon = null!;
+        private SpriteText modAcronym = null!;
+        private SpriteIcon background = null!;
 
         private const float size = 80;
 
-        public virtual LocalisableString TooltipText => showTooltip ? ((mod as Mod)?.IconTooltip ?? mod.Name) : null;
+        public virtual LocalisableString TooltipText => showTooltip ? ((mod as Mod)?.IconTooltip ?? mod.Name) : string.Empty;
 
         private IMod mod;
 
@@ -58,17 +56,17 @@ namespace osu.Game.Rulesets.UI
         }
 
         [Resolved]
-        private OsuColour colours { get; set; }
+        private OsuColour colours { get; set; } = null!;
 
         private Color4 backgroundColour;
 
-        private Sprite extendedBackground;
+        private Sprite extendedBackground = null!;
 
-        private OsuSpriteText extendedText;
+        private OsuSpriteText extendedText = null!;
 
-        private Container extendedContent;
+        private Container extendedContent = null!;
 
-        private ModSettingChangeTracker modSettingsChangeTracker;
+        private ModSettingChangeTracker? modSettingsChangeTracker;
 
         /// <summary>
         /// Construct a new instance.

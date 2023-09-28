@@ -48,7 +48,7 @@ namespace osu.Game.Tests.Visual.UserInterface
                     Direction = FillDirection.Full,
                     ChildrenEnumerable = Ruleset.Value.CreateInstance().CreateAllMods()
                                                 .OfType<ModRateAdjust>()
-                                                .SelectMany((m) =>
+                                                .SelectMany(m =>
                                                 {
                                                     List<ModIcon> icons = new List<ModIcon> { new ModIcon(m) };
 
@@ -70,10 +70,9 @@ namespace osu.Game.Tests.Visual.UserInterface
                 {
                     if (icon.Mod is ModRateAdjust rateAdjust)
                     {
-                        if (RNG.NextDouble() > 0.9)
-                            rateAdjust.SpeedChange.Value = rateAdjust.SpeedChange.Default;
-                        else
-                            rateAdjust.SpeedChange.Value = RNG.NextDouble(rateAdjust.SpeedChange.MinValue, rateAdjust.SpeedChange.MaxValue);
+                        rateAdjust.SpeedChange.Value = RNG.NextDouble() > 0.9
+                            ? rateAdjust.SpeedChange.Default
+                            : RNG.NextDouble(rateAdjust.SpeedChange.MinValue, rateAdjust.SpeedChange.MaxValue);
                     }
                 }
             });
