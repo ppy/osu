@@ -143,7 +143,7 @@ namespace osu.Game.Rulesets.UI
                         },
                         extendedText = new OsuSpriteText
                         {
-                            Font = OsuFont.Default.With(size: 30f, weight: FontWeight.Bold),
+                            Font = OsuFont.Default.With(size: 34f, weight: FontWeight.Bold),
                             UseFullGlyphHeight = false,
                             Text = mod.ExtendedIconInformation,
                             X = 5,
