@@ -2,21 +2,21 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
-using osuTK.Graphics;
 using osu.Framework.Allocation;
+using osu.Framework.Bindables;
+using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Cursor;
 using osu.Framework.Graphics.Sprites;
+using osu.Framework.Graphics.Textures;
+using osu.Framework.Localisation;
+using osu.Game.Configuration;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Rulesets.Mods;
 using osuTK;
-using osu.Framework.Bindables;
-using osu.Framework.Extensions.Color4Extensions;
-using osu.Framework.Graphics.Textures;
-using osu.Framework.Localisation;
-using osu.Game.Configuration;
+using osuTK.Graphics;
 
 namespace osu.Game.Rulesets.UI
 {
@@ -29,9 +29,9 @@ namespace osu.Game.Rulesets.UI
 
         private SpriteIcon modIcon = null!;
         private SpriteText modAcronym = null!;
-        private SpriteIcon background = null!;
+        private Sprite background = null!;
 
-        private const float size = 80;
+        public static readonly Vector2 MOD_ICON_SIZE = new Vector2(80);
 
         public virtual LocalisableString TooltipText => showTooltip ? ((mod as Mod)?.IconTooltip ?? mod.Name) : string.Empty;
 
@@ -76,8 +76,9 @@ namespace osu.Game.Rulesets.UI
         /// <param name="showExtendedInformation">Whether to display a mod's extended information, if available.</param>
         public ModIcon(IMod mod, bool showTooltip = true, bool showExtendedInformation = true)
         {
+            // May expand due to expanded content, so autosize here.
             AutoSizeAxes = Axes.X;
-            Height = size;
+            Height = MOD_ICON_SIZE.Y;
 
             this.mod = mod ?? throw new ArgumentNullException(nameof(mod));
             this.showTooltip = showTooltip;
@@ -89,21 +90,50 @@ namespace osu.Game.Rulesets.UI
         {
             Children = new Drawable[]
             {
+                extendedContent = new Container
+                {
+                    Name = "extended content",
+                    Anchor = Anchor.CentreLeft,
+                    Origin = Anchor.CentreLeft,
+                    Size = new Vector2(116, MOD_ICON_SIZE.Y),
+                    X = MOD_ICON_SIZE.X - 22,
+                    Children = new Drawable[]
+                    {
+                        extendedBackground = new Sprite
+                        {
+                            RelativeSizeAxes = Axes.Both,
+                            FillMode = FillMode.Fit,
+                            Texture = textures.Get("Icons/BeatmapDetails/mod-icon-extender"),
+                            Anchor = Anchor.Centre,
+                            Origin = Anchor.Centre,
+                            //Scale = SHADOW_FUDGE
+                        },
+                        extendedText = new OsuSpriteText
+                        {
+                            Font = OsuFont.Default.With(size: 34f, weight: FontWeight.Bold),
+                            UseFullGlyphHeight = false,
+                            Text = mod.ExtendedIconInformation,
+                            X = 5,
+                            Anchor = Anchor.Centre,
+                            Origin = Anchor.Centre,
+                        },
+                    }
+                },
                 new Container
                 {
                     Anchor = Anchor.CentreLeft,
                     Origin = Anchor.CentreLeft,
                     Name = "main content",
-                    Size = new Vector2(size),
+                    Size = MOD_ICON_SIZE,
                     Children = new Drawable[]
                     {
-                        background = new SpriteIcon
+                        background = new Sprite
                         {
-                            Origin = Anchor.Centre,
+                            RelativeSizeAxes = Axes.Both,
+                            FillMode = FillMode.Fit,
+                            Texture = textures.Get("Icons/BeatmapDetails/mod-icon"),
                             Anchor = Anchor.Centre,
-                            Size = new Vector2(size),
-                            Icon = OsuIcon.ModBg,
-                            Shadow = true,
+                            Origin = Anchor.Centre,
                         },
                         modAcronym = new OsuSpriteText
                         {
@@ -122,31 +152,6 @@ namespace osu.Game.Rulesets.UI
                             Colour = OsuColour.Gray(84),
                             Size = new Vector2(45),
                             Icon = FontAwesome.Solid.Question
-                        },
-                    }
-                },
-                extendedContent = new Container
-                {
-                    Name = "extended content",
-                    Anchor = Anchor.CentreLeft,
-                    Origin = Anchor.CentreLeft,
-                    Size = new Vector2(120, 55),
-                    X = size - 22,
-                    Children = new Drawable[]
-                    {
-                        extendedBackground = new Sprite
-                        {
-                            Texture = textures.Get("Icons/BeatmapDetails/mod-icon-extender"),
-                            Size = new Vector2(120, 55),
-                        },
-                        extendedText = new OsuSpriteText
-                        {
-                            Font = OsuFont.Default.With(size: 34f, weight: FontWeight.Bold),
-                            UseFullGlyphHeight = false,
-                            Text = mod.ExtendedIconInformation,
-                            X = 5,
-                            Anchor = Anchor.Centre,
-                            Origin = Anchor.Centre,
                         },
                     }
                 },
