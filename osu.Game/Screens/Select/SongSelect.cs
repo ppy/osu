@@ -525,7 +525,11 @@ namespace osu.Game.Screens.Select
             if (beatmapInfoNoDebounce == null)
                 run();
             else
-                selectionChangedDebounce = Scheduler.AddDelayed(run, 200);
+            {
+                // Intentionally slightly higher than repeat_tick_rate to avoid loading songs when holding left / right arrows.
+                // See https://github.com/ppy/osu-framework/blob/master/osu.Framework/Input/InputManager.cs#L44
+                selectionChangedDebounce = Scheduler.AddDelayed(run, 80);
+            }
 
             if (beatmap?.Equals(beatmapInfoPrevious) != true)
             {
