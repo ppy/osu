@@ -6,6 +6,7 @@ using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Sprites;
+using osu.Framework.Graphics.Textures;
 using osu.Framework.Utils;
 using osu.Game.Graphics;
 using osu.Game.Overlays;
@@ -23,8 +24,8 @@ namespace osu.Game.Rulesets.UI
 
         private readonly IMod mod;
 
-        private readonly SpriteIcon background;
-        private readonly SpriteIcon? modIcon;
+        private Drawable background = null!;
+        private SpriteIcon? modIcon;
 
         private Color4 activeForegroundColour;
         private Color4 inactiveForegroundColour;
@@ -36,19 +37,24 @@ namespace osu.Game.Rulesets.UI
         {
             this.mod = mod;
 
-            AutoSizeAxes = Axes.Both;
+            Size = new Vector2(DEFAULT_SIZE);
+        }
 
+        [BackgroundDependencyLoader]
+        private void load(TextureStore textures, OsuColour colours, OverlayColourProvider? colourProvider)
+        {
             FillFlowContainer contentFlow;
             ModSwitchTiny tinySwitch;
 
-            InternalChildren = new Drawable[]
+            InternalChildren = new[]
             {
-                background = new SpriteIcon
+                background = new Sprite
                 {
+                    RelativeSizeAxes = Axes.Both,
+                    FillMode = FillMode.Fit,
+                    Texture = textures.Get("Icons/BeatmapDetails/mod-icon"),
                     Anchor = Anchor.Centre,
                     Origin = Anchor.Centre,
-                    Size = new Vector2(DEFAULT_SIZE),
-                    Icon = OsuIcon.ModBg
                 },
                 contentFlow = new FillFlowContainer
                 {
@@ -78,11 +84,7 @@ namespace osu.Game.Rulesets.UI
                 });
                 tinySwitch.Scale = new Vector2(0.3f);
             }
-        }
 
-        [BackgroundDependencyLoader(true)]
-        private void load(OsuColour colours, OverlayColourProvider? colourProvider)
-        {
             inactiveForegroundColour = colourProvider?.Background5 ?? colours.Gray3;
             activeForegroundColour = colours.ForModType(mod.Type);
 
