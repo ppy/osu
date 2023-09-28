@@ -112,7 +112,7 @@ namespace osu.Game.Rulesets.UI
                             Font = OsuFont.Default.With(size: 34f, weight: FontWeight.Bold),
                             UseFullGlyphHeight = false,
                             Text = mod.ExtendedIconInformation,
-                            X = 5,
+                            X = 6,
                             Anchor = Anchor.Centre,
                             Origin = Anchor.Centre,
                         },
