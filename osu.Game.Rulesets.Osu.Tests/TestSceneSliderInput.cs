@@ -6,6 +6,7 @@ using System.Linq;
 using NUnit.Framework;
 using osu.Framework.Screens;
 using osu.Game.Beatmaps;
+using osu.Game.Beatmaps.ControlPoints;
 using osu.Game.Replays;
 using osu.Game.Rulesets.Judgements;
 using osu.Game.Rulesets.Objects;
@@ -37,16 +38,18 @@ namespace osu.Game.Rulesets.Osu.Tests
 
         private readonly List<JudgementResult> judgementResults = new List<JudgementResult>();
 
-        [Test]
-        public void TestTrackingBetweenLastTickAndTail()
+        [TestCase(300, false)]
+        [TestCase(200, true)]
+        [TestCase(150, true)]
+        [TestCase(120, true)]
+        [TestCase(60, true)]
+        [TestCase(10, true)]
+        public void TestTailLeniency(float finalPosition, bool hit)
         {
             performTest(new List<ReplayFrame>
             {
                 new OsuReplayFrame { Position = Vector2.Zero, Actions = { OsuAction.LeftButton, OsuAction.RightButton }, Time = time_slider_start },
-                new OsuReplayFrame { Position = new Vector2(200, 0), Actions = { OsuAction.LeftButton, OsuAction.RightButton }, Time = time_slider_start + 50 },
-                new OsuReplayFrame { Position = new Vector2(200, 0), Actions = { OsuAction.LeftButton, OsuAction.RightButton }, Time = time_slider_start + 480 },
-                new OsuReplayFrame { Position = new Vector2(0, 0), Actions = { OsuAction.LeftButton, OsuAction.RightButton }, Time = time_slider_start + 500 },
-                new OsuReplayFrame { Position = new Vector2(200, 0), Actions = { OsuAction.RightButton }, Time = time_slider_start + 520 },
+                new OsuReplayFrame { Position = new Vector2(finalPosition, slider_path_length * 3), Actions = { OsuAction.LeftButton, OsuAction.RightButton }, Time = time_slider_start + 20 },
             }, new Slider
             {
                 StartTime = time_slider_start,
@@ -56,64 +59,18 @@ namespace osu.Game.Rulesets.Osu.Tests
                 {
                     Vector2.Zero,
                     new Vector2(slider_path_length * 10, 0),
-                    new Vector2(slider_path_length * 10, slider_path_length),
-                    new Vector2(0, slider_path_length),
+                    new Vector2(slider_path_length * 10, slider_path_length * 3),
+                    new Vector2(0, slider_path_length * 3),
                 }),
-            });
+            }, 240, 1);
 
-            AddAssert("Full judgement awarded", assertMaxJudge);
-        }
-
-        [Test]
-        public void TestTrackingAtTailButNotLastTick()
-        {
-            performTest(new List<ReplayFrame>
+            if (hit)
             {
-                new OsuReplayFrame { Position = Vector2.Zero, Actions = { OsuAction.LeftButton, OsuAction.RightButton }, Time = time_slider_start },
-                new OsuReplayFrame { Position = new Vector2(200, 0), Actions = { OsuAction.LeftButton, OsuAction.RightButton }, Time = time_slider_start + 50 },
-                new OsuReplayFrame { Position = new Vector2(200, 0), Actions = { OsuAction.LeftButton, OsuAction.RightButton }, Time = time_slider_start + 350 },
-                new OsuReplayFrame { Position = new Vector2(0, 0), Actions = { OsuAction.RightButton }, Time = time_slider_start + 380 },
-            }, new Slider
-            {
-                StartTime = time_slider_start,
-                Position = new Vector2(0, 0),
-                SliderVelocityMultiplier = 10f,
-                Path = new SliderPath(PathType.Linear, new[]
-                {
-                    Vector2.Zero,
-                    new Vector2(slider_path_length * 10, 0),
-                    new Vector2(slider_path_length * 10, slider_path_length),
-                    new Vector2(0, slider_path_length),
-                }),
-            });
-
-            AddAssert("Full judgement awarded", assertMaxJudge);
-        }
-
-        [Test]
-        public void TestTrackingAtLastTickButNotTail()
-        {
-            performTest(new List<ReplayFrame>
-            {
-                new OsuReplayFrame { Position = Vector2.Zero, Actions = { OsuAction.LeftButton, OsuAction.RightButton }, Time = time_slider_start },
-                new OsuReplayFrame { Position = new Vector2(200, 0), Actions = { OsuAction.LeftButton, OsuAction.RightButton }, Time = time_slider_start + 50 },
-                new OsuReplayFrame { Position = new Vector2(200, 0), Actions = { OsuAction.LeftButton, OsuAction.RightButton }, Time = time_slider_start + 350 },
-                new OsuReplayFrame { Position = new Vector2(100, 0), Actions = { OsuAction.RightButton }, Time = time_slider_start + 380 },
-            }, new Slider
-            {
-                StartTime = time_slider_start,
-                Position = new Vector2(0, 0),
-                SliderVelocityMultiplier = 10f,
-                Path = new SliderPath(PathType.Linear, new[]
-                {
-                    Vector2.Zero,
-                    new Vector2(slider_path_length * 10, 0),
-                    new Vector2(slider_path_length * 10, slider_path_length),
-                    new Vector2(0, slider_path_length),
-                }),
-            });
-
-            AddAssert("Full judgement awarded", assertMaxJudge);
+                AddAssert("Tracking retained", assertMaxJudge);
+                AddAssert("Full judgement awarded", assertMaxJudge);
+            }
+            else
+                AddAssert("Tracking dropped", assertMidSliderJudgementFail);
         }
 
         [Test]
@@ -414,7 +371,7 @@ namespace osu.Game.Rulesets.Osu.Tests
 
         private bool assertMidSliderJudgementFail() => judgementResults[^2].Type == HitResult.SmallTickMiss;
 
-        private void performTest(List<ReplayFrame> frames, Slider? slider = null)
+        private void performTest(List<ReplayFrame> frames, Slider? slider = null, double? bpm = null, int? tickRate = null)
         {
             slider ??= new Slider
             {
@@ -430,14 +387,20 @@ namespace osu.Game.Rulesets.Osu.Tests
 
             AddStep("load player", () =>
             {
+                var cpi = new ControlPointInfo();
+
+                if (bpm != null)
+                    cpi.Add(0, new TimingControlPoint { BeatLength = 60000 / bpm.Value });
+
                 Beatmap.Value = CreateWorkingBeatmap(new Beatmap<OsuHitObject>
                 {
                     HitObjects = { slider },
                     BeatmapInfo =
                     {
-                        Difficulty = new BeatmapDifficulty { SliderTickRate = 3 },
-                        Ruleset = new OsuRuleset().RulesetInfo
+                        Difficulty = new BeatmapDifficulty { SliderTickRate = tickRate ?? 3 },
+                        Ruleset = new OsuRuleset().RulesetInfo,
                     },
+                    ControlPointInfo = cpi,
                 });
 
                 var p = new ScoreAccessibleReplayPlayer(new Score { Replay = new Replay { Frames = frames } });
