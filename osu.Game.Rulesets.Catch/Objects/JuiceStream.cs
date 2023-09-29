@@ -104,8 +104,8 @@ namespace osu.Game.Rulesets.Catch.Objects
                     }
                 }
 
-                // this also includes LegacyLastTick and this is used for TinyDroplet generation above.
-                // this means that the final segment of TinyDroplets are increasingly mistimed where LegacyLastTickOffset is being applied.
+                // this also includes LastTick and this is used for TinyDroplet generation above.
+                // this means that the final segment of TinyDroplets are increasingly mistimed where LastTick is being applied.
                 lastEvent = e;
 
                 switch (e.Type)
