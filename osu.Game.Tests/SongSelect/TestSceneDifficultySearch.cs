@@ -19,7 +19,7 @@ namespace osu.Game.Tests.SongSelect
             ("Title1", "Diff2"),
             ("My[Favourite]Song", "Expert"),
             ("Title", "My Favourite Diff"),
-            ("Another One", "diff ]with [[] brackets]]]"),
+            ("Another One", "diff ]with [[ brackets]]]"),
         };
 
         [TestCase("[1]", new[] { 0 })]
@@ -34,7 +34,8 @@ namespace osu.Game.Tests.SongSelect
         [TestCase("Title1 [Diff]", new[] { 0, 1 })]
         [TestCase("Title1[Diff]", new int[] { })]
         [TestCase("[diff ]with]", new[] { 4 })]
-        [TestCase("[diff ]with [[] brackets]]]]", new[] { 4 })]
+        [TestCase("[diff ]with [[ brackets]]]]", new[] { 4 })]
+        [TestCase("[diff] another [brackets]", new[] { 4 })]
         public void TestDifficultySearch(string query, int[] expectedBeatmapIndexes)
         {
             var carouselBeatmaps = createCarouselBeatmaps().ToList();
