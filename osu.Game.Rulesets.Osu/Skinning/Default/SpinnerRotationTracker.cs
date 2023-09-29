@@ -8,6 +8,7 @@ using osu.Framework.Extensions.ObjectExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Input.Events;
+using osu.Framework.Logging;
 using osu.Framework.Utils;
 using osu.Game.Rulesets.Objects.Drawables;
 using osu.Game.Rulesets.Osu.Objects.Drawables;
@@ -63,12 +64,15 @@ namespace osu.Game.Rulesets.Osu.Skinning.Default
         protected override void Update()
         {
             base.Update();
-            float thisAngle = -MathUtils.RadiansToDegrees(MathF.Atan2(mousePosition.X - DrawSize.X / 2, mousePosition.Y - DrawSize.Y / 2));
 
+            float thisAngle = -MathUtils.RadiansToDegrees(MathF.Atan2(mousePosition.X - DrawSize.X / 2, mousePosition.Y - DrawSize.Y / 2));
             float delta = thisAngle - lastAngle;
 
             if (Tracking)
+            {
+                Logger.Log($"last: {lastAngle}, this: {thisAngle}");
                 AddRotation(delta);
+            }
 
             lastAngle = thisAngle;
 
@@ -76,6 +80,17 @@ namespace osu.Game.Rulesets.Osu.Skinning.Default
 
             Rotation = (float)Interpolation.Damp(Rotation, currentRotation, 0.99, Math.Abs(Time.Elapsed));
         }
+
+        /// <summary>
+        /// The total amount spun in the current turn.
+        /// This ranges between -360 to +360.
+        /// </summary>
+        private float currentTurnTotal;
+
+        /// <summary>
+        /// The absolute value of <see cref="currentTurnTotal"/> that has been transferred to the judgement in the current turn.
+        /// </summary>
+        private float currentTurnTransferred;
 
         /// <summary>
         /// Rotate the disc by the provided angle (in addition to any existing rotation).
@@ -107,9 +122,24 @@ namespace osu.Game.Rulesets.Osu.Skinning.Default
             }
 
             currentRotation += angle;
-            // rate has to be applied each frame, because it's not guaranteed to be constant throughout playback
-            // (see: ModTimeRamp)
-            drawableSpinner.Result.RateAdjustedRotation += (float)(Math.Abs(angle) * (gameplayClock?.GetTrueGameplayRate() ?? Clock.Rate));
+
+            currentTurnTotal += (float)(angle * (gameplayClock?.GetTrueGameplayRate() ?? Clock.Rate));
+            drawableSpinner.Result.RateAdjustedRotation += Math.Max(0, Math.Abs(currentTurnTotal) - currentTurnTransferred);
+
+            // Logger.Log($"current: {currentTurnTotal}, angle: {angle}");
+
+            if (currentTurnTotal <= -360)
+            {
+                currentTurnTotal += 360;
+                currentTurnTransferred = 0;
+            }
+            else if (currentTurnTotal >= 360)
+            {
+                currentTurnTotal -= 360;
+                currentTurnTransferred = 0;
+            }
+
+            currentTurnTransferred = Math.Max(currentTurnTransferred, Math.Abs(currentTurnTotal));
         }
 
         private void resetState(DrawableHitObject obj)
