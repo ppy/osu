@@ -88,7 +88,7 @@ namespace osu.Game.Skinning
                 }
 
                 Samples = samples;
-                Textures = new TextureStore(resources.Renderer, new MaxDimensionLimitedTextureLoaderStore(resources.CreateTextureLoaderStore(storage)));
+                Textures = new TextureStore(resources.Renderer, CreateTextureLoaderStore(resources, storage));
             }
             else
             {
@@ -170,6 +170,9 @@ namespace osu.Game.Skinning
                 }
             }
         }
+
+        protected virtual IResourceStore<TextureUpload> CreateTextureLoaderStore(IStorageResourceProvider resources, IResourceStore<byte[]> storage)
+            => new MaxDimensionLimitedTextureLoaderStore(resources.CreateTextureLoaderStore(storage));
 
         protected virtual void ParseConfigurationStream(Stream stream)
         {
