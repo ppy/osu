@@ -4,6 +4,7 @@
 #nullable disable
 
 using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 using JetBrains.Annotations;
 using osu.Framework.Allocation;
@@ -33,6 +34,11 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
         public SkinnableDrawable ApproachCircle { get; private set; }
         public HitReceptor HitArea { get; private set; }
         public SkinnableDrawable CirclePiece { get; private set; }
+
+        protected override IEnumerable<Drawable> DimmablePieces => new[]
+        {
+            CirclePiece,
+        };
 
         Drawable IHasApproachCircle.ApproachCircle => ApproachCircle;
 
