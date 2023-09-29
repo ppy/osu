@@ -129,9 +129,11 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
             if (userTriggered)
                 return;
 
-            if (timeOffset >= 0 && Tracking)
+            // The player needs to have engaged in tracking at any point after the tail leniency cutoff.
+            // An actual tick miss should only occur if reaching the tick itself.
+            if (timeOffset >= SliderEventGenerator.TAIL_LENIENCY && Tracking)
                 ApplyResult(r => r.Type = r.Judgement.MaxResult);
-            else if (timeOffset >= -SliderEventGenerator.LAST_TICK_OFFSET)
+            else if (timeOffset >= 0)
                 ApplyResult(r => r.Type = r.Judgement.MinResult);
         }
 
