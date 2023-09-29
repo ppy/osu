@@ -41,7 +41,6 @@ namespace osu.Game.Rulesets.Catch.Beatmaps
                         X = xPositionData?.X ?? 0,
                         NewCombo = comboData?.NewCombo ?? false,
                         ComboOffset = comboData?.ComboOffset ?? 0,
-                        LegacyLastTickOffset = (obj as IHasLegacyLastTickOffset)?.LegacyLastTickOffset ?? 0,
                         LegacyConvertedY = yPositionData?.Y ?? CatchHitObject.DEFAULT_LEGACY_CONVERT_Y,
                         SliderVelocityMultiplier = sliderVelocityData?.SliderVelocityMultiplier ?? 1
                     }.Yield();

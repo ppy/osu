@@ -77,7 +77,7 @@ namespace osu.Game.Rulesets.Catch.Objects
             int nodeIndex = 0;
             SliderEventDescriptor? lastEvent = null;
 
-            foreach (var e in SliderEventGenerator.Generate(StartTime, SpanDuration, Velocity, TickDistance, Path.Distance, this.SpanCount(), LegacyLastTickOffset, cancellationToken))
+            foreach (var e in SliderEventGenerator.Generate(StartTime, SpanDuration, Velocity, TickDistance, Path.Distance, this.SpanCount(), cancellationToken))
             {
                 // generate tiny droplets since the last point
                 if (lastEvent != null)
@@ -162,7 +162,5 @@ namespace osu.Game.Rulesets.Catch.Objects
         public double Distance => Path.Distance;
 
         public IList<IList<HitSampleInfo>> NodeSamples { get; set; } = new List<IList<HitSampleInfo>>();
-
-        public double? LegacyLastTickOffset { get; set; }
     }
 }
