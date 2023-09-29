@@ -317,6 +317,8 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
         public SnapResult FindSnappedPositionAndTime(Vector2 screenSpacePosition, SnapType snapType = SnapType.All)
         {
             double time = TimeAtPosition(Content.ToLocalSpace(screenSpacePosition).X);
+            // prevent snapping outside of track length
+            time = Math.Min(time, editorClock.TrackLength);
             return new SnapResult(screenSpacePosition, beatSnapProvider.SnapTime(time));
         }
     }
