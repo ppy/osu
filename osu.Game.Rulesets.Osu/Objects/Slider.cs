@@ -205,9 +205,10 @@ namespace osu.Game.Rulesets.Osu.Objects
                         break;
 
                     case SliderEventType.LastTick:
-                        // we need to use the LegacyLastTick here for compatibility reasons (difficulty).
-                        // it is *okay* to use this because the TailCircle is not used for any meaningful purpose in gameplay.
-                        // if this is to change, we should revisit this.
+                        // Of note, we are directly mapping LastTick (instead of `SliderEventType.Tail`)  to SliderTailCircle.
+                        // It is required as difficulty calculation and gameplay relies on reading this value.
+                        // (although it is displayed in classic skins, which may be a concern).
+                        // If this is to change, we should revisit this.
                         AddNested(TailCircle = new SliderTailCircle(this)
                         {
                             RepeatIndex = e.SpanIndex,
@@ -262,7 +263,9 @@ namespace osu.Game.Rulesets.Osu.Objects
             if (HeadCircle != null)
                 HeadCircle.Samples = this.GetNodeSamples(0);
 
-            // The samples should be attached to the slider tail, however this can only be done after LegacyLastTick is removed otherwise they would play earlier than they're intended to.
+            // The samples should be attached to the slider tail, however this can only be done if LastTick is removed otherwise they would play earlier than they're intended to.
+            // (see mapping logic in `CreateNestedHitObjects` above)
+            //
             // For now, the samples are played by the slider itself at the correct end time.
             TailSamples = this.GetNodeSamples(repeatCount + 1);
         }
