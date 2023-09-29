@@ -46,6 +46,10 @@ namespace osu.Game.Screens.Select
         };
 
         public OptionalTextFilter[] SearchTerms = Array.Empty<OptionalTextFilter>();
+
+        /// <summary>
+        /// Search terms that are used for searching difficulty names.
+        /// </summary>
         public OptionalTextFilter[] DifficultySearchTerms = Array.Empty<OptionalTextFilter>();
 
         public RulesetInfo? Ruleset;
@@ -74,6 +78,10 @@ namespace osu.Game.Screens.Select
             }
         }
 
+        /// <summary>
+        /// Extracts the search terms from the provided <see cref="string"/>
+        /// and stores them in <see cref="DifficultySearchTerms"/>.
+        /// </summary>
         public string DifficultySearchText
         {
             set => DifficultySearchTerms = getTermsFromSearchText(value);
