@@ -9,6 +9,7 @@ using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Animations;
+using osu.Framework.Graphics.Primitives;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.Textures;
 using osuTK;
@@ -112,9 +113,11 @@ namespace osu.Game.Skinning
             if (texture.DisplayWidth <= maxSize.X && texture.DisplayHeight <= maxSize.Y)
                 return texture;
 
-            // use scale adjust property for downscaling the texture in order to meet the specified maximum dimensions.
-            texture.ScaleAdjust *= Math.Max(texture.DisplayWidth / maxSize.X, texture.DisplayHeight / maxSize.Y);
-            return texture;
+            maxSize *= texture.ScaleAdjust;
+
+            var croppedTexture = texture.Crop(new RectangleF(texture.Width / 2f - maxSize.X / 2f, texture.Height / 2f - maxSize.Y / 2f, maxSize.X, maxSize.Y));
+            croppedTexture.ScaleAdjust = texture.ScaleAdjust;
+            return croppedTexture;
         }
 
         public static bool HasFont(this ISkin source, LegacyFont font)
