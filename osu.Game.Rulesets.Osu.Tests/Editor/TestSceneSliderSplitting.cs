@@ -163,7 +163,6 @@ namespace osu.Game.Rulesets.Osu.Tests.Editor
                 slider = new Slider
                 {
                     Position = new Vector2(0, 50),
-                    LegacyLastTickOffset = 36, // This is necessary for undo to retain the sample control point
                     Path = new SliderPath(new[]
                     {
                         new PathControlPoint(Vector2.Zero, PathType.PerfectCurve),
