@@ -1,8 +1,6 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
 using System.Collections.Generic;
 using System.Linq;
 using NUnit.Framework;
@@ -33,7 +31,11 @@ namespace osu.Game.Rulesets.Osu.Tests
         private const double time_during_slide_4 = 3800;
         private const double time_slider_end = 4000;
 
-        private List<JudgementResult> judgementResults;
+        private ScoreAccessibleReplayPlayer currentPlayer = null!;
+
+        private const float slider_path_length = 25;
+
+        private readonly List<JudgementResult> judgementResults = new List<JudgementResult>();
 
         [Test]
         public void TestPressBothKeysSimultaneouslyAndReleaseOne()
@@ -333,10 +335,6 @@ namespace osu.Game.Rulesets.Osu.Tests
 
         private bool assertMidSliderJudgementFail() => judgementResults[^2].Type == HitResult.SmallTickMiss;
 
-        private ScoreAccessibleReplayPlayer currentPlayer;
-
-        private const float slider_path_length = 25;
-
         private void performTest(List<ReplayFrame> frames)
         {
             AddStep("load player", () =>
@@ -375,7 +373,7 @@ namespace osu.Game.Rulesets.Osu.Tests
                 };
 
                 LoadScreen(currentPlayer = p);
-                judgementResults = new List<JudgementResult>();
+                judgementResults.Clear();
             });
 
             AddUntilStep("Beatmap at 0", () => Beatmap.Value.Track.CurrentTime == 0);
