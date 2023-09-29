@@ -27,6 +27,11 @@ namespace osu.Game.Rulesets.Osu.Tests
         private const double time_spinner_start = 1500;
         private const double time_spinner_end = 4000;
 
+        /// <summary>
+        /// A small amount to spin beyond a given angle to avoid any issues with floating-point precision.
+        /// </summary>
+        private const float spin_error = 1.1f;
+
         private readonly List<JudgementResult> judgementResults = new List<JudgementResult>();
 
         private ScoreAccessibleReplayPlayer currentPlayer = null!;
@@ -54,7 +59,8 @@ namespace osu.Game.Rulesets.Osu.Tests
 
             performTest(frames);
 
-            AddAssert("spinner is missed", () => !judgementResults.Single(r => r.HitObject is Spinner).IsHit);
+            assertTicksHit(0);
+            assertSpinnerHit(false);
         }
 
         /// <summary>
@@ -79,57 +85,76 @@ namespace osu.Game.Rulesets.Osu.Tests
 
             performTest(frames);
 
-            AddAssert("spinner is missed", () => !judgementResults.Single(r => r.HitObject is Spinner).IsHit);
+            assertTicksHit(0);
+            assertSpinnerHit(false);
         }
 
         /// <summary>
-        /// Performs one half-spin, then changes direction and performs a full spin. +0.5 rotation -> -1 rotation -> 1 judgement.
+        /// Spins in a single direction.
+        /// </summary>
+        [TestCase(0.5f, 0)]
+        [TestCase(-0.5f, 0)]
+        [TestCase(1, 1)]
+        [TestCase(-1, 1)]
+        [TestCase(1.5f, 1)]
+        [TestCase(-1.5f, 1)]
+        [TestCase(2f, 2)]
+        [TestCase(-2f, 2)]
+        public void TestSpinSingleDirection(float amount, int expectedTicks)
+        {
+            performTest(
+                SpinGenerator.From(0)
+                             .Spin(amount, 500)
+                             .Build());
+
+            assertTicksHit(expectedTicks);
+            assertSpinnerHit(false);
+        }
+
+        /// <summary>
+        /// Spin half-way clockwise then perform one full spin counter-clockwise.
+        /// No ticks should be hit since the total rotation is -0.5 (0.5 CW + 1 CCW = 0.5 CCW).
         /// </summary>
         [Test]
-        public void TestSpinHalfThenChangeDirection()
+        public void TestSpinHalfBothDirections()
         {
-            List<ReplayFrame> frames =
-                // HALF clockwise rotation.
-                generateSpinnerFrames(time_spinner_start, time_spinner_start + 500, 0, MathF.PI)
-                    // Just a bit more than one FULL counter-clockwise rotation.
-                    .Concat(generateSpinnerFrames(time_spinner_start + 500, time_spinner_start + 1000, MathF.PI, -MathF.PI * 1.1f))
-                    // Just a bit more than a HALF clockwise rotation.
-                    .Concat(generateSpinnerFrames(time_spinner_start + 1000, time_spinner_start + 1500, -MathF.PI * 1.1f, 0))
-                    .Select(t => new OsuReplayFrame(t.time, t.pos, OsuAction.LeftButton))
-                    .Cast<ReplayFrame>()
-                    .ToList();
+            performTest(
+                SpinGenerator.From(0)
+                             .Spin(0.5f, 500) // Rotate to +0.5.
+                             .Spin(-1f, 500) // Rotate to -0.5
+                             .Build());
 
-            performTest(frames);
-
-            AddAssert("one tick hit", () => judgementResults.Where(r => r.HitObject is SpinnerTick).Count(r => r.IsHit), () => Is.EqualTo(1));
-            AddAssert("spinner is missed", () => !judgementResults.Single(r => r.HitObject is Spinner).IsHit);
+            assertTicksHit(0);
+            assertSpinnerHit(false);
         }
 
         /// <summary>
-        /// Generates rotational spinner frames.
+        /// Spin in one direction then spin in the other.
         /// </summary>
-        /// <param name="startTime">The start time.</param>
-        /// <param name="endTime">The end time.</param>
-        /// <param name="startAngle">The starting angle, clockwise with origin at the top of the spinner.</param>
-        /// <param name="endAngle">The ending angle, clockwise with origin at the top of the spinner.</param>
-        /// <returns></returns>
-        private IEnumerable<(double time, Vector2 pos)> generateSpinnerFrames(double startTime, double endTime, float startAngle, float endAngle)
+        [TestCase(0.5f, -1.5f, 1)]
+        [TestCase(-0.5f, 1.5f, 1)]
+        [TestCase(0.5f, -2.5f, 2)]
+        [TestCase(-0.5f, 2.5f, 2)]
+        public void TestSpinOneDirectionThenChangeDirection(float direction1, float direction2, int expectedTicks)
         {
-            startAngle -= MathF.PI / 2;
-            endAngle -= MathF.PI / 2;
+            performTest(
+                SpinGenerator.From(0)
+                             .Spin(direction1, 500)
+                             .Spin(direction2, 500)
+                             .Build());
 
-            Vector2 offset = new Vector2(50);
+            assertTicksHit(expectedTicks);
+            assertSpinnerHit(false);
+        }
 
-            for (double t = startTime; t < endTime; t += 10)
-                yield return (t, calcOffset((t - startTime) / (endTime - startTime)));
+        private void assertTicksHit(int count)
+        {
+            AddAssert($"{count} ticks hit", () => judgementResults.Where(r => r.HitObject is SpinnerTick).Count(r => r.IsHit), () => Is.EqualTo(count));
+        }
 
-            yield return (endTime, calcOffset(1));
-
-            Vector2 calcOffset(double p)
-            {
-                float angle = startAngle + (endAngle - startAngle) * (float)p;
-                return new Vector2(centre_x, centre_y) + offset * new Vector2(MathF.Cos(angle), MathF.Sin(angle));
-            }
+        private void assertSpinnerHit(bool shouldBeHit)
+        {
+            AddAssert($"spinner is {(shouldBeHit ? "hit" : "missed")}", () => judgementResults.Single(r => r.HitObject is Spinner).IsHit, () => Is.EqualTo(shouldBeHit));
         }
 
         private void performTest(List<ReplayFrame> frames)
@@ -171,6 +196,72 @@ namespace osu.Game.Rulesets.Osu.Tests
             AddUntilStep("Beatmap at 0", () => Beatmap.Value.Track.CurrentTime == 0);
             AddUntilStep("Wait until player is loaded", () => currentPlayer.IsCurrentScreen());
             AddUntilStep("Wait for completion", () => currentPlayer.ScoreProcessor.HasCompleted.Value);
+        }
+
+        private class SpinGenerator
+        {
+            private readonly SpinGenerator? last;
+            private readonly float startAngle;
+            private readonly float endAngle;
+            private readonly double duration;
+
+            private SpinGenerator(float startAngle)
+                : this(null, startAngle, 0)
+            {
+            }
+
+            private SpinGenerator(SpinGenerator? last, float endAngle, double duration)
+            {
+                this.last = last;
+                startAngle = last?.endAngle ?? endAngle;
+                this.endAngle = endAngle;
+                this.duration = duration;
+            }
+
+            public List<ReplayFrame> Build()
+            {
+                List<ReplayFrame> frames = new List<ReplayFrame>();
+
+                List<SpinGenerator> allGenerators = new List<SpinGenerator>();
+
+                SpinGenerator? l = this;
+
+                while (l != null)
+                {
+                    allGenerators.Add(l);
+                    l = l.last;
+                }
+
+                allGenerators.Reverse();
+
+                double currentTime = time_spinner_start;
+
+                foreach (var gen in allGenerators)
+                {
+                    double startTime = currentTime;
+                    double endTime = currentTime + gen.duration;
+
+                    for (; currentTime < endTime; currentTime += 10)
+                        frames.Add(new OsuReplayFrame(currentTime, calcOffset(gen, (currentTime - startTime) / (endTime - startTime)), OsuAction.LeftButton));
+
+                    frames.Add(new OsuReplayFrame(currentTime, calcOffset(gen, 1), OsuAction.LeftButton));
+                }
+
+                frames.Add(new OsuReplayFrame(currentTime, calcOffset(this, 1)));
+
+                return frames;
+            }
+
+            private static Vector2 calcOffset(SpinGenerator generator, double p)
+            {
+                Vector2 offset = new Vector2(50);
+                float angle = generator.startAngle + (generator.endAngle - generator.startAngle) * (float)p;
+                return new Vector2(centre_x, centre_y) + offset * new Vector2(MathF.Cos(angle), MathF.Sin(angle));
+            }
+
+            public static SpinGenerator From(float startAngle) => new SpinGenerator(startAngle - MathF.PI / 2f);
+
+            public SpinGenerator Spin(float amount, double duration) => new SpinGenerator(this, endAngle + amount * 2 * MathF.PI * spin_error, duration);
         }
 
         private partial class ScoreAccessibleReplayPlayer : ReplayPlayer
