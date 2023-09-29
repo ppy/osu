@@ -22,11 +22,10 @@ namespace osu.Game.Rulesets.Osu.Skinning.Default
 
         private readonly DrawableSpinner drawableSpinner;
 
-        private Vector2 mousePosition;
+        private Vector2? mousePosition;
+        private float? lastAngle;
 
-        private float lastAngle;
         private float currentRotation;
-
         private bool rotationTransferred;
 
         [Resolved(canBeNull: true)]
@@ -63,17 +62,19 @@ namespace osu.Game.Rulesets.Osu.Skinning.Default
         protected override void Update()
         {
             base.Update();
-            float thisAngle = -MathUtils.RadiansToDegrees(MathF.Atan2(mousePosition.X - DrawSize.X / 2, mousePosition.Y - DrawSize.Y / 2));
 
-            float delta = thisAngle - lastAngle;
+            if (mousePosition is Vector2 pos)
+            {
+                float thisAngle = -MathUtils.RadiansToDegrees(MathF.Atan2(pos.X - DrawSize.X / 2, pos.Y - DrawSize.Y / 2));
+                float delta = lastAngle == null ? 0 : thisAngle - lastAngle.Value;
 
-            if (Tracking)
-                AddRotation(delta);
+                if (Tracking)
+                    AddRotation(delta);
 
-            lastAngle = thisAngle;
+                lastAngle = thisAngle;
+            }
 
             IsSpinning.Value = isSpinnableTime && Math.Abs(currentRotation - Rotation) > 10f;
-
             Rotation = (float)Interpolation.Damp(Rotation, currentRotation, 0.99, Math.Abs(Time.Elapsed));
         }
 
@@ -116,8 +117,10 @@ namespace osu.Game.Rulesets.Osu.Skinning.Default
         {
             Tracking = false;
             IsSpinning.Value = false;
-            mousePosition = default;
-            lastAngle = currentRotation = Rotation = 0;
+            mousePosition = null;
+            lastAngle = null;
+            currentRotation = 0;
+            Rotation = 0;
             rotationTransferred = false;
         }
 
