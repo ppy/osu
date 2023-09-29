@@ -38,6 +38,58 @@ namespace osu.Game.Rulesets.Osu.Tests
         private readonly List<JudgementResult> judgementResults = new List<JudgementResult>();
 
         [Test]
+        public void TestTrackingAtTailButNotLastTick()
+        {
+            performTest(new List<ReplayFrame>
+            {
+                new OsuReplayFrame { Position = Vector2.Zero, Actions = { OsuAction.LeftButton, OsuAction.RightButton }, Time = time_slider_start },
+                new OsuReplayFrame { Position = new Vector2(200, 0), Actions = { OsuAction.LeftButton, OsuAction.RightButton }, Time = time_slider_start + 50 },
+                new OsuReplayFrame { Position = new Vector2(200, 0), Actions = { OsuAction.LeftButton, OsuAction.RightButton }, Time = time_slider_start + 350 },
+                new OsuReplayFrame { Position = new Vector2(0, 0), Actions = { OsuAction.RightButton }, Time = time_slider_start + 380 },
+            }, new Slider
+            {
+                StartTime = time_slider_start,
+                Position = new Vector2(0, 0),
+                SliderVelocityMultiplier = 10f,
+                Path = new SliderPath(PathType.Linear, new[]
+                {
+                    Vector2.Zero,
+                    new Vector2(slider_path_length * 10, 0),
+                    new Vector2(slider_path_length * 10, slider_path_length),
+                    new Vector2(0, slider_path_length),
+                }),
+            });
+
+            AddAssert("Full judgement awarded", assertMaxJudge);
+        }
+
+        [Test]
+        public void TestTrackingAtLastTickButNotTail()
+        {
+            performTest(new List<ReplayFrame>
+            {
+                new OsuReplayFrame { Position = Vector2.Zero, Actions = { OsuAction.LeftButton, OsuAction.RightButton }, Time = time_slider_start },
+                new OsuReplayFrame { Position = new Vector2(200, 0), Actions = { OsuAction.LeftButton, OsuAction.RightButton }, Time = time_slider_start + 50 },
+                new OsuReplayFrame { Position = new Vector2(200, 0), Actions = { OsuAction.LeftButton, OsuAction.RightButton }, Time = time_slider_start + 350 },
+                new OsuReplayFrame { Position = new Vector2(100, 0), Actions = { OsuAction.RightButton }, Time = time_slider_start + 380 },
+            }, new Slider
+            {
+                StartTime = time_slider_start,
+                Position = new Vector2(0, 0),
+                SliderVelocityMultiplier = 10f,
+                Path = new SliderPath(PathType.Linear, new[]
+                {
+                    Vector2.Zero,
+                    new Vector2(slider_path_length * 10, 0),
+                    new Vector2(slider_path_length * 10, slider_path_length),
+                    new Vector2(0, slider_path_length),
+                }),
+            });
+
+            AddAssert("Full judgement awarded", assertMaxJudge);
+        }
+
+        [Test]
         public void TestPressBothKeysSimultaneouslyAndReleaseOne()
         {
             performTest(new List<ReplayFrame>
@@ -335,26 +387,25 @@ namespace osu.Game.Rulesets.Osu.Tests
 
         private bool assertMidSliderJudgementFail() => judgementResults[^2].Type == HitResult.SmallTickMiss;
 
-        private void performTest(List<ReplayFrame> frames)
+        private void performTest(List<ReplayFrame> frames, Slider? slider = null)
         {
+            slider ??= new Slider
+            {
+                StartTime = time_slider_start,
+                Position = new Vector2(0, 0),
+                SliderVelocityMultiplier = 0.1f,
+                Path = new SliderPath(PathType.PerfectCurve, new[]
+                {
+                    Vector2.Zero,
+                    new Vector2(slider_path_length, 0),
+                }, slider_path_length),
+            };
+
             AddStep("load player", () =>
             {
                 Beatmap.Value = CreateWorkingBeatmap(new Beatmap<OsuHitObject>
                 {
-                    HitObjects =
-                    {
-                        new Slider
-                        {
-                            StartTime = time_slider_start,
-                            Position = new Vector2(0, 0),
-                            SliderVelocityMultiplier = 0.1f,
-                            Path = new SliderPath(PathType.PerfectCurve, new[]
-                            {
-                                Vector2.Zero,
-                                new Vector2(slider_path_length, 0),
-                            }, slider_path_length),
-                        }
-                    },
+                    HitObjects = { slider },
                     BeatmapInfo =
                     {
                         Difficulty = new BeatmapDifficulty { SliderTickRate = 3 },
