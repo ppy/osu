@@ -19,30 +19,9 @@ namespace osu.Game.Screens.Select
             @"\b(?<key>\w+)(?<op>(:|=|(>|<)(:|=)?))(?<value>("".*""[!]?)|(\S*))",
             RegexOptions.Compiled | RegexOptions.IgnoreCase);
 
-        private static readonly Regex difficulty_query_syntax_regex = new Regex(
-            @"(\s|^)((\[(?>\[(?<level>)|[^[\]]+|\](?<-level>))*(?(level)(?!))\](\s|$))|(\[.*))",
-            RegexOptions.Compiled);
-
         internal static void ApplyQueries(FilterCriteria criteria, string query)
         {
-            while (true)
-            {
-                var match = difficulty_query_syntax_regex.Matches(query).FirstOrDefault();
-
-                if (match is null) break;
-
-                // Trim the first character because it's always '[' (ignoring spaces)
-                string cleanDifficultyQuery = match.Value.Trim(' ')[1..];
-
-                if (cleanDifficultyQuery.EndsWith(']'))
-                    cleanDifficultyQuery = cleanDifficultyQuery[..^1];
-
-                criteria.DifficultySearchText = cleanDifficultyQuery;
-
-                // Insert whitespace if necessary so that the words before and after the difficulty query aren't joined together.
-                bool insertWhitespace = match.Value.StartsWith(' ') && match.Value.EndsWith(' ');
-                query = query.Replace(match.Value, insertWhitespace ? " " : "");
-            }
+            criteria.DifficultySearchText = extractDifficultySearchText(ref query);
 
             foreach (Match match in query_syntax_regex.Matches(query))
             {
@@ -55,6 +34,73 @@ namespace osu.Game.Screens.Select
             }
 
             criteria.SearchText = query;
+        }
+
+        /// <summary>
+        /// Extracts and returns the difficulty search text between square brackets.
+        /// </summary>
+        /// <param name="query">The search query. The difficulty search text will be removed from the query.</param>
+        /// <returns>The difficulty search text (without the square brackets).</returns>
+        private static string extractDifficultySearchText(ref string query)
+        {
+            var openingBracketIndexes = new List<int>();
+            var closingBracketIndexes = new List<int>();
+
+            populateIndexLists(ref query);
+
+            return performExtraction(ref query);
+
+            void populateIndexLists(ref string query)
+            {
+                bool currentlyBetweenBrackets = false;
+
+                for (int i = 0; i < query.Length; i++)
+                {
+                    switch (query[i])
+                    {
+                        case '[' when !currentlyBetweenBrackets && (i == 0 || query[i - 1] == ' '):
+                            currentlyBetweenBrackets = true;
+                            openingBracketIndexes.Add(i + 1);
+                            break;
+
+                        case ']' when currentlyBetweenBrackets && (i == query.Length - 1 || query[i + 1] == ' '):
+                            currentlyBetweenBrackets = false;
+                            closingBracketIndexes.Add(i);
+                            break;
+                    }
+                }
+
+                if (currentlyBetweenBrackets)
+                {
+                    // If there is no "]" closing the current difficulty search query, append it.
+                    query += ']';
+                    closingBracketIndexes.Add(query.Length - 1);
+                }
+            }
+
+            string performExtraction(ref string query)
+            {
+                var searchTexts = new List<string>();
+                string originalQuery = query;
+
+                for (int i = 0; i < openingBracketIndexes.Count; i++)
+                {
+                    int startIndex = openingBracketIndexes[i];
+                    int endIndex = closingBracketIndexes[i];
+
+                    string searchText = originalQuery[startIndex..endIndex];
+
+                    searchTexts.Add(searchText);
+
+                    query = query
+                            .Replace($" [{searchText}]", "")
+                            .Replace($"[{searchText}] ", "")
+                            .Replace($"[{searchText}]", "")
+                            .Replace($" [{searchText}] ", " ");
+                }
+
+                return string.Join(' ', searchTexts);
+            }
         }
 
         private static bool tryParseKeywordCriteria(FilterCriteria criteria, string key, string value, Operator op)
