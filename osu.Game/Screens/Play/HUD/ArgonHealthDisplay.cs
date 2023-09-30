@@ -38,8 +38,8 @@ namespace osu.Game.Screens.Play.HUD
         private static readonly Colour4 health_bar_colour = Colour4.White;
 
         // the opacity isn't part of the design, it's only here to control glow intensity.
-        private static readonly Colour4 health_bar_glow_colour = Color4Extensions.FromHex("#7ED7FD").Opacity(0.3f);
-        private static readonly Colour4 health_bar_flash_colour = Color4Extensions.FromHex("#7ED7FD").Opacity(0.4f);
+        private static readonly Colour4 health_bar_glow_colour = Color4Extensions.FromHex("#7ED7FD").Opacity(0.5f);
+        private static readonly Colour4 health_bar_flash_colour = Color4Extensions.FromHex("#7ED7FD").Opacity(0.6f);
 
         private static readonly Colour4 miss_bar_colour = Color4Extensions.FromHex("#FF9393");
         private static readonly Colour4 miss_bar_glow_colour = Color4Extensions.FromHex("#FD0000");
