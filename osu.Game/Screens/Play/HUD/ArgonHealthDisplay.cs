@@ -7,11 +7,13 @@ using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
+using osu.Framework.Graphics.Colour;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Lines;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Threading;
 using osu.Framework.Utils;
+using osu.Game.Graphics;
 using osu.Game.Rulesets.Judgements;
 using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Objects.Types;
@@ -96,13 +98,13 @@ namespace osu.Game.Screens.Play.HUD
                             },
                             missBar = new BarPath
                             {
-                                BarColour = miss_bar_colour,
-                                GlowColour = miss_bar_glow_colour,
+                                BarColour = Color4.White,
+                                GlowColour = OsuColour.Gray(0.5f),
                                 Blending = BlendingParameters.Additive,
-                                Alpha = 0f,
-                                PathRadius = 20f,
-                                GlowPortion = 0.75f,
-                                Margin = new MarginPadding(-10f),
+                                Colour = ColourInfo.GradientHorizontal(Color4.White.Opacity(0.8f), Color4.White),
+                                PathRadius = 40f,
+                                GlowPortion = 0.9f,
+                                Margin = new MarginPadding(-30f),
                                 Vertices = vertices
                             },
                             healthBar = new BarPath
@@ -130,7 +132,8 @@ namespace osu.Game.Screens.Play.HUD
             {
                 if (v.NewValue > MissBarValue)
                 {
-                    missBar.FadeOut(300, Easing.OutQuint);
+                    missBar.TransformTo(nameof(BarPath.BarColour), Colour4.White, 300, Easing.OutQuint);
+                    missBar.TransformTo(nameof(BarPath.GlowColour), Colour4.White, 300, Easing.OutQuint);
                     resetMissBarDelegate?.Cancel();
                     resetMissBarDelegate = null;
                 }
@@ -158,18 +161,22 @@ namespace osu.Game.Screens.Play.HUD
                 return;
 
             if (resetMissBarDelegate != null)
+            {
                 resetMissBarDelegate.Cancel();
+                resetMissBarDelegate = null;
+            }
             else
                 this.TransformTo(nameof(MissBarValue), HealthBarValue);
 
             this.Delay(500).Schedule(() =>
             {
                 this.TransformTo(nameof(MissBarValue), Current.Value, 300, Easing.OutQuint);
+
+                missBar.TransformTo(nameof(BarPath.BarColour), Colour4.White, 300, Easing.OutQuint);
+                missBar.TransformTo(nameof(BarPath.GlowColour), Colour4.White, 300, Easing.OutQuint);
+
                 resetMissBarDelegate = null;
             }, out resetMissBarDelegate);
-
-            missBar.FadeIn(120, Easing.OutQuint);
-            missBar.Delay(500).FadeOut(300, Easing.InQuint);
 
             missBar.TransformTo(nameof(BarPath.BarColour), miss_bar_colour.Lighten(0.1f))
                    .TransformTo(nameof(BarPath.BarColour), miss_bar_colour, 300, Easing.OutQuint);
@@ -287,7 +294,7 @@ namespace osu.Game.Screens.Play.HUD
                 if (position >= GlowPortion)
                     return BarColour;
 
-                return Interpolation.ValueAt(position, Colour4.Black.Opacity(0.0f), GlowColour, 0.0, GlowPortion);
+                return Interpolation.ValueAt(position, Colour4.Black.Opacity(0.0f), GlowColour, 0.0, GlowPortion, Easing.InQuart);
             }
         }
     }
