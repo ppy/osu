@@ -131,13 +131,16 @@ namespace osu.Game.Screens.Play.HUD
                     resetMissBarDelegate = null;
                 }
 
-                if (v.NewValue == 0)
-                    healthBar.FadeOut(300, Easing.OutQuint);
-                else if (healthBar.Alpha < 1)
-                    healthBar.FadeIn(300, Easing.OutQuint);
-
                 this.TransformTo(nameof(HealthBarValue), v.NewValue, 300, Easing.OutQuint);
             }, true);
+        }
+
+        protected override void Update()
+        {
+            base.Update();
+
+            float targetAlpha = Current.Value > 0 ? 1 : 0;
+            healthBar.Alpha = (float)Interpolation.DampContinuously(healthBar.Alpha, targetAlpha, 50.0, Time.Elapsed);
         }
 
         private ScheduledDelegate? resetMissBarDelegate;
