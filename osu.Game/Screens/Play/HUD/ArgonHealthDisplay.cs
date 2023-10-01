@@ -96,21 +96,20 @@ namespace osu.Game.Screens.Play.HUD
                             },
                             missBar = new BarPath
                             {
-                                AutoSizeAxes = Axes.None,
-                                RelativeSizeAxes = Axes.Both,
                                 BarColour = miss_bar_colour,
                                 GlowColour = miss_bar_glow_colour,
                                 Alpha = 0f,
-                                PathRadius = 10f,
+                                PathRadius = 20f,
+                                GlowPortion = 0.75f,
+                                Margin = new MarginPadding(-10f),
                                 Vertices = vertices
                             },
                             healthBar = new BarPath
                             {
-                                AutoSizeAxes = Axes.None,
-                                RelativeSizeAxes = Axes.Both,
                                 BarColour = health_bar_colour,
                                 GlowColour = health_bar_glow_colour,
                                 PathRadius = 10f,
+                                GlowPortion = 0.6f,
                                 Vertices = vertices
                             },
                         }
@@ -270,9 +269,11 @@ namespace osu.Game.Screens.Play.HUD
                 }
             }
 
+            public float GlowPortion { get; init; }
+
             protected override Color4 ColourAt(float position)
             {
-                if (position >= 0.6f)
+                if (position >= GlowPortion)
                     return BarColour;
 
                 return Interpolation.ValueAt(position, Colour4.Black.Opacity(0.0f), GlowColour, 0.0, 0.6);
