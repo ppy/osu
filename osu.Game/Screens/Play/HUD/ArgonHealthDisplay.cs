@@ -41,7 +41,7 @@ namespace osu.Game.Screens.Play.HUD
 
         // the opacity isn't part of the design, it's only here to control glow intensity.
         private static readonly Colour4 health_bar_glow_colour = Color4Extensions.FromHex("#7ED7FD").Opacity(0.5f);
-        private static readonly Colour4 health_bar_flash_colour = Color4Extensions.FromHex("#7ED7FD").Opacity(0.6f);
+        private static readonly Colour4 health_bar_flash_colour = Color4Extensions.FromHex("#7ED7FD").Opacity(0.8f);
 
         private static readonly Colour4 miss_bar_colour = Color4Extensions.FromHex("#FF9393");
         private static readonly Colour4 miss_bar_glow_colour = Color4Extensions.FromHex("#FD0000");
@@ -130,13 +130,15 @@ namespace osu.Game.Screens.Play.HUD
 
             Current.BindValueChanged(v =>
             {
-                if (v.NewValue > MissBarValue)
+                if (v.NewValue >= MissBarValue)
                     finishMissBarUsage();
 
                 this.TransformTo(nameof(HealthBarValue), v.NewValue, 300, Easing.OutQuint);
                 if (resetMissBarDelegate == null)
                     this.TransformTo(nameof(MissBarValue), v.NewValue, 300, Easing.OutQuint);
             }, true);
+
+            updatePathVertices();
         }
 
         protected override void Update()
@@ -172,19 +174,20 @@ namespace osu.Game.Screens.Play.HUD
                 finishMissBarUsage();
             }, out resetMissBarDelegate);
 
-            missBar.TransformTo(nameof(BarPath.BarColour), miss_bar_colour.Lighten(0.1f))
-                   .TransformTo(nameof(BarPath.BarColour), miss_bar_colour, 300, Easing.OutQuint);
+            missBar.TransformTo(nameof(BarPath.BarColour), miss_bar_colour, 100, Easing.OutQuint)
+                   .Then()
+                   .TransformTo(nameof(BarPath.BarColour), miss_bar_flash_colour, 800, Easing.OutQuint);
 
-            missBar.TransformTo(nameof(BarPath.GlowColour), miss_bar_flash_colour)
-                   .TransformTo(nameof(BarPath.GlowColour), miss_bar_glow_colour, 300, Easing.OutQuint);
+            missBar.TransformTo(nameof(BarPath.GlowColour), miss_bar_glow_colour.Lighten(0.2f))
+                   .TransformTo(nameof(BarPath.GlowColour), miss_bar_glow_colour, 800, Easing.OutQuint);
         }
 
         private void finishMissBarUsage()
         {
             if (Current.Value > 0)
             {
-                missBar.TransformTo(nameof(BarPath.BarColour), Colour4.Gray, 300, Easing.OutQuint);
-                missBar.TransformTo(nameof(BarPath.GlowColour), health_bar_glow_colour, 300, Easing.OutQuint);
+                missBar.TransformTo(nameof(BarPath.BarColour), health_bar_colour, 300, Easing.In);
+                missBar.TransformTo(nameof(BarPath.GlowColour), health_bar_glow_colour, 300, Easing.In);
             }
 
             resetMissBarDelegate?.Cancel();
@@ -197,6 +200,16 @@ namespace osu.Game.Screens.Play.HUD
 
             healthBar.TransformTo(nameof(BarPath.GlowColour), health_bar_flash_colour)
                      .TransformTo(nameof(BarPath.GlowColour), health_bar_glow_colour, 300, Easing.OutQuint);
+
+            if (resetMissBarDelegate == null)
+            {
+                missBar.TransformTo(nameof(BarPath.BarColour), Colour4.White, 100, Easing.OutQuint)
+                       .Then()
+                       .TransformTo(nameof(BarPath.BarColour), health_bar_colour, 800, Easing.OutQuint);
+
+                missBar.TransformTo(nameof(BarPath.GlowColour), Colour4.White)
+                       .TransformTo(nameof(BarPath.GlowColour), health_bar_glow_colour, 800, Easing.OutQuint);
+            }
         }
 
         private double missBarValue = 1.0;
