@@ -131,14 +131,11 @@ namespace osu.Game.Screens.Play.HUD
             Current.BindValueChanged(v =>
             {
                 if (v.NewValue > MissBarValue)
-                {
-                    missBar.TransformTo(nameof(BarPath.BarColour), Colour4.White, 300, Easing.OutQuint);
-                    missBar.TransformTo(nameof(BarPath.GlowColour), Colour4.White, 300, Easing.OutQuint);
-                    resetMissBarDelegate?.Cancel();
-                    resetMissBarDelegate = null;
-                }
+                    finishMissBarUsage();
 
                 this.TransformTo(nameof(HealthBarValue), v.NewValue, 300, Easing.OutQuint);
+                if (resetMissBarDelegate == null)
+                    this.TransformTo(nameof(MissBarValue), v.NewValue, 300, Easing.OutQuint);
             }, true);
         }
 
@@ -146,8 +143,8 @@ namespace osu.Game.Screens.Play.HUD
         {
             base.Update();
 
-            float targetAlpha = Current.Value > 0 ? 1 : 0;
-            healthBar.Alpha = (float)Interpolation.DampContinuously(healthBar.Alpha, targetAlpha, 50.0, Time.Elapsed);
+            healthBar.Alpha = (float)Interpolation.DampContinuously(healthBar.Alpha, (float)(Current.Value > 0 ? 1 : 0), 40, Time.Elapsed);
+            missBar.Alpha = (float)Interpolation.DampContinuously(missBar.Alpha, (float)(MissBarValue > 0 ? 1 : 0), 40, Time.Elapsed);
         }
 
         private ScheduledDelegate? resetMissBarDelegate;
@@ -172,10 +169,7 @@ namespace osu.Game.Screens.Play.HUD
             {
                 this.TransformTo(nameof(MissBarValue), Current.Value, 300, Easing.OutQuint);
 
-                missBar.TransformTo(nameof(BarPath.BarColour), Colour4.White, 300, Easing.OutQuint);
-                missBar.TransformTo(nameof(BarPath.GlowColour), Colour4.White, 300, Easing.OutQuint);
-
-                resetMissBarDelegate = null;
+                finishMissBarUsage();
             }, out resetMissBarDelegate);
 
             missBar.TransformTo(nameof(BarPath.BarColour), miss_bar_colour.Lighten(0.1f))
@@ -183,6 +177,18 @@ namespace osu.Game.Screens.Play.HUD
 
             missBar.TransformTo(nameof(BarPath.GlowColour), miss_bar_flash_colour)
                    .TransformTo(nameof(BarPath.GlowColour), miss_bar_glow_colour, 300, Easing.OutQuint);
+        }
+
+        private void finishMissBarUsage()
+        {
+            if (Current.Value > 0)
+            {
+                missBar.TransformTo(nameof(BarPath.BarColour), Colour4.Gray, 300, Easing.OutQuint);
+                missBar.TransformTo(nameof(BarPath.GlowColour), Colour4.Gray, 300, Easing.OutQuint);
+            }
+
+            resetMissBarDelegate?.Cancel();
+            resetMissBarDelegate = null;
         }
 
         protected override void Flash(JudgementResult result)
