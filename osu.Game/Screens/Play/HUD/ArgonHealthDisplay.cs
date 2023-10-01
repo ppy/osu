@@ -184,7 +184,7 @@ namespace osu.Game.Screens.Play.HUD
             if (Current.Value > 0)
             {
                 missBar.TransformTo(nameof(BarPath.BarColour), Colour4.Gray, 300, Easing.OutQuint);
-                missBar.TransformTo(nameof(BarPath.GlowColour), Colour4.Gray, 300, Easing.OutQuint);
+                missBar.TransformTo(nameof(BarPath.GlowColour), health_bar_glow_colour, 300, Easing.OutQuint);
             }
 
             resetMissBarDelegate?.Cancel();
@@ -300,7 +300,7 @@ namespace osu.Game.Screens.Play.HUD
                 if (position >= GlowPortion)
                     return BarColour;
 
-                return Interpolation.ValueAt(position, Colour4.Black.Opacity(0.0f), GlowColour, 0.0, GlowPortion, Easing.InQuart);
+                return Interpolation.ValueAt(position, Colour4.Black.Opacity(0.0f), GlowColour, 0.0, GlowPortion, Easing.InQuint);
             }
         }
     }
