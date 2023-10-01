@@ -52,8 +52,6 @@ namespace osu.Game.Screens.Play.HUD
         [BackgroundDependencyLoader]
         private void load()
         {
-            Anchor = Anchor.TopLeft;
-            Origin = Anchor.TopLeft;
             AutoSizeAxes = Axes.Both;
 
             Vector2 diagonalDir = (new Vector2(curve_end, bar_height) - new Vector2(curve_start, 0)).Normalized();
