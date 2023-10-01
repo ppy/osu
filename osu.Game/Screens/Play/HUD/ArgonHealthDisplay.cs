@@ -149,6 +149,10 @@ namespace osu.Game.Screens.Play.HUD
         {
             base.Miss(result);
 
+            if (result.HealthAtJudgement == 0.0)
+                // health is already empty, nothing should be displayed here.
+                return;
+
             if (resetMissBarDelegate != null)
                 resetMissBarDelegate.Cancel();
             else
