@@ -276,7 +276,7 @@ namespace osu.Game.Screens.Play.HUD
                 if (position >= GlowPortion)
                     return BarColour;
 
-                return Interpolation.ValueAt(position, Colour4.Black.Opacity(0.0f), GlowColour, 0.0, 0.6);
+                return Interpolation.ValueAt(position, Colour4.Black.Opacity(0.0f), GlowColour, 0.0, GlowPortion);
             }
         }
     }
