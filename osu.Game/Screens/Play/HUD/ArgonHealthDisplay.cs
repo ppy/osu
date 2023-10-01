@@ -98,6 +98,7 @@ namespace osu.Game.Screens.Play.HUD
                             {
                                 BarColour = miss_bar_colour,
                                 GlowColour = miss_bar_glow_colour,
+                                Blending = BlendingParameters.Additive,
                                 Alpha = 0f,
                                 PathRadius = 20f,
                                 GlowPortion = 0.75f,
@@ -106,6 +107,9 @@ namespace osu.Game.Screens.Play.HUD
                             },
                             healthBar = new BarPath
                             {
+                                AutoSizeAxes = Axes.None,
+                                RelativeSizeAxes = Axes.Both,
+                                Blending = BlendingParameters.Additive,
                                 BarColour = health_bar_colour,
                                 GlowColour = health_bar_glow_colour,
                                 PathRadius = 10f,
