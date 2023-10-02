@@ -11,6 +11,7 @@ using Newtonsoft.Json;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Development;
+using osu.Framework.Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Logging;
 using osu.Game.Database;
@@ -29,6 +30,8 @@ namespace osu.Game.Online.Multiplayer
     public abstract partial class MultiplayerClient : Component, IMultiplayerClient, IMultiplayerRoomServer
     {
         public Action<Notification>? PostNotification { protected get; set; }
+
+        public Action<Room, string>? InviteAccepted { protected get; set; }
 
         /// <summary>
         /// Invoked when any change occurs to the multiplayer room.
@@ -442,17 +445,47 @@ namespace osu.Game.Online.Multiplayer
             return handleUserLeft(user, UserKicked);
         }
 
-        async Task IMultiplayerClient.Invited(int invitedBy, MultiplayerRoom room)
+        async Task IMultiplayerClient.Invited(int invitedBy, long roomID, string password)
         {
-            var user = await userLookupCache.GetUserAsync(invitedBy).ConfigureAwait(false);
+            var loadUserTask = userLookupCache.GetUserAsync(invitedBy);
+            var loadRoomTask = loadRoom(roomID);
 
-            if (user == null) return;
+            await Task.WhenAll(loadUserTask, loadRoomTask).ConfigureAwait(false);
+
+            APIUser? apiUser = loadUserTask.GetResultSafely();
+            Room? apiRoom = loadRoomTask.GetResultSafely();
+
+            if (apiUser == null || apiRoom == null) return;
 
             Scheduler.Add(() =>
             {
                 PostNotification?.Invoke(
-                    new UserAvatarNotification(user, $"{user.Username} invited you to a multiplayer match:\"{room.Settings.Name}\"!")
+                    new UserAvatarNotification(apiUser, $"{apiUser.Username} invited you to a multiplayer match:\"{apiRoom.Name}\"!")
+                    {
+                        Activated = () =>
+                        {
+                            InviteAccepted?.Invoke(apiRoom, password);
+                            return true;
+                        }
+                    }
                 );
+            });
+        }
+
+        private Task<Room?> loadRoom(long id)
+        {
+            return Task.Run(() =>
+            {
+                var t = new TaskCompletionSource<Room?>();
+                var request = new GetRoomRequest(id);
+
+                request.Success += room => t.TrySetResult(room);
+
+                request.Failure += e => t.TrySetResult(null);
+
+                API.Queue(request);
+
+                return t.Task;
             });
         }
 
