@@ -36,7 +36,7 @@ namespace osu.Game.Rulesets.Osu.Skinning.Legacy
         private void load(ISkinSource skinSource)
         {
             Divisor = 2;
-            MinimumBeatLength = 200;
+            MinimumBeatLength = 150;
 
             AutoSizeAxes = Axes.Both;
 
