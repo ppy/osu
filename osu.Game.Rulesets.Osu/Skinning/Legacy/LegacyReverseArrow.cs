@@ -4,6 +4,7 @@
 using System.Diagnostics;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
+using osu.Framework.Extensions.ObjectExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Game.Rulesets.Objects.Drawables;
@@ -103,8 +104,11 @@ namespace osu.Game.Rulesets.Osu.Skinning.Legacy
         {
             base.Dispose(isDisposing);
 
-            drawableObject.HitObjectApplied -= onHitObjectApplied;
-            drawableObject.ApplyCustomUpdateState -= updateStateTransforms;
+            if (drawableObject.IsNotNull())
+            {
+                drawableObject.HitObjectApplied -= onHitObjectApplied;
+                drawableObject.ApplyCustomUpdateState -= updateStateTransforms;
+            }
         }
     }
 }

@@ -2,6 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using osu.Framework.Allocation;
+using osu.Framework.Extensions.ObjectExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Sprites;
@@ -60,7 +61,9 @@ namespace osu.Game.Rulesets.Osu.Skinning.Default
         protected override void Dispose(bool isDisposing)
         {
             base.Dispose(isDisposing);
-            drawableObject.ApplyCustomUpdateState -= updateStateTransforms;
+
+            if (drawableObject.IsNotNull())
+                drawableObject.ApplyCustomUpdateState -= updateStateTransforms;
         }
     }
 }
