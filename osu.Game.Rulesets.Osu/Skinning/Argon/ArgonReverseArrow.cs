@@ -2,7 +2,6 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using osu.Framework.Allocation;
-using osu.Framework.Audio.Track;
 using osu.Framework.Bindables;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
@@ -10,8 +9,6 @@ using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.Textures;
-using osu.Game.Beatmaps.ControlPoints;
-using osu.Game.Graphics.Containers;
 using osu.Game.Rulesets.Objects.Drawables;
 using osu.Game.Rulesets.Osu.Objects;
 using osuTK;
@@ -19,24 +16,20 @@ using osuTK.Graphics;
 
 namespace osu.Game.Rulesets.Osu.Skinning.Argon
 {
-    public partial class ArgonReverseArrow : BeatSyncedContainer
+    public partial class ArgonReverseArrow : CompositeDrawable
     {
         [Resolved]
-        private DrawableHitObject drawableRepeat { get; set; } = null!;
+        private DrawableHitObject drawableObject { get; set; } = null!;
 
         private Bindable<Color4> accentColour = null!;
 
         private SpriteIcon icon = null!;
-
         private Container main = null!;
         private Sprite side = null!;
 
         [BackgroundDependencyLoader]
-        private void load(TextureStore textures, DrawableHitObject hitObject)
+        private void load(TextureStore textures)
         {
-            Divisor = 2;
-            MinimumBeatLength = 150;
-
             Anchor = Anchor.Centre;
             Origin = Anchor.Centre;
 
@@ -76,22 +69,39 @@ namespace osu.Game.Rulesets.Osu.Skinning.Argon
                 }
             };
 
-            accentColour = hitObject.AccentColour.GetBoundCopy();
+            accentColour = drawableObject.AccentColour.GetBoundCopy();
             accentColour.BindValueChanged(accent => icon.Colour = accent.NewValue.Darken(4), true);
+
+            drawableObject.ApplyCustomUpdateState += updateStateTransforms;
         }
 
-        protected override void OnNewBeat(int beatIndex, TimingControlPoint timingPoint, EffectControlPoint effectPoint, ChannelAmplitudes amplitudes)
+        private void updateStateTransforms(DrawableHitObject hitObject, ArmedState state)
         {
-            if (!drawableRepeat.Judged)
+            const float move_distance = -12;
+            const double move_out_duration = 35;
+            const double move_in_duration = 250;
+            const double total = 300;
+
+            switch (state)
             {
-                main.ScaleTo(1.3f, timingPoint.BeatLength / 8, Easing.Out)
-                    .Then()
-                    .ScaleTo(1f, timingPoint.BeatLength / 2, Easing.Out);
-                side
-                    .MoveToX(-12, timingPoint.BeatLength / 8, Easing.Out)
-                    .Then()
-                    .MoveToX(0, timingPoint.BeatLength / 2, Easing.Out);
+                case ArmedState.Idle:
+                    main.ScaleTo(1.3f, move_out_duration, Easing.Out)
+                        .Then()
+                        .ScaleTo(1f, move_in_duration, Easing.Out)
+                        .Loop(total - (move_in_duration + move_out_duration));
+                    side
+                        .MoveToX(move_distance, move_out_duration, Easing.Out)
+                        .Then()
+                        .MoveToX(0, move_in_duration, Easing.Out)
+                        .Loop(total - (move_in_duration + move_out_duration));
+                    break;
             }
+        }
+
+        protected override void Dispose(bool isDisposing)
+        {
+            base.Dispose(isDisposing);
+            drawableObject.ApplyCustomUpdateState -= updateStateTransforms;
         }
     }
 }
