@@ -35,8 +35,7 @@ namespace osu.Game.Rulesets.Osu.Skinning.Argon
         private void load(TextureStore textures, DrawableHitObject hitObject)
         {
             Divisor = 2;
-            MinimumBeatLength = 120;
-            EarlyActivationMilliseconds = 30;
+            MinimumBeatLength = 150;
 
             Anchor = Anchor.Centre;
             Origin = Anchor.Centre;
@@ -85,11 +84,11 @@ namespace osu.Game.Rulesets.Osu.Skinning.Argon
         {
             if (!drawableRepeat.Judged)
             {
-                main.ScaleTo(1.3f, 30, Easing.Out)
+                main.ScaleTo(1.3f, timingPoint.BeatLength / 8, Easing.Out)
                     .Then()
                     .ScaleTo(1f, timingPoint.BeatLength / 2, Easing.Out);
                 side
-                    .MoveToX(-12, 30, Easing.Out)
+                    .MoveToX(-12, timingPoint.BeatLength / 8, Easing.Out)
                     .Then()
                     .MoveToX(0, timingPoint.BeatLength / 2, Easing.Out);
             }

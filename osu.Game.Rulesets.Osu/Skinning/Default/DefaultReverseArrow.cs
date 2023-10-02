@@ -21,7 +21,7 @@ namespace osu.Game.Rulesets.Osu.Skinning.Default
         public DefaultReverseArrow()
         {
             Divisor = 2;
-            MinimumBeatLength = 200;
+            MinimumBeatLength = 150;
 
             Anchor = Anchor.Centre;
             Origin = Anchor.Centre;
