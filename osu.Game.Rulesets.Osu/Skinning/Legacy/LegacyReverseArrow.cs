@@ -73,28 +73,26 @@ namespace osu.Game.Rulesets.Osu.Skinning.Legacy
 
         private void updateStateTransforms(DrawableHitObject hitObject, ArmedState state)
         {
-            const double move_out_duration = 35;
-            const double move_in_duration = 250;
-            const double total = 300;
+            const double duration = 300;
+            const float rotation = 5.625f;
 
             switch (state)
             {
                 case ArmedState.Idle:
                     if (shouldRotate)
                     {
-                        InternalChild.ScaleTo(1.3f, move_out_duration)
-                                     .RotateTo(5.625f)
+                        InternalChild.ScaleTo(1.3f)
+                                     .RotateTo(rotation)
                                      .Then()
-                                     .ScaleTo(1f, move_in_duration)
-                                     .RotateTo(-5.625f, move_in_duration)
-                                     .Loop(total - (move_in_duration + move_out_duration));
+                                     .ScaleTo(1f, duration)
+                                     .RotateTo(-rotation, duration)
+                                     .Loop();
                     }
                     else
                     {
-                        InternalChild.ScaleTo(1.3f)
-                                     .Then()
-                                     .ScaleTo(1f, move_in_duration)
-                                     .Loop(total - (move_in_duration + move_out_duration));
+                        InternalChild.ScaleTo(1.3f).Then()
+                                     .ScaleTo(1f, duration, Easing.Out)
+                                     .Loop();
                     }
 
                     break;
