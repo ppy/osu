@@ -44,6 +44,8 @@ namespace osu.Game.Rulesets.Osu.Tests
         [TestCase(120, true)]
         [TestCase(60, true)]
         [TestCase(10, true)]
+        [TestCase(0, true)]
+        [TestCase(-30, false)]
         public void TestTailLeniency(float finalPosition, bool hit)
         {
             Slider slider;
