@@ -106,6 +106,16 @@ namespace osu.Game.Online.Multiplayer
             return connection.InvokeAsync(nameof(IMultiplayerServer.LeaveRoom));
         }
 
+        public override Task InvitePlayer(int userId)
+        {
+            if (!IsConnected.Value)
+                return Task.CompletedTask;
+
+            Debug.Assert(connection != null);
+
+            return connection.InvokeAsync(nameof(IMultiplayerServer.InvitePlayer), userId);
+        }
+
         public override Task TransferHost(int userId)
         {
             if (!IsConnected.Value)

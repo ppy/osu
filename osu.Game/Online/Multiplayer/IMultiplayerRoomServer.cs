@@ -99,5 +99,12 @@ namespace osu.Game.Online.Multiplayer
         /// </summary>
         /// <param name="playlistItemId">The item to remove.</param>
         Task RemovePlaylistItem(long playlistItemId);
+
+        /// <summary>
+        /// Invites a player to the current room.
+        /// </summary>
+        /// <param name="userId"></param>
+        /// <returns></returns>
+        Task InvitePlayer(int userId);
     }
 }
