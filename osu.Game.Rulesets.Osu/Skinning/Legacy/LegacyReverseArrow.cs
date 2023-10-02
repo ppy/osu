@@ -27,6 +27,8 @@ namespace osu.Game.Rulesets.Osu.Skinning.Legacy
 
         private Drawable arrow = null!;
 
+        private bool shouldRotate;
+
         [BackgroundDependencyLoader]
         private void load(ISkinSource skinSource)
         {
@@ -40,6 +42,8 @@ namespace osu.Game.Rulesets.Osu.Skinning.Legacy
             textureIsDefaultSkin = skin is ISkinTransformer transformer && transformer.Skin is DefaultLegacySkin;
 
             drawableObject.ApplyCustomUpdateState += updateStateTransforms;
+
+            shouldRotate = skinSource.GetConfig<SkinConfiguration.LegacySetting, decimal>(SkinConfiguration.LegacySetting.Version)?.Value <= 1;
         }
 
         protected override void LoadComplete()
@@ -76,11 +80,23 @@ namespace osu.Game.Rulesets.Osu.Skinning.Legacy
             switch (state)
             {
                 case ArmedState.Idle:
-                    // TODO: rotate slightly if Version < 1 (aka UseNewLayout)
-                    InternalChild.ScaleTo(1.3f, move_out_duration, Easing.Out)
-                                 .Then()
-                                 .ScaleTo(1f, move_in_duration, Easing.Out)
-                                 .Loop(total - (move_in_duration + move_out_duration));
+                    if (shouldRotate)
+                    {
+                        InternalChild.ScaleTo(1.3f, move_out_duration)
+                                     .RotateTo(5.625f)
+                                     .Then()
+                                     .ScaleTo(1f, move_in_duration)
+                                     .RotateTo(-5.625f, move_in_duration)
+                                     .Loop(total - (move_in_duration + move_out_duration));
+                    }
+                    else
+                    {
+                        InternalChild.ScaleTo(1.3f)
+                                     .Then()
+                                     .ScaleTo(1f, move_in_duration)
+                                     .Loop(total - (move_in_duration + move_out_duration));
+                    }
+
                     break;
             }
         }
