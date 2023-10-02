@@ -133,7 +133,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
             // An actual tick miss should only occur if reaching the tick itself.
             if (timeOffset >= SliderEventGenerator.TAIL_LENIENCY && Tracking)
                 ApplyResult(r => r.Type = r.Judgement.MaxResult);
-            else if (timeOffset >= 0)
+            else if (timeOffset > 0)
                 ApplyResult(r => r.Type = r.Judgement.MinResult);
         }
 
