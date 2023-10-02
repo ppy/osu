@@ -7,6 +7,7 @@ using osu.Framework.Extensions.ObjectExtensions;
 using osu.Framework.Logging;
 using osu.Framework.Screens;
 using osu.Game.Online.Multiplayer;
+using osu.Game.Online.Rooms;
 using osu.Game.Screens.OnlinePlay.Components;
 using osu.Game.Screens.OnlinePlay.Lounge;
 
@@ -89,6 +90,11 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
         protected override RoomManager CreateRoomManager() => new MultiplayerRoomManager();
 
         protected override LoungeSubScreen CreateLounge() => new MultiplayerLoungeSubScreen();
+
+        public void Join(Room room, string? password)
+        {
+            LoungeSubScreen.Join(room, password);
+        }
 
         protected override void Dispose(bool isDisposing)
         {
