@@ -260,6 +260,8 @@ namespace osu.Game.Online.Multiplayer
 
         protected abstract Task LeaveRoomInternal();
 
+        public abstract Task InvitePlayer(int userId);
+
         /// <summary>
         /// Change the current <see cref="MultiplayerRoom"/> settings.
         /// </summary>
