@@ -1,6 +1,7 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using NUnit.Framework;
@@ -38,6 +39,44 @@ namespace osu.Game.Rulesets.Osu.Tests
 
         private readonly List<JudgementResult> judgementResults = new List<JudgementResult>();
 
+        // Making these too short causes breakage from frames not being processed fast enough.
+        // To keep things simple, these tests are crafted to always be >16ms length.
+        // If sliders shorter than this are ever used in gameplay it will probably break things and we can revisit.
+        [TestCase(80, 0)]
+        [TestCase(80, 1)]
+        [TestCase(80, 10)]
+        public void TestVeryShortSlider(float sliderLength, int repeatCount)
+        {
+            Slider slider;
+
+            performTest(new List<ReplayFrame>
+            {
+                new OsuReplayFrame { Position = new Vector2(10, 0), Actions = { OsuAction.LeftButton, OsuAction.RightButton }, Time = time_slider_start - 10 },
+                new OsuReplayFrame { Position = new Vector2(10, 0), Actions = { OsuAction.LeftButton, OsuAction.RightButton }, Time = time_slider_start + 2000 },
+            }, slider = new Slider
+            {
+                StartTime = time_slider_start,
+                Position = new Vector2(0, 0),
+                SliderVelocityMultiplier = 10f,
+                RepeatCount = repeatCount,
+                Path = new SliderPath(PathType.Linear, new[]
+                {
+                    Vector2.Zero,
+                    new Vector2(sliderLength, 0),
+                }),
+            }, 240, 1);
+
+            AddAssert("Slider is longer than one frame", () => slider.Duration / (slider.RepeatCount + 1), () => Is.GreaterThan(1000 / 60f));
+            AddAssert("Slider is shorter than lenience", () => slider.Duration / (slider.RepeatCount + 1), () => Is.LessThan(Math.Abs(SliderEventGenerator.TAIL_LENIENCY)));
+
+            assertAllMaxJudgements();
+
+            // Even if the last tick is hit early, the slider should always execute its final judgement at its endtime.
+            // If not, hitsounds will not play on time.
+            AddAssert("Judgement offset is zero", () => judgementResults.Last().TimeOffset == 0);
+            AddAssert("Slider judged at end time", () => judgementResults.Last().TimeAbsolute, () => Is.EqualTo(slider.EndTime));
+        }
+
         [TestCase(300, false)]
         [TestCase(200, true)]
         [TestCase(150, true)]
@@ -70,7 +109,6 @@ namespace osu.Game.Rulesets.Osu.Tests
 
             if (hit)
             {
-                AddAssert("Tracking retained", assertMaxJudge);
                 AddAssert("Full judgement awarded", assertMaxJudge);
             }
             else
