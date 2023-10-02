@@ -3,11 +3,9 @@
 
 using System.Diagnostics;
 using osu.Framework.Allocation;
-using osu.Framework.Audio.Track;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
-using osu.Game.Beatmaps.ControlPoints;
-using osu.Game.Graphics.Containers;
+using osu.Framework.Graphics.Containers;
 using osu.Game.Rulesets.Objects.Drawables;
 using osu.Game.Rulesets.Osu.Objects;
 using osu.Game.Rulesets.Osu.Objects.Drawables;
@@ -16,13 +14,10 @@ using osuTK.Graphics;
 
 namespace osu.Game.Rulesets.Osu.Skinning.Legacy
 {
-    public partial class LegacyReverseArrow : BeatSyncedContainer
+    public partial class LegacyReverseArrow : CompositeDrawable
     {
         [Resolved]
-        private DrawableHitObject drawableRepeat { get; set; } = null!;
-
-        [Resolved(canBeNull: true)]
-        private DrawableHitObject? drawableHitObject { get; set; }
+        private DrawableHitObject drawableObject { get; set; } = null!;
 
         private Drawable proxy = null!;
 
@@ -35,9 +30,6 @@ namespace osu.Game.Rulesets.Osu.Skinning.Legacy
         [BackgroundDependencyLoader]
         private void load(ISkinSource skinSource)
         {
-            Divisor = 2;
-            MinimumBeatLength = 150;
-
             AutoSizeAxes = Axes.Both;
 
             string lookupName = new OsuSkinComponentLookup(OsuSkinComponents.ReverseArrow).LookupName;
@@ -46,6 +38,8 @@ namespace osu.Game.Rulesets.Osu.Skinning.Legacy
 
             InternalChild = arrow = (skin?.GetAnimation(lookupName, true, true, maxSize: OsuHitObject.OBJECT_DIMENSIONS) ?? Empty());
             textureIsDefaultSkin = skin is ISkinTransformer transformer && transformer.Skin is DefaultLegacySkin;
+
+            drawableObject.ApplyCustomUpdateState += updateStateTransforms;
         }
 
         protected override void LoadComplete()
@@ -54,23 +48,14 @@ namespace osu.Game.Rulesets.Osu.Skinning.Legacy
 
             proxy = CreateProxy();
 
-            if (drawableHitObject != null)
+            drawableObject.HitObjectApplied += onHitObjectApplied;
+            onHitObjectApplied(drawableObject);
+
+            accentColour = drawableObject.AccentColour.GetBoundCopy();
+            accentColour.BindValueChanged(c =>
             {
-                drawableHitObject.HitObjectApplied += onHitObjectApplied;
-                onHitObjectApplied(drawableHitObject);
-
-                accentColour = drawableHitObject.AccentColour.GetBoundCopy();
-                accentColour.BindValueChanged(c =>
-                {
-                    arrow.Colour = textureIsDefaultSkin && c.NewValue.R + c.NewValue.G + c.NewValue.B > (600 / 255f) ? Color4.Black : Color4.White;
-                }, true);
-            }
-        }
-
-        protected override void OnNewBeat(int beatIndex, TimingControlPoint timingPoint, EffectControlPoint effectPoint, ChannelAmplitudes amplitudes)
-        {
-            if (!drawableRepeat.Judged)
-                Child.ScaleTo(1.3f).ScaleTo(1f, timingPoint.BeatLength, Easing.Out);
+                arrow.Colour = textureIsDefaultSkin && c.NewValue.R + c.NewValue.G + c.NewValue.B > (600 / 255f) ? Color4.Black : Color4.White;
+            }, true);
         }
 
         private void onHitObjectApplied(DrawableHitObject drawableObject)
@@ -82,11 +67,29 @@ namespace osu.Game.Rulesets.Osu.Skinning.Legacy
                                                     .OverlayElementContainer.Add(proxy);
         }
 
+        private void updateStateTransforms(DrawableHitObject hitObject, ArmedState state)
+        {
+            const double move_out_duration = 35;
+            const double move_in_duration = 250;
+            const double total = 300;
+
+            switch (state)
+            {
+                case ArmedState.Idle:
+                    InternalChild.ScaleTo(1.3f, move_out_duration, Easing.Out)
+                                 .Then()
+                                 .ScaleTo(1f, move_in_duration, Easing.Out)
+                                 .Loop(total - (move_in_duration + move_out_duration));
+                    break;
+            }
+        }
+
         protected override void Dispose(bool isDisposing)
         {
             base.Dispose(isDisposing);
-            if (drawableHitObject != null)
-                drawableHitObject.HitObjectApplied -= onHitObjectApplied;
+
+            drawableObject.HitObjectApplied -= onHitObjectApplied;
+            drawableObject.ApplyCustomUpdateState -= updateStateTransforms;
         }
     }
 }
