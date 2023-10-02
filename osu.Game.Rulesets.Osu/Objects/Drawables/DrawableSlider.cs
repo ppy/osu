@@ -256,7 +256,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
 
         protected override void CheckForResult(bool userTriggered, double timeOffset)
         {
-            if (userTriggered || !TailCircle.Judged)
+            if (userTriggered || !TailCircle.Judged || Time.Current < HitObject.EndTime)
                 return;
 
             // If only the nested hitobjects are judged, then the slider's own judgement is ignored for scoring purposes.

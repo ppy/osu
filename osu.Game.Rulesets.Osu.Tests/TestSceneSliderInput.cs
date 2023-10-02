@@ -46,11 +46,13 @@ namespace osu.Game.Rulesets.Osu.Tests
         [TestCase(10, true)]
         public void TestTailLeniency(float finalPosition, bool hit)
         {
+            Slider slider;
+
             performTest(new List<ReplayFrame>
             {
                 new OsuReplayFrame { Position = Vector2.Zero, Actions = { OsuAction.LeftButton, OsuAction.RightButton }, Time = time_slider_start },
                 new OsuReplayFrame { Position = new Vector2(finalPosition, slider_path_length * 3), Actions = { OsuAction.LeftButton, OsuAction.RightButton }, Time = time_slider_start + 20 },
-            }, new Slider
+            }, slider = new Slider
             {
                 StartTime = time_slider_start,
                 Position = new Vector2(0, 0),
@@ -71,6 +73,11 @@ namespace osu.Game.Rulesets.Osu.Tests
             }
             else
                 AddAssert("Tracking dropped", assertMidSliderJudgementFail);
+
+            // Even if the last tick is hit early, the slider should always execute its final judgement at its endtime.
+            // If not, hitsounds will not play on time.
+            AddAssert("Judgement offset is zero", () => judgementResults.Last().TimeOffset == 0);
+            AddAssert("Slider judged at end time", () => judgementResults.Last().TimeAbsolute, () => Is.EqualTo(slider.EndTime));
         }
 
         [Test]
