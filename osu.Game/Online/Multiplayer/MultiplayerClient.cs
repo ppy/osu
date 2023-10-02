@@ -442,6 +442,21 @@ namespace osu.Game.Online.Multiplayer
             return handleUserLeft(user, UserKicked);
         }
 
+        async Task IMultiplayerClient.Invited(int invitedBy, MultiplayerRoom room)
+        {
+            var user = await userLookupCache.GetUserAsync(invitedBy).ConfigureAwait(false);
+
+            if (user == null) return;
+
+            Scheduler.Add(() =>
+            {
+                PostNotification?.Invoke(new SimpleNotification
+                {
+                    Text = "You got invited into a multiplayer match by " + user.Username + "!",
+                });
+            });
+        }
+
         private void addUserToAPIRoom(MultiplayerRoomUser user)
         {
             Debug.Assert(APIRoom != null);
