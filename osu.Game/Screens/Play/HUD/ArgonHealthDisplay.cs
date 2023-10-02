@@ -212,7 +212,7 @@ namespace osu.Game.Screens.Play.HUD
             }
         }
 
-        private double missBarValue = 1.0;
+        private double missBarValue;
         private readonly List<Vector2> missBarVertices = new List<Vector2>();
 
         public double MissBarValue
@@ -228,7 +228,7 @@ namespace osu.Game.Screens.Play.HUD
             }
         }
 
-        private double healthBarValue = 1.0;
+        private double healthBarValue;
         private readonly List<Vector2> healthBarVertices = new List<Vector2>();
 
         public double HealthBarValue
