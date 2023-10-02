@@ -108,9 +108,7 @@ namespace osu.Game.Rulesets.Osu.Tests
             }, 240, 1);
 
             if (hit)
-            {
-                AddAssert("Full judgement awarded", assertMaxJudge);
-            }
+                assertAllMaxJudgements();
             else
                 AddAssert("Tracking dropped", assertMidSliderJudgementFail);
 
@@ -129,7 +127,7 @@ namespace osu.Game.Rulesets.Osu.Tests
                 new OsuReplayFrame { Position = Vector2.Zero, Actions = { OsuAction.RightButton }, Time = time_during_slide_1 },
             });
 
-            AddAssert("Tracking retained", assertMaxJudge);
+            assertAllMaxJudgements();
         }
 
         /// <summary>
@@ -171,7 +169,7 @@ namespace osu.Game.Rulesets.Osu.Tests
                 new OsuReplayFrame { Position = new Vector2(0, 0), Actions = { OsuAction.RightButton }, Time = time_during_slide_2 },
             });
 
-            AddAssert("Tracking retained", assertMaxJudge);
+            assertAllMaxJudgements();
         }
 
         /// <summary>
@@ -192,7 +190,7 @@ namespace osu.Game.Rulesets.Osu.Tests
                 new OsuReplayFrame { Position = new Vector2(0, 0), Actions = { OsuAction.RightButton }, Time = time_during_slide_1 },
             });
 
-            AddAssert("Tracking retained", assertMaxJudge);
+            assertAllMaxJudgements();
         }
 
         /// <summary>
@@ -213,7 +211,7 @@ namespace osu.Game.Rulesets.Osu.Tests
                 new OsuReplayFrame { Position = new Vector2(0, 0), Actions = { OsuAction.RightButton }, Time = time_during_slide_1 },
             });
 
-            AddAssert("Tracking retained", assertMaxJudge);
+            assertAllMaxJudgements();
         }
 
         /// <summary>
@@ -386,7 +384,7 @@ namespace osu.Game.Rulesets.Osu.Tests
                 new OsuReplayFrame { Position = new Vector2(slider_path_length, OsuHitObject.OBJECT_RADIUS * 1.199f), Actions = { OsuAction.LeftButton }, Time = time_slider_end },
             });
 
-            AddAssert("Tracking kept", assertMaxJudge);
+            assertAllMaxJudgements();
         }
 
         /// <summary>
@@ -410,7 +408,13 @@ namespace osu.Game.Rulesets.Osu.Tests
             AddAssert("Tracking dropped", assertMidSliderJudgementFail);
         }
 
-        private bool assertMaxJudge() => judgementResults.Any() && judgementResults.All(t => t.Type == t.Judgement.MaxResult);
+        private void assertAllMaxJudgements()
+        {
+            AddAssert("All judgements max", () =>
+            {
+                return judgementResults.Select(j => (j.HitObject, j.Type));
+            }, () => Is.EqualTo(judgementResults.Select(j => (j.HitObject, j.Judgement.MaxResult))));
+        }
 
         private bool assertHeadMissTailTracked() => judgementResults[^2].Type == HitResult.SmallTickHit && !judgementResults.First().IsHit;
 
