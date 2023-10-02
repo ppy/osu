@@ -451,7 +451,7 @@ namespace osu.Game.Online.Multiplayer
             Scheduler.Add(() =>
             {
                 PostNotification?.Invoke(
-                    new UserAvatarNotification(user, $"{user.Username} invited you to a multiplayer match!")
+                    new UserAvatarNotification(user, $"{user.Username} invited you to a multiplayer match:\"{room.Settings.Name}\"!")
                 );
             });
         }
