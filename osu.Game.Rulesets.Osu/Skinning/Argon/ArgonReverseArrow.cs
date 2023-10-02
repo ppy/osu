@@ -29,10 +29,15 @@ namespace osu.Game.Rulesets.Osu.Skinning.Argon
         private SpriteIcon icon = null!;
 
         private Container main = null!;
+        private Sprite side = null!;
 
         [BackgroundDependencyLoader]
         private void load(TextureStore textures, DrawableHitObject hitObject)
         {
+            Divisor = 2;
+            MinimumBeatLength = 120;
+            EarlyActivationMilliseconds = 30;
+
             Anchor = Anchor.Centre;
             Origin = Anchor.Centre;
 
@@ -63,6 +68,13 @@ namespace osu.Game.Rulesets.Osu.Skinning.Argon
                         },
                     }
                 },
+                side = new Sprite
+                {
+                    Anchor = Anchor.Centre,
+                    Origin = Anchor.Centre,
+                    Texture = textures.Get("Gameplay/osu/repeat-edge-piece"),
+                    Size = new Vector2(ArgonMainCirclePiece.OUTER_GRADIENT_SIZE),
+                }
             };
 
             accentColour = hitObject.AccentColour.GetBoundCopy();
@@ -72,7 +84,15 @@ namespace osu.Game.Rulesets.Osu.Skinning.Argon
         protected override void OnNewBeat(int beatIndex, TimingControlPoint timingPoint, EffectControlPoint effectPoint, ChannelAmplitudes amplitudes)
         {
             if (!drawableRepeat.Judged)
-                main.ScaleTo(1.3f).ScaleTo(1f, timingPoint.BeatLength, Easing.Out);
+            {
+                main.ScaleTo(1.3f, 30, Easing.Out)
+                    .Then()
+                    .ScaleTo(1f, timingPoint.BeatLength / 2, Easing.Out);
+                side
+                    .MoveToX(-12, 30, Easing.Out)
+                    .Then()
+                    .MoveToX(0, timingPoint.BeatLength / 2, Easing.Out);
+            }
         }
     }
 }
