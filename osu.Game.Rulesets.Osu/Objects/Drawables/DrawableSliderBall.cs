@@ -132,6 +132,9 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
         {
             base.Update();
 
+            if (Time.Current >= drawableSlider.HitObject.EndTime)
+                return;
+
             // from the point at which the head circle is hit, this will be non-null.
             // it may be null if the head circle was missed.
             var headCircleHitAction = GetInitialHitAction();
@@ -153,9 +156,9 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
 
             Tracking =
                 // in valid time range
-                Time.Current >= drawableSlider.HitObject.StartTime && Time.Current < drawableSlider.HitObject.EndTime &&
+                Time.Current >= drawableSlider.HitObject.StartTime
                 // in valid position range
-                lastScreenSpaceMousePosition.HasValue && followCircleReceptor.ReceivePositionalInputAt(lastScreenSpaceMousePosition.Value) &&
+                && lastScreenSpaceMousePosition.HasValue && followCircleReceptor.ReceivePositionalInputAt(lastScreenSpaceMousePosition.Value) &&
                 // valid action
                 (actions?.Any(isValidTrackingAction) ?? false);
 
