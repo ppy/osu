@@ -76,6 +76,7 @@ namespace osu.Game.Rulesets.Osu.Skinning.Legacy
             switch (state)
             {
                 case ArmedState.Idle:
+                    // TODO: rotate slightly if Version < 1 (aka UseNewLayout)
                     InternalChild.ScaleTo(1.3f, move_out_duration, Easing.Out)
                                  .Then()
                                  .ScaleTo(1f, move_in_duration, Easing.Out)
