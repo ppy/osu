@@ -9,17 +9,16 @@ using osu.Game.Beatmaps.ControlPoints;
 using osu.Game.Graphics.Containers;
 using osu.Game.Rulesets.Objects.Drawables;
 using osu.Game.Rulesets.Osu.Objects;
-using osu.Game.Skinning;
 using osuTK;
 
 namespace osu.Game.Rulesets.Osu.Skinning.Default
 {
-    public partial class ReverseArrowPiece : BeatSyncedContainer
+    public partial class DefaultReverseArrow : BeatSyncedContainer
     {
         [Resolved]
         private DrawableHitObject drawableRepeat { get; set; } = null!;
 
-        public ReverseArrowPiece()
+        public DefaultReverseArrow()
         {
             Divisor = 2;
             MinimumBeatLength = 200;
@@ -29,14 +28,12 @@ namespace osu.Game.Rulesets.Osu.Skinning.Default
 
             Size = OsuHitObject.OBJECT_DIMENSIONS;
 
-            Child = new SkinnableDrawable(new OsuSkinComponentLookup(OsuSkinComponents.ReverseArrow), _ => new SpriteIcon
+            Child = new SpriteIcon
             {
                 RelativeSizeAxes = Axes.Both,
                 Blending = BlendingParameters.Additive,
                 Icon = FontAwesome.Solid.ChevronRight,
-                Size = new Vector2(0.35f)
-            })
-            {
+                Size = new Vector2(0.35f),
                 Anchor = Anchor.Centre,
                 Origin = Anchor.Centre,
             };
@@ -44,7 +41,7 @@ namespace osu.Game.Rulesets.Osu.Skinning.Default
 
         protected override void OnNewBeat(int beatIndex, TimingControlPoint timingPoint, EffectControlPoint effectPoint, ChannelAmplitudes amplitudes)
         {
-            if (!drawableRepeat.IsHit)
+            if (!drawableRepeat.Judged)
                 Child.ScaleTo(1.3f).ScaleTo(1f, timingPoint.BeatLength, Easing.Out);
         }
     }
