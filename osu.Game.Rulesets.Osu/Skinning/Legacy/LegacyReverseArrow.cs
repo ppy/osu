@@ -3,9 +3,11 @@
 
 using System.Diagnostics;
 using osu.Framework.Allocation;
+using osu.Framework.Audio.Track;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
-using osu.Framework.Graphics.Containers;
+using osu.Game.Beatmaps.ControlPoints;
+using osu.Game.Graphics.Containers;
 using osu.Game.Rulesets.Objects.Drawables;
 using osu.Game.Rulesets.Osu.Objects;
 using osu.Game.Rulesets.Osu.Objects.Drawables;
@@ -14,8 +16,11 @@ using osuTK.Graphics;
 
 namespace osu.Game.Rulesets.Osu.Skinning.Legacy
 {
-    public partial class LegacyReverseArrow : CompositeDrawable
+    public partial class LegacyReverseArrow : BeatSyncedContainer
     {
+        [Resolved]
+        private DrawableHitObject drawableRepeat { get; set; } = null!;
+
         [Resolved(canBeNull: true)]
         private DrawableHitObject? drawableHitObject { get; set; }
 
@@ -30,6 +35,9 @@ namespace osu.Game.Rulesets.Osu.Skinning.Legacy
         [BackgroundDependencyLoader]
         private void load(ISkinSource skinSource)
         {
+            Divisor = 2;
+            MinimumBeatLength = 200;
+
             AutoSizeAxes = Axes.Both;
 
             string lookupName = new OsuSkinComponentLookup(OsuSkinComponents.ReverseArrow).LookupName;
@@ -57,6 +65,12 @@ namespace osu.Game.Rulesets.Osu.Skinning.Legacy
                     arrow.Colour = textureIsDefaultSkin && c.NewValue.R + c.NewValue.G + c.NewValue.B > (600 / 255f) ? Color4.Black : Color4.White;
                 }, true);
             }
+        }
+
+        protected override void OnNewBeat(int beatIndex, TimingControlPoint timingPoint, EffectControlPoint effectPoint, ChannelAmplitudes amplitudes)
+        {
+            if (!drawableRepeat.Judged)
+                Child.ScaleTo(1.3f).ScaleTo(1f, timingPoint.BeatLength, Easing.Out);
         }
 
         private void onHitObjectApplied(DrawableHitObject drawableObject)
