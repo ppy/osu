@@ -39,7 +39,12 @@ namespace osu.Game.Rulesets.Osu.Skinning.Legacy
 
             var skin = skinSource.FindProvider(s => s.GetTexture(lookupName) != null);
 
-            InternalChild = arrow = (skin?.GetAnimation(lookupName, true, true, maxSize: OsuHitObject.OBJECT_DIMENSIONS) ?? Empty());
+            InternalChild = arrow = (skin?.GetAnimation(lookupName, true, true, maxSize: OsuHitObject.OBJECT_DIMENSIONS) ?? Empty()).With(d =>
+            {
+                d.Anchor = Anchor.Centre;
+                d.Origin = Anchor.Centre;
+            });
+
             textureIsDefaultSkin = skin is ISkinTransformer transformer && transformer.Skin is DefaultLegacySkin;
 
             drawableObject.ApplyCustomUpdateState += updateStateTransforms;
