@@ -16,9 +16,9 @@ namespace osu.Game.Rulesets.Osu.Judgements
         public Spinner Spinner => (Spinner)HitObject;
 
         /// <summary>
-        /// The total rotation.
+        /// The total amount that the spinner was rotated.
         /// </summary>
-        public float RateAdjustedRotation => History.TotalRotation;
+        public float TotalRotation => History.TotalRotation;
 
         /// <summary>
         /// Stores the spinning history of the spinner.<br />
