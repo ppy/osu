@@ -129,6 +129,13 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
             if (userTriggered)
                 return;
 
+            // Ensure the tail can only activate after all previous ticks already have.
+            //
+            // This covers the edge case where the lenience may allow the tail to activate before
+            // the last tick, changing ordering of score/combo awarding.
+            if (DrawableSlider.NestedHitObjects.Count > 1 && !DrawableSlider.NestedHitObjects[^2].Judged)
+                return;
+
             // The player needs to have engaged in tracking at any point after the tail leniency cutoff.
             // An actual tick miss should only occur if reaching the tick itself.
             if (timeOffset >= SliderEventGenerator.TAIL_LENIENCY && Tracking)
