@@ -29,7 +29,19 @@ namespace osu.Game.Screens.Play.HUD
             MaxValue = 1
         };
 
+        /// <summary>
+        /// Triggered when a <see cref="Judgement"/> is a successful hit, signaling the health display to perform a flash animation (if designed to do so).
+        /// </summary>
+        /// <param name="result">The judgement result.</param>
         protected virtual void Flash(JudgementResult result)
+        {
+        }
+
+        /// <summary>
+        /// Triggered when a <see cref="Judgement"/> resulted in the player losing health.
+        /// </summary>
+        /// <param name="result">The judgement result.</param>
+        protected virtual void Miss(JudgementResult result)
         {
         }
 
@@ -54,6 +66,8 @@ namespace osu.Game.Screens.Play.HUD
         {
             if (judgement.IsHit && judgement.Type != HitResult.IgnoreHit)
                 Flash(judgement);
+            else if (judgement.Judgement.HealthIncreaseFor(judgement) < 0)
+                Miss(judgement);
         }
 
         protected override void Dispose(bool isDisposing)
