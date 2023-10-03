@@ -32,7 +32,7 @@ namespace osu.Game.Overlays.Notifications
 
         private TextFlowContainer? textDrawable;
 
-        private APIUser user;
+        private readonly APIUser user;
 
         public UserAvatarNotification(APIUser user, LocalisableString text)
         {
