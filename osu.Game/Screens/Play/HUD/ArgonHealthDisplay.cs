@@ -34,8 +34,13 @@ namespace osu.Game.Screens.Play.HUD
         private const float bar_length = 350;
         private const float bar_verticality = 32.5f;
 
-        private BarPath healthBar = null!;
-        private BarPath missBar = null!;
+        private BarPath mainBar = null!;
+
+        /// <summary>
+        /// Used to show a glow at the end of the main bar, or red "damage" area when missing.
+        /// </summary>
+        private BarPath glowBar = null!;
+
         private BackgroundPath background = null!;
 
         private SliderPath barPath = null!;
@@ -48,17 +53,17 @@ namespace osu.Game.Screens.Play.HUD
         private readonly List<Vector2> missBarVertices = new List<Vector2>();
         private readonly List<Vector2> healthBarVertices = new List<Vector2>();
 
-        private double missBarValue = 1;
+        private double glowBarValue = 1;
 
-        public double MissBarValue
+        public double GlowBarValue
         {
-            get => missBarValue;
+            get => glowBarValue;
             set
             {
-                if (missBarValue == value)
+                if (glowBarValue == value)
                     return;
 
-                missBarValue = value;
+                glowBarValue = value;
                 updatePathVertices();
             }
         }
@@ -104,7 +109,7 @@ namespace osu.Game.Screens.Play.HUD
                             {
                                 PathRadius = 10f,
                             },
-                            missBar = new BarPath
+                            glowBar = new BarPath
                             {
                                 BarColour = Color4.White,
                                 GlowColour = OsuColour.Gray(0.5f),
@@ -115,7 +120,7 @@ namespace osu.Game.Screens.Play.HUD
                                 Margin = new MarginPadding(-30f),
                                 GlowPortion = 0.9f,
                             },
-                            healthBar = new BarPath
+                            mainBar = new BarPath
                             {
                                 AutoSizeAxes = Axes.None,
                                 RelativeSizeAxes = Axes.Both,
@@ -139,12 +144,12 @@ namespace osu.Game.Screens.Play.HUD
 
             Current.BindValueChanged(v =>
             {
-                if (v.NewValue >= MissBarValue)
-                    finishMissBarUsage();
+                if (v.NewValue >= GlowBarValue)
+                    finishMissDisplay();
 
                 this.TransformTo(nameof(HealthBarValue), v.NewValue, 300, Easing.OutQuint);
                 if (resetMissBarDelegate == null)
-                    this.TransformTo(nameof(MissBarValue), v.NewValue, 300, Easing.OutQuint);
+                    this.TransformTo(nameof(GlowBarValue), v.NewValue, 300, Easing.OutQuint);
             }, true);
         }
 
@@ -152,24 +157,24 @@ namespace osu.Game.Screens.Play.HUD
         {
             base.Update();
 
-            healthBar.Alpha = (float)Interpolation.DampContinuously(healthBar.Alpha, Current.Value > 0 ? 1 : 0, 40, Time.Elapsed);
-            missBar.Alpha = (float)Interpolation.DampContinuously(missBar.Alpha, MissBarValue > 0 ? 1 : 0, 40, Time.Elapsed);
+            mainBar.Alpha = (float)Interpolation.DampContinuously(mainBar.Alpha, Current.Value > 0 ? 1 : 0, 40, Time.Elapsed);
+            glowBar.Alpha = (float)Interpolation.DampContinuously(glowBar.Alpha, GlowBarValue > 0 ? 1 : 0, 40, Time.Elapsed);
         }
 
         protected override void Flash(JudgementResult result)
         {
             base.Flash(result);
 
-            healthBar.TransformTo(nameof(BarPath.GlowColour), main_bar_glow_colour.Opacity(0.8f))
-                     .TransformTo(nameof(BarPath.GlowColour), main_bar_glow_colour, 300, Easing.OutQuint);
+            mainBar.TransformTo(nameof(BarPath.GlowColour), main_bar_glow_colour.Opacity(0.8f))
+                   .TransformTo(nameof(BarPath.GlowColour), main_bar_glow_colour, 300, Easing.OutQuint);
 
             if (resetMissBarDelegate == null)
             {
-                missBar.TransformTo(nameof(BarPath.BarColour), Colour4.White, 100, Easing.OutQuint)
+                glowBar.TransformTo(nameof(BarPath.BarColour), Colour4.White, 100, Easing.OutQuint)
                        .Then()
                        .TransformTo(nameof(BarPath.BarColour), main_bar_colour, 800, Easing.OutQuint);
 
-                missBar.TransformTo(nameof(BarPath.GlowColour), Colour4.White)
+                glowBar.TransformTo(nameof(BarPath.GlowColour), Colour4.White)
                        .TransformTo(nameof(BarPath.GlowColour), main_bar_glow_colour, 800, Easing.OutQuint);
             }
         }
@@ -184,27 +189,30 @@ namespace osu.Game.Screens.Play.HUD
                 resetMissBarDelegate = null;
             }
             else
-                this.TransformTo(nameof(MissBarValue), HealthBarValue);
+            {
+                // Reset any ongoing animation immediately, else things get weird.
+                this.TransformTo(nameof(GlowBarValue), HealthBarValue);
+            }
 
             this.Delay(500).Schedule(() =>
             {
-                this.TransformTo(nameof(MissBarValue), Current.Value, 300, Easing.OutQuint);
-                finishMissBarUsage();
+                this.TransformTo(nameof(GlowBarValue), Current.Value, 300, Easing.OutQuint);
+                finishMissDisplay();
             }, out resetMissBarDelegate);
 
-            missBar.TransformTo(nameof(BarPath.BarColour), new Colour4(255, 147, 147, 255), 100, Easing.OutQuint).Then()
+            glowBar.TransformTo(nameof(BarPath.BarColour), new Colour4(255, 147, 147, 255), 100, Easing.OutQuint).Then()
                    .TransformTo(nameof(BarPath.BarColour), new Colour4(255, 93, 93, 255), 800, Easing.OutQuint);
 
-            missBar.TransformTo(nameof(BarPath.GlowColour), new Colour4(253, 0, 0, 255).Lighten(0.2f))
+            glowBar.TransformTo(nameof(BarPath.GlowColour), new Colour4(253, 0, 0, 255).Lighten(0.2f))
                    .TransformTo(nameof(BarPath.GlowColour), new Colour4(253, 0, 0, 255), 800, Easing.OutQuint);
         }
 
-        private void finishMissBarUsage()
+        private void finishMissDisplay()
         {
             if (Current.Value > 0)
             {
-                missBar.TransformTo(nameof(BarPath.BarColour), main_bar_colour, 300, Easing.In);
-                missBar.TransformTo(nameof(BarPath.GlowColour), main_bar_glow_colour, 300, Easing.In);
+                glowBar.TransformTo(nameof(BarPath.BarColour), main_bar_colour, 300, Easing.In);
+                glowBar.TransformTo(nameof(BarPath.GlowColour), main_bar_glow_colour, 300, Easing.In);
             }
 
             resetMissBarDelegate?.Cancel();
@@ -231,8 +239,8 @@ namespace osu.Game.Screens.Play.HUD
             barPath.GetPathToProgress(vertices, 0.0, 1.0);
 
             background.Vertices = vertices;
-            healthBar.Vertices = vertices;
-            missBar.Vertices = vertices;
+            mainBar.Vertices = vertices;
+            glowBar.Vertices = vertices;
 
             updatePathVertices();
         }
@@ -240,7 +248,7 @@ namespace osu.Game.Screens.Play.HUD
         private void updatePathVertices()
         {
             barPath.GetPathToProgress(healthBarVertices, 0.0, healthBarValue);
-            barPath.GetPathToProgress(missBarVertices, healthBarValue, Math.Max(missBarValue, healthBarValue));
+            barPath.GetPathToProgress(missBarVertices, healthBarValue, Math.Max(glowBarValue, healthBarValue));
 
             if (healthBarVertices.Count == 0)
                 healthBarVertices.Add(Vector2.Zero);
@@ -248,11 +256,11 @@ namespace osu.Game.Screens.Play.HUD
             if (missBarVertices.Count == 0)
                 missBarVertices.Add(Vector2.Zero);
 
-            missBar.Vertices = missBarVertices.Select(v => v - missBarVertices[0]).ToList();
-            missBar.Position = missBarVertices[0];
+            glowBar.Vertices = missBarVertices.Select(v => v - missBarVertices[0]).ToList();
+            glowBar.Position = missBarVertices[0];
 
-            healthBar.Vertices = healthBarVertices.Select(v => v - healthBarVertices[0]).ToList();
-            healthBar.Position = healthBarVertices[0];
+            mainBar.Vertices = healthBarVertices.Select(v => v - healthBarVertices[0]).ToList();
+            mainBar.Position = healthBarVertices[0];
         }
 
         private partial class BackgroundPath : SmoothPath
