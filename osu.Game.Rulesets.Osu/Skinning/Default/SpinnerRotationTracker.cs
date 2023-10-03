@@ -113,9 +113,9 @@ namespace osu.Game.Rulesets.Osu.Skinning.Default
             float delta = (float)(angle * Math.Abs(rate));
 
             if (rate >= 0)
-                drawableSpinner.Result.RateAdjustedRotation = drawableSpinner.Result.Turns.AddDelta(Time.Current, delta);
+                drawableSpinner.Result.History.AddDelta(Time.Current, delta);
             else
-                drawableSpinner.Result.RateAdjustedRotation = drawableSpinner.Result.Turns.RemoveDelta(Time.Current, delta);
+                drawableSpinner.Result.History.RemoveDelta(Time.Current, delta);
         }
 
         private void resetState(DrawableHitObject obj)

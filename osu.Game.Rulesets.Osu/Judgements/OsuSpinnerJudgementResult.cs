@@ -15,31 +15,9 @@ namespace osu.Game.Rulesets.Osu.Judgements
         /// </summary>
         public Spinner Spinner => (Spinner)HitObject;
 
-        /// <summary>
-        /// The total rotation performed on the spinner disc, disregarding the spin direction,
-        /// adjusted for the track's playback rate.
-        /// </summary>
-        /// <remarks>
-        /// <para>
-        /// This value is always non-negative and is monotonically increasing with time
-        /// (i.e. will only increase if time is passing forward, but can decrease during rewind).
-        /// </para>
-        /// <para>
-        /// The rotation from each frame is multiplied by the clock's current playback rate.
-        /// The reason this is done is to ensure that spinners give the same score and require the same number of spins
-        /// regardless of whether speed-modifying mods are applied.
-        /// </para>
-        /// </remarks>
-        /// <example>
-        /// Assuming no speed-modifying mods are active,
-        /// if the spinner is spun 360 degrees clockwise and then 360 degrees counter-clockwise,
-        /// this property will return the value of 720 (as opposed to 0).
-        /// If Double Time is active instead (with a speed multiplier of 1.5x),
-        /// in the same scenario the property will return 720 * 1.5 = 1080.
-        /// </example>
-        public float RateAdjustedRotation;
+        public float RateAdjustedRotation => History.TotalRotation;
 
-        public readonly SpinnerTurnList Turns = new SpinnerTurnList();
+        public readonly SpinnerSpinHistory History = new SpinnerSpinHistory();
 
         /// <summary>
         /// Time instant at which the spin was started (the first user input which caused an increase in spin).

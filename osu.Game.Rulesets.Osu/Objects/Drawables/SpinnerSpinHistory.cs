@@ -8,8 +8,16 @@ using System.Linq;
 
 namespace osu.Game.Rulesets.Osu.Objects.Drawables
 {
-    public class SpinnerTurnList
+    public class SpinnerSpinHistory
     {
+        /// <summary>
+        /// The total of all complete spins and any current partial spin.
+        /// </summary>
+        /// <remarks>
+        /// This is the final scoring value.
+        /// </remarks>
+        public float TotalRotation { get; private set; }
+
         /// <summary>
         /// The list of all turning points where either:
         /// <list type="bullet">
@@ -19,14 +27,6 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
         /// </list>
         /// </summary>
         private readonly Stack<Turn> turningPoints = new Stack<Turn>();
-
-        /// <summary>
-        /// The total rotation - a summation of all complete spins and the current partial spin.
-        /// </summary>
-        /// <remarks>
-        /// This is the final scoring value.
-        /// </remarks>
-        private float totalRotation;
 
         /// <summary>
         /// The current partial spin - the maximum absolute rotation among all turning points since the last spin.
@@ -44,10 +44,10 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
         /// <param name="currentTime">The current time.</param>
         /// <param name="delta">The rate-independent, instantaneous delta of the angle moved through. Negative values represent counter-clockwise movements, positive values represent clockwise movements.</param>
         /// <returns>The total rotation after applying the delta.</returns>
-        public float AddDelta(double currentTime, float delta)
+        public void AddDelta(double currentTime, float delta)
         {
             if (delta == 0)
-                return totalRotation;
+                return;
 
             int direction = Math.Sign(delta);
 
@@ -63,7 +63,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
 
             float rotation = Math.Abs(currentTurn.Current);
 
-            totalRotation += Math.Max(0, rotation - currentMaxRotation);
+            TotalRotation += Math.Max(0, rotation - currentMaxRotation);
 
             // Start a new turn if we've completed a spin.
             while (rotation >= 360)
@@ -82,8 +82,6 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
             }
 
             currentMaxRotation = Math.Max(currentMaxRotation, rotation);
-
-            return totalRotation;
         }
 
         /// <summary>
@@ -92,7 +90,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
         /// <param name="currentTime">The current time.</param>
         /// <param name="delta">The rate-independent, instantaneous delta of the angle moved through. Negative values represent counter-clockwise movements, positive values represent clockwise movements.</param>
         /// <returns>The total rotation after removing the delta.</returns>
-        public float RemoveDelta(double currentTime, float delta)
+        public void RemoveDelta(double currentTime, float delta)
         {
             while (currentTime < currentTurn.StartTime)
             {
@@ -122,9 +120,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
 
             // Note: Enumerating through a stack is already reverse order.
             currentMaxRotation = turningPoints.Prepend(currentTurn).TakeWhile(t => !t.IsCompleteSpin).Select(t => Math.Abs(t.Current)).Max();
-            totalRotation = 360 * turningPoints.Count(t => t.IsCompleteSpin) + currentMaxRotation;
-
-            return totalRotation;
+            TotalRotation = 360 * turningPoints.Count(t => t.IsCompleteSpin) + currentMaxRotation;
         }
 
         private void beginNewTurn(double currentTime, int direction)

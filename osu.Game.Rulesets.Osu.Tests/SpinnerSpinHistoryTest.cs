@@ -7,14 +7,14 @@ using osu.Game.Rulesets.Osu.Objects.Drawables;
 namespace osu.Game.Rulesets.Osu.Tests
 {
     [TestFixture]
-    public class SpinnerTurnListTest
+    public class SpinnerSpinHistoryTest
     {
-        private SpinnerTurnList list = null!;
+        private SpinnerSpinHistory history = null!;
 
         [SetUp]
         public void Setup()
         {
-            list = new SpinnerTurnList();
+            history = new SpinnerSpinHistory();
         }
 
         [TestCase(0, 0)]
@@ -36,7 +36,8 @@ namespace osu.Game.Rulesets.Osu.Tests
         [TestCase(-720, 720)]
         public void TestSpinOneDirection(float spin, float expectedRotation)
         {
-            Assert.That(list.AddDelta(500, spin), Is.EqualTo(expectedRotation));
+            history.AddDelta(500, spin);
+            Assert.That(history.TotalRotation, Is.EqualTo(expectedRotation));
         }
 
         [TestCase(0, 0, 0, 0)]
@@ -71,9 +72,10 @@ namespace osu.Game.Rulesets.Osu.Tests
         [TestCase(-10, 20, -350, 340)]
         public void TestSpinMultipleDirections(float spin1, float spin2, float spin3, float expectedRotation)
         {
-            list.AddDelta(500, spin1);
-            list.AddDelta(1000, spin2);
-            Assert.That(list.AddDelta(1500, spin3), Is.EqualTo(expectedRotation));
+            history.AddDelta(500, spin1);
+            history.AddDelta(1000, spin2);
+            history.AddDelta(1500, spin3);
+            Assert.That(history.TotalRotation, Is.EqualTo(expectedRotation));
         }
 
         // One spin
@@ -84,8 +86,9 @@ namespace osu.Game.Rulesets.Osu.Tests
         [TestCase(-740, 420, 320)]
         public void TestRemoveAndCrossFullSpin(float deltaToAdd, float deltaToRemove, float expectedRotation)
         {
-            list.AddDelta(1000, deltaToAdd);
-            Assert.That(list.RemoveDelta(500, deltaToRemove), Is.EqualTo(expectedRotation));
+            history.AddDelta(1000, deltaToAdd);
+            history.RemoveDelta(500, deltaToRemove);
+            Assert.That(history.TotalRotation, Is.EqualTo(expectedRotation));
         }
 
         // One spin + partial
@@ -96,9 +99,10 @@ namespace osu.Game.Rulesets.Osu.Tests
         [TestCase(-800, 430, 50, 320)]
         public void TestRemoveAndCrossFullAndPartialSpins(float deltaToAdd1, float deltaToAdd2, float deltaToRemove, float expectedRotation)
         {
-            list.AddDelta(1000, deltaToAdd1);
-            list.AddDelta(1500, deltaToAdd2);
-            Assert.That(list.RemoveDelta(500, deltaToRemove), Is.EqualTo(expectedRotation));
+            history.AddDelta(1000, deltaToAdd1);
+            history.AddDelta(1500, deltaToAdd2);
+            history.RemoveDelta(500, deltaToRemove);
+            Assert.That(history.TotalRotation, Is.EqualTo(expectedRotation));
         }
     }
 }
