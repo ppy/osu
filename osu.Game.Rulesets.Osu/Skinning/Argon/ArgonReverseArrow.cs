@@ -4,10 +4,12 @@
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Extensions.Color4Extensions;
+using osu.Framework.Extensions.ObjectExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.Sprites;
+using osu.Framework.Graphics.Textures;
 using osu.Game.Rulesets.Objects.Drawables;
 using osu.Game.Rulesets.Osu.Objects;
 using osuTK;
@@ -17,12 +19,17 @@ namespace osu.Game.Rulesets.Osu.Skinning.Argon
 {
     public partial class ArgonReverseArrow : CompositeDrawable
     {
+        [Resolved]
+        private DrawableHitObject drawableObject { get; set; } = null!;
+
         private Bindable<Color4> accentColour = null!;
 
         private SpriteIcon icon = null!;
+        private Container main = null!;
+        private Sprite side = null!;
 
         [BackgroundDependencyLoader]
-        private void load(DrawableHitObject hitObject)
+        private void load(TextureStore textures)
         {
             Anchor = Anchor.Centre;
             Origin = Anchor.Centre;
@@ -31,24 +38,73 @@ namespace osu.Game.Rulesets.Osu.Skinning.Argon
 
             InternalChildren = new Drawable[]
             {
-                new Circle
+                main = new Container
                 {
-                    Size = new Vector2(40, 20),
-                    Colour = Color4.White,
+                    RelativeSizeAxes = Axes.Both,
                     Anchor = Anchor.Centre,
                     Origin = Anchor.Centre,
+                    Children = new Drawable[]
+                    {
+                        new Circle
+                        {
+                            Size = new Vector2(40, 20),
+                            Colour = Color4.White,
+                            Anchor = Anchor.Centre,
+                            Origin = Anchor.Centre,
+                        },
+                        icon = new SpriteIcon
+                        {
+                            Icon = FontAwesome.Solid.AngleDoubleRight,
+                            Size = new Vector2(16),
+                            Anchor = Anchor.Centre,
+                            Origin = Anchor.Centre,
+                        },
+                    }
                 },
-                icon = new SpriteIcon
+                side = new Sprite
                 {
-                    Icon = FontAwesome.Solid.AngleDoubleRight,
-                    Size = new Vector2(16),
                     Anchor = Anchor.Centre,
                     Origin = Anchor.Centre,
-                },
+                    Texture = textures.Get("Gameplay/osu/repeat-edge-piece"),
+                    Size = new Vector2(ArgonMainCirclePiece.OUTER_GRADIENT_SIZE),
+                }
             };
 
-            accentColour = hitObject.AccentColour.GetBoundCopy();
+            accentColour = drawableObject.AccentColour.GetBoundCopy();
             accentColour.BindValueChanged(accent => icon.Colour = accent.NewValue.Darken(4), true);
+
+            drawableObject.ApplyCustomUpdateState += updateStateTransforms;
+        }
+
+        private void updateStateTransforms(DrawableHitObject hitObject, ArmedState state)
+        {
+            const float move_distance = -12;
+            const double move_out_duration = 35;
+            const double move_in_duration = 250;
+            const double total = 300;
+
+            switch (state)
+            {
+                case ArmedState.Idle:
+                    main.ScaleTo(1.3f, move_out_duration, Easing.Out)
+                        .Then()
+                        .ScaleTo(1f, move_in_duration, Easing.Out)
+                        .Loop(total - (move_in_duration + move_out_duration));
+                    side
+                        .MoveToX(move_distance, move_out_duration, Easing.Out)
+                        .Then()
+                        .MoveToX(0, move_in_duration, Easing.Out)
+                        .Loop(total - (move_in_duration + move_out_duration));
+                    break;
+            }
+        }
+
+        protected override void Dispose(bool isDisposing)
+        {
+            base.Dispose(isDisposing);
+
+            if (drawableObject.IsNotNull())
+                drawableObject.ApplyCustomUpdateState -= updateStateTransforms;
         }
     }
 }
