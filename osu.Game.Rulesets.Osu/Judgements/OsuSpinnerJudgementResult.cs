@@ -4,6 +4,7 @@
 using osu.Game.Rulesets.Judgements;
 using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Osu.Objects;
+using osu.Game.Rulesets.Osu.Objects.Drawables;
 
 namespace osu.Game.Rulesets.Osu.Judgements
 {
@@ -37,6 +38,8 @@ namespace osu.Game.Rulesets.Osu.Judgements
         /// in the same scenario the property will return 720 * 1.5 = 1080.
         /// </example>
         public float RateAdjustedRotation;
+
+        public readonly SpinnerTurnList Turns = new SpinnerTurnList();
 
         /// <summary>
         /// Time instant at which the spin was started (the first user input which caused an increase in spin).

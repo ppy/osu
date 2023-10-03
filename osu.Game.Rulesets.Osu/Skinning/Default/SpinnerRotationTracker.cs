@@ -8,7 +8,6 @@ using osu.Framework.Extensions.ObjectExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Input.Events;
-using osu.Framework.Logging;
 using osu.Framework.Utils;
 using osu.Game.Rulesets.Objects.Drawables;
 using osu.Game.Rulesets.Osu.Objects.Drawables;
@@ -80,17 +79,6 @@ namespace osu.Game.Rulesets.Osu.Skinning.Default
         }
 
         /// <summary>
-        /// The total amount spun in the current turn.
-        /// This ranges between -360 to +360.
-        /// </summary>
-        private float currentTurnTotal;
-
-        /// <summary>
-        /// The absolute value of <see cref="currentTurnTotal"/> that has been transferred to the judgement in the current turn.
-        /// </summary>
-        private float currentTurnTransferred;
-
-        /// <summary>
         /// Rotate the disc by the provided angle (in addition to any existing rotation).
         /// </summary>
         /// <remarks>
@@ -121,21 +109,13 @@ namespace osu.Game.Rulesets.Osu.Skinning.Default
 
             currentRotation += angle;
 
-            currentTurnTotal += (float)(angle * (gameplayClock?.GetTrueGameplayRate() ?? Clock.Rate));
-            drawableSpinner.Result.RateAdjustedRotation += Math.Max(0, Math.Abs(currentTurnTotal) - currentTurnTransferred);
+            double rate = gameplayClock?.GetTrueGameplayRate() ?? Clock.Rate;
+            float delta = (float)(angle * Math.Abs(rate));
 
-            if (currentTurnTotal <= -360)
-            {
-                currentTurnTotal += 360;
-                currentTurnTransferred = 0;
-            }
-            else if (currentTurnTotal >= 360)
-            {
-                currentTurnTotal -= 360;
-                currentTurnTransferred = 0;
-            }
-
-            currentTurnTransferred = Math.Max(currentTurnTransferred, Math.Abs(currentTurnTotal));
+            if (rate >= 0)
+                drawableSpinner.Result.RateAdjustedRotation = drawableSpinner.Result.Turns.AddDelta(Time.Current, delta);
+            else
+                drawableSpinner.Result.RateAdjustedRotation = drawableSpinner.Result.Turns.RemoveDelta(Time.Current, delta);
         }
 
         private void resetState(DrawableHitObject obj)
