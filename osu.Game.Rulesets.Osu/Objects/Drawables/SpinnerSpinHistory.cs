@@ -8,10 +8,21 @@ using System.Linq;
 
 namespace osu.Game.Rulesets.Osu.Objects.Drawables
 {
+    /// <summary>
+    /// Stores the spinning history of a single spinner.<br />
+    /// Instants of movement deltas may be added or removed from this in order to calculate the total rotation for the spinner.
+    /// </summary>
+    /// <remarks>
+    /// A single, full rotation of the spinner is defined as a 360-degree rotation of the spinner, starting from 0, going in a single direction.<br />
+    /// </remarks>
+    /// <example>
+    /// If the player spins 90-degrees clockwise, then changes direction, they need to spin 90-degrees counter-clockwise to return to 0
+    /// and then continue rotating the spinner for another 360-degrees in the same direction.
+    /// </example>
     public class SpinnerSpinHistory
     {
         /// <summary>
-        /// The total of all complete spins and any current partial spin.
+        /// The sum of all complete spins and any current partial spin.
         /// </summary>
         /// <remarks>
         /// This is the final scoring value.
@@ -22,8 +33,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
         /// The list of all turning points where either:
         /// <list type="bullet">
         /// <item>The spinning direction was changed.</item>
-        /// <item>A full spin of 360 degrees was performed in either direction.
-        /// Note that if the user first spun 359deg counter-clockwise, the user has to then spin 720deg clockwise to meet this criteria (-359deg -> +360deg).</item>
+        /// <item>A full spin of 360 degrees was performed in either direction.</item>
         /// </list>
         /// </summary>
         private readonly Stack<Turn> turningPoints = new Stack<Turn>();
@@ -39,7 +49,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
         private Turn currentTurn;
 
         /// <summary>
-        /// Adds a spinning delta.
+        /// Adds an instant of spin.
         /// </summary>
         /// <param name="currentTime">The current time.</param>
         /// <param name="delta">The rate-independent, instantaneous delta of the angle moved through. Negative values represent counter-clockwise movements, positive values represent clockwise movements.</param>
@@ -59,9 +69,9 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
             if (currentTurn.Direction != direction)
                 beginNewTurn(currentTime, direction);
 
-            currentTurn.Current += delta;
+            currentTurn.Angle += delta;
 
-            float rotation = Math.Abs(currentTurn.Current);
+            float rotation = Math.Abs(currentTurn.Angle);
 
             TotalRotation += Math.Max(0, rotation - currentMaxRotation);
 
@@ -71,13 +81,13 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
                 rotation -= 360;
 
                 // Make sure the current turn doesn't exceed a full spin.
-                currentTurn.Current = Math.Clamp(currentTurn.Current, -360, 360);
-                currentTurn.IsCompleteSpin = true;
+                currentTurn.Angle = Math.Clamp(currentTurn.Angle, -360, 360);
+                Debug.Assert(MathF.Abs(currentTurn.Angle) == 360);
 
                 beginNewTurn(currentTime, direction);
 
                 // The new turn should be in the same direction and with the excess of the previous turn.
-                currentTurn.Current = rotation * direction;
+                currentTurn.Angle = rotation * direction;
                 currentMaxRotation = 0;
             }
 
@@ -85,7 +95,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
         }
 
         /// <summary>
-        /// Removes a spinning delta.
+        /// Removes an instant of spin.
         /// </summary>
         /// <param name="currentTime">The current time.</param>
         /// <param name="delta">The rate-independent, instantaneous delta of the angle moved through. Negative values represent counter-clockwise movements, positive values represent clockwise movements.</param>
@@ -97,59 +107,66 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
                 // When crossing over a turn, we need to adjust the delta so that it's relative to the end point of the next turn.
                 //
                 // This is done by ADDING the delta between the current turn and the next turn.
-                // To understand this why this is, notice that delta is a rate-independent value. Suppose the turn values: { 90, 45 } (i.e. CW then CCW spin)...
+                // To understand why this is, notice that delta is a rate-independent value. Suppose the turn values are { 90, 45 } (i.e. CW then CCW spin)...
                 // - If delta < 0 (e.g. -15) (i.e. CCW rotation), then the next turn should be <45 (therefore delta = -15 + (45 - 90) = -60, next = 30).
                 // - If delta = 0, then the next turn should be =45 (therefore delta = 0 + (45 - 90) = -45, next = 45).
                 // - If delta > 0 (e.g. +15) (i.e. CW rotation), then the next turn should be >45 (therefore delta = 15 + (45 - 90) = -30, next = 60).
                 //
-                // There is a special case when crossing a complete spin, because the turn following it starts at 0 rather than +/- 360.
+                // There is a special case when crossing a complete spin, because the turn following it starts at 0 rather than the previous turn's value.
                 // In this case, only the remaining delta in the current turn needs to be considered.
 
                 Turn nextTurn = turningPoints.Pop();
 
                 if (nextTurn.IsCompleteSpin)
-                    delta += currentTurn.Current;
+                    delta += currentTurn.Angle;
                 else
-                    delta += currentTurn.Current - nextTurn.Current;
+                    delta += currentTurn.Angle - nextTurn.Angle;
 
                 currentTurn = nextTurn;
             }
 
-            currentTurn.Current += delta;
-            currentTurn.IsCompleteSpin = false;
+            currentTurn.Angle += delta;
 
             // Note: Enumerating through a stack is already reverse order.
-            currentMaxRotation = turningPoints.Prepend(currentTurn).TakeWhile(t => !t.IsCompleteSpin).Select(t => Math.Abs(t.Current)).Max();
+            currentMaxRotation = turningPoints.Prepend(currentTurn).TakeWhile(t => !t.IsCompleteSpin).Select(t => Math.Abs(t.Angle)).Max();
             TotalRotation = 360 * turningPoints.Count(t => t.IsCompleteSpin) + currentMaxRotation;
         }
 
+        /// <summary>
+        /// Finishes the current turn and starts a new one from its end point.
+        /// </summary>
+        /// <param name="currentTime">The start time of the new turn.</param>
+        /// <param name="direction">The turning direction.</param>
         private void beginNewTurn(double currentTime, int direction)
         {
             turningPoints.Push(currentTurn);
-            currentTurn = new Turn(currentTime, direction) { Current = currentTurn.Current };
+            currentTurn = new Turn(currentTime, direction) { Angle = currentTurn.Angle };
         }
 
+        /// <summary>
+        /// Represents a single direction turn of the spinner.
+        /// </summary>
         private struct Turn
         {
             /// <summary>
-            /// Time start time of this turn.
+            /// The start time of this turn.
             /// </summary>
             public readonly double StartTime;
 
             /// <summary>
-            /// The turn direction.
+            /// The turning direction.
             /// </summary>
             public readonly int Direction;
 
             /// <summary>
-            /// The amount turned in this direction.
+            /// The current angle.
             /// </summary>
-            public float Current;
+            public float Angle;
 
             /// <summary>
             /// Whether this turn represents a complete spin.
             /// </summary>
-            public bool IsCompleteSpin;
+            public bool IsCompleteSpin => Angle is -360 or 360;
 
             public Turn(double startTime, int direction)
             {
@@ -157,8 +174,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
 
                 StartTime = startTime;
                 Direction = direction;
-                Current = 0;
-                IsCompleteSpin = false;
+                Angle = 0;
             }
         }
     }
