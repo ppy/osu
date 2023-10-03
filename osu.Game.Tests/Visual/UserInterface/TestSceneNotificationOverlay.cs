@@ -549,7 +549,7 @@ namespace osu.Game.Tests.Visual.UserInterface
             var user = await userLookupCache.GetUserAsync(0).ConfigureAwait(true);
             if (user == null) return;
 
-            var n = new UserAvatarNotification(user, $"{user.Username} is telling you to NOT download Haitai!");
+            var n = new UserAvatarNotification(user, $"{user.Username} invited you to a multiplayer match!");
 
             notificationOverlay.Post(n);
         }
