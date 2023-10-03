@@ -214,7 +214,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Preprocessing
             if (slider.LazyEndPosition != null)
                 return;
 
-            slider.LazyTravelTime = slider.NestedHitObjects[^1].StartTime - slider.StartTime;
+            slider.LazyTravelTime = slider.NestedHitObjects[^1].StartTime + SliderEventGenerator.TAIL_LENIENCY - slider.StartTime;
 
             double endTimeMin = slider.LazyTravelTime / slider.SpanDuration;
             if (endTimeMin % 2 >= 1)
