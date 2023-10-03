@@ -35,7 +35,7 @@ namespace osu.Game.Tests.Visual.Gameplay
                     new Box
                     {
                         RelativeSizeAxes = Axes.Both,
-                        Colour = Color4.Black,
+                        Colour = Color4.Gray,
                     },
                     new ArgonHealthDisplay
                     {
