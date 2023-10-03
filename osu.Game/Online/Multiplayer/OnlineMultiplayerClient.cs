@@ -12,6 +12,7 @@ using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Game.Online.API;
 using osu.Game.Online.Rooms;
+using osu.Game.Overlays.Notifications;
 
 namespace osu.Game.Online.Multiplayer
 {
@@ -107,14 +108,36 @@ namespace osu.Game.Online.Multiplayer
             return connection.InvokeAsync(nameof(IMultiplayerServer.LeaveRoom));
         }
 
-        public override Task InvitePlayer(int userId)
+        public override async Task InvitePlayer(int userId)
         {
             if (!IsConnected.Value)
-                return Task.CompletedTask;
+                return;
 
             Debug.Assert(connection != null);
 
-            return connection.InvokeAsync(nameof(IMultiplayerServer.InvitePlayer), userId);
+            try
+            {
+                await connection.InvokeAsync(nameof(IMultiplayerServer.InvitePlayer), userId).ConfigureAwait(false);
+            }
+            catch (HubException exception)
+            {
+                switch (exception.GetHubExceptionMessage())
+                {
+                    case UserBlockedException.MESSAGE:
+                        PostNotification?.Invoke(new SimpleErrorNotification
+                        {
+                            Text = "User cannot be invited by someone they have blocked or are blocked by."
+                        });
+                        break;
+
+                    case UserBlocksPMsException.MESSAGE:
+                        PostNotification?.Invoke(new SimpleErrorNotification
+                        {
+                            Text = "User cannot be invited because they cannot receive private messages from people not on their friends list."
+                        });
+                        break;
+                }
+            }
         }
 
         public override Task TransferHost(int userId)
