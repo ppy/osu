@@ -3,6 +3,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using osu.Game.Rulesets.Difficulty.Preprocessing;
 using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Osu.Mods;
@@ -214,7 +215,15 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Preprocessing
             if (slider.LazyEndPosition != null)
                 return;
 
-            slider.LazyTravelTime = slider.NestedHitObjects[^1].StartTime + SliderEventGenerator.TAIL_LENIENCY - slider.StartTime;
+            double trackingEndTime = Math.Max(
+                // SliderTailCircle always occurs at the final end time of the slider, but the player only needs to hold until within a lenience before it.
+                slider.NestedHitObjects.OfType<SliderTailCircle>().Single().StartTime + SliderEventGenerator.TAIL_LENIENCY,
+                // There's an edge case where one or more ticks/repeats fall within that leniency range.
+                // In such a case, the player needs to track until the final tick or repeat.
+                slider.NestedHitObjects.LastOrDefault(n => n is not SliderTailCircle)?.StartTime ?? double.MinValue
+            );
+
+            slider.LazyTravelTime = trackingEndTime - slider.StartTime;
 
             double endTimeMin = slider.LazyTravelTime / slider.SpanDuration;
             if (endTimeMin % 2 >= 1)
