@@ -267,10 +267,12 @@ namespace osu.Game.Screens.Play.HUD
             protected override Color4 ColourAt(float position)
             {
                 if (position <= 0.128f)
-                    return Color4.White.Opacity(0.5f);
+                    return Color4.White.Opacity(0.8f);
 
-                position -= 0.128f;
-                return Interpolation.ValueAt(Math.Clamp(position, 0f, 1f), Color4.White.Opacity(0.5f), Color4.Black.Opacity(0.5f), -0.75f, 1f, Easing.OutQuart);
+                return Interpolation.ValueAt(position,
+                    Color4.White.Opacity(0.8f),
+                    Color4.Black.Opacity(0.2f),
+                    -0.5f, 1f, Easing.OutQuint);
             }
         }
 
