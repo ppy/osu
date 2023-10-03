@@ -1,9 +1,10 @@
-﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
 using NUnit.Framework;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
+using osu.Framework.Graphics.Shapes;
 using osu.Framework.Testing;
 using osu.Game.Rulesets.Judgements;
 using osu.Game.Rulesets.Objects;
@@ -11,18 +12,15 @@ using osu.Game.Rulesets.Osu.Judgements;
 using osu.Game.Rulesets.Osu.Objects;
 using osu.Game.Rulesets.Scoring;
 using osu.Game.Screens.Play.HUD;
-using osu.Game.Skinning;
+using osuTK;
+using osuTK.Graphics;
 
 namespace osu.Game.Tests.Visual.Gameplay
 {
-    public partial class TestSceneSkinnableHealthDisplay : SkinnableHUDComponentTestScene
+    public partial class TestSceneArgonHealthDisplay : OsuTestScene
     {
         [Cached(typeof(HealthProcessor))]
         private HealthProcessor healthProcessor = new DrainingHealthProcessor(0);
-
-        protected override Drawable CreateArgonImplementation() => new ArgonHealthDisplay();
-        protected override Drawable CreateDefaultImplementation() => new DefaultHealthDisplay();
-        protected override Drawable CreateLegacyImplementation() => new LegacyHealthDisplay();
 
         [SetUpSteps]
         public void SetUpSteps()
@@ -31,6 +29,21 @@ namespace osu.Game.Tests.Visual.Gameplay
             {
                 healthProcessor.Health.Value = 1;
                 healthProcessor.Failed += () => false; // health won't be updated if the processor gets into a "fail" state.
+
+                Children = new Drawable[]
+                {
+                    new Box
+                    {
+                        RelativeSizeAxes = Axes.Both,
+                        Colour = Color4.Gray,
+                    },
+                    new ArgonHealthDisplay
+                    {
+                        Anchor = Anchor.Centre,
+                        Origin = Anchor.Centre,
+                        Scale = new Vector2(2f),
+                    },
+                };
             });
         }
 
