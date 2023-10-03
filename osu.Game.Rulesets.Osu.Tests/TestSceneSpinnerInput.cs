@@ -1,7 +1,6 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using System;
 using System.Collections.Generic;
 using System.Linq;
 using NUnit.Framework;
@@ -26,11 +25,6 @@ namespace osu.Game.Rulesets.Osu.Tests
         private const int centre_y = 192;
         private const double time_spinner_start = 1500;
         private const double time_spinner_end = 4000;
-
-        /// <summary>
-        /// A small amount to spin beyond a given angle to avoid any issues with floating-point precision.
-        /// </summary>
-        private const float spin_error = 1.1f;
 
         private readonly List<JudgementResult> judgementResults = new List<JudgementResult>();
 
@@ -103,9 +97,9 @@ namespace osu.Game.Rulesets.Osu.Tests
         public void TestSpinSingleDirection(float amount, int expectedTicks)
         {
             performTest(
-                SpinGenerator.From(0)
+                SpinFramesGenerator.From(0)
                              .Spin(amount, 500)
-                             .Build());
+                             .Build(time_spinner_start, 50));
 
             assertTicksHit(expectedTicks);
             assertSpinnerHit(false);
@@ -119,10 +113,10 @@ namespace osu.Game.Rulesets.Osu.Tests
         public void TestSpinHalfBothDirections()
         {
             performTest(
-                SpinGenerator.From(0)
+                SpinFramesGenerator.From(0)
                              .Spin(0.5f, 500) // Rotate to +0.5.
                              .Spin(-1f, 500) // Rotate to -0.5
-                             .Build());
+                             .Build(time_spinner_start, 50));
 
             assertTicksHit(0);
             assertSpinnerHit(false);
@@ -138,10 +132,10 @@ namespace osu.Game.Rulesets.Osu.Tests
         public void TestSpinOneDirectionThenChangeDirection(float direction1, float direction2, int expectedTicks)
         {
             performTest(
-                SpinGenerator.From(0)
+                SpinFramesGenerator.From(0)
                              .Spin(direction1, 500)
                              .Spin(direction2, 500)
-                             .Build());
+                             .Build(time_spinner_start, 50));
 
             assertTicksHit(expectedTicks);
             assertSpinnerHit(false);
@@ -196,72 +190,6 @@ namespace osu.Game.Rulesets.Osu.Tests
             AddUntilStep("Beatmap at 0", () => Beatmap.Value.Track.CurrentTime == 0);
             AddUntilStep("Wait until player is loaded", () => currentPlayer.IsCurrentScreen());
             AddUntilStep("Wait for completion", () => currentPlayer.ScoreProcessor.HasCompleted.Value);
-        }
-
-        private class SpinGenerator
-        {
-            private readonly SpinGenerator? last;
-            private readonly float startAngle;
-            private readonly float endAngle;
-            private readonly double duration;
-
-            private SpinGenerator(float startAngle)
-                : this(null, startAngle, 0)
-            {
-            }
-
-            private SpinGenerator(SpinGenerator? last, float endAngle, double duration)
-            {
-                this.last = last;
-                startAngle = last?.endAngle ?? endAngle;
-                this.endAngle = endAngle;
-                this.duration = duration;
-            }
-
-            public List<ReplayFrame> Build()
-            {
-                List<ReplayFrame> frames = new List<ReplayFrame>();
-
-                List<SpinGenerator> allGenerators = new List<SpinGenerator>();
-
-                SpinGenerator? l = this;
-
-                while (l != null)
-                {
-                    allGenerators.Add(l);
-                    l = l.last;
-                }
-
-                allGenerators.Reverse();
-
-                double currentTime = time_spinner_start;
-
-                foreach (var gen in allGenerators)
-                {
-                    double startTime = currentTime;
-                    double endTime = currentTime + gen.duration;
-
-                    for (; currentTime < endTime; currentTime += 10)
-                        frames.Add(new OsuReplayFrame(currentTime, calcOffset(gen, (currentTime - startTime) / (endTime - startTime)), OsuAction.LeftButton));
-
-                    frames.Add(new OsuReplayFrame(currentTime, calcOffset(gen, 1), OsuAction.LeftButton));
-                }
-
-                frames.Add(new OsuReplayFrame(currentTime, calcOffset(this, 1)));
-
-                return frames;
-            }
-
-            private static Vector2 calcOffset(SpinGenerator generator, double p)
-            {
-                Vector2 offset = new Vector2(50);
-                float angle = generator.startAngle + (generator.endAngle - generator.startAngle) * (float)p;
-                return new Vector2(centre_x, centre_y) + offset * new Vector2(MathF.Cos(angle), MathF.Sin(angle));
-            }
-
-            public static SpinGenerator From(float startAngle) => new SpinGenerator(startAngle - MathF.PI / 2f);
-
-            public SpinGenerator Spin(float amount, double duration) => new SpinGenerator(this, endAngle + amount * 2 * MathF.PI * spin_error, duration);
         }
 
         private partial class ScoreAccessibleReplayPlayer : ReplayPlayer
