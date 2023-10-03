@@ -27,13 +27,6 @@ namespace osu.Game.Screens.Play.HUD
     {
         public bool UsesFixedAnchor { get; set; }
 
-        private const float curve_start = 280;
-        private const float curve_end = 310;
-        private const float curve_smoothness = 10;
-
-        private const float bar_length = 350;
-        private const float bar_verticality = 32.5f;
-
         private BarPath mainBar = null!;
 
         /// <summary>
@@ -221,6 +214,13 @@ namespace osu.Game.Screens.Play.HUD
 
         private void updatePath()
         {
+            const float curve_start = 280;
+            const float curve_end = 310;
+            const float curve_smoothness = 10;
+
+            const float bar_length = 350;
+            const float bar_verticality = 32.5f;
+
             Vector2 diagonalDir = (new Vector2(curve_end, bar_verticality) - new Vector2(curve_start, 0)).Normalized();
 
             barPath = new SliderPath(new[]
