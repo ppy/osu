@@ -13,8 +13,7 @@ namespace osu.Game.Online.Multiplayer
         public const string MESSAGE = "User cannot be invited by someone they have blocked or are blocked by.";
 
         public UserBlockedException()
-            :
-            base(MESSAGE)
+            : base(MESSAGE)
         {
         }
 
