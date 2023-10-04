@@ -448,7 +448,7 @@ namespace osu.Game.Online.Multiplayer
         async Task IMultiplayerClient.Invited(int invitedBy, long roomID, string password)
         {
             var loadUserTask = userLookupCache.GetUserAsync(invitedBy);
-            var loadRoomTask = loadRoom(roomID);
+            var loadRoomTask = lookupRoom(roomID);
 
             await Task.WhenAll(loadUserTask, loadRoomTask).ConfigureAwait(false);
 
@@ -472,7 +472,7 @@ namespace osu.Game.Online.Multiplayer
             });
         }
 
-        private Task<Room?> loadRoom(long id)
+        private Task<Room?> lookupRoom(long id)
         {
             return Task.Run(() =>
             {
