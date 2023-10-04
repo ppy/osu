@@ -53,7 +53,6 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
         /// </summary>
         /// <param name="currentTime">The current time.</param>
         /// <param name="delta">The rate-independent, instantaneous delta of the angle moved through. Negative values represent counter-clockwise movements, positive values represent clockwise movements.</param>
-        /// <returns>The total rotation after applying the delta.</returns>
         public void AddDelta(double currentTime, float delta)
         {
             if (delta == 0)
@@ -99,7 +98,6 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
         /// </summary>
         /// <param name="currentTime">The current time.</param>
         /// <param name="delta">The rate-independent, instantaneous delta of the angle moved through. Negative values represent counter-clockwise movements, positive values represent clockwise movements.</param>
-        /// <returns>The total rotation after removing the delta.</returns>
         public void RemoveDelta(double currentTime, float delta)
         {
             while (currentTime < currentTurn.StartTime)
