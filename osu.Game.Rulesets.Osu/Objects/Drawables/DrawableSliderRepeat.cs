@@ -30,7 +30,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
 
         public SkinnableDrawable CirclePiece { get; private set; }
 
-        public ReverseArrowPiece Arrow { get; private set; }
+        public SkinnableDrawable Arrow { get; private set; }
 
         private Drawable scaleContainer;
 
@@ -65,7 +65,11 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
                         Anchor = Anchor.Centre,
                         Origin = Anchor.Centre,
                     },
-                    Arrow = new ReverseArrowPiece(),
+                    Arrow = new SkinnableDrawable(new OsuSkinComponentLookup(OsuSkinComponents.ReverseArrow), _ => new DefaultReverseArrow())
+                    {
+                        Anchor = Anchor.Centre,
+                        Origin = Anchor.Centre,
+                    },
                 }
             });
 
