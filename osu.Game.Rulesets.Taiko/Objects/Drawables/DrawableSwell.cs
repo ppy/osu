@@ -38,6 +38,8 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
         private readonly CircularContainer targetRing;
         private readonly CircularContainer expandingRing;
 
+        private double? lastPressHandleTime;
+
         public override bool DisplayResult => false;
 
         public DrawableSwell()
@@ -140,6 +142,7 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
             UnproxyContent();
 
             lastWasCentre = null;
+            lastPressHandleTime = null;
         }
 
         protected override void AddNestedHitObject(DrawableHitObject hitObject)
@@ -285,7 +288,14 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
             if (lastWasCentre == isCentre)
                 return false;
 
+            // If we've already successfully judged a tick this frame, do not judge more.
+            // Note that the ordering is important here - this is intentionally placed after the alternating check.
+            // That is done to prevent accidental double inputs blocking simultaneous but legitimate hits from registering.
+            if (lastPressHandleTime == Time.Current)
+                return true;
+
             lastWasCentre = isCentre;
+            lastPressHandleTime = Time.Current;
 
             UpdateResult(true);
 
