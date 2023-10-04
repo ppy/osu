@@ -13,8 +13,7 @@ namespace osu.Game.Online.Multiplayer
         public const string MESSAGE = "User cannot be invited because they have disabled private messages.";
 
         public UserBlocksPMsException()
-            :
-            base(MESSAGE)
+            : base(MESSAGE)
         {
         }
 
