@@ -70,12 +70,15 @@ namespace osu.Game.Rulesets.Osu.Tests
 
         private static Vector2 calcOffsetAt(SpinFramesGenerator generator, float spinOffset, double p)
         {
-            float angle = generator.startAngle + (generator.endAngle - generator.startAngle) * (float)p;
+            int direction = Math.Sign(generator.endAngle - generator.startAngle);
+            float errorAdjustedEndAngle = generator.endAngle + spin_error * direction;
+
+            float angle = generator.startAngle + (errorAdjustedEndAngle - generator.startAngle) * (float)p;
             return new Vector2(256, 192) + spinOffset * new Vector2(MathF.Cos(angle), MathF.Sin(angle));
         }
 
         public static SpinFramesGenerator From(float startAngle) => new SpinFramesGenerator(startAngle - MathF.PI / 2f);
 
-        public SpinFramesGenerator Spin(float amount, double duration) => new SpinFramesGenerator(this, endAngle + amount * 2 * MathF.PI + spin_error, duration);
+        public SpinFramesGenerator Spin(float amount, double duration) => new SpinFramesGenerator(this, endAngle + amount * 2 * MathF.PI, duration);
     }
 }
