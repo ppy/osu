@@ -356,15 +356,17 @@ namespace osu.Game.Rulesets.Osu.Tests
                 },
             };
 
-            performTest(hitObjects, new List<ReplayFrame>
+            List<ReplayFrame> frames = new List<ReplayFrame>
             {
                 new OsuReplayFrame { Time = time_spinner - 90, Position = positionCircle, Actions = { OsuAction.LeftButton } },
-                new OsuReplayFrame { Time = time_spinner + 10, Position = new Vector2(236, 192), Actions = { OsuAction.RightButton } },
-                new OsuReplayFrame { Time = time_spinner + 20, Position = new Vector2(256, 172), Actions = { OsuAction.RightButton } },
-                new OsuReplayFrame { Time = time_spinner + 30, Position = new Vector2(276, 192), Actions = { OsuAction.RightButton } },
-                new OsuReplayFrame { Time = time_spinner + 40, Position = new Vector2(256, 212), Actions = { OsuAction.RightButton } },
-                new OsuReplayFrame { Time = time_spinner + 50, Position = new Vector2(236, 192), Actions = { OsuAction.RightButton } },
-            });
+            };
+
+            frames.AddRange(SpinFramesGenerator
+                            .From(0)
+                            .Spin(1, 500)
+                            .Build(time_spinner + 10, 50));
+
+            performTest(hitObjects, frames);
 
             addJudgementAssert(hitObjects[0], HitResult.Great);
             addJudgementAssert(hitObjects[1], HitResult.Meh);
