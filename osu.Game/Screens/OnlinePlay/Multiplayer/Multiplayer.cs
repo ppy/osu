@@ -93,7 +93,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
 
         public void Join(Room room, string? password)
         {
-            LoungeSubScreen.Join(room, password);
+            Lounge.Join(room, password);
         }
 
         protected override void Dispose(bool isDisposing)

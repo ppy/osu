@@ -32,7 +32,7 @@ namespace osu.Game.Screens.OnlinePlay
         // while leases may be taken out by a subscreen.
         public override bool DisallowExternalBeatmapRulesetChanges => true;
 
-        protected LoungeSubScreen LoungeSubScreen;
+        protected LoungeSubScreen Lounge;
 
         private MultiplayerWaveContainer waves;
         private ScreenStack screenStack;
@@ -90,7 +90,7 @@ namespace osu.Game.Screens.OnlinePlay
             screenStack.ScreenPushed += screenPushed;
             screenStack.ScreenExited += screenExited;
 
-            screenStack.Push(LoungeSubScreen = CreateLounge());
+            screenStack.Push(Lounge = CreateLounge());
 
             apiState.BindTo(API.State);
             apiState.BindValueChanged(onlineStateChanged, true);
@@ -121,10 +121,10 @@ namespace osu.Game.Screens.OnlinePlay
 
             Mods.SetDefault();
 
-            if (LoungeSubScreen.IsCurrentScreen())
-                LoungeSubScreen.OnEntering(e);
+            if (Lounge.IsCurrentScreen())
+                Lounge.OnEntering(e);
             else
-                LoungeSubScreen.MakeCurrent();
+                Lounge.MakeCurrent();
         }
 
         public override void OnResuming(ScreenTransitionEvent e)
@@ -159,7 +159,7 @@ namespace osu.Game.Screens.OnlinePlay
 
         public override bool OnExiting(ScreenExitEvent e)
         {
-            while (screenStack.CurrentScreen != null && screenStack.CurrentScreen is not Lounge.LoungeSubScreen)
+            while (screenStack.CurrentScreen != null && screenStack.CurrentScreen is not LoungeSubScreen)
             {
                 var subScreen = (Screen)screenStack.CurrentScreen;
                 if (subScreen.IsLoaded && subScreen.OnExiting(e))
