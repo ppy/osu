@@ -45,6 +45,11 @@ namespace osu.Game.Localisation
         public static LocalisableString YOffset => new TranslatableString(getKey(@"y_offset"), @"Y Offset");
 
         /// <summary>
+        /// "Allow dragging outside of full area"
+        /// </summary>
+        public static LocalisableString AllowDraggingOutsideArea => new TranslatableString(getKey(@"allow_dragging_outside_of_full_area"), @"Allow dragging outside of full area");
+
+        /// <summary>
         /// "Rotation"
         /// </summary>
         public static LocalisableString Rotation => new TranslatableString(getKey(@"rotation"), @"Rotation");
