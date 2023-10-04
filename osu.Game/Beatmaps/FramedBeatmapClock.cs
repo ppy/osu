@@ -79,7 +79,7 @@ namespace osu.Game.Beatmaps
             }
             else
             {
-                finalClockSource = new InterpolatingFramedClock(interpolatedTrack);
+                finalClockSource = interpolatedTrack;
             }
         }
 
