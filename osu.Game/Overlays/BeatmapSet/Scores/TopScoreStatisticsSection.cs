@@ -275,7 +275,7 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
                 set
                 {
                     modsContainer.Clear();
-                    modsContainer.Children = value.Select(mod => new ModIcon(mod)
+                    modsContainer.Children = value.AsOrdered().Select(mod => new ModIcon(mod)
                     {
                         AutoSizeAxes = Axes.Both,
                         Scale = new Vector2(0.25f),

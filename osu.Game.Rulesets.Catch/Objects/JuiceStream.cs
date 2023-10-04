@@ -77,7 +77,7 @@ namespace osu.Game.Rulesets.Catch.Objects
             int nodeIndex = 0;
             SliderEventDescriptor? lastEvent = null;
 
-            foreach (var e in SliderEventGenerator.Generate(StartTime, SpanDuration, Velocity, TickDistance, Path.Distance, this.SpanCount(), LegacyLastTickOffset, cancellationToken))
+            foreach (var e in SliderEventGenerator.Generate(StartTime, SpanDuration, Velocity, TickDistance, Path.Distance, this.SpanCount(), cancellationToken))
             {
                 // generate tiny droplets since the last point
                 if (lastEvent != null)
@@ -104,8 +104,8 @@ namespace osu.Game.Rulesets.Catch.Objects
                     }
                 }
 
-                // this also includes LegacyLastTick and this is used for TinyDroplet generation above.
-                // this means that the final segment of TinyDroplets are increasingly mistimed where LegacyLastTickOffset is being applied.
+                // this also includes LastTick and this is used for TinyDroplet generation above.
+                // this means that the final segment of TinyDroplets are increasingly mistimed where LastTick is being applied.
                 lastEvent = e;
 
                 switch (e.Type)
@@ -162,7 +162,5 @@ namespace osu.Game.Rulesets.Catch.Objects
         public double Distance => Path.Distance;
 
         public IList<IList<HitSampleInfo>> NodeSamples { get; set; } = new List<IList<HitSampleInfo>>();
-
-        public double? LegacyLastTickOffset { get; set; }
     }
 }
