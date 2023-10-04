@@ -164,11 +164,11 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
             /// <summary>
             /// Whether this turn represents a complete spin.
             /// </summary>
-            public bool IsCompleteSpin => Angle is -360 or 360;
+            public bool IsCompleteSpin => Angle == -360 || Angle == 360;
 
             public Turn(double startTime, int direction)
             {
-                Debug.Assert(direction is -1 or 1);
+                Debug.Assert(direction == -1 || direction == 1);
 
                 StartTime = startTime;
                 Direction = direction;
