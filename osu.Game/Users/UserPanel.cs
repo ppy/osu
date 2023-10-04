@@ -64,7 +64,7 @@ namespace osu.Game.Users
         protected OsuColour Colours { get; private set; } = null!;
 
         [Resolved]
-        private MultiplayerClient multiplayerClient { get; set; } = null!;
+        private MultiplayerClient? multiplayerClient { get; set; }
 
         [BackgroundDependencyLoader]
         private void load()
@@ -124,7 +124,7 @@ namespace osu.Game.Users
 
                 if (
                     User.IsOnline &&
-                    multiplayerClient.Room != null &&
+                    multiplayerClient?.Room != null &&
                     multiplayerClient.Room.Users.All(u => u.UserID != User.Id)
                 )
                 {
