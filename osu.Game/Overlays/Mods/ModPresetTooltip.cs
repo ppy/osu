@@ -50,7 +50,7 @@ namespace osu.Game.Overlays.Mods
                 return;
 
             lastPreset = preset;
-            Content.ChildrenEnumerable = preset.Mods.Select(mod => new ModPresetRow(mod));
+            Content.ChildrenEnumerable = preset.Mods.AsOrdered().Select(mod => new ModPresetRow(mod));
         }
 
         protected override void PopIn() => this.FadeIn(transition_duration, Easing.OutQuint);
