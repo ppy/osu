@@ -36,7 +36,7 @@ namespace osu.Game.Rulesets.Osu.Mods
 
             d.HitObjectApplied += _ =>
             {
-                // slider tails are a painful edge case, as their start time is offset 36ms back (see `LegacyLastTick`).
+                // slider tails are a painful edge case, as their start time is offset 36ms back (see `LastTick`).
                 // to work around this, look up the slider tail's parenting slider's end time instead to ensure proper snap.
                 double snapTime = d is DrawableSliderTail tail
                     ? tail.Slider.GetEndTime()

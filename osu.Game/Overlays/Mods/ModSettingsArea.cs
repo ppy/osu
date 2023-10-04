@@ -84,7 +84,7 @@ namespace osu.Game.Overlays.Mods
         {
             modSettingsFlow.Clear();
 
-            foreach (var mod in SelectedMods.Value.OrderBy(mod => mod.Type).ThenBy(mod => mod.Acronym))
+            foreach (var mod in SelectedMods.Value.AsOrdered())
             {
                 var settings = mod.CreateSettingsControls().ToList();
 
