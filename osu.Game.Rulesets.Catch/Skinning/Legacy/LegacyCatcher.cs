@@ -19,5 +19,14 @@ namespace osu.Game.Rulesets.Catch.Skinning.Legacy
             // and also a constant 0.7x factor for catcher sprites specifically.
             Scale = new Vector2(0.5f * 0.7f);
         }
+
+        protected override void Update()
+        {
+            base.Update();
+
+            // stable sets the Y origin position of the catcher to 16px in order for the catching range and OD scaling to align with the top of the catcher's plate in the default skin,
+            // (note that this is is applied pre-scale, i.e. 16px are acted upon in relation to the sprite's original @1x dimensions).
+            OriginPosition = new Vector2(DrawWidth / 2, 16f);
+        }
     }
 }

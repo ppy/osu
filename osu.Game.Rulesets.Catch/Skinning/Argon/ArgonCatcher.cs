@@ -6,6 +6,7 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Game.Rulesets.Catch.UI;
+using osuTK;
 using osuTK.Graphics;
 
 namespace osu.Game.Rulesets.Catch.Skinning.Argon
@@ -15,6 +16,7 @@ namespace osu.Game.Rulesets.Catch.Skinning.Argon
         [BackgroundDependencyLoader]
         private void load()
         {
+            Anchor = Anchor.TopCentre;
             RelativeSizeAxes = Axes.Both;
 
             InternalChildren = new Drawable[]
@@ -80,6 +82,12 @@ namespace osu.Game.Rulesets.Catch.Skinning.Argon
                     }
                 },
             };
+        }
+
+        protected override void Update()
+        {
+            base.Update();
+            OriginPosition = new Vector2(DrawWidth / 2, Catcher.BASE_SIZE * 0.06f);
         }
     }
 }
