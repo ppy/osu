@@ -88,18 +88,27 @@ namespace osu.Game.Rulesets.Objects
 
             int finalSpanIndex = spanCount - 1;
             double finalSpanStartTime = startTime + finalSpanIndex * spanDuration;
-            double finalSpanEndTime = Math.Max(startTime + totalDuration / 2, (finalSpanStartTime + spanDuration) + TAIL_LENIENCY);
-            double finalProgress = (finalSpanEndTime - finalSpanStartTime) / spanDuration;
 
-            if (spanCount % 2 == 0) finalProgress = 1 - finalProgress;
+            // Note that `finalSpanStartTime + spanDuration ≈ startTime + totalDuration`, but we write it like this to match floating point precision
+            // of stable.
+            //
+            // So thinking about this in a saner way, the time of the LegacyLastTick is
+            //
+            // `slider.StartTime + max(slider.Duration / 2, slider.Duration - 36)`
+            //
+            // As a slider gets shorter than 72 ms, the leniency offered falls below the 36 ms `TAIL_LENIENCY` constant.
+            double legacyLastTickTime = Math.Max(startTime + totalDuration / 2, (finalSpanStartTime + spanDuration) + TAIL_LENIENCY);
+            double legacyLastTickProgress = (legacyLastTickTime - finalSpanStartTime) / spanDuration;
+
+            if (spanCount % 2 == 0) legacyLastTickProgress = 1 - legacyLastTickProgress;
 
             yield return new SliderEventDescriptor
             {
                 Type = SliderEventType.LegacyLastTick,
                 SpanIndex = finalSpanIndex,
                 SpanStartTime = finalSpanStartTime,
-                Time = finalSpanEndTime,
-                PathProgress = finalProgress,
+                Time = legacyLastTickTime,
+                PathProgress = legacyLastTickProgress,
             };
 
             yield return new SliderEventDescriptor
