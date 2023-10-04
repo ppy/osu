@@ -13,6 +13,7 @@ namespace osu.Game.Skinning
     public sealed partial class LegacySpriteText : OsuSpriteText
     {
         private readonly LegacyFont font;
+        private readonly Vector2? maxSizePerGlyph;
 
         private LegacyGlyphStore glyphStore = null!;
 
@@ -20,9 +21,11 @@ namespace osu.Game.Skinning
 
         protected override char[] FixedWidthExcludeCharacters => new[] { ',', '.', '%', 'x' };
 
-        public LegacySpriteText(LegacyFont font)
+        public LegacySpriteText(LegacyFont font, Vector2? maxSizePerGlyph = null)
         {
             this.font = font;
+            this.maxSizePerGlyph = maxSizePerGlyph;
+
             Shadow = false;
             UseFullGlyphHeight = false;
         }
@@ -33,7 +36,7 @@ namespace osu.Game.Skinning
             Font = new FontUsage(skin.GetFontPrefix(font), 1, fixedWidth: true);
             Spacing = new Vector2(-skin.GetFontOverlap(font), 0);
 
-            glyphStore = new LegacyGlyphStore(skin);
+            glyphStore = new LegacyGlyphStore(skin, maxSizePerGlyph);
         }
 
         protected override TextBuilder CreateTextBuilder(ITexturedGlyphLookupStore store) => base.CreateTextBuilder(glyphStore);
@@ -41,10 +44,12 @@ namespace osu.Game.Skinning
         private class LegacyGlyphStore : ITexturedGlyphLookupStore
         {
             private readonly ISkin skin;
+            private readonly Vector2? maxSize;
 
-            public LegacyGlyphStore(ISkin skin)
+            public LegacyGlyphStore(ISkin skin, Vector2? maxSize)
             {
                 this.skin = skin;
+                this.maxSize = maxSize;
             }
 
             public ITexturedCharacterGlyph? Get(string fontName, char character)
@@ -55,6 +60,9 @@ namespace osu.Game.Skinning
 
                 if (texture == null)
                     return null;
+
+                if (maxSize != null)
+                    texture = texture.WithMaximumSize(maxSize.Value);
 
                 return new TexturedCharacterGlyph(new CharacterGlyph(character, 0, 0, texture.Width, texture.Height, null), texture, 1f / texture.ScaleAdjust);
             }

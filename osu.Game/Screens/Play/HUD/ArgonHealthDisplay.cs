@@ -25,211 +25,43 @@ namespace osu.Game.Screens.Play.HUD
 {
     public partial class ArgonHealthDisplay : HealthDisplay, ISerialisableDrawable
     {
-        private const float curve_start = 280;
-        private const float curve_end = 310;
-        private const float curve_smoothness = 10;
+        public bool UsesFixedAnchor { get; set; }
 
-        private const float bar_length = 350;
-        private const float bar_height = 32.5f;
+        private BarPath mainBar = null!;
 
-        private BarPath healthBar = null!;
-        private BarPath missBar = null!;
+        /// <summary>
+        /// Used to show a glow at the end of the main bar, or red "damage" area when missing.
+        /// </summary>
+        private BarPath glowBar = null!;
+
+        private BackgroundPath background = null!;
 
         private SliderPath barPath = null!;
 
-        private static readonly Colour4 health_bar_colour = Colour4.White;
-
-        // the opacity isn't part of the design, it's only here to control glow intensity.
-        private static readonly Colour4 health_bar_glow_colour = Color4Extensions.FromHex("#7ED7FD").Opacity(0.5f);
-        private static readonly Colour4 health_bar_flash_colour = Color4Extensions.FromHex("#7ED7FD").Opacity(0.8f);
-
-        private static readonly Colour4 miss_bar_colour = Color4Extensions.FromHex("#FF9393");
-        private static readonly Colour4 miss_bar_glow_colour = Color4Extensions.FromHex("#FD0000");
-
-        // the "flashed" glow colour is just a lightened version of the original one, not part of the design.
-        private static readonly Colour4 miss_bar_flash_colour = Color4Extensions.FromHex("#FF5D5D");
-
-        public bool UsesFixedAnchor { get; set; }
-
-        [BackgroundDependencyLoader]
-        private void load()
-        {
-            AutoSizeAxes = Axes.Both;
-
-            Vector2 diagonalDir = (new Vector2(curve_end, bar_height) - new Vector2(curve_start, 0)).Normalized();
-
-            // todo: SliderPath or parts of it should be moved away to a utility class as they're useful for making curved paths in general, as done here.
-            barPath = new SliderPath(new[]
-            {
-                new PathControlPoint(new Vector2(0, 0), PathType.Linear),
-                new PathControlPoint(new Vector2(curve_start - curve_smoothness, 0), PathType.Bezier),
-                new PathControlPoint(new Vector2(curve_start, 0)),
-                new PathControlPoint(new Vector2(curve_start, 0) + diagonalDir * curve_smoothness, PathType.Linear),
-                new PathControlPoint(new Vector2(curve_end, bar_height) - diagonalDir * curve_smoothness, PathType.Bezier),
-                new PathControlPoint(new Vector2(curve_end, bar_height)),
-                new PathControlPoint(new Vector2(curve_end + curve_smoothness, bar_height), PathType.Linear),
-                new PathControlPoint(new Vector2(bar_length, bar_height)),
-            });
-
-            var vertices = new List<Vector2>();
-            barPath.GetPathToProgress(vertices, 0.0, 1.0);
-
-            InternalChild = new FillFlowContainer
-            {
-                AutoSizeAxes = Axes.Both,
-                Direction = FillDirection.Horizontal,
-                Spacing = new Vector2(4f, 0f),
-                Children = new Drawable[]
-                {
-                    new Circle
-                    {
-                        Margin = new MarginPadding { Top = 10f - 3f / 2f, Left = -2f },
-                        Size = new Vector2(50f, 3f),
-                    },
-                    new Container
-                    {
-                        AutoSizeAxes = Axes.Both,
-                        Children = new Drawable[]
-                        {
-                            new BackgroundPath
-                            {
-                                PathRadius = 10f,
-                                Vertices = vertices,
-                            },
-                            missBar = new BarPath
-                            {
-                                BarColour = Color4.White,
-                                GlowColour = OsuColour.Gray(0.5f),
-                                Blending = BlendingParameters.Additive,
-                                Colour = ColourInfo.GradientHorizontal(Color4.White.Opacity(0.8f), Color4.White),
-                                PathRadius = 40f,
-                                GlowPortion = 0.9f,
-                                Margin = new MarginPadding(-30f),
-                                Vertices = vertices
-                            },
-                            healthBar = new BarPath
-                            {
-                                AutoSizeAxes = Axes.None,
-                                RelativeSizeAxes = Axes.Both,
-                                Blending = BlendingParameters.Additive,
-                                BarColour = health_bar_colour,
-                                GlowColour = health_bar_glow_colour,
-                                PathRadius = 10f,
-                                GlowPortion = 0.6f,
-                                Vertices = vertices
-                            },
-                        }
-                    }
-                },
-            };
-        }
-
-        protected override void LoadComplete()
-        {
-            base.LoadComplete();
-
-            Current.BindValueChanged(v =>
-            {
-                if (v.NewValue >= MissBarValue)
-                    finishMissBarUsage();
-
-                this.TransformTo(nameof(HealthBarValue), v.NewValue, 300, Easing.OutQuint);
-                if (resetMissBarDelegate == null)
-                    this.TransformTo(nameof(MissBarValue), v.NewValue, 300, Easing.OutQuint);
-            }, true);
-
-            updatePathVertices();
-        }
-
-        protected override void Update()
-        {
-            base.Update();
-
-            healthBar.Alpha = (float)Interpolation.DampContinuously(healthBar.Alpha, (float)(Current.Value > 0 ? 1 : 0), 40, Time.Elapsed);
-            missBar.Alpha = (float)Interpolation.DampContinuously(missBar.Alpha, (float)(MissBarValue > 0 ? 1 : 0), 40, Time.Elapsed);
-        }
+        private static readonly Colour4 main_bar_colour = Colour4.White;
+        private static readonly Colour4 main_bar_glow_colour = Color4Extensions.FromHex("#7ED7FD").Opacity(0.5f);
 
         private ScheduledDelegate? resetMissBarDelegate;
 
-        protected override void Miss(JudgementResult result)
-        {
-            base.Miss(result);
-
-            if (result.HealthAtJudgement == 0.0)
-                // health is already empty, nothing should be displayed here.
-                return;
-
-            if (resetMissBarDelegate != null)
-            {
-                resetMissBarDelegate.Cancel();
-                resetMissBarDelegate = null;
-            }
-            else
-                this.TransformTo(nameof(MissBarValue), HealthBarValue);
-
-            this.Delay(500).Schedule(() =>
-            {
-                this.TransformTo(nameof(MissBarValue), Current.Value, 300, Easing.OutQuint);
-
-                finishMissBarUsage();
-            }, out resetMissBarDelegate);
-
-            missBar.TransformTo(nameof(BarPath.BarColour), miss_bar_colour, 100, Easing.OutQuint)
-                   .Then()
-                   .TransformTo(nameof(BarPath.BarColour), miss_bar_flash_colour, 800, Easing.OutQuint);
-
-            missBar.TransformTo(nameof(BarPath.GlowColour), miss_bar_glow_colour.Lighten(0.2f))
-                   .TransformTo(nameof(BarPath.GlowColour), miss_bar_glow_colour, 800, Easing.OutQuint);
-        }
-
-        private void finishMissBarUsage()
-        {
-            if (Current.Value > 0)
-            {
-                missBar.TransformTo(nameof(BarPath.BarColour), health_bar_colour, 300, Easing.In);
-                missBar.TransformTo(nameof(BarPath.GlowColour), health_bar_glow_colour, 300, Easing.In);
-            }
-
-            resetMissBarDelegate?.Cancel();
-            resetMissBarDelegate = null;
-        }
-
-        protected override void Flash(JudgementResult result)
-        {
-            base.Flash(result);
-
-            healthBar.TransformTo(nameof(BarPath.GlowColour), health_bar_flash_colour)
-                     .TransformTo(nameof(BarPath.GlowColour), health_bar_glow_colour, 300, Easing.OutQuint);
-
-            if (resetMissBarDelegate == null)
-            {
-                missBar.TransformTo(nameof(BarPath.BarColour), Colour4.White, 100, Easing.OutQuint)
-                       .Then()
-                       .TransformTo(nameof(BarPath.BarColour), health_bar_colour, 800, Easing.OutQuint);
-
-                missBar.TransformTo(nameof(BarPath.GlowColour), Colour4.White)
-                       .TransformTo(nameof(BarPath.GlowColour), health_bar_glow_colour, 800, Easing.OutQuint);
-            }
-        }
-
-        private double missBarValue;
         private readonly List<Vector2> missBarVertices = new List<Vector2>();
+        private readonly List<Vector2> healthBarVertices = new List<Vector2>();
 
-        public double MissBarValue
+        private double glowBarValue;
+
+        public double GlowBarValue
         {
-            get => missBarValue;
+            get => glowBarValue;
             set
             {
-                if (missBarValue == value)
+                if (glowBarValue == value)
                     return;
 
-                missBarValue = value;
+                glowBarValue = value;
                 updatePathVertices();
             }
         }
 
         private double healthBarValue;
-        private readonly List<Vector2> healthBarVertices = new List<Vector2>();
 
         public double HealthBarValue
         {
@@ -244,10 +76,179 @@ namespace osu.Game.Screens.Play.HUD
             }
         }
 
+        [BackgroundDependencyLoader]
+        private void load()
+        {
+            AutoSizeAxes = Axes.Both;
+
+            InternalChild = new FillFlowContainer
+            {
+                AutoSizeAxes = Axes.Both,
+                Direction = FillDirection.Horizontal,
+                Spacing = new Vector2(4f, 0f),
+                Children = new Drawable[]
+                {
+                    new Circle
+                    {
+                        Margin = new MarginPadding { Top = 8.5f, Left = -2 },
+                        Size = new Vector2(50f, 3f),
+                    },
+                    new Container
+                    {
+                        AutoSizeAxes = Axes.Both,
+                        Children = new Drawable[]
+                        {
+                            background = new BackgroundPath
+                            {
+                                PathRadius = 10f,
+                            },
+                            glowBar = new BarPath
+                            {
+                                BarColour = Color4.White,
+                                GlowColour = OsuColour.Gray(0.5f),
+                                Blending = BlendingParameters.Additive,
+                                Colour = ColourInfo.GradientHorizontal(Color4.White.Opacity(0.8f), Color4.White),
+                                PathRadius = 40f,
+                                // Kinda hacky, but results in correct positioning with increased path radius.
+                                Margin = new MarginPadding(-30f),
+                                GlowPortion = 0.9f,
+                            },
+                            mainBar = new BarPath
+                            {
+                                AutoSizeAxes = Axes.None,
+                                RelativeSizeAxes = Axes.Both,
+                                Blending = BlendingParameters.Additive,
+                                BarColour = main_bar_colour,
+                                GlowColour = main_bar_glow_colour,
+                                PathRadius = 10f,
+                                GlowPortion = 0.6f,
+                            },
+                        }
+                    }
+                },
+            };
+
+            updatePath();
+        }
+
+        protected override void LoadComplete()
+        {
+            base.LoadComplete();
+
+            Current.BindValueChanged(v =>
+            {
+                if (v.NewValue >= GlowBarValue)
+                    finishMissDisplay();
+
+                this.TransformTo(nameof(HealthBarValue), v.NewValue, 300, Easing.OutQuint);
+                if (resetMissBarDelegate == null)
+                    this.TransformTo(nameof(GlowBarValue), v.NewValue, 300, Easing.OutQuint);
+            }, true);
+        }
+
+        protected override void Update()
+        {
+            base.Update();
+
+            mainBar.Alpha = (float)Interpolation.DampContinuously(mainBar.Alpha, Current.Value > 0 ? 1 : 0, 40, Time.Elapsed);
+            glowBar.Alpha = (float)Interpolation.DampContinuously(glowBar.Alpha, GlowBarValue > 0 ? 1 : 0, 40, Time.Elapsed);
+        }
+
+        protected override void Flash(JudgementResult result)
+        {
+            base.Flash(result);
+
+            mainBar.TransformTo(nameof(BarPath.GlowColour), main_bar_glow_colour.Opacity(0.8f))
+                   .TransformTo(nameof(BarPath.GlowColour), main_bar_glow_colour, 300, Easing.OutQuint);
+
+            if (resetMissBarDelegate == null)
+            {
+                glowBar.TransformTo(nameof(BarPath.BarColour), Colour4.White, 100, Easing.OutQuint)
+                       .Then()
+                       .TransformTo(nameof(BarPath.BarColour), main_bar_colour, 800, Easing.OutQuint);
+
+                glowBar.TransformTo(nameof(BarPath.GlowColour), Colour4.White)
+                       .TransformTo(nameof(BarPath.GlowColour), main_bar_glow_colour, 800, Easing.OutQuint);
+            }
+        }
+
+        protected override void Miss(JudgementResult result)
+        {
+            base.Miss(result);
+
+            if (resetMissBarDelegate != null)
+            {
+                resetMissBarDelegate.Cancel();
+                resetMissBarDelegate = null;
+            }
+            else
+            {
+                // Reset any ongoing animation immediately, else things get weird.
+                this.TransformTo(nameof(GlowBarValue), HealthBarValue);
+            }
+
+            this.Delay(500).Schedule(() =>
+            {
+                this.TransformTo(nameof(GlowBarValue), Current.Value, 300, Easing.OutQuint);
+                finishMissDisplay();
+            }, out resetMissBarDelegate);
+
+            glowBar.TransformTo(nameof(BarPath.BarColour), new Colour4(255, 147, 147, 255), 100, Easing.OutQuint).Then()
+                   .TransformTo(nameof(BarPath.BarColour), new Colour4(255, 93, 93, 255), 800, Easing.OutQuint);
+
+            glowBar.TransformTo(nameof(BarPath.GlowColour), new Colour4(253, 0, 0, 255).Lighten(0.2f))
+                   .TransformTo(nameof(BarPath.GlowColour), new Colour4(253, 0, 0, 255), 800, Easing.OutQuint);
+        }
+
+        private void finishMissDisplay()
+        {
+            if (Current.Value > 0)
+            {
+                glowBar.TransformTo(nameof(BarPath.BarColour), main_bar_colour, 300, Easing.In);
+                glowBar.TransformTo(nameof(BarPath.GlowColour), main_bar_glow_colour, 300, Easing.In);
+            }
+
+            resetMissBarDelegate?.Cancel();
+            resetMissBarDelegate = null;
+        }
+
+        private void updatePath()
+        {
+            const float curve_start = 280;
+            const float curve_end = 310;
+            const float curve_smoothness = 10;
+
+            const float bar_length = 350;
+            const float bar_verticality = 32.5f;
+
+            Vector2 diagonalDir = (new Vector2(curve_end, bar_verticality) - new Vector2(curve_start, 0)).Normalized();
+
+            barPath = new SliderPath(new[]
+            {
+                new PathControlPoint(new Vector2(0, 0), PathType.Linear),
+                new PathControlPoint(new Vector2(curve_start - curve_smoothness, 0), PathType.Bezier),
+                new PathControlPoint(new Vector2(curve_start, 0)),
+                new PathControlPoint(new Vector2(curve_start, 0) + diagonalDir * curve_smoothness, PathType.Linear),
+                new PathControlPoint(new Vector2(curve_end, bar_verticality) - diagonalDir * curve_smoothness, PathType.Bezier),
+                new PathControlPoint(new Vector2(curve_end, bar_verticality)),
+                new PathControlPoint(new Vector2(curve_end + curve_smoothness, bar_verticality), PathType.Linear),
+                new PathControlPoint(new Vector2(bar_length, bar_verticality)),
+            });
+
+            List<Vector2> vertices = new List<Vector2>();
+            barPath.GetPathToProgress(vertices, 0.0, 1.0);
+
+            background.Vertices = vertices;
+            mainBar.Vertices = vertices;
+            glowBar.Vertices = vertices;
+
+            updatePathVertices();
+        }
+
         private void updatePathVertices()
         {
             barPath.GetPathToProgress(healthBarVertices, 0.0, healthBarValue);
-            barPath.GetPathToProgress(missBarVertices, healthBarValue, Math.Max(missBarValue, healthBarValue));
+            barPath.GetPathToProgress(missBarVertices, healthBarValue, Math.Max(glowBarValue, healthBarValue));
 
             if (healthBarVertices.Count == 0)
                 healthBarVertices.Add(Vector2.Zero);
@@ -255,11 +256,11 @@ namespace osu.Game.Screens.Play.HUD
             if (missBarVertices.Count == 0)
                 missBarVertices.Add(Vector2.Zero);
 
-            missBar.Vertices = missBarVertices.Select(v => v - missBarVertices[0]).ToList();
-            missBar.Position = missBarVertices[0];
+            glowBar.Vertices = missBarVertices.Select(v => v - missBarVertices[0]).ToList();
+            glowBar.Position = missBarVertices[0];
 
-            healthBar.Vertices = healthBarVertices.Select(v => v - healthBarVertices[0]).ToList();
-            healthBar.Position = healthBarVertices[0];
+            mainBar.Vertices = healthBarVertices.Select(v => v - healthBarVertices[0]).ToList();
+            mainBar.Position = healthBarVertices[0];
         }
 
         private partial class BackgroundPath : SmoothPath
@@ -267,10 +268,12 @@ namespace osu.Game.Screens.Play.HUD
             protected override Color4 ColourAt(float position)
             {
                 if (position <= 0.128f)
-                    return Color4.White.Opacity(0.5f);
+                    return Color4.White.Opacity(0.8f);
 
-                position -= 0.128f;
-                return Interpolation.ValueAt(Math.Clamp(position, 0f, 1f), Color4.White.Opacity(0.5f), Color4.Black.Opacity(0.5f), -0.75f, 1f, Easing.OutQuart);
+                return Interpolation.ValueAt(position,
+                    Color4.White.Opacity(0.8f),
+                    Color4.Black.Opacity(0.2f),
+                    -0.5f, 1f, Easing.OutQuint);
             }
         }
 
