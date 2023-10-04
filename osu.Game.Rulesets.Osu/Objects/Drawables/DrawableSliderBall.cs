@@ -132,6 +132,8 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
         {
             base.Update();
 
+            // even in an edge case where current time has exceeded the slider's time, we may not have finished judging.
+            // we don't want to potentially update from Tracking=true to Tracking=false at this point.
             if (Time.Current >= drawableSlider.HitObject.EndTime)
                 return;
 
