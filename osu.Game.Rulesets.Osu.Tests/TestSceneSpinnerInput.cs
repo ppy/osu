@@ -98,8 +98,8 @@ namespace osu.Game.Rulesets.Osu.Tests
         {
             performTest(
                 SpinFramesGenerator.From(0)
-                             .Spin(amount, 500)
-                             .Build(time_spinner_start, 50));
+                                   .Spin(amount, 500)
+                                   .Build(time_spinner_start, 50));
 
             assertTicksHit(expectedTicks);
             assertSpinnerHit(false);
@@ -114,9 +114,9 @@ namespace osu.Game.Rulesets.Osu.Tests
         {
             performTest(
                 SpinFramesGenerator.From(0)
-                             .Spin(0.5f, 500) // Rotate to +0.5.
-                             .Spin(-1f, 500) // Rotate to -0.5
-                             .Build(time_spinner_start, 50));
+                                   .Spin(0.5f, 500) // Rotate to +0.5.
+                                   .Spin(-1f, 500) // Rotate to -0.5
+                                   .Build(time_spinner_start, 50));
 
             assertTicksHit(0);
             assertSpinnerHit(false);
@@ -133,9 +133,9 @@ namespace osu.Game.Rulesets.Osu.Tests
         {
             performTest(
                 SpinFramesGenerator.From(0)
-                             .Spin(direction1, 500)
-                             .Spin(direction2, 500)
-                             .Build(time_spinner_start, 50));
+                                   .Spin(direction1, 500)
+                                   .Spin(direction2, 500)
+                                   .Build(time_spinner_start, 50));
 
             assertTicksHit(expectedTicks);
             assertSpinnerHit(false);
