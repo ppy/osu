@@ -41,6 +41,7 @@ namespace osu.Game.Rulesets.Mania
                 },
                 new SettingsCheckbox
                 {
+                    Keywords = new[] { "color" },
                     LabelText = RulesetSettingsStrings.TimingBasedColouring,
                     Current = config.GetBindable<bool>(ManiaRulesetSetting.TimingBasedNoteColouring),
                 }

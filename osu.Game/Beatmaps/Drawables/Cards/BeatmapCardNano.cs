@@ -20,14 +20,24 @@ namespace osu.Game.Beatmaps.Drawables.Cards
         protected override Drawable IdleContent => idleBottomContent;
         protected override Drawable DownloadInProgressContent => downloadProgressBar;
 
+        public override float Width
+        {
+            get => base.Width;
+            set
+            {
+                base.Width = value;
+
+                if (LoadState >= LoadState.Ready)
+                    buttonContainer.Width = value;
+            }
+        }
+
         private const float height = 60;
         private const float width = 300;
-        private const float cover_width = 80;
 
         [Cached]
         private readonly BeatmapCardContent content;
 
-        private BeatmapCardThumbnail thumbnail = null!;
         private CollapsibleButtonContainer buttonContainer = null!;
 
         private FillFlowContainer idleBottomContent = null!;
@@ -52,21 +62,15 @@ namespace osu.Game.Beatmaps.Drawables.Cards
             {
                 c.MainContent = new Container
                 {
-                    RelativeSizeAxes = Axes.Both,
+                    RelativeSizeAxes = Axes.X,
+                    Height = height,
                     Children = new Drawable[]
                     {
-                        thumbnail = new BeatmapCardThumbnail(BeatmapSet)
-                        {
-                            Name = @"Left (icon) area",
-                            Size = new Vector2(cover_width, height),
-                            Padding = new MarginPadding { Right = CORNER_RADIUS },
-                        },
                         buttonContainer = new CollapsibleButtonContainer(BeatmapSet)
                         {
-                            X = cover_width - CORNER_RADIUS,
-                            Width = width - cover_width + CORNER_RADIUS,
+                            Width = Width,
                             FavouriteState = { BindTarget = FavouriteState },
-                            ButtonsCollapsedWidth = CORNER_RADIUS,
+                            ButtonsCollapsedWidth = 5,
                             ButtonsExpandedWidth = 30,
                             Children = new Drawable[]
                             {
@@ -160,7 +164,6 @@ namespace osu.Game.Beatmaps.Drawables.Cards
             bool showDetails = IsHovered;
 
             buttonContainer.ShowDetails.Value = showDetails;
-            thumbnail.Dimmed.Value = showDetails;
         }
     }
 }

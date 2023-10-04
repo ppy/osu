@@ -15,6 +15,7 @@ using osu.Game.Rulesets.Judgements;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Scoring;
+using osu.Game.Rulesets.Scoring.Legacy;
 using osu.Game.Scoring;
 
 namespace osu.Game.Database
@@ -222,15 +223,9 @@ namespace osu.Game.Database
                 throw new InvalidOperationException("Beatmap contains no hit objects!");
 
             ILegacyScoreSimulator sv1Simulator = legacyRuleset.CreateLegacyScoreSimulator();
+            LegacyScoreAttributes attributes = sv1Simulator.Simulate(beatmap, playableBeatmap);
 
-            sv1Simulator.Simulate(beatmap, playableBeatmap, mods);
-
-            return ConvertFromLegacyTotalScore(score, new DifficultyAttributes
-            {
-                LegacyAccuracyScore = sv1Simulator.AccuracyScore,
-                LegacyComboScore = sv1Simulator.ComboScore,
-                LegacyBonusScoreRatio = sv1Simulator.BonusScoreRatio
-            });
+            return ConvertFromLegacyTotalScore(score, attributes);
         }
 
         /// <summary>
@@ -241,20 +236,21 @@ namespace osu.Game.Database
         /// (<see cref="DifficultyAttributes.LegacyAccuracyScore"/>, <see cref="DifficultyAttributes.LegacyComboScore"/>, and <see cref="DifficultyAttributes.LegacyBonusScoreRatio"/>)
         /// for the beatmap which the score was set on.</param>
         /// <returns>The standardised total score.</returns>
-        public static long ConvertFromLegacyTotalScore(ScoreInfo score, DifficultyAttributes attributes)
+        public static long ConvertFromLegacyTotalScore(ScoreInfo score, LegacyScoreAttributes attributes)
         {
             if (!score.IsLegacyScore)
                 return score.TotalScore;
 
             Debug.Assert(score.LegacyTotalScore != null);
 
-            int maximumLegacyAccuracyScore = attributes.LegacyAccuracyScore;
-            int maximumLegacyComboScore = attributes.LegacyComboScore;
-            double maximumLegacyBonusRatio = attributes.LegacyBonusScoreRatio;
             double modMultiplier = score.Mods.Select(m => m.ScoreMultiplier).Aggregate(1.0, (c, n) => c * n);
 
+            int maximumLegacyAccuracyScore = attributes.AccuracyScore;
+            long maximumLegacyComboScore = (long)Math.Round(attributes.ComboScore * modMultiplier);
+            double maximumLegacyBonusRatio = attributes.BonusScoreRatio;
+
             // The part of total score that doesn't include bonus.
-            int maximumLegacyBaseScore = maximumLegacyAccuracyScore + maximumLegacyComboScore;
+            long maximumLegacyBaseScore = maximumLegacyAccuracyScore + maximumLegacyComboScore;
 
             // The combo proportion is calculated as a proportion of maximumLegacyBaseScore.
             double comboProportion = Math.Min(1, (double)score.LegacyTotalScore / maximumLegacyBaseScore);

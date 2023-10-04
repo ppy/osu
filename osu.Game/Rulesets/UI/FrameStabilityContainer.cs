@@ -264,8 +264,6 @@ namespace osu.Game.Rulesets.UI
 
         public double FramesPerSecond => framedClock.FramesPerSecond;
 
-        public FrameTimeInfo TimeInfo => framedClock.TimeInfo;
-
         public double StartTime => parentGameplayClock?.StartTime ?? 0;
 
         private readonly AudioAdjustments gameplayAdjustments = new AudioAdjustments();

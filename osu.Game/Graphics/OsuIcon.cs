@@ -89,6 +89,8 @@ namespace osu.Game.Graphics
         public static IconUsage ModSpunOut => Get(0xe046);
         public static IconUsage ModSuddenDeath => Get(0xe047);
         public static IconUsage ModTarget => Get(0xe048);
-        public static IconUsage ModBg => Get(0xe04a);
+
+        // Use "Icons/BeatmapDetails/mod-icon" instead
+        // public static IconUsage ModBg => Get(0xe04a);
     }
 }

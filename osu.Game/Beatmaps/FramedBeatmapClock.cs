@@ -216,8 +216,6 @@ namespace osu.Game.Beatmaps
 
         public double FramesPerSecond => finalClockSource.FramesPerSecond;
 
-        public FrameTimeInfo TimeInfo => finalClockSource.TimeInfo;
-
         #endregion
 
         protected override void Dispose(bool isDisposing)
