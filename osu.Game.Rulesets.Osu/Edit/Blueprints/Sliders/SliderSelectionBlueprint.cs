@@ -315,7 +315,6 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders
                     StartTime = HitObject.StartTime,
                     Position = HitObject.Position + splitControlPoints[0].Position,
                     NewCombo = HitObject.NewCombo,
-                    LegacyLastTickOffset = HitObject.LegacyLastTickOffset,
                     Samples = HitObject.Samples.Select(s => s.With()).ToList(),
                     RepeatCount = HitObject.RepeatCount,
                     NodeSamples = HitObject.NodeSamples.Select(n => (IList<HitSampleInfo>)n.Select(s => s.With()).ToList()).ToList(),
