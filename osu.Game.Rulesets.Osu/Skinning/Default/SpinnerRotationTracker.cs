@@ -120,13 +120,13 @@ namespace osu.Game.Rulesets.Osu.Skinning.Default
 
         private void resetState(DrawableHitObject obj)
         {
-            Tracking = default;
-            IsSpinning.Value = default;
-            mousePosition = default;
-            lastAngle = default;
-            currentRotation = default;
-            Rotation = default;
-            rotationTransferred = default;
+            Tracking = false;
+            IsSpinning.Value = false;
+            mousePosition = null;
+            lastAngle = null;
+            currentRotation = 0;
+            Rotation = 0;
+            rotationTransferred = false;
         }
 
         protected override void Dispose(bool isDisposing)
