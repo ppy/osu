@@ -158,8 +158,6 @@ namespace osu.Game.Screens.Edit
 
         public double CurrentTime => underlyingClock.CurrentTime;
 
-        public double TotalAppliedOffset => underlyingClock.TotalAppliedOffset;
-
         public void Reset()
         {
             ClearTransforms();
