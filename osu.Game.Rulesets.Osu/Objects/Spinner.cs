@@ -70,8 +70,11 @@ namespace osu.Game.Rulesets.Osu.Objects
 
             double secondsDuration = Duration / 1000;
 
-            SpinsRequired = (int)(minRps * secondsDuration);
-            MaximumBonusSpins = Math.Max(0, (int)(maxRps * secondsDuration) - SpinsRequired - bonus_spins_gap);
+            // Allow a 0.1ms floating point precision error in the calculation of the duration.
+            const double duration_error = 0.0001;
+
+            SpinsRequired = (int)(minRps * secondsDuration + duration_error);
+            MaximumBonusSpins = Math.Max(0, (int)(maxRps * secondsDuration + duration_error) - SpinsRequired - bonus_spins_gap);
         }
 
         protected override void CreateNestedHitObjects(CancellationToken cancellationToken)
