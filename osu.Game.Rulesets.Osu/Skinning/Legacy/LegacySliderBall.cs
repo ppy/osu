@@ -47,7 +47,7 @@ namespace osu.Game.Rulesets.Osu.Skinning.Legacy
                 {
                     Anchor = Anchor.Centre,
                     Origin = Anchor.Centre,
-                    Texture = skin.GetTexture("sliderb-nd")?.WithMaximumSize(OsuHitObject.OBJECT_DIMENSIONS),
+                    Texture = skin.GetTexture("sliderb-nd")?.WithMaximumSize(OsuHitObject.OBJECT_DIMENSIONS * 2),
                     Colour = new Color4(5, 5, 5, 255),
                 },
                 LegacyColourCompatibility.ApplyWithDoubledAlpha(animationContent.With(d =>
@@ -59,7 +59,7 @@ namespace osu.Game.Rulesets.Osu.Skinning.Legacy
                 {
                     Anchor = Anchor.Centre,
                     Origin = Anchor.Centre,
-                    Texture = skin.GetTexture("sliderb-spec")?.WithMaximumSize(OsuHitObject.OBJECT_DIMENSIONS),
+                    Texture = skin.GetTexture("sliderb-spec")?.WithMaximumSize(OsuHitObject.OBJECT_DIMENSIONS * 2),
                     Blending = BlendingParameters.Additive,
                 },
             };

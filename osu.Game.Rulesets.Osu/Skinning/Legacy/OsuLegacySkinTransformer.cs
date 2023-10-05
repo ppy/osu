@@ -42,14 +42,14 @@ namespace osu.Game.Rulesets.Osu.Skinning.Legacy
                         return this.GetAnimation("sliderscorepoint", false, false);
 
                     case OsuSkinComponents.SliderFollowCircle:
-                        var followCircleContent = this.GetAnimation("sliderfollowcircle", true, true, true, maxSize: new Vector2(308f));
+                        var followCircleContent = this.GetAnimation("sliderfollowcircle", true, true, true, maxSize: OsuHitObject.OBJECT_DIMENSIONS * 3);
                         if (followCircleContent != null)
                             return new LegacyFollowCircle(followCircleContent);
 
                         return null;
 
                     case OsuSkinComponents.SliderBall:
-                        var sliderBallContent = this.GetAnimation("sliderb", true, true, animationSeparator: "", maxSize: OsuHitObject.OBJECT_DIMENSIONS);
+                        var sliderBallContent = this.GetAnimation("sliderb", true, true, animationSeparator: "", maxSize: OsuHitObject.OBJECT_DIMENSIONS * 2);
 
                         // todo: slider ball has a custom frame delay based on velocity
                         // Math.Max((150 / Velocity) * GameBase.SIXTY_FRAME_TIME, GameBase.SIXTY_FRAME_TIME);
@@ -139,7 +139,7 @@ namespace osu.Game.Rulesets.Osu.Skinning.Legacy
                         if (!this.HasFont(LegacyFont.HitCircle))
                             return null;
 
-                        return new LegacySpriteText(LegacyFont.HitCircle, OsuHitObject.OBJECT_DIMENSIONS)
+                        return new LegacySpriteText(LegacyFont.HitCircle, OsuHitObject.OBJECT_DIMENSIONS * 2)
                         {
                             // stable applies a blanket 0.8x scale to hitcircle fonts
                             Scale = new Vector2(0.8f),
