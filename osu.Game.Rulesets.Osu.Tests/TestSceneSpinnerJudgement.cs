@@ -56,10 +56,9 @@ namespace osu.Game.Rulesets.Osu.Tests
             AddAssert("all max judgements", () => judgementResults.All(result => result.Type == result.Judgement.MaxResult));
         }
 
-        private static List<ReplayFrame> generateReplay(int spins) => SpinFramesGenerator
-                                                                      .From(0)
+        private static List<ReplayFrame> generateReplay(int spins) => new SpinFramesGenerator(time_spinner_start)
                                                                       .Spin(spins, time_spinner_end - time_spinner_start)
-                                                                      .Build(time_spinner_start, 50);
+                                                                      .Build();
 
         private void performTest(List<ReplayFrame> frames)
         {

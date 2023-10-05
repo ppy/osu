@@ -96,10 +96,9 @@ namespace osu.Game.Rulesets.Osu.Tests
         [TestCase(-2f, 2)]
         public void TestSpinSingleDirection(float amount, int expectedTicks)
         {
-            performTest(
-                SpinFramesGenerator.From(0)
-                                   .Spin(amount, 500)
-                                   .Build(time_spinner_start, 50));
+            performTest(new SpinFramesGenerator(time_spinner_start)
+                        .Spin(amount, 500)
+                        .Build());
 
             assertTicksHit(expectedTicks);
             assertSpinnerHit(false);
@@ -112,11 +111,10 @@ namespace osu.Game.Rulesets.Osu.Tests
         [Test]
         public void TestSpinHalfBothDirections()
         {
-            performTest(
-                SpinFramesGenerator.From(0)
-                                   .Spin(0.5f, 500) // Rotate to +0.5.
-                                   .Spin(-1f, 500) // Rotate to -0.5
-                                   .Build(time_spinner_start, 50));
+            performTest(new SpinFramesGenerator(time_spinner_start)
+                        .Spin(0.5f, 500) // Rotate to +0.5.
+                        .Spin(-1f, 500) // Rotate to -0.5
+                        .Build());
 
             assertTicksHit(0);
             assertSpinnerHit(false);
@@ -131,11 +129,10 @@ namespace osu.Game.Rulesets.Osu.Tests
         [TestCase(-0.5f, 2.5f, 2)]
         public void TestSpinOneDirectionThenChangeDirection(float direction1, float direction2, int expectedTicks)
         {
-            performTest(
-                SpinFramesGenerator.From(0)
-                                   .Spin(direction1, 500)
-                                   .Spin(direction2, 500)
-                                   .Build(time_spinner_start, 50));
+            performTest(new SpinFramesGenerator(time_spinner_start)
+                        .Spin(direction1, 500)
+                        .Spin(direction2, 500)
+                        .Build());
 
             assertTicksHit(expectedTicks);
             assertSpinnerHit(false);

@@ -361,10 +361,9 @@ namespace osu.Game.Rulesets.Osu.Tests
                 new OsuReplayFrame { Time = time_spinner - 90, Position = positionCircle, Actions = { OsuAction.LeftButton } },
             };
 
-            frames.AddRange(SpinFramesGenerator
-                            .From(0)
+            frames.AddRange(new SpinFramesGenerator(time_spinner + 10)
                             .Spin(1, 500)
-                            .Build(time_spinner + 10, 50));
+                            .Build());
 
             performTest(hitObjects, frames);
 

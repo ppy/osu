@@ -16,69 +16,80 @@ namespace osu.Game.Rulesets.Osu.Tests
         /// </summary>
         private const float spin_error = MathF.PI / 8;
 
-        private readonly SpinFramesGenerator? last;
+        /// <summary>
+        /// The offset from the centre of the spinner at which to spin.
+        /// </summary>
+        private const float centre_spin_offset = 50;
+
+        private readonly double startTime;
         private readonly float startAngle;
-        private readonly float endAngle;
-        private readonly double duration;
+        private readonly List<(float deltaAngle, double duration)> sequences = new List<(float deltaAngle, double duration)>();
 
-        private SpinFramesGenerator(float startAngle)
-            : this(null, startAngle, 0)
+        /// <summary>
+        /// Creates a new <see cref="SpinFramesGenerator"/> that can be used to generate spinner spin frames.
+        /// </summary>
+        /// <param name="startTime">The time at which to start spinning.</param>
+        /// <param name="startAngle">The angle, in radians, at which to start spinning from. Defaults to the positive-y-axis.</param>
+        public SpinFramesGenerator(double startTime, float startAngle = -MathF.PI / 2f)
         {
+            this.startTime = startTime;
+            this.startAngle = startAngle;
         }
 
-        private SpinFramesGenerator(SpinFramesGenerator? last, float endAngle, double duration)
-        {
-            this.last = last;
-            startAngle = last?.endAngle ?? endAngle;
-            this.endAngle = endAngle;
-            this.duration = duration;
-        }
-
-        public List<ReplayFrame> Build(double spinnerStartTime, float spinOffset)
+        /// <summary>
+        /// Constructs the replay frames.
+        /// </summary>
+        /// <returns>The replay frames.</returns>
+        public List<ReplayFrame> Build()
         {
             List<ReplayFrame> frames = new List<ReplayFrame>();
 
-            List<SpinFramesGenerator> allGenerators = new List<SpinFramesGenerator>();
+            double currentTime = startTime;
+            float currentAngle = startAngle;
 
-            SpinFramesGenerator? l = this;
-
-            while (l != null)
+            foreach (var seq in sequences)
             {
-                allGenerators.Add(l);
-                l = l.last;
+                double seqStartTime = currentTime;
+                double seqEndTime = currentTime + seq.duration;
+                float seqEndAngle = currentAngle + seq.deltaAngle;
+
+                // Intermediate spin frames.
+                for (; currentTime < seqEndTime; currentTime += 10)
+                    frames.Add(new OsuReplayFrame(currentTime, calcOffsetAt((currentTime - seqStartTime) / (seqEndTime - seqStartTime), currentAngle, seqEndAngle), OsuAction.LeftButton));
+
+                // Final frame at the end of the current spin.
+                frames.Add(new OsuReplayFrame(currentTime, calcOffsetAt(1, currentAngle, seqEndAngle), OsuAction.LeftButton));
+
+                currentTime = seqEndTime;
+                currentAngle = seqEndAngle;
             }
 
-            allGenerators.Reverse();
-
-            double currentTime = spinnerStartTime;
-
-            foreach (var gen in allGenerators)
-            {
-                double startTime = currentTime;
-                double endTime = currentTime + gen.duration;
-
-                for (; currentTime < endTime; currentTime += 10)
-                    frames.Add(new OsuReplayFrame(currentTime, calcOffsetAt(gen, spinOffset, (currentTime - startTime) / (endTime - startTime)), OsuAction.LeftButton));
-
-                frames.Add(new OsuReplayFrame(currentTime, calcOffsetAt(gen, spinOffset, 1), OsuAction.LeftButton));
-            }
-
-            frames.Add(new OsuReplayFrame(currentTime, calcOffsetAt(this, spinOffset, 1)));
+            // Key release frame.
+            if (frames.Count > 0)
+                frames.Add(new OsuReplayFrame(frames[^1].Time, ((OsuReplayFrame)frames[^1]).Position));
 
             return frames;
         }
 
-        private static Vector2 calcOffsetAt(SpinFramesGenerator generator, float spinOffset, double p)
+        private static Vector2 calcOffsetAt(double p, float startAngle, float endAngle)
         {
-            int direction = Math.Sign(generator.endAngle - generator.startAngle);
-            float errorAdjustedEndAngle = generator.endAngle + spin_error * direction;
+            int direction = Math.Sign(endAngle - startAngle);
+            float errorAdjustedEndAngle = endAngle + spin_error * direction;
 
-            float angle = generator.startAngle + (errorAdjustedEndAngle - generator.startAngle) * (float)p;
-            return new Vector2(256, 192) + spinOffset * new Vector2(MathF.Cos(angle), MathF.Sin(angle));
+            float angle = startAngle + (errorAdjustedEndAngle - startAngle) * (float)p;
+            return new Vector2(256, 192) + centre_spin_offset * new Vector2(MathF.Cos(angle), MathF.Sin(angle));
         }
 
-        public static SpinFramesGenerator From(float startAngle) => new SpinFramesGenerator(startAngle - MathF.PI / 2f);
-
-        public SpinFramesGenerator Spin(float amount, double duration) => new SpinFramesGenerator(this, endAngle + amount * 2 * MathF.PI, duration);
+        /// <summary>
+        /// Performs a single spin.
+        /// </summary>
+        /// <param name="delta">The amount, relative to a full circle, to spin.</param>
+        /// <param name="duration">The time to spend to perform the spin.</param>
+        /// <returns>This <see cref="SpinFramesGenerator"/>.</returns>
+        public SpinFramesGenerator Spin(float delta, double duration)
+        {
+            sequences.Add((delta * 2 * MathF.PI, duration));
+            return this;
+        }
     }
 }
