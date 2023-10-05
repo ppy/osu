@@ -17,6 +17,7 @@ using osu.Framework.Graphics.Shapes;
 using osu.Framework.Input.Events;
 using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Taiko.Skinning.Default;
+using osu.Game.Screens.Play;
 using osu.Game.Skinning;
 
 namespace osu.Game.Rulesets.Taiko.Objects.Drawables
@@ -269,6 +270,9 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
                 ProxyContent();
             else
                 UnproxyContent();
+
+            if ((Clock as IGameplayClock)?.IsRewinding == true)
+                lastPressHandleTime = null;
         }
 
         private bool? lastWasCentre;
