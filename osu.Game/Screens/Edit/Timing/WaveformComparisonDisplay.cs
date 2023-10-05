@@ -191,6 +191,10 @@ namespace osu.Game.Screens.Edit.Timing
 
         private void regenerateDisplay(bool animated)
         {
+            // Before a track is loaded, it won't have a valid length, which will break things.
+            if (!beatmap.Value.Track.IsLoaded)
+                return;
+
             double index = (displayedTime - selectedGroupStartTime) / timingPoint.BeatLength;
 
             // Chosen as a pretty usable number across all BPMs.
