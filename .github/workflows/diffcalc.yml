@@ -2,8 +2,6 @@
 #
 # Uses [diffcalc-sheet-generator](https://github.com/smoogipoo/diffcalc-sheet-generator) to run two builds of osu and generate an SR/PP/Score comparison spreadsheet.
 #
-# Can be dispatched both via GitHub -> Actions workflow, or via '!diffcalc' in an issue/PR comment.
-#
 # ## Requirements
 #
 # Self-hosted runner with installed:
