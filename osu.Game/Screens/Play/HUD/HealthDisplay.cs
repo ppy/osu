@@ -66,8 +66,8 @@ namespace osu.Game.Screens.Play.HUD
             health = HealthProcessor.Health.GetBoundCopy();
             health.BindValueChanged(h =>
             {
-                Current.Value = h.NewValue;
                 finishInitialAnimation();
+                Current.Value = h.NewValue;
             });
 
             if (hudOverlay != null)
@@ -103,6 +103,11 @@ namespace osu.Game.Screens.Play.HUD
         {
             initialIncrease?.Cancel();
             initialIncrease = null;
+
+            // aside from the repeating `initialIncrease` scheduled task,
+            // there may also be a `Current` transform in progress from that schedule.
+            // ensure it plays out fully, to prevent changes to `Current.Value` being discarded by the ongoing transform.
+            FinishTransforms();
         }
 
         private void onNewJudgement(JudgementResult judgement)
