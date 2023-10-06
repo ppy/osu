@@ -234,7 +234,5 @@ namespace osu.Game.Screens.Play
         public double ElapsedFrameTime => GameplayClock.ElapsedFrameTime;
 
         public double FramesPerSecond => GameplayClock.FramesPerSecond;
-
-        public FrameTimeInfo TimeInfo => GameplayClock.TimeInfo;
     }
 }

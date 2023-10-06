@@ -231,8 +231,6 @@ namespace osu.Game.Screens.Edit
 
         public double FramesPerSecond => underlyingClock.FramesPerSecond;
 
-        public FrameTimeInfo TimeInfo => underlyingClock.TimeInfo;
-
         public void ChangeSource(IClock source)
         {
             track.Value = source as Track;

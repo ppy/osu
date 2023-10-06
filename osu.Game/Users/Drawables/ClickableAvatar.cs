@@ -6,14 +6,13 @@ using osu.Framework.Allocation;
 using osu.Framework.Input.Events;
 using osu.Framework.Localisation;
 using osu.Game.Graphics.Containers;
+using osu.Game.Localisation;
 using osu.Game.Online.API.Requests.Responses;
 
 namespace osu.Game.Users.Drawables
 {
     public partial class ClickableAvatar : OsuClickableContainer
     {
-        private const string default_tooltip_text = "view profile";
-
         public override LocalisableString TooltipText
         {
             get
@@ -21,7 +20,7 @@ namespace osu.Game.Users.Drawables
                 if (!Enabled.Value)
                     return string.Empty;
 
-                return ShowUsernameTooltip ? (user?.Username ?? string.Empty) : default_tooltip_text;
+                return ShowUsernameTooltip ? (user?.Username ?? string.Empty) : ContextMenuStrings.ViewProfile;
             }
             set => throw new NotSupportedException();
         }

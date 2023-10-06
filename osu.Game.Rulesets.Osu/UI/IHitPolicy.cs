@@ -3,6 +3,7 @@
 
 using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Objects.Drawables;
+using osu.Game.Rulesets.Scoring;
 using osu.Game.Rulesets.UI;
 
 namespace osu.Game.Rulesets.Osu.UI
@@ -19,8 +20,9 @@ namespace osu.Game.Rulesets.Osu.UI
         /// </summary>
         /// <param name="hitObject">The <see cref="DrawableHitObject"/> to check.</param>
         /// <param name="time">The time to check.</param>
+        /// <param name="result">The result that the object would be judged with if hit.</param>
         /// <returns>Whether <paramref name="hitObject"/> can be hit at the given <paramref name="time"/>.</returns>
-        bool IsHittable(DrawableHitObject hitObject, double time);
+        ClickAction CheckHittable(DrawableHitObject hitObject, double time, HitResult result);
 
         /// <summary>
         /// Handles a <see cref="HitObject"/> being hit.

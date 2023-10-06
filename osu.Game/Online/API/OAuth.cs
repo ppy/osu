@@ -99,9 +99,14 @@ namespace osu.Game.Online.API
                     return true;
                 }
             }
+            catch (HttpRequestException)
+            {
+                // Network failure.
+                return false;
+            }
             catch
             {
-                //todo: potentially only kill the refresh token on certain exception types.
+                // Force a full re-reauthentication.
                 Token.Value = null;
                 return false;
             }
