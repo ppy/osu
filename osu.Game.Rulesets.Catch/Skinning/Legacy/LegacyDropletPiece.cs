@@ -9,7 +9,7 @@ namespace osu.Game.Rulesets.Catch.Skinning.Legacy
 {
     public partial class LegacyDropletPiece : LegacyCatchHitObjectPiece
     {
-        private static readonly Vector2 droplet_max_size = new Vector2(82, 103);
+        private static readonly Vector2 droplet_max_size = new Vector2(160);
 
         public LegacyDropletPiece()
         {

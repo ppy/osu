@@ -7,7 +7,6 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Sprites;
 using osu.Game.Rulesets.Objects.Drawables;
-using osu.Game.Rulesets.Osu.Objects;
 using osu.Game.Rulesets.Osu.Objects.Drawables;
 using osu.Game.Skinning;
 using osuTK.Graphics;
@@ -47,7 +46,7 @@ namespace osu.Game.Rulesets.Osu.Skinning.Legacy
                 {
                     Anchor = Anchor.Centre,
                     Origin = Anchor.Centre,
-                    Texture = skin.GetTexture("sliderb-nd")?.WithMaximumSize(OsuHitObject.OBJECT_DIMENSIONS),
+                    Texture = skin.GetTexture("sliderb-nd")?.WithMaximumSize(OsuLegacySkinTransformer.MAX_FOLLOW_CIRCLE_AREA_SIZE),
                     Colour = new Color4(5, 5, 5, 255),
                 },
                 LegacyColourCompatibility.ApplyWithDoubledAlpha(animationContent.With(d =>
@@ -59,7 +58,7 @@ namespace osu.Game.Rulesets.Osu.Skinning.Legacy
                 {
                     Anchor = Anchor.Centre,
                     Origin = Anchor.Centre,
-                    Texture = skin.GetTexture("sliderb-spec")?.WithMaximumSize(OsuHitObject.OBJECT_DIMENSIONS),
+                    Texture = skin.GetTexture("sliderb-spec")?.WithMaximumSize(OsuLegacySkinTransformer.MAX_FOLLOW_CIRCLE_AREA_SIZE),
                     Blending = BlendingParameters.Additive,
                 },
             };
