@@ -11,7 +11,6 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Colour;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Lines;
-using osu.Framework.Graphics.Shapes;
 using osu.Framework.Layout;
 using osu.Framework.Threading;
 using osu.Framework.Utils;
@@ -96,7 +95,7 @@ namespace osu.Game.Screens.Play.HUD
             }
         }
 
-        private const float left_line_width = 50f;
+        private const float main_path_radius = 10f;
 
         [BackgroundDependencyLoader]
         private void load()
@@ -104,51 +103,37 @@ namespace osu.Game.Screens.Play.HUD
             RelativeSizeAxes = Axes.X;
             AutoSizeAxes = Axes.Y;
 
-            InternalChild = new FillFlowContainer
+            InternalChild = new Container
             {
                 AutoSizeAxes = Axes.Both,
-                Direction = FillDirection.Horizontal,
-                Spacing = new Vector2(4f, 0f),
                 Children = new Drawable[]
                 {
-                    new Circle
+                    background = new BackgroundPath
                     {
-                        Margin = new MarginPadding { Top = 8.5f, Left = -2 },
-                        Size = new Vector2(left_line_width, 3f),
+                        PathRadius = main_path_radius,
                     },
-                    new Container
+                    glowBar = new BarPath
                     {
-                        AutoSizeAxes = Axes.Both,
-                        Children = new Drawable[]
-                        {
-                            background = new BackgroundPath
-                            {
-                                PathRadius = 10f,
-                            },
-                            glowBar = new BarPath
-                            {
-                                BarColour = Color4.White,
-                                GlowColour = OsuColour.Gray(0.5f),
-                                Blending = BlendingParameters.Additive,
-                                Colour = ColourInfo.GradientHorizontal(Color4.White.Opacity(0.8f), Color4.White),
-                                PathRadius = 40f,
-                                // Kinda hacky, but results in correct positioning with increased path radius.
-                                Margin = new MarginPadding(-30f),
-                                GlowPortion = 0.9f,
-                            },
-                            mainBar = new BarPath
-                            {
-                                AutoSizeAxes = Axes.None,
-                                RelativeSizeAxes = Axes.Both,
-                                Blending = BlendingParameters.Additive,
-                                BarColour = main_bar_colour,
-                                GlowColour = main_bar_glow_colour,
-                                PathRadius = 10f,
-                                GlowPortion = 0.6f,
-                            },
-                        }
-                    }
-                },
+                        BarColour = Color4.White,
+                        GlowColour = OsuColour.Gray(0.5f),
+                        Blending = BlendingParameters.Additive,
+                        Colour = ColourInfo.GradientHorizontal(Color4.White.Opacity(0.8f), Color4.White),
+                        PathRadius = 40f,
+                        // Kinda hacky, but results in correct positioning with increased path radius.
+                        Margin = new MarginPadding(-30f),
+                        GlowPortion = 0.9f,
+                    },
+                    mainBar = new BarPath
+                    {
+                        AutoSizeAxes = Axes.None,
+                        RelativeSizeAxes = Axes.Both,
+                        Blending = BlendingParameters.Additive,
+                        BarColour = main_bar_colour,
+                        GlowColour = main_bar_glow_colour,
+                        PathRadius = main_path_radius,
+                        GlowPortion = 0.6f,
+                    },
+                }
             };
         }
 
@@ -247,7 +232,7 @@ namespace osu.Game.Screens.Play.HUD
 
         private void updatePath()
         {
-            float barLength = DrawWidth - left_line_width - 24;
+            float barLength = DrawWidth - main_path_radius * 2;
             float curveStart = barLength - 70;
             float curveEnd = barLength - 40;
 
