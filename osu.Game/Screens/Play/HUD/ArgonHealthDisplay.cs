@@ -5,14 +5,17 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using osu.Framework.Allocation;
+using osu.Framework.Bindables;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Colour;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Lines;
 using osu.Framework.Graphics.Shapes;
+using osu.Framework.Layout;
 using osu.Framework.Threading;
 using osu.Framework.Utils;
+using osu.Game.Configuration;
 using osu.Game.Graphics;
 using osu.Game.Rulesets.Judgements;
 using osu.Game.Rulesets.Objects;
@@ -26,6 +29,23 @@ namespace osu.Game.Screens.Play.HUD
     public partial class ArgonHealthDisplay : HealthDisplay, ISerialisableDrawable
     {
         public bool UsesFixedAnchor { get; set; }
+
+        [SettingSource("Bar height")]
+        public BindableFloat BarHeight { get; } = new BindableFloat
+        {
+            Default = 32,
+            MinValue = 0,
+            MaxValue = 64,
+            Precision = 1
+        };
+
+        [SettingSource("Bar length")]
+        public BindableFloat BarLength { get; } = new BindableFloat(1)
+        {
+            MinValue = 0.2f,
+            MaxValue = 1,
+            Precision = 0.01f,
+        };
 
         private BarPath mainBar = null!;
 
@@ -76,10 +96,13 @@ namespace osu.Game.Screens.Play.HUD
             }
         }
 
+        private const float left_line_width = 50f;
+
         [BackgroundDependencyLoader]
         private void load()
         {
-            AutoSizeAxes = Axes.Both;
+            RelativeSizeAxes = Axes.X;
+            AutoSizeAxes = Axes.Y;
 
             InternalChild = new FillFlowContainer
             {
@@ -91,7 +114,7 @@ namespace osu.Game.Screens.Play.HUD
                     new Circle
                     {
                         Margin = new MarginPadding { Top = 8.5f, Left = -2 },
-                        Size = new Vector2(50f, 3f),
+                        Size = new Vector2(left_line_width, 3f),
                     },
                     new Container
                     {
@@ -127,8 +150,6 @@ namespace osu.Game.Screens.Play.HUD
                     }
                 },
             };
-
-            updatePath();
         }
 
         protected override void LoadComplete()
@@ -144,6 +165,18 @@ namespace osu.Game.Screens.Play.HUD
                 if (resetMissBarDelegate == null)
                     this.TransformTo(nameof(GlowBarValue), v.NewValue, 300, Easing.OutQuint);
             }, true);
+
+            BarLength.BindValueChanged(l => Width = l.NewValue, true);
+            BarHeight.BindValueChanged(_ => updatePath());
+            updatePath();
+        }
+
+        protected override bool OnInvalidate(Invalidation invalidation, InvalidationSource source)
+        {
+            if ((invalidation & Invalidation.DrawSize) > 0)
+                updatePath();
+
+            return base.OnInvalidate(invalidation, source);
         }
 
         protected override void Update()
@@ -214,25 +247,24 @@ namespace osu.Game.Screens.Play.HUD
 
         private void updatePath()
         {
-            const float curve_start = 280;
-            const float curve_end = 310;
+            float barLength = DrawWidth - left_line_width - 24;
+            float curveStart = barLength - 70;
+            float curveEnd = barLength - 40;
+
             const float curve_smoothness = 10;
 
-            const float bar_length = 350;
-            const float bar_verticality = 32.5f;
-
-            Vector2 diagonalDir = (new Vector2(curve_end, bar_verticality) - new Vector2(curve_start, 0)).Normalized();
+            Vector2 diagonalDir = (new Vector2(curveEnd, BarHeight.Value) - new Vector2(curveStart, 0)).Normalized();
 
             barPath = new SliderPath(new[]
             {
                 new PathControlPoint(new Vector2(0, 0), PathType.Linear),
-                new PathControlPoint(new Vector2(curve_start - curve_smoothness, 0), PathType.Bezier),
-                new PathControlPoint(new Vector2(curve_start, 0)),
-                new PathControlPoint(new Vector2(curve_start, 0) + diagonalDir * curve_smoothness, PathType.Linear),
-                new PathControlPoint(new Vector2(curve_end, bar_verticality) - diagonalDir * curve_smoothness, PathType.Bezier),
-                new PathControlPoint(new Vector2(curve_end, bar_verticality)),
-                new PathControlPoint(new Vector2(curve_end + curve_smoothness, bar_verticality), PathType.Linear),
-                new PathControlPoint(new Vector2(bar_length, bar_verticality)),
+                new PathControlPoint(new Vector2(curveStart - curve_smoothness, 0), PathType.Bezier),
+                new PathControlPoint(new Vector2(curveStart, 0)),
+                new PathControlPoint(new Vector2(curveStart, 0) + diagonalDir * curve_smoothness, PathType.Linear),
+                new PathControlPoint(new Vector2(curveEnd, BarHeight.Value) - diagonalDir * curve_smoothness, PathType.Bezier),
+                new PathControlPoint(new Vector2(curveEnd, BarHeight.Value)),
+                new PathControlPoint(new Vector2(curveEnd + curve_smoothness, BarHeight.Value), PathType.Linear),
+                new PathControlPoint(new Vector2(barLength, BarHeight.Value)),
             });
 
             List<Vector2> vertices = new List<Vector2>();
@@ -267,7 +299,7 @@ namespace osu.Game.Screens.Play.HUD
         {
             protected override Color4 ColourAt(float position)
             {
-                if (position <= 0.128f)
+                if (position <= 0.16f)
                     return Color4.White.Opacity(0.8f);
 
                 return Interpolation.ValueAt(position,
