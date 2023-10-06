@@ -30,16 +30,15 @@ namespace osu.Game.Screens.Play.HUD
         public bool UsesFixedAnchor { get; set; }
 
         [SettingSource("Bar height")]
-        public BindableFloat BarHeight { get; } = new BindableFloat
+        public BindableFloat BarHeight { get; } = new BindableFloat(20)
         {
-            Default = 32,
             MinValue = 0,
             MaxValue = 64,
             Precision = 1
         };
 
         [SettingSource("Bar length")]
-        public BindableFloat BarLength { get; } = new BindableFloat(1)
+        public BindableFloat BarLength { get; } = new BindableFloat(0.98f)
         {
             MinValue = 0.2f,
             MaxValue = 1,
