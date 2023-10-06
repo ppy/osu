@@ -103,8 +103,12 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
 
         private void rewindDelta(double currentTime, float delta)
         {
+            int lastDirection = currentSpinSegment.Direction;
+
             while (currentTime < currentSpinSegment.StartTime)
             {
+                lastDirection = currentSpinSegment.Direction;
+
                 // When crossing over a segment, we need to adjust the delta so that it's relative to the end point of the next segment.
                 //
                 // This is done by ADDING the delta between the current segment and the next segment.
@@ -128,14 +132,24 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
 
             currentSpinSegment.CurrentRotation += delta;
 
-            // Note: Enumerating through a stack is already reverse order.
-            currentMaxRotation = segments.Prepend(currentSpinSegment)
-                                         .TakeWhile(t => !t.IsCompleteSpin)
-                                         .Select(t => Math.Abs(t.CurrentRotation))
-                                         .DefaultIfEmpty(0)
-                                         .Max();
+            // Check if we've rewound exactly onto a complete spin, and insert a new segment.
+            if (currentSpinSegment.IsCompleteSpin)
+            {
+                beginNewSegment(currentTime, lastDirection);
+                currentSpinSegment.CurrentRotation = 0;
+            }
 
-            TotalRotation = 360 * segments.Count(t => t.IsCompleteSpin) + currentMaxRotation;
+            // Note: Enumerating through a stack is already reverse order.
+            IEnumerable<SpinSegment> allSegments = segments.Prepend(currentSpinSegment);
+
+            currentMaxRotation = allSegments
+                                 .TakeWhile(t => !t.IsCompleteSpin)
+                                 .Select(t => Math.Abs(t.CurrentRotation))
+                                 .DefaultIfEmpty(0)
+                                 .Max();
+
+            TotalRotation = 360 * allSegments.Count(t => t.IsCompleteSpin)
+                            + currentMaxRotation;
         }
 
         /// <summary>
