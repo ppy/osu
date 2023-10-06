@@ -37,6 +37,18 @@ namespace osu.Game.Rulesets.Osu.Tests
         }
 
         /// <summary>
+        /// Performs a single spin.
+        /// </summary>
+        /// <param name="delta">The amount, relative to a full circle, to spin.</param>
+        /// <param name="duration">The time to spend to perform the spin.</param>
+        /// <returns>This <see cref="SpinFramesGenerator"/>.</returns>
+        public SpinFramesGenerator Spin(float delta, double duration)
+        {
+            sequences.Add((delta * 2 * MathF.PI, duration));
+            return this;
+        }
+
+        /// <summary>
         /// Constructs the replay frames.
         /// </summary>
         /// <returns>The replay frames.</returns>
@@ -78,18 +90,6 @@ namespace osu.Game.Rulesets.Osu.Tests
 
             float angle = startAngle + (errorAdjustedEndAngle - startAngle) * (float)p;
             return new Vector2(256, 192) + centre_spin_offset * new Vector2(MathF.Cos(angle), MathF.Sin(angle));
-        }
-
-        /// <summary>
-        /// Performs a single spin.
-        /// </summary>
-        /// <param name="delta">The amount, relative to a full circle, to spin.</param>
-        /// <param name="duration">The time to spend to perform the spin.</param>
-        /// <returns>This <see cref="SpinFramesGenerator"/>.</returns>
-        public SpinFramesGenerator Spin(float delta, double duration)
-        {
-            sequences.Add((delta * 2 * MathF.PI, duration));
-            return this;
         }
     }
 }
