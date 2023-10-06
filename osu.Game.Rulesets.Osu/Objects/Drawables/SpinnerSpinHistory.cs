@@ -145,7 +145,6 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
             currentMaxRotation = allSegments
                                  .TakeWhile(t => !t.IsCompleteSpin)
                                  .Select(t => Math.Abs(t.CurrentRotation))
-                                 .DefaultIfEmpty(0)
                                  .Max();
 
             TotalRotation = 360 * allSegments.Count(t => t.IsCompleteSpin)
