@@ -36,7 +36,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
         /// <item>A full spin of 360 degrees was performed in either direction.</item>
         /// </list>
         /// </summary>
-        private readonly Stack<Turn> turningPoints = new Stack<Turn>();
+        private readonly Stack<SpinSegment> turningPoints = new Stack<SpinSegment>();
 
         /// <summary>
         /// The current partial spin - the maximum absolute rotation among all turning points since the last spin.
@@ -44,9 +44,9 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
         private float currentMaxRotation;
 
         /// <summary>
-        /// The current turn.
+        /// The current segment.
         /// </summary>
-        private Turn currentTurn;
+        private SpinSegment currentSpinSegment;
 
         /// <summary>
         /// Report a delta update based on user input.
@@ -55,7 +55,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
         /// <param name="deltaAngle">The delta of the angle moved through since the last report.</param>
         public void ReportDelta(double currentTime, float deltaAngle)
         {
-            if (currentTime >= currentTurn.StartTime)
+            if (currentTime >= currentSpinSegment.StartTime)
                 addDelta(currentTime, deltaAngle);
             else
                 rewindDelta(currentTime, deltaAngle);
@@ -68,33 +68,33 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
 
             int direction = Math.Sign(delta);
 
-            // Start a new turn if this is the first delta, to track the correct direction.
-            if (currentTurn.Direction == 0)
+            // Start a new segment if this is the first delta, to track the correct direction.
+            if (currentSpinSegment.Direction == 0)
                 beginNewTurn(double.NegativeInfinity, direction);
 
-            // Start a new turn if we've changed direction.
-            if (currentTurn.Direction != direction)
+            // Start a new segment if we've changed direction.
+            if (currentSpinSegment.Direction != direction)
                 beginNewTurn(currentTime, direction);
 
-            currentTurn.Angle += delta;
+            currentSpinSegment.CurrentRotation += delta;
 
-            float rotation = Math.Abs(currentTurn.Angle);
+            float rotation = Math.Abs(currentSpinSegment.CurrentRotation);
 
             TotalRotation += Math.Max(0, rotation - currentMaxRotation);
 
-            // Start a new turn if we've completed a spin.
+            // Start a new segment if we've completed a spin.
             while (rotation >= 360)
             {
                 rotation -= 360;
 
-                // Make sure the current turn doesn't exceed a full spin.
-                currentTurn.Angle = Math.Clamp(currentTurn.Angle, -360, 360);
-                Debug.Assert(MathF.Abs(currentTurn.Angle) == 360);
+                // Make sure the current segment doesn't exceed a full spin.
+                currentSpinSegment.CurrentRotation = Math.Clamp(currentSpinSegment.CurrentRotation, -360, 360);
+                Debug.Assert(MathF.Abs(currentSpinSegment.CurrentRotation) == 360);
 
                 beginNewTurn(currentTime, direction);
 
-                // The new turn should be in the same direction and with the excess of the previous turn.
-                currentTurn.Angle = rotation * direction;
+                // The new segment should be in the same direction and with the excess of the previous turn.
+                currentSpinSegment.CurrentRotation = rotation * direction;
                 currentMaxRotation = 0;
             }
 
@@ -103,7 +103,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
 
         private void rewindDelta(double currentTime, float delta)
         {
-            while (currentTime < currentTurn.StartTime)
+            while (currentTime < currentSpinSegment.StartTime)
             {
                 // When crossing over a turn, we need to adjust the delta so that it's relative to the end point of the next turn.
                 //
@@ -116,20 +116,20 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
                 // There is a special case when crossing a complete spin, because the turn following it starts at 0 rather than the previous turn's value.
                 // In this case, only the remaining delta in the current turn needs to be considered.
 
-                Turn nextTurn = turningPoints.Pop();
+                SpinSegment nextSpinSegment = turningPoints.Pop();
 
-                if (nextTurn.IsCompleteSpin)
-                    delta += currentTurn.Angle;
+                if (nextSpinSegment.IsCompleteSpin)
+                    delta += currentSpinSegment.CurrentRotation;
                 else
-                    delta += currentTurn.Angle - nextTurn.Angle;
+                    delta += currentSpinSegment.CurrentRotation - nextSpinSegment.CurrentRotation;
 
-                currentTurn = nextTurn;
+                currentSpinSegment = nextSpinSegment;
             }
 
-            currentTurn.Angle += delta;
+            currentSpinSegment.CurrentRotation += delta;
 
             // Note: Enumerating through a stack is already reverse order.
-            currentMaxRotation = turningPoints.Prepend(currentTurn).TakeWhile(t => !t.IsCompleteSpin).Select(t => Math.Abs(t.Angle)).Max();
+            currentMaxRotation = turningPoints.Prepend(currentSpinSegment).TakeWhile(t => !t.IsCompleteSpin).Select(t => Math.Abs(t.CurrentRotation)).Max();
             TotalRotation = 360 * turningPoints.Count(t => t.IsCompleteSpin) + currentMaxRotation;
         }
 
@@ -140,42 +140,51 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
         /// <param name="direction">The turning direction.</param>
         private void beginNewTurn(double currentTime, int direction)
         {
-            turningPoints.Push(currentTurn);
-            currentTurn = new Turn(currentTime, direction) { Angle = currentTurn.Angle };
+            turningPoints.Push(currentSpinSegment);
+            currentSpinSegment = new SpinSegment(currentTime, direction, currentSpinSegment.CurrentRotation);
         }
 
         /// <summary>
-        /// Represents a single direction turn of the spinner.
+        /// Represents a single segment of history.
         /// </summary>
-        private struct Turn
+        /// <remarks>
+        /// Each time the player changes direction, a new segment is recorded.
+        /// A segment stores the current absolute angle of rotation. Generally this would be either -360 or 360 for a completed spin, or
+        /// a number representing the last incomplete spin.
+        /// </remarks>
+        private struct SpinSegment
         {
             /// <summary>
-            /// The start time of this turn.
+            /// The start time of this segment, when the direction change occurred.
             /// </summary>
             public readonly double StartTime;
 
             /// <summary>
-            /// The turning direction.
+            /// The direction this segment started in.
             /// </summary>
             public readonly int Direction;
 
             /// <summary>
-            /// The absolute angle.
+            /// The current rotation at the last known point in this segment.
             /// </summary>
-            public float Angle;
+            /// <remarks>
+            /// - In the case of a completed spin, this is either -360 or 360.
+            /// - For the final (or ongoing) segment, this is a value representing how close to completing the spin we are.
+            /// </remarks>
+            public float CurrentRotation;
 
             /// <summary>
-            /// Whether this turn represents a complete spin.
+            /// Whether this segment represents a complete spin.
             /// </summary>
-            public bool IsCompleteSpin => Angle == -360 || Angle == 360;
+            public bool IsCompleteSpin => CurrentRotation == -360 || CurrentRotation == 360;
 
-            public Turn(double startTime, int direction)
+            public SpinSegment(double startTime, int direction, float currentRotation)
             {
                 Debug.Assert(direction == -1 || direction == 1);
 
                 StartTime = startTime;
                 Direction = direction;
-                Angle = 0;
+                CurrentRotation = currentRotation;
             }
         }
     }
