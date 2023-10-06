@@ -25,6 +25,8 @@ namespace osu.Game.Screens.Play.HUD
         [Resolved]
         protected HealthProcessor HealthProcessor { get; private set; } = null!;
 
+        protected virtual bool PlayInitialIncreaseAnimation => true;
+
         public Bindable<double> Current { get; } = new BindableDouble
         {
             MinValue = 0,
@@ -74,7 +76,10 @@ namespace osu.Game.Screens.Play.HUD
             // this probably shouldn't be operating on `this.`
             showHealthBar.BindValueChanged(healthBar => this.FadeTo(healthBar.NewValue ? 1 : 0, HUDOverlay.FADE_DURATION, HUDOverlay.FADE_EASING), true);
 
-            startInitialAnimation();
+            if (PlayInitialIncreaseAnimation)
+                startInitialAnimation();
+            else
+                Current.Value = 1;
         }
 
         private void startInitialAnimation()
