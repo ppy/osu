@@ -23,7 +23,18 @@ namespace osu.Game.Screens.OnlinePlay
 {
     public partial class FooterButtonFreeMods : FooterButton, IHasCurrentValue<IReadOnlyList<Mod>>
     {
-        public Bindable<IReadOnlyList<Mod>> Current { get; set; } = new BindableWithCurrent<IReadOnlyList<Mod>>();
+        private readonly BindableWithCurrent<IReadOnlyList<Mod>> current = new BindableWithCurrent<IReadOnlyList<Mod>>(Array.Empty<Mod>());
+
+        public Bindable<IReadOnlyList<Mod>> Current
+        {
+            get => current.Current;
+            set
+            {
+                ArgumentNullException.ThrowIfNull(value);
+
+                current.Current = value;
+            }
+        }
 
         private OsuSpriteText count = null!;
 
