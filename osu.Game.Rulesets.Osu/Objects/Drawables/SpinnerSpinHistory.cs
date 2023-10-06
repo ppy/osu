@@ -22,7 +22,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
     public class SpinnerSpinHistory
     {
         /// <summary>
-        /// The sum of all complete spins and any current partial spin.
+        /// The sum of all complete spins and any current partial spin, in degrees.
         /// </summary>
         /// <remarks>
         /// This is the final scoring value.
@@ -49,11 +49,19 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
         private Turn currentTurn;
 
         /// <summary>
-        /// Adds an instant of spin.
+        /// Report a delta update based on user input.
         /// </summary>
         /// <param name="currentTime">The current time.</param>
-        /// <param name="delta">The rate-independent, instantaneous delta of the angle moved through. Negative values represent counter-clockwise movements, positive values represent clockwise movements.</param>
-        public void AddDelta(double currentTime, float delta)
+        /// <param name="deltaAngle">The delta of the angle moved through since the last report.</param>
+        public void ReportDelta(double currentTime, float deltaAngle)
+        {
+            if (currentTime >= currentTurn.StartTime)
+                addDelta(currentTime, deltaAngle);
+            else
+                rewindDelta(currentTime, deltaAngle);
+        }
+
+        private void addDelta(double currentTime, float delta)
         {
             if (delta == 0)
                 return;
@@ -93,12 +101,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
             currentMaxRotation = Math.Max(currentMaxRotation, rotation);
         }
 
-        /// <summary>
-        /// Removes an instant of spin.
-        /// </summary>
-        /// <param name="currentTime">The current time.</param>
-        /// <param name="delta">The rate-independent, instantaneous delta of the angle moved through. Negative values represent counter-clockwise movements, positive values represent clockwise movements.</param>
-        public void RemoveDelta(double currentTime, float delta)
+        private void rewindDelta(double currentTime, float delta)
         {
             while (currentTime < currentTurn.StartTime)
             {
@@ -157,7 +160,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
             public readonly int Direction;
 
             /// <summary>
-            /// The current angle.
+            /// The absolute angle.
             /// </summary>
             public float Angle;
 

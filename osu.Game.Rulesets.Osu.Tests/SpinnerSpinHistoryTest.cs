@@ -36,7 +36,7 @@ namespace osu.Game.Rulesets.Osu.Tests
         [TestCase(-720, 720)]
         public void TestSpinOneDirection(float spin, float expectedRotation)
         {
-            history.AddDelta(500, spin);
+            history.ReportDelta(500, spin);
             Assert.That(history.TotalRotation, Is.EqualTo(expectedRotation));
         }
 
@@ -72,9 +72,9 @@ namespace osu.Game.Rulesets.Osu.Tests
         [TestCase(-10, 20, -350, 340)]
         public void TestSpinMultipleDirections(float spin1, float spin2, float spin3, float expectedRotation)
         {
-            history.AddDelta(500, spin1);
-            history.AddDelta(1000, spin2);
-            history.AddDelta(1500, spin3);
+            history.ReportDelta(500, spin1);
+            history.ReportDelta(1000, spin2);
+            history.ReportDelta(1500, spin3);
             Assert.That(history.TotalRotation, Is.EqualTo(expectedRotation));
         }
 
@@ -86,8 +86,8 @@ namespace osu.Game.Rulesets.Osu.Tests
         [TestCase(-740, 420, 320)]
         public void TestRemoveAndCrossFullSpin(float deltaToAdd, float deltaToRemove, float expectedRotation)
         {
-            history.AddDelta(1000, deltaToAdd);
-            history.RemoveDelta(500, deltaToRemove);
+            history.ReportDelta(1000, deltaToAdd);
+            history.ReportDelta(500, deltaToRemove);
             Assert.That(history.TotalRotation, Is.EqualTo(expectedRotation));
         }
 
@@ -99,9 +99,9 @@ namespace osu.Game.Rulesets.Osu.Tests
         [TestCase(-800, 430, 50, 320)]
         public void TestRemoveAndCrossFullAndPartialSpins(float deltaToAdd1, float deltaToAdd2, float deltaToRemove, float expectedRotation)
         {
-            history.AddDelta(1000, deltaToAdd1);
-            history.AddDelta(1500, deltaToAdd2);
-            history.RemoveDelta(500, deltaToRemove);
+            history.ReportDelta(1000, deltaToAdd1);
+            history.ReportDelta(1500, deltaToAdd2);
+            history.ReportDelta(500, deltaToRemove);
             Assert.That(history.TotalRotation, Is.EqualTo(expectedRotation));
         }
     }

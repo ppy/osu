@@ -112,10 +112,7 @@ namespace osu.Game.Rulesets.Osu.Skinning.Default
             double rate = gameplayClock?.GetTrueGameplayRate() ?? Clock.Rate;
             float delta = (float)(angle * Math.Abs(rate));
 
-            if (rate >= 0)
-                drawableSpinner.Result.History.AddDelta(Time.Current, delta);
-            else
-                drawableSpinner.Result.History.RemoveDelta(Time.Current, delta);
+            drawableSpinner.Result.History.ReportDelta(Time.Current, delta);
         }
 
         private void resetState(DrawableHitObject obj)
