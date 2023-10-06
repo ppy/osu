@@ -30,16 +30,16 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
         public float TotalRotation { get; private set; }
 
         /// <summary>
-        /// The list of all turning points where either:
+        /// The list of all segments where either:
         /// <list type="bullet">
         /// <item>The spinning direction was changed.</item>
         /// <item>A full spin of 360 degrees was performed in either direction.</item>
         /// </list>
         /// </summary>
-        private readonly Stack<SpinSegment> turningPoints = new Stack<SpinSegment>();
+        private readonly Stack<SpinSegment> segments = new Stack<SpinSegment>();
 
         /// <summary>
-        /// The current partial spin - the maximum absolute rotation among all turning points since the last spin.
+        /// The current partial spin - the maximum absolute rotation among all segments since the last spin.
         /// </summary>
         private float currentMaxRotation;
 
@@ -70,11 +70,11 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
 
             // Start a new segment if this is the first delta, to track the correct direction.
             if (currentSpinSegment.Direction == 0)
-                beginNewTurn(double.NegativeInfinity, direction);
+                beginNewSegment(double.NegativeInfinity, direction);
 
             // Start a new segment if we've changed direction.
             if (currentSpinSegment.Direction != direction)
-                beginNewTurn(currentTime, direction);
+                beginNewSegment(currentTime, direction);
 
             currentSpinSegment.CurrentRotation += delta;
 
@@ -91,9 +91,9 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
                 currentSpinSegment.CurrentRotation = Math.Clamp(currentSpinSegment.CurrentRotation, -360, 360);
                 Debug.Assert(MathF.Abs(currentSpinSegment.CurrentRotation) == 360);
 
-                beginNewTurn(currentTime, direction);
+                beginNewSegment(currentTime, direction);
 
-                // The new segment should be in the same direction and with the excess of the previous turn.
+                // The new segment should be in the same direction and with the excess of the previous segment.
                 currentSpinSegment.CurrentRotation = rotation * direction;
                 currentMaxRotation = 0;
             }
@@ -105,18 +105,18 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
         {
             while (currentTime < currentSpinSegment.StartTime)
             {
-                // When crossing over a turn, we need to adjust the delta so that it's relative to the end point of the next turn.
+                // When crossing over a segment, we need to adjust the delta so that it's relative to the end point of the next segment.
                 //
-                // This is done by ADDING the delta between the current turn and the next turn.
-                // To understand why this is, notice that delta is a rate-independent value. Suppose the turn values are { 90, 45 } (i.e. CW then CCW spin)...
-                // - If delta < 0 (e.g. -15) (i.e. CCW rotation), then the next turn should be <45 (therefore delta = -15 + (45 - 90) = -60, next = 30).
-                // - If delta = 0, then the next turn should be =45 (therefore delta = 0 + (45 - 90) = -45, next = 45).
-                // - If delta > 0 (e.g. +15) (i.e. CW rotation), then the next turn should be >45 (therefore delta = 15 + (45 - 90) = -30, next = 60).
+                // This is done by ADDING the delta between the current segment and the next segment.
+                // To understand why this is, notice that delta is a rate-independent value. Suppose the segment values are { 90, 45 } (i.e. CW then CCW spin)...
+                // - If delta < 0 (e.g. -15) (i.e. CCW rotation), then the next segment should be <45 (therefore delta = -15 + (45 - 90) = -60, next = 30).
+                // - If delta = 0, then the next segment should be =45 (therefore delta = 0 + (45 - 90) = -45, next = 45).
+                // - If delta > 0 (e.g. +15) (i.e. CW rotation), then the next segment should be >45 (therefore delta = 15 + (45 - 90) = -30, next = 60).
                 //
-                // There is a special case when crossing a complete spin, because the turn following it starts at 0 rather than the previous turn's value.
-                // In this case, only the remaining delta in the current turn needs to be considered.
+                // There is a special case when crossing a complete spin, because the segment following it starts at 0 rather than the previous segment's value.
+                // In this case, only the remaining delta in the current segment needs to be considered.
 
-                SpinSegment nextSpinSegment = turningPoints.Pop();
+                SpinSegment nextSpinSegment = segments.Pop();
 
                 if (nextSpinSegment.IsCompleteSpin)
                     delta += currentSpinSegment.CurrentRotation;
@@ -129,18 +129,18 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
             currentSpinSegment.CurrentRotation += delta;
 
             // Note: Enumerating through a stack is already reverse order.
-            currentMaxRotation = turningPoints.Prepend(currentSpinSegment).TakeWhile(t => !t.IsCompleteSpin).Select(t => Math.Abs(t.CurrentRotation)).Max();
-            TotalRotation = 360 * turningPoints.Count(t => t.IsCompleteSpin) + currentMaxRotation;
+            currentMaxRotation = segments.Prepend(currentSpinSegment).TakeWhile(t => !t.IsCompleteSpin).Select(t => Math.Abs(t.CurrentRotation)).Max();
+            TotalRotation = 360 * segments.Count(t => t.IsCompleteSpin) + currentMaxRotation;
         }
 
         /// <summary>
-        /// Finishes the current turn and starts a new one from its end point.
+        /// Finishes the current segment and starts a new one from its end point.
         /// </summary>
-        /// <param name="currentTime">The start time of the new turn.</param>
-        /// <param name="direction">The turning direction.</param>
-        private void beginNewTurn(double currentTime, int direction)
+        /// <param name="currentTime">The start time of the new segment.</param>
+        /// <param name="direction">The segment's direction.</param>
+        private void beginNewSegment(double currentTime, int direction)
         {
-            turningPoints.Push(currentSpinSegment);
+            segments.Push(currentSpinSegment);
             currentSpinSegment = new SpinSegment(currentTime, direction, currentSpinSegment.CurrentRotation);
         }
 
