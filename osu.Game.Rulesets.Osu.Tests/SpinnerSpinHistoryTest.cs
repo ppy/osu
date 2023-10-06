@@ -118,7 +118,7 @@ namespace osu.Game.Rulesets.Osu.Tests
 
             // Continue forward playback
             history.ReportDelta(1000, continuationDelta);
-            Assert.That(history.TotalRotation, Is.EqualTo(370));
+            Assert.That(history.TotalRotation, Is.EqualTo(expectedFinalRotation));
         }
     }
 }
