@@ -66,7 +66,7 @@ namespace osu.Game.Tests.Mods
 
             private partial class CustomControl : Drawable, IHasCurrentValue<int>
             {
-                public Bindable<int> Current { get; } = new Bindable<int>();
+                public Bindable<int> Current { get; set; } = new Bindable<int>();
             }
         }
     }
