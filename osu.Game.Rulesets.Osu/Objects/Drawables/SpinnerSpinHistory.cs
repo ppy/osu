@@ -129,7 +129,12 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
             currentSpinSegment.CurrentRotation += delta;
 
             // Note: Enumerating through a stack is already reverse order.
-            currentMaxRotation = segments.Prepend(currentSpinSegment).TakeWhile(t => !t.IsCompleteSpin).Select(t => Math.Abs(t.CurrentRotation)).Max();
+            currentMaxRotation = segments.Prepend(currentSpinSegment)
+                                         .TakeWhile(t => !t.IsCompleteSpin)
+                                         .Select(t => Math.Abs(t.CurrentRotation))
+                                         .DefaultIfEmpty(0)
+                                         .Max();
+
             TotalRotation = 360 * segments.Count(t => t.IsCompleteSpin) + currentMaxRotation;
         }
 
