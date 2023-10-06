@@ -17,8 +17,8 @@ namespace osu.Game.Tests.NonVisual
         [TestCase(1)]
         public void TestTrueGameplayRateWithGameplayAdjustment(double underlyingClockRate)
         {
-            var framedClock = new TrackVirtual(60000) { Frequency = { Value = underlyingClockRate } };
-            var gameplayClock = new TestGameplayClockContainer(framedClock);
+            var trackVirtual = new TrackVirtual(60000) { Frequency = { Value = underlyingClockRate } };
+            var gameplayClock = new TestGameplayClockContainer(trackVirtual);
 
             Assert.That(gameplayClock.GetTrueGameplayRate(), Is.EqualTo(2));
         }
