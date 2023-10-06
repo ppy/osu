@@ -107,7 +107,9 @@ namespace osu.Game.Screens.Play.HUD
             // aside from the repeating `initialIncrease` scheduled task,
             // there may also be a `Current` transform in progress from that schedule.
             // ensure it plays out fully, to prevent changes to `Current.Value` being discarded by the ongoing transform.
-            FinishTransforms();
+            // and yes, this funky `targetMember` spec is seemingly the only way to do this
+            // (see: https://github.com/ppy/osu-framework/blob/fe2769171c6e26d1b6fdd6eb7ea8353162fe9065/osu.Framework/Graphics/Transforms/TransformBindable.cs#L21)
+            FinishTransforms(targetMember: $"{Current.GetHashCode()}.{nameof(Current.Value)}");
         }
 
         private void onNewJudgement(JudgementResult judgement)
