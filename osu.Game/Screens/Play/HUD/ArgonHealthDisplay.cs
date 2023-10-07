@@ -64,7 +64,7 @@ namespace osu.Game.Screens.Play.HUD
         private readonly List<Vector2> missBarVertices = new List<Vector2>();
         private readonly List<Vector2> healthBarVertices = new List<Vector2>();
 
-        private double glowBarValue = 1;
+        private double glowBarValue;
 
         public double GlowBarValue
         {
@@ -79,7 +79,7 @@ namespace osu.Game.Screens.Play.HUD
             }
         }
 
-        private double healthBarValue = 1;
+        private double healthBarValue;
 
         public double HealthBarValue
         {

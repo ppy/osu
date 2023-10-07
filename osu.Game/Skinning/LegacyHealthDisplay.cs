@@ -66,6 +66,7 @@ namespace osu.Game.Skinning
             marker.Current.BindTo(Current);
 
             maxFillWidth = fill.Width;
+            fill.Width = 0;
         }
 
         protected override void Update()
