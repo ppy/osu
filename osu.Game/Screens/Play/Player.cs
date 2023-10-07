@@ -257,7 +257,7 @@ namespace osu.Game.Screens.Play
 
             rulesetSkinProvider.AddRange(new Drawable[]
             {
-                failAnimationLayer = new FailAnimation(DrawableRuleset)
+                failAnimationContainer = new FailAnimationContainer(DrawableRuleset)
                 {
                     OnComplete = onFailComplete,
                     Children = new[]
@@ -310,7 +310,7 @@ namespace osu.Game.Screens.Play
             // add the overlay components as a separate step as they proxy some elements from the above underlay/gameplay components.
             // also give the overlays the ruleset skin provider to allow rulesets to potentially override HUD elements (used to disable combo counters etc.)
             // we may want to limit this in the future to disallow rulesets from outright replacing elements the user expects to be there.
-            failAnimationLayer.Add(createOverlayComponents(Beatmap.Value));
+            failAnimationContainer.Add(createOverlayComponents(Beatmap.Value));
 
             if (!DrawableRuleset.AllowGameplayOverlays)
             {
@@ -587,7 +587,7 @@ namespace osu.Game.Screens.Play
                 // if the fail animation is currently in progress, accelerate it (it will show the pause dialog on completion).
                 if (ValidForResume && GameplayState.HasFailed)
                 {
-                    failAnimationLayer.FinishTransforms(true);
+                    failAnimationContainer.FinishTransforms(true);
                     return;
                 }
 
@@ -888,7 +888,7 @@ namespace osu.Game.Screens.Play
 
         protected FailOverlay FailOverlay { get; private set; }
 
-        private FailAnimation failAnimationLayer;
+        private FailAnimationContainer failAnimationContainer;
 
         private bool onFail()
         {
@@ -913,7 +913,7 @@ namespace osu.Game.Screens.Play
             if (PauseOverlay.State.Value == Visibility.Visible)
                 PauseOverlay.Hide();
 
-            failAnimationLayer.Start();
+            failAnimationContainer.Start();
 
             if (GameplayState.Mods.OfType<IApplicableFailOverride>().Any(m => m.RestartOnFail))
                 Restart(true);
@@ -1044,7 +1044,7 @@ namespace osu.Game.Screens.Play
 
                 b.StoryboardReplacesBackground.BindTo(storyboardReplacesBackground);
 
-                failAnimationLayer.Background = b;
+                failAnimationContainer.Background = b;
             });
 
             HUDOverlay.IsPlaying.BindTo(localUserPlaying);
@@ -1099,7 +1099,7 @@ namespace osu.Game.Screens.Play
             screenSuspension?.RemoveAndDisposeImmediately();
 
             // Eagerly clean these up as disposal of child components is asynchronous and may leave sounds playing beyond user expectations.
-            failAnimationLayer?.Stop();
+            failAnimationContainer?.Stop();
             PauseOverlay?.StopAllSamples();
 
             if (LoadedBeatmapSuccessfully)
