@@ -1,9 +1,11 @@
-﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
 using NUnit.Framework;
 using osu.Framework.Allocation;
+using osu.Framework.Extensions.ObjectExtensions;
 using osu.Framework.Graphics;
+using osu.Framework.Graphics.Shapes;
 using osu.Framework.Testing;
 using osu.Game.Rulesets.Judgements;
 using osu.Game.Rulesets.Objects;
@@ -11,19 +13,16 @@ using osu.Game.Rulesets.Osu.Judgements;
 using osu.Game.Rulesets.Osu.Objects;
 using osu.Game.Rulesets.Scoring;
 using osu.Game.Screens.Play.HUD;
-using osu.Game.Skinning;
-using osuTK;
+using osuTK.Graphics;
 
 namespace osu.Game.Tests.Visual.Gameplay
 {
-    public partial class TestSceneSkinnableHealthDisplay : SkinnableHUDComponentTestScene
+    public partial class TestSceneArgonHealthDisplay : OsuTestScene
     {
         [Cached(typeof(HealthProcessor))]
         private HealthProcessor healthProcessor = new DrainingHealthProcessor(0);
 
-        protected override Drawable CreateArgonImplementation() => new ArgonHealthDisplay { Scale = new Vector2(0.6f) };
-        protected override Drawable CreateDefaultImplementation() => new DefaultHealthDisplay { Scale = new Vector2(0.6f) };
-        protected override Drawable CreateLegacyImplementation() => new LegacyHealthDisplay { Scale = new Vector2(0.6f) };
+        private ArgonHealthDisplay healthDisplay = null!;
 
         [SetUpSteps]
         public void SetUpSteps()
@@ -32,6 +31,32 @@ namespace osu.Game.Tests.Visual.Gameplay
             {
                 healthProcessor.Health.Value = 1;
                 healthProcessor.Failed += () => false; // health won't be updated if the processor gets into a "fail" state.
+
+                Children = new Drawable[]
+                {
+                    new Box
+                    {
+                        RelativeSizeAxes = Axes.Both,
+                        Colour = Color4.Gray,
+                    },
+                    healthDisplay = new ArgonHealthDisplay
+                    {
+                        Anchor = Anchor.Centre,
+                        Origin = Anchor.Centre,
+                    },
+                };
+            });
+
+            AddSliderStep("Width", 0, 1f, 1f, val =>
+            {
+                if (healthDisplay.IsNotNull())
+                    healthDisplay.BarLength.Value = val;
+            });
+
+            AddSliderStep("Height", 0, 64, 0, val =>
+            {
+                if (healthDisplay.IsNotNull())
+                    healthDisplay.BarHeight.Value = val;
             });
         }
 

@@ -862,7 +862,7 @@ namespace osu.Game.Screens.Edit
 
         private void resetTrack(bool seekToStart = false)
         {
-            Beatmap.Value.Track.Stop();
+            clock.Stop();
 
             if (seekToStart)
             {
