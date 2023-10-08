@@ -14,7 +14,7 @@ namespace osu.Game.Rulesets.Osu.Tests
         /// <summary>
         /// A small amount to spin beyond a given angle to mitigate floating-point precision errors.
         /// </summary>
-        private const float spin_error = MathF.PI / 8;
+        public const float SPIN_ERROR = MathF.PI / 8;
 
         /// <summary>
         /// The offset from the centre of the spinner at which to spin.
@@ -86,7 +86,7 @@ namespace osu.Game.Rulesets.Osu.Tests
         private static Vector2 calcOffsetAt(double p, float startAngle, float endAngle)
         {
             int direction = Math.Sign(endAngle - startAngle);
-            float errorAdjustedEndAngle = endAngle + spin_error * direction;
+            float errorAdjustedEndAngle = endAngle + SPIN_ERROR * direction;
 
             float angle = startAngle + (errorAdjustedEndAngle - startAngle) * (float)p;
             return new Vector2(256, 192) + centre_spin_offset * new Vector2(MathF.Cos(angle), MathF.Sin(angle));

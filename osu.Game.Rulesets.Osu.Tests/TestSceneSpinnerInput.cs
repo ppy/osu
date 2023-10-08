@@ -5,15 +5,20 @@ using System.Collections.Generic;
 using System.Linq;
 using NUnit.Framework;
 using osu.Framework.Screens;
+using osu.Framework.Testing;
+using osu.Framework.Timing;
 using osu.Game.Beatmaps;
 using osu.Game.Replays;
 using osu.Game.Rulesets.Judgements;
 using osu.Game.Rulesets.Osu.Objects;
+using osu.Game.Rulesets.Osu.Objects.Drawables;
 using osu.Game.Rulesets.Osu.Replays;
 using osu.Game.Rulesets.Replays;
 using osu.Game.Rulesets.Scoring;
+using osu.Game.Rulesets.UI;
 using osu.Game.Scoring;
 using osu.Game.Screens.Play;
+using osu.Game.Storyboards;
 using osu.Game.Tests.Visual;
 using osuTK;
 
@@ -29,6 +34,20 @@ namespace osu.Game.Rulesets.Osu.Tests
         private readonly List<JudgementResult> judgementResults = new List<JudgementResult>();
 
         private ScoreAccessibleReplayPlayer currentPlayer = null!;
+        private ManualClock? manualClock;
+
+        protected override WorkingBeatmap CreateWorkingBeatmap(IBeatmap beatmap, Storyboard? storyboard = null)
+        {
+            return manualClock == null
+                ? base.CreateWorkingBeatmap(beatmap, storyboard)
+                : new ClockBackedTestWorkingBeatmap(beatmap, storyboard, new FramedClock(manualClock), Audio);
+        }
+
+        [SetUp]
+        public void Setup() => Schedule(() =>
+        {
+            manualClock = null;
+        });
 
         /// <summary>
         /// While off-centre, vibrates backwards and forwards on the x-axis, from centre-50 to centre+50, every 50ms.
@@ -138,6 +157,76 @@ namespace osu.Game.Rulesets.Osu.Tests
             assertSpinnerHit(false);
         }
 
+        [Test]
+        public void TestRewind()
+        {
+            AddStep("set manual clock", () => manualClock = new ManualClock { Rate = 1 });
+
+            List<ReplayFrame> frames = new SpinFramesGenerator(time_spinner_start)
+                                       .Spin(1f, 500) // +500ms -> 1 full CW spin
+                                       .Spin(-0.5f, 250) // +750ms -> 0.5 CCW spins
+                                       .Spin(0.25f, 250) // +1000ms -> 0.25 CW spins
+                                       .Spin(1.25f, 500) // +1500ms -> 1 full CW spin
+                                       .Spin(0.5f, 500) // +2000ms -> 0.5 CW spins
+                                       .Build();
+
+            loadPlayer(frames);
+
+            GameplayClockContainer clock = null!;
+            DrawableRuleset drawableRuleset = null!;
+            AddStep("get gameplay objects", () =>
+            {
+                clock = currentPlayer.ChildrenOfType<GameplayClockContainer>().Single();
+                drawableRuleset = currentPlayer.ChildrenOfType<DrawableRuleset>().Single();
+            });
+
+            addSeekStep(frames.Last().Time);
+
+            DrawableSpinner drawableSpinner = null!;
+            AddUntilStep("get spinner", () => (drawableSpinner = currentPlayer.ChildrenOfType<DrawableSpinner>().Single()) != null);
+
+            addSeekStep(time_spinner_start + 2000);
+            assertTotalRotation(900);
+
+            addSeekStep(time_spinner_start + 1750);
+            assertTotalRotation(810);
+
+            addSeekStep(time_spinner_start + 1500);
+            assertTotalRotation(720);
+
+            addSeekStep(time_spinner_start + 1250);
+            assertTotalRotation(530);
+
+            addSeekStep(time_spinner_start + 1000);
+            assertTotalRotation(540);
+
+            addSeekStep(time_spinner_start + 875);
+            assertTotalRotation(540);
+
+            addSeekStep(time_spinner_start + 750);
+            assertTotalRotation(540);
+
+            addSeekStep(time_spinner_start + 500);
+            assertTotalRotation(360);
+
+            addSeekStep(time_spinner_start + 250);
+            assertTotalRotation(180);
+
+            addSeekStep(time_spinner_start);
+            assertTotalRotation(0);
+
+            void assertTotalRotation(float expected) => AddAssert(
+                $"total rotation is {expected}",
+                () => drawableSpinner.Result.TotalRotation, () =>
+                    Is.EqualTo(expected).Within(SpinFramesGenerator.SPIN_ERROR * 2 * 360));
+
+            void addSeekStep(double time)
+            {
+                AddStep($"seek to {time}", () => clock.Seek(time));
+                AddUntilStep("wait for seek to finish", () => drawableRuleset.FrameStableClock.CurrentTime, () => Is.EqualTo(time).Within(100));
+            }
+        }
+
         private void assertTicksHit(int count)
         {
             AddAssert($"{count} ticks hit", () => judgementResults.Where(r => r.HitObject is SpinnerTick).Count(r => r.IsHit), () => Is.EqualTo(count));
@@ -148,7 +237,7 @@ namespace osu.Game.Rulesets.Osu.Tests
             AddAssert($"spinner is {(shouldBeHit ? "hit" : "missed")}", () => judgementResults.Single(r => r.HitObject is Spinner).IsHit, () => Is.EqualTo(shouldBeHit));
         }
 
-        private void performTest(List<ReplayFrame> frames)
+        private void loadPlayer(List<ReplayFrame> frames)
         {
             AddStep("load player", () =>
             {
@@ -186,6 +275,11 @@ namespace osu.Game.Rulesets.Osu.Tests
 
             AddUntilStep("Beatmap at 0", () => Beatmap.Value.Track.CurrentTime == 0);
             AddUntilStep("Wait until player is loaded", () => currentPlayer.IsCurrentScreen());
+        }
+
+        private void performTest(List<ReplayFrame> frames)
+        {
+            loadPlayer(frames);
             AddUntilStep("Wait for completion", () => currentPlayer.ScoreProcessor.HasCompleted.Value);
         }
 
