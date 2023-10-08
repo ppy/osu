@@ -64,6 +64,9 @@ namespace osu.Game.Tests.Visual.Online
             addMessageWithChecks("test!");
             addMessageWithChecks("dev.ppy.sh!");
             addMessageWithChecks("https://dev.ppy.sh!", 1, expectedActions: LinkAction.External);
+            addMessageWithChecks("http://dev.ppy.sh!", 1, expectedActions: LinkAction.External);
+            addMessageWithChecks("forgothttps://dev.ppy.sh!", 1, expectedActions: LinkAction.External);
+            addMessageWithChecks("forgothttp://dev.ppy.sh!", 1, expectedActions: LinkAction.External);
             addMessageWithChecks("00:12:345 (1,2) - Test?", 1, expectedActions: LinkAction.OpenEditorTimestamp);
             addMessageWithChecks("Wiki link for tasty [[Performance Points]]", 1, expectedActions: LinkAction.OpenWiki);
             addMessageWithChecks("(osu forums)[https://dev.ppy.sh/forum] (old link format)", 1, expectedActions: LinkAction.External);
@@ -84,9 +87,11 @@ namespace osu.Game.Tests.Visual.Online
             addMessageWithChecks("feels important", 0, true, true);
             addMessageWithChecks("likes to post this [https://dev.ppy.sh/home link].", 1, true, true, expectedActions: LinkAction.External);
             addMessageWithChecks("Join my multiplayer game osump://12346.", 1, expectedActions: LinkAction.JoinMultiplayerMatch);
+            addMessageWithChecks("Join my multiplayer gameosump://12346.", 1, expectedActions: LinkAction.JoinMultiplayerMatch);
             addMessageWithChecks("Join my [multiplayer game](osump://12346).", 1, expectedActions: LinkAction.JoinMultiplayerMatch);
             addMessageWithChecks($"Join my [#english]({OsuGameBase.OSU_PROTOCOL}chan/#english).", 1, expectedActions: LinkAction.OpenChannel);
             addMessageWithChecks($"Join my {OsuGameBase.OSU_PROTOCOL}chan/#english.", 1, expectedActions: LinkAction.OpenChannel);
+            addMessageWithChecks($"Join my{OsuGameBase.OSU_PROTOCOL}chan/#english.", 1, expectedActions: LinkAction.OpenChannel);
             addMessageWithChecks("Join my #english or #japanese channels.", 2, expectedActions: new[] { LinkAction.OpenChannel, LinkAction.OpenChannel });
             addMessageWithChecks("Join my #english or #nonexistent #hashtag channels.", 1, expectedActions: LinkAction.OpenChannel);
             addMessageWithChecks("Hello world\uD83D\uDE12(<--This is an emoji). There are more:\uD83D\uDE10\uD83D\uDE00,\uD83D\uDE20");

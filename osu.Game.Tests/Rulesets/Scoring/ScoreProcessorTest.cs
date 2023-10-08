@@ -45,9 +45,9 @@ namespace osu.Game.Tests.Rulesets.Scoring
         [TestCase(ScoringMode.Standardised, HitResult.Meh, 116_667)]
         [TestCase(ScoringMode.Standardised, HitResult.Ok, 233_338)]
         [TestCase(ScoringMode.Standardised, HitResult.Great, 1_000_000)]
-        [TestCase(ScoringMode.Classic, HitResult.Meh, 0)]
-        [TestCase(ScoringMode.Classic, HitResult.Ok, 2)]
-        [TestCase(ScoringMode.Classic, HitResult.Great, 36)]
+        [TestCase(ScoringMode.Classic, HitResult.Meh, 11_670)]
+        [TestCase(ScoringMode.Classic, HitResult.Ok, 23_341)]
+        [TestCase(ScoringMode.Classic, HitResult.Great, 100_033)]
         public void TestSingleOsuHit(ScoringMode scoringMode, HitResult hitResult, int expectedScore)
         {
             scoreProcessor.ApplyBeatmap(beatmap);
@@ -84,17 +84,17 @@ namespace osu.Game.Tests.Rulesets.Scoring
         [TestCase(ScoringMode.Standardised, HitResult.SmallBonus, HitResult.SmallBonus, 1_000_030)]
         [TestCase(ScoringMode.Standardised, HitResult.LargeBonus, HitResult.LargeBonus, 1_000_150)]
         [TestCase(ScoringMode.Classic, HitResult.Miss, HitResult.Great, 0)]
-        [TestCase(ScoringMode.Classic, HitResult.Meh, HitResult.Great, 4)]
-        [TestCase(ScoringMode.Classic, HitResult.Ok, HitResult.Great, 15)]
-        [TestCase(ScoringMode.Classic, HitResult.Good, HitResult.Perfect, 53)]
-        [TestCase(ScoringMode.Classic, HitResult.Great, HitResult.Great, 140)]
-        [TestCase(ScoringMode.Classic, HitResult.Perfect, HitResult.Perfect, 140)]
+        [TestCase(ScoringMode.Classic, HitResult.Meh, HitResult.Great, 7_975)]
+        [TestCase(ScoringMode.Classic, HitResult.Ok, HitResult.Great, 15_949)]
+        [TestCase(ScoringMode.Classic, HitResult.Good, HitResult.Perfect, 30_398)]
+        [TestCase(ScoringMode.Classic, HitResult.Great, HitResult.Great, 49_546)]
+        [TestCase(ScoringMode.Classic, HitResult.Perfect, HitResult.Perfect, 49_546)]
         [TestCase(ScoringMode.Classic, HitResult.SmallTickMiss, HitResult.SmallTickHit, 0)]
-        [TestCase(ScoringMode.Classic, HitResult.SmallTickHit, HitResult.SmallTickHit, 11)]
+        [TestCase(ScoringMode.Classic, HitResult.SmallTickHit, HitResult.SmallTickHit, 54_189)]
         [TestCase(ScoringMode.Classic, HitResult.LargeTickMiss, HitResult.LargeTickHit, 0)]
-        [TestCase(ScoringMode.Classic, HitResult.LargeTickHit, HitResult.LargeTickHit, 9)]
-        [TestCase(ScoringMode.Classic, HitResult.SmallBonus, HitResult.SmallBonus, 36)]
-        [TestCase(ScoringMode.Classic, HitResult.LargeBonus, HitResult.LargeBonus, 36)]
+        [TestCase(ScoringMode.Classic, HitResult.LargeTickHit, HitResult.LargeTickHit, 49_289)]
+        [TestCase(ScoringMode.Classic, HitResult.SmallBonus, HitResult.SmallBonus, 100_003)]
+        [TestCase(ScoringMode.Classic, HitResult.LargeBonus, HitResult.LargeBonus, 100_015)]
         public void TestFourVariousResultsOneMiss(ScoringMode scoringMode, HitResult hitResult, HitResult maxResult, int expectedScore)
         {
             var minResult = new TestJudgement(hitResult).MinResult;

@@ -108,11 +108,11 @@ namespace osu.Game.Rulesets.Catch.Tests.Editor
             double[] times = { 100, 300 };
             float[] positions = { 200, 300 };
             addBlueprintStep(times, positions);
-            AddAssert("default slider velocity", () => hitObject.SliderVelocityBindable.IsDefault);
+            AddAssert("default slider velocity", () => hitObject.SliderVelocityMultiplierBindable.IsDefault);
 
             addDragStartStep(times[1], positions[1]);
             AddMouseMoveStep(times[1], 400);
-            AddAssert("slider velocity changed", () => !hitObject.SliderVelocityBindable.IsDefault);
+            AddAssert("slider velocity changed", () => !hitObject.SliderVelocityMultiplierBindable.IsDefault);
         }
 
         [Test]

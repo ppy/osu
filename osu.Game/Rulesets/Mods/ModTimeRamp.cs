@@ -7,6 +7,7 @@ using osu.Framework.Audio;
 using osu.Framework.Bindables;
 using osu.Game.Beatmaps;
 using osu.Game.Configuration;
+using osu.Game.Overlays.Settings;
 using osu.Game.Rulesets.UI;
 
 namespace osu.Game.Rulesets.Mods
@@ -20,10 +21,10 @@ namespace osu.Game.Rulesets.Mods
 
         public override double ScoreMultiplier => 0.5;
 
-        [SettingSource("Initial rate", "The starting speed of the track")]
+        [SettingSource("Initial rate", "The starting speed of the track", SettingControlType = typeof(MultiplierSettingsSlider))]
         public abstract BindableNumber<double> InitialRate { get; }
 
-        [SettingSource("Final rate", "The final speed to ramp to")]
+        [SettingSource("Final rate", "The final speed to ramp to", SettingControlType = typeof(MultiplierSettingsSlider))]
         public abstract BindableNumber<double> FinalRate { get; }
 
         [SettingSource("Adjust pitch", "Should pitch be adjusted with speed")]
