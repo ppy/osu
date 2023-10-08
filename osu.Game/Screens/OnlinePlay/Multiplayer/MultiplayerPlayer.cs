@@ -148,6 +148,8 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
                 loadingDisplay.Show();
                 client.ChangeState(MultiplayerUserState.ReadyForGameplay);
             }
+
+            GameplayClockContainer.Reset();
         }
 
         private void failAndBail(string message = null)

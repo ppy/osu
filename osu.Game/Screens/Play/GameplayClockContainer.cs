@@ -143,7 +143,8 @@ namespace osu.Game.Screens.Play
         {
             bool wasPaused = isPaused.Value;
 
-            Stop();
+            // Forcefully stop, ignoring isPaused.
+            StopGameplayClock();
 
             if (time != null)
                 StartTime = time.Value;
