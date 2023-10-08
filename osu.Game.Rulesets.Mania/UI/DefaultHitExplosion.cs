@@ -150,9 +150,6 @@ namespace osu.Game.Rulesets.Mania.UI
             // scale roughly in-line with visual appearance of notes
             Vector2 scale = new Vector2(1, 0.6f);
 
-            if (result.Judgement is HoldNoteTickJudgement)
-                scale *= 0.5f;
-
             this.ScaleTo(scale);
 
             largeFaint

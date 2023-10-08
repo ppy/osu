@@ -69,9 +69,6 @@ namespace osu.Game.Rulesets.Mania.Skinning.Legacy
 
         public void Animate(JudgementResult result)
         {
-            if (result.Judgement is HoldNoteTickJudgement)
-                return;
-
             (explosion as IFramedAnimation)?.GotoFrame(0);
 
             explosion?.FadeInFromZero(FADE_IN_DURATION)
