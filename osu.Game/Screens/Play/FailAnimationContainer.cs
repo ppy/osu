@@ -27,10 +27,10 @@ using osuTK.Graphics;
 namespace osu.Game.Screens.Play
 {
     /// <summary>
-    /// Manage the animation to be applied when a player fails.
+    /// Manage the animation to be applied when a player fails. Applies the animation to children.
     /// Single use and automatically disposed after use.
     /// </summary>
-    public partial class FailAnimation : Container
+    public partial class FailAnimationContainer : Container
     {
         public Action? OnComplete;
 
@@ -66,7 +66,7 @@ namespace osu.Game.Screens.Play
         /// </summary>
         public BackgroundScreen? Background { private get; set; }
 
-        public FailAnimation(DrawableRuleset drawableRuleset)
+        public FailAnimationContainer(DrawableRuleset drawableRuleset)
         {
             this.drawableRuleset = drawableRuleset;
 

@@ -25,6 +25,7 @@ using osuTK;
 
 namespace osu.Game.Rulesets.Catch.Edit
 {
+    // we're also a ScrollingHitObjectComposer candidate, but can't be everything can we?
     public partial class CatchHitObjectComposer : DistancedHitObjectComposer<CatchHitObject>
     {
         private const float distance_snap_radius = 50;
@@ -140,7 +141,7 @@ namespace osu.Game.Rulesets.Catch.Edit
             return base.OnPressed(e);
         }
 
-        protected override DrawableRuleset<CatchHitObject> CreateDrawableRuleset(Ruleset ruleset, IBeatmap beatmap, IReadOnlyList<Mod>? mods = null) =>
+        protected override DrawableRuleset<CatchHitObject> CreateDrawableRuleset(Ruleset ruleset, IBeatmap beatmap, IReadOnlyList<Mod> mods) =>
             new DrawableCatchEditorRuleset(ruleset, beatmap, mods)
             {
                 TimeRangeMultiplier = { BindTarget = timeRangeMultiplier, }
