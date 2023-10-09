@@ -175,6 +175,7 @@ namespace osu.Game.Rulesets.Scoring
                 case HitResult.LargeTickHit:
                 case HitResult.LargeTickMiss:
                 case HitResult.LegacyComboIncrease:
+                case HitResult.ComboBreak:
                     return true;
 
                 default:
@@ -187,11 +188,19 @@ namespace osu.Game.Rulesets.Scoring
         /// </summary>
         public static bool AffectsAccuracy(this HitResult result)
         {
-            // LegacyComboIncrease is a special type which is neither a basic, tick, bonus, or accuracy-affecting result.
-            if (result == HitResult.LegacyComboIncrease)
-                return false;
+            switch (result)
+            {
+                // LegacyComboIncrease is a special non-gameplay type which is neither a basic, tick, bonus, or accuracy-affecting result.
+                case HitResult.LegacyComboIncrease:
+                    return false;
 
-            return IsScorable(result) && !IsBonus(result);
+                // ComboBreak is a special type that only affects combo. It cannot be considered as basic, tick, bonus, or accuracy-affecting.
+                case HitResult.ComboBreak:
+                    return false;
+
+                default:
+                    return IsScorable(result) && !IsBonus(result);
+            }
         }
 
         /// <summary>
@@ -199,11 +208,19 @@ namespace osu.Game.Rulesets.Scoring
         /// </summary>
         public static bool IsBasic(this HitResult result)
         {
-            // LegacyComboIncrease is a special type which is neither a basic, tick, bonus, or accuracy-affecting result.
-            if (result == HitResult.LegacyComboIncrease)
-                return false;
+            switch (result)
+            {
+                // LegacyComboIncrease is a special non-gameplay type which is neither a basic, tick, bonus, or accuracy-affecting result.
+                case HitResult.LegacyComboIncrease:
+                    return false;
 
-            return IsScorable(result) && !IsTick(result) && !IsBonus(result);
+                // ComboBreak is a special type that only affects combo. It cannot be considered as basic, tick, bonus, or accuracy-affecting.
+                case HitResult.ComboBreak:
+                    return false;
+
+                default:
+                    return IsScorable(result) && !IsTick(result) && !IsBonus(result);
+            }
         }
 
         /// <summary>
@@ -252,6 +269,7 @@ namespace osu.Game.Rulesets.Scoring
                 case HitResult.Miss:
                 case HitResult.SmallTickMiss:
                 case HitResult.LargeTickMiss:
+                case HitResult.ComboBreak:
                     return false;
 
                 default:
@@ -264,11 +282,20 @@ namespace osu.Game.Rulesets.Scoring
         /// </summary>
         public static bool IsScorable(this HitResult result)
         {
-            // LegacyComboIncrease is not actually scorable (in terms of usable by rulesets for that purpose), but needs to be defined as such to be correctly included in statistics output.
-            if (result == HitResult.LegacyComboIncrease)
-                return true;
+            switch (result)
+            {
+                // LegacyComboIncrease is not actually scorable (in terms of usable by rulesets for that purpose), but needs to be defined as such to be correctly included in statistics output.
+                case HitResult.LegacyComboIncrease:
+                    return true;
 
-            return result >= HitResult.Miss && result < HitResult.IgnoreMiss;
+                // ComboBreak is its own type that affects score via combo.
+                case HitResult.ComboBreak:
+                    return true;
+
+                default:
+                    // Note that IgnoreHit and IgnoreMiss are excluded as they do not affect score.
+                    return result >= HitResult.Miss && result < HitResult.IgnoreMiss;
+            }
         }
 
         /// <summary>
