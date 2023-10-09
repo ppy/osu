@@ -5,7 +5,7 @@ using osu.Game.Rulesets.Scoring;
 
 namespace osu.Game.Rulesets.Mania.Judgements
 {
-    public class HoldNoteHoldJudgement : ManiaJudgement
+    public class HoldNoteBodyJudgement : ManiaJudgement
     {
         public override HitResult MaxResult => HitResult.IgnoreHit;
         public override HitResult MinResult => HitResult.ComboBreak;
