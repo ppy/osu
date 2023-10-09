@@ -23,6 +23,16 @@ namespace osu.Game.Rulesets.Osu.Skinning.Legacy
         /// </summary>
         public const float LEGACY_CIRCLE_RADIUS = OsuHitObject.OBJECT_RADIUS - 5;
 
+        /// <summary>
+        /// The maximum allowed size of sprites that reside in the follow circle area of a slider.
+        /// </summary>
+        /// <remarks>
+        /// The reason this is extracted out to a constant, rather than be inlined in the follow circle sprite retrieval,
+        /// is that some skins will use `sliderb` elements to emulate a slider follow circle with slightly different visual effects applied
+        /// (`sliderb` is always shown and doesn't pulsate; `sliderfollowcircle` isn't always shown and pulsates).
+        /// </remarks>
+        public static readonly Vector2 MAX_FOLLOW_CIRCLE_AREA_SIZE = OsuHitObject.OBJECT_DIMENSIONS * 3;
+
         public OsuLegacySkinTransformer(ISkin skin)
             : base(skin)
         {
@@ -42,14 +52,14 @@ namespace osu.Game.Rulesets.Osu.Skinning.Legacy
                         return this.GetAnimation("sliderscorepoint", false, false);
 
                     case OsuSkinComponents.SliderFollowCircle:
-                        var followCircleContent = this.GetAnimation("sliderfollowcircle", true, true, true, maxSize: new Vector2(308f));
+                        var followCircleContent = this.GetAnimation("sliderfollowcircle", true, true, true, maxSize: MAX_FOLLOW_CIRCLE_AREA_SIZE);
                         if (followCircleContent != null)
                             return new LegacyFollowCircle(followCircleContent);
 
                         return null;
 
                     case OsuSkinComponents.SliderBall:
-                        var sliderBallContent = this.GetAnimation("sliderb", true, true, animationSeparator: "", maxSize: OsuHitObject.OBJECT_DIMENSIONS);
+                        var sliderBallContent = this.GetAnimation("sliderb", true, true, animationSeparator: "", maxSize: MAX_FOLLOW_CIRCLE_AREA_SIZE);
 
                         // todo: slider ball has a custom frame delay based on velocity
                         // Math.Max((150 / Velocity) * GameBase.SIXTY_FRAME_TIME, GameBase.SIXTY_FRAME_TIME);
@@ -139,10 +149,11 @@ namespace osu.Game.Rulesets.Osu.Skinning.Legacy
                         if (!this.HasFont(LegacyFont.HitCircle))
                             return null;
 
-                        return new LegacySpriteText(LegacyFont.HitCircle, OsuHitObject.OBJECT_DIMENSIONS)
+                        const float hitcircle_text_scale = 0.8f;
+                        return new LegacySpriteText(LegacyFont.HitCircle, OsuHitObject.OBJECT_DIMENSIONS * 2 / hitcircle_text_scale)
                         {
                             // stable applies a blanket 0.8x scale to hitcircle fonts
-                            Scale = new Vector2(0.8f),
+                            Scale = new Vector2(hitcircle_text_scale),
                         };
 
                     case OsuSkinComponents.SpinnerBody:

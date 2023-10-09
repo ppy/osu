@@ -109,6 +109,7 @@ namespace osu.Game.Skinning
                         case SkinComponentsContainerLookup.TargetArea.MainHUDComponents:
                             var skinnableTargetWrapper = new DefaultSkinComponentsContainer(container =>
                             {
+                                var health = container.OfType<ArgonHealthDisplay>().FirstOrDefault();
                                 var score = container.OfType<DefaultScoreCounter>().FirstOrDefault();
                                 var accuracy = container.OfType<DefaultAccuracyCounter>().FirstOrDefault();
                                 var combo = container.OfType<DefaultComboCounter>().FirstOrDefault();
@@ -127,6 +128,13 @@ namespace osu.Game.Skinning
                                     const float horizontal_padding = 20;
 
                                     score.Position = new Vector2(0, vertical_offset);
+
+                                    if (health != null)
+                                    {
+                                        health.Origin = Anchor.TopCentre;
+                                        health.Anchor = Anchor.TopCentre;
+                                        health.Y = 5;
+                                    }
 
                                     if (ppCounter != null)
                                     {
@@ -191,7 +199,7 @@ namespace osu.Game.Skinning
                                     new DefaultComboCounter(),
                                     new DefaultScoreCounter(),
                                     new DefaultAccuracyCounter(),
-                                    new DefaultHealthDisplay(),
+                                    new ArgonHealthDisplay(),
                                     new ArgonSongProgress(),
                                     new ArgonKeyCounterDisplay(),
                                     new BarHitErrorMeter(),
