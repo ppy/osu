@@ -91,10 +91,6 @@ namespace osu.Game.Rulesets.Judgements
             }
         }
 
-        public Judgement()
-        {
-        }
-
         /// <summary>
         /// The numeric score representation for the maximum achievable result.
         /// </summary>
