@@ -456,6 +456,7 @@ namespace osu.Game.Screens.OnlinePlay
 
         private IEnumerable<Drawable> createButtons() => new[]
         {
+            beatmap == null ? Empty() : new PlaylistDownloadButton(beatmap),
             showResultsButton = new GrayButton(FontAwesome.Solid.ChartPie)
             {
                 Size = new Vector2(30, 30),
@@ -463,7 +464,6 @@ namespace osu.Game.Screens.OnlinePlay
                 Alpha = AllowShowingResults ? 1 : 0,
                 TooltipText = "View results"
             },
-            beatmap == null ? Empty() : new PlaylistDownloadButton(beatmap),
             editButton = new PlaylistEditButton
             {
                 Size = new Vector2(30, 30),
