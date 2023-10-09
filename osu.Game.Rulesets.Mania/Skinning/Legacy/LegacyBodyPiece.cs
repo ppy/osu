@@ -210,7 +210,8 @@ namespace osu.Game.Rulesets.Mania.Skinning.Legacy
         {
             base.Update();
 
-            missFadeTime.Value = holdNote.Body.HasHoldBreak ? holdNote.Body.Result.TimeAbsolute : null;
+            if (holdNote.Body.HasHoldBreak)
+                missFadeTime.Value = holdNote.Body.Result.TimeAbsolute;
 
             int scaleDirection = (direction.Value == ScrollingDirection.Down ? 1 : -1);
 
