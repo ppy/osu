@@ -138,7 +138,7 @@ namespace osu.Game.Overlays.SkinEditor
 
             drawableQuad = drawable.ToScreenSpace(
                 drawable.DrawRectangle
-                        .Inflate(SkinSelectionHandler.INFLATE_SIZE));
+                        .Inflate(SkinSelectionHandler.INFLATE_SIZE / 3));
 
             var localSpaceQuad = ToLocalSpace(drawableQuad);
 
