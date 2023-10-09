@@ -79,6 +79,12 @@ namespace osu.Game.Rulesets.Mania.Objects
         /// </summary>
         public TailNote Tail { get; private set; }
 
+        /// <summary>
+        /// The body of the hold.
+        /// This is an invisible and silent object that tracks the holding state of the <see cref="HoldNote"/>.
+        /// </summary>
+        public HoldNoteBody Body { get; private set; }
+
         public override double MaximumJudgementOffset => Tail.MaximumJudgementOffset;
 
         protected override void CreateNestedHitObjects(CancellationToken cancellationToken)
@@ -97,6 +103,12 @@ namespace osu.Game.Rulesets.Mania.Objects
                 StartTime = EndTime,
                 Column = Column,
                 Samples = GetNodeSamples((NodeSamples?.Count - 1) ?? 1),
+            });
+
+            AddNested(Body = new HoldNoteBody
+            {
+                StartTime = StartTime,
+                Column = Column
             });
         }
 

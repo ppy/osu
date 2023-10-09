@@ -121,6 +121,16 @@ namespace osu.Game.Rulesets.Scoring
         IgnoreHit,
 
         /// <summary>
+        /// Indicates that a combo break should occur, but does not otherwise affect score.
+        /// </summary>
+        /// <remarks>
+        /// May be paired with <see cref="IgnoreHit"/>.
+        /// </remarks>
+        [EnumMember(Value = "combo_break")]
+        [Order(15)]
+        ComboBreak,
+
+        /// <summary>
         /// A special result used as a padding value for legacy rulesets. It is a hit type and affects combo, but does not affect the base score (does not affect accuracy).
         /// </summary>
         /// <remarks>
@@ -291,6 +301,105 @@ namespace osu.Game.Rulesets.Scoring
         /// <param name="result">The <see cref="HitResult"/> to get the index of.</param>
         /// <returns>The index of <paramref name="result"/>.</returns>
         public static int GetIndexForOrderedDisplay(this HitResult result) => order.IndexOf(result);
+
+        public static void ValidateHitResultPair(HitResult maxResult, HitResult minResult)
+        {
+            // Check valid maximum judgements.
+            switch (maxResult)
+            {
+                case HitResult.Meh:
+                case HitResult.Ok:
+                case HitResult.Good:
+                case HitResult.Great:
+                case HitResult.Perfect:
+                case HitResult.SmallTickHit:
+                case HitResult.LargeTickHit:
+                case HitResult.SmallBonus:
+                case HitResult.LargeBonus:
+                case HitResult.IgnoreHit:
+                    break;
+
+                default:
+                    throw new ArgumentOutOfRangeException(nameof(maxResult), $"{maxResult} is not a valid maximum judgement result.");
+            }
+
+            // Check valid minimum judgements.
+            switch (minResult)
+            {
+                case HitResult.Miss:
+                case HitResult.SmallTickMiss:
+                case HitResult.LargeTickMiss:
+                case HitResult.IgnoreMiss:
+                case HitResult.ComboBreak:
+                    break;
+
+                default:
+                    throw new ArgumentOutOfRangeException(nameof(minResult), $"{minResult} is not a valid minimum judgement result.");
+            }
+
+            // Check valid category pairings.
+            switch (maxResult)
+            {
+                case HitResult.SmallBonus:
+                case HitResult.LargeBonus:
+                    switch (minResult)
+                    {
+                        case HitResult.IgnoreMiss:
+                            break;
+
+                        default:
+                            throw new ArgumentOutOfRangeException(nameof(minResult), $"{HitResult.IgnoreMiss} is the only valid minimum result for a {maxResult} judgement.");
+                    }
+
+                    break;
+
+                case HitResult.SmallTickHit:
+                    switch (minResult)
+                    {
+                        case HitResult.SmallTickMiss:
+                        case HitResult.IgnoreMiss:
+                        case HitResult.ComboBreak:
+                            break;
+
+                        default:
+                            throw new ArgumentOutOfRangeException(nameof(minResult), $"{minResult} is not a valid minimum result for a {maxResult} judgement.");
+                    }
+
+                    break;
+
+                case HitResult.LargeTickHit:
+                    switch (minResult)
+                    {
+                        case HitResult.LargeTickMiss:
+                        case HitResult.IgnoreMiss:
+                        case HitResult.ComboBreak:
+                            break;
+
+                        default:
+                            throw new ArgumentOutOfRangeException(nameof(minResult), $"{minResult} is not a valid minimum result for a {maxResult} judgement.");
+                    }
+
+                    break;
+
+                case HitResult.Meh:
+                case HitResult.Ok:
+                case HitResult.Good:
+                case HitResult.Great:
+                case HitResult.Perfect:
+                    switch (minResult)
+                    {
+                        case HitResult.Miss:
+                        case HitResult.IgnoreMiss:
+                        case HitResult.ComboBreak:
+                            break;
+
+                        default:
+                            throw new ArgumentOutOfRangeException(nameof(minResult), $"{minResult} is not a valid minimum result for a {maxResult} judgement.");
+                    }
+
+                    break;
+            }
+        }
     }
 #pragma warning restore CS0618
 }
