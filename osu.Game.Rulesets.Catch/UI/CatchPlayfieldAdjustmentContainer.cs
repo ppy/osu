@@ -17,12 +17,13 @@ namespace osu.Game.Rulesets.Catch.UI
 
         public CatchPlayfieldAdjustmentContainer()
         {
-            // because we are using centre anchor/origin, we will need to limit visibility in the future
-            // to ensure tall windows do not get a readability advantage.
-            // it may be possible to bake the catch-specific offsets (-100..340 mentioned below) into new values
-            // which are compatible with TopCentre alignment.
-            Anchor = Anchor.Centre;
-            Origin = Anchor.Centre;
+            Anchor = Anchor.TopCentre;
+            Origin = Anchor.TopCentre;
+
+            // playfields in stable are positioned vertically at three fourths the difference between the playfield height and the window height in stable.
+            // we can match that in lazer by using relative coordinates for Y and considering window height to be 1, and playfield height to be 0.8.
+            RelativePositionAxes = Axes.Y;
+            Y = (1 - playfield_size_adjust) / 4 * 3;
 
             Size = new Vector2(playfield_size_adjust);
 
