@@ -39,7 +39,7 @@ namespace osu.Game.Rulesets.Judgements
         /// Defaults to a sane value for the given <see cref="MaxResult"/>. May be overridden to provide a supported custom value:
         /// <list type="table">
         ///   <listheader>
-        ///     <term>Valid <see cref="MaxResult"/>s</term>
+        ///     <term><see cref="MaxResult"/>s</term>
         ///     <description>Valid <see cref="MinResult"/>s</description>
         ///   </listheader>
         /// <item>
