@@ -29,7 +29,7 @@ namespace osu.Game.Rulesets.Osu.Tests
         private const int centre_x = 256;
         private const int centre_y = 192;
         private const double time_spinner_start = 1500;
-        private const double time_spinner_end = 4000;
+        private const double time_spinner_end = 8000;
 
         private readonly List<JudgementResult> judgementResults = new List<JudgementResult>();
 
@@ -163,11 +163,11 @@ namespace osu.Game.Rulesets.Osu.Tests
             AddStep("set manual clock", () => manualClock = new ManualClock { Rate = 1 });
 
             List<ReplayFrame> frames = new SpinFramesGenerator(time_spinner_start)
-                                       .Spin(1f, 500) // +500ms -> 1 full CW spin
-                                       .Spin(-0.5f, 250) // +750ms -> 0.5 CCW spins
-                                       .Spin(0.25f, 250) // +1000ms -> 0.25 CW spins
-                                       .Spin(1.25f, 500) // +1500ms -> 1 full CW spin
-                                       .Spin(0.5f, 500) // +2000ms -> 0.5 CW spins
+                                       .Spin(1f, 500) // 2000ms -> 1 full CW spin
+                                       .Spin(-0.5f, 500) // 2500ms -> 0.5 CCW spins
+                                       .Spin(0.25f, 500) // 3000ms -> 0.25 CW spins
+                                       .Spin(1.25f, 500) // 3500ms -> 1 full CW spin
+                                       .Spin(0.5f, 500) // 4000ms -> 0.5 CW spins
                                        .Build();
 
             loadPlayer(frames);
@@ -185,27 +185,28 @@ namespace osu.Game.Rulesets.Osu.Tests
             DrawableSpinner drawableSpinner = null!;
             AddUntilStep("get spinner", () => (drawableSpinner = currentPlayer.ChildrenOfType<DrawableSpinner>().Single()) != null);
 
-            assertTotalRotation(2000, 900);
-            assertTotalRotation(1750, 810);
-            assertTotalRotation(1500, 720);
-            assertTotalRotation(1250, 530);
-            assertTotalRotation(1000, 540);
-            assertTotalRotation(875, 540);
-            assertTotalRotation(750, 540);
-            assertTotalRotation(500, 360);
-            assertTotalRotation(250, 180);
-            assertTotalRotation(0, 0);
+            assertTotalRotation(4000, 900);
+            assertTotalRotation(3750, 810);
+            assertTotalRotation(3500, 720);
+            assertTotalRotation(3250, 530);
+            assertTotalRotation(3000, 540);
+            assertTotalRotation(2750, 540);
+            assertTotalRotation(2500, 540);
+            assertTotalRotation(2250, 360);
+            assertTotalRotation(2000, 180);
+            assertTotalRotation(1500, 0);
 
             void assertTotalRotation(double time, float expected)
             {
-                addSeekStep(time_spinner_start + time);
-                AddAssert($"total rotation @ +{time} is {expected}", () => drawableSpinner.Result.TotalRotation, () => Is.EqualTo(expected).Within(MathHelper.RadiansToDegrees(SpinFramesGenerator.SPIN_ERROR * 2)));
+                addSeekStep(time);
+                AddAssert($"total rotation @ {time} is {expected}", () => drawableSpinner.Result.TotalRotation,
+                    () => Is.EqualTo(expected).Within(MathHelper.RadiansToDegrees(SpinFramesGenerator.SPIN_ERROR * 2)));
             }
 
             void addSeekStep(double time)
             {
                 AddStep($"seek to {time}", () => clock.Seek(time));
-                AddUntilStep("wait for seek to finish", () => drawableRuleset.FrameStableClock.CurrentTime, () => Is.EqualTo(time).Within(100));
+                AddUntilStep("wait for seek to finish", () => drawableRuleset.FrameStableClock.CurrentTime, () => Is.EqualTo(time));
             }
         }
 
