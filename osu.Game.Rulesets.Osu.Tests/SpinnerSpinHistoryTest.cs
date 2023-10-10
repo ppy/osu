@@ -120,5 +120,15 @@ namespace osu.Game.Rulesets.Osu.Tests
             history.ReportDelta(1000, continuationDelta);
             Assert.That(history.TotalRotation, Is.EqualTo(expectedFinalRotation));
         }
+
+        [Test]
+        public void TestRewindMultipleFullSpins()
+        {
+            history.ReportDelta(500, 360);
+            history.ReportDelta(1000, 720);
+            history.ReportDelta(250, -180);
+
+            Assert.That(history.TotalRotation, Is.EqualTo(180));
+        }
     }
 }
