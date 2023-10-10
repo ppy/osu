@@ -15,7 +15,6 @@ using osu.Framework.Layout;
 using osu.Framework.Threading;
 using osu.Framework.Utils;
 using osu.Game.Configuration;
-using osu.Game.Graphics;
 using osu.Game.Rulesets.Judgements;
 using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Objects.Types;
@@ -114,7 +113,7 @@ namespace osu.Game.Screens.Play.HUD
                     glowBar = new BarPath
                     {
                         BarColour = Color4.White,
-                        GlowColour = OsuColour.Gray(0.5f),
+                        GlowColour = main_bar_glow_colour,
                         Blending = BlendingParameters.Additive,
                         Colour = ColourInfo.GradientHorizontal(Color4.White.Opacity(0.8f), Color4.White),
                         PathRadius = 40f,
