@@ -149,6 +149,7 @@ namespace osu.Game.Screens.Play.HUD
 
                     double time = v.NewValue > GlowBarValue ? 500 : 250;
 
+                    // TODO: this should probably use interpolation in update.
                     this.TransformTo(nameof(HealthBarValue), v.NewValue, time, Easing.OutQuint);
                     if (resetMissBarDelegate == null)
                         this.TransformTo(nameof(GlowBarValue), v.NewValue, time, Easing.OutQuint);
