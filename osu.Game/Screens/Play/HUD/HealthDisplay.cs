@@ -39,6 +39,7 @@ namespace osu.Game.Screens.Play.HUD
 
         /// <summary>
         /// Triggered when a <see cref="Judgement"/> is a successful hit, signaling the health display to perform a flash animation (if designed to do so).
+        /// Calls to this method are debounced.
         /// </summary>
         /// <param name="result">The judgement result.</param>
         protected virtual void Flash(JudgementResult result)
@@ -47,6 +48,7 @@ namespace osu.Game.Screens.Play.HUD
 
         /// <summary>
         /// Triggered when a <see cref="Judgement"/> resulted in the player losing health.
+        /// Calls to this method are debounced.
         /// </summary>
         /// <param name="result">The judgement result.</param>
         protected virtual void Miss(JudgementResult result)
@@ -92,7 +94,7 @@ namespace osu.Game.Screens.Play.HUD
             {
                 double newValue = Current.Value + 0.05f;
                 this.TransformBindableTo(Current, newValue, increase_delay);
-                Flash(new JudgementResult(new HitObject(), new Judgement()));
+                Scheduler.AddOnce(Flash, new JudgementResult(new HitObject(), new Judgement()));
 
                 if (newValue >= 1)
                     finishInitialAnimation();
@@ -115,9 +117,9 @@ namespace osu.Game.Screens.Play.HUD
         private void onNewJudgement(JudgementResult judgement)
         {
             if (judgement.IsHit && judgement.Type != HitResult.IgnoreHit)
-                Flash(judgement);
+                Scheduler.AddOnce(Flash, judgement);
             else if (judgement.Judgement.HealthIncreaseFor(judgement) < 0)
-                Miss(judgement);
+                Scheduler.AddOnce(Miss, judgement);
         }
 
         protected override void Dispose(bool isDisposing)

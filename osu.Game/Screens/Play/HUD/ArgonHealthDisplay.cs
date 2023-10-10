@@ -142,14 +142,17 @@ namespace osu.Game.Screens.Play.HUD
 
             Current.BindValueChanged(v =>
             {
-                if (v.NewValue >= GlowBarValue)
-                    finishMissDisplay();
+                Scheduler.AddOnce(() =>
+                {
+                    if (v.NewValue >= GlowBarValue)
+                        finishMissDisplay();
 
-                double time = v.NewValue > GlowBarValue ? 500 : 250;
+                    double time = v.NewValue > GlowBarValue ? 500 : 250;
 
-                this.TransformTo(nameof(HealthBarValue), v.NewValue, time, Easing.OutQuint);
-                if (resetMissBarDelegate == null)
-                    this.TransformTo(nameof(GlowBarValue), v.NewValue, time, Easing.OutQuint);
+                    this.TransformTo(nameof(HealthBarValue), v.NewValue, time, Easing.OutQuint);
+                    if (resetMissBarDelegate == null)
+                        this.TransformTo(nameof(GlowBarValue), v.NewValue, time, Easing.OutQuint);
+                });
             }, true);
 
             BarLength.BindValueChanged(l => Width = l.NewValue, true);
