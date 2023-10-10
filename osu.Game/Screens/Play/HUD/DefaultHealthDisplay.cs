@@ -112,20 +112,18 @@ namespace osu.Game.Screens.Play.HUD
             };
         }
 
+        protected override void Flash(JudgementResult result)
+        {
+            fill.FadeEdgeEffectTo(Math.Min(1, fill.EdgeEffect.Colour.Linear.A + (1f - base_glow_opacity) / glow_max_hits), 50, Easing.OutQuint)
+                .Delay(glow_fade_delay)
+                .FadeEdgeEffectTo(base_glow_opacity, glow_fade_time, Easing.OutQuint);
+        }
+
         [BackgroundDependencyLoader]
         private void load(OsuColour colours)
         {
             AccentColour = colours.BlueLighter;
             GlowColour = colours.BlueDarker;
-        }
-
-        protected override void Flash(JudgementResult result) => Scheduler.AddOnce(flash);
-
-        private void flash()
-        {
-            fill.FadeEdgeEffectTo(Math.Min(1, fill.EdgeEffect.Colour.Linear.A + (1f - base_glow_opacity) / glow_max_hits), 50, Easing.OutQuint)
-                .Delay(glow_fade_delay)
-                .FadeEdgeEffectTo(base_glow_opacity, glow_fade_time, Easing.OutQuint);
         }
 
         protected override void Update()
