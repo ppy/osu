@@ -13,6 +13,7 @@ using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Osu;
 using osu.Game.Rulesets.Osu.Mods;
 using osu.Game.Scoring;
+using osu.Game.Tests.Resources;
 using osu.Game.Users;
 using osuTK;
 
@@ -27,6 +28,29 @@ namespace osu.Game.Tests.Visual.SongSelect
 
         [BackgroundDependencyLoader]
         private void load()
+        {
+            Child = fillFlow = new FillFlowContainer
+            {
+                Anchor = Anchor.Centre,
+                Origin = Anchor.Centre,
+                Spacing = new Vector2(0, 10),
+                RelativeSizeAxes = Axes.X,
+                AutoSizeAxes = Axes.Y,
+            };
+
+            foreach (var scoreInfo in getTestScores())
+                fillFlow.Add(new LeaderboardScoreV2(scoreInfo, scoreInfo.Position, scoreInfo.User.Id == 2));
+
+            foreach (var score in fillFlow.Children)
+                score.Show();
+
+            AddSliderStep("change relative width", 0, 1f, 0.6f, v =>
+            {
+                fillFlow.Width = v;
+            });
+        }
+
+        private static ScoreInfo[] getTestScores()
         {
             var scores = new[]
             {
@@ -66,7 +90,6 @@ namespace osu.Game.Tests.Visual.SongSelect
                     },
                     Date = DateTimeOffset.Now.AddMonths(-6),
                 },
-
                 new ScoreInfo
                 {
                     Position = 110000,
@@ -82,31 +105,10 @@ namespace osu.Game.Tests.Visual.SongSelect
                     },
                     Date = DateTimeOffset.Now,
                 },
+                TestResources.CreateTestScoreInfo(),
             };
 
-            Child = fillFlow = new FillFlowContainer
-            {
-                Anchor = Anchor.Centre,
-                Origin = Anchor.Centre,
-                Spacing = new Vector2(0, 10),
-                RelativeSizeAxes = Axes.X,
-                AutoSizeAxes = Axes.Y,
-                Children = new Drawable[]
-                {
-                    new LeaderboardScoreV2(scores[0], 1),
-                    new LeaderboardScoreV2(scores[1], null, true),
-                    new LeaderboardScoreV2(scores[2], null, true),
-                    new LeaderboardScoreV2(scores[2], null),
-                }
-            };
-
-            foreach (var score in fillFlow.Children)
-                score.Show();
-
-            AddSliderStep("change relative width", 0, 1f, 0.6f, v =>
-            {
-                fillFlow.Width = v;
-            });
+            return scores;
         }
     }
 }
