@@ -138,7 +138,8 @@ namespace osu.Game.Screens.Play
         /// Resets this <see cref="GameplayClockContainer"/> and the source to an initial state ready for gameplay.
         /// </summary>
         /// <param name="time">The time to seek to on resetting. If <c>null</c>, the existing <see cref="StartTime"/> will be used.</param>
-        /// <param name="startClock">Whether to start the clock immediately. If <c>false</c>, the clock will remain stopped after this call.</param>
+        /// <param name="startClock">Whether to start the clock immediately. If <c>false</c> and the clock was already paused, the clock will remain paused after this call.
+        /// </param>
         public void Reset(double? time = null, bool startClock = false)
         {
             bool wasPaused = isPaused.Value;
