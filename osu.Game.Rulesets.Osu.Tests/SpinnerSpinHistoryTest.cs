@@ -114,5 +114,16 @@ namespace osu.Game.Rulesets.Osu.Tests
 
             Assert.That(history.TotalRotation, Is.EqualTo(180));
         }
+
+        [Test]
+        public void TestRewindIntoSegmentThatHasNotCrossedZero()
+        {
+            history.ReportDelta(1000, -180);
+            history.ReportDelta(1500, 90);
+            history.ReportDelta(2000, 450);
+            history.ReportDelta(1750, -45);
+
+            Assert.That(history.TotalRotation, Is.EqualTo(180));
+        }
     }
 }
