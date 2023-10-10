@@ -102,6 +102,7 @@ namespace osu.Game.Tests.Visual.Gameplay
         {
             DateTimeOffset? getLastPlayed() => Realm.Run(r => r.Find<BeatmapInfo>(Beatmap.Value.BeatmapInfo.ID)?.LastPlayed);
 
+            AddStep("reset last played", () => Realm.Write(r => r.Find<BeatmapInfo>(Beatmap.Value.BeatmapInfo.ID)!.LastPlayed = null));
             AddAssert("last played is null", () => getLastPlayed() == null);
 
             CreateTest();
