@@ -112,31 +112,19 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
         {
             Debug.Assert(currentSpinSegment.Direction != 0);
 
-            if (segments.Count > 0 && currentTime <= currentSpinSegment.StartTime)
-            {
-                // The case for crossing a segment (calculate based on absolute rotation).
+            // The current, absolute (i.e. 0-to-360) rotation.
+            float currentPosAbsolute = (currentSpinSegment.CurrentRotation + delta) % 360;
+            if (Math.Sign(currentPosAbsolute) < 0)
+                currentPosAbsolute += 360;
 
-                // The current, absolute (i.e. 0-to-360) rotation.
-                float currentPosAbsolute = (currentSpinSegment.CurrentRotation + delta) % 360;
-                if (Math.Sign(currentPosAbsolute) < 0)
-                    currentPosAbsolute += 360;
+            // Exclude any segments that we've rewound past.
+            while (segments.Count > 0 && currentTime <= currentSpinSegment.StartTime)
+                currentSpinSegment = segments.Pop();
 
-                // Exclude any segments that we've rewound past.
-                while (segments.Count > 0 && currentTime <= currentSpinSegment.StartTime)
-                    currentSpinSegment = segments.Pop();
-
-                // Compute the rotation for the current segment based on the absolute rotatiobn.
-                currentSpinSegment.CurrentRotation = currentSpinSegment.Direction < 0
-                    ? Math.Min(0, currentPosAbsolute - 360)
-                    : Math.Max(0, currentPosAbsolute);
-            }
-            else
-            {
-                // The case for not crossing a segment.
-                currentSpinSegment.CurrentRotation = currentSpinSegment.Direction < 0
-                    ? Math.Min(0, currentSpinSegment.CurrentRotation + delta)
-                    : Math.Max(0, currentSpinSegment.CurrentRotation + delta);
-            }
+            // Compute the rotation for the current segment based on the absolute rotatiobn.
+            currentSpinSegment.CurrentRotation = currentSpinSegment.Direction < 0
+                ? Math.Min(0, currentPosAbsolute - 360)
+                : Math.Max(0, currentPosAbsolute);
 
             // Check if we've rewound exactly onto a complete spin, and insert a new segment.
             if (currentSpinSegment.IsCompleteSpin)
