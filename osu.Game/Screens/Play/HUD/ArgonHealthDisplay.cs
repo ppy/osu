@@ -142,18 +142,8 @@ namespace osu.Game.Screens.Play.HUD
 
             Current.BindValueChanged(v =>
             {
-                Scheduler.AddOnce(() =>
-                {
-                    if (v.NewValue >= GlowBarValue)
-                        finishMissDisplay();
-
-                    double time = v.NewValue > GlowBarValue ? 500 : 250;
-
-                    // TODO: this should probably use interpolation in update.
-                    this.TransformTo(nameof(HealthBarValue), v.NewValue, time, Easing.OutQuint);
-                    if (resetMissBarDelegate == null)
-                        this.TransformTo(nameof(GlowBarValue), v.NewValue, time, Easing.OutQuint);
-                });
+                // For some reason making the delegate inline here doesn't work correctly.
+                Scheduler.AddOnce(updateCurrent);
             }, true);
 
             BarLength.BindValueChanged(l => Width = l.NewValue, true);
@@ -167,6 +157,17 @@ namespace osu.Game.Screens.Play.HUD
                 updatePath();
 
             return base.OnInvalidate(invalidation, source);
+        }
+
+        private void updateCurrent()
+        {
+            if (Current.Value >= GlowBarValue) finishMissDisplay();
+
+            double time = Current.Value > GlowBarValue ? 500 : 250;
+
+            // TODO: this should probably use interpolation in update.
+            this.TransformTo(nameof(HealthBarValue), Current.Value, time, Easing.OutQuint);
+            if (resetMissBarDelegate == null) this.TransformTo(nameof(GlowBarValue), Current.Value, time, Easing.OutQuint);
         }
 
         protected override void Update()
