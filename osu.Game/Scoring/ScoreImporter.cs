@@ -190,6 +190,9 @@ namespace osu.Game.Scoring
         /// </summary>
         private void populateUserDetails(ScoreInfo model)
         {
+            if (model.RealmUser.OnlineID == APIUser.SYSTEM_USER_ID)
+                return;
+
             string username = model.RealmUser.Username;
 
             if (usernameLookupCache.TryGetValue(username, out var existing))
