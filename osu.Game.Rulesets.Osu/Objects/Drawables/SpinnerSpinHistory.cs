@@ -103,39 +103,27 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
 
         private void rewindDelta(double currentTime, float delta)
         {
-            int lastDirection = currentSpinSegment.Direction;
+            Debug.Assert(currentSpinSegment.Direction != 0);
 
-            while (currentTime < currentSpinSegment.StartTime)
-            {
-                lastDirection = currentSpinSegment.Direction;
+            // The current, absolute (i.e. 0-to-360) rotation.
+            float currentPosAbsolute = (currentSpinSegment.CurrentRotation + delta) % 360;
+            if (Math.Sign(currentPosAbsolute) < 0)
+                currentPosAbsolute += 360;
 
-                // When crossing over a segment, we need to adjust the delta so that it's relative to the end point of the next segment.
-                //
-                // This is done by ADDING the delta between the current segment and the next segment.
-                // To understand why this is, notice that delta is a rate-independent value. Suppose the segment values are { 90, 45 } (i.e. CW then CCW spin)...
-                // - If delta < 0 (e.g. -15) (i.e. CCW rotation), then the next segment should be <45 (therefore delta = -15 + (45 - 90) = -60, next = 30).
-                // - If delta = 0, then the next segment should be =45 (therefore delta = 0 + (45 - 90) = -45, next = 45).
-                // - If delta > 0 (e.g. +15) (i.e. CW rotation), then the next segment should be >45 (therefore delta = 15 + (45 - 90) = -30, next = 60).
-                //
-                // There is a special case when crossing a complete spin, because the segment following it starts at 0 rather than the previous segment's value.
-                // In this case, only the remaining delta in the current segment needs to be considered.
+            // Exclude any segments that we've rewound past.
+            while (segments.Count > 0 && currentTime < currentSpinSegment.StartTime)
+                currentSpinSegment = segments.Pop();
 
-                SpinSegment nextSpinSegment = segments.Pop();
-
-                if (nextSpinSegment.IsCompleteSpin)
-                    delta += currentSpinSegment.CurrentRotation;
-                else
-                    delta += currentSpinSegment.CurrentRotation - nextSpinSegment.CurrentRotation;
-
-                currentSpinSegment = nextSpinSegment;
-            }
-
-            currentSpinSegment.CurrentRotation += delta;
+            // Compute the rotation for the current segment based on the absolute rotation.
+            currentSpinSegment.CurrentRotation = currentSpinSegment.Direction < 0
+                ? Math.Min(0, currentPosAbsolute - 360)
+                : Math.Max(0, currentPosAbsolute);
 
             // Check if we've rewound exactly onto a complete spin, and insert a new segment.
             if (currentSpinSegment.IsCompleteSpin)
             {
-                beginNewSegment(currentTime, lastDirection);
+                // The direction doesn't really matter here - a new segment will be inserted during following forward playback if incorrect.
+                beginNewSegment(currentTime, currentSpinSegment.Direction);
                 currentSpinSegment.CurrentRotation = 0;
             }
 

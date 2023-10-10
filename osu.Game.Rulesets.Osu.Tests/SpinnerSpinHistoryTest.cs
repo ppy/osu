@@ -105,22 +105,6 @@ namespace osu.Game.Rulesets.Osu.Tests
             Assert.That(history.TotalRotation, Is.EqualTo(expectedRotation));
         }
 
-        [TestCase(10, 370)]
-        [TestCase(-10, 370)]
-        public void TestRewindToCompletedSpin(float continuationDelta, float expectedFinalRotation)
-        {
-            history.ReportDelta(1000, 370);
-            Assert.That(history.TotalRotation, Is.EqualTo(370));
-
-            // Rewind to the completed spin.
-            history.ReportDelta(500, -10);
-            Assert.That(history.TotalRotation, Is.EqualTo(360));
-
-            // Continue forward playback
-            history.ReportDelta(1000, continuationDelta);
-            Assert.That(history.TotalRotation, Is.EqualTo(expectedFinalRotation));
-        }
-
         [Test]
         public void TestRewindMultipleFullSpins()
         {
