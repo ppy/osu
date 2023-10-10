@@ -75,7 +75,7 @@ namespace osu.Game.Screens.Play.HUD
                     return;
 
                 glowBarValue = value;
-                updatePathVertices();
+                Scheduler.AddOnce(updatePathVertices);
             }
         }
 
@@ -90,7 +90,7 @@ namespace osu.Game.Screens.Play.HUD
                     return;
 
                 healthBarValue = value;
-                updatePathVertices();
+                Scheduler.AddOnce(updatePathVertices);
             }
         }
 
