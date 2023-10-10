@@ -139,11 +139,7 @@ namespace osu.Game.Screens.Play.HUD
         {
             base.LoadComplete();
 
-            Current.BindValueChanged(v =>
-            {
-                // For some reason making the delegate inline here doesn't work correctly.
-                Scheduler.AddOnce(updateCurrent);
-            }, true);
+            Current.BindValueChanged(_ => Scheduler.AddOnce(updateCurrent), true);
 
             BarLength.BindValueChanged(l => Width = l.NewValue, true);
             BarHeight.BindValueChanged(_ => updatePath());
