@@ -151,8 +151,6 @@ namespace osu.Game.Rulesets.Scoring
             {
                 var judgement = obj.CreateJudgement();
 
-                HitResultExtensions.ValidateHitResultPair(judgement.MaxResult, judgement.MinResult);
-
                 var result = CreateResult(obj, judgement);
                 if (result == null)
                     throw new InvalidOperationException($"{GetType().ReadableName()} must provide a {nameof(JudgementResult)} through {nameof(CreateResult)}.");
