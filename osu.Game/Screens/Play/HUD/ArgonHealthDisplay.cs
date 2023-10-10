@@ -16,7 +16,6 @@ using osu.Framework.Threading;
 using osu.Framework.Utils;
 using osu.Game.Configuration;
 using osu.Game.Graphics;
-using osu.Game.Rulesets.Judgements;
 using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Objects.Types;
 using osu.Game.Skinning;
@@ -75,7 +74,7 @@ namespace osu.Game.Screens.Play.HUD
                     return;
 
                 glowBarValue = value;
-                updatePathVertices();
+                Scheduler.AddOnce(updatePathVertices);
             }
         }
 
@@ -90,7 +89,7 @@ namespace osu.Game.Screens.Play.HUD
                     return;
 
                 healthBarValue = value;
-                updatePathVertices();
+                Scheduler.AddOnce(updatePathVertices);
             }
         }
 
@@ -140,17 +139,7 @@ namespace osu.Game.Screens.Play.HUD
         {
             base.LoadComplete();
 
-            Current.BindValueChanged(v =>
-            {
-                if (v.NewValue >= GlowBarValue)
-                    finishMissDisplay();
-
-                double time = v.NewValue > GlowBarValue ? 500 : 250;
-
-                this.TransformTo(nameof(HealthBarValue), v.NewValue, time, Easing.OutQuint);
-                if (resetMissBarDelegate == null)
-                    this.TransformTo(nameof(GlowBarValue), v.NewValue, time, Easing.OutQuint);
-            }, true);
+            Current.BindValueChanged(_ => Scheduler.AddOnce(updateCurrent), true);
 
             BarLength.BindValueChanged(l => Width = l.NewValue, true);
             BarHeight.BindValueChanged(_ => updatePath());
@@ -165,6 +154,17 @@ namespace osu.Game.Screens.Play.HUD
             return base.OnInvalidate(invalidation, source);
         }
 
+        private void updateCurrent()
+        {
+            if (Current.Value >= GlowBarValue) finishMissDisplay();
+
+            double time = Current.Value > GlowBarValue ? 500 : 250;
+
+            // TODO: this should probably use interpolation in update.
+            this.TransformTo(nameof(HealthBarValue), Current.Value, time, Easing.OutQuint);
+            if (resetMissBarDelegate == null) this.TransformTo(nameof(GlowBarValue), Current.Value, time, Easing.OutQuint);
+        }
+
         protected override void Update()
         {
             base.Update();
@@ -173,9 +173,9 @@ namespace osu.Game.Screens.Play.HUD
             glowBar.Alpha = (float)Interpolation.DampContinuously(glowBar.Alpha, GlowBarValue > 0 ? 1 : 0, 40, Time.Elapsed);
         }
 
-        protected override void Flash(JudgementResult result)
+        protected override void Flash()
         {
-            base.Flash(result);
+            base.Flash();
 
             mainBar.TransformTo(nameof(BarPath.GlowColour), main_bar_glow_colour.Opacity(0.8f))
                    .TransformTo(nameof(BarPath.GlowColour), main_bar_glow_colour, 300, Easing.OutQuint);
@@ -191,9 +191,9 @@ namespace osu.Game.Screens.Play.HUD
             }
         }
 
-        protected override void Miss(JudgementResult result)
+        protected override void Miss()
         {
-            base.Miss(result);
+            base.Miss();
 
             if (resetMissBarDelegate != null)
             {
