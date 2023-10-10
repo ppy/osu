@@ -56,24 +56,43 @@ namespace osu.Game.Rulesets.Osu.Tests
         {
             List<ReplayFrame> frames = new List<ReplayFrame>();
 
-            double currentTime = startTime;
-            float currentAngle = startAngle;
+            double lastTime = startTime;
+            float lastAngle = startAngle;
+            int lastDirection = 0;
 
-            foreach (var seq in sequences)
+            for (int i = 0; i < sequences.Count; i++)
             {
-                double seqStartTime = currentTime;
-                double seqEndTime = currentTime + seq.duration;
-                float seqEndAngle = currentAngle + seq.deltaAngle;
+                var seq = sequences[i];
+
+                int seqDirection = Math.Sign(seq.deltaAngle);
+                float seqError = SPIN_ERROR * seqDirection;
+
+                if (seqDirection == lastDirection)
+                {
+                    // Spinning in the same direction, but the error was already added in the last rotation.
+                    seqError = 0;
+                }
+                else if (lastDirection != 0)
+                {
+                    // Spinning in a different direction, we need to account for the error of the start angle, so double it.
+                    seqError *= 2;
+                }
+
+                double seqStartTime = lastTime;
+                double seqEndTime = lastTime + seq.duration;
+                float seqStartAngle = lastAngle;
+                float seqEndAngle = seqStartAngle + seq.deltaAngle + seqError;
 
                 // Intermediate spin frames.
-                for (; currentTime < seqEndTime; currentTime += 10)
-                    frames.Add(new OsuReplayFrame(currentTime, calcOffsetAt((currentTime - seqStartTime) / (seqEndTime - seqStartTime), currentAngle, seqEndAngle), OsuAction.LeftButton));
+                for (; lastTime < seqEndTime; lastTime += 10)
+                    frames.Add(new OsuReplayFrame(lastTime, calcOffsetAt((lastTime - seqStartTime) / (seqEndTime - seqStartTime), seqStartAngle, seqEndAngle), OsuAction.LeftButton));
 
                 // Final frame at the end of the current spin.
-                frames.Add(new OsuReplayFrame(currentTime, calcOffsetAt(1, currentAngle, seqEndAngle), OsuAction.LeftButton));
+                frames.Add(new OsuReplayFrame(lastTime, calcOffsetAt(1, seqStartAngle, seqEndAngle), OsuAction.LeftButton));
 
-                currentTime = seqEndTime;
-                currentAngle = seqEndAngle;
+                lastTime = seqEndTime;
+                lastAngle = seqEndAngle;
+                lastDirection = seqDirection;
             }
 
             // Key release frame.
@@ -85,10 +104,7 @@ namespace osu.Game.Rulesets.Osu.Tests
 
         private static Vector2 calcOffsetAt(double p, float startAngle, float endAngle)
         {
-            int direction = Math.Sign(endAngle - startAngle);
-            float errorAdjustedEndAngle = endAngle + SPIN_ERROR * direction;
-
-            float angle = startAngle + (errorAdjustedEndAngle - startAngle) * (float)p;
+            float angle = startAngle + (endAngle - startAngle) * (float)p;
             return new Vector2(256, 192) + centre_spin_offset * new Vector2(MathF.Cos(angle), MathF.Sin(angle));
         }
     }
