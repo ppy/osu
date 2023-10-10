@@ -107,7 +107,7 @@ namespace osu.Game.Tests.Rulesets.Scoring
 
             for (int i = 0; i < 4; i++)
             {
-                var judgementResult = new JudgementResult(fourObjectBeatmap.HitObjects[i], beatmap.HitObjects[i].CreateJudgement())
+                var judgementResult = new JudgementResult(fourObjectBeatmap.HitObjects[i], fourObjectBeatmap.HitObjects[i].CreateJudgement())
                 {
                     Type = i == 2 ? minResult : hitResult
                 };
@@ -277,8 +277,8 @@ namespace osu.Game.Tests.Rulesets.Scoring
             {
                 HitObjects = new List<HitObject>
                 {
-                    new TestHitObject(HitResult.Great, HitResult.ComboBreak),
-                    new TestHitObject(HitResult.Great, HitResult.ComboBreak),
+                    new TestHitObject(HitResult.Great),
+                    new TestHitObject(HitResult.IgnoreHit, HitResult.ComboBreak),
                 }
             };
 
