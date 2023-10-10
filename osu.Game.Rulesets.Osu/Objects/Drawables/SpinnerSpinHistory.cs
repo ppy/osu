@@ -48,6 +48,8 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
         /// </summary>
         private SpinSegment currentSpinSegment;
 
+        private double lastReportTime = double.NegativeInfinity;
+
         /// <summary>
         /// Report a delta update based on user input.
         /// </summary>
@@ -55,10 +57,12 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
         /// <param name="deltaAngle">The delta of the angle moved through since the last report.</param>
         public void ReportDelta(double currentTime, float deltaAngle)
         {
-            if (currentTime >= currentSpinSegment.StartTime)
+            if (currentTime >= lastReportTime)
                 addDelta(currentTime, deltaAngle);
             else
                 rewindDelta(currentTime, deltaAngle);
+
+            lastReportTime = currentTime;
         }
 
         private void addDelta(double currentTime, float delta)
