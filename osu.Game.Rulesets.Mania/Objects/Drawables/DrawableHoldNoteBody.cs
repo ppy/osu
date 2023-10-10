@@ -23,8 +23,9 @@ namespace osu.Game.Rulesets.Mania.Objects.Drawables
 
         internal void TriggerResult(bool hit)
         {
-            if (!AllJudged)
-                ApplyResult(r => r.Type = hit ? r.Judgement.MaxResult : r.Judgement.MinResult);
+            if (AllJudged) return;
+
+            ApplyResult(r => r.Type = hit ? r.Judgement.MaxResult : r.Judgement.MinResult);
         }
     }
 }

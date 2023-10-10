@@ -61,7 +61,7 @@ namespace osu.Game.Rulesets.Mania.Objects.Drawables
         public double? HoldStartTime { get; private set; }
 
         /// <summary>
-        /// Whether the hold note has been released potentially without having caused a break.
+        /// Used to decide whether to visually clamp the hold note to the judgement line.
         /// </summary>
         private double? releaseTime;
 
@@ -322,19 +322,22 @@ namespace osu.Game.Rulesets.Mania.Objects.Drawables
             if (e.Action != Action.Value)
                 return;
 
-            // Make sure a hold was started
-            if (HoldStartTime == null)
-                return;
-
             // do not run any of this logic when rewinding, as it inverts order of presses/releases.
             if ((Clock as IGameplayClock)?.IsRewinding == true)
                 return;
 
-            Tail.UpdateResult();
-            Body.TriggerResult(Tail.IsHit);
+            // When our action is released and we are in the middle of a hold, there's a chance that
+            // the user has released too early (before the tail).
+            //
+            // In such a case, we want to record this against the DrawableHoldNoteBody.
+            if (HoldStartTime != null)
+            {
+                Tail.UpdateResult();
+                Body.TriggerResult(Tail.IsHit);
 
-            endHold();
-            releaseTime = Time.Current;
+                endHold();
+                releaseTime = Time.Current;
+            }
         }
 
         private void endHold()
