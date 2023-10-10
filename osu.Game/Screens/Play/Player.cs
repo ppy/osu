@@ -1078,7 +1078,7 @@ namespace osu.Game.Screens.Play
         protected virtual void StartGameplay()
         {
             if (GameplayClockContainer.IsRunning)
-                throw new InvalidOperationException($"{nameof(StartGameplay)} should not be called when the gameplay clock is already running");
+                Logger.Error(new InvalidOperationException($"{nameof(StartGameplay)} should not be called when the gameplay clock is already running"), "Clock failure");
 
             GameplayClockContainer.Reset(startClock: true);
 
