@@ -5,6 +5,7 @@ using System;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
+using osu.Game.Graphics.Sprites;
 using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Online.Leaderboards;
 using osu.Game.Overlays;
@@ -25,17 +26,22 @@ namespace osu.Game.Tests.Visual.SongSelect
         private OverlayColourProvider colourProvider { get; set; } = new OverlayColourProvider(OverlayColourScheme.Aquamarine);
 
         private FillFlowContainer fillFlow = null!;
+        private OsuSpriteText drawWidthText = null!;
 
         [BackgroundDependencyLoader]
         private void load()
         {
-            Child = fillFlow = new FillFlowContainer
+            Children = new Drawable[]
             {
-                Anchor = Anchor.Centre,
-                Origin = Anchor.Centre,
-                Spacing = new Vector2(0, 10),
-                RelativeSizeAxes = Axes.X,
-                AutoSizeAxes = Axes.Y,
+                fillFlow = new FillFlowContainer
+                {
+                    Anchor = Anchor.Centre,
+                    Origin = Anchor.Centre,
+                    Spacing = new Vector2(0, 10),
+                    RelativeSizeAxes = Axes.X,
+                    AutoSizeAxes = Axes.Y,
+                },
+                drawWidthText = new OsuSpriteText(),
             };
 
             foreach (var scoreInfo in getTestScores())
@@ -48,6 +54,13 @@ namespace osu.Game.Tests.Visual.SongSelect
             {
                 fillFlow.Width = v;
             });
+        }
+
+        protected override void UpdateAfterChildren()
+        {
+            base.UpdateAfterChildren();
+
+            drawWidthText.Text = $"DrawWidth: {fillFlow.DrawWidth}";
         }
 
         private static ScoreInfo[] getTestScores()
