@@ -15,7 +15,6 @@ using osu.Framework.Layout;
 using osu.Framework.Threading;
 using osu.Framework.Utils;
 using osu.Game.Configuration;
-using osu.Game.Graphics;
 using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Objects.Types;
 using osu.Game.Skinning;
@@ -113,7 +112,7 @@ namespace osu.Game.Screens.Play.HUD
                     glowBar = new BarPath
                     {
                         BarColour = Color4.White,
-                        GlowColour = OsuColour.Gray(0.5f),
+                        GlowColour = main_bar_glow_colour,
                         Blending = BlendingParameters.Additive,
                         Colour = ColourInfo.GradientHorizontal(Color4.White.Opacity(0.8f), Color4.White),
                         PathRadius = 40f,
@@ -182,12 +181,13 @@ namespace osu.Game.Screens.Play.HUD
 
             if (resetMissBarDelegate == null)
             {
-                glowBar.TransformTo(nameof(BarPath.BarColour), Colour4.White, 100, Easing.OutQuint)
+                glowBar.TransformTo(nameof(BarPath.BarColour), Colour4.White, 30, Easing.OutQuint)
                        .Then()
-                       .TransformTo(nameof(BarPath.BarColour), main_bar_colour, 800, Easing.OutQuint);
+                       .TransformTo(nameof(BarPath.BarColour), main_bar_colour, 1000, Easing.OutQuint);
 
-                glowBar.TransformTo(nameof(BarPath.GlowColour), Colour4.White)
-                       .TransformTo(nameof(BarPath.GlowColour), main_bar_glow_colour, 800, Easing.OutQuint);
+                glowBar.TransformTo(nameof(BarPath.GlowColour), Colour4.White, 30, Easing.OutQuint)
+                       .Then()
+                       .TransformTo(nameof(BarPath.GlowColour), main_bar_glow_colour, 300, Easing.OutQuint);
             }
         }
 
@@ -221,6 +221,9 @@ namespace osu.Game.Screens.Play.HUD
 
         private void finishMissDisplay()
         {
+            if (resetMissBarDelegate == null)
+                return;
+
             if (Current.Value > 0)
             {
                 glowBar.TransformTo(nameof(BarPath.BarColour), main_bar_colour, 300, Easing.In);
