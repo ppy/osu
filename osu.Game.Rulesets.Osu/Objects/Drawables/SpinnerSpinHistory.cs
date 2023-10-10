@@ -146,7 +146,9 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
         /// <param name="direction">The segment's direction.</param>
         private void beginNewSegment(double currentTime, int direction)
         {
-            segments.Push(currentSpinSegment);
+            if (currentSpinSegment.Direction != 0)
+                segments.Push(currentSpinSegment);
+
             currentSpinSegment = new SpinSegment(currentTime, direction, currentSpinSegment.CurrentRotation);
         }
 
