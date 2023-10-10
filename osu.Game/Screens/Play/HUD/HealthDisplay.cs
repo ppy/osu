@@ -103,6 +103,9 @@ namespace osu.Game.Screens.Play.HUD
 
         private void finishInitialAnimation()
         {
+            if (initialIncrease == null)
+                return;
+
             initialIncrease?.Cancel();
             initialIncrease = null;
 
