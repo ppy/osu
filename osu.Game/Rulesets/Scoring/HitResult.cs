@@ -337,17 +337,20 @@ namespace osu.Game.Rulesets.Scoring
             if (minResult == HitResult.None || IsHit(minResult))
                 throw new ArgumentOutOfRangeException(nameof(minResult), $"{minResult} is not a valid minimum judgement result.");
 
+            if (maxResult == HitResult.IgnoreHit && minResult is not (HitResult.IgnoreMiss or HitResult.ComboBreak))
+                throw new ArgumentOutOfRangeException(nameof(minResult), $"{minResult} is not a valid minimum result for a {maxResult} judgement.");
+
             if (maxResult.IsBonus() && minResult != HitResult.IgnoreMiss)
                 throw new ArgumentOutOfRangeException(nameof(minResult), $"{HitResult.IgnoreMiss} is the only valid minimum result for a {maxResult} judgement.");
 
-            if (maxResult == HitResult.LargeTickHit && minResult is not (HitResult.LargeTickMiss or HitResult.IgnoreMiss or HitResult.ComboBreak))
-                throw new ArgumentOutOfRangeException(nameof(minResult), $"{minResult} is not a valid minimum result for a {maxResult} judgement.");
+            if (maxResult == HitResult.LargeTickHit && minResult != HitResult.LargeTickMiss)
+                throw new ArgumentOutOfRangeException(nameof(minResult), $"{HitResult.LargeTickMiss} is the only valid minimum result for a {maxResult} judgement.");
 
-            if (maxResult == HitResult.SmallTickHit && minResult is not (HitResult.SmallTickMiss or HitResult.IgnoreMiss or HitResult.ComboBreak))
-                throw new ArgumentOutOfRangeException(nameof(minResult), $"{minResult} is not a valid minimum result for a {maxResult} judgement.");
+            if (maxResult == HitResult.SmallTickHit && minResult != HitResult.SmallTickMiss)
+                throw new ArgumentOutOfRangeException(nameof(minResult), $"{HitResult.SmallTickMiss} is the only valid minimum result for a {maxResult} judgement.");
 
-            if (maxResult.IsBasic() && minResult is not (HitResult.Miss or HitResult.IgnoreMiss or HitResult.ComboBreak))
-                throw new ArgumentOutOfRangeException(nameof(minResult), $"{minResult} is not a valid minimum result for a {maxResult} judgement.");
+            if (maxResult.IsBasic() && minResult != HitResult.Miss)
+                throw new ArgumentOutOfRangeException(nameof(minResult), $"{HitResult.Miss} is the only valid minimum result for a {maxResult} judgement.");
         }
     }
 #pragma warning restore CS0618

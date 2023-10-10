@@ -44,7 +44,7 @@ namespace osu.Game.Rulesets.Judgements
         ///   </listheader>
         /// <item>
         ///   <term><see cref="HitResult.Perfect"/>, <see cref="HitResult.Great"/>, <see cref="HitResult.Good"/>, <see cref="HitResult.Ok"/>, <see cref="HitResult.Meh"/></term>
-        ///   <description><see cref="HitResult.Miss"/>, <see cref="HitResult.IgnoreMiss"/>, <see cref="HitResult.ComboBreak"/></description>
+        ///   <description><see cref="HitResult.Miss"/></description>
         /// </item>
         /// <item>
         ///   <term><see cref="HitResult.LargeBonus"/></term>
@@ -56,11 +56,11 @@ namespace osu.Game.Rulesets.Judgements
         /// </item>
         /// <item>
         ///   <term><see cref="HitResult.SmallTickHit"/></term>
-        ///   <description><see cref="HitResult.SmallTickMiss"/>, <see cref="HitResult.IgnoreMiss"/>, <see cref="HitResult.ComboBreak"/></description>
+        ///   <description><see cref="HitResult.SmallTickMiss"/></description>
         /// </item>
         /// <item>
         ///   <term><see cref="HitResult.LargeTickHit"/></term>
-        ///   <description><see cref="HitResult.LargeTickMiss"/>, <see cref="HitResult.IgnoreMiss"/>, <see cref="HitResult.ComboBreak"/></description>
+        ///   <description><see cref="HitResult.LargeTickMiss"/></description>
         /// </item>
         /// <item>
         ///   <term><see cref="HitResult.IgnoreHit"/></term>
