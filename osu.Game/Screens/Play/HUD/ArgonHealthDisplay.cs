@@ -16,7 +16,6 @@ using osu.Framework.Threading;
 using osu.Framework.Utils;
 using osu.Game.Configuration;
 using osu.Game.Graphics;
-using osu.Game.Rulesets.Judgements;
 using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Objects.Types;
 using osu.Game.Skinning;
@@ -178,9 +177,9 @@ namespace osu.Game.Screens.Play.HUD
             glowBar.Alpha = (float)Interpolation.DampContinuously(glowBar.Alpha, GlowBarValue > 0 ? 1 : 0, 40, Time.Elapsed);
         }
 
-        protected override void Flash(JudgementResult result)
+        protected override void Flash()
         {
-            base.Flash(result);
+            base.Flash();
 
             mainBar.TransformTo(nameof(BarPath.GlowColour), main_bar_glow_colour.Opacity(0.8f))
                    .TransformTo(nameof(BarPath.GlowColour), main_bar_glow_colour, 300, Easing.OutQuint);
@@ -196,9 +195,9 @@ namespace osu.Game.Screens.Play.HUD
             }
         }
 
-        protected override void Miss(JudgementResult result)
+        protected override void Miss()
         {
-            base.Miss(result);
+            base.Miss();
 
             if (resetMissBarDelegate != null)
             {

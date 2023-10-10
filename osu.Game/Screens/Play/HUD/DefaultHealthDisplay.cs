@@ -8,7 +8,6 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Effects;
 using osu.Game.Graphics;
-using osu.Game.Rulesets.Judgements;
 using osuTK;
 using osuTK.Graphics;
 using osu.Framework.Graphics.Shapes;
@@ -112,7 +111,7 @@ namespace osu.Game.Screens.Play.HUD
             };
         }
 
-        protected override void Flash(JudgementResult result)
+        protected override void Flash()
         {
             fill.FadeEdgeEffectTo(Math.Min(1, fill.EdgeEffect.Colour.Linear.A + (1f - base_glow_opacity) / glow_max_hits), 50, Easing.OutQuint)
                 .Delay(glow_fade_delay)
