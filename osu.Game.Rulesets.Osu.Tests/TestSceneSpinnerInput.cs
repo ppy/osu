@@ -1,7 +1,6 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using System;
 using System.Collections.Generic;
 using System.Linq;
 using NUnit.Framework;
@@ -186,40 +185,22 @@ namespace osu.Game.Rulesets.Osu.Tests
             DrawableSpinner drawableSpinner = null!;
             AddUntilStep("get spinner", () => (drawableSpinner = currentPlayer.ChildrenOfType<DrawableSpinner>().Single()) != null);
 
-            addSeekStep(time_spinner_start + 2000);
-            assertTotalRotation(900);
+            assertTotalRotation(2000, 900);
+            assertTotalRotation(1750, 810);
+            assertTotalRotation(1500, 720);
+            assertTotalRotation(1250, 530);
+            assertTotalRotation(1000, 540);
+            assertTotalRotation(875, 540);
+            assertTotalRotation(750, 540);
+            assertTotalRotation(500, 360);
+            assertTotalRotation(250, 180);
+            assertTotalRotation(0, 0);
 
-            addSeekStep(time_spinner_start + 1750);
-            assertTotalRotation(810);
-
-            addSeekStep(time_spinner_start + 1500);
-            assertTotalRotation(720);
-
-            addSeekStep(time_spinner_start + 1250);
-            assertTotalRotation(530);
-
-            addSeekStep(time_spinner_start + 1000);
-            assertTotalRotation(540);
-
-            addSeekStep(time_spinner_start + 875);
-            assertTotalRotation(540);
-
-            addSeekStep(time_spinner_start + 750);
-            assertTotalRotation(540);
-
-            addSeekStep(time_spinner_start + 500);
-            assertTotalRotation(360);
-
-            addSeekStep(time_spinner_start + 250);
-            assertTotalRotation(180);
-
-            addSeekStep(time_spinner_start);
-            assertTotalRotation(0);
-
-            void assertTotalRotation(float expected) => AddAssert(
-                $"total rotation is {expected}",
-                () => drawableSpinner.Result.TotalRotation, () =>
-                    Is.EqualTo(expected).Within(SpinFramesGenerator.SPIN_ERROR * 2 * 360 / MathF.PI));
+            void assertTotalRotation(double time, float expected)
+            {
+                addSeekStep(time_spinner_start + time);
+                AddAssert($"total rotation @ +{time} is {expected}", () => drawableSpinner.Result.TotalRotation, () => Is.EqualTo(expected).Within(MathHelper.RadiansToDegrees(SpinFramesGenerator.SPIN_ERROR * 2)));
+            }
 
             void addSeekStep(double time)
             {
