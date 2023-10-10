@@ -221,6 +221,9 @@ namespace osu.Game.Screens.Play.HUD
 
         private void finishMissDisplay()
         {
+            if (resetMissBarDelegate == null)
+                return;
+
             if (Current.Value > 0)
             {
                 glowBar.TransformTo(nameof(BarPath.BarColour), main_bar_colour, 300, Easing.In);
