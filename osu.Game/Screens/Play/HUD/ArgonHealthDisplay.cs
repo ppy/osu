@@ -181,12 +181,13 @@ namespace osu.Game.Screens.Play.HUD
 
             if (resetMissBarDelegate == null)
             {
-                glowBar.TransformTo(nameof(BarPath.BarColour), Colour4.White, 100, Easing.OutQuint)
+                glowBar.TransformTo(nameof(BarPath.BarColour), Colour4.White, 30, Easing.OutQuint)
                        .Then()
-                       .TransformTo(nameof(BarPath.BarColour), main_bar_colour, 800, Easing.OutQuint);
+                       .TransformTo(nameof(BarPath.BarColour), main_bar_colour, 1000, Easing.OutQuint);
 
-                glowBar.TransformTo(nameof(BarPath.GlowColour), Colour4.White)
-                       .TransformTo(nameof(BarPath.GlowColour), main_bar_glow_colour, 800, Easing.OutQuint);
+                glowBar.TransformTo(nameof(BarPath.GlowColour), Colour4.White, 30, Easing.OutQuint)
+                       .Then()
+                       .TransformTo(nameof(BarPath.GlowColour), main_bar_glow_colour, 300, Easing.OutQuint);
             }
         }
 
