@@ -18,12 +18,8 @@ namespace osu.Game.Online.Leaderboards
 {
     public partial class DrawableRank : CompositeDrawable
     {
-        private readonly ScoreRank rank;
-
         public DrawableRank(ScoreRank rank)
         {
-            this.rank = rank;
-
             RelativeSizeAxes = Axes.Both;
             FillMode = FillMode.Fit;
             FillAspectRatio = 2;
