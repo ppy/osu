@@ -57,7 +57,7 @@ namespace osu.Game.Online.Leaderboards
                             Origin = Anchor.Centre,
                             Spacing = new Vector2(-3, 0),
                             Padding = new MarginPadding { Top = 5 },
-                            Colour = getRankNameColour(),
+                            Colour = GetRankNameColour(rank),
                             Font = OsuFont.Numeric.With(size: 25),
                             Text = GetRankName(rank),
                             ShadowColour = Color4.Black.Opacity(0.3f),
@@ -74,7 +74,7 @@ namespace osu.Game.Online.Leaderboards
         /// <summary>
         ///  Retrieves the grade text colour.
         /// </summary>
-        private ColourInfo getRankNameColour()
+        public static ColourInfo GetRankNameColour(ScoreRank rank)
         {
             switch (rank)
             {

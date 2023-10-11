@@ -2,6 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
+using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
@@ -70,11 +71,10 @@ namespace osu.Game.Tests.Visual.SongSelect
                 new ScoreInfo
                 {
                     Position = 999,
-                    Rank = ScoreRank.XH,
+                    Rank = ScoreRank.X,
                     Accuracy = 1,
                     MaxCombo = 244,
                     TotalScore = 1707827,
-                    Mods = new Mod[] { new OsuModHidden(), new OsuModHardRock(), new OsuModAlternate(), new OsuModFlashlight(), new OsuModFreezeFrame() },
                     Ruleset = new OsuRuleset().RulesetInfo,
                     User = new APIUser
                     {
@@ -91,7 +91,6 @@ namespace osu.Game.Tests.Visual.SongSelect
                     Rank = ScoreRank.S,
                     Accuracy = 0.1f,
                     MaxCombo = 32040,
-                    Mods = new Mod[] { new OsuModHidden(), new OsuModHardRock(), new OsuModAlternate(), new OsuModFlashlight(), new OsuModFreezeFrame(), new OsuModClassic() },
                     TotalScore = 1707827,
                     Ruleset = new OsuRuleset().RulesetInfo,
                     User = new APIUser
@@ -106,7 +105,7 @@ namespace osu.Game.Tests.Visual.SongSelect
                 new ScoreInfo
                 {
                     Position = 110000,
-                    Rank = ScoreRank.X,
+                    Rank = ScoreRank.A,
                     Accuracy = 1,
                     MaxCombo = 244,
                     TotalScore = 17078279,
@@ -124,7 +123,7 @@ namespace osu.Game.Tests.Visual.SongSelect
                     Rank = ScoreRank.A,
                     Accuracy = 1,
                     MaxCombo = 244,
-                    TotalScore = 1707827,
+                    TotalScore = 1234567890,
                     Ruleset = new ManiaRuleset().RulesetInfo,
                     User = new APIUser
                     {
@@ -136,6 +135,20 @@ namespace osu.Game.Tests.Visual.SongSelect
                 },
                 TestResources.CreateTestScoreInfo(),
             };
+
+            for (int i = 0; i < LeaderboardScoreV2.MAX_MODS_EXPANDED; i++)
+                scores[0].Mods = scores[0].Mods.Concat(new Mod[] { i % 2 == 0 ? new OsuModHidden() : new OsuModHalfTime() }).ToArray();
+
+            for (int i = 0; i < LeaderboardScoreV2.MAX_MODS_EXPANDED + 1; i++)
+                scores[1].Mods = scores[1].Mods.Concat(new Mod[] { i % 2 == 0 ? new OsuModHidden() : new OsuModHalfTime() }).ToArray();
+
+            for (int i = 0; i < LeaderboardScoreV2.MAX_MODS_CONTRACTED; i++)
+                scores[2].Mods = scores[2].Mods.Concat(new Mod[] { i % 2 == 0 ? new OsuModHidden() : new OsuModHalfTime() }).ToArray();
+
+            for (int i = 0; i < LeaderboardScoreV2.MAX_MODS_CONTRACTED + 1; i++)
+                scores[3].Mods = scores[3].Mods.Concat(new Mod[] { i % 2 == 0 ? new OsuModHidden() : new OsuModHalfTime() }).ToArray();
+
+            scores[4].Mods = scores[4].BeatmapInfo!.Ruleset.CreateInstance().CreateAllMods().ToArray();
 
             return scores;
         }
