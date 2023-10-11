@@ -1,15 +1,15 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Extensions;
 using osu.Framework.Extensions.Color4Extensions;
+using osu.Framework.Extensions.ObjectExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Effects;
@@ -37,7 +37,7 @@ namespace osu.Game.Overlays.Settings.Sections.Input
         /// <summary>
         /// Invoked when the binding of this row is updated with a change being written.
         /// </summary>
-        public Action<KeyBindingRow> BindingUpdated { get; init; }
+        public Action<KeyBindingRow>? BindingUpdated { get; init; }
 
         /// <summary>
         /// Whether left and right mouse button clicks should be included in the edited bindings.
@@ -47,7 +47,7 @@ namespace osu.Game.Overlays.Settings.Sections.Input
         /// <summary>
         /// The default key bindings for this row.
         /// </summary>
-        public IEnumerable<KeyCombination> Defaults { get; init; }
+        public IEnumerable<KeyCombination> Defaults { get; init; } = Array.Empty<KeyCombination>();
 
         #region IFilterable
 
@@ -75,18 +75,18 @@ namespace osu.Game.Overlays.Settings.Sections.Input
         private Bindable<bool> isDefault { get; } = new BindableBool(true);
 
         [Resolved]
-        private ReadableKeyCombinationProvider keyCombinationProvider { get; set; }
+        private ReadableKeyCombinationProvider keyCombinationProvider { get; set; } = null!;
 
         [Resolved]
-        private RealmAccess realm { get; set; }
+        private RealmAccess realm { get; set; } = null!;
 
-        private Container content;
+        private Container content = null!;
 
-        private OsuSpriteText text;
-        private FillFlowContainer cancelAndClearButtons;
-        private FillFlowContainer<KeyButton> buttons;
+        private OsuSpriteText text = null!;
+        private FillFlowContainer cancelAndClearButtons = null!;
+        private FillFlowContainer<KeyButton> buttons = null!;
 
-        private KeyButton bindTarget;
+        private KeyButton? bindTarget;
 
         private const float transition_time = 150;
         private const float height = 20;
@@ -232,7 +232,12 @@ namespace osu.Game.Overlays.Settings.Sections.Input
 
         protected override bool OnMouseDown(MouseDownEvent e)
         {
-            if (!HasFocus || !bindTarget.IsHovered)
+            if (!HasFocus)
+                return base.OnMouseDown(e);
+
+            Debug.Assert(bindTarget != null);
+
+            if (!bindTarget.IsHovered)
                 return base.OnMouseDown(e);
 
             if (!AllowMainMouseButtons)
@@ -258,6 +263,8 @@ namespace osu.Game.Overlays.Settings.Sections.Input
                 return;
             }
 
+            Debug.Assert(bindTarget != null);
+
             if (bindTarget.IsHovered)
                 finalise(false);
             // prevent updating bind target before clear button's action
@@ -269,6 +276,8 @@ namespace osu.Game.Overlays.Settings.Sections.Input
         {
             if (HasFocus)
             {
+                Debug.Assert(bindTarget != null);
+
                 if (bindTarget.IsHovered)
                 {
                     bindTarget.UpdateKeyCombination(KeyCombination.FromInputState(e.CurrentState, e.ScrollDelta), KeyCombination.FromScrollDelta(e.ScrollDelta).First());
@@ -284,6 +293,8 @@ namespace osu.Game.Overlays.Settings.Sections.Input
         {
             if (!HasFocus || e.Repeat)
                 return false;
+
+            Debug.Assert(bindTarget != null);
 
             bindTarget.UpdateKeyCombination(KeyCombination.FromInputState(e.CurrentState), KeyCombination.FromKey(e.Key));
             if (!isModifier(e.Key)) finalise();
@@ -307,6 +318,8 @@ namespace osu.Game.Overlays.Settings.Sections.Input
             if (!HasFocus)
                 return false;
 
+            Debug.Assert(bindTarget != null);
+
             bindTarget.UpdateKeyCombination(KeyCombination.FromInputState(e.CurrentState), KeyCombination.FromJoystickButton(e.Button));
             finalise();
 
@@ -328,6 +341,8 @@ namespace osu.Game.Overlays.Settings.Sections.Input
         {
             if (!HasFocus)
                 return false;
+
+            Debug.Assert(bindTarget != null);
 
             bindTarget.UpdateKeyCombination(KeyCombination.FromInputState(e.CurrentState), KeyCombination.FromMidiKey(e.Key));
             finalise();
@@ -351,6 +366,8 @@ namespace osu.Game.Overlays.Settings.Sections.Input
             if (!HasFocus)
                 return false;
 
+            Debug.Assert(bindTarget != null);
+
             bindTarget.UpdateKeyCombination(KeyCombination.FromInputState(e.CurrentState), KeyCombination.FromTabletAuxiliaryButton(e.Button));
             finalise();
 
@@ -372,6 +389,8 @@ namespace osu.Game.Overlays.Settings.Sections.Input
         {
             if (!HasFocus)
                 return false;
+
+            Debug.Assert(bindTarget != null);
 
             bindTarget.UpdateKeyCombination(KeyCombination.FromInputState(e.CurrentState), KeyCombination.FromTabletPenButton(e.Button));
             finalise();
@@ -486,10 +505,10 @@ namespace osu.Game.Overlays.Settings.Sections.Input
             public readonly OsuSpriteText Text;
 
             [Resolved]
-            private OverlayColourProvider colourProvider { get; set; }
+            private OverlayColourProvider colourProvider { get; set; } = null!;
 
             [Resolved]
-            private ReadableKeyCombinationProvider keyCombinationProvider { get; set; }
+            private ReadableKeyCombinationProvider keyCombinationProvider { get; set; } = null!;
 
             private bool isBinding;
 
@@ -612,7 +631,7 @@ namespace osu.Game.Overlays.Settings.Sections.Input
             {
                 base.Dispose(isDisposing);
 
-                if (keyCombinationProvider != null)
+                if (keyCombinationProvider.IsNotNull())
                     keyCombinationProvider.KeymapChanged -= updateKeyCombinationText;
             }
         }
