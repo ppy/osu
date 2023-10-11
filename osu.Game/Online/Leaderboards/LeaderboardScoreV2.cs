@@ -130,7 +130,11 @@ namespace osu.Game.Online.Leaderboards
             shadowColour = isPersonalBest ? colourProvider.Background3 : colourProvider.Background6;
             totalScoreBackgroundGradient = ColourInfo.GradientHorizontal(backgroundColour.Opacity(0), backgroundColour);
 
-            statisticsLabels = GetStatistics(score).Select(s => new ScoreComponentLabel(s, score)).ToList();
+            statisticsLabels = GetStatistics(score).Select(s => new ScoreComponentLabel(s, score)
+            {
+                // ensure statistics container is the correct width when invalidating
+                AlwaysPresent = true,
+            }).ToList();
 
             Child = content = new Container
             {
@@ -288,6 +292,7 @@ namespace osu.Game.Online.Leaderboards
                                             Origin = Anchor.CentreRight,
                                             Child = statisticsContainer = new FillFlowContainer
                                             {
+                                                Name = @"Statistics container",
                                                 Padding = new MarginPadding { Right = 40 },
                                                 Spacing = new Vector2(25),
                                                 Shear = -shear,
@@ -295,7 +300,8 @@ namespace osu.Game.Online.Leaderboards
                                                 Origin = Anchor.CentreRight,
                                                 AutoSizeAxes = Axes.Both,
                                                 Direction = FillDirection.Horizontal,
-                                                Children = statisticsLabels
+                                                Children = statisticsLabels,
+                                                Alpha = 0,
                                             }
                                         }
                                     }
