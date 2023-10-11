@@ -228,7 +228,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Preprocessing
             double trackingEndTime = Math.Max(Math.Max(
                 slider.StartTime + slider.Duration + SliderEventGenerator.TAIL_LENIENCY,
                 slider.StartTime + slider.Duration / 2
-            ), slider.NestedHitObjects.OfType<SliderTick>().Last().StartTime);
+            ), slider.NestedHitObjects.OfType<SliderTick>().LastOrDefault()?.StartTime ?? double.MinValue);
 
             slider.LazyTravelTime = trackingEndTime - slider.StartTime;
 
