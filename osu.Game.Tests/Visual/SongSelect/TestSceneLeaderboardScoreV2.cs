@@ -3,6 +3,7 @@
 
 using System;
 using System.Linq;
+using NUnit.Framework;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
@@ -26,16 +27,28 @@ namespace osu.Game.Tests.Visual.SongSelect
         [Cached]
         private OverlayColourProvider colourProvider { get; set; } = new OverlayColourProvider(OverlayColourScheme.Aquamarine);
 
-        private FillFlowContainer fillFlow = null!;
-        private OsuSpriteText drawWidthText = null!;
+        private FillFlowContainer? fillFlow;
+        private OsuSpriteText? drawWidthText;
+        private float relativeWidth;
 
         [BackgroundDependencyLoader]
         private void load()
+        {
+            AddSliderStep("change relative width", 0, 1f, 0.6f, v =>
+            {
+                relativeWidth = v;
+                if (fillFlow != null) fillFlow.Width = v;
+            });
+        }
+
+        [SetUp]
+        public void Setup() => Schedule(() =>
         {
             Children = new Drawable[]
             {
                 fillFlow = new FillFlowContainer
                 {
+                    Width = relativeWidth,
                     Anchor = Anchor.Centre,
                     Origin = Anchor.Centre,
                     Spacing = new Vector2(0, 10),
@@ -50,18 +63,13 @@ namespace osu.Game.Tests.Visual.SongSelect
 
             foreach (var score in fillFlow.Children)
                 score.Show();
-
-            AddSliderStep("change relative width", 0, 1f, 0.6f, v =>
-            {
-                fillFlow.Width = v;
-            });
-        }
+        });
 
         protected override void UpdateAfterChildren()
         {
             base.UpdateAfterChildren();
 
-            drawWidthText.Text = $"DrawWidth: {fillFlow.DrawWidth}";
+            if (drawWidthText != null) drawWidthText.Text = $"DrawWidth: {fillFlow?.DrawWidth}";
         }
 
         private static ScoreInfo[] getTestScores()
