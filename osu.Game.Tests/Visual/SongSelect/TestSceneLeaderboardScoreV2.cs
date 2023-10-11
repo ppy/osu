@@ -146,14 +146,22 @@ namespace osu.Game.Tests.Visual.SongSelect
                 TestResources.CreateTestScoreInfo(),
             };
 
+            var halfTime = new OsuModHalfTime
+            {
+                SpeedChange =
+                {
+                    Value = 0.99
+                }
+            };
+
             for (int i = 0; i < LeaderboardScoreV2.MAX_MODS_EXPANDED; i++)
-                scores[0].Mods = scores[0].Mods.Concat(new Mod[] { i % 2 == 0 ? new OsuModHidden() : new OsuModHalfTime() }).ToArray();
+                scores[0].Mods = scores[0].Mods.Concat(new Mod[] { i % 2 == 0 ? new OsuModHidden() : halfTime }).ToArray();
 
             for (int i = 0; i < LeaderboardScoreV2.MAX_MODS_EXPANDED + 1; i++)
                 scores[1].Mods = scores[1].Mods.Concat(new Mod[] { i % 2 == 0 ? new OsuModHidden() : new OsuModHalfTime() }).ToArray();
 
             for (int i = 0; i < LeaderboardScoreV2.MAX_MODS_CONTRACTED; i++)
-                scores[2].Mods = scores[2].Mods.Concat(new Mod[] { i % 2 == 0 ? new OsuModHidden() : new OsuModHalfTime() }).ToArray();
+                scores[2].Mods = scores[2].Mods.Concat(new Mod[] { i % 2 == 0 ? new OsuModHidden() : halfTime }).ToArray();
 
             for (int i = 0; i < LeaderboardScoreV2.MAX_MODS_CONTRACTED + 1; i++)
                 scores[3].Mods = scores[3].Mods.Concat(new Mod[] { i % 2 == 0 ? new OsuModHidden() : new OsuModHalfTime() }).ToArray();
