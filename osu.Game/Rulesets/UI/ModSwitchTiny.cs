@@ -24,8 +24,8 @@ namespace osu.Game.Rulesets.UI
 
         private readonly IMod mod;
 
-        protected Box Background;
-        protected OsuSpriteText AcronymText;
+        private readonly Box background;
+        private readonly OsuSpriteText acronymText;
 
         private Color4 activeForegroundColour;
         private Color4 inactiveForegroundColour;
@@ -44,11 +44,11 @@ namespace osu.Game.Rulesets.UI
                 Masking = true,
                 Children = new Drawable[]
                 {
-                    Background = new Box
+                    background = new Box
                     {
                         RelativeSizeAxes = Axes.Both
                     },
-                    AcronymText = new OsuSpriteText
+                    acronymText = new OsuSpriteText
                     {
                         Anchor = Anchor.Centre,
                         Origin = Anchor.Centre,
@@ -78,14 +78,14 @@ namespace osu.Game.Rulesets.UI
         {
             base.LoadComplete();
 
-            Active.BindValueChanged(_ => UpdateState(), true);
+            Active.BindValueChanged(_ => updateState(), true);
             FinishTransforms(true);
         }
 
-        protected virtual void UpdateState()
+        private void updateState()
         {
-            AcronymText.FadeColour(Active.Value ? activeForegroundColour : inactiveForegroundColour, 200, Easing.OutQuint);
-            Background.FadeColour(Active.Value ? activeBackgroundColour : inactiveBackgroundColour, 200, Easing.OutQuint);
+            acronymText.FadeColour(Active.Value ? activeForegroundColour : inactiveForegroundColour, 200, Easing.OutQuint);
+            background.FadeColour(Active.Value ? activeBackgroundColour : inactiveBackgroundColour, 200, Easing.OutQuint);
         }
     }
 }
