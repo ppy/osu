@@ -78,6 +78,7 @@ namespace osu.Game.Graphics
                 case HitResult.SmallTickMiss:
                 case HitResult.LargeTickMiss:
                 case HitResult.Miss:
+                case HitResult.ComboBreak:
                     return Red;
 
                 case HitResult.Meh:
