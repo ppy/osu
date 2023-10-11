@@ -118,6 +118,22 @@ namespace osu.Game.Tests.Visual.SongSelect
                     },
                     Date = DateTimeOffset.Now,
                 },
+                new ScoreInfo
+                {
+                    Position = 110000,
+                    Rank = ScoreRank.A,
+                    Accuracy = 1,
+                    MaxCombo = 244,
+                    TotalScore = 1707827,
+                    Ruleset = new ManiaRuleset().RulesetInfo,
+                    User = new APIUser
+                    {
+                        Id = 226597,
+                        Username = @"WWWWWWWWWWWWWWWWWWWW",
+                        CountryCode = CountryCode.US,
+                    },
+                    Date = DateTimeOffset.Now,
+                },
                 TestResources.CreateTestScoreInfo(),
             };
 
