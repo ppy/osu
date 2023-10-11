@@ -18,7 +18,6 @@ using osu.Framework.Input;
 using osu.Framework.Input.Bindings;
 using osu.Framework.Input.Events;
 using osu.Framework.Localisation;
-using osu.Game.Database;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Graphics.UserInterface;
@@ -37,7 +36,11 @@ namespace osu.Game.Overlays.Settings.Sections.Input
         /// <summary>
         /// Invoked when the binding of this row is updated with a change being written.
         /// </summary>
-        public Action<KeyBindingRow>? BindingUpdated { get; set; }
+        public KeyBindingUpdated? BindingUpdated { get; set; }
+
+        public delegate void KeyBindingUpdated(KeyBindingRow sender, KeyBindingUpdatedEventArgs args);
+
+        public record KeyBindingUpdatedEventArgs(Guid KeyBindingID, string KeyCombinationString);
 
         /// <summary>
         /// Whether left and right mouse button clicks should be included in the edited bindings.
@@ -80,9 +83,6 @@ namespace osu.Game.Overlays.Settings.Sections.Input
 
         [Resolved]
         private ReadableKeyCombinationProvider keyCombinationProvider { get; set; } = null!;
-
-        [Resolved]
-        private RealmAccess realm { get; set; } = null!;
 
         private Container content = null!;
 
@@ -220,8 +220,7 @@ namespace osu.Game.Overlays.Settings.Sections.Input
             {
                 var button = buttons[i++];
                 button.UpdateKeyCombination(d);
-
-                updateStoreFromButton(button);
+                finalise();
             }
 
             isDefault.Value = true;
@@ -437,17 +436,16 @@ namespace osu.Game.Overlays.Settings.Sections.Input
         {
             if (bindTarget != null)
             {
-                updateStoreFromButton(bindTarget);
-
                 updateIsDefaultValue();
 
                 bindTarget.IsBinding = false;
+                var args = new KeyBindingUpdatedEventArgs(bindTarget.KeyBinding.Value.ID, bindTarget.KeyBinding.Value.KeyCombinationString);
                 Schedule(() =>
                 {
                     // schedule to ensure we don't instantly get focus back on next OnMouseClick (see AcceptFocus impl.)
                     bindTarget = null;
                     if (hasChanged)
-                        BindingUpdated?.Invoke(this);
+                        BindingUpdated?.Invoke(this, args);
                 });
             }
 
@@ -485,9 +483,6 @@ namespace osu.Game.Overlays.Settings.Sections.Input
             bindTarget = buttons.FirstOrDefault(b => b.IsHovered) ?? buttons.FirstOrDefault();
             if (bindTarget != null) bindTarget.IsBinding = true;
         }
-
-        private void updateStoreFromButton(KeyButton button) =>
-            realm.WriteAsync(r => r.Find<RealmKeyBinding>(button.KeyBinding.Value.ID)!.KeyCombinationString = button.KeyBinding.Value.KeyCombinationString);
 
         private void updateIsDefaultValue()
         {

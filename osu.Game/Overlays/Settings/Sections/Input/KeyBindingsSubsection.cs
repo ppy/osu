@@ -27,13 +27,16 @@ namespace osu.Game.Overlays.Settings.Sections.Input
 
         protected IEnumerable<KeyBinding> Defaults { get; init; } = Array.Empty<KeyBinding>();
 
+        [Resolved]
+        private RealmAccess realm { get; set; } = null!;
+
         protected KeyBindingsSubsection()
         {
             FlowContent.Spacing = new Vector2(0, 3);
         }
 
         [BackgroundDependencyLoader]
-        private void load(RealmAccess realm)
+        private void load()
         {
             var bindings = realm.Run(r => GetKeyBindings(r).Detach());
 
@@ -63,8 +66,10 @@ namespace osu.Game.Overlays.Settings.Sections.Input
                 Defaults = defaults.Select(d => d.KeyCombination),
             };
 
-        private void onBindingUpdated(KeyBindingRow sender)
+        private void onBindingUpdated(KeyBindingRow sender, KeyBindingRow.KeyBindingUpdatedEventArgs args)
         {
+            realm.WriteAsync(r => r.Find<RealmKeyBinding>(args.KeyBindingID)!.KeyCombinationString = args.KeyCombinationString);
+
             if (AutoAdvanceTarget)
             {
                 var next = Children.SkipWhile(c => c != sender).Skip(1).FirstOrDefault();
