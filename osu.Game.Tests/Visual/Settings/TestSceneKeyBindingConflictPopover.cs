@@ -1,6 +1,7 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System;
 using NUnit.Framework;
 using osu.Framework.Allocation;
 using osu.Framework.Extensions;
@@ -12,6 +13,7 @@ using osu.Game.Graphics.UserInterfaceV2;
 using osu.Game.Overlays;
 using osu.Game.Overlays.Settings.Sections.Input;
 using osu.Game.Rulesets.Osu;
+using osuTK.Input;
 
 namespace osu.Game.Tests.Visual.Settings
 {
@@ -50,10 +52,15 @@ namespace osu.Game.Tests.Visual.Settings
                 Action = this.ShowPopover;
             }
 
-            public Popover GetPopover() => new KeyBindingConflictPopover(
-                OsuAction.LeftButton,
-                OsuAction.RightButton,
-                new KeyCombination(InputKey.Z));
+            public Popover GetPopover() => new KeyBindingConflictPopover
+            {
+                ConflictInfo =
+                {
+                    Value = new KeyBindingConflictInfo(
+                        new ConflictingKeyBinding(Guid.NewGuid(), OsuAction.LeftButton, KeyCombination.FromKey(Key.X), new KeyCombination(InputKey.None)),
+                        new ConflictingKeyBinding(Guid.NewGuid(), OsuAction.RightButton, KeyCombination.FromKey(Key.Z), KeyCombination.FromKey(Key.X)))
+                }
+            };
         }
     }
 }
