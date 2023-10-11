@@ -178,6 +178,9 @@ namespace osu.Game.Online.Leaderboards
                             {
                                 RelativeSizeAxes = Axes.Both,
                                 User = score.User,
+                                Shear = -shear,
+                                Anchor = Anchor.BottomLeft,
+                                Origin = Anchor.BottomLeft,
                                 Colour = ColourInfo.GradientHorizontal(Colour4.White.Opacity(0.5f), Colour4.White.Opacity(0)),
                             },
                             new GridContainer
