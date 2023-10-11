@@ -3,7 +3,6 @@
 
 using System;
 using osu.Framework.Extensions.Color4Extensions;
-using osu.Framework.Graphics;
 using osu.Framework.Graphics.Colour;
 using osu.Game.Beatmaps;
 using osu.Game.Online.Rooms;
@@ -66,26 +65,6 @@ namespace osu.Game.Graphics
 
                 default:
                     return Color4Extensions.FromHex(@"ff5a5a");
-            }
-        }
-
-        /// <summary>
-        /// Retrieves the colour for the total score depending on <see cref="ScoreRank"/>.
-        /// </summary>
-        public static ColourInfo TotalScoreColourFor(ScoreRank rank)
-        {
-            switch (rank)
-            {
-                case ScoreRank.XH:
-                case ScoreRank.X:
-                    return ColourInfo.GradientVertical(Colour4.FromHex(@"A4DEFF"), Colour4.FromHex(@"F0AADD"));
-
-                case ScoreRank.SH:
-                case ScoreRank.S:
-                    return ColourInfo.GradientVertical(Colour4.FromHex(@"FFFFFF"), Colour4.FromHex(@"F7E65D"));
-
-                default:
-                    return Colour4.White;
             }
         }
 

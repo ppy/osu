@@ -414,7 +414,6 @@ namespace osu.Game.Online.Leaderboards
                                         Shear = -shear,
                                         Current = scoreManager.GetBindableTotalScoreString(score),
                                         Font = OsuFont.GetFont(size: 30, weight: FontWeight.Light),
-                                        Colour = OsuColour.TotalScoreColourFor(score.Rank),
                                     },
                                     modsContainer = new FillFlowContainer<ColouredModSwitchTiny>
                                     {
