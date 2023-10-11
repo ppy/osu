@@ -88,7 +88,7 @@ namespace osu.Game.Skinning
                 }
 
                 Samples = samples;
-                Textures = new TextureStore(resources.Renderer, new MaxDimensionLimitedTextureLoaderStore(resources.CreateTextureLoaderStore(storage)));
+                Textures = new TextureStore(resources.Renderer, CreateTextureLoaderStore(resources, storage));
             }
             else
             {
@@ -105,7 +105,14 @@ namespace osu.Game.Skinning
                 Debug.Assert(Configuration != null);
             }
             else
-                Configuration = new SkinConfiguration();
+            {
+                Configuration = new SkinConfiguration
+                {
+                    // generally won't be hit as we always write a `skin.ini` on import, but best be safe than sorry.
+                    // see https://github.com/peppy/osu-stable-reference/blob/1531237b63392e82c003c712faa028406073aa8f/osu!/Graphics/Skinning/SkinManager.cs#L297-L298
+                    LegacyVersion = SkinConfiguration.LATEST_VERSION,
+                };
+            }
 
             // skininfo files may be null for default skin.
             foreach (SkinComponentsContainerLookup.TargetArea skinnableTarget in Enum.GetValues<SkinComponentsContainerLookup.TargetArea>())
@@ -164,6 +171,9 @@ namespace osu.Game.Skinning
             }
         }
 
+        protected virtual IResourceStore<TextureUpload> CreateTextureLoaderStore(IStorageResourceProvider resources, IResourceStore<byte[]> storage)
+            => new MaxDimensionLimitedTextureLoaderStore(resources.CreateTextureLoaderStore(storage));
+
         protected virtual void ParseConfigurationStream(Stream stream)
         {
             using (LineBufferedReader reader = new LineBufferedReader(stream, true))
@@ -197,7 +207,7 @@ namespace osu.Game.Skinning
             {
                 // This fallback is important for user skins which use SkinnableSprites.
                 case SkinnableSprite.SpriteComponentLookup sprite:
-                    return this.GetAnimation(sprite.LookupName, false, false);
+                    return this.GetAnimation(sprite.LookupName, false, false, maxSize: sprite.MaxSize);
 
                 case SkinComponentsContainerLookup containerLookup:
 
