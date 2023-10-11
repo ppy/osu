@@ -140,7 +140,7 @@ namespace osu.Game.Online.Leaderboards
                                     Width = 35
                                 },
                                 createCentreContent(user),
-                                createRightSideContent()
+                                createRightContent()
                             }
                         }
                     }
@@ -275,7 +275,7 @@ namespace osu.Game.Online.Leaderboards
                 },
             };
 
-        private FillFlowContainer createRightSideContent() =>
+        private FillFlowContainer createRightContent() =>
             new FillFlowContainer
             {
                 Padding = new MarginPadding { Left = 11, Right = 15 },
