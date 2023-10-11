@@ -12,8 +12,10 @@ using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Extensions.ObjectExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
+using osu.Framework.Graphics.Cursor;
 using osu.Framework.Graphics.Effects;
 using osu.Framework.Graphics.Shapes;
+using osu.Framework.Graphics.UserInterface;
 using osu.Framework.Input;
 using osu.Framework.Input.Bindings;
 using osu.Framework.Input.Events;
@@ -31,7 +33,7 @@ using osuTK.Input;
 
 namespace osu.Game.Overlays.Settings.Sections.Input
 {
-    public partial class KeyBindingRow : Container, IFilterable
+    public partial class KeyBindingRow : Container, IFilterable, IHasPopover
     {
         /// <summary>
         /// Invoked when the binding of this row is updated with a change being written.
@@ -40,7 +42,9 @@ namespace osu.Game.Overlays.Settings.Sections.Input
 
         public delegate void KeyBindingUpdated(KeyBindingRow sender, KeyBindingUpdatedEventArgs args);
 
-        public record KeyBindingUpdatedEventArgs(Guid KeyBindingID, string KeyCombinationString);
+        public record KeyBindingUpdatedEventArgs(object Action, Guid KeyBindingID, KeyCombination KeyCombination);
+
+        public Action? BindingConflictResolved { get; set; }
 
         /// <summary>
         /// Whether left and right mouse button clicks should be included in the edited bindings.
@@ -77,7 +81,7 @@ namespace osu.Game.Overlays.Settings.Sections.Input
 
         #endregion
 
-        private readonly object action;
+        public readonly object Action;
 
         private Bindable<bool> isDefault { get; } = new BindableBool(true);
 
@@ -107,7 +111,7 @@ namespace osu.Game.Overlays.Settings.Sections.Input
         /// <param name="action">The action that this row contains bindings for.</param>
         public KeyBindingRow(object action)
         {
-            this.action = action;
+            this.Action = action;
 
             RelativeSizeAxes = Axes.X;
             AutoSizeAxes = Axes.Y;
@@ -163,7 +167,7 @@ namespace osu.Game.Overlays.Settings.Sections.Input
                                 },
                                 text = new OsuSpriteText
                                 {
-                                    Text = action.GetLocalisableDescription(),
+                                    Text = Action.GetLocalisableDescription(),
                                     Margin = new MarginPadding(1.5f * padding),
                                 },
                                 buttons = new FillFlowContainer<KeyButton>
@@ -220,7 +224,9 @@ namespace osu.Game.Overlays.Settings.Sections.Input
             {
                 var button = buttons[i++];
                 button.UpdateKeyCombination(d);
-                finalise();
+
+                var args = new KeyBindingUpdatedEventArgs(Action, button.KeyBinding.Value.ID, button.KeyBinding.Value.KeyCombination);
+                BindingUpdated?.Invoke(this, args);
             }
 
             isDefault.Value = true;
@@ -280,7 +286,7 @@ namespace osu.Game.Overlays.Settings.Sections.Input
             Debug.Assert(bindTarget != null);
 
             if (bindTarget.IsHovered)
-                finalise(false);
+                finalise();
             // prevent updating bind target before clear button's action
             else if (!cancelAndClearButtons.Any(b => b.IsHovered))
                 updateBindTarget();
@@ -429,7 +435,7 @@ namespace osu.Game.Overlays.Settings.Sections.Input
                 return;
 
             bindTarget.UpdateKeyCombination(InputKey.None);
-            finalise(false);
+            finalise();
         }
 
         private void finalise(bool hasChanged = true)
@@ -439,7 +445,7 @@ namespace osu.Game.Overlays.Settings.Sections.Input
                 updateIsDefaultValue();
 
                 bindTarget.IsBinding = false;
-                var args = new KeyBindingUpdatedEventArgs(bindTarget.KeyBinding.Value.ID, bindTarget.KeyBinding.Value.KeyCombinationString);
+                var args = new KeyBindingUpdatedEventArgs(Action, bindTarget.KeyBinding.Value.ID, bindTarget.KeyBinding.Value.KeyCombination);
                 Schedule(() =>
                 {
                     // schedule to ensure we don't instantly get focus back on next OnMouseClick (see AcceptFocus impl.)
@@ -488,6 +494,24 @@ namespace osu.Game.Overlays.Settings.Sections.Input
         {
             isDefault.Value = KeyBindings.Select(b => b.KeyCombination).SequenceEqual(Defaults);
         }
+
+        #region Handling conflicts
+
+        private readonly Bindable<KeyBindingConflictInfo> keyBindingConflictInfo = new Bindable<KeyBindingConflictInfo>();
+
+        public Popover GetPopover() => new KeyBindingConflictPopover
+        {
+            ConflictInfo = { BindTarget = keyBindingConflictInfo },
+            BindingConflictResolved = BindingConflictResolved
+        };
+
+        public void ShowBindingConflictPopover(KeyBindingConflictInfo conflictInfo)
+        {
+            keyBindingConflictInfo.Value = conflictInfo;
+            this.ShowPopover();
+        }
+
+        #endregion
 
         private partial class CancelButton : RoundedButton
         {

@@ -1,6 +1,7 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Extensions;
@@ -10,34 +11,34 @@ using osu.Framework.Graphics.Shapes;
 using osu.Framework.Input;
 using osu.Framework.Input.Bindings;
 using osu.Framework.Input.Events;
+using osu.Game.Database;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Graphics.UserInterfaceV2;
+using osu.Game.Input.Bindings;
 using osuTK;
 
 namespace osu.Game.Overlays.Settings.Sections.Input
 {
     public partial class KeyBindingConflictPopover : OsuPopover
     {
-        private readonly object existingAction;
-        private readonly object newAction;
-        private readonly KeyCombination conflictingCombination;
+        public Bindable<KeyBindingConflictInfo> ConflictInfo { get; } = new Bindable<KeyBindingConflictInfo>();
+
+        public Action? BindingConflictResolved { get; init; }
 
         private ConflictingKeyBindingPreview newPreview = null!;
         private ConflictingKeyBindingPreview existingPreview = null!;
         private HoverableRoundedButton keepExistingButton = null!;
         private HoverableRoundedButton applyNewButton = null!;
 
-        public KeyBindingConflictPopover(object existingAction, object newAction, KeyCombination conflictingCombination)
-        {
-            this.existingAction = existingAction;
-            this.newAction = newAction;
-            this.conflictingCombination = conflictingCombination;
-        }
+        [Resolved]
+        private RealmAccess realm { get; set; } = null!;
 
         [BackgroundDependencyLoader]
-        private void load()
+        private void load() => recreateDisplay();
+
+        private void recreateDisplay()
         {
             Child = new FillFlowContainer
             {
@@ -54,8 +55,8 @@ namespace osu.Game.Overlays.Settings.Sections.Input
                         Text = "The binding you've selected conflicts with another existing binding.",
                         Margin = new MarginPadding { Bottom = 10 }
                     },
-                    existingPreview = new ConflictingKeyBindingPreview(existingAction, conflictingCombination),
-                    newPreview = new ConflictingKeyBindingPreview(newAction, conflictingCombination),
+                    existingPreview = new ConflictingKeyBindingPreview(ConflictInfo.Value.Existing.Action, ConflictInfo.Value.Existing.CombinationWhenChosen, ConflictInfo.Value.Existing.CombinationWhenNotChosen),
+                    newPreview = new ConflictingKeyBindingPreview(ConflictInfo.Value.New.Action, ConflictInfo.Value.New.CombinationWhenChosen, ConflictInfo.Value.New.CombinationWhenNotChosen),
                     new Container
                     {
                         RelativeSizeAxes = Axes.X,
@@ -79,12 +80,38 @@ namespace osu.Game.Overlays.Settings.Sections.Input
                                 Width = 0.48f,
                                 Anchor = Anchor.CentreRight,
                                 Origin = Anchor.CentreRight,
-                                Action = Hide
+                                Action = applyNew
                             }
                         }
                     }
                 }
             };
+        }
+
+        private void applyNew()
+        {
+            // only "apply new" needs to cause actual realm changes, since the flow in `KeyBindingsSubsection` does not actually make db changes
+            // if it detects a binding conflict.
+            // the temporary visual changes will be reverted by calling `Hide()` / `BindingConflictResolved`.
+            realm.Write(r =>
+            {
+                var existingBinding = r.Find<RealmKeyBinding>(ConflictInfo.Value.Existing.ID);
+                existingBinding!.KeyCombinationString = ConflictInfo.Value.Existing.CombinationWhenNotChosen.ToString();
+
+                var newBinding = r.Find<RealmKeyBinding>(ConflictInfo.Value.New.ID);
+                newBinding!.KeyCombinationString = ConflictInfo.Value.Existing.CombinationWhenChosen.ToString();
+            });
+
+            Hide();
+        }
+
+        protected override void PopOut()
+        {
+            base.PopOut();
+
+            // workaround for `VisibilityContainer.PopOut()` being called in `LoadAsyncComplete()`
+            if (IsLoaded)
+                BindingConflictResolved?.Invoke();
         }
 
         protected override void LoadComplete()
@@ -111,7 +138,8 @@ namespace osu.Game.Overlays.Settings.Sections.Input
         private partial class ConflictingKeyBindingPreview : CompositeDrawable
         {
             private readonly object action;
-            private readonly KeyCombination keyCombination;
+            private readonly KeyCombination combinationWhenChosen;
+            private readonly KeyCombination combinationWhenNotChosen;
 
             private OsuSpriteText newBindingText = null!;
 
@@ -123,10 +151,11 @@ namespace osu.Game.Overlays.Settings.Sections.Input
             [Resolved]
             private OsuColour colours { get; set; } = null!;
 
-            public ConflictingKeyBindingPreview(object action, KeyCombination keyCombination)
+            public ConflictingKeyBindingPreview(object action, KeyCombination combinationWhenChosen, KeyCombination combinationWhenNotChosen)
             {
                 this.action = action;
-                this.keyCombination = keyCombination;
+                this.combinationWhenChosen = combinationWhenChosen;
+                this.combinationWhenNotChosen = combinationWhenNotChosen;
             }
 
             [BackgroundDependencyLoader]
@@ -187,7 +216,6 @@ namespace osu.Game.Overlays.Settings.Sections.Input
                                             {
                                                 Font = OsuFont.Numeric.With(size: 10),
                                                 Margin = new MarginPadding(5),
-                                                Text = keyCombinationProvider.GetReadableString(keyCombination),
                                                 Anchor = Anchor.Centre,
                                                 Origin = Anchor.Centre
                                             }
@@ -209,23 +237,30 @@ namespace osu.Game.Overlays.Settings.Sections.Input
 
             private void updateState()
             {
+                string newBinding;
+
                 switch (IsChosen.Value)
                 {
                     case true:
-                        newBindingText.Text = keyCombinationProvider.GetReadableString(keyCombination);
+                        newBinding = keyCombinationProvider.GetReadableString(combinationWhenChosen);
                         newBindingText.Colour = colours.Green1;
                         break;
 
                     case false:
-                        newBindingText.Text = "(none)";
+                        newBinding = keyCombinationProvider.GetReadableString(combinationWhenNotChosen);
                         newBindingText.Colour = colours.Red1;
                         break;
 
                     case null:
-                        newBindingText.Text = keyCombinationProvider.GetReadableString(keyCombination);
+                        newBinding = keyCombinationProvider.GetReadableString(combinationWhenChosen);
                         newBindingText.Colour = Colour4.White;
                         break;
                 }
+
+                if (string.IsNullOrEmpty(newBinding))
+                    newBinding = "(none)";
+
+                newBindingText.Text = newBinding;
             }
         }
 
