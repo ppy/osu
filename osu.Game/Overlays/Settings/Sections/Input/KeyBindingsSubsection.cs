@@ -42,11 +42,10 @@ namespace osu.Game.Overlays.Settings.Sections.Input
                 int intKey = (int)defaultGroup.Key;
 
                 // one row per valid action.
-                Add(CreateKeyBindingRow(
-                        defaultGroup.Key,
-                        bindings.Where(b => b.ActionInt.Equals(intKey)).ToList(),
-                        defaultGroup)
-                    .With(row => row.BindingUpdated = onBindingUpdated));
+                var row = CreateKeyBindingRow(defaultGroup.Key, defaultGroup)
+                    .With(row => row.BindingUpdated = onBindingUpdated);
+                row.KeyBindings.AddRange(bindings.Where(b => b.ActionInt.Equals(intKey)));
+                Add(row);
             }
 
             Add(new ResetButton
@@ -57,8 +56,8 @@ namespace osu.Game.Overlays.Settings.Sections.Input
 
         protected abstract IEnumerable<RealmKeyBinding> GetKeyBindings(Realm realm);
 
-        protected virtual KeyBindingRow CreateKeyBindingRow(object action, IEnumerable<RealmKeyBinding> keyBindings, IEnumerable<KeyBinding> defaults)
-            => new KeyBindingRow(action, keyBindings.ToList())
+        protected virtual KeyBindingRow CreateKeyBindingRow(object action, IEnumerable<KeyBinding> defaults)
+            => new KeyBindingRow(action)
             {
                 AllowMainMouseButtons = false,
                 Defaults = defaults.Select(d => d.KeyCombination),
