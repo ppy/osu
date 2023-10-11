@@ -39,8 +39,14 @@ namespace osu.Game.Overlays.Settings.Sections.Input
         /// </summary>
         public Action<KeyBindingRow> BindingUpdated { get; init; }
 
+        /// <summary>
+        /// Whether left and right mouse button clicks should be included in the edited bindings.
+        /// </summary>
         public bool AllowMainMouseButtons { get; init; }
 
+        /// <summary>
+        /// The default key bindings for this row.
+        /// </summary>
         public IEnumerable<KeyCombination> Defaults { get; init; }
 
         #region IFilterable
@@ -91,6 +97,11 @@ namespace osu.Game.Overlays.Settings.Sections.Input
 
         public override bool AcceptsFocus => bindTarget == null;
 
+        /// <summary>
+        /// Creates a new <see cref="KeyBindingRow"/>.
+        /// </summary>
+        /// <param name="action">The action that this row contains bindings for.</param>
+        /// <param name="bindings">The keybindings to display in this row.</param>
         public KeyBindingRow(object action, List<RealmKeyBinding> bindings)
         {
             this.action = action;
