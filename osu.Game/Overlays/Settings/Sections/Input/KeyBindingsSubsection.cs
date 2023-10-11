@@ -1,13 +1,13 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Extensions.IEnumerableExtensions;
 using osu.Framework.Graphics;
+using osu.Framework.Input.Bindings;
 using osu.Framework.Localisation;
 using osu.Game.Database;
 using osu.Game.Input.Bindings;
@@ -25,9 +25,9 @@ namespace osu.Game.Overlays.Settings.Sections.Input
         /// </summary>
         protected virtual bool AutoAdvanceTarget => false;
 
-        protected IEnumerable<Framework.Input.Bindings.KeyBinding> Defaults { get; init; }
+        protected IEnumerable<KeyBinding> Defaults { get; init; } = Array.Empty<KeyBinding>();
 
-        public RulesetInfo Ruleset { get; protected set; }
+        public RulesetInfo? Ruleset { get; protected set; }
 
         private readonly int? variant;
 
@@ -41,7 +41,7 @@ namespace osu.Game.Overlays.Settings.Sections.Input
         [BackgroundDependencyLoader]
         private void load(RealmAccess realm)
         {
-            string rulesetName = Ruleset?.ShortName;
+            string? rulesetName = Ruleset?.ShortName;
 
             var bindings = realm.Run(r => r.All<RealmKeyBinding>()
                                            .Where(b => b.RulesetName == rulesetName && b.Variant == variant)
