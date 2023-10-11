@@ -273,6 +273,7 @@ namespace osu.Game.Online.Leaderboards
                                                         {
                                                             Anchor = Anchor.CentreLeft,
                                                             Origin = Anchor.CentreLeft,
+                                                            UseFullGlyphHeight = false,
                                                         }
                                                     }
                                                 },
