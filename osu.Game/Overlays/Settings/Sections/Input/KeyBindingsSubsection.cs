@@ -25,7 +25,7 @@ namespace osu.Game.Overlays.Settings.Sections.Input
         /// </summary>
         protected virtual bool AutoAdvanceTarget => false;
 
-        protected IEnumerable<Framework.Input.Bindings.KeyBinding> Defaults;
+        protected IEnumerable<Framework.Input.Bindings.KeyBinding> Defaults { get; init; }
 
         public RulesetInfo Ruleset { get; protected set; }
 

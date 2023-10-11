@@ -37,11 +37,11 @@ namespace osu.Game.Overlays.Settings.Sections.Input
         /// <summary>
         /// Invoked when the binding of this row is updated with a change being written.
         /// </summary>
-        public Action<KeyBindingRow> BindingUpdated { get; set; }
+        public Action<KeyBindingRow> BindingUpdated { get; init; }
 
-        public bool AllowMainMouseButtons;
+        public bool AllowMainMouseButtons { get; init; }
 
-        public IEnumerable<KeyCombination> Defaults;
+        public IEnumerable<KeyCombination> Defaults { get; init; }
 
         #region IFilterable
 
