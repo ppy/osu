@@ -510,8 +510,6 @@ namespace osu.Game.Online.Leaderboards
         {
             Scheduler.AddOnce(() =>
             {
-                // TODO: may not always invalidate as expected
-
                 // when width decreases
                 // - hide statistics, then
                 // - hide avatar, then
