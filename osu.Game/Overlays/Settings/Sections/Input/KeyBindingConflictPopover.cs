@@ -1,0 +1,249 @@
+// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
+
+using osu.Framework.Allocation;
+using osu.Framework.Bindables;
+using osu.Framework.Extensions;
+using osu.Framework.Graphics;
+using osu.Framework.Graphics.Containers;
+using osu.Framework.Graphics.Shapes;
+using osu.Framework.Input;
+using osu.Framework.Input.Bindings;
+using osu.Framework.Input.Events;
+using osu.Game.Graphics;
+using osu.Game.Graphics.Containers;
+using osu.Game.Graphics.Sprites;
+using osu.Game.Graphics.UserInterfaceV2;
+using osuTK;
+
+namespace osu.Game.Overlays.Settings.Sections.Input
+{
+    public partial class KeyBindingConflictPopover : OsuPopover
+    {
+        private readonly object existingAction;
+        private readonly object newAction;
+        private readonly KeyCombination conflictingCombination;
+
+        private ConflictingKeyBindingPreview newPreview = null!;
+        private ConflictingKeyBindingPreview existingPreview = null!;
+        private HoverableRoundedButton keepExistingButton = null!;
+        private HoverableRoundedButton applyNewButton = null!;
+
+        public KeyBindingConflictPopover(object existingAction, object newAction, KeyCombination conflictingCombination)
+        {
+            this.existingAction = existingAction;
+            this.newAction = newAction;
+            this.conflictingCombination = conflictingCombination;
+        }
+
+        [BackgroundDependencyLoader]
+        private void load()
+        {
+            Child = new FillFlowContainer
+            {
+                Width = 250,
+                AutoSizeAxes = Axes.Y,
+                Direction = FillDirection.Vertical,
+                Spacing = new Vector2(10),
+                Children = new Drawable[]
+                {
+                    new OsuTextFlowContainer
+                    {
+                        RelativeSizeAxes = Axes.X,
+                        AutoSizeAxes = Axes.Y,
+                        Text = "The binding you've selected conflicts with another existing binding.",
+                        Margin = new MarginPadding { Bottom = 10 }
+                    },
+                    existingPreview = new ConflictingKeyBindingPreview(existingAction, conflictingCombination),
+                    newPreview = new ConflictingKeyBindingPreview(newAction, conflictingCombination),
+                    new Container
+                    {
+                        RelativeSizeAxes = Axes.X,
+                        AutoSizeAxes = Axes.Y,
+                        Margin = new MarginPadding { Top = 10 },
+                        Children = new[]
+                        {
+                            keepExistingButton = new HoverableRoundedButton
+                            {
+                                Text = "Keep existing",
+                                RelativeSizeAxes = Axes.X,
+                                Width = 0.48f,
+                                Anchor = Anchor.CentreLeft,
+                                Origin = Anchor.CentreLeft,
+                                Action = Hide
+                            },
+                            applyNewButton = new HoverableRoundedButton
+                            {
+                                Text = "Apply new",
+                                RelativeSizeAxes = Axes.X,
+                                Width = 0.48f,
+                                Anchor = Anchor.CentreRight,
+                                Origin = Anchor.CentreRight,
+                                Action = Hide
+                            }
+                        }
+                    }
+                }
+            };
+        }
+
+        protected override void LoadComplete()
+        {
+            base.LoadComplete();
+
+            keepExistingButton.IsHoveredBindable.BindValueChanged(_ => updatePreviews());
+            applyNewButton.IsHoveredBindable.BindValueChanged(_ => updatePreviews());
+            updatePreviews();
+        }
+
+        private void updatePreviews()
+        {
+            if (!keepExistingButton.IsHovered && !applyNewButton.IsHovered)
+            {
+                existingPreview.IsChosen.Value = newPreview.IsChosen.Value = null;
+                return;
+            }
+
+            existingPreview.IsChosen.Value = keepExistingButton.IsHovered;
+            newPreview.IsChosen.Value = applyNewButton.IsHovered;
+        }
+
+        private partial class ConflictingKeyBindingPreview : CompositeDrawable
+        {
+            private readonly object action;
+            private readonly KeyCombination keyCombination;
+
+            private OsuSpriteText newBindingText = null!;
+
+            public Bindable<bool?> IsChosen { get; } = new Bindable<bool?>();
+
+            [Resolved]
+            private ReadableKeyCombinationProvider keyCombinationProvider { get; set; } = null!;
+
+            [Resolved]
+            private OsuColour colours { get; set; } = null!;
+
+            public ConflictingKeyBindingPreview(object action, KeyCombination keyCombination)
+            {
+                this.action = action;
+                this.keyCombination = keyCombination;
+            }
+
+            [BackgroundDependencyLoader]
+            private void load(OverlayColourProvider colourProvider)
+            {
+                RelativeSizeAxes = Axes.X;
+                AutoSizeAxes = Axes.Y;
+
+                InternalChild = new Container
+                {
+                    RelativeSizeAxes = Axes.X,
+                    AutoSizeAxes = Axes.Y,
+                    CornerRadius = 5,
+                    Masking = true,
+                    Children = new Drawable[]
+                    {
+                        new Box
+                        {
+                            RelativeSizeAxes = Axes.Both,
+                            Colour = colourProvider.Background5
+                        },
+                        new GridContainer
+                        {
+                            RelativeSizeAxes = Axes.X,
+                            AutoSizeAxes = Axes.Y,
+                            RowDimensions = new[] { new Dimension(GridSizeMode.AutoSize) },
+                            ColumnDimensions = new[]
+                            {
+                                new Dimension(),
+                                new Dimension(GridSizeMode.AutoSize, minSize: 80),
+                            },
+                            Content = new[]
+                            {
+                                new Drawable[]
+                                {
+                                    new OsuSpriteText
+                                    {
+                                        Text = action.GetLocalisableDescription(),
+                                        Margin = new MarginPadding(7.5f),
+                                    },
+                                    new Container
+                                    {
+                                        AutoSizeAxes = Axes.Y,
+                                        RelativeSizeAxes = Axes.X,
+                                        CornerRadius = 5,
+                                        Masking = true,
+                                        Anchor = Anchor.CentreRight,
+                                        Origin = Anchor.CentreRight,
+                                        X = -5,
+                                        Children = new Drawable[]
+                                        {
+                                            new Box
+                                            {
+                                                RelativeSizeAxes = Axes.Both,
+                                                Colour = colourProvider.Background6
+                                            },
+                                            newBindingText = new OsuSpriteText
+                                            {
+                                                Font = OsuFont.Numeric.With(size: 10),
+                                                Margin = new MarginPadding(5),
+                                                Text = keyCombinationProvider.GetReadableString(keyCombination),
+                                                Anchor = Anchor.Centre,
+                                                Origin = Anchor.Centre
+                                            }
+                                        }
+                                    },
+                                }
+                            }
+                        }
+                    }
+                };
+            }
+
+            protected override void LoadComplete()
+            {
+                base.LoadComplete();
+
+                IsChosen.BindValueChanged(_ => updateState(), true);
+            }
+
+            private void updateState()
+            {
+                switch (IsChosen.Value)
+                {
+                    case true:
+                        newBindingText.Text = keyCombinationProvider.GetReadableString(keyCombination);
+                        newBindingText.Colour = colours.Green1;
+                        break;
+
+                    case false:
+                        newBindingText.Text = "(none)";
+                        newBindingText.Colour = colours.Red1;
+                        break;
+
+                    case null:
+                        newBindingText.Text = keyCombinationProvider.GetReadableString(keyCombination);
+                        newBindingText.Colour = Colour4.White;
+                        break;
+                }
+            }
+        }
+
+        private partial class HoverableRoundedButton : RoundedButton
+        {
+            public BindableBool IsHoveredBindable { get; set; } = new BindableBool();
+
+            protected override bool OnHover(HoverEvent e)
+            {
+                IsHoveredBindable.Value = IsHovered;
+                return base.OnHover(e);
+            }
+
+            protected override void OnHoverLost(HoverLostEvent e)
+            {
+                IsHoveredBindable.Value = IsHovered;
+                base.OnHoverLost(e);
+            }
+        }
+    }
+}
