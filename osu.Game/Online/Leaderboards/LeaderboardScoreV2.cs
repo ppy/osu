@@ -131,14 +131,7 @@ namespace osu.Game.Online.Leaderboards
                         {
                             new Drawable[]
                             {
-                                new RankLabel(rank)
-                                {
-                                    Shear = -shear,
-                                    Anchor = Anchor.Centre,
-                                    Origin = Anchor.Centre,
-                                    RelativeSizeAxes = Axes.Y,
-                                    Width = 35
-                                },
+                                new RankLabel(rank) { Shear = -shear },
                                 createCentreContent(user),
                                 createRightContent()
                             }
@@ -457,13 +450,15 @@ namespace osu.Game.Online.Leaderboards
         {
             public RankLabel(int? rank)
             {
+                AutoSizeAxes = Axes.Both;
+                Anchor = Anchor.Centre;
+                Origin = Anchor.Centre;
+
                 if (rank >= 1000)
                     TooltipText = $"#{rank:N0}";
 
                 Child = new OsuSpriteText
                 {
-                    Anchor = Anchor.Centre,
-                    Origin = Anchor.Centre,
                     Font = OsuFont.GetFont(size: 20, weight: FontWeight.SemiBold, italics: true),
                     Text = rank == null ? "-" : rank.Value.FormatRank().Insert(0, "#")
                 };
