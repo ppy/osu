@@ -34,6 +34,8 @@ namespace osu.Game.Tests.Visual.SongSelect
         [BackgroundDependencyLoader]
         private void load()
         {
+            // TODO: invalidation seems to be one-off when clicking slider to a certain value, so drag for now
+            // doesn't seem to happen in-game (when toggling window mode)
             AddSliderStep("change relative width", 0, 1f, 0.6f, v =>
             {
                 relativeWidth = v;
