@@ -39,14 +39,11 @@ namespace osu.Game.Overlays.Settings.Sections.Input
         /// </summary>
         public Action<KeyBindingRow> BindingUpdated { get; set; }
 
-        private readonly object action;
-        private readonly IEnumerable<RealmKeyBinding> bindings;
+        public bool AllowMainMouseButtons;
 
-        private const float transition_time = 150;
+        public IEnumerable<KeyCombination> Defaults;
 
-        private const float height = 20;
-
-        private const float padding = 5;
+        #region IFilterable
 
         private bool matchingFilter;
 
@@ -60,23 +57,39 @@ namespace osu.Game.Overlays.Settings.Sections.Input
             }
         }
 
-        private Container content;
-
-        public override bool ReceivePositionalInputAt(Vector2 screenSpacePos) =>
-            content.ReceivePositionalInputAt(screenSpacePos);
-
         public bool FilteringActive { get; set; }
+
+        public IEnumerable<LocalisableString> FilterTerms => bindings.Select(b => (LocalisableString)keyCombinationProvider.GetReadableString(b.KeyCombination)).Prepend(text.Text);
+
+        #endregion
+
+        private readonly object action;
+        private readonly IEnumerable<RealmKeyBinding> bindings;
+
+        private Bindable<bool> isDefault { get; } = new BindableBool(true);
 
         [Resolved]
         private ReadableKeyCombinationProvider keyCombinationProvider { get; set; }
+
+        [Resolved]
+        private RealmAccess realm { get; set; }
+
+        private Container content;
 
         private OsuSpriteText text;
         private FillFlowContainer cancelAndClearButtons;
         private FillFlowContainer<KeyButton> buttons;
 
-        private Bindable<bool> isDefault { get; } = new BindableBool(true);
+        private KeyButton bindTarget;
 
-        public IEnumerable<LocalisableString> FilterTerms => bindings.Select(b => (LocalisableString)keyCombinationProvider.GetReadableString(b.KeyCombination)).Prepend(text.Text);
+        private const float transition_time = 150;
+        private const float height = 20;
+        private const float padding = 5;
+
+        public override bool ReceivePositionalInputAt(Vector2 screenSpacePos) =>
+            content.ReceivePositionalInputAt(screenSpacePos);
+
+        public override bool AcceptsFocus => bindTarget == null;
 
         public KeyBindingRow(object action, List<RealmKeyBinding> bindings)
         {
@@ -86,9 +99,6 @@ namespace osu.Game.Overlays.Settings.Sections.Input
             RelativeSizeAxes = Axes.X;
             AutoSizeAxes = Axes.Y;
         }
-
-        [Resolved]
-        private RealmAccess realm { get; set; }
 
         [BackgroundDependencyLoader]
         private void load(OverlayColourProvider colourProvider)
@@ -204,14 +214,6 @@ namespace osu.Game.Overlays.Settings.Sections.Input
 
             base.OnHoverLost(e);
         }
-
-        public override bool AcceptsFocus => bindTarget == null;
-
-        private KeyButton bindTarget;
-
-        public bool AllowMainMouseButtons;
-
-        public IEnumerable<KeyCombination> Defaults;
 
         private bool isModifier(Key k) => k < Key.F1;
 
