@@ -24,11 +24,6 @@ namespace osu.Game.Screens.Play
         public bool IsRewinding => GameplayClock.IsRewinding;
 
         /// <summary>
-        /// The source clock. Should generally not be used for any timekeeping purposes.
-        /// </summary>
-        public IClock SourceClock { get; private set; }
-
-        /// <summary>
         /// Invoked when a seek has been performed via <see cref="Seek"/>
         /// </summary>
         public event Action? OnSeek;
@@ -60,15 +55,14 @@ namespace osu.Game.Screens.Play
         /// </summary>
         /// <param name="sourceClock">The source <see cref="IClock"/> used for timing.</param>
         /// <param name="applyOffsets">Whether to apply platform, user and beatmap offsets to the mix.</param>
-        public GameplayClockContainer(IClock sourceClock, bool applyOffsets = false)
+        /// <param name="requireDecoupling">Whether decoupling logic should be applied on the source clock.</param>
+        public GameplayClockContainer(IClock sourceClock, bool applyOffsets, bool requireDecoupling)
         {
-            SourceClock = sourceClock;
-
             RelativeSizeAxes = Axes.Both;
 
             InternalChildren = new Drawable[]
             {
-                GameplayClock = new FramedBeatmapClock(applyOffsets) { IsCoupled = false },
+                GameplayClock = new FramedBeatmapClock(applyOffsets, requireDecoupling, sourceClock),
                 Content
             };
         }
@@ -82,8 +76,6 @@ namespace osu.Game.Screens.Play
                 return;
 
             isPaused.Value = false;
-
-            ensureSourceClockSet();
 
             PrepareStart();
 
@@ -146,34 +138,21 @@ namespace osu.Game.Screens.Play
         /// Resets this <see cref="GameplayClockContainer"/> and the source to an initial state ready for gameplay.
         /// </summary>
         /// <param name="time">The time to seek to on resetting. If <c>null</c>, the existing <see cref="StartTime"/> will be used.</param>
-        /// <param name="startClock">Whether to start the clock immediately, if not already started.</param>
+        /// <param name="startClock">Whether to start the clock immediately. If <c>false</c> and the clock was already paused, the clock will remain paused after this call.
+        /// </param>
         public void Reset(double? time = null, bool startClock = false)
         {
             bool wasPaused = isPaused.Value;
 
-            Stop();
-
-            ensureSourceClockSet();
+            // The intention of the Reset method is to get things into a known sane state.
+            // As such, we intentionally stop the underlying clock directly here, bypassing Stop/StopGameplayClock.
+            // This is to avoid any kind of isPaused state checks and frequency ramping (as provided by MasterGameplayClockContainer).
+            GameplayClock.Stop();
 
             if (time != null)
                 StartTime = time.Value;
 
             Seek(StartTime);
-
-            // This is a workaround for the fact that DecoupleableInterpolatingFramedClock doesn't seek the source
-            // if the source is not IsRunning. (see https://github.com/ppy/osu-framework/blob/2102638056dfcf85d21b4d85266d53b5dd018767/osu.Framework/Timing/DecoupleableInterpolatingFramedClock.cs#L209-L210)
-            // I hope to remove this once we knock some sense into clocks in general.
-            //
-            // Without this seek, the multiplayer spectator start sequence breaks:
-            // - Individual clients' clocks are never updated to their expected time
-            // - The sync manager thinks they are running behind
-            // - Gameplay doesn't start when it should (until a timeout occurs because nothing is happening for 10+ seconds)
-            //
-            // In addition, we use `CurrentTime` for this seek instead of `StartTime` as the above seek may have applied inherent
-            // offsets which need to be accounted for (ie. FramedBeatmapClock.TotalAppliedOffset).
-            //
-            // See https://github.com/ppy/osu/pull/24451/files/87fee001c786b29db34063ef3350e9a9f024d3ab#diff-28ca02979641e2d98a15fe5d5e806f56acf60ac100258a059fa72503b6cc54e8.
-            (SourceClock as IAdjustableClock)?.Seek(CurrentTime);
 
             if (!wasPaused || startClock)
                 Start();
@@ -183,20 +162,7 @@ namespace osu.Game.Screens.Play
         /// Changes the source clock.
         /// </summary>
         /// <param name="sourceClock">The new source.</param>
-        protected void ChangeSource(IClock sourceClock) => GameplayClock.ChangeSource(SourceClock = sourceClock);
-
-        /// <summary>
-        /// Ensures that the <see cref="GameplayClock"/> is set to <see cref="SourceClock"/>, if it hasn't been given a source yet.
-        /// This is usually done before a seek to avoid accidentally seeking only the adjustable source in decoupled mode,
-        /// but not the actual source clock.
-        /// That will pretty much only happen on the very first call of this method, as the source clock is passed in the constructor,
-        /// but it is not yet set on the adjustable source there.
-        /// </summary>
-        private void ensureSourceClockSet()
-        {
-            if (GameplayClock.Source == null)
-                ChangeSource(SourceClock);
-        }
+        protected void ChangeSource(IClock sourceClock) => GameplayClock.ChangeSource(sourceClock);
 
         #region IAdjustableClock
 
