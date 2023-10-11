@@ -216,16 +216,19 @@ namespace osu.Game.Online.Leaderboards
                                             },
                                             new FillFlowContainer
                                             {
-                                                Position = new Vector2(9),
-                                                AutoSizeAxes = Axes.Both,
+                                                Anchor = Anchor.CentreLeft,
+                                                Origin = Anchor.CentreLeft,
+                                                RelativeSizeAxes = Axes.X,
+                                                AutoSizeAxes = Axes.Y,
                                                 Direction = FillDirection.Vertical,
+                                                Padding = new MarginPadding { Horizontal = corner_radius },
                                                 Children = new Drawable[]
                                                 {
                                                     flagBadgeAndDateContainer = new FillFlowContainer
                                                     {
                                                         Shear = -shear,
                                                         Direction = FillDirection.Horizontal,
-                                                        Spacing = new Vector2(5f, 0f),
+                                                        Spacing = new Vector2(5),
                                                         AutoSizeAxes = Axes.Both,
                                                         Masking = true,
                                                         Children = new Drawable[]
@@ -243,8 +246,9 @@ namespace osu.Game.Online.Leaderboards
                                                             }
                                                         }
                                                     },
-                                                    nameLabel = new OsuSpriteText
+                                                    nameLabel = new TruncatingSpriteText
                                                     {
+                                                        RelativeSizeAxes = Axes.X,
                                                         Shear = -shear,
                                                         Text = user.Username,
                                                         Font = OsuFont.GetFont(size: 24, weight: FontWeight.SemiBold)
@@ -254,7 +258,7 @@ namespace osu.Game.Online.Leaderboards
                                             new FillFlowContainer
                                             {
                                                 Margin = new MarginPadding { Right = 40 },
-                                                Spacing = new Vector2(25, 0),
+                                                Spacing = new Vector2(25),
                                                 Shear = -shear,
                                                 Anchor = Anchor.CentreRight,
                                                 Origin = Anchor.CentreRight,
