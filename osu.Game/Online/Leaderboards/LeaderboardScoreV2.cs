@@ -15,6 +15,7 @@ using osu.Framework.Graphics.Effects;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.UserInterface;
 using osu.Framework.Input.Events;
+using osu.Framework.Layout;
 using osu.Framework.Localisation;
 using osu.Game.Extensions;
 using osu.Game.Graphics;
@@ -51,6 +52,7 @@ namespace osu.Game.Online.Leaderboards
 
         private const float right_content_min_width = 180;
         private const float grade_width = 40;
+        private const float username_min_width = 100;
 
         private readonly ScoreInfo score;
 
@@ -99,6 +101,10 @@ namespace osu.Game.Online.Leaderboards
         private OsuSpriteText scoreText = null!;
         private Drawable scoreRank = null!;
         private Box totalScoreBackground = null!;
+
+        private Container centreContent = null!;
+        private FillFlowContainer usernameAndFlagContainer = null!;
+        private FillFlowContainer statisticsContainer = null!;
 
         public ITooltip<ScoreInfo> GetCustomTooltip() => new LeaderboardScoreTooltip();
         public virtual ScoreInfo TooltipContent => score;
@@ -152,7 +158,7 @@ namespace osu.Game.Online.Leaderboards
                             new Drawable[]
                             {
                                 new RankLabel(rank) { Shear = -shear },
-                                createCentreContent(user),
+                                centreContent = createCentreContent(user),
                                 createRightContent()
                             }
                         }
@@ -215,22 +221,26 @@ namespace osu.Game.Online.Leaderboards
                                 },
                                 Content = new[]
                                 {
-                                    new[]
+                                    new Drawable[]
                                     {
-                                        avatar = new MaskedWrapper(
-                                            innerAvatar = new ClickableAvatar(user)
-                                            {
-                                                Anchor = Anchor.Centre,
-                                                Origin = Anchor.Centre,
-                                                Scale = new Vector2(1.1f),
-                                                Shear = -shear,
-                                                RelativeSizeAxes = Axes.Both,
-                                            })
+                                        new Container
                                         {
-                                            RelativeSizeAxes = Axes.None,
-                                            Size = new Vector2(height)
+                                            AutoSizeAxes = Axes.Both,
+                                            Child = avatar = new MaskedWrapper(
+                                                innerAvatar = new ClickableAvatar(user)
+                                                {
+                                                    Anchor = Anchor.Centre,
+                                                    Origin = Anchor.Centre,
+                                                    Scale = new Vector2(1.1f),
+                                                    Shear = -shear,
+                                                    RelativeSizeAxes = Axes.Both,
+                                                })
+                                            {
+                                                RelativeSizeAxes = Axes.None,
+                                                Size = new Vector2(height)
+                                            },
                                         },
-                                        new FillFlowContainer
+                                        usernameAndFlagContainer = new FillFlowContainer
                                         {
                                             Anchor = Anchor.CentreLeft,
                                             Origin = Anchor.CentreLeft,
@@ -271,16 +281,22 @@ namespace osu.Game.Online.Leaderboards
                                                 }
                                             }
                                         },
-                                        new FillFlowContainer
+                                        new Container
                                         {
-                                            Margin = new MarginPadding { Right = 40 },
-                                            Spacing = new Vector2(25),
-                                            Shear = -shear,
+                                            AutoSizeAxes = Axes.Both,
                                             Anchor = Anchor.CentreRight,
                                             Origin = Anchor.CentreRight,
-                                            AutoSizeAxes = Axes.Both,
-                                            Direction = FillDirection.Horizontal,
-                                            Children = statisticsLabels
+                                            Child = statisticsContainer = new FillFlowContainer
+                                            {
+                                                Padding = new MarginPadding { Right = 40 },
+                                                Spacing = new Vector2(25),
+                                                Shear = -shear,
+                                                Anchor = Anchor.CentreRight,
+                                                Origin = Anchor.CentreRight,
+                                                AutoSizeAxes = Axes.Both,
+                                                Direction = FillDirection.Horizontal,
+                                                Children = statisticsLabels
+                                            }
                                         }
                                     }
                                 }
@@ -482,6 +498,42 @@ namespace osu.Game.Online.Leaderboards
             foreground.FadeColour(IsHovered ? foregroundColour.Lighten(0.2f) : foregroundColour, transition_duration, Easing.OutQuint);
             background.FadeColour(IsHovered ? backgroundColour.Lighten(0.2f) : backgroundColour, transition_duration, Easing.OutQuint);
             totalScoreBackground.FadeColour(IsHovered ? lightenedGradient : totalScoreBackgroundGradient, transition_duration, Easing.OutQuint);
+        }
+
+        protected override bool OnInvalidate(Invalidation invalidation, InvalidationSource source)
+        {
+            Scheduler.AddOnce(() =>
+            {
+                // TODO: may not always invalidate as expected
+
+                // when width decreases
+                // - hide statistics, then
+                // - hide avatar, then
+                // - hide user and flag and show avatar again
+
+                if (centreContent.DrawWidth >= height + username_min_width || centreContent.DrawWidth < username_min_width)
+                    avatar.FadeIn(transition_duration, Easing.OutQuint).MoveToX(0, transition_duration, Easing.OutQuint);
+                else
+                    avatar.FadeOut(transition_duration, Easing.OutQuint).MoveToX(-avatar.DrawWidth, transition_duration, Easing.OutQuint);
+
+                if (centreContent.DrawWidth >= username_min_width)
+                {
+                    usernameAndFlagContainer.FadeIn(transition_duration, Easing.OutQuint).MoveToX(0, transition_duration, Easing.OutQuint);
+                    innerAvatar.ShowUsernameTooltip = false;
+                }
+                else
+                {
+                    usernameAndFlagContainer.FadeOut(transition_duration, Easing.OutQuint).MoveToX(usernameAndFlagContainer.DrawWidth, transition_duration, Easing.OutQuint);
+                    innerAvatar.ShowUsernameTooltip = true;
+                }
+
+                if (centreContent.DrawWidth >= height + statisticsContainer.DrawWidth + username_min_width)
+                    statisticsContainer.FadeIn(transition_duration, Easing.OutQuint).MoveToX(0, transition_duration, Easing.OutQuint);
+                else
+                    statisticsContainer.FadeOut(transition_duration, Easing.OutQuint).MoveToX(statisticsContainer.DrawWidth, transition_duration, Easing.OutQuint);
+            });
+
+            return base.OnInvalidate(invalidation, source);
         }
 
         #region Subclasses
