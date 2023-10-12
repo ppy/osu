@@ -5,7 +5,6 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using osu.Framework.Allocation;
-using osu.Framework.Extensions.IEnumerableExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Input.Bindings;
 using osu.Framework.Localisation;
@@ -56,7 +55,19 @@ namespace osu.Game.Overlays.Settings.Sections.Input
 
             Add(new ResetButton
             {
-                Action = () => Children.OfType<KeyBindingRow>().ForEach(k => k.RestoreDefaults())
+                Action = () =>
+                {
+                    realm.Write(r =>
+                    {
+                        // can't use `RestoreDefaults()` for each key binding row here as it might trigger binding conflicts along the way.
+                        foreach (var row in Children.OfType<KeyBindingRow>())
+                        {
+                            foreach (var (currentBinding, defaultBinding) in row.KeyBindings.Zip(row.Defaults))
+                                r.Find<RealmKeyBinding>(currentBinding.ID)!.KeyCombinationString = defaultBinding.ToString();
+                        }
+                    });
+                    reloadAllBindings();
+                }
             });
         }
 
