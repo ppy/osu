@@ -572,18 +572,6 @@ namespace osu.Game.Screens.Play
         /// <returns>Whether this call resulted in a final exit.</returns>
         protected bool PerformExit(bool showDialogFirst)
         {
-            // there is a chance that an exit request occurs after the transition to results has already started.
-            // even in such a case, the user has shown intent, so forcefully return to this screen (to proceed with the upwards exit process).
-            if (!this.IsCurrentScreen())
-            {
-                ValidForResume = false;
-
-                // in the potential case that this instance has already been exited, this is required to avoid a crash.
-                if (this.GetChildScreen() != null)
-                    this.MakeCurrent();
-                return true;
-            }
-
             bool pauseOrFailDialogVisible =
                 PauseOverlay.State.Value == Visibility.Visible || FailOverlay.State.Value == Visibility.Visible;
 
@@ -617,11 +605,16 @@ namespace osu.Game.Screens.Play
             // import current score if possible.
             prepareAndImportScoreAsync();
 
-            // The actual exit is performed if
-            // - the pause / fail dialog was not requested
-            // - the pause / fail dialog was requested but is already displayed (user showing intention to exit).
-            // - the pause / fail dialog was requested but couldn't be displayed due to the type or state of this Player instance.
-            this.Exit();
+            // Screen may not be current if a restart has been performed.
+            if (this.IsCurrentScreen())
+            {
+                // The actual exit is performed if
+                // - the pause / fail dialog was not requested
+                // - the pause / fail dialog was requested but is already displayed (user showing intention to exit).
+                // - the pause / fail dialog was requested but couldn't be displayed due to the type or state of this Player instance.
+                this.Exit();
+            }
+
             return true;
         }
 
@@ -741,9 +734,6 @@ namespace osu.Game.Screens.Play
             // is no chance that a user could return to the (already completed) Player instance from a child screen.
             ValidForResume = false;
 
-            if (!Configuration.ShowResults)
-                return;
-
             bool storyboardStillRunning = DimmableStoryboard.ContentDisplayed && !DimmableStoryboard.HasStoryboardEnded.Value;
 
             // If the current beatmap has a storyboard, this method will be called again on storyboard completion.
@@ -766,10 +756,16 @@ namespace osu.Game.Screens.Play
         /// <param name="withDelay">Whether a minimum delay (<see cref="RESULTS_DISPLAY_DELAY"/>) should be added before the screen is displayed.</param>
         private void progressToResults(bool withDelay)
         {
-            resultsDisplayDelegate?.Cancel();
+            if (!Configuration.ShowResults)
+                return;
+
+            // Setting this early in the process means that even if something were to go wrong in the order of events following, there
+            // is no chance that a user could return to the (already completed) Player instance from a child screen.
+            ValidForResume = false;
 
             double delay = withDelay ? RESULTS_DISPLAY_DELAY : 0;
 
+            resultsDisplayDelegate?.Cancel();
             resultsDisplayDelegate = new ScheduledDelegate(() =>
             {
                 if (prepareScoreForDisplayTask == null)
