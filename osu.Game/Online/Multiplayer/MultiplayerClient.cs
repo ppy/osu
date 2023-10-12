@@ -23,6 +23,7 @@ using osu.Game.Overlays.Notifications;
 using osu.Game.Rulesets;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Utils;
+using osu.Game.Localisation;
 
 namespace osu.Game.Online.Multiplayer
 {
@@ -452,7 +453,7 @@ namespace osu.Game.Online.Multiplayer
             if (apiUser == null || apiRoom == null) return;
 
             PostNotification?.Invoke(
-                new UserAvatarNotification(apiUser, $"{apiUser.Username} invited you to a multiplayer match:\"{apiRoom.Name}\"!")
+                new UserAvatarNotification(apiUser, NotificationsStrings.InvitedYouToTheMultiplayer(apiUser.Username, apiRoom.Name.Value))
                 {
                     Activated = () =>
                     {

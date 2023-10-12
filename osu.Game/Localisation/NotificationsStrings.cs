@@ -93,6 +93,11 @@ Please try changing your audio device to a working setting.");
         /// </summary>
         public static LocalisableString YourNameWasMentioned(string username) => new TranslatableString(getKey(@"your_name_was_mentioned"), @"Your name was mentioned in chat by '{0}'. Click to find out why!", username);
 
+        /// <summary>
+        /// "{0} invited you to the multiplayer match &quot;{1}&quot;! Click to join."
+        /// </summary>
+        public static LocalisableString InvitedYouToTheMultiplayer(string username, string roomName) => new TranslatableString(getKey(@"invited_you_to_the_multiplayer"), @"{0} invited you to the multiplayer match ""{1}""! Click to join.", username, roomName);
+
         private static string getKey(string key) => $@"{prefix}:{key}";
     }
 }
