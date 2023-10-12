@@ -64,6 +64,26 @@ namespace osu.Game.Localisation
         /// </summary>
         public static LocalisableString KeyBindingPanelDescription => new TranslatableString(getKey(@"key_binding_panel_description"), @"Customise your keys!");
 
+        /// <summary>
+        /// "The binding you&#39;ve selected conflicts with another existing binding."
+        /// </summary>
+        public static LocalisableString KeyBindingConflictDetected => new TranslatableString(getKey(@"key_binding_conflict_detected"), @"The binding you've selected conflicts with another existing binding.");
+
+        /// <summary>
+        /// "Keep existing"
+        /// </summary>
+        public static LocalisableString KeepExisting => new TranslatableString(getKey(@"keep_existing"), @"Keep existing");
+
+        /// <summary>
+        /// "Apply new"
+        /// </summary>
+        public static LocalisableString ApplyNew => new TranslatableString(getKey(@"apply_new"), @"Apply new");
+
+        /// <summary>
+        /// "(none)"
+        /// </summary>
+        public static LocalisableString EmptyBinding => new TranslatableString(getKey(@"none"), @"(none)");
+
         private static string getKey(string key) => $"{prefix}:{key}";
     }
 }
