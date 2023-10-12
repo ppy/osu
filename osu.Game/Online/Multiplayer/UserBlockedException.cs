@@ -10,7 +10,7 @@ namespace osu.Game.Online.Multiplayer
     [Serializable]
     public class UserBlockedException : HubException
     {
-        public const string MESSAGE = "User cannot be invited by someone they have blocked or are blocked by.";
+        public const string MESSAGE = @"Cannot perform action due to user being blocked.";
 
         public UserBlockedException()
             : base(MESSAGE)
