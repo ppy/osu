@@ -43,7 +43,7 @@ namespace osu.Game.Online.Multiplayer
         Task UserKicked(MultiplayerRoomUser user);
 
         /// <summary>
-        /// Signals that a user has been invited into a multiplayer room.
+        /// Signals that the local user has been invited into a multiplayer room.
         /// </summary>
         /// <param name="invitedBy">Id of user that invited the player.</param>
         /// <param name="roomID">Id of the room the user got invited to.</param>
