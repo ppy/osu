@@ -47,7 +47,7 @@ namespace osu.Game.Overlays.Settings.Sections.Input
                     .With(row =>
                     {
                         row.BindingUpdated = onBindingUpdated;
-                        row.BindingConflictResolved = reloadAllBindings;
+                        row.GetAllSectionBindings = getAllBindings;
                     });
                 row.KeyBindings.AddRange(bindings.Where(b => b.ActionInt.Equals(intKey)));
                 Add(row);
@@ -73,7 +73,11 @@ namespace osu.Game.Overlays.Settings.Sections.Input
 
         protected abstract IEnumerable<RealmKeyBinding> GetKeyBindings(Realm realm);
 
-        private List<RealmKeyBinding> getAllBindings() => realm.Run(r => GetKeyBindings(r).Detach());
+        private List<RealmKeyBinding> getAllBindings() => realm.Run(r =>
+        {
+            r.Refresh();
+            return GetKeyBindings(r).Detach();
+        });
 
         protected virtual KeyBindingRow CreateKeyBindingRow(object action, IEnumerable<KeyBinding> defaults)
             => new KeyBindingRow(action)
@@ -95,29 +99,10 @@ namespace osu.Game.Overlays.Settings.Sections.Input
 
         private void onBindingUpdated(KeyBindingRow sender, KeyBindingRow.KeyBindingUpdatedEventArgs args)
         {
-            var bindings = getAllBindings();
-            var existingBinding = args.KeyCombination.Equals(new KeyCombination(InputKey.None))
-                ? null
-                : bindings.FirstOrDefault(kb => kb.ID != args.KeyBindingID && kb.KeyCombination.Equals(args.KeyCombination));
+            if (args.BindingConflictResolved)
+                reloadAllBindings();
 
-            if (existingBinding != null)
-            {
-                // `RealmKeyBinding`'s  `Action` is just an int, always.
-                // we need more than that for proper display, so leverage `Defaults` (which have the correct enum-typed object in `Action` inside).
-                object existingAssignedAction = Defaults.First(binding => (int)binding.Action == existingBinding.ActionInt).Action;
-                var bindingBeforeUpdate = bindings.Single(binding => binding.ID == args.KeyBindingID);
-
-                sender.ShowBindingConflictPopover(
-                    new KeyBindingConflictInfo(
-                        new ConflictingKeyBinding(existingBinding.ID, existingAssignedAction, existingBinding.KeyCombination, new KeyCombination(InputKey.None)),
-                        new ConflictingKeyBinding(bindingBeforeUpdate.ID, args.Action, args.KeyCombination, bindingBeforeUpdate.KeyCombination)));
-
-                return;
-            }
-
-            realm.WriteAsync(r => r.Find<RealmKeyBinding>(args.KeyBindingID)!.KeyCombinationString = args.KeyCombination.ToString());
-
-            if (AutoAdvanceTarget)
+            if (AutoAdvanceTarget && args.CanAdvanceToNextBinding)
             {
                 var next = Children.SkipWhile(c => c != sender).Skip(1).FirstOrDefault();
                 if (next != null)
