@@ -53,6 +53,8 @@ namespace osu.Game.Overlays.Notifications
         public virtual string PopInSampleName => "UI/notification-default";
         public virtual string PopOutSampleName => "UI/overlay-pop-out";
 
+        protected const float CORNER_RADIUS = 6;
+
         protected NotificationLight Light;
 
         protected Container IconContent;
@@ -128,7 +130,7 @@ namespace osu.Game.Overlays.Notifications
                     AutoSizeAxes = Axes.Y,
                 }.WithChild(MainContent = new Container
                 {
-                    CornerRadius = 6,
+                    CornerRadius = CORNER_RADIUS,
                     Masking = true,
                     RelativeSizeAxes = Axes.X,
                     AutoSizeAxes = Axes.Y,
