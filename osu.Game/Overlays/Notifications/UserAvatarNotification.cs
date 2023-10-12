@@ -42,8 +42,10 @@ namespace osu.Game.Overlays.Notifications
         protected override IconUsage CloseButtonIcon => FontAwesome.Solid.Times;
 
         [BackgroundDependencyLoader]
-        private void load(OverlayColourProvider colourProvider)
+        private void load(OsuColour colours, OverlayColourProvider colourProvider)
         {
+            Light.Colour = colours.Orange2;
+
             Content.Add(textDrawable = new OsuTextFlowContainer(t => t.Font = t.Font.With(size: 14, weight: FontWeight.Medium))
             {
                 AutoSizeAxes = Axes.Y,

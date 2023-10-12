@@ -473,10 +473,9 @@ namespace osu.Game.Overlays.Notifications
                     base.Colour = value;
                     pulsateLayer.EdgeEffect = new EdgeEffectParameters
                     {
-                        Colour = ((Color4)value).Opacity(0.5f), //todo: avoid cast
+                        Colour = ((Color4)value).Opacity(0.18f),
                         Type = EdgeEffectType.Glow,
-                        Radius = 12,
-                        Roundness = 12,
+                        Radius = 14,
                     };
                 }
             }
