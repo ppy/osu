@@ -56,9 +56,9 @@ namespace osu.Game.Tests.Visual.Settings
             {
                 ConflictInfo =
                 {
-                    Value = new KeyBindingConflictInfo(
-                        new ConflictingKeyBinding(Guid.NewGuid(), OsuAction.LeftButton, KeyCombination.FromKey(Key.X), new KeyCombination(InputKey.None)),
-                        new ConflictingKeyBinding(Guid.NewGuid(), OsuAction.RightButton, KeyCombination.FromKey(Key.Z), KeyCombination.FromKey(Key.X)))
+                    Value = new KeyBindingRow.KeyBindingConflictInfo(
+                        new KeyBindingRow.ConflictingKeyBinding(Guid.NewGuid(), OsuAction.LeftButton, KeyCombination.FromKey(Key.X), new KeyCombination(InputKey.None)),
+                        new KeyBindingRow.ConflictingKeyBinding(Guid.NewGuid(), OsuAction.RightButton, KeyCombination.FromKey(Key.Z), KeyCombination.FromKey(Key.X)))
                 }
             };
         }

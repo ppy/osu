@@ -25,7 +25,7 @@ namespace osu.Game.Overlays.Settings.Sections.Input
 {
     public partial class KeyBindingConflictPopover : OsuPopover
     {
-        public Bindable<KeyBindingConflictInfo> ConflictInfo { get; } = new Bindable<KeyBindingConflictInfo>();
+        public Bindable<KeyBindingRow.KeyBindingConflictInfo> ConflictInfo { get; } = new Bindable<KeyBindingRow.KeyBindingConflictInfo>();
 
         public Action? BindingConflictResolved { get; init; }
 

@@ -539,6 +539,13 @@ namespace osu.Game.Overlays.Settings.Sections.Input
             this.ShowPopover();
         }
 
+        /// <summary>
+        /// Contains information about the key binding conflict to be resolved.
+        /// </summary>
+        public record KeyBindingConflictInfo(ConflictingKeyBinding Existing, ConflictingKeyBinding New);
+
+        public record ConflictingKeyBinding(Guid ID, object Action, KeyCombination CombinationWhenChosen, KeyCombination CombinationWhenNotChosen);
+
         #endregion
 
         private partial class CancelButton : RoundedButton
