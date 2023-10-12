@@ -123,7 +123,8 @@ namespace osu.Game.Users
                 }
 
                 if (
-                    User.IsOnline &&
+                    // TODO: uncomment this once lazer / osu-web is updating online states
+                    // User.IsOnline &&
                     multiplayerClient?.Room != null &&
                     multiplayerClient.Room.Users.All(u => u.UserID != User.Id)
                 )
