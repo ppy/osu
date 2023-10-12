@@ -55,8 +55,14 @@ namespace osu.Game.Overlays.Settings.Sections.Input
                         Text = "The binding you've selected conflicts with another existing binding.",
                         Margin = new MarginPadding { Bottom = 10 }
                     },
-                    existingPreview = new ConflictingKeyBindingPreview(ConflictInfo.Value.Existing.Action, ConflictInfo.Value.Existing.CombinationWhenChosen, ConflictInfo.Value.Existing.CombinationWhenNotChosen),
-                    newPreview = new ConflictingKeyBindingPreview(ConflictInfo.Value.New.Action, ConflictInfo.Value.New.CombinationWhenChosen, ConflictInfo.Value.New.CombinationWhenNotChosen),
+                    existingPreview = new ConflictingKeyBindingPreview(
+                        ConflictInfo.Value.Existing.Action,
+                        ConflictInfo.Value.Existing.CombinationWhenChosen,
+                        ConflictInfo.Value.Existing.CombinationWhenNotChosen),
+                    newPreview = new ConflictingKeyBindingPreview(
+                        ConflictInfo.Value.New.Action,
+                        ConflictInfo.Value.New.CombinationWhenChosen,
+                        ConflictInfo.Value.New.CombinationWhenNotChosen),
                     new Container
                     {
                         RelativeSizeAxes = Axes.X,
