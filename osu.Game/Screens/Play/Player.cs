@@ -601,8 +601,13 @@ namespace osu.Game.Screens.Play
                 }
             }
 
-            // if an exit has been requested, cancel any pending completion (the user has shown intention to exit).
-            resultsDisplayDelegate?.Cancel();
+            // Matching osu!stable behaviour, if the results screen is pending and the user requests an exit,
+            // show the results instead.
+            if (resultsDisplayDelegate != null)
+            {
+                progressToResults(false);
+                return;
+            }
 
             // import current score if possible.
             prepareAndImportScoreAsync();
