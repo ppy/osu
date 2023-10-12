@@ -11,6 +11,7 @@ using osu.Framework.Graphics.Shapes;
 using osu.Framework.Input;
 using osu.Framework.Input.Bindings;
 using osu.Framework.Input.Events;
+using osu.Framework.Localisation;
 using osu.Game.Database;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
@@ -18,6 +19,7 @@ using osu.Game.Graphics.Sprites;
 using osu.Game.Graphics.UserInterfaceV2;
 using osu.Game.Input.Bindings;
 using osuTK;
+using osu.Game.Localisation;
 
 namespace osu.Game.Overlays.Settings.Sections.Input
 {
@@ -52,7 +54,7 @@ namespace osu.Game.Overlays.Settings.Sections.Input
                     {
                         RelativeSizeAxes = Axes.X,
                         AutoSizeAxes = Axes.Y,
-                        Text = "The binding you've selected conflicts with another existing binding.",
+                        Text = InputSettingsStrings.KeyBindingConflictDetected,
                         Margin = new MarginPadding { Bottom = 10 }
                     },
                     existingPreview = new ConflictingKeyBindingPreview(
@@ -72,7 +74,7 @@ namespace osu.Game.Overlays.Settings.Sections.Input
                         {
                             keepExistingButton = new HoverableRoundedButton
                             {
-                                Text = "Keep existing",
+                                Text = InputSettingsStrings.KeepExisting,
                                 RelativeSizeAxes = Axes.X,
                                 Width = 0.48f,
                                 Anchor = Anchor.CentreLeft,
@@ -81,7 +83,7 @@ namespace osu.Game.Overlays.Settings.Sections.Input
                             },
                             applyNewButton = new HoverableRoundedButton
                             {
-                                Text = "Apply new",
+                                Text = InputSettingsStrings.ApplyNew,
                                 RelativeSizeAxes = Axes.X,
                                 Width = 0.48f,
                                 Anchor = Anchor.CentreRight,
@@ -243,30 +245,30 @@ namespace osu.Game.Overlays.Settings.Sections.Input
 
             private void updateState()
             {
-                string newBinding;
+                LocalisableString keyCombinationText;
 
                 switch (IsChosen.Value)
                 {
                     case true:
-                        newBinding = keyCombinationProvider.GetReadableString(combinationWhenChosen);
+                        keyCombinationText = keyCombinationProvider.GetReadableString(combinationWhenChosen);
                         newBindingText.Colour = colours.Green1;
                         break;
 
                     case false:
-                        newBinding = keyCombinationProvider.GetReadableString(combinationWhenNotChosen);
+                        keyCombinationText = keyCombinationProvider.GetReadableString(combinationWhenNotChosen);
                         newBindingText.Colour = colours.Red1;
                         break;
 
                     case null:
-                        newBinding = keyCombinationProvider.GetReadableString(combinationWhenChosen);
+                        keyCombinationText = keyCombinationProvider.GetReadableString(combinationWhenChosen);
                         newBindingText.Colour = Colour4.White;
                         break;
                 }
 
-                if (string.IsNullOrEmpty(newBinding))
-                    newBinding = "(none)";
+                if (LocalisableString.IsNullOrEmpty(keyCombinationText))
+                    keyCombinationText = InputSettingsStrings.EmptyBinding;
 
-                newBindingText.Text = newBinding;
+                newBindingText.Text = keyCombinationText;
             }
         }
 
