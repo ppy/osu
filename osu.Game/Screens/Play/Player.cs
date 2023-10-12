@@ -596,7 +596,7 @@ namespace osu.Game.Screens.Play
 
             // Matching osu!stable behaviour, if the results screen is pending and the user requests an exit,
             // show the results instead.
-            if (resultsDisplayDelegate != null && !isRestarting)
+            if (GameplayState.HasPassed && !isRestarting)
             {
                 progressToResults(false);
                 return false;
