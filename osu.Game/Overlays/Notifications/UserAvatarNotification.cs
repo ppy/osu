@@ -39,39 +39,34 @@ namespace osu.Game.Overlays.Notifications
             Text = text;
         }
 
-        private DrawableAvatar? avatar;
-
         protected override IconUsage CloseButtonIcon => FontAwesome.Solid.Times;
 
         [BackgroundDependencyLoader]
         private void load(OverlayColourProvider colourProvider)
         {
-            IconContent.Masking = true;
-
-            // Workaround for the corner radius on parent's mask breaking if we add masking to IconContent
-            IconContent.CornerRadius = 6;
-
-            IconContent.AddRange(new Drawable[]
-            {
-                new Box()
-                {
-                    RelativeSizeAxes = Axes.Both,
-                    Colour = colourProvider.Background5,
-                },
-            });
-
-            avatar = new DrawableAvatar(user)
-            {
-                FillMode = FillMode.Fill,
-            };
-            LoadComponentAsync(avatar, IconContent.Add);
-
             Content.Add(textDrawable = new OsuTextFlowContainer(t => t.Font = t.Font.With(size: 14, weight: FontWeight.Medium))
             {
                 AutoSizeAxes = Axes.Y,
                 RelativeSizeAxes = Axes.X,
                 Text = text
             });
+
+            IconContent.Masking = true;
+            IconContent.CornerRadius = CORNER_RADIUS;
+
+            IconContent.AddRange(new Drawable[]
+            {
+                new Box
+                {
+                    RelativeSizeAxes = Axes.Both,
+                    Colour = colourProvider.Background5,
+                },
+            });
+
+            LoadComponentAsync(new DrawableAvatar(user)
+            {
+                FillMode = FillMode.Fill,
+            }, IconContent.Add);
         }
     }
 }
