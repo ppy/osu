@@ -20,6 +20,7 @@ using osu.Framework.Input;
 using osu.Framework.Input.Bindings;
 using osu.Framework.Input.Events;
 using osu.Framework.Localisation;
+using osu.Game.Database;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Graphics.UserInterface;
@@ -27,6 +28,7 @@ using osu.Game.Graphics.UserInterfaceV2;
 using osu.Game.Input;
 using osu.Game.Input.Bindings;
 using osu.Game.Resources.Localisation.Web;
+using osu.Game.Rulesets;
 using osuTK;
 using osuTK.Graphics;
 using osuTK.Input;
@@ -42,9 +44,9 @@ namespace osu.Game.Overlays.Settings.Sections.Input
 
         public delegate void KeyBindingUpdated(KeyBindingRow sender, KeyBindingUpdatedEventArgs args);
 
-        public record KeyBindingUpdatedEventArgs(object Action, Guid KeyBindingID, KeyCombination KeyCombination);
+        public record KeyBindingUpdatedEventArgs(bool BindingConflictResolved, bool CanAdvanceToNextBinding);
 
-        public Action? BindingConflictResolved { get; set; }
+        public Func<List<RealmKeyBinding>> GetAllSectionBindings { get; set; } = null!;
 
         /// <summary>
         /// Whether left and right mouse button clicks should be included in the edited bindings.
@@ -86,6 +88,12 @@ namespace osu.Game.Overlays.Settings.Sections.Input
         private Bindable<bool> isDefault { get; } = new BindableBool(true);
 
         [Resolved]
+        private RealmAccess realm { get; set; } = null!;
+
+        [Resolved]
+        private RulesetStore rulesets { get; set; } = null!;
+
+        [Resolved]
         private ReadableKeyCombinationProvider keyCombinationProvider { get; set; } = null!;
 
         private Container content = null!;
@@ -111,7 +119,7 @@ namespace osu.Game.Overlays.Settings.Sections.Input
         /// <param name="action">The action that this row contains bindings for.</param>
         public KeyBindingRow(object action)
         {
-            this.Action = action;
+            Action = action;
 
             RelativeSizeAxes = Axes.X;
             AutoSizeAxes = Axes.Y;
@@ -225,8 +233,7 @@ namespace osu.Game.Overlays.Settings.Sections.Input
                 var button = buttons[i++];
                 button.UpdateKeyCombination(d);
 
-                var args = new KeyBindingUpdatedEventArgs(Action, button.KeyBinding.Value.ID, button.KeyBinding.Value.KeyCombination);
-                BindingUpdated?.Invoke(this, args);
+                tryPersistKeyBinding(button.KeyBinding.Value, advanceToNextBinding: false);
             }
 
             isDefault.Value = true;
@@ -286,7 +293,7 @@ namespace osu.Game.Overlays.Settings.Sections.Input
             Debug.Assert(bindTarget != null);
 
             if (bindTarget.IsHovered)
-                finalise();
+                finalise(false);
             // prevent updating bind target before clear button's action
             else if (!cancelAndClearButtons.Any(b => b.IsHovered))
                 updateBindTarget();
@@ -435,23 +442,22 @@ namespace osu.Game.Overlays.Settings.Sections.Input
                 return;
 
             bindTarget.UpdateKeyCombination(InputKey.None);
-            finalise();
+            finalise(false);
         }
 
-        private void finalise(bool hasChanged = true)
+        private void finalise(bool advanceToNextBinding = true)
         {
             if (bindTarget != null)
             {
                 updateIsDefaultValue();
 
                 bindTarget.IsBinding = false;
-                var args = new KeyBindingUpdatedEventArgs(Action, bindTarget.KeyBinding.Value.ID, bindTarget.KeyBinding.Value.KeyCombination);
+                var bindingToPersist = bindTarget.KeyBinding.Value;
                 Schedule(() =>
                 {
                     // schedule to ensure we don't instantly get focus back on next OnMouseClick (see AcceptFocus impl.)
                     bindTarget = null;
-                    if (hasChanged)
-                        BindingUpdated?.Invoke(this, args);
+                    tryPersistKeyBinding(bindingToPersist, advanceToNextBinding);
                 });
             }
 
@@ -460,6 +466,28 @@ namespace osu.Game.Overlays.Settings.Sections.Input
 
             cancelAndClearButtons.FadeOut(300, Easing.OutQuint);
             cancelAndClearButtons.BypassAutoSizeAxes |= Axes.Y;
+        }
+
+        private void tryPersistKeyBinding(RealmKeyBinding keyBinding, bool advanceToNextBinding)
+        {
+            var bindings = GetAllSectionBindings();
+            var existingBinding = keyBinding.KeyCombination.Equals(new KeyCombination(InputKey.None))
+                ? null
+                : bindings.FirstOrDefault(other => other.ID != keyBinding.ID && other.KeyCombination.Equals(keyBinding.KeyCombination));
+
+            if (existingBinding == null)
+            {
+                realm.WriteAsync(r => r.Find<RealmKeyBinding>(keyBinding.ID)!.KeyCombinationString = keyBinding.KeyCombination.ToString());
+                BindingUpdated?.Invoke(this, new KeyBindingUpdatedEventArgs(BindingConflictResolved: false, advanceToNextBinding));
+                return;
+            }
+
+            var keyBindingBeforeUpdate = bindings.Single(other => other.ID == keyBinding.ID);
+
+            showBindingConflictPopover(
+                new KeyBindingConflictInfo(
+                    new ConflictingKeyBinding(existingBinding.ID, existingBinding.GetAction(rulesets), existingBinding.KeyCombination, new KeyCombination(InputKey.None)),
+                    new ConflictingKeyBinding(keyBindingBeforeUpdate.ID, Action, keyBinding.KeyCombination, keyBindingBeforeUpdate.KeyCombination)));
         }
 
         protected override void OnFocus(FocusEvent e)
@@ -502,10 +530,10 @@ namespace osu.Game.Overlays.Settings.Sections.Input
         public Popover GetPopover() => new KeyBindingConflictPopover
         {
             ConflictInfo = { BindTarget = keyBindingConflictInfo },
-            BindingConflictResolved = BindingConflictResolved
+            BindingConflictResolved = () => BindingUpdated?.Invoke(this, new KeyBindingUpdatedEventArgs(BindingConflictResolved: true, CanAdvanceToNextBinding: false))
         };
 
-        public void ShowBindingConflictPopover(KeyBindingConflictInfo conflictInfo)
+        private void showBindingConflictPopover(KeyBindingConflictInfo conflictInfo)
         {
             keyBindingConflictInfo.Value = conflictInfo;
             this.ShowPopover();
