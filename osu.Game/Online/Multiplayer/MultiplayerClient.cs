@@ -11,7 +11,6 @@ using Newtonsoft.Json;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Development;
-using osu.Framework.Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Logging;
 using osu.Game.Database;
@@ -447,13 +446,8 @@ namespace osu.Game.Online.Multiplayer
 
         async Task IMultiplayerClient.Invited(int invitedBy, long roomID, string password)
         {
-            var loadUserTask = userLookupCache.GetUserAsync(invitedBy);
-            var loadRoomTask = lookupRoom(roomID);
-
-            await Task.WhenAll(loadUserTask, loadRoomTask).ConfigureAwait(false);
-
-            APIUser? apiUser = loadUserTask.GetResultSafely();
-            Room? apiRoom = loadRoomTask.GetResultSafely();
+            APIUser? apiUser = await userLookupCache.GetUserAsync(invitedBy);
+            Room? apiRoom = await lookupRoom(roomID);
 
             if (apiUser == null || apiRoom == null) return;
 
