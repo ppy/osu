@@ -185,7 +185,7 @@ namespace osu.Game.Overlays.Settings.Sections.Input
                             ColumnDimensions = new[]
                             {
                                 new Dimension(),
-                                new Dimension(GridSizeMode.AutoSize, minSize: 80),
+                                new Dimension(GridSizeMode.AutoSize),
                             },
                             Content = new[]
                             {
@@ -198,20 +198,20 @@ namespace osu.Game.Overlays.Settings.Sections.Input
                                     },
                                     new Container
                                     {
-                                        AutoSizeAxes = Axes.Y,
-                                        RelativeSizeAxes = Axes.X,
+                                        AutoSizeAxes = Axes.Both,
                                         CornerRadius = 5,
                                         Masking = true,
                                         Anchor = Anchor.CentreRight,
                                         Origin = Anchor.CentreRight,
                                         X = -5,
-                                        Children = new Drawable[]
+                                        Children = new[]
                                         {
                                             new Box
                                             {
                                                 RelativeSizeAxes = Axes.Both,
                                                 Colour = colourProvider.Background6
                                             },
+                                            Empty().With(d => d.Width = 80), // poor man's min-width
                                             newBindingText = new OsuSpriteText
                                             {
                                                 Font = OsuFont.Numeric.With(size: 10),
