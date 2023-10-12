@@ -1,6 +1,7 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using osu.Framework.Input;
@@ -37,7 +38,7 @@ namespace osu.Game.Input.Bindings
                                                                        // based on such usages potentially requiring a lot more key bindings that may be "shared" with global ones.
                                                                        .Concat(OverlayKeyBindings);
 
-        public IEnumerable<KeyBinding> GlobalKeyBindings => new[]
+        public static IEnumerable<KeyBinding> GlobalKeyBindings => new[]
         {
             new KeyBinding(InputKey.Up, GlobalAction.SelectPrevious),
             new KeyBinding(InputKey.Down, GlobalAction.SelectNext),
@@ -67,7 +68,7 @@ namespace osu.Game.Input.Bindings
             new KeyBinding(InputKey.F12, GlobalAction.TakeScreenshot),
         };
 
-        public IEnumerable<KeyBinding> OverlayKeyBindings => new[]
+        public static IEnumerable<KeyBinding> OverlayKeyBindings => new[]
         {
             new KeyBinding(InputKey.F8, GlobalAction.ToggleChat),
             new KeyBinding(InputKey.F6, GlobalAction.ToggleNowPlaying),
@@ -77,7 +78,7 @@ namespace osu.Game.Input.Bindings
             new KeyBinding(new[] { InputKey.Control, InputKey.N }, GlobalAction.ToggleNotifications),
         };
 
-        public IEnumerable<KeyBinding> EditorKeyBindings => new[]
+        public static IEnumerable<KeyBinding> EditorKeyBindings => new[]
         {
             new KeyBinding(new[] { InputKey.F1 }, GlobalAction.EditorComposeMode),
             new KeyBinding(new[] { InputKey.F2 }, GlobalAction.EditorDesignMode),
@@ -101,7 +102,7 @@ namespace osu.Game.Input.Bindings
             new KeyBinding(new[] { InputKey.Control, InputKey.R }, GlobalAction.EditorToggleRotateControl),
         };
 
-        public IEnumerable<KeyBinding> InGameKeyBindings => new[]
+        public static IEnumerable<KeyBinding> InGameKeyBindings => new[]
         {
             new KeyBinding(InputKey.Space, GlobalAction.SkipCutscene),
             new KeyBinding(InputKey.ExtraMouseButton2, GlobalAction.SkipCutscene),
@@ -118,7 +119,7 @@ namespace osu.Game.Input.Bindings
             new KeyBinding(InputKey.F2, GlobalAction.ExportReplay),
         };
 
-        public IEnumerable<KeyBinding> ReplayKeyBindings => new[]
+        public static IEnumerable<KeyBinding> ReplayKeyBindings => new[]
         {
             new KeyBinding(InputKey.Space, GlobalAction.TogglePauseReplay),
             new KeyBinding(InputKey.MouseMiddle, GlobalAction.TogglePauseReplay),
@@ -127,7 +128,7 @@ namespace osu.Game.Input.Bindings
             new KeyBinding(new[] { InputKey.Control, InputKey.H }, GlobalAction.ToggleReplaySettings),
         };
 
-        public IEnumerable<KeyBinding> SongSelectKeyBindings => new[]
+        public static IEnumerable<KeyBinding> SongSelectKeyBindings => new[]
         {
             new KeyBinding(InputKey.F1, GlobalAction.ToggleModSelection),
             new KeyBinding(InputKey.F2, GlobalAction.SelectNextRandom),
@@ -136,7 +137,7 @@ namespace osu.Game.Input.Bindings
             new KeyBinding(InputKey.BackSpace, GlobalAction.DeselectAllMods),
         };
 
-        public IEnumerable<KeyBinding> AudioControlKeyBindings => new[]
+        public static IEnumerable<KeyBinding> AudioControlKeyBindings => new[]
         {
             new KeyBinding(new[] { InputKey.Alt, InputKey.Up }, GlobalAction.IncreaseVolume),
             new KeyBinding(new[] { InputKey.Alt, InputKey.Down }, GlobalAction.DecreaseVolume),
@@ -153,6 +154,39 @@ namespace osu.Game.Input.Bindings
             new KeyBinding(InputKey.PlayPause, GlobalAction.MusicPlay),
             new KeyBinding(InputKey.F3, GlobalAction.MusicPlay)
         };
+
+        public static IEnumerable<KeyBinding> GetDefaultBindingsFor(GlobalActionCategory category)
+        {
+            switch (category)
+            {
+                case GlobalActionCategory.General:
+                    return GlobalKeyBindings;
+
+                case GlobalActionCategory.Editor:
+                    return EditorKeyBindings;
+
+                case GlobalActionCategory.InGame:
+                    return InGameKeyBindings;
+
+                case GlobalActionCategory.Replay:
+                    return ReplayKeyBindings;
+
+                case GlobalActionCategory.SongSelect:
+                    return SongSelectKeyBindings;
+
+                case GlobalActionCategory.AudioControl:
+                    return AudioControlKeyBindings;
+
+                case GlobalActionCategory.Overlays:
+                    return OverlayKeyBindings;
+
+                default:
+                    throw new ArgumentOutOfRangeException(nameof(category), category, $"Unexpected {nameof(GlobalActionCategory)}");
+            }
+        }
+
+        public static IEnumerable<GlobalAction> GetGlobalActionsFor(GlobalActionCategory category)
+            => GetDefaultBindingsFor(category).Select(binding => binding.Action).Cast<GlobalAction>().Distinct();
 
         public bool OnPressed(KeyBindingPressEvent<GlobalAction> e) => handler?.OnPressed(e) == true;
 
@@ -364,5 +398,16 @@ namespace osu.Game.Input.Bindings
 
         [LocalisableDescription(typeof(GlobalActionKeyBindingStrings), nameof(GlobalActionKeyBindingStrings.EditorToggleRotateControl))]
         EditorToggleRotateControl,
+    }
+
+    public enum GlobalActionCategory
+    {
+        General,
+        Editor,
+        InGame,
+        Replay,
+        SongSelect,
+        AudioControl,
+        Overlays
     }
 }

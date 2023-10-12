@@ -36,7 +36,7 @@ namespace osu.Game.Overlays.Settings.Sections.Input
             public DefaultBindingsSubsection(GlobalActionContainer manager)
                 : base(null)
             {
-                Defaults = manager.GlobalKeyBindings;
+                Defaults = GlobalActionContainer.GlobalKeyBindings;
             }
         }
 
@@ -47,7 +47,7 @@ namespace osu.Game.Overlays.Settings.Sections.Input
             public OverlayBindingsSubsection(GlobalActionContainer manager)
                 : base(null)
             {
-                Defaults = manager.OverlayKeyBindings;
+                Defaults = GlobalActionContainer.OverlayKeyBindings;
             }
         }
 
@@ -58,7 +58,7 @@ namespace osu.Game.Overlays.Settings.Sections.Input
             public SongSelectKeyBindingSubsection(GlobalActionContainer manager)
                 : base(null)
             {
-                Defaults = manager.SongSelectKeyBindings;
+                Defaults = GlobalActionContainer.SongSelectKeyBindings;
             }
         }
 
@@ -69,7 +69,7 @@ namespace osu.Game.Overlays.Settings.Sections.Input
             public InGameKeyBindingsSubsection(GlobalActionContainer manager)
                 : base(null)
             {
-                Defaults = manager.InGameKeyBindings;
+                Defaults = GlobalActionContainer.InGameKeyBindings;
             }
         }
 
@@ -80,7 +80,7 @@ namespace osu.Game.Overlays.Settings.Sections.Input
             public ReplayKeyBindingsSubsection(GlobalActionContainer manager)
                 : base(null)
             {
-                Defaults = manager.ReplayKeyBindings;
+                Defaults = GlobalActionContainer.ReplayKeyBindings;
             }
         }
 
@@ -91,7 +91,7 @@ namespace osu.Game.Overlays.Settings.Sections.Input
             public AudioControlKeyBindingsSubsection(GlobalActionContainer manager)
                 : base(null)
             {
-                Defaults = manager.AudioControlKeyBindings;
+                Defaults = GlobalActionContainer.AudioControlKeyBindings;
             }
         }
 
@@ -102,7 +102,7 @@ namespace osu.Game.Overlays.Settings.Sections.Input
             public EditorKeyBindingsSubsection(GlobalActionContainer manager)
                 : base(null)
             {
-                Defaults = manager.EditorKeyBindings;
+                Defaults = GlobalActionContainer.EditorKeyBindings;
             }
         }
     }
