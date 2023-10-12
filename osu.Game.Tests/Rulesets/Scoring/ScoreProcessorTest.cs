@@ -107,7 +107,7 @@ namespace osu.Game.Tests.Rulesets.Scoring
 
             for (int i = 0; i < 4; i++)
             {
-                var judgementResult = new JudgementResult(fourObjectBeatmap.HitObjects[i], new TestJudgement(maxResult))
+                var judgementResult = new JudgementResult(fourObjectBeatmap.HitObjects[i], fourObjectBeatmap.HitObjects[i].CreateJudgement())
                 {
                     Type = i == 2 ? minResult : hitResult
                 };
@@ -260,6 +260,41 @@ namespace osu.Game.Tests.Rulesets.Scoring
 #pragma warning restore CS0618
 
         [Test]
+        public void TestComboBreak()
+        {
+            Assert.That(HitResult.ComboBreak.IncreasesCombo(), Is.False);
+            Assert.That(HitResult.ComboBreak.BreaksCombo(), Is.True);
+            Assert.That(HitResult.ComboBreak.AffectsCombo(), Is.True);
+            Assert.That(HitResult.ComboBreak.AffectsAccuracy(), Is.False);
+            Assert.That(HitResult.ComboBreak.IsBasic(), Is.False);
+            Assert.That(HitResult.ComboBreak.IsTick(), Is.False);
+            Assert.That(HitResult.ComboBreak.IsBonus(), Is.False);
+            Assert.That(HitResult.ComboBreak.IsHit(), Is.False);
+            Assert.That(HitResult.ComboBreak.IsScorable(), Is.True);
+            Assert.That(HitResultExtensions.ALL_TYPES, Does.Contain(HitResult.ComboBreak));
+
+            beatmap = new TestBeatmap(new RulesetInfo())
+            {
+                HitObjects = new List<HitObject>
+                {
+                    new TestHitObject(HitResult.Great),
+                    new TestHitObject(HitResult.IgnoreHit, HitResult.ComboBreak),
+                }
+            };
+
+            scoreProcessor = new TestScoreProcessor();
+            scoreProcessor.ApplyBeatmap(beatmap);
+
+            scoreProcessor.ApplyResult(new JudgementResult(beatmap.HitObjects[0], beatmap.HitObjects[0].CreateJudgement()) { Type = HitResult.Great });
+            Assert.That(scoreProcessor.Combo.Value, Is.EqualTo(1));
+            Assert.That(scoreProcessor.Accuracy.Value, Is.EqualTo(1));
+
+            scoreProcessor.ApplyResult(new JudgementResult(beatmap.HitObjects[1], beatmap.HitObjects[1].CreateJudgement()) { Type = HitResult.ComboBreak });
+            Assert.That(scoreProcessor.Combo.Value, Is.EqualTo(0));
+            Assert.That(scoreProcessor.Accuracy.Value, Is.EqualTo(1));
+        }
+
+        [Test]
         public void TestAccuracyWhenNearPerfect()
         {
             const int count_judgements = 1000;
@@ -275,7 +310,7 @@ namespace osu.Game.Tests.Rulesets.Scoring
 
             for (int i = 0; i < beatmap.HitObjects.Count; i++)
             {
-                scoreProcessor.ApplyResult(new JudgementResult(beatmap.HitObjects[i], new TestJudgement(HitResult.Great))
+                scoreProcessor.ApplyResult(new JudgementResult(beatmap.HitObjects[i], beatmap.HitObjects[i].CreateJudgement())
                 {
                     Type = i == 0 ? HitResult.Miss : HitResult.Great
                 });
@@ -293,24 +328,31 @@ namespace osu.Game.Tests.Rulesets.Scoring
         {
             public override HitResult MaxResult { get; }
 
-            public TestJudgement(HitResult maxResult)
+            public override HitResult MinResult => minResult ?? base.MinResult;
+
+            private readonly HitResult? minResult;
+
+            public TestJudgement(HitResult maxResult, HitResult? minResult = null)
             {
                 MaxResult = maxResult;
+                this.minResult = minResult;
             }
         }
 
         private class TestHitObject : HitObject
         {
             private readonly HitResult maxResult;
+            private readonly HitResult? minResult;
 
             public override Judgement CreateJudgement()
             {
-                return new TestJudgement(maxResult);
+                return new TestJudgement(maxResult, minResult);
             }
 
-            public TestHitObject(HitResult maxResult)
+            public TestHitObject(HitResult maxResult, HitResult? minResult = null)
             {
                 this.maxResult = maxResult;
+                this.minResult = minResult;
             }
         }
 

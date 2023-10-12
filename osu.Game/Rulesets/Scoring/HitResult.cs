@@ -121,6 +121,16 @@ namespace osu.Game.Rulesets.Scoring
         IgnoreHit,
 
         /// <summary>
+        /// Indicates that a combo break should occur, but does not otherwise affect score.
+        /// </summary>
+        /// <remarks>
+        /// May be paired with <see cref="IgnoreHit"/>.
+        /// </remarks>
+        [EnumMember(Value = "combo_break")]
+        [Order(15)]
+        ComboBreak,
+
+        /// <summary>
         /// A special result used as a padding value for legacy rulesets. It is a hit type and affects combo, but does not affect the base score (does not affect accuracy).
         /// </summary>
         /// <remarks>
@@ -165,6 +175,7 @@ namespace osu.Game.Rulesets.Scoring
                 case HitResult.LargeTickHit:
                 case HitResult.LargeTickMiss:
                 case HitResult.LegacyComboIncrease:
+                case HitResult.ComboBreak:
                     return true;
 
                 default:
@@ -177,11 +188,19 @@ namespace osu.Game.Rulesets.Scoring
         /// </summary>
         public static bool AffectsAccuracy(this HitResult result)
         {
-            // LegacyComboIncrease is a special type which is neither a basic, tick, bonus, or accuracy-affecting result.
-            if (result == HitResult.LegacyComboIncrease)
-                return false;
+            switch (result)
+            {
+                // LegacyComboIncrease is a special non-gameplay type which is neither a basic, tick, bonus, or accuracy-affecting result.
+                case HitResult.LegacyComboIncrease:
+                    return false;
 
-            return IsScorable(result) && !IsBonus(result);
+                // ComboBreak is a special type that only affects combo. It cannot be considered as basic, tick, bonus, or accuracy-affecting.
+                case HitResult.ComboBreak:
+                    return false;
+
+                default:
+                    return IsScorable(result) && !IsBonus(result);
+            }
         }
 
         /// <summary>
@@ -189,11 +208,19 @@ namespace osu.Game.Rulesets.Scoring
         /// </summary>
         public static bool IsBasic(this HitResult result)
         {
-            // LegacyComboIncrease is a special type which is neither a basic, tick, bonus, or accuracy-affecting result.
-            if (result == HitResult.LegacyComboIncrease)
-                return false;
+            switch (result)
+            {
+                // LegacyComboIncrease is a special non-gameplay type which is neither a basic, tick, bonus, or accuracy-affecting result.
+                case HitResult.LegacyComboIncrease:
+                    return false;
 
-            return IsScorable(result) && !IsTick(result) && !IsBonus(result);
+                // ComboBreak is a special type that only affects combo. It cannot be considered as basic, tick, bonus, or accuracy-affecting.
+                case HitResult.ComboBreak:
+                    return false;
+
+                default:
+                    return IsScorable(result) && !IsTick(result) && !IsBonus(result);
+            }
         }
 
         /// <summary>
@@ -242,6 +269,7 @@ namespace osu.Game.Rulesets.Scoring
                 case HitResult.Miss:
                 case HitResult.SmallTickMiss:
                 case HitResult.LargeTickMiss:
+                case HitResult.ComboBreak:
                     return false;
 
                 default:
@@ -254,11 +282,20 @@ namespace osu.Game.Rulesets.Scoring
         /// </summary>
         public static bool IsScorable(this HitResult result)
         {
-            // LegacyComboIncrease is not actually scorable (in terms of usable by rulesets for that purpose), but needs to be defined as such to be correctly included in statistics output.
-            if (result == HitResult.LegacyComboIncrease)
-                return true;
+            switch (result)
+            {
+                // LegacyComboIncrease is not actually scorable (in terms of usable by rulesets for that purpose), but needs to be defined as such to be correctly included in statistics output.
+                case HitResult.LegacyComboIncrease:
+                    return true;
 
-            return result >= HitResult.Miss && result < HitResult.IgnoreMiss;
+                // ComboBreak is its own type that affects score via combo.
+                case HitResult.ComboBreak:
+                    return true;
+
+                default:
+                    // Note that IgnoreHit and IgnoreMiss are excluded as they do not affect score.
+                    return result >= HitResult.Miss && result < HitResult.IgnoreMiss;
+            }
         }
 
         /// <summary>
@@ -291,6 +328,30 @@ namespace osu.Game.Rulesets.Scoring
         /// <param name="result">The <see cref="HitResult"/> to get the index of.</param>
         /// <returns>The index of <paramref name="result"/>.</returns>
         public static int GetIndexForOrderedDisplay(this HitResult result) => order.IndexOf(result);
+
+        public static void ValidateHitResultPair(HitResult maxResult, HitResult minResult)
+        {
+            if (maxResult == HitResult.None || !IsHit(maxResult))
+                throw new ArgumentOutOfRangeException(nameof(maxResult), $"{maxResult} is not a valid maximum judgement result.");
+
+            if (minResult == HitResult.None || IsHit(minResult))
+                throw new ArgumentOutOfRangeException(nameof(minResult), $"{minResult} is not a valid minimum judgement result.");
+
+            if (maxResult == HitResult.IgnoreHit && minResult is not (HitResult.IgnoreMiss or HitResult.ComboBreak))
+                throw new ArgumentOutOfRangeException(nameof(minResult), $"{minResult} is not a valid minimum result for a {maxResult} judgement.");
+
+            if (maxResult.IsBonus() && minResult != HitResult.IgnoreMiss)
+                throw new ArgumentOutOfRangeException(nameof(minResult), $"{HitResult.IgnoreMiss} is the only valid minimum result for a {maxResult} judgement.");
+
+            if (maxResult == HitResult.LargeTickHit && minResult != HitResult.LargeTickMiss)
+                throw new ArgumentOutOfRangeException(nameof(minResult), $"{HitResult.LargeTickMiss} is the only valid minimum result for a {maxResult} judgement.");
+
+            if (maxResult == HitResult.SmallTickHit && minResult != HitResult.SmallTickMiss)
+                throw new ArgumentOutOfRangeException(nameof(minResult), $"{HitResult.SmallTickMiss} is the only valid minimum result for a {maxResult} judgement.");
+
+            if (maxResult.IsBasic() && minResult != HitResult.Miss)
+                throw new ArgumentOutOfRangeException(nameof(minResult), $"{HitResult.Miss} is the only valid minimum result for a {maxResult} judgement.");
+        }
     }
 #pragma warning restore CS0618
 }
