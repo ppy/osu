@@ -654,14 +654,13 @@ namespace osu.Game
         {
             PerformFromScreen(screen =>
             {
-                Multiplayer multiplayer = new Multiplayer();
-                multiplayer.OnLoadComplete += _ =>
-                {
-                    multiplayer.Join(room, password);
-                };
+                if (!(screen is Multiplayer multiplayer))
+                    screen.Push(multiplayer = new Multiplayer());
 
-                screen.Push(multiplayer);
+                multiplayer.Join(room, password);
             });
+            // TODO: We should really be able to use `validScreens: new[] { typeof(Multiplayer) }` here
+            // but `PerformFromScreen` doesn't understand nested stacks.
         }
 
         /// <summary>
