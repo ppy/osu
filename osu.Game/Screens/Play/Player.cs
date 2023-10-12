@@ -671,6 +671,7 @@ namespace osu.Game.Screens.Play
         /// <remarks>This can be called from a child screen in order to trigger the restart process.</remarks>
         /// </summary>
         /// <param name="quickRestart">Whether a quick restart was requested (skipping intro etc.).</param>
+        /// <returns>Whether this call resulted in a restart.</returns>
         public bool Restart(bool quickRestart = false)
         {
             if (!Configuration.AllowRestart)
