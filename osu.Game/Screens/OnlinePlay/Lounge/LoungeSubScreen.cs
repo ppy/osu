@@ -297,29 +297,26 @@ namespace osu.Game.Screens.OnlinePlay.Lounge
             popoverContainer.HidePopover();
         }
 
-        public void Join(Room room, string password, Action<Room> onSuccess = null, Action<string> onFailure = null)
+        public virtual void Join(Room room, string password, Action<Room> onSuccess = null, Action<string> onFailure = null) => Schedule(() =>
         {
-            Schedule(() =>
+            if (joiningRoomOperation != null)
+                return;
+
+            joiningRoomOperation = ongoingOperationTracker?.BeginOperation();
+
+            RoomManager?.JoinRoom(room, password, _ =>
             {
-                if (joiningRoomOperation != null)
-                    return;
-
-                joiningRoomOperation = ongoingOperationTracker?.BeginOperation();
-
-                RoomManager?.JoinRoom(room, password, _ =>
-                {
-                    Open(room);
-                    joiningRoomOperation?.Dispose();
-                    joiningRoomOperation = null;
-                    onSuccess?.Invoke(room);
-                }, error =>
-                {
-                    joiningRoomOperation?.Dispose();
-                    joiningRoomOperation = null;
-                    onFailure?.Invoke(error);
-                });
+                Open(room);
+                joiningRoomOperation?.Dispose();
+                joiningRoomOperation = null;
+                onSuccess?.Invoke(room);
+            }, error =>
+            {
+                joiningRoomOperation?.Dispose();
+                joiningRoomOperation = null;
+                onFailure?.Invoke(error);
             });
-        }
+        });
 
         /// <summary>
         /// Copies a room and opens it as a fresh (not-yet-created) one.
