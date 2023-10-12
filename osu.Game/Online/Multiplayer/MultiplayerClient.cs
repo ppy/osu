@@ -447,8 +447,8 @@ namespace osu.Game.Online.Multiplayer
 
         async Task IMultiplayerClient.Invited(int invitedBy, long roomID, string password)
         {
-            APIUser? apiUser = await userLookupCache.GetUserAsync(invitedBy);
-            Room? apiRoom = await getRoomAsync(roomID);
+            APIUser? apiUser = await userLookupCache.GetUserAsync(invitedBy).ConfigureAwait(false);
+            Room? apiRoom = await getRoomAsync(roomID).ConfigureAwait(false);
 
             if (apiUser == null || apiRoom == null) return;
 
