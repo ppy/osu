@@ -91,10 +91,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
 
         protected override LoungeSubScreen CreateLounge() => new MultiplayerLoungeSubScreen();
 
-        public void Join(Room room, string? password)
-        {
-            Lounge.Join(room, password);
-        }
+        public void Join(Room room, string? password) => Schedule(() => Lounge.Join(room, password));
 
         protected override void Dispose(bool isDisposing)
         {

@@ -26,6 +26,8 @@ namespace osu.Game.Screens.OnlinePlay
         [Cached]
         protected readonly OverlayColourProvider ColourProvider = new OverlayColourProvider(OverlayColourScheme.Plum);
 
+        public IScreen CurrentSubScreen => screenStack.CurrentScreen;
+
         public override bool CursorVisible => (screenStack?.CurrentScreen as IOnlinePlaySubScreen)?.CursorVisible ?? true;
 
         // this is required due to PlayerLoader eventually being pushed to the main stack
@@ -224,8 +226,6 @@ namespace osu.Game.Screens.OnlinePlay
             if (newScreen is IOsuScreen newOsuScreen)
                 ((IBindable<UserActivity>)Activity).BindTo(newOsuScreen.Activity);
         }
-
-        public IScreen CurrentSubScreen => screenStack.CurrentScreen;
 
         protected abstract string ScreenTitle { get; }
 
