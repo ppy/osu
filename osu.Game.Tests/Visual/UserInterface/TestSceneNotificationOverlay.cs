@@ -5,6 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using NUnit.Framework;
+using osu.Framework.Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Sprites;
@@ -541,9 +542,9 @@ namespace osu.Game.Tests.Visual.UserInterface
             progressingNotifications.Add(n);
         }
 
-        private async void sendUserNotification()
+        private void sendUserNotification()
         {
-            var user = await userLookupCache.GetUserAsync(0).ConfigureAwait(true);
+            var user = userLookupCache.GetUserAsync(0).GetResultSafely();
             if (user == null) return;
 
             var n = new UserAvatarNotification(user, $"{user.Username} invited you to a multiplayer match!");
