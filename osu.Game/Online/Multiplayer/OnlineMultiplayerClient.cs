@@ -13,6 +13,7 @@ using osu.Framework.Bindables;
 using osu.Game.Online.API;
 using osu.Game.Online.Rooms;
 using osu.Game.Overlays.Notifications;
+using osu.Game.Localisation;
 
 namespace osu.Game.Online.Multiplayer
 {
@@ -124,17 +125,11 @@ namespace osu.Game.Online.Multiplayer
                 switch (exception.GetHubExceptionMessage())
                 {
                     case UserBlockedException.MESSAGE:
-                        PostNotification?.Invoke(new SimpleErrorNotification
-                        {
-                            Text = "User cannot be invited by someone they have blocked or are blocked by."
-                        });
+                        PostNotification?.Invoke(new SimpleErrorNotification { Text = OnlinePlayStrings.InviteFailedUserBlocked });
                         break;
 
                     case UserBlocksPMsException.MESSAGE:
-                        PostNotification?.Invoke(new SimpleErrorNotification
-                        {
-                            Text = "User cannot be invited because they cannot receive private messages from people not on their friends list."
-                        });
+                        PostNotification?.Invoke(new SimpleErrorNotification { Text = OnlinePlayStrings.InviteFailedUserOptOut });
                         break;
                 }
             }

@@ -10,7 +10,7 @@ namespace osu.Game.Online.Multiplayer
     [Serializable]
     public class UserBlocksPMsException : HubException
     {
-        public const string MESSAGE = "User cannot be invited because they have disabled private messages.";
+        public const string MESSAGE = "Cannot perform action because user has disabled non-friend communications.";
 
         public UserBlocksPMsException()
             : base(MESSAGE)
