@@ -1,7 +1,6 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using System.Drawing;
 using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
@@ -47,8 +46,6 @@ namespace osu.Game.Tournament
         private void load(FrameworkConfigManager frameworkConfig, GameHost host)
         {
             frameworkConfig.BindWith(FrameworkSetting.WindowedSize, windowSize);
-
-            windowSize.MinValue = new Size(TournamentSceneManager.REQUIRED_WIDTH, TournamentSceneManager.STREAM_AREA_HEIGHT);
 
             windowMode = frameworkConfig.GetBindable<WindowMode>(FrameworkSetting.WindowMode);
 
