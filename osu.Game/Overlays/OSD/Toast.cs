@@ -1,4 +1,4 @@
-﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
 using osu.Framework.Extensions.LocalisationExtensions;
@@ -9,7 +9,6 @@ using osu.Framework.Localisation;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
 using osuTK;
-using osuTK.Graphics;
 using osu.Game.Localisation;
 
 namespace osu.Game.Overlays.OSD
@@ -17,6 +16,7 @@ namespace osu.Game.Overlays.OSD
     public abstract partial class Toast : Container
     {
         private const int toast_minimum_width = 240;
+        private readonly OverlayColourProvider colourProvider = new OverlayColourProvider(OverlayColourScheme.Purple);
 
         private readonly Container content;
 
@@ -46,8 +46,7 @@ namespace osu.Game.Overlays.OSD
                 new Box
                 {
                     RelativeSizeAxes = Axes.Both,
-                    Colour = Color4.Black,
-                    Alpha = 0.7f
+                    Colour = colourProvider.Background3,
                 },
                 content = new Container
                 {
