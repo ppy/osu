@@ -448,7 +448,7 @@ namespace osu.Game.Online.Multiplayer
         async Task IMultiplayerClient.Invited(int invitedBy, long roomID, string password)
         {
             APIUser? apiUser = await userLookupCache.GetUserAsync(invitedBy);
-            Room? apiRoom = await lookupRoom(roomID);
+            Room? apiRoom = await getRoomAsync(roomID);
 
             if (apiUser == null || apiRoom == null) return;
 
@@ -462,23 +462,19 @@ namespace osu.Game.Online.Multiplayer
                     }
                 }
             );
-        }
 
-        private Task<Room?> lookupRoom(long id)
-        {
-            return Task.Run(() =>
+            Task<Room?> getRoomAsync(long id)
             {
-                var t = new TaskCompletionSource<Room?>();
+                TaskCompletionSource<Room?> taskCompletionSource = new TaskCompletionSource<Room?>();
+
                 var request = new GetRoomRequest(id);
-
-                request.Success += room => t.TrySetResult(room);
-
-                request.Failure += e => t.TrySetResult(null);
+                request.Success += room => taskCompletionSource.TrySetResult(room);
+                request.Failure += _ => taskCompletionSource.TrySetResult(null);
 
                 API.Queue(request);
 
-                return t.Task;
-            });
+                return taskCompletionSource.Task;
+            }
         }
 
         private void addUserToAPIRoom(MultiplayerRoomUser user)
