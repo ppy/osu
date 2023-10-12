@@ -873,7 +873,7 @@ namespace osu.Game
             ScoreManager.PresentImport = items => PresentScore(items.First().Value);
 
             MultiplayerClient.PostNotification = n => Notifications.Post(n);
-            MultiplayerClient.InviteAccepted = PresentMultiplayerMatch;
+            MultiplayerClient.PresentMatch = PresentMultiplayerMatch;
 
             // make config aware of how to lookup skins for on-screen display purposes.
             // if this becomes a more common thing, tracked settings should be reconsidered to allow local DI.

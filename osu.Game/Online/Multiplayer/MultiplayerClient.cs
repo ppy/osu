@@ -31,7 +31,7 @@ namespace osu.Game.Online.Multiplayer
     {
         public Action<Notification>? PostNotification { protected get; set; }
 
-        public Action<Room, string>? InviteAccepted { protected get; set; }
+        public Action<Room, string>? PresentMatch { protected get; set; }
 
         /// <summary>
         /// Invoked when any change occurs to the multiplayer room.
@@ -457,7 +457,7 @@ namespace osu.Game.Online.Multiplayer
                 {
                     Activated = () =>
                     {
-                        InviteAccepted?.Invoke(apiRoom, password);
+                        PresentMatch?.Invoke(apiRoom, password);
                         return true;
                     }
                 }
