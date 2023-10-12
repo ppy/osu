@@ -451,19 +451,16 @@ namespace osu.Game.Online.Multiplayer
 
             if (apiUser == null || apiRoom == null) return;
 
-            Scheduler.Add(() =>
-            {
-                PostNotification?.Invoke(
-                    new UserAvatarNotification(apiUser, $"{apiUser.Username} invited you to a multiplayer match:\"{apiRoom.Name}\"!")
+            PostNotification?.Invoke(
+                new UserAvatarNotification(apiUser, $"{apiUser.Username} invited you to a multiplayer match:\"{apiRoom.Name}\"!")
+                {
+                    Activated = () =>
                     {
-                        Activated = () =>
-                        {
-                            InviteAccepted?.Invoke(apiRoom, password);
-                            return true;
-                        }
+                        InviteAccepted?.Invoke(apiRoom, password);
+                        return true;
                     }
-                );
-            });
+                }
+            );
         }
 
         private Task<Room?> lookupRoom(long id)
