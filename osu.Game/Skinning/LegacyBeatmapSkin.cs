@@ -19,7 +19,7 @@ namespace osu.Game.Skinning
 {
     public class LegacyBeatmapSkin : LegacySkin
     {
-        protected override bool AllowManiaSkin => false;
+        protected override bool AllowManiaConfigLookups => false;
         protected override bool UseCustomSampleBanks => true;
 
         /// <summary>
@@ -72,6 +72,8 @@ namespace osu.Game.Skinning
                     // If it is decided that we need this due to beatmaps somehow using it, the default (1.0 specified in LegacySkinDecoder.CreateTemplateObject)
                     // needs to be removed else it will cause incorrect skin behaviours. This is due to the config lookup having no context of which skin
                     // it should be returning the version for.
+
+                    Skin.LogLookupDebug(this, lookup, Skin.LookupDebugType.Miss);
                     return null;
             }
 

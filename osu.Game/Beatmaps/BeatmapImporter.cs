@@ -280,7 +280,7 @@ namespace osu.Game.Beatmaps
 
         public override string HumanisedModelName => "beatmap";
 
-        protected override BeatmapSetInfo? CreateModel(ArchiveReader reader)
+        protected override BeatmapSetInfo? CreateModel(ArchiveReader reader, ImportParameters parameters)
         {
             // let's make sure there are actually .osu files to import.
             string? mapName = reader.Filenames.FirstOrDefault(f => f.EndsWith(".osu", StringComparison.OrdinalIgnoreCase));
@@ -319,7 +319,7 @@ namespace osu.Game.Beatmaps
         {
             DateTimeOffset dateAdded = DateTimeOffset.UtcNow;
 
-            if (reader is LegacyDirectoryArchiveReader legacyReader)
+            if (reader is DirectoryArchiveReader legacyReader)
             {
                 var beatmaps = reader.Filenames.Where(f => f.EndsWith(".osu", StringComparison.OrdinalIgnoreCase));
 

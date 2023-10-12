@@ -38,7 +38,7 @@ namespace osu.Game.Rulesets.Taiko.Tests
         [SetUp]
         public void SetUp() => Schedule(() =>
         {
-            gameplayClock = new GameplayClockContainer(manualClock)
+            gameplayClock = new GameplayClockContainer(manualClock, false, false)
             {
                 RelativeSizeAxes = Axes.Both,
                 Children = new Drawable[]
