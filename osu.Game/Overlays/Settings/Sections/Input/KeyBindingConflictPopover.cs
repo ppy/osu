@@ -77,7 +77,7 @@ namespace osu.Game.Overlays.Settings.Sections.Input
                         {
                             keepExistingButton = new HoverableRoundedButton
                             {
-                                Text = InputSettingsStrings.KeepExisting,
+                                Text = InputSettingsStrings.KeepExistingBinding,
                                 RelativeSizeAxes = Axes.X,
                                 Width = 0.48f,
                                 Anchor = Anchor.CentreLeft,
@@ -86,7 +86,7 @@ namespace osu.Game.Overlays.Settings.Sections.Input
                             },
                             applyNewButton = new HoverableRoundedButton
                             {
-                                Text = InputSettingsStrings.ApplyNew,
+                                Text = InputSettingsStrings.ApplyNewBinding,
                                 BackgroundColour = colours.Pink3,
                                 RelativeSizeAxes = Axes.X,
                                 Width = 0.48f,
@@ -270,7 +270,7 @@ namespace osu.Game.Overlays.Settings.Sections.Input
                 }
 
                 if (LocalisableString.IsNullOrEmpty(keyCombinationText))
-                    keyCombinationText = InputSettingsStrings.EmptyBinding;
+                    keyCombinationText = InputSettingsStrings.ActionHasNoKeyBinding;
 
                 newBindingText.Text = keyCombinationText;
             }

@@ -72,17 +72,17 @@ namespace osu.Game.Localisation
         /// <summary>
         /// "Keep existing"
         /// </summary>
-        public static LocalisableString KeepExisting => new TranslatableString(getKey(@"keep_existing"), @"Keep existing");
+        public static LocalisableString KeepExistingBinding => new TranslatableString(getKey(@"keep_existing"), @"Keep existing");
 
         /// <summary>
         /// "Apply new"
         /// </summary>
-        public static LocalisableString ApplyNew => new TranslatableString(getKey(@"apply_new"), @"Apply new");
+        public static LocalisableString ApplyNewBinding => new TranslatableString(getKey(@"apply_new"), @"Apply new");
 
         /// <summary>
         /// "(none)"
         /// </summary>
-        public static LocalisableString EmptyBinding => new TranslatableString(getKey(@"none"), @"(none)");
+        public static LocalisableString ActionHasNoKeyBinding => new TranslatableString(getKey(@"none"), @"(none)");
 
         private static string getKey(string key) => $"{prefix}:{key}";
     }
