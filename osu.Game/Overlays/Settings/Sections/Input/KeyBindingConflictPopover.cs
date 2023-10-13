@@ -37,6 +37,9 @@ namespace osu.Game.Overlays.Settings.Sections.Input
         [Resolved]
         private RealmAccess realm { get; set; } = null!;
 
+        [Resolved]
+        private OsuColour colours { get; set; } = null!;
+
         [BackgroundDependencyLoader]
         private void load() => recreateDisplay();
 
@@ -84,6 +87,7 @@ namespace osu.Game.Overlays.Settings.Sections.Input
                             applyNewButton = new HoverableRoundedButton
                             {
                                 Text = InputSettingsStrings.ApplyNew,
+                                BackgroundColour = colours.Pink3,
                                 RelativeSizeAxes = Axes.X,
                                 Width = 0.48f,
                                 Anchor = Anchor.CentreRight,
