@@ -34,7 +34,7 @@ namespace osu.Game.Screens.OnlinePlay
         // while leases may be taken out by a subscreen.
         public override bool DisallowExternalBeatmapRulesetChanges => true;
 
-        protected LoungeSubScreen Lounge;
+        protected LoungeSubScreen Lounge { get; private set; }
 
         private MultiplayerWaveContainer waves;
         private ScreenStack screenStack;
