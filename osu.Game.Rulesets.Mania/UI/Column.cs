@@ -109,6 +109,7 @@ namespace osu.Game.Rulesets.Mania.UI
             TopLevelContainer.Add(HitObjectArea.Explosions.CreateProxy());
 
             RegisterPool<Note, DrawableNote>(10, 50);
+            RegisterPool<PerfectBonusNote, DrawablePerfectBonusNote>(10, 50);
             RegisterPool<HoldNote, DrawableHoldNote>(10, 50);
             RegisterPool<HeadNote, DrawableHoldNoteHead>(10, 50);
             RegisterPool<TailNote, DrawableHoldNoteTail>(10, 50);
