@@ -44,8 +44,6 @@ namespace osu.Game.Overlays.Settings.Sections.Input
 
         public delegate void KeyBindingUpdated(KeyBindingRow sender, KeyBindingUpdatedEventArgs args);
 
-        public record KeyBindingUpdatedEventArgs(bool BindingConflictResolved, bool CanAdvanceToNextBinding);
-
         public Func<List<RealmKeyBinding>> GetAllSectionBindings { get; set; } = null!;
 
         /// <summary>
@@ -470,15 +468,15 @@ namespace osu.Game.Overlays.Settings.Sections.Input
 
         private void tryPersistKeyBinding(RealmKeyBinding keyBinding, bool advanceToNextBinding)
         {
-            var bindings = GetAllSectionBindings();
-            var existingBinding = keyBinding.KeyCombination.Equals(new KeyCombination(InputKey.None))
+            List<RealmKeyBinding> bindings = GetAllSectionBindings();
+            RealmKeyBinding? existingBinding = keyBinding.KeyCombination.Equals(new KeyCombination(InputKey.None))
                 ? null
                 : bindings.FirstOrDefault(other => other.ID != keyBinding.ID && other.KeyCombination.Equals(keyBinding.KeyCombination));
 
             if (existingBinding == null)
             {
                 realm.WriteAsync(r => r.Find<RealmKeyBinding>(keyBinding.ID)!.KeyCombinationString = keyBinding.KeyCombination.ToString());
-                BindingUpdated?.Invoke(this, new KeyBindingUpdatedEventArgs(BindingConflictResolved: false, advanceToNextBinding));
+                BindingUpdated?.Invoke(this, new KeyBindingUpdatedEventArgs(bindingConflictResolved: false, advanceToNextBinding));
                 return;
             }
 
@@ -530,7 +528,7 @@ namespace osu.Game.Overlays.Settings.Sections.Input
         public Popover GetPopover() => new KeyBindingConflictPopover
         {
             ConflictInfo = { BindTarget = keyBindingConflictInfo },
-            BindingConflictResolved = () => BindingUpdated?.Invoke(this, new KeyBindingUpdatedEventArgs(BindingConflictResolved: true, CanAdvanceToNextBinding: false))
+            BindingConflictResolved = () => BindingUpdated?.Invoke(this, new KeyBindingUpdatedEventArgs(bindingConflictResolved: true, canAdvanceToNextBinding: false))
         };
 
         private void showBindingConflictPopover(KeyBindingConflictInfo conflictInfo)
@@ -542,9 +540,48 @@ namespace osu.Game.Overlays.Settings.Sections.Input
         /// <summary>
         /// Contains information about the key binding conflict to be resolved.
         /// </summary>
-        public record KeyBindingConflictInfo(ConflictingKeyBinding Existing, ConflictingKeyBinding New);
+        public class KeyBindingConflictInfo
+        {
+            public ConflictingKeyBinding Existing { get; }
+            public ConflictingKeyBinding New { get; }
 
-        public record ConflictingKeyBinding(Guid ID, object Action, KeyCombination CombinationWhenChosen, KeyCombination CombinationWhenNotChosen);
+            /// <summary>
+            /// Contains information about the key binding conflict to be resolved.
+            /// </summary>
+            public KeyBindingConflictInfo(ConflictingKeyBinding existingBinding, ConflictingKeyBinding newBinding)
+            {
+                Existing = existingBinding;
+                New = newBinding;
+            }
+        }
+
+        public class ConflictingKeyBinding
+        {
+            public Guid ID { get; }
+            public object Action { get; }
+            public KeyCombination CombinationWhenChosen { get; }
+            public KeyCombination CombinationWhenNotChosen { get; }
+
+            public ConflictingKeyBinding(Guid id, object action, KeyCombination combinationWhenChosen, KeyCombination combinationWhenNotChosen)
+            {
+                ID = id;
+                Action = action;
+                CombinationWhenChosen = combinationWhenChosen;
+                CombinationWhenNotChosen = combinationWhenNotChosen;
+            }
+        }
+
+        public class KeyBindingUpdatedEventArgs
+        {
+            public bool BindingConflictResolved { get; }
+            public bool CanAdvanceToNextBinding { get; }
+
+            public KeyBindingUpdatedEventArgs(bool bindingConflictResolved, bool canAdvanceToNextBinding)
+            {
+                BindingConflictResolved = bindingConflictResolved;
+                CanAdvanceToNextBinding = canAdvanceToNextBinding;
+            }
+        }
 
         #endregion
 
