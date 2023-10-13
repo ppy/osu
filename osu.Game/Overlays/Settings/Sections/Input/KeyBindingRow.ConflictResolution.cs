@@ -2,7 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
-using osu.Framework.Bindables;
+using System.Diagnostics;
 using osu.Framework.Extensions;
 using osu.Framework.Graphics.Cursor;
 using osu.Framework.Graphics.UserInterface;
@@ -12,17 +12,20 @@ namespace osu.Game.Overlays.Settings.Sections.Input
 {
     public partial class KeyBindingRow : IHasPopover
     {
-        private readonly Bindable<KeyBindingConflictInfo> keyBindingConflictInfo = new Bindable<KeyBindingConflictInfo>();
+        private KeyBindingConflictInfo? pendingKeyBindingConflict;
 
-        public Popover GetPopover() => new KeyBindingConflictPopover
+        public Popover GetPopover()
         {
-            ConflictInfo = { BindTarget = keyBindingConflictInfo },
-            BindingConflictResolved = () => BindingUpdated?.Invoke(this, new KeyBindingUpdatedEventArgs(bindingConflictResolved: true, canAdvanceToNextBinding: false))
-        };
+            Debug.Assert(pendingKeyBindingConflict != null);
+            return new KeyBindingConflictPopover(pendingKeyBindingConflict)
+            {
+                BindingConflictResolved = () => BindingUpdated?.Invoke(this, new KeyBindingUpdatedEventArgs(bindingConflictResolved: true, canAdvanceToNextBinding: false))
+            };
+        }
 
         private void showBindingConflictPopover(KeyBindingConflictInfo conflictInfo)
         {
-            keyBindingConflictInfo.Value = conflictInfo;
+            pendingKeyBindingConflict = conflictInfo;
             this.ShowPopover();
         }
 

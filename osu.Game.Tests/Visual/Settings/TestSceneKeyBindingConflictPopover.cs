@@ -52,15 +52,12 @@ namespace osu.Game.Tests.Visual.Settings
                 Action = this.ShowPopover;
             }
 
-            public Popover GetPopover() => new KeyBindingConflictPopover
-            {
-                ConflictInfo =
-                {
-                    Value = new KeyBindingRow.KeyBindingConflictInfo(
-                        new KeyBindingRow.ConflictingKeyBinding(Guid.NewGuid(), OsuAction.LeftButton, KeyCombination.FromKey(Key.X), new KeyCombination(InputKey.None)),
-                        new KeyBindingRow.ConflictingKeyBinding(Guid.NewGuid(), OsuAction.RightButton, KeyCombination.FromKey(Key.Z), KeyCombination.FromKey(Key.X)))
-                }
-            };
+            public Popover GetPopover() => new KeyBindingConflictPopover(
+                new KeyBindingRow.KeyBindingConflictInfo(
+                    new KeyBindingRow.ConflictingKeyBinding(Guid.NewGuid(), OsuAction.LeftButton, KeyCombination.FromKey(Key.X), new KeyCombination(InputKey.None)),
+                    new KeyBindingRow.ConflictingKeyBinding(Guid.NewGuid(), OsuAction.RightButton, KeyCombination.FromKey(Key.Z), KeyCombination.FromKey(Key.X))
+                )
+            );
         }
     }
 }
