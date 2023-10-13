@@ -46,7 +46,7 @@ namespace osu.Game.Rulesets.Osu.Skinning.Legacy
                 switch (osuComponent.Component)
                 {
                     case OsuSkinComponents.FollowPoint:
-                        return this.GetAnimation("followpoint", true, true, true, startAtCurrentTime: false);
+                        return this.GetAnimation("followpoint", true, true, true, startAtCurrentTime: false, maxSize: new Vector2(OsuHitObject.OBJECT_RADIUS * 2, OsuHitObject.OBJECT_RADIUS));
 
                     case OsuSkinComponents.SliderScorePoint:
                         return this.GetAnimation("sliderscorepoint", false, false);
