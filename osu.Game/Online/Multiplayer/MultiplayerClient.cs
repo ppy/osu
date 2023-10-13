@@ -23,12 +23,15 @@ using osu.Game.Overlays.Notifications;
 using osu.Game.Rulesets;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Utils;
+using osu.Game.Localisation;
 
 namespace osu.Game.Online.Multiplayer
 {
     public abstract partial class MultiplayerClient : Component, IMultiplayerClient, IMultiplayerRoomServer
     {
         public Action<Notification>? PostNotification { protected get; set; }
+
+        public Action<Room, string>? PresentMatch { protected get; set; }
 
         /// <summary>
         /// Invoked when any change occurs to the multiplayer room.
@@ -260,6 +263,8 @@ namespace osu.Game.Online.Multiplayer
 
         protected abstract Task LeaveRoomInternal();
 
+        public abstract Task InvitePlayer(int userId);
+
         /// <summary>
         /// Change the current <see cref="MultiplayerRoom"/> settings.
         /// </summary>
@@ -438,6 +443,38 @@ namespace osu.Game.Online.Multiplayer
                 LeaveRoom();
 
             return handleUserLeft(user, UserKicked);
+        }
+
+        async Task IMultiplayerClient.Invited(int invitedBy, long roomID, string password)
+        {
+            APIUser? apiUser = await userLookupCache.GetUserAsync(invitedBy).ConfigureAwait(false);
+            Room? apiRoom = await getRoomAsync(roomID).ConfigureAwait(false);
+
+            if (apiUser == null || apiRoom == null) return;
+
+            PostNotification?.Invoke(
+                new UserAvatarNotification(apiUser, NotificationsStrings.InvitedYouToTheMultiplayer(apiUser.Username, apiRoom.Name.Value))
+                {
+                    Activated = () =>
+                    {
+                        PresentMatch?.Invoke(apiRoom, password);
+                        return true;
+                    }
+                }
+            );
+
+            Task<Room?> getRoomAsync(long id)
+            {
+                TaskCompletionSource<Room?> taskCompletionSource = new TaskCompletionSource<Room?>();
+
+                var request = new GetRoomRequest(id);
+                request.Success += room => taskCompletionSource.TrySetResult(room);
+                request.Failure += _ => taskCompletionSource.TrySetResult(null);
+
+                API.Queue(request);
+
+                return taskCompletionSource.Task;
+            }
         }
 
         private void addUserToAPIRoom(MultiplayerRoomUser user)
