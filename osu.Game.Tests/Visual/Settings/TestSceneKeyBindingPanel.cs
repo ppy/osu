@@ -11,6 +11,7 @@ using osu.Framework.Threading;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Graphics.UserInterfaceV2;
+using osu.Game.Localisation;
 using osu.Game.Overlays;
 using osu.Game.Overlays.Settings;
 using osu.Game.Overlays.Settings.Sections.Input;
@@ -157,7 +158,9 @@ namespace osu.Game.Tests.Visual.Settings
 
             clickClearButton();
 
-            AddAssert("first binding cleared", () => string.IsNullOrEmpty(multiBindingRow.ChildrenOfType<KeyBindingRow.KeyButton>().First().Text.Text.ToString()));
+            AddAssert("first binding cleared",
+                () => multiBindingRow.ChildrenOfType<KeyBindingRow.KeyButton>().First().Text.Text,
+                () => Is.EqualTo(InputSettingsStrings.ActionHasNoKeyBinding));
 
             AddStep("click second binding", () =>
             {
@@ -169,7 +172,9 @@ namespace osu.Game.Tests.Visual.Settings
 
             clickClearButton();
 
-            AddAssert("second binding cleared", () => string.IsNullOrEmpty(multiBindingRow.ChildrenOfType<KeyBindingRow.KeyButton>().ElementAt(1).Text.Text.ToString()));
+            AddAssert("second binding cleared",
+                () => multiBindingRow.ChildrenOfType<KeyBindingRow.KeyButton>().ElementAt(1).Text.Text,
+                () => Is.EqualTo(InputSettingsStrings.ActionHasNoKeyBinding));
 
             void clickClearButton()
             {
@@ -327,7 +332,7 @@ namespace osu.Game.Tests.Visual.Settings
             KeyBindingConflictPopover popover = null;
             AddUntilStep("wait for popover", () => popover = panel.ChildrenOfType<KeyBindingConflictPopover>().SingleOrDefault(), () => Is.Not.Null);
             AddStep("click second button", () => popover.ChildrenOfType<RoundedButton>().ElementAt(1).TriggerClick());
-            checkBinding("Left (centre)", string.Empty);
+            checkBinding("Left (centre)", InputSettingsStrings.ActionHasNoKeyBinding.ToString());
             checkBinding("Left (rim)", "M1");
         }
 
@@ -360,7 +365,7 @@ namespace osu.Game.Tests.Visual.Settings
             AddUntilStep("wait for popover", () => popover = panel.ChildrenOfType<KeyBindingConflictPopover>().SingleOrDefault(), () => Is.Not.Null);
             AddStep("click second button", () => popover.ChildrenOfType<RoundedButton>().ElementAt(1).TriggerClick());
             checkBinding("Left (centre)", "M1");
-            checkBinding("Left (rim)", string.Empty);
+            checkBinding("Left (rim)", InputSettingsStrings.ActionHasNoKeyBinding.ToString());
         }
 
         [Test]
