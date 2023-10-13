@@ -385,20 +385,7 @@ namespace osu.Game.Rulesets.Mania
                 HitResult.Good,
                 HitResult.Ok,
                 HitResult.Meh,
-
-                HitResult.LargeTickHit,
             };
-        }
-
-        public override LocalisableString GetDisplayNameForHitResult(HitResult result)
-        {
-            switch (result)
-            {
-                case HitResult.LargeTickHit:
-                    return "hold tick";
-            }
-
-            return base.GetDisplayNameForHitResult(result);
         }
 
         public override StatisticItem[] CreateStatisticsForScore(ScoreInfo score, IBeatmap playableBeatmap) => new[]
