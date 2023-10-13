@@ -114,7 +114,7 @@ namespace osu.Game.Overlays
                                     Children = new[]
                                     {
                                         // The main section adds as a catch-all for notifications which don't group into other sections.
-                                        new NotificationSection(AccountsStrings.NotificationsTitle, new[] { typeof(Notification) }),
+                                        new NotificationSection(AccountsStrings.NotificationsTitle),
                                         new NotificationSection(NotificationsStrings.RunningTasks, new[] { typeof(ProgressNotification) }),
                                     }
                                 }
@@ -206,7 +206,8 @@ namespace osu.Game.Overlays
             var ourType = notification.GetType();
             int depth = notification.DisplayOnTop ? -runningDepth : runningDepth;
 
-            var section = sections.Children.Last(s => s.AcceptedNotificationTypes.Any(accept => accept.IsAssignableFrom(ourType)));
+            var section = sections.Children.FirstOrDefault(s => s.AcceptedNotificationTypes?.Any(accept => accept.IsAssignableFrom(ourType)) == true)
+                          ?? sections.First();
 
             section.Add(notification, depth);
 
