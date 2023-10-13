@@ -65,7 +65,7 @@ namespace osu.Game.Overlays.FirstRunSetup
                             {
                                 Anchor = Anchor.TopRight,
                                 Origin = Anchor.TopRight,
-                                BackgroundColour = colours.Pink3,
+                                BackgroundColour = colours.DangerousButtonColour,
                                 Text = FirstRunSetupOverlayStrings.ClassicDefaults,
                                 RelativeSizeAxes = Axes.X,
                                 Action = applyClassic
