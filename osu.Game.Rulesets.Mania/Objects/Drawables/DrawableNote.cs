@@ -108,8 +108,10 @@ namespace osu.Game.Rulesets.Mania.Objects.Drawables
                 return;
 
             bonusNote!.TriggerResult(result == HitResult.Perfect);
-            ApplyResult(r => r.Type = result);
+            ApplyResult(r => r.Type = MutateResultApplication(result));
         }
+
+        protected virtual HitResult MutateResultApplication(HitResult result) => result;
 
         public virtual bool OnPressed(KeyBindingPressEvent<ManiaAction> e)
         {
