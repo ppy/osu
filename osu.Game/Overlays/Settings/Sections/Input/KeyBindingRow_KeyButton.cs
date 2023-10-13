@@ -12,11 +12,13 @@ using osu.Framework.Graphics.Shapes;
 using osu.Framework.Input;
 using osu.Framework.Input.Bindings;
 using osu.Framework.Input.Events;
+using osu.Framework.Localisation;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Input;
 using osu.Game.Input.Bindings;
+using osu.Game.Localisation;
 using osuTK.Graphics;
 
 namespace osu.Game.Overlays.Settings.Sections.Input
@@ -153,7 +155,20 @@ namespace osu.Game.Overlays.Settings.Sections.Input
             {
                 Scheduler.AddOnce(updateText);
 
-                void updateText() => Text.Text = keyCombinationProvider.GetReadableString(KeyBinding.Value.KeyCombination);
+                void updateText()
+                {
+                    LocalisableString keyCombinationString = keyCombinationProvider.GetReadableString(KeyBinding.Value.KeyCombination);
+                    float alpha = 1;
+
+                    if (LocalisableString.IsNullOrEmpty(keyCombinationString))
+                    {
+                        keyCombinationString = InputSettingsStrings.ActionHasNoKeyBinding;
+                        alpha = 0.4f;
+                    }
+
+                    Text.Text = keyCombinationString;
+                    Text.Alpha = alpha;
+                }
             }
 
             protected override void Dispose(bool isDisposing)

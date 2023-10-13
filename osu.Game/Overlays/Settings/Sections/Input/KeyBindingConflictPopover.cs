@@ -92,7 +92,7 @@ namespace osu.Game.Overlays.Settings.Sections.Input
                             applyNewButton = new HoverableRoundedButton
                             {
                                 Text = InputSettingsStrings.ApplyNewBinding,
-                                BackgroundColour = colours.Pink3,
+                                BackgroundColour = colours.DangerousButtonColour,
                                 RelativeSizeAxes = Axes.X,
                                 Width = 0.48f,
                                 Anchor = Anchor.CentreRight,
