@@ -40,6 +40,8 @@ namespace osu.Game.Overlays.Settings.Sections.Input
 
         private readonly KeyBindingRow.KeyBindingConflictInfo conflictInfo;
 
+        protected override string PopInSampleName => @"UI/generic-error";
+
         public KeyBindingConflictPopover(KeyBindingRow.KeyBindingConflictInfo conflictInfo)
         {
             this.conflictInfo = conflictInfo;
