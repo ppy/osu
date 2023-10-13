@@ -11,9 +11,9 @@ using osu.Framework.Input.Bindings;
 using osu.Framework.Localisation;
 using osu.Game.Database;
 using osu.Game.Input.Bindings;
-using osu.Game.Rulesets;
 using osu.Game.Localisation;
 using osuTK;
+using Realms;
 
 namespace osu.Game.Overlays.Settings.Sections.Input
 {
@@ -27,37 +27,26 @@ namespace osu.Game.Overlays.Settings.Sections.Input
 
         protected IEnumerable<KeyBinding> Defaults { get; init; } = Array.Empty<KeyBinding>();
 
-        public RulesetInfo? Ruleset { get; protected set; }
-
-        private readonly int? variant;
-
-        protected KeyBindingsSubsection(int? variant)
+        protected KeyBindingsSubsection()
         {
-            this.variant = variant;
-
             FlowContent.Spacing = new Vector2(0, 3);
         }
 
         [BackgroundDependencyLoader]
         private void load(RealmAccess realm)
         {
-            string? rulesetName = Ruleset?.ShortName;
-
-            var bindings = realm.Run(r => r.All<RealmKeyBinding>()
-                                           .Where(b => b.RulesetName == rulesetName && b.Variant == variant)
-                                           .Detach());
+            var bindings = realm.Run(r => GetKeyBindings(r).Detach());
 
             foreach (var defaultGroup in Defaults.GroupBy(d => d.Action))
             {
                 int intKey = (int)defaultGroup.Key;
 
                 // one row per valid action.
-                Add(new KeyBindingRow(defaultGroup.Key, bindings.Where(b => b.ActionInt.Equals(intKey)).ToList())
-                {
-                    AllowMainMouseButtons = Ruleset != null,
-                    Defaults = defaultGroup.Select(d => d.KeyCombination),
-                    BindingUpdated = onBindingUpdated
-                });
+                Add(CreateKeyBindingRow(
+                        defaultGroup.Key,
+                        bindings.Where(b => b.ActionInt.Equals(intKey)).ToList(),
+                        defaultGroup)
+                    .With(row => row.BindingUpdated = onBindingUpdated));
             }
 
             Add(new ResetButton
@@ -65,6 +54,15 @@ namespace osu.Game.Overlays.Settings.Sections.Input
                 Action = () => Children.OfType<KeyBindingRow>().ForEach(k => k.RestoreDefaults())
             });
         }
+
+        protected abstract IEnumerable<RealmKeyBinding> GetKeyBindings(Realm realm);
+
+        protected virtual KeyBindingRow CreateKeyBindingRow(object action, IEnumerable<RealmKeyBinding> keyBindings, IEnumerable<KeyBinding> defaults)
+            => new KeyBindingRow(action, keyBindings.ToList())
+            {
+                AllowMainMouseButtons = false,
+                Defaults = defaults.Select(d => d.KeyCombination),
+            };
 
         private void onBindingUpdated(KeyBindingRow sender)
         {
