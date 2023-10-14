@@ -90,6 +90,12 @@ namespace osu.Game.Rulesets.Osu.Objects
         /// </summary>
         internal double LazyTravelTime;
 
+        /// <summary>
+        /// The position of the cursor assumed by a player where true <see cref="Slider"/> End should be.
+        /// This is set and used by difficulty calculation.
+        /// </summary>
+        internal Vector2? VisualLazyEndPosition;
+
         public IList<IList<HitSampleInfo>> NodeSamples { get; set; } = new List<IList<HitSampleInfo>>();
 
         [JsonIgnore]

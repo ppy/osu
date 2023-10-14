@@ -223,6 +223,12 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Preprocessing
                 endTimeMin %= 1;
 
             slider.LazyEndPosition = slider.StackedPosition + slider.Path.PositionAt(endTimeMin); // temporary lazy end position until a real result can be derived.
+
+            OsuHitObject lastObj = (OsuHitObject)slider.NestedHitObjects[^1];
+            OsuHitObject preLastObj = (OsuHitObject)slider.NestedHitObjects[^2];
+            double relativePosition = (lastObj.StartTime - preLastObj.StartTime) / (slider.EndTime - preLastObj.StartTime);
+            slider.VisualLazyEndPosition = preLastObj.StackedPosition + (lastObj.StackedPosition - preLastObj.StackedPosition) * (float)relativePosition;
+
             var currCursorPosition = slider.StackedPosition;
             double scalingFactor = NORMALISED_RADIUS / slider.Radius; // lazySliderDistance is coded to be sensitive to scaling, this makes the maths easier with the thresholds being used.
 
@@ -236,6 +242,9 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Preprocessing
                 // Amount of movement required so that the cursor position needs to be updated.
                 double requiredMovement = assumed_slider_radius;
 
+                Vector2 visualCurrMovement;
+                double visualCurrMovementLength;
+
                 if (i == slider.NestedHitObjects.Count - 1)
                 {
                     // The end of a slider has special aim rules due to the relaxed time constraint on position.
@@ -243,11 +252,24 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Preprocessing
                     // For sliders that are circular, the lazy end position may actually be farther away than the sliders true end.
                     // This code is designed to prevent buffing situations where lazy end is actually a less efficient movement.
                     Vector2 lazyMovement = Vector2.Subtract((Vector2)slider.LazyEndPosition, currCursorPosition);
+                    Vector2 visualLazyMovement = Vector2.Subtract((Vector2)slider.VisualLazyEndPosition, currCursorPosition);
+
+                    visualCurrMovement = currMovement;
 
                     if (lazyMovement.Length < currMovement.Length)
                         currMovement = lazyMovement;
 
                     currMovementLength = scalingFactor * currMovement.Length;
+
+                    // same for visual things
+                    if (visualLazyMovement.Length < visualCurrMovement.Length)
+                        visualCurrMovement = visualLazyMovement;
+
+                    visualCurrMovementLength = scalingFactor * visualCurrMovement.Length;
+
+                    slider.VisualLazyEndPosition = currCursorPosition;
+                    if (currMovementLength > requiredMovement) slider.VisualLazyEndPosition = Vector2.Add(currCursorPosition, Vector2.Multiply(visualCurrMovement, (float)((visualCurrMovementLength - requiredMovement) / visualCurrMovementLength)));
+
                 }
                 else if (currMovementObj is SliderRepeat)
                 {

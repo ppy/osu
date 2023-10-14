@@ -16,6 +16,9 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
         private const double slider_multiplier = 1.35;
         private const double velocity_change_multiplier = 0.75;
 
+        private const double slider_shape_reading_multiplier = 1.6;
+        private const double slider_end_reading_multiplier = 4.0;
+
         /// <summary>
         /// Evaluates the difficulty of aiming the current object, based on:
         /// <list type="bullet">
@@ -113,11 +116,18 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
                 velocityChangeBonus *= Math.Pow(Math.Min(osuCurrObj.StrainTime, osuLastObj.StrainTime) / Math.Max(osuCurrObj.StrainTime, osuLastObj.StrainTime), 2);
             }
 
+            int params_size = 2;
+
             if (osuLastObj.BaseObject is Slider slider)
             {
                 // Reward sliders based on velocity.
                 sliderBonus = osuLastObj.TravelDistance / osuLastObj.TravelTime;
-                sliderBonus *= (1 + calculateSliderReadingDifficulty(slider));
+
+                double readingBonus = 1.0;
+                readingBonus += calculateSliderShapeReadingDifficulty(slider) * slider_shape_reading_multiplier;
+                readingBonus += calculateSliderEndReadingDifficulty(slider) * slider_end_reading_multiplier;
+                sliderBonus *= readingBonus;
+            }
             }
 
             // Add in acute angle bonus or wide angle bonus + velocity change bonus, whichever is larger.
@@ -130,7 +140,32 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
             return aimStrain;
         }
 
-        private static float calculateSliderReadingDifficulty(Slider slider)
+        private const int normalized_radius = 50;
+        private const float assumed_slider_radius = normalized_radius * 1.8f;
+
+        private const float short_sliders_penalty = normalized_radius * 2.0f;
+        private const float raw_diff_multiplier = 0.16f;
+        private const float lazy_diff_multiplier = 1.0f;
+
+        private static float calculateSliderEndReadingDifficulty(Slider slider)
+        {
+            if (slider.LazyEndPosition is null) return 0.0f;
+            if (slider.VisualLazyEndPosition is null) return 0.0f;
+
+            float rawDifference = Vector2.Distance(slider.StackedEndPosition, (Vector2)slider.LazyEndPosition);
+
+            var preLastObj = (OsuHitObject)slider.NestedHitObjects[^2];
+
+            double minimalMovement = Vector2.Distance((Vector2)slider.LazyEndPosition, preLastObj.Position) - slider.Radius * 2.4;
+            rawDifference *= (float)Math.Clamp(minimalMovement / slider.Radius, 0, 1); // if not need to move a cursor - 0 bonus
+
+            float lazyDifference = Vector2.Distance((Vector2)slider.VisualLazyEndPosition, (Vector2)slider.LazyEndPosition);
+
+            float difficulty = slider.LazyTravelDistance == 0 ? 0 : (raw_diff_multiplier * rawDifference + lazy_diff_multiplier * lazyDifference)
+                / (slider.LazyTravelDistance + short_sliders_penalty);
+            return difficulty;
+        }
+        private static float calculateSliderShapeReadingDifficulty(Slider slider)
         {
             double result = 0;
 
@@ -153,13 +188,14 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
 
                 var currentObject = (OsuHitObject)followPath[nestedObjectIndex];
                 var nextObject = (OsuHitObject)followPath[nestedObjectIndex + 1];
+                double nextObjectStartTime = nestedObjectIndex == followPath.Count - 2 ? slider.EndTime : nextObject.StartTime;
 
                 // calculating position of the normal path
                 double progress = deltaTime / slider.SpanDuration;
                 Vector2 ballPosition = slider.Position + slider.Path.PositionAt(progress);
 
                 // calculation position of the lazy path
-                float localProgress = (float)((absoluteTime - currentObject.StartTime) / (nextObject.StartTime - currentObject.StartTime));
+                float localProgress = (float)((absoluteTime - currentObject.StartTime) / (nextObjectStartTime - currentObject.StartTime));
                 localProgress = Math.Clamp(localProgress, 0, 1);
                 Vector2 lazyPosition = currentObject.Position + (nextObject.Position - currentObject.Position) * localProgress; // interpolation
 
@@ -169,7 +205,8 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
                 result += (float)continousBuff;
             }
 
-            return (float)(result / (slider.SpanDuration + 1));
+            if (slider.SpanDuration == 0) return 0;
+            return (float)(result / slider.SpanDuration);
         }
 
         private static double calcWideAngleBonus(double angle) => Math.Pow(Math.Sin(3.0 / 4 * (Math.Min(5.0 / 6 * Math.PI, Math.Max(Math.PI / 6, angle)) - Math.PI / 6)), 2);
