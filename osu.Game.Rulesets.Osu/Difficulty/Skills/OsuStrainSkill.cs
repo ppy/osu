@@ -34,6 +34,9 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
         /// </summary>
         protected virtual double DifficultyMultiplier => DEFAULT_DIFFICULTY_MULTIPLIER;
 
+        private const double a = 5.0;
+        private const double b = 1.475;
+
         protected OsuStrainSkill(Mod[] mods)
             : base(mods)
         {
@@ -42,7 +45,6 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
         public override double DifficultyValue()
         {
             double difficulty = 0;
-            double weight = 1;
 
             // Sections with 0 strain are excluded to avoid worst-case time complexity of the following sort (e.g. /b/2351871).
             // These sections will not contribute to the difficulty.
@@ -57,12 +59,19 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
                 strains[i] *= Interpolation.Lerp(ReducedStrainBaseline, 1.0, scale);
             }
 
+            int index = 0;
+
             // Difficulty is the weighted sum of the highest strains from every section.
             // We're sorting from highest to lowest strain.
             foreach (double strain in strains.OrderByDescending(d => d))
             {
+                // Below uses harmonic sum scaling which makes the resulting summation logarithmic rather than geometric.
+                // Good for properly weighting difficulty across full map instead of using object count for LengthBonus.
+                // a and b are arbitrary constants that worked well.
+                double weight = b * ((1 + Math.Sqrt(a / (1 + index))) / (index + 1 + Math.Sqrt(a / (1 + index))));
+
                 difficulty += strain * weight;
-                weight *= DecayWeight;
+                index += 1;
             }
 
             return difficulty * DifficultyMultiplier;
