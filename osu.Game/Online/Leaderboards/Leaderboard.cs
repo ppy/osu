@@ -22,6 +22,7 @@ using osu.Game.Online.Placeholders;
 using osuTK;
 using osuTK.Graphics;
 using osu.Game.Localisation;
+using osu.Game.Scoring;
 
 namespace osu.Game.Online.Leaderboards
 {
@@ -199,7 +200,25 @@ namespace osu.Game.Online.Leaderboards
                 if (userScore == null)
                     userScoreContainer.Hide();
                 else
-                    userScoreContainer.Show();
+                {
+                    bool containsScore = false;
+
+                    if (userScore is ScoreInfo userScoreInfo && scores is IEnumerable<ScoreInfo> scoreInfos)
+                    {
+                        foreach (var scoreInfo in scoreInfos)
+                        {
+                            if (scoreInfo.ID == userScoreInfo.ID)
+                            {
+                                containsScore = true;
+                                break;
+                            }
+                        }
+                    }
+                    if (containsScore)
+                        userScoreContainer.Hide();
+                    else
+                        userScoreContainer.Show();
+                }
 
                 updateScoresDrawables();
             }
