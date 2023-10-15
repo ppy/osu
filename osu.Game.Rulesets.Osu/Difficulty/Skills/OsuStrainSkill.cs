@@ -34,8 +34,8 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
         /// </summary>
         protected virtual double DifficultyMultiplier => DEFAULT_DIFFICULTY_MULTIPLIER;
 
-        private const double a = 5.0;
-        private const double b = 1.475;
+        private const double a = 10.0;
+        private const double b = 1.3725;
 
         protected OsuStrainSkill(Mod[] mods)
             : base(mods)
@@ -68,7 +68,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
                 // Below uses harmonic sum scaling which makes the resulting summation logarithmic rather than geometric.
                 // Good for properly weighting difficulty across full map instead of using object count for LengthBonus.
                 // a and b are arbitrary constants that worked well.
-                double weight = b * ((1 + Math.Sqrt(a / (1 + index))) / (index + 1 + Math.Sqrt(a / (1 + index))));
+                double weight = b * ((1 + (a / (1 + index))) / (index + 1 + (a / (1 + index))));
 
                 difficulty += strain * weight;
                 index += 1;
