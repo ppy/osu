@@ -3,7 +3,9 @@
 
 using System;
 using System.Linq;
+using Newtonsoft.Json;
 using osu.Framework.Bindables;
+using osu.Game.IO.Serialization.Converters;
 
 namespace osu.Game.Beatmaps.ControlPoints
 {
@@ -17,8 +19,11 @@ namespace osu.Game.Beatmaps.ControlPoints
         /// </summary>
         public double Time { get; }
 
+        [JsonIgnore]
         public IBindableList<ControlPoint> ControlPoints => controlPoints;
 
+        [JsonConverter(typeof(BindableListConverter<ControlPoint>))]
+        [JsonProperty]
         private readonly BindableList<ControlPoint> controlPoints = new BindableList<ControlPoint>();
 
         public ControlPointGroup(double time)
