@@ -35,7 +35,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
         protected virtual double DifficultyMultiplier => DEFAULT_DIFFICULTY_MULTIPLIER;
 
         private const double a = 7.5;
-        private const double b = 1.41625;
+        private const double b = 1.42;
         private const double c = 1;
 
         protected OsuStrainSkill(Mod[] mods)
