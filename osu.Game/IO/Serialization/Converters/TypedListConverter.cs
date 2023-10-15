@@ -7,17 +7,18 @@ using System;
 using System.Collections.Generic;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
+using osu.Framework.Bindables;
 using osu.Framework.Extensions.ObjectExtensions;
 
 namespace osu.Game.IO.Serialization.Converters
 {
     /// <summary>
-    /// A type of <see cref="JsonConverter"/> that serializes an <see cref="IReadOnlyList{T}"/> alongside
+    /// A type of <see cref="JsonConverter"/> that serializes a list alongside
     /// a lookup table for the types contained. The lookup table is used in deserialization to
     /// reconstruct the objects with their original types.
     /// </summary>
-    /// <typeparam name="T">The type of objects contained in the <see cref="IReadOnlyList{T}"/> this attribute is attached to.</typeparam>
-    public class TypedListConverter<T> : JsonConverter<IReadOnlyList<T>>
+    /// <typeparam name="T">The type of objects contained in the list this attribute is attached to.</typeparam>
+    public class TypedListConverter<T> : JsonConverter
     {
         private readonly bool requiresTypeVersion;
 
@@ -39,10 +40,9 @@ namespace osu.Game.IO.Serialization.Converters
             this.requiresTypeVersion = requiresTypeVersion;
         }
 
-        public override IReadOnlyList<T> ReadJson(JsonReader reader, Type objectType, IReadOnlyList<T> existingValue, bool hasExistingValue, JsonSerializer serializer)
+        public override object ReadJson(JsonReader reader, Type objectType, object existingValue, JsonSerializer serializer)
         {
             var list = new List<T>();
-
             var obj = JObject.Load(reader);
 
             if (obj["$lookup_table"] == null)
@@ -69,15 +69,25 @@ namespace osu.Game.IO.Serialization.Converters
                 list.Add(instance);
             }
 
+            if (objectType == typeof(IBindableList<T>) || objectType == typeof(BindableList<T>))
+                return new BindableList<T>(list);
+
+            if (objectType == typeof(IReadOnlyList<T>))
+                return list.AsReadOnly();
+
             return list;
         }
 
-        public override void WriteJson(JsonWriter writer, IReadOnlyList<T> value, JsonSerializer serializer)
+        public override bool CanConvert(Type objectType)
+            => objectType == typeof(IBindableList<T>) || objectType == typeof(BindableList<T>) || objectType == typeof(IReadOnlyList<T>) || objectType == typeof(List<T>);
+
+        public override void WriteJson(JsonWriter writer, object value, JsonSerializer serializer)
         {
+            var enumerable = (IEnumerable<T>)value!;
             var lookupTable = new List<string>();
             var objects = new List<JObject>();
 
-            foreach (var item in value)
+            foreach (var item in enumerable)
             {
                 var type = item.GetType();
                 var assemblyName = type.Assembly.GetName();

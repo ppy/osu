@@ -22,7 +22,7 @@ namespace osu.Game.Beatmaps.ControlPoints
         [JsonIgnore]
         public IBindableList<ControlPoint> ControlPoints => controlPoints;
 
-        [JsonConverter(typeof(BindableListConverter<ControlPoint>))]
+        [JsonConverter(typeof(TypedListConverter<ControlPoint>))]
         [JsonProperty]
         private readonly BindableList<ControlPoint> controlPoints = new BindableList<ControlPoint>();
 
