@@ -155,7 +155,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Preprocessing
 	    // We add a small circle bonus for objects with radius less than 30
             if (BaseObject.Radius < 30)
 	    {
-		float smallCircleBonus = (float)Math.Pow(1.35, 7.27 / (float)BaseObject.Radius ) ;
+		float smallCircleBonus = (float)Math.Pow(1.35, 7 / (float)BaseObject.Radius ) ;
 		scalingFactor *= smallCircleBonus;
 	    }
 	
