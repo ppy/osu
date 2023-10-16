@@ -5,10 +5,11 @@ namespace osu.Game.Rulesets.Mania.Objects.Drawables
 {
     public partial class DrawablePerfectBonusNote : DrawableManiaHitObject<PerfectBonusNote>
     {
+        public override bool DisplayResult => false;
+
         public DrawablePerfectBonusNote()
             : this(null!)
         {
-            AlwaysPresent = true;
         }
 
         public DrawablePerfectBonusNote(PerfectBonusNote hitObject)
