@@ -3,6 +3,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using NUnit.Framework;
 using osu.Framework.Utils;
 using osu.Game.Rulesets.Objects;
@@ -33,8 +34,13 @@ namespace osu.Game.Rulesets.Osu.Tests
             switch (hitObject)
             {
                 case Slider slider:
+                    var objects = new List<ConvertValue>();
+
                     foreach (var nested in slider.NestedHitObjects)
-                        yield return createConvertValue((OsuHitObject)nested);
+                        objects.Add(createConvertValue((OsuHitObject)nested, slider));
+
+                    foreach (var obj in objects.OrderBy(cv => cv.StartTime))
+                        yield return obj;
 
                     break;
 
@@ -44,13 +50,25 @@ namespace osu.Game.Rulesets.Osu.Tests
                     break;
             }
 
-            static ConvertValue createConvertValue(OsuHitObject obj) => new ConvertValue
+            static ConvertValue createConvertValue(OsuHitObject obj, OsuHitObject? parent = null)
             {
-                StartTime = obj.StartTime,
-                EndTime = obj.GetEndTime(),
-                X = obj.StackedPosition.X,
-                Y = obj.StackedPosition.Y
-            };
+                double startTime = obj.StartTime;
+                double endTime = obj.GetEndTime();
+
+                if (obj is SliderTailCircle && parent is Slider slider)
+                {
+                    startTime = Math.Max(startTime + SliderEventGenerator.TAIL_LENIENCY, slider.StartTime + slider.Duration / 2);
+                    endTime = Math.Max(endTime + SliderEventGenerator.TAIL_LENIENCY, slider.StartTime + slider.Duration / 2);
+                }
+
+                return new ConvertValue
+                {
+                    StartTime = startTime,
+                    EndTime = endTime,
+                    X = obj.StackedPosition.X,
+                    Y = obj.StackedPosition.Y
+                };
+            }
         }
 
         protected override Ruleset CreateRuleset() => new OsuRuleset();
