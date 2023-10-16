@@ -39,12 +39,12 @@ namespace osu.Game.Rulesets.Osu.Tests
         /// <summary>
         /// Performs a single spin.
         /// </summary>
-        /// <param name="delta">The amount, relative to a full circle, to spin.</param>
+        /// <param name="delta">The amount of degrees to spin.</param>
         /// <param name="duration">The time to spend to perform the spin.</param>
         /// <returns>This <see cref="SpinFramesGenerator"/>.</returns>
         public SpinFramesGenerator Spin(float delta, double duration)
         {
-            sequences.Add((delta * 2 * MathF.PI, duration));
+            sequences.Add((delta / 360 * 2 * MathF.PI, duration));
             return this;
         }
 

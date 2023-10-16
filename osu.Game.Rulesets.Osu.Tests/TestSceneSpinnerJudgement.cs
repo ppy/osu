@@ -57,7 +57,7 @@ namespace osu.Game.Rulesets.Osu.Tests
         }
 
         private static List<ReplayFrame> generateReplay(int spins) => new SpinFramesGenerator(time_spinner_start)
-                                                                      .Spin(spins, time_spinner_end - time_spinner_start)
+                                                                      .Spin(spins * 360, time_spinner_end - time_spinner_start)
                                                                       .Build();
 
         private void performTest(List<ReplayFrame> frames)
