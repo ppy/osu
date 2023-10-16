@@ -88,7 +88,7 @@ namespace osu.Game.Rulesets.Osu.Tests
                     frames.Add(new OsuReplayFrame(lastTime, calcOffsetAt((lastTime - seqStartTime) / (seqEndTime - seqStartTime), seqStartAngle, seqEndAngle), OsuAction.LeftButton));
 
                 // Final frame at the end of the current spin.
-                frames.Add(new OsuReplayFrame(lastTime, calcOffsetAt(1, seqStartAngle, seqEndAngle), OsuAction.LeftButton));
+                frames.Add(new OsuReplayFrame(seqEndTime, calcOffsetAt(1, seqStartAngle, seqEndAngle), OsuAction.LeftButton));
 
                 lastTime = seqEndTime;
                 lastAngle = seqEndAngle;
