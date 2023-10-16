@@ -105,11 +105,16 @@ namespace osu.Game.Rulesets.Mania.Objects.Drawables
             if (result == HitResult.None)
                 return;
 
+            result = GetCappedResult(result);
+
             bonusNote.TriggerResult(result == HitResult.Perfect);
-            ApplyResult(r => r.Type = MutateResultApplication(result));
+            ApplyResult(r => r.Type = result);
         }
 
-        protected virtual HitResult MutateResultApplication(HitResult result) => result;
+        /// <summary>
+        /// Some objects in mania may want to limit the max result.
+        /// </summary>
+        protected virtual HitResult GetCappedResult(HitResult result) => result;
 
         public virtual bool OnPressed(KeyBindingPressEvent<ManiaAction> e)
         {
