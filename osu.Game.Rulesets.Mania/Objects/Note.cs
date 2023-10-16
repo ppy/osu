@@ -18,7 +18,7 @@ namespace osu.Game.Rulesets.Mania.Objects
         {
             base.CreateNestedHitObjects(cancellationToken);
 
-            AddNested(new PerfectBonusNote { StartTime = StartTime });
+            AddNested(new NotePerfectBonus { StartTime = StartTime });
         }
     }
 }

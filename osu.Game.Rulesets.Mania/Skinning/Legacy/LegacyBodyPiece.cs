@@ -126,7 +126,7 @@ namespace osu.Game.Rulesets.Mania.Skinning.Legacy
             switch (hitObject)
             {
                 // Ensure that the hold note is also faded out when the head/tail/any tick is missed.
-                // Importantly, we filter out unrelated objects like DrawablePerfectBonusNote.
+                // Importantly, we filter out unrelated objects like DrawableNotePerfectBonus.
                 case DrawableHoldNoteTail:
                 case DrawableHoldNoteHead:
                 case DrawableHoldNoteBody:

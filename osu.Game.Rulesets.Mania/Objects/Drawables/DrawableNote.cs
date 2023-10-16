@@ -40,7 +40,7 @@ namespace osu.Game.Rulesets.Mania.Objects.Drawables
 
         private Drawable headPiece;
 
-        private DrawablePerfectBonusNote bonusNote;
+        private DrawableNotePerfectBonus perfectBonus;
 
         public DrawableNote()
             : this(null)
@@ -94,7 +94,7 @@ namespace osu.Game.Rulesets.Mania.Objects.Drawables
             {
                 if (!HitObject.HitWindows.CanBeHit(timeOffset))
                 {
-                    bonusNote.TriggerResult(false);
+                    perfectBonus.TriggerResult(false);
                     ApplyResult(r => r.Type = r.Judgement.MinResult);
                 }
 
@@ -107,13 +107,13 @@ namespace osu.Game.Rulesets.Mania.Objects.Drawables
 
             result = GetCappedResult(result);
 
-            bonusNote.TriggerResult(result == HitResult.Perfect);
+            perfectBonus.TriggerResult(result == HitResult.Perfect);
             ApplyResult(r => r.Type = result);
         }
 
         public override void MissForcefully()
         {
-            bonusNote.TriggerResult(false);
+            perfectBonus.TriggerResult(false);
             base.MissForcefully();
         }
 
@@ -141,23 +141,23 @@ namespace osu.Game.Rulesets.Mania.Objects.Drawables
         {
             switch (hitObject)
             {
-                case DrawablePerfectBonusNote bonus:
-                    AddInternal(bonusNote = bonus);
+                case DrawableNotePerfectBonus bonus:
+                    AddInternal(perfectBonus = bonus);
                     break;
             }
         }
 
         protected override void ClearNestedHitObjects()
         {
-            RemoveInternal(bonusNote, false);
+            RemoveInternal(perfectBonus, false);
         }
 
         protected override DrawableHitObject CreateNestedHitObject(HitObject hitObject)
         {
             switch (hitObject)
             {
-                case PerfectBonusNote bonus:
-                    return new DrawablePerfectBonusNote(bonus);
+                case NotePerfectBonus bonus:
+                    return new DrawableNotePerfectBonus(bonus);
             }
 
             return base.CreateNestedHitObject(hitObject);
