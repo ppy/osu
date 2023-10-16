@@ -10,6 +10,7 @@ namespace osu.Game.Rulesets.Mania.Objects
     public class PerfectBonusNote : ManiaHitObject
     {
         public override Judgement CreateJudgement() => new PerfectBonusNoteJudgement();
+        protected override HitWindows CreateHitWindows() => HitWindows.Empty;
 
         public class PerfectBonusNoteJudgement : ManiaJudgement
         {
