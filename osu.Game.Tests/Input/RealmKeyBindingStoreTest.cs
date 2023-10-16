@@ -86,5 +86,32 @@ namespace osu.Game.Tests.Input
                 Assert.That(bindings[6].KeyCombination, Is.EqualTo(new KeyCombination(InputKey.PrintScreen)));
             });
         }
+
+        [Test]
+        public void TestDuplicateBindingsAllowedIfBoundToSameAction()
+        {
+            var bindings = new List<RealmKeyBinding>
+            {
+                new RealmKeyBinding(GlobalAction.Back, KeyCombination.FromKey(Key.Escape)),
+                new RealmKeyBinding(GlobalAction.Back, KeyCombination.FromKey(Key.Escape)),
+                new RealmKeyBinding(GlobalAction.MusicPrev, KeyCombination.FromKey(Key.F1)),
+            };
+
+            int countCleared = RealmKeyBindingStore.ClearDuplicateBindings(bindings);
+
+            Assert.Multiple(() =>
+            {
+                Assert.That(countCleared, Is.EqualTo(0));
+
+                Assert.That(bindings[0].Action, Is.EqualTo((int)GlobalAction.Back));
+                Assert.That(bindings[0].KeyCombination, Is.EqualTo(new KeyCombination(InputKey.Escape)));
+
+                Assert.That(bindings[1].Action, Is.EqualTo((int)GlobalAction.Back));
+                Assert.That(bindings[1].KeyCombination, Is.EqualTo(new KeyCombination(InputKey.Escape)));
+
+                Assert.That(bindings[2].Action, Is.EqualTo((int)GlobalAction.MusicPrev));
+                Assert.That(bindings[2].KeyCombination, Is.EqualTo(new KeyCombination(InputKey.F1)));
+            });
+        }
     }
 }
