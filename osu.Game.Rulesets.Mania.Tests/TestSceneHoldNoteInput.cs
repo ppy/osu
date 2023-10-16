@@ -200,10 +200,12 @@ namespace osu.Game.Rulesets.Mania.Tests
             });
 
             assertHeadJudgement(HitResult.Perfect);
-            assertComboAtJudgement(0, 1);
+            // judgement combo offset by perfect bonus judgement. see logic in DrawableNote.CheckForResult.
+            assertComboAtJudgement(1, 1);
             assertTailJudgement(HitResult.Meh);
-            assertComboAtJudgement(1, 0);
-            assertComboAtJudgement(2, 1);
+            assertComboAtJudgement(2, 0);
+            // judgement combo offset by perfect bonus judgement. see logic in DrawableNote.CheckForResult.
+            assertComboAtJudgement(4, 1);
         }
 
         /// <summary>
@@ -392,13 +394,11 @@ namespace osu.Game.Rulesets.Mania.Tests
                         Duration = time_tail - time_head,
                         Column = 0,
                     },
+                    // Next note within tail lenience
+                    (ManiaHitObject)(note = new Note
                     {
-                        // Next note within tail lenience
-                        note = new Note
-                        {
-                            StartTime = time_tail + 50
-                        }
-                    }
+                        StartTime = time_tail + 50
+                    })
                 },
                 BeatmapInfo =
                 {
