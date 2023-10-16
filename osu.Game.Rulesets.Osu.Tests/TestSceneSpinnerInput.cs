@@ -53,7 +53,6 @@ namespace osu.Game.Rulesets.Osu.Tests
         /// While off-centre, vibrates backwards and forwards on the x-axis, from centre-50 to centre+50, every 50ms.
         /// </summary>
         [Test]
-        [Ignore("An upcoming implementation will fix this case")]
         public void TestVibrateWithoutSpinningOffCentre()
         {
             List<ReplayFrame> frames = new List<ReplayFrame>();
@@ -81,7 +80,6 @@ namespace osu.Game.Rulesets.Osu.Tests
         /// While centred on the slider, vibrates backwards and forwards on the x-axis, from centre-50 to centre+50, every 50ms.
         /// </summary>
         [Test]
-        [Ignore("An upcoming implementation will fix this case")]
         public void TestVibrateWithoutSpinningOnCentre()
         {
             List<ReplayFrame> frames = new List<ReplayFrame>();
@@ -130,7 +128,6 @@ namespace osu.Game.Rulesets.Osu.Tests
         /// No ticks should be hit since the total rotation is -0.5 (0.5 CW + 1 CCW = 0.5 CCW).
         /// </summary>
         [Test]
-        [Ignore("An upcoming implementation will fix this case")]
         public void TestSpinHalfBothDirections()
         {
             performTest(new SpinFramesGenerator(time_spinner_start)
@@ -149,7 +146,6 @@ namespace osu.Game.Rulesets.Osu.Tests
         [TestCase(-180, 540, 1)]
         [TestCase(180, -900, 2)]
         [TestCase(-180, 900, 2)]
-        [Ignore("An upcoming implementation will fix this case")]
         public void TestSpinOneDirectionThenChangeDirection(float direction1, float direction2, int expectedTicks)
         {
             performTest(new SpinFramesGenerator(time_spinner_start)
@@ -162,7 +158,6 @@ namespace osu.Game.Rulesets.Osu.Tests
         }
 
         [Test]
-        [Ignore("An upcoming implementation will fix this case")]
         public void TestRewind()
         {
             AddStep("set manual clock", () => manualClock = new ManualClock { Rate = 1 });
