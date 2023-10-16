@@ -36,7 +36,7 @@ namespace osu.Game.Rulesets.Mania.Objects.Drawables
             // Factor in the release lenience
             base.CheckForResult(userTriggered, timeOffset / TailNote.RELEASE_WINDOW_LENIENCE);
 
-        protected override HitResult MutateResultApplication(HitResult result)
+        protected override HitResult GetCappedResult(HitResult result)
         {
             // If the head wasn't hit or the hold note was broken, cap the max score to Meh.
             bool hasComboBreak = !HoldNote.Head.IsHit || HoldNote.Body.HasHoldBreak;
