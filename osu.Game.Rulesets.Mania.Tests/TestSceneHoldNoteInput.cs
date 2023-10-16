@@ -382,7 +382,8 @@ namespace osu.Game.Rulesets.Mania.Tests
         [Test]
         public void TestPressAndReleaseJustAfterTailWithNearbyNote()
         {
-            Note note;
+            // Next note within tail lenience
+            Note note = new Note { StartTime = time_tail + 50 };
 
             var beatmap = new Beatmap<ManiaHitObject>
             {
@@ -394,11 +395,7 @@ namespace osu.Game.Rulesets.Mania.Tests
                         Duration = time_tail - time_head,
                         Column = 0,
                     },
-                    // Next note within tail lenience
-                    (ManiaHitObject)(note = new Note
-                    {
-                        StartTime = time_tail + 50
-                    })
+                    note
                 },
                 BeatmapInfo =
                 {
