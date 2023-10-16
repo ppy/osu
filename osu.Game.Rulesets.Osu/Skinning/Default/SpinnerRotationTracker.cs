@@ -2,6 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
+using System.Diagnostics;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Extensions.ObjectExtensions;
@@ -68,6 +69,10 @@ namespace osu.Game.Rulesets.Osu.Skinning.Default
                 float thisAngle = -MathUtils.RadiansToDegrees(MathF.Atan2(pos.X - DrawSize.X / 2, pos.Y - DrawSize.Y / 2));
                 float delta = lastAngle == null ? 0 : thisAngle - lastAngle.Value;
 
+                // Normalise the delta to -180 .. 180
+                if (delta > 180) delta -= 360;
+                if (delta < -180) delta += 360;
+
                 if (Tracking)
                     AddRotation(delta);
 
@@ -84,8 +89,8 @@ namespace osu.Game.Rulesets.Osu.Skinning.Default
         /// <remarks>
         /// Will be a no-op if not a valid time to spin.
         /// </remarks>
-        /// <param name="angle">The delta angle.</param>
-        public void AddRotation(float angle)
+        /// <param name="delta">The delta angle.</param>
+        public void AddRotation(float delta)
         {
             if (!isSpinnableTime)
                 return;
@@ -96,21 +101,15 @@ namespace osu.Game.Rulesets.Osu.Skinning.Default
                 rotationTransferred = true;
             }
 
-            if (angle > 180)
-            {
-                lastAngle += 360;
-                angle -= 360;
-            }
-            else if (-angle > 180)
-            {
-                lastAngle -= 360;
-                angle += 360;
-            }
+            currentRotation += delta;
 
-            currentRotation += angle;
+            double rate = gameplayClock?.GetTrueGameplayRate() ?? Clock.Rate;
+
+            Debug.Assert(Math.Abs(delta) <= 180);
+
             // rate has to be applied each frame, because it's not guaranteed to be constant throughout playback
             // (see: ModTimeRamp)
-            drawableSpinner.Result.TotalRotation += (float)(Math.Abs(angle) * (gameplayClock?.GetTrueGameplayRate() ?? Clock.Rate));
+            drawableSpinner.Result.TotalRotation += (float)(Math.Abs(delta) * rate);
         }
 
         private void resetState(DrawableHitObject obj)
