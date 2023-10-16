@@ -137,7 +137,7 @@ namespace osu.Game.Input
         /// </summary>
         /// <param name="keyBindings">The <see cref="RealmKeyBinding"/>s to de-duplicate.</param>
         /// <returns>Whether any bindings have been cleared.</returns>
-        public static bool ClearDuplicateBindings(IQueryable<RealmKeyBinding> keyBindings)
+        public static bool ClearDuplicateBindings(IQueryable<IKeyBinding> keyBindings)
         {
             bool anyRemoved = false;
 
