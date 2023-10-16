@@ -174,10 +174,12 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
             double deltaFollowRadius = maxFollowRadius - minFollowRadius;
 
             int nestedObjectIndex = 0;
+            double numberOfUpdates = slider.Path.Distance / slider.Radius;
+            double deltaT = slider.SpanDuration / numberOfUpdates;
 
-            for (double deltaTime = 0; deltaTime <= slider.SpanDuration; deltaTime++)
+            for (double relativeTime = 0; relativeTime <= slider.SpanDuration; relativeTime += deltaT)
             {
-                double absoluteTime = deltaTime + slider.StartTime;
+                double absoluteTime = relativeTime + slider.StartTime;
 
                 while (nestedObjectIndex < followPath.Count - 2 && followPath[nestedObjectIndex + 1].StartTime < absoluteTime)
                 {
@@ -189,7 +191,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
                 double nextObjectStartTime = nestedObjectIndex == followPath.Count - 2 ? slider.EndTime : nextObject.StartTime;
 
                 // calculating position of the normal path
-                double progress = deltaTime / slider.SpanDuration;
+                double progress = relativeTime / slider.SpanDuration;
                 Vector2 ballPosition = slider.Position + slider.Path.PositionAt(progress);
 
                 // calculation position of the lazy path
@@ -199,7 +201,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
 
                 // buff scales from 0 to 1 when slider follow distance is changing from 1.0x to 2.4x
                 double continousBuff = (Vector2.Distance(ballPosition, lazyPosition) - minFollowRadius) / deltaFollowRadius;
-                continousBuff = Math.Clamp(continousBuff, 0, 1);
+                continousBuff = Math.Clamp(continousBuff, 0, 1) * deltaT;
                 result += (float)continousBuff;
             }
 
