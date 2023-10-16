@@ -78,7 +78,7 @@ namespace osu.Game.Online.Rooms
 
             var scoreInfo = new ScoreInfo
             {
-                OnlineID = (long?)SoloScoreID ?? -1,
+                OnlineID = ID,
                 TotalScore = TotalScore,
                 MaxCombo = MaxCombo,
                 BeatmapInfo = beatmap,
