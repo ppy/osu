@@ -111,6 +111,12 @@ namespace osu.Game.Rulesets.Mania.Objects.Drawables
             ApplyResult(r => r.Type = result);
         }
 
+        public override void MissForcefully()
+        {
+            bonusNote.TriggerResult(false);
+            base.MissForcefully();
+        }
+
         /// <summary>
         /// Some objects in mania may want to limit the max result.
         /// </summary>
