@@ -159,7 +159,6 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Preprocessing
 		scalingFactor *= smallCircleBonus;
 	    }
 	
-
             Vector2 lastCursorPosition = getEndCursorPosition(lastObject);
 
             LazyJumpDistance = (BaseObject.StackedPosition * scalingFactor - lastCursorPosition * scalingFactor).Length;
