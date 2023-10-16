@@ -2,7 +2,6 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System.Collections.Generic;
-using System.Linq;
 using NUnit.Framework;
 using osu.Framework.Input.Bindings;
 using osu.Game.Input;
@@ -25,11 +24,11 @@ namespace osu.Game.Tests.Input
                 new RealmKeyBinding(GlobalAction.MusicNext, KeyCombination.FromKey(Key.F5))
             };
 
-            bool anyCleared = RealmKeyBindingStore.ClearDuplicateBindings(bindings.AsQueryable());
+            int countCleared = RealmKeyBindingStore.ClearDuplicateBindings(bindings);
 
             Assert.Multiple(() =>
             {
-                Assert.That(anyCleared, Is.False);
+                Assert.That(countCleared, Is.Zero);
 
                 Assert.That(bindings[0].Action, Is.EqualTo((int)GlobalAction.Back));
                 Assert.That(bindings[0].KeyCombination, Is.EqualTo(new KeyCombination(InputKey.Escape)));
@@ -59,11 +58,11 @@ namespace osu.Game.Tests.Input
                 new RealmKeyBinding(GlobalAction.TakeScreenshot, KeyCombination.FromKey(Key.PrintScreen)),
             };
 
-            bool anyCleared = RealmKeyBindingStore.ClearDuplicateBindings(bindings.AsQueryable());
+            int countCleared = RealmKeyBindingStore.ClearDuplicateBindings(bindings);
 
             Assert.Multiple(() =>
             {
-                Assert.That(anyCleared, Is.True);
+                Assert.That(countCleared, Is.EqualTo(4));
 
                 Assert.That(bindings[0].Action, Is.EqualTo((int)GlobalAction.Back));
                 Assert.That(bindings[0].KeyCombination, Is.EqualTo(new KeyCombination(InputKey.None)));
