@@ -130,5 +130,16 @@ namespace osu.Game.Input
 
             return true;
         }
+
+        /// <summary>
+        /// Clears all <see cref="RealmKeyBinding.KeyCombination"/>s from the provided <paramref name="keyBindings"/>
+        /// which are assigned to more than one binding.
+        /// </summary>
+        /// <param name="keyBindings">The <see cref="RealmKeyBinding"/>s to de-duplicate.</param>
+        /// <returns>Whether any bindings have been cleared.</returns>
+        public static bool ClearDuplicateBindings(IQueryable<RealmKeyBinding> keyBindings)
+        {
+            return false;
+        }
     }
 }
