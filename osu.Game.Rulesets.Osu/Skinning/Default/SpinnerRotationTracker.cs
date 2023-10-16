@@ -97,7 +97,7 @@ namespace osu.Game.Rulesets.Osu.Skinning.Default
 
             if (!rotationTransferred)
             {
-                currentRotation = Rotation * 2;
+                currentRotation = Rotation;
                 rotationTransferred = true;
             }
 
