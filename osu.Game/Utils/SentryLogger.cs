@@ -47,6 +47,7 @@ namespace osu.Game.Utils
 
                 options.AutoSessionTracking = true;
                 options.IsEnvironmentUser = false;
+                options.IsGlobalModeEnabled = true;
                 // The reported release needs to match version as reported to Sentry in .github/workflows/sentry-release.yml
                 options.Release = $"osu@{game.Version.Replace($@"-{OsuGameBase.BUILD_SUFFIX}", string.Empty)}";
             });

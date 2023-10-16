@@ -141,9 +141,9 @@ namespace osu.Game.Screens.Select
                                                     LayoutEasing = Easing.OutQuad,
                                                     Children = new[]
                                                     {
-                                                        description = new MetadataSectionDescription(searchOnSongSelect),
-                                                        source = new MetadataSectionSource(searchOnSongSelect),
-                                                        tags = new MetadataSectionTags(searchOnSongSelect),
+                                                        description = new MetadataSectionDescription(query => songSelect?.Search(query)),
+                                                        source = new MetadataSectionSource(query => songSelect?.Search(query)),
+                                                        tags = new MetadataSectionTags(query => songSelect?.Search(query)),
                                                     },
                                                 },
                                             },
@@ -176,12 +176,6 @@ namespace osu.Game.Screens.Select
                 },
                 loading = new LoadingLayer(true)
             };
-
-            void searchOnSongSelect(string text)
-            {
-                if (songSelect != null)
-                    songSelect.FilterControl.CurrentTextSearch.Value = text;
-            }
         }
 
         private void updateStatistics()

@@ -37,7 +37,7 @@ namespace osu.Game.Tournament.Screens
             SongBar.Mods = mods.NewValue;
         }
 
-        private void beatmapChanged(ValueChangedEvent<TournamentBeatmap> beatmap)
+        private void beatmapChanged(ValueChangedEvent<TournamentBeatmap?> beatmap)
         {
             SongBar.FadeInFromZero(300, Easing.OutQuint);
             SongBar.Beatmap = beatmap.NewValue;

@@ -115,6 +115,48 @@ namespace osu.Game.Rulesets.Taiko.Tests.Judgements
             AddAssert("all tick offsets are 0", () => JudgementResults.Where(r => r.HitObject is SwellTick).All(r => r.TimeOffset == 0));
         }
 
+        [Test]
+        public void TestAtMostOneSwellTickJudgedPerFrame()
+        {
+            const double swell_time = 1000;
+
+            Swell swell = new Swell
+            {
+                StartTime = swell_time,
+                Duration = 1000,
+                RequiredHits = 10
+            };
+
+            List<ReplayFrame> frames = new List<ReplayFrame>
+            {
+                new TaikoReplayFrame(1000),
+                new TaikoReplayFrame(1250, TaikoAction.LeftCentre, TaikoAction.LeftRim),
+                new TaikoReplayFrame(1251),
+                new TaikoReplayFrame(1500, TaikoAction.LeftCentre, TaikoAction.LeftRim, TaikoAction.RightCentre, TaikoAction.RightRim),
+                new TaikoReplayFrame(1501),
+                new TaikoReplayFrame(2000),
+            };
+
+            PerformTest(frames, CreateBeatmap(swell));
+
+            AssertJudgementCount(11);
+
+            // this is a charitable interpretation of the inputs.
+            //
+            // for the frame at time 1250, we only count either one of the input actions - simple.
+            //
+            // for the frame at time 1500, we give the user the benefit of the doubt,
+            // and we ignore actions that wouldn't otherwise cause a hit due to not alternating,
+            // but we still count one (just one) of the actions that _would_ normally cause a hit.
+            // this is done as a courtesy to avoid stuff like key chattering after press blocking legitimate inputs.
+            for (int i = 0; i < 2; i++)
+                AssertResult<SwellTick>(i, HitResult.IgnoreHit);
+            for (int i = 2; i < swell.RequiredHits; i++)
+                AssertResult<SwellTick>(i, HitResult.IgnoreMiss);
+
+            AssertResult<Swell>(0, HitResult.IgnoreMiss);
+        }
+
         /// <summary>
         /// Ensure input is correctly sent to subsequent hits if a swell is fully completed.
         /// </summary>

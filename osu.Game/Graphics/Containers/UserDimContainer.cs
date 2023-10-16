@@ -47,7 +47,7 @@ namespace osu.Game.Graphics.Containers
         /// <summary>
         /// The amount of dim to be used when <see cref="IgnoreUserSettings"/> is <c>true</c>.
         /// </summary>
-        public Bindable<float> DimWhenUserSettingsIgnored { get; set; } = new Bindable<float>();
+        public Bindable<float> DimWhenUserSettingsIgnored { get; } = new Bindable<float>();
 
         protected Bindable<bool> LightenDuringBreaks { get; private set; } = null!;
 

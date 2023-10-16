@@ -119,7 +119,7 @@ namespace osu.Game.Overlays.Dashboard
                     {
                         users.GetUserAsync(userId).ContinueWith(task =>
                         {
-                            var user = task.GetResultSafely();
+                            APIUser user = task.GetResultSafely();
 
                             if (user == null)
                                 return;
@@ -129,6 +129,9 @@ namespace osu.Game.Overlays.Dashboard
                                 // user may no longer be playing.
                                 if (!playingUsers.Contains(user.Id))
                                     return;
+
+                                // TODO: remove this once online state is being updated more correctly.
+                                user.IsOnline = true;
 
                                 userFlow.Add(createUserPanel(user));
                             });

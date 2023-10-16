@@ -37,7 +37,7 @@ namespace osu.Game.Rulesets.Osu.Edit
         {
         }
 
-        protected override DrawableRuleset<OsuHitObject> CreateDrawableRuleset(Ruleset ruleset, IBeatmap beatmap, IReadOnlyList<Mod> mods = null)
+        protected override DrawableRuleset<OsuHitObject> CreateDrawableRuleset(Ruleset ruleset, IBeatmap beatmap, IReadOnlyList<Mod> mods)
             => new DrawableOsuEditorRuleset(ruleset, beatmap, mods);
 
         protected override IReadOnlyList<HitObjectCompositionTool> CompositionTools => new HitObjectCompositionTool[]
@@ -85,6 +85,11 @@ namespace osu.Game.Rulesets.Osu.Edit
 
             // we may be entering the screen with a selection already active
             updateDistanceSnapGrid();
+
+            RightToolbox.Add(new TransformToolboxGroup
+            {
+                RotationHandler = BlueprintContainer.SelectionHandler.RotationHandler
+            });
         }
 
         protected override ComposeBlueprintContainer CreateBlueprintContainer()

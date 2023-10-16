@@ -66,7 +66,7 @@ namespace osu.Game.Scoring
         /// If this does not match <see cref="LegacyScoreEncoder.LATEST_VERSION"/>,
         /// the total score has not yet been updated to reflect the current scoring values.
         ///
-        /// See <see cref="BackgroundBeatmapProcessor"/>'s conversion logic.
+        /// See <see cref="BackgroundDataStoreProcessor"/>'s conversion logic.
         /// </summary>
         /// <remarks>
         /// This may not match the version stored in the replay files.
@@ -80,6 +80,15 @@ namespace osu.Game.Scoring
         /// Not populated if <see cref="IsLegacyScore"/> is <c>false</c>.
         /// </remarks>
         public long? LegacyTotalScore { get; set; }
+
+        /// <summary>
+        /// If background processing of this beatmap failed in some way, this flag will become <c>true</c>.
+        /// Should be used to ensure we don't repeatedly attempt to reprocess the same scores each startup even though we already know they will fail.
+        /// </summary>
+        /// <remarks>
+        /// See https://github.com/ppy/osu/issues/24301 for one example of how this can occur (missing beatmap file on disk).
+        /// </remarks>
+        public bool BackgroundReprocessingFailed { get; set; }
 
         public int MaxCombo { get; set; }
 
@@ -337,7 +346,7 @@ namespace osu.Game.Scoring
                     case HitResult.LargeBonus:
                     case HitResult.SmallBonus:
                         if (MaximumStatistics.TryGetValue(r.result, out int count) && count > 0)
-                            yield return new HitResultDisplayStatistic(r.result, value, null, r.displayName);
+                            yield return new HitResultDisplayStatistic(r.result, value, count, r.displayName);
 
                         break;
 

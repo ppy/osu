@@ -55,6 +55,9 @@ namespace osu.Game.Overlays
         private const float side_bar_width = 190;
         private const float chat_bar_height = 60;
 
+        protected override string PopInSampleName => @"UI/overlay-big-pop-in";
+        protected override string PopOutSampleName => @"UI/overlay-big-pop-out";
+
         [Resolved]
         private OsuConfigManager config { get; set; } = null!;
 
