@@ -49,7 +49,7 @@ namespace osu.Game.Rulesets.Mania.Tests.Mods
             CreateModTest(new ModTestData
             {
                 Mod = doubleTime,
-                PassCondition = () => Player.ScoreProcessor.JudgedHits > 0 && Player.ScoreProcessor.Accuracy.Value == 1 && Player.ScoreProcessor.TotalScore.Value / doubleTime.ScoreMultiplier == 100010,
+                PassCondition = () => Player.ScoreProcessor.JudgedHits > 0 && Player.ScoreProcessor.Accuracy.Value == 1 && Player.ScoreProcessor.TotalScore.Value == (long)(1000010 * doubleTime.ScoreMultiplier),
                 Autoplay = false,
                 Beatmap = new Beatmap
                 {
