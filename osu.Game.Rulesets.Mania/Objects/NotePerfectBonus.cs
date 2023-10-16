@@ -7,12 +7,12 @@ using osu.Game.Rulesets.Scoring;
 
 namespace osu.Game.Rulesets.Mania.Objects
 {
-    public class PerfectBonusNote : ManiaHitObject
+    public class NotePerfectBonus : ManiaHitObject
     {
-        public override Judgement CreateJudgement() => new PerfectBonusNoteJudgement();
+        public override Judgement CreateJudgement() => new NotePerfectBonusJudgement();
         protected override HitWindows CreateHitWindows() => HitWindows.Empty;
 
-        public class PerfectBonusNoteJudgement : ManiaJudgement
+        public class NotePerfectBonusJudgement : ManiaJudgement
         {
             public override HitResult MaxResult => HitResult.SmallBonus;
         }

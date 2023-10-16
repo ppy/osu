@@ -3,16 +3,16 @@
 
 namespace osu.Game.Rulesets.Mania.Objects.Drawables
 {
-    public partial class DrawablePerfectBonusNote : DrawableManiaHitObject<PerfectBonusNote>
+    public partial class DrawableNotePerfectBonus : DrawableManiaHitObject<NotePerfectBonus>
     {
         public override bool DisplayResult => false;
 
-        public DrawablePerfectBonusNote()
+        public DrawableNotePerfectBonus()
             : this(null!)
         {
         }
 
-        public DrawablePerfectBonusNote(PerfectBonusNote hitObject)
+        public DrawableNotePerfectBonus(NotePerfectBonus hitObject)
             : base(hitObject)
         {
         }
