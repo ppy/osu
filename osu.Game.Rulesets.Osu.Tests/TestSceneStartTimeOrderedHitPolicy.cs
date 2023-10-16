@@ -290,7 +290,7 @@ namespace osu.Game.Rulesets.Osu.Tests
             };
 
             frames.AddRange(new SpinFramesGenerator(time_spinner + 10)
-                            .Spin(1, 500)
+                            .Spin(360, 500)
                             .Build());
 
             performTest(hitObjects, frames);

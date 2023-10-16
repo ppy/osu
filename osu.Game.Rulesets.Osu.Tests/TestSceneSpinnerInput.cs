@@ -107,14 +107,14 @@ namespace osu.Game.Rulesets.Osu.Tests
         /// <summary>
         /// Spins in a single direction.
         /// </summary>
-        [TestCase(0.5f, 0)]
-        [TestCase(-0.5f, 0)]
-        [TestCase(1, 1)]
-        [TestCase(-1, 1)]
-        [TestCase(1.5f, 1)]
-        [TestCase(-1.5f, 1)]
-        [TestCase(2f, 2)]
-        [TestCase(-2f, 2)]
+        [TestCase(180, 0)]
+        [TestCase(-180, 0)]
+        [TestCase(360, 1)]
+        [TestCase(-360, 1)]
+        [TestCase(540, 1)]
+        [TestCase(-540, 1)]
+        [TestCase(720, 2)]
+        [TestCase(-720, 2)]
         public void TestSpinSingleDirection(float amount, int expectedTicks)
         {
             performTest(new SpinFramesGenerator(time_spinner_start)
@@ -134,8 +134,8 @@ namespace osu.Game.Rulesets.Osu.Tests
         public void TestSpinHalfBothDirections()
         {
             performTest(new SpinFramesGenerator(time_spinner_start)
-                        .Spin(0.5f, 500) // Rotate to +0.5.
-                        .Spin(-1f, 500) // Rotate to -0.5
+                        .Spin(180, 500) // Rotate to +0.5.
+                        .Spin(-360, 500) // Rotate to -0.5
                         .Build());
 
             assertTicksHit(0);
@@ -145,10 +145,10 @@ namespace osu.Game.Rulesets.Osu.Tests
         /// <summary>
         /// Spin in one direction then spin in the other.
         /// </summary>
-        [TestCase(0.5f, -1.5f, 1)]
-        [TestCase(-0.5f, 1.5f, 1)]
-        [TestCase(0.5f, -2.5f, 2)]
-        [TestCase(-0.5f, 2.5f, 2)]
+        [TestCase(180, -540, 1)]
+        [TestCase(-180, 540, 1)]
+        [TestCase(180, -900, 2)]
+        [TestCase(-180, 900, 2)]
         [Ignore("An upcoming implementation will fix this case")]
         public void TestSpinOneDirectionThenChangeDirection(float direction1, float direction2, int expectedTicks)
         {
@@ -168,11 +168,11 @@ namespace osu.Game.Rulesets.Osu.Tests
             AddStep("set manual clock", () => manualClock = new ManualClock { Rate = 1 });
 
             List<ReplayFrame> frames = new SpinFramesGenerator(time_spinner_start)
-                                       .Spin(1f, 500) // 2000ms -> 1 full CW spin
-                                       .Spin(-0.5f, 500) // 2500ms -> 0.5 CCW spins
-                                       .Spin(0.25f, 500) // 3000ms -> 0.25 CW spins
-                                       .Spin(1.25f, 500) // 3500ms -> 1 full CW spin
-                                       .Spin(0.5f, 500) // 4000ms -> 0.5 CW spins
+                                       .Spin(360, 500) // 2000ms -> 1 full CW spin
+                                       .Spin(-180, 500) // 2500ms -> 0.5 CCW spins
+                                       .Spin(90, 500) // 3000ms -> 0.25 CW spins
+                                       .Spin(450, 500) // 3500ms -> 1 full CW spin
+                                       .Spin(180, 500) // 4000ms -> 0.5 CW spins
                                        .Build();
 
             loadPlayer(frames);
