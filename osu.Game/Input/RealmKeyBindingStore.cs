@@ -136,10 +136,10 @@ namespace osu.Game.Input
         /// which are assigned to more than one binding.
         /// </summary>
         /// <param name="keyBindings">The <see cref="RealmKeyBinding"/>s to de-duplicate.</param>
-        /// <returns>Whether any bindings have been cleared.</returns>
-        public static bool ClearDuplicateBindings(IQueryable<IKeyBinding> keyBindings)
+        /// <returns>Number of bindings cleared.</returns>
+        public static int ClearDuplicateBindings(IEnumerable<IKeyBinding> keyBindings)
         {
-            bool anyRemoved = false;
+            int countRemoved = 0;
 
             var lookup = keyBindings.ToLookup(kb => kb.KeyCombination);
 
@@ -151,10 +151,10 @@ namespace osu.Game.Input
                 foreach (var binding in group)
                     binding.KeyCombination = new KeyCombination(InputKey.None);
 
-                anyRemoved = true;
+                countRemoved += group.Count();
             }
 
-            return anyRemoved;
+            return countRemoved;
         }
     }
 }
