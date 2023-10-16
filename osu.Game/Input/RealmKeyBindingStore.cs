@@ -145,7 +145,7 @@ namespace osu.Game.Input
 
             foreach (var group in lookup)
             {
-                if (group.Count() <= 1)
+                if (group.Select(kb => kb.Action).Distinct().Count() <= 1)
                     continue;
 
                 foreach (var binding in group)
