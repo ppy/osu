@@ -24,7 +24,9 @@ namespace osu.Game.Rulesets.Mania.Tests.Mods
         [Test]
         public void TestHitWindowWithoutDoubleTime() => CreateModTest(new ModTestData
         {
-            PassCondition = () => Player.ScoreProcessor.JudgedHits > 0 && Player.ScoreProcessor.Accuracy.Value == 1 && Player.ScoreProcessor.TotalScore.Value == 1_000_000,
+            PassCondition = () => Player.ScoreProcessor.JudgedHits > 0
+                                  && Player.ScoreProcessor.Accuracy.Value == 1
+                                  && Player.ScoreProcessor.TotalScore.Value == 1_000_000,
             Autoplay = false,
             Beatmap = new Beatmap
             {
@@ -49,7 +51,9 @@ namespace osu.Game.Rulesets.Mania.Tests.Mods
             CreateModTest(new ModTestData
             {
                 Mod = doubleTime,
-                PassCondition = () => Player.ScoreProcessor.JudgedHits > 0 && Player.ScoreProcessor.Accuracy.Value == 1 && Player.ScoreProcessor.TotalScore.Value == (long)(1000010 * doubleTime.ScoreMultiplier),
+                PassCondition = () => Player.ScoreProcessor.JudgedHits > 0
+                                      && Player.ScoreProcessor.Accuracy.Value == 1
+                                      && Player.ScoreProcessor.TotalScore.Value == (long)(1_000_010 * doubleTime.ScoreMultiplier),
                 Autoplay = false,
                 Beatmap = new Beatmap
                 {
