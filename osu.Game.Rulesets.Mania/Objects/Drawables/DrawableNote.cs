@@ -4,7 +4,6 @@
 #nullable disable
 
 using System.Diagnostics;
-using JetBrains.Annotations;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
@@ -41,7 +40,6 @@ namespace osu.Game.Rulesets.Mania.Objects.Drawables
 
         private Drawable headPiece;
 
-        [CanBeNull]
         private DrawablePerfectBonusNote bonusNote;
 
         public DrawableNote()
@@ -96,7 +94,7 @@ namespace osu.Game.Rulesets.Mania.Objects.Drawables
             {
                 if (!HitObject.HitWindows.CanBeHit(timeOffset))
                 {
-                    bonusNote!.TriggerResult(false);
+                    bonusNote.TriggerResult(false);
                     ApplyResult(r => r.Type = r.Judgement.MinResult);
                 }
 
@@ -107,7 +105,7 @@ namespace osu.Game.Rulesets.Mania.Objects.Drawables
             if (result == HitResult.None)
                 return;
 
-            bonusNote!.TriggerResult(result == HitResult.Perfect);
+            bonusNote.TriggerResult(result == HitResult.Perfect);
             ApplyResult(r => r.Type = MutateResultApplication(result));
         }
 
@@ -140,9 +138,7 @@ namespace osu.Game.Rulesets.Mania.Objects.Drawables
 
         protected override void ClearNestedHitObjects()
         {
-            if (bonusNote != null)
-                RemoveInternal(bonusNote, false);
-            bonusNote = null;
+            RemoveInternal(bonusNote, false);
         }
 
         protected override DrawableHitObject CreateNestedHitObject(HitObject hitObject)
