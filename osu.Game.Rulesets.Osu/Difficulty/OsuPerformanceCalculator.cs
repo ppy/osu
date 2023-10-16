@@ -209,8 +209,6 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             if (score.Mods.Any(m => m is OsuModFlashlight))
                 accuracyValue *= 1.02;
 
-            accuracyValue *= Math.Pow(0.97, Math.Max(0, effectiveMissCount - 1)); // Penalize accuracy pp after the first miss.
-
             return accuracyValue;
         }
 
@@ -335,18 +333,48 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             if (totalSuccessfulHits == 0)
                 return double.PositiveInfinity;
 
-            double hitWindow300 = 80 - 6 * attributes.OverallDifficulty;
+            // Create a new track to properly calculate the hit windows of 100s and 50s.
+            var track = new TrackVirtual(1);
+            score.Mods.OfType<IApplicableToTrack>().ForEach(m => m.ApplyToTrack(track));
+            double clockRate = track.Rate;
 
+            double hitWindow300 = 80 - 6 * attributes.OverallDifficulty;
+            double hitWindow100 = (140 - 8 * ((80 - hitWindow300 * clockRate) / 6)) / clockRate;
+            double hitWindow50 = (200 - 10 * ((80 - hitWindow300 * clockRate) / 6)) / clockRate;
+
+            // Calculate accuracy assuming the worst case scenario
+            double speedNoteCount = attributes.SpeedNoteCount;
             double relevantTotalDiff = totalHits - attributes.SpeedNoteCount;
             double relevantCountGreat = Math.Max(0, countGreat - relevantTotalDiff);
+            double relevantCountOk = Math.Max(0, countOk - Math.Max(0, relevantTotalDiff - countGreat));
+            double relevantCountMeh = Math.Max(0, countMeh - Math.Max(0, relevantTotalDiff - countGreat - countOk));
+            double relevantCountMiss = Math.Max(0, countMiss - Math.Max(0, relevantTotalDiff - countGreat - countOk - countMeh));
 
-            if (relevantCountGreat == 0)
-                return double.PositiveInfinity;
+            // Assume 100s, 50s, and misses happen on circles. If there are less non-300s on circles than 300s,
+            // compute the deviation on circles.
+            if (relevantCountGreat > 0)
+            {
+                // The probability that a player hits a circle is unknown, but we can estimate it to be
+                // the number of greats on circles divided by the number of circles, and then add one
+                // to the number of circles as a bias correction.
+                double greatProbabilityCircle = relevantCountGreat / (speedNoteCount - relevantCountMiss - relevantCountMeh + 1.0);
 
-            double greatProbability = relevantCountGreat / (attributes.SpeedNoteCount + 1);
-            double deviationOnSpeedCircles = hitWindow300 / (Math.Sqrt(2) * SpecialFunctions.ErfInv(greatProbability));
+                // Compute the deviation assuming 300s and 100s are normally distributed, and 50s are uniformly distributed.
+                // Begin with the normal distribution first.
+                double deviationOnCircles = hitWindow300 / (Math.Sqrt(2) * SpecialFunctions.ErfInv(greatProbabilityCircle));
+                deviationOnCircles *= Math.Sqrt(1 - Math.Sqrt(2 / Math.PI) * hitWindow100 * Math.Exp(-0.5 * Math.Pow(hitWindow100 / deviationOnCircles, 2))
+                    / (deviationOnCircles * SpecialFunctions.Erf(hitWindow100 / (Math.Sqrt(2) * deviationOnCircles))));
 
-            return deviationOnSpeedCircles;
+                // Then compute the variance for 50s.
+                double mehVariance = (hitWindow50 * hitWindow50 + hitWindow100 * hitWindow50 + hitWindow100 * hitWindow100) / 3;
+
+                // Find the total deviation.
+                deviationOnCircles = Math.Sqrt(((relevantCountGreat + relevantCountOk) * Math.Pow(deviationOnCircles, 2) + relevantCountMeh * mehVariance) / (relevantCountGreat + relevantCountOk + relevantCountMeh));
+
+                return deviationOnCircles;
+            }
+
+            return double.PositiveInfinity;
         }
 
         private double getComboScalingFactor(OsuDifficultyAttributes attributes) => attributes.MaxCombo <= 0 ? 1.0 : Math.Min(Math.Pow(scoreMaxCombo, 0.8) / Math.Pow(attributes.MaxCombo, 0.8), 1.0);
