@@ -2,6 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System.Collections.Generic;
+using System.Linq;
 using NUnit.Framework;
 using osu.Framework.Input.Bindings;
 using osu.Game.Input;
@@ -24,7 +25,7 @@ namespace osu.Game.Tests.Input
                 new RealmKeyBinding(GlobalAction.MusicNext, KeyCombination.FromKey(Key.F5))
             };
 
-            bool anyCleared = RealmKeyBindingStore.ClearDuplicateBindings(bindings);
+            bool anyCleared = RealmKeyBindingStore.ClearDuplicateBindings(bindings.AsQueryable());
 
             Assert.Multiple(() =>
             {
@@ -58,7 +59,7 @@ namespace osu.Game.Tests.Input
                 new RealmKeyBinding(GlobalAction.TakeScreenshot, KeyCombination.FromKey(Key.PrintScreen)),
             };
 
-            bool anyCleared = RealmKeyBindingStore.ClearDuplicateBindings(bindings);
+            bool anyCleared = RealmKeyBindingStore.ClearDuplicateBindings(bindings.AsQueryable());
 
             Assert.Multiple(() =>
             {

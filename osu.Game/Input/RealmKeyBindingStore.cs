@@ -139,7 +139,22 @@ namespace osu.Game.Input
         /// <returns>Whether any bindings have been cleared.</returns>
         public static bool ClearDuplicateBindings(IQueryable<RealmKeyBinding> keyBindings)
         {
-            return false;
+            bool anyRemoved = false;
+
+            var lookup = keyBindings.ToLookup(kb => kb.KeyCombination);
+
+            foreach (var group in lookup)
+            {
+                if (group.Count() <= 1)
+                    continue;
+
+                foreach (var binding in group)
+                    binding.KeyCombination = new KeyCombination(InputKey.None);
+
+                anyRemoved = true;
+            }
+
+            return anyRemoved;
         }
     }
 }
