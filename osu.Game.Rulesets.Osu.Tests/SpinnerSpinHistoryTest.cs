@@ -113,7 +113,7 @@ namespace osu.Game.Rulesets.Osu.Tests
 
             Assert.That(history.TotalRotation, Is.EqualTo(1080));
 
-            history.ReportDelta(250, -180);
+            history.ReportDelta(250, -900);
 
             Assert.That(history.TotalRotation, Is.EqualTo(180));
         }
@@ -122,11 +122,27 @@ namespace osu.Game.Rulesets.Osu.Tests
         public void TestRewindIntoSegmentThatHasNotCrossedZero()
         {
             history.ReportDelta(1000, -180);
-            history.ReportDelta(1500, 90);
-            history.ReportDelta(2000, 450);
-            history.ReportDelta(1750, -45);
-
             Assert.That(history.TotalRotation, Is.EqualTo(180));
+            history.ReportDelta(1500, 90);
+            Assert.That(history.TotalRotation, Is.EqualTo(180));
+            history.ReportDelta(2000, 450);
+            Assert.That(history.TotalRotation, Is.EqualTo(360));
+            history.ReportDelta(1750, -45);
+            Assert.That(history.TotalRotation, Is.EqualTo(315));
+        }
+
+        [Test]
+        public void TestRewindOverDirectionChange()
+        {
+            history.ReportDelta(1000, 40); // max is now CW 40 degrees
+            Assert.That(history.TotalRotation, Is.EqualTo(40));
+            history.ReportDelta(1100, -90); // max is now CCW 50 degrees
+            Assert.That(history.TotalRotation, Is.EqualTo(50));
+            history.ReportDelta(1200, 110); // max is now CW 60 degrees
+            Assert.That(history.TotalRotation, Is.EqualTo(60));
+
+            history.ReportDelta(1000, -20);
+            Assert.That(history.TotalRotation, Is.EqualTo(40));
         }
     }
 }
