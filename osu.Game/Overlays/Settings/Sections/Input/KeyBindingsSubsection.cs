@@ -5,7 +5,6 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using osu.Framework.Allocation;
-using osu.Framework.Extensions.IEnumerableExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Input.Bindings;
 using osu.Framework.Localisation;
@@ -27,46 +26,83 @@ namespace osu.Game.Overlays.Settings.Sections.Input
 
         protected IEnumerable<KeyBinding> Defaults { get; init; } = Array.Empty<KeyBinding>();
 
+        [Resolved]
+        private RealmAccess realm { get; set; } = null!;
+
         protected KeyBindingsSubsection()
         {
             FlowContent.Spacing = new Vector2(0, 3);
         }
 
         [BackgroundDependencyLoader]
-        private void load(RealmAccess realm)
+        private void load()
         {
-            var bindings = realm.Run(r => GetKeyBindings(r).Detach());
+            var bindings = getAllBindings();
 
             foreach (var defaultGroup in Defaults.GroupBy(d => d.Action))
             {
                 int intKey = (int)defaultGroup.Key;
 
-                // one row per valid action.
-                Add(CreateKeyBindingRow(
-                        defaultGroup.Key,
-                        bindings.Where(b => b.ActionInt.Equals(intKey)).ToList(),
-                        defaultGroup)
-                    .With(row => row.BindingUpdated = onBindingUpdated));
+                var row = CreateKeyBindingRow(defaultGroup.Key, defaultGroup)
+                    .With(row =>
+                    {
+                        row.BindingUpdated = onBindingUpdated;
+                        row.GetAllSectionBindings = getAllBindings;
+                    });
+                row.KeyBindings.AddRange(bindings.Where(b => b.ActionInt.Equals(intKey)));
+                Add(row);
             }
 
             Add(new ResetButton
             {
-                Action = () => Children.OfType<KeyBindingRow>().ForEach(k => k.RestoreDefaults())
+                Action = () =>
+                {
+                    realm.Write(r =>
+                    {
+                        // can't use `RestoreDefaults()` for each key binding row here as it might trigger binding conflicts along the way.
+                        foreach (var row in Children.OfType<KeyBindingRow>())
+                        {
+                            foreach (var (currentBinding, defaultBinding) in row.KeyBindings.Zip(row.Defaults))
+                                r.Find<RealmKeyBinding>(currentBinding.ID)!.KeyCombinationString = defaultBinding.ToString();
+                        }
+                    });
+                    reloadAllBindings();
+                }
             });
         }
 
         protected abstract IEnumerable<RealmKeyBinding> GetKeyBindings(Realm realm);
 
-        protected virtual KeyBindingRow CreateKeyBindingRow(object action, IEnumerable<RealmKeyBinding> keyBindings, IEnumerable<KeyBinding> defaults)
-            => new KeyBindingRow(action, keyBindings.ToList())
+        private List<RealmKeyBinding> getAllBindings() => realm.Run(r =>
+        {
+            r.Refresh();
+            return GetKeyBindings(r).Detach();
+        });
+
+        protected virtual KeyBindingRow CreateKeyBindingRow(object action, IEnumerable<KeyBinding> defaults)
+            => new KeyBindingRow(action)
             {
                 AllowMainMouseButtons = false,
                 Defaults = defaults.Select(d => d.KeyCombination),
             };
 
-        private void onBindingUpdated(KeyBindingRow sender)
+        private void reloadAllBindings()
         {
-            if (AutoAdvanceTarget)
+            var bindings = getAllBindings();
+
+            foreach (var row in Children.OfType<KeyBindingRow>())
+            {
+                row.KeyBindings.Clear();
+                row.KeyBindings.AddRange(bindings.Where(b => b.ActionInt.Equals((int)row.Action)));
+            }
+        }
+
+        private void onBindingUpdated(KeyBindingRow sender, KeyBindingRow.KeyBindingUpdatedEventArgs args)
+        {
+            if (args.BindingConflictResolved)
+                reloadAllBindings();
+
+            if (AutoAdvanceTarget && args.CanAdvanceToNextBinding)
             {
                 var next = Children.SkipWhile(c => c != sender).Skip(1).FirstOrDefault();
                 if (next != null)
