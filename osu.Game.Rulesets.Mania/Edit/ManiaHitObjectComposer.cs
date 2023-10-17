@@ -28,11 +28,6 @@ namespace osu.Game.Rulesets.Mania.Edit
         {
         }
 
-        private DependencyContainer dependencies;
-
-        protected override IReadOnlyDependencyContainer CreateChildDependencies(IReadOnlyDependencyContainer parent)
-            => dependencies = new DependencyContainer(base.CreateChildDependencies(parent));
-
         public new ManiaPlayfield Playfield => ((ManiaPlayfield)drawableRuleset.Playfield);
 
         public IScrollingInfo ScrollingInfo => drawableRuleset.ScrollingInfo;
