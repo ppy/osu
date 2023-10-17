@@ -86,7 +86,7 @@ namespace osu.Game.Beatmaps
 
         public event Action<WorkingBeatmap> OnInvalidated;
 
-        public virtual WorkingBeatmap GetWorkingBeatmap(BeatmapInfo beatmapInfo)
+        public virtual WorkingBeatmap GetWorkingBeatmap([CanBeNull] BeatmapInfo beatmapInfo)
         {
             if (beatmapInfo?.BeatmapSet == null)
                 return DefaultBeatmap;

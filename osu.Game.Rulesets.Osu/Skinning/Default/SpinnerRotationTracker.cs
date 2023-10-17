@@ -56,7 +56,7 @@ namespace osu.Game.Rulesets.Osu.Skinning.Default
 
         protected override bool OnMouseMove(MouseMoveEvent e)
         {
-            mousePosition = Parent.ToLocalSpace(e.ScreenSpaceMousePosition);
+            mousePosition = Parent!.ToLocalSpace(e.ScreenSpaceMousePosition);
             return base.OnMouseMove(e);
         }
 

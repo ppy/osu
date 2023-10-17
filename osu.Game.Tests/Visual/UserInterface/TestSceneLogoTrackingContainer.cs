@@ -269,8 +269,8 @@ namespace osu.Game.Tests.Visual.UserInterface
             if (!logoFacade.Transforms.Any() && !transferContainer.Transforms.Any())
             {
                 Random random = new Random();
-                trackingContainer.Delay(500).MoveTo(new Vector2(random.Next(0, (int)logo.Parent.DrawWidth), random.Next(0, (int)logo.Parent.DrawHeight)), 300);
-                transferContainer.Delay(500).MoveTo(new Vector2(random.Next(0, (int)logo.Parent.DrawWidth), random.Next(0, (int)logo.Parent.DrawHeight)), 300);
+                trackingContainer.Delay(500).MoveTo(new Vector2(random.Next(0, (int)logo.Parent!.DrawWidth), random.Next(0, (int)logo.Parent!.DrawHeight)), 300);
+                transferContainer.Delay(500).MoveTo(new Vector2(random.Next(0, (int)logo.Parent!.DrawWidth), random.Next(0, (int)logo.Parent!.DrawHeight)), 300);
             }
 
             if (randomPositions)

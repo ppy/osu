@@ -88,7 +88,7 @@ namespace osu.Game.Rulesets.Osu.Skinning.Legacy
             base.UpdateAfterChildren();
 
             //undo rotation on layers which should not be rotated.
-            float appliedRotation = Parent.Rotation;
+            float appliedRotation = Parent!.Rotation;
 
             layerNd.Rotation = -appliedRotation;
             layerSpec.Rotation = -appliedRotation;
