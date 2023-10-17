@@ -98,6 +98,9 @@ namespace osu.Game.Rulesets.Osu.Mods
                         // only apply to circle piece – reverse arrow is not affected by hidden.
                         sliderRepeat.CirclePiece.FadeOut(fadeDuration);
 
+                    using (drawableObject.BeginAbsoluteSequence(drawableObject.HitStateUpdateTime))
+                        sliderRepeat.FadeOut();
+
                     break;
 
                 case DrawableHitCircle circle:
