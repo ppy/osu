@@ -241,7 +241,7 @@ namespace osu.Game.Rulesets.Osu.Tests.Editor
             {
                 if (visualiser is null) return;
 
-                MenuItem? item = visualiser.ContextMenuItems.FirstOrDefault(menuItem => menuItem.Text.Value == contextMenuText);
+                MenuItem? item = visualiser.ContextMenuItems?.FirstOrDefault(menuItem => menuItem.Text.Value == contextMenuText);
 
                 item?.Action.Value?.Invoke();
             });
