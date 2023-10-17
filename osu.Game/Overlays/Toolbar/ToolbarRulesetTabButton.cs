@@ -63,7 +63,7 @@ namespace osu.Game.Overlays.Toolbar
 
             protected override bool OnClick(ClickEvent e)
             {
-                Parent.TriggerClick();
+                Parent!.TriggerClick();
                 return base.OnClick(e);
             }
         }

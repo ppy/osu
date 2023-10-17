@@ -35,7 +35,7 @@ namespace osu.Game.Storyboards.Drawables
 
         protected override Container<DrawableStoryboardLayer> Content { get; }
 
-        protected override Vector2 DrawScale => new Vector2(Parent.DrawHeight / 480);
+        protected override Vector2 DrawScale => new Vector2(Parent!.DrawHeight / 480);
 
         private bool passing = true;
 

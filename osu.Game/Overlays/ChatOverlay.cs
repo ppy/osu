@@ -267,7 +267,7 @@ namespace osu.Game.Overlays
             if (!isDraggingTopBar)
                 return;
 
-            float targetChatHeight = dragStartChatHeight - (e.MousePosition.Y - e.MouseDownPosition.Y) / Parent.DrawSize.Y;
+            float targetChatHeight = dragStartChatHeight - (e.MousePosition.Y - e.MouseDownPosition.Y) / Parent!.DrawSize.Y;
             chatHeight.Value = targetChatHeight;
         }
 
