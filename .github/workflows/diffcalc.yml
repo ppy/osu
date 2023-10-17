@@ -352,7 +352,7 @@ jobs:
     name: Update PR comment
     needs: [ create-comment, generator ]
     runs-on: ubuntu-latest
-    if: ${{ needs.create-comment.result == 'success' }}
+    if: ${{ always() && needs.create-comment.result == 'success' }}
     steps:
       - name: Update comment on success
         if: ${{ needs.generator.result == 'success' }}
@@ -374,3 +374,11 @@ jobs:
           create_if_not_exists: false
           message: |
             Difficulty calculation failed: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+
+      - name: Update comment on cancellation
+        if: ${{ needs.generator.result == 'cancelled' }}
+        uses: thollander/actions-comment-pull-request@v2
+        with:
+          comment_tag: ${{ env.COMMENT_TAG }}
+          mode: delete
+          message: '.' # Appears to be required by this action for non-error status code.
