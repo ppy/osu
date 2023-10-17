@@ -36,7 +36,7 @@ namespace osu.Game.Rulesets.Osu.Judgements
         /// If Double Time is active instead (with a speed multiplier of 1.5x),
         /// in the same scenario the property will return 720 * 1.5 = 1080.
         /// </example>
-        public float RateAdjustedRotation;
+        public float TotalRotation;
 
         /// <summary>
         /// Time instant at which the spin was started (the first user input which caused an increase in spin).

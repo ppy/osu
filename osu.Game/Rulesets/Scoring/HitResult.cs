@@ -55,6 +55,13 @@ namespace osu.Game.Rulesets.Scoring
         [Order(1)]
         Great,
 
+        /// <summary>
+        /// This is an optional timing window tighter than <see cref="Great"/>.
+        /// </summary>
+        /// <remarks>
+        /// By default, this does not give any bonus accuracy or score.
+        /// To have it affect scoring, consider adding a nested bonus object.
+        /// </remarks>
         [Description(@"Perfect")]
         [EnumMember(Value = "perfect")]
         [Order(0)]
