@@ -231,7 +231,7 @@ namespace osu.Game.Rulesets.Osu.Tests.Editor
                 if (slider is null || visualiser is null) return;
 
                 Vector2 position = slider.Path.ControlPoints[index].Position + slider.Position;
-                InputManager.MoveMouseTo(visualiser.Pieces[0].Parent.ToScreenSpace(position));
+                InputManager.MoveMouseTo(visualiser.Pieces[0].Parent!.ToScreenSpace(position));
             });
         }
 

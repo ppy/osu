@@ -220,7 +220,7 @@ namespace osu.Game.Tests.Visual.Gameplay
 
         public partial class TestInputConsumer : CompositeDrawable, IKeyBindingHandler<TestAction>
         {
-            public override bool ReceivePositionalInputAt(Vector2 screenSpacePos) => Parent.ReceivePositionalInputAt(screenSpacePos);
+            public override bool ReceivePositionalInputAt(Vector2 screenSpacePos) => Parent!.ReceivePositionalInputAt(screenSpacePos);
 
             private readonly Box box;
 
