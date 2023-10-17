@@ -133,13 +133,13 @@ jobs:
   wait-for-queue:
     name: "Wait for previous workflows"
     needs: check-permissions
-    runs-on: ubuntu-latest
-    timeout-minutes: 50400 # 35 days, the maximum for jobs.
+    runs-on: self-hosted
+    timeout-minutes: 50400 # 35 days, the maximum for jobs on self-hosted runners.
     steps:
       - uses: ahmadnassri/action-workflow-queue@v1
         with:
-          timeout: 2147483647 # Around 24 days, maximum supported.
-          delay: 120000 # Poll every 2 minutes. API seems fairly low on this one.
+          timeout: 2147483647 # Around 24 days - the maximum supported by JS setTimeout().
+          delay: 120000 # Poll every 2 minutes - the API limit seems fairly low on this one.
 
   directory:
     name: Prepare directory
