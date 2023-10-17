@@ -57,15 +57,8 @@ namespace osu.Game.Rulesets.Mania.Edit
         protected override Playfield PlayfieldAtScreenSpacePosition(Vector2 screenSpacePosition) =>
             Playfield.GetColumnByPosition(screenSpacePosition);
 
-        protected override DrawableRuleset<ManiaHitObject> CreateDrawableRuleset(Ruleset ruleset, IBeatmap beatmap, IReadOnlyList<Mod> mods)
-        {
+        protected override DrawableRuleset<ManiaHitObject> CreateDrawableRuleset(Ruleset ruleset, IBeatmap beatmap, IReadOnlyList<Mod> mods) =>
             drawableRuleset = new DrawableManiaEditorRuleset(ruleset, beatmap, mods);
-
-            // This is the earliest we can cache the scrolling info to ourselves, before masks are added to the hierarchy and inject it
-            dependencies.CacheAs(drawableRuleset.ScrollingInfo);
-
-            return drawableRuleset;
-        }
 
         protected override ComposeBlueprintContainer CreateBlueprintContainer()
             => new ManiaBlueprintContainer(this);
