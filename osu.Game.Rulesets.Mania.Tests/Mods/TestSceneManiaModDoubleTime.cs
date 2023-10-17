@@ -17,12 +17,16 @@ namespace osu.Game.Rulesets.Mania.Tests.Mods
     {
         private const double offset = 18;
 
+        protected override bool AllowFail => true;
+
         protected override Ruleset CreatePlayerRuleset() => new ManiaRuleset();
 
         [Test]
         public void TestHitWindowWithoutDoubleTime() => CreateModTest(new ModTestData
         {
-            PassCondition = () => Player.ScoreProcessor.JudgedHits > 0 && Player.ScoreProcessor.Accuracy.Value != 1,
+            PassCondition = () => Player.ScoreProcessor.JudgedHits > 0
+                                  && Player.ScoreProcessor.Accuracy.Value == 1
+                                  && Player.ScoreProcessor.TotalScore.Value == 1_000_000,
             Autoplay = false,
             Beatmap = new Beatmap
             {
@@ -40,24 +44,31 @@ namespace osu.Game.Rulesets.Mania.Tests.Mods
         });
 
         [Test]
-        public void TestHitWindowWithDoubleTime() => CreateModTest(new ModTestData
+        public void TestHitWindowWithDoubleTime()
         {
-            Mod = new ManiaModDoubleTime(),
-            PassCondition = () => Player.ScoreProcessor.JudgedHits > 0 && Player.ScoreProcessor.Accuracy.Value == 1,
-            Autoplay = false,
-            Beatmap = new Beatmap
+            var doubleTime = new ManiaModDoubleTime();
+
+            CreateModTest(new ModTestData
             {
-                BeatmapInfo = { Ruleset = new ManiaRuleset().RulesetInfo },
-                Difficulty = { OverallDifficulty = 10 },
-                HitObjects = new List<HitObject>
+                Mod = doubleTime,
+                PassCondition = () => Player.ScoreProcessor.JudgedHits > 0
+                                      && Player.ScoreProcessor.Accuracy.Value == 1
+                                      && Player.ScoreProcessor.TotalScore.Value == (long)(1_000_010 * doubleTime.ScoreMultiplier),
+                Autoplay = false,
+                Beatmap = new Beatmap
                 {
-                    new Note { StartTime = 1000 }
+                    BeatmapInfo = { Ruleset = new ManiaRuleset().RulesetInfo },
+                    Difficulty = { OverallDifficulty = 10 },
+                    HitObjects = new List<HitObject>
+                    {
+                        new Note { StartTime = 1000 }
+                    },
                 },
-            },
-            ReplayFrames = new List<ReplayFrame>
-            {
-                new ManiaReplayFrame(1000 + offset, ManiaAction.Key1)
-            }
-        });
+                ReplayFrames = new List<ReplayFrame>
+                {
+                    new ManiaReplayFrame(1000 + offset, ManiaAction.Key1)
+                }
+            });
+        }
     }
 }
