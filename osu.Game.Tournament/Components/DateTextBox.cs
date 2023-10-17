@@ -15,7 +15,7 @@ namespace osu.Game.Tournament.Components
         public new Bindable<DateTimeOffset>? Current
         {
             get => current;
-            set => current.Current = value;
+            set => current.Current = value!;
         }
 
         public DateTextBox()

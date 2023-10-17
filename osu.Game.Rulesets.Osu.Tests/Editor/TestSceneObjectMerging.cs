@@ -34,7 +34,7 @@ namespace osu.Game.Rulesets.Osu.Tests.Editor
             });
 
             moveMouseToHitObject(1);
-            AddAssert("merge option available", () => selectionHandler.ContextMenuItems.Any(o => o.Text.Value == "Merge selection"));
+            AddAssert("merge option available", () => selectionHandler.ContextMenuItems?.Any(o => o.Text.Value == "Merge selection") == true);
 
             mergeSelection();
 
@@ -198,7 +198,7 @@ namespace osu.Game.Rulesets.Osu.Tests.Editor
             });
 
             moveMouseToHitObject(1);
-            AddAssert("merge option not available", () => selectionHandler.ContextMenuItems.Length > 0 && selectionHandler.ContextMenuItems.All(o => o.Text.Value != "Merge selection"));
+            AddAssert("merge option not available", () => selectionHandler.ContextMenuItems?.Length > 0 && selectionHandler.ContextMenuItems.All(o => o.Text.Value != "Merge selection"));
             mergeSelection();
             AddAssert("circles not merged", () => circle1 is not null && circle2 is not null
                                                                       && EditorBeatmap.HitObjects.Contains(circle1) && EditorBeatmap.HitObjects.Contains(circle2));
@@ -222,7 +222,7 @@ namespace osu.Game.Rulesets.Osu.Tests.Editor
             });
 
             moveMouseToHitObject(1);
-            AddAssert("merge option available", () => selectionHandler.ContextMenuItems.Any(o => o.Text.Value == "Merge selection"));
+            AddAssert("merge option available", () => selectionHandler.ContextMenuItems?.Any(o => o.Text.Value == "Merge selection") == true);
 
             mergeSelection();
 
