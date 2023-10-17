@@ -66,20 +66,20 @@ namespace osu.Game.Tests.Visual.Settings
             });
 
             AddStep("set non-default value", () => revertToDefaultButton.Current.Value = "non-default");
-            AddAssert("default value button centre aligned to control size", () => Precision.AlmostEquals(revertToDefaultButton.Parent.DrawHeight, control.DrawHeight, 1));
+            AddAssert("default value button centre aligned to control size", () => Precision.AlmostEquals(revertToDefaultButton.Parent!.DrawHeight, control.DrawHeight, 1));
 
             AddStep("set label", () => textBox.LabelText = "label text");
             AddAssert("default value button centre aligned to label size", () =>
             {
                 var label = textBox.ChildrenOfType<OsuSpriteText>().Single(spriteText => spriteText.Text == "label text");
-                return Precision.AlmostEquals(revertToDefaultButton.Parent.DrawHeight, label.DrawHeight, 1);
+                return Precision.AlmostEquals(revertToDefaultButton.Parent!.DrawHeight, label.DrawHeight, 1);
             });
 
             AddStep("clear label", () => textBox.LabelText = default);
-            AddAssert("default value button centre aligned to control size", () => Precision.AlmostEquals(revertToDefaultButton.Parent.DrawHeight, control.DrawHeight, 1));
+            AddAssert("default value button centre aligned to control size", () => Precision.AlmostEquals(revertToDefaultButton.Parent!.DrawHeight, control.DrawHeight, 1));
 
             AddStep("set warning text", () => textBox.SetNoticeText("This is some very important warning text! Hopefully it doesn't break the alignment of the default value indicator...", true));
-            AddAssert("default value button centre aligned to control size", () => Precision.AlmostEquals(revertToDefaultButton.Parent.DrawHeight, control.DrawHeight, 1));
+            AddAssert("default value button centre aligned to control size", () => Precision.AlmostEquals(revertToDefaultButton.Parent!.DrawHeight, control.DrawHeight, 1));
         }
 
         /// <summary>

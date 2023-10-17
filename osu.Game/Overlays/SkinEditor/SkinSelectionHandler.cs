@@ -135,7 +135,7 @@ namespace osu.Game.Overlays.SkinEditor
             {
                 var drawableItem = (Drawable)b.Item;
 
-                var flippedPosition = GeometryUtils.GetFlippedPosition(direction, flipOverOrigin ? drawableItem.Parent.ScreenSpaceDrawQuad : selectionQuad, b.ScreenSpaceSelectionPoint);
+                var flippedPosition = GeometryUtils.GetFlippedPosition(direction, flipOverOrigin ? drawableItem.Parent!.ScreenSpaceDrawQuad : selectionQuad, b.ScreenSpaceSelectionPoint);
 
                 updateDrawablePosition(drawableItem, flippedPosition);
 
@@ -242,7 +242,7 @@ namespace osu.Game.Overlays.SkinEditor
         private static void updateDrawablePosition(Drawable drawable, Vector2 screenSpacePosition)
         {
             drawable.Position =
-                drawable.Parent.ToLocalSpace(screenSpacePosition) - drawable.AnchorPosition;
+                drawable.Parent!.ToLocalSpace(screenSpacePosition) - drawable.AnchorPosition;
         }
 
         private void applyOrigins(Anchor origin)
