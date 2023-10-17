@@ -35,6 +35,7 @@ using osu.Game.Rulesets.Mods;
 using osu.Game.Scoring;
 using osu.Game.Scoring.Legacy;
 using osu.Game.Skinning;
+using osuTK.Input;
 using Realms;
 using Realms.Exceptions;
 
@@ -1036,6 +1037,20 @@ namespace osu.Game.Database
 
                 case 35:
                 {
+                    // catch used `Shift` twice as a default key combination for dash, which generally was bothersome and causes issues elsewhere.
+                    // the duplicate binding logic below had to account for it, it could also break keybinding conflict resolution on revert-to-default.
+                    // as such, detect this situation and fix it before proceeding further.
+                    var catchDashBindings = migration.NewRealm.All<RealmKeyBinding>()
+                                                     .Where(kb => kb.RulesetName == @"fruits" && kb.ActionInt == 2)
+                                                     .ToList();
+
+                    if (catchDashBindings.All(kb => kb.KeyCombination.Equals(new KeyCombination(InputKey.Shift))))
+                    {
+                        Debug.Assert(catchDashBindings.Count == 2);
+                        catchDashBindings.Last().KeyCombination = KeyCombination.FromMouseButton(MouseButton.Left);
+                    }
+
+                    // with the catch case dealt with, de-duplicate the remaining bindings.
                     int countCleared = 0;
 
                     var globalBindings = migration.NewRealm.All<RealmKeyBinding>().Where(kb => kb.RulesetName == null).ToList();
