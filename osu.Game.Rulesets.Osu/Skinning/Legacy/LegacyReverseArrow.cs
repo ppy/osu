@@ -1,6 +1,7 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System;
 using System.Diagnostics;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
@@ -17,8 +18,7 @@ namespace osu.Game.Rulesets.Osu.Skinning.Legacy
 {
     public partial class LegacyReverseArrow : CompositeDrawable
     {
-        [Resolved]
-        private DrawableHitObject drawableObject { get; set; } = null!;
+        private DrawableSliderRepeat drawableRepeat { get; set; } = null!;
 
         private Drawable proxy = null!;
 
@@ -31,8 +31,10 @@ namespace osu.Game.Rulesets.Osu.Skinning.Legacy
         private bool shouldRotate;
 
         [BackgroundDependencyLoader]
-        private void load(ISkinSource skinSource)
+        private void load(DrawableHitObject drawableObject, ISkinSource skinSource)
         {
+            drawableRepeat = (DrawableSliderRepeat)drawableObject;
+
             AutoSizeAxes = Axes.Both;
 
             string lookupName = new OsuSkinComponentLookup(OsuSkinComponents.ReverseArrow).LookupName;
@@ -58,10 +60,10 @@ namespace osu.Game.Rulesets.Osu.Skinning.Legacy
 
             proxy = CreateProxy();
 
-            drawableObject.HitObjectApplied += onHitObjectApplied;
-            onHitObjectApplied(drawableObject);
+            drawableRepeat.HitObjectApplied += onHitObjectApplied;
+            onHitObjectApplied(drawableRepeat);
 
-            accentColour = drawableObject.AccentColour.GetBoundCopy();
+            accentColour = drawableRepeat.AccentColour.GetBoundCopy();
             accentColour.BindValueChanged(c =>
             {
                 arrow.Colour = textureIsDefaultSkin && c.NewValue.R + c.NewValue.G + c.NewValue.B > (600 / 255f) ? Color4.Black : Color4.White;
@@ -73,8 +75,7 @@ namespace osu.Game.Rulesets.Osu.Skinning.Legacy
             Debug.Assert(proxy.Parent == null);
 
             // see logic in LegacySliderHeadHitCircle.
-            (drawableObject as DrawableSliderRepeat)?.DrawableSlider
-                                                    .OverlayElementContainer.Add(proxy);
+            drawableRepeat.DrawableSlider.OverlayElementContainer.Add(proxy);
         }
 
         private void updateStateTransforms(DrawableHitObject hitObject, ArmedState state)
@@ -102,6 +103,11 @@ namespace osu.Game.Rulesets.Osu.Skinning.Legacy
                     }
 
                     break;
+
+                case ArmedState.Hit:
+                    double animDuration = Math.Min(300, drawableRepeat.HitObject.SpanDuration);
+                    InternalChild.ScaleTo(1.4f, animDuration, Easing.Out);
+                    break;
             }
         }
 
@@ -109,10 +115,10 @@ namespace osu.Game.Rulesets.Osu.Skinning.Legacy
         {
             base.Dispose(isDisposing);
 
-            if (drawableObject.IsNotNull())
+            if (drawableRepeat.IsNotNull())
             {
-                drawableObject.HitObjectApplied -= onHitObjectApplied;
-                drawableObject.ApplyCustomUpdateState -= updateStateTransforms;
+                drawableRepeat.HitObjectApplied -= onHitObjectApplied;
+                drawableRepeat.ApplyCustomUpdateState -= updateStateTransforms;
             }
         }
     }
