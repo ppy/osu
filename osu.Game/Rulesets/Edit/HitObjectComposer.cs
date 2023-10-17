@@ -7,6 +7,7 @@ using System;
 using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.Linq;
+using JetBrains.Annotations;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Extensions.EnumExtensions;
@@ -76,7 +77,7 @@ namespace osu.Game.Rulesets.Edit
 
         protected readonly Container LayerBelowRuleset = new Container { RelativeSizeAxes = Axes.Both };
 
-        private InputManager inputManager;
+        protected InputManager InputManager { get; private set; }
 
         private EditorRadioButtonCollection toolboxCollection;
 
@@ -88,6 +89,9 @@ namespace osu.Game.Rulesets.Edit
         private Bindable<bool> autoSeekOnPlacement;
 
         protected DrawableRuleset<TObject> DrawableRuleset { get; private set; }
+
+        [CanBeNull]
+        private BeatSnapGrid beatSnapGrid;
 
         protected HitObjectComposer(Ruleset ruleset)
             : base(ruleset)
@@ -204,7 +208,9 @@ namespace osu.Game.Rulesets.Edit
                             },
                         }
                     }
-                }
+                },
+                // Must be constructed after drawable ruleset above.
+                (beatSnapGrid = CreateBeatSnapGrid()) ?? Empty(),
             };
 
             toolboxCollection.Items = CompositionTools
@@ -235,7 +241,7 @@ namespace osu.Game.Rulesets.Edit
         {
             base.LoadComplete();
 
-            inputManager = GetContainingInputManager();
+            InputManager = GetContainingInputManager();
 
             hasTiming = EditorBeatmap.HasTiming.GetBoundCopy();
             hasTiming.BindValueChanged(timing =>
@@ -269,11 +275,42 @@ namespace osu.Game.Rulesets.Edit
             }
         }
 
+        protected override void UpdateAfterChildren()
+        {
+            base.UpdateAfterChildren();
+
+            updateBeatSnapGrid();
+        }
+
+        private void updateBeatSnapGrid()
+        {
+            if (beatSnapGrid == null)
+                return;
+
+            if (BlueprintContainer.CurrentTool is SelectTool)
+            {
+                if (EditorBeatmap.SelectedHitObjects.Any())
+                {
+                    beatSnapGrid.SelectionTimeRange = (EditorBeatmap.SelectedHitObjects.Min(h => h.StartTime), EditorBeatmap.SelectedHitObjects.Max(h => h.GetEndTime()));
+                }
+                else
+                    beatSnapGrid.SelectionTimeRange = null;
+            }
+            else
+            {
+                var result = FindSnappedPositionAndTime(InputManager.CurrentState.Mouse.Position);
+                if (result.Time is double time)
+                    beatSnapGrid.SelectionTimeRange = (time, time);
+                else
+                    beatSnapGrid.SelectionTimeRange = null;
+            }
+        }
+
         public override Playfield Playfield => drawableRulesetWrapper.Playfield;
 
         public override IEnumerable<DrawableHitObject> HitObjects => drawableRulesetWrapper.Playfield.AllHitObjects;
 
-        public override bool CursorInPlacementArea => drawableRulesetWrapper.Playfield.ReceivePositionalInputAt(inputManager.CurrentState.Mouse.Position);
+        public override bool CursorInPlacementArea => drawableRulesetWrapper.Playfield.ReceivePositionalInputAt(InputManager.CurrentState.Mouse.Position);
 
         /// <summary>
         /// Defines all available composition tools, listed on the left side of the editor screen as button controls.
@@ -298,6 +335,12 @@ namespace osu.Game.Rulesets.Edit
         /// Construct a relevant blueprint container. This will manage hitobject selection/placement input handling and display logic.
         /// </summary>
         protected virtual ComposeBlueprintContainer CreateBlueprintContainer() => new ComposeBlueprintContainer(this);
+
+        /// <summary>
+        /// Construct an optional beat snap grid.
+        /// </summary>
+        [CanBeNull]
+        protected virtual BeatSnapGrid CreateBeatSnapGrid() => null;
 
         /// <summary>
         /// Construct a drawable ruleset for the provided ruleset.
