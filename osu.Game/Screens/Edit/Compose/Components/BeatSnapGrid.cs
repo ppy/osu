@@ -173,9 +173,6 @@ namespace osu.Game.Screens.Edit.Compose.Components
             public DrawableGridLine()
                 : base(new HitObject())
             {
-                RelativeSizeAxes = Axes.X;
-                Height = 2;
-
                 AddInternal(new Box { RelativeSizeAxes = Axes.Both });
             }
 
@@ -191,6 +188,19 @@ namespace osu.Game.Screens.Edit.Compose.Components
                 Origin = Anchor = direction.NewValue == ScrollingDirection.Up
                     ? Anchor.TopLeft
                     : Anchor.BottomLeft;
+
+                bool isHorizontal = direction.NewValue == ScrollingDirection.Left || direction.NewValue == ScrollingDirection.Right;
+
+                if (isHorizontal)
+                {
+                    RelativeSizeAxes = Axes.Y;
+                    Width = 2;
+                }
+                else
+                {
+                    RelativeSizeAxes = Axes.X;
+                    Height = 2;
+                }
             }
 
             protected override void UpdateInitialTransforms()
