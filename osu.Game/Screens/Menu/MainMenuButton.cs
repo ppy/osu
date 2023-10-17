@@ -48,15 +48,21 @@ namespace osu.Game.Screens.Menu
         public ButtonSystemState VisibleState = ButtonSystemState.TopLevel;
 
         private readonly Action clickAction;
+        private readonly Func<Vector2, Drawable, bool> hoverAction;
         private Sample sampleClick;
         private Sample sampleHover;
 
+        // for tests
+        internal bool LooksHovered { get; private set; }
+
         public override bool ReceivePositionalInputAt(Vector2 screenSpacePos) => box.ReceivePositionalInputAt(screenSpacePos);
 
-        public MainMenuButton(LocalisableString text, string sampleName, IconUsage symbol, Color4 colour, Action clickAction = null, float extraWidth = 0, Key triggerKey = Key.Unknown)
+        public MainMenuButton(LocalisableString text, string sampleName, IconUsage symbol, Color4 colour, Action clickAction = null, float extraWidth = 0,
+                              Key triggerKey = Key.Unknown, Func<Vector2, Drawable, bool> hoverAction = null)
         {
             this.sampleName = sampleName;
             this.clickAction = clickAction;
+            this.hoverAction = hoverAction;
             TriggerKey = triggerKey;
 
             AutoSizeAxes = Axes.Both;
@@ -158,22 +164,41 @@ namespace osu.Game.Screens.Menu
 
         protected override bool OnHover(HoverEvent e)
         {
-            if (State != ButtonState.Expanded) return true;
+            if (hoverAction?.Invoke(e.ScreenSpaceMousePosition, e.Target) == false)
+                return false;
+
+            SimulateHover();
+            return true;
+        }
+
+        public void SimulateHover()
+        {
+            if (State != ButtonState.Expanded) return;
 
             sampleHover?.Play();
 
             box.ScaleTo(new Vector2(1.5f, 1), 500, Easing.OutElastic);
+            LooksHovered = true;
 
             double duration = TimeUntilNextBeat;
 
             icon.ClearTransforms();
             icon.RotateTo(rightward ? -10 : 10, duration, Easing.InOutSine);
             icon.ScaleTo(new Vector2(1, 0.9f), duration, Easing.Out);
-            return true;
         }
 
         protected override void OnHoverLost(HoverLostEvent e)
         {
+            if (hoverAction?.Invoke(e.ScreenSpaceMousePosition, null) == false)
+                return;
+
+            SimulateHoverLost();
+        }
+
+        public void SimulateHoverLost()
+        {
+            LooksHovered = false;
+
             icon.ClearTransforms();
             icon.RotateTo(0, 500, Easing.Out);
             icon.MoveTo(Vector2.Zero, 500, Easing.Out);

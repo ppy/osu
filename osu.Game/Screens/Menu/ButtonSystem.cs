@@ -81,9 +81,65 @@ namespace osu.Game.Screens.Menu
         private readonly ButtonArea buttonArea;
 
         private readonly MainMenuButton backButton;
+        private readonly MainMenuButton settingsButton;
+
+        [CanBeNull]
+        internal MainMenuButton PlayButton;
 
         private readonly List<MainMenuButton> buttonsTopLevel = new List<MainMenuButton>();
         private readonly List<MainMenuButton> buttonsPlay = new List<MainMenuButton>();
+
+        [CanBeNull]
+        public List<MainMenuButton> CurrentButtonsList
+        {
+            get
+            {
+                switch (State)
+                {
+                    case ButtonSystemState.TopLevel:
+                        return buttonsTopLevel;
+
+                    case ButtonSystemState.Play:
+                        return buttonsPlay;
+
+                    default:
+                        return null;
+                }
+            }
+        }
+
+        private int? selectionIndex;
+
+        public int? SelectionIndex
+        {
+            get => selectionIndex;
+            set
+            {
+                if (selectionIndex == value)
+                    return;
+
+                (CurrentSelection as MainMenuButton)?.SimulateHoverLost();
+                selectionIndex = value;
+                (CurrentSelection as MainMenuButton)?.SimulateHover();
+            }
+        }
+
+        /// <summary>
+        /// The current keyboard-focused MainMenuButton, or the osu logo if
+        /// nothing valid is focused.
+        /// </summary>
+        [CanBeNull]
+        public Container CurrentSelection =>
+            (SelectionIndex >= 0 && SelectionIndex < CurrentButtonsList?.Count)
+                ? CurrentButtonsList[SelectionIndex.Value]
+                : logo;
+
+        /// <summary>
+        /// When using keyboard navigation, mouse position at last keyboard
+        /// input. Reset to Vector2.Zero when hovering over buttons. When a
+        /// hover is registered very close to this position, we ignore the hover.
+        /// </summary>
+        private Vector2? blockedMousePosition;
 
         private Sample sampleBack;
 
@@ -103,9 +159,10 @@ namespace osu.Game.Screens.Menu
 
             buttonArea.AddRange(new Drawable[]
             {
-                new MainMenuButton(ButtonSystemStrings.Settings, string.Empty, FontAwesome.Solid.Cog, new Color4(85, 85, 85, 255), () => OnSettings?.Invoke(), -WEDGE_WIDTH, Key.O),
+                settingsButton = new MainMenuButton(ButtonSystemStrings.Settings, string.Empty, FontAwesome.Solid.Cog, new Color4(85, 85, 85, 255), () => OnSettings?.Invoke(),
+                    -WEDGE_WIDTH, Key.O, hoverAction: processMenuButtonHover),
                 backButton = new MainMenuButton(ButtonSystemStrings.Back, @"button-back-select", OsuIcon.LeftCircle, new Color4(51, 58, 94, 255), () => State = ButtonSystemState.TopLevel,
-                    -WEDGE_WIDTH)
+                    -WEDGE_WIDTH, hoverAction: processMenuButtonHover)
                 {
                     VisibleState = ButtonSystemState.Play,
                 },
@@ -127,22 +184,35 @@ namespace osu.Game.Screens.Menu
         [BackgroundDependencyLoader(true)]
         private void load(AudioManager audio, IdleTracker idleTracker, GameHost host)
         {
-            buttonsPlay.Add(new MainMenuButton(ButtonSystemStrings.Solo, @"button-solo-select", FontAwesome.Solid.User, new Color4(102, 68, 204, 255), () => OnSolo?.Invoke(), WEDGE_WIDTH, Key.P));
-            buttonsPlay.Add(new MainMenuButton(ButtonSystemStrings.Multi, @"button-generic-select", FontAwesome.Solid.Users, new Color4(94, 63, 186, 255), onMultiplayer, 0, Key.M));
-            buttonsPlay.Add(new MainMenuButton(ButtonSystemStrings.Playlists, @"button-generic-select", OsuIcon.Charts, new Color4(94, 63, 186, 255), onPlaylists, 0, Key.L));
+            buttonsPlay.Add(new MainMenuButton(ButtonSystemStrings.Solo, @"button-solo-select", FontAwesome.Solid.User, new Color4(102, 68, 204, 255), () => OnSolo?.Invoke(),
+                WEDGE_WIDTH, Key.P, hoverAction: processMenuButtonHover));
+            buttonsPlay.Add(new MainMenuButton(ButtonSystemStrings.Multi, @"button-generic-select", FontAwesome.Solid.Users, new Color4(94, 63, 186, 255), onMultiplayer,
+                0, Key.M, hoverAction: processMenuButtonHover));
+            buttonsPlay.Add(new MainMenuButton(ButtonSystemStrings.Playlists, @"button-generic-select", OsuIcon.Charts, new Color4(94, 63, 186, 255), onPlaylists,
+                0, Key.L, hoverAction: processMenuButtonHover));
             buttonsPlay.ForEach(b => b.VisibleState = ButtonSystemState.Play);
 
-            buttonsTopLevel.Add(new MainMenuButton(ButtonSystemStrings.Play, @"button-play-select", OsuIcon.Logo, new Color4(102, 68, 204, 255), () => State = ButtonSystemState.Play, WEDGE_WIDTH,
-                Key.P));
-            buttonsTopLevel.Add(new MainMenuButton(ButtonSystemStrings.Edit, @"button-edit-select", OsuIcon.EditCircle, new Color4(238, 170, 0, 255), () => OnEdit?.Invoke(), 0, Key.E));
-            buttonsTopLevel.Add(new MainMenuButton(ButtonSystemStrings.Browse, @"button-direct-select", OsuIcon.ChevronDownCircle, new Color4(165, 204, 0, 255), () => OnBeatmapListing?.Invoke(), 0,
-                Key.D));
+            buttonsTopLevel.Add(
+                PlayButton = new MainMenuButton(ButtonSystemStrings.Play, @"button-play-select", OsuIcon.Logo, new Color4(102, 68, 204, 255), () => State = ButtonSystemState.Play,
+                    WEDGE_WIDTH, Key.P, hoverAction: processMenuButtonHover)
+            );
+            buttonsTopLevel.Add(new MainMenuButton(ButtonSystemStrings.Edit, @"button-edit-select", OsuIcon.EditCircle, new Color4(238, 170, 0, 255), () => OnEdit?.Invoke(),
+                0, Key.E, hoverAction: processMenuButtonHover));
+            buttonsTopLevel.Add(new MainMenuButton(ButtonSystemStrings.Browse, @"button-direct-select", OsuIcon.ChevronDownCircle, new Color4(165, 204, 0, 255), () => OnBeatmapListing?.Invoke(),
+                0, Key.D, hoverAction: processMenuButtonHover));
 
             if (host.CanExit)
-                buttonsTopLevel.Add(new MainMenuButton(ButtonSystemStrings.Exit, string.Empty, OsuIcon.CrossCircle, new Color4(238, 51, 153, 255), () => OnExit?.Invoke(), 0, Key.Q));
+            {
+                buttonsTopLevel.Add(new MainMenuButton(ButtonSystemStrings.Exit, string.Empty, OsuIcon.CrossCircle, new Color4(238, 51, 153, 255), () => OnExit?.Invoke(),
+                    0, Key.Q, hoverAction: processMenuButtonHover));
+            }
 
             buttonArea.AddRange(buttonsPlay);
             buttonArea.AddRange(buttonsTopLevel);
+
+            // for keyboard navigation
+            buttonsTopLevel.Insert(0, settingsButton);
+            buttonsPlay.Insert(0, backButton);
 
             buttonArea.ForEach(b =>
             {
@@ -241,10 +311,26 @@ namespace osu.Game.Screens.Menu
             switch (e.Action)
             {
                 case GlobalAction.Back:
-                    return goBack();
+                    PreferKeyboardNavigation();
+                    SelectUp();
+                    return true;
 
                 case GlobalAction.Select:
-                    logo?.TriggerClick();
+                    PreferKeyboardNavigation();
+                    CurrentSelection?.TriggerClick();
+                    // keyboard navgiation into submenu
+                    if (State != ButtonSystemState.EnteringMode)
+                        SelectionIndex = 1; // 1 to skip the back/settings btn
+                    return true;
+
+                case GlobalAction.SelectNextGroup:
+                    PreferKeyboardNavigation();
+                    SelectNext(1);
+                    return true;
+
+                case GlobalAction.SelectPreviousGroup:
+                    PreferKeyboardNavigation();
+                    SelectNext(-1);
                     return true;
 
                 default:
@@ -254,6 +340,94 @@ namespace osu.Game.Screens.Menu
 
         public void OnReleased(KeyBindingReleaseEvent<GlobalAction> e)
         {
+        }
+
+        public void SelectNext(int d)
+        {
+            if (d > 0 && State == ButtonSystemState.Initial)
+            {
+                State = ButtonSystemState.TopLevel;
+                SelectionIndex = 1;
+            }
+            else if (CurrentButtonsList == null)
+            {
+                SelectionIndex = null;
+            }
+            else
+            {
+                // start at 1, to not focus back/settings button, except when clicking left (focuses on settings)
+                int nextSelection = SelectionIndex ?? 0;
+                nextSelection += d;
+
+                if (nextSelection >= CurrentButtonsList.Count)
+                    nextSelection = CurrentButtonsList.Count - 1;
+                else if (nextSelection < 0)
+                    nextSelection = 0;
+
+                SelectionIndex = nextSelection;
+            }
+        }
+
+        public void SelectUp()
+        {
+            // if we come from play, focus play button again
+            int? parentSelection = State == ButtonSystemState.Play ? buttonsTopLevel.FindIndex(b => b == PlayButton) : null;
+            if (parentSelection == -1)
+                parentSelection = null;
+            goBack();
+            SelectionIndex = parentSelection;
+        }
+
+        private bool processMenuButtonHover(Vector2 screenSpacePosition, [CanBeNull] Drawable hoverElement)
+        {
+            if (!ConfirmHover(screenSpacePosition))
+                return false;
+
+            if (hoverElement == null)
+                return true; // unhover event
+
+            SelectionIndex = null;
+
+            if (CurrentButtonsList == null)
+                return true;
+
+            foreach (var btn in CurrentButtonsList.Where(btn => btn != hoverElement))
+                btn.SimulateHoverLost();
+            return true;
+        }
+
+        public void PreferKeyboardNavigation()
+        {
+            blockedMousePosition = GetContainingInputManager().CurrentState.Mouse.Position;
+
+            if (CurrentButtonsList == null)
+                return;
+
+            foreach (var btn in CurrentButtonsList.Where(btn => btn != CurrentSelection))
+                btn.SimulateHoverLost();
+        }
+
+        public bool ConfirmHover(Vector2 currentMousePosition)
+        {
+            if (blockedMousePosition == null)
+            {
+                return true;
+            }
+            else if ((blockedMousePosition.Value - currentMousePosition).LengthSquared > 4 * 4)
+            {
+                blockedMousePosition = null;
+                return true;
+            }
+            else
+            {
+                return false;
+            }
+        }
+
+        protected override bool OnMouseMove(MouseMoveEvent e)
+        {
+            ConfirmHover(e.ScreenSpaceMousePosition);
+            return base.OnMouseMove(e);
         }
 
         private bool goBack()
@@ -286,7 +460,7 @@ namespace osu.Game.Screens.Menu
                     return true;
 
                 case ButtonSystemState.TopLevel:
-                    buttonsTopLevel.First().TriggerClick();
+                    PlayButton!.TriggerClick();
                     return false;
 
                 case ButtonSystemState.Play:
@@ -310,6 +484,11 @@ namespace osu.Game.Screens.Menu
 
                 ButtonSystemState lastState = state;
                 state = value;
+                // Clear keyboard selection when it's coming from a click.
+                // In case of keyboard navigation we want to keep the selection
+                // visible, so this is reassigned immediately afterwards in
+                // other places in the code.
+                SelectionIndex = null;
 
                 updateLogoState(lastState);
 
