@@ -12,6 +12,8 @@ using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Game.Online.API;
 using osu.Game.Online.Rooms;
+using osu.Game.Overlays.Notifications;
+using osu.Game.Localisation;
 
 namespace osu.Game.Online.Multiplayer
 {
@@ -50,6 +52,7 @@ namespace osu.Game.Online.Multiplayer
                     connection.On<MultiplayerRoomUser>(nameof(IMultiplayerClient.UserJoined), ((IMultiplayerClient)this).UserJoined);
                     connection.On<MultiplayerRoomUser>(nameof(IMultiplayerClient.UserLeft), ((IMultiplayerClient)this).UserLeft);
                     connection.On<MultiplayerRoomUser>(nameof(IMultiplayerClient.UserKicked), ((IMultiplayerClient)this).UserKicked);
+                    connection.On<int, long, string>(nameof(IMultiplayerClient.Invited), ((IMultiplayerClient)this).Invited);
                     connection.On<int>(nameof(IMultiplayerClient.HostChanged), ((IMultiplayerClient)this).HostChanged);
                     connection.On<MultiplayerRoomSettings>(nameof(IMultiplayerClient.SettingsChanged), ((IMultiplayerClient)this).SettingsChanged);
                     connection.On<int, MultiplayerUserState>(nameof(IMultiplayerClient.UserStateChanged), ((IMultiplayerClient)this).UserStateChanged);
@@ -104,6 +107,32 @@ namespace osu.Game.Online.Multiplayer
             Debug.Assert(connection != null);
 
             return connection.InvokeAsync(nameof(IMultiplayerServer.LeaveRoom));
+        }
+
+        public override async Task InvitePlayer(int userId)
+        {
+            if (!IsConnected.Value)
+                return;
+
+            Debug.Assert(connection != null);
+
+            try
+            {
+                await connection.InvokeAsync(nameof(IMultiplayerServer.InvitePlayer), userId).ConfigureAwait(false);
+            }
+            catch (HubException exception)
+            {
+                switch (exception.GetHubExceptionMessage())
+                {
+                    case UserBlockedException.MESSAGE:
+                        PostNotification?.Invoke(new SimpleErrorNotification { Text = OnlinePlayStrings.InviteFailedUserBlocked });
+                        break;
+
+                    case UserBlocksPMsException.MESSAGE:
+                        PostNotification?.Invoke(new SimpleErrorNotification { Text = OnlinePlayStrings.InviteFailedUserOptOut });
+                        break;
+                }
+            }
         }
 
         public override Task TransferHost(int userId)

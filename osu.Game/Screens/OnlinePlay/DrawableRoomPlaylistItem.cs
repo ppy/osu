@@ -500,7 +500,11 @@ namespace osu.Game.Screens.OnlinePlay
                 {
                     if (beatmaps.QueryBeatmap(b => b.OnlineID == beatmap.OnlineID) is BeatmapInfo local && !local.BeatmapSet.AsNonNull().DeletePending)
                     {
-                        var collectionItems = realm.Realm.All<BeatmapCollection>().AsEnumerable().Select(c => new CollectionToggleMenuItem(c.ToLive(realm), beatmap)).Cast<OsuMenuItem>().ToList();
+                        var collectionItems = realm.Realm.All<BeatmapCollection>()
+                                                   .OrderBy(c => c.Name)
+                                                   .AsEnumerable()
+                                                   .Select(c => new CollectionToggleMenuItem(c.ToLive(realm), beatmap)).Cast<OsuMenuItem>().ToList();
+
                         if (manageCollectionsDialog != null)
                             collectionItems.Add(new OsuMenuItem("Manage...", MenuItemType.Standard, manageCollectionsDialog.Show));
 
