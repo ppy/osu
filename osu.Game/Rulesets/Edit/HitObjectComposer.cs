@@ -128,7 +128,7 @@ namespace osu.Game.Rulesets.Edit
 
             dependencies.CacheAs(Playfield);
 
-            InternalChildren = new Drawable[]
+            InternalChildren = new[]
             {
                 PlayfieldContentContainer = new Container
                 {
