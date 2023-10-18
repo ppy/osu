@@ -100,7 +100,8 @@ namespace osu.Game.Graphics.UserInterface
                         X = -SHEAR.X * HEIGHT / 2f,
                         Origin = Anchor.TopCentre,
                         RelativePositionAxes = Axes.X,
-                        Current = { Value = true }
+                        Current = { Value = true },
+                        OnDoubleClicked = () => Current.SetDefault(),
                     },
                 },
                 hoverClickSounds = new HoverClickSounds()
