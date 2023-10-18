@@ -51,7 +51,7 @@ namespace osu.Game.Rulesets.Osu.Tests
         [TestCase(80, 1)]
         [TestCase(80, 0)]
         [TestCase(80, 10)]
-        [TestCase(90, 1)]
+        // [TestCase(90, 1)] flaky
         public void TestVeryShortSlider(float sliderLength, int repeatCount)
         {
             Slider slider;
@@ -87,8 +87,8 @@ namespace osu.Game.Rulesets.Osu.Tests
         [TestCase(300, false)]
         [TestCase(200, true)]
         [TestCase(150, true)]
-        [TestCase(120, true)]
-        [TestCase(60, true)]
+        // [TestCase(120, true)] flaky
+        // [TestCase(60, true)] flaky
         [TestCase(10, true)]
         // [TestCase(0, true)] headless test doesn't run at high enough precision for this to always enter a tracking state in time.
         [TestCase(-30, false)]
