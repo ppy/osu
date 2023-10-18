@@ -208,8 +208,7 @@ namespace osu.Game.Rulesets.Osu.Statistics
             if (score.HitEvents.Count == 0)
                 return;
 
-            // Todo: This should probably not be done like this.
-            float radius = OsuHitObject.OBJECT_RADIUS * (1.0f - 0.7f * (playableBeatmap.Difficulty.CircleSize - 5) / 5) / 2;
+            float radius = OsuHitObject.OBJECT_RADIUS * IBeatmapDifficultyInfo.CalculateScaleFromCircleSize(playableBeatmap.Difficulty.CircleSize);
 
             foreach (var e in score.HitEvents.Where(e => e.HitObject is HitCircle && !(e.HitObject is SliderTailCircle)))
             {
