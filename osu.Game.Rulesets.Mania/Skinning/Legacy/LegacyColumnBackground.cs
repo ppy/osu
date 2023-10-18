@@ -5,7 +5,6 @@ using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
-using osu.Framework.Graphics.Sprites;
 using osu.Framework.Input.Bindings;
 using osu.Framework.Input.Events;
 using osu.Game.Rulesets.UI.Scrolling;
@@ -20,7 +19,7 @@ namespace osu.Game.Rulesets.Mania.Skinning.Legacy
         private readonly IBindable<ScrollingDirection> direction = new Bindable<ScrollingDirection>();
 
         private Container lightContainer = null!;
-        private Sprite light = null!;
+        private Drawable? light = null!;
 
         public LegacyColumnBackground()
         {
@@ -39,6 +38,8 @@ namespace osu.Game.Rulesets.Mania.Skinning.Legacy
             Color4 lightColour = GetColumnSkinConfig<Color4>(skin, LegacyManiaSkinConfigurationLookups.ColumnLightColour)?.Value
                                  ?? Color4.White;
 
+            int lightFramePerSecond = skin.GetManiaSkinConfig<int>(LegacyManiaSkinConfigurationLookups.LightFramePerSecond)?.Value ?? 60;
+
             InternalChildren = new[]
             {
                 lightContainer = new Container
@@ -46,16 +47,15 @@ namespace osu.Game.Rulesets.Mania.Skinning.Legacy
                     Origin = Anchor.BottomCentre,
                     RelativeSizeAxes = Axes.Both,
                     Padding = new MarginPadding { Bottom = lightPosition },
-                    Child = light = new Sprite
+                    Child = light = skin.GetAnimation(lightImage, true, true, frameLength: 1000d / lightFramePerSecond)?.With(l =>
                     {
-                        Anchor = Anchor.BottomCentre,
-                        Origin = Anchor.BottomCentre,
-                        Colour = LegacyColourCompatibility.DisallowZeroAlpha(lightColour),
-                        Texture = skin.GetTexture(lightImage),
-                        RelativeSizeAxes = Axes.X,
-                        Width = 1,
-                        Alpha = 0
-                    }
+                        l.Anchor = Anchor.BottomCentre;
+                        l.Origin = Anchor.BottomCentre;
+                        l.Colour = LegacyColourCompatibility.DisallowZeroAlpha(lightColour);
+                        l.RelativeSizeAxes = Axes.X;
+                        l.Width = 1;
+                        l.Alpha = 0;
+                    }) ?? Empty(),
                 }
             };
 
