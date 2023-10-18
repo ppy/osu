@@ -13,7 +13,7 @@ namespace osu.Game.IO
 
         public bool IsManaged => ID > 0;
 
-        public string Hash { get; set; }
+        public string Hash { get; set; } = string.Empty;
 
         public int ReferenceCount { get; set; }
     }

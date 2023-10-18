@@ -9,7 +9,7 @@ namespace osu.Game.Rulesets.Catch.Skinning.Legacy
 {
     public partial class LegacyBananaPiece : LegacyCatchHitObjectPiece
     {
-        private static readonly Vector2 banana_max_size = new Vector2(128);
+        private static readonly Vector2 banana_max_size = new Vector2(160);
 
         protected override void LoadComplete()
         {

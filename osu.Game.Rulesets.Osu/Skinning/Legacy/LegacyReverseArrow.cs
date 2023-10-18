@@ -39,7 +39,7 @@ namespace osu.Game.Rulesets.Osu.Skinning.Legacy
 
             var skin = skinSource.FindProvider(s => s.GetTexture(lookupName) != null);
 
-            InternalChild = arrow = (skin?.GetAnimation(lookupName, true, true, maxSize: OsuHitObject.OBJECT_DIMENSIONS) ?? Empty()).With(d =>
+            InternalChild = arrow = (skin?.GetAnimation(lookupName, true, true, maxSize: OsuHitObject.OBJECT_DIMENSIONS * 2) ?? Empty()).With(d =>
             {
                 d.Anchor = Anchor.Centre;
                 d.Origin = Anchor.Centre;

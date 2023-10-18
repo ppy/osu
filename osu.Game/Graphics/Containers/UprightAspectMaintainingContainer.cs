@@ -48,7 +48,7 @@ namespace osu.Game.Graphics.Containers
         private void keepUprightAndUnstretched()
         {
             // Decomposes the inverse of the parent DrawInfo.Matrix into rotation, shear and scale.
-            var parentMatrix = Parent.DrawInfo.Matrix;
+            var parentMatrix = Parent!.DrawInfo.Matrix;
 
             // Remove Translation.>
             parentMatrix.M31 = 0.0f;

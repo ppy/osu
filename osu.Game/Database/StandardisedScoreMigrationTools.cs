@@ -10,7 +10,6 @@ using osu.Game.Beatmaps;
 using osu.Game.Extensions;
 using osu.Game.IO.Legacy;
 using osu.Game.Rulesets;
-using osu.Game.Rulesets.Difficulty;
 using osu.Game.Rulesets.Judgements;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Objects;
@@ -225,28 +224,30 @@ namespace osu.Game.Database
             ILegacyScoreSimulator sv1Simulator = legacyRuleset.CreateLegacyScoreSimulator();
             LegacyScoreAttributes attributes = sv1Simulator.Simulate(beatmap, playableBeatmap);
 
-            return ConvertFromLegacyTotalScore(score, attributes);
+            return ConvertFromLegacyTotalScore(score, LegacyBeatmapConversionDifficultyInfo.FromBeatmap(beatmap.Beatmap), attributes);
         }
 
         /// <summary>
         /// Converts from <see cref="ScoreInfo.LegacyTotalScore"/> to the new standardised scoring of <see cref="ScoreProcessor"/>.
         /// </summary>
         /// <param name="score">The score to convert the total score of.</param>
-        /// <param name="attributes">Difficulty attributes providing the legacy scoring values
-        /// (<see cref="DifficultyAttributes.LegacyAccuracyScore"/>, <see cref="DifficultyAttributes.LegacyComboScore"/>, and <see cref="DifficultyAttributes.LegacyBonusScoreRatio"/>)
-        /// for the beatmap which the score was set on.</param>
+        /// <param name="difficulty">The beatmap difficulty.</param>
+        /// <param name="attributes">The legacy scoring attributes for the beatmap which the score was set on.</param>
         /// <returns>The standardised total score.</returns>
-        public static long ConvertFromLegacyTotalScore(ScoreInfo score, LegacyScoreAttributes attributes)
+        public static long ConvertFromLegacyTotalScore(ScoreInfo score, LegacyBeatmapConversionDifficultyInfo difficulty, LegacyScoreAttributes attributes)
         {
             if (!score.IsLegacyScore)
                 return score.TotalScore;
 
             Debug.Assert(score.LegacyTotalScore != null);
 
-            double modMultiplier = score.Mods.Select(m => m.ScoreMultiplier).Aggregate(1.0, (c, n) => c * n);
+            Ruleset ruleset = score.Ruleset.CreateInstance();
+            if (ruleset is not ILegacyRuleset legacyRuleset)
+                return score.TotalScore;
 
+            double legacyModMultiplier = legacyRuleset.CreateLegacyScoreSimulator().GetLegacyScoreMultiplier(score.Mods, difficulty);
             int maximumLegacyAccuracyScore = attributes.AccuracyScore;
-            long maximumLegacyComboScore = (long)Math.Round(attributes.ComboScore * modMultiplier);
+            long maximumLegacyComboScore = (long)Math.Round(attributes.ComboScore * legacyModMultiplier);
             double maximumLegacyBonusRatio = attributes.BonusScoreRatio;
 
             // The part of total score that doesn't include bonus.
@@ -257,6 +258,8 @@ namespace osu.Game.Database
 
             // The bonus proportion makes up the rest of the score that exceeds maximumLegacyBaseScore.
             double bonusProportion = Math.Max(0, ((long)score.LegacyTotalScore - maximumLegacyBaseScore) * maximumLegacyBonusRatio);
+
+            double modMultiplier = score.Mods.Select(m => m.ScoreMultiplier).Aggregate(1.0, (c, n) => c * n);
 
             switch (score.Ruleset.OnlineID)
             {
