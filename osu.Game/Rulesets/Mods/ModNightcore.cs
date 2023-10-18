@@ -45,6 +45,8 @@ namespace osu.Game.Rulesets.Mods
         {
             rateAdjustHelper = new RateAdjustModHelper(SpeedChange);
 
+            // intentionally not deferring the speed change handling to `RateAdjustModHelper`
+            // as the expected result of operation is not the same (nightcore should preserve constant pitch).
             SpeedChange.BindValueChanged(val =>
             {
                 freqAdjust.Value = SpeedChange.Default;
