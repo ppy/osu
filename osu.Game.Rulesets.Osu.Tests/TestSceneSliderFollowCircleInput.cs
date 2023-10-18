@@ -35,7 +35,7 @@ namespace osu.Game.Rulesets.Osu.Tests
         {
             const double time_slider_start = 1000;
 
-            float circleRadius = OsuHitObject.OBJECT_RADIUS * (1.0f - 0.7f * (circleSize - 5) / 5) / 2;
+            float circleRadius = OsuHitObject.OBJECT_RADIUS * IBeatmapDifficultyInfo.CalculateScaleFromCircleSize(circleSize);
             float followCircleRadius = circleRadius * 1.2f;
 
             performTest(new Beatmap<OsuHitObject>

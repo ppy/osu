@@ -145,7 +145,7 @@ namespace osu.Game.Rulesets.Catch.UI
             Size = new Vector2(BASE_SIZE);
 
             if (difficulty != null)
-                Scale = calculateScale(difficulty);
+                Scale = new Vector2(IBeatmapDifficultyInfo.CalculateScaleFromCircleSize(difficulty.CircleSize));
 
             CatchWidth = CalculateCatchWidth(Scale);
 
@@ -183,11 +183,6 @@ namespace osu.Game.Rulesets.Catch.UI
         public Drawable CreateProxiedContent() => caughtObjectContainer.CreateProxy();
 
         /// <summary>
-        /// Calculates the scale of the catcher based off the provided beatmap difficulty.
-        /// </summary>
-        private static Vector2 calculateScale(IBeatmapDifficultyInfo difficulty) => new Vector2(1.0f - 0.7f * (difficulty.CircleSize - 5) / 5);
-
-        /// <summary>
         /// Calculates the width of the area used for attempting catches in gameplay.
         /// </summary>
         /// <param name="scale">The scale of the catcher.</param>
@@ -197,7 +192,7 @@ namespace osu.Game.Rulesets.Catch.UI
         /// Calculates the width of the area used for attempting catches in gameplay.
         /// </summary>
         /// <param name="difficulty">The beatmap difficulty.</param>
-        public static float CalculateCatchWidth(IBeatmapDifficultyInfo difficulty) => CalculateCatchWidth(calculateScale(difficulty));
+        public static float CalculateCatchWidth(IBeatmapDifficultyInfo difficulty) => CalculateCatchWidth(new Vector2(IBeatmapDifficultyInfo.CalculateScaleFromCircleSize(difficulty.CircleSize)));
 
         /// <summary>
         /// Determine if this catcher can catch a <see cref="CatchHitObject"/> in the current position.
