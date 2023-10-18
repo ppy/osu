@@ -145,7 +145,7 @@ namespace osu.Game.Rulesets.Catch.UI
             Size = new Vector2(BASE_SIZE);
 
             if (difficulty != null)
-                Scale = new Vector2(IBeatmapDifficultyInfo.CalculateScaleFromCircleSize(difficulty.CircleSize));
+                Scale = calculateScale(difficulty);
 
             CatchWidth = CalculateCatchWidth(Scale);
 
@@ -192,7 +192,7 @@ namespace osu.Game.Rulesets.Catch.UI
         /// Calculates the width of the area used for attempting catches in gameplay.
         /// </summary>
         /// <param name="difficulty">The beatmap difficulty.</param>
-        public static float CalculateCatchWidth(IBeatmapDifficultyInfo difficulty) => CalculateCatchWidth(new Vector2(IBeatmapDifficultyInfo.CalculateScaleFromCircleSize(difficulty.CircleSize)));
+        public static float CalculateCatchWidth(IBeatmapDifficultyInfo difficulty) => CalculateCatchWidth(calculateScale(difficulty));
 
         /// <summary>
         /// Determine if this catcher can catch a <see cref="CatchHitObject"/> in the current position.
@@ -465,6 +465,11 @@ namespace osu.Game.Rulesets.Catch.UI
             d.LifetimeStart = Clock.CurrentTime;
             d.Expire();
         }
+
+        /// <summary>
+        /// Calculates the scale of the catcher based off the provided beatmap difficulty.
+        /// </summary>
+        private static Vector2 calculateScale(IBeatmapDifficultyInfo difficulty) => new Vector2(IBeatmapDifficultyInfo.CalculateScaleFromCircleSize(difficulty.CircleSize) * 2);
 
         private enum DroppedObjectAnimation
         {
