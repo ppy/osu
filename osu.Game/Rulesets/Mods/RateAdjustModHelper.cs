@@ -12,19 +12,39 @@ namespace osu.Game.Rulesets.Mods
     /// </summary>
     public class RateAdjustModHelper : IApplicableToTrack
     {
-        private readonly BindableNumber<double> speedChange;
+        public readonly IBindableNumber<double> SpeedChange;
 
         private IAdjustableAudioComponent? track;
 
         private BindableBool? adjustPitch;
 
         /// <summary>
+        /// The score multiplier for the current <see cref="SpeedChange"/>.
+        /// </summary>
+        public double ScoreMultiplier
+        {
+            get
+            {
+                // Round to the nearest multiple of 0.1.
+                double value = (int)(SpeedChange.Value * 10) / 10.0;
+
+                // Offset back to 0.
+                value -= 1;
+
+                if (SpeedChange.Value >= 1)
+                    value /= 5;
+
+                return 1 + value;
+            }
+        }
+
+        /// <summary>
         /// Construct a new <see cref="RateAdjustModHelper"/>.
         /// </summary>
         /// <param name="speedChange">The main speed adjust parameter which is exposed to the user.</param>
-        public RateAdjustModHelper(BindableNumber<double> speedChange)
+        public RateAdjustModHelper(IBindableNumber<double> speedChange)
         {
-            this.speedChange = speedChange;
+            SpeedChange = speedChange;
         }
 
         /// <summary>
@@ -39,8 +59,8 @@ namespace osu.Game.Rulesets.Mods
             // When switching between pitch adjust, we need to update adjustments to time-shift or frequency-scale.
             adjustPitch.BindValueChanged(adjustPitchSetting =>
             {
-                track?.RemoveAdjustment(adjustmentForPitchSetting(adjustPitchSetting.OldValue), speedChange);
-                track?.AddAdjustment(adjustmentForPitchSetting(adjustPitchSetting.NewValue), speedChange);
+                track?.RemoveAdjustment(adjustmentForPitchSetting(adjustPitchSetting.OldValue), SpeedChange);
+                track?.AddAdjustment(adjustmentForPitchSetting(adjustPitchSetting.NewValue), SpeedChange);
 
                 AdjustableProperty adjustmentForPitchSetting(bool adjustPitchSettingValue)
                     => adjustPitchSettingValue ? AdjustableProperty.Frequency : AdjustableProperty.Tempo;
@@ -59,26 +79,6 @@ namespace osu.Game.Rulesets.Mods
 
             this.track = track;
             adjustPitch.TriggerChange();
-        }
-
-        /// <summary>
-        /// The score multiplier for the current <see cref="speedChange"/>.
-        /// </summary>
-        public double ScoreMultiplier
-        {
-            get
-            {
-                // Round to the nearest multiple of 0.1.
-                double value = (int)(speedChange.Value * 10) / 10.0;
-
-                // Offset back to 0.
-                value -= 1;
-
-                if (speedChange.Value >= 1)
-                    value /= 5;
-
-                return 1 + value;
-            }
         }
     }
 }
