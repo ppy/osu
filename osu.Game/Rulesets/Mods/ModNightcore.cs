@@ -36,27 +36,6 @@ namespace osu.Game.Rulesets.Mods
             Precision = 0.01,
         };
 
-        public override double ScoreMultiplier
-        {
-            get
-            {
-                // Round to the nearest multiple of 0.1.
-                double value = (int)(SpeedChange.Value * 10) / 10.0;
-
-                // Offset back to 0.
-                value -= 1;
-
-                // Each 0.1 multiple changes score multiplier by 0.02.
-                value /= 5;
-
-                return 1 + value;
-            }
-        }
-    }
-
-    public abstract partial class ModNightcore<TObject> : ModNightcore, IApplicableToDrawableRuleset<TObject>
-        where TObject : HitObject
-    {
         private readonly BindableNumber<double> tempoAdjust = new BindableDouble(1);
         private readonly BindableNumber<double> freqAdjust = new BindableDouble(1);
 
@@ -71,11 +50,28 @@ namespace osu.Game.Rulesets.Mods
 
         public override void ApplyToTrack(IAdjustableAudioComponent track)
         {
-            // base.ApplyToTrack() intentionally not called (different tempo adjustment is applied)
             track.AddAdjustment(AdjustableProperty.Frequency, freqAdjust);
             track.AddAdjustment(AdjustableProperty.Tempo, tempoAdjust);
         }
 
+        public override double ScoreMultiplier
+        {
+            get
+            {
+                // Round to the nearest multiple of 0.1.
+                double value = (int)(SpeedChange.Value * 10) / 10.0;
+
+                // Offset back to 0.
+                value -= 1;
+
+                return 1 + value;
+            }
+        }
+    }
+
+    public abstract partial class ModNightcore<TObject> : ModNightcore, IApplicableToDrawableRuleset<TObject>
+        where TObject : HitObject
+    {
         public void ApplyToDrawableRuleset(DrawableRuleset<TObject> drawableRuleset)
         {
             drawableRuleset.Overlays.Add(new NightcoreBeatContainer());

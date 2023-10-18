@@ -27,29 +27,19 @@ namespace osu.Game.Rulesets.Mods
             Precision = 0.01,
         };
 
-        private IAdjustableAudioComponent? track;
-
         [SettingSource("Adjust pitch", "Should pitch be adjusted with speed")]
-        public virtual BindableBool AdjustPitch { get; } = new BindableBool(false);
+        public virtual BindableBool AdjustPitch { get; } = new BindableBool();
+
+        private readonly RateAdjustModHelper rateAdjustHelper;
 
         protected ModDoubleTime()
         {
-            AdjustPitch.BindValueChanged(adjustPitchChanged);
+            rateAdjustHelper = new RateAdjustModHelper(SpeedChange, AdjustPitch);
         }
-
-        private void adjustPitchChanged(ValueChangedEvent<bool> adjustPitchSetting)
-        {
-            track?.RemoveAdjustment(adjustmentForPitchSetting(adjustPitchSetting.OldValue), SpeedChange);
-            track?.AddAdjustment(adjustmentForPitchSetting(adjustPitchSetting.NewValue), SpeedChange);
-        }
-
-        private AdjustableProperty adjustmentForPitchSetting(bool adjustPitchSettingValue)
-            => adjustPitchSettingValue ? AdjustableProperty.Frequency : AdjustableProperty.Tempo;
 
         public override void ApplyToTrack(IAdjustableAudioComponent track)
         {
-            this.track = track;
-            AdjustPitch.TriggerChange();
+            rateAdjustHelper.ApplyToTrack(track);
         }
 
         public override double ScoreMultiplier
