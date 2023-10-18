@@ -248,7 +248,7 @@ namespace osu.Game.Overlays
         {
             base.UpdateAfterChildren();
 
-            playlistContainer.Height = MathF.Min(Parent.DrawHeight - margin * 3 - player_height, PlaylistOverlay.PLAYLIST_HEIGHT);
+            playlistContainer.Height = MathF.Min(Parent!.DrawHeight - margin * 3 - player_height, PlaylistOverlay.PLAYLIST_HEIGHT);
 
             float height = player_height;
 

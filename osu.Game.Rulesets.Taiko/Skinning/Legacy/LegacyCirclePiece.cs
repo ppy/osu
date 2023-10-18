@@ -23,6 +23,7 @@ namespace osu.Game.Rulesets.Taiko.Skinning.Legacy
     public partial class LegacyCirclePiece : CompositeDrawable, IHasAccentColour
     {
         private static readonly Vector2 circle_piece_size = new Vector2(128);
+        private static readonly Vector2 max_circle_sprite_size = new Vector2(160);
 
         private Drawable backgroundLayer = null!;
         private Drawable? foregroundLayer;
@@ -54,9 +55,9 @@ namespace osu.Game.Rulesets.Taiko.Skinning.Legacy
 
                 string prefix = ((drawableHitObject.HitObject as TaikoStrongableHitObject)?.IsStrong ?? false) ? big_hit : normal_hit;
 
-                return skin.GetAnimation($"{prefix}{lookup}", true, false, maxSize: circle_piece_size) ??
+                return skin.GetAnimation($"{prefix}{lookup}", true, false, maxSize: max_circle_sprite_size) ??
                        // fallback to regular size if "big" version doesn't exist.
-                       skin.GetAnimation($"{normal_hit}{lookup}", true, false, maxSize: circle_piece_size);
+                       skin.GetAnimation($"{normal_hit}{lookup}", true, false, maxSize: max_circle_sprite_size);
             }
 
             // backgroundLayer is guaranteed to exist due to the pre-check in TaikoLegacySkinTransformer.

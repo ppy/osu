@@ -13,7 +13,7 @@ namespace osu.Game.Rulesets.Taiko.Edit
 {
     public partial class DrawableTaikoEditorRuleset : DrawableTaikoRuleset, ISupportConstantAlgorithmToggle
     {
-        public BindableBool ShowSpeedChanges { get; set; } = new BindableBool();
+        public BindableBool ShowSpeedChanges { get; } = new BindableBool();
 
         public DrawableTaikoEditorRuleset(Ruleset ruleset, IBeatmap beatmap, IReadOnlyList<Mod> mods)
             : base(ruleset, beatmap, mods)

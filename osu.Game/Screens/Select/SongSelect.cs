@@ -138,7 +138,7 @@ namespace osu.Game.Screens.Select
         [Resolved]
         internal IOverlayManager? OverlayManager { get; private set; }
 
-        private Bindable<bool> configBackgroundBlur { get; set; } = new BindableBool();
+        private Bindable<bool> configBackgroundBlur = null!;
 
         [BackgroundDependencyLoader(true)]
         private void load(AudioManager audio, OsuColour colours, ManageCollectionsDialog? manageCollectionsDialog, DifficultyRecommender? recommender, OsuConfigManager config)
@@ -647,7 +647,7 @@ namespace osu.Game.Screens.Select
 
             beginLooping();
 
-            if (Beatmap != null && !Beatmap.Value.BeatmapSetInfo.DeletePending)
+            if (!Beatmap.Value.BeatmapSetInfo.DeletePending)
             {
                 updateCarouselSelection();
 

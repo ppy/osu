@@ -29,7 +29,7 @@ namespace osu.Game.Online.API.Requests.Responses
         public DateTimeOffset JoinDate;
 
         [JsonProperty(@"username")]
-        public string Username { get; set; }
+        public string Username { get; set; } = string.Empty;
 
         [JsonProperty(@"previous_usernames")]
         public string[] PreviousUsernames;

@@ -184,6 +184,7 @@ namespace osu.Game.Configuration
             SetDefault(OsuSetting.EditorShowHitMarkers, true);
             SetDefault(OsuSetting.EditorAutoSeekOnPlacement, true);
             SetDefault(OsuSetting.EditorLimitedDistanceSnap, false);
+            SetDefault(OsuSetting.EditorShowSpeedChanges, false);
 
             SetDefault(OsuSetting.LastProcessedMetadataId, -1);
 
@@ -407,5 +408,6 @@ namespace osu.Game.Configuration
         EditorLimitedDistanceSnap,
         ReplaySettingsOverlay,
         AutomaticallyDownloadMissingBeatmaps,
+        EditorShowSpeedChanges
     }
 }
