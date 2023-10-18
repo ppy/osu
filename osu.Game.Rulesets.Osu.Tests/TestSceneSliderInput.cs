@@ -52,7 +52,7 @@ namespace osu.Game.Rulesets.Osu.Tests
         [TestCase(80, 0)]
         [TestCase(80, 10)]
         [TestCase(90, 1)]
-        [Retry(100)] // headless test doesn't run at high enough precision for this to always enter a tracking state in time.
+        [Ignore("headless test doesn't run at high enough precision for this to always enter a tracking state in time.")]
         public void TestVeryShortSlider(float sliderLength, int repeatCount)
         {
             Slider slider;
@@ -93,7 +93,7 @@ namespace osu.Game.Rulesets.Osu.Tests
         [TestCase(10, true)]
         [TestCase(0, true)]
         [TestCase(-30, false)]
-        [Retry(100)] // headless test doesn't run at high enough precision for this to always enter a tracking state in time.
+        [Ignore("headless test doesn't run at high enough precision for this to always enter a tracking state in time.")]
         public void TestTailLeniency(float finalPosition, bool hit)
         {
             Slider slider;
