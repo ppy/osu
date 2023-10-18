@@ -34,7 +34,8 @@ namespace osu.Game.Rulesets.Mods
 
         protected ModDoubleTime()
         {
-            rateAdjustHelper = new RateAdjustModHelper(SpeedChange, AdjustPitch);
+            rateAdjustHelper = new RateAdjustModHelper(SpeedChange);
+            rateAdjustHelper.HandleAudioAdjustments(AdjustPitch);
         }
 
         public override void ApplyToTrack(IAdjustableAudioComponent track)
