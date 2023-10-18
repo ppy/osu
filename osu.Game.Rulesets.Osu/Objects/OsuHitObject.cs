@@ -155,7 +155,17 @@ namespace osu.Game.Rulesets.Osu.Objects
             // This adjustment is necessary for AR>10, otherwise TimePreempt can become smaller leading to hitcircles not fully fading in.
             TimeFadeIn = 400 * Math.Min(1, TimePreempt / PREEMPT_MIN);
 
-            Scale = (1.0f - 0.7f * (difficulty.CircleSize - 5) / 5) / 2;
+            // The following comment is copied verbatim from osu-stable:
+            //
+            //   Builds of osu! up to 2013-05-04 had the gamefield being rounded down, which caused incorrect radius calculations
+            //   in widescreen cases. This ratio adjusts to allow for old replays to work post-fix, which in turn increases the lenience
+            //   for all plays, but by an amount so small it should only be effective in replays.
+            //
+            // To match expectations of gameplay we need to apply this multiplier to circle scale. It's weird but is what it is.
+            // It works out to under 1 game pixel and is generally not meaningful to gameplay, but is to replay playback accuracy.
+            const float broken_gamefield_rounding_allowance = 1.00041f;
+
+            Scale = (1.0f - 0.7f * (difficulty.CircleSize - 5) / 5) / 2 * broken_gamefield_rounding_allowance;
         }
 
         protected override HitWindows CreateHitWindows() => new OsuHitWindows();
