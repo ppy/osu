@@ -25,6 +25,7 @@ using osu.Game.Rulesets.Edit;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Replays.Types;
 using osu.Game.Rulesets.Scoring;
+using osu.Game.Rulesets.Scoring.Legacy;
 using osu.Game.Rulesets.UI;
 using osu.Game.Scoring;
 using osu.Game.Screens.Ranking.Statistics;
@@ -53,7 +54,7 @@ namespace osu.Game.Rulesets.Catch
             new KeyBinding(InputKey.X, CatchAction.MoveRight),
             new KeyBinding(InputKey.Right, CatchAction.MoveRight),
             new KeyBinding(InputKey.Shift, CatchAction.Dash),
-            new KeyBinding(InputKey.Shift, CatchAction.Dash),
+            new KeyBinding(InputKey.MouseLeft, CatchAction.Dash),
         };
 
         public override IEnumerable<Mod> ConvertFromLegacyMods(LegacyMods mods)

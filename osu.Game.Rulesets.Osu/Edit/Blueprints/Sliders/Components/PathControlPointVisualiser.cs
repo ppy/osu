@@ -288,10 +288,10 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders.Components
             if (selectedControlPoints.Contains(hitObject.Path.ControlPoints[0]))
             {
                 // Special handling for selections containing head control point - the position of the hit object changes which means the snapped position and time have to be taken into account
-                Vector2 newHeadPosition = Parent.ToScreenSpace(e.MousePosition + (dragStartPositions[0] - dragStartPositions[draggedControlPointIndex]));
+                Vector2 newHeadPosition = Parent!.ToScreenSpace(e.MousePosition + (dragStartPositions[0] - dragStartPositions[draggedControlPointIndex]));
                 var result = snapProvider?.FindSnappedPositionAndTime(newHeadPosition);
 
-                Vector2 movementDelta = Parent.ToLocalSpace(result?.ScreenSpacePosition ?? newHeadPosition) - hitObject.Position;
+                Vector2 movementDelta = Parent!.ToLocalSpace(result?.ScreenSpacePosition ?? newHeadPosition) - hitObject.Position;
 
                 hitObject.Position += movementDelta;
                 hitObject.StartTime = result?.Time ?? hitObject.StartTime;
@@ -309,9 +309,9 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders.Components
             }
             else
             {
-                var result = snapProvider?.FindSnappedPositionAndTime(Parent.ToScreenSpace(e.MousePosition), SnapType.GlobalGrids);
+                var result = snapProvider?.FindSnappedPositionAndTime(Parent!.ToScreenSpace(e.MousePosition), SnapType.GlobalGrids);
 
-                Vector2 movementDelta = Parent.ToLocalSpace(result?.ScreenSpacePosition ?? Parent.ToScreenSpace(e.MousePosition)) - dragStartPositions[draggedControlPointIndex] - hitObject.Position;
+                Vector2 movementDelta = Parent!.ToLocalSpace(result?.ScreenSpacePosition ?? Parent!.ToScreenSpace(e.MousePosition)) - dragStartPositions[draggedControlPointIndex] - hitObject.Position;
 
                 for (int i = 0; i < controlPoints.Count; ++i)
                 {

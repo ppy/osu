@@ -26,6 +26,7 @@ using osu.Game.Overlays.Notifications;
 using osu.Game.Rulesets;
 using osu.Game.Skinning;
 using osu.Game.Utils;
+using Realms;
 
 namespace osu.Game.Beatmaps
 {
@@ -284,7 +285,7 @@ namespace osu.Game.Beatmaps
         /// </summary>
         /// <param name="query">The query.</param>
         /// <returns>The first result for the provided query, or null if no results were found.</returns>
-        public BeatmapInfo? QueryBeatmap(Expression<Func<BeatmapInfo, bool>> query) => Realm.Run(r => r.All<BeatmapInfo>().FirstOrDefault(query)?.Detach());
+        public BeatmapInfo? QueryBeatmap(Expression<Func<BeatmapInfo, bool>> query) => Realm.Run(r => r.All<BeatmapInfo>().Filter($"{nameof(BeatmapInfo.BeatmapSet)}.{nameof(BeatmapSetInfo.DeletePending)} == false").FirstOrDefault(query)?.Detach());
 
         /// <summary>
         /// A default representation of a WorkingBeatmap to use when no beatmap is available.

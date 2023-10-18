@@ -7,6 +7,7 @@ using osu.Framework.Graphics.Sprites;
 using osu.Framework.Localisation;
 using osu.Game.Configuration;
 using osu.Game.Graphics;
+using osu.Game.Overlays.Settings;
 
 namespace osu.Game.Rulesets.Mods
 {
@@ -18,7 +19,7 @@ namespace osu.Game.Rulesets.Mods
         public override ModType Type => ModType.DifficultyIncrease;
         public override LocalisableString Description => "Zoooooooooom...";
 
-        [SettingSource("Speed increase", "The actual increase to apply")]
+        [SettingSource("Speed increase", "The actual increase to apply", SettingControlType = typeof(MultiplierSettingsSlider))]
         public override BindableNumber<double> SpeedChange { get; } = new BindableDouble(1.5)
         {
             MinValue = 1.01,

@@ -46,6 +46,7 @@ using osu.Game.IO;
 using osu.Game.Localisation;
 using osu.Game.Online;
 using osu.Game.Online.Chat;
+using osu.Game.Online.Rooms;
 using osu.Game.Overlays;
 using osu.Game.Overlays.BeatmapListing;
 using osu.Game.Overlays.Music;
@@ -58,6 +59,7 @@ using osu.Game.Rulesets.Mods;
 using osu.Game.Scoring;
 using osu.Game.Screens;
 using osu.Game.Screens.Menu;
+using osu.Game.Screens.OnlinePlay.Multiplayer;
 using osu.Game.Screens.Play;
 using osu.Game.Screens.Ranking;
 using osu.Game.Screens.Select;
@@ -644,6 +646,24 @@ namespace osu.Game
         }
 
         /// <summary>
+        /// Join a multiplayer match immediately.
+        /// </summary>
+        /// <param name="room">The room to join.</param>
+        /// <param name="password">The password to join the room, if any is given.</param>
+        public void PresentMultiplayerMatch(Room room, string password)
+        {
+            PerformFromScreen(screen =>
+            {
+                if (!(screen is Multiplayer multiplayer))
+                    screen.Push(multiplayer = new Multiplayer());
+
+                multiplayer.Join(room, password);
+            });
+            // TODO: We should really be able to use `validScreens: new[] { typeof(Multiplayer) }` here
+            // but `PerformFromScreen` doesn't understand nested stacks.
+        }
+
+        /// <summary>
         /// Present a score's replay immediately.
         /// The user should have already requested this interactively.
         /// </summary>
@@ -853,6 +873,7 @@ namespace osu.Game
             ScoreManager.PresentImport = items => PresentScore(items.First().Value);
 
             MultiplayerClient.PostNotification = n => Notifications.Post(n);
+            MultiplayerClient.PresentMatch = PresentMultiplayerMatch;
 
             // make config aware of how to lookup skins for on-screen display purposes.
             // if this becomes a more common thing, tracked settings should be reconsidered to allow local DI.

@@ -12,12 +12,6 @@ namespace osu.Game.Rulesets.Mania.Judgements
         {
             switch (result)
             {
-                case HitResult.LargeTickHit:
-                    return DEFAULT_MAX_HEALTH_INCREASE * 0.1;
-
-                case HitResult.LargeTickMiss:
-                    return -DEFAULT_MAX_HEALTH_INCREASE * 0.1;
-
                 case HitResult.Meh:
                     return -DEFAULT_MAX_HEALTH_INCREASE * 0.5;
 

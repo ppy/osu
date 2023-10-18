@@ -31,6 +31,8 @@ namespace osu.Game.Overlays
         public LocalisableString Title => NotificationsStrings.HeaderTitle;
         public LocalisableString Description => NotificationsStrings.HeaderDescription;
 
+        protected override double PopInOutSampleBalance => OsuGameBase.SFX_STEREO_STRENGTH;
+
         public const float WIDTH = 320;
 
         public const float TRANSITION_LENGTH = 600;
@@ -111,7 +113,8 @@ namespace osu.Game.Overlays
                                     RelativeSizeAxes = Axes.X,
                                     Children = new[]
                                     {
-                                        new NotificationSection(AccountsStrings.NotificationsTitle, new[] { typeof(SimpleNotification) }),
+                                        // The main section adds as a catch-all for notifications which don't group into other sections.
+                                        new NotificationSection(AccountsStrings.NotificationsTitle),
                                         new NotificationSection(NotificationsStrings.RunningTasks, new[] { typeof(ProgressNotification) }),
                                     }
                                 }
@@ -203,7 +206,8 @@ namespace osu.Game.Overlays
             var ourType = notification.GetType();
             int depth = notification.DisplayOnTop ? -runningDepth : runningDepth;
 
-            var section = sections.Children.First(s => s.AcceptedNotificationTypes.Any(accept => accept.IsAssignableFrom(ourType)));
+            var section = sections.Children.FirstOrDefault(s => s.AcceptedNotificationTypes?.Any(accept => accept.IsAssignableFrom(ourType)) == true)
+                          ?? sections.First();
 
             section.Add(notification, depth);
 

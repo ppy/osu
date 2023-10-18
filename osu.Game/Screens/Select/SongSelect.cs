@@ -138,7 +138,7 @@ namespace osu.Game.Screens.Select
         [Resolved]
         internal IOverlayManager? OverlayManager { get; private set; }
 
-        private Bindable<bool> configBackgroundBlur { get; set; } = new BindableBool();
+        private Bindable<bool> configBackgroundBlur = null!;
 
         [BackgroundDependencyLoader(true)]
         private void load(AudioManager audio, OsuColour colours, ManageCollectionsDialog? manageCollectionsDialog, DifficultyRecommender? recommender, OsuConfigManager config)
@@ -311,9 +311,9 @@ namespace osu.Game.Screens.Select
                     Footer.AddButton(button, overlay);
 
                 BeatmapOptions.AddButton(@"Manage", @"collections", FontAwesome.Solid.Book, colours.Green, () => manageCollectionsDialog?.Show());
-                BeatmapOptions.AddButton(@"Delete", @"all difficulties", FontAwesome.Solid.Trash, colours.Pink, () => delete(Beatmap.Value.BeatmapSetInfo));
+                BeatmapOptions.AddButton(@"Delete", @"all difficulties", FontAwesome.Solid.Trash, colours.Pink, () => DeleteBeatmap(Beatmap.Value.BeatmapSetInfo));
                 BeatmapOptions.AddButton(@"Remove", @"from unplayed", FontAwesome.Regular.TimesCircle, colours.Purple, null);
-                BeatmapOptions.AddButton(@"Clear", @"local scores", FontAwesome.Solid.Eraser, colours.Purple, () => clearScores(Beatmap.Value.BeatmapInfo));
+                BeatmapOptions.AddButton(@"Clear", @"local scores", FontAwesome.Solid.Eraser, colours.Purple, () => ClearScores(Beatmap.Value.BeatmapInfo));
             }
 
             sampleChangeDifficulty = audio.Samples.Get(@"SongSelect/select-difficulty");
@@ -388,6 +388,15 @@ namespace osu.Game.Screens.Select
 
             Beatmap.Value = beatmaps.GetWorkingBeatmap(beatmapInfo ?? beatmapInfoNoDebounce);
             this.Push(new EditorLoader());
+        }
+
+        /// <summary>
+        /// Set the query to the search text box.
+        /// </summary>
+        /// <param name="query">The string to search.</param>
+        public void Search(string query)
+        {
+            FilterControl.CurrentTextSearch.Value = query;
         }
 
         /// <summary>
@@ -516,7 +525,11 @@ namespace osu.Game.Screens.Select
             if (beatmapInfoNoDebounce == null)
                 run();
             else
-                selectionChangedDebounce = Scheduler.AddDelayed(run, 200);
+            {
+                // Intentionally slightly higher than repeat_tick_rate to avoid loading songs when holding left / right arrows.
+                // See https://github.com/ppy/osu-framework/blob/master/osu.Framework/Input/InputManager.cs#L44
+                selectionChangedDebounce = Scheduler.AddDelayed(run, 80);
+            }
 
             if (beatmap?.Equals(beatmapInfoPrevious) != true)
             {
@@ -634,7 +647,7 @@ namespace osu.Game.Screens.Select
 
             beginLooping();
 
-            if (Beatmap != null && !Beatmap.Value.BeatmapSetInfo.DeletePending)
+            if (!Beatmap.Value.BeatmapSetInfo.DeletePending)
             {
                 updateCarouselSelection();
 
@@ -783,6 +796,8 @@ namespace osu.Game.Screens.Select
 
             BeatmapDetails.Beatmap = beatmap;
 
+            ModSelect.Beatmap = beatmap;
+
             bool beatmapSelected = beatmap is not DummyWorkingBeatmap;
 
             if (beatmapSelected)
@@ -916,14 +931,20 @@ namespace osu.Game.Screens.Select
             return true;
         }
 
-        private void delete(BeatmapSetInfo? beatmap)
+        /// <summary>
+        /// Request to delete a specific beatmap.
+        /// </summary>
+        public void DeleteBeatmap(BeatmapSetInfo? beatmap)
         {
             if (beatmap == null) return;
 
             dialogOverlay?.Push(new BeatmapDeleteDialog(beatmap));
         }
 
-        private void clearScores(BeatmapInfo? beatmapInfo)
+        /// <summary>
+        /// Request to clear the scores of a specific beatmap.
+        /// </summary>
+        public void ClearScores(BeatmapInfo? beatmapInfo)
         {
             if (beatmapInfo == null) return;
 
@@ -963,7 +984,7 @@ namespace osu.Game.Screens.Select
                     if (e.ShiftPressed)
                     {
                         if (!Beatmap.IsDefault)
-                            delete(Beatmap.Value.BeatmapSetInfo);
+                            DeleteBeatmap(Beatmap.Value.BeatmapSetInfo);
                         return true;
                     }
 

@@ -4,6 +4,7 @@
 using System;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
+using osu.Framework.Extensions.EnumExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
@@ -307,6 +308,25 @@ namespace osu.Game.Screens.Edit.Compose.Components
             return button;
         }
 
+        /// <remarks>
+        /// This method should be called when a selection needs to be flipped
+        /// because of an ongoing scale handle drag that would otherwise cause width or height to go negative.
+        /// </remarks>
+        public void PerformFlipFromScaleHandles(Axes axes)
+        {
+            if (axes.HasFlagFast(Axes.X))
+            {
+                dragHandles.FlipScaleHandles(Direction.Horizontal);
+                OnFlip?.Invoke(Direction.Horizontal, false);
+            }
+
+            if (axes.HasFlagFast(Axes.Y))
+            {
+                dragHandles.FlipScaleHandles(Direction.Vertical);
+                OnFlip?.Invoke(Direction.Vertical, false);
+            }
+        }
+
         private void addScaleHandle(Anchor anchor)
         {
             var handle = new SelectionBoxScaleHandle
@@ -363,7 +383,7 @@ namespace osu.Game.Screens.Edit.Compose.Components
 
             // Shrink the parent quad to give a bit of padding so the buttons don't stick *right* on the border.
             // AABBFloat assumes no rotation. one would hope the whole editor is not being rotated.
-            var parentQuad = Parent.ScreenSpaceDrawQuad.AABBFloat.Shrink(ToLocalSpace(thisQuad.TopLeft + new Vector2(button_padding * 2)));
+            var parentQuad = Parent!.ScreenSpaceDrawQuad.AABBFloat.Shrink(ToLocalSpace(thisQuad.TopLeft + new Vector2(button_padding * 2)));
 
             float topExcess = thisQuad.TopLeft.Y - parentQuad.TopLeft.Y;
             float bottomExcess = parentQuad.BottomLeft.Y - thisQuad.BottomLeft.Y;
@@ -376,7 +396,7 @@ namespace osu.Game.Screens.Edit.Compose.Components
             {
                 buttons.Anchor = Anchor.BottomCentre;
                 buttons.Origin = Anchor.BottomCentre;
-                buttons.Y = Math.Min(0, ToLocalSpace(Parent.ScreenSpaceDrawQuad.BottomLeft).Y - DrawHeight);
+                buttons.Y = Math.Min(0, ToLocalSpace(Parent!.ScreenSpaceDrawQuad.BottomLeft).Y - DrawHeight);
             }
             else if (topExcess > bottomExcess)
             {

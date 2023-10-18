@@ -2,12 +2,15 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using osu.Framework.Graphics.Textures;
+using osu.Game.Skinning;
 using osuTK;
 
 namespace osu.Game.Rulesets.Catch.Skinning.Legacy
 {
     public partial class LegacyDropletPiece : LegacyCatchHitObjectPiece
     {
+        private static readonly Vector2 droplet_max_size = new Vector2(160);
+
         public LegacyDropletPiece()
         {
             Scale = new Vector2(0.8f);
@@ -17,8 +20,8 @@ namespace osu.Game.Rulesets.Catch.Skinning.Legacy
         {
             base.LoadComplete();
 
-            Texture? texture = Skin.GetTexture("fruit-drop");
-            Texture? overlayTexture = Skin.GetTexture("fruit-drop-overlay");
+            Texture? texture = Skin.GetTexture("fruit-drop")?.WithMaximumSize(droplet_max_size);
+            Texture? overlayTexture = Skin.GetTexture("fruit-drop-overlay")?.WithMaximumSize(droplet_max_size);
 
             SetTexture(texture, overlayTexture);
         }

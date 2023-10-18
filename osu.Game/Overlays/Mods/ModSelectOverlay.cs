@@ -17,6 +17,7 @@ using osu.Framework.Input.Bindings;
 using osu.Framework.Input.Events;
 using osu.Framework.Utils;
 using osu.Game.Audio;
+using osu.Game.Beatmaps;
 using osu.Game.Configuration;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
@@ -77,9 +78,9 @@ namespace osu.Game.Overlays.Mods
         public ShearedSearchTextBox SearchTextBox { get; private set; } = null!;
 
         /// <summary>
-        /// Whether the total score multiplier calculated from the current selected set of mods should be shown.
+        /// Whether the effects (on score multiplier, on or beatmap difficulty) of the current selected set of mods should be shown.
         /// </summary>
-        protected virtual bool ShowTotalMultiplier => true;
+        protected virtual bool ShowModEffects => true;
 
         /// <summary>
         /// Whether per-mod customisation controls are visible.
@@ -119,16 +120,33 @@ namespace osu.Game.Overlays.Mods
         private ColumnScrollContainer columnScroll = null!;
         private ColumnFlowContainer columnFlow = null!;
         private FillFlowContainer<ShearedButton> footerButtonFlow = null!;
+        private FillFlowContainer footerContentFlow = null!;
         private DeselectAllModsButton deselectAllModsButton = null!;
 
         private Container aboveColumnsContent = null!;
-        private DifficultyMultiplierDisplay? multiplierDisplay;
+        private ScoreMultiplierDisplay? multiplierDisplay;
+        private BeatmapAttributesDisplay? beatmapAttributesDisplay;
 
         protected ShearedButton BackButton { get; private set; } = null!;
         protected ShearedToggleButton? CustomisationButton { get; private set; }
         protected SelectAllModsButton? SelectAllModsButton { get; set; }
 
         private Sample? columnAppearSample;
+
+        private WorkingBeatmap? beatmap;
+
+        public WorkingBeatmap? Beatmap
+        {
+            get => beatmap;
+            set
+            {
+                if (beatmap == value) return;
+
+                beatmap = value;
+                if (IsLoaded && beatmapAttributesDisplay != null)
+                    beatmapAttributesDisplay.BeatmapInfo.Value = beatmap?.BeatmapInfo;
+            }
+        }
 
         protected ModSelectOverlay(OverlayColourScheme colourScheme = OverlayColourScheme.Green)
             : base(colourScheme)
@@ -164,7 +182,7 @@ namespace osu.Game.Overlays.Mods
                 aboveColumnsContent = new Container
                 {
                     RelativeSizeAxes = Axes.X,
-                    Height = ModsEffectDisplay.HEIGHT,
+                    Height = ScoreMultiplierDisplay.HEIGHT,
                     Padding = new MarginPadding { Horizontal = 100 },
                     Child = SearchTextBox = new ShearedSearchTextBox
                     {
@@ -179,7 +197,7 @@ namespace osu.Game.Overlays.Mods
                     {
                         Padding = new MarginPadding
                         {
-                            Top = ModsEffectDisplay.HEIGHT + PADDING,
+                            Top = ScoreMultiplierDisplay.HEIGHT + PADDING,
                             Bottom = PADDING
                         },
                         RelativeSizeAxes = Axes.Both,
@@ -210,16 +228,7 @@ namespace osu.Game.Overlays.Mods
                 }
             });
 
-            if (ShowTotalMultiplier)
-            {
-                aboveColumnsContent.Add(multiplierDisplay = new DifficultyMultiplierDisplay
-                {
-                    Anchor = Anchor.TopRight,
-                    Origin = Anchor.TopRight
-                });
-            }
-
-            FooterContent.Child = footerButtonFlow = new FillFlowContainer<ShearedButton>
+            FooterContent.Add(footerButtonFlow = new FillFlowContainer<ShearedButton>
             {
                 RelativeSizeAxes = Axes.X,
                 AutoSizeAxes = Axes.Y,
@@ -239,7 +248,38 @@ namespace osu.Game.Overlays.Mods
                     DarkerColour = colours.Pink2,
                     LighterColour = colours.Pink1
                 })
-            };
+            });
+
+            if (ShowModEffects)
+            {
+                FooterContent.Add(footerContentFlow = new FillFlowContainer
+                {
+                    AutoSizeAxes = Axes.Both,
+                    Direction = FillDirection.Vertical,
+                    Spacing = new Vector2(30, 10),
+                    Anchor = Anchor.BottomRight,
+                    Origin = Anchor.BottomRight,
+                    Margin = new MarginPadding
+                    {
+                        Vertical = PADDING,
+                        Horizontal = 20
+                    },
+                    Children = new Drawable[]
+                    {
+                        multiplierDisplay = new ScoreMultiplierDisplay
+                        {
+                            Anchor = Anchor.BottomRight,
+                            Origin = Anchor.BottomRight
+                        },
+                        beatmapAttributesDisplay = new BeatmapAttributesDisplay
+                        {
+                            Anchor = Anchor.BottomRight,
+                            Origin = Anchor.BottomRight,
+                            BeatmapInfo = { Value = beatmap?.BeatmapInfo }
+                        },
+                    }
+                });
+            }
 
             globalAvailableMods.BindTo(game.AvailableMods);
         }
@@ -309,6 +349,25 @@ namespace osu.Game.Overlays.Mods
             base.Update();
 
             SearchTextBox.PlaceholderText = SearchTextBox.HasFocus ? Resources.Localisation.Web.CommonStrings.InputSearch : ModSelectOverlayStrings.TabToSearch;
+
+            if (beatmapAttributesDisplay != null)
+            {
+                float rightEdgeOfLastButton = footerButtonFlow.Last().ScreenSpaceDrawQuad.TopRight.X;
+
+                // this is cheating a bit; the 640 value is hardcoded based on how wide the expanded panel _generally_ is.
+                // due to the transition applied, the raw screenspace quad of the panel cannot be used, as it will trigger an ugly feedback cycle of expanding and collapsing.
+                float projectedLeftEdgeOfExpandedBeatmapAttributesDisplay = footerButtonFlow.ToScreenSpace(footerButtonFlow.DrawSize - new Vector2(640, 0)).X;
+
+                bool screenIsntWideEnough = rightEdgeOfLastButton > projectedLeftEdgeOfExpandedBeatmapAttributesDisplay;
+
+                // only update preview panel's collapsed state after we are fully visible, to ensure all the buttons are where we expect them to be.
+                if (Alpha == 1)
+                    beatmapAttributesDisplay.Collapsed.Value = screenIsntWideEnough;
+
+                footerContentFlow.LayoutDuration = 200;
+                footerContentFlow.LayoutEasing = Easing.OutQuint;
+                footerContentFlow.Direction = screenIsntWideEnough ? FillDirection.Vertical : FillDirection.Horizontal;
+            }
         }
 
         /// <summary>
@@ -545,7 +604,7 @@ namespace osu.Game.Overlays.Mods
                     if (columnNumber > 5 && !column.Active.Value) return;
 
                     // use X position of the column on screen as a basis for panning the sample
-                    float balance = column.Parent.BoundingBox.Centre.X / RelativeToAbsoluteFactor.X;
+                    float balance = column.Parent!.BoundingBox.Centre.X / RelativeToAbsoluteFactor.X;
 
                     // dip frequency and ramp volume of sample over the first 5 displayed columns
                     float progress = Math.Min(1, columnNumber / 5f);
@@ -885,6 +944,9 @@ namespace osu.Game.Overlays.Mods
                     case ClickEvent:
                         OnClicked?.Invoke();
                         return true;
+
+                    case HoverEvent:
+                        return false;
 
                     case MouseEvent:
                         return true;

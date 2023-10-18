@@ -188,7 +188,7 @@ namespace osu.Game.Tests.Visual.Online
                 AddUntilStep("placeholder shown", () =>
                 {
                     var notFoundDrawable = overlay.ChildrenOfType<BeatmapListingOverlay.NotFoundDrawable>().SingleOrDefault();
-                    return notFoundDrawable != null && notFoundDrawable.IsPresent && notFoundDrawable.Parent.DrawHeight > 0;
+                    return notFoundDrawable != null && notFoundDrawable.IsPresent && notFoundDrawable.Parent!.DrawHeight > 0;
                 });
         }
 
