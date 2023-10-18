@@ -2,6 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
+using System.Diagnostics;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Extensions.ObjectExtensions;
@@ -22,11 +23,10 @@ namespace osu.Game.Rulesets.Osu.Skinning.Default
 
         private readonly DrawableSpinner drawableSpinner;
 
-        private Vector2 mousePosition;
+        private Vector2? mousePosition;
+        private float? lastAngle;
 
-        private float lastAngle;
         private float currentRotation;
-
         private bool rotationTransferred;
 
         [Resolved(canBeNull: true)]
@@ -56,24 +56,30 @@ namespace osu.Game.Rulesets.Osu.Skinning.Default
 
         protected override bool OnMouseMove(MouseMoveEvent e)
         {
-            mousePosition = Parent.ToLocalSpace(e.ScreenSpaceMousePosition);
+            mousePosition = Parent!.ToLocalSpace(e.ScreenSpaceMousePosition);
             return base.OnMouseMove(e);
         }
 
         protected override void Update()
         {
             base.Update();
-            float thisAngle = -MathUtils.RadiansToDegrees(MathF.Atan2(mousePosition.X - DrawSize.X / 2, mousePosition.Y - DrawSize.Y / 2));
 
-            float delta = thisAngle - lastAngle;
+            if (mousePosition is Vector2 pos)
+            {
+                float thisAngle = -MathUtils.RadiansToDegrees(MathF.Atan2(pos.X - DrawSize.X / 2, pos.Y - DrawSize.Y / 2));
+                float delta = lastAngle == null ? 0 : thisAngle - lastAngle.Value;
 
-            if (Tracking)
-                AddRotation(delta);
+                // Normalise the delta to -180 .. 180
+                if (delta > 180) delta -= 360;
+                if (delta < -180) delta += 360;
 
-            lastAngle = thisAngle;
+                if (Tracking)
+                    AddRotation(delta);
+
+                lastAngle = thisAngle;
+            }
 
             IsSpinning.Value = isSpinnableTime && Math.Abs(currentRotation - Rotation) > 10f;
-
             Rotation = (float)Interpolation.Damp(Rotation, currentRotation, 0.99, Math.Abs(Time.Elapsed));
         }
 
@@ -83,41 +89,37 @@ namespace osu.Game.Rulesets.Osu.Skinning.Default
         /// <remarks>
         /// Will be a no-op if not a valid time to spin.
         /// </remarks>
-        /// <param name="angle">The delta angle.</param>
-        public void AddRotation(float angle)
+        /// <param name="delta">The delta angle.</param>
+        public void AddRotation(float delta)
         {
             if (!isSpinnableTime)
                 return;
 
             if (!rotationTransferred)
             {
-                currentRotation = Rotation * 2;
+                currentRotation = Rotation;
                 rotationTransferred = true;
             }
 
-            if (angle > 180)
-            {
-                lastAngle += 360;
-                angle -= 360;
-            }
-            else if (-angle > 180)
-            {
-                lastAngle -= 360;
-                angle += 360;
-            }
+            currentRotation += delta;
 
-            currentRotation += angle;
+            double rate = gameplayClock?.GetTrueGameplayRate() ?? Clock.Rate;
+
+            Debug.Assert(Math.Abs(delta) <= 180);
+
             // rate has to be applied each frame, because it's not guaranteed to be constant throughout playback
             // (see: ModTimeRamp)
-            drawableSpinner.Result.RateAdjustedRotation += (float)(Math.Abs(angle) * (gameplayClock?.GetTrueGameplayRate() ?? Clock.Rate));
+            drawableSpinner.Result.TotalRotation += (float)(Math.Abs(delta) * rate);
         }
 
         private void resetState(DrawableHitObject obj)
         {
             Tracking = false;
             IsSpinning.Value = false;
-            mousePosition = default;
-            lastAngle = currentRotation = Rotation = 0;
+            mousePosition = null;
+            lastAngle = null;
+            currentRotation = 0;
+            Rotation = 0;
             rotationTransferred = false;
         }
 

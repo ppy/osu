@@ -28,6 +28,9 @@ namespace osu.Game.Rulesets.Mods
         public abstract string Acronym { get; }
 
         [JsonIgnore]
+        public virtual string ExtendedIconInformation => string.Empty;
+
+        [JsonIgnore]
         public virtual IconUsage? Icon => null;
 
         [JsonIgnore]

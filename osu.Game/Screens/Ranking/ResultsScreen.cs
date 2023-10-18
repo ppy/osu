@@ -156,7 +156,7 @@ namespace osu.Game.Screens.Ranking
             if (Score != null)
             {
                 // only show flair / animation when arriving after watching a play that isn't autoplay.
-                bool shouldFlair = player != null && Score.Mods.All(m => m.UserPlayable);
+                bool shouldFlair = player != null && !Score.User.IsBot;
 
                 ScorePanelList.AddScore(Score, shouldFlair);
             }
@@ -329,7 +329,7 @@ namespace osu.Game.Screens.Ranking
                 ScorePanelList.Attach(detachedPanel);
 
                 // Move into its original location in the attached container first, then to the final location.
-                float origLocation = detachedPanel.Parent.ToLocalSpace(screenSpacePos).X;
+                float origLocation = detachedPanel.Parent!.ToLocalSpace(screenSpacePos).X;
                 detachedPanel.MoveToX(origLocation)
                              .Then()
                              .MoveToX(0, 250, Easing.OutElasticQuarter);

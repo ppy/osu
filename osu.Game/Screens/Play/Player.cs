@@ -257,7 +257,7 @@ namespace osu.Game.Screens.Play
 
             rulesetSkinProvider.AddRange(new Drawable[]
             {
-                failAnimationLayer = new FailAnimation(DrawableRuleset)
+                failAnimationContainer = new FailAnimationContainer(DrawableRuleset)
                 {
                     OnComplete = onFailComplete,
                     Children = new[]
@@ -279,8 +279,10 @@ namespace osu.Game.Screens.Play
                     {
                         if (!this.IsCurrentScreen()) return;
 
-                        fadeOut(true);
-                        PerformExit(false);
+                        if (PerformExit(false))
+                            // The hotkey overlay dims the screen.
+                            // If the operation succeeds, we want to make sure we stay dimmed to keep continuity.
+                            fadeOut(true);
                     },
                 },
             });
@@ -298,8 +300,10 @@ namespace osu.Game.Screens.Play
                         {
                             if (!this.IsCurrentScreen()) return;
 
-                            fadeOut(true);
-                            Restart(true);
+                            if (Restart(true))
+                                // The hotkey overlay dims the screen.
+                                // If the operation succeeds, we want to make sure we stay dimmed to keep continuity.
+                                fadeOut(true);
                         },
                     },
                 });
@@ -310,7 +314,7 @@ namespace osu.Game.Screens.Play
             // add the overlay components as a separate step as they proxy some elements from the above underlay/gameplay components.
             // also give the overlays the ruleset skin provider to allow rulesets to potentially override HUD elements (used to disable combo counters etc.)
             // we may want to limit this in the future to disallow rulesets from outright replacing elements the user expects to be there.
-            failAnimationLayer.Add(createOverlayComponents(Beatmap.Value));
+            failAnimationContainer.Add(createOverlayComponents(Beatmap.Value));
 
             if (!DrawableRuleset.AllowGameplayOverlays)
             {
@@ -565,20 +569,9 @@ namespace osu.Game.Screens.Play
         /// Whether the pause or fail dialog should be shown before performing an exit.
         /// If <see langword="true"/> and a dialog is not yet displayed, the exit will be blocked and the relevant dialog will display instead.
         /// </param>
-        protected void PerformExit(bool showDialogFirst)
+        /// <returns>Whether this call resulted in a final exit.</returns>
+        protected bool PerformExit(bool showDialogFirst)
         {
-            // there is a chance that an exit request occurs after the transition to results has already started.
-            // even in such a case, the user has shown intent, so forcefully return to this screen (to proceed with the upwards exit process).
-            if (!this.IsCurrentScreen())
-            {
-                ValidForResume = false;
-
-                // in the potential case that this instance has already been exited, this is required to avoid a crash.
-                if (this.GetChildScreen() != null)
-                    this.MakeCurrent();
-                return;
-            }
-
             bool pauseOrFailDialogVisible =
                 PauseOverlay.State.Value == Visibility.Visible || FailOverlay.State.Value == Visibility.Visible;
 
@@ -587,8 +580,8 @@ namespace osu.Game.Screens.Play
                 // if the fail animation is currently in progress, accelerate it (it will show the pause dialog on completion).
                 if (ValidForResume && GameplayState.HasFailed)
                 {
-                    failAnimationLayer.FinishTransforms(true);
-                    return;
+                    failAnimationContainer.FinishTransforms(true);
+                    return false;
                 }
 
                 // even if this call has requested a dialog, there is a chance the current player mode doesn't support pausing.
@@ -597,21 +590,32 @@ namespace osu.Game.Screens.Play
                     // in the case a dialog needs to be shown, attempt to pause and show it.
                     // this may fail (see internal checks in Pause()) but the fail cases are temporary, so don't fall through to Exit().
                     Pause();
-                    return;
+                    return false;
                 }
             }
 
-            // if an exit has been requested, cancel any pending completion (the user has shown intention to exit).
-            resultsDisplayDelegate?.Cancel();
+            // Matching osu!stable behaviour, if the results screen is pending and the user requests an exit,
+            // show the results instead.
+            if (GameplayState.HasPassed && !isRestarting)
+            {
+                progressToResults(false);
+                return false;
+            }
 
             // import current score if possible.
             prepareAndImportScoreAsync();
 
-            // The actual exit is performed if
-            // - the pause / fail dialog was not requested
-            // - the pause / fail dialog was requested but is already displayed (user showing intention to exit).
-            // - the pause / fail dialog was requested but couldn't be displayed due to the type or state of this Player instance.
-            this.Exit();
+            // Screen may not be current if a restart has been performed.
+            if (this.IsCurrentScreen())
+            {
+                // The actual exit is performed if
+                // - the pause / fail dialog was not requested
+                // - the pause / fail dialog was requested but is already displayed (user showing intention to exit).
+                // - the pause / fail dialog was requested but couldn't be displayed due to the type or state of this Player instance.
+                this.Exit();
+            }
+
+            return true;
         }
 
         private void performUserRequestedSkip()
@@ -660,10 +664,11 @@ namespace osu.Game.Screens.Play
         /// <remarks>This can be called from a child screen in order to trigger the restart process.</remarks>
         /// </summary>
         /// <param name="quickRestart">Whether a quick restart was requested (skipping intro etc.).</param>
-        public void Restart(bool quickRestart = false)
+        /// <returns>Whether this call resulted in a restart.</returns>
+        public bool Restart(bool quickRestart = false)
         {
             if (!Configuration.AllowRestart)
-                return;
+                return false;
 
             isRestarting = true;
 
@@ -673,7 +678,7 @@ namespace osu.Game.Screens.Play
 
             RestartRequested?.Invoke(quickRestart);
 
-            PerformExit(false);
+            return PerformExit(false);
         }
 
         /// <summary>
@@ -729,9 +734,6 @@ namespace osu.Game.Screens.Play
             // is no chance that a user could return to the (already completed) Player instance from a child screen.
             ValidForResume = false;
 
-            if (!Configuration.ShowResults)
-                return;
-
             bool storyboardStillRunning = DimmableStoryboard.ContentDisplayed && !DimmableStoryboard.HasStoryboardEnded.Value;
 
             // If the current beatmap has a storyboard, this method will be called again on storyboard completion.
@@ -754,10 +756,16 @@ namespace osu.Game.Screens.Play
         /// <param name="withDelay">Whether a minimum delay (<see cref="RESULTS_DISPLAY_DELAY"/>) should be added before the screen is displayed.</param>
         private void progressToResults(bool withDelay)
         {
-            resultsDisplayDelegate?.Cancel();
+            if (!Configuration.ShowResults)
+                return;
+
+            // Setting this early in the process means that even if something were to go wrong in the order of events following, there
+            // is no chance that a user could return to the (already completed) Player instance from a child screen.
+            ValidForResume = false;
 
             double delay = withDelay ? RESULTS_DISPLAY_DELAY : 0;
 
+            resultsDisplayDelegate?.Cancel();
             resultsDisplayDelegate = new ScheduledDelegate(() =>
             {
                 if (prepareScoreForDisplayTask == null)
@@ -888,7 +896,7 @@ namespace osu.Game.Screens.Play
 
         protected FailOverlay FailOverlay { get; private set; }
 
-        private FailAnimation failAnimationLayer;
+        private FailAnimationContainer failAnimationContainer;
 
         private bool onFail()
         {
@@ -913,7 +921,7 @@ namespace osu.Game.Screens.Play
             if (PauseOverlay.State.Value == Visibility.Visible)
                 PauseOverlay.Hide();
 
-            failAnimationLayer.Start();
+            failAnimationContainer.Start();
 
             if (GameplayState.Mods.OfType<IApplicableFailOverride>().Any(m => m.RestartOnFail))
                 Restart(true);
@@ -1044,7 +1052,7 @@ namespace osu.Game.Screens.Play
 
                 b.StoryboardReplacesBackground.BindTo(storyboardReplacesBackground);
 
-                failAnimationLayer.Background = b;
+                failAnimationContainer.Background = b;
             });
 
             HUDOverlay.IsPlaying.BindTo(localUserPlaying);
@@ -1078,7 +1086,7 @@ namespace osu.Game.Screens.Play
         protected virtual void StartGameplay()
         {
             if (GameplayClockContainer.IsRunning)
-                throw new InvalidOperationException($"{nameof(StartGameplay)} should not be called when the gameplay clock is already running");
+                Logger.Error(new InvalidOperationException($"{nameof(StartGameplay)} should not be called when the gameplay clock is already running"), "Clock failure");
 
             GameplayClockContainer.Reset(startClock: true);
 
@@ -1099,7 +1107,7 @@ namespace osu.Game.Screens.Play
             screenSuspension?.RemoveAndDisposeImmediately();
 
             // Eagerly clean these up as disposal of child components is asynchronous and may leave sounds playing beyond user expectations.
-            failAnimationLayer?.Stop();
+            failAnimationContainer?.Stop();
             PauseOverlay?.StopAllSamples();
 
             if (LoadedBeatmapSuccessfully)
@@ -1144,14 +1152,14 @@ namespace osu.Game.Screens.Play
             if (DrawableRuleset.ReplayScore != null)
                 return Task.CompletedTask;
 
-            LegacyByteArrayReader replayReader = null;
+            ByteArrayArchiveReader replayReader = null;
 
             if (score.ScoreInfo.Ruleset.IsLegacyRuleset())
             {
                 using (var stream = new MemoryStream())
                 {
                     new LegacyScoreEncoder(score, GameplayState.Beatmap).Encode(stream);
-                    replayReader = new LegacyByteArrayReader(stream.ToArray(), "replay.osr");
+                    replayReader = new ByteArrayArchiveReader(stream.ToArray(), "replay.osr");
                 }
             }
 
@@ -1200,8 +1208,11 @@ namespace osu.Game.Screens.Play
             float fadeOutDuration = instant ? 0 : 250;
             this.FadeOut(fadeOutDuration);
 
-            ApplyToBackground(b => b.IgnoreUserSettings.Value = true);
-            storyboardReplacesBackground.Value = false;
+            if (this.IsCurrentScreen())
+            {
+                ApplyToBackground(b => b.IgnoreUserSettings.Value = true);
+                storyboardReplacesBackground.Value = false;
+            }
         }
 
         #endregion
