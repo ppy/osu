@@ -35,7 +35,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
         /// </summary>
         private float totalAbsoluteRotation;
 
-        private float totalAbsoluteRotationsAtLastCompletion;
+        private float totalAbsoluteRotationAtLastCompletion;
 
         /// <summary>
         /// For the current spin, represents the maximum absolute rotation (from 0..360) achieved by the user.
@@ -52,7 +52,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
         /// <summary>
         /// The current spin, from -360..360.
         /// </summary>
-        private float currentSpinRotation => totalAbsoluteRotation - totalAbsoluteRotationsAtLastCompletion;
+        private float currentSpinRotation => totalAbsoluteRotation - totalAbsoluteRotationAtLastCompletion;
 
         private double lastReportTime = double.NegativeInfinity;
 
@@ -93,7 +93,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
 
                     // Incrementing the last completion point will cause `currentSpinRotation` to
                     // hold the remaining spin that needs to be considered.
-                    totalAbsoluteRotationsAtLastCompletion += direction * 360;
+                    totalAbsoluteRotationAtLastCompletion += direction * 360;
 
                     // Reset the current max as we are entering a new spin.
                     // Importantly, carry over the remainder (which is now stored in `currentSpinRotation`).
@@ -107,7 +107,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
                 while (completedSpins.TryPeek(out var segment) && segment.CompletionTime > currentTime)
                 {
                     completedSpins.Pop();
-                    totalAbsoluteRotationsAtLastCompletion -= segment.Direction * 360;
+                    totalAbsoluteRotationAtLastCompletion -= segment.Direction * 360;
                 }
 
                 // This is a best effort. We may not have enough data to match this 1:1, but that's okay.
