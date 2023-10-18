@@ -126,7 +126,8 @@ namespace osu.Game.Rulesets.Mods
 
         public ModAdaptiveSpeed()
         {
-            rateAdjustHelper = new RateAdjustModHelper(SpeedChange, AdjustPitch);
+            rateAdjustHelper = new RateAdjustModHelper(SpeedChange);
+            rateAdjustHelper.HandleAudioAdjustments(AdjustPitch);
 
             InitialRate.BindValueChanged(val =>
             {

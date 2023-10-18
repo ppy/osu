@@ -48,7 +48,8 @@ namespace osu.Game.Rulesets.Mods
 
         protected ModTimeRamp()
         {
-            rateAdjustHelper = new RateAdjustModHelper(SpeedChange, AdjustPitch);
+            rateAdjustHelper = new RateAdjustModHelper(SpeedChange);
+            rateAdjustHelper.HandleAudioAdjustments(AdjustPitch);
 
             // for preview purpose at song select. eventually we'll want to be able to update every frame.
             FinalRate.BindValueChanged(_ => applyRateAdjustment(double.PositiveInfinity), true);
