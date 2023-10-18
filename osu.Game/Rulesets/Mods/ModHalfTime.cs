@@ -42,18 +42,6 @@ namespace osu.Game.Rulesets.Mods
             rateAdjustHelper.ApplyToTrack(track);
         }
 
-        public override double ScoreMultiplier
-        {
-            get
-            {
-                // Round to the nearest multiple of 0.1.
-                double value = (int)(SpeedChange.Value * 10) / 10.0;
-
-                // Offset back to 0.
-                value -= 1;
-
-                return 1 + value;
-            }
-        }
+        public override double ScoreMultiplier => rateAdjustHelper.ScoreMultiplier;
     }
 }

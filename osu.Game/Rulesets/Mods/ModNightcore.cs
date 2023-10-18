@@ -39,8 +39,12 @@ namespace osu.Game.Rulesets.Mods
         private readonly BindableNumber<double> tempoAdjust = new BindableDouble(1);
         private readonly BindableNumber<double> freqAdjust = new BindableDouble(1);
 
+        private readonly RateAdjustModHelper rateAdjustHelper;
+
         protected ModNightcore()
         {
+            rateAdjustHelper = new RateAdjustModHelper(SpeedChange);
+
             SpeedChange.BindValueChanged(val =>
             {
                 freqAdjust.Value = SpeedChange.Default;
@@ -54,19 +58,7 @@ namespace osu.Game.Rulesets.Mods
             track.AddAdjustment(AdjustableProperty.Tempo, tempoAdjust);
         }
 
-        public override double ScoreMultiplier
-        {
-            get
-            {
-                // Round to the nearest multiple of 0.1.
-                double value = (int)(SpeedChange.Value * 10) / 10.0;
-
-                // Offset back to 0.
-                value -= 1;
-
-                return 1 + value;
-            }
-        }
+        public override double ScoreMultiplier => rateAdjustHelper.ScoreMultiplier;
     }
 
     public abstract partial class ModNightcore<TObject> : ModNightcore, IApplicableToDrawableRuleset<TObject>
