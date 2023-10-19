@@ -64,8 +64,8 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
             {
                 // Below uses harmonic sum scaling which makes the resulting summation logarithmic rather than geometric.
                 // Good for properly weighting difficulty across full map instead of using object count for LengthBonus.
-                // 1.42 and 7.5 are arbitrary constants that worked well.
-                double weight = 1.42 * ((1 + (7.5 / (1 + index))) / (index + 1 + (7.5 / (1 + index))));
+                // 1.44 and 7.5 are arbitrary constants that worked well.
+                double weight = 1.44 * ((1 + (7.5 / (1 + index))) / (index + 1 + (7.5 / (1 + index))));
 
                 difficulty += strain * weight;
                 index += 1;
