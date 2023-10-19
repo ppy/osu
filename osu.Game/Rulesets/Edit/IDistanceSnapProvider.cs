@@ -12,7 +12,7 @@ namespace osu.Game.Rulesets.Edit
     /// A snap provider which given a reference hit object and proposed distance from it, offers a more correct duration or distance value.
     /// </summary>
     [Cached]
-    public interface IDistanceSnapProvider : IPositionSnapProvider
+    public interface IDistanceSnapProvider
     {
         /// <summary>
         /// A multiplier which changes the ratio of distance travelled per time unit.
