@@ -102,6 +102,7 @@ permissions:
 
 env:
   COMMENT_TAG: execution-${{ github.run_id }}-${{ github.run_number }}-${{ github.run_attempt }}
+  LOCK_FILE: '/tmp/diffcalc.lock'
 
 jobs:
   check-permissions:
@@ -130,20 +131,21 @@ jobs:
 
             *This comment will update on completion*
 
-  wait-for-queue:
-    name: "Wait for previous workflows"
+  lock-environment:
+    name: Lock environment
     needs: check-permissions
     runs-on: self-hosted
-    timeout-minutes: 50400 # 35 days, the maximum for jobs on self-hosted runners.
     steps:
-      - uses: ahmadnassri/action-workflow-queue@f547ac848c16a9bb1b2ed4a850e0cc5098af2cf8 # v1.1.5
-        with:
-          timeout: 2147483647 # Around 24 days - the maximum supported by JS setTimeout().
-          delay: 120000 # Poll every 2 minutes - the API limit seems fairly low on this one.
+      - name: "Lock"
+        run: |
+          while ! (set -o noclobber; echo > "${{ env.LOCK_FILE }}") 2>/dev/null; do
+            echo "Waiting for other execution..."
+            sleep 5
+          done
 
   directory:
     name: Prepare directory
-    needs: wait-for-queue
+    needs: lock-environment
     runs-on: self-hosted
     outputs:
       GENERATOR_DIR: ${{ steps.set-outputs.outputs.GENERATOR_DIR }}
@@ -347,6 +349,16 @@ jobs:
         run: |
           echo "Target: ${{ needs.generator.outputs.TARGET }}"
           echo "Spreadsheet: ${{ needs.generator.outputs.SPREADSHEET_LINK }}"
+
+  unlock-environment:
+    name: Unlock environment
+    needs: [ lock-environment, generator ]
+    runs-on: self-hosted
+    if: ${{ always() }}
+    steps:
+      - name: "Unlock"
+        run: |
+          rm -f "${{ env.LOCK_FILE }}"
 
   update-comment:
     name: Update PR comment
