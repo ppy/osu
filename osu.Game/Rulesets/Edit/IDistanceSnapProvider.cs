@@ -19,7 +19,7 @@ namespace osu.Game.Rulesets.Edit
         /// Importantly, this is provided for manual usage, and not multiplied into any of the methods exposed by this interface.
         /// </summary>
         /// <seealso cref="BeatmapInfo.DistanceSpacing"/>
-        IBindable<double> DistanceSpacingMultiplier { get; }
+        Bindable<double> DistanceSpacingMultiplier { get; }
 
         /// <summary>
         /// Retrieves the distance between two points within a timing point that are one beat length apart.
