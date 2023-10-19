@@ -1,6 +1,7 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System;
 using osu.Framework.Allocation;
 using osu.Framework.Extensions.ObjectExtensions;
 using osu.Framework.Graphics;
@@ -8,14 +9,14 @@ using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Sprites;
 using osu.Game.Rulesets.Objects.Drawables;
 using osu.Game.Rulesets.Osu.Objects;
+using osu.Game.Rulesets.Osu.Objects.Drawables;
 using osuTK;
 
 namespace osu.Game.Rulesets.Osu.Skinning.Default
 {
     public partial class DefaultReverseArrow : CompositeDrawable
     {
-        [Resolved]
-        private DrawableHitObject drawableObject { get; set; } = null!;
+        private DrawableSliderRepeat drawableRepeat { get; set; } = null!;
 
         public DefaultReverseArrow()
         {
@@ -36,9 +37,10 @@ namespace osu.Game.Rulesets.Osu.Skinning.Default
         }
 
         [BackgroundDependencyLoader]
-        private void load()
+        private void load(DrawableHitObject drawableObject)
         {
-            drawableObject.ApplyCustomUpdateState += updateStateTransforms;
+            drawableRepeat = (DrawableSliderRepeat)drawableObject;
+            drawableRepeat.ApplyCustomUpdateState += updateStateTransforms;
         }
 
         private void updateStateTransforms(DrawableHitObject hitObject, ArmedState state)
@@ -55,6 +57,11 @@ namespace osu.Game.Rulesets.Osu.Skinning.Default
                                  .ScaleTo(1f, move_in_duration, Easing.Out)
                                  .Loop(total - (move_in_duration + move_out_duration));
                     break;
+
+                case ArmedState.Hit:
+                    double animDuration = Math.Min(300, drawableRepeat.HitObject.SpanDuration);
+                    InternalChild.ScaleTo(1.5f, animDuration, Easing.Out);
+                    break;
             }
         }
 
@@ -62,8 +69,8 @@ namespace osu.Game.Rulesets.Osu.Skinning.Default
         {
             base.Dispose(isDisposing);
 
-            if (drawableObject.IsNotNull())
-                drawableObject.ApplyCustomUpdateState -= updateStateTransforms;
+            if (drawableRepeat.IsNotNull())
+                drawableRepeat.ApplyCustomUpdateState -= updateStateTransforms;
         }
     }
 }

@@ -41,7 +41,7 @@ namespace osu.Game.Rulesets.Catch.Edit
             {
                 base.Update();
 
-                Scale = new Vector2(Math.Min(Parent.ChildSize.X / CatchPlayfield.WIDTH, Parent.ChildSize.Y / CatchPlayfield.HEIGHT));
+                Scale = new Vector2(Math.Min(Parent!.ChildSize.X / CatchPlayfield.WIDTH, Parent!.ChildSize.Y / CatchPlayfield.HEIGHT));
                 Height = 1 / Scale.Y;
             }
         }

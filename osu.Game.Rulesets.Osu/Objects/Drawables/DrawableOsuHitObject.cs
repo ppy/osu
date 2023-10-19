@@ -102,7 +102,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
         /// </summary>
         public void MissForcefully() => ApplyResult(r => r.Type = r.Judgement.MinResult);
 
-        private RectangleF parentScreenSpaceRectangle => ((DrawableOsuHitObject)ParentHitObject)?.parentScreenSpaceRectangle ?? Parent.ScreenSpaceDrawQuad.AABBFloat;
+        private RectangleF parentScreenSpaceRectangle => ((DrawableOsuHitObject)ParentHitObject)?.parentScreenSpaceRectangle ?? Parent!.ScreenSpaceDrawQuad.AABBFloat;
 
         /// <summary>
         /// Calculates the position of the given <paramref name="drawable"/> relative to the playfield area.

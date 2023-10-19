@@ -6,6 +6,7 @@ using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Sprites;
+using osu.Game.Configuration;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.UI.Scrolling;
@@ -18,6 +19,7 @@ namespace osu.Game.Rulesets.Edit
         where TObject : HitObject
     {
         private readonly Bindable<TernaryState> showSpeedChanges = new Bindable<TernaryState>();
+        private Bindable<bool> configShowSpeedChanges = null!;
 
         protected ScrollingHitObjectComposer(Ruleset ruleset)
             : base(ruleset)
@@ -25,7 +27,7 @@ namespace osu.Game.Rulesets.Edit
         }
 
         [BackgroundDependencyLoader]
-        private void load()
+        private void load(OsuConfigManager config)
         {
             if (DrawableRuleset is ISupportConstantAlgorithmToggle toggleRuleset)
             {
@@ -44,7 +46,16 @@ namespace osu.Game.Rulesets.Edit
                     },
                 });
 
-                showSpeedChanges.BindValueChanged(state => toggleRuleset.ShowSpeedChanges.Value = state.NewValue == TernaryState.True, true);
+                configShowSpeedChanges = config.GetBindable<bool>(OsuSetting.EditorShowSpeedChanges);
+                configShowSpeedChanges.BindValueChanged(enabled => showSpeedChanges.Value = enabled.NewValue ? TernaryState.True : TernaryState.False, true);
+
+                showSpeedChanges.BindValueChanged(state =>
+                {
+                    bool enabled = state.NewValue == TernaryState.True;
+
+                    toggleRuleset.ShowSpeedChanges.Value = enabled;
+                    configShowSpeedChanges.Value = enabled;
+                }, true);
             }
         }
     }
