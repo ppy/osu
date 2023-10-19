@@ -1,7 +1,6 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using System;
 using System.Collections.Generic;
 using System.Linq;
 using osu.Framework.Allocation;
@@ -9,6 +8,7 @@ using osu.Framework.Bindables;
 using osu.Framework.Extensions.EnumExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Input;
+using osu.Framework.Input.Bindings;
 using osu.Framework.Input.Events;
 using osu.Game.Beatmaps;
 using osu.Game.Graphics.UserInterface;
@@ -20,13 +20,13 @@ using osu.Game.Rulesets.Edit.Tools;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.UI;
+using osu.Game.Screens.Edit.Components.TernaryButtons;
 using osu.Game.Screens.Edit.Compose.Components;
 using osuTK;
 
 namespace osu.Game.Rulesets.Catch.Edit
 {
-    // we're also a ScrollingHitObjectComposer candidate, but can't be everything can we?
-    public partial class CatchHitObjectComposer : DistancedHitObjectComposer<CatchHitObject>
+    public partial class CatchHitObjectComposer : ScrollingHitObjectComposer<CatchHitObject>, IKeyBindingHandler<GlobalAction>
     {
         private const float distance_snap_radius = 50;
 
@@ -42,6 +42,9 @@ namespace osu.Game.Rulesets.Catch.Edit
             MaxValue = 10,
         };
 
+        [Cached(typeof(IDistanceSnapProvider))]
+        protected readonly CatchDistanceSnapProvider DistanceSnapProvider = new CatchDistanceSnapProvider();
+
         public CatchHitObjectComposer(CatchRuleset ruleset)
             : base(ruleset)
         {
@@ -50,8 +53,11 @@ namespace osu.Game.Rulesets.Catch.Edit
         [BackgroundDependencyLoader]
         private void load()
         {
+            AddInternal(DistanceSnapProvider);
+            DistanceSnapProvider.AttachToToolbox(RightToolbox);
+
             // todo: enable distance spacing once catch supports applying it to its existing distance snap grid implementation.
-            DistanceSpacingMultiplier.Disabled = true;
+            DistanceSnapProvider.DistanceSpacingMultiplier.Disabled = true;
 
             LayerBelowRuleset.Add(new PlayfieldBorder
             {
@@ -71,6 +77,10 @@ namespace osu.Game.Rulesets.Catch.Edit
 
             AddInternal(beatSnapGrid = new CatchBeatSnapGrid());
         }
+
+        protected override IEnumerable<TernaryButton> CreateTernaryButtons()
+            => base.CreateTernaryButtons()
+                   .Concat(DistanceSnapProvider.CreateTernaryButtons());
 
         protected override void LoadComplete()
         {
@@ -102,19 +112,6 @@ namespace osu.Game.Rulesets.Catch.Edit
             }
         }
 
-        protected override double ReadCurrentDistanceSnap(HitObject before, HitObject after)
-        {
-            // osu!catch's distance snap implementation is limited, in that a custom spacing cannot be specified.
-            // Therefore this functionality is not currently used.
-            //
-            // The implementation below is probably correct but should be checked if/when exposed via controls.
-
-            float expectedDistance = DurationToDistance(before, after.StartTime - before.GetEndTime());
-            float actualDistance = Math.Abs(((CatchHitObject)before).EffectiveX - ((CatchHitObject)after).EffectiveX);
-
-            return actualDistance / expectedDistance;
-        }
-
         protected override void Update()
         {
             base.Update();
@@ -122,7 +119,7 @@ namespace osu.Game.Rulesets.Catch.Edit
             updateDistanceSnapGrid();
         }
 
-        public override bool OnPressed(KeyBindingPressEvent<GlobalAction> e)
+        public bool OnPressed(KeyBindingPressEvent<GlobalAction> e)
         {
             switch (e.Action)
             {
@@ -131,14 +128,18 @@ namespace osu.Game.Rulesets.Catch.Edit
                 // May be worth considering standardising "zoom" behaviour with what the timeline uses (ie. alt-wheel) but that may cause new conflicts.
                 case GlobalAction.IncreaseScrollSpeed:
                     this.TransformBindableTo(timeRangeMultiplier, timeRangeMultiplier.Value - 1, 200, Easing.OutQuint);
-                    break;
+                    return true;
 
                 case GlobalAction.DecreaseScrollSpeed:
                     this.TransformBindableTo(timeRangeMultiplier, timeRangeMultiplier.Value + 1, 200, Easing.OutQuint);
-                    break;
+                    return true;
             }
 
-            return base.OnPressed(e);
+            return false;
+        }
+
+        public void OnReleased(KeyBindingReleaseEvent<GlobalAction> e)
+        {
         }
 
         protected override DrawableRuleset<CatchHitObject> CreateDrawableRuleset(Ruleset ruleset, IBeatmap beatmap, IReadOnlyList<Mod> mods) =>
@@ -224,7 +225,7 @@ namespace osu.Game.Rulesets.Catch.Edit
 
         private void updateDistanceSnapGrid()
         {
-            if (DistanceSnapToggle.Value != TernaryState.True)
+            if (DistanceSnapProvider.DistanceSnapToggle.Value != TernaryState.True)
             {
                 distanceSnapGrid.Hide();
                 return;
