@@ -8,6 +8,7 @@ using osu.Framework.Bindables;
 using osu.Framework.Extensions.ObjectExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
+using osu.Framework.Graphics.Sprites;
 using osu.Game.Rulesets.Objects.Drawables;
 using osu.Game.Rulesets.Osu.Objects;
 using osu.Game.Rulesets.Osu.Objects.Drawables;
@@ -41,11 +42,12 @@ namespace osu.Game.Rulesets.Osu.Skinning.Legacy
 
             var skin = skinSource.FindProvider(s => s.GetTexture(lookupName) != null);
 
-            InternalChild = arrow = (skin?.GetAnimation(lookupName, true, true, maxSize: OsuHitObject.OBJECT_DIMENSIONS * 2) ?? Empty()).With(d =>
+            InternalChild = arrow = new Sprite
             {
-                d.Anchor = Anchor.Centre;
-                d.Origin = Anchor.Centre;
-            });
+                Anchor = Anchor.Centre,
+                Origin = Anchor.Centre,
+                Texture = skin?.GetTexture(lookupName)?.WithMaximumSize(maxSize: OsuHitObject.OBJECT_DIMENSIONS * 2),
+            };
 
             textureIsDefaultSkin = skin is ISkinTransformer transformer && transformer.Skin is DefaultLegacySkin;
 
