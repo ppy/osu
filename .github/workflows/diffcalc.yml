@@ -195,7 +195,7 @@ jobs:
       - name: Add pull-request environment
         if: ${{ github.event_name == 'issue_comment' && github.event.issue.pull_request }}
         run: |
-          sed -i "s;^OSU_B=.*$;OSU_B=${{ github.event.issue.pull_request.url }};" "${{ needs.directory.outputs.GENERATOR_ENV }}"
+          sed -i "s;^OSU_B=.*$;OSU_B=${{ github.event.issue.pull_request.html_url }};" "${{ needs.directory.outputs.GENERATOR_ENV }}"
 
       - name: Add comment environment
         if: ${{ github.event_name == 'issue_comment' }}
