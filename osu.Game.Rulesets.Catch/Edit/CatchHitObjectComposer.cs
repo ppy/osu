@@ -10,7 +10,6 @@ using osu.Framework.Graphics;
 using osu.Framework.Input.Bindings;
 using osu.Framework.Input.Events;
 using osu.Game.Beatmaps;
-using osu.Game.Graphics.UserInterface;
 using osu.Game.Input.Bindings;
 using osu.Game.Rulesets.Catch.Objects;
 using osu.Game.Rulesets.Catch.UI;
@@ -75,6 +74,23 @@ namespace osu.Game.Rulesets.Catch.Edit
             => base.CreateTernaryButtons()
                    .Concat(DistanceSnapProvider.CreateTernaryButtons());
 
+        protected override DrawableRuleset<CatchHitObject> CreateDrawableRuleset(Ruleset ruleset, IBeatmap beatmap, IReadOnlyList<Mod> mods) =>
+            new DrawableCatchEditorRuleset(ruleset, beatmap, mods)
+            {
+                TimeRangeMultiplier = { BindTarget = timeRangeMultiplier, }
+            };
+
+        protected override ComposeBlueprintContainer CreateBlueprintContainer() => new CatchBlueprintContainer(this);
+
+        protected override BeatSnapGrid CreateBeatSnapGrid() => new CatchBeatSnapGrid();
+
+        protected override IReadOnlyList<HitObjectCompositionTool> CompositionTools => new HitObjectCompositionTool[]
+        {
+            new FruitCompositionTool(),
+            new JuiceStreamCompositionTool(),
+            new BananaShowerCompositionTool()
+        };
+
         public bool OnPressed(KeyBindingPressEvent<GlobalAction> e)
         {
             switch (e.Action)
@@ -98,19 +114,6 @@ namespace osu.Game.Rulesets.Catch.Edit
         {
         }
 
-        protected override DrawableRuleset<CatchHitObject> CreateDrawableRuleset(Ruleset ruleset, IBeatmap beatmap, IReadOnlyList<Mod> mods) =>
-            new DrawableCatchEditorRuleset(ruleset, beatmap, mods)
-            {
-                TimeRangeMultiplier = { BindTarget = timeRangeMultiplier, }
-            };
-
-        protected override IReadOnlyList<HitObjectCompositionTool> CompositionTools => new HitObjectCompositionTool[]
-        {
-            new FruitCompositionTool(),
-            new JuiceStreamCompositionTool(),
-            new BananaShowerCompositionTool()
-        };
-
         public override SnapResult FindSnappedPositionAndTime(Vector2 screenSpacePosition, SnapType snapType = SnapType.All)
         {
             var result = base.FindSnappedPositionAndTime(screenSpacePosition, snapType);
@@ -128,10 +131,6 @@ namespace osu.Game.Rulesets.Catch.Edit
 
             return result;
         }
-
-        protected override ComposeBlueprintContainer CreateBlueprintContainer() => new CatchBlueprintContainer(this);
-
-        protected override BeatSnapGrid CreateBeatSnapGrid() => new CatchBeatSnapGrid();
 
         private PalpableCatchHitObject? getLastSnappableHitObject(double time)
         {
@@ -179,27 +178,6 @@ namespace osu.Game.Rulesets.Catch.Edit
                 default:
                     return null;
             }
-        }
-
-        private void updateDistanceSnapGrid()
-        {
-            if (DistanceSnapProvider.DistanceSnapToggle.Value != TernaryState.True)
-            {
-                distanceSnapGrid.Hide();
-                return;
-            }
-
-            var sourceHitObject = getDistanceSnapGridSourceHitObject();
-
-            if (sourceHitObject == null)
-            {
-                distanceSnapGrid.Hide();
-                return;
-            }
-
-            distanceSnapGrid.Show();
-            distanceSnapGrid.StartTime = sourceHitObject.GetEndTime();
-            distanceSnapGrid.StartX = sourceHitObject.EffectiveX;
         }
     }
 }
