@@ -69,7 +69,7 @@ namespace osu.Game.Tests.Visual.Gameplay
 
             var expectedComponentsAdjustmentContainer = new DependencyProvidingContainer
             {
-                Position = actualComponentsContainer.Parent.ToSpaceOfOtherDrawable(actualComponentsContainer.DrawPosition, Content),
+                Position = actualComponentsContainer.Parent!.ToSpaceOfOtherDrawable(actualComponentsContainer.DrawPosition, Content),
                 Size = actualComponentsContainer.DrawSize,
                 Child = expectedComponentsContainer,
                 // proxy the same required dependencies that `actualComponentsContainer` is using.

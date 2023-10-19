@@ -62,7 +62,7 @@ namespace osu.Game.Graphics.UserInterface
             if (!PlaySamplesOnAdjust)
                 return;
 
-            if (Clock == null || Clock.CurrentTime - lastSampleTime <= 30)
+            if (Clock.CurrentTime - lastSampleTime <= 30)
                 return;
 
             if (value.Equals(lastSampleValue))

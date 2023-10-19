@@ -13,7 +13,7 @@ using osuTK.Input;
 
 namespace osu.Game.Tests.Visual.UserInterface
 {
-    public partial class TestSceneShearedSliderBar : OsuManualInputManagerTestScene
+    public partial class TestSceneRoundedSliderBar : OsuManualInputManagerTestScene
     {
         [Cached]
         private OverlayColourProvider colourProvider { get; set; } = new OverlayColourProvider(OverlayColourScheme.Purple);
@@ -25,12 +25,12 @@ namespace osu.Game.Tests.Visual.UserInterface
             MaxValue = 15
         };
 
-        private ShearedSliderBar<double> slider = null!;
+        private RoundedSliderBar<double> slider = null!;
 
         [BackgroundDependencyLoader]
         private void load()
         {
-            Child = slider = new ShearedSliderBar<double>
+            Child = slider = new RoundedSliderBar<double>
             {
                 Anchor = Anchor.Centre,
                 Origin = Anchor.Centre,
@@ -45,7 +45,7 @@ namespace osu.Game.Tests.Visual.UserInterface
         {
             AddStep("set slider to 1", () => slider.Current.Value = 1);
 
-            AddStep("move mouse to nub", () => InputManager.MoveMouseTo(slider.ChildrenOfType<ShearedNub>().Single()));
+            AddStep("move mouse to nub", () => InputManager.MoveMouseTo(slider.ChildrenOfType<Nub>().Single()));
 
             AddStep("double click nub", () =>
             {

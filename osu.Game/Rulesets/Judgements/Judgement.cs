@@ -190,10 +190,9 @@ namespace osu.Game.Rulesets.Judgements
                     return 200;
 
                 case HitResult.Great:
-                    return 300;
-
+                // Perfect doesn't actually give more score / accuracy directly.
                 case HitResult.Perfect:
-                    return 315;
+                    return 300;
 
                 case HitResult.SmallBonus:
                     return SMALL_BONUS_SCORE;

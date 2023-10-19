@@ -647,7 +647,7 @@ namespace osu.Game.Screens.Select
 
             beginLooping();
 
-            if (Beatmap != null && !Beatmap.Value.BeatmapSetInfo.DeletePending)
+            if (!Beatmap.Value.BeatmapSetInfo.DeletePending)
             {
                 updateCarouselSelection();
 

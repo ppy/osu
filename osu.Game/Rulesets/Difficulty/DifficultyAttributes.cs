@@ -6,7 +6,6 @@ using System.Collections.Generic;
 using Newtonsoft.Json;
 using osu.Game.Beatmaps;
 using osu.Game.Rulesets.Mods;
-using osu.Game.Rulesets.Scoring;
 
 namespace osu.Game.Rulesets.Difficulty
 {
@@ -44,22 +43,6 @@ namespace osu.Game.Rulesets.Difficulty
         /// </summary>
         [JsonProperty("max_combo", Order = -2)]
         public int MaxCombo { get; set; }
-
-        /// <summary>
-        /// The accuracy portion of the legacy (ScoreV1) total score.
-        /// </summary>
-        public int LegacyAccuracyScore { get; set; }
-
-        /// <summary>
-        /// The combo-multiplied portion of the legacy (ScoreV1) total score.
-        /// </summary>
-        public int LegacyComboScore { get; set; }
-
-        /// <summary>
-        /// A ratio of <c>new_bonus_score / old_bonus_score</c> for converting the bonus score of legacy scores to the new scoring.
-        /// This is made up of all judgements that would be <see cref="HitResult.SmallBonus"/> or <see cref="HitResult.LargeBonus"/>.
-        /// </summary>
-        public double LegacyBonusScoreRatio { get; set; }
 
         /// <summary>
         /// Creates new <see cref="DifficultyAttributes"/>.
