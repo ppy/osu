@@ -5,6 +5,7 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Effects;
 using osu.Framework.Graphics.UserInterface;
 using osu.Framework.Input.Events;
+using osu.Game.Graphics.UserInterface;
 using osu.Game.Localisation;
 using osu.Game.Rulesets;
 using osuTK.Graphics;
@@ -38,6 +39,8 @@ namespace osu.Game.Overlays.Toolbar
 
         private partial class RulesetButton : ToolbarButton
         {
+            protected override HoverSounds CreateHoverSounds(HoverSampleSet sampleSet) => new HoverSounds(HoverSampleSet.Button);
+
             public bool Active
             {
                 set
