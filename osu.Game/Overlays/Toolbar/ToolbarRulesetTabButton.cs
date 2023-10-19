@@ -39,7 +39,7 @@ namespace osu.Game.Overlays.Toolbar
 
         private partial class RulesetButton : ToolbarButton
         {
-            protected override HoverSounds CreateHoverSounds(HoverSampleSet sampleSet) => new HoverSounds(HoverSampleSet.Button);
+            protected override HoverSounds CreateHoverSounds(HoverSampleSet sampleSet) => new HoverSounds();
 
             public bool Active
             {
