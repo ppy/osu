@@ -137,13 +137,22 @@ namespace osu.Game.Overlays.SkinEditor
             base.Update();
 
             drawableQuad = drawable.ToScreenSpace(
-                drawable.DrawRectangle
-                        .Inflate(SkinSelectionHandler.INFLATE_SIZE));
+                drawable.DrawRectangle);
 
             var localSpaceQuad = ToLocalSpace(drawableQuad);
 
-            box.Position = localSpaceQuad.TopLeft;
-            box.Size = localSpaceQuad.Size;
+            float cos = MathF.Cos(MathUtils.DegreesToRadians(drawable.Rotation));
+            float sin = MathF.Sin(MathUtils.DegreesToRadians(drawable.Rotation));
+
+            float offsetX = drawable.Scale.X > 0 ? -SkinSelectionHandler.INFLATE_SIZE : SkinSelectionHandler.INFLATE_SIZE;
+            float offsetY = drawable.Scale.Y > 0 ? -SkinSelectionHandler.INFLATE_SIZE : SkinSelectionHandler.INFLATE_SIZE;
+
+            float rotatedX = cos * offsetX - sin * offsetY;
+            float rotatedY = sin * offsetX + cos * offsetY;
+
+            box.Position = new Vector2(localSpaceQuad.TopLeft[0] + rotatedX, localSpaceQuad.TopLeft[1] + rotatedY);
+            box.Size = new Vector2(localSpaceQuad.Width + MathF.Abs(SkinSelectionHandler.INFLATE_SIZE) * 2,
+                localSpaceQuad.Height + MathF.Abs(SkinSelectionHandler.INFLATE_SIZE) * 2);
             box.Rotation = drawable.Rotation;
             box.Scale = new Vector2(MathF.Sign(drawable.Scale.X), MathF.Sign(drawable.Scale.Y));
         }
