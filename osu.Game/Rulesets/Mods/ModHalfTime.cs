@@ -1,6 +1,7 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using osu.Framework.Audio;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Localisation;
@@ -26,18 +27,22 @@ namespace osu.Game.Rulesets.Mods
             Precision = 0.01,
         };
 
-        public override double ScoreMultiplier
+        [SettingSource("Adjust pitch", "Should pitch be adjusted with speed")]
+        public virtual BindableBool AdjustPitch { get; } = new BindableBool();
+
+        private readonly RateAdjustModHelper rateAdjustHelper;
+
+        protected ModHalfTime()
         {
-            get
-            {
-                // Round to the nearest multiple of 0.1.
-                double value = (int)(SpeedChange.Value * 10) / 10.0;
-
-                // Offset back to 0.
-                value -= 1;
-
-                return 1 + value;
-            }
+            rateAdjustHelper = new RateAdjustModHelper(SpeedChange);
+            rateAdjustHelper.HandleAudioAdjustments(AdjustPitch);
         }
+
+        public override void ApplyToTrack(IAdjustableAudioComponent track)
+        {
+            rateAdjustHelper.ApplyToTrack(track);
+        }
+
+        public override double ScoreMultiplier => rateAdjustHelper.ScoreMultiplier;
     }
 }

@@ -14,8 +14,8 @@
 #
 # The workflow can be run in two ways:
 # 1. Via workflow dispatch.
-# 2. By an owner of the repository posting a pull request or issue comment containing `!diffcalc`.  
-# For pull requests, the workflow will assume the pull request as the target to compare against (i.e. the `OSU_B` variable).  
+# 2. By an owner of the repository posting a pull request or issue comment containing `!diffcalc`.
+# For pull requests, the workflow will assume the pull request as the target to compare against (i.e. the `OSU_B` variable).
 # Any lines in the comment of the form `KEY=VALUE` are treated as variables for the generator.
 #
 # ## Google Service Account
@@ -104,24 +104,25 @@ env:
   COMMENT_TAG: execution-${{ github.run_id }}-${{ github.run_number }}-${{ github.run_attempt }}
 
 jobs:
-  wait-for-queue:
-    name: "Wait for previous workflows"
+  check-permissions:
+    name: Check permissions
     runs-on: ubuntu-latest
-    if: ${{ !cancelled() && (github.event_name == 'workflow_dispatch' || contains(github.event.comment.body, '!diffcalc') && github.event.comment.author_association == 'OWNER') }}
-    timeout-minutes: 50400 # 35 days, the maximum for jobs.
+    if: ${{ github.event_name == 'workflow_dispatch' || contains(github.event.comment.body, '!diffcalc') }}
     steps:
-      - uses: ahmadnassri/action-workflow-queue@v1
+      - name: Check permissions
+        if: ${{ github.event_name != 'workflow_dispatch' }}
+        uses: actions-cool/check-user-permission@a0668c9aec87f3875fc56170b6452a453e9dd819 # v2.2.0
         with:
-          timeout: 2147483647 # Around 24 days, maximum supported.
-          delay: 120000 # Poll every 2 minutes. API seems fairly low on this one.
+          require: 'write'
 
   create-comment:
     name: Create PR comment
+    needs: check-permissions
     runs-on: ubuntu-latest
-    if: ${{ github.event_name == 'issue_comment' && github.event.issue.pull_request && contains(github.event.comment.body, '!diffcalc') && github.event.comment.author_association == 'OWNER' }}
+    if: ${{ github.event_name == 'issue_comment' && github.event.issue.pull_request }}
     steps:
       - name: Create comment
-        uses: thollander/actions-comment-pull-request@v2
+        uses: thollander/actions-comment-pull-request@363c6f6eae92cc5c3a66e95ba016fc771bb38943 # v2.4.2
         with:
           comment_tag: ${{ env.COMMENT_TAG }}
           message: |
@@ -129,11 +130,21 @@ jobs:
 
             *This comment will update on completion*
 
+  wait-for-queue:
+    name: "Wait for previous workflows"
+    needs: check-permissions
+    runs-on: self-hosted
+    timeout-minutes: 50400 # 35 days, the maximum for jobs on self-hosted runners.
+    steps:
+      - uses: ahmadnassri/action-workflow-queue@f547ac848c16a9bb1b2ed4a850e0cc5098af2cf8 # v1.1.5
+        with:
+          timeout: 2147483647 # Around 24 days - the maximum supported by JS setTimeout().
+          delay: 120000 # Poll every 2 minutes - the API limit seems fairly low on this one.
+
   directory:
     name: Prepare directory
     needs: wait-for-queue
     runs-on: self-hosted
-    if: ${{ !cancelled() && (github.event_name == 'workflow_dispatch' || contains(github.event.comment.body, '!diffcalc') && github.event.comment.author_association == 'OWNER') }}
     outputs:
       GENERATOR_DIR: ${{ steps.set-outputs.outputs.GENERATOR_DIR }}
       GENERATOR_ENV: ${{ steps.set-outputs.outputs.GENERATOR_ENV }}
@@ -159,7 +170,6 @@ jobs:
     name: Setup environment
     needs: directory
     runs-on: self-hosted
-    if: ${{ !cancelled() && needs.directory.result == 'success' }}
     env:
       VARS_JSON: ${{ toJSON(vars) }}
     steps:
@@ -185,7 +195,7 @@ jobs:
       - name: Add pull-request environment
         if: ${{ github.event_name == 'issue_comment' && github.event.issue.pull_request }}
         run: |
-          sed -i "s;^OSU_B=.*$;OSU_B=${{ github.event.issue.pull_request.url }};" "${{ needs.directory.outputs.GENERATOR_ENV }}"
+          sed -i "s;^OSU_B=.*$;OSU_B=${{ github.event.issue.pull_request.html_url }};" "${{ needs.directory.outputs.GENERATOR_ENV }}"
 
       - name: Add comment environment
         if: ${{ github.event_name == 'issue_comment' }}
@@ -239,7 +249,6 @@ jobs:
     name: Setup scores
     needs: [ directory, environment ]
     runs-on: self-hosted
-    if: ${{ !cancelled() && needs.environment.result == 'success' }}
     steps:
       - name: Query latest data
         id: query
@@ -252,7 +261,7 @@ jobs:
 
       - name: Restore cache
         id: restore-cache
-        uses: maxnowack/local-cache@v1
+        uses: maxnowack/local-cache@038cc090b52e4f205fbc468bf5b0756df6f68775 # v1
         with:
           path: ${{ steps.query.outputs.DATA_NAME }}.tar.bz2
           key: ${{ steps.query.outputs.DATA_NAME }}
@@ -272,7 +281,6 @@ jobs:
     name: Setup beatmaps
     needs: directory
     runs-on: self-hosted
-    if: ${{ !cancelled() && needs.directory.result == 'success' }}
     steps:
       - name: Query latest data
         id: query
@@ -284,7 +292,7 @@ jobs:
 
       - name: Restore cache
         id: restore-cache
-        uses: maxnowack/local-cache@v1
+        uses: maxnowack/local-cache@038cc090b52e4f205fbc468bf5b0756df6f68775 # v1
         with:
           path: ${{ steps.query.outputs.DATA_NAME }}.tar.bz2
           key: ${{ steps.query.outputs.DATA_NAME }}
@@ -305,7 +313,6 @@ jobs:
     needs: [ directory, environment, scores, beatmaps ]
     runs-on: self-hosted
     timeout-minutes: 720
-    if: ${{ !cancelled() && needs.scores.result == 'success' && needs.beatmaps.result == 'success' }}
     outputs:
       TARGET: ${{ steps.run.outputs.TARGET }}
       SPREADSHEET_LINK: ${{ steps.run.outputs.SPREADSHEET_LINK }}
@@ -331,21 +338,25 @@ jobs:
           cd "${{ needs.directory.outputs.GENERATOR_DIR }}"
           docker-compose down
 
+  output-cli:
+    name: Output info
+    needs: generator
+    runs-on: ubuntu-latest
+    steps:
       - name: Output info
-        if: ${{ success() }}
         run: |
-          echo "Target: ${{ steps.run.outputs.TARGET }}"
-          echo "Spreadsheet: ${{ steps.run.outputs.SPREADSHEET_LINK }}"
+          echo "Target: ${{ needs.generator.outputs.TARGET }}"
+          echo "Spreadsheet: ${{ needs.generator.outputs.SPREADSHEET_LINK }}"
 
   update-comment:
     name: Update PR comment
     needs: [ create-comment, generator ]
     runs-on: ubuntu-latest
-    if: ${{ github.event_name == 'issue_comment' && github.event.issue.pull_request && contains(github.event.comment.body, '!diffcalc') && github.event.comment.author_association == 'OWNER' }}
+    if: ${{ always() && needs.create-comment.result == 'success' }}
     steps:
       - name: Update comment on success
         if: ${{ needs.generator.result == 'success' }}
-        uses: thollander/actions-comment-pull-request@v2
+        uses: thollander/actions-comment-pull-request@363c6f6eae92cc5c3a66e95ba016fc771bb38943 # v2.4.2
         with:
           comment_tag: ${{ env.COMMENT_TAG }}
           mode: upsert
@@ -356,10 +367,18 @@ jobs:
 
       - name: Update comment on failure
         if: ${{ needs.generator.result == 'failure' }}
-        uses: thollander/actions-comment-pull-request@v2
+        uses: thollander/actions-comment-pull-request@363c6f6eae92cc5c3a66e95ba016fc771bb38943 # v2.4.2
         with:
           comment_tag: ${{ env.COMMENT_TAG }}
           mode: upsert
           create_if_not_exists: false
           message: |
             Difficulty calculation failed: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+
+      - name: Update comment on cancellation
+        if: ${{ needs.generator.result == 'cancelled' }}
+        uses: thollander/actions-comment-pull-request@363c6f6eae92cc5c3a66e95ba016fc771bb38943 # v2.4.2
+        with:
+          comment_tag: ${{ env.COMMENT_TAG }}
+          mode: delete
+          message: '.' # Appears to be required by this action for non-error status code.

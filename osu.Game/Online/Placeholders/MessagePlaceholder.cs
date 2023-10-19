@@ -22,6 +22,6 @@ namespace osu.Game.Online.Placeholders
             AddText(this.message = message);
         }
 
-        public override bool Equals(Placeholder other) => (other as MessagePlaceholder)?.message == message;
+        public override bool Equals(Placeholder? other) => (other as MessagePlaceholder)?.message == message;
     }
 }
