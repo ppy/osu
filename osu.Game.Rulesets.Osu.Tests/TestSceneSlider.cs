@@ -3,6 +3,7 @@
 
 #nullable disable
 
+using System;
 using System.Collections.Generic;
 using osu.Framework.Graphics;
 using osu.Game.Audio;
@@ -15,13 +16,18 @@ using osuTK.Graphics;
 using osu.Game.Rulesets.Mods;
 using System.Linq;
 using NUnit.Framework;
-using osu.Game.Beatmaps.Legacy;
+using osu.Framework.Allocation;
+using osu.Framework.Bindables;
+using osu.Framework.Extensions.ObjectExtensions;
+using osu.Framework.Testing;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Rulesets.Judgements;
 using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Objects.Drawables;
 using osu.Game.Rulesets.Objects.Types;
+using osu.Game.Rulesets.Osu.Configuration;
+using osu.Game.Rulesets.Osu.Mods;
 
 namespace osu.Game.Rulesets.Osu.Tests
 {
@@ -29,6 +35,49 @@ namespace osu.Game.Rulesets.Osu.Tests
     public partial class TestSceneSlider : OsuSkinnableTestScene
     {
         private int depthIndex;
+
+        private readonly BindableBool snakingIn = new BindableBool(true);
+        private readonly BindableBool snakingOut = new BindableBool(true);
+
+        private float progressToHit;
+
+        protected override void LoadComplete()
+        {
+            base.LoadComplete();
+
+            AddToggleStep("disable snaking", v =>
+            {
+                snakingIn.Value = !v;
+                snakingOut.Value = !v;
+            });
+
+            AddToggleStep("toggle hidden", hiddenActive => SelectedMods.Value = hiddenActive ? new[] { new OsuModHidden() } : Array.Empty<Mod>());
+
+            AddSliderStep("hit at", 0f, 1f, 0f, v =>
+            {
+                progressToHit = v;
+            });
+        }
+
+        [BackgroundDependencyLoader]
+        private void load()
+        {
+            var config = (OsuRulesetConfigManager)RulesetConfigs.GetConfigFor(Ruleset.Value.CreateInstance()).AsNonNull();
+            config.BindWith(OsuRulesetSetting.SnakingInSliders, snakingIn);
+            config.BindWith(OsuRulesetSetting.SnakingOutSliders, snakingOut);
+        }
+
+        protected override void Update()
+        {
+            base.Update();
+
+            foreach (var slider in this.ChildrenOfType<DrawableSlider>())
+            {
+                double completionProgress = Math.Clamp((Time.Current - slider.HitObject.StartTime) / slider.HitObject.Duration, 0, 1);
+                if (completionProgress > progressToHit && !slider.IsHit)
+                    slider.HeadCircle.HitArea.Hit();
+            }
+        }
 
         [Test]
         public void TestVariousSliders()
@@ -180,7 +229,7 @@ namespace osu.Game.Rulesets.Osu.Tests
                 StackHeight = 10
             };
 
-            return createDrawable(slider, 2, 2);
+            return createDrawable(slider, 2);
         }
 
         private Drawable testSimpleMedium(int repeats = 0) => createSlider(5, repeats: repeats);
@@ -203,6 +252,7 @@ namespace osu.Game.Rulesets.Osu.Tests
         {
             var slider = new Slider
             {
+                SliderVelocityMultiplier = speedMultiplier,
                 StartTime = Time.Current + time_offset,
                 Position = new Vector2(0, -(distance / 2)),
                 Path = new SliderPath(PathType.PerfectCurve, new[]
@@ -214,7 +264,7 @@ namespace osu.Game.Rulesets.Osu.Tests
                 StackHeight = stackHeight
             };
 
-            return createDrawable(slider, circleSize, speedMultiplier);
+            return createDrawable(slider, circleSize);
         }
 
         private Drawable testPerfect(int repeats = 0)
@@ -232,7 +282,7 @@ namespace osu.Game.Rulesets.Osu.Tests
                 RepeatCount = repeats,
             };
 
-            return createDrawable(slider, 2, 3);
+            return createDrawable(slider, 2);
         }
 
         private Drawable testLinear(int repeats = 0) => createLinear(repeats);
@@ -255,7 +305,7 @@ namespace osu.Game.Rulesets.Osu.Tests
                 RepeatCount = repeats,
             };
 
-            return createDrawable(slider, 2, 3);
+            return createDrawable(slider, 2);
         }
 
         private Drawable testBezier(int repeats = 0) => createBezier(repeats);
@@ -277,7 +327,7 @@ namespace osu.Game.Rulesets.Osu.Tests
                 RepeatCount = repeats,
             };
 
-            return createDrawable(slider, 2, 3);
+            return createDrawable(slider, 2);
         }
 
         private Drawable testLinearOverlapping(int repeats = 0) => createOverlapping(repeats);
@@ -300,7 +350,7 @@ namespace osu.Game.Rulesets.Osu.Tests
                 RepeatCount = repeats,
             };
 
-            return createDrawable(slider, 2, 3);
+            return createDrawable(slider, 2);
         }
 
         private Drawable testCatmull(int repeats = 0) => createCatmull(repeats);
@@ -326,15 +376,12 @@ namespace osu.Game.Rulesets.Osu.Tests
                 NodeSamples = repeatSamples
             };
 
-            return createDrawable(slider, 3, 1);
+            return createDrawable(slider, 3);
         }
 
-        private Drawable createDrawable(Slider slider, float circleSize, double speedMultiplier)
+        private Drawable createDrawable(Slider slider, float circleSize)
         {
-            var cpi = new LegacyControlPointInfo();
-            cpi.Add(0, new DifficultyControlPoint { SliderVelocity = speedMultiplier });
-
-            slider.ApplyDefaults(cpi, new BeatmapDifficulty
+            slider.ApplyDefaults(new ControlPointInfo(), new BeatmapDifficulty
             {
                 CircleSize = circleSize,
                 SliderTickRate = 3

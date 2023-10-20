@@ -14,6 +14,7 @@ using System.Linq;
 using JetBrains.Annotations;
 using osu.Framework.Extensions.EnumExtensions;
 using osu.Framework.Utils;
+using osu.Game.Beatmaps.ControlPoints;
 using osu.Game.Beatmaps.Legacy;
 using osu.Game.Skinning;
 using osu.Game.Utils;
@@ -43,7 +44,6 @@ namespace osu.Game.Rulesets.Objects.Legacy
             FormatVersion = formatVersion;
         }
 
-        [CanBeNull]
         public override HitObject Parse(string text)
         {
             string[] split = text.Split(',');
@@ -92,7 +92,7 @@ namespace osu.Game.Rulesets.Objects.Legacy
                 }
 
                 if (split.Length > 10)
-                    readCustomSampleBanks(split[10], bankInfo);
+                    readCustomSampleBanks(split[10], bankInfo, true);
 
                 // One node for each repeat + the start and end nodes
                 int nodes = repeatCount + 2;
@@ -182,7 +182,7 @@ namespace osu.Game.Rulesets.Objects.Legacy
             return result;
         }
 
-        private void readCustomSampleBanks(string str, SampleBankInfo bankInfo)
+        private void readCustomSampleBanks(string str, SampleBankInfo bankInfo, bool banksOnly = false)
         {
             if (string.IsNullOrEmpty(str))
                 return;
@@ -190,7 +190,12 @@ namespace osu.Game.Rulesets.Objects.Legacy
             string[] split = str.Split(':');
 
             var bank = (LegacySampleBank)Parsing.ParseInt(split[0]);
+            if (!Enum.IsDefined(bank))
+                bank = LegacySampleBank.Normal;
+
             var addBank = (LegacySampleBank)Parsing.ParseInt(split[1]);
+            if (!Enum.IsDefined(addBank))
+                addBank = LegacySampleBank.Normal;
 
             string stringBank = bank.ToString().ToLowerInvariant();
             if (stringBank == @"none")
@@ -201,6 +206,8 @@ namespace osu.Game.Rulesets.Objects.Legacy
 
             bankInfo.BankForNormal = stringBank;
             bankInfo.BankForAdditions = string.IsNullOrEmpty(stringAddBank) ? stringBank : stringAddBank;
+
+            if (banksOnly) return;
 
             if (split.Length > 2)
                 bankInfo.CustomSampleBank = Parsing.ParseInt(split[2]);
@@ -444,9 +451,9 @@ namespace osu.Game.Rulesets.Objects.Legacy
             if (string.IsNullOrEmpty(bankInfo.Filename))
             {
                 soundTypes.Add(new LegacyHitSampleInfo(HitSampleInfo.HIT_NORMAL, bankInfo.BankForNormal, bankInfo.Volume, bankInfo.CustomSampleBank,
-                                // if the sound type doesn't have the Normal flag set, attach it anyway as a layered sample.
-                                // None also counts as a normal non-layered sample: https://osu.ppy.sh/help/wiki/osu!_File_Formats/Osu_(file_format)#hitsounds
-                                type != LegacyHitSoundType.None && !type.HasFlagFast(LegacyHitSoundType.Normal)));
+                    // if the sound type doesn't have the Normal flag set, attach it anyway as a layered sample.
+                    // None also counts as a normal non-layered sample: https://osu.ppy.sh/help/wiki/osu!_File_Formats/Osu_(file_format)#hitsounds
+                    type != LegacyHitSoundType.None && !type.HasFlagFast(LegacyHitSoundType.Normal)));
             }
             else
             {
@@ -477,12 +484,14 @@ namespace osu.Game.Rulesets.Objects.Legacy
             /// The bank identifier to use for the base ("hitnormal") sample.
             /// Transferred to <see cref="HitSampleInfo.Bank"/> when appropriate.
             /// </summary>
+            [CanBeNull]
             public string BankForNormal;
 
             /// <summary>
             /// The bank identifier to use for additions ("hitwhistle", "hitfinish", "hitclap").
             /// Transferred to <see cref="HitSampleInfo.Bank"/> when appropriate.
             /// </summary>
+            [CanBeNull]
             public string BankForAdditions;
 
             /// <summary>
@@ -516,17 +525,24 @@ namespace osu.Game.Rulesets.Objects.Legacy
             /// </remarks>
             public readonly bool IsLayered;
 
+            /// <summary>
+            /// Whether a bank was specified locally to the relevant hitobject.
+            /// If <c>false</c>, a bank will be retrieved from the closest control point.
+            /// </summary>
+            public bool BankSpecified;
+
             public LegacyHitSampleInfo(string name, string? bank = null, int volume = 0, int customSampleBank = 0, bool isLayered = false)
-                : base(name, bank, customSampleBank >= 2 ? customSampleBank.ToString() : null, volume)
+                : base(name, bank ?? SampleControlPoint.DEFAULT_BANK, customSampleBank >= 2 ? customSampleBank.ToString() : null, volume)
             {
                 CustomSampleBank = customSampleBank;
+                BankSpecified = !string.IsNullOrEmpty(bank);
                 IsLayered = isLayered;
             }
 
-            public sealed override HitSampleInfo With(Optional<string> newName = default, Optional<string?> newBank = default, Optional<string?> newSuffix = default, Optional<int> newVolume = default)
+            public sealed override HitSampleInfo With(Optional<string> newName = default, Optional<string> newBank = default, Optional<string?> newSuffix = default, Optional<int> newVolume = default)
                 => With(newName, newBank, newVolume);
 
-            public virtual LegacyHitSampleInfo With(Optional<string> newName = default, Optional<string?> newBank = default, Optional<int> newVolume = default,
+            public virtual LegacyHitSampleInfo With(Optional<string> newName = default, Optional<string> newBank = default, Optional<int> newVolume = default,
                                                     Optional<int> newCustomSampleBank = default,
                                                     Optional<bool> newIsLayered = default)
                 => new LegacyHitSampleInfo(newName.GetOr(Name), newBank.GetOr(Bank), newVolume.GetOr(Volume), newCustomSampleBank.GetOr(CustomSampleBank), newIsLayered.GetOr(IsLayered));
@@ -561,7 +577,7 @@ namespace osu.Game.Rulesets.Objects.Legacy
                 Path.ChangeExtension(Filename, null)
             };
 
-            public sealed override LegacyHitSampleInfo With(Optional<string> newName = default, Optional<string?> newBank = default, Optional<int> newVolume = default,
+            public sealed override LegacyHitSampleInfo With(Optional<string> newName = default, Optional<string> newBank = default, Optional<int> newVolume = default,
                                                             Optional<int> newCustomSampleBank = default,
                                                             Optional<bool> newIsLayered = default)
                 => new FileHitSampleInfo(Filename, newVolume.GetOr(Volume));
@@ -574,7 +590,5 @@ namespace osu.Game.Rulesets.Objects.Legacy
 
             public override int GetHashCode() => HashCode.Combine(base.GetHashCode(), Filename);
         }
-
-#nullable disable
     }
 }

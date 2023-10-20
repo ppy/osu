@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using Newtonsoft.Json;
+using osu.Framework.Bindables;
 using osu.Game.Audio;
 using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.ControlPoints;
@@ -16,7 +17,7 @@ using osu.Game.Rulesets.Objects.Types;
 
 namespace osu.Game.Rulesets.Catch.Objects
 {
-    public class JuiceStream : CatchHitObject, IHasPathWithRepeats
+    public class JuiceStream : CatchHitObject, IHasPathWithRepeats, IHasSliderVelocity
     {
         /// <summary>
         /// Positional distance that results in a duration of one second, before any speed adjustments.
@@ -27,6 +28,19 @@ namespace osu.Game.Rulesets.Catch.Objects
 
         public int RepeatCount { get; set; }
 
+        public BindableNumber<double> SliderVelocityMultiplierBindable { get; } = new BindableDouble(1)
+        {
+            Precision = 0.01,
+            MinValue = 0.1,
+            MaxValue = 10
+        };
+
+        public double SliderVelocityMultiplier
+        {
+            get => SliderVelocityMultiplierBindable.Value;
+            set => SliderVelocityMultiplierBindable.Value = value;
+        }
+
         [JsonIgnore]
         private double velocityFactor;
 
@@ -34,10 +48,10 @@ namespace osu.Game.Rulesets.Catch.Objects
         private double tickDistanceFactor;
 
         [JsonIgnore]
-        public double Velocity => velocityFactor * DifficultyControlPoint.SliderVelocity;
+        public double Velocity => velocityFactor * SliderVelocityMultiplier;
 
         [JsonIgnore]
-        public double TickDistance => tickDistanceFactor * DifficultyControlPoint.SliderVelocity;
+        public double TickDistance => tickDistanceFactor * SliderVelocityMultiplier;
 
         /// <summary>
         /// The length of one span of this <see cref="JuiceStream"/>.
@@ -63,7 +77,7 @@ namespace osu.Game.Rulesets.Catch.Objects
             int nodeIndex = 0;
             SliderEventDescriptor? lastEvent = null;
 
-            foreach (var e in SliderEventGenerator.Generate(StartTime, SpanDuration, Velocity, TickDistance, Path.Distance, this.SpanCount(), LegacyLastTickOffset, cancellationToken))
+            foreach (var e in SliderEventGenerator.Generate(StartTime, SpanDuration, Velocity, TickDistance, Path.Distance, this.SpanCount(), cancellationToken))
             {
                 // generate tiny droplets since the last point
                 if (lastEvent != null)
@@ -90,8 +104,8 @@ namespace osu.Game.Rulesets.Catch.Objects
                     }
                 }
 
-                // this also includes LegacyLastTick and this is used for TinyDroplet generation above.
-                // this means that the final segment of TinyDroplets are increasingly mistimed where LegacyLastTickOffset is being applied.
+                // this also includes LastTick and this is used for TinyDroplet generation above.
+                // this means that the final segment of TinyDroplets are increasingly mistimed where LastTick is being applied.
                 lastEvent = e;
 
                 switch (e.Type)
@@ -148,7 +162,5 @@ namespace osu.Game.Rulesets.Catch.Objects
         public double Distance => Path.Distance;
 
         public IList<IList<HitSampleInfo>> NodeSamples { get; set; } = new List<IList<HitSampleInfo>>();
-
-        public double? LegacyLastTickOffset { get; set; }
     }
 }

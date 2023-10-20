@@ -15,7 +15,11 @@ namespace osu.Game.Rulesets.Catch.Skinning.Argon
         [BackgroundDependencyLoader]
         private void load()
         {
-            RelativeSizeAxes = Axes.Both;
+            Anchor = Anchor.TopCentre;
+            Origin = Anchor.Centre;
+
+            RelativeSizeAxes = Axes.X;
+            AutoSizeAxes = Axes.Y;
 
             InternalChildren = new Drawable[]
             {

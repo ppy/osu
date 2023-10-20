@@ -65,7 +65,7 @@ namespace osu.Game.Screens.Play
         /// <param name="beatmap">The beatmap to be used for time and metadata references.</param>
         /// <param name="skipTargetTime">The latest time which should be used when introducing gameplay. Will be used when skipping forward.</param>
         public MasterGameplayClockContainer(WorkingBeatmap beatmap, double skipTargetTime)
-            : base(beatmap.Track, true)
+            : base(beatmap.Track, applyOffsets: true, requireDecoupling: true)
         {
             this.beatmap = beatmap;
             this.skipTargetTime = skipTargetTime;
@@ -187,7 +187,13 @@ namespace osu.Game.Screens.Play
         public void StopUsingBeatmapClock()
         {
             removeSourceClockAdjustments();
-            ChangeSource(new TrackVirtual(beatmap.Track.Length));
+
+            var virtualTrack = new TrackVirtual(beatmap.Track.Length);
+            virtualTrack.Seek(CurrentTime);
+            if (IsRunning)
+                virtualTrack.Start();
+            ChangeSource(virtualTrack);
+
             addSourceClockAdjustments();
         }
 

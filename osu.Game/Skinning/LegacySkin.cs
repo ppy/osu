@@ -4,6 +4,7 @@
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Linq;
 using JetBrains.Annotations;
@@ -22,19 +23,14 @@ using osu.Game.Rulesets.Objects.Types;
 using osu.Game.Rulesets.Scoring;
 using osu.Game.Screens.Play.HUD;
 using osu.Game.Screens.Play.HUD.HitErrorMeters;
+using osuTK;
 using osuTK.Graphics;
 
 namespace osu.Game.Skinning
 {
     public class LegacySkin : Skin
     {
-        /// <summary>
-        /// Whether texture for the keys exists.
-        /// Used to determine if the mania ruleset is skinned.
-        /// </summary>
-        private readonly Lazy<bool> hasKeyTexture;
-
-        protected virtual bool AllowManiaSkin => hasKeyTexture.Value;
+        protected virtual bool AllowManiaConfigLookups => true;
 
         /// <summary>
         /// Whether this skin can use samples with a custom bank (custom sample set in stable terminology).
@@ -60,10 +56,6 @@ namespace osu.Game.Skinning
         protected LegacySkin(SkinInfo skin, IStorageResourceProvider? resources, IResourceStore<byte[]>? storage, string configurationFilename = @"skin.ini")
             : base(skin, resources, storage, configurationFilename)
         {
-            // todo: this shouldn't really be duplicated here (from ManiaLegacySkinTransformer). we need to come up with a better solution.
-            hasKeyTexture = new Lazy<bool>(() => this.GetAnimation(
-                lookupForMania<string>(new LegacyManiaSkinConfigurationLookup(4, LegacyManiaSkinConfigurationLookups.KeyImage, 0))?.Value ?? "mania-key1", true,
-                true) != null);
         }
 
         protected override void ParseConfigurationStream(Stream stream)
@@ -81,50 +73,61 @@ namespace osu.Game.Skinning
             }
         }
 
+        [SuppressMessage("ReSharper", "RedundantAssignment")] // for `wasHit` assignments used in `finally` debug logic
         public override IBindable<TValue>? GetConfig<TLookup, TValue>(TLookup lookup)
         {
-            switch (lookup)
+            bool wasHit = true;
+
+            try
             {
-                case GlobalSkinColours colour:
-                    switch (colour)
-                    {
-                        case GlobalSkinColours.ComboColours:
-                            var comboColours = Configuration.ComboColours;
-                            if (comboColours != null)
-                                return SkinUtils.As<TValue>(new Bindable<IReadOnlyList<Color4>>(comboColours));
+                switch (lookup)
+                {
+                    case GlobalSkinColours colour:
+                        switch (colour)
+                        {
+                            case GlobalSkinColours.ComboColours:
+                                var comboColours = Configuration.ComboColours;
+                                if (comboColours != null)
+                                    return SkinUtils.As<TValue>(new Bindable<IReadOnlyList<Color4>>(comboColours));
 
-                            break;
+                                break;
 
-                        default:
-                            return SkinUtils.As<TValue>(getCustomColour(Configuration, colour.ToString()));
-                    }
+                            default:
+                                return SkinUtils.As<TValue>(getCustomColour(Configuration, colour.ToString()));
+                        }
 
-                    break;
-
-                case SkinComboColourLookup comboColour:
-                    return SkinUtils.As<TValue>(GetComboColour(Configuration, comboColour.ColourIndex, comboColour.Combo));
-
-                case SkinCustomColourLookup customColour:
-                    return SkinUtils.As<TValue>(getCustomColour(Configuration, customColour.Lookup.ToString() ?? string.Empty));
-
-                case LegacyManiaSkinConfigurationLookup maniaLookup:
-                    if (!AllowManiaSkin)
                         break;
 
-                    var result = lookupForMania<TValue>(maniaLookup);
-                    if (result != null)
-                        return result;
+                    case SkinComboColourLookup comboColour:
+                        return SkinUtils.As<TValue>(GetComboColour(Configuration, comboColour.ColourIndex, comboColour.Combo));
 
-                    break;
+                    case SkinCustomColourLookup customColour:
+                        return SkinUtils.As<TValue>(getCustomColour(Configuration, customColour.Lookup.ToString() ?? string.Empty));
 
-                case SkinConfiguration.LegacySetting legacy:
-                    return legacySettingLookup<TValue>(legacy);
+                    case LegacyManiaSkinConfigurationLookup maniaLookup:
+                        if (!AllowManiaConfigLookups)
+                            break;
 
-                default:
-                    return genericLookup<TLookup, TValue>(lookup);
+                        var result = lookupForMania<TValue>(maniaLookup);
+                        if (result != null)
+                            return result;
+
+                        break;
+
+                    case SkinConfiguration.LegacySetting legacy:
+                        return legacySettingLookup<TValue>(legacy);
+
+                    default:
+                        return genericLookup<TLookup, TValue>(lookup);
+                }
+
+                wasHit = false;
+                return null;
             }
-
-            return null;
+            finally
+            {
+                LogLookupDebug(this, lookup, wasHit ? LookupDebugType.Hit : LookupDebugType.Miss);
+            }
         }
 
         private IBindable<TValue>? lookupForMania<TValue>(LegacyManiaSkinConfigurationLookup maniaLookup)
@@ -367,17 +370,27 @@ namespace osu.Game.Skinning
                                 {
                                     songProgress.Anchor = Anchor.TopRight;
                                     songProgress.Origin = Anchor.CentreRight;
-                                    songProgress.X = -accuracy.ScreenSpaceDeltaToParentSpace(accuracy.ScreenSpaceDrawQuad.Size).X - 10;
+                                    songProgress.X = -accuracy.ScreenSpaceDeltaToParentSpace(accuracy.ScreenSpaceDrawQuad.Size).X - 18;
                                     songProgress.Y = container.ToLocalSpace(accuracy.ScreenSpaceDrawQuad.TopLeft).Y + (accuracy.ScreenSpaceDeltaToParentSpace(accuracy.ScreenSpaceDrawQuad.Size).Y / 2);
                                 }
 
                                 var hitError = container.OfType<HitErrorMeter>().FirstOrDefault();
+                                var keyCounter = container.OfType<DefaultKeyCounterDisplay>().FirstOrDefault();
 
                                 if (hitError != null)
                                 {
                                     hitError.Anchor = Anchor.BottomCentre;
                                     hitError.Origin = Anchor.CentreLeft;
                                     hitError.Rotation = -90;
+
+                                    if (keyCounter != null)
+                                    {
+                                        const float padding = 10;
+
+                                        keyCounter.Anchor = Anchor.BottomRight;
+                                        keyCounter.Origin = Anchor.BottomRight;
+                                        keyCounter.Position = new Vector2(-padding, -(padding + hitError.Width));
+                                    }
                                 }
                             })
                             {
@@ -386,9 +399,10 @@ namespace osu.Game.Skinning
                                     new LegacyComboCounter(),
                                     new LegacyScoreCounter(),
                                     new LegacyAccuracyCounter(),
-                                    new LegacyHealthDisplay(),
                                     new LegacySongProgress(),
+                                    new LegacyHealthDisplay(),
                                     new BarHitErrorMeter(),
+                                    new DefaultKeyCounterDisplay()
                                 }
                             };
                     }
@@ -456,6 +470,13 @@ namespace osu.Game.Skinning
 
         public override Texture? GetTexture(string componentName, WrapMode wrapModeS, WrapMode wrapModeT)
         {
+            switch (componentName)
+            {
+                case "Menu/fountain-star":
+                    componentName = "star2";
+                    break;
+            }
+
             foreach (string name in getFallbackNames(componentName))
             {
                 // some component names (especially user-controlled ones, like `HitX` in mania)

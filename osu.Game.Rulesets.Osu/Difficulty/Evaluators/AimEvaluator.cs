@@ -1,7 +1,5 @@
-// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
-
-#nullable disable
 
 using System;
 using osu.Game.Rulesets.Difficulty.Preprocessing;
@@ -28,7 +26,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
         /// <item><description>and slider difficulty.</description></item>
         /// </list>
         /// </summary>
-        public static double EvaluateDifficultyOf(DifficultyHitObject current, bool withSliders)
+        public static double EvaluateDifficultyOf(DifficultyHitObject current, bool withSliderTravelDistance)
         {
             if (current.BaseObject is Spinner)
                 return 0;
@@ -38,10 +36,10 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
             if (osuCurrObj.IsOverlapping(true))
                 return 0;
 
-            return aimStrainOf(current, withSliders) + movementStrainOf(current);
+            return aimStrainOf(current, withSliderTravelDistance) + movementStrainOf(current);
         }
 
-        private static double aimStrainOf(DifficultyHitObject current, bool withSliders)
+        private static double aimStrainOf(DifficultyHitObject current, bool withSliderTravelDistance)
         {
             if (current.Index <= 1 || current.Previous(0).BaseObject is Spinner)
                 return 0;
@@ -54,7 +52,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
             double currVelocity = osuCurrObj.LazyJumpDistance / osuCurrObj.StrainTime;
 
             // But if the last object is a slider, then we extend the travel velocity through the slider into the current object.
-            if (osuLastObj.BaseObject is Slider lastSlider && withSliders)
+            if (osuLastObj.BaseObject is Slider lastSlider && withSliderTravelDistance)
             {
                 bool canGrantBonus =
                     lastSlider.NestedHitObjects.Count > 2 && lastSlider.NestedHitObjects[1] is SliderTick;
@@ -71,7 +69,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
             // As above, do the same for the previous hitobject.
             double prevVelocity = osuLastObj.LazyJumpDistance / osuLastObj.StrainTime;
 
-            if (osuLastLastObj.BaseObject is Slider lastLastSlider && withSliders)
+            if (osuLastLastObj.BaseObject is Slider lastLastSlider && withSliderTravelDistance)
             {
                 bool canGrantBonus =
                     lastLastSlider.NestedHitObjects.Count > 2 && lastLastSlider.NestedHitObjects[1] is SliderTick;
@@ -151,7 +149,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
             aimStrain += Math.Max(acuteAngleBonus * acute_angle_multiplier, wideAngleBonus * wide_angle_multiplier + velocityChangeBonus * velocity_change_multiplier);
 
             // Add in additional slider velocity bonus.
-            if (withSliders)
+            if (withSliderTravelDistance)
                 aimStrain += sliderBonus * slider_multiplier;
 
             return aimStrain;
@@ -164,7 +162,8 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
 
             double speedBonus = 1;
 
-            if (osuCurrObj.StrainTime < min_speed_bonus) {
+            if (osuCurrObj.StrainTime < min_speed_bonus)
+            {
                 speedBonus +=
                     0.75 *
                     Math.Pow((min_speed_bonus - osuCurrObj.StrainTime) / 45, 2);

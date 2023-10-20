@@ -30,7 +30,7 @@ namespace osu.Game.Overlays.Profile.Header
                 {
                     RelativeSizeAxes = Axes.X,
                     AutoSizeAxes = Axes.Y,
-                    Padding = new MarginPadding { Horizontal = UserProfileOverlay.CONTENT_X_MARGIN, Vertical = 10 },
+                    Padding = new MarginPadding { Horizontal = WaveOverlayContainer.HORIZONTAL_PADDING, Vertical = 10 },
                     Child = new GridContainer
                     {
                         RelativeSizeAxes = Axes.X,

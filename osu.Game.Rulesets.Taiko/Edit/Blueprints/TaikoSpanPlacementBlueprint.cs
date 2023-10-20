@@ -25,6 +25,8 @@ namespace osu.Game.Rulesets.Taiko.Edit.Blueprints
 
         private readonly IHasDuration spanPlacementObject;
 
+        protected override bool IsValidForPlacement => spanPlacementObject.Duration > 0;
+
         public TaikoSpanPlacementBlueprint(HitObject hitObject)
             : base(hitObject)
         {
@@ -73,7 +75,7 @@ namespace osu.Game.Rulesets.Taiko.Edit.Blueprints
                 return;
 
             base.OnMouseUp(e);
-            EndPlacement(spanPlacementObject.Duration > 0);
+            EndPlacement(true);
         }
 
         public override void UpdateTimeAndPosition(SnapResult result)

@@ -60,6 +60,7 @@ namespace osu.Game.Rulesets.Mania.UI
             RelativeSizeAxes = Axes.Y;
             AutoSizeAxes = Axes.X;
 
+            Container columnBackgrounds;
             Container topLevelContainer;
 
             InternalChildren = new Drawable[]
@@ -77,9 +78,10 @@ namespace osu.Game.Rulesets.Mania.UI
                         {
                             RelativeSizeAxes = Axes.Both
                         },
-                        columnFlow = new ColumnFlow<Column>(definition)
+                        columnBackgrounds = new Container
                         {
-                            RelativeSizeAxes = Axes.Y,
+                            Name = "Column backgrounds",
+                            RelativeSizeAxes = Axes.Both,
                         },
                         new Container
                         {
@@ -97,6 +99,10 @@ namespace osu.Game.Rulesets.Mania.UI
                                 Origin = Anchor.TopCentre,
                                 RelativeSizeAxes = Axes.Y,
                             }
+                        },
+                        columnFlow = new ColumnFlow<Column>(definition)
+                        {
+                            RelativeSizeAxes = Axes.Y,
                         },
                         new SkinnableDrawable(new ManiaSkinComponentLookup(ManiaSkinComponents.StageForeground), _ => null)
                         {
@@ -126,9 +132,12 @@ namespace osu.Game.Rulesets.Mania.UI
                 };
 
                 topLevelContainer.Add(column.TopLevelContainer.CreateProxy());
+                columnBackgrounds.Add(column.BackgroundContainer.CreateProxy());
                 columnFlow.SetContentForColumn(i, column);
                 AddNested(column);
             }
+
+            RegisterPool<BarLine, DrawableBarLine>(50, 200);
         }
 
         private ISkinSource currentSkin;
@@ -179,15 +188,11 @@ namespace osu.Game.Rulesets.Mania.UI
 
         public override bool Remove(DrawableHitObject h) => Columns.ElementAt(((ManiaHitObject)h.HitObject).Column - firstColumnIndex).Remove(h);
 
-        public void Add(BarLine barLine) => base.Add(new DrawableBarLine(barLine));
+        public void Add(BarLine barLine) => base.Add(barLine);
 
         internal void OnNewResult(DrawableHitObject judgedObject, JudgementResult result)
         {
             if (!judgedObject.DisplayResult || !DisplayJudgements.Value)
-                return;
-
-            // Tick judgements should not display text.
-            if (judgedObject is DrawableHoldNoteTick)
                 return;
 
             judgements.Clear(false);

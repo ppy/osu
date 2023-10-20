@@ -29,6 +29,13 @@ namespace osu.Game.Rulesets.Catch.UI
         /// <summary>
         /// The size of the catcher at 1x scale.
         /// </summary>
+        /// <remarks>
+        /// This is mainly used to compute catching range, the actual catcher size may differ based on skin implementation and sprite textures.
+        /// This is also equivalent to the "catcherWidth" property in osu-stable when the game field and beatmap difficulty are set to default values.
+        /// </remarks>
+        /// <seealso cref="CatchPlayfield.WIDTH"/>
+        /// <seealso cref="CatchPlayfield.HEIGHT"/>
+        /// <seealso cref="IBeatmapDifficultyInfo.DEFAULT_DIFFICULTY"/>
         public const float BASE_SIZE = 106.75f;
 
         /// <summary>
@@ -136,6 +143,7 @@ namespace osu.Game.Rulesets.Catch.UI
             Origin = Anchor.TopCentre;
 
             Size = new Vector2(BASE_SIZE);
+
             if (difficulty != null)
                 Scale = calculateScale(difficulty);
 
@@ -333,8 +341,11 @@ namespace osu.Game.Rulesets.Catch.UI
             base.Update();
 
             var scaleFromDirection = new Vector2((int)VisualDirection, 1);
+
             body.Scale = scaleFromDirection;
-            caughtObjectContainer.Scale = hitExplosionContainer.Scale = flipCatcherPlate ? scaleFromDirection : Vector2.One;
+            // Inverse of catcher scale is applied here, as catcher gets scaled by circle size and so do the incoming fruit.
+            caughtObjectContainer.Scale = (1 / Scale.X) * (flipCatcherPlate ? scaleFromDirection : Vector2.One);
+            hitExplosionContainer.Scale = flipCatcherPlate ? scaleFromDirection : Vector2.One;
 
             // Correct overshooting.
             if ((hyperDashDirection > 0 && hyperDashTargetPosition < X) ||
@@ -414,9 +425,12 @@ namespace osu.Game.Rulesets.Catch.UI
 
         private void clearPlate(DroppedObjectAnimation animation)
         {
-            var droppedObjects = caughtObjectContainer.Children.Select(getDroppedObject).ToArray();
+            var caughtObjects = caughtObjectContainer.Children.ToArray();
 
             caughtObjectContainer.Clear(false);
+
+            // Use the already returned PoolableDrawables for new objects
+            var droppedObjects = caughtObjects.Select(getDroppedObject).ToArray();
 
             droppedObjectTarget.AddRange(droppedObjects);
 
@@ -426,9 +440,9 @@ namespace osu.Game.Rulesets.Catch.UI
 
         private void removeFromPlate(CaughtObject caughtObject, DroppedObjectAnimation animation)
         {
-            var droppedObject = getDroppedObject(caughtObject);
-
             caughtObjectContainer.Remove(caughtObject, false);
+
+            var droppedObject = getDroppedObject(caughtObject);
 
             droppedObjectTarget.Add(droppedObject);
 
@@ -452,6 +466,8 @@ namespace osu.Game.Rulesets.Catch.UI
                     break;
             }
 
+            // Define lifetime start for dropped objects to be disposed correctly when rewinding replay
+            d.LifetimeStart = Clock.CurrentTime;
             d.Expire();
         }
 

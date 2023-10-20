@@ -9,7 +9,6 @@ using System.Diagnostics;
 using System.Linq;
 using System.Threading;
 using JetBrains.Annotations;
-using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
@@ -66,9 +65,6 @@ namespace osu.Game.Screens.Ranking
         public Action PostExpandAction;
 
         public readonly Bindable<ScoreInfo> SelectedScore = new Bindable<ScoreInfo>();
-
-        [Resolved]
-        private ScoreManager scoreManager { get; set; }
 
         private readonly CancellationTokenSource loadCancellationSource = new CancellationTokenSource();
         private readonly Flow flow;
@@ -149,7 +145,7 @@ namespace osu.Game.Screens.Ranking
 
             var score = trackingContainer.Panel.Score;
 
-            flow.SetLayoutPosition(trackingContainer, scoreManager.GetTotalScore(score));
+            flow.SetLayoutPosition(trackingContainer, score.TotalScore);
 
             trackingContainer.Show();
 

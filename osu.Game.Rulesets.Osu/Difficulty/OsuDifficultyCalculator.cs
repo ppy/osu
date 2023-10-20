@@ -93,7 +93,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
 
             double hitWindowGreat = hitWindows.WindowFor(HitResult.Great) / clockRate;
 
-            return new OsuDifficultyAttributes
+            OsuDifficultyAttributes attributes = new OsuDifficultyAttributes
             {
                 StarRating = starRating,
                 Mods = mods,
@@ -112,6 +112,8 @@ namespace osu.Game.Rulesets.Osu.Difficulty
                 SliderCount = sliderCount,
                 SpinnerCount = spinnerCount,
             };
+
+            return attributes;
         }
 
         protected override IEnumerable<DifficultyHitObject> CreateDifficultyHitObjects(IBeatmap beatmap, double clockRate)

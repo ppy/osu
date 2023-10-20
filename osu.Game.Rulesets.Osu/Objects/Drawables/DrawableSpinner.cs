@@ -126,7 +126,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
         {
             base.LoadSamples();
 
-            spinningSample.Samples = HitObject.CreateSpinningSamples().Select(s => HitObject.SampleControlPoint.ApplyTo(s)).Cast<ISampleInfo>().ToArray();
+            spinningSample.Samples = HitObject.CreateSpinningSamples().Cast<ISampleInfo>().ToArray();
             spinningSample.Frequency.Value = spinning_sample_initial_frequency;
         }
 
@@ -218,7 +218,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
                     // these become implicitly hit.
                     return 1;
 
-                return Math.Clamp(Result.RateAdjustedRotation / 360 / HitObject.SpinsRequired, 0, 1);
+                return Math.Clamp(Result.TotalRotation / 360 / HitObject.SpinsRequired, 0, 1);
             }
         }
 
@@ -279,30 +279,30 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
             // don't update after end time to avoid the rate display dropping during fade out.
             // this shouldn't be limited to StartTime as it causes weirdness with the underlying calculation, which is expecting updates during that period.
             if (Time.Current <= HitObject.EndTime)
-                spmCalculator.SetRotation(Result.RateAdjustedRotation);
+                spmCalculator.SetRotation(Result.TotalRotation);
 
             updateBonusScore();
         }
 
         private static readonly int score_per_tick = new SpinnerBonusTick.OsuSpinnerBonusTickJudgement().MaxNumericResult;
 
-        private int wholeSpins;
+        private int completedFullSpins;
 
         private void updateBonusScore()
         {
             if (ticks.Count == 0)
                 return;
 
-            int spins = (int)(Result.RateAdjustedRotation / 360);
+            int spins = (int)(Result.TotalRotation / 360);
 
-            if (spins < wholeSpins)
+            if (spins < completedFullSpins)
             {
                 // rewinding, silently handle
-                wholeSpins = spins;
+                completedFullSpins = spins;
                 return;
             }
 
-            while (wholeSpins != spins)
+            while (completedFullSpins != spins)
             {
                 var tick = ticks.FirstOrDefault(t => !t.Result.HasResult);
 
@@ -312,10 +312,10 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
                     tick.TriggerResult(true);
 
                     if (tick is DrawableSpinnerBonusTick)
-                        gainedBonus.Value = score_per_tick * (spins - HitObject.SpinsRequired);
+                        gainedBonus.Value = score_per_tick * (spins - HitObject.SpinsRequiredForBonus);
                 }
 
-                wholeSpins++;
+                completedFullSpins++;
             }
         }
     }

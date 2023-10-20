@@ -63,7 +63,7 @@ namespace osu.Game.Screens.Ranking
 
         protected override APIRequest? FetchScores(Action<IEnumerable<ScoreInfo>>? scoresCallback)
         {
-            if (Score.BeatmapInfo.OnlineID <= 0 || Score.BeatmapInfo.Status <= BeatmapOnlineStatus.Pending)
+            if (Score.BeatmapInfo!.OnlineID <= 0 || Score.BeatmapInfo.Status <= BeatmapOnlineStatus.Pending)
                 return null;
 
             getScoreRequest = new GetScoresRequest(Score.BeatmapInfo, Score.Ruleset);

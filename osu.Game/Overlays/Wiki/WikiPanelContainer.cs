@@ -75,7 +75,7 @@ namespace osu.Game.Overlays.Wiki
         protected override void Update()
         {
             base.Update();
-            Height = Math.Max(panelContainer.Height, Parent.DrawHeight);
+            Height = Math.Max(panelContainer.Height, Parent!.DrawHeight);
         }
 
         private partial class WikiPanelMarkdownContainer : WikiMarkdownContainer

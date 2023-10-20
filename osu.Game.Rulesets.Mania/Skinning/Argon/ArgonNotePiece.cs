@@ -26,7 +26,6 @@ namespace osu.Game.Rulesets.Mania.Skinning.Argon
         private readonly IBindable<Color4> accentColour = new Bindable<Color4>();
 
         private readonly Box colouredBox;
-        private readonly Box shadow;
 
         public ArgonNotePiece()
         {
@@ -36,11 +35,12 @@ namespace osu.Game.Rulesets.Mania.Skinning.Argon
             CornerRadius = CORNER_RADIUS;
             Masking = true;
 
-            InternalChildren = new Drawable[]
+            InternalChildren = new[]
             {
-                shadow = new Box
+                new Box
                 {
                     RelativeSizeAxes = Axes.Both,
+                    Colour = ColourInfo.GradientVertical(Color4.Black.Opacity(0), Colour4.Black)
                 },
                 new Container
                 {
@@ -65,17 +65,21 @@ namespace osu.Game.Rulesets.Mania.Skinning.Argon
                     RelativeSizeAxes = Axes.X,
                     Height = CORNER_RADIUS * 2,
                 },
-                new SpriteIcon
-                {
-                    Anchor = Anchor.Centre,
-                    Origin = Anchor.Centre,
-                    Y = 4,
-                    Icon = FontAwesome.Solid.AngleDown,
-                    Size = new Vector2(20),
-                    Scale = new Vector2(1, 0.7f)
-                }
+                CreateIcon(),
             };
         }
+
+        protected virtual Drawable CreateIcon() => new SpriteIcon
+        {
+            Anchor = Anchor.Centre,
+            Origin = Anchor.Centre,
+            Y = 4,
+            // TODO: replace with a non-squashed version.
+            // The 0.7f height scale should be removed.
+            Icon = FontAwesome.Solid.AngleDown,
+            Size = new Vector2(20),
+            Scale = new Vector2(1, 0.7f)
+        };
 
         [BackgroundDependencyLoader(true)]
         private void load(IScrollingInfo scrollingInfo, DrawableHitObject? drawableObject)
@@ -105,8 +109,6 @@ namespace osu.Game.Rulesets.Mania.Skinning.Argon
                 accent.NewValue.Lighten(0.1f),
                 accent.NewValue
             );
-
-            shadow.Colour = accent.NewValue.Darken(0.5f);
         }
     }
 }

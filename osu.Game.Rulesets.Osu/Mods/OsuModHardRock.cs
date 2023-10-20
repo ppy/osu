@@ -35,5 +35,13 @@ namespace osu.Game.Rulesets.Osu.Mods
 
             OsuHitObjectGenerationUtils.ReflectVerticallyAlongPlayfield(osuObject);
         }
+
+        public override void ApplyToDifficulty(BeatmapDifficulty difficulty)
+        {
+            base.ApplyToDifficulty(difficulty);
+
+            difficulty.CircleSize = Math.Min(difficulty.CircleSize * 1.3f, 10.0f); // CS uses a custom 1.3 ratio.
+            difficulty.ApproachRate = Math.Min(difficulty.ApproachRate * ADJUST_RATIO, 10.0f);
+        }
     }
 }

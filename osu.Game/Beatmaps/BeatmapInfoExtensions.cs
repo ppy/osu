@@ -1,7 +1,7 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using System.Linq;
+using System.Collections.Generic;
 using osu.Framework.Localisation;
 
 namespace osu.Game.Beatmaps
@@ -29,10 +29,21 @@ namespace osu.Game.Beatmaps
             return new RomanisableString($"{metadata.GetPreferred(true)}".Trim(), $"{metadata.GetPreferred(false)}".Trim());
         }
 
-        public static string[] GetSearchableTerms(this IBeatmapInfo beatmapInfo) => new[]
+        public static List<string> GetSearchableTerms(this IBeatmapInfo beatmapInfo)
         {
-            beatmapInfo.DifficultyName
-        }.Concat(beatmapInfo.Metadata.GetSearchableTerms()).Where(s => !string.IsNullOrEmpty(s)).ToArray();
+            var termsList = new List<string>(BeatmapMetadataInfoExtensions.MAX_SEARCHABLE_TERM_COUNT + 1);
+
+            addIfNotNull(beatmapInfo.DifficultyName);
+
+            BeatmapMetadataInfoExtensions.CollectSearchableTerms(beatmapInfo.Metadata, termsList);
+            return termsList;
+
+            void addIfNotNull(string? s)
+            {
+                if (!string.IsNullOrEmpty(s))
+                    termsList.Add(s);
+            }
+        }
 
         private static string getVersionString(IBeatmapInfo beatmapInfo) => string.IsNullOrEmpty(beatmapInfo.DifficultyName) ? string.Empty : $"[{beatmapInfo.DifficultyName}]";
     }

@@ -14,7 +14,6 @@ using osu.Framework.Threading;
 using osu.Framework.Utils;
 using osu.Game.Graphics;
 using osuTK;
-using osuTK.Graphics;
 
 namespace osu.Game.Screens.Play.HUD
 {
@@ -32,18 +31,8 @@ namespace osu.Game.Screens.Play.HUD
 
         private readonly Box background;
 
-        private readonly BindableBool showBackground = new BindableBool();
-
         private readonly ColourInfo mainColour;
-        private readonly ColourInfo mainColourDarkened;
         private ColourInfo catchUpColour;
-        private ColourInfo catchUpColourDarkened;
-
-        public bool ShowBackground
-        {
-            get => showBackground.Value;
-            set => showBackground.Value = value;
-        }
 
         public double StartTime
         {
@@ -95,7 +84,7 @@ namespace osu.Game.Screens.Play.HUD
                 {
                     RelativeSizeAxes = Axes.Both,
                     Alpha = 0,
-                    Colour = Colour4.White.Darken(1 + 1 / 4f)
+                    Colour = OsuColour.Gray(0.2f),
                 },
                 catchupBar = new RoundedBar
                 {
@@ -112,12 +101,10 @@ namespace osu.Game.Screens.Play.HUD
                     Anchor = Anchor.BottomLeft,
                     Origin = Anchor.BottomLeft,
                     CornerRadius = 5,
-                    AccentColour = mainColour = Color4.White,
+                    AccentColour = mainColour = OsuColour.Gray(0.9f),
                     RelativeSizeAxes = Axes.Both
                 },
             };
-
-            mainColourDarkened = Colour4.White.Darken(1 / 3f);
         }
 
         private void setupAlternateValue()
@@ -141,16 +128,15 @@ namespace osu.Game.Screens.Play.HUD
         [BackgroundDependencyLoader]
         private void load(OsuColour colours)
         {
-            catchUpColour = colours.BlueLight;
-            catchUpColourDarkened = colours.BlueDark;
-
-            showBackground.BindValueChanged(_ => updateBackground(), true);
+            catchUpColour = colours.BlueDark;
         }
 
-        private void updateBackground()
+        protected override void LoadComplete()
         {
-            background.FadeTo(showBackground.Value ? 1 / 4f : 0, 200, Easing.In);
-            playfieldBar.TransformTo(nameof(playfieldBar.AccentColour), ShowBackground ? mainColour : mainColourDarkened, 200, Easing.In);
+            base.LoadComplete();
+
+            background.FadeTo(0.3f, 200, Easing.In);
+            playfieldBar.TransformTo(nameof(playfieldBar.AccentColour), mainColour, 200, Easing.In);
         }
 
         protected override bool OnHover(HoverEvent e)
@@ -190,8 +176,8 @@ namespace osu.Game.Screens.Play.HUD
 
             catchupBar.AccentColour = Interpolation.ValueAt(
                 Math.Min(timeDelta, colour_transition_threshold),
-                ShowBackground ? mainColour : mainColourDarkened,
-                ShowBackground ? catchUpColour : catchUpColourDarkened,
+                mainColour,
+                catchUpColour,
                 0, colour_transition_threshold,
                 Easing.OutQuint);
 
@@ -242,7 +228,6 @@ namespace osu.Game.Screens.Play.HUD
                 {
                     length = value;
                     mask.Width = value * DrawWidth;
-                    fill.Width = value * DrawWidth;
                 }
             }
 

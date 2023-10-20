@@ -14,7 +14,6 @@ using osu.Framework.Graphics.UserInterface;
 using osu.Framework.Input.Events;
 using osu.Framework.Utils;
 using osu.Game.Audio;
-using osu.Game.Beatmaps.ControlPoints;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Rulesets.Edit;
 using osu.Game.Rulesets.Objects;
@@ -41,7 +40,10 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders
         protected PathControlPointVisualiser<Slider> ControlPointVisualiser { get; private set; }
 
         [Resolved(CanBeNull = true)]
-        private IDistanceSnapProvider snapProvider { get; set; }
+        private IPositionSnapProvider positionSnapProvider { get; set; }
+
+        [Resolved(CanBeNull = true)]
+        private IDistanceSnapProvider distanceSnapProvider { get; set; }
 
         [Resolved(CanBeNull = true)]
         private IPlacementHandler placementHandler { get; set; }
@@ -195,7 +197,7 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders
         {
             if (placementControlPoint != null)
             {
-                var result = snapProvider?.FindSnappedPositionAndTime(ToScreenSpace(e.MousePosition));
+                var result = positionSnapProvider?.FindSnappedPositionAndTime(ToScreenSpace(e.MousePosition));
                 placementControlPoint.Position = ToLocalSpace(result?.ScreenSpacePosition ?? ToScreenSpace(e.MousePosition)) - HitObject.Position;
             }
         }
@@ -246,7 +248,7 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders
             // Move the control points from the insertion index onwards to make room for the insertion
             controlPoints.Insert(insertionIndex, pathControlPoint);
 
-            HitObject.SnapTo(snapProvider);
+            HitObject.SnapTo(distanceSnapProvider);
 
             return pathControlPoint;
         }
@@ -268,7 +270,7 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders
             }
 
             // Snap the slider to the current beat divisor before checking length validity.
-            HitObject.SnapTo(snapProvider);
+            HitObject.SnapTo(distanceSnapProvider);
 
             // If there are 0 or 1 remaining control points, or the slider has an invalid length, it is in a degenerate form and should be deleted
             if (controlPoints.Count <= 1 || !HitObject.Path.HasValidLength)
@@ -311,18 +313,11 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders
                 var splitControlPoints = controlPoints.Take(index + 1).ToList();
                 controlPoints.RemoveRange(0, index);
 
-                // Turn the control points which were split off into a new slider.
-                var samplePoint = (SampleControlPoint)HitObject.SampleControlPoint.DeepClone();
-                var difficultyPoint = (DifficultyControlPoint)HitObject.DifficultyControlPoint.DeepClone();
-
                 var newSlider = new Slider
                 {
                     StartTime = HitObject.StartTime,
                     Position = HitObject.Position + splitControlPoints[0].Position,
                     NewCombo = HitObject.NewCombo,
-                    SampleControlPoint = samplePoint,
-                    DifficultyControlPoint = difficultyPoint,
-                    LegacyLastTickOffset = HitObject.LegacyLastTickOffset,
                     Samples = HitObject.Samples.Select(s => s.With()).ToList(),
                     RepeatCount = HitObject.RepeatCount,
                     NodeSamples = HitObject.NodeSamples.Select(n => (IList<HitSampleInfo>)n.Select(s => s.With()).ToList()).ToList(),
@@ -378,15 +373,11 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders
 
                 Vector2 position = HitObject.Position + HitObject.Path.PositionAt(pathPosition);
 
-                var samplePoint = (SampleControlPoint)HitObject.SampleControlPoint.DeepClone();
-                samplePoint.Time = time;
-
                 editorBeatmap.Add(new HitCircle
                 {
                     StartTime = time,
                     Position = position,
                     NewCombo = i == 0 && HitObject.NewCombo,
-                    SampleControlPoint = samplePoint,
                     Samples = HitObject.HeadCircle.Samples.Select(s => s.With()).ToList()
                 });
 

@@ -1,9 +1,7 @@
-// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
-using System.Linq;
+using System.Collections.Generic;
 using osu.Framework.Localisation;
 
 namespace osu.Game.Beatmaps
@@ -13,16 +11,31 @@ namespace osu.Game.Beatmaps
         /// <summary>
         /// An array of all searchable terms provided in contained metadata.
         /// </summary>
-        public static string[] GetSearchableTerms(this IBeatmapMetadataInfo metadataInfo) => new[]
+        public static string[] GetSearchableTerms(this IBeatmapMetadataInfo metadataInfo)
         {
-            metadataInfo.Author.Username,
-            metadataInfo.Artist,
-            metadataInfo.ArtistUnicode,
-            metadataInfo.Title,
-            metadataInfo.TitleUnicode,
-            metadataInfo.Source,
-            metadataInfo.Tags
-        }.Where(s => !string.IsNullOrEmpty(s)).ToArray();
+            var termsList = new List<string>(MAX_SEARCHABLE_TERM_COUNT);
+            CollectSearchableTerms(metadataInfo, termsList);
+            return termsList.ToArray();
+        }
+
+        internal const int MAX_SEARCHABLE_TERM_COUNT = 7;
+
+        internal static void CollectSearchableTerms(IBeatmapMetadataInfo metadataInfo, IList<string> termsList)
+        {
+            addIfNotNull(metadataInfo.Author.Username);
+            addIfNotNull(metadataInfo.Artist);
+            addIfNotNull(metadataInfo.ArtistUnicode);
+            addIfNotNull(metadataInfo.Title);
+            addIfNotNull(metadataInfo.TitleUnicode);
+            addIfNotNull(metadataInfo.Source);
+            addIfNotNull(metadataInfo.Tags);
+
+            void addIfNotNull(string s)
+            {
+                if (!string.IsNullOrEmpty(s))
+                    termsList.Add(s);
+            }
+        }
 
         /// <summary>
         /// A user-presentable display title representing this metadata.

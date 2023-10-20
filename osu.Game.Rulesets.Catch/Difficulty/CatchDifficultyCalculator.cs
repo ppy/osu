@@ -38,13 +38,15 @@ namespace osu.Game.Rulesets.Catch.Difficulty
             // this is the same as osu!, so there's potential to share the implementation... maybe
             double preempt = IBeatmapDifficultyInfo.DifficultyRange(beatmap.Difficulty.ApproachRate, 1800, 1200, 450) / clockRate;
 
-            return new CatchDifficultyAttributes
+            CatchDifficultyAttributes attributes = new CatchDifficultyAttributes
             {
                 StarRating = Math.Sqrt(skills[0].DifficultyValue()) * star_scaling_factor,
                 Mods = mods,
                 ApproachRate = preempt > 1200.0 ? -(preempt - 1800.0) / 120.0 : -(preempt - 1200.0) / 150.0 + 5.0,
                 MaxCombo = beatmap.HitObjects.Count(h => h is Fruit) + beatmap.HitObjects.OfType<JuiceStream>().SelectMany(j => j.NestedHitObjects).Count(h => !(h is TinyDroplet)),
             };
+
+            return attributes;
         }
 
         protected override IEnumerable<DifficultyHitObject> CreateDifficultyHitObjects(IBeatmap beatmap, double clockRate)

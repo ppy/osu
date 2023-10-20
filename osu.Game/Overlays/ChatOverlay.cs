@@ -9,6 +9,7 @@ using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
+using osu.Framework.Graphics.Cursor;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Input;
 using osu.Framework.Input.Bindings;
@@ -53,6 +54,9 @@ namespace osu.Game.Overlays
         private const float top_bar_height = 40;
         private const float side_bar_width = 190;
         private const float chat_bar_height = 60;
+
+        protected override string PopInSampleName => @"UI/overlay-big-pop-in";
+        protected override string PopOutSampleName => @"UI/overlay-big-pop-out";
 
         [Resolved]
         private OsuConfigManager config { get; set; } = null!;
@@ -134,9 +138,13 @@ namespace osu.Game.Overlays
                                     },
                                     Children = new Drawable[]
                                     {
-                                        currentChannelContainer = new Container<DrawableChannel>
+                                        new PopoverContainer
                                         {
                                             RelativeSizeAxes = Axes.Both,
+                                            Child = currentChannelContainer = new Container<DrawableChannel>
+                                            {
+                                                RelativeSizeAxes = Axes.Both,
+                                            }
                                         },
                                         loading = new LoadingLayer(true),
                                         channelListing = new ChannelListing
@@ -259,7 +267,7 @@ namespace osu.Game.Overlays
             if (!isDraggingTopBar)
                 return;
 
-            float targetChatHeight = dragStartChatHeight - (e.MousePosition.Y - e.MouseDownPosition.Y) / Parent.DrawSize.Y;
+            float targetChatHeight = dragStartChatHeight - (e.MousePosition.Y - e.MouseDownPosition.Y) / Parent!.DrawSize.Y;
             chatHeight.Value = targetChatHeight;
         }
 
@@ -271,8 +279,6 @@ namespace osu.Game.Overlays
 
         protected override void PopIn()
         {
-            base.PopIn();
-
             this.MoveToY(0, transition_length, Easing.OutQuint);
             this.FadeIn(transition_length, Easing.OutQuint);
         }

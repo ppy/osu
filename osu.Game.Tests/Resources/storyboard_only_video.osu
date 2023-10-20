@@ -1,0 +1,31 @@
+osu file format v14
+
+[Events]
+//Background and Video events
+0,0,"BG.jpg",0,0
+Video,0,"video.avi"
+//Break Periods
+//Storyboard Layer 0 (Background)
+//Storyboard Layer 1 (Fail)
+//Storyboard Layer 2 (Pass)
+//Storyboard Layer 3 (Foreground)
+//Storyboard Layer 4 (Overlay)
+//Storyboard Sound Samples
+
+[TimingPoints]
+1674,333.333333333333,4,2,1,70,1,0
+1674,-100,4,2,1,70,0,0
+3340,-100,4,2,1,70,0,0
+3507,-100,4,2,1,70,0,0
+3673,-100,4,2,1,70,0,0
+
+[Colours]
+Combo1 : 240,80,80
+Combo2 : 171,252,203
+Combo3 : 128,128,255
+Combo4 : 249,254,186
+
+[HitObjects]
+148,303,1674,5,6,3:2:0:0:
+378,252,1840,1,0,0:0:0:0:
+389,270,2340,5,2,0:1:0:0:

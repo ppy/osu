@@ -16,7 +16,7 @@ namespace osu.Game.Screens.Select
     public static class FilterQueryParser
     {
         private static readonly Regex query_syntax_regex = new Regex(
-            @"\b(?<key>\w+)(?<op>(:|=|(>|<)(:|=)?))(?<value>("".*"")|(\S*))",
+            @"\b(?<key>\w+)(?<op>(:|=|(>|<)(:|=)?))(?<value>("".*""[!]?)|(\S*))",
             RegexOptions.Compiled | RegexOptions.IgnoreCase);
 
         internal static void ApplyQueries(FilterCriteria criteria, string query)
@@ -72,6 +72,9 @@ namespace osu.Game.Screens.Select
 
                 case "artist":
                     return TryUpdateCriteriaText(ref criteria.Artist, op, value);
+
+                case "title":
+                    return TryUpdateCriteriaText(ref criteria.Title, op, value);
 
                 default:
                     return criteria.RulesetCriteria?.TryParseCustomKeywordCriteria(key, op, value) ?? false;
@@ -161,7 +164,7 @@ namespace osu.Game.Screens.Select
             switch (op)
             {
                 case Operator.Equal:
-                    textFilter.SearchTerm = value.Trim('"');
+                    textFilter.SearchTerm = value;
                     return true;
 
                 default:

@@ -75,7 +75,7 @@ namespace osu.Game.Tests.Visual.Playlists
                 });
             });
 
-            AddUntilStep("Progress details are hidden", () => match.ChildrenOfType<RoomLocalUserInfo>().FirstOrDefault()?.Parent.Alpha == 0);
+            AddUntilStep("Progress details are hidden", () => match.ChildrenOfType<RoomLocalUserInfo>().FirstOrDefault()?.Parent!.Alpha == 0);
 
             AddUntilStep("Leaderboard shows two aggregate scores", () => match.ChildrenOfType<MatchLeaderboardScore>().Count(s => s.ScoreText.Text != "0") == 2);
 
@@ -99,7 +99,7 @@ namespace osu.Game.Tests.Visual.Playlists
                 });
             });
 
-            AddUntilStep("Progress details are visible", () => match.ChildrenOfType<RoomLocalUserInfo>().FirstOrDefault()?.Parent.Alpha == 1);
+            AddUntilStep("Progress details are visible", () => match.ChildrenOfType<RoomLocalUserInfo>().FirstOrDefault()?.Parent!.Alpha == 1);
         }
 
         [Test]

@@ -10,15 +10,19 @@ using System.Threading.Tasks;
 using osuTK;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
+using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Extensions.IEnumerableExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
+using osu.Framework.Graphics.Cursor;
+using osu.Framework.Graphics.Effects;
 using osu.Framework.Graphics.Primitives;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Input.Events;
 using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Overlays.Settings;
+using osuTK.Graphics;
 
 namespace osu.Game.Overlays
 {
@@ -53,6 +57,7 @@ namespace osu.Game.Overlays
         private SeekLimitedSearchTextBox searchTextBox;
 
         protected override string PopInSampleName => "UI/settings-pop-in";
+        protected override double PopInOutSampleBalance => -OsuGameBase.SFX_STEREO_STRENGTH;
 
         private readonly bool showSidebar;
 
@@ -102,31 +107,43 @@ namespace osu.Game.Overlays
                 }
             };
 
-            Add(SectionsContainer = new SettingsSectionsContainer
+            Add(new PopoverContainer
             {
-                Masking = true,
                 RelativeSizeAxes = Axes.Both,
-                ExpandableHeader = CreateHeader(),
-                SelectedSection = { BindTarget = CurrentSection },
-                FixedHeader = new Container
+                Child = SectionsContainer = new SettingsSectionsContainer
                 {
-                    RelativeSizeAxes = Axes.X,
-                    AutoSizeAxes = Axes.Y,
-                    Padding = new MarginPadding
+                    Masking = true,
+                    EdgeEffect = new EdgeEffectParameters
                     {
-                        Vertical = 20,
-                        Horizontal = CONTENT_MARGINS
+                        Colour = Color4.Black.Opacity(0),
+                        Type = EdgeEffectType.Shadow,
+                        Hollow = true,
+                        Radius = 10
                     },
-                    Anchor = Anchor.TopCentre,
-                    Origin = Anchor.TopCentre,
-                    Child = searchTextBox = new SeekLimitedSearchTextBox
+                    MaskingSmoothness = 0,
+                    RelativeSizeAxes = Axes.Both,
+                    ExpandableHeader = CreateHeader(),
+                    SelectedSection = { BindTarget = CurrentSection },
+                    FixedHeader = new Container
                     {
                         RelativeSizeAxes = Axes.X,
-                        Origin = Anchor.TopCentre,
+                        AutoSizeAxes = Axes.Y,
+                        Padding = new MarginPadding
+                        {
+                            Vertical = 20,
+                            Horizontal = CONTENT_MARGINS
+                        },
                         Anchor = Anchor.TopCentre,
-                    }
-                },
-                Footer = CreateFooter().With(f => f.Alpha = 0)
+                        Origin = Anchor.TopCentre,
+                        Child = searchTextBox = new SeekLimitedSearchTextBox
+                        {
+                            RelativeSizeAxes = Axes.X,
+                            Origin = Anchor.TopCentre,
+                            Anchor = Anchor.TopCentre,
+                        }
+                    },
+                    Footer = CreateFooter().With(f => f.Alpha = 0)
+                }
             });
 
             if (showSidebar)
@@ -152,9 +169,9 @@ namespace osu.Game.Overlays
 
         protected override void PopIn()
         {
-            base.PopIn();
-
             ContentContainer.MoveToX(ExpandedPosition, TRANSITION_LENGTH, Easing.OutQuint);
+
+            SectionsContainer.FadeEdgeEffectTo(WaveContainer.SHADOW_OPACITY, WaveContainer.APPEAR_DURATION, Easing.Out);
 
             // delay load enough to ensure it doesn't overlap with the initial animation.
             // this is done as there is still a brief stutter during load completion which is more visible if the transition is in progress.
@@ -175,6 +192,7 @@ namespace osu.Game.Overlays
         {
             base.PopOut();
 
+            SectionsContainer.FadeEdgeEffectTo(0, WaveContainer.DISAPPEAR_DURATION, Easing.In);
             ContentContainer.MoveToX(-WIDTH + ExpandedPosition, TRANSITION_LENGTH, Easing.OutQuint);
 
             Sidebar?.MoveToX(-sidebar_width, TRANSITION_LENGTH, Easing.OutQuint);
@@ -314,7 +332,7 @@ namespace osu.Game.Overlays
                 base.UpdateAfterChildren();
 
                 // no null check because the usage of this class is strict
-                HeaderBackground.Alpha = -ExpandableHeader.Y / ExpandableHeader.LayoutSize.Y;
+                HeaderBackground!.Alpha = -ExpandableHeader!.Y / ExpandableHeader.LayoutSize.Y;
             }
         }
     }

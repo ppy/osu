@@ -163,7 +163,6 @@ namespace osu.Game.Rulesets.Osu.Tests.Editor
                 slider = new Slider
                 {
                     Position = new Vector2(0, 50),
-                    LegacyLastTickOffset = 36, // This is necessary for undo to retain the sample control point
                     Path = new SliderPath(new[]
                     {
                         new PathControlPoint(Vector2.Zero, PathType.PerfectCurve),
@@ -181,10 +180,8 @@ namespace osu.Game.Rulesets.Osu.Tests.Editor
             {
                 if (slider is null) return;
 
-                slider.SampleControlPoint.SampleBank = "soft";
-                slider.SampleControlPoint.SampleVolume = 70;
-                sample = new HitSampleInfo("hitwhistle");
-                slider.Samples.Add(sample);
+                sample = new HitSampleInfo("hitwhistle", HitSampleInfo.BANK_SOFT, volume: 70);
+                slider.Samples.Add(sample.With());
             });
 
             AddStep("select added slider", () =>
@@ -207,9 +204,7 @@ namespace osu.Game.Rulesets.Osu.Tests.Editor
             AddAssert("sliders have hitsounds", hasHitsounds);
 
             bool hasHitsounds() => sample is not null &&
-                                   EditorBeatmap.HitObjects.All(o => o.SampleControlPoint.SampleBank == "soft" &&
-                                                                     o.SampleControlPoint.SampleVolume == 70 &&
-                                                                     o.Samples.Contains(sample));
+                                   EditorBeatmap.HitObjects.All(o => o.Samples.Contains(sample));
         }
 
         private bool sliderCreatedFor(Slider s, double startTime, double endTime, params (Vector2 pos, PathType? pathType)[] expectedControlPoints)
@@ -236,7 +231,7 @@ namespace osu.Game.Rulesets.Osu.Tests.Editor
                 if (slider is null || visualiser is null) return;
 
                 Vector2 position = slider.Path.ControlPoints[index].Position + slider.Position;
-                InputManager.MoveMouseTo(visualiser.Pieces[0].Parent.ToScreenSpace(position));
+                InputManager.MoveMouseTo(visualiser.Pieces[0].Parent!.ToScreenSpace(position));
             });
         }
 
@@ -246,9 +241,9 @@ namespace osu.Game.Rulesets.Osu.Tests.Editor
             {
                 if (visualiser is null) return;
 
-                MenuItem? item = visualiser.ContextMenuItems.FirstOrDefault(menuItem => menuItem.Text.Value == contextMenuText);
+                MenuItem? item = visualiser.ContextMenuItems?.FirstOrDefault(menuItem => menuItem.Text.Value == contextMenuText);
 
-                item?.Action?.Value();
+                item?.Action.Value?.Invoke();
             });
         }
     }

@@ -1,15 +1,69 @@
-// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
+using System;
 using System.Collections.Generic;
+using System.Linq;
+using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Rulesets.Scoring;
 
 namespace osu.Game.Scoring.Legacy
 {
     public static class ScoreInfoExtensions
     {
+        public static long GetDisplayScore(this ScoreProcessor scoreProcessor, ScoringMode mode)
+            => getDisplayScore(scoreProcessor.Ruleset.RulesetInfo.OnlineID, scoreProcessor.TotalScore.Value, mode, scoreProcessor.MaximumStatistics);
+
+        public static long GetDisplayScore(this ScoreInfo scoreInfo, ScoringMode mode)
+            => getDisplayScore(scoreInfo.Ruleset.OnlineID, scoreInfo.TotalScore, mode, scoreInfo.MaximumStatistics);
+
+        public static long GetDisplayScore(this SoloScoreInfo soloScoreInfo, ScoringMode mode)
+            => getDisplayScore(soloScoreInfo.RulesetID, soloScoreInfo.TotalScore, mode, soloScoreInfo.MaximumStatistics);
+
+        private static long getDisplayScore(int rulesetId, long score, ScoringMode mode, IReadOnlyDictionary<HitResult, int> maximumStatistics)
+        {
+            if (mode == ScoringMode.Standardised)
+                return score;
+
+            int maxBasicJudgements = maximumStatistics
+                                     .Where(k => k.Key.IsBasic())
+                                     .Select(k => k.Value)
+                                     .DefaultIfEmpty(0)
+                                     .Sum();
+
+            return convertStandardisedToClassic(rulesetId, score, maxBasicJudgements);
+        }
+
+        /// <summary>
+        /// Returns a ballpark "classic" score which gives a similar "feel" to stable.
+        /// This is different per ruleset to match the different algorithms used in the scoring implementation.
+        /// </summary>
+        /// <remarks>
+        /// The coefficients chosen here were determined by a least-squares fit performed over all beatmaps
+        /// with the goal of minimising the relative error of maximum possible base score (without bonus).
+        /// The constant coefficients (100000, 1 / 10d) - while being detrimental to the least-squares fit - are forced,
+        /// so that every 10 points in standardised mode converts to at least 1 point in classic mode.
+        /// This is done to account for bonus judgements in a way that does not reorder scores.
+        /// </remarks>
+        private static long convertStandardisedToClassic(int rulesetId, long standardisedTotalScore, int objectCount)
+        {
+            switch (rulesetId)
+            {
+                case 0:
+                    return (long)Math.Round((objectCount * objectCount * 32.57 + 100000) * standardisedTotalScore / ScoreProcessor.MAX_SCORE);
+
+                case 1:
+                    return (long)Math.Round((objectCount * 1109 + 100000) * standardisedTotalScore / ScoreProcessor.MAX_SCORE);
+
+                case 2:
+                    return (long)Math.Round(Math.Pow(standardisedTotalScore / ScoreProcessor.MAX_SCORE * objectCount, 2) * 21.62 + standardisedTotalScore / 10d);
+
+                case 3:
+                default:
+                    return standardisedTotalScore;
+            }
+        }
+
         public static int? GetCountGeki(this ScoreInfo scoreInfo)
         {
             switch (scoreInfo.Ruleset.OnlineID)

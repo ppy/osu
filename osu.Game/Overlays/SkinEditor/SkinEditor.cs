@@ -17,6 +17,7 @@ using osu.Framework.Input;
 using osu.Framework.Input.Bindings;
 using osu.Framework.Input.Events;
 using osu.Framework.Localisation;
+using Web = osu.Game.Resources.Localisation.Web;
 using osu.Framework.Testing;
 using osu.Game.Database;
 using osu.Game.Graphics;
@@ -24,6 +25,7 @@ using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.Cursor;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Localisation;
+using osu.Game.Overlays.Dialog;
 using osu.Game.Overlays.OSD;
 using osu.Game.Overlays.Settings;
 using osu.Game.Screens.Edit;
@@ -97,6 +99,9 @@ namespace osu.Game.Overlays.SkinEditor
         [Resolved]
         private OnScreenDisplay? onScreenDisplay { get; set; }
 
+        [Resolved]
+        private IDialogOverlay? dialogOverlay { get; set; }
+
         public SkinEditor()
         {
         }
@@ -147,8 +152,8 @@ namespace osu.Game.Overlays.SkinEditor
                                             {
                                                 Items = new[]
                                                 {
-                                                    new EditorMenuItem(Resources.Localisation.Web.CommonStrings.ButtonsSave, MenuItemType.Standard, () => Save()),
-                                                    new EditorMenuItem(CommonStrings.RevertToDefault, MenuItemType.Destructive, revert),
+                                                    new EditorMenuItem(Web.CommonStrings.ButtonsSave, MenuItemType.Standard, () => Save()),
+                                                    new EditorMenuItem(CommonStrings.RevertToDefault, MenuItemType.Destructive, () => dialogOverlay?.Push(new RevertConfirmDialog(revert))),
                                                     new EditorMenuItemSpacer(),
                                                     new EditorMenuItem(CommonStrings.Exit, MenuItemType.Standard, () => skinEditorOverlay?.Hide()),
                                                 },
@@ -304,7 +309,8 @@ namespace osu.Game.Overlays.SkinEditor
             changeHandler?.Dispose();
 
             // Immediately clear the previous blueprint container to ensure it doesn't try to interact with the old target.
-            content?.Clear();
+            if (content?.Child is SkinBlueprintContainer)
+                content.Clear();
 
             Scheduler.AddOnce(loadBlueprintContainer);
             Scheduler.AddOnce(populateSettings);
@@ -323,17 +329,18 @@ namespace osu.Game.Overlays.SkinEditor
             foreach (var toolbox in componentsSidebar.OfType<SkinComponentToolbox>())
                 toolbox.Expire();
 
-            if (target.NewValue == null)
-                return;
+            componentsSidebar.Clear();
+            SelectedComponents.Clear();
 
             Debug.Assert(content != null);
 
-            SelectedComponents.Clear();
-
             var skinComponentsContainer = getTarget(target.NewValue);
 
-            if (skinComponentsContainer == null)
+            if (target.NewValue == null || skinComponentsContainer == null)
+            {
+                content.Child = new NonSkinnableScreenPlaceholder();
                 return;
+            }
 
             changeHandler = new SkinEditorChangeHandler(skinComponentsContainer);
             changeHandler.CanUndo.BindValueChanged(v => undoMenuItem.Action.Disabled = !v.NewValue, true);
@@ -349,7 +356,7 @@ namespace osu.Game.Overlays.SkinEditor
                     {
                         new SettingsDropdown<SkinComponentsContainerLookup?>
                         {
-                            Items = availableTargets.Select(t => t.Lookup),
+                            Items = availableTargets.Select(t => t.Lookup).Distinct(),
                             Current = selectedTarget,
                         }
                     }
@@ -359,14 +366,14 @@ namespace osu.Game.Overlays.SkinEditor
             // If the new target has a ruleset, let's show ruleset-specific items at the top, and the rest below.
             if (target.NewValue.Ruleset != null)
             {
-                componentsSidebar.Add(new SkinComponentToolbox(skinComponentsContainer)
+                componentsSidebar.Add(new SkinComponentToolbox(skinComponentsContainer, target.NewValue.Ruleset)
                 {
                     RequestPlacement = requestPlacement
                 });
             }
 
             // Remove the ruleset from the lookup to get base components.
-            componentsSidebar.Add(new SkinComponentToolbox(getTarget(new SkinComponentsContainerLookup(target.NewValue.Target)))
+            componentsSidebar.Add(new SkinComponentToolbox(skinComponentsContainer, null)
             {
                 RequestPlacement = requestPlacement
             });
@@ -665,6 +672,16 @@ namespace osu.Game.Overlays.SkinEditor
             public SkinEditorToast(LocalisableString value, string skinDisplayName)
                 : base(SkinSettingsStrings.SkinLayoutEditor, value, skinDisplayName)
             {
+            }
+        }
+
+        public partial class RevertConfirmDialog : DangerousActionDialog
+        {
+            public RevertConfirmDialog(Action revert)
+            {
+                HeaderText = CommonStrings.RevertToDefault;
+                BodyText = SkinEditorStrings.RevertToDefaultDescription;
+                DangerousAction = revert;
             }
         }
 

@@ -13,6 +13,7 @@ using osu.Framework.Screens;
 using osu.Framework.Testing;
 using osu.Game.Beatmaps;
 using osu.Game.Configuration;
+using osu.Game.Graphics.Containers;
 using osu.Game.Rulesets;
 using osu.Game.Rulesets.Judgements;
 using osu.Game.Rulesets.Osu;
@@ -71,12 +72,12 @@ namespace osu.Game.Tests.Visual.Gameplay
         }
 
         [Test]
-        public void TestStoryboardExitDuringOutroStillExits()
+        public void TestStoryboardExitDuringOutroProgressesToResults()
         {
             CreateTest();
             AddUntilStep("completion set by processor", () => Player.ScoreProcessor.HasCompleted.Value);
             AddStep("exit via pause", () => Player.ExitViaPause());
-            AddAssert("player exited", () => !Player.IsCurrentScreen() && Player.GetChildScreen() == null);
+            AddUntilStep("reached results screen", () => Stack.CurrentScreen is ResultsScreen);
         }
 
         [TestCase(false)]
@@ -104,6 +105,26 @@ namespace osu.Game.Tests.Visual.Gameplay
             AddUntilStep("wait for fail", () => Player.GameplayState.HasFailed);
             AddUntilStep("storyboard ends", () => Player.GameplayClockContainer.CurrentTime >= currentStoryboardDuration);
             AddUntilStep("wait for fail overlay", () => Player.FailOverlay.State.Value == Visibility.Visible);
+        }
+
+        [Test]
+        public void TestSaveFailedReplayWithStoryboardEndedDoesNotProgress()
+        {
+            CreateTest(() =>
+            {
+                AddStep("fail on first judgement", () => currentFailConditions = (_, _) => true);
+                AddStep("set storyboard duration to 0s", () => currentStoryboardDuration = 0);
+            });
+            AddUntilStep("storyboard ends", () => Player.GameplayClockContainer.CurrentTime >= currentStoryboardDuration);
+            AddUntilStep("wait for fail", () => Player.GameplayState.HasFailed);
+
+            AddUntilStep("wait for fail overlay", () => Player.FailOverlay.State.Value == Visibility.Visible);
+            AddUntilStep("wait for button clickable", () => Player.ChildrenOfType<SaveFailedScoreButton>().First().ChildrenOfType<OsuClickableContainer>().First().Enabled.Value);
+            AddStep("click save button", () => Player.ChildrenOfType<SaveFailedScoreButton>().First().ChildrenOfType<OsuClickableContainer>().First().TriggerClick());
+
+            // Test a regression where importing the fail replay would cause progression to results screen in a failed state.
+            AddWaitStep("wait some", 10);
+            AddAssert("player is still current screen", () => Player.IsCurrentScreen());
         }
 
         [Test]
@@ -150,7 +171,7 @@ namespace osu.Game.Tests.Visual.Gameplay
             AddStep("disable storyboard", () => LocalConfig.SetValue(OsuSetting.ShowStoryboard, false));
             AddUntilStep("completion set by processor", () => Player.ScoreProcessor.HasCompleted.Value);
             AddStep("exit via pause", () => Player.ExitViaPause());
-            AddAssert("player exited", () => Stack.CurrentScreen == null);
+            AddUntilStep("reached results screen", () => Stack.CurrentScreen is ResultsScreen);
         }
 
         [Test]

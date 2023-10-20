@@ -8,6 +8,7 @@ using osu.Framework.Testing;
 using osu.Game.Beatmaps;
 using osu.Game.Rulesets;
 using osu.Game.Rulesets.Osu;
+using osu.Game.Scoring;
 using osu.Game.Screens.Play;
 using osu.Game.Tests.Beatmaps;
 using osuTK.Input;
@@ -43,6 +44,18 @@ namespace osu.Game.Tests.Visual.Gameplay
             AddWaitStep("wait some", 10);
 
             AddAssert("Time still stopped", () => lastTime == Player.GameplayClockContainer.CurrentTime);
+        }
+
+        [Test]
+        public void TestDoesNotFailOnExit()
+        {
+            loadPlayerWithBeatmap();
+
+            AddUntilStep("wait for first hit", () => Player.ScoreProcessor.TotalScore.Value > 0);
+            AddAssert("ensure rank is not fail", () => Player.ScoreProcessor.Rank.Value, () => Is.Not.EqualTo(ScoreRank.F));
+            AddStep("exit player", () => Player.Exit());
+            AddUntilStep("wait for exit", () => Player.Parent == null);
+            AddAssert("ensure rank is not fail", () => Player.ScoreProcessor.Rank.Value, () => Is.Not.EqualTo(ScoreRank.F));
         }
 
         [Test]

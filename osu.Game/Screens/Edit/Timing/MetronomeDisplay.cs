@@ -240,7 +240,7 @@ namespace osu.Game.Screens.Edit.Timing
         {
             base.Update();
 
-            if (BeatSyncSource.ControlPoints == null || BeatSyncSource.Clock == null)
+            if (BeatSyncSource.ControlPoints == null)
                 return;
 
             metronomeClock.Rate = IsBeatSyncedWithTrack ? BeatSyncSource.Clock.Rate : 1;
@@ -259,7 +259,7 @@ namespace osu.Game.Screens.Edit.Timing
                 this.TransformBindableTo(interpolatedBpm, (int)Math.Round(timingPoint.BPM), 600, Easing.OutQuint);
             }
 
-            if (BeatSyncSource.Clock?.IsRunning != true && isSwinging)
+            if (!BeatSyncSource.Clock.IsRunning && isSwinging)
             {
                 swing.ClearTransforms(true);
 

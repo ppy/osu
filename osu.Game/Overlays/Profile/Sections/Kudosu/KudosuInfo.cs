@@ -2,15 +2,12 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using osu.Framework.Bindables;
-using osuTK;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
-using osu.Framework.Graphics.Shapes;
 using osu.Framework.Input.Events;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.Sprites;
-using osu.Framework.Allocation;
 using osu.Framework.Extensions.LocalisationExtensions;
 using osu.Game.Resources.Localisation.Web;
 using osu.Framework.Localisation;
@@ -52,36 +49,24 @@ namespace osu.Game.Overlays.Profile.Sections.Kudosu
         {
             private readonly OsuSpriteText valueText;
             protected readonly LinkFlowContainer DescriptionText;
-            private readonly Box lineBackground;
 
             public new int Count
             {
                 set => valueText.Text = value.ToLocalisableString("N0");
             }
 
-            public CountSection(LocalisableString header)
+            protected CountSection(LocalisableString header)
             {
                 RelativeSizeAxes = Axes.X;
                 AutoSizeAxes = Axes.Y;
-                Padding = new MarginPadding { Top = 10, Bottom = 20 };
+                Padding = new MarginPadding { Bottom = 20 };
                 Child = new FillFlowContainer
                 {
                     AutoSizeAxes = Axes.Y,
                     RelativeSizeAxes = Axes.X,
                     Direction = FillDirection.Vertical,
-                    Spacing = new Vector2(0, 5),
                     Children = new Drawable[]
                     {
-                        new CircularContainer
-                        {
-                            Masking = true,
-                            RelativeSizeAxes = Axes.X,
-                            Height = 2,
-                            Child = lineBackground = new Box
-                            {
-                                RelativeSizeAxes = Axes.Both,
-                            }
-                        },
                         new OsuSpriteText
                         {
                             Text = header,
@@ -91,7 +76,6 @@ namespace osu.Game.Overlays.Profile.Sections.Kudosu
                         {
                             Text = "0",
                             Font = OsuFont.GetFont(size: 40, weight: FontWeight.Light),
-                            UseFullGlyphHeight = false,
                         },
                         DescriptionText = new LinkFlowContainer(t => t.Font = t.Font.With(size: 14))
                         {
@@ -100,12 +84,6 @@ namespace osu.Game.Overlays.Profile.Sections.Kudosu
                         }
                     }
                 };
-            }
-
-            [BackgroundDependencyLoader]
-            private void load(OverlayColourProvider colourProvider)
-            {
-                lineBackground.Colour = colourProvider.Highlight1;
             }
         }
     }

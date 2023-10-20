@@ -30,6 +30,8 @@ namespace osu.Game.Skinning
             Lookup = lookup;
             ColumnIndex = columnIndex;
         }
+
+        public override string ToString() => $"[{nameof(LegacyManiaSkinConfigurationLookup)} lookup:{Lookup} col:{ColumnIndex} totalcols:{TotalColumns}]";
     }
 
     public enum LegacyManiaSkinConfigurationLookups

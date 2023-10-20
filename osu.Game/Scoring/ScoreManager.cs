@@ -20,6 +20,7 @@ using osu.Game.Overlays.Notifications;
 using osu.Game.Rulesets;
 using osu.Game.Rulesets.Scoring;
 using osu.Game.Online.API;
+using osu.Game.Scoring.Legacy;
 
 namespace osu.Game.Scoring
 {
@@ -27,6 +28,7 @@ namespace osu.Game.Scoring
     {
         private readonly OsuConfigManager configManager;
         private readonly ScoreImporter scoreImporter;
+        private readonly LegacyScoreExporter scoreExporter;
 
         public override bool PauseImports
         {
@@ -48,6 +50,11 @@ namespace osu.Game.Scoring
             {
                 PostNotification = obj => PostNotification?.Invoke(obj)
             };
+
+            scoreExporter = new LegacyScoreExporter(storage)
+            {
+                PostNotification = obj => PostNotification?.Invoke(obj)
+            };
         }
 
         public Score GetScore(ScoreInfo score) => scoreImporter.GetScore(score);
@@ -63,17 +70,6 @@ namespace osu.Game.Scoring
         }
 
         /// <summary>
-        /// Orders an array of <see cref="ScoreInfo"/>s by total score.
-        /// </summary>
-        /// <param name="scores">The array of <see cref="ScoreInfo"/>s to reorder.</param>
-        /// <returns>The given <paramref name="scores"/> ordered by decreasing total score.</returns>
-        public IEnumerable<ScoreInfo> OrderByTotalScore(IEnumerable<ScoreInfo> scores)
-            => scores.OrderByDescending(s => GetTotalScore(s))
-                     .ThenBy(s => s.OnlineID)
-                     // Local scores may not have an online ID. Fall back to date in these cases.
-                     .ThenBy(s => s.Date);
-
-        /// <summary>
         /// Retrieves a bindable that represents the total score of a <see cref="ScoreInfo"/>.
         /// </summary>
         /// <remarks>
@@ -81,7 +77,7 @@ namespace osu.Game.Scoring
         /// </remarks>
         /// <param name="score">The <see cref="ScoreInfo"/> to retrieve the bindable for.</param>
         /// <returns>The bindable containing the total score.</returns>
-        public Bindable<long> GetBindableTotalScore([NotNull] ScoreInfo score) => new TotalScoreBindable(score, this, configManager);
+        public Bindable<long> GetBindableTotalScore([NotNull] ScoreInfo score) => new TotalScoreBindable(score, configManager);
 
         /// <summary>
         /// Retrieves a bindable that represents the formatted total score string of a <see cref="ScoreInfo"/>.
@@ -94,32 +90,6 @@ namespace osu.Game.Scoring
         public Bindable<string> GetBindableTotalScoreString([NotNull] ScoreInfo score) => new TotalScoreStringBindable(GetBindableTotalScore(score));
 
         /// <summary>
-        /// Retrieves the total score of a <see cref="ScoreInfo"/> in the given <see cref="ScoringMode"/>.
-        /// </summary>
-        /// <param name="score">The <see cref="ScoreInfo"/> to calculate the total score of.</param>
-        /// <param name="mode">The <see cref="ScoringMode"/> to return the total score as.</param>
-        /// <returns>The total score.</returns>
-        public long GetTotalScore([NotNull] ScoreInfo score, ScoringMode mode = ScoringMode.Standardised)
-        {
-            // TODO: This is required for playlist aggregate scores. They should likely not be getting here in the first place.
-            if (string.IsNullOrEmpty(score.BeatmapInfo.MD5Hash))
-                return score.TotalScore;
-
-            var ruleset = score.Ruleset.CreateInstance();
-            var scoreProcessor = ruleset.CreateScoreProcessor();
-            scoreProcessor.Mods.Value = score.Mods;
-
-            return scoreProcessor.ComputeScore(mode, score);
-        }
-
-        /// <summary>
-        /// Retrieves the maximum achievable combo for the provided score.
-        /// </summary>
-        /// <param name="score">The <see cref="ScoreInfo"/> to compute the maximum achievable combo for.</param>
-        /// <returns>The maximum achievable combo.</returns>
-        public int GetMaximumAchievableCombo([NotNull] ScoreInfo score) => score.MaximumStatistics.Where(kvp => kvp.Key.AffectsCombo()).Sum(kvp => kvp.Value);
-
-        /// <summary>
         /// Provides the total score of a <see cref="ScoreInfo"/>. Responds to changes in the currently-selected <see cref="ScoringMode"/>.
         /// </summary>
         private class TotalScoreBindable : Bindable<long>
@@ -130,12 +100,11 @@ namespace osu.Game.Scoring
             /// Creates a new <see cref="TotalScoreBindable"/>.
             /// </summary>
             /// <param name="score">The <see cref="ScoreInfo"/> to provide the total score of.</param>
-            /// <param name="scoreManager">The <see cref="ScoreManager"/>.</param>
             /// <param name="configManager">The config.</param>
-            public TotalScoreBindable(ScoreInfo score, ScoreManager scoreManager, OsuConfigManager configManager)
+            public TotalScoreBindable(ScoreInfo score, OsuConfigManager configManager)
             {
                 configManager?.BindWith(OsuSetting.ScoreDisplayMode, scoringMode);
-                scoringMode.BindValueChanged(mode => Value = scoreManager.GetTotalScore(score, mode.NewValue), true);
+                scoringMode.BindValueChanged(mode => Value = score.GetDisplayScore(mode.NewValue), true);
             }
         }
 
@@ -172,7 +141,7 @@ namespace osu.Game.Scoring
         {
             Realm.Run(r =>
             {
-                var beatmapScores = r.Find<BeatmapInfo>(beatmap.ID).Scores.ToList();
+                var beatmapScores = r.Find<BeatmapInfo>(beatmap.ID)!.Scores.ToList();
                 Delete(beatmapScores, silent);
             });
         }
@@ -186,6 +155,8 @@ namespace osu.Game.Scoring
         public IEnumerable<string> HandledExtensions => scoreImporter.HandledExtensions;
 
         public Task<IEnumerable<Live<ScoreInfo>>> Import(ProgressNotification notification, ImportTask[] tasks, ImportParameters parameters = default) => scoreImporter.Import(notification, tasks);
+
+        public Task Export(ScoreInfo score) => scoreExporter.ExportAsync(score.ToLive(Realm));
 
         public Task<Live<ScoreInfo>> ImportAsUpdate(ProgressNotification notification, ImportTask task, ScoreInfo original) => scoreImporter.ImportAsUpdate(notification, task, original);
 

@@ -1,13 +1,13 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
 using System;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
+using osu.Framework.Extensions.LocalisationExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
+using osu.Framework.Graphics.Primitives;
 using osu.Framework.Input.Events;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
@@ -15,33 +15,33 @@ using osu.Game.Graphics.Sprites;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Localisation;
 using osu.Game.Online.API;
+using osu.Game.Overlays.Settings;
 using osu.Game.Users;
 using osuTK;
-using RectangleF = osu.Framework.Graphics.Primitives.RectangleF;
-using Container = osu.Framework.Graphics.Containers.Container;
 
 namespace osu.Game.Overlays.Login
 {
-    public partial class LoginPanel : FillFlowContainer
+    public partial class LoginPanel : Container
     {
         private bool bounding = true;
-        private LoginForm form;
+
+        private LoginForm? form;
 
         [Resolved]
-        private OsuColour colours { get; set; }
+        private OsuColour colours { get; set; } = null!;
 
-        private UserGridPanel panel;
-        private UserDropdown dropdown;
+        private UserGridPanel panel = null!;
+        private UserDropdown dropdown = null!;
 
         /// <summary>
         /// Called to request a hide of a parent displaying this container.
         /// </summary>
-        public Action RequestHide;
+        public Action? RequestHide;
 
         private readonly IBindable<APIState> apiState = new Bindable<APIState>();
 
         [Resolved]
-        private IAPIProvider api { get; set; }
+        private IAPIProvider api { get; set; } = null!;
 
         public override RectangleF BoundingBox => bounding ? base.BoundingBox : RectangleF.Empty;
 
@@ -59,8 +59,6 @@ namespace osu.Game.Overlays.Login
         {
             RelativeSizeAxes = Axes.X;
             AutoSizeAxes = Axes.Y;
-            Direction = FillDirection.Vertical;
-            Spacing = new Vector2(0f, 5f);
         }
 
         [BackgroundDependencyLoader]
@@ -77,18 +75,9 @@ namespace osu.Game.Overlays.Login
             switch (state.NewValue)
             {
                 case APIState.Offline:
-                    Children = new Drawable[]
+                    Child = form = new LoginForm
                     {
-                        new OsuSpriteText
-                        {
-                            Text = "ACCOUNT",
-                            Margin = new MarginPadding { Bottom = 5 },
-                            Font = OsuFont.GetFont(weight: FontWeight.Bold),
-                        },
-                        form = new LoginForm
-                        {
-                            RequestHide = RequestHide
-                        }
+                        RequestHide = RequestHide
                     };
                     break;
 
@@ -96,63 +85,58 @@ namespace osu.Game.Overlays.Login
                 case APIState.Connecting:
                     LinkFlowContainer linkFlow;
 
-                    Children = new Drawable[]
+                    Child = new FillFlowContainer
                     {
-                        new LoadingSpinner
+                        RelativeSizeAxes = Axes.X,
+                        AutoSizeAxes = Axes.Y,
+                        Padding = new MarginPadding { Horizontal = SettingsPanel.CONTENT_MARGINS },
+                        Direction = FillDirection.Vertical,
+                        Spacing = new Vector2(0f, SettingsSection.ITEM_SPACING),
+                        Children = new Drawable[]
                         {
-                            State = { Value = Visibility.Visible },
-                            Anchor = Anchor.TopCentre,
-                            Origin = Anchor.TopCentre,
-                        },
-                        linkFlow = new LinkFlowContainer
-                        {
-                            Anchor = Anchor.TopCentre,
-                            Origin = Anchor.TopCentre,
-                            TextAnchor = Anchor.TopCentre,
-                            AutoSizeAxes = Axes.Both,
-                            Text = state.NewValue == APIState.Failing ? ToolbarStrings.AttemptingToReconnect : ToolbarStrings.Connecting,
-                            Margin = new MarginPadding { Top = 10, Bottom = 10 },
+                            new LoadingSpinner
+                            {
+                                State = { Value = Visibility.Visible },
+                                Anchor = Anchor.TopCentre,
+                                Origin = Anchor.TopCentre,
+                            },
+                            linkFlow = new LinkFlowContainer
+                            {
+                                Anchor = Anchor.TopCentre,
+                                Origin = Anchor.TopCentre,
+                                TextAnchor = Anchor.TopCentre,
+                                AutoSizeAxes = Axes.Both,
+                                Text = state.NewValue == APIState.Failing ? ToolbarStrings.AttemptingToReconnect : ToolbarStrings.Connecting,
+                            },
                         },
                     };
 
-                    linkFlow.AddLink("cancel", api.Logout, string.Empty);
+                    linkFlow.AddLink(Resources.Localisation.Web.CommonStrings.ButtonsCancel.ToLower(), api.Logout, string.Empty);
                     break;
 
                 case APIState.Online:
-                    Children = new Drawable[]
+                    Child = new FillFlowContainer
                     {
-                        new FillFlowContainer
+                        RelativeSizeAxes = Axes.X,
+                        AutoSizeAxes = Axes.Y,
+                        Padding = new MarginPadding { Horizontal = SettingsPanel.CONTENT_MARGINS },
+                        Direction = FillDirection.Vertical,
+                        Spacing = new Vector2(0f, SettingsSection.ITEM_SPACING),
+                        Children = new Drawable[]
                         {
-                            RelativeSizeAxes = Axes.X,
-                            AutoSizeAxes = Axes.Y,
-                            Padding = new MarginPadding { Left = 20, Right = 20 },
-                            Direction = FillDirection.Vertical,
-                            Spacing = new Vector2(0f, 10f),
-                            Children = new Drawable[]
+                            new OsuSpriteText
                             {
-                                new Container
-                                {
-                                    RelativeSizeAxes = Axes.X,
-                                    AutoSizeAxes = Axes.Y,
-                                    Children = new[]
-                                    {
-                                        new OsuSpriteText
-                                        {
-                                            Anchor = Anchor.Centre,
-                                            Origin = Anchor.Centre,
-                                            Text = "Signed in",
-                                            Font = OsuFont.GetFont(size: 18, weight: FontWeight.Bold),
-                                            Margin = new MarginPadding { Top = 5, Bottom = 5 },
-                                        },
-                                    },
-                                },
-                                panel = new UserGridPanel(api.LocalUser.Value)
-                                {
-                                    RelativeSizeAxes = Axes.X,
-                                    Action = RequestHide
-                                },
-                                dropdown = new UserDropdown { RelativeSizeAxes = Axes.X },
+                                Anchor = Anchor.TopCentre,
+                                Origin = Anchor.TopCentre,
+                                Text = LoginPanelStrings.SignedIn,
+                                Font = OsuFont.GetFont(size: 18, weight: FontWeight.Bold),
                             },
+                            panel = new UserGridPanel(api.LocalUser.Value)
+                            {
+                                RelativeSizeAxes = Axes.X,
+                                Action = RequestHide
+                            },
+                            dropdown = new UserDropdown { RelativeSizeAxes = Axes.X },
                         },
                     };
 

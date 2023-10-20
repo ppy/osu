@@ -132,11 +132,10 @@ namespace osu.Game.Overlays.Comments
                 },
                 sideNumber = new OsuSpriteText
                 {
-                    Anchor = Anchor.CentreLeft,
-                    Origin = Anchor.CentreRight,
+                    Anchor = Anchor.TopCentre,
+                    Origin = Anchor.BottomCentre,
                     Text = "+1",
                     Font = OsuFont.GetFont(size: 14),
-                    Margin = new MarginPadding { Right = 3 },
                     Alpha = 0,
                 },
                 votesCounter = new OsuSpriteText
@@ -189,7 +188,7 @@ namespace osu.Game.Overlays.Comments
             else
                 sideNumber.FadeTo(IsHovered ? 1 : 0);
 
-            borderContainer.BorderThickness = IsHovered ? 3 : 0;
+            borderContainer.BorderThickness = IsHovered ? 2 : 0;
         }
 
         private void onHoverAction()

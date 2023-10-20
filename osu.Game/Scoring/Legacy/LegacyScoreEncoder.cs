@@ -28,9 +28,12 @@ namespace osu.Game.Scoring.Legacy
         /// <remarks>
         /// <list type="bullet">
         /// <item><description>30000001: Appends <see cref="LegacyReplaySoloScoreInfo"/> to the end of scores.</description></item>
+        /// <item><description>30000002: Score stored to replay calculated using the Score V2 algorithm. Legacy scores on this version are candidate to Score V1 -> V2 conversion.</description></item>
+        /// <item><description>30000003: First version after converting legacy total score to standardised.</description></item>
+        /// <item><description>30000004: Fixed mod multipliers during legacy score conversion. Reconvert all scores.</description></item>
         /// </list>
         /// </remarks>
-        public const int LATEST_VERSION = 30000001;
+        public const int LATEST_VERSION = 30000004;
 
         /// <summary>
         /// The first stable-compatible YYYYMMDD format version given to lazer usage of replays.
@@ -64,7 +67,7 @@ namespace osu.Game.Scoring.Legacy
             {
                 sw.Write((byte)(score.ScoreInfo.Ruleset.OnlineID));
                 sw.Write(LATEST_VERSION);
-                sw.Write(score.ScoreInfo.BeatmapInfo.MD5Hash);
+                sw.Write(score.ScoreInfo.BeatmapInfo!.MD5Hash);
                 sw.Write(score.ScoreInfo.User.Username);
                 sw.Write(FormattableString.Invariant($"lazer-{score.ScoreInfo.User.Username}-{score.ScoreInfo.Date}").ComputeMD5Hash());
                 sw.Write((ushort)(score.ScoreInfo.GetCount300() ?? 0));
@@ -125,10 +128,10 @@ namespace osu.Game.Scoring.Legacy
                 // As this is baked into hitobject timing (see `LegacyBeatmapDecoder`) we also need to apply this to replay frame timing.
                 double offset = beatmap?.BeatmapInfo.BeatmapVersion < 5 ? -LegacyBeatmapDecoder.EARLY_VERSION_TIMING_OFFSET : 0;
 
+                int lastTime = 0;
+
                 if (score.Replay != null)
                 {
-                    int lastTime = 0;
-
                     foreach (var f in score.Replay.Frames)
                     {
                         var legacyFrame = getLegacyFrame(f);

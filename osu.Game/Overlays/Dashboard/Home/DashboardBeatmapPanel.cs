@@ -100,17 +100,15 @@ namespace osu.Game.Overlays.Dashboard.Home
                                         Direction = FillDirection.Vertical,
                                         Children = new Drawable[]
                                         {
-                                            new OsuSpriteText
+                                            new TruncatingSpriteText
                                             {
                                                 RelativeSizeAxes = Axes.X,
-                                                Truncate = true,
                                                 Font = OsuFont.GetFont(weight: FontWeight.Regular),
                                                 Text = BeatmapSet.Title
                                             },
-                                            new OsuSpriteText
+                                            new TruncatingSpriteText
                                             {
                                                 RelativeSizeAxes = Axes.X,
-                                                Truncate = true,
                                                 Font = OsuFont.GetFont(size: 12, weight: FontWeight.Regular),
                                                 Text = BeatmapSet.Artist
                                             },

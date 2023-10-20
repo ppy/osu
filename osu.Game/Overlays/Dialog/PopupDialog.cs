@@ -1,10 +1,11 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
 using System.Collections.Generic;
 using System.Linq;
+using osu.Framework.Allocation;
+using osu.Framework.Audio;
+using osu.Framework.Audio.Sample;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
@@ -29,6 +30,9 @@ namespace osu.Game.Overlays.Dialog
         private readonly Vector2 ringSize = new Vector2(100f);
         private readonly Vector2 ringMinifiedSize = new Vector2(20f);
         private readonly Vector2 buttonsEnterSpacing = new Vector2(0f, 50f);
+
+        private readonly Box flashLayer;
+        private Sample flashSample = null!;
 
         private readonly Container content;
         private readonly Container ring;
@@ -210,6 +214,13 @@ namespace osu.Game.Overlays.Dialog
                             AutoSizeAxes = Axes.Y,
                             Direction = FillDirection.Vertical,
                         },
+                        flashLayer = new Box
+                        {
+                            Alpha = 0,
+                            RelativeSizeAxes = Axes.Both,
+                            Blending = BlendingParameters.Additive,
+                            Colour = Color4Extensions.FromHex(@"221a21"),
+                        },
                     },
                 },
             };
@@ -217,6 +228,12 @@ namespace osu.Game.Overlays.Dialog
             // It's important we start in a visible state so our state fires on hide, even before load.
             // This is used by the dialog overlay to know when the dialog was dismissed.
             Show();
+        }
+
+        [BackgroundDependencyLoader]
+        private void load(AudioManager audio)
+        {
+            flashSample = audio.Samples.Get(@"UI/default-select-disabled");
         }
 
         /// <summary>
@@ -227,7 +244,20 @@ namespace osu.Game.Overlays.Dialog
         /// <summary>
         /// Programmatically clicks the first button of the provided type.
         /// </summary>
-        public void PerformAction<T>() where T : PopupDialogButton => Buttons.OfType<T>().First().TriggerClick();
+        public void PerformAction<T>() where T : PopupDialogButton
+        {
+            // Buttons are regularly added in BDL or LoadComplete, so let's schedule to ensure
+            // they are ready to be pressed.
+            Scheduler.AddOnce(() => Buttons.OfType<T>().FirstOrDefault()?.TriggerClick());
+        }
+
+        public void Flash()
+        {
+            flashLayer.FadeInFromZero(80, Easing.OutQuint)
+                      .Then()
+                      .FadeOutFromOne(1500, Easing.OutQuint);
+            flashSample.Play();
+        }
 
         protected override bool OnKeyDown(KeyDownEvent e)
         {

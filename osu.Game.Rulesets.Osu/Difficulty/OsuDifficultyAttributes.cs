@@ -105,7 +105,6 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             yield return (ATTRIB_ID_TAP, TapDifficulty);
             yield return (ATTRIB_ID_OVERALL_DIFFICULTY, OverallDifficulty);
             yield return (ATTRIB_ID_APPROACH_RATE, ApproachRate);
-            yield return (ATTRIB_ID_MAX_COMBO, MaxCombo);
             yield return (ATTRIB_ID_DIFFICULTY, StarRating);
 
             if (ShouldSerializeFlashlightRating())
@@ -125,7 +124,6 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             TapDifficulty = values[ATTRIB_ID_TAP];
             OverallDifficulty = values[ATTRIB_ID_OVERALL_DIFFICULTY];
             ApproachRate = values[ATTRIB_ID_APPROACH_RATE];
-            MaxCombo = (int)values[ATTRIB_ID_MAX_COMBO];
             StarRating = values[ATTRIB_ID_DIFFICULTY];
             FlashlightDifficulty = values.GetValueOrDefault(ATTRIB_ID_FLASHLIGHT);
             SliderFactor = values[ATTRIB_ID_SLIDER_FACTOR];

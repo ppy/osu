@@ -149,7 +149,7 @@ namespace osu.Game.Database
                     return imported;
                 }
 
-                notification.Text = $"{HumanisedModelName.Humanize(LetterCasing.Title)} import failed!";
+                notification.Text = $"{HumanisedModelName.Humanize(LetterCasing.Title)} import failed! Check logs for more information.";
                 notification.State = ProgressNotificationState.Cancelled;
             }
             else
@@ -229,7 +229,7 @@ namespace osu.Game.Database
 
             try
             {
-                model = CreateModel(archive);
+                model = CreateModel(archive, parameters);
 
                 if (model == null)
                     return null;
@@ -474,8 +474,9 @@ namespace osu.Game.Database
         /// Actual expensive population should be done in <see cref="Populate"/>; this should just prepare for duplicate checking.
         /// </summary>
         /// <param name="archive">The archive to create the model for.</param>
+        /// <param name="parameters">Parameters to further configure the import process.</param>
         /// <returns>A model populated with minimal information. Returning a null will abort importing silently.</returns>
-        protected abstract TModel? CreateModel(ArchiveReader archive);
+        protected abstract TModel? CreateModel(ArchiveReader archive, ImportParameters parameters);
 
         /// <summary>
         /// Populate the provided model completely from the given archive.

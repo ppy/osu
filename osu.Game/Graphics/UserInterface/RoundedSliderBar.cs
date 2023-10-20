@@ -51,7 +51,7 @@ namespace osu.Game.Graphics.UserInterface
         public RoundedSliderBar()
         {
             Height = Nub.HEIGHT;
-            RangePadding = Nub.EXPANDED_SIZE / 2;
+            RangePadding = Nub.DEFAULT_EXPANDED_SIZE / 2;
             Children = new Drawable[]
             {
                 new Container
@@ -93,11 +93,12 @@ namespace osu.Game.Graphics.UserInterface
                 nubContainer = new Container
                 {
                     RelativeSizeAxes = Axes.Both,
-                    Child = Nub = new Nub
+                    Child = Nub = new SliderNub
                     {
                         Origin = Anchor.TopCentre,
                         RelativePositionAxes = Axes.X,
-                        Current = { Value = true }
+                        Current = { Value = true },
+                        OnDoubleClicked = () => Current.SetDefault(),
                     },
                 },
                 hoverClickSounds = new HoverClickSounds()
@@ -165,6 +166,19 @@ namespace osu.Game.Graphics.UserInterface
         protected override void UpdateValue(float value)
         {
             Nub.MoveToX(value, 250, Easing.OutQuint);
+        }
+
+        public partial class SliderNub : Nub
+        {
+            public Action? OnDoubleClicked { get; init; }
+
+            protected override bool OnClick(ClickEvent e) => true;
+
+            protected override bool OnDoubleClick(DoubleClickEvent e)
+            {
+                OnDoubleClicked?.Invoke();
+                return true;
+            }
         }
     }
 }

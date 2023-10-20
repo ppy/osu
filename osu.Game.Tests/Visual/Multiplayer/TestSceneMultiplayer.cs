@@ -906,7 +906,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
 
             enterGameplay();
             AddStep("join other user", () => multiplayerClient.AddUser(new APIUser { Id = 1234 }));
-            AddStep("add item as other user", () => multiplayerClient.AddUserPlaylistItem(1234, new MultiplayerPlaylistItem(
+            AddStep("add item as other user", () => multiplayerClient.AddUserPlaylistItem(1234, TestMultiplayerClient.CreateMultiplayerPlaylistItem(
                 new PlaylistItem(beatmaps.GetWorkingBeatmap(importedSet.Beatmaps.First(b => b.Ruleset.OnlineID == 0)).BeatmapInfo)
                 {
                     RulesetID = new OsuRuleset().RulesetInfo.OnlineID,
@@ -938,7 +938,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
             enterGameplay();
 
             AddStep("join other user", () => multiplayerClient.AddUser(new APIUser { Id = 1234 }));
-            AddStep("add item as other user", () => multiplayerClient.AddUserPlaylistItem(1234, new MultiplayerPlaylistItem(
+            AddStep("add item as other user", () => multiplayerClient.AddUserPlaylistItem(1234, TestMultiplayerClient.CreateMultiplayerPlaylistItem(
                 new PlaylistItem(beatmaps.GetWorkingBeatmap(importedSet.Beatmaps.First(b => b.Ruleset.OnlineID == 0)).BeatmapInfo)
                 {
                     RulesetID = new OsuRuleset().RulesetInfo.OnlineID,

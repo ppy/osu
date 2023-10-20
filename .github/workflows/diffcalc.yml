@@ -1,206 +1,380 @@
-# Listens for new PR comments containing !pp check [id], and runs a diffcalc comparison against master.
-# Usage:
-#   !pp check 0        | Runs only the osu! ruleset.
-#   !pp check 0 2      | Runs only the osu! and catch rulesets.
+# ## Description
 #
+# Uses [diffcalc-sheet-generator](https://github.com/smoogipoo/diffcalc-sheet-generator) to run two builds of osu and generate an SR/PP/Score comparison spreadsheet.
+#
+# ## Requirements
+#
+# Self-hosted runner with installed:
+# - `docker >= 20.10.16`
+# - `docker-compose >= 2.5.1`
+# - `lbzip2`
+# - `jq`
+#
+# ## Usage
+#
+# The workflow can be run in two ways:
+# 1. Via workflow dispatch.
+# 2. By an owner of the repository posting a pull request or issue comment containing `!diffcalc`.
+# For pull requests, the workflow will assume the pull request as the target to compare against (i.e. the `OSU_B` variable).
+# Any lines in the comment of the form `KEY=VALUE` are treated as variables for the generator.
+#
+# ## Google Service Account
+#
+# Spreadsheets are uploaded to a Google Service Account, and exposed with read-only permissions to the wider audience.
+#
+# 1. Create a project at https://console.cloud.google.com
+# 2. Enable the `Google Sheets` and `Google Drive` APIs.
+# 3. Create a Service Account
+# 4. Generate a key in the JSON format.
+# 5. Encode the key as base64 and store as an **actions secret** with name **`DIFFCALC_GOOGLE_CREDENTIALS`**
+#
+# ## Environment variables
+#
+# The default environment may be configured via **actions variables**.
+#
+# Refer to [the sample environment](https://github.com/smoogipoo/diffcalc-sheet-generator/blob/master/.env.sample), and prefix each variable with `DIFFCALC_` (e.g. `DIFFCALC_THREADS`, `DIFFCALC_INNODB_BUFFER_SIZE`, etc...).
 
-name: Difficulty Calculation
+name: Run difficulty calculation comparison
+
+run-name: "${{ github.event_name == 'workflow_dispatch' && format('Manual run: {0}', inputs.osu-b) || 'Automatic comment trigger' }}"
+
 on:
   issue_comment:
     types: [ created ]
+  workflow_dispatch:
+    inputs:
+      osu-b:
+        description: "The target build of ppy/osu"
+        type: string
+        required: true
+      ruleset:
+        description: "The ruleset to process"
+        type: choice
+        required: true
+        options:
+          - osu
+          - taiko
+          - catch
+          - mania
+      converts:
+        description: "Include converted beatmaps"
+        type: boolean
+        required: false
+        default: true
+      ranked-only:
+        description: "Only ranked beatmaps"
+        type: boolean
+        required: false
+        default: true
+      generators:
+        description: "Comma-separated list of generators (available: [sr, pp, score])"
+        type: string
+        required: false
+        default: 'pp,sr'
+      osu-a:
+        description: "The source build of ppy/osu"
+        type: string
+        required: false
+        default: 'latest'
+      difficulty-calculator-a:
+        description: "The source build of ppy/osu-difficulty-calculator"
+        type: string
+        required: false
+        default: 'latest'
+      difficulty-calculator-b:
+        description: "The target build of ppy/osu-difficulty-calculator"
+        type: string
+        required: false
+        default: 'latest'
+      score-processor-a:
+        description: "The source build of ppy/osu-queue-score-statistics"
+        type: string
+        required: false
+        default: 'latest'
+      score-processor-b:
+        description: "The target build of ppy/osu-queue-score-statistics"
+        type: string
+        required: false
+        default: 'latest'
+
+permissions:
+  pull-requests: write
 
 env:
-  CONCURRENCY: 4
-  ALLOW_DOWNLOAD: 1
-  SAVE_DOWNLOADED: 1
-  SKIP_INSERT_ATTRIBUTES: 1
+  EXECUTION_ID: execution-${{ github.run_id }}-${{ github.run_number }}-${{ github.run_attempt }}
 
 jobs:
-  metadata:
-    name: Check for requests
+  check-permissions:
+    name: Check permissions
+    runs-on: ubuntu-latest
+    if: ${{ github.event_name == 'workflow_dispatch' || contains(github.event.comment.body, '!diffcalc') }}
+    steps:
+      - name: Check permissions
+        if: ${{ github.event_name != 'workflow_dispatch' }}
+        uses: actions-cool/check-user-permission@a0668c9aec87f3875fc56170b6452a453e9dd819 # v2.2.0
+        with:
+          require: 'write'
+
+  create-comment:
+    name: Create PR comment
+    needs: check-permissions
+    runs-on: ubuntu-latest
+    if: ${{ github.event_name == 'issue_comment' && github.event.issue.pull_request }}
+    steps:
+      - name: Create comment
+        uses: thollander/actions-comment-pull-request@363c6f6eae92cc5c3a66e95ba016fc771bb38943 # v2.4.2
+        with:
+          comment_tag: ${{ env.EXECUTION_ID }}
+          message: |
+            Difficulty calculation queued -- please wait! (${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }})
+
+            *This comment will update on completion*
+
+  directory:
+    name: Prepare directory
+    needs: check-permissions
     runs-on: self-hosted
-    if: github.event.issue.pull_request && contains(github.event.comment.body, '!pp check') && (github.event.comment.author_association == 'MEMBER' || github.event.comment.author_association == 'OWNER')
     outputs:
-      matrix: ${{ steps.generate-matrix.outputs.matrix }}
-      continue: ${{ steps.generate-matrix.outputs.continue }}
+      GENERATOR_DIR: ${{ steps.set-outputs.outputs.GENERATOR_DIR }}
+      GENERATOR_ENV: ${{ steps.set-outputs.outputs.GENERATOR_ENV }}
+      GOOGLE_CREDS_FILE: ${{ steps.set-outputs.outputs.GOOGLE_CREDS_FILE }}
     steps:
-      - name: Construct build matrix
-        id: generate-matrix
+      - name: Checkout diffcalc-sheet-generator
+        uses: actions/checkout@v3
+        with:
+          path: ${{ env.EXECUTION_ID }}
+          repository: 'smoogipoo/diffcalc-sheet-generator'
+
+      - name: Set outputs
+        id: set-outputs
         run: |
-          if [[ "${{ github.event.comment.body }}" =~ "osu" ]] ; then
-            MATRIX_PROJECTS_JSON+='{ "name": "osu", "id": 0 },'
-          fi
-          if [[ "${{ github.event.comment.body }}" =~ "taiko" ]] ; then
-            MATRIX_PROJECTS_JSON+='{ "name": "taiko", "id": 1 },'
-          fi
-          if [[ "${{ github.event.comment.body }}" =~ "catch" ]] ; then
-            MATRIX_PROJECTS_JSON+='{ "name": "catch", "id": 2 },'
-          fi
-          if [[ "${{ github.event.comment.body }}" =~ "mania" ]] ; then
-            MATRIX_PROJECTS_JSON+='{ "name": "mania", "id": 3 },'
-          fi
+          echo "GENERATOR_DIR=${{ github.workspace }}/${{ env.EXECUTION_ID }}" >> "${GITHUB_OUTPUT}"
+          echo "GENERATOR_ENV=${{ github.workspace }}/${{ env.EXECUTION_ID }}/.env" >> "${GITHUB_OUTPUT}"
+          echo "GOOGLE_CREDS_FILE=${{ github.workspace }}/${{ env.EXECUTION_ID }}/google-credentials.json" >> "${GITHUB_OUTPUT}"
 
-          if [[ "${MATRIX_PROJECTS_JSON}" != "" ]]; then
-            MATRIX_JSON="{ \"ruleset\": [ ${MATRIX_PROJECTS_JSON} ] }"
-            echo "${MATRIX_JSON}"
-            CONTINUE="yes"
-          else
-            CONTINUE="no"
-          fi
-
-          echo "::set-output name=continue::${CONTINUE}"
-          echo "::set-output name=matrix::${MATRIX_JSON}"
-  diffcalc:
-    name: Run
+  environment:
+    name: Setup environment
+    needs: directory
     runs-on: self-hosted
-    timeout-minutes: 1440
-    if: needs.metadata.outputs.continue == 'yes'
-    needs: metadata
-    strategy:
-      matrix: ${{ fromJson(needs.metadata.outputs.matrix) }}
+    env:
+      VARS_JSON: ${{ toJSON(vars) }}
     steps:
-      - name: Verify MySQL connection from host
+      - name: Add base environment
         run: |
-          mysql -e "SHOW DATABASES"
+          # Required by diffcalc-sheet-generator
+          cp '${{ needs.directory.outputs.GENERATOR_DIR }}/.env.sample' "${{ needs.directory.outputs.GENERATOR_ENV }}"
 
-      - name: Drop previous databases
-        run: |
-          for db in osu_master osu_pr
-          do
-            mysql -e "DROP DATABASE IF EXISTS $db"
+          # Add Google credentials
+          echo '${{ secrets.DIFFCALC_GOOGLE_CREDENTIALS }}' | base64 -d > "${{ needs.directory.outputs.GOOGLE_CREDS_FILE }}"
+
+          # Add repository variables
+          echo "${VARS_JSON}" | jq -c '. | to_entries | .[]' | while read -r line; do
+              opt=$(jq -r '.key' <<< ${line})
+              val=$(jq -r '.value' <<< ${line})
+
+              if [[ "${opt}" =~ ^DIFFCALC_ ]]; then
+                optNoPrefix=$(echo "${opt}" | cut -d '_' -f2-)
+                sed -i "s;^${optNoPrefix}=.*$;${optNoPrefix}=${val};" "${{ needs.directory.outputs.GENERATOR_ENV }}"
+              fi
           done
 
-      - name: Create directory structure
+      - name: Add pull-request environment
+        if: ${{ github.event_name == 'issue_comment' && github.event.issue.pull_request }}
         run: |
-          mkdir -p $GITHUB_WORKSPACE/master/
-          mkdir -p $GITHUB_WORKSPACE/pr/
+          sed -i "s;^OSU_B=.*$;OSU_B=${{ github.event.issue.pull_request.html_url }};" "${{ needs.directory.outputs.GENERATOR_ENV }}"
 
-      - name: Get upstream branch # https://akaimo.hatenablog.jp/entry/2020/05/16/101251
-        id: upstreambranch
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - name: Add comment environment
+        if: ${{ github.event_name == 'issue_comment' }}
         run: |
-          echo "::set-output name=branchname::$(curl -H "Authorization: token ${GITHUB_TOKEN}" ${{ github.event.issue.pull_request.url }} | jq '.head.ref' | sed 's/\"//g')"
-          echo "::set-output name=repo::$(curl -H "Authorization: token ${GITHUB_TOKEN}" ${{ github.event.issue.pull_request.url }} | jq '.head.repo.full_name' | sed 's/\"//g')"
-
-      # Checkout osu
-      - name: Checkout osu (master)
-        uses: actions/checkout@v2
-        with:
-          path: 'master/osu'
-      - name: Checkout osu (pr)
-        uses: actions/checkout@v2
-        with:
-          path: 'pr/osu'
-          repository: ${{ steps.upstreambranch.outputs.repo }}
-          ref: ${{ steps.upstreambranch.outputs.branchname }}
-
-      - name: Checkout osu-difficulty-calculator (master)
-        uses: actions/checkout@v2
-        with:
-          repository: ppy/osu-difficulty-calculator
-          path: 'master/osu-difficulty-calculator'
-      - name: Checkout osu-difficulty-calculator (pr)
-        uses: actions/checkout@v2
-        with:
-          repository: ppy/osu-difficulty-calculator
-          path: 'pr/osu-difficulty-calculator'
-
-      - name: Install .NET 5.0.x
-        uses: actions/setup-dotnet@v1
-        with:
-          dotnet-version: "5.0.x"
-
-      # Sanity checks to make sure diffcalc is not run when incompatible.
-      - name: Build diffcalc (master)
-        run: |
-          cd $GITHUB_WORKSPACE/master/osu-difficulty-calculator
-          ./UseLocalOsu.sh
-          dotnet build
-      - name: Build diffcalc (pr)
-        run: |
-          cd $GITHUB_WORKSPACE/pr/osu-difficulty-calculator
-          ./UseLocalOsu.sh
-          dotnet build
-
-      - name: Download + import data
-        run: |
-          PERFORMANCE_DATA_NAME=$(curl https://data.ppy.sh/ | grep performance_${{ matrix.ruleset.name }}_top_1000 | tail -1 | awk -F "\"" '{print $2}' | sed 's/\.tar\.bz2//g')
-          BEATMAPS_DATA_NAME=$(curl https://data.ppy.sh/ | grep osu_files | tail -1 | awk -F "\"" '{print $2}' | sed 's/\.tar\.bz2//g')
-
-          # Set env variable for further steps.
-          echo "BEATMAPS_PATH=$GITHUB_WORKSPACE/$BEATMAPS_DATA_NAME" >> $GITHUB_ENV
-
-          cd $GITHUB_WORKSPACE
-
-          echo "Downloading database dump $PERFORMANCE_DATA_NAME.."
-          wget -q -nc https://data.ppy.sh/$PERFORMANCE_DATA_NAME.tar.bz2
-          echo "Extracting.."
-          tar -xf $PERFORMANCE_DATA_NAME.tar.bz2
-
-          echo "Downloading beatmap dump $BEATMAPS_DATA_NAME.."
-          wget -q -nc https://data.ppy.sh/$BEATMAPS_DATA_NAME.tar.bz2
-          echo "Extracting.."
-          tar -xf $BEATMAPS_DATA_NAME.tar.bz2
-
-          cd $PERFORMANCE_DATA_NAME
-
-          for db in osu_master osu_pr
-          do
-            echo "Setting up database $db.."
-
-            mysql -e "CREATE DATABASE $db"
-
-            echo "Importing beatmaps.."
-            cat osu_beatmaps.sql | mysql $db
-            echo "Importing beatmapsets.."
-            cat osu_beatmapsets.sql | mysql $db
-
-            echo "Creating table structure.."
-            mysql $db -e 'CREATE TABLE `osu_beatmap_difficulty` (
-                `beatmap_id` int unsigned NOT NULL,
-                `mode` tinyint NOT NULL DEFAULT 0,
-                `mods` int unsigned NOT NULL,
-                `diff_unified` float NOT NULL,
-                `last_update` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-                PRIMARY KEY (`beatmap_id`,`mode`,`mods`),
-                KEY `diff_sort` (`mode`,`mods`,`diff_unified`)
-              ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;'
+          # Add comment environment
+          echo '${{ github.event.comment.body }}' | sed -r 's/\r$//' | grep -E '^\w+=' | while read -r line; do
+              opt=$(echo ${line} | cut -d '=' -f1)
+              sed -i "s;^${opt}=.*$;${line};" "${{ needs.directory.outputs.GENERATOR_ENV }}"
           done
 
-      - name: Run diffcalc (master)
-        env:
-          DB_NAME: osu_master
+      - name: Add dispatch environment
+        if: ${{ github.event_name == 'workflow_dispatch' }}
         run: |
-          cd $GITHUB_WORKSPACE/master/osu-difficulty-calculator/osu.Server.DifficultyCalculator
-          dotnet run -c:Release -- all -m ${{ matrix.ruleset.id }} -ac -c ${{ env.CONCURRENCY }}
-      - name: Run diffcalc (pr)
-        env:
-          DB_NAME: osu_pr
-        run: |
-          cd $GITHUB_WORKSPACE/pr/osu-difficulty-calculator/osu.Server.DifficultyCalculator
-          dotnet run -c:Release -- all -m ${{ matrix.ruleset.id }} -ac -c ${{ env.CONCURRENCY }}
+          sed -i 's;^OSU_B=.*$;OSU_B=${{ inputs.osu-b }};' "${{ needs.directory.outputs.GENERATOR_ENV }}"
+          sed -i 's/^RULESET=.*$/RULESET=${{ inputs.ruleset }}/' "${{ needs.directory.outputs.GENERATOR_ENV }}"
+          sed -i 's/^GENERATORS=.*$/GENERATORS=${{ inputs.generators }}/' "${{ needs.directory.outputs.GENERATOR_ENV }}"
 
-      - name: Print diffs
-        run: |
-          mysql -e "
-            SELECT
-              m.beatmap_id,
-              m.mods,
-              b.filename,
-              m.diff_unified as 'sr_master',
-              p.diff_unified as 'sr_pr',
-              (p.diff_unified - m.diff_unified) as 'diff'
-            FROM osu_master.osu_beatmap_difficulty m
-            JOIN osu_pr.osu_beatmap_difficulty p
-              ON m.beatmap_id = p.beatmap_id
-              AND m.mode = p.mode
-              AND m.mods = p.mods
-            JOIN osu_pr.osu_beatmaps b
-              ON b.beatmap_id = p.beatmap_id
-            WHERE abs(m.diff_unified - p.diff_unified) > 0.1
-            ORDER BY abs(m.diff_unified - p.diff_unified)
-              DESC
-            LIMIT 10000;"
+          if [[ '${{ inputs.osu-a }}' != 'latest' ]]; then
+              sed -i 's;^OSU_A=.*$;OSU_A=${{ inputs.osu-a }};' "${{ needs.directory.outputs.GENERATOR_ENV }}"
+          fi
 
-      # Todo: Run ppcalc
+          if [[ '${{ inputs.difficulty-calculator-a }}' != 'latest' ]]; then
+              sed -i 's;^DIFFICULTY_CALCULATOR_A=.*$;DIFFICULTY_CALCULATOR_A=${{ inputs.difficulty-calculator-a }};' "${{ needs.directory.outputs.GENERATOR_ENV }}"
+          fi
+
+          if [[ '${{ inputs.difficulty-calculator-b }}' != 'latest' ]]; then
+              sed -i 's;^DIFFICULTY_CALCULATOR_B=.*$;DIFFICULTY_CALCULATOR_B=${{ inputs.difficulty-calculator-b }};' "${{ needs.directory.outputs.GENERATOR_ENV }}"
+          fi
+
+          if [[ '${{ inputs.score-processor-a }}' != 'latest' ]]; then
+              sed -i 's;^SCORE_PROCESSOR_A=.*$;SCORE_PROCESSOR_A=${{ inputs.score-processor-a }};' "${{ needs.directory.outputs.GENERATOR_ENV }}"
+          fi
+
+          if [[ '${{ inputs.score-processor-b }}' != 'latest' ]]; then
+              sed -i 's;^SCORE_PROCESSOR_B=.*$;SCORE_PROCESSOR_B=${{ inputs.score-processor-b }};' "${{ needs.directory.outputs.GENERATOR_ENV }}"
+          fi
+
+          if [[ '${{ inputs.converts }}' == 'true' ]]; then
+              sed -i 's/^NO_CONVERTS=.*$/NO_CONVERTS=0/' "${{ needs.directory.outputs.GENERATOR_ENV }}"
+          else
+              sed -i 's/^NO_CONVERTS=.*$/NO_CONVERTS=1/' "${{ needs.directory.outputs.GENERATOR_ENV }}"
+          fi
+
+          if [[ '${{ inputs.ranked-only }}' == 'true' ]]; then
+              sed -i 's/^RANKED_ONLY=.*$/RANKED_ONLY=1/' "${{ needs.directory.outputs.GENERATOR_ENV }}"
+          else
+              sed -i 's/^RANKED_ONLY=.*$/RANKED_ONLY=0/' "${{ needs.directory.outputs.GENERATOR_ENV }}"
+          fi
+
+  scores:
+    name: Setup scores
+    needs: [ directory, environment ]
+    runs-on: self-hosted
+    steps:
+      - name: Query latest data
+        id: query
+        run: |
+          ruleset=$(cat ${{ needs.directory.outputs.GENERATOR_ENV }} | grep -E '^RULESET=' | cut -d '=' -f2-)
+          performance_data_name=$(curl -s "https://data.ppy.sh/" | grep "performance_${ruleset}_top_1000\b" | tail -1 | awk -F "'" '{print $2}' | sed 's/\.tar\.bz2//g')
+
+          echo "TARGET_DIR=${{ needs.directory.outputs.GENERATOR_DIR }}/sql/${ruleset}" >> "${GITHUB_OUTPUT}"
+          echo "DATA_NAME=${performance_data_name}" >> "${GITHUB_OUTPUT}"
+
+      - name: Restore cache
+        id: restore-cache
+        uses: maxnowack/local-cache@038cc090b52e4f205fbc468bf5b0756df6f68775 # v1
+        with:
+          path: ${{ steps.query.outputs.DATA_NAME }}.tar.bz2
+          key: ${{ steps.query.outputs.DATA_NAME }}
+
+      - name: Download
+        if: steps.restore-cache.outputs.cache-hit != 'true'
+        run: |
+          wget -q -nc "https://data.ppy.sh/${{ steps.query.outputs.DATA_NAME }}.tar.bz2"
+
+      - name: Extract
+        run: |
+          tar -I lbzip2 -xf "${{ steps.query.outputs.DATA_NAME }}.tar.bz2"
+          rm -r "${{ steps.query.outputs.TARGET_DIR }}"
+          mv "${{ steps.query.outputs.DATA_NAME }}" "${{ steps.query.outputs.TARGET_DIR }}"
+
+  beatmaps:
+    name: Setup beatmaps
+    needs: directory
+    runs-on: self-hosted
+    steps:
+      - name: Query latest data
+        id: query
+        run: |
+          beatmaps_data_name=$(curl -s "https://data.ppy.sh/" | grep "osu_files" | tail -1 | awk -F "'" '{print $2}' | sed 's/\.tar\.bz2//g')
+
+          echo "TARGET_DIR=${{ needs.directory.outputs.GENERATOR_DIR }}/beatmaps" >> "${GITHUB_OUTPUT}"
+          echo "DATA_NAME=${beatmaps_data_name}" >> "${GITHUB_OUTPUT}"
+
+      - name: Restore cache
+        id: restore-cache
+        uses: maxnowack/local-cache@038cc090b52e4f205fbc468bf5b0756df6f68775 # v1
+        with:
+          path: ${{ steps.query.outputs.DATA_NAME }}.tar.bz2
+          key: ${{ steps.query.outputs.DATA_NAME }}
+
+      - name: Download
+        if: steps.restore-cache.outputs.cache-hit != 'true'
+        run: |
+          wget -q -nc "https://data.ppy.sh/${{ steps.query.outputs.DATA_NAME }}.tar.bz2"
+
+      - name: Extract
+        run: |
+          tar -I lbzip2 -xf "${{ steps.query.outputs.DATA_NAME }}.tar.bz2"
+          rm -r "${{ steps.query.outputs.TARGET_DIR }}"
+          mv "${{ steps.query.outputs.DATA_NAME }}" "${{ steps.query.outputs.TARGET_DIR }}"
+
+  generator:
+    name: Run generator
+    needs: [ directory, environment, scores, beatmaps ]
+    runs-on: self-hosted
+    timeout-minutes: 720
+    outputs:
+      TARGET: ${{ steps.run.outputs.TARGET }}
+      SPREADSHEET_LINK: ${{ steps.run.outputs.SPREADSHEET_LINK }}
+    steps:
+      - name: Run
+        id: run
+        run: |
+          # Add the GitHub token. This needs to be done here because it's unique per-job.
+          sed -i 's/^GH_TOKEN=.*$/GH_TOKEN=${{ github.token }}/' "${{ needs.directory.outputs.GENERATOR_ENV }}"
+
+          cd "${{ needs.directory.outputs.GENERATOR_DIR }}"
+          docker-compose up --build generator
+
+          link=$(docker-compose logs generator -n 10 | grep 'http' | sed -E 's/^.*(http.*)$/\1/')
+          target=$(cat "${{ needs.directory.outputs.GENERATOR_ENV }}" | grep -E '^OSU_B=' | cut -d '=' -f2-)
+
+          echo "TARGET=${target}" >> "${GITHUB_OUTPUT}"
+          echo "SPREADSHEET_LINK=${link}" >> "${GITHUB_OUTPUT}"
+
+      - name: Shutdown
+        if: ${{ always() }}
+        run: |
+          cd "${{ needs.directory.outputs.GENERATOR_DIR }}"
+          docker-compose down -v
+
+  output-cli:
+    name: Output info
+    needs: generator
+    runs-on: ubuntu-latest
+    steps:
+      - name: Output info
+        run: |
+          echo "Target: ${{ needs.generator.outputs.TARGET }}"
+          echo "Spreadsheet: ${{ needs.generator.outputs.SPREADSHEET_LINK }}"
+
+  cleanup:
+    name: Cleanup
+    needs: [ directory, generator ]
+    if: ${{ always() && needs.directory.result == 'success' }}
+    runs-on: self-hosted
+    steps:
+      - name: Cleanup
+        run: |
+          rm -rf "${{ needs.directory.outputs.GENERATOR_DIR }}"
+
+  update-comment:
+    name: Update PR comment
+    needs: [ create-comment, generator ]
+    runs-on: ubuntu-latest
+    if: ${{ always() && needs.create-comment.result == 'success' }}
+    steps:
+      - name: Update comment on success
+        if: ${{ needs.generator.result == 'success' }}
+        uses: thollander/actions-comment-pull-request@363c6f6eae92cc5c3a66e95ba016fc771bb38943 # v2.4.2
+        with:
+          comment_tag: ${{ env.EXECUTION_ID }}
+          mode: upsert
+          create_if_not_exists: false
+          message: |
+            Target: ${{ needs.generator.outputs.TARGET }}
+            Spreadsheet: ${{ needs.generator.outputs.SPREADSHEET_LINK }}
+
+      - name: Update comment on failure
+        if: ${{ needs.generator.result == 'failure' }}
+        uses: thollander/actions-comment-pull-request@363c6f6eae92cc5c3a66e95ba016fc771bb38943 # v2.4.2
+        with:
+          comment_tag: ${{ env.EXECUTION_ID }}
+          mode: upsert
+          create_if_not_exists: false
+          message: |
+            Difficulty calculation failed: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+
+      - name: Update comment on cancellation
+        if: ${{ needs.generator.result == 'cancelled' }}
+        uses: thollander/actions-comment-pull-request@363c6f6eae92cc5c3a66e95ba016fc771bb38943 # v2.4.2
+        with:
+          comment_tag: ${{ env.EXECUTION_ID }}
+          mode: delete
+          message: '.' # Appears to be required by this action for non-error status code.

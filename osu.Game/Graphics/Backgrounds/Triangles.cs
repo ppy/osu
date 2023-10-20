@@ -252,7 +252,7 @@ namespace osu.Game.Graphics.Backgrounds
 
         private class TrianglesDrawNode : DrawNode
         {
-            private float fill = 1f;
+            private const float fill = 1f;
 
             protected new Triangles Source => (Triangles)base.Source;
 
@@ -284,6 +284,8 @@ namespace osu.Game.Graphics.Backgrounds
                 parts.AddRange(Source.parts);
             }
 
+            private IUniformBuffer<TriangleBorderData> borderDataBuffer;
+
             public override void Draw(IRenderer renderer)
             {
                 base.Draw(renderer);
@@ -294,14 +296,17 @@ namespace osu.Game.Graphics.Backgrounds
                     vertexBatch = renderer.CreateQuadBatch<TexturedVertex2D>(Source.AimCount, 1);
                 }
 
-                // Due to triangles having various sizes we would need to set a different "texelSize" value for each of them, which is insanely expensive, thus we should use one single value.
-                // texelSize computed for an average triangle (size 100) will result in big triangles becoming blurry, so we may just use 0 for all of them.
-                // But we still need to specify at least something, because otherwise other shader usages will override this value.
-                float texelSize = 0f;
+                borderDataBuffer ??= renderer.CreateUniformBuffer<TriangleBorderData>();
+                borderDataBuffer.Data = borderDataBuffer.Data with
+                {
+                    Thickness = fill,
+                    // Due to triangles having various sizes we would need to set a different "TexelSize" value for each of them, which is insanely expensive, thus we should use one single value.
+                    // TexelSize computed for an average triangle (size 100) will result in big triangles becoming blurry, so we may just use 0 for all of them.
+                    TexelSize = 0
+                };
 
                 shader.Bind();
-                shader.GetUniform<float>("thickness").UpdateValue(ref fill);
-                shader.GetUniform<float>("texelSize").UpdateValue(ref texelSize);
+                shader.BindUniformBlock(@"m_BorderData", borderDataBuffer);
 
                 foreach (TriangleParticle particle in parts)
                 {
@@ -352,6 +357,7 @@ namespace osu.Game.Graphics.Backgrounds
                 base.Dispose(isDisposing);
 
                 vertexBatch?.Dispose();
+                borderDataBuffer?.Dispose();
             }
         }
 

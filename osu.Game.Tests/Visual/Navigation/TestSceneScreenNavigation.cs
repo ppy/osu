@@ -17,10 +17,12 @@ using osu.Game.Beatmaps;
 using osu.Game.Collections;
 using osu.Game.Configuration;
 using osu.Game.Graphics.UserInterface;
+using osu.Game.Online.API;
 using osu.Game.Online.Leaderboards;
 using osu.Game.Overlays;
 using osu.Game.Overlays.BeatmapListing;
 using osu.Game.Overlays.Mods;
+using osu.Game.Overlays.Notifications;
 using osu.Game.Overlays.Toolbar;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Osu.Mods;
@@ -211,6 +213,24 @@ namespace osu.Game.Tests.Visual.Navigation
 
             AddUntilStep("get new player", () => (player = Game.ScreenStack.CurrentScreen as Player) != null);
             AddAssert("retry count is 1", () => player.RestartCount == 1);
+        }
+
+        [Test]
+        public void TestRetryImmediatelyAfterCompletion()
+        {
+            var getOriginalPlayer = playToCompletion();
+
+            AddStep("attempt to retry", () => getOriginalPlayer().ChildrenOfType<HotkeyRetryOverlay>().First().Action());
+            AddUntilStep("wait for player", () => Game.ScreenStack.CurrentScreen != getOriginalPlayer() && Game.ScreenStack.CurrentScreen is Player);
+        }
+
+        [Test]
+        public void TestExitImmediatelyAfterCompletion()
+        {
+            var player = playToCompletion();
+
+            AddStep("attempt to exit", () => player().ChildrenOfType<HotkeyExitOverlay>().First().Action());
+            AddUntilStep("wait for results", () => Game.ScreenStack.CurrentScreen is ResultsScreen);
         }
 
         [Test]
@@ -539,6 +559,11 @@ namespace osu.Game.Tests.Visual.Navigation
             AddStep("open room", () => multiplayerComponents.ChildrenOfType<LoungeSubScreen>().Single().Open());
             AddStep("press back button", () => Game.ChildrenOfType<BackButton>().First().Action());
             AddWaitStep("wait two frames", 2);
+
+            AddStep("exit lounge", () => Game.ScreenStack.Exit());
+            // `TestMultiplayerComponents` registers a request handler in its BDL, but never unregisters it.
+            // to prevent the handler living for longer than it should be, clean up manually.
+            AddStep("clean up multiplayer request handler", () => ((DummyAPIAccess)API).HandleRequest = null);
         }
 
         [Test]
@@ -678,6 +703,68 @@ namespace osu.Game.Tests.Visual.Navigation
         }
 
         [Test]
+        public void TestExitWithOperationInProgress()
+        {
+            AddUntilStep("wait for dialog overlay", () => Game.ChildrenOfType<DialogOverlay>().SingleOrDefault() != null);
+
+            ProgressNotification progressNotification = null!;
+
+            AddStep("start ongoing operation", () =>
+            {
+                progressNotification = new ProgressNotification
+                {
+                    Text = "Something is still running",
+                    Progress = 0.5f,
+                    State = ProgressNotificationState.Active,
+                };
+                Game.Notifications.Post(progressNotification);
+            });
+
+            AddStep("Hold escape", () => InputManager.PressKey(Key.Escape));
+            AddUntilStep("confirmation dialog shown", () => Game.ChildrenOfType<DialogOverlay>().Single().CurrentDialog is ConfirmExitDialog);
+            AddStep("Release escape", () => InputManager.ReleaseKey(Key.Escape));
+
+            AddStep("cancel exit", () => InputManager.Key(Key.Escape));
+            AddAssert("dialog dismissed", () => Game.ChildrenOfType<DialogOverlay>().Single().CurrentDialog == null);
+
+            AddStep("complete operation", () =>
+            {
+                progressNotification.Progress = 100;
+                progressNotification.State = ProgressNotificationState.Completed;
+            });
+
+            AddStep("Hold escape", () => InputManager.PressKey(Key.Escape));
+            AddUntilStep("Wait for intro", () => Game.ScreenStack.CurrentScreen is IntroScreen);
+            AddStep("Release escape", () => InputManager.ReleaseKey(Key.Escape));
+
+            AddUntilStep("Wait for game exit", () => Game.ScreenStack.CurrentScreen == null);
+        }
+
+        [Test]
+        public void TestForceExitWithOperationInProgress()
+        {
+            AddStep("set hold delay to 0", () => Game.LocalConfig.SetValue(OsuSetting.UIHoldActivationDelay, 0.0));
+            AddUntilStep("wait for dialog overlay", () => Game.ChildrenOfType<DialogOverlay>().SingleOrDefault() != null);
+
+            AddStep("start ongoing operation", () =>
+            {
+                Game.Notifications.Post(new ProgressNotification
+                {
+                    Text = "Something is still running",
+                    Progress = 0.5f,
+                    State = ProgressNotificationState.Active,
+                });
+            });
+
+            AddStep("attempt exit", () =>
+            {
+                for (int i = 0; i < 2; ++i)
+                    Game.ScreenStack.CurrentScreen.Exit();
+            });
+            AddUntilStep("stopped at exit confirm", () => Game.ChildrenOfType<DialogOverlay>().Single().CurrentDialog is ConfirmExitDialog);
+        }
+
+        [Test]
         public void TestExitGameFromSongSelect()
         {
             PushAndConfirm(() => new TestPlaySongSelect());
@@ -693,22 +780,29 @@ namespace osu.Game.Tests.Visual.Navigation
         }
 
         [Test]
-        public void TestRapidBackButtonExit()
+        public void TestExitWithHoldDisabled()
         {
             AddStep("set hold delay to 0", () => Game.LocalConfig.SetValue(OsuSetting.UIHoldActivationDelay, 0.0));
 
             AddStep("press escape twice rapidly", () =>
             {
                 InputManager.Key(Key.Escape);
-                InputManager.Key(Key.Escape);
+                Schedule(InputManager.Key, Key.Escape);
             });
 
             pushEscape();
 
-            AddAssert("exit dialog is shown", () => Game.Dependencies.Get<IDialogOverlay>().CurrentDialog != null);
+            AddAssert("exit dialog is shown", () => Game.Dependencies.Get<IDialogOverlay>().CurrentDialog is ConfirmExitDialog);
         }
 
         private Func<Player> playToResults()
+        {
+            var player = playToCompletion();
+            AddUntilStep("wait for results", () => (Game.ScreenStack.CurrentScreen as ResultsScreen)?.IsLoaded == true);
+            return player;
+        }
+
+        private Func<Player> playToCompletion()
         {
             Player player = null;
 
@@ -734,7 +828,8 @@ namespace osu.Game.Tests.Visual.Navigation
 
             AddUntilStep("wait for track playing", () => beatmap().Track.IsRunning);
             AddStep("seek to near end", () => player.ChildrenOfType<GameplayClockContainer>().First().Seek(beatmap().Beatmap.HitObjects[^1].StartTime - 1000));
-            AddUntilStep("wait for pass", () => (Game.ScreenStack.CurrentScreen as ResultsScreen)?.IsLoaded == true);
+            AddUntilStep("wait for complete", () => player.GameplayState.HasPassed);
+
             return () => player;
         }
 

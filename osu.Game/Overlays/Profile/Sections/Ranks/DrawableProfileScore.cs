@@ -15,6 +15,7 @@ using osu.Game.Graphics.Sprites;
 using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Online.Leaderboards;
 using osu.Game.Rulesets;
+using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.UI;
 using osu.Game.Scoring.Drawables;
 using osu.Game.Utils;
@@ -48,6 +49,8 @@ namespace osu.Game.Overlays.Profile.Sections.Ranks
         [BackgroundDependencyLoader]
         private void load(RulesetStore rulesets)
         {
+            var ruleset = rulesets.GetRuleset(Score.RulesetID)?.CreateInstance() ?? throw new InvalidOperationException($"Ruleset with ID of {Score.RulesetID} not found locally");
+
             AddInternal(new ProfileItemContainer
             {
                 Children = new Drawable[]
@@ -132,14 +135,9 @@ namespace osu.Game.Overlays.Profile.Sections.Ranks
                                         Origin = Anchor.CentreRight,
                                         Direction = FillDirection.Horizontal,
                                         Spacing = new Vector2(2),
-                                        Children = Score.Mods.Select(mod =>
+                                        Children = Score.Mods.Select(m => m.ToMod(ruleset)).AsOrdered().Select(mod => new ModIcon(mod)
                                         {
-                                            var ruleset = rulesets.GetRuleset(Score.RulesetID) ?? throw new InvalidOperationException($"Ruleset with ID of {Score.RulesetID} not found locally");
-
-                                            return new ModIcon(mod.ToMod(ruleset.CreateInstance()))
-                                            {
-                                                Scale = new Vector2(0.35f)
-                                            };
+                                            Scale = new Vector2(0.35f)
                                         }).ToList(),
                                     }
                                 }

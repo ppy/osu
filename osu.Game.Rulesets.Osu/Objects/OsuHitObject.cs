@@ -1,8 +1,6 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
 using System;
 using System.Linq;
 using osu.Framework.Bindables;
@@ -22,6 +20,11 @@ namespace osu.Game.Rulesets.Osu.Objects
         /// The radius of hit objects (ie. the radius of a <see cref="HitCircle"/>).
         /// </summary>
         public const float OBJECT_RADIUS = 64;
+
+        /// <summary>
+        /// The width and height any element participating in display of a hitcircle (or similarly sized object) should be.
+        /// </summary>
+        public static readonly Vector2 OBJECT_DIMENSIONS = new Vector2(OBJECT_RADIUS * 2);
 
         /// <summary>
         /// Scoring distance with a speed-adjusted beat length of 1 second (ie. the speed slider balls move through their track).

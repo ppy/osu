@@ -26,6 +26,7 @@ namespace osu.Game.Rulesets.Catch.Beatmaps
             var xPositionData = obj as IHasXPosition;
             var yPositionData = obj as IHasYPosition;
             var comboData = obj as IHasCombo;
+            var sliderVelocityData = obj as IHasSliderVelocity;
 
             switch (obj)
             {
@@ -40,8 +41,8 @@ namespace osu.Game.Rulesets.Catch.Beatmaps
                         X = xPositionData?.X ?? 0,
                         NewCombo = comboData?.NewCombo ?? false,
                         ComboOffset = comboData?.ComboOffset ?? 0,
-                        LegacyLastTickOffset = (obj as IHasLegacyLastTickOffset)?.LegacyLastTickOffset ?? 0,
-                        LegacyConvertedY = yPositionData?.Y ?? CatchHitObject.DEFAULT_LEGACY_CONVERT_Y
+                        LegacyConvertedY = yPositionData?.Y ?? CatchHitObject.DEFAULT_LEGACY_CONVERT_Y,
+                        SliderVelocityMultiplier = sliderVelocityData?.SliderVelocityMultiplier ?? 1
                     }.Yield();
 
                 case IHasDuration endTime:

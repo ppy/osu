@@ -31,9 +31,9 @@ namespace osu.Game.Rulesets.Taiko.UI
     {
         public new BindableDouble TimeRange => base.TimeRange;
 
-        public readonly BindableBool LockPlayfieldMaxAspect = new BindableBool(true);
+        public readonly BindableBool LockPlayfieldAspectRange = new BindableBool(true);
 
-        protected override ScrollVisualisationMethod VisualisationMethod => ScrollVisualisationMethod.Overlapping;
+        public new TaikoInputManager KeyBindingInputManager => (TaikoInputManager)base.KeyBindingInputManager;
 
         protected override bool UserScrollSpeedAdjustment => false;
 
@@ -43,6 +43,7 @@ namespace osu.Game.Rulesets.Taiko.UI
             : base(ruleset, beatmap, mods)
         {
             Direction.Value = ScrollingDirection.Left;
+            VisualisationMethod = ScrollVisualisationMethod.Overlapping;
         }
 
         [BackgroundDependencyLoader]
@@ -63,13 +64,20 @@ namespace osu.Game.Rulesets.Taiko.UI
         {
             base.Update();
 
+            TimeRange.Value = ComputeTimeRange();
+        }
+
+        protected virtual double ComputeTimeRange()
+        {
             // Taiko scrolls at a constant 100px per 1000ms. More notes become visible as the playfield is lengthened.
             const float scroll_rate = 10;
 
             // Since the time range will depend on a positional value, it is referenced to the x480 pixel space.
-            float ratio = DrawHeight / 480;
+            // Width is used because it defines how many notes fit on the playfield.
+            // We clamp the ratio to the maximum aspect ratio to keep scroll speed consistent on widths lower than the default.
+            float ratio = Math.Max(DrawSize.X / 768f, TaikoPlayfieldAdjustmentContainer.MAXIMUM_ASPECT);
 
-            TimeRange.Value = (Playfield.HitObjectContainer.DrawWidth / ratio) * scroll_rate;
+            return (Playfield.HitObjectContainer.DrawWidth / ratio) * scroll_rate;
         }
 
         protected override void UpdateAfterChildren()
@@ -90,7 +98,7 @@ namespace osu.Game.Rulesets.Taiko.UI
 
         public override PlayfieldAdjustmentContainer CreatePlayfieldAdjustmentContainer() => new TaikoPlayfieldAdjustmentContainer
         {
-            LockPlayfieldMaxAspect = { BindTarget = LockPlayfieldMaxAspect }
+            LockPlayfieldAspectRange = { BindTarget = LockPlayfieldAspectRange }
         };
 
         protected override PassThroughInputManager CreateInputManager() => new TaikoInputManager(Ruleset.RulesetInfo);

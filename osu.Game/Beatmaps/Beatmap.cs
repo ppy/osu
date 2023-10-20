@@ -107,8 +107,11 @@ namespace osu.Game.Beatmaps
                                 // Aggregate durations into a set of (beatLength, duration) tuples for each beat length
                                 .GroupBy(t => Math.Round(t.beatLength * 1000) / 1000)
                                 .Select(g => (beatLength: g.Key, duration: g.Sum(t => t.duration)))
-                                // Get the most common one, or 0 as a suitable default
+                                // Get the most common one, or 0 as a suitable default (see handling below)
                                 .OrderByDescending(i => i.duration).FirstOrDefault();
+
+            if (mostCommon.beatLength == 0)
+                return TimingControlPoint.DEFAULT_BEAT_LENGTH;
 
             return mostCommon.beatLength;
         }

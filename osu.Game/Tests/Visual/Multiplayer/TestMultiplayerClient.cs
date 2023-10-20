@@ -108,7 +108,8 @@ namespace osu.Game.Tests.Visual.Multiplayer
                     // simulate the server's automatic assignment of users to teams on join.
                     // the "best" team is the one with the least users on it.
                     int bestTeam = teamVersus.Teams
-                                             .Select(team => (teamID: team.ID, userCount: ServerRoom.Users.Count(u => (u.MatchState as TeamVersusUserState)?.TeamID == team.ID))).MinBy(pair => pair.userCount).teamID;
+                                             .Select(team => (teamID: team.ID, userCount: ServerRoom.Users.Count(u => (u.MatchState as TeamVersusUserState)?.TeamID == team.ID)))
+                                             .MinBy(pair => pair.userCount).teamID;
 
                     user.MatchState = new TeamVersusUserState { TeamID = bestTeam };
                     ((IMultiplayerClient)this).MatchUserStateChanged(clone(user.UserID), clone(user.MatchState)).WaitSafely();
@@ -232,7 +233,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
                     QueueMode = ServerAPIRoom.QueueMode.Value,
                     AutoStartDuration = ServerAPIRoom.AutoStartDuration.Value
                 },
-                Playlist = ServerAPIRoom.Playlist.Select(item => new MultiplayerPlaylistItem(item)).ToList(),
+                Playlist = ServerAPIRoom.Playlist.Select(CreateMultiplayerPlaylistItem).ToList(),
                 Users = { localUser },
                 Host = localUser
             };
@@ -259,6 +260,11 @@ namespace osu.Game.Tests.Visual.Multiplayer
         protected override Task LeaveRoomInternal()
         {
             RoomJoined = false;
+            return Task.CompletedTask;
+        }
+
+        public override Task InvitePlayer(int userId)
+        {
             return Task.CompletedTask;
         }
 
@@ -634,8 +640,23 @@ namespace osu.Game.Tests.Visual.Multiplayer
 
         private T clone<T>(T incoming)
         {
-            byte[]? serialized = MessagePackSerializer.Serialize(typeof(T), incoming, SignalRUnionWorkaroundResolver.OPTIONS);
+            byte[] serialized = MessagePackSerializer.Serialize(typeof(T), incoming, SignalRUnionWorkaroundResolver.OPTIONS);
             return MessagePackSerializer.Deserialize<T>(serialized, SignalRUnionWorkaroundResolver.OPTIONS);
         }
+
+        public static MultiplayerPlaylistItem CreateMultiplayerPlaylistItem(PlaylistItem item) => new MultiplayerPlaylistItem
+        {
+            ID = item.ID,
+            OwnerID = item.OwnerID,
+            BeatmapID = item.Beatmap.OnlineID,
+            BeatmapChecksum = item.Beatmap.MD5Hash,
+            RulesetID = item.RulesetID,
+            RequiredMods = item.RequiredMods.ToArray(),
+            AllowedMods = item.AllowedMods.ToArray(),
+            Expired = item.Expired,
+            PlaylistOrder = item.PlaylistOrder ?? 0,
+            PlayedAt = item.PlayedAt,
+            StarRating = item.Beatmap.StarRating,
+        };
     }
 }

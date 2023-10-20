@@ -10,6 +10,7 @@ using osu.Framework.Testing;
 using osu.Game.Beatmaps;
 using osu.Game.Online.API;
 using osu.Game.Online.Chat;
+using osu.Game.Online.Rooms;
 using osu.Game.Rulesets;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Users;
@@ -32,7 +33,7 @@ namespace osu.Game.Tests.Visual.Online
         [Test]
         public void TestGenericActivity()
         {
-            AddStep("Set activity", () => api.Activity.Value = new UserActivity.InLobby(null));
+            AddStep("Set activity", () => api.Activity.Value = new UserActivity.InLobby(new Room()));
 
             AddStep("Run command", () => Add(new NowPlayingCommand(new Channel())));
 
@@ -63,7 +64,7 @@ namespace osu.Game.Tests.Visual.Online
         [TestCase(false)]
         public void TestLinkPresence(bool hasOnlineId)
         {
-            AddStep("Set activity", () => api.Activity.Value = new UserActivity.InLobby(null));
+            AddStep("Set activity", () => api.Activity.Value = new UserActivity.InLobby(new Room()));
 
             AddStep("Set beatmap", () => Beatmap.Value = new DummyWorkingBeatmap(Audio, null)
             {

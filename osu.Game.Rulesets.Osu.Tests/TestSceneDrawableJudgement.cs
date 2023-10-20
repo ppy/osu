@@ -1,8 +1,6 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -25,7 +23,7 @@ namespace osu.Game.Rulesets.Osu.Tests
     public partial class TestSceneDrawableJudgement : OsuSkinnableTestScene
     {
         [Resolved]
-        private OsuConfigManager config { get; set; }
+        private OsuConfigManager config { get; set; } = null!;
 
         private readonly List<DrawablePool<TestDrawableOsuJudgement>> pools;
 
@@ -77,7 +75,7 @@ namespace osu.Game.Rulesets.Osu.Tests
                         pool = pools[poolIndex];
 
                         // We need to make sure neither the pool nor the judgement get disposed when new content is set, and they both share the same parent.
-                        ((Container)pool.Parent).Clear(false);
+                        ((Container)pool.Parent!).Clear(false);
                     }
 
                     var container = new Container
