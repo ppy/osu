@@ -334,6 +334,14 @@ jobs:
           echo "Target: ${{ needs.generator.outputs.TARGET }}"
           echo "Spreadsheet: ${{ needs.generator.outputs.SPREADSHEET_LINK }}"
 
+  cleanup:
+    name: Cleanup
+    needs: [ directory, generator ]
+    if: ${{ always() }}
+    runs-on: self-hosted
+    run: |
+      rm -rf "${{ needs.directory.outputs.GENERATOR_DIR }}"
+
   update-comment:
     name: Update PR comment
     needs: [ create-comment, generator ]
