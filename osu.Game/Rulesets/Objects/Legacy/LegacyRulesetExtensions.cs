@@ -55,7 +55,7 @@ namespace osu.Game.Rulesets.Objects.Legacy
             // It works out to under 1 game pixel and is generally not meaningful to gameplay, but is to replay playback accuracy.
             const float broken_gamefield_rounding_allowance = 1.00041f;
 
-            return (float)(1.0f - 0.7f * IBeatmapDifficultyInfo.DifficultyRange(circleSize)) / 2 * broken_gamefield_rounding_allowance;
+            return (float)(1.0f - 0.7f * IBeatmapDifficultyInfo.DifficultyRange(circleSize)) / 2 * (applyFudge ? broken_gamefield_rounding_allowance : 1);
         }
     }
 }
