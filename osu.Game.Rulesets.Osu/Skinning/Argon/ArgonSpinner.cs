@@ -85,11 +85,25 @@ namespace osu.Game.Rulesets.Osu.Skinning.Argon
             base.LoadComplete();
 
             completedSpins = drawableSpinner.CompletedFullSpins.GetBoundCopy();
-            completedSpins.BindValueChanged(bonus =>
+            completedSpins.BindValueChanged(_ =>
             {
-                bonusCounter.Text = drawableSpinner.CurrentBonusScore.ToString(NumberFormatInfo.InvariantInfo);
-                bonusCounter.FadeOutFromOne(1500);
-                bonusCounter.ScaleTo(1.5f).Then().ScaleTo(1f, 1000, Easing.OutQuint);
+                if (drawableSpinner.CurrentBonusScore <= 0)
+                    return;
+
+                if (drawableSpinner.CurrentBonusScore == drawableSpinner.MaximumBonusScore)
+                {
+                    bonusCounter.Text = "MAX";
+                    bonusCounter.ScaleTo(1.5f).Then().ScaleTo(2.8f, 1000, Easing.OutQuint);
+
+                    bonusCounter.FlashColour(Colour4.FromHex("FC618F"), 400);
+                    bonusCounter.FadeOutFromOne(500);
+                }
+                else
+                {
+                    bonusCounter.Text = drawableSpinner.CurrentBonusScore.ToString(NumberFormatInfo.InvariantInfo);
+                    bonusCounter.ScaleTo(1.5f).Then().ScaleTo(1f, 1000, Easing.OutQuint);
+                    bonusCounter.FadeOutFromOne(1500);
+                }
             });
 
             spinsPerMinute = drawableSpinner.SpinsPerMinute.GetBoundCopy();
