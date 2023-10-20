@@ -144,7 +144,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
 
         private double computeSpeedValue(ScoreInfo score, OsuDifficultyAttributes attributes)
         {
-            if (score.Mods.Any(h => h is OsuModRelax))
+            if (score.Mods.Any(h => h is OsuModRelax) || deviation == null)
                 return 0.0;
 
             double speedValue = Math.Pow(5.0 * Math.Max(1.0, attributes.SpeedDifficulty / 0.0675) - 4.0, 3.0) / 100000.0;
@@ -177,9 +177,12 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             }
 
             // Scale the speed value with speed deviation
-            speedValue *= SpecialFunctions.Erf(20 / (Math.Sqrt(2) * speedDeviation));
+            double accOd10Speed = 2.0 / 3 * SpecialFunctions.Erf(20 / (Math.Sqrt(2) * speedDeviation))
+                                  + 1.0 / 6 * SpecialFunctions.Erf(60 / (Math.Sqrt(2) * speedDeviation))
+                                  + 1.0 / 6 * SpecialFunctions.Erf(100 / (Math.Sqrt(2) * speedDeviation));
 
             speedValue *= 0.95 + Math.Pow(100.0 / 9, 2) / 750; // OD 11 SS stays the same.
+            speedValue *= Math.Pow(accOd10Speed, 2);
 
             return speedValue;
         }
@@ -191,14 +194,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             if (score.Mods.Any(h => h is OsuModRelax) || deviation == null)
                 return 0.0;
 
-            double liveLengthBonus = Math.Min(1.15, Math.Pow(hitCircleCount / 1000.0, 0.3)); // Should eventually be removed.
-            double threshold = 1000 * Math.Pow(1.15, 1 / 0.3); // Number of objects until length bonus caps.
-
-            // Some fancy stuff to ensure SS values stay the same.
-            double scaling = Math.Sqrt(2) * Math.Log(1.52163) * SpecialFunctions.ErfInv(1 / (1 + 1 / Math.Min(hitCircleCount, threshold))) / 6;
-
-            // Accuracy pp formula that's roughly the same as live.
-            double accuracyValue = 2.83 * Math.Pow(1.52163, 40.0 / 3) * liveLengthBonus * Math.Exp(-scaling * (double)deviation);
+            double accuracyValue = 75 * Math.Pow(7.5 / (double)deviation, 2);
 
             // Increasing the accuracy value by object count for Blinds isn't ideal, so the minimum buff is given.
             if (score.Mods.Any(m => m is OsuModBlinds))
