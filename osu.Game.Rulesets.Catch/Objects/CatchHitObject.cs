@@ -8,6 +8,7 @@ using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.ControlPoints;
 using osu.Game.Rulesets.Catch.UI;
 using osu.Game.Rulesets.Objects;
+using osu.Game.Rulesets.Objects.Legacy;
 using osu.Game.Rulesets.Objects.Types;
 using osu.Game.Rulesets.Scoring;
 using osuTK;
@@ -151,7 +152,7 @@ namespace osu.Game.Rulesets.Catch.Objects
 
             TimePreempt = (float)IBeatmapDifficultyInfo.DifficultyRange(difficulty.ApproachRate, 1800, 1200, 450);
 
-            Scale = IBeatmapDifficultyInfo.CalculateScaleFromCircleSize(difficulty.CircleSize);
+            Scale = LegacyRulesetExtensions.CalculateScaleFromCircleSize(difficulty.CircleSize);
         }
 
         protected override HitWindows CreateHitWindows() => HitWindows.Empty;

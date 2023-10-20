@@ -13,6 +13,7 @@ using osu.Framework.Utils;
 using osu.Game.Beatmaps;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
+using osu.Game.Rulesets.Objects.Legacy;
 using osu.Game.Rulesets.Osu.Objects;
 using osu.Game.Scoring;
 using osuTK;
@@ -208,7 +209,7 @@ namespace osu.Game.Rulesets.Osu.Statistics
             if (score.HitEvents.Count == 0)
                 return;
 
-            float radius = OsuHitObject.OBJECT_RADIUS * IBeatmapDifficultyInfo.CalculateScaleFromCircleSize(playableBeatmap.Difficulty.CircleSize);
+            float radius = OsuHitObject.OBJECT_RADIUS * LegacyRulesetExtensions.CalculateScaleFromCircleSize(playableBeatmap.Difficulty.CircleSize, true);
 
             foreach (var e in score.HitEvents.Where(e => e.HitObject is HitCircle && !(e.HitObject is SliderTailCircle)))
             {

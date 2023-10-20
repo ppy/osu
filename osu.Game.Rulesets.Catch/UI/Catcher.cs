@@ -17,6 +17,7 @@ using osu.Game.Rulesets.Catch.Objects;
 using osu.Game.Rulesets.Catch.Objects.Drawables;
 using osu.Game.Rulesets.Catch.Skinning;
 using osu.Game.Rulesets.Judgements;
+using osu.Game.Rulesets.Objects.Legacy;
 using osu.Game.Skinning;
 using osuTK;
 using osuTK.Graphics;
@@ -469,7 +470,7 @@ namespace osu.Game.Rulesets.Catch.UI
         /// <summary>
         /// Calculates the scale of the catcher based off the provided beatmap difficulty.
         /// </summary>
-        private static Vector2 calculateScale(IBeatmapDifficultyInfo difficulty) => new Vector2(IBeatmapDifficultyInfo.CalculateScaleFromCircleSize(difficulty.CircleSize) * 2);
+        private static Vector2 calculateScale(IBeatmapDifficultyInfo difficulty) => new Vector2(LegacyRulesetExtensions.CalculateScaleFromCircleSize(difficulty.CircleSize) * 2);
 
         private enum DroppedObjectAnimation
         {
