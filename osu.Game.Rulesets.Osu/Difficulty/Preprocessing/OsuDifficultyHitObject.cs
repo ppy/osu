@@ -86,7 +86,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Preprocessing
         /// <summary>
         /// Selective bonus for maps with higher circle size.
         /// </summary>
-        public double smallCircleBonus { get; private set; }
+        public double SmallCircleBonus { get; private set; }
 
         private readonly OsuHitObject? lastLastObject;
         private readonly OsuHitObject lastObject;
@@ -158,10 +158,10 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Preprocessing
             // We will scale distances by this factor, so we can assume a uniform CircleSize among beatmaps.
             float scalingFactor = NORMALISED_RADIUS / (float)BaseObject.Radius;
 
-            smallCircleBonus = 1.0;
+            SmallCircleBonus = 1.0;
             if (BaseObject.Radius < 30)
             {
-                smallCircleBonus += (float)Math.Min(30 - BaseObject.Radius, 30) / 40;
+                SmallCircleBonus += (float)Math.Min(30 - BaseObject.Radius, 30) / 35;
             }
 
             Vector2 lastCursorPosition = getEndCursorPosition(lastObject);

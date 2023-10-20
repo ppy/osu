@@ -39,7 +39,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
         protected override double StrainValueAt(DifficultyHitObject current)
         {
             currentStrain *= strainDecay(((OsuDifficultyHitObject)current).StrainTime);
-            currentStrain += ((OsuDifficultyHitObject)current).smallCircleBonus * SpeedEvaluator.EvaluateDifficultyOf(current) * skillMultiplier;
+            currentStrain += SpeedEvaluator.EvaluateDifficultyOf(current) * skillMultiplier;
 
             currentRhythm = RhythmEvaluator.EvaluateDifficultyOf(current);
 
