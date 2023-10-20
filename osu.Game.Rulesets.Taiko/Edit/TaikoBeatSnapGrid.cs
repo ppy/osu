@@ -3,17 +3,17 @@
 
 using System.Collections.Generic;
 using osu.Framework.Graphics.Containers;
-using osu.Game.Rulesets.Catch.UI;
 using osu.Game.Rulesets.Edit;
+using osu.Game.Rulesets.Taiko.UI;
 using osu.Game.Screens.Edit.Compose.Components;
 
-namespace osu.Game.Rulesets.Catch.Edit
+namespace osu.Game.Rulesets.Taiko.Edit
 {
-    public partial class CatchBeatSnapGrid : BeatSnapGrid
+    public partial class TaikoBeatSnapGrid : BeatSnapGrid
     {
         protected override IEnumerable<Container> GetTargetContainers(HitObjectComposer composer) => new[]
         {
-            ((CatchPlayfield)composer.Playfield).UnderlayElements
+            ((TaikoPlayfield)composer.Playfield).UnderlayElements
         };
     }
 }

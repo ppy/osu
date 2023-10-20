@@ -76,7 +76,7 @@ namespace osu.Game.Rulesets.Edit
 
         protected readonly Container LayerBelowRuleset = new Container { RelativeSizeAxes = Axes.Both };
 
-        private InputManager inputManager;
+        protected InputManager InputManager { get; private set; }
 
         private EditorRadioButtonCollection toolboxCollection;
 
@@ -119,9 +119,12 @@ namespace osu.Game.Rulesets.Edit
                 return;
             }
 
+            if (DrawableRuleset is IDrawableScrollingRuleset scrollingRuleset)
+                dependencies.CacheAs(scrollingRuleset.ScrollingInfo);
+
             dependencies.CacheAs(Playfield);
 
-            InternalChildren = new Drawable[]
+            InternalChildren = new[]
             {
                 PlayfieldContentContainer = new Container
                 {
@@ -201,7 +204,7 @@ namespace osu.Game.Rulesets.Edit
                             },
                         }
                     }
-                }
+                },
             };
 
             toolboxCollection.Items = CompositionTools
@@ -232,7 +235,7 @@ namespace osu.Game.Rulesets.Edit
         {
             base.LoadComplete();
 
-            inputManager = GetContainingInputManager();
+            InputManager = GetContainingInputManager();
 
             hasTiming = EditorBeatmap.HasTiming.GetBoundCopy();
             hasTiming.BindValueChanged(timing =>
@@ -270,7 +273,7 @@ namespace osu.Game.Rulesets.Edit
 
         public override IEnumerable<DrawableHitObject> HitObjects => drawableRulesetWrapper.Playfield.AllHitObjects;
 
-        public override bool CursorInPlacementArea => drawableRulesetWrapper.Playfield.ReceivePositionalInputAt(inputManager.CurrentState.Mouse.Position);
+        public override bool CursorInPlacementArea => drawableRulesetWrapper.Playfield.ReceivePositionalInputAt(InputManager.CurrentState.Mouse.Position);
 
         /// <summary>
         /// Defines all available composition tools, listed on the left side of the editor screen as button controls.
