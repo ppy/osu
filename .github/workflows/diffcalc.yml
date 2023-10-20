@@ -139,9 +139,6 @@ jobs:
       GENERATOR_ENV: ${{ steps.set-outputs.outputs.GENERATOR_ENV }}
       GOOGLE_CREDS_FILE: ${{ steps.set-outputs.outputs.GOOGLE_CREDS_FILE }}
     steps:
-      - name: Checkout
-        uses: actions/checkout@v3
-
       - name: Checkout diffcalc-sheet-generator
         uses: actions/checkout@v3
         with:
