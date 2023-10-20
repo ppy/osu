@@ -171,11 +171,6 @@ namespace osu.Game.Screens.Select
 
             AddRangeInternal(new Drawable[]
             {
-                new ResetScrollContainer(() => Carousel.ScrollToSelected())
-                {
-                    RelativeSizeAxes = Axes.Y,
-                    Width = 250,
-                },
                 new VerticalMaskingContainer
                 {
                     Children = new Drawable[]
@@ -243,6 +238,10 @@ namespace osu.Game.Screens.Select
                                         Padding = new MarginPadding { Top = left_area_padding },
                                         Children = new Drawable[]
                                         {
+                                            new ResetScrollContainer(() => Carousel.ScrollToSelected())
+                                            {
+                                                RelativeSizeAxes = Axes.Both,
+                                            },
                                             beatmapInfoWedge = new BeatmapInfoWedge
                                             {
                                                 Height = WEDGE_HEIGHT,
