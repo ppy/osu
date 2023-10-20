@@ -17,6 +17,7 @@ using osu.Game.Rulesets.Catch.Objects;
 using osu.Game.Rulesets.Catch.Objects.Drawables;
 using osu.Game.Rulesets.Catch.Skinning;
 using osu.Game.Rulesets.Judgements;
+using osu.Game.Rulesets.Objects.Legacy;
 using osu.Game.Skinning;
 using osuTK;
 using osuTK.Graphics;
@@ -181,11 +182,6 @@ namespace osu.Game.Rulesets.Catch.UI
         /// Creates proxied content to be displayed beneath hitobjects.
         /// </summary>
         public Drawable CreateProxiedContent() => caughtObjectContainer.CreateProxy();
-
-        /// <summary>
-        /// Calculates the scale of the catcher based off the provided beatmap difficulty.
-        /// </summary>
-        private static Vector2 calculateScale(IBeatmapDifficultyInfo difficulty) => new Vector2(1.0f - 0.7f * (difficulty.CircleSize - 5) / 5);
 
         /// <summary>
         /// Calculates the width of the area used for attempting catches in gameplay.
@@ -470,6 +466,11 @@ namespace osu.Game.Rulesets.Catch.UI
             d.LifetimeStart = Clock.CurrentTime;
             d.Expire();
         }
+
+        /// <summary>
+        /// Calculates the scale of the catcher based off the provided beatmap difficulty.
+        /// </summary>
+        private static Vector2 calculateScale(IBeatmapDifficultyInfo difficulty) => new Vector2(LegacyRulesetExtensions.CalculateScaleFromCircleSize(difficulty.CircleSize) * 2);
 
         private enum DroppedObjectAnimation
         {
