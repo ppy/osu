@@ -74,7 +74,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
                     // Rewarding angles, take the smaller velocity as base.
                     double angleBonus = Math.Min(currVelocity, prevVelocity);
 
-                    wideAngleBonus = calcWideAngleBonus(currAngle);
+                    wideAngleBonus = calcWideAngleBonus(lastAngle);
                     acuteAngleBonus = calcAcuteAngleBonus(currAngle);
 
                     if (osuCurrObj.StrainTime > 100) // Only buff deltaTime exceeding 300 bpm 1/2.
@@ -88,9 +88,12 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
                     }
 
                     // Penalize wide angles if they're repeated, reducing the penalty as the lastAngle gets more acute.
-                    wideAngleBonus *= angleBonus * (1 - Math.Min(wideAngleBonus, Math.Pow(calcWideAngleBonus(lastAngle), 3)));
+                    wideAngleBonus *= angleBonus * (1 - Math.Min(wideAngleBonus, Math.Pow(calcWideAngleBonus(lastLastAngle), 3)));
                     // Penalize acute angles if they're repeated, reducing the penalty as the lastLastAngle gets more obtuse.
                     acuteAngleBonus *= 0.5 + 0.5 * (1 - Math.Min(acuteAngleBonus, Math.Pow(calcAcuteAngleBonus(lastLastAngle), 3)));
+
+                    // If your last angle was acute and your next angle is acute your wide angle isn't that special.
+                    wideAngleBonus *= 1 - 0.35 * (calcAcuteAngleBonus(currAngle) * calcAcuteAngleBonus(lastLastAngle));
                 }
             }
 
