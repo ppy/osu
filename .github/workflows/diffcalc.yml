@@ -101,7 +101,7 @@ permissions:
   pull-requests: write
 
 env:
-  COMMENT_TAG: execution-${{ github.run_id }}-${{ github.run_number }}-${{ github.run_attempt }}
+  EXECUTION_ID: execution-${{ github.run_id }}-${{ github.run_number }}-${{ github.run_attempt }}
 
 jobs:
   check-permissions:
@@ -124,26 +124,15 @@ jobs:
       - name: Create comment
         uses: thollander/actions-comment-pull-request@363c6f6eae92cc5c3a66e95ba016fc771bb38943 # v2.4.2
         with:
-          comment_tag: ${{ env.COMMENT_TAG }}
+          comment_tag: ${{ env.EXECUTION_ID }}
           message: |
             Difficulty calculation queued -- please wait! (${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }})
 
             *This comment will update on completion*
 
-  wait-for-queue:
-    name: "Wait for previous workflows"
-    needs: check-permissions
-    runs-on: self-hosted
-    timeout-minutes: 50400 # 35 days, the maximum for jobs on self-hosted runners.
-    steps:
-      - uses: ahmadnassri/action-workflow-queue@f547ac848c16a9bb1b2ed4a850e0cc5098af2cf8 # v1.1.5
-        with:
-          timeout: 2147483647 # Around 24 days - the maximum supported by JS setTimeout().
-          delay: 120000 # Poll every 2 minutes - the API limit seems fairly low on this one.
-
   directory:
     name: Prepare directory
-    needs: wait-for-queue
+    needs: check-permissions
     runs-on: self-hosted
     outputs:
       GENERATOR_DIR: ${{ steps.set-outputs.outputs.GENERATOR_DIR }}
@@ -156,15 +145,15 @@ jobs:
       - name: Checkout diffcalc-sheet-generator
         uses: actions/checkout@v3
         with:
-          path: 'diffcalc-sheet-generator'
+          path: ${{ env.EXECUTION_ID }}
           repository: 'smoogipoo/diffcalc-sheet-generator'
 
       - name: Set outputs
         id: set-outputs
         run: |
-          echo "GENERATOR_DIR=${{ github.workspace }}/diffcalc-sheet-generator" >> "${GITHUB_OUTPUT}"
-          echo "GENERATOR_ENV=${{ github.workspace }}/diffcalc-sheet-generator/.env" >> "${GITHUB_OUTPUT}"
-          echo "GOOGLE_CREDS_FILE=${{ github.workspace }}/diffcalc-sheet-generator/google-credentials.json" >> "${GITHUB_OUTPUT}"
+          echo "GENERATOR_DIR=${{ github.workspace }}/${{ env.EXECUTION_ID }}" >> "${GITHUB_OUTPUT}"
+          echo "GENERATOR_ENV=${{ github.workspace }}/${{ env.EXECUTION_ID }}/.env" >> "${GITHUB_OUTPUT}"
+          echo "GOOGLE_CREDS_FILE=${{ github.workspace }}/${{ env.EXECUTION_ID }}/google-credentials.json" >> "${GITHUB_OUTPUT}"
 
   environment:
     name: Setup environment
@@ -176,7 +165,7 @@ jobs:
       - name: Add base environment
         run: |
           # Required by diffcalc-sheet-generator
-          cp '${{ github.workspace }}/diffcalc-sheet-generator/.env.sample' "${{ needs.directory.outputs.GENERATOR_ENV }}"
+          cp '${{ env.GENERATOR_DIR }}/.env.sample' "${{ needs.directory.outputs.GENERATOR_ENV }}"
 
           # Add Google credentials
           echo '${{ secrets.DIFFCALC_GOOGLE_CREDENTIALS }}' | base64 -d > "${{ needs.directory.outputs.GOOGLE_CREDS_FILE }}"
@@ -336,7 +325,7 @@ jobs:
         if: ${{ always() }}
         run: |
           cd "${{ needs.directory.outputs.GENERATOR_DIR }}"
-          docker-compose down
+          docker-compose down -v
 
   output-cli:
     name: Output info
@@ -358,7 +347,7 @@ jobs:
         if: ${{ needs.generator.result == 'success' }}
         uses: thollander/actions-comment-pull-request@363c6f6eae92cc5c3a66e95ba016fc771bb38943 # v2.4.2
         with:
-          comment_tag: ${{ env.COMMENT_TAG }}
+          comment_tag: ${{ env.EXECUTION_ID }}
           mode: upsert
           create_if_not_exists: false
           message: |
@@ -369,7 +358,7 @@ jobs:
         if: ${{ needs.generator.result == 'failure' }}
         uses: thollander/actions-comment-pull-request@363c6f6eae92cc5c3a66e95ba016fc771bb38943 # v2.4.2
         with:
-          comment_tag: ${{ env.COMMENT_TAG }}
+          comment_tag: ${{ env.EXECUTION_ID }}
           mode: upsert
           create_if_not_exists: false
           message: |
@@ -379,6 +368,6 @@ jobs:
         if: ${{ needs.generator.result == 'cancelled' }}
         uses: thollander/actions-comment-pull-request@363c6f6eae92cc5c3a66e95ba016fc771bb38943 # v2.4.2
         with:
-          comment_tag: ${{ env.COMMENT_TAG }}
+          comment_tag: ${{ env.EXECUTION_ID }}
           mode: delete
           message: '.' # Appears to be required by this action for non-error status code.
