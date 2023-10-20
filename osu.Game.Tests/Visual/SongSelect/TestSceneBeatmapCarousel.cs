@@ -515,6 +515,7 @@ namespace osu.Game.Tests.Visual.SongSelect
             checkVisibleItemCount(false, local_set_count * local_diff_count);
 
             var firstAdded = TestResources.CreateTestBeatmapSetInfo(local_diff_count);
+            firstAdded.Status = BeatmapOnlineStatus.Loved;
 
             AddStep("Add new set", () => carousel.UpdateBeatmapSet(firstAdded));
 
@@ -1176,12 +1177,18 @@ namespace osu.Game.Tests.Visual.SongSelect
             if (beatmapSets == null)
             {
                 beatmapSets = new List<BeatmapSetInfo>();
+                var statuses = Enum.GetValues<BeatmapOnlineStatus>()
+                                   .Except(new[] { BeatmapOnlineStatus.None }) // make sure a badge is always shown.
+                                   .ToArray();
 
                 for (int i = 1; i <= (setCount ?? set_count); i++)
                 {
-                    beatmapSets.Add(randomDifficulties
+                    var set = randomDifficulties
                         ? TestResources.CreateTestBeatmapSetInfo()
-                        : TestResources.CreateTestBeatmapSetInfo(diffCount ?? diff_count));
+                        : TestResources.CreateTestBeatmapSetInfo(diffCount ?? diff_count);
+                    set.Status = statuses[RNG.Next(statuses.Length)];
+
+                    beatmapSets.Add(set);
                 }
             }
 

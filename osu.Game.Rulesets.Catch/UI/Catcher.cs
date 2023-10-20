@@ -29,6 +29,13 @@ namespace osu.Game.Rulesets.Catch.UI
         /// <summary>
         /// The size of the catcher at 1x scale.
         /// </summary>
+        /// <remarks>
+        /// This is mainly used to compute catching range, the actual catcher size may differ based on skin implementation and sprite textures.
+        /// This is also equivalent to the "catcherWidth" property in osu-stable when the game field and beatmap difficulty are set to default values.
+        /// </remarks>
+        /// <seealso cref="CatchPlayfield.WIDTH"/>
+        /// <seealso cref="CatchPlayfield.HEIGHT"/>
+        /// <seealso cref="IBeatmapDifficultyInfo.DEFAULT_DIFFICULTY"/>
         public const float BASE_SIZE = 106.75f;
 
         /// <summary>

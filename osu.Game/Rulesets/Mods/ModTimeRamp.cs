@@ -7,6 +7,7 @@ using osu.Framework.Audio;
 using osu.Framework.Bindables;
 using osu.Game.Beatmaps;
 using osu.Game.Configuration;
+using osu.Game.Overlays.Settings;
 using osu.Game.Rulesets.UI;
 
 namespace osu.Game.Rulesets.Mods
@@ -20,10 +21,10 @@ namespace osu.Game.Rulesets.Mods
 
         public override double ScoreMultiplier => 0.5;
 
-        [SettingSource("Initial rate", "The starting speed of the track")]
+        [SettingSource("Initial rate", "The starting speed of the track", SettingControlType = typeof(MultiplierSettingsSlider))]
         public abstract BindableNumber<double> InitialRate { get; }
 
-        [SettingSource("Final rate", "The final speed to ramp to")]
+        [SettingSource("Final rate", "The final speed to ramp to", SettingControlType = typeof(MultiplierSettingsSlider))]
         public abstract BindableNumber<double> FinalRate { get; }
 
         [SettingSource("Adjust pitch", "Should pitch be adjusted with speed")]
@@ -43,21 +44,21 @@ namespace osu.Game.Rulesets.Mods
             Precision = 0.01,
         };
 
-        private IAdjustableAudioComponent? track;
+        private readonly RateAdjustModHelper rateAdjustHelper;
 
         protected ModTimeRamp()
         {
+            rateAdjustHelper = new RateAdjustModHelper(SpeedChange);
+            rateAdjustHelper.HandleAudioAdjustments(AdjustPitch);
+
             // for preview purpose at song select. eventually we'll want to be able to update every frame.
             FinalRate.BindValueChanged(_ => applyRateAdjustment(double.PositiveInfinity), true);
-            AdjustPitch.BindValueChanged(applyPitchAdjustment);
         }
 
         public void ApplyToTrack(IAdjustableAudioComponent track)
         {
-            this.track = track;
-
+            rateAdjustHelper.ApplyToTrack(track);
             FinalRate.TriggerChange();
-            AdjustPitch.TriggerChange();
         }
 
         public void ApplyToSample(IAdjustableAudioComponent sample)
@@ -94,16 +95,5 @@ namespace osu.Game.Rulesets.Mods
         /// Adjust the rate along the specified ramp.
         /// </summary>
         private void applyRateAdjustment(double time) => SpeedChange.Value = ApplyToRate(time);
-
-        private void applyPitchAdjustment(ValueChangedEvent<bool> adjustPitchSetting)
-        {
-            // remove existing old adjustment
-            track?.RemoveAdjustment(adjustmentForPitchSetting(adjustPitchSetting.OldValue), SpeedChange);
-
-            track?.AddAdjustment(adjustmentForPitchSetting(adjustPitchSetting.NewValue), SpeedChange);
-        }
-
-        private AdjustableProperty adjustmentForPitchSetting(bool adjustPitchSettingValue)
-            => adjustPitchSettingValue ? AdjustableProperty.Frequency : AdjustableProperty.Tempo;
     }
 }

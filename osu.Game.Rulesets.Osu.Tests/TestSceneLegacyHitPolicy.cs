@@ -356,15 +356,16 @@ namespace osu.Game.Rulesets.Osu.Tests
                 },
             };
 
-            performTest(hitObjects, new List<ReplayFrame>
+            List<ReplayFrame> frames = new List<ReplayFrame>
             {
                 new OsuReplayFrame { Time = time_spinner - 90, Position = positionCircle, Actions = { OsuAction.LeftButton } },
-                new OsuReplayFrame { Time = time_spinner + 10, Position = new Vector2(236, 192), Actions = { OsuAction.RightButton } },
-                new OsuReplayFrame { Time = time_spinner + 20, Position = new Vector2(256, 172), Actions = { OsuAction.RightButton } },
-                new OsuReplayFrame { Time = time_spinner + 30, Position = new Vector2(276, 192), Actions = { OsuAction.RightButton } },
-                new OsuReplayFrame { Time = time_spinner + 40, Position = new Vector2(256, 212), Actions = { OsuAction.RightButton } },
-                new OsuReplayFrame { Time = time_spinner + 50, Position = new Vector2(236, 192), Actions = { OsuAction.RightButton } },
-            });
+            };
+
+            frames.AddRange(new SpinFramesGenerator(time_spinner + 10)
+                            .Spin(360, 500)
+                            .Build());
+
+            performTest(hitObjects, frames);
 
             addJudgementAssert(hitObjects[0], HitResult.Great);
             addJudgementAssert(hitObjects[1], HitResult.Meh);
@@ -549,10 +550,149 @@ namespace osu.Game.Rulesets.Osu.Tests
             addJudgementOffsetAssert("first slider head", () => ((Slider)hitObjects[0]).HeadCircle, 0);
             addJudgementAssert(hitObjects[1], HitResult.Miss);
             // the slider head of the first slider prevents the second slider's head from being hit, so the judgement offset should be very late.
-            // this is not strictly done by the hit policy implementation itself (see `OsuModClassic.blockInputToUnderlyingObjects()`),
+            // this is not strictly done by the hit policy implementation itself (see `OsuModClassic.blockInputToObjectsUnderSliderHead()`),
             // but we're testing this here anyways to just keep everything related to input handling and note lock in one place.
             addJudgementOffsetAssert("second slider head", () => ((Slider)hitObjects[1]).HeadCircle, referenceHitWindows.WindowFor(HitResult.Meh));
             addClickActionAssert(0, ClickAction.Hit);
+        }
+
+        [Test]
+        public void TestOverlappingSlidersDontBlockEachOtherWhenFullyJudged()
+        {
+            const double time_first_slider = 1000;
+            const double time_second_slider = 1600;
+            Vector2 positionFirstSlider = new Vector2(100, 50);
+            Vector2 positionSecondSlider = new Vector2(100, 80);
+            var midpoint = (positionFirstSlider + positionSecondSlider) / 2;
+
+            var hitObjects = new List<OsuHitObject>
+            {
+                new Slider
+                {
+                    StartTime = time_first_slider,
+                    Position = positionFirstSlider,
+                    Path = new SliderPath(PathType.Linear, new[]
+                    {
+                        Vector2.Zero,
+                        new Vector2(25, 0),
+                    })
+                },
+                new Slider
+                {
+                    StartTime = time_second_slider,
+                    Position = positionSecondSlider,
+                    Path = new SliderPath(PathType.Linear, new[]
+                    {
+                        Vector2.Zero,
+                        new Vector2(25, 0),
+                    })
+                }
+            };
+
+            performTest(hitObjects, new List<ReplayFrame>
+            {
+                new OsuReplayFrame { Time = time_first_slider, Position = midpoint, Actions = { OsuAction.RightButton } },
+                new OsuReplayFrame { Time = time_first_slider + 25, Position = midpoint },
+                // this frame doesn't do anything on lazer, but is REQUIRED for correct playback on stable,
+                // because stable during replay playback only updates game state _when it encounters a replay frame_
+                new OsuReplayFrame { Time = 1250, Position = midpoint },
+                new OsuReplayFrame { Time = time_second_slider + 50, Position = midpoint, Actions = { OsuAction.LeftButton } },
+                new OsuReplayFrame { Time = time_second_slider + 75, Position = midpoint },
+            });
+
+            addJudgementAssert(hitObjects[0], HitResult.Ok);
+            addJudgementOffsetAssert("first slider head", () => ((Slider)hitObjects[0]).HeadCircle, 0);
+            addJudgementAssert(hitObjects[1], HitResult.Ok);
+            addJudgementOffsetAssert("second slider head", () => ((Slider)hitObjects[1]).HeadCircle, 50);
+            addClickActionAssert(0, ClickAction.Hit);
+            addClickActionAssert(1, ClickAction.Hit);
+        }
+
+        [Test]
+        public void TestOverlappingHitCirclesDontBlockEachOtherWhenBothVisible()
+        {
+            const double time_first_circle = 1000;
+            const double time_second_circle = 1200;
+            Vector2 positionFirstCircle = new Vector2(100);
+            Vector2 positionSecondCircle = new Vector2(120);
+            var midpoint = (positionFirstCircle + positionSecondCircle) / 2;
+
+            var hitObjects = new List<OsuHitObject>
+            {
+                new HitCircle
+                {
+                    StartTime = time_first_circle,
+                    Position = positionFirstCircle,
+                },
+                new HitCircle
+                {
+                    StartTime = time_second_circle,
+                    Position = positionSecondCircle,
+                },
+            };
+
+            performTest(hitObjects, new List<ReplayFrame>
+            {
+                new OsuReplayFrame { Time = time_first_circle, Position = midpoint, Actions = { OsuAction.LeftButton } },
+                new OsuReplayFrame { Time = time_first_circle + 25, Position = midpoint },
+                new OsuReplayFrame { Time = time_first_circle + 50, Position = midpoint, Actions = { OsuAction.RightButton } },
+            });
+
+            addJudgementAssert(hitObjects[0], HitResult.Great);
+            addJudgementOffsetAssert(hitObjects[0], 0);
+
+            addJudgementAssert(hitObjects[1], HitResult.Meh);
+            addJudgementOffsetAssert(hitObjects[1], -150);
+        }
+
+        [Test]
+        public void TestOverlappingHitCirclesDontBlockEachOtherWhenFullyFadedOut()
+        {
+            const double time_first_circle = 1000;
+            const double time_second_circle = 1200;
+            const double time_third_circle = 1400;
+            Vector2 positionFirstCircle = new Vector2(100);
+            Vector2 positionSecondCircle = new Vector2(200);
+
+            var hitObjects = new List<OsuHitObject>
+            {
+                new HitCircle
+                {
+                    StartTime = time_first_circle,
+                    Position = positionFirstCircle,
+                },
+                new HitCircle
+                {
+                    StartTime = time_second_circle,
+                    Position = positionSecondCircle,
+                },
+                new HitCircle
+                {
+                    StartTime = time_third_circle,
+                    Position = positionFirstCircle,
+                },
+            };
+
+            performTest(hitObjects, new List<ReplayFrame>
+            {
+                new OsuReplayFrame { Time = time_first_circle, Position = positionFirstCircle, Actions = { OsuAction.LeftButton } },
+                new OsuReplayFrame { Time = time_first_circle + 50, Position = positionFirstCircle },
+                new OsuReplayFrame { Time = time_second_circle - 50, Position = positionSecondCircle },
+                new OsuReplayFrame { Time = time_second_circle, Position = positionSecondCircle, Actions = { OsuAction.LeftButton } },
+                new OsuReplayFrame { Time = time_second_circle + 50, Position = positionSecondCircle },
+                new OsuReplayFrame { Time = time_third_circle - 50, Position = positionFirstCircle },
+                new OsuReplayFrame { Time = time_third_circle, Position = positionFirstCircle, Actions = { OsuAction.LeftButton } },
+                new OsuReplayFrame { Time = time_third_circle + 50, Position = positionFirstCircle },
+            });
+
+            addJudgementAssert(hitObjects[0], HitResult.Great);
+            addJudgementOffsetAssert(hitObjects[0], 0);
+
+            addJudgementAssert(hitObjects[1], HitResult.Great);
+            addJudgementOffsetAssert(hitObjects[1], 0);
+
+            addJudgementAssert(hitObjects[2], HitResult.Great);
+            addJudgementOffsetAssert(hitObjects[2], 0);
         }
 
         private void addJudgementAssert(OsuHitObject hitObject, HitResult result)

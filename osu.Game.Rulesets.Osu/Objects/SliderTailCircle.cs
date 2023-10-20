@@ -10,7 +10,7 @@ namespace osu.Game.Rulesets.Osu.Objects
 {
     /// <summary>
     /// Note that this should not be used for timing correctness.
-    /// See <see cref="SliderEventType.LegacyLastTick"/> usage in <see cref="Slider"/> for more information.
+    /// See <see cref="SliderEventType.LastTick"/> usage in <see cref="Slider"/> for more information.
     /// </summary>
     public class SliderTailCircle : SliderEndCircle
     {

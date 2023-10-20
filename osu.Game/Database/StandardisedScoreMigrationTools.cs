@@ -10,11 +10,11 @@ using osu.Game.Beatmaps;
 using osu.Game.Extensions;
 using osu.Game.IO.Legacy;
 using osu.Game.Rulesets;
-using osu.Game.Rulesets.Difficulty;
 using osu.Game.Rulesets.Judgements;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Scoring;
+using osu.Game.Rulesets.Scoring.Legacy;
 using osu.Game.Scoring;
 
 namespace osu.Game.Database
@@ -222,45 +222,44 @@ namespace osu.Game.Database
                 throw new InvalidOperationException("Beatmap contains no hit objects!");
 
             ILegacyScoreSimulator sv1Simulator = legacyRuleset.CreateLegacyScoreSimulator();
+            LegacyScoreAttributes attributes = sv1Simulator.Simulate(beatmap, playableBeatmap);
 
-            sv1Simulator.Simulate(beatmap, playableBeatmap, mods);
-
-            return ConvertFromLegacyTotalScore(score, new DifficultyAttributes
-            {
-                LegacyAccuracyScore = sv1Simulator.AccuracyScore,
-                LegacyComboScore = sv1Simulator.ComboScore,
-                LegacyBonusScoreRatio = sv1Simulator.BonusScoreRatio
-            });
+            return ConvertFromLegacyTotalScore(score, LegacyBeatmapConversionDifficultyInfo.FromBeatmap(beatmap.Beatmap), attributes);
         }
 
         /// <summary>
         /// Converts from <see cref="ScoreInfo.LegacyTotalScore"/> to the new standardised scoring of <see cref="ScoreProcessor"/>.
         /// </summary>
         /// <param name="score">The score to convert the total score of.</param>
-        /// <param name="attributes">Difficulty attributes providing the legacy scoring values
-        /// (<see cref="DifficultyAttributes.LegacyAccuracyScore"/>, <see cref="DifficultyAttributes.LegacyComboScore"/>, and <see cref="DifficultyAttributes.LegacyBonusScoreRatio"/>)
-        /// for the beatmap which the score was set on.</param>
+        /// <param name="difficulty">The beatmap difficulty.</param>
+        /// <param name="attributes">The legacy scoring attributes for the beatmap which the score was set on.</param>
         /// <returns>The standardised total score.</returns>
-        public static long ConvertFromLegacyTotalScore(ScoreInfo score, DifficultyAttributes attributes)
+        public static long ConvertFromLegacyTotalScore(ScoreInfo score, LegacyBeatmapConversionDifficultyInfo difficulty, LegacyScoreAttributes attributes)
         {
             if (!score.IsLegacyScore)
                 return score.TotalScore;
 
             Debug.Assert(score.LegacyTotalScore != null);
 
-            int maximumLegacyAccuracyScore = attributes.LegacyAccuracyScore;
-            int maximumLegacyComboScore = attributes.LegacyComboScore;
-            double maximumLegacyBonusRatio = attributes.LegacyBonusScoreRatio;
-            double modMultiplier = score.Mods.Select(m => m.ScoreMultiplier).Aggregate(1.0, (c, n) => c * n);
+            Ruleset ruleset = score.Ruleset.CreateInstance();
+            if (ruleset is not ILegacyRuleset legacyRuleset)
+                return score.TotalScore;
+
+            double legacyModMultiplier = legacyRuleset.CreateLegacyScoreSimulator().GetLegacyScoreMultiplier(score.Mods, difficulty);
+            int maximumLegacyAccuracyScore = attributes.AccuracyScore;
+            long maximumLegacyComboScore = (long)Math.Round(attributes.ComboScore * legacyModMultiplier);
+            double maximumLegacyBonusRatio = attributes.BonusScoreRatio;
 
             // The part of total score that doesn't include bonus.
-            int maximumLegacyBaseScore = maximumLegacyAccuracyScore + maximumLegacyComboScore;
+            long maximumLegacyBaseScore = maximumLegacyAccuracyScore + maximumLegacyComboScore;
 
             // The combo proportion is calculated as a proportion of maximumLegacyBaseScore.
             double comboProportion = Math.Min(1, (double)score.LegacyTotalScore / maximumLegacyBaseScore);
 
             // The bonus proportion makes up the rest of the score that exceeds maximumLegacyBaseScore.
             double bonusProportion = Math.Max(0, ((long)score.LegacyTotalScore - maximumLegacyBaseScore) * maximumLegacyBonusRatio);
+
+            double modMultiplier = score.Mods.Select(m => m.ScoreMultiplier).Aggregate(1.0, (c, n) => c * n);
 
             switch (score.Ruleset.OnlineID)
             {

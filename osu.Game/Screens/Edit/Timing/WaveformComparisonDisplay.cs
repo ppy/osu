@@ -94,7 +94,7 @@ namespace osu.Game.Screens.Edit.Timing
             controlPointGroups.BindTo(editorBeatmap.ControlPointInfo.Groups);
             controlPointGroups.BindCollectionChanged((_, _) => updateTimingGroup());
 
-            beatLength.BindValueChanged(_ => regenerateDisplay(true), true);
+            beatLength.BindValueChanged(_ => Scheduler.AddOnce(regenerateDisplay, true), true);
 
             displayLocked.BindValueChanged(locked =>
             {
@@ -186,11 +186,18 @@ namespace osu.Game.Screens.Edit.Timing
                 return;
 
             displayedTime = time;
-            regenerateDisplay(animated);
+            Scheduler.AddOnce(regenerateDisplay, animated);
         }
 
         private void regenerateDisplay(bool animated)
         {
+            // Before a track is loaded, it won't have a valid length, which will break things.
+            if (!beatmap.Value.Track.IsLoaded)
+            {
+                Scheduler.AddOnce(regenerateDisplay, animated);
+                return;
+            }
+
             double index = (displayedTime - selectedGroupStartTime) / timingPoint.BeatLength;
 
             // Chosen as a pretty usable number across all BPMs.

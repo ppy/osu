@@ -1,10 +1,9 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
@@ -19,15 +18,13 @@ using osu.Framework.Input.Bindings;
 using osu.Framework.Input.Events;
 using osu.Framework.Localisation;
 using osu.Game.Database;
-using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Graphics.UserInterfaceV2;
-using osu.Game.Input;
 using osu.Game.Input.Bindings;
 using osu.Game.Resources.Localisation.Web;
+using osu.Game.Rulesets;
 using osuTK;
-using osuTK.Graphics;
 using osuTK.Input;
 
 namespace osu.Game.Overlays.Settings.Sections.Input
@@ -37,16 +34,28 @@ namespace osu.Game.Overlays.Settings.Sections.Input
         /// <summary>
         /// Invoked when the binding of this row is updated with a change being written.
         /// </summary>
-        public Action<KeyBindingRow> BindingUpdated { get; set; }
+        public KeyBindingUpdated? BindingUpdated { get; set; }
 
-        private readonly object action;
-        private readonly IEnumerable<RealmKeyBinding> bindings;
+        public delegate void KeyBindingUpdated(KeyBindingRow sender, KeyBindingUpdatedEventArgs args);
 
-        private const float transition_time = 150;
+        public Func<List<RealmKeyBinding>> GetAllSectionBindings { get; set; } = null!;
 
-        private const float height = 20;
+        /// <summary>
+        /// Whether left and right mouse button clicks should be included in the edited bindings.
+        /// </summary>
+        public bool AllowMainMouseButtons { get; init; }
 
-        private const float padding = 5;
+        /// <summary>
+        /// The bindings to display in this row.
+        /// </summary>
+        public BindableList<RealmKeyBinding> KeyBindings { get; } = new BindableList<RealmKeyBinding>();
+
+        /// <summary>
+        /// The default key bindings for this row.
+        /// </summary>
+        public IEnumerable<KeyCombination> Defaults { get; init; } = Array.Empty<KeyCombination>();
+
+        #region IFilterable
 
         private bool matchingFilter;
 
@@ -60,35 +69,53 @@ namespace osu.Game.Overlays.Settings.Sections.Input
             }
         }
 
-        private Container content;
+        public bool FilteringActive { get; set; }
+
+        public IEnumerable<LocalisableString> FilterTerms => KeyBindings.Select(b => (LocalisableString)keyCombinationProvider.GetReadableString(b.KeyCombination)).Prepend(text.Text);
+
+        #endregion
+
+        public readonly object Action;
+
+        private Bindable<bool> isDefault { get; } = new BindableBool(true);
+
+        [Resolved]
+        private RealmAccess realm { get; set; } = null!;
+
+        [Resolved]
+        private RulesetStore rulesets { get; set; } = null!;
+
+        [Resolved]
+        private ReadableKeyCombinationProvider keyCombinationProvider { get; set; } = null!;
+
+        private Container content = null!;
+
+        private OsuSpriteText text = null!;
+        private FillFlowContainer cancelAndClearButtons = null!;
+        private FillFlowContainer<KeyButton> buttons = null!;
+
+        private KeyButton? bindTarget;
+
+        private const float transition_time = 150;
+        private const float height = 20;
+        private const float padding = 5;
 
         public override bool ReceivePositionalInputAt(Vector2 screenSpacePos) =>
             content.ReceivePositionalInputAt(screenSpacePos);
 
-        public bool FilteringActive { get; set; }
+        public override bool AcceptsFocus => bindTarget == null;
 
-        [Resolved]
-        private ReadableKeyCombinationProvider keyCombinationProvider { get; set; }
-
-        private OsuSpriteText text;
-        private FillFlowContainer cancelAndClearButtons;
-        private FillFlowContainer<KeyButton> buttons;
-
-        private Bindable<bool> isDefault { get; } = new BindableBool(true);
-
-        public IEnumerable<LocalisableString> FilterTerms => bindings.Select(b => (LocalisableString)keyCombinationProvider.GetReadableString(b.KeyCombination)).Prepend(text.Text);
-
-        public KeyBindingRow(object action, List<RealmKeyBinding> bindings)
+        /// <summary>
+        /// Creates a new <see cref="KeyBindingRow"/>.
+        /// </summary>
+        /// <param name="action">The action that this row contains bindings for.</param>
+        public KeyBindingRow(object action)
         {
-            this.action = action;
-            this.bindings = bindings;
+            Action = action;
 
             RelativeSizeAxes = Axes.X;
             AutoSizeAxes = Axes.Y;
         }
-
-        [Resolved]
-        private RealmAccess realm { get; set; }
 
         [BackgroundDependencyLoader]
         private void load(OverlayColourProvider colourProvider)
@@ -140,7 +167,7 @@ namespace osu.Game.Overlays.Settings.Sections.Input
                                 },
                                 text = new OsuSpriteText
                                 {
-                                    Text = action.GetLocalisableDescription(),
+                                    Text = Action.GetLocalisableDescription(),
                                     Margin = new MarginPadding(1.5f * padding),
                                 },
                                 buttons = new FillFlowContainer<KeyButton>
@@ -170,10 +197,11 @@ namespace osu.Game.Overlays.Settings.Sections.Input
                 }
             };
 
-            foreach (var b in bindings)
-                buttons.Add(new KeyButton(b));
-
-            updateIsDefaultValue();
+            KeyBindings.BindCollectionChanged((_, _) =>
+            {
+                Scheduler.AddOnce(updateButtons);
+                updateIsDefaultValue();
+            }, true);
         }
 
         public void RestoreDefaults()
@@ -185,7 +213,7 @@ namespace osu.Game.Overlays.Settings.Sections.Input
                 var button = buttons[i++];
                 button.UpdateKeyCombination(d);
 
-                updateStoreFromButton(button);
+                tryPersistKeyBinding(button.KeyBinding.Value, advanceToNextBinding: false);
             }
 
             isDefault.Value = true;
@@ -205,21 +233,16 @@ namespace osu.Game.Overlays.Settings.Sections.Input
             base.OnHoverLost(e);
         }
 
-        public override bool AcceptsFocus => bindTarget == null;
-
-        private KeyButton bindTarget;
-
-        public bool AllowMainMouseButtons;
-
-        public IEnumerable<KeyCombination> Defaults;
-
-        private bool isModifier(Key k) => k < Key.F1;
-
         protected override bool OnClick(ClickEvent e) => true;
 
         protected override bool OnMouseDown(MouseDownEvent e)
         {
-            if (!HasFocus || !bindTarget.IsHovered)
+            if (!HasFocus)
+                return base.OnMouseDown(e);
+
+            Debug.Assert(bindTarget != null);
+
+            if (!bindTarget.IsHovered)
                 return base.OnMouseDown(e);
 
             if (!AllowMainMouseButtons)
@@ -245,6 +268,8 @@ namespace osu.Game.Overlays.Settings.Sections.Input
                 return;
             }
 
+            Debug.Assert(bindTarget != null);
+
             if (bindTarget.IsHovered)
                 finalise(false);
             // prevent updating bind target before clear button's action
@@ -256,6 +281,8 @@ namespace osu.Game.Overlays.Settings.Sections.Input
         {
             if (HasFocus)
             {
+                Debug.Assert(bindTarget != null);
+
                 if (bindTarget.IsHovered)
                 {
                     bindTarget.UpdateKeyCombination(KeyCombination.FromInputState(e.CurrentState, e.ScrollDelta), KeyCombination.FromScrollDelta(e.ScrollDelta).First());
@@ -272,10 +299,14 @@ namespace osu.Game.Overlays.Settings.Sections.Input
             if (!HasFocus || e.Repeat)
                 return false;
 
+            Debug.Assert(bindTarget != null);
+
             bindTarget.UpdateKeyCombination(KeyCombination.FromInputState(e.CurrentState), KeyCombination.FromKey(e.Key));
             if (!isModifier(e.Key)) finalise();
 
             return true;
+
+            bool isModifier(Key k) => k < Key.F1;
         }
 
         protected override void OnKeyUp(KeyUpEvent e)
@@ -293,6 +324,8 @@ namespace osu.Game.Overlays.Settings.Sections.Input
         {
             if (!HasFocus)
                 return false;
+
+            Debug.Assert(bindTarget != null);
 
             bindTarget.UpdateKeyCombination(KeyCombination.FromInputState(e.CurrentState), KeyCombination.FromJoystickButton(e.Button));
             finalise();
@@ -316,6 +349,8 @@ namespace osu.Game.Overlays.Settings.Sections.Input
             if (!HasFocus)
                 return false;
 
+            Debug.Assert(bindTarget != null);
+
             bindTarget.UpdateKeyCombination(KeyCombination.FromInputState(e.CurrentState), KeyCombination.FromMidiKey(e.Key));
             finalise();
 
@@ -337,6 +372,8 @@ namespace osu.Game.Overlays.Settings.Sections.Input
         {
             if (!HasFocus)
                 return false;
+
+            Debug.Assert(bindTarget != null);
 
             bindTarget.UpdateKeyCombination(KeyCombination.FromInputState(e.CurrentState), KeyCombination.FromTabletAuxiliaryButton(e.Button));
             finalise();
@@ -360,6 +397,8 @@ namespace osu.Game.Overlays.Settings.Sections.Input
             if (!HasFocus)
                 return false;
 
+            Debug.Assert(bindTarget != null);
+
             bindTarget.UpdateKeyCombination(KeyCombination.FromInputState(e.CurrentState), KeyCombination.FromTabletPenButton(e.Button));
             finalise();
 
@@ -377,6 +416,18 @@ namespace osu.Game.Overlays.Settings.Sections.Input
             finalise();
         }
 
+        private void updateButtons()
+        {
+            if (buttons.Count > KeyBindings.Count)
+                buttons.RemoveRange(buttons.Skip(KeyBindings.Count).ToArray(), true);
+
+            while (buttons.Count < KeyBindings.Count)
+                buttons.Add(new KeyButton());
+
+            foreach (var (button, binding) in buttons.Zip(KeyBindings))
+                button.KeyBinding.Value = binding;
+        }
+
         private void clear()
         {
             if (bindTarget == null)
@@ -386,21 +437,19 @@ namespace osu.Game.Overlays.Settings.Sections.Input
             finalise(false);
         }
 
-        private void finalise(bool hasChanged = true)
+        private void finalise(bool advanceToNextBinding = true)
         {
             if (bindTarget != null)
             {
-                updateStoreFromButton(bindTarget);
-
                 updateIsDefaultValue();
 
                 bindTarget.IsBinding = false;
+                var bindingToPersist = bindTarget.KeyBinding.Value;
                 Schedule(() =>
                 {
                     // schedule to ensure we don't instantly get focus back on next OnMouseClick (see AcceptFocus impl.)
                     bindTarget = null;
-                    if (hasChanged)
-                        BindingUpdated?.Invoke(this);
+                    tryPersistKeyBinding(bindingToPersist, advanceToNextBinding);
                 });
             }
 
@@ -429,6 +478,28 @@ namespace osu.Game.Overlays.Settings.Sections.Input
             base.OnFocusLost(e);
         }
 
+        private void tryPersistKeyBinding(RealmKeyBinding keyBinding, bool advanceToNextBinding)
+        {
+            List<RealmKeyBinding> bindings = GetAllSectionBindings();
+            RealmKeyBinding? existingBinding = keyBinding.KeyCombination.Equals(new KeyCombination(InputKey.None))
+                ? null
+                : bindings.FirstOrDefault(other => other.ID != keyBinding.ID && other.KeyCombination.Equals(keyBinding.KeyCombination));
+
+            if (existingBinding == null)
+            {
+                realm.WriteAsync(r => r.Find<RealmKeyBinding>(keyBinding.ID)!.KeyCombinationString = keyBinding.KeyCombination.ToString());
+                BindingUpdated?.Invoke(this, new KeyBindingUpdatedEventArgs(bindingConflictResolved: false, advanceToNextBinding));
+                return;
+            }
+
+            var keyBindingBeforeUpdate = bindings.Single(other => other.ID == keyBinding.ID);
+
+            showBindingConflictPopover(
+                new KeyBindingConflictInfo(
+                    new ConflictingKeyBinding(existingBinding.ID, existingBinding.GetAction(rulesets), existingBinding.KeyCombination, new KeyCombination(InputKey.None)),
+                    new ConflictingKeyBinding(keyBindingBeforeUpdate.ID, Action, keyBinding.KeyCombination, keyBindingBeforeUpdate.KeyCombination)));
+        }
+
         /// <summary>
         /// Updates the bind target to the currently hovered key button or the first if clicked anywhere else.
         /// </summary>
@@ -439,12 +510,9 @@ namespace osu.Game.Overlays.Settings.Sections.Input
             if (bindTarget != null) bindTarget.IsBinding = true;
         }
 
-        private void updateStoreFromButton(KeyButton button) =>
-            realm.WriteAsync(r => r.Find<RealmKeyBinding>(button.KeyBinding.ID)!.KeyCombinationString = button.KeyBinding.KeyCombinationString);
-
         private void updateIsDefaultValue()
         {
-            isDefault.Value = bindings.Select(b => b.KeyCombination).SequenceEqual(Defaults);
+            isDefault.Value = KeyBindings.Select(b => b.KeyCombination).SequenceEqual(Defaults);
         }
 
         private partial class CancelButton : RoundedButton
@@ -462,145 +530,6 @@ namespace osu.Game.Overlays.Settings.Sections.Input
             {
                 Text = CommonStrings.ButtonsClear;
                 Size = new Vector2(80, 20);
-            }
-        }
-
-        public partial class KeyButton : Container
-        {
-            public readonly RealmKeyBinding KeyBinding;
-
-            private readonly Box box;
-            public readonly OsuSpriteText Text;
-
-            [Resolved]
-            private OverlayColourProvider colourProvider { get; set; }
-
-            [Resolved]
-            private ReadableKeyCombinationProvider keyCombinationProvider { get; set; }
-
-            private bool isBinding;
-
-            public bool IsBinding
-            {
-                get => isBinding;
-                set
-                {
-                    if (value == isBinding) return;
-
-                    isBinding = value;
-
-                    updateHoverState();
-                }
-            }
-
-            public KeyButton(RealmKeyBinding keyBinding)
-            {
-                if (keyBinding.IsManaged)
-                    throw new ArgumentException("Key binding should not be attached as we make temporary changes", nameof(keyBinding));
-
-                KeyBinding = keyBinding;
-
-                Margin = new MarginPadding(padding);
-
-                Masking = true;
-                CornerRadius = padding;
-
-                Height = height;
-                AutoSizeAxes = Axes.X;
-
-                Children = new Drawable[]
-                {
-                    new Container
-                    {
-                        AlwaysPresent = true,
-                        Width = 80,
-                        Height = height,
-                    },
-                    box = new Box
-                    {
-                        RelativeSizeAxes = Axes.Both,
-                    },
-                    Text = new OsuSpriteText
-                    {
-                        Font = OsuFont.Numeric.With(size: 10),
-                        Margin = new MarginPadding(5),
-                        Anchor = Anchor.Centre,
-                        Origin = Anchor.Centre,
-                    },
-                    new HoverSounds()
-                };
-            }
-
-            protected override void LoadComplete()
-            {
-                base.LoadComplete();
-
-                keyCombinationProvider.KeymapChanged += updateKeyCombinationText;
-                updateKeyCombinationText();
-            }
-
-            [BackgroundDependencyLoader]
-            private void load()
-            {
-                updateHoverState();
-            }
-
-            protected override bool OnHover(HoverEvent e)
-            {
-                updateHoverState();
-                return base.OnHover(e);
-            }
-
-            protected override void OnHoverLost(HoverLostEvent e)
-            {
-                updateHoverState();
-                base.OnHoverLost(e);
-            }
-
-            private void updateHoverState()
-            {
-                if (isBinding)
-                {
-                    box.FadeColour(colourProvider.Light2, transition_time, Easing.OutQuint);
-                    Text.FadeColour(Color4.Black, transition_time, Easing.OutQuint);
-                }
-                else
-                {
-                    box.FadeColour(IsHovered ? colourProvider.Light4 : colourProvider.Background6, transition_time, Easing.OutQuint);
-                    Text.FadeColour(IsHovered ? Color4.Black : Color4.White, transition_time, Easing.OutQuint);
-                }
-            }
-
-            /// <summary>
-            /// Update from a key combination, only allowing a single non-modifier key to be specified.
-            /// </summary>
-            /// <param name="fullState">A <see cref="KeyCombination"/> generated from the full input state.</param>
-            /// <param name="triggerKey">The key which triggered this update, and should be used as the binding.</param>
-            public void UpdateKeyCombination(KeyCombination fullState, InputKey triggerKey) =>
-                UpdateKeyCombination(new KeyCombination(fullState.Keys.Where(KeyCombination.IsModifierKey).Append(triggerKey)));
-
-            public void UpdateKeyCombination(KeyCombination newCombination)
-            {
-                if (KeyBinding.RulesetName != null && !RealmKeyBindingStore.CheckValidForGameplay(newCombination))
-                    return;
-
-                KeyBinding.KeyCombination = newCombination;
-                updateKeyCombinationText();
-            }
-
-            private void updateKeyCombinationText()
-            {
-                Scheduler.AddOnce(updateText);
-
-                void updateText() => Text.Text = keyCombinationProvider.GetReadableString(KeyBinding.KeyCombination);
-            }
-
-            protected override void Dispose(bool isDisposing)
-            {
-                base.Dispose(isDisposing);
-
-                if (keyCombinationProvider != null)
-                    keyCombinationProvider.KeymapChanged -= updateKeyCombinationText;
             }
         }
     }

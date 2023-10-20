@@ -73,7 +73,7 @@ namespace osu.Game.Rulesets.Osu.Tests.Mods
                                 new PathControlPoint(new Vector2(0, 6.25f))
                             }),
                             RepeatCount = 1,
-                            SliderVelocity = 10
+                            SliderVelocityMultiplier = 10
                         }
                     }
                 },

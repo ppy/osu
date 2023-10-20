@@ -84,6 +84,7 @@ namespace osu.Game.Tournament.Components
                 {
                     Colour = colours.Gray3,
                     RelativeSizeAxes = Axes.Both,
+                    Alpha = 0.4f,
                 },
                 flow = new FillFlowContainer
                 {

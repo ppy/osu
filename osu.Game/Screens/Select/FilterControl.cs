@@ -254,6 +254,9 @@ namespace osu.Game.Screens.Select
 
             public OsuSpriteText FilterText { get; private set; }
 
+            // clipboard is disabled because one of the "cut" platform key bindings (shift-delete) conflicts with the beatmap deletion action.
+            protected override bool AllowClipboardExport => false;
+
             public FilterControlTextBox()
             {
                 Height += filter_text_size;

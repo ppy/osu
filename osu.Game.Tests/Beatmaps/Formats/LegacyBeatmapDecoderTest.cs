@@ -33,7 +33,7 @@ namespace osu.Game.Tests.Beatmaps.Formats
         [Test]
         public void TestDecodeBeatmapVersion()
         {
-            using (var resStream = TestResources.OpenResource("beatmap-version.osu"))
+            using (var resStream = TestResources.OpenResource("beatmap-version-6.osu"))
             using (var stream = new LineBufferedReader(resStream))
             {
                 var decoder = Decoder.GetDecoder<Beatmap>(stream);
@@ -42,6 +42,25 @@ namespace osu.Game.Tests.Beatmaps.Formats
                 Assert.AreEqual(6, working.BeatmapInfo.BeatmapVersion);
                 Assert.AreEqual(6, working.Beatmap.BeatmapInfo.BeatmapVersion);
                 Assert.AreEqual(6, working.GetPlayableBeatmap(new OsuRuleset().RulesetInfo, Array.Empty<Mod>()).BeatmapInfo.BeatmapVersion);
+            }
+        }
+
+        [TestCase(false)]
+        [TestCase(true)]
+        public void TestPreviewPointWithOffsets(bool applyOffsets)
+        {
+            using (var resStream = TestResources.OpenResource("beatmap-version-4.osu"))
+            using (var stream = new LineBufferedReader(resStream))
+            {
+                var decoder = Decoder.GetDecoder<Beatmap>(stream);
+                ((LegacyBeatmapDecoder)decoder).ApplyOffsets = applyOffsets;
+                var working = new TestWorkingBeatmap(decoder.Decode(stream));
+
+                Assert.AreEqual(4, working.BeatmapInfo.BeatmapVersion);
+                Assert.AreEqual(4, working.Beatmap.BeatmapInfo.BeatmapVersion);
+                Assert.AreEqual(4, working.GetPlayableBeatmap(new OsuRuleset().RulesetInfo, Array.Empty<Mod>()).BeatmapInfo.BeatmapVersion);
+
+                Assert.AreEqual(-1, working.BeatmapInfo.Metadata.PreviewTime);
             }
         }
 
@@ -622,6 +641,38 @@ namespace osu.Game.Tests.Beatmaps.Formats
         }
 
         [Test]
+        public void TestInvalidBankDefaultsToNormal()
+        {
+            var decoder = new LegacyBeatmapDecoder { ApplyOffsets = false };
+
+            using (var resStream = TestResources.OpenResource("invalid-bank.osu"))
+            using (var stream = new LineBufferedReader(resStream))
+            {
+                var hitObjects = decoder.Decode(stream).HitObjects;
+
+                assertObjectHasBanks(hitObjects[0], HitSampleInfo.BANK_DRUM);
+                assertObjectHasBanks(hitObjects[1], HitSampleInfo.BANK_NORMAL);
+                assertObjectHasBanks(hitObjects[2], HitSampleInfo.BANK_SOFT);
+                assertObjectHasBanks(hitObjects[3], HitSampleInfo.BANK_DRUM);
+                assertObjectHasBanks(hitObjects[4], HitSampleInfo.BANK_NORMAL);
+
+                assertObjectHasBanks(hitObjects[5], HitSampleInfo.BANK_DRUM, HitSampleInfo.BANK_DRUM);
+                assertObjectHasBanks(hitObjects[6], HitSampleInfo.BANK_DRUM, HitSampleInfo.BANK_NORMAL);
+                assertObjectHasBanks(hitObjects[7], HitSampleInfo.BANK_DRUM, HitSampleInfo.BANK_SOFT);
+                assertObjectHasBanks(hitObjects[8], HitSampleInfo.BANK_DRUM, HitSampleInfo.BANK_DRUM);
+                assertObjectHasBanks(hitObjects[9], HitSampleInfo.BANK_DRUM, HitSampleInfo.BANK_NORMAL);
+            }
+
+            void assertObjectHasBanks(HitObject hitObject, string normalBank, string? additionsBank = null)
+            {
+                Assert.AreEqual(normalBank, hitObject.Samples[0].Bank);
+
+                if (additionsBank != null)
+                    Assert.AreEqual(additionsBank, hitObject.Samples[1].Bank);
+            }
+        }
+
+        [Test]
         public void TestFallbackDecoderForCorruptedHeader()
         {
             Decoder<Beatmap> decoder = null!;
@@ -883,10 +934,11 @@ namespace osu.Game.Tests.Beatmaps.Formats
             }
         }
 
-        [Test]
-        public void TestLegacyDefaultsPreserved()
+        [TestCase(false)]
+        [TestCase(true)]
+        public void TestLegacyDefaultsPreserved(bool applyOffsets)
         {
-            var decoder = new LegacyBeatmapDecoder { ApplyOffsets = false };
+            var decoder = new LegacyBeatmapDecoder { ApplyOffsets = applyOffsets };
 
             using (var memoryStream = new MemoryStream())
             using (var stream = new LineBufferedReader(memoryStream))
@@ -1024,10 +1076,8 @@ namespace osu.Game.Tests.Beatmaps.Formats
                 Assert.That(controlPoints.DifficultyPointAt(2000).SliderVelocity, Is.EqualTo(1));
                 Assert.That(controlPoints.DifficultyPointAt(3000).SliderVelocity, Is.EqualTo(1));
 
-#pragma warning disable 618
-                Assert.That(((LegacyBeatmapDecoder.LegacyDifficultyControlPoint)controlPoints.DifficultyPointAt(2000)).GenerateTicks, Is.False);
-                Assert.That(((LegacyBeatmapDecoder.LegacyDifficultyControlPoint)controlPoints.DifficultyPointAt(3000)).GenerateTicks, Is.True);
-#pragma warning restore 618
+                Assert.That(controlPoints.DifficultyPointAt(2000).GenerateTicks, Is.False);
+                Assert.That(controlPoints.DifficultyPointAt(3000).GenerateTicks, Is.True);
             }
         }
     }

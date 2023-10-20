@@ -110,5 +110,31 @@ namespace osu.Game.Tests.Visual.Online
                 }
             }, new OsuRuleset().RulesetInfo));
         }
+
+        [Test]
+        public void TestPreviousUsernames()
+        {
+            AddStep("Show user w/ previous usernames", () => header.User.Value = new UserProfileData(new APIUser
+            {
+                Id = 727,
+                Username = "SomeoneIndecisive",
+                CoverUrl = @"https://osu.ppy.sh/images/headers/profile-covers/c1.jpg",
+                Groups = new[]
+                {
+                    new APIUserGroup { Colour = "#EB47D0", ShortName = "DEV", Name = "Developers" },
+                },
+                Statistics = new UserStatistics
+                {
+                    IsRanked = false,
+                    // web will sometimes return non-empty rank history even for unranked users.
+                    RankHistory = new APIRankHistory
+                    {
+                        Mode = @"osu",
+                        Data = Enumerable.Range(2345, 85).ToArray()
+                    },
+                },
+                PreviousUsernames = new[] { "tsrk.", "quoicoubeh", "apagnan", "epita" }
+            }, new OsuRuleset().RulesetInfo));
+        }
     }
 }

@@ -216,6 +216,24 @@ namespace osu.Game.Tests.Visual.Navigation
         }
 
         [Test]
+        public void TestRetryImmediatelyAfterCompletion()
+        {
+            var getOriginalPlayer = playToCompletion();
+
+            AddStep("attempt to retry", () => getOriginalPlayer().ChildrenOfType<HotkeyRetryOverlay>().First().Action());
+            AddUntilStep("wait for player", () => Game.ScreenStack.CurrentScreen != getOriginalPlayer() && Game.ScreenStack.CurrentScreen is Player);
+        }
+
+        [Test]
+        public void TestExitImmediatelyAfterCompletion()
+        {
+            var player = playToCompletion();
+
+            AddStep("attempt to exit", () => player().ChildrenOfType<HotkeyExitOverlay>().First().Action());
+            AddUntilStep("wait for results", () => Game.ScreenStack.CurrentScreen is ResultsScreen);
+        }
+
+        [Test]
         public void TestRetryFromResults()
         {
             var getOriginalPlayer = playToResults();
@@ -779,6 +797,13 @@ namespace osu.Game.Tests.Visual.Navigation
 
         private Func<Player> playToResults()
         {
+            var player = playToCompletion();
+            AddUntilStep("wait for results", () => (Game.ScreenStack.CurrentScreen as ResultsScreen)?.IsLoaded == true);
+            return player;
+        }
+
+        private Func<Player> playToCompletion()
+        {
             Player player = null;
 
             IWorkingBeatmap beatmap() => Game.Beatmap.Value;
@@ -803,7 +828,8 @@ namespace osu.Game.Tests.Visual.Navigation
 
             AddUntilStep("wait for track playing", () => beatmap().Track.IsRunning);
             AddStep("seek to near end", () => player.ChildrenOfType<GameplayClockContainer>().First().Seek(beatmap().Beatmap.HitObjects[^1].StartTime - 1000));
-            AddUntilStep("wait for pass", () => (Game.ScreenStack.CurrentScreen as ResultsScreen)?.IsLoaded == true);
+            AddUntilStep("wait for complete", () => player.GameplayState.HasPassed);
+
             return () => player;
         }
 
