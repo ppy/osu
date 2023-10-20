@@ -13,7 +13,6 @@ using osu.Framework.Input.Events;
 using osu.Framework.Localisation;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
-using osu.Game.Graphics.UserInterface;
 using osu.Game.Localisation;
 using osuTK;
 
@@ -54,11 +53,6 @@ namespace osu.Game.Overlays
                 if (IsLoaded)
                     UpdateState();
             }
-        }
-
-        public RevertToDefaultButton()
-            : base(HoverSampleSet.Button)
-        {
         }
 
         [BackgroundDependencyLoader]
