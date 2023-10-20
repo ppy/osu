@@ -10,6 +10,7 @@ using osu.Game.Beatmaps;
 using osu.Game.Replays;
 using osu.Game.Rulesets.Judgements;
 using osu.Game.Rulesets.Objects;
+using osu.Game.Rulesets.Objects.Legacy;
 using osu.Game.Rulesets.Objects.Types;
 using osu.Game.Rulesets.Osu.Objects;
 using osu.Game.Rulesets.Osu.Replays;
@@ -35,7 +36,7 @@ namespace osu.Game.Rulesets.Osu.Tests
         {
             const double time_slider_start = 1000;
 
-            float circleRadius = OsuHitObject.OBJECT_RADIUS * (1.0f - 0.7f * (circleSize - 5) / 5) / 2;
+            float circleRadius = OsuHitObject.OBJECT_RADIUS * LegacyRulesetExtensions.CalculateScaleFromCircleSize(circleSize, true);
             float followCircleRadius = circleRadius * 1.2f;
 
             performTest(new Beatmap<OsuHitObject>
