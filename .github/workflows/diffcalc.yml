@@ -337,7 +337,7 @@ jobs:
   cleanup:
     name: Cleanup
     needs: [ directory, generator ]
-    if: ${{ always() }}
+    if: ${{ always() && needs.directory.result == 'success' }}
     runs-on: self-hosted
     steps:
       - name: Cleanup
