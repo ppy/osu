@@ -35,14 +35,6 @@ namespace osu.Game.Rulesets.Osu.Skinning.Argon
 
             InternalChildren = new Drawable[]
             {
-                bonusCounter = new OsuSpriteText
-                {
-                    Alpha = 0,
-                    Anchor = Anchor.Centre,
-                    Origin = Anchor.Centre,
-                    Font = OsuFont.Default.With(size: 24),
-                    Y = -120,
-                },
                 new ArgonSpinnerDisc
                 {
                     RelativeSizeAxes = Axes.Both,
