@@ -19,7 +19,7 @@ namespace osu.Game.Rulesets.Mania.Skinning.Legacy
         private readonly IBindable<ScrollingDirection> direction = new Bindable<ScrollingDirection>();
 
         private Container lightContainer = null!;
-        private Drawable? light = null!;
+        private Drawable light = null!;
 
         public LegacyColumnBackground()
         {
