@@ -165,7 +165,7 @@ jobs:
       - name: Add base environment
         run: |
           # Required by diffcalc-sheet-generator
-          cp '${{ env.GENERATOR_DIR }}/.env.sample' "${{ needs.directory.outputs.GENERATOR_ENV }}"
+          cp '${{ needs.directory.outputs.GENERATOR_DIR }}/.env.sample' "${{ needs.directory.outputs.GENERATOR_ENV }}"
 
           # Add Google credentials
           echo '${{ secrets.DIFFCALC_GOOGLE_CREDENTIALS }}' | base64 -d > "${{ needs.directory.outputs.GOOGLE_CREDS_FILE }}"
