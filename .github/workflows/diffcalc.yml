@@ -339,8 +339,10 @@ jobs:
     needs: [ directory, generator ]
     if: ${{ always() }}
     runs-on: self-hosted
-    run: |
-      rm -rf "${{ needs.directory.outputs.GENERATOR_DIR }}"
+    steps:
+      - name: Cleanup
+        run: |
+          rm -rf "${{ needs.directory.outputs.GENERATOR_DIR }}"
 
   update-comment:
     name: Update PR comment
