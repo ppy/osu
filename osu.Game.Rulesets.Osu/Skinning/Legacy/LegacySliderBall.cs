@@ -1,8 +1,10 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
+using osu.Framework.Extensions.ObjectExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Sprites;
@@ -15,30 +17,40 @@ namespace osu.Game.Rulesets.Osu.Skinning.Legacy
 {
     public partial class LegacySliderBall : CompositeDrawable
     {
-        private readonly Drawable animationContent;
-
         private readonly ISkin skin;
 
         [Resolved(canBeNull: true)]
         private DrawableHitObject? parentObject { get; set; }
 
-        public Color4 BallColour => animationContent.Colour;
-
         private Sprite layerNd = null!;
+        private Drawable ball = null!;
         private Sprite layerSpec = null!;
 
-        public LegacySliderBall(Drawable animationContent, ISkin skin)
+        public Color4 BallColour => ball.Colour;
+
+        public LegacySliderBall(ISkin skin)
         {
-            this.animationContent = animationContent;
             this.skin = skin;
 
             AutoSizeAxes = Axes.Both;
         }
 
         [BackgroundDependencyLoader]
-        private void load()
+        private void load(DrawableHitObject drawableHitObject)
         {
             var ballColour = skin.GetConfig<OsuSkinColour, Color4>(OsuSkinColour.SliderBall)?.Value ?? Color4.White;
+
+            DrawableSlider drawableSlider = (DrawableSlider)drawableHitObject;
+
+            // stable apparently calculates slider velocity in units of seconds rather than milliseconds.
+            double stableSliderVelocity = drawableSlider.HitObject.Velocity * 1000;
+
+            double ballAnimationRate = Math.Max(
+                150 / stableSliderVelocity * LegacySkinExtensions.SIXTY_FRAME_TIME,
+                LegacySkinExtensions.SIXTY_FRAME_TIME);
+
+            ball = skin.GetAnimation("sliderb", true, true, animationSeparator: "", frameLength: ballAnimationRate,
+                maxSize: OsuLegacySkinTransformer.MAX_FOLLOW_CIRCLE_AREA_SIZE).AsNonNull();
 
             InternalChildren = new[]
             {
@@ -49,7 +61,7 @@ namespace osu.Game.Rulesets.Osu.Skinning.Legacy
                     Texture = skin.GetTexture("sliderb-nd")?.WithMaximumSize(OsuLegacySkinTransformer.MAX_FOLLOW_CIRCLE_AREA_SIZE),
                     Colour = new Color4(5, 5, 5, 255),
                 },
-                LegacyColourCompatibility.ApplyWithDoubledAlpha(animationContent.With(d =>
+                LegacyColourCompatibility.ApplyWithDoubledAlpha(ball.With(d =>
                 {
                     d.Anchor = Anchor.Centre;
                     d.Origin = Anchor.Centre;
@@ -78,7 +90,7 @@ namespace osu.Game.Rulesets.Osu.Skinning.Legacy
                 if (skin.GetConfig<SkinConfiguration.LegacySetting, bool>(SkinConfiguration.LegacySetting.AllowSliderBallTint)?.Value == true)
                 {
                     accentColour.BindTo(parentObject.AccentColour);
-                    accentColour.BindValueChanged(a => animationContent.Colour = a.NewValue, true);
+                    accentColour.BindValueChanged(a => ball.Colour = a.NewValue, true);
                 }
             }
         }
