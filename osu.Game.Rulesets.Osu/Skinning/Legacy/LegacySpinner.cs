@@ -107,7 +107,7 @@ namespace osu.Game.Rulesets.Osu.Skinning.Legacy
             });
         }
 
-        private IBindable<double> gainedBonus = null!;
+        private IBindable<int> completedSpins = null!;
         private IBindable<double> spinsPerMinute = null!;
 
         private readonly Bindable<bool> completed = new Bindable<bool>();
@@ -116,10 +116,10 @@ namespace osu.Game.Rulesets.Osu.Skinning.Legacy
         {
             base.LoadComplete();
 
-            gainedBonus = DrawableSpinner.GainedBonus.GetBoundCopy();
-            gainedBonus.BindValueChanged(bonus =>
+            completedSpins = DrawableSpinner.CompletedFullSpins.GetBoundCopy();
+            completedSpins.BindValueChanged(bonus =>
             {
-                bonusCounter.Text = bonus.NewValue.ToString(NumberFormatInfo.InvariantInfo);
+                bonusCounter.Text = DrawableSpinner.CurrentBonusScore.ToString(NumberFormatInfo.InvariantInfo);
                 bonusCounter.FadeOutFromOne(800, Easing.Out);
                 bonusCounter.ScaleTo(SPRITE_SCALE * 2f).Then().ScaleTo(SPRITE_SCALE * 1.28f, 800, Easing.Out);
             });
