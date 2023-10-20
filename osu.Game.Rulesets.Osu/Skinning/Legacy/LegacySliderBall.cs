@@ -11,6 +11,7 @@ using osu.Framework.Graphics.Sprites;
 using osu.Game.Rulesets.Objects.Drawables;
 using osu.Game.Rulesets.Osu.Objects.Drawables;
 using osu.Game.Skinning;
+using osuTK;
 using osuTK.Graphics;
 
 namespace osu.Game.Rulesets.Osu.Skinning.Legacy
@@ -49,8 +50,7 @@ namespace osu.Game.Rulesets.Osu.Skinning.Legacy
                 150 / stableSliderVelocity * LegacySkinExtensions.SIXTY_FRAME_TIME,
                 LegacySkinExtensions.SIXTY_FRAME_TIME);
 
-            ball = skin.GetAnimation("sliderb", true, true, animationSeparator: "", frameLength: ballAnimationRate,
-                maxSize: OsuLegacySkinTransformer.MAX_FOLLOW_CIRCLE_AREA_SIZE).AsNonNull();
+            Vector2 maxSize = OsuLegacySkinTransformer.MAX_FOLLOW_CIRCLE_AREA_SIZE;
 
             InternalChildren = new[]
             {
@@ -58,19 +58,20 @@ namespace osu.Game.Rulesets.Osu.Skinning.Legacy
                 {
                     Anchor = Anchor.Centre,
                     Origin = Anchor.Centre,
-                    Texture = skin.GetTexture("sliderb-nd")?.WithMaximumSize(OsuLegacySkinTransformer.MAX_FOLLOW_CIRCLE_AREA_SIZE),
+                    Texture = skin.GetTexture("sliderb-nd")?.WithMaximumSize(maxSize),
                     Colour = new Color4(5, 5, 5, 255),
                 },
-                LegacyColourCompatibility.ApplyWithDoubledAlpha(ball.With(d =>
+                ball = skin.GetAnimation("sliderb", true, true, animationSeparator: "", frameLength: ballAnimationRate, maxSize: maxSize).AsNonNull().With(d =>
                 {
                     d.Anchor = Anchor.Centre;
                     d.Origin = Anchor.Centre;
-                }), ballColour),
+                    d.Colour = ballColour;
+                }),
                 layerSpec = new Sprite
                 {
                     Anchor = Anchor.Centre,
                     Origin = Anchor.Centre,
-                    Texture = skin.GetTexture("sliderb-spec")?.WithMaximumSize(OsuLegacySkinTransformer.MAX_FOLLOW_CIRCLE_AREA_SIZE),
+                    Texture = skin.GetTexture("sliderb-spec")?.WithMaximumSize(maxSize),
                     Blending = BlendingParameters.Additive,
                 },
             };
