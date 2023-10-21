@@ -176,13 +176,11 @@ namespace osu.Game.Rulesets.Osu.Difficulty
                 speedValue *= 1.0 + 0.04 * (12.0 - attributes.ApproachRate);
             }
 
-            // Scale the speed value with speed deviation
-            double accOd10Speed = 2.0 / 3 * SpecialFunctions.Erf(20 / (Math.Sqrt(2) * speedDeviation))
-                                  + 1.0 / 6 * SpecialFunctions.Erf(60 / (Math.Sqrt(2) * speedDeviation))
-                                  + 1.0 / 6 * SpecialFunctions.Erf(100 / (Math.Sqrt(2) * speedDeviation));
-
             speedValue *= 0.95 + Math.Pow(100.0 / 9, 2) / 750; // OD 11 SS stays the same.
-            speedValue *= Math.Pow(accOd10Speed, 2);
+
+            // Scale the speed value with speed deviation.
+            // Constants obtained with regression.
+            speedValue *= Math.Exp(1 - Math.Cosh(Math.Pow(speedDeviation / 18.8, 1.9)));
 
             return speedValue;
         }
