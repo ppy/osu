@@ -24,6 +24,9 @@ namespace osu.Game.Rulesets.Osu.Skinning.Default
         private Container spmContainer = null!;
         private OsuSpriteText spmCounter = null!;
 
+        [Resolved]
+        private OsuColour colours { get; set; } = null!;
+
         public DefaultSpinner()
         {
             RelativeSizeAxes = Axes.Both;
@@ -80,19 +83,33 @@ namespace osu.Game.Rulesets.Osu.Skinning.Default
             });
         }
 
-        private IBindable<double> gainedBonus = null!;
+        private IBindable<int> completedSpins = null!;
         private IBindable<double> spinsPerMinute = null!;
 
         protected override void LoadComplete()
         {
             base.LoadComplete();
 
-            gainedBonus = drawableSpinner.GainedBonus.GetBoundCopy();
-            gainedBonus.BindValueChanged(bonus =>
+            completedSpins = drawableSpinner.CompletedFullSpins.GetBoundCopy();
+            completedSpins.BindValueChanged(bonus =>
             {
-                bonusCounter.Text = bonus.NewValue.ToString(NumberFormatInfo.InvariantInfo);
-                bonusCounter.FadeOutFromOne(1500);
-                bonusCounter.ScaleTo(1.5f).Then().ScaleTo(1f, 1000, Easing.OutQuint);
+                if (drawableSpinner.CurrentBonusScore <= 0)
+                    return;
+
+                if (drawableSpinner.CurrentBonusScore == drawableSpinner.MaximumBonusScore)
+                {
+                    bonusCounter.Text = "MAX";
+                    bonusCounter.ScaleTo(1.5f).Then().ScaleTo(2.8f, 1000, Easing.OutQuint);
+
+                    bonusCounter.FlashColour(colours.YellowLight, 400);
+                    bonusCounter.FadeOutFromOne(500);
+                }
+                else
+                {
+                    bonusCounter.Text = drawableSpinner.CurrentBonusScore.ToString(NumberFormatInfo.InvariantInfo);
+                    bonusCounter.FadeOutFromOne(1500);
+                    bonusCounter.ScaleTo(1.5f).Then().ScaleTo(1f, 1000, Easing.OutQuint);
+                }
             });
 
             spinsPerMinute = drawableSpinner.SpinsPerMinute.GetBoundCopy();
