@@ -102,7 +102,7 @@ namespace osu.Game.Overlays.Comments
                         Texture t = base.GetImageTexture(textures, url);
 
                         if (t != null)
-                            Size = t.Height > 96 ? new Vector2(max_height / t.Height * t.Width, max_height) : t.Size;
+                            Size = t.Height > max_height ? new Vector2(max_height / t.Height * t.Width, max_height) : t.Size;
 
                         return t;
                     }
