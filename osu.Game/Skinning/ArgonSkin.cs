@@ -44,9 +44,7 @@ namespace osu.Game.Skinning
             : base(
                 skin,
                 resources,
-                // In the case of the actual default legacy skin (ie. the fallback one, which a user hasn't applied any modifications to) we want to use the game provided resources.
-                // todo: I don't know if this is required.
-                skin.Protected ? new NamespacedResourceStore<byte[]>(resources.Resources, "Skins/Argon") : null
+                new NamespacedResourceStore<byte[]>(resources.Resources, "Skins/Argon")
             )
         {
             Resources = resources;
