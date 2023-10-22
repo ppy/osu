@@ -104,7 +104,7 @@ namespace osu.Game.Beatmaps.Drawables
                         break;
 
                     default:
-                        if ((beatmapSet as IBeatmapSetOnlineInfo)?.Availability.DownloadDisabled == true)
+                        if (beatmapSet is IBeatmapSetOnlineInfo { Availability.DownloadDisabled: true })
                         {
                             button.Enabled.Value = false;
                             button.TooltipText = BeatmapsetsStrings.AvailabilityDisabled;

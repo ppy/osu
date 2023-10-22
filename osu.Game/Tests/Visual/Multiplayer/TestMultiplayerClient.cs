@@ -421,11 +421,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
 
             item.OwnerID = userId;
 
-            var existingItem = ServerRoom.Playlist.SingleOrDefault(i => i.ID == item.ID);
-
-            if (existingItem == null)
-                throw new InvalidOperationException("Attempted to change an item that doesn't exist.");
-
+            var existingItem = ServerRoom.Playlist.SingleOrDefault(i => i.ID == item.ID) ?? throw new InvalidOperationException("Attempted to change an item that doesn't exist.");
             if (existingItem.OwnerID != userId && ServerRoom.Host?.UserID != LocalUser?.UserID)
                 throw new InvalidOperationException("Attempted to change an item which is not owned by the user.");
 
@@ -448,11 +444,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
             Debug.Assert(ServerRoom != null);
             Debug.Assert(ServerAPIRoom != null);
 
-            var item = ServerRoom.Playlist.FirstOrDefault(i => i.ID == playlistItemId);
-
-            if (item == null)
-                throw new InvalidOperationException("Item does not exist in the room.");
-
+            var item = ServerRoom.Playlist.FirstOrDefault(i => i.ID == playlistItemId) ?? throw new InvalidOperationException("Item does not exist in the room.");
             if (item == currentItem)
                 throw new InvalidOperationException("The room's current item cannot be removed.");
 

@@ -663,7 +663,7 @@ namespace osu.Game.Tests.Beatmaps.Formats
                 assertObjectHasBanks(hitObjects[9], HitSampleInfo.BANK_DRUM, HitSampleInfo.BANK_NORMAL);
             }
 
-            void assertObjectHasBanks(HitObject hitObject, string normalBank, string? additionsBank = null)
+            static void assertObjectHasBanks(HitObject hitObject, string normalBank, string? additionsBank = null)
             {
                 Assert.AreEqual(normalBank, hitObject.Samples[0].Bank);
 

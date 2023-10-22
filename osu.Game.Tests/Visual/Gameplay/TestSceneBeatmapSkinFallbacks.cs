@@ -63,8 +63,7 @@ namespace osu.Game.Tests.Visual.Gameplay
 
             var actualInfo = actualComponentsContainer.CreateSerialisedInfo();
 
-            var expectedComponentsContainer = expectedSource.GetDrawableComponent(new SkinComponentsContainerLookup(target)) as Container;
-            if (expectedComponentsContainer == null)
+            if (expectedSource.GetDrawableComponent(new SkinComponentsContainerLookup(target)) is not Container expectedComponentsContainer)
                 return false;
 
             var expectedComponentsAdjustmentContainer = new DependencyProvidingContainer

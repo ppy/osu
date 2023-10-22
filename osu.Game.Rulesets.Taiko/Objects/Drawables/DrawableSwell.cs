@@ -271,7 +271,7 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
             else
                 UnproxyContent();
 
-            if ((Clock as IGameplayClock)?.IsRewinding == true)
+            if (Clock is IGameplayClock { IsRewinding: true })
                 lastPressHandleTime = null;
         }
 

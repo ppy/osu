@@ -190,7 +190,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
 
             var diff = lastPosition.HasValue ? lastPosition.Value - Position : Position - drawableSlider.HitObject.CurvePositionAt(completionProgress + 0.01f);
 
-            bool rewinding = (Clock as IGameplayClock)?.IsRewinding == true;
+            bool rewinding = Clock is IGameplayClock { IsRewinding: true };
 
             // Ensure the value is substantially high enough to allow for Atan2 to get a valid angle.
             if (diff.LengthFast < 0.01f)

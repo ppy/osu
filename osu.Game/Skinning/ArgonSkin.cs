@@ -84,7 +84,7 @@ namespace osu.Game.Skinning
         public override Drawable? GetDrawableComponent(ISkinComponentLookup lookup)
         {
             // Temporary until default skin has a valid hit lighting.
-            if ((lookup as SkinnableSprite.SpriteComponentLookup)?.LookupName == @"lighting") return Drawable.Empty();
+            if (lookup is SkinnableSprite.SpriteComponentLookup { LookupName: @"lighting" }) return Drawable.Empty();
 
             if (base.GetDrawableComponent(lookup) is Drawable c)
                 return c;

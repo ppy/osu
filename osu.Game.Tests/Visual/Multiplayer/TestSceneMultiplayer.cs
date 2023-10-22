@@ -836,7 +836,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
             AddStep("set other user ready", () => multiplayerClient.ChangeUserState(1234, MultiplayerUserState.Ready));
 
             pressReadyButton(1234);
-            AddUntilStep("wait for gameplay", () => (multiplayerComponents.CurrentScreen as MultiSpectatorScreen)?.IsLoaded == true);
+            AddUntilStep("wait for gameplay", () => multiplayerComponents.CurrentScreen is MultiSpectatorScreen { IsLoaded: true });
 
             AddStep("press back button and exit", () =>
             {
@@ -872,7 +872,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
             AddStep("set other user ready", () => multiplayerClient.ChangeUserState(1234, MultiplayerUserState.Ready));
 
             pressReadyButton(1234);
-            AddUntilStep("wait for gameplay", () => (multiplayerComponents.CurrentScreen as MultiSpectatorScreen)?.IsLoaded == true);
+            AddUntilStep("wait for gameplay", () => multiplayerComponents.CurrentScreen is MultiSpectatorScreen { IsLoaded: true });
             AddStep("set other user loaded", () => multiplayerClient.ChangeUserState(1234, MultiplayerUserState.Loaded));
             AddStep("set other user finished play", () => multiplayerClient.ChangeUserState(1234, MultiplayerUserState.FinishedPlay));
 

@@ -77,7 +77,7 @@ namespace osu.Game.Tests.Beatmaps.Formats
 
             compareBeatmaps(decoded, decodedAfterEncode);
 
-            ControlPointInfo removeLegacyControlPointTypes(ControlPointInfo controlPointInfo)
+            static ControlPointInfo removeLegacyControlPointTypes(ControlPointInfo controlPointInfo)
             {
                 // emulate non-legacy control points by cloning the non-legacy portion.
                 // the assertion is that the encoder can recreate this losslessly from hitobject data.

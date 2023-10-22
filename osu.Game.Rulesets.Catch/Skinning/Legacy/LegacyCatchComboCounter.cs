@@ -60,7 +60,7 @@ namespace osu.Game.Rulesets.Catch.Skinning.Legacy
 
             lastDisplayedCombo = combo;
 
-            if ((Clock as IGameplayClock)?.IsRewinding == true)
+            if (Clock is IGameplayClock { IsRewinding: true })
             {
                 // needs more work to make rewind somehow look good.
                 // basically we want the previous increment to play... or turning off RemoveCompletedTransforms (not feasible from a performance angle).

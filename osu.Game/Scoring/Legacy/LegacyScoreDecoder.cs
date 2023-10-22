@@ -319,10 +319,7 @@ namespace osu.Game.Scoring.Legacy
 
         private ReplayFrame convertFrame(LegacyReplayFrame currentFrame, ReplayFrame lastFrame)
         {
-            var convertible = currentRuleset.CreateConvertibleReplayFrame();
-            if (convertible == null)
-                throw new InvalidOperationException($"Legacy replay cannot be converted for the ruleset: {currentRuleset.Description}");
-
+            var convertible = currentRuleset.CreateConvertibleReplayFrame() ?? throw new InvalidOperationException($"Legacy replay cannot be converted for the ruleset: {currentRuleset.Description}");
             convertible.FromLegacy(currentFrame, currentBeatmap, lastFrame);
 
             var frame = (ReplayFrame)convertible;

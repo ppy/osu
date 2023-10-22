@@ -286,7 +286,7 @@ namespace osu.Game.Beatmaps.Drawables.Cards
 
         private void createStatistics()
         {
-            BeatmapCardStatistic withMargin(BeatmapCardStatistic original)
+            static BeatmapCardStatistic withMargin(BeatmapCardStatistic original)
             {
                 original.Margin = new MarginPadding { Right = 10 };
                 return original;

@@ -198,7 +198,7 @@ namespace osu.Game.Tests.Visual.Gameplay
 
             AddStep("seek to completion", () => Player.GameplayClockContainer.Seek(Player.DrawableRuleset.Objects.Last().GetEndTime()));
 
-            AddUntilStep("results displayed", () => (Player.GetChildScreen() as ResultsScreen)?.IsLoaded == true);
+            AddUntilStep("results displayed", () => Player.GetChildScreen() is ResultsScreen { IsLoaded: true });
             AddUntilStep("score in database", () => Realm.Run(r => r.Find<ScoreInfo>(Player.Score.ScoreInfo.ID) != null));
 
             AddUntilStep("wait for button clickable", () => ((OsuScreen)Player.GetChildScreen())
@@ -224,7 +224,7 @@ namespace osu.Game.Tests.Visual.Gameplay
         [Test]
         public void TestScoreStoredLocallyCustomRuleset()
         {
-            Ruleset createCustomRuleset() => new CustomRuleset();
+            static Ruleset createCustomRuleset() => new CustomRuleset();
 
             AddStep("import custom ruleset", () => Realm.Write(r => r.Add(createCustomRuleset().RulesetInfo)));
             AddStep("set custom ruleset", () => customRuleset = createCustomRuleset());

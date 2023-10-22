@@ -60,7 +60,7 @@ namespace osu.Game.Screens
                     return new IntroTriangles(createMainMenu);
             }
 
-            MainMenu createMainMenu() => new MainMenu();
+            static MainMenu createMainMenu() => new MainMenu();
         }
 
         protected virtual ShaderPrecompiler CreateShaderPrecompiler() => new ShaderPrecompiler();

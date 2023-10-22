@@ -311,7 +311,7 @@ namespace osu.Game.Screens.OnlinePlay
                 authorText.AddUserLink(beatmap.Metadata.Author);
             }
 
-            bool hasExplicitContent = (beatmap?.BeatmapSet as IBeatmapSetOnlineInfo)?.HasExplicitContent == true;
+            bool hasExplicitContent = beatmap?.BeatmapSet is IBeatmapSetOnlineInfo { HasExplicitContent: true };
             explicitContent.Alpha = hasExplicitContent ? 1 : 0;
 
             modDisplay.Current.Value = requiredMods.ToArray();

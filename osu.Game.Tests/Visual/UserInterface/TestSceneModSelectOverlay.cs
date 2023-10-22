@@ -319,13 +319,13 @@ namespace osu.Game.Tests.Visual.UserInterface
 
             AddStep("set dt mod with custom rate", () => { SelectedMods.Value = new[] { osuModDoubleTime }; });
 
-            AddAssert("selected mod matches", () => (SelectedMods.Value.Single() as OsuModDoubleTime)?.SpeedChange.Value == 1.2);
+            AddAssert("selected mod matches", () => SelectedMods.Value.Single() is OsuModDoubleTime { SpeedChange.Value: 1.2 });
 
             AddStep("deselect", () => getPanelForMod(typeof(OsuModDoubleTime)).TriggerClick());
             AddAssert("selected mods empty", () => SelectedMods.Value.Count == 0);
 
             AddStep("reselect", () => getPanelForMod(typeof(OsuModDoubleTime)).TriggerClick());
-            AddAssert("selected mod has default value", () => (SelectedMods.Value.Single() as OsuModDoubleTime)?.SpeedChange.IsDefault == true);
+            AddAssert("selected mod has default value", () => SelectedMods.Value.Single() is OsuModDoubleTime { SpeedChange.IsDefault: true });
         }
 
         [Test]
@@ -454,10 +454,10 @@ namespace osu.Game.Tests.Visual.UserInterface
             changeRuleset(0);
 
             AddStep("set customized mod externally", () => SelectedMods.Value = new[] { new OsuModDoubleTime { SpeedChange = { Value = 1.01 } } });
-            AddAssert("setting remains", () => (SelectedMods.Value.SingleOrDefault() as OsuModDoubleTime)?.SpeedChange.Value == 1.01);
+            AddAssert("setting remains", () => SelectedMods.Value.SingleOrDefault() is OsuModDoubleTime { SpeedChange.Value: 1.01 });
 
             createScreen();
-            AddAssert("setting remains", () => (SelectedMods.Value.SingleOrDefault() as OsuModDoubleTime)?.SpeedChange.Value == 1.01);
+            AddAssert("setting remains", () => SelectedMods.Value.SingleOrDefault() is OsuModDoubleTime { SpeedChange.Value: 1.01 });
         }
 
         [Test]

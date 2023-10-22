@@ -268,10 +268,7 @@ namespace osu.Game.Screens.Ranking
         /// <exception cref="InvalidOperationException">If <paramref name="panel"/> is not a part of this <see cref="ScorePanelList"/>.</exception>
         public void Detach(ScorePanel panel)
         {
-            var container = flow.SingleOrDefault(t => t.Panel == panel);
-            if (container == null)
-                throw new InvalidOperationException("Panel is not contained by the score panel list.");
-
+            var container = flow.SingleOrDefault(t => t.Panel == panel) ?? throw new InvalidOperationException("Panel is not contained by the score panel list.");
             container.Detach();
         }
 
@@ -282,10 +279,7 @@ namespace osu.Game.Screens.Ranking
         /// <exception cref="InvalidOperationException">If <paramref name="panel"/> is not a part of this <see cref="ScorePanelList"/>.</exception>
         public void Attach(ScorePanel panel)
         {
-            var container = flow.SingleOrDefault(t => t.Panel == panel);
-            if (container == null)
-                throw new InvalidOperationException("Panel is not contained by the score panel list.");
-
+            var container = flow.SingleOrDefault(t => t.Panel == panel) ?? throw new InvalidOperationException("Panel is not contained by the score panel list.");
             container.Attach();
         }
 

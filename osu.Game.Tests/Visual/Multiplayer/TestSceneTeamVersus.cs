@@ -95,7 +95,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
                 }
             });
 
-            AddUntilStep("user on team 0", () => (multiplayerClient.ClientRoom?.Users.FirstOrDefault()?.MatchState as TeamVersusUserState)?.TeamID == 0);
+            AddUntilStep("user on team 0", () => multiplayerClient.ClientRoom?.Users.FirstOrDefault()?.MatchState is TeamVersusUserState { TeamID: 0 });
             AddStep("add another user", () => multiplayerClient.AddUser(new APIUser { Username = "otheruser", Id = 44 }));
 
             AddStep("press own button", () =>
@@ -103,17 +103,17 @@ namespace osu.Game.Tests.Visual.Multiplayer
                 InputManager.MoveMouseTo(multiplayerComponents.ChildrenOfType<TeamDisplay>().First());
                 InputManager.Click(MouseButton.Left);
             });
-            AddUntilStep("user on team 1", () => (multiplayerClient.ClientRoom?.Users.FirstOrDefault()?.MatchState as TeamVersusUserState)?.TeamID == 1);
+            AddUntilStep("user on team 1", () => multiplayerClient.ClientRoom?.Users.FirstOrDefault()?.MatchState is TeamVersusUserState { TeamID: 1 });
 
             AddStep("press own button again", () => InputManager.Click(MouseButton.Left));
-            AddUntilStep("user on team 0", () => (multiplayerClient.ClientRoom?.Users.FirstOrDefault()?.MatchState as TeamVersusUserState)?.TeamID == 0);
+            AddUntilStep("user on team 0", () => multiplayerClient.ClientRoom?.Users.FirstOrDefault()?.MatchState is TeamVersusUserState { TeamID: 0 });
 
             AddStep("press other user's button", () =>
             {
                 InputManager.MoveMouseTo(multiplayerComponents.ChildrenOfType<TeamDisplay>().ElementAt(1));
                 InputManager.Click(MouseButton.Left);
             });
-            AddUntilStep("user still on team 0", () => (multiplayerClient.ClientRoom?.Users.FirstOrDefault()?.MatchState as TeamVersusUserState)?.TeamID == 0);
+            AddUntilStep("user still on team 0", () => multiplayerClient.ClientRoom?.Users.FirstOrDefault()?.MatchState is TeamVersusUserState { TeamID: 0 });
         }
 
         [Test]

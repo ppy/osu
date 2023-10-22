@@ -97,7 +97,7 @@ namespace osu.Game.Rulesets.Catch.UI
 
             comboDisplay.X = Catcher.X;
 
-            if ((Clock as IGameplayClock)?.IsRewinding == true)
+            if (Clock is IGameplayClock { IsRewinding: true })
             {
                 // This is probably a wrong value, but currently the true value is not recorded.
                 // Setting `true` will prevent generation of false-positive after-images (with more false-negatives).

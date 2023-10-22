@@ -696,7 +696,7 @@ namespace osu.Game.Rulesets.Objects.Drawables
         protected bool UpdateResult(bool userTriggered)
         {
             // It's possible for input to get into a bad state when rewinding gameplay, so results should not be processed
-            if ((Clock as IGameplayClock)?.IsRewinding == true)
+            if (Clock is IGameplayClock { IsRewinding: true })
                 return false;
 
             if (Judged)

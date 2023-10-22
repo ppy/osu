@@ -128,7 +128,7 @@ namespace osu.Game.Tests.Visual.Editing
 
             AddAssert("no circles placed", () => editorBeatmap.HitObjects.Count == 0);
 
-            Vector2 getOverlapPoint(DrawableTernaryButton ternaryButton)
+            static Vector2 getOverlapPoint(DrawableTernaryButton ternaryButton)
             {
                 var quad = ternaryButton.ScreenSpaceDrawQuad;
                 return quad.TopLeft + new Vector2(quad.Width * 9 / 10, quad.Height / 2);

@@ -45,7 +45,7 @@ namespace osu.Game.Rulesets.Taiko.UI
 
         public bool OnPressed(KeyBindingPressEvent<TaikoAction> e)
         {
-            if ((Clock as IGameplayClock)?.IsRewinding == true)
+            if (Clock is IGameplayClock { IsRewinding: true })
                 return false;
 
             HitType hitType;
