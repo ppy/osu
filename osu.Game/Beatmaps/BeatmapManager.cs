@@ -127,7 +127,11 @@ namespace osu.Game.Beatmaps
             foreach (BeatmapInfo b in beatmapSet.Beatmaps)
                 b.BeatmapSet = beatmapSet;
 
-            var imported = beatmapImporter.ImportModel(beatmapSet) ?? throw new InvalidOperationException("Failed to import new beatmap");
+            var imported = beatmapImporter.ImportModel(beatmapSet);
+
+            if (imported == null)
+                throw new InvalidOperationException("Failed to import new beatmap");
+
             return imported.PerformRead(s => GetWorkingBeatmap(s.Beatmaps.First()));
         }
 
