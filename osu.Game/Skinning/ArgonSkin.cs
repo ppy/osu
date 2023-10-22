@@ -8,6 +8,7 @@ using osu.Framework.Audio.Sample;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Textures;
+using osu.Framework.IO.Stores;
 using osu.Game.Audio;
 using osu.Game.Beatmaps.Formats;
 using osu.Game.Extensions;
@@ -40,7 +41,13 @@ namespace osu.Game.Skinning
 
         [UsedImplicitly(ImplicitUseKindFlags.InstantiatedWithFixedConstructorSignature)]
         public ArgonSkin(SkinInfo skin, IStorageResourceProvider resources)
-            : base(skin, resources)
+            : base(
+                skin,
+                resources,
+                // In the case of the actual default legacy skin (ie. the fallback one, which a user hasn't applied any modifications to) we want to use the game provided resources.
+                // todo: I don't know if this is required.
+                skin.Protected ? new NamespacedResourceStore<byte[]>(resources.Resources, "Skins/Argon") : null
+            )
         {
             Resources = resources;
 
