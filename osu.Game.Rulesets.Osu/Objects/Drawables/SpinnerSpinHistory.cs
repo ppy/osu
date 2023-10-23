@@ -31,11 +31,11 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
         private readonly Stack<CompletedSpin> completedSpins = new Stack<CompletedSpin>();
 
         /// <summary>
-        /// The total accumulated rotation.
+        /// The total accumulated (absolute) rotation.
         /// </summary>
-        private float totalAbsoluteRotation;
+        private float totalAccumulatedRotation;
 
-        private float totalAbsoluteRotationAtLastCompletion;
+        private float totalAccumulatedRotationAtLastCompletion;
 
         /// <summary>
         /// For the current spin, represents the maximum absolute rotation (from 0..360) achieved by the user.
@@ -52,7 +52,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
         /// <summary>
         /// The current spin, from -360..360.
         /// </summary>
-        private float currentSpinRotation => totalAbsoluteRotation - totalAbsoluteRotationAtLastCompletion;
+        private float currentSpinRotation => totalAccumulatedRotation - totalAccumulatedRotationAtLastCompletion;
 
         private double lastReportTime = double.NegativeInfinity;
 
@@ -76,7 +76,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
             //
             // But this can come later.
 
-            totalAbsoluteRotation += delta;
+            totalAccumulatedRotation += delta;
 
             if (currentTime >= lastReportTime)
             {
@@ -93,7 +93,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
 
                     // Incrementing the last completion point will cause `currentSpinRotation` to
                     // hold the remaining spin that needs to be considered.
-                    totalAbsoluteRotationAtLastCompletion += direction * 360;
+                    totalAccumulatedRotationAtLastCompletion += direction * 360;
 
                     // Reset the current max as we are entering a new spin.
                     // Importantly, carry over the remainder (which is now stored in `currentSpinRotation`).
@@ -107,7 +107,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
                 while (completedSpins.TryPeek(out var segment) && segment.CompletionTime > currentTime)
                 {
                     completedSpins.Pop();
-                    totalAbsoluteRotationAtLastCompletion -= segment.Direction * 360;
+                    totalAccumulatedRotationAtLastCompletion -= segment.Direction * 360;
                 }
 
                 // This is a best effort. We may not have enough data to match this 1:1, but that's okay.
