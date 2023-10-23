@@ -3,6 +3,7 @@
 
 using System;
 using System.Diagnostics;
+using System.Linq;
 using System.Threading.Tasks;
 using ManagedBass.Fx;
 using osu.Framework.Allocation;
@@ -24,6 +25,7 @@ using osu.Game.Input;
 using osu.Game.Localisation;
 using osu.Game.Overlays;
 using osu.Game.Overlays.Notifications;
+using osu.Game.Rulesets.Mods;
 using osu.Game.Screens.Menu;
 using osu.Game.Screens.Play.PlayerSettings;
 using osu.Game.Skinning;
@@ -397,6 +399,11 @@ namespace osu.Game.Screens.Play
             CurrentPlayer.Configuration.AutomaticallySkipIntro |= quickRestart;
             CurrentPlayer.RestartCount = restartCount++;
             CurrentPlayer.RestartRequested = restartRequested;
+
+            foreach (var mods in Mods.Value.OfType<IApplicableToPlayerConfiguration>())
+            {
+                mods.ApplyConfiguration(CurrentPlayer.Configuration);
+            }
 
             LoadTask = LoadComponentAsync(CurrentPlayer, _ =>
             {
