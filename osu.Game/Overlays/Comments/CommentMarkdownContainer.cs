@@ -82,8 +82,8 @@ namespace osu.Game.Overlays.Comments
                 private partial class CommentImageContainer : ImageContainer
                 {
                     // https://github.com/ppy/osu-web/blob/3bd0f406dc78d60b356d955cd4201f8c3e1cca09/resources/css/bem/osu-md.less#L36
-                    // Web version defines max height in em units (6 em), which assuming default pixel size as 14 results in 84 px,
-                    // which also seems to match my observations upon expecting the web element.
+                    // Web version defines max height in em units (6 em), which assuming default font size as 14 results in 84 px,
+                    // which also seems to match observations upon inspecting the web element.
                     private const float max_height = 84f;
 
                     public CommentImageContainer(string url)
