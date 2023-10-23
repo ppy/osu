@@ -432,7 +432,10 @@ namespace osu.Game.Tests.Visual
 
                 private bool running;
 
-                public override double Rate => referenceClock.Rate;
+                public override double Rate => base.Rate
+                                               // This is mainly to allow some tests to override the rate to zero
+                                               // and avoid interpolation.
+                                               * referenceClock.Rate;
 
                 public TrackVirtualManual(IFrameBasedClock referenceClock, string name = "virtual")
                     : base(name)
