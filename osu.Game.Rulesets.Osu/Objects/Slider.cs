@@ -71,8 +71,6 @@ namespace osu.Game.Rulesets.Osu.Objects
             }
         }
 
-        public double? LegacyLastTickOffset { get; set; }
-
         /// <summary>
         /// The position of the cursor at the point of completion of this <see cref="Slider"/> if it was hit
         /// with as few movements as possible. This is set and used by difficulty calculation.
@@ -179,7 +177,7 @@ namespace osu.Game.Rulesets.Osu.Objects
         {
             base.CreateNestedHitObjects(cancellationToken);
 
-            var sliderEvents = SliderEventGenerator.Generate(StartTime, SpanDuration, Velocity, TickDistance, Path.Distance, this.SpanCount(), LegacyLastTickOffset, cancellationToken);
+            var sliderEvents = SliderEventGenerator.Generate(StartTime, SpanDuration, Velocity, TickDistance, Path.Distance, this.SpanCount(), cancellationToken);
 
             foreach (var e in sliderEvents)
             {
@@ -206,10 +204,7 @@ namespace osu.Game.Rulesets.Osu.Objects
                         });
                         break;
 
-                    case SliderEventType.LegacyLastTick:
-                        // we need to use the LegacyLastTick here for compatibility reasons (difficulty).
-                        // it is *okay* to use this because the TailCircle is not used for any meaningful purpose in gameplay.
-                        // if this is to change, we should revisit this.
+                    case SliderEventType.Tail:
                         AddNested(TailCircle = new SliderTailCircle(this)
                         {
                             RepeatIndex = e.SpanIndex,
@@ -264,7 +259,9 @@ namespace osu.Game.Rulesets.Osu.Objects
             if (HeadCircle != null)
                 HeadCircle.Samples = this.GetNodeSamples(0);
 
-            // The samples should be attached to the slider tail, however this can only be done after LegacyLastTick is removed otherwise they would play earlier than they're intended to.
+            // The samples should be attached to the slider tail, however this can only be done if LastTick is removed otherwise they would play earlier than they're intended to.
+            // (see mapping logic in `CreateNestedHitObjects` above)
+            //
             // For now, the samples are played by the slider itself at the correct end time.
             TailSamples = this.GetNodeSamples(repeatCount + 1);
         }

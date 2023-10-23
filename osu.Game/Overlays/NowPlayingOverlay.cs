@@ -55,8 +55,7 @@ namespace osu.Game.Overlays
         private Container playerContainer = null!;
         private Container playlistContainer = null!;
 
-        protected override string PopInSampleName => "UI/now-playing-pop-in";
-        protected override string PopOutSampleName => "UI/now-playing-pop-out";
+        protected override double PopInOutSampleBalance => OsuGameBase.SFX_STEREO_STRENGTH * 0.75f;
 
         [Resolved]
         private MusicController musicController { get; set; } = null!;
@@ -248,7 +247,7 @@ namespace osu.Game.Overlays
         {
             base.UpdateAfterChildren();
 
-            playlistContainer.Height = MathF.Min(Parent.DrawHeight - margin * 3 - player_height, PlaylistOverlay.PLAYLIST_HEIGHT);
+            playlistContainer.Height = MathF.Min(Parent!.DrawHeight - margin * 3 - player_height, PlaylistOverlay.PLAYLIST_HEIGHT);
 
             float height = player_height;
 

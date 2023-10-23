@@ -30,7 +30,7 @@ namespace osu.Game.Rulesets.Taiko.UI
             // This is still a bit weird, because readability changes with window size, but it is what it is.
             if (LockPlayfieldAspectRange.Value)
             {
-                float currentAspect = Parent.ChildSize.X / Parent.ChildSize.Y;
+                float currentAspect = Parent!.ChildSize.X / Parent!.ChildSize.Y;
 
                 if (currentAspect > MAXIMUM_ASPECT)
                     height *= currentAspect / MAXIMUM_ASPECT;

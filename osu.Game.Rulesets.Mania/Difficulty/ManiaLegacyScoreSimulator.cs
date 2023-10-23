@@ -4,25 +4,63 @@
 using System.Collections.Generic;
 using System.Linq;
 using osu.Game.Beatmaps;
+using osu.Game.Rulesets.Mania.Beatmaps;
 using osu.Game.Rulesets.Mania.Mods;
 using osu.Game.Rulesets.Mods;
-using osu.Game.Rulesets.Scoring;
+using osu.Game.Rulesets.Scoring.Legacy;
 
 namespace osu.Game.Rulesets.Mania.Difficulty
 {
     internal class ManiaLegacyScoreSimulator : ILegacyScoreSimulator
     {
-        public int AccuracyScore => 0;
-        public int ComboScore { get; private set; }
-        public double BonusScoreRatio => 0;
-
-        public void Simulate(IWorkingBeatmap workingBeatmap, IBeatmap playableBeatmap, IReadOnlyList<Mod> mods)
+        public LegacyScoreAttributes Simulate(IWorkingBeatmap workingBeatmap, IBeatmap playableBeatmap)
         {
-            double multiplier = mods.Where(m => m is not (ModHidden or ModHardRock or ModDoubleTime or ModFlashlight or ManiaModFadeIn))
-                                    .Select(m => m.ScoreMultiplier)
-                                    .Aggregate(1.0, (c, n) => c * n);
+            return new LegacyScoreAttributes { ComboScore = 1000000 };
+        }
 
-            ComboScore = (int)(1000000 * multiplier);
+        public double GetLegacyScoreMultiplier(IReadOnlyList<Mod> mods, LegacyBeatmapConversionDifficultyInfo difficulty)
+        {
+            bool scoreV2 = mods.Any(m => m is ModScoreV2);
+
+            double multiplier = 1.0;
+
+            foreach (var mod in mods)
+            {
+                switch (mod)
+                {
+                    case ManiaModNoFail:
+                        multiplier *= scoreV2 ? 1.0 : 0.5;
+                        break;
+
+                    case ManiaModEasy:
+                        multiplier *= 0.5;
+                        break;
+
+                    case ManiaModHalfTime:
+                    case ManiaModDaycore:
+                        multiplier *= 0.5;
+                        break;
+                }
+            }
+
+            if (new ManiaRuleset().RulesetInfo.Equals(difficulty.SourceRuleset))
+                return multiplier;
+
+            // Apply key mod multipliers.
+
+            int originalColumns = ManiaBeatmapConverter.GetColumnCount(difficulty);
+            int actualColumns = originalColumns;
+
+            actualColumns = mods.OfType<ManiaKeyMod>().SingleOrDefault()?.KeyCount ?? actualColumns;
+            if (mods.Any(m => m is ManiaModDualStages))
+                actualColumns *= 2;
+
+            if (actualColumns > originalColumns)
+                multiplier *= 0.9;
+            else if (actualColumns < originalColumns)
+                multiplier *= 0.9 - 0.04 * (originalColumns - actualColumns);
+
+            return multiplier;
         }
     }
 }

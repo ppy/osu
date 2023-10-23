@@ -132,11 +132,9 @@ namespace osu.Game.Screens.Menu
             buttonsPlay.Add(new MainMenuButton(ButtonSystemStrings.Playlists, @"button-generic-select", OsuIcon.Charts, new Color4(94, 63, 186, 255), onPlaylists, 0, Key.L));
             buttonsPlay.ForEach(b => b.VisibleState = ButtonSystemState.Play);
 
-            buttonsTopLevel.Add(new MainMenuButton(ButtonSystemStrings.Play, @"button-play-select", OsuIcon.Logo, new Color4(102, 68, 204, 255), () => State = ButtonSystemState.Play, WEDGE_WIDTH,
-                Key.P));
+            buttonsTopLevel.Add(new MainMenuButton(ButtonSystemStrings.Play, @"button-play-select", OsuIcon.Logo, new Color4(102, 68, 204, 255), () => State = ButtonSystemState.Play, WEDGE_WIDTH, Key.P));
             buttonsTopLevel.Add(new MainMenuButton(ButtonSystemStrings.Edit, @"button-edit-select", OsuIcon.EditCircle, new Color4(238, 170, 0, 255), () => OnEdit?.Invoke(), 0, Key.E));
-            buttonsTopLevel.Add(new MainMenuButton(ButtonSystemStrings.Browse, @"button-direct-select", OsuIcon.ChevronDownCircle, new Color4(165, 204, 0, 255), () => OnBeatmapListing?.Invoke(), 0,
-                Key.D));
+            buttonsTopLevel.Add(new MainMenuButton(ButtonSystemStrings.Browse, @"button-direct-select", OsuIcon.ChevronDownCircle, new Color4(165, 204, 0, 255), () => OnBeatmapListing?.Invoke(), 0, Key.B, Key.D));
 
             if (host.CanExit)
                 buttonsTopLevel.Add(new MainMenuButton(ButtonSystemStrings.Exit, string.Empty, OsuIcon.CrossCircle, new Color4(238, 51, 153, 255), () => OnExit?.Invoke(), 0, Key.Q));

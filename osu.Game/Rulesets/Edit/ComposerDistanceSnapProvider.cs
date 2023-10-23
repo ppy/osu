@@ -1,8 +1,7 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
@@ -24,16 +23,13 @@ using osu.Game.Overlays.OSD;
 using osu.Game.Overlays.Settings.Sections;
 using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Objects.Types;
+using osu.Game.Rulesets.UI;
+using osu.Game.Screens.Edit;
 using osu.Game.Screens.Edit.Components.TernaryButtons;
 
 namespace osu.Game.Rulesets.Edit
 {
-    /// <summary>
-    /// Represents a <see cref="HitObjectComposer{TObject}"/> for rulesets with the concept of distances between objects.
-    /// </summary>
-    /// <typeparam name="TObject">The base type of supported objects.</typeparam>
-    public abstract partial class DistancedHitObjectComposer<TObject> : HitObjectComposer<TObject>, IDistanceSnapProvider, IScrollBindingHandler<GlobalAction>
-        where TObject : HitObject
+    public abstract partial class ComposerDistanceSnapProvider : Component, IDistanceSnapProvider, IScrollBindingHandler<GlobalAction>
     {
         private const float adjust_step = 0.1f;
 
@@ -44,27 +40,38 @@ namespace osu.Game.Rulesets.Edit
             Precision = 0.01,
         };
 
-        IBindable<double> IDistanceSnapProvider.DistanceSpacingMultiplier => DistanceSpacingMultiplier;
+        Bindable<double> IDistanceSnapProvider.DistanceSpacingMultiplier => DistanceSpacingMultiplier;
 
-        private ExpandableSlider<double, SizeSlider<double>> distanceSpacingSlider;
-        private ExpandableButton currentDistanceSpacingButton;
+        private ExpandableSlider<double, SizeSlider<double>> distanceSpacingSlider = null!;
+        private ExpandableButton currentDistanceSpacingButton = null!;
 
-        [Resolved(canBeNull: true)]
-        private OnScreenDisplay onScreenDisplay { get; set; }
+        [Resolved]
+        private Playfield playfield { get; set; } = null!;
 
-        protected readonly Bindable<TernaryState> DistanceSnapToggle = new Bindable<TernaryState>();
+        [Resolved]
+        private EditorClock editorClock { get; set; } = null!;
+
+        [Resolved]
+        private EditorBeatmap editorBeatmap { get; set; } = null!;
+
+        [Resolved]
+        private IBeatSnapProvider beatSnapProvider { get; set; } = null!;
+
+        [Resolved]
+        private OnScreenDisplay? onScreenDisplay { get; set; }
+
+        public readonly Bindable<TernaryState> DistanceSnapToggle = new Bindable<TernaryState>();
 
         private bool distanceSnapMomentary;
 
-        protected DistancedHitObjectComposer(Ruleset ruleset)
-            : base(ruleset)
-        {
-        }
+        private EditorToolboxGroup? toolboxGroup;
 
-        [BackgroundDependencyLoader]
-        private void load()
+        public void AttachToToolbox(ExpandingToolboxContainer toolboxContainer)
         {
-            RightToolbox.Add(new EditorToolboxGroup("snapping")
+            if (toolboxGroup != null)
+                throw new InvalidOperationException($"{nameof(AttachToToolbox)} may be called only once for a single {nameof(ComposerDistanceSnapProvider)} instance.");
+
+            toolboxContainer.Add(toolboxGroup = new EditorToolboxGroup("snapping")
             {
                 Alpha = DistanceSpacingMultiplier.Disabled ? 0 : 1,
                 Children = new Drawable[]
@@ -90,16 +97,42 @@ namespace osu.Game.Rulesets.Edit
                     }
                 }
             });
+
+            if (DistanceSpacingMultiplier.Disabled)
+            {
+                distanceSpacingSlider.Hide();
+                return;
+            }
+
+            DistanceSpacingMultiplier.Value = editorBeatmap.BeatmapInfo.DistanceSpacing;
+            DistanceSpacingMultiplier.BindValueChanged(multiplier =>
+            {
+                distanceSpacingSlider.ContractedLabelText = $"D. S. ({multiplier.NewValue:0.##x})";
+                distanceSpacingSlider.ExpandedLabelText = $"Distance Spacing ({multiplier.NewValue:0.##x})";
+
+                if (multiplier.NewValue != multiplier.OldValue)
+                    onScreenDisplay?.Display(new DistanceSpacingToast(multiplier.NewValue.ToLocalisableString(@"0.##x"), multiplier));
+
+                editorBeatmap.BeatmapInfo.DistanceSpacing = multiplier.NewValue;
+            }, true);
+
+            // Manual binding to handle enabling distance spacing when the slider is interacted with.
+            distanceSpacingSlider.Current.BindValueChanged(spacing =>
+            {
+                DistanceSpacingMultiplier.Value = spacing.NewValue;
+                DistanceSnapToggle.Value = TernaryState.True;
+            });
+            DistanceSpacingMultiplier.BindValueChanged(spacing => distanceSpacingSlider.Current.Value = spacing.NewValue);
         }
 
         private (HitObject before, HitObject after)? getObjectsOnEitherSideOfCurrentTime()
         {
-            HitObject lastBefore = Playfield.HitObjectContainer.AliveObjects.LastOrDefault(h => h.HitObject.StartTime < EditorClock.CurrentTime)?.HitObject;
+            HitObject? lastBefore = playfield.HitObjectContainer.AliveObjects.LastOrDefault(h => h.HitObject.StartTime < editorClock.CurrentTime)?.HitObject;
 
             if (lastBefore == null)
                 return null;
 
-            HitObject firstAfter = Playfield.HitObjectContainer.AliveObjects.FirstOrDefault(h => h.HitObject.StartTime >= EditorClock.CurrentTime)?.HitObject;
+            HitObject? firstAfter = playfield.HitObjectContainer.AliveObjects.FirstOrDefault(h => h.HitObject.StartTime >= editorClock.CurrentTime)?.HitObject;
 
             if (firstAfter == null)
                 return null;
@@ -138,41 +171,10 @@ namespace osu.Game.Rulesets.Edit
             }
         }
 
-        protected override void LoadComplete()
-        {
-            base.LoadComplete();
-
-            if (DistanceSpacingMultiplier.Disabled)
-            {
-                distanceSpacingSlider.Hide();
-                return;
-            }
-
-            DistanceSpacingMultiplier.Value = EditorBeatmap.BeatmapInfo.DistanceSpacing;
-            DistanceSpacingMultiplier.BindValueChanged(multiplier =>
-            {
-                distanceSpacingSlider.ContractedLabelText = $"D. S. ({multiplier.NewValue:0.##x})";
-                distanceSpacingSlider.ExpandedLabelText = $"Distance Spacing ({multiplier.NewValue:0.##x})";
-
-                if (multiplier.NewValue != multiplier.OldValue)
-                    onScreenDisplay?.Display(new DistanceSpacingToast(multiplier.NewValue.ToLocalisableString(@"0.##x"), multiplier));
-
-                EditorBeatmap.BeatmapInfo.DistanceSpacing = multiplier.NewValue;
-            }, true);
-
-            // Manual binding to handle enabling distance spacing when the slider is interacted with.
-            distanceSpacingSlider.Current.BindValueChanged(spacing =>
-            {
-                DistanceSpacingMultiplier.Value = spacing.NewValue;
-                DistanceSnapToggle.Value = TernaryState.True;
-            });
-            DistanceSpacingMultiplier.BindValueChanged(spacing => distanceSpacingSlider.Current.Value = spacing.NewValue);
-        }
-
-        protected override IEnumerable<TernaryButton> CreateTernaryButtons() => base.CreateTernaryButtons().Concat(new[]
+        public IEnumerable<TernaryButton> CreateTernaryButtons() => new[]
         {
             new TernaryButton(DistanceSnapToggle, "Distance Snap", () => new SpriteIcon { Icon = FontAwesome.Solid.Ruler })
-        });
+        };
 
         protected override bool OnKeyDown(KeyDownEvent e)
         {
@@ -242,26 +244,28 @@ namespace osu.Game.Rulesets.Edit
             return true;
         }
 
+        #region IDistanceSnapProvider
+
         public virtual float GetBeatSnapDistanceAt(HitObject referenceObject, bool useReferenceSliderVelocity = true)
         {
-            return (float)(100 * (useReferenceSliderVelocity && referenceObject is IHasSliderVelocity hasSliderVelocity ? hasSliderVelocity.SliderVelocityMultiplier : 1) * EditorBeatmap.Difficulty.SliderMultiplier * 1
-                           / BeatSnapProvider.BeatDivisor);
+            return (float)(100 * (useReferenceSliderVelocity && referenceObject is IHasSliderVelocity hasSliderVelocity ? hasSliderVelocity.SliderVelocityMultiplier : 1) * editorBeatmap.Difficulty.SliderMultiplier * 1
+                           / beatSnapProvider.BeatDivisor);
         }
 
         public virtual float DurationToDistance(HitObject referenceObject, double duration)
         {
-            double beatLength = BeatSnapProvider.GetBeatLengthAtTime(referenceObject.StartTime);
+            double beatLength = beatSnapProvider.GetBeatLengthAtTime(referenceObject.StartTime);
             return (float)(duration / beatLength * GetBeatSnapDistanceAt(referenceObject));
         }
 
         public virtual double DistanceToDuration(HitObject referenceObject, float distance)
         {
-            double beatLength = BeatSnapProvider.GetBeatLengthAtTime(referenceObject.StartTime);
+            double beatLength = beatSnapProvider.GetBeatLengthAtTime(referenceObject.StartTime);
             return distance / GetBeatSnapDistanceAt(referenceObject) * beatLength;
         }
 
         public virtual double FindSnappedDuration(HitObject referenceObject, float distance)
-            => BeatSnapProvider.SnapTime(referenceObject.StartTime + DistanceToDuration(referenceObject, distance), referenceObject.StartTime) - referenceObject.StartTime;
+            => beatSnapProvider.SnapTime(referenceObject.StartTime + DistanceToDuration(referenceObject, distance), referenceObject.StartTime) - referenceObject.StartTime;
 
         public virtual float FindSnappedDistance(HitObject referenceObject, float distance)
         {
@@ -269,9 +273,9 @@ namespace osu.Game.Rulesets.Edit
 
             double actualDuration = startTime + DistanceToDuration(referenceObject, distance);
 
-            double snappedEndTime = BeatSnapProvider.SnapTime(actualDuration, startTime);
+            double snappedEndTime = beatSnapProvider.SnapTime(actualDuration, startTime);
 
-            double beatLength = BeatSnapProvider.GetBeatLengthAtTime(startTime);
+            double beatLength = beatSnapProvider.GetBeatLengthAtTime(startTime);
 
             // we don't want to exceed the actual duration and snap to a point in the future.
             // as we are snapping to beat length via SnapTime (which will round-to-nearest), check for snapping in the forward direction and reverse it.
@@ -280,6 +284,8 @@ namespace osu.Game.Rulesets.Edit
 
             return DurationToDistance(referenceObject, snappedEndTime - startTime);
         }
+
+        #endregion
 
         private partial class DistanceSpacingToast : Toast
         {

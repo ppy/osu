@@ -4,7 +4,6 @@
 using System.Linq;
 using NUnit.Framework;
 using osu.Framework.Allocation;
-using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Testing;
 using osu.Game.Online.API.Requests.Responses;
@@ -80,11 +79,11 @@ namespace osu.Game.Tournament.Tests.Components
             {
                 Team1 =
                 {
-                    Value = new TournamentTeam { Players = new BindableList<TournamentUser> { redUser } }
+                    Value = new TournamentTeam { Players = { redUser } }
                 },
                 Team2 =
                 {
-                    Value = new TournamentTeam { Players = new BindableList<TournamentUser> { blueUser, blueUserWithCustomColour } }
+                    Value = new TournamentTeam { Players = { blueUser, blueUserWithCustomColour } }
                 }
             });
 

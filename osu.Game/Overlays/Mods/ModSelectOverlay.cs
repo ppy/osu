@@ -604,7 +604,7 @@ namespace osu.Game.Overlays.Mods
                     if (columnNumber > 5 && !column.Active.Value) return;
 
                     // use X position of the column on screen as a basis for panning the sample
-                    float balance = column.Parent.BoundingBox.Centre.X / RelativeToAbsoluteFactor.X;
+                    float balance = column.Parent!.BoundingBox.Centre.X / RelativeToAbsoluteFactor.X;
 
                     // dip frequency and ramp volume of sample over the first 5 displayed columns
                     float progress = Math.Min(1, columnNumber / 5f);

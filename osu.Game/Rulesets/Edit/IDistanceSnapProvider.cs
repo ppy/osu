@@ -12,14 +12,14 @@ namespace osu.Game.Rulesets.Edit
     /// A snap provider which given a reference hit object and proposed distance from it, offers a more correct duration or distance value.
     /// </summary>
     [Cached]
-    public interface IDistanceSnapProvider : IPositionSnapProvider
+    public interface IDistanceSnapProvider
     {
         /// <summary>
         /// A multiplier which changes the ratio of distance travelled per time unit.
         /// Importantly, this is provided for manual usage, and not multiplied into any of the methods exposed by this interface.
         /// </summary>
         /// <seealso cref="BeatmapInfo.DistanceSpacing"/>
-        IBindable<double> DistanceSpacingMultiplier { get; }
+        Bindable<double> DistanceSpacingMultiplier { get; }
 
         /// <summary>
         /// Retrieves the distance between two points within a timing point that are one beat length apart.
