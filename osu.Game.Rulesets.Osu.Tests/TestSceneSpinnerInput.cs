@@ -160,7 +160,11 @@ namespace osu.Game.Rulesets.Osu.Tests
         [Test]
         public void TestRewind()
         {
-            AddStep("set manual clock", () => manualClock = new ManualClock { Rate = 1 });
+            AddStep("set manual clock", () => manualClock = new ManualClock
+            {
+                // Avoids interpolation trying to run ahead during testing.
+                Rate = 0
+            });
 
             List<ReplayFrame> frames =
                 new SpinFramesGenerator(time_spinner_start)
@@ -214,7 +218,7 @@ namespace osu.Game.Rulesets.Osu.Tests
             {
                 AddStep($"seek to {time}", () => clock.Seek(time));
                 // Lenience is required due to interpolation running slightly ahead on a stalled clock.
-                AddUntilStep("wait for seek to finish", () => drawableRuleset.FrameStableClock.CurrentTime, () => Is.EqualTo(time).Within(40));
+                AddUntilStep("wait for seek to finish", () => drawableRuleset.FrameStableClock.CurrentTime, () => Is.EqualTo(time));
             }
         }
 
