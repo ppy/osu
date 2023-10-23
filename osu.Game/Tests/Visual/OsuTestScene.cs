@@ -432,6 +432,8 @@ namespace osu.Game.Tests.Visual
 
                 private bool running;
 
+                public override double Rate => referenceClock.Rate;
+
                 public TrackVirtualManual(IFrameBasedClock referenceClock, string name = "virtual")
                     : base(name)
                 {
