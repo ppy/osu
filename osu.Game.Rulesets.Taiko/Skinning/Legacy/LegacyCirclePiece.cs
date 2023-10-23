@@ -26,7 +26,7 @@ namespace osu.Game.Rulesets.Taiko.Skinning.Legacy
         private static readonly Vector2 max_circle_sprite_size = new Vector2(160);
 
         private Drawable backgroundLayer = null!;
-        private TextureAnimation? foregroundLayer;
+        private Drawable? foregroundLayer;
 
         private Bindable<int> currentCombo { get; } = new BindableInt();
 
@@ -67,7 +67,7 @@ namespace osu.Game.Rulesets.Taiko.Skinning.Legacy
                 Origin = Anchor.Centre
             });
 
-            foregroundLayer = (TextureAnimation?)getDrawableFor("circleoverlay", true);
+            foregroundLayer = getDrawableFor("circleoverlay", true);
 
             if (foregroundLayer != null)
             {
@@ -76,7 +76,8 @@ namespace osu.Game.Rulesets.Taiko.Skinning.Legacy
 
                 // Animations in taiko skins are used in a custom way (>150 combo and animating in time with beat).
                 // For now just stop at first frame for sanity.
-                foregroundLayer.Stop();
+                if (foregroundLayer is IFramedAnimation animatedForegroundLayer)
+                    animatedForegroundLayer.Stop();
 
                 AddInternal(foregroundLayer);
             }
@@ -105,14 +106,12 @@ namespace osu.Game.Rulesets.Taiko.Skinning.Legacy
             foreach (var c in InternalChildren)
                 c.Scale = new Vector2(DrawHeight / circle_piece_size.Y);
 
-            animateForegroundLayer();
+            if (foregroundLayer is IFramedAnimation animatedForegroundLayer)
+                animateForegroundLayer(animatedForegroundLayer);
         }
 
-        private void animateForegroundLayer()
+        private void animateForegroundLayer(IFramedAnimation animation)
         {
-            if (foregroundLayer == null)
-                return;
-
             int multiplier;
 
             if (currentCombo.Value >= 150)
@@ -125,12 +124,12 @@ namespace osu.Game.Rulesets.Taiko.Skinning.Legacy
             }
             else
             {
-                foregroundLayer.GotoFrame(0);
+                animation.GotoFrame(0);
                 return;
             }
 
             animationFrame = Math.Abs(Time.Current - timingPoint.Time) % ((timingPoint.BeatLength * 2) / multiplier) >= timingPoint.BeatLength / multiplier ? 0 : 1;
-            foregroundLayer.GotoFrame(animationFrame);
+            animation.GotoFrame(animationFrame);
         }
 
         private Color4 accentColour;
