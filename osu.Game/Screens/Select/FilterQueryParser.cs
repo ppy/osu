@@ -46,11 +46,11 @@ namespace osu.Game.Screens.Select
             var openingBracketIndexes = new List<int>();
             var closingBracketIndexes = new List<int>();
 
-            populateIndexLists(ref query);
+            populateIndexLists(query);
 
             return performExtraction(ref query);
 
-            void populateIndexLists(ref string query)
+            void populateIndexLists(string query)
             {
                 bool currentlyBetweenBrackets = false;
 
@@ -58,23 +58,24 @@ namespace osu.Game.Screens.Select
                 {
                     switch (query[i])
                     {
-                        case '[' when !currentlyBetweenBrackets && (i == 0 || query[i - 1] == ' '):
-                            currentlyBetweenBrackets = true;
-                            openingBracketIndexes.Add(i + 1);
+                        case '[':
+                            if (!currentlyBetweenBrackets && (i == 0 || query[i - 1] == ' '))
+                            {
+                                currentlyBetweenBrackets = true;
+                                openingBracketIndexes.Add(i + 1);
+                            }
+
                             break;
 
-                        case ']' when currentlyBetweenBrackets && (i == query.Length - 1 || query[i + 1] == ' '):
-                            currentlyBetweenBrackets = false;
-                            closingBracketIndexes.Add(i);
+                        case ']':
+                            if (currentlyBetweenBrackets && (i == query.Length - 1 || query[i + 1] == ' '))
+                            {
+                                currentlyBetweenBrackets = false;
+                                closingBracketIndexes.Add(i);
+                            }
+
                             break;
                     }
-                }
-
-                if (currentlyBetweenBrackets)
-                {
-                    // If there is no "]" closing the current difficulty search query, append it.
-                    query += ']';
-                    closingBracketIndexes.Add(query.Length - 1);
                 }
             }
 
@@ -86,7 +87,10 @@ namespace osu.Game.Screens.Select
                 for (int i = 0; i < openingBracketIndexes.Count; i++)
                 {
                     int startIndex = openingBracketIndexes[i];
-                    int endIndex = closingBracketIndexes[i];
+
+                    int endIndex = closingBracketIndexes.Count > 0
+                        ? closingBracketIndexes[Math.Min(i, closingBracketIndexes.Count - 1)]
+                        : query.Length;
 
                     string searchText = originalQuery[startIndex..endIndex];
 
@@ -96,7 +100,9 @@ namespace osu.Game.Screens.Select
                             .Replace($" [{searchText}]", "")
                             .Replace($"[{searchText}] ", "")
                             .Replace($"[{searchText}]", "")
-                            .Replace($" [{searchText}] ", " ");
+                            .Replace($" [{searchText}] ", " ")
+                            .Replace($" [{searchText}", "")
+                            .Replace($"[{searchText}", "");
                 }
 
                 return string.Join(' ', searchTexts);
