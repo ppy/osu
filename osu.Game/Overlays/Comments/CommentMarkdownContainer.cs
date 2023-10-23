@@ -1,8 +1,6 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
 using Markdig.Syntax;
 using Markdig.Syntax.Inlines;
 using osu.Framework.Graphics;
@@ -62,7 +60,7 @@ namespace osu.Game.Overlays.Comments
                 {
                 }
 
-                private DelayedLoadWrapper wrapper;
+                private DelayedLoadWrapper wrapper = null!;
 
                 protected override Drawable CreateContent(string url) => wrapper = new DelayedLoadWrapper(CreateImageContainer(url));
 
@@ -104,7 +102,7 @@ namespace osu.Game.Overlays.Comments
                         if (t != null)
                             Size = t.Height > max_height ? new Vector2(max_height / t.Height * t.Width, max_height) : t.Size;
 
-                        return t;
+                        return t!;
                     }
                 }
             }
