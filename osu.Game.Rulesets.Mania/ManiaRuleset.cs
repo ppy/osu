@@ -250,6 +250,7 @@ namespace osu.Game.Rulesets.Mania
                         new MultiMod(new ManiaModFadeIn(), new ManiaModHidden()),
                         new ManiaModFlashlight(),
                         new ModAccuracyChallenge(),
+                        new ModNoStop(),
                     };
 
                 case ModType.Conversion:
