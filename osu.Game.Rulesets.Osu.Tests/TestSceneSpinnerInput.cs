@@ -196,7 +196,7 @@ namespace osu.Game.Rulesets.Osu.Tests
             DrawableSpinner drawableSpinner = null!;
             AddUntilStep("get spinner", () => (drawableSpinner = currentPlayer.ChildrenOfType<DrawableSpinner>().Single()) != null);
 
-            assertTotalRotation(4000, 900);
+            assertFinalRotationCorrect();
             assertTotalRotation(3750, 810);
             assertTotalRotation(3500, 720);
             assertTotalRotation(3250, 530);
@@ -205,6 +205,26 @@ namespace osu.Game.Rulesets.Osu.Tests
             assertTotalRotation(2500, 540);
             assertTotalRotation(2250, 450);
             assertTotalRotation(2000, 360);
+            assertTotalRotation(1500, 0);
+
+            // same thing but always returning to final time to check.
+            assertFinalRotationCorrect();
+            assertTotalRotation(3750, 810);
+            assertFinalRotationCorrect();
+            assertTotalRotation(3500, 720);
+            assertFinalRotationCorrect();
+            assertTotalRotation(3250, 530);
+            assertFinalRotationCorrect();
+            assertTotalRotation(3000, 450);
+            assertFinalRotationCorrect();
+            assertTotalRotation(2750, 540);
+            assertFinalRotationCorrect();
+            assertTotalRotation(2500, 540);
+            assertFinalRotationCorrect();
+            assertTotalRotation(2250, 450);
+            assertFinalRotationCorrect();
+            assertTotalRotation(2000, 360);
+            assertFinalRotationCorrect();
             assertTotalRotation(1500, 0);
 
             void assertTotalRotation(double time, float expected)
@@ -220,6 +240,8 @@ namespace osu.Game.Rulesets.Osu.Tests
                 // Lenience is required due to interpolation running slightly ahead on a stalled clock.
                 AddUntilStep("wait for seek to finish", () => drawableRuleset.FrameStableClock.CurrentTime, () => Is.EqualTo(time));
             }
+
+            void assertFinalRotationCorrect() => assertTotalRotation(4000, 900);
         }
 
         private void assertTicksHit(int count)
