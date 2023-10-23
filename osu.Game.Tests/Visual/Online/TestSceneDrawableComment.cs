@@ -64,7 +64,8 @@ namespace osu.Game.Tests.Visual.Online
             new[] { "Plain", "This is plain comment" },
             new[] { "Pinned", "This is pinned comment" },
             new[] { "Link", "Please visit https://osu.ppy.sh" },
-
+            new[] { "Big Image", "![](Backgrounds/bg1)" },
+            new[] { "Small Image", "![](Cursor/cursortrail)" },
             new[]
             {
                 "Heading", @"# Heading 1
