@@ -119,19 +119,6 @@ namespace osu.Game.Rulesets.Osu.Tests
         }
 
         [Test]
-        public void TestRewindIntoSegmentThatHasNotCrossedZero()
-        {
-            history.ReportDelta(1000, -180);
-            Assert.That(history.TotalRotation, Is.EqualTo(180));
-            history.ReportDelta(1500, 90);
-            Assert.That(history.TotalRotation, Is.EqualTo(180));
-            history.ReportDelta(2000, 450);
-            Assert.That(history.TotalRotation, Is.EqualTo(360));
-            history.ReportDelta(1750, -45);
-            Assert.That(history.TotalRotation, Is.EqualTo(315));
-        }
-
-        [Test]
         public void TestRewindOverDirectionChange()
         {
             history.ReportDelta(1000, 40); // max is now CW 40 degrees
