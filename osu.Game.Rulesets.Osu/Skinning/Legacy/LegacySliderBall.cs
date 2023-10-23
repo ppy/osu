@@ -37,18 +37,23 @@ namespace osu.Game.Rulesets.Osu.Skinning.Legacy
         }
 
         [BackgroundDependencyLoader]
-        private void load(DrawableHitObject drawableHitObject)
+        private void load()
         {
             var ballColour = skin.GetConfig<OsuSkinColour, Color4>(OsuSkinColour.SliderBall)?.Value ?? Color4.White;
 
-            DrawableSlider drawableSlider = (DrawableSlider)drawableHitObject;
+            double? ballAnimationRate = null;
 
-            // stable apparently calculates slider velocity in units of seconds rather than milliseconds.
-            double stableSliderVelocity = drawableSlider.HitObject.Velocity * 1000;
+            if (parentObject != null)
+            {
+                DrawableSlider drawableSlider = (DrawableSlider)parentObject;
 
-            double ballAnimationRate = Math.Max(
-                150 / stableSliderVelocity * LegacySkinExtensions.SIXTY_FRAME_TIME,
-                LegacySkinExtensions.SIXTY_FRAME_TIME);
+                // stable apparently calculates slider velocity in units of seconds rather than milliseconds.
+                double stableSliderVelocity = drawableSlider.HitObject.Velocity * 1000;
+
+                ballAnimationRate = Math.Max(
+                    150 / stableSliderVelocity * LegacySkinExtensions.SIXTY_FRAME_TIME,
+                    LegacySkinExtensions.SIXTY_FRAME_TIME);
+            }
 
             Vector2 maxSize = OsuLegacySkinTransformer.MAX_FOLLOW_CIRCLE_AREA_SIZE;
 
