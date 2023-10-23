@@ -263,6 +263,11 @@ namespace osu.Game.Tests.Visual.Multiplayer
             return Task.CompletedTask;
         }
 
+        public override Task InvitePlayer(int userId)
+        {
+            return Task.CompletedTask;
+        }
+
         public override Task TransferHost(int userId)
         {
             userId = clone(userId);

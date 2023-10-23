@@ -312,7 +312,9 @@ namespace osu.Game.Tests.Visual.SongSelect
         {
             createSongSelect();
 
-            addRulesetImportStep(0);
+            // We need to use one real beatmap to trigger the "same-track-transfer" logic that we're looking to test here.
+            // See `SongSelect.ensurePlayingSelected` and `WorkingBeatmap.TryTransferTrack`.
+            AddStep("import test beatmap", () => manager.Import(new ImportTask(TestResources.GetTestBeatmapForImport())).WaitSafely());
             addRulesetImportStep(0);
 
             checkMusicPlaying(true);
@@ -321,6 +323,8 @@ namespace osu.Game.Tests.Visual.SongSelect
 
             AddStep("manual pause", () => music.TogglePause());
             checkMusicPlaying(false);
+
+            // Track should not have changed, so music should still not be playing.
             AddStep("select next difficulty", () => songSelect!.Carousel.SelectNext(skipDifficulties: false));
             checkMusicPlaying(false);
 

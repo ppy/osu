@@ -16,6 +16,7 @@ using osu.Framework.Audio;
 using osu.Framework.Audio.Track;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
+using osu.Framework.Graphics.Colour;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.IO.Stores;
 using osu.Framework.Platform;
@@ -23,6 +24,7 @@ using osu.Framework.Testing;
 using osu.Framework.Timing;
 using osu.Game.Beatmaps;
 using osu.Game.Database;
+using osu.Game.Graphics;
 using osu.Game.Online.API;
 using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Overlays;
@@ -158,19 +160,24 @@ namespace osu.Game.Tests.Visual
             return Dependencies;
         }
 
+        [Resolved]
+        private OsuColour colours { get; set; }
+
         protected override void LoadComplete()
         {
             base.LoadComplete();
 
-            var parentBeatmap = Parent.Dependencies.Get<Bindable<WorkingBeatmap>>();
+            ChangeBackgroundColour(ColourInfo.GradientVertical(colours.GreyCarmine, colours.GreyCarmineDarker));
+
+            var parentBeatmap = Parent!.Dependencies.Get<Bindable<WorkingBeatmap>>();
             parentBeatmap.Value = Beatmap.Value;
             Beatmap.BindTo(parentBeatmap);
 
-            var parentRuleset = Parent.Dependencies.Get<Bindable<RulesetInfo>>();
+            var parentRuleset = Parent!.Dependencies.Get<Bindable<RulesetInfo>>();
             parentRuleset.Value = Ruleset.Value;
             Ruleset.BindTo(parentRuleset);
 
-            var parentMods = Parent.Dependencies.Get<Bindable<IReadOnlyList<Mod>>>();
+            var parentMods = Parent!.Dependencies.Get<Bindable<IReadOnlyList<Mod>>>();
             parentMods.Value = SelectedMods.Value;
             SelectedMods.BindTo(parentMods);
         }

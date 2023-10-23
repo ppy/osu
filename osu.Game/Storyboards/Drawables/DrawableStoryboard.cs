@@ -23,7 +23,7 @@ namespace osu.Game.Storyboards.Drawables
 {
     public partial class DrawableStoryboard : Container<DrawableStoryboardLayer>
     {
-        [Cached]
+        [Cached(typeof(Storyboard))]
         public Storyboard Storyboard { get; }
 
         /// <summary>
@@ -35,7 +35,7 @@ namespace osu.Game.Storyboards.Drawables
 
         protected override Container<DrawableStoryboardLayer> Content { get; }
 
-        protected override Vector2 DrawScale => new Vector2(Parent.DrawHeight / 480);
+        protected override Vector2 DrawScale => new Vector2(Parent!.DrawHeight / 480);
 
         private bool passing = true;
 

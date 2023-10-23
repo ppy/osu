@@ -78,6 +78,7 @@ namespace osu.Game.Graphics
                 case HitResult.SmallTickMiss:
                 case HitResult.LargeTickMiss:
                 case HitResult.Miss:
+                case HitResult.ComboBreak:
                     return Red;
 
                 case HitResult.Meh:
@@ -396,5 +397,7 @@ namespace osu.Game.Graphics
 
         public Color4 SpotlightColour => Green2;
         public Color4 FeaturedArtistColour => Blue2;
+
+        public Color4 DangerousButtonColour => Pink3;
     }
 }

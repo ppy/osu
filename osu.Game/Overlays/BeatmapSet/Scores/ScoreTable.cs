@@ -24,6 +24,7 @@ using osu.Framework.Localisation;
 using osu.Framework.Extensions.LocalisationExtensions;
 using osu.Framework.Graphics.Cursor;
 using osu.Game.Resources.Localisation.Web;
+using osu.Game.Rulesets.Mods;
 using osu.Game.Scoring.Drawables;
 
 namespace osu.Game.Overlays.BeatmapSet.Scores
@@ -195,7 +196,7 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
                 Direction = FillDirection.Horizontal,
                 AutoSizeAxes = Axes.Both,
                 Spacing = new Vector2(1),
-                ChildrenEnumerable = score.Mods.Select(m => new ModIcon(m)
+                ChildrenEnumerable = score.Mods.AsOrdered().Select(m => new ModIcon(m)
                 {
                     AutoSizeAxes = Axes.Both,
                     Scale = new Vector2(0.3f)

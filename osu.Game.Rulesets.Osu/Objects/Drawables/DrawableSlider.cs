@@ -4,6 +4,7 @@
 #nullable disable
 
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using JetBrains.Annotations;
 using osu.Framework.Allocation;
@@ -34,6 +35,13 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
         public SkinnableDrawable Body { get; private set; }
 
         private ShakeContainer shakeContainer;
+
+        protected override IEnumerable<Drawable> DimmablePieces => new Drawable[]
+        {
+            HeadCircle,
+            TailCircle,
+            Body,
+        };
 
         /// <summary>
         /// A target container which can be used to add top level elements to the slider's display.
@@ -256,7 +264,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
 
         protected override void CheckForResult(bool userTriggered, double timeOffset)
         {
-            if (userTriggered || Time.Current < HitObject.EndTime)
+            if (userTriggered || !TailCircle.Judged || Time.Current < HitObject.EndTime)
                 return;
 
             // If only the nested hitobjects are judged, then the slider's own judgement is ignored for scoring purposes.
@@ -288,7 +296,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
         public override void PlaySamples()
         {
             // rather than doing it this way, we should probably attach the sample to the tail circle.
-            // this can only be done after we stop using LegacyLastTick.
+            // this can only be done if we stop using LastTick.
             if (!TailCircle.SamplePlaysOnlyOnHit || TailCircle.IsHit)
                 base.PlaySamples();
         }

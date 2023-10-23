@@ -6,6 +6,7 @@
 using System;
 using System.Diagnostics;
 using System.Net.Http;
+using System.Net.Sockets;
 using Newtonsoft.Json;
 using osu.Framework.Bindables;
 
@@ -99,9 +100,19 @@ namespace osu.Game.Online.API
                     return true;
                 }
             }
+            catch (SocketException)
+            {
+                // Network failure.
+                return false;
+            }
+            catch (HttpRequestException)
+            {
+                // Network failure.
+                return false;
+            }
             catch
             {
-                //todo: potentially only kill the refresh token on certain exception types.
+                // Force a full re-authentication.
                 Token.Value = null;
                 return false;
             }

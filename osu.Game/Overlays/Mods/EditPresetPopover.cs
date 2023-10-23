@@ -159,7 +159,7 @@ namespace osu.Game.Overlays.Mods
 
         private void updateState()
         {
-            scrollContent.ChildrenEnumerable = saveableMods.Select(mod => new ModPresetRow(mod));
+            scrollContent.ChildrenEnumerable = saveableMods.AsOrdered().Select(mod => new ModPresetRow(mod));
             useCurrentModsButton.Enabled.Value = checkSelectedModsDiffersFromSaved();
         }
 

@@ -33,7 +33,7 @@ namespace osu.Game.Tests.Beatmaps.Formats
         [Test]
         public void TestDecodeBeatmapVersion()
         {
-            using (var resStream = TestResources.OpenResource("beatmap-version.osu"))
+            using (var resStream = TestResources.OpenResource("beatmap-version-6.osu"))
             using (var stream = new LineBufferedReader(resStream))
             {
                 var decoder = Decoder.GetDecoder<Beatmap>(stream);
@@ -42,6 +42,25 @@ namespace osu.Game.Tests.Beatmaps.Formats
                 Assert.AreEqual(6, working.BeatmapInfo.BeatmapVersion);
                 Assert.AreEqual(6, working.Beatmap.BeatmapInfo.BeatmapVersion);
                 Assert.AreEqual(6, working.GetPlayableBeatmap(new OsuRuleset().RulesetInfo, Array.Empty<Mod>()).BeatmapInfo.BeatmapVersion);
+            }
+        }
+
+        [TestCase(false)]
+        [TestCase(true)]
+        public void TestPreviewPointWithOffsets(bool applyOffsets)
+        {
+            using (var resStream = TestResources.OpenResource("beatmap-version-4.osu"))
+            using (var stream = new LineBufferedReader(resStream))
+            {
+                var decoder = Decoder.GetDecoder<Beatmap>(stream);
+                ((LegacyBeatmapDecoder)decoder).ApplyOffsets = applyOffsets;
+                var working = new TestWorkingBeatmap(decoder.Decode(stream));
+
+                Assert.AreEqual(4, working.BeatmapInfo.BeatmapVersion);
+                Assert.AreEqual(4, working.Beatmap.BeatmapInfo.BeatmapVersion);
+                Assert.AreEqual(4, working.GetPlayableBeatmap(new OsuRuleset().RulesetInfo, Array.Empty<Mod>()).BeatmapInfo.BeatmapVersion);
+
+                Assert.AreEqual(-1, working.BeatmapInfo.Metadata.PreviewTime);
             }
         }
 
@@ -915,10 +934,11 @@ namespace osu.Game.Tests.Beatmaps.Formats
             }
         }
 
-        [Test]
-        public void TestLegacyDefaultsPreserved()
+        [TestCase(false)]
+        [TestCase(true)]
+        public void TestLegacyDefaultsPreserved(bool applyOffsets)
         {
-            var decoder = new LegacyBeatmapDecoder { ApplyOffsets = false };
+            var decoder = new LegacyBeatmapDecoder { ApplyOffsets = applyOffsets };
 
             using (var memoryStream = new MemoryStream())
             using (var stream = new LineBufferedReader(memoryStream))
@@ -1058,6 +1078,19 @@ namespace osu.Game.Tests.Beatmaps.Formats
 
                 Assert.That(controlPoints.DifficultyPointAt(2000).GenerateTicks, Is.False);
                 Assert.That(controlPoints.DifficultyPointAt(3000).GenerateTicks, Is.True);
+            }
+        }
+
+        [Test]
+        public void TestSamplePointLeniency()
+        {
+            var decoder = new LegacyBeatmapDecoder { ApplyOffsets = false };
+
+            using (var resStream = TestResources.OpenResource("sample-point-leniency.osu"))
+            using (var stream = new LineBufferedReader(resStream))
+            {
+                var hitObject = decoder.Decode(stream).HitObjects.Single();
+                Assert.That(hitObject.Samples.Select(s => s.Volume), Has.All.EqualTo(70));
             }
         }
     }
