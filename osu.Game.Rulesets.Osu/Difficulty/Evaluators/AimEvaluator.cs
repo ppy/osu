@@ -126,7 +126,6 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
                 readingBonus += calculateSliderEndReadingDifficulty(slider) * slider_end_reading_multiplier;
                 sliderBonus *= readingBonus;
             }
-            }
 
             // Add in acute angle bonus or wide angle bonus + velocity change bonus, whichever is larger.
             aimStrain += Math.Max(acuteAngleBonus * acute_angle_multiplier, wideAngleBonus * wide_angle_multiplier + velocityChangeBonus * velocity_change_multiplier);
