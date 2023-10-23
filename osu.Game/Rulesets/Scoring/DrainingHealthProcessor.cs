@@ -42,7 +42,6 @@ namespace osu.Game.Rulesets.Scoring
         private const double max_health_target = 0.4;
 
         private IBeatmap beatmap;
-
         private double gameplayEndTime;
 
         private readonly double drainStartTime;
