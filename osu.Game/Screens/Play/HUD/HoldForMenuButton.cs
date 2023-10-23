@@ -57,7 +57,8 @@ namespace osu.Game.Screens.Play.HUD
                     Anchor = Anchor.CentreLeft,
                     Origin = Anchor.CentreLeft
                 },
-                button = new HoldButton(player?.Configuration.AllowRestart == false)
+                button = new HoldButton(player?.Configuration.AllowRestart == false
+                                        || player?.Configuration.AllowPause == false)
                 {
                     HoverGained = () => text.FadeIn(500, Easing.OutQuint),
                     HoverLost = () => text.FadeOut(500, Easing.OutQuint),
