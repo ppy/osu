@@ -402,7 +402,7 @@ namespace osu.Game.Tests.NonVisual.Filtering
         [TestCase("diff=Diff", new[] { 0, 1, 3, 4, 6 })]
         [TestCase("diff=Diff1", new[] { 0 })]
         [TestCase("diff=\"Diff\"", new[] { 3, 4, 6 })]
-        [TestCase("diff=!\"Diff\"", new int[] {})]
+        [TestCase("diff=!\"Diff\"", new int[] { })]
         public void TestDifficultySearch(string query, int[] expectedBeatmapIndexes)
         {
             var carouselBeatmaps = (((string title, string difficultyName)[])new[]
