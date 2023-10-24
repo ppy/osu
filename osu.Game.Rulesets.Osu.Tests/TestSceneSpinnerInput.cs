@@ -53,7 +53,6 @@ namespace osu.Game.Rulesets.Osu.Tests
         /// While off-centre, vibrates backwards and forwards on the x-axis, from centre-50 to centre+50, every 50ms.
         /// </summary>
         [Test]
-        [Ignore("An upcoming implementation will fix this case")]
         public void TestVibrateWithoutSpinningOffCentre()
         {
             List<ReplayFrame> frames = new List<ReplayFrame>();
@@ -81,7 +80,6 @@ namespace osu.Game.Rulesets.Osu.Tests
         /// While centred on the slider, vibrates backwards and forwards on the x-axis, from centre-50 to centre+50, every 50ms.
         /// </summary>
         [Test]
-        [Ignore("An upcoming implementation will fix this case")]
         public void TestVibrateWithoutSpinningOnCentre()
         {
             List<ReplayFrame> frames = new List<ReplayFrame>();
@@ -130,7 +128,6 @@ namespace osu.Game.Rulesets.Osu.Tests
         /// No ticks should be hit since the total rotation is -0.5 (0.5 CW + 1 CCW = 0.5 CCW).
         /// </summary>
         [Test]
-        [Ignore("An upcoming implementation will fix this case")]
         public void TestSpinHalfBothDirections()
         {
             performTest(new SpinFramesGenerator(time_spinner_start)
@@ -149,7 +146,6 @@ namespace osu.Game.Rulesets.Osu.Tests
         [TestCase(-180, 540, 1)]
         [TestCase(180, -900, 2)]
         [TestCase(-180, 900, 2)]
-        [Ignore("An upcoming implementation will fix this case")]
         public void TestSpinOneDirectionThenChangeDirection(float direction1, float direction2, int expectedTicks)
         {
             performTest(new SpinFramesGenerator(time_spinner_start)
@@ -162,18 +158,28 @@ namespace osu.Game.Rulesets.Osu.Tests
         }
 
         [Test]
-        [Ignore("An upcoming implementation will fix this case")]
         public void TestRewind()
         {
-            AddStep("set manual clock", () => manualClock = new ManualClock { Rate = 1 });
+            AddStep("set manual clock", () => manualClock = new ManualClock
+            {
+                // Avoids interpolation trying to run ahead during testing.
+                Rate = 0
+            });
 
-            List<ReplayFrame> frames = new SpinFramesGenerator(time_spinner_start)
-                                       .Spin(360, 500) // 2000ms -> 1 full CW spin
-                                       .Spin(-180, 500) // 2500ms -> 0.5 CCW spins
-                                       .Spin(90, 500) // 3000ms -> 0.25 CW spins
-                                       .Spin(450, 500) // 3500ms -> 1 full CW spin
-                                       .Spin(180, 500) // 4000ms -> 0.5 CW spins
-                                       .Build();
+            List<ReplayFrame> frames =
+                new SpinFramesGenerator(time_spinner_start)
+                    // 1500ms start
+                    .Spin(360, 500)
+                    // 2000ms -> 1 full CW spin
+                    .Spin(-180, 500)
+                    // 2500ms -> 1 full CW spin + 0.5 CCW spins
+                    .Spin(90, 500)
+                    // 3000ms -> 1 full CW spin + 0.25 CCW spins
+                    .Spin(450, 500)
+                    // 3500ms -> 2 full CW spins
+                    .Spin(180, 500)
+                    // 4000ms -> 2 full CW spins + 0.5 CW spins
+                    .Build();
 
             loadPlayer(frames);
 
@@ -190,15 +196,35 @@ namespace osu.Game.Rulesets.Osu.Tests
             DrawableSpinner drawableSpinner = null!;
             AddUntilStep("get spinner", () => (drawableSpinner = currentPlayer.ChildrenOfType<DrawableSpinner>().Single()) != null);
 
-            assertTotalRotation(4000, 900);
+            assertFinalRotationCorrect();
             assertTotalRotation(3750, 810);
             assertTotalRotation(3500, 720);
             assertTotalRotation(3250, 530);
-            assertTotalRotation(3000, 540);
+            assertTotalRotation(3000, 450);
             assertTotalRotation(2750, 540);
             assertTotalRotation(2500, 540);
-            assertTotalRotation(2250, 360);
-            assertTotalRotation(2000, 180);
+            assertTotalRotation(2250, 450);
+            assertTotalRotation(2000, 360);
+            assertTotalRotation(1500, 0);
+
+            // same thing but always returning to final time to check.
+            assertFinalRotationCorrect();
+            assertTotalRotation(3750, 810);
+            assertFinalRotationCorrect();
+            assertTotalRotation(3500, 720);
+            assertFinalRotationCorrect();
+            assertTotalRotation(3250, 530);
+            assertFinalRotationCorrect();
+            assertTotalRotation(3000, 450);
+            assertFinalRotationCorrect();
+            assertTotalRotation(2750, 540);
+            assertFinalRotationCorrect();
+            assertTotalRotation(2500, 540);
+            assertFinalRotationCorrect();
+            assertTotalRotation(2250, 450);
+            assertFinalRotationCorrect();
+            assertTotalRotation(2000, 360);
+            assertFinalRotationCorrect();
             assertTotalRotation(1500, 0);
 
             void assertTotalRotation(double time, float expected)
@@ -211,8 +237,11 @@ namespace osu.Game.Rulesets.Osu.Tests
             void addSeekStep(double time)
             {
                 AddStep($"seek to {time}", () => clock.Seek(time));
+                // Lenience is required due to interpolation running slightly ahead on a stalled clock.
                 AddUntilStep("wait for seek to finish", () => drawableRuleset.FrameStableClock.CurrentTime, () => Is.EqualTo(time));
             }
+
+            void assertFinalRotationCorrect() => assertTotalRotation(4000, 900);
         }
 
         private void assertTicksHit(int count)
