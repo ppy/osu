@@ -20,6 +20,12 @@ namespace osu.Game.Skinning
     /// </summary>
     public partial class SkinnableSound : SkinReloadableDrawable, IAdjustableAudioComponent
     {
+        /// <summary>
+        /// The minimum allowable volume for <see cref="Samples"/>.
+        /// <see cref="Samples"/> that specify a lower <see cref="ISampleInfo.Volume"/> will be forcibly pulled up to this volume.
+        /// </summary>
+        public int MinimumSampleVolume { get; set; }
+
         public override bool RemoveWhenNotAlive => false;
         public override bool RemoveCompletedTransforms => false;
 
@@ -156,7 +162,7 @@ namespace osu.Game.Skinning
             {
                 var sample = samplePool?.GetPooledSample(s) ?? new PoolableSkinnableSample(s);
                 sample.Looping = Looping;
-                sample.Volume.Value = s.Volume / 100.0;
+                sample.Volume.Value = Math.Max(s.Volume, MinimumSampleVolume) / 100.0;
 
                 samplesContainer.Add(sample);
             }
