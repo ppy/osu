@@ -90,7 +90,7 @@ namespace osu.Game.Users
         [Description("Belize")]
         BZ,
 
-        [Description("Russia")]
+        [Description("Russian Federation")]
         RU,
 
         [Description("Rwanda")]
@@ -639,7 +639,7 @@ namespace osu.Game.Users
         [Description("Trinidad and Tobago")]
         TT,
 
-        [Description("Turkey")]
+        [Description("Türkiye")]
         TR,
 
         [Description("Sri Lanka")]
