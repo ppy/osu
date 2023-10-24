@@ -398,7 +398,7 @@ namespace osu.Game.Tests.NonVisual.Filtering
         [TestCase("[diff ]with]", new[] { 4 })]
         [TestCase("[diff ]with [[ brackets]]]]", new[] { 4 })]
         [TestCase("[Diff in title]", new int[] { })]
-        [TestCase("[Diff in diff]", new int[] { 6 })]
+        [TestCase("[Diff in diff]", new[] { 6 })]
         [TestCase("diff=Diff", new[] { 0, 1, 3, 4, 6 })]
         [TestCase("diff=Diff1", new[] { 0 })]
         [TestCase("diff=\"Diff\"", new[] { 3, 4, 6 })]
