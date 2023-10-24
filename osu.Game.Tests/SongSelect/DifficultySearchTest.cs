@@ -11,7 +11,7 @@ using osu.Game.Tests.Visual;
 
 namespace osu.Game.Tests.SongSelect
 {
-    public partial class TestSceneDifficultySearch : OsuTestScene
+    public partial class DifficultySearchTest : OsuTestScene
     {
         private static readonly (string title, string difficultyName)[] beatmaps =
         {
