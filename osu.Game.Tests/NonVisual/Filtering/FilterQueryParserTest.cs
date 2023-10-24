@@ -399,6 +399,10 @@ namespace osu.Game.Tests.NonVisual.Filtering
         [TestCase("[diff ]with [[ brackets]]]]", new[] { 4 })]
         [TestCase("[Diff in title]", new int[] { })]
         [TestCase("[Diff in diff]", new int[] { 6 })]
+        [TestCase("diff=Diff", new[] { 0, 1, 3, 4, 6 })]
+        [TestCase("diff=Diff1", new[] { 0 })]
+        [TestCase("diff=\"Diff\"", new[] { 3, 4, 6 })]
+        [TestCase("diff=!\"Diff\"", new int[] {})]
         public void TestDifficultySearch(string query, int[] expectedBeatmapIndexes)
         {
             var carouselBeatmaps = (((string title, string difficultyName)[])new[]
@@ -424,15 +428,11 @@ namespace osu.Game.Tests.NonVisual.Filtering
             FilterQueryParser.ApplyQueries(criteria, query);
             carouselBeatmaps.ForEach(b => b.Filter(criteria));
 
-            Assert.That(carouselBeatmaps.All(b =>
-            {
-                int index = carouselBeatmaps.IndexOf(b);
+            int[] visibleBeatmaps = carouselBeatmaps
+                                    .Where(b => !b.Filtered.Value)
+                                    .Select(b => carouselBeatmaps.IndexOf(b)).ToArray();
 
-                bool shouldBeVisible = expectedBeatmapIndexes.Contains(index);
-                bool isVisible = !b.Filtered.Value;
-
-                return isVisible == shouldBeVisible;
-            }));
+            Assert.That(visibleBeatmaps, Is.EqualTo(expectedBeatmapIndexes));
         }
 
         private class CustomFilterCriteria : IRulesetFilterCriteria
