@@ -15,6 +15,12 @@ namespace osu.Game.Users
         [Description("Unknown")]
         Unknown = 0,
 
+        [Description("Anonymous Proxy")]
+        A1,
+
+        [Description("Satellite Provider")]
+        A2,
+
         [Description("Andorra")]
         AD,
 
@@ -36,8 +42,14 @@ namespace osu.Game.Users
         [Description("Armenia")]
         AM,
 
+        [Description("Netherlands Antilles")]
+        AN,
+
         [Description("Angola")]
         AO,
+
+        [Description("Asia/Pacific Region")]
+        AP,
 
         [Description("Antarctica")]
         AQ,
@@ -102,7 +114,7 @@ namespace osu.Game.Users
         [Description("Bolivia")]
         BO,
 
-        [Description("Bonaire, Saint Eustatius and Saba")]
+        [Description("Caribbean Netherlands")]
         BQ,
 
         [Description("Brazil")]
@@ -129,22 +141,22 @@ namespace osu.Game.Users
         [Description("Canada")]
         CA,
 
-        [Description("Cocos Islands")]
+        [Description("Cocos (Keeling) Islands")]
         CC,
 
-        [Description("Democratic Republic of the Congo")]
+        [Description("The Democratic Republic of the Congo")]
         CD,
 
         [Description("Central African Republic")]
         CF,
 
-        [Description("Republic of the Congo")]
+        [Description("Congo")]
         CG,
 
         [Description("Switzerland")]
         CH,
 
-        [Description("Ivory Coast")]
+        [Description("Cote D'Ivoire")]
         CI,
 
         [Description("Cook Islands")]
@@ -171,7 +183,7 @@ namespace osu.Game.Users
         [Description("Cabo Verde")]
         CV,
 
-        [Description("Curacao")]
+        [Description("Curaçao")]
         CW,
 
         [Description("Christmas Island")]
@@ -180,7 +192,7 @@ namespace osu.Game.Users
         [Description("Cyprus")]
         CY,
 
-        [Description("Czech Republic")]
+        [Description("Czechia")]
         CZ,
 
         [Description("Germany")]
@@ -222,16 +234,19 @@ namespace osu.Game.Users
         [Description("Ethiopia")]
         ET,
 
+        [Description("Europe")]
+        EU,
+
         [Description("Finland")]
         FI,
 
         [Description("Fiji")]
         FJ,
 
-        [Description("Falkland Islands")]
+        [Description("Falkland Islands (Malvinas)")]
         FK,
 
-        [Description("Micronesia")]
+        [Description("Federated States of Micronesia")]
         FM,
 
         [Description("Faroe Islands")]
@@ -239,6 +254,9 @@ namespace osu.Game.Users
 
         [Description("France")]
         FR,
+
+        [Description("France, Metropolitan")]
+        FX,
 
         [Description("Gabon")]
         GA,
@@ -336,7 +354,7 @@ namespace osu.Game.Users
         [Description("Iraq")]
         IQ,
 
-        [Description("Iran")]
+        [Description("Islamic Republic of Iran")]
         IR,
 
         [Description("Iceland")]
@@ -375,7 +393,7 @@ namespace osu.Game.Users
         [Description("Saint Kitts and Nevis")]
         KN,
 
-        [Description("North Korea")]
+        [Description("Democratic People's Republic of Korea")]
         KP,
 
         [Description("South Korea")]
@@ -390,7 +408,7 @@ namespace osu.Game.Users
         [Description("Kazakhstan")]
         KZ,
 
-        [Description("Laos")]
+        [Description("Lao People's Democratic Republic")]
         LA,
 
         [Description("Lebanon")]
@@ -456,7 +474,7 @@ namespace osu.Game.Users
         [Description("Mongolia")]
         MN,
 
-        [Description("Macao")]
+        [Description("Macau")]
         MO,
 
         [Description("Northern Mariana Islands")]
@@ -528,6 +546,9 @@ namespace osu.Game.Users
         [Description("New Zealand")]
         NZ,
 
+        [Description("Other")]
+        O1,
+
         [Description("Oman")]
         OM,
 
@@ -561,7 +582,7 @@ namespace osu.Game.Users
         [Description("Puerto Rico")]
         PR,
 
-        [Description("Palestinian Territory")]
+        [Description("State of Palestine")]
         PS,
 
         [Description("Portugal")]
@@ -636,9 +657,6 @@ namespace osu.Game.Users
         [Description("Suriname")]
         SR,
 
-        [Description("South Sudan")]
-        SS,
-
         [Description("Sao Tome and Principe")]
         ST,
 
@@ -648,7 +666,7 @@ namespace osu.Game.Users
         [Description("Sint Maarten")]
         SX,
 
-        [Description("Syria")]
+        [Description("Syrian Arab Republic")]
         SY,
 
         [Description("Eswatini")]
@@ -675,7 +693,7 @@ namespace osu.Game.Users
         [Description("Tokelau")]
         TK,
 
-        [Description("East Timor")]
+        [Description("Timor-Leste")]
         TL,
 
         [Description("Turkmenistan")]
@@ -699,7 +717,7 @@ namespace osu.Game.Users
         [Description("Taiwan")]
         TW,
 
-        [Description("Tanzania")]
+        [Description("United Republic of Tanzania")]
         TZ,
 
         [Description("Ukraine")]
@@ -720,7 +738,7 @@ namespace osu.Game.Users
         [Description("Uzbekistan")]
         UZ,
 
-        [Description("Vatican")]
+        [Description("Holy See (Vatican City State)")]
         VA,
 
         [Description("Saint Vincent and the Grenadines")]
@@ -729,10 +747,10 @@ namespace osu.Game.Users
         [Description("Venezuela")]
         VE,
 
-        [Description("British Virgin Islands")]
+        [Description("Virgin Islands, British")]
         VG,
 
-        [Description("U.S. Virgin Islands")]
+        [Description("Virgin Islands, U.S.")]
         VI,
 
         [Description("Vietnam")]
