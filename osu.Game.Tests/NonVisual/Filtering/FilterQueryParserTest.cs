@@ -390,14 +390,16 @@ namespace osu.Game.Tests.NonVisual.Filtering
         [TestCase("My[Favourite]", new[] { 2 })]
         [TestCase("My[Favourite]Song", new[] { 2 })]
         [TestCase("Favourite]", new[] { 2 })]
-        [TestCase("[Diff", new[] { 0, 1, 3, 4 })]
-        [TestCase("[Diff]", new[] { 0, 1, 3, 4 })]
+        [TestCase("[Diff", new[] { 0, 1, 3, 4, 6 })]
+        [TestCase("[Diff]", new[] { 0, 1, 3, 4, 6 })]
         [TestCase("[Favourite]", new[] { 3 })]
         [TestCase("Title1 [Diff]", new[] { 0, 1 })]
         [TestCase("Title1[Diff]", new int[] { })]
         [TestCase("[diff ]with]", new[] { 4 })]
         [TestCase("[diff ]with [[ brackets]]]]", new[] { 4 })]
         [TestCase("[diff] another [brackets]", new[] { 4 })]
+        [TestCase("[Diff in title]", new int[] { })]
+        [TestCase("[Diff in diff]", new int[] { 6 })]
         public void TestDifficultySearch(string query, int[] expectedBeatmapIndexes)
         {
             var carouselBeatmaps = (((string title, string difficultyName)[])new[]
@@ -407,6 +409,8 @@ namespace osu.Game.Tests.NonVisual.Filtering
                 ("My[Favourite]Song", "Expert"),
                 ("Title", "My Favourite Diff"),
                 ("Another One", "diff ]with [[ brackets]]]"),
+                ("Diff in title", "a"),
+                ("a", "Diff in diff"),
             }).Select(info => new CarouselBeatmap(new BeatmapInfo
             {
                 Metadata = new BeatmapMetadata
