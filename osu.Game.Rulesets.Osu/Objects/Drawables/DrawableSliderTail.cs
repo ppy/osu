@@ -4,6 +4,7 @@
 #nullable disable
 
 using System.Diagnostics;
+using System.Linq;
 using JetBrains.Annotations;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
@@ -129,11 +130,12 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
             if (userTriggered)
                 return;
 
-            // Ensure the tail can only activate after all previous ticks already have.
+            // Ensure the tail can only activate after all previous ticks/repeats already have.
             //
             // This covers the edge case where the lenience may allow the tail to activate before
             // the last tick, changing ordering of score/combo awarding.
-            if (DrawableSlider.NestedHitObjects.Count > 1 && !DrawableSlider.NestedHitObjects[^2].Judged)
+            var lastTick = DrawableSlider.NestedHitObjects.LastOrDefault(o => o.HitObject is SliderTick || o.HitObject is SliderRepeat);
+            if (lastTick?.Judged == false)
                 return;
 
             // The player needs to have engaged in tracking at any point after the tail leniency cutoff.
