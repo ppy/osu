@@ -120,11 +120,8 @@ namespace osu.Game.Rulesets.Osu.Skinning.Legacy
             {
                 DrawableSlider drawableSlider = (DrawableSlider)drawableObject;
 
-                // stable apparently calculates slider velocity in units of seconds rather than milliseconds.
-                double stableSliderVelocity = drawableSlider.HitObject.Velocity * 1000;
-
                 frameDelay = Math.Max(
-                    150 / stableSliderVelocity * LegacySkinExtensions.SIXTY_FRAME_TIME,
+                    0.15 / drawableSlider.HitObject.Velocity * LegacySkinExtensions.SIXTY_FRAME_TIME,
                     LegacySkinExtensions.SIXTY_FRAME_TIME);
             }
             else
