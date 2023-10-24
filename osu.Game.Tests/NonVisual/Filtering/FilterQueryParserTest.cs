@@ -2,10 +2,12 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
+using System.Linq;
 using NUnit.Framework;
 using osu.Game.Beatmaps;
 using osu.Game.Rulesets.Filter;
 using osu.Game.Screens.Select;
+using osu.Game.Screens.Select.Carousel;
 using osu.Game.Screens.Select.Filter;
 
 namespace osu.Game.Tests.NonVisual.Filtering
@@ -380,6 +382,54 @@ namespace osu.Game.Tests.NonVisual.Filtering
             FilterQueryParser.ApplyQueries(filterCriteria, query);
             Assert.AreEqual("readme", customCriteria.CustomValue);
             Assert.AreEqual("unrecognised=keyword", filterCriteria.SearchText.Trim());
+        }
+
+        [TestCase("[1]", new[] { 0 })]
+        [TestCase("[1", new[] { 0 })]
+        [TestCase("My[Favourite", new[] { 2 })]
+        [TestCase("My[Favourite]", new[] { 2 })]
+        [TestCase("My[Favourite]Song", new[] { 2 })]
+        [TestCase("Favourite]", new[] { 2 })]
+        [TestCase("[Diff", new[] { 0, 1, 3, 4 })]
+        [TestCase("[Diff]", new[] { 0, 1, 3, 4 })]
+        [TestCase("[Favourite]", new[] { 3 })]
+        [TestCase("Title1 [Diff]", new[] { 0, 1 })]
+        [TestCase("Title1[Diff]", new int[] { })]
+        [TestCase("[diff ]with]", new[] { 4 })]
+        [TestCase("[diff ]with [[ brackets]]]]", new[] { 4 })]
+        [TestCase("[diff] another [brackets]", new[] { 4 })]
+        public void TestDifficultySearch(string query, int[] expectedBeatmapIndexes)
+        {
+            var carouselBeatmaps = (((string title, string difficultyName)[])new[]
+            {
+                ("Title1", "Diff1"),
+                ("Title1", "Diff2"),
+                ("My[Favourite]Song", "Expert"),
+                ("Title", "My Favourite Diff"),
+                ("Another One", "diff ]with [[ brackets]]]"),
+            }).Select(info => new CarouselBeatmap(new BeatmapInfo
+            {
+                Metadata = new BeatmapMetadata
+                {
+                    Title = info.title
+                },
+                DifficultyName = info.difficultyName
+            })).ToList();
+
+            var criteria = new FilterCriteria();
+
+            FilterQueryParser.ApplyQueries(criteria, query);
+            carouselBeatmaps.ForEach(b => b.Filter(criteria));
+
+            Assert.That(carouselBeatmaps.All(b =>
+            {
+                int index = carouselBeatmaps.IndexOf(b);
+
+                bool shouldBeVisible = expectedBeatmapIndexes.Contains(index);
+                bool isVisible = !b.Filtered.Value;
+
+                return isVisible == shouldBeVisible;
+            }));
         }
 
         private class CustomFilterCriteria : IRulesetFilterCriteria
