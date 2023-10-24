@@ -171,11 +171,6 @@ namespace osu.Game.Screens.Select
 
             AddRangeInternal(new Drawable[]
             {
-                new ResetScrollContainer(() => Carousel.ScrollToSelected())
-                {
-                    RelativeSizeAxes = Axes.Y,
-                    Width = 250,
-                },
                 new VerticalMaskingContainer
                 {
                     Children = new Drawable[]
@@ -243,6 +238,10 @@ namespace osu.Game.Screens.Select
                                         Padding = new MarginPadding { Top = left_area_padding },
                                         Children = new Drawable[]
                                         {
+                                            new LeftSideInteractionContainer(() => Carousel.ScrollToSelected())
+                                            {
+                                                RelativeSizeAxes = Axes.Both,
+                                            },
                                             beatmapInfoWedge = new BeatmapInfoWedge
                                             {
                                                 Height = WEDGE_HEIGHT,
@@ -1017,18 +1016,25 @@ namespace osu.Game.Screens.Select
             }
         }
 
-        private partial class ResetScrollContainer : Container
+        /// <summary>
+        /// Handles mouse interactions required when moving away from the carousel.
+        /// </summary>
+        private partial class LeftSideInteractionContainer : Container
         {
-            private readonly Action? onHoverAction;
+            private readonly Action? resetCarouselPosition;
 
-            public ResetScrollContainer(Action onHoverAction)
+            public LeftSideInteractionContainer(Action resetCarouselPosition)
             {
-                this.onHoverAction = onHoverAction;
+                this.resetCarouselPosition = resetCarouselPosition;
             }
+
+            protected override bool OnScroll(ScrollEvent e) => true;
+
+            protected override bool OnMouseDown(MouseDownEvent e) => true;
 
             protected override bool OnHover(HoverEvent e)
             {
-                onHoverAction?.Invoke();
+                resetCarouselPosition?.Invoke();
                 return base.OnHover(e);
             }
         }
