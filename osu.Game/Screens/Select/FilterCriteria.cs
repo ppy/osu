@@ -73,7 +73,7 @@ namespace osu.Game.Screens.Select
                 // or match a closed one with a whitespace after it.
                 //
                 // To keep things simple, the closing ']' may be included in the match group,
-                // and is trimmer post-match.
+                // and is trimmed post-match.
                 foreach (Match quotedSegment in Regex.Matches(value, "(^|\\s)\\[(.*)(\\]\\s|$)"))
                 {
                     DifficultyName = new OptionalTextFilter
