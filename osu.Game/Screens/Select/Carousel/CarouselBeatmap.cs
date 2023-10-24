@@ -59,12 +59,12 @@ namespace osu.Game.Screens.Select.Carousel
                      criteria.Artist.Matches(BeatmapInfo.Metadata.ArtistUnicode);
             match &= !criteria.Title.HasFilter || criteria.Title.Matches(BeatmapInfo.Metadata.Title) ||
                      criteria.Title.Matches(BeatmapInfo.Metadata.TitleUnicode);
+            match &= !criteria.DifficultyName.HasFilter || criteria.DifficultyName.Matches(BeatmapInfo.DifficultyName) ||
+                     criteria.DifficultyName.Matches(BeatmapInfo.Metadata.TitleUnicode);
 
             match &= !criteria.UserStarDifficulty.HasFilter || criteria.UserStarDifficulty.IsInRange(BeatmapInfo.StarRating);
 
             if (!match) return false;
-
-            match &= criteria.DifficultySearchTerms.All(term => term.Matches(BeatmapInfo.DifficultyName));
 
             if (criteria.SearchTerms.Length > 0)
             {

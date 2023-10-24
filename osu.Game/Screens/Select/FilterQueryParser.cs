@@ -21,8 +21,6 @@ namespace osu.Game.Screens.Select
 
         internal static void ApplyQueries(FilterCriteria criteria, string query)
         {
-            criteria.DifficultySearchText = extractDifficultySearchText(ref query);
-
             foreach (Match match in query_syntax_regex.Matches(query))
             {
                 string key = match.Groups["key"].Value.ToLowerInvariant();
@@ -34,79 +32,6 @@ namespace osu.Game.Screens.Select
             }
 
             criteria.SearchText = query;
-        }
-
-        /// <summary>
-        /// Extracts and returns the difficulty search text between square brackets.
-        /// </summary>
-        /// <param name="query">The search query. The difficulty search text will be removed from the query.</param>
-        /// <returns>The difficulty search text (without the square brackets).</returns>
-        private static string extractDifficultySearchText(ref string query)
-        {
-            var openingBracketIndexes = new List<int>();
-            var closingBracketIndexes = new List<int>();
-
-            populateIndexLists(query);
-
-            return performExtraction(ref query);
-
-            void populateIndexLists(string query)
-            {
-                bool currentlyBetweenBrackets = false;
-
-                for (int i = 0; i < query.Length; i++)
-                {
-                    switch (query[i])
-                    {
-                        case '[':
-                            if (!currentlyBetweenBrackets && (i == 0 || query[i - 1] == ' '))
-                            {
-                                currentlyBetweenBrackets = true;
-                                openingBracketIndexes.Add(i + 1);
-                            }
-
-                            break;
-
-                        case ']':
-                            if (currentlyBetweenBrackets && (i == query.Length - 1 || query[i + 1] == ' '))
-                            {
-                                currentlyBetweenBrackets = false;
-                                closingBracketIndexes.Add(i);
-                            }
-
-                            break;
-                    }
-                }
-            }
-
-            string performExtraction(ref string query)
-            {
-                var searchTexts = new List<string>();
-                string originalQuery = query;
-
-                for (int i = 0; i < openingBracketIndexes.Count; i++)
-                {
-                    int startIndex = openingBracketIndexes[i];
-
-                    int endIndex = closingBracketIndexes.Count > 0
-                        ? closingBracketIndexes[Math.Min(i, closingBracketIndexes.Count - 1)]
-                        : query.Length;
-
-                    string searchText = originalQuery[startIndex..endIndex];
-
-                    searchTexts.Add(searchText);
-
-                    query = query
-                            .Replace($" [{searchText}]", "")
-                            .Replace($"[{searchText}] ", "")
-                            .Replace($"[{searchText}]", "")
-                            .Replace($" [{searchText}] ", " ")
-                            .Replace($" [{searchText}", "")
-                            .Replace($"[{searchText}", "");
-                }
-
-                return string.Join(' ', searchTexts);
-            }
         }
 
         private static bool tryParseKeywordCriteria(FilterCriteria criteria, string key, string value, Operator op)

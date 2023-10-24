@@ -38,6 +38,7 @@ namespace osu.Game.Screens.Select
         public OptionalTextFilter Creator;
         public OptionalTextFilter Artist;
         public OptionalTextFilter Title;
+        public OptionalTextFilter DifficultyName;
 
         public OptionalRange<double> UserStarDifficulty = new OptionalRange<double>
         {
@@ -46,11 +47,6 @@ namespace osu.Game.Screens.Select
         };
 
         public OptionalTextFilter[] SearchTerms = Array.Empty<OptionalTextFilter>();
-
-        /// <summary>
-        /// Search terms that are used for searching difficulty names.
-        /// </summary>
-        public OptionalTextFilter[] DifficultySearchTerms = Array.Empty<OptionalTextFilter>();
 
         public RulesetInfo? Ruleset;
         public bool AllowConvertedBeatmaps;
@@ -69,7 +65,39 @@ namespace osu.Game.Screens.Select
             {
                 searchText = value;
 
-                SearchTerms = getTermsFromSearchText(value);
+                List<OptionalTextFilter> terms = new List<OptionalTextFilter>();
+
+                string remainingText = value;
+
+                // Match either an open difficulty tag to the end of string,
+                // or match a closed one with a whitespace after it.
+                //
+                // To keep things simple, the closing ']' may be included in the match group,
+                // and is trimmer post-match.
+                foreach (Match quotedSegment in Regex.Matches(value, "(^|\\s)\\[(.*)(\\]\\s|$)"))
+                {
+                    DifficultyName = new OptionalTextFilter
+                    {
+                        SearchTerm = quotedSegment.Groups[2].Value.Trim(']')
+                    };
+
+                    remainingText = remainingText.Replace(quotedSegment.Value, string.Empty);
+                }
+
+                // First handle quoted segments to ensure we keep inline spaces in exact matches.
+                foreach (Match quotedSegment in Regex.Matches(value, "(\"[^\"]+\"[!]?)"))
+                {
+                    terms.Add(new OptionalTextFilter { SearchTerm = quotedSegment.Value });
+                    remainingText = remainingText.Replace(quotedSegment.Value, string.Empty);
+                }
+
+                // Then handle the rest splitting on any spaces.
+                terms.AddRange(remainingText.Split(' ', StringSplitOptions.RemoveEmptyEntries).Select(s => new OptionalTextFilter
+                {
+                    SearchTerm = s
+                }));
+
+                SearchTerms = terms.ToArray();
 
                 SearchNumber = null;
 
@@ -79,42 +107,11 @@ namespace osu.Game.Screens.Select
         }
 
         /// <summary>
-        /// Extracts the search terms from the provided <see cref="string"/>
-        /// and stores them in <see cref="DifficultySearchTerms"/>.
-        /// </summary>
-        public string DifficultySearchText
-        {
-            set => DifficultySearchTerms = getTermsFromSearchText(value);
-        }
-
-        /// <summary>
         /// Hashes from the <see cref="BeatmapCollection"/> to filter to.
         /// </summary>
         public IEnumerable<string>? CollectionBeatmapMD5Hashes { get; set; }
 
         public IRulesetFilterCriteria? RulesetCriteria { get; set; }
-
-        private static OptionalTextFilter[] getTermsFromSearchText(string searchText)
-        {
-            List<OptionalTextFilter> terms = new List<OptionalTextFilter>();
-
-            string remainingText = searchText;
-
-            // First handle quoted segments to ensure we keep inline spaces in exact matches.
-            foreach (Match quotedSegment in Regex.Matches(searchText, "(\"[^\"]+\"[!]?)"))
-            {
-                terms.Add(new OptionalTextFilter { SearchTerm = quotedSegment.Value });
-                remainingText = remainingText.Replace(quotedSegment.Value, string.Empty);
-            }
-
-            // Then handle the rest splitting on any spaces.
-            terms.AddRange(remainingText.Split(' ', StringSplitOptions.RemoveEmptyEntries).Select(s => new OptionalTextFilter
-            {
-                SearchTerm = s
-            }));
-
-            return terms.ToArray();
-        }
 
         public struct OptionalRange<T> : IEquatable<OptionalRange<T>>
             where T : struct

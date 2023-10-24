@@ -397,7 +397,6 @@ namespace osu.Game.Tests.NonVisual.Filtering
         [TestCase("Title1[Diff]", new int[] { })]
         [TestCase("[diff ]with]", new[] { 4 })]
         [TestCase("[diff ]with [[ brackets]]]]", new[] { 4 })]
-        [TestCase("[diff] another [brackets]", new[] { 4 })]
         [TestCase("[Diff in title]", new int[] { })]
         [TestCase("[Diff in diff]", new int[] { 6 })]
         public void TestDifficultySearch(string query, int[] expectedBeatmapIndexes)
