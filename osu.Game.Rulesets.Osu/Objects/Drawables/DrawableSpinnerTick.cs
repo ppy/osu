@@ -5,7 +5,6 @@
 
 using osu.Framework.Graphics;
 using osu.Game.Rulesets.Objects;
-using osu.Game.Rulesets.Objects.Drawables;
 
 namespace osu.Game.Rulesets.Osu.Objects.Drawables
 {
@@ -35,16 +34,6 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
             // so it must be alive throughout the spinner's entire lifetime.
             // this mostly matters for correct sample playback.
             LifetimeStart = DrawableSpinner.HitObject.StartTime;
-        }
-
-        protected override void UpdateHitStateTransforms(ArmedState state)
-        {
-            base.UpdateHitStateTransforms(state);
-
-            // the tick can be theoretically judged at any point in the spinner's duration,
-            // so it must be alive throughout the spinner's entire lifetime (or until hit, whichever applies).
-            // this mostly matters for correct sample playback.
-            LifetimeEnd = (Result?.IsHit == true ? Result.TimeAbsolute : DrawableSpinner.HitObject.GetEndTime()) + (Samples?.Length ?? 0);
         }
 
         /// <summary>
