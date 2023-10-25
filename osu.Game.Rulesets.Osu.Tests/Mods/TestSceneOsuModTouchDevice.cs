@@ -1,12 +1,15 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System.Linq;
 using NUnit.Framework;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Input;
 using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.Timing;
+using osu.Game.Configuration;
+using osu.Game.Input;
 using osu.Game.Overlays;
 using osu.Game.Rulesets.Osu.Beatmaps;
 using osu.Game.Rulesets.Osu.Mods;
@@ -19,6 +22,9 @@ namespace osu.Game.Rulesets.Osu.Tests.Mods
 {
     public partial class TestSceneOsuModTouchDevice : PlayerTestScene
     {
+        [Resolved]
+        private SessionStatics statics { get; set; } = null!;
+
         private TestOnScreenDisplay testOnScreenDisplay = null!;
 
         protected override Ruleset CreatePlayerRuleset() => new OsuRuleset();
@@ -49,18 +55,26 @@ namespace osu.Game.Rulesets.Osu.Tests.Mods
         private void load()
         {
             Add(testOnScreenDisplay = new TestOnScreenDisplay());
+            Add(new TouchInputInterceptor());
             Dependencies.CacheAs<OnScreenDisplay>(testOnScreenDisplay);
         }
 
         public override void SetUpSteps()
         {
-            base.SetUpSteps();
             AddStep("reset OSD toast count", () => testOnScreenDisplay.ToastCount = 0);
+            AddStep("reset static", () => statics.SetValue(Static.TouchInputActive, false));
+            base.SetUpSteps();
         }
 
         [Test]
-        public void TestFirstObjectTouched()
+        public void TestUserAlreadyHasTouchDeviceActive()
         {
+            // it is presumed that a previous screen (i.e. song select) will set this up
+            AddStep("set up touchscreen user", () =>
+            {
+                Player.Score.ScoreInfo.Mods = Player.Score.ScoreInfo.Mods.Append(new OsuModTouchDevice()).ToArray();
+                statics.SetValue(Static.TouchInputActive, true);
+            });
             AddUntilStep("wait until 0 near", () => Player.GameplayClockContainer.CurrentTime, () => Is.GreaterThanOrEqualTo(0).Within(500));
             AddStep("slow down", () => Player.GameplayClockContainer.AdjustmentsFromMods.Frequency.Value = 0.2);
             AddUntilStep("wait until 0", () => Player.GameplayClockContainer.CurrentTime, () => Is.GreaterThanOrEqualTo(0));
