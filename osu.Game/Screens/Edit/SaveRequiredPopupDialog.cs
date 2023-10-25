@@ -1,17 +1,17 @@
-﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
 using osu.Framework.Graphics.Sprites;
 using osu.Game.Overlays.Dialog;
 
-namespace osu.Game.Screens.Edit.GameplayTest
+namespace osu.Game.Screens.Edit
 {
-    public partial class SaveBeforeGameplayTestDialog : PopupDialog
+    public partial class SaveRequiredPopupDialog : PopupDialog
     {
-        public SaveBeforeGameplayTestDialog(Action saveAndPreview)
+        public SaveRequiredPopupDialog(string headerText, Action saveAndAction)
         {
-            HeaderText = "The beatmap will be saved in order to test it.";
+            HeaderText = headerText;
 
             Icon = FontAwesome.Regular.Save;
 
@@ -20,7 +20,7 @@ namespace osu.Game.Screens.Edit.GameplayTest
                 new PopupDialogOkButton
                 {
                     Text = "Sounds good, let's go!",
-                    Action = saveAndPreview
+                    Action = saveAndAction
                 },
                 new PopupDialogCancelButton
                 {
