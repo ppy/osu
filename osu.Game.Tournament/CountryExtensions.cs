@@ -518,9 +518,6 @@ namespace osu.Game.Tournament
                 case CountryCode.KE:
                     return "KEN";
 
-                case CountryCode.SS:
-                    return "SSD";
-
                 case CountryCode.SR:
                     return "SUR";
 
