@@ -138,6 +138,9 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
             if (lastTick?.Judged == false)
                 return;
 
+            if (timeOffset < SliderEventGenerator.TAIL_LENIENCY)
+                return;
+
             // Attempt to preserve correct ordering of judgements as best we can by forcing
             // an un-judged head to be missed when the user has clearly skipped it.
             if (Tracking && !DrawableSlider.HeadCircle.Judged)
@@ -145,7 +148,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
 
             // The player needs to have engaged in tracking at any point after the tail leniency cutoff.
             // An actual tick miss should only occur if reaching the tick itself.
-            if (timeOffset >= SliderEventGenerator.TAIL_LENIENCY && Tracking)
+            if (Tracking)
                 ApplyResult(r => r.Type = r.Judgement.MaxResult);
             else if (timeOffset > 0)
                 ApplyResult(r => r.Type = r.Judgement.MinResult);
