@@ -24,7 +24,7 @@ namespace osu.Game.Rulesets.Osu.Mods
 
         // todo: this mod needs to be incompatible with "hidden" due to forcing the circle to remain opaque,
         // further implementation will be required for supporting that.
-        public override Type[] IncompatibleMods => new[] { typeof(IRequiresApproachCircles), typeof(OsuModObjectScaleTween), typeof(OsuModHidden) };
+        public override Type[] IncompatibleMods => new[] { typeof(IRequiresApproachCircles), typeof(OsuModObjectScaleTween), typeof(OsuModHidden), typeof(OsuModSlide) };
 
         private const int rotate_offset = 360;
         private const float rotate_starting_width = 2;
