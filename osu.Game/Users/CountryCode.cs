@@ -8,6 +8,9 @@ using Newtonsoft.Json.Converters;
 
 namespace osu.Game.Users
 {
+    /// <summary>
+    /// Matches `osu_countries` database table.
+    /// </summary>
     [JsonConverter(typeof(StringEnumConverter))]
     [UsedImplicitly(ImplicitUseTargetFlags.WithMembers)]
     public enum CountryCode
