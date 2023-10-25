@@ -25,6 +25,16 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
             Origin = Anchor.Centre;
         }
 
+        protected override void OnApply()
+        {
+            base.OnApply();
+
+            // the tick can be theoretically judged at any point in the spinner's duration,
+            // so it must be alive throughout the spinner's entire lifetime.
+            // this mostly matters for correct sample playback.
+            LifetimeStart = DrawableSpinner.HitObject.StartTime;
+        }
+
         /// <summary>
         /// Apply a judgement result.
         /// </summary>
