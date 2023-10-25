@@ -858,7 +858,10 @@ namespace osu.Game.Tests.Visual.Navigation
 
             AddStep("close settings sidebar", () => InputManager.Key(Key.Escape));
 
-            PushAndConfirm(() => new TestPlaySongSelect());
+            Screens.Select.SongSelect songSelect = null;
+            PushAndConfirm(() => songSelect = new TestPlaySongSelect());
+            AddUntilStep("wait for song select", () => songSelect.BeatmapSetsLoaded);
+
             AddStep("switch to osu! ruleset", () =>
             {
                 InputManager.PressKey(Key.LControl);
