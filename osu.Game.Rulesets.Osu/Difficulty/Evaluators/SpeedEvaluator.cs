@@ -60,12 +60,20 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
             double distance = Math.Min(single_spacing_threshold, travelDistance + osuCurrObj.MinimumJumpDistance);
 
             double adjustedDistanceScale = 1.0;
-            if (osuCurrObj.Angle.HasValue)
-                adjustedDistanceScale = 0.7 + calcAngleBonus(osuCurrObj.Angle.Value) * 0.3;
+
+            if (osuCurrObj.Angle.HasValue && osuPrevObj?.Angle != null && osuCurrObj.Angle != osuPrevObj.Angle)
+            {
+                double currAngleDegrees = osuCurrObj.Angle.Value * 180.0 / Math.PI;
+                double prevAngleDegrees = osuPrevObj.Angle.Value * 180.0 / Math.PI;
+
+                double angleDifference = Math.Abs(currAngleDegrees - prevAngleDegrees);
+                double angleDifferenceAdjusted = Math.Sin((Math.PI * angleDifference) / 360.0) * 180.0;
+                double angularVelocity = angleDifferenceAdjusted / (0.1 * strainTime);
+                double angularVelocityBonus = Math.Max(0.0, Math.Pow(angularVelocity, 0.4) - 1.0); //Math.Max(0.0, 1.0 - 1.0 / angularVelocity);
+                adjustedDistanceScale = 0.65 + angularVelocityBonus * 0.45;
+            }
 
             return (speedBonus + speedBonus * (Math.Pow(distance / single_spacing_threshold, 3.5)) * adjustedDistanceScale) * doubletapness / strainTime;
         }
-
-        private static double calcAngleBonus(double angle) => 1 - Math.Pow(Math.Sin(3.0 / 4 * (Math.Min(5.0 / 6 * Math.PI, Math.Max(Math.PI / 6, angle)) - Math.PI / 6)), 2);
     }
 }
