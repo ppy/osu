@@ -109,11 +109,6 @@ namespace osu.Game.Rulesets.Osu.Skinning.Legacy
 
         private void onHitObjectApplied(DrawableHitObject? drawableObject = null)
         {
-            if (drawableObject != null && drawableObject is not DrawableSlider)
-                return;
-
-            ballAnimation.ClearFrames();
-
             double frameDelay;
 
             if (drawableObject?.HitObject != null)
@@ -127,6 +122,7 @@ namespace osu.Game.Rulesets.Osu.Skinning.Legacy
             else
                 frameDelay = LegacySkinExtensions.SIXTY_FRAME_TIME;
 
+            ballAnimation.ClearFrames();
             foreach (var texture in ballTextures)
                 ballAnimation.AddFrame(texture, frameDelay);
         }
