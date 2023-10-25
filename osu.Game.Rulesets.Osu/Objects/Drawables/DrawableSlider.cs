@@ -40,6 +40,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
         {
             HeadCircle,
             TailCircle,
+            repeatContainer,
             Body,
         };
 
