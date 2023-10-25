@@ -143,6 +143,8 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
 
             // Attempt to preserve correct ordering of judgements as best we can by forcing
             // an un-judged head to be missed when the user has clearly skipped it.
+            //
+            // This check is applied to all nested slider objects apart from the head (ticks, repeats, tail).
             if (Tracking && !DrawableSlider.HeadCircle.Judged)
                 DrawableSlider.HeadCircle.MissForcefully();
 
