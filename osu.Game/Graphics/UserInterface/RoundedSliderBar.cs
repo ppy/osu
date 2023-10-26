@@ -98,7 +98,11 @@ namespace osu.Game.Graphics.UserInterface
                         Origin = Anchor.TopCentre,
                         RelativePositionAxes = Axes.X,
                         Current = { Value = true },
-                        OnDoubleClicked = () => Current.SetDefault(),
+                        OnDoubleClicked = () =>
+                        {
+                            if (!Current.Disabled)
+                                Current.SetDefault();
+                        },
                     },
                 },
                 hoverClickSounds = new HoverClickSounds()
