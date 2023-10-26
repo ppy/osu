@@ -190,6 +190,7 @@ namespace osu.Game.Online.API.Requests.Responses
             var score = new ScoreInfo
             {
                 OnlineID = OnlineID,
+                LegacyOnlineID = (long?)LegacyScoreId ?? -1,
                 User = User ?? new APIUser { Id = UserID },
                 BeatmapInfo = new BeatmapInfo { OnlineID = BeatmapID },
                 Ruleset = new RulesetInfo { OnlineID = RulesetID },
