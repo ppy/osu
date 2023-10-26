@@ -11,6 +11,7 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Colour;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Lines;
+using osu.Framework.Graphics.Shapes;
 using osu.Framework.Layout;
 using osu.Framework.Threading;
 using osu.Framework.Utils;
@@ -28,7 +29,7 @@ namespace osu.Game.Screens.Play.HUD
         public bool UsesFixedAnchor { get; set; }
 
         [SettingSource("Bar height")]
-        public BindableFloat BarHeight { get; } = new BindableFloat(20)
+        public BindableFloat BarHeight { get; } = new BindableFloat(30)
         {
             MinValue = 0,
             MaxValue = 64,
@@ -36,7 +37,7 @@ namespace osu.Game.Screens.Play.HUD
         };
 
         [SettingSource("Bar length")]
-        public BindableFloat BarLength { get; } = new BindableFloat(0.98f)
+        public BindableFloat BarLength { get; } = new BindableFloat(0.35f)
         {
             MinValue = 0.2f,
             MaxValue = 1,
@@ -100,36 +101,45 @@ namespace osu.Game.Screens.Play.HUD
             RelativeSizeAxes = Axes.X;
             AutoSizeAxes = Axes.Y;
 
-            InternalChild = new Container
+            InternalChildren = new[]
             {
-                AutoSizeAxes = Axes.Both,
-                Children = new Drawable[]
+                new Circle
                 {
-                    background = new BackgroundPath
+                    Position = new Vector2(-4f, main_path_radius - 1.5f),
+                    Size = new Vector2(50f, 3f),
+                },
+                new Container
+                {
+                    AutoSizeAxes = Axes.Both,
+                    Margin = new MarginPadding { Left = 50f },
+                    Children = new Drawable[]
                     {
-                        PathRadius = main_path_radius,
-                    },
-                    glowBar = new BarPath
-                    {
-                        BarColour = Color4.White,
-                        GlowColour = main_bar_glow_colour,
-                        Blending = BlendingParameters.Additive,
-                        Colour = ColourInfo.GradientHorizontal(Color4.White.Opacity(0.8f), Color4.White),
-                        PathRadius = 40f,
-                        // Kinda hacky, but results in correct positioning with increased path radius.
-                        Margin = new MarginPadding(-30f),
-                        GlowPortion = 0.9f,
-                    },
-                    mainBar = new BarPath
-                    {
-                        AutoSizeAxes = Axes.None,
-                        RelativeSizeAxes = Axes.Both,
-                        Blending = BlendingParameters.Additive,
-                        BarColour = main_bar_colour,
-                        GlowColour = main_bar_glow_colour,
-                        PathRadius = main_path_radius,
-                        GlowPortion = 0.6f,
-                    },
+                        background = new BackgroundPath
+                        {
+                            PathRadius = main_path_radius,
+                        },
+                        glowBar = new BarPath
+                        {
+                            BarColour = Color4.White,
+                            GlowColour = main_bar_glow_colour,
+                            Blending = BlendingParameters.Additive,
+                            Colour = ColourInfo.GradientHorizontal(Color4.White.Opacity(0.8f), Color4.White),
+                            PathRadius = 40f,
+                            // Kinda hacky, but results in correct positioning with increased path radius.
+                            Margin = new MarginPadding(-30f),
+                            GlowPortion = 0.9f,
+                        },
+                        mainBar = new BarPath
+                        {
+                            AutoSizeAxes = Axes.None,
+                            RelativeSizeAxes = Axes.Both,
+                            Blending = BlendingParameters.Additive,
+                            BarColour = main_bar_colour,
+                            GlowColour = main_bar_glow_colour,
+                            PathRadius = main_path_radius,
+                            GlowPortion = 0.6f,
+                        },
+                    }
                 }
             };
         }
