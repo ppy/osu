@@ -187,7 +187,6 @@ namespace osu.Game.Scoring
         IRulesetInfo IScoreInfo.Ruleset => Ruleset;
         IBeatmapInfo? IScoreInfo.Beatmap => BeatmapInfo;
         IUser IScoreInfo.User => User;
-        IEnumerable<INamedFileUsage> IHasNamedFiles.Files => Files;
 
         #region Properties required to make things work with existing usages
 
