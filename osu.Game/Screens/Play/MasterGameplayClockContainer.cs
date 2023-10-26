@@ -41,7 +41,7 @@ namespace osu.Game.Screens.Play
 
         private readonly WorkingBeatmap beatmap;
 
-        private readonly Track track;
+        private Track track;
 
         private readonly double skipTargetTime;
 
@@ -188,11 +188,11 @@ namespace osu.Game.Screens.Play
         {
             removeSourceClockAdjustments();
 
-            var virtualTrack = new TrackVirtual(beatmap.Track.Length);
-            virtualTrack.Seek(CurrentTime);
+            track = new TrackVirtual(beatmap.Track.Length);
+            track.Seek(CurrentTime);
             if (IsRunning)
-                virtualTrack.Start();
-            ChangeSource(virtualTrack);
+                track.Start();
+            ChangeSource(track);
 
             addSourceClockAdjustments();
         }
