@@ -115,49 +115,67 @@ namespace osu.Game.Skinning
                             var skinnableTargetWrapper = new DefaultSkinComponentsContainer(container =>
                             {
                                 var health = container.OfType<ArgonHealthDisplay>().FirstOrDefault();
-                                var score = container.OfType<DefaultScoreCounter>().FirstOrDefault();
-                                var accuracy = container.OfType<DefaultAccuracyCounter>().FirstOrDefault();
-                                var combo = container.OfType<DefaultComboCounter>().FirstOrDefault();
-                                var ppCounter = container.OfType<PerformancePointsCounter>().FirstOrDefault();
+                                var scoreWedge = container.OfType<ArgonScoreWedge>().FirstOrDefault();
+                                var score = container.OfType<ArgonScoreCounter>().FirstOrDefault();
+                                var accuracy = container.OfType<ArgonAccuracyCounter>().FirstOrDefault();
+                                var comboWedge = container.OfType<ArgonComboWedge>().FirstOrDefault();
+                                var combo = container.OfType<ArgonComboCounter>().FirstOrDefault();
+                                var rightWedge = container.OfType<ArgonRightWedge>().FirstOrDefault();
+                                var ppCounter = container.OfType<ArgonPerformancePointsCounter>().FirstOrDefault();
                                 var songProgress = container.OfType<ArgonSongProgress>().FirstOrDefault();
                                 var keyCounter = container.OfType<ArgonKeyCounterDisplay>().FirstOrDefault();
 
-                                if (score != null)
+                                if (health != null)
                                 {
-                                    score.Anchor = Anchor.TopCentre;
-                                    score.Origin = Anchor.TopCentre;
-
                                     // elements default to beneath the health bar
-                                    const float vertical_offset = 30;
+                                    const float components_x_offset = 50;
 
-                                    const float horizontal_padding = 20;
+                                    health.Anchor = Anchor.TopLeft;
+                                    health.Origin = Anchor.TopLeft;
+                                    health.Y = 15;
 
-                                    score.Position = new Vector2(0, vertical_offset);
-
-                                    if (health != null)
+                                    if (scoreWedge != null)
                                     {
-                                        health.Origin = Anchor.TopCentre;
-                                        health.Anchor = Anchor.TopCentre;
-                                        health.Y = 5;
+                                        scoreWedge.Position = new Vector2(-50, 50);
+
+                                        if (score != null)
+                                        {
+                                            score.Scale = new Vector2(0.5f);
+                                            score.Position = new Vector2(components_x_offset, scoreWedge.Y + 15);
+                                        }
+
+                                        if (accuracy != null)
+                                        {
+                                            // +4 to vertically align the accuracy counter with the score counter.
+                                            accuracy.Position = new Vector2(components_x_offset + 4, scoreWedge.Y + 45);
+                                            accuracy.Anchor = Anchor.TopLeft;
+                                            accuracy.Origin = Anchor.TopLeft;
+                                        }
                                     }
 
-                                    if (ppCounter != null)
+                                    if (comboWedge != null)
                                     {
-                                        ppCounter.Y = score.Position.Y + ppCounter.ScreenSpaceDeltaToParentSpace(score.ScreenSpaceDrawQuad.Size).Y - 4;
-                                        ppCounter.Origin = Anchor.TopCentre;
-                                        ppCounter.Anchor = Anchor.TopCentre;
-                                    }
-
-                                    if (accuracy != null)
-                                    {
-                                        accuracy.Position = new Vector2(-accuracy.ScreenSpaceDeltaToParentSpace(score.ScreenSpaceDrawQuad.Size).X / 2 - horizontal_padding, vertical_offset + 5);
-                                        accuracy.Origin = Anchor.TopRight;
-                                        accuracy.Anchor = Anchor.TopCentre;
+                                        comboWedge.Position = new Vector2(-12, 130);
 
                                         if (combo != null)
                                         {
-                                            combo.Position = new Vector2(accuracy.ScreenSpaceDeltaToParentSpace(score.ScreenSpaceDrawQuad.Size).X / 2 + horizontal_padding, vertical_offset + 5);
-                                            combo.Anchor = Anchor.TopCentre;
+                                            combo.Anchor = Anchor.TopLeft;
+                                            combo.Origin = Anchor.TopLeft;
+                                            combo.Position = new Vector2(components_x_offset, comboWedge.Y - 2);
+                                        }
+                                    }
+
+                                    if (rightWedge != null)
+                                    {
+                                        rightWedge.Anchor = Anchor.TopRight;
+                                        rightWedge.Origin = Anchor.TopRight;
+                                        rightWedge.Position = new Vector2(180, 20);
+
+                                        if (ppCounter != null)
+                                        {
+                                            ppCounter.Anchor = Anchor.TopRight;
+                                            ppCounter.Origin = Anchor.TopRight;
+                                            ppCounter.Position = new Vector2(rightWedge.X - 240, rightWedge.Y + 8);
                                         }
                                     }
 
@@ -201,15 +219,18 @@ namespace osu.Game.Skinning
                             {
                                 Children = new Drawable[]
                                 {
-                                    new DefaultComboCounter(),
-                                    new DefaultScoreCounter(),
-                                    new DefaultAccuracyCounter(),
                                     new ArgonHealthDisplay(),
+                                    new ArgonScoreWedge(),
+                                    new ArgonScoreCounter(),
+                                    new ArgonAccuracyCounter(),
+                                    new ArgonComboWedge(),
+                                    new ArgonComboCounter(),
+                                    new ArgonRightWedge(),
+                                    new ArgonPerformancePointsCounter(),
+                                    new BarHitErrorMeter(),
+                                    new BarHitErrorMeter(),
                                     new ArgonSongProgress(),
                                     new ArgonKeyCounterDisplay(),
-                                    new BarHitErrorMeter(),
-                                    new BarHitErrorMeter(),
-                                    new PerformancePointsCounter()
                                 }
                             };
 
