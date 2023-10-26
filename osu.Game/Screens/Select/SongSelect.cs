@@ -1028,7 +1028,10 @@ namespace osu.Game.Screens.Select
                 this.resetCarouselPosition = resetCarouselPosition;
             }
 
-            protected override bool OnScroll(ScrollEvent e) => true;
+            // we want to block plain scrolls on the left side so that they don't scroll the carousel,
+            // but also we *don't* want to handle scrolls when they're combined with keyboard modifiers
+            // as those will usually correspond to other interactions like adjusting volume.
+            protected override bool OnScroll(ScrollEvent e) => !e.ControlPressed && !e.AltPressed && !e.ShiftPressed && !e.SuperPressed;
 
             protected override bool OnMouseDown(MouseDownEvent e) => true;
 
