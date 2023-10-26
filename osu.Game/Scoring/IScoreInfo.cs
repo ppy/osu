@@ -9,7 +9,7 @@ using osu.Game.Users;
 
 namespace osu.Game.Scoring
 {
-    public interface IScoreInfo : IHasOnlineID<long>, IHasNamedFiles
+    public interface IScoreInfo : IHasOnlineID<long>
     {
         IUser User { get; }
 
