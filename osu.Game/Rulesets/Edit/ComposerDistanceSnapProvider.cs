@@ -98,12 +98,6 @@ namespace osu.Game.Rulesets.Edit
                 }
             });
 
-            if (DistanceSpacingMultiplier.Disabled)
-            {
-                distanceSpacingSlider.Hide();
-                return;
-            }
-
             DistanceSpacingMultiplier.Value = editorBeatmap.BeatmapInfo.DistanceSpacing;
             DistanceSpacingMultiplier.BindValueChanged(multiplier =>
             {
@@ -115,6 +109,8 @@ namespace osu.Game.Rulesets.Edit
 
                 editorBeatmap.BeatmapInfo.DistanceSpacing = multiplier.NewValue;
             }, true);
+
+            DistanceSpacingMultiplier.BindDisabledChanged(disabled => distanceSpacingSlider.Alpha = disabled ? 0 : 1, true);
 
             // Manual binding to handle enabling distance spacing when the slider is interacted with.
             distanceSpacingSlider.Current.BindValueChanged(spacing =>
