@@ -18,26 +18,24 @@ namespace osu.Game.Tests.Visual.UserInterface
         [Cached]
         private OverlayColourProvider colourProvider { get; set; } = new OverlayColourProvider(OverlayColourScheme.Purple);
 
-        private readonly BindableDouble current = new BindableDouble(5)
-        {
-            Precision = 0.1,
-            MinValue = 0,
-            MaxValue = 15
-        };
-
         private ShearedSliderBar<double> slider = null!;
 
-        [BackgroundDependencyLoader]
-        private void load()
+        [SetUpSteps]
+        public void SetUpSteps()
         {
-            Child = slider = new ShearedSliderBar<double>
+            AddStep("create slider", () => Child = slider = new ShearedSliderBar<double>
             {
                 Anchor = Anchor.Centre,
                 Origin = Anchor.Centre,
-                Current = current,
+                Current = new BindableDouble(5)
+                {
+                    Precision = 0.1,
+                    MinValue = 0,
+                    MaxValue = 15
+                },
                 RelativeSizeAxes = Axes.X,
                 Width = 0.4f
-            };
+            });
         }
 
         [Test]
