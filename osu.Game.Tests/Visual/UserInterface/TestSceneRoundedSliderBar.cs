@@ -55,5 +55,22 @@ namespace osu.Game.Tests.Visual.UserInterface
 
             AddAssert("slider is default", () => slider.Current.IsDefault);
         }
+
+        [Test]
+        public void TestNubDoubleClickOnDisabledSliderDoesNothing()
+        {
+            AddStep("set slider to 1", () => slider.Current.Value = 1);
+            AddStep("disable slider", () => slider.Current.Disabled = true);
+
+            AddStep("move mouse to nub", () => InputManager.MoveMouseTo(slider.ChildrenOfType<Nub>().Single()));
+
+            AddStep("double click nub", () =>
+            {
+                InputManager.Click(MouseButton.Left);
+                InputManager.Click(MouseButton.Left);
+            });
+
+            AddAssert("slider is still at 1", () => slider.Current.Value, () => Is.EqualTo(1));
+        }
     }
 }
