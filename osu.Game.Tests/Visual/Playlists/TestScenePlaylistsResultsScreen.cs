@@ -262,10 +262,9 @@ namespace osu.Game.Tests.Visual.Playlists
 
             for (int i = 1; i <= scores_per_result; i++)
             {
-                int nextLowest = getNextLowestScoreId();
                 multiplayerUserScore.ScoresAround.Lower.Scores.Add(new MultiplayerScore
                 {
-                    ID = nextLowest,
+                    ID = getNextLowestScoreId(),
                     Accuracy = userScore.Accuracy,
                     Passed = true,
                     Rank = userScore.Rank,
@@ -278,10 +277,9 @@ namespace osu.Game.Tests.Visual.Playlists
                     },
                 });
 
-                int nextHighest = getNextHighestScoreId();
                 multiplayerUserScore.ScoresAround.Higher.Scores.Add(new MultiplayerScore
                 {
-                    ID = nextHighest,
+                    ID = getNextHighestScoreId(),
                     Accuracy = userScore.Accuracy,
                     Passed = true,
                     Rank = userScore.Rank,
@@ -311,10 +309,9 @@ namespace osu.Game.Tests.Visual.Playlists
 
             for (int i = 1; i <= scores_per_result; i++)
             {
-                int id = sort == "score_asc" ? getNextHighestScoreId() : getNextLowestScoreId();
                 result.Scores.Add(new MultiplayerScore
                 {
-                    ID = id,
+                    ID = sort == "score_asc" ? getNextHighestScoreId() : getNextLowestScoreId(),
                     Accuracy = 1,
                     Passed = true,
                     Rank = ScoreRank.X,
