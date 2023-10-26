@@ -139,10 +139,7 @@ namespace osu.Game.Skinning
                                         scoreWedge.Position = new Vector2(-50, 50);
 
                                         if (score != null)
-                                        {
-                                            score.Scale = new Vector2(0.5f);
                                             score.Position = new Vector2(components_x_offset, scoreWedge.Y + 15);
-                                        }
 
                                         if (accuracy != null)
                                         {
