@@ -40,6 +40,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
         {
             HeadCircle,
             TailCircle,
+            repeatContainer,
             Body,
         };
 
@@ -107,7 +108,11 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
                 headContainer = new Container<DrawableSliderHead> { RelativeSizeAxes = Axes.Both },
                 OverlayElementContainer = new Container { RelativeSizeAxes = Axes.Both, },
                 Ball,
-                slidingSample = new PausableSkinnableSound { Looping = true }
+                slidingSample = new PausableSkinnableSound
+                {
+                    Looping = true,
+                    MinimumSampleVolume = MINIMUM_SAMPLE_VOLUME,
+                }
             });
 
             PositionBindable.BindValueChanged(_ => Position = HitObject.StackedPosition);
@@ -264,7 +269,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
 
         protected override void CheckForResult(bool userTriggered, double timeOffset)
         {
-            if (userTriggered || Time.Current < HitObject.EndTime)
+            if (userTriggered || !TailCircle.Judged || Time.Current < HitObject.EndTime)
                 return;
 
             // If only the nested hitobjects are judged, then the slider's own judgement is ignored for scoring purposes.

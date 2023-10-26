@@ -8,6 +8,7 @@ using JetBrains.Annotations;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
+using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Objects.Drawables;
 using osu.Game.Rulesets.Objects.Types;
 using osu.Game.Skinning;
@@ -125,8 +126,22 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
 
         protected override void CheckForResult(bool userTriggered, double timeOffset)
         {
-            if (!userTriggered && timeOffset >= 0)
-                ApplyResult(r => r.Type = Tracking ? r.Judgement.MaxResult : r.Judgement.MinResult);
+            if (userTriggered)
+                return;
+
+            // Ensure the tail can only activate after all previous ticks already have.
+            //
+            // This covers the edge case where the lenience may allow the tail to activate before
+            // the last tick, changing ordering of score/combo awarding.
+            if (DrawableSlider.NestedHitObjects.Count > 1 && !DrawableSlider.NestedHitObjects[^2].Judged)
+                return;
+
+            // The player needs to have engaged in tracking at any point after the tail leniency cutoff.
+            // An actual tick miss should only occur if reaching the tick itself.
+            if (timeOffset >= SliderEventGenerator.TAIL_LENIENCY && Tracking)
+                ApplyResult(r => r.Type = r.Judgement.MaxResult);
+            else if (timeOffset > 0)
+                ApplyResult(r => r.Type = r.Judgement.MinResult);
         }
 
         protected override void OnApply()

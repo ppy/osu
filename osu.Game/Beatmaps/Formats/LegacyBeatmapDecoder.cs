@@ -28,9 +28,12 @@ namespace osu.Game.Beatmaps.Formats
         public const int EARLY_VERSION_TIMING_OFFSET = 24;
 
         /// <summary>
-        /// A small adjustment to the start time of control points to account for rounding/precision errors.
+        /// A small adjustment to the start time of sample control points to account for rounding/precision errors.
         /// </summary>
-        private const double control_point_leniency = 1;
+        /// <remarks>
+        /// Compare: https://github.com/peppy/osu-stable-reference/blob/master/osu!/GameplayElements/HitObjects/HitObject.cs#L319
+        /// </remarks>
+        private const double control_point_leniency = 5;
 
         internal static RulesetStore? RulesetStore;
 
