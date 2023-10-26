@@ -7,16 +7,16 @@ using System.Linq;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
 using osu.Game.Beatmaps;
-using osu.Game.Database;
 using osu.Game.Rulesets;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Scoring;
 using osu.Game.Scoring;
+using osu.Game.Users;
 
 namespace osu.Game.Online.API.Requests.Responses
 {
     [Serializable]
-    public class SoloScoreInfo : IHasOnlineID<long>
+    public class SoloScoreInfo : IScoreInfo
     {
         [JsonProperty("beatmap_id")]
         public int BeatmapID { get; set; }
@@ -138,6 +138,18 @@ namespace osu.Game.Online.API.Requests.Responses
 
         #endregion
 
+        #region IScoreInfo
+
+        public long OnlineID => (long?)ID ?? -1;
+
+        IUser IScoreInfo.User => User!;
+        DateTimeOffset IScoreInfo.Date => EndedAt;
+        long IScoreInfo.LegacyOnlineID => (long?)LegacyScoreId ?? -1;
+        IBeatmapInfo IScoreInfo.Beatmap => Beatmap!;
+        IRulesetInfo IScoreInfo.Ruleset => Beatmap!.Ruleset;
+
+        #endregion
+
         public override string ToString() => $"score_id: {ID} user_id: {UserID}";
 
         /// <summary>
@@ -223,7 +235,5 @@ namespace osu.Game.Online.API.Requests.Responses
             Statistics = score.Statistics.Where(kvp => kvp.Value != 0).ToDictionary(kvp => kvp.Key, kvp => kvp.Value),
             MaximumStatistics = score.MaximumStatistics.Where(kvp => kvp.Value != 0).ToDictionary(kvp => kvp.Key, kvp => kvp.Value),
         };
-
-        public long OnlineID => (long?)ID ?? -1;
     }
 }
