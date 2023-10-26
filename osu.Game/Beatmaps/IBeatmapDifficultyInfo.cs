@@ -55,12 +55,19 @@ namespace osu.Game.Beatmaps
         static double DifficultyRange(double difficulty, double min, double mid, double max)
         {
             if (difficulty > 5)
-                return mid + (max - mid) * (difficulty - 5) / 5;
+                return mid + (max - mid) * DifficultyRange(difficulty);
             if (difficulty < 5)
-                return mid - (mid - min) * (5 - difficulty) / 5;
+                return mid + (mid - min) * DifficultyRange(difficulty);
 
             return mid;
         }
+
+        /// <summary>
+        /// Maps a difficulty value [0, 10] to a linear range of [-1, 1].
+        /// </summary>
+        /// <param name="difficulty">The difficulty value to be mapped.</param>
+        /// <returns>Value to which the difficulty value maps in the specified range.</returns>
+        static double DifficultyRange(double difficulty) => (difficulty - 5) / 5;
 
         /// <summary>
         /// Maps a difficulty value [0, 10] to a two-piece linear range of values.

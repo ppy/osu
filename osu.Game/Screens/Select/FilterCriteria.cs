@@ -38,6 +38,7 @@ namespace osu.Game.Screens.Select
         public OptionalTextFilter Creator;
         public OptionalTextFilter Artist;
         public OptionalTextFilter Title;
+        public OptionalTextFilter DifficultyName;
 
         public OptionalRange<double> UserStarDifficulty = new OptionalRange<double>
         {
@@ -68,8 +69,23 @@ namespace osu.Game.Screens.Select
 
                 string remainingText = value;
 
+                // Match either an open difficulty tag to the end of string,
+                // or match a closed one with a whitespace after it.
+                //
+                // To keep things simple, the closing ']' may be included in the match group,
+                // and is trimmed post-match.
+                foreach (Match quotedSegment in Regex.Matches(value, "(^|\\s)\\[(.*)(\\]\\s|$)"))
+                {
+                    DifficultyName = new OptionalTextFilter
+                    {
+                        SearchTerm = quotedSegment.Groups[2].Value.Trim(']')
+                    };
+
+                    remainingText = remainingText.Replace(quotedSegment.Value, string.Empty);
+                }
+
                 // First handle quoted segments to ensure we keep inline spaces in exact matches.
-                foreach (Match quotedSegment in Regex.Matches(searchText, "(\"[^\"]+\"[!]?)"))
+                foreach (Match quotedSegment in Regex.Matches(value, "(\"[^\"]+\"[!]?)"))
                 {
                     terms.Add(new OptionalTextFilter { SearchTerm = quotedSegment.Value });
                     remainingText = remainingText.Replace(quotedSegment.Value, string.Empty);

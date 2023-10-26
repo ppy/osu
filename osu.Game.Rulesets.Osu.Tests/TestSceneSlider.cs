@@ -27,6 +27,7 @@ using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Objects.Drawables;
 using osu.Game.Rulesets.Objects.Types;
 using osu.Game.Rulesets.Osu.Configuration;
+using osu.Game.Rulesets.Osu.Mods;
 
 namespace osu.Game.Rulesets.Osu.Tests
 {
@@ -49,6 +50,8 @@ namespace osu.Game.Rulesets.Osu.Tests
                 snakingIn.Value = !v;
                 snakingOut.Value = !v;
             });
+
+            AddToggleStep("toggle hidden", hiddenActive => SelectedMods.Value = hiddenActive ? new[] { new OsuModHidden() } : Array.Empty<Mod>());
 
             AddSliderStep("hit at", 0f, 1f, 0f, v =>
             {
