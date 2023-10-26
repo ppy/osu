@@ -1019,7 +1019,7 @@ namespace osu.Game.Screens.Select
         /// <summary>
         /// Handles mouse interactions required when moving away from the carousel.
         /// </summary>
-        private partial class LeftSideInteractionContainer : Container
+        internal partial class LeftSideInteractionContainer : Container
         {
             private readonly Action? resetCarouselPosition;
 
