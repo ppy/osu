@@ -145,7 +145,7 @@ namespace osu.Game.Screens.Play
 
         protected override void StartGameplayClock()
         {
-            addSourceClockAdjustments();
+            addAdjustmentsToTrack();
 
             base.StartGameplayClock();
 
@@ -186,7 +186,7 @@ namespace osu.Game.Screens.Play
         /// </summary>
         public void StopUsingBeatmapClock()
         {
-            removeSourceClockAdjustments();
+            removeAdjustmentsFromTrack();
 
             track = new TrackVirtual(beatmap.Track.Length);
             track.Seek(CurrentTime);
@@ -194,12 +194,12 @@ namespace osu.Game.Screens.Play
                 track.Start();
             ChangeSource(track);
 
-            addSourceClockAdjustments();
+            addAdjustmentsToTrack();
         }
 
         private bool speedAdjustmentsApplied;
 
-        private void addSourceClockAdjustments()
+        private void addAdjustmentsToTrack()
         {
             if (speedAdjustmentsApplied)
                 return;
@@ -213,7 +213,7 @@ namespace osu.Game.Screens.Play
             speedAdjustmentsApplied = true;
         }
 
-        private void removeSourceClockAdjustments()
+        private void removeAdjustmentsFromTrack()
         {
             if (!speedAdjustmentsApplied)
                 return;
@@ -228,7 +228,7 @@ namespace osu.Game.Screens.Play
         protected override void Dispose(bool isDisposing)
         {
             base.Dispose(isDisposing);
-            removeSourceClockAdjustments();
+            removeAdjustmentsFromTrack();
         }
 
         ControlPointInfo IBeatSyncProvider.ControlPoints => beatmap.Beatmap.ControlPointInfo;
