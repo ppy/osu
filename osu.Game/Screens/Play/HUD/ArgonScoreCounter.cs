@@ -113,7 +113,7 @@ namespace osu.Game.Screens.Play.HUD
                         if (texture == null)
                             return null;
 
-                        return new TexturedCharacterGlyph(new CharacterGlyph(character, 0, 0, texture.Width, texture.Height, null), texture, 0.25f);
+                        return new TexturedCharacterGlyph(new CharacterGlyph(character, 0, 0, texture.Width, texture.Height, null), texture, 0.125f);
                     }
 
                     public Task<ITexturedCharacterGlyph?> GetAsync(string fontName, char character) => Task.Run(() => Get(fontName, character));
