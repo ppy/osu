@@ -20,7 +20,7 @@ namespace osu.Game.Tests.Visual.UserInterface
 
         private readonly BindableDouble current = new BindableDouble(5)
         {
-            Precision = 0.1f,
+            Precision = 0.1,
             MinValue = 0,
             MaxValue = 15
         };
