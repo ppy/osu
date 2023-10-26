@@ -2,6 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
+using System.Linq;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Localisation;
@@ -10,6 +11,9 @@ using osu.Game.Rulesets.Objects.Drawables;
 using osu.Game.Rulesets.Osu.Objects;
 using osu.Game.Rulesets.Osu.Objects.Drawables;
 using osuTK;
+
+
+
 
 namespace osu.Game.Rulesets.Osu.Mods
 {
@@ -21,7 +25,7 @@ namespace osu.Game.Rulesets.Osu.Mods
         public override ModType Type => ModType.Fun;
         public override LocalisableString Description => "Everything rotates. EVERYTHING.";
         public override double ScoreMultiplier => 1;
-        public override Type[] IncompatibleMods => new[] { typeof(OsuModWiggle), typeof(OsuModMagnetised), typeof(OsuModRepel) };
+        public override Type[] IncompatibleMods => base.IncompatibleMods.Concat(new[] { typeof(OsuModWiggle), typeof(OsuModMagnetised), typeof(OsuModRepel), typeof(OsuModFreezeFrame) }).ToArray();
 
         private float theta;
 
