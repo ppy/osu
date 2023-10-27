@@ -9,7 +9,7 @@ using osu.Game.Users;
 
 namespace osu.Game.Scoring
 {
-    public interface IScoreInfo : IHasOnlineID<long>, IHasNamedFiles
+    public interface IScoreInfo : IHasOnlineID<long>
     {
         IUser User { get; }
 
@@ -22,7 +22,7 @@ namespace osu.Game.Scoring
 
         double Accuracy { get; }
 
-        bool HasReplay { get; }
+        long LegacyOnlineID { get; }
 
         DateTimeOffset Date { get; }
 
