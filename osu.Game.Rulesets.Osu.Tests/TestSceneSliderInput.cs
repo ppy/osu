@@ -38,6 +38,42 @@ namespace osu.Game.Rulesets.Osu.Tests
 
         private readonly List<JudgementResult> judgementResults = new List<JudgementResult>();
 
+        [TestCase(30, 0)]
+        [TestCase(30, 1)]
+        [TestCase(40, 0)]
+        [TestCase(40, 1)]
+        [TestCase(50, 1)]
+        [TestCase(60, 1)]
+        [TestCase(70, 1)]
+        [TestCase(80, 1)]
+        [TestCase(80, 0)]
+        [TestCase(80, 10)]
+        [TestCase(90, 1)]
+        [Ignore("headless test doesn't run at high enough precision for this to always enter a tracking state in time.")]
+        public void TestVeryShortSliderMissHead(float sliderLength, int repeatCount)
+        {
+            performTest(new List<ReplayFrame>
+            {
+                new OsuReplayFrame { Position = new Vector2(50, 0), Actions = { OsuAction.LeftButton, OsuAction.RightButton }, Time = time_slider_start - 10 },
+                new OsuReplayFrame { Position = new Vector2(50, 0), Actions = { OsuAction.LeftButton, OsuAction.RightButton }, Time = time_slider_start + 2000 },
+            }, new Slider
+            {
+                StartTime = time_slider_start,
+                Position = new Vector2(0, 0),
+                SliderVelocityMultiplier = 10f,
+                RepeatCount = repeatCount,
+                Path = new SliderPath(PathType.Linear, new[]
+                {
+                    Vector2.Zero,
+                    new Vector2(sliderLength, 0),
+                }),
+            }, 240, 1);
+
+            AddAssert("Head judgement is first", () => judgementResults[0].HitObject is SliderHeadCircle);
+            AddAssert("Tail judgement is second last", () => judgementResults[^2].HitObject is SliderTailCircle);
+            AddAssert("Slider judgement is last", () => judgementResults[^1].HitObject is Slider);
+        }
+
         // Making these too short causes breakage from frames not being processed fast enough.
         // To keep things simple, these tests are crafted to always be >16ms length.
         // If sliders shorter than this are ever used in gameplay it will probably break things and we can revisit.
@@ -75,6 +111,8 @@ namespace osu.Game.Rulesets.Osu.Tests
             }, 240, 1);
 
             assertAllMaxJudgements();
+
+            AddAssert("Head judgement is first", () => judgementResults.First().HitObject is SliderHeadCircle);
 
             // Even if the last tick is hit early, the slider should always execute its final judgement at its endtime.
             // If not, hitsounds will not play on time.
@@ -120,6 +158,8 @@ namespace osu.Game.Rulesets.Osu.Tests
                 assertAllMaxJudgements();
             else
                 AddAssert("Tracking dropped", assertMidSliderJudgementFail);
+
+            AddAssert("Head judgement is first", () => judgementResults.First().HitObject is SliderHeadCircle);
 
             // Even if the last tick is hit early, the slider should always execute its final judgement at its endtime.
             // If not, hitsounds will not play on time.
