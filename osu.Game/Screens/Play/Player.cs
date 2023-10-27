@@ -1115,8 +1115,7 @@ namespace osu.Game.Screens.Play
                 if (!GameplayState.HasPassed && !GameplayState.HasFailed)
                     GameplayState.HasQuit = true;
 
-                // if arriving here and the results screen preparation task hasn't run, it's safe to say the user has not completed the beatmap.
-                if (prepareScoreForDisplayTask == null && DrawableRuleset.ReplayScore == null)
+                if (!GameplayState.HasPassed && DrawableRuleset.ReplayScore == null)
                     ScoreProcessor.FailScore(Score.ScoreInfo);
             }
 
