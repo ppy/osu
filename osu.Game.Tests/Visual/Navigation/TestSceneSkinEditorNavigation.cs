@@ -31,7 +31,7 @@ namespace osu.Game.Tests.Visual.Navigation
         private SkinEditor skinEditor => Game.ChildrenOfType<SkinEditor>().FirstOrDefault();
 
         [Test]
-        public void TestEditComponentDuringGameplay()
+        public void TestEditComponentFromGameplayScene()
         {
             advanceToSongSelect();
             openSkinEditor();
