@@ -30,8 +30,11 @@ namespace osu.Game.Storyboards
         /// </summary>
         /// <remarks>
         /// This iterates all elements and as such should be used sparingly or stored locally.
+        /// Video and background events are not included to match stable.
         /// </remarks>
-        public double? EarliestEventTime => Layers.SelectMany(l => l.Elements).MinBy(e => e.StartTime)?.StartTime;
+        public double? EarliestEventTime => Layers.SelectMany(l => l.Elements)
+                                                  .Where(e => e is not StoryboardVideo)
+                                                  .MinBy(e => e.StartTime)?.StartTime;
 
         /// <summary>
         /// Across all layers, find the latest point in time that a storyboard element ends at.
@@ -39,9 +42,12 @@ namespace osu.Game.Storyboards
         /// </summary>
         /// <remarks>
         /// This iterates all elements and as such should be used sparingly or stored locally.
-        /// Videos and samples return StartTime as their EndTIme.
+        /// Samples return StartTime as their EndTIme.
+        /// Video and background events are not included to match stable.
         /// </remarks>
-        public double? LatestEventTime => Layers.SelectMany(l => l.Elements).MaxBy(e => e.GetEndTime())?.GetEndTime();
+        public double? LatestEventTime => Layers.SelectMany(l => l.Elements)
+                                                .Where(e => e is not StoryboardVideo)
+                                                .MaxBy(e => e.GetEndTime())?.GetEndTime();
 
         /// <summary>
         /// Depth of the currently front-most storyboard layer, excluding the overlay layer.
