@@ -87,8 +87,9 @@ namespace osu.Game.Database
         /// 33   2023-08-16    Reset default chat toggle key binding to avoid conflict with newly added leaderboard toggle key binding.
         /// 34   2023-08-21    Add BackgroundReprocessingFailed flag to ScoreInfo to track upgrade failures.
         /// 35   2023-10-16    Clear key combinations of keybindings that are assigned to more than one action in a given settings section.
+        /// 36   2023-10-26    Add LegacyOnlineID to ScoreInfo. Move osu_scores_*_high IDs stored in OnlineID to LegacyOnlineID. Reset anomalous OnlineIDs.
         /// </summary>
-        private const int schema_version = 35;
+        private const int schema_version = 36;
 
         /// <summary>
         /// Lock object which is held during <see cref="BlockAllOperations"/> sections, blocking realm retrieval during blocking periods.
@@ -1071,6 +1072,24 @@ namespace osu.Game.Database
                     {
                         Logger.Log($"{countCleared} of your keybinding(s) have been cleared due to being bound to multiple actions. "
                                    + "Please choose new unique ones in the settings panel.", level: LogLevel.Important);
+                    }
+
+                    break;
+                }
+
+                case 36:
+                {
+                    foreach (var score in migration.NewRealm.All<ScoreInfo>())
+                    {
+                        if (score.OnlineID > 0)
+                        {
+                            score.LegacyOnlineID = score.OnlineID;
+                            score.OnlineID = -1;
+                        }
+                        else
+                        {
+                            score.LegacyOnlineID = score.OnlineID = -1;
+                        }
                     }
 
                     break;
