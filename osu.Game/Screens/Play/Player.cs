@@ -1110,12 +1110,12 @@ namespace osu.Game.Screens.Play
             failAnimationContainer?.Stop();
             PauseOverlay?.StopAllSamples();
 
-            if (LoadedBeatmapSuccessfully)
+            if (LoadedBeatmapSuccessfully && !GameplayState.HasPassed)
             {
-                if (!GameplayState.HasPassed && !GameplayState.HasFailed)
+                if (!GameplayState.HasFailed)
                     GameplayState.HasQuit = true;
 
-                if (!GameplayState.HasPassed && DrawableRuleset.ReplayScore == null)
+                if (DrawableRuleset.ReplayScore == null)
                     ScoreProcessor.FailScore(Score.ScoreInfo);
             }
 
