@@ -67,16 +67,24 @@ namespace osu.Game.Rulesets.Taiko.Skinning.Legacy
 
             bool shouldAnimate = animation?.FrameCount > 1;
 
-            this.FadeInFromZero(fade_in_length)
-                .Then().FadeOut(fade_in_length * 1.5);
-
             if (shouldAnimate)
             {
-                this.ScaleTo(0.6f)
-                    .Then().ScaleTo(1.1f, fade_in_length * 0.8)
-                    .Then().ScaleTo(0.9f, fade_in_length * 0.4)
-                    .Then().ScaleTo(1f, fade_in_length * 0.2);
+                // This logic matches LegacyJudgementPieceOld. So why aren't we just using that class? I guess for the adjusted fadeout length below.
+                this
+                    .ScaleTo(0.6f)
+                    .Then().ScaleTo(1.1f, fade_in_length * 0.8f)
+                    .Then() // t = 0.8
+                    .Delay(fade_in_length * 0.2f) // t = 1.0
+                    .ScaleTo(0.9f, fade_in_length * 0.2f).Then() // t = 1.2
+
+                    // stable dictates scale of 0.9->1 over time 1.0 to 1.4, but we are already at 1.2.
+                    // so we need to force the current value to be correct at 1.2 (0.95) then complete the
+                    // second half of the transform.
+                    .ScaleTo(0.95f).ScaleTo(1, fade_in_length * 0.2f); // t = 1.4
             }
+
+            this.FadeInFromZero(fade_in_length)
+                .Then().FadeOut(fade_in_length * 1.5);
         }
 
         public void AnimateSecondHit()
