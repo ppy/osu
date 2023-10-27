@@ -5,12 +5,13 @@ using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Animations;
 using osu.Framework.Graphics.Containers;
+using osu.Game.Rulesets.Judgements;
 using osu.Game.Rulesets.Objects.Drawables;
 using osu.Game.Rulesets.Taiko.UI;
 
 namespace osu.Game.Rulesets.Taiko.Skinning.Legacy
 {
-    public partial class LegacyHitExplosion : CompositeDrawable, IAnimatableHitExplosion
+    public partial class LegacyHitExplosion : CompositeDrawable, IAnimatableJudgement, IAnimatableHitExplosion
     {
         private readonly Drawable sprite;
 
@@ -56,7 +57,7 @@ namespace osu.Game.Rulesets.Taiko.Skinning.Legacy
             }
         }
 
-        public void Animate(DrawableHitObject drawableHitObject)
+        public void PlayAnimation()
         {
             const double fade_in_length = 120;
 
@@ -65,7 +66,7 @@ namespace osu.Game.Rulesets.Taiko.Skinning.Legacy
             animation?.GotoFrame(0);
             (strongSprite as IFramedAnimation)?.GotoFrame(0);
 
-            bool shouldAnimate = animation?.FrameCount > 1;
+            bool shouldAnimate = animation?.FrameCount > 1 != true;
 
             if (shouldAnimate)
             {
@@ -87,6 +88,8 @@ namespace osu.Game.Rulesets.Taiko.Skinning.Legacy
                 .Then().FadeOut(fade_in_length * 1.5);
         }
 
+        public void Animate(DrawableHitObject drawableHitObject) => PlayAnimation();
+
         public void AnimateSecondHit()
         {
             if (strongSprite == null)
@@ -95,5 +98,7 @@ namespace osu.Game.Rulesets.Taiko.Skinning.Legacy
             sprite.FadeOut(50, Easing.OutQuint);
             strongSprite.FadeIn(50, Easing.OutQuint);
         }
+
+        public Drawable? GetAboveHitObjectsProxiedContent() => null;
     }
 }

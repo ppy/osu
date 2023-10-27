@@ -323,7 +323,11 @@ namespace osu.Game.Rulesets.Taiko.UI
             {
                 case TaikoStrongJudgement:
                     if (result.IsHit)
+                    {
                         hitExplosionContainer.Children.FirstOrDefault(e => e.JudgedObject == ((DrawableStrongNestedHit)judgedObject).ParentHitObject)?.VisualiseSecondHit(result);
+                        (judgementContainer.Children.FirstOrDefault(e => e.JudgedObject == ((DrawableStrongNestedHit)judgedObject).ParentHitObject) as IAnimatableHitExplosion)?.AnimateSecondHit();
+                    }
+
                     break;
 
                 case TaikoDrumRollTickJudgement:
