@@ -10,7 +10,7 @@ namespace osu.Game.Tournament.Components
 {
     public partial class DateTextBox : SettingsTextBox
     {
-        private readonly BindableWithCurrent<DateTimeOffset> current = new BindableWithCurrent<DateTimeOffset>();
+        private readonly BindableWithCurrent<DateTimeOffset> current = new BindableWithCurrent<DateTimeOffset>(DateTimeOffset.Now);
 
         public new Bindable<DateTimeOffset>? Current
         {
