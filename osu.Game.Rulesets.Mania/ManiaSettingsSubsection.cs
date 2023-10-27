@@ -48,7 +48,7 @@ namespace osu.Game.Rulesets.Mania
             };
         }
 
-        private partial class ManiaScrollSlider : RoundedSliderBar<int>
+        public partial class ManiaScrollSlider : RoundedSliderBar<int>
         {
             public override LocalisableString TooltipText => RulesetSettingsStrings.ScrollSpeedTooltip((int)DrawableManiaRuleset.ComputeScrollTime(Current.Value), Current.Value);
         }
