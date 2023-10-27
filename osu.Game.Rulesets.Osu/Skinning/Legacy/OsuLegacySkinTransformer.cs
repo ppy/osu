@@ -145,10 +145,11 @@ namespace osu.Game.Rulesets.Osu.Skinning.Legacy
                             return null;
 
                         const float hitcircle_text_scale = 0.8f;
-                        return new LegacySpriteText(LegacyFont.HitCircle, OsuHitObject.OBJECT_DIMENSIONS * 2 / hitcircle_text_scale)
+                        return new LegacySpriteText(LegacyFont.HitCircle)
                         {
                             // stable applies a blanket 0.8x scale to hitcircle fonts
                             Scale = new Vector2(hitcircle_text_scale),
+                            MaxSizePerGlyph = OsuHitObject.OBJECT_DIMENSIONS * 2 / hitcircle_text_scale,
                         };
 
                     case OsuSkinComponents.SpinnerBody:

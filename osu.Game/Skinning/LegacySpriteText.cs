@@ -12,8 +12,9 @@ namespace osu.Game.Skinning
 {
     public sealed partial class LegacySpriteText : OsuSpriteText
     {
+        public Vector2? MaxSizePerGlyph { get; init; }
+
         private readonly LegacyFont font;
-        private readonly Vector2? maxSizePerGlyph;
 
         private LegacyGlyphStore glyphStore = null!;
 
@@ -21,10 +22,9 @@ namespace osu.Game.Skinning
 
         protected override char[] FixedWidthExcludeCharacters => new[] { ',', '.', '%', 'x' };
 
-        public LegacySpriteText(LegacyFont font, Vector2? maxSizePerGlyph = null)
+        public LegacySpriteText(LegacyFont font)
         {
             this.font = font;
-            this.maxSizePerGlyph = maxSizePerGlyph;
 
             Shadow = false;
             UseFullGlyphHeight = false;
@@ -36,7 +36,7 @@ namespace osu.Game.Skinning
             Font = new FontUsage(skin.GetFontPrefix(font), 1, fixedWidth: true);
             Spacing = new Vector2(-skin.GetFontOverlap(font), 0);
 
-            glyphStore = new LegacyGlyphStore(skin, maxSizePerGlyph);
+            glyphStore = new LegacyGlyphStore(skin, MaxSizePerGlyph);
         }
 
         protected override TextBuilder CreateTextBuilder(ITexturedGlyphLookupStore store) => base.CreateTextBuilder(glyphStore);
