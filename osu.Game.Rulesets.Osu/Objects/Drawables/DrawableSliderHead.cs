@@ -4,7 +4,6 @@
 #nullable disable
 
 using System.Diagnostics;
-using JetBrains.Annotations;
 using osu.Framework.Bindables;
 using osu.Game.Rulesets.Osu.UI;
 using osu.Game.Rulesets.Scoring;
@@ -14,9 +13,6 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
     public partial class DrawableSliderHead : DrawableHitCircle
     {
         public new SliderHeadCircle HitObject => (SliderHeadCircle)base.HitObject;
-
-        [CanBeNull]
-        public Slider Slider => DrawableSlider?.HitObject;
 
         public DrawableSlider DrawableSlider => (DrawableSlider)ParentHitObject;
 
