@@ -58,17 +58,25 @@ namespace osu.Game.Rulesets.Taiko.Skinning.Legacy
 
         public void Animate(DrawableHitObject drawableHitObject)
         {
-            const double animation_time = 120;
+            const double fade_in_length = 120;
 
-            (sprite as IFramedAnimation)?.GotoFrame(0);
+            var animation = sprite as IFramedAnimation;
+
+            animation?.GotoFrame(0);
             (strongSprite as IFramedAnimation)?.GotoFrame(0);
 
-            this.FadeInFromZero(animation_time).Then().FadeOut(animation_time * 1.5);
+            bool shouldAnimate = animation?.FrameCount > 1;
 
-            this.ScaleTo(0.6f)
-                .Then().ScaleTo(1.1f, animation_time * 0.8)
-                .Then().ScaleTo(0.9f, animation_time * 0.4)
-                .Then().ScaleTo(1f, animation_time * 0.2);
+            this.FadeInFromZero(fade_in_length)
+                .Then().FadeOut(fade_in_length * 1.5);
+
+            if (shouldAnimate)
+            {
+                this.ScaleTo(0.6f)
+                    .Then().ScaleTo(1.1f, fade_in_length * 0.8)
+                    .Then().ScaleTo(0.9f, fade_in_length * 0.4)
+                    .Then().ScaleTo(1f, fade_in_length * 0.2);
+            }
         }
 
         public void AnimateSecondHit()
