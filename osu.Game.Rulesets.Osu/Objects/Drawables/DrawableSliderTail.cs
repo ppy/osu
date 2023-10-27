@@ -4,6 +4,7 @@
 #nullable disable
 
 using System.Diagnostics;
+using System.Linq;
 using JetBrains.Annotations;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
@@ -129,16 +130,27 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
             if (userTriggered)
                 return;
 
-            // Ensure the tail can only activate after all previous ticks already have.
+            // Ensure the tail can only activate after all previous ticks/repeats already have.
             //
             // This covers the edge case where the lenience may allow the tail to activate before
             // the last tick, changing ordering of score/combo awarding.
-            if (DrawableSlider.NestedHitObjects.Count > 1 && !DrawableSlider.NestedHitObjects[^2].Judged)
+            var lastTick = DrawableSlider.NestedHitObjects.LastOrDefault(o => o.HitObject is SliderTick || o.HitObject is SliderRepeat);
+            if (lastTick?.Judged == false)
                 return;
+
+            if (timeOffset < SliderEventGenerator.TAIL_LENIENCY)
+                return;
+
+            // Attempt to preserve correct ordering of judgements as best we can by forcing
+            // an un-judged head to be missed when the user has clearly skipped it.
+            //
+            // This check is applied to all nested slider objects apart from the head (ticks, repeats, tail).
+            if (Tracking && !DrawableSlider.HeadCircle.Judged)
+                DrawableSlider.HeadCircle.MissForcefully();
 
             // The player needs to have engaged in tracking at any point after the tail leniency cutoff.
             // An actual tick miss should only occur if reaching the tick itself.
-            if (timeOffset >= SliderEventGenerator.TAIL_LENIENCY && Tracking)
+            if (Tracking)
                 ApplyResult(r => r.Type = r.Judgement.MaxResult);
             else if (timeOffset > 0)
                 ApplyResult(r => r.Type = r.Judgement.MinResult);
