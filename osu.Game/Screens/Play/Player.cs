@@ -1112,7 +1112,7 @@ namespace osu.Game.Screens.Play
 
             if (LoadedBeatmapSuccessfully && !GameplayState.HasPassed)
             {
-                Debug.Assert(resultsDisplayDelegate == null && prepareScoreForDisplayTask == null);
+                Debug.Assert(resultsDisplayDelegate == null);
 
                 if (!GameplayState.HasFailed)
                     GameplayState.HasQuit = true;
