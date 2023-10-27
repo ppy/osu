@@ -3,6 +3,7 @@
 
 using osu.Framework.Graphics;
 using osu.Game.Rulesets.Judgements;
+using osu.Game.Rulesets.Objects.Drawables;
 using osu.Game.Rulesets.Scoring;
 using osuTK;
 
@@ -11,7 +12,7 @@ namespace osu.Game.Rulesets.Taiko.UI
     /// <summary>
     /// Text that is shown as judgement when a hit object is hit or missed.
     /// </summary>
-    public partial class DrawableTaikoJudgement : DrawableJudgement
+    public partial class DrawableTaikoJudgement : DrawableJudgement, IAnimatableHitExplosion
     {
         public DrawableTaikoJudgement()
         {
@@ -23,5 +24,16 @@ namespace osu.Game.Rulesets.Taiko.UI
         }
 
         protected override Drawable CreateDefaultJudgement(HitResult result) => new DefaultJudgementPiece(result);
+
+        // Not actually used in execution. We're implementing the interface for AnimateSecondHit().
+        public void Animate(DrawableHitObject drawableHitObject)
+        {
+            (JudgementBody.Drawable as IAnimatableHitExplosion)?.Animate(drawableHitObject);
+        }
+
+        public void AnimateSecondHit()
+        {
+            (JudgementBody.Drawable as IAnimatableHitExplosion)?.AnimateSecondHit();
+        }
     }
 }
