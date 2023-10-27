@@ -22,8 +22,6 @@ namespace osu.Game.Scoring
 
         double Accuracy { get; }
 
-        bool HasReplay { get; }
-
         long LegacyOnlineID { get; }
 
         DateTimeOffset Date { get; }
