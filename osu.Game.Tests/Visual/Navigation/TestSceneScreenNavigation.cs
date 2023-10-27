@@ -247,6 +247,7 @@ namespace osu.Game.Tests.Visual.Navigation
             AddStep("end spectator before retry", () => Game.SpectatorClient.EndPlaying(player.GameplayState));
 
             AddStep("attempt to retry", () => player.ChildrenOfType<HotkeyRetryOverlay>().First().Action());
+            AddAssert("old player score marked failed", () => player.Score.ScoreInfo.Rank, () => Is.EqualTo(ScoreRank.F));
             AddUntilStep("wait for old player gone", () => Game.ScreenStack.CurrentScreen != player);
 
             AddUntilStep("get new player", () => (player = Game.ScreenStack.CurrentScreen as Player) != null);
@@ -259,6 +260,7 @@ namespace osu.Game.Tests.Visual.Navigation
             var getOriginalPlayer = playToCompletion();
 
             AddStep("attempt to retry", () => getOriginalPlayer().ChildrenOfType<HotkeyRetryOverlay>().First().Action());
+            AddAssert("original play isn't failed", () => getOriginalPlayer().Score.ScoreInfo.Rank, () => Is.Not.EqualTo(ScoreRank.F));
             AddUntilStep("wait for player", () => Game.ScreenStack.CurrentScreen != getOriginalPlayer() && Game.ScreenStack.CurrentScreen is Player);
         }
 
