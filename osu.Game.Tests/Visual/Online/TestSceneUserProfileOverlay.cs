@@ -121,12 +121,29 @@ namespace osu.Game.Tests.Visual.Online
                     Data = Enumerable.Range(2345, 45).Concat(Enumerable.Range(2109, 40)).ToArray()
                 },
             },
-            TournamentBanner = new TournamentBanner
+            TournamentBanners = new[]
             {
-                Id = 13926,
-                TournamentId = 35,
-                ImageLowRes = "https://assets.ppy.sh/tournament-banners/official/owc2022/profile/winner_US.jpg",
-                Image = "https://assets.ppy.sh/tournament-banners/official/owc2022/profile/winner_US@2x.jpg",
+                new TournamentBanner
+                {
+                    Id = 15588,
+                    TournamentId = 41,
+                    ImageLowRes = "https://assets.ppy.sh/tournament-banners/official/owc2023/profile/supporter_CN.jpg",
+                    Image = "https://assets.ppy.sh/tournament-banners/official/owc2023/profile/supporter_CN@2x.jpg"
+                },
+                new TournamentBanner
+                {
+                    Id = 15589,
+                    TournamentId = 41,
+                    ImageLowRes = "https://assets.ppy.sh/tournament-banners/official/owc2023/profile/supporter_PH.jpg",
+                    Image = "https://assets.ppy.sh/tournament-banners/official/owc2023/profile/supporter_PH@2x.jpg"
+                },
+                new TournamentBanner
+                {
+                    Id = 15590,
+                    TournamentId = 41,
+                    ImageLowRes = "https://assets.ppy.sh/tournament-banners/official/owc2023/profile/supporter_CL.jpg",
+                    Image = "https://assets.ppy.sh/tournament-banners/official/owc2023/profile/supporter_CL@2x.jpg"
+                }
             },
             Badges = new[]
             {
