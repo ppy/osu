@@ -87,7 +87,7 @@ namespace osu.Game.Rulesets.Osu.Skinning.Legacy
                         Origin = Anchor.Centre,
                         Scale = new Vector2(SPRITE_SCALE),
                         Y = SPINNER_TOP_OFFSET + 299,
-                    }.With(s => s.Font = s.Font.With(fixedWidth: false)),
+                    },
                     spmBackground = new Sprite
                     {
                         Anchor = Anchor.TopCentre,
@@ -102,7 +102,7 @@ namespace osu.Game.Rulesets.Osu.Skinning.Legacy
                         Origin = Anchor.TopRight,
                         Scale = new Vector2(SPRITE_SCALE * 0.9f),
                         Position = new Vector2(80, 448 + spm_hide_offset),
-                    }.With(s => s.Font = s.Font.With(fixedWidth: false)),
+                    },
                 }
             });
         }
