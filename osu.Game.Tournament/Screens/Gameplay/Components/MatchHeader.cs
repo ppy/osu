@@ -2,7 +2,6 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using osu.Framework.Allocation;
-using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Game.Tournament.Components;
@@ -16,8 +15,6 @@ namespace osu.Game.Tournament.Screens.Gameplay.Components
         private TeamScoreDisplay teamDisplay1 = null!;
         private TeamScoreDisplay teamDisplay2 = null!;
         private DrawableTournamentHeaderLogo logo = null!;
-
-        public readonly BindableBool DisplaySeeds = new BindableBool();
 
         private bool showScores = true;
 
@@ -91,13 +88,11 @@ namespace osu.Game.Tournament.Screens.Gameplay.Components
                 {
                     Anchor = Anchor.TopLeft,
                     Origin = Anchor.TopLeft,
-                    DisplaySeed = { BindTarget = DisplaySeeds },
                 },
                 teamDisplay2 = new TeamScoreDisplay(TeamColour.Blue)
                 {
                     Anchor = Anchor.TopRight,
                     Origin = Anchor.TopRight,
-                    DisplaySeed = { BindTarget = DisplaySeeds },
                 },
             };
         }
