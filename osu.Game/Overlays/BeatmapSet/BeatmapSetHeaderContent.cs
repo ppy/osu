@@ -24,6 +24,7 @@ using osu.Game.Online.API;
 using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Online.Chat;
 using osu.Game.Overlays.BeatmapSet.Buttons;
+using osu.Game.Users;
 using osuTK;
 using osuTK.Graphics;
 
@@ -68,6 +69,7 @@ namespace osu.Game.Overlays.BeatmapSet
         {
             RelativeSizeAxes = Axes.X;
             AutoSizeAxes = Axes.Y;
+            var recentFavouritedUsersList = new UserSquareList();
             InternalChild = new Container
             {
                 RelativeSizeAxes = Axes.X,
@@ -113,7 +115,7 @@ namespace osu.Game.Overlays.BeatmapSet
                                     {
                                         RelativeSizeAxes = Axes.X,
                                         AutoSizeAxes = Axes.Y,
-                                        Child = Picker = new BeatmapPicker(),
+                                        Child = Picker = new BeatmapPicker(recentFavouritedUsersList),
                                     },
                                     title = new MetadataFlowContainer(s =>
                                     {
@@ -186,7 +188,8 @@ namespace osu.Game.Overlays.BeatmapSet
                             Details = new Details(),
                         },
                     },
-                }
+                    recentFavouritedUsersList
+                },
             };
 
             Picker.Beatmap.ValueChanged += b =>

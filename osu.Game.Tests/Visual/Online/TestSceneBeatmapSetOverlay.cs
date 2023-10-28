@@ -166,7 +166,8 @@ namespace osu.Game.Tests.Visual.Online
                 overlay.ShowBeatmapSet(set);
             });
 
-            AddAssert("shown beatmaps of current ruleset", () => overlay.Header.HeaderContent.Picker.Difficulties.All(b => b.Beatmap.Ruleset.OnlineID == overlay.Header.RulesetSelector.Current.Value.OnlineID));
+            AddAssert("shown beatmaps of current ruleset",
+                () => overlay.Header.HeaderContent.Picker.Difficulties.All(b => b.Beatmap.Ruleset.OnlineID == overlay.Header.RulesetSelector.Current.Value.OnlineID));
             AddAssert("left-most beatmap selected", () => overlay.Header.HeaderContent.Picker.Difficulties.First().State == BeatmapPicker.DifficultySelectorState.Selected);
         }
 
@@ -212,6 +213,54 @@ namespace osu.Game.Tests.Visual.Online
                 beatmapSet.HasExplicitContent = true;
                 beatmapSet.FeaturedInSpotlight = true;
                 beatmapSet.TrackId = 1;
+                overlay.ShowBeatmapSet(beatmapSet);
+            });
+        }
+
+        [Test]
+        public void TestBeatmapWithZeroRecentFavourite()
+        {
+            AddStep("show map with zero recent favourties", () =>
+            {
+                var beatmapSet = getBeatmapSet();
+                beatmapSet.FavouriteCount = 0;
+                beatmapSet.RecentFavourites = Array.Empty<APIUser>();
+                overlay.ShowBeatmapSet(beatmapSet);
+            });
+        }
+
+        [Test]
+        public void TestBeatmapWithFiveRecentFavourite()
+        {
+            AddStep("show map with five recent favourties", () =>
+            {
+                var beatmapSet = getBeatmapSet();
+                beatmapSet.FavouriteCount = 5;
+                beatmapSet.RecentFavourites = generateDummyApiUsers(beatmapSet.FavouriteCount);
+                overlay.ShowBeatmapSet(beatmapSet);
+            });
+        }
+
+        [Test]
+        public void TestBeatmapWithTwentyFiveRecentFavourite()
+        {
+            AddStep("show map with twenty five recent favourties", () =>
+            {
+                var beatmapSet = getBeatmapSet();
+                beatmapSet.FavouriteCount = 25;
+                beatmapSet.RecentFavourites = generateDummyApiUsers(beatmapSet.FavouriteCount);
+                overlay.ShowBeatmapSet(beatmapSet);
+            });
+        }
+
+        [Test]
+        public void TestBeatmapWithSixtyFiveRecentFavourite()
+        {
+            AddStep("show map with sixty five recent favourties", () =>
+            {
+                var beatmapSet = getBeatmapSet();
+                beatmapSet.FavouriteCount = 65;
+                beatmapSet.RecentFavourites = generateDummyApiUsers(beatmapSet.FavouriteCount);
                 overlay.ShowBeatmapSet(beatmapSet);
             });
         }
@@ -388,6 +437,25 @@ namespace osu.Game.Tests.Visual.Online
             set.Beatmaps = beatmaps.ToArray();
 
             return set;
+        }
+
+        private APIUser[] generateDummyApiUsers(int amount)
+        {
+            var users = new List<APIUser>();
+
+            for (int i = 0; i < amount; i++)
+            {
+                var user = new APIUser
+                {
+                    Id = i + 2,
+                    Username = $"joshika39-{i}",
+                    CoverUrl = "https://osu.ppy.sh/images/headers/profile-covers/c3.jpg",
+                    AvatarUrl = "https://a.ppy.sh/17032217?1698744064.jpeg"
+                };
+                users.Add(user);
+            }
+
+            return users.ToArray();
         }
 
         private void downloadAssert(bool shown)
