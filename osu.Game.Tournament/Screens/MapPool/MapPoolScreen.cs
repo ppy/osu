@@ -50,7 +50,6 @@ namespace osu.Game.Tournament.Screens.MapPool
                 new MatchHeader
                 {
                     ShowScores = true,
-                    DisplaySeeds = { BindTarget = LadderInfo.DisplayTeamSeeds },
                 },
                 mapFlows = new FillFlowContainer<FillFlowContainer<TournamentBeatmapPanel>>
                 {

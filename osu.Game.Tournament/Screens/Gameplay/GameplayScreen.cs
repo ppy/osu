@@ -50,7 +50,6 @@ namespace osu.Game.Tournament.Screens.Gameplay
                 header = new MatchHeader
                 {
                     ShowLogo = false,
-                    DisplaySeeds = { BindTarget = LadderInfo.DisplayTeamSeeds },
                 },
                 new Container
                 {

@@ -22,7 +22,17 @@ namespace osu.Game.Tournament.Components
                 Children = new Drawable[]
                 {
                     new DrawableTeamHeader(colour),
-                    new DrawableTeamTitle(team),
+                    new FillFlowContainer
+                    {
+                        AutoSizeAxes = Axes.Both,
+                        Direction = FillDirection.Horizontal,
+                        Spacing = new Vector2(5),
+                        Children = new Drawable[]
+                        {
+                            new DrawableTeamTitle(team),
+                            new DrawableTeamSeed(team),
+                        }
+                    }
                 }
             };
         }

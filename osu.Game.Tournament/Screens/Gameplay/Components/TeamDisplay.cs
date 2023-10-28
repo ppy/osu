@@ -15,10 +15,8 @@ namespace osu.Game.Tournament.Screens.Gameplay.Components
         private readonly TeamScore score;
 
         private readonly TournamentSpriteTextWithBackground teamNameText;
-        private readonly TournamentSpriteTextWithBackground teamSeedText;
 
         private readonly Bindable<string> teamName = new Bindable<string>("???");
-        private readonly Bindable<string> teamSeed = new Bindable<string>();
 
         private bool showScore;
 
@@ -37,7 +35,7 @@ namespace osu.Game.Tournament.Screens.Gameplay.Components
             }
         }
 
-        public TeamDisplay(TournamentTeam? team, TeamColour colour, Bindable<int?> currentTeamScore, int pointsToWin, bool displaySeed)
+        public TeamDisplay(TournamentTeam? team, TeamColour colour, Bindable<int?> currentTeamScore, int pointsToWin)
             : base(team)
         {
             AutoSizeAxes = Axes.Both;
@@ -112,13 +110,12 @@ namespace osu.Game.Tournament.Screens.Gameplay.Components
                                                 Origin = anchor,
                                                 Anchor = anchor,
                                             },
-                                            teamSeedText = new TournamentSpriteTextWithBackground
+                                            new DrawableTeamSeed(Team)
                                             {
                                                 Scale = new Vector2(0.5f),
                                                 Origin = anchor,
                                                 Anchor = anchor,
-                                                Alpha = displaySeed ? 1 : 0,
-                                            }
+                                            },
                                         }
                                     },
                                 }
@@ -137,13 +134,9 @@ namespace osu.Game.Tournament.Screens.Gameplay.Components
             FinishTransforms(true);
 
             if (Team != null)
-            {
                 teamName.BindTo(Team.FullName);
-                teamSeed.BindTo(Team.Seed);
-            }
 
             teamName.BindValueChanged(name => teamNameText.Text.Text = name.NewValue, true);
-            teamSeed.BindValueChanged(seed => teamSeedText.Text.Text = seed.NewValue, true);
         }
 
         private void updateDisplay()
