@@ -49,7 +49,8 @@ namespace osu.Game.Tournament.Screens.Gameplay
                 },
                 header = new MatchHeader
                 {
-                    ShowLogo = false
+                    ShowLogo = false,
+                    DisplaySeeds = { BindTarget = LadderInfo.DisplayTeamSeeds },
                 },
                 new Container
                 {
@@ -119,17 +120,11 @@ namespace osu.Game.Tournament.Screens.Gameplay
                             Current = LadderInfo.PlayersPerTeam,
                             KeyboardStep = 1,
                         },
-                        new SettingsCheckbox
-                        {
-                            LabelText = "Display team seeds",
-                            Current = LadderInfo.DisplayTeamSeeds,
-                        },
                     }
                 }
             });
 
             LadderInfo.ChromaKeyWidth.BindValueChanged(width => chroma.Width = width.NewValue, true);
-            LadderInfo.DisplayTeamSeeds.BindValueChanged(v => header.DisplaySeeds.Value = v.NewValue, true);
 
             warmup.BindValueChanged(w =>
             {
