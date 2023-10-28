@@ -3,20 +3,14 @@
 
 using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
-using System.Threading;
-using System.Threading.Tasks;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics.Textures;
-using osu.Framework.IO.Stores;
 using osu.Framework.Testing;
 using osu.Game.IO;
 using osu.Game.Rulesets;
 using osu.Game.Screens.Play;
 using osu.Game.Skinning;
-using SixLabors.ImageSharp;
-using SixLabors.ImageSharp.Processing;
 
 namespace osu.Game.Tests.Visual.Gameplay
 {
