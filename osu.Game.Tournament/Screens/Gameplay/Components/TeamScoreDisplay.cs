@@ -21,6 +21,8 @@ namespace osu.Game.Tournament.Screens.Gameplay.Components
 
         private TeamDisplay? teamDisplay;
 
+        public readonly BindableBool DisplaySeed = new BindableBool();
+
         public bool ShowScore
         {
             get => teamDisplay?.ShowScore ?? false;
@@ -48,6 +50,7 @@ namespace osu.Game.Tournament.Screens.Gameplay.Components
             currentMatch.BindValueChanged(matchChanged);
 
             currentTeam.BindValueChanged(teamChanged);
+            DisplaySeed.BindValueChanged(_ => currentTeam.TriggerChange());
 
             updateMatch();
         }
@@ -101,7 +104,7 @@ namespace osu.Game.Tournament.Screens.Gameplay.Components
 
             InternalChildren = new Drawable[]
             {
-                teamDisplay = new TeamDisplay(team.NewValue, teamColour, currentTeamScore, currentMatch.Value?.PointsToWin ?? 0),
+                teamDisplay = new TeamDisplay(team.NewValue, teamColour, currentTeamScore, currentMatch.Value?.PointsToWin ?? 0, DisplaySeed.Value),
             };
 
             teamDisplay.ShowScore = wasShowingScores;
