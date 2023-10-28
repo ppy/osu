@@ -30,6 +30,7 @@ namespace osu.Game.Storyboards
         /// </summary>
         /// <remarks>
         /// This iterates all elements and as such should be used sparingly or stored locally.
+        /// Sample events use their start time as "end time" during this calculation.
         /// Video and background events are not included to match stable.
         /// </remarks>
         public double? EarliestEventTime => Layers.SelectMany(l => l.Elements)
@@ -42,7 +43,7 @@ namespace osu.Game.Storyboards
         /// </summary>
         /// <remarks>
         /// This iterates all elements and as such should be used sparingly or stored locally.
-        /// Samples return StartTime as their EndTIme.
+        /// Sample events use their start time as "end time" during this calculation.
         /// Video and background events are not included to match stable.
         /// </remarks>
         public double? LatestEventTime => Layers.SelectMany(l => l.Elements)
