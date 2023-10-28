@@ -21,6 +21,7 @@ namespace osu.Game.Tournament.Tests.Components
             {
                 FlagName = { Value = "AU" },
                 FullName = { Value = "Australia" },
+                Seed = { Value = "#5" },
                 Players =
                 {
                     new TournamentUser { Username = "ASecretBox" },
@@ -30,7 +31,7 @@ namespace osu.Game.Tournament.Tests.Components
                     new TournamentUser { Username = "Parkes" },
                     new TournamentUser { Username = "Shiroha" },
                     new TournamentUser { Username = "Jordan The Bear" },
-                }
+                },
             };
 
             var match = new TournamentMatch { Team1 = { Value = team } };
@@ -100,7 +101,7 @@ namespace osu.Game.Tournament.Tests.Components
             Cell(i).AddRange(new Drawable[]
             {
                 new TournamentSpriteText { Text = "TeamDisplay" },
-                new TeamDisplay(team, TeamColour.Red, new Bindable<int?>(2), 6)
+                new TeamDisplay(team, TeamColour.Red, new Bindable<int?>(2), 6, true)
                 {
                     Anchor = Anchor.Centre,
                     Origin = Anchor.Centre,
