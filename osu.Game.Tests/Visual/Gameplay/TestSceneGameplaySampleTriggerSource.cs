@@ -18,6 +18,7 @@ using osu.Game.Rulesets.Objects.Drawables;
 using osu.Game.Rulesets.Objects.Types;
 using osu.Game.Rulesets.Osu;
 using osu.Game.Rulesets.Osu.Objects;
+using osu.Game.Rulesets.Osu.Scoring;
 using osu.Game.Rulesets.Scoring;
 using osu.Game.Rulesets.UI;
 using osu.Game.Storyboards;
@@ -63,33 +64,30 @@ namespace osu.Game.Tests.Visual.Gameplay
             {
                 new HitCircle
                 {
-                    HitWindows = new HitWindows(),
                     StartTime = t += spacing,
                     Samples = new[] { new HitSampleInfo(HitSampleInfo.HIT_NORMAL) }
                 },
                 new HitCircle
                 {
-                    HitWindows = new HitWindows(),
                     StartTime = t += spacing,
                     Samples = new[] { new HitSampleInfo(HitSampleInfo.HIT_WHISTLE) }
                 },
                 new HitCircle
                 {
-                    HitWindows = new HitWindows(),
                     StartTime = t += spacing,
                     Samples = new[] { new HitSampleInfo(HitSampleInfo.HIT_NORMAL, HitSampleInfo.BANK_SOFT) },
                 },
                 new HitCircle
                 {
-                    HitWindows = new HitWindows(),
                     StartTime = t += spacing,
                 },
-                new Slider
+                new TestSlider
                 {
-                    HitWindows = new HitWindows(),
                     StartTime = t += spacing,
                     Path = new SliderPath(PathType.Linear, new[] { Vector2.Zero, Vector2.UnitY * 200 }),
                     Samples = new[] { new HitSampleInfo(HitSampleInfo.HIT_WHISTLE, HitSampleInfo.BANK_SOFT) },
+                    // sliders usually don't have a hit window, but add one to test the scenario of playing a nested object's sample first before the main object itself.
+                    HitWindows = new OsuHitWindows(),
                 },
             });
 
@@ -141,7 +139,7 @@ namespace osu.Game.Tests.Visual.Gameplay
             checkValidObjectIndex(0);
 
             // still too far away.
-            seekBeforeIndex(1, 400);
+            seekBeforeIndex(1, OsuHitWindows.MISS_WINDOW * 2 + 50);
             checkValidObjectIndex(0);
 
             // Still object 1 as it's not hit yet.
@@ -158,7 +156,7 @@ namespace osu.Game.Tests.Visual.Gameplay
             waitForAliveObjectIndex(1);
             checkValidObjectIndex(1);
 
-            seekBeforeIndex(1, 400);
+            seekBeforeIndex(1, OsuHitWindows.MISS_WINDOW * 2 + 50);
             checkValidObjectIndex(0);
 
             seekBeforeIndex(3);
@@ -224,6 +222,11 @@ namespace osu.Game.Tests.Visual.Gameplay
             }
 
             public new HitObject? GetMostValidObject() => base.GetMostValidObject();
+        }
+
+        private class TestSlider : Slider
+        {
+            protected override HitWindows CreateHitWindows() => new OsuHitWindows();
         }
     }
 }
