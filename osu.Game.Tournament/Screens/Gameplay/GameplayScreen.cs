@@ -36,7 +36,7 @@ namespace osu.Game.Tournament.Screens.Gameplay
         private Drawable chroma = null!;
 
         [BackgroundDependencyLoader]
-        private void load(LadderInfo ladder, MatchIPCInfo ipc)
+        private void load(MatchIPCInfo ipc)
         {
             this.ipc = ipc;
 
@@ -118,12 +118,18 @@ namespace osu.Game.Tournament.Screens.Gameplay
                             LabelText = "Players per team",
                             Current = LadderInfo.PlayersPerTeam,
                             KeyboardStep = 1,
-                        }
+                        },
+                        new SettingsCheckbox
+                        {
+                            LabelText = "Display team seeds",
+                            Current = LadderInfo.DisplayTeamSeeds,
+                        },
                     }
                 }
             });
 
-            ladder.ChromaKeyWidth.BindValueChanged(width => chroma.Width = width.NewValue, true);
+            LadderInfo.ChromaKeyWidth.BindValueChanged(width => chroma.Width = width.NewValue, true);
+            LadderInfo.DisplayTeamSeeds.BindValueChanged(v => header.DisplaySeeds.Value = v.NewValue, true);
 
             warmup.BindValueChanged(w =>
             {
