@@ -287,5 +287,26 @@ namespace osu.Game.Tests.Beatmaps.Formats
                 Assert.That(manyTimes.EndTime, Is.EqualTo(9000 + loop_duration));
             }
         }
+
+        [Test]
+        public void TestVideoAndBackgroundEventsDoNotAffectStoryboardBounds()
+        {
+            var decoder = new LegacyStoryboardDecoder();
+
+            using var resStream = TestResources.OpenResource("video-background-events-ignored.osb");
+            using var stream = new LineBufferedReader(resStream);
+
+            var storyboard = decoder.Decode(stream);
+
+            Assert.Multiple(() =>
+            {
+                Assert.That(storyboard.GetLayer(@"Video").Elements, Has.Count.EqualTo(1));
+                Assert.That(storyboard.GetLayer(@"Video").Elements.Single(), Is.InstanceOf<StoryboardVideo>());
+                Assert.That(storyboard.GetLayer(@"Video").Elements.Single().StartTime, Is.EqualTo(-5678));
+
+                Assert.That(storyboard.EarliestEventTime, Is.Null);
+                Assert.That(storyboard.LatestEventTime, Is.Null);
+            });
+        }
     }
 }
