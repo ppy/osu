@@ -81,7 +81,7 @@ namespace osu.Game.Tests.Visual.Gameplay
                 {
                     StartTime = t += spacing,
                 },
-                new TestSlider
+                new Slider
                 {
                     StartTime = t += spacing,
                     Path = new SliderPath(PathType.Linear, new[] { Vector2.Zero, Vector2.UnitY * 200 }),
@@ -222,11 +222,6 @@ namespace osu.Game.Tests.Visual.Gameplay
             }
 
             public new HitObject? GetMostValidObject() => base.GetMostValidObject();
-        }
-
-        private class TestSlider : Slider
-        {
-            protected override HitWindows CreateHitWindows() => new OsuHitWindows();
         }
     }
 }
