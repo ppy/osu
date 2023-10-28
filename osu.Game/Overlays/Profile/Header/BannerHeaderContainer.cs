@@ -1,6 +1,7 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System.Linq;
 using System.Threading;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
@@ -11,7 +12,7 @@ using osu.Game.Overlays.Profile.Header.Components;
 
 namespace osu.Game.Overlays.Profile.Header
 {
-    public partial class BannerHeaderContainer : CompositeDrawable
+    public partial class BannerHeaderContainer : FillFlowContainer
     {
         public readonly Bindable<UserProfileData?> User = new Bindable<UserProfileData?>();
 
@@ -19,9 +20,9 @@ namespace osu.Game.Overlays.Profile.Header
         private void load()
         {
             Alpha = 0;
-            RelativeSizeAxes = Axes.Both;
-            FillMode = FillMode.Fit;
-            FillAspectRatio = 1000 / 60f;
+            RelativeSizeAxes = Axes.X;
+            AutoSizeAxes = Axes.Y;
+            Direction = FillDirection.Vertical;
         }
 
         protected override void LoadComplete()
@@ -40,13 +41,13 @@ namespace osu.Game.Overlays.Profile.Header
 
             ClearInternal();
 
-            var banner = user?.TournamentBanner;
+            var banners = user?.TournamentBanners;
 
-            if (banner != null)
+            if (banners?.Length > 0)
             {
                 Show();
 
-                LoadComponentAsync(new DrawableTournamentBanner(banner), AddInternal, cancellationTokenSource.Token);
+                LoadComponentsAsync(banners.Select(b => new DrawableTournamentBanner(b)), AddRangeInternal, cancellationTokenSource.Token);
             }
             else
             {
