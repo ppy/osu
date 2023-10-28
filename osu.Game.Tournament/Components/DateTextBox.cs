@@ -2,6 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
+using System.Globalization;
 using osu.Framework.Bindables;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Overlays.Settings;
@@ -23,13 +24,13 @@ namespace osu.Game.Tournament.Components
             base.Current = new Bindable<string>(string.Empty);
 
             current.BindValueChanged(dto =>
-                base.Current.Value = dto.NewValue.ToUniversalTime().ToString("yyyy-MM-ddTHH:mm:ssZ"), true);
+                base.Current.Value = dto.NewValue.ToUniversalTime().ToString("yyyy-MM-ddTHH:mm:ssZ", DateTimeFormatInfo.InvariantInfo), true);
 
             ((OsuTextBox)Control).OnCommit += (sender, _) =>
             {
                 try
                 {
-                    current.Value = DateTimeOffset.Parse(sender.Text);
+                    current.Value = DateTimeOffset.Parse(sender.Text, DateTimeFormatInfo.InvariantInfo);
                 }
                 catch
                 {
