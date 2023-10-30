@@ -1,8 +1,6 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
 using System.Diagnostics;
 using System.Linq;
 using NUnit.Framework;
@@ -24,15 +22,15 @@ namespace osu.Game.Rulesets.Osu.Tests.Editor
 {
     public partial class TestSceneSliderVelocityAdjust : OsuGameTestScene
     {
-        private Screens.Edit.Editor editor => Game.ScreenStack.CurrentScreen as Screens.Edit.Editor;
+        private Screens.Edit.Editor? editor => Game.ScreenStack.CurrentScreen as Screens.Edit.Editor;
 
-        private EditorBeatmap editorBeatmap => editor.ChildrenOfType<EditorBeatmap>().FirstOrDefault();
+        private EditorBeatmap editorBeatmap => editor.ChildrenOfType<EditorBeatmap>().FirstOrDefault()!;
 
-        private EditorClock editorClock => editor.ChildrenOfType<EditorClock>().FirstOrDefault();
+        private EditorClock editorClock => editor.ChildrenOfType<EditorClock>().FirstOrDefault()!;
 
-        private Slider slider => editorBeatmap.HitObjects.OfType<Slider>().FirstOrDefault();
+        private Slider? slider => editorBeatmap.HitObjects.OfType<Slider>().FirstOrDefault();
 
-        private TimelineHitObjectBlueprint blueprint => editor.ChildrenOfType<TimelineHitObjectBlueprint>().FirstOrDefault();
+        private TimelineHitObjectBlueprint blueprint => editor.ChildrenOfType<TimelineHitObjectBlueprint>().FirstOrDefault()!;
 
         private DifficultyPointPiece difficultyPointPiece => blueprint.ChildrenOfType<DifficultyPointPiece>().First();
 
@@ -66,7 +64,7 @@ namespace osu.Game.Rulesets.Osu.Tests.Editor
 
             AddAssert("ensure one slider placed", () => slider != null);
 
-            AddStep("store velocity", () => velocity = slider.Velocity);
+            AddStep("store velocity", () => velocity = slider!.Velocity);
 
             if (adjustVelocity)
             {
@@ -76,10 +74,10 @@ namespace osu.Game.Rulesets.Osu.Tests.Editor
                 AddAssert("velocity adjusted", () =>
                 {
                     Debug.Assert(velocity != null);
-                    return Precision.AlmostEquals(velocity.Value * 2, slider.Velocity);
+                    return Precision.AlmostEquals(velocity.Value * 2, slider!.Velocity);
                 });
 
-                AddStep("store velocity", () => velocity = slider.Velocity);
+                AddStep("store velocity", () => velocity = slider!.Velocity);
             }
 
             AddStep("save", () => InputManager.Keys(PlatformAction.Save));
@@ -88,8 +86,8 @@ namespace osu.Game.Rulesets.Osu.Tests.Editor
             AddStep("enter editor (again)", () => Game.ScreenStack.Push(new EditorLoader()));
             AddUntilStep("wait for editor load", () => editor?.ReadyForUse == true);
 
-            AddStep("seek to slider", () => editorClock.Seek(slider.StartTime));
-            AddAssert("slider has correct velocity", () => slider.Velocity == velocity);
+            AddStep("seek to slider", () => editorClock.Seek(slider!.StartTime));
+            AddAssert("slider has correct velocity", () => slider!.Velocity == velocity);
         }
     }
 }
