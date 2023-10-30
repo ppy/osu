@@ -182,7 +182,7 @@ namespace osu.Game.Tests.Visual.Editing
 
             AddStep("click away", () =>
             {
-                InputManager.MoveMouseTo(Editor.ChildrenOfType<TimelineArea>().Single().ScreenSpaceDrawQuad.TopLeft + Vector2.One);
+                InputManager.MoveMouseTo(Editor.ChildrenOfType<Timeline>().First().ScreenSpaceDrawQuad.TopLeft + new Vector2(5));
                 InputManager.Click(MouseButton.Left);
             });
 
