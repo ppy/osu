@@ -1,7 +1,6 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using System.Diagnostics;
 using System.Linq;
 using NUnit.Framework;
 using osu.Framework.Input;
@@ -45,7 +44,7 @@ namespace osu.Game.Rulesets.Osu.Tests.Editor
             double? velocity = null;
 
             AddStep("enter editor", () => Game.ScreenStack.Push(new EditorLoader()));
-            AddUntilStep("wait for editor load", () => editor?.ReadyForUse == true);
+            AddUntilStep("wait for editor load", () => editor?.ReadyForUse, () => Is.True);
 
             AddStep("seek to first control point", () => editorClock.Seek(editorBeatmap.ControlPointInfo.TimingPoints.First().Time));
             AddStep("enter slider placement mode", () => InputManager.Key(Key.Number3));
@@ -58,11 +57,11 @@ namespace osu.Game.Rulesets.Osu.Tests.Editor
 
             AddStep("exit placement mode", () => InputManager.Key(Key.Number1));
 
-            AddAssert("slider placed", () => slider != null);
+            AddAssert("slider placed", () => slider, () => Is.Not.Null);
 
             AddStep("select slider", () => editorBeatmap.SelectedHitObjects.Add(slider));
 
-            AddAssert("ensure one slider placed", () => slider != null);
+            AddAssert("ensure one slider placed", () => slider, () => Is.Not.Null);
 
             AddStep("store velocity", () => velocity = slider!.Velocity);
 
@@ -71,11 +70,8 @@ namespace osu.Game.Rulesets.Osu.Tests.Editor
                 AddStep("open velocity adjust panel", () => difficultyPointPiece.TriggerClick());
                 AddStep("change velocity", () => velocityTextBox.Current.Value = 2);
 
-                AddAssert("velocity adjusted", () =>
-                {
-                    Debug.Assert(velocity != null);
-                    return Precision.AlmostEquals(velocity.Value * 2, slider!.Velocity);
-                });
+                AddAssert("velocity adjusted", () => slider!.Velocity,
+                    () => Is.EqualTo(velocity!.Value * 2).Within(Precision.DOUBLE_EPSILON));
 
                 AddStep("store velocity", () => velocity = slider!.Velocity);
             }
@@ -84,10 +80,10 @@ namespace osu.Game.Rulesets.Osu.Tests.Editor
             AddStep("exit", () => InputManager.Key(Key.Escape));
 
             AddStep("enter editor (again)", () => Game.ScreenStack.Push(new EditorLoader()));
-            AddUntilStep("wait for editor load", () => editor?.ReadyForUse == true);
+            AddUntilStep("wait for editor load", () => editor?.ReadyForUse, () => Is.True);
 
             AddStep("seek to slider", () => editorClock.Seek(slider!.StartTime));
-            AddAssert("slider has correct velocity", () => slider!.Velocity == velocity);
+            AddAssert("slider has correct velocity", () => slider!.Velocity, () => Is.EqualTo(velocity));
         }
     }
 }
