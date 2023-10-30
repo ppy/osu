@@ -855,6 +855,48 @@ namespace osu.Game.Tests.Visual.Navigation
                 InputManager.Click(MouseButton.Left);
             });
             AddAssert("touch screen detected inactive", () => Game.Dependencies.Get<SessionStatics>().Get<bool>(Static.TouchInputActive), () => Is.False);
+
+            AddStep("close settings sidebar", () => InputManager.Key(Key.Escape));
+
+            PushAndConfirm(() => new TestPlaySongSelect());
+            AddStep("switch to osu! ruleset", () =>
+            {
+                InputManager.PressKey(Key.LControl);
+                InputManager.Key(Key.Number1);
+                InputManager.ReleaseKey(Key.LControl);
+            });
+            AddStep("touch beatmap wedge", () =>
+            {
+                var wedge = Game.ChildrenOfType<BeatmapInfoWedge>().Single();
+                var touch = new Touch(TouchSource.Touch2, wedge.ScreenSpaceDrawQuad.Centre);
+                InputManager.BeginTouch(touch);
+                InputManager.EndTouch(touch);
+            });
+            AddUntilStep("touch device mod activated", () => Game.SelectedMods.Value, () => Has.One.InstanceOf<ModTouchDevice>());
+
+            AddStep("switch to mania ruleset", () =>
+            {
+                InputManager.PressKey(Key.LControl);
+                InputManager.Key(Key.Number4);
+                InputManager.ReleaseKey(Key.LControl);
+            });
+            AddUntilStep("touch device mod not activated", () => Game.SelectedMods.Value, () => Has.None.InstanceOf<ModTouchDevice>());
+            AddStep("touch beatmap wedge", () =>
+            {
+                var wedge = Game.ChildrenOfType<BeatmapInfoWedge>().Single();
+                var touch = new Touch(TouchSource.Touch2, wedge.ScreenSpaceDrawQuad.Centre);
+                InputManager.BeginTouch(touch);
+                InputManager.EndTouch(touch);
+            });
+            AddUntilStep("touch device mod not activated", () => Game.SelectedMods.Value, () => Has.None.InstanceOf<ModTouchDevice>());
+
+            AddStep("switch to osu! ruleset", () =>
+            {
+                InputManager.PressKey(Key.LControl);
+                InputManager.Key(Key.Number1);
+                InputManager.ReleaseKey(Key.LControl);
+            });
+            AddUntilStep("touch device mod activated", () => Game.SelectedMods.Value, () => Has.One.InstanceOf<ModTouchDevice>());
         }
 
         private Func<Player> playToResults()
