@@ -5,7 +5,7 @@ using osu.Framework.Localisation;
 
 namespace osu.Game.Rulesets.Mods
 {
-    public class ModTouchDevice : Mod
+    public class ModTouchDevice : Mod, IApplicableMod
     {
         public sealed override string Name => "Touch Device";
         public sealed override string Acronym => "TD";
