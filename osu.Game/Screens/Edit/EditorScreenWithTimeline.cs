@@ -16,9 +16,9 @@ namespace osu.Game.Screens.Edit
     {
         public const float PADDING = 10;
 
-        public Container TimelineContent = null!;
+        public Container TimelineContent { get; private set; } = null!;
 
-        public Container MainContent = null!;
+        public Container MainContent { get; private set; } = null!;
 
         private LoadingSpinner spinner = null!;
 
