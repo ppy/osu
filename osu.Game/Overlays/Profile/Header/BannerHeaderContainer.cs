@@ -1,7 +1,6 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using System.Linq;
 using System.Threading;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
@@ -47,7 +46,15 @@ namespace osu.Game.Overlays.Profile.Header
             {
                 Show();
 
-                LoadComponentsAsync(banners.Select(b => new DrawableTournamentBanner(b)), AddRangeInternal, cancellationTokenSource.Token);
+                for (int index = 0; index < banners.Length; index++)
+                {
+                    int displayIndex = index;
+                    LoadComponentAsync(new DrawableTournamentBanner(banners[index]), asyncBanner =>
+                    {
+                        // load in stable order regardless of async load order.
+                        Insert(displayIndex, asyncBanner);
+                    }, cancellationTokenSource.Token);
+                }
             }
             else
             {
