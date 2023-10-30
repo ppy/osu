@@ -12,7 +12,11 @@ namespace osu.Game.Overlays
         protected override void OnFocus(FocusEvent e)
         {
             base.OnFocus(e);
-            SelectAll();
+
+            // on mobile platforms, focus is not held by the search text box, and the select all feature
+            // will not make sense on it, and might annoy the user when they try to focus manually.
+            if (HoldFocus)
+                SelectAll();
         }
     }
 }
