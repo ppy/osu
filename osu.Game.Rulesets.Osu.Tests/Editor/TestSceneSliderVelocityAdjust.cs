@@ -85,5 +85,50 @@ namespace osu.Game.Rulesets.Osu.Tests.Editor
             AddStep("seek to slider", () => editorClock.Seek(slider!.StartTime));
             AddAssert("slider has correct velocity", () => slider!.Velocity, () => Is.EqualTo(velocity));
         }
+
+        [Test]
+        public void TestVelocityUndo()
+        {
+            double? velocityBefore = null;
+            double? durationBefore = null;
+
+            AddStep("enter editor", () => Game.ScreenStack.Push(new EditorLoader()));
+            AddUntilStep("wait for editor load", () => editor?.ReadyForUse == true);
+
+            AddStep("seek to first control point", () => editorClock.Seek(editorBeatmap.ControlPointInfo.TimingPoints.First().Time));
+            AddStep("enter slider placement mode", () => InputManager.Key(Key.Number3));
+
+            AddStep("move mouse to centre", () => InputManager.MoveMouseTo(editor.ChildrenOfType<Playfield>().First().ScreenSpaceDrawQuad.Centre));
+            AddStep("start placement", () => InputManager.Click(MouseButton.Left));
+
+            AddStep("move mouse to bottom right", () => InputManager.MoveMouseTo(editor.ChildrenOfType<Playfield>().First().ScreenSpaceDrawQuad.BottomRight - new Vector2(10)));
+            AddStep("end placement", () => InputManager.Click(MouseButton.Right));
+
+            AddStep("exit placement mode", () => InputManager.Key(Key.Number1));
+
+            AddAssert("slider placed", () => slider, () => Is.Not.Null);
+            AddStep("select slider", () => editorBeatmap.SelectedHitObjects.Add(slider));
+
+            AddStep("store velocity", () =>
+            {
+                velocityBefore = slider!.Velocity;
+                durationBefore = slider.Duration;
+            });
+
+            AddStep("open velocity adjust panel", () => difficultyPointPiece.TriggerClick());
+            AddStep("change velocity", () => velocityTextBox.Current.Value = 2);
+
+            AddAssert("velocity adjusted", () => slider!.Velocity, () => Is.EqualTo(velocityBefore!.Value * 2).Within(Precision.DOUBLE_EPSILON));
+
+            AddStep("undo", () =>
+            {
+                InputManager.PressKey(Key.ControlLeft);
+                InputManager.Key(Key.Z);
+                InputManager.ReleaseKey(Key.ControlLeft);
+            });
+
+            AddAssert("slider has correct velocity", () => slider!.Velocity, () => Is.EqualTo(velocityBefore));
+            AddAssert("slider has correct duration", () => slider!.Duration, () => Is.EqualTo(durationBefore));
+        }
     }
 }
