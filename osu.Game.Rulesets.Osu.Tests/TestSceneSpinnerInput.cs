@@ -1,6 +1,7 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using NUnit.Framework;
@@ -10,6 +11,8 @@ using osu.Framework.Timing;
 using osu.Game.Beatmaps;
 using osu.Game.Replays;
 using osu.Game.Rulesets.Judgements;
+using osu.Game.Rulesets.Mods;
+using osu.Game.Rulesets.Osu.Mods;
 using osu.Game.Rulesets.Osu.Objects;
 using osu.Game.Rulesets.Osu.Objects.Drawables;
 using osu.Game.Rulesets.Osu.Replays;
@@ -47,6 +50,7 @@ namespace osu.Game.Rulesets.Osu.Tests
         public void Setup() => Schedule(() =>
         {
             manualClock = null;
+            SelectedMods.Value = Array.Empty<Mod>();
         });
 
         /// <summary>
@@ -96,6 +100,34 @@ namespace osu.Game.Rulesets.Osu.Tests
                 direction *= -1;
             }
 
+            performTest(frames);
+
+            assertTicksHit(0);
+            assertSpinnerHit(false);
+        }
+
+        [Test]
+        public void TestVibrateWithoutSpinningOnCentreWithDoubleTime()
+        {
+            List<ReplayFrame> frames = new List<ReplayFrame>();
+
+            const int rate = 2;
+            // the track clock is going to be playing twice as fast,
+            // so the vibration time in clock time needs to be twice as long
+            // to keep constant speed in real time.
+            const int vibrate_time = 50 * rate;
+
+            int direction = -1;
+
+            for (double i = time_spinner_start; i <= time_spinner_end; i += vibrate_time)
+            {
+                frames.Add(new OsuReplayFrame(i, new Vector2(centre_x + direction * 50, centre_y), OsuAction.LeftButton));
+                frames.Add(new OsuReplayFrame(i + vibrate_time, new Vector2(centre_x - direction * 50, centre_y), OsuAction.LeftButton));
+
+                direction *= -1;
+            }
+
+            AddStep("set DT", () => SelectedMods.Value = new[] { new OsuModDoubleTime { SpeedChange = { Value = rate } } });
             performTest(frames);
 
             assertTicksHit(0);
