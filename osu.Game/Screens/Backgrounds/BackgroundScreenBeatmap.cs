@@ -166,6 +166,8 @@ namespace osu.Game.Screens.Backgrounds
 
             public override void Add(Drawable drawable)
             {
+                ArgumentNullException.ThrowIfNull(drawable);
+
                 if (drawable is Background)
                     throw new InvalidOperationException($"Use {nameof(Background)} to set a background.");
 
