@@ -18,12 +18,6 @@ namespace osu.Game.Graphics.UserInterface
             PlaceholderText = HomeStrings.SearchPlaceholder;
         }
 
-        protected override void OnFocus(FocusEvent e)
-        {
-            base.OnFocus(e);
-            SelectAll();
-        }
-
         public override bool OnPressed(KeyBindingPressEvent<PlatformAction> e)
         {
             switch (e.Action)
