@@ -91,7 +91,7 @@ namespace osu.Game.Rulesets.Mania.Skinning.Legacy
             direction.BindTo(scrollingInfo.Direction);
             isHitting.BindTo(holdNote.IsHitting);
 
-            bodySprite = skin.GetAnimation(imageName, wrapMode, wrapMode, true, true).With(d =>
+            bodySprite = skin.GetAnimation(imageName, wrapMode, wrapMode, true, true, frameLength: 30).With(d =>
             {
                 if (d == null)
                     return;
