@@ -200,7 +200,11 @@ namespace osu.Game.Skinning
             }
         }
 
-        private const double default_frame_time = 1000 / 60d;
+        /// <summary>
+        /// The frame length of each frame at a 60 FPS rate.
+        /// Default frame rate for legacy skin animations.
+        /// </summary>
+        public const double SIXTY_FRAME_TIME = 1000 / 60d;
 
         private static double getFrameLength(ISkin source, bool applyConfigFrameRate, Texture[] textures)
         {
@@ -214,7 +218,7 @@ namespace osu.Game.Skinning
                 return 1000f / textures.Length;
             }
 
-            return default_frame_time;
+            return SIXTY_FRAME_TIME;
         }
     }
 }

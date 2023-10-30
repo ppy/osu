@@ -106,6 +106,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
                 spinningSample = new PausableSkinnableSound
                 {
                     Volume = { Value = 0 },
+                    MinimumSampleVolume = MINIMUM_SAMPLE_VOLUME,
                     Looping = true,
                     Frequency = { Value = spinning_sample_initial_frequency }
                 }
