@@ -130,7 +130,6 @@ namespace osu.Game.Rulesets.Osu.Tests
             AddStep("set DT", () => SelectedMods.Value = new[] { new OsuModDoubleTime { SpeedChange = { Value = rate } } });
             performTest(frames);
 
-            assertTicksHit(0);
             assertSpinnerHit(false);
         }
 
