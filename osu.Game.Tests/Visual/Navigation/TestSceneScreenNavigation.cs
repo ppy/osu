@@ -12,6 +12,7 @@ using osu.Framework.Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.UserInterface;
+using osu.Framework.Input;
 using osu.Framework.Screens;
 using osu.Framework.Testing;
 using osu.Game.Beatmaps;
@@ -833,6 +834,27 @@ namespace osu.Game.Tests.Visual.Navigation
             pushEscape();
 
             AddAssert("exit dialog is shown", () => Game.Dependencies.Get<IDialogOverlay>().CurrentDialog is ConfirmExitDialog);
+        }
+
+        [Test]
+        public void TestTouchScreenDetection()
+        {
+            AddStep("touch logo", () =>
+            {
+                var button = Game.ChildrenOfType<OsuLogo>().Single();
+                var touch = new Touch(TouchSource.Touch1, button.ScreenSpaceDrawQuad.Centre);
+                InputManager.BeginTouch(touch);
+                InputManager.EndTouch(touch);
+            });
+            AddAssert("touch screen detected active", () => Game.Dependencies.Get<SessionStatics>().Get<bool>(Static.TouchInputActive), () => Is.True);
+
+            AddStep("click settings button", () =>
+            {
+                var button = Game.ChildrenOfType<MainMenuButton>().Last();
+                InputManager.MoveMouseTo(button);
+                InputManager.Click(MouseButton.Left);
+            });
+            AddAssert("touch screen detected inactive", () => Game.Dependencies.Get<SessionStatics>().Get<bool>(Static.TouchInputActive), () => Is.False);
         }
 
         private Func<Player> playToResults()
