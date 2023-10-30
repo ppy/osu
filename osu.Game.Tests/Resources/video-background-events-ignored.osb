@@ -1,0 +1,5 @@
+osu file format v14
+
+[Events]
+0,-1234,"BG.jpg",0,0
+Video,-5678,"Video.avi",0,0
