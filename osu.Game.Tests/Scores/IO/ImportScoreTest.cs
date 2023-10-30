@@ -11,6 +11,8 @@ using NUnit.Framework;
 using osu.Framework.Allocation;
 using osu.Framework.Extensions;
 using osu.Framework.Platform;
+using osu.Game.Beatmaps;
+using osu.Game.Database;
 using osu.Game.IO.Archives;
 using osu.Game.Online.API;
 using osu.Game.Online.API.Requests.Responses;
@@ -118,6 +120,58 @@ namespace osu.Game.Tests.Scores.IO
                         Assert.That(imported.BeatmapInfo!.LastPlayed, Is.EqualTo(replayDate));
                     else
                         Assert.That(imported.BeatmapInfo!.LastPlayed, Is.Null);
+                }
+                finally
+                {
+                    host.Exit();
+                }
+            }
+        }
+
+        [Test]
+        public void TestLastPlayedNotUpdatedDueToNewerPlays()
+        {
+            using (HeadlessGameHost host = new CleanRunHeadlessGameHost())
+            {
+                try
+                {
+                    var osu = LoadOsuIntoHost(host, true);
+
+                    var beatmap = BeatmapImportHelper.LoadOszIntoOsu(osu, TestResources.GetQuickTestBeatmapForImport()).GetResultSafely();
+                    var beatmapInfo = beatmap.Beatmaps.First();
+
+                    var realmAccess = osu.Dependencies.Get<RealmAccess>();
+                    realmAccess.Write(r => r.Find<BeatmapInfo>(beatmapInfo.ID)!.LastPlayed = new DateTimeOffset(2023, 10, 30, 0, 0, 0, TimeSpan.Zero));
+
+                    var toImport = new ScoreInfo
+                    {
+                        Rank = ScoreRank.B,
+                        TotalScore = 987654,
+                        Accuracy = 0.8,
+                        MaxCombo = 500,
+                        Combo = 250,
+                        User = new APIUser
+                        {
+                            Username = "Test user",
+                            Id = DummyAPIAccess.DUMMY_USER_ID,
+                        },
+                        Date = new DateTimeOffset(2023, 10, 27, 0, 0, 0, TimeSpan.Zero),
+                        OnlineID = 12345,
+                        Ruleset = new OsuRuleset().RulesetInfo,
+                        BeatmapInfo = beatmapInfo
+                    };
+
+                    var imported = LoadScoreIntoOsu(osu, toImport);
+
+                    Assert.AreEqual(toImport.Rank, imported.Rank);
+                    Assert.AreEqual(toImport.TotalScore, imported.TotalScore);
+                    Assert.AreEqual(toImport.Accuracy, imported.Accuracy);
+                    Assert.AreEqual(toImport.MaxCombo, imported.MaxCombo);
+                    Assert.AreEqual(toImport.User.Username, imported.User.Username);
+                    Assert.AreEqual(toImport.Date, imported.Date);
+                    Assert.AreEqual(toImport.OnlineID, imported.OnlineID);
+
+                    Assert.That(imported.BeatmapInfo!.LastPlayed, Is.EqualTo(new DateTimeOffset(2023, 10, 30, 0, 0, 0, TimeSpan.Zero)));
                 }
                 finally
                 {
