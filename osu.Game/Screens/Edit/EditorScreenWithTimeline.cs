@@ -11,13 +11,14 @@ using osu.Game.Screens.Edit.Compose.Components.Timeline;
 
 namespace osu.Game.Screens.Edit
 {
+    [Cached]
     public abstract partial class EditorScreenWithTimeline : EditorScreen
     {
         public const float PADDING = 10;
 
-        private Container timelineContainer = null!;
+        public Container TimelineContent = null!;
 
-        private Container mainContent = null!;
+        public Container MainContent = null!;
 
         private LoadingSpinner spinner = null!;
 
@@ -70,7 +71,7 @@ namespace osu.Game.Screens.Edit
                                         {
                                             new Drawable[]
                                             {
-                                                timelineContainer = new Container
+                                                TimelineContent = new Container
                                                 {
                                                     RelativeSizeAxes = Axes.X,
                                                     AutoSizeAxes = Axes.Y,
@@ -93,7 +94,7 @@ namespace osu.Game.Screens.Edit
                     },
                     new Drawable[]
                     {
-                        mainContent = new Container
+                        MainContent = new Container
                         {
                             Name = "Main content",
                             RelativeSizeAxes = Axes.Both,
@@ -116,10 +117,10 @@ namespace osu.Game.Screens.Edit
             {
                 spinner.State.Value = Visibility.Hidden;
 
-                mainContent.Add(content);
+                MainContent.Add(content);
                 content.FadeInFromZero(300, Easing.OutQuint);
 
-                LoadComponentAsync(new TimelineArea(CreateTimelineContent()), timelineContainer.Add);
+                LoadComponentAsync(new TimelineArea(CreateTimelineContent()), TimelineContent.Add);
             });
         }
 

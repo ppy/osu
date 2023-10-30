@@ -40,11 +40,14 @@ namespace osu.Game.Screens.Edit.Compose.Components
 
         public PlacementBlueprint CurrentPlacement { get; private set; }
 
+        [Resolved]
+        private EditorScreenWithTimeline editorScreen { get; set; }
+
         /// <remarks>
         /// Positional input must be received outside the container's bounds,
         /// in order to handle composer blueprints which are partially offscreen.
         /// </remarks>
-        public override bool ReceivePositionalInputAt(Vector2 screenSpacePos) => true;
+        public override bool ReceivePositionalInputAt(Vector2 screenSpacePos) => editorScreen.MainContent.ReceivePositionalInputAt(screenSpacePos);
 
         public ComposeBlueprintContainer(HitObjectComposer composer)
             : base(composer)
