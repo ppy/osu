@@ -12,7 +12,7 @@ namespace osu.Game.Rulesets.Taiko.UI
     /// <summary>
     /// Text that is shown as judgement when a hit object is hit or missed.
     /// </summary>
-    public partial class DrawableTaikoJudgement : DrawableJudgement, IAnimatableHitExplosion
+    public partial class DrawableTaikoJudgement : DrawableJudgement, IAnimatableTaikoJudgement
     {
         public DrawableTaikoJudgement()
         {
@@ -28,12 +28,12 @@ namespace osu.Game.Rulesets.Taiko.UI
         // Not actually used in execution. We're implementing the interface for AnimateSecondHit().
         public void Animate(DrawableHitObject drawableHitObject)
         {
-            (JudgementBody.Drawable as IAnimatableHitExplosion)?.Animate(drawableHitObject);
+            (JudgementBody.Drawable as IAnimatableTaikoJudgement)?.Animate(drawableHitObject);
         }
 
         public void AnimateSecondHit()
         {
-            (JudgementBody.Drawable as IAnimatableHitExplosion)?.AnimateSecondHit();
+            (JudgementBody.Drawable as IAnimatableTaikoJudgement)?.AnimateSecondHit();
         }
     }
 }

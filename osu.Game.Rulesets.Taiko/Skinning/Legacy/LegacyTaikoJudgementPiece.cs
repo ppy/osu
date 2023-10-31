@@ -11,7 +11,7 @@ using osu.Game.Skinning;
 
 namespace osu.Game.Rulesets.Taiko.Skinning.Legacy
 {
-    public partial class LegacyTaikoJudgementPiece : LegacyJudgementPieceOld, IAnimatableHitExplosion
+    public partial class LegacyTaikoJudgementPiece : LegacyJudgementPieceOld, IAnimatableTaikoJudgement
     {
         private readonly Drawable? strongSprite;
 

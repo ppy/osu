@@ -84,13 +84,13 @@ namespace osu.Game.Rulesets.Taiko.UI
             ClearTransforms(true);
 
             using (BeginAbsoluteSequence(resultTime))
-                (skinnable.Drawable as IAnimatableHitExplosion)?.Animate(JudgedObject);
+                (skinnable.Drawable as IAnimatableTaikoJudgement)?.Animate(JudgedObject);
 
             if (secondHitTime != null)
             {
                 using (BeginAbsoluteSequence(secondHitTime.Value))
                 {
-                    (skinnable.Drawable as IAnimatableHitExplosion)?.AnimateSecondHit();
+                    (skinnable.Drawable as IAnimatableTaikoJudgement)?.AnimateSecondHit();
                 }
             }
 
