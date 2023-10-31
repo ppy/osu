@@ -135,7 +135,7 @@ namespace osu.Game.Overlays
                         },
                         Anchor = Anchor.TopCentre,
                         Origin = Anchor.TopCentre,
-                        Child = searchTextBox = new SeekLimitedSearchTextBox
+                        Child = searchTextBox = new SettingsSearchTextBox
                         {
                             RelativeSizeAxes = Axes.X,
                             Origin = Anchor.TopCentre,
