@@ -900,6 +900,38 @@ namespace osu.Game.Tests.Visual.Navigation
                 InputManager.ReleaseKey(Key.LControl);
             });
             AddUntilStep("touch device mod activated", () => Game.SelectedMods.Value, () => Has.One.InstanceOf<ModTouchDevice>());
+
+            AddStep("click beatmap wedge", () =>
+            {
+                InputManager.MoveMouseTo(Game.ChildrenOfType<BeatmapInfoWedge>().Single());
+                InputManager.Click(MouseButton.Left);
+            });
+            AddUntilStep("touch device mod not activated", () => Game.SelectedMods.Value, () => Has.None.InstanceOf<ModTouchDevice>());
+
+            AddStep("import beatmap", () => BeatmapImportHelper.LoadQuickOszIntoOsu(Game).WaitSafely());
+            AddUntilStep("wait for selected", () => !Game.Beatmap.IsDefault);
+            AddStep("press enter", () => InputManager.Key(Key.Enter));
+
+            Player player = null;
+
+            AddUntilStep("wait for player", () =>
+            {
+                DismissAnyNotifications();
+                return (player = Game.ScreenStack.CurrentScreen as Player) != null;
+            });
+
+            AddUntilStep("wait for track playing", () => Game.Beatmap.Value.Track.IsRunning);
+
+            AddStep("touch", () =>
+            {
+                var touch = new Touch(TouchSource.Touch2, Game.ScreenSpaceDrawQuad.Centre);
+                InputManager.BeginTouch(touch);
+                InputManager.EndTouch(touch);
+            });
+            AddUntilStep("touch device mod added to score", () => player.Score.ScoreInfo.Mods, () => Has.One.InstanceOf<ModTouchDevice>());
+
+            AddStep("exit player", () => player.Exit());
+            AddUntilStep("touch device mod still active", () => Game.SelectedMods.Value, () => Has.One.InstanceOf<ModTouchDevice>());
         }
 
         private Func<Player> playToResults()
