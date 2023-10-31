@@ -400,11 +400,6 @@ namespace osu.Game.Screens.Play
             CurrentPlayer.RestartCount = restartCount++;
             CurrentPlayer.RestartRequested = restartRequested;
 
-            foreach (var mods in Mods.Value.OfType<IApplicableToPlayerConfiguration>())
-            {
-                mods.ApplyConfiguration(CurrentPlayer.Configuration);
-            }
-
             LoadTask = LoadComponentAsync(CurrentPlayer, _ =>
             {
                 MetadataInfo.Loading = false;

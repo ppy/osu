@@ -210,6 +210,11 @@ namespace osu.Game.Screens.Play
             if (playableBeatmap == null)
                 return;
 
+            foreach (var mods in Mods.Value.OfType<IApplicableToPlayerConfiguration>())
+            {
+                mods.ApplyConfiguration(Configuration);
+            }
+
             mouseWheelDisabled = config.GetBindable<bool>(OsuSetting.MouseDisableWheel);
 
             if (game != null)
