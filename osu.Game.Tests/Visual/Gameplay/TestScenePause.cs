@@ -95,7 +95,7 @@ namespace osu.Game.Tests.Visual.Gameplay
                     alwaysGoingForward &= goingForward;
 
                     if (!goingForward)
-                        Logger.Log($"Backwards time occurred ({currentTime:N1} -> {lastTime:N1})");
+                        Logger.Log($"Backwards time occurred ({lastTime:N1} -> {currentTime:N1})");
 
                     lastTime = currentTime;
                 };
