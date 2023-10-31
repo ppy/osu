@@ -18,21 +18,12 @@ namespace osu.Game.Tournament.Components
             {
                 AutoSizeAxes = Axes.Both,
                 Direction = FillDirection.Vertical,
-                Spacing = new Vector2(0, 10),
+                Spacing = new Vector2(0, 5),
                 Children = new Drawable[]
                 {
                     new DrawableTeamHeader(colour),
-                    new FillFlowContainer
-                    {
-                        AutoSizeAxes = Axes.Both,
-                        Direction = FillDirection.Horizontal,
-                        Spacing = new Vector2(5),
-                        Children = new Drawable[]
-                        {
-                            new DrawableTeamTitle(team),
-                            new DrawableTeamSeed(team),
-                        }
-                    }
+                    new DrawableTeamTitle(team),
+                    new DrawableTeamSeed(team),
                 }
             };
         }
