@@ -214,10 +214,18 @@ namespace osu.Game.Tests.Visual.Gameplay
 
             // Files starting with _ are temporary, created by CreateFileSafely call.
             AddUntilStep("wait for export file", () => filePath = LocalStorage.GetFiles("exports").SingleOrDefault(f => !Path.GetFileName(f).StartsWith("_", StringComparison.Ordinal)), () => Is.Not.Null);
-            AddAssert("filesize is non-zero", () =>
+            AddUntilStep("filesize is non-zero", () =>
             {
-                using (var stream = LocalStorage.GetStream(filePath))
-                    return stream.Length;
+                try
+                {
+                    using (var stream = LocalStorage.GetStream(filePath))
+                        return stream.Length;
+                }
+                catch (IOException)
+                {
+                    // file move may still be in progress.
+                    return 0;
+                }
             }, () => Is.Not.Zero);
         }
 
