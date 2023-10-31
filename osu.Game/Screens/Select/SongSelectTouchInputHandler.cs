@@ -32,14 +32,18 @@ namespace osu.Game.Screens.Select
         {
             base.LoadComplete();
 
-            ruleset.BindValueChanged(_ => updateState());
-            mods.BindValueChanged(_ => updateState());
-            touchActive.BindValueChanged(_ => updateState());
+            ruleset.BindValueChanged(_ => Scheduler.AddOnce(updateState));
+            mods.BindValueChanged(_ => Scheduler.AddOnce(updateState));
+            mods.BindDisabledChanged(_ => Scheduler.AddOnce(updateState));
+            touchActive.BindValueChanged(_ => Scheduler.AddOnce(updateState));
             updateState();
         }
 
         private void updateState()
         {
+            if (mods.Disabled)
+                return;
+
             var touchDeviceMod = ruleset.Value.CreateInstance().GetTouchDeviceMod();
 
             if (touchDeviceMod == null)
