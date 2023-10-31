@@ -95,28 +95,17 @@ namespace osu.Game.Tournament.Screens.Gameplay.Components
                                             }
                                         }
                                     },
-                                    new FillFlowContainer
+                                    teamNameText = new TournamentSpriteTextWithBackground
                                     {
-                                        AutoSizeAxes = Axes.Both,
-                                        Direction = FillDirection.Horizontal,
-                                        Spacing = new Vector2(5),
+                                        Scale = new Vector2(0.5f),
                                         Origin = anchor,
                                         Anchor = anchor,
-                                        Children = new Drawable[]
-                                        {
-                                            teamNameText = new TournamentSpriteTextWithBackground
-                                            {
-                                                Scale = new Vector2(0.5f),
-                                                Origin = anchor,
-                                                Anchor = anchor,
-                                            },
-                                            new DrawableTeamSeed(Team)
-                                            {
-                                                Scale = new Vector2(0.5f),
-                                                Origin = anchor,
-                                                Anchor = anchor,
-                                            },
-                                        }
+                                    },
+                                    new DrawableTeamSeed(Team)
+                                    {
+                                        Scale = new Vector2(0.5f),
+                                        Origin = anchor,
+                                        Anchor = anchor,
                                     },
                                 }
                             },
