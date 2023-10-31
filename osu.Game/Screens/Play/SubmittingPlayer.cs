@@ -188,7 +188,10 @@ namespace osu.Game.Screens.Play
         {
             // token may be null if the request failed but gameplay was still allowed (see HandleTokenRetrievalFailure).
             if (token == null)
+            {
+                Logger.Log("No token, skipping score submission");
                 return Task.CompletedTask;
+            }
 
             if (scoreSubmissionSource != null)
                 return scoreSubmissionSource.Task;
@@ -196,6 +199,8 @@ namespace osu.Game.Screens.Play
             // if the user never hit anything, this score should not be counted in any way.
             if (!score.ScoreInfo.Statistics.Any(s => s.Key.IsHit() && s.Value > 0))
                 return Task.CompletedTask;
+
+            Logger.Log($"Beginning score submission (token:{token.Value})...");
 
             scoreSubmissionSource = new TaskCompletionSource<bool>();
             var request = CreateSubmissionRequest(score, token.Value);
@@ -206,11 +211,12 @@ namespace osu.Game.Screens.Play
                 score.ScoreInfo.Position = s.Position;
 
                 scoreSubmissionSource.SetResult(true);
+                Logger.Log($"Score submission completed! (token:{token.Value} id:{s.ID})");
             };
 
             request.Failure += e =>
             {
-                Logger.Error(e, $"Failed to submit score ({e.Message})");
+                Logger.Error(e, $"Failed to submit score (token:{token.Value}): {e.Message}");
                 scoreSubmissionSource.SetResult(false);
             };
 

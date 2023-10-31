@@ -101,10 +101,10 @@ namespace osu.Game.Rulesets.Osu.Skinning.Default
                 rotationTransferred = true;
             }
 
+            Debug.Assert(Math.Abs(delta) <= 180);
+
             double rate = gameplayClock?.GetTrueGameplayRate() ?? Clock.Rate;
             delta = (float)(delta * Math.Abs(rate));
-
-            Debug.Assert(Math.Abs(delta) <= 180);
 
             currentRotation += delta;
             drawableSpinner.Result.History.ReportDelta(Time.Current, delta);
