@@ -498,7 +498,7 @@ namespace osu.Game.Overlays.Settings.Sections.Input
 
             if (existingBinding == null)
             {
-                realm.WriteAsync(r => r.Find<RealmKeyBinding>(keyBinding.ID)!.KeyCombinationString = keyBinding.KeyCombination.ToString());
+                realm.Write(r => r.Find<RealmKeyBinding>(keyBinding.ID)!.KeyCombinationString = keyBinding.KeyCombination.ToString());
                 BindingUpdated?.Invoke(this, new KeyBindingUpdatedEventArgs(bindingConflictResolved: false, advanceToNextBinding));
                 return;
             }
