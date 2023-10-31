@@ -693,7 +693,9 @@ namespace osu.Game.Tests.Visual.Multiplayer
         }
 
         [Test]
-        [FlakyTest] // See above
+        [Ignore("Failing too often, needs revisiting in some future.")]
+        // This test is failing even after 10 retries (see https://github.com/ppy/osu/actions/runs/6700910613/job/18208272419)
+        // Something is stopping the ready button from changing states, over multiple runs.
         public void TestGameplayExitFlow()
         {
             Bindable<double>? holdDelay = null;
