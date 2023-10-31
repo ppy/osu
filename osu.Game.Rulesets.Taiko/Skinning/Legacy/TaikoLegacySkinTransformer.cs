@@ -42,7 +42,7 @@ namespace osu.Game.Rulesets.Taiko.Skinning.Legacy
                     {
                         var strongHitSprite = isMiss ? null : this.GetAnimation($"{hitName}k", true, false);
 
-                        return new LegacyHitExplosion(hitSprite, strongHitSprite);
+                        return new LegacyTaikoJudgementPiece(hitResultLookup.Component, hitSprite, strongHitSprite);
                     }
                 }
             }
