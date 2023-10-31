@@ -16,6 +16,9 @@ namespace osu.Game.Rulesets.Mods
         public override ModType Type => ModType.DifficultyIncrease;
         public override Type[] IncompatibleMods => new[] { typeof(ModAutoplay) };
 
+        public override bool ValidForMultiplayer => false;
+        public override bool ValidForMultiplayerAsFreeMod => false;
+
         public void ApplyConfiguration(PlayerConfiguration configuration)
         {
             configuration.AllowPause = false;
