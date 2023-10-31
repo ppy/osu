@@ -146,12 +146,24 @@ namespace osu.Game.Screens.Select
         public override void OnResuming(ScreenTransitionEvent e)
         {
             base.OnResuming(e);
+            revertMods();
+        }
 
-            if (playerLoader != null)
-            {
-                Mods.Value = modsAtGameplayStart;
-                playerLoader = null;
-            }
+        public override bool OnExiting(ScreenExitEvent e)
+        {
+            if (base.OnExiting(e))
+                return true;
+
+            revertMods();
+            return false;
+        }
+
+        private void revertMods()
+        {
+            if (playerLoader == null) return;
+
+            Mods.Value = modsAtGameplayStart;
+            playerLoader = null;
         }
     }
 }

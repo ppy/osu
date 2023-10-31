@@ -45,9 +45,9 @@ namespace osu.Game.Tests.Rulesets.Scoring
         [TestCase(ScoringMode.Standardised, HitResult.Meh, 116_667)]
         [TestCase(ScoringMode.Standardised, HitResult.Ok, 233_338)]
         [TestCase(ScoringMode.Standardised, HitResult.Great, 1_000_000)]
-        [TestCase(ScoringMode.Classic, HitResult.Meh, 0)]
-        [TestCase(ScoringMode.Classic, HitResult.Ok, 2)]
-        [TestCase(ScoringMode.Classic, HitResult.Great, 36)]
+        [TestCase(ScoringMode.Classic, HitResult.Meh, 11_670)]
+        [TestCase(ScoringMode.Classic, HitResult.Ok, 23_341)]
+        [TestCase(ScoringMode.Classic, HitResult.Great, 100_033)]
         public void TestSingleOsuHit(ScoringMode scoringMode, HitResult hitResult, int expectedScore)
         {
             scoreProcessor.ApplyBeatmap(beatmap);
@@ -74,7 +74,7 @@ namespace osu.Game.Tests.Rulesets.Scoring
         [TestCase(ScoringMode.Standardised, HitResult.Miss, HitResult.Great, 0)]
         [TestCase(ScoringMode.Standardised, HitResult.Meh, HitResult.Great, 79_333)]
         [TestCase(ScoringMode.Standardised, HitResult.Ok, HitResult.Great, 158_667)]
-        [TestCase(ScoringMode.Standardised, HitResult.Good, HitResult.Perfect, 302_402)]
+        [TestCase(ScoringMode.Standardised, HitResult.Good, HitResult.Perfect, 317_626)]
         [TestCase(ScoringMode.Standardised, HitResult.Great, HitResult.Great, 492_894)]
         [TestCase(ScoringMode.Standardised, HitResult.Perfect, HitResult.Perfect, 492_894)]
         [TestCase(ScoringMode.Standardised, HitResult.SmallTickMiss, HitResult.SmallTickHit, 0)]
@@ -84,17 +84,17 @@ namespace osu.Game.Tests.Rulesets.Scoring
         [TestCase(ScoringMode.Standardised, HitResult.SmallBonus, HitResult.SmallBonus, 1_000_030)]
         [TestCase(ScoringMode.Standardised, HitResult.LargeBonus, HitResult.LargeBonus, 1_000_150)]
         [TestCase(ScoringMode.Classic, HitResult.Miss, HitResult.Great, 0)]
-        [TestCase(ScoringMode.Classic, HitResult.Meh, HitResult.Great, 4)]
-        [TestCase(ScoringMode.Classic, HitResult.Ok, HitResult.Great, 15)]
-        [TestCase(ScoringMode.Classic, HitResult.Good, HitResult.Perfect, 53)]
-        [TestCase(ScoringMode.Classic, HitResult.Great, HitResult.Great, 140)]
-        [TestCase(ScoringMode.Classic, HitResult.Perfect, HitResult.Perfect, 140)]
+        [TestCase(ScoringMode.Classic, HitResult.Meh, HitResult.Great, 7_975)]
+        [TestCase(ScoringMode.Classic, HitResult.Ok, HitResult.Great, 15_949)]
+        [TestCase(ScoringMode.Classic, HitResult.Good, HitResult.Perfect, 31_928)]
+        [TestCase(ScoringMode.Classic, HitResult.Great, HitResult.Great, 49_546)]
+        [TestCase(ScoringMode.Classic, HitResult.Perfect, HitResult.Perfect, 49_546)]
         [TestCase(ScoringMode.Classic, HitResult.SmallTickMiss, HitResult.SmallTickHit, 0)]
-        [TestCase(ScoringMode.Classic, HitResult.SmallTickHit, HitResult.SmallTickHit, 11)]
+        [TestCase(ScoringMode.Classic, HitResult.SmallTickHit, HitResult.SmallTickHit, 54_189)]
         [TestCase(ScoringMode.Classic, HitResult.LargeTickMiss, HitResult.LargeTickHit, 0)]
-        [TestCase(ScoringMode.Classic, HitResult.LargeTickHit, HitResult.LargeTickHit, 9)]
-        [TestCase(ScoringMode.Classic, HitResult.SmallBonus, HitResult.SmallBonus, 36)]
-        [TestCase(ScoringMode.Classic, HitResult.LargeBonus, HitResult.LargeBonus, 36)]
+        [TestCase(ScoringMode.Classic, HitResult.LargeTickHit, HitResult.LargeTickHit, 49_289)]
+        [TestCase(ScoringMode.Classic, HitResult.SmallBonus, HitResult.SmallBonus, 100_003)]
+        [TestCase(ScoringMode.Classic, HitResult.LargeBonus, HitResult.LargeBonus, 100_015)]
         public void TestFourVariousResultsOneMiss(ScoringMode scoringMode, HitResult hitResult, HitResult maxResult, int expectedScore)
         {
             var minResult = new TestJudgement(hitResult).MinResult;
@@ -107,7 +107,7 @@ namespace osu.Game.Tests.Rulesets.Scoring
 
             for (int i = 0; i < 4; i++)
             {
-                var judgementResult = new JudgementResult(fourObjectBeatmap.HitObjects[i], new TestJudgement(maxResult))
+                var judgementResult = new JudgementResult(fourObjectBeatmap.HitObjects[i], fourObjectBeatmap.HitObjects[i].CreateJudgement())
                 {
                     Type = i == 2 ? minResult : hitResult
                 };
@@ -260,6 +260,41 @@ namespace osu.Game.Tests.Rulesets.Scoring
 #pragma warning restore CS0618
 
         [Test]
+        public void TestComboBreak()
+        {
+            Assert.That(HitResult.ComboBreak.IncreasesCombo(), Is.False);
+            Assert.That(HitResult.ComboBreak.BreaksCombo(), Is.True);
+            Assert.That(HitResult.ComboBreak.AffectsCombo(), Is.True);
+            Assert.That(HitResult.ComboBreak.AffectsAccuracy(), Is.False);
+            Assert.That(HitResult.ComboBreak.IsBasic(), Is.False);
+            Assert.That(HitResult.ComboBreak.IsTick(), Is.False);
+            Assert.That(HitResult.ComboBreak.IsBonus(), Is.False);
+            Assert.That(HitResult.ComboBreak.IsHit(), Is.False);
+            Assert.That(HitResult.ComboBreak.IsScorable(), Is.True);
+            Assert.That(HitResultExtensions.ALL_TYPES, Does.Contain(HitResult.ComboBreak));
+
+            beatmap = new TestBeatmap(new RulesetInfo())
+            {
+                HitObjects = new List<HitObject>
+                {
+                    new TestHitObject(HitResult.Great),
+                    new TestHitObject(HitResult.IgnoreHit, HitResult.ComboBreak),
+                }
+            };
+
+            scoreProcessor = new TestScoreProcessor();
+            scoreProcessor.ApplyBeatmap(beatmap);
+
+            scoreProcessor.ApplyResult(new JudgementResult(beatmap.HitObjects[0], beatmap.HitObjects[0].CreateJudgement()) { Type = HitResult.Great });
+            Assert.That(scoreProcessor.Combo.Value, Is.EqualTo(1));
+            Assert.That(scoreProcessor.Accuracy.Value, Is.EqualTo(1));
+
+            scoreProcessor.ApplyResult(new JudgementResult(beatmap.HitObjects[1], beatmap.HitObjects[1].CreateJudgement()) { Type = HitResult.ComboBreak });
+            Assert.That(scoreProcessor.Combo.Value, Is.EqualTo(0));
+            Assert.That(scoreProcessor.Accuracy.Value, Is.EqualTo(1));
+        }
+
+        [Test]
         public void TestAccuracyWhenNearPerfect()
         {
             const int count_judgements = 1000;
@@ -275,7 +310,7 @@ namespace osu.Game.Tests.Rulesets.Scoring
 
             for (int i = 0; i < beatmap.HitObjects.Count; i++)
             {
-                scoreProcessor.ApplyResult(new JudgementResult(beatmap.HitObjects[i], new TestJudgement(HitResult.Great))
+                scoreProcessor.ApplyResult(new JudgementResult(beatmap.HitObjects[i], beatmap.HitObjects[i].CreateJudgement())
                 {
                     Type = i == 0 ? HitResult.Miss : HitResult.Great
                 });
@@ -293,24 +328,31 @@ namespace osu.Game.Tests.Rulesets.Scoring
         {
             public override HitResult MaxResult { get; }
 
-            public TestJudgement(HitResult maxResult)
+            public override HitResult MinResult => minResult ?? base.MinResult;
+
+            private readonly HitResult? minResult;
+
+            public TestJudgement(HitResult maxResult, HitResult? minResult = null)
             {
                 MaxResult = maxResult;
+                this.minResult = minResult;
             }
         }
 
         private class TestHitObject : HitObject
         {
             private readonly HitResult maxResult;
+            private readonly HitResult? minResult;
 
             public override Judgement CreateJudgement()
             {
-                return new TestJudgement(maxResult);
+                return new TestJudgement(maxResult, minResult);
             }
 
-            public TestHitObject(HitResult maxResult)
+            public TestHitObject(HitResult maxResult, HitResult? minResult = null)
             {
                 this.maxResult = maxResult;
+                this.minResult = minResult;
             }
         }
 

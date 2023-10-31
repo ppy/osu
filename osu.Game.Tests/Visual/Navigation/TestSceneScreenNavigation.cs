@@ -7,6 +7,7 @@ using System;
 using System.Linq;
 using NUnit.Framework;
 using osu.Framework.Allocation;
+using osu.Framework.Configuration;
 using osu.Framework.Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
@@ -16,12 +17,14 @@ using osu.Framework.Testing;
 using osu.Game.Beatmaps;
 using osu.Game.Collections;
 using osu.Game.Configuration;
+using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Online.API;
 using osu.Game.Online.Leaderboards;
 using osu.Game.Overlays;
 using osu.Game.Overlays.BeatmapListing;
 using osu.Game.Overlays.Mods;
+using osu.Game.Overlays.Notifications;
 using osu.Game.Overlays.Toolbar;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Osu.Mods;
@@ -33,6 +36,7 @@ using osu.Game.Screens.OnlinePlay.Playlists;
 using osu.Game.Screens.Play;
 using osu.Game.Screens.Ranking;
 using osu.Game.Screens.Select;
+using osu.Game.Screens.Select.Carousel;
 using osu.Game.Screens.Select.Leaderboards;
 using osu.Game.Screens.Select.Options;
 using osu.Game.Tests.Beatmaps.IO;
@@ -164,6 +168,41 @@ namespace osu.Game.Tests.Visual.Navigation
             ConfirmAtMainMenu();
         }
 
+        [Test]
+        public void TestSongSelectScrollHandling()
+        {
+            TestPlaySongSelect songSelect = null;
+            double scrollPosition = 0;
+
+            AddStep("set game volume to max", () => Game.Dependencies.Get<FrameworkConfigManager>().SetValue(FrameworkSetting.VolumeUniversal, 1d));
+            AddUntilStep("wait for volume overlay to hide", () => Game.ChildrenOfType<VolumeOverlay>().SingleOrDefault()?.State.Value, () => Is.EqualTo(Visibility.Hidden));
+            PushAndConfirm(() => songSelect = new TestPlaySongSelect());
+            AddUntilStep("wait for song select", () => songSelect.BeatmapSetsLoaded);
+            AddStep("import beatmap", () => BeatmapImportHelper.LoadQuickOszIntoOsu(Game).WaitSafely());
+            AddUntilStep("wait for selected", () => !Game.Beatmap.IsDefault);
+
+            AddStep("store scroll position", () => scrollPosition = getCarouselScrollPosition());
+
+            AddStep("move to left side", () => InputManager.MoveMouseTo(
+                songSelect.ChildrenOfType<Screens.Select.SongSelect.LeftSideInteractionContainer>().Single().ScreenSpaceDrawQuad.TopLeft + new Vector2(1)));
+            AddStep("scroll down", () => InputManager.ScrollVerticalBy(-1));
+            AddAssert("carousel didn't move", getCarouselScrollPosition, () => Is.EqualTo(scrollPosition));
+
+            AddRepeatStep("alt-scroll down", () =>
+            {
+                InputManager.PressKey(Key.AltLeft);
+                InputManager.ScrollVerticalBy(-1);
+                InputManager.ReleaseKey(Key.AltLeft);
+            }, 5);
+            AddAssert("game volume decreased", () => Game.Dependencies.Get<FrameworkConfigManager>().Get<double>(FrameworkSetting.VolumeUniversal), () => Is.LessThan(1));
+
+            AddStep("move to carousel", () => InputManager.MoveMouseTo(songSelect.ChildrenOfType<BeatmapCarousel>().Single()));
+            AddStep("scroll down", () => InputManager.ScrollVerticalBy(-1));
+            AddAssert("carousel moved", getCarouselScrollPosition, () => Is.Not.EqualTo(scrollPosition));
+
+            double getCarouselScrollPosition() => Game.ChildrenOfType<UserTrackingScrollContainer<DrawableCarouselItem>>().Single().Current;
+        }
+
         /// <summary>
         /// This tests that the F1 key will open the mod select overlay, and not be handled / blocked by the music controller (which has the same default binding
         /// but should be handled *after* song select).
@@ -208,10 +247,30 @@ namespace osu.Game.Tests.Visual.Navigation
             AddStep("end spectator before retry", () => Game.SpectatorClient.EndPlaying(player.GameplayState));
 
             AddStep("attempt to retry", () => player.ChildrenOfType<HotkeyRetryOverlay>().First().Action());
+            AddAssert("old player score marked failed", () => player.Score.ScoreInfo.Rank, () => Is.EqualTo(ScoreRank.F));
             AddUntilStep("wait for old player gone", () => Game.ScreenStack.CurrentScreen != player);
 
             AddUntilStep("get new player", () => (player = Game.ScreenStack.CurrentScreen as Player) != null);
             AddAssert("retry count is 1", () => player.RestartCount == 1);
+        }
+
+        [Test]
+        public void TestRetryImmediatelyAfterCompletion()
+        {
+            var getOriginalPlayer = playToCompletion();
+
+            AddStep("attempt to retry", () => getOriginalPlayer().ChildrenOfType<HotkeyRetryOverlay>().First().Action());
+            AddAssert("original play isn't failed", () => getOriginalPlayer().Score.ScoreInfo.Rank, () => Is.Not.EqualTo(ScoreRank.F));
+            AddUntilStep("wait for player", () => Game.ScreenStack.CurrentScreen != getOriginalPlayer() && Game.ScreenStack.CurrentScreen is Player);
+        }
+
+        [Test]
+        public void TestExitImmediatelyAfterCompletion()
+        {
+            var player = playToCompletion();
+
+            AddStep("attempt to exit", () => player().ChildrenOfType<HotkeyExitOverlay>().First().Action());
+            AddUntilStep("wait for results", () => Game.ScreenStack.CurrentScreen is ResultsScreen);
         }
 
         [Test]
@@ -684,6 +743,68 @@ namespace osu.Game.Tests.Visual.Navigation
         }
 
         [Test]
+        public void TestExitWithOperationInProgress()
+        {
+            AddUntilStep("wait for dialog overlay", () => Game.ChildrenOfType<DialogOverlay>().SingleOrDefault() != null);
+
+            ProgressNotification progressNotification = null!;
+
+            AddStep("start ongoing operation", () =>
+            {
+                progressNotification = new ProgressNotification
+                {
+                    Text = "Something is still running",
+                    Progress = 0.5f,
+                    State = ProgressNotificationState.Active,
+                };
+                Game.Notifications.Post(progressNotification);
+            });
+
+            AddStep("Hold escape", () => InputManager.PressKey(Key.Escape));
+            AddUntilStep("confirmation dialog shown", () => Game.ChildrenOfType<DialogOverlay>().Single().CurrentDialog is ConfirmExitDialog);
+            AddStep("Release escape", () => InputManager.ReleaseKey(Key.Escape));
+
+            AddStep("cancel exit", () => InputManager.Key(Key.Escape));
+            AddAssert("dialog dismissed", () => Game.ChildrenOfType<DialogOverlay>().Single().CurrentDialog == null);
+
+            AddStep("complete operation", () =>
+            {
+                progressNotification.Progress = 100;
+                progressNotification.State = ProgressNotificationState.Completed;
+            });
+
+            AddStep("Hold escape", () => InputManager.PressKey(Key.Escape));
+            AddUntilStep("Wait for intro", () => Game.ScreenStack.CurrentScreen is IntroScreen);
+            AddStep("Release escape", () => InputManager.ReleaseKey(Key.Escape));
+
+            AddUntilStep("Wait for game exit", () => Game.ScreenStack.CurrentScreen == null);
+        }
+
+        [Test]
+        public void TestForceExitWithOperationInProgress()
+        {
+            AddStep("set hold delay to 0", () => Game.LocalConfig.SetValue(OsuSetting.UIHoldActivationDelay, 0.0));
+            AddUntilStep("wait for dialog overlay", () => Game.ChildrenOfType<DialogOverlay>().SingleOrDefault() != null);
+
+            AddStep("start ongoing operation", () =>
+            {
+                Game.Notifications.Post(new ProgressNotification
+                {
+                    Text = "Something is still running",
+                    Progress = 0.5f,
+                    State = ProgressNotificationState.Active,
+                });
+            });
+
+            AddStep("attempt exit", () =>
+            {
+                for (int i = 0; i < 2; ++i)
+                    Game.ScreenStack.CurrentScreen.Exit();
+            });
+            AddUntilStep("stopped at exit confirm", () => Game.ChildrenOfType<DialogOverlay>().Single().CurrentDialog is ConfirmExitDialog);
+        }
+
+        [Test]
         public void TestExitGameFromSongSelect()
         {
             PushAndConfirm(() => new TestPlaySongSelect());
@@ -699,7 +820,7 @@ namespace osu.Game.Tests.Visual.Navigation
         }
 
         [Test]
-        public void TestRapidBackButtonExit()
+        public void TestExitWithHoldDisabled()
         {
             AddStep("set hold delay to 0", () => Game.LocalConfig.SetValue(OsuSetting.UIHoldActivationDelay, 0.0));
 
@@ -711,10 +832,17 @@ namespace osu.Game.Tests.Visual.Navigation
 
             pushEscape();
 
-            AddAssert("exit dialog is shown", () => Game.Dependencies.Get<IDialogOverlay>().CurrentDialog != null);
+            AddAssert("exit dialog is shown", () => Game.Dependencies.Get<IDialogOverlay>().CurrentDialog is ConfirmExitDialog);
         }
 
         private Func<Player> playToResults()
+        {
+            var player = playToCompletion();
+            AddUntilStep("wait for results", () => (Game.ScreenStack.CurrentScreen as ResultsScreen)?.IsLoaded == true);
+            return player;
+        }
+
+        private Func<Player> playToCompletion()
         {
             Player player = null;
 
@@ -740,7 +868,8 @@ namespace osu.Game.Tests.Visual.Navigation
 
             AddUntilStep("wait for track playing", () => beatmap().Track.IsRunning);
             AddStep("seek to near end", () => player.ChildrenOfType<GameplayClockContainer>().First().Seek(beatmap().Beatmap.HitObjects[^1].StartTime - 1000));
-            AddUntilStep("wait for pass", () => (Game.ScreenStack.CurrentScreen as ResultsScreen)?.IsLoaded == true);
+            AddUntilStep("wait for complete", () => player.GameplayState.HasPassed);
+
             return () => player;
         }
 

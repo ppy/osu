@@ -15,12 +15,13 @@ namespace osu.Game.Overlays.Profile.Header.Components
     [LongRunningLoad]
     public partial class DrawableTournamentBanner : OsuClickableContainer
     {
+        private const float banner_aspect_ratio = 60 / 1000f;
         private readonly TournamentBanner banner;
 
         public DrawableTournamentBanner(TournamentBanner banner)
         {
             this.banner = banner;
-            RelativeSizeAxes = Axes.Both;
+            RelativeSizeAxes = Axes.X;
         }
 
         [BackgroundDependencyLoader]
@@ -39,6 +40,12 @@ namespace osu.Game.Overlays.Profile.Header.Components
         {
             base.LoadComplete();
             this.FadeInFromZero(200);
+        }
+
+        protected override void Update()
+        {
+            base.Update();
+            Height = DrawWidth * banner_aspect_ratio;
         }
 
         public override LocalisableString TooltipText => "view in browser";

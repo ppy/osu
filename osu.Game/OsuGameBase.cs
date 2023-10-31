@@ -215,7 +215,7 @@ namespace osu.Game
         /// For now, this is used as a source specifically for beat synced components.
         /// Going forward, it could potentially be used as the single source-of-truth for beatmap timing.
         /// </summary>
-        private readonly FramedBeatmapClock beatmapClock = new FramedBeatmapClock(true);
+        private readonly FramedBeatmapClock beatmapClock = new FramedBeatmapClock(applyOffsets: true, requireDecoupling: false);
 
         protected override Container<Drawable> Content => content;
 
@@ -392,17 +392,18 @@ namespace osu.Game
             {
                 SafeAreaOverrideEdges = SafeAreaOverrideEdges,
                 RelativeSizeAxes = Axes.Both,
-                Child = CreateScalingContainer().WithChildren(new Drawable[]
+                Child = CreateScalingContainer().WithChild(globalBindings = new GlobalActionContainer(this)
                 {
-                    (GlobalCursorDisplay = new GlobalCursorDisplay
+                    Children = new Drawable[]
                     {
-                        RelativeSizeAxes = Axes.Both
-                    }).WithChild(content = new OsuTooltipContainer(GlobalCursorDisplay.MenuCursor)
-                    {
-                        RelativeSizeAxes = Axes.Both
-                    }),
-                    // to avoid positional input being blocked by children, ensure the GlobalActionContainer is above everything.
-                    globalBindings = new GlobalActionContainer(this)
+                        (GlobalCursorDisplay = new GlobalCursorDisplay
+                        {
+                            RelativeSizeAxes = Axes.Both
+                        }).WithChild(content = new OsuTooltipContainer(GlobalCursorDisplay.MenuCursor)
+                        {
+                            RelativeSizeAxes = Axes.Both
+                        }),
+                    }
                 })
             });
 
@@ -440,16 +441,7 @@ namespace osu.Game
             }
         }
 
-        private void onTrackChanged(WorkingBeatmap beatmap, TrackChangeDirection direction)
-        {
-            // FramedBeatmapClock uses a decoupled clock internally which will mutate the source if it is an `IAdjustableClock`.
-            // We don't want this for now, as the intention of beatmapClock is to be a read-only source for beat sync components.
-            //
-            // Encapsulating in a FramedClock will avoid any mutations.
-            var framedClock = new FramedClock(beatmap.Track);
-
-            beatmapClock.ChangeSource(framedClock);
-        }
+        private void onTrackChanged(WorkingBeatmap beatmap, TrackChangeDirection direction) => beatmapClock.ChangeSource(beatmap.Track);
 
         protected virtual void InitialiseFonts()
         {
@@ -514,6 +506,12 @@ namespace osu.Game
             else
                 Scheduler.AddDelayed(AttemptExit, 2000);
         }
+
+        /// <summary>
+        /// If supported by the platform, the game will automatically restart after the next exit.
+        /// </summary>
+        /// <returns>Whether a restart operation was queued.</returns>
+        public virtual bool RestartAppWhenExited() => false;
 
         public bool Migrate(string path)
         {

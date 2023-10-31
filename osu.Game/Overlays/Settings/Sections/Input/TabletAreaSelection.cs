@@ -241,7 +241,7 @@ namespace osu.Game.Overlays.Settings.Sections.Input
         protected override void OnDrag(DragEvent e)
         {
             var newPos = Position + e.Delta;
-            this.MoveTo(Vector2.Clamp(newPos, Vector2.Zero, Parent.Size));
+            this.MoveTo(Vector2.Clamp(newPos, Vector2.Zero, Parent!.Size));
         }
 
         protected override void OnDragEnd(DragEndEvent e)

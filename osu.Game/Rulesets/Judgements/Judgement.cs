@@ -1,8 +1,6 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
 using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Scoring;
 
@@ -37,7 +35,40 @@ namespace osu.Game.Rulesets.Judgements
         /// <summary>
         /// The minimum <see cref="HitResult"/> that can be achieved - the inverse of <see cref="MaxResult"/>.
         /// </summary>
-        public HitResult MinResult
+        /// <remarks>
+        /// Defaults to a sane value for the given <see cref="MaxResult"/>. May be overridden to provide a supported custom value:
+        /// <list type="table">
+        ///   <listheader>
+        ///     <term><see cref="MaxResult"/>s</term>
+        ///     <description>Valid <see cref="MinResult"/>s</description>
+        ///   </listheader>
+        /// <item>
+        ///   <term><see cref="HitResult.Perfect"/>, <see cref="HitResult.Great"/>, <see cref="HitResult.Good"/>, <see cref="HitResult.Ok"/>, <see cref="HitResult.Meh"/></term>
+        ///   <description><see cref="HitResult.Miss"/></description>
+        /// </item>
+        /// <item>
+        ///   <term><see cref="HitResult.LargeBonus"/></term>
+        ///   <description><see cref="HitResult.IgnoreMiss"/></description>
+        /// </item>
+        /// <item>
+        ///   <term><see cref="HitResult.SmallBonus"/></term>
+        ///   <description><see cref="HitResult.IgnoreMiss"/></description>
+        /// </item>
+        /// <item>
+        ///   <term><see cref="HitResult.SmallTickHit"/></term>
+        ///   <description><see cref="HitResult.SmallTickMiss"/></description>
+        /// </item>
+        /// <item>
+        ///   <term><see cref="HitResult.LargeTickHit"/></term>
+        ///   <description><see cref="HitResult.LargeTickMiss"/></description>
+        /// </item>
+        /// <item>
+        ///   <term><see cref="HitResult.IgnoreHit"/></term>
+        ///   <description><see cref="HitResult.IgnoreMiss"/>, <see cref="HitResult.ComboBreak"/></description>
+        /// </item>
+        /// </list>
+        /// </remarks>
+        public virtual HitResult MinResult
         {
             get
             {
@@ -159,10 +190,9 @@ namespace osu.Game.Rulesets.Judgements
                     return 200;
 
                 case HitResult.Great:
-                    return 300;
-
+                // Perfect doesn't actually give more score / accuracy directly.
                 case HitResult.Perfect:
-                    return 315;
+                    return 300;
 
                 case HitResult.SmallBonus:
                     return SMALL_BONUS_SCORE;

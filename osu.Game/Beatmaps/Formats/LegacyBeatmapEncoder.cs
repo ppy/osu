@@ -1,15 +1,12 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
 using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Text;
-using JetBrains.Annotations;
 using osu.Game.Audio;
 using osu.Game.Beatmaps.ControlPoints;
 using osu.Game.Beatmaps.Legacy;
@@ -34,8 +31,7 @@ namespace osu.Game.Beatmaps.Formats
 
         private readonly IBeatmap beatmap;
 
-        [CanBeNull]
-        private readonly ISkin skin;
+        private readonly ISkin? skin;
 
         private readonly int onlineRulesetID;
 
@@ -44,7 +40,7 @@ namespace osu.Game.Beatmaps.Formats
         /// </summary>
         /// <param name="beatmap">The beatmap to encode.</param>
         /// <param name="skin">The beatmap's skin, used for encoding combo colours.</param>
-        public LegacyBeatmapEncoder(IBeatmap beatmap, [CanBeNull] ISkin skin)
+        public LegacyBeatmapEncoder(IBeatmap beatmap, ISkin? skin)
         {
             this.beatmap = beatmap;
             this.skin = skin;
@@ -93,7 +89,7 @@ namespace osu.Game.Beatmaps.Formats
             writer.WriteLine(FormattableString.Invariant($"PreviewTime: {beatmap.Metadata.PreviewTime}"));
             writer.WriteLine(FormattableString.Invariant($"Countdown: {(int)beatmap.BeatmapInfo.Countdown}"));
             writer.WriteLine(FormattableString.Invariant(
-                $"SampleSet: {toLegacySampleBank(((beatmap.ControlPointInfo as LegacyControlPointInfo)?.SamplePoints?.FirstOrDefault() ?? SampleControlPoint.DEFAULT).SampleBank)}"));
+                $"SampleSet: {toLegacySampleBank(((beatmap.ControlPointInfo as LegacyControlPointInfo)?.SamplePoints.FirstOrDefault() ?? SampleControlPoint.DEFAULT).SampleBank)}"));
             writer.WriteLine(FormattableString.Invariant($"StackLeniency: {beatmap.BeatmapInfo.StackLeniency}"));
             writer.WriteLine(FormattableString.Invariant($"Mode: {onlineRulesetID}"));
             writer.WriteLine(FormattableString.Invariant($"LetterboxInBreaks: {(beatmap.BeatmapInfo.LetterboxInBreaks ? '1' : '0')}"));
@@ -180,8 +176,8 @@ namespace osu.Game.Beatmaps.Formats
 
             writer.WriteLine("[TimingPoints]");
 
-            SampleControlPoint lastRelevantSamplePoint = null;
-            DifficultyControlPoint lastRelevantDifficultyPoint = null;
+            SampleControlPoint? lastRelevantSamplePoint = null;
+            DifficultyControlPoint? lastRelevantDifficultyPoint = null;
 
             // In osu!taiko and osu!mania, a scroll speed is stored as "slider velocity" in legacy formats.
             // In that case, a scrolling speed change is a global effect and per-hit object difficulty control points are ignored.
@@ -273,7 +269,7 @@ namespace osu.Game.Beatmaps.Formats
                 foreach (var hitObject in hitObjects)
                 {
                     if (hitObject is IHasSliderVelocity hasSliderVelocity)
-                        yield return new DifficultyControlPoint { Time = hitObject.StartTime, SliderVelocity = hasSliderVelocity.SliderVelocity };
+                        yield return new DifficultyControlPoint { Time = hitObject.StartTime, SliderVelocity = hasSliderVelocity.SliderVelocityMultiplier };
                 }
             }
 
@@ -585,7 +581,7 @@ namespace osu.Game.Beatmaps.Formats
             return type;
         }
 
-        private LegacySampleBank toLegacySampleBank(string sampleBank)
+        private LegacySampleBank toLegacySampleBank(string? sampleBank)
         {
             switch (sampleBank?.ToLowerInvariant())
             {
@@ -603,7 +599,7 @@ namespace osu.Game.Beatmaps.Formats
             }
         }
 
-        private int toLegacyCustomSampleBank(HitSampleInfo hitSampleInfo)
+        private int toLegacyCustomSampleBank(HitSampleInfo? hitSampleInfo)
         {
             if (hitSampleInfo is ConvertHitObjectParser.LegacyHitSampleInfo legacy)
                 return legacy.CustomSampleBank;

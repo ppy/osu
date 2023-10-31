@@ -46,6 +46,16 @@ namespace osu.Game.Scoring.Legacy
                 score.ScoreInfo = scoreInfo;
 
                 int version = sr.ReadInt32();
+
+                scoreInfo.IsLegacyScore = version < LegacyScoreEncoder.FIRST_LAZER_VERSION;
+
+                // TotalScoreVersion gets initialised to LATEST_VERSION.
+                // In the case where the incoming score has either an osu!stable or old lazer version, we need
+                // to mark it with the correct version increment to trigger reprocessing to new standardised scoring.
+                //
+                // See StandardisedScoreMigrationTools.ShouldMigrateToNewStandardised().
+                scoreInfo.TotalScoreVersion = version < 30000002 ? 30000001 : LegacyScoreEncoder.LATEST_VERSION;
+
                 string beatmapHash = sr.ReadString();
 
                 workingBeatmap = GetBeatmap(beatmapHash);
@@ -91,9 +101,9 @@ namespace osu.Game.Scoring.Legacy
                 byte[] compressedReplay = sr.ReadByteArray();
 
                 if (version >= 20140721)
-                    scoreInfo.OnlineID = sr.ReadInt64();
+                    scoreInfo.LegacyOnlineID = sr.ReadInt64();
                 else if (version >= 20121008)
-                    scoreInfo.OnlineID = sr.ReadInt32();
+                    scoreInfo.LegacyOnlineID = sr.ReadInt32();
 
                 byte[] compressedScoreInfo = null;
 
@@ -111,6 +121,7 @@ namespace osu.Game.Scoring.Legacy
 
                         Debug.Assert(readScore != null);
 
+                        score.ScoreInfo.OnlineID = readScore.OnlineID;
                         score.ScoreInfo.Statistics = readScore.Statistics;
                         score.ScoreInfo.MaximumStatistics = readScore.MaximumStatistics;
                         score.ScoreInfo.Mods = readScore.Mods.Select(m => m.ToMod(currentRuleset)).ToArray();

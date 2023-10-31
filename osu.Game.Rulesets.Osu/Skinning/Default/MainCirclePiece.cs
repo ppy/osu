@@ -9,7 +9,6 @@ using osu.Framework.Graphics.Containers;
 using osu.Game.Rulesets.Objects.Drawables;
 using osu.Game.Rulesets.Osu.Objects;
 using osu.Game.Rulesets.Osu.Objects.Drawables;
-using osuTK;
 using osuTK.Graphics;
 
 namespace osu.Game.Rulesets.Osu.Skinning.Default
@@ -25,7 +24,7 @@ namespace osu.Game.Rulesets.Osu.Skinning.Default
 
         public MainCirclePiece()
         {
-            Size = new Vector2(OsuHitObject.OBJECT_RADIUS * 2);
+            Size = OsuHitObject.OBJECT_DIMENSIONS;
 
             Anchor = Anchor.Centre;
             Origin = Anchor.Centre;

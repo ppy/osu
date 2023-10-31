@@ -2,6 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
+using osu.Framework.Logging;
 using osu.Framework.Timing;
 using osu.Game.Screens.Play;
 
@@ -59,6 +60,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Spectate
 
         public bool Seek(double position)
         {
+            Logger.Log($"{nameof(SpectatorPlayerClock)} seeked to {position}");
             CurrentTime = position;
             return true;
         }

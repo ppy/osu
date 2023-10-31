@@ -91,7 +91,7 @@ namespace osu.Game.Rulesets.Mania.Skinning.Legacy
             direction.BindTo(scrollingInfo.Direction);
             isHitting.BindTo(holdNote.IsHitting);
 
-            bodySprite = skin.GetAnimation(imageName, wrapMode, wrapMode, true, true).With(d =>
+            bodySprite = skin.GetAnimation(imageName, wrapMode, wrapMode, true, true, frameLength: 30).With(d =>
             {
                 if (d == null)
                     return;
@@ -123,9 +123,18 @@ namespace osu.Game.Rulesets.Mania.Skinning.Legacy
 
         private void applyCustomUpdateState(DrawableHitObject hitObject, ArmedState state)
         {
-            // ensure that the hold note is also faded out when the head/tail/any tick is missed.
-            if (state == ArmedState.Miss)
-                missFadeTime.Value ??= hitObject.HitStateUpdateTime;
+            switch (hitObject)
+            {
+                // Ensure that the hold note is also faded out when the head/tail/body is missed.
+                // Importantly, we filter out unrelated objects like DrawableNotePerfectBonus.
+                case DrawableHoldNoteTail:
+                case DrawableHoldNoteHead:
+                case DrawableHoldNoteBody:
+                    if (state == ArmedState.Miss)
+                        missFadeTime.Value ??= hitObject.HitStateUpdateTime;
+
+                    break;
+            }
         }
 
         private void onIsHittingChanged(ValueChangedEvent<bool> isHitting)
@@ -209,7 +218,9 @@ namespace osu.Game.Rulesets.Mania.Skinning.Legacy
         protected override void Update()
         {
             base.Update();
-            missFadeTime.Value ??= holdNote.HoldBrokenTime;
+
+            if (holdNote.Body.HasHoldBreak)
+                missFadeTime.Value = holdNote.Body.Result.TimeAbsolute;
 
             int scaleDirection = (direction.Value == ScrollingDirection.Down ? 1 : -1);
 

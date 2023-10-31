@@ -2,10 +2,12 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
+using System.Linq;
 using NUnit.Framework;
 using osu.Game.Beatmaps;
 using osu.Game.Rulesets.Filter;
 using osu.Game.Screens.Select;
+using osu.Game.Screens.Select.Carousel;
 using osu.Game.Screens.Select.Filter;
 
 namespace osu.Game.Tests.NonVisual.Filtering
@@ -21,6 +23,63 @@ namespace osu.Game.Tests.NonVisual.Filtering
             FilterQueryParser.ApplyQueries(filterCriteria, query);
             Assert.AreEqual("looking for a beatmap", filterCriteria.SearchText);
             Assert.AreEqual(4, filterCriteria.SearchTerms.Length);
+        }
+
+        [Test]
+        public void TestApplyQueriesBareWordsWithExactMatch()
+        {
+            const string query = "looking for \"a beatmap\"! like \"this\"";
+            var filterCriteria = new FilterCriteria();
+            FilterQueryParser.ApplyQueries(filterCriteria, query);
+            Assert.AreEqual("looking for \"a beatmap\"! like \"this\"", filterCriteria.SearchText);
+            Assert.AreEqual(5, filterCriteria.SearchTerms.Length);
+
+            Assert.That(filterCriteria.SearchTerms[0].SearchTerm, Is.EqualTo("a beatmap"));
+            Assert.That(filterCriteria.SearchTerms[0].MatchMode, Is.EqualTo(FilterCriteria.MatchMode.FullPhrase));
+
+            Assert.That(filterCriteria.SearchTerms[1].SearchTerm, Is.EqualTo("this"));
+            Assert.That(filterCriteria.SearchTerms[1].MatchMode, Is.EqualTo(FilterCriteria.MatchMode.IsolatedPhrase));
+
+            Assert.That(filterCriteria.SearchTerms[2].SearchTerm, Is.EqualTo("looking"));
+            Assert.That(filterCriteria.SearchTerms[2].MatchMode, Is.EqualTo(FilterCriteria.MatchMode.Substring));
+
+            Assert.That(filterCriteria.SearchTerms[3].SearchTerm, Is.EqualTo("for"));
+            Assert.That(filterCriteria.SearchTerms[3].MatchMode, Is.EqualTo(FilterCriteria.MatchMode.Substring));
+
+            Assert.That(filterCriteria.SearchTerms[4].SearchTerm, Is.EqualTo("like"));
+            Assert.That(filterCriteria.SearchTerms[4].MatchMode, Is.EqualTo(FilterCriteria.MatchMode.Substring));
+        }
+
+        [Test]
+        public void TestApplyFullPhraseQueryWithExclamationPointInTerm()
+        {
+            const string query = "looking for \"circles!\"!";
+            var filterCriteria = new FilterCriteria();
+            FilterQueryParser.ApplyQueries(filterCriteria, query);
+            Assert.AreEqual("looking for \"circles!\"!", filterCriteria.SearchText);
+            Assert.AreEqual(3, filterCriteria.SearchTerms.Length);
+
+            Assert.That(filterCriteria.SearchTerms[0].SearchTerm, Is.EqualTo("circles!"));
+            Assert.That(filterCriteria.SearchTerms[0].MatchMode, Is.EqualTo(FilterCriteria.MatchMode.FullPhrase));
+
+            Assert.That(filterCriteria.SearchTerms[1].SearchTerm, Is.EqualTo("looking"));
+            Assert.That(filterCriteria.SearchTerms[1].MatchMode, Is.EqualTo(FilterCriteria.MatchMode.Substring));
+
+            Assert.That(filterCriteria.SearchTerms[2].SearchTerm, Is.EqualTo("for"));
+            Assert.That(filterCriteria.SearchTerms[2].MatchMode, Is.EqualTo(FilterCriteria.MatchMode.Substring));
+        }
+
+        [Test]
+        public void TestApplyBrokenFullPhraseQuery()
+        {
+            const string query = "\"!";
+            var filterCriteria = new FilterCriteria();
+            FilterQueryParser.ApplyQueries(filterCriteria, query);
+            Assert.AreEqual("\"!", filterCriteria.SearchText);
+            Assert.AreEqual(1, filterCriteria.SearchTerms.Length);
+
+            Assert.That(filterCriteria.SearchTerms[0].SearchTerm, Is.EqualTo("!"));
+            Assert.That(filterCriteria.SearchTerms[0].MatchMode, Is.EqualTo(FilterCriteria.MatchMode.IsolatedPhrase));
         }
 
         /*
@@ -227,6 +286,18 @@ namespace osu.Game.Tests.NonVisual.Filtering
         }
 
         [Test]
+        public void TestApplyTitleQueries()
+        {
+            const string query = "find me songs with title=\"a certain title\" please";
+            var filterCriteria = new FilterCriteria();
+            FilterQueryParser.ApplyQueries(filterCriteria, query);
+            Assert.AreEqual("find me songs with  please", filterCriteria.SearchText.Trim());
+            Assert.AreEqual(5, filterCriteria.SearchTerms.Length);
+            Assert.AreEqual("a certain title", filterCriteria.Title.SearchTerm);
+            Assert.That(filterCriteria.Title.MatchMode, Is.EqualTo(FilterCriteria.MatchMode.IsolatedPhrase));
+        }
+
+        [Test]
         public void TestApplyArtistQueries()
         {
             const string query = "find me songs by artist=singer please";
@@ -235,6 +306,7 @@ namespace osu.Game.Tests.NonVisual.Filtering
             Assert.AreEqual("find me songs by  please", filterCriteria.SearchText.Trim());
             Assert.AreEqual(5, filterCriteria.SearchTerms.Length);
             Assert.AreEqual("singer", filterCriteria.Artist.SearchTerm);
+            Assert.That(filterCriteria.Artist.MatchMode, Is.EqualTo(FilterCriteria.MatchMode.Substring));
         }
 
         [Test]
@@ -246,6 +318,19 @@ namespace osu.Game.Tests.NonVisual.Filtering
             Assert.AreEqual("really like  yes", filterCriteria.SearchText.Trim());
             Assert.AreEqual(3, filterCriteria.SearchTerms.Length);
             Assert.AreEqual("name with space", filterCriteria.Artist.SearchTerm);
+            Assert.That(filterCriteria.Artist.MatchMode, Is.EqualTo(FilterCriteria.MatchMode.IsolatedPhrase));
+        }
+
+        [Test]
+        public void TestApplyArtistQueriesWithSpacesFullPhrase()
+        {
+            const string query = "artist=\"The Only One\"!";
+            var filterCriteria = new FilterCriteria();
+            FilterQueryParser.ApplyQueries(filterCriteria, query);
+            Assert.That(filterCriteria.SearchText.Trim(), Is.Empty);
+            Assert.AreEqual(0, filterCriteria.SearchTerms.Length);
+            Assert.AreEqual("The Only One", filterCriteria.Artist.SearchTerm);
+            Assert.That(filterCriteria.Artist.MatchMode, Is.EqualTo(FilterCriteria.MatchMode.FullPhrase));
         }
 
         [Test]
@@ -297,6 +382,57 @@ namespace osu.Game.Tests.NonVisual.Filtering
             FilterQueryParser.ApplyQueries(filterCriteria, query);
             Assert.AreEqual("readme", customCriteria.CustomValue);
             Assert.AreEqual("unrecognised=keyword", filterCriteria.SearchText.Trim());
+        }
+
+        [TestCase("[1]", new[] { 0 })]
+        [TestCase("[1", new[] { 0 })]
+        [TestCase("My[Favourite", new[] { 2 })]
+        [TestCase("My[Favourite]", new[] { 2 })]
+        [TestCase("My[Favourite]Song", new[] { 2 })]
+        [TestCase("Favourite]", new[] { 2 })]
+        [TestCase("[Diff", new[] { 0, 1, 3, 4, 6 })]
+        [TestCase("[Diff]", new[] { 0, 1, 3, 4, 6 })]
+        [TestCase("[Favourite]", new[] { 3 })]
+        [TestCase("Title1 [Diff]", new[] { 0, 1 })]
+        [TestCase("Title1[Diff]", new int[] { })]
+        [TestCase("[diff ]with]", new[] { 4 })]
+        [TestCase("[diff ]with [[ brackets]]]]", new[] { 4 })]
+        [TestCase("[Diff in title]", new int[] { })]
+        [TestCase("[Diff in diff]", new[] { 6 })]
+        [TestCase("diff=Diff", new[] { 0, 1, 3, 4, 6 })]
+        [TestCase("diff=Diff1", new[] { 0 })]
+        [TestCase("diff=\"Diff\"", new[] { 3, 4, 6 })]
+        [TestCase("diff=!\"Diff\"", new int[] { })]
+        public void TestDifficultySearch(string query, int[] expectedBeatmapIndexes)
+        {
+            var carouselBeatmaps = (((string title, string difficultyName)[])new[]
+            {
+                ("Title1", "Diff1"),
+                ("Title1", "Diff2"),
+                ("My[Favourite]Song", "Expert"),
+                ("Title", "My Favourite Diff"),
+                ("Another One", "diff ]with [[ brackets]]]"),
+                ("Diff in title", "a"),
+                ("a", "Diff in diff"),
+            }).Select(info => new CarouselBeatmap(new BeatmapInfo
+            {
+                Metadata = new BeatmapMetadata
+                {
+                    Title = info.title
+                },
+                DifficultyName = info.difficultyName
+            })).ToList();
+
+            var criteria = new FilterCriteria();
+
+            FilterQueryParser.ApplyQueries(criteria, query);
+            carouselBeatmaps.ForEach(b => b.Filter(criteria));
+
+            int[] visibleBeatmaps = carouselBeatmaps
+                                    .Where(b => !b.Filtered.Value)
+                                    .Select(b => carouselBeatmaps.IndexOf(b)).ToArray();
+
+            Assert.That(visibleBeatmaps, Is.EqualTo(expectedBeatmapIndexes));
         }
 
         private class CustomFilterCriteria : IRulesetFilterCriteria

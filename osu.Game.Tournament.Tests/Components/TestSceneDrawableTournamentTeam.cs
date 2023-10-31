@@ -1,8 +1,7 @@
-// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
+using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Game.Tests.Visual;
@@ -16,13 +15,19 @@ namespace osu.Game.Tournament.Tests.Components
 {
     public partial class TestSceneDrawableTournamentTeam : OsuGridTestScene
     {
+        [Cached]
+        protected LadderInfo Ladder { get; private set; } = new LadderInfo();
+
         public TestSceneDrawableTournamentTeam()
             : base(4, 3)
         {
+            AddToggleStep("toggle seed view", v => Ladder.DisplayTeamSeeds.Value = v);
+
             var team = new TournamentTeam
             {
                 FlagName = { Value = "AU" },
                 FullName = { Value = "Australia" },
+                Seed = { Value = "#5" },
                 Players =
                 {
                     new TournamentUser { Username = "ASecretBox" },
@@ -32,7 +37,7 @@ namespace osu.Game.Tournament.Tests.Components
                     new TournamentUser { Username = "Parkes" },
                     new TournamentUser { Username = "Shiroha" },
                     new TournamentUser { Username = "Jordan The Bear" },
-                }
+                },
             };
 
             var match = new TournamentMatch { Team1 = { Value = team } };

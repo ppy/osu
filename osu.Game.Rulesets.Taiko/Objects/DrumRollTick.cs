@@ -1,8 +1,6 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
 using osu.Game.Rulesets.Judgements;
 using osu.Game.Rulesets.Scoring;
 using osu.Game.Rulesets.Taiko.Judgements;
@@ -11,6 +9,8 @@ namespace osu.Game.Rulesets.Taiko.Objects
 {
     public class DrumRollTick : TaikoStrongableHitObject
     {
+        public readonly DrumRoll Parent;
+
         /// <summary>
         /// Whether this is the first (initial) tick of the slider.
         /// </summary>
@@ -26,6 +26,11 @@ namespace osu.Game.Rulesets.Taiko.Objects
         /// The time allowed to hit this tick.
         /// </summary>
         public double HitWindow => TickSpacing / 2;
+
+        public DrumRollTick(DrumRoll parent)
+        {
+            Parent = parent;
+        }
 
         public override Judgement CreateJudgement() => new TaikoDrumRollTickJudgement();
 

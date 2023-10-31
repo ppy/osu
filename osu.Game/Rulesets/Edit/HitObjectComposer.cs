@@ -44,6 +44,11 @@ namespace osu.Game.Rulesets.Edit
     public abstract partial class HitObjectComposer<TObject> : HitObjectComposer, IPlacementHandler
         where TObject : HitObject
     {
+        /// <summary>
+        /// Whether the playfield should be centered horizontally. Should be disabled for playfields which span the full horizontal width.
+        /// </summary>
+        protected virtual bool ApplyHorizontalCentering => true;
+
         protected IRulesetConfigManager Config { get; private set; }
 
         // Provides `Playfield`
@@ -71,7 +76,7 @@ namespace osu.Game.Rulesets.Edit
 
         protected readonly Container LayerBelowRuleset = new Container { RelativeSizeAxes = Axes.Both };
 
-        private InputManager inputManager;
+        protected InputManager InputManager { get; private set; }
 
         private EditorRadioButtonCollection toolboxCollection;
 
@@ -81,6 +86,8 @@ namespace osu.Game.Rulesets.Edit
 
         private IBindable<bool> hasTiming;
         private Bindable<bool> autoSeekOnPlacement;
+
+        protected DrawableRuleset<TObject> DrawableRuleset { get; private set; }
 
         protected HitObjectComposer(Ruleset ruleset)
             : base(ruleset)
@@ -99,7 +106,8 @@ namespace osu.Game.Rulesets.Edit
 
             try
             {
-                drawableRulesetWrapper = new DrawableEditorRulesetWrapper<TObject>(CreateDrawableRuleset(Ruleset, EditorBeatmap.PlayableBeatmap, new[] { Ruleset.GetAutoplayMod() }))
+                DrawableRuleset = CreateDrawableRuleset(Ruleset, EditorBeatmap.PlayableBeatmap, new[] { Ruleset.GetAutoplayMod() });
+                drawableRulesetWrapper = new DrawableEditorRulesetWrapper<TObject>(DrawableRuleset)
                 {
                     Clock = EditorClock,
                     ProcessCustomClock = false
@@ -111,19 +119,17 @@ namespace osu.Game.Rulesets.Edit
                 return;
             }
 
+            if (DrawableRuleset is IDrawableScrollingRuleset scrollingRuleset)
+                dependencies.CacheAs(scrollingRuleset.ScrollingInfo);
+
             dependencies.CacheAs(Playfield);
 
-            InternalChildren = new Drawable[]
+            InternalChildren = new[]
             {
                 PlayfieldContentContainer = new Container
                 {
-                    Name = "Content",
-                    Padding = new MarginPadding
-                    {
-                        Left = TOOLBOX_CONTRACTED_SIZE_LEFT,
-                        Right = TOOLBOX_CONTRACTED_SIZE_RIGHT,
-                    },
-                    RelativeSizeAxes = Axes.Both,
+                    Name = "Playfield content",
+                    RelativeSizeAxes = Axes.Y,
                     Children = new Drawable[]
                     {
                         // layers below playfield
@@ -198,7 +204,7 @@ namespace osu.Game.Rulesets.Edit
                             },
                         }
                     }
-                }
+                },
             };
 
             toolboxCollection.Items = CompositionTools
@@ -229,7 +235,7 @@ namespace osu.Game.Rulesets.Edit
         {
             base.LoadComplete();
 
-            inputManager = GetContainingInputManager();
+            InputManager = GetContainingInputManager();
 
             hasTiming = EditorBeatmap.HasTiming.GetBoundCopy();
             hasTiming.BindValueChanged(timing =>
@@ -240,11 +246,34 @@ namespace osu.Game.Rulesets.Edit
             });
         }
 
+        protected override void Update()
+        {
+            base.Update();
+
+            if (ApplyHorizontalCentering)
+            {
+                PlayfieldContentContainer.Anchor = Anchor.Centre;
+                PlayfieldContentContainer.Origin = Anchor.Centre;
+
+                // Ensure that the playfield is always centered but also doesn't get cut off by toolboxes.
+                PlayfieldContentContainer.Width = Math.Max(1024, DrawWidth) - TOOLBOX_CONTRACTED_SIZE_RIGHT * 2;
+                PlayfieldContentContainer.X = 0;
+            }
+            else
+            {
+                PlayfieldContentContainer.Anchor = Anchor.CentreLeft;
+                PlayfieldContentContainer.Origin = Anchor.CentreLeft;
+
+                PlayfieldContentContainer.Width = Math.Max(1024, DrawWidth) - (TOOLBOX_CONTRACTED_SIZE_LEFT + TOOLBOX_CONTRACTED_SIZE_RIGHT);
+                PlayfieldContentContainer.X = TOOLBOX_CONTRACTED_SIZE_LEFT;
+            }
+        }
+
         public override Playfield Playfield => drawableRulesetWrapper.Playfield;
 
         public override IEnumerable<DrawableHitObject> HitObjects => drawableRulesetWrapper.Playfield.AllHitObjects;
 
-        public override bool CursorInPlacementArea => drawableRulesetWrapper.Playfield.ReceivePositionalInputAt(inputManager.CurrentState.Mouse.Position);
+        public override bool CursorInPlacementArea => drawableRulesetWrapper.Playfield.ReceivePositionalInputAt(InputManager.CurrentState.Mouse.Position);
 
         /// <summary>
         /// Defines all available composition tools, listed on the left side of the editor screen as button controls.
@@ -281,7 +310,7 @@ namespace osu.Game.Rulesets.Edit
         /// <param name="beatmap">The loaded beatmap.</param>
         /// <param name="mods">The mods to be applied.</param>
         /// <returns>An editor-relevant <see cref="DrawableRuleset{TObject}"/>.</returns>
-        protected virtual DrawableRuleset<TObject> CreateDrawableRuleset(Ruleset ruleset, IBeatmap beatmap, IReadOnlyList<Mod> mods = null)
+        protected virtual DrawableRuleset<TObject> CreateDrawableRuleset(Ruleset ruleset, IBeatmap beatmap, IReadOnlyList<Mod> mods)
             => (DrawableRuleset<TObject>)ruleset.CreateDrawableRulesetWith(beatmap, mods);
 
         #region Tool selection logic
@@ -472,7 +501,7 @@ namespace osu.Game.Rulesets.Edit
     public abstract partial class HitObjectComposer : CompositeDrawable, IPositionSnapProvider
     {
         public const float TOOLBOX_CONTRACTED_SIZE_LEFT = 60;
-        public const float TOOLBOX_CONTRACTED_SIZE_RIGHT = 130;
+        public const float TOOLBOX_CONTRACTED_SIZE_RIGHT = 120;
 
         public readonly Ruleset Ruleset;
 

@@ -18,6 +18,7 @@ using osu.Game.Rulesets.Objects.Drawables;
 using osu.Game.Rulesets.Objects.Types;
 using osu.Game.Rulesets.Osu;
 using osu.Game.Rulesets.Osu.Objects;
+using osu.Game.Rulesets.Scoring;
 using osu.Game.Rulesets.UI;
 using osu.Game.Storyboards;
 using osuTK;
@@ -62,25 +63,30 @@ namespace osu.Game.Tests.Visual.Gameplay
             {
                 new HitCircle
                 {
+                    HitWindows = new HitWindows(),
                     StartTime = t += spacing,
                     Samples = new[] { new HitSampleInfo(HitSampleInfo.HIT_NORMAL) }
                 },
                 new HitCircle
                 {
+                    HitWindows = new HitWindows(),
                     StartTime = t += spacing,
                     Samples = new[] { new HitSampleInfo(HitSampleInfo.HIT_WHISTLE) }
                 },
                 new HitCircle
                 {
+                    HitWindows = new HitWindows(),
                     StartTime = t += spacing,
                     Samples = new[] { new HitSampleInfo(HitSampleInfo.HIT_NORMAL, HitSampleInfo.BANK_SOFT) },
                 },
                 new HitCircle
                 {
+                    HitWindows = new HitWindows(),
                     StartTime = t += spacing,
                 },
                 new Slider
                 {
+                    HitWindows = new HitWindows(),
                     StartTime = t += spacing,
                     Path = new SliderPath(PathType.Linear, new[] { Vector2.Zero, Vector2.UnitY * 200 }),
                     Samples = new[] { new HitSampleInfo(HitSampleInfo.HIT_WHISTLE, HitSampleInfo.BANK_SOFT) },
@@ -101,7 +107,7 @@ namespace osu.Game.Tests.Visual.Gameplay
         {
             base.SetUpSteps();
 
-            AddStep("Add trigger source", () => Player.HUDOverlay.Add(sampleTriggerSource = new TestGameplaySampleTriggerSource(Player.DrawableRuleset.Playfield.HitObjectContainer)));
+            AddStep("Add trigger source", () => Player.DrawableRuleset.FrameStableComponents.Add(sampleTriggerSource = new TestGameplaySampleTriggerSource(Player.DrawableRuleset.Playfield.HitObjectContainer)));
         }
 
         [Test]
@@ -131,7 +137,12 @@ namespace osu.Game.Tests.Visual.Gameplay
 
             AddAssert("first object hit", () => getNextAliveObject()?.Entry?.Result?.HasResult == true);
 
-            checkValidObjectIndex(1);
+            // next object is too far away, so we still use the already hit object.
+            checkValidObjectIndex(0);
+
+            // still too far away.
+            seekBeforeIndex(1, 400);
+            checkValidObjectIndex(0);
 
             // Still object 1 as it's not hit yet.
             seekBeforeIndex(1);
@@ -141,6 +152,14 @@ namespace osu.Game.Tests.Visual.Gameplay
             seekBeforeIndex(2);
             waitForAliveObjectIndex(2);
             checkValidObjectIndex(2);
+
+            // test rewinding
+            seekBeforeIndex(1);
+            waitForAliveObjectIndex(1);
+            checkValidObjectIndex(1);
+
+            seekBeforeIndex(1, 400);
+            checkValidObjectIndex(0);
 
             seekBeforeIndex(3);
             waitForAliveObjectIndex(3);
@@ -168,9 +187,9 @@ namespace osu.Game.Tests.Visual.Gameplay
             checkValidObjectIndex(4);
         }
 
-        private void seekBeforeIndex(int index)
+        private void seekBeforeIndex(int index, double amount = 100)
         {
-            AddStep($"seek to just before object {index}", () => Player.GameplayClockContainer.Seek(beatmap.HitObjects[index].StartTime - 100));
+            AddStep($"seek to {amount} ms before object {index}", () => Player.GameplayClockContainer.Seek(beatmap.HitObjects[index].StartTime - amount));
             waitForCatchUp();
         }
 
@@ -186,7 +205,7 @@ namespace osu.Game.Tests.Visual.Gameplay
         }
 
         private void checkValidObjectIndex(int index) =>
-            AddAssert($"check valid object is {index}", () => sampleTriggerSource.GetMostValidObject(), () => Is.EqualTo(beatmap.HitObjects[index]));
+            AddAssert($"check object at index {index} is correct", () => sampleTriggerSource.GetMostValidObject(), () => Is.EqualTo(beatmap.HitObjects[index]));
 
         private DrawableHitObject? getNextAliveObject() =>
             Player.DrawableRuleset.Playfield.HitObjectContainer.AliveObjects.FirstOrDefault();
@@ -204,7 +223,7 @@ namespace osu.Game.Tests.Visual.Gameplay
             {
             }
 
-            public new HitObject GetMostValidObject() => base.GetMostValidObject();
+            public new HitObject? GetMostValidObject() => base.GetMostValidObject();
         }
     }
 }

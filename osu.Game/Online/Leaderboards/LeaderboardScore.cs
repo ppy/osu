@@ -31,6 +31,7 @@ using osuTK;
 using osuTK.Graphics;
 using osu.Game.Online.API;
 using osu.Game.Resources.Localisation.Web;
+using osu.Game.Rulesets.Mods;
 using osu.Game.Utils;
 
 namespace osu.Game.Online.Leaderboards
@@ -242,7 +243,7 @@ namespace osu.Game.Online.Leaderboards
                                     Origin = Anchor.BottomRight,
                                     AutoSizeAxes = Axes.Both,
                                     Direction = FillDirection.Horizontal,
-                                    ChildrenEnumerable = Score.Mods.Select(mod => new ModIcon(mod) { Scale = new Vector2(0.375f) })
+                                    ChildrenEnumerable = Score.Mods.AsOrdered().Select(mod => new ModIcon(mod) { Scale = new Vector2(0.375f) })
                                 },
                             },
                         },
@@ -425,7 +426,7 @@ namespace osu.Game.Online.Leaderboards
 
                 if (Score.Files.Count > 0)
                 {
-                    items.Add(new OsuMenuItem("Export", MenuItemType.Standard, () => scoreManager.Export(Score)));
+                    items.Add(new OsuMenuItem(Localisation.CommonStrings.Export, MenuItemType.Standard, () => scoreManager.Export(Score)));
                     items.Add(new OsuMenuItem(CommonStrings.ButtonsDelete, MenuItemType.Destructive, () => dialogOverlay?.Push(new LocalScoreDeleteDialog(Score))));
                 }
 

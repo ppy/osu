@@ -1,12 +1,11 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
-using JetBrains.Annotations;
+using System.Text.RegularExpressions;
 using osu.Game.Beatmaps;
 using osu.Game.Collections;
 using osu.Game.Rulesets;
@@ -20,7 +19,12 @@ namespace osu.Game.Screens.Select
         public GroupMode Group;
         public SortMode Sort;
 
-        public BeatmapSetInfo SelectedBeatmapSet;
+        /// <summary>
+        /// Whether the display of beatmap sets should be split apart per-difficulty for the current criteria.
+        /// </summary>
+        public bool SplitOutDifficulties => Sort == SortMode.Difficulty;
+
+        public BeatmapSetInfo? SelectedBeatmapSet;
 
         public OptionalRange<double> StarDifficulty;
         public OptionalRange<float> ApproachRate;
@@ -33,6 +37,8 @@ namespace osu.Game.Screens.Select
         public OptionalRange<BeatmapOnlineStatus> OnlineStatus;
         public OptionalTextFilter Creator;
         public OptionalTextFilter Artist;
+        public OptionalTextFilter Title;
+        public OptionalTextFilter DifficultyName;
 
         public OptionalRange<double> UserStarDifficulty = new OptionalRange<double>
         {
@@ -40,12 +46,12 @@ namespace osu.Game.Screens.Select
             IsUpperInclusive = true
         };
 
-        public string[] SearchTerms = Array.Empty<string>();
+        public OptionalTextFilter[] SearchTerms = Array.Empty<OptionalTextFilter>();
 
-        public RulesetInfo Ruleset;
+        public RulesetInfo? Ruleset;
         public bool AllowConvertedBeatmaps;
 
-        private string searchText;
+        private string searchText = string.Empty;
 
         /// <summary>
         /// <see cref="SearchText"/> as a number (if it can be parsed as one).
@@ -58,11 +64,44 @@ namespace osu.Game.Screens.Select
             set
             {
                 searchText = value;
-                SearchTerms = searchText.Split(' ', StringSplitOptions.RemoveEmptyEntries).ToArray();
+
+                List<OptionalTextFilter> terms = new List<OptionalTextFilter>();
+
+                string remainingText = value;
+
+                // Match either an open difficulty tag to the end of string,
+                // or match a closed one with a whitespace after it.
+                //
+                // To keep things simple, the closing ']' may be included in the match group,
+                // and is trimmed post-match.
+                foreach (Match quotedSegment in Regex.Matches(value, "(^|\\s)\\[(.*)(\\]\\s|$)"))
+                {
+                    DifficultyName = new OptionalTextFilter
+                    {
+                        SearchTerm = quotedSegment.Groups[2].Value.Trim(']')
+                    };
+
+                    remainingText = remainingText.Replace(quotedSegment.Value, string.Empty);
+                }
+
+                // First handle quoted segments to ensure we keep inline spaces in exact matches.
+                foreach (Match quotedSegment in Regex.Matches(value, "(\"[^\"]+\"[!]?)"))
+                {
+                    terms.Add(new OptionalTextFilter { SearchTerm = quotedSegment.Value });
+                    remainingText = remainingText.Replace(quotedSegment.Value, string.Empty);
+                }
+
+                // Then handle the rest splitting on any spaces.
+                terms.AddRange(remainingText.Split(' ', StringSplitOptions.RemoveEmptyEntries).Select(s => new OptionalTextFilter
+                {
+                    SearchTerm = s
+                }));
+
+                SearchTerms = terms.ToArray();
 
                 SearchNumber = null;
 
-                if (SearchTerms.Length == 1 && int.TryParse(SearchTerms[0], out int parsed))
+                if (SearchTerms.Length == 1 && int.TryParse(SearchTerms[0].SearchTerm, out int parsed))
                     SearchNumber = parsed;
             }
         }
@@ -70,11 +109,9 @@ namespace osu.Game.Screens.Select
         /// <summary>
         /// Hashes from the <see cref="BeatmapCollection"/> to filter to.
         /// </summary>
-        [CanBeNull]
-        public IEnumerable<string> CollectionBeatmapMD5Hashes { get; set; }
+        public IEnumerable<string>? CollectionBeatmapMD5Hashes { get; set; }
 
-        [CanBeNull]
-        public IRulesetFilterCriteria RulesetCriteria { get; set; }
+        public IRulesetFilterCriteria? RulesetCriteria { get; set; }
 
         public struct OptionalRange<T> : IEquatable<OptionalRange<T>>
             where T : struct
@@ -124,6 +161,8 @@ namespace osu.Game.Screens.Select
         {
             public bool HasFilter => !string.IsNullOrEmpty(SearchTerm);
 
+            public MatchMode MatchMode { get; private set; }
+
             public bool Matches(string value)
             {
                 if (!HasFilter)
@@ -133,12 +172,67 @@ namespace osu.Game.Screens.Select
                 if (string.IsNullOrEmpty(value))
                     return false;
 
-                return value.Contains(SearchTerm, StringComparison.InvariantCultureIgnoreCase);
+                switch (MatchMode)
+                {
+                    default:
+                    case MatchMode.Substring:
+                        return value.Contains(SearchTerm, StringComparison.InvariantCultureIgnoreCase);
+
+                    case MatchMode.IsolatedPhrase:
+                        return Regex.IsMatch(value, $@"(^|\s){Regex.Escape(searchTerm)}($|\s)", RegexOptions.IgnoreCase | RegexOptions.CultureInvariant);
+
+                    case MatchMode.FullPhrase:
+                        return CultureInfo.InvariantCulture.CompareInfo.Compare(value, searchTerm, CompareOptions.IgnoreCase) == 0;
+                }
             }
 
-            public string SearchTerm;
+            private string searchTerm;
+
+            public string SearchTerm
+            {
+                get => searchTerm;
+                set
+                {
+                    searchTerm = value;
+
+                    if (searchTerm.StartsWith('\"'))
+                    {
+                        // length check ensures that the quote character in the `StartsWith()` check above and the `EndsWith()` check below is not the same character.
+                        if (searchTerm.EndsWith("\"!", StringComparison.Ordinal) && searchTerm.Length >= 3)
+                        {
+                            searchTerm = searchTerm.TrimEnd('!').Trim('\"');
+                            MatchMode = MatchMode.FullPhrase;
+                        }
+                        else
+                        {
+                            searchTerm = searchTerm.Trim('\"');
+                            MatchMode = MatchMode.IsolatedPhrase;
+                        }
+                    }
+                    else
+                        MatchMode = MatchMode.Substring;
+                }
+            }
 
             public bool Equals(OptionalTextFilter other) => SearchTerm == other.SearchTerm;
+        }
+
+        public enum MatchMode
+        {
+            /// <summary>
+            /// Match using a simple "contains" substring match.
+            /// </summary>
+            Substring,
+
+            /// <summary>
+            /// Match for the search phrase being isolated by spaces, or at the start or end of the text.
+            /// </summary>
+            IsolatedPhrase,
+
+            /// <summary>
+            /// Match for the search phrase matching the full text in completion.
+            /// </summary>
+            FullPhrase,
         }
     }
 }

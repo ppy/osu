@@ -15,6 +15,7 @@ using osu.Framework.Graphics.Transforms;
 using osu.Framework.Input;
 using osu.Framework.Screens;
 using osu.Framework.Threading;
+using osu.Game.Audio;
 using osu.Game.Audio.Effects;
 using osu.Game.Configuration;
 using osu.Game.Graphics;
@@ -25,6 +26,7 @@ using osu.Game.Overlays;
 using osu.Game.Overlays.Notifications;
 using osu.Game.Screens.Menu;
 using osu.Game.Screens.Play.PlayerSettings;
+using osu.Game.Skinning;
 using osu.Game.Users;
 using osu.Game.Utils;
 using osuTK;
@@ -43,6 +45,8 @@ namespace osu.Game.Screens.Play
         public override bool HideOverlaysOnEnter => hideOverlays;
 
         public override bool DisallowExternalBeatmapRulesetChanges => true;
+
+        public override bool? AllowGlobalTrackControl => false;
 
         // Here because IsHovered will not update unless we do so.
         public override bool HandlePositionalInput => true;
@@ -75,6 +79,8 @@ namespace osu.Game.Screens.Play
 
         private AudioFilter lowPassFilter = null!;
         private AudioFilter highPassFilter = null!;
+
+        private SkinnableSound sampleRestart = null!;
 
         [Cached]
         private OverlayColourProvider colourProvider = new OverlayColourProvider(OverlayColourScheme.Purple);
@@ -199,7 +205,8 @@ namespace osu.Game.Screens.Play
                 },
                 idleTracker = new IdleTracker(750),
                 lowPassFilter = new AudioFilter(audio.TrackMixer),
-                highPassFilter = new AudioFilter(audio.TrackMixer, BQFType.HighPass)
+                highPassFilter = new AudioFilter(audio.TrackMixer, BQFType.HighPass),
+                sampleRestart = new SkinnableSound(new SampleInfo(@"Gameplay/restart", @"pause-retry-click"))
             };
 
             if (Beatmap.Value.BeatmapInfo.EpilepsyWarning)
@@ -240,7 +247,7 @@ namespace osu.Game.Screens.Play
 
             contentIn();
 
-            MetadataInfo.Delay(750).FadeIn(500);
+            MetadataInfo.Delay(750).FadeIn(500, Easing.OutQuint);
 
             // after an initial delay, start the debounced load check.
             // this will continue to execute even after resuming back on restart.
@@ -264,6 +271,8 @@ namespace osu.Game.Screens.Play
             CurrentPlayer = null;
             playerConsumed = false;
             cancelLoad();
+
+            sampleRestart.Play();
 
             contentIn();
         }
@@ -405,13 +414,15 @@ namespace osu.Game.Screens.Play
             quickRestart = quickRestartRequested;
             hideOverlays = true;
             ValidForResume = true;
+
+            this.MakeCurrent();
         }
 
         private void contentIn()
         {
             MetadataInfo.Loading = true;
 
-            content.FadeInFromZero(400);
+            content.FadeInFromZero(500, Easing.OutQuint);
             content.ScaleTo(1, 650, Easing.OutQuint).Then().Schedule(prepareNewPlayer);
 
             settingsScroll.FadeInFromZero(500, Easing.Out)

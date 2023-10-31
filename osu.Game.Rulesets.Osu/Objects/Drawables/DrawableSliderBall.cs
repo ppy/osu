@@ -11,9 +11,11 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Input;
 using osu.Framework.Input.Events;
+using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Objects.Drawables;
 using osu.Game.Rulesets.Objects.Types;
 using osu.Game.Rulesets.Osu.Skinning.Default;
+using osu.Game.Screens.Play;
 using osu.Game.Skinning;
 using osuTK;
 
@@ -36,7 +38,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
 
             Origin = Anchor.Centre;
 
-            Size = new Vector2(OsuHitObject.OBJECT_RADIUS * 2);
+            Size = OsuHitObject.OBJECT_DIMENSIONS;
 
             Children = new[]
             {
@@ -152,9 +154,12 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
 
             Tracking =
                 // in valid time range
-                Time.Current >= drawableSlider.HitObject.StartTime && Time.Current < drawableSlider.HitObject.EndTime &&
+                Time.Current >= drawableSlider.HitObject.StartTime
+                // even in an edge case where current time has exceeded the slider's time, we may not have finished judging.
+                // we don't want to potentially update from Tracking=true to Tracking=false at this point.
+                && (!drawableSlider.AllJudged || Time.Current <= drawableSlider.HitObject.GetEndTime())
                 // in valid position range
-                lastScreenSpaceMousePosition.HasValue && followCircleReceptor.ReceivePositionalInputAt(lastScreenSpaceMousePosition.Value) &&
+                && lastScreenSpaceMousePosition.HasValue && followCircleReceptor.ReceivePositionalInputAt(lastScreenSpaceMousePosition.Value) &&
                 // valid action
                 (actions?.Any(isValidTrackingAction) ?? false);
 
@@ -179,16 +184,13 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
 
         private Vector2? lastPosition;
 
-        private bool rewinding;
-
         public void UpdateProgress(double completionProgress)
         {
             Position = drawableSlider.HitObject.CurvePositionAt(completionProgress);
 
             var diff = lastPosition.HasValue ? lastPosition.Value - Position : Position - drawableSlider.HitObject.CurvePositionAt(completionProgress + 0.01f);
 
-            if (Clock.ElapsedFrameTime != 0)
-                rewinding = Clock.ElapsedFrameTime < 0;
+            bool rewinding = (Clock as IGameplayClock)?.IsRewinding == true;
 
             // Ensure the value is substantially high enough to allow for Atan2 to get a valid angle.
             if (diff.LengthFast < 0.01f)

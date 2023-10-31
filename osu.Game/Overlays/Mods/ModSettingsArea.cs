@@ -1,7 +1,5 @@
-// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
-
-#nullable disable
 
 using System;
 using System.Collections.Generic;
@@ -32,7 +30,7 @@ namespace osu.Game.Overlays.Mods
         private readonly FillFlowContainer modSettingsFlow;
 
         [Resolved]
-        private OverlayColourProvider colourProvider { get; set; }
+        private OverlayColourProvider colourProvider { get; set; } = null!;
 
         public ModSettingsArea()
         {
@@ -86,7 +84,7 @@ namespace osu.Game.Overlays.Mods
         {
             modSettingsFlow.Clear();
 
-            foreach (var mod in SelectedMods.Value.OrderBy(mod => mod.Type).ThenBy(mod => mod.Acronym))
+            foreach (var mod in SelectedMods.Value.AsOrdered())
             {
                 var settings = mod.CreateSettingsControls().ToList();
 

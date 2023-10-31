@@ -1,8 +1,6 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
 using System;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics.Colour;
@@ -80,6 +78,7 @@ namespace osu.Game.Graphics
                 case HitResult.SmallTickMiss:
                 case HitResult.LargeTickMiss:
                 case HitResult.Miss:
+                case HitResult.ComboBreak:
                     return Red;
 
                 case HitResult.Meh:
@@ -398,5 +397,7 @@ namespace osu.Game.Graphics
 
         public Color4 SpotlightColour => Green2;
         public Color4 FeaturedArtistColour => Blue2;
+
+        public Color4 DangerousButtonColour => Pink3;
     }
 }

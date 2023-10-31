@@ -169,7 +169,7 @@ namespace osu.Game.Rulesets.Osu.Tests.Editor
             AddStep($"move mouse to control point {index}", () =>
             {
                 Vector2 position = slider.Path.ControlPoints[index].Position;
-                InputManager.MoveMouseTo(visualiser.Pieces[0].Parent.ToScreenSpace(position));
+                InputManager.MoveMouseTo(visualiser.Pieces[0].Parent!.ToScreenSpace(position));
             });
         }
 
@@ -184,7 +184,7 @@ namespace osu.Game.Rulesets.Osu.Tests.Editor
             {
                 MenuItem item = visualiser.ContextMenuItems.FirstOrDefault(menuItem => menuItem.Text.Value == "Curve type")?.Items.FirstOrDefault(menuItem => menuItem.Text.Value == contextMenuText);
 
-                item?.Action?.Value();
+                item?.Action.Value?.Invoke();
             });
         }
     }

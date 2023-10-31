@@ -33,6 +33,7 @@ using osu.Game.Rulesets.Mania.UI;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Replays.Types;
 using osu.Game.Rulesets.Scoring;
+using osu.Game.Rulesets.Scoring.Legacy;
 using osu.Game.Rulesets.UI;
 using osu.Game.Scoring;
 using osu.Game.Screens.Edit.Setup;
@@ -157,6 +158,9 @@ namespace osu.Game.Rulesets.Mania
 
             if (mods.HasFlagFast(LegacyMods.Mirror))
                 yield return new ManiaModMirror();
+
+            if (mods.HasFlagFast(LegacyMods.ScoreV2))
+                yield return new ModScoreV2();
         }
 
         public override LegacyMods ConvertToLegacyMods(Mod[] mods)
@@ -285,6 +289,12 @@ namespace osu.Game.Rulesets.Mania
                         new ModAdaptiveSpeed()
                     };
 
+                case ModType.System:
+                    return new Mod[]
+                    {
+                        new ModScoreV2(),
+                    };
+
                 default:
                     return Array.Empty<Mod>();
             }
@@ -301,6 +311,8 @@ namespace osu.Game.Rulesets.Mania
         public override DifficultyCalculator CreateDifficultyCalculator(IWorkingBeatmap beatmap) => new ManiaDifficultyCalculator(RulesetInfo, beatmap);
 
         public int LegacyID => 3;
+
+        public ILegacyScoreSimulator CreateLegacyScoreSimulator() => new ManiaLegacyScoreSimulator();
 
         public override IConvertibleReplayFrame CreateConvertibleReplayFrame() => new ManiaReplayFrame();
 
@@ -374,19 +386,9 @@ namespace osu.Game.Rulesets.Mania
                 HitResult.Ok,
                 HitResult.Meh,
 
-                HitResult.LargeTickHit,
+                // HitResult.SmallBonus is used for awarding perfect bonus score but is not included here as
+                // it would be a bit redundant to show this to the user.
             };
-        }
-
-        public override LocalisableString GetDisplayNameForHitResult(HitResult result)
-        {
-            switch (result)
-            {
-                case HitResult.LargeTickHit:
-                    return "hold tick";
-            }
-
-            return base.GetDisplayNameForHitResult(result);
         }
 
         public override StatisticItem[] CreateStatisticsForScore(ScoreInfo score, IBeatmap playableBeatmap) => new[]
@@ -401,7 +403,7 @@ namespace osu.Game.Rulesets.Mania
                 RelativeSizeAxes = Axes.X,
                 Height = 250
             }, true),
-            new StatisticItem(string.Empty, () => new SimpleStatisticTable(3, new SimpleStatisticItem[]
+            new StatisticItem("Statistics", () => new SimpleStatisticTable(2, new SimpleStatisticItem[]
             {
                 new AverageHitError(score.HitEvents),
                 new UnstableRate(score.HitEvents)
@@ -414,6 +416,8 @@ namespace osu.Game.Rulesets.Mania
         }
 
         public override RulesetSetupSection CreateEditorSetupSection() => new ManiaSetupSection();
+
+        public override DifficultySection CreateEditorDifficultySection() => new ManiaDifficultySection();
     }
 
     public enum PlayfieldType

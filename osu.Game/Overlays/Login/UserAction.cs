@@ -1,11 +1,9 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
-using System.ComponentModel;
 using osu.Framework.Localisation;
 using osu.Game.Resources.Localisation.Web;
+using osu.Game.Localisation;
 
 namespace osu.Game.Overlays.Login
 {
@@ -14,13 +12,13 @@ namespace osu.Game.Overlays.Login
         [LocalisableDescription(typeof(UsersStrings), nameof(UsersStrings.StatusOnline))]
         Online,
 
-        [Description(@"Do not disturb")]
+        [LocalisableDescription(typeof(LoginPanelStrings), nameof(LoginPanelStrings.DoNotDisturb))]
         DoNotDisturb,
 
-        [Description(@"Appear offline")]
+        [LocalisableDescription(typeof(LoginPanelStrings), nameof(LoginPanelStrings.AppearOffline))]
         AppearOffline,
 
-        [Description(@"Sign out")]
+        [LocalisableDescription(typeof(LoginPanelStrings), nameof(LoginPanelStrings.SignOut))]
         SignOut,
     }
 }

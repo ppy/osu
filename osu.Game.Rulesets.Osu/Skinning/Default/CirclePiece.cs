@@ -9,7 +9,6 @@ using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.Textures;
 using osu.Game.Rulesets.Objects.Drawables;
 using osu.Game.Rulesets.Osu.Objects;
-using osuTK;
 
 namespace osu.Game.Rulesets.Osu.Skinning.Default
 {
@@ -22,7 +21,7 @@ namespace osu.Game.Rulesets.Osu.Skinning.Default
 
         public CirclePiece()
         {
-            Size = new Vector2(OsuHitObject.OBJECT_RADIUS * 2);
+            Size = OsuHitObject.OBJECT_DIMENSIONS;
             Masking = true;
 
             CornerRadius = Size.X / 2;

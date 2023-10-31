@@ -22,19 +22,19 @@ namespace osu.Game.Screens.Play.HUD.JudgementCounter
         public bool UsesFixedAnchor { get; set; }
 
         [SettingSource(typeof(JudgementCounterDisplayStrings), nameof(JudgementCounterDisplayStrings.JudgementDisplayMode))]
-        public Bindable<DisplayMode> Mode { get; set; } = new Bindable<DisplayMode>();
+        public Bindable<DisplayMode> Mode { get; } = new Bindable<DisplayMode>();
 
         [SettingSource(typeof(JudgementCounterDisplayStrings), nameof(JudgementCounterDisplayStrings.FlowDirection))]
-        public Bindable<Direction> FlowDirection { get; set; } = new Bindable<Direction>();
+        public Bindable<Direction> FlowDirection { get; } = new Bindable<Direction>();
 
         [SettingSource(typeof(JudgementCounterDisplayStrings), nameof(JudgementCounterDisplayStrings.ShowJudgementNames))]
-        public BindableBool ShowJudgementNames { get; set; } = new BindableBool(true);
+        public BindableBool ShowJudgementNames { get; } = new BindableBool(true);
 
         [SettingSource(typeof(JudgementCounterDisplayStrings), nameof(JudgementCounterDisplayStrings.ShowMaxJudgement))]
-        public BindableBool ShowMaxJudgement { get; set; } = new BindableBool(true);
+        public BindableBool ShowMaxJudgement { get; } = new BindableBool(true);
 
         [Resolved]
-        private JudgementTally tally { get; set; } = null!;
+        private JudgementCountController judgementCountController { get; set; } = null!;
 
         protected FillFlowContainer<JudgementCounter> CounterFlow = null!;
 
@@ -49,7 +49,7 @@ namespace osu.Game.Screens.Play.HUD.JudgementCounter
                 AutoSizeAxes = Axes.Both
             };
 
-            foreach (var result in tally.Results)
+            foreach (var result in judgementCountController.Results)
                 CounterFlow.Add(createCounter(result));
         }
 
@@ -123,7 +123,7 @@ namespace osu.Game.Screens.Play.HUD.JudgementCounter
             }
         }
 
-        private JudgementCounter createCounter(JudgementTally.JudgementCount info) =>
+        private JudgementCounter createCounter(JudgementCountController.JudgementCount info) =>
             new JudgementCounter(info)
             {
                 State = { Value = Visibility.Hidden },

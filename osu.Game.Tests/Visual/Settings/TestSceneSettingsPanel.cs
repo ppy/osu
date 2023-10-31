@@ -140,6 +140,17 @@ namespace osu.Game.Tests.Visual.Settings
             AddUntilStep("top-level textbox focused", () => settings.SectionsContainer.ChildrenOfType<FocusedTextBox>().FirstOrDefault()?.HasFocus == true);
         }
 
+        [Test]
+        public void TestSearchTextBoxSelectedOnShow()
+        {
+            SearchTextBox searchTextBox = null!;
+
+            AddStep("set text", () => (searchTextBox = settings.SectionsContainer.ChildrenOfType<SearchTextBox>().First()).Current.Value = "some text");
+            AddAssert("no text selected", () => searchTextBox.SelectedText == string.Empty);
+            AddRepeatStep("toggle visibility", () => settings.ToggleVisibility(), 2);
+            AddAssert("search text selected", () => searchTextBox.SelectedText == searchTextBox.Current.Value);
+        }
+
         [BackgroundDependencyLoader]
         private void load()
         {

@@ -5,11 +5,13 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using NUnit.Framework;
+using osu.Framework.Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Testing;
 using osu.Framework.Utils;
+using osu.Game.Database;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Online.Multiplayer;
 using osu.Game.Overlays;
@@ -31,6 +33,8 @@ namespace osu.Game.Tests.Visual.UserInterface
 
         public double TimeToCompleteProgress { get; set; } = 2000;
 
+        private readonly UserLookupCache userLookupCache = new TestUserLookupCache();
+
         [SetUp]
         public void SetUp() => Schedule(() =>
         {
@@ -51,6 +55,33 @@ namespace osu.Game.Tests.Visual.UserInterface
 
             notificationOverlay.UnreadCount.ValueChanged += count => { displayedCount.Text = $"unread count: {count.NewValue}"; };
         });
+
+        [Test]
+        public void TestBasicFlow()
+        {
+            setState(Visibility.Visible);
+            AddStep(@"simple #1", sendHelloNotification);
+            AddStep(@"simple #2", sendAmazingNotification);
+            AddStep(@"progress #1", sendUploadProgress);
+            AddStep(@"progress #2", sendDownloadProgress);
+            AddStep(@"User notification", sendUserNotification);
+
+            checkProgressingCount(2);
+
+            setState(Visibility.Hidden);
+
+            AddRepeatStep(@"add many simple", sendManyNotifications, 3);
+
+            waitForCompletion();
+
+            AddStep(@"progress #3", sendUploadProgress);
+
+            checkProgressingCount(1);
+
+            checkDisplayedCount(33);
+
+            waitForCompletion();
+        }
 
         [Test]
         public void TestForwardWithFlingRight()
@@ -412,32 +443,6 @@ namespace osu.Game.Tests.Visual.UserInterface
         }
 
         [Test]
-        public void TestBasicFlow()
-        {
-            setState(Visibility.Visible);
-            AddStep(@"simple #1", sendHelloNotification);
-            AddStep(@"simple #2", sendAmazingNotification);
-            AddStep(@"progress #1", sendUploadProgress);
-            AddStep(@"progress #2", sendDownloadProgress);
-
-            checkProgressingCount(2);
-
-            setState(Visibility.Hidden);
-
-            AddRepeatStep(@"add many simple", sendManyNotifications, 3);
-
-            waitForCompletion();
-
-            AddStep(@"progress #3", sendUploadProgress);
-
-            checkProgressingCount(1);
-
-            checkDisplayedCount(33);
-
-            waitForCompletion();
-        }
-
-        [Test]
         public void TestImportantWhileClosed()
         {
             AddStep(@"simple #1", sendHelloNotification);
@@ -535,6 +540,16 @@ namespace osu.Game.Tests.Visual.UserInterface
             };
             notificationOverlay.Post(n);
             progressingNotifications.Add(n);
+        }
+
+        private void sendUserNotification()
+        {
+            var user = userLookupCache.GetUserAsync(0).GetResultSafely();
+            if (user == null) return;
+
+            var n = new UserAvatarNotification(user, $"{user.Username} invited you to a multiplayer match!");
+
+            notificationOverlay.Post(n);
         }
 
         private void sendUploadProgress()

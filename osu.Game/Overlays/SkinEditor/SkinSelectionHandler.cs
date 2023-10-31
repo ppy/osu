@@ -16,6 +16,7 @@ using osu.Game.Rulesets.Edit;
 using osu.Game.Screens.Edit.Components.Menus;
 using osu.Game.Screens.Edit.Compose.Components;
 using osu.Game.Skinning;
+using osu.Game.Utils;
 using osuTK;
 
 namespace osu.Game.Overlays.SkinEditor
@@ -25,31 +26,10 @@ namespace osu.Game.Overlays.SkinEditor
         [Resolved]
         private SkinEditor skinEditor { get; set; } = null!;
 
-        public override bool HandleRotation(float angle)
+        public override SelectionRotationHandler CreateRotationHandler() => new SkinSelectionRotationHandler
         {
-            if (SelectedBlueprints.Count == 1)
-            {
-                // for single items, rotate around the origin rather than the selection centre.
-                ((Drawable)SelectedBlueprints.First().Item).Rotation += angle;
-            }
-            else
-            {
-                var selectionQuad = getSelectionQuad();
-
-                foreach (var b in SelectedBlueprints)
-                {
-                    var drawableItem = (Drawable)b.Item;
-
-                    var rotatedPosition = RotatePointAroundOrigin(b.ScreenSpaceSelectionPoint, selectionQuad.Centre, angle);
-                    updateDrawablePosition(drawableItem, rotatedPosition);
-
-                    drawableItem.Rotation += angle;
-                }
-            }
-
-            // this isn't always the case but let's be lenient for now.
-            return true;
-        }
+            UpdatePosition = updateDrawablePosition
+        };
 
         public override bool HandleScale(Vector2 scale, Anchor anchor)
         {
@@ -67,10 +47,7 @@ namespace osu.Game.Overlays.SkinEditor
 
             // copy to mutate, as we will need to compare to the original later on.
             var adjustedRect = selectionRect;
-
-            // first, remove any scale axis we are not interested in.
-            if (anchor.HasFlagFast(Anchor.x1)) scale.X = 0;
-            if (anchor.HasFlagFast(Anchor.y1)) scale.Y = 0;
+            bool isRotated = false;
 
             // for now aspect lock scale adjustments that occur at corners..
             if (!anchor.HasFlagFast(Anchor.x1) && !anchor.HasFlagFast(Anchor.y1))
@@ -81,8 +58,9 @@ namespace osu.Game.Overlays.SkinEditor
             }
             // ..or if any of the selection have been rotated.
             // this is to avoid requiring skew logic (which would likely not be the user's expected transform anyway).
-            else if (SelectedBlueprints.Any(b => !Precision.AlmostEquals(((Drawable)b.Item).Rotation, 0)))
+            else if (SelectedBlueprints.Any(b => !Precision.AlmostEquals(((Drawable)b.Item).Rotation % 90, 0)))
             {
+                isRotated = true;
                 if (anchor.HasFlagFast(Anchor.x1))
                     // if dragging from the horizontal centre, only a vertical component is available.
                     scale.X = scale.Y / selectionRect.Height * selectionRect.Width;
@@ -94,13 +72,28 @@ namespace osu.Game.Overlays.SkinEditor
             if (anchor.HasFlagFast(Anchor.x0)) adjustedRect.X -= scale.X;
             if (anchor.HasFlagFast(Anchor.y0)) adjustedRect.Y -= scale.Y;
 
+            // Maintain the selection's centre position if dragging from the centre anchors and selection is rotated.
+            if (isRotated && anchor.HasFlagFast(Anchor.x1)) adjustedRect.X -= scale.X / 2;
+            if (isRotated && anchor.HasFlagFast(Anchor.y1)) adjustedRect.Y -= scale.Y / 2;
+
             adjustedRect.Width += scale.X;
             adjustedRect.Height += scale.Y;
 
+            if (adjustedRect.Width <= 0 || adjustedRect.Height <= 0)
+            {
+                Axes toFlip = Axes.None;
+
+                if (adjustedRect.Width <= 0) toFlip |= Axes.X;
+                if (adjustedRect.Height <= 0) toFlip |= Axes.Y;
+
+                SelectionBox.PerformFlipFromScaleHandles(toFlip);
+                return true;
+            }
+
             // scale adjust applied to each individual item should match that of the quad itself.
             var scaledDelta = new Vector2(
-                MathF.Max(adjustedRect.Width / selectionRect.Width, 0),
-                MathF.Max(adjustedRect.Height / selectionRect.Height, 0)
+                adjustedRect.Width / selectionRect.Width,
+                adjustedRect.Height / selectionRect.Height
             );
 
             foreach (var b in SelectedBlueprints)
@@ -122,7 +115,12 @@ namespace osu.Game.Overlays.SkinEditor
                 );
 
                 updateDrawablePosition(drawableItem, newPositionInAdjusted);
-                drawableItem.Scale *= scaledDelta;
+
+                var currentScaledDelta = scaledDelta;
+                if (Precision.AlmostEquals(MathF.Abs(drawableItem.Rotation) % 180, 90))
+                    currentScaledDelta = new Vector2(scaledDelta.Y, scaledDelta.X);
+
+                drawableItem.Scale *= currentScaledDelta;
             }
 
             return true;
@@ -137,7 +135,7 @@ namespace osu.Game.Overlays.SkinEditor
             {
                 var drawableItem = (Drawable)b.Item;
 
-                var flippedPosition = GetFlippedPosition(direction, flipOverOrigin ? drawableItem.Parent.ScreenSpaceDrawQuad : selectionQuad, b.ScreenSpaceSelectionPoint);
+                var flippedPosition = GeometryUtils.GetFlippedPosition(direction, flipOverOrigin ? drawableItem.Parent!.ScreenSpaceDrawQuad : selectionQuad, b.ScreenSpaceSelectionPoint);
 
                 updateDrawablePosition(drawableItem, flippedPosition);
 
@@ -171,7 +169,6 @@ namespace osu.Game.Overlays.SkinEditor
         {
             base.OnSelectionChanged();
 
-            SelectionBox.CanRotate = true;
             SelectionBox.CanScaleX = true;
             SelectionBox.CanScaleY = true;
             SelectionBox.CanFlipX = true;
@@ -245,7 +242,7 @@ namespace osu.Game.Overlays.SkinEditor
         private static void updateDrawablePosition(Drawable drawable, Vector2 screenSpacePosition)
         {
             drawable.Position =
-                drawable.Parent.ToLocalSpace(screenSpacePosition) - drawable.AnchorPosition;
+                drawable.Parent!.ToLocalSpace(screenSpacePosition) - drawable.AnchorPosition;
         }
 
         private void applyOrigins(Anchor origin)
@@ -275,7 +272,7 @@ namespace osu.Game.Overlays.SkinEditor
         /// </summary>
         /// <returns></returns>
         private Quad getSelectionQuad() =>
-            GetSurroundingQuad(SelectedBlueprints.SelectMany(b => b.Item.ScreenSpaceDrawQuad.GetVertices().ToArray()));
+            GeometryUtils.GetSurroundingQuad(SelectedBlueprints.SelectMany(b => b.Item.ScreenSpaceDrawQuad.GetVertices().ToArray()));
 
         private void applyFixedAnchors(Anchor anchor)
         {
@@ -312,7 +309,7 @@ namespace osu.Game.Overlays.SkinEditor
             if (parent == null)
                 return drawable.Anchor;
 
-            var screenPosition = getScreenPosition();
+            var screenPosition = drawable.ToScreenSpace(drawable.OriginPosition);
 
             var absolutePosition = parent.ToLocalSpace(screenPosition);
             var factor = parent.RelativeToAbsoluteFactor;
@@ -334,26 +331,6 @@ namespace osu.Game.Overlays.SkinEditor
             result |= getAnchorFromPosition(absolutePosition.Y / factor.Y, Anchor.y0, Anchor.y1, Anchor.y2);
 
             return result;
-
-            Vector2 getScreenPosition()
-            {
-                var quad = drawable.ScreenSpaceDrawQuad;
-                var origin = drawable.Origin;
-
-                var pos = quad.TopLeft;
-
-                if (origin.HasFlagFast(Anchor.x2))
-                    pos.X += quad.Width;
-                else if (origin.HasFlagFast(Anchor.x1))
-                    pos.X += quad.Width / 2f;
-
-                if (origin.HasFlagFast(Anchor.y2))
-                    pos.Y += quad.Height;
-                else if (origin.HasFlagFast(Anchor.y1))
-                    pos.Y += quad.Height / 2f;
-
-                return pos;
-            }
         }
 
         private static void applyAnchor(Drawable drawable, Anchor anchor)
