@@ -1,7 +1,5 @@
-// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
-
-#nullable disable
 
 using System;
 using System.Collections.Generic;
@@ -28,7 +26,7 @@ namespace osu.Game.Screens.Edit.Compose.Components
         public const string HIT_BANK_AUTO = "auto";
 
         [Resolved]
-        protected EditorBeatmap EditorBeatmap { get; private set; }
+        protected EditorBeatmap EditorBeatmap { get; private set; } = null!;
 
         [BackgroundDependencyLoader]
         private void load()

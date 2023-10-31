@@ -76,6 +76,25 @@ namespace osu.Game.Rulesets.Taiko.Tests.Judgements
         }
 
         [Test]
+        public void TestHitNoneStrongDrumRoll()
+        {
+            PerformTest(new List<ReplayFrame>
+            {
+                new TaikoReplayFrame(0),
+            }, CreateBeatmap(createDrumRoll(true)));
+
+            AssertJudgementCount(12);
+
+            for (int i = 0; i < 5; ++i)
+            {
+                AssertResult<DrumRollTick>(i, HitResult.IgnoreMiss);
+                AssertResult<DrumRollTick.StrongNestedHit>(i, HitResult.IgnoreMiss);
+            }
+
+            AssertResult<DrumRoll>(0, HitResult.IgnoreHit);
+        }
+
+        [Test]
         public void TestHitAllStrongDrumRollWithOneKey()
         {
             PerformTest(new List<ReplayFrame>

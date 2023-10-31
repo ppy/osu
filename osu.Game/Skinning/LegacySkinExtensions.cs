@@ -9,8 +9,10 @@ using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Animations;
+using osu.Framework.Graphics.Primitives;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.Textures;
+using osuTK;
 using static osu.Game.Skinning.SkinConfiguration;
 
 namespace osu.Game.Skinning
@@ -18,16 +20,16 @@ namespace osu.Game.Skinning
     public static partial class LegacySkinExtensions
     {
         public static Drawable? GetAnimation(this ISkin? source, string componentName, bool animatable, bool looping, bool applyConfigFrameRate = false, string animationSeparator = "-",
-                                             bool startAtCurrentTime = true, double? frameLength = null)
-            => source.GetAnimation(componentName, default, default, animatable, looping, applyConfigFrameRate, animationSeparator, startAtCurrentTime, frameLength);
+                                             bool startAtCurrentTime = true, double? frameLength = null, Vector2? maxSize = null)
+            => source.GetAnimation(componentName, default, default, animatable, looping, applyConfigFrameRate, animationSeparator, startAtCurrentTime, frameLength, maxSize);
 
         public static Drawable? GetAnimation(this ISkin? source, string componentName, WrapMode wrapModeS, WrapMode wrapModeT, bool animatable, bool looping, bool applyConfigFrameRate = false,
-                                             string animationSeparator = "-", bool startAtCurrentTime = true, double? frameLength = null)
+                                             string animationSeparator = "-", bool startAtCurrentTime = true, double? frameLength = null, Vector2? maxSize = null)
         {
             if (source == null)
                 return null;
 
-            var textures = GetTextures(source, componentName, wrapModeS, wrapModeT, animatable, animationSeparator, out var retrievalSource);
+            var textures = GetTextures(source, componentName, wrapModeS, wrapModeT, animatable, animationSeparator, maxSize, out var retrievalSource);
 
             switch (textures.Length)
             {
@@ -53,7 +55,7 @@ namespace osu.Game.Skinning
             }
         }
 
-        public static Texture[] GetTextures(this ISkin? source, string componentName, WrapMode wrapModeS, WrapMode wrapModeT, bool animatable, string animationSeparator, out ISkin? retrievalSource)
+        public static Texture[] GetTextures(this ISkin? source, string componentName, WrapMode wrapModeS, WrapMode wrapModeT, bool animatable, string animationSeparator, Vector2? maxSize, out ISkin? retrievalSource)
         {
             retrievalSource = null;
 
@@ -80,6 +82,9 @@ namespace osu.Game.Skinning
             // if an animation was not allowed or not found, fall back to a sprite retrieval.
             var singleTexture = retrievalSource.GetTexture(componentName, wrapModeS, wrapModeT);
 
+            if (singleTexture != null && maxSize != null)
+                singleTexture = singleTexture.WithMaximumSize(maxSize.Value);
+
             return singleTexture != null
                 ? new[] { singleTexture }
                 : Array.Empty<Texture>();
@@ -88,16 +93,31 @@ namespace osu.Game.Skinning
             {
                 for (int i = 0; true; i++)
                 {
-                    Texture? texture;
+                    var texture = skin.GetTexture(getFrameName(i), wrapModeS, wrapModeT);
 
-                    if ((texture = skin.GetTexture(getFrameName(i), wrapModeS, wrapModeT)) == null)
+                    if (texture == null)
                         break;
+
+                    if (maxSize != null)
+                        texture = texture.WithMaximumSize(maxSize.Value);
 
                     yield return texture;
                 }
             }
 
             string getFrameName(int frameIndex) => $"{componentName}{animationSeparator}{frameIndex}";
+        }
+
+        public static Texture WithMaximumSize(this Texture texture, Vector2 maxSize)
+        {
+            if (texture.DisplayWidth <= maxSize.X && texture.DisplayHeight <= maxSize.Y)
+                return texture;
+
+            maxSize *= texture.ScaleAdjust;
+
+            var croppedTexture = texture.Crop(new RectangleF(texture.Width / 2f - maxSize.X / 2f, texture.Height / 2f - maxSize.Y / 2f, maxSize.X, maxSize.Y));
+            croppedTexture.ScaleAdjust = texture.ScaleAdjust;
+            return croppedTexture;
         }
 
         public static bool HasFont(this ISkin source, LegacyFont font)
@@ -180,7 +200,11 @@ namespace osu.Game.Skinning
             }
         }
 
-        private const double default_frame_time = 1000 / 60d;
+        /// <summary>
+        /// The frame length of each frame at a 60 FPS rate.
+        /// Default frame rate for legacy skin animations.
+        /// </summary>
+        public const double SIXTY_FRAME_TIME = 1000 / 60d;
 
         private static double getFrameLength(ISkin source, bool applyConfigFrameRate, Texture[] textures)
         {
@@ -194,7 +218,7 @@ namespace osu.Game.Skinning
                 return 1000f / textures.Length;
             }
 
-            return default_frame_time;
+            return SIXTY_FRAME_TIME;
         }
     }
 }

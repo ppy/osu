@@ -61,10 +61,12 @@ namespace osu.Game.Rulesets.Osu.Mods
 
         public void ApplyToDrawableRuleset(DrawableRuleset<OsuHitObject> drawableRuleset)
         {
+            OsuHitObject firstObject = drawableRuleset.Beatmap.HitObjects.First();
+
             // Multiplying by 2 results in an initial size that is too large, hence 1.90 has been chosen
             // Also avoids the HitObject bleeding around the edges of the bubble drawable at minimum size
-            bubbleSize = (float)(drawableRuleset.Beatmap.HitObjects.OfType<HitCircle>().First().Radius * 1.90f);
-            bubbleFade = drawableRuleset.Beatmap.HitObjects.OfType<HitCircle>().First().TimePreempt * 2;
+            bubbleSize = (float)firstObject.Radius * 1.90f;
+            bubbleFade = firstObject.TimePreempt * 2;
 
             // We want to hide the judgements since they are obscured by the BubbleDrawable (due to layering)
             drawableRuleset.Playfield.DisplayJudgements.Value = false;

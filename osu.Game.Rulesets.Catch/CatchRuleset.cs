@@ -25,7 +25,10 @@ using osu.Game.Rulesets.Edit;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Replays.Types;
 using osu.Game.Rulesets.Scoring;
+using osu.Game.Rulesets.Scoring.Legacy;
 using osu.Game.Rulesets.UI;
+using osu.Game.Scoring;
+using osu.Game.Screens.Ranking.Statistics;
 using osu.Game.Skinning;
 
 namespace osu.Game.Rulesets.Catch
@@ -51,7 +54,7 @@ namespace osu.Game.Rulesets.Catch
             new KeyBinding(InputKey.X, CatchAction.MoveRight),
             new KeyBinding(InputKey.Right, CatchAction.MoveRight),
             new KeyBinding(InputKey.Shift, CatchAction.Dash),
-            new KeyBinding(InputKey.Shift, CatchAction.Dash),
+            new KeyBinding(InputKey.MouseLeft, CatchAction.Dash),
         };
 
         public override IEnumerable<Mod> ConvertFromLegacyMods(LegacyMods mods)
@@ -91,6 +94,9 @@ namespace osu.Game.Rulesets.Catch
 
             if (mods.HasFlagFast(LegacyMods.Relax))
                 yield return new CatchModRelax();
+
+            if (mods.HasFlagFast(LegacyMods.ScoreV2))
+                yield return new ModScoreV2();
         }
 
         public override IEnumerable<Mod> GetModsFor(ModType type)
@@ -138,6 +144,12 @@ namespace osu.Game.Rulesets.Catch
                         new CatchModFloatingFruits(),
                         new CatchModMuted(),
                         new CatchModNoScope(),
+                    };
+
+                case ModType.System:
+                    return new Mod[]
+                    {
+                        new ModScoreV2(),
                     };
 
                 default:
@@ -202,10 +214,24 @@ namespace osu.Game.Rulesets.Catch
 
         public int LegacyID => 2;
 
+        public ILegacyScoreSimulator CreateLegacyScoreSimulator() => new CatchLegacyScoreSimulator();
+
         public override IConvertibleReplayFrame CreateConvertibleReplayFrame() => new CatchReplayFrame();
 
         public override HitObjectComposer CreateHitObjectComposer() => new CatchHitObjectComposer(this);
 
         public override IBeatmapVerifier CreateBeatmapVerifier() => new CatchBeatmapVerifier();
+
+        public override StatisticItem[] CreateStatisticsForScore(ScoreInfo score, IBeatmap playableBeatmap)
+        {
+            return new[]
+            {
+                new StatisticItem("Performance Breakdown", () => new PerformanceBreakdownChart(score, playableBeatmap)
+                {
+                    RelativeSizeAxes = Axes.X,
+                    AutoSizeAxes = Axes.Y
+                }),
+            };
+        }
     }
 }

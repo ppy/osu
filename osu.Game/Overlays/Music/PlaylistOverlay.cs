@@ -109,7 +109,7 @@ namespace osu.Game.Overlays.Music
             beatmap.BindValueChanged(working => list.SelectedSet.Value = working.NewValue.BeatmapSetInfo.ToLive(realm), true);
         }
 
-        private void beatmapsChanged(IRealmCollection<BeatmapSetInfo> sender, ChangeSet changes, Exception error)
+        private void beatmapsChanged(IRealmCollection<BeatmapSetInfo> sender, ChangeSet changes)
         {
             if (changes == null)
             {

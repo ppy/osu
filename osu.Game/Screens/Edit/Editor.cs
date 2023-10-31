@@ -66,7 +66,7 @@ namespace osu.Game.Screens.Edit
 
         public override bool DisallowExternalBeatmapRulesetChanges => true;
 
-        public override bool? AllowTrackAdjustments => false;
+        public override bool? ApplyModTrackAdjustments => false;
 
         protected override bool PlayExitSound => !ExitConfirmed && !switchingDifficulty;
 
@@ -185,6 +185,7 @@ namespace osu.Game.Screens.Edit
         private Bindable<float> editorBackgroundDim;
         private Bindable<bool> editorHitMarkers;
         private Bindable<bool> editorAutoSeekOnPlacement;
+        private Bindable<bool> editorLimitedDistanceSnap;
 
         public Editor(EditorLoader loader = null)
         {
@@ -198,6 +199,8 @@ namespace osu.Game.Screens.Edit
 
             if (loadableBeatmap is DummyWorkingBeatmap)
             {
+                Logger.Log("Editor was loaded without a valid beatmap; creating a new beatmap.");
+
                 isNewBeatmap = true;
 
                 loadableBeatmap = beatmapManager.CreateNew(Ruleset.Value, api.LocalUser.Value);
@@ -276,6 +279,7 @@ namespace osu.Game.Screens.Edit
             editorBackgroundDim = config.GetBindable<float>(OsuSetting.EditorDim);
             editorHitMarkers = config.GetBindable<bool>(OsuSetting.EditorShowHitMarkers);
             editorAutoSeekOnPlacement = config.GetBindable<bool>(OsuSetting.EditorAutoSeekOnPlacement);
+            editorLimitedDistanceSnap = config.GetBindable<bool>(OsuSetting.EditorLimitedDistanceSnap);
 
             AddInternal(new OsuContextMenuContainer
             {
@@ -337,6 +341,10 @@ namespace osu.Game.Screens.Edit
                                             new ToggleMenuItem(EditorStrings.AutoSeekOnPlacement)
                                             {
                                                 State = { BindTarget = editorAutoSeekOnPlacement },
+                                            },
+                                            new ToggleMenuItem(EditorStrings.LimitedDistanceSnap)
+                                            {
+                                                State = { BindTarget = editorLimitedDistanceSnap },
                                             }
                                         }
                                     },
@@ -353,7 +361,7 @@ namespace osu.Game.Screens.Edit
                             {
                                 Anchor = Anchor.BottomRight,
                                 Origin = Anchor.BottomRight,
-                                X = -15,
+                                X = -10,
                                 Current = Mode,
                             },
                         },
@@ -417,9 +425,10 @@ namespace osu.Game.Screens.Edit
         {
             if (HasUnsavedChanges)
             {
-                dialogOverlay.Push(new SaveBeforeGameplayTestDialog(() =>
+                dialogOverlay.Push(new SaveRequiredPopupDialog("The beatmap will be saved in order to test it.", () =>
                 {
-                    Save();
+                    if (!Save()) return;
+
                     pushEditorPlayer();
                 }));
             }
@@ -533,6 +542,9 @@ namespace osu.Game.Screens.Edit
                 // Track traversal keys.
                 // Matching osu-stable implementations.
                 case Key.Z:
+                    if (e.Repeat)
+                        return false;
+
                     // Seek to first object time, or track start if already there.
                     double? firstObjectTime = editorBeatmap.HitObjects.FirstOrDefault()?.StartTime;
 
@@ -543,12 +555,18 @@ namespace osu.Game.Screens.Edit
                     return true;
 
                 case Key.X:
+                    if (e.Repeat)
+                        return false;
+
                     // Restart playback from beginning of track.
                     clock.Seek(0);
                     clock.Start();
                     return true;
 
                 case Key.C:
+                    if (e.Repeat)
+                        return false;
+
                     // Pause or resume.
                     if (clock.IsRunning)
                         clock.Stop();
@@ -557,6 +575,9 @@ namespace osu.Game.Screens.Edit
                     return true;
 
                 case Key.V:
+                    if (e.Repeat)
+                        return false;
+
                     // Seek to last object time, or track end if already there.
                     // Note that in osu-stable subsequent presses when at track end won't return to last object.
                     // This has intentionally been changed to make it more useful.
@@ -693,8 +714,11 @@ namespace osu.Game.Screens.Edit
                 }
 
                 // if the dialog is already displayed, block exiting until the user explicitly makes a decision.
-                if (dialogOverlay.CurrentDialog is PromptForSaveDialog)
+                if (dialogOverlay.CurrentDialog is PromptForSaveDialog saveDialog)
+                {
+                    saveDialog.Flash();
                     return true;
+                }
 
                 if (isNewBeatmap || HasUnsavedChanges)
                 {
@@ -746,7 +770,7 @@ namespace osu.Game.Screens.Edit
 
         private void confirmExitWithSave()
         {
-            Save();
+            if (!Save()) return;
 
             ExitConfirmed = true;
             this.Exit();
@@ -838,7 +862,7 @@ namespace osu.Game.Screens.Edit
 
         private void resetTrack(bool seekToStart = false)
         {
-            Beatmap.Value.Track.Stop();
+            clock.Stop();
 
             if (seekToStart)
             {
@@ -979,21 +1003,51 @@ namespace osu.Game.Screens.Edit
 
         private List<MenuItem> createFileMenuItems() => new List<MenuItem>
         {
-            new EditorMenuItem(WebCommonStrings.ButtonsSave, MenuItemType.Standard, () => Save()),
-            new EditorMenuItem(EditorStrings.ExportPackage, MenuItemType.Standard, exportBeatmap) { Action = { Disabled = !RuntimeInfo.IsDesktop } },
-            new EditorMenuItemSpacer(),
             createDifficultyCreationMenu(),
             createDifficultySwitchMenu(),
             new EditorMenuItemSpacer(),
             new EditorMenuItem(EditorStrings.DeleteDifficulty, MenuItemType.Standard, deleteDifficulty) { Action = { Disabled = Beatmap.Value.BeatmapSetInfo.Beatmaps.Count < 2 } },
             new EditorMenuItemSpacer(),
+            new EditorMenuItem(WebCommonStrings.ButtonsSave, MenuItemType.Standard, () => Save()),
+            createExportMenu(),
+            new EditorMenuItemSpacer(),
             new EditorMenuItem(CommonStrings.Exit, MenuItemType.Standard, this.Exit)
         };
 
-        private void exportBeatmap()
+        private EditorMenuItem createExportMenu()
         {
-            Save();
-            beatmapManager.Export(Beatmap.Value.BeatmapSetInfo);
+            var exportItems = new List<MenuItem>
+            {
+                new EditorMenuItem(EditorStrings.ExportForEditing, MenuItemType.Standard, () => exportBeatmap(false)) { Action = { Disabled = !RuntimeInfo.IsDesktop } },
+                new EditorMenuItem(EditorStrings.ExportForCompatibility, MenuItemType.Standard, () => exportBeatmap(true)) { Action = { Disabled = !RuntimeInfo.IsDesktop } },
+            };
+
+            return new EditorMenuItem(CommonStrings.Export) { Items = exportItems };
+        }
+
+        private void exportBeatmap(bool legacy)
+        {
+            if (HasUnsavedChanges)
+            {
+                dialogOverlay.Push(new SaveRequiredPopupDialog("The beatmap will be saved in order to export it.", () =>
+                {
+                    if (!Save()) return;
+
+                    runExport();
+                }));
+            }
+            else
+            {
+                runExport();
+            }
+
+            void runExport()
+            {
+                if (legacy)
+                    beatmapManager.ExportLegacy(Beatmap.Value.BeatmapSetInfo);
+                else
+                    beatmapManager.Export(Beatmap.Value.BeatmapSetInfo);
+            }
         }
 
         /// <summary>

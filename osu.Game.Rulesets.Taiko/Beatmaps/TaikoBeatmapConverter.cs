@@ -1,8 +1,6 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
 using osu.Game.Beatmaps;
 using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Objects.Types;
@@ -16,6 +14,7 @@ using JetBrains.Annotations;
 using osu.Game.Audio;
 using osu.Game.Beatmaps.ControlPoints;
 using osu.Game.Beatmaps.Formats;
+using osu.Game.Rulesets.Objects.Legacy;
 
 namespace osu.Game.Rulesets.Taiko.Beatmaps
 {
@@ -66,7 +65,7 @@ namespace osu.Game.Rulesets.Taiko.Beatmaps
                 {
                     if (hitObject is not IHasSliderVelocity hasSliderVelocity) continue;
 
-                    double nextScrollSpeed = hasSliderVelocity.SliderVelocity;
+                    double nextScrollSpeed = hasSliderVelocity.SliderVelocityMultiplier;
                     EffectControlPoint currentEffectPoint = converted.ControlPointInfo.EffectPointAt(hitObject.StartTime);
 
                     if (!Precision.AlmostEquals(lastScrollSpeed, nextScrollSpeed, acceptableDifference: currentEffectPoint.ScrollSpeedBindable.Precision))
@@ -141,7 +140,6 @@ namespace osu.Game.Rulesets.Taiko.Beatmaps
                             StartTime = obj.StartTime,
                             Samples = obj.Samples,
                             Duration = taikoDuration,
-                            SliderVelocity = obj is IHasSliderVelocity velocityData ? velocityData.SliderVelocity : 1
                         };
                     }
 
@@ -189,10 +187,9 @@ namespace osu.Game.Rulesets.Taiko.Beatmaps
             TimingControlPoint timingPoint = beatmap.ControlPointInfo.TimingPointAt(obj.StartTime);
 
             double beatLength;
-            if (obj.LegacyBpmMultiplier.HasValue)
-                beatLength = timingPoint.BeatLength * obj.LegacyBpmMultiplier.Value;
-            else if (obj is IHasSliderVelocity hasSliderVelocity)
-                beatLength = timingPoint.BeatLength / hasSliderVelocity.SliderVelocity;
+
+            if (obj is IHasSliderVelocity hasSliderVelocity)
+                beatLength = LegacyRulesetExtensions.GetPrecisionAdjustedBeatLength(hasSliderVelocity, timingPoint, TaikoRuleset.SHORT_NAME);
             else
                 beatLength = timingPoint.BeatLength;
 

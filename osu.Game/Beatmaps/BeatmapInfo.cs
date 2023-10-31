@@ -234,6 +234,22 @@ namespace osu.Game.Beatmaps
             }
         }
 
+        /// <summary>
+        /// Local scores are retained separate from a beatmap's lifetime, matched via <see cref="ScoreInfo.BeatmapHash"/>.
+        /// Therefore we need to detach / reattach scores when a beatmap is edited or imported.
+        /// </summary>
+        /// <param name="realm">A realm instance in an active write transaction.</param>
+        public void UpdateLocalScores(Realm realm)
+        {
+            // first disassociate any scores which are already attached and no longer valid.
+            foreach (var score in Scores)
+                score.BeatmapInfo = null;
+
+            // then attach any scores which match the new hash.
+            foreach (var score in realm.All<ScoreInfo>().Where(s => s.BeatmapHash == Hash))
+                score.BeatmapInfo = this;
+        }
+
         IBeatmapMetadataInfo IBeatmapInfo.Metadata => Metadata;
         IBeatmapSetInfo? IBeatmapInfo.BeatmapSet => BeatmapSet;
         IRulesetInfo IBeatmapInfo.Ruleset => Ruleset;

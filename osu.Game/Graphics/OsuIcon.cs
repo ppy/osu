@@ -1,7 +1,5 @@
-// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
-
-#nullable disable
 
 using osu.Framework.Graphics.Sprites;
 
@@ -91,6 +89,8 @@ namespace osu.Game.Graphics
         public static IconUsage ModSpunOut => Get(0xe046);
         public static IconUsage ModSuddenDeath => Get(0xe047);
         public static IconUsage ModTarget => Get(0xe048);
-        public static IconUsage ModBg => Get(0xe04a);
+
+        // Use "Icons/BeatmapDetails/mod-icon" instead
+        // public static IconUsage ModBg => Get(0xe04a);
     }
 }

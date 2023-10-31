@@ -14,6 +14,7 @@ using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Objects.Types;
 using osu.Game.Rulesets.Mania.Beatmaps.Patterns;
 using osu.Game.Rulesets.Mania.Beatmaps.Patterns.Legacy;
+using osu.Game.Rulesets.Scoring.Legacy;
 using osu.Game.Utils;
 using osuTK;
 
@@ -43,39 +44,41 @@ namespace osu.Game.Rulesets.Mania.Beatmaps
             : base(beatmap, ruleset)
         {
             IsForCurrentRuleset = beatmap.BeatmapInfo.Ruleset.Equals(ruleset.RulesetInfo);
+            TargetColumns = GetColumnCount(LegacyBeatmapConversionDifficultyInfo.FromBeatmap(beatmap));
 
-            double roundedCircleSize = Math.Round(beatmap.Difficulty.CircleSize);
-            double roundedOverallDifficulty = Math.Round(beatmap.Difficulty.OverallDifficulty);
-
-            if (IsForCurrentRuleset)
+            if (IsForCurrentRuleset && TargetColumns > ManiaRuleset.MAX_STAGE_KEYS)
             {
-                TargetColumns = GetColumnCountForNonConvert(beatmap.BeatmapInfo);
-
-                if (TargetColumns > ManiaRuleset.MAX_STAGE_KEYS)
-                {
-                    TargetColumns /= 2;
-                    Dual = true;
-                }
-            }
-            else
-            {
-                float percentSliderOrSpinner = (float)beatmap.HitObjects.Count(h => h is IHasDuration) / beatmap.HitObjects.Count;
-                if (percentSliderOrSpinner < 0.2)
-                    TargetColumns = 7;
-                else if (percentSliderOrSpinner < 0.3 || roundedCircleSize >= 5)
-                    TargetColumns = roundedOverallDifficulty > 5 ? 7 : 6;
-                else if (percentSliderOrSpinner > 0.6)
-                    TargetColumns = roundedOverallDifficulty > 4 ? 5 : 4;
-                else
-                    TargetColumns = Math.Max(4, Math.Min((int)roundedOverallDifficulty + 1, 7));
+                TargetColumns /= 2;
+                Dual = true;
             }
 
             originalTargetColumns = TargetColumns;
         }
 
-        public static int GetColumnCountForNonConvert(BeatmapInfo beatmapInfo)
+        public static int GetColumnCount(LegacyBeatmapConversionDifficultyInfo difficulty)
         {
-            double roundedCircleSize = Math.Round(beatmapInfo.Difficulty.CircleSize);
+            if (new ManiaRuleset().RulesetInfo.Equals(difficulty.SourceRuleset))
+                return GetColumnCountForNonConvert(difficulty);
+
+            double roundedCircleSize = Math.Round(difficulty.CircleSize);
+            double roundedOverallDifficulty = Math.Round(difficulty.OverallDifficulty);
+
+            int countSliderOrSpinner = difficulty.TotalObjectCount - difficulty.CircleCount;
+            float percentSpecialObjects = (float)countSliderOrSpinner / difficulty.TotalObjectCount;
+
+            if (percentSpecialObjects < 0.2)
+                return 7;
+            if (percentSpecialObjects < 0.3 || roundedCircleSize >= 5)
+                return roundedOverallDifficulty > 5 ? 7 : 6;
+            if (percentSpecialObjects > 0.6)
+                return roundedOverallDifficulty > 4 ? 5 : 4;
+
+            return Math.Max(4, Math.Min((int)roundedOverallDifficulty + 1, 7));
+        }
+
+        public static int GetColumnCountForNonConvert(IBeatmapDifficultyInfo difficulty)
+        {
+            double roundedCircleSize = Math.Round(difficulty.CircleSize);
             return (int)Math.Max(1, roundedCircleSize);
         }
 
@@ -119,14 +122,12 @@ namespace osu.Game.Rulesets.Mania.Beatmaps
                 yield return obj;
         }
 
-        private readonly List<double> prevNoteTimes = new List<double>(max_notes_for_density);
+        private readonly LimitedCapacityQueue<double> prevNoteTimes = new LimitedCapacityQueue<double>(max_notes_for_density);
         private double density = int.MaxValue;
 
         private void computeDensity(double newNoteTime)
         {
-            if (prevNoteTimes.Count == max_notes_for_density)
-                prevNoteTimes.RemoveAt(0);
-            prevNoteTimes.Add(newNoteTime);
+            prevNoteTimes.Enqueue(newNoteTime);
 
             if (prevNoteTimes.Count >= 2)
                 density = (prevNoteTimes[^1] - prevNoteTimes[0]) / prevNoteTimes.Count;

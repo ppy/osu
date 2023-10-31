@@ -1,7 +1,5 @@
-// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
-
-#nullable disable
 
 using System;
 using System.IO;
@@ -29,7 +27,7 @@ namespace osu.Game.Tests.Skins.IO
             var import1 = await loadSkinIntoOsu(osu, new ImportTask(createOskWithIni("test skin", "skinner"), "skin.osk"));
 
             // When the import filename doesn't match, it should be appended (and update the skin.ini).
-            assertCorrectMetadata(import1, "test skin [skin]", "skinner", osu);
+            assertCorrectMetadata(import1, "test skin [skin]", "skinner", 1.0m, osu);
         });
 
         [Test]
@@ -38,7 +36,7 @@ namespace osu.Game.Tests.Skins.IO
             var import1 = await loadSkinIntoOsu(osu, new ImportTask(createOskWithIni("test skin", "skinner", iniFilename: "Skin.InI"), "skin.osk"));
 
             // When the import filename doesn't match, it should be appended (and update the skin.ini).
-            assertCorrectMetadata(import1, "test skin [skin]", "skinner", osu);
+            assertCorrectMetadata(import1, "test skin [skin]", "skinner", 1.0m, osu);
         });
 
         [Test]
@@ -47,7 +45,7 @@ namespace osu.Game.Tests.Skins.IO
             var import1 = await loadSkinIntoOsu(osu, new ImportTask(createOskWithIni("test skin", "skinner", includeSectionHeader: false), "skin.osk"));
 
             // When the import filename doesn't match, it should be appended (and update the skin.ini).
-            assertCorrectMetadata(import1, "test skin [skin]", "skinner", osu);
+            assertCorrectMetadata(import1, "test skin [skin]", "skinner", 1.0m, osu);
         });
 
         [Test]
@@ -56,7 +54,7 @@ namespace osu.Game.Tests.Skins.IO
             var import1 = await loadSkinIntoOsu(osu, new ImportTask(createOskWithIni("test skin", "skinner"), "test skin.osk"));
 
             // When the import filename matches it shouldn't be appended.
-            assertCorrectMetadata(import1, "test skin", "skinner", osu);
+            assertCorrectMetadata(import1, "test skin", "skinner", 1.0m, osu);
         });
 
         [Test]
@@ -65,7 +63,7 @@ namespace osu.Game.Tests.Skins.IO
             var import1 = await loadSkinIntoOsu(osu, new ImportTask(createOskWithNonIniFile(), "test skin.osk"));
 
             // When the import filename matches it shouldn't be appended.
-            assertCorrectMetadata(import1, "test skin", "Unknown", osu);
+            assertCorrectMetadata(import1, "test skin", "Unknown", SkinConfiguration.LATEST_VERSION, osu);
         });
 
         [Test]
@@ -74,7 +72,7 @@ namespace osu.Game.Tests.Skins.IO
             var import1 = await loadSkinIntoOsu(osu, new ImportTask(createEmptyOsk(), "test skin.osk"));
 
             // When the import filename matches it shouldn't be appended.
-            assertCorrectMetadata(import1, "test skin", "Unknown", osu);
+            assertCorrectMetadata(import1, "test skin", "Unknown", SkinConfiguration.LATEST_VERSION, osu);
         });
 
         #endregion
@@ -104,7 +102,7 @@ namespace osu.Game.Tests.Skins.IO
         public Task TestImportUpperCasedOskArchive() => runSkinTest(async osu =>
         {
             var import1 = await loadSkinIntoOsu(osu, new ImportTask(createOskWithIni("name 1", "author 1"), "name 1.OsK"));
-            assertCorrectMetadata(import1, "name 1", "author 1", osu);
+            assertCorrectMetadata(import1, "name 1", "author 1", 1.0m, osu);
 
             var import2 = await loadSkinIntoOsu(osu, new ImportTask(createOskWithIni("name 1", "author 1"), "name 1.oSK"));
 
@@ -117,14 +115,14 @@ namespace osu.Game.Tests.Skins.IO
             MemoryStream exportStream = new MemoryStream();
 
             var import1 = await loadSkinIntoOsu(osu, new ImportTask(createOskWithIni("name 1", "author 1"), "custom.osk"));
-            assertCorrectMetadata(import1, "name 1 [custom]", "author 1", osu);
+            assertCorrectMetadata(import1, "name 1 [custom]", "author 1", 1.0m, osu);
 
             await new LegacySkinExporter(osu.Dependencies.Get<Storage>()).ExportToStreamAsync(import1, exportStream);
 
             string exportFilename = import1.GetDisplayString();
 
             var import2 = await loadSkinIntoOsu(osu, new ImportTask(exportStream, $"{exportFilename}.osk"));
-            assertCorrectMetadata(import2, "name 1 [custom]", "author 1", osu);
+            assertCorrectMetadata(import2, "name 1 [custom]", "author 1", 1.0m, osu);
 
             assertImportedOnce(import1, import2);
         });
@@ -135,14 +133,14 @@ namespace osu.Game.Tests.Skins.IO
             MemoryStream exportStream = new MemoryStream();
 
             var import1 = await loadSkinIntoOsu(osu, new ImportTask(createOskWithIni("name 『1』", "author 1"), "custom.osk"));
-            assertCorrectMetadata(import1, "name 『1』 [custom]", "author 1", osu);
+            assertCorrectMetadata(import1, "name 『1』 [custom]", "author 1", 1.0m, osu);
 
             await new LegacySkinExporter(osu.Dependencies.Get<Storage>()).ExportToStreamAsync(import1, exportStream);
 
             string exportFilename = import1.GetDisplayString().GetValidFilename();
 
             var import2 = await loadSkinIntoOsu(osu, new ImportTask(exportStream, $"{exportFilename}.osk"));
-            assertCorrectMetadata(import2, "name 『1』 [custom]", "author 1", osu);
+            assertCorrectMetadata(import2, "name 『1』 [custom]", "author 1", 1.0m, osu);
         });
 
         [Test]
@@ -152,7 +150,7 @@ namespace osu.Game.Tests.Skins.IO
             var import2 = await loadSkinIntoOsu(osu, new ImportTask(createOskWithIni("name 1", "author 1"), "my custom skin 1"), batchImport);
 
             assertImportedOnce(import1, import2);
-            assertCorrectMetadata(import1, "name 1 [my custom skin 1]", "author 1", osu);
+            assertCorrectMetadata(import1, "name 1 [my custom skin 1]", "author 1", 1.0m, osu);
         });
 
         #endregion
@@ -185,8 +183,8 @@ namespace osu.Game.Tests.Skins.IO
             var import2 = await loadSkinIntoOsu(osu, new ImportTask(createOskWithIni("test skin v2.1", "skinner"), "skin.osk"));
 
             assertImportedBoth(import1, import2);
-            assertCorrectMetadata(import1, "test skin v2 [skin]", "skinner", osu);
-            assertCorrectMetadata(import2, "test skin v2.1 [skin]", "skinner", osu);
+            assertCorrectMetadata(import1, "test skin v2 [skin]", "skinner", 1.0m, osu);
+            assertCorrectMetadata(import2, "test skin v2.1 [skin]", "skinner", 1.0m, osu);
         });
 
         [Test]
@@ -196,8 +194,8 @@ namespace osu.Game.Tests.Skins.IO
             var import2 = await loadSkinIntoOsu(osu, new ImportTask(createOskWithIni("name 1", "author 1"), "my custom skin 2"));
 
             assertImportedBoth(import1, import2);
-            assertCorrectMetadata(import1, "name 1 [my custom skin 1]", "author 1", osu);
-            assertCorrectMetadata(import2, "name 1 [my custom skin 2]", "author 1", osu);
+            assertCorrectMetadata(import1, "name 1 [my custom skin 1]", "author 1", 1.0m, osu);
+            assertCorrectMetadata(import2, "name 1 [my custom skin 2]", "author 1", 1.0m, osu);
         });
 
         [Test]
@@ -266,7 +264,7 @@ namespace osu.Game.Tests.Skins.IO
 
         #endregion
 
-        private void assertCorrectMetadata(Live<SkinInfo> import1, string name, string creator, OsuGameBase osu)
+        private void assertCorrectMetadata(Live<SkinInfo> import1, string name, string creator, decimal version, OsuGameBase osu)
         {
             import1.PerformRead(i =>
             {
@@ -278,6 +276,7 @@ namespace osu.Game.Tests.Skins.IO
 
                 Assert.That(instance.Configuration.SkinInfo.Name, Is.EqualTo(name));
                 Assert.That(instance.Configuration.SkinInfo.Creator, Is.EqualTo(creator));
+                Assert.That(instance.Configuration.LegacyVersion, Is.EqualTo(version));
             });
         }
 

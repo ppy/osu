@@ -18,6 +18,7 @@ using osu.Game.Database;
 using osu.Game.Overlays.Dialog;
 using osu.Game.Rulesets;
 using osu.Game.Rulesets.Catch;
+using osu.Game.Rulesets.Catch.Objects;
 using osu.Game.Rulesets.Osu;
 using osu.Game.Rulesets.Osu.Objects;
 using osu.Game.Rulesets.Osu.UI;
@@ -91,25 +92,6 @@ namespace osu.Game.Tests.Visual.Editing
         }
 
         [Test]
-        [FlakyTest]
-        /*
-         * Fail rate around 1.2%.
-         *
-         * Failing with realm refetch occasionally being null.
-         * My only guess is that the WorkingBeatmap at SetupScreen is dummy instead of the true one.
-         * If it's something else, we have larger issues with realm, but I don't think that's the case.
-         *
-         * at osu.Framework.Logging.ThrowingTraceListener.Fail(String message1, String message2)
-         * at System.Diagnostics.TraceInternal.Fail(String message, String detailMessage)
-         * at System.Diagnostics.TraceInternal.TraceProvider.Fail(String message, String detailMessage)
-         * at System.Diagnostics.Debug.Fail(String message, String detailMessage)
-         * at osu.Game.Database.ModelManager`1.<>c__DisplayClass8_0.<performFileOperation>b__0(Realm realm) ModelManager.cs:line 50
-         * at osu.Game.Database.RealmExtensions.Write(Realm realm, Action`1 function) RealmExtensions.cs:line 14
-         * at osu.Game.Database.ModelManager`1.performFileOperation(TModel item, Action`1 operation) ModelManager.cs:line 47
-         * at osu.Game.Database.ModelManager`1.AddFile(TModel item, Stream contents, String filename) ModelManager.cs:line 37
-         * at osu.Game.Screens.Edit.Setup.ResourcesSection.ChangeAudioTrack(FileInfo source) ResourcesSection.cs:line 115
-         * at osu.Game.Tests.Visual.Editing.TestSceneEditorBeatmapCreation.<TestAddAudioTrack>b__11_0() TestSceneEditorBeatmapCreation.cs:line 101
-         */
         public void TestAddAudioTrack()
         {
             AddAssert("track is virtual", () => Beatmap.Value.Track is TrackVirtual);
@@ -143,7 +125,7 @@ namespace osu.Game.Tests.Visual.Editing
             });
 
             AddAssert("track is not virtual", () => Beatmap.Value.Track is not TrackVirtual);
-            AddAssert("track length changed", () => Beatmap.Value.Track.Length > 60000);
+            AddUntilStep("track length changed", () => Beatmap.Value.Track.Length > 60000);
 
             AddStep("test play", () => Editor.TestGameplay());
 
@@ -200,7 +182,7 @@ namespace osu.Game.Tests.Visual.Editing
             if (sameRuleset)
             {
                 AddUntilStep("wait for dialog", () => DialogOverlay.CurrentDialog is CreateNewDifficultyDialog);
-                AddStep("confirm creation with no objects", () => DialogOverlay.CurrentDialog.PerformOkAction());
+                AddStep("confirm creation with no objects", () => DialogOverlay.CurrentDialog!.PerformOkAction());
             }
 
             AddUntilStep("wait for created", () =>
@@ -287,7 +269,7 @@ namespace osu.Game.Tests.Visual.Editing
             AddStep("create new difficulty", () => Editor.CreateNewDifficulty(new OsuRuleset().RulesetInfo));
 
             AddUntilStep("wait for dialog", () => DialogOverlay.CurrentDialog is CreateNewDifficultyDialog);
-            AddStep("confirm creation as a copy", () => DialogOverlay.CurrentDialog.Buttons.ElementAt(1).TriggerClick());
+            AddStep("confirm creation as a copy", () => DialogOverlay.CurrentDialog!.Buttons.ElementAt(1).TriggerClick());
 
             AddUntilStep("wait for created", () =>
             {
@@ -360,7 +342,7 @@ namespace osu.Game.Tests.Visual.Editing
             AddStep("create new difficulty", () => Editor.CreateNewDifficulty(new OsuRuleset().RulesetInfo));
 
             AddUntilStep("wait for dialog", () => DialogOverlay.CurrentDialog is CreateNewDifficultyDialog);
-            AddStep("confirm creation as a copy", () => DialogOverlay.CurrentDialog.Buttons.ElementAt(1).TriggerClick());
+            AddStep("confirm creation as a copy", () => DialogOverlay.CurrentDialog!.Buttons.ElementAt(1).TriggerClick());
 
             AddUntilStep("wait for created", () =>
             {
@@ -398,7 +380,7 @@ namespace osu.Game.Tests.Visual.Editing
 
             AddStep("try to create new difficulty", () => Editor.CreateNewDifficulty(new OsuRuleset().RulesetInfo));
             AddUntilStep("wait for dialog", () => DialogOverlay.CurrentDialog is CreateNewDifficultyDialog);
-            AddStep("confirm creation with no objects", () => DialogOverlay.CurrentDialog.PerformOkAction());
+            AddStep("confirm creation with no objects", () => DialogOverlay.CurrentDialog!.PerformOkAction());
 
             AddUntilStep("wait for created", () =>
             {
@@ -433,7 +415,7 @@ namespace osu.Game.Tests.Visual.Editing
             if (sameRuleset)
             {
                 AddUntilStep("wait for dialog", () => DialogOverlay.CurrentDialog is CreateNewDifficultyDialog);
-                AddStep("confirm creation with no objects", () => DialogOverlay.CurrentDialog.PerformOkAction());
+                AddStep("confirm creation with no objects", () => DialogOverlay.CurrentDialog!.PerformOkAction());
             }
 
             AddUntilStep("wait for created", () =>
@@ -451,6 +433,51 @@ namespace osu.Game.Tests.Visual.Editing
                 // what we want to check is that both difficulties do not use the same file.
                 return set != null && set.PerformRead(s => s.Beatmaps.Count == 2 && s.Files.Count == 2);
             });
+        }
+
+        [Test]
+        public void TestExitBlockedWhenSavingBeatmapWithSameNamedDifficulties()
+        {
+            Guid setId = Guid.Empty;
+            const string duplicate_difficulty_name = "duplicate";
+
+            AddStep("retrieve set ID", () => setId = EditorBeatmap.BeatmapInfo.BeatmapSet!.ID);
+            AddStep("set difficulty name", () => EditorBeatmap.BeatmapInfo.DifficultyName = duplicate_difficulty_name);
+            AddStep("save beatmap", () => Editor.Save());
+            AddAssert("new beatmap persisted", () =>
+            {
+                var set = beatmapManager.QueryBeatmapSet(s => s.ID == setId);
+                return set != null && set.PerformRead(s => s.Beatmaps.Count == 1 && s.Files.Count == 1);
+            });
+
+            AddStep("create new difficulty", () => Editor.CreateNewDifficulty(new CatchRuleset().RulesetInfo));
+
+            AddUntilStep("wait for created", () =>
+            {
+                string? difficultyName = Editor.ChildrenOfType<EditorBeatmap>().SingleOrDefault()?.BeatmapInfo.DifficultyName;
+                return difficultyName != null && difficultyName != duplicate_difficulty_name;
+            });
+            AddUntilStep("wait for editor load", () => Editor.IsLoaded && DialogOverlay.IsLoaded);
+
+            AddStep("add hitobjects", () => EditorBeatmap.AddRange(new[]
+            {
+                new Fruit
+                {
+                    StartTime = 0
+                },
+                new Fruit
+                {
+                    StartTime = 1000
+                }
+            }));
+
+            AddStep("set difficulty name", () => EditorBeatmap.BeatmapInfo.DifficultyName = duplicate_difficulty_name);
+            AddUntilStep("wait for has unsaved changes", () => Editor.HasUnsavedChanges);
+
+            AddStep("exit", () => Editor.Exit());
+            AddUntilStep("wait for dialog", () => DialogOverlay.CurrentDialog is PromptForSaveDialog);
+            AddStep("attempt to save", () => DialogOverlay.CurrentDialog!.PerformOkAction());
+            AddAssert("editor is still current", () => Editor.IsCurrentScreen());
         }
 
         [Test]

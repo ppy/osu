@@ -263,6 +263,11 @@ namespace osu.Game.Tests.Visual.Multiplayer
             return Task.CompletedTask;
         }
 
+        public override Task InvitePlayer(int userId)
+        {
+            return Task.CompletedTask;
+        }
+
         public override Task TransferHost(int userId)
         {
             userId = clone(userId);
@@ -635,7 +640,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
 
         private T clone<T>(T incoming)
         {
-            byte[]? serialized = MessagePackSerializer.Serialize(typeof(T), incoming, SignalRUnionWorkaroundResolver.OPTIONS);
+            byte[] serialized = MessagePackSerializer.Serialize(typeof(T), incoming, SignalRUnionWorkaroundResolver.OPTIONS);
             return MessagePackSerializer.Deserialize<T>(serialized, SignalRUnionWorkaroundResolver.OPTIONS);
         }
 

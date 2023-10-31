@@ -51,6 +51,10 @@ namespace osu.Game.Tests.Skins
             "Archives/modified-default-20230117.osk",
             // Covers player avatar and flag.
             "Archives/modified-argon-20230305.osk",
+            // Covers key counters
+            "Archives/modified-argon-pro-20230618.osk",
+            // Covers "Argon" health display
+            "Archives/modified-argon-pro-20231001.osk"
         };
 
         /// <summary>

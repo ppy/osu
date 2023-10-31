@@ -70,17 +70,6 @@ namespace osu.Game.Scoring
         }
 
         /// <summary>
-        /// Orders an array of <see cref="ScoreInfo"/>s by total score.
-        /// </summary>
-        /// <param name="scores">The array of <see cref="ScoreInfo"/>s to reorder.</param>
-        /// <returns>The given <paramref name="scores"/> ordered by decreasing total score.</returns>
-        public IEnumerable<ScoreInfo> OrderByTotalScore(IEnumerable<ScoreInfo> scores)
-            => scores.OrderByDescending(s => s.TotalScore)
-                     .ThenBy(s => s.OnlineID)
-                     // Local scores may not have an online ID. Fall back to date in these cases.
-                     .ThenBy(s => s.Date);
-
-        /// <summary>
         /// Retrieves a bindable that represents the total score of a <see cref="ScoreInfo"/>.
         /// </summary>
         /// <remarks>
@@ -99,13 +88,6 @@ namespace osu.Game.Scoring
         /// <param name="score">The <see cref="ScoreInfo"/> to retrieve the bindable for.</param>
         /// <returns>The bindable containing the formatted total score string.</returns>
         public Bindable<string> GetBindableTotalScoreString([NotNull] ScoreInfo score) => new TotalScoreStringBindable(GetBindableTotalScore(score));
-
-        /// <summary>
-        /// Retrieves the maximum achievable combo for the provided score.
-        /// </summary>
-        /// <param name="score">The <see cref="ScoreInfo"/> to compute the maximum achievable combo for.</param>
-        /// <returns>The maximum achievable combo.</returns>
-        public int GetMaximumAchievableCombo([NotNull] ScoreInfo score) => score.MaximumStatistics.Where(kvp => kvp.Key.AffectsCombo()).Sum(kvp => kvp.Value);
 
         /// <summary>
         /// Provides the total score of a <see cref="ScoreInfo"/>. Responds to changes in the currently-selected <see cref="ScoringMode"/>.
@@ -159,7 +141,7 @@ namespace osu.Game.Scoring
         {
             Realm.Run(r =>
             {
-                var beatmapScores = r.Find<BeatmapInfo>(beatmap.ID).Scores.ToList();
+                var beatmapScores = r.Find<BeatmapInfo>(beatmap.ID)!.Scores.ToList();
                 Delete(beatmapScores, silent);
             });
         }
@@ -168,7 +150,11 @@ namespace osu.Game.Scoring
 
         public Task Import(ImportTask[] imports, ImportParameters parameters = default) => scoreImporter.Import(imports, parameters);
 
-        public override bool IsAvailableLocally(ScoreInfo model) => Realm.Run(realm => realm.All<ScoreInfo>().Any(s => s.OnlineID == model.OnlineID));
+        public override bool IsAvailableLocally(ScoreInfo model)
+            => Realm.Run(realm => realm.All<ScoreInfo>()
+                                       // this basically inlines `ModelExtension.MatchesOnlineID(IScoreInfo, IScoreInfo)`,
+                                       // because that method can't be used here, as realm can't translate it to its query language.
+                                       .Any(s => s.OnlineID == model.OnlineID || s.LegacyOnlineID == model.LegacyOnlineID));
 
         public IEnumerable<string> HandledExtensions => scoreImporter.HandledExtensions;
 

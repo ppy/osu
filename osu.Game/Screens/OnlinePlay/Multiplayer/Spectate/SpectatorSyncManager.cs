@@ -182,7 +182,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Spectate
                 return;
 
             masterState = newState;
-            Logger.Log($"{nameof(SpectatorSyncManager)}'s master clock become {masterState}");
+            Logger.Log($"{nameof(SpectatorSyncManager)}'s master clock became {masterState}");
 
             switch (masterState)
             {

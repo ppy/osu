@@ -162,17 +162,20 @@ namespace osu.Game.Screens.Play.PlayerSettings
 
                 realmWriteTask = realm.WriteAsync(r =>
                 {
-                    var settings = r.Find<BeatmapInfo>(beatmap.Value.BeatmapInfo.ID)?.UserSettings;
+                    var setInfo = r.Find<BeatmapSetInfo>(beatmap.Value.BeatmapSetInfo.ID);
 
-                    if (settings == null) // only the case for tests.
+                    if (setInfo == null) // only the case for tests.
                         return;
 
-                    double val = Current.Value;
+                    // Apply to all difficulties in a beatmap set for now (they generally always share timing).
+                    foreach (var b in setInfo.Beatmaps)
+                    {
+                        BeatmapUserSettings settings = b.UserSettings;
+                        double val = Current.Value;
 
-                    if (settings.Offset == val)
-                        return;
-
-                    settings.Offset = val;
+                        if (settings.Offset != val)
+                            settings.Offset = val;
+                    }
                 });
             }
         }

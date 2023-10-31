@@ -1,13 +1,13 @@
-// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
-
-#nullable disable
 
 using System.Diagnostics;
 using osu.Framework.Allocation;
+using osu.Framework.Extensions.ObjectExtensions;
 using osu.Framework.Logging;
 using osu.Framework.Screens;
 using osu.Game.Online.Multiplayer;
+using osu.Game.Online.Rooms;
 using osu.Game.Screens.OnlinePlay.Components;
 using osu.Game.Screens.OnlinePlay.Lounge;
 
@@ -16,7 +16,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
     public partial class Multiplayer : OnlinePlayScreen
     {
         [Resolved]
-        private MultiplayerClient client { get; set; }
+        private MultiplayerClient client { get; set; } = null!;
 
         protected override void LoadComplete()
         {
@@ -91,11 +91,13 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
 
         protected override LoungeSubScreen CreateLounge() => new MultiplayerLoungeSubScreen();
 
+        public void Join(Room room, string? password) => Schedule(() => Lounge.Join(room, password));
+
         protected override void Dispose(bool isDisposing)
         {
             base.Dispose(isDisposing);
 
-            if (client != null)
+            if (client.IsNotNull())
                 client.RoomUpdated -= onRoomUpdated;
         }
     }

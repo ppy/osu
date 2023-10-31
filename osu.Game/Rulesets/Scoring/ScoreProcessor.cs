@@ -31,6 +31,14 @@ namespace osu.Game.Rulesets.Scoring
         private const double accuracy_cutoff_d = 0;
 
         /// <summary>
+        /// Whether <see cref="HitEvents"/> should be populated during application of results.
+        /// </summary>
+        /// <remarks>
+        /// Should only be disabled for special cases.
+        /// When disabled, <see cref="JudgementProcessor.RevertResult"/> cannot be used.</remarks>
+        internal bool TrackHitEvents = true;
+
+        /// <summary>
         /// Invoked when this <see cref="ScoreProcessor"/> was reset from a replay frame.
         /// </summary>
         public event Action? OnResetFromReplayFrame;
@@ -226,10 +234,16 @@ namespace osu.Game.Rulesets.Scoring
 
             ApplyScoreChange(result);
 
-            hitEvents.Add(CreateHitEvent(result));
-            lastHitObject = result.HitObject;
+            if (!IsSimulating)
+            {
+                if (TrackHitEvents)
+                {
+                    hitEvents.Add(CreateHitEvent(result));
+                    lastHitObject = result.HitObject;
+                }
 
-            updateScore();
+                updateScore();
+            }
         }
 
         /// <summary>
@@ -242,6 +256,9 @@ namespace osu.Game.Rulesets.Scoring
 
         protected sealed override void RevertResultInternal(JudgementResult result)
         {
+            if (!TrackHitEvents)
+                throw new InvalidOperationException(@$"Rewind is not supported when {nameof(TrackHitEvents)} is disabled.");
+
             Combo.Value = result.ComboAtJudgement;
             HighestCombo.Value = result.HighestComboAtJudgement;
 
@@ -311,6 +328,9 @@ namespace osu.Game.Rulesets.Scoring
         /// <param name="storeResults">Whether to store the current state of the <see cref="ScoreProcessor"/> for future use.</param>
         protected override void Reset(bool storeResults)
         {
+            // Run one last time to store max values.
+            updateScore();
+
             base.Reset(storeResults);
 
             hitEvents.Clear();

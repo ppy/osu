@@ -90,7 +90,7 @@ namespace osu.Game.Screens.Spectate
             }));
         }
 
-        private void beatmapsChanged(IRealmCollection<BeatmapSetInfo> items, ChangeSet changes, Exception ___)
+        private void beatmapsChanged(IRealmCollection<BeatmapSetInfo> items, ChangeSet changes)
         {
             if (changes?.InsertedIndices == null) return;
 

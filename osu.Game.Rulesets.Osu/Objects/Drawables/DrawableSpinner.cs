@@ -48,9 +48,16 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
         /// <summary>
         /// The amount of bonus score gained from spinning after the required number of spins, for display purposes.
         /// </summary>
-        public IBindable<double> GainedBonus => gainedBonus;
+        public double CurrentBonusScore => score_per_tick * Math.Clamp(completedFullSpins.Value - HitObject.SpinsRequiredForBonus, 0, HitObject.MaximumBonusSpins);
 
-        private readonly Bindable<double> gainedBonus = new BindableDouble();
+        /// <summary>
+        /// The maximum amount of bonus score which can be achieved from extra spins.
+        /// </summary>
+        public double MaximumBonusScore => score_per_tick * HitObject.MaximumBonusSpins;
+
+        public IBindable<int> CompletedFullSpins => completedFullSpins;
+
+        private readonly Bindable<int> completedFullSpins = new Bindable<int>();
 
         /// <summary>
         /// The number of spins per minute this spinner is spinning at, for display purposes.
@@ -99,6 +106,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
                 spinningSample = new PausableSkinnableSound
                 {
                     Volume = { Value = 0 },
+                    MinimumSampleVolume = MINIMUM_SAMPLE_VOLUME,
                     Looping = true,
                     Frequency = { Value = spinning_sample_initial_frequency }
                 }
@@ -218,7 +226,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
                     // these become implicitly hit.
                     return 1;
 
-                return Math.Clamp(Result.RateAdjustedRotation / 360 / HitObject.SpinsRequired, 0, 1);
+                return Math.Clamp(Result.TotalRotation / 360 / HitObject.SpinsRequired, 0, 1);
             }
         }
 
@@ -279,43 +287,35 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
             // don't update after end time to avoid the rate display dropping during fade out.
             // this shouldn't be limited to StartTime as it causes weirdness with the underlying calculation, which is expecting updates during that period.
             if (Time.Current <= HitObject.EndTime)
-                spmCalculator.SetRotation(Result.RateAdjustedRotation);
+                spmCalculator.SetRotation(Result.TotalRotation);
 
             updateBonusScore();
         }
 
         private static readonly int score_per_tick = new SpinnerBonusTick.OsuSpinnerBonusTickJudgement().MaxNumericResult;
 
-        private int wholeSpins;
-
         private void updateBonusScore()
         {
             if (ticks.Count == 0)
                 return;
 
-            int spins = (int)(Result.RateAdjustedRotation / 360);
+            int spins = (int)(Result.TotalRotation / 360);
 
-            if (spins < wholeSpins)
+            if (spins < completedFullSpins.Value)
             {
                 // rewinding, silently handle
-                wholeSpins = spins;
+                completedFullSpins.Value = spins;
                 return;
             }
 
-            while (wholeSpins != spins)
+            while (completedFullSpins.Value != spins)
             {
                 var tick = ticks.FirstOrDefault(t => !t.Result.HasResult);
 
                 // tick may be null if we've hit the spin limit.
-                if (tick != null)
-                {
-                    tick.TriggerResult(true);
+                tick?.TriggerResult(true);
 
-                    if (tick is DrawableSpinnerBonusTick)
-                        gainedBonus.Value = score_per_tick * (spins - HitObject.SpinsRequired);
-                }
-
-                wholeSpins++;
+                completedFullSpins.Value++;
             }
         }
     }

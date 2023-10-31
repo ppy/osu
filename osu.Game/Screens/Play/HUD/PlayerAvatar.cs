@@ -18,7 +18,7 @@ namespace osu.Game.Screens.Play.HUD
     {
         [SettingSource(typeof(SkinnableComponentStrings), nameof(SkinnableComponentStrings.CornerRadius), nameof(SkinnableComponentStrings.CornerRadiusDescription),
             SettingControlType = typeof(SettingsPercentageSlider<float>))]
-        public new BindableFloat CornerRadius { get; set; } = new BindableFloat(0.25f)
+        public new BindableFloat CornerRadius { get; } = new BindableFloat(0.25f)
         {
             MinValue = 0,
             MaxValue = 0.5f,

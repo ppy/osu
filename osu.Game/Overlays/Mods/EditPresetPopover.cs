@@ -8,11 +8,13 @@ using osu.Framework.Bindables;
 using osu.Framework.Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
+using osu.Framework.Input.Events;
 using osu.Game.Database;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Graphics.UserInterfaceV2;
+using osu.Game.Input.Bindings;
 using osu.Game.Localisation;
 using osu.Game.Rulesets.Mods;
 using osuTK;
@@ -130,6 +132,25 @@ namespace osu.Game.Overlays.Mods
             }, true);
         }
 
+        protected override void LoadComplete()
+        {
+            base.LoadComplete();
+
+            ScheduleAfterChildren(() => GetContainingInputManager().ChangeFocus(nameTextBox));
+        }
+
+        public override bool OnPressed(KeyBindingPressEvent<GlobalAction> e)
+        {
+            switch (e.Action)
+            {
+                case GlobalAction.Select:
+                    saveButton.TriggerClick();
+                    return true;
+            }
+
+            return base.OnPressed(e);
+        }
+
         private void useCurrentMods()
         {
             saveableMods = selectedMods.Value.ToHashSet();
@@ -138,7 +159,7 @@ namespace osu.Game.Overlays.Mods
 
         private void updateState()
         {
-            scrollContent.ChildrenEnumerable = saveableMods.Select(mod => new ModPresetRow(mod));
+            scrollContent.ChildrenEnumerable = saveableMods.AsOrdered().Select(mod => new ModPresetRow(mod));
             useCurrentModsButton.Enabled.Value = checkSelectedModsDiffersFromSaved();
         }
 
@@ -148,13 +169,6 @@ namespace osu.Game.Overlays.Mods
                 return false;
 
             return !saveableMods.SetEquals(selectedMods.Value);
-        }
-
-        protected override void LoadComplete()
-        {
-            base.LoadComplete();
-
-            ScheduleAfterChildren(() => GetContainingInputManager().ChangeFocus(nameTextBox));
         }
 
         private void save()

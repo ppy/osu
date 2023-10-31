@@ -63,6 +63,16 @@ namespace osu.Game.Online.API.Requests.Responses
             set => Length = TimeSpan.FromSeconds(value).TotalMilliseconds;
         }
 
+        [JsonIgnore]
+        public double HitLength { get; set; }
+
+        [JsonProperty(@"hit_length")]
+        private double hitLengthInSeconds
+        {
+            get => TimeSpan.FromMilliseconds(HitLength).TotalSeconds;
+            set => HitLength = TimeSpan.FromSeconds(value).TotalMilliseconds;
+        }
+
         [JsonProperty(@"convert")]
         public bool Convert { get; set; }
 

@@ -6,6 +6,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using NUnit.Framework;
+using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Testing;
 using osu.Game.Audio;
@@ -26,6 +27,15 @@ namespace osu.Game.Rulesets.Osu.Tests
 
         private TestDrawableSpinner drawableSpinner;
 
+        private readonly BindableDouble spinRate = new BindableDouble();
+
+        protected override void LoadComplete()
+        {
+            base.LoadComplete();
+
+            AddSliderStep("Spin rate", 0.5, 5, 1, val => spinRate.Value = val);
+        }
+
         [TestCase(true)]
         [TestCase(false)]
         public void TestVariousSpinners(bool autoplay)
@@ -43,7 +53,8 @@ namespace osu.Game.Rulesets.Osu.Tests
             AddUntilStep("Pitch starts low", () => getSpinningSample().Frequency.Value < 0.8);
             AddUntilStep("Pitch increases", () => getSpinningSample().Frequency.Value > 0.8);
 
-            PausableSkinnableSound getSpinningSample() => drawableSpinner.ChildrenOfType<PausableSkinnableSound>().FirstOrDefault(s => s.Samples.Any(i => i.LookupNames.Any(l => l.Contains("spinnerspin"))));
+            PausableSkinnableSound getSpinningSample() =>
+                drawableSpinner.ChildrenOfType<PausableSkinnableSound>().FirstOrDefault(s => s.Samples.Any(i => i.LookupNames.Any(l => l.Contains("spinnerspin"))));
         }
 
         [TestCase(false)]
@@ -64,6 +75,39 @@ namespace osu.Game.Rulesets.Osu.Tests
             AddUntilStep("Short spinner implicitly completes", () => drawableSpinner.Progress == 1);
         }
 
+        [TestCase(0, 4, 6)]
+        [TestCase(5, 7, 10)]
+        [TestCase(10, 11, 8)]
+        public void TestSpinnerSpinRequirements(int od, int normalTicks, int bonusTicks)
+        {
+            Spinner spinner = null;
+
+            AddStep("add spinner", () => SetContents(_ =>
+            {
+                spinner = new Spinner
+                {
+                    StartTime = Time.Current,
+                    EndTime = Time.Current + 3000,
+                    Samples = new List<HitSampleInfo>
+                    {
+                        new HitSampleInfo(HitSampleInfo.HIT_NORMAL)
+                    }
+                };
+
+                spinner.ApplyDefaults(new ControlPointInfo(), new BeatmapDifficulty { OverallDifficulty = od });
+
+                return drawableSpinner = new TestDrawableSpinner(spinner, true, spinRate)
+                {
+                    Anchor = Anchor.Centre,
+                    Depth = depthIndex++,
+                    Scale = new Vector2(0.75f)
+                };
+            }));
+
+            AddAssert("number of normal ticks matches", () => spinner.SpinsRequired, () => Is.EqualTo(normalTicks));
+            AddAssert("number of bonus ticks matches", () => spinner.MaximumBonusSpins, () => Is.EqualTo(bonusTicks));
+        }
+
         private Drawable testSingle(float circleSize, bool auto = false, double length = 3000)
         {
             const double delay = 2000;
@@ -80,7 +124,7 @@ namespace osu.Game.Rulesets.Osu.Tests
 
             spinner.ApplyDefaults(new ControlPointInfo(), new BeatmapDifficulty { CircleSize = circleSize });
 
-            drawableSpinner = new TestDrawableSpinner(spinner, auto)
+            drawableSpinner = new TestDrawableSpinner(spinner, auto, spinRate)
             {
                 Anchor = Anchor.Centre,
                 Depth = depthIndex++,
@@ -96,18 +140,20 @@ namespace osu.Game.Rulesets.Osu.Tests
         private partial class TestDrawableSpinner : DrawableSpinner
         {
             private readonly bool auto;
+            private readonly BindableDouble spinRate;
 
-            public TestDrawableSpinner(Spinner s, bool auto)
+            public TestDrawableSpinner(Spinner s, bool auto, BindableDouble spinRate)
                 : base(s)
             {
                 this.auto = auto;
+                this.spinRate = spinRate;
             }
 
             protected override void Update()
             {
                 base.Update();
                 if (auto)
-                    RotationTracker.AddRotation((float)(Clock.ElapsedFrameTime * 2));
+                    RotationTracker.AddRotation((float)(Clock.ElapsedFrameTime * spinRate.Value));
             }
         }
     }

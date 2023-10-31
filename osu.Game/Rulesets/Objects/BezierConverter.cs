@@ -40,6 +40,13 @@ namespace osu.Game.Rulesets.Objects
         };
 
         /// <summary>
+        /// Counts the number of segments in a slider path.
+        /// </summary>
+        /// <param name="controlPoints">The control points of the path.</param>
+        /// <returns>The number of segments in a slider path.</returns>
+        public static int CountSegments(IList<PathControlPoint> controlPoints) => controlPoints.Where((t, i) => t.Type != null && i < controlPoints.Count - 1).Count();
+
+        /// <summary>
         /// Converts a slider path to bezier control point positions compatible with the legacy osu! client.
         /// </summary>
         /// <param name="controlPoints">The control points of the path.</param>

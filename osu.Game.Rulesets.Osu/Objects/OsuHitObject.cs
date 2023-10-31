@@ -1,14 +1,13 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
 using System;
 using System.Linq;
 using osu.Framework.Bindables;
 using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.ControlPoints;
 using osu.Game.Rulesets.Objects;
+using osu.Game.Rulesets.Objects.Legacy;
 using osu.Game.Rulesets.Objects.Types;
 using osu.Game.Rulesets.Osu.Scoring;
 using osu.Game.Rulesets.Scoring;
@@ -22,6 +21,11 @@ namespace osu.Game.Rulesets.Osu.Objects
         /// The radius of hit objects (ie. the radius of a <see cref="HitCircle"/>).
         /// </summary>
         public const float OBJECT_RADIUS = 64;
+
+        /// <summary>
+        /// The width and height any element participating in display of a hitcircle (or similarly sized object) should be.
+        /// </summary>
+        public static readonly Vector2 OBJECT_DIMENSIONS = new Vector2(OBJECT_RADIUS * 2);
 
         /// <summary>
         /// Scoring distance with a speed-adjusted beat length of 1 second (ie. the speed slider balls move through their track).
@@ -152,7 +156,7 @@ namespace osu.Game.Rulesets.Osu.Objects
             // This adjustment is necessary for AR>10, otherwise TimePreempt can become smaller leading to hitcircles not fully fading in.
             TimeFadeIn = 400 * Math.Min(1, TimePreempt / PREEMPT_MIN);
 
-            Scale = (1.0f - 0.7f * (difficulty.CircleSize - 5) / 5) / 2;
+            Scale = LegacyRulesetExtensions.CalculateScaleFromCircleSize(difficulty.CircleSize, true);
         }
 
         protected override HitWindows CreateHitWindows() => new OsuHitWindows();

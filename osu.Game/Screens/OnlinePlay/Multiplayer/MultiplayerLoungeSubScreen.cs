@@ -41,7 +41,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
             // To work around this, temporarily remove the room and trigger an immediate listing poll.
             if (e.Last is MultiplayerMatchSubScreen match)
             {
-                RoomManager.RemoveRoom(match.Room);
+                RoomManager?.RemoveRoom(match.Room);
                 ListingPollingComponent.PollImmediately();
             }
         }

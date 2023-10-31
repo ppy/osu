@@ -92,7 +92,7 @@ namespace osu.Game.Overlays.Settings.Sections
             });
         }
 
-        private void skinsChanged(IRealmCollection<SkinInfo> sender, ChangeSet changes, Exception error)
+        private void skinsChanged(IRealmCollection<SkinInfo> sender, ChangeSet changes)
         {
             // This can only mean that realm is recycling, else we would see the protected skins.
             // Because we are using `Live<>` in this class, we don't need to worry about this scenario too much.

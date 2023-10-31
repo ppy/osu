@@ -11,8 +11,8 @@ using osu.Framework.Graphics.Containers;
 using osu.Framework.Testing;
 using osu.Game.Rulesets;
 using osu.Game.Rulesets.Judgements;
-using osu.Game.Rulesets.Mania;
 using osu.Game.Rulesets.Objects;
+using osu.Game.Rulesets.Osu;
 using osu.Game.Rulesets.Osu.Judgements;
 using osu.Game.Rulesets.Scoring;
 using osu.Game.Screens.Play.HUD.JudgementCounter;
@@ -22,7 +22,7 @@ namespace osu.Game.Tests.Visual.Gameplay
     public partial class TestSceneJudgementCounter : OsuTestScene
     {
         private ScoreProcessor scoreProcessor = null!;
-        private JudgementTally judgementTally = null!;
+        private JudgementCountController judgementCountController = null!;
         private TestJudgementCounterDisplay counterDisplay = null!;
 
         private DependencyProvidingContainer content = null!;
@@ -47,17 +47,17 @@ namespace osu.Game.Tests.Visual.Gameplay
                 CachedDependencies = new (Type, object)[] { (typeof(ScoreProcessor), scoreProcessor), (typeof(Ruleset), ruleset) },
                 Children = new Drawable[]
                 {
-                    judgementTally = new JudgementTally(),
+                    judgementCountController = new JudgementCountController(),
                     content = new DependencyProvidingContainer
                     {
                         RelativeSizeAxes = Axes.Both,
-                        CachedDependencies = new (Type, object)[] { (typeof(JudgementTally), judgementTally) },
+                        CachedDependencies = new (Type, object)[] { (typeof(JudgementCountController), judgementCountController) },
                     }
                 },
             };
         });
 
-        protected override Ruleset CreateRuleset() => new ManiaRuleset();
+        protected override Ruleset CreateRuleset() => new OsuRuleset();
 
         private void applyOneJudgement(HitResult result)
         {

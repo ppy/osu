@@ -1,12 +1,11 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Effects;
 using osu.Framework.Graphics.UserInterface;
 using osu.Framework.Input.Events;
+using osu.Game.Graphics.UserInterface;
 using osu.Game.Localisation;
 using osu.Game.Rulesets;
 using osuTK.Graphics;
@@ -40,6 +39,8 @@ namespace osu.Game.Overlays.Toolbar
 
         private partial class RulesetButton : ToolbarButton
         {
+            protected override HoverSounds CreateHoverSounds(HoverSampleSet sampleSet) => new HoverSounds();
+
             public bool Active
             {
                 set
@@ -65,7 +66,7 @@ namespace osu.Game.Overlays.Toolbar
 
             protected override bool OnClick(ClickEvent e)
             {
-                Parent.TriggerClick();
+                Parent!.TriggerClick();
                 return base.OnClick(e);
             }
         }

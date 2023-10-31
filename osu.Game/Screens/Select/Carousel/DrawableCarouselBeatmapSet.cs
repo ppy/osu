@@ -112,11 +112,11 @@ namespace osu.Game.Screens.Select.Carousel
                 background = new DelayedLoadWrapper(() => new SetPanelBackground(manager.GetWorkingBeatmap(beatmapSet.Beatmaps.MinBy(b => b.OnlineID)))
                 {
                     RelativeSizeAxes = Axes.Both,
-                }, 300)
+                }, 200)
                 {
                     RelativeSizeAxes = Axes.Both
                 },
-                mainFlow = new DelayedLoadWrapper(() => new SetPanelContent((CarouselBeatmapSet)Item), 100)
+                mainFlow = new DelayedLoadWrapper(() => new SetPanelContent((CarouselBeatmapSet)Item), 50)
                 {
                     RelativeSizeAxes = Axes.Both
                 },
@@ -126,7 +126,7 @@ namespace osu.Game.Screens.Select.Carousel
             mainFlow.DelayedLoadComplete += fadeContentIn;
         }
 
-        private void fadeContentIn(Drawable d) => d.FadeInFromZero(750, Easing.OutQuint);
+        private void fadeContentIn(Drawable d) => d.FadeInFromZero(150);
 
         protected override void Deselected()
         {
@@ -225,7 +225,12 @@ namespace osu.Game.Screens.Select.Carousel
                 if (beatmapSet.OnlineID > 0 && viewDetails != null)
                     items.Add(new OsuMenuItem("Details...", MenuItemType.Standard, () => viewDetails(beatmapSet.OnlineID)));
 
-                var collectionItems = realm.Realm.All<BeatmapCollection>().AsEnumerable().Select(createCollectionMenuItem).ToList();
+                var collectionItems = realm.Realm.All<BeatmapCollection>()
+                                           .OrderBy(c => c.Name)
+                                           .AsEnumerable()
+                                           .Select(createCollectionMenuItem)
+                                           .ToList();
+
                 if (manageCollectionsDialog != null)
                     collectionItems.Add(new OsuMenuItem("Manage...", MenuItemType.Standard, manageCollectionsDialog.Show));
 

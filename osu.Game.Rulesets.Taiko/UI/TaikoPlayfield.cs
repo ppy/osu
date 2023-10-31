@@ -40,6 +40,8 @@ namespace osu.Game.Rulesets.Taiko.UI
         /// </summary>
         public Bindable<bool> ClassicHitTargetPosition = new BindableBool();
 
+        public Container UnderlayElements { get; private set; } = null!;
+
         private Container<HitExplosion> hitExplosionContainer;
         private Container<KiaiHitExplosion> kiaiExplosionContainer;
         private JudgementContainer<DrawableTaikoJudgement> judgementContainer;
@@ -130,7 +132,14 @@ namespace osu.Game.Rulesets.Taiko.UI
                         {
                             Name = "Bar line content",
                             RelativeSizeAxes = Axes.Both,
-                            Child = barLinePlayfield = new BarLinePlayfield(),
+                            Children = new Drawable[]
+                            {
+                                UnderlayElements = new Container
+                                {
+                                    RelativeSizeAxes = Axes.Both,
+                                },
+                                barLinePlayfield = new BarLinePlayfield(),
+                            }
                         },
                         hitObjectContent = new Container
                         {
@@ -170,7 +179,10 @@ namespace osu.Game.Rulesets.Taiko.UI
                     RelativeSizeAxes = Axes.Both,
                 },
                 drumRollHitContainer.CreateProxy(),
-                new DrumSamplePlayer(HitObjectContainer),
+                new SkinnableDrawable(new TaikoSkinComponentLookup(TaikoSkinComponents.DrumSamplePlayer), _ => new DrumSamplePlayer())
+                {
+                    RelativeSizeAxes = Axes.Both,
+                },
                 // this is added at the end of the hierarchy to receive input before taiko objects.
                 // but is proxied below everything to not cover visual effects such as hit explosions.
                 inputDrum,

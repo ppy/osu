@@ -138,24 +138,28 @@ namespace osu.Game.Tests.Visual.Gameplay
         [Test]
         public void TestCyclicSelection()
         {
-            SkinBlueprint[] blueprints = null!;
+            List<SkinBlueprint> blueprints = new List<SkinBlueprint>();
 
-            AddStep("Add big black boxes", () =>
+            AddStep("clear list", () => blueprints.Clear());
+
+            for (int i = 0; i < 3; i++)
             {
-                InputManager.MoveMouseTo(skinEditor.ChildrenOfType<BigBlackBox>().First());
-                InputManager.Click(MouseButton.Left);
-                InputManager.Click(MouseButton.Left);
-                InputManager.Click(MouseButton.Left);
-            });
+                AddStep("Add big black box", () =>
+                {
+                    InputManager.MoveMouseTo(skinEditor.ChildrenOfType<BigBlackBox>().First());
+                    InputManager.Click(MouseButton.Left);
+                });
+
+                AddStep("store box", () =>
+                {
+                    // Add blueprints one-by-one so we have a stable order for testing reverse cyclic selection against.
+                    blueprints.Add(skinEditor.ChildrenOfType<SkinBlueprint>().Single(s => s.IsSelected));
+                });
+            }
 
             AddAssert("Three black boxes added", () => targetContainer.Components.OfType<BigBlackBox>().Count(), () => Is.EqualTo(3));
 
-            AddStep("Store black box blueprints", () =>
-            {
-                blueprints = skinEditor.ChildrenOfType<SkinBlueprint>().Where(b => b.Item is BigBlackBox).ToArray();
-            });
-
-            AddAssert("Selection is black box 1", () => skinEditor.SelectedComponents.Single(), () => Is.EqualTo(blueprints[0].Item));
+            AddAssert("Selection is last", () => skinEditor.SelectedComponents.Single(), () => Is.EqualTo(blueprints[2].Item));
 
             AddStep("move cursor to black box", () =>
             {
@@ -164,13 +168,13 @@ namespace osu.Game.Tests.Visual.Gameplay
             });
 
             AddStep("click on black box stack", () => InputManager.Click(MouseButton.Left));
-            AddAssert("Selection is black box 2", () => skinEditor.SelectedComponents.Single(), () => Is.EqualTo(blueprints[1].Item));
+            AddAssert("Selection is second last", () => skinEditor.SelectedComponents.Single(), () => Is.EqualTo(blueprints[1].Item));
 
             AddStep("click on black box stack", () => InputManager.Click(MouseButton.Left));
-            AddAssert("Selection is black box 3", () => skinEditor.SelectedComponents.Single(), () => Is.EqualTo(blueprints[2].Item));
+            AddAssert("Selection is last", () => skinEditor.SelectedComponents.Single(), () => Is.EqualTo(blueprints[0].Item));
 
             AddStep("click on black box stack", () => InputManager.Click(MouseButton.Left));
-            AddAssert("Selection is black box 1", () => skinEditor.SelectedComponents.Single(), () => Is.EqualTo(blueprints[0].Item));
+            AddAssert("Selection is first", () => skinEditor.SelectedComponents.Single(), () => Is.EqualTo(blueprints[2].Item));
 
             AddStep("select all boxes", () =>
             {
