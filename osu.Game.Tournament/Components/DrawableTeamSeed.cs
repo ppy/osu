@@ -22,6 +22,12 @@ namespace osu.Game.Tournament.Components
         [Resolved]
         private LadderInfo ladder { get; set; } = null!;
 
+        [BackgroundDependencyLoader]
+        private void load()
+        {
+            Text.Font = Text.Font.With(size: 36);
+        }
+
         protected override void LoadComplete()
         {
             base.LoadComplete();
