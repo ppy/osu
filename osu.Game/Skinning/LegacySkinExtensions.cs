@@ -115,7 +115,18 @@ namespace osu.Game.Skinning
 
             maxSize *= texture.ScaleAdjust;
 
-            var croppedTexture = texture.Crop(new RectangleF(texture.Width / 2f - maxSize.X / 2f, texture.Height / 2f - maxSize.Y / 2f, maxSize.X, maxSize.Y));
+            // Importantly, check per-axis for the minimum dimension to avoid accidentally inflating
+            // textures with weird aspect ratios.
+            float newWidth = Math.Min(texture.Width, maxSize.X);
+            float newHeight = Math.Min(texture.Height, maxSize.Y);
+
+            var croppedTexture = texture.Crop(new RectangleF(
+                texture.Width / 2f - newWidth / 2f,
+                texture.Height / 2f - newHeight / 2f,
+                newWidth,
+                newHeight
+            ));
+
             croppedTexture.ScaleAdjust = texture.ScaleAdjust;
             return croppedTexture;
         }
