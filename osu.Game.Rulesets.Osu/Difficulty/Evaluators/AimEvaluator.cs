@@ -17,7 +17,8 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
         private const double velocity_change_multiplier = 0.75;
 
         private const double slider_shape_reading_multiplier = 1.6;
-        private const double slider_end_reading_multiplier = 4.0;
+        private const double slider_end_reading_multiplier = 5.0;
+        private const double raw_slider_end_difference_multiplier = 0.06;
 
         /// <summary>
         /// Evaluates the difficulty of aiming the current object, based on:
@@ -124,7 +125,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
                 double readingBonus = 1.0;
                 readingBonus += calculateSliderShapeReadingDifficulty(slider) * slider_shape_reading_multiplier;
                 readingBonus += calculateSliderEndReadingDifficulty(slider) * slider_end_reading_multiplier;
-                sliderBonus *= readingBonus;
+                sliderBonus *= Math.Max(readingBonus, 1.0);
             }
 
             // Add in acute angle bonus or wide angle bonus + velocity change bonus, whichever is larger.
@@ -138,13 +139,10 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
         }
 
         private const int normalized_radius = 50;
-        private const float assumed_slider_radius = normalized_radius * 1.8f;
 
         private const float short_sliders_penalty = normalized_radius * 2.0f;
-        private const float raw_diff_multiplier = 0.16f;
-        private const float lazy_diff_multiplier = 1.0f;
 
-        private static float calculateSliderEndReadingDifficulty(Slider slider)
+        private static double calculateSliderEndReadingDifficulty(Slider slider)
         {
             if (slider.LazyEndPosition is null) return 0.0f;
             if (slider.VisualLazyEndPosition is null) return 0.0f;
@@ -153,16 +151,17 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
 
             var preLastObj = (OsuHitObject)slider.NestedHitObjects[^2];
 
-            double minimalMovement = Vector2.Distance((Vector2)slider.LazyEndPosition, preLastObj.Position) - slider.Radius * 2.4;
-            rawDifference *= (float)Math.Clamp(minimalMovement / slider.Radius, 0, 1); // if not need to move a cursor - 0 bonus
+            double minimalMovement = Vector2.Distance((Vector2)slider.LazyEndPosition, preLastObj.Position) - slider.Radius * 4.8;
+            rawDifference *= (float)Math.Clamp(minimalMovement / slider.Radius, 0, 1); // buff only very long sliders
 
-            float lazyDifference = Vector2.Distance((Vector2)slider.VisualLazyEndPosition, (Vector2)slider.LazyEndPosition);
+            double lazyDifference = Vector2.Distance((Vector2)slider.VisualLazyEndPosition, (Vector2)slider.LazyEndPosition);
+            lazyDifference = Math.Max(lazyDifference - slider.Radius * 0.5, 0); // prevent slightly curvy sliders from overbuffing
 
-            float difficulty = slider.LazyTravelDistance == 0 ? 0 : (raw_diff_multiplier * rawDifference + lazy_diff_multiplier * lazyDifference)
+            double difficulty = slider.LazyTravelDistance == 0 ? 0 : (lazyDifference + rawDifference * raw_slider_end_difference_multiplier)
                 / (slider.LazyTravelDistance + short_sliders_penalty);
             return difficulty;
         }
-        private static float calculateSliderShapeReadingDifficulty(Slider slider)
+        private static double calculateSliderShapeReadingDifficulty(Slider slider)
         {
             double result = 0;
 
