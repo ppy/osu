@@ -67,7 +67,7 @@ namespace osu.Game.Tournament.Tests
                     FlagName = { Value = "JP" },
                     FullName = { Value = "Japan" },
                     LastYearPlacing = { Value = 10 },
-                    Seed = { Value = "Low" },
+                    Seed = { Value = "#12" },
                     SeedingResults =
                     {
                         new SeedingResult
@@ -140,6 +140,7 @@ namespace osu.Game.Tournament.Tests
                     Acronym = { Value = "USA" },
                     FlagName = { Value = "US" },
                     FullName = { Value = "United States" },
+                    Seed = { Value = "#3" },
                     Players =
                     {
                         new TournamentUser { Username = "Hello" },

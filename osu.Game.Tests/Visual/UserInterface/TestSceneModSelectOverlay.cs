@@ -799,8 +799,11 @@ namespace osu.Game.Tests.Visual.UserInterface
             AddUntilStep("difficulty multiplier display shows correct value", () => modSelectOverlay.ChildrenOfType<ScoreMultiplierDisplay>().Single().Current.Value, () => Is.EqualTo(0.7));
         }
 
-        private void waitForColumnLoad() => AddUntilStep("all column content loaded",
-            () => modSelectOverlay.ChildrenOfType<ModColumn>().Any() && modSelectOverlay.ChildrenOfType<ModColumn>().All(column => column.IsLoaded && column.ItemsLoaded));
+        private void waitForColumnLoad() => AddUntilStep("all column content loaded", () =>
+            modSelectOverlay.ChildrenOfType<ModColumn>().Any()
+            && modSelectOverlay.ChildrenOfType<ModColumn>().All(column => column.IsLoaded && column.ItemsLoaded)
+            && modSelectOverlay.ChildrenOfType<ModPresetColumn>().Any()
+            && modSelectOverlay.ChildrenOfType<ModPresetColumn>().All(column => column.IsLoaded));
 
         private void changeRuleset(int id)
         {
