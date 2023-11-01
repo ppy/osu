@@ -324,8 +324,10 @@ namespace osu.Game.Rulesets.Taiko.UI
                 case TaikoStrongJudgement:
                     if (result.IsHit)
                     {
-                        hitExplosionContainer.Children.FirstOrDefault(e => e.JudgedObject == ((DrawableStrongNestedHit)judgedObject).ParentHitObject)?.VisualiseSecondHit(result);
-                        (judgementContainer.Children.FirstOrDefault(e => e.JudgedObject == ((DrawableStrongNestedHit)judgedObject).ParentHitObject) as IAnimatableTaikoJudgement)?.AnimateSecondHit();
+                        var hitObject = ((DrawableStrongNestedHit)judgedObject).ParentHitObject;
+
+                        hitExplosionContainer.Children.FirstOrDefault(e => e.JudgedObject == hitObject)?.VisualiseSecondHit(result);
+                        (judgementContainer.Children.FirstOrDefault(e => e.JudgedObject == hitObject) as IVisualiseSecondHit)?.VisualiseSecondHit(result);
                     }
 
                     break;

@@ -97,7 +97,7 @@ namespace osu.Game.Rulesets.Judgements
         /// </summary>
         /// <param name="result">The applicable judgement.</param>
         /// <param name="judgedObject">The drawable object.</param>
-        public void Apply([NotNull] JudgementResult result, [CanBeNull] DrawableHitObject judgedObject)
+        public virtual void Apply([NotNull] JudgementResult result, [CanBeNull] DrawableHitObject judgedObject)
         {
             Result = result;
             JudgedObject = judgedObject;

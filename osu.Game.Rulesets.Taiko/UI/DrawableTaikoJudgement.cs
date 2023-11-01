@@ -13,7 +13,7 @@ namespace osu.Game.Rulesets.Taiko.UI
     /// <summary>
     /// Text that is shown as judgement when a hit object is hit or missed.
     /// </summary>
-    public partial class DrawableTaikoJudgement : DrawableJudgement, IAnimatableTaikoJudgement
+    public partial class DrawableTaikoJudgement : DrawableJudgement, IVisualiseSecondHit
     {
         public DrawableTaikoJudgement()
         {
@@ -35,10 +35,17 @@ namespace osu.Game.Rulesets.Taiko.UI
                 animatableJudgement.Animate();
         }
 
-        public void AnimateSecondHit()
+        public override void Apply(JudgementResult result, DrawableHitObject? judgedObject)
         {
-            if (JudgementBody.Drawable is IAnimatableTaikoJudgement taikoJudgement)
-                taikoJudgement.AnimateSecondHit();
+            base.Apply(result, judgedObject);
+            if (JudgementBody.Drawable is IVisualiseSecondHit visualiseSecondHit)
+                visualiseSecondHit.VisualiseSecondHit(null);
+        }
+
+        public void VisualiseSecondHit(JudgementResult? judgementResult)
+        {
+            if (JudgementBody.Drawable is IVisualiseSecondHit visualiseSecondHit)
+                visualiseSecondHit.VisualiseSecondHit(judgementResult);
         }
     }
 }

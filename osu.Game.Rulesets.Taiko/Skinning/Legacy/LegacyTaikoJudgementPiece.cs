@@ -4,7 +4,7 @@
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Animations;
-using osu.Game.Rulesets.Objects.Drawables;
+using osu.Game.Rulesets.Judgements;
 using osu.Game.Rulesets.Scoring;
 using osu.Game.Rulesets.Taiko.UI;
 using osu.Game.Skinning;
@@ -12,8 +12,10 @@ using osuTK;
 
 namespace osu.Game.Rulesets.Taiko.Skinning.Legacy
 {
-    public partial class LegacyTaikoJudgementPiece : LegacyJudgementPieceOld, IAnimatableTaikoJudgement
+    public partial class LegacyTaikoJudgementPiece : LegacyJudgementPieceOld, IVisualiseSecondHit
     {
+        private double? secondHitTime;
+
         private readonly Drawable? strongSprite;
 
         /// <summary>
@@ -58,17 +60,15 @@ namespace osu.Game.Rulesets.Taiko.Skinning.Legacy
             base.PlayAnimation();
 
             (strongSprite as IFramedAnimation)?.GotoFrame(0);
-        }
 
-        public void Animate(DrawableHitObject drawableHitObject) => PlayAnimation();
-
-        public void AnimateSecondHit()
-        {
-            if (strongSprite == null)
-                return;
-
-            Sprite.FadeOut(50, Easing.OutQuint);
-            strongSprite.FadeIn(50, Easing.OutQuint);
+            if (secondHitTime != null && strongSprite != null)
+            {
+                using (BeginAbsoluteSequence(secondHitTime.Value))
+                {
+                    Sprite.FadeOut(50, Easing.OutQuint);
+                    strongSprite.FadeIn(50, Easing.OutQuint);
+                }
+            }
         }
 
         protected override void Update()
@@ -79,6 +79,12 @@ namespace osu.Game.Rulesets.Taiko.Skinning.Legacy
                 // Relying on RelativeSizeAxes.Both + FillMode.Fit doesn't work due to the precise pixel layout requirements.
                 // This is a bit ugly but makes the non-legacy implementations a lot cleaner to implement.
                 child.Scale = new Vector2(DrawHeight / Sprite.Size.Y) * 0.3f;
+        }
+
+        public void VisualiseSecondHit(JudgementResult? judgementResult)
+        {
+            secondHitTime = judgementResult?.TimeAbsolute;
+            PlayAnimation();
         }
     }
 }
