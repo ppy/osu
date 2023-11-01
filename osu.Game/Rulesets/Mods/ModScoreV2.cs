@@ -9,7 +9,7 @@ namespace osu.Game.Rulesets.Mods
     /// This mod is used strictly to mark osu!stable scores set with the "Score V2" mod active.
     /// It should not be used in any real capacity going forward.
     /// </remarks>
-    public class ModScoreV2 : Mod
+    public sealed class ModScoreV2 : Mod
     {
         public override string Name => "Score V2";
         public override string Acronym => @"SV2";
@@ -17,5 +17,7 @@ namespace osu.Game.Rulesets.Mods
         public override LocalisableString Description => "Score set on earlier osu! versions with the V2 scoring algorithm active.";
         public override double ScoreMultiplier => 1;
         public override bool UserPlayable => false;
+        public override bool ValidForMultiplayer => false;
+        public override bool ValidForMultiplayerAsFreeMod => false;
     }
 }

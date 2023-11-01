@@ -30,7 +30,7 @@ namespace osu.Game.Rulesets.Mods
         [SettingSource("Adjust pitch", "Should pitch be adjusted with speed")]
         public abstract BindableBool AdjustPitch { get; }
 
-        public override bool ValidForMultiplayerAsFreeMod => false;
+        public sealed override bool ValidForMultiplayerAsFreeMod => false;
 
         public override Type[] IncompatibleMods => new[] { typeof(ModRateAdjust), typeof(ModAdaptiveSpeed) };
 
