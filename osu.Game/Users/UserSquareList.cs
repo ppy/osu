@@ -95,8 +95,6 @@ namespace osu.Game.Users
 
         #endregion
 
-        #endregion
-
         public override void Show()
         {
             if (State.Value == Visibility.Visible)
@@ -141,8 +139,6 @@ namespace osu.Game.Users
                 }
             }, out popOutDelegate);
         }
-
-        #endregion
 
         #endregion
 
