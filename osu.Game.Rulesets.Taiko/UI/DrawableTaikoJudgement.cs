@@ -5,6 +5,7 @@ using osu.Framework.Graphics;
 using osu.Game.Rulesets.Judgements;
 using osu.Game.Rulesets.Objects.Drawables;
 using osu.Game.Rulesets.Scoring;
+using osu.Game.Rulesets.Taiko.Skinning.Default;
 using osuTK;
 
 namespace osu.Game.Rulesets.Taiko.UI
@@ -23,17 +24,21 @@ namespace osu.Game.Rulesets.Taiko.UI
             Size = Vector2.One;
         }
 
-        protected override Drawable CreateDefaultJudgement(HitResult result) => new DefaultJudgementPiece(result);
+        protected override Drawable CreateDefaultJudgement(HitResult result) => new TaikoDefaultJudgementPiece(result);
 
         // Not actually used in execution. We're implementing the interface for AnimateSecondHit().
         public void Animate(DrawableHitObject drawableHitObject)
         {
-            (JudgementBody.Drawable as IAnimatableTaikoJudgement)?.Animate(drawableHitObject);
+            if (JudgementBody.Drawable is IAnimatableTaikoJudgement taikoJudgement)
+                taikoJudgement.Animate(drawableHitObject);
+            else if (JudgementBody.Drawable is IAnimatableJudgement animatableJudgement)
+                animatableJudgement.Animate();
         }
 
         public void AnimateSecondHit()
         {
-            (JudgementBody.Drawable as IAnimatableTaikoJudgement)?.AnimateSecondHit();
+            if (JudgementBody.Drawable is IAnimatableTaikoJudgement taikoJudgement)
+                taikoJudgement.AnimateSecondHit();
         }
     }
 }
