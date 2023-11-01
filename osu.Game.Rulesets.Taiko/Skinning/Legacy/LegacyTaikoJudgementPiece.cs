@@ -8,6 +8,7 @@ using osu.Game.Rulesets.Objects.Drawables;
 using osu.Game.Rulesets.Scoring;
 using osu.Game.Rulesets.Taiko.UI;
 using osu.Game.Skinning;
+using osuTK;
 
 namespace osu.Game.Rulesets.Taiko.Skinning.Legacy
 {
@@ -29,6 +30,9 @@ namespace osu.Game.Rulesets.Taiko.Skinning.Legacy
             : base(hitResult, () => sprite)
         {
             this.strongSprite = strongSprite;
+
+            AutoSizeAxes = Axes.None;
+            RelativeSizeAxes = Axes.Both;
         }
 
         [BackgroundDependencyLoader]
@@ -65,6 +69,16 @@ namespace osu.Game.Rulesets.Taiko.Skinning.Legacy
 
             Sprite.FadeOut(50, Easing.OutQuint);
             strongSprite.FadeIn(50, Easing.OutQuint);
+        }
+
+        protected override void Update()
+        {
+            base.Update();
+
+            foreach (var child in InternalChildren)
+                // Relying on RelativeSizeAxes.Both + FillMode.Fit doesn't work due to the precise pixel layout requirements.
+                // This is a bit ugly but makes the non-legacy implementations a lot cleaner to implement.
+                child.Scale = new Vector2(DrawHeight / Sprite.Size.Y) * 0.3f;
         }
     }
 }

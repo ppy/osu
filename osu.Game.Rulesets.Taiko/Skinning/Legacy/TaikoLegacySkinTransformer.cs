@@ -40,7 +40,11 @@ namespace osu.Game.Rulesets.Taiko.Skinning.Legacy
 
                     if (hitSprite != null)
                     {
+                        hitSprite.Anchor = hitSprite.Origin = Anchor.Centre;
+
                         var strongHitSprite = isMiss ? null : this.GetAnimation($"{hitName}k", true, false);
+                        if (strongHitSprite != null)
+                            strongHitSprite.Anchor = strongHitSprite.Origin = Anchor.Centre;
 
                         return new LegacyTaikoJudgementPiece(hitResultLookup.Component, hitSprite, strongHitSprite);
                     }
