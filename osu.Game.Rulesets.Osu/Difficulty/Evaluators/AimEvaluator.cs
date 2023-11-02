@@ -17,8 +17,8 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
         private const double velocity_change_multiplier = 0.75;
 
         private const double slider_shape_reading_multiplier = 1.6;
-        private const double slider_end_reading_multiplier = 5.0;
-        private const double raw_slider_end_difference_multiplier = 0.06;
+        private const double slider_end_complexity_multiplier = 5.0;
+        private const double slider_end_distance_multiplier = 0.3;
 
         /// <summary>
         /// Evaluates the difficulty of aiming the current object, based on:
@@ -124,7 +124,8 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
 
                 double readingBonus = 1.0;
                 readingBonus += calculateSliderShapeReadingDifficulty(slider) * slider_shape_reading_multiplier;
-                readingBonus += calculateSliderEndReadingDifficulty(slider) * slider_end_reading_multiplier;
+                readingBonus += calculateSliderEndComplexityDifficulty(slider) * slider_end_complexity_multiplier;
+                readingBonus += calculateSliderEndDistanceDifficulty(slider) * slider_end_distance_multiplier;
                 sliderBonus *= Math.Max(readingBonus, 1.0);
             }
 
@@ -139,28 +140,6 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
         }
 
         private const int normalized_radius = 50;
-
-        private const float short_sliders_penalty = normalized_radius * 2.0f;
-
-        private static double calculateSliderEndReadingDifficulty(Slider slider)
-        {
-            if (slider.LazyEndPosition is null) return 0.0f;
-            if (slider.VisualLazyEndPosition is null) return 0.0f;
-
-            float rawDifference = Vector2.Distance(slider.StackedEndPosition, (Vector2)slider.LazyEndPosition);
-
-            var preLastObj = (OsuHitObject)slider.NestedHitObjects[^2];
-
-            double minimalMovement = Vector2.Distance((Vector2)slider.LazyEndPosition, preLastObj.Position) - slider.Radius * 4.8;
-            rawDifference *= (float)Math.Clamp(minimalMovement / slider.Radius, 0, 1); // buff only very long sliders
-
-            double lazyDifference = Vector2.Distance((Vector2)slider.VisualLazyEndPosition, (Vector2)slider.LazyEndPosition);
-            lazyDifference = Math.Max(lazyDifference - slider.Radius * 0.5, 0); // prevent slightly curvy sliders from overbuffing
-
-            double difficulty = slider.LazyTravelDistance == 0 ? 0 : (lazyDifference + rawDifference * raw_slider_end_difference_multiplier)
-                / (slider.LazyTravelDistance + short_sliders_penalty);
-            return difficulty;
-        }
         private static double calculateSliderShapeReadingDifficulty(Slider slider)
         {
             double result = 0;
@@ -205,6 +184,33 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
 
             if (slider.SpanDuration == 0) return 0;
             return (float)(result / slider.SpanDuration);
+        }
+
+        private const float short_sliders_penalty = normalized_radius * 2.0f;
+        private static double calculateSliderEndComplexityDifficulty(Slider slider)
+        {
+            if (slider.LazyEndPosition is null) return 0;
+            if (slider.LineLazyEndPosition is null) return 0;
+            if (slider.LazyTravelDistance == 0) return 0;
+
+            double complexityDistance = Vector2.Distance((Vector2)slider.LineLazyEndPosition, (Vector2)slider.LazyEndPosition);
+            complexityDistance = Math.Max(complexityDistance - slider.Radius * 0.5, 0); // prevent slightly curvy sliders from overbuffing
+
+            return complexityDistance / (slider.LazyTravelDistance + short_sliders_penalty);
+        }
+
+        private static double calculateSliderEndDistanceDifficulty(Slider slider)
+        {
+            if (slider.LazyEndPosition is null) return 0.0f;
+            if (slider.LazyTravelDistance == 0) return 0;
+
+            float visualDistance = Vector2.Distance(slider.StackedEndPosition, (Vector2)slider.LazyEndPosition);
+
+            var preLastObj = (OsuHitObject)slider.NestedHitObjects[^2];
+
+            double minimalMovement = Vector2.Distance((Vector2)slider.LazyEndPosition, preLastObj.Position) - slider.Radius * 4.8;
+            visualDistance *= (float)Math.Clamp(minimalMovement / slider.Radius, 0, 1); // buff only very long sliders
+            return visualDistance / (slider.LazyTravelDistance + short_sliders_penalty);
         }
 
         private static double calcWideAngleBonus(double angle) => Math.Pow(Math.Sin(3.0 / 4 * (Math.Min(5.0 / 6 * Math.PI, Math.Max(Math.PI / 6, angle)) - Math.PI / 6)), 2);
