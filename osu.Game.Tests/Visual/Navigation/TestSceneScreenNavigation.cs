@@ -837,7 +837,7 @@ namespace osu.Game.Tests.Visual.Navigation
         }
 
         [Test]
-        public void TestTouchScreenDetection()
+        public void TestTouchScreenDetectionAtSongSelect()
         {
             AddStep("touch logo", () =>
             {
@@ -859,8 +859,9 @@ namespace osu.Game.Tests.Visual.Navigation
             AddStep("close settings sidebar", () => InputManager.Key(Key.Escape));
 
             Screens.Select.SongSelect songSelect = null;
-            PushAndConfirm(() => songSelect = new TestPlaySongSelect());
-            AddUntilStep("wait for song select", () => songSelect.BeatmapSetsLoaded);
+            AddRepeatStep("go to solo", () => InputManager.Key(Key.P), 3);
+            AddUntilStep("wait for song select", () => (songSelect = Game.ScreenStack.CurrentScreen as Screens.Select.SongSelect) != null);
+            AddUntilStep("wait for beatmap sets loaded", () => songSelect.BeatmapSetsLoaded);
 
             AddStep("switch to osu! ruleset", () =>
             {
@@ -907,10 +908,15 @@ namespace osu.Game.Tests.Visual.Navigation
                 InputManager.Click(MouseButton.Left);
             });
             AddUntilStep("touch device mod not activated", () => Game.SelectedMods.Value, () => Has.None.InstanceOf<ModTouchDevice>());
+        }
 
+        [Test]
+        public void TestTouchScreenDetectionInGame()
+        {
+            PushAndConfirm(() => new TestPlaySongSelect());
             AddStep("import beatmap", () => BeatmapImportHelper.LoadQuickOszIntoOsu(Game).WaitSafely());
             AddUntilStep("wait for selected", () => !Game.Beatmap.IsDefault);
-            AddStep("press enter", () => InputManager.Key(Key.Enter));
+            AddStep("select", () => InputManager.Key(Key.Enter));
 
             Player player = null;
 
