@@ -12,8 +12,8 @@ namespace osu.Game.Rulesets.Osu.Objects
         /// Whether to treat this <see cref="SliderHeadCircle"/> as a normal <see cref="HitCircle"/> for judgement purposes.
         /// If <c>false</c>, this <see cref="SliderHeadCircle"/> will be judged as a <see cref="SliderTick"/> instead.
         /// </summary>
-        public bool JudgeAsNormalHitCircle = true;
+        public bool ClassicSliderBehaviour;
 
-        public override Judgement CreateJudgement() => JudgeAsNormalHitCircle ? base.CreateJudgement() : new SliderTickJudgement();
+        public override Judgement CreateJudgement() => ClassicSliderBehaviour ? new SliderTickJudgement() : base.CreateJudgement();
     }
 }
