@@ -16,7 +16,16 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
 
         public DrawableSlider DrawableSlider => (DrawableSlider)ParentHitObject;
 
-        public override bool DisplayResult => HitObject?.JudgeAsNormalHitCircle ?? base.DisplayResult;
+        public override bool DisplayResult
+        {
+            get
+            {
+                if (HitObject?.ClassicSliderBehaviour == true)
+                    return false;
+
+                return base.DisplayResult;
+            }
+        }
 
         private readonly IBindable<int> pathVersion = new Bindable<int>();
 
@@ -56,7 +65,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
         {
             Debug.Assert(HitObject != null);
 
-            if (HitObject.JudgeAsNormalHitCircle)
+            if (!HitObject.ClassicSliderBehaviour)
                 return base.ResultFor(timeOffset);
 
             // If not judged as a normal hitcircle, judge as a slider tick instead. This is the classic osu!stable scoring.
