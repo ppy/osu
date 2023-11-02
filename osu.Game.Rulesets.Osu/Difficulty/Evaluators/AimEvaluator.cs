@@ -151,7 +151,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
             double deltaFollowRadius = maxFollowRadius - minFollowRadius;
 
             int nestedObjectIndex = 0;
-            double numberOfUpdates = slider.Path.Distance / slider.Radius;
+            double numberOfUpdates = Math.Ceiling(2 * slider.Path.Distance / slider.Radius);
             double deltaT = slider.SpanDuration / numberOfUpdates;
 
             for (double relativeTime = 0; relativeTime <= slider.SpanDuration; relativeTime += deltaT)
