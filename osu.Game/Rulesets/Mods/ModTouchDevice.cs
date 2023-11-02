@@ -14,6 +14,6 @@ namespace osu.Game.Rulesets.Mods
         public sealed override double ScoreMultiplier => 1;
         public sealed override ModType Type => ModType.System;
         public sealed override bool AlwaysValidForSubmission => true;
-        public sealed override Type[] IncompatibleMods => new[] { typeof(ICreateReplayData) };
+        public override Type[] IncompatibleMods => new[] { typeof(ICreateReplayData) };
     }
 }
