@@ -187,7 +187,6 @@ namespace osu.Game.Rulesets.Osu.Objects
                             StartTime = e.Time,
                             Position = Position + Path.PositionAt(e.PathProgress),
                             StackHeight = StackHeight,
-                            Scale = Scale,
                         });
                         break;
 
@@ -206,7 +205,7 @@ namespace osu.Game.Rulesets.Osu.Objects
                             RepeatIndex = e.SpanIndex,
                             StartTime = e.Time,
                             Position = EndPosition,
-                            StackHeight = StackHeight
+                            StackHeight = StackHeight,
                         });
                         break;
 
@@ -217,7 +216,6 @@ namespace osu.Game.Rulesets.Osu.Objects
                             StartTime = StartTime + (e.SpanIndex + 1) * SpanDuration,
                             Position = Position + Path.PositionAt(e.PathProgress),
                             StackHeight = StackHeight,
-                            Scale = Scale,
                         });
                         break;
                 }
