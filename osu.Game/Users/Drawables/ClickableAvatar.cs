@@ -3,16 +3,27 @@
 
 using System;
 using osu.Framework.Allocation;
+using osu.Framework.Graphics;
+using osu.Framework.Graphics.Containers;
+using osu.Framework.Graphics.Cursor;
 using osu.Framework.Input.Events;
 using osu.Framework.Localisation;
 using osu.Game.Graphics.Containers;
 using osu.Game.Localisation;
 using osu.Game.Online.API.Requests.Responses;
+using osuTK;
 
 namespace osu.Game.Users.Drawables
 {
-    public partial class ClickableAvatar : OsuClickableContainer
+    public partial class ClickableAvatar : OsuClickableContainer, IHasCustomTooltip<UserGridPanel>
     {
+        public ITooltip<UserGridPanel> GetCustomTooltip() => new UserGridPanelTooltip();
+
+        public UserGridPanel TooltipContent => new UserGridPanel(user!)
+        {
+            Width = 300
+        };
+
         public override LocalisableString TooltipText
         {
             get
@@ -66,6 +77,26 @@ namespace osu.Game.Users.Drawables
                 return false;
 
             return base.OnClick(e);
+        }
+
+        private partial class UserGridPanelTooltip : VisibilityContainer, ITooltip<UserGridPanel>
+        {
+            private UserGridPanel? displayedUser;
+
+            protected override void PopIn()
+            {
+                Child = displayedUser;
+                this.FadeIn(20, Easing.OutQuint);
+            }
+
+            protected override void PopOut() => this.FadeOut(80, Easing.OutQuint);
+
+            public void Move(Vector2 pos) => Position = pos;
+
+            public void SetContent(UserGridPanel userGridPanel)
+            {
+                displayedUser = userGridPanel;
+            }
         }
     }
 }
