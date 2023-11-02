@@ -101,13 +101,17 @@ namespace osu.Game.Rulesets.Mania.Skinning.Argon
 
                     case LegacyManiaSkinConfigurationLookups.ColumnWidth:
 
-                        float width = 60;
+                        float width;
+
+                        bool isSpecialColumn = stage.IsSpecialColumn(columnIndex);
 
                         // Best effort until we have better mobile support.
                         if (RuntimeInfo.IsMobile)
-                            width = 180 * Math.Min(1, 7f / beatmap.TotalColumns);
+                            width = 170 * Math.Min(1, 7f / beatmap.TotalColumns) * (isSpecialColumn ? 1.8f : 1);
+                        else
+                            width = 60 * (isSpecialColumn ? 2 : 1);
 
-                        return SkinUtils.As<TValue>(new Bindable<float>(stage.IsSpecialColumn(columnIndex) ? width * 2 : width));
+                        return SkinUtils.As<TValue>(new Bindable<float>(width));
 
                     case LegacyManiaSkinConfigurationLookups.ColumnBackgroundColour:
 
