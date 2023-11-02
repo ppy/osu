@@ -9,6 +9,7 @@ using osu.Game.Configuration;
 using osu.Game.Overlays;
 using osu.Game.Overlays.OSD;
 using osu.Game.Rulesets.Mods;
+using osu.Game.Rulesets.Scoring;
 
 namespace osu.Game.Screens.Play
 {
@@ -50,11 +51,15 @@ namespace osu.Game.Screens.Play
             if (touchDeviceMod == null)
                 return;
 
-            onScreenDisplay?.Display(new TouchDeviceDetectedToast());
+            // do not show the toast if the user hasn't hit anything yet.
+            // we're kind of assuming that the user just switches to touch for gameplay
+            // and we don't want to spam them with obvious toasts.
+            if (gameplayState.ScoreProcessor.HitEvents.Any(ev => ev.Result.IsHit()))
+                onScreenDisplay?.Display(new TouchDeviceDetectedToast());
 
-            // TODO: this is kinda crude. `Player` (probably rightly so) assumes immutability of mods.
-            // this probably should be shown immediately on screen in the HUD,
-            // which means that immutability will probably need to be revisited.
+            // `Player` (probably rightly so) assumes immutability of mods,
+            // so this will not be shown immediately on the mod display in the top right.
+            // if this is to change, the mod immutability should be revisited.
             player.Score.ScoreInfo.Mods = player.Score.ScoreInfo.Mods.Append(touchDeviceMod).ToArray();
         }
     }
