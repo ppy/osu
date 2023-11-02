@@ -303,6 +303,8 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
 
         private static readonly int score_per_tick = new SpinnerBonusTick.OsuSpinnerBonusTickJudgement().MaxNumericResult;
 
+        private int lastMaxSamplePlayback;
+
         private void updateBonusScore()
         {
             if (ticks.Count == 0)
@@ -322,7 +324,15 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
                 var tick = ticks.FirstOrDefault(t => !t.Result.HasResult);
 
                 // tick may be null if we've hit the spin limit.
-                tick?.TriggerResult(true);
+                if (tick == null)
+                {
+                    // we still want to play a sound. this will probably be a new sound in the future, but for now let's continue playing the bonus sound.
+                    // round robin to avoid hitting playback concurrency.
+                    tick = ticks.OfType<DrawableSpinnerBonusTick>().Skip(lastMaxSamplePlayback++ % HitObject.MaximumBonusSpins).First();
+                    tick.PlaySamples();
+                }
+                else
+                    tick.TriggerResult(true);
 
                 completedFullSpins.Value++;
             }
