@@ -265,7 +265,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Preprocessing
 
             OsuHitObject lastObj = (OsuHitObject)slider.NestedHitObjects[^1];
             OsuHitObject preLastObj = (OsuHitObject)slider.NestedHitObjects[^2];
-            double relativePosition = (lastObj.StartTime - preLastObj.StartTime) / (slider.EndTime - preLastObj.StartTime);
+            double relativePosition = (trackingEndTime - preLastObj.StartTime) / (slider.EndTime - preLastObj.StartTime);
             slider.LineLazyEndPosition = preLastObj.StackedPosition + (lastObj.StackedPosition - preLastObj.StackedPosition) * (float)relativePosition;
 
             Vector2 currCursorPosition = slider.StackedPosition;
