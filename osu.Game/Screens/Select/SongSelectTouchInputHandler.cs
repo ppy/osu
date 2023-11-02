@@ -9,6 +9,7 @@ using osu.Framework.Graphics;
 using osu.Game.Configuration;
 using osu.Game.Rulesets;
 using osu.Game.Rulesets.Mods;
+using osu.Game.Utils;
 
 namespace osu.Game.Screens.Select
 {
@@ -52,7 +53,15 @@ namespace osu.Game.Screens.Select
             bool touchDeviceModEnabled = mods.Value.Any(mod => mod is ModTouchDevice);
 
             if (touchActive.Value && !touchDeviceModEnabled)
-                mods.Value = mods.Value.Append(touchDeviceMod).ToArray();
+            {
+                var candidateMods = mods.Value.Append(touchDeviceMod).ToArray();
+
+                if (!ModUtils.CheckCompatibleSet(candidateMods, out _))
+                    return;
+
+                mods.Value = candidateMods;
+            }
+
             if (!touchActive.Value && touchDeviceModEnabled)
                 mods.Value = mods.Value.Where(mod => mod is not ModTouchDevice).ToArray();
         }
