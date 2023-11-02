@@ -186,7 +186,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
             return (float)(result / slider.SpanDuration);
         }
 
-        private const float short_sliders_penalty = normalized_radius * 2.0f;
+        private const float short_sliders_penalty = normalized_radius * 0.0f;
         private static double calculateSliderEndComplexityDifficulty(Slider slider)
         {
             if (slider.LazyEndPosition is null) return 0;
