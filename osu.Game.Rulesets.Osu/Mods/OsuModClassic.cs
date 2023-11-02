@@ -42,10 +42,6 @@ namespace osu.Game.Rulesets.Osu.Mods
             {
                 case Slider slider:
                     slider.ClassicSliderBehaviour = NoSliderHeadAccuracy.Value;
-
-                    foreach (var head in slider.NestedHitObjects.OfType<SliderHeadCircle>())
-                        head.ClassicSliderBehaviour = NoSliderHeadAccuracy.Value;
-
                     break;
             }
         }
