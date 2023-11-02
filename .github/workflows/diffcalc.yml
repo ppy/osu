@@ -139,9 +139,6 @@ jobs:
       GENERATOR_ENV: ${{ steps.set-outputs.outputs.GENERATOR_ENV }}
       GOOGLE_CREDS_FILE: ${{ steps.set-outputs.outputs.GOOGLE_CREDS_FILE }}
     steps:
-      - name: Checkout
-        uses: actions/checkout@v3
-
       - name: Checkout diffcalc-sheet-generator
         uses: actions/checkout@v3
         with:
@@ -165,7 +162,7 @@ jobs:
       - name: Add base environment
         run: |
           # Required by diffcalc-sheet-generator
-          cp '${{ env.GENERATOR_DIR }}/.env.sample' "${{ needs.directory.outputs.GENERATOR_ENV }}"
+          cp '${{ needs.directory.outputs.GENERATOR_DIR }}/.env.sample' "${{ needs.directory.outputs.GENERATOR_ENV }}"
 
           # Add Google credentials
           echo '${{ secrets.DIFFCALC_GOOGLE_CREDENTIALS }}' | base64 -d > "${{ needs.directory.outputs.GOOGLE_CREDS_FILE }}"
@@ -336,6 +333,16 @@ jobs:
         run: |
           echo "Target: ${{ needs.generator.outputs.TARGET }}"
           echo "Spreadsheet: ${{ needs.generator.outputs.SPREADSHEET_LINK }}"
+
+  cleanup:
+    name: Cleanup
+    needs: [ directory, generator ]
+    if: ${{ always() && needs.directory.result == 'success' }}
+    runs-on: self-hosted
+    steps:
+      - name: Cleanup
+        run: |
+          rm -rf "${{ needs.directory.outputs.GENERATOR_DIR }}"
 
   update-comment:
     name: Update PR comment

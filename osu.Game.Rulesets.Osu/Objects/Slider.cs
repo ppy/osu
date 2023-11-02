@@ -49,13 +49,9 @@ namespace osu.Game.Rulesets.Osu.Objects
             set
             {
                 path.ControlPoints.Clear();
-                path.ExpectedDistance.Value = null;
+                path.ControlPoints.AddRange(value.ControlPoints.Select(c => new PathControlPoint(c.Position, c.Type)));
 
-                if (value != null)
-                {
-                    path.ControlPoints.AddRange(value.ControlPoints.Select(c => new PathControlPoint(c.Position, c.Type)));
-                    path.ExpectedDistance.Value = value.ExpectedDistance.Value;
-                }
+                path.ExpectedDistance.Value = value.ExpectedDistance.Value;
             }
         }
 
@@ -210,11 +206,7 @@ namespace osu.Game.Rulesets.Osu.Objects
                         });
                         break;
 
-                    case SliderEventType.LastTick:
-                        // Of note, we are directly mapping LastTick (instead of `SliderEventType.Tail`)  to SliderTailCircle.
-                        // It is required as difficulty calculation and gameplay relies on reading this value.
-                        // (although it is displayed in classic skins, which may be a concern).
-                        // If this is to change, we should revisit this.
+                    case SliderEventType.Tail:
                         AddNested(TailCircle = new SliderTailCircle(this)
                         {
                             RepeatIndex = e.SpanIndex,

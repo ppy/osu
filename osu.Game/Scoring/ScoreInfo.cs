@@ -94,14 +94,31 @@ namespace osu.Game.Scoring
 
         public double Accuracy { get; set; }
 
-        public bool HasReplay => !string.IsNullOrEmpty(Hash);
+        [Ignored]
+        public bool HasOnlineReplay { get; set; }
 
         public DateTimeOffset Date { get; set; }
 
         public double? PP { get; set; }
 
+        /// <summary>
+        /// The online ID of this score.
+        /// </summary>
+        /// <remarks>
+        /// In the osu-web database, this ID (if present) comes from the new <c>solo_scores</c> table.
+        /// </remarks>
         [Indexed]
         public long OnlineID { get; set; } = -1;
+
+        /// <summary>
+        /// The legacy online ID of this score.
+        /// </summary>
+        /// <remarks>
+        /// In the osu-web database, this ID (if present) comes from the legacy <c>osu_scores_*_high</c> tables.
+        /// This ID is also stored to replays set on osu!stable.
+        /// </remarks>
+        [Indexed]
+        public long LegacyOnlineID { get; set; } = -1;
 
         [MapTo("User")]
         public RealmUser RealmUser { get; set; } = null!;
@@ -168,7 +185,6 @@ namespace osu.Game.Scoring
         IRulesetInfo IScoreInfo.Ruleset => Ruleset;
         IBeatmapInfo? IScoreInfo.Beatmap => BeatmapInfo;
         IUser IScoreInfo.User => User;
-        IEnumerable<INamedFileUsage> IHasNamedFiles.Files => Files;
 
         #region Properties required to make things work with existing usages
 

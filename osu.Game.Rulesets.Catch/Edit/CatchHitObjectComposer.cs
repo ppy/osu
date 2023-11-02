@@ -10,6 +10,7 @@ using osu.Framework.Graphics;
 using osu.Framework.Input.Bindings;
 using osu.Framework.Input.Events;
 using osu.Game.Beatmaps;
+using osu.Game.Graphics.UserInterface;
 using osu.Game.Input.Bindings;
 using osu.Game.Rulesets.Catch.Objects;
 using osu.Game.Rulesets.Catch.UI;
@@ -178,6 +179,34 @@ namespace osu.Game.Rulesets.Catch.Edit
                 default:
                     return null;
             }
+        }
+
+        protected override void Update()
+        {
+            base.Update();
+
+            updateDistanceSnapGrid();
+        }
+
+        private void updateDistanceSnapGrid()
+        {
+            if (DistanceSnapProvider.DistanceSnapToggle.Value != TernaryState.True)
+            {
+                distanceSnapGrid.Hide();
+                return;
+            }
+
+            var sourceHitObject = getDistanceSnapGridSourceHitObject();
+
+            if (sourceHitObject == null)
+            {
+                distanceSnapGrid.Hide();
+                return;
+            }
+
+            distanceSnapGrid.Show();
+            distanceSnapGrid.StartTime = sourceHitObject.GetEndTime();
+            distanceSnapGrid.StartX = sourceHitObject.EffectiveX;
         }
     }
 }
