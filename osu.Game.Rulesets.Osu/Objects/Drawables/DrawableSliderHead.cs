@@ -69,8 +69,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
             {
                 // With classic slider behaviour, heads are considered fully hit if in the largest hit window.
                 // We can't award a full Great because the true Great judgement is awarded on the Slider itself,
-                // reduced based on number of ticks hit.
-                //
+                // reduced based on number of ticks hit,
                 // so we use the most suitable LargeTick judgement here instead.
                 return base.ResultFor(timeOffset).IsHit() ? HitResult.LargeTickHit : HitResult.LargeTickMiss;
             }
