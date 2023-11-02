@@ -44,6 +44,12 @@ namespace osu.Game.Screens.Play
         {
         }
 
+        [BackgroundDependencyLoader]
+        private void load()
+        {
+            AddInternal(new PlayerTouchInputHandler());
+        }
+
         protected override void LoadAsyncComplete()
         {
             base.LoadAsyncComplete();

@@ -285,7 +285,6 @@ namespace osu.Game.Screens.Play
                             fadeOut(true);
                     },
                 },
-                new PlayerTouchInputHandler()
             });
 
             if (cancellationToken.IsCancellationRequested)
