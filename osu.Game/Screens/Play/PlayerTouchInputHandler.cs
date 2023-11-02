@@ -55,7 +55,7 @@ namespace osu.Game.Screens.Play
             // we're kind of assuming that the user just switches to touch for gameplay
             // and we don't want to spam them with obvious toasts.
             if (gameplayState.ScoreProcessor.HitEvents.Any(ev => ev.Result.IsHit()))
-                onScreenDisplay?.Display(new TouchDeviceDetectedToast());
+                onScreenDisplay?.Display(new TouchDeviceDetectedToast(gameplayState.Ruleset.RulesetInfo));
 
             // `Player` (probably rightly so) assumes immutability of mods,
             // so this will not be shown immediately on the mod display in the top right.
