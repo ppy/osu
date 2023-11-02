@@ -277,17 +277,13 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
                 spinningSample.Frequency.Value = spinning_sample_modulated_base_frequency + Progress;
 
             // Ticks can theoretically be judged at any point in the spinner's duration.
-            // For performance reasons, we only want to keep the next tick alive.
+            // A tick must be alive to correctly play back samples,
+            // but for performance reasons, we only want to keep the next tick alive.
             var next = NestedHitObjects.FirstOrDefault(h => !h.Judged);
 
             // See default `LifetimeStart` as set in `DrawableSpinnerTick`.
             if (next?.LifetimeStart == double.MaxValue)
-            {
-                // the tick can be theoretically judged at any point in the spinner's duration,
-                // so it must be alive throughout the spinner's entire lifetime.
-                // this mostly matters for correct sample playback.
                 next.LifetimeStart = HitObject.StartTime;
-            }
         }
 
         protected override void UpdateAfterChildren()
