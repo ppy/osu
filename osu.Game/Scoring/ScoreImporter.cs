@@ -182,6 +182,12 @@ namespace osu.Game.Scoring
             base.PostImport(model, realm, parameters);
 
             populateUserDetails(model);
+
+            Debug.Assert(model.BeatmapInfo != null);
+
+            // This needs to be run after user detail population to ensure we have a valid user id.
+            if (api.IsLoggedIn && api.LocalUser.Value.OnlineID == model.UserID && (model.BeatmapInfo.LastPlayed == null || model.Date > model.BeatmapInfo.LastPlayed))
+                model.BeatmapInfo.LastPlayed = model.Date;
         }
 
         /// <summary>

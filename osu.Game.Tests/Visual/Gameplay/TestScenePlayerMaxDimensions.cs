@@ -7,6 +7,7 @@ using System.IO;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using NUnit.Framework;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics.Textures;
 using osu.Framework.IO.Stores;
@@ -27,6 +28,7 @@ namespace osu.Game.Tests.Visual.Gameplay
     /// <remarks>
     /// The HUD is hidden as it does't really affect game balance if HUD elements are larger than they should be.
     /// </remarks>
+    [Ignore("This test is for visual testing, and has no value in being run in standard CI runs.")]
     public partial class TestScenePlayerMaxDimensions : TestSceneAllRulesetPlayers
     {
         // scale textures to 4 times their size.

@@ -1080,5 +1080,18 @@ namespace osu.Game.Tests.Beatmaps.Formats
                 Assert.That(controlPoints.DifficultyPointAt(3000).GenerateTicks, Is.True);
             }
         }
+
+        [Test]
+        public void TestSamplePointLeniency()
+        {
+            var decoder = new LegacyBeatmapDecoder { ApplyOffsets = false };
+
+            using (var resStream = TestResources.OpenResource("sample-point-leniency.osu"))
+            using (var stream = new LineBufferedReader(resStream))
+            {
+                var hitObject = decoder.Decode(stream).HitObjects.Single();
+                Assert.That(hitObject.Samples.Select(s => s.Volume), Has.All.EqualTo(70));
+            }
+        }
     }
 }
