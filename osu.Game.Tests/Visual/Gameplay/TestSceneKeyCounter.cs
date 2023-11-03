@@ -31,36 +31,65 @@ namespace osu.Game.Tests.Visual.Gameplay
                     Origin = Anchor.Centre,
                     RelativeSizeAxes = Axes.Both,
                     Direction = FillDirection.Vertical,
-                    Spacing = new Vector2(72.7f),
-                    Children = new KeyCounterDisplay[]
+                    Spacing = new Vector2(20),
+                    Children = new Drawable[]
                     {
                         new DefaultKeyCounterDisplay
                         {
                             Origin = Anchor.Centre,
                             Anchor = Anchor.Centre,
                         },
-                        new ArgonKeyCounterDisplay
+                        new DefaultKeyCounterDisplay
                         {
                             Origin = Anchor.Centre,
                             Anchor = Anchor.Centre,
+                            Scale = new Vector2(1, -1)
                         },
                         new ArgonKeyCounterDisplay
                         {
                             Origin = Anchor.Centre,
                             Anchor = Anchor.Centre,
-                            Rotation = -90,
-                        },
-                        new ArgonKeyCounterDisplay
-                        {
-                            Origin = Anchor.Centre,
-                            Anchor = Anchor.Centre,
-                            Rotation = 90,
                         },
                         new ArgonKeyCounterDisplay
                         {
                             Origin = Anchor.Centre,
                             Anchor = Anchor.Centre,
                             Scale = new Vector2(1, -1)
+                        },
+                        new FillFlowContainer
+                        {
+                            AutoSizeAxes = Axes.Both,
+                            Direction = FillDirection.Horizontal,
+                            Origin = Anchor.Centre,
+                            Anchor = Anchor.Centre,
+                            Spacing = new Vector2(20),
+                            Children = new Drawable[]
+                            {
+                                new DefaultKeyCounterDisplay
+                                {
+                                    Origin = Anchor.Centre,
+                                    Anchor = Anchor.Centre,
+                                    Rotation = -90,
+                                },
+                                new DefaultKeyCounterDisplay
+                                {
+                                    Origin = Anchor.Centre,
+                                    Anchor = Anchor.Centre,
+                                    Rotation = 90,
+                                },
+                                new ArgonKeyCounterDisplay
+                                {
+                                    Origin = Anchor.Centre,
+                                    Anchor = Anchor.Centre,
+                                    Rotation = -90,
+                                },
+                                new ArgonKeyCounterDisplay
+                                {
+                                    Origin = Anchor.Centre,
+                                    Anchor = Anchor.Centre,
+                                    Rotation = 90,
+                                },
+                            }
                         },
                     }
                 }
