@@ -55,6 +55,8 @@ namespace osu.Game.Screens.Play
                         new UprightAspectMaintainingContainer
                         {
                             RelativeSizeAxes = Axes.Both,
+                            Anchor = Anchor.Centre,
+                            Origin = Anchor.Centre,
                             Children = new Drawable[]
                             {
                                 keyNameText = new OsuSpriteText
