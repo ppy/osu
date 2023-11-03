@@ -124,10 +124,21 @@ namespace osu.Game.Rulesets.Osu.Objects
         public double TickDistanceMultiplier = 1;
 
         /// <summary>
-        /// Whether this <see cref="Slider"/>'s judgement is fully handled by its nested <see cref="HitObject"/>s.
-        /// If <c>false</c>, this <see cref="Slider"/> will be judged proportionally to the number of nested <see cref="HitObject"/>s hit.
+        /// If <see langword="false"/>, <see cref="Slider"/>'s judgement is fully handled by its nested <see cref="HitObject"/>s.
+        /// If <see langword="true"/>, this <see cref="Slider"/> will be judged proportionally to the number of nested <see cref="HitObject"/>s hit.
         /// </summary>
-        public bool OnlyJudgeNestedObjects = true;
+        public bool ClassicSliderBehaviour
+        {
+            get => classicSliderBehaviour;
+            set
+            {
+                classicSliderBehaviour = value;
+                if (HeadCircle != null)
+                    HeadCircle.ClassicSliderBehaviour = value;
+            }
+        }
+
+        private bool classicSliderBehaviour;
 
         public BindableNumber<double> SliderVelocityMultiplierBindable { get; } = new BindableDouble(1)
         {
@@ -187,7 +198,6 @@ namespace osu.Game.Rulesets.Osu.Objects
                             StartTime = e.Time,
                             Position = Position + Path.PositionAt(e.PathProgress),
                             StackHeight = StackHeight,
-                            Scale = Scale,
                         });
                         break;
 
@@ -197,6 +207,7 @@ namespace osu.Game.Rulesets.Osu.Objects
                             StartTime = e.Time,
                             Position = Position,
                             StackHeight = StackHeight,
+                            ClassicSliderBehaviour = ClassicSliderBehaviour,
                         });
                         break;
 
@@ -206,7 +217,7 @@ namespace osu.Game.Rulesets.Osu.Objects
                             RepeatIndex = e.SpanIndex,
                             StartTime = e.Time,
                             Position = EndPosition,
-                            StackHeight = StackHeight
+                            StackHeight = StackHeight,
                         });
                         break;
 
@@ -217,7 +228,6 @@ namespace osu.Game.Rulesets.Osu.Objects
                             StartTime = StartTime + (e.SpanIndex + 1) * SpanDuration,
                             Position = Position + Path.PositionAt(e.PathProgress),
                             StackHeight = StackHeight,
-                            Scale = Scale,
                         });
                         break;
                 }
@@ -262,7 +272,11 @@ namespace osu.Game.Rulesets.Osu.Objects
             TailSamples = this.GetNodeSamples(repeatCount + 1);
         }
 
-        public override Judgement CreateJudgement() => OnlyJudgeNestedObjects ? new OsuIgnoreJudgement() : new OsuJudgement();
+        public override Judgement CreateJudgement() => ClassicSliderBehaviour
+            // See logic in `DrawableSlider.CheckForResult()`
+            ? new OsuJudgement()
+            // Of note, this creates a combo discrepancy for non-classic-mod sliders (there is no combo increase for tail or slider judgement).
+            : new OsuIgnoreJudgement();
 
         protected override HitWindows CreateHitWindows() => HitWindows.Empty;
     }
