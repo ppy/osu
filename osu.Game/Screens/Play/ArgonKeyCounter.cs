@@ -3,8 +3,10 @@
 
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
+using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Game.Graphics;
+using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Screens.Play.HUD;
 using osuTK;
@@ -40,26 +42,39 @@ namespace osu.Game.Screens.Play
             {
                 inputIndicator = new Circle
                 {
-                    Anchor = Anchor.TopCentre,
-                    Origin = Anchor.TopCentre,
                     RelativeSizeAxes = Axes.X,
                     Height = line_height * scale_factor,
                     Alpha = 0.5f
                 },
-                keyNameText = new OsuSpriteText
+                new Container
                 {
-                    Anchor = Anchor.BottomLeft,
-                    Origin = Anchor.BottomLeft,
-                    Position = new Vector2(0, -13) * scale_factor,
-                    Font = OsuFont.Torus.With(size: name_font_size * scale_factor, weight: FontWeight.Bold),
-                    Colour = colours.Blue0,
-                    Text = Trigger.Name
-                },
-                countText = new OsuSpriteText
-                {
-                    Anchor = Anchor.BottomLeft,
-                    Origin = Anchor.BottomLeft,
-                    Font = OsuFont.Torus.With(size: count_font_size * scale_factor, weight: FontWeight.Bold),
+                    RelativeSizeAxes = Axes.X,
+                    Height = 40,
+                    Children = new Drawable[]
+                    {
+                        new UprightAspectMaintainingContainer
+                        {
+                            RelativeSizeAxes = Axes.Both,
+                            Children = new Drawable[]
+                            {
+                                keyNameText = new OsuSpriteText
+                                {
+                                    Anchor = Anchor.TopCentre,
+                                    Origin = Anchor.TopCentre,
+                                    Font = OsuFont.Torus.With(size: name_font_size * scale_factor, weight: FontWeight.Bold),
+                                    Colour = colours.Blue0,
+                                    Text = Trigger.Name
+                                },
+                                countText = new OsuSpriteText
+                                {
+                                    Anchor = Anchor.TopCentre,
+                                    Origin = Anchor.TopCentre,
+                                    Position = new Vector2(0, 13) * scale_factor,
+                                    Font = OsuFont.Torus.With(size: count_font_size * scale_factor, weight: FontWeight.Bold),
+                                },
+                            }
+                        }
+                    }
                 },
             };
 

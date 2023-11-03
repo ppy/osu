@@ -43,7 +43,25 @@ namespace osu.Game.Tests.Visual.Gameplay
                         {
                             Origin = Anchor.Centre,
                             Anchor = Anchor.Centre,
-                        }
+                        },
+                        new ArgonKeyCounterDisplay
+                        {
+                            Origin = Anchor.Centre,
+                            Anchor = Anchor.Centre,
+                            Rotation = -90,
+                        },
+                        new ArgonKeyCounterDisplay
+                        {
+                            Origin = Anchor.Centre,
+                            Anchor = Anchor.Centre,
+                            Rotation = 90,
+                        },
+                        new ArgonKeyCounterDisplay
+                        {
+                            Origin = Anchor.Centre,
+                            Anchor = Anchor.Centre,
+                            Scale = new Vector2(1, -1)
+                        },
                     }
                 }
             };
