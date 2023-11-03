@@ -124,8 +124,15 @@ namespace osu.Game.Tests.Visual.Gameplay
             AddStep("Disable counting", () => controller.IsCounting.Value = false);
             addPressKeyStep();
             AddAssert($"Check {testKey} count has not changed", () => testTrigger.ActivationCount.Value == 2);
+            AddStep("Enable counting", () => controller.IsCounting.Value = true);
+            addPressKeyStep(100);
+            addPressKeyStep(1000);
 
-            void addPressKeyStep() => AddStep($"Press {testKey} key", () => InputManager.Key(testKey));
+            void addPressKeyStep(int repeat = 1) => AddStep($"Press {testKey} key {repeat} times", () =>
+            {
+                for (int i = 0; i < repeat; i++)
+                    InputManager.Key(testKey);
+            });
         }
     }
 }
