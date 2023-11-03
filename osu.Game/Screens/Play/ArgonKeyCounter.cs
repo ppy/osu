@@ -9,7 +9,6 @@ using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Screens.Play.HUD;
-using osuTK;
 
 namespace osu.Game.Screens.Play
 {
@@ -26,6 +25,8 @@ namespace osu.Game.Screens.Play
 
         // Make things look bigger without using Scale
         private const float scale_factor = 1.5f;
+
+        private const float indicator_press_offset = 4;
 
         [Resolved]
         private OsuColour colours { get; set; } = null!;
@@ -48,8 +49,8 @@ namespace osu.Game.Screens.Play
                 },
                 new Container
                 {
-                    RelativeSizeAxes = Axes.X,
-                    Height = 40,
+                    RelativeSizeAxes = Axes.Both,
+                    Padding = new MarginPadding { Top = line_height * scale_factor + indicator_press_offset },
                     Children = new Drawable[]
                     {
                         new UprightAspectMaintainingContainer
@@ -69,9 +70,8 @@ namespace osu.Game.Screens.Play
                                 },
                                 countText = new OsuSpriteText
                                 {
-                                    Anchor = Anchor.TopCentre,
-                                    Origin = Anchor.TopCentre,
-                                    Position = new Vector2(0, 13) * scale_factor,
+                                    Anchor = Anchor.BottomCentre,
+                                    Origin = Anchor.BottomCentre,
                                     Font = OsuFont.Torus.With(size: count_font_size * scale_factor, weight: FontWeight.Bold),
                                 },
                             }
@@ -104,7 +104,7 @@ namespace osu.Game.Screens.Play
                 .FadeIn(10, Easing.OutQuint)
                 .MoveToY(0)
                 .Then()
-                .MoveToY(4, 60, Easing.OutQuint);
+                .MoveToY(indicator_press_offset, 60, Easing.OutQuint);
         }
 
         protected override void Deactivate(bool forwardPlayback = true)
