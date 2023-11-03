@@ -18,26 +18,24 @@ namespace osu.Game.Tests.Visual.UserInterface
         [Cached]
         private OverlayColourProvider colourProvider { get; set; } = new OverlayColourProvider(OverlayColourScheme.Purple);
 
-        private readonly BindableDouble current = new BindableDouble(5)
-        {
-            Precision = 0.1f,
-            MinValue = 0,
-            MaxValue = 15
-        };
-
         private RoundedSliderBar<double> slider = null!;
 
-        [BackgroundDependencyLoader]
-        private void load()
+        [SetUpSteps]
+        public void SetUpSteps()
         {
-            Child = slider = new RoundedSliderBar<double>
+            AddStep("create slider", () => Child = slider = new RoundedSliderBar<double>
             {
                 Anchor = Anchor.Centre,
                 Origin = Anchor.Centre,
-                Current = current,
+                Current = new BindableDouble(5)
+                {
+                    Precision = 0.1,
+                    MinValue = 0,
+                    MaxValue = 15
+                },
                 RelativeSizeAxes = Axes.X,
                 Width = 0.4f
-            };
+            });
         }
 
         [Test]
@@ -54,6 +52,23 @@ namespace osu.Game.Tests.Visual.UserInterface
             });
 
             AddAssert("slider is default", () => slider.Current.IsDefault);
+        }
+
+        [Test]
+        public void TestNubDoubleClickOnDisabledSliderDoesNothing()
+        {
+            AddStep("set slider to 1", () => slider.Current.Value = 1);
+            AddStep("disable slider", () => slider.Current.Disabled = true);
+
+            AddStep("move mouse to nub", () => InputManager.MoveMouseTo(slider.ChildrenOfType<Nub>().Single()));
+
+            AddStep("double click nub", () =>
+            {
+                InputManager.Click(MouseButton.Left);
+                InputManager.Click(MouseButton.Left);
+            });
+
+            AddAssert("slider is still at 1", () => slider.Current.Value, () => Is.EqualTo(1));
         }
     }
 }

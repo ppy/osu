@@ -7,8 +7,10 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using NUnit.Framework;
+using osu.Framework.Graphics.UserInterface;
 using osu.Framework.Testing;
 using osu.Game.Beatmaps;
+using osu.Game.Graphics.UserInterface;
 using osu.Game.Rulesets;
 using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Osu;
@@ -42,6 +44,47 @@ namespace osu.Game.Tests.Visual.Editing
                 var hitObject = targetFunc();
                 InputManager.MoveMouseTo(getPosition(hitObject));
             });
+        }
+
+        [Test]
+        public void TestContextMenuWithObjectBehind()
+        {
+            TimelineHitObjectBlueprint blueprint;
+
+            AddStep("add object", () =>
+            {
+                EditorBeatmap.Add(new HitCircle { StartTime = 3000 });
+            });
+
+            AddStep("enter slider placement", () =>
+            {
+                InputManager.Key(Key.Number3);
+                InputManager.MoveMouseTo(ScreenSpaceDrawQuad.Centre);
+            });
+
+            AddStep("start conflicting slider", () =>
+            {
+                InputManager.Click(MouseButton.Left);
+
+                blueprint = this.ChildrenOfType<TimelineHitObjectBlueprint>().First();
+                InputManager.MoveMouseTo(blueprint.ScreenSpaceDrawQuad.TopLeft - new Vector2(10, 0));
+            });
+
+            AddStep("end conflicting slider", () =>
+            {
+                InputManager.Click(MouseButton.Right);
+            });
+
+            AddStep("click object", () =>
+            {
+                InputManager.Key(Key.Number1);
+                blueprint = this.ChildrenOfType<TimelineHitObjectBlueprint>().First();
+                InputManager.MoveMouseTo(blueprint);
+                InputManager.Click(MouseButton.Left);
+            });
+
+            AddStep("right click", () => InputManager.Click(MouseButton.Right));
+            AddAssert("context menu open", () => this.ChildrenOfType<OsuContextMenu>().SingleOrDefault()?.State == MenuState.Open);
         }
 
         [Test]
@@ -139,7 +182,7 @@ namespace osu.Game.Tests.Visual.Editing
 
             AddStep("click away", () =>
             {
-                InputManager.MoveMouseTo(Editor.ChildrenOfType<TimelineArea>().Single().ScreenSpaceDrawQuad.TopLeft + Vector2.One);
+                InputManager.MoveMouseTo(Editor.ChildrenOfType<Timeline>().First().ScreenSpaceDrawQuad.TopLeft + new Vector2(5));
                 InputManager.Click(MouseButton.Left);
             });
 
