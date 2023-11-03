@@ -17,8 +17,8 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
         private const double slider_multiplier = 1.35;
         private const double velocity_change_multiplier = 0.75;
 
-        private const double slider_shape_reading_multiplier = 1.6;
-        private const double slider_end_complexity_multiplier = 5.0;
+        private const double slider_shape_reading_multiplier = 4;
+        private const double slider_end_complexity_multiplier = 0; // temporary disabled because of wrong edgecase values
         private const double slider_end_distance_multiplier = 0.3;
 
         /// <summary>
@@ -139,10 +139,38 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
 
             return aimStrain;
         }
+        private static Vector2 positionWithRepeats(double relativeTime, Slider slider)
+        {
+            double progress = relativeTime / slider.SpanDuration;
+            if (slider.RepeatCount % 2 == 1)
+                progress = 1 - progress; // revert if odd number of repeats
+            return slider.Position + slider.Path.PositionAt(progress);
+        }
+
+        private static Vector2 interpolate(Vector2 start, Vector2 end, float progress)
+            => start + (end - start) * progress;
+
+        private static double interpolate(double start, double end, double progress)
+            => start + (end - start) * progress;
+
+        private static double getCurveComfort(Vector2 start, Vector2 middle, Vector2 end)
+        {
+            float deltaDistance = Math.Abs(Vector2.Distance(start, middle) - Vector2.Distance(middle, end));
+            float scaleDistance = Vector2.Distance(start, end) / 4;
+            float result = Math.Min(deltaDistance / scaleDistance, 1);
+            return 1 - (double)result;
+        }
+
+        private static double getCurveDegree(Vector2 start, Vector2 middle, Vector2 end)
+        {
+            Vector2 middleInterpolated = interpolate(start, end, 0.5f);
+            float distance = Vector2.Distance(middleInterpolated, middle);
+            float scaleDistance = Vector2.Distance(start, end);
+            float result = Math.Min(distance / scaleDistance, 1);
+            return 1 - (double)result;
+        }
         private static double calculateSliderShapeReadingDifficulty(Slider slider)
         {
-            double result = 0;
-
             double minFollowRadius = slider.Radius;
             double maxFollowRadius = slider.Radius * 2.4;
             double deltaFollowRadius = maxFollowRadius - minFollowRadius;
@@ -158,29 +186,78 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
             double numberOfUpdates = Math.Ceiling(2 * slider.Path.Distance / slider.Radius);
             double deltaT = slider.SpanDuration / numberOfUpdates;
 
-            for (double relativeTime = 0; relativeTime <= slider.SpanDuration; relativeTime += deltaT)
-            {
-                double absoluteTime = relativeTime + head.StartTime;
+            double relativeTime = 0;
+            double middleTime = (head.StartTime + tail.StartTime) / 2 - head.StartTime;
+            var middlePos = positionWithRepeats(middleTime, slider);
 
+            double lineBonus = 0;
+            double curveBonus = 0;
+
+            for (; relativeTime <= middleTime; relativeTime += deltaT)
+            {
                 // calculating position of the normal path
-                double progress = relativeTime / slider.SpanDuration;
-                if (slider.RepeatCount % 2 == 1)
-                    progress = 1 - progress; // revert if odd number of repeats
-                Vector2 ballPosition = slider.Position + slider.Path.PositionAt(progress);
+                Vector2 ballPosition = positionWithRepeats(relativeTime, slider);
 
                 // calculation position of the line path
-                float localProgress = (float)((absoluteTime - head.StartTime) / (slider.EndTime - head.StartTime));
+                float localProgress = (float)(relativeTime / (slider.EndTime - head.StartTime));
                 localProgress = Math.Clamp(localProgress, 0, 1);
-                Vector2 lazyPosition = head.Position + (tail.Position - head.Position) * localProgress; // interpolation
+
+                Vector2 linePosition = interpolate(head.Position, tail.Position, localProgress);
 
                 // buff scales from 0 to 1 when slider follow distance is changing from 1.0x to 2.4x
-                double continousBuff = (Vector2.Distance(ballPosition, lazyPosition) - minFollowRadius) / deltaFollowRadius;
-                continousBuff = Math.Clamp(continousBuff, 0, 1) * deltaT;
-                result += (float)continousBuff;
+                double continousLineBuff = (Vector2.Distance(ballPosition, linePosition) - minFollowRadius) / deltaFollowRadius;
+                continousLineBuff = Math.Clamp(continousLineBuff, 0, 1) * deltaT;
+
+                // calculation position of the curvy path
+                localProgress = (float)(relativeTime / middleTime);
+                localProgress = Math.Clamp(localProgress, 0, 1);
+
+                Vector2 curvyPosition = interpolate(head.Position, middlePos, localProgress);
+
+                // buff scales from 0 to 1 when slider follow distance is changing from 1.0x to 2.4x
+                double continousCurveBuff = (Vector2.Distance(ballPosition, curvyPosition) - minFollowRadius) / deltaFollowRadius;
+                continousCurveBuff = Math.Clamp(continousCurveBuff, 0, 1) * deltaT;
+
+                lineBonus += (float)continousLineBuff;
+                curveBonus += (float)continousCurveBuff;
             }
 
+            for (; relativeTime <= slider.SpanDuration; relativeTime += deltaT)
+            {
+                // calculating position of the normal path
+                Vector2 ballPosition = positionWithRepeats(relativeTime, slider);
+
+                // calculation position of the line path
+                float localProgress = (float)(relativeTime / (slider.EndTime - head.StartTime));
+                localProgress = Math.Clamp(localProgress, 0, 1);
+
+                Vector2 linePosition = interpolate(head.Position, tail.Position, localProgress);
+
+                // buff scales from 0 to 1 when slider follow distance is changing from 1.0x to 2.4x
+                double continousLineBuff = (Vector2.Distance(ballPosition, linePosition) - minFollowRadius) / deltaFollowRadius;
+                continousLineBuff = Math.Clamp(continousLineBuff, 0, 1) * deltaT;
+
+                // calculation position of the curvy path
+                localProgress = (float)((relativeTime - middleTime) / (slider.SpanDuration - middleTime));
+                localProgress = Math.Clamp(localProgress, 0, 1);
+
+                Vector2 curvyPosition = interpolate(middlePos, tail.Position, localProgress);
+
+                // buff scales from 0 to 1 when slider follow distance is changing from 1.0x to 2.4x
+                double continousCurveBuff = (Vector2.Distance(ballPosition, curvyPosition) - minFollowRadius) / deltaFollowRadius;
+                continousCurveBuff = Math.Clamp(continousCurveBuff, 0, 1) * deltaT;
+
+                lineBonus += (float)continousLineBuff;
+                curveBonus += (float)continousCurveBuff;
+            }
+
+            double comfortableCurveFactor = getCurveComfort(head.Position, middlePos, tail.Position);
+            double curveDegreeFactor = getCurveDegree(head.Position, middlePos, tail.Position);
+
+            curveBonus = interpolate(lineBonus, curveBonus, comfortableCurveFactor * curveDegreeFactor);
+
             if (slider.SpanDuration == 0) return 0;
-            return (float)(result / slider.SpanDuration);
+            return (float)(Math.Min(lineBonus, curveBonus) / slider.SpanDuration);
         }
         private static double calculateSliderEndComplexityDifficulty(Slider slider)
         {
