@@ -291,7 +291,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Preprocessing
                     // For sliders that are circular, the lazy end position may actually be farther away than the sliders true end.
                     // This code is designed to prevent buffing situations where lazy end is actually a less efficient movement.
                     Vector2 lazyMovement = Vector2.Subtract((Vector2)slider.LazyEndPosition, currCursorPosition);
-                    Vector2 visualLazyMovement = Vector2.Subtract((Vector2)slider.LineLazyEndPosition, currCursorPosition);
+                    Vector2 lineLazyMovement = Vector2.Subtract((Vector2)slider.LineLazyEndPosition, currCursorPosition);
 
                     lineCurrMovement = currMovement;
 
@@ -301,8 +301,8 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Preprocessing
                     currMovementLength = scalingFactor * currMovement.Length;
 
                     // same for visual things
-                    if (visualLazyMovement.Length < lineCurrMovement.Length)
-                        lineCurrMovement = visualLazyMovement;
+                    if (lineLazyMovement.Length < lineCurrMovement.Length)
+                        lineCurrMovement = lineLazyMovement;
 
                     lineCurrMovementLength = scalingFactor * lineCurrMovement.Length;
 
