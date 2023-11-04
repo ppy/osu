@@ -67,17 +67,6 @@ namespace osu.Game.Tests.Visual.Editing
                    && checkCombos;
         }
 
-        private bool checkSnapAndSelectColumn(double startTime, List<(int, int)> columnPairs = null)
-        {
-            bool checkColumns = columnPairs != null
-                ? EditorBeatmap.SelectedHitObjects.All(x => columnPairs.Any(col => isNoteAt(x, col.Item1, col.Item2)))
-                : !EditorBeatmap.SelectedHitObjects.Any();
-
-            return EditorClock.CurrentTime == startTime
-                   && EditorBeatmap.SelectedHitObjects.Count == (columnPairs?.Count ?? 0)
-                   && checkColumns;
-        }
-
         private bool hasCombosInOrder(IEnumerable<HitObject> selected, params int[] comboNumbers)
         {
             List<HitObject> hitObjects = selected.ToList();
@@ -89,6 +78,17 @@ namespace osu.Game.Tests.Visual.Editing
                               .Any();
         }
 
+        private bool checkSnapAndSelectColumn(double startTime, IReadOnlyCollection<(int, int)> columnPairs = null)
+        {
+            bool checkColumns = columnPairs != null
+                ? EditorBeatmap.SelectedHitObjects.All(x => columnPairs.Any(col => isNoteAt(x, col.Item1, col.Item2)))
+                : !EditorBeatmap.SelectedHitObjects.Any();
+
+            return EditorClock.CurrentTime == startTime
+                   && EditorBeatmap.SelectedHitObjects.Count == (columnPairs?.Count ?? 0)
+                   && checkColumns;
+        }
+
         private bool isNoteAt(HitObject hitObject, double time, int column)
         {
             return hitObject is IHasColumn columnInfo
@@ -96,7 +96,7 @@ namespace osu.Game.Tests.Visual.Editing
                    && columnInfo.Column == column;
         }
 
-        public void SetUpEditor(RulesetInfo ruleset)
+        protected void SetUpEditor(RulesetInfo ruleset)
         {
             BeatmapSetInfo beatmapSet = null!;
 
@@ -320,6 +320,7 @@ namespace osu.Game.Tests.Visual.Editing
                 { (956, 1) })
             );
 
+            // TODO: discuss - this selects the first 2 objects on Stable, do we want that or is this fine?
             AddStepClickLink("00:00:000 (1,2)", "std link");
             AddAssert("snap to 1, select none", () => checkSnapAndSelectColumn(956));
         }

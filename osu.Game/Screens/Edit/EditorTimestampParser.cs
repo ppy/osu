@@ -32,7 +32,7 @@ namespace osu.Game.Screens.Edit
             return (times[0] * 60 + times[1]) * 1_000 + times[2];
         }
 
-        public static List<HitObject> GetSelectedHitObjects(IEnumerable<HitObject> editorHitObjects, string objectsGroup, double position)
+        public static List<HitObject> GetSelectedHitObjects(IReadOnlyList<HitObject> editorHitObjects, string objectsGroup, double position)
         {
             List<HitObject> hitObjects = editorHitObjects.Where(x => x.StartTime >= position).ToList();
             List<HitObject> selectedObjects = new List<HitObject>();
@@ -51,7 +51,7 @@ namespace osu.Game.Screens.Edit
             }
 
             // Stable behavior
-            // - always selects next closest object when `objectsGroup` only has one, non-Column item
+            // - always selects the next closest object when `objectsGroup` only has one (combo) item
             if (objectsToSelect.Length != 1 || objectsGroup.Contains('|'))
                 return selectedObjects;
 

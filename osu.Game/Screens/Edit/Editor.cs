@@ -1138,11 +1138,33 @@ namespace osu.Game.Screens.Edit
             loader?.CancelPendingDifficultySwitch();
         }
 
-        public void SeekAndSelectHitObjects(string timeGroup, string objectsGroup)
+        public void SeekAndSelectHitObjects(string timestamp, Action<LocalisableString> onError)
         {
+            string[] groups = EditorTimestampParser.GetRegexGroups(timestamp);
+
+            if (groups.Length != 2 || string.IsNullOrEmpty(groups[0]))
+            {
+                onError.Invoke(EditorStrings.FailedToProcessTimestamp);
+                return;
+            }
+
+            string timeGroup = groups[0];
+            string objectsGroup = groups[1];
+            string timeMinutes = timeGroup.Split(':').FirstOrDefault() ?? string.Empty;
+
+            // Currently, lazer chat highlights infinite-long editor links like `10000000000:00:000 (1)`
+            // Limit timestamp link length at 30000 min (50 hr) to avoid parsing issues
+            if (timeMinutes.Length > 5 || double.Parse(timeMinutes) > 30_000)
+            {
+                onError.Invoke(EditorStrings.TooLongTimestamp);
+                return;
+            }
+
             double position = EditorTimestampParser.GetTotalMilliseconds(timeGroup);
+
             editorBeatmap.SelectedHitObjects.Clear();
 
+            // Only seeking is necessary
             if (string.IsNullOrEmpty(objectsGroup))
             {
                 if (clock.IsRunning)
@@ -1155,8 +1177,9 @@ namespace osu.Game.Screens.Edit
             if (Mode.Value != EditorScreenMode.Compose)
                 Mode.Value = EditorScreenMode.Compose;
 
-            // Seek to the next closest HitObject's position
+            // Seek to the next closest HitObject
             HitObject nextObject = editorBeatmap.HitObjects.FirstOrDefault(x => x.StartTime >= position);
+
             if (nextObject != null && nextObject.StartTime > 0)
                 position = nextObject.StartTime;
 
