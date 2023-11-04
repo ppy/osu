@@ -1138,7 +1138,7 @@ namespace osu.Game.Screens.Edit
             loader?.CancelPendingDifficultySwitch();
         }
 
-        public void SeekToTimestamp(string timeGroup, string objectsGroup)
+        public void SeekAndSelectHitObjects(string timeGroup, string objectsGroup)
         {
             double position = EditorTimestampParser.GetTotalMilliseconds(timeGroup);
             editorBeatmap.SelectedHitObjects.Clear();
