@@ -1,15 +1,12 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using System;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Cursor;
 using osu.Framework.Input.Events;
-using osu.Framework.Localisation;
 using osu.Game.Graphics.Containers;
-using osu.Game.Localisation;
 using osu.Game.Online.API.Requests.Responses;
 using osuTK;
 
@@ -23,24 +20,6 @@ namespace osu.Game.Users.Drawables
         {
             Width = 300
         };
-
-        public override LocalisableString TooltipText
-        {
-            get
-            {
-                if (!Enabled.Value)
-                    return string.Empty;
-
-                return ShowUsernameTooltip ? (user?.Username ?? string.Empty) : ContextMenuStrings.ViewProfile;
-            }
-            set => throw new NotSupportedException();
-        }
-
-        /// <summary>
-        /// By default, the tooltip will show "view profile" as avatars are usually displayed next to a username.
-        /// Setting this to <c>true</c> exposes the username via tooltip for special cases where this is not true.
-        /// </summary>
-        public bool ShowUsernameTooltip { get; set; }
 
         private readonly APIUser? user;
 

@@ -74,7 +74,6 @@ namespace osu.Game.Users.Drawables
             {
                 return new ClickableAvatar(user)
                 {
-                    ShowUsernameTooltip = showUsernameTooltip,
                     RelativeSizeAxes = Axes.Both,
                 };
             }
