@@ -120,8 +120,6 @@ namespace osu.Game.Skinning
                                 var accuracy = container.OfType<ArgonAccuracyCounter>().FirstOrDefault();
                                 var comboWedge = container.OfType<ArgonComboWedge>().FirstOrDefault();
                                 var combo = container.OfType<ArgonComboCounter>().FirstOrDefault();
-                                var rightWedge = container.OfType<ArgonRightWedge>().FirstOrDefault();
-                                var ppCounter = container.OfType<ArgonPerformancePointsCounter>().FirstOrDefault();
                                 var songProgress = container.OfType<ArgonSongProgress>().FirstOrDefault();
                                 var keyCounter = container.OfType<ArgonKeyCounterDisplay>().FirstOrDefault();
 
@@ -159,20 +157,6 @@ namespace osu.Game.Skinning
                                             combo.Anchor = Anchor.TopLeft;
                                             combo.Origin = Anchor.TopLeft;
                                             combo.Position = new Vector2(components_x_offset, comboWedge.Y - 2);
-                                        }
-                                    }
-
-                                    if (rightWedge != null)
-                                    {
-                                        rightWedge.Anchor = Anchor.TopRight;
-                                        rightWedge.Origin = Anchor.TopRight;
-                                        rightWedge.Position = new Vector2(180, 20);
-
-                                        if (ppCounter != null)
-                                        {
-                                            ppCounter.Anchor = Anchor.TopRight;
-                                            ppCounter.Origin = Anchor.TopRight;
-                                            ppCounter.Position = new Vector2(rightWedge.X - 240, rightWedge.Y + 8);
                                         }
                                     }
 
@@ -222,8 +206,6 @@ namespace osu.Game.Skinning
                                     new ArgonAccuracyCounter(),
                                     new ArgonComboWedge(),
                                     new ArgonComboCounter(),
-                                    new ArgonRightWedge(),
-                                    new ArgonPerformancePointsCounter(),
                                     new BarHitErrorMeter(),
                                     new BarHitErrorMeter(),
                                     new ArgonSongProgress(),
