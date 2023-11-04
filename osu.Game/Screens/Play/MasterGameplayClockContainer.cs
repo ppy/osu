@@ -54,7 +54,7 @@ namespace osu.Game.Screens.Play
         ///
         /// In the future I want to change this.
         /// </summary>
-        private double? actualStopTime;
+        internal double? LastStopTime;
 
         [Resolved]
         private MusicController musicController { get; set; } = null!;
@@ -100,7 +100,7 @@ namespace osu.Game.Screens.Play
 
         protected override void StopGameplayClock()
         {
-            actualStopTime = GameplayClock.CurrentTime;
+            LastStopTime = GameplayClock.CurrentTime;
 
             if (IsLoaded)
             {
@@ -127,17 +127,17 @@ namespace osu.Game.Screens.Play
         public override void Seek(double time)
         {
             // Safety in case the clock is seeked while stopped.
-            actualStopTime = null;
+            LastStopTime = null;
 
             base.Seek(time);
         }
 
         protected override void PrepareStart()
         {
-            if (actualStopTime != null)
+            if (LastStopTime != null)
             {
-                Seek(actualStopTime.Value);
-                actualStopTime = null;
+                Seek(LastStopTime.Value);
+                LastStopTime = null;
             }
             else
                 base.PrepareStart();

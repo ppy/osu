@@ -273,6 +273,9 @@ namespace osu.Game.Skinning
 
                 case LegacyManiaSkinConfigurationLookups.KeysUnderNotes:
                     return SkinUtils.As<TValue>(new Bindable<bool>(existing.KeysUnderNotes));
+
+                case LegacyManiaSkinConfigurationLookups.LightFramePerSecond:
+                    return SkinUtils.As<TValue>(new Bindable<int>(existing.LightFramePerSecond));
             }
 
             return null;

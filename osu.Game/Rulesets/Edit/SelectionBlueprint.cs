@@ -5,6 +5,7 @@
 
 using System;
 using System.Linq;
+using JetBrains.Annotations;
 using osu.Framework;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
@@ -51,6 +52,7 @@ namespace osu.Game.Rulesets.Edit
 
         private SelectionState state;
 
+        [CanBeNull]
         public event Action<SelectionState> StateChanged;
 
         public SelectionState State
