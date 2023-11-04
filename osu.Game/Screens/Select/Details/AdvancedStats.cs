@@ -16,6 +16,7 @@ using osu.Game.Beatmaps;
 using osu.Framework.Bindables;
 using System.Collections.Generic;
 using osu.Game.Rulesets.Mods;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using osu.Framework.Extensions;
@@ -25,7 +26,6 @@ using osu.Framework.Utils;
 using osu.Game.Configuration;
 using osu.Game.Resources.Localisation.Web;
 using osu.Game.Rulesets;
-using System.Linq;
 
 namespace osu.Game.Screens.Select.Details
 {
