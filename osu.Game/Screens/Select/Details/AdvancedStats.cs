@@ -8,6 +8,7 @@ using osu.Framework.Allocation;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
+using osu.Framework.Graphics.Cursor;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Graphics.UserInterface;
@@ -28,7 +29,7 @@ using System.Linq;
 
 namespace osu.Game.Screens.Select.Details
 {
-    public partial class AdvancedStats : Container
+    public partial class AdvancedStats : Container, IHasTooltip
     {
         [Resolved]
         private BeatmapDifficultyCache difficultyCache { get; set; }
@@ -43,6 +44,9 @@ namespace osu.Game.Screens.Select.Details
 
         protected readonly StatisticRow FirstValue, HpDrain, Accuracy, ApproachRate;
         private readonly StatisticRow starDifficulty;
+
+        private BeatmapDifficulty originalDifficulty = null;
+        private bool haveRateChangedValues = false;
 
         private IBeatmapInfo beatmapInfo;
 
@@ -125,13 +129,15 @@ namespace osu.Game.Screens.Select.Details
                 foreach (var mod in mods.Value.OfType<IApplicableToDifficulty>())
                     mod.ApplyToDifficulty(adjustedDifficulty);
 
-                // For now we not using rate adjusted difficulty here
+                originalDifficulty = adjustedDifficulty;
 
-                //Ruleset ruleset = gameRuleset.Value.CreateInstance();
-                //double rate = 1;
-                //foreach (var mod in mods.Value.OfType<IApplicableToRate>())
-                //    rate = mod.ApplyToRate(0, rate);
-                //adjustedDifficulty = ruleset.GetRateAdjustedDifficulty(adjustedDifficulty, rate);
+                Ruleset ruleset = gameRuleset.Value.CreateInstance();
+                double rate = 1;
+                foreach (var mod in mods.Value.OfType<IApplicableToRate>())
+                    rate = mod.ApplyToRate(0, rate);
+                adjustedDifficulty = ruleset.GetRateAdjustedDifficulty(adjustedDifficulty, rate);
+
+                haveRateChangedValues = !isDifferentArOd(originalDifficulty, adjustedDifficulty);
             }
 
             switch (BeatmapInfo?.Ruleset.OnlineID)
@@ -194,6 +200,30 @@ namespace osu.Game.Screens.Select.Details
             base.Dispose(isDisposing);
             modSettingChangeTracker?.Dispose();
             starDifficultyCancellationSource?.Cancel();
+        }
+
+        private bool isDifferentArOd(BeatmapDifficulty a, BeatmapDifficulty b)
+        {
+            if (a == null && b == null) return true;
+            if (a == null || b == null) return false;
+
+            if (!Precision.AlmostEquals(a.ApproachRate, b.ApproachRate, 0.01)) return false;
+            if (!Precision.AlmostEquals(a.OverallDifficulty, b.OverallDifficulty, 0.01)) return false;
+
+            return true;
+        }
+
+        public LocalisableString TooltipText
+        {
+            get
+            {
+                if (haveRateChangedValues)
+                {
+                    return LocalisableString.Format("Values are changed by mods that change speed.\n" +
+                        "Original values: AR = {0}, OD = {1}", originalDifficulty?.ApproachRate ?? 0, originalDifficulty?.OverallDifficulty ?? 0);
+                }
+                return "";
+            }
         }
 
         public partial class StatisticRow : Container, IHasAccentColour
