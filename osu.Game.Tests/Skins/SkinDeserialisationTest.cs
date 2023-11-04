@@ -55,8 +55,8 @@ namespace osu.Game.Tests.Skins
             "Archives/modified-argon-pro-20230618.osk",
             // Covers "Argon" health display
             "Archives/modified-argon-pro-20231001.osk",
-            // Covers "Argon" score/combo/accuracy/pp counters, and wedges
-            "Archives/modified-argon-pro-20231026.osk"
+            // Covers "Argon" accuracy/score/combo counters, and wedges
+            "Archives/modified-argon-pro-20231105.osk",
         };
 
         /// <summary>
