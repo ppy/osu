@@ -562,8 +562,9 @@ namespace osu.Game
         {
             if (ScreenStack.CurrentScreen is not Editor editor)
             {
-                waitForReady(() => Notifications, _ => Notifications.Post(new SimpleErrorNotification
+                waitForReady(() => Notifications, _ => Notifications.Post(new SimpleNotification
                 {
+                    Icon = FontAwesome.Solid.ExclamationTriangle,
                     Text = EditorStrings.MustBeInEdit,
                 }));
                 return;
@@ -573,8 +574,9 @@ namespace osu.Game
 
             if (groups.Length != 2 || string.IsNullOrEmpty(groups[0]))
             {
-                waitForReady(() => Notifications, _ => Notifications.Post(new SimpleErrorNotification
+                waitForReady(() => Notifications, _ => Notifications.Post(new SimpleNotification
                 {
+                    Icon = FontAwesome.Solid.ExclamationTriangle,
                     Text = EditorStrings.FailedToProcessTimestamp
                 }));
                 return;
@@ -588,8 +590,9 @@ namespace osu.Game
             // Limit timestamp link length at 30000 min (50 hr) to avoid parsing issues
             if (timeMinutes.Length > 5 || double.Parse(timeMinutes) > 30_000)
             {
-                waitForReady(() => Notifications, _ => Notifications.Post(new SimpleErrorNotification
+                waitForReady(() => Notifications, _ => Notifications.Post(new SimpleNotification
                 {
+                    Icon = FontAwesome.Solid.ExclamationTriangle,
                     Text = EditorStrings.TooLongTimestamp
                 }));
                 return;
