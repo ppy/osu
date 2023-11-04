@@ -119,6 +119,21 @@ namespace osu.Game.Localisation
         /// </summary>
         public static LocalisableString LimitedDistanceSnap => new TranslatableString(getKey(@"limited_distance_snap_grid"), @"Limit distance snap placement to current time");
 
+        /// <summary>
+        /// "Must be in edit mode to handle editor links"
+        /// </summary>
+        public static LocalisableString MustBeInEdit => new TranslatableString(getKey(@"must_be_in_edit"), @"Must be in edit mode to handle editor links");
+
+        /// <summary>
+        /// "Failed to process timestamp"
+        /// </summary>
+        public static LocalisableString FailedToProcessTimestamp => new TranslatableString(getKey(@"failed_to_process_timestamp"), @"Failed to process timestamp");
+
+        /// <summary>
+        /// "The timestamp was too long to process"
+        /// </summary>
+        public static LocalisableString TooLongTimestamp => new TranslatableString(getKey(@"too_long_timestamp"), @"The timestamp was too long to process");
+
         private static string getKey(string key) => $@"{prefix}:{key}";
     }
 }

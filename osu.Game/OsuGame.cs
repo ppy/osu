@@ -58,6 +58,7 @@ using osu.Game.Performance;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Scoring;
 using osu.Game.Screens;
+using osu.Game.Screens.Edit;
 using osu.Game.Screens.Menu;
 using osu.Game.Screens.OnlinePlay.Multiplayer;
 using osu.Game.Screens.Play;
@@ -433,6 +434,9 @@ namespace osu.Game
                     break;
 
                 case LinkAction.OpenEditorTimestamp:
+                    SeekToTimestamp(argString);
+                    break;
+
                 case LinkAction.JoinMultiplayerMatch:
                 case LinkAction.Spectate:
                     waitForReady(() => Notifications, _ => Notifications.Post(new SimpleNotification
@@ -549,6 +553,50 @@ namespace osu.Game
         /// <param name="updateStream">The update stream name</param>
         /// <param name="version">The build version of the update stream</param>
         public void ShowChangelogBuild(string updateStream, string version) => waitForReady(() => changelogOverlay, _ => changelogOverlay.ShowBuild(updateStream, version));
+
+        /// <summary>
+        /// Seek to a given timestamp in the Editor and select relevant HitObjects if needed
+        /// </summary>
+        /// <param name="timestamp">The timestamp and the selected objects</param>
+        public void SeekToTimestamp(string timestamp)
+        {
+            if (ScreenStack.CurrentScreen is not Editor editor)
+            {
+                waitForReady(() => Notifications, _ => Notifications.Post(new SimpleErrorNotification
+                {
+                    Text = EditorStrings.MustBeInEdit,
+                }));
+                return;
+            }
+
+            string[] groups = EditorTimestampParser.GetRegexGroups(timestamp);
+
+            if (groups.Length != 2 || string.IsNullOrEmpty(groups[0]))
+            {
+                waitForReady(() => Notifications, _ => Notifications.Post(new SimpleErrorNotification
+                {
+                    Text = EditorStrings.FailedToProcessTimestamp
+                }));
+                return;
+            }
+
+            string timeGroup = groups[0];
+            string objectsGroup = groups[1];
+            string timeMinutes = timeGroup.Split(':').FirstOrDefault() ?? string.Empty;
+
+            // Currently, lazer chat highlights infinite-long editor links like `10000000000:00:000 (1)`
+            // Limit timestamp link length at 30000 min (50 hr) to avoid parsing issues
+            if (timeMinutes.Length > 5 || double.Parse(timeMinutes) > 30_000)
+            {
+                waitForReady(() => Notifications, _ => Notifications.Post(new SimpleErrorNotification
+                {
+                    Text = EditorStrings.TooLongTimestamp
+                }));
+                return;
+            }
+
+            editor.SeekToTimestamp(timeGroup, objectsGroup);
+        }
 
         /// <summary>
         /// Present a skin select immediately.
