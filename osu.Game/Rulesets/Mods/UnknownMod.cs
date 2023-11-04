@@ -5,7 +5,7 @@ using osu.Framework.Localisation;
 
 namespace osu.Game.Rulesets.Mods
 {
-    public class UnknownMod : Mod
+    public sealed class UnknownMod : Mod
     {
         /// <summary>
         /// The acronym of the mod which could not be resolved.

@@ -11,8 +11,6 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
     {
         public override bool DisplayResult => false;
 
-        protected DrawableSpinner DrawableSpinner => (DrawableSpinner)ParentHitObject;
-
         public DrawableSpinnerTick()
             : this(null)
         {
@@ -29,10 +27,8 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
         {
             base.OnApply();
 
-            // the tick can be theoretically judged at any point in the spinner's duration,
-            // so it must be alive throughout the spinner's entire lifetime.
-            // this mostly matters for correct sample playback.
-            LifetimeStart = DrawableSpinner.HitObject.StartTime;
+            // Lifetime will be managed by `DrawableSpinner`.
+            LifetimeStart = double.MaxValue;
         }
 
         /// <summary>
