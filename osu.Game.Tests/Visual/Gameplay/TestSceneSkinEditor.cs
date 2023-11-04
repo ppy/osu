@@ -96,7 +96,7 @@ namespace osu.Game.Tests.Visual.Gameplay
 
             AddStep("Begin drag top left", () =>
             {
-                InputManager.MoveMouseTo(box1.ScreenSpaceDrawQuad.TopLeft - new Vector2(box1.ScreenSpaceDrawQuad.Width / 4));
+                InputManager.MoveMouseTo(box1.ScreenSpaceDrawQuad.TopLeft - new Vector2(box1.ScreenSpaceDrawQuad.Width / 4, box1.ScreenSpaceDrawQuad.Height / 8));
                 InputManager.PressButton(MouseButton.Left);
             });
 
@@ -146,8 +146,7 @@ namespace osu.Game.Tests.Visual.Gameplay
             {
                 AddStep("Add big black box", () =>
                 {
-                    InputManager.MoveMouseTo(skinEditor.ChildrenOfType<BigBlackBox>().First());
-                    InputManager.Click(MouseButton.Left);
+                    skinEditor.ChildrenOfType<SkinComponentToolbox.ToolboxComponentButton>().First(b => b.ChildrenOfType<BigBlackBox>().FirstOrDefault() != null).TriggerClick();
                 });
 
                 AddStep("store box", () =>
