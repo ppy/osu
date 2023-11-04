@@ -1,7 +1,6 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using osu.Framework.Allocation;
 using osu.Framework.Extensions.LocalisationExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
@@ -18,11 +17,6 @@ namespace osu.Game.Screens.Play
     public partial class ArgonPerformancePointsCounter : GameplayPerformancePointsCounter, ISerialisableDrawable
     {
         public bool UsesFixedAnchor { get; set; }
-
-        [BackgroundDependencyLoader]
-        private void load()
-        {
-        }
 
         protected override IHasText CreateText() => new TextComponent();
 
@@ -42,6 +36,7 @@ namespace osu.Game.Screens.Play
 
                 InternalChild = new FillFlowContainer
                 {
+                    AutoSizeAxes = Axes.Both,
                     Direction = FillDirection.Vertical,
                     Children = new[]
                     {

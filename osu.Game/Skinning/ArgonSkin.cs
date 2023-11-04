@@ -171,8 +171,8 @@ namespace osu.Game.Skinning
                                         if (ppCounter != null)
                                         {
                                             ppCounter.Anchor = Anchor.TopRight;
-                                            ppCounter.Origin = Anchor.TopRight;
-                                            ppCounter.Position = new Vector2(rightWedge.X - 240, rightWedge.Y + 8);
+                                            ppCounter.Origin = Anchor.TopLeft;
+                                            ppCounter.Position = new Vector2(rightWedge.X - 250, rightWedge.Y + 8);
                                         }
                                     }
 
