@@ -9,6 +9,7 @@ using osu.Framework.Extensions.LocalisationExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Colour;
+using osu.Framework.Graphics.Cursor;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Localisation;
 using osu.Game.Beatmaps;
@@ -23,6 +24,7 @@ using osuTK.Graphics;
 using System.Threading;
 using osu.Framework.Input.Events;
 using osu.Game.Configuration;
+using osu.Game.Rulesets.Difficulty;
 
 namespace osu.Game.Overlays.Mods
 {
@@ -30,7 +32,7 @@ namespace osu.Game.Overlays.Mods
     /// On the mod select overlay, this provides a local updating view of BPM, star rating and other
     /// difficulty attributes so the user can have a better insight into what mods are changing.
     /// </summary>
-    public partial class BeatmapAttributesDisplay : CompositeDrawable
+    public partial class BeatmapAttributesDisplay : CompositeDrawable, IHasTooltip
     {
         private Container content = null!;
         private Container innerContent = null!;
@@ -70,6 +72,10 @@ namespace osu.Game.Overlays.Mods
 
         private CancellationTokenSource? cancellationSource;
         private IBindable<StarDifficulty?> starDifficulty = null!;
+
+        private BeatmapDifficulty? baseDifficultyAttributes = null;
+
+        private bool haveRateChangedValues = false;
 
         [BackgroundDependencyLoader]
         private void load()
@@ -256,8 +262,12 @@ namespace osu.Game.Overlays.Mods
             foreach (var mod in mods.Value.OfType<IApplicableToDifficulty>())
                 mod.ApplyToDifficulty(moddedDifficulty);
 
+            baseDifficultyAttributes = moddedDifficulty;
+
             Ruleset ruleset = gameRuleset.Value.CreateInstance();
             var rateAdjustedDifficulty = ruleset.GetRateAdjustedDifficulty(moddedDifficulty, rate);
+
+            haveRateChangedValues = !haveEqualDifficulties(rateAdjustedDifficulty, moddedDifficulty);
 
             approachRateDisplay.AdjustType.Value = VerticalAttributeDisplay.CalculateEffect(moddedDifficulty.ApproachRate, rateAdjustedDifficulty.ApproachRate);
             overallDifficultyDisplay.AdjustType.Value = VerticalAttributeDisplay.CalculateEffect(moddedDifficulty.OverallDifficulty, rateAdjustedDifficulty.OverallDifficulty);
@@ -267,6 +277,19 @@ namespace osu.Game.Overlays.Mods
             approachRateDisplay.Current.Value = rateAdjustedDifficulty.ApproachRate;
             overallDifficultyDisplay.Current.Value = rateAdjustedDifficulty.OverallDifficulty;
         });
+
+        private bool haveEqualDifficulties(BeatmapDifficulty? a, BeatmapDifficulty? b)
+        {
+            if (a == null && b == null) return true;
+            if (a == null || b == null) return false;
+
+            if (a.ApproachRate != b.ApproachRate) return false;
+            if (a.OverallDifficulty != b.OverallDifficulty) return false;
+            if (a.DrainRate != b.DrainRate) return false;
+            if (a.CircleSize != b.CircleSize) return false;
+
+            return true;
+        }
 
         private void updateCollapsedState()
         {
@@ -284,6 +307,18 @@ namespace osu.Game.Overlays.Mods
                 Font = OsuFont.Default.With(size: 20, weight: FontWeight.SemiBold),
                 UseFullGlyphHeight = false,
             };
+        }
+
+        public LocalisableString TooltipText
+        {
+            get
+            {
+                if (haveRateChangedValues)
+                {
+                    return "Some of the values are Rate-Adjusted.";
+                }
+                return "";
+            }
         }
     }
 }
