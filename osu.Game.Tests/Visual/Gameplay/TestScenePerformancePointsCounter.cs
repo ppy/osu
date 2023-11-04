@@ -16,7 +16,6 @@ using osu.Game.Rulesets.Osu;
 using osu.Game.Rulesets.Osu.Judgements;
 using osu.Game.Rulesets.Scoring;
 using osu.Game.Screens.Play;
-using osu.Game.Screens.Play.HUD;
 using osuTK;
 
 namespace osu.Game.Tests.Visual.Gameplay
@@ -30,7 +29,7 @@ namespace osu.Game.Tests.Visual.Gameplay
 
         private int iteration;
         private Bindable<JudgementResult> lastJudgementResult = new Bindable<JudgementResult>();
-        private PerformancePointsCounter counter;
+        private ArgonPerformancePointsCounter counter;
 
         [SetUpSteps]
         public void SetUpSteps() => AddStep("create components", () =>
@@ -66,7 +65,7 @@ namespace osu.Game.Tests.Visual.Gameplay
 
         private void createCounter() => AddStep("Create counter", () =>
         {
-            dependencyContainer.Child = counter = new PerformancePointsCounter
+            dependencyContainer.Child = counter = new ArgonPerformancePointsCounter
             {
                 Anchor = Anchor.Centre,
                 Origin = Anchor.Centre,
