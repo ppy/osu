@@ -39,6 +39,7 @@ using osu.Game.Overlays.Notifications;
 using osu.Game.Overlays.OSD;
 using osu.Game.Rulesets;
 using osu.Game.Rulesets.Edit;
+using osu.Game.Rulesets.Objects;
 using osu.Game.Screens.Edit.Components.Menus;
 using osu.Game.Screens.Edit.Compose;
 using osu.Game.Screens.Edit.Compose.Components.Timeline;
@@ -1135,6 +1136,39 @@ namespace osu.Game.Screens.Edit
         {
             updateSampleDisabledState();
             loader?.CancelPendingDifficultySwitch();
+        }
+
+        public void SeekToTimestamp(string timeGroup, string objectsGroup)
+        {
+            double position = EditorTimestampParser.GetTotalMilliseconds(timeGroup);
+            editorBeatmap.SelectedHitObjects.Clear();
+
+            if (string.IsNullOrEmpty(objectsGroup))
+            {
+                if (clock.IsRunning)
+                    clock.Stop();
+
+                clock.Seek(position);
+                return;
+            }
+
+            if (Mode.Value != EditorScreenMode.Compose)
+                Mode.Value = EditorScreenMode.Compose;
+
+            // Seek to the next closest HitObject's position
+            HitObject nextObject = editorBeatmap.HitObjects.FirstOrDefault(x => x.StartTime >= position);
+            if (nextObject != null && nextObject.StartTime > 0)
+                position = nextObject.StartTime;
+
+            List<HitObject> selected = EditorTimestampParser.GetSelectedHitObjects(editorBeatmap.HitObjects.ToList(), objectsGroup, position);
+
+            if (selected.Any())
+                editorBeatmap.SelectedHitObjects.AddRange(selected);
+
+            if (clock.IsRunning)
+                clock.Stop();
+
+            clock.Seek(position);
         }
 
         public double SnapTime(double time, double? referenceTime) => editorBeatmap.SnapTime(time, referenceTime);
