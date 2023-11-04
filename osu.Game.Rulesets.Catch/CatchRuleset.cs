@@ -238,37 +238,14 @@ namespace osu.Game.Rulesets.Catch
         public float ArFromPreempt(double preempt) => (float)(preempt > 1200 ? ((1800 - preempt) / 120) : ((1200 - preempt) / 150)) + 5;
         public float ChangeArFromRate(float AR, double rate) => ArFromPreempt(PreemptFromAr(AR) / rate);
 
-        public override BeatmapDifficulty GetEffectiveDifficulty(IBeatmapDifficultyInfo baseDifficulty, IReadOnlyList<Mod> mods, ref (RateAdjustType AR, RateAdjustType OD) rateAdjustedInfo)
+        public override BeatmapDifficulty GetRateAdjustedDifficulty(IBeatmapDifficultyInfo baseDifficulty, double rate)
         {
-            BeatmapDifficulty? adjustedDifficulty = null;
-            rateAdjustedInfo = (RateAdjustType.NotChanged, RateAdjustType.NotChanged);
+            BeatmapDifficulty adjustedDifficulty = new BeatmapDifficulty(baseDifficulty);
 
-            if (mods.Any(m => m is IApplicableToDifficulty))
-            {
-                adjustedDifficulty = new BeatmapDifficulty(baseDifficulty);
-
-                foreach (var mod in mods.OfType<IApplicableToDifficulty>())
-                    mod.ApplyToDifficulty(adjustedDifficulty);
-            }
-
-            if (mods.Any(m => m is ModRateAdjust))
-            {
-                adjustedDifficulty ??= new BeatmapDifficulty(baseDifficulty);
-
-                foreach (var mod in mods.OfType<ModRateAdjust>())
-                {
-                    double speedChange = (float)mod.SpeedChange.Value;
-
-                    float ar = adjustedDifficulty.ApproachRate;
-                    float od = adjustedDifficulty.OverallDifficulty;
-
-                    adjustedDifficulty.ApproachRate = ChangeArFromRate(ar, speedChange);
-
-                    rateAdjustedInfo.AR = GetRateAdjustType(ar, adjustedDifficulty.ApproachRate);
-                }
-            }
+            adjustedDifficulty.ApproachRate = ChangeArFromRate(adjustedDifficulty.ApproachRate, rate);
 
             return adjustedDifficulty ?? (BeatmapDifficulty)baseDifficulty;
         }
+
     }
 }
