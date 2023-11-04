@@ -166,7 +166,7 @@ namespace osu.Game.Skinning
                                     {
                                         rightWedge.Anchor = Anchor.TopRight;
                                         rightWedge.Origin = Anchor.TopRight;
-                                        rightWedge.Position = new Vector2(180, 20);
+                                        rightWedge.Position = new Vector2(180, 80);
 
                                         if (ppCounter != null)
                                         {
