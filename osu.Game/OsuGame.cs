@@ -598,7 +598,7 @@ namespace osu.Game
                 return;
             }
 
-            editor.SeekToTimestamp(timeGroup, objectsGroup);
+            editor.SeekAndSelectHitObjects(timeGroup, objectsGroup);
         }
 
         /// <summary>
