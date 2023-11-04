@@ -335,37 +335,12 @@ namespace osu.Game.Rulesets.Osu
         public float OdFromHitwindow(double hitwindow300) => (float)(80.0 - hitwindow300) / 6;
         public float ChangeArFromRate(float AR, double rate) => ArFromPreempt(PreemptFromAr(AR) / rate);
         public float ChangeOdFromRate(float OD, double rate) => OdFromHitwindow(HitwindowFromOd(OD) / rate);
-        public override BeatmapDifficulty GetEffectiveDifficulty(IBeatmapDifficultyInfo baseDifficulty, IReadOnlyList<Mod> mods, ref (RateAdjustType AR, RateAdjustType OD) rateAdjustedInfo)
+        public override BeatmapDifficulty GetRateAdjustedDifficulty(IBeatmapDifficultyInfo baseDifficulty, double rate)
         {
-            BeatmapDifficulty? adjustedDifficulty = null;
-            rateAdjustedInfo = (RateAdjustType.NotChanged, RateAdjustType.NotChanged);
+            BeatmapDifficulty adjustedDifficulty = new BeatmapDifficulty(baseDifficulty);
 
-            if (mods.Any(m => m is IApplicableToDifficulty))
-            {
-                adjustedDifficulty = new BeatmapDifficulty(baseDifficulty);
-
-                foreach (var mod in mods.OfType<IApplicableToDifficulty>())
-                    mod.ApplyToDifficulty(adjustedDifficulty);
-            }
-
-            if (mods.Any(m => m is ModRateAdjust))
-            {
-                adjustedDifficulty ??= new BeatmapDifficulty(baseDifficulty);
-
-                foreach (var mod in mods.OfType<ModRateAdjust>())
-                {
-                    double speedChange = (float)mod.SpeedChange.Value;
-
-                    float ar = adjustedDifficulty.ApproachRate;
-                    float od = adjustedDifficulty.OverallDifficulty;
-
-                    adjustedDifficulty.ApproachRate = ChangeArFromRate(ar, speedChange);
-                    adjustedDifficulty.OverallDifficulty = ChangeOdFromRate(od, speedChange);
-
-                    rateAdjustedInfo.AR = GetRateAdjustType(ar, adjustedDifficulty.ApproachRate);
-                    rateAdjustedInfo.OD = GetRateAdjustType(od, adjustedDifficulty.OverallDifficulty);
-                }
-            }
+            adjustedDifficulty.ApproachRate = ChangeArFromRate(adjustedDifficulty.ApproachRate, rate);
+            adjustedDifficulty.OverallDifficulty = ChangeOdFromRate(adjustedDifficulty.OverallDifficulty, rate);
 
             return adjustedDifficulty ?? (BeatmapDifficulty)baseDifficulty;
         }

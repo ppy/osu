@@ -431,34 +431,12 @@ namespace osu.Game.Rulesets.Mania
         public double HitwindowFromOd(float OD) => 64.0 - 3 * OD;
         public float OdFromHitwindow(double hitwindow300) => (float)(64.0 - hitwindow300) / 3;
         public float ChangeOdFromRate(float OD, double rate) => OdFromHitwindow(HitwindowFromOd(OD) / rate);
-        public override BeatmapDifficulty GetEffectiveDifficulty(IBeatmapDifficultyInfo baseDifficulty, IReadOnlyList<Mod> mods, ref (RateAdjustType AR, RateAdjustType OD) rateAdjustedInfo)
+
+        public override BeatmapDifficulty GetRateAdjustedDifficulty(IBeatmapDifficultyInfo baseDifficulty, double rate)
         {
-            BeatmapDifficulty? adjustedDifficulty = null;
-            rateAdjustedInfo = (RateAdjustType.NotChanged, RateAdjustType.NotChanged);
+            BeatmapDifficulty adjustedDifficulty = new BeatmapDifficulty(baseDifficulty);
 
-            if (mods.Any(m => m is IApplicableToDifficulty))
-            {
-                adjustedDifficulty = new BeatmapDifficulty(baseDifficulty);
-
-                foreach (var mod in mods.OfType<IApplicableToDifficulty>())
-                    mod.ApplyToDifficulty(adjustedDifficulty);
-            }
-
-            if (mods.Any(m => m is ModRateAdjust))
-            {
-                adjustedDifficulty ??= new BeatmapDifficulty(baseDifficulty);
-
-                foreach (var mod in mods.OfType<ModRateAdjust>())
-                {
-                    double speedChange = (float)mod.SpeedChange.Value;
-
-                    float od = adjustedDifficulty.OverallDifficulty;
-
-                    adjustedDifficulty.OverallDifficulty = ChangeOdFromRate(od, speedChange);
-
-                    rateAdjustedInfo.OD = GetRateAdjustType(od, adjustedDifficulty.OverallDifficulty);
-                }
-            }
+            adjustedDifficulty.OverallDifficulty = ChangeOdFromRate(adjustedDifficulty.OverallDifficulty, rate);
 
             return adjustedDifficulty ?? (BeatmapDifficulty)baseDifficulty;
         }

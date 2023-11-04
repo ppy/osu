@@ -12,7 +12,6 @@ using osu.Framework.Localisation;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Graphics.UserInterface;
-using osu.Game.Rulesets;
 using osu.Game.Rulesets.Mods;
 using osuTK.Graphics;
 
@@ -28,7 +27,7 @@ namespace osu.Game.Overlays.Mods
 
         private readonly BindableWithCurrent<double> current = new BindableWithCurrent<double>();
 
-        public Bindable<Ruleset.RateAdjustType> RateChangeType = new Bindable<Ruleset.RateAdjustType>(Ruleset.RateAdjustType.NotChanged);
+        public Bindable<ModEffect> AdjustType = new Bindable<ModEffect>();
 
         /// <summary>
         /// Text to display in the top area of the display.
@@ -43,22 +42,22 @@ namespace osu.Game.Overlays.Mods
         private void updateTextColor()
         {
             Color4 newColor;
-            switch (RateChangeType.Value)
+            switch (AdjustType.Value)
             {
-                case Ruleset.RateAdjustType.NotChanged:
+                case ModEffect.NotChanged:
                     newColor = Color4.White;
                     break;
 
-                case Ruleset.RateAdjustType.DifficultyReduction:
+                case ModEffect.DifficultyReduction:
                     newColor = colours.ForModType(ModType.DifficultyReduction);
                     break;
 
-                case Ruleset.RateAdjustType.DifficultyIncrease:
+                case ModEffect.DifficultyIncrease:
                     newColor = colours.ForModType(ModType.DifficultyIncrease);
                     break;
 
                 default:
-                    throw new ArgumentOutOfRangeException(nameof(RateChangeType.Value));
+                    throw new ArgumentOutOfRangeException(nameof(AdjustType.Value));
             }
 
             text.Colour = newColor;
@@ -74,7 +73,7 @@ namespace osu.Game.Overlays.Mods
             Origin = Anchor.CentreLeft;
             Anchor = Anchor.CentreLeft;
 
-            RateChangeType.BindValueChanged(_ => updateTextColor());
+            AdjustType.BindValueChanged(_ => updateTextColor());
 
             InternalChild = new FillFlowContainer
             {
@@ -101,6 +100,24 @@ namespace osu.Game.Overlays.Mods
                 }
             };
         }
+
+        public static ModEffect CalculateEffect(double oldValue, double newValue)
+        {
+            if (newValue == oldValue)
+                return ModEffect.NotChanged;
+            if (newValue < oldValue)
+                return ModEffect.DifficultyReduction;
+
+            return ModEffect.DifficultyIncrease;
+        }
+
+        public enum ModEffect
+        {
+            NotChanged,
+            DifficultyReduction,
+            DifficultyIncrease,
+        }
+
         private partial class EffectCounter : RollingCounter<double>
         {
             protected override double RollingDuration => 500;

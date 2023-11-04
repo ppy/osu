@@ -251,17 +251,21 @@ namespace osu.Game.Overlays.Mods
 
             bpmDisplay.Current.Value = BeatmapInfo.Value.BPM * rate;
 
-            (Ruleset.RateAdjustType AR, Ruleset.RateAdjustType OD) rateAdjustType = (Ruleset.RateAdjustType.NotChanged, Ruleset.RateAdjustType.NotChanged);
+            var moddedDifficulty = new BeatmapDifficulty(BeatmapInfo.Value.Difficulty);
+
+            foreach (var mod in mods.Value.OfType<IApplicableToDifficulty>())
+                mod.ApplyToDifficulty(moddedDifficulty);
 
             Ruleset ruleset = gameRuleset.Value.CreateInstance();
-            BeatmapDifficulty adjustedDifficulty = ruleset.GetEffectiveDifficulty(BeatmapInfo.Value.Difficulty, mods.Value, ref rateAdjustType);
-            approachRateDisplay.RateChangeType.Value = rateAdjustType.AR;
-            overallDifficultyDisplay.RateChangeType.Value = rateAdjustType.OD;
+            var rateAdjustedDifficulty = ruleset.GetRateAdjustedDifficulty(moddedDifficulty, rate);
 
-            circleSizeDisplay.Current.Value = adjustedDifficulty.CircleSize;
-            drainRateDisplay.Current.Value = adjustedDifficulty.DrainRate;
-            approachRateDisplay.Current.Value = adjustedDifficulty.ApproachRate;
-            overallDifficultyDisplay.Current.Value = adjustedDifficulty.OverallDifficulty;
+            approachRateDisplay.AdjustType.Value = VerticalAttributeDisplay.CalculateEffect(moddedDifficulty.ApproachRate, rateAdjustedDifficulty.ApproachRate);
+            overallDifficultyDisplay.AdjustType.Value = VerticalAttributeDisplay.CalculateEffect(moddedDifficulty.OverallDifficulty, rateAdjustedDifficulty.OverallDifficulty);
+
+            circleSizeDisplay.Current.Value = rateAdjustedDifficulty.CircleSize;
+            drainRateDisplay.Current.Value = rateAdjustedDifficulty.DrainRate;
+            approachRateDisplay.Current.Value = rateAdjustedDifficulty.ApproachRate;
+            overallDifficultyDisplay.Current.Value = rateAdjustedDifficulty.OverallDifficulty;
         });
 
         private void updateCollapsedState()
