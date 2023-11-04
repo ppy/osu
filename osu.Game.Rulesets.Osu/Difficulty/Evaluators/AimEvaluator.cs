@@ -18,7 +18,6 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
         private const double velocity_change_multiplier = 0.75;
 
         private const double slider_shape_reading_multiplier = 4;
-        private const double slider_end_complexity_multiplier = 0; // temporary disabled because of wrong edgecase values
         private const double slider_end_distance_multiplier = 0.3;
 
         /// <summary>
@@ -124,9 +123,8 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
                 sliderBonus = osuLastObj.TravelDistance / osuLastObj.TravelTime;
 
                 double readingBonus = 1.0;
-                readingBonus += calculateSliderShapeReadingDifficulty(slider) * slider_shape_reading_multiplier;
-                readingBonus += calculateSliderEndComplexityDifficulty(slider) * slider_end_complexity_multiplier;
-                readingBonus += calculateSliderEndDistanceDifficulty(slider) * slider_end_distance_multiplier;
+                readingBonus += calculateSliderShapeReadingDifficulty(slider);
+                readingBonus += calculateSliderEndDistanceDifficulty(slider);
                 sliderBonus *= Math.Max(readingBonus, 1.0);
             }
 
@@ -165,12 +163,17 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
         {
             Vector2 middleInterpolated = interpolate(start, end, 0.5f);
             float distance = Vector2.Distance(middleInterpolated, middle);
+
             float scaleDistance = Vector2.Distance(start, end);
-            float result = Math.Min(distance / scaleDistance, 1);
+            float maxComfortDistance = scaleDistance / 2;
+
+            float result = Math.Clamp((distance - maxComfortDistance) / scaleDistance, 0, 1);
             return 1 - (double)result;
         }
         private static double calculateSliderShapeReadingDifficulty(Slider slider)
         {
+            if (slider.SpanDuration == 0) return 0;
+
             double minFollowRadius = slider.Radius;
             double maxFollowRadius = slider.Radius * 2.4;
             double deltaFollowRadius = maxFollowRadius - minFollowRadius;
@@ -256,19 +259,14 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
 
             curveBonus = interpolate(lineBonus, curveBonus, comfortableCurveFactor * curveDegreeFactor);
 
-            if (slider.SpanDuration == 0) return 0;
-            return (float)(Math.Min(lineBonus, curveBonus) / slider.SpanDuration);
-        }
-        private static double calculateSliderEndComplexityDifficulty(Slider slider)
-        {
-            if (slider.LazyEndPosition is null) return 0;
-            if (slider.LineLazyEndPosition is null) return 0;
-            if (slider.LazyTravelDistance == 0) return 0;
+            lineBonus *= slider_shape_reading_multiplier / slider.SpanDuration;
+            curveBonus *= slider_shape_reading_multiplier / slider.SpanDuration;
 
-            double complexityDistance = Vector2.Distance((Vector2)slider.LineLazyEndPosition, (Vector2)slider.LazyEndPosition);
-            complexityDistance = Math.Max(complexityDistance - slider.Radius * 0.5, 0); // add threshold with respect to lazer tail leniency
+            double curvedLengthBonus = (Vector2.Distance(head.Position, middlePos) + Vector2.Distance(middlePos, tail.Position))
+                / Vector2.Distance(head.Position, tail.Position) - 1;
+            curveBonus += curvedLengthBonus;
 
-            return complexityDistance / slider.LazyTravelDistance;
+            return (float)Math.Min(lineBonus, curveBonus);
         }
 
         private static double calculateSliderEndDistanceDifficulty(Slider slider)
@@ -282,7 +280,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
 
             double minimalMovement = Vector2.Distance((Vector2)slider.LazyEndPosition, preLastObj.Position) - slider.Radius * 4.8;
             visualDistance *= (float)Math.Clamp(minimalMovement / slider.Radius, 0, 1); // buff only very long sliders
-            return visualDistance / slider.LazyTravelDistance;
+            return (visualDistance / slider.LazyTravelDistance) * slider_end_distance_multiplier;
         }
 
         private static double calcWideAngleBonus(double angle) => Math.Pow(Math.Sin(3.0 / 4 * (Math.Min(5.0 / 6 * Math.PI, Math.Max(Math.PI / 6, angle)) - Math.PI / 6)), 2);
