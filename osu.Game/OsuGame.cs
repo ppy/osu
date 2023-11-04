@@ -562,43 +562,18 @@ namespace osu.Game
         {
             if (ScreenStack.CurrentScreen is not Editor editor)
             {
-                waitForReady(() => Notifications, _ => Notifications.Post(new SimpleNotification
-                {
-                    Icon = FontAwesome.Solid.ExclamationTriangle,
-                    Text = EditorStrings.MustBeInEdit,
-                }));
+                postNotification(EditorStrings.MustBeInEdit);
                 return;
             }
 
-            string[] groups = EditorTimestampParser.GetRegexGroups(timestamp);
+            editor.SeekAndSelectHitObjects(timestamp, onError: postNotification);
+            return;
 
-            if (groups.Length != 2 || string.IsNullOrEmpty(groups[0]))
+            void postNotification(LocalisableString message) => Schedule(() => Notifications.Post(new SimpleNotification
             {
-                waitForReady(() => Notifications, _ => Notifications.Post(new SimpleNotification
-                {
-                    Icon = FontAwesome.Solid.ExclamationTriangle,
-                    Text = EditorStrings.FailedToProcessTimestamp
-                }));
-                return;
-            }
-
-            string timeGroup = groups[0];
-            string objectsGroup = groups[1];
-            string timeMinutes = timeGroup.Split(':').FirstOrDefault() ?? string.Empty;
-
-            // Currently, lazer chat highlights infinite-long editor links like `10000000000:00:000 (1)`
-            // Limit timestamp link length at 30000 min (50 hr) to avoid parsing issues
-            if (timeMinutes.Length > 5 || double.Parse(timeMinutes) > 30_000)
-            {
-                waitForReady(() => Notifications, _ => Notifications.Post(new SimpleNotification
-                {
-                    Icon = FontAwesome.Solid.ExclamationTriangle,
-                    Text = EditorStrings.TooLongTimestamp
-                }));
-                return;
-            }
-
-            editor.SeekAndSelectHitObjects(timeGroup, objectsGroup);
+                Icon = FontAwesome.Solid.ExclamationTriangle,
+                Text = message
+            }));
         }
 
         /// <summary>
