@@ -2,6 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System.Collections.Generic;
+using System.Threading;
 using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
@@ -11,9 +12,12 @@ using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Colour;
 using osu.Framework.Graphics.Cursor;
 using osu.Framework.Graphics.Shapes;
+using osu.Framework.Input.Events;
 using osu.Framework.Localisation;
+using osu.Framework.Utils;
 using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.Drawables;
+using osu.Game.Configuration;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Graphics.UserInterface;
@@ -21,10 +25,6 @@ using osu.Game.Rulesets;
 using osu.Game.Rulesets.Mods;
 using osuTK;
 using osuTK.Graphics;
-using System.Threading;
-using osu.Framework.Input.Events;
-using osu.Game.Configuration;
-using osu.Game.Rulesets.Difficulty;
 
 namespace osu.Game.Overlays.Mods
 {
@@ -73,8 +73,7 @@ namespace osu.Game.Overlays.Mods
         private CancellationTokenSource? cancellationSource;
         private IBindable<StarDifficulty?> starDifficulty = null!;
 
-        private BeatmapDifficulty? baseDifficultyAttributes = null;
-
+        private BeatmapDifficulty? originalDifficulty = null;
         private bool haveRateChangedValues = false;
 
         [BackgroundDependencyLoader]
@@ -257,36 +256,34 @@ namespace osu.Game.Overlays.Mods
 
             bpmDisplay.Current.Value = BeatmapInfo.Value.BPM * rate;
 
-            var moddedDifficulty = new BeatmapDifficulty(BeatmapInfo.Value.Difficulty);
+            var adjustedDifficulty = new BeatmapDifficulty(BeatmapInfo.Value.Difficulty);
 
             foreach (var mod in mods.Value.OfType<IApplicableToDifficulty>())
-                mod.ApplyToDifficulty(moddedDifficulty);
+                mod.ApplyToDifficulty(adjustedDifficulty);
 
-            baseDifficultyAttributes = moddedDifficulty;
+            originalDifficulty = adjustedDifficulty;
 
             Ruleset ruleset = gameRuleset.Value.CreateInstance();
-            var rateAdjustedDifficulty = ruleset.GetRateAdjustedDifficulty(moddedDifficulty, rate);
+            adjustedDifficulty = ruleset.GetRateAdjustedDifficulty(adjustedDifficulty, rate);
 
-            haveRateChangedValues = !haveEqualDifficulties(rateAdjustedDifficulty, moddedDifficulty);
+            haveRateChangedValues = !isDifferentArOd(originalDifficulty, adjustedDifficulty);
 
-            approachRateDisplay.AdjustType.Value = VerticalAttributeDisplay.CalculateEffect(moddedDifficulty.ApproachRate, rateAdjustedDifficulty.ApproachRate);
-            overallDifficultyDisplay.AdjustType.Value = VerticalAttributeDisplay.CalculateEffect(moddedDifficulty.OverallDifficulty, rateAdjustedDifficulty.OverallDifficulty);
+            approachRateDisplay.AdjustType.Value = VerticalAttributeDisplay.CalculateEffect(originalDifficulty.ApproachRate, adjustedDifficulty.ApproachRate);
+            overallDifficultyDisplay.AdjustType.Value = VerticalAttributeDisplay.CalculateEffect(originalDifficulty.OverallDifficulty, adjustedDifficulty.OverallDifficulty);
 
-            circleSizeDisplay.Current.Value = rateAdjustedDifficulty.CircleSize;
-            drainRateDisplay.Current.Value = rateAdjustedDifficulty.DrainRate;
-            approachRateDisplay.Current.Value = rateAdjustedDifficulty.ApproachRate;
-            overallDifficultyDisplay.Current.Value = rateAdjustedDifficulty.OverallDifficulty;
+            circleSizeDisplay.Current.Value = adjustedDifficulty.CircleSize;
+            drainRateDisplay.Current.Value = adjustedDifficulty.DrainRate;
+            approachRateDisplay.Current.Value = adjustedDifficulty.ApproachRate;
+            overallDifficultyDisplay.Current.Value = adjustedDifficulty.OverallDifficulty;
         });
 
-        private bool haveEqualDifficulties(BeatmapDifficulty? a, BeatmapDifficulty? b)
+        private bool isDifferentArOd(BeatmapDifficulty? a, BeatmapDifficulty? b)
         {
             if (a == null && b == null) return true;
             if (a == null || b == null) return false;
 
-            if (a.ApproachRate != b.ApproachRate) return false;
-            if (a.OverallDifficulty != b.OverallDifficulty) return false;
-            if (a.DrainRate != b.DrainRate) return false;
-            if (a.CircleSize != b.CircleSize) return false;
+            if (!Precision.AlmostEquals(a.ApproachRate, b.ApproachRate, 0.01)) return false;
+            if (!Precision.AlmostEquals(a.OverallDifficulty, b.OverallDifficulty, 0.01)) return false;
 
             return true;
         }
@@ -315,7 +312,8 @@ namespace osu.Game.Overlays.Mods
             {
                 if (haveRateChangedValues)
                 {
-                    return "Some of the values are Rate-Adjusted.";
+                    return LocalisableString.Format("Values are changed by mods that change speed.\n" +
+                        "Original values: AR = {0}, OD = {1}", originalDifficulty?.ApproachRate ?? 0, originalDifficulty?.OverallDifficulty ?? 0);
                 }
                 return "";
             }

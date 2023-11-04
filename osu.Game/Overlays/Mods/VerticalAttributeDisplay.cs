@@ -9,6 +9,7 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.UserInterface;
 using osu.Framework.Localisation;
+using osu.Framework.Utils;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Graphics.UserInterface;
@@ -103,7 +104,7 @@ namespace osu.Game.Overlays.Mods
 
         public static ModEffect CalculateEffect(double oldValue, double newValue)
         {
-            if (newValue == oldValue)
+            if (Precision.AlmostEquals(newValue, oldValue, 0.01))
                 return ModEffect.NotChanged;
             if (newValue < oldValue)
                 return ModEffect.DifficultyReduction;
