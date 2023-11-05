@@ -5,6 +5,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Collections.Specialized;
 using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
@@ -50,6 +51,10 @@ namespace osu.Game.Screens.Edit.Compose.Components
 
             Beatmap.HitObjectAdded += AddBlueprintFor;
             Beatmap.HitObjectRemoved += RemoveBlueprintFor;
+
+            // This makes sure HitObjects will have active Blueprints ready to display
+            // after clicking on an Editor Timestamp/Link
+            Beatmap.SelectedHitObjects.CollectionChanged += SetHitObjectsAlive;
 
             if (Composer != null)
             {
@@ -144,6 +149,15 @@ namespace osu.Game.Screens.Edit.Compose.Components
             SelectedItems.AddRange(Beatmap.HitObjects.Except(SelectedItems).ToArray());
         }
 
+        protected void SetHitObjectsAlive(object sender, NotifyCollectionChangedEventArgs e)
+        {
+            if (e == null || e.Action != NotifyCollectionChangedAction.Add || e.NewItems == null)
+                return;
+
+            foreach (HitObject item in e.NewItems)
+                Composer.Playfield.SetKeepAlive(item, true);
+        }
+
         protected override void OnBlueprintSelected(SelectionBlueprint<HitObject> blueprint)
         {
             base.OnBlueprintSelected(blueprint);
@@ -166,6 +180,7 @@ namespace osu.Game.Screens.Edit.Compose.Components
             {
                 Beatmap.HitObjectAdded -= AddBlueprintFor;
                 Beatmap.HitObjectRemoved -= RemoveBlueprintFor;
+                Beatmap.SelectedHitObjects.CollectionChanged -= SetHitObjectsAlive;
             }
 
             usageEventBuffer?.Dispose();
