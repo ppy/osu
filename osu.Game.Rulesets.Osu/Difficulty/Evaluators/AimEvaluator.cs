@@ -87,7 +87,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
                                            * Math.Pow(Math.Sin(Math.PI / 2 * (Math.Clamp(osuCurrObj.LazyJumpDistance, 50, 100) - 50) / 50), 2); // Buff distance exceeding 50 (radius) up to 100 (diameter).
                     }
 
-                    // Penalize wide angles if they're repeated, reducing the penalty as the lastAngle gets more acute.
+                    // Penalize wide angles if they're repeated, reducing the penalty as the lastLastAngle gets more acute.
                     wideAngleBonus *= angleBonus * (1 - Math.Min(wideAngleBonus, Math.Pow(calcWideAngleBonus(lastLastAngle), 3)));
                     // Penalize acute angles if they're repeated, reducing the penalty as the lastLastAngle gets more obtuse.
                     acuteAngleBonus *= 0.5 + 0.5 * (1 - Math.Min(acuteAngleBonus, Math.Pow(calcAcuteAngleBonus(lastLastAngle), 3)));
