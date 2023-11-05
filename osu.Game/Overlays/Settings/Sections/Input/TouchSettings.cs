@@ -3,38 +3,48 @@
 
 using System.Collections.Generic;
 using System.Linq;
+using osu.Framework;
 using osu.Framework.Allocation;
-using osu.Framework.Graphics;
-using osu.Framework.Input.Handlers.Touch;
+using osu.Framework.Input.Handlers;
 using osu.Framework.Localisation;
+using osu.Game.Configuration;
 using osu.Game.Localisation;
 
 namespace osu.Game.Overlays.Settings.Sections.Input
 {
+    /// <summary>
+    /// Touch input settings subsection common to all touch handlers (even on different platforms).
+    /// </summary>
     public partial class TouchSettings : SettingsSubsection
     {
-        private readonly TouchHandler handler;
+        private readonly InputHandler handler;
 
-        public TouchSettings(TouchHandler handler)
+        protected override LocalisableString Header => TouchSettingsStrings.Touch;
+
+        public TouchSettings(InputHandler handler)
         {
             this.handler = handler;
         }
 
         [BackgroundDependencyLoader]
-        private void load()
+        private void load(OsuConfigManager osuConfig)
         {
-            Children = new Drawable[]
+            if (!RuntimeInfo.IsMobile) // don't allow disabling the only input method (touch) on mobile.
             {
-                new SettingsCheckbox
+                Add(new SettingsCheckbox
                 {
                     LabelText = CommonStrings.Enabled,
                     Current = handler.Enabled
-                },
-            };
+                });
+            }
+
+            Add(new SettingsCheckbox
+            {
+                LabelText = TouchSettingsStrings.DisableTapsDuringGameplay,
+                Current = osuConfig.GetBindable<bool>(OsuSetting.MouseDisableButtons)
+            });
         }
 
         public override IEnumerable<LocalisableString> FilterTerms => base.FilterTerms.Concat(new LocalisableString[] { @"touchscreen" });
-
-        protected override LocalisableString Header => handler.Description;
     }
 }
