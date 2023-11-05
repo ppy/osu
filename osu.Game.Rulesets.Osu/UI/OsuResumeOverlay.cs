@@ -19,7 +19,7 @@ namespace osu.Game.Rulesets.Osu.UI
 {
     public partial class OsuResumeOverlay : ResumeOverlay
     {
-        private Container cursorScaleContainer;
+        private Container resumeCursorContainer;
         private OsuClickToResumeCursor clickToResumeCursor;
 
         private OsuCursorContainer localCursorContainer;
@@ -31,7 +31,7 @@ namespace osu.Game.Rulesets.Osu.UI
         [BackgroundDependencyLoader]
         private void load()
         {
-            Add(cursorScaleContainer = new Container
+            Add(resumeCursorContainer = new Container
             {
                 Child = clickToResumeCursor = new OsuClickToResumeCursor { ResumeRequested = Resume }
             });
@@ -42,7 +42,7 @@ namespace osu.Game.Rulesets.Osu.UI
             base.PopIn();
 
             GameplayCursor.ActiveCursor.Hide();
-            cursorScaleContainer.Position = ToLocalSpace(GameplayCursor.ActiveCursor.ScreenSpaceDrawQuad.Centre);
+            resumeCursorContainer.Position = ToLocalSpace(GameplayCursor.ActiveCursor.ScreenSpaceDrawQuad.Centre);
             clickToResumeCursor.Appear();
 
             if (localCursorContainer == null)
