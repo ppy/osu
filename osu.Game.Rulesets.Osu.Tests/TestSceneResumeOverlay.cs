@@ -1,6 +1,7 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using NUnit.Framework;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Cursor;
@@ -12,14 +13,15 @@ namespace osu.Game.Rulesets.Osu.Tests
 {
     public partial class TestSceneResumeOverlay : OsuManualInputManagerTestScene
     {
-        public TestSceneResumeOverlay()
+        private ManualOsuInputManager osuInputManager = null!;
+        private CursorContainer cursor = null!;
+        private ResumeOverlay resume = null!;
+
+        private bool resumeFired;
+
+        [SetUp]
+        public void SetUp() => Schedule(() =>
         {
-            ManualOsuInputManager osuInputManager;
-            CursorContainer cursor;
-            ResumeOverlay resume;
-
-            bool resumeFired = false;
-
             Child = osuInputManager = new ManualOsuInputManager(new OsuRuleset().RulesetInfo)
             {
                 Children = new Drawable[]
@@ -32,8 +34,13 @@ namespace osu.Game.Rulesets.Osu.Tests
                 }
             };
 
+            resumeFired = false;
             resume.ResumeAction = () => resumeFired = true;
+        });
 
+        [Test]
+        public void TestResume()
+        {
             AddStep("move mouse to center", () => InputManager.MoveMouseTo(ScreenSpaceDrawQuad.Centre));
             AddStep("show", () => resume.Show());
 
