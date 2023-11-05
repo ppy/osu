@@ -330,6 +330,10 @@ namespace osu.Game.Configuration
 
         ShowHealthDisplayWhenCantFail,
         FadePlayfieldWhenHealthLow,
+
+        /// <summary>
+        /// Disables mouse buttons clicks and touchscreen taps during gameplay.
+        /// </summary>
         MouseDisableButtons,
         MouseDisableWheel,
         ConfineMouseMode,
