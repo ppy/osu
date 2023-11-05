@@ -246,7 +246,7 @@ namespace osu.Game.Configuration
                 ),
                 new TrackedSetting<bool>(OsuSetting.MouseDisableButtons, disabledState => new SettingDescription(
                     rawValue: !disabledState,
-                    name: GlobalActionKeyBindingStrings.ToggleGameplayMouseButtons,
+                    name: GlobalActionKeyBindingStrings.ToggleGameplayClicksTaps,
                     value: disabledState ? CommonStrings.Disabled.ToLower() : CommonStrings.Enabled.ToLower(),
                     shortcut: LookupKeyBindings(GlobalAction.ToggleGameplayMouseButtons))
                 ),
