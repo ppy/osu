@@ -46,7 +46,6 @@ namespace osu.Game.Users.Drawables
         protected override double LoadDelay => 200;
 
         private readonly bool isInteractive;
-        private readonly bool showUsernameTooltip;
         private readonly bool showGuestOnNull;
 
         /// <summary>
@@ -54,12 +53,10 @@ namespace osu.Game.Users.Drawables
         /// </summary>
         /// <param name="user">The initial user to display.</param>
         /// <param name="isInteractive">If set to true, hover/click sounds will play and clicking the avatar will open the user's profile.</param>
-        /// <param name="showUsernameTooltip">Whether to show the username rather than "view profile" on the tooltip. (note: this only applies if <paramref name="isInteractive"/> is also true)</param>
         /// <param name="showGuestOnNull">Whether to show a default guest representation on null user (as opposed to nothing).</param>
-        public UpdateableAvatar(APIUser? user = null, bool isInteractive = true, bool showUsernameTooltip = false, bool showGuestOnNull = true)
+        public UpdateableAvatar(APIUser? user = null, bool isInteractive = true, bool showGuestOnNull = true)
         {
             this.isInteractive = isInteractive;
-            this.showUsernameTooltip = showUsernameTooltip;
             this.showGuestOnNull = showGuestOnNull;
 
             User = user;
@@ -75,7 +72,6 @@ namespace osu.Game.Users.Drawables
                 return new ClickableAvatar(user)
                 {
                     RelativeSizeAxes = Axes.Both,
-                    ShowUsernameTooltip = showUsernameTooltip,
                 };
             }
             else
