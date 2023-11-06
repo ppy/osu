@@ -43,7 +43,7 @@ namespace osu.Game.Rulesets.Osu.UI
         [BackgroundDependencyLoader]
         private void load(OsuConfigManager config)
         {
-            tapsDisabled = config.GetBindable<bool>(OsuSetting.GameplayDisableTaps);
+            tapsDisabled = config.GetBindable<bool>(OsuSetting.TouchDisableGameplayTaps);
         }
 
         // Required to handle touches outside of the playfield when screen scaling is enabled.

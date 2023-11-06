@@ -41,7 +41,7 @@ namespace osu.Game.Overlays.Settings.Sections.Input
             Add(new SettingsCheckbox
             {
                 LabelText = TouchSettingsStrings.DisableTapsDuringGameplay,
-                Current = osuConfig.GetBindable<bool>(OsuSetting.GameplayDisableTaps)
+                Current = osuConfig.GetBindable<bool>(OsuSetting.TouchDisableGameplayTaps)
             });
         }
 

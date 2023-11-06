@@ -108,7 +108,7 @@ namespace osu.Game.Configuration
             SetDefault(OsuSetting.MouseDisableWheel, false);
             SetDefault(OsuSetting.ConfineMouseMode, OsuConfineMouseMode.DuringGameplay);
 
-            SetDefault(OsuSetting.GameplayDisableTaps, false);
+            SetDefault(OsuSetting.TouchDisableGameplayTaps, false);
 
             // Graphics
             SetDefault(OsuSetting.ShowFpsDisplay, false);
@@ -415,6 +415,6 @@ namespace osu.Game.Configuration
         ReplaySettingsOverlay,
         AutomaticallyDownloadMissingBeatmaps,
         EditorShowSpeedChanges,
-        GameplayDisableTaps,
+        TouchDisableGameplayTaps,
     }
 }
