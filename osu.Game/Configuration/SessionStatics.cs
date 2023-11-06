@@ -3,6 +3,7 @@
 
 #nullable disable
 
+using osu.Framework;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Input;
 using osu.Game.Online.API.Requests.Responses;
@@ -25,7 +26,7 @@ namespace osu.Game.Configuration
             SetDefault(Static.LastHoverSoundPlaybackTime, (double?)null);
             SetDefault(Static.LastModSelectPanelSamplePlaybackTime, (double?)null);
             SetDefault<APISeasonalBackgrounds>(Static.SeasonalBackgrounds, null);
-            SetDefault(Static.TouchInputActive, false);
+            SetDefault(Static.TouchInputActive, RuntimeInfo.IsMobile);
         }
 
         /// <summary>
