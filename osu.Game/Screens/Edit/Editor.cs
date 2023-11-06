@@ -1,4 +1,4 @@
-﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
 #nullable disable
@@ -1138,13 +1138,17 @@ namespace osu.Game.Screens.Edit
             loader?.CancelPendingDifficultySwitch();
         }
 
-        public void SeekAndSelectHitObjects(string timestamp, Action<LocalisableString> onError)
+        public void HandleTimestamp(string timestamp)
         {
             string[] groups = EditorTimestampParser.GetRegexGroups(timestamp);
 
             if (groups.Length != 2 || string.IsNullOrEmpty(groups[0]))
             {
-                onError.Invoke(EditorStrings.FailedToProcessTimestamp);
+                Schedule(() => notifications.Post(new SimpleNotification
+                {
+                    Icon = FontAwesome.Solid.ExclamationTriangle,
+                    Text = EditorStrings.FailedToProcessTimestamp
+                }));
                 return;
             }
 
@@ -1156,7 +1160,11 @@ namespace osu.Game.Screens.Edit
             // Limit timestamp link length at 30000 min (50 hr) to avoid parsing issues
             if (timeMinutes.Length > 5 || double.Parse(timeMinutes) > 30_000)
             {
-                onError.Invoke(EditorStrings.TooLongTimestamp);
+                Schedule(() => notifications.Post(new SimpleNotification
+                {
+                    Icon = FontAwesome.Solid.ExclamationTriangle,
+                    Text = EditorStrings.TooLongTimestamp
+                }));
                 return;
             }
 
