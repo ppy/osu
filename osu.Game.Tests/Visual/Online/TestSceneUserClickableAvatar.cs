@@ -27,59 +27,14 @@ namespace osu.Game.Tests.Visual.Online
                 Anchor = Anchor.Centre,
                 Origin = Anchor.Centre,
                 Spacing = new Vector2(10f),
-                Children = new Drawable[]
+                Children = new[]
                 {
-                    new ClickableAvatar(new APIUser
-                    {
-                        Username = @"flyte", Id = 3103765, CoverUrl = @"https://osu.ppy.sh/images/headers/profile-covers/c6.jpg"
-                    })
-                    {
-                        Width = 50,
-                        Height = 50,
-                        CornerRadius = 10,
-                        Masking = true,
-                        EdgeEffect = new EdgeEffectParameters
-                        {
-                            Type = EdgeEffectType.Shadow, Radius = 1, Colour = Color4.Black.Opacity(0.2f),
-                        },
-                    },
-                    new ClickableAvatar(new APIUser
-                    {
-                        Username = @"peppy", Id = 2, Colour = "99EB47", CoverUrl = @"https://osu.ppy.sh/images/headers/profile-covers/c3.jpg",
-                    })
-                    {
-                        Width = 50,
-                        Height = 50,
-                        CornerRadius = 10,
-                        Masking = true,
-                        EdgeEffect = new EdgeEffectParameters
-                        {
-                            Type = EdgeEffectType.Shadow, Radius = 1, Colour = Color4.Black.Opacity(0.2f),
-                        },
-                    },
-                    new ClickableAvatar(new APIUser
-                    {
-                        Username = @"flyte",
-                        Id = 3103765,
-                        CountryCode = CountryCode.JP,
-                        CoverUrl = @"https://osu.ppy.sh/images/headers/profile-covers/c6.jpg",
-                        Status =
-                        {
-                            Value = new UserStatusOnline()
-                        }
-                    })
-                    {
-                        Width = 50,
-                        Height = 50,
-                        CornerRadius = 10,
-                        Masking = true,
-                        EdgeEffect = new EdgeEffectParameters
-                        {
-                            Type = EdgeEffectType.Shadow, Radius = 1, Colour = Color4.Black.Opacity(0.2f),
-                        },
-                    },
+                    generateUser(@"peppy", 2, CountryCode.AU, @"https://osu.ppy.sh/images/headers/profile-covers/c3.jpg", "99EB47"),
+                    generateUser(@"flyte", 3103765, CountryCode.JP, @"https://osu.ppy.sh/images/headers/profile-covers/c6.jpg"),
+                    generateUser(@"flyte", 3103765, CountryCode.JP, @"https://osu.ppy.sh/images/headers/profile-covers/c6.jpg"),
                     new ClickableAvatar(),
-                    new ClickableAvatar(),
+                    new UpdateableAvatar(),
+                    new UpdateableAvatar(),
                 },
             };
         });
@@ -146,6 +101,32 @@ namespace osu.Game.Tests.Visual.Online
             AddWaitStep("wait for tooltip to show", 5);
             AddStep("Hover out", () => InputManager.MoveMouseTo(new Vector2(0)));
             AddWaitStep("wait for tooltip to hide", 3);
+        }
+
+        private Drawable generateUser(string username, int id, CountryCode countryCode, string cover, string? color = null)
+        {
+            return new ClickableAvatar(new APIUser
+                {
+                    Username = username,
+                    Id = id,
+                    CountryCode = countryCode,
+                    CoverUrl = cover,
+                    Colour = color ?? "000000",
+                    Status =
+                    {
+                        Value = new UserStatusOnline()
+                    }
+                })
+                {
+                    Width = 50,
+                    Height = 50,
+                    CornerRadius = 10,
+                    Masking = true,
+                    EdgeEffect = new EdgeEffectParameters
+                    {
+                        Type = EdgeEffectType.Shadow, Radius = 1, Colour = Color4.Black.Opacity(0.2f),
+                    },
+                };
         }
     }
 }
