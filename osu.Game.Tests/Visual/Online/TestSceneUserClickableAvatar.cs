@@ -78,6 +78,8 @@ namespace osu.Game.Tests.Visual.Online
                             Type = EdgeEffectType.Shadow, Radius = 1, Colour = Color4.Black.Opacity(0.2f),
                         },
                     },
+                    new ClickableAvatar(),
+                    new ClickableAvatar(),
                 },
             };
         });
@@ -116,6 +118,30 @@ namespace osu.Game.Tests.Visual.Online
                     return;
 
                 InputManager.MoveMouseTo(targets[2]);
+            });
+            AddWaitStep("wait for tooltip to show", 5);
+            AddStep("Hover out", () => InputManager.MoveMouseTo(new Vector2(0)));
+            AddWaitStep("wait for tooltip to hide", 3);
+
+            AddStep($"click null user {4}. {nameof(ClickableAvatar)}", () =>
+            {
+                var targets = this.ChildrenOfType<ClickableAvatar>().ToList();
+                if (targets.Count < 4)
+                    return;
+
+                InputManager.MoveMouseTo(targets[3]);
+            });
+            AddWaitStep("wait for tooltip to show", 5);
+            AddStep("Hover out", () => InputManager.MoveMouseTo(new Vector2(0)));
+            AddWaitStep("wait for tooltip to hide", 3);
+
+            AddStep($"click null user {5}. {nameof(ClickableAvatar)}", () =>
+            {
+                var targets = this.ChildrenOfType<ClickableAvatar>().ToList();
+                if (targets.Count < 5)
+                    return;
+
+                InputManager.MoveMouseTo(targets[4]);
             });
             AddWaitStep("wait for tooltip to show", 5);
             AddStep("Hover out", () => InputManager.MoveMouseTo(new Vector2(0)));
