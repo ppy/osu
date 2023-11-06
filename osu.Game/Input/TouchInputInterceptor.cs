@@ -65,7 +65,7 @@ namespace osu.Game.Input
         [Conditional("TOUCH_INPUT_DEBUG")]
         private void debugToggleTouchInputActive()
         {
-            Logger.Log($@"Debug-toggling touch input to {(touchInputActive.Value ? @"inactive" : @"active")}", LoggingTarget.Input, LogLevel.Debug);
+            Logger.Log($@"Debug-toggling touch input to {(touchInputActive.Value ? @"inactive" : @"active")}", LoggingTarget.Information, LogLevel.Important);
             touchInputActive.Toggle();
         }
     }
