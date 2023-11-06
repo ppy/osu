@@ -128,9 +128,11 @@ namespace osu.Game.Skinning
                                     // elements default to beneath the health bar
                                     const float components_x_offset = 50;
 
-                                    health.Anchor = Anchor.TopCentre;
-                                    health.Origin = Anchor.TopCentre;
-                                    health.Y = 15;
+                                    health.Anchor = Anchor.TopLeft;
+                                    health.Origin = Anchor.TopLeft;
+                                    health.BarLength.Value = 0.22f;
+                                    health.BarHeight.Value = 30f;
+                                    health.Position = new Vector2(components_x_offset, 20f);
 
                                     if (scoreWedge != null)
                                     {
