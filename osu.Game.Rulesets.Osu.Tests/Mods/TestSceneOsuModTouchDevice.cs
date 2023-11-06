@@ -119,7 +119,7 @@ namespace osu.Game.Rulesets.Osu.Tests.Mods
                 InputManager.BeginTouch(touch);
                 InputManager.EndTouch(touch);
             });
-            AddAssert("touch device mod not activated", () => Player.Mods.Value, () => Has.No.InstanceOf<OsuModTouchDevice>());
+            AddAssert("touch device mod activated", () => Player.Score.ScoreInfo.Mods, () => Has.One.InstanceOf<OsuModTouchDevice>());
         }
 
         [Test]
@@ -136,7 +136,7 @@ namespace osu.Game.Rulesets.Osu.Tests.Mods
                 InputManager.MoveMouseTo(Player.DrawableRuleset.Playfield.ScreenSpaceDrawQuad.Centre);
                 InputManager.Click(MouseButton.Left);
             });
-            AddAssert("touch device mod not activated", () => Player.Mods.Value, () => Has.No.InstanceOf<OsuModTouchDevice>());
+            AddAssert("touch device mod not activated", () => Player.Score.ScoreInfo.Mods, () => Has.None.InstanceOf<OsuModTouchDevice>());
 
             AddStep("speed back up", () => Player.GameplayClockContainer.AdjustmentsFromMods.Frequency.Value = 1);
             AddUntilStep("wait until 5000 near", () => Player.GameplayClockContainer.CurrentTime, () => Is.GreaterThanOrEqualTo(5000).Within(500));
