@@ -3,6 +3,7 @@
 
 using System.Diagnostics;
 using osu.Framework.Allocation;
+using osu.Framework.Bindables;
 using osu.Framework.Extensions.TypeExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Input.Events;
@@ -22,12 +23,17 @@ namespace osu.Game.Input
     {
         public override bool ReceivePositionalInputAt(Vector2 screenSpacePos) => true;
 
-        [Resolved]
-        private SessionStatics statics { get; set; } = null!;
+        private readonly BindableBool touchInputActive = new BindableBool();
+
+        [BackgroundDependencyLoader]
+        private void load(SessionStatics statics)
+        {
+            statics.BindWith(Static.TouchInputActive, touchInputActive);
+        }
 
         protected override bool Handle(UIEvent e)
         {
-            bool touchInputWasActive = statics.Get<bool>(Static.TouchInputActive);
+            bool touchInputWasActive = touchInputActive.Value;
 
             switch (e)
             {
@@ -36,7 +42,7 @@ namespace osu.Game.Input
                     {
                         if (touchInputWasActive)
                             Logger.Log($@"Touch input deactivated due to received {e.GetType().ReadableName()}", LoggingTarget.Input);
-                        statics.SetValue(Static.TouchInputActive, false);
+                        touchInputActive.Value = false;
                     }
 
                     break;
@@ -44,7 +50,7 @@ namespace osu.Game.Input
                 case TouchEvent:
                     if (!touchInputWasActive)
                         Logger.Log($@"Touch input activated due to received {e.GetType().ReadableName()}", LoggingTarget.Input);
-                    statics.SetValue(Static.TouchInputActive, true);
+                    touchInputActive.Value = true;
                     break;
 
                 case KeyDownEvent keyDown:
@@ -59,10 +65,8 @@ namespace osu.Game.Input
         [Conditional("TOUCH_INPUT_DEBUG")]
         private void debugToggleTouchInputActive()
         {
-            bool oldValue = statics.Get<bool>(Static.TouchInputActive);
-            bool newValue = !oldValue;
-            Logger.Log($@"Debug-toggling touch input to {(newValue ? @"active" : @"inactive")}", LoggingTarget.Input, LogLevel.Debug);
-            statics.SetValue(Static.TouchInputActive, newValue);
+            Logger.Log($@"Debug-toggling touch input to {(touchInputActive.Value ? @"inactive" : @"active")}", LoggingTarget.Input, LogLevel.Debug);
+            touchInputActive.Toggle();
         }
     }
 }
