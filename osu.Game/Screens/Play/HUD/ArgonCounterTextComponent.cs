@@ -1,0 +1,152 @@
+// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
+
+using System;
+using System.Linq;
+using System.Threading.Tasks;
+using osu.Framework.Allocation;
+using osu.Framework.Bindables;
+using osu.Framework.Graphics;
+using osu.Framework.Graphics.Containers;
+using osu.Framework.Graphics.Sprites;
+using osu.Framework.Localisation;
+using osu.Framework.Text;
+using osu.Game.Graphics;
+using osu.Game.Graphics.Sprites;
+using osu.Game.Skinning;
+using osuTK;
+
+namespace osu.Game.Screens.Play.HUD
+{
+    public partial class ArgonCounterTextComponent : CompositeDrawable, IHasText
+    {
+        private readonly LocalisableString? label;
+
+        private readonly ArgonCounterSpriteText wireframesPart;
+        private readonly ArgonCounterSpriteText textPart;
+
+        public IBindable<int> RequiredDisplayDigits { get; } = new BindableInt();
+        public IBindable<float> WireframeOpacity { get; } = new BindableFloat();
+
+        public LocalisableString Text
+        {
+            get => textPart.Text;
+            set
+            {
+                wireframesPart.Text = new string('#', Math.Max(value.ToString().Count(char.IsDigit), RequiredDisplayDigits.Value));
+                textPart.Text = value;
+            }
+        }
+
+        public ArgonCounterTextComponent(Anchor anchor, LocalisableString? label = null)
+        {
+            Anchor = anchor;
+            Origin = anchor;
+
+            this.label = label;
+
+            wireframesPart = new ArgonCounterSpriteText(@"wireframes")
+            {
+                Anchor = anchor,
+                Origin = anchor,
+            };
+            textPart = new ArgonCounterSpriteText
+            {
+                Anchor = anchor,
+                Origin = anchor,
+            };
+        }
+
+        [BackgroundDependencyLoader]
+        private void load(OsuColour colours)
+        {
+            AutoSizeAxes = Axes.Both;
+
+            InternalChild = new FillFlowContainer
+            {
+                AutoSizeAxes = Axes.Both,
+                Direction = FillDirection.Vertical,
+                Children = new Drawable[]
+                {
+                    new OsuSpriteText
+                    {
+                        Alpha = label != null ? 1 : 0,
+                        Text = label.GetValueOrDefault(),
+                        Font = OsuFont.Torus.With(size: 12, weight: FontWeight.Bold),
+                        Colour = colours.Blue0,
+                        Margin = new MarginPadding { Left = 2.5f },
+                    },
+                    new Container
+                    {
+                        AutoSizeAxes = Axes.Both,
+                        Children = new[]
+                        {
+                            wireframesPart,
+                            textPart,
+                        }
+                    }
+                }
+            };
+        }
+
+        protected override void LoadComplete()
+        {
+            base.LoadComplete();
+            WireframeOpacity.BindValueChanged(v => wireframesPart.Alpha = v.NewValue, true);
+        }
+
+        private partial class ArgonCounterSpriteText : OsuSpriteText
+        {
+            private readonly string? glyphLookupOverride;
+
+            private GlyphStore glyphStore = null!;
+
+            protected override char FixedWidthReferenceCharacter => '5';
+
+            public ArgonCounterSpriteText(string? glyphLookupOverride = null)
+            {
+                this.glyphLookupOverride = glyphLookupOverride;
+
+                Shadow = false;
+                UseFullGlyphHeight = false;
+            }
+
+            [BackgroundDependencyLoader]
+            private void load(ISkinSource skin)
+            {
+                // todo: rename font
+                Font = new FontUsage(@"argon-score", 1, fixedWidth: true);
+                Spacing = new Vector2(-2, 0);
+
+                glyphStore = new GlyphStore(skin, glyphLookupOverride);
+            }
+
+            protected override TextBuilder CreateTextBuilder(ITexturedGlyphLookupStore store) => base.CreateTextBuilder(glyphStore);
+
+            private class GlyphStore : ITexturedGlyphLookupStore
+            {
+                private readonly ISkin skin;
+                private readonly string? glyphLookupOverride;
+
+                public GlyphStore(ISkin skin, string? glyphLookupOverride)
+                {
+                    this.skin = skin;
+                    this.glyphLookupOverride = glyphLookupOverride;
+                }
+
+                public ITexturedCharacterGlyph? Get(string fontName, char character)
+                {
+                    string lookup = glyphLookupOverride ?? character.ToString();
+                    var texture = skin.GetTexture($"{fontName}-{lookup}");
+
+                    if (texture == null)
+                        return null;
+
+                    return new TexturedCharacterGlyph(new CharacterGlyph(character, 0, 0, texture.Width, texture.Height, null), texture, 0.125f);
+                }
+
+                public Task<ITexturedCharacterGlyph?> GetAsync(string fontName, char character) => Task.Run(() => Get(fontName, character));
+            }
+        }
+    }
+}
