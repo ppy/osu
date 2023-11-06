@@ -5,6 +5,7 @@
 
 using System;
 using osu.Framework.Allocation;
+using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Cursor;
@@ -13,16 +14,18 @@ using osu.Framework.Input.Events;
 using osu.Framework.Localisation;
 using osu.Game.Rulesets.Osu.UI.Cursor;
 using osu.Game.Screens.Play;
+using osuTK;
 using osuTK.Graphics;
 
 namespace osu.Game.Rulesets.Osu.UI
 {
     public partial class OsuResumeOverlay : ResumeOverlay
     {
-        private Container resumeCursorContainer;
+        private Container cursorScaleContainer;
         private OsuClickToResumeCursor clickToResumeCursor;
 
         private OsuCursorContainer localCursorContainer;
+        private IBindable<float> localCursorScale;
 
         public override CursorContainer LocalCursor => State.Value == Visibility.Visible ? localCursorContainer : null;
 
@@ -31,7 +34,7 @@ namespace osu.Game.Rulesets.Osu.UI
         [BackgroundDependencyLoader]
         private void load()
         {
-            Add(resumeCursorContainer = new Container
+            Add(cursorScaleContainer = new Container
             {
                 Child = clickToResumeCursor = new OsuClickToResumeCursor { ResumeRequested = Resume }
             });
@@ -42,11 +45,17 @@ namespace osu.Game.Rulesets.Osu.UI
             base.PopIn();
 
             GameplayCursor.ActiveCursor.Hide();
-            resumeCursorContainer.Position = ToLocalSpace(GameplayCursor.ActiveCursor.ScreenSpaceDrawQuad.Centre);
+            cursorScaleContainer.Position = ToLocalSpace(GameplayCursor.ActiveCursor.ScreenSpaceDrawQuad.Centre);
             clickToResumeCursor.Appear();
 
             if (localCursorContainer == null)
+            {
                 Add(localCursorContainer = new OsuCursorContainer());
+
+                localCursorScale = new BindableFloat();
+                localCursorScale.BindTo(localCursorContainer.CursorScale);
+                localCursorScale.BindValueChanged(scale => cursorScaleContainer.Scale = new Vector2(scale.NewValue), true);
+            }
         }
 
         protected override void PopOut()
