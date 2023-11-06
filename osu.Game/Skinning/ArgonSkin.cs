@@ -129,7 +129,8 @@ namespace osu.Game.Skinning
 
                                     health.Anchor = Anchor.TopLeft;
                                     health.Origin = Anchor.TopLeft;
-                                    health.BarLength.Value = 0.22f;
+                                    health.UseRelativeSize.Value = false;
+                                    health.BarLength.Value = 300;
                                     health.BarHeight.Value = 30f;
                                     health.Position = new Vector2(components_x_offset, 20f);
 
