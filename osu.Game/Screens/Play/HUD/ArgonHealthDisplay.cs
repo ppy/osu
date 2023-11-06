@@ -36,12 +36,10 @@ namespace osu.Game.Screens.Play.HUD
         };
 
         [SettingSource("Bar length")]
-        public BindableFloat BarLength { get; } = new BindableFloat(0.98f)
-        {
-            MinValue = 0.2f,
-            MaxValue = 1,
-            Precision = 0.01f,
-        };
+        public BindableFloat BarLength { get; } = new BindableFloat(0.98f);
+
+        [SettingSource("Use relative size")]
+        public BindableBool UseRelativeSize { get; } = new BindableBool(true);
 
         private BarPath mainBar = null!;
 
@@ -140,9 +138,23 @@ namespace osu.Game.Screens.Play.HUD
 
             Current.BindValueChanged(_ => Scheduler.AddOnce(updateCurrent), true);
 
-            BarLength.BindValueChanged(l => Width = l.NewValue, true);
-            BarHeight.BindValueChanged(_ => updatePath());
-            updatePath();
+            // update relative axes first before reading width from bar length.
+            RelativeSizeAxes = UseRelativeSize.Value ? Axes.X : Axes.None;
+            Width = BarLength.Value;
+
+            UseRelativeSize.BindValueChanged(v =>
+            {
+                RelativeSizeAxes = v.NewValue ? Axes.X : Axes.None;
+                float newWidth = Width;
+
+                BarLength.MinValue = v.NewValue ? 0.2f : 200f;
+                BarLength.MaxValue = v.NewValue ? 1f : 1000f;
+                BarLength.Precision = v.NewValue ? 0.01f : 1f;
+                BarLength.Value = newWidth;
+            }, true);
+
+            BarLength.ValueChanged += l => Width = l.NewValue;
+            BarHeight.BindValueChanged(_ => updatePath(), true);
         }
 
         protected override bool OnInvalidate(Invalidation invalidation, InvalidationSource source)
