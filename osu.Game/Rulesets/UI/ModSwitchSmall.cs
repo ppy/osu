@@ -85,11 +85,15 @@ namespace osu.Game.Rulesets.UI
                 tinySwitch.Scale = new Vector2(0.3f);
             }
 
+            var modTypeColour = colours.ForModType(mod.Type);
+
             inactiveForegroundColour = colourProvider?.Background5 ?? colours.Gray3;
-            activeForegroundColour = colours.ForModType(mod.Type);
+            activeForegroundColour = mod.Type != ModType.System ? modTypeColour : colours.Yellow;
 
             inactiveBackgroundColour = colourProvider?.Background2 ?? colours.Gray5;
-            activeBackgroundColour = Interpolation.ValueAt<Colour4>(0.1f, Colour4.Black, activeForegroundColour, 0, 1);
+            activeBackgroundColour = mod.Type != ModType.System
+                ? Interpolation.ValueAt<Colour4>(0.1f, Colour4.Black, modTypeColour, 0, 1)
+                : modTypeColour;
         }
 
         protected override void LoadComplete()
