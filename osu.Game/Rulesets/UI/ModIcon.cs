@@ -204,9 +204,7 @@ namespace osu.Game.Rulesets.UI
 
         private void updateColour()
         {
-            modAcronym.Colour = modIcon.Colour = mod.Type != ModType.System
-                ? OsuColour.Gray(84)
-                : colours.Yellow;
+            modAcronym.Colour = modIcon.Colour = OsuColour.Gray(84);
 
             extendedText.Colour = background.Colour = Selected.Value ? backgroundColour.Lighten(0.2f) : backgroundColour;
             extendedBackground.Colour = Selected.Value ? backgroundColour.Darken(2.4f) : backgroundColour.Darken(2.8f);

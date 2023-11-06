@@ -162,7 +162,7 @@ namespace osu.Game.Graphics
                     return Pink1;
 
                 case ModType.System:
-                    return Gray5;
+                    return Yellow;
 
                 default:
                     throw new ArgumentOutOfRangeException(nameof(modType), modType, "Unknown mod type");
