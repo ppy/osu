@@ -14,12 +14,14 @@ namespace osu.Game.Users.Drawables
 {
     public partial class ClickableAvatar : OsuClickableContainer, IHasCustomTooltip<UserGridPanel>
     {
-        public ITooltip<UserGridPanel> GetCustomTooltip() => new UserGridPanelTooltip();
+        public ITooltip<UserGridPanel> GetCustomTooltip() => new UserGridPanelTooltip(IsTooltipEnabled);
 
         public UserGridPanel TooltipContent => new UserGridPanel(user!)
         {
             Width = 300
         };
+
+        public bool IsTooltipEnabled;
 
         private readonly APIUser? user;
 
@@ -33,6 +35,7 @@ namespace osu.Game.Users.Drawables
         public ClickableAvatar(APIUser? user = null)
         {
             this.user = user;
+            IsTooltipEnabled = true;
 
             if (user?.Id != APIUser.SYSTEM_USER_ID)
                 Action = openProfile;
@@ -60,10 +63,21 @@ namespace osu.Game.Users.Drawables
 
         private partial class UserGridPanelTooltip : VisibilityContainer, ITooltip<UserGridPanel>
         {
+            private readonly bool isEnabled;
             private UserGridPanel? displayedUser;
+
+            public UserGridPanelTooltip(bool isEnabled = true)
+            {
+                this.isEnabled = isEnabled;
+            }
 
             protected override void PopIn()
             {
+                if (displayedUser is null || !isEnabled)
+                {
+                    return;
+                }
+
                 Child = displayedUser;
                 this.FadeIn(20, Easing.OutQuint);
             }
