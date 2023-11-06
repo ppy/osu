@@ -118,7 +118,6 @@ namespace osu.Game.Skinning
                                 var scoreWedge = container.OfType<ArgonScoreWedge>().FirstOrDefault();
                                 var score = container.OfType<ArgonScoreCounter>().FirstOrDefault();
                                 var accuracy = container.OfType<ArgonAccuracyCounter>().FirstOrDefault();
-                                var comboWedge = container.OfType<ArgonComboWedge>().FirstOrDefault();
                                 var combo = container.OfType<ArgonComboCounter>().FirstOrDefault();
                                 var songProgress = container.OfType<ArgonSongProgress>().FirstOrDefault();
                                 var keyCounter = container.OfType<ArgonKeyCounterDisplay>().FirstOrDefault();
@@ -150,18 +149,6 @@ namespace osu.Game.Skinning
                                             accuracy.Position = new Vector2(components_x_offset + 4, scoreWedge.Y + 45);
                                             accuracy.Anchor = Anchor.TopLeft;
                                             accuracy.Origin = Anchor.TopLeft;
-                                        }
-                                    }
-
-                                    if (comboWedge != null)
-                                    {
-                                        comboWedge.Position = new Vector2(-12, 130);
-
-                                        if (combo != null)
-                                        {
-                                            combo.Anchor = Anchor.TopLeft;
-                                            combo.Origin = Anchor.TopLeft;
-                                            combo.Position = new Vector2(components_x_offset, comboWedge.Y - 2);
                                         }
                                     }
 
@@ -199,6 +186,13 @@ namespace osu.Game.Skinning
                                             keyCounter.Origin = Anchor.BottomRight;
                                             keyCounter.Position = new Vector2(-(hitError.Width + padding), -(padding * 2 + song_progress_offset_height));
                                         }
+
+                                        if (combo != null && hitError != null)
+                                        {
+                                            combo.Anchor = Anchor.BottomLeft;
+                                            combo.Origin = Anchor.BottomLeft;
+                                            combo.Position = new Vector2(hitError.Width + padding, -50);
+                                        }
                                     }
                                 }
                             })
@@ -209,7 +203,6 @@ namespace osu.Game.Skinning
                                     new ArgonScoreWedge(),
                                     new ArgonScoreCounter(),
                                     new ArgonAccuracyCounter(),
-                                    new ArgonComboWedge(),
                                     new ArgonComboCounter(),
                                     new BarHitErrorMeter(),
                                     new BarHitErrorMeter(),
