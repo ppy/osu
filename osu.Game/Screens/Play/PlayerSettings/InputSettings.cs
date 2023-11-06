@@ -11,22 +11,23 @@ namespace osu.Game.Screens.Play.PlayerSettings
 {
     public partial class InputSettings : PlayerSettingsGroup
     {
-        private readonly PlayerCheckbox mouseButtonsCheckbox;
-
         public InputSettings()
             : base("Input Settings")
         {
-            Children = new Drawable[]
-            {
-                mouseButtonsCheckbox = new PlayerCheckbox
-                {
-                    // TODO: change to touchscreen detection once https://github.com/ppy/osu/pull/25348 makes it in
-                    LabelText = RuntimeInfo.IsDesktop ? MouseSettingsStrings.DisableClicksDuringGameplay : TouchSettingsStrings.DisableTapsDuringGameplay
-                }
-            };
         }
 
         [BackgroundDependencyLoader]
-        private void load(OsuConfigManager config) => mouseButtonsCheckbox.Current = config.GetBindable<bool>(RuntimeInfo.IsDesktop ? OsuSetting.MouseDisableButtons : OsuSetting.DisableTapsDuringGameplay);
+        private void load(OsuConfigManager config)
+        {
+            Children = new Drawable[]
+            {
+                new PlayerCheckbox
+                {
+                    // TODO: change to touchscreen detection once https://github.com/ppy/osu/pull/25348 makes it in
+                    LabelText = RuntimeInfo.IsDesktop ? MouseSettingsStrings.DisableClicksDuringGameplay : TouchSettingsStrings.DisableTapsDuringGameplay,
+                    Current = config.GetBindable<bool>(RuntimeInfo.IsDesktop ? OsuSetting.MouseDisableButtons : OsuSetting.TouchDisableGameplayTaps)
+                }
+            };
+        }
     }
 }
