@@ -138,7 +138,6 @@ namespace osu.Game.Rulesets.UI
                         {
                             Origin = Anchor.Centre,
                             Anchor = Anchor.Centre,
-                            Colour = OsuColour.Gray(84),
                             Alpha = 0,
                             Font = OsuFont.Numeric.With(null, 22f),
                             UseFullGlyphHeight = false,
@@ -148,7 +147,6 @@ namespace osu.Game.Rulesets.UI
                         {
                             Origin = Anchor.Centre,
                             Anchor = Anchor.Centre,
-                            Colour = OsuColour.Gray(84),
                             Size = new Vector2(45),
                             Icon = FontAwesome.Solid.Question
                         },
@@ -206,6 +204,10 @@ namespace osu.Game.Rulesets.UI
 
         private void updateColour()
         {
+            modAcronym.Colour = modIcon.Colour = mod.Type != ModType.System
+                ? OsuColour.Gray(84)
+                : colours.Yellow;
+
             extendedText.Colour = background.Colour = Selected.Value ? backgroundColour.Lighten(0.2f) : backgroundColour;
             extendedBackground.Colour = Selected.Value ? backgroundColour.Darken(2.4f) : backgroundColour.Darken(2.8f);
         }
