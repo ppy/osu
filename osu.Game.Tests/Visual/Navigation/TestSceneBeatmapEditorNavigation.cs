@@ -12,9 +12,7 @@ using osu.Framework.Testing;
 using osu.Game.Beatmaps;
 using osu.Game.Configuration;
 using osu.Game.Database;
-using osu.Game.Graphics.UserInterface;
 using osu.Game.Overlays;
-using osu.Game.Overlays.Dialog;
 using osu.Game.Rulesets.Mania;
 using osu.Game.Rulesets.Osu;
 using osu.Game.Screens.Edit;
@@ -258,10 +256,10 @@ namespace osu.Game.Tests.Visual.Navigation
                 var item = getEditor().ChildrenOfType<Menu.DrawableMenuItem>().Single(i => i.Item.Text.Value.ToString() == "osu!catch");
                 item.TriggerClick();
             });
-            AddAssert("save dialog displayed", () => Game.ChildrenOfType<DialogOverlay>().Single().CurrentDialog is PromptForSaveDialog);
+            AddAssert("save dialog displayed", () => Game.ChildrenOfType<DialogOverlay>().Single().CurrentDialog is SaveRequiredPopupDialog);
 
-            AddStep("press forget all changes", () => Game.ChildrenOfType<DialogOverlay>().Single().CurrentDialog!.PerformAction<PopupDialogDangerousButton>());
-            AddWaitStep("wait", 5);
+            AddStep("press save", () => Game.ChildrenOfType<DialogOverlay>().Single().CurrentDialog!.PerformOkAction());
+            AddUntilStep("wait for editor", () => Game.ScreenStack.CurrentScreen is Editor editor && editor.IsLoaded);
             AddAssert("editor beatmap uses catch ruleset", () => getEditorBeatmap().BeatmapInfo.Ruleset.ShortName == "fruits");
         }
 
