@@ -1,9 +1,11 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System;
 using System.Threading.Tasks;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
+using osu.Framework.Extensions.LocalisationExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Sprites;
@@ -19,7 +21,7 @@ namespace osu.Game.Screens.Play.HUD
     public partial class ArgonScoreCounter : GameplayScoreCounter, ISerialisableDrawable
     {
         [SettingSource("Wireframe opacity", "Controls the opacity of the wire frames behind the digits.")]
-        public BindableFloat WireframeOpactiy { get; } = new BindableFloat(0.4f)
+        public BindableFloat WireframeOpacity { get; } = new BindableFloat(0.4f)
         {
             Precision = 0.01f,
             MinValue = 0,
@@ -28,9 +30,12 @@ namespace osu.Game.Screens.Play.HUD
 
         public bool UsesFixedAnchor { get; set; }
 
+        protected override LocalisableString FormatCount(long count) => count.ToLocalisableString();
+
         protected override IHasText CreateText() => new ArgonScoreTextComponent
         {
-            WireframeOpactiy = { BindTarget = WireframeOpactiy },
+            RequiredDisplayDigits = { BindTarget = RequiredDisplayDigits },
+            WireframeOpacity = { BindTarget = WireframeOpacity },
         };
 
         private partial class ArgonScoreTextComponent : CompositeDrawable, IHasText
@@ -38,14 +43,15 @@ namespace osu.Game.Screens.Play.HUD
             private readonly ArgonScoreSpriteText wireframesPart;
             private readonly ArgonScoreSpriteText textPart;
 
-            public IBindable<float> WireframeOpactiy { get; } = new BindableFloat();
+            public IBindable<int> RequiredDisplayDigits { get; } = new BindableInt();
+            public IBindable<float> WireframeOpacity { get; } = new BindableFloat();
 
             public LocalisableString Text
             {
                 get => textPart.Text;
                 set
                 {
-                    wireframesPart.Text = value;
+                    wireframesPart.Text = new string('#', Math.Max(value.ToString().Length, RequiredDisplayDigits.Value));
                     textPart.Text = value;
                 }
             }
@@ -56,15 +62,23 @@ namespace osu.Game.Screens.Play.HUD
 
                 InternalChildren = new[]
                 {
-                    wireframesPart = new ArgonScoreSpriteText(@"wireframes"),
-                    textPart = new ArgonScoreSpriteText(),
+                    wireframesPart = new ArgonScoreSpriteText(@"wireframes")
+                    {
+                        Anchor = Anchor.TopRight,
+                        Origin = Anchor.TopRight,
+                    },
+                    textPart = new ArgonScoreSpriteText
+                    {
+                        Anchor = Anchor.TopRight,
+                        Origin = Anchor.TopRight,
+                    },
                 };
             }
 
             protected override void LoadComplete()
             {
                 base.LoadComplete();
-                WireframeOpactiy.BindValueChanged(v => wireframesPart.Alpha = v.NewValue, true);
+                WireframeOpacity.BindValueChanged(v => wireframesPart.Alpha = v.NewValue, true);
             }
 
             private partial class ArgonScoreSpriteText : OsuSpriteText
