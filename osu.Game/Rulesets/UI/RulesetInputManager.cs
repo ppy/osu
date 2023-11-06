@@ -72,6 +72,7 @@ namespace osu.Game.Rulesets.UI
         private void load(OsuConfigManager config)
         {
             mouseDisabled = config.GetBindable<bool>(OsuSetting.MouseDisableButtons);
+            tapsDisabled = config.GetBindable<bool>(OsuSetting.GameplayDisableTaps);
         }
 
         #region Action mapping (for replays)
@@ -124,6 +125,7 @@ namespace osu.Game.Rulesets.UI
         #region Setting application (disables etc.)
 
         private Bindable<bool> mouseDisabled;
+        private Bindable<bool> tapsDisabled;
 
         protected override bool Handle(UIEvent e)
         {
@@ -147,9 +149,9 @@ namespace osu.Game.Rulesets.UI
 
         protected override bool HandleMouseTouchStateChange(TouchStateChangeEvent e)
         {
-            if (mouseDisabled.Value)
+            if (tapsDisabled.Value)
             {
-                // Only propagate positional data when mouse buttons are disabled.
+                // Only propagate positional data when taps are disabled.
                 e = new TouchStateChangeEvent(e.State, e.Input, e.Touch, false, e.LastPosition);
             }
 
