@@ -562,18 +562,15 @@ namespace osu.Game
         {
             if (ScreenStack.CurrentScreen is not Editor editor)
             {
-                postNotification(EditorStrings.MustBeInEdit);
+                Schedule(() => Notifications.Post(new SimpleNotification
+            {
+                Icon = FontAwesome.Solid.ExclamationTriangle,
+                    Text = EditorStrings.MustBeInEdit
+            }));
                 return;
             }
 
-            editor.SeekAndSelectHitObjects(timestamp, onError: postNotification);
-            return;
-
-            void postNotification(LocalisableString message) => Schedule(() => Notifications.Post(new SimpleNotification
-            {
-                Icon = FontAwesome.Solid.ExclamationTriangle,
-                Text = message
-            }));
+            editor.HandleTimestamp(timestamp);
         }
 
         /// <summary>
