@@ -72,7 +72,7 @@ namespace osu.Game.Rulesets.UI
         private void load(OsuConfigManager config)
         {
             mouseDisabled = config.GetBindable<bool>(OsuSetting.MouseDisableButtons);
-            tapsDisabled = config.GetBindable<bool>(OsuSetting.GameplayDisableTaps);
+            tapsDisabled = config.GetBindable<bool>(OsuSetting.TouchDisableGameplayTaps);
         }
 
         #region Action mapping (for replays)

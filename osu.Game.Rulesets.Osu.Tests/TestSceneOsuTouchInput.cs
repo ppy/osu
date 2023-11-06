@@ -471,7 +471,7 @@ namespace osu.Game.Rulesets.Osu.Tests
         [Test]
         public void TestInputWhileMouseButtonsDisabled()
         {
-            AddStep("Disable gameplay taps", () => config.SetValue(OsuSetting.GameplayDisableTaps, true));
+            AddStep("Disable gameplay taps", () => config.SetValue(OsuSetting.TouchDisableGameplayTaps, true));
 
             beginTouch(TouchSource.Touch1);
 
@@ -623,7 +623,7 @@ namespace osu.Game.Rulesets.Osu.Tests
             AddStep("Release all touches", () =>
             {
                 config.SetValue(OsuSetting.MouseDisableButtons, false);
-                config.SetValue(OsuSetting.GameplayDisableTaps, false);
+                config.SetValue(OsuSetting.TouchDisableGameplayTaps, false);
                 foreach (TouchSource source in InputManager.CurrentState.Touch.ActiveSources)
                     InputManager.EndTouch(new Touch(source, osuInputManager.ScreenSpaceDrawQuad.Centre));
             });
