@@ -1,6 +1,7 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
@@ -17,6 +18,8 @@ namespace osu.Game.Screens.Play
         private Circle inputIndicator = null!;
         private OsuSpriteText keyNameText = null!;
         private OsuSpriteText countText = null!;
+
+        private UprightAspectMaintainingContainer uprightContainer = null!;
 
         // These values were taken from Figma
         private const float line_height = 3;
@@ -53,7 +56,7 @@ namespace osu.Game.Screens.Play
                     Padding = new MarginPadding { Top = line_height * scale_factor + indicator_press_offset },
                     Children = new Drawable[]
                     {
-                        new UprightAspectMaintainingContainer
+                        uprightContainer = new UprightAspectMaintainingContainer
                         {
                             RelativeSizeAxes = Axes.Both,
                             Anchor = Anchor.Centre,
@@ -62,16 +65,16 @@ namespace osu.Game.Screens.Play
                             {
                                 keyNameText = new OsuSpriteText
                                 {
-                                    Anchor = Anchor.TopCentre,
-                                    Origin = Anchor.TopCentre,
+                                    Anchor = Anchor.TopLeft,
+                                    Origin = Anchor.TopLeft,
                                     Font = OsuFont.Torus.With(size: name_font_size * scale_factor, weight: FontWeight.Bold),
                                     Colour = colours.Blue0,
                                     Text = Trigger.Name
                                 },
                                 countText = new OsuSpriteText
                                 {
-                                    Anchor = Anchor.BottomCentre,
-                                    Origin = Anchor.BottomCentre,
+                                    Anchor = Anchor.BottomLeft,
+                                    Origin = Anchor.BottomLeft,
                                     Font = OsuFont.Torus.With(size: count_font_size * scale_factor, weight: FontWeight.Bold),
                                 },
                             }
@@ -91,6 +94,21 @@ namespace osu.Game.Screens.Play
             base.LoadComplete();
 
             CountPresses.BindValueChanged(e => countText.Text = e.NewValue.ToString(@"#,0"), true);
+        }
+
+        protected override void Update()
+        {
+            base.Update();
+
+            const float allowance = 6;
+            float absRotation = Math.Abs(uprightContainer.Rotation) % 180;
+            bool isRotated = absRotation > allowance && absRotation < (180 - allowance);
+
+            keyNameText.Anchor =
+                keyNameText.Origin = isRotated ? Anchor.TopCentre : Anchor.TopLeft;
+
+            countText.Anchor =
+                countText.Origin = isRotated ? Anchor.BottomCentre : Anchor.BottomLeft;
         }
 
         protected override void Activate(bool forwardPlayback = true)
