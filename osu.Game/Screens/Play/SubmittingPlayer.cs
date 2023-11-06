@@ -53,7 +53,7 @@ namespace osu.Game.Screens.Play
                 return;
             }
 
-            AddInternal(new PlayerTouchInputHandler());
+            AddInternal(new PlayerTouchInputDetector());
         }
 
         protected override void LoadAsyncComplete()
