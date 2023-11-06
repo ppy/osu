@@ -13,7 +13,7 @@ using osu.Game.Utils;
 
 namespace osu.Game.Screens.Select
 {
-    public partial class SongSelectTouchInputHandler : Component
+    public partial class SongSelectTouchInputDetector : Component
     {
         [Resolved]
         private Bindable<RulesetInfo> ruleset { get; set; } = null!;

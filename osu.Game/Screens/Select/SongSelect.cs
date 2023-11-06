@@ -279,7 +279,7 @@ namespace osu.Game.Screens.Select
                 {
                     RelativeSizeAxes = Axes.Both,
                 },
-                new SongSelectTouchInputHandler()
+                new SongSelectTouchInputDetector()
             });
 
             if (ShowFooter)

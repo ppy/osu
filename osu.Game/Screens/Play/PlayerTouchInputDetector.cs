@@ -13,7 +13,7 @@ using osu.Game.Rulesets.Scoring;
 
 namespace osu.Game.Screens.Play
 {
-    public partial class PlayerTouchInputHandler : Component
+    public partial class PlayerTouchInputDetector : Component
     {
         [Resolved]
         private Player player { get; set; } = null!;
