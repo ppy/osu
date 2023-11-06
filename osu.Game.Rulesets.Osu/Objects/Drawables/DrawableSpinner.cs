@@ -4,6 +4,7 @@
 #nullable disable
 
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using JetBrains.Annotations;
 using osu.Framework.Allocation;
@@ -144,7 +145,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
             spinningSample.Samples = HitObject.CreateSpinningSamples().Cast<ISampleInfo>().ToArray();
             spinningSample.Frequency.Value = spinning_sample_initial_frequency;
 
-            maxBonusSample.Samples = new ISampleInfo[] { HitObject.CreateHitSampleInfo("spinnerbonus") };
+            maxBonusSample.Samples = new ISampleInfo[] { new SpinnerBonusMaxSampleInfo(HitObject.CreateHitSampleInfo()) };
         }
 
         private void updateSpinningSample(ValueChangedEvent<bool> tracking)
@@ -342,6 +343,27 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
                     tick.TriggerResult(true);
 
                 completedFullSpins.Value++;
+            }
+        }
+
+        public class SpinnerBonusMaxSampleInfo : HitSampleInfo
+        {
+            public override IEnumerable<string> LookupNames
+            {
+                get
+                {
+                    foreach (string name in base.LookupNames)
+                        yield return name;
+
+                    foreach (string name in base.LookupNames)
+                        yield return name.Replace("-max", string.Empty);
+                }
+            }
+
+            public SpinnerBonusMaxSampleInfo(HitSampleInfo sampleInfo)
+                : base("spinnerbonus-max", sampleInfo.Bank, sampleInfo.Suffix, sampleInfo.Volume)
+
+            {
             }
         }
     }
