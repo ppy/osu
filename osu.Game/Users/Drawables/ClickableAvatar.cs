@@ -15,14 +15,14 @@ using osuTK;
 
 namespace osu.Game.Users.Drawables
 {
-    public partial class ClickableAvatar : OsuClickableContainer, IHasCustomTooltip<UserGridPanel>
+    public partial class ClickableAvatar : OsuClickableContainer, IHasCustomTooltip<APIUser>
     {
-        public ITooltip<UserGridPanel> GetCustomTooltip() => new UserGridPanelTooltip(this);
-
-        public UserGridPanel TooltipContent => new UserGridPanel(user!)
+        public ITooltip<APIUser> GetCustomTooltip()
         {
-            Width = 300
-        };
+            return new APIUserTooltip(user);
+        }
+
+        public APIUser? TooltipContent => user;
 
         public override LocalisableString TooltipText
         {
@@ -35,12 +35,6 @@ namespace osu.Game.Users.Drawables
             }
             set => throw new NotSupportedException();
         }
-
-        /// <summary>
-        /// By default, the tooltip will show "view profile" as avatars are usually displayed next to a username.
-        /// Setting this to <c>true</c> exposes the username via tooltip for special cases where this is not true.
-        /// </summary>
-        // public bool ShowUsernameTooltip { get; set; }
 
         public bool IsTooltipEnabled { get; set; }
 
@@ -86,28 +80,23 @@ namespace osu.Game.Users.Drawables
             return base.OnClick(e);
         }
 
-        public partial class UserGridPanelTooltip : VisibilityContainer, ITooltip<UserGridPanel>
+        public partial class APIUserTooltip : VisibilityContainer, ITooltip<APIUser>
         {
-            private readonly ClickableAvatar parent;
-            private UserGridPanel? displayedUser;
-            private bool isEnabled;
+            private APIUser? user;
 
-            public UserGridPanelTooltip(ClickableAvatar parent)
+            public APIUserTooltip(APIUser? user)
             {
-                this.parent = parent ?? throw new ArgumentNullException(nameof(parent));
-                isEnabled = this.parent.IsTooltipEnabled;
+                this.user = user;
             }
 
             protected override void PopIn()
             {
-                parent.SetValue(out isEnabled);
-
-                if (displayedUser is null || !isEnabled)
+                if (user is null)
                 {
                     return;
                 }
 
-                Child = displayedUser;
+                Child = new UserGridPanel(user);
                 this.FadeIn(20, Easing.OutQuint);
             }
 
@@ -115,9 +104,9 @@ namespace osu.Game.Users.Drawables
 
             public void Move(Vector2 pos) => Position = pos;
 
-            public void SetContent(UserGridPanel userGridPanel)
+            public void SetContent(APIUser user)
             {
-                displayedUser = userGridPanel;
+                this.user = user;
             }
         }
     }
