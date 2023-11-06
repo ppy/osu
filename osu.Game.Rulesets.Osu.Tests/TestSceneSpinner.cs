@@ -3,6 +3,7 @@
 
 #nullable disable
 
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using NUnit.Framework;
@@ -153,7 +154,7 @@ namespace osu.Game.Rulesets.Osu.Tests
             {
                 base.Update();
                 if (auto)
-                    RotationTracker.AddRotation((float)(Clock.ElapsedFrameTime * spinRate.Value));
+                    RotationTracker.AddRotation((float)Math.Min(180, Clock.ElapsedFrameTime * spinRate.Value));
             }
         }
     }
