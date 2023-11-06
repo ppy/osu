@@ -54,7 +54,9 @@ namespace osu.Game.Tests.Skins
             // Covers key counters
             "Archives/modified-argon-pro-20230618.osk",
             // Covers "Argon" health display
-            "Archives/modified-argon-pro-20231001.osk"
+            "Archives/modified-argon-pro-20231001.osk",
+            // Covers player name text component.
+            "Archives/modified-argon-20231106.osk",
         };
 
         /// <summary>
