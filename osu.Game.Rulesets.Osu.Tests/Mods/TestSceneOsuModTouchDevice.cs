@@ -105,6 +105,24 @@ namespace osu.Game.Rulesets.Osu.Tests.Mods
         }
 
         [Test]
+        public void TestTouchMiss()
+        {
+            // ensure mouse is active (and that it's not suppressed due to touches in previous tests)
+            AddStep("click mouse", () => InputManager.Click(MouseButton.Left));
+
+            AddUntilStep("wait until 200 near", () => Player.GameplayClockContainer.CurrentTime, () => Is.GreaterThanOrEqualTo(200).Within(500));
+            AddStep("slow down", () => Player.GameplayClockContainer.AdjustmentsFromMods.Frequency.Value = 0.2);
+            AddUntilStep("wait until 200", () => Player.GameplayClockContainer.CurrentTime, () => Is.GreaterThanOrEqualTo(200));
+            AddStep("touch playfield", () =>
+            {
+                var touch = new Touch(TouchSource.Touch1, Player.DrawableRuleset.Playfield.ScreenSpaceDrawQuad.Centre);
+                InputManager.BeginTouch(touch);
+                InputManager.EndTouch(touch);
+            });
+            AddAssert("touch device mod not activated", () => Player.Mods.Value, () => Has.No.InstanceOf<OsuModTouchDevice>());
+        }
+
+        [Test]
         public void TestSecondObjectTouched()
         {
             // ensure mouse is active (and that it's not suppressed due to touches in previous tests)
