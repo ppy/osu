@@ -112,9 +112,7 @@ namespace osu.Game.Rulesets.UI
             activeBackgroundColour = modTypeColour;
 
             inactiveForegroundColour = colourProvider?.Background2 ?? colours.Gray5;
-            activeForegroundColour = Mod.Type != ModType.System
-                ? Interpolation.ValueAt<Colour4>(0.1f, Colour4.Black, modTypeColour, 0, 1)
-                : colours.Yellow;
+            activeForegroundColour = Interpolation.ValueAt<Colour4>(0.1f, Colour4.Black, modTypeColour, 0, 1);
         }
 
         protected override void LoadComplete()
