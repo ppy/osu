@@ -109,11 +109,11 @@ namespace osu.Game.Rulesets.UI
             var modTypeColour = colours.ForModType(Mod.Type);
 
             inactiveBackgroundColour = colourProvider?.Background5 ?? colours.Gray3;
-            activeBackgroundColour = colours.ForModType(Mod.Type);
+            activeBackgroundColour = modTypeColour;
 
             inactiveForegroundColour = colourProvider?.Background2 ?? colours.Gray5;
             activeForegroundColour = Mod.Type != ModType.System
-                ? Interpolation.ValueAt<Colour4>(0.1f, Colour4.Black, activeForegroundColour, 0, 1)
+                ? Interpolation.ValueAt<Colour4>(0.1f, Colour4.Black, modTypeColour, 0, 1)
                 : colours.Yellow;
         }
 
