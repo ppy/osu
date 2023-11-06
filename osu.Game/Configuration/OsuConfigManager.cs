@@ -108,6 +108,8 @@ namespace osu.Game.Configuration
             SetDefault(OsuSetting.MouseDisableWheel, false);
             SetDefault(OsuSetting.ConfineMouseMode, OsuConfineMouseMode.DuringGameplay);
 
+            SetDefault(OsuSetting.GameplayDisableTaps, false);
+
             // Graphics
             SetDefault(OsuSetting.ShowFpsDisplay, false);
 
@@ -332,7 +334,7 @@ namespace osu.Game.Configuration
         FadePlayfieldWhenHealthLow,
 
         /// <summary>
-        /// Disables mouse buttons clicks and touchscreen taps during gameplay.
+        /// Disables mouse buttons clicks during gameplay.
         /// </summary>
         MouseDisableButtons,
         MouseDisableWheel,
@@ -412,6 +414,7 @@ namespace osu.Game.Configuration
         EditorLimitedDistanceSnap,
         ReplaySettingsOverlay,
         AutomaticallyDownloadMissingBeatmaps,
-        EditorShowSpeedChanges
+        EditorShowSpeedChanges,
+        GameplayDisableTaps,
     }
 }
