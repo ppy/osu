@@ -136,7 +136,7 @@ namespace osu.Game.Skinning
 
                                     if (scoreWedge != null)
                                     {
-                                        scoreWedge.Position = new Vector2(-50, 50);
+                                        scoreWedge.Position = new Vector2(-50, 15);
 
                                         if (score != null)
                                             score.Position = new Vector2(components_x_offset, scoreWedge.Y + 15);
