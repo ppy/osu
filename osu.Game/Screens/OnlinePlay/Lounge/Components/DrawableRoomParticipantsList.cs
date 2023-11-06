@@ -289,7 +289,7 @@ namespace osu.Game.Screens.OnlinePlay.Lounge.Components
                 set => avatar.User = value;
             }
 
-            private readonly UpdateableAvatar avatar = new UpdateableAvatar(showUsernameTooltip: true) { RelativeSizeAxes = Axes.Both };
+            private readonly UpdateableAvatar avatar = new UpdateableAvatar { RelativeSizeAxes = Axes.Both };
 
             [BackgroundDependencyLoader]
             private void load(OverlayColourProvider colours)
