@@ -4,13 +4,11 @@
 using System.Linq;
 using NUnit.Framework;
 using osu.Framework.Allocation;
-using osu.Framework.Graphics;
 using osu.Framework.Input;
 using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.Timing;
 using osu.Game.Configuration;
 using osu.Game.Input;
-using osu.Game.Overlays;
 using osu.Game.Rulesets.Osu.Beatmaps;
 using osu.Game.Rulesets.Osu.Mods;
 using osu.Game.Rulesets.Osu.Objects;
@@ -24,8 +22,6 @@ namespace osu.Game.Rulesets.Osu.Tests.Mods
     {
         [Resolved]
         private SessionStatics statics { get; set; } = null!;
-
-        private TestOnScreenDisplay testOnScreenDisplay = null!;
 
         protected override Ruleset CreatePlayerRuleset() => new OsuRuleset();
 
@@ -54,14 +50,11 @@ namespace osu.Game.Rulesets.Osu.Tests.Mods
         [BackgroundDependencyLoader]
         private void load()
         {
-            Add(testOnScreenDisplay = new TestOnScreenDisplay());
             Add(new TouchInputInterceptor());
-            Dependencies.CacheAs<OnScreenDisplay>(testOnScreenDisplay);
         }
 
         public override void SetUpSteps()
         {
-            AddStep("reset OSD toast count", () => testOnScreenDisplay.ToastCount = 0);
             AddStep("reset static", () => statics.SetValue(Static.TouchInputActive, false));
             base.SetUpSteps();
         }
@@ -85,7 +78,6 @@ namespace osu.Game.Rulesets.Osu.Tests.Mods
                 InputManager.EndTouch(touch);
             });
             AddAssert("touch device mod activated", () => Player.Score.ScoreInfo.Mods, () => Has.One.InstanceOf<OsuModTouchDevice>());
-            AddAssert("no toasts displayed", () => testOnScreenDisplay.ToastCount, () => Is.Zero);
         }
 
         [Test]
@@ -101,7 +93,6 @@ namespace osu.Game.Rulesets.Osu.Tests.Mods
                 InputManager.EndTouch(touch);
             });
             AddAssert("touch device mod not activated", () => Player.Score.ScoreInfo.Mods, () => Has.None.InstanceOf<OsuModTouchDevice>());
-            AddAssert("no toasts displayed", () => testOnScreenDisplay.ToastCount, () => Is.Zero);
         }
 
         [Test]
@@ -149,18 +140,6 @@ namespace osu.Game.Rulesets.Osu.Tests.Mods
                 InputManager.EndTouch(touch);
             });
             AddAssert("touch device mod activated", () => Player.Score.ScoreInfo.Mods, () => Has.One.InstanceOf<OsuModTouchDevice>());
-            AddAssert("toast displayed", () => testOnScreenDisplay.ToastCount, () => Is.EqualTo(1));
-        }
-
-        private partial class TestOnScreenDisplay : OnScreenDisplay
-        {
-            public int ToastCount { get; set; }
-
-            protected override void DisplayTemporarily(Drawable toDisplay)
-            {
-                base.DisplayTemporarily(toDisplay);
-                ToastCount++;
-            }
         }
     }
 }
