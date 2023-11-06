@@ -45,6 +45,8 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
         private const float spinning_sample_initial_frequency = 1.0f;
         private const float spinning_sample_modulated_base_frequency = 0.5f;
 
+        private SkinnableSound maxBonusSample;
+
         /// <summary>
         /// The amount of bonus score gained from spinning after the required number of spins, for display purposes.
         /// </summary>
@@ -109,6 +111,10 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
                     MinimumSampleVolume = MINIMUM_SAMPLE_VOLUME,
                     Looping = true,
                     Frequency = { Value = spinning_sample_initial_frequency }
+                },
+                maxBonusSample = new SkinnableSound
+                {
+                    MinimumSampleVolume = MINIMUM_SAMPLE_VOLUME,
                 }
             });
 
@@ -128,6 +134,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
             base.OnFree();
 
             spinningSample.ClearSamples();
+            maxBonusSample.ClearSamples();
         }
 
         protected override void LoadSamples()
@@ -136,6 +143,8 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
 
             spinningSample.Samples = HitObject.CreateSpinningSamples().Cast<ISampleInfo>().ToArray();
             spinningSample.Frequency.Value = spinning_sample_initial_frequency;
+
+            maxBonusSample.Samples = new ISampleInfo[] { HitObject.CreateHitSampleInfo("spinnerbonus") };
         }
 
         private void updateSpinningSample(ValueChangedEvent<bool> tracking)
@@ -157,6 +166,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
         {
             base.StopAllSamples();
             spinningSample?.Stop();
+            maxBonusSample?.Stop();
         }
 
         protected override void AddNestedHitObject(DrawableHitObject hitObject)
@@ -303,8 +313,6 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
 
         private static readonly int score_per_tick = new SpinnerBonusTick.OsuSpinnerBonusTickJudgement().MaxNumericResult;
 
-        private int lastMaxSamplePlayback;
-
         private void updateBonusScore()
         {
             if (ticks.Count == 0)
@@ -327,9 +335,8 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
                 if (tick == null)
                 {
                     // we still want to play a sound. this will probably be a new sound in the future, but for now let's continue playing the bonus sound.
-                    // round robin to avoid hitting playback concurrency.
-                    tick = ticks.OfType<DrawableSpinnerBonusTick>().Skip(lastMaxSamplePlayback++ % HitObject.MaximumBonusSpins).First();
-                    tick.PlaySamples();
+                    // TODO: this doesn't concurrency. i can't figure out how to make it concurrency. samples are bad and need a refactor.
+                    maxBonusSample.Play();
                 }
                 else
                     tick.TriggerResult(true);
