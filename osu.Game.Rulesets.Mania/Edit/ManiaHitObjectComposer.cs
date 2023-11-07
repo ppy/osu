@@ -3,6 +3,7 @@
 
 #nullable disable
 
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using osu.Game.Beatmaps;
@@ -11,6 +12,7 @@ using osu.Game.Rulesets.Edit.Tools;
 using osu.Game.Rulesets.Mania.Objects;
 using osu.Game.Rulesets.Mania.UI;
 using osu.Game.Rulesets.Mods;
+using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.UI;
 using osu.Game.Rulesets.UI.Scrolling;
 using osu.Game.Screens.Edit.Compose.Components;
@@ -49,6 +51,21 @@ namespace osu.Game.Rulesets.Mania.Edit
         };
 
         public override string ConvertSelectionToString()
-            => string.Join(',', EditorBeatmap.SelectedHitObjects.Cast<ManiaHitObject>().OrderBy(h => h.StartTime).Select(h => $"{h.StartTime}|{h.Column}"));
+            => string.Join(ObjectSeparator, EditorBeatmap.SelectedHitObjects.Cast<ManiaHitObject>().OrderBy(h => h.StartTime).Select(h => $"{h.StartTime}|{h.Column}"));
+
+        public override bool HandleHitObjectSelection(HitObject hitObject, string objectInfo)
+        {
+            if (hitObject is not ManiaHitObject maniaHitObject)
+                return false;
+
+            double[] split = objectInfo.Split('|').Select(double.Parse).ToArray();
+            if (split.Length != 2)
+                return false;
+
+            double timeValue = split[0];
+            double columnValue = split[1];
+            return Math.Abs(maniaHitObject.StartTime - timeValue) < 0.5
+                   && Math.Abs(maniaHitObject.Column - columnValue) < 0.5;
+        }
     }
 }

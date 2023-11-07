@@ -528,6 +528,19 @@ namespace osu.Game.Rulesets.Edit
 
         public virtual string ConvertSelectionToString() => string.Empty;
 
+        /// <summary>
+        /// The custom logic that decides whether a HitObject should be selected when clicking an editor timestamp link
+        /// </summary>
+        /// <param name="hitObject">The hitObject being checked</param>
+        /// <param name="objectInfo">A single hitObject's information created with <see cref="ConvertSelectionToString"/></param>
+        /// <returns>Whether a HitObject should be selected or not</returns>
+        public virtual bool HandleHitObjectSelection(HitObject hitObject, string objectInfo) => false;
+
+        /// <summary>
+        /// A character that separates the selection in <see cref="ConvertSelectionToString"/>
+        /// </summary>
+        public virtual char ObjectSeparator => ',';
+
         #region IPositionSnapProvider
 
         public abstract SnapResult FindSnappedPositionAndTime(Vector2 screenSpacePosition, SnapType snapType = SnapType.All);
