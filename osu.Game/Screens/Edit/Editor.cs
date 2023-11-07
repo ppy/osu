@@ -1145,7 +1145,7 @@ namespace osu.Game.Screens.Edit
 
             if (groups.Length != 4 || string.IsNullOrEmpty(groups[0]))
             {
-                Schedule(() => notifications.Post(new SimpleNotification
+                Schedule(() => notifications?.Post(new SimpleNotification
                 {
                     Icon = FontAwesome.Solid.ExclamationTriangle,
                     Text = EditorStrings.FailedToProcessTimestamp
@@ -1162,7 +1162,7 @@ namespace osu.Game.Screens.Edit
             // Limit timestamp link length at 30000 min (50 hr) to avoid parsing issues
             if (string.IsNullOrEmpty(timeMin) || timeMin.Length > 5 || double.Parse(timeMin) > 30_000)
             {
-                Schedule(() => notifications.Post(new SimpleNotification
+                Schedule(() => notifications?.Post(new SimpleNotification
                 {
                     Icon = FontAwesome.Solid.ExclamationTriangle,
                     Text = EditorStrings.TooLongTimestamp
@@ -1171,6 +1171,9 @@ namespace osu.Game.Screens.Edit
             }
 
             editorBeatmap.SelectedHitObjects.Clear();
+
+            if (clock.IsRunning)
+                clock.Stop();
 
             double position = EditorTimestampParser.GetTotalMilliseconds(timeMin, timeSec, timeMss);
 
