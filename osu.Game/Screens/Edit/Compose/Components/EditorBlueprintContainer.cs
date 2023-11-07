@@ -54,7 +54,7 @@ namespace osu.Game.Screens.Edit.Compose.Components
 
             // This makes sure HitObjects will have active Blueprints ready to display
             // after clicking on an Editor Timestamp/Link
-            Beatmap.SelectedHitObjects.CollectionChanged += keepHitObjectsAlive;
+            Beatmap.SelectedHitObjects.CollectionChanged += selectionChanged;
 
             if (Composer != null)
             {
@@ -149,7 +149,7 @@ namespace osu.Game.Screens.Edit.Compose.Components
             SelectedItems.AddRange(Beatmap.HitObjects.Except(SelectedItems).ToArray());
         }
 
-        private void keepHitObjectsAlive(object sender, NotifyCollectionChangedEventArgs e)
+        private void selectionChanged(object sender, NotifyCollectionChangedEventArgs e)
         {
             if (e == null || e.Action != NotifyCollectionChangedAction.Add || e.NewItems == null)
                 return;
@@ -180,7 +180,7 @@ namespace osu.Game.Screens.Edit.Compose.Components
             {
                 Beatmap.HitObjectAdded -= AddBlueprintFor;
                 Beatmap.HitObjectRemoved -= RemoveBlueprintFor;
-                Beatmap.SelectedHitObjects.CollectionChanged -= keepHitObjectsAlive;
+                Beatmap.SelectedHitObjects.CollectionChanged -= selectionChanged;
             }
 
             usageEventBuffer?.Dispose();
