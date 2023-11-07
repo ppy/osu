@@ -3,7 +3,6 @@
 
 using System.Collections.Generic;
 using System.Linq;
-using osu.Framework;
 using osu.Framework.Allocation;
 using osu.Framework.Input.Handlers;
 using osu.Framework.Localisation;
