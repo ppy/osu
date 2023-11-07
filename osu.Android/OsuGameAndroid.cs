@@ -11,7 +11,6 @@ using osu.Framework.Input.Handlers;
 using osu.Framework.Platform;
 using osu.Game;
 using osu.Game.Overlays.Settings;
-using osu.Game.Overlays.Settings.Sections.Input;
 using osu.Game.Updater;
 using osu.Game.Utils;
 
