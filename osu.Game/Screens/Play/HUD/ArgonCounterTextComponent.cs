@@ -1,6 +1,7 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System;
 using System.Threading.Tasks;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
@@ -42,13 +43,28 @@ namespace osu.Game.Screens.Play.HUD
 
             this.label = label;
 
-            wireframesPart = new ArgonCounterSpriteText(@"wireframes")
+            wireframesPart = new ArgonCounterSpriteText(c =>
+            {
+                if (c == '.')
+                    return @"dot";
+
+                return @"wireframes";
+            })
             {
                 Anchor = anchor,
                 Origin = anchor,
                 Spacing = spacing ?? new Vector2(-2, 0),
             };
-            textPart = new ArgonCounterSpriteText
+            textPart = new ArgonCounterSpriteText(c =>
+            {
+                if (c == '.')
+                    return @"dot";
+
+                if (c == '%')
+                    return @"percentage";
+
+                return c.ToString();
+            })
             {
                 Anchor = anchor,
                 Origin = anchor,
@@ -98,15 +114,15 @@ namespace osu.Game.Screens.Play.HUD
 
         private partial class ArgonCounterSpriteText : OsuSpriteText
         {
-            private readonly string? glyphLookupOverride;
+            private readonly Func<char, string> getLookup;
 
             private GlyphStore glyphStore = null!;
 
             protected override char FixedWidthReferenceCharacter => '5';
 
-            public ArgonCounterSpriteText(string? glyphLookupOverride = null)
+            public ArgonCounterSpriteText(Func<char, string> getLookup)
             {
-                this.glyphLookupOverride = glyphLookupOverride;
+                this.getLookup = getLookup;
 
                 Shadow = false;
                 UseFullGlyphHeight = false;
@@ -117,7 +133,7 @@ namespace osu.Game.Screens.Play.HUD
             {
                 // todo: rename font
                 Font = new FontUsage(@"argon-score", 1);
-                glyphStore = new GlyphStore(skin, glyphLookupOverride);
+                glyphStore = new GlyphStore(skin, getLookup);
             }
 
             protected override TextBuilder CreateTextBuilder(ITexturedGlyphLookupStore store) => base.CreateTextBuilder(glyphStore);
@@ -125,17 +141,17 @@ namespace osu.Game.Screens.Play.HUD
             private class GlyphStore : ITexturedGlyphLookupStore
             {
                 private readonly ISkin skin;
-                private readonly string? glyphLookupOverride;
+                private readonly Func<char, string> getLookup;
 
-                public GlyphStore(ISkin skin, string? glyphLookupOverride)
+                public GlyphStore(ISkin skin, Func<char, string> getLookup)
                 {
                     this.skin = skin;
-                    this.glyphLookupOverride = glyphLookupOverride;
+                    this.getLookup = getLookup;
                 }
 
                 public ITexturedCharacterGlyph? Get(string fontName, char character)
                 {
-                    string lookup = glyphLookupOverride ?? character.ToString();
+                    string lookup = getLookup(character);
                     var texture = skin.GetTexture($"{fontName}-{lookup}");
 
                     if (texture == null)
