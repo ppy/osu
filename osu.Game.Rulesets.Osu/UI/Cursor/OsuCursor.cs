@@ -22,7 +22,7 @@ namespace osu.Game.Rulesets.Osu.UI.Cursor
 {
     public partial class OsuCursor : SkinReloadableDrawable
     {
-        private const float size = 28;
+        public const float SIZE = 28;
 
         private const float pressed_scale = 1.2f;
         private const float released_scale = 1f;
@@ -51,7 +51,7 @@ namespace osu.Game.Rulesets.Osu.UI.Cursor
         {
             Origin = Anchor.Centre;
 
-            Size = new Vector2(size);
+            Size = new Vector2(SIZE);
         }
 
         [BackgroundDependencyLoader]
@@ -134,7 +134,7 @@ namespace osu.Game.Rulesets.Osu.UI.Cursor
                         Origin = Anchor.Centre,
                         RelativeSizeAxes = Axes.Both,
                         Masking = true,
-                        BorderThickness = size / 6,
+                        BorderThickness = SIZE / 6,
                         BorderColour = Color4.White,
                         EdgeEffect = new EdgeEffectParameters
                         {
@@ -156,7 +156,7 @@ namespace osu.Game.Rulesets.Osu.UI.Cursor
                                 Anchor = Anchor.Centre,
                                 RelativeSizeAxes = Axes.Both,
                                 Masking = true,
-                                BorderThickness = size / 3,
+                                BorderThickness = SIZE / 3,
                                 BorderColour = Color4.White.Opacity(0.5f),
                                 Children = new Drawable[]
                                 {
