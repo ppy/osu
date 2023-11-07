@@ -29,14 +29,11 @@ namespace osu.Game.Overlays.Settings.Sections.Input
         [BackgroundDependencyLoader]
         private void load(OsuConfigManager osuConfig)
         {
-            if (!RuntimeInfo.IsMobile) // don't allow disabling the only input method (touch) on mobile.
+            Add(new SettingsCheckbox
             {
-                Add(new SettingsCheckbox
-                {
-                    LabelText = CommonStrings.Enabled,
-                    Current = handler.Enabled
-                });
-            }
+                LabelText = CommonStrings.Enabled,
+                Current = handler.Enabled
+            });
 
             Add(new SettingsCheckbox
             {
