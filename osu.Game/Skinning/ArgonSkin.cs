@@ -115,6 +115,7 @@ namespace osu.Game.Skinning
                             var skinnableTargetWrapper = new DefaultSkinComponentsContainer(container =>
                             {
                                 var health = container.OfType<ArgonHealthDisplay>().FirstOrDefault();
+                                var healthLine = container.OfType<ArgonHealthRightLine>().FirstOrDefault();
                                 var scoreWedge = container.OfType<ArgonScoreWedge>().FirstOrDefault();
                                 var score = container.OfType<ArgonScoreCounter>().FirstOrDefault();
                                 var accuracy = container.OfType<ArgonAccuracyCounter>().FirstOrDefault();
@@ -133,6 +134,9 @@ namespace osu.Game.Skinning
                                     health.BarLength.Value = 300;
                                     health.BarHeight.Value = 30f;
                                     health.Position = new Vector2(components_x_offset, 20f);
+
+                                    if (healthLine != null)
+                                        healthLine.Y = health.Y;
 
                                     if (scoreWedge != null)
                                     {

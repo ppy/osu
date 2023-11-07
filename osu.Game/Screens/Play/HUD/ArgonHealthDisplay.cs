@@ -90,12 +90,11 @@ namespace osu.Game.Screens.Play.HUD
             }
         }
 
-        private const float main_path_radius = 10f;
+        public const float MAIN_PATH_RADIUS = 10f;
 
         [BackgroundDependencyLoader]
         private void load()
         {
-            RelativeSizeAxes = Axes.X;
             AutoSizeAxes = Axes.Y;
 
             InternalChild = new Container
@@ -105,7 +104,7 @@ namespace osu.Game.Screens.Play.HUD
                 {
                     background = new BackgroundPath
                     {
-                        PathRadius = main_path_radius,
+                        PathRadius = MAIN_PATH_RADIUS,
                     },
                     glowBar = new BarPath
                     {
@@ -125,7 +124,7 @@ namespace osu.Game.Screens.Play.HUD
                         Blending = BlendingParameters.Additive,
                         BarColour = main_bar_colour,
                         GlowColour = main_bar_glow_colour,
-                        PathRadius = main_path_radius,
+                        PathRadius = MAIN_PATH_RADIUS,
                         GlowPortion = 0.6f,
                     },
                 }
@@ -248,7 +247,7 @@ namespace osu.Game.Screens.Play.HUD
 
         private void updatePath()
         {
-            float barLength = DrawWidth - main_path_radius * 2;
+            float barLength = DrawWidth - MAIN_PATH_RADIUS * 2;
             float curveStart = barLength - 70;
             float curveEnd = barLength - 40;
 
