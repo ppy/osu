@@ -204,9 +204,10 @@ namespace osu.Game.Skinning
                             {
                                 Children = new Drawable[]
                                 {
-                                    new ArgonHealthDisplay(),
                                     new ArgonScoreWedge(),
                                     new ArgonScoreCounter(),
+                                    new ArgonHealthDisplay(),
+                                    new ArgonHealthRightLine(),
                                     new ArgonAccuracyCounter(),
                                     new ArgonComboCounter(),
                                     new BarHitErrorMeter(),
