@@ -98,9 +98,6 @@ namespace osu.Android
                 case AndroidJoystickHandler jh:
                     return new AndroidJoystickSettings(jh);
 
-                case AndroidTouchHandler:
-                    return new TouchSettings(handler);
-
                 default:
                     return base.CreateSettingsSubsectionFor(handler);
             }
