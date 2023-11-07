@@ -143,14 +143,14 @@ namespace osu.Game.Skinning
                                             score.Origin = Anchor.TopRight;
                                             score.Position = new Vector2(components_x_offset + 200, scoreWedge.Y + 30);
                                         }
+                                    }
 
-                                        if (accuracy != null)
-                                        {
-                                            // +4 to vertically align the accuracy counter with the score counter.
-                                            accuracy.Position = new Vector2(components_x_offset + 4, scoreWedge.Y + 45);
-                                            accuracy.Anchor = Anchor.TopLeft;
-                                            accuracy.Origin = Anchor.TopLeft;
-                                        }
+                                    if (accuracy != null)
+                                    {
+                                        // +4 to vertically align the accuracy counter with the score counter.
+                                        accuracy.Position = new Vector2(-20, 20);
+                                        accuracy.Anchor = Anchor.TopRight;
+                                        accuracy.Origin = Anchor.TopRight;
                                     }
 
                                     var hitError = container.OfType<HitErrorMeter>().FirstOrDefault();

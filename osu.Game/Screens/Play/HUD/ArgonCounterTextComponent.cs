@@ -38,7 +38,7 @@ namespace osu.Game.Screens.Play.HUD
             }
         }
 
-        public ArgonCounterTextComponent(Anchor anchor, LocalisableString? label = null)
+        public ArgonCounterTextComponent(Anchor anchor, LocalisableString? label = null, Vector2? spacing = null)
         {
             Anchor = anchor;
             Origin = anchor;
@@ -49,11 +49,13 @@ namespace osu.Game.Screens.Play.HUD
             {
                 Anchor = anchor,
                 Origin = anchor,
+                Spacing = spacing ?? new Vector2(-2, 0),
             };
             textPart = new ArgonCounterSpriteText
             {
                 Anchor = anchor,
                 Origin = anchor,
+                Spacing = spacing ?? new Vector2(-2, 0),
             };
         }
 
@@ -115,9 +117,7 @@ namespace osu.Game.Screens.Play.HUD
             private void load(ISkinSource skin)
             {
                 // todo: rename font
-                Font = new FontUsage(@"argon-score", 1, fixedWidth: true);
-                Spacing = new Vector2(-2, 0);
-
+                Font = new FontUsage(@"argon-score", 1);
                 glyphStore = new GlyphStore(skin, glyphLookupOverride);
             }
 
