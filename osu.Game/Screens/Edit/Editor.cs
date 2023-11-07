@@ -1,4 +1,4 @@
-// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
 #nullable disable
@@ -14,6 +14,7 @@ using osu.Framework.Audio.Track;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
+using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.UserInterface;
 using osu.Framework.Input;
 using osu.Framework.Input.Bindings;
@@ -1142,7 +1143,7 @@ namespace osu.Game.Screens.Edit
         {
             string[] groups = EditorTimestampParser.GetRegexGroups(timestamp);
 
-            if (groups.Length != 2 || string.IsNullOrEmpty(groups[0]))
+            if (groups.Length != 4 || string.IsNullOrEmpty(groups[0]))
             {
                 Schedule(() => notifications.Post(new SimpleNotification
                 {
@@ -1152,13 +1153,14 @@ namespace osu.Game.Screens.Edit
                 return;
             }
 
-            string timeGroup = groups[0];
-            string objectsGroup = groups[1];
-            string timeMinutes = timeGroup.Split(':').FirstOrDefault() ?? string.Empty;
+            string timeMin = groups[0];
+            string timeSec = groups[1];
+            string timeMss = groups[2];
+            string objectsGroup = groups[3].Replace("(", "").Replace(")", "").Trim();
 
             // Currently, lazer chat highlights infinite-long editor links like `10000000000:00:000 (1)`
             // Limit timestamp link length at 30000 min (50 hr) to avoid parsing issues
-            if (timeMinutes.Length > 5 || double.Parse(timeMinutes) > 30_000)
+            if (string.IsNullOrEmpty(timeMin) || timeMin.Length > 5 || double.Parse(timeMin) > 30_000)
             {
                 Schedule(() => notifications.Post(new SimpleNotification
                 {
@@ -1168,38 +1170,36 @@ namespace osu.Game.Screens.Edit
                 return;
             }
 
-            double position = EditorTimestampParser.GetTotalMilliseconds(timeGroup);
-
             editorBeatmap.SelectedHitObjects.Clear();
 
-            // Only seeking is necessary
+            double position = EditorTimestampParser.GetTotalMilliseconds(timeMin, timeSec, timeMss);
+
             if (string.IsNullOrEmpty(objectsGroup))
             {
-                if (clock.IsRunning)
-                    clock.Stop();
-
-                clock.Seek(position);
+                clock.SeekSmoothlyTo(position);
                 return;
             }
+
+            // Seek to the next closest HitObject instead
+            HitObject nextObject = editorBeatmap.HitObjects.FirstOrDefault(x => x.StartTime >= position);
+
+            if (nextObject != null)
+                position = nextObject.StartTime;
+
+            clock.SeekSmoothlyTo(position);
 
             if (Mode.Value != EditorScreenMode.Compose)
                 Mode.Value = EditorScreenMode.Compose;
 
-            // Seek to the next closest HitObject
-            HitObject nextObject = editorBeatmap.HitObjects.FirstOrDefault(x => x.StartTime >= position);
-
-            if (nextObject != null && nextObject.StartTime > 0)
-                position = nextObject.StartTime;
-
-            List<HitObject> selected = EditorTimestampParser.GetSelectedHitObjects(editorBeatmap.HitObjects.ToList(), objectsGroup, position);
+            List<HitObject> selected = EditorTimestampParser.GetSelectedHitObjects(
+                currentScreen.Dependencies.Get<HitObjectComposer>(),
+                editorBeatmap.HitObjects.ToList(),
+                objectsGroup,
+                position
+            );
 
             if (selected.Any())
                 editorBeatmap.SelectedHitObjects.AddRange(selected);
-
-            if (clock.IsRunning)
-                clock.Stop();
-
-            clock.Seek(position);
         }
 
         public double SnapTime(double time, double? referenceTime) => editorBeatmap.SnapTime(time, referenceTime);

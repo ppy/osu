@@ -104,7 +104,18 @@ namespace osu.Game.Rulesets.Osu.Edit
             => new OsuBlueprintContainer(this);
 
         public override string ConvertSelectionToString()
-            => string.Join(',', selectedHitObjects.Cast<OsuHitObject>().OrderBy(h => h.StartTime).Select(h => (h.IndexInCurrentCombo + 1).ToString()));
+            => string.Join(ObjectSeparator, selectedHitObjects.Cast<OsuHitObject>().OrderBy(h => h.StartTime).Select(h => (h.IndexInCurrentCombo + 1).ToString()));
+
+        public override bool HandleHitObjectSelection(HitObject hitObject, string objectInfo)
+        {
+            if (hitObject is not OsuHitObject osuHitObject)
+                return false;
+
+            if (!int.TryParse(objectInfo, out int comboValue) || comboValue < 1)
+                return false;
+
+            return osuHitObject.IndexInCurrentCombo + 1 == comboValue;
+        }
 
         private DistanceSnapGrid distanceSnapGrid;
         private Container distanceSnapGridContainer;
