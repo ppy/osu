@@ -1,8 +1,6 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using System;
-using System.Linq;
 using System.Threading.Tasks;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
@@ -25,7 +23,6 @@ namespace osu.Game.Screens.Play.HUD
         private readonly ArgonCounterSpriteText wireframesPart;
         private readonly ArgonCounterSpriteText textPart;
 
-        public IBindable<int> RequiredDisplayDigits { get; } = new BindableInt();
         public IBindable<float> WireframeOpacity { get; } = new BindableFloat();
 
         public LocalisableString Text
@@ -33,7 +30,7 @@ namespace osu.Game.Screens.Play.HUD
             get => textPart.Text;
             set
             {
-                wireframesPart.Text = new string('#', Math.Max(value.ToString().Count(char.IsDigit), RequiredDisplayDigits.Value));
+                wireframesPart.Text = FormatWireframes(value);
                 textPart.Text = value;
             }
         }
@@ -90,6 +87,8 @@ namespace osu.Game.Screens.Play.HUD
                 }
             };
         }
+
+        protected virtual LocalisableString FormatWireframes(LocalisableString text) => text;
 
         protected override void LoadComplete()
         {
