@@ -242,18 +242,15 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders.Components
         {
             int indexInSegment = piece.PointsInSegment.IndexOf(piece.ControlPoint);
 
-            switch (type)
+            if (type.HasValue && type.Value.SplineType == SplineType.PerfectCurve)
             {
-                case PathType.PerfectCurve:
-                    // Can't always create a circular arc out of 4 or more points,
-                    // so we split the segment into one 3-point circular arc segment
-                    // and one segment of the previous type.
-                    int thirdPointIndex = indexInSegment + 2;
+                // Can't always create a circular arc out of 4 or more points,
+                // so we split the segment into one 3-point circular arc segment
+                // and one segment of the previous type.
+                int thirdPointIndex = indexInSegment + 2;
 
-                    if (piece.PointsInSegment.Count > thirdPointIndex + 1)
-                        piece.PointsInSegment[thirdPointIndex].Type = piece.PointsInSegment[0].Type;
-
-                    break;
+                if (piece.PointsInSegment.Count > thirdPointIndex + 1)
+                    piece.PointsInSegment[thirdPointIndex].Type = piece.PointsInSegment[0].Type;
             }
 
             hitObject.Path.ExpectedDistance.Value = null;
@@ -370,10 +367,11 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders.Components
                     curveTypeItems.Add(createMenuItemForPathType(null));
 
                 // todo: hide/disable items which aren't valid for selected points
-                curveTypeItems.Add(createMenuItemForPathType(PathType.Linear));
-                curveTypeItems.Add(createMenuItemForPathType(PathType.PerfectCurve));
-                curveTypeItems.Add(createMenuItemForPathType(PathType.Bezier));
-                curveTypeItems.Add(createMenuItemForPathType(PathType.Catmull));
+                curveTypeItems.Add(createMenuItemForPathType(PathType.LINEAR));
+                curveTypeItems.Add(createMenuItemForPathType(PathType.PERFECTCURVE));
+                curveTypeItems.Add(createMenuItemForPathType(PathType.BEZIER));
+                curveTypeItems.Add(createMenuItemForPathType(PathType.BSpline(3)));
+                curveTypeItems.Add(createMenuItemForPathType(PathType.CATMULL));
 
                 var menuItems = new List<MenuItem>
                 {

@@ -77,7 +77,7 @@ namespace osu.Game.Tests.Beatmaps.Formats
 
             compareBeatmaps(decoded, decodedAfterEncode);
 
-            ControlPointInfo removeLegacyControlPointTypes(ControlPointInfo controlPointInfo)
+            static ControlPointInfo removeLegacyControlPointTypes(ControlPointInfo controlPointInfo)
             {
                 // emulate non-legacy control points by cloning the non-legacy portion.
                 // the assertion is that the encoder can recreate this losslessly from hitobject data.
@@ -125,10 +125,10 @@ namespace osu.Game.Tests.Beatmaps.Formats
                         Position = new Vector2(0.6f),
                         Path = new SliderPath(new[]
                         {
-                            new PathControlPoint(Vector2.Zero, PathType.Bezier),
+                            new PathControlPoint(Vector2.Zero, PathType.BEZIER),
                             new PathControlPoint(new Vector2(0.5f)),
                             new PathControlPoint(new Vector2(0.51f)), // This is actually on the same position as the previous one in legacy beatmaps (truncated to int).
-                            new PathControlPoint(new Vector2(1f), PathType.Bezier),
+                            new PathControlPoint(new Vector2(1f), PathType.BEZIER),
                             new PathControlPoint(new Vector2(2f))
                         })
                     },

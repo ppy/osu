@@ -37,7 +37,7 @@ namespace osu.Game.Rulesets.Osu.Tests
                 Position = new Vector2(256, 192),
                 IndexInCurrentCombo = 0,
                 StartTime = Time.Current,
-                Path = new SliderPath(PathType.Linear, new[]
+                Path = new SliderPath(PathType.LINEAR, new[]
                 {
                     Vector2.Zero,
                     new Vector2(150, 100),
@@ -52,7 +52,7 @@ namespace osu.Game.Rulesets.Osu.Tests
                 Position = new Vector2(256, 192),
                 ComboIndex = 1,
                 StartTime = dho.HitObject.StartTime,
-                Path = new SliderPath(PathType.Bezier, new[]
+                Path = new SliderPath(PathType.BEZIER, new[]
                 {
                     Vector2.Zero,
                     new Vector2(150, 100),
@@ -80,7 +80,7 @@ namespace osu.Game.Rulesets.Osu.Tests
                         Position = new Vector2(256, 192),
                         IndexInCurrentCombo = 0,
                         StartTime = Time.Current,
-                        Path = new SliderPath(PathType.Linear, new[]
+                        Path = new SliderPath(PathType.LINEAR, new[]
                         {
                             Vector2.Zero,
                             new Vector2(150, 100),

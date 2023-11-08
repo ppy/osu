@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.Diagnostics;
 using System.Linq;
+using Microsoft.Toolkit.HighPerformance;
 using Newtonsoft.Json;
 using osu.Framework.Bindables;
 using osu.Framework.Caching;
@@ -260,7 +261,7 @@ namespace osu.Game.Rulesets.Objects
 
                 // The current vertex ends the segment
                 var segmentVertices = vertices.AsSpan().Slice(start, i - start + 1);
-                var segmentType = ControlPoints[start].Type ?? PathType.Linear;
+                var segmentType = ControlPoints[start].Type ?? PathType.LINEAR;
 
                 // No need to calculate path when there is only 1 vertex
                 if (segmentVertices.Length == 1)
@@ -288,12 +289,12 @@ namespace osu.Game.Rulesets.Objects
 
         private List<Vector2> calculateSubPath(ReadOnlySpan<Vector2> subControlPoints, PathType type)
         {
-            switch (type)
+            switch (type.SplineType)
             {
-                case PathType.Linear:
+                case SplineType.Linear:
                     return PathApproximator.ApproximateLinear(subControlPoints);
 
-                case PathType.PerfectCurve:
+                case SplineType.PerfectCurve:
                     if (subControlPoints.Length != 3)
                         break;
 
@@ -305,11 +306,11 @@ namespace osu.Game.Rulesets.Objects
 
                     return subPath;
 
-                case PathType.Catmull:
+                case SplineType.Catmull:
                     return PathApproximator.ApproximateCatmull(subControlPoints);
             }
 
-            return PathApproximator.ApproximateBezier(subControlPoints);
+            return PathApproximator.ApproximateBSpline(subControlPoints, type.Degree ?? subControlPoints.Length);
         }
 
         private void calculateLength()

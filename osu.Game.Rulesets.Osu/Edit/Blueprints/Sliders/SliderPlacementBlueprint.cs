@@ -51,7 +51,7 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders
         {
             RelativeSizeAxes = Axes.Both;
 
-            HitObject.Path.ControlPoints.Add(segmentStart = new PathControlPoint(Vector2.Zero, PathType.Linear));
+            HitObject.Path.ControlPoints.Add(segmentStart = new PathControlPoint(Vector2.Zero, PathType.LINEAR));
             currentSegmentLength = 1;
         }
 
@@ -128,7 +128,7 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders
                         Debug.Assert(lastPoint != null);
 
                         segmentStart = lastPoint;
-                        segmentStart.Type = PathType.Linear;
+                        segmentStart.Type = PathType.LINEAR;
 
                         currentSegmentLength = 1;
                     }
@@ -173,15 +173,15 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders
             {
                 case 1:
                 case 2:
-                    segmentStart.Type = PathType.Linear;
+                    segmentStart.Type = PathType.LINEAR;
                     break;
 
                 case 3:
-                    segmentStart.Type = PathType.PerfectCurve;
+                    segmentStart.Type = PathType.PERFECTCURVE;
                     break;
 
                 default:
-                    segmentStart.Type = PathType.Bezier;
+                    segmentStart.Type = PathType.BEZIER;
                     break;
             }
         }
@@ -195,7 +195,7 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders
                 {
                     HitObject.Path.ControlPoints.Add(cursor = new PathControlPoint { Position = Vector2.Zero });
 
-                    // The path type should be adjusted in the progression of updatePathType() (Linear -> PC -> Bezier).
+                    // The path type should be adjusted in the progression of updatePathType() (LINEAR -> PC -> BEZIER).
                     currentSegmentLength++;
                     updatePathType();
                 }
@@ -210,7 +210,7 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders
                 HitObject.Path.ControlPoints.Remove(cursor);
                 cursor = null;
 
-                // The path type should be adjusted in the reverse progression of updatePathType() (Bezier -> PC -> Linear).
+                // The path type should be adjusted in the reverse progression of updatePathType() (BEZIER -> PC -> LINEAR).
                 currentSegmentLength--;
                 updatePathType();
             }

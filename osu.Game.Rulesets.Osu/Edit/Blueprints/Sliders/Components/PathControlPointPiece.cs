@@ -221,11 +221,11 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders.Components
         /// </summary>
         private void updatePathType()
         {
-            if (ControlPoint.Type != PathType.PerfectCurve)
+            if (ControlPoint.Type != PathType.PERFECTCURVE)
                 return;
 
             if (PointsInSegment.Count > 3)
-                ControlPoint.Type = PathType.Bezier;
+                ControlPoint.Type = PathType.BEZIER;
 
             if (PointsInSegment.Count != 3)
                 return;
@@ -233,7 +233,7 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders.Components
             ReadOnlySpan<Vector2> points = PointsInSegment.Select(p => p.Position).ToArray();
             RectangleF boundingBox = PathApproximator.CircularArcBoundingBox(points);
             if (boundingBox.Width >= 640 || boundingBox.Height >= 480)
-                ControlPoint.Type = PathType.Bezier;
+                ControlPoint.Type = PathType.BEZIER;
         }
 
         /// <summary>
@@ -256,18 +256,22 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders.Components
 
         private Color4 getColourFromNodeType()
         {
-            if (!(ControlPoint.Type is PathType pathType))
+            if (ControlPoint.Type is not PathType pathType)
                 return colours.Yellow;
 
             switch (pathType)
             {
-                case PathType.Catmull:
+                case { SplineType: SplineType.Catmull }:
                     return colours.SeaFoam;
 
-                case PathType.Bezier:
-                    return colours.Pink;
+                case { SplineType: SplineType.BSpline, Degree: null }:
+                    return colours.PinkLighter;
 
-                case PathType.PerfectCurve:
+                case { SplineType: SplineType.BSpline, Degree: >= 1 }:
+                    int idx = Math.Clamp(pathType.Degree.Value, 0, 3);
+                    return new[] { colours.PinkDarker, colours.PinkDark, colours.Pink, colours.PinkLight }[idx];
+
+                case { SplineType: SplineType.PerfectCurve }:
                     return colours.PurpleDark;
 
                 default:

@@ -224,16 +224,18 @@ namespace osu.Game.Rulesets.Objects.Legacy
             {
                 default:
                 case 'C':
-                    return PathType.Catmull;
+                    return new PathType(SplineType.Catmull);
 
                 case 'B':
-                    return PathType.Bezier;
+                    if (input.Length > 1 && int.TryParse(input.Substring(1), out int degree) && degree > 0)
+                        return new PathType { SplineType = SplineType.BSpline, Degree = degree };
+                    return new PathType(SplineType.BSpline);
 
                 case 'L':
-                    return PathType.Linear;
+                    return new PathType(SplineType.Linear);
 
                 case 'P':
-                    return PathType.PerfectCurve;
+                    return new PathType(SplineType.PerfectCurve);
             }
         }
 
@@ -320,14 +322,14 @@ namespace osu.Game.Rulesets.Objects.Legacy
                 readPoint(endPoint, offset, out vertices[^1]);
 
             // Edge-case rules (to match stable).
-            if (type == PathType.PerfectCurve)
+            if (type == PathType.PERFECTCURVE)
             {
                 if (vertices.Length != 3)
-                    type = PathType.Bezier;
+                    type = PathType.BEZIER;
                 else if (isLinear(vertices))
                 {
                     // osu-stable special-cased colinear perfect curves to a linear path
-                    type = PathType.Linear;
+                    type = PathType.LINEAR;
                 }
             }
 
@@ -349,10 +351,10 @@ namespace osu.Game.Rulesets.Objects.Legacy
                 if (vertices[endIndex].Position != vertices[endIndex - 1].Position)
                     continue;
 
-                // Legacy Catmull sliders don't support multiple segments, so adjacent Catmull segments should be treated as a single one.
+                // Legacy CATMULL sliders don't support multiple segments, so adjacent CATMULL segments should be treated as a single one.
                 // Importantly, this is not applied to the first control point, which may duplicate the slider path's position
                 // resulting in a duplicate (0,0) control point in the resultant list.
-                if (type == PathType.Catmull && endIndex > 1 && FormatVersion < LegacyBeatmapEncoder.FIRST_LAZER_VERSION)
+                if (type == PathType.CATMULL && endIndex > 1 && FormatVersion < LegacyBeatmapEncoder.FIRST_LAZER_VERSION)
                     continue;
 
                 // The last control point of each segment is not allowed to start a new implicit segment.
