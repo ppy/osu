@@ -13,10 +13,10 @@ namespace osu.Game.Tests.Visual.Online
     [TestFixture]
     public partial class TestSceneGraph : OsuTestScene
     {
-        private readonly BarGraph graph;
-
         public TestSceneGraph()
         {
+            BarGraph graph;
+
             Child = graph = new BarGraph
             {
                 RelativeSizeAxes = Axes.Both,
@@ -34,13 +34,14 @@ namespace osu.Game.Tests.Visual.Online
             AddStep("Top to bottom", () => graph.Direction = BarDirection.TopToBottom);
             AddStep("Left to right", () => graph.Direction = BarDirection.LeftToRight);
             AddStep("Right to left", () => graph.Direction = BarDirection.RightToLeft);
-        }
 
-        protected override void LoadComplete()
-        {
-            base.LoadComplete();
-
-            graph.MoveToY(-10, 1000).Then().MoveToY(10, 1000).Loop();
+            AddToggleStep("Toggle movement", enabled =>
+            {
+                if (enabled)
+                    graph.MoveToY(-10, 1000).Then().MoveToY(10, 1000).Loop();
+                else
+                    graph.ClearTransforms();
+            });
         }
     }
 }
