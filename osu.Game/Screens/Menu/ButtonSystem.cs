@@ -86,6 +86,7 @@ namespace osu.Game.Screens.Menu
         private readonly List<MainMenuButton> buttonsPlay = new List<MainMenuButton>();
 
         private Sample sampleBackToLogo;
+        private Sample sampleLogoSwoosh;
 
         private readonly LogoTrackingContainer logoTrackingContainer;
 
@@ -156,6 +157,7 @@ namespace osu.Game.Screens.Menu
             if (idleTracker != null) isIdle.BindTo(idleTracker.IsIdle);
 
             sampleBackToLogo = audio.Samples.Get(@"Menu/back-to-logo");
+            sampleLogoSwoosh = audio.Samples.Get(@"Menu/osu-logo-swoosh");
         }
 
         private void onMultiplayer()
@@ -263,6 +265,8 @@ namespace osu.Game.Screens.Menu
 
                     // Samples are explicitly played here in response to user interaction and not when transitioning due to idle.
                     sampleBackToLogo?.Play();
+                    sampleLogoSwoosh?.Play();
+
                     return true;
 
                 case ButtonSystemState.Play:

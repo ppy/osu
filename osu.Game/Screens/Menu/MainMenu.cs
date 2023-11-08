@@ -7,6 +7,8 @@ using System;
 using System.Diagnostics;
 using JetBrains.Annotations;
 using osu.Framework.Allocation;
+using osu.Framework.Audio;
+using osu.Framework.Audio.Sample;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
@@ -89,8 +91,10 @@ namespace osu.Game.Screens.Menu
         private SongTicker songTicker;
         private Container logoTarget;
 
+        private Sample reappearSampleSwoosh;
+
         [BackgroundDependencyLoader(true)]
-        private void load(BeatmapListingOverlay beatmapListing, SettingsOverlay settings, OsuConfigManager config, SessionStatics statics)
+        private void load(BeatmapListingOverlay beatmapListing, SettingsOverlay settings, OsuConfigManager config, SessionStatics statics, AudioManager audio)
         {
             holdDelay = config.GetBindable<double>(OsuSetting.UIHoldActivationDelay);
             loginDisplayed = statics.GetBindable<bool>(Static.LoginOverlayDisplayed);
@@ -161,6 +165,8 @@ namespace osu.Game.Screens.Menu
 
             Buttons.OnSettings = () => settings?.ToggleVisibility();
             Buttons.OnBeatmapListing = () => beatmapListing?.ToggleVisibility();
+
+            reappearSampleSwoosh = audio.Samples.Get(@"Menu/reappear-swoosh");
 
             preloadSongSelect();
         }
@@ -290,6 +296,8 @@ namespace osu.Game.Screens.Menu
         public override void OnResuming(ScreenTransitionEvent e)
         {
             base.OnResuming(e);
+
+            reappearSampleSwoosh?.Play();
 
             ApplyToBackground(b => (b as BackgroundScreenDefault)?.Next());
 
