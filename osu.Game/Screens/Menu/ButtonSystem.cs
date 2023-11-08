@@ -85,7 +85,7 @@ namespace osu.Game.Screens.Menu
         private readonly List<MainMenuButton> buttonsTopLevel = new List<MainMenuButton>();
         private readonly List<MainMenuButton> buttonsPlay = new List<MainMenuButton>();
 
-        private Sample sampleBack;
+        private Sample sampleBackToLogo;
 
         private readonly LogoTrackingContainer logoTrackingContainer;
 
@@ -104,7 +104,7 @@ namespace osu.Game.Screens.Menu
             buttonArea.AddRange(new Drawable[]
             {
                 new MainMenuButton(ButtonSystemStrings.Settings, string.Empty, FontAwesome.Solid.Cog, new Color4(85, 85, 85, 255), () => OnSettings?.Invoke(), -WEDGE_WIDTH, Key.O),
-                backButton = new MainMenuButton(ButtonSystemStrings.Back, @"button-back-select", OsuIcon.LeftCircle, new Color4(51, 58, 94, 255), () => State = ButtonSystemState.TopLevel,
+                backButton = new MainMenuButton(ButtonSystemStrings.Back, @"back-to-top", OsuIcon.LeftCircle, new Color4(51, 58, 94, 255), () => State = ButtonSystemState.TopLevel,
                     -WEDGE_WIDTH)
                 {
                     VisibleState = ButtonSystemState.Play,
@@ -155,7 +155,7 @@ namespace osu.Game.Screens.Menu
 
             if (idleTracker != null) isIdle.BindTo(idleTracker.IsIdle);
 
-            sampleBack = audio.Samples.Get(@"Menu/button-back-select");
+            sampleBackToLogo = audio.Samples.Get(@"Menu/back-to-logo");
         }
 
         private void onMultiplayer()
@@ -260,7 +260,9 @@ namespace osu.Game.Screens.Menu
             {
                 case ButtonSystemState.TopLevel:
                     State = ButtonSystemState.Initial;
-                    sampleBack?.Play();
+
+                    // Samples are explicitly played here in response to user interaction and not when transitioning due to idle.
+                    sampleBackToLogo?.Play();
                     return true;
 
                 case ButtonSystemState.Play:
