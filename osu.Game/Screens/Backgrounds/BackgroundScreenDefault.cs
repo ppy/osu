@@ -3,11 +3,14 @@
 
 #nullable disable
 
+using System.Diagnostics;
 using System.Threading;
+using JetBrains.Annotations;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Logging;
+using osu.Framework.Screens;
 using osu.Framework.Threading;
 using osu.Framework.Utils;
 using osu.Game.Beatmaps;
@@ -69,6 +72,25 @@ namespace osu.Game.Screens.Backgrounds
 
             // helper function required for AddOnce usage.
             void next() => Next();
+        }
+
+        public override void OnSuspending(ScreenTransitionEvent e)
+        {
+            var backgroundScreenStack = Parent as BackgroundScreenStack;
+            Debug.Assert(backgroundScreenStack != null);
+
+            if (background is BeatmapBackgroundWithStoryboard storyboardBackground)
+                storyboardBackground.UnloadStoryboard(backgroundScreenStack.ScheduleStoryboardDisposal);
+
+            base.OnSuspending(e);
+        }
+
+        public override void OnResuming(ScreenTransitionEvent e)
+        {
+            if (background is BeatmapBackgroundWithStoryboard storyboardBackground)
+                storyboardBackground.LoadStoryboard();
+
+            base.OnResuming(e);
         }
 
         private ScheduledDelegate nextTask;

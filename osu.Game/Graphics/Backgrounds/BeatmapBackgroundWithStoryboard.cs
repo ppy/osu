@@ -1,15 +1,21 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System;
 using System.Collections.Generic;
+using System.Diagnostics;
+using System.Threading;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
+using osu.Framework.Extensions.ObjectExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
+using osu.Framework.Threading;
 using osu.Framework.Timing;
 using osu.Game.Beatmaps;
 using osu.Game.Overlays;
 using osu.Game.Rulesets.Mods;
+using osu.Game.Screens;
 using osu.Game.Storyboards.Drawables;
 
 namespace osu.Game.Graphics.Backgrounds
@@ -17,6 +23,10 @@ namespace osu.Game.Graphics.Backgrounds
     public partial class BeatmapBackgroundWithStoryboard : BeatmapBackground
     {
         private readonly InterpolatingFramedClock storyboardClock;
+
+        private AudioContainer storyboardContainer = null!;
+        private DrawableStoryboard? drawableStoryboard;
+        private CancellationTokenSource? loadCancellationSource = new CancellationTokenSource();
 
         [Resolved(CanBeNull = true)]
         private MusicController? musicController { get; set; }
@@ -33,18 +43,48 @@ namespace osu.Game.Graphics.Backgrounds
         [BackgroundDependencyLoader]
         private void load()
         {
+            AddInternal(storyboardContainer = new AudioContainer
+            {
+                RelativeSizeAxes = Axes.Both,
+                Volume = { Value = 0 },
+            });
+
+            LoadStoryboard();
+        }
+
+        public void LoadStoryboard()
+        {
+            Debug.Assert(drawableStoryboard == null);
+
             if (!Beatmap.Storyboard.HasDrawable)
                 return;
 
             if (Beatmap.Storyboard.ReplacesBackground)
                 Sprite.Alpha = 0;
 
-            LoadComponentAsync(new AudioContainer
+            LoadComponentAsync(drawableStoryboard = new DrawableStoryboard(Beatmap.Storyboard, mods.Value)
             {
-                RelativeSizeAxes = Axes.Both,
-                Volume = { Value = 0 },
-                Child = new DrawableStoryboard(Beatmap.Storyboard, mods.Value) { Clock = storyboardClock }
-            }, AddInternal);
+                Clock = storyboardClock
+            }, s =>
+            {
+                storyboardContainer.FadeInFromZero(BackgroundScreen.TRANSITION_LENGTH, Easing.OutQuint);
+                storyboardContainer.Add(s);
+            }, (loadCancellationSource = new CancellationTokenSource()).Token);
+        }
+
+        public void UnloadStoryboard(Action<DrawableStoryboard> scheduleStoryboardRemoval)
+        {
+            Debug.Assert(drawableStoryboard != null);
+
+            loadCancellationSource.AsNonNull().Cancel();
+            loadCancellationSource = null;
+
+            DrawableStoryboard s = drawableStoryboard;
+
+            storyboardContainer.FadeOut(BackgroundScreen.TRANSITION_LENGTH, Easing.OutQuint);
+            scheduleStoryboardRemoval(s);
+
+            drawableStoryboard = null;
         }
 
         protected override void LoadComplete()
