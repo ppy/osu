@@ -297,6 +297,8 @@ namespace osu.Game.Screens.Menu
         {
             base.OnResuming(e);
 
+            // Ensures any playing `ButtonSystem` samples are stopped when returning to MainMenu (as to not overlap with the 'back' sample)
+            Buttons.StopSamplePlayback();
             reappearSampleSwoosh?.Play();
 
             ApplyToBackground(b => (b as BackgroundScreenDefault)?.Next());

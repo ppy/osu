@@ -52,6 +52,8 @@ namespace osu.Game.Screens.Menu
         private readonly IntroSequence intro;
 
         private Sample sampleClick;
+        private SampleChannel sampleClickChannel;
+
         private Sample sampleBeat;
         private Sample sampleDownbeat;
 
@@ -391,7 +393,11 @@ namespace osu.Game.Screens.Menu
             flashLayer.FadeOut(1500, Easing.OutExpo);
 
             if (Action?.Invoke() == true)
-                sampleClick.Play();
+            {
+                StopSamplePlayback();
+                sampleClickChannel = sampleClick.GetChannel();
+                sampleClickChannel.Play();
+            }
 
             return true;
         }
@@ -439,6 +445,8 @@ namespace osu.Game.Screens.Menu
         private Container defaultProxyTarget;
         private Container currentProxyTarget;
         private Drawable proxy;
+
+        public void StopSamplePlayback() => sampleClickChannel?.Stop();
 
         public Drawable ProxyToContainer(Container c)
         {
