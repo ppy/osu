@@ -148,7 +148,7 @@ namespace osu.Game.Graphics.UserInterface
                     if (barHeight == 0 || barWidth == 0)
                         continue;
 
-                    // Make sure draw quad is thick enough
+                    // Apply minimum sizing to hide the fact that we don't have fractional anti-aliasing.
                     barHeight = Math.Max(barHeight, 1.5f);
                     barWidth = Math.Max(barWidth, 1.5f);
 
