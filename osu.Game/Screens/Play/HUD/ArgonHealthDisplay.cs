@@ -246,13 +246,13 @@ namespace osu.Game.Screens.Play.HUD
 
             barPath = new SliderPath(new[]
             {
-                new PathControlPoint(new Vector2(0, 0), PathType.Linear),
-                new PathControlPoint(new Vector2(curveStart - curve_smoothness, 0), PathType.Bezier),
+                new PathControlPoint(new Vector2(0, 0), PathType.LINEAR),
+                new PathControlPoint(new Vector2(curveStart - curve_smoothness, 0), PathType.BEZIER),
                 new PathControlPoint(new Vector2(curveStart, 0)),
-                new PathControlPoint(new Vector2(curveStart, 0) + diagonalDir * curve_smoothness, PathType.Linear),
-                new PathControlPoint(new Vector2(curveEnd, BarHeight.Value) - diagonalDir * curve_smoothness, PathType.Bezier),
+                new PathControlPoint(new Vector2(curveStart, 0) + diagonalDir * curve_smoothness, PathType.LINEAR),
+                new PathControlPoint(new Vector2(curveEnd, BarHeight.Value) - diagonalDir * curve_smoothness, PathType.BEZIER),
                 new PathControlPoint(new Vector2(curveEnd, BarHeight.Value)),
-                new PathControlPoint(new Vector2(curveEnd + curve_smoothness, BarHeight.Value), PathType.Linear),
+                new PathControlPoint(new Vector2(curveEnd + curve_smoothness, BarHeight.Value), PathType.LINEAR),
                 new PathControlPoint(new Vector2(barLength, BarHeight.Value)),
             });
 

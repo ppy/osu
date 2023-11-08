@@ -3,6 +3,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Globalization;
 using System.IO;
 using System.Linq;
@@ -437,7 +438,7 @@ namespace osu.Game.Beatmaps.Formats
                     // Explicit segments have a new format in which the type is injected into the middle of the control point string.
                     // To preserve compatibility with osu-stable as much as possible, explicit segments with the same type are converted to use implicit segments by duplicating the control point.
                     // One exception are consecutive perfect curves, which aren't supported in osu!stable and can lead to decoding issues if encoded as implicit segments
-                    bool needsExplicitSegment = point.Type != lastType || point.Type == PathType.PerfectCurve;
+                    bool needsExplicitSegment = point.Type != lastType || point.Type == PathType.PERFECTCURVE;
 
                     // Another exception to this is when the last two control points of the last segment were duplicated. This is not a scenario supported by osu!stable.
                     // Lazer does not add implicit segments for the last two control points of _any_ explicit segment, so an explicit segment is forced in order to maintain consistency with the decoder.
@@ -455,19 +456,23 @@ namespace osu.Game.Beatmaps.Formats
                     {
                         switch (point.Type)
                         {
-                            case PathType.Bezier:
+                            case { SplineType: SplineType.BSpline, Degree: > 0 }:
+                                writer.Write($"B{point.Type.Value.Degree}|");
+                                break;
+
+                            case { SplineType: SplineType.BSpline, Degree: <= 0 }:
                                 writer.Write("B|");
                                 break;
 
-                            case PathType.Catmull:
+                            case { SplineType: SplineType.Catmull }:
                                 writer.Write("C|");
                                 break;
 
-                            case PathType.PerfectCurve:
+                            case { SplineType: SplineType.PerfectCurve }:
                                 writer.Write("P|");
                                 break;
 
-                            case PathType.Linear:
+                            case { SplineType: SplineType.Linear }:
                                 writer.Write("L|");
                                 break;
                         }

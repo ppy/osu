@@ -68,26 +68,26 @@ namespace osu.Game.Rulesets.Objects
 
                 // The current vertex ends the segment
                 var segmentVertices = vertices.AsSpan().Slice(start, i - start + 1);
-                var segmentType = controlPoints[start].Type ?? PathType.Linear;
+                var segmentType = controlPoints[start].Type ?? PathType.LINEAR;
 
                 switch (segmentType)
                 {
-                    case PathType.Catmull:
+                    case { SplineType: SplineType.Catmull }:
                         result.AddRange(from segment in ConvertCatmullToBezierAnchors(segmentVertices) from v in segment select v + position);
-
                         break;
 
-                    case PathType.Linear:
+                    case { SplineType: SplineType.Linear }:
                         result.AddRange(from segment in ConvertLinearToBezierAnchors(segmentVertices) from v in segment select v + position);
-
                         break;
 
-                    case PathType.PerfectCurve:
+                    case { SplineType: SplineType.PerfectCurve }:
                         result.AddRange(ConvertCircleToBezierAnchors(segmentVertices).Select(v => v + position));
-
                         break;
 
                     default:
+                        if (segmentType.Degree != null)
+                            throw new NotImplementedException("BSpline conversion of arbitrary degree is not implemented.");
+
                         foreach (Vector2 v in segmentVertices)
                         {
                             result.Add(v + position);
@@ -104,7 +104,7 @@ namespace osu.Game.Rulesets.Objects
         }
 
         /// <summary>
-        /// Converts a path of control points to an identical path using only Bezier type control points.
+        /// Converts a path of control points to an identical path using only BEZIER type control points.
         /// </summary>
         /// <param name="controlPoints">The control points of the path.</param>
         /// <returns>The list of bezier control points.</returns>
@@ -124,38 +124,38 @@ namespace osu.Game.Rulesets.Objects
 
                 // The current vertex ends the segment
                 var segmentVertices = vertices.AsSpan().Slice(start, i - start + 1);
-                var segmentType = controlPoints[start].Type ?? PathType.Linear;
+                var segmentType = controlPoints[start].Type ?? PathType.LINEAR;
 
                 switch (segmentType)
                 {
-                    case PathType.Catmull:
+                    case { SplineType: SplineType.Catmull }:
                         foreach (var segment in ConvertCatmullToBezierAnchors(segmentVertices))
                         {
                             for (int j = 0; j < segment.Length - 1; j++)
                             {
-                                result.Add(new PathControlPoint(segment[j], j == 0 ? PathType.Bezier : null));
+                                result.Add(new PathControlPoint(segment[j], j == 0 ? PathType.BEZIER : null));
                             }
                         }
 
                         break;
 
-                    case PathType.Linear:
+                    case { SplineType: SplineType.Linear }:
                         foreach (var segment in ConvertLinearToBezierAnchors(segmentVertices))
                         {
                             for (int j = 0; j < segment.Length - 1; j++)
                             {
-                                result.Add(new PathControlPoint(segment[j], j == 0 ? PathType.Bezier : null));
+                                result.Add(new PathControlPoint(segment[j], j == 0 ? PathType.BEZIER : null));
                             }
                         }
 
                         break;
 
-                    case PathType.PerfectCurve:
+                    case { SplineType: SplineType.PerfectCurve }:
                         var circleResult = ConvertCircleToBezierAnchors(segmentVertices);
 
                         for (int j = 0; j < circleResult.Length - 1; j++)
                         {
-                            result.Add(new PathControlPoint(circleResult[j], j == 0 ? PathType.Bezier : null));
+                            result.Add(new PathControlPoint(circleResult[j], j == 0 ? PathType.BEZIER : null));
                         }
 
                         break;
@@ -163,7 +163,7 @@ namespace osu.Game.Rulesets.Objects
                     default:
                         for (int j = 0; j < segmentVertices.Length - 1; j++)
                         {
-                            result.Add(new PathControlPoint(segmentVertices[j], j == 0 ? PathType.Bezier : null));
+                            result.Add(new PathControlPoint(segmentVertices[j], j == 0 ? segmentType : null));
                         }
 
                         break;

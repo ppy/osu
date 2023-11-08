@@ -29,11 +29,11 @@ namespace osu.Game.Rulesets.Objects
         {
             var controlPoints = sliderPath.ControlPoints;
 
-            var inheritedLinearPoints = controlPoints.Where(p => sliderPath.PointsInSegment(p)[0].Type == PathType.Linear && p.Type is null).ToList();
+            var inheritedLinearPoints = controlPoints.Where(p => sliderPath.PointsInSegment(p)[0].Type == PathType.LINEAR && p.Type is null).ToList();
 
             // Inherited points after a linear point, as well as the first control point if it inherited,
             // should be treated as linear points, so their types are temporarily changed to linear.
-            inheritedLinearPoints.ForEach(p => p.Type = PathType.Linear);
+            inheritedLinearPoints.ForEach(p => p.Type = PathType.LINEAR);
 
             double[] segmentEnds = sliderPath.GetSegmentEnds().ToArray();
 
@@ -53,7 +53,7 @@ namespace osu.Game.Rulesets.Objects
             inheritedLinearPoints.ForEach(p => p.Type = null);
 
             // Recalculate middle perfect curve control points at the end of the slider path.
-            if (controlPoints.Count >= 3 && controlPoints[^3].Type == PathType.PerfectCurve && controlPoints[^2].Type is null && segmentEnds.Any())
+            if (controlPoints.Count >= 3 && controlPoints[^3].Type == PathType.PERFECTCURVE && controlPoints[^2].Type is null && segmentEnds.Any())
             {
                 double lastSegmentStart = segmentEnds.Length > 1 ? segmentEnds[^2] : 0;
                 double lastSegmentEnd = segmentEnds[^1];

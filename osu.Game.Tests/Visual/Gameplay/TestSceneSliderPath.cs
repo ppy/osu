@@ -52,59 +52,68 @@ namespace osu.Game.Tests.Visual.Gameplay
         {
         }
 
-        [TestCase(PathType.Linear)]
-        [TestCase(PathType.Bezier)]
-        [TestCase(PathType.Catmull)]
-        [TestCase(PathType.PerfectCurve)]
-        public void TestSingleSegment(PathType type)
-            => AddStep("create path", () => path.ControlPoints.AddRange(createSegment(type, Vector2.Zero, new Vector2(0, 100), new Vector2(100))));
+        [TestCase(SplineType.Linear, null)]
+        [TestCase(SplineType.BSpline, null)]
+        [TestCase(SplineType.BSpline, 3)]
+        [TestCase(SplineType.Catmull, null)]
+        [TestCase(SplineType.PerfectCurve, null)]
+        public void TestSingleSegment(SplineType splineType, int? degree)
+            => AddStep("create path", () => path.ControlPoints.AddRange(createSegment(
+                new PathType { SplineType = splineType, Degree = degree },
+                Vector2.Zero,
+                new Vector2(0, 100),
+                new Vector2(100),
+                new Vector2(0, 200),
+                new Vector2(200)
+            )));
 
-        [TestCase(PathType.Linear)]
-        [TestCase(PathType.Bezier)]
-        [TestCase(PathType.Catmull)]
-        [TestCase(PathType.PerfectCurve)]
-        public void TestMultipleSegment(PathType type)
+        [TestCase(SplineType.Linear, null)]
+        [TestCase(SplineType.BSpline, null)]
+        [TestCase(SplineType.BSpline, 3)]
+        [TestCase(SplineType.Catmull, null)]
+        [TestCase(SplineType.PerfectCurve, null)]
+        public void TestMultipleSegment(SplineType splineType, int? degree)
         {
             AddStep("create path", () =>
             {
-                path.ControlPoints.AddRange(createSegment(PathType.Linear, Vector2.Zero));
-                path.ControlPoints.AddRange(createSegment(type, new Vector2(0, 100), new Vector2(100), Vector2.Zero));
+                path.ControlPoints.AddRange(createSegment(PathType.LINEAR, Vector2.Zero));
+                path.ControlPoints.AddRange(createSegment(new PathType { SplineType = splineType, Degree = degree }, new Vector2(0, 100), new Vector2(100), Vector2.Zero));
             });
         }
 
         [Test]
         public void TestAddControlPoint()
         {
-            AddStep("create path", () => path.ControlPoints.AddRange(createSegment(PathType.Linear, Vector2.Zero, new Vector2(0, 100))));
+            AddStep("create path", () => path.ControlPoints.AddRange(createSegment(PathType.LINEAR, Vector2.Zero, new Vector2(0, 100))));
             AddStep("add point", () => path.ControlPoints.Add(new PathControlPoint { Position = new Vector2(100) }));
         }
 
         [Test]
         public void TestInsertControlPoint()
         {
-            AddStep("create path", () => path.ControlPoints.AddRange(createSegment(PathType.Linear, Vector2.Zero, new Vector2(100))));
+            AddStep("create path", () => path.ControlPoints.AddRange(createSegment(PathType.LINEAR, Vector2.Zero, new Vector2(100))));
             AddStep("insert point", () => path.ControlPoints.Insert(1, new PathControlPoint { Position = new Vector2(0, 100) }));
         }
 
         [Test]
         public void TestRemoveControlPoint()
         {
-            AddStep("create path", () => path.ControlPoints.AddRange(createSegment(PathType.Linear, Vector2.Zero, new Vector2(0, 100), new Vector2(100))));
+            AddStep("create path", () => path.ControlPoints.AddRange(createSegment(PathType.LINEAR, Vector2.Zero, new Vector2(0, 100), new Vector2(100))));
             AddStep("remove second point", () => path.ControlPoints.RemoveAt(1));
         }
 
         [Test]
         public void TestChangePathType()
         {
-            AddStep("create path", () => path.ControlPoints.AddRange(createSegment(PathType.Linear, Vector2.Zero, new Vector2(0, 100), new Vector2(100))));
-            AddStep("change type to bezier", () => path.ControlPoints[0].Type = PathType.Bezier);
+            AddStep("create path", () => path.ControlPoints.AddRange(createSegment(PathType.LINEAR, Vector2.Zero, new Vector2(0, 100), new Vector2(100))));
+            AddStep("change type to bezier", () => path.ControlPoints[0].Type = PathType.BEZIER);
         }
 
         [Test]
         public void TestAddSegmentByChangingType()
         {
-            AddStep("create path", () => path.ControlPoints.AddRange(createSegment(PathType.Linear, Vector2.Zero, new Vector2(0, 100), new Vector2(100), new Vector2(100, 0))));
-            AddStep("change second point type to bezier", () => path.ControlPoints[1].Type = PathType.Bezier);
+            AddStep("create path", () => path.ControlPoints.AddRange(createSegment(PathType.LINEAR, Vector2.Zero, new Vector2(0, 100), new Vector2(100), new Vector2(100, 0))));
+            AddStep("change second point type to bezier", () => path.ControlPoints[1].Type = PathType.BEZIER);
         }
 
         [Test]
@@ -112,8 +121,8 @@ namespace osu.Game.Tests.Visual.Gameplay
         {
             AddStep("create path", () =>
             {
-                path.ControlPoints.AddRange(createSegment(PathType.Linear, Vector2.Zero, new Vector2(0, 100), new Vector2(100), new Vector2(100, 0)));
-                path.ControlPoints[1].Type = PathType.Bezier;
+                path.ControlPoints.AddRange(createSegment(PathType.LINEAR, Vector2.Zero, new Vector2(0, 100), new Vector2(100), new Vector2(100, 0)));
+                path.ControlPoints[1].Type = PathType.BEZIER;
             });
 
             AddStep("change second point type to null", () => path.ControlPoints[1].Type = null);
@@ -124,8 +133,8 @@ namespace osu.Game.Tests.Visual.Gameplay
         {
             AddStep("create path", () =>
             {
-                path.ControlPoints.AddRange(createSegment(PathType.Linear, Vector2.Zero, new Vector2(0, 100), new Vector2(100), new Vector2(100, 0)));
-                path.ControlPoints[1].Type = PathType.Bezier;
+                path.ControlPoints.AddRange(createSegment(PathType.LINEAR, Vector2.Zero, new Vector2(0, 100), new Vector2(100), new Vector2(100, 0)));
+                path.ControlPoints[1].Type = PathType.BEZIER;
             });
 
             AddStep("remove second point", () => path.ControlPoints.RemoveAt(1));
@@ -140,11 +149,11 @@ namespace osu.Game.Tests.Visual.Gameplay
                 switch (points)
                 {
                     case 2:
-                        path.ControlPoints.AddRange(createSegment(PathType.PerfectCurve, Vector2.Zero, new Vector2(0, 100)));
+                        path.ControlPoints.AddRange(createSegment(PathType.PERFECTCURVE, Vector2.Zero, new Vector2(0, 100)));
                         break;
 
                     case 4:
-                        path.ControlPoints.AddRange(createSegment(PathType.PerfectCurve, Vector2.Zero, new Vector2(0, 100), new Vector2(100), new Vector2(100, 0)));
+                        path.ControlPoints.AddRange(createSegment(PathType.PERFECTCURVE, Vector2.Zero, new Vector2(0, 100), new Vector2(100), new Vector2(100, 0)));
                         break;
                 }
             });
@@ -153,35 +162,35 @@ namespace osu.Game.Tests.Visual.Gameplay
         [Test]
         public void TestLengthenLastSegment()
         {
-            AddStep("create path", () => path.ControlPoints.AddRange(createSegment(PathType.Linear, Vector2.Zero, new Vector2(0, 100), new Vector2(100))));
+            AddStep("create path", () => path.ControlPoints.AddRange(createSegment(PathType.LINEAR, Vector2.Zero, new Vector2(0, 100), new Vector2(100))));
             AddStep("lengthen last segment", () => path.ExpectedDistance.Value = 300);
         }
 
         [Test]
         public void TestShortenLastSegment()
         {
-            AddStep("create path", () => path.ControlPoints.AddRange(createSegment(PathType.Linear, Vector2.Zero, new Vector2(0, 100), new Vector2(100))));
+            AddStep("create path", () => path.ControlPoints.AddRange(createSegment(PathType.LINEAR, Vector2.Zero, new Vector2(0, 100), new Vector2(100))));
             AddStep("shorten last segment", () => path.ExpectedDistance.Value = 150);
         }
 
         [Test]
         public void TestShortenFirstSegment()
         {
-            AddStep("create path", () => path.ControlPoints.AddRange(createSegment(PathType.Linear, Vector2.Zero, new Vector2(0, 100), new Vector2(100))));
+            AddStep("create path", () => path.ControlPoints.AddRange(createSegment(PathType.LINEAR, Vector2.Zero, new Vector2(0, 100), new Vector2(100))));
             AddStep("shorten first segment", () => path.ExpectedDistance.Value = 50);
         }
 
         [Test]
         public void TestShortenToZeroLength()
         {
-            AddStep("create path", () => path.ControlPoints.AddRange(createSegment(PathType.Linear, Vector2.Zero, new Vector2(0, 100), new Vector2(100))));
+            AddStep("create path", () => path.ControlPoints.AddRange(createSegment(PathType.LINEAR, Vector2.Zero, new Vector2(0, 100), new Vector2(100))));
             AddStep("shorten to 0 length", () => path.ExpectedDistance.Value = 0);
         }
 
         [Test]
         public void TestShortenToNegativeLength()
         {
-            AddStep("create path", () => path.ControlPoints.AddRange(createSegment(PathType.Linear, Vector2.Zero, new Vector2(0, 100), new Vector2(100))));
+            AddStep("create path", () => path.ControlPoints.AddRange(createSegment(PathType.LINEAR, Vector2.Zero, new Vector2(0, 100), new Vector2(100))));
             AddStep("shorten to -10 length", () => path.ExpectedDistance.Value = -10);
         }
 
@@ -197,7 +206,7 @@ namespace osu.Game.Tests.Visual.Gameplay
             };
             double[] distances = { 100d, 200d, 300d };
 
-            AddStep("create path", () => path.ControlPoints.AddRange(positions.Select(p => new PathControlPoint(p, PathType.Linear))));
+            AddStep("create path", () => path.ControlPoints.AddRange(positions.Select(p => new PathControlPoint(p, PathType.LINEAR))));
             AddAssert("segment ends are correct", () => path.GetSegmentEnds(), () => Is.EqualTo(distances.Select(d => d / 300)));
             AddAssert("segment end positions recovered", () => path.GetSegmentEnds().Select(p => path.PositionAt(p)), () => Is.EqualTo(positions.Skip(1)));
 
