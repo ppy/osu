@@ -199,6 +199,7 @@ namespace osu.Game.Screens.Menu
         {
             if (State == ButtonSystemState.Initial)
             {
+                StopSamplePlayback();
                 logo?.TriggerClick();
                 return true;
             }
@@ -264,18 +265,27 @@ namespace osu.Game.Screens.Menu
                     State = ButtonSystemState.Initial;
 
                     // Samples are explicitly played here in response to user interaction and not when transitioning due to idle.
+                    StopSamplePlayback();
                     sampleBackToLogo?.Play();
                     sampleLogoSwoosh?.Play();
 
                     return true;
 
                 case ButtonSystemState.Play:
+                    StopSamplePlayback();
                     backButton.TriggerClick();
                     return true;
 
                 default:
                     return false;
             }
+        }
+
+        public void StopSamplePlayback()
+        {
+            buttonsPlay.ForEach(button => button.StopSamplePlayback());
+            buttonsTopLevel.ForEach(button => button.StopSamplePlayback());
+            logo?.StopSamplePlayback();
         }
 
         private bool onOsuLogo()
