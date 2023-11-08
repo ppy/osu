@@ -4,6 +4,7 @@
 using System.Collections.Generic;
 using osu.Framework.Graphics;
 using osu.Framework.Screens;
+using osu.Game.Storyboards.Drawables;
 
 namespace osu.Game.Screens
 {
@@ -33,5 +34,7 @@ namespace osu.Game.Screens
             base.Push(screen);
             return true;
         }
+
+        public void ScheduleStoryboardDisposal(DrawableStoryboard storyboard) => Scheduler.AddDelayed(storyboard.RemoveAndDisposeImmediately, BackgroundScreen.TRANSITION_LENGTH);
     }
 }
