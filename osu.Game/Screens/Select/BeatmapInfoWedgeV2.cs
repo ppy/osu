@@ -319,8 +319,9 @@ namespace osu.Game.Screens.Select
             {
                 base.UpdateAfterChildren();
 
-                // best effort to confine the auto-sized text to wedge bounds
+                // best effort to confine the auto-sized text to parent bounds
                 // the artist label doesn't have an extra text_margin as it doesn't touch the right metadata
+                // TODO: remove when text/link flow can support truncation with ellipsis natively.
                 TitleLabel.MaxWidth = DrawWidth - text_margin * 2 - shear_width;
                 ArtistLabel.MaxWidth = DrawWidth - text_margin - shear_width;
             }
