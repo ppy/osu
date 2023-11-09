@@ -2,6 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
+using System.Linq;
 using System.Threading.Tasks;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
@@ -19,62 +20,30 @@ namespace osu.Game.Screens.Play.HUD
 {
     public partial class ArgonCounterTextComponent : CompositeDrawable, IHasText
     {
-        private readonly LocalisableString? label;
-
         private readonly ArgonCounterSpriteText wireframesPart;
         private readonly ArgonCounterSpriteText textPart;
+        private readonly OsuSpriteText labelText;
 
         public IBindable<float> WireframeOpacity { get; } = new BindableFloat();
+        public Bindable<int> RequiredDisplayDigits { get; } = new BindableInt();
 
         public LocalisableString Text
         {
             get => textPart.Text;
             set
             {
-                wireframesPart.Text = FormatWireframes(value);
+                int remainingCount = RequiredDisplayDigits.Value - value.ToString().Count(char.IsDigit);
+                string remainingText = remainingCount > 0 ? new string('#', remainingCount) : string.Empty;
+
+                wireframesPart.Text = remainingText + value;
                 textPart.Text = value;
             }
         }
 
-        public ArgonCounterTextComponent(Anchor anchor, LocalisableString? label = null, Vector2? spacing = null)
+        public ArgonCounterTextComponent(Anchor anchor, LocalisableString? label = null)
         {
             Anchor = anchor;
             Origin = anchor;
-
-            this.label = label;
-
-            wireframesPart = new ArgonCounterSpriteText(c =>
-            {
-                if (c == '.')
-                    return @"dot";
-
-                return @"wireframes";
-            })
-            {
-                Anchor = anchor,
-                Origin = anchor,
-                Spacing = spacing ?? new Vector2(-2, 0),
-            };
-            textPart = new ArgonCounterSpriteText(c =>
-            {
-                if (c == '.')
-                    return @"dot";
-
-                if (c == '%')
-                    return @"percentage";
-
-                return c.ToString();
-            })
-            {
-                Anchor = anchor,
-                Origin = anchor,
-                Spacing = spacing ?? new Vector2(-2, 0),
-            };
-        }
-
-        [BackgroundDependencyLoader]
-        private void load(OsuColour colours)
-        {
             AutoSizeAxes = Axes.Both;
 
             InternalChild = new FillFlowContainer
@@ -83,12 +52,11 @@ namespace osu.Game.Screens.Play.HUD
                 Direction = FillDirection.Vertical,
                 Children = new Drawable[]
                 {
-                    new OsuSpriteText
+                    labelText = new OsuSpriteText
                     {
                         Alpha = label != null ? 1 : 0,
                         Text = label.GetValueOrDefault(),
                         Font = OsuFont.Torus.With(size: 12, weight: FontWeight.Bold),
-                        Colour = colours.Blue0,
                         Margin = new MarginPadding { Left = 2.5f },
                     },
                     new Container
@@ -96,12 +64,48 @@ namespace osu.Game.Screens.Play.HUD
                         AutoSizeAxes = Axes.Both,
                         Children = new[]
                         {
-                            wireframesPart,
-                            textPart,
+                            wireframesPart = new ArgonCounterSpriteText(wireframesLookup)
+                            {
+                                Anchor = anchor,
+                                Origin = anchor,
+                            },
+                            textPart = new ArgonCounterSpriteText(textLookup)
+                            {
+                                Anchor = anchor,
+                                Origin = anchor,
+                            },
                         }
                     }
                 }
             };
+        }
+
+        private string textLookup(char c)
+        {
+            switch (c)
+            {
+                case '.':
+                    return @"dot";
+
+                case '%':
+                    return @"percentage";
+
+                default:
+                    return c.ToString();
+            }
+        }
+
+        private string wireframesLookup(char c)
+        {
+            if (c == '.') return @"dot";
+
+            return @"wireframes";
+        }
+
+        [BackgroundDependencyLoader]
+        private void load(OsuColour colours)
+        {
+            labelText.Colour = colours.Blue0;
         }
 
         protected virtual LocalisableString FormatWireframes(LocalisableString text) => text;
@@ -131,8 +135,8 @@ namespace osu.Game.Screens.Play.HUD
             [BackgroundDependencyLoader]
             private void load(ISkinSource skin)
             {
-                // todo: rename font
-                Font = new FontUsage(@"argon-score", 1);
+                Spacing = new Vector2(-2f, 0f);
+                Font = new FontUsage(@"argon-counter", 1);
                 glyphStore = new GlyphStore(skin, getLookup);
             }
 
