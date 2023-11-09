@@ -120,6 +120,7 @@ namespace osu.Game.Rulesets.Catch
                         new CatchModHidden(),
                         new CatchModFlashlight(),
                         new ModAccuracyChallenge(),
+                        new ModNoStop()
                     };
 
                 case ModType.Conversion:
