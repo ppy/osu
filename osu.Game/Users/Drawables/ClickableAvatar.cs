@@ -5,38 +5,25 @@ using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Cursor;
-using osu.Framework.Graphics.Shapes;
 using osu.Framework.Input.Events;
-using osu.Framework.Localisation;
 using osu.Game.Graphics.Containers;
-using osu.Game.Graphics.Sprites;
+using osu.Game.Online.API;
 using osu.Game.Online.API.Requests.Responses;
 using osuTK;
-using osuTK.Graphics;
 
 namespace osu.Game.Users.Drawables
 {
-    public partial class ClickableAvatar : OsuClickableContainer, IHasCustomTooltip<ClickableAvatar.APIUserTooltipContent>
+    public partial class ClickableAvatar : OsuClickableContainer, IHasCustomTooltip<APIUser?>
     {
         // public ITooltip<APIUser> GetCustomTooltip() => new APIUserTooltip(user!) { ShowTooltip = TooltipEnabled };
-        public ITooltip<APIUserTooltipContent> GetCustomTooltip() => new APIUserTooltip(new APIUserTooltipContent(user!));
+        public ITooltip<APIUser?> GetCustomTooltip() => new UserCardTooltip();
 
-        public APIUserTooltipContent TooltipContent { get; }
+        public APIUser? TooltipContent { get; }
 
         private readonly APIUser? user;
-        private bool tooltipEnabled;
 
-        public override LocalisableString TooltipText => user!.Username;
-
-        public bool ShowUsernameOnly
-        {
-            get => tooltipEnabled;
-            set
-            {
-                tooltipEnabled = value;
-                TooltipContent.ShowUsernameOnly = ShowUsernameOnly;
-            }
-        }
+        // TODO: reimplement.
+        public bool ShowUsernameOnly { get; set; }
 
         [Resolved]
         private OsuGame? game { get; set; }
@@ -47,12 +34,10 @@ namespace osu.Game.Users.Drawables
         /// <param name="user">The user. A null value will get a placeholder avatar.</param>
         public ClickableAvatar(APIUser? user = null)
         {
-            this.user = user;
-
             if (user?.Id != APIUser.SYSTEM_USER_ID)
                 Action = openProfile;
 
-            TooltipContent = new APIUserTooltipContent(user!, ShowUsernameOnly);
+            TooltipContent = this.user = user;
         }
 
         [BackgroundDependencyLoader]
@@ -75,58 +60,17 @@ namespace osu.Game.Users.Drawables
             return base.OnClick(e);
         }
 
-        public partial class APIUserTooltip : VisibilityContainer, ITooltip<APIUserTooltipContent>
+        public partial class UserCardTooltip : VisibilityContainer, ITooltip<APIUser?>
         {
-            private OsuSpriteText text;
-            private APIUserTooltipContent content;
-
-            public APIUserTooltip(APIUserTooltipContent content)
+            public UserCardTooltip()
             {
-                this.content = content;
                 AutoSizeAxes = Axes.Both;
                 Masking = true;
                 CornerRadius = 5;
-
-                Child = new UserGridPanel(content.User)
-                {
-                    Width = 300
-                };
-                text = new OsuSpriteText
-                {
-                    Text = this.content.User.Username
-                };
             }
 
             protected override void PopIn()
             {
-                if (content.ShowUsernameOnly)
-                {
-                    Child = new UserGridPanel(content.User)
-                    {
-                        Width = 300
-                    };
-                }
-                else
-                {
-                    Alpha = 0;
-                    AutoSizeAxes = Axes.Both;
-
-                    Children = new Drawable[]
-                    {
-                        new Box
-                        {
-                            RelativeSizeAxes = Axes.Both,
-                            Colour = Color4.Gray,
-                        },
-                        text = new OsuSpriteText
-                        {
-                            Font = FrameworkFont.Regular.With(size: 16),
-                            Padding = new MarginPadding(5),
-                            Text = content.User.Username
-                        }
-                    };
-                }
-
                 this.FadeIn(20, Easing.OutQuint);
             }
 
@@ -134,23 +78,10 @@ namespace osu.Game.Users.Drawables
 
             public void Move(Vector2 pos) => Position = pos;
 
-            public void SetContent(APIUserTooltipContent content)
+            public void SetContent(APIUser? content) => LoadComponentAsync(new UserGridPanel(content ?? new GuestUser())
             {
-                this.content = content;
-                text.Text = this.content.User.Username;
-            }
-        }
-
-        public class APIUserTooltipContent
-        {
-            public APIUser User { get; }
-            public bool ShowUsernameOnly { get; set; }
-
-            public APIUserTooltipContent(APIUser user, bool showUsernameOnly = false)
-            {
-                User = user;
-                ShowUsernameOnly = showUsernameOnly;
-            }
+                Width = 300,
+            }, panel => Child = panel);
         }
     }
 }
