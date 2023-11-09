@@ -18,7 +18,7 @@ namespace osu.Game.Tests.Rulesets.Scoring
         [TestCase(new[] { HitResult.IgnoreHit }, new[] { HitResult.IgnoreMiss, HitResult.ComboBreak })]
         public void TestValidResultPairs(HitResult[] maxResults, HitResult[] minResults)
         {
-            HitResult[] unsupportedResults = HitResultExtensions.ALL_TYPES.Where(t => !minResults.Contains(t)).ToArray();
+            HitResult[] unsupportedResults = HitResultExtensions.ALL_TYPES.Where(t => t != HitResult.IgnoreMiss && !minResults.Contains(t)).ToArray();
 
             Assert.Multiple(() =>
             {
