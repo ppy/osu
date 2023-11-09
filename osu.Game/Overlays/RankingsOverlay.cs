@@ -135,6 +135,9 @@ namespace osu.Game.Overlays
 
                 case RankingsScope.Score:
                     return new GetUserRankingsRequest(ruleset.Value, UserRankingsType.Score);
+
+                case RankingsScope.Kudosu:
+                    return new GetKudosuRankingsRequest();
             }
 
             return null;
@@ -166,6 +169,12 @@ namespace osu.Game.Overlays
 
                     return new CountriesTable(1, countryRequest.Response.Countries);
                 }
+
+                case GetKudosuRankingsRequest kudosuRequest:
+                    if (kudosuRequest.Response == null)
+                        return null;
+
+                    return new KudosuTable(1, kudosuRequest.Response.Users);
             }
 
             return null;
