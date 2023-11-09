@@ -182,6 +182,30 @@ namespace osu.Game.Tests.Visual.Background
         }
 
         [Test]
+        public void TestBeatmapBackgroundWithStoryboardUnloadedOnSuspension()
+        {
+            BackgroundScreenBeatmap nestedScreen = null;
+
+            setSupporter(true);
+            setSourceMode(BackgroundSource.BeatmapWithStoryboard);
+
+            AddStep("change beatmap", () => Beatmap.Value = createTestWorkingBeatmapWithStoryboard());
+            AddAssert("background changed", () => screen.CheckLastLoadChange() == true);
+            AddUntilStep("wait for beatmap background to be loaded", () => getCurrentBackground()?.GetType() == typeof(BeatmapBackgroundWithStoryboard));
+
+            AddUntilStep("storyboard present", () => screen.ChildrenOfType<DrawableStoryboard>().SingleOrDefault()?.IsLoaded == true);
+
+            AddStep("push new background to stack", () => stack.Push(nestedScreen = new BackgroundScreenBeatmap(Beatmap.Value)));
+            AddUntilStep("wait for screen to load", () => nestedScreen.IsLoaded && nestedScreen.IsCurrentScreen());
+
+            AddUntilStep("storyboard unloaded", () => !screen.ChildrenOfType<DrawableStoryboard>().Any());
+
+            AddStep("go back", () => screen.MakeCurrent());
+
+            AddUntilStep("storyboard reloaded", () => screen.ChildrenOfType<DrawableStoryboard>().SingleOrDefault()?.IsLoaded == true);
+        }
+
+        [Test]
         public void TestBackgroundTypeSwitch()
         {
             setSupporter(true);
