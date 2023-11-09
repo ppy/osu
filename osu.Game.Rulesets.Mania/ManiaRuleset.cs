@@ -428,18 +428,18 @@ namespace osu.Game.Rulesets.Mania
 
         public override DifficultySection CreateEditorDifficultySection() => new ManiaDifficultySection();
 
-        public double HitwindowFromOd(float OD) => 64.0 - 3 * OD;
-        public float OdFromHitwindow(double hitwindow300) => (float)(64.0 - hitwindow300) / 3;
-        public float ChangeOdFromRate(float OD, double rate) => OdFromHitwindow(HitwindowFromOd(OD) / rate);
+        // Mania doesn't have rate-adjusted attributes anymore?
 
-        public override BeatmapDifficulty GetRateAdjustedDifficulty(IBeatmapDifficultyInfo baseDifficulty, double rate)
-        {
-            BeatmapDifficulty adjustedDifficulty = new BeatmapDifficulty(baseDifficulty);
+        //public override BeatmapDifficulty GetRateAdjustedDifficulty(IBeatmapDifficultyInfo baseDifficulty, double rate)
+        //{
+        //    BeatmapDifficulty adjustedDifficulty = new BeatmapDifficulty(baseDifficulty);
 
-            adjustedDifficulty.OverallDifficulty = ChangeOdFromRate(adjustedDifficulty.OverallDifficulty, rate);
+        //    double hitwindow = 64.0 - 3 * adjustedDifficulty.OverallDifficulty;
+        //    hitwindow /= rate;
+        //    adjustedDifficulty.OverallDifficulty = (float)(64.0 - hitwindow) / 3;
 
-            return adjustedDifficulty ?? (BeatmapDifficulty)baseDifficulty;
-        }
+        //    return adjustedDifficulty ?? (BeatmapDifficulty)baseDifficulty;
+        //}
 
     }
 

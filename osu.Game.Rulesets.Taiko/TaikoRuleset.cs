@@ -263,15 +263,14 @@ namespace osu.Game.Rulesets.Taiko
                 }), true)
             };
         }
-        public double HitwindowFromOd(float OD) => 35.0 - 15.0 * (OD - 5) / 5;
-        public float OdFromHitwindow(double hitwindow300) => (float)(5 * (35 - hitwindow300) / 15 + 5);
-        public float ChangeOdFromRate(float OD, double rate) => OdFromHitwindow(HitwindowFromOd(OD) / rate);
 
         public override BeatmapDifficulty GetRateAdjustedDifficulty(IBeatmapDifficultyInfo baseDifficulty, double rate)
         {
             BeatmapDifficulty adjustedDifficulty = new BeatmapDifficulty(baseDifficulty);
 
-            adjustedDifficulty.OverallDifficulty = ChangeOdFromRate(adjustedDifficulty.OverallDifficulty, rate);
+            double hitwindow = 35.0 - 15.0 * (adjustedDifficulty.OverallDifficulty - 5) / 5;
+            hitwindow /= rate;
+            adjustedDifficulty.OverallDifficulty = (float)(5 * (35 - hitwindow) / 15 + 5);
 
             return adjustedDifficulty ?? (BeatmapDifficulty)baseDifficulty;
         }
