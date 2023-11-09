@@ -135,6 +135,8 @@ namespace osu.Game.Rulesets.Osu.Objects
                 classicSliderBehaviour = value;
                 if (HeadCircle != null)
                     HeadCircle.ClassicSliderBehaviour = value;
+                if (TailCircle != null)
+                    TailCircle.ClassicSliderBehaviour = value;
             }
         }
 
@@ -218,6 +220,7 @@ namespace osu.Game.Rulesets.Osu.Objects
                             StartTime = e.Time,
                             Position = EndPosition,
                             StackHeight = StackHeight,
+                            ClassicSliderBehaviour = ClassicSliderBehaviour,
                         });
                         break;
 
