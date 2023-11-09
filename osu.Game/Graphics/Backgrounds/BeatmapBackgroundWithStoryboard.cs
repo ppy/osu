@@ -10,7 +10,6 @@ using osu.Framework.Bindables;
 using osu.Framework.Extensions.ObjectExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
-using osu.Framework.Threading;
 using osu.Framework.Timing;
 using osu.Game.Beatmaps;
 using osu.Game.Overlays;
@@ -74,15 +73,14 @@ namespace osu.Game.Graphics.Backgrounds
 
         public void UnloadStoryboard(Action<DrawableStoryboard> scheduleStoryboardRemoval)
         {
-            Debug.Assert(drawableStoryboard != null);
+            if (drawableStoryboard == null)
+                return;
 
             loadCancellationSource.AsNonNull().Cancel();
             loadCancellationSource = null;
 
-            DrawableStoryboard s = drawableStoryboard;
-
             storyboardContainer.FadeOut(BackgroundScreen.TRANSITION_LENGTH, Easing.OutQuint);
-            scheduleStoryboardRemoval(s);
+            scheduleStoryboardRemoval(drawableStoryboard);
 
             drawableStoryboard = null;
         }
