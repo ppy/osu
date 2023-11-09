@@ -21,9 +21,8 @@ namespace osu.Game.Users.Drawables
         // public ITooltip<APIUser> GetCustomTooltip() => new APIUserTooltip(user!) { ShowTooltip = TooltipEnabled };
         public ITooltip<APIUserTooltipContent> GetCustomTooltip() => new APIUserTooltip(new APIUserTooltipContent(user!));
 
-        public APIUserTooltipContent TooltipContent => content;
+        public APIUserTooltipContent TooltipContent { get; }
 
-        private readonly APIUserTooltipContent content;
         private readonly APIUser? user;
         private bool tooltipEnabled;
 
@@ -35,7 +34,7 @@ namespace osu.Game.Users.Drawables
             set
             {
                 tooltipEnabled = value;
-                content.ShowUsernameOnly = ShowUsernameOnly;
+                TooltipContent.ShowUsernameOnly = ShowUsernameOnly;
             }
         }
 
@@ -53,7 +52,7 @@ namespace osu.Game.Users.Drawables
             if (user?.Id != APIUser.SYSTEM_USER_ID)
                 Action = openProfile;
 
-            content = new APIUserTooltipContent(user!, ShowUsernameOnly);
+            TooltipContent = new APIUserTooltipContent(user!, ShowUsernameOnly);
         }
 
         [BackgroundDependencyLoader]
@@ -80,6 +79,7 @@ namespace osu.Game.Users.Drawables
         {
             private OsuSpriteText text;
             private APIUserTooltipContent content;
+
             public APIUserTooltip(APIUserTooltipContent content)
             {
                 this.content = content;
@@ -91,7 +91,7 @@ namespace osu.Game.Users.Drawables
                 {
                     Width = 300
                 };
-                text = new OsuSpriteText()
+                text = new OsuSpriteText
                 {
                     Text = this.content.User.Username
                 };
@@ -118,7 +118,7 @@ namespace osu.Game.Users.Drawables
                             RelativeSizeAxes = Axes.Both,
                             Colour = Color4.Gray,
                         },
-                        text = new OsuSpriteText()
+                        text = new OsuSpriteText
                         {
                             Font = FrameworkFont.Regular.With(size: 16),
                             Padding = new MarginPadding(5),
