@@ -198,10 +198,24 @@ namespace osu.Game.Overlays.SkinEditor
                 Items = createAnchorItems((d, o) => ((Drawable)d).Origin == o, applyOrigins).ToArray()
             };
 
+            yield return new EditorMenuItemSpacer();
+
             yield return new OsuMenuItem("Reset position", MenuItemType.Standard, () =>
             {
                 foreach (var blueprint in SelectedBlueprints)
                     ((Drawable)blueprint.Item).Position = Vector2.Zero;
+            });
+
+            yield return new OsuMenuItem("Reset rotation", MenuItemType.Standard, () =>
+            {
+                foreach (var blueprint in SelectedBlueprints)
+                    ((Drawable)blueprint.Item).Rotation = 0;
+            });
+
+            yield return new OsuMenuItem("Reset scale", MenuItemType.Standard, () =>
+            {
+                foreach (var blueprint in SelectedBlueprints)
+                    ((Drawable)blueprint.Item).Scale = Vector2.One;
             });
 
             yield return new EditorMenuItemSpacer();
