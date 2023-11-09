@@ -5,7 +5,6 @@
 
 using System.Diagnostics;
 using System.Threading;
-using JetBrains.Annotations;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
