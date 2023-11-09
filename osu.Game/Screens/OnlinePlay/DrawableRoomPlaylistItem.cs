@@ -24,9 +24,9 @@ using osu.Game.Collections;
 using osu.Game.Database;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
+using osu.Game.Graphics.Sprites;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Online;
-using osu.Game.Online.Chat;
 using osu.Game.Online.Rooms;
 using osu.Game.Overlays;
 using osu.Game.Overlays.BeatmapSet;
@@ -80,7 +80,10 @@ namespace osu.Game.Screens.OnlinePlay
 
         private Container maskingContainer = null!;
         private Container difficultyIconContainer = null!;
-        private LinkFlowContainer beatmapText = null!;
+
+        private OsuHoverContainer beatmapLink = null!;
+        private OsuSpriteText beatmapText = null!;
+
         private LinkFlowContainer authorText = null!;
         private ExplicitContentBeatmapBadge explicitContent = null!;
         private ModDisplay modDisplay = null!;
@@ -116,6 +119,9 @@ namespace osu.Game.Screens.OnlinePlay
         [Resolved]
         private ManageCollectionsDialog? manageCollectionsDialog { get; set; }
 
+        [Resolved]
+        private OsuGame? game { get; set; }
+
         protected override bool ShouldBeConsideredForInput(Drawable child) => AllowReordering || AllowDeletion || !AllowSelection || SelectedItem.Value == Model;
 
         public DrawableRoomPlaylistItem(PlaylistItem item)
@@ -130,9 +136,10 @@ namespace osu.Game.Screens.OnlinePlay
         }
 
         [BackgroundDependencyLoader]
-        private void load()
+        private void load(OverlayColourProvider colourProvider)
         {
             maskingContainer.BorderColour = colours.Yellow;
+            beatmapLink.IdleColour = colourProvider.Light2;
 
             ruleset = rulesets.GetRuleset(Item.RulesetID);
             var rulesetInstance = ruleset?.CreateInstance();
@@ -192,6 +199,15 @@ namespace osu.Game.Screens.OnlinePlay
             };
 
             refresh();
+        }
+
+        protected override void UpdateAfterChildren()
+        {
+            base.UpdateAfterChildren();
+
+            // best effort to confine the auto-sized text to parent bounds
+            // TODO: remove when text/link flow can support truncation with ellipsis natively.
+            beatmapText.MaxWidth = mainFillFlow.DrawWidth;
         }
 
         /// <summary>
@@ -291,18 +307,12 @@ namespace osu.Game.Screens.OnlinePlay
 
             panelBackground.Beatmap.Value = beatmap;
 
-            beatmapText.Clear();
+            beatmapText.Text = string.Empty;
 
             if (beatmap != null)
             {
-                beatmapText.AddLink(beatmap.GetDisplayTitleRomanisable(includeCreator: false),
-                    LinkAction.OpenBeatmap,
-                    beatmap.OnlineID.ToString(),
-                    null,
-                    text =>
-                    {
-                        text.Truncate = true;
-                    });
+                beatmapText.Text = beatmap.GetDisplayTitleRomanisable(includeCreator: false);
+                beatmapLink.Action = () => game?.ShowBeatmap(beatmap.OnlineID);
             }
 
             authorText.Clear();
@@ -378,13 +388,13 @@ namespace osu.Game.Screens.OnlinePlay
                                     Direction = FillDirection.Vertical,
                                     Children = new Drawable[]
                                     {
-                                        beatmapText = new LinkFlowContainer(fontParameters)
+                                        beatmapLink = new OsuHoverContainer
                                         {
-                                            RelativeSizeAxes = Axes.X,
-                                            // workaround to ensure only the first line of text shows, emulating truncation (but without ellipsis at the end).
-                                            // TODO: remove when text/link flow can support truncation with ellipsis natively.
-                                            Height = OsuFont.DEFAULT_FONT_SIZE,
-                                            Masking = true
+                                            AutoSizeAxes = Axes.Both,
+                                            Child = beatmapText = new TruncatingSpriteText
+                                            {
+                                                Font = OsuFont.Default.With(weight: FontWeight.SemiBold),
+                                            }
                                         },
                                         new FillFlowContainer
                                         {

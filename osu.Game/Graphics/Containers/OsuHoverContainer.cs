@@ -17,7 +17,7 @@ namespace osu.Game.Graphics.Containers
 
         protected Color4 HoverColour;
 
-        protected Color4 IdleColour = Color4.White;
+        public Color4 IdleColour = Color4.White;
 
         protected virtual IEnumerable<Drawable> EffectTargets => new[] { Content };
 

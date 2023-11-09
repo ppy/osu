@@ -18,7 +18,6 @@ using osu.Game.Database;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.Sprites;
-using osu.Game.Online.Chat;
 using osu.Game.Online.Rooms;
 using osu.Game.Overlays;
 using osu.Game.Screens.OnlinePlay.Components;
@@ -328,8 +327,14 @@ namespace osu.Game.Screens.OnlinePlay.Lounge.Components
             [Resolved]
             private BeatmapLookupCache beatmapLookupCache { get; set; } = null!;
 
+            [Resolved]
+            private OsuGame? game { get; set; }
+
             private SpriteText statusText = null!;
-            private LinkFlowContainer beatmapText = null!;
+
+            private Container beatmapLinkContainer = null!;
+            private OsuHoverContainer beatmapLink = null!;
+            private OsuSpriteText beatmapText = null!;
 
             public RoomStatusText()
             {
@@ -338,7 +343,7 @@ namespace osu.Game.Screens.OnlinePlay.Lounge.Components
             }
 
             [BackgroundDependencyLoader]
-            private void load()
+            private void load(OverlayColourProvider colourProvider)
             {
                 InternalChild = new GridContainer
                 {
@@ -361,17 +366,16 @@ namespace osu.Game.Screens.OnlinePlay.Lounge.Components
                                 Font = OsuFont.Default.With(size: 16),
                                 Colour = colours.Lime1
                             },
-                            beatmapText = new LinkFlowContainer(s =>
-                            {
-                                s.Font = OsuFont.Default.With(size: 16);
-                                s.Colour = colours.Lime1;
-                            })
+                            beatmapLinkContainer = new Container
                             {
                                 RelativeSizeAxes = Axes.X,
-                                // workaround to ensure only the first line of text shows, emulating truncation (but without ellipsis at the end).
-                                // TODO: remove when text/link flow can support truncation with ellipsis natively.
-                                Height = 16,
-                                Masking = true
+                                AutoSizeAxes = Axes.Y,
+                                Child = beatmapLink = new OsuHoverContainer
+                                {
+                                    AutoSizeAxes = Axes.Both,
+                                    IdleColour = colourProvider.Light2,
+                                    Child = beatmapText = new TruncatingSpriteText(),
+                                }
                             }
                         }
                     }
@@ -384,12 +388,21 @@ namespace osu.Game.Screens.OnlinePlay.Lounge.Components
                 CurrentPlaylistItem.BindValueChanged(onSelectedItemChanged, true);
             }
 
+            protected override void UpdateAfterChildren()
+            {
+                base.UpdateAfterChildren();
+
+                // best effort to confine the auto-sized text to parent bounds
+                // TODO: remove when text/link flow can support truncation with ellipsis natively.
+                beatmapText.MaxWidth = beatmapLinkContainer.DrawWidth;
+            }
+
             private CancellationTokenSource? beatmapLookupCancellation;
 
-            private void onSelectedItemChanged(ValueChangedEvent<PlaylistItem> item)
+            private void onSelectedItemChanged(ValueChangedEvent<PlaylistItem?> item)
             {
                 beatmapLookupCancellation?.Cancel();
-                beatmapText.Clear();
+                beatmapText.Text = string.Empty;
 
                 if (Type.Value == MatchType.Playlists)
                 {
@@ -414,13 +427,11 @@ namespace osu.Game.Screens.OnlinePlay.Lounge.Components
 
                                       if (retrievedBeatmap != null)
                                       {
-                                          beatmapText.AddLink(retrievedBeatmap.GetDisplayTitleRomanisable(),
-                                              LinkAction.OpenBeatmap,
-                                              retrievedBeatmap.OnlineID.ToString(),
-                                              creationParameters: s => s.Truncate = true);
+                                          beatmapText.Text = retrievedBeatmap.GetDisplayTitleRomanisable();
+                                          beatmapLink.Action = () => game?.ShowBeatmap(retrievedBeatmap.OnlineID);
                                       }
                                       else
-                                          beatmapText.AddText("unknown beatmap");
+                                          beatmapText.Text = "unknown beatmap";
                                   }), cancellationSource.Token);
             }
         }
