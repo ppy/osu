@@ -267,7 +267,6 @@ namespace osu.Game.Screens.Menu
                     // Samples are explicitly played here in response to user interaction and not when transitioning due to idle.
                     StopSamplePlayback();
                     sampleBackToLogo?.Play();
-                    sampleLogoSwoosh?.Play();
 
                     return true;
 
@@ -362,6 +361,9 @@ namespace osu.Game.Screens.Menu
                         logo?.MoveTo(new Vector2(0.5f), 800, Easing.OutExpo);
                         logo?.ScaleTo(1, 800, Easing.OutExpo);
                     }, buttonArea.Alpha * 150);
+
+                    if (lastState == ButtonSystemState.TopLevel)
+                        sampleLogoSwoosh?.Play();
                     break;
 
                 case ButtonSystemState.TopLevel:
