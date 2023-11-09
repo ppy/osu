@@ -105,28 +105,28 @@ namespace osu.Game.Tests.Visual.Online
         private Drawable generateUser(string username, int id, CountryCode countryCode, string cover, bool onlyUsername, string? color = null)
         {
             return new ClickableAvatar(new APIUser
+            {
+                Username = username,
+                Id = id,
+                CountryCode = countryCode,
+                CoverUrl = cover,
+                Colour = color ?? "000000",
+                Status =
                 {
-                    Username = username,
-                    Id = id,
-                    CountryCode = countryCode,
-                    CoverUrl = cover,
-                    Colour = color ?? "000000",
-                    Status =
-                    {
-                        Value = new UserStatusOnline()
-                    },
-                })
+                    Value = new UserStatusOnline()
+                },
+            })
+            {
+                Width = 50,
+                Height = 50,
+                CornerRadius = 10,
+                Masking = true,
+                EdgeEffect = new EdgeEffectParameters
                 {
-                    Width = 50,
-                    Height = 50,
-                    CornerRadius = 10,
-                    Masking = true,
-                    EdgeEffect = new EdgeEffectParameters
-                    {
-                        Type = EdgeEffectType.Shadow, Radius = 1, Colour = Color4.Black.Opacity(0.2f),
-                    },
-                    ShowUsernameOnly = onlyUsername,
-                };
+                    Type = EdgeEffectType.Shadow, Radius = 1, Colour = Color4.Black.Opacity(0.2f),
+                },
+                ShowUsernameOnly = onlyUsername,
+            };
         }
     }
 }

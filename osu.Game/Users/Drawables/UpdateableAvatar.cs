@@ -75,15 +75,14 @@ namespace osu.Game.Users.Drawables
                 return new ClickableAvatar(user)
                 {
                     RelativeSizeAxes = Axes.Both,
+                    ShowUsernameOnly = showUsernameOnly
                 };
             }
-            else
+
+            return new DrawableAvatar(user)
             {
-                return new DrawableAvatar(user)
-                {
-                    RelativeSizeAxes = Axes.Both,
-                };
-            }
+                RelativeSizeAxes = Axes.Both,
+            };
         }
     }
 }
