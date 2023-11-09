@@ -7,6 +7,7 @@ using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Game.Configuration;
 using osu.Game.Rulesets.Mods;
+using osu.Game.Utils;
 
 namespace osu.Game.Screens.Play
 {
@@ -45,10 +46,15 @@ namespace osu.Game.Screens.Play
             if (touchDeviceMod == null)
                 return;
 
+            var candidateMods = player.Score.ScoreInfo.Mods.Append(touchDeviceMod).ToArray();
+
+            if (!ModUtils.CheckCompatibleSet(candidateMods, out _))
+                return;
+
             // `Player` (probably rightly so) assumes immutability of mods,
             // so this will not be shown immediately on the mod display in the top right.
             // if this is to change, the mod immutability should be revisited.
-            player.Score.ScoreInfo.Mods = player.Score.ScoreInfo.Mods.Append(touchDeviceMod).ToArray();
+            player.Score.ScoreInfo.Mods = candidateMods;
         }
     }
 }
