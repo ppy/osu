@@ -34,19 +34,14 @@ namespace osu.Game.Online.API.Requests.Responses
         [JsonProperty(@"previous_usernames")]
         public string[] PreviousUsernames;
 
-        private CountryCode? countryCode;
+        [JsonProperty(@"country_code")]
+        private string countryCodeString;
 
         public CountryCode CountryCode
         {
-            get => countryCode ??= (Enum.TryParse(country?.Code, out CountryCode result) ? result : default);
-            set => countryCode = value;
+            get => Enum.TryParse(countryCodeString, out CountryCode result) ? result : CountryCode.Unknown;
+            set => countryCodeString = value.ToString();
         }
-
-#pragma warning disable 649
-        [CanBeNull]
-        [JsonProperty(@"country")]
-        private Country country;
-#pragma warning restore 649
 
         public readonly Bindable<UserStatus> Status = new Bindable<UserStatus>();
 
