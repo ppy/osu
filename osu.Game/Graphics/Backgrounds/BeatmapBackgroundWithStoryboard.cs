@@ -79,7 +79,6 @@ namespace osu.Game.Graphics.Backgrounds
             loadCancellationSource.AsNonNull().Cancel();
             loadCancellationSource = null;
 
-            storyboardContainer.FadeOut(BackgroundScreen.TRANSITION_LENGTH, Easing.OutQuint);
             scheduleStoryboardRemoval(drawableStoryboard);
 
             drawableStoryboard = null;
