@@ -79,7 +79,7 @@ namespace osu.Game.Screens.Backgrounds
             Debug.Assert(backgroundScreenStack != null);
 
             if (background is BeatmapBackgroundWithStoryboard storyboardBackground)
-                storyboardBackground.UnloadStoryboard(backgroundScreenStack.ScheduleStoryboardDisposal);
+                storyboardBackground.UnloadStoryboard(backgroundScreenStack.ScheduleToTransitionEnd);
 
             base.OnSuspending(e);
         }

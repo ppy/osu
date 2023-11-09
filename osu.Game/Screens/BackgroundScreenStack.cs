@@ -1,10 +1,10 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System;
 using System.Collections.Generic;
 using osu.Framework.Graphics;
 using osu.Framework.Screens;
-using osu.Game.Storyboards.Drawables;
 
 namespace osu.Game.Screens
 {
@@ -35,6 +35,6 @@ namespace osu.Game.Screens
             return true;
         }
 
-        public void ScheduleStoryboardDisposal(DrawableStoryboard storyboard) => Scheduler.AddDelayed(storyboard.RemoveAndDisposeImmediately, BackgroundScreen.TRANSITION_LENGTH);
+        internal void ScheduleToTransitionEnd(Action action) => Scheduler.AddDelayed(action, BackgroundScreen.TRANSITION_LENGTH);
     }
 }

@@ -58,20 +58,20 @@ namespace osu.Game.Graphics.Backgrounds
             if (!Beatmap.Storyboard.HasDrawable)
                 return;
 
-            if (Beatmap.Storyboard.ReplacesBackground)
-                Sprite.Alpha = 0;
-
             LoadComponentAsync(drawableStoryboard = new DrawableStoryboard(Beatmap.Storyboard, mods.Value)
             {
                 Clock = storyboardClock
             }, s =>
             {
+                if (Beatmap.Storyboard.ReplacesBackground)
+                    Sprite.FadeOut(BackgroundScreen.TRANSITION_LENGTH, Easing.InQuint);
+
                 storyboardContainer.FadeInFromZero(BackgroundScreen.TRANSITION_LENGTH, Easing.OutQuint);
                 storyboardContainer.Add(s);
             }, (loadCancellationSource = new CancellationTokenSource()).Token);
         }
 
-        public void UnloadStoryboard(Action<DrawableStoryboard> scheduleStoryboardRemoval)
+        public void UnloadStoryboard(Action<Action> scheduleStoryboardRemoval)
         {
             if (drawableStoryboard == null)
                 return;
@@ -79,7 +79,13 @@ namespace osu.Game.Graphics.Backgrounds
             loadCancellationSource.AsNonNull().Cancel();
             loadCancellationSource = null;
 
-            scheduleStoryboardRemoval(drawableStoryboard);
+            DrawableStoryboard s = drawableStoryboard;
+
+            scheduleStoryboardRemoval(() =>
+            {
+                s.RemoveAndDisposeImmediately();
+                Sprite.Alpha = 1f;
+            });
 
             drawableStoryboard = null;
         }
