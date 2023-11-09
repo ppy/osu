@@ -9,6 +9,7 @@ using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.Timing;
 using osu.Game.Configuration;
 using osu.Game.Input;
+using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Osu.Beatmaps;
 using osu.Game.Rulesets.Osu.Mods;
 using osu.Game.Rulesets.Osu.Objects;
@@ -111,6 +112,25 @@ namespace osu.Game.Rulesets.Osu.Tests.Mods
                 InputManager.EndTouch(touch);
             });
             AddAssert("touch device mod activated", () => Player.Score.ScoreInfo.Mods, () => Has.One.InstanceOf<OsuModTouchDevice>());
+        }
+
+        [Test]
+        public void TestIncompatibleModActive()
+        {
+            // this is only a veneer of enabling autopilot as having it actually active from the start is annoying to make happen
+            // given the tests' structure.
+            AddStep("enable autopilot", () => Player.Score.ScoreInfo.Mods = new Mod[] { new OsuModAutopilot() });
+
+            AddUntilStep("wait until 0 near", () => Player.GameplayClockContainer.CurrentTime, () => Is.GreaterThanOrEqualTo(0).Within(500));
+            AddStep("slow down", () => Player.GameplayClockContainer.AdjustmentsFromMods.Frequency.Value = 0.2);
+            AddUntilStep("wait until 0", () => Player.GameplayClockContainer.CurrentTime, () => Is.GreaterThanOrEqualTo(0));
+            AddStep("touch playfield", () =>
+            {
+                var touch = new Touch(TouchSource.Touch1, Player.DrawableRuleset.Playfield.ScreenSpaceDrawQuad.Centre);
+                InputManager.BeginTouch(touch);
+                InputManager.EndTouch(touch);
+            });
+            AddAssert("touch device mod not activated", () => Player.Score.ScoreInfo.Mods, () => Has.None.InstanceOf<OsuModTouchDevice>());
         }
 
         [Test]
