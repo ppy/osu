@@ -27,6 +27,8 @@ namespace osu.Game.Screens.Play.HUD
         public IBindable<float> WireframeOpacity { get; } = new BindableFloat();
         public Bindable<int> RequiredDisplayDigits { get; } = new BindableInt();
 
+        public Container NumberContainer { get; private set; }
+
         public LocalisableString Text
         {
             get => textPart.Text;
@@ -59,7 +61,7 @@ namespace osu.Game.Screens.Play.HUD
                         Font = OsuFont.Torus.With(size: 12, weight: FontWeight.Bold),
                         Margin = new MarginPadding { Left = 2.5f },
                     },
-                    new Container
+                    NumberContainer = new Container
                     {
                         AutoSizeAxes = Axes.Both,
                         Children = new[]

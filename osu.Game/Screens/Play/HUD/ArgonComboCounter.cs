@@ -1,6 +1,7 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
@@ -9,11 +10,14 @@ using osu.Framework.Localisation;
 using osu.Game.Configuration;
 using osu.Game.Rulesets.Scoring;
 using osuTK;
+using osuTK.Graphics;
 
 namespace osu.Game.Screens.Play.HUD
 {
     public partial class ArgonComboCounter : ComboCounter
     {
+        private ArgonCounterTextComponent text = null!;
+
         protected override double RollingDuration => 500;
         protected override Easing RollingEasing => Easing.OutQuint;
 
@@ -32,14 +36,24 @@ namespace osu.Game.Screens.Play.HUD
             Current.BindValueChanged(combo =>
             {
                 bool wasIncrease = combo.NewValue > combo.OldValue;
-                DrawableCount.ScaleTo(new Vector2(1, wasIncrease ? 1.2f : 0.8f))
-                             .ScaleTo(Vector2.One, 600, Easing.OutQuint);
+                bool wasMiss = combo.OldValue > 1 && combo.NewValue == 0;
+
+                float newScale = Math.Clamp(text.NumberContainer.Scale.X * (wasIncrease ? 1.1f : 0.8f), 0.6f, 1.4f);
+
+                float duration = wasMiss ? 2000 : 300;
+
+                text.NumberContainer
+                    .ScaleTo(new Vector2(newScale))
+                    .ScaleTo(Vector2.One, duration, Easing.OutQuint);
+
+                if (wasMiss)
+                    text.FlashColour(Color4.Red, duration, Easing.OutQuint);
             });
         }
 
         protected override LocalisableString FormatCount(int count) => $@"{count}x";
 
-        protected override IHasText CreateText() => new ArgonCounterTextComponent(Anchor.TopLeft, "COMBO")
+        protected override IHasText CreateText() => text = new ArgonCounterTextComponent(Anchor.TopLeft, "COMBO")
         {
             WireframeOpacity = { BindTarget = WireframeOpacity },
         };
