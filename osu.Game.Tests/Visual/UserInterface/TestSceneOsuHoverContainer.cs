@@ -149,6 +149,31 @@ namespace osu.Game.Tests.Visual.UserInterface
             waitUntilColourIs(OsuHoverTestContainer.IDLE_COLOUR);
         }
 
+        [Test]
+        public void TestIdleColourChange()
+        {
+            enableContainer();
+            checkColour(OsuHoverTestContainer.IDLE_COLOUR);
+
+            changeIdleColour(Color4.White);
+            waitUntilColourIs(Color4.White);
+
+            moveToText();
+            waitUntilColourIs(OsuHoverTestContainer.HOVER_COLOUR);
+
+            changeIdleColour(Color4.Black);
+            checkColour(OsuHoverTestContainer.HOVER_COLOUR);
+
+            disableContainer();
+            waitUntilColourIs(Color4.Black);
+
+            changeIdleColour(Color4.Blue);
+            waitUntilColourIs(Color4.Blue);
+
+            moveOut();
+            checkColour(Color4.Blue);
+        }
+
         private void enableContainer() => setContainerEnabledTo(true);
 
         private void disableContainer() => setContainerEnabledTo(false);
@@ -172,6 +197,9 @@ namespace osu.Game.Tests.Visual.UserInterface
 
         private void waitUntilColourIs(ColourInfo expectedColour)
             => AddUntilStep($"Wait until hover colour is {expectedColour}", () => currentColour.Equals(expectedColour));
+
+        private void changeIdleColour(ColourInfo idleColour)
+            => AddStep($"Change idle colour to {idleColour}", () => hoverContainer.IdleColour = idleColour);
 
         private ColourInfo currentColour => colourContainer.DrawColourInfo.Colour;
 
