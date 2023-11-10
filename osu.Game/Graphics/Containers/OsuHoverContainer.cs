@@ -65,7 +65,7 @@ namespace osu.Game.Graphics.Containers
             base.LoadComplete();
 
             Enabled.BindValueChanged(_ => updateColour(), true);
-            FinishTransforms(true);
+            EffectTargets.ForEach(d => d.FinishTransforms());
         }
 
         private void updateColour()
