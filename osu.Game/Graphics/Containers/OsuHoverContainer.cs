@@ -26,7 +26,7 @@ namespace osu.Game.Graphics.Containers
         {
             Enabled.ValueChanged += e =>
             {
-                if (isHovered)
+                if (IsHovered)
                 {
                     if (e.NewValue)
                         fadeIn();
@@ -36,15 +36,8 @@ namespace osu.Game.Graphics.Containers
             };
         }
 
-        private bool isHovered;
-
         protected override bool OnHover(HoverEvent e)
         {
-            if (isHovered)
-                return false;
-
-            isHovered = true;
-
             if (!Enabled.Value)
                 return false;
 
@@ -55,10 +48,6 @@ namespace osu.Game.Graphics.Containers
 
         protected override void OnHoverLost(HoverLostEvent e)
         {
-            if (!isHovered)
-                return;
-
-            isHovered = false;
             fadeOut();
 
             base.OnHoverLost(e);
