@@ -276,9 +276,9 @@ namespace osu.Game.Rulesets.Osu.Objects
         }
 
         public override Judgement CreateJudgement() => ClassicSliderBehaviour
-            // See logic in `DrawableSlider.CheckForResult()`
+            // Final combo is provided by the slider itself - see logic in `DrawableSlider.CheckForResult()`
             ? new OsuJudgement()
-            // Of note, this creates a combo discrepancy for non-classic-mod sliders (there is no combo increase for tail or slider judgement).
+            // Final combo is provided by the tail circle - see `SliderTailCircle`
             : new OsuIgnoreJudgement();
 
         protected override HitWindows CreateHitWindows() => HitWindows.Empty;
