@@ -102,9 +102,9 @@ namespace osu.Game.Tests.Visual.Online
             AddWaitStep("wait for tooltip to hide", 3);
         }
 
-        private Drawable generateUser(string username, int id, CountryCode countryCode, string cover, bool onlyUsername, string? color = null)
+        private Drawable generateUser(string username, int id, CountryCode countryCode, string cover, bool showPanel, string? color = null)
         {
-            return new ClickableAvatar(new APIUser
+            var user = new APIUser
             {
                 Username = username,
                 Id = id,
@@ -115,7 +115,9 @@ namespace osu.Game.Tests.Visual.Online
                 {
                     Value = new UserStatusOnline()
                 },
-            })
+            };
+
+            return new ClickableAvatar(user, showPanel)
             {
                 Width = 50,
                 Height = 50,
@@ -125,7 +127,6 @@ namespace osu.Game.Tests.Visual.Online
                 {
                     Type = EdgeEffectType.Shadow, Radius = 1, Colour = Color4.Black.Opacity(0.2f),
                 },
-                ShowUsernameOnly = onlyUsername,
             };
         }
     }

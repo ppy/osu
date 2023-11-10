@@ -1,12 +1,15 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Cursor;
 using osu.Framework.Input.Events;
 using osu.Game.Graphics.Containers;
+using osu.Game.Graphics.Cursor;
+using osu.Game.Localisation;
 using osu.Game.Online.API;
 using osu.Game.Online.API.Requests.Responses;
 using osuTK;
@@ -15,15 +18,13 @@ namespace osu.Game.Users.Drawables
 {
     public partial class ClickableAvatar : OsuClickableContainer, IHasCustomTooltip<APIUser?>
     {
-        // public ITooltip<APIUser> GetCustomTooltip() => new APIUserTooltip(user!) { ShowTooltip = TooltipEnabled };
-        public ITooltip<APIUser?> GetCustomTooltip() => new UserCardTooltip();
+        public ITooltip<APIUser?> GetCustomTooltip() => showCardOnHover ? new UserCardTooltip() : new NoCardTooltip();
 
         public APIUser? TooltipContent { get; }
 
         private readonly APIUser? user;
 
-        // TODO: reimplement.
-        public bool ShowUsernameOnly { get; set; }
+        private readonly bool showCardOnHover;
 
         [Resolved]
         private OsuGame? game { get; set; }
@@ -32,12 +33,15 @@ namespace osu.Game.Users.Drawables
         /// A clickable avatar for the specified user, with UI sounds included.
         /// </summary>
         /// <param name="user">The user. A null value will get a placeholder avatar.</param>
-        public ClickableAvatar(APIUser? user = null)
+        /// <param name="showCardOnHover"></param>
+        public ClickableAvatar(APIUser? user = null, bool showCardOnHover = false)
         {
             if (user?.Id != APIUser.SYSTEM_USER_ID)
                 Action = openProfile;
 
-            TooltipContent = this.user = user;
+            this.showCardOnHover = showCardOnHover;
+
+            TooltipContent = this.user = user ?? new GuestUser();
         }
 
         [BackgroundDependencyLoader]
@@ -65,23 +69,59 @@ namespace osu.Game.Users.Drawables
             public UserCardTooltip()
             {
                 AutoSizeAxes = Axes.Both;
-                Masking = true;
-                CornerRadius = 5;
             }
 
-            protected override void PopIn()
-            {
-                this.FadeIn(20, Easing.OutQuint);
-            }
-
-            protected override void PopOut() => this.FadeOut(80, Easing.OutQuint);
+            protected override void PopIn() => this.FadeIn(150, Easing.OutQuint);
+            protected override void PopOut() => this.Delay(150).FadeOut(500, Easing.OutQuint);
 
             public void Move(Vector2 pos) => Position = pos;
 
-            public void SetContent(APIUser? content) => LoadComponentAsync(new UserGridPanel(content ?? new GuestUser())
+            private APIUser? user;
+
+            public void SetContent(APIUser? content)
             {
-                Width = 300,
-            }, panel => Child = panel);
+                if (content == user && Children.Any())
+                    return;
+
+                user = content;
+
+                if (user != null)
+                {
+                    LoadComponentAsync(new UserGridPanel(user)
+                    {
+                        Width = 300,
+                    }, panel => Child = panel);
+                }
+                else
+                {
+                    var tooltip = new OsuTooltipContainer.OsuTooltip();
+                    tooltip.SetContent(ContextMenuStrings.ViewProfile);
+                    tooltip.Show();
+
+                    Child = tooltip;
+                }
+            }
+        }
+
+        public partial class NoCardTooltip : VisibilityContainer, ITooltip<APIUser?>
+        {
+            public NoCardTooltip()
+            {
+                var tooltip = new OsuTooltipContainer.OsuTooltip();
+                tooltip.SetContent(ContextMenuStrings.ViewProfile);
+                tooltip.Show();
+
+                Child = tooltip;
+            }
+
+            protected override void PopIn() => this.FadeIn(150, Easing.OutQuint);
+            protected override void PopOut() => this.Delay(150).FadeOut(500, Easing.OutQuint);
+
+            public void Move(Vector2 pos) => Position = pos;
+
+            public void SetContent(APIUser? content)
+            {
+            }
         }
     }
 }
