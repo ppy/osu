@@ -72,11 +72,7 @@ namespace osu.Game.Users.Drawables
             }
 
             protected override void PopIn() => this.FadeIn(150, Easing.OutQuint);
-            protected override void PopOut()
-            {
-                this.Delay(150).FadeOut(500, Easing.OutQuint);
-                Clear();
-            }
+            protected override void PopOut() => this.Delay(150).FadeOut(500, Easing.OutQuint);
 
             public void Move(Vector2 pos) => Position = pos;
 
