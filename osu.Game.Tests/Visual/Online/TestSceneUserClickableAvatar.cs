@@ -8,6 +8,7 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Effects;
 using osu.Framework.Testing;
+using osu.Game.Graphics.Cursor;
 using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Users;
 using osu.Game.Users.Drawables;
@@ -41,65 +42,15 @@ namespace osu.Game.Tests.Visual.Online
         [Test]
         public void TestClickableAvatarHover()
         {
-            AddStep($"click user {1} with UserGridPanel {nameof(ClickableAvatar)}", () =>
-            {
-                var targets = this.ChildrenOfType<ClickableAvatar>().ToList();
-                if (targets.Count < 1)
-                    return;
+            AddStep("hover avatar with user panel", () => InputManager.MoveMouseTo(this.ChildrenOfType<ClickableAvatar>().ElementAt(1)));
+            AddUntilStep("wait for tooltip to show", () => this.ChildrenOfType<ClickableAvatar.UserCardTooltip>().FirstOrDefault()?.State.Value == Visibility.Visible);
+            AddStep("hover out", () => InputManager.MoveMouseTo(new Vector2(0)));
+            AddUntilStep("wait for tooltip to hide", () => this.ChildrenOfType<ClickableAvatar.UserCardTooltip>().FirstOrDefault()?.State.Value == Visibility.Hidden);
 
-                InputManager.MoveMouseTo(targets[0]);
-            });
-            AddWaitStep("wait for tooltip to show", 5);
-            AddStep("Hover out", () => InputManager.MoveMouseTo(new Vector2(0)));
-            AddWaitStep("wait for tooltip to hide", 3);
-
-            AddStep($"click user {2} with username only. {nameof(ClickableAvatar)}", () =>
-            {
-                var targets = this.ChildrenOfType<ClickableAvatar>().ToList();
-                if (targets.Count < 2)
-                    return;
-
-                InputManager.MoveMouseTo(targets[1]);
-            });
-            AddWaitStep("wait for tooltip to show", 5);
-            AddStep("Hover out", () => InputManager.MoveMouseTo(new Vector2(0)));
-            AddWaitStep("wait for tooltip to hide", 3);
-
-            AddStep($"click user {3} with UserGridPanel {nameof(ClickableAvatar)}", () =>
-            {
-                var targets = this.ChildrenOfType<ClickableAvatar>().ToList();
-                if (targets.Count < 3)
-                    return;
-
-                InputManager.MoveMouseTo(targets[2]);
-            });
-            AddWaitStep("wait for tooltip to show", 5);
-            AddStep("Hover out", () => InputManager.MoveMouseTo(new Vector2(0)));
-            AddWaitStep("wait for tooltip to hide", 3);
-
-            AddStep($"click null user {4}. {nameof(ClickableAvatar)}", () =>
-            {
-                var targets = this.ChildrenOfType<ClickableAvatar>().ToList();
-                if (targets.Count < 4)
-                    return;
-
-                InputManager.MoveMouseTo(targets[3]);
-            });
-            AddWaitStep("wait for tooltip to show", 5);
-            AddStep("Hover out", () => InputManager.MoveMouseTo(new Vector2(0)));
-            AddWaitStep("wait for tooltip to hide", 3);
-
-            AddStep($"click null user {5}. {nameof(ClickableAvatar)}", () =>
-            {
-                var targets = this.ChildrenOfType<ClickableAvatar>().ToList();
-                if (targets.Count < 5)
-                    return;
-
-                InputManager.MoveMouseTo(targets[4]);
-            });
-            AddWaitStep("wait for tooltip to show", 5);
-            AddStep("Hover out", () => InputManager.MoveMouseTo(new Vector2(0)));
-            AddWaitStep("wait for tooltip to hide", 3);
+            AddStep("hover avatar without user panel", () => InputManager.MoveMouseTo(this.ChildrenOfType<ClickableAvatar>().ElementAt(0)));
+            AddUntilStep("wait for tooltip to show", () => this.ChildrenOfType<OsuTooltipContainer.OsuTooltip>().FirstOrDefault()?.State.Value == Visibility.Visible);
+            AddStep("hover out", () => InputManager.MoveMouseTo(new Vector2(0)));
+            AddUntilStep("wait for tooltip to hide", () => this.ChildrenOfType<OsuTooltipContainer.OsuTooltip>().FirstOrDefault()?.State.Value == Visibility.Hidden);
         }
 
         private Drawable generateUser(string username, int id, CountryCode countryCode, string cover, bool showPanel, string? color = null)
