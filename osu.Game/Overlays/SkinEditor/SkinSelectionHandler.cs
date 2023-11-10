@@ -249,7 +249,12 @@ namespace osu.Game.Overlays.SkinEditor
             yield return new OsuMenuItem("Reset scale", MenuItemType.Standard, () =>
             {
                 foreach (var blueprint in SelectedBlueprints)
-                    ((Drawable)blueprint.Item).Scale = Vector2.One;
+                {
+                    var blueprintItem = ((Drawable)blueprint.Item);
+                    blueprintItem.Scale = Vector2.One;
+                    if (RelativeSizeAxes == Axes.Both)
+                        blueprintItem.Size = Vector2.One;
+                }
             });
 
             yield return new EditorMenuItemSpacer();
