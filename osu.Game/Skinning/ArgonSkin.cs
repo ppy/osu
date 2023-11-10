@@ -116,7 +116,7 @@ namespace osu.Game.Skinning
                             var skinnableTargetWrapper = new DefaultSkinComponentsContainer(container =>
                             {
                                 var health = container.OfType<ArgonHealthDisplay>().FirstOrDefault();
-                                var healthLine = container.OfType<RoundedLine>().FirstOrDefault();
+                                var healthLine = container.OfType<BoxElement>().FirstOrDefault();
                                 var scoreWedge = container.OfType<ArgonScoreWedge>().FirstOrDefault();
                                 var score = container.OfType<ArgonScoreCounter>().FirstOrDefault();
                                 var accuracy = container.OfType<ArgonAccuracyCounter>().FirstOrDefault();
@@ -213,7 +213,7 @@ namespace osu.Game.Skinning
                                     new ArgonScoreWedge(),
                                     new ArgonScoreCounter(),
                                     new ArgonHealthDisplay(),
-                                    new RoundedLine(),
+                                    new BoxElement(),
                                     new ArgonAccuracyCounter(),
                                     new ArgonComboCounter(),
                                     new BarHitErrorMeter(),
