@@ -47,20 +47,20 @@ namespace osu.Game.Users.Drawables
 
         private readonly bool isInteractive;
         private readonly bool showGuestOnNull;
-        private readonly bool showUsernameOnly;
+        private readonly bool showUserPanelOnHover;
 
         /// <summary>
         /// Construct a new UpdateableAvatar.
         /// </summary>
         /// <param name="user">The initial user to display.</param>
         /// <param name="isInteractive">If set to true, hover/click sounds will play and clicking the avatar will open the user's profile.</param>
-        /// <param name="showUsernameOnly">If set to true, the user status panel will be displayed in the tooltip.</param>
+        /// <param name="showUserPanelOnHover">If set to true, the user status panel will be displayed in the tooltip.</param>
         /// <param name="showGuestOnNull">Whether to show a default guest representation on null user (as opposed to nothing).</param>
-        public UpdateableAvatar(APIUser? user = null, bool isInteractive = true, bool showUsernameOnly = false, bool showGuestOnNull = true)
+        public UpdateableAvatar(APIUser? user = null, bool isInteractive = true, bool showUserPanelOnHover = false, bool showGuestOnNull = true)
         {
             this.isInteractive = isInteractive;
             this.showGuestOnNull = showGuestOnNull;
-            this.showUsernameOnly = showUsernameOnly;
+            this.showUserPanelOnHover = showUserPanelOnHover;
 
             User = user;
         }
@@ -72,10 +72,9 @@ namespace osu.Game.Users.Drawables
 
             if (isInteractive)
             {
-                return new ClickableAvatar(user)
+                return new ClickableAvatar(user, showUserPanelOnHover)
                 {
                     RelativeSizeAxes = Axes.Both,
-                    ShowUsernameOnly = showUsernameOnly
                 };
             }
 
