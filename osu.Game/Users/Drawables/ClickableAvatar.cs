@@ -33,7 +33,7 @@ namespace osu.Game.Users.Drawables
         /// A clickable avatar for the specified user, with UI sounds included.
         /// </summary>
         /// <param name="user">The user. A null value will get a placeholder avatar.</param>
-        /// <param name="showCardOnHover"></param>
+        /// <param name="showCardOnHover">If set to true, the <see cref="UserGridPanel"/> will be shown for the tooltip</param>
         public ClickableAvatar(APIUser? user = null, bool showCardOnHover = false)
         {
             if (user?.Id != APIUser.SYSTEM_USER_ID)
@@ -72,7 +72,11 @@ namespace osu.Game.Users.Drawables
             }
 
             protected override void PopIn() => this.FadeIn(150, Easing.OutQuint);
-            protected override void PopOut() => this.Delay(150).FadeOut(500, Easing.OutQuint);
+            protected override void PopOut()
+            {
+                this.Delay(150).FadeOut(500, Easing.OutQuint);
+                Clear();
+            }
 
             public void Move(Vector2 pos) => Position = pos;
 
