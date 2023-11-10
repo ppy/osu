@@ -35,6 +35,6 @@ namespace osu.Game.Screens
             return true;
         }
 
-        internal void ScheduleToTransitionEnd(Action action) => Scheduler.AddDelayed(action, BackgroundScreen.TRANSITION_LENGTH);
+        internal ScheduledDelegate ScheduleUntilTransitionEnd(Action action) => Scheduler.AddDelayed(action, BackgroundScreen.TRANSITION_LENGTH);
     }
 }

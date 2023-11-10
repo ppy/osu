@@ -73,13 +73,15 @@ namespace osu.Game.Screens.Backgrounds
             void next() => Next();
         }
 
+        private ScheduledDelegate storyboardUnloadDelegate;
+
         public override void OnSuspending(ScreenTransitionEvent e)
         {
             var backgroundScreenStack = Parent as BackgroundScreenStack;
             Debug.Assert(backgroundScreenStack != null);
 
             if (background is BeatmapBackgroundWithStoryboard storyboardBackground)
-                storyboardBackground.UnloadStoryboard(backgroundScreenStack.ScheduleToTransitionEnd);
+                storyboardUnloadDelegate = backgroundScreenStack.ScheduleUntilTransitionEnd(storyboardBackground.UnloadStoryboard);
 
             base.OnSuspending(e);
         }
@@ -87,7 +89,14 @@ namespace osu.Game.Screens.Backgrounds
         public override void OnResuming(ScreenTransitionEvent e)
         {
             if (background is BeatmapBackgroundWithStoryboard storyboardBackground)
-                storyboardBackground.LoadStoryboard();
+            {
+                if (storyboardUnloadDelegate?.Completed == false)
+                    storyboardUnloadDelegate.Cancel();
+                else
+                    storyboardBackground.LoadStoryboard();
+
+                storyboardUnloadDelegate = null;
+            }
 
             base.OnResuming(e);
         }

@@ -71,7 +71,7 @@ namespace osu.Game.Graphics.Backgrounds
             }, (loadCancellationSource = new CancellationTokenSource()).Token);
         }
 
-        public void UnloadStoryboard(Action<Action> scheduleStoryboardRemoval)
+        public void UnloadStoryboard()
         {
             if (drawableStoryboard == null)
                 return;
@@ -79,15 +79,12 @@ namespace osu.Game.Graphics.Backgrounds
             loadCancellationSource.AsNonNull().Cancel();
             loadCancellationSource = null;
 
-            DrawableStoryboard s = drawableStoryboard;
-
-            scheduleStoryboardRemoval(() =>
-            {
-                s.RemoveAndDisposeImmediately();
-                Sprite.Alpha = 1f;
-            });
+            // clear is intentionally used here for the storyboard to be disposed asynchronously.
+            storyboardContainer.Clear();
 
             drawableStoryboard = null;
+
+            Sprite.Alpha = 1f;
         }
 
         protected override void LoadComplete()
