@@ -5,6 +5,8 @@ using System;
 using System.Collections.Generic;
 using osu.Framework.Graphics;
 using osu.Framework.Screens;
+using osu.Framework.Threading;
+using osu.Game.Screens.Backgrounds;
 
 namespace osu.Game.Screens
 {
@@ -35,6 +37,19 @@ namespace osu.Game.Screens
             return true;
         }
 
+        /// <summary>
+        /// Schedules a delegate to run after 500ms, the time length of a background screen transition.
+        /// This is used in <see cref="BackgroundScreenDefault"/> to dispose of the storyboard once the background screen is completely off-screen.
+        /// </summary>
+        /// <remarks>
+        /// Late storyboard disposals cannot be achieved with any local scheduler from <see cref="BackgroundScreenDefault"/> or any component inside it,
+        /// due to the screen becoming dead at the moment the transition finishes. And, on the frame that it is dead on, it will not receive an <see cref="Drawable.UpdateSubTree"/>,
+        /// therefore not guaranteeing to dispose the storyboard at any period of time close to the end of the transition.
+        /// This might require reconsideration framework-side, possibly exposing a "death" event in <see cref="Screen"/> or all <see cref="Drawable"/>s in general.
+        /// </remarks>
+        /// <param name="action">The delegate </param>
+        /// <returns></returns>
+        /// <seealso cref="BackgroundScreen.TRANSITION_LENGTH"/>
         internal ScheduledDelegate ScheduleUntilTransitionEnd(Action action) => Scheduler.AddDelayed(action, BackgroundScreen.TRANSITION_LENGTH);
     }
 }
