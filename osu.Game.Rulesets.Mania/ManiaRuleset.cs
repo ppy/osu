@@ -427,7 +427,6 @@ namespace osu.Game.Rulesets.Mania
         public override RulesetSetupSection CreateEditorSetupSection() => new ManiaSetupSection();
 
         public override DifficultySection CreateEditorDifficultySection() => new ManiaDifficultySection();
-
     }
 
     public enum PlayfieldType
