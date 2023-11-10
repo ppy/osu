@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.Linq;
 using Newtonsoft.Json;
 using osu.Framework.Bindables;
+using osu.Framework.Extensions.EnumExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Logging;
@@ -66,8 +67,13 @@ namespace osu.Game.Skinning
             Position = component.Position;
             Rotation = component.Rotation;
             Scale = component.Scale;
-            Height = component.Height;
-            Width = component.Width;
+
+            if ((component as CompositeDrawable)?.AutoSizeAxes.HasFlagFast(Axes.X) != true)
+                Width = component.Width;
+
+            if ((component as CompositeDrawable)?.AutoSizeAxes.HasFlagFast(Axes.Y) != true)
+                Height = component.Height;
+
             Anchor = component.Anchor;
             Origin = component.Origin;
 
