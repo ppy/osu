@@ -221,7 +221,7 @@ namespace osu.Game.Overlays.SkinEditor
 
             SelectionBox.CanScaleX = allSelectedSupportManualSizing(Axes.X);
             SelectionBox.CanScaleY = allSelectedSupportManualSizing(Axes.Y);
-            SelectionBox.CanScaleProportionally = true;
+            SelectionBox.CanScaleDiagonally = true;
             SelectionBox.CanFlipX = true;
             SelectionBox.CanFlipY = true;
             SelectionBox.CanReverse = false;

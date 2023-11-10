@@ -47,7 +47,7 @@ namespace osu.Game.Tests.Visual.Editing
 
                         CanScaleX = true,
                         CanScaleY = true,
-                        CanScaleProportionally = true,
+                        CanScaleDiagonally = true,
                         CanFlipX = true,
                         CanFlipY = true,
 
