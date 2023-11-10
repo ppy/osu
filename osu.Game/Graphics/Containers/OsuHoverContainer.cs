@@ -70,7 +70,7 @@ namespace osu.Game.Graphics.Containers
 
         private void updateColour()
         {
-            EffectTargets.ForEach(d => d.FadeColour(IsHovered && Enabled.Value ? HoverColour : IdleColour, FADE_DURATION, Easing.OutQuint));
+            EffectTargets.ForEach(d => d?.FadeColour(IsHovered && Enabled.Value ? HoverColour : IdleColour, FADE_DURATION, Easing.OutQuint));
         }
     }
 }
