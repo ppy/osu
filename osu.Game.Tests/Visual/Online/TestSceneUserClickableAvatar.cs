@@ -125,7 +125,9 @@ namespace osu.Game.Tests.Visual.Online
                 Masking = true,
                 EdgeEffect = new EdgeEffectParameters
                 {
-                    Type = EdgeEffectType.Shadow, Radius = 1, Colour = Color4.Black.Opacity(0.2f),
+                    Type = EdgeEffectType.Shadow,
+                    Radius = 1,
+                    Colour = Color4.Black.Opacity(0.2f),
                 },
             };
         }
