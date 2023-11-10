@@ -11,14 +11,14 @@ namespace osu.Game.Tests.Rulesets.Scoring
     [TestFixture]
     public class HitResultTest
     {
-        [TestCase(new[] { HitResult.Perfect, HitResult.Great, HitResult.Good, HitResult.Ok, HitResult.Meh }, new[] { HitResult.Miss })]
-        [TestCase(new[] { HitResult.LargeTickHit }, new[] { HitResult.LargeTickMiss })]
-        [TestCase(new[] { HitResult.SmallTickHit }, new[] { HitResult.SmallTickMiss })]
+        [TestCase(new[] { HitResult.Perfect, HitResult.Great, HitResult.Good, HitResult.Ok, HitResult.Meh }, new[] { HitResult.Miss, HitResult.IgnoreMiss })]
+        [TestCase(new[] { HitResult.LargeTickHit }, new[] { HitResult.LargeTickMiss, HitResult.IgnoreMiss })]
+        [TestCase(new[] { HitResult.SmallTickHit }, new[] { HitResult.SmallTickMiss, HitResult.IgnoreMiss })]
         [TestCase(new[] { HitResult.LargeBonus, HitResult.SmallBonus }, new[] { HitResult.IgnoreMiss })]
         [TestCase(new[] { HitResult.IgnoreHit }, new[] { HitResult.IgnoreMiss, HitResult.ComboBreak })]
         public void TestValidResultPairs(HitResult[] maxResults, HitResult[] minResults)
         {
-            HitResult[] unsupportedResults = HitResultExtensions.ALL_TYPES.Where(t => t != HitResult.IgnoreMiss && !minResults.Contains(t)).ToArray();
+            HitResult[] unsupportedResults = HitResultExtensions.ALL_TYPES.Where(t => !minResults.Contains(t)).ToArray();
 
             Assert.Multiple(() =>
             {
