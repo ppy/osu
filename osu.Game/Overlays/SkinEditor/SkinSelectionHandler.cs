@@ -7,6 +7,7 @@ using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Extensions.EnumExtensions;
 using osu.Framework.Graphics;
+using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Primitives;
 using osu.Framework.Graphics.UserInterface;
 using osu.Framework.Utils;
@@ -31,8 +32,38 @@ namespace osu.Game.Overlays.SkinEditor
             UpdatePosition = updateDrawablePosition
         };
 
+        private bool allSelectedSupportManualSizing => SelectedItems.All(b => (b as CompositeDrawable)?.AutoSizeAxes == Axes.None);
+
         public override bool HandleScale(Vector2 scale, Anchor anchor)
         {
+            bool adjustSize;
+
+            switch (anchor)
+            {
+                // for corners, adjust scale.
+                case Anchor.TopLeft:
+                case Anchor.TopRight:
+                case Anchor.BottomLeft:
+                case Anchor.BottomRight:
+                    adjustSize = false;
+                    break;
+
+                // for edges, adjust size.
+                case Anchor.TopCentre:
+                case Anchor.CentreLeft:
+                case Anchor.CentreRight:
+                case Anchor.BottomCentre:
+                    // autosize elements can't be easily handled so just disable sizing for now.
+                    if (!allSelectedSupportManualSizing)
+                        return false;
+
+                    adjustSize = true;
+                    break;
+
+                default:
+                    throw new ArgumentOutOfRangeException(nameof(anchor), anchor, null);
+            }
+
             // convert scale to screen space
             scale = ToScreenSpace(scale) - ToScreenSpace(Vector2.Zero);
 
@@ -120,7 +151,10 @@ namespace osu.Game.Overlays.SkinEditor
                 if (Precision.AlmostEquals(MathF.Abs(drawableItem.Rotation) % 180, 90))
                     currentScaledDelta = new Vector2(scaledDelta.Y, scaledDelta.X);
 
-                drawableItem.Scale *= currentScaledDelta;
+                if (adjustSize)
+                    drawableItem.Size *= currentScaledDelta;
+                else
+                    drawableItem.Scale *= currentScaledDelta;
             }
 
             return true;
@@ -169,8 +203,8 @@ namespace osu.Game.Overlays.SkinEditor
         {
             base.OnSelectionChanged();
 
-            SelectionBox.CanScaleX = true;
-            SelectionBox.CanScaleY = true;
+            SelectionBox.CanScaleX = SelectionBox.CanScaleY = allSelectedSupportManualSizing;
+            SelectionBox.CanScaleProportionally = true;
             SelectionBox.CanFlipX = true;
             SelectionBox.CanFlipY = true;
             SelectionBox.CanReverse = false;

@@ -91,6 +91,23 @@ namespace osu.Game.Screens.Edit.Compose.Components
             }
         }
 
+        private bool canScaleProportionally;
+
+        /// <summary>
+        /// Whether vertical scaling support should be enabled.
+        /// </summary>
+        public bool CanScaleProportionally
+        {
+            get => canScaleProportionally;
+            set
+            {
+                if (canScaleProportionally == value) return;
+
+                canScaleProportionally = value;
+                recreate();
+            }
+        }
+
         private bool canFlipX;
 
         /// <summary>
@@ -245,7 +262,7 @@ namespace osu.Game.Screens.Edit.Compose.Components
             };
 
             if (CanScaleX) addXScaleComponents();
-            if (CanScaleX && CanScaleY) addFullScaleComponents();
+            if (CanScaleProportionally) addFullScaleComponents();
             if (CanScaleY) addYScaleComponents();
             if (CanFlipX) addXFlipComponents();
             if (CanFlipY) addYFlipComponents();
