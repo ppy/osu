@@ -468,7 +468,7 @@ namespace osu.Game.Rulesets.Osu.Tests
         private void assertHeadMissTailTracked()
         {
             AddAssert("Tracking retained", () => judgementResults[^2].Type, () => Is.EqualTo(HitResult.LargeTickHit));
-            AddAssert("Slider head misseed", () => judgementResults.First().IsHit, () => Is.False);
+            AddAssert("Slider head missed", () => judgementResults.First().IsHit, () => Is.False);
         }
 
         private void assertMidSliderJudgements()
