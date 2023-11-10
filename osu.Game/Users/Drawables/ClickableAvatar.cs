@@ -105,17 +105,17 @@ namespace osu.Game.Users.Drawables
 
         public partial class NoCardTooltip : VisibilityContainer, ITooltip<APIUser?>
         {
+            private readonly OsuTooltipContainer.OsuTooltip tooltip;
+
             public NoCardTooltip()
             {
-                var tooltip = new OsuTooltipContainer.OsuTooltip();
+                tooltip = new OsuTooltipContainer.OsuTooltip();
                 tooltip.SetContent(ContextMenuStrings.ViewProfile);
-                tooltip.Show();
-
                 Child = tooltip;
             }
 
-            protected override void PopIn() => this.FadeIn(150, Easing.OutQuint);
-            protected override void PopOut() => this.Delay(150).FadeOut(500, Easing.OutQuint);
+            protected override void PopIn() => tooltip.Show();
+            protected override void PopOut() => tooltip.Hide();
 
             public void Move(Vector2 pos) => Position = pos;
 
