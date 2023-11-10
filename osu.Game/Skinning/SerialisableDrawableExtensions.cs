@@ -7,7 +7,6 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Game.Configuration;
 using osu.Game.Extensions;
-using osuTK;
 
 namespace osu.Game.Skinning
 {
