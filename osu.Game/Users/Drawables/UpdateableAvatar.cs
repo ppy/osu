@@ -54,7 +54,10 @@ namespace osu.Game.Users.Drawables
         /// </summary>
         /// <param name="user">The initial user to display.</param>
         /// <param name="isInteractive">If set to true, hover/click sounds will play and clicking the avatar will open the user's profile.</param>
-        /// <param name="showUserPanelOnHover">If set to true, the user status panel will be displayed in the tooltip.</param>
+        /// <param name="showUserPanelOnHover">
+        /// If set to true, the user status panel will be displayed in the tooltip.
+        /// Only has an effect if <see cref="isInteractive"/> is true.
+        /// </param>
         /// <param name="showGuestOnNull">Whether to show a default guest representation on null user (as opposed to nothing).</param>
         public UpdateableAvatar(APIUser? user = null, bool isInteractive = true, bool showUserPanelOnHover = false, bool showGuestOnNull = true)
         {
