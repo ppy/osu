@@ -407,6 +407,8 @@ namespace osu.Game
                 })
             });
 
+            base.Content.Add(new TouchInputInterceptor());
+
             KeyBindingStore = new RealmKeyBindingStore(realm, keyCombinationProvider);
             KeyBindingStore.Register(globalBindings, RulesetStore.AvailableRulesets);
 
