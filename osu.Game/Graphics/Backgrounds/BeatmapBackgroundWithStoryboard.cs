@@ -1,13 +1,11 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Threading;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
-using osu.Framework.Extensions.ObjectExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Timing;
@@ -48,27 +46,37 @@ namespace osu.Game.Graphics.Backgrounds
                 Volume = { Value = 0 },
             });
 
-            LoadStoryboard();
+            LoadStoryboard(false);
         }
 
-        public void LoadStoryboard()
+        public void LoadStoryboard(bool async = true)
         {
             Debug.Assert(drawableStoryboard == null);
 
             if (!Beatmap.Storyboard.HasDrawable)
                 return;
 
-            LoadComponentAsync(drawableStoryboard = new DrawableStoryboard(Beatmap.Storyboard, mods.Value)
+            drawableStoryboard = new DrawableStoryboard(Beatmap.Storyboard, mods.Value)
             {
                 Clock = storyboardClock
-            }, s =>
+            };
+
+            if (async)
+                LoadComponentAsync(drawableStoryboard, finishLoad, (loadCancellationSource = new CancellationTokenSource()).Token);
+            else
+            {
+                LoadComponent(drawableStoryboard);
+                finishLoad(drawableStoryboard);
+            }
+
+            void finishLoad(DrawableStoryboard s)
             {
                 if (Beatmap.Storyboard.ReplacesBackground)
                     Sprite.FadeOut(BackgroundScreen.TRANSITION_LENGTH, Easing.InQuint);
 
                 storyboardContainer.FadeInFromZero(BackgroundScreen.TRANSITION_LENGTH, Easing.OutQuint);
                 storyboardContainer.Add(s);
-            }, (loadCancellationSource = new CancellationTokenSource()).Token);
+            }
         }
 
         public void UnloadStoryboard()
@@ -76,7 +84,7 @@ namespace osu.Game.Graphics.Backgrounds
             if (drawableStoryboard == null)
                 return;
 
-            loadCancellationSource.AsNonNull().Cancel();
+            loadCancellationSource?.Cancel();
             loadCancellationSource = null;
 
             // clear is intentionally used here for the storyboard to be disposed asynchronously.
