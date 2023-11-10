@@ -108,8 +108,6 @@ namespace osu.Game.Screens.Play.HUD
             labelText.Colour = colours.Blue0;
         }
 
-        protected virtual LocalisableString FormatWireframes(LocalisableString text) => text;
-
         protected override void LoadComplete()
         {
             base.LoadComplete();
