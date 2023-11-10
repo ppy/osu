@@ -64,6 +64,7 @@ namespace osu.Game.Rulesets.Osu.Scoring
                     double localLastTime = lastTime;
                     double breakTime = 0;
 
+                    // TODO: This doesn't handle overlapping/sequential breaks correctly (/b/614).
                     // Subtract any break time from the duration since the last object
                     if (Beatmap.Breaks.Count > 0 && currentBreak < Beatmap.Breaks.Count)
                     {
@@ -107,6 +108,8 @@ namespace osu.Game.Rulesets.Osu.Scoring
                             increaseHp(nested);
                     }
 
+                    // Note: Because HP is capped during the above increases, long sliders (with many ticks) or spinners
+                    // will appear to overkill at lower drain levels than they should. However, it is also not correct to simply use the uncapped version.
                     if (hpOverkill > 0 && currentHp - hpOverkill <= lowestHpEver)
                     {
                         fail = true;
