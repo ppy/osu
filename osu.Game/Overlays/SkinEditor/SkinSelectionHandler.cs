@@ -252,8 +252,11 @@ namespace osu.Game.Overlays.SkinEditor
                 {
                     var blueprintItem = ((Drawable)blueprint.Item);
                     blueprintItem.Scale = Vector2.One;
-                    if (RelativeSizeAxes == Axes.Both)
-                        blueprintItem.Size = Vector2.One;
+
+                    if (blueprintItem.RelativeSizeAxes.HasFlagFast(Axes.X))
+                        blueprintItem.Width = 1;
+                    if (blueprintItem.RelativeSizeAxes.HasFlagFast(Axes.Y))
+                        blueprintItem.Height = 1;
                 }
             });
 
