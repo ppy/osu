@@ -266,7 +266,7 @@ namespace osu.Game.Overlays.Mods
             Ruleset ruleset = gameRuleset.Value.CreateInstance();
             adjustedDifficulty = ruleset.GetRateAdjustedDifficulty(adjustedDifficulty, rate);
 
-            haveRateChangedValues = !isDifferentArOd(originalDifficulty, adjustedDifficulty);
+            haveRateChangedValues = isDifferentArOd(originalDifficulty, adjustedDifficulty);
 
             approachRateDisplay.AdjustType.Value = VerticalAttributeDisplay.CalculateEffect(originalDifficulty.ApproachRate, adjustedDifficulty.ApproachRate);
             overallDifficultyDisplay.AdjustType.Value = VerticalAttributeDisplay.CalculateEffect(originalDifficulty.OverallDifficulty, adjustedDifficulty.OverallDifficulty);
@@ -279,13 +279,13 @@ namespace osu.Game.Overlays.Mods
 
         private bool isDifferentArOd(BeatmapDifficulty? a, BeatmapDifficulty? b)
         {
-            if (a == null && b == null) return true;
-            if (a == null || b == null) return false;
+            if (a == null && b == null) return false;
+            if (a == null || b == null) return true;
 
-            if (!Precision.AlmostEquals(a.ApproachRate, b.ApproachRate, 0.01)) return false;
-            if (!Precision.AlmostEquals(a.OverallDifficulty, b.OverallDifficulty, 0.01)) return false;
+            if (!Precision.AlmostEquals(a.ApproachRate, b.ApproachRate, 0.01)) return true;
+            if (!Precision.AlmostEquals(a.OverallDifficulty, b.OverallDifficulty, 0.01)) return true;
 
-            return true;
+            return false;
         }
 
         private void updateCollapsedState()
