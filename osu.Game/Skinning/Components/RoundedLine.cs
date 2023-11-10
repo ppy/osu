@@ -5,19 +5,18 @@ using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
-using osu.Game.Skinning;
-using osuTK;
 
-namespace osu.Game.Screens.Play.HUD
+namespace osu.Game.Skinning.Components
 {
-    public partial class ArgonHealthRightLine : CompositeDrawable, ISerialisableDrawable
+    public partial class RoundedLine : CompositeDrawable, ISerialisableDrawable
     {
         public bool UsesFixedAnchor { get; set; }
 
         [BackgroundDependencyLoader]
         private void load()
         {
-            Size = new Vector2(50f, ArgonHealthDisplay.MAIN_PATH_RADIUS * 2);
+            AutoSizeAxes = Axes.Both;
+
             InternalChild = new Circle
             {
                 Anchor = Anchor.CentreLeft,

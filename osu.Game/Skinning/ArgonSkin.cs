@@ -16,6 +16,7 @@ using osu.Game.IO;
 using osu.Game.Screens.Play;
 using osu.Game.Screens.Play.HUD;
 using osu.Game.Screens.Play.HUD.HitErrorMeters;
+using osu.Game.Skinning.Components;
 using osuTK;
 using osuTK.Graphics;
 
@@ -115,7 +116,7 @@ namespace osu.Game.Skinning
                             var skinnableTargetWrapper = new DefaultSkinComponentsContainer(container =>
                             {
                                 var health = container.OfType<ArgonHealthDisplay>().FirstOrDefault();
-                                var healthLine = container.OfType<ArgonHealthRightLine>().FirstOrDefault();
+                                var healthLine = container.OfType<RoundedLine>().FirstOrDefault();
                                 var scoreWedge = container.OfType<ArgonScoreWedge>().FirstOrDefault();
                                 var score = container.OfType<ArgonScoreCounter>().FirstOrDefault();
                                 var accuracy = container.OfType<ArgonAccuracyCounter>().FirstOrDefault();
@@ -207,7 +208,7 @@ namespace osu.Game.Skinning
                                     new ArgonScoreWedge(),
                                     new ArgonScoreCounter(),
                                     new ArgonHealthDisplay(),
-                                    new ArgonHealthRightLine(),
+                                    new RoundedLine(),
                                     new ArgonAccuracyCounter(),
                                     new ArgonComboCounter(),
                                     new BarHitErrorMeter(),
