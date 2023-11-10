@@ -137,7 +137,7 @@ namespace osu.Game.Screens.Select.Details
                     rate = mod.ApplyToRate(0, rate);
                 adjustedDifficulty = ruleset.GetRateAdjustedDifficulty(adjustedDifficulty, rate);
 
-                haveRateChangedValues = !isDifferentArOd(originalDifficulty, adjustedDifficulty);
+                haveRateChangedValues = isDifferentArOd(originalDifficulty, adjustedDifficulty);
             }
 
             switch (BeatmapInfo?.Ruleset.OnlineID)
@@ -204,13 +204,13 @@ namespace osu.Game.Screens.Select.Details
 
         private bool isDifferentArOd(BeatmapDifficulty a, BeatmapDifficulty b)
         {
-            if (a == null && b == null) return true;
-            if (a == null || b == null) return false;
+            if (a == null && b == null) return false;
+            if (a == null || b == null) return true;
 
-            if (!Precision.AlmostEquals(a.ApproachRate, b.ApproachRate, 0.01)) return false;
-            if (!Precision.AlmostEquals(a.OverallDifficulty, b.OverallDifficulty, 0.01)) return false;
+            if (!Precision.AlmostEquals(a.ApproachRate, b.ApproachRate, 0.01)) return true;
+            if (!Precision.AlmostEquals(a.OverallDifficulty, b.OverallDifficulty, 0.01)) return true;
 
-            return true;
+            return false;
         }
 
         public LocalisableString TooltipText
