@@ -389,6 +389,14 @@ namespace osu.Game.Rulesets
         /// Can be overridden to alter the difficulty section to the editor beatmap setup screen.
         /// </summary>
         public virtual DifficultySection? CreateEditorDifficultySection() => null;
+
+        /// <summary>
+        /// Changes difficulty after they're adjusted according to rate.
+        /// Doesn't change any attributes by default.
+        /// </summary>
+        /// <param name="baseDifficulty">Difficulty attributes that will be changed</param>
+        /// <param name="rate">Rate of the gameplay. For example 1.5 for DT.</param>
+        /// <returns>Copy of difficulty info with values changed according to rate and ruleset-specific behaviour.</returns>
         public virtual BeatmapDifficulty GetRateAdjustedDifficulty(IBeatmapDifficultyInfo baseDifficulty, double rate) => new BeatmapDifficulty(baseDifficulty);
     }
 }
