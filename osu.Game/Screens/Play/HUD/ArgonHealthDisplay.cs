@@ -35,14 +35,6 @@ namespace osu.Game.Screens.Play.HUD
             Precision = 1
         };
 
-        [SettingSource("Bar length")]
-        public BindableFloat BarLength { get; } = new BindableFloat(0.98f)
-        {
-            MinValue = 0.2f,
-            MaxValue = 1,
-            Precision = 0.01f,
-        };
-
         private BarPath mainBar = null!;
 
         /// <summary>
@@ -140,7 +132,6 @@ namespace osu.Game.Screens.Play.HUD
 
             Current.BindValueChanged(_ => Scheduler.AddOnce(updateCurrent), true);
 
-            BarLength.BindValueChanged(l => Width = l.NewValue, true);
             BarHeight.BindValueChanged(_ => updatePath());
             updatePath();
         }
