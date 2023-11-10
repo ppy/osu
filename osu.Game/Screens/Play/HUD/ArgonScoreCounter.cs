@@ -17,7 +17,7 @@ namespace osu.Game.Screens.Play.HUD
         protected override Easing RollingEasing => Easing.OutQuint;
 
         [SettingSource("Wireframe opacity", "Controls the opacity of the wire frames behind the digits.")]
-        public BindableFloat WireframeOpacity { get; } = new BindableFloat(0.4f)
+        public BindableFloat WireframeOpacity { get; } = new BindableFloat(0.25f)
         {
             Precision = 0.01f,
             MinValue = 0,
