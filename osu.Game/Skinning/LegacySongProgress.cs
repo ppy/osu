@@ -21,6 +21,8 @@ namespace osu.Game.Skinning
 
         public LegacySongProgress()
         {
+            // User shouldn't be able to adjust width/height of this as `CircularProgress` doesn't
+            // handle stretched cases ell.
             AutoSizeAxes = Axes.Both;
         }
 
