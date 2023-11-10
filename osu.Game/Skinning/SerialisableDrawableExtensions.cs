@@ -6,6 +6,7 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Game.Configuration;
 using osu.Game.Extensions;
+using osuTK;
 
 namespace osu.Game.Skinning
 {
@@ -18,6 +19,8 @@ namespace osu.Game.Skinning
             // todo: can probably make this better via deserialisation directly using a common interface.
             component.Position = drawableInfo.Position;
             component.Rotation = drawableInfo.Rotation;
+            if (drawableInfo.Size != Vector2.Zero && (component as CompositeDrawable)?.AutoSizeAxes == Axes.None)
+                component.Size = drawableInfo.Size;
             component.Scale = drawableInfo.Scale;
             component.Anchor = drawableInfo.Anchor;
             component.Origin = drawableInfo.Origin;

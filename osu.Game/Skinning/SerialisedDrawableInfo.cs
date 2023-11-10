@@ -35,6 +35,8 @@ namespace osu.Game.Skinning
 
         public Vector2 Scale { get; set; }
 
+        public Vector2 Size { get; set; }
+
         public Anchor Anchor { get; set; }
 
         public Anchor Origin { get; set; }
@@ -62,6 +64,7 @@ namespace osu.Game.Skinning
             Position = component.Position;
             Rotation = component.Rotation;
             Scale = component.Scale;
+            Size = component.Size;
             Anchor = component.Anchor;
             Origin = component.Origin;
 
