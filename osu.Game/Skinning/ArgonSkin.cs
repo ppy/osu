@@ -117,7 +117,7 @@ namespace osu.Game.Skinning
                             {
                                 var health = container.OfType<ArgonHealthDisplay>().FirstOrDefault();
                                 var healthLine = container.OfType<BoxElement>().FirstOrDefault();
-                                var scoreWedge = container.OfType<ArgonScoreWedge>().FirstOrDefault();
+                                var wedgePieces = container.OfType<ArgonWedgePiece>().ToArray();
                                 var score = container.OfType<ArgonScoreCounter>().FirstOrDefault();
                                 var accuracy = container.OfType<ArgonAccuracyCounter>().FirstOrDefault();
                                 var combo = container.OfType<ArgonComboCounter>().FirstOrDefault();
@@ -144,15 +144,13 @@ namespace osu.Game.Skinning
                                         healthLine.Size = new Vector2(45, 3);
                                     }
 
-                                    if (scoreWedge != null)
-                                    {
-                                        scoreWedge.Position = new Vector2(-50, 15);
+                                    foreach (var wedgePiece in wedgePieces)
+                                        wedgePiece.Position += new Vector2(-50, 15);
 
-                                        if (score != null)
-                                        {
-                                            score.Origin = Anchor.TopRight;
-                                            score.Position = new Vector2(components_x_offset + 200, scoreWedge.Y + 30);
-                                        }
+                                    if (score != null)
+                                    {
+                                        score.Origin = Anchor.TopRight;
+                                        score.Position = new Vector2(components_x_offset + 200, wedgePieces.Last().Y + 30);
                                     }
 
                                     if (accuracy != null)
@@ -210,7 +208,15 @@ namespace osu.Game.Skinning
                             {
                                 Children = new Drawable[]
                                 {
-                                    new ArgonScoreWedge(),
+                                    new ArgonWedgePiece
+                                    {
+                                        Size = new Vector2(380, 72),
+                                    },
+                                    new ArgonWedgePiece
+                                    {
+                                        Size = new Vector2(380, 72),
+                                        Position = new Vector2(4, 5)
+                                    },
                                     new ArgonScoreCounter(),
                                     new ArgonHealthDisplay(),
                                     new BoxElement(),
