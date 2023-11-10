@@ -137,7 +137,12 @@ namespace osu.Game.Skinning
                                     health.Position = new Vector2(components_x_offset, 20f);
 
                                     if (healthLine != null)
-                                        healthLine.Y = health.Y;
+                                    {
+                                        healthLine.Anchor = Anchor.TopLeft;
+                                        healthLine.Origin = Anchor.CentreLeft;
+                                        healthLine.Y = health.Y + ArgonHealthDisplay.MAIN_PATH_RADIUS;
+                                        healthLine.Size = new Vector2(45, 3);
+                                    }
 
                                     if (scoreWedge != null)
                                     {
