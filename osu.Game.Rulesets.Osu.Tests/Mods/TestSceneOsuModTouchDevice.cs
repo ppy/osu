@@ -75,6 +75,7 @@ namespace osu.Game.Rulesets.Osu.Tests.Mods
             loadPlayer();
             AddStep("seek to 2000", () => currentPlayer.GameplayClockContainer.Seek(2000));
             AddUntilStep("wait until 2000", () => currentPlayer.GameplayClockContainer.CurrentTime, () => Is.GreaterThanOrEqualTo(2000));
+            AddUntilStep("wait until break entered", () => currentPlayer.IsBreakTime.Value);
             AddStep("touch playfield", () =>
             {
                 var touch = new Touch(TouchSource.Touch1, currentPlayer.DrawableRuleset.Playfield.ScreenSpaceDrawQuad.Centre);
