@@ -4,6 +4,9 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Text;
+using System.Text.Unicode;
+using Newtonsoft.Json;
 using NUnit.Framework;
 using osu.Framework.Allocation;
 using osu.Framework.Extensions.IEnumerableExtensions;
@@ -214,7 +217,11 @@ namespace osu.Game.Tests.Visual.Gameplay
             });
 
             AddStep("Press undo", () => InputManager.Keys(PlatformAction.Undo));
-            AddAssert("Nothing changed", () => defaultState.SequenceEqual(changeHandler.GetCurrentState()));
+
+            AddAssert("Nothing changed",
+                () => JsonConvert.DeserializeObject<IEnumerable<SerialisedDrawableInfo>>(Encoding.UTF8.GetString(defaultState)),
+                () => Is.EqualTo(JsonConvert.DeserializeObject<IEnumerable<SerialisedDrawableInfo>>(Encoding.UTF8.GetString(changeHandler.GetCurrentState())))
+            );
 
             AddStep("Add components", () =>
             {
@@ -243,7 +250,11 @@ namespace osu.Game.Tests.Visual.Gameplay
             void revertAndCheckUnchanged()
             {
                 AddStep("Revert changes", () => changeHandler.RestoreState(int.MinValue));
-                AddAssert("Current state is same as default", () => defaultState.SequenceEqual(changeHandler.GetCurrentState()));
+
+                AddAssert("Current state is same as default",
+                    () => JsonConvert.DeserializeObject<IEnumerable<SerialisedDrawableInfo>>(Encoding.UTF8.GetString(defaultState)),
+                    () => Is.EqualTo(JsonConvert.DeserializeObject<IEnumerable<SerialisedDrawableInfo>>(Encoding.UTF8.GetString(changeHandler.GetCurrentState())))
+                );
             }
         }
 
