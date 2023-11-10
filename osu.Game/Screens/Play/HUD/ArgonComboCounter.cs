@@ -40,7 +40,7 @@ namespace osu.Game.Screens.Play.HUD
 
                 float newScale = Math.Clamp(text.NumberContainer.Scale.X * (wasIncrease ? 1.1f : 0.8f), 0.6f, 1.4f);
 
-                float duration = wasMiss ? 2000 : 300;
+                float duration = wasMiss ? 2000 : 500;
 
                 text.NumberContainer
                     .ScaleTo(new Vector2(newScale))
