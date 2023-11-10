@@ -42,6 +42,7 @@ namespace osu.Game.Rulesets.Osu.Edit
 
             SelectionBox.CanFlipX = SelectionBox.CanScaleX = quad.Width > 0;
             SelectionBox.CanFlipY = SelectionBox.CanScaleY = quad.Height > 0;
+            SelectionBox.CanScaleProportionally = SelectionBox.CanScaleX && SelectionBox.CanScaleY;
             SelectionBox.CanReverse = EditorBeatmap.SelectedHitObjects.Count > 1 || EditorBeatmap.SelectedHitObjects.Any(s => s is Slider);
         }
 
