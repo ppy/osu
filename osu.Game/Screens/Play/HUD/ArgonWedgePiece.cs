@@ -18,30 +18,14 @@ namespace osu.Game.Screens.Play.HUD
     {
         public bool UsesFixedAnchor { get; set; }
 
-        public float EndOpacity { get; init; } = 0.25f;
-
-        [SettingSource("Wedge width")]
-        public BindableFloat WedgeWidth { get; } = new BindableFloat(400f)
-        {
-            MinValue = 0f,
-            MaxValue = 500f,
-            Precision = 1f,
-        };
-
-        [SettingSource("Wedge height")]
-        public BindableFloat WedgeHeight { get; } = new BindableFloat(100f)
-        {
-            MinValue = 0f,
-            MaxValue = 500f,
-            Precision = 1f,
-        };
-
         [SettingSource("Inverted shear")]
         public BindableBool InvertShear { get; } = new BindableBool();
 
         public ArgonWedgePiece()
         {
             CornerRadius = 10f;
+
+            Size = new Vector2(400, 100);
         }
 
         [BackgroundDependencyLoader]
@@ -53,7 +37,7 @@ namespace osu.Game.Screens.Play.HUD
             InternalChild = new Box
             {
                 RelativeSizeAxes = Axes.Both,
-                Colour = ColourInfo.GradientVertical(Color4Extensions.FromHex("#66CCFF").Opacity(0.0f), Color4Extensions.FromHex("#66CCFF").Opacity(EndOpacity)),
+                Colour = ColourInfo.GradientVertical(Color4Extensions.FromHex("#66CCFF").Opacity(0.0f), Color4Extensions.FromHex("#66CCFF").Opacity(0.25f)),
             };
         }
 
@@ -61,8 +45,6 @@ namespace osu.Game.Screens.Play.HUD
         {
             base.LoadComplete();
 
-            WedgeWidth.BindValueChanged(v => Width = v.NewValue, true);
-            WedgeHeight.BindValueChanged(v => Height = v.NewValue, true);
             InvertShear.BindValueChanged(v => Shear = new Vector2(0.8f, 0f) * (v.NewValue ? -1 : 1), true);
         }
     }
