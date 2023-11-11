@@ -19,15 +19,13 @@ namespace osu.Game.Rulesets.Osu.Edit
             Precision = 0.01f
         };
 
-        private BindableInt sliderTolerance = new BindableInt(10)
+        private readonly BindableInt sliderTolerance = new BindableInt(10)
         {
             MinValue = 5,
             MaxValue = 100
         };
 
         private ExpandableSlider<int> toleranceSlider = null!;
-
-        private EditorToolboxGroup? toolboxGroup;
 
         public OsuSliderDrawingSettingsProvider()
         {
@@ -47,7 +45,7 @@ namespace osu.Game.Rulesets.Osu.Edit
 
         public void AttachToToolbox(ExpandingToolboxContainer toolboxContainer)
         {
-            toolboxContainer.Add(toolboxGroup = new EditorToolboxGroup("drawing")
+            toolboxContainer.Add(new EditorToolboxGroup("drawing")
             {
                 Children = new Drawable[]
                 {
@@ -60,8 +58,8 @@ namespace osu.Game.Rulesets.Osu.Edit
 
             sliderTolerance.BindValueChanged(e =>
             {
-                toleranceSlider.ContractedLabelText = $"Tolerance: {e.NewValue:N0}";
-                toleranceSlider.ExpandedLabelText = $"Tolerance: {e.NewValue:N0}";
+                toleranceSlider.ContractedLabelText = $"C. P. S.: {e.NewValue:N0}";
+                toleranceSlider.ExpandedLabelText = $"Control Point Spacing: {e.NewValue:N0}";
             }, true);
         }
     }

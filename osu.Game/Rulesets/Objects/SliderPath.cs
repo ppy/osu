@@ -6,7 +6,6 @@ using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.Diagnostics;
 using System.Linq;
-using Microsoft.Toolkit.HighPerformance;
 using Newtonsoft.Json;
 using osu.Framework.Bindables;
 using osu.Framework.Caching;
@@ -289,7 +288,7 @@ namespace osu.Game.Rulesets.Objects
 
         private List<Vector2> calculateSubPath(ReadOnlySpan<Vector2> subControlPoints, PathType type)
         {
-            switch (type.SplineType)
+            switch (type.Type)
             {
                 case SplineType.Linear:
                     return PathApproximator.LinearToPiecewiseLinear(subControlPoints);

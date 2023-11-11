@@ -72,15 +72,15 @@ namespace osu.Game.Rulesets.Objects
 
                 switch (segmentType)
                 {
-                    case { SplineType: SplineType.Catmull }:
+                    case { Type: SplineType.Catmull }:
                         result.AddRange(from segment in ConvertCatmullToBezierAnchors(segmentVertices) from v in segment select v + position);
                         break;
 
-                    case { SplineType: SplineType.Linear }:
+                    case { Type: SplineType.Linear }:
                         result.AddRange(from segment in ConvertLinearToBezierAnchors(segmentVertices) from v in segment select v + position);
                         break;
 
-                    case { SplineType: SplineType.PerfectCurve }:
+                    case { Type: SplineType.PerfectCurve }:
                         result.AddRange(ConvertCircleToBezierAnchors(segmentVertices).Select(v => v + position));
                         break;
 
@@ -128,7 +128,7 @@ namespace osu.Game.Rulesets.Objects
 
                 switch (segmentType)
                 {
-                    case { SplineType: SplineType.Catmull }:
+                    case { Type: SplineType.Catmull }:
                         foreach (var segment in ConvertCatmullToBezierAnchors(segmentVertices))
                         {
                             for (int j = 0; j < segment.Length - 1; j++)
@@ -139,7 +139,7 @@ namespace osu.Game.Rulesets.Objects
 
                         break;
 
-                    case { SplineType: SplineType.Linear }:
+                    case { Type: SplineType.Linear }:
                         foreach (var segment in ConvertLinearToBezierAnchors(segmentVertices))
                         {
                             for (int j = 0; j < segment.Length - 1; j++)
@@ -150,7 +150,7 @@ namespace osu.Game.Rulesets.Objects
 
                         break;
 
-                    case { SplineType: SplineType.PerfectCurve }:
+                    case { Type: SplineType.PerfectCurve }:
                         var circleResult = ConvertCircleToBezierAnchors(segmentVertices);
 
                         for (int j = 0; j < circleResult.Length - 1; j++)

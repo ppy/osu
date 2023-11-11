@@ -228,7 +228,8 @@ namespace osu.Game.Rulesets.Objects.Legacy
 
                 case 'B':
                     if (input.Length > 1 && int.TryParse(input.Substring(1), out int degree) && degree > 0)
-                        return new PathType { SplineType = SplineType.BSpline, Degree = degree };
+                        return new PathType { Type = SplineType.BSpline, Degree = degree };
+
                     return new PathType(SplineType.BSpline);
 
                 case 'L':
