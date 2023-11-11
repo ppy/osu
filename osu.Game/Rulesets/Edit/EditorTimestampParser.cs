@@ -11,8 +11,8 @@ namespace osu.Game.Rulesets.Edit
     public static class EditorTimestampParser
     {
         // 00:00:000 (1,2,3) - test
-        // regex from https://github.com/ppy/osu-web/blob/651a9bac2b60d031edd7e33b8073a469bf11edaa/resources/assets/coffee/_classes/beatmap-discussion-helper.coffee#L10
-        public static readonly Regex TIME_REGEX = new Regex(@"\b(((\d{2,}):([0-5]\d)[:.](\d{3}))(\s\((?:\d+[,|])*\d+\))?)");
+        // osu-web regex: https://github.com/ppy/osu-web/blob/3b1698639244cfdaf0b41c68bfd651ea729ec2e3/resources/js/utils/beatmapset-discussion-helper.ts#L78
+        public static readonly Regex TIME_REGEX = new Regex(@"\b(((\d{2,}):([0-5]\d)[:.](\d{3}))(\s\([^)]+\))?)");
 
         public static string[] GetRegexGroups(string timestamp)
         {
