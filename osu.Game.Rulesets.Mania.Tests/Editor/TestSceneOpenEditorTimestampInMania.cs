@@ -84,17 +84,14 @@ namespace osu.Game.Rulesets.Mania.Tests.Editor
         [Test]
         public void TestUnusualSelection()
         {
-            addStepClickLink("00:00:000 (0|1)", "invalid link");
+            addStepClickLink("00:00:000 (0|1)", "wrong offset");
             AddAssert("snap to 1, select none", () => checkSnapAndSelectColumn(2_170));
 
             addReset();
-            addStepClickLink("00:00:000 (0)", "std link");
-            AddAssert("snap and select 1", () => checkSnapAndSelectColumn(2_170, new List<(int, int)>
-                { (2_170, 2) })
-            );
+            addStepClickLink("00:00:000 (2)", "std link");
+            AddAssert("snap to 1, select none", () => checkSnapAndSelectColumn(2_170));
 
             addReset();
-            // TODO: discuss - this selects the first 2 objects on Stable, do we want that or is this fine?
             addStepClickLink("00:00:000 (1,2)", "std link");
             AddAssert("snap to 1, select none", () => checkSnapAndSelectColumn(2_170));
         }
