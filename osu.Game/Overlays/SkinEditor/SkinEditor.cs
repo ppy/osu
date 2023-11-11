@@ -406,7 +406,14 @@ namespace osu.Game.Overlays.SkinEditor
                 cp.Colour = colours.Yellow;
             });
 
+            changeHandler?.Dispose();
+
             skins.EnsureMutableSkin();
+
+            var targetContainer = getTarget(selectedTarget.Value);
+
+            if (targetContainer != null)
+                changeHandler = new SkinEditorChangeHandler(targetContainer);
             hasBegunMutating = true;
         }
 
