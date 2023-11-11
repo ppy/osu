@@ -242,7 +242,7 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders.Components
         {
             int indexInSegment = piece.PointsInSegment.IndexOf(piece.ControlPoint);
 
-            if (type.HasValue && type.Value.SplineType == SplineType.PerfectCurve)
+            if (type.HasValue && type.Value.Type == SplineType.PerfectCurve)
             {
                 // Can't always create a circular arc out of 4 or more points,
                 // so we split the segment into one 3-point circular arc segment

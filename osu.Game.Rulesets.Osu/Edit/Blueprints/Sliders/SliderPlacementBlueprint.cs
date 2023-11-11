@@ -173,9 +173,11 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders
                             setState(SliderPlacementState.Drawing);
                             return true;
                         }
+
                         return false;
                 }
             }
+
             return base.OnDragStart(e);
         }
 

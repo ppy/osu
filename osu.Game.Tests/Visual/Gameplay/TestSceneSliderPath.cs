@@ -59,7 +59,7 @@ namespace osu.Game.Tests.Visual.Gameplay
         [TestCase(SplineType.PerfectCurve, null)]
         public void TestSingleSegment(SplineType splineType, int? degree)
             => AddStep("create path", () => path.ControlPoints.AddRange(createSegment(
-                new PathType { SplineType = splineType, Degree = degree },
+                new PathType { Type = splineType, Degree = degree },
                 Vector2.Zero,
                 new Vector2(0, 100),
                 new Vector2(100),
@@ -77,7 +77,7 @@ namespace osu.Game.Tests.Visual.Gameplay
             AddStep("create path", () =>
             {
                 path.ControlPoints.AddRange(createSegment(PathType.LINEAR, Vector2.Zero));
-                path.ControlPoints.AddRange(createSegment(new PathType { SplineType = splineType, Degree = degree }, new Vector2(0, 100), new Vector2(100), Vector2.Zero));
+                path.ControlPoints.AddRange(createSegment(new PathType { Type = splineType, Degree = degree }, new Vector2(0, 100), new Vector2(100), Vector2.Zero));
             });
         }
 

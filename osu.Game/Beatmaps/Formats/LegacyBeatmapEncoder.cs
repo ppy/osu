@@ -3,7 +3,6 @@
 
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Globalization;
 using System.IO;
 using System.Linq;
@@ -456,23 +455,23 @@ namespace osu.Game.Beatmaps.Formats
                     {
                         switch (point.Type)
                         {
-                            case { SplineType: SplineType.BSpline, Degree: > 0 }:
+                            case { Type: SplineType.BSpline, Degree: > 0 }:
                                 writer.Write($"B{point.Type.Value.Degree}|");
                                 break;
 
-                            case { SplineType: SplineType.BSpline, Degree: <= 0 }:
+                            case { Type: SplineType.BSpline, Degree: <= 0 }:
                                 writer.Write("B|");
                                 break;
 
-                            case { SplineType: SplineType.Catmull }:
+                            case { Type: SplineType.Catmull }:
                                 writer.Write("C|");
                                 break;
 
-                            case { SplineType: SplineType.PerfectCurve }:
+                            case { Type: SplineType.PerfectCurve }:
                                 writer.Write("P|");
                                 break;
 
-                            case { SplineType: SplineType.Linear }:
+                            case { Type: SplineType.Linear }:
                                 writer.Write("L|");
                                 break;
                         }

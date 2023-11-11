@@ -261,17 +261,17 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders.Components
 
             switch (pathType)
             {
-                case { SplineType: SplineType.Catmull }:
+                case { Type: SplineType.Catmull }:
                     return colours.SeaFoam;
 
-                case { SplineType: SplineType.BSpline, Degree: null }:
+                case { Type: SplineType.BSpline, Degree: null }:
                     return colours.PinkLighter;
 
-                case { SplineType: SplineType.BSpline, Degree: >= 1 }:
+                case { Type: SplineType.BSpline, Degree: >= 1 }:
                     int idx = Math.Clamp(pathType.Degree.Value, 0, 3);
                     return new[] { colours.PinkDarker, colours.PinkDark, colours.Pink, colours.PinkLight }[idx];
 
-                case { SplineType: SplineType.PerfectCurve }:
+                case { Type: SplineType.PerfectCurve }:
                     return colours.PurpleDark;
 
                 default:
