@@ -10,6 +10,7 @@ using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Input;
 using osu.Framework.Input.Events;
+using osu.Framework.Utils;
 using osu.Game.Rulesets.Edit;
 using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Objects.Types;
@@ -44,6 +45,11 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders
         [Resolved(CanBeNull = true)]
         private IDistanceSnapProvider distanceSnapProvider { get; set; }
 
+        [Resolved(CanBeNull = true)]
+        private ISliderDrawingSettingsProvider drawingSettingsProvider { get; set; }
+
+        private readonly IncrementalBSplineBuilder bSplineBuilder = new IncrementalBSplineBuilder();
+
         protected override bool IsValidForPlacement => HitObject.Path.HasValidLength;
 
         public SliderPlacementBlueprint()
@@ -73,6 +79,13 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders
         {
             base.LoadComplete();
             inputManager = GetContainingInputManager();
+
+            drawingSettingsProvider.Tolerance.BindValueChanged(e =>
+            {
+                if (bSplineBuilder.Tolerance != e.NewValue)
+                    bSplineBuilder.Tolerance = e.NewValue;
+                updateSliderPathFromBSplineBuilder();
+            }, true);
         }
 
         [Resolved]
@@ -98,7 +111,7 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders
                     ApplyDefaultsToHitObject();
                     break;
 
-                case SliderPlacementState.Body:
+                case SliderPlacementState.ControlPoints:
                     updateCursor();
                     break;
             }
@@ -115,7 +128,7 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders
                     beginCurve();
                     break;
 
-                case SliderPlacementState.Body:
+                case SliderPlacementState.ControlPoints:
                     if (canPlaceNewControlPoint(out var lastPoint))
                     {
                         // Place a new point by detatching the current cursor.
@@ -139,9 +152,62 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders
             return true;
         }
 
+        protected override bool OnDragStart(DragStartEvent e)
+        {
+            if (e.Button == MouseButton.Left)
+            {
+                switch (state)
+                {
+                    case SliderPlacementState.Initial:
+                        return true;
+
+                    case SliderPlacementState.ControlPoints:
+                        if (HitObject.Path.ControlPoints.Count < 3)
+                        {
+                            var lastCp = HitObject.Path.ControlPoints.LastOrDefault();
+                            if (lastCp != cursor)
+                                return false;
+
+                            bSplineBuilder.Clear();
+                            bSplineBuilder.AddLinearPoint(ToLocalSpace(e.ScreenSpaceMousePosition) - HitObject.Position);
+                            setState(SliderPlacementState.Drawing);
+                            return true;
+                        }
+                        return false;
+                }
+            }
+            return base.OnDragStart(e);
+        }
+
+        protected override void OnDrag(DragEvent e)
+        {
+            base.OnDrag(e);
+
+            bSplineBuilder.AddLinearPoint(ToLocalSpace(e.ScreenSpaceMousePosition) - HitObject.Position);
+            updateSliderPathFromBSplineBuilder();
+        }
+
+        private void updateSliderPathFromBSplineBuilder()
+        {
+            Scheduler.AddOnce(static self =>
+            {
+                var cps = self.bSplineBuilder.GetControlPoints();
+                self.HitObject.Path.ControlPoints.RemoveRange(1, self.HitObject.Path.ControlPoints.Count - 1);
+                self.HitObject.Path.ControlPoints.AddRange(cps.Select(v => new PathControlPoint(v)));
+            }, this);
+        }
+
+        protected override void OnDragEnd(DragEndEvent e)
+        {
+            base.OnDragEnd(e);
+
+            if (state == SliderPlacementState.Drawing)
+                endCurve();
+        }
+
         protected override void OnMouseUp(MouseUpEvent e)
         {
-            if (state == SliderPlacementState.Body && e.Button == MouseButton.Right)
+            if (state == SliderPlacementState.ControlPoints && e.Button == MouseButton.Right)
                 endCurve();
             base.OnMouseUp(e);
         }
@@ -149,7 +215,7 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders
         private void beginCurve()
         {
             BeginPlacement(commitStart: true);
-            setState(SliderPlacementState.Body);
+            setState(SliderPlacementState.ControlPoints);
         }
 
         private void endCurve()
@@ -169,6 +235,12 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders
 
         private void updatePathType()
         {
+            if (state == SliderPlacementState.Drawing)
+            {
+                segmentStart.Type = PathType.BSpline(3);
+                return;
+            }
+
             switch (currentSegmentLength)
             {
                 case 1:
@@ -201,7 +273,7 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders
                 }
 
                 // Update the cursor position.
-                var result = positionSnapProvider?.FindSnappedPositionAndTime(inputManager.CurrentState.Mouse.Position, state == SliderPlacementState.Body ? SnapType.GlobalGrids : SnapType.All);
+                var result = positionSnapProvider?.FindSnappedPositionAndTime(inputManager.CurrentState.Mouse.Position, state == SliderPlacementState.ControlPoints ? SnapType.GlobalGrids : SnapType.All);
                 cursor.Position = ToLocalSpace(result?.ScreenSpacePosition ?? inputManager.CurrentState.Mouse.Position) - HitObject.Position;
             }
             else if (cursor != null)
@@ -248,7 +320,9 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders
         private enum SliderPlacementState
         {
             Initial,
-            Body,
+            ControlPoints,
+            Drawing,
+            DrawingFinalization
         }
     }
 }

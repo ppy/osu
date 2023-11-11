@@ -292,13 +292,13 @@ namespace osu.Game.Rulesets.Objects
             switch (type.SplineType)
             {
                 case SplineType.Linear:
-                    return PathApproximator.ApproximateLinear(subControlPoints);
+                    return PathApproximator.LinearToPiecewiseLinear(subControlPoints);
 
                 case SplineType.PerfectCurve:
                     if (subControlPoints.Length != 3)
                         break;
 
-                    List<Vector2> subPath = PathApproximator.ApproximateCircularArc(subControlPoints);
+                    List<Vector2> subPath = PathApproximator.CircularArcToPiecewiseLinear(subControlPoints);
 
                     // If for some reason a circular arc could not be fit to the 3 given points, fall back to a numerically stable bezier approximation.
                     if (subPath.Count == 0)
@@ -307,10 +307,10 @@ namespace osu.Game.Rulesets.Objects
                     return subPath;
 
                 case SplineType.Catmull:
-                    return PathApproximator.ApproximateCatmull(subControlPoints);
+                    return PathApproximator.CatmullToPiecewiseLinear(subControlPoints);
             }
 
-            return PathApproximator.ApproximateBSpline(subControlPoints, type.Degree ?? subControlPoints.Length);
+            return PathApproximator.BSplineToPiecewiseLinear(subControlPoints, type.Degree ?? subControlPoints.Length);
         }
 
         private void calculateLength()
