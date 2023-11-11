@@ -3,16 +3,15 @@
 
 #nullable disable
 
-using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text.RegularExpressions;
 using osu.Game.Beatmaps;
 using osu.Game.Rulesets.Edit;
 using osu.Game.Rulesets.Edit.Tools;
 using osu.Game.Rulesets.Mania.Objects;
 using osu.Game.Rulesets.Mania.UI;
 using osu.Game.Rulesets.Mods;
-using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.UI;
 using osu.Game.Rulesets.UI.Scrolling;
 using osu.Game.Screens.Edit.Compose.Components;
@@ -50,22 +49,44 @@ namespace osu.Game.Rulesets.Mania.Edit
             new HoldNoteCompositionTool()
         };
 
+        private static readonly Regex selection_regex = new Regex(@"^\d+\|\d+(,\d+\|\d+)*$");
+
         public override string ConvertSelectionToString()
-            => string.Join(ObjectSeparator, EditorBeatmap.SelectedHitObjects.Cast<ManiaHitObject>().OrderBy(h => h.StartTime).Select(h => $"{h.StartTime}|{h.Column}"));
+            => string.Join(',', EditorBeatmap.SelectedHitObjects.Cast<ManiaHitObject>().OrderBy(h => h.StartTime).Select(h => $"{h.StartTime}|{h.Column}"));
 
-        public override bool HandleHitObjectSelection(HitObject hitObject, string objectInfo)
+        public override void SelectHitObjects(double timestamp, string objectDescription)
         {
-            if (hitObject is not ManiaHitObject maniaHitObject)
-                return false;
+            if (!selection_regex.IsMatch(objectDescription))
+                return;
 
-            double[] split = objectInfo.Split('|').Select(double.Parse).ToArray();
+            List<ManiaHitObject> remainingHitObjects = EditorBeatmap.HitObjects.Cast<ManiaHitObject>().Where(h => h.StartTime >= timestamp).ToList();
+            string[] split = objectDescription.Split(',').ToArray();
+
+            for (int i = 0; i < split.Length; i++)
+            {
+                ManiaHitObject current = remainingHitObjects.FirstOrDefault(h => shouldBeSelected(h, split[i]));
+
+                if (current == null)
+                    continue;
+
+                EditorBeatmap.SelectedHitObjects.Add(current);
+
+                if (i < split.Length - 1)
+                    remainingHitObjects = remainingHitObjects.Where(h => h != current && h.StartTime >= current.StartTime).ToList();
+            }
+        }
+
+        private bool shouldBeSelected(ManiaHitObject hitObject, string objectInfo)
+        {
+            string[] split = objectInfo.Split('|').ToArray();
             if (split.Length != 2)
                 return false;
 
-            double timeValue = split[0];
-            double columnValue = split[1];
-            return Math.Abs(maniaHitObject.StartTime - timeValue) < 0.5
-                   && Math.Abs(maniaHitObject.Column - columnValue) < 0.5;
+            if (!double.TryParse(split[0], out double time) || !int.TryParse(split[1], out int column))
+                return false;
+
+            return hitObject.StartTime == time
+                   && hitObject.Column == column;
         }
     }
 }

@@ -2,11 +2,9 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
-using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Text.RegularExpressions;
-using osu.Game.Rulesets.Objects;
 
 namespace osu.Game.Rulesets.Edit
 {
@@ -31,43 +29,7 @@ namespace osu.Game.Rulesets.Edit
 
             Debug.Assert(times.Length == 3);
 
-            return (times[0] * 60 + times[1]) * 1_000 + times[2];
-        }
-
-        public static List<HitObject> GetSelectedHitObjects(HitObjectComposer composer, IReadOnlyList<HitObject> editorHitObjects, string objectsGroup, double position)
-        {
-            List<HitObject> hitObjects = editorHitObjects.Where(x => x.StartTime >= position).ToList();
-            List<HitObject> selectedObjects = new List<HitObject>();
-
-            string[] objectsToSelect = objectsGroup.Split(composer.ObjectSeparator).ToArray();
-
-            foreach (string objectInfo in objectsToSelect)
-            {
-                HitObject? current = hitObjects.FirstOrDefault(x => composer.HandleHitObjectSelection(x, objectInfo));
-
-                if (current == null)
-                    continue;
-
-                selectedObjects.Add(current);
-                hitObjects = hitObjects.Where(x => x != current && x.StartTime >= current.StartTime).ToList();
-            }
-
-            // Stable behavior
-            // - always selects the next closest object when `objectsGroup` only has one (combo) item
-            if (objectsToSelect.Length != 1 || objectsGroup.Contains('|'))
-                return selectedObjects;
-
-            HitObject? nextClosest = editorHitObjects.FirstOrDefault(x => x.StartTime >= position);
-            if (nextClosest == null)
-                return selectedObjects;
-
-            if (nextClosest.StartTime <= (selectedObjects.FirstOrDefault()?.StartTime ?? position))
-            {
-                selectedObjects.Clear();
-                selectedObjects.Add(nextClosest);
-            }
-
-            return selectedObjects;
+            return (times[0] * 60 + times[1]) * 1000 + times[2];
         }
     }
 }
