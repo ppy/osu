@@ -86,6 +86,10 @@ namespace osu.Game.Tests.Visual.UserInterface
 
             AddStep("set mods to HD+HR+DT", () => SelectedMods.Value = new Mod[] { new OsuModHidden(), new OsuModHardRock(), new OsuModDoubleTime() });
             AddAssert("panel is not active", () => !panel.AsNonNull().Active.Value);
+
+            // system mods are not included in presets.
+            AddStep("set mods to HR+DT+TD", () => SelectedMods.Value = new Mod[] { new OsuModHardRock(), new OsuModDoubleTime(), new OsuModTouchDevice() });
+            AddAssert("panel is active", () => panel.AsNonNull().Active.Value);
         }
 
         [Test]
@@ -113,6 +117,10 @@ namespace osu.Game.Tests.Visual.UserInterface
             AddStep("set customised mod", () => SelectedMods.Value = new[] { new OsuModDoubleTime { SpeedChange = { Value = 1.25 } } });
             AddStep("activate panel", () => panel.AsNonNull().TriggerClick());
             assertSelectedModsEquivalentTo(new Mod[] { new OsuModHardRock(), new OsuModDoubleTime { SpeedChange = { Value = 1.5 } } });
+
+            AddStep("set system mod", () => SelectedMods.Value = new[] { new OsuModTouchDevice() });
+            AddStep("activate panel", () => panel.AsNonNull().TriggerClick());
+            assertSelectedModsEquivalentTo(new Mod[] { new OsuModTouchDevice(), new OsuModHardRock(), new OsuModDoubleTime { SpeedChange = { Value = 1.5 } } });
         }
 
         private void assertSelectedModsEquivalentTo(IEnumerable<Mod> mods)

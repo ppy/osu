@@ -35,9 +35,6 @@ namespace osu.Game.Screens.Play.HUD
             Precision = 1
         };
 
-        [SettingSource("Bar length")]
-        public BindableFloat BarLength { get; } = new BindableFloat(0.98f);
-
         [SettingSource("Use relative size")]
         public BindableBool UseRelativeSize { get; } = new BindableBool(true);
 
@@ -137,22 +134,11 @@ namespace osu.Game.Screens.Play.HUD
 
             Current.BindValueChanged(_ => Scheduler.AddOnce(updateCurrent), true);
 
-            // update relative axes first before reading width from bar length.
-            RelativeSizeAxes = UseRelativeSize.Value ? Axes.X : Axes.None;
-            Width = BarLength.Value;
-
             UseRelativeSize.BindValueChanged(v =>
             {
                 RelativeSizeAxes = v.NewValue ? Axes.X : Axes.None;
-                float newWidth = Width;
-
-                BarLength.MinValue = v.NewValue ? 0.2f : 200f;
-                BarLength.MaxValue = v.NewValue ? 1f : 1000f;
-                BarLength.Precision = v.NewValue ? 0.01f : 1f;
-                BarLength.Value = newWidth;
             }, true);
 
-            BarLength.ValueChanged += l => Width = l.NewValue;
             BarHeight.BindValueChanged(_ => updatePath(), true);
         }
 

@@ -3,6 +3,7 @@
 
 using System.Collections.Generic;
 using System.Linq;
+using osu.Framework;
 using osu.Framework.Allocation;
 using osu.Framework.Input.Handlers;
 using osu.Framework.Localisation;
@@ -28,11 +29,14 @@ namespace osu.Game.Overlays.Settings.Sections.Input
         [BackgroundDependencyLoader]
         private void load(OsuConfigManager osuConfig)
         {
-            Add(new SettingsCheckbox
+            if (!RuntimeInfo.IsMobile) // don't allow disabling the only input method (touch) on mobile.
             {
-                LabelText = CommonStrings.Enabled,
-                Current = handler.Enabled
-            });
+                Add(new SettingsCheckbox
+                {
+                    LabelText = CommonStrings.Enabled,
+                    Current = handler.Enabled
+                });
+            }
 
             Add(new SettingsCheckbox
             {
