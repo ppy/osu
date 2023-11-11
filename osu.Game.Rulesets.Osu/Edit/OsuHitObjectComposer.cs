@@ -6,6 +6,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text.RegularExpressions;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Caching;
@@ -103,18 +104,39 @@ namespace osu.Game.Rulesets.Osu.Edit
         protected override ComposeBlueprintContainer CreateBlueprintContainer()
             => new OsuBlueprintContainer(this);
 
+        private static readonly Regex selection_regex = new Regex(@"^\d+(,\d+)*$");
+
         public override string ConvertSelectionToString()
-            => string.Join(ObjectSeparator, selectedHitObjects.Cast<OsuHitObject>().OrderBy(h => h.StartTime).Select(h => (h.IndexInCurrentCombo + 1).ToString()));
+            => string.Join(',', selectedHitObjects.Cast<OsuHitObject>().OrderBy(h => h.StartTime).Select(h => (h.IndexInCurrentCombo + 1).ToString()));
 
-        public override bool HandleHitObjectSelection(HitObject hitObject, string objectInfo)
+        public override void SelectHitObjects(double timestamp, string objectDescription)
         {
-            if (hitObject is not OsuHitObject osuHitObject)
+            if (!selection_regex.IsMatch(objectDescription))
+                return;
+
+            List<OsuHitObject> remainingHitObjects = EditorBeatmap.HitObjects.Cast<OsuHitObject>().Where(h => h.StartTime >= timestamp).ToList();
+            string[] split = objectDescription.Split(',').ToArray();
+
+            for (int i = 0; i < split.Length; i++)
+            {
+                OsuHitObject current = remainingHitObjects.FirstOrDefault(h => shouldBeSelected(h, split[i]));
+
+                if (current == null)
+                    continue;
+
+                EditorBeatmap.SelectedHitObjects.Add(current);
+
+                if (i < split.Length - 1)
+                    remainingHitObjects = remainingHitObjects.Where(h => h != current && h.StartTime >= current.StartTime).ToList();
+            }
+        }
+
+        private bool shouldBeSelected(OsuHitObject hitObject, string objectInfo)
+        {
+            if (!int.TryParse(objectInfo, out int combo) || combo < 1)
                 return false;
 
-            if (!int.TryParse(objectInfo, out int comboValue) || comboValue < 1)
-                return false;
-
-            return osuHitObject.IndexInCurrentCombo + 1 == comboValue;
+            return hitObject.IndexInCurrentCombo + 1 == combo;
         }
 
         private DistanceSnapGrid distanceSnapGrid;
