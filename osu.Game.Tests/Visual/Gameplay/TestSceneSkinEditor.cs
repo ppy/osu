@@ -5,7 +5,6 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
-using System.Text.Unicode;
 using Newtonsoft.Json;
 using NUnit.Framework;
 using osu.Framework.Allocation;
