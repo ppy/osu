@@ -71,40 +71,24 @@ namespace osu.Game.Rulesets.Osu.Tests.Editor
         {
             HitObject firstObject = null!;
 
-            addStepClickLink("00:00:000 (1,2,3)", "invalid offset");
-            AddAssert("snap to next, select 1-2-3", () =>
+            addStepClickLink("00:00:000 (0)", "invalid combo");
+            AddAssert("snap to next, select none", () =>
             {
                 firstObject = EditorBeatmap.HitObjects.First();
-                return checkSnapAndSelectCombo(firstObject.StartTime, 1, 2, 3);
+                return checkSnapAndSelectCombo(firstObject.StartTime);
             });
 
             addReset();
-            addStepClickLink("00:00:956 (2,3,4)", "invalid offset");
+            addStepClickLink("00:00:000 (1)", "wrong offset");
+            AddAssert("snap and select 1", () => checkSnapAndSelectCombo(firstObject.StartTime, 1));
+
+            addReset();
+            addStepClickLink("00:00:956 (2,3,4)", "wrong offset");
             AddAssert("snap to next, select 2-3-4", () => checkSnapAndSelectCombo(firstObject.StartTime, 2, 3, 4));
-
-            addReset();
-            addStepClickLink("00:00:000 (0)", "invalid offset");
-            AddAssert("snap and select 1", () => checkSnapAndSelectCombo(firstObject.StartTime, 1));
-
-            addReset();
-            addStepClickLink("00:00:000 (1)", "invalid offset");
-            AddAssert("snap and select 1", () => checkSnapAndSelectCombo(firstObject.StartTime, 1));
-
-            addReset();
-            addStepClickLink("00:00:000 (2)", "invalid offset");
-            AddAssert("snap and select 1", () => checkSnapAndSelectCombo(firstObject.StartTime, 1));
-
-            addReset();
-            addStepClickLink("00:00:000 (2,3)", "invalid offset");
-            AddAssert("snap to 1, select 2-3", () => checkSnapAndSelectCombo(firstObject.StartTime, 2, 3));
 
             addReset();
             addStepClickLink("00:00:956 (956|1,956|2)", "mania link");
             AddAssert("snap to next, select none", () => checkSnapAndSelectCombo(firstObject.StartTime));
-
-            addReset();
-            addStepClickLink("00:00:000 (0|1)", "mania link");
-            AddAssert("snap to 1, select none", () => checkSnapAndSelectCombo(firstObject.StartTime));
         }
     }
 }
