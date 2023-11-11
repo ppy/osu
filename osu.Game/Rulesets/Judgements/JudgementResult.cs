@@ -55,6 +55,11 @@ namespace osu.Game.Rulesets.Judgements
         public double TimeAbsolute => RawTime != null ? Math.Min(RawTime.Value, HitObject.GetEndTime() + HitObject.MaximumJudgementOffset) : HitObject.GetEndTime();
 
         /// <summary>
+        /// The gameplay rate at the time this <see cref="JudgementResult"/> occurred.
+        /// </summary>
+        public double GameplayRate { get; internal set; }
+
+        /// <summary>
         /// The combo prior to this <see cref="JudgementResult"/> occurring.
         /// </summary>
         public int ComboAtJudgement { get; internal set; }
