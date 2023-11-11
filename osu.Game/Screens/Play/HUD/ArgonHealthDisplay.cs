@@ -89,6 +89,13 @@ namespace osu.Game.Screens.Play.HUD
 
         public const float MAIN_PATH_RADIUS = 10f;
 
+        private readonly LayoutValue drawSizeLayout = new LayoutValue(Invalidation.DrawSize);
+
+        public ArgonHealthDisplay()
+        {
+            AddLayout(drawSizeLayout);
+        }
+
         [BackgroundDependencyLoader]
         private void load()
         {
@@ -134,20 +141,9 @@ namespace osu.Game.Screens.Play.HUD
 
             Current.BindValueChanged(_ => Scheduler.AddOnce(updateCurrent), true);
 
-            UseRelativeSize.BindValueChanged(v =>
-            {
-                RelativeSizeAxes = v.NewValue ? Axes.X : Axes.None;
-            }, true);
+            UseRelativeSize.BindValueChanged(v => RelativeSizeAxes = v.NewValue ? Axes.X : Axes.None, true);
 
             BarHeight.BindValueChanged(_ => updatePath(), true);
-        }
-
-        protected override bool OnInvalidate(Invalidation invalidation, InvalidationSource source)
-        {
-            if ((invalidation & Invalidation.DrawSize) > 0)
-                updatePath();
-
-            return base.OnInvalidate(invalidation, source);
         }
 
         private void updateCurrent()
@@ -164,6 +160,12 @@ namespace osu.Game.Screens.Play.HUD
         protected override void Update()
         {
             base.Update();
+
+            if (!drawSizeLayout.IsValid)
+            {
+                updatePath();
+                drawSizeLayout.Validate();
+            }
 
             mainBar.Alpha = (float)Interpolation.DampContinuously(mainBar.Alpha, Current.Value > 0 ? 1 : 0, 40, Time.Elapsed);
             glowBar.Alpha = (float)Interpolation.DampContinuously(glowBar.Alpha, GlowBarValue > 0 ? 1 : 0, 40, Time.Elapsed);
