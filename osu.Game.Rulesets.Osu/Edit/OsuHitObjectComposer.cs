@@ -63,6 +63,9 @@ namespace osu.Game.Rulesets.Osu.Edit
         [Cached(typeof(IDistanceSnapProvider))]
         protected readonly OsuDistanceSnapProvider DistanceSnapProvider = new OsuDistanceSnapProvider();
 
+        [Cached(typeof(ISliderDrawingSettingsProvider))]
+        protected readonly OsuSliderDrawingSettingsProvider SliderDrawingSettingsProvider = new OsuSliderDrawingSettingsProvider();
+
         [BackgroundDependencyLoader]
         private void load()
         {
@@ -96,8 +99,11 @@ namespace osu.Game.Rulesets.Osu.Edit
 
             RightToolbox.Add(new TransformToolboxGroup
             {
-                RotationHandler = BlueprintContainer.SelectionHandler.RotationHandler
+                RotationHandler = BlueprintContainer.SelectionHandler.RotationHandler,
             });
+
+            AddInternal(SliderDrawingSettingsProvider);
+            SliderDrawingSettingsProvider.AttachToToolbox(RightToolbox);
         }
 
         protected override ComposeBlueprintContainer CreateBlueprintContainer()
