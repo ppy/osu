@@ -35,6 +35,9 @@ namespace osu.Game.Screens.Play.HUD
             Precision = 1
         };
 
+        [SettingSource("Use relative size")]
+        public BindableBool UseRelativeSize { get; } = new BindableBool(true);
+
         private BarPath mainBar = null!;
 
         /// <summary>
@@ -84,12 +87,18 @@ namespace osu.Game.Screens.Play.HUD
             }
         }
 
-        private const float main_path_radius = 10f;
+        public const float MAIN_PATH_RADIUS = 10f;
+
+        private readonly LayoutValue drawSizeLayout = new LayoutValue(Invalidation.DrawSize);
+
+        public ArgonHealthDisplay()
+        {
+            AddLayout(drawSizeLayout);
+        }
 
         [BackgroundDependencyLoader]
         private void load()
         {
-            RelativeSizeAxes = Axes.X;
             AutoSizeAxes = Axes.Y;
 
             InternalChild = new Container
@@ -99,7 +108,7 @@ namespace osu.Game.Screens.Play.HUD
                 {
                     background = new BackgroundPath
                     {
-                        PathRadius = main_path_radius,
+                        PathRadius = MAIN_PATH_RADIUS,
                     },
                     glowBar = new BarPath
                     {
@@ -119,7 +128,7 @@ namespace osu.Game.Screens.Play.HUD
                         Blending = BlendingParameters.Additive,
                         BarColour = main_bar_colour,
                         GlowColour = main_bar_glow_colour,
-                        PathRadius = main_path_radius,
+                        PathRadius = MAIN_PATH_RADIUS,
                         GlowPortion = 0.6f,
                     },
                 }
@@ -132,16 +141,9 @@ namespace osu.Game.Screens.Play.HUD
 
             Current.BindValueChanged(_ => Scheduler.AddOnce(updateCurrent), true);
 
-            BarHeight.BindValueChanged(_ => updatePath());
-            updatePath();
-        }
+            UseRelativeSize.BindValueChanged(v => RelativeSizeAxes = v.NewValue ? Axes.X : Axes.None, true);
 
-        protected override bool OnInvalidate(Invalidation invalidation, InvalidationSource source)
-        {
-            if ((invalidation & Invalidation.DrawSize) > 0)
-                updatePath();
-
-            return base.OnInvalidate(invalidation, source);
+            BarHeight.BindValueChanged(_ => updatePath(), true);
         }
 
         private void updateCurrent()
@@ -158,6 +160,12 @@ namespace osu.Game.Screens.Play.HUD
         protected override void Update()
         {
             base.Update();
+
+            if (!drawSizeLayout.IsValid)
+            {
+                updatePath();
+                drawSizeLayout.Validate();
+            }
 
             mainBar.Alpha = (float)Interpolation.DampContinuously(mainBar.Alpha, Current.Value > 0 ? 1 : 0, 40, Time.Elapsed);
             glowBar.Alpha = (float)Interpolation.DampContinuously(glowBar.Alpha, GlowBarValue > 0 ? 1 : 0, 40, Time.Elapsed);
@@ -227,7 +235,7 @@ namespace osu.Game.Screens.Play.HUD
 
         private void updatePath()
         {
-            float barLength = DrawWidth - main_path_radius * 2;
+            float barLength = DrawWidth - MAIN_PATH_RADIUS * 2;
             float curveStart = barLength - 70;
             float curveEnd = barLength - 40;
 
