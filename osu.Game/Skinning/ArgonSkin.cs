@@ -182,15 +182,14 @@ namespace osu.Game.Skinning
                                     if (songProgress != null)
                                     {
                                         const float padding = 10;
+                                        // Hard to find this at runtime, so taken from the most expanded state during replay.
+                                        const float song_progress_offset_height = 36 + padding;
 
                                         songProgress.Position = new Vector2(0, -padding);
                                         songProgress.Scale = new Vector2(0.9f, 1);
 
                                         if (keyCounter != null && hitError != null)
                                         {
-                                            // Hard to find this at runtime, so taken from the most expanded state during replay.
-                                            const float song_progress_offset_height = 36 + padding;
-
                                             keyCounter.Anchor = Anchor.BottomRight;
                                             keyCounter.Origin = Anchor.BottomRight;
                                             keyCounter.Position = new Vector2(-(hitError.Width + padding), -(padding * 2 + song_progress_offset_height));
@@ -200,7 +199,7 @@ namespace osu.Game.Skinning
                                         {
                                             combo.Anchor = Anchor.BottomLeft;
                                             combo.Origin = Anchor.BottomLeft;
-                                            combo.Position = new Vector2(hitError.Width + padding, -50);
+                                            combo.Position = new Vector2((hitError.Width + padding), -(padding * 2 + song_progress_offset_height));
                                         }
                                     }
                                 }
@@ -221,7 +220,10 @@ namespace osu.Game.Skinning
                                     new ArgonHealthDisplay(),
                                     new BoxElement(),
                                     new ArgonAccuracyCounter(),
-                                    new ArgonComboCounter(),
+                                    new ArgonComboCounter
+                                    {
+                                        Scale = new Vector2(1.3f)
+                                    },
                                     new BarHitErrorMeter(),
                                     new BarHitErrorMeter(),
                                     new ArgonSongProgress(),
