@@ -3,6 +3,7 @@
 
 #nullable disable
 
+using System;
 using NUnit.Framework;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
@@ -79,6 +80,27 @@ namespace osu.Game.Tests.Visual.Gameplay
             AddStep("Create Display", recreateDisplay);
 
             AddUntilStep("UR = 250", () => counter.Current.Value == 250.0);
+        }
+
+        [Test]
+        public void TestStaticRateChange()
+        {
+            AddStep("Create Display", recreateDisplay);
+
+            AddRepeatStep("Set UR to 250 at 1.5x", () => applyJudgement(25, true, 1.5), 4);
+
+            AddUntilStep("UR = 250/1.5", () => counter.Current.Value == Math.Round(250.0 / 1.5));
+        }
+
+        [Test]
+        public void TestDynamicRateChange()
+        {
+            AddStep("Create Display", recreateDisplay);
+
+            AddRepeatStep("Set UR to 100 at 1.0x", () => applyJudgement(10, true, 1.0), 4);
+            AddRepeatStep("Bring UR to 100 at 1.5x", () => applyJudgement(15, true, 1.5), 4);
+
+            AddUntilStep("UR = 100", () => counter.Current.Value == 100.0);
         }
 
         private void recreateDisplay()
