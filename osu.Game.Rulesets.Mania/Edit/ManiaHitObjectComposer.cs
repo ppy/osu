@@ -60,33 +60,27 @@ namespace osu.Game.Rulesets.Mania.Edit
                 return;
 
             List<ManiaHitObject> remainingHitObjects = EditorBeatmap.HitObjects.Cast<ManiaHitObject>().Where(h => h.StartTime >= timestamp).ToList();
-            string[] split = objectDescription.Split(',').ToArray();
+            string[] splitDescription = objectDescription.Split(',').ToArray();
 
-            for (int i = 0; i < split.Length; i++)
+            for (int i = 0; i < splitDescription.Length; i++)
             {
-                ManiaHitObject current = remainingHitObjects.FirstOrDefault(h => shouldBeSelected(h, split[i]));
+                string[] split = splitDescription[i].Split('|').ToArray();
+                if (split.Length != 2)
+                    continue;
+
+                if (!double.TryParse(split[0], out double time) || !int.TryParse(split[1], out int column))
+                    continue;
+
+                ManiaHitObject current = remainingHitObjects.FirstOrDefault(h => h.StartTime == time && h.Column == column);
 
                 if (current == null)
                     continue;
 
                 EditorBeatmap.SelectedHitObjects.Add(current);
 
-                if (i < split.Length - 1)
+                if (i < splitDescription.Length - 1)
                     remainingHitObjects = remainingHitObjects.Where(h => h != current && h.StartTime >= current.StartTime).ToList();
             }
-        }
-
-        private bool shouldBeSelected(ManiaHitObject hitObject, string objectInfo)
-        {
-            string[] split = objectInfo.Split('|').ToArray();
-            if (split.Length != 2)
-                return false;
-
-            if (!double.TryParse(split[0], out double time) || !int.TryParse(split[1], out int column))
-                return false;
-
-            return hitObject.StartTime == time
-                   && hitObject.Column == column;
         }
     }
 }

@@ -115,28 +115,23 @@ namespace osu.Game.Rulesets.Osu.Edit
                 return;
 
             List<OsuHitObject> remainingHitObjects = EditorBeatmap.HitObjects.Cast<OsuHitObject>().Where(h => h.StartTime >= timestamp).ToList();
-            string[] split = objectDescription.Split(',').ToArray();
+            string[] splitDescription = objectDescription.Split(',').ToArray();
 
-            for (int i = 0; i < split.Length; i++)
+            for (int i = 0; i < splitDescription.Length; i++)
             {
-                OsuHitObject current = remainingHitObjects.FirstOrDefault(h => shouldBeSelected(h, split[i]));
+                if (!int.TryParse(splitDescription[i], out int combo) || combo < 1)
+                    continue;
+
+                OsuHitObject current = remainingHitObjects.FirstOrDefault(h => h.IndexInCurrentCombo + 1 == combo);
 
                 if (current == null)
                     continue;
 
                 EditorBeatmap.SelectedHitObjects.Add(current);
 
-                if (i < split.Length - 1)
+                if (i < splitDescription.Length - 1)
                     remainingHitObjects = remainingHitObjects.Where(h => h != current && h.StartTime >= current.StartTime).ToList();
             }
-        }
-
-        private bool shouldBeSelected(OsuHitObject hitObject, string objectInfo)
-        {
-            if (!int.TryParse(objectInfo, out int combo) || combo < 1)
-                return false;
-
-            return hitObject.IndexInCurrentCombo + 1 == combo;
         }
 
         private DistanceSnapGrid distanceSnapGrid;
