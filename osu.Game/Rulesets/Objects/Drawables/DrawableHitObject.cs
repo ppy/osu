@@ -154,6 +154,9 @@ namespace osu.Game.Rulesets.Objects.Drawables
         [Resolved(CanBeNull = true)]
         private IPooledHitObjectProvider pooledObjectProvider { get; set; }
 
+        [Resolved]
+        private IGameplayClock gameplayClock { get; set; } = null!;
+
         /// <summary>
         /// Whether the initialization logic in <see cref="Playfield" /> has applied.
         /// </summary>
@@ -704,7 +707,7 @@ namespace osu.Game.Rulesets.Objects.Drawables
             }
 
             Result.RawTime = Time.Current;
-            Result.GameplayRate = Clock.Rate;
+            Result.GameplayRate = gameplayClock.GetTrueGameplayRate();
 
             if (Result.HasResult)
                 updateState(Result.IsHit ? ArmedState.Hit : ArmedState.Miss);
