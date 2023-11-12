@@ -204,8 +204,8 @@ namespace osu.Game.Overlays.Mods
                 if (haveRateChangedValues)
                 {
                     return $"One or more values are being adjusted by mods that change speed." +
-                           $" (AR {originalDifficulty?.ApproachRate ?? 0}→{adjustedDifficulty?.ApproachRate ?? 0}, " +
-                           $"OD {originalDifficulty?.OverallDifficulty ?? 0}→{adjustedDifficulty?.OverallDifficulty ?? 0})";
+                           $" (AR {originalDifficulty?.ApproachRate ?? 0}→{(adjustedDifficulty?.ApproachRate ?? 0):0.0#}, " +
+                           $"OD {originalDifficulty?.OverallDifficulty ?? 0}→{(adjustedDifficulty?.OverallDifficulty ?? 0):0.0#})";
                 }
 
                 return string.Empty;
