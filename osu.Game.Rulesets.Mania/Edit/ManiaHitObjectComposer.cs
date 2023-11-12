@@ -49,6 +49,7 @@ namespace osu.Game.Rulesets.Mania.Edit
             new HoldNoteCompositionTool()
         };
 
+        // 123|0,456|1,789|2 ...
         private static readonly Regex selection_regex = new Regex(@"^\d+\|\d+(,\d+\|\d+)*$");
 
         public override string ConvertSelectionToString()

@@ -434,7 +434,7 @@ namespace osu.Game
                     break;
 
                 case LinkAction.OpenEditorTimestamp:
-                    SeekToTimestamp(argString);
+                    HandleTimestamp(argString);
                     break;
 
                 case LinkAction.JoinMultiplayerMatch:
@@ -558,7 +558,7 @@ namespace osu.Game
         /// Seek to a given timestamp in the Editor and select relevant HitObjects if needed
         /// </summary>
         /// <param name="timestamp">The timestamp and the selected objects</param>
-        public void SeekToTimestamp(string timestamp)
+        public void HandleTimestamp(string timestamp)
         {
             if (ScreenStack.CurrentScreen is not Editor editor)
             {
