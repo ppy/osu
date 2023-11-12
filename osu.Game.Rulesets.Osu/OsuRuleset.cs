@@ -334,9 +334,7 @@ namespace osu.Game.Rulesets.Osu
         {
             BeatmapDifficulty adjustedDifficulty = new BeatmapDifficulty(baseDifficulty);
 
-            double preempt = adjustedDifficulty.ApproachRate < 5 ?
-                (1200.0 + 600.0 * (5 - adjustedDifficulty.ApproachRate) / 5) :
-                (1200.0 - 750.0 * (adjustedDifficulty.ApproachRate - 5) / 5);
+            double preempt = adjustedDifficulty.ApproachRate < 5 ? (1200.0 + 600.0 * (5 - adjustedDifficulty.ApproachRate) / 5) : (1200.0 - 750.0 * (adjustedDifficulty.ApproachRate - 5) / 5);
             preempt /= rate;
             adjustedDifficulty.ApproachRate = (float)(preempt > 1200 ? ((1800 - preempt) / 120) : ((1200 - preempt) / 150 + 5));
 
@@ -344,7 +342,7 @@ namespace osu.Game.Rulesets.Osu
             hitwindow /= rate;
             adjustedDifficulty.OverallDifficulty = (float)(80.0 - hitwindow) / 6;
 
-            return adjustedDifficulty ?? (BeatmapDifficulty)baseDifficulty;
+            return adjustedDifficulty;
         }
     }
 }

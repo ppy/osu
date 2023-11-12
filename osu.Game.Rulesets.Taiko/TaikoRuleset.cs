@@ -273,7 +273,7 @@ namespace osu.Game.Rulesets.Taiko
             hitwindow /= rate;
             adjustedDifficulty.OverallDifficulty = (float)(5 * (35 - hitwindow) / 15 + 5);
 
-            return adjustedDifficulty ?? (BeatmapDifficulty)baseDifficulty;
+            return adjustedDifficulty;
         }
     }
 }

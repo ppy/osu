@@ -238,12 +238,12 @@ namespace osu.Game.Rulesets.Catch
         {
             BeatmapDifficulty adjustedDifficulty = new BeatmapDifficulty(baseDifficulty);
 
-            double preempt = adjustedDifficulty.ApproachRate < 5 ? (1200.0 + 600.0 * (5 - adjustedDifficulty.ApproachRate) / 5) : (1200.0 - 750.0 * (adjustedDifficulty.ApproachRate - 5) / 5);
+            double preempt = adjustedDifficulty.ApproachRate < 6 ? (1200.0 + 600.0 * (5 - adjustedDifficulty.ApproachRate) / 5) : (1200.0 - 750.0 * (adjustedDifficulty.ApproachRate - 5) / 5);
 
             preempt /= rate;
             adjustedDifficulty.ApproachRate = (float)(preempt > 1200 ? ((1800 - preempt) / 120) : ((1200 - preempt) / 150 + 5));
 
-            return adjustedDifficulty ?? (BeatmapDifficulty)baseDifficulty;
+            return adjustedDifficulty;
         }
     }
 }
