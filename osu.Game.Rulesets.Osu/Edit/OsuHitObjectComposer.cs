@@ -104,6 +104,7 @@ namespace osu.Game.Rulesets.Osu.Edit
         protected override ComposeBlueprintContainer CreateBlueprintContainer()
             => new OsuBlueprintContainer(this);
 
+        // 1,2,3,4 ...
         private static readonly Regex selection_regex = new Regex(@"^\d+(,\d+)*$");
 
         public override string ConvertSelectionToString()
