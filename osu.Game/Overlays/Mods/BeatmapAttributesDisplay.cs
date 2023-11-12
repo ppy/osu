@@ -59,6 +59,8 @@ namespace osu.Game.Overlays.Mods
         private IBindable<StarDifficulty?> starDifficulty = null!;
 
         private BeatmapDifficulty? originalDifficulty;
+        private BeatmapDifficulty? adjustedDifficulty;
+
         private bool haveRateChangedValues;
 
         private const float transition_duration = 250;
@@ -171,17 +173,15 @@ namespace osu.Game.Overlays.Mods
 
             bpmDisplay.Current.Value = BeatmapInfo.Value.BPM * rate;
 
-            var adjustedDifficulty = new BeatmapDifficulty(BeatmapInfo.Value.Difficulty);
+            originalDifficulty = new BeatmapDifficulty(BeatmapInfo.Value.Difficulty);
 
             foreach (var mod in mods.Value.OfType<IApplicableToDifficulty>())
-                mod.ApplyToDifficulty(adjustedDifficulty);
-
-            originalDifficulty = adjustedDifficulty;
+                mod.ApplyToDifficulty(originalDifficulty);
 
             Ruleset ruleset = gameRuleset.Value.CreateInstance();
-            adjustedDifficulty = ruleset.GetRateAdjustedDifficulty(adjustedDifficulty, rate);
+            adjustedDifficulty = ruleset.GetRateAdjustedDifficulty(originalDifficulty, rate);
 
-            haveRateChangedValues = isDifferentArOd(originalDifficulty, adjustedDifficulty);
+            haveRateChangedValues = hasRateAdjustedProperties(originalDifficulty, adjustedDifficulty);
 
             approachRateDisplay.AdjustType.Value = VerticalAttributeDisplay.CalculateEffect(originalDifficulty.ApproachRate, adjustedDifficulty.ApproachRate);
             overallDifficultyDisplay.AdjustType.Value = VerticalAttributeDisplay.CalculateEffect(originalDifficulty.OverallDifficulty, adjustedDifficulty.OverallDifficulty);
@@ -192,20 +192,32 @@ namespace osu.Game.Overlays.Mods
             overallDifficultyDisplay.Current.Value = adjustedDifficulty.OverallDifficulty;
         });
 
-        private bool isDifferentArOd(BeatmapDifficulty? a, BeatmapDifficulty? b)
-        {
-            if (a == null && b == null) return false;
-            if (a == null || b == null) return true;
-
-            if (!Precision.AlmostEquals(a.ApproachRate, b.ApproachRate, 0.01)) return true;
-            if (!Precision.AlmostEquals(a.OverallDifficulty, b.OverallDifficulty, 0.01)) return true;
-
-            return false;
-        }
-
         private void updateCollapsedState()
         {
             RightContent.FadeTo(Collapsed.Value && !IsHovered ? 0 : 1, transition_duration, Easing.OutQuint);
+        }
+
+        public LocalisableString TooltipText
+        {
+            get
+            {
+                if (haveRateChangedValues)
+                {
+                    return $"One or more values are being adjusted by mods that change speed." +
+                           $" (AR {originalDifficulty?.ApproachRate ?? 0}→{adjustedDifficulty?.ApproachRate ?? 0}, " +
+                           $"OD {originalDifficulty?.OverallDifficulty ?? 0}→{adjustedDifficulty?.OverallDifficulty ?? 0})";
+                }
+
+                return string.Empty;
+            }
+        }
+
+        private static bool hasRateAdjustedProperties(BeatmapDifficulty a, BeatmapDifficulty b)
+        {
+            if (!Precision.AlmostEquals(a.ApproachRate, b.ApproachRate)) return true;
+            if (!Precision.AlmostEquals(a.OverallDifficulty, b.OverallDifficulty)) return true;
+
+            return false;
         }
 
         private partial class BPMDisplay : RollingCounter<double>
@@ -221,20 +233,6 @@ namespace osu.Game.Overlays.Mods
                 Font = OsuFont.Default.With(size: 20, weight: FontWeight.SemiBold),
                 UseFullGlyphHeight = false,
             };
-        }
-
-        public LocalisableString TooltipText
-        {
-            get
-            {
-                if (haveRateChangedValues)
-                {
-                    return LocalisableString.Format("Values are changed by mods that change speed.\n" +
-                                                    "Original values: AR = {0}, OD = {1}", originalDifficulty?.ApproachRate ?? 0, originalDifficulty?.OverallDifficulty ?? 0);
-                }
-
-                return "";
-            }
         }
     }
 }
