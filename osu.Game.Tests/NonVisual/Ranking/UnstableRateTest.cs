@@ -42,5 +42,37 @@ namespace osu.Game.Tests.NonVisual.Ranking
 
             Assert.AreEqual(0, unstableRate.Value);
         }
+
+        [Test]
+        public void TestStaticRateChange()
+        {
+            var events = new[]
+            {
+                new HitEvent(-150, 1.5, HitResult.Great, new HitObject(), null, null),
+                new HitEvent(-150, 1.5, HitResult.Great, new HitObject(), null, null),
+                new HitEvent(150, 1.5, HitResult.Great, new HitObject(), null, null),
+                new HitEvent(150, 1.5, HitResult.Great, new HitObject(), null, null),
+            };
+
+            var unstableRate = new UnstableRate(events);
+
+            Assert.AreEqual(10 * 100, unstableRate.Value);
+        }
+
+        [Test]
+        public void TestDynamicRateChange()
+        {
+            var events = new[]
+            {
+                new HitEvent(-50, 0.5, HitResult.Great, new HitObject(), null, null),
+                new HitEvent(75, 0.75, HitResult.Great, new HitObject(), null, null),
+                new HitEvent(-100, 1.0, HitResult.Great, new HitObject(), null, null),
+                new HitEvent(125, 1.25, HitResult.Great, new HitObject(), null, null),
+            };
+
+            var unstableRate = new UnstableRate(events);
+
+            Assert.AreEqual(10 * 100, unstableRate.Value);
+        }
     }
 }
