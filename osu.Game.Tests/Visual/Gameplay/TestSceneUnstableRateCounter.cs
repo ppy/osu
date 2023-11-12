@@ -56,6 +56,7 @@ namespace osu.Game.Tests.Visual.Gameplay
                 scoreProcessor.RevertResult(
                     new JudgementResult(new HitCircle { HitWindows = hitWindows }, new Judgement())
                     {
+                        GameplayRate = 1.0,
                         TimeOffset = 25,
                         Type = HitResult.Perfect,
                     });
@@ -92,7 +93,7 @@ namespace osu.Game.Tests.Visual.Gameplay
             });
         }
 
-        private void applyJudgement(double offsetMs, bool alt)
+        private void applyJudgement(double offsetMs, bool alt, double gameplayRate = 1.0)
         {
             double placement = offsetMs;
 
@@ -105,6 +106,7 @@ namespace osu.Game.Tests.Visual.Gameplay
             scoreProcessor.ApplyResult(new JudgementResult(new HitCircle { HitWindows = hitWindows }, new Judgement())
             {
                 TimeOffset = placement,
+                GameplayRate = gameplayRate,
                 Type = HitResult.Perfect,
             });
         }
