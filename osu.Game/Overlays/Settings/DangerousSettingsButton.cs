@@ -14,7 +14,7 @@ namespace osu.Game.Overlays.Settings
         [BackgroundDependencyLoader]
         private void load(OsuColour colours)
         {
-            BackgroundColour = colours.Pink3;
+            BackgroundColour = colours.DangerousButtonColour;
         }
     }
 }

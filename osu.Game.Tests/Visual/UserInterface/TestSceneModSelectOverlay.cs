@@ -115,7 +115,7 @@ namespace osu.Game.Tests.Visual.UserInterface
             AddAssert("mod multiplier correct", () =>
             {
                 double multiplier = SelectedMods.Value.Aggregate(1d, (m, mod) => m * mod.ScoreMultiplier);
-                return Precision.AlmostEquals(multiplier, modSelectOverlay.ChildrenOfType<DifficultyMultiplierDisplay>().Single().Current.Value);
+                return Precision.AlmostEquals(multiplier, modSelectOverlay.ChildrenOfType<ScoreMultiplierDisplay>().Single().Current.Value);
             });
             assertCustomisationToggleState(disabled: false, active: false);
             AddAssert("setting items created", () => modSelectOverlay.ChildrenOfType<ISettingsItem>().Any());
@@ -130,7 +130,7 @@ namespace osu.Game.Tests.Visual.UserInterface
             AddAssert("mod multiplier correct", () =>
             {
                 double multiplier = SelectedMods.Value.Aggregate(1d, (m, mod) => m * mod.ScoreMultiplier);
-                return Precision.AlmostEquals(multiplier, modSelectOverlay.ChildrenOfType<DifficultyMultiplierDisplay>().Single().Current.Value);
+                return Precision.AlmostEquals(multiplier, modSelectOverlay.ChildrenOfType<ScoreMultiplierDisplay>().Single().Current.Value);
             });
             assertCustomisationToggleState(disabled: false, active: false);
             AddAssert("setting items created", () => modSelectOverlay.ChildrenOfType<ISettingsItem>().Any());
@@ -787,7 +787,7 @@ namespace osu.Game.Tests.Visual.UserInterface
                 InputManager.MoveMouseTo(this.ChildrenOfType<ModPresetPanel>().Single(preset => preset.Preset.Value.Name == "Half Time 0.5x"));
                 InputManager.Click(MouseButton.Left);
             });
-            AddAssert("difficulty multiplier display shows correct value", () => modSelectOverlay.ChildrenOfType<DifficultyMultiplierDisplay>().Single().Current.Value, () => Is.EqualTo(0.5));
+            AddAssert("difficulty multiplier display shows correct value", () => modSelectOverlay.ChildrenOfType<ScoreMultiplierDisplay>().Single().Current.Value, () => Is.EqualTo(0.5));
 
             // this is highly unorthodox in a test, but because the `ModSettingChangeTracker` machinery heavily leans on events and object disposal and re-creation,
             // it is instrumental in the reproduction of the failure scenario that this test is supposed to cover.
@@ -796,11 +796,14 @@ namespace osu.Game.Tests.Visual.UserInterface
             AddStep("open customisation area", () => modSelectOverlay.CustomisationButton!.TriggerClick());
             AddStep("reset half time speed to default", () => modSelectOverlay.ChildrenOfType<ModSettingsArea>().Single()
                                                                               .ChildrenOfType<RevertToDefaultButton<double>>().Single().TriggerClick());
-            AddUntilStep("difficulty multiplier display shows correct value", () => modSelectOverlay.ChildrenOfType<DifficultyMultiplierDisplay>().Single().Current.Value, () => Is.EqualTo(0.7));
+            AddUntilStep("difficulty multiplier display shows correct value", () => modSelectOverlay.ChildrenOfType<ScoreMultiplierDisplay>().Single().Current.Value, () => Is.EqualTo(0.7));
         }
 
-        private void waitForColumnLoad() => AddUntilStep("all column content loaded",
-            () => modSelectOverlay.ChildrenOfType<ModColumn>().Any() && modSelectOverlay.ChildrenOfType<ModColumn>().All(column => column.IsLoaded && column.ItemsLoaded));
+        private void waitForColumnLoad() => AddUntilStep("all column content loaded", () =>
+            modSelectOverlay.ChildrenOfType<ModColumn>().Any()
+            && modSelectOverlay.ChildrenOfType<ModColumn>().All(column => column.IsLoaded && column.ItemsLoaded)
+            && modSelectOverlay.ChildrenOfType<ModPresetColumn>().Any()
+            && modSelectOverlay.ChildrenOfType<ModPresetColumn>().All(column => column.IsLoaded));
 
         private void changeRuleset(int id)
         {

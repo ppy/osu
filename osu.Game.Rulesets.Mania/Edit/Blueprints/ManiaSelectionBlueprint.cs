@@ -37,7 +37,7 @@ namespace osu.Game.Rulesets.Mania.Edit.Blueprints
             foreach (var child in InternalChildren)
                 child.Anchor = child.Origin = anchor;
 
-            Position = Parent.ToLocalSpace(HitObjectContainer.ScreenSpacePositionAtTime(HitObject.StartTime)) - AnchorPosition;
+            Position = Parent!.ToLocalSpace(HitObjectContainer.ScreenSpacePositionAtTime(HitObject.StartTime)) - AnchorPosition;
             Width = HitObjectContainer.DrawWidth;
         }
     }

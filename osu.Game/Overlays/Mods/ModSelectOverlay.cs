@@ -120,11 +120,12 @@ namespace osu.Game.Overlays.Mods
         private ColumnScrollContainer columnScroll = null!;
         private ColumnFlowContainer columnFlow = null!;
         private FillFlowContainer<ShearedButton> footerButtonFlow = null!;
+        private FillFlowContainer footerContentFlow = null!;
         private DeselectAllModsButton deselectAllModsButton = null!;
 
         private Container aboveColumnsContent = null!;
-        private DifficultyMultiplierDisplay? multiplierDisplay;
-        private BeatmapAttributesDisplay? modEffectPreviewPanel;
+        private ScoreMultiplierDisplay? multiplierDisplay;
+        private BeatmapAttributesDisplay? beatmapAttributesDisplay;
 
         protected ShearedButton BackButton { get; private set; } = null!;
         protected ShearedToggleButton? CustomisationButton { get; private set; }
@@ -142,8 +143,8 @@ namespace osu.Game.Overlays.Mods
                 if (beatmap == value) return;
 
                 beatmap = value;
-                if (IsLoaded && modEffectPreviewPanel != null)
-                    modEffectPreviewPanel.BeatmapInfo.Value = beatmap?.BeatmapInfo;
+                if (IsLoaded && beatmapAttributesDisplay != null)
+                    beatmapAttributesDisplay.BeatmapInfo.Value = beatmap?.BeatmapInfo;
             }
         }
 
@@ -181,7 +182,7 @@ namespace osu.Game.Overlays.Mods
                 aboveColumnsContent = new Container
                 {
                     RelativeSizeAxes = Axes.X,
-                    Height = ModCounterDisplay.HEIGHT,
+                    Height = ScoreMultiplierDisplay.HEIGHT,
                     Padding = new MarginPadding { Horizontal = 100 },
                     Child = SearchTextBox = new ShearedSearchTextBox
                     {
@@ -196,7 +197,7 @@ namespace osu.Game.Overlays.Mods
                     {
                         Padding = new MarginPadding
                         {
-                            Top = ModCounterDisplay.HEIGHT + PADDING,
+                            Top = ScoreMultiplierDisplay.HEIGHT + PADDING,
                             Bottom = PADDING
                         },
                         RelativeSizeAxes = Axes.Both,
@@ -251,22 +252,32 @@ namespace osu.Game.Overlays.Mods
 
             if (ShowModEffects)
             {
-                aboveColumnsContent.Add(multiplierDisplay = new DifficultyMultiplierDisplay
+                FooterContent.Add(footerContentFlow = new FillFlowContainer
                 {
-                    Anchor = Anchor.TopRight,
-                    Origin = Anchor.TopRight
-                });
-
-                FooterContent.Add(modEffectPreviewPanel = new BeatmapAttributesDisplay
-                {
+                    AutoSizeAxes = Axes.Both,
+                    Direction = FillDirection.Vertical,
+                    Spacing = new Vector2(30, 10),
                     Anchor = Anchor.BottomRight,
                     Origin = Anchor.BottomRight,
                     Margin = new MarginPadding
                     {
                         Vertical = PADDING,
-                        Horizontal = 70
+                        Horizontal = 20
                     },
-                    BeatmapInfo = { Value = beatmap?.BeatmapInfo }
+                    Children = new Drawable[]
+                    {
+                        multiplierDisplay = new ScoreMultiplierDisplay
+                        {
+                            Anchor = Anchor.BottomRight,
+                            Origin = Anchor.BottomRight
+                        },
+                        beatmapAttributesDisplay = new BeatmapAttributesDisplay
+                        {
+                            Anchor = Anchor.BottomRight,
+                            Origin = Anchor.BottomRight,
+                            BeatmapInfo = { Value = beatmap?.BeatmapInfo }
+                        },
+                    }
                 });
             }
 
@@ -339,15 +350,23 @@ namespace osu.Game.Overlays.Mods
 
             SearchTextBox.PlaceholderText = SearchTextBox.HasFocus ? Resources.Localisation.Web.CommonStrings.InputSearch : ModSelectOverlayStrings.TabToSearch;
 
-            // only update preview panel's collapsed state after we are fully visible, to ensure all the buttons are where we expect them to be.
-            if (modEffectPreviewPanel != null && Alpha == 1)
+            if (beatmapAttributesDisplay != null)
             {
                 float rightEdgeOfLastButton = footerButtonFlow.Last().ScreenSpaceDrawQuad.TopRight.X;
 
-                // this is cheating a bit; the 375 value is hardcoded based on how wide the expanded panel _generally_ is.
+                // this is cheating a bit; the 640 value is hardcoded based on how wide the expanded panel _generally_ is.
                 // due to the transition applied, the raw screenspace quad of the panel cannot be used, as it will trigger an ugly feedback cycle of expanding and collapsing.
-                float projectedLeftEdgeOfExpandedModEffectPreviewPanel = footerButtonFlow.ToScreenSpace(footerButtonFlow.DrawSize - new Vector2(375 + 70, 0)).X;
-                modEffectPreviewPanel.Collapsed.Value = rightEdgeOfLastButton > projectedLeftEdgeOfExpandedModEffectPreviewPanel;
+                float projectedLeftEdgeOfExpandedBeatmapAttributesDisplay = footerButtonFlow.ToScreenSpace(footerButtonFlow.DrawSize - new Vector2(640, 0)).X;
+
+                bool screenIsntWideEnough = rightEdgeOfLastButton > projectedLeftEdgeOfExpandedBeatmapAttributesDisplay;
+
+                // only update preview panel's collapsed state after we are fully visible, to ensure all the buttons are where we expect them to be.
+                if (Alpha == 1)
+                    beatmapAttributesDisplay.Collapsed.Value = screenIsntWideEnough;
+
+                footerContentFlow.LayoutDuration = 200;
+                footerContentFlow.LayoutEasing = Easing.OutQuint;
+                footerContentFlow.Direction = screenIsntWideEnough ? FillDirection.Vertical : FillDirection.Horizontal;
             }
         }
 
@@ -585,7 +604,7 @@ namespace osu.Game.Overlays.Mods
                     if (columnNumber > 5 && !column.Active.Value) return;
 
                     // use X position of the column on screen as a basis for panning the sample
-                    float balance = column.Parent.BoundingBox.Centre.X / RelativeToAbsoluteFactor.X;
+                    float balance = column.Parent!.BoundingBox.Centre.X / RelativeToAbsoluteFactor.X;
 
                     // dip frequency and ramp volume of sample over the first 5 displayed columns
                     float progress = Math.Min(1, columnNumber / 5f);

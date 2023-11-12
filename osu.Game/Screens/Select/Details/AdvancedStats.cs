@@ -45,8 +45,8 @@ namespace osu.Game.Screens.Select.Details
         protected readonly StatisticRow FirstValue, HpDrain, Accuracy, ApproachRate;
         private readonly StatisticRow starDifficulty;
 
-        private BeatmapDifficulty originalDifficulty = null;
-        private bool haveRateChangedValues = false;
+        private BeatmapDifficulty originalDifficulty;
+        private bool haveRateChangedValues;
 
         private IBeatmapInfo beatmapInfo;
 
@@ -220,8 +220,9 @@ namespace osu.Game.Screens.Select.Details
                 if (haveRateChangedValues)
                 {
                     return LocalisableString.Format("Values are changed by mods that change speed.\n" +
-                        "Original values: AR = {0}, OD = {1}", originalDifficulty?.ApproachRate ?? 0, originalDifficulty?.OverallDifficulty ?? 0);
+                                                    "Original values: AR = {0}, OD = {1}", originalDifficulty?.ApproachRate ?? 0, originalDifficulty?.OverallDifficulty ?? 0);
                 }
+
                 return "";
             }
         }

@@ -329,7 +329,7 @@ namespace osu.Game.Screens.Ranking
                 ScorePanelList.Attach(detachedPanel);
 
                 // Move into its original location in the attached container first, then to the final location.
-                float origLocation = detachedPanel.Parent.ToLocalSpace(screenSpacePos).X;
+                float origLocation = detachedPanel.Parent!.ToLocalSpace(screenSpacePos).X;
                 detachedPanel.MoveToX(origLocation)
                              .Then()
                              .MoveToX(0, 250, Easing.OutElasticQuarter);
