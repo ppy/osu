@@ -25,9 +25,6 @@ namespace osu.Game.Rulesets.Osu.Mods
         [SettingSource("No slider head accuracy requirement", "Scores sliders proportionally to the number of ticks hit.")]
         public Bindable<bool> NoSliderHeadAccuracy { get; } = new BindableBool(true);
 
-        [SettingSource("No slider head movement", "Pins slider heads at their starting position, regardless of time.")]
-        public Bindable<bool> NoSliderHeadMovement { get; } = new BindableBool(true);
-
         [SettingSource("Apply classic note lock", "Applies note lock to the full hit window.")]
         public Bindable<bool> ClassicNoteLock { get; } = new BindableBool(true);
 
@@ -44,11 +41,7 @@ namespace osu.Game.Rulesets.Osu.Mods
             switch (hitObject)
             {
                 case Slider slider:
-                    slider.OnlyJudgeNestedObjects = !NoSliderHeadAccuracy.Value;
-
-                    foreach (var head in slider.NestedHitObjects.OfType<SliderHeadCircle>())
-                        head.JudgeAsNormalHitCircle = !NoSliderHeadAccuracy.Value;
-
+                    slider.ClassicSliderBehaviour = NoSliderHeadAccuracy.Value;
                     break;
             }
         }
@@ -71,7 +64,6 @@ namespace osu.Game.Rulesets.Osu.Mods
             switch (obj)
             {
                 case DrawableSliderHead head:
-                    head.TrackFollowCircle = !NoSliderHeadMovement.Value;
                     if (FadeHitCircleEarly.Value && !usingHiddenFading)
                         applyEarlyFading(head);
 

@@ -35,14 +35,16 @@ namespace osu.Game.Overlays.Mods
         /// </summary>
         public LocalisableString Label { get; protected set; }
 
-        private EffectCounter counter;
-        private OsuSpriteText text;
+        private readonly EffectCounter counter;
+        private readonly OsuSpriteText text;
 
         [Resolved]
         private OsuColour colours { get; set; } = null!;
+
         private void updateTextColor()
         {
             Color4 newColor;
+
             switch (AdjustType.Value)
             {
                 case ModEffect.NotChanged:

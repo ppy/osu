@@ -4,6 +4,7 @@
 #nullable disable
 
 using System;
+using System.Linq;
 using osu.Framework;
 using osu.Framework.Allocation;
 using osu.Framework.Audio;
@@ -34,7 +35,7 @@ namespace osu.Game.Screens.Menu
     {
         public event Action<ButtonState> StateChanged;
 
-        public readonly Key TriggerKey;
+        public readonly Key[] TriggerKeys;
 
         private readonly Container iconText;
         private readonly Container box;
@@ -50,14 +51,15 @@ namespace osu.Game.Screens.Menu
         private readonly Action clickAction;
         private Sample sampleClick;
         private Sample sampleHover;
+        private SampleChannel sampleChannel;
 
         public override bool ReceivePositionalInputAt(Vector2 screenSpacePos) => box.ReceivePositionalInputAt(screenSpacePos);
 
-        public MainMenuButton(LocalisableString text, string sampleName, IconUsage symbol, Color4 colour, Action clickAction = null, float extraWidth = 0, Key triggerKey = Key.Unknown)
+        public MainMenuButton(LocalisableString text, string sampleName, IconUsage symbol, Color4 colour, Action clickAction = null, float extraWidth = 0, params Key[] triggerKeys)
         {
             this.sampleName = sampleName;
             this.clickAction = clickAction;
-            TriggerKey = triggerKey;
+            TriggerKeys = triggerKeys;
 
             AutoSizeAxes = Axes.Both;
             Alpha = 0;
@@ -213,7 +215,7 @@ namespace osu.Game.Screens.Menu
             if (e.Repeat || e.ControlPressed || e.ShiftPressed || e.AltPressed || e.SuperPressed)
                 return false;
 
-            if (TriggerKey == e.Key && TriggerKey != Key.Unknown)
+            if (TriggerKeys.Contains(e.Key))
             {
                 trigger();
                 return true;
@@ -224,7 +226,8 @@ namespace osu.Game.Screens.Menu
 
         private void trigger()
         {
-            sampleClick?.Play();
+            sampleChannel = sampleClick?.GetChannel();
+            sampleChannel?.Play();
 
             clickAction?.Invoke();
 
@@ -235,6 +238,8 @@ namespace osu.Game.Screens.Menu
 
         public override bool HandleNonPositionalInput => state == ButtonState.Expanded;
         public override bool HandlePositionalInput => state != ButtonState.Exploded && box.Scale.X >= 0.8f;
+
+        public void StopSamplePlayback() => sampleChannel?.Stop();
 
         protected override void Update()
         {

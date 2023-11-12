@@ -40,6 +40,7 @@ namespace osu.Game.Skinning
         public float ScorePosition = 300 * POSITION_SCALE_FACTOR;
         public bool ShowJudgementLine = true;
         public bool KeysUnderNotes;
+        public int LightFramePerSecond = 60;
 
         public LegacyNoteBodyStyle? NoteBodyStyle;
 

@@ -35,14 +35,6 @@ namespace osu.Game.Rulesets.Osu.Skinning.Argon
 
             InternalChildren = new Drawable[]
             {
-                bonusCounter = new OsuSpriteText
-                {
-                    Alpha = 0,
-                    Anchor = Anchor.Centre,
-                    Origin = Anchor.Centre,
-                    Font = OsuFont.Default.With(size: 24),
-                    Y = -120,
-                },
                 new ArgonSpinnerDisc
                 {
                     RelativeSizeAxes = Axes.Both,
@@ -85,19 +77,33 @@ namespace osu.Game.Rulesets.Osu.Skinning.Argon
             };
         }
 
-        private IBindable<double> gainedBonus = null!;
+        private IBindable<int> completedSpins = null!;
         private IBindable<double> spinsPerMinute = null!;
 
         protected override void LoadComplete()
         {
             base.LoadComplete();
 
-            gainedBonus = drawableSpinner.GainedBonus.GetBoundCopy();
-            gainedBonus.BindValueChanged(bonus =>
+            completedSpins = drawableSpinner.CompletedFullSpins.GetBoundCopy();
+            completedSpins.BindValueChanged(_ =>
             {
-                bonusCounter.Text = bonus.NewValue.ToString(NumberFormatInfo.InvariantInfo);
-                bonusCounter.FadeOutFromOne(1500);
-                bonusCounter.ScaleTo(1.5f).Then().ScaleTo(1f, 1000, Easing.OutQuint);
+                if (drawableSpinner.CurrentBonusScore <= 0)
+                    return;
+
+                if (drawableSpinner.CurrentBonusScore == drawableSpinner.MaximumBonusScore)
+                {
+                    bonusCounter.Text = "MAX";
+                    bonusCounter.ScaleTo(1.5f).Then().ScaleTo(2.8f, 1000, Easing.OutQuint);
+
+                    bonusCounter.FlashColour(Colour4.FromHex("FC618F"), 400);
+                    bonusCounter.FadeOutFromOne(500);
+                }
+                else
+                {
+                    bonusCounter.Text = drawableSpinner.CurrentBonusScore.ToString(NumberFormatInfo.InvariantInfo);
+                    bonusCounter.ScaleTo(1.5f).Then().ScaleTo(1f, 1000, Easing.OutQuint);
+                    bonusCounter.FadeOutFromOne(1500);
+                }
             });
 
             spinsPerMinute = drawableSpinner.SpinsPerMinute.GetBoundCopy();

@@ -123,6 +123,11 @@ namespace osu.Game.Skinning
                         currentConfig.WidthForNoteHeightScale = (float.Parse(pair.Value, CultureInfo.InvariantCulture)) * LegacyManiaSkinConfiguration.POSITION_SCALE_FACTOR;
                         break;
 
+                    case "LightFramePerSecond":
+                        int lightFramePerSecond = int.Parse(pair.Value, CultureInfo.InvariantCulture);
+                        currentConfig.LightFramePerSecond = lightFramePerSecond > 0 ? lightFramePerSecond : 24;
+                        break;
+
                     case string when pair.Key.StartsWith("Colour", StringComparison.Ordinal):
                         HandleColours(currentConfig, line, true);
                         break;

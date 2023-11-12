@@ -41,7 +41,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
         [BackgroundDependencyLoader]
         private void load()
         {
-            Size = new Vector2(OsuHitObject.OBJECT_RADIUS * 2);
+            Size = OsuHitObject.OBJECT_DIMENSIONS;
             Origin = Anchor.Centre;
 
             AddInternal(scaleContainer = new SkinnableDrawable(new OsuSkinComponentLookup(OsuSkinComponents.SliderScorePoint), _ => new CircularContainer
@@ -75,8 +75,18 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
 
         protected override void CheckForResult(bool userTriggered, double timeOffset)
         {
+            // shared implementation with DrawableSliderRepeat.
             if (timeOffset >= 0)
+            {
+                // Attempt to preserve correct ordering of judgements as best we can by forcing
+                // an un-judged head to be missed when the user has clearly skipped it.
+                //
+                // This check is applied to all nested slider objects apart from the head (ticks, repeats, tail).
+                if (Tracking && !DrawableSlider.HeadCircle.Judged)
+                    DrawableSlider.HeadCircle.MissForcefully();
+
                 ApplyResult(r => r.Type = Tracking ? r.Judgement.MaxResult : r.Judgement.MinResult);
+            }
         }
 
         protected override void UpdateInitialTransforms()

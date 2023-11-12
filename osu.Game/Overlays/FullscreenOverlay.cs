@@ -17,7 +17,7 @@ namespace osu.Game.Overlays
     public abstract partial class FullscreenOverlay<T> : WaveOverlayContainer, INamedOverlayComponent
         where T : OverlayHeader
     {
-        public virtual string IconTexture => Header.Title.IconTexture ?? string.Empty;
+        public virtual string IconTexture => Header.Title.IconTexture;
         public virtual LocalisableString Title => Header.Title.Title;
         public virtual LocalisableString Description => Header.Title.Description;
 

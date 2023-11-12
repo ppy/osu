@@ -101,7 +101,7 @@ namespace osu.Game.Rulesets.Osu.Tests.Editor
             {
                 var firstPiece = this.ChildrenOfType<PathControlPointPiece<Slider>>().Single(piece => piece.ControlPoint == slider.Path.ControlPoints[0]);
                 var pos = slider.Path.PositionAt(0.25d) + slider.Position;
-                InputManager.MoveMouseTo(firstPiece.Parent.ToScreenSpace(pos));
+                InputManager.MoveMouseTo(firstPiece.Parent!.ToScreenSpace(pos));
             });
             AddStep("move slider end", () =>
             {

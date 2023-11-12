@@ -123,6 +123,8 @@ namespace osu.Game.Screens.Edit
                     oldWithRepeats.NodeSamples.Clear();
                     oldWithRepeats.NodeSamples.AddRange(newWithRepeats.NodeSamples);
                 }
+
+                editorBeatmap.Update(oldObject);
             }
         }
 
