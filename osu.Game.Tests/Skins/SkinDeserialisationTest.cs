@@ -57,6 +57,8 @@ namespace osu.Game.Tests.Skins
             "Archives/modified-argon-pro-20231001.osk",
             // Covers player name text component.
             "Archives/modified-argon-20231106.osk",
+            // Covers "Argon" accuracy/score/combo counters, and wedges
+            "Archives/modified-argon-20231108.osk",
         };
 
         /// <summary>
