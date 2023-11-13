@@ -140,7 +140,7 @@ namespace osu.Game.Rulesets.Catch.Tests.Editor
 
             AddStep("update hit object path", () =>
             {
-                hitObject.Path = new SliderPath(PathType.PERFECTCURVE, new[]
+                hitObject.Path = new SliderPath(PathType.PERFECT_CURVE, new[]
                 {
                     Vector2.Zero,
                     new Vector2(100, 100),
@@ -190,14 +190,14 @@ namespace osu.Game.Rulesets.Catch.Tests.Editor
         [Test]
         public void TestVertexResampling()
         {
-            addBlueprintStep(100, 100, new SliderPath(PathType.PERFECTCURVE, new[]
+            addBlueprintStep(100, 100, new SliderPath(PathType.PERFECT_CURVE, new[]
             {
                 Vector2.Zero,
                 new Vector2(100, 100),
                 new Vector2(50, 200),
             }), 0.5);
             AddAssert("1 vertex per 1 nested HO", () => getVertices().Count == hitObject.NestedHitObjects.Count);
-            AddAssert("slider path not yet changed", () => hitObject.Path.ControlPoints[0].Type == PathType.PERFECTCURVE);
+            AddAssert("slider path not yet changed", () => hitObject.Path.ControlPoints[0].Type == PathType.PERFECT_CURVE);
             addAddVertexSteps(150, 150);
             AddAssert("slider path change to linear", () => hitObject.Path.ControlPoints[0].Type == PathType.LINEAR);
         }

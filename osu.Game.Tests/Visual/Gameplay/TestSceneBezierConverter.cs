@@ -143,7 +143,7 @@ namespace osu.Game.Tests.Visual.Gameplay
             {
                 path.ControlPoints.AddRange(createSegment(PathType.LINEAR, Vector2.Zero, new Vector2(100, 0)));
                 path.ControlPoints.AddRange(createSegment(PathType.BEZIER, new Vector2(100, 0), new Vector2(150, 30), new Vector2(100, 100)));
-                path.ControlPoints.AddRange(createSegment(PathType.PERFECTCURVE, new Vector2(100, 100), new Vector2(25, 50), Vector2.Zero));
+                path.ControlPoints.AddRange(createSegment(PathType.PERFECT_CURVE, new Vector2(100, 100), new Vector2(25, 50), Vector2.Zero));
             });
         }
 
@@ -159,7 +159,7 @@ namespace osu.Game.Tests.Visual.Gameplay
         {
             AddStep("create path", () =>
             {
-                path.ControlPoints.AddRange(createSegment(PathType.PERFECTCURVE, Vector2.Zero, new Vector2(width / 2, height), new Vector2(width, 0)));
+                path.ControlPoints.AddRange(createSegment(PathType.PERFECT_CURVE, Vector2.Zero, new Vector2(width / 2, height), new Vector2(width, 0)));
             });
         }
 
@@ -172,11 +172,11 @@ namespace osu.Game.Tests.Visual.Gameplay
                 switch (points)
                 {
                     case 2:
-                        path.ControlPoints.AddRange(createSegment(PathType.PERFECTCURVE, Vector2.Zero, new Vector2(0, 100)));
+                        path.ControlPoints.AddRange(createSegment(PathType.PERFECT_CURVE, Vector2.Zero, new Vector2(0, 100)));
                         break;
 
                     case 4:
-                        path.ControlPoints.AddRange(createSegment(PathType.PERFECTCURVE, Vector2.Zero, new Vector2(0, 100), new Vector2(100), new Vector2(100, 0)));
+                        path.ControlPoints.AddRange(createSegment(PathType.PERFECT_CURVE, Vector2.Zero, new Vector2(0, 100), new Vector2(100), new Vector2(100, 0)));
                         break;
                 }
             });

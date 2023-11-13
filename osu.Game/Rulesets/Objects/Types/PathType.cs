@@ -2,7 +2,6 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
-using System.Diagnostics;
 
 namespace osu.Game.Rulesets.Objects.Types
 {
@@ -14,12 +13,12 @@ namespace osu.Game.Rulesets.Objects.Types
         PerfectCurve
     }
 
-    public readonly struct PathType
+    public readonly struct PathType : IEquatable<PathType>
     {
         public static readonly PathType CATMULL = new PathType(SplineType.Catmull);
         public static readonly PathType BEZIER = new PathType(SplineType.BSpline);
         public static readonly PathType LINEAR = new PathType(SplineType.Linear);
-        public static readonly PathType PERFECTCURVE = new PathType(SplineType.PerfectCurve);
+        public static readonly PathType PERFECT_CURVE = new PathType(SplineType.PerfectCurve);
 
         /// <summary>
         /// The type of the spline that should be used to interpret the control points of the path.
@@ -52,8 +51,13 @@ namespace osu.Game.Rulesets.Objects.Types
 
         public static PathType BSpline(int degree)
         {
-            Debug.Assert(degree > 0);
+            if (degree <= 0)
+                throw new ArgumentOutOfRangeException(nameof(degree), "The degree of a B-Spline path must be greater than zero.");
+
             return new PathType { Type = SplineType.BSpline, Degree = degree };
         }
+
+        public bool Equals(PathType other)
+            => Type == other.Type && Degree == other.Degree;
     }
 }

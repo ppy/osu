@@ -10,7 +10,7 @@ using osu.Game.Rulesets.Edit;
 
 namespace osu.Game.Rulesets.Osu.Edit
 {
-    public partial class OsuSliderDrawingSettingsProvider : Drawable, ISliderDrawingSettingsProvider
+    public partial class OsuSliderDrawingSettingsProvider : Drawable, ISliderDrawingSettingsProvider, IToolboxAttachment
     {
         public BindableFloat Tolerance { get; } = new BindableFloat(0.1f)
         {
@@ -27,12 +27,14 @@ namespace osu.Game.Rulesets.Osu.Edit
 
         private ExpandableSlider<int> toleranceSlider = null!;
 
-        public OsuSliderDrawingSettingsProvider()
+        protected override void LoadComplete()
         {
+            base.LoadComplete();
+
             sliderTolerance.BindValueChanged(v =>
             {
                 float newValue = v.NewValue / 100f;
-                if (!Precision.AlmostEquals(newValue, Tolerance.Value, 1e-7f))
+                if (!Precision.AlmostEquals(newValue, Tolerance.Value))
                     Tolerance.Value = newValue;
             });
             Tolerance.BindValueChanged(v =>

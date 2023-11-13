@@ -90,7 +90,7 @@ namespace osu.Game.Rulesets.Osu.Tests.Editor
             assertPlaced(true);
             assertControlPointCount(3);
             assertControlPointPosition(1, new Vector2(100, 0));
-            assertControlPointType(0, PathType.PERFECTCURVE);
+            assertControlPointType(0, PathType.PERFECT_CURVE);
         }
 
         [Test]
@@ -172,7 +172,7 @@ namespace osu.Game.Rulesets.Osu.Tests.Editor
 
             assertPlaced(true);
             assertControlPointCount(3);
-            assertControlPointType(0, PathType.PERFECTCURVE);
+            assertControlPointType(0, PathType.PERFECT_CURVE);
         }
 
         [Test]
@@ -241,7 +241,7 @@ namespace osu.Game.Rulesets.Osu.Tests.Editor
             assertControlPointPosition(1, new Vector2(100, 0));
             assertControlPointPosition(2, new Vector2(100));
             assertControlPointType(0, PathType.LINEAR);
-            assertControlPointType(1, PathType.PERFECTCURVE);
+            assertControlPointType(1, PathType.PERFECT_CURVE);
         }
 
         [Test]
@@ -269,8 +269,8 @@ namespace osu.Game.Rulesets.Osu.Tests.Editor
             assertControlPointPosition(2, new Vector2(100));
             assertControlPointPosition(3, new Vector2(200, 100));
             assertControlPointPosition(4, new Vector2(200));
-            assertControlPointType(0, PathType.PERFECTCURVE);
-            assertControlPointType(2, PathType.PERFECTCURVE);
+            assertControlPointType(0, PathType.PERFECT_CURVE);
+            assertControlPointType(2, PathType.PERFECT_CURVE);
         }
 
         [Test]
@@ -326,7 +326,7 @@ namespace osu.Game.Rulesets.Osu.Tests.Editor
 
             assertPlaced(true);
             assertControlPointCount(3);
-            assertControlPointType(0, PathType.PERFECTCURVE);
+            assertControlPointType(0, PathType.PERFECT_CURVE);
         }
 
         [Test]
@@ -347,7 +347,7 @@ namespace osu.Game.Rulesets.Osu.Tests.Editor
 
             assertPlaced(true);
             assertControlPointCount(3);
-            assertControlPointType(0, PathType.PERFECTCURVE);
+            assertControlPointType(0, PathType.PERFECT_CURVE);
         }
 
         [Test]
@@ -385,7 +385,7 @@ namespace osu.Game.Rulesets.Osu.Tests.Editor
 
             assertPlaced(true);
             assertControlPointCount(3);
-            assertControlPointType(0, PathType.PERFECTCURVE);
+            assertControlPointType(0, PathType.PERFECT_CURVE);
         }
 
         private void addMovementStep(Vector2 position) => AddStep($"move mouse to {position}", () => InputManager.MoveMouseTo(InputManager.ToScreenSpace(position)));

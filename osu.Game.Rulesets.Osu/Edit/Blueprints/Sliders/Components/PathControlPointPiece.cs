@@ -221,7 +221,7 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders.Components
         /// </summary>
         private void updatePathType()
         {
-            if (ControlPoint.Type != PathType.PERFECTCURVE)
+            if (ControlPoint.Type != PathType.PERFECT_CURVE)
                 return;
 
             if (PointsInSegment.Count > 3)
@@ -259,19 +259,19 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders.Components
             if (ControlPoint.Type is not PathType pathType)
                 return colours.Yellow;
 
-            switch (pathType)
+            switch (pathType.Type)
             {
-                case { Type: SplineType.Catmull }:
+                case SplineType.Catmull:
                     return colours.SeaFoam;
 
-                case { Type: SplineType.BSpline, Degree: null }:
-                    return colours.PinkLighter;
+                case SplineType.BSpline:
+                    if (!pathType.Degree.HasValue)
+                        return colours.PinkLighter;
 
-                case { Type: SplineType.BSpline, Degree: >= 1 }:
                     int idx = Math.Clamp(pathType.Degree.Value, 0, 3);
                     return new[] { colours.PinkDarker, colours.PinkDark, colours.Pink, colours.PinkLight }[idx];
 
-                case { Type: SplineType.PerfectCurve }:
+                case SplineType.PerfectCurve:
                     return colours.PurpleDark;
 
                 default:

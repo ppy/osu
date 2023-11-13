@@ -478,7 +478,7 @@ namespace osu.Game.Rulesets.Osu.Tests
                 StartTime = time_slider_start,
                 Position = new Vector2(0, 0),
                 SliderVelocityMultiplier = 0.1f,
-                Path = new SliderPath(PathType.PERFECTCURVE, new[]
+                Path = new SliderPath(PathType.PERFECT_CURVE, new[]
                 {
                     Vector2.Zero,
                     new Vector2(slider_path_length, 0),

@@ -154,7 +154,7 @@ namespace osu.Game.Rulesets.Catch.Tests
                     } while (rng.Next(2) != 0);
 
                     int length = sliderPath.ControlPoints.Count - start + 1;
-                    sliderPath.ControlPoints[start].Type = length <= 2 ? PathType.LINEAR : length == 3 ? PathType.PERFECTCURVE : PathType.BEZIER;
+                    sliderPath.ControlPoints[start].Type = length <= 2 ? PathType.LINEAR : length == 3 ? PathType.PERFECT_CURVE : PathType.BEZIER;
                 } while (rng.Next(3) != 0);
 
                 if (rng.Next(5) == 0)

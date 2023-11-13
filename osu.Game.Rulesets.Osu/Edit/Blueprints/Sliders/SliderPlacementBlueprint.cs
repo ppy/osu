@@ -251,7 +251,7 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders
                     break;
 
                 case 3:
-                    segmentStart.Type = PathType.PERFECTCURVE;
+                    segmentStart.Type = PathType.PERFECT_CURVE;
                     break;
 
                 default:

@@ -25,7 +25,7 @@ namespace osu.Game.Rulesets.Osu.Tests.Editor
 
             PathControlPoint[] points =
             {
-                new PathControlPoint(new Vector2(0), PathType.PERFECTCURVE),
+                new PathControlPoint(new Vector2(0), PathType.PERFECT_CURVE),
                 new PathControlPoint(new Vector2(-100, 0)),
                 new PathControlPoint(new Vector2(100, 20))
             };
