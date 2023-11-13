@@ -165,7 +165,7 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders
                         if (HitObject.Path.ControlPoints.Count < 3)
                         {
                             var lastCp = HitObject.Path.ControlPoints.LastOrDefault();
-                            if (lastCp != cursor)
+                            if (lastCp != cursor && HitObject.Path.ControlPoints.Count == 2)
                                 return false;
 
                             bSplineBuilder.Clear();
