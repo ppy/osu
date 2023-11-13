@@ -26,6 +26,7 @@ namespace osu.Game.Rulesets.Osu.Scoring
 
         public Action<string>? OnIterationFail;
         public Action<string>? OnIterationSuccess;
+        public bool ApplyComboEndBonus { get; set; } = true;
 
         private double lowestHpEver;
         private double lowestHpEnd;
@@ -148,7 +149,7 @@ namespace osu.Game.Rulesets.Osu.Scoring
                         break;
                     }
 
-                    if (i == Beatmap.HitObjects.Count - 1 || ((OsuHitObject)Beatmap.HitObjects[i + 1]).NewCombo)
+                    if (ApplyComboEndBonus && (i == Beatmap.HitObjects.Count - 1 || ((OsuHitObject)Beatmap.HitObjects[i + 1]).NewCombo))
                     {
                         increaseHp(hpMultiplierComboEnd * hp_combo_geki + hpMultiplierNormal * hp_hit_300);
 
