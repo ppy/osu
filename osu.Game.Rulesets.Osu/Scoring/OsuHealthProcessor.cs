@@ -185,12 +185,12 @@ namespace osu.Game.Rulesets.Osu.Scoring
                     return IBeatmapDifficultyInfo.DifficultyRange(Beatmap.Difficulty.DrainRate, -0.03, -0.125, -0.2);
 
                 case HitResult.SmallTickHit:
-                    // This result is always as a result of the slider tail.
+                    // This result always comes from the slider tail, which is judged the same as a repeat.
                     increase = 0.02;
                     break;
 
                 case HitResult.LargeTickHit:
-                    // This result is either a result of a slider tick or a repeat.
+                    // This result comes from either a slider tick or repeat.
                     increase = hitObject is SliderTick ? 0.015 : 0.02;
                     break;
 
