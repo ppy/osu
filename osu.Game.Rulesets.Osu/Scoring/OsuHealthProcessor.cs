@@ -3,6 +3,7 @@
 
 using System;
 using System.Linq;
+using osu.Framework.Logging;
 using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.Timing;
 using osu.Game.Rulesets.Judgements;
@@ -12,8 +13,11 @@ using osu.Game.Rulesets.Scoring;
 
 namespace osu.Game.Rulesets.Osu.Scoring
 {
-    public partial class OsuHealthProcessor : LegacyDrainingHealthProcessor
+    public partial class OsuHealthProcessor : DrainingHealthProcessor
     {
+        public Action<string>? OnIterationFail;
+        public Action<string>? OnIterationSuccess;
+
         private double lowestHpEver;
         private double lowestHpEnd;
         private double hpRecoveryAvailable;
@@ -141,13 +145,11 @@ namespace osu.Game.Rulesets.Osu.Scoring
 
                 if (fail)
                 {
-                    if (Log)
-                        Console.WriteLine($"FAILED drop {testDrop}: {failReason}");
+                    OnIterationFail?.Invoke($"FAILED drop {testDrop}: {failReason}");
                     continue;
                 }
 
-                if (Log)
-                    Console.WriteLine($"PASSED drop {testDrop}");
+                OnIterationSuccess?.Invoke($"PASSED drop {testDrop}");
                 return testDrop;
             } while (true);
 
