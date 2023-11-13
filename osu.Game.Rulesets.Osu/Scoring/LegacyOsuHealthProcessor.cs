@@ -5,13 +5,17 @@ using System;
 using System.Linq;
 using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.Timing;
+using osu.Game.Rulesets.Judgements;
 using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Osu.Objects;
 using osu.Game.Rulesets.Scoring;
 
 namespace osu.Game.Rulesets.Osu.Scoring
 {
-    // Reference implementation for osu!stable's HP drain.
+    /// <summary>
+    /// Reference implementation for osu!stable's HP drain.
+    /// Cannot be used for gameplay.
+    /// </summary>
     public partial class LegacyOsuHealthProcessor : LegacyDrainingHealthProcessor
     {
         private const double hp_bar_maximum = 200;
@@ -19,8 +23,6 @@ namespace osu.Game.Rulesets.Osu.Scoring
         private const double hp_hit_300 = 6;
         private const double hp_slider_repeat = 4;
         private const double hp_slider_tick = 3;
-
-        public bool ComboEndBonus { get; set; }
 
         private double lowestHpEver;
         private double lowestHpEnd;
@@ -42,6 +44,18 @@ namespace osu.Game.Rulesets.Osu.Scoring
             hpRecoveryAvailable = IBeatmapDifficultyInfo.DifficultyRange(beatmap.Difficulty.DrainRate, 8, 4, 0);
 
             base.ApplyBeatmap(beatmap);
+        }
+
+        protected override void ApplyResultInternal(JudgementResult result)
+        {
+            if (!IsSimulating)
+                throw new NotSupportedException("The legacy osu! health processor is not supported for gameplay.");
+        }
+
+        protected override void RevertResultInternal(JudgementResult result)
+        {
+            if (!IsSimulating)
+                throw new NotSupportedException("The legacy osu! health processor is not supported for gameplay.");
         }
 
         protected override void Reset(bool storeResults)
@@ -131,7 +145,7 @@ namespace osu.Game.Rulesets.Osu.Scoring
                         break;
                     }
 
-                    if (ComboEndBonus && (i == Beatmap.HitObjects.Count - 1 || ((OsuHitObject)Beatmap.HitObjects[i + 1]).NewCombo))
+                    if (i == Beatmap.HitObjects.Count - 1 || ((OsuHitObject)Beatmap.HitObjects[i + 1]).NewCombo)
                     {
                         increaseHp(hpMultiplierComboEnd * hp_combo_geki + hpMultiplierNormal * hp_hit_300);
 
