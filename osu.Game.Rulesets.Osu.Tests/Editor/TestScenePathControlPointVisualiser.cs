@@ -64,7 +64,7 @@ namespace osu.Game.Rulesets.Osu.Tests.Editor
             addContextMenuItemStep("Perfect curve");
 
             assertControlPointPathType(0, PathType.BEZIER);
-            assertControlPointPathType(1, PathType.PERFECTCURVE);
+            assertControlPointPathType(1, PathType.PERFECT_CURVE);
             assertControlPointPathType(3, PathType.BEZIER);
         }
 
@@ -84,7 +84,7 @@ namespace osu.Game.Rulesets.Osu.Tests.Editor
             addContextMenuItemStep("Perfect curve");
 
             assertControlPointPathType(0, PathType.BEZIER);
-            assertControlPointPathType(2, PathType.PERFECTCURVE);
+            assertControlPointPathType(2, PathType.PERFECT_CURVE);
             assertControlPointPathType(4, null);
         }
 
@@ -124,7 +124,7 @@ namespace osu.Game.Rulesets.Osu.Tests.Editor
             addContextMenuItemStep("Perfect curve");
 
             assertControlPointPathType(0, PathType.LINEAR);
-            assertControlPointPathType(1, PathType.PERFECTCURVE);
+            assertControlPointPathType(1, PathType.PERFECT_CURVE);
             assertControlPointPathType(3, PathType.LINEAR);
         }
 
@@ -134,7 +134,7 @@ namespace osu.Game.Rulesets.Osu.Tests.Editor
             createVisualiser(true);
 
             addControlPointStep(new Vector2(200), PathType.BEZIER);
-            addControlPointStep(new Vector2(300), PathType.PERFECTCURVE);
+            addControlPointStep(new Vector2(300), PathType.PERFECT_CURVE);
             addControlPointStep(new Vector2(500, 300));
             addControlPointStep(new Vector2(700, 200), PathType.BEZIER);
             addControlPointStep(new Vector2(500, 100));

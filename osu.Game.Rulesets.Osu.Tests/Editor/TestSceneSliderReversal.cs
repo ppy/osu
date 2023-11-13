@@ -22,7 +22,7 @@ namespace osu.Game.Rulesets.Osu.Tests.Editor
         private readonly PathControlPoint[][] paths =
         {
             createPathSegment(
-                PathType.PERFECTCURVE,
+                PathType.PERFECT_CURVE,
                 new Vector2(200, -50),
                 new Vector2(250, 0)
             ),

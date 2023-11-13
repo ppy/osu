@@ -56,7 +56,7 @@ namespace osu.Game.Rulesets.Osu.Tests.Editor
                 {
                     ControlPoints =
                     {
-                        new PathControlPoint(Vector2.Zero, PathType.PERFECTCURVE),
+                        new PathControlPoint(Vector2.Zero, PathType.PERFECT_CURVE),
                         new PathControlPoint(new Vector2(136, 205)),
                         new PathControlPoint(new Vector2(-4, 226))
                     }
@@ -181,7 +181,7 @@ namespace osu.Game.Rulesets.Osu.Tests.Editor
         {
             OsuSelectionHandler selectionHandler;
 
-            AddAssert("first control point perfect", () => slider.Path.ControlPoints[0].Type == PathType.PERFECTCURVE);
+            AddAssert("first control point perfect", () => slider.Path.ControlPoints[0].Type == PathType.PERFECT_CURVE);
 
             AddStep("select slider", () => EditorBeatmap.SelectedHitObjects.Add(slider));
             AddStep("rotate 90 degrees ccw", () =>
@@ -190,7 +190,7 @@ namespace osu.Game.Rulesets.Osu.Tests.Editor
                 selectionHandler.HandleRotation(-90);
             });
 
-            AddAssert("first control point still perfect", () => slider.Path.ControlPoints[0].Type == PathType.PERFECTCURVE);
+            AddAssert("first control point still perfect", () => slider.Path.ControlPoints[0].Type == PathType.PERFECT_CURVE);
         }
 
         [Test]
@@ -223,7 +223,7 @@ namespace osu.Game.Rulesets.Osu.Tests.Editor
         {
             OsuSelectionHandler selectionHandler;
 
-            AddAssert("first control point perfect", () => slider.Path.ControlPoints[0].Type == PathType.PERFECTCURVE);
+            AddAssert("first control point perfect", () => slider.Path.ControlPoints[0].Type == PathType.PERFECT_CURVE);
 
             AddStep("select slider", () => EditorBeatmap.SelectedHitObjects.Add(slider));
             AddStep("flip slider horizontally", () =>
@@ -232,7 +232,7 @@ namespace osu.Game.Rulesets.Osu.Tests.Editor
                 selectionHandler.OnPressed(new KeyBindingPressEvent<GlobalAction>(InputManager.CurrentState, GlobalAction.EditorFlipVertically));
             });
 
-            AddAssert("first control point still perfect", () => slider.Path.ControlPoints[0].Type == PathType.PERFECTCURVE);
+            AddAssert("first control point still perfect", () => slider.Path.ControlPoints[0].Type == PathType.PERFECT_CURVE);
         }
 
         [Test]

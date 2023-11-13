@@ -219,7 +219,7 @@ namespace osu.Game.Rulesets.Osu.Tests
             {
                 StartTime = Time.Current + time_offset,
                 Position = new Vector2(239, 176),
-                Path = new SliderPath(PathType.PERFECTCURVE, new[]
+                Path = new SliderPath(PathType.PERFECT_CURVE, new[]
                 {
                     Vector2.Zero,
                     new Vector2(154, 28),
@@ -255,7 +255,7 @@ namespace osu.Game.Rulesets.Osu.Tests
                 SliderVelocityMultiplier = speedMultiplier,
                 StartTime = Time.Current + time_offset,
                 Position = new Vector2(0, -(distance / 2)),
-                Path = new SliderPath(PathType.PERFECTCURVE, new[]
+                Path = new SliderPath(PathType.PERFECT_CURVE, new[]
                 {
                     Vector2.Zero,
                     new Vector2(0, distance),
@@ -273,7 +273,7 @@ namespace osu.Game.Rulesets.Osu.Tests
             {
                 StartTime = Time.Current + time_offset,
                 Position = new Vector2(-max_length / 2, 0),
-                Path = new SliderPath(PathType.PERFECTCURVE, new[]
+                Path = new SliderPath(PathType.PERFECT_CURVE, new[]
                 {
                     Vector2.Zero,
                     new Vector2(max_length / 2, max_length / 2),

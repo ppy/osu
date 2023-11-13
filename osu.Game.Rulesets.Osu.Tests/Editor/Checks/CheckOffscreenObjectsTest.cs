@@ -214,7 +214,7 @@ namespace osu.Game.Rulesets.Osu.Tests.Editor.Checks
                         Path = new SliderPath(new[]
                         {
                             // Circular arc shoots over the top of the screen.
-                            new PathControlPoint(new Vector2(0, 0), PathType.PERFECTCURVE),
+                            new PathControlPoint(new Vector2(0, 0), PathType.PERFECT_CURVE),
                             new PathControlPoint(new Vector2(-100, -200)),
                             new PathControlPoint(new Vector2(100, -200))
                         }),

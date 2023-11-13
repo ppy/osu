@@ -224,19 +224,19 @@ namespace osu.Game.Rulesets.Objects.Legacy
             {
                 default:
                 case 'C':
-                    return new PathType(SplineType.Catmull);
+                    return PathType.CATMULL;
 
                 case 'B':
                     if (input.Length > 1 && int.TryParse(input.Substring(1), out int degree) && degree > 0)
-                        return new PathType { Type = SplineType.BSpline, Degree = degree };
+                        return PathType.BSpline(degree);
 
                     return new PathType(SplineType.BSpline);
 
                 case 'L':
-                    return new PathType(SplineType.Linear);
+                    return PathType.LINEAR;
 
                 case 'P':
-                    return new PathType(SplineType.PerfectCurve);
+                    return PathType.PERFECT_CURVE;
             }
         }
 
@@ -323,7 +323,7 @@ namespace osu.Game.Rulesets.Objects.Legacy
                 readPoint(endPoint, offset, out vertices[^1]);
 
             // Edge-case rules (to match stable).
-            if (type == PathType.PERFECTCURVE)
+            if (type == PathType.PERFECT_CURVE)
             {
                 if (vertices.Length != 3)
                     type = PathType.BEZIER;

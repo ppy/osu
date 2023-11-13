@@ -126,9 +126,9 @@ namespace osu.Game.Rulesets.Objects
                 var segmentVertices = vertices.AsSpan().Slice(start, i - start + 1);
                 var segmentType = controlPoints[start].Type ?? PathType.LINEAR;
 
-                switch (segmentType)
+                switch (segmentType.Type)
                 {
-                    case { Type: SplineType.Catmull }:
+                    case SplineType.Catmull:
                         foreach (var segment in ConvertCatmullToBezierAnchors(segmentVertices))
                         {
                             for (int j = 0; j < segment.Length - 1; j++)
@@ -139,7 +139,7 @@ namespace osu.Game.Rulesets.Objects
 
                         break;
 
-                    case { Type: SplineType.Linear }:
+                    case SplineType.Linear:
                         foreach (var segment in ConvertLinearToBezierAnchors(segmentVertices))
                         {
                             for (int j = 0; j < segment.Length - 1; j++)
@@ -150,7 +150,7 @@ namespace osu.Game.Rulesets.Objects
 
                         break;
 
-                    case { Type: SplineType.PerfectCurve }:
+                    case SplineType.PerfectCurve:
                         var circleResult = ConvertCircleToBezierAnchors(segmentVertices);
 
                         for (int j = 0; j < circleResult.Length - 1; j++)

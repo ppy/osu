@@ -53,7 +53,7 @@ namespace osu.Game.Rulesets.Objects
             inheritedLinearPoints.ForEach(p => p.Type = null);
 
             // Recalculate middle perfect curve control points at the end of the slider path.
-            if (controlPoints.Count >= 3 && controlPoints[^3].Type == PathType.PERFECTCURVE && controlPoints[^2].Type is null && segmentEnds.Any())
+            if (controlPoints.Count >= 3 && controlPoints[^3].Type == PathType.PERFECT_CURVE && controlPoints[^2].Type is null && segmentEnds.Any())
             {
                 double lastSegmentStart = segmentEnds.Length > 1 ? segmentEnds[^2] : 0;
                 double lastSegmentEnd = segmentEnds[^1];
