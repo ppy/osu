@@ -16,13 +16,16 @@ namespace osu.Game.Rulesets.Osu.Scoring
     /// Reference implementation for osu!stable's HP drain.
     /// Cannot be used for gameplay.
     /// </summary>
-    public partial class LegacyOsuHealthProcessor : LegacyDrainingHealthProcessor
+    public partial class LegacyOsuHealthProcessor : DrainingHealthProcessor
     {
         private const double hp_bar_maximum = 200;
         private const double hp_combo_geki = 14;
         private const double hp_hit_300 = 6;
         private const double hp_slider_repeat = 4;
         private const double hp_slider_tick = 3;
+
+        public Action<string>? OnIterationFail;
+        public Action<string>? OnIterationSuccess;
 
         private double lowestHpEver;
         private double lowestHpEnd;
@@ -187,13 +190,11 @@ namespace osu.Game.Rulesets.Osu.Scoring
 
                 if (fail)
                 {
-                    if (Log)
-                        Console.WriteLine($"FAILED drop {testDrop / hp_bar_maximum}: {failReason}");
+                    OnIterationFail?.Invoke($"FAILED drop {testDrop / hp_bar_maximum}: {failReason}");
                     continue;
                 }
 
-                if (Log)
-                    Console.WriteLine($"PASSED drop {testDrop / hp_bar_maximum}");
+                OnIterationSuccess?.Invoke($"PASSED drop {testDrop / hp_bar_maximum}");
                 return testDrop / hp_bar_maximum;
             } while (true);
 
