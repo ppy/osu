@@ -195,7 +195,7 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders
             {
                 var cps = self.bSplineBuilder.GetControlPoints();
                 self.HitObject.Path.ControlPoints.RemoveRange(1, self.HitObject.Path.ControlPoints.Count - 1);
-                self.HitObject.Path.ControlPoints.AddRange(cps.Select(v => new PathControlPoint(v)));
+                self.HitObject.Path.ControlPoints.AddRange(cps.Skip(1).Select(v => new PathControlPoint(v)));
             }, this);
         }
 
