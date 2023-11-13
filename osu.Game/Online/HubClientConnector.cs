@@ -102,6 +102,8 @@ namespace osu.Game.Online
             return Task.FromResult((PersistentEndpointClient)new HubClient(newConnection));
         }
 
+        Task IHubClientConnector.Disconnect() => base.Disconnect();
+
         protected override string ClientName { get; }
     }
 }

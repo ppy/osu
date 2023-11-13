@@ -33,7 +33,8 @@ namespace osu.Game.Tests.Visual.Spectator
 
         public int FrameSendAttempts { get; private set; }
 
-        public override IBindable<bool> IsConnected { get; } = new Bindable<bool>(true);
+        public override IBindable<bool> IsConnected => isConnected;
+        private readonly BindableBool isConnected = new BindableBool(true);
 
         public IReadOnlyDictionary<int, ReplayFrame> LastReceivedUserFrames => lastReceivedUserFrames;
 
@@ -178,6 +179,12 @@ namespace osu.Game.Tests.Visual.Spectator
                 Mods = userModsDictionary[userId],
                 State = SpectatedUserState.Playing
             });
+        }
+
+        protected override Task DisconnectInternal()
+        {
+            isConnected.Value = false;
+            return Task.CompletedTask;
         }
     }
 }

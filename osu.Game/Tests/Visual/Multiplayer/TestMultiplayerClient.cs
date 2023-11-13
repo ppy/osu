@@ -658,5 +658,11 @@ namespace osu.Game.Tests.Visual.Multiplayer
             PlayedAt = item.PlayedAt,
             StarRating = item.Beatmap.StarRating,
         };
+
+        public override Task DisconnectInternal()
+        {
+            isConnected.Value = false;
+            return Task.CompletedTask;
+        }
     }
 }

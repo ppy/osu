@@ -174,6 +174,12 @@ namespace osu.Game.Online.Spectator
             return Task.CompletedTask;
         }
 
+        Task IStatefulUserHubClient.DisconnectRequested()
+        {
+            Schedule(() => DisconnectInternal());
+            return Task.CompletedTask;
+        }
+
         public void BeginPlaying(long? scoreToken, GameplayState state, Score score)
         {
             // This schedule is only here to match the one below in `EndPlaying`.
@@ -290,6 +296,8 @@ namespace osu.Game.Online.Spectator
         protected abstract Task WatchUserInternal(int userId);
 
         protected abstract Task StopWatchingUserInternal(int userId);
+
+        protected abstract Task DisconnectInternal();
 
         protected override void Update()
         {

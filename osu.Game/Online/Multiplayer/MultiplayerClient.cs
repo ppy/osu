@@ -357,6 +357,8 @@ namespace osu.Game.Online.Multiplayer
 
         public abstract Task ChangeBeatmapAvailability(BeatmapAvailability newBeatmapAvailability);
 
+        public abstract Task DisconnectInternal();
+
         /// <summary>
         /// Change the local user's mods in the currently joined room.
         /// </summary>
@@ -875,6 +877,12 @@ namespace osu.Game.Online.Multiplayer
             });
 
             return tcs.Task;
+        }
+
+        Task IStatefulUserHubClient.DisconnectRequested()
+        {
+            Schedule(() => DisconnectInternal());
+            return Task.CompletedTask;
         }
     }
 }
