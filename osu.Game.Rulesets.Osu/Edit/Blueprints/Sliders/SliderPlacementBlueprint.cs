@@ -86,6 +86,13 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders
                     bSplineBuilder.Tolerance = e.NewValue;
                 updateSliderPathFromBSplineBuilder();
             }, true);
+
+            drawingSettingsProvider.CornerThreshold.BindValueChanged(e =>
+            {
+                if (bSplineBuilder.CornerThreshold != e.NewValue)
+                    bSplineBuilder.CornerThreshold = e.NewValue;
+                updateSliderPathFromBSplineBuilder();
+            }, true);
         }
 
         [Resolved]
@@ -100,8 +107,9 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders
                 case SliderPlacementState.Initial:
                     BeginPlacement();
 
-                    double? nearestSliderVelocity = (editorBeatmap.HitObjects
-                                                                  .LastOrDefault(h => h is Slider && h.GetEndTime() < HitObject.StartTime) as Slider)?.SliderVelocityMultiplier;
+                    double? nearestSliderVelocity = (editorBeatmap
+                        .HitObjects
+                        .LastOrDefault(h => h is Slider && h.GetEndTime() < HitObject.StartTime) as Slider)?.SliderVelocityMultiplier;
 
                     HitObject.SliderVelocityMultiplier = nearestSliderVelocity ?? 1;
                     HitObject.Position = ToLocalSpace(result.ScreenSpacePosition);
@@ -193,9 +201,19 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders
         {
             Scheduler.AddOnce(static self =>
             {
-                var cps = self.bSplineBuilder.GetControlPoints();
-                self.HitObject.Path.ControlPoints.RemoveRange(1, self.HitObject.Path.ControlPoints.Count - 1);
-                self.HitObject.Path.ControlPoints.AddRange(cps.Skip(1).Select(v => new PathControlPoint(v)));
+                var cps = self.bSplineBuilder.ControlPoints;
+                var sliderCps = self.HitObject.Path.ControlPoints;
+                sliderCps.RemoveRange(1, sliderCps.Count - 1);
+
+                // Add the control points from the BSpline builder while converting control points that repeat
+                // three or more times to a single PathControlPoint with linear type.
+                for (int i = 1; i < cps.Count; i++)
+                {
+                    bool isSharp = i < cps.Count - 2 && cps[i] == cps[i + 1] && cps[i] == cps[i + 2];
+                    sliderCps.Add(new PathControlPoint(cps[i], isSharp ? PathType.BSpline(3) : null));
+                    if (isSharp)
+                        i += 2;
+                }
             }, this);
         }
 

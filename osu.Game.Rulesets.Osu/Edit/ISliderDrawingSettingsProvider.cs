@@ -8,5 +8,6 @@ namespace osu.Game.Rulesets.Osu.Edit
     public interface ISliderDrawingSettingsProvider
     {
         BindableFloat Tolerance { get; }
+        BindableFloat CornerThreshold { get; }
     }
 }
