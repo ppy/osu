@@ -12,20 +12,34 @@ namespace osu.Game.Rulesets.Osu.Edit
 {
     public partial class OsuSliderDrawingSettingsProvider : Drawable, ISliderDrawingSettingsProvider, IToolboxAttachment
     {
-        public BindableFloat Tolerance { get; } = new BindableFloat(0.1f)
+        public BindableFloat Tolerance { get; } = new BindableFloat(1.5f)
+        {
+            MinValue = 0.05f,
+            MaxValue = 3f,
+            Precision = 0.01f
+        };
+
+        private readonly BindableInt sliderTolerance = new BindableInt(50)
+        {
+            MinValue = 5,
+            MaxValue = 100
+        };
+
+        public BindableFloat CornerThreshold { get; } = new BindableFloat(0.4f)
         {
             MinValue = 0.05f,
             MaxValue = 1f,
             Precision = 0.01f
         };
 
-        private readonly BindableInt sliderTolerance = new BindableInt(10)
+        private readonly BindableInt sliderCornerThreshold = new BindableInt(40)
         {
             MinValue = 5,
             MaxValue = 100
         };
 
         private ExpandableSlider<int> toleranceSlider = null!;
+        private ExpandableSlider<int> cornerThresholdSlider = null!;
 
         protected override void LoadComplete()
         {
@@ -33,15 +47,27 @@ namespace osu.Game.Rulesets.Osu.Edit
 
             sliderTolerance.BindValueChanged(v =>
             {
-                float newValue = v.NewValue / 100f;
-                if (!Precision.AlmostEquals(newValue, Tolerance.Value))
+                float newValue = v.NewValue / 33f;
+                if (!Precision.AlmostEquals(newValue, Tolerance.Value, 1e-7f))
                     Tolerance.Value = newValue;
             });
             Tolerance.BindValueChanged(v =>
             {
-                int newValue = (int)Math.Round(v.NewValue * 100f);
+                int newValue = (int)Math.Round(v.NewValue * 33f);
                 if (sliderTolerance.Value != newValue)
                     sliderTolerance.Value = newValue;
+            });
+            sliderCornerThreshold.BindValueChanged(v =>
+            {
+                float newValue = v.NewValue / 100f;
+                if (!Precision.AlmostEquals(newValue, CornerThreshold.Value, 1e-7f))
+                    CornerThreshold.Value = newValue;
+            });
+            CornerThreshold.BindValueChanged(v =>
+            {
+                int newValue = (int)Math.Round(v.NewValue * 100f);
+                if (sliderCornerThreshold.Value != newValue)
+                    sliderCornerThreshold.Value = newValue;
             });
         }
 
@@ -54,6 +80,10 @@ namespace osu.Game.Rulesets.Osu.Edit
                     toleranceSlider = new ExpandableSlider<int>
                     {
                         Current = sliderTolerance
+                    },
+                    cornerThresholdSlider = new ExpandableSlider<int>
+                    {
+                        Current = sliderCornerThreshold
                     }
                 }
             });
@@ -62,6 +92,12 @@ namespace osu.Game.Rulesets.Osu.Edit
             {
                 toleranceSlider.ContractedLabelText = $"C. P. S.: {e.NewValue:N0}";
                 toleranceSlider.ExpandedLabelText = $"Control Point Spacing: {e.NewValue:N0}";
+            }, true);
+
+            sliderCornerThreshold.BindValueChanged(e =>
+            {
+                cornerThresholdSlider.ContractedLabelText = $"C. T.: {e.NewValue:N0}";
+                cornerThresholdSlider.ExpandedLabelText = $"Corner Threshold: {e.NewValue:N0}";
             }, true);
         }
     }
