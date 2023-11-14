@@ -115,6 +115,8 @@ namespace osu.Game.Audio
 
             Stop();
             Track?.Dispose();
+
+            Track = null;
         }
     }
 }
