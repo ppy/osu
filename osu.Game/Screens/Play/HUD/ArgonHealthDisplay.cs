@@ -141,7 +141,13 @@ namespace osu.Game.Screens.Play.HUD
 
             Current.BindValueChanged(_ => Scheduler.AddOnce(updateCurrent), true);
 
+            // we're about to set `RelativeSizeAxes` depending on the value of `UseRelativeSize`.
+            // setting `RelativeSizeAxes` internally transforms absolute sizing to relative and back to keep the size the same,
+            // but that is not what we want in this case, since the width at this point is valid in the *target* sizing mode.
+            // to counteract this, store the numerical value here, and restore it after setting the correct initial relative sizing axes.
+            float previousWidth = Width;
             UseRelativeSize.BindValueChanged(v => RelativeSizeAxes = v.NewValue ? Axes.X : Axes.None, true);
+            Width = previousWidth;
 
             BarHeight.BindValueChanged(_ => updatePath(), true);
         }
