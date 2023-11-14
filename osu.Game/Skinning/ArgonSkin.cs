@@ -8,7 +8,6 @@ using osu.Framework.Audio.Sample;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Textures;
-using osu.Framework.IO.Stores;
 using osu.Game.Audio;
 using osu.Game.Beatmaps.Formats;
 using osu.Game.Extensions;
@@ -44,8 +43,7 @@ namespace osu.Game.Skinning
         public ArgonSkin(SkinInfo skin, IStorageResourceProvider resources)
             : base(
                 skin,
-                resources,
-                new NamespacedResourceStore<byte[]>(resources.Resources, "Skins/Argon")
+                resources
             )
         {
             Resources = resources;
