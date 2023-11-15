@@ -49,6 +49,16 @@ namespace osu.Game.Localisation.SkinComponents
         /// </summary>
         public static LocalisableString CornerRadiusDescription => new TranslatableString(getKey(@"corner_radius_description"), "How rounded the corners should be.");
 
+        /// <summary>
+        /// "Show label"
+        /// </summary>
+        public static LocalisableString ShowLabel => new TranslatableString(getKey(@"show_label"), @"Show label");
+
+        /// <summary>
+        /// "Whether the label should be shown."
+        /// </summary>
+        public static LocalisableString ShowLabelDescription => new TranslatableString(getKey(@"show_label_description"), @"Whether the label should be shown.");
+
         private static string getKey(string key) => $"{prefix}:{key}";
     }
 }
