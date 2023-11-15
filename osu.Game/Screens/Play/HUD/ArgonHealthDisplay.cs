@@ -293,9 +293,13 @@ namespace osu.Game.Screens.Play.HUD
 
             void enforceMinimumWidth()
             {
-                var relativeAxes = RelativeSizeAxes;
+                // Switch to absolute in order to be able to define a minimum width.
+                // Then switch back is required. Framework will handle the conversion for us.
+                Axes relativeAxes = RelativeSizeAxes;
                 RelativeSizeAxes = Axes.None;
+
                 Width = padding;
+
                 RelativeSizeAxes = relativeAxes;
             }
 
