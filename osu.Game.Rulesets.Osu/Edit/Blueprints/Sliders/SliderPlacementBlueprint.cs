@@ -108,8 +108,8 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders
                     BeginPlacement();
 
                     double? nearestSliderVelocity = (editorBeatmap
-                        .HitObjects
-                        .LastOrDefault(h => h is Slider && h.GetEndTime() < HitObject.StartTime) as Slider)?.SliderVelocityMultiplier;
+                                                     .HitObjects
+                                                     .LastOrDefault(h => h is Slider && h.GetEndTime() < HitObject.StartTime) as Slider)?.SliderVelocityMultiplier;
 
                     HitObject.SliderVelocityMultiplier = nearestSliderVelocity ?? 1;
                     HitObject.Position = ToLocalSpace(result.ScreenSpacePosition);
