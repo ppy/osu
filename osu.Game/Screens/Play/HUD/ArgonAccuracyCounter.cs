@@ -64,7 +64,7 @@ namespace osu.Game.Screens.Play.HUD
                         new Container
                         {
                             AutoSizeAxes = Axes.Both,
-                            Child = wholePart = new ArgonCounterTextComponent(Anchor.TopRight, "ACCURACY")
+                            Child = wholePart = new ArgonCounterTextComponent(Anchor.TopRight, BeatmapsetsStrings.ShowScoreboardHeadersAccuracy.ToUpper())
                             {
                                 RequiredDisplayDigits = { Value = 3 },
                                 WireframeOpacity = { BindTarget = WireframeOpacity }
