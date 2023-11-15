@@ -25,7 +25,7 @@ namespace osu.Game.Overlays.Login
     {
         private bool bounding = true;
 
-        private LoginForm? form;
+        private Drawable? form;
 
         [Resolved]
         private OsuColour colours { get; set; } = null!;
@@ -79,6 +79,10 @@ namespace osu.Game.Overlays.Login
                     {
                         RequestHide = RequestHide
                     };
+                    break;
+
+                case APIState.RequiresAuthentication:
+                    Child = form = new AccountVerificationForm();
                     break;
 
                 case APIState.Failing:
