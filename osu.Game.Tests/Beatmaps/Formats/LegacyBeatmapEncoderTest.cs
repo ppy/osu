@@ -26,6 +26,7 @@ using osu.Game.Rulesets.Osu.Objects;
 using osu.Game.Rulesets.Taiko;
 using osu.Game.Skinning;
 using osu.Game.Tests.Resources;
+using osu.Game.Utils;
 using osuTK;
 
 namespace osu.Game.Tests.Beatmaps.Formats

@@ -2,6 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using osu.Game.Rulesets.Judgements;
+using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Scoring;
 
 namespace osu.Game.Rulesets.Osu.Objects
@@ -9,6 +10,8 @@ namespace osu.Game.Rulesets.Osu.Objects
     public class SpinnerBonusTick : SpinnerTick
     {
         public override Judgement CreateJudgement() => new OsuSpinnerBonusTickJudgement();
+
+        protected override HitObject CreateInstance() => new SpinnerBonusTick();
 
         public class OsuSpinnerBonusTickJudgement : OsuSpinnerTickJudgement
         {

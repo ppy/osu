@@ -1,13 +1,15 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System.Collections.Generic;
 using MessagePack;
 using osu.Game.Online.Spectator;
+using osu.Game.Utils;
 
 namespace osu.Game.Rulesets.Replays
 {
     [MessagePackObject]
-    public class ReplayFrame
+    public class ReplayFrame : IDeepCloneable<ReplayFrame>
     {
         /// <summary>
         /// The time at which this <see cref="ReplayFrame"/> takes place.
@@ -29,6 +31,21 @@ namespace osu.Game.Rulesets.Replays
         public ReplayFrame(double time)
         {
             Time = time;
+        }
+
+        public ReplayFrame DeepClone(IDictionary<object, object> referenceLookup)
+        {
+            if (referenceLookup.TryGetValue(this, out object? existing))
+                return (ReplayFrame)existing;
+
+            var clone = new ReplayFrame(Time)
+            {
+                Header = Header?.DeepClone(referenceLookup)
+            };
+
+            referenceLookup[this] = clone;
+
+            return clone;
         }
     }
 }

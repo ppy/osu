@@ -68,5 +68,7 @@ namespace osu.Game.Beatmaps.ControlPoints
 
         // ReSharper disable once NonReadonlyMemberInGetHashCode
         public override int GetHashCode() => HashCode.Combine(base.GetHashCode(), SliderVelocity, GenerateTicks);
+
+        protected override ControlPoint CreateInstance() => new DifficultyControlPoint();
     }
 }

@@ -162,5 +162,22 @@ namespace osu.Game.Rulesets.Catch.Objects
         public double Distance => Path.Distance;
 
         public IList<IList<HitSampleInfo>> NodeSamples { get; set; } = new List<IList<HitSampleInfo>>();
+
+        protected override void CopyFrom(HitObject other, IDictionary<object, object>? referenceLookup = null)
+        {
+            base.CopyFrom(other, referenceLookup);
+
+            if (other is not JuiceStream juiceStream)
+                throw new ArgumentException($"{nameof(other)} must be of type {nameof(JuiceStream)}");
+
+            velocityFactor = juiceStream.velocityFactor;
+            tickDistanceFactor = juiceStream.tickDistanceFactor;
+            RepeatCount = juiceStream.RepeatCount;
+            Path = juiceStream.Path;
+            NodeSamples = juiceStream.NodeSamples.Select(s => (IList<HitSampleInfo>)s.Select(s2 => s2.DeepClone(referenceLookup)).ToList()).ToList();
+            SliderVelocityMultiplier = juiceStream.SliderVelocityMultiplier;
+        }
+
+        protected override HitObject CreateInstance() => new JuiceStream();
     }
 }

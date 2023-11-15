@@ -2,6 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using osu.Game.Rulesets.Judgements;
+using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Osu.Judgements;
 
 namespace osu.Game.Rulesets.Osu.Objects
@@ -9,5 +10,7 @@ namespace osu.Game.Rulesets.Osu.Objects
     public class HitCircle : OsuHitObject
     {
         public override Judgement CreateJudgement() => new OsuJudgement();
+
+        protected override HitObject CreateInstance() => new HitCircle();
     }
 }

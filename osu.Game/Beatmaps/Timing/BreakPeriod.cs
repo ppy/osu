@@ -1,11 +1,13 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System.Collections.Generic;
 using osu.Game.Screens.Play;
+using osu.Game.Utils;
 
 namespace osu.Game.Beatmaps.Timing
 {
-    public class BreakPeriod
+    public class BreakPeriod : IDeepCloneable<BreakPeriod>
     {
         /// <summary>
         /// The minimum duration required for a break to have any effect.
@@ -49,5 +51,16 @@ namespace osu.Game.Beatmaps.Timing
         /// <param name="time">The time to check in milliseconds.</param>
         /// <returns>Whether the time falls within this <see cref="BreakPeriod"/>.</returns>
         public bool Contains(double time) => time >= StartTime && time <= EndTime - BreakOverlay.BREAK_FADE_DURATION;
+
+        public BreakPeriod DeepClone(IDictionary<object, object> referenceLookup)
+        {
+            if (referenceLookup.TryGetValue(this, out object? existing))
+                return (BreakPeriod)existing;
+
+            var clone = (BreakPeriod)MemberwiseClone();
+            referenceLookup[this] = clone;
+
+            return clone;
+        }
     }
 }

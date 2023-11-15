@@ -77,6 +77,8 @@ namespace osu.Game.Rulesets.Osu.Mods
             }
 
             public override Judgement CreateJudgement() => new OsuJudgement();
+
+            protected override HitObject CreateInstance() => new StrictTrackingSliderTailCircle(null!);
         }
 
         private partial class StrictTrackingDrawableSliderTail : DrawableSliderTail
@@ -98,6 +100,10 @@ namespace osu.Game.Rulesets.Osu.Mods
                 ComboOffset = original.ComboOffset;
                 TickDistanceMultiplier = original.TickDistanceMultiplier;
                 SliderVelocityMultiplier = original.SliderVelocityMultiplier;
+            }
+
+            private StrictTrackingSlider()
+            {
             }
 
             protected override void CreateNestedHitObjects(CancellationToken cancellationToken)
@@ -154,6 +160,8 @@ namespace osu.Game.Rulesets.Osu.Mods
 
                 UpdateNestedSamples();
             }
+
+            protected override HitObject CreateInstance() => new StrictTrackingSlider();
         }
     }
 }

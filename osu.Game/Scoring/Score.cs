@@ -3,6 +3,7 @@
 
 #nullable disable
 
+using System.Collections.Generic;
 using osu.Game.Replays;
 using osu.Game.Utils;
 
@@ -20,6 +21,11 @@ namespace osu.Game.Scoring
                 ScoreInfo = ScoreInfo.DeepClone(),
                 Replay = Replay.DeepClone(),
             };
+        }
+
+        Score IDeepCloneable<Score>.DeepClone(IDictionary<object, object> referenceLookup)
+        {
+            return DeepClone();
         }
     }
 }

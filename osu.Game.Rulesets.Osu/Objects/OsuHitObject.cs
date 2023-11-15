@@ -2,6 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using osu.Framework.Bindables;
 using osu.Game.Beatmaps;
@@ -160,5 +161,25 @@ namespace osu.Game.Rulesets.Osu.Objects
         }
 
         protected override HitWindows CreateHitWindows() => new OsuHitWindows();
+
+        protected override void CopyFrom(HitObject other, IDictionary<object, object>? referenceLookup = null)
+        {
+            base.CopyFrom(other, referenceLookup);
+
+            if (other is not OsuHitObject osuObject)
+                throw new ArgumentException($"{nameof(other)} must be of type {nameof(OsuHitObject)}");
+
+            TimePreempt = osuObject.TimePreempt;
+            TimeFadeIn = osuObject.TimeFadeIn;
+            Position = osuObject.Position;
+            Scale = osuObject.Scale;
+            NewCombo = osuObject.NewCombo;
+            StackHeight = osuObject.StackHeight;
+            ComboOffset = osuObject.ComboOffset;
+            IndexInCurrentCombo = osuObject.IndexInCurrentCombo;
+            ComboIndex = osuObject.ComboIndex;
+            ComboIndexWithOffsets = osuObject.ComboIndexWithOffsets;
+            LastInCombo = osuObject.LastInCombo;
+        }
     }
 }

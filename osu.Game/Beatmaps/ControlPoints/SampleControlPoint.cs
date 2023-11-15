@@ -94,5 +94,7 @@ namespace osu.Game.Beatmaps.ControlPoints
                && SampleVolume == other.SampleVolume;
 
         public override int GetHashCode() => HashCode.Combine(base.GetHashCode(), SampleBank, SampleVolume);
+
+        protected override ControlPoint CreateInstance() => new SampleControlPoint();
     }
 }

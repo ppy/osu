@@ -97,5 +97,7 @@ namespace osu.Game.Beatmaps.Legacy
 
             base.GroupItemRemoved(controlPoint);
         }
+
+        protected override ControlPointInfo CreateInstance() => new LegacyControlPointInfo();
     }
 }

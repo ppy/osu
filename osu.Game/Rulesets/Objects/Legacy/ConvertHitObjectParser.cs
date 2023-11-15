@@ -557,6 +557,8 @@ namespace osu.Game.Rulesets.Objects.Legacy
                 => obj is LegacyHitSampleInfo other && Equals(other);
 
             public override int GetHashCode() => HashCode.Combine(base.GetHashCode(), CustomSampleBank, IsLayered);
+
+            protected override HitSampleInfo CreateInstance() => new LegacyHitSampleInfo(Name, Bank, Volume, CustomSampleBank, IsLayered);
         }
 
         private class FileHitSampleInfo : LegacyHitSampleInfo, IEquatable<FileHitSampleInfo>
@@ -589,6 +591,8 @@ namespace osu.Game.Rulesets.Objects.Legacy
                 => obj is FileHitSampleInfo other && Equals(other);
 
             public override int GetHashCode() => HashCode.Combine(base.GetHashCode(), Filename);
+
+            protected override HitSampleInfo CreateInstance() => new FileHitSampleInfo(Filename, Volume);
         }
     }
 }

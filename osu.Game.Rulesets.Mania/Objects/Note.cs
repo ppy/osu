@@ -4,6 +4,7 @@
 using System.Threading;
 using osu.Game.Rulesets.Judgements;
 using osu.Game.Rulesets.Mania.Judgements;
+using osu.Game.Rulesets.Objects;
 
 namespace osu.Game.Rulesets.Mania.Objects
 {
@@ -20,5 +21,7 @@ namespace osu.Game.Rulesets.Mania.Objects
 
             AddNested(new NotePerfectBonus { StartTime = StartTime });
         }
+
+        protected override HitObject CreateInstance() => new Note();
     }
 }

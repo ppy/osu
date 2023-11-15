@@ -7,6 +7,7 @@ using osu.Game.Beatmaps.ControlPoints;
 using osu.Game.Beatmaps.Timing;
 using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Scoring;
+using osu.Game.Utils;
 
 namespace osu.Game.Beatmaps
 {
@@ -14,7 +15,7 @@ namespace osu.Game.Beatmaps
     /// A materialised beatmap.
     /// Generally this interface will be implemented alongside <see cref="IBeatmap{T}"/>, which exposes the ruleset-typed hit objects.
     /// </summary>
-    public interface IBeatmap
+    public interface IBeatmap : IDeepCloneable<IBeatmap>
     {
         /// <summary>
         /// This beatmap's info.
@@ -60,12 +61,6 @@ namespace osu.Game.Beatmaps
         /// Finds the most common beat length represented by the control points in this beatmap.
         /// </summary>
         double GetMostCommonBeatLength();
-
-        /// <summary>
-        /// Creates a shallow-clone of this beatmap and returns it.
-        /// </summary>
-        /// <returns>The shallow-cloned beatmap.</returns>
-        IBeatmap Clone();
     }
 
     /// <summary>

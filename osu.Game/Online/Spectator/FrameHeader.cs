@@ -7,12 +7,13 @@ using MessagePack;
 using Newtonsoft.Json;
 using osu.Game.Rulesets.Scoring;
 using osu.Game.Scoring;
+using osu.Game.Utils;
 
 namespace osu.Game.Online.Spectator
 {
     [Serializable]
     [MessagePackObject]
-    public class FrameHeader
+    public class FrameHeader : IDeepCloneable<FrameHeader>
     {
         /// <summary>
         /// The total score.
@@ -84,6 +85,29 @@ namespace osu.Game.Online.Spectator
             Statistics = statistics;
             ScoreProcessorStatistics = scoreProcessorStatistics;
             ReceivedTime = receivedTime;
+        }
+
+        private FrameHeader()
+        {
+            // this constructor is only used for cloning, so
+            // we avoid redundant allocations by forcibly initializing
+            // to null here.
+            ScoreProcessorStatistics = null!;
+            Statistics = null!;
+        }
+
+        public FrameHeader DeepClone(IDictionary<object, object> referenceLookup)
+        {
+            if (referenceLookup.TryGetValue(this, out object? existing))
+                return (FrameHeader)existing;
+
+            var clone = (FrameHeader)MemberwiseClone();
+            referenceLookup[this] = clone;
+
+            clone.Statistics = new Dictionary<HitResult, int>(Statistics);
+            clone.ScoreProcessorStatistics = ScoreProcessorStatistics.DeepClone(referenceLookup);
+
+            return clone;
         }
     }
 }

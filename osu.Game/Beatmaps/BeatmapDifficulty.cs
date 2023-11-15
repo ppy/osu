@@ -1,12 +1,14 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System.Collections.Generic;
+using osu.Game.Utils;
 using Realms;
 
 namespace osu.Game.Beatmaps
 {
     [MapTo("BeatmapDifficulty")]
-    public class BeatmapDifficulty : EmbeddedObject, IBeatmapDifficultyInfo
+    public class BeatmapDifficulty : EmbeddedObject, IBeatmapDifficultyInfo, IDeepCloneable<BeatmapDifficulty>
     {
         /// <summary>
         /// The default value used for all difficulty settings except <see cref="SliderMultiplier"/> and <see cref="SliderTickRate"/>.
@@ -55,6 +57,17 @@ namespace osu.Game.Beatmaps
 
             SliderMultiplier = other.SliderMultiplier;
             SliderTickRate = other.SliderTickRate;
+        }
+
+        public BeatmapDifficulty DeepClone(IDictionary<object, object> referenceLookup)
+        {
+            if (referenceLookup.TryGetValue(this, out object? existing))
+                return (BeatmapDifficulty)existing;
+
+            var clone = (BeatmapDifficulty)MemberwiseClone();
+            referenceLookup[this] = clone;
+
+            return clone;
         }
     }
 }

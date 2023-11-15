@@ -6,6 +6,9 @@ using osu.Game.Rulesets.Objects.Types;
 using osu.Game.Rulesets.Judgements;
 using osu.Game.Rulesets.Scoring;
 using osu.Game.Rulesets.Taiko.Judgements;
+using osu.Game.Rulesets.Objects;
+using System.Collections.Generic;
+using System;
 
 namespace osu.Game.Rulesets.Taiko.Objects
 {
@@ -41,5 +44,18 @@ namespace osu.Game.Rulesets.Taiko.Objects
         public override Judgement CreateJudgement() => new TaikoSwellJudgement();
 
         protected override HitWindows CreateHitWindows() => HitWindows.Empty;
+
+        protected override void CopyFrom(HitObject other, IDictionary<object, object>? referenceLookup = null)
+        {
+            base.CopyFrom(other, referenceLookup);
+
+            if (other is not Swell swell)
+                throw new ArgumentException($"{nameof(other)} must be of type {nameof(Swell)}");
+
+            Duration = swell.Duration;
+            RequiredHits = swell.RequiredHits;
+        }
+
+        protected override HitObject CreateInstance() => new Swell();
     }
 }

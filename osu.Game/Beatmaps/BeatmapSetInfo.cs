@@ -9,6 +9,7 @@ using Newtonsoft.Json;
 using osu.Game.Database;
 using osu.Game.Extensions;
 using osu.Game.Models;
+using osu.Game.Utils;
 using Realms;
 
 namespace osu.Game.Beatmaps
@@ -17,7 +18,7 @@ namespace osu.Game.Beatmaps
     /// A realm model containing metadata for a beatmap set (containing multiple <see cref="BeatmapInfo"/>s).
     /// </summary>
     [MapTo("BeatmapSet")]
-    public class BeatmapSetInfo : RealmObject, IHasGuidPrimaryKey, IHasRealmFiles, ISoftDelete, IEquatable<BeatmapSetInfo>, IBeatmapSetInfo
+    public class BeatmapSetInfo : RealmObject, IHasGuidPrimaryKey, IHasRealmFiles, ISoftDelete, IEquatable<BeatmapSetInfo>, IBeatmapSetInfo, IDeepCloneable<BeatmapSetInfo>
     {
         [PrimaryKey]
         public Guid ID { get; set; }
@@ -93,6 +94,37 @@ namespace osu.Game.Beatmaps
         public override string ToString() => Metadata.GetDisplayString();
 
         public bool Equals(IBeatmapSetInfo? other) => other is BeatmapSetInfo b && Equals(b);
+
+        public BeatmapSetInfo DeepClone(IDictionary<object, object> referenceLookup)
+        {
+            if (referenceLookup.TryGetValue(this, out object? existing))
+                return (BeatmapSetInfo)existing;
+
+            var clone = this.Detach();
+
+            if (ReferenceEquals(clone, this))
+            {
+                clone = new BeatmapSetInfo
+                {
+                    ID = ID,
+                    OnlineID = OnlineID,
+                    DateAdded = DateAdded,
+                    DateSubmitted = DateSubmitted,
+                    DateRanked = DateRanked,
+                    StatusInt = StatusInt,
+                    DeletePending = DeletePending,
+                    Hash = Hash,
+                    Protected = Protected
+                };
+            }
+
+            referenceLookup[this] = clone;
+
+            clone.Beatmaps.AddRange(Beatmaps.Select(b => b.DeepClone(referenceLookup)));
+            clone.Files.AddRange(Files.Select(f => f.DeepClone(referenceLookup)));
+
+            return clone;
+        }
 
         IEnumerable<IBeatmapInfo> IBeatmapSetInfo.Beatmaps => Beatmaps;
 
