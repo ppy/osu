@@ -216,7 +216,10 @@ namespace osu.Game.Skinning
                                     },
                                     new ArgonScoreCounter(),
                                     new ArgonHealthDisplay(),
-                                    new BoxElement(),
+                                    new BoxElement
+                                    {
+                                        CornerRadius = { Value = 0.5f }
+                                    },
                                     new ArgonAccuracyCounter(),
                                     new ArgonComboCounter
                                     {
