@@ -20,11 +20,11 @@ namespace osu.Game.Skinning.Components
 
         [SettingSource(typeof(SkinnableComponentStrings), nameof(SkinnableComponentStrings.CornerRadius), nameof(SkinnableComponentStrings.CornerRadiusDescription),
             SettingControlType = typeof(SettingsPercentageSlider<float>))]
-        public new BindableFloat CornerRadius { get; } = new BindableFloat(1)
+        public new BindableFloat CornerRadius { get; } = new BindableFloat(0.25f)
         {
-            Precision = 0.01f,
             MinValue = 0,
-            MaxValue = 1,
+            MaxValue = 0.5f,
+            Precision = 0.01f
         };
 
         public BoxElement()
@@ -47,7 +47,7 @@ namespace osu.Game.Skinning.Components
         {
             base.Update();
 
-            base.CornerRadius = CornerRadius.Value * Math.Min(DrawWidth, DrawHeight) * 0.5f;
+            base.CornerRadius = CornerRadius.Value * Math.Min(DrawWidth, DrawHeight);
         }
     }
 }
