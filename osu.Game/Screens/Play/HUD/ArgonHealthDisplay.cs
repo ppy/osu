@@ -89,6 +89,11 @@ namespace osu.Game.Screens.Play.HUD
 
         public const float MAIN_PATH_RADIUS = 10f;
 
+        private const float curve_start_offset = 70;
+        private const float curve_end_offset = 40;
+        private const float padding = MAIN_PATH_RADIUS * 2;
+        private const float curve_smoothness = 10;
+
         private readonly LayoutValue drawSizeLayout = new LayoutValue(Invalidation.DrawSize);
 
         public ArgonHealthDisplay()
@@ -248,11 +253,17 @@ namespace osu.Game.Screens.Play.HUD
 
         private void updatePath()
         {
-            float barLength = DrawWidth - MAIN_PATH_RADIUS * 2;
-            float curveStart = barLength - 70;
-            float curveEnd = barLength - 40;
+            float usableWidth = DrawWidth - padding;
 
-            const float curve_smoothness = 10;
+            if (usableWidth < 0) enforceMinimumWidth();
+
+            // the display starts curving at `curve_start_offset` units from the right and ends curving at `curve_end_offset`.
+            // to ensure that the curve is symmetric when it starts being narrow enough, add a `curve_end_offset` to the left side too.
+            const float rescale_cutoff = curve_start_offset + curve_end_offset;
+
+            float barLength = Math.Max(DrawWidth - padding, rescale_cutoff);
+            float curveStart = barLength - curve_start_offset;
+            float curveEnd = barLength - curve_end_offset;
 
             Vector2 diagonalDir = (new Vector2(curveEnd, BarHeight.Value) - new Vector2(curveStart, 0)).Normalized();
 
@@ -268,6 +279,9 @@ namespace osu.Game.Screens.Play.HUD
                 new PathControlPoint(new Vector2(barLength, BarHeight.Value)),
             });
 
+            if (DrawWidth - padding < rescale_cutoff)
+                rescalePathProportionally();
+
             List<Vector2> vertices = new List<Vector2>();
             barPath.GetPathToProgress(vertices, 0.0, 1.0);
 
@@ -276,6 +290,24 @@ namespace osu.Game.Screens.Play.HUD
             glowBar.Vertices = vertices;
 
             updatePathVertices();
+
+            void enforceMinimumWidth()
+            {
+                // Switch to absolute in order to be able to define a minimum width.
+                // Then switch back is required. Framework will handle the conversion for us.
+                Axes relativeAxes = RelativeSizeAxes;
+                RelativeSizeAxes = Axes.None;
+
+                Width = padding;
+
+                RelativeSizeAxes = relativeAxes;
+            }
+
+            void rescalePathProportionally()
+            {
+                foreach (var point in barPath.ControlPoints)
+                    point.Position = new Vector2(point.Position.X / barLength * (DrawWidth - padding), point.Position.Y);
+            }
         }
 
         private void updatePathVertices()
