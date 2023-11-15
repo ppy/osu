@@ -37,6 +37,19 @@ namespace osu.Game.Tests.Visual.Menus
         }
 
         [Test]
+        public void TestLoginTwoFactorSuccess()
+        {
+            AddStep("logout", () =>
+            {
+                API.Logout();
+                ((DummyAPIAccess)API).RequireTwoFactor();
+            });
+
+            AddStep("enter password", () => loginOverlay.ChildrenOfType<OsuPasswordTextBox>().First().Text = "password");
+            AddStep("submit", () => loginOverlay.ChildrenOfType<OsuButton>().First(b => b.Text.ToString() == "Sign in").TriggerClick());
+        }
+
+        [Test]
         public void TestLoginSuccess()
         {
             AddStep("logout", () => API.Logout());
