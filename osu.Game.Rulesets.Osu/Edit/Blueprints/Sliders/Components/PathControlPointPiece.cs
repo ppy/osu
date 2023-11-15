@@ -279,6 +279,6 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders.Components
             }
         }
 
-        public LocalisableString TooltipText => ControlPoint.Type.ToString() ?? string.Empty;
+        public LocalisableString TooltipText => ControlPoint.Type?.Description ?? string.Empty;
     }
 }
