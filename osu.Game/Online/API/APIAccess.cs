@@ -541,6 +541,11 @@ namespace osu.Game.Online.API
         Failing,
 
         /// <summary>
+        /// Waiting on second factor authentication.
+        /// </summary>
+        RequiresAuthentication,
+
+        /// <summary>
         /// We are in the process of (re-)connecting.
         /// </summary>
         Connecting,
