@@ -16,6 +16,8 @@ namespace osu.Game.Rulesets.Mods
         public sealed override LocalisableString Description => "Automatically applied to plays on devices with a touchscreen.";
         public sealed override double ScoreMultiplier => 1;
         public sealed override ModType Type => ModType.System;
+        public sealed override bool ValidForMultiplayer => false;
+        public sealed override bool ValidForMultiplayerAsFreeMod => false;
         public sealed override bool AlwaysValidForSubmission => true;
         public override Type[] IncompatibleMods => new[] { typeof(ICreateReplayData) };
     }

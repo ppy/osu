@@ -9,11 +9,11 @@ using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Sprites;
+using osu.Framework.Graphics.Textures;
 using osu.Framework.Localisation;
 using osu.Framework.Text;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
-using osu.Game.Skinning;
 using osuTK;
 
 namespace osu.Game.Screens.Play.HUD
@@ -133,30 +133,30 @@ namespace osu.Game.Screens.Play.HUD
             }
 
             [BackgroundDependencyLoader]
-            private void load(ISkinSource skin)
+            private void load(TextureStore textures)
             {
                 Spacing = new Vector2(-2f, 0f);
                 Font = new FontUsage(@"argon-counter", 1);
-                glyphStore = new GlyphStore(skin, getLookup);
+                glyphStore = new GlyphStore(textures, getLookup);
             }
 
             protected override TextBuilder CreateTextBuilder(ITexturedGlyphLookupStore store) => base.CreateTextBuilder(glyphStore);
 
             private class GlyphStore : ITexturedGlyphLookupStore
             {
-                private readonly ISkin skin;
+                private readonly TextureStore textures;
                 private readonly Func<char, string> getLookup;
 
-                public GlyphStore(ISkin skin, Func<char, string> getLookup)
+                public GlyphStore(TextureStore textures, Func<char, string> getLookup)
                 {
-                    this.skin = skin;
+                    this.textures = textures;
                     this.getLookup = getLookup;
                 }
 
                 public ITexturedCharacterGlyph? Get(string fontName, char character)
                 {
                     string lookup = getLookup(character);
-                    var texture = skin.GetTexture($"{fontName}-{lookup}");
+                    var texture = textures.Get($"Gameplay/Fonts/{fontName}-{lookup}");
 
                     if (texture == null)
                         return null;
