@@ -53,7 +53,7 @@ namespace osu.Game.Screens.Play.HUD
 
         protected override LocalisableString FormatCount(int count) => $@"{count}x";
 
-        protected override IHasText CreateText() => text = new ArgonCounterTextComponent(Anchor.TopLeft, "COMBO")
+        protected override IHasText CreateText() => text = new ArgonCounterTextComponent(Anchor.TopLeft, MatchesStrings.MatchScoreStatsCombo.ToUpper())
         {
             WireframeOpacity = { BindTarget = WireframeOpacity },
         };
