@@ -94,6 +94,13 @@ namespace osu.Game.Screens.Play.HUD
         public ArgonHealthDisplay()
         {
             AddLayout(drawSizeLayout);
+
+            // sane default width specification.
+            // this only matters if the health display isn't part of the default skin
+            // (in which case width will be set to 300 via `ArgonSkin.GetDrawableComponent()`),
+            // and if the user hasn't applied their own modifications
+            // (which are applied via `SerialisedDrawableInfo.ApplySerialisedInfo()`).
+            Width = 0.98f;
         }
 
         [BackgroundDependencyLoader]
