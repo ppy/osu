@@ -48,7 +48,7 @@ namespace osu.Game.Rulesets.Osu.Edit
             sliderTolerance.BindValueChanged(v =>
             {
                 float newValue = v.NewValue / 33f;
-                if (!Precision.AlmostEquals(newValue, Tolerance.Value, 1e-7f))
+                if (!Precision.AlmostEquals(newValue, Tolerance.Value))
                     Tolerance.Value = newValue;
             });
             Tolerance.BindValueChanged(v =>
@@ -60,7 +60,7 @@ namespace osu.Game.Rulesets.Osu.Edit
             sliderCornerThreshold.BindValueChanged(v =>
             {
                 float newValue = v.NewValue / 100f;
-                if (!Precision.AlmostEquals(newValue, CornerThreshold.Value, 1e-7f))
+                if (!Precision.AlmostEquals(newValue, CornerThreshold.Value))
                     CornerThreshold.Value = newValue;
             });
             CornerThreshold.BindValueChanged(v =>
@@ -73,7 +73,7 @@ namespace osu.Game.Rulesets.Osu.Edit
 
         public void AttachToToolbox(ExpandingToolboxContainer toolboxContainer)
         {
-            toolboxContainer.Add(new EditorToolboxGroup("drawing")
+            toolboxContainer.Add(new EditorToolboxGroup("slider")
             {
                 Children = new Drawable[]
                 {
