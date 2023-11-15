@@ -2,6 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
+using osu.Framework.Bindables;
 
 namespace osu.Game.Rulesets.Objects.Types
 {
@@ -13,7 +14,7 @@ namespace osu.Game.Rulesets.Objects.Types
         PerfectCurve
     }
 
-    public readonly struct PathType : IEquatable<PathType>
+    public readonly struct PathType : IEquatable<PathType>, IHasDescription
     {
         public static readonly PathType CATMULL = new PathType(SplineType.Catmull);
         public static readonly PathType BEZIER = new PathType(SplineType.BSpline);
@@ -30,6 +31,15 @@ namespace osu.Game.Rulesets.Objects.Types
         /// Null means the degree is equal to the number of control points, 1 means linear, 2 means quadratic, etc.
         /// </summary>
         public int? Degree { get; init; }
+
+        public string Description => Type switch
+        {
+            SplineType.Catmull => "Catmull",
+            SplineType.BSpline => Degree == null ? "Bezier" : "B-Spline",
+            SplineType.Linear => "Linear",
+            SplineType.PerfectCurve => "Perfect Curve",
+            _ => Type.ToString()
+        };
 
         public PathType(SplineType splineType)
         {
