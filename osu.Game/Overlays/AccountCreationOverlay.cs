@@ -3,6 +3,7 @@
 
 #nullable disable
 
+using System;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Extensions.Color4Extensions;
@@ -118,12 +119,16 @@ namespace osu.Game.Overlays
                     break;
 
                 case APIState.Connecting:
+                case APIState.RequiresSecondFactorAuth:
                     break;
 
                 case APIState.Online:
                     scheduledHide?.Cancel();
                     scheduledHide = Schedule(Hide);
                     break;
+
+                default:
+                    throw new ArgumentOutOfRangeException();
             }
         }
     }
