@@ -27,7 +27,7 @@ namespace osu.Game.Screens.Play.HUD
         };
 
         [SettingSource(typeof(SkinnableComponentStrings), nameof(SkinnableComponentStrings.ShowLabel), nameof(SkinnableComponentStrings.ShowLabelDescription))]
-        public Bindable<bool> ShowLabel { get; } = new BindableBool();
+        public Bindable<bool> ShowLabel { get; } = new BindableBool(true);
 
         public bool UsesFixedAnchor { get; set; }
 
