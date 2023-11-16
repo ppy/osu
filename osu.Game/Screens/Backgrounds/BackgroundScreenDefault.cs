@@ -9,6 +9,7 @@ using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Logging;
+using osu.Framework.Platform;
 using osu.Framework.Screens;
 using osu.Framework.Threading;
 using osu.Framework.Utils;
@@ -35,6 +36,9 @@ namespace osu.Game.Screens.Backgrounds
 
         [Resolved]
         private IBindable<WorkingBeatmap> beatmap { get; set; }
+
+        [Resolved]
+        private GameHost gameHost { get; set; }
 
         protected virtual bool AllowStoryboardBackground => true;
 
@@ -81,7 +85,7 @@ namespace osu.Game.Screens.Backgrounds
             Debug.Assert(backgroundScreenStack != null);
 
             if (background is BeatmapBackgroundWithStoryboard storyboardBackground)
-                storyboardUnloadDelegate = backgroundScreenStack.ScheduleUntilTransitionEnd(storyboardBackground.UnloadStoryboard);
+                storyboardUnloadDelegate = gameHost.UpdateThread.Scheduler.AddDelayed(storyboardBackground.UnloadStoryboard, TRANSITION_LENGTH);
 
             base.OnSuspending(e);
         }
