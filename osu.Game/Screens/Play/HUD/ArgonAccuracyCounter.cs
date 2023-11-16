@@ -2,11 +2,14 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using osu.Framework.Bindables;
+using osu.Framework.Extensions.LocalisationExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Localisation;
 using osu.Game.Configuration;
+using osu.Game.Localisation.SkinComponents;
+using osu.Game.Resources.Localisation.Web;
 using osu.Game.Skinning;
 using osuTK;
 
@@ -25,19 +28,26 @@ namespace osu.Game.Screens.Play.HUD
             MaxValue = 1,
         };
 
+        [SettingSource(typeof(SkinnableComponentStrings), nameof(SkinnableComponentStrings.ShowLabel), nameof(SkinnableComponentStrings.ShowLabelDescription))]
+        public Bindable<bool> ShowLabel { get; } = new BindableBool(true);
+
         public bool UsesFixedAnchor { get; set; }
 
         protected override IHasText CreateText() => new ArgonAccuracyTextComponent
         {
             WireframeOpacity = { BindTarget = WireframeOpacity },
+            ShowLabel = { BindTarget = ShowLabel },
         };
 
         private partial class ArgonAccuracyTextComponent : CompositeDrawable, IHasText
         {
             private readonly ArgonCounterTextComponent wholePart;
             private readonly ArgonCounterTextComponent fractionPart;
+            private readonly ArgonCounterTextComponent percentText;
 
             public IBindable<float> WireframeOpacity { get; } = new BindableFloat();
+
+            public Bindable<bool> ShowLabel { get; } = new BindableBool();
 
             public LocalisableString Text
             {
@@ -64,26 +74,36 @@ namespace osu.Game.Screens.Play.HUD
                         new Container
                         {
                             AutoSizeAxes = Axes.Both,
-                            Child = wholePart = new ArgonCounterTextComponent(Anchor.TopRight, "ACCURACY")
+                            Child = wholePart = new ArgonCounterTextComponent(Anchor.TopRight, BeatmapsetsStrings.ShowScoreboardHeadersAccuracy.ToUpper())
                             {
                                 RequiredDisplayDigits = { Value = 3 },
-                                WireframeOpacity = { BindTarget = WireframeOpacity }
+                                WireframeOpacity = { BindTarget = WireframeOpacity },
+                                ShowLabel = { BindTarget = ShowLabel },
                             }
                         },
                         fractionPart = new ArgonCounterTextComponent(Anchor.TopLeft)
                         {
-                            Margin = new MarginPadding { Top = 12f * 2f + 4f }, // +4 to account for the extra spaces above the digits.
                             WireframeOpacity = { BindTarget = WireframeOpacity },
                             Scale = new Vector2(0.5f),
                         },
-                        new ArgonCounterTextComponent(Anchor.TopLeft)
+                        percentText = new ArgonCounterTextComponent(Anchor.TopLeft)
                         {
                             Text = @"%",
-                            Margin = new MarginPadding { Top = 12f },
                             WireframeOpacity = { BindTarget = WireframeOpacity }
                         },
                     }
                 };
+            }
+
+            protected override void LoadComplete()
+            {
+                base.LoadComplete();
+
+                ShowLabel.BindValueChanged(s =>
+                {
+                    fractionPart.Margin = new MarginPadding { Top = s.NewValue ? 12f * 2f + 4f : 4f }; // +4 to account for the extra spaces above the digits.
+                    percentText.Margin = new MarginPadding { Top = s.NewValue ? 12f : 0 };
+                }, true);
             }
         }
     }

@@ -26,6 +26,7 @@ namespace osu.Game.Screens.Play.HUD
 
         public IBindable<float> WireframeOpacity { get; } = new BindableFloat();
         public Bindable<int> RequiredDisplayDigits { get; } = new BindableInt();
+        public Bindable<bool> ShowLabel { get; } = new BindableBool();
 
         public Container NumberContainer { get; private set; }
 
@@ -56,7 +57,7 @@ namespace osu.Game.Screens.Play.HUD
                 {
                     labelText = new OsuSpriteText
                     {
-                        Alpha = label != null ? 1 : 0,
+                        Alpha = 0,
                         Text = label.GetValueOrDefault(),
                         Font = OsuFont.Torus.With(size: 12, weight: FontWeight.Bold),
                         Margin = new MarginPadding { Left = 2.5f },
@@ -114,6 +115,7 @@ namespace osu.Game.Screens.Play.HUD
         {
             base.LoadComplete();
             WireframeOpacity.BindValueChanged(v => wireframesPart.Alpha = v.NewValue, true);
+            ShowLabel.BindValueChanged(s => labelText.Alpha = s.NewValue ? 1 : 0, true);
         }
 
         private partial class ArgonCounterSpriteText : OsuSpriteText
