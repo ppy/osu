@@ -55,7 +55,7 @@ namespace osu.Game.Online.API
 
         private bool shouldFailNextLogin;
         private bool stayConnectingNextLogin;
-        private bool requiresTwoFactor;
+        private bool requiredSecondFactorAuth = true;
 
         /// <summary>
         /// The current connectivity state of the API.
@@ -116,13 +116,15 @@ namespace osu.Game.Online.API
                 Id = DUMMY_USER_ID,
             };
 
-            if (requiresTwoFactor)
+            if (requiredSecondFactorAuth)
             {
                 state.Value = APIState.RequiresSecondFactorAuth;
-                requiresTwoFactor = false;
             }
             else
+            {
                 state.Value = APIState.Online;
+                requiredSecondFactorAuth = true;
+            }
         }
 
         public void AuthenticateSecondFactor(string code)
@@ -154,7 +156,10 @@ namespace osu.Game.Online.API
         IBindableList<APIUser> IAPIProvider.Friends => Friends;
         IBindable<UserActivity> IAPIProvider.Activity => Activity;
 
-        public void RequireTwoFactor() => requiresTwoFactor = true;
+        /// <summary>
+        /// Skip 2FA requirement for next login.
+        /// </summary>
+        public void SkipSecondFactor() => requiredSecondFactorAuth = false;
 
         /// <summary>
         /// During the next simulated login, the process will fail immediately.
