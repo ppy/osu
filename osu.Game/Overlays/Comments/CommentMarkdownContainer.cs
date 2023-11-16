@@ -22,7 +22,7 @@ namespace osu.Game.Overlays.Comments
 
         protected override MarkdownHeading CreateHeading(HeadingBlock headingBlock) => new CommentMarkdownHeading(headingBlock);
 
-        public override MarkdownTextFlowContainer CreateTextFlow() => new CommentMarkdownTextFlowContainer();
+        public override OsuMarkdownTextFlowContainer CreateTextFlow() => new CommentMarkdownTextFlowContainer();
 
         private partial class CommentMarkdownHeading : OsuMarkdownHeading
         {
@@ -49,7 +49,7 @@ namespace osu.Game.Overlays.Comments
             }
         }
 
-        private partial class CommentMarkdownTextFlowContainer : MarkdownTextFlowContainer
+        private partial class CommentMarkdownTextFlowContainer : OsuMarkdownTextFlowContainer
         {
             protected override void AddImage(LinkInline linkInline) => AddDrawable(new CommentMarkdownImage(linkInline.Url));
 
