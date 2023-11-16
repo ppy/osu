@@ -21,11 +21,6 @@ using osu.Game.Localisation;
 
 namespace osu.Game.Overlays.Login
 {
-    public partial class AccountVerificationForm : FillFlowContainer
-    {
-
-    }
-
     public partial class LoginForm : FillFlowContainer
     {
         private TextBox username = null!;
