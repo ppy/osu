@@ -101,6 +101,7 @@ namespace osu.Game.Overlays.Toolbar
 
             switch (state.NewValue)
             {
+                case APIState.RequiresSecondFactorAuth:
                 case APIState.Connecting:
                     TooltipText = ToolbarStrings.Connecting;
                     spinner.Show();
