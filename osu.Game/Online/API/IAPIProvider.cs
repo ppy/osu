@@ -107,6 +107,12 @@ namespace osu.Game.Online.API
         void Login(string username, string password);
 
         /// <summary>
+        /// Provide a second-factor authentication code for authentication.
+        /// </summary>
+        /// <param name="code">The 2FA code.</param>
+        void AuthenticateSecondFactor(string code);
+
+        /// <summary>
         /// Log out the current user.
         /// </summary>
         void Logout();

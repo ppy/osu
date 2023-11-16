@@ -81,7 +81,7 @@ namespace osu.Game.Overlays.Login
                     };
                     break;
 
-                case APIState.RequiresAuthentication:
+                case APIState.RequiresSecondFactorAuth:
                     Child = form = new AccountVerificationForm();
                     break;
 
