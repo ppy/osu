@@ -3,7 +3,6 @@
 
 using System;
 using System.Linq;
-using osu.Framework.Logging;
 using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.Timing;
 using osu.Game.Rulesets.Judgements;
