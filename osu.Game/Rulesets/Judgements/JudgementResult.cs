@@ -57,7 +57,7 @@ namespace osu.Game.Rulesets.Judgements
         /// <summary>
         /// The gameplay rate at the time this <see cref="JudgementResult"/> occurred.
         /// </summary>
-        public double GameplayRate { get; internal set; }
+        public double? GameplayRate { get; internal set; }
 
         /// <summary>
         /// The combo prior to this <see cref="JudgementResult"/> occurring.
