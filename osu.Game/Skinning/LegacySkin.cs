@@ -16,7 +16,6 @@ using osu.Framework.Graphics.Textures;
 using osu.Framework.IO.Stores;
 using osu.Game.Audio;
 using osu.Game.Beatmaps.Formats;
-using osu.Game.Database;
 using osu.Game.Extensions;
 using osu.Game.IO;
 using osu.Game.Rulesets.Objects.Types;
@@ -51,10 +50,10 @@ namespace osu.Game.Skinning
         /// </summary>
         /// <param name="skin">The model for this skin.</param>
         /// <param name="resources">Access to raw game resources.</param>
-        /// <param name="storage">An optional store which will be used for looking up skin resources. If null, one will be created from realm <see cref="IHasRealmFiles"/> pattern.</param>
+        /// <param name="fallbackStore">An optional fallback store which will be used for file lookups that are not serviced by realm user storage.</param>
         /// <param name="configurationFilename">The user-facing filename of the configuration file to be parsed. Can accept an .osu or skin.ini file.</param>
-        protected LegacySkin(SkinInfo skin, IStorageResourceProvider? resources, IResourceStore<byte[]>? storage, string configurationFilename = @"skin.ini")
-            : base(skin, resources, storage, configurationFilename)
+        protected LegacySkin(SkinInfo skin, IStorageResourceProvider? resources, IResourceStore<byte[]>? fallbackStore, string configurationFilename = @"skin.ini")
+            : base(skin, resources, fallbackStore, configurationFilename)
         {
         }
 
