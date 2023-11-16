@@ -22,7 +22,7 @@ namespace osu.Game.Rulesets.Scoring
         /// <summary>
         /// The true gameplay rate at the time of the event.
         /// </summary>
-        public readonly double GameplayRate;
+        public readonly double? GameplayRate;
 
         /// <summary>
         /// The hit result.
@@ -55,7 +55,7 @@ namespace osu.Game.Rulesets.Scoring
         /// <param name="hitObject">The <see cref="HitObject"/> that triggered the event.</param>
         /// <param name="lastHitObject">The previous <see cref="HitObject"/>.</param>
         /// <param name="position">A position corresponding to the event.</param>
-        public HitEvent(double timeOffset, double gameplayRate, HitResult result, HitObject hitObject, [CanBeNull] HitObject lastHitObject, [CanBeNull] Vector2? position)
+        public HitEvent(double timeOffset, double? gameplayRate, HitResult result, HitObject hitObject, [CanBeNull] HitObject lastHitObject, [CanBeNull] Vector2? position)
         {
             TimeOffset = timeOffset;
             GameplayRate = gameplayRate;

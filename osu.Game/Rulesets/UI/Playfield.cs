@@ -473,7 +473,7 @@ namespace osu.Game.Rulesets.UI
 
         private void onNewResult(DrawableHitObject drawable, JudgementResult result)
         {
-            Debug.Assert(result != null && drawable.Entry?.Result == result && result.RawTime != null && result.GameplayRate != 0.0);
+            Debug.Assert(result != null && drawable.Entry?.Result == result && result.RawTime != null && result.GameplayRate != null);
             judgedEntries.Push(drawable.Entry.AsNonNull());
 
             NewResult?.Invoke(drawable, result);
