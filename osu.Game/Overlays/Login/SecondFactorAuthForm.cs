@@ -10,6 +10,7 @@ using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Online.API;
 using osu.Game.Overlays.Settings;
+using osu.Game.Resources.Localisation.Web;
 using osuTK;
 
 namespace osu.Game.Overlays.Login
@@ -75,13 +76,17 @@ namespace osu.Game.Overlays.Login
                 },
             };
 
-            explainText.AddParagraph("Make sure to check your spam folder if you can't find the email.");
+            explainText.AddParagraph(UserVerificationStrings.BoxInfoCheckSpam);
+            // We can't support localisable strings with nested links yet. Not sure if we even can (probably need to allow markdown link formatting or something).
             explainText.AddParagraph("If you can't access your email or have forgotten what you used, please follow the ");
-            explainText.AddLink("email recovery process here", () => { });
+            explainText.AddLink(UserVerificationStrings.BoxInfoRecoverLink, $"{api.WebsiteRootUrl}/home/password-reset");
             explainText.AddText(". You can also ");
-            explainText.AddLink("request another code", () => { });
+            explainText.AddLink(UserVerificationStrings.BoxInfoReissueLink, () =>
+            {
+                // TODO: request another code.
+            });
             explainText.AddText(" or ");
-            explainText.AddLink("sign out", () => { });
+            explainText.AddLink(UserVerificationStrings.BoxInfoLogoutLink, () => { api.Logout(); });
             explainText.AddText(".");
 
             codeTextBox.Current.BindValueChanged(code =>
