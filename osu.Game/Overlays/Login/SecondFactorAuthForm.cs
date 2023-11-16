@@ -8,15 +8,20 @@ using osu.Framework.Input.Events;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.UserInterface;
+using osu.Game.Online.API;
 using osu.Game.Overlays.Settings;
 using osuTK;
 
 namespace osu.Game.Overlays.Login
 {
-    public partial class AccountVerificationForm : FillFlowContainer
+    public partial class SecondFactorAuthForm : FillFlowContainer
     {
-        private OsuTextBox code = null!;
+        private OsuTextBox codeTextBox = null!;
         private LinkFlowContainer explainText = null!;
+        private ErrorTextFlowContainer errorText = null!;
+
+        [Resolved]
+        private IAPIProvider api { get; set; } = null!;
 
         [BackgroundDependencyLoader]
         private void load()
@@ -43,18 +48,18 @@ namespace osu.Game.Overlays.Login
                             AutoSizeAxes = Axes.Y,
                             Text = "An email has been sent to you with a verification code. Enter the code.",
                         },
-                        code = new OsuTextBox
+                        codeTextBox = new OsuTextBox
                         {
                             PlaceholderText = "Enter code",
                             RelativeSizeAxes = Axes.X,
-                            TabbableContentContainer = this
+                            TabbableContentContainer = this,
                         },
                         explainText = new LinkFlowContainer(s => s.Font = OsuFont.GetFont(weight: FontWeight.Regular))
                         {
                             RelativeSizeAxes = Axes.X,
                             AutoSizeAxes = Axes.Y,
                         },
-                        new ErrorTextFlowContainer
+                        errorText = new ErrorTextFlowContainer
                         {
                             RelativeSizeAxes = Axes.X,
                             AutoSizeAxes = Axes.Y,
@@ -78,6 +83,21 @@ namespace osu.Game.Overlays.Login
             explainText.AddText(" or ");
             explainText.AddLink("sign out", () => { });
             explainText.AddText(".");
+
+            codeTextBox.Current.BindValueChanged(code =>
+            {
+                if (code.NewValue.Length == 8)
+                {
+                    api.AuthenticateSecondFactor(code.NewValue);
+                    codeTextBox.Current.Disabled = true;
+                }
+            });
+
+            if (api.LastLoginError?.Message is string error)
+            {
+                errorText.Alpha = 1;
+                errorText.AddErrors(new[] { error });
+            }
         }
 
         public override bool AcceptsFocus => true;
@@ -86,7 +106,7 @@ namespace osu.Game.Overlays.Login
 
         protected override void OnFocus(FocusEvent e)
         {
-            Schedule(() => { GetContainingInputManager().ChangeFocus(code); });
+            Schedule(() => { GetContainingInputManager().ChangeFocus(codeTextBox); });
         }
     }
 }
