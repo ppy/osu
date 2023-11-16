@@ -51,12 +51,12 @@ namespace osu.Game.Overlays.Comments
 
         private partial class CommentMarkdownTextFlowContainer : OsuMarkdownTextFlowContainer
         {
-            protected override void AddImage(LinkInline linkInline) => AddDrawable(new CommentMarkdownImage(linkInline.Url));
+            protected override void AddImage(LinkInline linkInline) => AddDrawable(new CommentMarkdownImage(linkInline));
 
-            private partial class CommentMarkdownImage : MarkdownImage
+            private partial class CommentMarkdownImage : OsuMarkdownImage
             {
-                public CommentMarkdownImage(string url)
-                    : base(url)
+                public CommentMarkdownImage(LinkInline linkInline)
+                    : base(linkInline)
                 {
                 }
 
