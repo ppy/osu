@@ -118,11 +118,16 @@ namespace osu.Game.Online.API
 
             if (requiresTwoFactor)
             {
-                state.Value = APIState.RequiresAuthentication;
+                state.Value = APIState.RequiresSecondFactorAuth;
                 requiresTwoFactor = false;
             }
             else
                 state.Value = APIState.Online;
+        }
+
+        public void AuthenticateSecondFactor(string code)
+        {
+            state.Value = APIState.Online;
         }
 
         public void Logout()
