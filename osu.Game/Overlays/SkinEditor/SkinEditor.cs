@@ -8,6 +8,7 @@ using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using Newtonsoft.Json;
+using osu.Framework;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
@@ -153,6 +154,8 @@ namespace osu.Game.Overlays.SkinEditor
                                                 Items = new[]
                                                 {
                                                     new EditorMenuItem(Web.CommonStrings.ButtonsSave, MenuItemType.Standard, () => Save()),
+                                                    new EditorMenuItem(CommonStrings.Export, MenuItemType.Standard, () => skins.ExportCurrentSkin()) { Action = { Disabled = !RuntimeInfo.IsDesktop } },
+                                                    new EditorMenuItemSpacer(),
                                                     new EditorMenuItem(CommonStrings.RevertToDefault, MenuItemType.Destructive, () => dialogOverlay?.Push(new RevertConfirmDialog(revert))),
                                                     new EditorMenuItemSpacer(),
                                                     new EditorMenuItem(CommonStrings.Exit, MenuItemType.Standard, () => skinEditorOverlay?.Hide()),
@@ -406,7 +409,14 @@ namespace osu.Game.Overlays.SkinEditor
                 cp.Colour = colours.Yellow;
             });
 
+            changeHandler?.Dispose();
+
             skins.EnsureMutableSkin();
+
+            var targetContainer = getTarget(selectedTarget.Value);
+
+            if (targetContainer != null)
+                changeHandler = new SkinEditorChangeHandler(targetContainer);
             hasBegunMutating = true;
         }
 

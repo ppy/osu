@@ -47,16 +47,16 @@ namespace osu.Game.Tests.Visual.Gameplay
                 };
             });
 
-            AddSliderStep("Width", 0, 1f, 1f, val =>
-            {
-                if (healthDisplay.IsNotNull())
-                    healthDisplay.BarLength.Value = val;
-            });
-
             AddSliderStep("Height", 0, 64, 0, val =>
             {
                 if (healthDisplay.IsNotNull())
                     healthDisplay.BarHeight.Value = val;
+            });
+
+            AddSliderStep("Width", 0, 1f, 0.98f, val =>
+            {
+                if (healthDisplay.IsNotNull())
+                    healthDisplay.Width = val;
             });
         }
 

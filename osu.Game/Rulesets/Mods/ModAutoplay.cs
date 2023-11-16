@@ -24,7 +24,7 @@ namespace osu.Game.Rulesets.Mods
         public sealed override bool ValidForMultiplayer => false;
         public sealed override bool ValidForMultiplayerAsFreeMod => false;
 
-        public override Type[] IncompatibleMods => new[] { typeof(ModCinema), typeof(ModRelax), typeof(ModAdaptiveSpeed) };
+        public override Type[] IncompatibleMods => new[] { typeof(ModCinema), typeof(ModRelax), typeof(ModAdaptiveSpeed), typeof(ModTouchDevice) };
 
         public override bool HasImplementation => GetType().GenericTypeArguments.Length == 0;
 

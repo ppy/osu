@@ -3,6 +3,7 @@
 
 #nullable disable
 
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using NUnit.Framework;
@@ -36,6 +37,12 @@ namespace osu.Game.Rulesets.Osu.Tests
             AddSliderStep("Spin rate", 0.5, 5, 1, val => spinRate.Value = val);
         }
 
+        [SetUpSteps]
+        public void SetUpSteps()
+        {
+            AddStep("Reset rate", () => spinRate.Value = 1);
+        }
+
         [TestCase(true)]
         [TestCase(false)]
         public void TestVariousSpinners(bool autoplay)
@@ -44,6 +51,36 @@ namespace osu.Game.Rulesets.Osu.Tests
             AddStep($"{term} Big", () => SetContents(_ => testSingle(2, autoplay)));
             AddStep($"{term} Medium", () => SetContents(_ => testSingle(5, autoplay)));
             AddStep($"{term} Small", () => SetContents(_ => testSingle(7, autoplay)));
+        }
+
+        [Test]
+        public void TestSpinnerNoBonus()
+        {
+            AddStep("Set high spin rate", () => spinRate.Value = 5);
+
+            Spinner spinner;
+
+            AddStep("add spinner", () => SetContents(_ =>
+            {
+                spinner = new Spinner
+                {
+                    StartTime = Time.Current,
+                    EndTime = Time.Current + 750,
+                    Samples = new List<HitSampleInfo>
+                    {
+                        new HitSampleInfo(HitSampleInfo.HIT_NORMAL)
+                    }
+                };
+
+                spinner.ApplyDefaults(new ControlPointInfo(), new BeatmapDifficulty { OverallDifficulty = 0 });
+
+                return drawableSpinner = new TestDrawableSpinner(spinner, true, spinRate)
+                {
+                    Anchor = Anchor.Centre,
+                    Depth = depthIndex++,
+                    Scale = new Vector2(0.75f)
+                };
+            }));
         }
 
         [Test]
@@ -153,7 +190,7 @@ namespace osu.Game.Rulesets.Osu.Tests
             {
                 base.Update();
                 if (auto)
-                    RotationTracker.AddRotation((float)(Clock.ElapsedFrameTime * spinRate.Value));
+                    RotationTracker.AddRotation((float)Math.Min(180, Clock.ElapsedFrameTime * spinRate.Value));
             }
         }
     }

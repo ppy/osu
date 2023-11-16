@@ -15,6 +15,7 @@ using osu.Game.IO;
 using osu.Game.Screens.Play;
 using osu.Game.Screens.Play.HUD;
 using osu.Game.Screens.Play.HUD.HitErrorMeters;
+using osu.Game.Skinning.Components;
 using osuTK;
 using osuTK.Graphics;
 
@@ -40,7 +41,10 @@ namespace osu.Game.Skinning
 
         [UsedImplicitly(ImplicitUseKindFlags.InstantiatedWithFixedConstructorSignature)]
         public ArgonSkin(SkinInfo skin, IStorageResourceProvider resources)
-            : base(skin, resources)
+            : base(
+                skin,
+                resources
+            )
         {
             Resources = resources;
 
@@ -110,50 +114,49 @@ namespace osu.Game.Skinning
                             var skinnableTargetWrapper = new DefaultSkinComponentsContainer(container =>
                             {
                                 var health = container.OfType<ArgonHealthDisplay>().FirstOrDefault();
-                                var score = container.OfType<DefaultScoreCounter>().FirstOrDefault();
-                                var accuracy = container.OfType<DefaultAccuracyCounter>().FirstOrDefault();
-                                var combo = container.OfType<DefaultComboCounter>().FirstOrDefault();
-                                var ppCounter = container.OfType<PerformancePointsCounter>().FirstOrDefault();
+                                var healthLine = container.OfType<BoxElement>().FirstOrDefault();
+                                var wedgePieces = container.OfType<ArgonWedgePiece>().ToArray();
+                                var score = container.OfType<ArgonScoreCounter>().FirstOrDefault();
+                                var accuracy = container.OfType<ArgonAccuracyCounter>().FirstOrDefault();
+                                var combo = container.OfType<ArgonComboCounter>().FirstOrDefault();
                                 var songProgress = container.OfType<ArgonSongProgress>().FirstOrDefault();
                                 var keyCounter = container.OfType<ArgonKeyCounterDisplay>().FirstOrDefault();
 
-                                if (score != null)
+                                if (health != null)
                                 {
-                                    score.Anchor = Anchor.TopCentre;
-                                    score.Origin = Anchor.TopCentre;
-
                                     // elements default to beneath the health bar
-                                    const float vertical_offset = 30;
+                                    const float components_x_offset = 50;
 
-                                    const float horizontal_padding = 20;
+                                    health.Anchor = Anchor.TopLeft;
+                                    health.Origin = Anchor.TopLeft;
+                                    health.UseRelativeSize.Value = false;
+                                    health.Width = 300;
+                                    health.BarHeight.Value = 30f;
+                                    health.Position = new Vector2(components_x_offset, 20f);
 
-                                    score.Position = new Vector2(0, vertical_offset);
-
-                                    if (health != null)
+                                    if (healthLine != null)
                                     {
-                                        health.Origin = Anchor.TopCentre;
-                                        health.Anchor = Anchor.TopCentre;
-                                        health.Y = 5;
+                                        healthLine.Anchor = Anchor.TopLeft;
+                                        healthLine.Origin = Anchor.CentreLeft;
+                                        healthLine.Y = health.Y + ArgonHealthDisplay.MAIN_PATH_RADIUS;
+                                        healthLine.Size = new Vector2(45, 3);
                                     }
 
-                                    if (ppCounter != null)
+                                    foreach (var wedgePiece in wedgePieces)
+                                        wedgePiece.Position += new Vector2(-50, 15);
+
+                                    if (score != null)
                                     {
-                                        ppCounter.Y = score.Position.Y + ppCounter.ScreenSpaceDeltaToParentSpace(score.ScreenSpaceDrawQuad.Size).Y - 4;
-                                        ppCounter.Origin = Anchor.TopCentre;
-                                        ppCounter.Anchor = Anchor.TopCentre;
+                                        score.Origin = Anchor.TopRight;
+                                        score.Position = new Vector2(components_x_offset + 200, wedgePieces.Last().Y + 30);
                                     }
 
                                     if (accuracy != null)
                                     {
-                                        accuracy.Position = new Vector2(-accuracy.ScreenSpaceDeltaToParentSpace(score.ScreenSpaceDrawQuad.Size).X / 2 - horizontal_padding, vertical_offset + 5);
+                                        // +4 to vertically align the accuracy counter with the score counter.
+                                        accuracy.Position = new Vector2(-20, 20);
+                                        accuracy.Anchor = Anchor.TopRight;
                                         accuracy.Origin = Anchor.TopRight;
-                                        accuracy.Anchor = Anchor.TopCentre;
-
-                                        if (combo != null)
-                                        {
-                                            combo.Position = new Vector2(accuracy.ScreenSpaceDeltaToParentSpace(score.ScreenSpaceDrawQuad.Size).X / 2 + horizontal_padding, vertical_offset + 5);
-                                            combo.Anchor = Anchor.TopCentre;
-                                        }
                                     }
 
                                     var hitError = container.OfType<HitErrorMeter>().FirstOrDefault();
@@ -177,18 +180,24 @@ namespace osu.Game.Skinning
                                     if (songProgress != null)
                                     {
                                         const float padding = 10;
+                                        // Hard to find this at runtime, so taken from the most expanded state during replay.
+                                        const float song_progress_offset_height = 36 + padding;
 
                                         songProgress.Position = new Vector2(0, -padding);
                                         songProgress.Scale = new Vector2(0.9f, 1);
 
                                         if (keyCounter != null && hitError != null)
                                         {
-                                            // Hard to find this at runtime, so taken from the most expanded state during replay.
-                                            const float song_progress_offset_height = 36 + padding;
-
                                             keyCounter.Anchor = Anchor.BottomRight;
                                             keyCounter.Origin = Anchor.BottomRight;
                                             keyCounter.Position = new Vector2(-(hitError.Width + padding), -(padding * 2 + song_progress_offset_height));
+                                        }
+
+                                        if (combo != null && hitError != null)
+                                        {
+                                            combo.Anchor = Anchor.BottomLeft;
+                                            combo.Origin = Anchor.BottomLeft;
+                                            combo.Position = new Vector2((hitError.Width + padding), -(padding * 2 + song_progress_offset_height));
                                         }
                                     }
                                 }
@@ -196,15 +205,30 @@ namespace osu.Game.Skinning
                             {
                                 Children = new Drawable[]
                                 {
-                                    new DefaultComboCounter(),
-                                    new DefaultScoreCounter(),
-                                    new DefaultAccuracyCounter(),
+                                    new ArgonWedgePiece
+                                    {
+                                        Size = new Vector2(380, 72),
+                                    },
+                                    new ArgonWedgePiece
+                                    {
+                                        Size = new Vector2(380, 72),
+                                        Position = new Vector2(4, 5)
+                                    },
+                                    new ArgonScoreCounter(),
                                     new ArgonHealthDisplay(),
+                                    new BoxElement
+                                    {
+                                        CornerRadius = { Value = 0.5f }
+                                    },
+                                    new ArgonAccuracyCounter(),
+                                    new ArgonComboCounter
+                                    {
+                                        Scale = new Vector2(1.3f)
+                                    },
+                                    new BarHitErrorMeter(),
+                                    new BarHitErrorMeter(),
                                     new ArgonSongProgress(),
                                     new ArgonKeyCounterDisplay(),
-                                    new BarHitErrorMeter(),
-                                    new BarHitErrorMeter(),
-                                    new PerformancePointsCounter()
                                 }
                             };
 
