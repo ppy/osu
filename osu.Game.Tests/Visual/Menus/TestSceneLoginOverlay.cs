@@ -10,6 +10,7 @@ using osu.Framework.Testing;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Online.API;
 using osu.Game.Overlays;
+using osu.Game.Overlays.Login;
 using osu.Game.Users.Drawables;
 using osuTK.Input;
 
@@ -37,26 +38,23 @@ namespace osu.Game.Tests.Visual.Menus
         }
 
         [Test]
-        public void TestLoginTwoFactorSuccess()
-        {
-            AddStep("logout", () =>
-            {
-                API.Logout();
-                ((DummyAPIAccess)API).RequireTwoFactor();
-            });
-
-            AddStep("enter password", () => loginOverlay.ChildrenOfType<OsuPasswordTextBox>().First().Text = "password");
-            AddStep("submit", () => loginOverlay.ChildrenOfType<OsuButton>().First(b => b.Text.ToString() == "Sign in").TriggerClick());
-        }
-
-        [Test]
         public void TestLoginSuccess()
         {
             AddStep("logout", () => API.Logout());
+            assertAPIState(APIState.Offline);
 
             AddStep("enter password", () => loginOverlay.ChildrenOfType<OsuPasswordTextBox>().First().Text = "password");
             AddStep("submit", () => loginOverlay.ChildrenOfType<OsuButton>().First(b => b.Text.ToString() == "Sign in").TriggerClick());
+
+            assertAPIState(APIState.RequiresSecondFactorAuth);
+            AddUntilStep("wait for second factor auth form", () => loginOverlay.ChildrenOfType<SecondFactorAuthForm>().SingleOrDefault(), () => Is.Not.Null);
+
+            AddStep("enter code", () => loginOverlay.ChildrenOfType<OsuTextBox>().First().Text = "88800088");
+            assertAPIState(APIState.Online);
         }
+
+        private void assertAPIState(APIState expected) =>
+            AddUntilStep($"login state is {expected}", () => API.State.Value, () => Is.EqualTo(expected));
 
         [Test]
         public void TestLoginFailure()
