@@ -9,16 +9,12 @@ namespace osu.Game.Rulesets.Objects.Legacy.Catch
     /// <summary>
     /// Legacy osu!catch Hit-type, used for parsing Beatmaps.
     /// </summary>
-    internal sealed class ConvertHit : ConvertHitObject, IHasPosition, IHasCombo
+    internal sealed class ConvertHit : ConvertHitObject, IHasPosition
     {
         public float X => Position.X;
 
         public float Y => Position.Y;
 
         public Vector2 Position { get; set; }
-
-        public bool NewCombo { get; set; }
-
-        public int ComboOffset { get; set; }
     }
 }

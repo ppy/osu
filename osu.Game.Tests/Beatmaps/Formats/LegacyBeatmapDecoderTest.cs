@@ -1093,5 +1093,20 @@ namespace osu.Game.Tests.Beatmaps.Formats
                 Assert.That(hitObject.Samples.Select(s => s.Volume), Has.All.EqualTo(70));
             }
         }
+
+        [Test]
+        public void TestNewComboAfterBreak()
+        {
+            var decoder = new LegacyBeatmapDecoder { ApplyOffsets = false };
+
+            using (var resStream = TestResources.OpenResource("break-between-objects.osu"))
+            using (var stream = new LineBufferedReader(resStream))
+            {
+                var beatmap = decoder.Decode(stream);
+                Assert.That(((IHasCombo)beatmap.HitObjects[0]).NewCombo, Is.True);
+                Assert.That(((IHasCombo)beatmap.HitObjects[1]).NewCombo, Is.True);
+                Assert.That(((IHasCombo)beatmap.HitObjects[2]).NewCombo, Is.False);
+            }
+        }
     }
 }
