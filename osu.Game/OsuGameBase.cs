@@ -407,6 +407,8 @@ namespace osu.Game
                 })
             });
 
+            base.Content.Add(new TouchInputInterceptor());
+
             KeyBindingStore = new RealmKeyBindingStore(realm, keyCombinationProvider);
             KeyBindingStore.Register(globalBindings, RulesetStore.AvailableRulesets);
 
@@ -575,14 +577,14 @@ namespace osu.Game
 
                     case JoystickHandler jh:
                         return new JoystickSettings(jh);
-
-                    case TouchHandler th:
-                        return new TouchSettings(th);
                 }
             }
 
             switch (handler)
             {
+                case TouchHandler th:
+                    return new TouchSettings(th);
+
                 case MidiHandler:
                     return new InputSection.HandlerSection(handler);
 

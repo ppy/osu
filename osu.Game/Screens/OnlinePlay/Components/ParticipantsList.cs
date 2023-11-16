@@ -115,7 +115,7 @@ namespace osu.Game.Screens.OnlinePlay.Components
                         RelativeSizeAxes = Axes.Both,
                         Colour = Color4Extensions.FromHex(@"27252d"),
                     },
-                    avatar = new UpdateableAvatar(showUsernameTooltip: true) { RelativeSizeAxes = Axes.Both },
+                    avatar = new UpdateableAvatar(showUserPanelOnHover: true) { RelativeSizeAxes = Axes.Both },
                 };
             }
         }

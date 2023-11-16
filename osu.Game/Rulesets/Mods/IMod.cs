@@ -60,6 +60,13 @@ namespace osu.Game.Rulesets.Mods
         bool ValidForMultiplayerAsFreeMod { get; }
 
         /// <summary>
+        /// Indicates that this mod is always permitted in scenarios wherein a user is submitting a score regardless of other circumstances.
+        /// Intended for mods that are informational in nature and do not really affect gameplay by themselves,
+        /// but are more of a gauge of increased/decreased difficulty due to the user's configuration (e.g. <see cref="ModTouchDevice"/>).
+        /// </summary>
+        bool AlwaysValidForSubmission { get; }
+
+        /// <summary>
         /// Create a fresh <see cref="Mod"/> instance based on this mod.
         /// </summary>
         Mod CreateInstance() => (Mod)Activator.CreateInstance(GetType())!;

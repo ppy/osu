@@ -51,6 +51,7 @@ namespace osu.Game.Screens.Menu
         private readonly Action clickAction;
         private Sample sampleClick;
         private Sample sampleHover;
+        private SampleChannel sampleChannel;
 
         public override bool ReceivePositionalInputAt(Vector2 screenSpacePos) => box.ReceivePositionalInputAt(screenSpacePos);
 
@@ -225,7 +226,8 @@ namespace osu.Game.Screens.Menu
 
         private void trigger()
         {
-            sampleClick?.Play();
+            sampleChannel = sampleClick?.GetChannel();
+            sampleChannel?.Play();
 
             clickAction?.Invoke();
 
@@ -236,6 +238,8 @@ namespace osu.Game.Screens.Menu
 
         public override bool HandleNonPositionalInput => state == ButtonState.Expanded;
         public override bool HandlePositionalInput => state != ButtonState.Exploded && box.Scale.X >= 0.8f;
+
+        public void StopSamplePlayback() => sampleChannel?.Stop();
 
         protected override void Update()
         {
