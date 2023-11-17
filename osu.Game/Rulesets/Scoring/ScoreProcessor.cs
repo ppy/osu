@@ -202,6 +202,8 @@ namespace osu.Game.Rulesets.Scoring
 
         protected sealed override void ApplyResultInternal(JudgementResult result)
         {
+            HitResult maxResult = result.Judgement.MaxResult;
+
             result.ComboAtJudgement = Combo.Value;
             result.HighestComboAtJudgement = HighestCombo.Value;
 
@@ -210,29 +212,29 @@ namespace osu.Game.Rulesets.Scoring
 
             scoreResultCounts[result.Type] = scoreResultCounts.GetValueOrDefault(result.Type) + 1;
 
-            if (!result.Type.IsScorable())
-                return;
-
-            if (result.Type.IncreasesCombo())
-                Combo.Value++;
-            else if (result.Type.BreaksCombo())
-                Combo.Value = 0;
-
-            result.ComboAfterJudgement = Combo.Value;
-
-            if (result.Type.AffectsAccuracy())
+            if (maxResult.AffectsAccuracy())
             {
-                currentMaximumBaseScore += Judgement.ToNumericResult(result.Judgement.MaxResult);
+                currentMaximumBaseScore += Judgement.ToNumericResult(maxResult);
                 currentBaseScore += Judgement.ToNumericResult(result.Type);
                 currentAccuracyJudgementCount++;
             }
 
-            if (result.Type.IsBonus())
-                currentBonusPortion += GetBonusScoreChange(result);
-            else
-                currentComboPortion += GetComboScoreChange(result);
+            if (!result.Type.IsScorable())
+            {
+                if (result.Type.IncreasesCombo())
+                    Combo.Value++;
+                else if (result.Type.BreaksCombo())
+                    Combo.Value = 0;
 
-            ApplyScoreChange(result);
+                result.ComboAfterJudgement = Combo.Value;
+
+                if (result.Type.IsBonus())
+                    currentBonusPortion += GetBonusScoreChange(result);
+                else
+                    currentComboPortion += GetComboScoreChange(result);
+
+                ApplyScoreChange(result);
+            }
 
             if (!IsSimulating)
             {
