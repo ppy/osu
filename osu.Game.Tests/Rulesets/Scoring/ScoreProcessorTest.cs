@@ -260,6 +260,30 @@ namespace osu.Game.Tests.Rulesets.Scoring
 #pragma warning restore CS0618
 
         [Test]
+        public void TestMaxAccuracyOnIgnoreMiss()
+        {
+            beatmap = new TestBeatmap(new RulesetInfo())
+            {
+                HitObjects = new List<HitObject>
+                {
+                    new TestHitObject(HitResult.Great),
+                    new TestHitObject(HitResult.LargeTickHit, HitResult.IgnoreMiss),
+                }
+            };
+
+            scoreProcessor = new TestScoreProcessor();
+            scoreProcessor.ApplyBeatmap(beatmap);
+
+            scoreProcessor.ApplyResult(new JudgementResult(beatmap.HitObjects[0], beatmap.HitObjects[0].CreateJudgement()) { Type = HitResult.Miss });
+            Assert.That(scoreProcessor.Combo.Value, Is.EqualTo(0));
+            Assert.That(scoreProcessor.Accuracy.Value, Is.EqualTo(0));
+
+            scoreProcessor.ApplyResult(new JudgementResult(beatmap.HitObjects[1], beatmap.HitObjects[1].CreateJudgement()) { Type = HitResult.IgnoreMiss });
+            Assert.That(scoreProcessor.Accuracy.Value, Is.EqualTo(0));
+            Assert.That(scoreProcessor.MaximumAccuracy.Value, Is.EqualTo(0));
+        }
+
+        [Test]
         public void TestComboBreak()
         {
             Assert.That(HitResult.ComboBreak.IncreasesCombo(), Is.False);
