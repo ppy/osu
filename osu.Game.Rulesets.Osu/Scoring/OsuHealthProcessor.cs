@@ -99,15 +99,21 @@ namespace osu.Game.Rulesets.Osu.Scoring
                     double hpOverkill = Math.Max(0, hpReduction - currentHp);
                     reduceHp(hpReduction);
 
-                    if (h is Slider slider)
+                    switch (h)
                     {
-                        foreach (var nested in slider.NestedHitObjects)
-                            increaseHp(nested);
-                    }
-                    else if (h is Spinner spinner)
-                    {
-                        foreach (var nested in spinner.NestedHitObjects.Where(t => t is not SpinnerBonusTick))
-                            increaseHp(nested);
+                        case Slider slider:
+                        {
+                            foreach (var nested in slider.NestedHitObjects)
+                                increaseHp(nested);
+                            break;
+                        }
+
+                        case Spinner spinner:
+                        {
+                            foreach (var nested in spinner.NestedHitObjects.Where(t => t is not SpinnerBonusTick))
+                                increaseHp(nested);
+                            break;
+                        }
                     }
 
                     // Note: Because HP is capped during the above increases, long sliders (with many ticks) or spinners
