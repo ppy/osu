@@ -179,7 +179,7 @@ namespace osu.Game.Overlays.Mods
                 mod.ApplyToDifficulty(originalDifficulty);
 
             Ruleset ruleset = gameRuleset.Value.CreateInstance();
-            adjustedDifficulty = ruleset.GetRateAdjustedDifficulty(originalDifficulty, rate);
+            adjustedDifficulty = ruleset.GetRateAdjustedDisplayDifficulty(originalDifficulty, rate);
 
             haveRateChangedValues = hasRateAdjustedProperties(originalDifficulty, adjustedDifficulty);
 

@@ -265,9 +265,9 @@ namespace osu.Game.Rulesets.Taiko
             };
         }
 
-        public override BeatmapDifficulty GetRateAdjustedDifficulty(IBeatmapDifficultyInfo baseDifficulty, double rate)
+        public override BeatmapDifficulty GetRateAdjustedDisplayDifficulty(IBeatmapDifficultyInfo difficulty, double rate)
         {
-            BeatmapDifficulty adjustedDifficulty = new BeatmapDifficulty(baseDifficulty);
+            BeatmapDifficulty adjustedDifficulty = new BeatmapDifficulty(difficulty);
 
             double hitwindow = 35.0 - 15.0 * (adjustedDifficulty.OverallDifficulty - 5) / 5;
             hitwindow /= rate;

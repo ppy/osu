@@ -378,6 +378,16 @@ namespace osu.Game.Rulesets
         public virtual LocalisableString GetDisplayNameForHitResult(HitResult result) => result.GetLocalisableDescription();
 
         /// <summary>
+        /// Applies changes to difficulty attributes for presenting to a user a rough estimate of how rate adjust mods affect difficulty.
+        /// Importantly, this should NOT BE USED FOR ANY CALCULATIONS.
+        /// It is also not always correct, and arguably is never correct depending on your frame of mind.
+        /// </summary>
+        /// <param name="difficulty">>The <see cref="IBeatmapDifficultyInfo"/> that will be adjusted.</param>
+        /// <param name="rate">The rate adjustment multiplier from mods. For example 1.5 for DT.</param>
+        /// <returns>The adjusted difficulty attributes.</returns>
+        public virtual BeatmapDifficulty GetRateAdjustedDisplayDifficulty(IBeatmapDifficultyInfo difficulty, double rate) => new BeatmapDifficulty(difficulty);
+
+        /// <summary>
         /// Creates ruleset-specific beatmap filter criteria to be used on the song select screen.
         /// </summary>
         public virtual IRulesetFilterCriteria? CreateRulesetFilterCriteria() => null;
@@ -391,14 +401,5 @@ namespace osu.Game.Rulesets
         /// Can be overridden to alter the difficulty section to the editor beatmap setup screen.
         /// </summary>
         public virtual DifficultySection? CreateEditorDifficultySection() => null;
-
-        /// <summary>
-        /// Changes <see cref="BeatmapDifficulty"/> after they're adjusted according to rate.
-        /// Doesn't change any attributes by default.
-        /// </summary>
-        /// <param name="baseDifficulty">>The <see cref="IBeatmapDifficultyInfo"/> that will be adjusted.</param>
-        /// <param name="rate">Rate of the gameplay. For example 1.5 for DT.</param>
-        /// <returns>Copy of difficulty info with values changed according to rate and ruleset-specific behaviour.</returns>
-        public virtual BeatmapDifficulty GetRateAdjustedDifficulty(IBeatmapDifficultyInfo baseDifficulty, double rate) => new BeatmapDifficulty(baseDifficulty);
     }
 }
