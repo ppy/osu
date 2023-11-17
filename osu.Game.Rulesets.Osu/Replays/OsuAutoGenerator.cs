@@ -339,6 +339,10 @@ namespace osu.Game.Rulesets.Osu.Replays
 
             AddFrameToReplay(startFrame);
 
+            // ~477 as per stable.
+            const float spin_rpm = 60000f / 20 * (180 / MathF.PI) / 360;
+            float radsPerMillisecond = MathUtils.DegreesToRadians(spin_rpm * 360) / 60000;
+
             switch (h)
             {
                 // We add intermediate frames for spinning / following a slider here.
@@ -354,7 +358,7 @@ namespace osu.Game.Rulesets.Osu.Replays
                     for (double nextFrame = h.StartTime + GetFrameDelay(h.StartTime); nextFrame < spinner.EndTime; nextFrame += GetFrameDelay(nextFrame))
                     {
                         t = ApplyModsToTimeDelta(previousFrame, nextFrame) * spinnerDirection;
-                        angle += (float)t / 20;
+                        angle += (float)t * radsPerMillisecond;
 
                         Vector2 pos = SPINNER_CENTRE + CirclePosition(angle, SPIN_RADIUS);
                         AddFrameToReplay(new OsuReplayFrame((int)nextFrame, new Vector2(pos.X, pos.Y), action));
@@ -363,7 +367,7 @@ namespace osu.Game.Rulesets.Osu.Replays
                     }
 
                     t = ApplyModsToTimeDelta(previousFrame, spinner.EndTime) * spinnerDirection;
-                    angle += (float)t / 20;
+                    angle += (float)t * radsPerMillisecond;
 
                     Vector2 endPosition = SPINNER_CENTRE + CirclePosition(angle, SPIN_RADIUS);
 
