@@ -166,7 +166,7 @@ namespace osu.Game.Rulesets.Osu.Scoring
 
         private double healthIncreaseFor(HitObject hitObject, HitResult result)
         {
-            double increase;
+            double increase = 0;
 
             switch (result)
             {
@@ -207,10 +207,6 @@ namespace osu.Game.Rulesets.Osu.Scoring
 
                 case HitResult.LargeBonus:
                     increase = 0.01;
-                    break;
-
-                default:
-                    increase = 0;
                     break;
             }
 
