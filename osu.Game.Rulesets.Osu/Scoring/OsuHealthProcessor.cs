@@ -68,6 +68,7 @@ namespace osu.Game.Rulesets.Osu.Scoring
 
                     // TODO: This doesn't handle overlapping/sequential breaks correctly (/b/614).
                     // Subtract any break time from the duration since the last object
+                    // Note that this method is a bit convoluted, but matches stable code for compatibility.
                     if (Beatmap.Breaks.Count > 0 && currentBreak < Beatmap.Breaks.Count)
                     {
                         BreakPeriod e = Beatmap.Breaks[currentBreak];
