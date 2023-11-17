@@ -23,13 +23,11 @@ namespace osu.Game.Replays
             if (referenceLookup.TryGetValue(this, out object? existing))
                 return (Replay)existing;
 
-            var clone = new Replay
-            {
-                HasReceivedAllFrames = HasReceivedAllFrames,
-                Frames = Frames.Select(f => f.DeepClone(referenceLookup)).ToList()
-            };
-
+            var clone = new Replay();
             referenceLookup[this] = clone;
+
+            clone.HasReceivedAllFrames = HasReceivedAllFrames;
+            clone.Frames = Frames.Select(f => f.DeepClone(referenceLookup)).ToList();
 
             return clone;
         }

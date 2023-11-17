@@ -51,7 +51,7 @@ namespace osu.Game.Rulesets.Osu.Objects
 
         public override Judgement CreateJudgement() => new SliderEndJudgement();
 
-        protected override void CopyFrom(HitObject other, IDictionary<object, object>? referenceLookup = null)
+        protected override void CopyFrom(HitObject other, IDictionary<object, object> referenceLookup)
         {
             base.CopyFrom(other, referenceLookup);
 

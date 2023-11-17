@@ -122,7 +122,7 @@ namespace osu.Game.Rulesets.Mania.Objects
         public IList<HitSampleInfo> GetNodeSamples(int nodeIndex) =>
             nodeIndex < NodeSamples?.Count ? NodeSamples[nodeIndex] : Samples;
 
-        protected override void CopyFrom(HitObject other, IDictionary<object, object> referenceLookup = null)
+        protected override void CopyFrom(HitObject other, IDictionary<object, object> referenceLookup)
         {
             base.CopyFrom(other, referenceLookup);
 
@@ -132,9 +132,9 @@ namespace osu.Game.Rulesets.Mania.Objects
             NodeSamples = hold.NodeSamples.Select(s => (IList<HitSampleInfo>)s.Select(s2 => s2.DeepClone(referenceLookup)).ToList()).ToList();
             Duration = hold.Duration;
 
-            Head = hold.NestedHitObjects.OfType<HeadNote>().Single();
-            Tail = hold.NestedHitObjects.OfType<TailNote>().Single();
-            Body = hold.NestedHitObjects.OfType<HoldNoteBody>().Single();
+            Head = NestedHitObjects.OfType<HeadNote>().Single();
+            Tail = NestedHitObjects.OfType<TailNote>().Single();
+            Body = NestedHitObjects.OfType<HoldNoteBody>().Single();
         }
 
         protected override HitObject CreateInstance() => new HoldNote();

@@ -23,7 +23,7 @@ namespace osu.Game.Rulesets.Osu.Objects
 
         public override double MaximumJudgementOffset => SpinnerDuration;
 
-        protected override void CopyFrom(HitObject other, IDictionary<object, object>? referenceLookup = null)
+        protected override void CopyFrom(HitObject other, IDictionary<object, object> referenceLookup)
         {
             base.CopyFrom(other, referenceLookup);
 

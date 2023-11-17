@@ -20,6 +20,11 @@ namespace osu.Game.Utils
         /// Creates a new <typeparamref name="T" /> that is a deep copy of the current instance.
         /// </summary>
         /// <returns>The <typeparamref name="T" />.</returns>
+        /// <remarks>
+        /// This default implementation exists so that a class implementing <see cref="IDeepCloneable{T}"/> can choose
+        /// to override this overload instead to save an allocation, in cases where it is
+        /// known that reference loops cannot occur.
+        /// </remarks>
         public T DeepClone()
         {
             return DeepClone(new Dictionary<object, object>());

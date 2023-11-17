@@ -52,7 +52,7 @@ namespace osu.Game.Rulesets.Catch.Objects
 
         Color4 IHasComboInformation.GetComboColour(ISkin skin) => IHasComboInformation.GetSkinComboColour(this, skin, IndexInBeatmap + 1);
 
-        protected override void CopyFrom(HitObject other, IDictionary<object, object>? referenceLookup = null)
+        protected override void CopyFrom(HitObject other, IDictionary<object, object> referenceLookup)
         {
             base.CopyFrom(other, referenceLookup);
 

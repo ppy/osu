@@ -48,7 +48,7 @@ namespace osu.Game.Rulesets.Catch.Objects
             }
         }
 
-        protected override void CopyFrom(HitObject other, IDictionary<object, object>? referenceLookup = null)
+        protected override void CopyFrom(HitObject other, IDictionary<object, object> referenceLookup)
         {
             base.CopyFrom(other, referenceLookup);
 

@@ -162,7 +162,7 @@ namespace osu.Game.Rulesets.Osu.Objects
 
         protected override HitWindows CreateHitWindows() => new OsuHitWindows();
 
-        protected override void CopyFrom(HitObject other, IDictionary<object, object>? referenceLookup = null)
+        protected override void CopyFrom(HitObject other, IDictionary<object, object> referenceLookup)
         {
             base.CopyFrom(other, referenceLookup);
 

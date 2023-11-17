@@ -102,7 +102,7 @@ namespace osu.Game.Rulesets.Taiko.Objects
             Samples = Samples
         };
 
-        protected override void CopyFrom(HitObject other, IDictionary<object, object>? referenceLookup = null)
+        protected override void CopyFrom(HitObject other, IDictionary<object, object> referenceLookup)
         {
             base.CopyFrom(other, referenceLookup);
 

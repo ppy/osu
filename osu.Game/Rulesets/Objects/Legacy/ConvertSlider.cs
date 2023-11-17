@@ -63,7 +63,7 @@ namespace osu.Game.Rulesets.Objects.Legacy
             Velocity = scoringDistance / timingPoint.BeatLength;
         }
 
-        protected override void CopyFrom(HitObject other, IDictionary<object, object> referenceLookup = null)
+        protected override void CopyFrom(HitObject other, IDictionary<object, object> referenceLookup)
         {
             base.CopyFrom(other, referenceLookup);
 

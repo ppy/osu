@@ -59,7 +59,7 @@ namespace osu.Game.Rulesets.Catch.Objects
 
         public double Duration { get; set; }
 
-        protected override void CopyFrom(HitObject other, IDictionary<object, object>? referenceLookup = null)
+        protected override void CopyFrom(HitObject other, IDictionary<object, object> referenceLookup)
         {
             base.CopyFrom(other, referenceLookup);
 

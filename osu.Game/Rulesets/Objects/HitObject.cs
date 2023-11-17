@@ -232,10 +232,8 @@ namespace osu.Game.Rulesets.Objects
 
         protected virtual HitObject CreateInstance() => new HitObject();
 
-        protected virtual void CopyFrom(HitObject other, IDictionary<object, object> referenceLookup = null)
+        protected virtual void CopyFrom(HitObject other, IDictionary<object, object> referenceLookup)
         {
-            referenceLookup ??= new Dictionary<object, object>();
-
             StartTime = other.StartTime;
             Samples = other.Samples.Select(s => s.DeepClone(referenceLookup)).ToList();
             Kiai = other.Kiai;

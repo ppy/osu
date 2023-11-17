@@ -82,7 +82,7 @@ namespace osu.Game.Rulesets.Taiko.Objects
         /// <param name="startTime">The start time of the nested hit.</param>
         protected abstract StrongNestedHitObject CreateStrongNestedHit(double startTime);
 
-        protected override void CopyFrom(HitObject other, IDictionary<object, object>? referenceLookup = null)
+        protected override void CopyFrom(HitObject other, IDictionary<object, object> referenceLookup)
         {
             base.CopyFrom(other, referenceLookup);
 

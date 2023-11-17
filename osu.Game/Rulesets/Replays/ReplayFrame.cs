@@ -38,12 +38,10 @@ namespace osu.Game.Rulesets.Replays
             if (referenceLookup.TryGetValue(this, out object? existing))
                 return (ReplayFrame)existing;
 
-            var clone = new ReplayFrame(Time)
-            {
-                Header = Header?.DeepClone(referenceLookup)
-            };
-
+            var clone = new ReplayFrame(Time);
             referenceLookup[this] = clone;
+
+            clone.Header = Header?.DeepClone(referenceLookup);
 
             return clone;
         }

@@ -25,7 +25,7 @@ namespace osu.Game.Rulesets.Objects.Legacy.Osu
 
         public bool GenerateTicks { get; set; } = true;
 
-        protected override void CopyFrom(HitObject other, IDictionary<object, object>? referenceLookup = null)
+        protected override void CopyFrom(HitObject other, IDictionary<object, object> referenceLookup)
         {
             base.CopyFrom(other, referenceLookup);
 
