@@ -197,17 +197,8 @@ namespace osu.Game.Rulesets.Osu.Scoring
                     increase = 0.011;
                     break;
 
-                case HitResult.Good:
-                    increase = 0.024;
-                    break;
-
                 case HitResult.Great:
                     increase = 0.03;
-                    break;
-
-                case HitResult.Perfect:
-                    // 1.1 * Great. Unused.
-                    increase = 0.033;
                     break;
 
                 case HitResult.SmallBonus:
