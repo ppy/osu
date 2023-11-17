@@ -234,9 +234,9 @@ namespace osu.Game.Rulesets.Catch
             };
         }
 
-        public override BeatmapDifficulty GetRateAdjustedDifficulty(IBeatmapDifficultyInfo baseDifficulty, double rate)
+        public override BeatmapDifficulty GetRateAdjustedDisplayDifficulty(IBeatmapDifficultyInfo difficulty, double rate)
         {
-            BeatmapDifficulty adjustedDifficulty = new BeatmapDifficulty(baseDifficulty);
+            BeatmapDifficulty adjustedDifficulty = new BeatmapDifficulty(difficulty);
 
             double preempt = adjustedDifficulty.ApproachRate < 6 ? (1200.0 + 600.0 * (5 - adjustedDifficulty.ApproachRate) / 5) : (1200.0 - 750.0 * (adjustedDifficulty.ApproachRate - 5) / 5);
 

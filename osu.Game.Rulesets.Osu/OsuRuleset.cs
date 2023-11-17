@@ -330,9 +330,9 @@ namespace osu.Game.Rulesets.Osu
 
         public override RulesetSetupSection CreateEditorSetupSection() => new OsuSetupSection();
 
-        public override BeatmapDifficulty GetRateAdjustedDifficulty(IBeatmapDifficultyInfo baseDifficulty, double rate)
+        public override BeatmapDifficulty GetRateAdjustedDisplayDifficulty(IBeatmapDifficultyInfo difficulty, double rate)
         {
-            BeatmapDifficulty adjustedDifficulty = new BeatmapDifficulty(baseDifficulty);
+            BeatmapDifficulty adjustedDifficulty = new BeatmapDifficulty(difficulty);
 
             double preempt = adjustedDifficulty.ApproachRate < 5 ? (1200.0 + 600.0 * (5 - adjustedDifficulty.ApproachRate) / 5) : (1200.0 - 750.0 * (adjustedDifficulty.ApproachRate - 5) / 5);
             preempt /= rate;

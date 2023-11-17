@@ -137,7 +137,7 @@ namespace osu.Game.Screens.Select.Details
                     foreach (var mod in mods.Value.OfType<IApplicableToRate>())
                         rate = mod.ApplyToRate(0, rate);
 
-                    adjustedDifficulty = ruleset.GetRateAdjustedDifficulty(originalDifficulty, rate);
+                    adjustedDifficulty = ruleset.GetRateAdjustedDisplayDifficulty(originalDifficulty, rate);
                     haveRateChangedValues = hasRateAdjustedProperties(originalDifficulty, adjustedDifficulty);
                 }
             }
