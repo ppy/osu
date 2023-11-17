@@ -4,6 +4,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Text;
 using NUnit.Framework;
 using osu.Framework.Allocation;
 using osu.Framework.Extensions.IEnumerableExtensions;
@@ -96,7 +97,7 @@ namespace osu.Game.Tests.Visual.Gameplay
 
             AddStep("Begin drag top left", () =>
             {
-                InputManager.MoveMouseTo(box1.ScreenSpaceDrawQuad.TopLeft - new Vector2(box1.ScreenSpaceDrawQuad.Width / 4));
+                InputManager.MoveMouseTo(box1.ScreenSpaceDrawQuad.TopLeft - new Vector2(box1.ScreenSpaceDrawQuad.Width / 4, box1.ScreenSpaceDrawQuad.Height / 8));
                 InputManager.PressButton(MouseButton.Left);
             });
 
@@ -146,8 +147,7 @@ namespace osu.Game.Tests.Visual.Gameplay
             {
                 AddStep("Add big black box", () =>
                 {
-                    InputManager.MoveMouseTo(skinEditor.ChildrenOfType<BigBlackBox>().First());
-                    InputManager.Click(MouseButton.Left);
+                    skinEditor.ChildrenOfType<SkinComponentToolbox.ToolboxComponentButton>().First(b => b.ChildrenOfType<BigBlackBox>().FirstOrDefault() != null).TriggerClick();
                 });
 
                 AddStep("store box", () =>
@@ -243,7 +243,9 @@ namespace osu.Game.Tests.Visual.Gameplay
             void revertAndCheckUnchanged()
             {
                 AddStep("Revert changes", () => changeHandler.RestoreState(int.MinValue));
-                AddAssert("Current state is same as default", () => defaultState.SequenceEqual(changeHandler.GetCurrentState()));
+                AddAssert("Current state is same as default",
+                    () => Encoding.UTF8.GetString(defaultState),
+                    () => Is.EqualTo(Encoding.UTF8.GetString(changeHandler.GetCurrentState())));
             }
         }
 
