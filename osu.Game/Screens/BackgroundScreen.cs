@@ -13,7 +13,8 @@ namespace osu.Game.Screens
 {
     public abstract partial class BackgroundScreen : Screen, IEquatable<BackgroundScreen>
     {
-        protected const float TRANSITION_LENGTH = 500;
+        public const float TRANSITION_LENGTH = 500;
+
         private const float x_movement_amount = 50;
 
         private readonly bool animateOnEnter;

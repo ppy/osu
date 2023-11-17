@@ -144,7 +144,7 @@ namespace osu.Game.Overlays.Comments
                                             Size = new Vector2(avatar_size),
                                             Children = new Drawable[]
                                             {
-                                                new UpdateableAvatar(Comment.User)
+                                                new UpdateableAvatar(Comment.User, showUserPanelOnHover: true)
                                                 {
                                                     Size = new Vector2(avatar_size),
                                                     Masking = true,

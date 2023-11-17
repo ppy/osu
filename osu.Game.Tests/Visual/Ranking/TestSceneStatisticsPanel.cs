@@ -203,6 +203,7 @@ namespace osu.Game.Tests.Visual.Ranking
 
                 public IBeatmap Beatmap { get; }
 
+                // ReSharper disable once NotNullOrRequiredMemberIsNotInitialized
                 public TestBeatmapConverter(IBeatmap beatmap)
                 {
                     Beatmap = beatmap;
