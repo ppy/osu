@@ -210,7 +210,8 @@ namespace osu.Game.Screens.Select.Details
             {
                 if (haveRateChangedValues)
                 {
-                    return $"One or more values are being adjusted by mods that change speed." +
+                    // Rather than localising this, it should be displayed in a better way (a custom tooltip which isn't a single super-long line).
+                    return "One or more values are being adjusted by mods that change speed." +
                            $" (AR {originalDifficulty?.ApproachRate ?? 0}→{(adjustedDifficulty?.ApproachRate ?? 0):0.0#}, " +
                            $"OD {originalDifficulty?.OverallDifficulty ?? 0}→{(adjustedDifficulty?.OverallDifficulty ?? 0):0.0#})";
                 }
