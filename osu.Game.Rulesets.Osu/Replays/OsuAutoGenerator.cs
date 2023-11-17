@@ -340,7 +340,7 @@ namespace osu.Game.Rulesets.Osu.Replays
             AddFrameToReplay(startFrame);
 
             // ~477 as per stable.
-            const float spin_rpm = 60000f / 20 * (180 / MathF.PI) / 360;
+            const float spin_rpm = 0.05f / (2 * MathF.PI) * 60000;
             float radsPerMillisecond = MathUtils.DegreesToRadians(spin_rpm * 360) / 60000;
 
             switch (h)
