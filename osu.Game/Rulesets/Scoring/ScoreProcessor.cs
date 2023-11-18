@@ -219,7 +219,7 @@ namespace osu.Game.Rulesets.Scoring
                 currentAccuracyJudgementCount++;
             }
 
-            if (!result.Type.IsScorable())
+            if (result.Type.IsScorable())
             {
                 if (result.Type.IncreasesCombo())
                     Combo.Value++;
