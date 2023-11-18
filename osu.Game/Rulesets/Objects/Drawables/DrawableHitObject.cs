@@ -704,7 +704,7 @@ namespace osu.Game.Rulesets.Objects.Drawables
             }
 
             Result.RawTime = Time.Current;
-            Result.GameplayRate = (Clock as IGameplayClock)?.GetTrueGameplayRate();
+            Result.GameplayRate = (Clock as IGameplayClock)?.GetTrueGameplayRate() ?? 1.0;
 
             if (Result.HasResult)
                 updateState(Result.IsHit ? ArmedState.Hit : ArmedState.Miss);
