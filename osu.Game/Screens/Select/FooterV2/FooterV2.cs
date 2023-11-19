@@ -48,11 +48,17 @@ namespace osu.Game.Screens.Select.FooterV2
 
         private FillFlowContainer<FooterButtonV2> buttons = null!;
 
-        [BackgroundDependencyLoader]
-        private void load(OverlayColourProvider colourProvider)
+        public FooterV2()
         {
             RelativeSizeAxes = Axes.X;
             Height = height;
+            Anchor = Anchor.BottomLeft;
+            Origin = Anchor.BottomLeft;
+        }
+
+        [BackgroundDependencyLoader]
+        private void load(OverlayColourProvider colourProvider)
+        {
             InternalChildren = new Drawable[]
             {
                 new Box

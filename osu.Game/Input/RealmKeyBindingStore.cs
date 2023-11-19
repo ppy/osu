@@ -130,5 +130,31 @@ namespace osu.Game.Input
 
             return true;
         }
+
+        /// <summary>
+        /// Clears all <see cref="RealmKeyBinding.KeyCombination"/>s from the provided <paramref name="keyBindings"/>
+        /// which are assigned to more than one binding.
+        /// </summary>
+        /// <param name="keyBindings">The <see cref="RealmKeyBinding"/>s to de-duplicate.</param>
+        /// <returns>Number of bindings cleared.</returns>
+        public static int ClearDuplicateBindings(IEnumerable<IKeyBinding> keyBindings)
+        {
+            int countRemoved = 0;
+
+            var lookup = keyBindings.ToLookup(kb => kb.KeyCombination);
+
+            foreach (var group in lookup)
+            {
+                if (group.Select(kb => kb.Action).Distinct().Count() <= 1)
+                    continue;
+
+                foreach (var binding in group)
+                    binding.KeyCombination = new KeyCombination(InputKey.None);
+
+                countRemoved += group.Count();
+            }
+
+            return countRemoved;
+        }
     }
 }

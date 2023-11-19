@@ -30,6 +30,7 @@ using osu.Game.Rulesets;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.UI;
 using osu.Game.Graphics.Containers;
+using osu.Game.Resources.Localisation.Web;
 
 namespace osu.Game.Screens.Select
 {
@@ -371,7 +372,7 @@ namespace osu.Game.Screens.Select
                     {
                         new InfoLabel(new BeatmapStatistic
                         {
-                            Name = $"Length (Drain: {playableBeatmap.CalculateDrainLength().ToFormattedDuration().ToString()})",
+                            Name = BeatmapsetsStrings.ShowStatsTotalLength(playableBeatmap.CalculateDrainLength().ToFormattedDuration()),
                             CreateIcon = () => new BeatmapStatisticIcon(BeatmapStatisticsIconType.Length),
                             Content = working.BeatmapInfo.Length.ToFormattedDuration().ToString(),
                         }),
@@ -415,7 +416,7 @@ namespace osu.Game.Screens.Select
 
                 bpmLabelContainer.Child = new InfoLabel(new BeatmapStatistic
                 {
-                    Name = "BPM",
+                    Name = BeatmapsetsStrings.ShowStatsBpm,
                     CreateIcon = () => new BeatmapStatisticIcon(BeatmapStatisticsIconType.Bpm),
                     Content = labelText
                 });

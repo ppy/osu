@@ -81,10 +81,10 @@ namespace osu.Game.Overlays.Wiki.Markdown
                     {
                         base.Update();
 
-                        if (Width > Parent.DrawWidth)
+                        if (Width > Parent!.DrawWidth)
                         {
                             float ratio = Height / Width;
-                            Width = Parent.DrawWidth;
+                            Width = Parent!.DrawWidth;
                             Height = ratio * Width;
                         }
                     }

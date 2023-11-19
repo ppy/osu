@@ -109,7 +109,7 @@ namespace osu.Game.Rulesets.Osu.Skinning.Argon
             base.Update();
 
             //undo rotation on layers which should not be rotated.
-            float appliedRotation = Parent.Rotation;
+            float appliedRotation = Parent!.Rotation;
 
             fill.Rotation = -appliedRotation;
         }

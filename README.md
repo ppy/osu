@@ -12,45 +12,48 @@
 
 A free-to-win rhythm game. Rhythm is just a *click* away!
 
-The future of [osu!](https://osu.ppy.sh) and the beginning of an open era! Currently known by and released under the release codename "*lazer*". As in sharper than cutting-edge.
+This is the future – and final – iteration of the [osu!](https://osu.ppy.sh) game client which marks the beginning of an open era! Currently known by and released under the release codename "*lazer*". As in sharper than cutting-edge.
 
 ## Status
 
-This project is under constant development, but we aim to keep things in a stable state. Users are encouraged to try it out and keep it installed alongside the stable *osu!* client. It will continue to evolve to the point of eventually replacing the existing stable client as an update.
+This project is under constant development, but we do our best to keep things in a stable state. Players are encouraged to install from a release alongside their stable *osu!* client. This project will continue to evolve until we eventually reach the point where most users prefer it over the previous "osu!stable" release.
 
-**IMPORTANT:** Gameplay mechanics (and other features which you may have come to know and love) are in a constant state of flux. Game balance and final quality-of-life passes come at the end of development, preceded by experimentation and changes which may potentially **reduce playability or usability**. This is done in order to allow us to move forward as developers and designers more efficiently. If this offends you, please consider sticking to a [stable release](https://osu.ppy.sh/home/download) of osu!. We are not yet open to heated discussion over game mechanics and will not be using github as a forum for such discussions just yet.
-
-We are accepting bug reports (please report with as much detail as possible and follow the existing issue templates). Feature requests are also welcome, but understand that our focus is on completing the game to feature parity before adding new features. A few resources are available as starting points to getting involved and understanding the project:
+A few resources are available as starting points to getting involved and understanding the project:
 
 - Detailed release changelogs are available on the [official osu! site](https://osu.ppy.sh/home/changelog/lazer).
 - You can learn more about our approach to [project management](https://github.com/ppy/osu/wiki/Project-management).
+- Track our current efforts [towards full "ranked play" support](https://github.com/orgs/ppy/projects/13?query=is%3Aopen+sort%3Aupdated-desc).
 
 ## Running osu!
 
-If you are looking to install or test osu! without setting up a development environment, you can consume our [releases](https://github.com/ppy/osu/releases). You can also generally download a version for your current device from the [osu! site](https://osu.ppy.sh/home/download). Failing that, you may use the links below to download the latest version for your operating system of choice:
+If you are just looking to give the game a whirl, you can grab the latest release for your platform:
 
-**Latest release:**
+### Latest release:
 
 | [Windows 8.1+ (x64)](https://github.com/ppy/osu/releases/latest/download/install.exe) | macOS 10.15+ ([Intel](https://github.com/ppy/osu/releases/latest/download/osu.app.Intel.zip), [Apple Silicon](https://github.com/ppy/osu/releases/latest/download/osu.app.Apple.Silicon.zip)) | [Linux (x64)](https://github.com/ppy/osu/releases/latest/download/osu.AppImage) | [iOS 13.4+](https://osu.ppy.sh/home/testflight) | [Android 5+](https://github.com/ppy/osu/releases/latest/download/sh.ppy.osulazer.apk) |
 | ------------- | ------------- | ------------- | ------------- | ------------- |
 
-- The iOS testflight link may fill up (Apple has a hard limit of 10,000 users). We reset it occasionally when this happens. Please do not ask about this. Check back regularly for link resets or follow [peppy](https://twitter.com/ppy) on twitter for announcements of link resets.
+You can also generally download a version for your current device from the [osu! site](https://osu.ppy.sh/home/download).
 
 If your platform is not listed above, there is still a chance you can manually build it by following the instructions below.
 
+**For iOS/iPadOS users**: The iOS testflight link fills up very fast (Apple has a hard limit of 10,000 users). We reset it occasionally. Please do not ask about this. Check back regularly for link resets or follow [peppy](https://twitter.com/ppy) on twitter for announcements. Our goal is to get the game on mobile app stores in early 2024.
+
 ## Developing a custom ruleset
 
-osu! is designed to have extensible modular gameplay modes, called "rulesets". Building one of these allows a developer to harness the power of osu! for their own game style. To get started working on a ruleset, we have some templates available [here](https://github.com/ppy/osu/tree/master/Templates).
+osu! is designed to allow user-created gameplay variations, called "rulesets". Building one of these allows a developer to harness the power of the osu! beatmap library, game engine, and general UX for a new style of gameplay. To get started working on a ruleset, we have some templates available [here](https://github.com/ppy/osu/tree/master/Templates).
 
 You can see some examples of custom rulesets by visiting the [custom ruleset directory](https://github.com/ppy/osu/discussions/13096).
 
 ## Developing osu!
 
+### Prerequisites
+
 Please make sure you have the following prerequisites:
 
 - A desktop platform with the [.NET 6.0 SDK](https://dotnet.microsoft.com/download) installed.
 
-When working with the codebase, we recommend using an IDE with intelligent code completion and syntax highlighting, such as the latest version of [Visual Studio](https://visualstudio.microsoft.com/vs/), [JetBrains Rider](https://www.jetbrains.com/rider/) or [Visual Studio Code](https://code.visualstudio.com/).
+When working with the codebase, we recommend using an IDE with intelligent code completion and syntax highlighting, such as the latest version of [Visual Studio](https://visualstudio.microsoft.com/vs/), [JetBrains Rider](https://www.jetbrains.com/rider/), or [Visual Studio Code](https://code.visualstudio.com/) with the [EditorConfig](https://marketplace.visualstudio.com/items?itemName=EditorConfig.EditorConfig) and [C#](https://marketplace.visualstudio.com/items?itemName=ms-dotnettools.csharp) plugin installed.
 
 ### Downloading the source code
 
@@ -69,9 +72,19 @@ git pull
 
 ### Building
 
-Build configurations for the recommended IDEs (listed above) are included. You should use the provided Build/Run functionality of your IDE to get things going. When testing or building new components, it's highly encouraged you use the `VisualTests` project/configuration. More information on this is provided [below](#contributing).
+#### From an IDE
 
-- Visual Studio / Rider users should load the project via one of the platform-specific `.slnf` files, rather than the main `.sln`. This will allow access to template run configurations.
+You should load the solution via one of the platform-specific `.slnf` files, rather than the main `.sln`. This will reduce dependencies and hide platforms that you don't care about. Valid `.slnf` files are:
+
+- `osu.Desktop.slnf` (most common)
+- `osu.Android.slnf`
+- `osu.iOS.slnf`
+
+Run configurations for the recommended IDEs (listed above) are included. You should use the provided Build/Run functionality of your IDE to get things going. When testing or building new components, it's highly encouraged you use the `osu! (Tests)` project/configuration. More information on this is provided [below](#contributing).
+
+To build for mobile platforms, you will likely need to run `sudo dotnet workload restore` if you haven't done so previously. This will install Android/iOS tooling required to complete the build.
+
+#### From CLI
 
 You can also build and run *osu!* from the command-line with a single command:
 
@@ -79,11 +92,9 @@ You can also build and run *osu!* from the command-line with a single command:
 dotnet run --project osu.Desktop
 ```
 
-If you are not interested in debugging *osu!*, you can add `-c Release` to gain performance. In this case, you must replace `Debug` with `Release` in any commands mentioned in this document.
+When running locally to do any kind of performance testing, make sure to add `-c Release` to the build command, as the overhead of running with the default `Debug` configuration can be large (especially when testing with local framework modifications as below).
 
 If the build fails, try to restore NuGet packages with `dotnet restore`.
-
-_Due to a historical feature gap between .NET Core and Xamarin, running `dotnet` CLI from the root directory will not work for most commands. This can be resolved by specifying a target `.csproj` or the helper project at `build/Desktop.proj`. Configurations have been provided to work around this issue for all supported IDEs mentioned above._
 
 ### Testing with resource/framework modifications
 

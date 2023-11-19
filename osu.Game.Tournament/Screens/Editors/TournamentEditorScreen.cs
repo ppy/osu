@@ -82,7 +82,7 @@ namespace osu.Game.Tournament.Screens.Editors
                         new TourneyButton
                         {
                             RelativeSizeAxes = Axes.X,
-                            BackgroundColour = colours.Pink3,
+                            BackgroundColour = colours.DangerousButtonColour,
                             Text = "Clear all",
                             Action = () =>
                             {

@@ -19,6 +19,13 @@ namespace osu.Game.Scoring.Legacy
     [JsonObject(MemberSerialization.OptIn)]
     public class LegacyReplaySoloScoreInfo
     {
+        /// <remarks>
+        /// The value of this property should correspond to <see cref="ScoreInfo.OnlineID"/>
+        /// (i.e. come from the `solo_scores` ID scheme).
+        /// </remarks>
+        [JsonProperty("online_id")]
+        public long OnlineID { get; set; } = -1;
+
         [JsonProperty("mods")]
         public APIMod[] Mods { get; set; } = Array.Empty<APIMod>();
 
@@ -30,6 +37,7 @@ namespace osu.Game.Scoring.Legacy
 
         public static LegacyReplaySoloScoreInfo FromScore(ScoreInfo score) => new LegacyReplaySoloScoreInfo
         {
+            OnlineID = score.OnlineID,
             Mods = score.APIMods,
             Statistics = score.Statistics.Where(kvp => kvp.Value != 0).ToDictionary(kvp => kvp.Key, kvp => kvp.Value),
             MaximumStatistics = score.MaximumStatistics.Where(kvp => kvp.Value != 0).ToDictionary(kvp => kvp.Key, kvp => kvp.Value),

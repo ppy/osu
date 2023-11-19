@@ -15,6 +15,7 @@ using osu.Game.IO.Archives;
 using osu.Game.Screens.Play.HUD;
 using osu.Game.Screens.Play.HUD.HitErrorMeters;
 using osu.Game.Skinning;
+using osu.Game.Skinning.Components;
 using osu.Game.Tests.Resources;
 
 namespace osu.Game.Tests.Skins
@@ -52,7 +53,13 @@ namespace osu.Game.Tests.Skins
             // Covers player avatar and flag.
             "Archives/modified-argon-20230305.osk",
             // Covers key counters
-            "Archives/modified-argon-pro-20230618.osk"
+            "Archives/modified-argon-pro-20230618.osk",
+            // Covers "Argon" health display
+            "Archives/modified-argon-pro-20231001.osk",
+            // Covers player name text component.
+            "Archives/modified-argon-20231106.osk",
+            // Covers "Argon" accuracy/score/combo counters, and wedges
+            "Archives/modified-argon-20231108.osk",
         };
 
         /// <summary>
@@ -97,6 +104,20 @@ namespace osu.Game.Tests.Skins
         }
 
         [Test]
+        public void TestDeserialiseModifiedArgon()
+        {
+            using (var stream = TestResources.OpenResource("Archives/modified-argon-20231106.osk"))
+            using (var storage = new ZipArchiveReader(stream))
+            {
+                var skin = new TestSkin(new SkinInfo(), null, storage);
+
+                Assert.That(skin.LayoutInfos, Has.Count.EqualTo(2));
+                Assert.That(skin.LayoutInfos[SkinComponentsContainerLookup.TargetArea.MainHUDComponents].AllDrawables.ToArray(), Has.Length.EqualTo(10));
+                Assert.That(skin.LayoutInfos[SkinComponentsContainerLookup.TargetArea.MainHUDComponents].AllDrawables.Select(i => i.Type), Contains.Item(typeof(PlayerName)));
+            }
+        }
+
+        [Test]
         public void TestDeserialiseModifiedClassic()
         {
             using (var stream = TestResources.OpenResource("Archives/modified-classic-20220723.osk"))
@@ -128,8 +149,8 @@ namespace osu.Game.Tests.Skins
 
         private class TestSkin : Skin
         {
-            public TestSkin(SkinInfo skin, IStorageResourceProvider? resources, IResourceStore<byte[]>? storage = null, string configurationFilename = "skin.ini")
-                : base(skin, resources, storage, configurationFilename)
+            public TestSkin(SkinInfo skin, IStorageResourceProvider? resources, IResourceStore<byte[]>? fallbackStore = null, string configurationFilename = "skin.ini")
+                : base(skin, resources, fallbackStore, configurationFilename)
             {
             }
 

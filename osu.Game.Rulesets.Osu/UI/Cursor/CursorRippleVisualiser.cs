@@ -95,7 +95,7 @@ namespace osu.Game.Rulesets.Osu.UI.Cursor
                 {
                     new RingPiece(3)
                     {
-                        Size = new Vector2(OsuHitObject.OBJECT_RADIUS * 2),
+                        Size = OsuHitObject.OBJECT_DIMENSIONS,
                         Alpha = 0.1f,
                     }
                 };

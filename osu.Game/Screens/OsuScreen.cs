@@ -89,9 +89,9 @@ namespace osu.Game.Screens
 
         public virtual bool? AllowGlobalTrackControl => null;
 
-        public Bindable<WorkingBeatmap> Beatmap { get; private set; }
+        public Bindable<WorkingBeatmap> Beatmap { get; private set; } = null!;
 
-        public Bindable<RulesetInfo> Ruleset { get; private set; }
+        public Bindable<RulesetInfo> Ruleset { get; private set; } = null!;
 
         public Bindable<IReadOnlyList<Mod>> Mods { get; private set; }
 

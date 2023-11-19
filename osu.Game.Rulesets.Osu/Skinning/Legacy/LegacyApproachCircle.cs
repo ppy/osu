@@ -5,12 +5,14 @@ using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Game.Rulesets.Objects.Drawables;
+using osu.Game.Rulesets.Osu.Objects;
 using osu.Game.Skinning;
 using osuTK;
 using osuTK.Graphics;
 
 namespace osu.Game.Rulesets.Osu.Skinning.Legacy
 {
+    // todo: this should probably not be a SkinnableSprite, as this is always created for legacy skins and is recreated on skin change.
     public partial class LegacyApproachCircle : SkinnableSprite
     {
         private readonly IBindable<Color4> accentColour = new Bindable<Color4>();
@@ -19,7 +21,7 @@ namespace osu.Game.Rulesets.Osu.Skinning.Legacy
         private DrawableHitObject drawableObject { get; set; } = null!;
 
         public LegacyApproachCircle()
-            : base("Gameplay/osu/approachcircle")
+            : base("Gameplay/osu/approachcircle", OsuHitObject.OBJECT_DIMENSIONS * 2)
         {
         }
 
