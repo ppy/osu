@@ -263,18 +263,19 @@ namespace osu.Game.Rulesets.Mania
                         new ManiaModInvert(),
                         new ManiaModConstantSpeed(),
                         new ManiaModHoldOff(),
-                        new MultiMod(
-                            new ManiaModKey1(),
-                            new ManiaModKey2(),
-                            new ManiaModKey3(),
-                            new ManiaModKey4(),
-                            new ManiaModKey5(),
-                            new ManiaModKey6(),
-                            new ManiaModKey7(),
-                            new ManiaModKey8(),
-                            new ManiaModKey9(),
-                            new ManiaModKey10()
-                        ),
+                        // new MultiMod(
+                        //     new ManiaModKey1(),
+                        //     new ManiaModKey2(),
+                        //     new ManiaModKey3(),
+                        //     new ManiaModKey4(),
+                        //     new ManiaModKey5(),
+                        //     new ManiaModKey6(),
+                        //     new ManiaModKey7(),
+                        //     new ManiaModKey8(),
+                        //     new ManiaModKey9(),
+                        //     new ManiaModKey10()
+                        // ),
+                        new ManiaModKeyCount()
                     };
 
                 case ModType.Automation:
