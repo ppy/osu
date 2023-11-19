@@ -9,6 +9,6 @@ namespace osu.Game.Rulesets.Mania.Mods
     {
         public override string Name => "Key Count";
         public override string Acronym => "KC";
-        public override LocalisableString Description => @"Change the number of keys";
+        public override LocalisableString Description => @"Change the number of keys.";
     }
 }
