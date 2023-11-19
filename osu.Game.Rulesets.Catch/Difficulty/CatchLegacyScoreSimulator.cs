@@ -20,12 +20,9 @@ namespace osu.Game.Rulesets.Catch.Difficulty
 
         public int ComboScore { get; private set; }
 
-        public int LegacyBonusScore { get; private set; }
+        public double BonusScoreRatio => legacyBonusScore == 0 ? 0 : (double)modernBonusScore / legacyBonusScore;
 
-        public int MaxCombo { get; private set; }
-
-        public double BonusScoreRatio => LegacyBonusScore == 0 ? 0 : (double)modernBonusScore / LegacyBonusScore;
-
+        private int legacyBonusScore;
         private int modernBonusScore;
         private int combo;
 
@@ -77,7 +74,6 @@ namespace osu.Game.Rulesets.Catch.Difficulty
 
             foreach (var obj in playableBeatmap.HitObjects)
                 simulateHit(obj);
-            MaxCombo = combo;
         }
 
         private void simulateHit(HitObject hitObject)
@@ -133,7 +129,7 @@ namespace osu.Game.Rulesets.Catch.Difficulty
 
             if (isBonus)
             {
-                LegacyBonusScore += scoreIncrease;
+                legacyBonusScore += scoreIncrease;
                 modernBonusScore += Judgement.ToNumericResult(bonusResult);
             }
             else
