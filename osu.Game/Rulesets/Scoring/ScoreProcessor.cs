@@ -301,7 +301,7 @@ namespace osu.Game.Rulesets.Scoring
 
         protected virtual double GetBonusScoreChange(JudgementResult result) => Judgement.ToNumericResult(result.Type);
 
-        protected virtual double GetComboScoreChange(JudgementResult result) => Judgement.ToNumericResult(result.Type) * Math.Pow(result.ComboAfterJudgement, COMBO_EXPONENT);
+        protected virtual double GetComboScoreChange(JudgementResult result) => Judgement.ToNumericResult(result.Judgement.MaxResult) * Math.Pow(result.ComboAfterJudgement, COMBO_EXPONENT);
 
         protected virtual void ApplyScoreChange(JudgementResult result)
         {
@@ -325,8 +325,8 @@ namespace osu.Game.Rulesets.Scoring
 
         protected virtual double ComputeTotalScore(double comboProgress, double accuracyProgress, double bonusPortion)
         {
-            return 700000 * Accuracy.Value * comboProgress +
-                   300000 * Math.Pow(Accuracy.Value, 8) * accuracyProgress +
+            return 500000 * Accuracy.Value * comboProgress +
+                   500000 * Math.Pow(Accuracy.Value, 5) * accuracyProgress +
                    bonusPortion;
         }
 

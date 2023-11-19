@@ -316,11 +316,11 @@ namespace osu.Game.Database
                         1.2 * (newLowerStrippedV3 + newUpperStrippedV3) / 2
                     );
 
-                    double newComboScoreProportion = (strippedV3 / maxStrippedV3) * score.Accuracy;
+                    double newComboScoreProportion = (strippedV3 / maxStrippedV3);
 
                     return (long)Math.Round((
-                        700000 * newComboScoreProportion * score.Accuracy
-                        + 300000 * Math.Pow(score.Accuracy, 8)
+                        500000 * newComboScoreProportion * score.Accuracy
+                        + 500000 * Math.Pow(score.Accuracy, 5)
                         + bonusProportion) * modMultiplier);
 
                 case 1:
