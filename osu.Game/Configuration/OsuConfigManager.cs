@@ -64,7 +64,13 @@ namespace osu.Game.Configuration
             SetDefault(OsuSetting.Username, string.Empty);
             SetDefault(OsuSetting.Token, string.Empty);
 
+#pragma warning disable CS0618 // Type or member is obsolete
+            // this default set MUST remain despite the setting being deprecated, because `SetDefault()` calls are implicitly used to declare the type returned for the lookup.
+            // if this is removed, the setting will be interpreted as a string, and `Migrate()` will fail due to cast failure.
+            // can be removed 20240618
             SetDefault(OsuSetting.AutomaticallyDownloadWhenSpectating, false);
+#pragma warning restore CS0618 // Type or member is obsolete
+            SetDefault(OsuSetting.AutomaticallyDownloadMissingBeatmaps, false);
 
             SetDefault(OsuSetting.SavePassword, false).ValueChanged += enabled =>
             {
@@ -101,6 +107,8 @@ namespace osu.Game.Configuration
             SetDefault(OsuSetting.MouseDisableButtons, false);
             SetDefault(OsuSetting.MouseDisableWheel, false);
             SetDefault(OsuSetting.ConfineMouseMode, OsuConfineMouseMode.DuringGameplay);
+
+            SetDefault(OsuSetting.TouchDisableGameplayTaps, false);
 
             // Graphics
             SetDefault(OsuSetting.ShowFpsDisplay, false);
@@ -178,6 +186,7 @@ namespace osu.Game.Configuration
             SetDefault(OsuSetting.EditorShowHitMarkers, true);
             SetDefault(OsuSetting.EditorAutoSeekOnPlacement, true);
             SetDefault(OsuSetting.EditorLimitedDistanceSnap, false);
+            SetDefault(OsuSetting.EditorShowSpeedChanges, false);
 
             SetDefault(OsuSetting.LastProcessedMetadataId, -1);
 
@@ -215,6 +224,12 @@ namespace osu.Game.Configuration
 
             // migrations can be added here using a condition like:
             // if (combined < 20220103) { performMigration() }
+            if (combined < 20230918)
+            {
+#pragma warning disable CS0618 // Type or member is obsolete
+                SetValue(OsuSetting.AutomaticallyDownloadMissingBeatmaps, Get<bool>(OsuSetting.AutomaticallyDownloadWhenSpectating)); // can be removed 20240618
+#pragma warning restore CS0618 // Type or member is obsolete
+            }
         }
 
         public override TrackedSettings CreateTrackedSettings()
@@ -317,6 +332,10 @@ namespace osu.Game.Configuration
 
         ShowHealthDisplayWhenCantFail,
         FadePlayfieldWhenHealthLow,
+
+        /// <summary>
+        /// Disables mouse buttons clicks during gameplay.
+        /// </summary>
         MouseDisableButtons,
         MouseDisableWheel,
         ConfineMouseMode,
@@ -383,13 +402,19 @@ namespace osu.Game.Configuration
         EditorShowHitMarkers,
         EditorAutoSeekOnPlacement,
         DiscordRichPresence,
+
+        [Obsolete($"Use {nameof(AutomaticallyDownloadMissingBeatmaps)} instead.")] // can be removed 20240318
         AutomaticallyDownloadWhenSpectating,
+
         ShowOnlineExplicitContent,
         LastProcessedMetadataId,
         SafeAreaConsiderations,
         ComboColourNormalisationAmount,
         ProfileCoverExpanded,
         EditorLimitedDistanceSnap,
-        ReplaySettingsOverlay
+        ReplaySettingsOverlay,
+        AutomaticallyDownloadMissingBeatmaps,
+        EditorShowSpeedChanges,
+        TouchDisableGameplayTaps,
     }
 }

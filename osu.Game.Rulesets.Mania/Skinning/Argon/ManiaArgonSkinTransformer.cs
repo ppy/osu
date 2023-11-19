@@ -2,6 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
+using osu.Framework;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Game.Beatmaps;
@@ -99,9 +100,18 @@ namespace osu.Game.Rulesets.Mania.Skinning.Argon
                         return SkinUtils.As<TValue>(new Bindable<float>(30));
 
                     case LegacyManiaSkinConfigurationLookups.ColumnWidth:
-                        return SkinUtils.As<TValue>(new Bindable<float>(
-                            stage.IsSpecialColumn(columnIndex) ? 120 : 60
-                        ));
+
+                        float width;
+
+                        bool isSpecialColumn = stage.IsSpecialColumn(columnIndex);
+
+                        // Best effort until we have better mobile support.
+                        if (RuntimeInfo.IsMobile)
+                            width = 170 * Math.Min(1, 7f / beatmap.TotalColumns) * (isSpecialColumn ? 1.8f : 1);
+                        else
+                            width = 60 * (isSpecialColumn ? 2 : 1);
+
+                        return SkinUtils.As<TValue>(new Bindable<float>(width));
 
                     case LegacyManiaSkinConfigurationLookups.ColumnBackgroundColour:
 

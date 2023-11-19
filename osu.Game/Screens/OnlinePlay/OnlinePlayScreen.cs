@@ -26,14 +26,17 @@ namespace osu.Game.Screens.OnlinePlay
         [Cached]
         protected readonly OverlayColourProvider ColourProvider = new OverlayColourProvider(OverlayColourScheme.Plum);
 
+        public IScreen CurrentSubScreen => screenStack.CurrentScreen;
+
         public override bool CursorVisible => (screenStack?.CurrentScreen as IOnlinePlaySubScreen)?.CursorVisible ?? true;
 
         // this is required due to PlayerLoader eventually being pushed to the main stack
         // while leases may be taken out by a subscreen.
         public override bool DisallowExternalBeatmapRulesetChanges => true;
 
+        protected LoungeSubScreen Lounge { get; private set; }
+
         private MultiplayerWaveContainer waves;
-        private LoungeSubScreen loungeSubScreen;
         private ScreenStack screenStack;
 
         [Cached(Type = typeof(IRoomManager))]
@@ -89,7 +92,7 @@ namespace osu.Game.Screens.OnlinePlay
             screenStack.ScreenPushed += screenPushed;
             screenStack.ScreenExited += screenExited;
 
-            screenStack.Push(loungeSubScreen = CreateLounge());
+            screenStack.Push(Lounge = CreateLounge());
 
             apiState.BindTo(API.State);
             apiState.BindValueChanged(onlineStateChanged, true);
@@ -120,10 +123,10 @@ namespace osu.Game.Screens.OnlinePlay
 
             Mods.SetDefault();
 
-            if (loungeSubScreen.IsCurrentScreen())
-                loungeSubScreen.OnEntering(e);
+            if (Lounge.IsCurrentScreen())
+                Lounge.OnEntering(e);
             else
-                loungeSubScreen.MakeCurrent();
+                Lounge.MakeCurrent();
         }
 
         public override void OnResuming(ScreenTransitionEvent e)
@@ -223,8 +226,6 @@ namespace osu.Game.Screens.OnlinePlay
             if (newScreen is IOsuScreen newOsuScreen)
                 ((IBindable<UserActivity>)Activity).BindTo(newOsuScreen.Activity);
         }
-
-        public IScreen CurrentSubScreen => screenStack.CurrentScreen;
 
         protected abstract string ScreenTitle { get; }
 

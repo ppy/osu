@@ -58,7 +58,7 @@ namespace osu.Game.Tests.Visual
             IBindable<double> IScrollingInfo.TimeRange => TimeRange;
 
             public readonly TestScrollAlgorithm Algorithm = new TestScrollAlgorithm();
-            IScrollAlgorithm IScrollingInfo.Algorithm => Algorithm;
+            IBindable<IScrollAlgorithm> IScrollingInfo.Algorithm => new Bindable<IScrollAlgorithm>(Algorithm);
         }
 
         public class TestScrollAlgorithm : IScrollAlgorithm

@@ -39,7 +39,10 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders
         private int currentSegmentLength;
 
         [Resolved(CanBeNull = true)]
-        private IDistanceSnapProvider snapProvider { get; set; }
+        private IPositionSnapProvider positionSnapProvider { get; set; }
+
+        [Resolved(CanBeNull = true)]
+        private IDistanceSnapProvider distanceSnapProvider { get; set; }
 
         protected override bool IsValidForPlacement => HitObject.Path.HasValidLength;
 
@@ -85,9 +88,9 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders
                     BeginPlacement();
 
                     double? nearestSliderVelocity = (editorBeatmap.HitObjects
-                                                                  .LastOrDefault(h => h is Slider && h.GetEndTime() < HitObject.StartTime) as Slider)?.SliderVelocity;
+                                                                  .LastOrDefault(h => h is Slider && h.GetEndTime() < HitObject.StartTime) as Slider)?.SliderVelocityMultiplier;
 
-                    HitObject.SliderVelocity = nearestSliderVelocity ?? 1;
+                    HitObject.SliderVelocityMultiplier = nearestSliderVelocity ?? 1;
                     HitObject.Position = ToLocalSpace(result.ScreenSpacePosition);
 
                     // Replacing the DifficultyControlPoint above doesn't trigger any kind of invalidation.
@@ -198,7 +201,7 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders
                 }
 
                 // Update the cursor position.
-                var result = snapProvider?.FindSnappedPositionAndTime(inputManager.CurrentState.Mouse.Position, state == SliderPlacementState.Body ? SnapType.GlobalGrids : SnapType.All);
+                var result = positionSnapProvider?.FindSnappedPositionAndTime(inputManager.CurrentState.Mouse.Position, state == SliderPlacementState.Body ? SnapType.GlobalGrids : SnapType.All);
                 cursor.Position = ToLocalSpace(result?.ScreenSpacePosition ?? inputManager.CurrentState.Mouse.Position) - HitObject.Position;
             }
             else if (cursor != null)
@@ -230,7 +233,7 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders
 
         private void updateSlider()
         {
-            HitObject.Path.ExpectedDistance.Value = snapProvider?.FindSnappedDistance(HitObject, (float)HitObject.Path.CalculatedDistance) ?? (float)HitObject.Path.CalculatedDistance;
+            HitObject.Path.ExpectedDistance.Value = distanceSnapProvider?.FindSnappedDistance(HitObject, (float)HitObject.Path.CalculatedDistance) ?? (float)HitObject.Path.CalculatedDistance;
 
             bodyPiece.UpdateFrom(HitObject);
             headCirclePiece.UpdateFrom(HitObject.HeadCircle);

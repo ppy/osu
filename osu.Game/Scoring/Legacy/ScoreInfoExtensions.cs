@@ -4,6 +4,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Rulesets.Scoring;
 
 namespace osu.Game.Scoring.Legacy
@@ -16,6 +17,9 @@ namespace osu.Game.Scoring.Legacy
         public static long GetDisplayScore(this ScoreInfo scoreInfo, ScoringMode mode)
             => getDisplayScore(scoreInfo.Ruleset.OnlineID, scoreInfo.TotalScore, mode, scoreInfo.MaximumStatistics);
 
+        public static long GetDisplayScore(this SoloScoreInfo soloScoreInfo, ScoringMode mode)
+            => getDisplayScore(soloScoreInfo.RulesetID, soloScoreInfo.TotalScore, mode, soloScoreInfo.MaximumStatistics);
+
         private static long getDisplayScore(int rulesetId, long score, ScoringMode mode, IReadOnlyDictionary<HitResult, int> maximumStatistics)
         {
             if (mode == ScoringMode.Standardised)
@@ -27,44 +31,37 @@ namespace osu.Game.Scoring.Legacy
                                      .DefaultIfEmpty(0)
                                      .Sum();
 
-            // This gives a similar feeling to osu!stable scoring (ScoreV1) while keeping classic scoring as only a constant multiple of standardised scoring.
-            // The invariant is important to ensure that scores don't get re-ordered on leaderboards between the two scoring modes.
-            double scaledRawScore = score / ScoreProcessor.MAX_SCORE;
-
-            return (long)Math.Round(Math.Pow(scaledRawScore * Math.Max(1, maxBasicJudgements), 2) * getStandardisedToClassicMultiplier(rulesetId));
+            return convertStandardisedToClassic(rulesetId, score, maxBasicJudgements);
         }
 
         /// <summary>
-        /// Returns a ballpark multiplier which gives a similar "feel" for how large scores should get when displayed in "classic" mode.
+        /// Returns a ballpark "classic" score which gives a similar "feel" to stable.
         /// This is different per ruleset to match the different algorithms used in the scoring implementation.
         /// </summary>
-        private static double getStandardisedToClassicMultiplier(int rulesetId)
+        /// <remarks>
+        /// The coefficients chosen here were determined by a least-squares fit performed over all beatmaps
+        /// with the goal of minimising the relative error of maximum possible base score (without bonus).
+        /// The constant coefficients (100000, 1 / 10d) - while being detrimental to the least-squares fit - are forced,
+        /// so that every 10 points in standardised mode converts to at least 1 point in classic mode.
+        /// This is done to account for bonus judgements in a way that does not reorder scores.
+        /// </remarks>
+        private static long convertStandardisedToClassic(int rulesetId, long standardisedTotalScore, int objectCount)
         {
-            double multiplier;
-
             switch (rulesetId)
             {
-                // For non-legacy rulesets, just go with the same as the osu! ruleset.
-                // This is arbitrary, but at least allows the setting to do something to the score.
-                default:
                 case 0:
-                    multiplier = 36;
-                    break;
+                    return (long)Math.Round((objectCount * objectCount * 32.57 + 100000) * standardisedTotalScore / ScoreProcessor.MAX_SCORE);
 
                 case 1:
-                    multiplier = 22;
-                    break;
+                    return (long)Math.Round((objectCount * 1109 + 100000) * standardisedTotalScore / ScoreProcessor.MAX_SCORE);
 
                 case 2:
-                    multiplier = 28;
-                    break;
+                    return (long)Math.Round(Math.Pow(standardisedTotalScore / ScoreProcessor.MAX_SCORE * objectCount, 2) * 21.62 + standardisedTotalScore / 10d);
 
                 case 3:
-                    multiplier = 16;
-                    break;
+                default:
+                    return standardisedTotalScore;
             }
-
-            return multiplier;
         }
 
         public static int? GetCountGeki(this ScoreInfo scoreInfo)

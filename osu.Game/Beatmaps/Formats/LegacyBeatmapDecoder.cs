@@ -1,8 +1,6 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#pragma warning disable 618
-
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -30,9 +28,12 @@ namespace osu.Game.Beatmaps.Formats
         public const int EARLY_VERSION_TIMING_OFFSET = 24;
 
         /// <summary>
-        /// A small adjustment to the start time of control points to account for rounding/precision errors.
+        /// A small adjustment to the start time of sample control points to account for rounding/precision errors.
         /// </summary>
-        private const double control_point_leniency = 1;
+        /// <remarks>
+        /// Compare: https://github.com/peppy/osu-stable-reference/blob/master/osu!/GameplayElements/HitObjects/HitObject.cs#L319
+        /// </remarks>
+        private const double control_point_leniency = 5;
 
         internal static RulesetStore? RulesetStore;
 
@@ -103,15 +104,11 @@ namespace osu.Game.Beatmaps.Formats
         {
             DifficultyControlPoint difficultyControlPoint = (beatmap.ControlPointInfo as LegacyControlPointInfo)?.DifficultyPointAt(hitObject.StartTime) ?? DifficultyControlPoint.DEFAULT;
 
-            if (difficultyControlPoint is LegacyDifficultyControlPoint legacyDifficultyControlPoint)
-            {
-                hitObject.LegacyBpmMultiplier = legacyDifficultyControlPoint.BpmMultiplier;
-                if (hitObject is IHasGenerateTicks hasGenerateTicks)
-                    hasGenerateTicks.GenerateTicks = legacyDifficultyControlPoint.GenerateTicks;
-            }
+            if (hitObject is IHasGenerateTicks hasGenerateTicks)
+                hasGenerateTicks.GenerateTicks = difficultyControlPoint.GenerateTicks;
 
             if (hitObject is IHasSliderVelocity hasSliderVelocity)
-                hasSliderVelocity.SliderVelocity = difficultyControlPoint.SliderVelocity;
+                hasSliderVelocity.SliderVelocityMultiplier = difficultyControlPoint.SliderVelocity;
 
             hitObject.ApplyDefaults(beatmap.ControlPointInfo, beatmap.Difficulty);
         }
@@ -202,7 +199,8 @@ namespace osu.Game.Beatmaps.Formats
                     break;
 
                 case @"PreviewTime":
-                    metadata.PreviewTime = getOffsetTime(Parsing.ParseInt(pair.Value));
+                    int time = Parsing.ParseInt(pair.Value);
+                    metadata.PreviewTime = time == -1 ? time : getOffsetTime(time);
                     break;
 
                 case @"SampleSet":
@@ -497,8 +495,9 @@ namespace osu.Game.Beatmaps.Formats
 
             int onlineRulesetID = beatmap.BeatmapInfo.Ruleset.OnlineID;
 
-            addControlPoint(time, new LegacyDifficultyControlPoint(onlineRulesetID, beatLength)
+            addControlPoint(time, new DifficultyControlPoint
             {
+                GenerateTicks = !double.IsNaN(beatLength),
                 SliderVelocity = speedMultiplier,
             }, timingChange);
 

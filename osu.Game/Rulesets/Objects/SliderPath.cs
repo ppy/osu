@@ -262,9 +262,16 @@ namespace osu.Game.Rulesets.Objects
                 var segmentVertices = vertices.AsSpan().Slice(start, i - start + 1);
                 var segmentType = ControlPoints[start].Type ?? PathType.Linear;
 
-                foreach (Vector2 t in calculateSubPath(segmentVertices, segmentType))
+                // No need to calculate path when there is only 1 vertex
+                if (segmentVertices.Length == 1)
+                    calculatedPath.Add(segmentVertices[0]);
+                else if (segmentVertices.Length > 1)
                 {
-                    if (calculatedPath.Count == 0 || calculatedPath.Last() != t)
+                    List<Vector2> subPath = calculateSubPath(segmentVertices, segmentType);
+                    // Skip the first vertex if it is the same as the last vertex from the previous segment
+                    int skipFirst = calculatedPath.Count > 0 && subPath.Count > 0 && calculatedPath.Last() == subPath[0] ? 1 : 0;
+
+                    foreach (Vector2 t in subPath.Skip(skipFirst))
                         calculatedPath.Add(t);
                 }
 
@@ -328,8 +335,8 @@ namespace osu.Game.Rulesets.Objects
 
             if (ExpectedDistance.Value is double expectedDistance && calculatedLength != expectedDistance)
             {
-                // In osu-stable, if the last two control points of a slider are equal, extension is not performed.
-                if (ControlPoints.Count >= 2 && ControlPoints[^1].Position == ControlPoints[^2].Position && expectedDistance > calculatedLength)
+                // In osu-stable, if the last two path points of a slider are equal, extension is not performed.
+                if (calculatedPath.Count >= 2 && calculatedPath[^1] == calculatedPath[^2] && expectedDistance > calculatedLength)
                 {
                     cumulativeLength.Add(calculatedLength);
                     return;
