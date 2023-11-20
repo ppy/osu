@@ -80,19 +80,22 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders
             base.LoadComplete();
             inputManager = GetContainingInputManager();
 
-            drawingSettingsProvider.Tolerance.BindValueChanged(e =>
+            if (drawingSettingsProvider != null)
             {
-                if (bSplineBuilder.Tolerance != e.NewValue)
-                    bSplineBuilder.Tolerance = e.NewValue;
-                updateSliderPathFromBSplineBuilder();
-            }, true);
+                drawingSettingsProvider.Tolerance.BindValueChanged(e =>
+                {
+                    if (bSplineBuilder.Tolerance != e.NewValue)
+                        bSplineBuilder.Tolerance = e.NewValue;
+                    updateSliderPathFromBSplineBuilder();
+                }, true);
 
-            drawingSettingsProvider.CornerThreshold.BindValueChanged(e =>
-            {
-                if (bSplineBuilder.CornerThreshold != e.NewValue)
-                    bSplineBuilder.CornerThreshold = e.NewValue;
-                updateSliderPathFromBSplineBuilder();
-            }, true);
+                drawingSettingsProvider.CornerThreshold.BindValueChanged(e =>
+                {
+                    if (bSplineBuilder.CornerThreshold != e.NewValue)
+                        bSplineBuilder.CornerThreshold = e.NewValue;
+                    updateSliderPathFromBSplineBuilder();
+                }, true);
+            }
         }
 
         [Resolved]
