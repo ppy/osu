@@ -63,7 +63,7 @@ namespace osu.Game.Graphics.Containers.Markdown
             Font = OsuFont.GetFont(Typeface.Inter, size: 14, weight: FontWeight.Regular),
         };
 
-        public override MarkdownTextFlowContainer CreateTextFlow() => new OsuMarkdownTextFlowContainer();
+        public override OsuMarkdownTextFlowContainer CreateTextFlow() => new OsuMarkdownTextFlowContainer();
 
         protected override MarkdownHeading CreateHeading(HeadingBlock headingBlock) => new OsuMarkdownHeading(headingBlock);
 
