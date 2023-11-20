@@ -129,11 +129,6 @@ namespace osu.Game.Localisation
         /// </summary>
         public static LocalisableString FailedToProcessTimestamp => new TranslatableString(getKey(@"failed_to_process_timestamp"), @"Failed to process timestamp");
 
-        /// <summary>
-        /// "The timestamp was too long to process"
-        /// </summary>
-        public static LocalisableString TooLongTimestamp => new TranslatableString(getKey(@"too_long_timestamp"), @"The timestamp was too long to process");
-
         private static string getKey(string key) => $@"{prefix}:{key}";
     }
 }

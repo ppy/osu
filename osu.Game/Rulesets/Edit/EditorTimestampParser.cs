@@ -2,8 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
-using System.Diagnostics;
-using System.Linq;
+using System.Diagnostics.CodeAnalysis;
 using System.Text.RegularExpressions;
 
 namespace osu.Game.Rulesets.Edit
@@ -12,26 +11,40 @@ namespace osu.Game.Rulesets.Edit
     {
         // 00:00:000 (...) - test
         // original osu-web regex: https://github.com/ppy/osu-web/blob/3b1698639244cfdaf0b41c68bfd651ea729ec2e3/resources/js/utils/beatmapset-discussion-helper.ts#L78
-        public static readonly Regex TIME_REGEX = new Regex(@"\b(((\d{2,}):([0-5]\d)[:.](\d{3}))(\s\([^)]+\))?)");
+        public static readonly Regex TIME_REGEX = new Regex(@"\b(((?<minutes>\d{2,}):(?<seconds>[0-5]\d)[:.](?<milliseconds>\d{3}))(?<selection>\s\([^)]+\))?)", RegexOptions.Compiled);
 
-        public static string[] GetRegexGroups(string timestamp)
+        public static bool TryParse(string timestamp, [NotNullWhen(true)] out TimeSpan? parsedTime, out string? parsedSelection)
         {
             Match match = TIME_REGEX.Match(timestamp);
 
-            string[] result = match.Success
-                ? match.Groups.Values.Where(x => x is not Match && !x.Value.Contains(':')).Select(x => x.Value).ToArray()
-                : Array.Empty<string>();
+            if (!match.Success)
+            {
+                parsedTime = null;
+                parsedSelection = null;
+                return false;
+            }
 
-            return result;
-        }
+            bool result = true;
 
-        public static double GetTotalMilliseconds(params string[] timesGroup)
-        {
-            int[] times = timesGroup.Select(int.Parse).ToArray();
+            result &= int.TryParse(match.Groups[@"minutes"].Value, out int timeMin);
+            result &= int.TryParse(match.Groups[@"seconds"].Value, out int timeSec);
+            result &= int.TryParse(match.Groups[@"milliseconds"].Value, out int timeMsec);
 
-            Debug.Assert(times.Length == 3);
+            // somewhat sane limit for timestamp duration (10 hours).
+            result &= timeMin < 600;
 
-            return (times[0] * 60 + times[1]) * 1000 + times[2];
+            if (!result)
+            {
+                parsedTime = null;
+                parsedSelection = null;
+                return false;
+            }
+
+            parsedTime = TimeSpan.FromMinutes(timeMin) + TimeSpan.FromSeconds(timeSec) + TimeSpan.FromMilliseconds(timeMsec);
+            parsedSelection = match.Groups[@"selection"].Value.Trim();
+            if (!string.IsNullOrEmpty(parsedSelection))
+                parsedSelection = parsedSelection[1..^1];
+            return true;
         }
     }
 }
