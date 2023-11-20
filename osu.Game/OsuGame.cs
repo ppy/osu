@@ -555,9 +555,9 @@ namespace osu.Game
         public void ShowChangelogBuild(string updateStream, string version) => waitForReady(() => changelogOverlay, _ => changelogOverlay.ShowBuild(updateStream, version));
 
         /// <summary>
-        /// Seek to a given timestamp in the Editor and select relevant HitObjects if needed
+        /// Seeks to the provided <paramref name="timestamp"/> if the editor is currently open.
+        /// Can also select objects as indicated by the <paramref name="timestamp"/> (depends on ruleset implementation).
         /// </summary>
-        /// <param name="timestamp">The timestamp and the selected objects</param>
         public void HandleTimestamp(string timestamp)
         {
             if (ScreenStack.CurrentScreen is not Editor editor)
