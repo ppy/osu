@@ -64,7 +64,7 @@ namespace osu.Game.Rulesets.Osu.Edit
         protected readonly OsuDistanceSnapProvider DistanceSnapProvider = new OsuDistanceSnapProvider();
 
         [Cached]
-        protected readonly FreehandSliderSettingsProvider FreehandSliderSettingsProvider = new FreehandSliderSettingsProvider();
+        protected readonly FreehandSliderSettingsProvider FreehandlSliderToolboxGroup = new FreehandSliderSettingsProvider();
 
         [BackgroundDependencyLoader]
         private void load()
@@ -102,8 +102,7 @@ namespace osu.Game.Rulesets.Osu.Edit
                 RotationHandler = BlueprintContainer.SelectionHandler.RotationHandler,
             });
 
-            AddInternal(FreehandSliderSettingsProvider);
-            FreehandSliderSettingsProvider.AttachToToolbox(RightToolbox);
+            RightToolbox.Add(FreehandlSliderToolboxGroup);
         }
 
         protected override ComposeBlueprintContainer CreateBlueprintContainer()

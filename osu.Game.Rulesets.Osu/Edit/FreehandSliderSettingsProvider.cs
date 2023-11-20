@@ -2,6 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
+using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Utils;
@@ -10,8 +11,13 @@ using osu.Game.Rulesets.Edit;
 
 namespace osu.Game.Rulesets.Osu.Edit
 {
-    public partial class FreehandSliderSettingsProvider : Drawable
+    public partial class FreehandSliderSettingsProvider : EditorToolboxGroup
     {
+        public FreehandSliderSettingsProvider()
+            : base("slider")
+        {
+        }
+
         public BindableFloat Tolerance { get; } = new BindableFloat(1.5f)
         {
             MinValue = 0.05f,
@@ -41,6 +47,34 @@ namespace osu.Game.Rulesets.Osu.Edit
         private ExpandableSlider<int> toleranceSlider = null!;
         private ExpandableSlider<int> cornerThresholdSlider = null!;
 
+        [BackgroundDependencyLoader]
+        private void load()
+        {
+            Children = new Drawable[]
+            {
+                toleranceSlider = new ExpandableSlider<int>
+                {
+                    Current = sliderTolerance
+                },
+                cornerThresholdSlider = new ExpandableSlider<int>
+                {
+                    Current = sliderCornerThreshold
+                }
+            };
+
+            sliderTolerance.BindValueChanged(e =>
+            {
+                toleranceSlider.ContractedLabelText = $"C. P. S.: {e.NewValue:N0}";
+                toleranceSlider.ExpandedLabelText = $"Control Point Spacing: {e.NewValue:N0}";
+            }, true);
+
+            sliderCornerThreshold.BindValueChanged(e =>
+            {
+                cornerThresholdSlider.ContractedLabelText = $"C. T.: {e.NewValue:N0}";
+                cornerThresholdSlider.ExpandedLabelText = $"Corner Threshold: {e.NewValue:N0}";
+            }, true);
+        }
+
         protected override void LoadComplete()
         {
             base.LoadComplete();
@@ -69,36 +103,6 @@ namespace osu.Game.Rulesets.Osu.Edit
                 if (sliderCornerThreshold.Value != newValue)
                     sliderCornerThreshold.Value = newValue;
             });
-        }
-
-        public void AttachToToolbox(ExpandingToolboxContainer toolboxContainer)
-        {
-            toolboxContainer.Add(new EditorToolboxGroup("slider")
-            {
-                Children = new Drawable[]
-                {
-                    toleranceSlider = new ExpandableSlider<int>
-                    {
-                        Current = sliderTolerance
-                    },
-                    cornerThresholdSlider = new ExpandableSlider<int>
-                    {
-                        Current = sliderCornerThreshold
-                    }
-                }
-            });
-
-            sliderTolerance.BindValueChanged(e =>
-            {
-                toleranceSlider.ContractedLabelText = $"C. P. S.: {e.NewValue:N0}";
-                toleranceSlider.ExpandedLabelText = $"Control Point Spacing: {e.NewValue:N0}";
-            }, true);
-
-            sliderCornerThreshold.BindValueChanged(e =>
-            {
-                cornerThresholdSlider.ContractedLabelText = $"C. T.: {e.NewValue:N0}";
-                cornerThresholdSlider.ExpandedLabelText = $"Corner Threshold: {e.NewValue:N0}";
-            }, true);
         }
     }
 }
