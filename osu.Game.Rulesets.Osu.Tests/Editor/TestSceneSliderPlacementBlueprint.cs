@@ -291,6 +291,27 @@ namespace osu.Game.Rulesets.Osu.Tests.Editor
         }
 
         [Test]
+        public void TestSliderDrawing()
+        {
+            addMovementStep(new Vector2(200));
+            AddStep("press left button", () => InputManager.PressButton(MouseButton.Left));
+
+            addMovementStep(new Vector2(300, 200));
+            addMovementStep(new Vector2(400, 200));
+            addMovementStep(new Vector2(400, 300));
+            addMovementStep(new Vector2(400));
+            addMovementStep(new Vector2(300, 400));
+            addMovementStep(new Vector2(200, 400));
+
+            AddStep("release left button", () => InputManager.ReleaseButton(MouseButton.Left));
+
+            assertPlaced(true);
+            assertLength(600, tolerance: 10);
+            assertControlPointCount(4);
+            assertControlPointType(0, PathType.BSpline(3));
+        }
+
+        [Test]
         public void TestPlacePerfectCurveSegmentAlmostLinearlyExterior()
         {
             Vector2 startPosition = new Vector2(200);
@@ -397,7 +418,7 @@ namespace osu.Game.Rulesets.Osu.Tests.Editor
 
         private void assertPlaced(bool expected) => AddAssert($"slider {(expected ? "placed" : "not placed")}", () => (getSlider() != null) == expected);
 
-        private void assertLength(double expected) => AddAssert($"slider length is {expected}", () => Precision.AlmostEquals(expected, getSlider().Distance, 1));
+        private void assertLength(double expected, double tolerance = 1) => AddAssert($"slider length is {expected}±{tolerance}", () => Precision.AlmostEquals(expected, getSlider().Distance, tolerance));
 
         private void assertControlPointCount(int expected) => AddAssert($"has {expected} control points", () => getSlider().Path.ControlPoints.Count == expected);
 
