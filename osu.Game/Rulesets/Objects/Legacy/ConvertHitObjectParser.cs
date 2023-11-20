@@ -230,7 +230,7 @@ namespace osu.Game.Rulesets.Objects.Legacy
                     if (input.Length > 1 && int.TryParse(input.Substring(1), out int degree) && degree > 0)
                         return PathType.BSpline(degree);
 
-                    return new PathType(SplineType.BSpline);
+                    return PathType.BEZIER;
 
                 case 'L':
                     return PathType.LINEAR;
