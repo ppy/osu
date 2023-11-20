@@ -405,7 +405,7 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders.Components
             int totalCount = Pieces.Count(p => p.IsSelected.Value);
             int countOfState = Pieces.Where(p => p.IsSelected.Value).Count(p => p.ControlPoint.Type == type);
 
-            var item = new TernaryStateRadioMenuItem(type == null ? "Inherit" : type!.Value.Description, MenuItemType.Standard, _ =>
+            var item = new TernaryStateRadioMenuItem(type == null ? "Inherit" : type.Value.Description, MenuItemType.Standard, _ =>
             {
                 foreach (var p in Pieces.Where(p => p.IsSelected.Value))
                     updatePathType(p, type);
