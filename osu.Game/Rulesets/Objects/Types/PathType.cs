@@ -16,11 +16,6 @@ namespace osu.Game.Rulesets.Objects.Types
 
     public readonly struct PathType : IEquatable<PathType>, IHasDescription
     {
-        public static readonly PathType CATMULL = new PathType(SplineType.Catmull);
-        public static readonly PathType BEZIER = new PathType(SplineType.BSpline);
-        public static readonly PathType LINEAR = new PathType(SplineType.Linear);
-        public static readonly PathType PERFECT_CURVE = new PathType(SplineType.PerfectCurve);
-
         /// <summary>
         /// The type of the spline that should be used to interpret the control points of the path.
         /// </summary>
@@ -32,6 +27,25 @@ namespace osu.Game.Rulesets.Objects.Types
         /// </summary>
         public int? Degree { get; init; }
 
+        public PathType(SplineType splineType)
+        {
+            Type = splineType;
+            Degree = null;
+        }
+
+        public static readonly PathType CATMULL = new PathType(SplineType.Catmull);
+        public static readonly PathType BEZIER = new PathType(SplineType.BSpline);
+        public static readonly PathType LINEAR = new PathType(SplineType.Linear);
+        public static readonly PathType PERFECT_CURVE = new PathType(SplineType.PerfectCurve);
+
+        public static PathType BSpline(int degree)
+        {
+            if (degree <= 0)
+                throw new ArgumentOutOfRangeException(nameof(degree), "The degree of a B-Spline path must be greater than zero.");
+
+            return new PathType { Type = SplineType.BSpline, Degree = degree };
+        }
+
         public string Description => Type switch
         {
             SplineType.Catmull => "Catmull",
@@ -40,12 +54,6 @@ namespace osu.Game.Rulesets.Objects.Types
             SplineType.PerfectCurve => "Perfect Curve",
             _ => Type.ToString()
         };
-
-        public PathType(SplineType splineType)
-        {
-            Type = splineType;
-            Degree = null;
-        }
 
         public override int GetHashCode()
             => HashCode.Combine(Type, Degree);
@@ -58,14 +66,6 @@ namespace osu.Game.Rulesets.Objects.Types
 
         public static bool operator !=(PathType a, PathType b)
             => a.Type != b.Type || a.Degree != b.Degree;
-
-        public static PathType BSpline(int degree)
-        {
-            if (degree <= 0)
-                throw new ArgumentOutOfRangeException(nameof(degree), "The degree of a B-Spline path must be greater than zero.");
-
-            return new PathType { Type = SplineType.BSpline, Degree = degree };
-        }
 
         public bool Equals(PathType other)
             => Type == other.Type && Degree == other.Degree;
