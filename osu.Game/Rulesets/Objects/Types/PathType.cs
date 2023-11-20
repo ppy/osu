@@ -46,14 +46,29 @@ namespace osu.Game.Rulesets.Objects.Types
             return new PathType { Type = SplineType.BSpline, Degree = degree };
         }
 
-        public string Description => Type switch
+        public string Description
         {
-            SplineType.Catmull => "Catmull",
-            SplineType.BSpline => Degree == null ? "Bezier" : "B-Spline",
-            SplineType.Linear => "Linear",
-            SplineType.PerfectCurve => "Perfect Curve",
-            _ => Type.ToString()
-        };
+            get
+            {
+                switch (Type)
+                {
+                    case SplineType.Catmull:
+                        return "Catmull";
+
+                    case SplineType.BSpline:
+                        return Degree == null ? "Bezier" : "B-Spline";
+
+                    case SplineType.Linear:
+                        return "Linear";
+
+                    case SplineType.PerfectCurve:
+                        return "Perfect Curve";
+
+                    default:
+                        return Type.ToString();
+                }
+            }
+        }
 
         public override int GetHashCode()
             => HashCode.Combine(Type, Degree);
