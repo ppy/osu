@@ -526,14 +526,19 @@ namespace osu.Game.Rulesets.Edit
         /// </summary>
         public abstract bool CursorInPlacementArea { get; }
 
+        /// <summary>
+        /// Returns a string representing the current selection.
+        /// The inverse method to <see cref="SelectFromTimestamp"/>.
+        /// </summary>
         public virtual string ConvertSelectionToString() => string.Empty;
 
         /// <summary>
-        /// Each ruleset has it's own selection method
+        /// Selects objects based on the supplied <paramref name="timestamp"/> and <paramref name="objectDescription"/>.
+        /// The inverse method to <see cref="ConvertSelectionToString"/>.
         /// </summary>
-        /// <param name="timestamp">The given timestamp</param>
-        /// <param name="objectDescription">The selected object information between the brackets</param>
-        public virtual void SelectHitObjects(double timestamp, string objectDescription) { }
+        /// <param name="timestamp">The time instant to seek to, in milliseconds.</param>
+        /// <param name="objectDescription">The ruleset-specific description of objects to select at the given timestamp.</param>
+        public virtual void SelectFromTimestamp(double timestamp, string objectDescription) { }
 
         #region IPositionSnapProvider
 
