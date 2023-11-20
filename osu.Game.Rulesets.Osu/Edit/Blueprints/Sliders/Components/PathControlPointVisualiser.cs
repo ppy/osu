@@ -372,9 +372,7 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders.Components
                 curveTypeItems.Add(createMenuItemForPathType(PathType.BEZIER));
                 curveTypeItems.Add(createMenuItemForPathType(PathType.BSpline(3)));
 
-                var hoveredPiece = Pieces.FirstOrDefault(p => p.IsHovered);
-
-                if (hoveredPiece?.ControlPoint.Type == PathType.CATMULL)
+                if (selectedPieces.Any(piece => piece.ControlPoint.Type?.Type == SplineType.Catmull))
                     curveTypeItems.Add(createMenuItemForPathType(PathType.CATMULL));
 
                 var menuItems = new List<MenuItem>

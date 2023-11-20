@@ -148,6 +148,30 @@ namespace osu.Game.Rulesets.Osu.Tests.Editor
             assertControlPointPathType(3, null);
         }
 
+        [Test]
+        public void TestCatmullAvailableIffSelectionContainsCatmull()
+        {
+            createVisualiser(true);
+
+            addControlPointStep(new Vector2(200), PathType.CATMULL);
+            addControlPointStep(new Vector2(300));
+            addControlPointStep(new Vector2(500, 300));
+            addControlPointStep(new Vector2(700, 200));
+            addControlPointStep(new Vector2(500, 100));
+
+            moveMouseToControlPoint(2);
+            AddStep("select first and third control point", () =>
+            {
+                visualiser.Pieces[0].IsSelected.Value = true;
+                visualiser.Pieces[2].IsSelected.Value = true;
+            });
+            addContextMenuItemStep("Catmull");
+
+            assertControlPointPathType(0, PathType.CATMULL);
+            assertControlPointPathType(2, PathType.CATMULL);
+            assertControlPointPathType(4, null);
+        }
+
         private void createVisualiser(bool allowSelection) => AddStep("create visualiser", () => Child = visualiser = new PathControlPointVisualiser<Slider>(slider, allowSelection)
         {
             Anchor = Anchor.Centre,
@@ -158,7 +182,7 @@ namespace osu.Game.Rulesets.Osu.Tests.Editor
 
         private void addControlPointStep(Vector2 position, PathType? type)
         {
-            AddStep($"add {type} control point at {position}", () =>
+            AddStep($"add {type?.Type} control point at {position}", () =>
             {
                 slider.Path.ControlPoints.Add(new PathControlPoint(position, type));
             });
