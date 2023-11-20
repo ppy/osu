@@ -10,7 +10,7 @@ using osu.Game.Rulesets.Edit;
 
 namespace osu.Game.Rulesets.Osu.Edit
 {
-    public partial class OsuSliderDrawingSettingsProvider : Drawable
+    public partial class FreehandSliderSettingsProvider : Drawable
     {
         public BindableFloat Tolerance { get; } = new BindableFloat(1.5f)
         {
@@ -19,17 +19,17 @@ namespace osu.Game.Rulesets.Osu.Edit
             Precision = 0.01f
         };
 
-        private readonly BindableInt sliderTolerance = new BindableInt(40)
-        {
-            MinValue = 5,
-            MaxValue = 100
-        };
-
         public BindableFloat CornerThreshold { get; } = new BindableFloat(0.4f)
         {
             MinValue = 0.05f,
             MaxValue = 1f,
             Precision = 0.01f
+        };
+
+        private readonly BindableInt sliderTolerance = new BindableInt(40)
+        {
+            MinValue = 5,
+            MaxValue = 100
         };
 
         private readonly BindableInt sliderCornerThreshold = new BindableInt(40)
