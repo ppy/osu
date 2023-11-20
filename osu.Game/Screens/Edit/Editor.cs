@@ -1141,9 +1141,7 @@ namespace osu.Game.Screens.Edit
 
         public void HandleTimestamp(string timestamp)
         {
-            string[] groups = EditorTimestampParser.GetRegexGroups(timestamp);
-
-            if (groups.Length != 4 || string.IsNullOrEmpty(groups[0]))
+            if (!EditorTimestampParser.TryParse(timestamp, out var timeSpan, out string selection))
             {
                 Schedule(() => notifications?.Post(new SimpleNotification
                 {
@@ -1153,31 +1151,14 @@ namespace osu.Game.Screens.Edit
                 return;
             }
 
-            string timeMin = groups[0];
-            string timeSec = groups[1];
-            string timeMss = groups[2];
-            string objectsGroup = groups[3].Replace("(", "").Replace(")", "").Trim();
-
-            // Currently, lazer chat highlights infinite-long editor links like `10000000000:00:000 (1)`
-            // Limit timestamp link length at 30000 min (50 hr) to avoid parsing issues
-            if (string.IsNullOrEmpty(timeMin) || timeMin.Length > 5 || double.Parse(timeMin) > 30_000)
-            {
-                Schedule(() => notifications?.Post(new SimpleNotification
-                {
-                    Icon = FontAwesome.Solid.ExclamationTriangle,
-                    Text = EditorStrings.TooLongTimestamp
-                }));
-                return;
-            }
-
             editorBeatmap.SelectedHitObjects.Clear();
 
             if (clock.IsRunning)
                 clock.Stop();
 
-            double position = EditorTimestampParser.GetTotalMilliseconds(timeMin, timeSec, timeMss);
+            double position = timeSpan.Value.TotalMilliseconds;
 
-            if (string.IsNullOrEmpty(objectsGroup))
+            if (string.IsNullOrEmpty(selection))
             {
                 clock.SeekSmoothlyTo(position);
                 return;
@@ -1194,8 +1175,8 @@ namespace osu.Game.Screens.Edit
             if (Mode.Value != EditorScreenMode.Compose)
                 Mode.Value = EditorScreenMode.Compose;
 
-            // Let the Ruleset handle selection
-            currentScreen.Dependencies.Get<HitObjectComposer>().SelectHitObjects(position, objectsGroup);
+            // Delegate handling the selection to the ruleset.
+            currentScreen.Dependencies.Get<HitObjectComposer>().SelectHitObjects(position, selection);
         }
 
         public double SnapTime(double time, double? referenceTime) => editorBeatmap.SnapTime(time, referenceTime);
