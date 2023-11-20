@@ -29,6 +29,5 @@ namespace osu.Game.Rulesets.Scoring.Legacy
         /// The max combo of the legacy (ScoreV1) total score.
         /// </summary>
         public int MaxCombo;
-
     }
 }

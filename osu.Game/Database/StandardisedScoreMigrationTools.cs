@@ -267,10 +267,12 @@ namespace osu.Game.Database
             {
                 case 0:
                     if (score.MaxCombo == 0 || score.Accuracy == 0)
+                    {
                         return (long)Math.Round((
                             0
                             + 300000 * Math.Pow(score.Accuracy, 8)
                             + bonusProportion) * modMultiplier);
+                    }
 
                     // Assumption :
                     // - sliders and slider-ticks are uniformly spread arround the beatmap
