@@ -5,6 +5,7 @@ using System;
 using System.Diagnostics;
 using System.Linq;
 using osu.Framework.Allocation;
+using osu.Framework.Bindables;
 using osu.Framework.Extensions.ObjectExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
@@ -42,6 +43,11 @@ namespace osu.Game.Overlays
         private ProfileSectionsContainer? sectionsContainer;
         private ProfileSectionTabControl? tabs;
 
+        private IUser? user;
+        private IRulesetInfo? ruleset;
+
+        private IBindable<APIUser> apiUser = null!;
+
         [Resolved]
         private RulesetStore rulesets { get; set; } = null!;
 
@@ -58,16 +64,37 @@ namespace osu.Game.Overlays
             });
         }
 
+        [BackgroundDependencyLoader]
+        private void load()
+        {
+            apiUser = API.LocalUser.GetBoundCopy();
+            apiUser.BindValueChanged(_ => Schedule(() =>
+            {
+                if (API.IsLoggedIn)
+                    fetchAndSetContent();
+            }));
+        }
+
         protected override ProfileHeader CreateHeader() => new ProfileHeader();
 
         protected override Color4 BackgroundColour => ColourProvider.Background5;
 
-        public void ShowUser(IUser user, IRulesetInfo? ruleset = null)
+        public void ShowUser(IUser userToShow, IRulesetInfo? userRuleset = null)
         {
-            if (user.OnlineID == APIUser.SYSTEM_USER_ID)
+            if (userToShow.OnlineID == APIUser.SYSTEM_USER_ID)
                 return;
 
+            user = userToShow;
+            ruleset = userRuleset;
+
             Show();
+
+            fetchAndSetContent();
+        }
+
+        private void fetchAndSetContent()
+        {
+            Debug.Assert(user != null);
 
             if (user.OnlineID == Header.User.Value?.User.Id && ruleset?.MatchesOnlineID(Header.User.Value?.Ruleset) == true)
                 return;
@@ -143,24 +170,27 @@ namespace osu.Game.Overlays
 
             sectionsContainer.ScrollToTop();
 
+            if (!API.IsLoggedIn)
+                return;
+
             userReq = user.OnlineID > 1 ? new GetUserRequest(user.OnlineID, ruleset) : new GetUserRequest(user.Username, ruleset);
-            userReq.Success += u => userLoadComplete(u, ruleset);
+            userReq.Success += userLoadComplete;
             API.Queue(userReq);
             loadingLayer.Show();
         }
 
-        private void userLoadComplete(APIUser user, IRulesetInfo? ruleset)
+        private void userLoadComplete(APIUser loadedUser)
         {
             Debug.Assert(sections != null && sectionsContainer != null && tabs != null);
 
-            var actualRuleset = rulesets.GetRuleset(ruleset?.ShortName ?? user.PlayMode).AsNonNull();
+            var actualRuleset = rulesets.GetRuleset(ruleset?.ShortName ?? loadedUser.PlayMode).AsNonNull();
 
-            var userProfile = new UserProfileData(user, actualRuleset);
+            var userProfile = new UserProfileData(loadedUser, actualRuleset);
             Header.User.Value = userProfile;
 
-            if (user.ProfileOrder != null)
+            if (loadedUser.ProfileOrder != null)
             {
-                foreach (string id in user.ProfileOrder)
+                foreach (string id in loadedUser.ProfileOrder)
                 {
                     var sec = sections.FirstOrDefault(s => s.Identifier == id);
 
