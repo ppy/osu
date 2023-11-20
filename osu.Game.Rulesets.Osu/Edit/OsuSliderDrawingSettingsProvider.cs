@@ -19,7 +19,7 @@ namespace osu.Game.Rulesets.Osu.Edit
             Precision = 0.01f
         };
 
-        private readonly BindableInt sliderTolerance = new BindableInt(50)
+        private readonly BindableInt sliderTolerance = new BindableInt(40)
         {
             MinValue = 5,
             MaxValue = 100
