@@ -1,6 +1,7 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using NUnit.Framework;
@@ -25,16 +26,17 @@ namespace osu.Game.Rulesets.Osu.Tests.Editor
             addStepClickLink("00:00:000", "reset", false);
         }
 
-        private bool checkSnapAndSelectCombo(double startTime, params int[] comboNumbers)
-        {
-            bool checkCombos = comboNumbers.Any()
-                ? hasCombosInOrder(EditorBeatmap.SelectedHitObjects, comboNumbers)
-                : !EditorBeatmap.SelectedHitObjects.Any();
+        private void checkSelection(Func<double> startTime, params int[] comboNumbers)
+            => AddUntilStep($"seeked & selected {(comboNumbers.Any() ? string.Join(",", comboNumbers) : "nothing")}", () =>
+            {
+                bool checkCombos = comboNumbers.Any()
+                    ? hasCombosInOrder(EditorBeatmap.SelectedHitObjects, comboNumbers)
+                    : !EditorBeatmap.SelectedHitObjects.Any();
 
-            return EditorClock.CurrentTime == startTime
-                   && EditorBeatmap.SelectedHitObjects.Count == comboNumbers.Length
-                   && checkCombos;
-        }
+                return EditorClock.CurrentTime == startTime()
+                       && EditorBeatmap.SelectedHitObjects.Count == comboNumbers.Length
+                       && checkCombos;
+            });
 
         private bool hasCombosInOrder(IEnumerable<HitObject> selected, params int[] comboNumbers)
         {
@@ -51,19 +53,19 @@ namespace osu.Game.Rulesets.Osu.Tests.Editor
         public void TestNormalSelection()
         {
             addStepClickLink("00:02:170 (1,2,3)");
-            AddAssert("snap and select 1-2-3", () => checkSnapAndSelectCombo(2_170, 1, 2, 3));
+            checkSelection(() => 2_170, 1, 2, 3);
 
             addReset();
             addStepClickLink("00:04:748 (2,3,4,1,2)");
-            AddAssert("snap and select 2-3-4-1-2", () => checkSnapAndSelectCombo(4_748, 2, 3, 4, 1, 2));
+            checkSelection(() => 4_748, 2, 3, 4, 1, 2);
 
             addReset();
             addStepClickLink("00:02:170 (1,1,1)");
-            AddAssert("snap and select 1-1-1", () => checkSnapAndSelectCombo(2_170, 1, 1, 1));
+            checkSelection(() => 2_170, 1, 1, 1);
 
             addReset();
             addStepClickLink("00:02:873 (2,2,2,2)");
-            AddAssert("snap and select 2-2-2-2", () => checkSnapAndSelectCombo(2_873, 2, 2, 2, 2));
+            checkSelection(() => 2_873, 2, 2, 2, 2);
         }
 
         [Test]
@@ -71,24 +73,22 @@ namespace osu.Game.Rulesets.Osu.Tests.Editor
         {
             HitObject firstObject = null!;
 
+            AddStep("retrieve first object", () => firstObject = EditorBeatmap.HitObjects.First());
+
             addStepClickLink("00:00:000 (0)", "invalid combo");
-            AddAssert("snap to next, select none", () =>
-            {
-                firstObject = EditorBeatmap.HitObjects.First();
-                return checkSnapAndSelectCombo(firstObject.StartTime);
-            });
+            checkSelection(() => firstObject.StartTime);
 
             addReset();
             addStepClickLink("00:00:000 (1)", "wrong offset");
-            AddAssert("snap and select 1", () => checkSnapAndSelectCombo(firstObject.StartTime, 1));
+            checkSelection(() => firstObject.StartTime, 1);
 
             addReset();
             addStepClickLink("00:00:956 (2,3,4)", "wrong offset");
-            AddAssert("snap to next, select 2-3-4", () => checkSnapAndSelectCombo(firstObject.StartTime, 2, 3, 4));
+            checkSelection(() => firstObject.StartTime, 2, 3, 4);
 
             addReset();
             addStepClickLink("00:00:956 (956|1,956|2)", "mania link");
-            AddAssert("snap to next, select none", () => checkSnapAndSelectCombo(firstObject.StartTime));
+            checkSelection(() => firstObject.StartTime);
         }
     }
 }
