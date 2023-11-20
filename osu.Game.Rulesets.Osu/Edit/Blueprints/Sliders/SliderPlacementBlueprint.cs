@@ -46,7 +46,7 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders
         private IDistanceSnapProvider distanceSnapProvider { get; set; }
 
         [Resolved(CanBeNull = true)]
-        private ISliderDrawingSettingsProvider drawingSettingsProvider { get; set; }
+        private OsuSliderDrawingSettingsProvider drawingSettingsProvider { get; set; }
 
         private readonly IncrementalBSplineBuilder bSplineBuilder = new IncrementalBSplineBuilder();
 

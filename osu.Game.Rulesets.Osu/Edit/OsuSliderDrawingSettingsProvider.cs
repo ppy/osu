@@ -10,7 +10,7 @@ using osu.Game.Rulesets.Edit;
 
 namespace osu.Game.Rulesets.Osu.Edit
 {
-    public partial class OsuSliderDrawingSettingsProvider : Drawable, ISliderDrawingSettingsProvider, IToolboxAttachment
+    public partial class OsuSliderDrawingSettingsProvider : Drawable, IToolboxAttachment
     {
         public BindableFloat Tolerance { get; } = new BindableFloat(1.5f)
         {

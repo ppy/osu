@@ -63,7 +63,7 @@ namespace osu.Game.Rulesets.Osu.Edit
         [Cached(typeof(IDistanceSnapProvider))]
         protected readonly OsuDistanceSnapProvider DistanceSnapProvider = new OsuDistanceSnapProvider();
 
-        [Cached(typeof(ISliderDrawingSettingsProvider))]
+        [Cached]
         protected readonly OsuSliderDrawingSettingsProvider SliderDrawingSettingsProvider = new OsuSliderDrawingSettingsProvider();
 
         [BackgroundDependencyLoader]
