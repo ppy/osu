@@ -70,21 +70,21 @@ namespace osu.Game.Rulesets.Objects
                 var segmentVertices = vertices.AsSpan().Slice(start, i - start + 1);
                 var segmentType = controlPoints[start].Type ?? PathType.LINEAR;
 
-                switch (segmentType)
+                switch (segmentType.Type)
                 {
-                    case { Type: SplineType.Catmull }:
+                    case SplineType.Catmull:
                         result.AddRange(from segment in ConvertCatmullToBezierAnchors(segmentVertices) from v in segment select v + position);
                         break;
 
-                    case { Type: SplineType.Linear }:
+                    case SplineType.Linear:
                         result.AddRange(from segment in ConvertLinearToBezierAnchors(segmentVertices) from v in segment select v + position);
                         break;
 
-                    case { Type: SplineType.PerfectCurve }:
+                    case SplineType.PerfectCurve:
                         result.AddRange(ConvertCircleToBezierAnchors(segmentVertices).Select(v => v + position));
                         break;
 
-                    default:
+                    case SplineType.BSpline:
                         if (segmentType.Degree != null)
                             throw new NotImplementedException("BSpline conversion of arbitrary degree is not implemented.");
 
@@ -94,6 +94,9 @@ namespace osu.Game.Rulesets.Objects
                         }
 
                         break;
+
+                    default:
+                        throw new ArgumentOutOfRangeException(nameof(segmentType.Type), segmentType.Type, "Unsupported segment type found when converting to legacy Bezier");
                 }
 
                 // Start the new segment at the current vertex
@@ -160,13 +163,16 @@ namespace osu.Game.Rulesets.Objects
 
                         break;
 
-                    default:
+                    case SplineType.BSpline:
                         for (int j = 0; j < segmentVertices.Length - 1; j++)
                         {
                             result.Add(new PathControlPoint(segmentVertices[j], j == 0 ? segmentType : null));
                         }
 
                         break;
+
+                    default:
+                        throw new ArgumentOutOfRangeException(nameof(segmentType.Type), segmentType.Type, "Unsupported segment type found when converting to legacy Bezier");
                 }
 
                 // Start the new segment at the current vertex
