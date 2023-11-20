@@ -49,11 +49,11 @@ namespace osu.Game.Rulesets.Mania.Edit
             new HoldNoteCompositionTool()
         };
 
-        // 123|0,456|1,789|2 ...
-        private static readonly Regex selection_regex = new Regex(@"^\d+\|\d+(,\d+\|\d+)*$");
-
         public override string ConvertSelectionToString()
             => string.Join(',', EditorBeatmap.SelectedHitObjects.Cast<ManiaHitObject>().OrderBy(h => h.StartTime).Select(h => $"{h.StartTime}|{h.Column}"));
+
+        // 123|0,456|1,789|2 ...
+        private static readonly Regex selection_regex = new Regex(@"^\d+\|\d+(,\d+\|\d+)*$", RegexOptions.Compiled);
 
         public override void SelectFromTimestamp(double timestamp, string objectDescription)
         {

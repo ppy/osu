@@ -104,11 +104,11 @@ namespace osu.Game.Rulesets.Osu.Edit
         protected override ComposeBlueprintContainer CreateBlueprintContainer()
             => new OsuBlueprintContainer(this);
 
-        // 1,2,3,4 ...
-        private static readonly Regex selection_regex = new Regex(@"^\d+(,\d+)*$");
-
         public override string ConvertSelectionToString()
             => string.Join(',', selectedHitObjects.Cast<OsuHitObject>().OrderBy(h => h.StartTime).Select(h => (h.IndexInCurrentCombo + 1).ToString()));
+
+        // 1,2,3,4 ...
+        private static readonly Regex selection_regex = new Regex(@"^\d+(,\d+)*$", RegexOptions.Compiled);
 
         public override void SelectFromTimestamp(double timestamp, string objectDescription)
         {
