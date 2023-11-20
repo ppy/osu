@@ -61,11 +61,11 @@ namespace osu.Game.Rulesets.Mania.Edit
                 return;
 
             List<ManiaHitObject> remainingHitObjects = EditorBeatmap.HitObjects.Cast<ManiaHitObject>().Where(h => h.StartTime >= timestamp).ToList();
-            string[] splitDescription = objectDescription.Split(',').ToArray();
+            string[] objectDescriptions = objectDescription.Split(',').ToArray();
 
-            for (int i = 0; i < splitDescription.Length; i++)
+            for (int i = 0; i < objectDescriptions.Length; i++)
             {
-                string[] split = splitDescription[i].Split('|').ToArray();
+                string[] split = objectDescriptions[i].Split('|').ToArray();
                 if (split.Length != 2)
                     continue;
 
@@ -79,7 +79,7 @@ namespace osu.Game.Rulesets.Mania.Edit
 
                 EditorBeatmap.SelectedHitObjects.Add(current);
 
-                if (i < splitDescription.Length - 1)
+                if (i < objectDescriptions.Length - 1)
                     remainingHitObjects = remainingHitObjects.Where(h => h != current && h.StartTime >= current.StartTime).ToList();
             }
         }
