@@ -85,7 +85,8 @@ namespace osu.Game.Database
                 if (hasPath.Path.ControlPoints.Count > 1)
                     hasPath.Path.ControlPoints[^1].Type = null;
 
-                if (BezierConverter.CountSegments(hasPath.Path.ControlPoints) <= 1) continue;
+                if (BezierConverter.CountSegments(hasPath.Path.ControlPoints) <= 1
+                    && hasPath.Path.ControlPoints[0].Type!.Value.Degree == null) continue;
 
                 var newControlPoints = BezierConverter.ConvertToModernBezier(hasPath.Path.ControlPoints);
 
