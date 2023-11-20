@@ -344,8 +344,7 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders
         {
             Initial,
             ControlPoints,
-            Drawing,
-            DrawingFinalization
+            Drawing
         }
     }
 }
