@@ -83,46 +83,42 @@ namespace osu.Game.Tests.Visual.Editing
             RulesetInfo rulesetInfo = new OsuRuleset().RulesetInfo;
 
             addStepClickLink("00:00:000", waitForSeek: false);
-            AddAssert("recieved 'must be in edit'", () =>
-                Game.Notifications.AllNotifications.Count(x => x.Text == EditorStrings.MustBeInEdit) == 1
-            );
+            AddAssert("received 'must be in edit'",
+                () => Game.Notifications.AllNotifications.Count(x => x.Text == EditorStrings.MustBeInEdit),
+                () => Is.EqualTo(1));
 
             AddStep("enter song select", () => Game.ChildrenOfType<ButtonSystem>().Single().OnSolo.Invoke());
-            AddAssert("entered song select", () => Game.ScreenStack.CurrentScreen is PlaySongSelect);
+            AddUntilStep("entered song select", () => Game.ScreenStack.CurrentScreen is PlaySongSelect);
 
             addStepClickLink("00:00:000 (1)", waitForSeek: false);
-            AddAssert("recieved 'must be in edit'", () =>
-                Game.Notifications.AllNotifications.Count(x => x.Text == EditorStrings.MustBeInEdit) == 2
-            );
+            AddAssert("received 'must be in edit'",
+                () => Game.Notifications.AllNotifications.Count(x => x.Text == EditorStrings.MustBeInEdit),
+                () => Is.EqualTo(2));
 
             setUpEditor(rulesetInfo);
-            AddAssert("is editor Osu", () => editorBeatmap.BeatmapInfo.Ruleset.Equals(rulesetInfo));
+            AddAssert("ruleset is osu!", () => editorBeatmap.BeatmapInfo.Ruleset.Equals(rulesetInfo));
 
             addStepClickLink("00:000", "invalid link", waitForSeek: false);
-            AddAssert("recieved 'failed to process'", () =>
-                Game.Notifications.AllNotifications.Count(x => x.Text == EditorStrings.FailedToProcessTimestamp) == 1
-            );
+            AddAssert("received 'failed to process'",
+                () => Game.Notifications.AllNotifications.Count(x => x.Text == EditorStrings.FailedToProcessTimestamp),
+                () => Is.EqualTo(1));
 
             addStepClickLink("50000:00:000", "too long link", waitForSeek: false);
-            AddAssert("recieved 'too long'", () =>
-                Game.Notifications.AllNotifications.Count(x => x.Text == EditorStrings.TooLongTimestamp) == 1
-            );
+            AddAssert("received 'failed to process'",
+                () => Game.Notifications.AllNotifications.Count(x => x.Text == EditorStrings.FailedToProcessTimestamp),
+                () => Is.EqualTo(2));
         }
 
         [Test]
         public void TestHandleCurrentScreenChanges()
         {
-            const long long_link_value = 1_000 * 60 * 1_000;
             RulesetInfo rulesetInfo = new OsuRuleset().RulesetInfo;
 
             setUpEditor(rulesetInfo);
-            AddAssert("is editor Osu", () => editorBeatmap.BeatmapInfo.Ruleset.Equals(rulesetInfo));
+            AddAssert("is osu! ruleset", () => editorBeatmap.BeatmapInfo.Ruleset.Equals(rulesetInfo));
 
-            addStepClickLink("1000:00:000", "long link");
-            AddAssert("moved to end of track", () =>
-                editorClock.CurrentTime == long_link_value
-                || (editorClock.TrackLength < long_link_value && editorClock.CurrentTime == editorClock.TrackLength)
-            );
+            addStepClickLink("100:00:000", "long link");
+            AddUntilStep("moved to end of track", () => editorClock.CurrentTime, () => Is.EqualTo(editorClock.TrackLength));
 
             addStepScreenModeTo(EditorScreenMode.SongSetup);
             addStepClickLink("00:00:000");
