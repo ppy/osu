@@ -242,7 +242,7 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders.Components
         {
             int indexInSegment = piece.PointsInSegment.IndexOf(piece.ControlPoint);
 
-            if (type.HasValue && type.Value.Type == SplineType.PerfectCurve)
+            if (type?.Type == SplineType.PerfectCurve)
             {
                 // Can't always create a circular arc out of 4 or more points,
                 // so we split the segment into one 3-point circular arc segment
@@ -405,7 +405,7 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders.Components
             int totalCount = Pieces.Count(p => p.IsSelected.Value);
             int countOfState = Pieces.Where(p => p.IsSelected.Value).Count(p => p.ControlPoint.Type == type);
 
-            var item = new TernaryStateRadioMenuItem(type == null ? "Inherit" : type.Value.Description, MenuItemType.Standard, _ =>
+            var item = new TernaryStateRadioMenuItem(type?.Description ?? "Inherit", MenuItemType.Standard, _ =>
             {
                 foreach (var p in Pieces.Where(p => p.IsSelected.Value))
                     updatePathType(p, type);
