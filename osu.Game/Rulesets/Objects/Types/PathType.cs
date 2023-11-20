@@ -74,15 +74,12 @@ namespace osu.Game.Rulesets.Objects.Types
             => HashCode.Combine(Type, Degree);
 
         public override bool Equals(object? obj)
-            => obj is PathType pathType && this == pathType;
-
-        public static bool operator ==(PathType a, PathType b)
-            => a.Type == b.Type && a.Degree == b.Degree;
-
-        public static bool operator !=(PathType a, PathType b)
-            => a.Type != b.Type || a.Degree != b.Degree;
+            => obj is PathType pathType && Equals(pathType);
 
         public bool Equals(PathType other)
             => Type == other.Type && Degree == other.Degree;
+
+        public static bool operator ==(PathType a, PathType b) => a.Equals(b);
+        public static bool operator !=(PathType a, PathType b) => !a.Equals(b);
     }
 }
