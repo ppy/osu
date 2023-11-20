@@ -1172,8 +1172,7 @@ namespace osu.Game.Screens.Edit
 
             clock.SeekSmoothlyTo(position);
 
-            if (Mode.Value != EditorScreenMode.Compose)
-                Mode.Value = EditorScreenMode.Compose;
+            Mode.Value = EditorScreenMode.Compose;
 
             // Delegate handling the selection to the ruleset.
             currentScreen.Dependencies.Get<HitObjectComposer>().SelectHitObjects(position, selection);
