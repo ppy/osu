@@ -35,13 +35,8 @@ namespace osu.Game.Screens.Play.HUD
             Precision = 1
         };
 
-        [SettingSource("Bar length")]
-        public BindableFloat BarLength { get; } = new BindableFloat(0.98f)
-        {
-            MinValue = 0.2f,
-            MaxValue = 1,
-            Precision = 0.01f,
-        };
+        [SettingSource("Use relative size")]
+        public BindableBool UseRelativeSize { get; } = new BindableBool(true);
 
         private BarPath mainBar = null!;
 
@@ -92,12 +87,30 @@ namespace osu.Game.Screens.Play.HUD
             }
         }
 
-        private const float main_path_radius = 10f;
+        public const float MAIN_PATH_RADIUS = 10f;
+
+        private const float curve_start_offset = 70;
+        private const float curve_end_offset = 40;
+        private const float padding = MAIN_PATH_RADIUS * 2;
+        private const float curve_smoothness = 10;
+
+        private readonly LayoutValue drawSizeLayout = new LayoutValue(Invalidation.DrawSize);
+
+        public ArgonHealthDisplay()
+        {
+            AddLayout(drawSizeLayout);
+
+            // sane default width specification.
+            // this only matters if the health display isn't part of the default skin
+            // (in which case width will be set to 300 via `ArgonSkin.GetDrawableComponent()`),
+            // and if the user hasn't applied their own modifications
+            // (which are applied via `SerialisedDrawableInfo.ApplySerialisedInfo()`).
+            Width = 0.98f;
+        }
 
         [BackgroundDependencyLoader]
         private void load()
         {
-            RelativeSizeAxes = Axes.X;
             AutoSizeAxes = Axes.Y;
 
             InternalChild = new Container
@@ -107,7 +120,7 @@ namespace osu.Game.Screens.Play.HUD
                 {
                     background = new BackgroundPath
                     {
-                        PathRadius = main_path_radius,
+                        PathRadius = MAIN_PATH_RADIUS,
                     },
                     glowBar = new BarPath
                     {
@@ -127,7 +140,7 @@ namespace osu.Game.Screens.Play.HUD
                         Blending = BlendingParameters.Additive,
                         BarColour = main_bar_colour,
                         GlowColour = main_bar_glow_colour,
-                        PathRadius = main_path_radius,
+                        PathRadius = MAIN_PATH_RADIUS,
                         GlowPortion = 0.6f,
                     },
                 }
@@ -140,17 +153,15 @@ namespace osu.Game.Screens.Play.HUD
 
             Current.BindValueChanged(_ => Scheduler.AddOnce(updateCurrent), true);
 
-            BarLength.BindValueChanged(l => Width = l.NewValue, true);
-            BarHeight.BindValueChanged(_ => updatePath());
-            updatePath();
-        }
+            // we're about to set `RelativeSizeAxes` depending on the value of `UseRelativeSize`.
+            // setting `RelativeSizeAxes` internally transforms absolute sizing to relative and back to keep the size the same,
+            // but that is not what we want in this case, since the width at this point is valid in the *target* sizing mode.
+            // to counteract this, store the numerical value here, and restore it after setting the correct initial relative sizing axes.
+            float previousWidth = Width;
+            UseRelativeSize.BindValueChanged(v => RelativeSizeAxes = v.NewValue ? Axes.X : Axes.None, true);
+            Width = previousWidth;
 
-        protected override bool OnInvalidate(Invalidation invalidation, InvalidationSource source)
-        {
-            if ((invalidation & Invalidation.DrawSize) > 0)
-                updatePath();
-
-            return base.OnInvalidate(invalidation, source);
+            BarHeight.BindValueChanged(_ => updatePath(), true);
         }
 
         private void updateCurrent()
@@ -167,6 +178,12 @@ namespace osu.Game.Screens.Play.HUD
         protected override void Update()
         {
             base.Update();
+
+            if (!drawSizeLayout.IsValid)
+            {
+                updatePath();
+                drawSizeLayout.Validate();
+            }
 
             mainBar.Alpha = (float)Interpolation.DampContinuously(mainBar.Alpha, Current.Value > 0 ? 1 : 0, 40, Time.Elapsed);
             glowBar.Alpha = (float)Interpolation.DampContinuously(glowBar.Alpha, GlowBarValue > 0 ? 1 : 0, 40, Time.Elapsed);
@@ -236,11 +253,17 @@ namespace osu.Game.Screens.Play.HUD
 
         private void updatePath()
         {
-            float barLength = DrawWidth - main_path_radius * 2;
-            float curveStart = barLength - 70;
-            float curveEnd = barLength - 40;
+            float usableWidth = DrawWidth - padding;
 
-            const float curve_smoothness = 10;
+            if (usableWidth < 0) enforceMinimumWidth();
+
+            // the display starts curving at `curve_start_offset` units from the right and ends curving at `curve_end_offset`.
+            // to ensure that the curve is symmetric when it starts being narrow enough, add a `curve_end_offset` to the left side too.
+            const float rescale_cutoff = curve_start_offset + curve_end_offset;
+
+            float barLength = Math.Max(DrawWidth - padding, rescale_cutoff);
+            float curveStart = barLength - curve_start_offset;
+            float curveEnd = barLength - curve_end_offset;
 
             Vector2 diagonalDir = (new Vector2(curveEnd, BarHeight.Value) - new Vector2(curveStart, 0)).Normalized();
 
@@ -256,6 +279,9 @@ namespace osu.Game.Screens.Play.HUD
                 new PathControlPoint(new Vector2(barLength, BarHeight.Value)),
             });
 
+            if (DrawWidth - padding < rescale_cutoff)
+                rescalePathProportionally();
+
             List<Vector2> vertices = new List<Vector2>();
             barPath.GetPathToProgress(vertices, 0.0, 1.0);
 
@@ -264,6 +290,24 @@ namespace osu.Game.Screens.Play.HUD
             glowBar.Vertices = vertices;
 
             updatePathVertices();
+
+            void enforceMinimumWidth()
+            {
+                // Switch to absolute in order to be able to define a minimum width.
+                // Then switch back is required. Framework will handle the conversion for us.
+                Axes relativeAxes = RelativeSizeAxes;
+                RelativeSizeAxes = Axes.None;
+
+                Width = padding;
+
+                RelativeSizeAxes = relativeAxes;
+            }
+
+            void rescalePathProportionally()
+            {
+                foreach (var point in barPath.ControlPoints)
+                    point.Position = new Vector2(point.Position.X / barLength * (DrawWidth - padding), point.Position.Y);
+            }
         }
 
         private void updatePathVertices()

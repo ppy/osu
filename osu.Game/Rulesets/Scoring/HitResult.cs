@@ -350,6 +350,9 @@ namespace osu.Game.Rulesets.Scoring
             if (maxResult.IsBonus() && minResult != HitResult.IgnoreMiss)
                 throw new ArgumentOutOfRangeException(nameof(minResult), $"{HitResult.IgnoreMiss} is the only valid minimum result for a {maxResult} judgement.");
 
+            if (minResult == HitResult.IgnoreMiss)
+                return;
+
             if (maxResult == HitResult.LargeTickHit && minResult != HitResult.LargeTickMiss)
                 throw new ArgumentOutOfRangeException(nameof(minResult), $"{HitResult.LargeTickMiss} is the only valid minimum result for a {maxResult} judgement.");
 
