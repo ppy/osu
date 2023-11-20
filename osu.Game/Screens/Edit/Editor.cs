@@ -1175,7 +1175,7 @@ namespace osu.Game.Screens.Edit
             Mode.Value = EditorScreenMode.Compose;
 
             // Delegate handling the selection to the ruleset.
-            currentScreen.Dependencies.Get<HitObjectComposer>().SelectHitObjects(position, selection);
+            currentScreen.Dependencies.Get<HitObjectComposer>().SelectFromTimestamp(position, selection);
         }
 
         public double SnapTime(double time, double? referenceTime) => editorBeatmap.SnapTime(time, referenceTime);

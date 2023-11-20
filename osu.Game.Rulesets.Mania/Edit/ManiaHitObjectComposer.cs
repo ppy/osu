@@ -55,7 +55,7 @@ namespace osu.Game.Rulesets.Mania.Edit
         public override string ConvertSelectionToString()
             => string.Join(',', EditorBeatmap.SelectedHitObjects.Cast<ManiaHitObject>().OrderBy(h => h.StartTime).Select(h => $"{h.StartTime}|{h.Column}"));
 
-        public override void SelectHitObjects(double timestamp, string objectDescription)
+        public override void SelectFromTimestamp(double timestamp, string objectDescription)
         {
             if (!selection_regex.IsMatch(objectDescription))
                 return;

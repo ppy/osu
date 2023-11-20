@@ -110,7 +110,7 @@ namespace osu.Game.Rulesets.Osu.Edit
         public override string ConvertSelectionToString()
             => string.Join(',', selectedHitObjects.Cast<OsuHitObject>().OrderBy(h => h.StartTime).Select(h => (h.IndexInCurrentCombo + 1).ToString()));
 
-        public override void SelectHitObjects(double timestamp, string objectDescription)
+        public override void SelectFromTimestamp(double timestamp, string objectDescription)
         {
             if (!selection_regex.IsMatch(objectDescription))
                 return;
