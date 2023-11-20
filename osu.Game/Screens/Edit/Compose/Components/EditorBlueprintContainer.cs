@@ -51,10 +51,7 @@ namespace osu.Game.Screens.Edit.Compose.Components
 
             Beatmap.HitObjectAdded += AddBlueprintFor;
             Beatmap.HitObjectRemoved += RemoveBlueprintFor;
-
-            // This makes sure HitObjects will have active Blueprints ready to display
-            // after clicking on an Editor Timestamp/Link
-            Beatmap.SelectedHitObjects.CollectionChanged += selectionChanged;
+            Beatmap.SelectedHitObjects.CollectionChanged += updateSelectionLifetime;
 
             if (Composer != null)
             {
@@ -149,13 +146,23 @@ namespace osu.Game.Screens.Edit.Compose.Components
             SelectedItems.AddRange(Beatmap.HitObjects.Except(SelectedItems).ToArray());
         }
 
-        private void selectionChanged(object sender, NotifyCollectionChangedEventArgs e)
+        /// <summary>
+        /// Ensures that newly-selected hitobjects are kept alive
+        /// and drops that keep-alive from newly-deselected objects.
+        /// </summary>
+        private void updateSelectionLifetime(object sender, NotifyCollectionChangedEventArgs e)
         {
-            if (e == null || e.Action != NotifyCollectionChangedAction.Add || e.NewItems == null)
-                return;
+            if (e.NewItems != null)
+            {
+                foreach (HitObject newSelection in e.NewItems)
+                    Composer.Playfield.SetKeepAlive(newSelection, true);
+            }
 
-            foreach (HitObject item in e.NewItems)
-                Composer.Playfield.SetKeepAlive(item, true);
+            if (e.OldItems != null)
+            {
+                foreach (HitObject oldSelection in e.OldItems)
+                    Composer.Playfield.SetKeepAlive(oldSelection, false);
+            }
         }
 
         protected override void OnBlueprintSelected(SelectionBlueprint<HitObject> blueprint)
@@ -180,7 +187,7 @@ namespace osu.Game.Screens.Edit.Compose.Components
             {
                 Beatmap.HitObjectAdded -= AddBlueprintFor;
                 Beatmap.HitObjectRemoved -= RemoveBlueprintFor;
-                Beatmap.SelectedHitObjects.CollectionChanged -= selectionChanged;
+                Beatmap.SelectedHitObjects.CollectionChanged -= updateSelectionLifetime;
             }
 
             usageEventBuffer?.Dispose();
