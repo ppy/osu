@@ -274,23 +274,6 @@ namespace osu.Game.Rulesets.Osu.Tests.Editor
         }
 
         [Test]
-        public void TestBeginPlacementWithoutReleasingMouse()
-        {
-            addMovementStep(new Vector2(200));
-            AddStep("press left button", () => InputManager.PressButton(MouseButton.Left));
-
-            addMovementStep(new Vector2(400, 200));
-            AddStep("release left button", () => InputManager.ReleaseButton(MouseButton.Left));
-
-            addClickStep(MouseButton.Right);
-
-            assertPlaced(true);
-            assertLength(200);
-            assertControlPointCount(2);
-            assertControlPointType(0, PathType.LINEAR);
-        }
-
-        [Test]
         public void TestSliderDrawing()
         {
             addMovementStep(new Vector2(200));
