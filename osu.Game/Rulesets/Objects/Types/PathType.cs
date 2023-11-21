@@ -81,5 +81,7 @@ namespace osu.Game.Rulesets.Objects.Types
 
         public static bool operator ==(PathType a, PathType b) => a.Equals(b);
         public static bool operator !=(PathType a, PathType b) => !a.Equals(b);
+
+        public override string ToString() => Description;
     }
 }
