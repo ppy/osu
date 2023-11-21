@@ -273,6 +273,30 @@ namespace osu.Game.Rulesets.Osu.Tests.Editor
         }
 
         [Test]
+        public void TestSliderDrawingDoesntActivateAfterNormalPlacement()
+        {
+            Vector2 startPoint = new Vector2(200);
+
+            addMovementStep(startPoint);
+            addClickStep(MouseButton.Left);
+
+            for (int i = 0; i < 20; i++)
+            {
+                if (i == 5)
+                    AddStep("press left button", () => InputManager.PressButton(MouseButton.Left));
+                addMovementStep(startPoint + new Vector2(i * 40, MathF.Sin(i * MathF.PI / 5) * 50));
+            }
+
+            AddStep("release left button", () => InputManager.ReleaseButton(MouseButton.Left));
+            assertPlaced(false);
+
+            addClickStep(MouseButton.Right);
+            assertPlaced(true);
+
+            assertControlPointType(0, PathType.BEZIER);
+        }
+
+        [Test]
         public void TestSliderDrawingCurve()
         {
             Vector2 startPoint = new Vector2(200);
