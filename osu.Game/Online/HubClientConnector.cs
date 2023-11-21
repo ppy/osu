@@ -27,7 +27,6 @@ namespace osu.Game.Online
         private readonly string endpoint;
         private readonly string versionHash;
         private readonly bool preferMessagePack;
-        private readonly IAPIProvider api;
 
         /// <summary>
         /// The current connection opened by this connector.
@@ -47,7 +46,6 @@ namespace osu.Game.Online
         {
             ClientName = clientName;
             this.endpoint = endpoint;
-            this.api = api;
             this.versionHash = versionHash;
             this.preferMessagePack = preferMessagePack;
 
@@ -70,7 +68,7 @@ namespace osu.Game.Online
                             options.Proxy.Credentials = CredentialCache.DefaultCredentials;
                     }
 
-                    options.Headers.Add("Authorization", $"Bearer {api.AccessToken}");
+                    options.Headers.Add("Authorization", $"Bearer {API.AccessToken}");
                     options.Headers.Add("OsuVersionHash", versionHash);
                 });
 
