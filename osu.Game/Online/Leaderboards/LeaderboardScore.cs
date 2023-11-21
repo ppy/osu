@@ -180,7 +180,7 @@ namespace osu.Game.Online.Leaderboards
                                                     Masking = true,
                                                     Children = new Drawable[]
                                                     {
-                                                        new UpdateableFlag(user.CountryCode)
+                                                        new ClickableUpdateableFlag(user.CountryCode)
                                                         {
                                                             Anchor = Anchor.CentreLeft,
                                                             Origin = Anchor.CentreLeft,

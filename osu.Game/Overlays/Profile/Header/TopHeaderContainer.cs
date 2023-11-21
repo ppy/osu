@@ -41,7 +41,7 @@ namespace osu.Game.Overlays.Profile.Header
         private OsuSpriteText usernameText = null!;
         private ExternalLinkButton openUserExternally = null!;
         private OsuSpriteText titleText = null!;
-        private UpdateableFlag userFlag = null!;
+        private ClickableUpdateableFlag userFlag = null!;
         private OsuHoverContainer userCountryContainer = null!;
         private OsuSpriteText userCountryText = null!;
         private GroupBadgeFlow groupBadgeFlow = null!;
@@ -162,7 +162,7 @@ namespace osu.Game.Overlays.Profile.Header
                                                     Direction = FillDirection.Horizontal,
                                                     Children = new Drawable[]
                                                     {
-                                                        userFlag = new UpdateableFlag
+                                                        userFlag = new ClickableUpdateableFlag
                                                         {
                                                             Size = new Vector2(28, 20),
                                                             ShowPlaceholderOnUnknown = false,

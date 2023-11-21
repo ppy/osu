@@ -80,7 +80,7 @@ namespace osu.Game.Tests.Visual.Menus
 
             AddStep("click on flag", () =>
             {
-                InputManager.MoveMouseTo(loginOverlay.ChildrenOfType<UpdateableFlag>().First());
+                InputManager.MoveMouseTo(loginOverlay.ChildrenOfType<ClickableUpdateableFlag>().First());
                 InputManager.Click(MouseButton.Left);
             });
             AddAssert("login overlay is hidden", () => loginOverlay.State.Value == Visibility.Hidden);
