@@ -78,6 +78,31 @@ namespace osu.Game.Tests.Visual.Online
             AddStep("complete request", () => pendingRequest.TriggerSuccess(TEST_USER));
         }
 
+        [Test]
+        public void TestLogin()
+        {
+            GetUserRequest pendingRequest = null!;
+
+            AddStep("set up request handling", () =>
+            {
+                dummyAPI.HandleRequest = req =>
+                {
+                    if (dummyAPI.State.Value == APIState.Online && req is GetUserRequest getUserRequest)
+                    {
+                        pendingRequest = getUserRequest;
+                        return true;
+                    }
+
+                    return false;
+                };
+            });
+            AddStep("logout", () => dummyAPI.Logout());
+            AddStep("show user", () => profile.ShowUser(new APIUser { Id = 1 }));
+            AddStep("login", () => dummyAPI.Login("username", "password"));
+            AddWaitStep("wait some", 3);
+            AddStep("complete request", () => pendingRequest.TriggerSuccess(TEST_USER));
+        }
+
         public static readonly APIUser TEST_USER = new APIUser
         {
             Username = @"Somebody",
