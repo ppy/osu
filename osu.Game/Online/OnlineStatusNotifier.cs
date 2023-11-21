@@ -17,6 +17,9 @@ using osu.Game.Screens.OnlinePlay;
 
 namespace osu.Game.Online
 {
+    /// <summary>
+    /// Handles various scenarios where connection is lost and we need to let the user know what and why.
+    /// </summary>
     public partial class OnlineStatusNotifier : Component
     {
         private readonly Func<IScreen> getCurrentScreen;
@@ -33,7 +36,11 @@ namespace osu.Game.Online
         private IBindable<APIState> apiState = null!;
         private IBindable<bool> multiplayerState = null!;
         private IBindable<bool> spectatorState = null!;
-        private bool forcedDisconnection;
+
+        /// <summary>
+        /// This flag will be set to <c>true</c> when the user has been notified so we don't show more than one notification.
+        /// </summary>
+        private bool userNotified;
 
         public OnlineStatusNotifier(Func<IScreen> getCurrentScreen)
         {
@@ -51,59 +58,68 @@ namespace osu.Game.Online
             spectatorClient.Disconnecting += notifyAboutForcedDisconnection;
         }
 
+        protected override void LoadComplete()
+        {
+            base.LoadComplete();
+
+            apiState.BindValueChanged(state =>
+            {
+                if (state.NewValue == APIState.Online)
+                {
+                    userNotified = false;
+                    return;
+                }
+
+                if (userNotified) return;
+
+                if (state.NewValue == APIState.Offline && getCurrentScreen() is OnlinePlayScreen)
+                {
+                    userNotified = true;
+                    notificationOverlay?.Post(new SimpleErrorNotification
+                    {
+                        Icon = FontAwesome.Solid.ExclamationCircle,
+                        Text = "Connection to API was lost. Can't continue with online play."
+                    });
+                }
+            });
+
+            multiplayerState.BindValueChanged(connected => Schedule(() =>
+            {
+                if (connected.NewValue)
+                {
+                    userNotified = false;
+                    return;
+                }
+
+                if (userNotified) return;
+
+                if (multiplayerClient.Room != null)
+                {
+                    userNotified = true;
+                    notificationOverlay?.Post(new SimpleErrorNotification
+                    {
+                        Icon = FontAwesome.Solid.ExclamationCircle,
+                        Text = "Connection to the multiplayer server was lost. Exiting multiplayer."
+                    });
+                }
+            }));
+
+            spectatorState.BindValueChanged(_ =>
+            {
+                // TODO: handle spectator server failure somehow?
+            });
+        }
+
         private void notifyAboutForcedDisconnection()
         {
-            if (forcedDisconnection)
-                return;
+            if (userNotified) return;
 
-            forcedDisconnection = true;
+            userNotified = true;
             notificationOverlay?.Post(new SimpleErrorNotification
             {
                 Icon = FontAwesome.Solid.ExclamationCircle,
                 Text = "You have been logged out on this device due to a login to your account on another device."
             });
-        }
-
-        protected override void LoadComplete()
-        {
-            base.LoadComplete();
-
-            apiState.BindValueChanged(_ =>
-            {
-                if (apiState.Value == APIState.Online)
-                    forcedDisconnection = false;
-
-                Scheduler.AddOnce(updateState);
-            });
-            multiplayerState.BindValueChanged(_ => Scheduler.AddOnce(updateState));
-            spectatorState.BindValueChanged(_ => Scheduler.AddOnce(updateState));
-        }
-
-        private void updateState()
-        {
-            if (forcedDisconnection)
-                return;
-
-            if (apiState.Value == APIState.Offline && getCurrentScreen() is OnlinePlayScreen)
-            {
-                notificationOverlay?.Post(new SimpleErrorNotification
-                {
-                    Icon = FontAwesome.Solid.ExclamationCircle,
-                    Text = "API connection was lost. Can't continue with online play."
-                });
-                return;
-            }
-
-            if (!multiplayerClient.IsConnected.Value && multiplayerClient.Room != null)
-            {
-                notificationOverlay?.Post(new SimpleErrorNotification
-                {
-                    Icon = FontAwesome.Solid.ExclamationCircle,
-                    Text = "Connection to the multiplayer server was lost. Exiting multiplayer."
-                });
-            }
-
-            // TODO: handle spectator server failure somehow?
         }
 
         protected override void Dispose(bool isDisposing)
