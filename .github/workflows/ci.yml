@@ -108,6 +108,12 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v3
 
+      - name: Setup JDK 11
+        uses: actions/setup-java@v3
+        with:
+          distribution: microsoft
+          java-version: 11
+
       - name: Install .NET 6.0.x
         uses: actions/setup-dotnet@v3
         with:
