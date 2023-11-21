@@ -19,6 +19,7 @@ using osu.Game.Graphics.Cursor;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Online;
+using osu.Game.Online.API;
 using osu.Game.Online.API.Requests;
 using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Overlays.Profile;
@@ -170,7 +171,7 @@ namespace osu.Game.Overlays
 
             sectionsContainer.ScrollToTop();
 
-            if (!API.IsLoggedIn)
+            if (API.State.Value != APIState.Online)
                 return;
 
             userReq = user.OnlineID > 1 ? new GetUserRequest(user.OnlineID, ruleset) : new GetUserRequest(user.Username, ruleset);
