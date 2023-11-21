@@ -44,7 +44,7 @@ namespace osu.Game.Rulesets.Scoring
         /// <summary>
         /// The drain rate as a proportion of the total health drained per millisecond.
         /// </summary>
-        public double DrainRate { get; private set; } = 1;
+        public double DrainRate { get; private set; }
 
         /// <summary>
         /// The beatmap.
@@ -138,8 +138,6 @@ namespace osu.Game.Rulesets.Scoring
         protected override void Reset(bool storeResults)
         {
             base.Reset(storeResults);
-
-            DrainRate = 1;
 
             if (storeResults)
                 DrainRate = ComputeDrainRate();
