@@ -174,16 +174,16 @@ namespace osu.Game.Overlays
                 return;
 
             userReq = user.OnlineID > 1 ? new GetUserRequest(user.OnlineID, ruleset) : new GetUserRequest(user.Username, ruleset);
-            userReq.Success += userLoadComplete;
+            userReq.Success += u => userLoadComplete(u, ruleset);
             API.Queue(userReq);
             loadingLayer.Show();
         }
 
-        private void userLoadComplete(APIUser loadedUser)
+        private void userLoadComplete(APIUser loadedUser, IRulesetInfo? userRuleset)
         {
             Debug.Assert(sections != null && sectionsContainer != null && tabs != null);
 
-            var actualRuleset = rulesets.GetRuleset(ruleset?.ShortName ?? loadedUser.PlayMode).AsNonNull();
+            var actualRuleset = rulesets.GetRuleset(userRuleset?.ShortName ?? loadedUser.PlayMode).AsNonNull();
 
             var userProfile = new UserProfileData(loadedUser, actualRuleset);
             Header.User.Value = userProfile;
