@@ -270,7 +270,7 @@ namespace osu.Game.Database
                     {
                         return (long)Math.Round((
                             0
-                            + 300000 * Math.Pow(score.Accuracy, 8)
+                            + 500000 * Math.Pow(score.Accuracy, 5)
                             + bonusProportion) * modMultiplier);
                     }
 
