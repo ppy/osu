@@ -15,40 +15,6 @@ namespace osu.Game.Rulesets.Osu.Tests.Editor
     {
         protected override Ruleset CreateEditorRuleset() => new OsuRuleset();
 
-        private void addStepClickLink(string timestamp, string step = "", bool displayTimestamp = true)
-        {
-            AddStep(displayTimestamp ? $"{step} {timestamp}" : step, () => Editor.HandleTimestamp(timestamp));
-            AddUntilStep("wait for seek", () => EditorClock.SeekingOrStopped.Value);
-        }
-
-        private void addReset()
-        {
-            addStepClickLink("00:00:000", "reset", false);
-        }
-
-        private void checkSelection(Func<double> startTime, params int[] comboNumbers)
-            => AddUntilStep($"seeked & selected {(comboNumbers.Any() ? string.Join(",", comboNumbers) : "nothing")}", () =>
-            {
-                bool checkCombos = comboNumbers.Any()
-                    ? hasCombosInOrder(EditorBeatmap.SelectedHitObjects, comboNumbers)
-                    : !EditorBeatmap.SelectedHitObjects.Any();
-
-                return EditorClock.CurrentTime == startTime()
-                       && EditorBeatmap.SelectedHitObjects.Count == comboNumbers.Length
-                       && checkCombos;
-            });
-
-        private bool hasCombosInOrder(IEnumerable<HitObject> selected, params int[] comboNumbers)
-        {
-            List<HitObject> hitObjects = selected.ToList();
-            if (hitObjects.Count != comboNumbers.Length)
-                return false;
-
-            return !hitObjects.Select(x => (OsuHitObject)x)
-                              .Where((x, i) => x.IndexInCurrentCombo + 1 != comboNumbers[i])
-                              .Any();
-        }
-
         [Test]
         public void TestNormalSelection()
         {
@@ -89,6 +55,37 @@ namespace osu.Game.Rulesets.Osu.Tests.Editor
             addReset();
             addStepClickLink("00:00:956 (956|1,956|2)", "mania link");
             checkSelection(() => firstObject.StartTime);
+        }
+
+        private void addReset() => addStepClickLink("00:00:000", "reset", false);
+
+        private void addStepClickLink(string timestamp, string step = "", bool displayTimestamp = true)
+        {
+            AddStep(displayTimestamp ? $"{step} {timestamp}" : step, () => Editor.HandleTimestamp(timestamp));
+            AddUntilStep("wait for seek", () => EditorClock.SeekingOrStopped.Value);
+        }
+
+        private void checkSelection(Func<double> startTime, params int[] comboNumbers)
+            => AddUntilStep($"seeked & selected {(comboNumbers.Any() ? string.Join(",", comboNumbers) : "nothing")}", () =>
+            {
+                bool checkCombos = comboNumbers.Any()
+                    ? hasCombosInOrder(EditorBeatmap.SelectedHitObjects, comboNumbers)
+                    : !EditorBeatmap.SelectedHitObjects.Any();
+
+                return EditorClock.CurrentTime == startTime()
+                       && EditorBeatmap.SelectedHitObjects.Count == comboNumbers.Length
+                       && checkCombos;
+            });
+
+        private bool hasCombosInOrder(IEnumerable<HitObject> selected, params int[] comboNumbers)
+        {
+            List<HitObject> hitObjects = selected.ToList();
+            if (hitObjects.Count != comboNumbers.Length)
+                return false;
+
+            return !hitObjects.Select(x => (OsuHitObject)x)
+                              .Where((x, i) => x.IndexInCurrentCombo + 1 != comboNumbers[i])
+                              .Any();
         }
     }
 }
