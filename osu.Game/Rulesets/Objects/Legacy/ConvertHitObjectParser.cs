@@ -273,8 +273,8 @@ namespace osu.Game.Rulesets.Objects.Legacy
 
             while (++endIndex < pointSplit.Length)
             {
-                // Keep incrementing endIndex while it's not the start of a new segment (indicated by having a type descriptor of length 1).
-                if (pointSplit[endIndex].Length > 1)
+                // Keep incrementing endIndex while it's not the start of a new segment (indicated by having an alpha character at position 0).
+                if (!char.IsLetter(pointSplit[endIndex][0]))
                     continue;
 
                 // Multi-segmented sliders DON'T contain the end point as part of the current segment as it's assumed to be the start of the next segment.
