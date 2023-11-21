@@ -39,7 +39,7 @@ namespace osu.Game.Rulesets.Osu.Tests.Editor
             mergeSelection();
 
             AddAssert("slider created", () => circle1 is not null && circle2 is not null && sliderCreatedFor(
-                (pos: circle1.Position, pathType: PathType.Linear),
+                (pos: circle1.Position, pathType: PathType.LINEAR),
                 (pos: circle2.Position, pathType: null)));
 
             AddStep("undo", () => Editor.Undo());
@@ -73,11 +73,11 @@ namespace osu.Game.Rulesets.Osu.Tests.Editor
 
                 var controlPoints = slider.Path.ControlPoints;
                 (Vector2, PathType?)[] args = new (Vector2, PathType?)[controlPoints.Count + 2];
-                args[0] = (circle1.Position, PathType.Linear);
+                args[0] = (circle1.Position, PathType.LINEAR);
 
                 for (int i = 0; i < controlPoints.Count; i++)
                 {
-                    args[i + 1] = (controlPoints[i].Position + slider.Position, i == controlPoints.Count - 1 ? PathType.Linear : controlPoints[i].Type);
+                    args[i + 1] = (controlPoints[i].Position + slider.Position, i == controlPoints.Count - 1 ? PathType.LINEAR : controlPoints[i].Type);
                 }
 
                 args[^1] = (circle2.Position, null);
@@ -172,7 +172,7 @@ namespace osu.Game.Rulesets.Osu.Tests.Editor
             mergeSelection();
 
             AddAssert("slider created", () => circle1 is not null && circle2 is not null && sliderCreatedFor(
-                (pos: circle1.Position, pathType: PathType.Linear),
+                (pos: circle1.Position, pathType: PathType.LINEAR),
                 (pos: circle2.Position, pathType: null)));
 
             AddAssert("samples exist", sliderSampleExist);
@@ -227,7 +227,7 @@ namespace osu.Game.Rulesets.Osu.Tests.Editor
             mergeSelection();
 
             AddAssert("slider created", () => circle1 is not null && circle2 is not null && sliderCreatedFor(
-                (pos: circle1.Position, pathType: PathType.Linear),
+                (pos: circle1.Position, pathType: PathType.LINEAR),
                 (pos: circle2.Position, pathType: null)));
         }
 
