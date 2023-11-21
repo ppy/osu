@@ -1143,7 +1143,7 @@ namespace osu.Game.Screens.Edit
         {
             if (!EditorTimestampParser.TryParse(timestamp, out var timeSpan, out string selection))
             {
-                Schedule(() => notifications?.Post(new SimpleNotification
+                Schedule(() => notifications?.Post(new SimpleErrorNotification
                 {
                     Icon = FontAwesome.Solid.ExclamationTriangle,
                     Text = EditorStrings.FailedToParseEditorLink
