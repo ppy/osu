@@ -71,7 +71,7 @@ namespace osu.Game.Screens.OnlinePlay
                     screenStack = new OnlinePlaySubScreenStack { RelativeSizeAxes = Axes.Both },
                     new Header(ScreenTitle, screenStack),
                     RoomManager,
-                    ongoingOperationTracker
+                    ongoingOperationTracker,
                 }
             };
         }
@@ -79,10 +79,7 @@ namespace osu.Game.Screens.OnlinePlay
         private void onlineStateChanged(ValueChangedEvent<APIState> state) => Schedule(() =>
         {
             if (state.NewValue != APIState.Online)
-            {
-                Logger.Log("API connection was lost, can't continue with online play", LoggingTarget.Network, LogLevel.Important);
                 Schedule(forcefullyExit);
-            }
         });
 
         protected override void LoadComplete()

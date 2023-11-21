@@ -181,10 +181,10 @@ namespace osu.Game.Tests.Visual.Spectator
             });
         }
 
-        protected override Task DisconnectInternal()
+        protected override async Task DisconnectInternal()
         {
+            await base.DisconnectInternal().ConfigureAwait(false);
             isConnected.Value = false;
-            return Task.CompletedTask;
         }
     }
 }

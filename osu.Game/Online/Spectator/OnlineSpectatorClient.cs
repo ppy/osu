@@ -115,12 +115,14 @@ namespace osu.Game.Online.Spectator
             return connection.InvokeAsync(nameof(ISpectatorServer.EndWatchingUser), userId);
         }
 
-        protected override Task DisconnectInternal()
+        protected override async Task DisconnectInternal()
         {
-            if (connector == null)
-                return Task.CompletedTask;
+            await base.DisconnectInternal().ConfigureAwait(false);
 
-            return connector.Disconnect();
+            if (connector == null)
+                return;
+
+            await connector.Disconnect().ConfigureAwait(false);
         }
     }
 }
