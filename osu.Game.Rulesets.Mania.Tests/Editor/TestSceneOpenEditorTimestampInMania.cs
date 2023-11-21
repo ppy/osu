@@ -14,35 +14,6 @@ namespace osu.Game.Rulesets.Mania.Tests.Editor
     {
         protected override Ruleset CreateEditorRuleset() => new ManiaRuleset();
 
-        private void addStepClickLink(string timestamp, string step = "", bool displayTimestamp = true)
-        {
-            AddStep(displayTimestamp ? $"{step} {timestamp}" : step, () => Editor.HandleTimestamp(timestamp));
-            AddUntilStep("wait for seek", () => EditorClock.SeekingOrStopped.Value);
-        }
-
-        private void addReset()
-        {
-            addStepClickLink("00:00:000", "reset", false);
-        }
-
-        private bool checkSnapAndSelectColumn(double startTime, IReadOnlyCollection<(int, int)>? columnPairs = null)
-        {
-            bool checkColumns = columnPairs != null
-                ? EditorBeatmap.SelectedHitObjects.All(x => columnPairs.Any(col => isNoteAt(x, col.Item1, col.Item2)))
-                : !EditorBeatmap.SelectedHitObjects.Any();
-
-            return EditorClock.CurrentTime == startTime
-                   && EditorBeatmap.SelectedHitObjects.Count == (columnPairs?.Count ?? 0)
-                   && checkColumns;
-        }
-
-        private bool isNoteAt(HitObject hitObject, double time, int column)
-        {
-            return hitObject is ManiaHitObject maniaHitObject
-                   && maniaHitObject.StartTime == time
-                   && maniaHitObject.Column == column;
-        }
-
         [Test]
         public void TestNormalSelection()
         {
@@ -95,5 +66,29 @@ namespace osu.Game.Rulesets.Mania.Tests.Editor
             addStepClickLink("00:00:000 (1,2)", "std link");
             AddAssert("snap to 1, select none", () => checkSnapAndSelectColumn(2_170));
         }
+
+        private void addStepClickLink(string timestamp, string step = "", bool displayTimestamp = true)
+        {
+            AddStep(displayTimestamp ? $"{step} {timestamp}" : step, () => Editor.HandleTimestamp(timestamp));
+            AddUntilStep("wait for seek", () => EditorClock.SeekingOrStopped.Value);
+        }
+
+        private void addReset() => addStepClickLink("00:00:000", "reset", false);
+
+        private bool checkSnapAndSelectColumn(double startTime, IReadOnlyCollection<(int, int)>? columnPairs = null)
+        {
+            bool checkColumns = columnPairs != null
+                ? EditorBeatmap.SelectedHitObjects.All(x => columnPairs.Any(col => isNoteAt(x, col.Item1, col.Item2)))
+                : !EditorBeatmap.SelectedHitObjects.Any();
+
+            return EditorClock.CurrentTime == startTime
+                   && EditorBeatmap.SelectedHitObjects.Count == (columnPairs?.Count ?? 0)
+                   && checkColumns;
+        }
+
+        private bool isNoteAt(HitObject hitObject, double time, int column) =>
+            hitObject is ManiaHitObject maniaHitObject
+            && maniaHitObject.StartTime == time
+            && maniaHitObject.Column == column;
     }
 }
