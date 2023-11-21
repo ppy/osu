@@ -1146,7 +1146,7 @@ namespace osu.Game.Screens.Edit
                 Schedule(() => notifications?.Post(new SimpleNotification
                 {
                     Icon = FontAwesome.Solid.ExclamationTriangle,
-                    Text = EditorStrings.FailedToProcessTimestamp
+                    Text = EditorStrings.FailedToParseEditorLink
                 }));
                 return;
             }

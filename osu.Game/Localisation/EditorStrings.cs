@@ -122,12 +122,12 @@ namespace osu.Game.Localisation
         /// <summary>
         /// "Must be in edit mode to handle editor links"
         /// </summary>
-        public static LocalisableString MustBeInEdit => new TranslatableString(getKey(@"must_be_in_edit"), @"Must be in edit mode to handle editor links");
+        public static LocalisableString MustBeInEditorToHandleLinks => new TranslatableString(getKey(@"must_be_in_editor_to_handle_links"), @"Must be in edit mode to handle editor links");
 
         /// <summary>
-        /// "Failed to process timestamp"
+        /// "Failed to parse editor link"
         /// </summary>
-        public static LocalisableString FailedToProcessTimestamp => new TranslatableString(getKey(@"failed_to_process_timestamp"), @"Failed to process timestamp");
+        public static LocalisableString FailedToParseEditorLink => new TranslatableString(getKey(@"failed_to_parse_edtior_link"), @"Failed to parse editor link");
 
         private static string getKey(string key) => $@"{prefix}:{key}";
     }

@@ -32,7 +32,7 @@ namespace osu.Game.Tests.Visual.Editing
 
             addStepClickLink("00:00:000", waitForSeek: false);
             AddAssert("received 'must be in edit'",
-                () => Game.Notifications.AllNotifications.Count(x => x.Text == EditorStrings.MustBeInEdit),
+                () => Game.Notifications.AllNotifications.Count(x => x.Text == EditorStrings.MustBeInEditorToHandleLinks),
                 () => Is.EqualTo(1));
 
             AddStep("enter song select", () => Game.ChildrenOfType<ButtonSystem>().Single().OnSolo.Invoke());
@@ -40,7 +40,7 @@ namespace osu.Game.Tests.Visual.Editing
 
             addStepClickLink("00:00:000 (1)", waitForSeek: false);
             AddAssert("received 'must be in edit'",
-                () => Game.Notifications.AllNotifications.Count(x => x.Text == EditorStrings.MustBeInEdit),
+                () => Game.Notifications.AllNotifications.Count(x => x.Text == EditorStrings.MustBeInEditorToHandleLinks),
                 () => Is.EqualTo(2));
 
             setUpEditor(rulesetInfo);
@@ -48,12 +48,12 @@ namespace osu.Game.Tests.Visual.Editing
 
             addStepClickLink("00:000", "invalid link", waitForSeek: false);
             AddAssert("received 'failed to process'",
-                () => Game.Notifications.AllNotifications.Count(x => x.Text == EditorStrings.FailedToProcessTimestamp),
+                () => Game.Notifications.AllNotifications.Count(x => x.Text == EditorStrings.FailedToParseEditorLink),
                 () => Is.EqualTo(1));
 
             addStepClickLink("50000:00:000", "too long link", waitForSeek: false);
             AddAssert("received 'failed to process'",
-                () => Game.Notifications.AllNotifications.Count(x => x.Text == EditorStrings.FailedToProcessTimestamp),
+                () => Game.Notifications.AllNotifications.Count(x => x.Text == EditorStrings.FailedToParseEditorLink),
                 () => Is.EqualTo(2));
         }
 
