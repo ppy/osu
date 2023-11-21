@@ -3,18 +3,19 @@
 
 using System;
 using osu.Framework.Allocation;
-using osu.Framework.Extensions;
-using osu.Framework.Graphics.Cursor;
+using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.Textures;
-using osu.Framework.Localisation;
 
 namespace osu.Game.Users.Drawables
 {
-    public partial class DrawableFlag : BaseDrawableFlag, IHasTooltip
+    public partial class BaseDrawableFlag : Sprite
     {
-        public LocalisableString TooltipText => CountryCode == CountryCode.Unknown ? string.Empty : CountryCode.GetDescription();
+        protected readonly CountryCode CountryCode;
 
-        public DrawableFlag(CountryCode countryCode) : base(countryCode) { }
+        public BaseDrawableFlag(CountryCode countryCode)
+        {
+            CountryCode = countryCode;
+        }
 
         [BackgroundDependencyLoader]
         private void load(TextureStore ts)
