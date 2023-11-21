@@ -562,7 +562,7 @@ namespace osu.Game
         {
             if (ScreenStack.CurrentScreen is not Editor editor)
             {
-                Schedule(() => Notifications.Post(new SimpleNotification
+                Schedule(() => Notifications.Post(new SimpleErrorNotification
                 {
                     Icon = FontAwesome.Solid.ExclamationTriangle,
                     Text = EditorStrings.MustBeInEditorToHandleLinks
