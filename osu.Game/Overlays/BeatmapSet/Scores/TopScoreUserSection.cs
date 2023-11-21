@@ -27,7 +27,7 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
         private readonly UpdateableAvatar avatar;
         private readonly LinkFlowContainer usernameText;
         private readonly DrawableDate achievedOn;
-        private readonly UpdateableFlag flag;
+        private readonly ClickableUpdateableFlag flag;
 
         public TopScoreUserSection()
         {
@@ -112,7 +112,7 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
                                     },
                                 }
                             },
-                            flag = new UpdateableFlag
+                            flag = new ClickableUpdateableFlag
                             {
                                 Anchor = Anchor.CentreLeft,
                                 Origin = Anchor.CentreLeft,

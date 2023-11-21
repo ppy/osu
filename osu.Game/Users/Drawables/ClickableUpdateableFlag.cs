@@ -11,7 +11,7 @@ using osu.Game.Overlays;
 
 namespace osu.Game.Users.Drawables
 {
-    public partial class UpdateableFlag : ModelBackedDrawable<CountryCode>
+    public partial class ClickableUpdateableFlag : ModelBackedDrawable<CountryCode>
     {
         public CountryCode CountryCode
         {
@@ -30,7 +30,7 @@ namespace osu.Game.Users.Drawables
         /// </summary>
         public Action? Action;
 
-        public UpdateableFlag(CountryCode countryCode = CountryCode.Unknown)
+        public ClickableUpdateableFlag(CountryCode countryCode = CountryCode.Unknown)
         {
             CountryCode = countryCode;
         }

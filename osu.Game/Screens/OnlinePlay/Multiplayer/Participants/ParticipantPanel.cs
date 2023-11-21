@@ -123,7 +123,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Participants
                                             FillMode = FillMode.Fit,
                                             User = user
                                         },
-                                        new UpdateableFlag
+                                        new ClickableUpdateableFlag
                                         {
                                             Anchor = Anchor.CentreLeft,
                                             Origin = Anchor.CentreLeft,

@@ -12,14 +12,14 @@ namespace osu.Game.Screens.Play.HUD
 {
     public partial class PlayerFlag : CompositeDrawable, ISerialisableDrawable
     {
-        private readonly UpdateableFlag flag;
+        private readonly ClickableUpdateableFlag flag;
 
         private const float default_size = 40f;
 
         public PlayerFlag()
         {
             Size = new Vector2(default_size, default_size / 1.4f);
-            InternalChild = flag = new UpdateableFlag
+            InternalChild = flag = new ClickableUpdateableFlag
             {
                 RelativeSizeAxes = Axes.Both,
             };
