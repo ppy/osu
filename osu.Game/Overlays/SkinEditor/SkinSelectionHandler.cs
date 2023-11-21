@@ -14,7 +14,6 @@ using osu.Framework.Utils;
 using osu.Game.Extensions;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Rulesets.Edit;
-using osu.Game.Screens.Edit.Components.Menus;
 using osu.Game.Screens.Edit.Compose.Components;
 using osu.Game.Skinning;
 using osu.Game.Utils;
@@ -249,7 +248,7 @@ namespace osu.Game.Overlays.SkinEditor
                 Items = createAnchorItems((d, o) => ((Drawable)d).Origin == o, applyOrigins).ToArray()
             };
 
-            yield return new EditorMenuItemSpacer();
+            yield return new OsuMenuItemSpacer();
 
             yield return new OsuMenuItem("Reset position", MenuItemType.Standard, () =>
             {
@@ -277,13 +276,13 @@ namespace osu.Game.Overlays.SkinEditor
                 }
             });
 
-            yield return new EditorMenuItemSpacer();
+            yield return new OsuMenuItemSpacer();
 
             yield return new OsuMenuItem("Bring to front", MenuItemType.Standard, () => skinEditor.BringSelectionToFront());
 
             yield return new OsuMenuItem("Send to back", MenuItemType.Standard, () => skinEditor.SendSelectionToBack());
 
-            yield return new EditorMenuItemSpacer();
+            yield return new OsuMenuItemSpacer();
 
             foreach (var item in base.GetContextMenuItemsForSelection(selection))
                 yield return item;
