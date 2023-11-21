@@ -178,7 +178,6 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders
                             if (lastCp != cursor && HitObject.Path.ControlPoints.Count == 2)
                                 return false;
 
-                            bSplineBuilder.Clear();
                             bSplineBuilder.AddLinearPoint(ToLocalSpace(e.ScreenSpaceMouseDownPosition) - HitObject.Position);
                             setState(SliderPlacementState.Drawing);
                             return true;
