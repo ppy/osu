@@ -114,6 +114,33 @@ namespace osu.Game.Tests.Beatmaps.Formats
         }
 
         [Test]
+        public void TestEncodeBSplineCurveType()
+        {
+            var beatmap = new Beatmap
+            {
+                HitObjects =
+                {
+                    new Slider
+                    {
+                        Path = new SliderPath(new[]
+                        {
+                            new PathControlPoint(Vector2.Zero, PathType.BSpline(3)),
+                            new PathControlPoint(new Vector2(50)),
+                            new PathControlPoint(new Vector2(100), PathType.BSpline(3)),
+                            new PathControlPoint(new Vector2(150))
+                        })
+                    },
+                }
+            };
+
+            var decodedAfterEncode = decodeFromLegacy(encodeToLegacy((beatmap, new TestLegacySkin(beatmaps_resource_store, string.Empty))), string.Empty);
+            var decodedSlider = (Slider)decodedAfterEncode.beatmap.HitObjects[0];
+            Assert.That(decodedSlider.Path.ControlPoints.Count, Is.EqualTo(4));
+            Assert.That(decodedSlider.Path.ControlPoints[0].Type, Is.EqualTo(PathType.BSpline(3)));
+            Assert.That(decodedSlider.Path.ControlPoints[2].Type, Is.EqualTo(PathType.BSpline(3)));
+        }
+
+        [Test]
         public void TestEncodeMultiSegmentSliderWithFloatingPointError()
         {
             var beatmap = new Beatmap
