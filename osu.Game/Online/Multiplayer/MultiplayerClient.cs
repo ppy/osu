@@ -12,7 +12,6 @@ using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Development;
 using osu.Framework.Graphics;
-using osu.Framework.Logging;
 using osu.Game.Database;
 using osu.Game.Online.API;
 using osu.Game.Online.API.Requests.Responses;
@@ -89,6 +88,11 @@ namespace osu.Game.Online.Multiplayer
         public event Action? ResultsReady;
 
         /// <summary>
+        /// Invoked just prior to disconnection requested by the server via <see cref="IStatefulUserHubClient.DisconnectRequested"/>.
+        /// </summary>
+        public event Action? Disconnecting;
+
+        /// <summary>
         /// Whether the <see cref="MultiplayerClient"/> is currently connected.
         /// This is NOT thread safe and usage should be scheduled.
         /// </summary>
@@ -155,10 +159,7 @@ namespace osu.Game.Online.Multiplayer
             {
                 // clean up local room state on server disconnect.
                 if (!connected.NewValue && Room != null)
-                {
-                    Logger.Log("Clearing room due to multiplayer server connection loss.", LoggingTarget.Runtime, LogLevel.Important);
                     LeaveRoom();
-                }
             }));
         }
 
@@ -881,7 +882,11 @@ namespace osu.Game.Online.Multiplayer
 
         Task IStatefulUserHubClient.DisconnectRequested()
         {
-            Schedule(() => DisconnectInternal());
+            Schedule(() =>
+            {
+                Disconnecting?.Invoke();
+                DisconnectInternal();
+            });
             return Task.CompletedTask;
         }
     }
