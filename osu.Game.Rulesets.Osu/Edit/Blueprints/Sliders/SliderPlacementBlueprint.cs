@@ -3,10 +3,12 @@
 
 #nullable disable
 
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using JetBrains.Annotations;
 using osu.Framework.Allocation;
+using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Input;
 using osu.Framework.Input.Events;
@@ -84,16 +86,14 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders
             {
                 freehandToolboxGroup.Tolerance.BindValueChanged(e =>
                 {
-                    if (bSplineBuilder.Tolerance != e.NewValue)
-                        bSplineBuilder.Tolerance = e.NewValue;
-                    updateSliderPathFromBSplineBuilder();
+                    bSplineBuilder.Tolerance = e.NewValue;
+                    Scheduler.AddOnce(updateSliderPathFromBSplineBuilder);
                 }, true);
 
                 freehandToolboxGroup.CornerThreshold.BindValueChanged(e =>
                 {
-                    if (bSplineBuilder.CornerThreshold != e.NewValue)
-                        bSplineBuilder.CornerThreshold = e.NewValue;
-                    updateSliderPathFromBSplineBuilder();
+                    bSplineBuilder.CornerThreshold = e.NewValue;
+                    Scheduler.AddOnce(updateSliderPathFromBSplineBuilder);
                 }, true);
             }
         }
@@ -197,27 +197,24 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders
             base.OnDrag(e);
 
             bSplineBuilder.AddLinearPoint(ToLocalSpace(e.ScreenSpaceMousePosition) - HitObject.Position);
-            updateSliderPathFromBSplineBuilder();
+            Scheduler.AddOnce(updateSliderPathFromBSplineBuilder);
         }
 
         private void updateSliderPathFromBSplineBuilder()
         {
-            Scheduler.AddOnce(static self =>
-            {
-                var cps = self.bSplineBuilder.ControlPoints;
-                var sliderCps = self.HitObject.Path.ControlPoints;
-                sliderCps.RemoveRange(1, sliderCps.Count - 1);
+            IReadOnlyList<Vector2> builderPoints = bSplineBuilder.ControlPoints;
+            BindableList<PathControlPoint> sliderPoints = HitObject.Path.ControlPoints;
 
-                // Add the control points from the BSpline builder while converting control points that repeat
-                // three or more times to a single PathControlPoint with linear type.
-                for (int i = 1; i < cps.Count; i++)
-                {
-                    bool isSharp = i < cps.Count - 2 && cps[i] == cps[i + 1] && cps[i] == cps[i + 2];
-                    sliderCps.Add(new PathControlPoint(cps[i], isSharp ? PathType.BSpline(3) : null));
-                    if (isSharp)
-                        i += 2;
-                }
-            }, this);
+            sliderPoints.RemoveRange(1, sliderPoints.Count - 1);
+
+            // Add the control points from the BSpline builder while converting control points that repeat
+            // three or more times to a single PathControlPoint with linear type.
+            for (int i = 1; i < builderPoints.Count; i++)
+            {
+                bool isSharp = i < builderPoints.Count - 2 && builderPoints[i] == builderPoints[i + 1] && builderPoints[i] == builderPoints[i + 2];
+                sliderPoints.Add(new PathControlPoint(builderPoints[i], isSharp ? PathType.BSpline(3) : null));
+                if (isSharp) i += 2;
+            }
         }
 
         protected override void OnDragEnd(DragEndEvent e)
