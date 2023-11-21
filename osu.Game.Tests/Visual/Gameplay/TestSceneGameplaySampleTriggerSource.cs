@@ -88,7 +88,7 @@ namespace osu.Game.Tests.Visual.Gameplay
                 {
                     HitWindows = new HitWindows(),
                     StartTime = t += spacing,
-                    Path = new SliderPath(PathType.Linear, new[] { Vector2.Zero, Vector2.UnitY * 200 }),
+                    Path = new SliderPath(PathType.LINEAR, new[] { Vector2.Zero, Vector2.UnitY * 200 }),
                     Samples = new[] { new HitSampleInfo(HitSampleInfo.HIT_WHISTLE, HitSampleInfo.BANK_SOFT) },
                 },
             });

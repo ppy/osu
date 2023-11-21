@@ -31,7 +31,7 @@ namespace osu.Game.Rulesets.Catch.Tests
                         new JuiceStream
                         {
                             StartTime = 1000,
-                            Path = new SliderPath(PathType.Linear, new[] { Vector2.Zero, new Vector2(0, -192) }),
+                            Path = new SliderPath(PathType.LINEAR, new[] { Vector2.Zero, new Vector2(0, -192) }),
                             X = CatchPlayfield.WIDTH / 2
                         }
                     }
