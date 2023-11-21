@@ -3,6 +3,7 @@
 
 #nullable disable
 
+using System;
 using NUnit.Framework;
 using osu.Framework.Utils;
 using osu.Game.Rulesets.Edit;
@@ -274,7 +275,30 @@ namespace osu.Game.Rulesets.Osu.Tests.Editor
         }
 
         [Test]
-        public void TestSliderDrawing()
+        public void TestSliderDrawingCurve()
+        {
+            Vector2 startPoint = new Vector2(200);
+
+            addMovementStep(startPoint);
+            AddStep("press left button", () => InputManager.PressButton(MouseButton.Left));
+
+            for (int i = 0; i < 20; i++)
+                addMovementStep(startPoint + new Vector2(i * 40, MathF.Sin(i * MathF.PI / 5) * 50));
+
+            AddStep("release left button", () => InputManager.ReleaseButton(MouseButton.Left));
+
+            assertPlaced(true);
+            assertLength(760, tolerance: 10);
+            assertControlPointCount(5);
+            assertControlPointType(0, PathType.BSpline(3));
+            assertControlPointType(1, null);
+            assertControlPointType(2, null);
+            assertControlPointType(3, null);
+            assertControlPointType(4, null);
+        }
+
+        [Test]
+        public void TestSliderDrawingLinear()
         {
             addMovementStep(new Vector2(200));
             AddStep("press left button", () => InputManager.PressButton(MouseButton.Left));
@@ -291,7 +315,10 @@ namespace osu.Game.Rulesets.Osu.Tests.Editor
             assertPlaced(true);
             assertLength(600, tolerance: 10);
             assertControlPointCount(4);
-            assertControlPointType(0, PathType.BSpline(3));
+            assertControlPointType(0, PathType.LINEAR);
+            assertControlPointType(1, null);
+            assertControlPointType(2, null);
+            assertControlPointType(3, null);
         }
 
         [Test]
@@ -401,11 +428,11 @@ namespace osu.Game.Rulesets.Osu.Tests.Editor
 
         private void assertPlaced(bool expected) => AddAssert($"slider {(expected ? "placed" : "not placed")}", () => (getSlider() != null) == expected);
 
-        private void assertLength(double expected, double tolerance = 1) => AddAssert($"slider length is {expected}±{tolerance}", () => Precision.AlmostEquals(expected, getSlider().Distance, tolerance));
+        private void assertLength(double expected, double tolerance = 1) => AddAssert($"slider length is {expected}±{tolerance}", () => getSlider().Distance, () => Is.EqualTo(expected).Within(tolerance));
 
-        private void assertControlPointCount(int expected) => AddAssert($"has {expected} control points", () => getSlider().Path.ControlPoints.Count == expected);
+        private void assertControlPointCount(int expected) => AddAssert($"has {expected} control points", () => getSlider().Path.ControlPoints.Count, () => Is.EqualTo(expected));
 
-        private void assertControlPointType(int index, PathType type) => AddAssert($"control point {index} is {type}", () => getSlider().Path.ControlPoints[index].Type == type);
+        private void assertControlPointType(int index, PathType? type) => AddAssert($"control point {index} is {type?.ToString() ?? "inherit"}", () => getSlider().Path.ControlPoints[index].Type, () => Is.EqualTo(type));
 
         private void assertControlPointPosition(int index, Vector2 position) =>
             AddAssert($"control point {index} at {position}", () => Precision.AlmostEquals(position, getSlider().Path.ControlPoints[index].Position, 1));
