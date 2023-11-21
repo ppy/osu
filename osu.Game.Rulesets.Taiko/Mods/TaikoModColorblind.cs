@@ -14,9 +14,9 @@ using osuTK.Graphics;
 
 namespace osu.Game.Rulesets.Taiko.Mods
 {
-    public class TaikoModColorBind : ModWithVisibilityAdjustment, IApplicableToDrawableRuleset<TaikoHitObject>
+    public class TaikoModColorBlind : ModWithVisibilityAdjustment, IApplicableToDrawableRuleset<TaikoHitObject>
     {
-        public override string Name => "ColorBind";
+        public override string Name => "ColorBlind";
         public override string Acronym => "CB";
 
         public override LocalisableString Description => @"What these notes color?";
