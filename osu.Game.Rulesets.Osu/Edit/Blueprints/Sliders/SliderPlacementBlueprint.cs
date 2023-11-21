@@ -73,7 +73,7 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders
                 controlPointVisualiser = new PathControlPointVisualiser<Slider>(HitObject, false)
             };
 
-            setState(SliderPlacementState.Initial);
+            state = SliderPlacementState.Initial;
         }
 
         protected override void LoadComplete()
@@ -164,38 +164,30 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders
 
         protected override bool OnDragStart(DragStartEvent e)
         {
-            if (e.Button == MouseButton.Left)
-            {
-                switch (state)
-                {
-                    case SliderPlacementState.Initial:
-                        return true;
+            if (e.Button != MouseButton.Left)
+                return base.OnDragStart(e);
 
-                    case SliderPlacementState.ControlPoints:
-                        if (HitObject.Path.ControlPoints.Count < 3)
-                        {
-                            var lastCp = HitObject.Path.ControlPoints.LastOrDefault();
-                            if (lastCp != cursor && HitObject.Path.ControlPoints.Count == 2)
-                                return false;
+            if (state != SliderPlacementState.ControlPoints)
+                return base.OnDragStart(e);
 
-                            bSplineBuilder.AddLinearPoint(ToLocalSpace(e.ScreenSpaceMouseDownPosition) - HitObject.Position);
-                            setState(SliderPlacementState.Drawing);
-                            return true;
-                        }
+            // Only enter drawing mode if no additional control points have been placed.
+            if (HitObject.Path.ControlPoints.Count > 2)
+                return base.OnDragStart(e);
 
-                        return false;
-                }
-            }
-
-            return base.OnDragStart(e);
+            bSplineBuilder.AddLinearPoint(ToLocalSpace(e.ScreenSpaceMouseDownPosition) - HitObject.Position);
+            state = SliderPlacementState.Drawing;
+            return true;
         }
 
         protected override void OnDrag(DragEvent e)
         {
             base.OnDrag(e);
 
-            bSplineBuilder.AddLinearPoint(ToLocalSpace(e.ScreenSpaceMousePosition) - HitObject.Position);
-            Scheduler.AddOnce(updateSliderPathFromBSplineBuilder);
+            if (state == SliderPlacementState.Drawing)
+            {
+                bSplineBuilder.AddLinearPoint(ToLocalSpace(e.ScreenSpaceMousePosition) - HitObject.Position);
+                Scheduler.AddOnce(updateSliderPathFromBSplineBuilder);
+            }
         }
 
         private void updateSliderPathFromBSplineBuilder()
@@ -260,7 +252,7 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders
         private void beginCurve()
         {
             BeginPlacement(commitStart: true);
-            setState(SliderPlacementState.ControlPoints);
+            state = SliderPlacementState.ControlPoints;
         }
 
         private void endCurve()
@@ -355,11 +347,6 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders
             bodyPiece.UpdateFrom(HitObject);
             headCirclePiece.UpdateFrom(HitObject.HeadCircle);
             tailCirclePiece.UpdateFrom(HitObject.TailCircle);
-        }
-
-        private void setState(SliderPlacementState newState)
-        {
-            state = newState;
         }
 
         private enum SliderPlacementState
