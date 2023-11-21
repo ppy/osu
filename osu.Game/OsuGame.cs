@@ -565,7 +565,7 @@ namespace osu.Game
                 Schedule(() => Notifications.Post(new SimpleNotification
                 {
                     Icon = FontAwesome.Solid.ExclamationTriangle,
-                    Text = EditorStrings.MustBeInEdit
+                    Text = EditorStrings.MustBeInEditorToHandleLinks
                 }));
                 return;
             }
