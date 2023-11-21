@@ -64,7 +64,7 @@ namespace osu.Game.Rulesets.Osu.Edit
         protected readonly OsuDistanceSnapProvider DistanceSnapProvider = new OsuDistanceSnapProvider();
 
         [Cached]
-        protected readonly FreehandSliderSettingsProvider FreehandlSliderToolboxGroup = new FreehandSliderSettingsProvider();
+        protected readonly FreehandSliderToolboxGroup FreehandlSliderToolboxGroup = new FreehandSliderToolboxGroup();
 
         [BackgroundDependencyLoader]
         private void load()

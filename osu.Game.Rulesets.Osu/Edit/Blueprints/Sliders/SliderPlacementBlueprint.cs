@@ -46,7 +46,7 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders
         private IDistanceSnapProvider distanceSnapProvider { get; set; }
 
         [Resolved(CanBeNull = true)]
-        private FreehandSliderSettingsProvider freehandSettingsProvider { get; set; }
+        private FreehandSliderToolboxGroup freehandToolboxGroup { get; set; }
 
         private readonly IncrementalBSplineBuilder bSplineBuilder = new IncrementalBSplineBuilder();
 
@@ -80,16 +80,16 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders
             base.LoadComplete();
             inputManager = GetContainingInputManager();
 
-            if (freehandSettingsProvider != null)
+            if (freehandToolboxGroup != null)
             {
-                freehandSettingsProvider.Tolerance.BindValueChanged(e =>
+                freehandToolboxGroup.Tolerance.BindValueChanged(e =>
                 {
                     if (bSplineBuilder.Tolerance != e.NewValue)
                         bSplineBuilder.Tolerance = e.NewValue;
                     updateSliderPathFromBSplineBuilder();
                 });
 
-                freehandSettingsProvider.CornerThreshold.BindValueChanged(e =>
+                freehandToolboxGroup.CornerThreshold.BindValueChanged(e =>
                 {
                     if (bSplineBuilder.CornerThreshold != e.NewValue)
                         bSplineBuilder.CornerThreshold = e.NewValue;
