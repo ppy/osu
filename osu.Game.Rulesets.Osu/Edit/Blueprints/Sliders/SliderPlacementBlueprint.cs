@@ -180,7 +180,7 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders
                                 return false;
 
                             bSplineBuilder.Clear();
-                            bSplineBuilder.AddLinearPoint(ToLocalSpace(e.ScreenSpaceMousePosition) - HitObject.Position);
+                            bSplineBuilder.AddLinearPoint(ToLocalSpace(e.ScreenSpaceMouseDownPosition) - HitObject.Position);
                             setState(SliderPlacementState.Drawing);
                             return true;
                         }
