@@ -275,50 +275,52 @@ namespace osu.Game.Database
                     }
 
                     // Assumption :
-                    // - sliders and slider-ticks are uniformly spread arround the beatmap
-                    //      thus we can ignore them without losing much precision (consider a map of hit-circles only !)
-                    // - the Ok/Meh hit results are uniformly spread in the score
-                    //      thus we can simplify and consider each hit result to be score.Accuracy without losing much precision
-                    // What is strippedV1/strippedV3 :
-                    // This is the ComboScore of v1/v3 were we remove all (map-)constant multipliers and accuracy multipliers (including hit results),
-                    // based on the previous assumptions. For Scorev1, this is basically the sum of squared combos (because without sliders: object_count == combo).
+                    // - sliders and slider-ticks are uniformly spread arround the beatmap, and thus can be ignored without losing much precision.
+                    //      We thus consider a map of hit-circles only, which gives objectCount == maximumCombo !
+                    // - the Ok/Meh hit results are uniformly spread in the score, and thus can be ignored without losing much precision.
+                    //      We simplify and consider each hit result to be equal to `300*score.Accuracy`, which allows us to isolate the accuracy multiplier.
+                    // What is strippedV1/strippedNew :
+                    // This is the ComboScore (of v1 / new score) were we remove all (map-)constant multipliers and accuracy multipliers (including hit results),
+                    // based on the previous assumptions.
+                    // We use integrals to approximate the sum of each object's combo contribution (thus the original combo exponent is increased by 1)
+                    // For the maximum score, we thus integrate `f(combo) = 300*combo^exponent`, and ignoring the constant multipliers we get:
                     double maxStrippedV1 = Math.Pow(maximumLegacyCombo, 2);
-                    double maxStrippedV3 = Math.Pow(maximumLegacyCombo, 1 + ScoreProcessor.COMBO_EXPONENT);
+                    double maxStrippedNew = Math.Pow(maximumLegacyCombo, 1 + ScoreProcessor.COMBO_EXPONENT);
 
                     double strippedV1 = maxStrippedV1 * comboProportion / score.Accuracy;
 
                     double strippedV1FromMaxCombo = Math.Pow(score.MaxCombo, 2);
-                    double strippedV3FromMaxCombo = Math.Pow(score.MaxCombo, 1 + ScoreProcessor.COMBO_EXPONENT);
+                    double strippedNewFromMaxCombo = Math.Pow(score.MaxCombo, 1 + ScoreProcessor.COMBO_EXPONENT);
 
-                    // Compute approximate lower estimate scorev3 for that play
+                    // Compute approximate lower estimate new score for that play
                     // That is, a play were we made biggest amount of big combos (Repeat MaxCombo + 1 remaining big combo)
                     // And didn't combo anything in the reminder of the map
                     double possibleMaxComboRepeat = Math.Floor(strippedV1 / strippedV1FromMaxCombo);
                     double strippedV1FromMaxComboRepeat = possibleMaxComboRepeat * strippedV1FromMaxCombo;
                     double remainingStrippedV1 = strippedV1 - strippedV1FromMaxComboRepeat;
                     double remainingCombo = Math.Sqrt(remainingStrippedV1);
-                    double remainingStrippedV3 = Math.Pow(remainingCombo, 1 + ScoreProcessor.COMBO_EXPONENT);
+                    double remainingStrippedNew = Math.Pow(remainingCombo, 1 + ScoreProcessor.COMBO_EXPONENT);
 
-                    double newLowerStrippedV3 = (possibleMaxComboRepeat * strippedV3FromMaxCombo) + remainingStrippedV3;
+                    double lowerStrippedNew = (possibleMaxComboRepeat * strippedNewFromMaxCombo) + remainingStrippedNew;
 
-                    // Compute approximate upper estimate scorev3 for that play
+                    // Compute approximate upper estimate new score for that play
                     // That is, a play were all combos were equal (except MaxCombo)
                     remainingStrippedV1 = strippedV1 - strippedV1FromMaxCombo;
                     double remainingComboObjects = maximumLegacyCombo - score.MaxCombo - score.Statistics[HitResult.Miss];
                     double remainingAverageCombo = remainingComboObjects > 0 ? remainingStrippedV1 / remainingComboObjects : 0;
-                    remainingStrippedV3 = remainingComboObjects * Math.Pow(remainingAverageCombo, ScoreProcessor.COMBO_EXPONENT);
+                    remainingStrippedNew = remainingComboObjects * Math.Pow(remainingAverageCombo, ScoreProcessor.COMBO_EXPONENT);
 
-                    double newUpperStrippedV3 = strippedV3FromMaxCombo + remainingStrippedV3;
+                    double upperStrippedNew = strippedNewFromMaxCombo + remainingStrippedNew;
 
                     // Approximate by combining lower and upper estimates
                     // As the lower-estimate is very pessimistic, we use a 30/70 ratio
                     // And cap it with 1.2 times the middle-point to avoid overstimates
-                    double strippedV3 = Math.Min(
-                        0.3 * newLowerStrippedV3 + 0.7 * newUpperStrippedV3,
-                        1.2 * (newLowerStrippedV3 + newUpperStrippedV3) / 2
+                    double strippedNew = Math.Min(
+                        0.3 * lowerStrippedNew + 0.7 * upperStrippedNew,
+                        1.2 * (lowerStrippedNew + upperStrippedNew) / 2
                     );
 
-                    double newComboScoreProportion = (strippedV3 / maxStrippedV3);
+                    double newComboScoreProportion = (strippedNew / maxStrippedNew);
 
                     return (long)Math.Round((
                         500000 * newComboScoreProportion * score.Accuracy
