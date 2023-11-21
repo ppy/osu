@@ -171,7 +171,8 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders
                 return base.OnDragStart(e);
 
             // Only enter drawing mode if no additional control points have been placed.
-            if (HitObject.Path.ControlPoints.Count > 2)
+            int controlPointCount = HitObject.Path.ControlPoints.Count;
+            if (controlPointCount > 2 || (controlPointCount == 2 && HitObject.Path.ControlPoints.Last() != cursor))
                 return base.OnDragStart(e);
 
             bSplineBuilder.AddLinearPoint(ToLocalSpace(e.ScreenSpaceMouseDownPosition) - HitObject.Position);
