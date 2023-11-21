@@ -87,7 +87,7 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders
                     if (bSplineBuilder.Tolerance != e.NewValue)
                         bSplineBuilder.Tolerance = e.NewValue;
                     updateSliderPathFromBSplineBuilder();
-                });
+                }, true);
 
                 freehandToolboxGroup.CornerThreshold.BindValueChanged(e =>
                 {
