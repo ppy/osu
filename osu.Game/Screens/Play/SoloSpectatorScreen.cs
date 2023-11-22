@@ -63,6 +63,12 @@ namespace osu.Game.Screens.Play
 
         private APIBeatmapSet? beatmapSet;
 
+        private OsuScreenStack playerScreenStack = null!;
+
+        private Container screenStackContainer = null!;
+
+        public override bool DisallowExternalBeatmapRulesetChanges => true;
+
         public SoloSpectatorScreen(APIUser targetUser)
             : base(targetUser.Id)
         {
@@ -156,6 +162,20 @@ namespace osu.Game.Screens.Play
                     }
                 }
             };
+
+            AddInternal(screenStackContainer = new Container
+            {
+                CornerRadius = 10,
+                Masking = true,
+                Anchor = Anchor.Centre,
+                Origin = Anchor.Centre,
+                RelativeSizeAxes = Axes.Both,
+                Scale = new Vector2(0.95f),
+                Children = new Drawable[]
+                {
+                    playerScreenStack = new OsuScreenStack()
+                }
+            });
         }
 
         protected override void LoadComplete()
@@ -185,6 +205,8 @@ namespace osu.Game.Screens.Play
             watchButton.Enabled.Value = false;
 
             clearDisplay();
+
+            playerScreenStack.CurrentScreen?.Exit();
         }
 
         private void clearDisplay()
@@ -216,7 +238,21 @@ namespace osu.Game.Screens.Play
                 Beatmap.Value = spectatorGameplayState.Beatmap;
                 Ruleset.Value = spectatorGameplayState.Ruleset.RulesetInfo;
 
-                this.Push(new SpectatorPlayerLoader(spectatorGameplayState.Score, () => new SoloSpectatorPlayer(spectatorGameplayState.Score)));
+                screenStackContainer.FadeInFromZero(500);
+                screenStackContainer
+                    .ScaleTo(0.9f)
+                    .ScaleTo(0.95f, 500, Easing.OutQuint);
+                playerScreenStack.Push(new SpectatorPlayerLoader(spectatorGameplayState.Score, () => new SoloSpectatorPlayer(spectatorGameplayState.Score)));
+
+                // LoadComponentAsync(new SpectatorPlayerLoader(spectatorGameplayState.Score, () => new SoloSpectatorPlayer(spectatorGameplayState.Score)), loader =>
+                // {
+                //     playerScreenStack.FadeInFromZero(500);
+                //     playerScreenStack
+                //         .ScaleTo(0.9f)
+                //         .ScaleTo(0.95f, 500, Easing.OutQuint);
+                //
+                //     playerScreenStack.PushSynchronously(loader);
+                // });
             }
         }
 
