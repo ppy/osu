@@ -212,7 +212,7 @@ namespace osu.Game.Overlays.Dashboard
                                 Text = "Spectate",
                                 Anchor = Anchor.TopCentre,
                                 Origin = Anchor.TopCentre,
-                                Action = () => performer?.PerformFromScreen(s => s.Push(new SoloSpectator(User))),
+                                Action = () => performer?.PerformFromScreen(s => s.Push(new SoloSpectatorScreen(User))),
                                 Enabled = { Value = User.Id != api.LocalUser.Value.Id }
                             }
                         }
