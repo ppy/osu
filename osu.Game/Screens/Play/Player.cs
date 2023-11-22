@@ -267,7 +267,7 @@ namespace osu.Game.Screens.Play
                         createGameplayComponents(Beatmap.Value)
                     }
                 },
-                FailOverlay = new FailOverlay
+                FailOverlay = new FailOverlay(Configuration.AllowUserInteraction)
                 {
                     SaveReplay = async () => await prepareAndImportScoreAsync(true).ConfigureAwait(false),
                     OnRetry = () => Restart(),
