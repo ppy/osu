@@ -47,7 +47,7 @@ namespace osu.Game.Overlays
         private IUser? user;
         private IRulesetInfo? ruleset;
 
-        private IBindable<APIUser> apiUser = null!;
+        private readonly IBindable<APIState> apiState = new Bindable<APIState>();
 
         [Resolved]
         private RulesetStore rulesets { get; set; } = null!;
@@ -68,10 +68,10 @@ namespace osu.Game.Overlays
         [BackgroundDependencyLoader]
         private void load()
         {
-            apiUser = API.LocalUser.GetBoundCopy();
-            apiUser.BindValueChanged(_ => Schedule(() =>
+            apiState.BindTo(API.State);
+            apiState.BindValueChanged(state => Schedule(() =>
             {
-                if (API.IsLoggedIn)
+                if (state.NewValue == APIState.Online && user != null)
                     fetchAndSetContent();
             }));
         }
@@ -89,7 +89,6 @@ namespace osu.Game.Overlays
             ruleset = userRuleset;
 
             Show();
-
             fetchAndSetContent();
         }
 
@@ -171,13 +170,14 @@ namespace osu.Game.Overlays
 
             sectionsContainer.ScrollToTop();
 
-            if (API.State.Value != APIState.Online)
-                return;
+            if (API.State.Value != APIState.Offline)
+            {
+                userReq = user.OnlineID > 1 ? new GetUserRequest(user.OnlineID, ruleset) : new GetUserRequest(user.Username, ruleset);
+                userReq.Success += u => userLoadComplete(u, ruleset);
 
-            userReq = user.OnlineID > 1 ? new GetUserRequest(user.OnlineID, ruleset) : new GetUserRequest(user.Username, ruleset);
-            userReq.Success += u => userLoadComplete(u, ruleset);
-            API.Queue(userReq);
-            loadingLayer.Show();
+                API.Queue(userReq);
+                loadingLayer.Show();
+            }
         }
 
         private void userLoadComplete(APIUser loadedUser, IRulesetInfo? userRuleset)
