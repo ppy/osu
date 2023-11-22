@@ -184,12 +184,20 @@ namespace osu.Game.Screens.Play
             scheduleStart(spectatorGameplayState);
         }
 
+        protected override void FailGameplay(int userId)
+        {
+            scheduledStart?.Cancel();
+            immediateSpectatorGameplayState = null;
+            clearDisplay();
+
+            if (playerScreenStack?.CurrentScreen is SpectatorPlayer player)
+                player.AllowFail();
+        }
+
         protected override void QuitGameplay(int userId)
         {
             scheduledStart?.Cancel();
             immediateSpectatorGameplayState = null;
-            watchButton.Enabled.Value = false;
-
             clearDisplay();
 
             playerScreenStack?.CurrentScreen?.Exit();

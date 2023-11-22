@@ -137,6 +137,10 @@ namespace osu.Game.Screens.Spectate
                     markReceivedAllFrames(userId);
                     break;
 
+                case SpectatedUserState.Failed:
+                    failGameplay(userId);
+                    break;
+
                 case SpectatedUserState.Quit:
                     quitGameplay(userId);
                     break;
@@ -185,6 +189,20 @@ namespace osu.Game.Screens.Spectate
                 gameplayState.Score.Replay.HasReceivedAllFrames = true;
         }
 
+        private void failGameplay(int userId)
+        {
+            if (!userMap.ContainsKey(userId))
+                return;
+
+            if (!gameplayStates.ContainsKey(userId))
+                return;
+
+            markReceivedAllFrames(userId);
+
+            gameplayStates.Remove(userId);
+            Schedule(() => FailGameplay(userId));
+        }
+
         private void quitGameplay(int userId)
         {
             if (!userMap.ContainsKey(userId))
@@ -218,6 +236,12 @@ namespace osu.Game.Screens.Spectate
         /// </summary>
         /// <param name="userId">The user to quit gameplay for.</param>
         protected abstract void QuitGameplay(int userId);
+
+        /// <summary>
+        /// Fails gameplay for a user.
+        /// </summary>
+        /// <param name="userId">The user to fail gameplay for.</param>
+        protected abstract void FailGameplay(int userId);
 
         /// <summary>
         /// Stops spectating a user.
