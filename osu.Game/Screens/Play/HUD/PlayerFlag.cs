@@ -12,6 +12,8 @@ namespace osu.Game.Screens.Play.HUD
 {
     public partial class PlayerFlag : CompositeDrawable, ISerialisableDrawable
     {
+        protected override bool ReceivePositionalInputAtSubTree(Vector2 screenSpacePos) => false;
+
         private readonly UpdateableFlag flag;
 
         private const float default_size = 40f;
