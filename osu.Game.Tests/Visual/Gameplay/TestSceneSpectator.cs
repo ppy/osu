@@ -100,19 +100,18 @@ namespace osu.Game.Tests.Visual.Gameplay
 
             start();
 
-            AddUntilStep("wait for player loader", () => (Stack.CurrentScreen as PlayerLoader)?.IsLoaded == true);
+            AddUntilStep("wait for player loader", () => this.ChildrenOfType<PlayerLoader>().SingleOrDefault()?.IsLoaded == true);
 
             AddUntilStep("queue send frames on player load", () =>
             {
-                var loadingPlayer = (Stack.CurrentScreen as PlayerLoader)?.CurrentPlayer;
+                var loadingPlayer = this.ChildrenOfType<PlayerLoader>().SingleOrDefault()?.CurrentPlayer;
 
                 if (loadingPlayer == null)
                     return false;
 
                 loadingPlayer.OnLoadComplete += _ =>
-                {
                     spectatorClient.SendFramesFromUser(streamingUser.Id, 10, gameplay_start);
-                };
+
                 return true;
             });
 
@@ -360,12 +359,12 @@ namespace osu.Game.Tests.Visual.Gameplay
         private OsuFramedReplayInputHandler replayHandler =>
             (OsuFramedReplayInputHandler)Stack.ChildrenOfType<OsuInputManager>().First().ReplayInputHandler;
 
-        private Player player => Stack.CurrentScreen as Player;
+        private Player player => this.ChildrenOfType<Player>().Single();
 
         private double currentFrameStableTime
             => player.ChildrenOfType<FrameStabilityContainer>().First().CurrentTime;
 
-        private void waitForPlayer() => AddUntilStep("wait for player", () => (Stack.CurrentScreen as Player)?.IsLoaded == true);
+        private void waitForPlayer() => AddUntilStep("wait for player", () => this.ChildrenOfType<Player>().SingleOrDefault()?.IsLoaded == true);
 
         private void start(int? beatmapId = null) => AddStep("start play", () => spectatorClient.SendStartPlay(streamingUser.Id, beatmapId ?? importedBeatmapId));
 
