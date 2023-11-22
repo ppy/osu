@@ -34,7 +34,6 @@ namespace osu.Game.Users.Drawables
                 RelativeSizeAxes = Axes.Both,
                 Children = new Drawable[]
                 {
-                    // This is a DrawableFlag which implements IHasTooltip, so a tooltip is shown.
                     new DrawableFlag(countryCode)
                     {
                         RelativeSizeAxes = Axes.Both
