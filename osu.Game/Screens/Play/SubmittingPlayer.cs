@@ -54,6 +54,8 @@ namespace osu.Game.Screens.Play
             }
 
             AddInternal(new PlayerTouchInputDetector());
+
+            HealthProcessor.Failed += onFail;
         }
 
         protected override void LoadAsyncComplete()
@@ -165,10 +167,21 @@ namespace osu.Game.Screens.Play
             spectatorClient.BeginPlaying(token, GameplayState, Score);
         }
 
+        private bool onFail()
+        {
+            submitFromFailOrQuit();
+            return true;
+        }
+
         public override bool OnExiting(ScreenExitEvent e)
         {
             bool exiting = base.OnExiting(e);
+            submitFromFailOrQuit();
+            return exiting;
+        }
 
+        private void submitFromFailOrQuit()
+        {
             if (LoadedBeatmapSuccessfully)
             {
                 Task.Run(async () =>
@@ -177,8 +190,6 @@ namespace osu.Game.Screens.Play
                     spectatorClient.EndPlaying(GameplayState);
                 }).FireAndForget();
             }
-
-            return exiting;
         }
 
         /// <summary>
