@@ -46,9 +46,9 @@ namespace osu.Game.Online.Spectator
         public IBindableList<int> PlayingUsers => playingUsers;
 
         /// <summary>
-        /// Whether the local user is playing.
+        /// Whether the spectated user is playing.
         /// </summary>
-        protected internal bool IsPlaying { get; private set; }
+        private bool isPlaying { get; set; }
 
         /// <summary>
         /// Called whenever new frames arrive from the server.
@@ -58,17 +58,17 @@ namespace osu.Game.Online.Spectator
         /// <summary>
         /// Called whenever a user starts a play session, or immediately if the user is being watched and currently in a play session.
         /// </summary>
-        public virtual event Action<int, SpectatorState>? OnUserBeganPlaying;
+        public event Action<int, SpectatorState>? OnUserBeganPlaying;
 
         /// <summary>
         /// Called whenever a user finishes a play session.
         /// </summary>
-        public virtual event Action<int, SpectatorState>? OnUserFinishedPlaying;
+        public event Action<int, SpectatorState>? OnUserFinishedPlaying;
 
         /// <summary>
         /// Called whenever a user-submitted score has been fully processed.
         /// </summary>
-        public virtual event Action<int, long>? OnUserScoreProcessed;
+        public event Action<int, long>? OnUserScoreProcessed;
 
         /// <summary>
         /// A dictionary containing all users currently being watched, with the number of watching components for each user.
@@ -114,7 +114,7 @@ namespace osu.Game.Online.Spectator
                     }
 
                     // re-send state in case it wasn't received
-                    if (IsPlaying)
+                    if (isPlaying)
                         // TODO: this is likely sent out of order after a reconnect scenario. needs further consideration.
                         BeginPlayingInternal(currentScoreToken, currentState);
                 }
@@ -179,10 +179,10 @@ namespace osu.Game.Online.Spectator
             // This schedule is only here to match the one below in `EndPlaying`.
             Schedule(() =>
             {
-                if (IsPlaying)
+                if (isPlaying)
                     throw new InvalidOperationException($"Cannot invoke {nameof(BeginPlaying)} when already playing");
 
-                IsPlaying = true;
+                isPlaying = true;
 
                 // transfer state at point of beginning play
                 currentState.BeatmapID = score.ScoreInfo.BeatmapInfo!.OnlineID;
@@ -202,7 +202,7 @@ namespace osu.Game.Online.Spectator
 
         public void HandleFrame(ReplayFrame frame) => Schedule(() =>
         {
-            if (!IsPlaying)
+            if (!isPlaying)
             {
                 Logger.Log($"Frames arrived at {nameof(SpectatorClient)} outside of gameplay scope and will be ignored.");
                 return;
@@ -224,7 +224,7 @@ namespace osu.Game.Online.Spectator
             // We probably need to find a better way to handle this...
             Schedule(() =>
             {
-                if (!IsPlaying)
+                if (!isPlaying)
                     return;
 
                 // Disposal can take some time, leading to EndPlaying potentially being called after a future play session.
@@ -235,7 +235,7 @@ namespace osu.Game.Online.Spectator
                 if (pendingFrames.Count > 0)
                     purgePendingFrames();
 
-                IsPlaying = false;
+                isPlaying = false;
                 currentBeatmap = null;
 
                 if (state.HasPassed)
