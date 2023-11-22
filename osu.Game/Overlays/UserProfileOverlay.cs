@@ -72,7 +72,7 @@ namespace osu.Game.Overlays
             apiState.BindValueChanged(state => Schedule(() =>
             {
                 if (state.NewValue == APIState.Online && user != null)
-                    fetchAndSetContent();
+                    Scheduler.AddOnce(fetchAndSetContent);
             }));
         }
 
@@ -89,7 +89,7 @@ namespace osu.Game.Overlays
             ruleset = userRuleset;
 
             Show();
-            fetchAndSetContent();
+            Scheduler.AddOnce(fetchAndSetContent);
         }
 
         private void fetchAndSetContent()
