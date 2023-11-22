@@ -33,7 +33,7 @@ namespace osu.Game.Tests.Visual.Spectator
 
         public int FrameSendAttempts { get; private set; }
 
-        public override IBindable<bool> IsConnected { get; } = new Bindable<bool>(true);
+        protected override IBindable<bool> IsConnected { get; } = new Bindable<bool>(true);
 
         public IReadOnlyDictionary<int, ReplayFrame> LastReceivedUserFrames => lastReceivedUserFrames;
 

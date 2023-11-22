@@ -18,7 +18,7 @@ namespace osu.Game.Online.Spectator
 
         private IHubClientConnector? connector;
 
-        public override IBindable<bool> IsConnected { get; } = new BindableBool();
+        protected override IBindable<bool> IsConnected { get; } = new BindableBool();
 
         private HubConnection? connection => connector?.CurrentConnection;
 
