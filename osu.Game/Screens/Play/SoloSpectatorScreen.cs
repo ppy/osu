@@ -63,9 +63,9 @@ namespace osu.Game.Screens.Play
 
         private APIBeatmapSet? beatmapSet;
 
-        private OsuScreenStack playerScreenStack = null!;
+        private OsuScreenStack? playerScreenStack;
 
-        private Container screenStackContainer = null!;
+        private Container? screenStackContainer;
 
         public override bool DisallowExternalBeatmapRulesetChanges => true;
 
@@ -162,20 +162,6 @@ namespace osu.Game.Screens.Play
                     }
                 }
             };
-
-            AddInternal(screenStackContainer = new Container
-            {
-                CornerRadius = 10,
-                Masking = true,
-                Anchor = Anchor.Centre,
-                Origin = Anchor.Centre,
-                RelativeSizeAxes = Axes.Both,
-                Scale = new Vector2(0.95f),
-                Children = new Drawable[]
-                {
-                    playerScreenStack = new OsuScreenStack()
-                }
-            });
         }
 
         protected override void LoadComplete()
@@ -206,7 +192,7 @@ namespace osu.Game.Screens.Play
 
             clearDisplay();
 
-            playerScreenStack.CurrentScreen?.Exit();
+            playerScreenStack?.CurrentScreen?.Exit();
         }
 
         private void clearDisplay()
@@ -238,21 +224,47 @@ namespace osu.Game.Screens.Play
                 Beatmap.Value = spectatorGameplayState.Beatmap;
                 Ruleset.Value = spectatorGameplayState.Ruleset.RulesetInfo;
 
-                screenStackContainer.FadeInFromZero(500);
-                screenStackContainer
-                    .ScaleTo(0.9f)
-                    .ScaleTo(0.95f, 500, Easing.OutQuint);
-                playerScreenStack.Push(new SpectatorPlayerLoader(spectatorGameplayState.Score, () => new SoloSpectatorPlayer(spectatorGameplayState.Score)));
+                OsuScreenStack newStack;
 
-                // LoadComponentAsync(new SpectatorPlayerLoader(spectatorGameplayState.Score, () => new SoloSpectatorPlayer(spectatorGameplayState.Score)), loader =>
-                // {
-                //     playerScreenStack.FadeInFromZero(500);
-                //     playerScreenStack
-                //         .ScaleTo(0.9f)
-                //         .ScaleTo(0.95f, 500, Easing.OutQuint);
-                //
-                //     playerScreenStack.PushSynchronously(loader);
-                // });
+                LoadComponentAsync(new Container
+                {
+                    CornerRadius = 10,
+                    Masking = true,
+                    Alpha = 0,
+                    AlwaysPresent = true,
+                    Anchor = Anchor.Centre,
+                    Origin = Anchor.Centre,
+                    RelativeSizeAxes = Axes.Both,
+                    Scale = new Vector2(0.95f),
+                    Children = new Drawable[]
+                    {
+                        newStack = new OsuScreenStack()
+                    }
+                }, container =>
+                {
+                    screenStackContainer?.FadeOut(200);
+                    screenStackContainer?.Expire();
+
+                    AddInternal(screenStackContainer = container);
+                    playerScreenStack = newStack;
+
+                    var spectatorPlayerLoader = new SpectatorPlayerLoader(spectatorGameplayState.Score, () =>
+                        new SoloSpectatorPlayer(spectatorGameplayState.Score));
+
+                    spectatorPlayerLoader.OnLoadComplete += _ =>
+                    {
+                        // Slight delay to allow the other animations to play out on this screen first.
+                        Scheduler.AddDelayed(() =>
+                        {
+                            container.FadeInFromZero(300);
+                            container
+                                .ScaleTo(0.6f)
+                                .ScaleTo(0.95f, 500, Easing.OutQuint);
+                        }, 600);
+                    };
+
+                    newStack.Push(spectatorPlayerLoader);
+                });
             }
         }
 
