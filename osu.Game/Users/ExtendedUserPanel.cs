@@ -52,7 +52,7 @@ namespace osu.Game.Users
 
         protected UpdateableAvatar CreateAvatar() => new UpdateableAvatar(User, false);
 
-        protected ClickableUpdateableFlag CreateFlag() => new ClickableUpdateableFlag(User.CountryCode)
+        protected UpdateableFlag CreateFlag() => new UpdateableFlag(User.CountryCode)
         {
             Size = new Vector2(36, 26),
             Action = Action,

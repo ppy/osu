@@ -157,7 +157,7 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
                     Margin = new MarginPadding { Right = horizontal_inset },
                     Text = score.DisplayAccuracy,
                 },
-                new ClickableUpdateableFlag(score.User.CountryCode)
+                new UpdateableFlag(score.User.CountryCode)
                 {
                     Size = new Vector2(19, 14),
                     ShowPlaceholderOnUnknown = false,

@@ -96,7 +96,7 @@ namespace osu.Game.Overlays.Rankings.Tables
             Margin = new MarginPadding { Bottom = row_spacing },
             Children = new[]
             {
-                new ClickableUpdateableFlag(GetCountryCode(item))
+                new UpdateableFlag(GetCountryCode(item))
                 {
                     Size = new Vector2(28, 20),
                     ShowPlaceholderOnUnknown = false,
