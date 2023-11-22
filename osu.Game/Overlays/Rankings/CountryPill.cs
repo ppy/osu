@@ -34,7 +34,7 @@ namespace osu.Game.Overlays.Rankings
 
         private readonly Container content;
         private readonly Box background;
-        private readonly ClickableUpdateableFlag flag;
+        private readonly UpdateableFlag flag;
         private readonly OsuSpriteText countryName;
 
         public CountryPill()
@@ -74,7 +74,7 @@ namespace osu.Game.Overlays.Rankings
                                 Spacing = new Vector2(5, 0),
                                 Children = new Drawable[]
                                 {
-                                    flag = new ClickableUpdateableFlag
+                                    flag = new UpdateableFlag
                                     {
                                         Anchor = Anchor.Centre,
                                         Origin = Anchor.Centre,
