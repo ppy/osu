@@ -1,10 +1,7 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
 using System.Diagnostics;
-using JetBrains.Annotations;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
@@ -35,39 +32,38 @@ namespace osu.Game.Screens.Play
     [Cached(typeof(IPreviewTrackOwner))]
     public partial class SoloSpectatorScreen : SpectatorScreen, IPreviewTrackOwner
     {
-        [NotNull]
-        private readonly APIUser targetUser;
+        [Resolved]
+        private IAPIProvider api { get; set; } = null!;
 
         [Resolved]
-        private IAPIProvider api { get; set; }
+        private PreviewTrackManager previewTrackManager { get; set; } = null!;
 
         [Resolved]
-        private PreviewTrackManager previewTrackManager { get; set; }
+        private BeatmapManager beatmaps { get; set; } = null!;
 
         [Resolved]
-        private BeatmapManager beatmaps { get; set; }
-
-        [Resolved]
-        private BeatmapModelDownloader beatmapDownloader { get; set; }
+        private BeatmapModelDownloader beatmapDownloader { get; set; } = null!;
 
         [Cached]
         private OverlayColourProvider colourProvider = new OverlayColourProvider(OverlayColourScheme.Purple);
 
-        private Container beatmapPanelContainer;
-        private RoundedButton watchButton;
-        private SettingsCheckbox automaticDownload;
+        private Container beatmapPanelContainer = null!;
+        private RoundedButton watchButton = null!;
+        private SettingsCheckbox automaticDownload = null!;
+
+        private readonly APIUser targetUser;
 
         /// <summary>
         /// The player's immediate online gameplay state.
         /// This doesn't always reflect the gameplay state being watched.
         /// </summary>
-        private SpectatorGameplayState immediateSpectatorGameplayState;
+        private SpectatorGameplayState? immediateSpectatorGameplayState;
 
-        private GetBeatmapSetRequest onlineBeatmapRequest;
+        private GetBeatmapSetRequest? onlineBeatmapRequest;
 
-        private APIBeatmapSet beatmapSet;
+        private APIBeatmapSet? beatmapSet;
 
-        public SoloSpectatorScreen([NotNull] APIUser targetUser)
+        public SoloSpectatorScreen(APIUser targetUser)
             : base(targetUser.Id)
         {
             this.targetUser = targetUser;
@@ -199,10 +195,12 @@ namespace osu.Game.Screens.Play
             previewTrackManager.StopAnyPlaying(this);
         }
 
-        private ScheduledDelegate scheduledStart;
+        private ScheduledDelegate? scheduledStart;
 
-        private void scheduleStart(SpectatorGameplayState spectatorGameplayState)
+        private void scheduleStart(SpectatorGameplayState? spectatorGameplayState)
         {
+            Debug.Assert(spectatorGameplayState != null);
+
             // This function may be called multiple times in quick succession once the screen becomes current again.
             scheduledStart?.Cancel();
             scheduledStart = Schedule(() =>
