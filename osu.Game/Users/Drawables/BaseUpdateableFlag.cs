@@ -34,8 +34,7 @@ namespace osu.Game.Users.Drawables
                 RelativeSizeAxes = Axes.Both,
                 Children = new Drawable[]
                 {
-                    // This is a BaseDrawableFlag which does not show a tooltip.
-                    new BaseDrawableFlag(countryCode)
+                    new DrawableFlag(countryCode)
                     {
                         RelativeSizeAxes = Axes.Both
                     },
