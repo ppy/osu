@@ -274,53 +274,79 @@ namespace osu.Game.Database
                             + bonusProportion) * modMultiplier);
                     }
 
-                    // Assumption :
-                    // - sliders and slider-ticks are uniformly spread arround the beatmap, and thus can be ignored without losing much precision.
-                    //      We thus consider a map of hit-circles only, which gives objectCount == maximumCombo !
+                    // Assumptions:
+                    // - sliders and slider ticks are uniformly distributed in the beatmap, and thus can be ignored without losing much precision.
+                    //   We thus consider a map of hit-circles only, which gives objectCount == maximumCombo.
                     // - the Ok/Meh hit results are uniformly spread in the score, and thus can be ignored without losing much precision.
-                    //      We simplify and consider each hit result to be equal to `300*score.Accuracy`, which allows us to isolate the accuracy multiplier.
-                    // What is strippedV1/strippedNew :
-                    // This is the ComboScore (of v1 / new score) were we remove all (map-)constant multipliers and accuracy multipliers (including hit results),
-                    // based on the previous assumptions.
-                    // We use integrals to approximate the sum of each object's combo contribution (thus the original combo exponent is increased by 1)
-                    // For the maximum score, we thus integrate `f(combo) = 300*combo^exponent`, and ignoring the constant multipliers we get:
-                    double maxStrippedV1 = Math.Pow(maximumLegacyCombo, 2);
-                    double maxStrippedNew = Math.Pow(maximumLegacyCombo, 1 + ScoreProcessor.COMBO_EXPONENT);
+                    //   We simplify and consider each hit result to have the same hit value of `300 * score.Accuracy`
+                    //   (which represents the average hit value over the entire play),
+                    //   which allows us to isolate the accuracy multiplier.
 
-                    double strippedV1 = maxStrippedV1 * comboProportion / score.Accuracy;
+                    // This is a very ballpark estimate of the maximum magnitude of the combo portion in score V1.
+                    // It is derived by assuming a full combo play and summing up the contribution to combo portion from each individual object.
+                    // Because each object's combo contribution is proportional to the current combo at the time of judgement,
+                    // this can be roughly represented by summing / integrating f(combo) = combo.
+                    // All mod- and beatmap-dependent multipliers and constants are not included here,
+                    // as we will only be using the magnitude of this to compute ratios.
+                    double maximumAchievableComboPortionInScoreV1 = Math.Pow(maximumLegacyCombo, 2);
+                    // Similarly, estimate the maximum magnitude of the combo portion in standardised score.
+                    // Roughly corresponds to integrating f(combo) = combo ^ COMBO_EXPONENT (omitting constants)
+                    double maximumAchievableComboPortionInStandardisedScore = Math.Pow(maximumLegacyCombo, 1 + ScoreProcessor.COMBO_EXPONENT);
 
-                    double strippedV1FromMaxCombo = Math.Pow(score.MaxCombo, 2);
-                    double strippedNewFromMaxCombo = Math.Pow(score.MaxCombo, 1 + ScoreProcessor.COMBO_EXPONENT);
+                    double comboPortionInScoreV1 = maximumAchievableComboPortionInScoreV1 * comboProportion / score.Accuracy;
 
-                    // Compute approximate lower estimate new score for that play
-                    // That is, a play were we made biggest amount of big combos (Repeat MaxCombo + 1 remaining big combo)
-                    // And didn't combo anything in the reminder of the map
-                    double possibleMaxComboRepeat = Math.Floor(strippedV1 / strippedV1FromMaxCombo);
-                    double strippedV1FromMaxComboRepeat = possibleMaxComboRepeat * strippedV1FromMaxCombo;
-                    double remainingStrippedV1 = strippedV1 - strippedV1FromMaxComboRepeat;
-                    double remainingCombo = Math.Sqrt(remainingStrippedV1);
-                    double remainingStrippedNew = Math.Pow(remainingCombo, 1 + ScoreProcessor.COMBO_EXPONENT);
+                    // This is - roughly - how much score, in the combo portion, the longest combo on this particular play would gain in score V1.
+                    double comboPortionFromLongestComboInScoreV1 = Math.Pow(score.MaxCombo, 2);
+                    // Same for standardised score.
+                    double comboPortionFromLongestComboInStandardisedScore = Math.Pow(score.MaxCombo, 1 + ScoreProcessor.COMBO_EXPONENT);
 
-                    double lowerStrippedNew = (possibleMaxComboRepeat * strippedNewFromMaxCombo) + remainingStrippedNew;
+                    // Calculate how many times the longest combo the user has achieved in the play can repeat
+                    // without exceeding the combo portion in score V1 as achieved by the player.
+                    // This is a pessimistic estimate; it intentionally does not operate on object count and uses only score instead.
+                    double maximumOccurrencesOfLongestCombo = Math.Floor(comboPortionInScoreV1 / comboPortionFromLongestComboInScoreV1);
+                    double comboPortionFromRepeatedLongestCombosInScoreV1 = maximumOccurrencesOfLongestCombo * comboPortionFromLongestComboInScoreV1;
 
-                    // Compute approximate upper estimate new score for that play
-                    // That is, a play were all combos were equal (except MaxCombo)
-                    remainingStrippedV1 = strippedV1 - strippedV1FromMaxCombo;
-                    double remainingComboObjects = maximumLegacyCombo - score.MaxCombo - score.Statistics[HitResult.Miss];
-                    double remainingAverageCombo = remainingComboObjects > 0 ? remainingStrippedV1 / remainingComboObjects : 0;
-                    remainingStrippedNew = remainingComboObjects * Math.Pow(remainingAverageCombo, ScoreProcessor.COMBO_EXPONENT);
+                    double remainingComboPortionInScoreV1 = comboPortionInScoreV1 - comboPortionFromRepeatedLongestCombosInScoreV1;
+                    // `remainingComboPortionInScoreV1` is in the "score ballpark" realm, which means it's proportional to combo squared.
+                    // To convert that back to a raw combo length, we need to take the square root...
+                    double remainingCombo = Math.Sqrt(remainingComboPortionInScoreV1);
+                    // ...and then based on that raw combo length, we calculate how much this last combo is worth in standardised score.
+                    double remainingComboPortionInStandardisedScore = Math.Pow(remainingCombo, 1 + ScoreProcessor.COMBO_EXPONENT);
 
-                    double upperStrippedNew = strippedNewFromMaxCombo + remainingStrippedNew;
+                    double lowerEstimateOfComboPortionInStandardisedScore
+                        = maximumOccurrencesOfLongestCombo * comboPortionFromLongestComboInStandardisedScore
+                          + remainingComboPortionInStandardisedScore;
 
-                    // Approximate by combining lower and upper estimates
+                    // Compute approximate upper estimate new score for that play.
+                    // This time, divide the remaining combo among remaining objects equally to achieve longest possible combo lengths.
+                    // There is no rigorous proof that doing this will yield a correct upper bound, but it seems to work out in practice.
+                    remainingComboPortionInScoreV1 = comboPortionInScoreV1 - comboPortionFromLongestComboInScoreV1;
+                    double remainingCountOfObjectsGivingCombo = maximumLegacyCombo - score.MaxCombo - score.Statistics[HitResult.Miss];
+                    // Because we assumed all combos were equal, `remainingComboPortionInScoreV1`
+                    // can be approximated by n * x^2, wherein n is the assumed number of equal combos,
+                    // and x is the assumed length of every one of those combos.
+                    // The remaining count of objects giving combo is, using those terms, equal to n * x.
+                    // Therefore, dividing the two will result in x, i.e. the assumed length of the remaining combos.
+                    double lengthOfRemainingCombos = remainingCountOfObjectsGivingCombo > 0
+                        ? remainingComboPortionInScoreV1 / remainingCountOfObjectsGivingCombo
+                        : 0;
+                    // In standardised scoring, each combo yields a score proportional to combo length to the power 1 + COMBO_EXPONENT.
+                    // Using the symbols introduced above, that would be x ^ 1.5 per combo, n times (because there are n assumed equal-length combos).
+                    // However, because `remainingCountOfObjectsGivingCombo` - using the symbols introduced above - is assumed to be equal to n * x,
+                    // we can skip adding the 1 and just multiply by x ^ 0.5.
+                    remainingComboPortionInStandardisedScore = remainingCountOfObjectsGivingCombo * Math.Pow(lengthOfRemainingCombos, ScoreProcessor.COMBO_EXPONENT);
+
+                    double upperEstimateOfComboPortionInStandardisedScore = comboPortionFromLongestComboInStandardisedScore + remainingComboPortionInStandardisedScore;
+
+                    // Approximate by combining lower and upper estimates.
                     // As the lower-estimate is very pessimistic, we use a 30/70 ratio
-                    // And cap it with 1.2 times the middle-point to avoid overstimates
-                    double strippedNew = Math.Min(
-                        0.3 * lowerStrippedNew + 0.7 * upperStrippedNew,
-                        1.2 * (lowerStrippedNew + upperStrippedNew) / 2
+                    // and cap it with 1.2 times the middle-point to avoid overestimates.
+                    double estimatedComboPortionInStandardisedScore = Math.Min(
+                        0.3 * lowerEstimateOfComboPortionInStandardisedScore + 0.7 * upperEstimateOfComboPortionInStandardisedScore,
+                        1.2 * (lowerEstimateOfComboPortionInStandardisedScore + upperEstimateOfComboPortionInStandardisedScore) / 2
                     );
 
-                    double newComboScoreProportion = (strippedNew / maxStrippedNew);
+                    double newComboScoreProportion = estimatedComboPortionInStandardisedScore / maximumAchievableComboPortionInStandardisedScore;
 
                     return (long)Math.Round((
                         500000 * newComboScoreProportion * score.Accuracy
