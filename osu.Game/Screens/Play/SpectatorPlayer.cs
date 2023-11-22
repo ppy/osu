@@ -25,7 +25,15 @@ namespace osu.Game.Screens.Play
 
         private readonly Score score;
 
-        protected override bool CheckModsAllowFailure() => false; // todo: better support starting mid-way through beatmap
+        protected override bool CheckModsAllowFailure()
+        {
+            if (!allowFail)
+                return false;
+
+            return base.CheckModsAllowFailure();
+        }
+
+        private bool allowFail;
 
         protected SpectatorPlayer(Score score, PlayerConfiguration configuration = null)
             : base(configuration)
@@ -123,5 +131,7 @@ namespace osu.Game.Screens.Play
             if (SpectatorClient != null)
                 SpectatorClient.OnNewFrames -= userSentFrames;
         }
+
+        public void AllowFail() => allowFail = true;
     }
 }
