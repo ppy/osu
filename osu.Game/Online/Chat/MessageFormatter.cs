@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text.RegularExpressions;
 using osu.Game.Online.API.Requests.Responses;
+using osu.Game.Rulesets.Edit;
 
 namespace osu.Game.Online.Chat
 {
@@ -40,10 +41,6 @@ namespace osu.Game.Online.Chat
             // fragment (optional)
             @"(?:#(?:[a-z0-9$_\+!\*\',;:\(\)@&=\/~-]|%[0-9a-f]{2})*)?)?)",
             RegexOptions.IgnoreCase);
-
-        // 00:00:000 (1,2,3) - test
-        // regex from https://github.com/ppy/osu-web/blob/651a9bac2b60d031edd7e33b8073a469bf11edaa/resources/assets/coffee/_classes/beatmap-discussion-helper.coffee#L10
-        private static readonly Regex time_regex = new Regex(@"\b(((\d{2,}):([0-5]\d)[:.](\d{3}))(\s\((?:\d+[,|])*\d+\))?)");
 
         // #osu
         private static readonly Regex channel_regex = new Regex(@"(#[a-zA-Z]+[a-zA-Z0-9]+)");
@@ -274,7 +271,7 @@ namespace osu.Game.Online.Chat
             handleAdvanced(advanced_link_regex, result, startIndex);
 
             // handle editor times
-            handleMatches(time_regex, "{0}", $@"{OsuGameBase.OSU_PROTOCOL}edit/{{0}}", result, startIndex, LinkAction.OpenEditorTimestamp);
+            handleMatches(EditorTimestampParser.TIME_REGEX, "{0}", $@"{OsuGameBase.OSU_PROTOCOL}edit/{{0}}", result, startIndex, LinkAction.OpenEditorTimestamp);
 
             // handle channels
             handleMatches(channel_regex, "{0}", $@"{OsuGameBase.OSU_PROTOCOL}chan/{{0}}", result, startIndex, LinkAction.OpenChannel);
