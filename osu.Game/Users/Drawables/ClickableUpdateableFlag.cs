@@ -11,8 +11,19 @@ using osu.Game.Overlays;
 
 namespace osu.Game.Users.Drawables
 {
-    public partial class ClickableUpdateableFlag : BaseUpdateableFlag
+    public partial class ClickableUpdateableFlag : ModelBackedDrawable<CountryCode>
     {
+        public CountryCode CountryCode
+        {
+            get => Model;
+            set => Model = value;
+        }
+
+        /// <summary>
+        /// Whether to show a place holder on unknown country.
+        /// </summary>
+        public bool ShowPlaceholderOnUnknown = true;
+
         /// <summary>
         /// Perform an action in addition to showing the country ranking.
         /// This should be used to perform auxiliary tasks and not as a primary action for clicking a flag (to maintain a consistent UX).
