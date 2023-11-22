@@ -178,6 +178,19 @@ namespace osu.Game.Screens.Play
             scheduleStart(spectatorGameplayState);
         });
 
+        protected override void FailGameplay(int userId)
+        {
+            if (this.GetChildScreen() is SpectatorPlayer player)
+                player.AllowFail();
+
+            Schedule(() =>
+            {
+                scheduledStart?.Cancel();
+                immediateSpectatorGameplayState = null;
+                clearDisplay();
+            });
+        }
+
         protected override void QuitGameplay(int userId)
         {
             // Importantly, don't schedule this call, as a child screen may be present (and will cause the schedule to not be run as expected).
@@ -187,7 +200,6 @@ namespace osu.Game.Screens.Play
             {
                 scheduledStart?.Cancel();
                 immediateSpectatorGameplayState = null;
-                watchButton.Enabled.Value = false;
 
                 clearDisplay();
             });
