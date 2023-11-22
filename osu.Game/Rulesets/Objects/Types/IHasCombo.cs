@@ -16,6 +16,12 @@ namespace osu.Game.Rulesets.Objects.Types
         /// <summary>
         /// When starting a new combo, the offset of the new combo relative to the current one.
         /// </summary>
+        /// <remarks>
+        /// This is generally a setting provided by a beatmap creator to choreograph interesting colour patterns
+        /// which can only be achieved by skipping combo colours with per-hitobject level.
+        ///
+        /// It is exposed via <see cref="IHasComboInformation.ComboIndexWithOffsets"/>.
+        /// </remarks>
         int ComboOffset { get; }
     }
 }
