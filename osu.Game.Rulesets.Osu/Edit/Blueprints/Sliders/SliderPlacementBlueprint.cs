@@ -3,6 +3,7 @@
 
 #nullable disable
 
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using JetBrains.Annotations;
@@ -10,6 +11,7 @@ using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Input;
 using osu.Framework.Input.Events;
+using osu.Framework.Utils;
 using osu.Game.Rulesets.Edit;
 using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Objects.Types;
@@ -44,6 +46,11 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders
         [Resolved(CanBeNull = true)]
         private IDistanceSnapProvider distanceSnapProvider { get; set; }
 
+        [Resolved(CanBeNull = true)]
+        private FreehandSliderToolboxGroup freehandToolboxGroup { get; set; }
+
+        private readonly IncrementalBSplineBuilder bSplineBuilder = new IncrementalBSplineBuilder();
+
         protected override bool IsValidForPlacement => HitObject.Path.HasValidLength;
 
         public SliderPlacementBlueprint()
@@ -51,7 +58,7 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders
         {
             RelativeSizeAxes = Axes.Both;
 
-            HitObject.Path.ControlPoints.Add(segmentStart = new PathControlPoint(Vector2.Zero, PathType.Linear));
+            HitObject.Path.ControlPoints.Add(segmentStart = new PathControlPoint(Vector2.Zero, PathType.LINEAR));
             currentSegmentLength = 1;
         }
 
@@ -66,13 +73,28 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders
                 controlPointVisualiser = new PathControlPointVisualiser<Slider>(HitObject, false)
             };
 
-            setState(SliderPlacementState.Initial);
+            state = SliderPlacementState.Initial;
         }
 
         protected override void LoadComplete()
         {
             base.LoadComplete();
             inputManager = GetContainingInputManager();
+
+            if (freehandToolboxGroup != null)
+            {
+                freehandToolboxGroup.Tolerance.BindValueChanged(e =>
+                {
+                    bSplineBuilder.Tolerance = e.NewValue;
+                    Scheduler.AddOnce(updateSliderPathFromBSplineBuilder);
+                }, true);
+
+                freehandToolboxGroup.CornerThreshold.BindValueChanged(e =>
+                {
+                    bSplineBuilder.CornerThreshold = e.NewValue;
+                    Scheduler.AddOnce(updateSliderPathFromBSplineBuilder);
+                }, true);
+            }
         }
 
         [Resolved]
@@ -87,8 +109,9 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders
                 case SliderPlacementState.Initial:
                     BeginPlacement();
 
-                    double? nearestSliderVelocity = (editorBeatmap.HitObjects
-                                                                  .LastOrDefault(h => h is Slider && h.GetEndTime() < HitObject.StartTime) as Slider)?.SliderVelocityMultiplier;
+                    double? nearestSliderVelocity = (editorBeatmap
+                                                     .HitObjects
+                                                     .LastOrDefault(h => h is Slider && h.GetEndTime() < HitObject.StartTime) as Slider)?.SliderVelocityMultiplier;
 
                     HitObject.SliderVelocityMultiplier = nearestSliderVelocity ?? 1;
                     HitObject.Position = ToLocalSpace(result.ScreenSpacePosition);
@@ -98,7 +121,7 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders
                     ApplyDefaultsToHitObject();
                     break;
 
-                case SliderPlacementState.Body:
+                case SliderPlacementState.ControlPoints:
                     updateCursor();
                     break;
             }
@@ -115,7 +138,7 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders
                     beginCurve();
                     break;
 
-                case SliderPlacementState.Body:
+                case SliderPlacementState.ControlPoints:
                     if (canPlaceNewControlPoint(out var lastPoint))
                     {
                         // Place a new point by detatching the current cursor.
@@ -128,7 +151,7 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders
                         Debug.Assert(lastPoint != null);
 
                         segmentStart = lastPoint;
-                        segmentStart.Type = PathType.Linear;
+                        segmentStart.Type = PathType.LINEAR;
 
                         currentSegmentLength = 1;
                     }
@@ -139,23 +162,48 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders
             return true;
         }
 
+        protected override bool OnDragStart(DragStartEvent e)
+        {
+            if (e.Button != MouseButton.Left)
+                return base.OnDragStart(e);
+
+            if (state != SliderPlacementState.ControlPoints)
+                return base.OnDragStart(e);
+
+            // Only enter drawing mode if no additional control points have been placed.
+            int controlPointCount = HitObject.Path.ControlPoints.Count;
+            if (controlPointCount > 2 || (controlPointCount == 2 && HitObject.Path.ControlPoints.Last() != cursor))
+                return base.OnDragStart(e);
+
+            bSplineBuilder.AddLinearPoint(ToLocalSpace(e.ScreenSpaceMouseDownPosition) - HitObject.Position);
+            state = SliderPlacementState.Drawing;
+            return true;
+        }
+
+        protected override void OnDrag(DragEvent e)
+        {
+            base.OnDrag(e);
+
+            if (state == SliderPlacementState.Drawing)
+            {
+                bSplineBuilder.AddLinearPoint(ToLocalSpace(e.ScreenSpaceMousePosition) - HitObject.Position);
+                Scheduler.AddOnce(updateSliderPathFromBSplineBuilder);
+            }
+        }
+
+        protected override void OnDragEnd(DragEndEvent e)
+        {
+            base.OnDragEnd(e);
+
+            if (state == SliderPlacementState.Drawing)
+                endCurve();
+        }
+
         protected override void OnMouseUp(MouseUpEvent e)
         {
-            if (state == SliderPlacementState.Body && e.Button == MouseButton.Right)
+            if (state == SliderPlacementState.ControlPoints && e.Button == MouseButton.Right)
                 endCurve();
             base.OnMouseUp(e);
-        }
-
-        private void beginCurve()
-        {
-            BeginPlacement(commitStart: true);
-            setState(SliderPlacementState.Body);
-        }
-
-        private void endCurve()
-        {
-            updateSlider();
-            EndPlacement(true);
         }
 
         protected override void Update()
@@ -167,21 +215,39 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders
             updatePathType();
         }
 
+        private void beginCurve()
+        {
+            BeginPlacement(commitStart: true);
+            state = SliderPlacementState.ControlPoints;
+        }
+
+        private void endCurve()
+        {
+            updateSlider();
+            EndPlacement(true);
+        }
+
         private void updatePathType()
         {
+            if (state == SliderPlacementState.Drawing)
+            {
+                segmentStart.Type = PathType.BSpline(3);
+                return;
+            }
+
             switch (currentSegmentLength)
             {
                 case 1:
                 case 2:
-                    segmentStart.Type = PathType.Linear;
+                    segmentStart.Type = PathType.LINEAR;
                     break;
 
                 case 3:
-                    segmentStart.Type = PathType.PerfectCurve;
+                    segmentStart.Type = PathType.PERFECT_CURVE;
                     break;
 
                 default:
-                    segmentStart.Type = PathType.Bezier;
+                    segmentStart.Type = PathType.BEZIER;
                     break;
             }
         }
@@ -195,13 +261,13 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders
                 {
                     HitObject.Path.ControlPoints.Add(cursor = new PathControlPoint { Position = Vector2.Zero });
 
-                    // The path type should be adjusted in the progression of updatePathType() (Linear -> PC -> Bezier).
+                    // The path type should be adjusted in the progression of updatePathType() (LINEAR -> PC -> BEZIER).
                     currentSegmentLength++;
                     updatePathType();
                 }
 
                 // Update the cursor position.
-                var result = positionSnapProvider?.FindSnappedPositionAndTime(inputManager.CurrentState.Mouse.Position, state == SliderPlacementState.Body ? SnapType.GlobalGrids : SnapType.All);
+                var result = positionSnapProvider?.FindSnappedPositionAndTime(inputManager.CurrentState.Mouse.Position, state == SliderPlacementState.ControlPoints ? SnapType.GlobalGrids : SnapType.All);
                 cursor.Position = ToLocalSpace(result?.ScreenSpacePosition ?? inputManager.CurrentState.Mouse.Position) - HitObject.Position;
             }
             else if (cursor != null)
@@ -210,7 +276,7 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders
                 HitObject.Path.ControlPoints.Remove(cursor);
                 cursor = null;
 
-                // The path type should be adjusted in the reverse progression of updatePathType() (Bezier -> PC -> Linear).
+                // The path type should be adjusted in the reverse progression of updatePathType() (BEZIER -> PC -> LINEAR).
                 currentSegmentLength--;
                 updatePathType();
             }
@@ -240,15 +306,55 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders
             tailCirclePiece.UpdateFrom(HitObject.TailCircle);
         }
 
-        private void setState(SliderPlacementState newState)
+        private void updateSliderPathFromBSplineBuilder()
         {
-            state = newState;
+            IReadOnlyList<Vector2> builderPoints = bSplineBuilder.ControlPoints;
+
+            if (builderPoints.Count == 0)
+                return;
+
+            int lastSegmentStart = 0;
+            PathType? lastPathType = null;
+
+            HitObject.Path.ControlPoints.Clear();
+
+            // Iterate through generated points, finding each segment and adding non-inheriting path types where appropriate.
+            // Importantly, the B-Spline builder returns three Vector2s at the same location when a new segment is to be started.
+            for (int i = 0; i < builderPoints.Count; i++)
+            {
+                bool isLastPoint = i == builderPoints.Count - 1;
+                bool isNewSegment = i < builderPoints.Count - 2 && builderPoints[i] == builderPoints[i + 1] && builderPoints[i] == builderPoints[i + 2];
+
+                if (isNewSegment || isLastPoint)
+                {
+                    int pointsInSegment = i - lastSegmentStart;
+
+                    // Where possible, we can use the simpler LINEAR path type.
+                    PathType? pathType = pointsInSegment == 1 ? PathType.LINEAR : PathType.BSpline(3);
+
+                    // Linear segments can be combined, as two adjacent linear sections are computationally the same as one with the points combined.
+                    if (lastPathType == pathType && lastPathType == PathType.LINEAR)
+                        pathType = null;
+
+                    HitObject.Path.ControlPoints.Add(new PathControlPoint(builderPoints[lastSegmentStart], pathType));
+                    for (int j = lastSegmentStart + 1; j < i; j++)
+                        HitObject.Path.ControlPoints.Add(new PathControlPoint(builderPoints[j]));
+
+                    if (isLastPoint)
+                        HitObject.Path.ControlPoints.Add(new PathControlPoint(builderPoints[i]));
+
+                    // Skip the redundant duplicated points (see isNewSegment above) which have been coalesced into a path type.
+                    lastSegmentStart = (i += 2);
+                    if (pathType != null) lastPathType = pathType;
+                }
+            }
         }
 
         private enum SliderPlacementState
         {
             Initial,
-            Body,
+            ControlPoints,
+            Drawing
         }
     }
 }
