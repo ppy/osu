@@ -335,6 +335,40 @@ namespace osu.Game.Tests.Visual.Gameplay
             AddAssert("value is less than default", () => hitErrorMeter.JudgementLineThickness.Value < hitErrorMeter.JudgementLineThickness.Default);
         }
 
+        [Test]
+        public void TestCopyPaste()
+        {
+            AddStep("paste", () =>
+            {
+                InputManager.PressKey(Key.LControl);
+                InputManager.Key(Key.V);
+                InputManager.ReleaseKey(Key.LControl);
+            });
+            // no assertions. just make sure nothing crashes.
+
+            AddStep("select bar hit error blueprint", () =>
+            {
+                var blueprint = skinEditor.ChildrenOfType<SkinBlueprint>().First(b => b.Item is BarHitErrorMeter);
+                skinEditor.SelectedComponents.Clear();
+                skinEditor.SelectedComponents.Add(blueprint.Item);
+            });
+            AddStep("copy", () =>
+            {
+                InputManager.PressKey(Key.LControl);
+                InputManager.Key(Key.C);
+                InputManager.ReleaseKey(Key.LControl);
+            });
+            AddStep("paste", () =>
+            {
+                InputManager.PressKey(Key.LControl);
+                InputManager.Key(Key.V);
+                InputManager.ReleaseKey(Key.LControl);
+            });
+            AddAssert("three hit error meters present",
+                () => skinEditor.ChildrenOfType<SkinBlueprint>().Count(b => b.Item is BarHitErrorMeter),
+                () => Is.EqualTo(3));
+        }
+
         protected override Ruleset CreatePlayerRuleset() => new OsuRuleset();
 
         private partial class TestSkinEditorChangeHandler : SkinEditorChangeHandler
