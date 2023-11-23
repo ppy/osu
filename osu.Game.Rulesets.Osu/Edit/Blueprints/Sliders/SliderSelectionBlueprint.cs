@@ -205,18 +205,13 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders
                 ControlPointVisualiser?.DragInProgress(e);
         }
 
-        protected override void OnDragEnd(DragEndEvent e)
-        {
-            base.OnDragEnd(e);
-
-            if (placementControlPoint != null)
-                ControlPointVisualiser?.DragEnded();
-        }
-
         protected override void OnMouseUp(MouseUpEvent e)
         {
             if (placementControlPoint != null)
             {
+                if (IsDragged)
+                    ControlPointVisualiser?.DragEnded();
+
                 placementControlPoint = null;
                 changeHandler?.EndChange();
             }
