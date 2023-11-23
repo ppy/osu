@@ -20,6 +20,11 @@ namespace osu.Game.Rulesets.Scoring
         public readonly double TimeOffset;
 
         /// <summary>
+        /// The true gameplay rate at the time of the event.
+        /// </summary>
+        public readonly double? GameplayRate;
+
+        /// <summary>
         /// The hit result.
         /// </summary>
         public readonly HitResult Result;
@@ -46,12 +51,14 @@ namespace osu.Game.Rulesets.Scoring
         /// </summary>
         /// <param name="timeOffset">The time offset from the end of <paramref name="hitObject"/> at which the event occurs.</param>
         /// <param name="result">The <see cref="HitResult"/>.</param>
+        /// <param name="gameplayRate">The true gameplay rate at the time of the event.</param>
         /// <param name="hitObject">The <see cref="HitObject"/> that triggered the event.</param>
         /// <param name="lastHitObject">The previous <see cref="HitObject"/>.</param>
         /// <param name="position">A position corresponding to the event.</param>
-        public HitEvent(double timeOffset, HitResult result, HitObject hitObject, [CanBeNull] HitObject lastHitObject, [CanBeNull] Vector2? position)
+        public HitEvent(double timeOffset, double? gameplayRate, HitResult result, HitObject hitObject, [CanBeNull] HitObject lastHitObject, [CanBeNull] Vector2? position)
         {
             TimeOffset = timeOffset;
+            GameplayRate = gameplayRate;
             Result = result;
             HitObject = hitObject;
             LastHitObject = lastHitObject;
@@ -63,6 +70,6 @@ namespace osu.Game.Rulesets.Scoring
         /// </summary>
         /// <param name="positionOffset">The positional offset.</param>
         /// <returns>The new <see cref="HitEvent"/>.</returns>
-        public HitEvent With(Vector2? positionOffset) => new HitEvent(TimeOffset, Result, HitObject, LastHitObject, positionOffset);
+        public HitEvent With(Vector2? positionOffset) => new HitEvent(TimeOffset, GameplayRate, Result, HitObject, LastHitObject, positionOffset);
     }
 }

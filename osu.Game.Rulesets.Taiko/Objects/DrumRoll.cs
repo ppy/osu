@@ -116,7 +116,7 @@ namespace osu.Game.Rulesets.Taiko.Objects
         double IHasDistance.Distance => Duration * Velocity;
 
         SliderPath IHasPath.Path
-            => new SliderPath(PathType.Linear, new[] { Vector2.Zero, new Vector2(1) }, ((IHasDistance)this).Distance / LegacyBeatmapEncoder.LEGACY_TAIKO_VELOCITY_MULTIPLIER);
+            => new SliderPath(PathType.LINEAR, new[] { Vector2.Zero, new Vector2(1) }, ((IHasDistance)this).Distance / LegacyBeatmapEncoder.LEGACY_TAIKO_VELOCITY_MULTIPLIER);
 
         #endregion
     }

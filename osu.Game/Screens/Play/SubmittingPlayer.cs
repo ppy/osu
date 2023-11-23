@@ -44,6 +44,18 @@ namespace osu.Game.Screens.Play
         {
         }
 
+        [BackgroundDependencyLoader]
+        private void load()
+        {
+            if (DrawableRuleset == null)
+            {
+                // base load must have failed (e.g. due to an unknown mod); bail.
+                return;
+            }
+
+            AddInternal(new PlayerTouchInputDetector());
+        }
+
         protected override void LoadAsyncComplete()
         {
             base.LoadAsyncComplete();
