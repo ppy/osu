@@ -206,6 +206,11 @@ namespace osu.Game.Rulesets.Mods
             return result;
         }
 
+        Mod IDeepCloneable<Mod>.DeepClone(IDictionary<object, object> referenceLookup)
+        {
+            return DeepClone();
+        }
+
         /// <summary>
         /// Copies mod setting values from <paramref name="source"/> into this instance, overwriting all existing settings.
         /// </summary>

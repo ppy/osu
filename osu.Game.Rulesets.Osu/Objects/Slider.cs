@@ -19,6 +19,7 @@ using osu.Game.Rulesets.Judgements;
 using osu.Game.Rulesets.Objects.Legacy;
 using osu.Game.Rulesets.Osu.Judgements;
 using osu.Game.Rulesets.Scoring;
+using System;
 
 namespace osu.Game.Rulesets.Osu.Objects
 {
@@ -30,7 +31,7 @@ namespace osu.Game.Rulesets.Osu.Objects
         public double Duration
         {
             get => EndTime - StartTime;
-            set => throw new System.NotSupportedException($"Adjust via {nameof(RepeatCount)} instead"); // can be implemented if/when needed.
+            set => throw new NotSupportedException($"Adjust via {nameof(RepeatCount)} instead"); // can be implemented if/when needed.
         }
 
         public override IList<HitSampleInfo> AuxiliarySamples => CreateSlidingSamples().Concat(TailSamples).ToArray();
@@ -282,5 +283,32 @@ namespace osu.Game.Rulesets.Osu.Objects
             : new OsuIgnoreJudgement();
 
         protected override HitWindows CreateHitWindows() => HitWindows.Empty;
+
+        protected override void CopyFrom(HitObject other, IDictionary<object, object> referenceLookup)
+        {
+            base.CopyFrom(other, referenceLookup);
+
+            if (other is not Slider slider)
+                throw new ArgumentException($"{nameof(other)} must be of type {nameof(Slider)}");
+
+            Path = slider.Path;
+            LazyEndPosition = slider.LazyEndPosition;
+            LazyTravelDistance = slider.LazyTravelDistance;
+            LazyTravelTime = slider.LazyTravelTime;
+            NodeSamples = slider.NodeSamples.Select(s => (IList<HitSampleInfo>)s.Select(s2 => s2.DeepClone(referenceLookup)).ToList()).ToList();
+            TailSamples = slider.TailSamples.Select(s => s.DeepClone(referenceLookup)).ToList();
+            repeatCount = slider.repeatCount;
+            Velocity = slider.Velocity;
+            TickDistance = slider.TickDistance;
+            TickDistanceMultiplier = slider.TickDistanceMultiplier;
+            classicSliderBehaviour = slider.classicSliderBehaviour;
+            SliderVelocityMultiplier = slider.SliderVelocityMultiplier;
+            GenerateTicks = slider.GenerateTicks;
+
+            HeadCircle = NestedHitObjects.OfType<SliderHeadCircle>().Single();
+            TailCircle = NestedHitObjects.OfType<SliderTailCircle>().Single();
+        }
+
+        protected override HitObject CreateInstance() => new Slider();
     }
 }

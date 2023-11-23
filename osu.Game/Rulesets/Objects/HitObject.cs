@@ -19,6 +19,7 @@ using osu.Game.Beatmaps.ControlPoints;
 using osu.Game.Rulesets.Judgements;
 using osu.Game.Rulesets.Objects.Types;
 using osu.Game.Rulesets.Scoring;
+using osu.Game.Utils;
 
 namespace osu.Game.Rulesets.Objects
 {
@@ -28,7 +29,7 @@ namespace osu.Game.Rulesets.Objects
     /// HitObjects may contain more properties for which you should be checking through the IHas* types.
     /// </para>
     /// </summary>
-    public class HitObject
+    public class HitObject : IDeepCloneable<HitObject>
     {
         /// <summary>
         /// A small adjustment to the start time of control points to account for rounding/precision errors.
@@ -214,6 +215,34 @@ namespace osu.Game.Rulesets.Objects
                 return existingSample.With(newName: sampleName);
 
             return new HitSampleInfo(sampleName);
+        }
+
+        public HitObject DeepClone(IDictionary<object, object> referenceLookup)
+        {
+            if (referenceLookup.TryGetValue(this, out object existing))
+                return (HitObject)existing;
+
+            var clone = CreateInstance();
+            referenceLookup[this] = clone;
+
+            clone.CopyFrom(this, referenceLookup);
+
+            return clone;
+        }
+
+        protected virtual HitObject CreateInstance() => new HitObject();
+
+        protected virtual void CopyFrom(HitObject other, IDictionary<object, object> referenceLookup)
+        {
+            StartTime = other.StartTime;
+            Samples = other.Samples.Select(s => s.DeepClone(referenceLookup)).ToList();
+            Kiai = other.Kiai;
+
+            // HitWindows is immutable, so we can copy by reference
+            HitWindows = other.HitWindows;
+
+            nestedHitObjects.Clear();
+            nestedHitObjects.AddRange(other.nestedHitObjects.Select(h => h.DeepClone(referenceLookup)));
         }
     }
 

@@ -42,12 +42,7 @@ namespace osu.Game.Beatmaps
         public IBeatmap Convert(CancellationToken cancellationToken = default)
         {
             // We always operate on a clone of the original beatmap, to not modify it game-wide
-            var original = Beatmap.Clone();
-
-            // Shallow clone isn't enough to ensure we don't mutate beatmap info unexpectedly.
-            // Can potentially be removed after `Beatmap.Difficulty` doesn't save back to `Beatmap.BeatmapInfo`.
-            original.BeatmapInfo = original.BeatmapInfo.Clone();
-            original.ControlPointInfo = original.ControlPointInfo.DeepClone();
+            var original = Beatmap.DeepClone();
 
             return ConvertBeatmap(original, cancellationToken);
         }

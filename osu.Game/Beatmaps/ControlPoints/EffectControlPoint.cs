@@ -74,5 +74,7 @@ namespace osu.Game.Beatmaps.ControlPoints
                && KiaiMode == other.KiaiMode;
 
         public override int GetHashCode() => HashCode.Combine(base.GetHashCode(), ScrollSpeed, KiaiMode);
+
+        protected override ControlPoint CreateInstance() => new EffectControlPoint();
     }
 }

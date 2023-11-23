@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using osu.Game.Audio;
 using osu.Game.Rulesets.Catch.Judgements;
 using osu.Game.Rulesets.Judgements;
+using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Objects.Types;
 using osu.Game.Skinning;
 using osu.Game.Utils;
@@ -47,6 +48,18 @@ namespace osu.Game.Rulesets.Catch.Objects
             }
         }
 
+        protected override void CopyFrom(HitObject other, IDictionary<object, object> referenceLookup)
+        {
+            base.CopyFrom(other, referenceLookup);
+
+            if (other is not Banana banana)
+                throw new ArgumentException($"{nameof(other)} must be of type {nameof(Banana)}");
+
+            BananaIndex = banana.BananaIndex;
+        }
+
+        protected override HitObject CreateInstance() => new Banana();
+
         public class BananaHitSampleInfo : HitSampleInfo, IEquatable<BananaHitSampleInfo>
         {
             private static readonly string[] lookup_names = { "Gameplay/metronomelow", "Gameplay/catch-banana" };
@@ -68,6 +81,8 @@ namespace osu.Game.Rulesets.Catch.Objects
                 => obj is BananaHitSampleInfo other && Equals(other);
 
             public override int GetHashCode() => lookup_names.GetHashCode();
+
+            protected override HitSampleInfo CreateInstance() => new BananaHitSampleInfo();
         }
     }
 }

@@ -2,12 +2,14 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using osu.Framework.Bindables;
+using osu.Game.Utils;
 
 namespace osu.Game.Beatmaps.ControlPoints
 {
-    public class ControlPointGroup : IComparable<ControlPointGroup>, IEquatable<ControlPointGroup>
+    public class ControlPointGroup : IComparable<ControlPointGroup>, IEquatable<ControlPointGroup>, IDeepCloneable<ControlPointGroup>
     {
         public event Action<ControlPoint>? ItemAdded;
         public event Action<ControlPoint>? ItemRemoved;
@@ -63,6 +65,20 @@ namespace osu.Game.Beatmaps.ControlPoints
             foreach (var point in controlPoints)
                 hashCode.Add(point);
             return hashCode.ToHashCode();
+        }
+
+        public ControlPointGroup DeepClone(IDictionary<object, object> referenceLookup)
+        {
+            if (referenceLookup.TryGetValue(this, out object? existing))
+                return (ControlPointGroup)existing;
+
+            var clone = new ControlPointGroup(Time);
+            referenceLookup[this] = clone;
+
+            foreach (var point in controlPoints)
+                clone.Add(point.DeepClone(referenceLookup));
+
+            return clone;
         }
     }
 }

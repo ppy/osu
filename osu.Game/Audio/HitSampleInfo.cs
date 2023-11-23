@@ -13,7 +13,7 @@ namespace osu.Game.Audio
     /// Describes a gameplay hit sample.
     /// </summary>
     [Serializable]
-    public class HitSampleInfo : ISampleInfo, IEquatable<HitSampleInfo>
+    public class HitSampleInfo : ISampleInfo, IEquatable<HitSampleInfo>, IDeepCloneable<HitSampleInfo>
     {
         public const string HIT_NORMAL = @"hitnormal";
         public const string HIT_WHISTLE = @"hitwhistle";
@@ -101,5 +101,25 @@ namespace osu.Game.Audio
             => obj is HitSampleInfo other && Equals(other);
 
         public override int GetHashCode() => HashCode.Combine(Name, Bank, Suffix);
+
+        public HitSampleInfo DeepClone(IDictionary<object, object>? referenceLookup)
+        {
+            if (referenceLookup?.TryGetValue(this, out object? existing) == true)
+                return (HitSampleInfo)existing;
+
+            var clone = CreateInstance();
+            if (referenceLookup != null)
+                referenceLookup[this] = clone;
+
+            clone.CopyFrom(this);
+
+            return clone;
+        }
+
+        protected virtual HitSampleInfo CreateInstance() => new HitSampleInfo(Name, Bank, Suffix, Volume);
+
+        protected virtual void CopyFrom(HitSampleInfo other)
+        {
+        }
     }
 }

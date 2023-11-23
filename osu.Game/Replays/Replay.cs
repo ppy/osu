@@ -18,14 +18,18 @@ namespace osu.Game.Replays
 
         public List<ReplayFrame> Frames = new List<ReplayFrame>();
 
-        public Replay DeepClone()
+        Replay IDeepCloneable<Replay>.DeepClone(IDictionary<object, object> referenceLookup)
         {
-            return new Replay
-            {
-                HasReceivedAllFrames = HasReceivedAllFrames,
-                // individual frames are mutable for now but hopefully this will not be a thing in the future.
-                Frames = Frames.ToList(),
-            };
+            if (referenceLookup.TryGetValue(this, out object? existing))
+                return (Replay)existing;
+
+            var clone = new Replay();
+            referenceLookup[this] = clone;
+
+            clone.HasReceivedAllFrames = HasReceivedAllFrames;
+            clone.Frames = Frames.Select(f => f.DeepClone(referenceLookup)).ToList();
+
+            return clone;
         }
     }
 }

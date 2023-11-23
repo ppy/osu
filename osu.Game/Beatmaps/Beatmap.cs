@@ -11,6 +11,7 @@ using System.Linq;
 using osu.Game.Beatmaps.ControlPoints;
 using Newtonsoft.Json;
 using osu.Game.IO.Serialization.Converters;
+using osu.Game.Utils;
 
 namespace osu.Game.Beatmaps
 {
@@ -116,14 +117,29 @@ namespace osu.Game.Beatmaps
             return mostCommon.beatLength;
         }
 
-        IBeatmap IBeatmap.Clone() => Clone();
+        IBeatmap IDeepCloneable<IBeatmap>.DeepClone(IDictionary<object, object> referenceLookup) => DeepClone(referenceLookup);
 
-        public Beatmap<T> Clone() => (Beatmap<T>)MemberwiseClone();
+        public Beatmap<T> DeepClone(IDictionary<object, object> referenceLookup)
+        {
+            if (referenceLookup.TryGetValue(this, out object existing))
+                return (Beatmap<T>)existing;
+
+            var clone = (Beatmap<T>)MemberwiseClone();
+            referenceLookup[this] = clone;
+
+            clone.beatmapInfo = beatmapInfo?.DeepClone(referenceLookup);
+            clone.difficulty = clone.beatmapInfo?.Difficulty;
+            clone.ControlPointInfo = ControlPointInfo.DeepClone(referenceLookup);
+            clone.Breaks = Breaks.Select(b => b.DeepClone(referenceLookup)).ToList();
+            clone.HitObjects = HitObjects.Select(h => (T)h.DeepClone(referenceLookup)).ToList();
+
+            return clone;
+        }
     }
 
     public class Beatmap : Beatmap<HitObject>
     {
-        public new Beatmap Clone() => (Beatmap)base.Clone();
+        public new Beatmap DeepClone(IDictionary<object, object> referencesLookup) => (Beatmap)base.DeepClone(referencesLookup);
 
         public override string ToString() => BeatmapInfo?.ToString() ?? base.ToString();
     }

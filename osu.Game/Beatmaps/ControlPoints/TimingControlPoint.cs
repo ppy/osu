@@ -105,5 +105,7 @@ namespace osu.Game.Beatmaps.ControlPoints
                && BeatLength.Equals(other.BeatLength);
 
         public override int GetHashCode() => HashCode.Combine(base.GetHashCode(), TimeSignature, BeatLength, OmitFirstBarLine);
+
+        protected override ControlPoint CreateInstance() => new TimingControlPoint();
     }
 }

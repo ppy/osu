@@ -155,7 +155,7 @@ namespace osu.Game.Beatmaps
             };
             var newBeatmap = new Beatmap { BeatmapInfo = newBeatmapInfo };
             foreach (var timingPoint in referenceWorkingBeatmap.Beatmap.ControlPointInfo.TimingPoints)
-                newBeatmap.ControlPointInfo.Add(timingPoint.Time, timingPoint.DeepClone());
+                newBeatmap.ControlPointInfo.Add(timingPoint.Time, timingPoint.DeepClone(new Dictionary<object, object>()));
 
             return addDifficultyToSet(targetBeatmapSet, newBeatmap, referenceWorkingBeatmap.Skin);
         }
@@ -173,10 +173,9 @@ namespace osu.Game.Beatmaps
         /// <param name="referenceWorkingBeatmap">The <see cref="WorkingBeatmap"/> to be copied.</param>
         public virtual WorkingBeatmap CopyExistingDifficulty(BeatmapSetInfo targetBeatmapSet, WorkingBeatmap referenceWorkingBeatmap)
         {
-            var newBeatmap = referenceWorkingBeatmap.GetPlayableBeatmap(referenceWorkingBeatmap.BeatmapInfo.Ruleset).Clone();
-            BeatmapInfo newBeatmapInfo;
+            var newBeatmap = referenceWorkingBeatmap.GetPlayableBeatmap(referenceWorkingBeatmap.BeatmapInfo.Ruleset);
+            var newBeatmapInfo = newBeatmap.BeatmapInfo;
 
-            newBeatmap.BeatmapInfo = newBeatmapInfo = referenceWorkingBeatmap.BeatmapInfo.Clone();
             // assign a new ID to the clone.
             newBeatmapInfo.ID = Guid.NewGuid();
             // add "(copy)" suffix to difficulty name, and additionally ensure that it doesn't conflict with any other potentially pre-existing copies.

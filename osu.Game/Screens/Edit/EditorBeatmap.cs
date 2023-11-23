@@ -17,6 +17,7 @@ using osu.Game.Beatmaps.Timing;
 using osu.Game.Rulesets.Edit;
 using osu.Game.Rulesets.Objects;
 using osu.Game.Skinning;
+using osu.Game.Utils;
 
 namespace osu.Game.Screens.Edit
 {
@@ -407,6 +408,11 @@ namespace osu.Game.Screens.Edit
         public double SnapTime(double time, double? referenceTime) => ControlPointInfo.GetClosestSnappedTime(time, BeatDivisor, referenceTime);
 
         public double GetBeatLengthAtTime(double referenceTime) => ControlPointInfo.TimingPointAt(referenceTime).BeatLength / BeatDivisor;
+
+        IBeatmap IDeepCloneable<IBeatmap>.DeepClone(IDictionary<object, object> referenceLookup)
+        {
+            throw new NotSupportedException($"Cloning an {nameof(EditorBeatmap)} is not supported.");
+        }
 
         public int BeatDivisor => beatDivisor?.Value ?? 1;
     }

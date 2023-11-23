@@ -1,7 +1,10 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System;
+using System.Collections.Generic;
 using osu.Game.Rulesets.Judgements;
+using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Scoring;
 using osu.Game.Rulesets.Taiko.Judgements;
 
@@ -44,12 +47,27 @@ namespace osu.Game.Rulesets.Taiko.Objects
             Samples = Samples
         };
 
+        protected override void CopyFrom(HitObject other, IDictionary<object, object> referenceLookup)
+        {
+            base.CopyFrom(other, referenceLookup);
+
+            if (other is not DrumRollTick tick)
+                throw new ArgumentException($"{nameof(other)} must be of type {nameof(DrumRollTick)}");
+
+            FirstTick = tick.FirstTick;
+            TickSpacing = tick.TickSpacing;
+        }
+
+        protected override HitObject CreateInstance() => new DrumRollTick(Parent);
+
         public class StrongNestedHit : StrongNestedHitObject
         {
             public StrongNestedHit(TaikoHitObject parent)
                 : base(parent)
             {
             }
+
+            protected override HitObject CreateInstance() => new StrongNestedHit(null!);
         }
     }
 }

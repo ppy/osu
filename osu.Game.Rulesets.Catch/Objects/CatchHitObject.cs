@@ -2,6 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
+using System.Collections.Generic;
 using Newtonsoft.Json;
 using osu.Framework.Bindables;
 using osu.Game.Beatmaps;
@@ -175,5 +176,26 @@ namespace osu.Game.Rulesets.Catch.Objects
         Vector2 IHasPosition.Position => new Vector2(OriginalX, LegacyConvertedY);
 
         #endregion
+
+        protected override void CopyFrom(HitObject other, IDictionary<object, object> referenceLookup)
+        {
+            base.CopyFrom(other, referenceLookup);
+
+            if (other is not CatchHitObject catchOther)
+                throw new ArgumentException($"{nameof(other)} must be of type {nameof(CatchHitObject)}");
+
+            XOffset = catchOther.XOffset;
+            OriginalX = catchOther.OriginalX;
+            TimePreempt = catchOther.TimePreempt;
+            IndexInBeatmap = catchOther.IndexInBeatmap;
+            NewCombo = catchOther.NewCombo;
+            ComboOffset = catchOther.ComboOffset;
+            IndexInCurrentCombo = catchOther.IndexInCurrentCombo;
+            ComboIndex = catchOther.ComboIndex;
+            ComboIndexWithOffsets = catchOther.ComboIndexWithOffsets;
+            LastInCombo = catchOther.LastInCombo;
+            Scale = catchOther.Scale;
+            LegacyConvertedY = catchOther.LegacyConvertedY;
+        }
     }
 }

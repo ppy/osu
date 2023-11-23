@@ -48,5 +48,7 @@ namespace osu.Game.Rulesets.Taiko.Skinning.Argon
                     return originalBank;
             }
         }
+
+        protected override HitSampleInfo CreateInstance() => new VolumeAwareHitSampleInfo(this);
     }
 }

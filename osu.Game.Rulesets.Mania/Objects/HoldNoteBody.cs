@@ -3,6 +3,7 @@
 
 using osu.Game.Rulesets.Judgements;
 using osu.Game.Rulesets.Mania.Judgements;
+using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Scoring;
 
 namespace osu.Game.Rulesets.Mania.Objects
@@ -17,5 +18,7 @@ namespace osu.Game.Rulesets.Mania.Objects
     {
         public override Judgement CreateJudgement() => new HoldNoteBodyJudgement();
         protected override HitWindows CreateHitWindows() => HitWindows.Empty;
+
+        protected override HitObject CreateInstance() => new HoldNoteBody();
     }
 }

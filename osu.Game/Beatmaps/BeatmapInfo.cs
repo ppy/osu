@@ -2,6 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using JetBrains.Annotations;
@@ -15,6 +16,7 @@ using osu.Game.Overlays.BeatmapSet.Scores;
 using osu.Game.Rulesets;
 using osu.Game.Rulesets.Edit;
 using osu.Game.Scoring;
+using osu.Game.Utils;
 using Realms;
 
 namespace osu.Game.Beatmaps
@@ -28,7 +30,7 @@ namespace osu.Game.Beatmaps
     /// </remarks>
     [Serializable]
     [MapTo("Beatmap")]
-    public class BeatmapInfo : RealmObject, IHasGuidPrimaryKey, IBeatmapInfo, IEquatable<BeatmapInfo>
+    public class BeatmapInfo : RealmObject, IHasGuidPrimaryKey, IBeatmapInfo, IEquatable<BeatmapInfo>, IDeepCloneable<BeatmapInfo>
     {
         [PrimaryKey]
         public Guid ID { get; set; }
@@ -276,7 +278,30 @@ namespace osu.Game.Beatmaps
 
         public int BeatmapVersion;
 
-        public BeatmapInfo Clone() => (BeatmapInfo)this.Detach().MemberwiseClone();
+        public BeatmapInfo DeepClone(IDictionary<object, object> referenceLookup)
+        {
+            if (referenceLookup.TryGetValue(this, out object? existingClone))
+                return (BeatmapInfo)existingClone;
+
+            var clone = this.Detach();
+            if (ReferenceEquals(clone, this))
+                clone = (BeatmapInfo)MemberwiseClone();
+
+            referenceLookup[this] = clone;
+
+            // The cloned instances are typically created when converting
+            // beatmaps using WorkingBeatmap.GetPlayableBeatmap().
+            // As a consequence, it should be safe to not copy
+            // the OnlineInfo or Scores properties and instead let
+            // MemberwiseClone() do its job.
+            clone.Difficulty = Difficulty.DeepClone(referenceLookup);
+            clone.Metadata = Metadata.DeepClone(referenceLookup);
+            clone.UserSettings = UserSettings.DeepClone(referenceLookup);
+            clone.BeatmapSet = BeatmapSet?.DeepClone(referenceLookup);
+            clone.Bookmarks = Bookmarks.ToArray();
+
+            return clone;
+        }
 
         public override string ToString() => this.GetDisplayTitle();
 

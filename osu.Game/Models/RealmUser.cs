@@ -2,6 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
+using System.Collections.Generic;
 using osu.Game.Database;
 using osu.Game.Users;
 using osu.Game.Utils;
@@ -35,6 +36,18 @@ namespace osu.Game.Models
             return OnlineID == other.OnlineID && Username == other.Username;
         }
 
-        public RealmUser DeepClone() => (RealmUser)this.Detach().MemberwiseClone();
+        public RealmUser DeepClone(IDictionary<object, object> referenceLookup)
+        {
+            if (referenceLookup.TryGetValue(this, out object? existing))
+                return (RealmUser)existing;
+
+            var clone = this.Detach();
+            if (ReferenceEquals(clone, this))
+                clone = (RealmUser)MemberwiseClone();
+
+            referenceLookup[this] = clone;
+
+            return clone;
+        }
     }
 }

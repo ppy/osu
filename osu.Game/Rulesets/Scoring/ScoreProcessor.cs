@@ -16,6 +16,7 @@ using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Replays;
 using osu.Game.Scoring;
+using osu.Game.Utils;
 
 namespace osu.Game.Rulesets.Scoring
 {
@@ -515,7 +516,7 @@ namespace osu.Game.Rulesets.Scoring
 
     [Serializable]
     [MessagePackObject]
-    public class ScoreProcessorStatistics
+    public class ScoreProcessorStatistics : IDeepCloneable<ScoreProcessorStatistics>
     {
         /// <summary>
         /// The sum of all accuracy-affecting judgements at the current point in time.
@@ -553,5 +554,16 @@ namespace osu.Game.Rulesets.Scoring
         /// </summary>
         [Key(4)]
         public double BonusPortion { get; set; }
+
+        public ScoreProcessorStatistics DeepClone(IDictionary<object, object> referenceLookup)
+        {
+            if (referenceLookup.TryGetValue(this, out object? existing))
+                return (ScoreProcessorStatistics)existing;
+
+            var clone = (ScoreProcessorStatistics)MemberwiseClone();
+            referenceLookup[this] = clone;
+
+            return clone;
+        }
     }
 }

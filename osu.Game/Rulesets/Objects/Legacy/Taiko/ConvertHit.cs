@@ -8,5 +8,6 @@ namespace osu.Game.Rulesets.Objects.Legacy.Taiko
     /// </summary>
     internal sealed class ConvertHit : ConvertHitObject
     {
+        protected override HitObject CreateInstance() => new ConvertHit();
     }
 }

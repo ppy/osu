@@ -3,6 +3,7 @@
 
 using osu.Game.Rulesets.Judgements;
 using osu.Game.Rulesets.Mania.Judgements;
+using osu.Game.Rulesets.Objects;
 
 namespace osu.Game.Rulesets.Mania.Objects
 {
@@ -21,5 +22,7 @@ namespace osu.Game.Rulesets.Mania.Objects
         public override Judgement CreateJudgement() => new ManiaJudgement();
 
         public override double MaximumJudgementOffset => base.MaximumJudgementOffset * RELEASE_WINDOW_LENIENCE;
+
+        protected override HitObject CreateInstance() => new TailNote();
     }
 }

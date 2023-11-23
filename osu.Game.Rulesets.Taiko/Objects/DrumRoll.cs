@@ -10,6 +10,8 @@ using osu.Game.Rulesets.Judgements;
 using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Scoring;
 using osuTK;
+using System.Collections.Generic;
+using System;
 
 namespace osu.Game.Rulesets.Taiko.Objects
 {
@@ -100,6 +102,21 @@ namespace osu.Game.Rulesets.Taiko.Objects
             Samples = Samples
         };
 
+        protected override void CopyFrom(HitObject other, IDictionary<object, object> referenceLookup)
+        {
+            base.CopyFrom(other, referenceLookup);
+
+            if (other is not DrumRoll drumRoll)
+                throw new ArgumentException($"{nameof(other)} must be of type {nameof(DrumRoll)}");
+
+            Duration = drumRoll.Duration;
+            Velocity = drumRoll.Velocity;
+            TickRate = drumRoll.TickRate;
+            tickSpacing = drumRoll.tickSpacing;
+        }
+
+        protected override HitObject CreateInstance() => new DrumRoll();
+
         public class StrongNestedHit : StrongNestedHitObject
         {
             // The strong hit of the drum roll doesn't actually provide any score.
@@ -109,6 +126,8 @@ namespace osu.Game.Rulesets.Taiko.Objects
                 : base(parent)
             {
             }
+
+            protected override HitObject CreateInstance() => new StrongNestedHit(null!);
         }
 
         #region LegacyBeatmapEncoder

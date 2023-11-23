@@ -2,14 +2,16 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
+using System.Collections.Generic;
 using JetBrains.Annotations;
 using osu.Game.Database;
 using osu.Game.IO;
+using osu.Game.Utils;
 using Realms;
 
 namespace osu.Game.Models
 {
-    public class RealmNamedFileUsage : EmbeddedObject, INamedFile, INamedFileUsage
+    public class RealmNamedFileUsage : EmbeddedObject, INamedFile, INamedFileUsage, IDeepCloneable<RealmNamedFileUsage>
     {
         public RealmFile File { get; set; } = null!;
 
@@ -28,5 +30,21 @@ namespace osu.Game.Models
         }
 
         IFileInfo INamedFileUsage.File => File;
+
+        public RealmNamedFileUsage DeepClone(IDictionary<object, object> referenceLookup)
+        {
+            if (referenceLookup.TryGetValue(this, out object? existing))
+                return (RealmNamedFileUsage)existing;
+
+            var clone = this.Detach();
+            if (ReferenceEquals(clone, this))
+                clone = (RealmNamedFileUsage)MemberwiseClone();
+
+            referenceLookup[this] = clone;
+
+            clone.File = File.DeepClone(referenceLookup);
+
+            return clone;
+        }
     }
 }

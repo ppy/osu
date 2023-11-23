@@ -3,10 +3,13 @@
 
 #nullable disable
 
+using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading;
 using osu.Game.Audio;
 using osu.Game.Rulesets.Judgements;
+using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Objects.Types;
 using osu.Game.Rulesets.Scoring;
 
@@ -118,5 +121,22 @@ namespace osu.Game.Rulesets.Mania.Objects
 
         public IList<HitSampleInfo> GetNodeSamples(int nodeIndex) =>
             nodeIndex < NodeSamples?.Count ? NodeSamples[nodeIndex] : Samples;
+
+        protected override void CopyFrom(HitObject other, IDictionary<object, object> referenceLookup)
+        {
+            base.CopyFrom(other, referenceLookup);
+
+            if (other is not HoldNote hold)
+                throw new ArgumentException($"{nameof(other)} must be of type {nameof(HoldNote)}");
+
+            NodeSamples = hold.NodeSamples.Select(s => (IList<HitSampleInfo>)s.Select(s2 => s2.DeepClone(referenceLookup)).ToList()).ToList();
+            Duration = hold.Duration;
+
+            Head = NestedHitObjects.OfType<HeadNote>().Single();
+            Tail = NestedHitObjects.OfType<TailNote>().Single();
+            Body = NestedHitObjects.OfType<HoldNoteBody>().Single();
+        }
+
+        protected override HitObject CreateInstance() => new HoldNote();
     }
 }

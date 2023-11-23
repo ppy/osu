@@ -1,10 +1,12 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System;
 using System.Collections.Generic;
 using System.Threading;
 using osu.Game.Audio;
 using osu.Game.Rulesets.Judgements;
+using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Objects.Types;
 
 namespace osu.Game.Rulesets.Catch.Objects
@@ -56,5 +58,17 @@ namespace osu.Game.Rulesets.Catch.Objects
         }
 
         public double Duration { get; set; }
+
+        protected override void CopyFrom(HitObject other, IDictionary<object, object> referenceLookup)
+        {
+            base.CopyFrom(other, referenceLookup);
+
+            if (other is not BananaShower bananaShower)
+                throw new ArgumentException($"{nameof(other)} must be of type {nameof(BananaShower)}");
+
+            Duration = bananaShower.Duration;
+        }
+
+        protected override HitObject CreateInstance() => new BananaShower();
     }
 }

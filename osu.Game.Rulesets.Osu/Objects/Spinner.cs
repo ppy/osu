@@ -9,6 +9,7 @@ using osu.Game.Audio;
 using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.ControlPoints;
 using osu.Game.Rulesets.Judgements;
+using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Objects.Types;
 using osu.Game.Rulesets.Osu.Judgements;
 using osu.Game.Rulesets.Scoring;
@@ -113,5 +114,19 @@ namespace osu.Game.Rulesets.Osu.Objects
                 referenceSample.With("spinnerspin")
             };
         }
+
+        protected override void CopyFrom(HitObject other, IDictionary<object, object> referenceLookup)
+        {
+            base.CopyFrom(other, referenceLookup);
+
+            if (other is not Spinner spinner)
+                throw new ArgumentException($"{nameof(other)} must be of type {nameof(Spinner)}");
+
+            Duration = spinner.Duration;
+            SpinsRequired = spinner.SpinsRequired;
+            MaximumBonusSpins = spinner.MaximumBonusSpins;
+        }
+
+        protected override HitObject CreateInstance() => new Spinner();
     }
 }

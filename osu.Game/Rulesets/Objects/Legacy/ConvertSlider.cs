@@ -10,6 +10,8 @@ using osu.Framework.Bindables;
 using osu.Game.Audio;
 using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.ControlPoints;
+using System;
+using System.Linq;
 
 namespace osu.Game.Rulesets.Objects.Legacy
 {
@@ -35,7 +37,7 @@ namespace osu.Game.Rulesets.Objects.Legacy
         public double Duration
         {
             get => this.SpanCount() * Distance / Velocity;
-            set => throw new System.NotSupportedException($"Adjust via {nameof(RepeatCount)} instead"); // can be implemented if/when needed.
+            set => throw new NotSupportedException($"Adjust via {nameof(RepeatCount)} instead"); // can be implemented if/when needed.
         }
 
         public double EndTime => StartTime + Duration;
@@ -59,6 +61,20 @@ namespace osu.Game.Rulesets.Objects.Legacy
             double scoringDistance = base_scoring_distance * difficulty.SliderMultiplier * SliderVelocityMultiplier;
 
             Velocity = scoringDistance / timingPoint.BeatLength;
+        }
+
+        protected override void CopyFrom(HitObject other, IDictionary<object, object> referenceLookup)
+        {
+            base.CopyFrom(other, referenceLookup);
+
+            if (other is not ConvertSlider convertSlider)
+                throw new ArgumentException($"{nameof(other)} must be of type {nameof(ConvertSlider)}");
+
+            Path = convertSlider.Path;
+            NodeSamples = convertSlider.NodeSamples.Select(s => (IList<HitSampleInfo>)s.Select(s2 => s2.DeepClone(referenceLookup)).ToList()).ToList();
+            RepeatCount = convertSlider.RepeatCount;
+            Velocity = convertSlider.Velocity;
+            SliderVelocityMultiplier = convertSlider.SliderVelocityMultiplier;
         }
     }
 }

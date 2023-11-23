@@ -187,6 +187,8 @@ namespace osu.Game.Rulesets.Taiko.Skinning.Legacy
                         yield return name.Insert(name.LastIndexOf('/') + 1, "taiko-");
                 }
             }
+
+            protected override HitSampleInfo CreateInstance() => new LegacyTaikoSampleInfo(this);
         }
     }
 }

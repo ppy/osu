@@ -303,14 +303,28 @@ namespace osu.Game.Beatmaps.ControlPoints
             }
         }
 
-        public ControlPointInfo DeepClone()
+        public ControlPointInfo DeepClone(IDictionary<object, object> referenceLookup)
         {
-            var controlPointInfo = (ControlPointInfo)Activator.CreateInstance(GetType())!;
+            if (referenceLookup.TryGetValue(this, out object existing))
+                return (ControlPointInfo)existing;
 
-            foreach (var point in AllControlPoints)
-                controlPointInfo.Add(point.Time, point.DeepClone());
+            var clone = CreateInstance();
+            referenceLookup[this] = clone;
 
-            return controlPointInfo;
+            clone.groups.AddRange(groups.Select(g => g.DeepClone(referenceLookup)));
+
+            foreach (var group in clone.groups)
+            {
+                group.ItemAdded += clone.GroupItemAdded;
+                group.ItemRemoved += clone.GroupItemRemoved;
+            }
+
+            foreach (var cp in clone.AllControlPoints)
+                clone.GroupItemAdded(cp);
+
+            return clone;
         }
+
+        protected virtual ControlPointInfo CreateInstance() => new ControlPointInfo();
     }
 }

@@ -211,7 +211,7 @@ namespace osu.Game.Tests.Visual.Ranking
 
                 public bool CanConvert() => true;
 
-                public IBeatmap Convert(CancellationToken cancellationToken = default) => Beatmap.Clone();
+                public IBeatmap Convert(CancellationToken cancellationToken = default) => Beatmap.DeepClone(new Dictionary<object, object>());
             }
         }
 

@@ -3,11 +3,14 @@
 
 using osu.Game.Rulesets.Catch.Judgements;
 using osu.Game.Rulesets.Judgements;
+using osu.Game.Rulesets.Objects;
 
 namespace osu.Game.Rulesets.Catch.Objects
 {
     public class TinyDroplet : Droplet
     {
         public override Judgement CreateJudgement() => new CatchTinyDropletJudgement();
+
+        protected override HitObject CreateInstance() => new TinyDroplet();
     }
 }
