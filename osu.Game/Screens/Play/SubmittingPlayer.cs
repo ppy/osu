@@ -54,8 +54,6 @@ namespace osu.Game.Screens.Play
             }
 
             AddInternal(new PlayerTouchInputDetector());
-
-            HealthProcessor.Failed += onFail;
         }
 
         protected override void LoadAsyncComplete()
@@ -167,10 +165,11 @@ namespace osu.Game.Screens.Play
             spectatorClient.BeginPlaying(token, GameplayState, Score);
         }
 
-        private bool onFail()
+        protected override void OnFail()
         {
+            base.OnFail();
+
             submitFromFailOrQuit();
-            return true;
         }
 
         public override bool OnExiting(ScreenExitEvent e)
