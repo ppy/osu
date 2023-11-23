@@ -127,23 +127,13 @@ jobs:
 
   build-only-ios:
     name: Build only (iOS)
-    # `macos-13` is required, because Xcode 14.3 is required (see below).
-    # TODO: can be changed to `macos-latest` once `macos-13` becomes latest (currently in beta)
+    # `macos-13` is required, because the newest Microsoft.iOS.Sdk versions require Xcode 14.3.
+    # TODO: can be changed to `macos-latest` once `macos-13` becomes latest (currently in beta: https://github.com/actions/runner-images/tree/main#available-images)
     runs-on: macos-13
     timeout-minutes: 60
     steps:
       - name: Checkout
         uses: actions/checkout@v3
-
-      # newest Microsoft.iOS.Sdk versions require Xcode 14.3.
-      # 14.3 is currently not the default Xcode version (https://github.com/actions/runner-images/blob/main/images/macos/macos-13-Readme.md#xcode),
-      # so set it manually.
-      # TODO: remove when 14.3 becomes the default Xcode version.
-      - name: Set Xcode version
-        shell: bash
-        run: |
-          sudo xcode-select -s "/Applications/Xcode_14.3.app"
-          echo "MD_APPLE_SDK_ROOT=/Applications/Xcode_14.3.app" >> $GITHUB_ENV
 
       - name: Install .NET 6.0.x
         uses: actions/setup-dotnet@v3
