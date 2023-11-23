@@ -352,6 +352,8 @@ namespace osu.Game.Tests.Visual.Gameplay
             AddStep("send failed", () => spectatorClient.SendEndPlay(streamingUser.Id, SpectatedUserState.Failed));
             AddUntilStep("state is failed", () => spectatorClient.WatchedUserStates[streamingUser.Id].State == SpectatedUserState.Failed);
 
+            AddUntilStep("wait for player to fail", () => this.ChildrenOfType<Player>().Single().GameplayState.HasFailed);
+
             start();
             sendFrames();
             waitForPlayer();
