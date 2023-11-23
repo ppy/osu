@@ -933,6 +933,7 @@ namespace osu.Game.Screens.Play
             if (GameplayState.Mods.OfType<IApplicableFailOverride>().Any(m => m.RestartOnFail))
                 Restart(true);
 
+            OnFail();
             return true;
         }
 
