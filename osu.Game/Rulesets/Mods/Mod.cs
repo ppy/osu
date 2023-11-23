@@ -156,6 +156,10 @@ namespace osu.Game.Rulesets.Mods
         [JsonIgnore]
         public virtual bool ValidForMultiplayerAsFreeMod => true;
 
+        /// <inheritdoc/>
+        [JsonIgnore]
+        public virtual bool AlwaysValidForSubmission => false;
+
         /// <summary>
         /// Whether this mod requires configuration to apply changes to the game.
         /// </summary>

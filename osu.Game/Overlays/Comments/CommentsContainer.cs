@@ -102,7 +102,7 @@ namespace osu.Game.Overlays.Comments
                             Padding = new MarginPadding { Horizontal = WaveOverlayContainer.HORIZONTAL_PADDING, Vertical = 20 },
                             Children = new Drawable[]
                             {
-                                avatar = new UpdateableAvatar(api.LocalUser.Value)
+                                avatar = new UpdateableAvatar(api.LocalUser.Value, isInteractive: false)
                                 {
                                     Size = new Vector2(50),
                                     CornerExponent = 2,

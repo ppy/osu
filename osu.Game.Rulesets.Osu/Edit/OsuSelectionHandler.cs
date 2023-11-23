@@ -42,6 +42,7 @@ namespace osu.Game.Rulesets.Osu.Edit
 
             SelectionBox.CanFlipX = SelectionBox.CanScaleX = quad.Width > 0;
             SelectionBox.CanFlipY = SelectionBox.CanScaleY = quad.Height > 0;
+            SelectionBox.CanScaleDiagonally = SelectionBox.CanScaleX && SelectionBox.CanScaleY;
             SelectionBox.CanReverse = EditorBeatmap.SelectedHitObjects.Count > 1 || EditorBeatmap.SelectedHitObjects.Any(s => s is Slider);
         }
 
@@ -320,7 +321,7 @@ namespace osu.Game.Rulesets.Osu.Edit
 
             if (mergedHitObject.Path.ControlPoints.Count == 0)
             {
-                mergedHitObject.Path.ControlPoints.Add(new PathControlPoint(Vector2.Zero, PathType.Linear));
+                mergedHitObject.Path.ControlPoints.Add(new PathControlPoint(Vector2.Zero, PathType.LINEAR));
             }
 
             // Merge all the selected hit objects into one slider path.
@@ -350,7 +351,7 @@ namespace osu.Game.Rulesets.Osu.Edit
                     // Turn the last control point into a linear type if this is the first merging circle in a sequence, so the subsequent control points can be inherited path type.
                     if (!lastCircle)
                     {
-                        mergedHitObject.Path.ControlPoints.Last().Type = PathType.Linear;
+                        mergedHitObject.Path.ControlPoints.Last().Type = PathType.LINEAR;
                     }
 
                     mergedHitObject.Path.ControlPoints.Add(new PathControlPoint(selectedMergeableObject.Position - mergedHitObject.Position));

@@ -47,7 +47,7 @@ namespace osu.Game.Rulesets.Osu.Scoring
             double currentHp;
             double currentHpUncapped;
 
-            do
+            while (true)
             {
                 currentHp = 1;
                 currentHpUncapped = 1;
@@ -56,7 +56,6 @@ namespace osu.Game.Rulesets.Osu.Scoring
                 double lastTime = DrainStartTime;
                 int currentBreak = 0;
                 bool fail = false;
-                string failReason = string.Empty;
 
                 for (int i = 0; i < Beatmap.HitObjects.Count; i++)
                 {
@@ -82,7 +81,7 @@ namespace osu.Game.Rulesets.Osu.Scoring
                     {
                         fail = true;
                         testDrop *= 0.96;
-                        failReason = $"hp too low ({currentHp} < {lowestHpEver})";
+                        OnIterationFail?.Invoke($"FAILED drop {testDrop}: hp too low ({currentHp} < {lowestHpEver})");
                         break;
                     }
 
@@ -90,15 +89,21 @@ namespace osu.Game.Rulesets.Osu.Scoring
                     double hpOverkill = Math.Max(0, hpReduction - currentHp);
                     reduceHp(hpReduction);
 
-                    if (h is Slider slider)
+                    switch (h)
                     {
-                        foreach (var nested in slider.NestedHitObjects)
-                            increaseHp(nested);
-                    }
-                    else if (h is Spinner spinner)
-                    {
-                        foreach (var nested in spinner.NestedHitObjects.Where(t => t is not SpinnerBonusTick))
-                            increaseHp(nested);
+                        case Slider slider:
+                        {
+                            foreach (var nested in slider.NestedHitObjects)
+                                increaseHp(nested);
+                            break;
+                        }
+
+                        case Spinner spinner:
+                        {
+                            foreach (var nested in spinner.NestedHitObjects.Where(t => t is not SpinnerBonusTick))
+                                increaseHp(nested);
+                            break;
+                        }
                     }
 
                     // Note: Because HP is capped during the above increases, long sliders (with many ticks) or spinners
@@ -107,7 +112,7 @@ namespace osu.Game.Rulesets.Osu.Scoring
                     {
                         fail = true;
                         testDrop *= 0.96;
-                        failReason = $"overkill ({currentHp} - {hpOverkill} <= {lowestHpEver})";
+                        OnIterationFail?.Invoke($"FAILED drop {testDrop}: overkill ({currentHp} - {hpOverkill} <= {lowestHpEver})");
                         break;
                     }
 
@@ -119,7 +124,7 @@ namespace osu.Game.Rulesets.Osu.Scoring
                     fail = true;
                     testDrop *= 0.94;
                     hpMultiplierNormal *= 1.01;
-                    failReason = $"end hp too low ({currentHp} < {lowestHpEnd})";
+                    OnIterationFail?.Invoke($"FAILED drop {testDrop}: end hp too low ({currentHp} < {lowestHpEnd})");
                 }
 
                 double recovery = (currentHpUncapped - 1) / Beatmap.HitObjects.Count;
@@ -129,18 +134,15 @@ namespace osu.Game.Rulesets.Osu.Scoring
                     fail = true;
                     testDrop *= 0.96;
                     hpMultiplierNormal *= 1.01;
-                    failReason = $"recovery too low ({recovery} < {hpRecoveryAvailable})";
+                    OnIterationFail?.Invoke($"FAILED drop {testDrop}: recovery too low ({recovery} < {hpRecoveryAvailable})");
                 }
 
-                if (fail)
+                if (!fail)
                 {
-                    OnIterationFail?.Invoke($"FAILED drop {testDrop}: {failReason}");
-                    continue;
+                    OnIterationSuccess?.Invoke($"PASSED drop {testDrop}");
+                    return testDrop;
                 }
-
-                OnIterationSuccess?.Invoke($"PASSED drop {testDrop}");
-                return testDrop;
-            } while (true);
+            }
 
             void reduceHp(double amount)
             {
@@ -160,7 +162,7 @@ namespace osu.Game.Rulesets.Osu.Scoring
 
         private double healthIncreaseFor(HitObject hitObject, HitResult result)
         {
-            double increase;
+            double increase = 0;
 
             switch (result)
             {
@@ -191,17 +193,8 @@ namespace osu.Game.Rulesets.Osu.Scoring
                     increase = 0.011;
                     break;
 
-                case HitResult.Good:
-                    increase = 0.024;
-                    break;
-
                 case HitResult.Great:
                     increase = 0.03;
-                    break;
-
-                case HitResult.Perfect:
-                    // 1.1 * Great. Unused.
-                    increase = 0.033;
                     break;
 
                 case HitResult.SmallBonus:
@@ -210,10 +203,6 @@ namespace osu.Game.Rulesets.Osu.Scoring
 
                 case HitResult.LargeBonus:
                     increase = 0.01;
-                    break;
-
-                default:
-                    increase = 0;
                     break;
             }
 

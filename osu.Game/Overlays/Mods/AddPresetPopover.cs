@@ -115,7 +115,7 @@ namespace osu.Game.Overlays.Mods
             {
                 Name = nameTextBox.Current.Value,
                 Description = descriptionTextBox.Current.Value,
-                Mods = selectedMods.Value.ToArray(),
+                Mods = selectedMods.Value.Where(mod => mod.Type != ModType.System).ToArray(),
                 Ruleset = r.Find<RulesetInfo>(ruleset.Value.ShortName)!
             }));
 

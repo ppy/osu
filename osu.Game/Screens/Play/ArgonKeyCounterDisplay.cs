@@ -10,8 +10,6 @@ namespace osu.Game.Screens.Play
 {
     public partial class ArgonKeyCounterDisplay : KeyCounterDisplay
     {
-        private const int duration = 100;
-
         protected override FillFlowContainer<KeyCounter> KeyFlow { get; }
 
         public ArgonKeyCounterDisplay()
@@ -25,16 +23,6 @@ namespace osu.Game.Screens.Play
             };
         }
 
-        protected override void Update()
-        {
-            base.Update();
-
-            Size = KeyFlow.Size;
-        }
-
         protected override KeyCounter CreateCounter(InputTrigger trigger) => new ArgonKeyCounter(trigger);
-
-        protected override void UpdateVisibility()
-            => KeyFlow.FadeTo(AlwaysVisible.Value || ConfigVisibility.Value ? 1 : 0, duration);
     }
 }
