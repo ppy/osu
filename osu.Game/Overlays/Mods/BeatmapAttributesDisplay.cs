@@ -11,7 +11,6 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Cursor;
 using osu.Framework.Input.Events;
 using osu.Framework.Localisation;
-using osu.Framework.Utils;
 using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.Drawables;
 using osu.Game.Configuration;
@@ -28,7 +27,7 @@ namespace osu.Game.Overlays.Mods
     /// On the mod select overlay, this provides a local updating view of BPM, star rating and other
     /// difficulty attributes so the user can have a better insight into what mods are changing.
     /// </summary>
-    public partial class BeatmapAttributesDisplay : ModFooterInformationDisplay, IHasTooltip
+    public partial class BeatmapAttributesDisplay : ModFooterInformationDisplay, IHasCustomTooltip
     {
         private StarRatingDisplay starRatingDisplay = null!;
         private BPMDisplay bpmDisplay = null!;
@@ -58,10 +57,11 @@ namespace osu.Game.Overlays.Mods
         private CancellationTokenSource? cancellationSource;
         private IBindable<StarDifficulty?> starDifficulty = null!;
 
-        private BeatmapDifficulty? originalDifficulty;
-        private BeatmapDifficulty? adjustedDifficulty;
+        private AdjustedAttributesTooltip rateAdjustTooltip = null!;
 
-        private bool haveRateChangedValues;
+        public ITooltip GetCustomTooltip() => rateAdjustTooltip;
+        public object TooltipContent => this;
+
 
         private const float transition_duration = 250;
 
@@ -69,6 +69,8 @@ namespace osu.Game.Overlays.Mods
         private void load()
         {
             const float shear = ShearedOverlayContainer.SHEAR;
+
+            rateAdjustTooltip = new AdjustedAttributesTooltip();
 
             LeftContent.AddRange(new Drawable[]
             {
@@ -105,7 +107,6 @@ namespace osu.Game.Overlays.Mods
             mods.BindValueChanged(_ =>
             {
                 modSettingChangeTracker?.Dispose();
-
                 modSettingChangeTracker = new ModSettingChangeTracker(mods.Value);
                 modSettingChangeTracker.SettingChanged += _ => updateValues();
                 updateValues();
@@ -124,6 +125,9 @@ namespace osu.Game.Overlays.Mods
             gameRuleset.BindValueChanged(_ => updateValues());
 
             BeatmapInfo.BindValueChanged(_ => updateValues(), true);
+
+            rateAdjustTooltip.AddAttribute("AR");
+            rateAdjustTooltip.AddAttribute("OD");
 
             updateCollapsedState();
         }
@@ -173,15 +177,16 @@ namespace osu.Game.Overlays.Mods
 
             bpmDisplay.Current.Value = BeatmapInfo.Value.BPM * rate;
 
-            originalDifficulty = new BeatmapDifficulty(BeatmapInfo.Value.Difficulty);
+            BeatmapDifficulty originalDifficulty = new BeatmapDifficulty(BeatmapInfo.Value.Difficulty);
 
             foreach (var mod in mods.Value.OfType<IApplicableToDifficulty>())
                 mod.ApplyToDifficulty(originalDifficulty);
 
             Ruleset ruleset = gameRuleset.Value.CreateInstance();
-            adjustedDifficulty = ruleset.GetRateAdjustedDisplayDifficulty(originalDifficulty, rate);
+            BeatmapDifficulty adjustedDifficulty = ruleset.GetRateAdjustedDisplayDifficulty(originalDifficulty, rate);
 
-            haveRateChangedValues = hasRateAdjustedProperties(originalDifficulty, adjustedDifficulty);
+            rateAdjustTooltip.UpdateAttribute("AR", originalDifficulty.ApproachRate, adjustedDifficulty.ApproachRate);
+            rateAdjustTooltip.UpdateAttribute("OD", originalDifficulty.OverallDifficulty, adjustedDifficulty.OverallDifficulty);
 
             approachRateDisplay.AdjustType.Value = VerticalAttributeDisplay.CalculateEffect(originalDifficulty.ApproachRate, adjustedDifficulty.ApproachRate);
             overallDifficultyDisplay.AdjustType.Value = VerticalAttributeDisplay.CalculateEffect(originalDifficulty.OverallDifficulty, adjustedDifficulty.OverallDifficulty);
@@ -195,29 +200,6 @@ namespace osu.Game.Overlays.Mods
         private void updateCollapsedState()
         {
             RightContent.FadeTo(Collapsed.Value && !IsHovered ? 0 : 1, transition_duration, Easing.OutQuint);
-        }
-
-        public LocalisableString TooltipText
-        {
-            get
-            {
-                if (haveRateChangedValues)
-                {
-                    return $"One or more values are being adjusted by mods that change speed." +
-                           $" (AR {originalDifficulty?.ApproachRate ?? 0}→{(adjustedDifficulty?.ApproachRate ?? 0):0.0#}, " +
-                           $"OD {originalDifficulty?.OverallDifficulty ?? 0}→{(adjustedDifficulty?.OverallDifficulty ?? 0):0.0#})";
-                }
-
-                return string.Empty;
-            }
-        }
-
-        private static bool hasRateAdjustedProperties(BeatmapDifficulty a, BeatmapDifficulty b)
-        {
-            if (!Precision.AlmostEquals(a.ApproachRate, b.ApproachRate)) return true;
-            if (!Precision.AlmostEquals(a.OverallDifficulty, b.OverallDifficulty)) return true;
-
-            return false;
         }
 
         private partial class BPMDisplay : RollingCounter<double>

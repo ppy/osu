@@ -26,10 +26,11 @@ using osu.Framework.Utils;
 using osu.Game.Configuration;
 using osu.Game.Resources.Localisation.Web;
 using osu.Game.Rulesets;
+using osu.Game.Overlays.Mods;
 
 namespace osu.Game.Screens.Select.Details
 {
-    public partial class AdvancedStats : Container, IHasTooltip
+    public partial class AdvancedStats : Container, IHasCustomTooltip
     {
         [Resolved]
         private BeatmapDifficultyCache difficultyCache { get; set; }
@@ -45,9 +46,9 @@ namespace osu.Game.Screens.Select.Details
         protected readonly StatisticRow FirstValue, HpDrain, Accuracy, ApproachRate;
         private readonly StatisticRow starDifficulty;
 
-        private BeatmapDifficulty originalDifficulty;
-        private BeatmapDifficulty adjustedDifficulty;
-        private bool haveRateChangedValues;
+        private AdjustedAttributesTooltip rateAdjustTooltip;
+        public ITooltip GetCustomTooltip() => rateAdjustTooltip;
+        public object TooltipContent => this;
 
         private IBeatmapInfo beatmapInfo;
 
@@ -85,6 +86,7 @@ namespace osu.Game.Screens.Select.Details
         private void load(OsuColour colours)
         {
             starDifficulty.AccentColour = colours.Yellow;
+            rateAdjustTooltip = new AdjustedAttributesTooltip();
         }
 
         protected override void LoadComplete()
@@ -99,6 +101,9 @@ namespace osu.Game.Screens.Select.Details
             gameRuleset.BindValueChanged(_ => updateStatistics());
 
             mods.BindValueChanged(modsChanged, true);
+
+            rateAdjustTooltip.AddAttribute("AR");
+            rateAdjustTooltip.AddAttribute("OD");
         }
 
         private ModSettingChangeTracker modSettingChangeTracker;
@@ -121,13 +126,16 @@ namespace osu.Game.Screens.Select.Details
         private void updateStatistics()
         {
             IBeatmapDifficultyInfo baseDifficulty = BeatmapInfo?.Difficulty;
+            BeatmapDifficulty adjustedDifficulty = null;
 
             if (baseDifficulty != null)
             {
-                originalDifficulty = new BeatmapDifficulty(baseDifficulty);
+                BeatmapDifficulty originalDifficulty = new BeatmapDifficulty(baseDifficulty);
 
                 foreach (var mod in mods.Value.OfType<IApplicableToDifficulty>())
                     mod.ApplyToDifficulty(originalDifficulty);
+
+                adjustedDifficulty = originalDifficulty;
 
                 if (gameRuleset != null)
                 {
@@ -138,7 +146,9 @@ namespace osu.Game.Screens.Select.Details
                         rate = mod.ApplyToRate(0, rate);
 
                     adjustedDifficulty = ruleset.GetRateAdjustedDisplayDifficulty(originalDifficulty, rate);
-                    haveRateChangedValues = hasRateAdjustedProperties(originalDifficulty, adjustedDifficulty);
+
+                    rateAdjustTooltip.UpdateAttribute("AR", originalDifficulty.ApproachRate, adjustedDifficulty.ApproachRate);
+                    rateAdjustTooltip.UpdateAttribute("OD", originalDifficulty.OverallDifficulty, adjustedDifficulty.OverallDifficulty);
                 }
             }
 
@@ -202,22 +212,6 @@ namespace osu.Game.Screens.Select.Details
             base.Dispose(isDisposing);
             modSettingChangeTracker?.Dispose();
             starDifficultyCancellationSource?.Cancel();
-        }
-
-        public LocalisableString TooltipText
-        {
-            get
-            {
-                if (haveRateChangedValues)
-                {
-                    // Rather than localising this, it should be displayed in a better way (a custom tooltip which isn't a single super-long line).
-                    return "One or more values are being adjusted by mods that change speed." +
-                           $" (AR {originalDifficulty?.ApproachRate ?? 0}→{(adjustedDifficulty?.ApproachRate ?? 0):0.0#}, " +
-                           $"OD {originalDifficulty?.OverallDifficulty ?? 0}→{(adjustedDifficulty?.OverallDifficulty ?? 0):0.0#})";
-                }
-
-                return string.Empty;
-            }
         }
 
         private static bool hasRateAdjustedProperties(BeatmapDifficulty a, BeatmapDifficulty b)
