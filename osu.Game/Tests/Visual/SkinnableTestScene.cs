@@ -201,8 +201,8 @@ namespace osu.Game.Tests.Visual
         {
             private readonly bool extrapolateAnimations;
 
-            public TestLegacySkin(SkinInfo skin, IResourceStore<byte[]> storage, IStorageResourceProvider resources, bool extrapolateAnimations)
-                : base(skin, resources, storage)
+            public TestLegacySkin(SkinInfo skin, IResourceStore<byte[]> fallbackStore, IStorageResourceProvider resources, bool extrapolateAnimations)
+                : base(skin, resources, fallbackStore)
             {
                 this.extrapolateAnimations = extrapolateAnimations;
             }

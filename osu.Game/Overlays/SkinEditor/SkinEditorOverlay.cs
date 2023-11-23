@@ -188,7 +188,10 @@ namespace osu.Game.Overlays.SkinEditor
             }
 
             if (skinEditor.State.Value == Visibility.Visible)
+            {
+                skinEditor.Save(false);
                 skinEditor.UpdateTargetScreen(target);
+            }
             else
             {
                 skinEditor.Hide();
