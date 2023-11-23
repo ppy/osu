@@ -26,7 +26,6 @@ namespace osu.Game.Overlays.Mods
         [Resolved]
         private OsuColour colours { get; set; } = null!;
 
-
         public AdjustedAttributesTooltip()
         {
             // Need to be initialized in constructor to ensure accessability in AddAttribute function
@@ -60,7 +59,7 @@ namespace osu.Game.Overlays.Mods
                 new FillFlowContainer
                 {
                     AutoSizeAxes = Axes.Both,
-                    Padding = new MarginPadding {Vertical = 10, Horizontal = 15},
+                    Padding = new MarginPadding { Vertical = 10, Horizontal = 15 },
                     Direction = FillDirection.Vertical,
                     Children = new Drawable[]
                     {
@@ -85,6 +84,7 @@ namespace osu.Game.Overlays.Mods
                 }
             }
             content.Hide();
+
         }
 
         public void AddAttribute(string name)
@@ -94,6 +94,7 @@ namespace osu.Game.Overlays.Mods
             attributes.Add(name, newBindable);
             attributesFillFlow.Add(new AttributeDisplay(name, newBindable.GetBoundCopy()));
         }
+
         public void UpdateAttribute(string name, double oldValue, double newValue)
         {
             Bindable<OldNewPair> attribute = attributes[name];
@@ -124,7 +125,7 @@ namespace osu.Game.Overlays.Mods
 
         private partial class AttributeDisplay : CompositeDrawable
         {
-            public Bindable<OldNewPair> AttributeValues = new Bindable<OldNewPair>();
+            public readonly Bindable<OldNewPair> AttributeValues;
             public string AttributeName;
 
             private OsuSpriteText text = new OsuSpriteText
