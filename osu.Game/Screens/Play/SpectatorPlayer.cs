@@ -68,6 +68,12 @@ namespace osu.Game.Screens.Play
             }, true);
         }
 
+        /// <summary>
+        /// Should be called when it is apparent that the player being spectated has failed.
+        /// This will subsequently stop blocking the fail screen from displaying (usually done out of safety).
+        /// </summary>
+        public void AllowFail() => allowFail = true;
+
         protected override void StartGameplay()
         {
             base.StartGameplay();
@@ -131,7 +137,5 @@ namespace osu.Game.Screens.Play
             if (SpectatorClient != null)
                 SpectatorClient.OnNewFrames -= userSentFrames;
         }
-
-        public void AllowFail() => allowFail = true;
     }
 }
