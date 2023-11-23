@@ -930,10 +930,22 @@ namespace osu.Game.Screens.Play
 
             failAnimationContainer.Start();
 
-            if (GameplayState.Mods.OfType<IApplicableFailOverride>().Any(m => m.RestartOnFail))
-                Restart(true);
+            // Failures can be triggered either by a judgement, or by a mod.
+            //
+            // For the case of a judgement, due to ordering considerations, ScoreProcessor will not have received
+            // the final judgement which triggered the failure yet (see DrawableRuleset.NewResult handling above).
+            //
+            // A schedule here ensures that any lingering judgements from the current frame are applied before we
+            // finalise the score as "failed".
+            Schedule(() =>
+            {
+                ScoreProcessor.FailScore(Score.ScoreInfo);
+                OnFail();
 
-            OnFail();
+                if (GameplayState.Mods.OfType<IApplicableFailOverride>().Any(m => m.RestartOnFail))
+                    Restart(true);
+            });
+
             return true;
         }
 
@@ -942,11 +954,6 @@ namespace osu.Game.Screens.Play
         /// </summary>
         private void onFailComplete()
         {
-            // fail completion is a good point to mark a score as failed,
-            // since the last judgement that caused the fail only applies to score processor after onFail.
-            // todo: this should probably be handled better.
-            ScoreProcessor.FailScore(Score.ScoreInfo);
-
             GameplayClockContainer.Stop();
 
             FailOverlay.Retries = RestartCount;
