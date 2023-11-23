@@ -159,6 +159,31 @@ namespace osu.Game.Rulesets.Osu.Objects
             Scale = LegacyRulesetExtensions.CalculateScaleFromCircleSize(difficulty.CircleSize, true);
         }
 
+        public void UpdateComboInformation(IHasComboInformation? lastObj)
+        {
+            ComboIndex = lastObj?.ComboIndex ?? 0;
+            ComboIndexWithOffsets = lastObj?.ComboIndexWithOffsets ?? 0;
+            IndexInCurrentCombo = (lastObj?.IndexInCurrentCombo + 1) ?? 0;
+
+            if (this is Spinner)
+            {
+                // For the purpose of combo colours, spinners never start a new combo even if they are flagged as doing so.
+                return;
+            }
+
+            // At decode time, the first hitobject in the beatmap and the first hitobject after a spinner are both enforced to be a new combo,
+            // but this isn't directly enforced by the editor so the extra checks against the last hitobject are duplicated here.
+            if (NewCombo || lastObj == null || lastObj is Spinner)
+            {
+                IndexInCurrentCombo = 0;
+                ComboIndex++;
+                ComboIndexWithOffsets += ComboOffset + 1;
+
+                if (lastObj != null)
+                    lastObj.LastInCombo = true;
+            }
+        }
+
         protected override HitWindows CreateHitWindows() => new OsuHitWindows();
     }
 }

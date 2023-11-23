@@ -12,6 +12,7 @@ using osu.Game.Beatmaps.Formats;
 using osu.Game.Beatmaps.Legacy;
 using osu.Game.Beatmaps.Timing;
 using osu.Game.IO;
+using osu.Game.Rulesets;
 using osu.Game.Rulesets.Catch;
 using osu.Game.Rulesets.Catch.Beatmaps;
 using osu.Game.Rulesets.Mods;
@@ -1106,6 +1107,53 @@ namespace osu.Game.Tests.Beatmaps.Formats
                 Assert.That(((IHasCombo)beatmap.HitObjects[0]).NewCombo, Is.True);
                 Assert.That(((IHasCombo)beatmap.HitObjects[1]).NewCombo, Is.True);
                 Assert.That(((IHasCombo)beatmap.HitObjects[2]).NewCombo, Is.False);
+            }
+        }
+
+        /// <summary>
+        /// Test cases that involve a spinner between two hitobjects.
+        /// </summary>
+        [Test]
+        public void TestSpinnerNewComboBetweenObjects([Values("osu", "catch")] string rulesetName)
+        {
+            var decoder = new LegacyBeatmapDecoder { ApplyOffsets = false };
+
+            using (var resStream = TestResources.OpenResource("spinner-between-objects.osu"))
+            using (var stream = new LineBufferedReader(resStream))
+            {
+                Ruleset ruleset;
+
+                switch (rulesetName)
+                {
+                    case "osu":
+                        ruleset = new OsuRuleset();
+                        break;
+
+                    case "catch":
+                        ruleset = new CatchRuleset();
+                        break;
+
+                    default:
+                        throw new ArgumentOutOfRangeException(nameof(rulesetName), rulesetName, null);
+                }
+
+                var working = new TestWorkingBeatmap(decoder.Decode(stream));
+                var playable = working.GetPlayableBeatmap(ruleset.RulesetInfo, Array.Empty<Mod>());
+
+                // There's no good way to figure out these values other than to compare (in code) with osu!stable...
+
+                Assert.That(((IHasComboInformation)playable.HitObjects[0]).ComboIndexWithOffsets, Is.EqualTo(1));
+                Assert.That(((IHasComboInformation)playable.HitObjects[2]).ComboIndexWithOffsets, Is.EqualTo(2));
+                Assert.That(((IHasComboInformation)playable.HitObjects[3]).ComboIndexWithOffsets, Is.EqualTo(2));
+                Assert.That(((IHasComboInformation)playable.HitObjects[5]).ComboIndexWithOffsets, Is.EqualTo(3));
+                Assert.That(((IHasComboInformation)playable.HitObjects[6]).ComboIndexWithOffsets, Is.EqualTo(3));
+                Assert.That(((IHasComboInformation)playable.HitObjects[8]).ComboIndexWithOffsets, Is.EqualTo(4));
+                Assert.That(((IHasComboInformation)playable.HitObjects[9]).ComboIndexWithOffsets, Is.EqualTo(4));
+                Assert.That(((IHasComboInformation)playable.HitObjects[11]).ComboIndexWithOffsets, Is.EqualTo(5));
+                Assert.That(((IHasComboInformation)playable.HitObjects[12]).ComboIndexWithOffsets, Is.EqualTo(6));
+                Assert.That(((IHasComboInformation)playable.HitObjects[14]).ComboIndexWithOffsets, Is.EqualTo(7));
+                Assert.That(((IHasComboInformation)playable.HitObjects[15]).ComboIndexWithOffsets, Is.EqualTo(8));
+                Assert.That(((IHasComboInformation)playable.HitObjects[17]).ComboIndexWithOffsets, Is.EqualTo(9));
             }
         }
     }
