@@ -40,9 +40,6 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders
         protected PathControlPointVisualiser<Slider> ControlPointVisualiser { get; private set; }
 
         [Resolved(CanBeNull = true)]
-        private IPositionSnapProvider positionSnapProvider { get; set; }
-
-        [Resolved(CanBeNull = true)]
         private IDistanceSnapProvider distanceSnapProvider { get; set; }
 
         [Resolved(CanBeNull = true)]
@@ -191,15 +188,29 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders
         [CanBeNull]
         private PathControlPoint placementControlPoint;
 
-        protected override bool OnDragStart(DragStartEvent e) => placementControlPoint != null;
+        protected override bool OnDragStart(DragStartEvent e)
+        {
+            if (placementControlPoint == null)
+                return base.OnDragStart(e);
+
+            ControlPointVisualiser?.DragStarted(placementControlPoint);
+            return true;
+        }
 
         protected override void OnDrag(DragEvent e)
         {
+            base.OnDrag(e);
+
             if (placementControlPoint != null)
-            {
-                var result = positionSnapProvider?.FindSnappedPositionAndTime(ToScreenSpace(e.MousePosition));
-                placementControlPoint.Position = ToLocalSpace(result?.ScreenSpacePosition ?? ToScreenSpace(e.MousePosition)) - HitObject.Position;
-            }
+                ControlPointVisualiser?.DragInProgress(e);
+        }
+
+        protected override void OnDragEnd(DragEndEvent e)
+        {
+            base.OnDragEnd(e);
+
+            if (placementControlPoint != null)
+                ControlPointVisualiser?.DragEnded();
         }
 
         protected override void OnMouseUp(MouseUpEvent e)
