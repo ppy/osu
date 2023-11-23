@@ -50,7 +50,7 @@ namespace osu.Game.Scoring.Legacy
             switch (rulesetId)
             {
                 case 0:
-                    return (long)Math.Round((objectCount * objectCount * 32.57 + 100000) * standardisedTotalScore / ScoreProcessor.MAX_SCORE);
+                    return (long)Math.Round((Math.Pow(objectCount, 2) * 32.57 + 100000) * standardisedTotalScore / ScoreProcessor.MAX_SCORE);
 
                 case 1:
                     return (long)Math.Round((objectCount * 1109 + 100000) * standardisedTotalScore / ScoreProcessor.MAX_SCORE);
