@@ -214,58 +214,63 @@ namespace osu.Game.Screens.Play
             scheduledStart = Schedule(() =>
             {
                 if (this.IsCurrentScreen())
-                    start();
+                    start(spectatorGameplayState);
                 else
                     scheduleStart(spectatorGameplayState);
             });
+        }
 
-            void start()
+        private void start(SpectatorGameplayState state)
+        {
+            Beatmap.Value = state.Beatmap;
+            Ruleset.Value = state.Ruleset.RulesetInfo;
+
+            OsuScreenStack newStack;
+
+            screenStackContainer?.FadeOut(200);
+            screenStackContainer?.Expire();
+
+            LoadComponentAsync(screenStackContainer = new Container
             {
-                Beatmap.Value = spectatorGameplayState.Beatmap;
-                Ruleset.Value = spectatorGameplayState.Ruleset.RulesetInfo;
-
-                OsuScreenStack newStack;
-
-                LoadComponentAsync(new Container
+                CornerRadius = 10,
+                Masking = true,
+                Alpha = 0,
+                AlwaysPresent = true,
+                Anchor = Anchor.Centre,
+                Origin = Anchor.Centre,
+                RelativeSizeAxes = Axes.Both,
+                Scale = new Vector2(0.95f),
+                Children = new Drawable[]
                 {
-                    CornerRadius = 10,
-                    Masking = true,
-                    Alpha = 0,
-                    AlwaysPresent = true,
-                    Anchor = Anchor.Centre,
-                    Origin = Anchor.Centre,
-                    RelativeSizeAxes = Axes.Both,
-                    Scale = new Vector2(0.95f),
-                    Children = new Drawable[]
-                    {
-                        newStack = new OsuScreenStack()
-                    }
-                }, container =>
+                    newStack = new OsuScreenStack()
+                }
+            }, container =>
+            {
+                if (screenStackContainer != container)
                 {
-                    screenStackContainer?.FadeOut(200);
-                    screenStackContainer?.Expire();
+                    container.Dispose();
+                    return;
+                }
 
-                    AddInternal(screenStackContainer = container);
-                    playerScreenStack = newStack;
+                AddInternal(screenStackContainer);
+                playerScreenStack = newStack;
 
-                    var spectatorPlayerLoader = new SpectatorPlayerLoader(spectatorGameplayState.Score, () =>
-                        new SoloSpectatorPlayer(spectatorGameplayState.Score));
+                var spectatorPlayerLoader = new SpectatorPlayerLoader(state.Score, () => new SoloSpectatorPlayer(state.Score));
 
-                    spectatorPlayerLoader.OnLoadComplete += _ =>
+                spectatorPlayerLoader.OnLoadComplete += _ =>
+                {
+                    // Slight delay to allow the other animations to play out on this screen first.
+                    Scheduler.AddDelayed(() =>
                     {
-                        // Slight delay to allow the other animations to play out on this screen first.
-                        Scheduler.AddDelayed(() =>
-                        {
-                            container.FadeInFromZero(300);
-                            container
-                                .ScaleTo(0.6f)
-                                .ScaleTo(0.95f, 500, Easing.OutQuint);
-                        }, 600);
-                    };
+                        container.FadeInFromZero(300);
+                        container
+                            .ScaleTo(0.6f)
+                            .ScaleTo(0.95f, 500, Easing.OutQuint);
+                    }, 600);
+                };
 
-                    newStack.Push(spectatorPlayerLoader);
-                });
-            }
+                newStack.Push(spectatorPlayerLoader);
+            });
         }
 
         private void showBeatmapPanel(SpectatorState state)
