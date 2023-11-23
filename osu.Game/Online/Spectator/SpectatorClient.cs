@@ -38,7 +38,7 @@ namespace osu.Game.Online.Spectator
         /// <summary>
         /// The states of all users currently being watched.
         /// </summary>
-        public IBindableDictionary<int, SpectatorState> WatchedUserStates => watchedUserStates;
+        public virtual IBindableDictionary<int, SpectatorState> WatchedUserStates => watchedUserStates;
 
         /// <summary>
         /// A global list of all players currently playing.
@@ -53,7 +53,7 @@ namespace osu.Game.Online.Spectator
         /// <summary>
         /// Called whenever new frames arrive from the server.
         /// </summary>
-        public event Action<int, FrameDataBundle>? OnNewFrames;
+        public virtual event Action<int, FrameDataBundle>? OnNewFrames;
 
         /// <summary>
         /// Called whenever a user starts a play session, or immediately if the user is being watched and currently in a play session.
@@ -249,7 +249,7 @@ namespace osu.Game.Online.Spectator
             });
         }
 
-        public void WatchUser(int userId)
+        public virtual void WatchUser(int userId)
         {
             Debug.Assert(ThreadSafety.IsUpdateThread);
 
