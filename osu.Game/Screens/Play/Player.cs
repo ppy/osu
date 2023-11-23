@@ -894,6 +894,13 @@ namespace osu.Game.Screens.Play
 
         #region Fail Logic
 
+        /// <summary>
+        /// Invoked when gameplay has permanently failed.
+        /// </summary>
+        protected virtual void OnFail()
+        {
+        }
+
         protected FailOverlay FailOverlay { get; private set; }
 
         private FailAnimationContainer failAnimationContainer;
