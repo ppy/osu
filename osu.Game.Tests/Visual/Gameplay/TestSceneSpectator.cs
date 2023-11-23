@@ -332,6 +332,8 @@ namespace osu.Game.Tests.Visual.Gameplay
             AddStep("send quit", () => spectatorClient.SendEndPlay(streamingUser.Id));
             AddUntilStep("state is quit", () => spectatorClient.WatchedUserStates[streamingUser.Id].State == SpectatedUserState.Quit);
 
+            AddUntilStep("wait for player exit", () => !this.ChildrenOfType<Player>().Any());
+
             start();
             sendFrames();
             waitForPlayer();
