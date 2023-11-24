@@ -58,6 +58,7 @@ using osu.Game.Performance;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Scoring;
 using osu.Game.Screens;
+using osu.Game.Screens.Edit;
 using osu.Game.Screens.Menu;
 using osu.Game.Screens.OnlinePlay.Multiplayer;
 using osu.Game.Screens.Play;
@@ -433,6 +434,9 @@ namespace osu.Game
                     break;
 
                 case LinkAction.OpenEditorTimestamp:
+                    HandleTimestamp(argString);
+                    break;
+
                 case LinkAction.JoinMultiplayerMatch:
                 case LinkAction.Spectate:
                     waitForReady(() => Notifications, _ => Notifications.Post(new SimpleNotification
@@ -549,6 +553,25 @@ namespace osu.Game
         /// <param name="updateStream">The update stream name</param>
         /// <param name="version">The build version of the update stream</param>
         public void ShowChangelogBuild(string updateStream, string version) => waitForReady(() => changelogOverlay, _ => changelogOverlay.ShowBuild(updateStream, version));
+
+        /// <summary>
+        /// Seeks to the provided <paramref name="timestamp"/> if the editor is currently open.
+        /// Can also select objects as indicated by the <paramref name="timestamp"/> (depends on ruleset implementation).
+        /// </summary>
+        public void HandleTimestamp(string timestamp)
+        {
+            if (ScreenStack.CurrentScreen is not Editor editor)
+            {
+                Schedule(() => Notifications.Post(new SimpleErrorNotification
+                {
+                    Icon = FontAwesome.Solid.ExclamationTriangle,
+                    Text = EditorStrings.MustBeInEditorToHandleLinks
+                }));
+                return;
+            }
+
+            editor.HandleTimestamp(timestamp);
+        }
 
         /// <summary>
         /// Present a skin select immediately.

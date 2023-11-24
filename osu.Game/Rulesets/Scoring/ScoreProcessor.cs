@@ -260,7 +260,7 @@ namespace osu.Game.Rulesets.Scoring
         /// <param name="result">The <see cref="JudgementResult"/> to describe.</param>
         /// <returns>The <see cref="HitEvent"/>.</returns>
         protected virtual HitEvent CreateHitEvent(JudgementResult result)
-            => new HitEvent(result.TimeOffset, result.Type, result.HitObject, lastHitObject, null);
+            => new HitEvent(result.TimeOffset, result.GameplayRate, result.Type, result.HitObject, lastHitObject, null);
 
         protected sealed override void RevertResultInternal(JudgementResult result)
         {

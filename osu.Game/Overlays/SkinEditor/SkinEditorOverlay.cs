@@ -188,7 +188,10 @@ namespace osu.Game.Overlays.SkinEditor
             }
 
             if (skinEditor.State.Value == Visibility.Visible)
+            {
+                skinEditor.Save(false);
                 skinEditor.UpdateTargetScreen(target);
+            }
             else
             {
                 skinEditor.Hide();
@@ -207,6 +210,9 @@ namespace osu.Game.Overlays.SkinEditor
 
             // The skin editor doesn't work well if beatmap skins are being applied to the player screen.
             // To keep things simple, disable the setting game-wide while using the skin editor.
+            //
+            // This causes a full reload of the skin, which is pretty ugly.
+            // TODO: Investigate if we can avoid this when a beatmap skin is not being applied by the current beatmap.
             leasedBeatmapSkins = beatmapSkins.BeginLease(true);
             leasedBeatmapSkins.Value = false;
         }

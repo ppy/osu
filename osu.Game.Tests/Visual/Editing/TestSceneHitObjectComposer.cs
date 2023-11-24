@@ -57,7 +57,7 @@ namespace osu.Game.Tests.Visual.Editing
                         new Slider
                         {
                             Position = new Vector2(128, 256),
-                            Path = new SliderPath(PathType.Linear, new[]
+                            Path = new SliderPath(PathType.LINEAR, new[]
                             {
                                 Vector2.Zero,
                                 new Vector2(216, 0),
