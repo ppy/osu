@@ -53,10 +53,16 @@ namespace osu.Game.Overlays.SkinEditor
         private OsuGame game { get; set; } = null!;
 
         [Resolved]
+        private MusicController music { get; set; } = null!;
+
+        [Resolved]
         private IBindable<RulesetInfo> ruleset { get; set; } = null!;
 
         [Resolved]
         private Bindable<IReadOnlyList<Mod>> mods { get; set; } = null!;
+
+        [Resolved]
+        private IBindable<WorkingBeatmap> beatmap { get; set; } = null!;
 
         private OsuScreen? lastTargetScreen;
 
@@ -133,6 +139,14 @@ namespace osu.Game.Overlays.SkinEditor
         {
             performer?.PerformFromScreen(screen =>
             {
+                // If we're playing the intro, switch away to another beatmap.
+                if (beatmap.Value.BeatmapSetInfo.Protected)
+                {
+                    music.NextTrack();
+                    Schedule(PresentGameplay);
+                    return;
+                }
+
                 if (screen is Player)
                     return;
 
@@ -275,6 +289,7 @@ namespace osu.Game.Overlays.SkinEditor
                 : base(createScore, new PlayerConfiguration
                 {
                     ShowResults = false,
+                    AutomaticallySkipIntro = true,
                 })
             {
             }
