@@ -2,8 +2,10 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
+using osu.Framework.Graphics;
 using osu.Framework.Screens;
 using osu.Game.Scoring;
+using osu.Game.Screens.Menu;
 
 namespace osu.Game.Screens.Play
 {
@@ -27,6 +29,15 @@ namespace osu.Game.Screens.Play
             Ruleset.Value = Score.Ruleset;
 
             base.OnEntering(e);
+        }
+
+        protected override void LogoExiting(OsuLogo logo)
+        {
+            const double logo_transition = 250;
+
+            base.LogoExiting(logo);
+            logo.ScaleTo(0.2f, logo_transition / 2, Easing.Out);
+            logo.FadeOut(logo_transition / 2, Easing.Out);
         }
     }
 }
