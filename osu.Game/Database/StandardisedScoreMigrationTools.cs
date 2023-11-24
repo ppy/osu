@@ -321,7 +321,7 @@ namespace osu.Game.Database
                     // This time, divide the remaining combo among remaining objects equally to achieve longest possible combo lengths.
                     // There is no rigorous proof that doing this will yield a correct upper bound, but it seems to work out in practice.
                     remainingComboPortionInScoreV1 = comboPortionInScoreV1 - comboPortionFromLongestComboInScoreV1;
-                    double remainingCountOfObjectsGivingCombo = maximumLegacyCombo - score.MaxCombo - score.Statistics[HitResult.Miss];
+                    double remainingCountOfObjectsGivingCombo = maximumLegacyCombo - score.MaxCombo - score.Statistics.GetValueOrDefault(HitResult.Miss);
                     // Because we assumed all combos were equal, `remainingComboPortionInScoreV1`
                     // can be approximated by n * x^2, wherein n is the assumed number of equal combos,
                     // and x is the assumed length of every one of those combos.
