@@ -159,9 +159,9 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders.Components
                             if (allowSelection)
                                 d.RequestSelection = selectionRequested;
 
-                            d.DragStarted = dragStarted;
-                            d.DragInProgress = dragInProgress;
-                            d.DragEnded = dragEnded;
+                            d.DragStarted = DragStarted;
+                            d.DragInProgress = DragInProgress;
+                            d.DragEnded = DragEnded;
                         }));
 
                         Connections.Add(new PathControlPointConnectionPiece<T>(hitObject, e.NewStartingIndex + i));
@@ -267,7 +267,7 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders.Components
         private int draggedControlPointIndex;
         private HashSet<PathControlPoint> selectedControlPoints;
 
-        private void dragStarted(PathControlPoint controlPoint)
+        public void DragStarted(PathControlPoint controlPoint)
         {
             dragStartPositions = hitObject.Path.ControlPoints.Select(point => point.Position).ToArray();
             dragPathTypes = hitObject.Path.ControlPoints.Select(point => point.Type).ToArray();
@@ -279,7 +279,7 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders.Components
             changeHandler?.BeginChange();
         }
 
-        private void dragInProgress(DragEvent e)
+        public void DragInProgress(DragEvent e)
         {
             Vector2[] oldControlPoints = hitObject.Path.ControlPoints.Select(cp => cp.Position).ToArray();
             var oldPosition = hitObject.Position;
@@ -341,7 +341,7 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders.Components
                 hitObject.Path.ControlPoints[i].Type = dragPathTypes[i];
         }
 
-        private void dragEnded() => changeHandler?.EndChange();
+        public void DragEnded() => changeHandler?.EndChange();
 
         #endregion
 
