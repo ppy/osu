@@ -13,27 +13,22 @@ using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Resources.Localisation.Web;
 using osuTK;
-using osuTK.Graphics;
 
 namespace osu.Game.Overlays.Chat
 {
     public partial class ChatOverlayTopBar : Container
     {
-        private Box background = null!;
-
-        private Color4 backgroundColour;
-
         public Drawable DragBar = null!;
 
         [BackgroundDependencyLoader]
         private void load(OverlayColourProvider colourProvider, TextureStore textures)
         {
-            Children = new Drawable[]
+            Children = new[]
             {
-                background = new Box
+                new Box
                 {
                     RelativeSizeAxes = Axes.Both,
-                    Colour = backgroundColour = colourProvider.Background3,
+                    Colour = colourProvider.Background3,
                 },
                 new GridContainer
                 {
