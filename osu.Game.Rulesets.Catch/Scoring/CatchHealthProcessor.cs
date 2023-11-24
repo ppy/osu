@@ -2,16 +2,17 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using osu.Game.Beatmaps;
+using osu.Game.Rulesets.Catch.Objects;
 using osu.Game.Rulesets.Judgements;
 using osu.Game.Rulesets.Objects;
-using osu.Game.Rulesets.Osu.Objects;
 using osu.Game.Rulesets.Scoring;
 
-namespace osu.Game.Rulesets.Osu.Scoring
+namespace osu.Game.Rulesets.Catch.Scoring
 {
-    public partial class OsuHealthProcessor : DrainingHealthProcessor
+    public partial class CatchHealthProcessor : DrainingHealthProcessor
     {
         public Action<string>? OnIterationFail;
         public Action<string>? OnIterationSuccess;
@@ -21,7 +22,7 @@ namespace osu.Game.Rulesets.Osu.Scoring
         private double hpRecoveryAvailable;
         private double hpMultiplierNormal;
 
-        public OsuHealthProcessor(double drainStartTime)
+        public CatchHealthProcessor(double drainStartTime)
             : base(drainStartTime)
         {
         }
@@ -57,9 +58,11 @@ namespace osu.Game.Rulesets.Osu.Scoring
                 int currentBreak = 0;
                 bool fail = false;
 
-                for (int i = 0; i < Beatmap.HitObjects.Count; i++)
+                List<HitObject> allObjects = EnumerateHitObjects(Beatmap).Where(h => h is Fruit || h is Droplet || h is Banana).ToList();
+
+                for (int i = 0; i < allObjects.Count; i++)
                 {
-                    HitObject h = Beatmap.HitObjects[i];
+                    HitObject h = allObjects[i];
 
                     while (currentBreak < Beatmap.Breaks.Count && Beatmap.Breaks[currentBreak].EndTime <= h.StartTime)
                     {
@@ -85,37 +88,6 @@ namespace osu.Game.Rulesets.Osu.Scoring
                         break;
                     }
 
-                    double hpReduction = testDrop * (h.GetEndTime() - h.StartTime);
-                    double hpOverkill = Math.Max(0, hpReduction - currentHp);
-                    reduceHp(hpReduction);
-
-                    switch (h)
-                    {
-                        case Slider slider:
-                        {
-                            foreach (var nested in slider.NestedHitObjects)
-                                increaseHp(nested);
-                            break;
-                        }
-
-                        case Spinner spinner:
-                        {
-                            foreach (var nested in spinner.NestedHitObjects.Where(t => t is not SpinnerBonusTick))
-                                increaseHp(nested);
-                            break;
-                        }
-                    }
-
-                    // Note: Because HP is capped during the above increases, long sliders (with many ticks) or spinners
-                    // will appear to overkill at lower drain levels than they should. However, it is also not correct to simply use the uncapped version.
-                    if (hpOverkill > 0 && currentHp - hpOverkill <= lowestHpEver)
-                    {
-                        fail = true;
-                        testDrop *= 0.96;
-                        OnIterationFail?.Invoke($"FAILED drop {testDrop}: overkill ({currentHp} - {hpOverkill} <= {lowestHpEver})");
-                        break;
-                    }
-
                     increaseHp(h);
                 }
 
@@ -127,7 +99,7 @@ namespace osu.Game.Rulesets.Osu.Scoring
                     OnIterationFail?.Invoke($"FAILED drop {testDrop}: end hp too low ({currentHp} < {lowestHpEnd})");
                 }
 
-                double recovery = (currentHpUncapped - 1) / Beatmap.HitObjects.Count;
+                double recovery = (currentHpUncapped - 1) / allObjects.Count;
 
                 if (!fail && recovery < hpRecoveryAvailable)
                 {
@@ -152,57 +124,41 @@ namespace osu.Game.Rulesets.Osu.Scoring
 
             void increaseHp(HitObject hitObject)
             {
-                double amount = healthIncreaseFor(hitObject, hitObject.CreateJudgement().MaxResult);
+                double amount = healthIncreaseFor(hitObject.CreateJudgement().MaxResult);
                 currentHpUncapped += amount;
                 currentHp = Math.Max(0, Math.Min(1, currentHp + amount));
             }
         }
 
-        protected override double GetHealthIncreaseFor(JudgementResult result) => healthIncreaseFor(result.HitObject, result.Type);
+        protected override double GetHealthIncreaseFor(JudgementResult result) => healthIncreaseFor(result.Type);
 
-        private double healthIncreaseFor(HitObject hitObject, HitResult result)
+        private double healthIncreaseFor(HitResult result)
         {
             double increase = 0;
 
             switch (result)
             {
                 case HitResult.SmallTickMiss:
-                    return IBeatmapDifficultyInfo.DifficultyRange(Beatmap.Difficulty.DrainRate, -0.02, -0.075, -0.14);
+                    return 0;
 
                 case HitResult.LargeTickMiss:
-                    return IBeatmapDifficultyInfo.DifficultyRange(Beatmap.Difficulty.DrainRate, -0.02, -0.075, -0.14);
-
                 case HitResult.Miss:
                     return IBeatmapDifficultyInfo.DifficultyRange(Beatmap.Difficulty.DrainRate, -0.03, -0.125, -0.2);
 
                 case HitResult.SmallTickHit:
-                    // This result always comes from the slider tail, which is judged the same as a repeat.
-                    increase = 0.02;
+                    increase = 0.0015;
                     break;
 
                 case HitResult.LargeTickHit:
-                    // This result comes from either a slider tick or repeat.
-                    increase = hitObject is SliderTick ? 0.015 : 0.02;
-                    break;
-
-                case HitResult.Meh:
-                    increase = 0.002;
-                    break;
-
-                case HitResult.Ok:
-                    increase = 0.011;
+                    increase = 0.015;
                     break;
 
                 case HitResult.Great:
                     increase = 0.03;
                     break;
 
-                case HitResult.SmallBonus:
-                    increase = 0.0085;
-                    break;
-
                 case HitResult.LargeBonus:
-                    increase = 0.01;
+                    increase = 0.0025;
                     break;
             }
 
