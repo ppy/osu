@@ -2,7 +2,6 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using osu.Framework.Allocation;
-using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
@@ -22,6 +21,8 @@ namespace osu.Game.Overlays.Chat
         private Box background = null!;
 
         private Color4 backgroundColour;
+
+        public Drawable DragBar = null!;
 
         [BackgroundDependencyLoader]
         private void load(OverlayColourProvider colourProvider, TextureStore textures)
@@ -50,7 +51,7 @@ namespace osu.Game.Overlays.Chat
                                 Anchor = Anchor.Centre,
                                 Origin = Anchor.Centre,
                                 Texture = textures.Get("Icons/Hexacons/messaging"),
-                                Size = new Vector2(18),
+                                Size = new Vector2(24),
                             },
                             // Placeholder text
                             new OsuSpriteText
@@ -64,19 +65,90 @@ namespace osu.Game.Overlays.Chat
                         },
                     },
                 },
+                DragBar = new DragArea
+                {
+                    Alpha = 0,
+                    Anchor = Anchor.Centre,
+                    Origin = Anchor.Centre,
+                    Colour = colourProvider.Background4,
+                }
             };
         }
 
         protected override bool OnHover(HoverEvent e)
         {
-            background.FadeColour(backgroundColour.Lighten(0.1f), 300, Easing.OutQuint);
+            DragBar.FadeIn(100);
             return base.OnHover(e);
         }
 
         protected override void OnHoverLost(HoverLostEvent e)
         {
-            background.FadeColour(backgroundColour, 300, Easing.OutQuint);
+            DragBar.FadeOut(100);
             base.OnHoverLost(e);
+        }
+
+        private partial class DragArea : CompositeDrawable
+        {
+            private readonly Circle circle;
+
+            public DragArea()
+            {
+                AutoSizeAxes = Axes.Both;
+
+                InternalChildren = new Drawable[]
+                {
+                    circle = new Circle
+                    {
+                        Anchor = Anchor.Centre,
+                        Origin = Anchor.Centre,
+                        Size = new Vector2(150, 7),
+                        Margin = new MarginPadding(12),
+                    }
+                };
+            }
+
+            protected override bool OnHover(HoverEvent e)
+            {
+                updateScale();
+                return base.OnHover(e);
+            }
+
+            protected override void OnHoverLost(HoverLostEvent e)
+            {
+                updateScale();
+                base.OnHoverLost(e);
+            }
+
+            private bool dragging;
+
+            protected override bool OnMouseDown(MouseDownEvent e)
+            {
+                dragging = true;
+                updateScale();
+                return base.OnMouseDown(e);
+            }
+
+            protected override void OnMouseUp(MouseUpEvent e)
+            {
+                dragging = false;
+                updateScale();
+                base.OnMouseUp(e);
+            }
+
+            private void updateScale()
+            {
+                if (dragging || IsHovered)
+                    circle.FadeIn(100);
+                else
+                    circle.FadeTo(0.6f, 100);
+
+                if (dragging)
+                    circle.ScaleTo(1f, 400, Easing.OutQuint);
+                else if (IsHovered)
+                    circle.ScaleTo(1.05f, 400, Easing.OutElasticHalf);
+                else
+                    circle.ScaleTo(1f, 500, Easing.OutQuint);
+            }
         }
     }
 }
