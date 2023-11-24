@@ -311,6 +311,10 @@ namespace osu.Game.Screens.Menu
                 case ButtonSystemState.Play:
                     buttonsPlay.First().TriggerClick();
                     return false;
+
+                case ButtonSystemState.Edit:
+                    buttonsEdit.First().TriggerClick();
+                    return false;
             }
         }
 
