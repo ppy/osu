@@ -4,6 +4,7 @@
 #nullable disable
 
 using osu.Framework.Graphics;
+using osu.Game.Graphics;
 using osu.Game.Localisation;
 using osu.Game.Resources.Localisation.Web;
 
@@ -23,7 +24,7 @@ namespace osu.Game.Overlays.BeatmapListing
             {
                 Title = PageTitleStrings.MainBeatmapsetsControllerIndex;
                 Description = NamedOverlayComponentStrings.BeatmapListingDescription;
-                IconTexture = "Icons/Hexacons/beatmap";
+                Icon = HexaconsIcons.Beatmap;
             }
         }
     }

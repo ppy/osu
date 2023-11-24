@@ -16,12 +16,31 @@ namespace osu.Game.Graphics
     {
         public const string FONT_NAME = "Icons/Hexacons";
 
+        public static IconUsage BeatmapPacks => get(HexaconsMapping.beatmap_packs);
+        public static IconUsage Beatmap => get(HexaconsMapping.beatmap);
+        public static IconUsage Calendar => get(HexaconsMapping.calendar);
+        public static IconUsage Chart => get(HexaconsMapping.chart);
+        public static IconUsage Community => get(HexaconsMapping.community);
+        public static IconUsage Contests => get(HexaconsMapping.contests);
+        public static IconUsage Devtools => get(HexaconsMapping.devtools);
+        public static IconUsage Download => get(HexaconsMapping.download);
         public static IconUsage Editor => get(HexaconsMapping.editor);
+        public static IconUsage FeaturedArtist => get(HexaconsMapping.featured_artist);
+        public static IconUsage Home => get(HexaconsMapping.home);
+        public static IconUsage Messaging => get(HexaconsMapping.messaging);
+        public static IconUsage Music => get(HexaconsMapping.music);
+        public static IconUsage News => get(HexaconsMapping.news);
+        public static IconUsage Notification => get(HexaconsMapping.notification);
+        public static IconUsage Profile => get(HexaconsMapping.profile);
+        public static IconUsage Rankings => get(HexaconsMapping.rankings);
+        public static IconUsage Search => get(HexaconsMapping.search);
+        public static IconUsage Settings => get(HexaconsMapping.settings);
+        public static IconUsage Social => get(HexaconsMapping.social);
+        public static IconUsage Store => get(HexaconsMapping.store);
+        public static IconUsage Tournament => get(HexaconsMapping.tournament);
+        public static IconUsage Wiki => get(HexaconsMapping.wiki);
 
-        private static IconUsage get(HexaconsMapping icon)
-        {
-            return new IconUsage((char)icon, FONT_NAME);
-        }
+        private static IconUsage get(HexaconsMapping icon) => new IconUsage((char)icon, FONT_NAME);
 
         // Basically just converting to something we can use in a `char` lookup for FontStore/GlyphStore compatibility.
         // Names should match filenames in resources.
