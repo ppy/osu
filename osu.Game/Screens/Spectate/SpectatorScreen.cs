@@ -129,7 +129,7 @@ namespace osu.Game.Screens.Spectate
             switch (newState.State)
             {
                 case SpectatedUserState.Playing:
-                    Schedule(() => OnNewPlayingUserState(userId, newState));
+                    OnNewPlayingUserState(userId, newState);
                     startGameplay(userId);
                     break;
 
@@ -173,7 +173,7 @@ namespace osu.Game.Screens.Spectate
             var gameplayState = new SpectatorGameplayState(score, resolvedRuleset, beatmaps.GetWorkingBeatmap(resolvedBeatmap));
 
             gameplayStates[userId] = gameplayState;
-            Schedule(() => StartGameplay(userId, gameplayState));
+            StartGameplay(userId, gameplayState);
         }
 
         /// <summary>
@@ -196,11 +196,12 @@ namespace osu.Game.Screens.Spectate
             markReceivedAllFrames(userId);
 
             gameplayStates.Remove(userId);
-            Schedule(() => QuitGameplay(userId));
+            QuitGameplay(userId);
         }
 
         /// <summary>
         /// Invoked when a spectated user's state has changed to a new state indicating the player is currently playing.
+        /// Thread safety is not guaranteed – should be scheduled as required.
         /// </summary>
         /// <param name="userId">The user whose state has changed.</param>
         /// <param name="spectatorState">The new state.</param>
@@ -208,6 +209,7 @@ namespace osu.Game.Screens.Spectate
 
         /// <summary>
         /// Starts gameplay for a user.
+        /// Thread safety is not guaranteed – should be scheduled as required.
         /// </summary>
         /// <param name="userId">The user to start gameplay for.</param>
         /// <param name="spectatorGameplayState">The gameplay state.</param>
@@ -215,6 +217,7 @@ namespace osu.Game.Screens.Spectate
 
         /// <summary>
         /// Quits gameplay for a user.
+        /// Thread safety is not guaranteed – should be scheduled as required.
         /// </summary>
         /// <param name="userId">The user to quit gameplay for.</param>
         protected abstract void QuitGameplay(int userId);
