@@ -1,8 +1,6 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
 using System;
 using System.Linq;
 using osu.Framework;
@@ -33,7 +31,7 @@ namespace osu.Game.Screens.Menu
     /// </summary>
     public partial class MainMenuButton : BeatSyncedContainer, IStateful<ButtonState>
     {
-        public event Action<ButtonState> StateChanged;
+        public event Action<ButtonState>? StateChanged;
 
         public readonly Key[] TriggerKeys;
 
@@ -48,14 +46,14 @@ namespace osu.Game.Screens.Menu
         /// </summary>
         public ButtonSystemState VisibleState = ButtonSystemState.TopLevel;
 
-        private readonly Action clickAction;
-        private Sample sampleClick;
-        private Sample sampleHover;
-        private SampleChannel sampleChannel;
+        private readonly Action? clickAction;
+        private Sample? sampleClick;
+        private Sample? sampleHover;
+        private SampleChannel? sampleChannel;
 
         public override bool ReceivePositionalInputAt(Vector2 screenSpacePos) => box.ReceivePositionalInputAt(screenSpacePos);
 
-        public MainMenuButton(LocalisableString text, string sampleName, IconUsage symbol, Color4 colour, Action clickAction = null, float extraWidth = 0, params Key[] triggerKeys)
+        public MainMenuButton(LocalisableString text, string sampleName, IconUsage symbol, Color4 colour, Action? clickAction = null, float extraWidth = 0, params Key[] triggerKeys)
         {
             this.sampleName = sampleName;
             this.clickAction = clickAction;
