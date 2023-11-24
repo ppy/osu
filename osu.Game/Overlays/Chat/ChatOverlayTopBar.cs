@@ -42,11 +42,11 @@ namespace osu.Game.Overlays.Chat
                     {
                         new Drawable[]
                         {
-                            new Sprite
+                            new SpriteIcon
                             {
                                 Anchor = Anchor.Centre,
                                 Origin = Anchor.Centre,
-                                Texture = textures.Get("Icons/Hexacons/messaging"),
+                                Icon = HexaconsIcons.Social,
                                 Size = new Vector2(24),
                             },
                             // Placeholder text
