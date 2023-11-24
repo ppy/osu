@@ -13,6 +13,7 @@ using osu.Framework.Audio;
 using osu.Framework.Audio.Sample;
 using osu.Framework.Bindables;
 using osu.Framework.Extensions.IEnumerableExtensions;
+using osu.Framework.Extensions.LocalisationExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Sprites;
@@ -40,7 +41,8 @@ namespace osu.Game.Screens.Menu
 
         private readonly IBindable<bool> isIdle = new BindableBool();
 
-        public Action OnEdit;
+        public Action OnEditBeatmap;
+        public Action OnEditSkin;
         public Action OnExit;
         public Action OnBeatmapListing;
         public Action OnSolo;
@@ -84,6 +86,7 @@ namespace osu.Game.Screens.Menu
 
         private readonly List<MainMenuButton> buttonsTopLevel = new List<MainMenuButton>();
         private readonly List<MainMenuButton> buttonsPlay = new List<MainMenuButton>();
+        private readonly List<MainMenuButton> buttonsEdit = new List<MainMenuButton>();
 
         private Sample sampleBackToLogo;
         private Sample sampleLogoSwoosh;
@@ -105,6 +108,11 @@ namespace osu.Game.Screens.Menu
             buttonArea.AddRange(new Drawable[]
             {
                 new MainMenuButton(ButtonSystemStrings.Settings, string.Empty, FontAwesome.Solid.Cog, new Color4(85, 85, 85, 255), () => OnSettings?.Invoke(), -WEDGE_WIDTH, Key.O),
+                backButton = new MainMenuButton(ButtonSystemStrings.Back, @"back-to-top", OsuIcon.LeftCircle, new Color4(51, 58, 94, 255), () => State = ButtonSystemState.TopLevel,
+                    -WEDGE_WIDTH)
+                {
+                    VisibleState = ButtonSystemState.Edit,
+                },
                 backButton = new MainMenuButton(ButtonSystemStrings.Back, @"back-to-top", OsuIcon.LeftCircle, new Color4(51, 58, 94, 255), () => State = ButtonSystemState.TopLevel,
                     -WEDGE_WIDTH)
                 {
@@ -133,14 +141,19 @@ namespace osu.Game.Screens.Menu
             buttonsPlay.Add(new MainMenuButton(ButtonSystemStrings.Playlists, @"button-default-select", OsuIcon.Charts, new Color4(94, 63, 186, 255), onPlaylists, 0, Key.L));
             buttonsPlay.ForEach(b => b.VisibleState = ButtonSystemState.Play);
 
+            buttonsEdit.Add(new MainMenuButton(CommonStrings.Beatmaps.ToLower(), @"button-default-select", FontAwesome.Solid.User, new Color4(238, 170, 0, 255), () => OnEditBeatmap?.Invoke(), WEDGE_WIDTH, Key.B));
+            buttonsEdit.Add(new MainMenuButton(CommonStrings.Skins.ToLower(), @"button-default-select", FontAwesome.Solid.Users, new Color4(220, 160, 0, 255), () => OnEditSkin?.Invoke(), 0, Key.S));
+            buttonsEdit.ForEach(b => b.VisibleState = ButtonSystemState.Edit);
+
             buttonsTopLevel.Add(new MainMenuButton(ButtonSystemStrings.Play, @"button-play-select", OsuIcon.Logo, new Color4(102, 68, 204, 255), () => State = ButtonSystemState.Play, WEDGE_WIDTH, Key.P));
-            buttonsTopLevel.Add(new MainMenuButton(ButtonSystemStrings.Edit, @"button-default-select", OsuIcon.EditCircle, new Color4(238, 170, 0, 255), () => OnEdit?.Invoke(), 0, Key.E));
+            buttonsTopLevel.Add(new MainMenuButton(ButtonSystemStrings.Edit, @"button-default-select", OsuIcon.EditCircle, new Color4(238, 170, 0, 255), () => State = ButtonSystemState.Edit, 0, Key.E));
             buttonsTopLevel.Add(new MainMenuButton(ButtonSystemStrings.Browse, @"button-default-select", OsuIcon.ChevronDownCircle, new Color4(165, 204, 0, 255), () => OnBeatmapListing?.Invoke(), 0, Key.B, Key.D));
 
             if (host.CanExit)
                 buttonsTopLevel.Add(new MainMenuButton(ButtonSystemStrings.Exit, string.Empty, OsuIcon.CrossCircle, new Color4(238, 51, 153, 255), () => OnExit?.Invoke(), 0, Key.Q));
 
             buttonArea.AddRange(buttonsPlay);
+            buttonArea.AddRange(buttonsEdit);
             buttonArea.AddRange(buttonsTopLevel);
 
             buttonArea.ForEach(b =>
@@ -270,6 +283,7 @@ namespace osu.Game.Screens.Menu
 
                     return true;
 
+                case ButtonSystemState.Edit:
                 case ButtonSystemState.Play:
                     StopSamplePlayback();
                     backButton.TriggerClick();
@@ -414,6 +428,7 @@ namespace osu.Game.Screens.Menu
         Initial,
         TopLevel,
         Play,
+        Edit,
         EnteringMode,
     }
 }

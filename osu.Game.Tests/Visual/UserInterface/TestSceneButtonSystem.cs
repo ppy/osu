@@ -97,7 +97,7 @@ namespace osu.Game.Tests.Visual.UserInterface
                         break;
 
                     case Key.E:
-                        buttons.OnEdit = action;
+                        buttons.OnEditBeatmap = action;
                         break;
 
                     case Key.D:
