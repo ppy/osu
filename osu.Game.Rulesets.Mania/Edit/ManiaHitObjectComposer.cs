@@ -5,6 +5,7 @@
 
 using System.Collections.Generic;
 using System.Linq;
+using System.Text.RegularExpressions;
 using osu.Game.Beatmaps;
 using osu.Game.Rulesets.Edit;
 using osu.Game.Rulesets.Edit.Tools;
@@ -50,5 +51,37 @@ namespace osu.Game.Rulesets.Mania.Edit
 
         public override string ConvertSelectionToString()
             => string.Join(',', EditorBeatmap.SelectedHitObjects.Cast<ManiaHitObject>().OrderBy(h => h.StartTime).Select(h => $"{h.StartTime}|{h.Column}"));
+
+        // 123|0,456|1,789|2 ...
+        private static readonly Regex selection_regex = new Regex(@"^\d+\|\d+(,\d+\|\d+)*$", RegexOptions.Compiled);
+
+        public override void SelectFromTimestamp(double timestamp, string objectDescription)
+        {
+            if (!selection_regex.IsMatch(objectDescription))
+                return;
+
+            List<ManiaHitObject> remainingHitObjects = EditorBeatmap.HitObjects.Cast<ManiaHitObject>().Where(h => h.StartTime >= timestamp).ToList();
+            string[] objectDescriptions = objectDescription.Split(',').ToArray();
+
+            for (int i = 0; i < objectDescriptions.Length; i++)
+            {
+                string[] split = objectDescriptions[i].Split('|').ToArray();
+                if (split.Length != 2)
+                    continue;
+
+                if (!double.TryParse(split[0], out double time) || !int.TryParse(split[1], out int column))
+                    continue;
+
+                ManiaHitObject current = remainingHitObjects.FirstOrDefault(h => h.StartTime == time && h.Column == column);
+
+                if (current == null)
+                    continue;
+
+                EditorBeatmap.SelectedHitObjects.Add(current);
+
+                if (i < objectDescriptions.Length - 1)
+                    remainingHitObjects = remainingHitObjects.Where(h => h != current && h.StartTime >= current.StartTime).ToList();
+            }
+        }
     }
 }

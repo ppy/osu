@@ -214,9 +214,15 @@ namespace osu.Game.Skinning
                                         Size = new Vector2(380, 72),
                                         Position = new Vector2(4, 5)
                                     },
-                                    new ArgonScoreCounter(),
+                                    new ArgonScoreCounter
+                                    {
+                                        ShowLabel = { Value = false },
+                                    },
                                     new ArgonHealthDisplay(),
-                                    new BoxElement(),
+                                    new BoxElement
+                                    {
+                                        CornerRadius = { Value = 0.5f }
+                                    },
                                     new ArgonAccuracyCounter(),
                                     new ArgonComboCounter
                                     {

@@ -52,6 +52,12 @@ namespace osu.Game.Tests.Visual.Gameplay
                 if (healthDisplay.IsNotNull())
                     healthDisplay.BarHeight.Value = val;
             });
+
+            AddSliderStep("Width", 0, 1f, 0.98f, val =>
+            {
+                if (healthDisplay.IsNotNull())
+                    healthDisplay.Width = val;
+            });
         }
 
         [Test]

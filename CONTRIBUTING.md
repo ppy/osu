@@ -59,7 +59,7 @@ The [issue tracker](https://github.com/ppy/osu/issues) should provide plenty of 
 
 In the case of simple issues, a direct PR is okay. However, if you decide to work on an existing issue which doesn't seem trivial, **please ask us first**. This way we can try to estimate if it is a good fit for you and provide the correct direction on how to address it. In addition, note that while we do not rule out external contributors from working on roadmapped issues, we will generally prefer to handle them ourselves unless they're not very time sensitive.
 
-If you'd like to propose a subjective change to one of the visual aspects of the game, or there is a bigger task you'd like to work on, but there is no corresponding issue or discussion thread yet for it, **please open a discussion or issue first** to avoid wasted effort. This in particular applies if you want to work on [one of the available designs from the osu! public Figma library](https://www.figma.com/file/6m10GiGEncVFWmgOoSyakH/osu!-Figma-Library).
+If you'd like to propose a subjective change to one of the visual aspects of the game, or there is a bigger task you'd like to work on, but there is no corresponding issue or discussion thread yet for it, **please open a discussion or issue first** to avoid wasted effort. This in particular applies if you want to work on [one of the available designs from the osu! Figma master library](https://www.figma.com/file/VIkXMYNPMtQem2RJg9k2iQ/Master-Library).
 
 Aside from the above, below is a brief checklist of things to watch out when you're preparing your code changes:
 
@@ -85,4 +85,4 @@ If you're uncertain about some part of the codebase or some inner workings of th
 - [Development roadmap](https://github.com/orgs/ppy/projects/7/views/6): What the core team is currently working on
 - [`ppy/osu-framework` wiki](https://github.com/ppy/osu-framework/wiki): Contains introductory information about osu!framework, the bespoke 2D game framework we use for the game
 - [`ppy/osu` wiki](https://github.com/ppy/osu/wiki): Contains articles about various technical aspects of the game
-- [Public Figma library](https://www.figma.com/file/6m10GiGEncVFWmgOoSyakH/osu!-Figma-Library): Contains finished and draft designs for osu!
+- [Figma master library](https://www.figma.com/file/VIkXMYNPMtQem2RJg9k2iQ/Master-Library): Contains finished and draft designs for osu!
