@@ -34,7 +34,7 @@ namespace osu.Game.Rulesets.Osu.Tests.Editor
             slider = new Slider
             {
                 Position = new Vector2(256, 192),
-                Path = new SliderPath(PathType.Bezier, new[]
+                Path = new SliderPath(PathType.BEZIER, new[]
                 {
                     Vector2.Zero,
                     new Vector2(150, 150),

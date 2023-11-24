@@ -26,9 +26,9 @@ namespace osu.Game.Rulesets.Osu.Tests
                 {
                     ControlPoints =
                     {
-                        new PathControlPoint(new Vector2(), PathType.Linear),
-                        new PathControlPoint(new Vector2(-64, -128), PathType.Linear), // absolute position: (64, 0)
-                        new PathControlPoint(new Vector2(-128, 0), PathType.Linear) // absolute position: (0, 128)
+                        new PathControlPoint(new Vector2(), PathType.LINEAR),
+                        new PathControlPoint(new Vector2(-64, -128), PathType.LINEAR), // absolute position: (64, 0)
+                        new PathControlPoint(new Vector2(-128, 0), PathType.LINEAR) // absolute position: (0, 128)
                     }
                 },
                 RepeatCount = 1
