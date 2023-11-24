@@ -1,7 +1,10 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System;
+using System.Collections.Generic;
 using System.Diagnostics;
+using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
@@ -9,12 +12,21 @@ using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Primitives;
 using osu.Framework.Input.Bindings;
 using osu.Framework.Input.Events;
+using osu.Framework.Screens;
+using osu.Game.Beatmaps;
 using osu.Game.Configuration;
 using osu.Game.Graphics.Containers;
 using osu.Game.Input.Bindings;
+using osu.Game.Rulesets;
+using osu.Game.Rulesets.Mods;
+using osu.Game.Scoring;
 using osu.Game.Screens;
 using osu.Game.Screens.Edit;
 using osu.Game.Screens.Edit.Components;
+using osu.Game.Screens.Menu;
+using osu.Game.Screens.Play;
+using osu.Game.Screens.Select;
+using osu.Game.Utils;
 using osuTK;
 
 namespace osu.Game.Overlays.SkinEditor
@@ -31,11 +43,20 @@ namespace osu.Game.Overlays.SkinEditor
 
         private SkinEditor? skinEditor;
 
+        [Resolved]
+        private IPerformFromScreenRunner? performer { get; set; }
+
         [Cached]
         public readonly EditorClipboard Clipboard = new EditorClipboard();
 
         [Resolved]
         private OsuGame game { get; set; } = null!;
+
+        [Resolved]
+        private IBindable<RulesetInfo> ruleset { get; set; } = null!;
+
+        [Resolved]
+        private Bindable<IReadOnlyList<Mod>> mods { get; set; } = null!;
 
         private OsuScreen? lastTargetScreen;
 
@@ -72,6 +93,9 @@ namespace osu.Game.Overlays.SkinEditor
         {
             globallyDisableBeatmapSkinSetting();
 
+            if (lastTargetScreen is MainMenu)
+                PresentGameplay();
+
             if (skinEditor != null)
             {
                 skinEditor.Show();
@@ -103,6 +127,28 @@ namespace osu.Game.Overlays.SkinEditor
             skinEditor?.Hide();
 
             globallyReenableBeatmapSkinSetting();
+        }
+
+        public void PresentGameplay()
+        {
+            performer?.PerformFromScreen(screen =>
+            {
+                if (screen is Player)
+                    return;
+
+                var replayGeneratingMod = ruleset.Value.CreateInstance().GetAutoplayMod();
+
+                IReadOnlyList<Mod> usableMods = mods.Value;
+
+                if (replayGeneratingMod != null)
+                    usableMods = usableMods.Append(replayGeneratingMod).ToArray();
+
+                if (!ModUtils.CheckCompatibleSet(usableMods, out var invalid))
+                    mods.Value = mods.Value.Except(invalid).ToArray();
+
+                if (replayGeneratingMod != null)
+                    screen.Push(new EndlessPlayer((beatmap, mods) => replayGeneratingMod.CreateScoreFromReplayData(beatmap, mods)));
+            }, new[] { typeof(Player), typeof(PlaySongSelect) });
         }
 
         protected override void Update()
@@ -221,6 +267,25 @@ namespace osu.Game.Overlays.SkinEditor
         {
             leasedBeatmapSkins?.Return();
             leasedBeatmapSkins = null;
+        }
+
+        private partial class EndlessPlayer : ReplayPlayer
+        {
+            public EndlessPlayer(Func<IBeatmap, IReadOnlyList<Mod>, Score> createScore)
+                : base(createScore, new PlayerConfiguration
+                {
+                    ShowResults = false,
+                })
+            {
+            }
+
+            protected override void Update()
+            {
+                base.Update();
+
+                if (GameplayState.HasPassed)
+                    GameplayClockContainer.Seek(0);
+            }
         }
     }
 }
