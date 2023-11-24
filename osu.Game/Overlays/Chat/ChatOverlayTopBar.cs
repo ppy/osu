@@ -1,6 +1,7 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using osu.Framework;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
@@ -67,7 +68,7 @@ namespace osu.Game.Overlays.Chat
                 },
                 DragBar = new DragArea
                 {
-                    Alpha = 0,
+                    Alpha = RuntimeInfo.IsMobile ? 1 : 0,
                     Anchor = Anchor.Centre,
                     Origin = Anchor.Centre,
                     Colour = colourProvider.Background4,
@@ -77,13 +78,15 @@ namespace osu.Game.Overlays.Chat
 
         protected override bool OnHover(HoverEvent e)
         {
-            DragBar.FadeIn(100);
+            if (!RuntimeInfo.IsMobile)
+                DragBar.FadeIn(100);
             return base.OnHover(e);
         }
 
         protected override void OnHoverLost(HoverLostEvent e)
         {
-            DragBar.FadeOut(100);
+            if (!RuntimeInfo.IsMobile)
+                DragBar.FadeOut(100);
             base.OnHoverLost(e);
         }
 
