@@ -56,7 +56,7 @@ namespace osu.Game.Screens.Menu
         /// Assign the <see cref="OsuLogo"/> that this ButtonSystem should manage the position of.
         /// </summary>
         /// <param name="logo">The instance of the logo to be assigned. If null, we are suspending from the screen that uses this ButtonSystem.</param>
-        public void SetOsuLogo(OsuLogo logo)
+        public void SetOsuLogo(OsuLogo? logo)
         {
             this.logo = logo;
 
