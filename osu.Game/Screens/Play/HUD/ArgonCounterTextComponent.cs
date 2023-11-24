@@ -155,7 +155,7 @@ namespace osu.Game.Screens.Play.HUD
                     this.getLookup = getLookup;
                 }
 
-                public ITexturedCharacterGlyph? Get(string fontName, char character)
+                public ITexturedCharacterGlyph? Get(string? fontName, char character)
                 {
                     string lookup = getLookup(character);
                     var texture = textures.Get($"Gameplay/Fonts/{fontName}-{lookup}");
