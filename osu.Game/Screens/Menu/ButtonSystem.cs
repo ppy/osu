@@ -1,12 +1,9 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using JetBrains.Annotations;
 using osu.Framework;
 using osu.Framework.Allocation;
 using osu.Framework.Audio;
@@ -37,24 +34,23 @@ namespace osu.Game.Screens.Menu
 {
     public partial class ButtonSystem : Container, IStateful<ButtonSystemState>, IKeyBindingHandler<GlobalAction>
     {
-        public event Action<ButtonSystemState> StateChanged;
-
-        private readonly IBindable<bool> isIdle = new BindableBool();
-
-        public Action OnEditBeatmap;
-        public Action OnEditSkin;
-        public Action OnExit;
-        public Action OnBeatmapListing;
-        public Action OnSolo;
-        public Action OnSettings;
-        public Action OnMultiplayer;
-        public Action OnPlaylists;
-
         public const float BUTTON_WIDTH = 140f;
         public const float WEDGE_WIDTH = 20;
 
-        [CanBeNull]
-        private OsuLogo logo;
+        public event Action<ButtonSystemState>? StateChanged;
+
+        public Action? OnEditBeatmap;
+        public Action? OnEditSkin;
+        public Action? OnExit;
+        public Action? OnBeatmapListing;
+        public Action? OnSolo;
+        public Action? OnSettings;
+        public Action? OnMultiplayer;
+        public Action? OnPlaylists;
+
+        private readonly IBindable<bool> isIdle = new BindableBool();
+
+        private OsuLogo? logo;
 
         /// <summary>
         /// Assign the <see cref="OsuLogo"/> that this ButtonSystem should manage the position of.
@@ -88,8 +84,8 @@ namespace osu.Game.Screens.Menu
         private readonly List<MainMenuButton> buttonsPlay = new List<MainMenuButton>();
         private readonly List<MainMenuButton> buttonsEdit = new List<MainMenuButton>();
 
-        private Sample sampleBackToLogo;
-        private Sample sampleLogoSwoosh;
+        private Sample? sampleBackToLogo;
+        private Sample? sampleLogoSwoosh;
 
         private readonly LogoTrackingContainer logoTrackingContainer;
 
@@ -124,17 +120,17 @@ namespace osu.Game.Screens.Menu
             buttonArea.Flow.CentreTarget = logoTrackingContainer.LogoFacade;
         }
 
-        [Resolved(CanBeNull = true)]
-        private OsuGame game { get; set; }
+        [Resolved]
+        private IAPIProvider api { get; set; } = null!;
 
         [Resolved]
-        private IAPIProvider api { get; set; }
+        private OsuGame? game { get; set; }
 
-        [Resolved(CanBeNull = true)]
-        private LoginOverlay loginOverlay { get; set; }
+        [Resolved]
+        private LoginOverlay? loginOverlay { get; set; }
 
-        [BackgroundDependencyLoader(true)]
-        private void load(AudioManager audio, IdleTracker idleTracker, GameHost host)
+        [BackgroundDependencyLoader]
+        private void load(AudioManager audio, IdleTracker? idleTracker, GameHost host)
         {
             buttonsPlay.Add(new MainMenuButton(ButtonSystemStrings.Solo, @"button-default-select", FontAwesome.Solid.User, new Color4(102, 68, 204, 255), () => OnSolo?.Invoke(), WEDGE_WIDTH, Key.P));
             buttonsPlay.Add(new MainMenuButton(ButtonSystemStrings.Multi, @"button-default-select", FontAwesome.Solid.Users, new Color4(94, 63, 186, 255), onMultiplayer, 0, Key.M));
@@ -354,7 +350,7 @@ namespace osu.Game.Screens.Menu
             }
         }
 
-        private ScheduledDelegate logoDelayedAction;
+        private ScheduledDelegate? logoDelayedAction;
 
         private void updateLogoState(ButtonSystemState lastState = ButtonSystemState.Initial)
         {
