@@ -27,7 +27,7 @@ namespace osu.Game.Rulesets.Objects.Legacy.Catch
             {
                 Position = position,
                 NewCombo = FirstObject || lastObject is ConvertSpinner || newCombo,
-                ComboOffset = comboOffset
+                ComboOffset = newCombo ? comboOffset : 0
             };
         }
 
@@ -38,7 +38,7 @@ namespace osu.Game.Rulesets.Objects.Legacy.Catch
             {
                 Position = position,
                 NewCombo = FirstObject || lastObject is ConvertSpinner || newCombo,
-                ComboOffset = comboOffset,
+                ComboOffset = newCombo ? comboOffset : 0,
                 Path = new SliderPath(controlPoints, length),
                 NodeSamples = nodeSamples,
                 RepeatCount = repeatCount
