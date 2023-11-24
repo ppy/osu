@@ -42,9 +42,19 @@ namespace osu.Game.Screens.Menu
         private readonly string sampleName;
 
         /// <summary>
-        /// The menu state for which we are visible for.
+        /// The menu state for which we are visible for (assuming only one).
         /// </summary>
-        public ButtonSystemState VisibleState = ButtonSystemState.TopLevel;
+        public ButtonSystemState VisibleState
+        {
+            set
+            {
+                VisibleStateMin = value;
+                VisibleStateMax = value;
+            }
+        }
+
+        public ButtonSystemState VisibleStateMin = ButtonSystemState.TopLevel;
+        public ButtonSystemState VisibleStateMax = ButtonSystemState.TopLevel;
 
         private readonly Action? clickAction;
         private Sample? sampleClick;
@@ -313,9 +323,9 @@ namespace osu.Game.Screens.Menu
                         break;
 
                     default:
-                        if (value == VisibleState)
+                        if (value <= VisibleStateMax && value >= VisibleStateMin)
                             State = ButtonState.Expanded;
-                        else if (value < VisibleState)
+                        else if (value < VisibleStateMin)
                             State = ButtonState.Contracted;
                         else
                             State = ButtonState.Exploded;

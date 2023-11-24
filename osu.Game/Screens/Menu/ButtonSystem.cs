@@ -107,12 +107,8 @@ namespace osu.Game.Screens.Menu
                 backButton = new MainMenuButton(ButtonSystemStrings.Back, @"back-to-top", OsuIcon.LeftCircle, new Color4(51, 58, 94, 255), () => State = ButtonSystemState.TopLevel,
                     -WEDGE_WIDTH)
                 {
-                    VisibleState = ButtonSystemState.Edit,
-                },
-                backButton = new MainMenuButton(ButtonSystemStrings.Back, @"back-to-top", OsuIcon.LeftCircle, new Color4(51, 58, 94, 255), () => State = ButtonSystemState.TopLevel,
-                    -WEDGE_WIDTH)
-                {
-                    VisibleState = ButtonSystemState.Play,
+                    VisibleStateMin = ButtonSystemState.Play,
+                    VisibleStateMax = ButtonSystemState.Edit,
                 },
                 logoTrackingContainer.LogoFacade.With(d => d.Scale = new Vector2(0.74f))
             });
