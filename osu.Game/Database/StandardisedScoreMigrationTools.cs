@@ -250,15 +250,14 @@ namespace osu.Game.Database
             long maximumLegacyComboScore = (long)Math.Round(attributes.ComboScore * legacyModMultiplier);
             double maximumLegacyBonusRatio = attributes.BonusScoreRatio;
             long maximumLegacyBonusScore = attributes.BonusScore;
-            int maximumLegacyCombo = attributes.MaxCombo;
 
+            double legacyAccScore = maximumLegacyAccuracyScore * score.Accuracy;
+            // We can not separate the ComboScore from the BonusScore, so we keep the bonus in the ratio.
+            double comboProportion =
+                ((double)score.LegacyTotalScore - legacyAccScore) / (maximumLegacyComboScore + maximumLegacyBonusScore);
+
+            // We assume the bonus proportion only makes up the rest of the score that exceeds maximumLegacyBaseScore.
             long maximumLegacyBaseScore = maximumLegacyAccuracyScore + maximumLegacyComboScore;
-            long maximumLegacyTotalScore = maximumLegacyBaseScore + maximumLegacyBonusScore;
-
-            // The combo proportion is calculated as a proportion of maximumLegacyTotalScore.
-            double comboProportion = (double)score.LegacyTotalScore / maximumLegacyTotalScore;
-
-            // The bonus proportion makes up the rest of the score that exceeds maximumLegacyBaseScore.
             double bonusProportion = Math.Max(0, ((long)score.LegacyTotalScore - maximumLegacyBaseScore) * maximumLegacyBonusRatio);
 
             double modMultiplier = score.Mods.Select(m => m.ScoreMultiplier).Aggregate(1.0, (c, n) => c * n);
@@ -288,6 +287,7 @@ namespace osu.Game.Database
                     // this can be roughly represented by summing / integrating f(combo) = combo.
                     // All mod- and beatmap-dependent multipliers and constants are not included here,
                     // as we will only be using the magnitude of this to compute ratios.
+                    int maximumLegacyCombo = attributes.MaxCombo;
                     double maximumAchievableComboPortionInScoreV1 = Math.Pow(maximumLegacyCombo, 2);
                     // Similarly, estimate the maximum magnitude of the combo portion in standardised score.
                     // Roughly corresponds to integrating f(combo) = combo ^ COMBO_EXPONENT (omitting constants)
