@@ -46,12 +46,12 @@ namespace osu.Game.Screens.Edit.Components.Menus
                     Padding = new MarginPadding(8),
                     Children = new Drawable[]
                     {
-                        new Sprite
+                        new SpriteIcon
                         {
                             Size = new Vector2(26),
                             Anchor = Anchor.CentreLeft,
                             Origin = Anchor.CentreLeft,
-                            Texture = textures.Get("Icons/Hexacons/editor"),
+                            Icon = HexaconsIcons.Editor,
                         },
                         text = new TextFlowContainer
                         {
