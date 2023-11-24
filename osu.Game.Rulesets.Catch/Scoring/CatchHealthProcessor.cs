@@ -5,7 +5,6 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using osu.Game.Beatmaps;
-using osu.Game.Beatmaps.Timing;
 using osu.Game.Rulesets.Catch.Objects;
 using osu.Game.Rulesets.Judgements;
 using osu.Game.Rulesets.Objects;
@@ -65,22 +64,16 @@ namespace osu.Game.Rulesets.Catch.Scoring
                 {
                     HitObject h = allObjects[i];
 
-                    double localLastTime = lastTime;
-                    double breakTime = 0;
-
-                    if (Beatmap.Breaks.Count > 0 && currentBreak < Beatmap.Breaks.Count)
+                    while (currentBreak < Beatmap.Breaks.Count && Beatmap.Breaks[currentBreak].EndTime <= h.StartTime)
                     {
-                        BreakPeriod e = Beatmap.Breaks[currentBreak];
-
-                        if (e.StartTime >= localLastTime && e.EndTime <= h.StartTime)
-                        {
-                            // consider break start equal to object end time for version 8+ since drain stops during this time
-                            breakTime = (Beatmap.BeatmapInfo.BeatmapVersion < 8) ? (e.EndTime - e.StartTime) : e.EndTime - localLastTime;
-                            currentBreak++;
-                        }
+                        // If two hitobjects are separated by a break period, there is no drain for the full duration between the hitobjects.
+                        // This differs from legacy (version < 8) beatmaps which continue draining until the break section is entered,
+                        // but this shouldn't have a noticeable impact in practice.
+                        lastTime = h.StartTime;
+                        currentBreak++;
                     }
 
-                    reduceHp(testDrop * (h.StartTime - lastTime - breakTime));
+                    reduceHp(testDrop * (h.StartTime - lastTime));
 
                     lastTime = h.GetEndTime();
 
