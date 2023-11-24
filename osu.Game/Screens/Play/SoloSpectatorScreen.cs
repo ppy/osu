@@ -164,27 +164,33 @@ namespace osu.Game.Screens.Play
             automaticDownload.Current.BindValueChanged(_ => checkForAutomaticDownload());
         }
 
-        protected override void OnNewPlayingUserState(int userId, SpectatorState spectatorState)
+        protected override void OnNewPlayingUserState(int userId, SpectatorState spectatorState) => Schedule(() =>
         {
             clearDisplay();
             showBeatmapPanel(spectatorState);
-        }
+        });
 
-        protected override void StartGameplay(int userId, SpectatorGameplayState spectatorGameplayState)
+        protected override void StartGameplay(int userId, SpectatorGameplayState spectatorGameplayState) => Schedule(() =>
         {
             immediateSpectatorGameplayState = spectatorGameplayState;
             watchButton.Enabled.Value = true;
 
             scheduleStart(spectatorGameplayState);
-        }
+        });
 
         protected override void QuitGameplay(int userId)
         {
-            scheduledStart?.Cancel();
-            immediateSpectatorGameplayState = null;
-            watchButton.Enabled.Value = false;
+            // Importantly, don't schedule this call, as a child screen may be present (and will cause the schedule to not be run as expected).
+            this.MakeCurrent();
 
-            clearDisplay();
+            Schedule(() =>
+            {
+                scheduledStart?.Cancel();
+                immediateSpectatorGameplayState = null;
+                watchButton.Enabled.Value = false;
+
+                clearDisplay();
+            });
         }
 
         private void clearDisplay()
