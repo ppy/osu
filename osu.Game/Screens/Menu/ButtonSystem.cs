@@ -338,6 +338,8 @@ namespace osu.Game.Screens.Menu
 
                 Logger.Log($"{nameof(ButtonSystem)}'s state changed from {lastState} to {state}");
 
+                buttonArea.FinishTransforms(true);
+
                 using (buttonArea.BeginDelayedSequence(lastState == ButtonSystemState.Initial ? 150 : 0))
                 {
                     buttonArea.ButtonSystemState = state;
