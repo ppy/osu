@@ -18,7 +18,7 @@ namespace osu.Game.Overlays.Chat
 {
     public partial class ChatOverlayTopBar : Container
     {
-        public Drawable DragBar = null!;
+        public Drawable DragBar { get; private set; } = null!;
 
         [BackgroundDependencyLoader]
         private void load(OverlayColourProvider colourProvider, TextureStore textures)
