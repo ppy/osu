@@ -46,7 +46,7 @@ namespace osu.Game.Online.Spectator
         public IBindableList<int> PlayingUsers => playingUsers;
 
         /// <summary>
-        /// Whether the spectated user is playing.
+        /// Whether the local user is playing.
         /// </summary>
         private bool isPlaying { get; set; }
 
