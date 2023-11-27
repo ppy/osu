@@ -1,8 +1,6 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
 using System.Threading.Tasks;
 using osu.Framework;
 using osu.Framework.Allocation;
@@ -21,17 +19,17 @@ namespace osu.Game.Overlays.Settings.Sections.General
 {
     public partial class UpdateSettings : SettingsSubsection
     {
-        [Resolved(CanBeNull = true)]
-        private UpdateManager updateManager { get; set; }
-
         protected override LocalisableString Header => GeneralSettingsStrings.UpdateHeader;
 
-        private SettingsButton checkForUpdatesButton;
+        private SettingsButton checkForUpdatesButton = null!;
 
-        [Resolved(CanBeNull = true)]
-        private INotificationOverlay notifications { get; set; }
+        [Resolved]
+        private UpdateManager? updateManager { get; set; }
 
-        [BackgroundDependencyLoader(true)]
+        [Resolved]
+        private INotificationOverlay? notifications { get; set; }
+
+        [BackgroundDependencyLoader]
         private void load(Storage storage, OsuConfigManager config, OsuGame game)
         {
             Add(new SettingsEnumDropdown<ReleaseStream>
@@ -77,7 +75,7 @@ namespace osu.Game.Overlays.Settings.Sections.General
                 Add(new SettingsButton
                 {
                     Text = GeneralSettingsStrings.ChangeFolderLocation,
-                    Action = () => game?.PerformFromScreen(menu => menu.Push(new MigrationSelectScreen()))
+                    Action = () => game.PerformFromScreen(menu => menu.Push(new MigrationSelectScreen()))
                 });
             }
         }
