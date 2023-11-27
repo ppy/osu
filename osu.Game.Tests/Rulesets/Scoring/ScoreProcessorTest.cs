@@ -47,17 +47,26 @@ namespace osu.Game.Tests.Rulesets.Scoring
             };
         }
 
-        [TestCase(ScoringMode.Standardised, HitResult.Meh, 116_667)]
-        [TestCase(ScoringMode.Standardised, HitResult.Ok, 233_338)]
-        [TestCase(ScoringMode.Standardised, HitResult.Great, 1_000_000)]
-        [TestCase(ScoringMode.Classic, HitResult.Meh, 11_670)]
-        [TestCase(ScoringMode.Classic, HitResult.Ok, 23_341)]
-        [TestCase(ScoringMode.Classic, HitResult.Great, 100_033)]
-        public void TestSingleOsuHit(ScoringMode scoringMode, HitResult hitResult, int expectedScore)
+        [TestCase(ScoringMode.Standardised, HitResult.Meh, 116_667, false)]
+        [TestCase(ScoringMode.Standardised, HitResult.Ok, 233_338, false)]
+        [TestCase(ScoringMode.Standardised, HitResult.Great, 1_000_000, false)]
+        [TestCase(ScoringMode.Classic, HitResult.Meh, 11_670, false)]
+        [TestCase(ScoringMode.Classic, HitResult.Ok, 23_341, false)]
+        [TestCase(ScoringMode.Classic, HitResult.Great, 100_033, false)]
+        [TestCase(ScoringMode.Standardised, HitResult.LegacyMehNoCombo, 116_667, true)]
+        [TestCase(ScoringMode.Standardised, HitResult.LegacyOkNoCombo, 233_338, true)]
+        [TestCase(ScoringMode.Standardised, HitResult.LegacyGreatNoCombo, 1_000_000, true)]
+        public void TestSingleOsuHit(ScoringMode scoringMode, HitResult hitResult, int expectedScore, bool isSlider)
         {
-            scoreProcessor.ApplyBeatmap(beatmap);
+            scoreProcessor.ApplyBeatmap(new TestBeatmap(new RulesetInfo())
+            {
+                HitObjects = new List<HitObject>
+                {
+                    new TestHitObject(isSlider ? new Slider().CreateJudgement().MaxResult : new HitCircle().CreateJudgement().MaxResult)
+                }
+            });
 
-            var judgementResult = new JudgementResult(beatmap.HitObjects.Single(), new OsuJudgement())
+            var judgementResult = new JudgementResult(beatmap.HitObjects.Single(), isSlider ? new Slider().CreateJudgement() : new HitCircle().CreateJudgement())
             {
                 Type = hitResult
             };

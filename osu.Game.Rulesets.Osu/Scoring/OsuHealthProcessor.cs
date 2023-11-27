@@ -1,6 +1,8 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#pragma warning disable CS0618 // Type or member is obsolete
+
 using System.Collections.Generic;
 using System.Linq;
 using osu.Game.Beatmaps;
@@ -62,14 +64,17 @@ namespace osu.Game.Rulesets.Osu.Scoring
                     increase = hitObject is SliderTick ? 0.015 : 0.02;
                     break;
 
+                case HitResult.LegacyMehNoCombo:
                 case HitResult.Meh:
                     increase = 0.002;
                     break;
 
+                case HitResult.LegacyOkNoCombo:
                 case HitResult.Ok:
                     increase = 0.011;
                     break;
 
+                case HitResult.LegacyGreatNoCombo:
                 case HitResult.Great:
                     increase = 0.03;
                     break;

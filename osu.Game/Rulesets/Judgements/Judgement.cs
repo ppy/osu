@@ -1,6 +1,8 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#pragma warning disable CS0618 // Type or member is obsolete
+
 using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Scoring;
 
@@ -135,15 +137,18 @@ namespace osu.Game.Rulesets.Judgements
                 case HitResult.Miss:
                     return -DEFAULT_MAX_HEALTH_INCREASE * 2;
 
+                case HitResult.LegacyMehNoCombo:
                 case HitResult.Meh:
                     return DEFAULT_MAX_HEALTH_INCREASE * 0.05;
 
+                case HitResult.LegacyOkNoCombo:
                 case HitResult.Ok:
                     return DEFAULT_MAX_HEALTH_INCREASE * 0.5;
 
                 case HitResult.Good:
                     return DEFAULT_MAX_HEALTH_INCREASE * 0.75;
 
+                case HitResult.LegacyGreatNoCombo:
                 case HitResult.Great:
                     return DEFAULT_MAX_HEALTH_INCREASE;
 
@@ -180,15 +185,18 @@ namespace osu.Game.Rulesets.Judgements
                 case HitResult.LargeTickHit:
                     return 30;
 
+                case HitResult.LegacyMehNoCombo:
                 case HitResult.Meh:
                     return 50;
 
+                case HitResult.LegacyOkNoCombo:
                 case HitResult.Ok:
                     return 100;
 
                 case HitResult.Good:
                     return 200;
 
+                case HitResult.LegacyGreatNoCombo:
                 case HitResult.Great:
                 // Perfect doesn't actually give more score / accuracy directly.
                 case HitResult.Perfect:
