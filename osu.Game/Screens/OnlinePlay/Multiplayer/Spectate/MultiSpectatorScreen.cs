@@ -244,6 +244,11 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Spectate
             playerArea.LoadScore(spectatorGameplayState.Score);
         });
 
+        protected override void FailGameplay(int userId)
+        {
+            // We probably want to visualise this in the future.
+        }
+
         protected override void QuitGameplay(int userId) => Schedule(() =>
         {
             RemoveUser(userId);

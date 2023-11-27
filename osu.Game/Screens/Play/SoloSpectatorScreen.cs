@@ -178,20 +178,33 @@ namespace osu.Game.Screens.Play
             scheduleStart(spectatorGameplayState);
         });
 
+        protected override void FailGameplay(int userId)
+        {
+            if (this.GetChildScreen() is SpectatorPlayerLoader loader)
+            {
+                if (loader.GetChildScreen() is SpectatorPlayer player)
+                {
+                    player.AllowFail();
+                    resetStartState();
+                }
+                else
+                    QuitGameplay(userId);
+            }
+        }
+
         protected override void QuitGameplay(int userId)
         {
             // Importantly, don't schedule this call, as a child screen may be present (and will cause the schedule to not be run as expected).
             this.MakeCurrent();
-
-            Schedule(() =>
-            {
-                scheduledStart?.Cancel();
-                immediateSpectatorGameplayState = null;
-                watchButton.Enabled.Value = false;
-
-                clearDisplay();
-            });
+            resetStartState();
         }
+
+        private void resetStartState() => Schedule(() =>
+        {
+            scheduledStart?.Cancel();
+            immediateSpectatorGameplayState = null;
+            clearDisplay();
+        });
 
         private void clearDisplay()
         {
