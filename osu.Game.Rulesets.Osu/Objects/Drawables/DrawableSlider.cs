@@ -267,37 +267,30 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
             SliderBody?.RecyclePath();
         }
 
+#pragma warning disable CS0618 // Type or member is obsolete
         protected override void CheckForResult(bool userTriggered, double timeOffset)
         {
             if (userTriggered || !TailCircle.Judged || Time.Current < HitObject.EndTime)
                 return;
 
-            if (HitObject.ClassicSliderBehaviour)
+            // Classic behaviour means a slider is judged proportionally to the number of nested hitobjects hit. This is the classic osu!stable scoring.
+            ApplyResult(r =>
             {
-                // Classic behaviour means a slider is judged proportionally to the number of nested hitobjects hit. This is the classic osu!stable scoring.
-                ApplyResult(r =>
-                {
-                    int totalTicks = NestedHitObjects.Count;
-                    int hitTicks = NestedHitObjects.Count(h => h.IsHit);
+                int totalTicks = NestedHitObjects.Count;
+                int hitTicks = NestedHitObjects.Count(h => h.IsHit);
 
-                    if (hitTicks == totalTicks)
-                        r.Type = HitResult.Great;
-                    else if (hitTicks == 0)
-                        r.Type = HitResult.Miss;
-                    else
-                    {
-                        double hitFraction = (double)hitTicks / totalTicks;
-                        r.Type = hitFraction >= 0.5 ? HitResult.Ok : HitResult.Meh;
-                    }
-                });
-            }
-            else
-            {
-                // If only the nested hitobjects are judged, then the slider's own judgement is ignored for scoring purposes.
-                // But the slider needs to still be judged with a reasonable hit/miss result for visual purposes (hit/miss transforms, etc).
-                ApplyResult(r => r.Type = NestedHitObjects.Any(h => h.Result.IsHit) ? r.Judgement.MaxResult : r.Judgement.MinResult);
-            }
+                if (hitTicks == totalTicks)
+                    r.Type = HitResult.LegacyGreatNoCombo;
+                else if (hitTicks == 0)
+                    r.Type = HitResult.Miss;
+                else
+                {
+                    double hitFraction = (double)hitTicks / totalTicks;
+                    r.Type = hitFraction >= 0.5 ? HitResult.LegacyOkNoCombo : HitResult.LegacyMehNoCombo;
+                }
+            });
         }
+#pragma warning restore CS0618 // Type or member is obsolete
 
         public override void PlaySamples()
         {

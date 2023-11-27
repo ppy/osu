@@ -9,25 +9,14 @@ namespace osu.Game.Rulesets.Osu.Objects
 {
     public class SliderTailCircle : SliderEndCircle
     {
-        /// <summary>
-        /// Whether to treat this <see cref="SliderHeadCircle"/> as a normal <see cref="HitCircle"/> for judgement purposes.
-        /// If <c>false</c>, this <see cref="SliderHeadCircle"/> will be judged as a <see cref="SliderTick"/> instead.
-        /// </summary>
-        public bool ClassicSliderBehaviour;
-
         public SliderTailCircle(Slider slider)
             : base(slider)
         {
         }
 
-        public override Judgement CreateJudgement() => ClassicSliderBehaviour ? new LegacyTailJudgement() : new TailJudgement();
+        public override Judgement CreateJudgement() => new TailJudgement();
 
-        public class LegacyTailJudgement : OsuJudgement
-        {
-            public override HitResult MaxResult => HitResult.SmallTickHit;
-        }
-
-        public class TailJudgement : SliderEndJudgement
+        private class TailJudgement : OsuJudgement
         {
             public override HitResult MaxResult => HitResult.LargeTickHit;
             public override HitResult MinResult => HitResult.IgnoreMiss;
