@@ -10,6 +10,11 @@ namespace osu.Game.Localisation
         private const string prefix = @"osu.Game.Resources.Localisation.Editor";
 
         /// <summary>
+        /// "Beatmap editor"
+        /// </summary>
+        public static LocalisableString BeatmapEditor => new TranslatableString(getKey(@"beatmap_editor"), @"Beatmap editor");
+
+        /// <summary>
         /// "Waveform opacity"
         /// </summary>
         public static LocalisableString WaveformOpacity => new TranslatableString(getKey(@"waveform_opacity"), @"Waveform opacity");
