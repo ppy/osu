@@ -29,7 +29,7 @@ namespace osu.Game.Overlays.SkinEditor
         private IPerformFromScreenRunner? performer { get; set; }
 
         [Resolved]
-        private SkinEditorOverlay skinEditorOverlay { get; set; } = null!;
+        private SkinEditorOverlay? skinEditorOverlay { get; set; }
 
         public SkinEditorSceneLibrary()
         {
@@ -86,7 +86,7 @@ namespace osu.Game.Overlays.SkinEditor
                                     Text = SkinEditorStrings.Gameplay,
                                     Anchor = Anchor.CentreLeft,
                                     Origin = Anchor.CentreLeft,
-                                    Action = () => skinEditorOverlay.PresentGameplay(),
+                                    Action = () => skinEditorOverlay?.PresentGameplay(),
                                 },
                             }
                         },
