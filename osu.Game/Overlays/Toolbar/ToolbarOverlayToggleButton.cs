@@ -39,7 +39,7 @@ namespace osu.Game.Overlays.Toolbar
                 {
                     TooltipMain = named.Title;
                     TooltipSub = named.Description;
-                    SetIcon(named.IconTexture);
+                    SetIcon(named.Icon);
                 }
             }
         }

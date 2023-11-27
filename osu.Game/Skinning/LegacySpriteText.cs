@@ -63,7 +63,7 @@ namespace osu.Game.Skinning
                 this.maxSize = maxSize;
             }
 
-            public ITexturedCharacterGlyph? Get(string fontName, char character)
+            public ITexturedCharacterGlyph? Get(string? fontName, char character)
             {
                 string lookup = getLookupName(character);
 

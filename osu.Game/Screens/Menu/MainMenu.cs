@@ -25,6 +25,7 @@ using osu.Game.Input.Bindings;
 using osu.Game.IO;
 using osu.Game.Online.API;
 using osu.Game.Overlays;
+using osu.Game.Overlays.SkinEditor;
 using osu.Game.Rulesets;
 using osu.Game.Screens.Backgrounds;
 using osu.Game.Screens.Edit;
@@ -93,6 +94,9 @@ namespace osu.Game.Screens.Menu
 
         private Sample reappearSampleSwoosh;
 
+        [Resolved(canBeNull: true)]
+        private SkinEditorOverlay skinEditor { get; set; }
+
         [BackgroundDependencyLoader(true)]
         private void load(BeatmapListingOverlay beatmapListing, SettingsOverlay settings, OsuConfigManager config, SessionStatics statics, AudioManager audio)
         {
@@ -120,10 +124,14 @@ namespace osu.Game.Screens.Menu
                     {
                         Buttons = new ButtonSystem
                         {
-                            OnEdit = delegate
+                            OnEditBeatmap = () =>
                             {
                                 Beatmap.SetDefault();
                                 this.Push(new EditorLoader());
+                            },
+                            OnEditSkin = () =>
+                            {
+                                skinEditor?.Show();
                             },
                             OnSolo = loadSoloSongSelect,
                             OnMultiplayer = () => this.Push(new Multiplayer()),
