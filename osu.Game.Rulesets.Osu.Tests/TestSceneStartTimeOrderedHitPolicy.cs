@@ -2,6 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 #nullable disable
+#pragma warning disable CS0618 // Type or member is obsolete
 
 using System;
 using System.Collections.Generic;
@@ -211,7 +212,7 @@ namespace osu.Game.Rulesets.Osu.Tests
             });
 
             addJudgementAssert(hitObjects[0], HitResult.Great);
-            addJudgementAssert(hitObjects[1], HitResult.IgnoreHit);
+            addJudgementAssert(hitObjects[1], HitResult.LegacyOkNoCombo);
             addJudgementAssert("slider head", () => ((Slider)hitObjects[1]).HeadCircle, HitResult.Miss);
             addJudgementAssert("slider tick", () => ((Slider)hitObjects[1]).NestedHitObjects[1] as SliderTick, HitResult.LargeTickHit);
         }
@@ -254,7 +255,7 @@ namespace osu.Game.Rulesets.Osu.Tests
             });
 
             addJudgementAssert(hitObjects[0], HitResult.Great);
-            addJudgementAssert(hitObjects[1], HitResult.IgnoreHit);
+            addJudgementAssert(hitObjects[1], HitResult.LegacyGreatNoCombo);
             addJudgementAssert("slider head", () => ((Slider)hitObjects[1]).HeadCircle, HitResult.Great);
             addJudgementAssert("slider tick", () => ((Slider)hitObjects[1]).NestedHitObjects[1] as SliderTick, HitResult.LargeTickHit);
         }
@@ -334,7 +335,7 @@ namespace osu.Game.Rulesets.Osu.Tests
             });
 
             addJudgementAssert(hitObjects[0], HitResult.Great);
-            addJudgementAssert(hitObjects[1], HitResult.IgnoreHit);
+            addJudgementAssert(hitObjects[1], HitResult.LegacyGreatNoCombo);
         }
 
         [Test]
@@ -385,8 +386,10 @@ namespace osu.Game.Rulesets.Osu.Tests
 
         private void addJudgementAssert(OsuHitObject hitObject, HitResult result)
         {
-            AddAssert($"({hitObject.GetType().ReadableName()} @ {hitObject.StartTime}) judgement is {result}",
-                () => judgementResults.Single(r => r.HitObject == hitObject).Type == result);
+            AddAssert(
+                $"check ({hitObject.GetType().ReadableName()} judgement @ {hitObject.StartTime})",
+                () => judgementResults.Single(r => r.HitObject == hitObject).Type,
+                () => Is.EqualTo(result));
         }
 
         private void addJudgementAssert(string name, Func<OsuHitObject> hitObject, HitResult result)

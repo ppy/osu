@@ -1,6 +1,8 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#pragma warning disable CS0618 // Type or member is obsolete
+
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -279,8 +281,8 @@ namespace osu.Game.Rulesets.Osu.Tests
             });
 
             addJudgementAssert(hitObjects[0], HitResult.Great);
-            addJudgementAssert(hitObjects[1], HitResult.Great);
-            addJudgementAssert("slider head", () => ((Slider)hitObjects[1]).HeadCircle, HitResult.LargeTickHit);
+            addJudgementAssert(hitObjects[1], HitResult.LegacyGreatNoCombo);
+            addJudgementAssert("slider head", () => ((Slider)hitObjects[1]).HeadCircle, HitResult.Great);
             addJudgementAssert("slider tick", () => ((Slider)hitObjects[1]).NestedHitObjects[1] as SliderTick, HitResult.LargeTickHit);
             addClickActionAssert(0, ClickAction.Hit);
             addClickActionAssert(1, ClickAction.Hit);
@@ -324,8 +326,8 @@ namespace osu.Game.Rulesets.Osu.Tests
             });
 
             addJudgementAssert(hitObjects[0], HitResult.Ok);
-            addJudgementAssert(hitObjects[1], HitResult.Great);
-            addJudgementAssert("slider head", () => ((Slider)hitObjects[1]).HeadCircle, HitResult.LargeTickHit);
+            addJudgementAssert(hitObjects[1], HitResult.LegacyGreatNoCombo);
+            addJudgementAssert("slider head", () => ((Slider)hitObjects[1]).HeadCircle, HitResult.Great);
             addJudgementAssert("slider tick", () => ((Slider)hitObjects[1]).NestedHitObjects[1] as SliderTick, HitResult.LargeTickHit);
             addClickActionAssert(0, ClickAction.Hit);
             addClickActionAssert(1, ClickAction.Hit);
@@ -407,7 +409,7 @@ namespace osu.Game.Rulesets.Osu.Tests
             });
 
             addJudgementAssert(hitObjects[0], HitResult.Great);
-            addJudgementAssert(hitObjects[1], HitResult.Great);
+            addJudgementAssert(hitObjects[1], HitResult.LegacyGreatNoCombo);
             addClickActionAssert(0, ClickAction.Shake);
             addClickActionAssert(1, ClickAction.Hit);
             addClickActionAssert(2, ClickAction.Hit);
@@ -454,8 +456,8 @@ namespace osu.Game.Rulesets.Osu.Tests
                 new OsuReplayFrame { Time = time_second_slider, Position = positionSecondSlider + new Vector2(0, 10), Actions = { OsuAction.LeftButton } },
             });
 
-            addJudgementAssert(hitObjects[0], HitResult.Ok);
-            addJudgementAssert(hitObjects[1], HitResult.Great);
+            addJudgementAssert(hitObjects[0], HitResult.LegacyOkNoCombo);
+            addJudgementAssert(hitObjects[1], HitResult.LegacyGreatNoCombo);
             addClickActionAssert(0, ClickAction.Hit);
             addClickActionAssert(1, ClickAction.Hit);
         }
@@ -546,7 +548,7 @@ namespace osu.Game.Rulesets.Osu.Tests
                 new OsuReplayFrame { Time = time_first_slider + 50, Position = midpoint },
             });
 
-            addJudgementAssert(hitObjects[0], HitResult.Ok);
+            addJudgementAssert(hitObjects[0], HitResult.LegacyOkNoCombo);
             addJudgementOffsetAssert("first slider head", () => ((Slider)hitObjects[0]).HeadCircle, 0);
             addJudgementAssert(hitObjects[1], HitResult.Miss);
             // the slider head of the first slider prevents the second slider's head from being hit, so the judgement offset should be very late.
@@ -600,9 +602,9 @@ namespace osu.Game.Rulesets.Osu.Tests
                 new OsuReplayFrame { Time = time_second_slider + 75, Position = midpoint },
             });
 
-            addJudgementAssert(hitObjects[0], HitResult.Ok);
+            addJudgementAssert(hitObjects[0], HitResult.LegacyOkNoCombo);
             addJudgementOffsetAssert("first slider head", () => ((Slider)hitObjects[0]).HeadCircle, 0);
-            addJudgementAssert(hitObjects[1], HitResult.Ok);
+            addJudgementAssert(hitObjects[1], HitResult.LegacyOkNoCombo);
             addJudgementOffsetAssert("second slider head", () => ((Slider)hitObjects[1]).HeadCircle, 50);
             addClickActionAssert(0, ClickAction.Hit);
             addClickActionAssert(1, ClickAction.Hit);

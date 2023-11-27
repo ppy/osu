@@ -2,6 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 #nullable disable
+#pragma warning disable CS0618 // Type or member is obsolete
 
 using System;
 using System.Collections.Generic;
@@ -69,6 +70,9 @@ namespace osu.Game.Rulesets.Osu.UI
             var hitWindows = new OsuHitWindows();
             foreach (var result in Enum.GetValues<HitResult>().Where(r => r > HitResult.None && hitWindows.IsHitResultAllowed(r)))
                 poolDictionary.Add(result, new DrawableJudgementPool(result, onJudgementLoaded));
+            poolDictionary.Add(HitResult.LegacyGreatNoCombo, new DrawableJudgementPool(HitResult.LegacyGreatNoCombo, onJudgementLoaded));
+            poolDictionary.Add(HitResult.LegacyOkNoCombo, new DrawableJudgementPool(HitResult.LegacyOkNoCombo, onJudgementLoaded));
+            poolDictionary.Add(HitResult.LegacyMehNoCombo, new DrawableJudgementPool(HitResult.LegacyMehNoCombo, onJudgementLoaded));
 
             AddRangeInternal(poolDictionary.Values);
 
