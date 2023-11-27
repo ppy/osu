@@ -110,6 +110,5 @@ namespace osu.Game.Overlays.SkinEditor
                 Content.CornerRadius = 5;
             }
         }
-
     }
 }
