@@ -165,10 +165,22 @@ namespace osu.Game.Screens.Play
             spectatorClient.BeginPlaying(token, GameplayState, Score);
         }
 
+        protected override void OnFail()
+        {
+            base.OnFail();
+
+            submitFromFailOrQuit();
+        }
+
         public override bool OnExiting(ScreenExitEvent e)
         {
             bool exiting = base.OnExiting(e);
+            submitFromFailOrQuit();
+            return exiting;
+        }
 
+        private void submitFromFailOrQuit()
+        {
             if (LoadedBeatmapSuccessfully)
             {
                 Task.Run(async () =>
@@ -177,8 +189,6 @@ namespace osu.Game.Screens.Play
                     spectatorClient.EndPlaying(GameplayState);
                 }).FireAndForget();
             }
-
-            return exiting;
         }
 
         /// <summary>
