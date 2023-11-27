@@ -14,6 +14,7 @@ using osu.Game.Localisation;
 using osu.Game.Overlays.Notifications;
 using osu.Game.Overlays.Settings.Sections.Maintenance;
 using osu.Game.Updater;
+using SharpCompress.Archives.Zip;
 
 namespace osu.Game.Overlays.Settings.Sections.General
 {
@@ -70,6 +71,29 @@ namespace osu.Game.Overlays.Settings.Sections.General
                     Text = GeneralSettingsStrings.OpenOsuFolder,
                     Keywords = new[] { @"logs", @"files", @"access", "directory" },
                     Action = () => storage.PresentExternally(),
+                });
+
+                Add(new SettingsButton
+                {
+                    Text = "Compress log files",
+                    Keywords = new[] { @"bug", "report", "logs" },
+                    Action = () =>
+                    {
+                        var logStorage = storage.GetStorageForDirectory(@"logs");
+
+                        const string archive_filename = "exports/compressed-logs.zip";
+
+                        using (var outStream = storage.CreateFileSafely(archive_filename))
+                        using (var zip = ZipArchive.Create())
+                        {
+                            foreach (string? f in logStorage.GetFiles(string.Empty, "*.log"))
+                                zip.AddEntry(f, logStorage.GetStream(f), true);
+
+                            zip.SaveTo(outStream);
+                        }
+
+                        storage.PresentFileExternally(archive_filename);
+                    },
                 });
 
                 Add(new SettingsButton
