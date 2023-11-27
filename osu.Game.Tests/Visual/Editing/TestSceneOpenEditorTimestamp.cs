@@ -35,7 +35,7 @@ namespace osu.Game.Tests.Visual.Editing
                 () => Game.Notifications.AllNotifications.Count(x => x.Text == EditorStrings.MustBeInEditorToHandleLinks),
                 () => Is.EqualTo(1));
 
-            AddStep("enter song select", () => Game.ChildrenOfType<ButtonSystem>().Single().OnSolo.Invoke());
+            AddStep("enter song select", () => Game.ChildrenOfType<ButtonSystem>().Single().OnSolo?.Invoke());
             AddUntilStep("entered song select", () => Game.ScreenStack.CurrentScreen is PlaySongSelect);
 
             addStepClickLink("00:00:000 (1)", waitForSeek: false);
