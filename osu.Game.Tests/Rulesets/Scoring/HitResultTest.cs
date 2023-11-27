@@ -1,6 +1,8 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#pragma warning disable CS0618 // Type or member is obsolete
+
 using System;
 using System.Linq;
 using NUnit.Framework;
@@ -16,6 +18,7 @@ namespace osu.Game.Tests.Rulesets.Scoring
         [TestCase(new[] { HitResult.SmallTickHit }, new[] { HitResult.SmallTickMiss, HitResult.IgnoreMiss })]
         [TestCase(new[] { HitResult.LargeBonus, HitResult.SmallBonus }, new[] { HitResult.IgnoreMiss })]
         [TestCase(new[] { HitResult.IgnoreHit }, new[] { HitResult.IgnoreMiss, HitResult.ComboBreak })]
+        [TestCase(new[] { HitResult.LegacyGreatNoCombo, HitResult.LegacyOkNoCombo, HitResult.LegacyMehNoCombo }, new[] { HitResult.Miss, HitResult.IgnoreMiss })]
         public void TestValidResultPairs(HitResult[] maxResults, HitResult[] minResults)
         {
             HitResult[] unsupportedResults = HitResultExtensions.ALL_TYPES.Where(t => !minResults.Contains(t)).ToArray();

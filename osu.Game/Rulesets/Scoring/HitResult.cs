@@ -146,7 +146,31 @@ namespace osu.Game.Rulesets.Scoring
         [EnumMember(Value = "legacy_combo_increase")]
         [Order(99)]
         [Obsolete("Do not use.")]
-        LegacyComboIncrease = 99
+        LegacyComboIncrease = 99,
+
+        /// <summary>
+        /// Special result for legacy rulesets that provide a <see cref="Meh"/> judgement that does not increase combo.
+        /// </summary>
+        [EnumMember(Value = "legacy_meh_no_combo")]
+        [Order(100)]
+        [Obsolete("Do not use.")]
+        LegacyMehNoCombo = 100,
+
+        /// <summary>
+        /// Special result for legacy rulesets that provide an <see cref="Ok"/> judgement that does not increase combo.
+        /// </summary>
+        [EnumMember(Value = "legacy_ok_no_combo")]
+        [Order(100)]
+        [Obsolete("Do not use.")]
+        LegacyOkNoCombo = 101,
+
+        /// <summary>
+        /// Special result for legacy rulesets that provide a <see cref="Great"/> judgement that does not increase combo.
+        /// </summary>
+        [EnumMember(Value = "legacy_great_no_combo")]
+        [Order(100)]
+        [Obsolete("Do not use.")]
+        LegacyGreatNoCombo = 102
     }
 
 #pragma warning disable CS0618
@@ -297,6 +321,12 @@ namespace osu.Game.Rulesets.Scoring
 
                 // ComboBreak is its own type that affects score via combo.
                 case HitResult.ComboBreak:
+                    return true;
+
+                // Special single-use legacy types that fall outside the standard valid range.
+                case HitResult.LegacyMehNoCombo:
+                case HitResult.LegacyOkNoCombo:
+                case HitResult.LegacyGreatNoCombo:
                     return true;
 
                 default:

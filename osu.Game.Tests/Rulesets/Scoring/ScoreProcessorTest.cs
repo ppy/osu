@@ -1,6 +1,8 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#pragma warning disable CS0618
+
 #nullable disable
 
 using System;
@@ -169,6 +171,9 @@ namespace osu.Game.Tests.Rulesets.Scoring
         [TestCase(HitResult.LargeTickHit, HitResult.LargeTickMiss)]
         [TestCase(HitResult.SmallBonus, HitResult.IgnoreMiss)]
         [TestCase(HitResult.LargeBonus, HitResult.IgnoreMiss)]
+        [TestCase(HitResult.LegacyMehNoCombo, HitResult.Miss)]
+        [TestCase(HitResult.LegacyOkNoCombo, HitResult.Miss)]
+        [TestCase(HitResult.LegacyGreatNoCombo, HitResult.Miss)]
         public void TestMinResults(HitResult hitResult, HitResult expectedMinResult)
         {
             Assert.AreEqual(expectedMinResult, new TestJudgement(hitResult).MinResult);
@@ -189,6 +194,9 @@ namespace osu.Game.Tests.Rulesets.Scoring
         [TestCase(HitResult.LargeTickHit, true)]
         [TestCase(HitResult.SmallBonus, false)]
         [TestCase(HitResult.LargeBonus, false)]
+        [TestCase(HitResult.LegacyMehNoCombo, false)]
+        [TestCase(HitResult.LegacyOkNoCombo, false)]
+        [TestCase(HitResult.LegacyGreatNoCombo, false)]
         public void TestAffectsCombo(HitResult hitResult, bool expectedReturnValue)
         {
             Assert.AreEqual(expectedReturnValue, hitResult.AffectsCombo());
@@ -209,6 +217,9 @@ namespace osu.Game.Tests.Rulesets.Scoring
         [TestCase(HitResult.LargeTickHit, true)]
         [TestCase(HitResult.SmallBonus, false)]
         [TestCase(HitResult.LargeBonus, false)]
+        [TestCase(HitResult.LegacyMehNoCombo, true)]
+        [TestCase(HitResult.LegacyOkNoCombo, true)]
+        [TestCase(HitResult.LegacyGreatNoCombo, true)]
         public void TestAffectsAccuracy(HitResult hitResult, bool expectedReturnValue)
         {
             Assert.AreEqual(expectedReturnValue, hitResult.AffectsAccuracy());
@@ -229,6 +240,9 @@ namespace osu.Game.Tests.Rulesets.Scoring
         [TestCase(HitResult.LargeTickHit, false)]
         [TestCase(HitResult.SmallBonus, true)]
         [TestCase(HitResult.LargeBonus, true)]
+        [TestCase(HitResult.LegacyMehNoCombo, false)]
+        [TestCase(HitResult.LegacyOkNoCombo, false)]
+        [TestCase(HitResult.LegacyGreatNoCombo, false)]
         public void TestIsBonus(HitResult hitResult, bool expectedReturnValue)
         {
             Assert.AreEqual(expectedReturnValue, hitResult.IsBonus());
@@ -249,6 +263,9 @@ namespace osu.Game.Tests.Rulesets.Scoring
         [TestCase(HitResult.LargeTickHit, true)]
         [TestCase(HitResult.SmallBonus, true)]
         [TestCase(HitResult.LargeBonus, true)]
+        [TestCase(HitResult.LegacyMehNoCombo, true)]
+        [TestCase(HitResult.LegacyOkNoCombo, true)]
+        [TestCase(HitResult.LegacyGreatNoCombo, true)]
         public void TestIsHit(HitResult hitResult, bool expectedReturnValue)
         {
             Assert.AreEqual(expectedReturnValue, hitResult.IsHit());
@@ -269,12 +286,14 @@ namespace osu.Game.Tests.Rulesets.Scoring
         [TestCase(HitResult.LargeTickHit, true)]
         [TestCase(HitResult.SmallBonus, true)]
         [TestCase(HitResult.LargeBonus, true)]
+        [TestCase(HitResult.LegacyMehNoCombo, true)]
+        [TestCase(HitResult.LegacyOkNoCombo, true)]
+        [TestCase(HitResult.LegacyGreatNoCombo, true)]
         public void TestIsScorable(HitResult hitResult, bool expectedReturnValue)
         {
             Assert.AreEqual(expectedReturnValue, hitResult.IsScorable());
         }
 
-#pragma warning disable CS0618
         [Test]
         public void TestLegacyComboIncrease()
         {
@@ -289,7 +308,6 @@ namespace osu.Game.Tests.Rulesets.Scoring
             Assert.That(HitResult.LegacyComboIncrease.IsScorable(), Is.True);
             Assert.That(HitResultExtensions.ALL_TYPES, Does.Not.Contain(HitResult.LegacyComboIncrease));
         }
-#pragma warning restore CS0618
 
         [Test]
         public void TestComboBreak()
