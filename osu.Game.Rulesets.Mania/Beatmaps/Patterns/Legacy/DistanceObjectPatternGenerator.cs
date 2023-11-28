@@ -60,8 +60,15 @@ namespace osu.Game.Rulesets.Mania.Beatmaps.Patterns.Legacy
             SpanCount = repeatsData?.SpanCount() ?? 1;
             StartTime = (int)Math.Round(hitObject.StartTime);
 
+            double distance;
+
+            if (hitObject is IHasPath pathData)
+                distance = pathData.Path.ExpectedDistance.Value ?? 0;
+            else
+                distance = distanceData.Distance;
+
             // This matches stable's calculation.
-            EndTime = (int)Math.Floor(StartTime + distanceData.Distance * beatLength * SpanCount * 0.01 / beatmap.Difficulty.SliderMultiplier);
+            EndTime = (int)Math.Floor(StartTime + distance * beatLength * SpanCount * 0.01 / beatmap.Difficulty.SliderMultiplier);
 
             SegmentDuration = (EndTime - StartTime) / SpanCount;
         }
