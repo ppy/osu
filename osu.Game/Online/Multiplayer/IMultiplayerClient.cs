@@ -13,7 +13,7 @@ namespace osu.Game.Online.Multiplayer
     /// <summary>
     /// An interface defining a multiplayer client instance.
     /// </summary>
-    public interface IMultiplayerClient
+    public interface IMultiplayerClient : IStatefulUserHubClient
     {
         /// <summary>
         /// Signals that the room has changed state.
