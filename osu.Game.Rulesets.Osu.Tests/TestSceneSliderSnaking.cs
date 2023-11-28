@@ -217,7 +217,7 @@ namespace osu.Game.Rulesets.Osu.Tests
             {
                 StartTime = 3000,
                 Position = new Vector2(100, 100),
-                Path = new SliderPath(PathType.PerfectCurve, new[]
+                Path = new SliderPath(PathType.PERFECT_CURVE, new[]
                 {
                     Vector2.Zero,
                     new Vector2(300, 200)
@@ -227,7 +227,7 @@ namespace osu.Game.Rulesets.Osu.Tests
             {
                 StartTime = 13000,
                 Position = new Vector2(100, 100),
-                Path = new SliderPath(PathType.PerfectCurve, new[]
+                Path = new SliderPath(PathType.PERFECT_CURVE, new[]
                 {
                     Vector2.Zero,
                     new Vector2(300, 200)
@@ -238,7 +238,7 @@ namespace osu.Game.Rulesets.Osu.Tests
             {
                 StartTime = 23000,
                 Position = new Vector2(100, 100),
-                Path = new SliderPath(PathType.PerfectCurve, new[]
+                Path = new SliderPath(PathType.PERFECT_CURVE, new[]
                 {
                     Vector2.Zero,
                     new Vector2(300, 200)

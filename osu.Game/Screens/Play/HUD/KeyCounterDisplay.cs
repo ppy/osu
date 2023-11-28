@@ -4,6 +4,7 @@
 using System.Collections.Specialized;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
+using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Game.Configuration;
 using osu.Game.Rulesets.UI;
@@ -31,13 +32,27 @@ namespace osu.Game.Screens.Play.HUD
         [Resolved]
         private InputCountController controller { get; set; } = null!;
 
-        protected abstract void UpdateVisibility();
+        private const int duration = 100;
+
+        protected void UpdateVisibility()
+        {
+            bool visible = AlwaysVisible.Value || ConfigVisibility.Value;
+
+            // Isolate changing visibility of the key counters from fading this component.
+            KeyFlow.FadeTo(visible ? 1 : 0, duration);
+
+            // Ensure a valid size is immediately obtained even if partially off-screen
+            // See https://github.com/ppy/osu/issues/14793.
+            KeyFlow.AlwaysPresent = visible;
+        }
 
         protected abstract KeyCounter CreateCounter(InputTrigger trigger);
 
         [BackgroundDependencyLoader]
         private void load(OsuConfigManager config, DrawableRuleset? drawableRuleset)
         {
+            AutoSizeAxes = Axes.Both;
+
             config.BindWith(OsuSetting.KeyOverlay, ConfigVisibility);
 
             if (drawableRuleset != null)

@@ -148,6 +148,9 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
                 loadingDisplay.Show();
                 client.ChangeState(MultiplayerUserState.ReadyForGameplay);
             }
+
+            // This will pause the clock, pending the gameplay started callback from the server.
+            GameplayClockContainer.Reset();
         }
 
         private void failAndBail(string message = null)

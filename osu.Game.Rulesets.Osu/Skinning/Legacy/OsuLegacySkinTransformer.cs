@@ -46,10 +46,10 @@ namespace osu.Game.Rulesets.Osu.Skinning.Legacy
                 switch (osuComponent.Component)
                 {
                     case OsuSkinComponents.FollowPoint:
-                        return this.GetAnimation("followpoint", true, true, true, startAtCurrentTime: false);
+                        return this.GetAnimation("followpoint", true, true, true, startAtCurrentTime: false, maxSize: new Vector2(OsuHitObject.OBJECT_RADIUS * 2, OsuHitObject.OBJECT_RADIUS));
 
                     case OsuSkinComponents.SliderScorePoint:
-                        return this.GetAnimation("sliderscorepoint", false, false);
+                        return this.GetAnimation("sliderscorepoint", false, false, maxSize: OsuHitObject.OBJECT_DIMENSIONS);
 
                     case OsuSkinComponents.SliderFollowCircle:
                         var followCircleContent = this.GetAnimation("sliderfollowcircle", true, true, true, maxSize: MAX_FOLLOW_CIRCLE_AREA_SIZE);
@@ -59,13 +59,8 @@ namespace osu.Game.Rulesets.Osu.Skinning.Legacy
                         return null;
 
                     case OsuSkinComponents.SliderBall:
-                        var sliderBallContent = this.GetAnimation("sliderb", true, true, animationSeparator: "", maxSize: MAX_FOLLOW_CIRCLE_AREA_SIZE);
-
-                        // todo: slider ball has a custom frame delay based on velocity
-                        // Math.Max((150 / Velocity) * GameBase.SIXTY_FRAME_TIME, GameBase.SIXTY_FRAME_TIME);
-
-                        if (sliderBallContent != null)
-                            return new LegacySliderBall(sliderBallContent, this);
+                        if (GetTexture("sliderb") != null || GetTexture("sliderb0") != null)
+                            return new LegacySliderBall(this);
 
                         return null;
 
@@ -150,10 +145,11 @@ namespace osu.Game.Rulesets.Osu.Skinning.Legacy
                             return null;
 
                         const float hitcircle_text_scale = 0.8f;
-                        return new LegacySpriteText(LegacyFont.HitCircle, OsuHitObject.OBJECT_DIMENSIONS * 2 / hitcircle_text_scale)
+                        return new LegacySpriteText(LegacyFont.HitCircle)
                         {
                             // stable applies a blanket 0.8x scale to hitcircle fonts
                             Scale = new Vector2(hitcircle_text_scale),
+                            MaxSizePerGlyph = OsuHitObject.OBJECT_DIMENSIONS * 2 / hitcircle_text_scale,
                         };
 
                     case OsuSkinComponents.SpinnerBody:

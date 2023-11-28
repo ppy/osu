@@ -3,6 +3,7 @@
 
 using System.ComponentModel;
 using osu.Framework.Localisation;
+using osu.Game.Graphics;
 using osu.Game.Localisation;
 using osu.Game.Resources.Localisation.Web;
 
@@ -18,7 +19,7 @@ namespace osu.Game.Overlays.Dashboard
             {
                 Title = PageTitleStrings.MainHomeControllerIndex;
                 Description = NamedOverlayComponentStrings.DashboardDescription;
-                IconTexture = "Icons/Hexacons/social";
+                Icon = HexaconsIcons.Social;
             }
         }
     }

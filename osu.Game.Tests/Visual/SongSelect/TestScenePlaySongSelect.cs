@@ -13,6 +13,7 @@ using osu.Framework.Extensions;
 using osu.Framework.Extensions.IEnumerableExtensions;
 using osu.Framework.Extensions.ObjectExtensions;
 using osu.Framework.Graphics.Containers;
+using osu.Framework.Input;
 using osu.Framework.Platform;
 using osu.Framework.Screens;
 using osu.Framework.Testing;
@@ -1109,6 +1110,23 @@ namespace osu.Game.Tests.Visual.SongSelect
             AddUntilStep("delete dialog shown", () => DialogOverlay.CurrentDialog, Is.InstanceOf<BeatmapDeleteDialog>);
             AddStep("confirm deletion", () => DialogOverlay.CurrentDialog!.PerformAction<PopupDialogDangerousButton>());
             AddAssert("0 matching shown", () => songSelect.ChildrenOfType<FilterControl>().Single().InformationalText == "0 matches");
+        }
+
+        [Test]
+        public void TestCutInFilterTextBox()
+        {
+            createSongSelect();
+
+            AddStep("set filter text", () => songSelect!.FilterControl.ChildrenOfType<SearchTextBox>().First().Text = "nonono");
+            AddStep("select all", () => InputManager.Keys(PlatformAction.SelectAll));
+            AddStep("press ctrl-x", () =>
+            {
+                InputManager.PressKey(Key.ControlLeft);
+                InputManager.Key(Key.X);
+                InputManager.ReleaseKey(Key.ControlLeft);
+            });
+
+            AddAssert("filter text cleared", () => songSelect!.FilterControl.ChildrenOfType<SearchTextBox>().First().Text, () => Is.Empty);
         }
 
         private void waitForInitialSelection()

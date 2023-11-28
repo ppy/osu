@@ -10,12 +10,11 @@ using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Effects;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.Sprites;
-using osu.Framework.Graphics.Textures;
 using osu.Framework.Input;
 using osu.Framework.Input.Bindings;
 using osu.Framework.Input.Events;
-using osu.Game.Database;
 using osu.Framework.Localisation;
+using osu.Game.Database;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Backgrounds;
 using osu.Game.Graphics.Containers;
@@ -37,15 +36,12 @@ namespace osu.Game.Overlays.Toolbar
         }
 
         [Resolved]
-        private TextureStore textures { get; set; } = null!;
-
-        [Resolved]
         private ReadableKeyCombinationProvider keyCombinationProvider { get; set; } = null!;
 
-        public void SetIcon(string texture) =>
-            SetIcon(new Sprite
+        public void SetIcon(IconUsage icon) =>
+            SetIcon(new SpriteIcon
             {
-                Texture = textures.Get(texture),
+                Icon = icon,
             });
 
         public LocalisableString Text

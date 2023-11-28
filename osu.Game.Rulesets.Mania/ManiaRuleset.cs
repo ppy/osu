@@ -255,16 +255,6 @@ namespace osu.Game.Rulesets.Mania
                 case ModType.Conversion:
                     return new Mod[]
                     {
-                        new MultiMod(new ManiaModKey4(),
-                            new ManiaModKey5(),
-                            new ManiaModKey6(),
-                            new ManiaModKey7(),
-                            new ManiaModKey8(),
-                            new ManiaModKey9(),
-                            new ManiaModKey10(),
-                            new ManiaModKey1(),
-                            new ManiaModKey2(),
-                            new ManiaModKey3()),
                         new ManiaModRandom(),
                         new ManiaModDualStages(),
                         new ManiaModMirror(),
@@ -272,7 +262,19 @@ namespace osu.Game.Rulesets.Mania
                         new ManiaModClassic(),
                         new ManiaModInvert(),
                         new ManiaModConstantSpeed(),
-                        new ManiaModHoldOff()
+                        new ManiaModHoldOff(),
+                        new MultiMod(
+                            new ManiaModKey1(),
+                            new ManiaModKey2(),
+                            new ManiaModKey3(),
+                            new ManiaModKey4(),
+                            new ManiaModKey5(),
+                            new ManiaModKey6(),
+                            new ManiaModKey7(),
+                            new ManiaModKey8(),
+                            new ManiaModKey9(),
+                            new ManiaModKey10()
+                        ),
                     };
 
                 case ModType.Automation:
@@ -386,19 +388,9 @@ namespace osu.Game.Rulesets.Mania
                 HitResult.Ok,
                 HitResult.Meh,
 
-                HitResult.LargeTickHit,
+                // HitResult.SmallBonus is used for awarding perfect bonus score but is not included here as
+                // it would be a bit redundant to show this to the user.
             };
-        }
-
-        public override LocalisableString GetDisplayNameForHitResult(HitResult result)
-        {
-            switch (result)
-            {
-                case HitResult.LargeTickHit:
-                    return "hold tick";
-            }
-
-            return base.GetDisplayNameForHitResult(result);
         }
 
         public override StatisticItem[] CreateStatisticsForScore(ScoreInfo score, IBeatmap playableBeatmap) => new[]

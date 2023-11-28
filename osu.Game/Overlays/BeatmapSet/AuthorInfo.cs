@@ -55,7 +55,7 @@ namespace osu.Game.Overlays.BeatmapSet
                     AutoSizeAxes = Axes.Both,
                     CornerRadius = 4,
                     Masking = true,
-                    Child = avatar = new UpdateableAvatar(showGuestOnNull: false)
+                    Child = avatar = new UpdateableAvatar(showUserPanelOnHover: true, showGuestOnNull: false)
                     {
                         Size = new Vector2(height),
                     },
