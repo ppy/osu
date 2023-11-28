@@ -14,9 +14,9 @@ namespace osu.Game.Rulesets.Osu.Objects
         {
         }
 
-        public override Judgement CreateJudgement() => new TailJudgement();
+        public override Judgement CreateJudgement() => new SliderTailJudgement();
 
-        private class TailJudgement : OsuJudgement
+        private class SliderTailJudgement : OsuJudgement
         {
             public override HitResult MaxResult => HitResult.LargeTickHit;
             public override HitResult MinResult => HitResult.IgnoreMiss;

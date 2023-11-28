@@ -3,7 +3,6 @@
 
 using osu.Game.Rulesets.Judgements;
 using osu.Game.Rulesets.Osu.Judgements;
-using osu.Game.Rulesets.Scoring;
 
 namespace osu.Game.Rulesets.Osu.Objects
 {
@@ -14,11 +13,6 @@ namespace osu.Game.Rulesets.Osu.Objects
         {
         }
 
-        public override Judgement CreateJudgement() => new SliderRepeatJudgement();
-
-        private class SliderRepeatJudgement : OsuJudgement
-        {
-            public override HitResult MaxResult => HitResult.LargeTickHit;
-        }
+        public override Judgement CreateJudgement() => new SliderTickJudgement();
     }
 }
