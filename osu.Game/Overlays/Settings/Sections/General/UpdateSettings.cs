@@ -75,8 +75,8 @@ namespace osu.Game.Overlays.Settings.Sections.General
 
                 Add(new SettingsButton
                 {
-                    Text = "Compress log files",
-                    Keywords = new[] { @"bug", "report", "logs" },
+                    Text = GeneralSettingsStrings.ExportLogs,
+                    Keywords = new[] { @"bug", "report", "logs", "files" },
                     Action = () =>
                     {
                         var logStorage = storage.GetStorageForDirectory(@"logs");
