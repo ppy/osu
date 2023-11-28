@@ -7,6 +7,7 @@ using osu.Framework.Allocation;
 using osu.Framework.Extensions;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Localisation;
+using osu.Framework.Logging;
 using osu.Framework.Platform;
 using osu.Framework.Screens;
 using osu.Game.Configuration;
@@ -79,7 +80,7 @@ namespace osu.Game.Overlays.Settings.Sections.General
                     Keywords = new[] { @"bug", "report", "logs", "files" },
                     Action = () =>
                     {
-                        var logStorage = storage.GetStorageForDirectory(@"logs");
+                        var logStorage = Logger.Storage;
 
                         const string archive_filename = "exports/compressed-logs.zip";
 
