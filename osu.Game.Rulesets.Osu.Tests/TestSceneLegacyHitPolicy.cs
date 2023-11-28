@@ -282,7 +282,7 @@ namespace osu.Game.Rulesets.Osu.Tests
 
             addJudgementAssert(hitObjects[0], HitResult.Great);
             addJudgementAssert(hitObjects[1], HitResult.LegacyGreatNoCombo);
-            addJudgementAssert("slider head", () => ((Slider)hitObjects[1]).HeadCircle, HitResult.Great);
+            addJudgementAssert("slider head", () => ((Slider)hitObjects[1]).HeadCircle, HitResult.LargeTickHit);
             addJudgementAssert("slider tick", () => ((Slider)hitObjects[1]).NestedHitObjects[1] as SliderTick, HitResult.LargeTickHit);
             addClickActionAssert(0, ClickAction.Hit);
             addClickActionAssert(1, ClickAction.Hit);
@@ -327,7 +327,7 @@ namespace osu.Game.Rulesets.Osu.Tests
 
             addJudgementAssert(hitObjects[0], HitResult.Ok);
             addJudgementAssert(hitObjects[1], HitResult.LegacyGreatNoCombo);
-            addJudgementAssert("slider head", () => ((Slider)hitObjects[1]).HeadCircle, HitResult.Great);
+            addJudgementAssert("slider head", () => ((Slider)hitObjects[1]).HeadCircle, HitResult.LargeTickHit);
             addJudgementAssert("slider tick", () => ((Slider)hitObjects[1]).NestedHitObjects[1] as SliderTick, HitResult.LargeTickHit);
             addClickActionAssert(0, ClickAction.Hit);
             addClickActionAssert(1, ClickAction.Hit);
