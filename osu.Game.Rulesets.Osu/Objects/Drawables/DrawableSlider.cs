@@ -50,8 +50,6 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
         /// </summary>
         public Container OverlayElementContainer { get; private set; }
 
-        public override bool DisplayResult => HitObject.ClassicSliderBehaviour;
-
         [CanBeNull]
         public PlaySliderBody SliderBody => Body.Drawable as PlaySliderBody;
 

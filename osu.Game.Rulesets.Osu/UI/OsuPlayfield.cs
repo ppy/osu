@@ -18,6 +18,7 @@ using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Objects.Drawables;
 using osu.Game.Rulesets.Osu.Beatmaps;
 using osu.Game.Rulesets.Osu.Configuration;
+using osu.Game.Rulesets.Osu.Judgements;
 using osu.Game.Rulesets.Osu.Objects;
 using osu.Game.Rulesets.Osu.Objects.Drawables;
 using osu.Game.Rulesets.Osu.Objects.Drawables.Connections;
@@ -70,11 +71,13 @@ namespace osu.Game.Rulesets.Osu.UI
             var hitWindows = new OsuHitWindows();
             foreach (var result in Enum.GetValues<HitResult>().Where(r => r > HitResult.None && hitWindows.IsHitResultAllowed(r)))
                 poolDictionary.Add(result, new DrawableJudgementPool(result, onJudgementLoaded));
-            poolDictionary.Add(HitResult.LegacyGreatNoCombo, new DrawableJudgementPool(HitResult.LegacyGreatNoCombo, onJudgementLoaded));
-            poolDictionary.Add(HitResult.LegacyOkNoCombo, new DrawableJudgementPool(HitResult.LegacyOkNoCombo, onJudgementLoaded));
-            poolDictionary.Add(HitResult.LegacyMehNoCombo, new DrawableJudgementPool(HitResult.LegacyMehNoCombo, onJudgementLoaded));
 
             AddRangeInternal(poolDictionary.Values);
+
+            // These results share existing judgement pools, so they're only added after the pools are added to the draw hierarchy above.
+            poolDictionary.Add(HitResult.LegacyGreatNoCombo, poolDictionary[HitResult.Great]);
+            poolDictionary.Add(HitResult.LegacyOkNoCombo, poolDictionary[HitResult.Ok]);
+            poolDictionary.Add(HitResult.LegacyMehNoCombo, poolDictionary[HitResult.Meh]);
 
             NewResult += onNewResult;
         }
