@@ -71,6 +71,11 @@ namespace osu.Game.Online.Spectator
         public event Action<int, long>? OnUserScoreProcessed;
 
         /// <summary>
+        /// Invoked just prior to disconnection requested by the server via <see cref="IStatefulUserHubClient.DisconnectRequested"/>.
+        /// </summary>
+        public event Action? Disconnecting;
+
+        /// <summary>
         /// A dictionary containing all users currently being watched, with the number of watching components for each user.
         /// </summary>
         private readonly Dictionary<int, int> watchedUsersRefCounts = new Dictionary<int, int>();
@@ -171,6 +176,12 @@ namespace osu.Game.Online.Spectator
         {
             Schedule(() => OnUserScoreProcessed?.Invoke(userId, scoreId));
 
+            return Task.CompletedTask;
+        }
+
+        Task IStatefulUserHubClient.DisconnectRequested()
+        {
+            Schedule(() => DisconnectInternal());
             return Task.CompletedTask;
         }
 
@@ -290,6 +301,12 @@ namespace osu.Game.Online.Spectator
         protected abstract Task WatchUserInternal(int userId);
 
         protected abstract Task StopWatchingUserInternal(int userId);
+
+        protected virtual Task DisconnectInternal()
+        {
+            Disconnecting?.Invoke();
+            return Task.CompletedTask;
+        }
 
         protected override void Update()
         {
