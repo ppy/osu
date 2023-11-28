@@ -7,6 +7,7 @@ using osu.Framework.Bindables;
 using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.ControlPoints;
 using osu.Game.Rulesets.Objects;
+using osu.Game.Rulesets.Objects.Legacy;
 using osu.Game.Rulesets.Objects.Types;
 using osu.Game.Rulesets.Osu.Scoring;
 using osu.Game.Rulesets.Scoring;
@@ -155,7 +156,34 @@ namespace osu.Game.Rulesets.Osu.Objects
             // This adjustment is necessary for AR>10, otherwise TimePreempt can become smaller leading to hitcircles not fully fading in.
             TimeFadeIn = 400 * Math.Min(1, TimePreempt / PREEMPT_MIN);
 
-            Scale = (1.0f - 0.7f * (difficulty.CircleSize - 5) / 5) / 2;
+            Scale = LegacyRulesetExtensions.CalculateScaleFromCircleSize(difficulty.CircleSize, true);
+        }
+
+        public void UpdateComboInformation(IHasComboInformation? lastObj)
+        {
+            // Note that this implementation is shared with the osu!catch ruleset's implementation.
+            // If a change is made here, CatchHitObject.cs should also be updated.
+            ComboIndex = lastObj?.ComboIndex ?? 0;
+            ComboIndexWithOffsets = lastObj?.ComboIndexWithOffsets ?? 0;
+            IndexInCurrentCombo = (lastObj?.IndexInCurrentCombo + 1) ?? 0;
+
+            if (this is Spinner)
+            {
+                // For the purpose of combo colours, spinners never start a new combo even if they are flagged as doing so.
+                return;
+            }
+
+            // At decode time, the first hitobject in the beatmap and the first hitobject after a spinner are both enforced to be a new combo,
+            // but this isn't directly enforced by the editor so the extra checks against the last hitobject are duplicated here.
+            if (NewCombo || lastObj == null || lastObj is Spinner)
+            {
+                IndexInCurrentCombo = 0;
+                ComboIndex++;
+                ComboIndexWithOffsets += ComboOffset + 1;
+
+                if (lastObj != null)
+                    lastObj.LastInCombo = true;
+            }
         }
 
         protected override HitWindows CreateHitWindows() => new OsuHitWindows();

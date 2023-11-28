@@ -261,7 +261,7 @@ namespace osu.Game.Database
         /// <param name="cancellationToken">An optional cancellation token.</param>
         public virtual Live<TModel>? ImportModel(TModel item, ArchiveReader? archive = null, ImportParameters parameters = default, CancellationToken cancellationToken = default) => Realm.Run(realm =>
         {
-            pauseIfNecessary(cancellationToken);
+            pauseIfNecessary(parameters, cancellationToken);
 
             TModel? existing;
 
@@ -560,9 +560,9 @@ namespace osu.Game.Database
         /// <returns>Whether to perform deletion.</returns>
         protected virtual bool ShouldDeleteArchive(string path) => false;
 
-        private void pauseIfNecessary(CancellationToken cancellationToken)
+        private void pauseIfNecessary(ImportParameters importParameters, CancellationToken cancellationToken)
         {
-            if (!PauseImports)
+            if (!PauseImports || importParameters.ImportImmediately)
                 return;
 
             Logger.Log($@"{GetType().Name} is being paused.");

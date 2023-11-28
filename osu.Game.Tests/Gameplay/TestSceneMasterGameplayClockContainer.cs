@@ -108,6 +108,28 @@ namespace osu.Game.Tests.Gameplay
             AddAssert("gameplay clock time = 10000", () => gameplayClockContainer.CurrentTime, () => Is.EqualTo(10000).Within(10f));
         }
 
+        [Test]
+        public void TestStopUsingBeatmapClock()
+        {
+            ClockBackedTestWorkingBeatmap working = null;
+            MasterGameplayClockContainer gameplayClockContainer = null;
+            BindableDouble frequencyAdjustment = new BindableDouble(2);
+
+            AddStep("create container", () =>
+            {
+                working = new ClockBackedTestWorkingBeatmap(new OsuRuleset().RulesetInfo, new FramedClock(new ManualClock()), Audio);
+                Child = gameplayClockContainer = new MasterGameplayClockContainer(working, 0);
+
+                gameplayClockContainer.Reset(startClock: true);
+            });
+
+            AddStep("apply frequency adjustment", () => gameplayClockContainer.AdjustmentsFromMods.AddAdjustment(AdjustableProperty.Frequency, frequencyAdjustment));
+            AddAssert("track frequency changed", () => working.Track.AggregateFrequency.Value, () => Is.EqualTo(2));
+
+            AddStep("stop using beatmap clock", () => gameplayClockContainer.StopUsingBeatmapClock());
+            AddAssert("frequency adjustment unapplied", () => working.Track.AggregateFrequency.Value, () => Is.EqualTo(1));
+        }
+
         protected override void Dispose(bool isDisposing)
         {
             localConfig?.Dispose();

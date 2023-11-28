@@ -239,7 +239,7 @@ namespace osu.Game.Screens.OnlinePlay.Lounge
                     }
                 };
 
-                sampleJoinFail = audio.Samples.Get(@"UI/password-fail");
+                sampleJoinFail = audio.Samples.Get(@"UI/generic-error");
 
                 joinButton.Action = performJoin;
             }

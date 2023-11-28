@@ -3,6 +3,9 @@
 
 namespace osu.Game.Rulesets.Mania.Objects
 {
+    /// <summary>
+    /// The head note of a <see cref="HoldNote"/>.
+    /// </summary>
     public class HeadNote : Note
     {
     }

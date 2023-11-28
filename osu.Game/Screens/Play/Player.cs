@@ -267,7 +267,7 @@ namespace osu.Game.Screens.Play
                         createGameplayComponents(Beatmap.Value)
                     }
                 },
-                FailOverlay = new FailOverlay
+                FailOverlay = new FailOverlay(Configuration.AllowUserInteraction)
                 {
                     SaveReplay = async () => await prepareAndImportScoreAsync(true).ConfigureAwait(false),
                     OnRetry = () => Restart(),
@@ -279,8 +279,10 @@ namespace osu.Game.Screens.Play
                     {
                         if (!this.IsCurrentScreen()) return;
 
-                        fadeOut(true);
-                        PerformExit(false);
+                        if (PerformExit(false))
+                            // The hotkey overlay dims the screen.
+                            // If the operation succeeds, we want to make sure we stay dimmed to keep continuity.
+                            fadeOut(true);
                     },
                 },
             });
@@ -298,8 +300,10 @@ namespace osu.Game.Screens.Play
                         {
                             if (!this.IsCurrentScreen()) return;
 
-                            fadeOut(true);
-                            Restart(true);
+                            if (Restart(true))
+                                // The hotkey overlay dims the screen.
+                                // If the operation succeeds, we want to make sure we stay dimmed to keep continuity.
+                                fadeOut(true);
                         },
                     },
                 });
@@ -565,20 +569,9 @@ namespace osu.Game.Screens.Play
         /// Whether the pause or fail dialog should be shown before performing an exit.
         /// If <see langword="true"/> and a dialog is not yet displayed, the exit will be blocked and the relevant dialog will display instead.
         /// </param>
-        protected void PerformExit(bool showDialogFirst)
+        /// <returns>Whether this call resulted in a final exit.</returns>
+        protected bool PerformExit(bool showDialogFirst)
         {
-            // there is a chance that an exit request occurs after the transition to results has already started.
-            // even in such a case, the user has shown intent, so forcefully return to this screen (to proceed with the upwards exit process).
-            if (!this.IsCurrentScreen())
-            {
-                ValidForResume = false;
-
-                // in the potential case that this instance has already been exited, this is required to avoid a crash.
-                if (this.GetChildScreen() != null)
-                    this.MakeCurrent();
-                return;
-            }
-
             bool pauseOrFailDialogVisible =
                 PauseOverlay.State.Value == Visibility.Visible || FailOverlay.State.Value == Visibility.Visible;
 
@@ -588,7 +581,7 @@ namespace osu.Game.Screens.Play
                 if (ValidForResume && GameplayState.HasFailed)
                 {
                     failAnimationContainer.FinishTransforms(true);
-                    return;
+                    return false;
                 }
 
                 // even if this call has requested a dialog, there is a chance the current player mode doesn't support pausing.
@@ -597,21 +590,32 @@ namespace osu.Game.Screens.Play
                     // in the case a dialog needs to be shown, attempt to pause and show it.
                     // this may fail (see internal checks in Pause()) but the fail cases are temporary, so don't fall through to Exit().
                     Pause();
-                    return;
+                    return false;
                 }
             }
 
-            // if an exit has been requested, cancel any pending completion (the user has shown intention to exit).
-            resultsDisplayDelegate?.Cancel();
+            // Matching osu!stable behaviour, if the results screen is pending and the user requests an exit,
+            // show the results instead.
+            if (GameplayState.HasPassed && !isRestarting)
+            {
+                progressToResults(false);
+                return false;
+            }
 
             // import current score if possible.
             prepareAndImportScoreAsync();
 
-            // The actual exit is performed if
-            // - the pause / fail dialog was not requested
-            // - the pause / fail dialog was requested but is already displayed (user showing intention to exit).
-            // - the pause / fail dialog was requested but couldn't be displayed due to the type or state of this Player instance.
-            this.Exit();
+            // Screen may not be current if a restart has been performed.
+            if (this.IsCurrentScreen())
+            {
+                // The actual exit is performed if
+                // - the pause / fail dialog was not requested
+                // - the pause / fail dialog was requested but is already displayed (user showing intention to exit).
+                // - the pause / fail dialog was requested but couldn't be displayed due to the type or state of this Player instance.
+                this.Exit();
+            }
+
+            return true;
         }
 
         private void performUserRequestedSkip()
@@ -660,10 +664,11 @@ namespace osu.Game.Screens.Play
         /// <remarks>This can be called from a child screen in order to trigger the restart process.</remarks>
         /// </summary>
         /// <param name="quickRestart">Whether a quick restart was requested (skipping intro etc.).</param>
-        public void Restart(bool quickRestart = false)
+        /// <returns>Whether this call resulted in a restart.</returns>
+        public bool Restart(bool quickRestart = false)
         {
             if (!Configuration.AllowRestart)
-                return;
+                return false;
 
             isRestarting = true;
 
@@ -673,7 +678,7 @@ namespace osu.Game.Screens.Play
 
             RestartRequested?.Invoke(quickRestart);
 
-            PerformExit(false);
+            return PerformExit(false);
         }
 
         /// <summary>
@@ -729,9 +734,6 @@ namespace osu.Game.Screens.Play
             // is no chance that a user could return to the (already completed) Player instance from a child screen.
             ValidForResume = false;
 
-            if (!Configuration.ShowResults)
-                return;
-
             bool storyboardStillRunning = DimmableStoryboard.ContentDisplayed && !DimmableStoryboard.HasStoryboardEnded.Value;
 
             // If the current beatmap has a storyboard, this method will be called again on storyboard completion.
@@ -754,10 +756,16 @@ namespace osu.Game.Screens.Play
         /// <param name="withDelay">Whether a minimum delay (<see cref="RESULTS_DISPLAY_DELAY"/>) should be added before the screen is displayed.</param>
         private void progressToResults(bool withDelay)
         {
-            resultsDisplayDelegate?.Cancel();
+            if (!Configuration.ShowResults)
+                return;
+
+            // Setting this early in the process means that even if something were to go wrong in the order of events following, there
+            // is no chance that a user could return to the (already completed) Player instance from a child screen.
+            ValidForResume = false;
 
             double delay = withDelay ? RESULTS_DISPLAY_DELAY : 0;
 
+            resultsDisplayDelegate?.Cancel();
             resultsDisplayDelegate = new ScheduledDelegate(() =>
             {
                 if (prepareScoreForDisplayTask == null)
@@ -886,6 +894,13 @@ namespace osu.Game.Screens.Play
 
         #region Fail Logic
 
+        /// <summary>
+        /// Invoked when gameplay has permanently failed.
+        /// </summary>
+        protected virtual void OnFail()
+        {
+        }
+
         protected FailOverlay FailOverlay { get; private set; }
 
         private FailAnimationContainer failAnimationContainer;
@@ -915,8 +930,21 @@ namespace osu.Game.Screens.Play
 
             failAnimationContainer.Start();
 
-            if (GameplayState.Mods.OfType<IApplicableFailOverride>().Any(m => m.RestartOnFail))
-                Restart(true);
+            // Failures can be triggered either by a judgement, or by a mod.
+            //
+            // For the case of a judgement, due to ordering considerations, ScoreProcessor will not have received
+            // the final judgement which triggered the failure yet (see DrawableRuleset.NewResult handling above).
+            //
+            // A schedule here ensures that any lingering judgements from the current frame are applied before we
+            // finalise the score as "failed".
+            Schedule(() =>
+            {
+                ScoreProcessor.FailScore(Score.ScoreInfo);
+                OnFail();
+
+                if (GameplayState.Mods.OfType<IApplicableFailOverride>().Any(m => m.RestartOnFail))
+                    Restart(true);
+            });
 
             return true;
         }
@@ -926,11 +954,6 @@ namespace osu.Game.Screens.Play
         /// </summary>
         private void onFailComplete()
         {
-            // fail completion is a good point to mark a score as failed,
-            // since the last judgement that caused the fail only applies to score processor after onFail.
-            // todo: this should probably be handled better.
-            ScoreProcessor.FailScore(Score.ScoreInfo);
-
             GameplayClockContainer.Stop();
 
             FailOverlay.Retries = RestartCount;
@@ -1078,7 +1101,7 @@ namespace osu.Game.Screens.Play
         protected virtual void StartGameplay()
         {
             if (GameplayClockContainer.IsRunning)
-                throw new InvalidOperationException($"{nameof(StartGameplay)} should not be called when the gameplay clock is already running");
+                Logger.Error(new InvalidOperationException($"{nameof(StartGameplay)} should not be called when the gameplay clock is already running"), "Clock failure");
 
             GameplayClockContainer.Reset(startClock: true);
 
@@ -1102,13 +1125,14 @@ namespace osu.Game.Screens.Play
             failAnimationContainer?.Stop();
             PauseOverlay?.StopAllSamples();
 
-            if (LoadedBeatmapSuccessfully)
+            if (LoadedBeatmapSuccessfully && !GameplayState.HasPassed)
             {
-                if (!GameplayState.HasPassed && !GameplayState.HasFailed)
+                Debug.Assert(resultsDisplayDelegate == null);
+
+                if (!GameplayState.HasFailed)
                     GameplayState.HasQuit = true;
 
-                // if arriving here and the results screen preparation task hasn't run, it's safe to say the user has not completed the beatmap.
-                if (prepareScoreForDisplayTask == null && DrawableRuleset.ReplayScore == null)
+                if (DrawableRuleset.ReplayScore == null)
                     ScoreProcessor.FailScore(Score.ScoreInfo);
             }
 
@@ -1158,13 +1182,6 @@ namespace osu.Game.Screens.Play
             // the import process will re-attach managed beatmap/rulesets to this score. we don't want this for now, so create a temporary copy to import.
             var importableScore = score.ScoreInfo.DeepClone();
 
-            // For the time being, online ID responses are not really useful for anything.
-            // In addition, the IDs provided via new (lazer) endpoints are based on a different autoincrement from legacy (stable) scores.
-            //
-            // Until we better define the server-side logic behind this, let's not store the online ID to avoid potential unique constraint
-            // conflicts across various systems (ie. solo and multiplayer).
-            importableScore.OnlineID = -1;
-
             var imported = scoreManager.Import(importableScore, replayReader);
 
             imported.PerformRead(s =>
@@ -1200,8 +1217,11 @@ namespace osu.Game.Screens.Play
             float fadeOutDuration = instant ? 0 : 250;
             this.FadeOut(fadeOutDuration);
 
-            ApplyToBackground(b => b.IgnoreUserSettings.Value = true);
-            storyboardReplacesBackground.Value = false;
+            if (this.IsCurrentScreen())
+            {
+                ApplyToBackground(b => b.IgnoreUserSettings.Value = true);
+                storyboardReplacesBackground.Value = false;
+            }
         }
 
         #endregion

@@ -133,6 +133,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
         private bool assertAllAvailableModsSelected()
         {
             var allAvailableMods = availableMods.Value
+                                                .Where(pair => pair.Key != ModType.System)
                                                 .SelectMany(pair => pair.Value)
                                                 .Where(mod => mod.UserPlayable && mod.HasImplementation)
                                                 .ToList();

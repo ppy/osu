@@ -121,7 +121,7 @@ namespace osu.Game.Utils
             if (!CheckCompatibleSet(mods, out invalidMods))
                 return false;
 
-            return checkValid(mods, m => m.Type != ModType.System && m.HasImplementation, out invalidMods);
+            return checkValid(mods, m => m.HasImplementation, out invalidMods);
         }
 
         /// <summary>

@@ -407,6 +407,8 @@ namespace osu.Game
                 })
             });
 
+            base.Content.Add(new TouchInputInterceptor());
+
             KeyBindingStore = new RealmKeyBindingStore(realm, keyCombinationProvider);
             KeyBindingStore.Register(globalBindings, RulesetStore.AvailableRulesets);
 
@@ -475,6 +477,8 @@ namespace osu.Game
             AddFont(Resources, @"Fonts/Venera/Venera-Light");
             AddFont(Resources, @"Fonts/Venera/Venera-Bold");
             AddFont(Resources, @"Fonts/Venera/Venera-Black");
+
+            Fonts.AddStore(new HexaconsIcons.HexaconsStore(Textures));
         }
 
         protected override IReadOnlyDependencyContainer CreateChildDependencies(IReadOnlyDependencyContainer parent) =>
@@ -575,14 +579,14 @@ namespace osu.Game
 
                     case JoystickHandler jh:
                         return new JoystickSettings(jh);
-
-                    case TouchHandler th:
-                        return new TouchSettings(th);
                 }
             }
 
             switch (handler)
             {
+                case TouchHandler th:
+                    return new TouchSettings(th);
+
                 case MidiHandler:
                     return new InputSection.HandlerSection(handler);
 
