@@ -16,16 +16,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
 
         public DrawableSlider DrawableSlider => (DrawableSlider)ParentHitObject;
 
-        public override bool DisplayResult
-        {
-            get
-            {
-                if (HitObject?.ClassicSliderBehaviour == true)
-                    return false;
-
-                return base.DisplayResult;
-            }
-        }
+        public override bool DisplayResult => false;
 
         private readonly IBindable<int> pathVersion = new Bindable<int>();
 
@@ -65,13 +56,9 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
         {
             Debug.Assert(HitObject != null);
 
-            if (HitObject.ClassicSliderBehaviour)
-            {
-                // With classic slider behaviour, heads are considered fully hit if in the largest hit window.
-                return base.ResultFor(timeOffset).IsHit() ? Result.Judgement.MaxResult : Result.Judgement.MinResult;
-            }
-
-            return base.ResultFor(timeOffset);
+            return base.ResultFor(timeOffset).IsHit()
+                ? Result.Judgement.MaxResult
+                : Result.Judgement.MinResult;
         }
 
         public override void Shake()
