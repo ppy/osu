@@ -26,7 +26,7 @@ namespace osu.Game.Rulesets.Scoring
         {
             base.Reset(storeResults);
 
-            Health.Value = 0;
+            SetHealth(0);
         }
     }
 }

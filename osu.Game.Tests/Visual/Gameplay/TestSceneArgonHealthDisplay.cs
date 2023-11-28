@@ -46,7 +46,7 @@ namespace osu.Game.Tests.Visual.Gameplay
         {
             AddStep(@"Reset all", delegate
             {
-                healthProcessor.Health.Value = 1;
+                healthProcessor.SetHealth(1);
                 healthProcessor.Failed += () => false; // health won't be updated if the processor gets into a "fail" state.
 
                 Children = new Drawable[]
@@ -72,17 +72,17 @@ namespace osu.Game.Tests.Visual.Gameplay
 
             AddRepeatStep(@"decrease hp slightly", delegate
             {
-                healthProcessor.Health.Value -= 0.01f;
+                healthProcessor.SetHealth(healthProcessor.Health.Value - 0.01f);
             }, 10);
 
             AddRepeatStep(@"increase hp without flash", delegate
             {
-                healthProcessor.Health.Value += 0.1f;
+                healthProcessor.SetHealth(healthProcessor.Health.Value + 0.1f);
             }, 3);
 
             AddRepeatStep(@"increase hp with flash", delegate
             {
-                healthProcessor.Health.Value += 0.1f;
+                healthProcessor.SetHealth(healthProcessor.Health.Value + 0.1f);
                 healthProcessor.ApplyResult(new JudgementResult(new HitCircle(), new OsuJudgement())
                 {
                     Type = HitResult.Perfect

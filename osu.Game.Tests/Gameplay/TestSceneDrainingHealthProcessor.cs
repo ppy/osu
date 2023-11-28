@@ -341,7 +341,7 @@ namespace osu.Game.Tests.Gameplay
 
         private void setTime(double time) => AddStep($"set time = {time}", () => clock.CurrentTime = time);
 
-        private void setHealth(double health) => AddStep($"set health = {health}", () => processor.Health.Value = health);
+        private void setHealth(double health) => AddStep($"set health = {health}", () => processor.SetHealth(health));
 
         private void assertHealthEqualTo(double value)
             => AddAssert($"health = {value}", () => Precision.AlmostEquals(value, processor.Health.Value, 0.0001f));

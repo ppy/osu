@@ -25,7 +25,7 @@ namespace osu.Game.Rulesets.Mods
 
         private int retries;
 
-        private readonly BindableNumber<double> health = new BindableDouble();
+        private Action? resetHealthToMaxValue;
 
         public override void ApplyToDifficulty(BeatmapDifficulty difficulty)
         {
@@ -37,7 +37,7 @@ namespace osu.Game.Rulesets.Mods
         {
             if (retries == 0) return true;
 
-            health.Value = health.MaxValue;
+            resetHealthToMaxValue?.Invoke();
             retries--;
 
             return false;
@@ -47,7 +47,7 @@ namespace osu.Game.Rulesets.Mods
 
         public void ApplyToHealthProcessor(HealthProcessor healthProcessor)
         {
-            health.BindTo(healthProcessor.Health);
+            resetHealthToMaxValue = () => healthProcessor.SetHealth(healthProcessor.Health.MaxValue);
         }
     }
 }

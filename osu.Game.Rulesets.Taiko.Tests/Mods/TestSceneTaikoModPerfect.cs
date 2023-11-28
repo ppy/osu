@@ -41,7 +41,7 @@ namespace osu.Game.Rulesets.Taiko.Tests.Mods
                 {
                     base.Reset(storeResults);
 
-                    Health.Value = 1; // Don't care about the health condition (only the mod condition)
+                    SetHealth(1); // Don't care about the health condition (only the mod condition)
                 }
             }
         }

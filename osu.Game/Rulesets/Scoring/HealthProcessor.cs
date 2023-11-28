@@ -17,6 +17,12 @@ namespace osu.Game.Rulesets.Scoring
         public event Func<bool>? Failed;
 
         /// <summary>
+        /// Invoked when a change in <see cref="Health"/> occurs, with a <see cref="JudgementResult"/> backing the event
+        /// (if the change occurred from a judgement).
+        /// </summary>
+        public event OnHealthChangeDelegate? HealthChanged;
+
+        /// <summary>
         /// Additional conditions on top of <see cref="DefaultFailCondition"/> that cause a failing state.
         /// </summary>
         public event Func<HealthProcessor, JudgementResult, bool>? FailConditions;
@@ -24,12 +30,21 @@ namespace osu.Game.Rulesets.Scoring
         /// <summary>
         /// The current health.
         /// </summary>
-        public readonly BindableDouble Health = new BindableDouble(1) { MinValue = 0, MaxValue = 1 };
+        public IBindableNumber<double> Health => health;
+
+        private readonly BindableDouble health = new BindableDouble(1) { MinValue = 0, MaxValue = 1 };
 
         /// <summary>
         /// Whether this ScoreProcessor has already triggered the failed state.
         /// </summary>
         public bool HasFailed { get; private set; }
+
+        public void SetHealth(double value, JudgementResult? result = null)
+        {
+            double oldValue = health.Value;
+            health.Value = value;
+            HealthChanged?.Invoke(value, oldValue, result);
+        }
 
         /// <summary>
         /// Immediately triggers a failure for this HealthProcessor.
@@ -48,7 +63,7 @@ namespace osu.Game.Rulesets.Scoring
             if (HasFailed)
                 return;
 
-            Health.Value += GetHealthIncreaseFor(result);
+            SetHealth(Health.Value + GetHealthIncreaseFor(result), result);
 
             if (meetsAnyFailCondition(result))
                 TriggerFailure();
@@ -56,7 +71,7 @@ namespace osu.Game.Rulesets.Scoring
 
         protected override void RevertResultInternal(JudgementResult result)
         {
-            Health.Value = result.HealthAtJudgement;
+            SetHealth(result.HealthAtJudgement, result);
 
             // Todo: Revert HasFailed state with proper player support
         }
@@ -99,8 +114,10 @@ namespace osu.Game.Rulesets.Scoring
         {
             base.Reset(storeResults);
 
-            Health.Value = 1;
+            SetHealth(1);
             HasFailed = false;
         }
     }
+
+    public delegate void OnHealthChangeDelegate(double newValue, double oldValue, JudgementResult? result = null);
 }
