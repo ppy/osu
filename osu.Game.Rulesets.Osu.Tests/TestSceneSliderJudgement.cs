@@ -11,8 +11,10 @@ using osu.Framework.Screens;
 using osu.Game.Beatmaps;
 using osu.Game.Replays;
 using osu.Game.Rulesets.Judgements;
+using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Objects.Types;
+using osu.Game.Rulesets.Osu.Mods;
 using osu.Game.Rulesets.Osu.Objects;
 using osu.Game.Rulesets.Osu.Replays;
 using osu.Game.Rulesets.Replays;
@@ -38,6 +40,8 @@ namespace osu.Game.Rulesets.Osu.Tests
         private const float slider_path_length = 200;
 
         private readonly List<JudgementResult> judgementResults = new List<JudgementResult>();
+
+        #region Nomod
 
         [Test]
         public void TestHitAll()
@@ -172,6 +176,145 @@ namespace osu.Game.Rulesets.Osu.Tests
             assertSliderJudgement(HitResult.LegacyOkNoCombo);
         }
 
+        #endregion
+
+        #region Classic
+
+        [Test]
+        public void TestHitAllClassic()
+        {
+            performTest(new List<ReplayFrame>
+            {
+                new OsuReplayFrame(time_slider_start, slider_start_position, OsuAction.LeftButton),
+                new OsuReplayFrame(time_slider_end, slider_end_position, OsuAction.LeftButton),
+            }, classic: true);
+
+            assertHeadJudgement(HitResult.LargeTickHit);
+            assertTickJudgement(HitResult.LargeTickHit);
+            assertTailJudgement(HitResult.LargeTickHit);
+            assertSliderJudgement(HitResult.LegacyGreatNoCombo);
+        }
+
+        [Test]
+        public void TestImperfectlyHitHeadClassic()
+        {
+            performTest(new List<ReplayFrame>
+            {
+                new OsuReplayFrame(time_slider_start - 100, slider_start_position, OsuAction.LeftButton),
+                new OsuReplayFrame(time_slider_start, slider_start_position, OsuAction.LeftButton),
+                new OsuReplayFrame(time_slider_end, slider_end_position, OsuAction.LeftButton),
+            }, classic: true);
+
+            assertHeadJudgement(HitResult.LargeTickHit);
+            assertTickJudgement(HitResult.LargeTickHit);
+            assertTailJudgement(HitResult.LargeTickHit);
+            assertSliderJudgement(HitResult.LegacyGreatNoCombo);
+        }
+
+        [Test]
+        public void TestMissHeadClassic()
+        {
+            performTest(new List<ReplayFrame>
+            {
+                new OsuReplayFrame(time_slider_start - 500, slider_start_position, OsuAction.LeftButton),
+                new OsuReplayFrame(time_slider_start, slider_start_position, OsuAction.LeftButton),
+                new OsuReplayFrame(time_slider_end, slider_end_position, OsuAction.LeftButton),
+            }, classic: true);
+
+            assertHeadJudgement(HitResult.LargeTickMiss);
+            assertTickJudgement(HitResult.LargeTickHit);
+            assertTailJudgement(HitResult.LargeTickHit);
+            assertSliderJudgement(HitResult.LegacyOkNoCombo);
+        }
+
+        [Test]
+        public void TestMissTickClassic()
+        {
+            performTest(new List<ReplayFrame>
+            {
+                new OsuReplayFrame(time_slider_start, slider_start_position, OsuAction.LeftButton),
+                new OsuReplayFrame(time_slider_tick - 200, computePositionFromTime(time_slider_tick - 200)),
+                new OsuReplayFrame(time_slider_tick + 200, computePositionFromTime(time_slider_tick + 200), OsuAction.LeftButton),
+                new OsuReplayFrame(time_slider_end, slider_end_position, OsuAction.LeftButton),
+            }, classic: true);
+
+            assertHeadJudgement(HitResult.LargeTickHit);
+            assertTickJudgement(HitResult.LargeTickMiss);
+            assertTailJudgement(HitResult.LargeTickHit);
+            assertSliderJudgement(HitResult.LegacyOkNoCombo);
+        }
+
+        [Test]
+        public void TestMissTailClassic()
+        {
+            performTest(new List<ReplayFrame>
+            {
+                new OsuReplayFrame(time_slider_start, slider_start_position, OsuAction.LeftButton),
+                new OsuReplayFrame(time_slider_tick + 200, computePositionFromTime(time_slider_tick + 200)),
+                new OsuReplayFrame(time_slider_end, slider_end_position),
+            }, classic: true);
+
+            assertHeadJudgement(HitResult.LargeTickHit);
+            assertTickJudgement(HitResult.LargeTickHit);
+            assertTailJudgement(HitResult.IgnoreMiss);
+            assertSliderJudgement(HitResult.LegacyOkNoCombo);
+        }
+
+        [Test]
+        public void TestMissHeadAndTickClassic()
+        {
+            performTest(new List<ReplayFrame>
+            {
+                new OsuReplayFrame(time_slider_start - 500, slider_start_position, OsuAction.LeftButton),
+                new OsuReplayFrame(time_slider_start, slider_start_position, OsuAction.LeftButton),
+                new OsuReplayFrame(time_slider_tick - 200, computePositionFromTime(time_slider_tick - 200)),
+                new OsuReplayFrame(time_slider_tick + 200, computePositionFromTime(time_slider_tick + 200), OsuAction.LeftButton),
+                new OsuReplayFrame(time_slider_end, slider_end_position),
+            }, classic: true);
+
+            assertHeadJudgement(HitResult.LargeTickMiss);
+            assertTickJudgement(HitResult.LargeTickMiss);
+            assertTailJudgement(HitResult.LargeTickHit);
+            assertSliderJudgement(HitResult.LegacyMehNoCombo);
+        }
+
+        [Test]
+        public void TestMissAllClassic()
+        {
+            performTest(new List<ReplayFrame>(), classic: true);
+
+            assertHeadJudgement(HitResult.LargeTickMiss);
+            assertTickJudgement(HitResult.LargeTickMiss);
+            assertTailJudgement(HitResult.IgnoreMiss);
+            assertSliderJudgement(HitResult.Miss);
+        }
+
+        [Test]
+        public void TestMissRepeatClassic()
+        {
+            // This adjusts the slider so that the repeat is at time_slider_tick.
+            performTest(new List<ReplayFrame>
+            {
+                new OsuReplayFrame(time_slider_start, slider_start_position, OsuAction.LeftButton),
+                new OsuReplayFrame(time_slider_tick - 200, computePositionFromTime(time_slider_end - 400)),
+                new OsuReplayFrame(time_slider_tick, slider_end_position),
+                new OsuReplayFrame(time_slider_tick + 200, computePositionFromTime(time_slider_end - 400), OsuAction.LeftButton),
+                new OsuReplayFrame(time_slider_end, slider_start_position, OsuAction.LeftButton),
+            }, s =>
+            {
+                s.RepeatCount = 1;
+                s.SliderVelocityMultiplier = 2;
+                s.TickDistanceMultiplier = 10;
+            }, classic: true);
+
+            assertHeadJudgement(HitResult.LargeTickHit);
+            assertRepeatJudgement(HitResult.LargeTickMiss);
+            assertTailJudgement(HitResult.LargeTickHit);
+            assertSliderJudgement(HitResult.LegacyOkNoCombo);
+        }
+
+        #endregion
+
         private void assertHeadJudgement(HitResult result)
         {
             AddAssert(
@@ -219,13 +362,14 @@ namespace osu.Game.Rulesets.Osu.Tests
             return slider_start_position + dist * (float)t;
         }
 
-        private void performTest(List<ReplayFrame> frames, Action<Slider>? adjustSliderFunc = null)
+        private void performTest(List<ReplayFrame> frames, Action<Slider>? adjustSliderFunc = null, bool classic = false)
         {
             Slider slider = new Slider
             {
                 StartTime = time_slider_start,
                 Position = new Vector2(256 - slider_path_length / 2, 192),
                 TickDistanceMultiplier = 3,
+                ClassicSliderBehaviour = classic,
                 Path = new SliderPath(PathType.LINEAR, new[]
                 {
                     Vector2.Zero,

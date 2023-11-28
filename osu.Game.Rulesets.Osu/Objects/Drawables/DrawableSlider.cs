@@ -271,23 +271,41 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
             if (userTriggered || !TailCircle.Judged || Time.Current < HitObject.EndTime)
                 return;
 
-            HitResult headResult = HeadCircle.HitObject.HitWindows.ResultFor(HeadCircle.Result.TimeOffset);
-
-            // Classic behaviour means a slider is judged proportionally to the number of nested hitobjects hit. This is the classic osu!stable scoring.
-            ApplyResult(r =>
+            if (HitObject.ClassicSliderBehaviour)
             {
-                int totalTicks = NestedHitObjects.Count;
-                int hitTicks = NestedHitObjects.Count(h => h.IsHit);
+                ApplyResult(r =>
+                {
+                    int totalTicks = NestedHitObjects.Count;
+                    int hitTicks = NestedHitObjects.Count(h => h.IsHit);
 
-                if (hitTicks == totalTicks && headResult == HitResult.Great)
-                    r.Type = HitResult.LegacyGreatNoCombo;
-                else if ((double)hitTicks / totalTicks >= 0.5 && headResult >= HitResult.Ok)
-                    r.Type = HitResult.LegacyOkNoCombo;
-                else if (hitTicks > 0)
-                    r.Type = HitResult.LegacyMehNoCombo;
-                else
-                    r.Type = HitResult.Miss;
-            });
+                    if (hitTicks == totalTicks)
+                        r.Type = HitResult.LegacyGreatNoCombo;
+                    else if ((double)hitTicks / totalTicks >= 0.5)
+                        r.Type = HitResult.LegacyOkNoCombo;
+                    else if (hitTicks > 0)
+                        r.Type = HitResult.LegacyMehNoCombo;
+                    else
+                        r.Type = HitResult.Miss;
+                });
+            }
+            else
+            {
+                HitResult headResult = HeadCircle.HitObject.HitWindows.ResultFor(HeadCircle.Result.TimeOffset);
+                ApplyResult(r =>
+                {
+                    int totalTicks = NestedHitObjects.Count;
+                    int hitTicks = NestedHitObjects.Count(h => h.IsHit);
+
+                    if (hitTicks == totalTicks && headResult == HitResult.Great)
+                        r.Type = HitResult.LegacyGreatNoCombo;
+                    else if ((double)hitTicks / totalTicks >= 0.5 && headResult >= HitResult.Ok)
+                        r.Type = HitResult.LegacyOkNoCombo;
+                    else if (hitTicks > 0)
+                        r.Type = HitResult.LegacyMehNoCombo;
+                    else
+                        r.Type = HitResult.Miss;
+                });
+            }
         }
 #pragma warning restore CS0618 // Type or member is obsolete
 
