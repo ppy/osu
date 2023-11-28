@@ -182,7 +182,15 @@ namespace osu.Game.Rulesets.Taiko.Beatmaps
 
             // The true distance, accounting for any repeats. This ends up being the drum roll distance later
             int spans = (obj as IHasRepeats)?.SpanCount() ?? 1;
-            double distance = distanceData.Distance * spans * LegacyBeatmapEncoder.LEGACY_TAIKO_VELOCITY_MULTIPLIER;
+
+            double distance;
+
+            if (obj is IHasPath pathData)
+                distance = pathData.Path.ExpectedDistance.Value ?? 0;
+            else
+                distance = distanceData.Distance;
+
+            distance *= spans * LegacyBeatmapEncoder.LEGACY_TAIKO_VELOCITY_MULTIPLIER;
 
             TimingControlPoint timingPoint = beatmap.ControlPointInfo.TimingPointAt(obj.StartTime);
 
