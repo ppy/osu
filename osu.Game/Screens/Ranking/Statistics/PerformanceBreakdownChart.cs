@@ -35,6 +35,7 @@ namespace osu.Game.Screens.Ranking.Statistics
         private Drawable content;
         private GridContainer chart;
         private OsuSpriteText achievedPerformance;
+        private OsuSpriteText fcPerformance;
         private OsuSpriteText maximumPerformance;
 
         private readonly CancellationTokenSource cancellationTokenSource = new CancellationTokenSource();
@@ -116,6 +117,24 @@ namespace osu.Game.Screens.Ranking.Statistics
                                         Origin = Anchor.CentreLeft,
                                         Anchor = Anchor.CentreLeft,
                                         Font = OsuFont.GetFont(weight: FontWeight.Regular, size: StatisticItem.FONT_SIZE),
+                                        Text = "PP for FC",
+                                        Colour = OsuColour.Gray(1.0f)
+                                    },
+                                    fcPerformance = new OsuSpriteText
+                                    {
+                                        Origin = Anchor.CentreRight,
+                                        Anchor = Anchor.CentreRight,
+                                        Font = OsuFont.GetFont(weight: FontWeight.SemiBold, sizeof: StatisticItem.FONT_SIZE),
+                                        Colour = OsuColour.Gray(1.0f)
+                                    }
+                                }
+                                new Drawable[]
+                                {
+                                    new OsuSpriteText
+                                    {
+                                        Origin = Anchor.CentreLeft,
+                                        Anchor = Anchor.CentreLeft,
+                                        Font = OsuFont.GetFont(weight: FontWeight.Regular, size: StatisticItem.FONT_SIZE),
                                         Text = "Maximum",
                                         Colour = OsuColour.Gray(0.7f)
                                     },
@@ -186,9 +205,10 @@ namespace osu.Game.Screens.Ranking.Statistics
             chart.Content = rows.ToArray();
         }
 
-        private void setTotalValues(PerformanceDisplayAttribute attribute, PerformanceDisplayAttribute perfectAttribute)
+        private void setTotalValues(PerformanceDisplayAttribute attribute, PerformanceDisplayAttribute fcAttribute, PerformanceDisplayAttribute perfectAttribute)
         {
             achievedPerformance.Text = Math.Round(attribute.Value, MidpointRounding.AwayFromZero).ToLocalisableString();
+            fcPerformance.Text = Math.Round(fcAttribute.Value, MidpointRound.AwayFromZero).ToLocalisableString();
             maximumPerformance.Text = Math.Round(perfectAttribute.Value, MidpointRounding.AwayFromZero).ToLocalisableString();
         }
 
