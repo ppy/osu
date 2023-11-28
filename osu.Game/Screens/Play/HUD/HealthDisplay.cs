@@ -33,23 +33,27 @@ namespace osu.Game.Screens.Play.HUD
             MaxValue = 1
         };
 
-        private BindableNumber<double> health = null!;
+        private double initialHealthAnimationValue;
+
+        protected double InitialHealthAnimationValue
+        {
+            get => initialHealthAnimationValue;
+            set
+            {
+                initialHealthAnimationValue = value;
+                setCurrent(value);
+            }
+        }
 
         private ScheduledDelegate? initialIncrease;
+
+        private IBindableNumber<double> health = null!;
 
         /// <summary>
         /// Triggered when a <see cref="Judgement"/> is a successful hit, signaling the health display to perform a flash animation (if designed to do so).
         /// Calls to this method are debounced.
         /// </summary>
         protected virtual void Flash()
-        {
-        }
-
-        /// <summary>
-        /// Triggered when a <see cref="Judgement"/> resulted in the player losing health.
-        /// Calls to this method are debounced.
-        /// </summary>
-        protected virtual void Miss()
         {
         }
 
@@ -61,14 +65,10 @@ namespace osu.Game.Screens.Play.HUD
             base.LoadComplete();
 
             HealthProcessor.NewJudgement += onNewJudgement;
+            HealthProcessor.HealthChanged += onHealthChanged;
 
             // Don't bind directly so we can animate the startup procedure.
             health = HealthProcessor.Health.GetBoundCopy();
-            health.BindValueChanged(h =>
-            {
-                finishInitialAnimation();
-                Current.Value = h.NewValue;
-            });
 
             if (hudOverlay != null)
                 showHealthBar.BindTo(hudOverlay.ShowHealthBar);
@@ -80,6 +80,27 @@ namespace osu.Game.Screens.Play.HUD
                 startInitialAnimation();
             else
                 Current.Value = health.Value;
+        }
+
+        protected virtual void OnHealthChanged(double newValue, double oldValue, JudgementResult? result = null)
+        {
+        }
+
+        private void onHealthChanged(double newValue, double _, JudgementResult? result = null)
+        {
+            finishInitialAnimation();
+            setCurrent(newValue, result);
+
+            if (result?.IsHit == true && result.Type != HitResult.IgnoreHit)
+                Scheduler.AddOnce(Flash);
+        }
+
+        private void setCurrent(double value, JudgementResult? result = null)
+        {
+            double oldValue = Current.Value;
+            Current.Value = value;
+
+            OnHealthChanged(value, oldValue, result);
         }
 
         private void startInitialAnimation()
@@ -94,7 +115,7 @@ namespace osu.Game.Screens.Play.HUD
             initialIncrease = Scheduler.AddDelayed(() =>
             {
                 double newValue = Math.Min(Current.Value + 0.05f, health.Value);
-                this.TransformBindableTo(Current, newValue, increase_delay);
+                this.TransformTo(nameof(InitialHealthAnimationValue), newValue, increase_delay);
                 Scheduler.AddOnce(Flash);
 
                 if (newValue >= health.Value)
@@ -110,20 +131,15 @@ namespace osu.Game.Screens.Play.HUD
             initialIncrease?.Cancel();
             initialIncrease = null;
 
+            // todo: this might be unnecessary
             // aside from the repeating `initialIncrease` scheduled task,
             // there may also be a `Current` transform in progress from that schedule.
-            // ensure it plays out fully, to prevent changes to `Current.Value` being discarded by the ongoing transform.
-            // and yes, this funky `targetMember` spec is seemingly the only way to do this
-            // (see: https://github.com/ppy/osu-framework/blob/fe2769171c6e26d1b6fdd6eb7ea8353162fe9065/osu.Framework/Graphics/Transforms/TransformBindable.cs#L21)
-            FinishTransforms(targetMember: $"{Current.GetHashCode()}.{nameof(Current.Value)}");
+            // ensure it plays out fully, to prevent changes to `initialHealthAnimationValue` being discarded by the ongoing transform.
+            FinishTransforms(targetMember: nameof(initialHealthAnimationValue));
         }
 
         private void onNewJudgement(JudgementResult judgement)
         {
-            if (judgement.IsHit && judgement.Type != HitResult.IgnoreHit)
-                Scheduler.AddOnce(Flash);
-            else if (judgement.Judgement.HealthIncreaseFor(judgement) < 0)
-                Scheduler.AddOnce(Miss);
         }
 
         protected override void Dispose(bool isDisposing)
