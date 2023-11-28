@@ -24,6 +24,23 @@ namespace osu.Game.Tests.Visual.Gameplay
 
         private ArgonHealthDisplay healthDisplay = null!;
 
+        protected override void LoadComplete()
+        {
+            base.LoadComplete();
+
+            AddSliderStep("Height", 0, 64, 0, val =>
+            {
+                if (healthDisplay.IsNotNull())
+                    healthDisplay.BarHeight.Value = val;
+            });
+
+            AddSliderStep("Width", 0, 1f, 0.98f, val =>
+            {
+                if (healthDisplay.IsNotNull())
+                    healthDisplay.Width = val;
+            });
+        }
+
         [SetUpSteps]
         public void SetUpSteps()
         {
@@ -46,27 +63,12 @@ namespace osu.Game.Tests.Visual.Gameplay
                     },
                 };
             });
-
-            AddSliderStep("Height", 0, 64, 0, val =>
-            {
-                if (healthDisplay.IsNotNull())
-                    healthDisplay.BarHeight.Value = val;
-            });
-
-            AddSliderStep("Width", 0, 1f, 0.98f, val =>
-            {
-                if (healthDisplay.IsNotNull())
-                    healthDisplay.Width = val;
-            });
         }
 
         [Test]
         public void TestHealthDisplayIncrementing()
         {
-            AddRepeatStep("apply miss judgement", delegate
-            {
-                healthProcessor.ApplyResult(new JudgementResult(new HitObject(), new Judgement()) { Type = HitResult.Miss });
-            }, 5);
+            AddRepeatStep("apply miss judgement", applyMiss, 5);
 
             AddRepeatStep(@"decrease hp slightly", delegate
             {
@@ -86,6 +88,45 @@ namespace osu.Game.Tests.Visual.Gameplay
                     Type = HitResult.Perfect
                 });
             }, 3);
+        }
+
+        [Test]
+        public void TestLateMissAfterConsequentMisses()
+        {
+            AddUntilStep("wait for health", () => healthDisplay.Current.Value == 1);
+            AddStep("apply sequence", () =>
+            {
+                for (int i = 0; i < 10; i++)
+                    applyMiss();
+
+                Scheduler.AddDelayed(applyMiss, 500 + 30);
+            });
+        }
+
+        [Test]
+        public void TestMissAlmostExactlyAfterLastMissAnimation()
+        {
+            AddUntilStep("wait for health", () => healthDisplay.Current.Value == 1);
+            AddStep("apply sequence", () =>
+            {
+                const double interval = 500 + 15;
+
+                for (int i = 0; i < 5; i++)
+                {
+                    if (i % 2 == 0)
+                        Scheduler.AddDelayed(applyMiss, i * interval);
+                    else
+                    {
+                        Scheduler.AddDelayed(applyMiss, i * interval);
+                        Scheduler.AddDelayed(applyMiss, i * interval);
+                    }
+                }
+            });
+        }
+
+        private void applyMiss()
+        {
+            healthProcessor.ApplyResult(new JudgementResult(new HitObject(), new Judgement()) { Type = HitResult.Miss });
         }
     }
 }
