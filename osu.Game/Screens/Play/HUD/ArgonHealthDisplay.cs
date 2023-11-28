@@ -55,7 +55,7 @@ namespace osu.Game.Screens.Play.HUD
 
         private ScheduledDelegate? finishMissDisplayDelegate;
 
-        private bool duringMissTransition => finishMissDisplayDelegate != null;
+        private bool displayingMiss => finishMissDisplayDelegate != null;
 
         private readonly List<Vector2> missBarVertices = new List<Vector2>();
         private readonly List<Vector2> healthBarVertices = new List<Vector2>();
@@ -177,7 +177,7 @@ namespace osu.Game.Screens.Play.HUD
 
             if (result != null && result.Judgement.HealthIncreaseFor(result) < 0)
                 Scheduler.AddOnce(displayMiss);
-            else if (!duringMissTransition)
+            else if (!displayingMiss)
                 this.TransformTo(nameof(GlowBarValue), newValue, time, Easing.OutQuint);
         }
 
@@ -202,7 +202,7 @@ namespace osu.Game.Screens.Play.HUD
             mainBar.TransformTo(nameof(BarPath.GlowColour), main_bar_glow_colour.Opacity(0.8f))
                    .TransformTo(nameof(BarPath.GlowColour), main_bar_glow_colour, 300, Easing.OutQuint);
 
-            if (!duringMissTransition)
+            if (!displayingMiss)
             {
                 glowBar.TransformTo(nameof(BarPath.BarColour), Colour4.White, 30, Easing.OutQuint)
                        .Then()
@@ -237,7 +237,7 @@ namespace osu.Game.Screens.Play.HUD
 
         private void finishMissDisplay()
         {
-            if (finishMissDisplayDelegate == null)
+            if (!displayingMiss)
                 return;
 
             if (Current.Value > 0)
