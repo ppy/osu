@@ -38,7 +38,7 @@ namespace osu.Game.Screens.Ranking.Statistics
         private OsuSpriteText fcPerformance;
         private OsuSpriteText maximumPerformance;
         private Color4 achieveColor = Color4Extensions.FromHex("#66FFCC");
-        private Color4 pfcColor = Color4Extensions.FromHex("#FF66E5");
+        private Color4 pfcColor = Color4Extensions.FromHex("#609882");
 
         private readonly CancellationTokenSource cancellationTokenSource = new CancellationTokenSource();
 
