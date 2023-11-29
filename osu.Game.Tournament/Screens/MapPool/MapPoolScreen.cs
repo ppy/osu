@@ -153,7 +153,9 @@ namespace osu.Game.Tournament.Screens.MapPool
 
             const TeamColour roll_winner = TeamColour.Red; //todo: draw from match
 
-            var nextColour = (CurrentMatch.Value.PicksBans.LastOrDefault()?.Team ?? roll_winner) == TeamColour.Red ? TeamColour.Blue : TeamColour.Red;
+            var previousBan = CurrentMatch.Value.PicksBans.LastOrDefault()?.Team ?? roll_winner;
+
+            var nextColour = (CurrentMatch.Value.PicksBans.Count() >= 2 ? CurrentMatch.Value.PicksBans[^2]?.Team : previousBan) == TeamColour.Red ? TeamColour.Blue : TeamColour.Red;
 
             bool hasAllBans = CurrentMatch.Value.PicksBans.Count(p => p.Type == ChoiceType.Ban) >= totalBansRequired;
 
