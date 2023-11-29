@@ -22,13 +22,8 @@ namespace osu.Game.Rulesets.Mania.Beatmaps.Patterns.Legacy
     /// <summary>
     /// A pattern generator for IHasDistance hit objects.
     /// </summary>
-    internal class DistanceObjectPatternGenerator : PatternGenerator
+    internal class PathObjectPatternGenerator : PatternGenerator
     {
-        /// <summary>
-        /// Base osu! slider scoring distance.
-        /// </summary>
-        private const float osu_base_scoring_distance = 100;
-
         public readonly int StartTime;
         public readonly int EndTime;
         public readonly int SegmentDuration;
@@ -36,17 +31,17 @@ namespace osu.Game.Rulesets.Mania.Beatmaps.Patterns.Legacy
 
         private PatternType convertType;
 
-        public DistanceObjectPatternGenerator(LegacyRandom random, HitObject hitObject, ManiaBeatmap beatmap, Pattern previousPattern, IBeatmap originalBeatmap)
+        public PathObjectPatternGenerator(LegacyRandom random, HitObject hitObject, ManiaBeatmap beatmap, Pattern previousPattern, IBeatmap originalBeatmap)
             : base(random, hitObject, beatmap, previousPattern, originalBeatmap)
         {
             convertType = PatternType.None;
             if (!Beatmap.ControlPointInfo.EffectPointAt(hitObject.StartTime).KiaiMode)
                 convertType = PatternType.LowProbability;
 
-            var distanceData = hitObject as IHasDistance;
+            var pathData = hitObject as IHasPath;
             var repeatsData = hitObject as IHasRepeats;
 
-            Debug.Assert(distanceData != null);
+            Debug.Assert(pathData != null);
 
             TimingControlPoint timingPoint = beatmap.ControlPointInfo.TimingPointAt(hitObject.StartTime);
 
@@ -60,12 +55,7 @@ namespace osu.Game.Rulesets.Mania.Beatmaps.Patterns.Legacy
             SpanCount = repeatsData?.SpanCount() ?? 1;
             StartTime = (int)Math.Round(hitObject.StartTime);
 
-            double distance;
-
-            if (hitObject is IHasPath pathData)
-                distance = pathData.Path.ExpectedDistance.Value ?? 0;
-            else
-                distance = distanceData.Distance;
+            double distance = pathData.Path.ExpectedDistance.Value ?? 0;
 
             // This matches stable's calculation.
             EndTime = (int)Math.Floor(StartTime + distance * beatLength * SpanCount * 0.01 / beatmap.Difficulty.SliderMultiplier);
