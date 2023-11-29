@@ -118,7 +118,7 @@ namespace osu.Game.Screens.Ranking.Statistics
                                         Origin = Anchor.CentreLeft,
                                         Anchor = Anchor.CentreLeft,
                                         Font = OsuFont.GetFont(weight: FontWeight.Regular, size: StatisticItem.FONT_SIZE),
-                                        Text = "PP for FC",
+                                        Text = "PP for Perfect Combo",
                                         Colour = Color4Extensions.FromHex("#FF6699")
                                     },
                                     fcPerformance = new OsuSpriteText
