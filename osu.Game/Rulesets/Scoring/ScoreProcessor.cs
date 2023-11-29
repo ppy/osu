@@ -446,7 +446,7 @@ namespace osu.Game.Rulesets.Scoring
         /// <summary>
         /// Given an accuracy (0..1), return the correct <see cref="ScoreRank"/>.
         /// </summary>
-        public static ScoreRank RankFromAccuracy(double accuracy)
+        public virtual ScoreRank RankFromAccuracy(double accuracy)
         {
             if (accuracy == accuracy_cutoff_x)
                 return ScoreRank.X;
@@ -466,7 +466,7 @@ namespace osu.Game.Rulesets.Scoring
         /// Given a <see cref="ScoreRank"/>, return the cutoff accuracy (0..1).
         /// Accuracy must be greater than or equal to the cutoff to qualify for the provided rank.
         /// </summary>
-        public static double AccuracyCutoffFromRank(ScoreRank rank)
+        public virtual double AccuracyCutoffFromRank(ScoreRank rank)
         {
             switch (rank)
             {
