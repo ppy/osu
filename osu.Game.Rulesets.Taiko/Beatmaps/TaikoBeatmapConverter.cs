@@ -190,7 +190,9 @@ namespace osu.Game.Rulesets.Taiko.Beatmaps
             else
                 distance = distanceData.Distance;
 
-            distance *= spans * LegacyBeatmapEncoder.LEGACY_TAIKO_VELOCITY_MULTIPLIER;
+            // Do not combine the following two lines!
+            distance *= LegacyBeatmapEncoder.LEGACY_TAIKO_VELOCITY_MULTIPLIER;
+            distance *= spans;
 
             TimingControlPoint timingPoint = beatmap.ControlPointInfo.TimingPointAt(obj.StartTime);
 
