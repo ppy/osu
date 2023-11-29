@@ -37,7 +37,7 @@ namespace osu.Game.Rulesets.Difficulty
                 // compute actual performance
                 performanceCache.CalculatePerformanceAsync(score, cancellationToken),
                 // compute performance for a full combo
-                getFCPerformance(score, cancellationToken),
+                getPFCPerformance(score, cancellationToken),
                 // compute performance for perfect play
                 getPerfectPerformance(score, cancellationToken)
             ).ConfigureAwait(false);
@@ -46,16 +46,17 @@ namespace osu.Game.Rulesets.Difficulty
         }
 
         [ItemCanBeNull]
-        private Task<PerformanceAttributes> getFCPerformance(ScoreInfo score, CancellationToken cancellationToken = default)
+        private Task<PerformanceAttributes> getPFCPerformance(ScoreInfo score, CancellationToken cancellationToken = default)
         {
             return Task.Run(async () =>
             {
                 Ruleset rulest = score.Ruleset.CreateInstance();
-                ScoreInfo FCPlay = score.DeepClone();
-                FCPlay.Passed = true;
+                ScoreInfo PFCPlay = score.DeepClone();
+                PFCPlay.Passed = true;
 
-                FCPlay.MaxCombo = calculateMaxCombo(playableBeatmap);
-                FCPlay.Statistics[HitResult.Miss] = 0;
+                // Update the play to be a pfc
+                PFCPlay.MaxCombo = calculateMaxCombo(playableBeatmap);
+                PFCPlay.Statistics[HitResult.Miss] = 0;
 
                 var difficulty = await difficultyCache.GetDifficultyAsync(
                     playableBeatmap.BeatmapInfo,
@@ -64,7 +65,7 @@ namespace osu.Game.Rulesets.Difficulty
                     cancellationToken
                 ).ConfigureAwait(false);
 
-                return difficulty == null ? null : rulest.CreatePerformanceCalculator()?.Calculate(FCPlay, difficulty.Value.Attributes.AsNonNull());
+                return difficulty == null ? null : rulest.CreatePerformanceCalculator()?.Calculate(PFCPlay, difficulty.Value.Attributes.AsNonNull());
             }, cancellationToken);
         }
 

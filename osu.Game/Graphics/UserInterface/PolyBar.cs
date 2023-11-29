@@ -11,31 +11,39 @@ using osu.Framework.Graphics.Shapes;
 
 namespace osu.Game.Graphics.UserInterface
 {
+    // A modified implementation of Bar which supports multiple accent bars
     public partial class PolyBar : Container
     {
+        // Box to represent the background of the bars
         private readonly Box background;
+        // Each accent coloured bar within the PolyBar
         private readonly Box[] bars;
+        // number of bars, could use bars.Length instead but moved to readonly field for readability
         private readonly int barCount;
         private const int resize_duration = 250;
         private const Easing easing = Easing.InOutCubic;
+        // Each of these maps to a box in bars 1:1, lengths[i] represents the length of bars[i]
         private float[] lengths;
+        // getters and setters for the lengths are moved to functions, because C# doesn't support indexed getters
         public void SetLength(int index, float value)
         {
             lengths[index] = Math.Clamp(value, 0, 1);
             updateBarLength(index);
         }
         public float GetLength(int index) => lengths[index];
+        // update colour of background through this class
         public Color4 BackgroundColour
         {
             get => background.Colour;
             set => background.Colour = value;
         }
+        // getters and setters for colours, maps same as lengths and bars, GetColour(i) returns the colour of bars[i]
         public void SetColour(int index, Color4 value)
         {
             bars[index].Colour = value;
         }
         public Color4 GetColour(int index) => bars[index].Colour;
-        // This should be modified so bars can go different directions, this is all that's needed for current usecase though
+        // Only supports all bars going in the same direction currently
         private BarDirection direction = BarDirection.LeftToRight;
         public BarDirection Direction
         {
@@ -69,6 +77,7 @@ namespace osu.Game.Graphics.UserInterface
             }
             Children = children.ToArray();
         }
+        // updates the length of a single bar of the given index, but will update all lengths if an argument of -1 or no argument is given
         private void updateBarLength(int index=-1)
         {
             if (index == -1)
@@ -105,6 +114,7 @@ namespace osu.Game.Graphics.UserInterface
             }
 
         }
+        // update the length of every bar
         private void updateBarLengths()
         {
             for (int i = 0; i < barCount; i++)

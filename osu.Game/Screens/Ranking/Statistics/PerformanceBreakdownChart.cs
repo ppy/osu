@@ -35,8 +35,9 @@ namespace osu.Game.Screens.Ranking.Statistics
         private Drawable content;
         private GridContainer chart;
         private OsuSpriteText achievedPerformance;
-        private OsuSpriteText fcPerformance;
+        private OsuSpriteText pfcPerformance;
         private OsuSpriteText maximumPerformance;
+        // Colours of the achieved and pfc text and bars
         private Color4 achieveColor = Color4Extensions.FromHex("#66FFCC");
         private Color4 pfcColor = Color4Extensions.FromHex("#609882");
 
@@ -123,7 +124,7 @@ namespace osu.Game.Screens.Ranking.Statistics
                                         Text = "PP for Perfect Combo",
                                         Colour = pfcColor
                                     },
-                                    fcPerformance = new OsuSpriteText
+                                    pfcPerformance = new OsuSpriteText
                                     {
                                         Origin = Anchor.CentreRight,
                                         Anchor = Anchor.CentreRight,
@@ -181,12 +182,12 @@ namespace osu.Game.Screens.Ranking.Statistics
             content.FadeIn(200);
 
             var displayAttributes = breakdown.Performance.GetAttributesForDisplay();
-            var fcAttribute = breakdown.FCPerformance.GetAttributesForDisplay();
+            var pfcAttribute = breakdown.PFCPerformance.GetAttributesForDisplay();
             var perfectDisplayAttributes = breakdown.PerfectPerformance.GetAttributesForDisplay();
 
             setTotalValues(
                 displayAttributes.First(a => a.PropertyName == nameof(PerformanceAttributes.Total)),
-                fcAttribute.First(a => a.PropertyName == nameof(PerformanceAttributes.Total)),
+                pfcAttribute.First(a => a.PropertyName == nameof(PerformanceAttributes.Total)),
                 perfectDisplayAttributes.First(a => a.PropertyName == nameof(PerformanceAttributes.Total))
             );
 
@@ -197,7 +198,7 @@ namespace osu.Game.Screens.Ranking.Statistics
             {
                 if (attr.PropertyName == nameof(PerformanceAttributes.Total)) continue;
 
-                var row = createAttributeRow(attr, fcAttribute.First(a => a.PropertyName == attr.PropertyName), perfectDisplayAttributes.First(a => a.PropertyName == attr.PropertyName));
+                var row = createAttributeRow(attr, pfcAttribute.First(a => a.PropertyName == attr.PropertyName), perfectDisplayAttributes.First(a => a.PropertyName == attr.PropertyName));
 
                 if (row != null)
                 {
@@ -210,15 +211,15 @@ namespace osu.Game.Screens.Ranking.Statistics
             chart.Content = rows.ToArray();
         }
 
-        private void setTotalValues(PerformanceDisplayAttribute attribute, PerformanceDisplayAttribute fcAttribute, PerformanceDisplayAttribute perfectAttribute)
+        private void setTotalValues(PerformanceDisplayAttribute attribute, PerformanceDisplayAttribute pfcAttribute, PerformanceDisplayAttribute perfectAttribute)
         {
             achievedPerformance.Text = Math.Round(attribute.Value, MidpointRounding.AwayFromZero).ToLocalisableString();
-            fcPerformance.Text = Math.Round(fcAttribute.Value, MidpointRounding.AwayFromZero).ToLocalisableString();
+            pfcPerformance.Text = Math.Round(pfcAttribute.Value, MidpointRounding.AwayFromZero).ToLocalisableString();
             maximumPerformance.Text = Math.Round(perfectAttribute.Value, MidpointRounding.AwayFromZero).ToLocalisableString();
         }
 
         [CanBeNull]
-        private Drawable[] createAttributeRow(PerformanceDisplayAttribute attribute, PerformanceDisplayAttribute fcAttribute, PerformanceDisplayAttribute perfectAttribute)
+        private Drawable[] createAttributeRow(PerformanceDisplayAttribute attribute, PerformanceDisplayAttribute pfcAttribute, PerformanceDisplayAttribute perfectAttribute)
         {
             // Don't display the attribute if its maximum is 0
             // For example, flashlight bonus would be zero if flashlight mod isn't on
@@ -226,7 +227,7 @@ namespace osu.Game.Screens.Ranking.Statistics
                 return null;
 
             float percentage = (float)(attribute.Value / perfectAttribute.Value);
-            float fcPercentage = (float)(fcAttribute.Value / perfectAttribute.Value);
+            float fcPercentage = (float)(pfcAttribute.Value / perfectAttribute.Value);
 
             PolyBar bar = new PolyBar(2)
             {
