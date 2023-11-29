@@ -235,13 +235,13 @@ namespace osu.Game.Screens.Ranking.Expanded.Accuracy
                     Padding = new MarginPadding { Vertical = -15, Horizontal = -20 },
                     Children = new[]
                     {
-                        // The S and A badges are moved down slightly to prevent collision with the SS badge.
-                        new RankBadge(accuracyX, accuracyX, getRank(ScoreRank.X)),
-                        new RankBadge(accuracyS, Interpolation.Lerp(accuracyS, (accuracyX - virtual_ss_percentage), 0.25), getRank(ScoreRank.S)),
-                        new RankBadge(accuracyA, Interpolation.Lerp(accuracyA, accuracyS, 0.25), getRank(ScoreRank.A)),
-                        new RankBadge(accuracyB, Interpolation.Lerp(accuracyB, accuracyA, 0.5), getRank(ScoreRank.B)),
-                        new RankBadge(accuracyC, Interpolation.Lerp(accuracyC, accuracyB, 0.5), getRank(ScoreRank.C)),
                         new RankBadge(accuracyD, Interpolation.Lerp(accuracyD, accuracyC, 0.5), getRank(ScoreRank.D)),
+                        new RankBadge(accuracyC, Interpolation.Lerp(accuracyC, accuracyB, 0.5), getRank(ScoreRank.C)),
+                        new RankBadge(accuracyB, Interpolation.Lerp(accuracyB, accuracyA, 0.5), getRank(ScoreRank.B)),
+                        // The S and A badges are moved down slightly to prevent collision with the SS badge.
+                        new RankBadge(accuracyA, Interpolation.Lerp(accuracyA, accuracyS, 0.25), getRank(ScoreRank.A)),
+                        new RankBadge(accuracyS, Interpolation.Lerp(accuracyS, (accuracyX - virtual_ss_percentage), 0.25), getRank(ScoreRank.S)),
+                        new RankBadge(accuracyX, accuracyX, getRank(ScoreRank.X)),
                     }
                 },
                 rankText = new RankText(score.Rank)
