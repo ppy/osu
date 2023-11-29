@@ -195,7 +195,7 @@ namespace osu.Game.Screens.Ranking.Statistics
             {
                 if (attr.PropertyName == nameof(PerformanceAttributes.Total)) continue;
 
-                var row = createAttributeRow(attr, perfectDisplayAttributes.First(a => a.PropertyName == attr.PropertyName));
+                var row = createAttributeRow(attr, fcAttribute.First(a => a.PropertyName == attr.PropertyName), perfectDisplayAttributes.First(a => a.PropertyName == attr.PropertyName));
 
                 if (row != null)
                 {
@@ -216,7 +216,7 @@ namespace osu.Game.Screens.Ranking.Statistics
         }
 
         [CanBeNull]
-        private Drawable[] createAttributeRow(PerformanceDisplayAttribute attribute, PerformanceDisplayAttribute perfectAttribute)
+        private Drawable[] createAttributeRow(PerformanceDisplayAttribute attribute, PerformanceDisplayAttribute fcAttribute, PerformanceDisplayAttribute perfectAttribute)
         {
             // Don't display the attribute if its maximum is 0
             // For example, flashlight bonus would be zero if flashlight mod isn't on
@@ -224,6 +224,22 @@ namespace osu.Game.Screens.Ranking.Statistics
                 return null;
 
             float percentage = (float)(attribute.Value / perfectAttribute.Value);
+            float fcPercentage = (float)(fcAttribute.Value / perfectAttribute.Value);
+
+            PolyBar bar = new PolyBar(2)
+            {
+                RelativeSizeAxes = Axes.X,
+                Origin = Anchor.Centre,
+                Anchor = Anchor.Centre,
+                CornerRadius = 2.5f,
+                Masking = true,
+                Height = 5,
+                BackgroundColour = Color4.White.Opacity(0.5f),
+            };
+            bar.SetColour(1, Color4Extensions.FromHex("#66FFCC"));
+            bar.SetColour(0, Color4Extensions.FromHex("#FF6699"));
+            bar.SetLength(1, percentage);
+            bar.SetLength(0, fcPercentage);
 
             return new Drawable[]
             {
@@ -239,18 +255,7 @@ namespace osu.Game.Screens.Ranking.Statistics
                 {
                     RelativeSizeAxes = Axes.Both,
                     Padding = new MarginPadding { Left = 10, Right = 10 },
-                    Child = new Bar
-                    {
-                        RelativeSizeAxes = Axes.X,
-                        Origin = Anchor.Centre,
-                        Anchor = Anchor.Centre,
-                        CornerRadius = 2.5f,
-                        Masking = true,
-                        Height = 5,
-                        BackgroundColour = Color4.White.Opacity(0.5f),
-                        AccentColour = Color4Extensions.FromHex("#66FFCC"),
-                        Length = percentage
-                    }
+                    Child = bar
                 },
                 new OsuSpriteText
                 {
