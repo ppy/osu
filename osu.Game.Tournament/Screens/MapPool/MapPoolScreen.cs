@@ -136,34 +136,34 @@ namespace osu.Game.Tournament.Screens.MapPool
             pickColour = colour;
             pickType = choiceType;
 
-            static Color4 setColour(bool active) => active ? Color4.White : Color4.Gray;
-
             buttonRedBan.Colour = setColour(pickColour == TeamColour.Red && pickType == ChoiceType.Ban);
             buttonBlueBan.Colour = setColour(pickColour == TeamColour.Blue && pickType == ChoiceType.Ban);
             buttonRedPick.Colour = setColour(pickColour == TeamColour.Red && pickType == ChoiceType.Pick);
             buttonBluePick.Colour = setColour(pickColour == TeamColour.Blue && pickType == ChoiceType.Pick);
+
+            static Color4 setColour(bool active) => active ? Color4.White : Color4.Gray;
         }
 
         private void setNextMode()
         {
-            int banCount = 2;
-
-            if (CurrentMatch.Value == null)
+            if (CurrentMatch.Value?.Round.Value == null)
                 return;
 
-            if (CurrentMatch.Value.Round.Value != null)
-            {
-                banCount = CurrentMatch.Value.Round.Value.BanCount.Value * 2;
-            }
+            int totalBansRequired = CurrentMatch.Value.Round.Value.BanCount.Value * 2;
 
             const TeamColour roll_winner = TeamColour.Red; //todo: draw from match
 
             var nextColour = (CurrentMatch.Value.PicksBans.LastOrDefault()?.Team ?? roll_winner) == TeamColour.Red ? TeamColour.Blue : TeamColour.Red;
 
-            if (pickType == ChoiceType.Ban && CurrentMatch.Value.PicksBans.Count(p => p.Type == ChoiceType.Ban) >= banCount)
-                setMode(pickColour, ChoiceType.Pick);
-            else
-                setMode(nextColour, CurrentMatch.Value.PicksBans.Count(p => p.Type == ChoiceType.Ban) >= banCount ? ChoiceType.Pick : ChoiceType.Ban);
+            bool hasAllBans = CurrentMatch.Value.PicksBans.Count(p => p.Type == ChoiceType.Ban) >= totalBansRequired;
+
+            if (hasAllBans && pickType == ChoiceType.Ban)
+            {
+                // When switching from bans to picks, we don't rotate the team colour.
+                nextColour = pickColour;
+            }
+
+            setMode(nextColour, hasAllBans ? ChoiceType.Pick : ChoiceType.Ban);
         }
 
         protected override bool OnMouseDown(MouseDownEvent e)
