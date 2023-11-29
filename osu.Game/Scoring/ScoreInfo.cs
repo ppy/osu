@@ -342,23 +342,7 @@ namespace osu.Game.Scoring
                 switch (r.result)
                 {
                     case HitResult.SmallTickHit:
-                    {
-                        int total = value + Statistics.GetValueOrDefault(HitResult.SmallTickMiss);
-                        if (total > 0)
-                            yield return new HitResultDisplayStatistic(r.result, value, total, r.displayName);
-
-                        break;
-                    }
-
                     case HitResult.LargeTickHit:
-                    {
-                        int total = value + Statistics.GetValueOrDefault(HitResult.LargeTickMiss);
-                        if (total > 0)
-                            yield return new HitResultDisplayStatistic(r.result, value, total, r.displayName);
-
-                        break;
-                    }
-
                     case HitResult.LargeBonus:
                     case HitResult.SmallBonus:
                         if (MaximumStatistics.TryGetValue(r.result, out int count) && count > 0)
