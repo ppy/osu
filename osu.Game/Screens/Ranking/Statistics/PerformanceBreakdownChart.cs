@@ -88,6 +88,7 @@ namespace osu.Game.Screens.Ranking.Statistics
                             RowDimensions = new[]
                             {
                                 new Dimension(GridSizeMode.AutoSize),
+                                new Dimension(GridSizeMode.AutoSize),
                                 new Dimension(GridSizeMode.AutoSize)
                             },
                             Content = new[]
@@ -118,14 +119,14 @@ namespace osu.Game.Screens.Ranking.Statistics
                                         Anchor = Anchor.CentreLeft,
                                         Font = OsuFont.GetFont(weight: FontWeight.Regular, size: StatisticItem.FONT_SIZE),
                                         Text = "PP for FC",
-                                        Colour = OsuColour.Gray(1.0f)
+                                        Colour = Color4Extensions.FromHex("#FF6699")
                                     },
                                     fcPerformance = new OsuSpriteText
                                     {
                                         Origin = Anchor.CentreRight,
                                         Anchor = Anchor.CentreRight,
                                         Font = OsuFont.GetFont(weight: FontWeight.SemiBold, size: StatisticItem.FONT_SIZE),
-                                        Colour = OsuColour.Gray(1.0f)
+                                        Colour = Color4Extensions.FromHex("#FF6699")
                                     }
                                 },
                                 new Drawable[]
