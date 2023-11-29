@@ -14,6 +14,11 @@ namespace osu.Game.Rulesets.Difficulty
         public PerformanceAttributes Performance { get; set; }
 
         /// <summary>
+        /// Performance if the play was a full combo
+        /// </summary>
+        public PerformanceAttributes FCPerformance {get; set;}
+
+        /// <summary>
         /// Performance of a perfect play for comparison.
         /// </summary>
         public PerformanceAttributes PerfectPerformance { get; set; }
@@ -22,10 +27,12 @@ namespace osu.Game.Rulesets.Difficulty
         /// Create a new performance breakdown.
         /// </summary>
         /// <param name="performance">Actual gameplay performance.</param>
+        /// <param name="fcPerformance">Performance rewarded if the play was a full combo</param>
         /// <param name="perfectPerformance">Performance of a perfect play for comparison.</param>
-        public PerformanceBreakdown(PerformanceAttributes performance, PerformanceAttributes perfectPerformance)
+        public PerformanceBreakdown(PerformanceAttributes performance, PerformanceAttributes fcPerformance, PerformanceAttributes perfectPerformance)
         {
             Performance = performance;
+            FCPerformance = fcPerformance;
             PerfectPerformance = perfectPerformance;
         }
     }

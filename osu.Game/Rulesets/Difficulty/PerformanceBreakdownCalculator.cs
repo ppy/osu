@@ -36,11 +36,36 @@ namespace osu.Game.Rulesets.Difficulty
             PerformanceAttributes[] performanceArray = await Task.WhenAll(
                 // compute actual performance
                 performanceCache.CalculatePerformanceAsync(score, cancellationToken),
+                // compute performance for a full combo
+                getFCPerformance(score, cancellationToken),
                 // compute performance for perfect play
                 getPerfectPerformance(score, cancellationToken)
             ).ConfigureAwait(false);
 
-            return new PerformanceBreakdown(performanceArray[0] ?? new PerformanceAttributes(), performanceArray[1] ?? new PerformanceAttributes());
+            return new PerformanceBreakdown(performanceArray[0] ?? new PerformanceAttributes(), performanceArray[1] ?? new PerformanceAttributes(), performanceArray[2] ?? new PerformanceAttributes());
+        }
+
+        [ItemCanBeNull]
+        private Task<PerformanceAttributes> getFCPerformance(ScoreInfo score, CancellationToken cancellationToken = default)
+        {
+            return Task.Run(async () =>
+            {
+                Ruleset rulest = score.Ruleset.CreateInstance();
+                ScoreInfo FCPlay = score.DeepClone();
+                FCPlay.Passed = true;
+
+                FCPlay.MaxCombo = calculateMaxCombo(playableBeatmap);
+                FCPlay.Statistics[HitResult.Miss] = 0;
+
+                var difficulty = await difficultyCache.GetDifficultyAsync(
+                    playableBeatmap.BeatmapInfo,
+                    score.Ruleset,
+                    score.Mods,
+                    cancellationToken
+                ).ConfigureAwait(false);
+
+                return difficulty == null ? null : rulest.CreatePerformanceCalculator()?.Calculate(FCPlay, difficulty.Value.Attributes.AsNonNull());
+            }, cancellationToken);
         }
 
         [ItemCanBeNull]

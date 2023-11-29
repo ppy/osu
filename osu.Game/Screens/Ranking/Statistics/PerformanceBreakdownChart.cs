@@ -124,10 +124,10 @@ namespace osu.Game.Screens.Ranking.Statistics
                                     {
                                         Origin = Anchor.CentreRight,
                                         Anchor = Anchor.CentreRight,
-                                        Font = OsuFont.GetFont(weight: FontWeight.SemiBold, sizeof: StatisticItem.FONT_SIZE),
+                                        Font = OsuFont.GetFont(weight: FontWeight.SemiBold, size: StatisticItem.FONT_SIZE),
                                         Colour = OsuColour.Gray(1.0f)
                                     }
-                                }
+                                },
                                 new Drawable[]
                                 {
                                     new OsuSpriteText
@@ -178,10 +178,12 @@ namespace osu.Game.Screens.Ranking.Statistics
             content.FadeIn(200);
 
             var displayAttributes = breakdown.Performance.GetAttributesForDisplay();
+            var fcAttribute = breakdown.FCPerformance.GetAttributesForDisplay();
             var perfectDisplayAttributes = breakdown.PerfectPerformance.GetAttributesForDisplay();
 
             setTotalValues(
                 displayAttributes.First(a => a.PropertyName == nameof(PerformanceAttributes.Total)),
+                fcAttribute.First(a => a.PropertyName == nameof(PerformanceAttributes.Total)),
                 perfectDisplayAttributes.First(a => a.PropertyName == nameof(PerformanceAttributes.Total))
             );
 
@@ -208,7 +210,7 @@ namespace osu.Game.Screens.Ranking.Statistics
         private void setTotalValues(PerformanceDisplayAttribute attribute, PerformanceDisplayAttribute fcAttribute, PerformanceDisplayAttribute perfectAttribute)
         {
             achievedPerformance.Text = Math.Round(attribute.Value, MidpointRounding.AwayFromZero).ToLocalisableString();
-            fcPerformance.Text = Math.Round(fcAttribute.Value, MidpointRound.AwayFromZero).ToLocalisableString();
+            fcPerformance.Text = Math.Round(fcAttribute.Value, MidpointRounding.AwayFromZero).ToLocalisableString();
             maximumPerformance.Text = Math.Round(perfectAttribute.Value, MidpointRounding.AwayFromZero).ToLocalisableString();
         }
 
