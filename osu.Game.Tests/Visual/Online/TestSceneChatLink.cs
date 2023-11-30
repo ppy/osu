@@ -59,8 +59,6 @@ namespace osu.Game.Tests.Visual.Online
         [Test]
         public void TestLinksGeneral()
         {
-            int messageIndex = 0;
-
             addMessageWithChecks("test!");
             addMessageWithChecks("dev.ppy.sh!");
             addMessageWithChecks("https://dev.ppy.sh!", expectedActions: LinkAction.External);
@@ -95,36 +93,35 @@ namespace osu.Game.Tests.Visual.Online
             addMessageWithChecks("Join my #english or #japanese channels.", expectedActions: new[] { LinkAction.OpenChannel, LinkAction.OpenChannel });
             addMessageWithChecks("Join my #english or #nonexistent #hashtag channels.", expectedActions: LinkAction.OpenChannel);
             addMessageWithChecks("Hello world\uD83D\uDE12(<--This is an emoji). There are more:\uD83D\uDE10\uD83D\uDE00,\uD83D\uDE20");
+        }
 
-            void addMessageWithChecks(string text, bool isAction = false, bool isImportant = false, params LinkAction[] expectedActions)
+        private void addMessageWithChecks(string text, bool isAction = false, bool isImportant = false, params LinkAction[] expectedActions)
+        {
+            ChatLine newLine = null;
+
+            AddStep("add message", () =>
             {
-                ChatLine newLine = null;
-                int index = messageIndex++;
+                newLine = new ChatLine(new DummyMessage(text, isAction, isImportant));
+                textContainer.Add(newLine);
+            });
 
-                AddStep("add message", () =>
-                {
-                    newLine = new ChatLine(new DummyMessage(text, isAction, isImportant, index));
-                    textContainer.Add(newLine);
-                });
+            AddAssert($"msg has the right action", () => newLine.Message.Links.Select(l => l.Action), () => Is.EqualTo(expectedActions));
+            //AddAssert($"msg is " + (isAction ? "italic" : "not italic"), () => newLine.ContentFlow.Any() && isAction == isItalic());
+            AddAssert($"msg shows {expectedActions.Length} link(s)", isShowingLinks);
 
-                AddAssert($"msg #{index} has the right action", () => newLine.Message.Links.Select(l => l.Action), () => Is.EqualTo(expectedActions));
-                //AddAssert($"msg #{index} is " + (isAction ? "italic" : "not italic"), () => newLine.ContentFlow.Any() && isAction == isItalic());
-                AddAssert($"msg #{index} shows {expectedActions.Length} link(s)", isShowingLinks);
+            //bool isItalic() => newLine.ContentFlow.Where(d => d is OsuSpriteText).Cast<OsuSpriteText>().All(sprite => sprite.Font.Italics);
 
-                //bool isItalic() => newLine.ContentFlow.Where(d => d is OsuSpriteText).Cast<OsuSpriteText>().All(sprite => sprite.Font.Italics);
+            bool isShowingLinks()
+            {
+                bool hasBackground = !string.IsNullOrEmpty(newLine.Message.Sender.Colour);
 
-                bool isShowingLinks()
-                {
-                    bool hasBackground = !string.IsNullOrEmpty(newLine.Message.Sender.Colour);
+                Color4 textColour = isAction && hasBackground ? Color4Extensions.FromHex(newLine.Message.Sender.Colour) : Color4.White;
 
-                    Color4 textColour = isAction && hasBackground ? Color4Extensions.FromHex(newLine.Message.Sender.Colour) : Color4.White;
+                var linkCompilers = newLine.DrawableContentFlow.Where(d => d is DrawableLinkCompiler).ToList();
+                var linkSprites = linkCompilers.SelectMany(comp => ((DrawableLinkCompiler)comp).Parts);
 
-                    var linkCompilers = newLine.DrawableContentFlow.Where(d => d is DrawableLinkCompiler).ToList();
-                    var linkSprites = linkCompilers.SelectMany(comp => ((DrawableLinkCompiler)comp).Parts);
-
-                    return linkSprites.All(d => d.Colour == linkColour)
-                           && newLine.DrawableContentFlow.Except(linkSprites.Concat(linkCompilers)).All(d => d.Colour == textColour);
-                }
+                return linkSprites.All(d => d.Colour == linkColour)
+                       && newLine.DrawableContentFlow.Except(linkSprites.Concat(linkCompilers)).All(d => d.Colour == textColour);
             }
         }
 
