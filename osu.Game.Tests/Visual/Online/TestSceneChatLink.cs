@@ -123,7 +123,8 @@ namespace osu.Game.Tests.Visual.Online
                 var linkSprites = linkCompilers.SelectMany(comp => ((DrawableLinkCompiler)comp).Parts);
 
                 return linkSprites.All(d => d.Colour == linkColour)
-                       && newLine.DrawableContentFlow.Except(linkSprites.Concat(linkCompilers)).All(d => d.Colour == textColour);
+                       && newLine.DrawableContentFlow.Except(linkSprites.Concat(linkCompilers)).All(d => d.Colour == textColour)
+                       && linkCompilers.Count == expectedActions.Length;
             }
         }
 
