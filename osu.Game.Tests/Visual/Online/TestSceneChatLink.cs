@@ -167,20 +167,11 @@ namespace osu.Game.Tests.Visual.Online
         {
             private static long messageCounter;
 
-            internal static readonly APIUser TEST_SENDER_BACKGROUND = new APIUser
-            {
-                Username = @"i-am-important",
-                Id = 42,
-                Colour = "#250cc9",
-            };
-
             internal static readonly APIUser TEST_SENDER = new APIUser
             {
                 Username = @"Somebody",
                 Id = 1,
             };
-
-            public new DateTimeOffset Timestamp = DateTimeOffset.Now;
 
             public DummyMessage(string text, bool isAction = false, bool isImportant = false, int number = 0)
                 : base(messageCounter++)
