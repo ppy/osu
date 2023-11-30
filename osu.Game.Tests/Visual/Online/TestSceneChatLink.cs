@@ -71,8 +71,6 @@ namespace osu.Game.Tests.Visual.Online
             addMessageWithChecks("[https://dev.ppy.sh/home New site] (new link format)", expectedActions: LinkAction.External);
             addMessageWithChecks("[osu forums](https://dev.ppy.sh/forum) (new link format 2)", expectedActions: LinkAction.External);
             addMessageWithChecks("[https://dev.ppy.sh/home This is only a link to the new osu webpage but this is supposed to test word wrap.]", expectedActions: LinkAction.External);
-            addMessageWithChecks("is now listening to [https://dev.ppy.sh/s/93523 IMAGE -MATERIAL- <Version 0>]", isAction: true, expectedActions: LinkAction.OpenBeatmapSet);
-            addMessageWithChecks("is now playing [https://dev.ppy.sh/b/252238 IMAGE -MATERIAL- <Version 0>]", isAction: true, expectedActions: LinkAction.OpenBeatmap);
             addMessageWithChecks("Let's (try)[https://dev.ppy.sh/home] [https://dev.ppy.sh/b/252238 multiple links] https://dev.ppy.sh/home",
                 expectedActions: new[] { LinkAction.External, LinkAction.OpenBeatmap, LinkAction.External });
             addMessageWithChecks("[https://dev.ppy.sh/home New link format with escaped [and \\[ paired] braces]", expectedActions: LinkAction.External);
@@ -81,9 +79,6 @@ namespace osu.Game.Tests.Visual.Online
                 expectedActions: new[] { LinkAction.External, LinkAction.OpenWiki });
             // note that there's 0 links here (they get removed if a channel is not found)
             addMessageWithChecks("#lobby or #osu would be blue (and work) in the ChatDisplay test (when a proper ChatOverlay is present).");
-            addMessageWithChecks("I am important!", isAction: false, isImportant: true);
-            addMessageWithChecks("feels important", isAction: true, isImportant: true);
-            addMessageWithChecks("likes to post this [https://dev.ppy.sh/home link].", isAction: true, isImportant: true, expectedActions: LinkAction.External);
             addMessageWithChecks("Join my multiplayer game osump://12346.", expectedActions: LinkAction.JoinMultiplayerMatch);
             addMessageWithChecks("Join my multiplayer gameosump://12346.", expectedActions: LinkAction.JoinMultiplayerMatch);
             addMessageWithChecks("Join my [multiplayer game](osump://12346).", expectedActions: LinkAction.JoinMultiplayerMatch);
@@ -93,6 +88,16 @@ namespace osu.Game.Tests.Visual.Online
             addMessageWithChecks("Join my #english or #japanese channels.", expectedActions: new[] { LinkAction.OpenChannel, LinkAction.OpenChannel });
             addMessageWithChecks("Join my #english or #nonexistent #hashtag channels.", expectedActions: LinkAction.OpenChannel);
             addMessageWithChecks("Hello world\uD83D\uDE12(<--This is an emoji). There are more:\uD83D\uDE10\uD83D\uDE00,\uD83D\uDE20");
+        }
+
+        [TestCase("is now listening to [https://dev.ppy.sh/s/93523 IMAGE -MATERIAL- <Version 0>]", true, false, LinkAction.OpenBeatmapSet)]
+        [TestCase("is now playing [https://dev.ppy.sh/b/252238 IMAGE -MATERIAL- <Version 0>]", true, false, LinkAction.OpenBeatmap)]
+        [TestCase("I am important!", false, true)]
+        [TestCase("feels important", true, true)]
+        [TestCase("likes to post this [https://dev.ppy.sh/home link].", true, true, LinkAction.External)]
+        public void TestActionAndImportantLinks(string text, bool isAction, bool isImportant, params LinkAction[] expectedActions)
+        {
+            addMessageWithChecks(text, isAction, isImportant, expectedActions);
         }
 
         private void addMessageWithChecks(string text, bool isAction = false, bool isImportant = false, params LinkAction[] expectedActions)
