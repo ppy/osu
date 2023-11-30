@@ -1,8 +1,6 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
 using System;
 using System.Linq;
 using NUnit.Framework;
@@ -99,7 +97,7 @@ namespace osu.Game.Tests.Visual.Online
 
         private void addMessageWithChecks(string text, bool isAction = false, bool isImportant = false, params LinkAction[] expectedActions)
         {
-            ChatLine newLine = null;
+            ChatLine newLine = null!;
 
             AddStep("add message", () =>
             {
@@ -138,7 +136,7 @@ namespace osu.Game.Tests.Visual.Online
             addEchoWithWait("[https://dev.ppy.sh/forum let's try multiple words too!]");
             addEchoWithWait("(long loading times! clickable while loading?)[https://dev.ppy.sh/home]", null, 5000);
 
-            void addEchoWithWait(string text, string completeText = null, double delay = 250)
+            void addEchoWithWait(string text, string? completeText = null, double delay = 250)
             {
                 int index = messageIndex++;
 
