@@ -107,26 +107,10 @@ namespace osu.Game.Tests.Visual.Online
                     textContainer.Add(newLine);
                 });
 
-                AddAssert($"msg #{index} has {linkAmount} link(s)", () => newLine.Message.Links.Count == linkAmount);
-                AddAssert($"msg #{index} has the right action", hasExpectedActions);
+                AddAssert($"msg #{index} has {linkAmount} link(s)", () => newLine.Message.Links, () => Has.Count.EqualTo(linkAmount));
+                AddAssert($"msg #{index} has the right action", () => newLine.Message.Links.Select(l => l.Action), () => Is.EqualTo(expectedActions));
                 //AddAssert($"msg #{index} is " + (isAction ? "italic" : "not italic"), () => newLine.ContentFlow.Any() && isAction == isItalic());
                 AddAssert($"msg #{index} shows {linkAmount} link(s)", isShowingLinks);
-
-                bool hasExpectedActions()
-                {
-                    var expectedActionsList = expectedActions.ToList();
-
-                    if (expectedActionsList.Count != newLine.Message.Links.Count)
-                        return false;
-
-                    for (int i = 0; i < newLine.Message.Links.Count; i++)
-                    {
-                        var action = newLine.Message.Links[i].Action;
-                        if (action != expectedActions[i]) return false;
-                    }
-
-                    return true;
-                }
 
                 //bool isItalic() => newLine.ContentFlow.Where(d => d is OsuSpriteText).Cast<OsuSpriteText>().All(sprite => sprite.Font.Italics);
 
