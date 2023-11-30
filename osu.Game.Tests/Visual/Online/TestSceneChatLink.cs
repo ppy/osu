@@ -63,6 +63,8 @@ namespace osu.Game.Tests.Visual.Online
         [TestCase("00:12:345 - Test?", LinkAction.OpenEditorTimestamp)]
         [TestCase("00:12:345 (1,2) - Test?", LinkAction.OpenEditorTimestamp)]
         [TestCase($"{OsuGameBase.OSU_PROTOCOL}edit/00:12:345 - Test?", LinkAction.OpenEditorTimestamp)]
+        [TestCase($"{OsuGameBase.OSU_PROTOCOL}edit/00:12:345 (1,2) - Test?", LinkAction.OpenEditorTimestamp)]
+        [TestCase($"{OsuGameBase.OSU_PROTOCOL}00:12:345 - not an editor timestamp", LinkAction.External)]
         [TestCase("Wiki link for tasty [[Performance Points]]", LinkAction.OpenWiki)]
         [TestCase("(osu forums)[https://dev.ppy.sh/forum] (old link format)", LinkAction.External)]
         [TestCase("[https://dev.ppy.sh/home New site] (new link format)", LinkAction.External)]
