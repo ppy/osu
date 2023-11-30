@@ -161,7 +161,7 @@ namespace osu.Game.Tournament.Screens.MapPool
 
             if (!hasAllBans)
                 // If it's the third ban or later, we need to check if it's the team's first or second ban in a row
-                nextColour = (CurrentMatch.Value.PicksBans.Count() >= 2 ? CurrentMatch.Value.PicksBans[^2]?.Team : previousBan) == TeamColour.Red ? TeamColour.Blue : TeamColour.Red;
+                nextColour = (CurrentMatch.Value.PicksBans.Count >= 2 ? CurrentMatch.Value.PicksBans[^2]?.Team : previousBan) == TeamColour.Red ? TeamColour.Blue : TeamColour.Red;
 
             if (hasAllBans && pickType == ChoiceType.Ban)
             {
