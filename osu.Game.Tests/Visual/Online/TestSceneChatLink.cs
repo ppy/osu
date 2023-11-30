@@ -56,38 +56,35 @@ namespace osu.Game.Tests.Visual.Online
             textContainer.Clear();
         });
 
-        [Test]
-        public void TestLinksGeneral()
+        [TestCase("test!")]
+        [TestCase("dev.ppy.sh!")]
+        [TestCase("https://dev.ppy.sh!", LinkAction.External)]
+        [TestCase("http://dev.ppy.sh!", LinkAction.External)]
+        [TestCase("forgothttps://dev.ppy.sh!", LinkAction.External)]
+        [TestCase("forgothttp://dev.ppy.sh!", LinkAction.External)]
+        [TestCase("00:12:345 (1,2) - Test?", LinkAction.OpenEditorTimestamp)]
+        [TestCase("Wiki link for tasty [[Performance Points]]", LinkAction.OpenWiki)]
+        [TestCase("(osu forums)[https://dev.ppy.sh/forum] (old link format)", LinkAction.External)]
+        [TestCase("[https://dev.ppy.sh/home New site] (new link format)", LinkAction.External)]
+        [TestCase("[osu forums](https://dev.ppy.sh/forum) (new link format 2)", LinkAction.External)]
+        [TestCase("[https://dev.ppy.sh/home This is only a link to the new osu webpage but this is supposed to test word wrap.]", LinkAction.External)]
+        [TestCase("Let's (try)[https://dev.ppy.sh/home] [https://dev.ppy.sh/b/252238 multiple links] https://dev.ppy.sh/home", LinkAction.External, LinkAction.OpenBeatmap, LinkAction.External)]
+        [TestCase("[https://dev.ppy.sh/home New link format with escaped [and \\[ paired] braces]", LinkAction.External)]
+        [TestCase("[Markdown link format with escaped [and \\[ paired] braces](https://dev.ppy.sh/home)", LinkAction.External)]
+        [TestCase("(Old link format with escaped (and \\( paired) parentheses)[https://dev.ppy.sh/home] and [[also a rogue wiki link]]", LinkAction.External, LinkAction.OpenWiki)]
+        [TestCase("#lobby or #osu would be blue (and work) in the ChatDisplay test (when a proper ChatOverlay is present).")] // note that there's 0 links here (they get removed if a channel is not found)
+        [TestCase("Join my multiplayer game osump://12346.", LinkAction.JoinMultiplayerMatch)]
+        [TestCase("Join my multiplayer gameosump://12346.", LinkAction.JoinMultiplayerMatch)]
+        [TestCase("Join my [multiplayer game](osump://12346).", LinkAction.JoinMultiplayerMatch)]
+        [TestCase($"Join my [#english]({OsuGameBase.OSU_PROTOCOL}chan/#english).", LinkAction.OpenChannel)]
+        [TestCase($"Join my {OsuGameBase.OSU_PROTOCOL}chan/#english.", LinkAction.OpenChannel)]
+        [TestCase($"Join my{OsuGameBase.OSU_PROTOCOL}chan/#english.", LinkAction.OpenChannel)]
+        [TestCase("Join my #english or #japanese channels.", LinkAction.OpenChannel, LinkAction.OpenChannel)]
+        [TestCase("Join my #english or #nonexistent #hashtag channels.", LinkAction.OpenChannel)]
+        [TestCase("Hello world\uD83D\uDE12(<--This is an emoji). There are more:\uD83D\uDE10\uD83D\uDE00,\uD83D\uDE20")]
+        public void TestLinksGeneral(string text, params LinkAction[] actions)
         {
-            addMessageWithChecks("test!");
-            addMessageWithChecks("dev.ppy.sh!");
-            addMessageWithChecks("https://dev.ppy.sh!", expectedActions: LinkAction.External);
-            addMessageWithChecks("http://dev.ppy.sh!", expectedActions: LinkAction.External);
-            addMessageWithChecks("forgothttps://dev.ppy.sh!", expectedActions: LinkAction.External);
-            addMessageWithChecks("forgothttp://dev.ppy.sh!", expectedActions: LinkAction.External);
-            addMessageWithChecks("00:12:345 (1,2) - Test?", expectedActions: LinkAction.OpenEditorTimestamp);
-            addMessageWithChecks("Wiki link for tasty [[Performance Points]]", expectedActions: LinkAction.OpenWiki);
-            addMessageWithChecks("(osu forums)[https://dev.ppy.sh/forum] (old link format)", expectedActions: LinkAction.External);
-            addMessageWithChecks("[https://dev.ppy.sh/home New site] (new link format)", expectedActions: LinkAction.External);
-            addMessageWithChecks("[osu forums](https://dev.ppy.sh/forum) (new link format 2)", expectedActions: LinkAction.External);
-            addMessageWithChecks("[https://dev.ppy.sh/home This is only a link to the new osu webpage but this is supposed to test word wrap.]", expectedActions: LinkAction.External);
-            addMessageWithChecks("Let's (try)[https://dev.ppy.sh/home] [https://dev.ppy.sh/b/252238 multiple links] https://dev.ppy.sh/home",
-                expectedActions: new[] { LinkAction.External, LinkAction.OpenBeatmap, LinkAction.External });
-            addMessageWithChecks("[https://dev.ppy.sh/home New link format with escaped [and \\[ paired] braces]", expectedActions: LinkAction.External);
-            addMessageWithChecks("[Markdown link format with escaped [and \\[ paired] braces](https://dev.ppy.sh/home)", expectedActions: LinkAction.External);
-            addMessageWithChecks("(Old link format with escaped (and \\( paired) parentheses)[https://dev.ppy.sh/home] and [[also a rogue wiki link]]",
-                expectedActions: new[] { LinkAction.External, LinkAction.OpenWiki });
-            // note that there's 0 links here (they get removed if a channel is not found)
-            addMessageWithChecks("#lobby or #osu would be blue (and work) in the ChatDisplay test (when a proper ChatOverlay is present).");
-            addMessageWithChecks("Join my multiplayer game osump://12346.", expectedActions: LinkAction.JoinMultiplayerMatch);
-            addMessageWithChecks("Join my multiplayer gameosump://12346.", expectedActions: LinkAction.JoinMultiplayerMatch);
-            addMessageWithChecks("Join my [multiplayer game](osump://12346).", expectedActions: LinkAction.JoinMultiplayerMatch);
-            addMessageWithChecks($"Join my [#english]({OsuGameBase.OSU_PROTOCOL}chan/#english).", expectedActions: LinkAction.OpenChannel);
-            addMessageWithChecks($"Join my {OsuGameBase.OSU_PROTOCOL}chan/#english.", expectedActions: LinkAction.OpenChannel);
-            addMessageWithChecks($"Join my{OsuGameBase.OSU_PROTOCOL}chan/#english.", expectedActions: LinkAction.OpenChannel);
-            addMessageWithChecks("Join my #english or #japanese channels.", expectedActions: new[] { LinkAction.OpenChannel, LinkAction.OpenChannel });
-            addMessageWithChecks("Join my #english or #nonexistent #hashtag channels.", expectedActions: LinkAction.OpenChannel);
-            addMessageWithChecks("Hello world\uD83D\uDE12(<--This is an emoji). There are more:\uD83D\uDE10\uD83D\uDE00,\uD83D\uDE20");
+            addMessageWithChecks(text, expectedActions: actions);
         }
 
         [TestCase("is now listening to [https://dev.ppy.sh/s/93523 IMAGE -MATERIAL- <Version 0>]", true, false, LinkAction.OpenBeatmapSet)]
