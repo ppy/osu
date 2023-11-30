@@ -37,9 +37,11 @@ namespace osu.Game.Screens.Ranking.Statistics
         private OsuSpriteText achievedPerformance;
         private OsuSpriteText pfcPerformance;
         private OsuSpriteText maximumPerformance;
+
         // Colours of the achieved and pfc text and bars
-        private Color4 achieveColor = Color4Extensions.FromHex("#66FFCC");
-        private Color4 pfcColor = Color4Extensions.FromHex("#609882");
+        private readonly Color4 achieveColor = Color4Extensions.FromHex("#66FFCC");
+
+        private readonly Color4 pfcColor = Color4Extensions.FromHex("#609882");
 
         private readonly CancellationTokenSource cancellationTokenSource = new CancellationTokenSource();
 
@@ -182,7 +184,7 @@ namespace osu.Game.Screens.Ranking.Statistics
             content.FadeIn(200);
 
             var displayAttributes = breakdown.Performance.GetAttributesForDisplay();
-            var pfcAttribute = breakdown.PFCPerformance.GetAttributesForDisplay();
+            var pfcAttribute = breakdown.PfcPerformance.GetAttributesForDisplay();
             var perfectDisplayAttributes = breakdown.PerfectPerformance.GetAttributesForDisplay();
 
             setTotalValues(

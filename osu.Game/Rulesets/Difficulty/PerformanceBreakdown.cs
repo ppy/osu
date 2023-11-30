@@ -16,7 +16,7 @@ namespace osu.Game.Rulesets.Difficulty
         /// <summary>
         /// Performance if the play was a perfect full combo (0 miss, max combo)
         /// </summary>
-        public PerformanceAttributes PFCPerformance {get; set;}
+        public PerformanceAttributes PfcPerformance { get; set; }
 
         /// <summary>
         /// Performance of a perfect play for comparison.
@@ -32,7 +32,7 @@ namespace osu.Game.Rulesets.Difficulty
         public PerformanceBreakdown(PerformanceAttributes performance, PerformanceAttributes pfcPerformance, PerformanceAttributes perfectPerformance)
         {
             Performance = performance;
-            PFCPerformance = pfcPerformance;
+            PfcPerformance = pfcPerformance;
             PerfectPerformance = perfectPerformance;
         }
     }
