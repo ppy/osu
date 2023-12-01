@@ -60,7 +60,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Match
                         {
                             RelativeSizeAxes = Axes.Both,
                             Size = Vector2.One,
-                            Action = onReadyClick,
+                            Action = onReadyButtonClick,
                         },
                         countdownButton = new MultiplayerCountdownButton
                         {
@@ -105,7 +105,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Match
             endOperation();
         }
 
-        private void onReadyClick()
+        private void onReadyButtonClick()
         {
             if (Room == null)
                 return;
