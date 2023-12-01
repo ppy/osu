@@ -106,10 +106,7 @@ namespace osu.Game.Tests.Visual.Online
             });
 
             AddAssert("msg has the right action", () => newLine.Message.Links.Select(l => l.Action), () => Is.EqualTo(expectedActions));
-            //AddAssert("msg is " + (isAction ? "italic" : "not italic"), () => newLine.ContentFlow.Any() && isAction == isItalic());
             AddAssert($"msg shows {expectedActions.Length} link(s)", isShowingLinks);
-
-            //bool isItalic() => newLine.ContentFlow.Where(d => d is OsuSpriteText).Cast<OsuSpriteText>().All(sprite => sprite.Font.Italics);
 
             bool isShowingLinks()
             {
