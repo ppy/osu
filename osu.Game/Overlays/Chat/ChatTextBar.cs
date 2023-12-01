@@ -75,7 +75,6 @@ namespace osu.Game.Overlays.Chat
                                 Padding = new MarginPadding { Horizontal = padding },
                                 Child = chattingText = new TruncatingSpriteText
                                 {
-                                    MaxWidth = chatting_text_width - padding * 2,
                                     Font = OsuFont.Torus.With(size: 20),
                                     Colour = colourProvider.Background1,
                                     Anchor = Anchor.CentreRight,

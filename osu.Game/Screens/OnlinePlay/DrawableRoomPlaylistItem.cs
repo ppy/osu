@@ -82,7 +82,7 @@ namespace osu.Game.Screens.OnlinePlay
         private Container difficultyIconContainer = null!;
 
         private OsuHoverContainer beatmapLink = null!;
-        private OsuSpriteText beatmapText = null!;
+        private TruncatingSpriteText beatmapText = null!;
 
         private LinkFlowContainer authorText = null!;
         private ExplicitContentBeatmapBadge explicitContent = null!;
@@ -199,15 +199,6 @@ namespace osu.Game.Screens.OnlinePlay
             };
 
             refresh();
-        }
-
-        protected override void UpdateAfterChildren()
-        {
-            base.UpdateAfterChildren();
-
-            // best effort to confine the auto-sized text to parent bounds
-            // TODO: remove when text/link flow can support truncation with ellipsis natively.
-            beatmapText.MaxWidth = mainFillFlow.DrawWidth;
         }
 
         /// <summary>

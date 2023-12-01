@@ -107,7 +107,6 @@ namespace osu.Game.Screens.Ranking.Expanded
                                 Origin = Anchor.TopCentre,
                                 Text = new RomanisableString(metadata.TitleUnicode, metadata.Title),
                                 Font = OsuFont.Torus.With(size: 20, weight: FontWeight.SemiBold),
-                                MaxWidth = ScorePanel.EXPANDED_WIDTH - padding * 2,
                             },
                             new TruncatingSpriteText
                             {
@@ -115,7 +114,6 @@ namespace osu.Game.Screens.Ranking.Expanded
                                 Origin = Anchor.TopCentre,
                                 Text = new RomanisableString(metadata.ArtistUnicode, metadata.Artist),
                                 Font = OsuFont.Torus.With(size: 14, weight: FontWeight.SemiBold),
-                                MaxWidth = ScorePanel.EXPANDED_WIDTH - padding * 2,
                             },
                             new Container
                             {
@@ -160,7 +158,6 @@ namespace osu.Game.Screens.Ranking.Expanded
                                         Origin = Anchor.TopCentre,
                                         Text = beatmap.DifficultyName,
                                         Font = OsuFont.Torus.With(size: 16, weight: FontWeight.SemiBold),
-                                        MaxWidth = ScorePanel.EXPANDED_WIDTH - padding * 2,
                                     },
                                     new OsuTextFlowContainer(s => s.Font = OsuFont.Torus.With(size: 12))
                                     {

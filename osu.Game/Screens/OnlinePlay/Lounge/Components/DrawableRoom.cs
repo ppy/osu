@@ -332,9 +332,8 @@ namespace osu.Game.Screens.OnlinePlay.Lounge.Components
 
             private SpriteText statusText = null!;
 
-            private Container beatmapLinkContainer = null!;
             private OsuHoverContainer beatmapLink = null!;
-            private OsuSpriteText beatmapText = null!;
+            private TruncatingSpriteText beatmapText = null!;
 
             public RoomStatusText()
             {
@@ -366,16 +365,11 @@ namespace osu.Game.Screens.OnlinePlay.Lounge.Components
                                 Font = OsuFont.Default.With(size: 16),
                                 Colour = colours.Lime1
                             },
-                            beatmapLinkContainer = new Container
+                            beatmapLink = new OsuHoverContainer
                             {
-                                RelativeSizeAxes = Axes.X,
-                                AutoSizeAxes = Axes.Y,
-                                Child = beatmapLink = new OsuHoverContainer
-                                {
-                                    AutoSizeAxes = Axes.Both,
-                                    IdleColour = colourProvider.Light2,
-                                    Child = beatmapText = new TruncatingSpriteText(),
-                                }
+                                AutoSizeAxes = Axes.Both,
+                                IdleColour = colourProvider.Light2,
+                                Child = beatmapText = new TruncatingSpriteText(),
                             }
                         }
                     }
@@ -386,15 +380,6 @@ namespace osu.Game.Screens.OnlinePlay.Lounge.Components
             {
                 base.LoadComplete();
                 CurrentPlaylistItem.BindValueChanged(onSelectedItemChanged, true);
-            }
-
-            protected override void UpdateAfterChildren()
-            {
-                base.UpdateAfterChildren();
-
-                // best effort to confine the auto-sized text to parent bounds
-                // TODO: remove when text/link flow can support truncation with ellipsis natively.
-                beatmapText.MaxWidth = beatmapLinkContainer.DrawWidth;
             }
 
             private CancellationTokenSource? beatmapLookupCancellation;

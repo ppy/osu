@@ -258,8 +258,8 @@ namespace osu.Game.Screens.Select
 
         public partial class WedgeInfoText : Container
         {
-            public OsuSpriteText TitleLabel { get; private set; } = null!;
-            public OsuSpriteText ArtistLabel { get; private set; } = null!;
+            public TruncatingSpriteText TitleLabel { get; private set; } = null!;
+            public TruncatingSpriteText ArtistLabel { get; private set; } = null!;
 
             private readonly WorkingBeatmap working;
 
@@ -282,21 +282,27 @@ namespace osu.Game.Screens.Select
                 {
                     Name = "Top-left aligned metadata",
                     Direction = FillDirection.Vertical,
-                    Padding = new MarginPadding { Left = text_margin, Top = 12 },
+                    Padding = new MarginPadding { Left = text_margin, Right = shear_width, Top = 12 },
                     AutoSizeAxes = Axes.Y,
                     RelativeSizeAxes = Axes.X,
                     Children = new Drawable[]
                     {
-                        new OsuHoverContainer
+                        new Container
                         {
-                            AutoSizeAxes = Axes.Both,
-                            Action = () => songSelect?.Search(titleText.GetPreferred(localisation.CurrentParameters.Value.PreferOriginalScript)),
-                            Child = TitleLabel = new TruncatingSpriteText
+                            AutoSizeAxes = Axes.Y,
+                            RelativeSizeAxes = Axes.X,
+                            Padding = new MarginPadding { Right = text_margin },
+                            Child = new OsuHoverContainer
                             {
-                                Shadow = true,
-                                Text = titleText,
-                                Font = OsuFont.TorusAlternate.With(size: 40, weight: FontWeight.SemiBold),
-                            },
+                                AutoSizeAxes = Axes.Both,
+                                Action = () => songSelect?.Search(titleText.GetPreferred(localisation.CurrentParameters.Value.PreferOriginalScript)),
+                                Child = TitleLabel = new TruncatingSpriteText
+                                {
+                                    Shadow = true,
+                                    Text = titleText,
+                                    Font = OsuFont.TorusAlternate.With(size: 40, weight: FontWeight.SemiBold),
+                                },
+                            }
                         },
                         new OsuHoverContainer
                         {
@@ -313,17 +319,6 @@ namespace osu.Game.Screens.Select
                         },
                     }
                 };
-            }
-
-            protected override void UpdateAfterChildren()
-            {
-                base.UpdateAfterChildren();
-
-                // best effort to confine the auto-sized text to parent bounds
-                // the artist label doesn't have an extra text_margin as it doesn't touch the right metadata
-                // TODO: remove when text/link flow can support truncation with ellipsis natively.
-                TitleLabel.MaxWidth = DrawWidth - text_margin * 2 - shear_width;
-                ArtistLabel.MaxWidth = DrawWidth - text_margin - shear_width;
             }
         }
     }

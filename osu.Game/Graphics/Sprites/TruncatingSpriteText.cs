@@ -1,6 +1,9 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System;
+using osu.Framework.Graphics;
+using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Cursor;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Localisation;
@@ -21,9 +24,43 @@ namespace osu.Game.Graphics.Sprites
 
         public override bool HandlePositionalInput => IsTruncated && ShowTooltip;
 
+        private CompositeDrawable firstNonAutoSizedWidthAncestor = null!;
+
         public TruncatingSpriteText()
         {
             ((SpriteText)this).Truncate = true;
+        }
+
+        protected override void LoadComplete()
+        {
+            base.LoadComplete();
+
+            firstNonAutoSizedWidthAncestor = getFirstNonAutoSizedWidthAncestor();
+        }
+
+        private CompositeDrawable getFirstNonAutoSizedWidthAncestor()
+        {
+            var ancestor = Parent!;
+
+            while (ancestor.AutoSizeAxes != Axes.None && ancestor.AutoSizeAxes != Axes.Y)
+                ancestor = ancestor.Parent!;
+
+            return ancestor;
+        }
+
+        protected override void Update()
+        {
+            base.Update();
+
+            // Confine the auto-sized text to the child width of the first non-autosized width ancestor drawable.
+            base.MaxWidth = firstNonAutoSizedWidthAncestor.ChildSize.X;
+        }
+
+        [Obsolete("Width is automatically handled by Update().")]
+
+        public new float MaxWidth
+        {
+            set => throw new InvalidOperationException($@"Width is automatically handled by {nameof(Update)}.");
         }
     }
 }
