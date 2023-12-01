@@ -378,6 +378,31 @@ namespace osu.Game.Tests.Visual.Multiplayer
             }, users);
         }
 
+        [Test]
+        public void TestAbortMatch()
+        {
+            multiplayerClient.Setup(m => m.StartMatch())
+                             .Callback(() =>
+                             {
+                                 multiplayerClient.Raise(m => m.LoadRequested -= null);
+                                 multiplayerClient.Object.Room!.State = MultiplayerRoomState.WaitingForLoad;
+
+                                 // The local user state doesn't really matter, so let's do the same as the base implementation for these tests.
+                                 changeUserState(localUser.UserID, MultiplayerUserState.Idle);
+                             });
+
+            multiplayerClient.Setup(m => m.AbortMatch())
+                             .Callback(() =>
+                             {
+                                 multiplayerClient.Object.Room!.State = MultiplayerRoomState.Open;
+                                 raiseRoomUpdated();
+                             });
+
+            ClickButtonWhenEnabled<MultiplayerReadyButton>();
+            ClickButtonWhenEnabled<MultiplayerReadyButton>();
+            ClickButtonWhenEnabled<MultiplayerReadyButton>();
+        }
+
         private void verifyGameplayStartFlow()
         {
             checkLocalUserState(MultiplayerUserState.Ready);
