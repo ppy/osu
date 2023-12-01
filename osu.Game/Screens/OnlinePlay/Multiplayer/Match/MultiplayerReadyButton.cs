@@ -155,19 +155,14 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Match
 
                     case MultiplayerUserState.Spectating:
                     case MultiplayerUserState.Ready:
-                        Text = room.Host?.Equals(localUser) == true
+                        Text = multiplayerClient.IsHost
                             ? $"Start match {countText}"
                             : $"Waiting for host... {countText}";
                         break;
 
-                    case MultiplayerUserState.Idle:
-                        if (room.State == MultiplayerRoomState.Open || room.Host?.Equals(localUser) != true)
-                        {
-                            Text = "Ready";
-                            break;
-                        }
-
-                        Text = "Abort!";
+                    // Show the abort button for the host as long as gameplay is in progress.
+                    case MultiplayerUserState when multiplayerClient.IsHost && room.State != MultiplayerRoomState.Open:
+                        Text = "Abort the match";
                         break;
                 }
             }
@@ -207,20 +202,15 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Match
 
                 case MultiplayerUserState.Spectating:
                 case MultiplayerUserState.Ready:
-                    if (room?.Host?.Equals(localUser) == true && !room.ActiveCountdowns.Any(c => c is MatchStartCountdown))
+                    if (multiplayerClient.IsHost && !room.ActiveCountdowns.Any(c => c is MatchStartCountdown))
                         setGreen();
                     else
                         setYellow();
 
                     break;
 
-                case MultiplayerUserState.Idle:
-                    if (room.State == MultiplayerRoomState.Open || room.Host?.Equals(localUser) != true)
-                    {
-                        setGreen();
-                        break;
-                    }
-
+                // Show the abort button for the host as long as gameplay is in progress.
+                case MultiplayerUserState when multiplayerClient.IsHost && room.State != MultiplayerRoomState.Open:
                     setRed();
                     break;
             }

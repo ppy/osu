@@ -11,7 +11,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Match
     {
         public ConfirmAbortDialog(Action onConfirm, Action onCancel)
         {
-            HeaderText = "Are you sure you want to go abort the match?";
+            HeaderText = "Are you sure you want to abort the match?";
 
             Icon = FontAwesome.Solid.ExclamationTriangle;
 
