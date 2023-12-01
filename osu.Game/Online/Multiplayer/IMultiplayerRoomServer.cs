@@ -83,6 +83,11 @@ namespace osu.Game.Online.Multiplayer
         Task AbortGameplay();
 
         /// <summary>
+        /// Real.
+        /// </summary>
+        Task AbortGameplayReal();
+
+        /// <summary>
         /// Adds an item to the playlist.
         /// </summary>
         /// <param name="item">The item to add.</param>

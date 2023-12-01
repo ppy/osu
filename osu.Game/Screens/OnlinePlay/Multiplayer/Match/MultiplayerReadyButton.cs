@@ -158,7 +158,16 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Match
                         Text = room.Host?.Equals(localUser) == true
                             ? $"Start match {countText}"
                             : $"Waiting for host... {countText}";
+                        break;
 
+                    case MultiplayerUserState.Idle:
+                        if (room.State == MultiplayerRoomState.Open || room.Host?.Equals(localUser) != true)
+                        {
+                            Text = "Ready";
+                            break;
+                        }
+
+                        Text = "Abort!";
                         break;
                 }
             }
@@ -204,17 +213,23 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Match
                         setYellow();
 
                     break;
+
+                case MultiplayerUserState.Idle:
+                    if (room.State == MultiplayerRoomState.Open || room.Host?.Equals(localUser) != true)
+                    {
+                        setGreen();
+                        break;
+                    }
+
+                    setRed();
+                    break;
             }
 
-            void setYellow()
-            {
-                BackgroundColour = colours.YellowDark;
-            }
+            void setYellow() => BackgroundColour = colours.YellowDark;
 
-            void setGreen()
-            {
-                BackgroundColour = colours.Green;
-            }
+            void setGreen() => BackgroundColour = colours.Green;
+
+            void setRed() => BackgroundColour = colours.Red;
         }
 
         protected override void Dispose(bool isDisposing)

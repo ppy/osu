@@ -396,6 +396,12 @@ namespace osu.Game.Tests.Visual.Multiplayer
             return Task.CompletedTask;
         }
 
+        public override Task AbortGameplayReal()
+        {
+            // Todo:
+            return Task.CompletedTask;
+        }
+
         public async Task AddUserPlaylistItem(int userId, MultiplayerPlaylistItem item)
         {
             Debug.Assert(ServerRoom != null);
