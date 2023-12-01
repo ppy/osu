@@ -37,7 +37,7 @@ namespace osu.Game.Rulesets.Difficulty
                 // compute actual performance
                 performanceCache.CalculatePerformanceAsync(score, cancellationToken),
                 // compute performance for a full combo
-                getPfcPerformance(score, cancellationToken),
+                getFCPerformance(score, cancellationToken),
                 // compute performance for perfect play
                 getPerfectPerformance(score, cancellationToken)
             ).ConfigureAwait(false);
@@ -46,17 +46,17 @@ namespace osu.Game.Rulesets.Difficulty
         }
 
         [ItemCanBeNull]
-        private Task<PerformanceAttributes> getPfcPerformance(ScoreInfo score, CancellationToken cancellationToken = default)
+        private Task<PerformanceAttributes> getFCPerformance(ScoreInfo score, CancellationToken cancellationToken = default)
         {
             return Task.Run(async () =>
             {
                 Ruleset rulest = score.Ruleset.CreateInstance();
-                ScoreInfo pfcPlay = score.DeepClone();
-                pfcPlay.Passed = true;
+                ScoreInfo fcPlay = score.DeepClone();
+                fcPlay.Passed = true;
 
-                // Update the play to be a pfc
-                pfcPlay.MaxCombo = calculateMaxCombo(playableBeatmap);
-                pfcPlay.Statistics[HitResult.Miss] = 0;
+                // Update the play to be a full combo
+                fcPlay.MaxCombo = calculateMaxCombo(playableBeatmap);
+                fcPlay.Statistics[HitResult.Miss] = 0;
 
                 var difficulty = await difficultyCache.GetDifficultyAsync(
                     playableBeatmap.BeatmapInfo,
@@ -65,7 +65,7 @@ namespace osu.Game.Rulesets.Difficulty
                     cancellationToken
                 ).ConfigureAwait(false);
 
-                return difficulty == null ? null : rulest.CreatePerformanceCalculator()?.Calculate(pfcPlay, difficulty.Value.Attributes.AsNonNull());
+                return difficulty == null ? null : rulest.CreatePerformanceCalculator()?.Calculate(fcPlay, difficulty.Value.Attributes.AsNonNull());
             }, cancellationToken);
         }
 
