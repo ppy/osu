@@ -396,7 +396,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
             return Task.CompletedTask;
         }
 
-        public override Task AbortGameplayReal()
+        public override Task AbortMatch()
         {
             // Todo:
             return Task.CompletedTask;

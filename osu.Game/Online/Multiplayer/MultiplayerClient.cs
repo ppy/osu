@@ -73,9 +73,9 @@ namespace osu.Game.Online.Multiplayer
         public virtual event Action? LoadRequested;
 
         /// <summary>
-        /// Invoked when the multiplayer server requests loading of play to be aborted.
+        /// Invoked when the multiplayer server requests gameplay to be aborted.
         /// </summary>
-        public event Action? LoadAborted;
+        public event Action<GameplayAbortReason>? GameplayAborted;
 
         /// <summary>
         /// Invoked when the multiplayer server requests gameplay to be started.
@@ -374,7 +374,7 @@ namespace osu.Game.Online.Multiplayer
 
         public abstract Task AbortGameplay();
 
-        public abstract Task AbortGameplayReal();
+        public abstract Task AbortMatch();
 
         public abstract Task AddPlaylistItem(MultiplayerPlaylistItem item);
 
@@ -684,14 +684,14 @@ namespace osu.Game.Online.Multiplayer
             return Task.CompletedTask;
         }
 
-        Task IMultiplayerClient.LoadAborted()
+        Task IMultiplayerClient.GameplayAborted(GameplayAbortReason reason)
         {
             Scheduler.Add(() =>
             {
                 if (Room == null)
                     return;
 
-                LoadAborted?.Invoke();
+                GameplayAborted?.Invoke(reason);
             }, false);
 
             return Task.CompletedTask;
