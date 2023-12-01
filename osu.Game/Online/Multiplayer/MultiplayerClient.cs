@@ -374,6 +374,8 @@ namespace osu.Game.Online.Multiplayer
 
         public abstract Task AbortGameplay();
 
+        public abstract Task AbortGameplayReal();
+
         public abstract Task AddPlaylistItem(MultiplayerPlaylistItem item);
 
         public abstract Task EditPlaylistItem(MultiplayerPlaylistItem item);
