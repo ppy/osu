@@ -26,13 +26,15 @@ namespace osu.Game.Tests.Visual.Gameplay
         private TestGameplayLeaderboard leaderboard;
 
         private readonly BindableLong playerScore = new BindableLong();
+        private bool leaderboardExpanded;
 
         public TestSceneGameplayLeaderboard()
         {
-            AddStep("toggle expanded", () =>
+            AddToggleStep("toggle expanded", e =>
             {
+                leaderboardExpanded = e;
                 if (leaderboard != null)
-                    leaderboard.Expanded.Value = !leaderboard.Expanded.Value;
+                    leaderboard.Expanded.Value = e;
             });
 
             AddSliderStep("set player score", 50, 5000000, 1222333, v => playerScore.Value = v);
@@ -120,6 +122,7 @@ namespace osu.Game.Tests.Visual.Gameplay
             AddStep("add smoogipoo", () => createRandomScore(new APIUser { Username = "smoogipoo", Id = 1040328 }));
             AddStep("add flyte", () => createRandomScore(new APIUser { Username = "flyte", Id = 3103765 }));
             AddStep("add frenzibyte", () => createRandomScore(new APIUser { Username = "frenzibyte", Id = 14210502 }));
+            AddStep("add really long user", () => createRandomScore(new APIUser { Username = "really long user", Id = 1 }));
         }
 
         [Test]
@@ -191,6 +194,7 @@ namespace osu.Game.Tests.Visual.Gameplay
                     Anchor = Anchor.Centre,
                     Origin = Anchor.Centre,
                     Scale = new Vector2(2),
+                    Expanded = { Value = leaderboardExpanded },
                 };
             });
         }

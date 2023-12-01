@@ -160,10 +160,10 @@ namespace osu.Game.Tests.Visual.Online
 
         private Channel createRandomPublicChannel()
         {
-            int id = RNG.Next(0, 10000);
+            int id = RNG.Next(0, 100000);
             return new Channel
             {
-                Name = $"#channel-{id}",
+                Name = $"#testing-channel-{id}",
                 Type = ChannelType.Public,
                 Id = id,
             };
