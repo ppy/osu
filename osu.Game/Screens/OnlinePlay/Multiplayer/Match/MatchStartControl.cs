@@ -148,7 +148,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Match
                 endOperation();
             });
 
-            void abortMatch() => Client.AbortGameplayReal().FireAndForget(endOperation, _ => endOperation());
+            void abortMatch() => Client.AbortMatch().FireAndForget(endOperation, _ => endOperation());
         }
 
         private void startCountdown(TimeSpan duration)

@@ -108,15 +108,16 @@ namespace osu.Game.Online.Multiplayer
         Task LoadRequested();
 
         /// <summary>
-        /// Signals that loading of gameplay is to be aborted.
-        /// </summary>
-        Task LoadAborted();
-
-        /// <summary>
         /// Signals that gameplay has started.
         /// All users in the <see cref="MultiplayerUserState.Loaded"/> or <see cref="MultiplayerUserState.ReadyForGameplay"/> states should begin gameplay as soon as possible.
         /// </summary>
         Task GameplayStarted();
+
+        /// <summary>
+        /// Signals that gameplay has been aborted.
+        /// </summary>
+        /// <param name="reason">The reason why gameplay was aborted.</param>
+        Task GameplayAborted(GameplayAbortReason reason);
 
         /// <summary>
         /// Signals that the match has ended, all players have finished and results are ready to be displayed.
