@@ -3,7 +3,6 @@
 
 using System.ComponentModel;
 using osu.Framework.Graphics;
-using osu.Game.Beatmaps;
 using osu.Game.Graphics.UserInterface;
 
 namespace osu.Game.Tests.Visual.UserInterface
