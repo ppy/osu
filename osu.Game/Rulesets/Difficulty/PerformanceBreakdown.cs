@@ -14,7 +14,7 @@ namespace osu.Game.Rulesets.Difficulty
         public PerformanceAttributes Performance { get; set; }
 
         /// <summary>
-        /// Performance if the play was a perfect full combo (0 miss, max combo)
+        /// Performance if the play was a full combo
         /// </summary>
         public PerformanceAttributes FCPerformance { get; set; }
 
