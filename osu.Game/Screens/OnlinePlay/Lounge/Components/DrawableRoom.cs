@@ -179,7 +179,6 @@ namespace osu.Game.Screens.OnlinePlay.Lounge.Components
                                                                 {
                                                                     new TruncatingSpriteText
                                                                     {
-                                                                        RelativeSizeAxes = Axes.X,
                                                                         Font = OsuFont.GetFont(size: 28),
                                                                         Current = { BindTarget = Room.Name }
                                                                     },

@@ -339,7 +339,6 @@ namespace osu.Game.Graphics.UserInterface
                             {
                                 Anchor = Anchor.CentreLeft,
                                 Origin = Anchor.CentreLeft,
-                                RelativeSizeAxes = Axes.X,
                             },
                             Icon = new SpriteIcon
                             {

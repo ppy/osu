@@ -241,8 +241,6 @@ namespace osu.Game.Screens.Play.HUD
                                                     },
                                                     usernameText = new TruncatingSpriteText
                                                     {
-                                                        RelativeSizeAxes = Axes.X,
-                                                        Width = 0.6f,
                                                         Anchor = Anchor.CentreLeft,
                                                         Origin = Anchor.CentreLeft,
                                                         Colour = Color4.White,

@@ -53,12 +53,25 @@ namespace osu.Game.Graphics.Sprites
             base.Update();
 
             // Confine the auto-sized text to the child width of the first non-autosized width ancestor drawable.
-            base.MaxWidth = firstNonAutoSizedWidthAncestor.ChildSize.X;
+            // Subtract by X to account for custom or automated positioning (e.g. inside a FillFlowContainer).
+            base.MaxWidth = firstNonAutoSizedWidthAncestor.ChildSize.X - X;
         }
 
         [Obsolete("Width is automatically handled by Update().")]
 
         public new float MaxWidth
+        {
+            set => throw new InvalidOperationException($@"Width is automatically handled by {nameof(Update)}.");
+        }
+
+        [Obsolete("Width is automatically handled by Update().")]
+        public new float Width
+        {
+            set => throw new InvalidOperationException($@"Width is automatically handled by {nameof(Update)}.");
+        }
+
+        [Obsolete("Width is automatically handled by Update().")]
+        public new Axes RelativeSizeAxes
         {
             set => throw new InvalidOperationException($@"Width is automatically handled by {nameof(Update)}.");
         }

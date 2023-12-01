@@ -236,7 +236,6 @@ namespace osu.Game.Screens.Select
                             {
                                 Text = beatmapInfo.DifficultyName,
                                 Font = OsuFont.GetFont(size: 24, italics: true),
-                                RelativeSizeAxes = Axes.X,
                             },
                         }
                     },
@@ -288,13 +287,11 @@ namespace osu.Game.Screens.Select
                             {
                                 Current = { BindTarget = titleBinding },
                                 Font = OsuFont.GetFont(size: 28, italics: true),
-                                RelativeSizeAxes = Axes.X,
                             },
                             ArtistLabel = new TruncatingSpriteText
                             {
                                 Current = { BindTarget = artistBinding },
                                 Font = OsuFont.GetFont(size: 17, italics: true),
-                                RelativeSizeAxes = Axes.X,
                             },
                             MapperContainer = new FillFlowContainer
                             {
