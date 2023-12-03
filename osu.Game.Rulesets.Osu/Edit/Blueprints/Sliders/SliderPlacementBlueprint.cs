@@ -197,7 +197,11 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders
             base.OnDragEnd(e);
 
             if (state == SliderPlacementState.Drawing)
+            {
+                bSplineBuilder.Finish();
+                updateSliderPathFromBSplineBuilder();
                 endCurve();
+            }
         }
 
         protected override void OnMouseUp(MouseUpEvent e)
