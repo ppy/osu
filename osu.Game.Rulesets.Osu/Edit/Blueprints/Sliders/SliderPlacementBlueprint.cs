@@ -200,6 +200,9 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders
             {
                 bSplineBuilder.Finish();
                 updateSliderPathFromBSplineBuilder();
+
+                // Change the state so it will snap the expected distance in endCurve.
+                state = SliderPlacementState.Finishing;
                 endCurve();
             }
         }
@@ -304,7 +307,10 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders
 
         private void updateSlider()
         {
-            HitObject.Path.ExpectedDistance.Value = distanceSnapProvider?.FindSnappedDistance(HitObject, (float)HitObject.Path.CalculatedDistance) ?? (float)HitObject.Path.CalculatedDistance;
+            if (state == SliderPlacementState.Drawing)
+                HitObject.Path.ExpectedDistance.Value = (float)HitObject.Path.CalculatedDistance;
+            else
+                HitObject.Path.ExpectedDistance.Value = distanceSnapProvider?.FindSnappedDistance(HitObject, (float)HitObject.Path.CalculatedDistance) ?? (float)HitObject.Path.CalculatedDistance;
 
             bodyPiece.UpdateFrom(HitObject);
             headCirclePiece.UpdateFrom(HitObject.HeadCircle);
@@ -343,7 +349,8 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders
         {
             Initial,
             ControlPoints,
-            Drawing
+            Drawing,
+            Finishing
         }
     }
 }
