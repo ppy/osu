@@ -314,8 +314,6 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders
             if (builderPoints.Count == 0 || builderPoints[0].Count == 0)
                 return;
 
-            PathType? lastPathType = null;
-
             HitObject.Path.ControlPoints.Clear();
 
             // Iterate through generated segments and adding non-inheriting path types where appropriate.
@@ -328,21 +326,12 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders
                 if (segment.Count == 0)
                     continue;
 
-                // Where possible, we can use the simpler LINEAR path type.
-                PathType? pathType = pointsInSegment == 2 ? PathType.LINEAR : PathType.BSpline(3);
-
-                // Linear segments can be combined, as two adjacent linear sections are computationally the same as one with the points combined.
-                if (lastPathType == pathType && lastPathType == PathType.LINEAR)
-                    pathType = null;
-
-                HitObject.Path.ControlPoints.Add(new PathControlPoint(segment[0], pathType));
+                HitObject.Path.ControlPoints.Add(new PathControlPoint(segment[0], PathType.BSpline(3)));
                 for (int j = 1; j < pointsInSegment - 1; j++)
                     HitObject.Path.ControlPoints.Add(new PathControlPoint(segment[j]));
 
                 if (isLastSegment)
                     HitObject.Path.ControlPoints.Add(new PathControlPoint(segment[pointsInSegment - 1]));
-
-                if (pathType != null) lastPathType = pathType;
             }
         }
 
