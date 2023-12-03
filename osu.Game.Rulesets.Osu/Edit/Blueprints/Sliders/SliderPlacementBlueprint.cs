@@ -309,12 +309,11 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders
 
         private void updateSliderPathFromBSplineBuilder()
         {
-            IReadOnlyList<Vector2> builderPoints = bSplineBuilder.ControlPoints;
+            IReadOnlyList<List<Vector2>> builderPoints = bSplineBuilder.ControlPoints;
 
             if (builderPoints.Count == 0)
                 return;
 
-            int lastSegmentStart = 0;
             PathType? lastPathType = null;
 
             HitObject.Path.ControlPoints.Clear();
@@ -323,31 +322,25 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders
             // Importantly, the B-Spline builder returns three Vector2s at the same location when a new segment is to be started.
             for (int i = 0; i < builderPoints.Count; i++)
             {
-                bool isLastPoint = i == builderPoints.Count - 1;
-                bool isNewSegment = i < builderPoints.Count - 2 && builderPoints[i] == builderPoints[i + 1] && builderPoints[i] == builderPoints[i + 2];
+                bool isLastSegment = i == builderPoints.Count - 1;
+                var segment = builderPoints[i];
+                int pointsInSegment = segment.Count;
 
-                if (isNewSegment || isLastPoint)
-                {
-                    int pointsInSegment = i - lastSegmentStart;
+                // Where possible, we can use the simpler LINEAR path type.
+                PathType? pathType = pointsInSegment == 1 ? PathType.LINEAR : PathType.BSpline(3);
 
-                    // Where possible, we can use the simpler LINEAR path type.
-                    PathType? pathType = pointsInSegment == 1 ? PathType.LINEAR : PathType.BSpline(3);
+                // Linear segments can be combined, as two adjacent linear sections are computationally the same as one with the points combined.
+                if (lastPathType == pathType && lastPathType == PathType.LINEAR)
+                    pathType = null;
 
-                    // Linear segments can be combined, as two adjacent linear sections are computationally the same as one with the points combined.
-                    if (lastPathType == pathType && lastPathType == PathType.LINEAR)
-                        pathType = null;
+                HitObject.Path.ControlPoints.Add(new PathControlPoint(segment[0], pathType));
+                for (int j = 1; j < pointsInSegment - 1; j++)
+                    HitObject.Path.ControlPoints.Add(new PathControlPoint(segment[j]));
 
-                    HitObject.Path.ControlPoints.Add(new PathControlPoint(builderPoints[lastSegmentStart], pathType));
-                    for (int j = lastSegmentStart + 1; j < i; j++)
-                        HitObject.Path.ControlPoints.Add(new PathControlPoint(builderPoints[j]));
+                if (isLastSegment)
+                    HitObject.Path.ControlPoints.Add(new PathControlPoint(segment[pointsInSegment - 1]));
 
-                    if (isLastPoint)
-                        HitObject.Path.ControlPoints.Add(new PathControlPoint(builderPoints[i]));
-
-                    // Skip the redundant duplicated points (see isNewSegment above) which have been coalesced into a path type.
-                    lastSegmentStart = (i += 2);
-                    if (pathType != null) lastPathType = pathType;
-                }
+                if (pathType != null) lastPathType = pathType;
             }
         }
 
