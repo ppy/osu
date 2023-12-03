@@ -384,7 +384,7 @@ namespace osu.Game.Scoring
         public bool Equals(ScoreInfo? other) => other?.ID == ID;
 
         public override string ToString() => this.GetDisplayTitle();
-        
+
         // Recalculate accuracy based off of the current state of Statistics
         public void CalculateAccuracy()
         {

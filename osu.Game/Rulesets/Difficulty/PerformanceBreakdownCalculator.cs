@@ -3,6 +3,7 @@
 
 #nullable disable
 
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
@@ -13,6 +14,7 @@ using osu.Game.Beatmaps;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Scoring;
+using osu.Game.Rulesets.Judgements;
 using osu.Game.Scoring;
 
 namespace osu.Game.Rulesets.Difficulty
@@ -53,13 +55,28 @@ namespace osu.Game.Rulesets.Difficulty
                 Ruleset rulest = score.Ruleset.CreateInstance();
                 ScoreInfo fcPlay = score.DeepClone();
                 fcPlay.Passed = true;
-
                 // Update the play to be a full combo
                 fcPlay.MaxCombo = calculateMaxCombo(playableBeatmap);
-                fcPlay.Statistics[HitResult.Great] += fcPlay.Statistics[HitResult.Miss];
-                fcPlay.Statistics[HitResult.Miss] = 0;
-                // Recalculate Accuracy with misses converted to 300s
-                fcPlay.CalculateAccuracy();
+
+                // Only recalculate accuracy if it's different
+                if (fcPlay.Statistics[HitResult.Miss] > 0)
+                {
+                    // number of hits which are worth 300 or more score (greats and perfects)
+                    int count300 = fcPlay.Statistics.Where(x => Judgement.ToNumericResult(x.Key) >= 300).Sum(x => x.Value);
+                    // The ratio of 300s to other values not including misses
+                    double ratio300 = (double)count300 / (fcPlay.Statistics.Sum(x => x.Value) - fcPlay.Statistics[HitResult.Miss]);
+                    Console.WriteLine($"{ratio300}");
+                    // The number of extra greats to add
+                    int newGreat = (int)Math.Round(fcPlay.Statistics[HitResult.Miss] * ratio300);
+                    Console.WriteLine($"{newGreat}");
+                    // The number of extra oks to add
+                    int newOk = fcPlay.Statistics[HitResult.Miss] - newGreat;
+                    fcPlay.Statistics[HitResult.Great] += newGreat;
+                    fcPlay.Statistics[HitResult.Ok] += newOk;
+                    fcPlay.Statistics[HitResult.Miss] = 0;
+                    // Recalculate Accuracy with misses converted to 300s
+                    fcPlay.CalculateAccuracy();
+                }
 
                 var difficulty = await difficultyCache.GetDifficultyAsync(
                     playableBeatmap.BeatmapInfo,
