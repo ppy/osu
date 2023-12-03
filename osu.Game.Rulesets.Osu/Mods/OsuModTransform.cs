@@ -22,7 +22,7 @@ namespace osu.Game.Rulesets.Osu.Mods
         public override ModType Type => ModType.Fun;
         public override LocalisableString Description => "Everything rotates. EVERYTHING.";
         public override double ScoreMultiplier => 1;
-        public override Type[] IncompatibleMods => base.IncompatibleMods.Concat(new[] { typeof(OsuModWiggle), typeof(OsuModMagnetised), typeof(OsuModRepel), typeof(OsuModFreezeFrame) }).ToArray();
+        public override Type[] IncompatibleMods => base.IncompatibleMods.Concat(new[] { typeof(OsuModWiggle), typeof(OsuModMagnetised), typeof(OsuModRepel), typeof(OsuModFreezeFrame), typeof(OsuModDepth) }).ToArray();
 
         private float theta;
 
