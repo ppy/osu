@@ -56,7 +56,10 @@ namespace osu.Game.Rulesets.Difficulty
 
                 // Update the play to be a full combo
                 fcPlay.MaxCombo = calculateMaxCombo(playableBeatmap);
+                fcPlay.Statistics[HitResult.Great] += fcPlay.Statistics[HitResult.Miss];
                 fcPlay.Statistics[HitResult.Miss] = 0;
+                // Recalculate Accuracy with misses converted to 300s
+                fcPlay.CalculateAccuracy();
 
                 var difficulty = await difficultyCache.GetDifficultyAsync(
                     playableBeatmap.BeatmapInfo,

@@ -15,6 +15,7 @@ using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Rulesets;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Scoring;
+using osu.Game.Rulesets.Judgements;
 using osu.Game.Scoring.Legacy;
 using osu.Game.Users;
 using osu.Game.Utils;
@@ -383,5 +384,13 @@ namespace osu.Game.Scoring
         public bool Equals(ScoreInfo? other) => other?.ID == ID;
 
         public override string ToString() => this.GetDisplayTitle();
+        
+        // Recalculate accuracy based off of the current state of Statistics
+        public void CalculateAccuracy()
+        {
+            // This iterates through statistics 3 times, which is probably not major for performance but is certainly not ideal
+            double scoreSum = Statistics.Sum(x => Judgement.ToNumericResult(x.Key) * x.Value);
+            Accuracy = scoreSum / (MaximumStatistics.Sum(x => Judgement.ToNumericResult(x.Key) * x.Value));
+        }
     }
 }
