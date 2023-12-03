@@ -1,3 +1,6 @@
+// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
+
 using System;
 using System.Linq;
 using osu.Framework.Bindables;
@@ -27,7 +30,7 @@ namespace osu.Game.Rulesets.Osu.Mods
 
         private static readonly Vector3 camera_position = new Vector3(OsuPlayfield.BASE_SIZE.X * 0.5f, OsuPlayfield.BASE_SIZE.Y * 0.5f, -100);
 
-        [SettingSource("Maximum Depth", "How far away object appear.", 0)]
+        [SettingSource("Maximum depth", "How far away objects appear.", 0)]
         public BindableFloat MaxDepth { get; } = new BindableFloat(100)
         {
             Precision = 10,
