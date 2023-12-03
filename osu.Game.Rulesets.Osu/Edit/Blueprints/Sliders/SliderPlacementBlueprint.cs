@@ -318,8 +318,7 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders
 
             HitObject.Path.ControlPoints.Clear();
 
-            // Iterate through generated points, finding each segment and adding non-inheriting path types where appropriate.
-            // Importantly, the B-Spline builder returns three Vector2s at the same location when a new segment is to be started.
+            // Iterate through generated segments and adding non-inheriting path types where appropriate.
             for (int i = 0; i < builderPoints.Count; i++)
             {
                 bool isLastSegment = i == builderPoints.Count - 1;
