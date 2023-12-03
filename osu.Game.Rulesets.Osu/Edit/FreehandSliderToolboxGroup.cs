@@ -17,7 +17,7 @@ namespace osu.Game.Rulesets.Osu.Edit
         {
         }
 
-        public BindableFloat Tolerance { get; } = new BindableFloat(1.5f)
+        public BindableFloat Tolerance { get; } = new BindableFloat(2f)
         {
             MinValue = 0.05f,
             MaxValue = 3f,
@@ -32,7 +32,7 @@ namespace osu.Game.Rulesets.Osu.Edit
         };
 
         // We map internal ranges to a more standard range of values for display to the user.
-        private readonly BindableInt displayTolerance = new BindableInt(40)
+        private readonly BindableInt displayTolerance = new BindableInt(66)
         {
             MinValue = 5,
             MaxValue = 100
