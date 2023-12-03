@@ -331,17 +331,16 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders
             {
                 bool isLastSegment = i == builderPoints.Count - 1;
                 var segment = builderPoints[i];
-                int pointsInSegment = segment.Count;
 
                 if (segment.Count == 0)
                     continue;
 
                 HitObject.Path.ControlPoints.Add(new PathControlPoint(segment[0], PathType.BSpline(3)));
-                for (int j = 1; j < pointsInSegment - 1; j++)
+                for (int j = 1; j < segment.Count - 1; j++)
                     HitObject.Path.ControlPoints.Add(new PathControlPoint(segment[j]));
 
                 if (isLastSegment)
-                    HitObject.Path.ControlPoints.Add(new PathControlPoint(segment[pointsInSegment - 1]));
+                    HitObject.Path.ControlPoints.Add(new PathControlPoint(segment[^1]));
             }
         }
 
