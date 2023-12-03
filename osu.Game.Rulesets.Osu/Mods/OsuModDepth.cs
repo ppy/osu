@@ -7,6 +7,7 @@ using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Localisation;
+using osu.Framework.Utils;
 using osu.Game.Configuration;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Objects.Drawables;
@@ -126,8 +127,7 @@ namespace osu.Game.Rulesets.Osu.Mods
                         var hitObject = (OsuHitObject)drawable.HitObject;
 
                         double appearTime = hitObject.StartTime - hitObject.TimePreempt;
-                        double moveDuration = hitObject.TimePreempt;
-                        float z = time > appearTime + moveDuration ? 0 : (MaxDepth.Value - (float)((time - appearTime) / moveDuration * MaxDepth.Value));
+                        float z = Interpolation.ValueAt(Math.Clamp(time, appearTime, hitObject.StartTime), MaxDepth.Value, 0f, appearTime, hitObject.StartTime);
 
                         float d = mappedDepth(z);
                         drawable.Position = positionAtDepth(d, hitObject.Position);
