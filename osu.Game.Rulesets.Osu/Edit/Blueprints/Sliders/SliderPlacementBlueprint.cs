@@ -311,7 +311,7 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders
         {
             IReadOnlyList<List<Vector2>> builderPoints = bSplineBuilder.ControlPoints;
 
-            if (builderPoints.Count == 0)
+            if (builderPoints.Count == 0 || builderPoints[0].Count == 0)
                 return;
 
             PathType? lastPathType = null;
@@ -325,6 +325,9 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders
                 bool isLastSegment = i == builderPoints.Count - 1;
                 var segment = builderPoints[i];
                 int pointsInSegment = segment.Count;
+
+                if (segment.Count == 0)
+                    continue;
 
                 // Where possible, we can use the simpler LINEAR path type.
                 PathType? pathType = pointsInSegment == 1 ? PathType.LINEAR : PathType.BSpline(3);
