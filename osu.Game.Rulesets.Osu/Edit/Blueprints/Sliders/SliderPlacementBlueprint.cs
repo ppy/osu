@@ -329,7 +329,7 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders
                     continue;
 
                 // Where possible, we can use the simpler LINEAR path type.
-                PathType? pathType = pointsInSegment == 1 ? PathType.LINEAR : PathType.BSpline(3);
+                PathType? pathType = pointsInSegment == 2 ? PathType.LINEAR : PathType.BSpline(3);
 
                 // Linear segments can be combined, as two adjacent linear sections are computationally the same as one with the points combined.
                 if (lastPathType == pathType && lastPathType == PathType.LINEAR)
