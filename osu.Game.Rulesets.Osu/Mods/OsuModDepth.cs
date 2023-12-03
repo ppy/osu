@@ -53,25 +53,6 @@ namespace osu.Game.Rulesets.Osu.Mods
             (drawableRuleset.Playfield as OsuPlayfield)?.FollowPoints.Hide();
         }
 
-        public override void ApplyToDrawableHitObject(DrawableHitObject dho)
-        {
-            base.ApplyToDrawableHitObject(dho);
-
-            switch (dho)
-            {
-                case DrawableSliderHead:
-                case DrawableSliderTail:
-                case DrawableSliderTick:
-                case DrawableSliderRepeat:
-                    return;
-
-                case DrawableHitCircle:
-                case DrawableSlider:
-                    dho.Anchor = Anchor.Centre;
-                    break;
-            }
-        }
-
         private void applyTransform(DrawableHitObject drawable, ArmedState state)
         {
             switch (drawable)
@@ -160,7 +141,7 @@ namespace osu.Game.Rulesets.Osu.Mods
 
         private static Vector2 positionAtDepth(float mappedDepth, Vector2 positionAtZeroDepth)
         {
-            return (positionAtZeroDepth - camera_position.Xy) * mappedDepth;
+            return (positionAtZeroDepth - camera_position.Xy) * mappedDepth + camera_position.Xy;
         }
     }
 }
