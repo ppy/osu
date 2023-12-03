@@ -65,10 +65,8 @@ namespace osu.Game.Rulesets.Difficulty
                     int count300 = fcPlay.Statistics.Where(x => Judgement.ToNumericResult(x.Key) >= 300).Sum(x => x.Value);
                     // The ratio of 300s to other values not including misses
                     double ratio300 = (double)count300 / (fcPlay.Statistics.Sum(x => x.Value) - fcPlay.Statistics[HitResult.Miss]);
-                    Console.WriteLine($"{ratio300}");
                     // The number of extra greats to add
                     int newGreat = (int)Math.Round(fcPlay.Statistics[HitResult.Miss] * ratio300);
-                    Console.WriteLine($"{newGreat}");
                     // The number of extra oks to add
                     int newOk = fcPlay.Statistics[HitResult.Miss] - newGreat;
                     fcPlay.Statistics[HitResult.Great] += newGreat;
