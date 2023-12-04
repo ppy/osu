@@ -140,6 +140,12 @@ namespace osu.Game.Overlays.SkinEditor
         {
             performer?.PerformFromScreen(screen =>
             {
+                if (beatmap.Value is DummyWorkingBeatmap)
+                {
+                    // presume we don't have anything good to play and just bail.
+                    return;
+                }
+
                 // If we're playing the intro, switch away to another beatmap.
                 if (beatmap.Value.BeatmapSetInfo.Protected)
                 {
