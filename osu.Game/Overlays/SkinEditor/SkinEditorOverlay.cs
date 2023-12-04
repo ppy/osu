@@ -157,7 +157,7 @@ namespace osu.Game.Overlays.SkinEditor
                 if (screen is Player)
                     return;
 
-                var replayGeneratingMod = ruleset.Value.CreateInstance().GetAutoplayMod();
+                var replayGeneratingMod = beatmap.Value.BeatmapInfo.Ruleset.CreateInstance().GetAutoplayMod();
 
                 IReadOnlyList<Mod> usableMods = mods.Value;
 
