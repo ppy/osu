@@ -15,6 +15,7 @@ using osu.Framework.Layout;
 using osu.Framework.Threading;
 using osu.Framework.Utils;
 using osu.Game.Configuration;
+using osu.Game.Rulesets.Judgements;
 using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Objects.Types;
 using osu.Game.Skinning;
@@ -53,6 +54,8 @@ namespace osu.Game.Screens.Play.HUD
         private static readonly Colour4 main_bar_glow_colour = Color4Extensions.FromHex("#7ED7FD").Opacity(0.5f);
 
         private ScheduledDelegate? resetMissBarDelegate;
+
+        private bool displayingMiss => resetMissBarDelegate != null;
 
         private readonly List<Vector2> missBarVertices = new List<Vector2>();
         private readonly List<Vector2> healthBarVertices = new List<Vector2>();
@@ -147,10 +150,13 @@ namespace osu.Game.Screens.Play.HUD
             };
         }
 
+        private JudgementResult? pendingJudgementResult;
+
         protected override void LoadComplete()
         {
             base.LoadComplete();
 
+            HealthProcessor.NewJudgement += result => pendingJudgementResult = result;
             Current.BindValueChanged(_ => Scheduler.AddOnce(updateCurrent), true);
 
             // we're about to set `RelativeSizeAxes` depending on the value of `UseRelativeSize`.
@@ -166,13 +172,22 @@ namespace osu.Game.Screens.Play.HUD
 
         private void updateCurrent()
         {
-            if (Current.Value >= GlowBarValue) finishMissDisplay();
+            var result = pendingJudgementResult;
+
+            if (Current.Value >= GlowBarValue)
+                finishMissDisplay();
 
             double time = Current.Value > GlowBarValue ? 500 : 250;
 
             // TODO: this should probably use interpolation in update.
             this.TransformTo(nameof(HealthBarValue), Current.Value, time, Easing.OutQuint);
-            if (resetMissBarDelegate == null) this.TransformTo(nameof(GlowBarValue), Current.Value, time, Easing.OutQuint);
+
+            if (result != null && !result.IsHit)
+                triggerMissDisplay();
+            else if (!displayingMiss)
+                this.TransformTo(nameof(GlowBarValue), Current.Value, time, Easing.OutQuint);
+
+            pendingJudgementResult = null;
         }
 
         protected override void Update()
@@ -196,7 +211,7 @@ namespace osu.Game.Screens.Play.HUD
             mainBar.TransformTo(nameof(BarPath.GlowColour), main_bar_glow_colour.Opacity(0.8f))
                    .TransformTo(nameof(BarPath.GlowColour), main_bar_glow_colour, 300, Easing.OutQuint);
 
-            if (resetMissBarDelegate == null)
+            if (!displayingMiss)
             {
                 glowBar.TransformTo(nameof(BarPath.BarColour), Colour4.White, 30, Easing.OutQuint)
                        .Then()
@@ -208,20 +223,10 @@ namespace osu.Game.Screens.Play.HUD
             }
         }
 
-        protected override void Miss()
+        private void triggerMissDisplay()
         {
-            base.Miss();
-
-            if (resetMissBarDelegate != null)
-            {
-                resetMissBarDelegate.Cancel();
-                resetMissBarDelegate = null;
-            }
-            else
-            {
-                // Reset any ongoing animation immediately, else things get weird.
-                this.TransformTo(nameof(GlowBarValue), HealthBarValue);
-            }
+            resetMissBarDelegate?.Cancel();
+            resetMissBarDelegate = null;
 
             this.Delay(500).Schedule(() =>
             {
@@ -238,7 +243,7 @@ namespace osu.Game.Screens.Play.HUD
 
         private void finishMissDisplay()
         {
-            if (resetMissBarDelegate == null)
+            if (!displayingMiss)
                 return;
 
             if (Current.Value > 0)
