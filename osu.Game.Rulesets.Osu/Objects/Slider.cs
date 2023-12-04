@@ -124,8 +124,8 @@ namespace osu.Game.Rulesets.Osu.Objects
         public double TickDistanceMultiplier = 1;
 
         /// <summary>
-        /// If <see langword="false"/>, <see cref="Slider"/>'s judgement is fully handled by its nested <see cref="HitObject"/>s.
-        /// If <see langword="true"/>, this <see cref="Slider"/> will be judged proportionally to the number of nested <see cref="HitObject"/>s hit.
+        /// If <see langword="false"/>, the <see cref="SliderHeadCircle"/> hit accuracy will limit the judgement of the <see cref="Slider"/>.
+        /// If <see langword="true"/>, the <see cref="SliderHeadCircle"/> is counted as a perfect hit at any point inside its hit window.
         /// </summary>
         public bool ClassicSliderBehaviour { get; set; }
 
