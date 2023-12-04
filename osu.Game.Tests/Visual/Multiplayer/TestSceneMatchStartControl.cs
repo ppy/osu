@@ -398,8 +398,13 @@ namespace osu.Game.Tests.Visual.Multiplayer
                                  raiseRoomUpdated();
                              });
 
+            // Ready
             ClickButtonWhenEnabled<MultiplayerReadyButton>();
+
+            // Start match
             ClickButtonWhenEnabled<MultiplayerReadyButton>();
+
+            // Abort
             ClickButtonWhenEnabled<MultiplayerReadyButton>();
             AddStep("check abort request received", () => multiplayerClient.Verify(m => m.AbortMatch(), Times.Once));
         }
