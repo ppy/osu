@@ -12,9 +12,11 @@ using osu.Framework.Graphics.UserInterface;
 using osu.Framework.Screens;
 using osu.Framework.Testing;
 using osu.Framework.Threading;
+using osu.Game.Online.API;
 using osu.Game.Overlays.Settings;
 using osu.Game.Overlays.SkinEditor;
 using osu.Game.Rulesets.Mods;
+using osu.Game.Rulesets.Osu;
 using osu.Game.Rulesets.Osu.Mods;
 using osu.Game.Screens.Edit.Components;
 using osu.Game.Screens.Play;
@@ -257,6 +259,19 @@ namespace osu.Game.Tests.Visual.Navigation
             AddAssert("blueprint container present", () => skinEditor.ChildrenOfType<SkinBlueprintContainer>().Count(), () => Is.EqualTo(1));
             AddAssert("placeholder not present", () => skinEditor.ChildrenOfType<NonSkinnableScreenPlaceholder>().Count(), () => Is.Zero);
             AddAssert("editor sidebars not empty", () => skinEditor.ChildrenOfType<EditorSidebar>().SelectMany(sidebar => sidebar.Children).Count(), () => Is.GreaterThan(0));
+        }
+
+        [Test]
+        public void TestOpenSkinEditorGameplaySceneOnBeatmapWithNoObjects()
+        {
+            AddStep("set dummy beatmap", () => Game.Beatmap.SetDefault());
+            advanceToSongSelect();
+
+            AddStep("create empty beatmap", () => Game.BeatmapManager.CreateNew(new OsuRuleset().RulesetInfo, new GuestUser()));
+            AddUntilStep("wait for selected", () => !Game.Beatmap.IsDefault);
+
+            openSkinEditor();
+            switchToGameplayScene();
         }
 
         private void advanceToSongSelect()
