@@ -27,6 +27,7 @@ namespace osu.Game.Rulesets.Catch.Tests
         [TestCase("hardrock-spinner", new[] { typeof(CatchModHardRock) })]
         [TestCase("right-bound-hr-offset", new[] { typeof(CatchModHardRock) })]
         [TestCase("basic-hyperdash")]
+        [TestCase("pixel-jump")]
         public new void Test(string name, params Type[] mods) => base.Test(name, mods);
 
         protected override IEnumerable<ConvertValue> CreateConvertValue(HitObject hitObject)
