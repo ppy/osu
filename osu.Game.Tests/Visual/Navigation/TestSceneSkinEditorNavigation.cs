@@ -281,7 +281,6 @@ namespace osu.Game.Tests.Visual.Navigation
             AddStep("set dummy beatmap", () => Game.Beatmap.SetDefault());
 
             openSkinEditor();
-            switchToGameplayScene();
         }
 
         [Test]
