@@ -57,9 +57,6 @@ namespace osu.Game.Overlays.SkinEditor
         private MusicController music { get; set; } = null!;
 
         [Resolved]
-        private IBindable<RulesetInfo> ruleset { get; set; } = null!;
-
-        [Resolved]
         private Bindable<IReadOnlyList<Mod>> mods { get; set; } = null!;
 
         [Resolved]
