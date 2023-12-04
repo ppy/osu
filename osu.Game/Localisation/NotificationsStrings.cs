@@ -94,6 +94,11 @@ Please try changing your audio device to a working setting.");
         public static LocalisableString YourNameWasMentioned(string username) => new TranslatableString(getKey(@"your_name_was_mentioned"), @"Your name was mentioned in chat by '{0}'. Click to find out why!", username);
 
         /// <summary>
+        /// "{0} invited you to the multiplayer match &quot;{1}&quot;! Click to join."
+        /// </summary>
+        public static LocalisableString InvitedYouToTheMultiplayer(string username, string roomName) => new TranslatableString(getKey(@"invited_you_to_the_multiplayer"), @"{0} invited you to the multiplayer match ""{1}""! Click to join.", username, roomName);
+
+        /// <summary>
         /// "You do not have the beatmap for this replay."
         /// </summary>
         public static LocalisableString MissingBeatmapForReplay => new TranslatableString(getKey(@"missing_beatmap_for_replay"), @"You do not have the beatmap for this replay.");

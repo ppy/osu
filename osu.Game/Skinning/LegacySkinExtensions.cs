@@ -9,6 +9,7 @@ using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Animations;
+using osu.Framework.Graphics.Primitives;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.Textures;
 using osuTK;
@@ -112,9 +113,22 @@ namespace osu.Game.Skinning
             if (texture.DisplayWidth <= maxSize.X && texture.DisplayHeight <= maxSize.Y)
                 return texture;
 
-            // use scale adjust property for downscaling the texture in order to meet the specified maximum dimensions.
-            texture.ScaleAdjust *= Math.Max(texture.DisplayWidth / maxSize.X, texture.DisplayHeight / maxSize.Y);
-            return texture;
+            maxSize *= texture.ScaleAdjust;
+
+            // Importantly, check per-axis for the minimum dimension to avoid accidentally inflating
+            // textures with weird aspect ratios.
+            float newWidth = Math.Min(texture.Width, maxSize.X);
+            float newHeight = Math.Min(texture.Height, maxSize.Y);
+
+            var croppedTexture = texture.Crop(new RectangleF(
+                texture.Width / 2f - newWidth / 2f,
+                texture.Height / 2f - newHeight / 2f,
+                newWidth,
+                newHeight
+            ));
+
+            croppedTexture.ScaleAdjust = texture.ScaleAdjust;
+            return croppedTexture;
         }
 
         public static bool HasFont(this ISkin source, LegacyFont font)
@@ -197,7 +211,11 @@ namespace osu.Game.Skinning
             }
         }
 
-        private const double default_frame_time = 1000 / 60d;
+        /// <summary>
+        /// The frame length of each frame at a 60 FPS rate.
+        /// Default frame rate for legacy skin animations.
+        /// </summary>
+        public const double SIXTY_FRAME_TIME = 1000 / 60d;
 
         private static double getFrameLength(ISkin source, bool applyConfigFrameRate, Texture[] textures)
         {
@@ -211,7 +229,7 @@ namespace osu.Game.Skinning
                 return 1000f / textures.Length;
             }
 
-            return default_frame_time;
+            return SIXTY_FRAME_TIME;
         }
     }
 }

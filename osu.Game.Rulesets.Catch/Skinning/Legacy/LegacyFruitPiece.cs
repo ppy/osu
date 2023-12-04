@@ -9,7 +9,7 @@ namespace osu.Game.Rulesets.Catch.Skinning.Legacy
 {
     internal partial class LegacyFruitPiece : LegacyCatchHitObjectPiece
     {
-        private static readonly Vector2 fruit_max_size = new Vector2(128);
+        private static readonly Vector2 fruit_max_size = new Vector2(160);
 
         protected override void LoadComplete()
         {

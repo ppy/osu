@@ -81,7 +81,7 @@ namespace osu.Game.Rulesets.UI.Scrolling
         /// </summary>
         protected readonly SortedList<MultiplierControlPoint> ControlPoints = new SortedList<MultiplierControlPoint>(Comparer<MultiplierControlPoint>.Default);
 
-        protected IScrollingInfo ScrollingInfo => scrollingInfo;
+        public IScrollingInfo ScrollingInfo => scrollingInfo;
 
         [Cached(Type = typeof(IScrollingInfo))]
         private readonly LocalScrollingInfo scrollingInfo;

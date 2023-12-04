@@ -13,9 +13,11 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Effects;
 using osu.Framework.Graphics.Shapes;
+using osu.Framework.Graphics.Sprites;
 using osu.Framework.Localisation;
 using osu.Framework.Logging;
 using osu.Framework.Threading;
+using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
 using osu.Game.Overlays.Notifications;
 using osu.Game.Resources.Localisation.Web;
@@ -27,7 +29,7 @@ namespace osu.Game.Overlays
 {
     public partial class NotificationOverlay : OsuFocusedOverlayContainer, INamedOverlayComponent, INotificationOverlay
     {
-        public string IconTexture => "Icons/Hexacons/notification";
+        public IconUsage Icon => HexaconsIcons.Notification;
         public LocalisableString Title => NotificationsStrings.HeaderTitle;
         public LocalisableString Description => NotificationsStrings.HeaderDescription;
 
@@ -113,7 +115,8 @@ namespace osu.Game.Overlays
                                     RelativeSizeAxes = Axes.X,
                                     Children = new[]
                                     {
-                                        new NotificationSection(AccountsStrings.NotificationsTitle, new[] { typeof(SimpleNotification) }),
+                                        // The main section adds as a catch-all for notifications which don't group into other sections.
+                                        new NotificationSection(AccountsStrings.NotificationsTitle),
                                         new NotificationSection(NotificationsStrings.RunningTasks, new[] { typeof(ProgressNotification) }),
                                     }
                                 }
@@ -205,7 +208,8 @@ namespace osu.Game.Overlays
             var ourType = notification.GetType();
             int depth = notification.DisplayOnTop ? -runningDepth : runningDepth;
 
-            var section = sections.Children.First(s => s.AcceptedNotificationTypes.Any(accept => accept.IsAssignableFrom(ourType)));
+            var section = sections.Children.FirstOrDefault(s => s.AcceptedNotificationTypes?.Any(accept => accept.IsAssignableFrom(ourType)) == true)
+                          ?? sections.First();
 
             section.Add(notification, depth);
 
