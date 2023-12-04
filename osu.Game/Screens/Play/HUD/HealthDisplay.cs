@@ -58,7 +58,9 @@ namespace osu.Game.Screens.Play.HUD
             health = HealthProcessor.Health.GetBoundCopy();
             health.BindValueChanged(h =>
             {
-                finishInitialAnimation();
+                if (initialIncrease != null)
+                    FinishInitialAnimation(h.OldValue);
+
                 Current.Value = h.NewValue;
             });
 
@@ -90,16 +92,16 @@ namespace osu.Game.Screens.Play.HUD
                 Scheduler.AddOnce(Flash);
 
                 if (newValue >= health.Value)
-                    finishInitialAnimation();
+                    FinishInitialAnimation(health.Value);
             }, increase_delay, true);
         }
 
-        private void finishInitialAnimation()
+        protected virtual void FinishInitialAnimation(double value)
         {
             if (initialIncrease == null)
                 return;
 
-            initialIncrease?.Cancel();
+            initialIncrease.Cancel();
             initialIncrease = null;
 
             // aside from the repeating `initialIncrease` scheduled task,
