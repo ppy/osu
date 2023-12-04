@@ -13,6 +13,7 @@ using osu.Framework.Screens;
 using osu.Framework.Testing;
 using osu.Framework.Threading;
 using osu.Game.Online.API;
+using osu.Game.Beatmaps;
 using osu.Game.Overlays.Settings;
 using osu.Game.Overlays.SkinEditor;
 using osu.Game.Rulesets.Mods;
@@ -278,6 +279,22 @@ namespace osu.Game.Tests.Visual.Navigation
         public void TestOpenSkinEditorGameplaySceneWhenDummyBeatmapActive()
         {
             AddStep("set dummy beatmap", () => Game.Beatmap.SetDefault());
+
+            openSkinEditor();
+            switchToGameplayScene();
+        }
+
+        [Test]
+        public void TestOpenSkinEditorGameplaySceneWhenDifferentRulesetActive()
+        {
+            BeatmapSetInfo beatmapSet = null!;
+
+            AddStep("import beatmap", () => beatmapSet = BeatmapImportHelper.LoadQuickOszIntoOsu(Game).GetResultSafely());
+            AddStep("select mania difficulty", () =>
+            {
+                var beatmap = beatmapSet.Beatmaps.First(b => b.Ruleset.OnlineID == 3);
+                Game.Beatmap.Value = Game.BeatmapManager.GetWorkingBeatmap(beatmap);
+            });
 
             openSkinEditor();
             switchToGameplayScene();
