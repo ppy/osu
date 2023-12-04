@@ -223,6 +223,9 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Match
             if (!Client.IsHost)
                 readyButton.Enabled.Value &= Room.State == MultiplayerRoomState.Open;
 
+            // At all times, the countdown button should only be enabled when no match is in progress.
+            countdownButton.Enabled.Value &= Room.State == MultiplayerRoomState.Open;
+
             if (newCountReady == countReady)
                 return;
 

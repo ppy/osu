@@ -381,28 +381,32 @@ namespace osu.Game.Tests.Visual.Multiplayer
         [Test]
         public void TestAbortMatch()
         {
-            multiplayerClient.Setup(m => m.StartMatch())
-                             .Callback(() =>
-                             {
-                                 multiplayerClient.Raise(m => m.LoadRequested -= null);
-                                 multiplayerClient.Object.Room!.State = MultiplayerRoomState.WaitingForLoad;
+            AddStep("setup client", () =>
+            {
+                multiplayerClient.Setup(m => m.StartMatch())
+                                 .Callback(() =>
+                                 {
+                                     multiplayerClient.Raise(m => m.LoadRequested -= null);
+                                     multiplayerClient.Object.Room!.State = MultiplayerRoomState.WaitingForLoad;
 
-                                 // The local user state doesn't really matter, so let's do the same as the base implementation for these tests.
-                                 changeUserState(localUser.UserID, MultiplayerUserState.Idle);
-                             });
+                                     // The local user state doesn't really matter, so let's do the same as the base implementation for these tests.
+                                     changeUserState(localUser.UserID, MultiplayerUserState.Idle);
+                                 });
 
-            multiplayerClient.Setup(m => m.AbortMatch())
-                             .Callback(() =>
-                             {
-                                 multiplayerClient.Object.Room!.State = MultiplayerRoomState.Open;
-                                 raiseRoomUpdated();
-                             });
+                multiplayerClient.Setup(m => m.AbortMatch())
+                                 .Callback(() =>
+                                 {
+                                     multiplayerClient.Object.Room!.State = MultiplayerRoomState.Open;
+                                     raiseRoomUpdated();
+                                 });
+            });
 
             // Ready
             ClickButtonWhenEnabled<MultiplayerReadyButton>();
 
             // Start match
             ClickButtonWhenEnabled<MultiplayerReadyButton>();
+            AddUntilStep("countdown button disabled", () => !this.ChildrenOfType<MultiplayerCountdownButton>().Single().Enabled.Value);
 
             // Abort
             ClickButtonWhenEnabled<MultiplayerReadyButton>();
