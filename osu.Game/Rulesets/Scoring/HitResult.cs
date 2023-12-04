@@ -160,7 +160,7 @@ namespace osu.Game.Rulesets.Scoring
         /// Special result for legacy rulesets that provide an <see cref="Ok"/> judgement that does not increase combo.
         /// </summary>
         [EnumMember(Value = "legacy_ok_no_combo")]
-        [Order(100)]
+        [Order(101)]
         [Obsolete("Do not use.")]
         LegacyOkNoCombo = 101,
 
@@ -168,7 +168,7 @@ namespace osu.Game.Rulesets.Scoring
         /// Special result for legacy rulesets that provide a <see cref="Great"/> judgement that does not increase combo.
         /// </summary>
         [EnumMember(Value = "legacy_great_no_combo")]
-        [Order(100)]
+        [Order(102)]
         [Obsolete("Do not use.")]
         LegacyGreatNoCombo = 102
     }
