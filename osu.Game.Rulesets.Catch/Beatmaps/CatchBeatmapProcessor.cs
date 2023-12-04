@@ -247,7 +247,7 @@ namespace osu.Game.Rulesets.Catch.Beatmaps
                 currentObject.DistanceToHyperDash = 0;
 
                 int thisDirection = nextObject.EffectiveX > currentObject.EffectiveX ? 1 : -1;
-                double timeToNext = nextObject.StartTime - currentObject.StartTime - 1000f / 60f / 4; // 1/4th of a frame of grace time, taken from osu-stable
+                double timeToNext = (int)nextObject.StartTime - (int)currentObject.StartTime - 1000f / 60f / 4; // 1/4th of a frame of grace time, taken from osu-stable
                 double distanceToNext = Math.Abs(nextObject.EffectiveX - currentObject.EffectiveX) - (lastDirection == thisDirection ? lastExcess : halfCatcherWidth);
                 float distanceToHyper = (float)(timeToNext * Catcher.BASE_DASH_SPEED - distanceToNext);
 
