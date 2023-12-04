@@ -38,6 +38,9 @@ namespace osu.Game.Tests.Visual.Navigation
             advanceToSongSelect();
             openSkinEditor();
 
+            AddStep("import beatmap", () => BeatmapImportHelper.LoadQuickOszIntoOsu(Game).WaitSafely());
+            AddUntilStep("wait for selected", () => !Game.Beatmap.IsDefault);
+
             switchToGameplayScene();
 
             BarHitErrorMeter hitErrorMeter = null;
@@ -98,6 +101,10 @@ namespace osu.Game.Tests.Visual.Navigation
         {
             advanceToSongSelect();
             openSkinEditor();
+
+            AddStep("import beatmap", () => BeatmapImportHelper.LoadQuickOszIntoOsu(Game).WaitSafely());
+            AddUntilStep("wait for selected", () => !Game.Beatmap.IsDefault);
+
             switchToGameplayScene();
 
             AddUntilStep("wait for components", () => skinEditor.ChildrenOfType<SkinBlueprint>().Any());
@@ -162,6 +169,9 @@ namespace osu.Game.Tests.Visual.Navigation
             openSkinEditor();
             AddStep("select DT", () => Game.SelectedMods.Value = new Mod[] { new OsuModDoubleTime() });
 
+            AddStep("import beatmap", () => BeatmapImportHelper.LoadQuickOszIntoOsu(Game).WaitSafely());
+            AddUntilStep("wait for selected", () => !Game.Beatmap.IsDefault);
+
             switchToGameplayScene();
 
             AddAssert("DT still selected", () => ((Player)Game.ScreenStack.CurrentScreen).Mods.Value.Single() is OsuModDoubleTime);
@@ -173,6 +183,9 @@ namespace osu.Game.Tests.Visual.Navigation
             advanceToSongSelect();
             openSkinEditor();
             AddStep("select relax and spun out", () => Game.SelectedMods.Value = new Mod[] { new OsuModRelax(), new OsuModSpunOut() });
+
+            AddStep("import beatmap", () => BeatmapImportHelper.LoadQuickOszIntoOsu(Game).WaitSafely());
+            AddUntilStep("wait for selected", () => !Game.Beatmap.IsDefault);
 
             switchToGameplayScene();
 
@@ -186,6 +199,9 @@ namespace osu.Game.Tests.Visual.Navigation
             openSkinEditor();
             AddStep("select autoplay", () => Game.SelectedMods.Value = new Mod[] { new OsuModAutoplay() });
 
+            AddStep("import beatmap", () => BeatmapImportHelper.LoadQuickOszIntoOsu(Game).WaitSafely());
+            AddUntilStep("wait for selected", () => !Game.Beatmap.IsDefault);
+
             switchToGameplayScene();
 
             AddAssert("no mod selected", () => !((Player)Game.ScreenStack.CurrentScreen).Mods.Value.Any());
@@ -197,6 +213,9 @@ namespace osu.Game.Tests.Visual.Navigation
             advanceToSongSelect();
             openSkinEditor();
             AddStep("select cinema", () => Game.SelectedMods.Value = new Mod[] { new OsuModCinema() });
+
+            AddStep("import beatmap", () => BeatmapImportHelper.LoadQuickOszIntoOsu(Game).WaitSafely());
+            AddUntilStep("wait for selected", () => !Game.Beatmap.IsDefault);
 
             switchToGameplayScene();
 
@@ -266,9 +285,6 @@ namespace osu.Game.Tests.Visual.Navigation
 
         private void switchToGameplayScene()
         {
-            AddStep("import beatmap", () => BeatmapImportHelper.LoadQuickOszIntoOsu(Game).WaitSafely());
-            AddUntilStep("wait for selected", () => !Game.Beatmap.IsDefault);
-
             AddStep("Click gameplay scene button", () =>
             {
                 InputManager.MoveMouseTo(skinEditor.ChildrenOfType<SkinEditorSceneLibrary.SceneButton>().First(b => b.Text.ToString() == "Gameplay"));
