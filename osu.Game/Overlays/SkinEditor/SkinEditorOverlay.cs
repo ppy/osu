@@ -26,6 +26,7 @@ using osu.Game.Screens.Edit.Components;
 using osu.Game.Screens.Menu;
 using osu.Game.Screens.Play;
 using osu.Game.Screens.Select;
+using osu.Game.Users;
 using osu.Game.Utils;
 using osuTK;
 
@@ -285,6 +286,8 @@ namespace osu.Game.Overlays.SkinEditor
 
         private partial class EndlessPlayer : ReplayPlayer
         {
+            protected override UserActivity? InitialActivity => null;
+
             public EndlessPlayer(Func<IBeatmap, IReadOnlyList<Mod>, Score> createScore)
                 : base(createScore, new PlayerConfiguration
                 {
