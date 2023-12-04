@@ -401,6 +401,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
             ClickButtonWhenEnabled<MultiplayerReadyButton>();
             ClickButtonWhenEnabled<MultiplayerReadyButton>();
             ClickButtonWhenEnabled<MultiplayerReadyButton>();
+            AddStep("check abort request received", () => multiplayerClient.Verify(m => m.AbortMatch(), Times.Once));
         }
 
         private void verifyGameplayStartFlow()

@@ -130,7 +130,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Match
                         dialogOverlay.Push(new ConfirmAbortDialog(abortMatch, endOperation));
                 }
             }
-            else
+            else if (Room.State != MultiplayerRoomState.Closed)
                 toggleReady();
 
             bool isReady() => Client.LocalUser?.State == MultiplayerUserState.Ready || Client.LocalUser?.State == MultiplayerUserState.Spectating;
@@ -210,7 +210,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Match
             }
 
             readyButton.Enabled.Value = countdownButton.Enabled.Value =
-                Room.State == MultiplayerRoomState.Open
+                Room.State != MultiplayerRoomState.Closed
                 && CurrentPlaylistItem.Value?.ID == Room.Settings.PlaylistItemId
                 && !Room.Playlist.Single(i => i.ID == Room.Settings.PlaylistItemId).Expired
                 && !operationInProgress.Value;
@@ -219,7 +219,9 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Match
             if (localUser?.State == MultiplayerUserState.Spectating)
                 readyButton.Enabled.Value &= Client.IsHost && newCountReady > 0 && !Room.ActiveCountdowns.Any(c => c is MatchStartCountdown);
 
-            readyButton.Enabled.Value = true;
+            // When the local user is not the host, the button should only be enabled when no match is in progress.
+            if (!Client.IsHost)
+                readyButton.Enabled.Value &= Room.State == MultiplayerRoomState.Open;
 
             if (newCountReady == countReady)
                 return;
