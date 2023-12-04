@@ -38,9 +38,9 @@ namespace osu.Game.Screens.Ranking.Statistics
         private OsuSpriteText fcPerformance;
         private OsuSpriteText maximumPerformance;
 
-        private readonly Color4 achieveColor = Color4Extensions.FromHex("#66FFCC");
+        private readonly Color4 achieveColour = Color4Extensions.FromHex("#66FFCC");
 
-        private readonly Color4 fcColor = Color4Extensions.FromHex("#609882");
+        private readonly Color4 fcColour = Color4Extensions.FromHex("#609882");
 
         private readonly CancellationTokenSource cancellationTokenSource = new CancellationTokenSource();
 
@@ -105,14 +105,14 @@ namespace osu.Game.Screens.Ranking.Statistics
                                         Anchor = Anchor.CentreLeft,
                                         Font = OsuFont.GetFont(weight: FontWeight.Regular, size: StatisticItem.FONT_SIZE),
                                         Text = "Achieved PP",
-                                        Colour = achieveColor
+                                        Colour = achieveColour
                                     },
                                     achievedPerformance = new OsuSpriteText
                                     {
                                         Origin = Anchor.CentreRight,
                                         Anchor = Anchor.CentreRight,
                                         Font = OsuFont.GetFont(weight: FontWeight.SemiBold, size: StatisticItem.FONT_SIZE),
-                                        Colour = achieveColor
+                                        Colour = achieveColour
                                     }
                                 },
                                 new Drawable[]
@@ -123,14 +123,14 @@ namespace osu.Game.Screens.Ranking.Statistics
                                         Anchor = Anchor.CentreLeft,
                                         Font = OsuFont.GetFont(weight: FontWeight.Regular, size: StatisticItem.FONT_SIZE),
                                         Text = "PP for Full Combo",
-                                        Colour = fcColor
+                                        Colour = fcColour
                                     },
                                     fcPerformance = new OsuSpriteText
                                     {
                                         Origin = Anchor.CentreRight,
                                         Anchor = Anchor.CentreRight,
                                         Font = OsuFont.GetFont(weight: FontWeight.SemiBold, size: StatisticItem.FONT_SIZE),
-                                        Colour = fcColor
+                                        Colour = fcColour
                                     }
                                 },
                                 new Drawable[]
@@ -230,7 +230,10 @@ namespace osu.Game.Screens.Ranking.Statistics
             float percentage = (float)(attribute.Value / perfectAttribute.Value);
             float fcPercentage = (float)(fcAttribute.Value / perfectAttribute.Value);
 
-            MultiValueBar bar = new MultiValueBar(2)
+            float[] lengths = { fcPercentage, percentage };
+            Color4[] colours = { fcColour, achieveColour };
+
+            MultiValueBar bar = new MultiValueBar(2, lengths, colours)
             {
                 RelativeSizeAxes = Axes.X,
                 Origin = Anchor.Centre,
@@ -240,10 +243,6 @@ namespace osu.Game.Screens.Ranking.Statistics
                 Height = 5,
                 BackgroundColour = Color4.White.Opacity(0.5f),
             };
-            bar.SetColour(1, achieveColor);
-            bar.SetColour(0, fcColor);
-            bar.SetLength(1, percentage);
-            bar.SetLength(0, fcPercentage);
 
             return new Drawable[]
             {

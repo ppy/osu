@@ -14,25 +14,73 @@ namespace osu.Game.Graphics.UserInterface
     // A modified implementation of Bar which supports multiple accent bars
     public partial class MultiValueBar : Container
     {
-        private readonly Box background;
-
-        private readonly Box[] bars;
-
-        private readonly int barCount;
-
-        private const int resize_duration = 250;
-
-        private const Easing easing = Easing.InOutCubic;
-
-        private readonly float[] lengths;
-
-        public void SetLength(int index, float value)
+        public partial class SingleBarValue : Box
         {
-            lengths[index] = Math.Clamp(value, 0, 1);
-            updateBarLength(index);
+            private const Easing easing = Easing.InOutCubic;
+
+            private const int resize_duration = 250;
+
+            private float length;
+
+            public float Length
+            {
+                get => length;
+                set
+                {
+                    length = Math.Clamp(value, 0, 1);
+                    updateBarLength();
+                }
+            }
+
+            private BarDirection direction = BarDirection.LeftToRight;
+
+            public BarDirection Direction
+            {
+                get => direction;
+                set
+                {
+                    direction = value;
+                    updateBarLength();
+                }
+            }
+
+            private void updateBarLength()
+            {
+                switch (direction)
+                {
+                    case BarDirection.LeftToRight:
+                    case BarDirection.RightToLeft:
+                        this.ResizeTo(new Vector2(Length, 1), resize_duration, easing);
+                        break;
+
+                    case BarDirection.TopToBottom:
+                    case BarDirection.BottomToTop:
+                        this.ResizeTo(new Vector2(1, Length), resize_duration, easing);
+                        break;
+                }
+
+                switch (direction)
+                {
+                    case BarDirection.LeftToRight:
+                    case BarDirection.TopToBottom:
+                        Anchor = Anchor.TopLeft;
+                        Origin = Anchor.TopLeft;
+                        break;
+
+                    case BarDirection.RightToLeft:
+                    case BarDirection.BottomToTop:
+                        Anchor = Anchor.BottomRight;
+                        Origin = Anchor.BottomRight;
+                        break;
+                }
+            }
         }
 
-        public float GetLength(int index) => lengths[index];
+        private readonly Box background;
+
+        public readonly SingleBarValue[] Bars;
+
+        private readonly int barCount;
 
         public Color4 BackgroundColour
         {
@@ -40,28 +88,8 @@ namespace osu.Game.Graphics.UserInterface
             set => background.Colour = value;
         }
 
-        public void SetColour(int index, Color4 value)
+        public MultiValueBar(int barCount, float[] lengths, Color4[] colours)
         {
-            bars[index].Colour = value;
-        }
-
-        public Color4 GetColour(int index) => bars[index].Colour;
-
-        private BarDirection direction = BarDirection.LeftToRight;
-
-        public BarDirection Direction
-        {
-            get => direction;
-            set
-            {
-                direction = value;
-                updateBarLength();
-            }
-        }
-
-        public MultiValueBar(int barCount)
-        {
-            lengths = new float[barCount];
             this.barCount = barCount;
 
             List<Drawable> children = new List<Drawable>();
@@ -72,62 +100,21 @@ namespace osu.Game.Graphics.UserInterface
             };
             children.Add(background);
 
-            bars = new Box[barCount];
+            Bars = new SingleBarValue[barCount];
 
             for (int i = 0; i < barCount; i++)
             {
-                bars[i] = new Box
+                Bars[i] = new SingleBarValue
                 {
                     RelativeSizeAxes = Axes.Both,
                     Width = 0,
+                    Length = lengths[i],
+                    Colour = colours[i]
                 };
-                children.Add(bars[i]);
+                children.Add(Bars[i]);
             }
 
             Children = children.ToArray();
-        }
-
-        private void updateBarLength(int index = -1)
-        {
-            if (index == -1)
-            {
-                updateBarLengths();
-                return;
-            }
-
-            switch (direction)
-            {
-                case BarDirection.LeftToRight:
-                case BarDirection.RightToLeft:
-                    bars[index].ResizeTo(new Vector2(lengths[index], 1), resize_duration, easing);
-                    break;
-
-                case BarDirection.TopToBottom:
-                case BarDirection.BottomToTop:
-                    bars[index].ResizeTo(new Vector2(1, lengths[index]), resize_duration, easing);
-                    break;
-            }
-
-            switch (direction)
-            {
-                case BarDirection.LeftToRight:
-                case BarDirection.TopToBottom:
-                    bars[index].Anchor = Anchor.TopLeft;
-                    bars[index].Origin = Anchor.TopLeft;
-                    break;
-
-                case BarDirection.RightToLeft:
-                case BarDirection.BottomToTop:
-                    bars[index].Anchor = Anchor.BottomRight;
-                    bars[index].Origin = Anchor.BottomRight;
-                    break;
-            }
-        }
-
-        private void updateBarLengths()
-        {
-            for (int i = 0; i < barCount; i++)
-                updateBarLength(i);
         }
     }
 }
