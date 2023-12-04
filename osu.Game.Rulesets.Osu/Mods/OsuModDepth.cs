@@ -6,7 +6,6 @@ using System.Linq;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Localisation;
-using osu.Framework.Utils;
 using osu.Game.Configuration;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Objects.Drawables;
@@ -78,30 +77,29 @@ namespace osu.Game.Rulesets.Osu.Mods
 
             foreach (var drawable in playfield.HitObjectContainer.AliveObjects)
             {
-                if (drawable is not DrawableOsuHitObject d)
-                    continue;
-
-                switch (d)
+                switch (drawable)
                 {
-                    case DrawableHitCircle:
-                    case DrawableSlider:
-                        processObject(time, d);
+                    case DrawableHitCircle circle:
+                        processObject(time, circle, 0);
+                        break;
+
+                    case DrawableSlider slider:
+                        processObject(time, slider, slider.HitObject.Duration);
                         break;
                 }
             }
         }
 
-        private void processObject(double time, DrawableOsuHitObject drawable)
+        private void processObject(double time, DrawableOsuHitObject drawable, double duration)
         {
             var hitObject = drawable.HitObject;
 
             double baseSpeed = MaxDepth.Value / hitObject.TimePreempt;
-            double hitObjectDuration = hitObject is Slider s ? s.Duration : 0.0;
-            double offsetAfterStartTime = hitObjectDuration + hitObject.MaximumJudgementOffset + 500;
-            double slowSpeed = -minDepth / offsetAfterStartTime;
+            double offsetAfterStartTime = duration + hitObject.MaximumJudgementOffset + 500;
+            double slowSpeed = Math.Min(-minDepth / offsetAfterStartTime, baseSpeed);
 
-            float decelerationDistance = MaxDepth.Value * 0.2f;
-            double decelerationTime = (slowSpeed - baseSpeed) * 2 * decelerationDistance / (slowSpeed * slowSpeed - baseSpeed * baseSpeed);
+            double decelerationTime = hitObject.TimePreempt * 0.2;
+            float decelerationDistance = (float)(decelerationTime * (baseSpeed + slowSpeed) * 0.5);
 
             float z;
 
@@ -109,7 +107,7 @@ namespace osu.Game.Rulesets.Osu.Mods
             {
                 double appearTime = hitObject.StartTime - hitObject.TimePreempt;
                 float fullDistance = decelerationDistance + (float)(baseSpeed * (hitObject.TimePreempt - decelerationTime));
-                z = Interpolation.ValueAt(Math.Max(time, appearTime), fullDistance, decelerationDistance, appearTime, hitObject.StartTime - decelerationTime);
+                z = fullDistance - (float)((Math.Max(time, appearTime) - appearTime) * baseSpeed);
             }
             else if (time < hitObject.StartTime)
             {
@@ -120,11 +118,11 @@ namespace osu.Game.Rulesets.Osu.Mods
             else
             {
                 double endTime = hitObject.StartTime + offsetAfterStartTime;
-                z = Interpolation.ValueAt(Math.Min(time, endTime), 0f, minDepth, hitObject.StartTime, endTime);
+                z = -(float)((Math.Min(time, endTime) - hitObject.StartTime) * slowSpeed);
             }
 
             float scale = scaleForDepth(z);
-            drawable.Position = positionAtDepth(scale, hitObject.Position);
+            drawable.Position = toPlayfieldPosition(scale, hitObject.Position);
             drawable.Scale = new Vector2(scale);
         }
 
@@ -132,7 +130,7 @@ namespace osu.Game.Rulesets.Osu.Mods
 
         private static float depthForScale(float scale) => 100 / scale + camera_position.Z;
 
-        private static Vector2 positionAtDepth(float scale, Vector2 positionAtZeroDepth)
+        private static Vector2 toPlayfieldPosition(float scale, Vector2 positionAtZeroDepth)
         {
             return (positionAtZeroDepth - camera_position.Xy) * scale + camera_position.Xy;
         }
