@@ -4,7 +4,6 @@
 using System;
 using System.Linq;
 using osu.Framework.Bindables;
-using osu.Framework.Graphics;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Localisation;
 using osu.Framework.Utils;
@@ -30,6 +29,7 @@ namespace osu.Game.Rulesets.Osu.Mods
         public override Type[] IncompatibleMods => base.IncompatibleMods.Concat(new[] { typeof(OsuModMagnetised), typeof(OsuModRepel), typeof(OsuModFreezeFrame), typeof(ModWithVisibilityAdjustment) }).ToArray();
 
         private static readonly Vector3 camera_position = new Vector3(OsuPlayfield.BASE_SIZE.X * 0.5f, OsuPlayfield.BASE_SIZE.Y * 0.5f, -100);
+        private readonly float minDepth = depthForScale(1.5f);
 
         [SettingSource("Maximum depth", "How far away objects appear.", 0)]
         public BindableFloat MaxDepth { get; } = new BindableFloat(100)
@@ -58,25 +58,7 @@ namespace osu.Game.Rulesets.Osu.Mods
         {
             switch (drawable)
             {
-                case DrawableSliderHead head:
-                    if (!ShowApproachCircles.Value)
-                    {
-                        var hitObject = (OsuHitObject)drawable.HitObject;
-                        double appearTime = hitObject.StartTime - hitObject.TimePreempt;
-
-                        using (head.BeginAbsoluteSequence(appearTime))
-                            head.ApproachCircle.Hide();
-                    }
-
-                    break;
-
-                case DrawableSliderTail:
-                case DrawableSliderTick:
-                case DrawableSliderRepeat:
-                    return;
-
                 case DrawableHitCircle circle:
-
                     if (!ShowApproachCircles.Value)
                     {
                         var hitObject = (OsuHitObject)drawable.HitObject;
@@ -86,25 +68,7 @@ namespace osu.Game.Rulesets.Osu.Mods
                             circle.ApproachCircle.Hide();
                     }
 
-                    setStartPosition(drawable);
                     break;
-
-                case DrawableSlider:
-                    setStartPosition(drawable);
-                    break;
-            }
-        }
-
-        private void setStartPosition(DrawableHitObject drawable)
-        {
-            var hitObject = (OsuHitObject)drawable.HitObject;
-
-            float d = mappedDepth(MaxDepth.Value);
-
-            using (drawable.BeginAbsoluteSequence(hitObject.StartTime - hitObject.TimePreempt))
-            {
-                drawable.MoveTo(positionAtDepth(d, hitObject.Position));
-                drawable.ScaleTo(new Vector2(d));
             }
         }
 
@@ -114,34 +78,63 @@ namespace osu.Game.Rulesets.Osu.Mods
 
             foreach (var drawable in playfield.HitObjectContainer.AliveObjects)
             {
-                switch (drawable)
-                {
-                    case DrawableSliderHead:
-                    case DrawableSliderTail:
-                    case DrawableSliderTick:
-                    case DrawableSliderRepeat:
-                        continue;
+                if (drawable is not DrawableOsuHitObject d)
+                    continue;
 
+                switch (d)
+                {
                     case DrawableHitCircle:
                     case DrawableSlider:
-                        var hitObject = (OsuHitObject)drawable.HitObject;
-
-                        double appearTime = hitObject.StartTime - hitObject.TimePreempt;
-                        float z = Interpolation.ValueAt(Math.Clamp(time, appearTime, hitObject.StartTime), MaxDepth.Value, 0f, appearTime, hitObject.StartTime);
-
-                        float d = mappedDepth(z);
-                        drawable.Position = positionAtDepth(d, hitObject.Position);
-                        drawable.Scale = new Vector2(d);
+                        processObject(time, d);
                         break;
                 }
             }
         }
 
-        private static float mappedDepth(float depth) => 100 / (depth - camera_position.Z);
-
-        private static Vector2 positionAtDepth(float mappedDepth, Vector2 positionAtZeroDepth)
+        private void processObject(double time, DrawableOsuHitObject drawable)
         {
-            return (positionAtZeroDepth - camera_position.Xy) * mappedDepth + camera_position.Xy;
+            var hitObject = drawable.HitObject;
+
+            double baseSpeed = MaxDepth.Value / hitObject.TimePreempt;
+            double hitObjectDuration = hitObject is Slider s ? s.Duration : 0.0;
+            double offsetAfterStartTime = hitObjectDuration + hitObject.MaximumJudgementOffset + 500;
+            double slowSpeed = -minDepth / offsetAfterStartTime;
+
+            float decelerationDistance = MaxDepth.Value * 0.2f;
+            double decelerationTime = (slowSpeed - baseSpeed) * 2 * decelerationDistance / (slowSpeed * slowSpeed - baseSpeed * baseSpeed);
+
+            float z;
+
+            if (time < hitObject.StartTime - decelerationTime)
+            {
+                double appearTime = hitObject.StartTime - hitObject.TimePreempt;
+                float fullDistance = decelerationDistance + (float)(baseSpeed * (hitObject.TimePreempt - decelerationTime));
+                z = Interpolation.ValueAt(Math.Max(time, appearTime), fullDistance, decelerationDistance, appearTime, hitObject.StartTime - decelerationTime);
+            }
+            else if (time < hitObject.StartTime)
+            {
+                double timeOffset = time - (hitObject.StartTime - decelerationTime);
+                double deceleration = (slowSpeed - baseSpeed) / decelerationTime;
+                z = decelerationDistance - (float)(baseSpeed * timeOffset + deceleration * timeOffset * timeOffset * 0.5);
+            }
+            else
+            {
+                double endTime = hitObject.StartTime + offsetAfterStartTime;
+                z = Interpolation.ValueAt(Math.Min(time, endTime), 0f, minDepth, hitObject.StartTime, endTime);
+            }
+
+            float scale = scaleForDepth(z);
+            drawable.Position = positionAtDepth(scale, hitObject.Position);
+            drawable.Scale = new Vector2(scale);
+        }
+
+        private static float scaleForDepth(float depth) => 100 / (depth - camera_position.Z);
+
+        private static float depthForScale(float scale) => 100 / scale + camera_position.Z;
+
+        private static Vector2 positionAtDepth(float scale, Vector2 positionAtZeroDepth)
+        {
+            return (positionAtZeroDepth - camera_position.Xy) * scale + camera_position.Xy;
         }
     }
 }
