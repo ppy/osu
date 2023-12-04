@@ -274,6 +274,15 @@ namespace osu.Game.Tests.Visual.Navigation
             switchToGameplayScene();
         }
 
+        [Test]
+        public void TestOpenSkinEditorGameplaySceneWhenDummyBeatmapActive()
+        {
+            AddStep("set dummy beatmap", () => Game.Beatmap.SetDefault());
+
+            openSkinEditor();
+            switchToGameplayScene();
+        }
+
         private void advanceToSongSelect()
         {
             PushAndConfirm(() => songSelect = new TestPlaySongSelect());
