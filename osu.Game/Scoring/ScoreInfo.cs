@@ -388,9 +388,8 @@ namespace osu.Game.Scoring
         // Recalculate accuracy based off of the current state of Statistics
         public void CalculateAccuracy()
         {
-            // This iterates through statistics 3 times, which is probably not major for performance but is certainly not ideal
-            double scoreSum = Statistics.Sum(x => Judgement.ToNumericResult(x.Key) * x.Value);
-            Accuracy = scoreSum / (MaximumStatistics.Sum(x => Judgement.ToNumericResult(x.Key) * x.Value));
+            double scoreSum = Statistics.Where(x => x.Key.AffectsAccuracy()).Sum(x => Judgement.ToNumericResult(x.Key) * x.Value);
+            Accuracy = scoreSum / (MaximumStatistics.Where(x => x.Key.AffectsAccuracy()).Sum(x => Judgement.ToNumericResult(x.Key) * x.Value));
         }
     }
 }
