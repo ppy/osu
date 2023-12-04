@@ -12,14 +12,17 @@ using osu.Game.Beatmaps.Formats;
 using osu.Game.Beatmaps.Legacy;
 using osu.Game.Beatmaps.Timing;
 using osu.Game.IO;
+using osu.Game.Rulesets;
 using osu.Game.Rulesets.Catch;
 using osu.Game.Rulesets.Catch.Beatmaps;
+using osu.Game.Rulesets.Mania;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Objects.Legacy;
 using osu.Game.Rulesets.Objects.Types;
 using osu.Game.Rulesets.Osu;
 using osu.Game.Rulesets.Osu.Beatmaps;
+using osu.Game.Rulesets.Taiko;
 using osu.Game.Skinning;
 using osu.Game.Tests.Resources;
 using osuTK;
@@ -33,7 +36,7 @@ namespace osu.Game.Tests.Beatmaps.Formats
         [Test]
         public void TestDecodeBeatmapVersion()
         {
-            using (var resStream = TestResources.OpenResource("beatmap-version.osu"))
+            using (var resStream = TestResources.OpenResource("beatmap-version-6.osu"))
             using (var stream = new LineBufferedReader(resStream))
             {
                 var decoder = Decoder.GetDecoder<Beatmap>(stream);
@@ -42,6 +45,25 @@ namespace osu.Game.Tests.Beatmaps.Formats
                 Assert.AreEqual(6, working.BeatmapInfo.BeatmapVersion);
                 Assert.AreEqual(6, working.Beatmap.BeatmapInfo.BeatmapVersion);
                 Assert.AreEqual(6, working.GetPlayableBeatmap(new OsuRuleset().RulesetInfo, Array.Empty<Mod>()).BeatmapInfo.BeatmapVersion);
+            }
+        }
+
+        [TestCase(false)]
+        [TestCase(true)]
+        public void TestPreviewPointWithOffsets(bool applyOffsets)
+        {
+            using (var resStream = TestResources.OpenResource("beatmap-version-4.osu"))
+            using (var stream = new LineBufferedReader(resStream))
+            {
+                var decoder = Decoder.GetDecoder<Beatmap>(stream);
+                ((LegacyBeatmapDecoder)decoder).ApplyOffsets = applyOffsets;
+                var working = new TestWorkingBeatmap(decoder.Decode(stream));
+
+                Assert.AreEqual(4, working.BeatmapInfo.BeatmapVersion);
+                Assert.AreEqual(4, working.Beatmap.BeatmapInfo.BeatmapVersion);
+                Assert.AreEqual(4, working.GetPlayableBeatmap(new OsuRuleset().RulesetInfo, Array.Empty<Mod>()).BeatmapInfo.BeatmapVersion);
+
+                Assert.AreEqual(-1, working.BeatmapInfo.Metadata.PreviewTime);
             }
         }
 
@@ -414,12 +436,12 @@ namespace osu.Game.Tests.Beatmaps.Formats
                 new OsuBeatmapProcessor(converted).PreProcess();
                 new OsuBeatmapProcessor(converted).PostProcess();
 
-                Assert.AreEqual(4, ((IHasComboInformation)converted.HitObjects.ElementAt(0)).ComboIndexWithOffsets);
-                Assert.AreEqual(5, ((IHasComboInformation)converted.HitObjects.ElementAt(2)).ComboIndexWithOffsets);
-                Assert.AreEqual(5, ((IHasComboInformation)converted.HitObjects.ElementAt(4)).ComboIndexWithOffsets);
-                Assert.AreEqual(6, ((IHasComboInformation)converted.HitObjects.ElementAt(6)).ComboIndexWithOffsets);
-                Assert.AreEqual(11, ((IHasComboInformation)converted.HitObjects.ElementAt(8)).ComboIndexWithOffsets);
-                Assert.AreEqual(14, ((IHasComboInformation)converted.HitObjects.ElementAt(11)).ComboIndexWithOffsets);
+                Assert.AreEqual(1, ((IHasComboInformation)converted.HitObjects.ElementAt(0)).ComboIndexWithOffsets);
+                Assert.AreEqual(2, ((IHasComboInformation)converted.HitObjects.ElementAt(2)).ComboIndexWithOffsets);
+                Assert.AreEqual(3, ((IHasComboInformation)converted.HitObjects.ElementAt(4)).ComboIndexWithOffsets);
+                Assert.AreEqual(4, ((IHasComboInformation)converted.HitObjects.ElementAt(6)).ComboIndexWithOffsets);
+                Assert.AreEqual(8, ((IHasComboInformation)converted.HitObjects.ElementAt(8)).ComboIndexWithOffsets);
+                Assert.AreEqual(9, ((IHasComboInformation)converted.HitObjects.ElementAt(11)).ComboIndexWithOffsets);
             }
         }
 
@@ -437,12 +459,12 @@ namespace osu.Game.Tests.Beatmaps.Formats
                 new CatchBeatmapProcessor(converted).PreProcess();
                 new CatchBeatmapProcessor(converted).PostProcess();
 
-                Assert.AreEqual(4, ((IHasComboInformation)converted.HitObjects.ElementAt(0)).ComboIndexWithOffsets);
-                Assert.AreEqual(5, ((IHasComboInformation)converted.HitObjects.ElementAt(2)).ComboIndexWithOffsets);
-                Assert.AreEqual(5, ((IHasComboInformation)converted.HitObjects.ElementAt(4)).ComboIndexWithOffsets);
-                Assert.AreEqual(6, ((IHasComboInformation)converted.HitObjects.ElementAt(6)).ComboIndexWithOffsets);
-                Assert.AreEqual(11, ((IHasComboInformation)converted.HitObjects.ElementAt(8)).ComboIndexWithOffsets);
-                Assert.AreEqual(14, ((IHasComboInformation)converted.HitObjects.ElementAt(11)).ComboIndexWithOffsets);
+                Assert.AreEqual(1, ((IHasComboInformation)converted.HitObjects.ElementAt(0)).ComboIndexWithOffsets);
+                Assert.AreEqual(2, ((IHasComboInformation)converted.HitObjects.ElementAt(2)).ComboIndexWithOffsets);
+                Assert.AreEqual(3, ((IHasComboInformation)converted.HitObjects.ElementAt(4)).ComboIndexWithOffsets);
+                Assert.AreEqual(4, ((IHasComboInformation)converted.HitObjects.ElementAt(6)).ComboIndexWithOffsets);
+                Assert.AreEqual(8, ((IHasComboInformation)converted.HitObjects.ElementAt(8)).ComboIndexWithOffsets);
+                Assert.AreEqual(9, ((IHasComboInformation)converted.HitObjects.ElementAt(11)).ComboIndexWithOffsets);
             }
         }
 
@@ -644,7 +666,7 @@ namespace osu.Game.Tests.Beatmaps.Formats
                 assertObjectHasBanks(hitObjects[9], HitSampleInfo.BANK_DRUM, HitSampleInfo.BANK_NORMAL);
             }
 
-            void assertObjectHasBanks(HitObject hitObject, string normalBank, string? additionsBank = null)
+            static void assertObjectHasBanks(HitObject hitObject, string normalBank, string? additionsBank = null)
             {
                 Assert.AreEqual(normalBank, hitObject.Samples[0].Bank);
 
@@ -789,14 +811,14 @@ namespace osu.Game.Tests.Beatmaps.Formats
                 var first = ((IHasPath)decoded.HitObjects[0]).Path;
 
                 Assert.That(first.ControlPoints[0].Position, Is.EqualTo(Vector2.Zero));
-                Assert.That(first.ControlPoints[0].Type, Is.EqualTo(PathType.PerfectCurve));
+                Assert.That(first.ControlPoints[0].Type, Is.EqualTo(PathType.PERFECT_CURVE));
                 Assert.That(first.ControlPoints[1].Position, Is.EqualTo(new Vector2(161, -244)));
                 Assert.That(first.ControlPoints[1].Type, Is.EqualTo(null));
 
                 // ReSharper disable once HeuristicUnreachableCode
                 // weird one, see https://youtrack.jetbrains.com/issue/RIDER-70159.
                 Assert.That(first.ControlPoints[2].Position, Is.EqualTo(new Vector2(376, -3)));
-                Assert.That(first.ControlPoints[2].Type, Is.EqualTo(PathType.Bezier));
+                Assert.That(first.ControlPoints[2].Type, Is.EqualTo(PathType.BEZIER));
                 Assert.That(first.ControlPoints[3].Position, Is.EqualTo(new Vector2(68, 15)));
                 Assert.That(first.ControlPoints[3].Type, Is.EqualTo(null));
                 Assert.That(first.ControlPoints[4].Position, Is.EqualTo(new Vector2(259, -132)));
@@ -808,7 +830,7 @@ namespace osu.Game.Tests.Beatmaps.Formats
                 var second = ((IHasPath)decoded.HitObjects[1]).Path;
 
                 Assert.That(second.ControlPoints[0].Position, Is.EqualTo(Vector2.Zero));
-                Assert.That(second.ControlPoints[0].Type, Is.EqualTo(PathType.PerfectCurve));
+                Assert.That(second.ControlPoints[0].Type, Is.EqualTo(PathType.PERFECT_CURVE));
                 Assert.That(second.ControlPoints[1].Position, Is.EqualTo(new Vector2(161, -244)));
                 Assert.That(second.ControlPoints[1].Type, Is.EqualTo(null));
                 Assert.That(second.ControlPoints[2].Position, Is.EqualTo(new Vector2(376, -3)));
@@ -818,14 +840,14 @@ namespace osu.Game.Tests.Beatmaps.Formats
                 var third = ((IHasPath)decoded.HitObjects[2]).Path;
 
                 Assert.That(third.ControlPoints[0].Position, Is.EqualTo(Vector2.Zero));
-                Assert.That(third.ControlPoints[0].Type, Is.EqualTo(PathType.Bezier));
+                Assert.That(third.ControlPoints[0].Type, Is.EqualTo(PathType.BEZIER));
                 Assert.That(third.ControlPoints[1].Position, Is.EqualTo(new Vector2(0, 192)));
                 Assert.That(third.ControlPoints[1].Type, Is.EqualTo(null));
                 Assert.That(third.ControlPoints[2].Position, Is.EqualTo(new Vector2(224, 192)));
                 Assert.That(third.ControlPoints[2].Type, Is.EqualTo(null));
 
                 Assert.That(third.ControlPoints[3].Position, Is.EqualTo(new Vector2(224, 0)));
-                Assert.That(third.ControlPoints[3].Type, Is.EqualTo(PathType.Bezier));
+                Assert.That(third.ControlPoints[3].Type, Is.EqualTo(PathType.BEZIER));
                 Assert.That(third.ControlPoints[4].Position, Is.EqualTo(new Vector2(224, -192)));
                 Assert.That(third.ControlPoints[4].Type, Is.EqualTo(null));
                 Assert.That(third.ControlPoints[5].Position, Is.EqualTo(new Vector2(480, -192)));
@@ -837,7 +859,7 @@ namespace osu.Game.Tests.Beatmaps.Formats
                 var fourth = ((IHasPath)decoded.HitObjects[3]).Path;
 
                 Assert.That(fourth.ControlPoints[0].Position, Is.EqualTo(Vector2.Zero));
-                Assert.That(fourth.ControlPoints[0].Type, Is.EqualTo(PathType.Bezier));
+                Assert.That(fourth.ControlPoints[0].Type, Is.EqualTo(PathType.BEZIER));
                 Assert.That(fourth.ControlPoints[1].Position, Is.EqualTo(new Vector2(1, 1)));
                 Assert.That(fourth.ControlPoints[1].Type, Is.EqualTo(null));
                 Assert.That(fourth.ControlPoints[2].Position, Is.EqualTo(new Vector2(2, 2)));
@@ -851,7 +873,7 @@ namespace osu.Game.Tests.Beatmaps.Formats
                 var fifth = ((IHasPath)decoded.HitObjects[4]).Path;
 
                 Assert.That(fifth.ControlPoints[0].Position, Is.EqualTo(Vector2.Zero));
-                Assert.That(fifth.ControlPoints[0].Type, Is.EqualTo(PathType.Bezier));
+                Assert.That(fifth.ControlPoints[0].Type, Is.EqualTo(PathType.BEZIER));
                 Assert.That(fifth.ControlPoints[1].Position, Is.EqualTo(new Vector2(1, 1)));
                 Assert.That(fifth.ControlPoints[1].Type, Is.EqualTo(null));
                 Assert.That(fifth.ControlPoints[2].Position, Is.EqualTo(new Vector2(2, 2)));
@@ -862,7 +884,7 @@ namespace osu.Game.Tests.Beatmaps.Formats
                 Assert.That(fifth.ControlPoints[4].Type, Is.EqualTo(null));
 
                 Assert.That(fifth.ControlPoints[5].Position, Is.EqualTo(new Vector2(4, 4)));
-                Assert.That(fifth.ControlPoints[5].Type, Is.EqualTo(PathType.Bezier));
+                Assert.That(fifth.ControlPoints[5].Type, Is.EqualTo(PathType.BEZIER));
                 Assert.That(fifth.ControlPoints[6].Position, Is.EqualTo(new Vector2(5, 5)));
                 Assert.That(fifth.ControlPoints[6].Type, Is.EqualTo(null));
 
@@ -870,12 +892,12 @@ namespace osu.Game.Tests.Beatmaps.Formats
                 var sixth = ((IHasPath)decoded.HitObjects[5]).Path;
 
                 Assert.That(sixth.ControlPoints[0].Position, Is.EqualTo(Vector2.Zero));
-                Assert.That(sixth.ControlPoints[0].Type == PathType.Bezier);
+                Assert.That(sixth.ControlPoints[0].Type == PathType.BEZIER);
                 Assert.That(sixth.ControlPoints[1].Position, Is.EqualTo(new Vector2(75, 145)));
                 Assert.That(sixth.ControlPoints[1].Type == null);
                 Assert.That(sixth.ControlPoints[2].Position, Is.EqualTo(new Vector2(170, 75)));
 
-                Assert.That(sixth.ControlPoints[2].Type == PathType.Bezier);
+                Assert.That(sixth.ControlPoints[2].Type == PathType.BEZIER);
                 Assert.That(sixth.ControlPoints[3].Position, Is.EqualTo(new Vector2(300, 145)));
                 Assert.That(sixth.ControlPoints[3].Type == null);
                 Assert.That(sixth.ControlPoints[4].Position, Is.EqualTo(new Vector2(410, 20)));
@@ -885,12 +907,12 @@ namespace osu.Game.Tests.Beatmaps.Formats
                 var seventh = ((IHasPath)decoded.HitObjects[6]).Path;
 
                 Assert.That(seventh.ControlPoints[0].Position, Is.EqualTo(Vector2.Zero));
-                Assert.That(seventh.ControlPoints[0].Type == PathType.PerfectCurve);
+                Assert.That(seventh.ControlPoints[0].Type == PathType.PERFECT_CURVE);
                 Assert.That(seventh.ControlPoints[1].Position, Is.EqualTo(new Vector2(75, 145)));
                 Assert.That(seventh.ControlPoints[1].Type == null);
                 Assert.That(seventh.ControlPoints[2].Position, Is.EqualTo(new Vector2(170, 75)));
 
-                Assert.That(seventh.ControlPoints[2].Type == PathType.PerfectCurve);
+                Assert.That(seventh.ControlPoints[2].Type == PathType.PERFECT_CURVE);
                 Assert.That(seventh.ControlPoints[3].Position, Is.EqualTo(new Vector2(300, 145)));
                 Assert.That(seventh.ControlPoints[3].Type == null);
                 Assert.That(seventh.ControlPoints[4].Position, Is.EqualTo(new Vector2(410, 20)));
@@ -915,10 +937,11 @@ namespace osu.Game.Tests.Beatmaps.Formats
             }
         }
 
-        [Test]
-        public void TestLegacyDefaultsPreserved()
+        [TestCase(false)]
+        [TestCase(true)]
+        public void TestLegacyDefaultsPreserved(bool applyOffsets)
         {
-            var decoder = new LegacyBeatmapDecoder { ApplyOffsets = false };
+            var decoder = new LegacyBeatmapDecoder { ApplyOffsets = applyOffsets };
 
             using (var memoryStream = new MemoryStream())
             using (var stream = new LineBufferedReader(memoryStream))
@@ -996,7 +1019,7 @@ namespace osu.Game.Tests.Beatmaps.Formats
                 var controlPoints = ((IHasPath)decoded.HitObjects[0]).Path.ControlPoints;
 
                 Assert.That(controlPoints.Count, Is.EqualTo(6));
-                Assert.That(controlPoints.Single(c => c.Type != null).Type, Is.EqualTo(PathType.Catmull));
+                Assert.That(controlPoints.Single(c => c.Type != null).Type, Is.EqualTo(PathType.CATMULL));
             }
         }
 
@@ -1012,9 +1035,9 @@ namespace osu.Game.Tests.Beatmaps.Formats
                 var controlPoints = ((IHasPath)decoded.HitObjects[0]).Path.ControlPoints;
 
                 Assert.That(controlPoints.Count, Is.EqualTo(4));
-                Assert.That(controlPoints[0].Type, Is.EqualTo(PathType.Catmull));
-                Assert.That(controlPoints[1].Type, Is.EqualTo(PathType.Catmull));
-                Assert.That(controlPoints[2].Type, Is.EqualTo(PathType.Catmull));
+                Assert.That(controlPoints[0].Type, Is.EqualTo(PathType.CATMULL));
+                Assert.That(controlPoints[1].Type, Is.EqualTo(PathType.CATMULL));
+                Assert.That(controlPoints[2].Type, Is.EqualTo(PathType.CATMULL));
                 Assert.That(controlPoints[3].Type, Is.Null);
             }
         }
@@ -1031,7 +1054,7 @@ namespace osu.Game.Tests.Beatmaps.Formats
                 var controlPoints = ((IHasPath)decoded.HitObjects[0]).Path.ControlPoints;
 
                 Assert.That(controlPoints.Count, Is.EqualTo(4));
-                Assert.That(controlPoints[0].Type, Is.EqualTo(PathType.Catmull));
+                Assert.That(controlPoints[0].Type, Is.EqualTo(PathType.CATMULL));
                 Assert.That(controlPoints[0].Position, Is.EqualTo(Vector2.Zero));
                 Assert.That(controlPoints[1].Type, Is.Null);
                 Assert.That(controlPoints[1].Position, Is.Not.EqualTo(Vector2.Zero));
@@ -1058,6 +1081,111 @@ namespace osu.Game.Tests.Beatmaps.Formats
 
                 Assert.That(controlPoints.DifficultyPointAt(2000).GenerateTicks, Is.False);
                 Assert.That(controlPoints.DifficultyPointAt(3000).GenerateTicks, Is.True);
+            }
+        }
+
+        [Test]
+        public void TestSamplePointLeniency()
+        {
+            var decoder = new LegacyBeatmapDecoder { ApplyOffsets = false };
+
+            using (var resStream = TestResources.OpenResource("sample-point-leniency.osu"))
+            using (var stream = new LineBufferedReader(resStream))
+            {
+                var hitObject = decoder.Decode(stream).HitObjects.Single();
+                Assert.That(hitObject.Samples.Select(s => s.Volume), Has.All.EqualTo(70));
+            }
+        }
+
+        [Test]
+        public void TestNewComboAfterBreak()
+        {
+            var decoder = new LegacyBeatmapDecoder { ApplyOffsets = false };
+
+            using (var resStream = TestResources.OpenResource("break-between-objects.osu"))
+            using (var stream = new LineBufferedReader(resStream))
+            {
+                var beatmap = decoder.Decode(stream);
+                Assert.That(((IHasCombo)beatmap.HitObjects[0]).NewCombo, Is.True);
+                Assert.That(((IHasCombo)beatmap.HitObjects[1]).NewCombo, Is.True);
+                Assert.That(((IHasCombo)beatmap.HitObjects[2]).NewCombo, Is.False);
+            }
+        }
+
+        /// <summary>
+        /// Test cases that involve a spinner between two hitobjects.
+        /// </summary>
+        [Test]
+        public void TestSpinnerNewComboBetweenObjects([Values("osu", "catch")] string rulesetName)
+        {
+            var decoder = new LegacyBeatmapDecoder { ApplyOffsets = false };
+
+            using (var resStream = TestResources.OpenResource("spinner-between-objects.osu"))
+            using (var stream = new LineBufferedReader(resStream))
+            {
+                Ruleset ruleset;
+
+                switch (rulesetName)
+                {
+                    case "osu":
+                        ruleset = new OsuRuleset();
+                        break;
+
+                    case "catch":
+                        ruleset = new CatchRuleset();
+                        break;
+
+                    default:
+                        throw new ArgumentOutOfRangeException(nameof(rulesetName), rulesetName, null);
+                }
+
+                var working = new TestWorkingBeatmap(decoder.Decode(stream));
+                var playable = working.GetPlayableBeatmap(ruleset.RulesetInfo, Array.Empty<Mod>());
+
+                // There's no good way to figure out these values other than to compare (in code) with osu!stable...
+
+                Assert.That(((IHasComboInformation)playable.HitObjects[0]).ComboIndexWithOffsets, Is.EqualTo(1));
+                Assert.That(((IHasComboInformation)playable.HitObjects[2]).ComboIndexWithOffsets, Is.EqualTo(2));
+                Assert.That(((IHasComboInformation)playable.HitObjects[3]).ComboIndexWithOffsets, Is.EqualTo(2));
+                Assert.That(((IHasComboInformation)playable.HitObjects[5]).ComboIndexWithOffsets, Is.EqualTo(3));
+                Assert.That(((IHasComboInformation)playable.HitObjects[6]).ComboIndexWithOffsets, Is.EqualTo(3));
+                Assert.That(((IHasComboInformation)playable.HitObjects[8]).ComboIndexWithOffsets, Is.EqualTo(4));
+                Assert.That(((IHasComboInformation)playable.HitObjects[9]).ComboIndexWithOffsets, Is.EqualTo(4));
+                Assert.That(((IHasComboInformation)playable.HitObjects[11]).ComboIndexWithOffsets, Is.EqualTo(5));
+                Assert.That(((IHasComboInformation)playable.HitObjects[12]).ComboIndexWithOffsets, Is.EqualTo(6));
+                Assert.That(((IHasComboInformation)playable.HitObjects[14]).ComboIndexWithOffsets, Is.EqualTo(7));
+                Assert.That(((IHasComboInformation)playable.HitObjects[15]).ComboIndexWithOffsets, Is.EqualTo(8));
+                Assert.That(((IHasComboInformation)playable.HitObjects[17]).ComboIndexWithOffsets, Is.EqualTo(9));
+            }
+        }
+
+        [Test]
+        public void TestSliderConversionWithCustomDistance([Values("taiko", "mania")] string rulesetName)
+        {
+            using (var resStream = TestResources.OpenResource("custom-slider-length.osu"))
+            using (var stream = new LineBufferedReader(resStream))
+            {
+                Ruleset ruleset;
+
+                switch (rulesetName)
+                {
+                    case "taiko":
+                        ruleset = new TaikoRuleset();
+                        break;
+
+                    case "mania":
+                        ruleset = new ManiaRuleset();
+                        break;
+
+                    default:
+                        throw new ArgumentOutOfRangeException(nameof(rulesetName), rulesetName, null);
+                }
+
+                var decoder = Decoder.GetDecoder<Beatmap>(stream);
+                var working = new TestWorkingBeatmap(decoder.Decode(stream));
+                IBeatmap beatmap = working.GetPlayableBeatmap(ruleset.RulesetInfo, Array.Empty<Mod>());
+
+                Assert.That(beatmap.HitObjects[0].GetEndTime(), Is.EqualTo(3153));
             }
         }
     }

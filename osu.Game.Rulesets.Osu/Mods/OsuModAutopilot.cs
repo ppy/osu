@@ -33,7 +33,8 @@ namespace osu.Game.Rulesets.Osu.Mods
             typeof(ModNoFail),
             typeof(ModAutoplay),
             typeof(OsuModMagnetised),
-            typeof(OsuModRepel)
+            typeof(OsuModRepel),
+            typeof(ModTouchDevice)
         };
 
         public bool PerformFail() => false;

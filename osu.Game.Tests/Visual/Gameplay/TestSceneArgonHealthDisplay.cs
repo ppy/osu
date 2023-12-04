@@ -3,6 +3,7 @@
 
 using NUnit.Framework;
 using osu.Framework.Allocation;
+using osu.Framework.Extensions.ObjectExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Testing;
@@ -12,7 +13,6 @@ using osu.Game.Rulesets.Osu.Judgements;
 using osu.Game.Rulesets.Osu.Objects;
 using osu.Game.Rulesets.Scoring;
 using osu.Game.Screens.Play.HUD;
-using osuTK;
 using osuTK.Graphics;
 
 namespace osu.Game.Tests.Visual.Gameplay
@@ -21,6 +21,8 @@ namespace osu.Game.Tests.Visual.Gameplay
     {
         [Cached(typeof(HealthProcessor))]
         private HealthProcessor healthProcessor = new DrainingHealthProcessor(0);
+
+        private ArgonHealthDisplay healthDisplay = null!;
 
         [SetUpSteps]
         public void SetUpSteps()
@@ -37,13 +39,24 @@ namespace osu.Game.Tests.Visual.Gameplay
                         RelativeSizeAxes = Axes.Both,
                         Colour = Color4.Gray,
                     },
-                    new ArgonHealthDisplay
+                    healthDisplay = new ArgonHealthDisplay
                     {
                         Anchor = Anchor.Centre,
                         Origin = Anchor.Centre,
-                        Scale = new Vector2(2f),
                     },
                 };
+            });
+
+            AddSliderStep("Height", 0, 64, 0, val =>
+            {
+                if (healthDisplay.IsNotNull())
+                    healthDisplay.BarHeight.Value = val;
+            });
+
+            AddSliderStep("Width", 0, 1f, 0.98f, val =>
+            {
+                if (healthDisplay.IsNotNull())
+                    healthDisplay.Width = val;
             });
         }
 

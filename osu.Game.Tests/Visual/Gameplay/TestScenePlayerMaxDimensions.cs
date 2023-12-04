@@ -3,14 +3,21 @@
 
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
+using System.Threading;
+using System.Threading.Tasks;
+using NUnit.Framework;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics.Textures;
+using osu.Framework.IO.Stores;
 using osu.Framework.Testing;
 using osu.Game.IO;
 using osu.Game.Rulesets;
 using osu.Game.Screens.Play;
 using osu.Game.Skinning;
+using SixLabors.ImageSharp;
+using SixLabors.ImageSharp.Processing;
 
 namespace osu.Game.Tests.Visual.Gameplay
 {
@@ -21,8 +28,12 @@ namespace osu.Game.Tests.Visual.Gameplay
     /// <remarks>
     /// The HUD is hidden as it does't really affect game balance if HUD elements are larger than they should be.
     /// </remarks>
+    [Ignore("This test is for visual testing, and has no value in being run in standard CI runs.")]
     public partial class TestScenePlayerMaxDimensions : TestSceneAllRulesetPlayers
     {
+        // scale textures to 4 times their size.
+        private const int scale_factor = 4;
+
         protected override IReadOnlyDependencyContainer CreateChildDependencies(IReadOnlyDependencyContainer parent)
         {
             var dependencies = new DependencyContainer(base.CreateChildDependencies(parent));
@@ -63,18 +74,66 @@ namespace osu.Game.Tests.Visual.Gameplay
                 remove { }
             }
 
-            public override Texture? GetTexture(string componentName, WrapMode wrapModeS, WrapMode wrapModeT)
-            {
-                var texture = base.GetTexture(componentName, wrapModeS, wrapModeT);
-
-                if (texture != null)
-                    texture.ScaleAdjust /= 8f;
-
-                return texture;
-            }
-
             public ISkin FindProvider(Func<ISkin, bool> lookupFunction) => this;
             public IEnumerable<ISkin> AllSources => new[] { this };
+
+            protected override IResourceStore<TextureUpload> CreateTextureLoaderStore(IStorageResourceProvider resources, IResourceStore<byte[]> storage)
+                => new UpscaledTextureLoaderStore(base.CreateTextureLoaderStore(resources, storage));
+
+            private class UpscaledTextureLoaderStore : IResourceStore<TextureUpload>
+            {
+                private readonly IResourceStore<TextureUpload>? textureStore;
+
+                public UpscaledTextureLoaderStore(IResourceStore<TextureUpload>? textureStore)
+                {
+                    this.textureStore = textureStore;
+                }
+
+                public void Dispose()
+                {
+                    textureStore?.Dispose();
+                }
+
+                public TextureUpload Get(string name)
+                {
+                    var textureUpload = textureStore?.Get(name);
+
+                    // NRT not enabled on framework side classes (IResourceStore / TextureLoaderStore), welp.
+                    if (textureUpload == null)
+                        return null!;
+
+                    return upscale(textureUpload);
+                }
+
+                public async Task<TextureUpload> GetAsync(string name, CancellationToken cancellationToken = new CancellationToken())
+                {
+                    // NRT not enabled on framework side classes (IResourceStore / TextureLoaderStore), welp.
+                    if (textureStore == null)
+                        return null!;
+
+                    var textureUpload = await textureStore.GetAsync(name, cancellationToken).ConfigureAwait(false);
+
+                    if (textureUpload == null)
+                        return null!;
+
+                    return await Task.Run(() => upscale(textureUpload), cancellationToken).ConfigureAwait(false);
+                }
+
+                private TextureUpload upscale(TextureUpload textureUpload)
+                {
+                    var image = Image.LoadPixelData(textureUpload.Data.ToArray(), textureUpload.Width, textureUpload.Height);
+
+                    // The original texture upload will no longer be returned or used.
+                    textureUpload.Dispose();
+
+                    image.Mutate(i => i.Resize(new Size(textureUpload.Width, textureUpload.Height) * scale_factor));
+                    return new TextureUpload(image);
+                }
+
+                public Stream? GetStream(string name) => textureStore?.GetStream(name);
+
+                public IEnumerable<string> GetAvailableResources() => textureStore?.GetAvailableResources() ?? Array.Empty<string>();
+            }
         }
     }
 }

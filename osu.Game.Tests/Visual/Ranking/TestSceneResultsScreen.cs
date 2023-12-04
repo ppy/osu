@@ -362,7 +362,7 @@ namespace osu.Game.Tests.Visual.Ranking
                 {
                     var score = TestResources.CreateTestScoreInfo();
                     score.TotalScore += 10 - i;
-                    score.Hash = $"test{i}";
+                    score.HasOnlineReplay = true;
                     scores.Add(score);
                 }
 

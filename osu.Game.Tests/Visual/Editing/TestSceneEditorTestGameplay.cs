@@ -138,7 +138,7 @@ namespace osu.Game.Tests.Visual.Editing
                 InputManager.MoveMouseTo(button);
                 InputManager.Click(MouseButton.Left);
             });
-            AddUntilStep("save prompt shown", () => DialogOverlay.CurrentDialog is SaveBeforeGameplayTestDialog);
+            AddUntilStep("save prompt shown", () => DialogOverlay.CurrentDialog is SaveRequiredPopupDialog);
 
             AddStep("dismiss prompt", () =>
             {
@@ -165,7 +165,7 @@ namespace osu.Game.Tests.Visual.Editing
                 InputManager.MoveMouseTo(button);
                 InputManager.Click(MouseButton.Left);
             });
-            AddUntilStep("save prompt shown", () => DialogOverlay.CurrentDialog is SaveBeforeGameplayTestDialog);
+            AddUntilStep("save prompt shown", () => DialogOverlay.CurrentDialog is SaveRequiredPopupDialog);
 
             AddStep("save changes", () => DialogOverlay.CurrentDialog.PerformOkAction());
 

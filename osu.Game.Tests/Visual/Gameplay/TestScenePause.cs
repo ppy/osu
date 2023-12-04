@@ -70,7 +70,7 @@ namespace osu.Game.Tests.Visual.Gameplay
         [Test]
         public void TestPauseWithLargeOffset()
         {
-            double lastTime;
+            double lastStopTime;
             bool alwaysGoingForward = true;
 
             AddStep("force large offset", () =>
@@ -84,20 +84,24 @@ namespace osu.Game.Tests.Visual.Gameplay
 
             AddStep("add time forward check hook", () =>
             {
-                lastTime = double.MinValue;
+                lastStopTime = double.MinValue;
                 alwaysGoingForward = true;
 
                 Player.OnUpdate += _ =>
                 {
-                    double currentTime = Player.GameplayClockContainer.CurrentTime;
-                    bool goingForward = currentTime >= lastTime - 500;
+                    var masterClock = (MasterGameplayClockContainer)Player.GameplayClockContainer;
+
+                    double currentTime = masterClock.CurrentTime;
+
+                    bool goingForward = currentTime >= (masterClock.LastStopTime ?? lastStopTime);
 
                     alwaysGoingForward &= goingForward;
 
                     if (!goingForward)
-                        Logger.Log($"Backwards time occurred ({currentTime:N1} -> {lastTime:N1})");
+                        Logger.Log($"Went too far backwards (last stop: {lastStopTime:N1} current: {currentTime:N1})");
 
-                    lastTime = currentTime;
+                    if (masterClock.LastStopTime != null)
+                        lastStopTime = masterClock.LastStopTime.Value;
                 };
             });
 

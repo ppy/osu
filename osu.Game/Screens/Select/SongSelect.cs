@@ -138,7 +138,7 @@ namespace osu.Game.Screens.Select
         [Resolved]
         internal IOverlayManager? OverlayManager { get; private set; }
 
-        private Bindable<bool> configBackgroundBlur { get; set; } = new BindableBool();
+        private Bindable<bool> configBackgroundBlur = null!;
 
         [BackgroundDependencyLoader(true)]
         private void load(AudioManager audio, OsuColour colours, ManageCollectionsDialog? manageCollectionsDialog, DifficultyRecommender? recommender, OsuConfigManager config)
@@ -171,11 +171,6 @@ namespace osu.Game.Screens.Select
 
             AddRangeInternal(new Drawable[]
             {
-                new ResetScrollContainer(() => Carousel.ScrollToSelected())
-                {
-                    RelativeSizeAxes = Axes.Y,
-                    Width = 250,
-                },
                 new VerticalMaskingContainer
                 {
                     Children = new Drawable[]
@@ -243,6 +238,10 @@ namespace osu.Game.Screens.Select
                                         Padding = new MarginPadding { Top = left_area_padding },
                                         Children = new Drawable[]
                                         {
+                                            new LeftSideInteractionContainer(() => Carousel.ScrollToSelected())
+                                            {
+                                                RelativeSizeAxes = Axes.Both,
+                                            },
                                             beatmapInfoWedge = new BeatmapInfoWedge
                                             {
                                                 Height = WEDGE_HEIGHT,
@@ -647,7 +646,7 @@ namespace osu.Game.Screens.Select
 
             beginLooping();
 
-            if (Beatmap != null && !Beatmap.Value.BeatmapSetInfo.DeletePending)
+            if (!Beatmap.Value.BeatmapSetInfo.DeletePending)
             {
                 updateCarouselSelection();
 
@@ -1017,18 +1016,28 @@ namespace osu.Game.Screens.Select
             }
         }
 
-        private partial class ResetScrollContainer : Container
+        /// <summary>
+        /// Handles mouse interactions required when moving away from the carousel.
+        /// </summary>
+        internal partial class LeftSideInteractionContainer : Container
         {
-            private readonly Action? onHoverAction;
+            private readonly Action? resetCarouselPosition;
 
-            public ResetScrollContainer(Action onHoverAction)
+            public LeftSideInteractionContainer(Action resetCarouselPosition)
             {
-                this.onHoverAction = onHoverAction;
+                this.resetCarouselPosition = resetCarouselPosition;
             }
+
+            // we want to block plain scrolls on the left side so that they don't scroll the carousel,
+            // but also we *don't* want to handle scrolls when they're combined with keyboard modifiers
+            // as those will usually correspond to other interactions like adjusting volume.
+            protected override bool OnScroll(ScrollEvent e) => !e.ControlPressed && !e.AltPressed && !e.ShiftPressed && !e.SuperPressed;
+
+            protected override bool OnMouseDown(MouseDownEvent e) => true;
 
             protected override bool OnHover(HoverEvent e)
             {
-                onHoverAction?.Invoke();
+                resetCarouselPosition?.Invoke();
                 return base.OnHover(e);
             }
         }

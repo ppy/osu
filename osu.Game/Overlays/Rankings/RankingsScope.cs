@@ -18,6 +18,9 @@ namespace osu.Game.Overlays.Rankings
         Score,
 
         [LocalisableDescription(typeof(RankingsStrings), nameof(RankingsStrings.TypeCountry))]
-        Country
+        Country,
+
+        [LocalisableDescription(typeof(RankingsStrings), nameof(RankingsStrings.TypeKudosu))]
+        Kudosu,
     }
 }

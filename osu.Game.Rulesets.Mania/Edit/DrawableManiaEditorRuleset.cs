@@ -16,7 +16,7 @@ namespace osu.Game.Rulesets.Mania.Edit
 {
     public partial class DrawableManiaEditorRuleset : DrawableManiaRuleset, ISupportConstantAlgorithmToggle
     {
-        public BindableBool ShowSpeedChanges { get; set; } = new BindableBool();
+        public BindableBool ShowSpeedChanges { get; } = new BindableBool();
 
         public new IScrollingInfo ScrollingInfo => base.ScrollingInfo;
 

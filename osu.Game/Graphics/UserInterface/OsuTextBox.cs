@@ -86,6 +86,7 @@ namespace osu.Game.Graphics.UserInterface
 
             Placeholder.Colour = colourProvider?.Foreground1 ?? new Color4(180, 180, 180, 255);
 
+            // Note that `KeyBindingRow` uses similar logic for input feedback, so remember to update there if changing here.
             var textAddedSamples = new Sample?[4];
             for (int i = 0; i < textAddedSamples.Length; i++)
                 textAddedSamples[i] = audio.Samples.Get($@"Keyboard/key-press-{1 + i}");

@@ -34,6 +34,7 @@ namespace osu.Game.Rulesets.Osu.Tests
             AddStep("Hit Big Stream", () => SetContents(_ => testStream(2, true)));
             AddStep("Hit Medium Stream", () => SetContents(_ => testStream(5, true)));
             AddStep("Hit Small Stream", () => SetContents(_ => testStream(7, true)));
+            AddStep("High combo index", () => SetContents(_ => testSingle(2, true, comboIndex: 15)));
         }
 
         [Test]
@@ -66,12 +67,12 @@ namespace osu.Game.Rulesets.Osu.Tests
             AddStep("Hit Big Single", () => SetContents(_ => testSingle(2, true)));
         }
 
-        private Drawable testSingle(float circleSize, bool auto = false, double timeOffset = 0, Vector2? positionOffset = null)
+        private Drawable testSingle(float circleSize, bool auto = false, double timeOffset = 0, Vector2? positionOffset = null, int comboIndex = 0)
         {
             var playfield = new TestOsuPlayfield();
 
             for (double t = timeOffset; t < timeOffset + 60000; t += 2000)
-                playfield.Add(createSingle(circleSize, auto, t, positionOffset));
+                playfield.Add(createSingle(circleSize, auto, t, positionOffset, comboIndex: comboIndex));
 
             return playfield;
         }
@@ -84,14 +85,14 @@ namespace osu.Game.Rulesets.Osu.Tests
 
             for (int i = 0; i <= 1000; i += 100)
             {
-                playfield.Add(createSingle(circleSize, auto, i, pos, hitOffset));
+                playfield.Add(createSingle(circleSize, auto, i, pos, hitOffset, i / 100 - 1));
                 pos.X += 50;
             }
 
             return playfield;
         }
 
-        private TestDrawableHitCircle createSingle(float circleSize, bool auto, double timeOffset, Vector2? positionOffset, double hitOffset = 0)
+        private TestDrawableHitCircle createSingle(float circleSize, bool auto, double timeOffset, Vector2? positionOffset, double hitOffset = 0, int comboIndex = 0)
         {
             positionOffset ??= Vector2.Zero;
 
@@ -99,6 +100,7 @@ namespace osu.Game.Rulesets.Osu.Tests
             {
                 StartTime = Time.Current + 1000 + timeOffset,
                 Position = OsuPlayfield.BASE_SIZE / 4 + positionOffset.Value,
+                IndexInCurrentCombo = comboIndex,
             };
 
             circle.ApplyDefaults(new ControlPointInfo(), new BeatmapDifficulty { CircleSize = circleSize });

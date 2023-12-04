@@ -1197,6 +1197,8 @@ namespace osu.Game.Screens.Select
         {
             private bool rightMouseScrollBlocked;
 
+            public override bool ReceivePositionalInputAt(Vector2 screenSpacePos) => true;
+
             public CarouselScrollContainer()
             {
                 // size is determined by the carousel itself, due to not all content necessarily being loaded.

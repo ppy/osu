@@ -75,7 +75,7 @@ namespace osu.Game.Overlays.Wiki
         protected override void Update()
         {
             base.Update();
-            Height = Math.Max(panelContainer.Height, Parent.DrawHeight);
+            Height = Math.Max(panelContainer.Height, Parent!.DrawHeight);
         }
 
         private partial class WikiPanelMarkdownContainer : WikiMarkdownContainer
@@ -93,7 +93,7 @@ namespace osu.Game.Overlays.Wiki
 
             public override SpriteText CreateSpriteText() => base.CreateSpriteText().With(t => t.Font = t.Font.With(Typeface.Torus, weight: FontWeight.Bold));
 
-            public override MarkdownTextFlowContainer CreateTextFlow() => base.CreateTextFlow().With(f => f.TextAnchor = Anchor.TopCentre);
+            public override OsuMarkdownTextFlowContainer CreateTextFlow() => base.CreateTextFlow().With(f => f.TextAnchor = Anchor.TopCentre);
 
             protected override MarkdownParagraph CreateParagraph(ParagraphBlock paragraphBlock, int level)
                 => base.CreateParagraph(paragraphBlock, level).With(p => p.Margin = new MarginPadding { Bottom = 10 });

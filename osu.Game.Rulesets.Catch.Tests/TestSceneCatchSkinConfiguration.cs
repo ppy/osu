@@ -73,7 +73,7 @@ namespace osu.Game.Rulesets.Catch.Tests
         private float getCaughtObjectPosition(Fruit fruit)
         {
             var caughtObject = catcher.ChildrenOfType<CaughtObject>().Single(c => c.HitObject == fruit);
-            return caughtObject.Parent.ToSpaceOfOtherDrawable(caughtObject.Position, catcher).X;
+            return caughtObject.Parent!.ToSpaceOfOtherDrawable(caughtObject.Position, catcher).X;
         }
 
         private void catchFruit(Fruit fruit, float x)

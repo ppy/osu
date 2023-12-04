@@ -81,12 +81,12 @@ namespace osu.Game.Rulesets.Osu.Tests.Mods
                     new Slider
                     {
                         StartTime = 3200,
-                        Path = new SliderPath(PathType.Linear, new[] { Vector2.Zero, new Vector2(100, 0), })
+                        Path = new SliderPath(PathType.LINEAR, new[] { Vector2.Zero, new Vector2(100, 0), })
                     },
                     new Slider
                     {
                         StartTime = 5200,
-                        Path = new SliderPath(PathType.Linear, new[] { Vector2.Zero, new Vector2(100, 0), })
+                        Path = new SliderPath(PathType.LINEAR, new[] { Vector2.Zero, new Vector2(100, 0), })
                     }
                 }
             },
@@ -105,12 +105,12 @@ namespace osu.Game.Rulesets.Osu.Tests.Mods
                     new Slider
                     {
                         StartTime = 1000,
-                        Path = new SliderPath(PathType.Linear, new[] { Vector2.Zero, new Vector2(100, 0), })
+                        Path = new SliderPath(PathType.LINEAR, new[] { Vector2.Zero, new Vector2(100, 0), })
                     },
                     new Slider
                     {
                         StartTime = 4000,
-                        Path = new SliderPath(PathType.Linear, new[] { Vector2.Zero, new Vector2(100, 0), })
+                        Path = new SliderPath(PathType.LINEAR, new[] { Vector2.Zero, new Vector2(100, 0), })
                     },
                 }
             },
@@ -140,7 +140,7 @@ namespace osu.Game.Rulesets.Osu.Tests.Mods
                     {
                         StartTime = 3000,
                         Position = new Vector2(156, 242),
-                        Path = new SliderPath(PathType.Linear, new[] { Vector2.Zero, new Vector2(200, 0), })
+                        Path = new SliderPath(PathType.LINEAR, new[] { Vector2.Zero, new Vector2(200, 0), })
                     },
                     new Spinner
                     {

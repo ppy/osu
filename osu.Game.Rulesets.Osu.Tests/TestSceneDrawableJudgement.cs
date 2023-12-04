@@ -75,7 +75,7 @@ namespace osu.Game.Rulesets.Osu.Tests
                         pool = pools[poolIndex];
 
                         // We need to make sure neither the pool nor the judgement get disposed when new content is set, and they both share the same parent.
-                        ((Container)pool.Parent).Clear(false);
+                        ((Container)pool.Parent!).Clear(false);
                     }
 
                     var container = new Container

@@ -11,8 +11,6 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
     {
         public override bool DisplayResult => false;
 
-        protected DrawableSpinner DrawableSpinner => (DrawableSpinner)ParentHitObject;
-
         public DrawableSpinnerTick()
             : this(null)
         {
@@ -23,6 +21,14 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
         {
             Anchor = Anchor.Centre;
             Origin = Anchor.Centre;
+        }
+
+        protected override void OnApply()
+        {
+            base.OnApply();
+
+            // Lifetime will be managed by `DrawableSpinner`.
+            LifetimeStart = double.MaxValue;
         }
 
         /// <summary>

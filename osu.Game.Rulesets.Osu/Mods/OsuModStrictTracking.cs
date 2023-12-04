@@ -129,7 +129,7 @@ namespace osu.Game.Rulesets.Osu.Mods
                             });
                             break;
 
-                        case SliderEventType.LastTick:
+                        case SliderEventType.Tail:
                             AddNested(TailCircle = new StrictTrackingSliderTailCircle(this)
                             {
                                 RepeatIndex = e.SpanIndex,

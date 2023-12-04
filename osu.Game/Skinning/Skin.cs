@@ -55,7 +55,7 @@ namespace osu.Game.Skinning
             where TLookup : notnull
             where TValue : notnull;
 
-        private readonly RealmBackedResourceStore<SkinInfo>? realmBackedStorage;
+        private readonly ResourceStore<byte[]> store = new ResourceStore<byte[]>();
 
         public string Name { get; }
 
@@ -64,9 +64,9 @@ namespace osu.Game.Skinning
         /// </summary>
         /// <param name="skin">The skin's metadata. Usually a live realm object.</param>
         /// <param name="resources">Access to game-wide resources.</param>
-        /// <param name="storage">An optional store which will *replace* all file lookups that are usually sourced from <paramref name="skin"/>.</param>
+        /// <param name="fallbackStore">An optional fallback store which will be used for file lookups that are not serviced by realm user storage.</param>
         /// <param name="configurationFilename">An optional filename to read the skin configuration from. If not provided, the configuration will be retrieved from the storage using "skin.ini".</param>
-        protected Skin(SkinInfo skin, IStorageResourceProvider? resources, IResourceStore<byte[]>? storage = null, string configurationFilename = @"skin.ini")
+        protected Skin(SkinInfo skin, IStorageResourceProvider? resources, IResourceStore<byte[]>? fallbackStore = null, string configurationFilename = @"skin.ini")
         {
             Name = skin.Name;
 
@@ -74,9 +74,9 @@ namespace osu.Game.Skinning
             {
                 SkinInfo = skin.ToLive(resources.RealmAccess);
 
-                storage ??= realmBackedStorage = new RealmBackedResourceStore<SkinInfo>(SkinInfo, resources.Files, resources.RealmAccess);
+                store.AddStore(new RealmBackedResourceStore<SkinInfo>(SkinInfo, resources.Files, resources.RealmAccess));
 
-                var samples = resources.AudioManager?.GetSampleStore(storage);
+                var samples = resources.AudioManager?.GetSampleStore(store);
 
                 if (samples != null)
                 {
@@ -88,7 +88,7 @@ namespace osu.Game.Skinning
                 }
 
                 Samples = samples;
-                Textures = new TextureStore(resources.Renderer, new MaxDimensionLimitedTextureLoaderStore(resources.CreateTextureLoaderStore(storage)));
+                Textures = new TextureStore(resources.Renderer, CreateTextureLoaderStore(resources, store));
             }
             else
             {
@@ -96,7 +96,10 @@ namespace osu.Game.Skinning
                 SkinInfo = skin.ToLiveUnmanaged();
             }
 
-            var configurationStream = storage?.GetStream(configurationFilename);
+            if (fallbackStore != null)
+                store.AddStore(fallbackStore);
+
+            var configurationStream = store.GetStream(configurationFilename);
 
             if (configurationStream != null)
             {
@@ -119,7 +122,7 @@ namespace osu.Game.Skinning
             {
                 string filename = $"{skinnableTarget}.json";
 
-                byte[]? bytes = storage?.Get(filename);
+                byte[]? bytes = store?.Get(filename);
 
                 if (bytes == null)
                     continue;
@@ -170,6 +173,9 @@ namespace osu.Game.Skinning
                 }
             }
         }
+
+        protected virtual IResourceStore<TextureUpload> CreateTextureLoaderStore(IStorageResourceProvider resources, IResourceStore<byte[]> storage)
+            => new MaxDimensionLimitedTextureLoaderStore(resources.CreateTextureLoaderStore(storage));
 
         protected virtual void ParseConfigurationStream(Stream stream)
         {
@@ -249,7 +255,7 @@ namespace osu.Game.Skinning
             Textures?.Dispose();
             Samples?.Dispose();
 
-            realmBackedStorage?.Dispose();
+            store.Dispose();
         }
 
         #endregion

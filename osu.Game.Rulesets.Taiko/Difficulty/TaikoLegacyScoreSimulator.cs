@@ -2,13 +2,16 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using osu.Game.Beatmaps;
 using osu.Game.Rulesets.Judgements;
+using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Objects.Types;
 using osu.Game.Rulesets.Scoring;
 using osu.Game.Rulesets.Scoring.Legacy;
+using osu.Game.Rulesets.Taiko.Mods;
 using osu.Game.Rulesets.Taiko.Objects;
 
 namespace osu.Game.Rulesets.Taiko.Difficulty
@@ -193,6 +196,48 @@ namespace osu.Game.Rulesets.Taiko.Difficulty
 
             if (increaseCombo)
                 combo++;
+        }
+
+        public double GetLegacyScoreMultiplier(IReadOnlyList<Mod> mods, LegacyBeatmapConversionDifficultyInfo difficulty)
+        {
+            bool scoreV2 = mods.Any(m => m is ModScoreV2);
+
+            double multiplier = 1.0;
+
+            foreach (var mod in mods)
+            {
+                switch (mod)
+                {
+                    case TaikoModNoFail:
+                        multiplier *= scoreV2 ? 1.0 : 0.5;
+                        break;
+
+                    case TaikoModEasy:
+                        multiplier *= 0.5;
+                        break;
+
+                    case TaikoModHalfTime:
+                    case TaikoModDaycore:
+                        multiplier *= 0.3;
+                        break;
+
+                    case TaikoModHidden:
+                    case TaikoModHardRock:
+                        multiplier *= 1.06;
+                        break;
+
+                    case TaikoModDoubleTime:
+                    case TaikoModNightcore:
+                    case TaikoModFlashlight:
+                        multiplier *= 1.12;
+                        break;
+
+                    case TaikoModRelax:
+                        return 0;
+                }
+            }
+
+            return multiplier;
         }
     }
 }

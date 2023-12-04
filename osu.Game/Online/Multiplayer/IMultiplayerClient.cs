@@ -13,7 +13,7 @@ namespace osu.Game.Online.Multiplayer
     /// <summary>
     /// An interface defining a multiplayer client instance.
     /// </summary>
-    public interface IMultiplayerClient
+    public interface IMultiplayerClient : IStatefulUserHubClient
     {
         /// <summary>
         /// Signals that the room has changed state.
@@ -41,6 +41,14 @@ namespace osu.Game.Online.Multiplayer
         /// </remarks>
         /// <param name="user">The user.</param>
         Task UserKicked(MultiplayerRoomUser user);
+
+        /// <summary>
+        /// Signals that the local user has been invited into a multiplayer room.
+        /// </summary>
+        /// <param name="invitedBy">Id of user that invited the player.</param>
+        /// <param name="roomID">Id of the room the user got invited to.</param>
+        /// <param name="password">Password to join the room.</param>
+        Task Invited(int invitedBy, long roomID, string password);
 
         /// <summary>
         /// Signal that the host of the room has changed.

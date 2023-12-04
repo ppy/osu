@@ -35,7 +35,7 @@ namespace osu.Game.Rulesets.Catch.Tests.Mods
             var stream = new JuiceStream
             {
                 StartTime = 1000,
-                Path = new SliderPath(PathType.Linear, new[]
+                Path = new SliderPath(PathType.LINEAR, new[]
                 {
                     Vector2.Zero,
                     new Vector2(100, 0),

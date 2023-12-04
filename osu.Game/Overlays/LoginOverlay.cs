@@ -20,7 +20,7 @@ namespace osu.Game.Overlays
 
         private const float transition_time = 400;
 
-        protected override double PopInOutSampleBalance => OsuGameBase.SFX_STEREO_STRENGTH;
+        protected override double PopInOutSampleBalance => OsuGameBase.SFX_STEREO_STRENGTH * 0.75f;
 
         [Cached]
         private OverlayColourProvider colourProvider = new OverlayColourProvider(OverlayColourScheme.Purple);

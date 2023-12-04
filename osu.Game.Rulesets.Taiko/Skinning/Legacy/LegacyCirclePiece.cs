@@ -23,6 +23,7 @@ namespace osu.Game.Rulesets.Taiko.Skinning.Legacy
     public partial class LegacyCirclePiece : CompositeDrawable, IHasAccentColour
     {
         private static readonly Vector2 circle_piece_size = new Vector2(128);
+        private static readonly Vector2 max_circle_sprite_size = new Vector2(160);
 
         private Drawable backgroundLayer = null!;
         private Drawable? foregroundLayer;
@@ -47,39 +48,44 @@ namespace osu.Game.Rulesets.Taiko.Skinning.Legacy
         [BackgroundDependencyLoader]
         private void load(ISkinSource skin, DrawableHitObject drawableHitObject, IBeatSyncProvider? beatSyncProvider)
         {
-            Drawable? getDrawableFor(string lookup)
+            Drawable? getDrawableFor(string lookup, bool animatable)
             {
                 const string normal_hit = "taikohit";
                 const string big_hit = "taikobig";
 
                 string prefix = ((drawableHitObject.HitObject as TaikoStrongableHitObject)?.IsStrong ?? false) ? big_hit : normal_hit;
 
-                return skin.GetAnimation($"{prefix}{lookup}", true, false, maxSize: circle_piece_size) ??
+                return skin.GetAnimation($"{prefix}{lookup}", animatable, false, maxSize: max_circle_sprite_size) ??
                        // fallback to regular size if "big" version doesn't exist.
-                       skin.GetAnimation($"{normal_hit}{lookup}", true, false, maxSize: circle_piece_size);
+                       skin.GetAnimation($"{normal_hit}{lookup}", animatable, false, maxSize: max_circle_sprite_size);
             }
 
             // backgroundLayer is guaranteed to exist due to the pre-check in TaikoLegacySkinTransformer.
-            AddInternal(backgroundLayer = new LegacyKiaiFlashingDrawable(() => getDrawableFor("circle")));
+            AddInternal(backgroundLayer = new LegacyKiaiFlashingDrawable(() => getDrawableFor("circle", false))
+            {
+                Anchor = Anchor.Centre,
+                Origin = Anchor.Centre
+            });
 
-            foregroundLayer = getDrawableFor("circleoverlay");
+            foregroundLayer = getDrawableFor("circleoverlay", true);
+
             if (foregroundLayer != null)
+            {
+                foregroundLayer.Anchor = Anchor.Centre;
+                foregroundLayer.Origin = Anchor.Centre;
+
+                // Animations in taiko skins are used in a custom way (>150 combo and animating in time with beat).
+                // For now just stop at first frame for sanity.
+                if (foregroundLayer is IFramedAnimation animatedForegroundLayer)
+                    animatedForegroundLayer.Stop();
+
                 AddInternal(foregroundLayer);
+            }
 
             drawableHitObject.StartTimeBindable.BindValueChanged(startTime =>
             {
                 timingPoint = beatSyncProvider?.ControlPoints?.TimingPointAt(startTime.NewValue) ?? TimingControlPoint.DEFAULT;
             }, true);
-
-            // Animations in taiko skins are used in a custom way (>150 combo and animating in time with beat).
-            // For now just stop at first frame for sanity.
-            foreach (var c in InternalChildren)
-            {
-                (c as IFramedAnimation)?.Stop();
-
-                c.Anchor = Anchor.Centre;
-                c.Origin = Anchor.Centre;
-            }
 
             if (gameplayState != null)
                 currentCombo.BindTo(gameplayState.ScoreProcessor.Combo);
@@ -100,11 +106,11 @@ namespace osu.Game.Rulesets.Taiko.Skinning.Legacy
             foreach (var c in InternalChildren)
                 c.Scale = new Vector2(DrawHeight / circle_piece_size.Y);
 
-            if (foregroundLayer is IFramedAnimation animatableForegroundLayer)
-                animateForegroundLayer(animatableForegroundLayer);
+            if (foregroundLayer is IFramedAnimation animatedForegroundLayer)
+                animateForegroundLayer(animatedForegroundLayer);
         }
 
-        private void animateForegroundLayer(IFramedAnimation animatableForegroundLayer)
+        private void animateForegroundLayer(IFramedAnimation animation)
         {
             int multiplier;
 
@@ -118,12 +124,12 @@ namespace osu.Game.Rulesets.Taiko.Skinning.Legacy
             }
             else
             {
-                animatableForegroundLayer.GotoFrame(0);
+                animation.GotoFrame(0);
                 return;
             }
 
             animationFrame = Math.Abs(Time.Current - timingPoint.Time) % ((timingPoint.BeatLength * 2) / multiplier) >= timingPoint.BeatLength / multiplier ? 0 : 1;
-            animatableForegroundLayer.GotoFrame(animationFrame);
+            animation.GotoFrame(animationFrame);
         }
 
         private Color4 accentColour;

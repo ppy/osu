@@ -42,22 +42,22 @@ namespace osu.Game.Tests.Mods
         private class ClassWithSettings
         {
             [SettingSource("Unordered setting", "Should be last")]
-            public BindableFloat UnorderedSetting { get; set; } = new BindableFloat();
+            public BindableFloat UnorderedSetting { get; } = new BindableFloat();
 
             [SettingSource("Second setting", "Another description", 2)]
-            public BindableBool SecondSetting { get; set; } = new BindableBool();
+            public BindableBool SecondSetting { get; } = new BindableBool();
 
             [SettingSource("First setting", "A description", 1)]
-            public BindableDouble FirstSetting { get; set; } = new BindableDouble();
+            public BindableDouble FirstSetting { get; } = new BindableDouble();
 
             [SettingSource("Third setting", "Yet another description", 3)]
-            public BindableInt ThirdSetting { get; set; } = new BindableInt();
+            public BindableInt ThirdSetting { get; } = new BindableInt();
         }
 
         private class ClassWithCustomSettingControl
         {
             [SettingSource("Custom setting", "Should be a custom control", SettingControlType = typeof(CustomSettingsControl))]
-            public BindableInt UnorderedSetting { get; set; } = new BindableInt();
+            public BindableInt UnorderedSetting { get; } = new BindableInt();
         }
 
         private partial class CustomSettingsControl : SettingsItem<int>

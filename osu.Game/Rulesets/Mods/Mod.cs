@@ -107,14 +107,58 @@ namespace osu.Game.Rulesets.Mods
         [JsonIgnore]
         public virtual bool HasImplementation => this is IApplicableMod;
 
+        /// <summary>
+        /// Whether this mod can be played by a real human user.
+        /// Non-user-playable mods are not viable for single-player score submission.
+        /// </summary>
+        /// <example>
+        /// <list type="bullet">
+        /// <item><see cref="ModDoubleTime"/> is user-playable.</item>
+        /// <item><see cref="ModAutoplay"/> is not user-playable.</item>
+        /// </list>
+        /// </example>
         [JsonIgnore]
         public virtual bool UserPlayable => true;
 
+        /// <summary>
+        /// Whether this mod can be specified as a "required" mod in a multiplayer context.
+        /// </summary>
+        /// <example>
+        /// <list type="bullet">
+        /// <item><see cref="ModHardRock"/> is valid for multiplayer.</item>
+        /// <item>
+        /// <see cref="ModDoubleTime"/> is valid for multiplayer as long as it is a <b>required</b> mod,
+        /// as that ensures the same duration of gameplay for all users in the room.
+        /// </item>
+        /// <item>
+        /// <see cref="ModAdaptiveSpeed"/> is not valid for multiplayer, as it leads to varying
+        /// gameplay duration depending on how the users in the room play.
+        /// </item>
+        /// <item><see cref="ModAutoplay"/> is not valid for multiplayer.</item>
+        /// </list>
+        /// </example>
         [JsonIgnore]
         public virtual bool ValidForMultiplayer => true;
 
+        /// <summary>
+        /// Whether this mod can be specified as a "free" or "allowed" mod in a multiplayer context.
+        /// </summary>
+        /// <example>
+        /// <list type="bullet">
+        /// <item><see cref="ModHardRock"/> is valid for multiplayer as a free mod.</item>
+        /// <item>
+        /// <see cref="ModDoubleTime"/> is <b>not</b> valid for multiplayer as a free mod,
+        /// as it could to varying gameplay duration between users in the room depending on whether they picked it.
+        /// </item>
+        /// <item><see cref="ModAutoplay"/> is not valid for multiplayer as a free mod.</item>
+        /// </list>
+        /// </example>
         [JsonIgnore]
         public virtual bool ValidForMultiplayerAsFreeMod => true;
+
+        /// <inheritdoc/>
+        [JsonIgnore]
+        public virtual bool AlwaysValidForSubmission => false;
 
         /// <summary>
         /// Whether this mod requires configuration to apply changes to the game.

@@ -119,7 +119,7 @@ namespace osu.Game.Overlays.Dashboard
                     {
                         users.GetUserAsync(userId).ContinueWith(task =>
                         {
-                            var user = task.GetResultSafely();
+                            APIUser user = task.GetResultSafely();
 
                             if (user == null)
                                 return;
@@ -129,6 +129,9 @@ namespace osu.Game.Overlays.Dashboard
                                 // user may no longer be playing.
                                 if (!playingUsers.Contains(user.Id))
                                     return;
+
+                                // TODO: remove this once online state is being updated more correctly.
+                                user.IsOnline = true;
 
                                 userFlow.Add(createUserPanel(user));
                             });
@@ -209,7 +212,7 @@ namespace osu.Game.Overlays.Dashboard
                                 Text = "Spectate",
                                 Anchor = Anchor.TopCentre,
                                 Origin = Anchor.TopCentre,
-                                Action = () => performer?.PerformFromScreen(s => s.Push(new SoloSpectator(User))),
+                                Action = () => performer?.PerformFromScreen(s => s.Push(new SoloSpectatorScreen(User))),
                                 Enabled = { Value = User.Id != api.LocalUser.Value.Id }
                             }
                         }

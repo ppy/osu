@@ -414,6 +414,8 @@ namespace osu.Game.Screens.Play
             quickRestart = quickRestartRequested;
             hideOverlays = true;
             ValidForResume = true;
+
+            this.MakeCurrent();
         }
 
         private void contentIn()

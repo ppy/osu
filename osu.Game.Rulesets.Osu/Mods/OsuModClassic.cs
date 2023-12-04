@@ -41,11 +41,7 @@ namespace osu.Game.Rulesets.Osu.Mods
             switch (hitObject)
             {
                 case Slider slider:
-                    slider.OnlyJudgeNestedObjects = !NoSliderHeadAccuracy.Value;
-
-                    foreach (var head in slider.NestedHitObjects.OfType<SliderHeadCircle>())
-                        head.JudgeAsNormalHitCircle = !NoSliderHeadAccuracy.Value;
-
+                    slider.ClassicSliderBehaviour = NoSliderHeadAccuracy.Value;
                     break;
             }
         }

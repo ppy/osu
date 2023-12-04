@@ -5,6 +5,7 @@
 
 using System.Linq;
 using NUnit.Framework;
+using osu.Framework.Allocation;
 using osu.Framework.Extensions;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.UserInterface;
@@ -18,6 +19,7 @@ using osu.Game.Rulesets.Osu.Mods;
 using osu.Game.Screens.Edit.Components;
 using osu.Game.Screens.Play;
 using osu.Game.Screens.Play.HUD.HitErrorMeters;
+using osu.Game.Skinning;
 using osu.Game.Tests.Beatmaps.IO;
 using osuTK;
 using osuTK.Input;
@@ -31,7 +33,7 @@ namespace osu.Game.Tests.Visual.Navigation
         private SkinEditor skinEditor => Game.ChildrenOfType<SkinEditor>().FirstOrDefault();
 
         [Test]
-        public void TestEditComponentDuringGameplay()
+        public void TestEditComponentFromGameplayScene()
         {
             advanceToSongSelect();
             openSkinEditor();
@@ -67,6 +69,28 @@ namespace osu.Game.Tests.Visual.Navigation
             AddStep("adjust slider via keyboard", () => InputManager.Key(Key.Left));
 
             AddAssert("value is less than default", () => hitErrorMeter.JudgementLineThickness.Value < hitErrorMeter.JudgementLineThickness.Default);
+        }
+
+        [Test]
+        public void TestMutateProtectedSkinDuringGameplay()
+        {
+            advanceToSongSelect();
+            AddStep("set default skin", () => Game.Dependencies.Get<SkinManager>().CurrentSkinInfo.SetDefault());
+
+            AddStep("import beatmap", () => BeatmapImportHelper.LoadQuickOszIntoOsu(Game).WaitSafely());
+            AddUntilStep("wait for selected", () => !Game.Beatmap.IsDefault);
+
+            AddStep("enable NF", () => Game.SelectedMods.Value = new[] { new OsuModNoFail() });
+            AddStep("enter gameplay", () => InputManager.Key(Key.Enter));
+
+            AddUntilStep("wait for player", () =>
+            {
+                DismissAnyNotifications();
+                return Game.ScreenStack.CurrentScreen is Player;
+            });
+
+            openSkinEditor();
+            AddUntilStep("current skin is mutable", () => !Game.Dependencies.Get<SkinManager>().CurrentSkin.Value.SkinInfo.Value.Protected);
         }
 
         [Test]
