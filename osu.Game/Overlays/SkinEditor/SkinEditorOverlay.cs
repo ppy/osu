@@ -297,9 +297,20 @@ namespace osu.Game.Overlays.SkinEditor
             {
             }
 
+            protected override void LoadComplete()
+            {
+                base.LoadComplete();
+
+                if (!LoadedBeatmapSuccessfully)
+                    Scheduler.AddDelayed(this.Exit, 3000);
+            }
+
             protected override void Update()
             {
                 base.Update();
+
+                if (!LoadedBeatmapSuccessfully)
+                    return;
 
                 if (GameplayState.HasPassed)
                     GameplayClockContainer.Seek(0);
