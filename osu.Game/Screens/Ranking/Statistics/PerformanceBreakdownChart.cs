@@ -38,7 +38,6 @@ namespace osu.Game.Screens.Ranking.Statistics
         private OsuSpriteText fcPerformance;
         private OsuSpriteText maximumPerformance;
 
-        // Colours of the achieved and pfc text and bars
         private readonly Color4 achieveColor = Color4Extensions.FromHex("#66FFCC");
 
         private readonly Color4 fcColor = Color4Extensions.FromHex("#609882");
@@ -231,7 +230,7 @@ namespace osu.Game.Screens.Ranking.Statistics
             float percentage = (float)(attribute.Value / perfectAttribute.Value);
             float fcPercentage = (float)(fcAttribute.Value / perfectAttribute.Value);
 
-            PolyBar bar = new PolyBar(2)
+            MultiValueBar bar = new MultiValueBar(2)
             {
                 RelativeSizeAxes = Axes.X,
                 Origin = Anchor.Centre,
