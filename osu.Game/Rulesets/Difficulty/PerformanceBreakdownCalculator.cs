@@ -13,6 +13,7 @@ using osu.Game.Beatmaps;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Scoring;
+using osu.Game.Rulesets.Judgements;
 using osu.Game.Scoring;
 
 namespace osu.Game.Rulesets.Difficulty
@@ -50,7 +51,7 @@ namespace osu.Game.Rulesets.Difficulty
         {
             return Task.Run(async () =>
             {
-                Ruleset rulest = score.Ruleset.CreateInstance();
+                Ruleset ruleset = score.Ruleset.CreateInstance();
                 ScoreInfo fcPlay = score.DeepClone();
                 fcPlay.Passed = true;
                 // Update the play to be a full combo
@@ -59,10 +60,15 @@ namespace osu.Game.Rulesets.Difficulty
                 // Only recalculate accuracy if it's different
                 if (fcPlay.Statistics[HitResult.Miss] > 0)
                 {
-                    if (fcPlay.Statistics.ContainsKey(HitResult.Perfect))
-                        fcPlay.Statistics[HitResult.Perfect] += fcPlay.Statistics[HitResult.Miss];
-                    else
-                        fcPlay.Statistics[HitResult.Great] += fcPlay.Statistics[HitResult.Miss];
+                    HitResult bestResult = HitResult.Miss;
+
+                    foreach (var hitResult in ruleset.GetHitResults())
+                    {
+                        if (Judgement.ToNumericResult(hitResult.result) > Judgement.ToNumericResult(bestResult))
+                            bestResult = hitResult.result;
+                    }
+
+                    fcPlay.Statistics[bestResult] += fcPlay.Statistics[HitResult.Miss];
                     fcPlay.Statistics[HitResult.Miss] = 0;
                     // Recalculate Accuracy with converted misses
                     fcPlay.CalculateAccuracy();
@@ -75,7 +81,7 @@ namespace osu.Game.Rulesets.Difficulty
                     cancellationToken
                 ).ConfigureAwait(false);
 
-                return difficulty == null ? null : rulest.CreatePerformanceCalculator()?.Calculate(fcPlay, difficulty.Value.Attributes.AsNonNull());
+                return difficulty == null ? null : ruleset.CreatePerformanceCalculator()?.Calculate(fcPlay, difficulty.Value.Attributes.AsNonNull());
             }, cancellationToken);
         }
 
