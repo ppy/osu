@@ -3,11 +3,14 @@
 
 using System.Collections.Generic;
 using osu.Framework.Localisation;
+using osu.Game.Screens.Select;
 
 namespace osu.Game.Beatmaps
 {
     public static class BeatmapMetadataInfoExtensions
     {
+        internal const int MAX_SEARCHABLE_TERM_COUNT = 7;
+
         /// <summary>
         /// An array of all searchable terms provided in contained metadata.
         /// </summary>
@@ -18,7 +21,21 @@ namespace osu.Game.Beatmaps
             return termsList.ToArray();
         }
 
-        internal const int MAX_SEARCHABLE_TERM_COUNT = 7;
+        public static bool Match(IBeatmapMetadataInfo metadataInfo, FilterCriteria.OptionalTextFilter[] filters)
+        {
+            foreach (var filter in filters)
+            {
+                if (filter.Matches(metadataInfo.Author.Username)) return true;
+                if (filter.Matches(metadataInfo.Artist)) return true;
+                if (filter.Matches(metadataInfo.ArtistUnicode)) return true;
+                if (filter.Matches(metadataInfo.Title)) return true;
+                if (filter.Matches(metadataInfo.TitleUnicode)) return true;
+                if (filter.Matches(metadataInfo.Source)) return true;
+                if (filter.Matches(metadataInfo.Tags)) return true;
+            }
+
+            return false;
+        }
 
         internal static void CollectSearchableTerms(IBeatmapMetadataInfo metadataInfo, IList<string> termsList)
         {
