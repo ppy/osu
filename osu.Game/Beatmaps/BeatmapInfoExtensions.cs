@@ -34,13 +34,17 @@ namespace osu.Game.Beatmaps
             foreach (var filter in filters)
             {
                 if (filter.Matches(beatmapInfo.DifficultyName))
-                    return true;
+                    continue;
 
-                if (BeatmapMetadataInfoExtensions.Match(beatmapInfo.Metadata, filters))
-                    return true;
+                if (BeatmapMetadataInfoExtensions.Match(beatmapInfo.Metadata, filter))
+                    continue;
+
+                // failed to match a single filter at all - fail the whole match.
+                return false;
             }
 
-            return false;
+            // got through all filters without failing any - pass the whole match.
+            return true;
         }
 
         private static string getVersionString(IBeatmapInfo beatmapInfo) => string.IsNullOrEmpty(beatmapInfo.DifficultyName) ? string.Empty : $"[{beatmapInfo.DifficultyName}]";
