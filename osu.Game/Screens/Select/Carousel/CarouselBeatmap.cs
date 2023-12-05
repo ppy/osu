@@ -66,26 +66,7 @@ namespace osu.Game.Screens.Select.Carousel
 
             if (criteria.SearchTerms.Length > 0)
             {
-                var searchableTerms = BeatmapInfo.GetSearchableTerms();
-
-                foreach (FilterCriteria.OptionalTextFilter criteriaTerm in criteria.SearchTerms)
-                {
-                    bool any = false;
-
-                    // ReSharper disable once ForeachCanBeConvertedToQueryUsingAnotherGetEnumerator
-                    foreach (string searchTerm in searchableTerms)
-                    {
-                        if (!criteriaTerm.Matches(searchTerm)) continue;
-
-                        any = true;
-                        break;
-                    }
-
-                    if (any) continue;
-
-                    match = false;
-                    break;
-                }
+                match = BeatmapInfo.Match(criteria.SearchTerms);
 
                 // if a match wasn't found via text matching of terms, do a second catch-all check matching against online IDs.
                 // this should be done after text matching so we can prioritise matching numbers in metadata.
