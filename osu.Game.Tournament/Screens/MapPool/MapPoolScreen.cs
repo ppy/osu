@@ -153,23 +153,35 @@ namespace osu.Game.Tournament.Screens.MapPool
 
             const TeamColour roll_winner = TeamColour.Red; //todo: draw from match
 
-            var previousBan = CurrentMatch.Value.PicksBans.LastOrDefault()?.Team ?? roll_winner;
+            var previousColour = CurrentMatch.Value.PicksBans.LastOrDefault()?.Team ?? roll_winner;
 
-            var nextColour = previousBan == TeamColour.Red ? TeamColour.Blue : TeamColour.Red;
+            TeamColour nextColour;
 
             bool hasAllBans = CurrentMatch.Value.PicksBans.Count(p => p.Type == ChoiceType.Ban) >= totalBansRequired;
 
             if (!hasAllBans)
-                // If it's the third ban or later, we need to check if it's the team's first or second ban in a row
-                nextColour = (CurrentMatch.Value.PicksBans.Count >= 2 ? CurrentMatch.Value.PicksBans[^2]?.Team : previousBan) == TeamColour.Red ? TeamColour.Blue : TeamColour.Red;
-
-            if (hasAllBans && pickType == ChoiceType.Ban)
             {
-                // When switching from bans to picks, we don't rotate the team colour.
+                // Ban phase.
+                // Switch teams every second ban.
+                nextColour = CurrentMatch.Value.PicksBans.Count % 2 == 1
+                    ? getOppositeTeamColour(previousColour)
+                    : previousColour;
+            }
+            else if (pickType == ChoiceType.Ban)
+            {
+                // Switching from bans to picks - stay with the last team that was banning.
                 nextColour = pickColour;
+            }
+            else
+            {
+                // Pick phase.
+                // Switch teams every pick.
+                nextColour = getOppositeTeamColour(previousColour);
             }
 
             setMode(nextColour, hasAllBans ? ChoiceType.Pick : ChoiceType.Ban);
+
+            TeamColour getOppositeTeamColour(TeamColour colour) => colour == TeamColour.Red ? TeamColour.Blue : TeamColour.Red;
         }
 
         protected override bool OnMouseDown(MouseDownEvent e)
