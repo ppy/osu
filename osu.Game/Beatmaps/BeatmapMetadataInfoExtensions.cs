@@ -21,18 +21,15 @@ namespace osu.Game.Beatmaps
             return termsList.ToArray();
         }
 
-        public static bool Match(IBeatmapMetadataInfo metadataInfo, FilterCriteria.OptionalTextFilter[] filters)
+        public static bool Match(IBeatmapMetadataInfo metadataInfo, FilterCriteria.OptionalTextFilter filter)
         {
-            foreach (var filter in filters)
-            {
-                if (filter.Matches(metadataInfo.Author.Username)) return true;
-                if (filter.Matches(metadataInfo.Artist)) return true;
-                if (filter.Matches(metadataInfo.ArtistUnicode)) return true;
-                if (filter.Matches(metadataInfo.Title)) return true;
-                if (filter.Matches(metadataInfo.TitleUnicode)) return true;
-                if (filter.Matches(metadataInfo.Source)) return true;
-                if (filter.Matches(metadataInfo.Tags)) return true;
-            }
+            if (filter.Matches(metadataInfo.Author.Username)) return true;
+            if (filter.Matches(metadataInfo.Artist)) return true;
+            if (filter.Matches(metadataInfo.ArtistUnicode)) return true;
+            if (filter.Matches(metadataInfo.Title)) return true;
+            if (filter.Matches(metadataInfo.TitleUnicode)) return true;
+            if (filter.Matches(metadataInfo.Source)) return true;
+            if (filter.Matches(metadataInfo.Tags)) return true;
 
             return false;
         }
