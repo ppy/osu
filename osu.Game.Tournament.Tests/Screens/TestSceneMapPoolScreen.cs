@@ -9,6 +9,7 @@ using osu.Framework.Testing;
 using osu.Game.Tournament.Components;
 using osu.Game.Tournament.Models;
 using osu.Game.Tournament.Screens.MapPool;
+using osuTK;
 
 namespace osu.Game.Tournament.Tests.Screens
 {
@@ -19,7 +20,7 @@ namespace osu.Game.Tournament.Tests.Screens
         [BackgroundDependencyLoader]
         private void load()
         {
-            Add(screen = new MapPoolScreen { Width = 0.7f });
+            Add(screen = new TestMapPoolScreen { Width = 0.7f });
         }
 
         [SetUp]
@@ -208,7 +209,6 @@ namespace osu.Game.Tournament.Tests.Screens
 
             AddStep("reset match", () =>
             {
-                InputManager.UseParentInput = true;
                 Ladder.CurrentMatch.Value = new TournamentMatch();
                 Ladder.CurrentMatch.Value = Ladder.Matches.First();
                 Ladder.CurrentMatch.Value.PicksBans.Clear();
@@ -300,7 +300,6 @@ namespace osu.Game.Tournament.Tests.Screens
 
             AddStep("reset match", () =>
             {
-                InputManager.UseParentInput = true;
                 Ladder.CurrentMatch.Value = new TournamentMatch();
                 Ladder.CurrentMatch.Value = Ladder.Matches.First();
                 Ladder.CurrentMatch.Value.PicksBans.Clear();
@@ -320,6 +319,17 @@ namespace osu.Game.Tournament.Tests.Screens
         {
             InputManager.MoveMouseTo(screen.ChildrenOfType<TournamentBeatmapPanel>().ElementAt(index));
             InputManager.Click(osuTK.Input.MouseButton.Left);
+        }
+
+        private partial class TestMapPoolScreen : MapPoolScreen
+        {
+            // this is a bit of a test-specific workaround.
+            // the way pick/ban is implemented is a bit funky; the screen itself is what handles the mouse there,
+            // rather than the beatmap panels themselves.
+            // in some extreme situations headless it may turn out that the panels overflow the screen,
+            // and as such picking stops working anymore outside of the bounds of the screen drawable.
+            // this override makes it so the screen sees all of the input at all times, making that impossible to happen.
+            public override bool ReceivePositionalInputAt(Vector2 screenSpacePos) => true;
         }
     }
 }
