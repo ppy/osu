@@ -7,6 +7,7 @@ using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Extensions.Color4Extensions;
+using osu.Framework.Extensions.ObjectExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Colour;
 using osu.Framework.Graphics.Containers;
@@ -156,8 +157,8 @@ namespace osu.Game.Screens.Play.HUD
         {
             base.LoadComplete();
 
-            HealthProcessor.NewJudgement += result => pendingJudgementResult = result;
-            Current.BindValueChanged(_ => Scheduler.AddOnce(updateCurrent), true);
+            HealthProcessor.NewJudgement += onNewJudgement;
+            Current.BindValueChanged(onCurrentChanged, true);
 
             // we're about to set `RelativeSizeAxes` depending on the value of `UseRelativeSize`.
             // setting `RelativeSizeAxes` internally transforms absolute sizing to relative and back to keep the size the same,
@@ -170,7 +171,12 @@ namespace osu.Game.Screens.Play.HUD
             BarHeight.BindValueChanged(_ => updatePath(), true);
         }
 
-        private void updateCurrent()
+        private void onNewJudgement(JudgementResult result) => pendingJudgementResult = result;
+
+        private void onCurrentChanged(ValueChangedEvent<double> valueChangedEvent)
+            => Scheduler.AddOnce(updateDisplay);
+
+        private void updateDisplay()
         {
             var result = pendingJudgementResult;
 
@@ -331,6 +337,14 @@ namespace osu.Game.Screens.Play.HUD
 
             mainBar.Vertices = healthBarVertices.Select(v => v - healthBarVertices[0]).ToList();
             mainBar.Position = healthBarVertices[0];
+        }
+
+        protected override void Dispose(bool isDisposing)
+        {
+            base.Dispose(isDisposing);
+
+            if (HealthProcessor.IsNotNull())
+                HealthProcessor.NewJudgement -= onNewJudgement;
         }
 
         private partial class BackgroundPath : SmoothPath
