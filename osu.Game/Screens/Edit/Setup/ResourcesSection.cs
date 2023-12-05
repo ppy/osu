@@ -146,13 +146,8 @@ namespace osu.Game.Screens.Edit.Setup
 
         private void updatePlaceholderText()
         {
-            audioTrackChooser.Text = audioTrackChooser.Current.Value == null
-                ? EditorSetupStrings.ClickToSelectTrack
-                : EditorSetupStrings.ClickToReplaceTrack;
-
-            backgroundChooser.Text = backgroundChooser.Current.Value == null
-                ? EditorSetupStrings.ClickToSelectBackground
-                : EditorSetupStrings.ClickToReplaceBackground;
+            audioTrackChooser.Text = audioTrackChooser.Current.Value?.Name ?? EditorSetupStrings.ClickToSelectTrack;
+            backgroundChooser.Text = backgroundChooser.Current.Value?.Name ?? EditorSetupStrings.ClickToSelectBackground;
         }
     }
 }
