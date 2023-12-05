@@ -22,7 +22,7 @@ using osuTK.Graphics;
 
 namespace osu.Game.Graphics.UserInterface
 {
-    public partial class OsuDropdown<T> : Dropdown<T>
+    public partial class OsuDropdown<T> : Dropdown<T>, IKeyBindingHandler<GlobalAction>
     {
         private const float corner_radius = 5;
 
@@ -30,9 +30,23 @@ namespace osu.Game.Graphics.UserInterface
 
         protected override DropdownMenu CreateMenu() => new OsuDropdownMenu();
 
+        public bool OnPressed(KeyBindingPressEvent<GlobalAction> e)
+        {
+            if (e.Repeat) return false;
+
+            if (e.Action == GlobalAction.Back)
+                return Back();
+
+            return false;
+        }
+
+        public void OnReleased(KeyBindingReleaseEvent<GlobalAction> e)
+        {
+        }
+
         #region OsuDropdownMenu
 
-        protected partial class OsuDropdownMenu : DropdownMenu, IKeyBindingHandler<GlobalAction>
+        protected partial class OsuDropdownMenu : DropdownMenu
         {
             public override bool HandleNonPositionalInput => State == MenuState.Open;
 
@@ -276,23 +290,6 @@ namespace osu.Game.Graphics.UserInterface
             }
 
             #endregion
-
-            public bool OnPressed(KeyBindingPressEvent<GlobalAction> e)
-            {
-                if (e.Repeat) return false;
-
-                if (e.Action == GlobalAction.Back)
-                {
-                    State = MenuState.Closed;
-                    return true;
-                }
-
-                return false;
-            }
-
-            public void OnReleased(KeyBindingReleaseEvent<GlobalAction> e)
-            {
-            }
         }
 
         #endregion
