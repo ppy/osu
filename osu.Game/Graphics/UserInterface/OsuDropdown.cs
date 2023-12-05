@@ -352,11 +352,82 @@ namespace osu.Game.Graphics.UserInterface
                 AddInternal(new HoverClickSounds());
             }
 
-            [BackgroundDependencyLoader(true)]
-            private void load(OverlayColourProvider? colourProvider, OsuColour colours)
+            [Resolved]
+            private OverlayColourProvider? colourProvider { get; set; }
+
+            [Resolved]
+            private OsuColour colours { get; set; } = null!;
+
+            protected override void LoadComplete()
             {
-                BackgroundColour = colourProvider?.Background5 ?? Color4.Black.Opacity(0.5f);
-                BackgroundColourHover = colourProvider?.Light4 ?? colours.PinkDarker;
+                base.LoadComplete();
+
+                SearchBar.State.ValueChanged += _ => updateColour();
+                updateColour();
+            }
+
+            protected override bool OnHover(HoverEvent e)
+            {
+                updateColour();
+                return false;
+            }
+
+            protected override void OnHoverLost(HoverLostEvent e)
+            {
+                updateColour();
+            }
+
+            private void updateColour()
+            {
+                bool hovered = Enabled.Value && IsHovered;
+                var hoveredColour = colourProvider?.Light4 ?? colours.PinkDarker;
+                var unhoveredColour = colourProvider?.Background5 ?? Color4.Black.Opacity(0.5f);
+
+                if (SearchBar.State.Value == Visibility.Visible)
+                {
+                    Icon.Colour = hovered ? hoveredColour.Lighten(0.5f) : Colour4.White;
+                    Background.Colour = unhoveredColour;
+                }
+                else
+                {
+                    Icon.Colour = Color4.White;
+                    Background.Colour = hovered ? hoveredColour : unhoveredColour;
+                }
+            }
+
+            protected override DropdownSearchBar CreateSearchBar() => new OsuDropdownSearchBar
+            {
+                Padding = new MarginPadding { Right = 36 },
+            };
+
+            private partial class OsuDropdownSearchBar : DropdownSearchBar
+            {
+                protected override void PopIn() => this.FadeIn();
+
+                protected override void PopOut() => this.FadeOut();
+
+                protected override TextBox CreateTextBox() => new DropdownSearchTextBox
+                {
+                    FontSize = OsuFont.Default.Size,
+                };
+
+                private partial class DropdownSearchTextBox : SearchTextBox
+                {
+                    public DropdownSearchTextBox()
+                    {
+                        TextContainer.Margin = new MarginPadding { Top = 4f };
+                    }
+
+                    public override bool OnPressed(KeyBindingPressEvent<GlobalAction> e)
+                    {
+                        if (e.Action == GlobalAction.Back)
+                            // this method is blocking Dropdown from receiving the back action, despite this text box residing in a separate input manager.
+                            // to fix this properly, a local global action container needs to be added as well, but for simplicity, just don't handle the back action here.
+                            return false;
+
+                        return base.OnPressed(e);
+                    }
+                }
             }
         }
     }
