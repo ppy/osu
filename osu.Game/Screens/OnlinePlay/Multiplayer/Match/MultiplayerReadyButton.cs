@@ -149,10 +149,6 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Match
             {
                 switch (localUser?.State)
                 {
-                    default:
-                        Text = "Ready";
-                        break;
-
                     case MultiplayerUserState.Spectating:
                     case MultiplayerUserState.Ready:
                         Text = multiplayerClient.IsHost
@@ -160,9 +156,12 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Match
                             : $"Waiting for host... {countText}";
                         break;
 
-                    // Show the abort button for the host as long as gameplay is in progress.
-                    case MultiplayerUserState when multiplayerClient.IsHost && room.State != MultiplayerRoomState.Open:
-                        Text = "Abort the match";
+                    default:
+                        // Show the abort button for the host as long as gameplay is in progress.
+                        if (multiplayerClient.IsHost && room.State != MultiplayerRoomState.Open)
+                            Text = "Abort the match";
+                        else
+                            Text = "Ready";
                         break;
                 }
             }
@@ -197,7 +196,11 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Match
             switch (localUser?.State)
             {
                 default:
-                    setGreen();
+                    // Show the abort button for the host as long as gameplay is in progress.
+                    if (multiplayerClient.IsHost && room.State != MultiplayerRoomState.Open)
+                        setRed();
+                    else
+                        setGreen();
                     break;
 
                 case MultiplayerUserState.Spectating:
@@ -207,11 +210,6 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Match
                     else
                         setYellow();
 
-                    break;
-
-                // Show the abort button for the host as long as gameplay is in progress.
-                case MultiplayerUserState when multiplayerClient.IsHost && room.State != MultiplayerRoomState.Open:
-                    setRed();
                     break;
             }
 
