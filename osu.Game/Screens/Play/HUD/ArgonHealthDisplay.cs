@@ -174,6 +174,7 @@ namespace osu.Game.Screens.Play.HUD
         private void onNewJudgement(JudgementResult result) => pendingJudgementResult = result;
 
         private void onCurrentChanged(ValueChangedEvent<double> valueChangedEvent)
+            // schedule display updates one frame later to ensure we know the judgement result causing this change (if there is one).
             => Scheduler.AddOnce(updateDisplay);
 
         private void updateDisplay()
