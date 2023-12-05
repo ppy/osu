@@ -82,7 +82,7 @@ namespace osu.Game.Rulesets.Catch.Objects
                 // generate tiny droplets since the last point
                 if (lastEvent != null)
                 {
-                    double sinceLastTick = e.Time - lastEvent.Value.Time;
+                    double sinceLastTick = (int)e.Time - (int)lastEvent.Value.Time;
 
                     if (sinceLastTick > 80)
                     {
