@@ -87,14 +87,6 @@ namespace osu.Game.Tests.Visual.Gameplay
             }, 3);
         }
 
-        private void applyPerfectHit()
-        {
-            healthProcessor.ApplyResult(new JudgementResult(new HitCircle(), new OsuJudgement())
-            {
-                Type = HitResult.Perfect
-            });
-        }
-
         [Test]
         public void TestLateMissAfterConsequentMisses()
         {
@@ -158,6 +150,14 @@ namespace osu.Game.Tests.Visual.Gameplay
         private void applyMiss()
         {
             healthProcessor.ApplyResult(new JudgementResult(new HitObject(), new Judgement()) { Type = HitResult.Miss });
+        }
+
+        private void applyPerfectHit()
+        {
+            healthProcessor.ApplyResult(new JudgementResult(new HitCircle(), new OsuJudgement())
+            {
+                Type = HitResult.Perfect
+            });
         }
     }
 }
