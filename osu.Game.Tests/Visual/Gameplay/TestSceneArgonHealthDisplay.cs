@@ -134,6 +134,7 @@ namespace osu.Game.Tests.Visual.Gameplay
         {
             AddUntilStep("wait for health", () => healthDisplay.Current.Value == 1);
             AddStep("set half health", () => healthProcessor.Health.Value = 0.5f);
+
             AddStep("apply miss and hit", () =>
             {
                 applyMiss();
@@ -141,7 +142,9 @@ namespace osu.Game.Tests.Visual.Gameplay
                 applyPerfectHit();
                 applyPerfectHit();
             });
+
             AddWaitStep("wait", 3);
+
             AddStep("apply miss and cancel with hit", () =>
             {
                 applyMiss();
