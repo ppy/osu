@@ -17,6 +17,7 @@ using osu.Framework.Threading;
 using osu.Game.Online.Multiplayer;
 using osu.Game.Online.Multiplayer.Countdown;
 using osu.Game.Overlays;
+using osu.Game.Overlays.Dialog;
 using osuTK;
 
 namespace osu.Game.Screens.OnlinePlay.Multiplayer.Match
@@ -246,6 +247,17 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Match
 
                 countReady = newCountReady;
             });
+        }
+
+        public partial class ConfirmAbortDialog : DangerousActionDialog
+        {
+            public ConfirmAbortDialog(Action abortMatch, Action cancel)
+            {
+                HeaderText = "Are you sure you want to abort the match?";
+
+                DangerousAction = abortMatch;
+                CancelAction = cancel;
+            }
         }
     }
 }
