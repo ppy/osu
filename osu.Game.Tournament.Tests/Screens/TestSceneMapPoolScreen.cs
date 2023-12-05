@@ -10,6 +10,7 @@ using osu.Game.Tournament.Components;
 using osu.Game.Tournament.Models;
 using osu.Game.Tournament.Screens.MapPool;
 using osuTK;
+using osuTK.Input;
 
 namespace osu.Game.Tournament.Tests.Screens
 {
@@ -318,7 +319,7 @@ namespace osu.Game.Tournament.Tests.Screens
         private void clickBeatmapPanel(int index)
         {
             InputManager.MoveMouseTo(screen.ChildrenOfType<TournamentBeatmapPanel>().ElementAt(index));
-            InputManager.Click(osuTK.Input.MouseButton.Left);
+            InputManager.Click(MouseButton.Left);
         }
 
         private partial class TestMapPoolScreen : MapPoolScreen
