@@ -29,6 +29,7 @@ namespace osu.Game.Rulesets.Catch.Tests
         [TestCase("basic-hyperdash")]
         [TestCase("pixel-jump")]
         [TestCase("tiny-ticks")]
+        [TestCase("v8-tick-distance")]
         public new void Test(string name, params Type[] mods) => base.Test(name, mods);
 
         protected override IEnumerable<ConvertValue> CreateConvertValue(HitObject hitObject)
