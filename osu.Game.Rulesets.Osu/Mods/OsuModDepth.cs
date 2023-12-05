@@ -103,13 +103,7 @@ namespace osu.Game.Rulesets.Osu.Mods
 
             float z;
 
-            if (time < hitObject.StartTime - decelerationTime)
-            {
-                double appearTime = hitObject.StartTime - hitObject.TimePreempt;
-                float fullDistance = decelerationDistance + (float)(baseSpeed * (hitObject.TimePreempt - decelerationTime));
-                z = fullDistance - (float)((Math.Max(time, appearTime) - appearTime) * baseSpeed);
-            }
-            else if (time < hitObject.StartTime)
+            if (time < hitObject.StartTime)
             {
                 double timeOffset = time - (hitObject.StartTime - decelerationTime);
                 double deceleration = (slowSpeed - baseSpeed) / decelerationTime;
