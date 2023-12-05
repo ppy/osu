@@ -86,16 +86,20 @@ namespace osu.Game.Screens.Select.Carousel
 
             items.ForEach(c => c.Filter(criteria));
 
-            criteriaComparer = Comparer<CarouselItem>.Create((x, y) =>
+            // Sorting is expensive, so only perform if it's actually changed.
+            if (lastCriteria?.Sort != criteria.Sort)
             {
-                int comparison = x.CompareTo(criteria, y);
-                if (comparison != 0)
-                    return comparison;
+                criteriaComparer = Comparer<CarouselItem>.Create((x, y) =>
+                {
+                    int comparison = x.CompareTo(criteria, y);
+                    if (comparison != 0)
+                        return comparison;
 
-                return x.ItemID.CompareTo(y.ItemID);
-            });
+                    return x.ItemID.CompareTo(y.ItemID);
+                });
 
-            items.Sort(criteriaComparer);
+                items.Sort(criteriaComparer);
+            }
 
             lastCriteria = criteria;
         }
