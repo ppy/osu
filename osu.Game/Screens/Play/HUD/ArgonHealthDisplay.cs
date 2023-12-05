@@ -151,7 +151,7 @@ namespace osu.Game.Screens.Play.HUD
             };
         }
 
-        private JudgementResult? pendingJudgementResult;
+        private bool pendingMissAnimation;
 
         protected override void LoadComplete()
         {
@@ -171,7 +171,7 @@ namespace osu.Game.Screens.Play.HUD
             BarHeight.BindValueChanged(_ => updatePath(), true);
         }
 
-        private void onNewJudgement(JudgementResult result) => pendingJudgementResult = result;
+        private void onNewJudgement(JudgementResult result) => pendingMissAnimation |= !result.IsHit;
 
         private void onCurrentChanged(ValueChangedEvent<double> valueChangedEvent)
             // schedule display updates one frame later to ensure we know the judgement result causing this change (if there is one).
@@ -179,22 +179,23 @@ namespace osu.Game.Screens.Play.HUD
 
         private void updateDisplay()
         {
-            var result = pendingJudgementResult;
+            double newHealth = Current.Value;
 
-            if (Current.Value >= GlowBarValue)
+            if (newHealth >= GlowBarValue)
                 finishMissDisplay();
 
-            double time = Current.Value > GlowBarValue ? 500 : 250;
+            double time = newHealth > GlowBarValue ? 500 : 250;
 
             // TODO: this should probably use interpolation in update.
-            this.TransformTo(nameof(HealthBarValue), Current.Value, time, Easing.OutQuint);
+            this.TransformTo(nameof(HealthBarValue), newHealth, time, Easing.OutQuint);
 
-            if (result != null && !result.IsHit)
+            if (pendingMissAnimation && newHealth < GlowBarValue)
                 triggerMissDisplay();
-            else if (!displayingMiss)
-                this.TransformTo(nameof(GlowBarValue), Current.Value, time, Easing.OutQuint);
 
-            pendingJudgementResult = null;
+            pendingMissAnimation = false;
+
+            if (!displayingMiss)
+                this.TransformTo(nameof(GlowBarValue), newHealth, time, Easing.OutQuint);
         }
 
         protected override void Update()
