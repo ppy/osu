@@ -392,6 +392,28 @@ namespace osu.Game.Rulesets.Scoring
             if (maxResult.IsBasic() && minResult != HitResult.Miss)
                 throw new ArgumentOutOfRangeException(nameof(minResult), $"{HitResult.Miss} is the only valid minimum result for a {maxResult} judgement.");
         }
+
+        /// <summary>
+        /// Returns the most applicable type for results that share a common visual representation.
+        /// </summary>
+        /// <param name="result">The result.</param>
+        /// <returns>The most applicable type for visual representations.</returns>
+        public static HitResult GetDisplayableType(this HitResult result)
+        {
+            switch (result)
+            {
+                case HitResult.LegacyGreatNoCombo:
+                    return HitResult.Great;
+
+                case HitResult.LegacyOkNoCombo:
+                    return HitResult.Ok;
+
+                case HitResult.LegacyMehNoCombo:
+                    return HitResult.Meh;
+            }
+
+            return result;
+        }
     }
 #pragma warning restore CS0618
 }

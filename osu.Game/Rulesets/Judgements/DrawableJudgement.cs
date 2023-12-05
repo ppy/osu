@@ -158,22 +158,7 @@ namespace osu.Game.Rulesets.Judgements
 
         private void prepareDrawables()
         {
-            var type = Result?.Type ?? HitResult.Perfect; //TODO: better default type from ruleset
-
-            switch (type)
-            {
-                case HitResult.LegacyGreatNoCombo:
-                    type = HitResult.Great;
-                    break;
-
-                case HitResult.LegacyOkNoCombo:
-                    type = HitResult.Ok;
-                    break;
-
-                case HitResult.LegacyMehNoCombo:
-                    type = HitResult.Meh;
-                    break;
-            }
+            var type = (Result?.Type ?? HitResult.Perfect).GetDisplayableType(); //TODO: better default type from ruleset
 
             // todo: this should be removed once judgements are always pooled.
             if (type == currentDrawableType)
