@@ -33,7 +33,7 @@ namespace osu.Desktop
         [Resolved]
         private IAPIProvider api { get; set; } = null!;
 
-        private readonly IBindable<UserStatus> status = new Bindable<UserStatus>();
+        private readonly IBindable<UserStatus?> status = new Bindable<UserStatus?>();
         private readonly IBindable<UserActivity> activity = new Bindable<UserActivity>();
 
         private readonly Bindable<DiscordRichPresenceMode> privacyMode = new Bindable<DiscordRichPresenceMode>();
@@ -86,13 +86,13 @@ namespace osu.Desktop
             if (!client.IsInitialized)
                 return;
 
-            if (status.Value is UserStatusOffline || privacyMode.Value == DiscordRichPresenceMode.Off)
+            if (status.Value == UserStatus.Offline || privacyMode.Value == DiscordRichPresenceMode.Off)
             {
                 client.ClearPresence();
                 return;
             }
 
-            if (status.Value is UserStatusOnline && activity.Value != null)
+            if (status.Value == UserStatus.Online && activity.Value != null)
             {
                 bool hideIdentifiableInformation = privacyMode.Value == DiscordRichPresenceMode.Limited;
                 presence.State = truncate(activity.Value.GetStatus(hideIdentifiableInformation));
