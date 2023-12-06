@@ -24,14 +24,24 @@ namespace osu.Game.Tournament.Tests.Screens
             Add(screen = new TestMapPoolScreen { Width = 0.7f });
         }
 
-        [SetUp]
-        public void SetUp() => Schedule(() =>
+        [SetUpSteps]
+        public override void SetUpSteps()
+        {
+            AddStep("reset state", resetState);
+        }
+
+        private void resetState()
         {
             Ladder.SplitMapPoolByMods.Value = true;
 
             Ladder.CurrentMatch.Value = new TournamentMatch();
             Ladder.CurrentMatch.Value = Ladder.Matches.First();
             Ladder.CurrentMatch.Value.PicksBans.Clear();
+        }
+
+        [SetUp]
+        public void SetUp() => Schedule(() =>
+        {
         });
 
         [Test]
@@ -48,7 +58,6 @@ namespace osu.Game.Tournament.Tests.Screens
             AddStep("reset match", () =>
             {
                 Ladder.CurrentMatch.Value = new TournamentMatch();
-                Ladder.CurrentMatch.Value = Ladder.Matches.First();
             });
 
             assertTwoWide();
@@ -65,11 +74,7 @@ namespace osu.Game.Tournament.Tests.Screens
                     addBeatmap();
             });
 
-            AddStep("reset match", () =>
-            {
-                Ladder.CurrentMatch.Value = new TournamentMatch();
-                Ladder.CurrentMatch.Value = Ladder.Matches.First();
-            });
+            AddStep("reset state", resetState);
 
             assertTwoWide();
         }
@@ -85,11 +90,7 @@ namespace osu.Game.Tournament.Tests.Screens
                     addBeatmap();
             });
 
-            AddStep("reset match", () =>
-            {
-                Ladder.CurrentMatch.Value = new TournamentMatch();
-                Ladder.CurrentMatch.Value = Ladder.Matches.First();
-            });
+            AddStep("reset state", resetState);
 
             assertThreeWide();
         }
@@ -105,11 +106,7 @@ namespace osu.Game.Tournament.Tests.Screens
                     addBeatmap(i > 4 ? Ruleset.Value.CreateInstance().AllMods.ElementAt(i).Acronym : "NM");
             });
 
-            AddStep("reset match", () =>
-            {
-                Ladder.CurrentMatch.Value = new TournamentMatch();
-                Ladder.CurrentMatch.Value = Ladder.Matches.First();
-            });
+            AddStep("reset state", resetState);
 
             assertTwoWide();
         }
@@ -131,11 +128,7 @@ namespace osu.Game.Tournament.Tests.Screens
                     addBeatmap(i > 4 ? Ruleset.Value.CreateInstance().AllMods.ElementAt(i).Acronym : "NM");
             });
 
-            AddStep("reset match", () =>
-            {
-                Ladder.CurrentMatch.Value = new TournamentMatch();
-                Ladder.CurrentMatch.Value = Ladder.Matches.First();
-            });
+            AddStep("reset state", resetState);
 
             assertThreeWide();
         }
@@ -153,11 +146,7 @@ namespace osu.Game.Tournament.Tests.Screens
 
             AddStep("disable splitting map pool by mods", () => Ladder.SplitMapPoolByMods.Value = false);
 
-            AddStep("reset match", () =>
-            {
-                Ladder.CurrentMatch.Value = new TournamentMatch();
-                Ladder.CurrentMatch.Value = Ladder.Matches.First();
-            });
+            AddStep("reset state", resetState);
         }
 
         [Test]
