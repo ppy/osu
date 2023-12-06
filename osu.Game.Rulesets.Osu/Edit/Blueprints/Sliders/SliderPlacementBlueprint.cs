@@ -3,6 +3,7 @@
 
 #nullable disable
 
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
@@ -335,13 +336,83 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders
                 if (segment.Count == 0)
                     continue;
 
-                HitObject.Path.ControlPoints.Add(new PathControlPoint(segment[0], PathType.BSpline(4)));
-                for (int j = 1; j < segment.Count - 1; j++)
-                    HitObject.Path.ControlPoints.Add(new PathControlPoint(segment[j]));
+                // Replace this segment with a circular arc if it is a reasonable substitute.
+                var circleArcSegment = tryCircleArc(segment);
+
+                if (circleArcSegment is not null)
+                {
+                    HitObject.Path.ControlPoints.Add(new PathControlPoint(circleArcSegment[0], PathType.PERFECT_CURVE));
+                    HitObject.Path.ControlPoints.Add(new PathControlPoint(circleArcSegment[1]));
+                }
+                else
+                {
+                    HitObject.Path.ControlPoints.Add(new PathControlPoint(segment[0], PathType.BSpline(4)));
+                    for (int j = 1; j < segment.Count - 1; j++)
+                        HitObject.Path.ControlPoints.Add(new PathControlPoint(segment[j]));
+                }
 
                 if (isLastSegment)
                     HitObject.Path.ControlPoints.Add(new PathControlPoint(segment[^1]));
             }
+        }
+
+        private Vector2[] tryCircleArc(List<Vector2> segment)
+        {
+            if (segment.Count < 3) return null;
+
+            // Assume the segment creates a reasonable circular arc and then check if it reasonable
+            var points = PathApproximator.BSplineToPiecewiseLinear(segment.ToArray(), bSplineBuilder.Degree);
+            var circleArcControlPoints = new[] { points[0], points[points.Count / 2], points[^1] };
+            var circleArc = new CircularArcProperties(circleArcControlPoints);
+
+            if (!circleArc.IsValid) return null;
+
+            double length = circleArc.ThetaRange * circleArc.Radius;
+
+            if (length > 1000) return null;
+
+            double loss = 0;
+            Vector2? lastPoint = null;
+            Vector2? lastVec = null;
+            int? lastDir = null;
+            double totalWinding = 0;
+
+            // Loop through the points and check if they are not too far away from the circular arc.
+            // Also make sure it curves monotonically in one direction and at most one loop is done.
+            foreach (var point in points)
+            {
+                loss += Math.Pow((Vector2.Distance(point, circleArc.Centre) - circleArc.Radius) / length, 2);
+
+                if (lastPoint.HasValue)
+                {
+                    var vec = point - lastPoint.Value;
+
+                    if (lastVec.HasValue)
+                    {
+                        double dot = Vector2.Dot(vec, lastVec.Value);
+                        double det = lastVec.Value.X * vec.Y - lastVec.Value.Y * vec.X;
+                        double angle = Math.Atan2(det, dot);
+                        int dir = Math.Sign(angle);
+
+                        if (dir == 0)
+                            continue;
+
+                        if (lastDir.HasValue && dir != lastDir)
+                            return null; // Curvature changed, like in an S-shape
+
+                        totalWinding += Math.Abs(angle);
+                        lastDir = dir;
+                    }
+
+                    lastVec = vec;
+                }
+
+                lastPoint = point;
+            }
+
+            loss /= points.Count;
+
+            return loss > 0.002 || totalWinding > MathHelper.TwoPi ? null : circleArcControlPoints;
         }
 
         private enum SliderPlacementState
