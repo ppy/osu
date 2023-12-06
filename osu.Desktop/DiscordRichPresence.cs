@@ -9,7 +9,6 @@ using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Logging;
-using osu.Game.Beatmaps;
 using osu.Game.Configuration;
 using osu.Game.Extensions;
 using osu.Game.Online.API;
@@ -95,17 +94,18 @@ namespace osu.Desktop
 
             if (status.Value is UserStatusOnline && activity.Value != null)
             {
-                presence.State = truncate(activity.Value.GetStatus(privacyMode.Value == DiscordRichPresenceMode.Limited));
-                presence.Details = truncate(getDetails(activity.Value));
+                bool hideIdentifiableInformation = privacyMode.Value == DiscordRichPresenceMode.Limited;
+                presence.State = truncate(activity.Value.GetStatus(hideIdentifiableInformation));
+                presence.Details = truncate(activity.Value.GetDetails(hideIdentifiableInformation) ?? string.Empty);
 
-                if (getBeatmap(activity.Value) is IBeatmapInfo beatmap && beatmap.OnlineID > 0)
+                if (getBeatmapID(activity.Value) is int beatmapId && beatmapId > 0)
                 {
                     presence.Buttons = new[]
                     {
                         new Button
                         {
                             Label = "View beatmap",
-                            Url = $@"{api.WebsiteRootUrl}/beatmapsets/{beatmap.BeatmapSet?.OnlineID}#{ruleset.Value.ShortName}/{beatmap.OnlineID}"
+                            Url = $@"{api.WebsiteRootUrl}/beatmaps/{beatmapId}?mode={ruleset.Value.ShortName}"
                         }
                     };
                 }
@@ -159,38 +159,18 @@ namespace osu.Desktop
             });
         }
 
-        private IBeatmapInfo? getBeatmap(UserActivity activity)
+        private int? getBeatmapID(UserActivity activity)
         {
             switch (activity)
             {
                 case UserActivity.InGame game:
-                    return game.BeatmapInfo;
+                    return game.BeatmapID;
 
                 case UserActivity.EditingBeatmap edit:
-                    return edit.BeatmapInfo;
+                    return edit.BeatmapID;
             }
 
             return null;
-        }
-
-        private string getDetails(UserActivity activity)
-        {
-            switch (activity)
-            {
-                case UserActivity.InGame game:
-                    return game.BeatmapInfo.ToString() ?? string.Empty;
-
-                case UserActivity.EditingBeatmap edit:
-                    return edit.BeatmapInfo.ToString() ?? string.Empty;
-
-                case UserActivity.WatchingReplay watching:
-                    return watching.BeatmapInfo?.ToString() ?? string.Empty;
-
-                case UserActivity.InLobby lobby:
-                    return privacyMode.Value == DiscordRichPresenceMode.Limited ? string.Empty : lobby.Room.Name.Value;
-            }
-
-            return string.Empty;
         }
 
         protected override void Dispose(bool isDisposing)
