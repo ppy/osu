@@ -198,7 +198,7 @@ namespace osu.Game.Tests.Visual.Gameplay
         {
             var beatmap = createBeatmap();
             beatmap.ControlPointInfo.Add(0, new TimingControlPoint { BeatLength = time_range });
-            beatmap.Difficulty.SliderMultiplier = 2;
+            beatmap.BeatmapInfo.Difficulty.SliderMultiplier = 2;
 
             createTest(beatmap);
             AddStep("adjust time range", () => drawableRuleset.TimeRange.Value = 2000);
@@ -237,7 +237,7 @@ namespace osu.Game.Tests.Visual.Gameplay
         });
 
         private void assertPosition(int index, float relativeY) => AddAssert($"hitobject {index} at {relativeY}",
-            () => Precision.AlmostEquals(getDrawableHitObject(index)?.DrawPosition.Y ?? -1, yScale * relativeY));
+            () => getDrawableHitObject(index)?.DrawPosition.Y / yScale ?? -1, () => Is.EqualTo(relativeY).Within(Precision.FLOAT_EPSILON));
 
         private void setTime(double time)
         {
