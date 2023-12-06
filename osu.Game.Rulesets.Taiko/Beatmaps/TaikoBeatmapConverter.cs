@@ -109,9 +109,9 @@ namespace osu.Game.Rulesets.Taiko.Beatmaps
 
             switch (obj)
             {
-                case IHasDistance distanceData:
+                case IHasPath pathData:
                 {
-                    if (shouldConvertSliderToHits(obj, beatmap, distanceData, out int taikoDuration, out double tickSpacing))
+                    if (shouldConvertSliderToHits(obj, beatmap, pathData, out int taikoDuration, out double tickSpacing))
                     {
                         IList<IList<HitSampleInfo>> allSamples = obj is IHasPathWithRepeats curveData ? curveData.NodeSamples : new List<IList<HitSampleInfo>>(new[] { samples });
 
@@ -174,7 +174,7 @@ namespace osu.Game.Rulesets.Taiko.Beatmaps
             }
         }
 
-        private bool shouldConvertSliderToHits(HitObject obj, IBeatmap beatmap, IHasDistance distanceData, out int taikoDuration, out double tickSpacing)
+        private bool shouldConvertSliderToHits(HitObject obj, IBeatmap beatmap, IHasPath pathData, out int taikoDuration, out double tickSpacing)
         {
             // DO NOT CHANGE OR REFACTOR ANYTHING IN HERE WITHOUT TESTING AGAINST _ALL_ BEATMAPS.
             // Some of these calculations look redundant, but they are not - extremely small floating point errors are introduced to maintain 1:1 compatibility with stable.
@@ -182,7 +182,11 @@ namespace osu.Game.Rulesets.Taiko.Beatmaps
 
             // The true distance, accounting for any repeats. This ends up being the drum roll distance later
             int spans = (obj as IHasRepeats)?.SpanCount() ?? 1;
-            double distance = distanceData.Distance * spans * LegacyBeatmapEncoder.LEGACY_TAIKO_VELOCITY_MULTIPLIER;
+            double distance = pathData.Path.ExpectedDistance.Value ?? 0;
+
+            // Do not combine the following two lines!
+            distance *= LegacyBeatmapEncoder.LEGACY_TAIKO_VELOCITY_MULTIPLIER;
+            distance *= spans;
 
             TimingControlPoint timingPoint = beatmap.ControlPointInfo.TimingPointAt(obj.StartTime);
 

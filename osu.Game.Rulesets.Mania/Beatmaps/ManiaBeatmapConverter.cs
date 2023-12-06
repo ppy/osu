@@ -174,9 +174,9 @@ namespace osu.Game.Rulesets.Mania.Beatmaps
 
             switch (original)
             {
-                case IHasDistance:
+                case IHasPath:
                 {
-                    var generator = new DistanceObjectPatternGenerator(Random, original, beatmap, lastPattern, originalBeatmap);
+                    var generator = new PathObjectPatternGenerator(Random, original, beatmap, lastPattern, originalBeatmap);
                     conversion = generator;
 
                     var positionData = original as IHasPosition;
