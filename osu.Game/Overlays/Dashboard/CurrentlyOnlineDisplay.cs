@@ -6,7 +6,6 @@
 using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.Diagnostics;
-using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Extensions;
@@ -20,6 +19,7 @@ using osu.Game.Database;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Online.API;
 using osu.Game.Online.API.Requests.Responses;
+using osu.Game.Online.Metadata;
 using osu.Game.Online.Spectator;
 using osu.Game.Resources.Localisation.Web;
 using osu.Game.Screens;
@@ -30,18 +30,26 @@ using osuTK;
 
 namespace osu.Game.Overlays.Dashboard
 {
-    internal partial class CurrentlyPlayingDisplay : CompositeDrawable
+    internal partial class CurrentlyOnlineDisplay : CompositeDrawable
     {
         private const float search_textbox_height = 40;
         private const float padding = 10;
 
         private readonly IBindableList<int> playingUsers = new BindableList<int>();
+        private readonly IBindableDictionary<int, UserPresence> onlineUsers = new BindableDictionary<int, UserPresence>();
+        private readonly Dictionary<int, OnlineUserPanel> userPanels = new Dictionary<int, OnlineUserPanel>();
 
-        private SearchContainer<PlayingUserPanel> userFlow;
+        private SearchContainer<OnlineUserPanel> userFlow;
         private BasicSearchTextBox searchTextBox;
 
         [Resolved]
+        private IAPIProvider api { get; set; }
+
+        [Resolved]
         private SpectatorClient spectatorClient { get; set; }
+
+        [Resolved]
+        private MetadataClient metadataClient { get; set; }
 
         [BackgroundDependencyLoader]
         private void load(OverlayColourProvider colourProvider)
@@ -72,7 +80,7 @@ namespace osu.Game.Overlays.Dashboard
                         PlaceholderText = HomeStrings.SearchPlaceholder,
                     },
                 },
-                userFlow = new SearchContainer<PlayingUserPanel>
+                userFlow = new SearchContainer<OnlineUserPanel>
                 {
                     RelativeSizeAxes = Axes.X,
                     AutoSizeAxes = Axes.Y,
@@ -97,6 +105,9 @@ namespace osu.Game.Overlays.Dashboard
         {
             base.LoadComplete();
 
+            onlineUsers.BindTo(metadataClient.UserStates);
+            onlineUsers.BindCollectionChanged(onUserUpdated, true);
+
             playingUsers.BindTo(spectatorClient.PlayingUsers);
             playingUsers.BindCollectionChanged(onPlayingUsersChanged, true);
         }
@@ -108,15 +119,20 @@ namespace osu.Game.Overlays.Dashboard
             searchTextBox.TakeFocus();
         }
 
-        private void onPlayingUsersChanged(object sender, NotifyCollectionChangedEventArgs e) => Schedule(() =>
+        private void onUserUpdated(object sender, NotifyDictionaryChangedEventArgs<int, UserPresence> e) => Schedule(() =>
         {
             switch (e.Action)
             {
-                case NotifyCollectionChangedAction.Add:
+                case NotifyDictionaryChangedAction.Add:
                     Debug.Assert(e.NewItems != null);
 
-                    foreach (int userId in e.NewItems)
+                    foreach (var kvp in e.NewItems)
                     {
+                        int userId = kvp.Key;
+
+                        if (userId == api.LocalUser.Value.Id)
+                            continue;
+
                         users.GetUserAsync(userId).ContinueWith(task =>
                         {
                             APIUser user = task.GetResultSafely();
@@ -126,16 +142,60 @@ namespace osu.Game.Overlays.Dashboard
 
                             Schedule(() =>
                             {
-                                // user may no longer be playing.
-                                if (!playingUsers.Contains(user.Id))
-                                    return;
+                                // explicitly refetch the user's status.
+                                // things may have changed in between the time of scheduling and the time of actual execution.
+                                if (onlineUsers.TryGetValue(userId, out var updatedStatus))
+                                {
+                                    user.Activity.Value = updatedStatus.Activity;
+                                    user.Status.Value = updatedStatus.Status;
+                                }
 
-                                // TODO: remove this once online state is being updated more correctly.
-                                user.IsOnline = true;
-
-                                userFlow.Add(createUserPanel(user));
+                                userFlow.Add(userPanels[userId] = createUserPanel(user));
                             });
                         });
+                    }
+
+                    break;
+
+                case NotifyDictionaryChangedAction.Replace:
+                    Debug.Assert(e.NewItems != null);
+
+                    foreach (var kvp in e.NewItems)
+                    {
+                        if (userPanels.TryGetValue(kvp.Key, out var panel))
+                        {
+                            panel.User.Activity.Value = kvp.Value.Activity;
+                            panel.User.Status.Value = kvp.Value.Status;
+                        }
+                    }
+
+                    break;
+
+                case NotifyDictionaryChangedAction.Remove:
+                    Debug.Assert(e.OldItems != null);
+
+                    foreach (var kvp in e.OldItems)
+                    {
+                        int userId = kvp.Key;
+                        if (userPanels.Remove(userId, out var userPanel))
+                            userPanel.Expire();
+                    }
+
+                    break;
+            }
+        });
+
+        private void onPlayingUsersChanged(object sender, NotifyCollectionChangedEventArgs e)
+        {
+            switch (e.Action)
+            {
+                case NotifyCollectionChangedAction.Add:
+                    Debug.Assert(e.NewItems != null);
+
+                    foreach (int userId in e.NewItems)
+                    {
+                        if (userPanels.TryGetValue(userId, out var panel))
+                            panel.CanSpectate.Value = userId != api.LocalUser.Value.Id;
                     }
 
                     break;
@@ -144,21 +204,27 @@ namespace osu.Game.Overlays.Dashboard
                     Debug.Assert(e.OldItems != null);
 
                     foreach (int userId in e.OldItems)
-                        userFlow.FirstOrDefault(card => card.User.Id == userId)?.Expire();
+                    {
+                        if (userPanels.TryGetValue(userId, out var panel))
+                            panel.CanSpectate.Value = false;
+                    }
+
                     break;
             }
-        });
+        }
 
-        private PlayingUserPanel createUserPanel(APIUser user) =>
-            new PlayingUserPanel(user).With(panel =>
+        private OnlineUserPanel createUserPanel(APIUser user) =>
+            new OnlineUserPanel(user).With(panel =>
             {
                 panel.Anchor = Anchor.TopCentre;
                 panel.Origin = Anchor.TopCentre;
             });
 
-        public partial class PlayingUserPanel : CompositeDrawable, IFilterable
+        public partial class OnlineUserPanel : CompositeDrawable, IFilterable
         {
             public readonly APIUser User;
+
+            public BindableBool CanSpectate { get; } = new BindableBool();
 
             public IEnumerable<LocalisableString> FilterTerms { get; }
 
@@ -178,7 +244,7 @@ namespace osu.Game.Overlays.Dashboard
                 }
             }
 
-            public PlayingUserPanel(APIUser user)
+            public OnlineUserPanel(APIUser user)
             {
                 User = user;
 
@@ -188,7 +254,7 @@ namespace osu.Game.Overlays.Dashboard
             }
 
             [BackgroundDependencyLoader]
-            private void load(IAPIProvider api)
+            private void load()
             {
                 InternalChildren = new Drawable[]
                 {
@@ -205,6 +271,9 @@ namespace osu.Game.Overlays.Dashboard
                                 RelativeSizeAxes = Axes.X,
                                 Anchor = Anchor.TopCentre,
                                 Origin = Anchor.TopCentre,
+                                // this is SHOCKING
+                                Activity = { BindTarget = User.Activity },
+                                Status = { BindTarget = User.Status },
                             },
                             new PurpleRoundedButton
                             {
@@ -213,7 +282,7 @@ namespace osu.Game.Overlays.Dashboard
                                 Anchor = Anchor.TopCentre,
                                 Origin = Anchor.TopCentre,
                                 Action = () => performer?.PerformFromScreen(s => s.Push(new SoloSpectatorScreen(User))),
-                                Enabled = { Value = User.Id != api.LocalUser.Value.Id }
+                                Enabled = { BindTarget = CanSpectate }
                             }
                         }
                     },
