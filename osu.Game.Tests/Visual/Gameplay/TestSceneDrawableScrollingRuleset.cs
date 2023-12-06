@@ -251,7 +251,17 @@ namespace osu.Game.Tests.Visual.Gameplay
         /// <returns>The <see cref="IBeatmap"/>.</returns>
         private IBeatmap createBeatmap(Func<int, TestHitObject> createAction = null)
         {
-            var beatmap = new Beatmap<TestHitObject> { BeatmapInfo = { Ruleset = new OsuRuleset().RulesetInfo } };
+            var beatmap = new Beatmap<TestHitObject>
+            {
+                BeatmapInfo =
+                {
+                    Difficulty = new BeatmapDifficulty
+                    {
+                        SliderMultiplier = 1
+                    },
+                    Ruleset = new OsuRuleset().RulesetInfo
+                }
+            };
 
             for (int i = 0; i < 10; i++)
             {
