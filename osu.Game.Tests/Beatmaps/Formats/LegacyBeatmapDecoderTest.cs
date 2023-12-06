@@ -15,12 +15,14 @@ using osu.Game.IO;
 using osu.Game.Rulesets;
 using osu.Game.Rulesets.Catch;
 using osu.Game.Rulesets.Catch.Beatmaps;
+using osu.Game.Rulesets.Mania;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Objects.Legacy;
 using osu.Game.Rulesets.Objects.Types;
 using osu.Game.Rulesets.Osu;
 using osu.Game.Rulesets.Osu.Beatmaps;
+using osu.Game.Rulesets.Taiko;
 using osu.Game.Skinning;
 using osu.Game.Tests.Resources;
 using osuTK;
@@ -1154,6 +1156,36 @@ namespace osu.Game.Tests.Beatmaps.Formats
                 Assert.That(((IHasComboInformation)playable.HitObjects[14]).ComboIndexWithOffsets, Is.EqualTo(7));
                 Assert.That(((IHasComboInformation)playable.HitObjects[15]).ComboIndexWithOffsets, Is.EqualTo(8));
                 Assert.That(((IHasComboInformation)playable.HitObjects[17]).ComboIndexWithOffsets, Is.EqualTo(9));
+            }
+        }
+
+        [Test]
+        public void TestSliderConversionWithCustomDistance([Values("taiko", "mania")] string rulesetName)
+        {
+            using (var resStream = TestResources.OpenResource("custom-slider-length.osu"))
+            using (var stream = new LineBufferedReader(resStream))
+            {
+                Ruleset ruleset;
+
+                switch (rulesetName)
+                {
+                    case "taiko":
+                        ruleset = new TaikoRuleset();
+                        break;
+
+                    case "mania":
+                        ruleset = new ManiaRuleset();
+                        break;
+
+                    default:
+                        throw new ArgumentOutOfRangeException(nameof(rulesetName), rulesetName, null);
+                }
+
+                var decoder = Decoder.GetDecoder<Beatmap>(stream);
+                var working = new TestWorkingBeatmap(decoder.Decode(stream));
+                IBeatmap beatmap = working.GetPlayableBeatmap(ruleset.RulesetInfo, Array.Empty<Mod>());
+
+                Assert.That(beatmap.HitObjects[0].GetEndTime(), Is.EqualTo(3153));
             }
         }
     }
