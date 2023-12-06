@@ -379,37 +379,56 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders
             double loss = 0;
             Vector2? lastPoint = null;
             Vector2? lastVec = null;
+            Vector2? lastVec2 = null;
             int? lastDir = null;
+            int? lastDir2 = null;
             double totalWinding = 0;
 
             // Loop through the points and check if they are not too far away from the circular arc.
             // Also make sure it curves monotonically in one direction and at most one loop is done.
             foreach (var point in points)
             {
-                loss += Math.Pow((Vector2.Distance(point, circleArc.Centre) - circleArc.Radius) / length, 2);
+                var vec = point - circleArc.Centre;
+                loss += Math.Pow((vec.Length - circleArc.Radius) / length, 2);
+
+                if (lastVec.HasValue)
+                {
+                    double det = lastVec.Value.X * vec.Y - lastVec.Value.Y * vec.X;
+                    int dir = Math.Sign(det);
+
+                    if (dir == 0)
+                        continue;
+
+                    if (lastDir.HasValue && dir != lastDir)
+                        return null; // Circle center is not inside the polygon
+
+                    lastDir = dir;
+                }
+
+                lastVec = vec;
 
                 if (lastPoint.HasValue)
                 {
-                    var vec = point - lastPoint.Value;
+                    var vec2 = point - lastPoint.Value;
 
-                    if (lastVec.HasValue)
+                    if (lastVec2.HasValue)
                     {
-                        double dot = Vector2.Dot(vec, lastVec.Value);
-                        double det = lastVec.Value.X * vec.Y - lastVec.Value.Y * vec.X;
+                        double dot = Vector2.Dot(vec2, lastVec2.Value);
+                        double det = lastVec2.Value.X * vec2.Y - lastVec2.Value.Y * vec2.X;
                         double angle = Math.Atan2(det, dot);
-                        int dir = Math.Sign(angle);
+                        int dir2 = Math.Sign(angle);
 
-                        if (dir == 0)
+                        if (dir2 == 0)
                             continue;
 
-                        if (lastDir.HasValue && dir != lastDir)
+                        if (lastDir2.HasValue && dir2 != lastDir2)
                             return null; // Curvature changed, like in an S-shape
 
                         totalWinding += Math.Abs(angle);
-                        lastDir = dir;
+                        lastDir2 = dir2;
                     }
 
-                    lastVec = vec;
+                    lastVec2 = vec2;
                 }
 
                 lastPoint = point;
