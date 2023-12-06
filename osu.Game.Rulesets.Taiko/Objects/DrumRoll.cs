@@ -51,7 +51,7 @@ namespace osu.Game.Rulesets.Taiko.Objects
             TimingControlPoint timingPoint = controlPointInfo.TimingPointAt(StartTime);
             EffectControlPoint effectPoint = controlPointInfo.EffectPointAt(StartTime);
 
-            double scoringDistance = base_distance * difficulty.SliderMultiplier * effectPoint.ScrollSpeed;
+            double scoringDistance = base_distance * (difficulty.SliderMultiplier * LegacyBeatmapEncoder.LEGACY_TAIKO_VELOCITY_MULTIPLIER) * effectPoint.ScrollSpeed;
             Velocity = scoringDistance / timingPoint.BeatLength;
 
             TickRate = difficulty.SliderTickRate == 3 ? 3 : 4;
