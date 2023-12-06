@@ -8,6 +8,7 @@ using System.Linq;
 using NUnit.Framework;
 using osu.Framework.Extensions;
 using osu.Framework.Utils;
+using osu.Game.Beatmaps;
 using osu.Game.Tests.Visual;
 using SharpCompress.Archives.Zip;
 
@@ -17,10 +18,14 @@ namespace osu.Game.Rulesets.Taiko.Tests.Editor
     {
         protected override Ruleset CreateRuleset() => new TaikoRuleset();
 
-        [Test]
-        public void TestTaikoSliderMultiplierInExport()
+        [TestCase(null)]
+        [TestCase(1f)]
+        [TestCase(2f)]
+        [TestCase(2.4f)]
+        public void TestTaikoSliderMultiplierInExport(float? multiplier)
         {
-            AddStep("Set slider multiplier", () => EditorBeatmap.Difficulty.SliderMultiplier = 2);
+            if (multiplier.HasValue)
+                AddStep("Set slider multiplier", () => EditorBeatmap.Difficulty.SliderMultiplier = multiplier.Value);
 
             SaveEditor();
             AddStep("export beatmap", () => Game.BeatmapManager.Export(EditorBeatmap.BeatmapInfo.BeatmapSet!).WaitSafely());
@@ -48,7 +53,7 @@ namespace osu.Game.Rulesets.Taiko.Tests.Editor
                 }
 
                 return 0;
-            }, () => Is.EqualTo(2));
+            }, () => Is.EqualTo(multiplier ?? new BeatmapDifficulty().SliderMultiplier).Within(Precision.FLOAT_EPSILON));
         }
 
         [Test]
