@@ -151,9 +151,7 @@ namespace osu.Game.Tournament.Screens.MapPool
 
             int totalBansRequired = CurrentMatch.Value.Round.Value.BanCount.Value * 2;
 
-            const TeamColour roll_winner = TeamColour.Red; //todo: draw from match
-
-            var previousColour = CurrentMatch.Value.PicksBans.LastOrDefault()?.Team ?? roll_winner;
+            TeamColour lastPickColour = CurrentMatch.Value.PicksBans.LastOrDefault()?.Team ?? TeamColour.Red;
 
             TeamColour nextColour;
 
@@ -161,22 +159,17 @@ namespace osu.Game.Tournament.Screens.MapPool
 
             if (!hasAllBans)
             {
-                // Ban phase.
-                // Switch teams every second ban.
+                // Ban phase: switch teams every second ban.
                 nextColour = CurrentMatch.Value.PicksBans.Count % 2 == 1
-                    ? getOppositeTeamColour(previousColour)
-                    : previousColour;
-            }
-            else if (pickType == ChoiceType.Ban)
-            {
-                // Switching from bans to picks - stay with the last team that was banning.
-                nextColour = pickColour;
+                    ? getOppositeTeamColour(lastPickColour)
+                    : lastPickColour;
             }
             else
             {
-                // Pick phase.
-                // Switch teams every pick.
-                nextColour = getOppositeTeamColour(previousColour);
+                // Pick phase : switch teams every pick, except for the first pick which generally goes to the team that placed the last ban.
+                nextColour = pickType == ChoiceType.Pick
+                    ? getOppositeTeamColour(lastPickColour)
+                    : lastPickColour;
             }
 
             setMode(nextColour, hasAllBans ? ChoiceType.Pick : ChoiceType.Ban);
