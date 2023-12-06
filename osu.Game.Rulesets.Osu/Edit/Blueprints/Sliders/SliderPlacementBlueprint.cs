@@ -49,7 +49,7 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders
         [Resolved(CanBeNull = true)]
         private FreehandSliderToolboxGroup freehandToolboxGroup { get; set; }
 
-        private readonly IncrementalBSplineBuilder bSplineBuilder = new IncrementalBSplineBuilder();
+        private readonly IncrementalBSplineBuilder bSplineBuilder = new IncrementalBSplineBuilder { Degree = 4 };
 
         protected override bool IsValidForPlacement => HitObject.Path.HasValidLength;
 
@@ -239,7 +239,7 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders
         {
             if (state == SliderPlacementState.Drawing)
             {
-                segmentStart.Type = PathType.BSpline(3);
+                segmentStart.Type = PathType.BSpline(4);
                 return;
             }
 
@@ -335,7 +335,7 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders
                 if (segment.Count == 0)
                     continue;
 
-                HitObject.Path.ControlPoints.Add(new PathControlPoint(segment[0], PathType.BSpline(3)));
+                HitObject.Path.ControlPoints.Add(new PathControlPoint(segment[0], PathType.BSpline(4)));
                 for (int j = 1; j < segment.Count - 1; j++)
                     HitObject.Path.ControlPoints.Add(new PathControlPoint(segment[j]));
 

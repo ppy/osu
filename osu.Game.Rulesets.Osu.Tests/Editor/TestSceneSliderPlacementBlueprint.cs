@@ -312,7 +312,7 @@ namespace osu.Game.Rulesets.Osu.Tests.Editor
             assertPlaced(true);
             assertLength(808, tolerance: 10);
             assertControlPointCount(5);
-            assertControlPointType(0, PathType.BSpline(3));
+            assertControlPointType(0, PathType.BSpline(4));
             assertControlPointType(1, null);
             assertControlPointType(2, null);
             assertControlPointType(3, null);
@@ -337,9 +337,9 @@ namespace osu.Game.Rulesets.Osu.Tests.Editor
             assertPlaced(true);
             assertLength(600, tolerance: 10);
             assertControlPointCount(4);
-            assertControlPointType(0, PathType.BSpline(3));
-            assertControlPointType(1, PathType.BSpline(3));
-            assertControlPointType(2, PathType.BSpline(3));
+            assertControlPointType(0, PathType.BSpline(4));
+            assertControlPointType(1, PathType.BSpline(4));
+            assertControlPointType(2, PathType.BSpline(4));
             assertControlPointType(3, null);
         }
 
