@@ -154,7 +154,7 @@ namespace osu.Game.Tournament.Tests.Screens
         }
 
         [Test]
-        public void TestSingleTeamBan()
+        public void TestPickBanOrder()
         {
             AddStep("set ban count", () => Ladder.CurrentMatch.Value!.Round.Value!.BanCount.Value = 1);
 
