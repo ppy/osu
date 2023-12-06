@@ -31,11 +31,6 @@ namespace osu.Game.Rulesets.Taiko.Beatmaps
         /// </summary>
         private const float osu_base_scoring_distance = 100;
 
-        /// <summary>
-        /// Drum roll distance that results in a duration of 1 speed-adjusted beat length.
-        /// </summary>
-        private const float taiko_base_distance = 100;
-
         private readonly bool isForCurrentRuleset;
 
         public TaikoBeatmapConverter(IBeatmap beatmap, Ruleset ruleset)
