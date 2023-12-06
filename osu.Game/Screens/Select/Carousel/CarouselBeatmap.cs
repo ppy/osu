@@ -41,6 +41,8 @@ namespace osu.Game.Screens.Select.Carousel
                 return match;
             }
 
+            if (!match) return false;
+
             if (criteria.SearchTerms.Length > 0)
             {
                 match = BeatmapInfo.Match(criteria.SearchTerms);
