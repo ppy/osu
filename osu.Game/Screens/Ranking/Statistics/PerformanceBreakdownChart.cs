@@ -50,15 +50,82 @@ namespace osu.Game.Screens.Ranking.Statistics
         [Resolved]
         private BeatmapDifficultyCache difficultyCache { get; set; }
 
-        public PerformanceBreakdownChart(ScoreInfo score, IBeatmap playableBeatmap)
+        private readonly bool showFCPerformance;
+
+        public PerformanceBreakdownChart(ScoreInfo score, IBeatmap playableBeatmap, bool showFCPerformance = true)
         {
             this.score = score;
             this.playableBeatmap = playableBeatmap;
+            this.showFCPerformance = showFCPerformance;
         }
 
         [BackgroundDependencyLoader]
         private void load()
         {
+            var texts = new List<Drawable[]>
+            {
+                new Drawable[]
+                {
+                    new OsuSpriteText
+                    {
+                        Origin = Anchor.CentreLeft,
+                        Anchor = Anchor.CentreLeft,
+                        Font = OsuFont.GetFont(weight: FontWeight.Regular, size: StatisticItem.FONT_SIZE),
+                        Text = "Achieved",
+                        Colour = achieveColour
+                    },
+                    achievedPerformance = new OsuSpriteText
+                    {
+                        Origin = Anchor.CentreRight,
+                        Anchor = Anchor.CentreRight,
+                        Font = OsuFont.GetFont(weight: FontWeight.SemiBold, size: StatisticItem.FONT_SIZE),
+                        Colour = achieveColour
+                    }
+                },
+            };
+
+            if (showFCPerformance)
+            {
+                texts.Add(
+                    new Drawable[]
+                    {
+                        new OsuSpriteText
+                        {
+                            Origin = Anchor.CentreLeft,
+                            Anchor = Anchor.CentreLeft,
+                            Font = OsuFont.GetFont(weight: FontWeight.Regular, size: StatisticItem.FONT_SIZE),
+                            Text = "On Full Combo",
+                            Colour = fcColour
+                        },
+                        fcPerformance = new OsuSpriteText
+                        {
+                            Origin = Anchor.CentreRight,
+                            Anchor = Anchor.CentreRight,
+                            Font = OsuFont.GetFont(weight: FontWeight.SemiBold, size: StatisticItem.FONT_SIZE),
+                            Colour = fcColour
+                        }
+                    });
+            }
+
+            texts.Add(
+                new Drawable[]
+                {
+                    new OsuSpriteText
+                    {
+                        Origin = Anchor.CentreLeft,
+                        Anchor = Anchor.CentreLeft,
+                        Font = OsuFont.GetFont(weight: FontWeight.Regular, size: StatisticItem.FONT_SIZE),
+                        Text = "Maximum",
+                        Colour = OsuColour.Gray(0.7f)
+                    },
+                    maximumPerformance = new OsuSpriteText
+                    {
+                        Origin = Anchor.CentreLeft,
+                        Anchor = Anchor.CentreLeft,
+                        Font = OsuFont.GetFont(weight: FontWeight.Regular, size: StatisticItem.FONT_SIZE),
+                        Colour = OsuColour.Gray(0.7f)
+                    }
+                });
             Children = new[]
             {
                 spinner = new LoadingSpinner(true)
@@ -95,63 +162,7 @@ namespace osu.Game.Screens.Ranking.Statistics
                                 new Dimension(GridSizeMode.AutoSize),
                                 new Dimension(GridSizeMode.AutoSize)
                             },
-                            Content = new[]
-                            {
-                                new Drawable[]
-                                {
-                                    new OsuSpriteText
-                                    {
-                                        Origin = Anchor.CentreLeft,
-                                        Anchor = Anchor.CentreLeft,
-                                        Font = OsuFont.GetFont(weight: FontWeight.Regular, size: StatisticItem.FONT_SIZE),
-                                        Text = "Achieved",
-                                        Colour = achieveColour
-                                    },
-                                    achievedPerformance = new OsuSpriteText
-                                    {
-                                        Origin = Anchor.CentreRight,
-                                        Anchor = Anchor.CentreRight,
-                                        Font = OsuFont.GetFont(weight: FontWeight.SemiBold, size: StatisticItem.FONT_SIZE),
-                                        Colour = achieveColour
-                                    }
-                                },
-                                new Drawable[]
-                                {
-                                    new OsuSpriteText
-                                    {
-                                        Origin = Anchor.CentreLeft,
-                                        Anchor = Anchor.CentreLeft,
-                                        Font = OsuFont.GetFont(weight: FontWeight.Regular, size: StatisticItem.FONT_SIZE),
-                                        Text = "On Full Combo",
-                                        Colour = fcColour
-                                    },
-                                    fcPerformance = new OsuSpriteText
-                                    {
-                                        Origin = Anchor.CentreRight,
-                                        Anchor = Anchor.CentreRight,
-                                        Font = OsuFont.GetFont(weight: FontWeight.SemiBold, size: StatisticItem.FONT_SIZE),
-                                        Colour = fcColour
-                                    }
-                                },
-                                new Drawable[]
-                                {
-                                    new OsuSpriteText
-                                    {
-                                        Origin = Anchor.CentreLeft,
-                                        Anchor = Anchor.CentreLeft,
-                                        Font = OsuFont.GetFont(weight: FontWeight.Regular, size: StatisticItem.FONT_SIZE),
-                                        Text = "Maximum",
-                                        Colour = OsuColour.Gray(0.7f)
-                                    },
-                                    maximumPerformance = new OsuSpriteText
-                                    {
-                                        Origin = Anchor.CentreLeft,
-                                        Anchor = Anchor.CentreLeft,
-                                        Font = OsuFont.GetFont(weight: FontWeight.Regular, size: StatisticItem.FONT_SIZE),
-                                        Colour = OsuColour.Gray(0.7f)
-                                    }
-                                }
-                            }
+                            Content = texts.ToArray(),
                         },
                         chart = new GridContainer
                         {
@@ -215,7 +226,8 @@ namespace osu.Game.Screens.Ranking.Statistics
         private void setTotalValues(PerformanceDisplayAttribute attribute, PerformanceDisplayAttribute fcAttribute, PerformanceDisplayAttribute perfectAttribute)
         {
             achievedPerformance.Text = Math.Round(attribute.Value, MidpointRounding.AwayFromZero).ToLocalisableString();
-            fcPerformance.Text = Math.Round(fcAttribute.Value, MidpointRounding.AwayFromZero).ToLocalisableString();
+            if (showFCPerformance)
+                fcPerformance.Text = Math.Round(fcAttribute.Value, MidpointRounding.AwayFromZero).ToLocalisableString();
             maximumPerformance.Text = Math.Round(perfectAttribute.Value, MidpointRounding.AwayFromZero).ToLocalisableString();
         }
 
@@ -228,7 +240,7 @@ namespace osu.Game.Screens.Ranking.Statistics
                 return null;
 
             float percentage = (float)(attribute.Value / perfectAttribute.Value);
-            float fcPercentage = (float)(fcAttribute.Value / perfectAttribute.Value);
+            float fcPercentage = showFCPerformance ? (float)(fcAttribute.Value / perfectAttribute.Value) : 0;
 
             float[] lengths = { fcPercentage, percentage };
             Color4[] colours = { fcColour, achieveColour };
