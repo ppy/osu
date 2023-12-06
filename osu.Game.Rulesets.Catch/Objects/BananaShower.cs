@@ -23,6 +23,7 @@ namespace osu.Game.Rulesets.Catch.Objects
 
         private void createBananas(CancellationToken cancellationToken)
         {
+            // Int truncation added to match osu!stable.
             int startTime = (int)StartTime;
             int endTime = (int)EndTime;
             float spacing = (float)(EndTime - StartTime);
