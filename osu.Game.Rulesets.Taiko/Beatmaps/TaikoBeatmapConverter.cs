@@ -12,13 +12,23 @@ using osu.Framework.Utils;
 using System.Threading;
 using osu.Game.Audio;
 using osu.Game.Beatmaps.ControlPoints;
-using osu.Game.Beatmaps.Formats;
 using osu.Game.Rulesets.Objects.Legacy;
 
 namespace osu.Game.Rulesets.Taiko.Beatmaps
 {
     internal class TaikoBeatmapConverter : BeatmapConverter<TaikoHitObject>
     {
+        /// <summary>
+        /// A speed multiplier applied globally to osu!taiko.
+        /// </summary>
+        /// <remarks>
+        /// osu! is generally slower than taiko, so a factor was historically added to increase speed for converts.
+        /// This must be used everywhere slider length or beat length is used in taiko.
+        ///
+        /// Of note, this has never been exposed to the end user, and is considered a hidden internal multiplier.
+        /// </remarks>
+        public const float VELOCITY_MULTIPLIER = 1.4f;
+
         /// <summary>
         /// Because swells are easier in taiko than spinners are in osu!,
         /// legacy taiko multiplies a factor when converting the number of required hits.
@@ -173,7 +183,7 @@ namespace osu.Game.Rulesets.Taiko.Beatmaps
             double distance = pathData.Path.ExpectedDistance.Value ?? 0;
 
             // Do not combine the following two lines!
-            distance *= LegacyBeatmapEncoder.LEGACY_TAIKO_VELOCITY_MULTIPLIER;
+            distance *= VELOCITY_MULTIPLIER;
             distance *= spans;
 
             TimingControlPoint timingPoint = beatmap.ControlPointInfo.TimingPointAt(obj.StartTime);
@@ -185,7 +195,7 @@ namespace osu.Game.Rulesets.Taiko.Beatmaps
             else
                 beatLength = timingPoint.BeatLength;
 
-            double sliderScoringPointDistance = osu_base_scoring_distance * (beatmap.Difficulty.SliderMultiplier * LegacyBeatmapEncoder.LEGACY_TAIKO_VELOCITY_MULTIPLIER) / beatmap.Difficulty.SliderTickRate;
+            double sliderScoringPointDistance = osu_base_scoring_distance * (beatmap.Difficulty.SliderMultiplier * TaikoBeatmapConverter.VELOCITY_MULTIPLIER) / beatmap.Difficulty.SliderTickRate;
 
             // The velocity and duration of the taiko hit object - calculated as the velocity of a drum roll.
             double taikoVelocity = sliderScoringPointDistance * beatmap.Difficulty.SliderTickRate;

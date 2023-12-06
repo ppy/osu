@@ -10,13 +10,13 @@ using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Input;
 using osu.Game.Beatmaps;
-using osu.Game.Beatmaps.Formats;
 using osu.Game.Configuration;
 using osu.Game.Input.Handlers;
 using osu.Game.Replays;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Objects.Drawables;
+using osu.Game.Rulesets.Taiko.Beatmaps;
 using osu.Game.Rulesets.Taiko.Objects;
 using osu.Game.Rulesets.Taiko.Replays;
 using osu.Game.Rulesets.Timing;
@@ -71,7 +71,7 @@ namespace osu.Game.Rulesets.Taiko.UI
         protected virtual double ComputeTimeRange()
         {
             // Taiko scrolls at a constant 100px per 1000ms. More notes become visible as the playfield is lengthened.
-            const float scroll_rate = 10 / LegacyBeatmapEncoder.LEGACY_TAIKO_VELOCITY_MULTIPLIER;
+            const float scroll_rate = 10 / TaikoBeatmapConverter.VELOCITY_MULTIPLIER;
 
             // Since the time range will depend on a positional value, it is referenced to the x480 pixel space.
             // Width is used because it defines how many notes fit on the playfield.
