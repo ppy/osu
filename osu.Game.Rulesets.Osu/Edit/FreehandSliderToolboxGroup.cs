@@ -20,7 +20,7 @@ namespace osu.Game.Rulesets.Osu.Edit
         public BindableFloat Tolerance { get; } = new BindableFloat(2f)
         {
             MinValue = 0.05f,
-            MaxValue = 3f,
+            MaxValue = 2.0f,
             Precision = 0.01f
         };
 
@@ -32,7 +32,7 @@ namespace osu.Game.Rulesets.Osu.Edit
         };
 
         // We map internal ranges to a more standard range of values for display to the user.
-        private readonly BindableInt displayTolerance = new BindableInt(66)
+        private readonly BindableInt displayTolerance = new BindableInt(100)
         {
             MinValue = 5,
             MaxValue = 100
@@ -90,8 +90,8 @@ namespace osu.Game.Rulesets.Osu.Edit
                 displayCornerThreshold.Value = internalToDisplayCornerThreshold(threshold.NewValue)
             );
 
-            float displayToInternalTolerance(float v) => v / 33f;
-            int internalToDisplayTolerance(float v) => (int)Math.Round(v * 33f);
+            float displayToInternalTolerance(float v) => v / 50f;
+            int internalToDisplayTolerance(float v) => (int)Math.Round(v * 50f);
 
             float displayToInternalCornerThreshold(float v) => v / 100f;
             int internalToDisplayCornerThreshold(float v) => (int)Math.Round(v * 100f);
