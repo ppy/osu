@@ -104,7 +104,7 @@ namespace osu.Game.Screens.Ranking.Statistics
                                         Origin = Anchor.CentreLeft,
                                         Anchor = Anchor.CentreLeft,
                                         Font = OsuFont.GetFont(weight: FontWeight.Regular, size: StatisticItem.FONT_SIZE),
-                                        Text = "Achieved PP",
+                                        Text = "Achieved",
                                         Colour = achieveColour
                                     },
                                     achievedPerformance = new OsuSpriteText
@@ -122,7 +122,7 @@ namespace osu.Game.Screens.Ranking.Statistics
                                         Origin = Anchor.CentreLeft,
                                         Anchor = Anchor.CentreLeft,
                                         Font = OsuFont.GetFont(weight: FontWeight.Regular, size: StatisticItem.FONT_SIZE),
-                                        Text = "PP for Full Combo",
+                                        Text = "On Full Combo",
                                         Colour = fcColour
                                     },
                                     fcPerformance = new OsuSpriteText
