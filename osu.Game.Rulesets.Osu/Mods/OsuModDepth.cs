@@ -100,7 +100,7 @@ namespace osu.Game.Rulesets.Osu.Mods
             float z = MaxDepth.Value - (float)((Math.Max(time, appearTime) - appearTime) * speed);
 
             float scale = scaleForDepth(z);
-            drawable.Position = toPlayfieldPosition(scale, hitObject.Position);
+            drawable.Position = toPlayfieldPosition(scale, hitObject.StackedPosition);
             drawable.Scale = new Vector2(scale);
         }
 
@@ -146,7 +146,7 @@ namespace osu.Game.Rulesets.Osu.Mods
             }
 
             float scale = scaleForDepth(z);
-            drawableSlider.Position = toPlayfieldPosition(scale, hitObject.Position);
+            drawableSlider.Position = toPlayfieldPosition(scale, hitObject.StackedPosition);
             drawableSlider.Scale = new Vector2(scale);
         }
 
