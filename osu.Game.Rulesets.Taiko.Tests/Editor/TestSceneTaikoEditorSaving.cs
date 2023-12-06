@@ -3,7 +3,6 @@
 
 using NUnit.Framework;
 using osu.Framework.Utils;
-using osu.Game.Rulesets.Taiko.Beatmaps;
 using osu.Game.Tests.Visual;
 
 namespace osu.Game.Rulesets.Taiko.Tests.Editor
@@ -27,11 +26,7 @@ namespace osu.Game.Rulesets.Taiko.Tests.Editor
 
             bool assertTaikoSliderMulitplier()
             {
-                // we can only assert value correctness on TaikoMultiplierAppliedDifficulty, because that is the final difficulty converted taiko beatmaps use.
-                // therefore, ensure that we have that difficulty type by calling .CopyFrom(), which is a no-op if the type is already correct.
-                var taikoDifficulty = new TaikoBeatmapConverter.TaikoMultiplierAppliedDifficulty();
-                taikoDifficulty.CopyFrom(EditorBeatmap.Difficulty);
-                return Precision.AlmostEquals(taikoDifficulty.SliderMultiplier, 2);
+                return Precision.AlmostEquals(EditorBeatmap.Difficulty.SliderMultiplier, 2);
             }
         }
     }
