@@ -7,6 +7,7 @@ using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Extensions.Color4Extensions;
+using osu.Framework.Extensions.ObjectExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Colour;
 using osu.Framework.Graphics.Containers;
@@ -150,14 +151,14 @@ namespace osu.Game.Screens.Play.HUD
             };
         }
 
-        private JudgementResult? pendingJudgementResult;
+        private bool pendingMissAnimation;
 
         protected override void LoadComplete()
         {
             base.LoadComplete();
 
-            HealthProcessor.NewJudgement += result => pendingJudgementResult = result;
-            Current.BindValueChanged(_ => Scheduler.AddOnce(updateCurrent), true);
+            HealthProcessor.NewJudgement += onNewJudgement;
+            Current.BindValueChanged(onCurrentChanged, true);
 
             // we're about to set `RelativeSizeAxes` depending on the value of `UseRelativeSize`.
             // setting `RelativeSizeAxes` internally transforms absolute sizing to relative and back to keep the size the same,
@@ -170,24 +171,31 @@ namespace osu.Game.Screens.Play.HUD
             BarHeight.BindValueChanged(_ => updatePath(), true);
         }
 
-        private void updateCurrent()
-        {
-            var result = pendingJudgementResult;
+        private void onNewJudgement(JudgementResult result) => pendingMissAnimation |= !result.IsHit;
 
-            if (Current.Value >= GlowBarValue)
+        private void onCurrentChanged(ValueChangedEvent<double> valueChangedEvent)
+            // schedule display updates one frame later to ensure we know the judgement result causing this change (if there is one).
+            => Scheduler.AddOnce(updateDisplay);
+
+        private void updateDisplay()
+        {
+            double newHealth = Current.Value;
+
+            if (newHealth >= GlowBarValue)
                 finishMissDisplay();
 
-            double time = Current.Value > GlowBarValue ? 500 : 250;
+            double time = newHealth > GlowBarValue ? 500 : 250;
 
             // TODO: this should probably use interpolation in update.
-            this.TransformTo(nameof(HealthBarValue), Current.Value, time, Easing.OutQuint);
+            this.TransformTo(nameof(HealthBarValue), newHealth, time, Easing.OutQuint);
 
-            if (result != null && !result.IsHit)
+            if (pendingMissAnimation && newHealth < GlowBarValue)
                 triggerMissDisplay();
-            else if (!displayingMiss)
-                this.TransformTo(nameof(GlowBarValue), Current.Value, time, Easing.OutQuint);
 
-            pendingJudgementResult = null;
+            pendingMissAnimation = false;
+
+            if (!displayingMiss)
+                this.TransformTo(nameof(GlowBarValue), newHealth, time, Easing.OutQuint);
         }
 
         protected override void Update()
@@ -338,6 +346,14 @@ namespace osu.Game.Screens.Play.HUD
 
             mainBar.Vertices = healthBarVertices.Select(v => v - healthBarVertices[0]).ToList();
             mainBar.Position = healthBarVertices[0];
+        }
+
+        protected override void Dispose(bool isDisposing)
+        {
+            base.Dispose(isDisposing);
+
+            if (HealthProcessor.IsNotNull())
+                HealthProcessor.NewJudgement -= onNewJudgement;
         }
 
         private partial class BackgroundPath : SmoothPath

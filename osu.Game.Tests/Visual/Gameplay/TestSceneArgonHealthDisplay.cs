@@ -83,10 +83,7 @@ namespace osu.Game.Tests.Visual.Gameplay
             AddRepeatStep(@"increase hp with flash", delegate
             {
                 healthProcessor.Health.Value += 0.1f;
-                healthProcessor.ApplyResult(new JudgementResult(new HitCircle(), new OsuJudgement())
-                {
-                    Type = HitResult.Perfect
-                });
+                applyPerfectHit();
             }, 3);
         }
 
@@ -124,9 +121,43 @@ namespace osu.Game.Tests.Visual.Gameplay
             });
         }
 
+        [Test]
+        public void TestMissThenHitAtSameUpdateFrame()
+        {
+            AddUntilStep("wait for health", () => healthDisplay.Current.Value == 1);
+            AddStep("set half health", () => healthProcessor.Health.Value = 0.5f);
+
+            AddStep("apply miss and hit", () =>
+            {
+                applyMiss();
+                applyMiss();
+                applyPerfectHit();
+                applyPerfectHit();
+            });
+
+            AddWaitStep("wait", 3);
+
+            AddStep("apply miss and cancel with hit", () =>
+            {
+                applyMiss();
+                applyPerfectHit();
+                applyPerfectHit();
+                applyPerfectHit();
+                applyPerfectHit();
+            });
+        }
+
         private void applyMiss()
         {
             healthProcessor.ApplyResult(new JudgementResult(new HitObject(), new Judgement()) { Type = HitResult.Miss });
+        }
+
+        private void applyPerfectHit()
+        {
+            healthProcessor.ApplyResult(new JudgementResult(new HitCircle(), new OsuJudgement())
+            {
+                Type = HitResult.Perfect
+            });
         }
     }
 }
