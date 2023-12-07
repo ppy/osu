@@ -12,7 +12,7 @@ namespace osu.Game.Rulesets.Mania.Tests
 {
     public class ManiaDifficultyCalculatorTest : DifficultyCalculatorTest
     {
-        protected override string ResourceAssembly => "osu.Game.Rulesets.Mania";
+        protected override string ResourceAssembly => "osu.Game.Rulesets.Mania.Tests";
 
         [TestCase(2.3493769750220914d, 242, "diffcalc-test")]
         public void Test(double expectedStarRating, int expectedMaxCombo, string name)
