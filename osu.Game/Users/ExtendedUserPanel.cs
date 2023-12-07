@@ -6,6 +6,7 @@
 using osuTK;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
+using osu.Framework.Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Game.Graphics;
@@ -18,7 +19,7 @@ namespace osu.Game.Users
 {
     public abstract partial class ExtendedUserPanel : UserPanel
     {
-        public readonly Bindable<UserStatus> Status = new Bindable<UserStatus>();
+        public readonly Bindable<UserStatus?> Status = new Bindable<UserStatus?>();
 
         public readonly IBindable<UserActivity> Activity = new Bindable<UserActivity>();
 
@@ -97,14 +98,14 @@ namespace osu.Game.Users
             return statusContainer;
         }
 
-        private void displayStatus(UserStatus status, UserActivity activity = null)
+        private void displayStatus(UserStatus? status, UserActivity activity = null)
         {
             if (status != null)
             {
-                LastVisitMessage.FadeTo(status is UserStatusOffline && User.LastVisit.HasValue ? 1 : 0);
+                LastVisitMessage.FadeTo(status == UserStatus.Offline && User.LastVisit.HasValue ? 1 : 0);
 
                 // Set status message based on activity (if we have one) and status is not offline
-                if (activity != null && !(status is UserStatusOffline))
+                if (activity != null && status != UserStatus.Offline)
                 {
                     statusMessage.Text = activity.GetStatus();
                     statusIcon.FadeColour(activity.GetAppropriateColour(Colours), 500, Easing.OutQuint);
@@ -112,8 +113,8 @@ namespace osu.Game.Users
                 }
 
                 // Otherwise use only status
-                statusMessage.Text = status.Message;
-                statusIcon.FadeColour(status.GetAppropriateColour(Colours), 500, Easing.OutQuint);
+                statusMessage.Text = status.GetLocalisableDescription();
+                statusIcon.FadeColour(status.Value.GetAppropriateColour(Colours), 500, Easing.OutQuint);
 
                 return;
             }
@@ -121,11 +122,11 @@ namespace osu.Game.Users
             // Fallback to web status if local one is null
             if (User.IsOnline)
             {
-                Status.Value = new UserStatusOnline();
+                Status.Value = UserStatus.Online;
                 return;
             }
 
-            Status.Value = new UserStatusOffline();
+            Status.Value = UserStatus.Offline;
         }
 
         protected override bool OnHover(HoverEvent e)

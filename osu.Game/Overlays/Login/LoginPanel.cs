@@ -148,17 +148,17 @@ namespace osu.Game.Overlays.Login
                         switch (action.NewValue)
                         {
                             case UserAction.Online:
-                                api.LocalUser.Value.Status.Value = new UserStatusOnline();
+                                api.LocalUser.Value.Status.Value = UserStatus.Online;
                                 dropdown.StatusColour = colours.Green;
                                 break;
 
                             case UserAction.DoNotDisturb:
-                                api.LocalUser.Value.Status.Value = new UserStatusDoNotDisturb();
+                                api.LocalUser.Value.Status.Value = UserStatus.DoNotDisturb;
                                 dropdown.StatusColour = colours.Red;
                                 break;
 
                             case UserAction.AppearOffline:
-                                api.LocalUser.Value.Status.Value = new UserStatusOffline();
+                                api.LocalUser.Value.Status.Value = UserStatus.Offline;
                                 dropdown.StatusColour = colours.Gray7;
                                 break;
 
