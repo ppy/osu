@@ -71,14 +71,18 @@ namespace osu.Game.Rulesets.Taiko.UI
         protected virtual double ComputeTimeRange()
         {
             // Taiko scrolls at a constant 100px per 1000ms. More notes become visible as the playfield is lengthened.
-            const float scroll_rate = 10 / TaikoBeatmapConverter.VELOCITY_MULTIPLIER;
+            const float scroll_rate = 10;
 
             // Since the time range will depend on a positional value, it is referenced to the x480 pixel space.
             // Width is used because it defines how many notes fit on the playfield.
             // We clamp the ratio to the maximum aspect ratio to keep scroll speed consistent on widths lower than the default.
             float ratio = Math.Max(DrawSize.X / 768f, TaikoPlayfieldAdjustmentContainer.MAXIMUM_ASPECT);
 
-            return (Playfield.HitObjectContainer.DrawWidth / ratio) * scroll_rate;
+            // Stable internally increased the slider velocity of objects by a factor of `VELOCITY_MULTIPLIER`.
+            // To simulate this, we shrink the time range by that factor here.
+            // This, when combined with the rest of the scrolling ruleset machinery (see `MultiplierControlPoint` et al.),
+            // has the effect of increasing each multiplier control point's multiplier by `VELOCITY_MULTIPLIER`, ensuring parity with stable.
+            return (Playfield.HitObjectContainer.DrawWidth / ratio) * scroll_rate / TaikoBeatmapConverter.VELOCITY_MULTIPLIER;
         }
 
         protected override void UpdateAfterChildren()
