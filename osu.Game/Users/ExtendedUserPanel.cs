@@ -9,10 +9,12 @@ using osu.Framework.Bindables;
 using osu.Framework.Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
+using osu.Framework.Graphics.Cursor;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Users.Drawables;
 using osu.Framework.Input.Events;
+using osu.Framework.Localisation;
 using osu.Game.Online.API.Requests.Responses;
 
 namespace osu.Game.Users
@@ -26,7 +28,7 @@ namespace osu.Game.Users
         protected TextFlowContainer LastVisitMessage { get; private set; }
 
         private StatusIcon statusIcon;
-        private OsuSpriteText statusMessage;
+        private StatusText statusMessage;
 
         protected ExtendedUserPanel(APIUser user)
             : base(user)
@@ -88,7 +90,7 @@ namespace osu.Game.Users
                 }
             }));
 
-            statusContainer.Add(statusMessage = new OsuSpriteText
+            statusContainer.Add(statusMessage = new StatusText
             {
                 Anchor = alignment,
                 Origin = alignment,
@@ -108,12 +110,14 @@ namespace osu.Game.Users
                 if (activity != null && status != UserStatus.Offline)
                 {
                     statusMessage.Text = activity.GetStatus();
+                    statusMessage.TooltipText = activity.GetDetails();
                     statusIcon.FadeColour(activity.GetAppropriateColour(Colours), 500, Easing.OutQuint);
                     return;
                 }
 
                 // Otherwise use only status
                 statusMessage.Text = status.GetLocalisableDescription();
+                statusMessage.TooltipText = string.Empty;
                 statusIcon.FadeColour(status.Value.GetAppropriateColour(Colours), 500, Easing.OutQuint);
 
                 return;
@@ -139,6 +143,11 @@ namespace osu.Game.Users
         {
             BorderThickness = 0;
             base.OnHoverLost(e);
+        }
+
+        private partial class StatusText : OsuSpriteText, IHasTooltip
+        {
+            public LocalisableString TooltipText { get; set; }
         }
     }
 }
