@@ -50,9 +50,8 @@ namespace osu.Game.Rulesets.Osu.Tests
                 double startTime = obj.StartTime;
                 double endTime = obj.GetEndTime();
 
-                // as stated in the inline comment above, this is locally bringing back
-                // the stable treatment of the "legacy last tick" just to make sure
-                // that the conversion output matches.
+                // this is locally bringing back the stable treatment of the "legacy last tick"
+                // just to make sure that the conversion output matches.
                 // compare: `SliderEventGenerator.Generate()`, and the calculation of `legacyLastTickTime`.
                 if (obj is SliderTailCircle && parent is Slider slider)
                 {
