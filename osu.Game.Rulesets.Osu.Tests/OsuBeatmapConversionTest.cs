@@ -3,7 +3,6 @@
 
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using NUnit.Framework;
 using osu.Framework.Utils;
 using osu.Game.Rulesets.Objects;
@@ -15,7 +14,7 @@ namespace osu.Game.Rulesets.Osu.Tests
     [TestFixture]
     public class OsuBeatmapConversionTest : BeatmapConversionTest<ConvertValue>
     {
-        protected override string ResourceAssembly => "osu.Game.Rulesets.Osu";
+        protected override string ResourceAssembly => "osu.Game.Rulesets.Osu.Tests";
 
         [TestCase("basic")]
         [TestCase("colinear-perfect-curve")]
@@ -27,6 +26,7 @@ namespace osu.Game.Rulesets.Osu.Tests
         [TestCase("old-stacking")]
         [TestCase("multi-segment-slider")]
         [TestCase("nan-slider")]
+        [TestCase("1124896")]
         public void Test(string name) => base.Test(name);
 
         protected override IEnumerable<ConvertValue> CreateConvertValue(HitObject hitObject)
@@ -34,21 +34,8 @@ namespace osu.Game.Rulesets.Osu.Tests
             switch (hitObject)
             {
                 case Slider slider:
-                    var objects = new List<ConvertValue>();
-
                     foreach (var nested in slider.NestedHitObjects)
-                        objects.Add(createConvertValue((OsuHitObject)nested, slider));
-
-                    // stable does slider tail leniency by offsetting the last tick 36ms back.
-                    // based on player feedback, we're doing this a little different in lazer,
-                    // and the lazer method does not require offsetting the last tick
-                    // (see `DrawableSliderTail.CheckForResult()`).
-                    // however, in conversion tests, just so the output matches, we're bringing
-                    // the 36ms offset back locally.
-                    // in particular, on some sliders, this may rearrange nested objects,
-                    // so we sort them again by start time to prevent test failures.
-                    foreach (var obj in objects.OrderBy(cv => cv.StartTime))
-                        yield return obj;
+                        yield return createConvertValue((OsuHitObject)nested, slider);
 
                     break;
 
