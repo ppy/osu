@@ -17,7 +17,7 @@ namespace osu.Game.Rulesets.Osu.Edit
         {
         }
 
-        public BindableFloat Tolerance { get; } = new BindableFloat(2f)
+        public BindableFloat Tolerance { get; } = new BindableFloat(1.8f)
         {
             MinValue = 0.05f,
             MaxValue = 2.0f,
@@ -31,7 +31,7 @@ namespace osu.Game.Rulesets.Osu.Edit
             Precision = 0.01f
         };
 
-        public BindableFloat CircleThreshold { get; } = new BindableFloat(0.002f)
+        public BindableFloat CircleThreshold { get; } = new BindableFloat(0.0015f)
         {
             MinValue = 0f,
             MaxValue = 0.005f,
@@ -39,7 +39,7 @@ namespace osu.Game.Rulesets.Osu.Edit
         };
 
         // We map internal ranges to a more standard range of values for display to the user.
-        private readonly BindableInt displayTolerance = new BindableInt(100)
+        private readonly BindableInt displayTolerance = new BindableInt(90)
         {
             MinValue = 5,
             MaxValue = 100
@@ -51,7 +51,7 @@ namespace osu.Game.Rulesets.Osu.Edit
             MaxValue = 100
         };
 
-        private readonly BindableInt displayCircleThreshold = new BindableInt(40)
+        private readonly BindableInt displayCircleThreshold = new BindableInt(30)
         {
             MinValue = 0,
             MaxValue = 100
