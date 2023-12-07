@@ -31,8 +31,11 @@ namespace osu.Game.Overlays.Settings.Sections.General
         [Resolved]
         private INotificationOverlay? notifications { get; set; }
 
+        [Resolved]
+        private Storage storage { get; set; } = null!;
+
         [BackgroundDependencyLoader]
-        private void load(Storage storage, OsuConfigManager config, OsuGame game)
+        private void load(OsuConfigManager config, OsuGame game)
         {
             Add(new SettingsEnumDropdown<ReleaseStream>
             {
@@ -78,23 +81,7 @@ namespace osu.Game.Overlays.Settings.Sections.General
                 {
                     Text = GeneralSettingsStrings.ExportLogs,
                     Keywords = new[] { @"bug", "report", "logs", "files" },
-                    Action = () =>
-                    {
-                        var logStorage = Logger.Storage;
-
-                        const string archive_filename = "exports/compressed-logs.zip";
-
-                        using (var outStream = storage.CreateFileSafely(archive_filename))
-                        using (var zip = ZipArchive.Create())
-                        {
-                            foreach (string? f in logStorage.GetFiles(string.Empty, "*.log"))
-                                zip.AddEntry(f, logStorage.GetStream(f), true);
-
-                            zip.SaveTo(outStream);
-                        }
-
-                        storage.PresentFileExternally(archive_filename);
-                    },
+                    Action = () => Task.Run(exportLogs),
                 });
 
                 Add(new SettingsButton
@@ -103,6 +90,45 @@ namespace osu.Game.Overlays.Settings.Sections.General
                     Action = () => game.PerformFromScreen(menu => menu.Push(new MigrationSelectScreen()))
                 });
             }
+        }
+
+        private void exportLogs()
+        {
+            ProgressNotification notification = new ProgressNotification
+            {
+                State = ProgressNotificationState.Active,
+                Text = "Exporting logs...",
+            };
+
+            notifications?.Post(notification);
+
+            const string archive_filename = "exports/compressed-logs.zip";
+
+            try
+            {
+                var logStorage = Logger.Storage;
+
+                using (var outStream = storage.CreateFileSafely(archive_filename))
+                using (var zip = ZipArchive.Create())
+                {
+                    foreach (string? f in logStorage.GetFiles(string.Empty, "*.log")) zip.AddEntry(f, logStorage.GetStream(f), true);
+
+                    zip.SaveTo(outStream);
+                }
+            }
+            catch
+            {
+                notification.State = ProgressNotificationState.Cancelled;
+
+                // cleanup if export is failed or canceled.
+                storage.Delete(archive_filename);
+                throw;
+            }
+
+            notification.CompletionText = "Exported logs! Click to view.";
+            notification.CompletionClickAction = () => storage.PresentFileExternally(archive_filename);
+
+            notification.State = ProgressNotificationState.Completed;
         }
     }
 }
