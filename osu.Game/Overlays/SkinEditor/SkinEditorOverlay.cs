@@ -290,6 +290,10 @@ namespace osu.Game.Overlays.SkinEditor
         {
             protected override UserActivity? InitialActivity => null;
 
+            public override bool DisallowExternalBeatmapRulesetChanges => true;
+
+            public override bool? AllowGlobalTrackControl => false;
+
             public EndlessPlayer(Func<IBeatmap, IReadOnlyList<Mod>, Score> createScore)
                 : base(createScore, new PlayerConfiguration
                 {
