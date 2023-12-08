@@ -52,18 +52,14 @@ namespace osu.Game.Rulesets.Mania.Beatmaps.Patterns.Legacy
         /// <returns>The column.</returns>
         protected int GetColumn(float position, bool allowSpecial = false)
         {
-            // Casts to doubles are present here because, although code is originally written as float division,
-            // the division actually appears to occur on doubles in osu!stable. This is likely a result of
-            // differences in optimisations between .NET versions due to the presence of the double parameter type of Math.Floor().
-
             if (allowSpecial && TotalColumns == 8)
             {
                 const float local_x_divisor = 512f / 7;
-                return Math.Clamp((int)Math.Floor((double)position / local_x_divisor), 0, 6) + 1;
+                return Math.Clamp((int)MathF.Floor(position / local_x_divisor), 0, 6) + 1;
             }
 
             float localXDivisor = 512f / TotalColumns;
-            return Math.Clamp((int)Math.Floor((double)position / localXDivisor), 0, TotalColumns - 1);
+            return Math.Clamp((int)MathF.Floor(position / localXDivisor), 0, TotalColumns - 1);
         }
 
         /// <summary>
