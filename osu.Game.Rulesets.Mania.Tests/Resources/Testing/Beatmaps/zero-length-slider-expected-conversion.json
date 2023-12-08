@@ -1,14 +1,18 @@
 {
-    "Mappings": [{
-        "RandomW": 3083084786,
-        "RandomX": 273326509,
-        "RandomY": 273553282,
-        "RandomZ": 2659838971,
-        "StartTime": 4836,
-        "Objects": [{
-            "StartTime": 4836,
-            "EndTime": 4836,
-            "Column": 0
-        }]
-    }]
+  "Mappings": [
+    {
+      "RandomW": 3083084786,
+      "RandomX": 273326509,
+      "RandomY": 273553282,
+      "RandomZ": 2659838971,
+      "StartTime": 4836.0,
+      "Objects": [
+        {
+          "StartTime": 4836.0,
+          "EndTime": 4836.0,
+          "Column": 0
+        }
+      ]
+    }
+  ]
 }
