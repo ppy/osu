@@ -45,6 +45,7 @@ namespace osu.Game.Rulesets.Scoring.Legacy
         float IBeatmapDifficultyInfo.ApproachRate => 0;
         double IBeatmapDifficultyInfo.SliderMultiplier => 0;
         double IBeatmapDifficultyInfo.SliderTickRate => 0;
+        int IBeatmapDifficultyInfo.EndTimeObjectCount => TotalObjectCount - CircleCount;
 
         public static LegacyBeatmapConversionDifficultyInfo FromAPIBeatmap(APIBeatmap apiBeatmap) => new LegacyBeatmapConversionDifficultyInfo
         {
