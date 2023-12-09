@@ -10,14 +10,17 @@ using NUnit.Framework;
 using osu.Framework.Utils;
 using osu.Game.Beatmaps;
 using osu.Game.Rulesets;
+using osu.Game.Rulesets.Catch;
 using osu.Game.Rulesets.Difficulty;
 using osu.Game.Rulesets.Judgements;
+using osu.Game.Rulesets.Mania;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Osu;
 using osu.Game.Rulesets.Osu.Judgements;
 using osu.Game.Rulesets.Osu.Objects;
 using osu.Game.Rulesets.Scoring;
+using osu.Game.Rulesets.Taiko;
 using osu.Game.Rulesets.UI;
 using osu.Game.Scoring.Legacy;
 using osu.Game.Tests.Beatmaps;
@@ -115,6 +118,35 @@ namespace osu.Game.Tests.Rulesets.Scoring
             }
 
             Assert.That(scoreProcessor.GetDisplayScore(scoringMode), Is.EqualTo(expectedScore).Within(0.5d));
+        }
+
+        [TestCase(typeof(OsuRuleset))]
+        [TestCase(typeof(TaikoRuleset))]
+        [TestCase(typeof(CatchRuleset))]
+        [TestCase(typeof(ManiaRuleset))]
+        public void TestBeatmapWithALotOfObjectsDoesNotOverflowClassicScore(Type rulesetType)
+        {
+            const int object_count = 999999;
+
+            var ruleset = (Ruleset)Activator.CreateInstance(rulesetType)!;
+            scoreProcessor = new ScoreProcessor(ruleset);
+
+            var largeBeatmap = new TestBeatmap(ruleset.RulesetInfo)
+            {
+                HitObjects = new List<HitObject>(Enumerable.Repeat(new TestHitObject(HitResult.Great), object_count))
+            };
+            scoreProcessor.ApplyBeatmap(largeBeatmap);
+
+            for (int i = 0; i < object_count; ++i)
+            {
+                var judgementResult = new JudgementResult(largeBeatmap.HitObjects[i], largeBeatmap.HitObjects[i].CreateJudgement())
+                {
+                    Type = HitResult.Great
+                };
+                scoreProcessor.ApplyResult(judgementResult);
+            }
+
+            Assert.That(scoreProcessor.GetDisplayScore(ScoringMode.Classic), Is.GreaterThan(0));
         }
 
         [Test]

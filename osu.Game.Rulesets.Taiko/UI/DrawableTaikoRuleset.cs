@@ -16,6 +16,7 @@ using osu.Game.Replays;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Objects.Drawables;
+using osu.Game.Rulesets.Taiko.Beatmaps;
 using osu.Game.Rulesets.Taiko.Objects;
 using osu.Game.Rulesets.Taiko.Replays;
 using osu.Game.Rulesets.Timing;
@@ -77,7 +78,11 @@ namespace osu.Game.Rulesets.Taiko.UI
             // We clamp the ratio to the maximum aspect ratio to keep scroll speed consistent on widths lower than the default.
             float ratio = Math.Max(DrawSize.X / 768f, TaikoPlayfieldAdjustmentContainer.MAXIMUM_ASPECT);
 
-            return (Playfield.HitObjectContainer.DrawWidth / ratio) * scroll_rate;
+            // Stable internally increased the slider velocity of objects by a factor of `VELOCITY_MULTIPLIER`.
+            // To simulate this, we shrink the time range by that factor here.
+            // This, when combined with the rest of the scrolling ruleset machinery (see `MultiplierControlPoint` et al.),
+            // has the effect of increasing each multiplier control point's multiplier by `VELOCITY_MULTIPLIER`, ensuring parity with stable.
+            return (Playfield.HitObjectContainer.DrawWidth / ratio) * scroll_rate / TaikoBeatmapConverter.VELOCITY_MULTIPLIER;
         }
 
         protected override void UpdateAfterChildren()

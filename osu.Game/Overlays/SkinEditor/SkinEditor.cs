@@ -151,23 +151,23 @@ namespace osu.Game.Overlays.SkinEditor
                                         {
                                             new MenuItem(CommonStrings.MenuBarFile)
                                             {
-                                                Items = new[]
+                                                Items = new OsuMenuItem[]
                                                 {
                                                     new EditorMenuItem(Web.CommonStrings.ButtonsSave, MenuItemType.Standard, () => Save()),
                                                     new EditorMenuItem(CommonStrings.Export, MenuItemType.Standard, () => skins.ExportCurrentSkin()) { Action = { Disabled = !RuntimeInfo.IsDesktop } },
-                                                    new EditorMenuItemSpacer(),
+                                                    new OsuMenuItemSpacer(),
                                                     new EditorMenuItem(CommonStrings.RevertToDefault, MenuItemType.Destructive, () => dialogOverlay?.Push(new RevertConfirmDialog(revert))),
-                                                    new EditorMenuItemSpacer(),
+                                                    new OsuMenuItemSpacer(),
                                                     new EditorMenuItem(CommonStrings.Exit, MenuItemType.Standard, () => skinEditorOverlay?.Hide()),
                                                 },
                                             },
                                             new MenuItem(CommonStrings.MenuBarEdit)
                                             {
-                                                Items = new[]
+                                                Items = new OsuMenuItem[]
                                                 {
                                                     undoMenuItem = new EditorMenuItem(CommonStrings.Undo, MenuItemType.Standard, Undo),
                                                     redoMenuItem = new EditorMenuItem(CommonStrings.Redo, MenuItemType.Standard, Redo),
-                                                    new EditorMenuItemSpacer(),
+                                                    new OsuMenuItemSpacer(),
                                                     cutMenuItem = new EditorMenuItem(CommonStrings.Cut, MenuItemType.Standard, Cut),
                                                     copyMenuItem = new EditorMenuItem(CommonStrings.Copy, MenuItemType.Standard, Copy),
                                                     pasteMenuItem = new EditorMenuItem(CommonStrings.Paste, MenuItemType.Standard, Paste),
@@ -510,6 +510,9 @@ namespace osu.Game.Overlays.SkinEditor
 
         protected void Paste()
         {
+            if (!canPaste.Value)
+                return;
+
             changeHandler?.BeginChange();
 
             var drawableInfo = JsonConvert.DeserializeObject<SerialisedDrawableInfo[]>(clipboard.Content.Value);

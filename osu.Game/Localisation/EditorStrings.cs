@@ -10,6 +10,11 @@ namespace osu.Game.Localisation
         private const string prefix = @"osu.Game.Resources.Localisation.Editor";
 
         /// <summary>
+        /// "Beatmap editor"
+        /// </summary>
+        public static LocalisableString BeatmapEditor => new TranslatableString(getKey(@"beatmap_editor"), @"Beatmap editor");
+
+        /// <summary>
         /// "Waveform opacity"
         /// </summary>
         public static LocalisableString WaveformOpacity => new TranslatableString(getKey(@"waveform_opacity"), @"Waveform opacity");
@@ -118,6 +123,16 @@ namespace osu.Game.Localisation
         /// "Limit distance snap placement to current time"
         /// </summary>
         public static LocalisableString LimitedDistanceSnap => new TranslatableString(getKey(@"limited_distance_snap_grid"), @"Limit distance snap placement to current time");
+
+        /// <summary>
+        /// "Must be in edit mode to handle editor links"
+        /// </summary>
+        public static LocalisableString MustBeInEditorToHandleLinks => new TranslatableString(getKey(@"must_be_in_editor_to_handle_links"), @"Must be in edit mode to handle editor links");
+
+        /// <summary>
+        /// "Failed to parse editor link"
+        /// </summary>
+        public static LocalisableString FailedToParseEditorLink => new TranslatableString(getKey(@"failed_to_parse_edtior_link"), @"Failed to parse editor link");
 
         private static string getKey(string key) => $@"{prefix}:{key}";
     }

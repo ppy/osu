@@ -7,6 +7,8 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Localisation;
 using osu.Game.Configuration;
+using osu.Game.Localisation.SkinComponents;
+using osu.Game.Resources.Localisation.Web;
 using osu.Game.Skinning;
 
 namespace osu.Game.Screens.Play.HUD
@@ -24,14 +26,18 @@ namespace osu.Game.Screens.Play.HUD
             MaxValue = 1,
         };
 
+        [SettingSource(typeof(SkinnableComponentStrings), nameof(SkinnableComponentStrings.ShowLabel), nameof(SkinnableComponentStrings.ShowLabelDescription))]
+        public Bindable<bool> ShowLabel { get; } = new BindableBool(true);
+
         public bool UsesFixedAnchor { get; set; }
 
         protected override LocalisableString FormatCount(long count) => count.ToLocalisableString();
 
-        protected override IHasText CreateText() => new ArgonScoreTextComponent(Anchor.TopRight)
+        protected override IHasText CreateText() => new ArgonScoreTextComponent(Anchor.TopRight, BeatmapsetsStrings.ShowScoreboardHeadersScore.ToUpper())
         {
             RequiredDisplayDigits = { BindTarget = RequiredDisplayDigits },
             WireframeOpacity = { BindTarget = WireframeOpacity },
+            ShowLabel = { BindTarget = ShowLabel },
         };
 
         private partial class ArgonScoreTextComponent : ArgonCounterTextComponent

@@ -9,6 +9,8 @@ using osu.Framework.Graphics.Colour;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Game.Online.API.Requests.Responses;
+using osu.Game.Rulesets;
+using osu.Game.Rulesets.Catch;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Osu;
 using osu.Game.Rulesets.Osu.Mods;
@@ -22,31 +24,48 @@ namespace osu.Game.Tests.Visual.Ranking
 {
     public partial class TestSceneAccuracyCircle : OsuTestScene
     {
-        [TestCase(0)]
-        [TestCase(0.2)]
-        [TestCase(0.5)]
-        [TestCase(0.6999)]
-        [TestCase(0.7)]
-        [TestCase(0.75)]
-        [TestCase(0.7999)]
-        [TestCase(0.8)]
-        [TestCase(0.85)]
-        [TestCase(0.8999)]
-        [TestCase(0.9)]
-        [TestCase(0.925)]
-        [TestCase(0.9499)]
-        [TestCase(0.95)]
-        [TestCase(0.975)]
-        [TestCase(0.9999)]
-        [TestCase(1)]
-        public void TestRank(double accuracy)
+        [Test]
+        public void TestOsuRank()
         {
-            var score = createScore(accuracy, ScoreProcessor.RankFromAccuracy(accuracy));
-
-            addCircleStep(score);
+            addCircleStep(createScore(0, new OsuRuleset()));
+            addCircleStep(createScore(0.5, new OsuRuleset()));
+            addCircleStep(createScore(0.699, new OsuRuleset()));
+            addCircleStep(createScore(0.7, new OsuRuleset()));
+            addCircleStep(createScore(0.75, new OsuRuleset()));
+            addCircleStep(createScore(0.799, new OsuRuleset()));
+            addCircleStep(createScore(0.8, new OsuRuleset()));
+            addCircleStep(createScore(0.85, new OsuRuleset()));
+            addCircleStep(createScore(0.899, new OsuRuleset()));
+            addCircleStep(createScore(0.9, new OsuRuleset()));
+            addCircleStep(createScore(0.925, new OsuRuleset()));
+            addCircleStep(createScore(0.9499, new OsuRuleset()));
+            addCircleStep(createScore(0.95, new OsuRuleset()));
+            addCircleStep(createScore(0.975, new OsuRuleset()));
+            addCircleStep(createScore(0.99, new OsuRuleset()));
+            addCircleStep(createScore(1, new OsuRuleset()));
         }
 
-        private void addCircleStep(ScoreInfo score) => AddStep("add panel", () =>
+        [Test]
+        public void TestCatchRank()
+        {
+            addCircleStep(createScore(0, new CatchRuleset()));
+            addCircleStep(createScore(0.5, new CatchRuleset()));
+            addCircleStep(createScore(0.8499, new CatchRuleset()));
+            addCircleStep(createScore(0.85, new CatchRuleset()));
+            addCircleStep(createScore(0.875, new CatchRuleset()));
+            addCircleStep(createScore(0.899, new CatchRuleset()));
+            addCircleStep(createScore(0.9, new CatchRuleset()));
+            addCircleStep(createScore(0.925, new CatchRuleset()));
+            addCircleStep(createScore(0.9399, new CatchRuleset()));
+            addCircleStep(createScore(0.94, new CatchRuleset()));
+            addCircleStep(createScore(0.9675, new CatchRuleset()));
+            addCircleStep(createScore(0.9799, new CatchRuleset()));
+            addCircleStep(createScore(0.98, new CatchRuleset()));
+            addCircleStep(createScore(0.99, new CatchRuleset()));
+            addCircleStep(createScore(1, new CatchRuleset()));
+        }
+
+        private void addCircleStep(ScoreInfo score) => AddStep($"add panel ({score.DisplayAccuracy})", () =>
         {
             Children = new Drawable[]
             {
@@ -73,28 +92,33 @@ namespace osu.Game.Tests.Visual.Ranking
             };
         });
 
-        private ScoreInfo createScore(double accuracy, ScoreRank rank) => new ScoreInfo
+        private ScoreInfo createScore(double accuracy, Ruleset ruleset)
         {
-            User = new APIUser
+            var scoreProcessor = ruleset.CreateScoreProcessor();
+
+            return new ScoreInfo
             {
-                Id = 2,
-                Username = "peppy",
-            },
-            BeatmapInfo = new TestBeatmap(new OsuRuleset().RulesetInfo).BeatmapInfo,
-            Ruleset = new OsuRuleset().RulesetInfo,
-            Mods = new Mod[] { new OsuModHardRock(), new OsuModDoubleTime() },
-            TotalScore = 2845370,
-            Accuracy = accuracy,
-            MaxCombo = 999,
-            Rank = rank,
-            Date = DateTimeOffset.Now,
-            Statistics =
-            {
-                { HitResult.Miss, 1 },
-                { HitResult.Meh, 50 },
-                { HitResult.Good, 100 },
-                { HitResult.Great, 300 },
-            }
-        };
+                User = new APIUser
+                {
+                    Id = 2,
+                    Username = "peppy",
+                },
+                BeatmapInfo = new TestBeatmap(new OsuRuleset().RulesetInfo).BeatmapInfo,
+                Ruleset = ruleset.RulesetInfo,
+                Mods = new Mod[] { new OsuModHardRock(), new OsuModDoubleTime() },
+                TotalScore = 2845370,
+                Accuracy = accuracy,
+                MaxCombo = 999,
+                Rank = scoreProcessor.RankFromAccuracy(accuracy),
+                Date = DateTimeOffset.Now,
+                Statistics =
+                {
+                    { HitResult.Miss, 1 },
+                    { HitResult.Meh, 50 },
+                    { HitResult.Good, 100 },
+                    { HitResult.Great, 300 },
+                }
+            };
+        }
     }
 }

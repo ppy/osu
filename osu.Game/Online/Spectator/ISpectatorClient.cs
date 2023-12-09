@@ -8,7 +8,7 @@ namespace osu.Game.Online.Spectator
     /// <summary>
     /// An interface defining a spectator client instance.
     /// </summary>
-    public interface ISpectatorClient
+    public interface ISpectatorClient : IStatefulUserHubClient
     {
         /// <summary>
         /// Signals that a user has begun a new play session.

@@ -39,6 +39,8 @@ namespace osu.Game.Rulesets.Catch
 
         public override ScoreProcessor CreateScoreProcessor() => new CatchScoreProcessor();
 
+        public override HealthProcessor CreateHealthProcessor(double drainStartTime) => new CatchHealthProcessor(drainStartTime);
+
         public override IBeatmapConverter CreateBeatmapConverter(IBeatmap beatmap) => new CatchBeatmapConverter(beatmap, this);
 
         public override IBeatmapProcessor CreateBeatmapProcessor(IBeatmap beatmap) => new CatchBeatmapProcessor(beatmap);

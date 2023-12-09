@@ -23,6 +23,22 @@ namespace osu.Game.Rulesets.Catch.Beatmaps
         {
         }
 
+        public override void PreProcess()
+        {
+            IHasComboInformation? lastObj = null;
+
+            // For sanity, ensures that both the first hitobject and the first hitobject after a banana shower start a new combo.
+            // This is normally enforced by the legacy decoder, but is not enforced by the editor.
+            foreach (var obj in Beatmap.HitObjects.OfType<IHasComboInformation>())
+            {
+                if (obj is not BananaShower && (lastObj == null || lastObj is BananaShower))
+                    obj.NewCombo = true;
+                lastObj = obj;
+            }
+
+            base.PreProcess();
+        }
+
         public override void PostProcess()
         {
             base.PostProcess();
@@ -231,7 +247,9 @@ namespace osu.Game.Rulesets.Catch.Beatmaps
                 currentObject.DistanceToHyperDash = 0;
 
                 int thisDirection = nextObject.EffectiveX > currentObject.EffectiveX ? 1 : -1;
-                double timeToNext = nextObject.StartTime - currentObject.StartTime - 1000f / 60f / 4; // 1/4th of a frame of grace time, taken from osu-stable
+
+                // Int truncation added to match osu!stable.
+                double timeToNext = (int)nextObject.StartTime - (int)currentObject.StartTime - 1000f / 60f / 4; // 1/4th of a frame of grace time, taken from osu-stable
                 double distanceToNext = Math.Abs(nextObject.EffectiveX - currentObject.EffectiveX) - (lastDirection == thisDirection ? lastExcess : halfCatcherWidth);
                 float distanceToHyper = (float)(timeToNext * Catcher.BASE_DASH_SPEED - distanceToNext);
 
