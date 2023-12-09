@@ -41,6 +41,23 @@ namespace osu.Game.Screens.Select.Carousel
                 return match;
             }
 
+            if (!match) return false;
+
+            if (criteria.SearchTerms.Length > 0)
+            {
+                match = BeatmapInfo.Match(criteria.SearchTerms);
+
+                // if a match wasn't found via text matching of terms, do a second catch-all check matching against online IDs.
+                // this should be done after text matching so we can prioritise matching numbers in metadata.
+                if (!match && criteria.SearchNumber.HasValue)
+                {
+                    match = (BeatmapInfo.OnlineID == criteria.SearchNumber.Value) ||
+                            (BeatmapInfo.BeatmapSet?.OnlineID == criteria.SearchNumber.Value);
+                }
+            }
+
+            if (!match) return false;
+
             match &= !criteria.StarDifficulty.HasFilter || criteria.StarDifficulty.IsInRange(BeatmapInfo.StarRating);
             match &= !criteria.ApproachRate.HasFilter || criteria.ApproachRate.IsInRange(BeatmapInfo.Difficulty.ApproachRate);
             match &= !criteria.DrainRate.HasFilter || criteria.DrainRate.IsInRange(BeatmapInfo.Difficulty.DrainRate);
@@ -61,40 +78,6 @@ namespace osu.Game.Screens.Select.Carousel
                      criteria.Title.Matches(BeatmapInfo.Metadata.TitleUnicode);
             match &= !criteria.DifficultyName.HasFilter || criteria.DifficultyName.Matches(BeatmapInfo.DifficultyName);
             match &= !criteria.UserStarDifficulty.HasFilter || criteria.UserStarDifficulty.IsInRange(BeatmapInfo.StarRating);
-
-            if (!match) return false;
-
-            if (criteria.SearchTerms.Length > 0)
-            {
-                var searchableTerms = BeatmapInfo.GetSearchableTerms();
-
-                foreach (FilterCriteria.OptionalTextFilter criteriaTerm in criteria.SearchTerms)
-                {
-                    bool any = false;
-
-                    // ReSharper disable once ForeachCanBeConvertedToQueryUsingAnotherGetEnumerator
-                    foreach (string searchTerm in searchableTerms)
-                    {
-                        if (!criteriaTerm.Matches(searchTerm)) continue;
-
-                        any = true;
-                        break;
-                    }
-
-                    if (any) continue;
-
-                    match = false;
-                    break;
-                }
-
-                // if a match wasn't found via text matching of terms, do a second catch-all check matching against online IDs.
-                // this should be done after text matching so we can prioritise matching numbers in metadata.
-                if (!match && criteria.SearchNumber.HasValue)
-                {
-                    match = (BeatmapInfo.OnlineID == criteria.SearchNumber.Value) ||
-                            (BeatmapInfo.BeatmapSet?.OnlineID == criteria.SearchNumber.Value);
-                }
-            }
 
             if (!match) return false;
 

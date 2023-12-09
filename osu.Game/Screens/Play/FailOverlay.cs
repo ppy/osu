@@ -26,11 +26,22 @@ namespace osu.Game.Screens.Play
 
         public override LocalisableString Header => GameplayMenuOverlayStrings.FailedHeader;
 
+        private readonly bool showButtons;
+
+        public FailOverlay(bool showButtons = true)
+        {
+            this.showButtons = showButtons;
+        }
+
         [BackgroundDependencyLoader]
         private void load(OsuColour colours)
         {
-            AddButton(GameplayMenuOverlayStrings.Retry, colours.YellowDark, () => OnRetry?.Invoke());
-            AddButton(GameplayMenuOverlayStrings.Quit, new Color4(170, 27, 39, 255), () => OnQuit?.Invoke());
+            if (showButtons)
+            {
+                AddButton(GameplayMenuOverlayStrings.Retry, colours.YellowDark, () => OnRetry?.Invoke());
+                AddButton(GameplayMenuOverlayStrings.Quit, new Color4(170, 27, 39, 255), () => OnQuit?.Invoke());
+            }
+
             // from #10339 maybe this is a better visual effect
             Add(new Container
             {

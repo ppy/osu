@@ -13,7 +13,7 @@ namespace osu.Game.Rulesets.Osu.Tests
     [TestFixture]
     public class OsuDifficultyCalculatorTest : DifficultyCalculatorTest
     {
-        protected override string ResourceAssembly => "osu.Game.Rulesets.Osu";
+        protected override string ResourceAssembly => "osu.Game.Rulesets.Osu.Tests";
 
         [TestCase(6.710442985146793d, 239, "diffcalc-test")]
         [TestCase(1.4386882251130073d, 54, "zero-length-sliders")]

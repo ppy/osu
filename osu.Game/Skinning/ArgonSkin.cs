@@ -8,7 +8,6 @@ using osu.Framework.Audio.Sample;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Textures;
-using osu.Framework.IO.Stores;
 using osu.Game.Audio;
 using osu.Game.Beatmaps.Formats;
 using osu.Game.Extensions;
@@ -44,8 +43,7 @@ namespace osu.Game.Skinning
         public ArgonSkin(SkinInfo skin, IStorageResourceProvider resources)
             : base(
                 skin,
-                resources,
-                new NamespacedResourceStore<byte[]>(resources.Resources, "Skins/Argon")
+                resources
             )
         {
             Resources = resources;
@@ -182,15 +180,14 @@ namespace osu.Game.Skinning
                                     if (songProgress != null)
                                     {
                                         const float padding = 10;
+                                        // Hard to find this at runtime, so taken from the most expanded state during replay.
+                                        const float song_progress_offset_height = 36 + padding;
 
                                         songProgress.Position = new Vector2(0, -padding);
                                         songProgress.Scale = new Vector2(0.9f, 1);
 
                                         if (keyCounter != null && hitError != null)
                                         {
-                                            // Hard to find this at runtime, so taken from the most expanded state during replay.
-                                            const float song_progress_offset_height = 36 + padding;
-
                                             keyCounter.Anchor = Anchor.BottomRight;
                                             keyCounter.Origin = Anchor.BottomRight;
                                             keyCounter.Position = new Vector2(-(hitError.Width + padding), -(padding * 2 + song_progress_offset_height));
@@ -200,7 +197,7 @@ namespace osu.Game.Skinning
                                         {
                                             combo.Anchor = Anchor.BottomLeft;
                                             combo.Origin = Anchor.BottomLeft;
-                                            combo.Position = new Vector2(hitError.Width + padding, -50);
+                                            combo.Position = new Vector2((hitError.Width + padding), -(padding * 2 + song_progress_offset_height));
                                         }
                                     }
                                 }
@@ -217,11 +214,20 @@ namespace osu.Game.Skinning
                                         Size = new Vector2(380, 72),
                                         Position = new Vector2(4, 5)
                                     },
-                                    new ArgonScoreCounter(),
+                                    new ArgonScoreCounter
+                                    {
+                                        ShowLabel = { Value = false },
+                                    },
                                     new ArgonHealthDisplay(),
-                                    new BoxElement(),
+                                    new BoxElement
+                                    {
+                                        CornerRadius = { Value = 0.5f }
+                                    },
                                     new ArgonAccuracyCounter(),
-                                    new ArgonComboCounter(),
+                                    new ArgonComboCounter
+                                    {
+                                        Scale = new Vector2(1.3f)
+                                    },
                                     new BarHitErrorMeter(),
                                     new BarHitErrorMeter(),
                                     new ArgonSongProgress(),
