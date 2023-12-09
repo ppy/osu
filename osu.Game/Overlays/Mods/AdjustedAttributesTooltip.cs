@@ -111,6 +111,7 @@ namespace osu.Game.Overlays.Mods
         protected override void Update()
         {
         }
+
         public void SetContent(object content)
         {
         }
@@ -128,12 +129,13 @@ namespace osu.Game.Overlays.Mods
         private partial class AttributeDisplay : CompositeDrawable
         {
             public readonly Bindable<OldNewPair> AttributeValues;
-            public string AttributeName;
+            public readonly string AttributeName;
 
-            private OsuSpriteText text = new OsuSpriteText
+            private readonly OsuSpriteText text = new OsuSpriteText
             {
                 Font = OsuFont.Default.With(weight: FontWeight.Bold)
             };
+
             public AttributeDisplay(string name, Bindable<OldNewPair> boundCopy)
             {
                 AutoSizeAxes = Axes.Both;
