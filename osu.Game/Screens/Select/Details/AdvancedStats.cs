@@ -214,14 +214,6 @@ namespace osu.Game.Screens.Select.Details
             starDifficultyCancellationSource?.Cancel();
         }
 
-        private static bool hasRateAdjustedProperties(BeatmapDifficulty a, BeatmapDifficulty b)
-        {
-            if (!Precision.AlmostEquals(a.ApproachRate, b.ApproachRate)) return true;
-            if (!Precision.AlmostEquals(a.OverallDifficulty, b.OverallDifficulty)) return true;
-
-            return false;
-        }
-
         public partial class StatisticRow : Container, IHasAccentColour
         {
             private const float value_width = 25;
