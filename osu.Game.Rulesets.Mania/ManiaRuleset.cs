@@ -420,6 +420,9 @@ namespace osu.Game.Rulesets.Mania
         public override RulesetSetupSection CreateEditorSetupSection() => new ManiaSetupSection();
 
         public override DifficultySection CreateEditorDifficultySection() => new ManiaDifficultySection();
+
+        public int GetKeyCount(IBeatmapInfo beatmapInfo)
+            => ManiaBeatmapConverter.GetColumnCount(LegacyBeatmapConversionDifficultyInfo.FromBeatmapInfo(beatmapInfo));
     }
 
     public enum PlayfieldType

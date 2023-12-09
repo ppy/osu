@@ -1,10 +1,8 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using System.Linq;
 using osu.Game.Beatmaps;
 using osu.Game.Online.API.Requests.Responses;
-using osu.Game.Rulesets.Objects.Types;
 
 namespace osu.Game.Rulesets.Scoring.Legacy
 {
@@ -31,9 +29,6 @@ namespace osu.Game.Rulesets.Scoring.Legacy
         /// <summary>
         /// The count of hitcircles in the beatmap.
         /// </summary>
-        /// <remarks>
-        /// When converting from osu! ruleset beatmaps, this is equivalent to the sum of sliders and spinners in the beatmap.
-        /// </remarks>
         public int CircleCount { get; set; }
 
         /// <summary>
@@ -47,22 +42,17 @@ namespace osu.Game.Rulesets.Scoring.Legacy
         double IBeatmapDifficultyInfo.SliderTickRate => 0;
         int IBeatmapDifficultyInfo.EndTimeObjectCount => TotalObjectCount - CircleCount;
 
-        public static LegacyBeatmapConversionDifficultyInfo FromAPIBeatmap(APIBeatmap apiBeatmap) => new LegacyBeatmapConversionDifficultyInfo
-        {
-            SourceRuleset = apiBeatmap.Ruleset,
-            CircleSize = apiBeatmap.CircleSize,
-            OverallDifficulty = apiBeatmap.OverallDifficulty,
-            CircleCount = apiBeatmap.CircleCount,
-            TotalObjectCount = apiBeatmap.SliderCount + apiBeatmap.SpinnerCount + apiBeatmap.CircleCount
-        };
+        public static LegacyBeatmapConversionDifficultyInfo FromAPIBeatmap(APIBeatmap apiBeatmap) => FromBeatmapInfo(apiBeatmap);
 
-        public static LegacyBeatmapConversionDifficultyInfo FromBeatmap(IBeatmap beatmap) => new LegacyBeatmapConversionDifficultyInfo
+        public static LegacyBeatmapConversionDifficultyInfo FromBeatmap(IBeatmap beatmap) => FromBeatmapInfo(beatmap.BeatmapInfo);
+
+        public static LegacyBeatmapConversionDifficultyInfo FromBeatmapInfo(IBeatmapInfo beatmapInfo) => new LegacyBeatmapConversionDifficultyInfo
         {
-            SourceRuleset = beatmap.BeatmapInfo.Ruleset,
-            CircleSize = beatmap.Difficulty.CircleSize,
-            OverallDifficulty = beatmap.Difficulty.OverallDifficulty,
-            CircleCount = beatmap.HitObjects.Count(h => h is not IHasDuration),
-            TotalObjectCount = beatmap.HitObjects.Count
+            SourceRuleset = beatmapInfo.Ruleset,
+            CircleSize = beatmapInfo.Difficulty.CircleSize,
+            OverallDifficulty = beatmapInfo.Difficulty.OverallDifficulty,
+            CircleCount = beatmapInfo.Difficulty.TotalObjectCount - beatmapInfo.Difficulty.EndTimeObjectCount,
+            TotalObjectCount = beatmapInfo.Difficulty.TotalObjectCount
         };
     }
 }

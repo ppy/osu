@@ -27,6 +27,7 @@ using osu.Game.Graphics.Sprites;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Overlays;
 using osu.Game.Resources.Localisation.Web;
+using osu.Game.Rulesets;
 using osuTK;
 using osuTK.Graphics;
 
@@ -57,6 +58,8 @@ namespace osu.Game.Screens.Select.Carousel
         private StarCounter starCounter = null!;
         private DifficultyIcon difficultyIcon = null!;
 
+        private OsuSpriteText keyCountText = null!;
+
         [Resolved]
         private BeatmapSetOverlay? beatmapOverlay { get; set; }
 
@@ -68,6 +71,9 @@ namespace osu.Game.Screens.Select.Carousel
 
         [Resolved]
         private RealmAccess realm { get; set; } = null!;
+
+        [Resolved]
+        private IBindable<RulesetInfo> ruleset { get; set; } = null!;
 
         private IBindable<StarDifficulty?> starDifficultyBindable = null!;
         private CancellationTokenSource? starDifficultyCancellationSource;
@@ -133,6 +139,13 @@ namespace osu.Game.Screens.Select.Carousel
                                     AutoSizeAxes = Axes.Both,
                                     Children = new[]
                                     {
+                                        keyCountText = new OsuSpriteText
+                                        {
+                                            Font = OsuFont.GetFont(size: 20),
+                                            Anchor = Anchor.BottomLeft,
+                                            Origin = Anchor.BottomLeft,
+                                            Alpha = 0,
+                                        },
                                         new OsuSpriteText
                                         {
                                             Text = beatmapInfo.DifficultyName,
@@ -165,6 +178,13 @@ namespace osu.Game.Screens.Select.Carousel
                     }
                 }
             };
+        }
+
+        protected override void LoadComplete()
+        {
+            base.LoadComplete();
+
+            ruleset.BindValueChanged(_ => updateKeyCount());
         }
 
         protected override void Selected()
@@ -216,9 +236,26 @@ namespace osu.Game.Screens.Select.Carousel
                     if (d.NewValue != null)
                         difficultyIcon.Current.Value = d.NewValue.Value;
                 }, true);
+
+                updateKeyCount();
             }
 
             base.ApplyState();
+        }
+
+        private void updateKeyCount()
+        {
+            if (ruleset.Value.OnlineID == 3)
+            {
+                // Account for mania differences locally for now.
+                // Eventually this should be handled in a more modular way, allowing rulesets to add more information to the panel.
+                ILegacyRuleset legacyRuleset = (ILegacyRuleset)ruleset.Value.CreateInstance();
+
+                keyCountText.Alpha = 1;
+                keyCountText.Text = $"[{legacyRuleset.GetKeyCount(beatmapInfo)}K]";
+            }
+            else
+                keyCountText.Alpha = 0;
         }
 
         public MenuItem[] ContextMenuItems
