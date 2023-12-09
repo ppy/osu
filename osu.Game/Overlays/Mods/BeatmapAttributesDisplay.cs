@@ -62,7 +62,6 @@ namespace osu.Game.Overlays.Mods
         public ITooltip GetCustomTooltip() => rateAdjustTooltip;
         public object TooltipContent => this;
 
-
         private const float transition_duration = 250;
 
         [BackgroundDependencyLoader]
