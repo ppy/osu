@@ -104,6 +104,9 @@ namespace osu.Game.Overlays.Mods
         {
             base.LoadComplete();
 
+            rateAdjustTooltip.AddAttribute("AR");
+            rateAdjustTooltip.AddAttribute("OD");
+
             mods.BindValueChanged(_ =>
             {
                 modSettingChangeTracker?.Dispose();
@@ -125,9 +128,6 @@ namespace osu.Game.Overlays.Mods
             gameRuleset.BindValueChanged(_ => updateValues());
 
             BeatmapInfo.BindValueChanged(_ => updateValues(), true);
-
-            rateAdjustTooltip.AddAttribute("AR");
-            rateAdjustTooltip.AddAttribute("OD");
 
             updateCollapsedState();
         }

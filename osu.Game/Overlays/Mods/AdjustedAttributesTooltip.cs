@@ -17,11 +17,11 @@ namespace osu.Game.Overlays.Mods
 {
     public partial class AdjustedAttributesTooltip : CompositeDrawable, ITooltip
     {
-        private Dictionary<string, Bindable<OldNewPair>> attributes = new Dictionary<string, Bindable<OldNewPair>>();
+        private readonly Dictionary<string, Bindable<OldNewPair>> attributes = new Dictionary<string, Bindable<OldNewPair>>();
 
-        private Container content;
+        private readonly Container content;
 
-        private FillFlowContainer attributesFillFlow;
+        private readonly FillFlowContainer attributesFillFlow;
 
         [Resolved]
         private OsuColour colours { get; set; } = null!;
@@ -83,8 +83,8 @@ namespace osu.Game.Overlays.Mods
                     return;
                 }
             }
-            content.Hide();
 
+            content.Hide();
         }
 
         public void AddAttribute(string name)
@@ -97,6 +97,8 @@ namespace osu.Game.Overlays.Mods
 
         public void UpdateAttribute(string name, double oldValue, double newValue)
         {
+            if (!attributes.ContainsKey(name)) return;
+
             Bindable<OldNewPair> attribute = attributes[name];
 
             OldNewPair attributeValue = attribute.Value;
