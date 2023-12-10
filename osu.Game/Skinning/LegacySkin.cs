@@ -90,6 +90,12 @@ namespace osu.Game.Skinning
                                     return SkinUtils.As<TValue>(new Bindable<IReadOnlyList<Color4>>(comboColours));
 
                                 break;
+                            case GlobalSkinColours.SnapColours:
+                                var snapColours = Configuration.SnapColours;
+                                if (snapColours != null)
+                                    return SkinUtils.As<TValue>(new Bindable<IReadOnlyList<Color4>>(snapColours));
+
+                                break;
 
                             default:
                                 return SkinUtils.As<TValue>(getCustomColour(Configuration, colour.ToString()));

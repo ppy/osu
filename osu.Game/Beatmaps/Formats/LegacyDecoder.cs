@@ -123,7 +123,7 @@ namespace osu.Game.Beatmaps.Formats
 
                 tHasComboColours.CustomComboColours.Add(colour);
             }
-            else if (isCombo)
+            else if (isSnap)
             {
                 if (!(output is IHasSnapColours tHasSnapColours)) return;
 
