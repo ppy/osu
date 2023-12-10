@@ -64,7 +64,7 @@ namespace osu.Game.Rulesets.Osu.Tests
 
                 gameObject = new CircularContainer
                 {
-                    Size = new Vector2(100),
+                    Size = new Vector2(108),
                     Position = new Vector2(256, 192),
                     Colour = Color4.Yellow,
                     Masking = true,
@@ -91,7 +91,7 @@ namespace osu.Game.Rulesets.Osu.Tests
 
         protected override bool OnMouseDown(MouseDownEvent e)
         {
-            hitPositionMeter.AddPoint(gameObject.ToLocalSpace(e.ScreenSpaceMouseDownPosition) - new Vector2(50));
+            hitPositionMeter.AddPoint(gameObject.ToLocalSpace(e.ScreenSpaceMouseDownPosition) - new Vector2(54));
             return true;
         }
 
@@ -103,10 +103,10 @@ namespace osu.Game.Rulesets.Osu.Tests
                 automaticAdditionDelegate = Scheduler.AddDelayed(() =>
                 {
                     var randomPos = new Vector2(
-                        RNG.NextSingle(0, 100),
-                        RNG.NextSingle(0, 100));
+                        RNG.NextSingle(0, 108),
+                        RNG.NextSingle(0, 108));
 
-                    hitPositionMeter.AddPoint(randomPos - new Vector2(50));
+                    hitPositionMeter.AddPoint(randomPos - new Vector2(54));
                     InputManager.MoveMouseTo(gameObject.ToScreenSpace(randomPos));
                 }, 1, true);
             });
