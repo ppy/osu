@@ -10,9 +10,9 @@ namespace osu.Game.Localisation
         private const string prefix = @"osu.Game.Resources.Localisation.HUD.PositionMeterStrings";
 
         /// <summary>
-        /// "Judgement position size."
+        /// "Judgement position size"
         /// </summary>
-        public static LocalisableString JudgementSize => new TranslatableString(getKey(@"judgement_line_thickness"), "Judgement position size.");
+        public static LocalisableString JudgementSize => new TranslatableString(getKey(@"judgement_line_thickness"), "Judgement position size");
 
         /// <summary>
         /// "How big of judgement position should be."
@@ -20,9 +20,9 @@ namespace osu.Game.Localisation
         public static LocalisableString JudgementSizeDescription => new TranslatableString(getKey("judgement_line_thickness"), "How big of judgement position should be.");
 
         /// <summary>
-        /// "Judgement position style."
+        /// "Judgement position style"
         /// </summary>
-        public static LocalisableString JudgementStyle => new TranslatableString(getKey(@"judgement_line_thickness"), "Judgement position style.");
+        public static LocalisableString JudgementStyle => new TranslatableString(getKey(@"judgement_line_thickness"), "Judgement position style");
 
         /// <summary>
         /// "The style of judgement position."
@@ -30,9 +30,9 @@ namespace osu.Game.Localisation
         public static LocalisableString JudgementStyleDescription => new TranslatableString(getKey("judgement_line_thickness"), "The style of judgement position.");
 
         /// <summary>
-        /// "Average position size."
+        /// "Average position size"
         /// </summary>
-        public static LocalisableString AverageSize => new TranslatableString(getKey(@"judgement_line_thickness"), "Average position size.");
+        public static LocalisableString AverageSize => new TranslatableString(getKey(@"judgement_line_thickness"), "Average position size");
 
         /// <summary>
         /// "How big of average position should be."
@@ -40,9 +40,9 @@ namespace osu.Game.Localisation
         public static LocalisableString AverageSizeDescription => new TranslatableString(getKey("judgement_line_thickness"), "How big of average position should be.");
 
         /// <summary>
-        /// "Average position style."
+        /// "Average position style"
         /// </summary>
-        public static LocalisableString AverageStyle => new TranslatableString(getKey(@"judgement_line_thickness"), "Average position style.");
+        public static LocalisableString AverageStyle => new TranslatableString(getKey(@"judgement_line_thickness"), "Average position style");
 
         /// <summary>
         /// "The style of average position."
