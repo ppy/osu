@@ -219,7 +219,7 @@ namespace osu.Game.Rulesets.Osu.Skinning
                 base.LoadComplete();
 
                 JudgmentSize.BindTo(aimErrorMeter.JudgmentSize);
-                JudgmentSize.BindValueChanged(size => Size = new Vector2(size.NewValue), true);
+                JudgmentSize.BindValueChanged(size => Size = new Vector2(size.NewValue));
                 JudgmentStyle.BindTo(aimErrorMeter.JudgmentStyle);
                 JudgmentStyle.BindValueChanged(style => Rotation = style.NewValue == HitPositionStyle.X ? 0 : 45);
             }
@@ -232,7 +232,9 @@ namespace osu.Game.Rulesets.Osu.Skinning
                 const int judgement_fade_out_duration = 5000;
 
                 this
+                    .ResizeTo(new Vector2(0))
                     .FadeInFromZero(judgement_fade_in_duration, Easing.OutQuint)
+                    .ResizeTo(new Vector2(JudgmentSize.Value), judgement_fade_in_duration, Easing.OutQuint)
                     .Then()
                     .FadeOut(judgement_fade_out_duration)
                     .Expire();
