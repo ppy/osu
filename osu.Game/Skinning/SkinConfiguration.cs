@@ -10,7 +10,7 @@ namespace osu.Game.Skinning
     /// <summary>
     /// An empty skin configuration.
     /// </summary>
-    public class SkinConfiguration : IHasComboColours, IHasCustomColours
+    public class SkinConfiguration : IHasComboColours, IHasCustomColours, IHasSnapColours
     {
         public readonly SkinInfo SkinInfo = new SkinInfo();
 
@@ -20,6 +20,8 @@ namespace osu.Game.Skinning
         /// Whether to allow <see cref="DefaultComboColours"/> as a fallback list for when no combo colours are provided.
         /// </summary>
         internal bool AllowDefaultComboColoursFallback = true;
+
+        internal bool AllowDefaultSnapColoursFallback = true;
 
         /// <summary>
         /// Legacy version of this skin.
@@ -48,7 +50,25 @@ namespace osu.Game.Skinning
             new Color4(242, 24, 57, 255),
         };
 
+        public static List<Color4> DefaultSnapColours { get; } = new List<Color4>
+        {
+            new Color4(255, 255, 255, 255),
+            new Color4(255, 0, 0, 255),
+            new Color4(0, 0, 255, 255),
+            new Color4(102, 45, 145, 255),
+            new Color4(255, 255, 0, 255),
+            new Color4(153, 153, 153, 255),
+            new Color4(255, 0, 255, 255),
+            new Color4(247, 148, 29, 255),
+            new Color4(0, 255, 255, 255),
+            new Color4(0, 198, 0, 255),
+            new Color4(255, 153, 153, 255),
+            new Color4(153, 143, 255, 255)
+        };
+
         public List<Color4> CustomComboColours { get; set; } = new List<Color4>();
+
+        public List<Color4> CustomSnapColours { get; set; } = new List<Color4>();
 
         public IReadOnlyList<Color4>? ComboColours
         {
@@ -59,6 +79,20 @@ namespace osu.Game.Skinning
 
                 if (AllowDefaultComboColoursFallback)
                     return DefaultComboColours;
+
+                return null;
+            }
+        }
+
+        public IReadOnlyList<Color4>? SnapColours
+        {
+            get
+            {
+                if (CustomSnapColours.Count > 0)
+                    return CustomSnapColours;
+
+                if (AllowDefaultSnapColoursFallback)
+                    return DefaultSnapColours;
 
                 return null;
             }

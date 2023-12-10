@@ -100,6 +100,9 @@ namespace osu.Game.Skinning
                     case SkinComboColourLookup comboColour:
                         return SkinUtils.As<TValue>(GetComboColour(Configuration, comboColour.ColourIndex, comboColour.Combo));
 
+                    case SkinSnapColourLookup snapColour:
+                        return SkinUtils.As<TValue>(GetSnapColour(Configuration, snapColour.ColourIndex, snapColour.Snap));
+
                     case SkinCustomColourLookup customColour:
                         return SkinUtils.As<TValue>(getCustomColour(Configuration, customColour.Lookup.ToString() ?? string.Empty));
 
@@ -289,6 +292,12 @@ namespace osu.Game.Skinning
         protected virtual IBindable<Color4>? GetComboColour(IHasComboColours source, int colourIndex, IHasComboInformation combo)
         {
             var colour = source.ComboColours?[colourIndex % source.ComboColours.Count];
+            return colour.HasValue ? new Bindable<Color4>(colour.Value) : null;
+        }
+
+        protected virtual IBindable<Color4>? GetSnapColour(IHasSnapColours source, int colourIndex, IHasSnapInformation snap)
+        {
+            var colour = source.SnapColours?[colourIndex % source.SnapColours.Count];
             return colour.HasValue ? new Bindable<Color4>(colour.Value) : null;
         }
 

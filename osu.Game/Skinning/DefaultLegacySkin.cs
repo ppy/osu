@@ -43,6 +43,22 @@ namespace osu.Game.Skinning
                 new Color4(242, 24, 57, 255)
             };
 
+            Configuration.CustomSnapColours = new List<Color4>
+            {
+                new Color4(255, 192, 0, 255),
+                new Color4(0, 202, 0, 255),
+                new Color4(18, 124, 255, 255),
+                new Color4(242, 24, 57, 255),
+                new Color4(255, 192, 0, 255),
+                new Color4(0, 202, 0, 255),
+                new Color4(18, 124, 255, 255),
+                new Color4(242, 24, 57, 255),
+                new Color4(255, 192, 0, 255),
+                new Color4(0, 202, 0, 255),
+                new Color4(18, 124, 255, 255),
+                new Color4(242, 24, 57, 255)
+            };
+
             Configuration.ConfigDictionary[nameof(SkinConfiguration.LegacySetting.AllowSliderBallTint)] = @"true";
 
             Configuration.LegacyVersion = 2.7m;

@@ -15,6 +15,7 @@ using osu.Game.Rulesets.Mania.Configuration;
 using osu.Game.Rulesets.Mania.Skinning.Default;
 using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Objects.Drawables;
+using osu.Game.Rulesets.Objects.Types;
 using osu.Game.Rulesets.Scoring;
 using osu.Game.Rulesets.UI.Scrolling;
 using osu.Game.Screens.Edit;
@@ -26,7 +27,7 @@ namespace osu.Game.Rulesets.Mania.Objects.Drawables
     /// <summary>
     /// Visualises a <see cref="Note"/> hit object.
     /// </summary>
-    public partial class DrawableNote : DrawableManiaHitObject<Note>, IKeyBindingHandler<ManiaAction>
+    public partial class DrawableNote : DrawableManiaHitObject<Note>, IKeyBindingHandler<ManiaAction>, IHasSnapInformation
     {
         [Resolved]
         private OsuColour colours { get; set; }
@@ -42,6 +43,10 @@ namespace osu.Game.Rulesets.Mania.Objects.Drawables
 
         private DrawableNotePerfectBonus perfectBonus;
 
+        protected ISkinSource skin { get; private set; }
+        public int SnapIndex { get; set; }
+
+
         public DrawableNote()
             : this(null)
         {
@@ -54,7 +59,7 @@ namespace osu.Game.Rulesets.Mania.Objects.Drawables
         }
 
         [BackgroundDependencyLoader(true)]
-        private void load(ManiaRulesetConfigManager rulesetConfig)
+        private void load(ManiaRulesetConfigManager rulesetConfig, ISkinSource skinSource)
         {
             rulesetConfig?.BindWith(ManiaRulesetSetting.TimingBasedNoteColouring, configTimingBasedNoteColouring);
 
@@ -63,6 +68,7 @@ namespace osu.Game.Rulesets.Mania.Objects.Drawables
                 RelativeSizeAxes = Axes.X,
                 AutoSizeAxes = Axes.Y
             });
+            skin = skinSource;
         }
 
         protected override void LoadComplete()
@@ -169,7 +175,59 @@ namespace osu.Game.Rulesets.Mania.Objects.Drawables
 
             int snapDivisor = beatmap.ControlPointInfo.GetClosestBeatDivisor(HitObject.StartTime);
 
-            Colour = configTimingBasedNoteColouring.Value ? BindableBeatDivisor.GetColourFor(snapDivisor, colours) : Color4.White;
+
+            if (configTimingBasedNoteColouring.Value) {
+                switch (snapDivisor) {
+                    case 1:
+                        SnapIndex = 1;
+                        break;
+
+                    case 2:
+                        SnapIndex = 2;
+                        break;
+
+                    case 3:
+                        SnapIndex = 3;
+                        break;
+
+                    case 4:
+                        SnapIndex = 4;
+                        break;
+
+                    case 5:
+                        SnapIndex = 5;
+                        break;
+
+                    case 6:
+                        SnapIndex = 6;
+                        break;
+
+                    case 8:
+                        SnapIndex = 7;
+                        break;
+
+                    case 12:
+                        SnapIndex = 8;
+                        break;
+
+                    case 16:
+                        SnapIndex = 9;
+                        break;
+
+                    case 20:
+                        SnapIndex = 10;
+                        break;
+
+                    case 24:
+                        SnapIndex = 11;
+                        break;
+
+                    default:
+                        SnapIndex = 0;
+                        break;
+                }
+                Colour = ((IHasSnapInformation)this).GetSnapColour(skin);
+            }
         }
     }
 }

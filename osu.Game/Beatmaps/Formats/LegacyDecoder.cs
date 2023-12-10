@@ -98,6 +98,7 @@ namespace osu.Game.Beatmaps.Formats
             var pair = SplitKeyVal(line);
 
             bool isCombo = pair.Key.StartsWith(@"Combo", StringComparison.Ordinal);
+            bool isSnap = pair.Key.StartsWith(@"Snap", StringComparison.Ordinal);
 
             string[] split = pair.Value.Split(',');
 
@@ -121,6 +122,12 @@ namespace osu.Game.Beatmaps.Formats
                 if (!(output is IHasComboColours tHasComboColours)) return;
 
                 tHasComboColours.CustomComboColours.Add(colour);
+            }
+            else if (isCombo)
+            {
+                if (!(output is IHasSnapColours tHasSnapColours)) return;
+
+                tHasSnapColours.CustomSnapColours.Add(colour);
             }
             else
             {
