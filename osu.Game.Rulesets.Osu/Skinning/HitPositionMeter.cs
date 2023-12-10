@@ -7,8 +7,12 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Pooling;
 using osu.Framework.Graphics.Shapes;
+using osu.Framework.Localisation;
 using osu.Game.Beatmaps;
+using osu.Game.Configuration;
 using osu.Game.Graphics;
+using osu.Game.Graphics.Containers;
+using osu.Game.Localisation;
 using osu.Game.Rulesets.Judgements;
 using osu.Game.Rulesets.Objects.Legacy;
 using osu.Game.Rulesets.Osu.Judgements;
@@ -19,8 +23,31 @@ using osuTK.Graphics;
 
 namespace osu.Game.Rulesets.Osu.Skinning
 {
+    [Cached]
     public partial class HitPositionMeter : HitErrorMeter
     {
+        [SettingSource(typeof(PositionMeterStrings), nameof(PositionMeterStrings.JudgmentSize), nameof(PositionMeterStrings.JudgmentSizeDescription))]
+        public BindableNumber<float> JudgmentSize { get; } = new BindableNumber<float>(7f)
+        {
+            MinValue = 0f,
+            MaxValue = 12f,
+            Precision = 1f
+        };
+
+        [SettingSource(typeof(PositionMeterStrings), nameof(PositionMeterStrings.JudgmentStyle), nameof(PositionMeterStrings.JudgmentStyleDescription))]
+        public Bindable<HitPositionStyle> JudgmentStyle { get; } = new Bindable<HitPositionStyle>();
+
+        [SettingSource(typeof(PositionMeterStrings), nameof(PositionMeterStrings.AverageSize), nameof(PositionMeterStrings.AverageSizeDescription))]
+        public BindableNumber<float> AverageSize { get; } = new BindableNumber<float>(12f)
+        {
+            MinValue = 7f,
+            MaxValue = 25f,
+            Precision = 1f
+        };
+
+        [SettingSource(typeof(PositionMeterStrings), nameof(PositionMeterStrings.AverageStyle), nameof(PositionMeterStrings.AverageStyleDescription))]
+        public Bindable<HitPositionStyle> AverageStyle { get; } = new Bindable<HitPositionStyle>(HitPositionStyle.Plus);
+
         private Container averagePositionContainer = null!;
         private Vector2 averagePosition = Vector2.Zero;
 
@@ -63,34 +90,39 @@ namespace osu.Game.Rulesets.Osu.Skinning
                             RelativeSizeAxes = Axes.Both
                         },
                     },
-                    hitPositionsContainer = new Container
+                    hitPositionsContainer = new UprightAspectMaintainingContainer
                     {
                         RelativeSizeAxes = Axes.Both,
                         Anchor = Anchor.Centre,
                         Origin = Anchor.Centre
                     },
-                    averagePositionContainer = new Container
+                    new UprightAspectMaintainingContainer
                     {
-                        RelativePositionAxes = Axes.Both,
-                        AutoSizeAxes = Axes.Both,
+                        RelativeSizeAxes = Axes.Both,
                         Anchor = Anchor.Centre,
                         Origin = Anchor.Centre,
-                        Children = new Drawable[]
+                        Child = averagePositionContainer = new Container
                         {
-                            new Circle
+                            RelativePositionAxes = Axes.Both,
+                            Anchor = Anchor.Centre,
+                            Origin = Anchor.Centre,
+                            Children = new Drawable[]
                             {
-                                Anchor = Anchor.Centre,
-                                Origin = Anchor.Centre,
-                                Width = arrow_width,
-                                Height = arrow_width * 4,
-                            },
-                            new Circle
-                            {
-                                Anchor = Anchor.Centre,
-                                Origin = Anchor.Centre,
-                                Width = arrow_width,
-                                Height = arrow_width * 4,
-                                Rotation = 90
+                                new Circle
+                                {
+                                    RelativeSizeAxes = Axes.Both,
+                                    Anchor = Anchor.Centre,
+                                    Origin = Anchor.Centre,
+                                    Width = 0.25f,
+                                },
+                                new Circle
+                                {
+                                    RelativeSizeAxes = Axes.Both,
+                                    Anchor = Anchor.Centre,
+                                    Origin = Anchor.Centre,
+                                    Width = 0.25f,
+                                    Rotation = 90
+                                }
                             }
                         }
                     }
@@ -98,6 +130,9 @@ namespace osu.Game.Rulesets.Osu.Skinning
             };
 
             objectRadius = OsuHitObject.OBJECT_RADIUS * LegacyRulesetExtensions.CalculateScaleFromCircleSize(beatmap.Value.Beatmap.Difficulty.CircleSize, true);
+
+            AverageSize.BindValueChanged(size => averagePositionContainer.Size = new Vector2(size.NewValue), true);
+            AverageStyle.BindValueChanged(style => averagePositionContainer.Rotation = style.NewValue == HitPositionStyle.Plus ? 0 : 45, true);
         }
 
         protected override void OnNewJudgement(JudgementResult judgement)
@@ -146,11 +181,15 @@ namespace osu.Game.Rulesets.Osu.Skinning
 
         private partial class HitPosition : PoolableDrawable
         {
-            private const float small_arrow_width = 1.5f;
+            [Resolved]
+            private HitPositionMeter hitPositionMeter { get; set; } = null!;
+
+            public readonly BindableNumber<float> JudgmentSize = new BindableFloat();
+
+            public readonly Bindable<HitPositionStyle> JudgmentStyle = new Bindable<HitPositionStyle>();
 
             public HitPosition()
             {
-                AutoSizeAxes = Axes.Both;
                 RelativePositionAxes = Axes.Both;
 
                 Anchor = Anchor.Centre;
@@ -160,21 +199,31 @@ namespace osu.Game.Rulesets.Osu.Skinning
                 {
                     new Circle
                     {
+                        RelativeSizeAxes = Axes.Both,
                         Anchor = Anchor.Centre,
                         Origin = Anchor.Centre,
-                        Width = small_arrow_width,
-                        Height = small_arrow_width * 4,
+                        Width = 0.25f,
                         Rotation = -45
                     },
                     new Circle
                     {
+                        RelativeSizeAxes = Axes.Both,
                         Anchor = Anchor.Centre,
                         Origin = Anchor.Centre,
-                        Width = small_arrow_width,
-                        Height = small_arrow_width * 4,
+                        Width = 0.25f,
                         Rotation = 45
                     }
                 };
+            }
+
+            protected override void LoadComplete()
+            {
+                base.LoadComplete();
+
+                JudgmentSize.BindTo(hitPositionMeter.JudgmentSize);
+                JudgmentSize.BindValueChanged(size => Size = new Vector2(size.NewValue), true);
+                JudgmentStyle.BindTo(hitPositionMeter.JudgmentStyle);
+                JudgmentStyle.BindValueChanged(style => Rotation = style.NewValue == HitPositionStyle.X ? 0 : 45);
             }
 
             protected override void PrepareForUse()
@@ -192,6 +241,15 @@ namespace osu.Game.Rulesets.Osu.Skinning
                     .FadeOut(judgement_fade_out_duration)
                     .Expire();
             }
+        }
+
+        public enum HitPositionStyle
+        {
+            [LocalisableDescription(typeof(PositionMeterStrings), nameof(PositionMeterStrings.StyleX))]
+            X,
+
+            [LocalisableDescription(typeof(PositionMeterStrings), nameof(PositionMeterStrings.StylePlus))]
+            Plus
         }
     }
 }
