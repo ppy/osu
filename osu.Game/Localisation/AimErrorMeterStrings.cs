@@ -5,7 +5,7 @@ using osu.Framework.Localisation;
 
 namespace osu.Game.Localisation
 {
-    public static class PositionMeterStrings
+    public static class AimErrorMeterStrings
     {
         private const string prefix = @"osu.Game.Resources.Localisation.HUD.PositionMeterStrings";
 

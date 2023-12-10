@@ -24,9 +24,9 @@ using osuTK.Graphics;
 namespace osu.Game.Rulesets.Osu.Skinning
 {
     [Cached]
-    public partial class HitPositionMeter : HitErrorMeter
+    public partial class AimErrorMeter : HitErrorMeter
     {
-        [SettingSource(typeof(PositionMeterStrings), nameof(PositionMeterStrings.JudgmentSize), nameof(PositionMeterStrings.JudgmentSizeDescription))]
+        [SettingSource(typeof(AimErrorMeterStrings), nameof(AimErrorMeterStrings.JudgmentSize), nameof(AimErrorMeterStrings.JudgmentSizeDescription))]
         public BindableNumber<float> JudgmentSize { get; } = new BindableNumber<float>(7f)
         {
             MinValue = 0f,
@@ -34,10 +34,10 @@ namespace osu.Game.Rulesets.Osu.Skinning
             Precision = 1f
         };
 
-        [SettingSource(typeof(PositionMeterStrings), nameof(PositionMeterStrings.JudgmentStyle), nameof(PositionMeterStrings.JudgmentStyleDescription))]
+        [SettingSource(typeof(AimErrorMeterStrings), nameof(AimErrorMeterStrings.JudgmentStyle), nameof(AimErrorMeterStrings.JudgmentStyleDescription))]
         public Bindable<HitPositionStyle> JudgmentStyle { get; } = new Bindable<HitPositionStyle>();
 
-        [SettingSource(typeof(PositionMeterStrings), nameof(PositionMeterStrings.AverageSize), nameof(PositionMeterStrings.AverageSizeDescription))]
+        [SettingSource(typeof(AimErrorMeterStrings), nameof(AimErrorMeterStrings.AverageSize), nameof(AimErrorMeterStrings.AverageSizeDescription))]
         public BindableNumber<float> AverageSize { get; } = new BindableNumber<float>(12f)
         {
             MinValue = 7f,
@@ -45,7 +45,7 @@ namespace osu.Game.Rulesets.Osu.Skinning
             Precision = 1f
         };
 
-        [SettingSource(typeof(PositionMeterStrings), nameof(PositionMeterStrings.AverageStyle), nameof(PositionMeterStrings.AverageStyleDescription))]
+        [SettingSource(typeof(AimErrorMeterStrings), nameof(AimErrorMeterStrings.AverageStyle), nameof(AimErrorMeterStrings.AverageStyleDescription))]
         public Bindable<HitPositionStyle> AverageStyle { get; } = new Bindable<HitPositionStyle>(HitPositionStyle.Plus);
 
         private Container averagePositionContainer = null!;
@@ -61,7 +61,7 @@ namespace osu.Game.Rulesets.Osu.Skinning
         [Resolved]
         private OsuColour colours { get; set; } = null!;
 
-        public HitPositionMeter()
+        public AimErrorMeter()
         {
             AutoSizeAxes = Axes.Both;
             AlwaysPresent = true;
@@ -182,7 +182,7 @@ namespace osu.Game.Rulesets.Osu.Skinning
         private partial class HitPosition : PoolableDrawable
         {
             [Resolved]
-            private HitPositionMeter hitPositionMeter { get; set; } = null!;
+            private AimErrorMeter aimErrorMeter { get; set; } = null!;
 
             public readonly BindableNumber<float> JudgmentSize = new BindableFloat();
 
@@ -220,9 +220,9 @@ namespace osu.Game.Rulesets.Osu.Skinning
             {
                 base.LoadComplete();
 
-                JudgmentSize.BindTo(hitPositionMeter.JudgmentSize);
+                JudgmentSize.BindTo(aimErrorMeter.JudgmentSize);
                 JudgmentSize.BindValueChanged(size => Size = new Vector2(size.NewValue), true);
-                JudgmentStyle.BindTo(hitPositionMeter.JudgmentStyle);
+                JudgmentStyle.BindTo(aimErrorMeter.JudgmentStyle);
                 JudgmentStyle.BindValueChanged(style => Rotation = style.NewValue == HitPositionStyle.X ? 0 : 45);
             }
 
@@ -245,10 +245,10 @@ namespace osu.Game.Rulesets.Osu.Skinning
 
         public enum HitPositionStyle
         {
-            [LocalisableDescription(typeof(PositionMeterStrings), nameof(PositionMeterStrings.StyleX))]
+            [LocalisableDescription(typeof(AimErrorMeterStrings), nameof(AimErrorMeterStrings.StyleX))]
             X,
 
-            [LocalisableDescription(typeof(PositionMeterStrings), nameof(PositionMeterStrings.StylePlus))]
+            [LocalisableDescription(typeof(AimErrorMeterStrings), nameof(AimErrorMeterStrings.StylePlus))]
             Plus
         }
     }
