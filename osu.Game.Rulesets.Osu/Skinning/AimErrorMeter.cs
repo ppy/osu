@@ -26,16 +26,16 @@ namespace osu.Game.Rulesets.Osu.Skinning
     [Cached]
     public partial class AimErrorMeter : HitErrorMeter
     {
-        [SettingSource(typeof(AimErrorMeterStrings), nameof(AimErrorMeterStrings.JudgmentSize), nameof(AimErrorMeterStrings.JudgmentSizeDescription))]
-        public BindableNumber<float> JudgmentSize { get; } = new BindableNumber<float>(7f)
+        [SettingSource(typeof(AimErrorMeterStrings), nameof(AimErrorMeterStrings.JudgementSize), nameof(AimErrorMeterStrings.JudgementSizeDescription))]
+        public BindableNumber<float> JudgementSize { get; } = new BindableNumber<float>(7f)
         {
             MinValue = 0f,
             MaxValue = 12f,
             Precision = 1f
         };
 
-        [SettingSource(typeof(AimErrorMeterStrings), nameof(AimErrorMeterStrings.JudgmentStyle), nameof(AimErrorMeterStrings.JudgmentStyleDescription))]
-        public Bindable<HitPositionStyle> JudgmentStyle { get; } = new Bindable<HitPositionStyle>();
+        [SettingSource(typeof(AimErrorMeterStrings), nameof(AimErrorMeterStrings.JudgementStyle), nameof(AimErrorMeterStrings.JudgementStyleDescription))]
+        public Bindable<HitPositionStyle> JudgementStyle { get; } = new Bindable<HitPositionStyle>();
 
         [SettingSource(typeof(AimErrorMeterStrings), nameof(AimErrorMeterStrings.AverageSize), nameof(AimErrorMeterStrings.AverageSizeDescription))]
         public BindableNumber<float> AverageSize { get; } = new BindableNumber<float>(12f)
@@ -182,9 +182,9 @@ namespace osu.Game.Rulesets.Osu.Skinning
             [Resolved]
             private AimErrorMeter aimErrorMeter { get; set; } = null!;
 
-            public readonly BindableNumber<float> JudgmentSize = new BindableFloat();
+            public readonly BindableNumber<float> JudgementSize = new BindableFloat();
 
-            public readonly Bindable<HitPositionStyle> JudgmentStyle = new Bindable<HitPositionStyle>();
+            public readonly Bindable<HitPositionStyle> JudgementStyle = new Bindable<HitPositionStyle>();
 
             public HitPosition()
             {
@@ -218,10 +218,10 @@ namespace osu.Game.Rulesets.Osu.Skinning
             {
                 base.LoadComplete();
 
-                JudgmentSize.BindTo(aimErrorMeter.JudgmentSize);
-                JudgmentSize.BindValueChanged(size => Size = new Vector2(size.NewValue));
-                JudgmentStyle.BindTo(aimErrorMeter.JudgmentStyle);
-                JudgmentStyle.BindValueChanged(style => Rotation = style.NewValue == HitPositionStyle.X ? 0 : 45);
+                JudgementSize.BindTo(aimErrorMeter.JudgementSize);
+                JudgementSize.BindValueChanged(size => Size = new Vector2(size.NewValue));
+                JudgementStyle.BindTo(aimErrorMeter.JudgementStyle);
+                JudgementStyle.BindValueChanged(style => Rotation = style.NewValue == HitPositionStyle.X ? 0 : 45);
             }
 
             protected override void PrepareForUse()
@@ -234,7 +234,7 @@ namespace osu.Game.Rulesets.Osu.Skinning
                 this
                     .ResizeTo(new Vector2(0))
                     .FadeInFromZero(judgement_fade_in_duration, Easing.OutQuint)
-                    .ResizeTo(new Vector2(JudgmentSize.Value), judgement_fade_in_duration, Easing.OutQuint)
+                    .ResizeTo(new Vector2(JudgementSize.Value), judgement_fade_in_duration, Easing.OutQuint)
                     .Then()
                     .FadeOut(judgement_fade_out_duration)
                     .Expire();
