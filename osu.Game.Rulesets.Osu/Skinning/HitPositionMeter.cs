@@ -164,6 +164,7 @@ namespace osu.Game.Rulesets.Osu.Skinning
                         Origin = Anchor.Centre,
                         Width = small_arrow_width,
                         Height = small_arrow_width * 4,
+                        Rotation = -45
                     },
                     new Circle
                     {
@@ -171,7 +172,7 @@ namespace osu.Game.Rulesets.Osu.Skinning
                         Origin = Anchor.Centre,
                         Width = small_arrow_width,
                         Height = small_arrow_width * 4,
-                        Rotation = 90
+                        Rotation = 45
                     }
                 };
             }
