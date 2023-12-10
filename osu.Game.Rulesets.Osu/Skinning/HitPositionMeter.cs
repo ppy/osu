@@ -1,8 +1,6 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using System;
-using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
@@ -15,10 +13,7 @@ using osu.Game.Rulesets.Judgements;
 using osu.Game.Rulesets.Objects.Legacy;
 using osu.Game.Rulesets.Osu.Judgements;
 using osu.Game.Rulesets.Osu.Objects;
-using osu.Game.Rulesets.Scoring;
-using osu.Game.Screens.Play;
 using osu.Game.Screens.Play.HUD.HitErrorMeters;
-using osu.Game.Skinning;
 using osuTK;
 using osuTK.Graphics;
 
@@ -129,6 +124,9 @@ namespace osu.Game.Rulesets.Osu.Skinning
         {
             switch (Vector2.Distance(position, Vector2.Zero))
             {
+                case >= 0.5f:
+                    return colours.Red;
+
                 case >= 0.35f:
                     return colours.Yellow;
 
