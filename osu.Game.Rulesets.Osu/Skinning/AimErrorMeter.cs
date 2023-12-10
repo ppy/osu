@@ -231,10 +231,8 @@ namespace osu.Game.Rulesets.Osu.Skinning
                 const int judgement_fade_in_duration = 100;
                 const int judgement_fade_out_duration = 5000;
 
-                Alpha = 0;
-
                 this
-                    .FadeTo(1f, judgement_fade_in_duration, Easing.OutQuint)
+                    .FadeInFromZero(judgement_fade_in_duration, Easing.OutQuint)
                     .Then()
                     .FadeOut(judgement_fade_out_duration)
                     .Expire();
