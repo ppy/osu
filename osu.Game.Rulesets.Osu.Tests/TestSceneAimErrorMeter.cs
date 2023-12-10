@@ -20,12 +20,12 @@ using osu.Framework.Threading;
 
 namespace osu.Game.Rulesets.Osu.Tests
 {
-    public partial class TestSceneHitPositionMeter : OsuManualInputManagerTestScene
+    public partial class TestSceneAimErrorMeter : OsuManualInputManagerTestScene
     {
         private DependencyProvidingContainer dependencyContainer = null!;
         private ScoreProcessor scoreProcessor = null!;
 
-        private TestHitPositionMeter hitPositionMeter = null!;
+        private TestAimErrorMeter aimErrorMeter = null!;
 
         private CircularContainer gameObject = null!;
 
@@ -50,7 +50,7 @@ namespace osu.Game.Rulesets.Osu.Tests
             };
             dependencyContainer.Children = new Drawable[]
             {
-                hitPositionMeter = new TestHitPositionMeter
+                aimErrorMeter = new TestAimErrorMeter
                 {
                     Margin = new MarginPadding
                     {
@@ -90,7 +90,7 @@ namespace osu.Game.Rulesets.Osu.Tests
 
         protected override bool OnMouseDown(MouseDownEvent e)
         {
-            hitPositionMeter.AddPoint(gameObject.ToLocalSpace(e.ScreenSpaceMouseDownPosition) - new Vector2(54));
+            aimErrorMeter.AddPoint(gameObject.ToLocalSpace(e.ScreenSpaceMouseDownPosition) - new Vector2(54));
             return true;
         }
 
@@ -105,7 +105,7 @@ namespace osu.Game.Rulesets.Osu.Tests
                         RNG.NextSingle(0, 108),
                         RNG.NextSingle(0, 108));
 
-                    hitPositionMeter.AddPoint(randomPos - new Vector2(54));
+                    aimErrorMeter.AddPoint(randomPos - new Vector2(54));
                     InputManager.MoveMouseTo(gameObject.ToScreenSpace(randomPos));
                 }, 1, true);
             });
@@ -119,7 +119,7 @@ namespace osu.Game.Rulesets.Osu.Tests
             AddStep("return user input", () => InputManager.UseParentInput = true);
         }
 
-        private partial class TestHitPositionMeter : HitPositionMeter
+        private partial class TestAimErrorMeter : AimErrorMeter
         {
             public void AddPoint(Vector2 position)
             {
