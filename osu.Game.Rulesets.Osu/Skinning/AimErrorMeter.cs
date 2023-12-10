@@ -49,12 +49,10 @@ namespace osu.Game.Rulesets.Osu.Skinning
         public Bindable<HitPositionStyle> AverageStyle { get; } = new Bindable<HitPositionStyle>(HitPositionStyle.Plus);
 
         private Container averagePositionContainer = null!;
-        private Vector2 averagePosition = Vector2.Zero;
+        private Vector2 averagePosition;
 
         private readonly DrawablePool<HitPosition> hitPositionPool = new DrawablePool<HitPosition>(20);
         private Container hitPositionsContainer = null!;
-
-        private const float arrow_width = 3f;
 
         private float objectRadius;
 
