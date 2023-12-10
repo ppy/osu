@@ -128,7 +128,8 @@ namespace osu.Game.Screens.Select.Details
             IBeatmapDifficultyInfo baseDifficulty = BeatmapInfo?.Difficulty;
             BeatmapDifficulty adjustedDifficulty = null;
 
-            if (baseDifficulty != null)
+            if (baseDifficulty != null &&
+                (mods.Value.Any(m => m is IApplicableToDifficulty) || mods.Value.Any(m => m is IApplicableToRate)))
             {
                 BeatmapDifficulty originalDifficulty = new BeatmapDifficulty(baseDifficulty);
 
