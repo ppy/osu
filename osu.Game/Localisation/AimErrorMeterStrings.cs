@@ -10,24 +10,24 @@ namespace osu.Game.Localisation
         private const string prefix = @"osu.Game.Resources.Localisation.HUD.PositionMeterStrings";
 
         /// <summary>
-        /// "Judgment position size."
+        /// "Judgement position size."
         /// </summary>
-        public static LocalisableString JudgmentSize => new TranslatableString(getKey(@"judgement_line_thickness"), "Judgment position size.");
+        public static LocalisableString JudgementSize => new TranslatableString(getKey(@"judgement_line_thickness"), "Judgement position size.");
 
         /// <summary>
-        /// "How big of judgment position should be."
+        /// "How big of judgement position should be."
         /// </summary>
-        public static LocalisableString JudgmentSizeDescription => new TranslatableString(getKey("judgement_line_thickness"), "How big of judgment position should be.");
+        public static LocalisableString JudgementSizeDescription => new TranslatableString(getKey("judgement_line_thickness"), "How big of judgement position should be.");
 
         /// <summary>
-        /// "Judgment position style."
+        /// "Judgement position style."
         /// </summary>
-        public static LocalisableString JudgmentStyle => new TranslatableString(getKey(@"judgement_line_thickness"), "Judgment position style.");
+        public static LocalisableString JudgementStyle => new TranslatableString(getKey(@"judgement_line_thickness"), "Judgement position style.");
 
         /// <summary>
-        /// "The style of judgment position."
+        /// "The style of judgement position."
         /// </summary>
-        public static LocalisableString JudgmentStyleDescription => new TranslatableString(getKey("judgement_line_thickness"), "The style of judgment position.");
+        public static LocalisableString JudgementStyleDescription => new TranslatableString(getKey("judgement_line_thickness"), "The style of judgement position.");
 
         /// <summary>
         /// "Average position size."
