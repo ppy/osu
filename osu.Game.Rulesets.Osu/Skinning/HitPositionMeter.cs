@@ -13,6 +13,7 @@ using osu.Game.Beatmaps;
 using osu.Game.Graphics;
 using osu.Game.Rulesets.Judgements;
 using osu.Game.Rulesets.Objects.Legacy;
+using osu.Game.Rulesets.Osu.Judgements;
 using osu.Game.Rulesets.Osu.Objects;
 using osu.Game.Rulesets.Scoring;
 using osu.Game.Screens.Play;
@@ -25,18 +26,15 @@ namespace osu.Game.Rulesets.Osu.Skinning
 {
     public partial class HitPositionMeter : HitErrorMeter
     {
-        [Resolved]
-        private ScoreProcessor processor { get; set; } = null!;
-
         private Container averagePositionContainer = null!;
         private Vector2 averagePosition = Vector2.Zero;
 
-        private readonly DrawablePool<HitPosition> hitPosisionPool = new DrawablePool<HitPosition>(20);
-        private Container hitPosisionsContainer = null!;
+        private readonly DrawablePool<HitPosition> hitPositionPool = new DrawablePool<HitPosition>(20);
+        private Container hitPositionsContainer = null!;
 
         private const float arrow_width = 3f;
 
-        private float objectRadis;
+        private float objectRadius;
 
         [Resolved]
         private OsuColour colours { get; set; } = null!;
@@ -56,14 +54,21 @@ namespace osu.Game.Rulesets.Osu.Skinning
                 Width = 100,
                 Children = new Drawable[]
                 {
-                    hitPosisionPool,
-                    new Circle
+                    hitPositionPool,
+                    new CircularContainer
                     {
+                        BorderColour = Colour4.White,
+                        Masking = true,
+                        BorderThickness = 2,
                         RelativeSizeAxes = Axes.Both,
-                        Alpha = 0.3f,
-                        Colour = Colour4.Gray
+                        Child = new Box
+                        {
+                            Colour = Colour4.Gray,
+                            Alpha = 0.3f,
+                            RelativeSizeAxes = Axes.Both
+                        },
                     },
-                    hitPosisionsContainer = new Container
+                    hitPositionsContainer = new Container
                     {
                         RelativeSizeAxes = Axes.Both,
                         Anchor = Anchor.Centre,
@@ -97,23 +102,24 @@ namespace osu.Game.Rulesets.Osu.Skinning
                 }
             };
 
-            objectRadis = OsuHitObject.OBJECT_RADIUS * LegacyRulesetExtensions.CalculateScaleFromCircleSize(beatmap.Value.Beatmap.Difficulty.CircleSize, true);
+            objectRadius = OsuHitObject.OBJECT_RADIUS * LegacyRulesetExtensions.CalculateScaleFromCircleSize(beatmap.Value.Beatmap.Difficulty.CircleSize, true);
         }
 
-        protected override void OnNewJudgement(JudgementResult _)
+        protected override void OnNewJudgement(JudgementResult judgement)
         {
-            var lastHit = processor.HitEvents.Last();
-            if (lastHit.Position == null) return;
+            if (judgement is not OsuHitCircleJudgementResult circleJudgement) return;
 
-            var relativeHitPosition = (lastHit.Position.Value - ((OsuHitObject)lastHit.HitObject).StackedPosition) / objectRadis / 2;
+            if (circleJudgement.CursorPositionAtHit == null) return;
 
-            hitPosisionPool.Get(drawableHit =>
+            var relativeHitPosition = (circleJudgement.CursorPositionAtHit.Value - ((OsuHitObject)circleJudgement.HitObject).StackedPosition) / objectRadius / 2;
+
+            hitPositionPool.Get(drawableHit =>
             {
                 drawableHit.X = relativeHitPosition.X;
                 drawableHit.Y = relativeHitPosition.Y;
                 drawableHit.Colour = getColourForPosition(relativeHitPosition);
 
-                hitPosisionsContainer.Add(drawableHit);
+                hitPositionsContainer.Add(drawableHit);
             });
 
             averagePositionContainer.MoveTo(averagePosition = (relativeHitPosition + averagePosition) / 2, 800, Easing.OutQuint);
@@ -137,7 +143,7 @@ namespace osu.Game.Rulesets.Osu.Skinning
         public override void Clear()
         {
             averagePositionContainer.MoveTo(averagePosition = Vector2.Zero, 800, Easing.OutQuint);
-            hitPosisionsContainer.Clear();
+            hitPositionsContainer.Clear();
         }
 
         private partial class HitPosition : PoolableDrawable
