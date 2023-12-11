@@ -13,6 +13,7 @@ using osu.Game.Beatmaps.ControlPoints;
 using osu.Game.Rulesets.Catch.UI;
 using osu.Game.Rulesets.Judgements;
 using osu.Game.Rulesets.Objects;
+using osu.Game.Rulesets.Objects.Legacy;
 using osu.Game.Rulesets.Objects.Types;
 
 namespace osu.Game.Rulesets.Catch.Objects
@@ -30,7 +31,6 @@ namespace osu.Game.Rulesets.Catch.Objects
 
         public BindableNumber<double> SliderVelocityMultiplierBindable { get; } = new BindableDouble(1)
         {
-            Precision = 0.01,
             MinValue = 0.1,
             MaxValue = 10
         };
@@ -48,16 +48,10 @@ namespace osu.Game.Rulesets.Catch.Objects
         public double TickDistanceMultiplier = 1;
 
         [JsonIgnore]
-        private double velocityFactor;
+        public double Velocity { get; private set; }
 
         [JsonIgnore]
-        private double tickDistanceFactor;
-
-        [JsonIgnore]
-        public double Velocity => velocityFactor * SliderVelocityMultiplier;
-
-        [JsonIgnore]
-        public double TickDistance => tickDistanceFactor * TickDistanceMultiplier;
+        public double TickDistance { get; private set; }
 
         /// <summary>
         /// The length of one span of this <see cref="JuiceStream"/>.
@@ -70,8 +64,13 @@ namespace osu.Game.Rulesets.Catch.Objects
 
             TimingControlPoint timingPoint = controlPointInfo.TimingPointAt(StartTime);
 
-            velocityFactor = base_scoring_distance * difficulty.SliderMultiplier / timingPoint.BeatLength;
-            tickDistanceFactor = base_scoring_distance * difficulty.SliderMultiplier / difficulty.SliderTickRate;
+            Velocity = base_scoring_distance * difficulty.SliderMultiplier / LegacyRulesetExtensions.GetPrecisionAdjustedBeatLength(this, timingPoint, CatchRuleset.SHORT_NAME);
+
+            // WARNING: this is intentionally not computed as `BASE_SCORING_DISTANCE * difficulty.SliderMultiplier`
+            // for backwards compatibility reasons (intentionally introducing floating point errors to match stable).
+            double scoringDistance = Velocity * timingPoint.BeatLength;
+
+            TickDistance = scoringDistance / difficulty.SliderTickRate * TickDistanceMultiplier;
         }
 
         protected override void CreateNestedHitObjects(CancellationToken cancellationToken)
