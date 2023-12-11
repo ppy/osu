@@ -25,16 +25,15 @@ namespace osu.Game.Rulesets.Mods
         {
             get
             {
-                // Round to the nearest multiple of 0.1.
-                double value = (int)(SpeedChange.Value * 10) / 10.0;
-
-                // Offset back to 0.
-                value -= 1;
+                // Round to the nearest multiple of 0.05.
+                double value = (int)(SpeedChange.Value * 20) / 20.0;
 
                 if (SpeedChange.Value >= 1)
-                    value /= 5;
+                    value = Math.Pow(1.12, Math.Log(value, 1.5));
+                else
+                    value = Math.Pow(0.3, Math.Log(value, 0.75));
 
-                return 1 + value;
+                return value;
             }
         }
 
