@@ -413,11 +413,6 @@ namespace osu.Game.Graphics.UserInterface
 
                 private partial class DropdownSearchTextBox : SearchTextBox
                 {
-                    public DropdownSearchTextBox()
-                    {
-                        TextContainer.Margin = new MarginPadding { Top = 4f };
-                    }
-
                     public override bool OnPressed(KeyBindingPressEvent<GlobalAction> e)
                     {
                         if (e.Action == GlobalAction.Back)
