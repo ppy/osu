@@ -18,7 +18,7 @@ namespace osu.Game.Beatmaps
         public float OverallDifficulty { get; set; } = IBeatmapDifficultyInfo.DEFAULT_DIFFICULTY;
         public float ApproachRate { get; set; } = IBeatmapDifficultyInfo.DEFAULT_DIFFICULTY;
 
-        public double SliderMultiplier { get; set; } = 1;
+        public double SliderMultiplier { get; set; } = 1.4;
         public double SliderTickRate { get; set; } = 1;
 
         public BeatmapDifficulty()
