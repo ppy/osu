@@ -356,18 +356,43 @@ namespace osu.Game.Tests.Rulesets.Scoring
             Assert.That(actual, Is.EqualTo(expected).Within(Precision.FLOAT_EPSILON));
         }
 
+        [Test]
+        public void TestJudgementCustomAffectsCombo()
+        {
+            scoreProcessor.ApplyBeatmap(new Beatmap
+            {
+                HitObjects =
+                {
+                    new TestHitObject(HitResult.Great, affectsCombo: false)
+                }
+            });
+
+            var judgementResult = new JudgementResult(beatmap.HitObjects.Single(), new TestJudgement(HitResult.Great, affectsCombo: false))
+            {
+                Type = HitResult.Great
+            };
+            scoreProcessor.ApplyResult(judgementResult);
+
+            Assert.That(scoreProcessor.Combo.Value, Is.EqualTo(0));
+            Assert.That(scoreProcessor.HighestCombo.Value, Is.EqualTo(0));
+        }
+
         private class TestJudgement : Judgement
         {
             public override HitResult MaxResult { get; }
 
             public override HitResult MinResult => minResult ?? base.MinResult;
 
-            private readonly HitResult? minResult;
+            public override bool AffectsCombo(HitResult result) => affectsCombo ?? base.AffectsCombo(result);
 
-            public TestJudgement(HitResult maxResult, HitResult? minResult = null)
+            private readonly HitResult? minResult;
+            private readonly bool? affectsCombo;
+
+            public TestJudgement(HitResult maxResult, HitResult? minResult = null, bool? affectsCombo = null)
             {
                 MaxResult = maxResult;
                 this.minResult = minResult;
+                this.affectsCombo = affectsCombo;
             }
         }
 
@@ -375,16 +400,18 @@ namespace osu.Game.Tests.Rulesets.Scoring
         {
             private readonly HitResult maxResult;
             private readonly HitResult? minResult;
+            private readonly bool? affectsCombo;
 
             public override Judgement CreateJudgement()
             {
-                return new TestJudgement(maxResult, minResult);
+                return new TestJudgement(maxResult, minResult, affectsCombo);
             }
 
-            public TestHitObject(HitResult maxResult, HitResult? minResult = null)
+            public TestHitObject(HitResult maxResult, HitResult? minResult = null, bool? affectsCombo = null)
             {
                 this.maxResult = maxResult;
                 this.minResult = minResult;
+                this.affectsCombo = affectsCombo;
             }
         }
 

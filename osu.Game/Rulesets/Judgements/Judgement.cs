@@ -92,6 +92,12 @@ namespace osu.Game.Rulesets.Judgements
         }
 
         /// <summary>
+        /// Whether the given <see cref="HitResult"/> affects combo in coordination with this <see cref="Judgement"/>.
+        /// </summary>
+        /// <param name="result">The hit result.</param>
+        public virtual bool AffectsCombo(HitResult result) => result.AffectsCombo();
+
+        /// <summary>
         /// The numeric score representation for the maximum achievable result.
         /// </summary>
         public int MaxNumericResult => ToNumericResult(MaxResult);

@@ -213,10 +213,13 @@ namespace osu.Game.Rulesets.Scoring
             if (!result.Type.IsScorable())
                 return;
 
-            if (result.Type.IncreasesCombo())
-                Combo.Value++;
-            else if (result.Type.BreaksCombo())
-                Combo.Value = 0;
+            if (result.Judgement.AffectsCombo(result.Type))
+            {
+                if (result.Type.IncreasesCombo())
+                    Combo.Value++;
+                else if (result.Type.BreaksCombo())
+                    Combo.Value = 0;
+            }
 
             result.ComboAfterJudgement = Combo.Value;
 

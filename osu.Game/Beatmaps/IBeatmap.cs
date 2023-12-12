@@ -94,7 +94,9 @@ namespace osu.Game.Beatmaps
 
             static void addCombo(HitObject hitObject, ref int combo)
             {
-                if (hitObject.CreateJudgement().MaxResult.AffectsCombo())
+                var judgement = hitObject.CreateJudgement();
+
+                if (judgement.AffectsCombo(judgement.MaxResult) && judgement.MaxResult.IncreasesCombo())
                     combo++;
 
                 foreach (var nested in hitObject.NestedHitObjects)
