@@ -170,6 +170,9 @@ namespace osu.Game.Rulesets.Osu.UI
             if (!judgedObject.DisplayResult || !DisplayJudgements.Value)
                 return;
 
+            if (!result.Type.IsScorable())
+                return;
+
             DrawableOsuJudgement explosion = poolDictionary[result.Type].Get(doj => doj.Apply(result, judgedObject));
 
             judgementLayer.Add(explosion);

@@ -135,8 +135,6 @@ namespace osu.Game.Rulesets.Osu.Objects
                 classicSliderBehaviour = value;
                 if (HeadCircle != null)
                     HeadCircle.ClassicSliderBehaviour = value;
-                if (TailCircle != null)
-                    TailCircle.ClassicSliderBehaviour = value;
             }
         }
 
@@ -219,8 +217,7 @@ namespace osu.Game.Rulesets.Osu.Objects
                             RepeatIndex = e.SpanIndex,
                             StartTime = e.Time,
                             Position = EndPosition,
-                            StackHeight = StackHeight,
-                            ClassicSliderBehaviour = ClassicSliderBehaviour,
+                            StackHeight = StackHeight
                         });
                         break;
 
@@ -275,12 +272,19 @@ namespace osu.Game.Rulesets.Osu.Objects
             TailSamples = this.GetNodeSamples(repeatCount + 1);
         }
 
-        public override Judgement CreateJudgement() => ClassicSliderBehaviour
-            // Final combo is provided by the slider itself - see logic in `DrawableSlider.CheckForResult()`
-            ? new OsuJudgement()
-            // Final combo is provided by the tail circle - see `SliderTailCircle`
-            : new OsuIgnoreJudgement();
+        public override Judgement CreateJudgement() => ClassicSliderBehaviour ? new ClassicSliderJudgement() : new OsuIgnoreJudgement();
 
         protected override HitWindows CreateHitWindows() => HitWindows.Empty;
+
+        private class ClassicSliderJudgement : OsuJudgement
+        {
+            public override bool AffectsCombo(HitResult result)
+            {
+                if (result == MinResult)
+                    return base.AffectsCombo(result);
+
+                return false;
+            }
+        }
     }
 }
