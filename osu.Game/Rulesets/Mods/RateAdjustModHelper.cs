@@ -33,6 +33,9 @@ namespace osu.Game.Rulesets.Mods
                 else
                     value = Math.Pow(0.3, Math.Log(value, 0.75));
 
+                // Round to the nearest double
+                value = Math.Round(value * 100) / 100.0;
+
                 return value;
             }
         }
