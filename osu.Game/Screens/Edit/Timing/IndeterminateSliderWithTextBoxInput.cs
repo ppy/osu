@@ -103,7 +103,7 @@ namespace osu.Game.Screens.Edit.Timing
                             break;
 
                         default:
-                            slider.Current.Parse(t.Text);
+                            slider.Current.Parse(t.Text, CultureInfo.CurrentCulture);
                             break;
                     }
                 }
