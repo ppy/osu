@@ -189,7 +189,7 @@ namespace osu.Game.Screens.Menu
                 Source.frequencyAmplitudes.AsSpan().CopyTo(audioData);
             }
 
-            public override void Draw(IRenderer renderer)
+            protected override void Draw(IRenderer renderer)
             {
                 base.Draw(renderer);
 
