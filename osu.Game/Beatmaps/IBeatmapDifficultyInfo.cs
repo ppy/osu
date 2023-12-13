@@ -45,19 +45,6 @@ namespace osu.Game.Beatmaps
         double SliderTickRate { get; }
 
         /// <summary>
-        /// The number of hitobjects in the beatmap with a distinct end time.
-        /// </summary>
-        /// <remarks>
-        /// Canonically, these are hitobjects are either sliders or spinners.
-        /// </remarks>
-        int EndTimeObjectCount { get; }
-
-        /// <summary>
-        /// The total number of hitobjects in the beatmap.
-        /// </summary>
-        int TotalObjectCount { get; }
-
-        /// <summary>
         /// Maps a difficulty value [0, 10] to a two-piece linear range of values.
         /// </summary>
         /// <param name="difficulty">The difficulty value to be mapped.</param>

@@ -62,8 +62,8 @@ namespace osu.Game.Rulesets.Scoring.Legacy
             SourceRuleset = beatmapInfo.Ruleset,
             CircleSize = beatmapInfo.Difficulty.CircleSize,
             OverallDifficulty = beatmapInfo.Difficulty.OverallDifficulty,
-            EndTimeObjectCount = beatmapInfo.Difficulty.EndTimeObjectCount,
-            TotalObjectCount = beatmapInfo.Difficulty.TotalObjectCount
+            EndTimeObjectCount = beatmapInfo.EndTimeObjectCount,
+            TotalObjectCount = beatmapInfo.TotalObjectCount
         };
     }
 }
