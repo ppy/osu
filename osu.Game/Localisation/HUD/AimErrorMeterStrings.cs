@@ -7,7 +7,7 @@ namespace osu.Game.Localisation.HUD
 {
     public static class AimErrorMeterStrings
     {
-        private const string prefix = @"osu.Game.Resources.Localisation.HUD.PositionMeterStrings";
+        private const string prefix = @"osu.Game.Resources.Localisation.HUD.AimErrorMeterStrings";
 
         /// <summary>
         /// "Judgement position size"
