@@ -1,8 +1,10 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System.Linq;
 using osu.Game.Beatmaps;
 using osu.Game.Online.API.Requests.Responses;
+using osu.Game.Rulesets.Objects.Types;
 
 namespace osu.Game.Rulesets.Scoring.Legacy
 {
@@ -44,7 +46,14 @@ namespace osu.Game.Rulesets.Scoring.Legacy
 
         public static LegacyBeatmapConversionDifficultyInfo FromAPIBeatmap(APIBeatmap apiBeatmap) => FromBeatmapInfo(apiBeatmap);
 
-        public static LegacyBeatmapConversionDifficultyInfo FromBeatmap(IBeatmap beatmap) => FromBeatmapInfo(beatmap.BeatmapInfo);
+        public static LegacyBeatmapConversionDifficultyInfo FromBeatmap(IBeatmap beatmap) => new LegacyBeatmapConversionDifficultyInfo
+        {
+            SourceRuleset = beatmap.BeatmapInfo.Ruleset,
+            CircleSize = beatmap.Difficulty.CircleSize,
+            OverallDifficulty = beatmap.Difficulty.OverallDifficulty,
+            CircleCount = beatmap.HitObjects.Count - beatmap.HitObjects.Count(h => h is IHasDuration),
+            TotalObjectCount = beatmap.HitObjects.Count
+        };
 
         public static LegacyBeatmapConversionDifficultyInfo FromBeatmapInfo(IBeatmapInfo beatmapInfo) => new LegacyBeatmapConversionDifficultyInfo
         {
