@@ -17,6 +17,7 @@ namespace osu.Game.Screens.Play
     /// Encapsulates gameplay timing logic and provides a <see cref="IGameplayClock"/> via DI for gameplay components to use.
     /// </summary>
     [Cached(typeof(IGameplayClock))]
+    [Cached(typeof(GameplayClockContainer))]
     public partial class GameplayClockContainer : Container, IAdjustableClock, IGameplayClock
     {
         public IBindable<bool> IsPaused => isPaused;

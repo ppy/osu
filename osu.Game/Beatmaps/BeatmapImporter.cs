@@ -388,9 +388,7 @@ namespace osu.Game.Beatmaps
                         OverallDifficulty = decodedDifficulty.OverallDifficulty,
                         ApproachRate = decodedDifficulty.ApproachRate,
                         SliderMultiplier = decodedDifficulty.SliderMultiplier,
-                        SliderTickRate = decodedDifficulty.SliderTickRate,
-                        EndTimeObjectCount = decoded.HitObjects.Count(h => h is IHasDuration),
-                        TotalObjectCount = decoded.HitObjects.Count
+                        SliderTickRate = decodedDifficulty.SliderTickRate
                     };
 
                     var metadata = new BeatmapMetadata
@@ -428,6 +426,8 @@ namespace osu.Game.Beatmaps
                         GridSize = decodedInfo.GridSize,
                         TimelineZoom = decodedInfo.TimelineZoom,
                         MD5Hash = memoryStream.ComputeMD5Hash(),
+                        EndTimeObjectCount = decoded.HitObjects.Count(h => h is IHasDuration),
+                        TotalObjectCount = decoded.HitObjects.Count
                     };
 
                     beatmaps.Add(beatmap);
