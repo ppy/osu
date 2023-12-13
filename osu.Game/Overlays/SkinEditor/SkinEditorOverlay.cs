@@ -17,6 +17,7 @@ using osu.Game.Beatmaps;
 using osu.Game.Configuration;
 using osu.Game.Graphics.Containers;
 using osu.Game.Input.Bindings;
+using osu.Game.Rulesets;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Scoring;
 using osu.Game.Screens;
@@ -57,6 +58,9 @@ namespace osu.Game.Overlays.SkinEditor
 
         [Resolved]
         private Bindable<IReadOnlyList<Mod>> mods { get; set; } = null!;
+
+        [Resolved]
+        private Bindable<RulesetInfo> ruleset { get; set; } = null!;
 
         [Resolved]
         private IBindable<WorkingBeatmap> beatmap { get; set; } = null!;
@@ -153,7 +157,11 @@ namespace osu.Game.Overlays.SkinEditor
                 if (screen is Player)
                     return;
 
-                var replayGeneratingMod = beatmap.Value.BeatmapInfo.Ruleset.CreateInstance().GetAutoplayMod();
+                // the validity of the current game-wide beatmap + ruleset combination is enforced by song select.
+                // if we're anywhere else, the state is unknown and may not make sense, so forcibly set something that does.
+                if (screen is not PlaySongSelect)
+                    ruleset.Value = beatmap.Value.BeatmapInfo.Ruleset;
+                var replayGeneratingMod = ruleset.Value.CreateInstance().GetAutoplayMod();
 
                 IReadOnlyList<Mod> usableMods = mods.Value;
 
