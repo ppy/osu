@@ -132,7 +132,7 @@ namespace osu.Game.Rulesets.Osu.Skinning.Argon
                     relativeGlowSize = Source.glowSize / Source.DrawSize.X;
                 }
 
-                public override void Draw(IRenderer renderer)
+                protected override void Draw(IRenderer renderer)
                 {
                     base.Draw(renderer);
                     drawGlow(renderer);
