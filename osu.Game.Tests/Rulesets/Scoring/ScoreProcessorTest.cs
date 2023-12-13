@@ -356,6 +356,27 @@ namespace osu.Game.Tests.Rulesets.Scoring
             Assert.That(actual, Is.EqualTo(expected).Within(Precision.FLOAT_EPSILON));
         }
 
+        [TestCase(HitResult.Great)]
+        [TestCase(HitResult.LargeTickHit)]
+        public void TestAccuracyUpdateFromIgnoreMiss(HitResult maxResult)
+        {
+            scoreProcessor.ApplyBeatmap(new Beatmap
+            {
+                HitObjects =
+                {
+                    new TestHitObject(maxResult, HitResult.IgnoreMiss)
+                }
+            });
+
+            var judgementResult = new JudgementResult(beatmap.HitObjects.Single(), new TestJudgement(maxResult, HitResult.IgnoreMiss))
+            {
+                Type = HitResult.IgnoreMiss
+            };
+            scoreProcessor.ApplyResult(judgementResult);
+
+            Assert.That(scoreProcessor.Accuracy.Value, Is.Not.EqualTo(1));
+        }
+
         private class TestJudgement : Judgement
         {
             public override HitResult MaxResult { get; }
