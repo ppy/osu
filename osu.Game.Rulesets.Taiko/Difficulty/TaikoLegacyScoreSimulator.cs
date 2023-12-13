@@ -75,6 +75,7 @@ namespace osu.Game.Rulesets.Taiko.Difficulty
                 simulateHit(obj, ref attributes);
 
             attributes.BonusScoreRatio = legacyBonusScore == 0 ? 0 : (double)standardisedBonusScore / legacyBonusScore;
+            attributes.BonusScore = legacyBonusScore;
 
             return attributes;
         }

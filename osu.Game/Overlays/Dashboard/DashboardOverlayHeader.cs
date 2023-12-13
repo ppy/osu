@@ -29,7 +29,7 @@ namespace osu.Game.Overlays.Dashboard
         [LocalisableDescription(typeof(FriendsStrings), nameof(FriendsStrings.TitleCompact))]
         Friends,
 
-        [Description("Currently Playing")]
+        [Description("Currently online")]
         CurrentlyPlaying
     }
 }
