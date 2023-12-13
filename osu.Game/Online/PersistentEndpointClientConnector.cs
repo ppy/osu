@@ -159,6 +159,8 @@ namespace osu.Game.Online
                 await Task.Run(connect, default).ConfigureAwait(false);
         }
 
+        protected Task Disconnect() => disconnect(true);
+
         private async Task disconnect(bool takeLock)
         {
             cancelExistingConnect();

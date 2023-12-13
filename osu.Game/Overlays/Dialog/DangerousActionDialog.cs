@@ -23,6 +23,11 @@ namespace osu.Game.Overlays.Dialog
         /// </summary>
         protected Action? DangerousAction { get; set; }
 
+        /// <summary>
+        /// The action to perform if cancelled.
+        /// </summary>
+        protected Action? CancelAction { get; set; }
+
         protected DangerousActionDialog()
         {
             HeaderText = DeleteConfirmationDialogStrings.HeaderText;
@@ -38,7 +43,8 @@ namespace osu.Game.Overlays.Dialog
                 },
                 new PopupDialogCancelButton
                 {
-                    Text = DeleteConfirmationDialogStrings.Cancel
+                    Text = DeleteConfirmationDialogStrings.Cancel,
+                    Action = () => CancelAction?.Invoke()
                 }
             };
         }

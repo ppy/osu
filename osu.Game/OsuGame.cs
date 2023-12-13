@@ -1077,6 +1077,7 @@ namespace osu.Game
             Add(difficultyRecommender);
             Add(externalLinkOpener = new ExternalLinkOpener());
             Add(new MusicKeyBindingHandler());
+            Add(new OnlineStatusNotifier(() => ScreenStack.CurrentScreen));
 
             // side overlays which cancel each other.
             var singleDisplaySideOverlays = new OverlayContainer[] { Settings, Notifications, FirstRunOverlay };

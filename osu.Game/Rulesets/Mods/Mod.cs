@@ -3,6 +3,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Reflection;
 using Newtonsoft.Json;
@@ -284,7 +285,7 @@ namespace osu.Game.Rulesets.Mods
                 if (!(target is IParseable parseable))
                     throw new InvalidOperationException($"Bindable type {target.GetType().ReadableName()} is not {nameof(IParseable)}.");
 
-                parseable.Parse(source);
+                parseable.Parse(source, CultureInfo.InvariantCulture);
             }
         }
 

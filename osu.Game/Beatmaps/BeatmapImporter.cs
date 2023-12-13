@@ -20,6 +20,7 @@ using osu.Game.IO;
 using osu.Game.IO.Archives;
 using osu.Game.Overlays.Notifications;
 using osu.Game.Rulesets;
+using osu.Game.Rulesets.Objects.Types;
 using Realms;
 
 namespace osu.Game.Beatmaps
@@ -388,6 +389,8 @@ namespace osu.Game.Beatmaps
                         ApproachRate = decodedDifficulty.ApproachRate,
                         SliderMultiplier = decodedDifficulty.SliderMultiplier,
                         SliderTickRate = decodedDifficulty.SliderTickRate,
+                        EndTimeObjectCount = decoded.HitObjects.Count(h => h is IHasDuration),
+                        TotalObjectCount = decoded.HitObjects.Count
                     };
 
                     var metadata = new BeatmapMetadata

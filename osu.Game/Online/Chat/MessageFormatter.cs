@@ -85,8 +85,8 @@ namespace osu.Game.Online.Chat
                 if (escapeChars != null)
                     displayText = escapeChars.Aggregate(displayText, (current, c) => current.Replace($"\\{c}", c.ToString()));
 
-                // Check for encapsulated links
-                if (result.Links.Find(l => (l.Index <= index && l.Index + l.Length >= index + m.Length) || (index <= l.Index && index + m.Length >= l.Index + l.Length)) == null)
+                // Check for overlapping links
+                if (!result.Links.Exists(l => l.Overlaps(index, m.Length)))
                 {
                     result.Text = result.Text.Remove(index, m.Length).Insert(index, displayText);
 
@@ -364,7 +364,9 @@ namespace osu.Game.Online.Chat
             Argument = argument;
         }
 
-        public bool Overlaps(Link otherLink) => Index < otherLink.Index + otherLink.Length && otherLink.Index < Index + Length;
+        public bool Overlaps(Link otherLink) => Overlaps(otherLink.Index, otherLink.Length);
+
+        public bool Overlaps(int otherIndex, int otherLength) => Index < otherIndex + otherLength && otherIndex < Index + Length;
 
         public int CompareTo(Link? otherLink) => Index > otherLink?.Index ? 1 : -1;
     }

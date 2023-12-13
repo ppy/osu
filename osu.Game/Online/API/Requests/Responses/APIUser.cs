@@ -43,7 +43,7 @@ namespace osu.Game.Online.API.Requests.Responses
             set => countryCodeString = value.ToString();
         }
 
-        public readonly Bindable<UserStatus> Status = new Bindable<UserStatus>();
+        public readonly Bindable<UserStatus?> Status = new Bindable<UserStatus?>();
 
         public readonly Bindable<UserActivity> Activity = new Bindable<UserActivity>();
 
