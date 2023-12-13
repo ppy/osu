@@ -218,9 +218,6 @@ namespace osu.Game.Rulesets.Scoring
 
             scoreResultCounts[result.Type] = scoreResultCounts.GetValueOrDefault(result.Type) + 1;
 
-            if (!result.Type.IsScorable())
-                return;
-
             if (result.Type.IncreasesCombo())
                 Combo.Value++;
             else if (result.Type.BreaksCombo())
@@ -228,16 +225,18 @@ namespace osu.Game.Rulesets.Scoring
 
             result.ComboAfterJudgement = Combo.Value;
 
-            if (result.Type.AffectsAccuracy())
+            if (result.Judgement.MaxResult.AffectsAccuracy())
             {
                 currentMaximumBaseScore += Judgement.ToNumericResult(result.Judgement.MaxResult);
-                currentBaseScore += Judgement.ToNumericResult(result.Type);
                 currentAccuracyJudgementCount++;
             }
 
+            if (result.Type.AffectsAccuracy())
+                currentBaseScore += Judgement.ToNumericResult(result.Type);
+
             if (result.Type.IsBonus())
                 currentBonusPortion += GetBonusScoreChange(result);
-            else
+            else if (result.Type.IsScorable())
                 currentComboPortion += GetComboScoreChange(result);
 
             ApplyScoreChange(result);
@@ -275,19 +274,18 @@ namespace osu.Game.Rulesets.Scoring
 
             scoreResultCounts[result.Type] = scoreResultCounts.GetValueOrDefault(result.Type) - 1;
 
-            if (!result.Type.IsScorable())
-                return;
-
-            if (result.Type.AffectsAccuracy())
+            if (result.Judgement.MaxResult.AffectsAccuracy())
             {
                 currentMaximumBaseScore -= Judgement.ToNumericResult(result.Judgement.MaxResult);
-                currentBaseScore -= Judgement.ToNumericResult(result.Type);
                 currentAccuracyJudgementCount--;
             }
 
+            if (result.Type.AffectsAccuracy())
+                currentBaseScore -= Judgement.ToNumericResult(result.Type);
+
             if (result.Type.IsBonus())
                 currentBonusPortion -= GetBonusScoreChange(result);
-            else
+            else if (result.Type.IsScorable())
                 currentComboPortion -= GetComboScoreChange(result);
 
             RemoveScoreChange(result);
