@@ -57,13 +57,14 @@ namespace osu.Game.Rulesets.Mania.Beatmaps
 
         public static int GetColumnCount(LegacyBeatmapConversionDifficultyInfo difficulty)
         {
-            if (new ManiaRuleset().RulesetInfo.Equals(difficulty.SourceRuleset))
-                return GetColumnCountForNonConvert(difficulty);
-
             double roundedCircleSize = Math.Round(difficulty.CircleSize);
+
+            if (new ManiaRuleset().RulesetInfo.Equals(difficulty.SourceRuleset))
+                return (int)Math.Max(1, roundedCircleSize);
+
             double roundedOverallDifficulty = Math.Round(difficulty.OverallDifficulty);
 
-            int countSliderOrSpinner = difficulty.TotalObjectCount - difficulty.CircleCount;
+            int countSliderOrSpinner = difficulty.EndTimeObjectCount;
 
             // In osu!stable, this division appears as if it happens on floats, but due to release-mode
             // optimisations, it actually ends up happening on doubles.
@@ -77,12 +78,6 @@ namespace osu.Game.Rulesets.Mania.Beatmaps
                 return roundedOverallDifficulty > 4 ? 5 : 4;
 
             return Math.Max(4, Math.Min((int)roundedOverallDifficulty + 1, 7));
-        }
-
-        public static int GetColumnCountForNonConvert(IBeatmapDifficultyInfo difficulty)
-        {
-            double roundedCircleSize = Math.Round(difficulty.CircleSize);
-            return (int)Math.Max(1, roundedCircleSize);
         }
 
         public override bool CanConvert() => Beatmap.HitObjects.All(h => h is IHasXPosition);
