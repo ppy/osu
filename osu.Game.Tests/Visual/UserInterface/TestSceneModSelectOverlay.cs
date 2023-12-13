@@ -787,7 +787,8 @@ namespace osu.Game.Tests.Visual.UserInterface
                 InputManager.MoveMouseTo(this.ChildrenOfType<ModPresetPanel>().Single(preset => preset.Preset.Value.Name == "Half Time 0.5x"));
                 InputManager.Click(MouseButton.Left);
             });
-            AddAssert("difficulty multiplier display shows correct value", () => modSelectOverlay.ChildrenOfType<ScoreMultiplierDisplay>().Single().Current.Value, () => Is.EqualTo(0.05));
+            AddAssert("difficulty multiplier display shows correct value",
+                () => modSelectOverlay.ChildrenOfType<ScoreMultiplierDisplay>().Single().Current.Value, () => Is.EqualTo(0.05).Within(Precision.DOUBLE_EPSILON));
 
             // this is highly unorthodox in a test, but because the `ModSettingChangeTracker` machinery heavily leans on events and object disposal and re-creation,
             // it is instrumental in the reproduction of the failure scenario that this test is supposed to cover.
