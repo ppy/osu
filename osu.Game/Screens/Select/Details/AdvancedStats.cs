@@ -8,6 +8,7 @@ using osu.Framework.Allocation;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
+using osu.Framework.Graphics.Cursor;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Graphics.UserInterface;
@@ -25,10 +26,11 @@ using osu.Framework.Utils;
 using osu.Game.Configuration;
 using osu.Game.Resources.Localisation.Web;
 using osu.Game.Rulesets;
+using osu.Game.Overlays.Mods;
 
 namespace osu.Game.Screens.Select.Details
 {
-    public partial class AdvancedStats : Container
+    public partial class AdvancedStats : Container, IHasCustomTooltip
     {
         [Resolved]
         private BeatmapDifficultyCache difficultyCache { get; set; }
@@ -43,6 +45,10 @@ namespace osu.Game.Screens.Select.Details
 
         protected readonly StatisticRow FirstValue, HpDrain, Accuracy, ApproachRate;
         private readonly StatisticRow starDifficulty;
+
+        private AdjustedAttributesTooltip rateAdjustTooltip;
+        public ITooltip GetCustomTooltip() => rateAdjustTooltip;
+        public object TooltipContent => this;
 
         private IBeatmapInfo beatmapInfo;
 
@@ -80,6 +86,7 @@ namespace osu.Game.Screens.Select.Details
         private void load(OsuColour colours)
         {
             starDifficulty.AccentColour = colours.Yellow;
+            rateAdjustTooltip = new AdjustedAttributesTooltip();
         }
 
         protected override void LoadComplete()
@@ -118,15 +125,29 @@ namespace osu.Game.Screens.Select.Details
             IBeatmapDifficultyInfo baseDifficulty = BeatmapInfo?.Difficulty;
             BeatmapDifficulty adjustedDifficulty = null;
 
-            if (baseDifficulty != null && mods.Value.Any(m => m is IApplicableToDifficulty))
+            IRulesetInfo ruleset = gameRuleset?.Value ?? beatmapInfo.Ruleset;
+
+            if (baseDifficulty != null &&
+                (mods.Value.Any(m => m is IApplicableToDifficulty) || mods.Value.Any(m => m is IApplicableToRate)))
             {
-                adjustedDifficulty = new BeatmapDifficulty(baseDifficulty);
+                BeatmapDifficulty originalDifficulty = new BeatmapDifficulty(baseDifficulty);
 
                 foreach (var mod in mods.Value.OfType<IApplicableToDifficulty>())
-                    mod.ApplyToDifficulty(adjustedDifficulty);
-            }
+                    mod.ApplyToDifficulty(originalDifficulty);
 
-            IRulesetInfo ruleset = gameRuleset?.Value ?? beatmapInfo.Ruleset;
+                adjustedDifficulty = originalDifficulty;
+
+                if (gameRuleset != null)
+                {
+                    double rate = 1;
+                    foreach (var mod in mods.Value.OfType<IApplicableToRate>())
+                        rate = mod.ApplyToRate(0, rate);
+
+                    adjustedDifficulty = ruleset.CreateInstance().GetRateAdjustedDisplayDifficulty(originalDifficulty, rate);
+
+                    rateAdjustTooltip.UpdateAttributes(originalDifficulty, adjustedDifficulty);
+                }
+            }
 
             switch (ruleset.OnlineID)
             {
