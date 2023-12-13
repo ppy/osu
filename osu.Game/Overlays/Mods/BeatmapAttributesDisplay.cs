@@ -60,6 +60,7 @@ namespace osu.Game.Overlays.Mods
         private AdjustedAttributesTooltip rateAdjustTooltip = null!;
 
         public ITooltip GetCustomTooltip() => rateAdjustTooltip;
+
         public object TooltipContent => this;
 
         private const float transition_duration = 250;
@@ -102,9 +103,6 @@ namespace osu.Game.Overlays.Mods
         protected override void LoadComplete()
         {
             base.LoadComplete();
-
-            rateAdjustTooltip.AddAttribute("AR");
-            rateAdjustTooltip.AddAttribute("OD");
 
             mods.BindValueChanged(_ =>
             {
@@ -184,8 +182,7 @@ namespace osu.Game.Overlays.Mods
             Ruleset ruleset = gameRuleset.Value.CreateInstance();
             BeatmapDifficulty adjustedDifficulty = ruleset.GetRateAdjustedDisplayDifficulty(originalDifficulty, rate);
 
-            rateAdjustTooltip.UpdateAttribute("AR", originalDifficulty.ApproachRate, adjustedDifficulty.ApproachRate);
-            rateAdjustTooltip.UpdateAttribute("OD", originalDifficulty.OverallDifficulty, adjustedDifficulty.OverallDifficulty);
+            rateAdjustTooltip.UpdateAttributes(originalDifficulty, adjustedDifficulty);
 
             approachRateDisplay.AdjustType.Value = VerticalAttributeDisplay.CalculateEffect(originalDifficulty.ApproachRate, adjustedDifficulty.ApproachRate);
             overallDifficultyDisplay.AdjustType.Value = VerticalAttributeDisplay.CalculateEffect(originalDifficulty.OverallDifficulty, adjustedDifficulty.OverallDifficulty);

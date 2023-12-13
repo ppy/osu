@@ -101,9 +101,6 @@ namespace osu.Game.Screens.Select.Details
             gameRuleset.BindValueChanged(_ => updateStatistics());
 
             mods.BindValueChanged(modsChanged, true);
-
-            rateAdjustTooltip.AddAttribute("AR");
-            rateAdjustTooltip.AddAttribute("OD");
         }
 
         private ModSettingChangeTracker modSettingChangeTracker;
@@ -148,8 +145,7 @@ namespace osu.Game.Screens.Select.Details
 
                     adjustedDifficulty = ruleset.CreateInstance().GetRateAdjustedDisplayDifficulty(originalDifficulty, rate);
 
-                    rateAdjustTooltip.UpdateAttribute("AR", originalDifficulty.ApproachRate, adjustedDifficulty.ApproachRate);
-                    rateAdjustTooltip.UpdateAttribute("OD", originalDifficulty.OverallDifficulty, adjustedDifficulty.OverallDifficulty);
+                    rateAdjustTooltip.UpdateAttributes(originalDifficulty, adjustedDifficulty);
                 }
             }
 
