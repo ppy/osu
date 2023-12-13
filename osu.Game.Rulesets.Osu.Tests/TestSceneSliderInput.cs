@@ -507,7 +507,11 @@ namespace osu.Game.Rulesets.Osu.Tests
                     HitObjects = { slider },
                     BeatmapInfo =
                     {
-                        Difficulty = new BeatmapDifficulty { SliderTickRate = tickRate ?? 3 },
+                        Difficulty = new BeatmapDifficulty
+                        {
+                            SliderTickRate = tickRate ?? 3,
+                            SliderMultiplier = 1,
+                        },
                         Ruleset = new OsuRuleset().RulesetInfo,
                     },
                     ControlPointInfo = cpi,

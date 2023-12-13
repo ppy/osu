@@ -253,10 +253,14 @@ namespace osu.Game.Overlays
         {
         }
 
+        protected override bool OnMouseDown(MouseDownEvent e)
+        {
+            isDraggingTopBar = topBar.DragBar.IsHovered;
+            return base.OnMouseDown(e);
+        }
+
         protected override bool OnDragStart(DragStartEvent e)
         {
-            isDraggingTopBar = topBar.IsHovered;
-
             if (!isDraggingTopBar)
                 return base.OnDragStart(e);
 

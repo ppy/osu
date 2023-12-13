@@ -150,6 +150,12 @@ namespace osu.Game.Online.API.Requests.Responses
 
         #endregion
 
+        /// <summary>
+        /// Whether this <see cref="ScoreInfo"/> represents a legacy (osu!stable) score.
+        /// </summary>
+        [JsonIgnore]
+        public bool IsLegacyScore => LegacyScoreId != null;
+
         public override string ToString() => $"score_id: {ID} user_id: {UserID}";
 
         /// <summary>
@@ -191,6 +197,7 @@ namespace osu.Game.Online.API.Requests.Responses
             {
                 OnlineID = OnlineID,
                 LegacyOnlineID = (long?)LegacyScoreId ?? -1,
+                IsLegacyScore = IsLegacyScore,
                 User = User ?? new APIUser { Id = UserID },
                 BeatmapInfo = new BeatmapInfo { OnlineID = BeatmapID },
                 Ruleset = new RulesetInfo { OnlineID = RulesetID },
