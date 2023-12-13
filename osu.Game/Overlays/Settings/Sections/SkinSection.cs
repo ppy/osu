@@ -57,9 +57,11 @@ namespace osu.Game.Overlays.Settings.Sections
             {
                 skinDropdown = new SkinSettingsDropdown
                 {
+                    AlwaysShowSearchBar = true,
+                    AllowNonContiguousMatching = true,
                     LabelText = SkinSettingsStrings.CurrentSkin,
                     Current = skins.CurrentSkinInfo,
-                    Keywords = new[] { @"skins" }
+                    Keywords = new[] { @"skins" },
                 },
                 new SettingsButton
                 {
