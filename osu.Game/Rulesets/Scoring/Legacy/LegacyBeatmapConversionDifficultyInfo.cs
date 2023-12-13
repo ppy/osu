@@ -29,9 +29,12 @@ namespace osu.Game.Rulesets.Scoring.Legacy
         public float OverallDifficulty { get; set; }
 
         /// <summary>
-        /// The count of hitcircles in the beatmap.
+        /// The number of hitobjects in the beatmap with a distinct end time.
         /// </summary>
-        public int CircleCount { get; set; }
+        /// <remarks>
+        /// Canonically, these are hitobjects are either sliders or spinners.
+        /// </remarks>
+        public int EndTimeObjectCount { get; set; }
 
         /// <summary>
         /// The total count of hitobjects in the beatmap.
@@ -42,7 +45,6 @@ namespace osu.Game.Rulesets.Scoring.Legacy
         float IBeatmapDifficultyInfo.ApproachRate => 0;
         double IBeatmapDifficultyInfo.SliderMultiplier => 0;
         double IBeatmapDifficultyInfo.SliderTickRate => 0;
-        int IBeatmapDifficultyInfo.EndTimeObjectCount => TotalObjectCount - CircleCount;
 
         public static LegacyBeatmapConversionDifficultyInfo FromAPIBeatmap(APIBeatmap apiBeatmap) => FromBeatmapInfo(apiBeatmap);
 
@@ -51,7 +53,7 @@ namespace osu.Game.Rulesets.Scoring.Legacy
             SourceRuleset = beatmap.BeatmapInfo.Ruleset,
             CircleSize = beatmap.Difficulty.CircleSize,
             OverallDifficulty = beatmap.Difficulty.OverallDifficulty,
-            CircleCount = beatmap.HitObjects.Count - beatmap.HitObjects.Count(h => h is IHasDuration),
+            EndTimeObjectCount = beatmap.HitObjects.Count(h => h is IHasDuration),
             TotalObjectCount = beatmap.HitObjects.Count
         };
 
@@ -60,7 +62,7 @@ namespace osu.Game.Rulesets.Scoring.Legacy
             SourceRuleset = beatmapInfo.Ruleset,
             CircleSize = beatmapInfo.Difficulty.CircleSize,
             OverallDifficulty = beatmapInfo.Difficulty.OverallDifficulty,
-            CircleCount = beatmapInfo.Difficulty.TotalObjectCount - beatmapInfo.Difficulty.EndTimeObjectCount,
+            EndTimeObjectCount = beatmapInfo.Difficulty.EndTimeObjectCount,
             TotalObjectCount = beatmapInfo.Difficulty.TotalObjectCount
         };
     }

@@ -64,7 +64,7 @@ namespace osu.Game.Rulesets.Mania.Beatmaps
 
             double roundedOverallDifficulty = Math.Round(difficulty.OverallDifficulty);
 
-            int countSliderOrSpinner = difficulty.TotalObjectCount - difficulty.CircleCount;
+            int countSliderOrSpinner = difficulty.EndTimeObjectCount;
             float percentSpecialObjects = (float)countSliderOrSpinner / difficulty.TotalObjectCount;
 
             if (percentSpecialObjects < 0.2)
