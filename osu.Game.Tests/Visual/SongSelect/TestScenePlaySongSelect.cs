@@ -1135,7 +1135,7 @@ namespace osu.Game.Tests.Visual.SongSelect
         {
             createSongSelect();
 
-            AddStep("set filter text", () => songSelect!.FilterControl.ChildrenOfType<SearchTextBox>().First().Text = "nonono");
+            AddStep("set filter text", () => songSelect!.FilterControl.ChildrenOfType<FilterControl.FilterControlTextBox>().First().Text = "nonono");
             AddStep("select all", () => InputManager.Keys(PlatformAction.SelectAll));
             AddStep("press ctrl-x", () =>
             {
@@ -1144,7 +1144,7 @@ namespace osu.Game.Tests.Visual.SongSelect
                 InputManager.ReleaseKey(Key.ControlLeft);
             });
 
-            AddAssert("filter text cleared", () => songSelect!.FilterControl.ChildrenOfType<SearchTextBox>().First().Text, () => Is.Empty);
+            AddAssert("filter text cleared", () => songSelect!.FilterControl.ChildrenOfType<FilterControl.FilterControlTextBox>().First().Text, () => Is.Empty);
         }
 
         private void waitForInitialSelection()
