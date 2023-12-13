@@ -35,7 +35,7 @@ namespace osu.Game.Overlays.Settings.Sections.General
         private Storage storage { get; set; } = null!;
 
         [BackgroundDependencyLoader]
-        private void load(OsuConfigManager config, OsuGame game)
+        private void load(OsuConfigManager config, OsuGame? game)
         {
             Add(new SettingsEnumDropdown<ReleaseStream>
             {
@@ -57,7 +57,7 @@ namespace osu.Game.Overlays.Settings.Sections.General
                             {
                                 notifications?.Post(new SimpleNotification
                                 {
-                                    Text = GeneralSettingsStrings.RunningLatestRelease(game.Version),
+                                    Text = GeneralSettingsStrings.RunningLatestRelease(game!.Version),
                                     Icon = FontAwesome.Solid.CheckCircle,
                                 });
                             }
@@ -87,7 +87,7 @@ namespace osu.Game.Overlays.Settings.Sections.General
                 Add(new SettingsButton
                 {
                     Text = GeneralSettingsStrings.ChangeFolderLocation,
-                    Action = () => game.PerformFromScreen(menu => menu.Push(new MigrationSelectScreen()))
+                    Action = () => game?.PerformFromScreen(menu => menu.Push(new MigrationSelectScreen()))
                 });
             }
         }
