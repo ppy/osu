@@ -25,11 +25,12 @@ namespace osu.Game.Rulesets.Osu.Tests
     public partial class TestSceneSliderEarlyHitJudgement : RateAdjustedBeatmapTestScene
     {
         private const double time_slider_start = 1000;
-        private const double time_slider_tick = 2000;
         private const double time_slider_end = 3000;
 
         private static readonly Vector2 slider_start_position = new Vector2(256 - slider_path_length / 2, 192);
         private static readonly Vector2 slider_end_position = new Vector2(256 + slider_path_length / 2, 192);
+        private static readonly Vector2 offset_inside_follow = new Vector2(35, 0);
+        private static readonly Vector2 offset_outside_follow = offset_inside_follow * 2;
 
         private ScoreAccessibleReplayPlayer currentPlayer = null!;
 
@@ -43,8 +44,8 @@ namespace osu.Game.Rulesets.Osu.Tests
             performTest(new List<ReplayFrame>
             {
                 new OsuReplayFrame(time_slider_start - 300, slider_start_position, OsuAction.LeftButton),
-                new OsuReplayFrame(time_slider_start - 200, slider_start_position + new Vector2(32, 0), OsuAction.LeftButton),
-                new OsuReplayFrame(time_slider_end - 200, slider_end_position + new Vector2(32, 0), OsuAction.LeftButton),
+                new OsuReplayFrame(time_slider_start - 200, slider_start_position + offset_inside_follow, OsuAction.LeftButton),
+                new OsuReplayFrame(time_slider_end - 200, slider_end_position + offset_inside_follow, OsuAction.LeftButton),
             });
 
             assertHeadJudgement(HitResult.Miss);
@@ -54,13 +55,48 @@ namespace osu.Game.Rulesets.Osu.Tests
         }
 
         [Test]
+        public void TestHitEarlyAndReleaseInFollowRegion()
+        {
+            performTest(new List<ReplayFrame>
+            {
+                new OsuReplayFrame(time_slider_start - 300, slider_start_position, OsuAction.LeftButton),
+                new OsuReplayFrame(time_slider_start - 200, slider_start_position + offset_inside_follow, OsuAction.LeftButton),
+                new OsuReplayFrame(time_slider_start - 100, slider_start_position + offset_inside_follow),
+                new OsuReplayFrame(time_slider_end - 100, slider_end_position + offset_inside_follow, OsuAction.LeftButton),
+            });
+
+            assertHeadJudgement(HitResult.Miss);
+            assertTickJudgement(HitResult.LargeTickMiss);
+            assertTailJudgement(HitResult.IgnoreMiss);
+            assertSliderJudgement(HitResult.IgnoreMiss);
+        }
+
+        [Test]
+        public void TestHitEarlyAndRepressInFollowRegion()
+        {
+            performTest(new List<ReplayFrame>
+            {
+                new OsuReplayFrame(time_slider_start - 300, slider_start_position, OsuAction.LeftButton),
+                new OsuReplayFrame(time_slider_start - 200, slider_start_position + offset_inside_follow, OsuAction.LeftButton),
+                new OsuReplayFrame(time_slider_start - 100, slider_start_position + offset_inside_follow),
+                new OsuReplayFrame(time_slider_start - 50, slider_start_position + offset_inside_follow, OsuAction.LeftButton),
+                new OsuReplayFrame(time_slider_end - 50, slider_end_position + offset_inside_follow, OsuAction.LeftButton),
+            });
+
+            assertHeadJudgement(HitResult.Miss);
+            assertTickJudgement(HitResult.LargeTickMiss);
+            assertTailJudgement(HitResult.IgnoreMiss);
+            assertSliderJudgement(HitResult.IgnoreMiss);
+        }
+
+        [Test]
         public void TestHitEarlyMoveOutsideFollowRegion()
         {
             performTest(new List<ReplayFrame>
             {
                 new OsuReplayFrame(time_slider_start - 300, slider_start_position, OsuAction.LeftButton),
-                new OsuReplayFrame(time_slider_start - 200, slider_start_position + new Vector2(96, 0), OsuAction.LeftButton),
-                new OsuReplayFrame(time_slider_end - 200, slider_end_position + new Vector2(96, 0), OsuAction.LeftButton),
+                new OsuReplayFrame(time_slider_start - 200, slider_start_position + offset_outside_follow, OsuAction.LeftButton),
+                new OsuReplayFrame(time_slider_end - 200, slider_end_position + offset_outside_follow, OsuAction.LeftButton),
             });
 
             assertHeadJudgement(HitResult.Miss);
