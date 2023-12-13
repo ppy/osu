@@ -109,6 +109,8 @@ namespace osu.Game.Online.API.Requests.Responses
             CircleSize = CircleSize,
             ApproachRate = ApproachRate,
             OverallDifficulty = OverallDifficulty,
+            EndTimeObjectCount = SliderCount + SpinnerCount,
+            TotalObjectCount = CircleCount + SliderCount + SpinnerCount
         };
 
         IBeatmapSetInfo? IBeatmapInfo.BeatmapSet => BeatmapSet;

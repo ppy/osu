@@ -18,8 +18,11 @@ namespace osu.Game.Beatmaps
         public float OverallDifficulty { get; set; } = IBeatmapDifficultyInfo.DEFAULT_DIFFICULTY;
         public float ApproachRate { get; set; } = IBeatmapDifficultyInfo.DEFAULT_DIFFICULTY;
 
-        public double SliderMultiplier { get; set; } = 1;
+        public double SliderMultiplier { get; set; } = 1.4;
         public double SliderTickRate { get; set; } = 1;
+
+        public int EndTimeObjectCount { get; set; }
+        public int TotalObjectCount { get; set; }
 
         public BeatmapDifficulty()
         {
@@ -44,6 +47,9 @@ namespace osu.Game.Beatmaps
 
             difficulty.SliderMultiplier = SliderMultiplier;
             difficulty.SliderTickRate = SliderTickRate;
+
+            difficulty.EndTimeObjectCount = EndTimeObjectCount;
+            difficulty.TotalObjectCount = TotalObjectCount;
         }
 
         public virtual void CopyFrom(IBeatmapDifficultyInfo other)
@@ -55,6 +61,9 @@ namespace osu.Game.Beatmaps
 
             SliderMultiplier = other.SliderMultiplier;
             SliderTickRate = other.SliderTickRate;
+
+            EndTimeObjectCount = other.EndTimeObjectCount;
+            TotalObjectCount = other.TotalObjectCount;
         }
     }
 }
