@@ -120,6 +120,10 @@ namespace osu.Game.Beatmaps
         [JsonIgnore]
         public bool Hidden { get; set; }
 
+        public int EndTimeObjectCount { get; set; }
+
+        public int TotalObjectCount { get; set; }
+
         /// <summary>
         /// Reset any fetched online linking information (and history).
         /// </summary>
