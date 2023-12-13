@@ -10,7 +10,6 @@ using osu.Framework.Bindables;
 using osu.Game.Audio;
 using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.ControlPoints;
-using osu.Game.Rulesets.Catch.UI;
 using osu.Game.Rulesets.Judgements;
 using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Objects.Types;
@@ -103,8 +102,7 @@ namespace osu.Game.Rulesets.Catch.Objects
                             AddNested(new TinyDroplet
                             {
                                 StartTime = t + lastEvent.Value.Time,
-                                X = ClampToPlayfield(EffectiveX + Path.PositionAt(
-                                    lastEvent.Value.PathProgress + (t / sinceLastTick) * (e.PathProgress - lastEvent.Value.PathProgress)).X),
+                                X = EffectiveX + Path.PositionAt(lastEvent.Value.PathProgress + (t / sinceLastTick) * (e.PathProgress - lastEvent.Value.PathProgress)).X,
                             });
                         }
                     }
@@ -121,7 +119,7 @@ namespace osu.Game.Rulesets.Catch.Objects
                         {
                             Samples = dropletSamples,
                             StartTime = e.Time,
-                            X = ClampToPlayfield(EffectiveX + Path.PositionAt(e.PathProgress).X),
+                            X = EffectiveX + Path.PositionAt(e.PathProgress).X,
                         });
                         break;
 
@@ -132,16 +130,14 @@ namespace osu.Game.Rulesets.Catch.Objects
                         {
                             Samples = this.GetNodeSamples(nodeIndex++),
                             StartTime = e.Time,
-                            X = ClampToPlayfield(EffectiveX + Path.PositionAt(e.PathProgress).X),
+                            X = EffectiveX + Path.PositionAt(e.PathProgress).X,
                         });
                         break;
                 }
             }
         }
 
-        public float EndX => ClampToPlayfield(EffectiveX + this.CurvePositionAt(1).X);
-
-        public float ClampToPlayfield(float value) => Math.Clamp(value, 0, CatchPlayfield.WIDTH);
+        public float EndX => EffectiveX + this.CurvePositionAt(1).X;
 
         [JsonIgnore]
         public double Duration
