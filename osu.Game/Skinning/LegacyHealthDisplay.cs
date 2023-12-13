@@ -11,7 +11,6 @@ using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.Textures;
 using osu.Framework.Utils;
-using osu.Game.Rulesets.Judgements;
 using osu.Game.Screens.Play.HUD;
 using osu.Game.Utils;
 using osuTK;
@@ -66,6 +65,7 @@ namespace osu.Game.Skinning
             marker.Current.BindTo(Current);
 
             maxFillWidth = fill.Width;
+            fill.Width = 0;
         }
 
         protected override void Update()
@@ -79,7 +79,7 @@ namespace osu.Game.Skinning
             marker.Position = fill.Position + new Vector2(fill.DrawWidth, isNewStyle ? fill.DrawHeight / 2 : 0);
         }
 
-        protected override void Flash(JudgementResult result) => marker.Flash(result);
+        protected override void Flash() => marker.Flash();
 
         private static Texture getTexture(ISkin skin, string name) => skin?.GetTexture($"scorebar-{name}");
 
@@ -237,7 +237,7 @@ namespace osu.Game.Skinning
                 });
             }
 
-            public override void Flash(JudgementResult result)
+            public override void Flash()
             {
                 bulgeMain();
 
@@ -256,7 +256,7 @@ namespace osu.Game.Skinning
         {
             public Bindable<double> Current { get; } = new Bindable<double>();
 
-            public virtual void Flash(JudgementResult result)
+            public virtual void Flash()
             {
             }
         }

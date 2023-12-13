@@ -73,7 +73,7 @@ namespace osu.Game.Skinning
                     // needs to be removed else it will cause incorrect skin behaviours. This is due to the config lookup having no context of which skin
                     // it should be returning the version for.
 
-                    Skin.LogLookupDebug(this, lookup, Skin.LookupDebugType.Miss);
+                    LogLookupDebug(this, lookup, LookupDebugType.Miss);
                     return null;
             }
 

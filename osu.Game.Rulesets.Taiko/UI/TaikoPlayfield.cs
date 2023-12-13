@@ -40,6 +40,8 @@ namespace osu.Game.Rulesets.Taiko.UI
         /// </summary>
         public Bindable<bool> ClassicHitTargetPosition = new BindableBool();
 
+        public Container UnderlayElements { get; private set; } = null!;
+
         private Container<HitExplosion> hitExplosionContainer;
         private Container<KiaiHitExplosion> kiaiExplosionContainer;
         private JudgementContainer<DrawableTaikoJudgement> judgementContainer;
@@ -130,7 +132,14 @@ namespace osu.Game.Rulesets.Taiko.UI
                         {
                             Name = "Bar line content",
                             RelativeSizeAxes = Axes.Both,
-                            Child = barLinePlayfield = new BarLinePlayfield(),
+                            Children = new Drawable[]
+                            {
+                                UnderlayElements = new Container
+                                {
+                                    RelativeSizeAxes = Axes.Both,
+                                },
+                                barLinePlayfield = new BarLinePlayfield(),
+                            }
                         },
                         hitObjectContent = new Container
                         {

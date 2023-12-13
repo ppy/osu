@@ -9,14 +9,11 @@ namespace osu.Game.Rulesets.Mods
 {
     public abstract class ModRateAdjust : Mod, IApplicableToRate
     {
-        public override bool ValidForMultiplayerAsFreeMod => false;
+        public sealed override bool ValidForMultiplayerAsFreeMod => false;
 
         public abstract BindableNumber<double> SpeedChange { get; }
 
-        public virtual void ApplyToTrack(IAdjustableAudioComponent track)
-        {
-            track.AddAdjustment(AdjustableProperty.Tempo, SpeedChange);
-        }
+        public abstract void ApplyToTrack(IAdjustableAudioComponent track);
 
         public virtual void ApplyToSample(IAdjustableAudioComponent sample)
         {
@@ -28,5 +25,7 @@ namespace osu.Game.Rulesets.Mods
         public override Type[] IncompatibleMods => new[] { typeof(ModTimeRamp), typeof(ModAdaptiveSpeed), typeof(ModRateAdjust) };
 
         public override string SettingDescription => SpeedChange.IsDefault ? string.Empty : $"{SpeedChange.Value:N2}x";
+
+        public override string ExtendedIconInformation => SettingDescription;
     }
 }

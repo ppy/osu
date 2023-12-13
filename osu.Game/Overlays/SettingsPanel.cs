@@ -14,6 +14,7 @@ using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Extensions.IEnumerableExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
+using osu.Framework.Graphics.Cursor;
 using osu.Framework.Graphics.Effects;
 using osu.Framework.Graphics.Primitives;
 using osu.Framework.Graphics.Shapes;
@@ -106,39 +107,43 @@ namespace osu.Game.Overlays
                 }
             };
 
-            Add(SectionsContainer = new SettingsSectionsContainer
+            Add(new PopoverContainer
             {
-                Masking = true,
-                EdgeEffect = new EdgeEffectParameters
-                {
-                    Colour = Color4.Black.Opacity(0),
-                    Type = EdgeEffectType.Shadow,
-                    Hollow = true,
-                    Radius = 10
-                },
-                MaskingSmoothness = 0,
                 RelativeSizeAxes = Axes.Both,
-                ExpandableHeader = CreateHeader(),
-                SelectedSection = { BindTarget = CurrentSection },
-                FixedHeader = new Container
+                Child = SectionsContainer = new SettingsSectionsContainer
                 {
-                    RelativeSizeAxes = Axes.X,
-                    AutoSizeAxes = Axes.Y,
-                    Padding = new MarginPadding
+                    Masking = true,
+                    EdgeEffect = new EdgeEffectParameters
                     {
-                        Vertical = 20,
-                        Horizontal = CONTENT_MARGINS
+                        Colour = Color4.Black.Opacity(0),
+                        Type = EdgeEffectType.Shadow,
+                        Hollow = true,
+                        Radius = 10
                     },
-                    Anchor = Anchor.TopCentre,
-                    Origin = Anchor.TopCentre,
-                    Child = searchTextBox = new SeekLimitedSearchTextBox
+                    MaskingSmoothness = 0,
+                    RelativeSizeAxes = Axes.Both,
+                    ExpandableHeader = CreateHeader(),
+                    SelectedSection = { BindTarget = CurrentSection },
+                    FixedHeader = new Container
                     {
                         RelativeSizeAxes = Axes.X,
-                        Origin = Anchor.TopCentre,
+                        AutoSizeAxes = Axes.Y,
+                        Padding = new MarginPadding
+                        {
+                            Vertical = 20,
+                            Horizontal = CONTENT_MARGINS
+                        },
                         Anchor = Anchor.TopCentre,
-                    }
-                },
-                Footer = CreateFooter().With(f => f.Alpha = 0)
+                        Origin = Anchor.TopCentre,
+                        Child = searchTextBox = new SettingsSearchTextBox
+                        {
+                            RelativeSizeAxes = Axes.X,
+                            Origin = Anchor.TopCentre,
+                            Anchor = Anchor.TopCentre,
+                        }
+                    },
+                    Footer = CreateFooter().With(f => f.Alpha = 0)
+                }
             });
 
             if (showSidebar)

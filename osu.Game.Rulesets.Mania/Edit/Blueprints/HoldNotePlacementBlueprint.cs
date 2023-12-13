@@ -44,8 +44,8 @@ namespace osu.Game.Rulesets.Mania.Edit.Blueprints
 
             if (Column != null)
             {
-                headPiece.Y = Parent.ToLocalSpace(Column.ScreenSpacePositionAtTime(HitObject.StartTime)).Y;
-                tailPiece.Y = Parent.ToLocalSpace(Column.ScreenSpacePositionAtTime(HitObject.EndTime)).Y;
+                headPiece.Y = Parent!.ToLocalSpace(Column.ScreenSpacePositionAtTime(HitObject.StartTime)).Y;
+                tailPiece.Y = Parent!.ToLocalSpace(Column.ScreenSpacePositionAtTime(HitObject.EndTime)).Y;
 
                 switch (scrollingInfo.Direction.Value)
                 {

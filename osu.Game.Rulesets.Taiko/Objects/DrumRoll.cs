@@ -1,14 +1,14 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using osu.Game.Rulesets.Objects.Types;
 using System.Threading;
 using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.ControlPoints;
-using osu.Game.Beatmaps.Formats;
 using osu.Game.Rulesets.Judgements;
 using osu.Game.Rulesets.Objects;
+using osu.Game.Rulesets.Objects.Types;
 using osu.Game.Rulesets.Scoring;
+using osu.Game.Rulesets.Taiko.Beatmaps;
 using osuTK;
 
 namespace osu.Game.Rulesets.Taiko.Objects
@@ -51,7 +51,7 @@ namespace osu.Game.Rulesets.Taiko.Objects
             TimingControlPoint timingPoint = controlPointInfo.TimingPointAt(StartTime);
             EffectControlPoint effectPoint = controlPointInfo.EffectPointAt(StartTime);
 
-            double scoringDistance = base_distance * difficulty.SliderMultiplier * effectPoint.ScrollSpeed;
+            double scoringDistance = base_distance * (difficulty.SliderMultiplier * TaikoBeatmapConverter.VELOCITY_MULTIPLIER) * effectPoint.ScrollSpeed;
             Velocity = scoringDistance / timingPoint.BeatLength;
 
             TickRate = difficulty.SliderTickRate == 3 ? 3 : 4;
@@ -116,7 +116,7 @@ namespace osu.Game.Rulesets.Taiko.Objects
         double IHasDistance.Distance => Duration * Velocity;
 
         SliderPath IHasPath.Path
-            => new SliderPath(PathType.Linear, new[] { Vector2.Zero, new Vector2(1) }, ((IHasDistance)this).Distance / LegacyBeatmapEncoder.LEGACY_TAIKO_VELOCITY_MULTIPLIER);
+            => new SliderPath(PathType.LINEAR, new[] { Vector2.Zero, new Vector2(1) }, ((IHasDistance)this).Distance / TaikoBeatmapConverter.VELOCITY_MULTIPLIER);
 
         #endregion
     }

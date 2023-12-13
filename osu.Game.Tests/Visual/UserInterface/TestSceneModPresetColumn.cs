@@ -167,7 +167,7 @@ namespace osu.Game.Tests.Visual.UserInterface
         }
 
         [Test]
-        public void TestAddingFlow()
+        public void TestAddingFlow([Values] bool withSystemModActive)
         {
             ModPresetColumn modPresetColumn = null!;
 
@@ -181,7 +181,13 @@ namespace osu.Game.Tests.Visual.UserInterface
             AddUntilStep("items loaded", () => modPresetColumn.IsLoaded && modPresetColumn.ItemsLoaded);
             AddAssert("add preset button disabled", () => !this.ChildrenOfType<AddPresetButton>().Single().Enabled.Value);
 
-            AddStep("set mods", () => SelectedMods.Value = new Mod[] { new OsuModDaycore(), new OsuModClassic() });
+            AddStep("set mods", () =>
+            {
+                var newMods = new Mod[] { new OsuModDaycore(), new OsuModClassic() };
+                if (withSystemModActive)
+                    newMods = newMods.Append(new OsuModTouchDevice()).ToArray();
+                SelectedMods.Value = newMods;
+            });
             AddAssert("add preset button enabled", () => this.ChildrenOfType<AddPresetButton>().Single().Enabled.Value);
 
             AddStep("click add preset button", () =>
@@ -209,6 +215,9 @@ namespace osu.Game.Tests.Visual.UserInterface
             });
             AddUntilStep("popover closed", () => !this.ChildrenOfType<OsuPopover>().Any());
             AddUntilStep("preset creation occurred", () => this.ChildrenOfType<ModPresetPanel>().Count() == 4);
+            AddAssert("preset has correct mods",
+                () => this.ChildrenOfType<ModPresetPanel>().Single(panel => panel.Preset.Value.Name == "new preset").Preset.Value.Mods,
+                () => Has.Count.EqualTo(2));
 
             AddStep("click add preset button", () =>
             {

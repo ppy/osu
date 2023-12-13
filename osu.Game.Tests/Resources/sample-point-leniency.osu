@@ -1,0 +1,10 @@
+osu file format v14
+
+# extracted from https://osu.ppy.sh/beatmapsets/1859679#osu/3823636
+
+[TimingPoints]
+39166,-117.647058823529,4,2,1,5,0,0
+39262,-117.647058823529,4,2,1,70,0,0
+
+[HitObjects]
+440,70,39260,1,10,0:2:0:0:

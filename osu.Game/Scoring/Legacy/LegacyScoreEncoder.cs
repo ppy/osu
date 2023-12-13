@@ -30,9 +30,11 @@ namespace osu.Game.Scoring.Legacy
         /// <item><description>30000001: Appends <see cref="LegacyReplaySoloScoreInfo"/> to the end of scores.</description></item>
         /// <item><description>30000002: Score stored to replay calculated using the Score V2 algorithm. Legacy scores on this version are candidate to Score V1 -> V2 conversion.</description></item>
         /// <item><description>30000003: First version after converting legacy total score to standardised.</description></item>
+        /// <item><description>30000004: Fixed mod multipliers during legacy score conversion. Reconvert all scores.</description></item>
+        /// <item><description>30000005: Introduce combo exponent in the osu! gamemode. Reconvert all scores.</description></item>
         /// </list>
         /// </remarks>
-        public const int LATEST_VERSION = 30000003;
+        public const int LATEST_VERSION = 30000005;
 
         /// <summary>
         /// The first stable-compatible YYYYMMDD format version given to lazer usage of replays.
@@ -83,7 +85,7 @@ namespace osu.Game.Scoring.Legacy
                 sw.Write(getHpGraphFormatted());
                 sw.Write(score.ScoreInfo.Date.DateTime);
                 sw.WriteByteArray(createReplayData());
-                sw.Write((long)0);
+                sw.Write(score.ScoreInfo.LegacyOnlineID);
                 writeModSpecificData(score.ScoreInfo, sw);
                 sw.WriteByteArray(createScoreInfoData());
             }

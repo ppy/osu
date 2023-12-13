@@ -198,7 +198,7 @@ namespace osu.Game.Tests.Visual.Gameplay
         {
             var beatmap = createBeatmap();
             beatmap.ControlPointInfo.Add(0, new TimingControlPoint { BeatLength = time_range });
-            beatmap.Difficulty.SliderMultiplier = 2;
+            beatmap.BeatmapInfo.Difficulty.SliderMultiplier = 2;
 
             createTest(beatmap);
             AddStep("adjust time range", () => drawableRuleset.TimeRange.Value = 2000);
@@ -237,7 +237,7 @@ namespace osu.Game.Tests.Visual.Gameplay
         });
 
         private void assertPosition(int index, float relativeY) => AddAssert($"hitobject {index} at {relativeY}",
-            () => Precision.AlmostEquals(getDrawableHitObject(index)?.DrawPosition.Y ?? -1, yScale * relativeY));
+            () => getDrawableHitObject(index)?.DrawPosition.Y / yScale ?? -1, () => Is.EqualTo(relativeY).Within(Precision.FLOAT_EPSILON));
 
         private void setTime(double time)
         {
@@ -251,7 +251,17 @@ namespace osu.Game.Tests.Visual.Gameplay
         /// <returns>The <see cref="IBeatmap"/>.</returns>
         private IBeatmap createBeatmap(Func<int, TestHitObject> createAction = null)
         {
-            var beatmap = new Beatmap<TestHitObject> { BeatmapInfo = { Ruleset = new OsuRuleset().RulesetInfo } };
+            var beatmap = new Beatmap<TestHitObject>
+            {
+                BeatmapInfo =
+                {
+                    Difficulty = new BeatmapDifficulty
+                    {
+                        SliderMultiplier = 1
+                    },
+                    Ruleset = new OsuRuleset().RulesetInfo
+                }
+            };
 
             for (int i = 0; i < 10; i++)
             {
@@ -311,14 +321,13 @@ namespace osu.Game.Tests.Visual.Gameplay
 
             protected override bool RelativeScaleBeatLengths => RelativeScaleBeatLengthsOverride;
 
-            protected override ScrollVisualisationMethod VisualisationMethod => ScrollVisualisationMethod.Overlapping;
-
             public new Bindable<double> TimeRange => base.TimeRange;
 
             public TestDrawableScrollingRuleset(Ruleset ruleset, IBeatmap beatmap, IReadOnlyList<Mod> mods = null)
                 : base(ruleset, beatmap, mods)
             {
                 TimeRange.Value = time_range;
+                VisualisationMethod = ScrollVisualisationMethod.Overlapping;
             }
 
             public override DrawableHitObject<TestHitObject> CreateDrawableRepresentation(TestHitObject h)

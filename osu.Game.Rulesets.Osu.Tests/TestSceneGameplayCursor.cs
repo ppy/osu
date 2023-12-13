@@ -94,16 +94,16 @@ namespace osu.Game.Rulesets.Osu.Tests
 
             AddStep("load content", loadContent);
 
-            AddUntilStep("cursor size correct", () => lastContainer.ActiveCursor.Scale.X == OsuCursorContainer.GetScaleForCircleSize(circleSize) * userScale);
+            AddUntilStep("cursor size correct", () => lastContainer.ActiveCursor.CursorScale.Value == OsuCursor.GetScaleForCircleSize(circleSize) * userScale);
 
             AddStep("set user scale to 1", () => config.SetValue(OsuSetting.GameplayCursorSize, 1f));
-            AddUntilStep("cursor size correct", () => lastContainer.ActiveCursor.Scale.X == OsuCursorContainer.GetScaleForCircleSize(circleSize));
+            AddUntilStep("cursor size correct", () => lastContainer.ActiveCursor.CursorScale.Value == OsuCursor.GetScaleForCircleSize(circleSize));
 
             AddStep("turn off autosizing", () => config.SetValue(OsuSetting.AutoCursorSize, false));
-            AddUntilStep("cursor size correct", () => lastContainer.ActiveCursor.Scale.X == 1);
+            AddUntilStep("cursor size correct", () => lastContainer.ActiveCursor.CursorScale.Value == 1);
 
             AddStep($"set user scale to {userScale}", () => config.SetValue(OsuSetting.GameplayCursorSize, userScale));
-            AddUntilStep("cursor size correct", () => lastContainer.ActiveCursor.Scale.X == userScale);
+            AddUntilStep("cursor size correct", () => lastContainer.ActiveCursor.CursorScale.Value == userScale);
         }
 
         [Test]

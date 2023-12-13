@@ -17,7 +17,7 @@ using osuTK;
 
 namespace osu.Game.Rulesets.Osu.Objects.Drawables
 {
-    public partial class DrawableSliderRepeat : DrawableOsuHitObject, ITrackSnaking
+    public partial class DrawableSliderRepeat : DrawableOsuHitObject, ITrackSnaking, IRequireTracking
     {
         public new SliderRepeat HitObject => (SliderRepeat)base.HitObject;
 
@@ -30,11 +30,13 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
 
         public SkinnableDrawable CirclePiece { get; private set; }
 
-        public ReverseArrowPiece Arrow { get; private set; }
+        public SkinnableDrawable Arrow { get; private set; }
 
         private Drawable scaleContainer;
 
         public override bool DisplayResult => false;
+
+        public bool Tracking { get; set; }
 
         public DrawableSliderRepeat()
             : base(null)
@@ -50,7 +52,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
         private void load()
         {
             Origin = Anchor.Centre;
-            Size = new Vector2(OsuHitObject.OBJECT_RADIUS * 2);
+            Size = OsuHitObject.OBJECT_DIMENSIONS;
 
             AddInternal(scaleContainer = new Container
             {
@@ -65,7 +67,11 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
                         Anchor = Anchor.Centre,
                         Origin = Anchor.Centre,
                     },
-                    Arrow = new ReverseArrowPiece(),
+                    Arrow = new SkinnableDrawable(new OsuSkinComponentLookup(OsuSkinComponents.ReverseArrow), _ => new DefaultReverseArrow())
+                    {
+                        Anchor = Anchor.Centre,
+                        Origin = Anchor.Centre,
+                    },
                 }
             });
 
@@ -81,8 +87,18 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
 
         protected override void CheckForResult(bool userTriggered, double timeOffset)
         {
-            if (HitObject.StartTime <= Time.Current)
-                ApplyResult(r => r.Type = DrawableSlider.Tracking.Value ? r.Judgement.MaxResult : r.Judgement.MinResult);
+            // shared implementation with DrawableSliderTick.
+            if (timeOffset >= 0)
+            {
+                // Attempt to preserve correct ordering of judgements as best we can by forcing
+                // an un-judged head to be missed when the user has clearly skipped it.
+                //
+                // This check is applied to all nested slider objects apart from the head (ticks, repeats, tail).
+                if (Tracking && !DrawableSlider.HeadCircle.Judged)
+                    DrawableSlider.HeadCircle.MissForcefully();
+
+                ApplyResult(r => r.Type = Tracking ? r.Judgement.MaxResult : r.Judgement.MinResult);
+            }
         }
 
         protected override void UpdateInitialTransforms()
@@ -114,11 +130,6 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
 
                 case ArmedState.Hit:
                     this.FadeOut(animDuration, Easing.Out);
-
-                    const float final_scale = 1.5f;
-
-                    Arrow.ScaleTo(Scale * final_scale, animDuration, Easing.Out);
-                    CirclePiece.ScaleTo(Scale * final_scale, animDuration, Easing.Out);
                     break;
             }
         }

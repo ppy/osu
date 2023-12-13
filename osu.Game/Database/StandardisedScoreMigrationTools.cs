@@ -10,11 +10,11 @@ using osu.Game.Beatmaps;
 using osu.Game.Extensions;
 using osu.Game.IO.Legacy;
 using osu.Game.Rulesets;
-using osu.Game.Rulesets.Difficulty;
 using osu.Game.Rulesets.Judgements;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Scoring;
+using osu.Game.Rulesets.Scoring.Legacy;
 using osu.Game.Scoring;
 
 namespace osu.Game.Database
@@ -26,7 +26,7 @@ namespace osu.Game.Database
             if (score.IsLegacyScore)
                 return false;
 
-            if (score.TotalScoreVersion > 30000002)
+            if (score.TotalScoreVersion > 30000004)
                 return false;
 
             // Recalculate the old-style standardised score to see if this was an old lazer score.
@@ -222,52 +222,135 @@ namespace osu.Game.Database
                 throw new InvalidOperationException("Beatmap contains no hit objects!");
 
             ILegacyScoreSimulator sv1Simulator = legacyRuleset.CreateLegacyScoreSimulator();
+            LegacyScoreAttributes attributes = sv1Simulator.Simulate(beatmap, playableBeatmap);
 
-            sv1Simulator.Simulate(beatmap, playableBeatmap, mods);
-
-            return ConvertFromLegacyTotalScore(score, new DifficultyAttributes
-            {
-                LegacyAccuracyScore = sv1Simulator.AccuracyScore,
-                LegacyComboScore = sv1Simulator.ComboScore,
-                LegacyBonusScoreRatio = sv1Simulator.BonusScoreRatio
-            });
+            return ConvertFromLegacyTotalScore(score, LegacyBeatmapConversionDifficultyInfo.FromBeatmap(beatmap.Beatmap), attributes);
         }
 
         /// <summary>
         /// Converts from <see cref="ScoreInfo.LegacyTotalScore"/> to the new standardised scoring of <see cref="ScoreProcessor"/>.
         /// </summary>
         /// <param name="score">The score to convert the total score of.</param>
-        /// <param name="attributes">Difficulty attributes providing the legacy scoring values
-        /// (<see cref="DifficultyAttributes.LegacyAccuracyScore"/>, <see cref="DifficultyAttributes.LegacyComboScore"/>, and <see cref="DifficultyAttributes.LegacyBonusScoreRatio"/>)
-        /// for the beatmap which the score was set on.</param>
+        /// <param name="difficulty">The beatmap difficulty.</param>
+        /// <param name="attributes">The legacy scoring attributes for the beatmap which the score was set on.</param>
         /// <returns>The standardised total score.</returns>
-        public static long ConvertFromLegacyTotalScore(ScoreInfo score, DifficultyAttributes attributes)
+        public static long ConvertFromLegacyTotalScore(ScoreInfo score, LegacyBeatmapConversionDifficultyInfo difficulty, LegacyScoreAttributes attributes)
         {
             if (!score.IsLegacyScore)
                 return score.TotalScore;
 
             Debug.Assert(score.LegacyTotalScore != null);
 
-            int maximumLegacyAccuracyScore = attributes.LegacyAccuracyScore;
-            int maximumLegacyComboScore = attributes.LegacyComboScore;
-            double maximumLegacyBonusRatio = attributes.LegacyBonusScoreRatio;
-            double modMultiplier = score.Mods.Select(m => m.ScoreMultiplier).Aggregate(1.0, (c, n) => c * n);
+            Ruleset ruleset = score.Ruleset.CreateInstance();
+            if (ruleset is not ILegacyRuleset legacyRuleset)
+                return score.TotalScore;
 
-            // The part of total score that doesn't include bonus.
-            int maximumLegacyBaseScore = maximumLegacyAccuracyScore + maximumLegacyComboScore;
+            double legacyModMultiplier = legacyRuleset.CreateLegacyScoreSimulator().GetLegacyScoreMultiplier(score.Mods, difficulty);
+            int maximumLegacyAccuracyScore = attributes.AccuracyScore;
+            long maximumLegacyComboScore = (long)Math.Round(attributes.ComboScore * legacyModMultiplier);
+            double maximumLegacyBonusRatio = attributes.BonusScoreRatio;
+            long maximumLegacyBonusScore = attributes.BonusScore;
 
-            // The combo proportion is calculated as a proportion of maximumLegacyBaseScore.
-            double comboProportion = Math.Min(1, (double)score.LegacyTotalScore / maximumLegacyBaseScore);
+            double legacyAccScore = maximumLegacyAccuracyScore * score.Accuracy;
+            // We can not separate the ComboScore from the BonusScore, so we keep the bonus in the ratio.
+            double comboProportion =
+                ((double)score.LegacyTotalScore - legacyAccScore) / (maximumLegacyComboScore + maximumLegacyBonusScore);
 
-            // The bonus proportion makes up the rest of the score that exceeds maximumLegacyBaseScore.
+            // We assume the bonus proportion only makes up the rest of the score that exceeds maximumLegacyBaseScore.
+            long maximumLegacyBaseScore = maximumLegacyAccuracyScore + maximumLegacyComboScore;
             double bonusProportion = Math.Max(0, ((long)score.LegacyTotalScore - maximumLegacyBaseScore) * maximumLegacyBonusRatio);
+
+            double modMultiplier = score.Mods.Select(m => m.ScoreMultiplier).Aggregate(1.0, (c, n) => c * n);
 
             switch (score.Ruleset.OnlineID)
             {
                 case 0:
+                    if (score.MaxCombo == 0 || score.Accuracy == 0)
+                    {
+                        return (long)Math.Round((
+                            0
+                            + 500000 * Math.Pow(score.Accuracy, 5)
+                            + bonusProportion) * modMultiplier);
+                    }
+
+                    // Assumptions:
+                    // - sliders and slider ticks are uniformly distributed in the beatmap, and thus can be ignored without losing much precision.
+                    //   We thus consider a map of hit-circles only, which gives objectCount == maximumCombo.
+                    // - the Ok/Meh hit results are uniformly spread in the score, and thus can be ignored without losing much precision.
+                    //   We simplify and consider each hit result to have the same hit value of `300 * score.Accuracy`
+                    //   (which represents the average hit value over the entire play),
+                    //   which allows us to isolate the accuracy multiplier.
+
+                    // This is a very ballpark estimate of the maximum magnitude of the combo portion in score V1.
+                    // It is derived by assuming a full combo play and summing up the contribution to combo portion from each individual object.
+                    // Because each object's combo contribution is proportional to the current combo at the time of judgement,
+                    // this can be roughly represented by summing / integrating f(combo) = combo.
+                    // All mod- and beatmap-dependent multipliers and constants are not included here,
+                    // as we will only be using the magnitude of this to compute ratios.
+                    int maximumLegacyCombo = attributes.MaxCombo;
+                    double maximumAchievableComboPortionInScoreV1 = Math.Pow(maximumLegacyCombo, 2);
+                    // Similarly, estimate the maximum magnitude of the combo portion in standardised score.
+                    // Roughly corresponds to integrating f(combo) = combo ^ COMBO_EXPONENT (omitting constants)
+                    double maximumAchievableComboPortionInStandardisedScore = Math.Pow(maximumLegacyCombo, 1 + ScoreProcessor.COMBO_EXPONENT);
+
+                    double comboPortionInScoreV1 = maximumAchievableComboPortionInScoreV1 * comboProportion / score.Accuracy;
+
+                    // This is - roughly - how much score, in the combo portion, the longest combo on this particular play would gain in score V1.
+                    double comboPortionFromLongestComboInScoreV1 = Math.Pow(score.MaxCombo, 2);
+                    // Same for standardised score.
+                    double comboPortionFromLongestComboInStandardisedScore = Math.Pow(score.MaxCombo, 1 + ScoreProcessor.COMBO_EXPONENT);
+
+                    // Calculate how many times the longest combo the user has achieved in the play can repeat
+                    // without exceeding the combo portion in score V1 as achieved by the player.
+                    // This is a pessimistic estimate; it intentionally does not operate on object count and uses only score instead.
+                    double maximumOccurrencesOfLongestCombo = Math.Floor(comboPortionInScoreV1 / comboPortionFromLongestComboInScoreV1);
+                    double comboPortionFromRepeatedLongestCombosInScoreV1 = maximumOccurrencesOfLongestCombo * comboPortionFromLongestComboInScoreV1;
+
+                    double remainingComboPortionInScoreV1 = comboPortionInScoreV1 - comboPortionFromRepeatedLongestCombosInScoreV1;
+                    // `remainingComboPortionInScoreV1` is in the "score ballpark" realm, which means it's proportional to combo squared.
+                    // To convert that back to a raw combo length, we need to take the square root...
+                    double remainingCombo = Math.Sqrt(remainingComboPortionInScoreV1);
+                    // ...and then based on that raw combo length, we calculate how much this last combo is worth in standardised score.
+                    double remainingComboPortionInStandardisedScore = Math.Pow(remainingCombo, 1 + ScoreProcessor.COMBO_EXPONENT);
+
+                    double lowerEstimateOfComboPortionInStandardisedScore
+                        = maximumOccurrencesOfLongestCombo * comboPortionFromLongestComboInStandardisedScore
+                          + remainingComboPortionInStandardisedScore;
+
+                    // Compute approximate upper estimate new score for that play.
+                    // This time, divide the remaining combo among remaining objects equally to achieve longest possible combo lengths.
+                    // There is no rigorous proof that doing this will yield a correct upper bound, but it seems to work out in practice.
+                    remainingComboPortionInScoreV1 = comboPortionInScoreV1 - comboPortionFromLongestComboInScoreV1;
+                    double remainingCountOfObjectsGivingCombo = maximumLegacyCombo - score.MaxCombo - score.Statistics.GetValueOrDefault(HitResult.Miss);
+                    // Because we assumed all combos were equal, `remainingComboPortionInScoreV1`
+                    // can be approximated by n * x^2, wherein n is the assumed number of equal combos,
+                    // and x is the assumed length of every one of those combos.
+                    // The remaining count of objects giving combo is, using those terms, equal to n * x.
+                    // Therefore, dividing the two will result in x, i.e. the assumed length of the remaining combos.
+                    double lengthOfRemainingCombos = remainingCountOfObjectsGivingCombo > 0
+                        ? remainingComboPortionInScoreV1 / remainingCountOfObjectsGivingCombo
+                        : 0;
+                    // In standardised scoring, each combo yields a score proportional to combo length to the power 1 + COMBO_EXPONENT.
+                    // Using the symbols introduced above, that would be x ^ 1.5 per combo, n times (because there are n assumed equal-length combos).
+                    // However, because `remainingCountOfObjectsGivingCombo` - using the symbols introduced above - is assumed to be equal to n * x,
+                    // we can skip adding the 1 and just multiply by x ^ 0.5.
+                    remainingComboPortionInStandardisedScore = remainingCountOfObjectsGivingCombo * Math.Pow(lengthOfRemainingCombos, ScoreProcessor.COMBO_EXPONENT);
+
+                    double upperEstimateOfComboPortionInStandardisedScore = comboPortionFromLongestComboInStandardisedScore + remainingComboPortionInStandardisedScore;
+
+                    // Approximate by combining lower and upper estimates.
+                    // As the lower-estimate is very pessimistic, we use a 30/70 ratio
+                    // and cap it with 1.2 times the middle-point to avoid overestimates.
+                    double estimatedComboPortionInStandardisedScore = Math.Min(
+                        0.3 * lowerEstimateOfComboPortionInStandardisedScore + 0.7 * upperEstimateOfComboPortionInStandardisedScore,
+                        1.2 * (lowerEstimateOfComboPortionInStandardisedScore + upperEstimateOfComboPortionInStandardisedScore) / 2
+                    );
+
+                    double newComboScoreProportion = estimatedComboPortionInStandardisedScore / maximumAchievableComboPortionInStandardisedScore;
+
                     return (long)Math.Round((
-                        700000 * comboProportion
-                        + 300000 * Math.Pow(score.Accuracy, 10)
+                        500000 * newComboScoreProportion * score.Accuracy
+                        + 500000 * Math.Pow(score.Accuracy, 5)
                         + bonusProportion) * modMultiplier);
 
                 case 1:

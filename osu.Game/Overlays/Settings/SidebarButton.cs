@@ -14,8 +14,8 @@ namespace osu.Game.Overlays.Settings
         [Resolved]
         protected OverlayColourProvider ColourProvider { get; private set; } = null!;
 
-        protected SidebarButton()
-            : base(HoverSampleSet.ButtonSidebar)
+        protected SidebarButton(HoverSampleSet? hoverSounds = HoverSampleSet.ButtonSidebar)
+            : base(hoverSounds)
         {
         }
 

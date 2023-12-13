@@ -21,8 +21,6 @@ namespace osu.Game.Rulesets.Catch.UI
 {
     public partial class DrawableCatchRuleset : DrawableScrollingRuleset<CatchHitObject>
     {
-        protected override ScrollVisualisationMethod VisualisationMethod => ScrollVisualisationMethod.Constant;
-
         protected override bool UserScrollSpeedAdjustment => false;
 
         public DrawableCatchRuleset(Ruleset ruleset, IBeatmap beatmap, IReadOnlyList<Mod>? mods = null)
@@ -30,6 +28,7 @@ namespace osu.Game.Rulesets.Catch.UI
         {
             Direction.Value = ScrollingDirection.Down;
             TimeRange.Value = GetTimeRange(beatmap.Difficulty.ApproachRate);
+            VisualisationMethod = ScrollVisualisationMethod.Constant;
         }
 
         [BackgroundDependencyLoader]
