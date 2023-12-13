@@ -1,28 +1,29 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using System.Collections.Generic;
+using System;
 using System.Linq;
 using osu.Framework.Allocation;
-using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Cursor;
 using osu.Framework.Graphics.Shapes;
-using osu.Game.Graphics.Sprites;
-using osu.Game.Graphics;
 using osu.Framework.Utils;
+using osu.Game.Beatmaps;
+using osu.Game.Graphics;
+using osu.Game.Graphics.Sprites;
 using osuTK;
 
 namespace osu.Game.Overlays.Mods
 {
     public partial class AdjustedAttributesTooltip : VisibilityContainer, ITooltip
     {
-        private readonly Dictionary<string, Bindable<OldNewPair>> attributes = new Dictionary<string, Bindable<OldNewPair>>();
-
-        private FillFlowContainer? attributesFillFlow;
+        private FillFlowContainer attributesFillFlow = null!;
 
         private Container content = null!;
+
+        private BeatmapDifficulty? originalDifficulty;
+        private BeatmapDifficulty? adjustedDifficulty;
 
         [Resolved]
         private OsuColour colours { get; set; } = null!;
@@ -69,36 +70,43 @@ namespace osu.Game.Overlays.Mods
                 },
             };
 
-            foreach (var attribute in attributes)
-                attributesFillFlow?.Add(new AttributeDisplay(attribute.Key, attribute.Value.GetBoundCopy()));
-
-            updateVisibility();
+            updateDisplay();
         }
 
-        public void AddAttribute(string name)
+        public void UpdateAttributes(BeatmapDifficulty original, BeatmapDifficulty adjusted)
         {
-            Bindable<OldNewPair> newBindable = new Bindable<OldNewPair>();
-            newBindable.BindValueChanged(_ => updateVisibility());
-            attributes.Add(name, newBindable);
+            originalDifficulty = original;
+            adjustedDifficulty = adjusted;
 
-            attributesFillFlow?.Add(new AttributeDisplay(name, newBindable.GetBoundCopy()));
+            if (IsLoaded)
+                updateDisplay();
         }
 
-        public void UpdateAttribute(string name, double oldValue, double newValue)
+        private void updateDisplay()
         {
-            if (!attributes.ContainsKey(name)) return;
+            attributesFillFlow.Clear();
 
-            Bindable<OldNewPair> attribute = attributes[name];
+            if (originalDifficulty == null || adjustedDifficulty == null)
+                return;
 
-            OldNewPair attributeValue = attribute.Value;
-            attributeValue.OldValue = oldValue;
-            attributeValue.NewValue = newValue;
+            attemptAdd("AR", bd => bd.ApproachRate);
+            attemptAdd("OD", bd => bd.OverallDifficulty);
+            attemptAdd("CS", bd => bd.CircleSize);
+            attemptAdd("HP", bd => bd.DrainRate);
 
-            attribute.Value = attributeValue;
-        }
+            if (attributesFillFlow.Any())
+                content.Show();
+            else
+                content.Hide();
 
-        protected override void Update()
-        {
+            void attemptAdd(string name, Func<BeatmapDifficulty, double> lookup)
+            {
+                double a = lookup(originalDifficulty);
+                double b = lookup(adjustedDifficulty);
+
+                if (!Precision.AlmostEquals(a, b))
+                    attributesFillFlow.Add(new AttributeDisplay(name, a, b));
+            }
         }
 
         public void SetContent(object content)
@@ -110,55 +118,18 @@ namespace osu.Game.Overlays.Mods
 
         public void Move(Vector2 pos) => Position = pos;
 
-        private void updateVisibility()
-        {
-            if (!IsLoaded)
-                return;
-
-            if (attributes.Any(attribute => !Precision.AlmostEquals(attribute.Value.Value.OldValue, attribute.Value.Value.NewValue)))
-                content.Show();
-            else
-                content.Hide();
-        }
-
         private partial class AttributeDisplay : CompositeDrawable
         {
-            public readonly Bindable<OldNewPair> AttributeValues;
-            public readonly string AttributeName;
-
-            private readonly OsuSpriteText text;
-
-            public AttributeDisplay(string name, Bindable<OldNewPair> values)
+            public AttributeDisplay(string name, double original, double adjusted)
             {
                 AutoSizeAxes = Axes.Both;
 
-                AttributeName = name;
-                AttributeValues = values;
-
-                InternalChild = text = new OsuSpriteText
+                InternalChild = new OsuSpriteText
                 {
-                    Font = OsuFont.Default.With(weight: FontWeight.Bold)
+                    Font = OsuFont.Default.With(weight: FontWeight.Bold),
+                    Text = $"{name}: {original:0.0#} → {adjusted:0.0#}"
                 };
-
-                AttributeValues.BindValueChanged(_ => update(), true);
             }
-
-            private void update()
-            {
-                if (Precision.AlmostEquals(AttributeValues.Value.OldValue, AttributeValues.Value.NewValue))
-                {
-                    Hide();
-                    return;
-                }
-
-                Show();
-                text.Text = $"{AttributeName}: {(AttributeValues.Value.OldValue):0.0#} → {(AttributeValues.Value.NewValue):0.0#}";
-            }
-        }
-
-        private struct OldNewPair
-        {
-            public double OldValue, NewValue;
         }
     }
 }
