@@ -580,6 +580,24 @@ namespace osu.Game.Tests.Visual.SongSelect
             AddAssert("start not requested", () => !startRequested);
         }
 
+        [Test]
+        public void TestSearchTextWithRulesetCriteria()
+        {
+            createSongSelect();
+
+            addRulesetImportStep(0);
+
+            AddStep("disallow convert display", () => config.SetValue(OsuSetting.ShowConvertedBeatmaps, false));
+
+            AddUntilStep("has selection", () => songSelect!.Carousel.SelectedBeatmapInfo != null);
+
+            AddStep("set filter to match all", () => songSelect!.FilterControl.CurrentTextSearch.Value = "Some");
+
+            changeRuleset(1);
+
+            AddUntilStep("has no selection", () => songSelect!.Carousel.SelectedBeatmapInfo == null);
+        }
+
         [TestCase(false)]
         [TestCase(true)]
         public void TestExternalBeatmapChangeWhileFiltered(bool differentRuleset)

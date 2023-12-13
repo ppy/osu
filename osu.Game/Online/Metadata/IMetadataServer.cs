@@ -2,6 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System.Threading.Tasks;
+using osu.Game.Users;
 
 namespace osu.Game.Online.Metadata
 {
@@ -17,5 +18,25 @@ namespace osu.Game.Online.Metadata
         /// <param name="queueId">The last processed queue ID.</param>
         /// <returns></returns>
         Task<BeatmapUpdates> GetChangesSince(int queueId);
+
+        /// <summary>
+        /// Signals to the server that the current user's <see cref="UserActivity"/> has changed.
+        /// </summary>
+        Task UpdateActivity(UserActivity? activity);
+
+        /// <summary>
+        /// Signals to the server that the current user's <see cref="UserStatus"/> has changed.
+        /// </summary>
+        Task UpdateStatus(UserStatus? status);
+
+        /// <summary>
+        /// Signals to the server that the current user would like to begin receiving updates on other users' online presence.
+        /// </summary>
+        Task BeginWatchingUserPresence();
+
+        /// <summary>
+        /// Signals to the server that the current user would like to stop receiving updates on other users' online presence.
+        /// </summary>
+        Task EndWatchingUserPresence();
     }
 }

@@ -180,19 +180,9 @@ namespace osu.Game.Localisation
         public static LocalisableString ClickToSelectTrack => new TranslatableString(getKey(@"click_to_select_track"), @"Click to select a track");
 
         /// <summary>
-        /// "Click to replace the track"
-        /// </summary>
-        public static LocalisableString ClickToReplaceTrack => new TranslatableString(getKey(@"click_to_replace_track"), @"Click to replace the track");
-
-        /// <summary>
         /// "Click to select a background image"
         /// </summary>
         public static LocalisableString ClickToSelectBackground => new TranslatableString(getKey(@"click_to_select_background"), @"Click to select a background image");
-
-        /// <summary>
-        /// "Click to replace the background image"
-        /// </summary>
-        public static LocalisableString ClickToReplaceBackground => new TranslatableString(getKey(@"click_to_replace_background"), @"Click to replace the background image");
 
         /// <summary>
         /// "Ruleset ({0})"
