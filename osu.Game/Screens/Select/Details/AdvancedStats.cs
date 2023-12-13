@@ -126,12 +126,14 @@ namespace osu.Game.Screens.Select.Details
                     mod.ApplyToDifficulty(adjustedDifficulty);
             }
 
-            switch (gameRuleset.Value.OnlineID)
+            IRulesetInfo ruleset = gameRuleset?.Value ?? beatmapInfo.Ruleset;
+
+            switch (ruleset.OnlineID)
             {
                 case 3:
                     // Account for mania differences locally for now.
                     // Eventually this should be handled in a more modular way, allowing rulesets to return arbitrary difficulty attributes.
-                    ILegacyRuleset legacyRuleset = (ILegacyRuleset)gameRuleset.Value.CreateInstance();
+                    ILegacyRuleset legacyRuleset = (ILegacyRuleset)ruleset.CreateInstance();
 
                     // For the time being, the key count is static no matter what, because:
                     // a) The method doesn't have knowledge of the active keymods. Doing so may require considerations for filtering.
