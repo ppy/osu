@@ -65,7 +65,10 @@ namespace osu.Game.Rulesets.Mania.Beatmaps
             double roundedOverallDifficulty = Math.Round(difficulty.OverallDifficulty);
 
             int countSliderOrSpinner = difficulty.EndTimeObjectCount;
-            float percentSpecialObjects = (float)countSliderOrSpinner / difficulty.TotalObjectCount;
+
+            // In osu!stable, this division appears as if it happens on floats, but due to release-mode
+            // optimisations, it actually ends up happening on doubles.
+            double percentSpecialObjects = (double)countSliderOrSpinner / difficulty.TotalObjectCount;
 
             if (percentSpecialObjects < 0.2)
                 return 7;
