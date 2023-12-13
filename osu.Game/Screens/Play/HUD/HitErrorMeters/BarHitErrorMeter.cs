@@ -488,7 +488,10 @@ namespace osu.Game.Screens.Play.HUD.HitErrorMeters
         public override void Clear()
         {
             foreach (var j in judgementsContainer)
-                j.FadeOut().Expire();
+            {
+                j.ClearTransforms();
+                j.Expire();
+            }
         }
 
         public enum CentreMarkerStyles
