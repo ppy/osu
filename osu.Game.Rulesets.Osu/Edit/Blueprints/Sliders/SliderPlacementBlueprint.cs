@@ -42,12 +42,15 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders
         private int currentSegmentLength;
 
         [Resolved(CanBeNull = true)]
+        [CanBeNull]
         private IPositionSnapProvider positionSnapProvider { get; set; }
 
         [Resolved(CanBeNull = true)]
+        [CanBeNull]
         private IDistanceSnapProvider distanceSnapProvider { get; set; }
 
         [Resolved(CanBeNull = true)]
+        [CanBeNull]
         private FreehandSliderToolboxGroup freehandToolboxGroup { get; set; }
 
         private readonly IncrementalBSplineBuilder bSplineBuilder = new IncrementalBSplineBuilder { Degree = 4 };
@@ -363,7 +366,7 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders
 
         private Vector2[] tryCircleArc(List<Vector2> segment)
         {
-            if (segment.Count < 3 || freehandToolboxGroup.CircleThreshold.Value == 0) return null;
+            if (segment.Count < 3 || freehandToolboxGroup?.CircleThreshold.Value == 0) return null;
 
             // Assume the segment creates a reasonable circular arc and then check if it reasonable
             var points = PathApproximator.BSplineToPiecewiseLinear(segment.ToArray(), bSplineBuilder.Degree);
@@ -436,7 +439,7 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders
 
             loss /= points.Count;
 
-            return loss > freehandToolboxGroup.CircleThreshold.Value || totalWinding > MathHelper.TwoPi ? null : circleArcControlPoints;
+            return loss > freehandToolboxGroup?.CircleThreshold.Value || totalWinding > MathHelper.TwoPi ? null : circleArcControlPoints;
         }
 
         private enum SliderPlacementState
