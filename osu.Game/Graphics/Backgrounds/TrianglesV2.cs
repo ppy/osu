@@ -228,7 +228,7 @@ namespace osu.Game.Graphics.Backgrounds
 
             private IUniformBuffer<TriangleBorderData>? borderDataBuffer;
 
-            public override void Draw(IRenderer renderer)
+            protected override void Draw(IRenderer renderer)
             {
                 base.Draw(renderer);
 

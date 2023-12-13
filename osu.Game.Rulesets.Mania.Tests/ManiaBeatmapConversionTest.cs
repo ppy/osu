@@ -24,6 +24,7 @@ namespace osu.Game.Rulesets.Mania.Tests
         [TestCase("zero-length-slider")]
         [TestCase("20544")]
         [TestCase("100374")]
+        [TestCase("1450162")]
         public void Test(string name) => base.Test(name);
 
         protected override IEnumerable<ConvertValue> CreateConvertValue(HitObject hitObject)
