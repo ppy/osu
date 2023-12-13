@@ -91,8 +91,8 @@ namespace osu.Game.Beatmaps
             var working = workingBeatmapCache.GetWorkingBeatmap(beatmapInfo);
             var beatmap = working.Beatmap;
 
-            beatmapInfo.Difficulty.EndTimeObjectCount = beatmap.HitObjects.Count(h => h is IHasDuration);
-            beatmapInfo.Difficulty.TotalObjectCount = beatmap.HitObjects.Count;
+            beatmapInfo.EndTimeObjectCount = beatmap.HitObjects.Count(h => h is IHasDuration);
+            beatmapInfo.TotalObjectCount = beatmap.HitObjects.Count;
 
             // And invalidate again afterwards as re-fetching the most up-to-date database metadata will be required.
             workingBeatmapCache.Invalidate(beatmapInfo);
