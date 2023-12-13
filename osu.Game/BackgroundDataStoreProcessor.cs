@@ -3,7 +3,6 @@
 
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -136,19 +135,13 @@ namespace osu.Game
                 // of other possible ways), but for now avoid queueing if the user isn't logged in at startup.
                 if (api.IsLoggedIn)
                 {
-                    foreach (var b in r.All<BeatmapInfo>().Where(b => b.StarRating < 0 || (b.OnlineID > 0 && b.LastOnlineUpdate == null)))
-                    {
-                        Debug.Assert(b.BeatmapSet != null);
-                        beatmapSetIds.Add(b.BeatmapSet.ID);
-                    }
+                    foreach (var b in r.All<BeatmapInfo>().Where(b => (b.StarRating < 0 || (b.OnlineID > 0 && b.LastOnlineUpdate == null)) && b.BeatmapSet != null))
+                        beatmapSetIds.Add(b.BeatmapSet!.ID);
                 }
                 else
                 {
-                    foreach (var b in r.All<BeatmapInfo>().Where(b => b.StarRating < 0))
-                    {
-                        Debug.Assert(b.BeatmapSet != null);
-                        beatmapSetIds.Add(b.BeatmapSet.ID);
-                    }
+                    foreach (var b in r.All<BeatmapInfo>().Where(b => b.StarRating < 0 && b.BeatmapSet != null))
+                        beatmapSetIds.Add(b.BeatmapSet!.ID);
                 }
             });
 
