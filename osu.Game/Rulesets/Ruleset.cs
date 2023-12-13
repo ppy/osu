@@ -380,6 +380,7 @@ namespace osu.Game.Rulesets
         /// <summary>
         /// Applies changes to difficulty attributes for presenting to a user a rough estimate of how rate adjust mods affect difficulty.
         /// Importantly, this should NOT BE USED FOR ANY CALCULATIONS.
+        ///
         /// It is also not always correct, and arguably is never correct depending on your frame of mind.
         /// </summary>
         /// <param name="difficulty">>The <see cref="IBeatmapDifficultyInfo"/> that will be adjusted.</param>
