@@ -1,0 +1,168 @@
+{
+  "Mappings": [
+    {
+      "RandomW": 2659373485,
+      "RandomX": 3579807591,
+      "RandomY": 273326509,
+      "RandomZ": 272969173,
+      "StartTime": 500.0,
+      "Objects": [
+        {
+          "StartTime": 500.0,
+          "EndTime": 2500.0,
+          "Column": 0
+        },
+        {
+          "StartTime": 1500.0,
+          "EndTime": 2500.0,
+          "Column": 1
+        }
+      ]
+    },
+    {
+      "RandomW": 3083803045,
+      "RandomX": 273326509,
+      "RandomY": 272969173,
+      "RandomZ": 2659373485,
+      "StartTime": 3000.0,
+      "Objects": [
+        {
+          "StartTime": 3000.0,
+          "EndTime": 4000.0,
+          "Column": 2
+        }
+      ]
+    },
+    {
+      "RandomW": 4073554232,
+      "RandomX": 272969173,
+      "RandomY": 2659373485,
+      "RandomZ": 3083803045,
+      "StartTime": 4500.0,
+      "Objects": [
+        {
+          "StartTime": 4500.0,
+          "EndTime": 5500.0,
+          "Column": 4
+        }
+      ]
+    },
+    {
+      "RandomW": 3420401969,
+      "RandomX": 2659373485,
+      "RandomY": 3083803045,
+      "RandomZ": 4073554232,
+      "StartTime": 6000.0,
+      "Objects": [
+        {
+          "StartTime": 6000.0,
+          "EndTime": 6500.0,
+          "Column": 2
+        }
+      ]
+    },
+    {
+      "RandomW": 1129881182,
+      "RandomX": 3083803045,
+      "RandomY": 4073554232,
+      "RandomZ": 3420401969,
+      "StartTime": 7000.0,
+      "Objects": [
+        {
+          "StartTime": 7000.0,
+          "EndTime": 8000.0,
+          "Column": 2
+        }
+      ]
+    },
+    {
+      "RandomW": 315568458,
+      "RandomX": 3420401969,
+      "RandomY": 1129881182,
+      "RandomZ": 2358617505,
+      "StartTime": 8500.0,
+      "Objects": [
+        {
+          "StartTime": 8500.0,
+          "EndTime": 11000.0,
+          "Column": 0
+        }
+      ]
+    },
+    {
+      "RandomW": 548134043,
+      "RandomX": 1129881182,
+      "RandomY": 2358617505,
+      "RandomZ": 315568458,
+      "StartTime": 11500.0,
+      "Objects": [
+        {
+          "StartTime": 11500.0,
+          "EndTime": 12000.0,
+          "Column": 1
+        }
+      ]
+    },
+    {
+      "RandomW": 3979422122,
+      "RandomX": 548134043,
+      "RandomY": 2810584254,
+      "RandomZ": 2250186050,
+      "StartTime": 12500.0,
+      "Objects": [
+        {
+          "StartTime": 12500.0,
+          "EndTime": 16500.0,
+          "Column": 4
+        }
+      ]
+    },
+    {
+      "RandomW": 2466283411,
+      "RandomX": 2810584254,
+      "RandomY": 2250186050,
+      "RandomZ": 3979422122,
+      "StartTime": 17000.0,
+      "Objects": [
+        {
+          "StartTime": 17000.0,
+          "EndTime": 18000.0,
+          "Column": 2
+        }
+      ]
+    },
+    {
+      "RandomW": 83157665,
+      "RandomX": 2250186050,
+      "RandomY": 3979422122,
+      "RandomZ": 2466283411,
+      "StartTime": 18500.0,
+      "Objects": [
+        {
+          "StartTime": 18500.0,
+          "EndTime": 19450.0,
+          "Column": 0
+        }
+      ]
+    },
+    {
+      "RandomW": 2383087700,
+      "RandomX": 83157665,
+      "RandomY": 2055150192,
+      "RandomZ": 510071020,
+      "StartTime": 19875.0,
+      "Objects": [
+        {
+          "StartTime": 19875.0,
+          "EndTime": 23875.0,
+          "Column": 1
+        },
+        {
+          "StartTime": 19875.0,
+          "EndTime": 23875.0,
+          "Column": 0
+        }
+      ]
+    }
+  ]
+}

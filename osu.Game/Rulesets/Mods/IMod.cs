@@ -20,6 +20,13 @@ namespace osu.Game.Rulesets.Mods
         string Name { get; }
 
         /// <summary>
+        /// Short important information to display on the mod icon. For example, a rate adjust mod's rate
+        /// or similarly important setting.
+        /// Use <see cref="string.Empty"/> if the icon should not display any additional info.
+        /// </summary>
+        string ExtendedIconInformation { get; }
+
+        /// <summary>
         /// The user readable description of this mod.
         /// </summary>
         LocalisableString Description { get; }
@@ -51,6 +58,13 @@ namespace osu.Game.Rulesets.Mods
         /// Should be <c>false</c> for mods that affect the gameplay duration (e.g. <see cref="ModRateAdjust"/> and <see cref="ModTimeRamp"/>).
         /// </summary>
         bool ValidForMultiplayerAsFreeMod { get; }
+
+        /// <summary>
+        /// Indicates that this mod is always permitted in scenarios wherein a user is submitting a score regardless of other circumstances.
+        /// Intended for mods that are informational in nature and do not really affect gameplay by themselves,
+        /// but are more of a gauge of increased/decreased difficulty due to the user's configuration (e.g. <see cref="ModTouchDevice"/>).
+        /// </summary>
+        bool AlwaysValidForSubmission { get; }
 
         /// <summary>
         /// Create a fresh <see cref="Mod"/> instance based on this mod.

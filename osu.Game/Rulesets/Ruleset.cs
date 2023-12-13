@@ -204,6 +204,8 @@ namespace osu.Game.Rulesets
 
         public ModAutoplay? GetAutoplayMod() => CreateMod<ModAutoplay>();
 
+        public ModTouchDevice? GetTouchDeviceMod() => CreateMod<ModTouchDevice>();
+
         /// <summary>
         /// Create a transformer which adds lookups specific to a ruleset to skin sources.
         /// </summary>

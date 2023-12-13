@@ -46,6 +46,7 @@ using osu.Game.IO;
 using osu.Game.Localisation;
 using osu.Game.Online;
 using osu.Game.Online.Chat;
+using osu.Game.Online.Rooms;
 using osu.Game.Overlays;
 using osu.Game.Overlays.BeatmapListing;
 using osu.Game.Overlays.Music;
@@ -57,7 +58,9 @@ using osu.Game.Performance;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Scoring;
 using osu.Game.Screens;
+using osu.Game.Screens.Edit;
 using osu.Game.Screens.Menu;
+using osu.Game.Screens.OnlinePlay.Multiplayer;
 using osu.Game.Screens.Play;
 using osu.Game.Screens.Ranking;
 using osu.Game.Screens.Select;
@@ -431,6 +434,9 @@ namespace osu.Game
                     break;
 
                 case LinkAction.OpenEditorTimestamp:
+                    HandleTimestamp(argString);
+                    break;
+
                 case LinkAction.JoinMultiplayerMatch:
                 case LinkAction.Spectate:
                     waitForReady(() => Notifications, _ => Notifications.Post(new SimpleNotification
@@ -549,6 +555,25 @@ namespace osu.Game
         public void ShowChangelogBuild(string updateStream, string version) => waitForReady(() => changelogOverlay, _ => changelogOverlay.ShowBuild(updateStream, version));
 
         /// <summary>
+        /// Seeks to the provided <paramref name="timestamp"/> if the editor is currently open.
+        /// Can also select objects as indicated by the <paramref name="timestamp"/> (depends on ruleset implementation).
+        /// </summary>
+        public void HandleTimestamp(string timestamp)
+        {
+            if (ScreenStack.CurrentScreen is not Editor editor)
+            {
+                Schedule(() => Notifications.Post(new SimpleErrorNotification
+                {
+                    Icon = FontAwesome.Solid.ExclamationTriangle,
+                    Text = EditorStrings.MustBeInEditorToHandleLinks
+                }));
+                return;
+            }
+
+            editor.HandleTimestamp(timestamp);
+        }
+
+        /// <summary>
         /// Present a skin select immediately.
         /// </summary>
         /// <param name="skin">The skin to select.</param>
@@ -644,6 +669,24 @@ namespace osu.Game
         }
 
         /// <summary>
+        /// Join a multiplayer match immediately.
+        /// </summary>
+        /// <param name="room">The room to join.</param>
+        /// <param name="password">The password to join the room, if any is given.</param>
+        public void PresentMultiplayerMatch(Room room, string password)
+        {
+            PerformFromScreen(screen =>
+            {
+                if (!(screen is Multiplayer multiplayer))
+                    screen.Push(multiplayer = new Multiplayer());
+
+                multiplayer.Join(room, password);
+            });
+            // TODO: We should really be able to use `validScreens: new[] { typeof(Multiplayer) }` here
+            // but `PerformFromScreen` doesn't understand nested stacks.
+        }
+
+        /// <summary>
         /// Present a score's replay immediately.
         /// The user should have already requested this interactively.
         /// </summary>
@@ -657,6 +700,9 @@ namespace osu.Game
 
             if (score.OnlineID > 0)
                 databasedScoreInfo = ScoreManager.Query(s => s.OnlineID == score.OnlineID);
+
+            if (score.LegacyOnlineID > 0)
+                databasedScoreInfo ??= ScoreManager.Query(s => s.LegacyOnlineID == score.LegacyOnlineID);
 
             if (score is ScoreInfo scoreInfo)
                 databasedScoreInfo ??= ScoreManager.Query(s => s.Hash == scoreInfo.Hash);
@@ -853,6 +899,7 @@ namespace osu.Game
             ScoreManager.PresentImport = items => PresentScore(items.First().Value);
 
             MultiplayerClient.PostNotification = n => Notifications.Post(n);
+            MultiplayerClient.PresentMatch = PresentMultiplayerMatch;
 
             // make config aware of how to lookup skins for on-screen display purposes.
             // if this becomes a more common thing, tracked settings should be reconsidered to allow local DI.
@@ -1030,6 +1077,7 @@ namespace osu.Game
             Add(difficultyRecommender);
             Add(externalLinkOpener = new ExternalLinkOpener());
             Add(new MusicKeyBindingHandler());
+            Add(new OnlineStatusNotifier(() => ScreenStack.CurrentScreen));
 
             // side overlays which cancel each other.
             var singleDisplaySideOverlays = new OverlayContainer[] { Settings, Notifications, FirstRunOverlay };

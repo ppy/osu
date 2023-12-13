@@ -4,6 +4,7 @@
 #nullable disable
 
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using JetBrains.Annotations;
 using osu.Framework.Allocation;
@@ -35,13 +36,21 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
 
         private ShakeContainer shakeContainer;
 
+        protected override IEnumerable<Drawable> DimmablePieces => new Drawable[]
+        {
+            HeadCircle,
+            TailCircle,
+            repeatContainer,
+            Body,
+        };
+
         /// <summary>
         /// A target container which can be used to add top level elements to the slider's display.
         /// Intended to be used for proxy purposes only.
         /// </summary>
         public Container OverlayElementContainer { get; private set; }
 
-        public override bool DisplayResult => !HitObject.OnlyJudgeNestedObjects;
+        public override bool DisplayResult => HitObject.ClassicSliderBehaviour;
 
         [CanBeNull]
         public PlaySliderBody SliderBody => Body.Drawable as PlaySliderBody;
@@ -99,7 +108,11 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
                 headContainer = new Container<DrawableSliderHead> { RelativeSizeAxes = Axes.Both },
                 OverlayElementContainer = new Container { RelativeSizeAxes = Axes.Both, },
                 Ball,
-                slidingSample = new PausableSkinnableSound { Looping = true }
+                slidingSample = new PausableSkinnableSound
+                {
+                    Looping = true,
+                    MinimumSampleVolume = MINIMUM_SAMPLE_VOLUME,
+                }
             });
 
             PositionBindable.BindValueChanged(_ => Position = HitObject.StackedPosition);
@@ -256,39 +269,40 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
 
         protected override void CheckForResult(bool userTriggered, double timeOffset)
         {
-            if (userTriggered || Time.Current < HitObject.EndTime)
+            if (userTriggered || !TailCircle.Judged || Time.Current < HitObject.EndTime)
                 return;
 
-            // If only the nested hitobjects are judged, then the slider's own judgement is ignored for scoring purposes.
-            // But the slider needs to still be judged with a reasonable hit/miss result for visual purposes (hit/miss transforms, etc).
-            if (HitObject.OnlyJudgeNestedObjects)
+            if (HitObject.ClassicSliderBehaviour)
             {
-                ApplyResult(r => r.Type = NestedHitObjects.Any(h => h.Result.IsHit) ? r.Judgement.MaxResult : r.Judgement.MinResult);
-                return;
-            }
-
-            // Otherwise, if this slider also needs to be judged, apply judgement proportionally to the number of nested hitobjects hit. This is the classic osu!stable scoring.
-            ApplyResult(r =>
-            {
-                int totalTicks = NestedHitObjects.Count;
-                int hitTicks = NestedHitObjects.Count(h => h.IsHit);
-
-                if (hitTicks == totalTicks)
-                    r.Type = HitResult.Great;
-                else if (hitTicks == 0)
-                    r.Type = HitResult.Miss;
-                else
+                // Classic behaviour means a slider is judged proportionally to the number of nested hitobjects hit. This is the classic osu!stable scoring.
+                ApplyResult(r =>
                 {
-                    double hitFraction = (double)hitTicks / totalTicks;
-                    r.Type = hitFraction >= 0.5 ? HitResult.Ok : HitResult.Meh;
-                }
-            });
+                    int totalTicks = NestedHitObjects.Count;
+                    int hitTicks = NestedHitObjects.Count(h => h.IsHit);
+
+                    if (hitTicks == totalTicks)
+                        r.Type = HitResult.Great;
+                    else if (hitTicks == 0)
+                        r.Type = HitResult.Miss;
+                    else
+                    {
+                        double hitFraction = (double)hitTicks / totalTicks;
+                        r.Type = hitFraction >= 0.5 ? HitResult.Ok : HitResult.Meh;
+                    }
+                });
+            }
+            else
+            {
+                // If only the nested hitobjects are judged, then the slider's own judgement is ignored for scoring purposes.
+                // But the slider needs to still be judged with a reasonable hit/miss result for visual purposes (hit/miss transforms, etc).
+                ApplyResult(r => r.Type = NestedHitObjects.Any(h => h.Result.IsHit) ? r.Judgement.MaxResult : r.Judgement.MinResult);
+            }
         }
 
         public override void PlaySamples()
         {
             // rather than doing it this way, we should probably attach the sample to the tail circle.
-            // this can only be done after we stop using LegacyLastTick.
+            // this can only be done if we stop using LastTick.
             if (!TailCircle.SamplePlaysOnlyOnHit || TailCircle.IsHit)
                 base.PlaySamples();
         }

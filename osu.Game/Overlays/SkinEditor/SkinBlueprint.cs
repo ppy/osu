@@ -202,7 +202,7 @@ namespace osu.Game.Overlays.SkinEditor
             if (drawable.Parent == null)
                 return;
 
-            var newAnchor = drawable.Parent.ToSpaceOfOtherDrawable(drawable.AnchorPosition, this);
+            var newAnchor = drawable.Parent!.ToSpaceOfOtherDrawable(drawable.AnchorPosition, this);
             anchorPosition = tweenPosition(anchorPosition ?? newAnchor, newAnchor);
             anchorBox.Position = anchorPosition.Value;
 
