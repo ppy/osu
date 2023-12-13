@@ -3,7 +3,6 @@
 
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -68,6 +67,7 @@ namespace osu.Game
 
                 checkForOutdatedStarRatings();
                 processBeatmapSetsWithMissingMetrics();
+                processBeatmapsWithMissingObjectCounts();
                 processScoresWithMissingStatistics();
                 convertLegacyTotalScoreToStandardised();
             }, TaskCreationOptions.LongRunning).ContinueWith(t =>
@@ -134,19 +134,13 @@ namespace osu.Game
                 // of other possible ways), but for now avoid queueing if the user isn't logged in at startup.
                 if (api.IsLoggedIn)
                 {
-                    foreach (var b in r.All<BeatmapInfo>().Where(b => b.StarRating < 0 || (b.OnlineID > 0 && b.LastOnlineUpdate == null)))
-                    {
-                        Debug.Assert(b.BeatmapSet != null);
-                        beatmapSetIds.Add(b.BeatmapSet.ID);
-                    }
+                    foreach (var b in r.All<BeatmapInfo>().Where(b => (b.StarRating < 0 || (b.OnlineID > 0 && b.LastOnlineUpdate == null)) && b.BeatmapSet != null))
+                        beatmapSetIds.Add(b.BeatmapSet!.ID);
                 }
                 else
                 {
-                    foreach (var b in r.All<BeatmapInfo>().Where(b => b.StarRating < 0))
-                    {
-                        Debug.Assert(b.BeatmapSet != null);
-                        beatmapSetIds.Add(b.BeatmapSet.ID);
-                    }
+                    foreach (var b in r.All<BeatmapInfo>().Where(b => b.StarRating < 0 && b.BeatmapSet != null))
+                        beatmapSetIds.Add(b.BeatmapSet!.ID);
                 }
             });
 
@@ -172,6 +166,46 @@ namespace osu.Game
                         catch (Exception e)
                         {
                             Logger.Log($"Background processing failed on {set}: {e}");
+                        }
+                    }
+                });
+            }
+        }
+
+        private void processBeatmapsWithMissingObjectCounts()
+        {
+            Logger.Log("Querying for beatmaps with missing hitobject counts to reprocess...");
+
+            HashSet<Guid> beatmapIds = new HashSet<Guid>();
+
+            realmAccess.Run(r =>
+            {
+                foreach (var b in r.All<BeatmapInfo>().Where(b => b.TotalObjectCount == 0))
+                    beatmapIds.Add(b.ID);
+            });
+
+            Logger.Log($"Found {beatmapIds.Count} beatmaps which require reprocessing.");
+
+            int i = 0;
+
+            foreach (var id in beatmapIds)
+            {
+                sleepIfRequired();
+
+                realmAccess.Run(r =>
+                {
+                    var beatmap = r.Find<BeatmapInfo>(id);
+
+                    if (beatmap != null)
+                    {
+                        try
+                        {
+                            Logger.Log($"Background processing {beatmap} ({++i} / {beatmapIds.Count})");
+                            beatmapUpdater.ProcessObjectCounts(beatmap);
+                        }
+                        catch (Exception e)
+                        {
+                            Logger.Log($"Background processing failed on {beatmap}: {e}");
                         }
                     }
                 });

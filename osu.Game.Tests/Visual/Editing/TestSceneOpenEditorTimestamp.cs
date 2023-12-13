@@ -21,7 +21,7 @@ namespace osu.Game.Tests.Visual.Editing
 {
     public partial class TestSceneOpenEditorTimestamp : OsuGameTestScene
     {
-        private Editor editor => (Editor)Game.ScreenStack.CurrentScreen;
+        private Editor? editor => Game.ScreenStack.CurrentScreen as Editor;
         private EditorBeatmap editorBeatmap => editor.ChildrenOfType<EditorBeatmap>().Single();
         private EditorClock editorClock => editor.ChildrenOfType<EditorClock>().Single();
 
@@ -111,18 +111,18 @@ namespace osu.Game.Tests.Visual.Editing
         }
 
         private void addStepScreenModeTo(EditorScreenMode screenMode) =>
-            AddStep("change screen to " + screenMode, () => editor.Mode.Value = screenMode);
+            AddStep("change screen to " + screenMode, () => editor!.Mode.Value = screenMode);
 
         private void assertOnScreenAt(EditorScreenMode screen, double time)
         {
             AddAssert($"stayed on {screen} at {time}", () =>
-                editor.Mode.Value == screen
+                editor!.Mode.Value == screen
                 && editorClock.CurrentTime == time
             );
         }
 
         private void assertMovedScreenTo(EditorScreenMode screen, string text = "moved to") =>
-            AddAssert($"{text} {screen}", () => editor.Mode.Value == screen);
+            AddAssert($"{text} {screen}", () => editor!.Mode.Value == screen);
 
         private void setUpEditor(RulesetInfo ruleset)
         {
@@ -145,7 +145,7 @@ namespace osu.Game.Tests.Visual.Editing
                 ((PlaySongSelect)Game.ScreenStack.CurrentScreen)
                 .Edit(beatmapSet.Beatmaps.Last(beatmap => beatmap.Ruleset.Name == ruleset.Name))
             );
-            AddUntilStep("Wait for editor open", () => editor.ReadyForUse);
+            AddUntilStep("Wait for editor open", () => editor?.ReadyForUse == true);
         }
     }
 }

@@ -796,7 +796,8 @@ namespace osu.Game.Tests.Visual.UserInterface
             AddStep("open customisation area", () => modSelectOverlay.CustomisationButton!.TriggerClick());
             AddStep("reset half time speed to default", () => modSelectOverlay.ChildrenOfType<ModSettingsArea>().Single()
                                                                               .ChildrenOfType<RevertToDefaultButton<double>>().Single().TriggerClick());
-            AddUntilStep("difficulty multiplier display shows correct value", () => modSelectOverlay.ChildrenOfType<ScoreMultiplierDisplay>().Single().Current.Value, () => Is.EqualTo(0.3));
+            AddUntilStep("difficulty multiplier display shows correct value",
+                () => modSelectOverlay.ChildrenOfType<ScoreMultiplierDisplay>().Single().Current.Value, () => Is.EqualTo(0.3).Within(Precision.DOUBLE_EPSILON));
         }
 
         private void waitForColumnLoad() => AddUntilStep("all column content loaded", () =>

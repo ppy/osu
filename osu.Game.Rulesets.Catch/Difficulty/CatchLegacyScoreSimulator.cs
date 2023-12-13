@@ -74,6 +74,7 @@ namespace osu.Game.Rulesets.Catch.Difficulty
                 simulateHit(obj, ref attributes);
 
             attributes.BonusScoreRatio = legacyBonusScore == 0 ? 0 : (double)standardisedBonusScore / legacyBonusScore;
+            attributes.BonusScore = legacyBonusScore;
 
             return attributes;
         }

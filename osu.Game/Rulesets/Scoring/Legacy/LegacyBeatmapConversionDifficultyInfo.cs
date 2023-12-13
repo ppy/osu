@@ -29,12 +29,12 @@ namespace osu.Game.Rulesets.Scoring.Legacy
         public float OverallDifficulty { get; set; }
 
         /// <summary>
-        /// The count of hitcircles in the beatmap.
+        /// The number of hitobjects in the beatmap with a distinct end time.
         /// </summary>
         /// <remarks>
-        /// When converting from osu! ruleset beatmaps, this is equivalent to the sum of sliders and spinners in the beatmap.
+        /// Canonically, these are hitobjects are either sliders or spinners.
         /// </remarks>
-        public int CircleCount { get; set; }
+        public int EndTimeObjectCount { get; set; }
 
         /// <summary>
         /// The total count of hitobjects in the beatmap.
@@ -46,22 +46,24 @@ namespace osu.Game.Rulesets.Scoring.Legacy
         double IBeatmapDifficultyInfo.SliderMultiplier => 0;
         double IBeatmapDifficultyInfo.SliderTickRate => 0;
 
-        public static LegacyBeatmapConversionDifficultyInfo FromAPIBeatmap(APIBeatmap apiBeatmap) => new LegacyBeatmapConversionDifficultyInfo
-        {
-            SourceRuleset = apiBeatmap.Ruleset,
-            CircleSize = apiBeatmap.CircleSize,
-            OverallDifficulty = apiBeatmap.OverallDifficulty,
-            CircleCount = apiBeatmap.CircleCount,
-            TotalObjectCount = apiBeatmap.SliderCount + apiBeatmap.SpinnerCount + apiBeatmap.CircleCount
-        };
+        public static LegacyBeatmapConversionDifficultyInfo FromAPIBeatmap(APIBeatmap apiBeatmap) => FromBeatmapInfo(apiBeatmap);
 
         public static LegacyBeatmapConversionDifficultyInfo FromBeatmap(IBeatmap beatmap) => new LegacyBeatmapConversionDifficultyInfo
         {
             SourceRuleset = beatmap.BeatmapInfo.Ruleset,
             CircleSize = beatmap.Difficulty.CircleSize,
             OverallDifficulty = beatmap.Difficulty.OverallDifficulty,
-            CircleCount = beatmap.HitObjects.Count(h => h is not IHasDuration),
+            EndTimeObjectCount = beatmap.HitObjects.Count(h => h is IHasDuration),
             TotalObjectCount = beatmap.HitObjects.Count
+        };
+
+        public static LegacyBeatmapConversionDifficultyInfo FromBeatmapInfo(IBeatmapInfo beatmapInfo) => new LegacyBeatmapConversionDifficultyInfo
+        {
+            SourceRuleset = beatmapInfo.Ruleset,
+            CircleSize = beatmapInfo.Difficulty.CircleSize,
+            OverallDifficulty = beatmapInfo.Difficulty.OverallDifficulty,
+            EndTimeObjectCount = beatmapInfo.EndTimeObjectCount,
+            TotalObjectCount = beatmapInfo.TotalObjectCount
         };
     }
 }

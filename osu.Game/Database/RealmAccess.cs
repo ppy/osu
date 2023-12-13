@@ -88,8 +88,9 @@ namespace osu.Game.Database
         /// 34   2023-08-21    Add BackgroundReprocessingFailed flag to ScoreInfo to track upgrade failures.
         /// 35   2023-10-16    Clear key combinations of keybindings that are assigned to more than one action in a given settings section.
         /// 36   2023-10-26    Add LegacyOnlineID to ScoreInfo. Move osu_scores_*_high IDs stored in OnlineID to LegacyOnlineID. Reset anomalous OnlineIDs.
+        /// 38   2023-12-10    Add EndTimeObjectCount and TotalObjectCount to BeatmapInfo.
         /// </summary>
-        private const int schema_version = 36;
+        private const int schema_version = 38;
 
         /// <summary>
         /// Lock object which is held during <see cref="BlockAllOperations"/> sections, blocking realm retrieval during blocking periods.
