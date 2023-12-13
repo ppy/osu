@@ -14,7 +14,7 @@ namespace osu.Game.Rulesets.Osu.Tests
     [TestFixture]
     public class OsuBeatmapConversionTest : BeatmapConversionTest<ConvertValue>
     {
-        protected override string ResourceAssembly => "osu.Game.Rulesets.Osu";
+        protected override string ResourceAssembly => "osu.Game.Rulesets.Osu.Tests";
 
         [TestCase("basic")]
         [TestCase("colinear-perfect-curve")]
@@ -26,6 +26,7 @@ namespace osu.Game.Rulesets.Osu.Tests
         [TestCase("old-stacking")]
         [TestCase("multi-segment-slider")]
         [TestCase("nan-slider")]
+        [TestCase("1124896")]
         public void Test(string name) => base.Test(name);
 
         protected override IEnumerable<ConvertValue> CreateConvertValue(HitObject hitObject)
@@ -34,7 +35,7 @@ namespace osu.Game.Rulesets.Osu.Tests
             {
                 case Slider slider:
                     foreach (var nested in slider.NestedHitObjects)
-                        yield return createConvertValue((OsuHitObject)nested);
+                        yield return createConvertValue((OsuHitObject)nested, slider);
 
                     break;
 
@@ -44,13 +45,28 @@ namespace osu.Game.Rulesets.Osu.Tests
                     break;
             }
 
-            static ConvertValue createConvertValue(OsuHitObject obj) => new ConvertValue
+            static ConvertValue createConvertValue(OsuHitObject obj, OsuHitObject? parent = null)
             {
-                StartTime = obj.StartTime,
-                EndTime = obj.GetEndTime(),
-                X = obj.StackedPosition.X,
-                Y = obj.StackedPosition.Y
-            };
+                double startTime = obj.StartTime;
+                double endTime = obj.GetEndTime();
+
+                // this is locally bringing back the stable treatment of the "legacy last tick"
+                // just to make sure that the conversion output matches.
+                // compare: `SliderEventGenerator.Generate()`, and the calculation of `legacyLastTickTime`.
+                if (obj is SliderTailCircle && parent is Slider slider)
+                {
+                    startTime = Math.Max(startTime + SliderEventGenerator.TAIL_LENIENCY, slider.StartTime + slider.Duration / 2);
+                    endTime = Math.Max(endTime + SliderEventGenerator.TAIL_LENIENCY, slider.StartTime + slider.Duration / 2);
+                }
+
+                return new ConvertValue
+                {
+                    StartTime = startTime,
+                    EndTime = endTime,
+                    X = obj.StackedPosition.X,
+                    Y = obj.StackedPosition.Y
+                };
+            }
         }
 
         protected override Ruleset CreateRuleset() => new OsuRuleset();

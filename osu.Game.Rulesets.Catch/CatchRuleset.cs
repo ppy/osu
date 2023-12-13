@@ -25,6 +25,7 @@ using osu.Game.Rulesets.Edit;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Replays.Types;
 using osu.Game.Rulesets.Scoring;
+using osu.Game.Rulesets.Scoring.Legacy;
 using osu.Game.Rulesets.UI;
 using osu.Game.Scoring;
 using osu.Game.Screens.Ranking.Statistics;
@@ -37,6 +38,8 @@ namespace osu.Game.Rulesets.Catch
         public override DrawableRuleset CreateDrawableRulesetWith(IBeatmap beatmap, IReadOnlyList<Mod>? mods = null) => new DrawableCatchRuleset(this, beatmap, mods);
 
         public override ScoreProcessor CreateScoreProcessor() => new CatchScoreProcessor();
+
+        public override HealthProcessor CreateHealthProcessor(double drainStartTime) => new CatchHealthProcessor(drainStartTime);
 
         public override IBeatmapConverter CreateBeatmapConverter(IBeatmap beatmap) => new CatchBeatmapConverter(beatmap, this);
 
@@ -53,7 +56,7 @@ namespace osu.Game.Rulesets.Catch
             new KeyBinding(InputKey.X, CatchAction.MoveRight),
             new KeyBinding(InputKey.Right, CatchAction.MoveRight),
             new KeyBinding(InputKey.Shift, CatchAction.Dash),
-            new KeyBinding(InputKey.Shift, CatchAction.Dash),
+            new KeyBinding(InputKey.MouseLeft, CatchAction.Dash),
         };
 
         public override IEnumerable<Mod> ConvertFromLegacyMods(LegacyMods mods)
@@ -231,6 +234,21 @@ namespace osu.Game.Rulesets.Catch
                     AutoSizeAxes = Axes.Y
                 }),
             };
+        }
+
+        public override BeatmapDifficulty GetRateAdjustedDisplayDifficulty(IBeatmapDifficultyInfo difficulty, double rate)
+        {
+            BeatmapDifficulty adjustedDifficulty = new BeatmapDifficulty(difficulty);
+
+            double preempt = adjustedDifficulty.ApproachRate < 6
+                ? 1200.0 + 600.0 * (5 - adjustedDifficulty.ApproachRate) / 5
+                : 1200.0 - 750.0 * (adjustedDifficulty.ApproachRate - 5) / 5;
+
+            preempt /= rate;
+
+            adjustedDifficulty.ApproachRate = (float)(preempt > 1200 ? (1800 - preempt) / 120 : (1200 - preempt) / 150 + 5);
+
+            return adjustedDifficulty;
         }
     }
 }

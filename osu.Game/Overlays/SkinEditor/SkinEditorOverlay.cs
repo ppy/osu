@@ -1,7 +1,10 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System;
+using System.Collections.Generic;
 using System.Diagnostics;
+using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
@@ -9,12 +12,22 @@ using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Primitives;
 using osu.Framework.Input.Bindings;
 using osu.Framework.Input.Events;
+using osu.Framework.Screens;
+using osu.Game.Beatmaps;
 using osu.Game.Configuration;
 using osu.Game.Graphics.Containers;
 using osu.Game.Input.Bindings;
+using osu.Game.Rulesets;
+using osu.Game.Rulesets.Mods;
+using osu.Game.Scoring;
 using osu.Game.Screens;
 using osu.Game.Screens.Edit;
 using osu.Game.Screens.Edit.Components;
+using osu.Game.Screens.Menu;
+using osu.Game.Screens.Play;
+using osu.Game.Screens.Select;
+using osu.Game.Users;
+using osu.Game.Utils;
 using osuTK;
 
 namespace osu.Game.Overlays.SkinEditor
@@ -31,11 +44,26 @@ namespace osu.Game.Overlays.SkinEditor
 
         private SkinEditor? skinEditor;
 
+        [Resolved]
+        private IPerformFromScreenRunner? performer { get; set; }
+
         [Cached]
         public readonly EditorClipboard Clipboard = new EditorClipboard();
 
         [Resolved]
         private OsuGame game { get; set; } = null!;
+
+        [Resolved]
+        private MusicController music { get; set; } = null!;
+
+        [Resolved]
+        private Bindable<IReadOnlyList<Mod>> mods { get; set; } = null!;
+
+        [Resolved]
+        private Bindable<RulesetInfo> ruleset { get; set; } = null!;
+
+        [Resolved]
+        private IBindable<WorkingBeatmap> beatmap { get; set; } = null!;
 
         private OsuScreen? lastTargetScreen;
 
@@ -72,6 +100,9 @@ namespace osu.Game.Overlays.SkinEditor
         {
             globallyDisableBeatmapSkinSetting();
 
+            if (lastTargetScreen is MainMenu)
+                PresentGameplay();
+
             if (skinEditor != null)
             {
                 skinEditor.Show();
@@ -103,6 +134,46 @@ namespace osu.Game.Overlays.SkinEditor
             skinEditor?.Hide();
 
             globallyReenableBeatmapSkinSetting();
+        }
+
+        public void PresentGameplay()
+        {
+            performer?.PerformFromScreen(screen =>
+            {
+                if (beatmap.Value is DummyWorkingBeatmap)
+                {
+                    // presume we don't have anything good to play and just bail.
+                    return;
+                }
+
+                // If we're playing the intro, switch away to another beatmap.
+                if (beatmap.Value.BeatmapSetInfo.Protected)
+                {
+                    music.NextTrack();
+                    Schedule(PresentGameplay);
+                    return;
+                }
+
+                if (screen is Player)
+                    return;
+
+                // the validity of the current game-wide beatmap + ruleset combination is enforced by song select.
+                // if we're anywhere else, the state is unknown and may not make sense, so forcibly set something that does.
+                if (screen is not PlaySongSelect)
+                    ruleset.Value = beatmap.Value.BeatmapInfo.Ruleset;
+                var replayGeneratingMod = ruleset.Value.CreateInstance().GetAutoplayMod();
+
+                IReadOnlyList<Mod> usableMods = mods.Value;
+
+                if (replayGeneratingMod != null)
+                    usableMods = usableMods.Append(replayGeneratingMod).ToArray();
+
+                if (!ModUtils.CheckCompatibleSet(usableMods, out var invalid))
+                    mods.Value = mods.Value.Except(invalid).ToArray();
+
+                if (replayGeneratingMod != null)
+                    screen.Push(new EndlessPlayer((beatmap, mods) => replayGeneratingMod.CreateScoreFromReplayData(beatmap, mods)));
+            }, new[] { typeof(Player), typeof(PlaySongSelect) });
         }
 
         protected override void Update()
@@ -188,7 +259,10 @@ namespace osu.Game.Overlays.SkinEditor
             }
 
             if (skinEditor.State.Value == Visibility.Visible)
+            {
+                skinEditor.Save(false);
                 skinEditor.UpdateTargetScreen(target);
+            }
             else
             {
                 skinEditor.Hide();
@@ -207,6 +281,9 @@ namespace osu.Game.Overlays.SkinEditor
 
             // The skin editor doesn't work well if beatmap skins are being applied to the player screen.
             // To keep things simple, disable the setting game-wide while using the skin editor.
+            //
+            // This causes a full reload of the skin, which is pretty ugly.
+            // TODO: Investigate if we can avoid this when a beatmap skin is not being applied by the current beatmap.
             leasedBeatmapSkins = beatmapSkins.BeginLease(true);
             leasedBeatmapSkins.Value = false;
         }
@@ -215,6 +292,43 @@ namespace osu.Game.Overlays.SkinEditor
         {
             leasedBeatmapSkins?.Return();
             leasedBeatmapSkins = null;
+        }
+
+        private partial class EndlessPlayer : ReplayPlayer
+        {
+            protected override UserActivity? InitialActivity => null;
+
+            public override bool DisallowExternalBeatmapRulesetChanges => true;
+
+            public override bool? AllowGlobalTrackControl => false;
+
+            public EndlessPlayer(Func<IBeatmap, IReadOnlyList<Mod>, Score> createScore)
+                : base(createScore, new PlayerConfiguration
+                {
+                    ShowResults = false,
+                    AutomaticallySkipIntro = true,
+                })
+            {
+            }
+
+            protected override void LoadComplete()
+            {
+                base.LoadComplete();
+
+                if (!LoadedBeatmapSuccessfully)
+                    Scheduler.AddDelayed(this.Exit, 3000);
+            }
+
+            protected override void Update()
+            {
+                base.Update();
+
+                if (!LoadedBeatmapSuccessfully)
+                    return;
+
+                if (GameplayState.HasPassed)
+                    GameplayClockContainer.Seek(0);
+            }
         }
     }
 }

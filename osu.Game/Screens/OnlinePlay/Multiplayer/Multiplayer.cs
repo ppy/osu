@@ -7,6 +7,7 @@ using osu.Framework.Extensions.ObjectExtensions;
 using osu.Framework.Logging;
 using osu.Framework.Screens;
 using osu.Game.Online.Multiplayer;
+using osu.Game.Online.Rooms;
 using osu.Game.Screens.OnlinePlay.Components;
 using osu.Game.Screens.OnlinePlay.Lounge;
 
@@ -22,7 +23,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
             base.LoadComplete();
 
             client.RoomUpdated += onRoomUpdated;
-            client.LoadAborted += onLoadAborted;
+            client.GameplayAborted += onGameplayAborted;
             onRoomUpdated();
         }
 
@@ -38,12 +39,22 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
                 transitionFromResults();
         }
 
-        private void onLoadAborted()
+        private void onGameplayAborted(GameplayAbortReason reason)
         {
             // If the server aborts gameplay for this user (due to loading too slow), exit gameplay screens.
             if (!this.IsCurrentScreen())
             {
-                Logger.Log("Gameplay aborted because loading the beatmap took too long.", LoggingTarget.Runtime, LogLevel.Important);
+                switch (reason)
+                {
+                    case GameplayAbortReason.LoadTookTooLong:
+                        Logger.Log("Gameplay aborted because loading the beatmap took too long.", LoggingTarget.Runtime, LogLevel.Important);
+                        break;
+
+                    case GameplayAbortReason.HostAbortedTheMatch:
+                        Logger.Log("The host aborted the match.", LoggingTarget.Runtime, LogLevel.Important);
+                        break;
+                }
+
                 this.MakeCurrent();
             }
         }
@@ -89,6 +100,8 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
         protected override RoomManager CreateRoomManager() => new MultiplayerRoomManager();
 
         protected override LoungeSubScreen CreateLounge() => new MultiplayerLoungeSubScreen();
+
+        public void Join(Room room, string? password) => Schedule(() => Lounge.Join(room, password));
 
         protected override void Dispose(bool isDisposing)
         {

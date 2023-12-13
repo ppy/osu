@@ -31,13 +31,9 @@ namespace osu.Game.Rulesets.Mania.Difficulty
 
         public override int Version => 20220902;
 
-        private readonly IWorkingBeatmap workingBeatmap;
-
         public ManiaDifficultyCalculator(IRulesetInfo ruleset, IWorkingBeatmap beatmap)
             : base(ruleset, beatmap)
         {
-            workingBeatmap = beatmap;
-
             isForCurrentRuleset = beatmap.BeatmapInfo.Ruleset.MatchesOnlineID(ruleset);
             originalOverallDifficulty = beatmap.BeatmapInfo.Difficulty.OverallDifficulty;
         }
@@ -65,15 +61,6 @@ namespace osu.Game.Rulesets.Mania.Difficulty
                 NoteCount = noteCount,
                 HoldNoteCount = holdNoteCount,
             };
-
-            if (ComputeLegacyScoringValues)
-            {
-                ManiaLegacyScoreSimulator sv1Simulator = new ManiaLegacyScoreSimulator();
-                sv1Simulator.Simulate(workingBeatmap, beatmap, mods);
-                attributes.LegacyAccuracyScore = sv1Simulator.AccuracyScore;
-                attributes.LegacyComboScore = sv1Simulator.ComboScore;
-                attributes.LegacyBonusScoreRatio = sv1Simulator.BonusScoreRatio;
-            }
 
             return attributes;
         }

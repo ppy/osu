@@ -5,30 +5,26 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using osu.Game.Beatmaps;
+using osu.Game.Rulesets.Catch.Mods;
 using osu.Game.Rulesets.Catch.Objects;
 using osu.Game.Rulesets.Judgements;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Objects.Types;
 using osu.Game.Rulesets.Scoring;
+using osu.Game.Rulesets.Scoring.Legacy;
 
 namespace osu.Game.Rulesets.Catch.Difficulty
 {
     internal class CatchLegacyScoreSimulator : ILegacyScoreSimulator
     {
-        public int AccuracyScore { get; private set; }
-
-        public int ComboScore { get; private set; }
-
-        public double BonusScoreRatio => legacyBonusScore == 0 ? 0 : (double)modernBonusScore / legacyBonusScore;
-
         private int legacyBonusScore;
-        private int modernBonusScore;
+        private int standardisedBonusScore;
         private int combo;
 
         private double scoreMultiplier;
 
-        public void Simulate(IWorkingBeatmap workingBeatmap, IBeatmap playableBeatmap, IReadOnlyList<Mod> mods)
+        public LegacyScoreAttributes Simulate(IWorkingBeatmap workingBeatmap, IBeatmap playableBeatmap)
         {
             IBeatmap baseBeatmap = workingBeatmap.Beatmap;
 
@@ -70,13 +66,20 @@ namespace osu.Game.Rulesets.Catch.Difficulty
                  + baseBeatmap.Difficulty.CircleSize
                  + Math.Clamp((float)objectCount / drainLength * 8, 0, 16)) / 38 * 5);
 
-            scoreMultiplier = difficultyPeppyStars * mods.Aggregate(1.0, (current, mod) => current * mod.ScoreMultiplier);
+            scoreMultiplier = difficultyPeppyStars;
+
+            LegacyScoreAttributes attributes = new LegacyScoreAttributes();
 
             foreach (var obj in playableBeatmap.HitObjects)
-                simulateHit(obj);
+                simulateHit(obj, ref attributes);
+
+            attributes.BonusScoreRatio = legacyBonusScore == 0 ? 0 : (double)standardisedBonusScore / legacyBonusScore;
+            attributes.BonusScore = legacyBonusScore;
+
+            return attributes;
         }
 
-        private void simulateHit(HitObject hitObject)
+        private void simulateHit(HitObject hitObject, ref LegacyScoreAttributes attributes)
         {
             bool increaseCombo = true;
             bool addScoreComboMultiplier = false;
@@ -112,31 +115,79 @@ namespace osu.Game.Rulesets.Catch.Difficulty
 
                 case JuiceStream:
                     foreach (var nested in hitObject.NestedHitObjects)
-                        simulateHit(nested);
+                        simulateHit(nested, ref attributes);
                     return;
 
                 case BananaShower:
                     foreach (var nested in hitObject.NestedHitObjects)
-                        simulateHit(nested);
+                        simulateHit(nested, ref attributes);
                     return;
             }
 
             if (addScoreComboMultiplier)
             {
                 // ReSharper disable once PossibleLossOfFraction (intentional to match osu-stable...)
-                ComboScore += (int)(Math.Max(0, combo - 1) * (scoreIncrease / 25 * scoreMultiplier));
+                attributes.ComboScore += (int)(Math.Max(0, combo - 1) * (scoreIncrease / 25 * scoreMultiplier));
             }
 
             if (isBonus)
             {
                 legacyBonusScore += scoreIncrease;
-                modernBonusScore += Judgement.ToNumericResult(bonusResult);
+                standardisedBonusScore += Judgement.ToNumericResult(bonusResult);
             }
             else
-                AccuracyScore += scoreIncrease;
+                attributes.AccuracyScore += scoreIncrease;
 
             if (increaseCombo)
                 combo++;
+        }
+
+        public double GetLegacyScoreMultiplier(IReadOnlyList<Mod> mods, LegacyBeatmapConversionDifficultyInfo difficulty)
+        {
+            bool scoreV2 = mods.Any(m => m is ModScoreV2);
+
+            double multiplier = 1.0;
+
+            foreach (var mod in mods)
+            {
+                switch (mod)
+                {
+                    case CatchModNoFail:
+                        multiplier *= scoreV2 ? 1.0 : 0.5;
+                        break;
+
+                    case CatchModEasy:
+                        multiplier *= 0.5;
+                        break;
+
+                    case CatchModHalfTime:
+                    case CatchModDaycore:
+                        multiplier *= 0.3;
+                        break;
+
+                    case CatchModHidden:
+                        multiplier *= scoreV2 ? 1.0 : 1.06;
+                        break;
+
+                    case CatchModHardRock:
+                        multiplier *= 1.12;
+                        break;
+
+                    case CatchModDoubleTime:
+                    case CatchModNightcore:
+                        multiplier *= 1.06;
+                        break;
+
+                    case CatchModFlashlight:
+                        multiplier *= 1.12;
+                        break;
+
+                    case CatchModRelax:
+                        return 0;
+                }
+            }
+
+            return multiplier;
         }
     }
 }

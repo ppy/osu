@@ -252,7 +252,7 @@ namespace osu.Game.Rulesets.Mods
 
                 private IUniformBuffer<FlashlightParameters>? flashlightParametersBuffer;
 
-                public override void Draw(IRenderer renderer)
+                protected override void Draw(IRenderer renderer)
                 {
                     base.Draw(renderer);
 

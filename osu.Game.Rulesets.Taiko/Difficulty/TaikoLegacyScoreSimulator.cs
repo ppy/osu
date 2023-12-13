@@ -10,31 +10,24 @@ using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Objects.Types;
 using osu.Game.Rulesets.Scoring;
+using osu.Game.Rulesets.Scoring.Legacy;
+using osu.Game.Rulesets.Taiko.Mods;
 using osu.Game.Rulesets.Taiko.Objects;
 
 namespace osu.Game.Rulesets.Taiko.Difficulty
 {
     internal class TaikoLegacyScoreSimulator : ILegacyScoreSimulator
     {
-        public int AccuracyScore { get; private set; }
-
-        public int ComboScore { get; private set; }
-
-        public double BonusScoreRatio => legacyBonusScore == 0 ? 0 : (double)modernBonusScore / legacyBonusScore;
-
         private int legacyBonusScore;
-        private int modernBonusScore;
+        private int standardisedBonusScore;
         private int combo;
 
-        private double modMultiplier;
         private int difficultyPeppyStars;
         private IBeatmap playableBeatmap = null!;
-        private IReadOnlyList<Mod> mods = null!;
 
-        public void Simulate(IWorkingBeatmap workingBeatmap, IBeatmap playableBeatmap, IReadOnlyList<Mod> mods)
+        public LegacyScoreAttributes Simulate(IWorkingBeatmap workingBeatmap, IBeatmap playableBeatmap)
         {
             this.playableBeatmap = playableBeatmap;
-            this.mods = mods;
 
             IBeatmap baseBeatmap = workingBeatmap.Beatmap;
 
@@ -76,13 +69,18 @@ namespace osu.Game.Rulesets.Taiko.Difficulty
                  + baseBeatmap.Difficulty.CircleSize
                  + Math.Clamp((float)objectCount / drainLength * 8, 0, 16)) / 38 * 5);
 
-            modMultiplier = mods.Aggregate(1.0, (current, mod) => current * mod.ScoreMultiplier);
+            LegacyScoreAttributes attributes = new LegacyScoreAttributes();
 
             foreach (var obj in playableBeatmap.HitObjects)
-                simulateHit(obj);
+                simulateHit(obj, ref attributes);
+
+            attributes.BonusScoreRatio = legacyBonusScore == 0 ? 0 : (double)standardisedBonusScore / legacyBonusScore;
+            attributes.BonusScore = legacyBonusScore;
+
+            return attributes;
         }
 
-        private void simulateHit(HitObject hitObject)
+        private void simulateHit(HitObject hitObject, ref LegacyScoreAttributes attributes)
         {
             bool increaseCombo = true;
             bool addScoreComboMultiplier = false;
@@ -109,21 +107,24 @@ namespace osu.Game.Rulesets.Taiko.Difficulty
                 case Swell swell:
                     // The taiko swell generally does not match the osu-stable implementation in any way.
                     // We'll redo the calculations to match osu-stable here...
-                    double minimumRotationsPerSecond = IBeatmapDifficultyInfo.DifficultyRange(playableBeatmap.Difficulty.OverallDifficulty, 3, 5, 7.5);
-                    double secondsDuration = swell.Duration / 1000;
+
+                    // Normally, this value depends on the final overall difficulty. For simplicity, we'll only consider the worst case that maximises rotations.
+                    const double minimum_rotations_per_second = 7.5;
 
                     // The amount of half spins that are required to successfully complete the spinner (i.e. get a 300).
-                    int halfSpinsRequiredForCompletion = (int)(secondsDuration * minimumRotationsPerSecond);
-
+                    int halfSpinsRequiredForCompletion = (int)(swell.Duration / 1000 * minimum_rotations_per_second);
                     halfSpinsRequiredForCompletion = (int)Math.Max(1, halfSpinsRequiredForCompletion * 1.65f);
 
-                    if (mods.Any(m => m is ModDoubleTime))
-                        halfSpinsRequiredForCompletion = Math.Max(1, (int)(halfSpinsRequiredForCompletion * 0.75f));
-                    if (mods.Any(m => m is ModHalfTime))
-                        halfSpinsRequiredForCompletion = Math.Max(1, (int)(halfSpinsRequiredForCompletion * 1.5f));
+                    //
+                    // Normally, this multiplier depends on the active mods (DT = 0.75, HT = 1.5). For simplicity, we'll only consider the worst case that maximises rotations.
+                    // This way, scores remain beatable at the cost of the conversion being slightly inaccurate.
+                    //   - A perfect DT/NM score will have less than 1M total score (excluding bonus).
+                    //   - A perfect HT score will have 1M total score (excluding bonus).
+                    //
+                    halfSpinsRequiredForCompletion = Math.Max(1, (int)(halfSpinsRequiredForCompletion * 1.5f));
 
                     for (int i = 0; i <= halfSpinsRequiredForCompletion; i++)
-                        simulateHit(new SwellTick());
+                        simulateHit(new SwellTick(), ref attributes);
 
                     scoreIncrease = 300;
                     addScoreComboMultiplier = true;
@@ -139,7 +140,7 @@ namespace osu.Game.Rulesets.Taiko.Difficulty
 
                 case DrumRoll:
                     foreach (var nested in hitObject.NestedHitObjects)
-                        simulateHit(nested);
+                        simulateHit(nested, ref attributes);
                     return;
             }
 
@@ -159,8 +160,7 @@ namespace osu.Game.Rulesets.Taiko.Difficulty
             {
                 int oldScoreIncrease = scoreIncrease;
 
-                // ReSharper disable once PossibleLossOfFraction (intentional to match osu-stable...)
-                scoreIncrease += (int)(scoreIncrease / 35 * 2 * (difficultyPeppyStars + 1) * modMultiplier) * (Math.Min(100, combo) / 10);
+                scoreIncrease += scoreIncrease / 35 * 2 * (difficultyPeppyStars + 1) * (Math.Min(100, combo) / 10);
 
                 if (hitObject is Swell)
                 {
@@ -185,18 +185,60 @@ namespace osu.Game.Rulesets.Taiko.Difficulty
             scoreIncrease -= comboScoreIncrease;
 
             if (addScoreComboMultiplier)
-                ComboScore += comboScoreIncrease;
+                attributes.ComboScore += comboScoreIncrease;
 
             if (isBonus)
             {
                 legacyBonusScore += scoreIncrease;
-                modernBonusScore += Judgement.ToNumericResult(bonusResult);
+                standardisedBonusScore += Judgement.ToNumericResult(bonusResult);
             }
             else
-                AccuracyScore += scoreIncrease;
+                attributes.AccuracyScore += scoreIncrease;
 
             if (increaseCombo)
                 combo++;
+        }
+
+        public double GetLegacyScoreMultiplier(IReadOnlyList<Mod> mods, LegacyBeatmapConversionDifficultyInfo difficulty)
+        {
+            bool scoreV2 = mods.Any(m => m is ModScoreV2);
+
+            double multiplier = 1.0;
+
+            foreach (var mod in mods)
+            {
+                switch (mod)
+                {
+                    case TaikoModNoFail:
+                        multiplier *= scoreV2 ? 1.0 : 0.5;
+                        break;
+
+                    case TaikoModEasy:
+                        multiplier *= 0.5;
+                        break;
+
+                    case TaikoModHalfTime:
+                    case TaikoModDaycore:
+                        multiplier *= 0.3;
+                        break;
+
+                    case TaikoModHidden:
+                    case TaikoModHardRock:
+                        multiplier *= 1.06;
+                        break;
+
+                    case TaikoModDoubleTime:
+                    case TaikoModNightcore:
+                    case TaikoModFlashlight:
+                        multiplier *= 1.12;
+                        break;
+
+                    case TaikoModRelax:
+                        return 0;
+                }
+            }
+
+            return multiplier;
         }
     }
 }

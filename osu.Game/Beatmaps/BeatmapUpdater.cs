@@ -3,6 +3,7 @@
 
 using System;
 using System.Diagnostics;
+using System.Linq;
 using System.Threading.Tasks;
 using osu.Framework.Extensions.ObjectExtensions;
 using osu.Framework.Logging;
@@ -10,6 +11,7 @@ using osu.Framework.Platform;
 using osu.Framework.Threading;
 using osu.Game.Database;
 using osu.Game.Online.API;
+using osu.Game.Rulesets.Objects.Types;
 
 namespace osu.Game.Beatmaps
 {
@@ -44,7 +46,8 @@ namespace osu.Game.Beatmaps
         public void Queue(Live<BeatmapSetInfo> beatmapSet, MetadataLookupScope lookupScope = MetadataLookupScope.LocalCacheFirst)
         {
             Logger.Log($"Queueing change for local beatmap {beatmapSet}");
-            Task.Factory.StartNew(() => beatmapSet.PerformRead(b => Process(b, lookupScope)), default, TaskCreationOptions.HideScheduler | TaskCreationOptions.RunContinuationsAsynchronously, updateScheduler);
+            Task.Factory.StartNew(() => beatmapSet.PerformRead(b => Process(b, lookupScope)), default, TaskCreationOptions.HideScheduler | TaskCreationOptions.RunContinuationsAsynchronously,
+                updateScheduler);
         }
 
         /// <summary>
@@ -78,6 +81,21 @@ namespace osu.Game.Beatmaps
 
             // And invalidate again afterwards as re-fetching the most up-to-date database metadata will be required.
             workingBeatmapCache.Invalidate(beatmapSet);
+        });
+
+        public void ProcessObjectCounts(BeatmapInfo beatmapInfo, MetadataLookupScope lookupScope = MetadataLookupScope.LocalCacheFirst) => beatmapInfo.Realm!.Write(_ =>
+        {
+            // Before we use below, we want to invalidate.
+            workingBeatmapCache.Invalidate(beatmapInfo);
+
+            var working = workingBeatmapCache.GetWorkingBeatmap(beatmapInfo);
+            var beatmap = working.Beatmap;
+
+            beatmapInfo.EndTimeObjectCount = beatmap.HitObjects.Count(h => h is IHasDuration);
+            beatmapInfo.TotalObjectCount = beatmap.HitObjects.Count;
+
+            // And invalidate again afterwards as re-fetching the most up-to-date database metadata will be required.
+            workingBeatmapCache.Invalidate(beatmapInfo);
         });
 
         #region Implementation of IDisposable

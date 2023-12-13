@@ -7,6 +7,7 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Effects;
 using osu.Framework.Graphics.Shapes;
+using osu.Framework.Graphics.Sprites;
 using osu.Framework.Localisation;
 using osu.Game.Graphics.Containers;
 using osu.Game.Online.API;
@@ -17,7 +18,7 @@ namespace osu.Game.Overlays
     public abstract partial class FullscreenOverlay<T> : WaveOverlayContainer, INamedOverlayComponent
         where T : OverlayHeader
     {
-        public virtual string IconTexture => Header.Title.IconTexture ?? string.Empty;
+        public virtual IconUsage Icon => Header.Title.Icon;
         public virtual LocalisableString Title => Header.Title.Title;
         public virtual LocalisableString Description => Header.Title.Description;
 

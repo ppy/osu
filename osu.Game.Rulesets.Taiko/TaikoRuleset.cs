@@ -34,6 +34,7 @@ using osu.Game.Screens.Ranking.Statistics;
 using osu.Game.Skinning;
 using osu.Game.Rulesets.Configuration;
 using osu.Game.Configuration;
+using osu.Game.Rulesets.Scoring.Legacy;
 using osu.Game.Rulesets.Taiko.Configuration;
 
 namespace osu.Game.Rulesets.Taiko
@@ -262,6 +263,19 @@ namespace osu.Game.Rulesets.Taiko
                     new UnstableRate(timedHitEvents)
                 }), true)
             };
+        }
+
+        public override BeatmapDifficulty GetRateAdjustedDisplayDifficulty(IBeatmapDifficultyInfo difficulty, double rate)
+        {
+            BeatmapDifficulty adjustedDifficulty = new BeatmapDifficulty(difficulty);
+
+            double hitWindow = 35.0 - 15.0 * (adjustedDifficulty.OverallDifficulty - 5) / 5;
+
+            hitWindow /= rate;
+
+            adjustedDifficulty.OverallDifficulty = (float)(5 * (35 - hitWindow) / 15 + 5);
+
+            return adjustedDifficulty;
         }
     }
 }

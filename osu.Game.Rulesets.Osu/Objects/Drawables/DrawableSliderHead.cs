@@ -4,7 +4,6 @@
 #nullable disable
 
 using System.Diagnostics;
-using JetBrains.Annotations;
 using osu.Framework.Bindables;
 using osu.Game.Rulesets.Osu.UI;
 using osu.Game.Rulesets.Scoring;
@@ -15,12 +14,18 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
     {
         public new SliderHeadCircle HitObject => (SliderHeadCircle)base.HitObject;
 
-        [CanBeNull]
-        public Slider Slider => DrawableSlider?.HitObject;
-
         public DrawableSlider DrawableSlider => (DrawableSlider)ParentHitObject;
 
-        public override bool DisplayResult => HitObject?.JudgeAsNormalHitCircle ?? base.DisplayResult;
+        public override bool DisplayResult
+        {
+            get
+            {
+                if (HitObject?.ClassicSliderBehaviour == true)
+                    return false;
+
+                return base.DisplayResult;
+            }
+        }
 
         private readonly IBindable<int> pathVersion = new Bindable<int>();
 
@@ -60,12 +65,16 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
         {
             Debug.Assert(HitObject != null);
 
-            if (HitObject.JudgeAsNormalHitCircle)
-                return base.ResultFor(timeOffset);
+            if (HitObject.ClassicSliderBehaviour)
+            {
+                // With classic slider behaviour, heads are considered fully hit if in the largest hit window.
+                // We can't award a full Great because the true Great judgement is awarded on the Slider itself,
+                // reduced based on number of ticks hit,
+                // so we use the most suitable LargeTick judgement here instead.
+                return base.ResultFor(timeOffset).IsHit() ? HitResult.LargeTickHit : HitResult.LargeTickMiss;
+            }
 
-            // If not judged as a normal hitcircle, judge as a slider tick instead. This is the classic osu!stable scoring.
-            var result = base.ResultFor(timeOffset);
-            return result.IsHit() ? HitResult.LargeTickHit : HitResult.LargeTickMiss;
+            return base.ResultFor(timeOffset);
         }
 
         public override void Shake()

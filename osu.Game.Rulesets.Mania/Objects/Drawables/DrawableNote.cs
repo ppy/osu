@@ -13,6 +13,8 @@ using osu.Game.Beatmaps;
 using osu.Game.Graphics;
 using osu.Game.Rulesets.Mania.Configuration;
 using osu.Game.Rulesets.Mania.Skinning.Default;
+using osu.Game.Rulesets.Objects;
+using osu.Game.Rulesets.Objects.Drawables;
 using osu.Game.Rulesets.Scoring;
 using osu.Game.Rulesets.UI.Scrolling;
 using osu.Game.Screens.Edit;
@@ -37,6 +39,8 @@ namespace osu.Game.Rulesets.Mania.Objects.Drawables
         protected virtual ManiaSkinComponents Component => ManiaSkinComponents.Note;
 
         private Drawable headPiece;
+
+        private DrawableNotePerfectBonus perfectBonus;
 
         public DrawableNote()
             : this(null)
@@ -89,7 +93,11 @@ namespace osu.Game.Rulesets.Mania.Objects.Drawables
             if (!userTriggered)
             {
                 if (!HitObject.HitWindows.CanBeHit(timeOffset))
+                {
+                    perfectBonus.TriggerResult(false);
                     ApplyResult(r => r.Type = r.Judgement.MinResult);
+                }
+
                 return;
             }
 
@@ -97,8 +105,22 @@ namespace osu.Game.Rulesets.Mania.Objects.Drawables
             if (result == HitResult.None)
                 return;
 
+            result = GetCappedResult(result);
+
+            perfectBonus.TriggerResult(result == HitResult.Perfect);
             ApplyResult(r => r.Type = result);
         }
+
+        public override void MissForcefully()
+        {
+            perfectBonus.TriggerResult(false);
+            base.MissForcefully();
+        }
+
+        /// <summary>
+        /// Some objects in mania may want to limit the max result.
+        /// </summary>
+        protected virtual HitResult GetCappedResult(HitResult result) => result;
 
         public virtual bool OnPressed(KeyBindingPressEvent<ManiaAction> e)
         {
@@ -113,6 +135,32 @@ namespace osu.Game.Rulesets.Mania.Objects.Drawables
 
         public virtual void OnReleased(KeyBindingReleaseEvent<ManiaAction> e)
         {
+        }
+
+        protected override void AddNestedHitObject(DrawableHitObject hitObject)
+        {
+            switch (hitObject)
+            {
+                case DrawableNotePerfectBonus bonus:
+                    AddInternal(perfectBonus = bonus);
+                    break;
+            }
+        }
+
+        protected override void ClearNestedHitObjects()
+        {
+            RemoveInternal(perfectBonus, false);
+        }
+
+        protected override DrawableHitObject CreateNestedHitObject(HitObject hitObject)
+        {
+            switch (hitObject)
+            {
+                case NotePerfectBonus bonus:
+                    return new DrawableNotePerfectBonus(bonus);
+            }
+
+            return base.CreateNestedHitObject(hitObject);
         }
 
         private void updateSnapColour()
