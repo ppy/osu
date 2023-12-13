@@ -128,6 +128,8 @@ namespace osu.Game.Screens.Select.Details
             IBeatmapDifficultyInfo baseDifficulty = BeatmapInfo?.Difficulty;
             BeatmapDifficulty adjustedDifficulty = null;
 
+            IRulesetInfo ruleset = gameRuleset?.Value ?? beatmapInfo.Ruleset;
+
             if (baseDifficulty != null &&
                 (mods.Value.Any(m => m is IApplicableToDifficulty) || mods.Value.Any(m => m is IApplicableToRate)))
             {
@@ -140,20 +142,16 @@ namespace osu.Game.Screens.Select.Details
 
                 if (gameRuleset != null)
                 {
-                    Ruleset ruleset = gameRuleset.Value.CreateInstance();
-
                     double rate = 1;
                     foreach (var mod in mods.Value.OfType<IApplicableToRate>())
                         rate = mod.ApplyToRate(0, rate);
 
-                    adjustedDifficulty = ruleset.GetRateAdjustedDisplayDifficulty(originalDifficulty, rate);
+                    adjustedDifficulty = ruleset.CreateInstance().GetRateAdjustedDisplayDifficulty(originalDifficulty, rate);
 
                     rateAdjustTooltip.UpdateAttribute("AR", originalDifficulty.ApproachRate, adjustedDifficulty.ApproachRate);
                     rateAdjustTooltip.UpdateAttribute("OD", originalDifficulty.OverallDifficulty, adjustedDifficulty.OverallDifficulty);
                 }
             }
-
-            IRulesetInfo ruleset = gameRuleset?.Value ?? beatmapInfo.Ruleset;
 
             switch (ruleset.OnlineID)
             {
