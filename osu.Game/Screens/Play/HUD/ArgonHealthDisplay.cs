@@ -212,6 +212,13 @@ namespace osu.Game.Screens.Play.HUD
             glowBar.Alpha = (float)Interpolation.DampContinuously(glowBar.Alpha, GlowBarValue > 0 ? 1 : 0, 40, Time.Elapsed);
         }
 
+        protected override void FinishInitialAnimation(double value)
+        {
+            base.FinishInitialAnimation(value);
+            this.TransformTo(nameof(HealthBarValue), value, 500, Easing.OutQuint);
+            this.TransformTo(nameof(GlowBarValue), value, 250, Easing.OutQuint);
+        }
+
         protected override void Flash()
         {
             base.Flash();
