@@ -269,9 +269,11 @@ namespace osu.Game.Rulesets.Taiko
         {
             BeatmapDifficulty adjustedDifficulty = new BeatmapDifficulty(difficulty);
 
-            double hitwindow = 35.0 - 15.0 * (adjustedDifficulty.OverallDifficulty - 5) / 5;
-            hitwindow /= rate;
-            adjustedDifficulty.OverallDifficulty = (float)(5 * (35 - hitwindow) / 15 + 5);
+            double hitWindow = 35.0 - 15.0 * (adjustedDifficulty.OverallDifficulty - 5) / 5;
+
+            hitWindow /= rate;
+
+            adjustedDifficulty.OverallDifficulty = (float)(5 * (35 - hitWindow) / 15 + 5);
 
             return adjustedDifficulty;
         }
