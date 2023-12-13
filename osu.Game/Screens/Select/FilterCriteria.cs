@@ -176,13 +176,15 @@ namespace osu.Game.Screens.Select
                 {
                     default:
                     case MatchMode.Substring:
-                        return value.Contains(SearchTerm, StringComparison.InvariantCultureIgnoreCase);
+                        // Note that we are using ordinal here to avoid performance issues caused by globalisation concerns.
+                        // See https://github.com/ppy/osu/issues/11571 / https://github.com/dotnet/docs/issues/18423.
+                        return value.Contains(SearchTerm, StringComparison.OrdinalIgnoreCase);
 
                     case MatchMode.IsolatedPhrase:
                         return Regex.IsMatch(value, $@"(^|\s){Regex.Escape(searchTerm)}($|\s)", RegexOptions.IgnoreCase | RegexOptions.CultureInvariant);
 
                     case MatchMode.FullPhrase:
-                        return CultureInfo.InvariantCulture.CompareInfo.Compare(value, searchTerm, CompareOptions.IgnoreCase) == 0;
+                        return CultureInfo.InvariantCulture.CompareInfo.Compare(value, searchTerm, CompareOptions.OrdinalIgnoreCase) == 0;
                 }
             }
 

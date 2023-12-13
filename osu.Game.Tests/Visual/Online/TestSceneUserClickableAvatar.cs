@@ -64,7 +64,7 @@ namespace osu.Game.Tests.Visual.Online
                 Colour = color ?? "000000",
                 Status =
                 {
-                    Value = new UserStatusOnline()
+                    Value = UserStatus.Online
                 },
             };
 

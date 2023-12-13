@@ -268,7 +268,7 @@ namespace osu.Game.Graphics.UserInterface
         protected override Drawable GetDrawableCharacter(char c) => new FallingDownContainer
         {
             AutoSizeAxes = Axes.Both,
-            Child = new OsuSpriteText { Text = c.ToString(), Font = OsuFont.GetFont(size: CalculatedTextSize) },
+            Child = new OsuSpriteText { Text = c.ToString(), Font = OsuFont.GetFont(size: FontSize) },
         };
 
         protected override Caret CreateCaret() => caret = new OsuCaret
@@ -314,18 +314,16 @@ namespace osu.Game.Graphics.UserInterface
 
             public OsuCaret()
             {
-                RelativeSizeAxes = Axes.Y;
-                Size = new Vector2(1, 0.9f);
-
                 Colour = Color4.Transparent;
-                Anchor = Anchor.CentreLeft;
-                Origin = Anchor.CentreLeft;
 
-                Masking = true;
-                CornerRadius = 1;
                 InternalChild = beatSync = new CaretBeatSyncedContainer
                 {
+                    Anchor = Anchor.CentreLeft,
+                    Origin = Anchor.CentreLeft,
+                    Masking = true,
+                    CornerRadius = 1f,
                     RelativeSizeAxes = Axes.Both,
+                    Height = 0.9f,
                 };
             }
 
