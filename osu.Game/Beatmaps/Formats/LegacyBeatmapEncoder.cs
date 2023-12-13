@@ -23,12 +23,6 @@ namespace osu.Game.Beatmaps.Formats
     {
         public const int FIRST_LAZER_VERSION = 128;
 
-        /// <summary>
-        /// osu! is generally slower than taiko, so a factor is added to increase
-        /// speed. This must be used everywhere slider length or beat length is used.
-        /// </summary>
-        public const float LEGACY_TAIKO_VELOCITY_MULTIPLIER = 1.4f;
-
         private readonly IBeatmap beatmap;
 
         private readonly ISkin? skin;
@@ -149,11 +143,7 @@ namespace osu.Game.Beatmaps.Formats
             writer.WriteLine(FormattableString.Invariant($"OverallDifficulty: {beatmap.Difficulty.OverallDifficulty}"));
             writer.WriteLine(FormattableString.Invariant($"ApproachRate: {beatmap.Difficulty.ApproachRate}"));
 
-            // Taiko adjusts the slider multiplier (see: LEGACY_TAIKO_VELOCITY_MULTIPLIER)
-            writer.WriteLine(onlineRulesetID == 1
-                ? FormattableString.Invariant($"SliderMultiplier: {beatmap.Difficulty.SliderMultiplier / LEGACY_TAIKO_VELOCITY_MULTIPLIER}")
-                : FormattableString.Invariant($"SliderMultiplier: {beatmap.Difficulty.SliderMultiplier}"));
-
+            writer.WriteLine(FormattableString.Invariant($"SliderMultiplier: {beatmap.Difficulty.SliderMultiplier}"));
             writer.WriteLine(FormattableString.Invariant($"SliderTickRate: {beatmap.Difficulty.SliderTickRate}"));
         }
 

@@ -9,6 +9,7 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Screens;
 using osu.Game.Online.API;
+using osu.Game.Online.Metadata;
 using osu.Game.Online.Multiplayer;
 using osu.Game.Online.Spectator;
 using osu.Game.Overlays;
@@ -29,6 +30,9 @@ namespace osu.Game.Online
 
         [Resolved]
         private SpectatorClient spectatorClient { get; set; } = null!;
+
+        [Resolved]
+        private MetadataClient metadataClient { get; set; } = null!;
 
         [Resolved]
         private INotificationOverlay? notificationOverlay { get; set; }
@@ -56,6 +60,7 @@ namespace osu.Game.Online
 
             multiplayerClient.Disconnecting += notifyAboutForcedDisconnection;
             spectatorClient.Disconnecting += notifyAboutForcedDisconnection;
+            metadataClient.Disconnecting += notifyAboutForcedDisconnection;
         }
 
         protected override void LoadComplete()
@@ -131,6 +136,9 @@ namespace osu.Game.Online
 
             if (multiplayerClient.IsNotNull())
                 multiplayerClient.Disconnecting -= notifyAboutForcedDisconnection;
+
+            if (metadataClient.IsNotNull())
+                metadataClient.Disconnecting -= notifyAboutForcedDisconnection;
         }
     }
 }

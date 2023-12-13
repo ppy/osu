@@ -45,14 +45,6 @@ namespace osu.Game.Screens.Play.HUD
         {
         }
 
-        /// <summary>
-        /// Triggered when a <see cref="Judgement"/> resulted in the player losing health.
-        /// Calls to this method are debounced.
-        /// </summary>
-        protected virtual void Miss()
-        {
-        }
-
         [Resolved]
         private HUDOverlay? hudOverlay { get; set; }
 
@@ -122,8 +114,6 @@ namespace osu.Game.Screens.Play.HUD
         {
             if (judgement.IsHit && judgement.Type != HitResult.IgnoreHit)
                 Scheduler.AddOnce(Flash);
-            else if (judgement.Judgement.HealthIncreaseFor(judgement) < 0)
-                Scheduler.AddOnce(Miss);
         }
 
         protected override void Dispose(bool isDisposing)

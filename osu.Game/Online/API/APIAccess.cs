@@ -247,7 +247,7 @@ namespace osu.Game.Online.API
             userReq.Success += user =>
             {
                 // todo: save/pull from settings
-                user.Status.Value = new UserStatusOnline();
+                user.Status.Value = UserStatus.Online;
 
                 setLocalUser(user);
 
