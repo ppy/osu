@@ -174,7 +174,12 @@ namespace osu.Game.Rulesets.Osu.Skinning
         public override void Clear()
         {
             averagePositionContainer.MoveTo(averagePosition = Vector2.Zero, 800, Easing.OutQuint);
-            hitPositionsContainer.Clear();
+
+            foreach (var h in hitPositionsContainer)
+            {
+                h.ClearTransforms();
+                h.Expire();
+            }
         }
 
         private partial class HitPosition : PoolableDrawable
