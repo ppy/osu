@@ -2,6 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System.Collections.Generic;
+using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
@@ -15,30 +16,16 @@ using osuTK;
 
 namespace osu.Game.Overlays.Mods
 {
-    public partial class AdjustedAttributesTooltip : CompositeDrawable, ITooltip
+    public partial class AdjustedAttributesTooltip : VisibilityContainer, ITooltip
     {
         private readonly Dictionary<string, Bindable<OldNewPair>> attributes = new Dictionary<string, Bindable<OldNewPair>>();
 
-        private readonly Container content;
+        private FillFlowContainer? attributesFillFlow;
 
-        private readonly FillFlowContainer attributesFillFlow;
+        private Container content = null!;
 
         [Resolved]
         private OsuColour colours { get; set; } = null!;
-
-        public AdjustedAttributesTooltip()
-        {
-            // Need to be initialized in constructor to ensure accessability in AddAttribute function
-            InternalChild = content = new Container
-            {
-                AutoSizeAxes = Axes.Both
-            };
-            attributesFillFlow = new FillFlowContainer
-            {
-                Direction = FillDirection.Vertical,
-                AutoSizeAxes = Axes.Both
-            };
-        }
 
         [BackgroundDependencyLoader]
         private void load()
@@ -46,53 +33,55 @@ namespace osu.Game.Overlays.Mods
             AutoSizeAxes = Axes.Both;
 
             Masking = true;
-            CornerRadius = 15;
+            CornerRadius = 5;
 
-            content.AddRange(new Drawable[]
+            InternalChildren = new Drawable[]
             {
-                new Box
-                {
-                    RelativeSizeAxes = Axes.Both,
-                    Colour = colours.Gray1,
-                    Alpha = 0.8f
-                },
-                new FillFlowContainer
+                content = new Container
                 {
                     AutoSizeAxes = Axes.Both,
-                    Padding = new MarginPadding { Vertical = 10, Horizontal = 15 },
-                    Direction = FillDirection.Vertical,
                     Children = new Drawable[]
                     {
-                        new OsuSpriteText
+                        new Box
                         {
-                            Text = "One or more values are being adjusted by mods that change speed.",
+                            RelativeSizeAxes = Axes.Both,
+                            Colour = colours.Gray3,
                         },
-                        attributesFillFlow
+                        new FillFlowContainer
+                        {
+                            AutoSizeAxes = Axes.Both,
+                            Padding = new MarginPadding { Vertical = 10, Horizontal = 15 },
+                            Direction = FillDirection.Vertical,
+                            Children = new Drawable[]
+                            {
+                                new OsuSpriteText
+                                {
+                                    Text = "One or more values are being adjusted by mods that change speed.",
+                                },
+                                attributesFillFlow = new FillFlowContainer
+                                {
+                                    Direction = FillDirection.Vertical,
+                                    AutoSizeAxes = Axes.Both
+                                }
+                            }
+                        }
                     }
-                }
-            });
-        }
+                },
+            };
 
-        private void checkAttributes()
-        {
             foreach (var attribute in attributes)
-            {
-                if (!Precision.AlmostEquals(attribute.Value.Value.Old, attribute.Value.Value.New))
-                {
-                    content.Show();
-                    return;
-                }
-            }
+                attributesFillFlow?.Add(new AttributeDisplay(attribute.Key, attribute.Value.GetBoundCopy()));
 
-            content.Hide();
+            updateVisibility();
         }
 
         public void AddAttribute(string name)
         {
             Bindable<OldNewPair> newBindable = new Bindable<OldNewPair>();
-            newBindable.BindValueChanged(_ => checkAttributes());
+            newBindable.BindValueChanged(_ => updateVisibility());
             attributes.Add(name, newBindable);
-            attributesFillFlow.Add(new AttributeDisplay(name, newBindable.GetBoundCopy()));
+
+            attributesFillFlow?.Add(new AttributeDisplay(name, newBindable.GetBoundCopy()));
         }
 
         public void UpdateAttribute(string name, double oldValue, double newValue)
@@ -102,8 +91,8 @@ namespace osu.Game.Overlays.Mods
             Bindable<OldNewPair> attribute = attributes[name];
 
             OldNewPair attributeValue = attribute.Value;
-            attributeValue.Old = oldValue;
-            attributeValue.New = newValue;
+            attributeValue.OldValue = oldValue;
+            attributeValue.NewValue = newValue;
 
             attribute.Value = attributeValue;
         }
@@ -116,14 +105,20 @@ namespace osu.Game.Overlays.Mods
         {
         }
 
-        public void Move(Vector2 pos)
-        {
-            Position = pos;
-        }
+        protected override void PopIn() => this.FadeIn(200, Easing.OutQuint);
+        protected override void PopOut() => this.FadeOut(200, Easing.OutQuint);
 
-        private struct OldNewPair
+        public void Move(Vector2 pos) => Position = pos;
+
+        private void updateVisibility()
         {
-            public double Old, New;
+            if (!IsLoaded)
+                return;
+
+            if (attributes.Any(attribute => !Precision.AlmostEquals(attribute.Value.Value.OldValue, attribute.Value.Value.NewValue)))
+                content.Show();
+            else
+                content.Hide();
         }
 
         private partial class AttributeDisplay : CompositeDrawable
@@ -131,33 +126,39 @@ namespace osu.Game.Overlays.Mods
             public readonly Bindable<OldNewPair> AttributeValues;
             public readonly string AttributeName;
 
-            private readonly OsuSpriteText text = new OsuSpriteText
-            {
-                Font = OsuFont.Default.With(weight: FontWeight.Bold)
-            };
+            private readonly OsuSpriteText text;
 
-            public AttributeDisplay(string name, Bindable<OldNewPair> boundCopy)
+            public AttributeDisplay(string name, Bindable<OldNewPair> values)
             {
                 AutoSizeAxes = Axes.Both;
 
                 AttributeName = name;
-                AttributeValues = boundCopy;
-                InternalChild = text;
+                AttributeValues = values;
+
+                InternalChild = text = new OsuSpriteText
+                {
+                    Font = OsuFont.Default.With(weight: FontWeight.Bold)
+                };
+
                 AttributeValues.BindValueChanged(_ => update(), true);
             }
 
             private void update()
             {
-                if (Precision.AlmostEquals(AttributeValues.Value.Old, AttributeValues.Value.New))
+                if (Precision.AlmostEquals(AttributeValues.Value.OldValue, AttributeValues.Value.NewValue))
                 {
                     Hide();
+                    return;
                 }
-                else
-                {
-                    Show();
-                    text.Text = $"{AttributeName}: {(AttributeValues.Value.Old):0.0#} → {(AttributeValues.Value.New):0.0#}";
-                }
+
+                Show();
+                text.Text = $"{AttributeName}: {(AttributeValues.Value.OldValue):0.0#} → {(AttributeValues.Value.NewValue):0.0#}";
             }
+        }
+
+        private struct OldNewPair
+        {
+            public double OldValue, NewValue;
         }
     }
 }
