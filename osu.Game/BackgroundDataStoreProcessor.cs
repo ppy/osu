@@ -20,7 +20,6 @@ using osu.Game.Rulesets;
 using osu.Game.Scoring;
 using osu.Game.Scoring.Legacy;
 using osu.Game.Screens.Play;
-using Realms;
 
 namespace osu.Game
 {
@@ -177,9 +176,13 @@ namespace osu.Game
         {
             Logger.Log("Querying for beatmaps with missing hitobject counts to reprocess...");
 
-            HashSet<Guid> beatmapIds = realmAccess.Run(r => new HashSet<Guid>(r.All<BeatmapInfo>()
-                                                                               .Filter($"{nameof(BeatmapInfo.Difficulty)}.{nameof(BeatmapDifficulty.TotalObjectCount)} == 0")
-                                                                               .AsEnumerable().Select(b => b.ID)));
+            HashSet<Guid> beatmapIds = new HashSet<Guid>();
+
+            realmAccess.Run(r =>
+            {
+                foreach (var b in r.All<BeatmapInfo>().Where(b => b.TotalObjectCount == 0))
+                    beatmapIds.Add(b.ID);
+            });
 
             Logger.Log($"Found {beatmapIds.Count} beatmaps which require reprocessing.");
 
