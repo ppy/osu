@@ -12,7 +12,7 @@ using osu.Game.Beatmaps;
 using osu.Game.Configuration;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
-using osu.Game.Localisation;
+using osu.Game.Localisation.HUD;
 using osu.Game.Rulesets.Judgements;
 using osu.Game.Rulesets.Objects.Legacy;
 using osu.Game.Rulesets.Osu.Judgements;

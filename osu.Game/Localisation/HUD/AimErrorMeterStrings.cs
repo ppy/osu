@@ -3,7 +3,7 @@
 
 using osu.Framework.Localisation;
 
-namespace osu.Game.Localisation
+namespace osu.Game.Localisation.HUD
 {
     public static class AimErrorMeterStrings
     {
