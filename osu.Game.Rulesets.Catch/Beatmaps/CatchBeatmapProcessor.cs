@@ -44,7 +44,6 @@ namespace osu.Game.Rulesets.Catch.Beatmaps
             base.PostProcess();
 
             ApplyPositionOffsets(Beatmap);
-            ApplyPositionClamping(Beatmap);
 
             int index = 0;
 
@@ -113,17 +112,6 @@ namespace osu.Game.Rulesets.Catch.Beatmaps
             }
 
             initialiseHyperDash(beatmap);
-        }
-
-        public void ApplyPositionClamping(IBeatmap beatmap)
-        {
-            foreach (var obj in beatmap.HitObjects.OfType<CatchHitObject>())
-            {
-                if (obj.EffectiveX < 0)
-                    obj.XOffset += Math.Abs(obj.EffectiveX);
-                else if (obj.EffectiveX > CatchPlayfield.WIDTH)
-                    obj.XOffset += CatchPlayfield.WIDTH - obj.EffectiveX;
-            }
         }
 
         private static void applyHardRockOffset(CatchHitObject hitObject, ref float? lastPosition, ref double lastStartTime, LegacyRandom rng)
