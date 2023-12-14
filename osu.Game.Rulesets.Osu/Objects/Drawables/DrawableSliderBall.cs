@@ -27,7 +27,6 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
 
         public Func<OsuAction?> GetInitialHitAction;
 
-        private Drawable followCircleReceptor;
         private DrawableSlider drawableSlider;
         private Drawable ball;
 
@@ -47,13 +46,6 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
                     Origin = Anchor.Centre,
                     Anchor = Anchor.Centre,
                     RelativeSizeAxes = Axes.Both,
-                },
-                followCircleReceptor = new CircularContainer
-                {
-                    Origin = Anchor.Centre,
-                    Anchor = Anchor.Centre,
-                    RelativeSizeAxes = Axes.Both,
-                    Masking = true
                 },
                 ball = new SkinnableDrawable(new OsuSkinComponentLookup(OsuSkinComponents.SliderBall), _ => new DefaultSliderBall())
                 {
@@ -86,21 +78,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
             base.ApplyTransformsAt(time, false);
         }
 
-        private bool tracking;
-
-        public bool Tracking
-        {
-            get => tracking;
-            private set
-            {
-                if (value == tracking)
-                    return;
-
-                tracking = value;
-
-                followCircleReceptor.Scale = new Vector2(tracking ? FOLLOW_AREA : 1f);
-            }
-        }
+        public bool Tracking { get; private set; }
 
         /// <summary>
         /// If the cursor moves out of the ball's radius we still need to be able to receive positional updates to stop tracking.
@@ -129,6 +107,30 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
         /// </summary>
         private readonly List<OsuAction> lastPressedActions = new List<OsuAction>();
 
+        public bool IsMouseInFollowCircleWithState(bool expanded)
+        {
+            if (lastScreenSpaceMousePosition is not Vector2 mousePos)
+                return false;
+
+            float radius = GetFollowCircleRadius(expanded);
+
+            double followProgress = Math.Clamp((Time.Current - drawableSlider.HitObject.StartTime) / drawableSlider.HitObject.Duration, 0, 1);
+            Vector2 followCirclePosition = drawableSlider.HitObject.CurvePositionAt(followProgress);
+            Vector2 mousePositionInSlider = drawableSlider.ToLocalSpace(mousePos) - drawableSlider.OriginPosition;
+
+            return (mousePositionInSlider - followCirclePosition).LengthSquared <= radius * radius;
+        }
+
+        public float GetFollowCircleRadius(bool expanded)
+        {
+            float radius = (float)drawableSlider.HitObject.Radius;
+
+            if (expanded)
+                radius *= FOLLOW_AREA;
+
+            return radius;
+        }
+
         protected override void Update()
         {
             base.Update();
@@ -152,14 +154,19 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
                     timeToAcceptAnyKeyAfter = Time.Current;
             }
 
+            bool validInFollowArea = IsMouseInFollowCircleWithState(Tracking);
+            bool validInHeadCircle = drawableSlider.HeadCircle.IsHit
+                                     && IsMouseInFollowCircleWithState(true)
+                                     && drawableSlider.HeadCircle.Result.TimeAbsolute == Time.Current;
+
             Tracking =
                 // even in an edge case where current time has exceeded the slider's time, we may not have finished judging.
                 // we don't want to potentially update from Tracking=true to Tracking=false at this point.
                 (!drawableSlider.AllJudged || Time.Current <= drawableSlider.HitObject.GetEndTime())
                 // in valid position range
-                && lastScreenSpaceMousePosition.HasValue && followCircleReceptor.ReceivePositionalInputAt(lastScreenSpaceMousePosition.Value) &&
+                && (validInFollowArea || validInHeadCircle)
                 // valid action
-                (actions?.Any(isValidTrackingAction) ?? false);
+                && (actions?.Any(isValidTrackingAction) ?? false);
 
             lastPressedActions.Clear();
             if (actions != null)

@@ -28,6 +28,8 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
 
         public DrawableSliderHead HeadCircle => headContainer.Child;
         public DrawableSliderTail TailCircle => tailContainer.Child;
+        public IEnumerable<DrawableSliderTick> Ticks => tickContainer.Children;
+        public IEnumerable<DrawableSliderRepeat> Repeats => repeatContainer.Children;
 
         [Cached]
         public DrawableSliderBall Ball { get; private set; }

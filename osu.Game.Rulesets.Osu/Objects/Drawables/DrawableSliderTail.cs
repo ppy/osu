@@ -125,6 +125,14 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
             }
         }
 
+        public void HitForcefully()
+        {
+            if (Judged)
+                return;
+
+            ApplyResult(r => r.Type = r.Judgement.MaxResult);
+        }
+
         protected override void CheckForResult(bool userTriggered, double timeOffset)
         {
             if (userTriggered)
@@ -141,12 +149,20 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
             if (timeOffset < SliderEventGenerator.TAIL_LENIENCY)
                 return;
 
-            // Attempt to preserve correct ordering of judgements as best we can by forcing
-            // an un-judged head to be missed when the user has clearly skipped it.
-            //
             // This check is applied to all nested slider objects apart from the head (ticks, repeats, tail).
-            if (Tracking && !DrawableSlider.HeadCircle.Judged)
-                DrawableSlider.HeadCircle.MissForcefully();
+            if (!DrawableSlider.HeadCircle.Judged)
+            {
+                if (Tracking)
+                {
+                    // Attempt to preserve correct ordering of judgements as best we can by forcing an un-judged head to be missed when the user has clearly skipped it.
+                    DrawableSlider.HeadCircle.MissForcefully();
+                }
+                else
+                {
+                    // Don't judge this object as a miss before the head has been judged, to allow the head to be hit late.
+                    return;
+                }
+            }
 
             // The player needs to have engaged in tracking at any point after the tail leniency cutoff.
             // An actual tick miss should only occur if reaching the tick itself.
