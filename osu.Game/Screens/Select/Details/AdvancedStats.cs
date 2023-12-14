@@ -123,6 +123,8 @@ namespace osu.Game.Screens.Select.Details
         private void updateStatistics()
         {
             IBeatmapDifficultyInfo baseDifficulty = BeatmapInfo?.Difficulty;
+
+            BeatmapDifficulty originalDifficulty = null;
             BeatmapDifficulty adjustedDifficulty = null;
 
             IRulesetInfo ruleset = gameRuleset?.Value ?? beatmapInfo.Ruleset;
@@ -130,7 +132,7 @@ namespace osu.Game.Screens.Select.Details
             if (baseDifficulty != null &&
                 (mods.Value.Any(m => m is IApplicableToDifficulty) || mods.Value.Any(m => m is IApplicableToRate)))
             {
-                BeatmapDifficulty originalDifficulty = new BeatmapDifficulty(baseDifficulty);
+                originalDifficulty = new BeatmapDifficulty(baseDifficulty);
 
                 foreach (var mod in mods.Value.OfType<IApplicableToDifficulty>())
                     mod.ApplyToDifficulty(originalDifficulty);
@@ -147,6 +149,13 @@ namespace osu.Game.Screens.Select.Details
 
                     rateAdjustTooltip.UpdateAttributes(originalDifficulty, adjustedDifficulty);
                 }
+            }
+
+            // update tooltip anyway
+            else if (baseDifficulty != null)
+            {
+                originalDifficulty = new BeatmapDifficulty(baseDifficulty);
+                rateAdjustTooltip.UpdateAttributes(originalDifficulty, originalDifficulty);
             }
 
             switch (ruleset.OnlineID)
