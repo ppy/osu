@@ -95,8 +95,8 @@ namespace osu.Game.Overlays.Mods
             {
                 circleSizeDisplay = new VerticalAttributeDisplay("CS") { Shear = new Vector2(-shear, 0), },
                 drainRateDisplay = new VerticalAttributeDisplay("HP") { Shear = new Vector2(-shear, 0), },
-                approachRateDisplay = new VerticalAttributeDisplay("AR") { Shear = new Vector2(-shear, 0), },
                 overallDifficultyDisplay = new VerticalAttributeDisplay("OD") { Shear = new Vector2(-shear, 0), },
+                approachRateDisplay = new VerticalAttributeDisplay("AR") { Shear = new Vector2(-shear, 0), },
             });
         }
 
