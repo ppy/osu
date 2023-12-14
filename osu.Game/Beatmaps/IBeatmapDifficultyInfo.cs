@@ -1,6 +1,8 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System;
+
 namespace osu.Game.Beatmaps
 {
     /// <summary>
@@ -98,15 +100,15 @@ namespace osu.Game.Beatmaps
         /// Maps a value returned by the function above back to the difficulty that produced it.
         /// </summary>
         /// <param name="difficultyValue">The difficulty-dependent value to be unmapped.</param>
-        /// <param name="min">Minimum of the resulting range which will be achieved by a difficulty value of 0.</param>
-        /// <param name="mid">Midpoint of the resulting range which will be achieved by a difficulty value of 5.</param>
-        /// <param name="max">Maximum of the resulting range which will be achieved by a difficulty value of 10.</param>
+        /// <param name="diff0">Minimum of the resulting range which will be achieved by a difficulty value of 0.</param>
+        /// <param name="diff5">Midpoint of the resulting range which will be achieved by a difficulty value of 5.</param>
+        /// <param name="diff10">Maximum of the resulting range which will be achieved by a difficulty value of 10.</param>
         /// <returns>Value to which the difficulty value maps in the specified range.</returns>
-        static double InverseDifficultyRange(double difficultyValue, double min, double mid, double max)
+        static double InverseDifficultyRange(double difficultyValue, double diff0, double diff5, double diff10)
         {
-            return difficultyValue >= mid
-                ? (difficultyValue - mid) / (max - mid) * 5 + 5
-                : (difficultyValue - mid) / (mid - min) * 5 + 5;
+            return Math.Sign(difficultyValue - diff5) == Math.Sign(diff10 - diff5)
+                ? (difficultyValue - diff5) / (diff10 - diff5) * 5 + 5
+                : (difficultyValue - diff5) / (diff5 - diff0) * 5 + 5;
         }
     }
 }
