@@ -127,8 +127,7 @@ namespace osu.Game.Screens.Select.Details
 
             IRulesetInfo ruleset = gameRuleset?.Value ?? beatmapInfo.Ruleset;
 
-            if (baseDifficulty != null &&
-                (mods.Value.Any(m => m is IApplicableToDifficulty) || mods.Value.Any(m => m is IApplicableToRate)))
+            if (baseDifficulty != null)
             {
                 BeatmapDifficulty originalDifficulty = new BeatmapDifficulty(baseDifficulty);
 
