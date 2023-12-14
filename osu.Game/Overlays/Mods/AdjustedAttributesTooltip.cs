@@ -89,8 +89,8 @@ namespace osu.Game.Overlays.Mods
             if (originalDifficulty == null || adjustedDifficulty == null)
                 return;
 
-            attemptAdd("AR", bd => bd.ApproachRate);
             attemptAdd("OD", bd => bd.OverallDifficulty);
+            attemptAdd("AR", bd => bd.ApproachRate);
             attemptAdd("CS", bd => bd.CircleSize);
             attemptAdd("HP", bd => bd.DrainRate);
 
