@@ -1,6 +1,7 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System;
 using System.Diagnostics;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
@@ -26,13 +27,17 @@ namespace osu.Game.Rulesets.Osu.Skinning
             ((DrawableSlider?)ParentObject)?.Tracking.BindValueChanged(tracking =>
             {
                 Debug.Assert(ParentObject != null);
+
                 if (ParentObject.Judged)
                     return;
 
-                if (tracking.NewValue)
-                    OnSliderPress();
-                else
-                    OnSliderRelease();
+                using (BeginAbsoluteSequence(Math.Max(Time.Current, ParentObject.HitObject?.StartTime ?? 0)))
+                {
+                    if (tracking.NewValue)
+                        OnSliderPress();
+                    else
+                        OnSliderRelease();
+                }
             }, true);
         }
 
