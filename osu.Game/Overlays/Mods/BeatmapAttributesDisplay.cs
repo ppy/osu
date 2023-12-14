@@ -27,7 +27,7 @@ namespace osu.Game.Overlays.Mods
     /// On the mod select overlay, this provides a local updating view of BPM, star rating and other
     /// difficulty attributes so the user can have a better insight into what mods are changing.
     /// </summary>
-    public partial class BeatmapAttributesDisplay : ModFooterInformationDisplay, IHasCustomTooltip
+    public partial class BeatmapAttributesDisplay : ModFooterInformationDisplay, IHasCustomTooltip<AdjustedAttributesTooltip.Data?>
     {
         private StarRatingDisplay starRatingDisplay = null!;
         private BPMDisplay bpmDisplay = null!;
@@ -57,11 +57,9 @@ namespace osu.Game.Overlays.Mods
         private CancellationTokenSource? cancellationSource;
         private IBindable<StarDifficulty?> starDifficulty = null!;
 
-        private AdjustedAttributesTooltip rateAdjustTooltip = null!;
+        public ITooltip<AdjustedAttributesTooltip.Data?> GetCustomTooltip() => new AdjustedAttributesTooltip();
 
-        public ITooltip GetCustomTooltip() => rateAdjustTooltip;
-
-        public object TooltipContent => this;
+        public AdjustedAttributesTooltip.Data? TooltipContent { get; private set; }
 
         private const float transition_duration = 250;
 
@@ -69,8 +67,6 @@ namespace osu.Game.Overlays.Mods
         private void load()
         {
             const float shear = ShearedOverlayContainer.SHEAR;
-
-            rateAdjustTooltip = new AdjustedAttributesTooltip();
 
             LeftContent.AddRange(new Drawable[]
             {
@@ -182,7 +178,7 @@ namespace osu.Game.Overlays.Mods
             Ruleset ruleset = gameRuleset.Value.CreateInstance();
             BeatmapDifficulty adjustedDifficulty = ruleset.GetRateAdjustedDisplayDifficulty(originalDifficulty, rate);
 
-            rateAdjustTooltip.UpdateAttributes(originalDifficulty, adjustedDifficulty);
+            TooltipContent = new AdjustedAttributesTooltip.Data(originalDifficulty, adjustedDifficulty);
 
             approachRateDisplay.AdjustType.Value = VerticalAttributeDisplay.CalculateEffect(originalDifficulty.ApproachRate, adjustedDifficulty.ApproachRate);
             overallDifficultyDisplay.AdjustType.Value = VerticalAttributeDisplay.CalculateEffect(originalDifficulty.OverallDifficulty, adjustedDifficulty.OverallDifficulty);

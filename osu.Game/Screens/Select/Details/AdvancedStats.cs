@@ -30,7 +30,7 @@ using osu.Game.Overlays.Mods;
 
 namespace osu.Game.Screens.Select.Details
 {
-    public partial class AdvancedStats : Container, IHasCustomTooltip
+    public partial class AdvancedStats : Container, IHasCustomTooltip<AdjustedAttributesTooltip.Data>
     {
         [Resolved]
         private BeatmapDifficultyCache difficultyCache { get; set; }
@@ -46,9 +46,8 @@ namespace osu.Game.Screens.Select.Details
         protected readonly StatisticRow FirstValue, HpDrain, Accuracy, ApproachRate;
         private readonly StatisticRow starDifficulty;
 
-        private AdjustedAttributesTooltip rateAdjustTooltip;
-        public ITooltip GetCustomTooltip() => rateAdjustTooltip;
-        public object TooltipContent => this;
+        public ITooltip<AdjustedAttributesTooltip.Data> GetCustomTooltip() => new AdjustedAttributesTooltip();
+        public AdjustedAttributesTooltip.Data TooltipContent { get; private set; }
 
         private IBeatmapInfo beatmapInfo;
 
@@ -86,7 +85,6 @@ namespace osu.Game.Screens.Select.Details
         private void load(OsuColour colours)
         {
             starDifficulty.AccentColour = colours.Yellow;
-            rateAdjustTooltip = new AdjustedAttributesTooltip();
         }
 
         protected override void LoadComplete()
@@ -144,7 +142,7 @@ namespace osu.Game.Screens.Select.Details
 
                     adjustedDifficulty = ruleset.CreateInstance().GetRateAdjustedDisplayDifficulty(originalDifficulty, rate);
 
-                    rateAdjustTooltip.UpdateAttributes(originalDifficulty, adjustedDifficulty);
+                    TooltipContent = new AdjustedAttributesTooltip.Data(originalDifficulty, adjustedDifficulty);
                 }
             }
 

@@ -16,14 +16,13 @@ using osuTK;
 
 namespace osu.Game.Overlays.Mods
 {
-    public partial class AdjustedAttributesTooltip : VisibilityContainer, ITooltip
+    public partial class AdjustedAttributesTooltip : VisibilityContainer, ITooltip<AdjustedAttributesTooltip.Data?>
     {
         private FillFlowContainer attributesFillFlow = null!;
 
         private Container content = null!;
 
-        private BeatmapDifficulty? originalDifficulty;
-        private BeatmapDifficulty? adjustedDifficulty;
+        private Data? data;
 
         [Resolved]
         private OsuColour colours { get; set; } = null!;
@@ -73,26 +72,17 @@ namespace osu.Game.Overlays.Mods
             updateDisplay();
         }
 
-        public void UpdateAttributes(BeatmapDifficulty original, BeatmapDifficulty adjusted)
-        {
-            originalDifficulty = original;
-            adjustedDifficulty = adjusted;
-
-            if (IsLoaded)
-                updateDisplay();
-        }
-
         private void updateDisplay()
         {
             attributesFillFlow.Clear();
 
-            if (originalDifficulty == null || adjustedDifficulty == null)
-                return;
-
-            attemptAdd("CS", bd => bd.CircleSize);
-            attemptAdd("HP", bd => bd.DrainRate);
-            attemptAdd("OD", bd => bd.OverallDifficulty);
-            attemptAdd("AR", bd => bd.ApproachRate);
+            if (data != null)
+            {
+                attemptAdd("CS", bd => bd.CircleSize);
+                attemptAdd("HP", bd => bd.DrainRate);
+                attemptAdd("OD", bd => bd.OverallDifficulty);
+                attemptAdd("AR", bd => bd.ApproachRate);
+            }
 
             if (attributesFillFlow.Any())
                 content.Show();
@@ -101,22 +91,39 @@ namespace osu.Game.Overlays.Mods
 
             void attemptAdd(string name, Func<BeatmapDifficulty, double> lookup)
             {
-                double a = lookup(originalDifficulty);
-                double b = lookup(adjustedDifficulty);
+                double originalValue = lookup(data.OriginalDifficulty);
+                double adjustedValue = lookup(data.AdjustedDifficulty);
 
-                if (!Precision.AlmostEquals(a, b))
-                    attributesFillFlow.Add(new AttributeDisplay(name, a, b));
+                if (!Precision.AlmostEquals(originalValue, adjustedValue))
+                    attributesFillFlow.Add(new AttributeDisplay(name, originalValue, adjustedValue));
             }
         }
 
-        public void SetContent(object content)
+        public void SetContent(Data? data)
         {
+            if (this.data == data)
+                return;
+
+            this.data = data;
+            updateDisplay();
         }
 
         protected override void PopIn() => this.FadeIn(200, Easing.OutQuint);
         protected override void PopOut() => this.FadeOut(200, Easing.OutQuint);
 
         public void Move(Vector2 pos) => Position = pos;
+
+        public class Data
+        {
+            public BeatmapDifficulty OriginalDifficulty { get; }
+            public BeatmapDifficulty AdjustedDifficulty { get; }
+
+            public Data(BeatmapDifficulty originalDifficulty, BeatmapDifficulty adjustedDifficulty)
+            {
+                OriginalDifficulty = originalDifficulty;
+                AdjustedDifficulty = adjustedDifficulty;
+            }
+        }
 
         private partial class AttributeDisplay : CompositeDrawable
         {
