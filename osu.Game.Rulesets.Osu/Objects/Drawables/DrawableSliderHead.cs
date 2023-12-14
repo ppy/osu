@@ -3,10 +3,14 @@
 
 #nullable disable
 
+using System;
 using System.Diagnostics;
+using System.Linq;
 using osu.Framework.Bindables;
+using osu.Game.Rulesets.Objects.Types;
 using osu.Game.Rulesets.Osu.UI;
 using osu.Game.Rulesets.Scoring;
+using osuTK;
 
 namespace osu.Game.Rulesets.Osu.Objects.Drawables
 {
@@ -59,6 +63,50 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
             pathVersion.BindTo(DrawableSlider.PathVersion);
 
             CheckHittable = (d, t, r) => DrawableSlider.CheckHittable?.Invoke(d, t, r) ?? ClickAction.Hit;
+        }
+
+        protected override void CheckForResult(bool userTriggered, double timeOffset)
+        {
+            base.CheckForResult(userTriggered, timeOffset);
+
+            if (!Judged || !Result.IsHit)
+                return;
+
+            // If the head is hit and in radius of the would-be-expanded follow circle,
+            // then hit every object that the follow circle has passed through up until the current time.
+            if (DrawableSlider.Ball.IsMouseInFollowCircleWithState(true))
+            {
+                foreach (var nested in DrawableSlider.NestedHitObjects.OfType<DrawableOsuHitObject>())
+                {
+                    if (nested.Judged)
+                        continue;
+
+                    if (!check(nested.HitObject))
+                        break;
+
+                    if (nested is DrawableSliderTick tick)
+                        tick.HitForcefully();
+
+                    if (nested is DrawableSliderRepeat repeat)
+                        repeat.HitForcefully();
+
+                    if (nested is DrawableSliderTail tail)
+                        tail.HitForcefully();
+                }
+            }
+
+            bool check(OsuHitObject h)
+            {
+                if (h.StartTime > Time.Current)
+                    return false;
+
+                float radius = DrawableSlider.Ball.GetFollowCircleRadius(true);
+
+                double objectProgress = Math.Clamp((h.StartTime - DrawableSlider.HitObject.StartTime) / DrawableSlider.HitObject.Duration, 0, 1);
+                Vector2 objectPosition = DrawableSlider.HitObject.CurvePositionAt(objectProgress);
+
+                return objectPosition.LengthSquared <= radius * radius;
+            }
         }
 
         protected override HitResult ResultFor(double timeOffset)
