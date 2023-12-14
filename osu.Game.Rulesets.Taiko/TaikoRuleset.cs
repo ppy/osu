@@ -265,15 +265,14 @@ namespace osu.Game.Rulesets.Taiko
             };
         }
 
+        /// <seealso cref="TaikoHitWindows"/>
         public override BeatmapDifficulty GetRateAdjustedDisplayDifficulty(IBeatmapDifficultyInfo difficulty, double rate)
         {
             BeatmapDifficulty adjustedDifficulty = new BeatmapDifficulty(difficulty);
 
-            double hitWindow = 35.0 - 15.0 * (adjustedDifficulty.OverallDifficulty - 5) / 5;
-
-            hitWindow /= rate;
-
-            adjustedDifficulty.OverallDifficulty = (float)(5 * (35 - hitWindow) / 15 + 5);
+            double greatHitWindow = IBeatmapDifficultyInfo.DifficultyRange(adjustedDifficulty.OverallDifficulty, 50, 35, 20);
+            greatHitWindow /= rate;
+            adjustedDifficulty.OverallDifficulty = (float)IBeatmapDifficultyInfo.InverseDifficultyRange(greatHitWindow, 50, 35, 20);
 
             return adjustedDifficulty;
         }

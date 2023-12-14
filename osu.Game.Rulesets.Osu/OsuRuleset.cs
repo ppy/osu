@@ -332,23 +332,19 @@ namespace osu.Game.Rulesets.Osu
 
         public override RulesetSetupSection CreateEditorSetupSection() => new OsuSetupSection();
 
+        /// <seealso cref="OsuHitObject.ApplyDefaultsToSelf"/>
+        /// <seealso cref="OsuHitWindows"/>
         public override BeatmapDifficulty GetRateAdjustedDisplayDifficulty(IBeatmapDifficultyInfo difficulty, double rate)
         {
             BeatmapDifficulty adjustedDifficulty = new BeatmapDifficulty(difficulty);
 
-            double preempt = adjustedDifficulty.ApproachRate < 5
-                ? 1200.0 + 600.0 * (5 - adjustedDifficulty.ApproachRate) / 5
-                : 1200.0 - 750.0 * (adjustedDifficulty.ApproachRate - 5) / 5;
-
+            double preempt = IBeatmapDifficultyInfo.DifficultyRange(adjustedDifficulty.ApproachRate, 1800, 1200, 450);
             preempt /= rate;
+            adjustedDifficulty.ApproachRate = (float)IBeatmapDifficultyInfo.InverseDifficultyRange(preempt, 1800, 1200, 450);
 
-            adjustedDifficulty.ApproachRate = (float)(preempt > 1200 ? (1800 - preempt) / 120 : (1200 - preempt) / 150 + 5);
-
-            double hitwindow = 80.0 - 6 * adjustedDifficulty.OverallDifficulty;
-
-            hitwindow /= rate;
-
-            adjustedDifficulty.OverallDifficulty = (float)(80.0 - hitwindow) / 6;
+            double greatHitWindow = IBeatmapDifficultyInfo.DifficultyRange(adjustedDifficulty.OverallDifficulty, 80, 50, 20);
+            greatHitWindow /= rate;
+            adjustedDifficulty.OverallDifficulty = (float)IBeatmapDifficultyInfo.InverseDifficultyRange(greatHitWindow, 80, 50, 20);
 
             return adjustedDifficulty;
         }
