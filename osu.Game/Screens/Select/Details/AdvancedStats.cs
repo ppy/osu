@@ -123,7 +123,6 @@ namespace osu.Game.Screens.Select.Details
         private void updateStatistics()
         {
             IBeatmapDifficultyInfo baseDifficulty = BeatmapInfo?.Difficulty;
-
             BeatmapDifficulty adjustedDifficulty = null;
 
             IRulesetInfo ruleset = gameRuleset?.Value ?? beatmapInfo.Ruleset;
