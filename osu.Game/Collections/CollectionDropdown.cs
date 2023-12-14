@@ -48,6 +48,8 @@ namespace osu.Game.Collections
             ItemSource = filters;
 
             Current.Value = new AllBeatmapsCollectionFilterMenuItem();
+
+            AlwaysShowSearchBar = true;
         }
 
         protected override void LoadComplete()
