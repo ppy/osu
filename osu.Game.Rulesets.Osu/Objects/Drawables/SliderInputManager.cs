@@ -3,6 +3,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using osu.Framework.Graphics;
 using osu.Framework.Input;
@@ -75,8 +76,12 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
             if (!isMouseInFollowArea(true))
                 return;
 
+            Debug.Assert(screenSpaceMousePosition != null);
+
+            Vector2 mousePositionInSlider = slider.ToLocalSpace(screenSpaceMousePosition.Value) - slider.OriginPosition;
+
             // When the head is hit and the mouse is in the expanded follow area, force a hit on every nested hitobject
-            // from the start of the slider that is within follow-radius units from the head.
+            // from the start of the slider that is within the follow area.
 
             bool forceMiss = false;
 
@@ -94,9 +99,10 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
                 double objectProgress = Math.Clamp((nested.HitObject.StartTime - slider.HitObject.StartTime) / slider.HitObject.Duration, 0, 1);
                 Vector2 objectPosition = slider.HitObject.CurvePositionAt(objectProgress);
 
-                // When the first nested object that is further than follow-radius units away from the start of the slider is reached,
-                // forcefully miss all other nested objects that would otherwise be valid to be hit by this process.
-                if (forceMiss || objectPosition.LengthSquared > radius * radius)
+                // When the first nested object that is further outside the follow area is reached,
+                // forcefully miss all other nested objects that would otherwise be valid to be hit.
+                // This covers a case of a slider overlapping itself that requires tracking to a tick on an outer edge.
+                if (forceMiss || (objectPosition - mousePositionInSlider).LengthSquared > radius * radius)
                 {
                     nested.MissForcefully();
                     forceMiss = true;

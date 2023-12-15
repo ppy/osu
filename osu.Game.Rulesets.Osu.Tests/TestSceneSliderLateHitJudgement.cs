@@ -184,7 +184,7 @@ namespace osu.Game.Rulesets.Osu.Tests
 
         /// <summary>
         /// If the head circle is hit late and the mouse is in range of the follow circle,
-        /// then all the repeats that the mouse has passed through should be hit.
+        /// then all the repeats that the follow circle has passed through should be hit.
         /// </summary>
         [Test]
         public void TestHitLateInRangeHitsRepeat()
@@ -212,8 +212,8 @@ namespace osu.Game.Rulesets.Osu.Tests
 
         /// <summary>
         /// If the head circle is hit and the mouse is in range of the follow circle,
-        /// then only the ticks that were in range of the follow circle at the head should be hit.
-        /// If any hitobject was outside the follow range, ALL hitobjects after that point should be missed.
+        /// then only the ticks that are in range of the cursor position should be hit.
+        /// If any hitobject does not meet this criteria, ALL hitobjects after that one should be missed.
         /// </summary>
         [Test]
         public void TestHitLateInRangeDoesNotHitAfterAnyOutOfRange()
@@ -257,7 +257,7 @@ namespace osu.Game.Rulesets.Osu.Tests
             assertTickJudgement(11, HitResult.LargeTickMiss);
             assertTickJudgement(12, HitResult.LargeTickMiss);
 
-            // And the tail should be hit because of its leniency.
+            // This particular test actually starts tracking the slider just before the end, so the tail should be hit because of its leniency.
             assertTailJudgement(HitResult.LargeTickHit);
 
             assertSliderJudgement(HitResult.IgnoreHit);
@@ -265,10 +265,10 @@ namespace osu.Game.Rulesets.Osu.Tests
 
         /// <summary>
         /// If the head circle is hit and the mouse is in range of the follow circle,
-        /// then a tick outside the range of the follow circle from the head should not be hit.
+        /// then a tick not within the follow radius from the cursor position should not be hit.
         /// </summary>
         [Test]
-        public void TestHitLateInRangeDoesNotHitOutOfRange()
+        public void TestHitLateInRangeDoesNotHitOutOfRangeTick()
         {
             performTest(new List<ReplayFrame>
             {
@@ -290,6 +290,36 @@ namespace osu.Game.Rulesets.Osu.Tests
             assertHeadJudgement(HitResult.Meh);
             assertTickJudgement(0, HitResult.LargeTickMiss);
             assertTailJudgement(HitResult.LargeTickHit);
+            assertSliderJudgement(HitResult.IgnoreHit);
+        }
+
+        /// <summary>
+        /// If the head circle is hit and the mouse is in range of the follow circle,
+        /// then a tick not within the follow radius from the cursor position should not be hit.
+        /// </summary>
+        [Test]
+        public void TestHitLateWithEdgeHit()
+        {
+            performTest(new List<ReplayFrame>
+            {
+                new OsuReplayFrame(time_slider_start + 150, slider_start_position - new Vector2(20), OsuAction.LeftButton),
+                new OsuReplayFrame(time_slider_end + 150, slider_start_position - new Vector2(20), OsuAction.LeftButton),
+            }, s =>
+            {
+                s.Path = new SliderPath(PathType.PERFECT_CURVE, new[]
+                {
+                    Vector2.Zero,
+                    new Vector2(50, 50),
+                    new Vector2(20, 0),
+                });
+
+                s.TickDistanceMultiplier = 0.35f;
+                s.SliderVelocityMultiplier = 4;
+            });
+
+            assertHeadJudgement(HitResult.Meh);
+            assertTickJudgement(0, HitResult.LargeTickMiss);
+            assertTailJudgement(HitResult.IgnoreMiss);
             assertSliderJudgement(HitResult.IgnoreHit);
         }
 
