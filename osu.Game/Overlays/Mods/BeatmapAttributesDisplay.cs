@@ -144,8 +144,8 @@ namespace osu.Game.Overlays.Mods
 
         private void startAnimating()
         {
-            Content.AutoSizeEasing = Easing.OutQuint;
-            Content.AutoSizeDuration = transition_duration;
+            LeftContent.AutoSizeEasing = Content.AutoSizeEasing = Easing.OutQuint;
+            LeftContent.AutoSizeDuration = Content.AutoSizeDuration = transition_duration;
         }
 
         private void updateValues() => Scheduler.AddOnce(() =>
