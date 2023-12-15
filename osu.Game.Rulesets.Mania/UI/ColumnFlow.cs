@@ -109,22 +109,23 @@ namespace osu.Game.Rulesets.Mania.UI
             if (!IsLoaded || !RuntimeInfo.IsMobile)
                 return;
 
+            // GridContainer+CellContainer containing this stage (gets split up for dual stages).
+            Vector2? containingCell = this.FindClosestParent<Stage>()?.Parent?.DrawSize;
+
+            // Will be null in tests.
+            if (containingCell == null)
+                return;
+
+            float aspectRatio = containingCell.Value.X / containingCell.Value.Y;
+
+            // These numbers are based on mobile phones, aspect ~1.92.
+            float mobileAdjust = 2.83f * Math.Min(1, 7f / stageDefinition.Columns);
+            // We should scale it back for cases like tablets which aren't so extreme.
+            mobileAdjust *= aspectRatio / 1.92f;
+
+            // Best effort until we have better mobile support.
             for (int i = 0; i < stageDefinition.Columns; i++)
-            {
-                // GridContainer+CellContainer containing this stage (gets split up for dual stages).
-                Vector2 containingCell = this.FindClosestParent<Stage>().Parent!.DrawSize;
-
-                // Best effort until we have better mobile support.
-                if (RuntimeInfo.IsMobile)
-                {
-                    // These numbers are based on mobile phones, aspect ~1.92.
-                    float mobileAdjust = 2.83f * Math.Min(1, 7f / stageDefinition.Columns);
-                    // We should scale it back for cases like tablets which aren't so extreme.
-                    mobileAdjust *= (containingCell.X / containingCell.Y) / 1.92f;
-
-                    columns[i].Width *= mobileAdjust;
-                }
-            }
+                columns[i].Width *= mobileAdjust;
         }
 
         protected override void Dispose(bool isDisposing)
