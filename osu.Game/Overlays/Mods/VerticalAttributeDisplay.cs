@@ -82,7 +82,8 @@ namespace osu.Game.Overlays.Mods
             {
                 Origin = Anchor.CentreLeft,
                 Anchor = Anchor.CentreLeft,
-                AutoSizeAxes = Axes.Both,
+                AutoSizeAxes = Axes.Y,
+                Width = 50,
                 Direction = FillDirection.Vertical,
                 Children = new Drawable[]
                 {
