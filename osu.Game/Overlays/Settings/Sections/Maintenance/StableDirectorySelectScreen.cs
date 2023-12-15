@@ -46,6 +46,6 @@ namespace osu.Game.Overlays.Settings.Sections.Maintenance
         }
 
         private bool shouldUseParentDirectory(DirectoryInfo? info)
-            => info?.Parent != null && (info?.Name == "Songs" || info?.Name == "Skins");
+            => info?.Parent != null && (info.Name == "Songs" || info.Name == "Skins");
     }
 }
