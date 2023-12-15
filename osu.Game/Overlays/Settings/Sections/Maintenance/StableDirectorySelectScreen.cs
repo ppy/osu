@@ -1,11 +1,13 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System;
 using System.IO;
-using System.Linq;
 using System.Threading.Tasks;
+using osu.Framework.Allocation;
 using osu.Framework.Localisation;
 using osu.Framework.Screens;
+using osu.Game.Database;
 
 namespace osu.Game.Overlays.Settings.Sections.Maintenance
 {
@@ -13,18 +15,12 @@ namespace osu.Game.Overlays.Settings.Sections.Maintenance
     {
         private readonly TaskCompletionSource<string> taskCompletionSource;
 
+        [Resolved]
+        private LegacyImportManager legacyImportManager { get; set; } = null!;
+
         protected override OverlayActivation InitialOverlayActivationMode => OverlayActivation.Disabled;
 
-        protected override bool IsValidDirectory(DirectoryInfo? info) =>
-            // A full stable installation will have a configuration file present.
-            // This is the best case scenario, as it may contain a custom beatmap directory we need to traverse to.
-            info?.GetFiles("osu!.*.cfg").Any() == true ||
-            // The user may only have their songs or skins folders left.
-            // We still want to allow them to import based on this.
-            info?.GetDirectories("Songs").Any() == true ||
-            info?.GetDirectories("Skins").Any() == true ||
-            // The user may have traverse *inside* their songs or skins folders.
-            shouldUseParentDirectory(info);
+        protected override bool IsValidDirectory(DirectoryInfo? info) => legacyImportManager.IsUsableForStableImport(info, out _);
 
         public override LocalisableString HeaderText => "Please select your osu!stable install location";
 
@@ -35,7 +31,10 @@ namespace osu.Game.Overlays.Settings.Sections.Maintenance
 
         protected override void OnSelection(DirectoryInfo directory)
         {
-            taskCompletionSource.TrySetResult(shouldUseParentDirectory(directory) ? directory.Parent!.FullName : directory.FullName);
+            if (!legacyImportManager.IsUsableForStableImport(directory, out var stableRoot))
+                throw new InvalidOperationException($@"{nameof(OnSelection)} was called on an invalid directory. This should never happen.");
+
+            taskCompletionSource.TrySetResult(stableRoot.FullName);
             this.Exit();
         }
 
@@ -44,8 +43,5 @@ namespace osu.Game.Overlays.Settings.Sections.Maintenance
             taskCompletionSource.TrySetCanceled();
             return base.OnExiting(e);
         }
-
-        private bool shouldUseParentDirectory(DirectoryInfo? info)
-            => info?.Parent != null && (info.Name == "Songs" || info.Name == "Skins");
     }
 }

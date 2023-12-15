@@ -269,11 +269,11 @@ namespace osu.Game.Overlays.FirstRunSetup
                 if (directory.OldValue?.FullName == directory.NewValue.FullName)
                     return;
 
-                if (directory.NewValue?.GetFiles(@"osu!.*.cfg").Any() ?? false)
+                if (legacyImportManager.IsUsableForStableImport(directory.NewValue, out var stableRoot))
                 {
                     this.HidePopover();
 
-                    string path = directory.NewValue.FullName;
+                    string path = stableRoot.FullName;
 
                     legacyImportManager.UpdateStorage(path);
                     Current.Value = path;
