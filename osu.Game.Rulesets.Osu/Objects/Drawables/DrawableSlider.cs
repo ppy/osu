@@ -28,8 +28,6 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
 
         public DrawableSliderHead HeadCircle => headContainer.Child;
         public DrawableSliderTail TailCircle => tailContainer.Child;
-        public IEnumerable<DrawableSliderTick> Ticks => tickContainer.Children;
-        public IEnumerable<DrawableSliderRepeat> Repeats => repeatContainer.Children;
 
         [Cached]
         public DrawableSliderBall Ball { get; private set; }
@@ -60,6 +58,8 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
         public IBindable<int> PathVersion => pathVersion;
         private readonly Bindable<int> pathVersion = new Bindable<int>();
 
+        public readonly SliderInputManager SliderInputManager;
+
         private Container<DrawableSliderHead> headContainer;
         private Container<DrawableSliderTail> tailContainer;
         private Container<DrawableSliderTick> tickContainer;
@@ -74,9 +74,10 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
         public DrawableSlider([CanBeNull] Slider s = null)
             : base(s)
         {
+            SliderInputManager = new SliderInputManager(this);
+
             Ball = new DrawableSliderBall
             {
-                GetInitialHitAction = () => HeadCircle.HitAction,
                 BypassAutoSizeAxes = Axes.Both,
                 AlwaysPresent = true,
                 Alpha = 0
@@ -90,6 +91,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
 
             AddRangeInternal(new Drawable[]
             {
+                SliderInputManager,
                 shakeContainer = new ShakeContainer
                 {
                     ShakeDuration = 30,
@@ -234,7 +236,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
         {
             base.Update();
 
-            Tracking.Value = Ball.Tracking;
+            Tracking.Value = SliderInputManager.Tracking;
 
             if (Tracking.Value && slidingSample != null)
                 // keep the sliding sample playing at the current tracking position
@@ -247,8 +249,8 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
 
             foreach (DrawableHitObject hitObject in NestedHitObjects)
             {
-                if (hitObject is ITrackSnaking s) s.UpdateSnakingPosition(HitObject.Path.PositionAt(SliderBody?.SnakedStart ?? 0), HitObject.Path.PositionAt(SliderBody?.SnakedEnd ?? 0));
-                if (hitObject is IRequireTracking t) t.Tracking = Ball.Tracking;
+                if (hitObject is ITrackSnaking s)
+                    s.UpdateSnakingPosition(HitObject.Path.PositionAt(SliderBody?.SnakedStart ?? 0), HitObject.Path.PositionAt(SliderBody?.SnakedEnd ?? 0));
             }
 
             Size = SliderBody?.Size ?? Vector2.Zero;

@@ -17,7 +17,7 @@ using osuTK;
 
 namespace osu.Game.Rulesets.Osu.Objects.Drawables
 {
-    public partial class DrawableSliderRepeat : DrawableOsuHitObject, ITrackSnaking, IRequireTracking
+    public partial class DrawableSliderRepeat : DrawableOsuHitObject, ITrackSnaking
     {
         public new SliderRepeat HitObject => (SliderRepeat)base.HitObject;
 
@@ -35,8 +35,6 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
         private Drawable scaleContainer;
 
         public override bool DisplayResult => false;
-
-        public bool Tracking { get; set; }
 
         public DrawableSliderRepeat()
             : base(null)
@@ -85,37 +83,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
             Position = HitObject.Position - DrawableSlider.Position;
         }
 
-        public void HitForcefully()
-        {
-            if (Judged)
-                return;
-
-            ApplyResult(r => r.Type = r.Judgement.MaxResult);
-        }
-
-        protected override void CheckForResult(bool userTriggered, double timeOffset)
-        {
-            // shared implementation with DrawableSliderTick.
-            if (timeOffset >= 0)
-            {
-                // This check is applied to all nested slider objects apart from the head (ticks, repeats, tail).
-                if (!DrawableSlider.HeadCircle.Judged)
-                {
-                    if (Tracking)
-                    {
-                        // Attempt to preserve correct ordering of judgements as best we can by forcing an un-judged head to be missed when the user has clearly skipped it.
-                        DrawableSlider.HeadCircle.MissForcefully();
-                    }
-                    else
-                    {
-                        // Don't judge this object as a miss before the head has been judged, to allow the head to be hit late.
-                        return;
-                    }
-                }
-
-                ApplyResult(r => r.Type = Tracking ? r.Judgement.MaxResult : r.Judgement.MinResult);
-            }
-        }
+        protected override void CheckForResult(bool userTriggered, double timeOffset) => DrawableSlider.SliderInputManager.TryJudgeNestedObject(this, timeOffset);
 
         protected override void UpdateInitialTransforms()
         {
