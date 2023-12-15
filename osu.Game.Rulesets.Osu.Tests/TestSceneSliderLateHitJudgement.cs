@@ -296,7 +296,7 @@ namespace osu.Game.Rulesets.Osu.Tests
         private void assertHeadJudgement(HitResult result)
         {
             AddAssert(
-                "check head result",
+                $"head = {result}",
                 () => judgementResults.SingleOrDefault(r => r.HitObject is SliderHeadCircle)?.Type,
                 () => Is.EqualTo(result));
         }
@@ -304,7 +304,7 @@ namespace osu.Game.Rulesets.Osu.Tests
         private void assertTickJudgement(int index, HitResult result)
         {
             AddAssert(
-                $"check tick({index}) result",
+                $"tick({index}) = {result}",
                 () => judgementResults.Where(r => r.HitObject is SliderTick).ElementAtOrDefault(index)?.Type,
                 () => Is.EqualTo(result));
         }
@@ -312,7 +312,7 @@ namespace osu.Game.Rulesets.Osu.Tests
         private void assertAllTickJudgements(HitResult result)
         {
             AddAssert(
-                "check all tick results",
+                $"all ticks = {result}",
                 () => judgementResults.Where(r => r.HitObject is SliderTick).Select(t => t.Type),
                 () => Has.All.EqualTo(result));
         }
@@ -320,7 +320,7 @@ namespace osu.Game.Rulesets.Osu.Tests
         private void assertRepeatJudgement(HitResult result)
         {
             AddAssert(
-                "check repeat result",
+                $"repeat = {result}",
                 () => judgementResults.SingleOrDefault(r => r.HitObject is SliderRepeat)?.Type,
                 () => Is.EqualTo(result));
         }
@@ -328,7 +328,7 @@ namespace osu.Game.Rulesets.Osu.Tests
         private void assertTailJudgement(HitResult result)
         {
             AddAssert(
-                "check tail result",
+                $"tail = {result}",
                 () => judgementResults.SingleOrDefault(r => r.HitObject is SliderTailCircle)?.Type,
                 () => Is.EqualTo(result));
         }
@@ -336,16 +336,9 @@ namespace osu.Game.Rulesets.Osu.Tests
         private void assertSliderJudgement(HitResult result)
         {
             AddAssert(
-                "check slider result",
+                $"slider = {result}",
                 () => judgementResults.SingleOrDefault(r => r.HitObject is Slider)?.Type,
                 () => Is.EqualTo(result));
-        }
-
-        private Vector2 computePositionFromTime(double time)
-        {
-            Vector2 dist = slider_end_position - slider_start_position;
-            double t = (time - time_slider_start) / (time_slider_end - time_slider_start);
-            return slider_start_position + dist * (float)t;
         }
 
         private void performTest(List<ReplayFrame> frames, Action<Slider>? adjustSliderFunc = null, bool classic = false)
