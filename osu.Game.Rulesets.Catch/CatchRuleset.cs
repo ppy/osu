@@ -15,6 +15,7 @@ using osu.Game.Rulesets.Catch.Beatmaps;
 using osu.Game.Rulesets.Catch.Difficulty;
 using osu.Game.Rulesets.Catch.Edit;
 using osu.Game.Rulesets.Catch.Mods;
+using osu.Game.Rulesets.Catch.Objects;
 using osu.Game.Rulesets.Catch.Replays;
 using osu.Game.Rulesets.Catch.Scoring;
 using osu.Game.Rulesets.Catch.Skinning.Argon;
@@ -236,17 +237,14 @@ namespace osu.Game.Rulesets.Catch
             };
         }
 
+        /// <seealso cref="CatchHitObject.ApplyDefaultsToSelf"/>
         public override BeatmapDifficulty GetRateAdjustedDisplayDifficulty(IBeatmapDifficultyInfo difficulty, double rate)
         {
             BeatmapDifficulty adjustedDifficulty = new BeatmapDifficulty(difficulty);
 
-            double preempt = adjustedDifficulty.ApproachRate < 6
-                ? 1200.0 + 600.0 * (5 - adjustedDifficulty.ApproachRate) / 5
-                : 1200.0 - 750.0 * (adjustedDifficulty.ApproachRate - 5) / 5;
-
+            double preempt = IBeatmapDifficultyInfo.DifficultyRange(adjustedDifficulty.ApproachRate, CatchHitObject.PREEMPT_MAX, CatchHitObject.PREEMPT_MID, CatchHitObject.PREEMPT_MIN);
             preempt /= rate;
-
-            adjustedDifficulty.ApproachRate = (float)(preempt > 1200 ? (1800 - preempt) / 120 : (1200 - preempt) / 150 + 5);
+            adjustedDifficulty.ApproachRate = (float)IBeatmapDifficultyInfo.InverseDifficultyRange(preempt, CatchHitObject.PREEMPT_MAX, CatchHitObject.PREEMPT_MID, CatchHitObject.PREEMPT_MIN);
 
             return adjustedDifficulty;
         }
