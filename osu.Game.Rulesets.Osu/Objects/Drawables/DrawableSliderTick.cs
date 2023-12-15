@@ -14,13 +14,11 @@ using osu.Framework.Graphics.Containers;
 
 namespace osu.Game.Rulesets.Osu.Objects.Drawables
 {
-    public partial class DrawableSliderTick : DrawableOsuHitObject, IRequireTracking
+    public partial class DrawableSliderTick : DrawableOsuHitObject
     {
         public const double ANIM_DURATION = 150;
 
         private const float default_tick_size = 16;
-
-        public bool Tracking { get; set; }
 
         public override bool DisplayResult => false;
 
@@ -73,37 +71,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
             Position = HitObject.Position - DrawableSlider.HitObject.Position;
         }
 
-        public void HitForcefully()
-        {
-            if (Judged)
-                return;
-
-            ApplyResult(r => r.Type = r.Judgement.MaxResult);
-        }
-
-        protected override void CheckForResult(bool userTriggered, double timeOffset)
-        {
-            // shared implementation with DrawableSliderRepeat.
-            if (timeOffset >= 0)
-            {
-                // This check is applied to all nested slider objects apart from the head (ticks, repeats, tail).
-                if (!DrawableSlider.HeadCircle.Judged)
-                {
-                    if (Tracking)
-                    {
-                        // Attempt to preserve correct ordering of judgements as best we can by forcing an un-judged head to be missed when the user has clearly skipped it.
-                        DrawableSlider.HeadCircle.MissForcefully();
-                    }
-                    else
-                    {
-                        // Don't judge this object as a miss before the head has been judged, to allow the head to be hit late.
-                        return;
-                    }
-                }
-
-                ApplyResult(r => r.Type = Tracking ? r.Judgement.MaxResult : r.Judgement.MinResult);
-            }
-        }
+        protected override void CheckForResult(bool userTriggered, double timeOffset) => DrawableSlider.SliderInputManager.TryJudgeNestedObject(this, timeOffset);
 
         protected override void UpdateInitialTransforms()
         {
