@@ -5,12 +5,17 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using NUnit.Framework;
+using osu.Framework.Graphics;
 using osu.Framework.Screens;
+using osu.Framework.Testing;
 using osu.Game.Beatmaps;
+using osu.Game.Graphics.Sprites;
 using osu.Game.Replays;
 using osu.Game.Rulesets.Judgements;
 using osu.Game.Rulesets.Objects;
+using osu.Game.Rulesets.Objects.Drawables;
 using osu.Game.Rulesets.Objects.Types;
+using osu.Game.Rulesets.Osu.Judgements;
 using osu.Game.Rulesets.Osu.Objects;
 using osu.Game.Rulesets.Osu.Replays;
 using osu.Game.Rulesets.Replays;
@@ -410,7 +415,21 @@ namespace osu.Game.Rulesets.Osu.Tests
                 {
                     p.ScoreProcessor.NewJudgement += result =>
                     {
-                        if (currentPlayer == p) judgementResults.Add(result);
+                        if (currentPlayer == p)
+                            judgementResults.Add(result);
+
+                        DrawableHitObject drawableObj = this.ChildrenOfType<DrawableHitObject>().Single(h => h.HitObject == result.HitObject);
+
+                        var text = new OsuSpriteText
+                        {
+                            Origin = Anchor.Centre,
+                            Position = Content.ToLocalSpace(drawableObj.ToScreenSpace(drawableObj.OriginPosition)) - new Vector2(0, 20),
+                            Text = result.IsHit ? "hit" : "miss"
+                        };
+
+                        Add(text);
+
+                        text.FadeOutFromOne(1000).Expire();
                     };
                 };
 
