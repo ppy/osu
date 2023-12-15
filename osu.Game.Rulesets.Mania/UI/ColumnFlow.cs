@@ -118,8 +118,9 @@ namespace osu.Game.Rulesets.Mania.UI
 
             float aspectRatio = containingCell.Value.X / containingCell.Value.Y;
 
-            // These numbers are based on mobile phones, aspect ~1.92.
+            // 2.83 is a mostly arbitrary scale-up (170 / 60, based on original implementation for argon)
             float mobileAdjust = 2.83f * Math.Min(1, 7f / stageDefinition.Columns);
+            // 1.92 is a "reference" mobile screen aspect ratio for phones.
             // We should scale it back for cases like tablets which aren't so extreme.
             mobileAdjust *= aspectRatio / 1.92f;
 
