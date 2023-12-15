@@ -245,6 +245,9 @@ namespace osu.Game.Screens.Select.Carousel
 
         private void updateKeyCount()
         {
+            if (Item?.State.Value == CarouselItemState.Collapsed)
+                return;
+
             if (ruleset.Value.OnlineID == 3)
             {
                 // Account for mania differences locally for now.
