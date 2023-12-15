@@ -3,14 +3,17 @@
 
 #nullable disable
 
+using System;
 using System.Collections.Generic;
 using System.Linq;
+using osu.Framework;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Game.Rulesets.Mania.Beatmaps;
 using osu.Game.Rulesets.Mania.Skinning;
 using osu.Game.Skinning;
+using osuTK;
 
 namespace osu.Game.Rulesets.Mania.UI
 {
@@ -60,6 +63,12 @@ namespace osu.Game.Rulesets.Mania.UI
             onSkinChanged();
         }
 
+        protected override void LoadComplete()
+        {
+            base.LoadComplete();
+            updateMobileSizing();
+        }
+
         private void onSkinChanged()
         {
             for (int i = 0; i < stageDefinition.Columns; i++)
@@ -77,12 +86,15 @@ namespace osu.Game.Rulesets.Mania.UI
                                               new ManiaSkinConfigurationLookup(LegacyManiaSkinConfigurationLookups.ColumnWidth, i))
                                           ?.Value;
 
-                if (width == null)
-                    // only used by default skin (legacy skins get defaults set in LegacyManiaSkinConfiguration)
-                    columns[i].Width = stageDefinition.IsSpecialColumn(i) ? Column.SPECIAL_COLUMN_WIDTH : Column.COLUMN_WIDTH;
-                else
-                    columns[i].Width = width.Value;
+                bool isSpecialColumn = stageDefinition.IsSpecialColumn(i);
+
+                // only used by default skin (legacy skins get defaults set in LegacyManiaSkinConfiguration)
+                width ??= isSpecialColumn ? Column.SPECIAL_COLUMN_WIDTH : Column.COLUMN_WIDTH;
+
+                columns[i].Width = width.Value;
             }
+
+            updateMobileSizing();
         }
 
         /// <summary>
@@ -92,10 +104,27 @@ namespace osu.Game.Rulesets.Mania.UI
         /// <param name="content">The content.</param>
         public void SetContentForColumn(int column, TContent content) => columns[column].Child = content;
 
-        public new MarginPadding Padding
+        private void updateMobileSizing()
         {
-            get => base.Padding;
-            set => base.Padding = value;
+            if (!IsLoaded)
+                return;
+
+            for (int i = 0; i < stageDefinition.Columns; i++)
+            {
+                // GridContainer+CellContainer containing this stage (gets split up for dual stages).
+                Vector2 containingCell = this.FindClosestParent<Stage>().Parent!.DrawSize;
+
+                // Best effort until we have better mobile support.
+                if (RuntimeInfo.IsMobile)
+                {
+                    // These numbers are based on mobile phones, aspect ~1.92.
+                    float mobileAdjust = 2.83f * Math.Min(1, 7f / stageDefinition.Columns);
+                    // We should scale it back for cases like tablets which aren't so extreme.
+                    mobileAdjust *= (containingCell.X / containingCell.Y) / 1.92f;
+
+                    columns[i].Width *= mobileAdjust;
+                }
+            }
         }
 
         protected override void Dispose(bool isDisposing)
