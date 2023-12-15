@@ -106,7 +106,7 @@ namespace osu.Game.Rulesets.Mania.UI
 
         private void updateMobileSizing()
         {
-            if (!IsLoaded)
+            if (!IsLoaded || !RuntimeInfo.IsMobile)
                 return;
 
             for (int i = 0; i < stageDefinition.Columns; i++)
