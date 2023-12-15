@@ -244,6 +244,8 @@ namespace osu.Game.Overlays.FirstRunSetup
             [Resolved(canBeNull: true)] // Can't really be null but required to handle potential of disposal before DI completes.
             private OsuGameBase? game { get; set; }
 
+            private bool changingDirectory;
+
             protected override void LoadComplete()
             {
                 base.LoadComplete();
@@ -259,24 +261,37 @@ namespace osu.Game.Overlays.FirstRunSetup
 
             private void onDirectorySelected(ValueChangedEvent<DirectoryInfo?> directory)
             {
-                if (directory.NewValue == null)
-                {
-                    Current.Value = string.Empty;
+                if (changingDirectory)
                     return;
+
+                try
+                {
+                    changingDirectory = true;
+
+                    if (directory.NewValue == null)
+                    {
+                        Current.Value = string.Empty;
+                        return;
+                    }
+
+                    // DirectorySelectors can trigger a noop value changed, but `DirectoryInfo` equality doesn't catch this.
+                    if (directory.OldValue?.FullName == directory.NewValue.FullName)
+                        return;
+
+                    if (legacyImportManager.IsUsableForStableImport(directory.NewValue, out var stableRoot))
+                    {
+                        this.HidePopover();
+
+                        string path = stableRoot.FullName;
+
+                        legacyImportManager.UpdateStorage(path);
+                        Current.Value = path;
+                        currentDirectory.Value = stableRoot;
+                    }
                 }
-
-                // DirectorySelectors can trigger a noop value changed, but `DirectoryInfo` equality doesn't catch this.
-                if (directory.OldValue?.FullName == directory.NewValue.FullName)
-                    return;
-
-                if (legacyImportManager.IsUsableForStableImport(directory.NewValue, out var stableRoot))
+                finally
                 {
-                    this.HidePopover();
-
-                    string path = stableRoot.FullName;
-
-                    legacyImportManager.UpdateStorage(path);
-                    Current.Value = path;
+                    changingDirectory = false;
                 }
             }
 
