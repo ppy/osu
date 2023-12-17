@@ -107,7 +107,15 @@ namespace osu.Game.Rulesets.Mania.Difficulty
                 // if we are a convert, we can be played in any key mod.
                 return mods.Concat(new Mod[]
                 {
-                    new ManiaModKeyCount(),
+                    new ManiaModKeyCount { KeyCount = { Value = 1 } },
+                    new ManiaModKeyCount { KeyCount = { Value = 2 } },
+                    new ManiaModKeyCount { KeyCount = { Value = 3 } },
+                    new ManiaModKeyCount { KeyCount = { Value = 4 } },
+                    new ManiaModKeyCount { KeyCount = { Value = 5 } },
+                    new ManiaModKeyCount { KeyCount = { Value = 6 } },
+                    new ManiaModKeyCount { KeyCount = { Value = 7 } },
+                    new ManiaModKeyCount { KeyCount = { Value = 8 } },
+                    new ManiaModKeyCount { KeyCount = { Value = 9 } },
                     new ManiaModDualStages(),
                 }).ToArray();
             }
