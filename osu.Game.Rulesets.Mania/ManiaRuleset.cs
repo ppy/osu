@@ -216,16 +216,35 @@ namespace osu.Game.Rulesets.Mania
                 // Previously, there were separate mods for each key count conversion. When
                 // deserialising these mods, migrate them into `ManiaModKeyCount` with the
                 // appropriate key count.
-                case "1K": return new ManiaModKeyCount { KeyCount = { Value = 1 } };
-                case "2K": return new ManiaModKeyCount { KeyCount = { Value = 2 } };
-                case "3K": return new ManiaModKeyCount { KeyCount = { Value = 3 } };
-                case "4K": return new ManiaModKeyCount { KeyCount = { Value = 4 } };
-                case "5K": return new ManiaModKeyCount { KeyCount = { Value = 5 } };
-                case "6K": return new ManiaModKeyCount { KeyCount = { Value = 6 } };
-                case "7K": return new ManiaModKeyCount { KeyCount = { Value = 7 } };
-                case "8K": return new ManiaModKeyCount { KeyCount = { Value = 8 } };
-                case "9K": return new ManiaModKeyCount { KeyCount = { Value = 9 } };
-                case "10K": return new ManiaModKeyCount { KeyCount = { Value = 10 } };
+                case "1K":
+                    return new ManiaModKeyCount { KeyCount = { Value = 1 } };
+
+                case "2K":
+                    return new ManiaModKeyCount { KeyCount = { Value = 2 } };
+
+                case "3K":
+                    return new ManiaModKeyCount { KeyCount = { Value = 3 } };
+
+                case "4K":
+                    return new ManiaModKeyCount { KeyCount = { Value = 4 } };
+
+                case "5K":
+                    return new ManiaModKeyCount { KeyCount = { Value = 5 } };
+
+                case "6K":
+                    return new ManiaModKeyCount { KeyCount = { Value = 6 } };
+
+                case "7K":
+                    return new ManiaModKeyCount { KeyCount = { Value = 7 } };
+
+                case "8K":
+                    return new ManiaModKeyCount { KeyCount = { Value = 8 } };
+
+                case "9K":
+                    return new ManiaModKeyCount { KeyCount = { Value = 9 } };
+
+                case "10K":
+                    return new ManiaModKeyCount { KeyCount = { Value = 10 } };
 
                 default:
                     return base.CreateModFromAcronym(acronym);
