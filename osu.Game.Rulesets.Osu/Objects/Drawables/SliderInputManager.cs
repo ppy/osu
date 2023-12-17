@@ -175,7 +175,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
 
             if (slider.Tracking.Value)
                 nestedObject.HitForcefully();
-            else
+            else if (timeOffset >= 0)
                 nestedObject.MissForcefully();
         }
 
