@@ -11,8 +11,8 @@ namespace osu.Game.Rulesets.Mods
     public interface IApplicableHealthProcessor
     {
         /// <summary>
-        /// Creates the <see cref="HealthProcessor"/>.
+        /// Creates the <see cref="HealthProcessor"/>. May be null to use the ruleset default.
         /// </summary>
-        HealthProcessor CreateHealthProcessor(double drainStartTime);
+        HealthProcessor? CreateHealthProcessor(double drainStartTime);
     }
 }

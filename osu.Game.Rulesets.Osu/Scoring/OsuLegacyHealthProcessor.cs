@@ -10,9 +10,9 @@ using osu.Game.Rulesets.Scoring;
 
 namespace osu.Game.Rulesets.Osu.Scoring
 {
-    public partial class OsuHealthProcessor : LegacyDrainingHealthProcessor
+    public partial class OsuLegacyHealthProcessor : LegacyDrainingHealthProcessor
     {
-        public OsuHealthProcessor(double drainStartTime)
+        public OsuLegacyHealthProcessor(double drainStartTime)
             : base(drainStartTime)
         {
         }
