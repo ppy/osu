@@ -43,11 +43,14 @@ namespace osu.Game.Collections
 
         private IDisposable? realmSubscription;
 
+        private readonly CollectionFilterMenuItem allBeatmapsItem = new AllBeatmapsCollectionFilterMenuItem();
+
         public CollectionDropdown()
         {
             ItemSource = filters;
 
-            Current.Value = new AllBeatmapsCollectionFilterMenuItem();
+            Current.Value = allBeatmapsItem;
+            AlwaysShowSearchBar = true;
         }
 
         protected override void LoadComplete()
@@ -61,37 +64,51 @@ namespace osu.Game.Collections
 
         private void collectionsChanged(IRealmCollection<BeatmapCollection> collections, ChangeSet? changes)
         {
-            var selectedItem = SelectedItem?.Value?.Collection;
-
-            var allBeatmaps = new AllBeatmapsCollectionFilterMenuItem();
-
-            filters.Clear();
-            filters.Add(allBeatmaps);
-            filters.AddRange(collections.Select(c => new CollectionFilterMenuItem(c.ToLive(realm))));
-
-            if (ShowManageCollectionsItem)
-                filters.Add(new ManageCollectionsFilterMenuItem());
-
-            // This current update and schedule is required to work around dropdown headers not updating text even when the selected item
-            // changes. It's not great but honestly the whole dropdown menu structure isn't great. This needs to be fixed, but I'll issue
-            // a warning that it's going to be a frustrating journey.
-            Current.Value = allBeatmaps;
-            Schedule(() =>
+            if (changes == null)
             {
-                // current may have changed before the scheduled call is run.
-                if (Current.Value != allBeatmaps)
-                    return;
-
-                Current.Value = filters.SingleOrDefault(f => f.Collection != null && f.Collection.ID == selectedItem?.ID) ?? filters[0];
-            });
-
-            // Trigger a re-filter if the current item was in the change set.
-            if (selectedItem != null && changes != null)
+                filters.Add(allBeatmapsItem);
+                filters.AddRange(collections.Select(c => new CollectionFilterMenuItem(c.ToLive(realm))));
+                if (ShowManageCollectionsItem)
+                    filters.Add(new ManageCollectionsFilterMenuItem());
+            }
+            else
             {
-                foreach (int index in changes.ModifiedIndices)
+                foreach (int i in changes.DeletedIndices)
+                    filters.RemoveAt(i + 1);
+
+                foreach (int i in changes.InsertedIndices)
+                    filters.Insert(i + 1, new CollectionFilterMenuItem(collections[i].ToLive(realm)));
+
+                var selectedItem = SelectedItem?.Value;
+
+                foreach (int i in changes.NewModifiedIndices)
                 {
-                    if (collections[index].ID == selectedItem.ID)
+                    var updatedItem = collections[i];
+
+                    // This is responsible for updating the state of the +/- button and the collection's name.
+                    // TODO: we can probably make the menu items update with changes to avoid this.
+                    filters.RemoveAt(i + 1);
+                    filters.Insert(i + 1, new CollectionFilterMenuItem(updatedItem.ToLive(realm)));
+
+                    if (updatedItem.ID == selectedItem?.Collection?.ID)
+                    {
+                        // This current update and schedule is required to work around dropdown headers not updating text even when the selected item
+                        // changes. It's not great but honestly the whole dropdown menu structure isn't great. This needs to be fixed, but I'll issue
+                        // a warning that it's going to be a frustrating journey.
+                        Current.Value = allBeatmapsItem;
+                        Schedule(() =>
+                        {
+                            // current may have changed before the scheduled call is run.
+                            if (Current.Value != allBeatmapsItem)
+                                return;
+
+                            Current.Value = filters.SingleOrDefault(f => f.Collection?.ID == selectedItem.Collection?.ID) ?? filters[0];
+                        });
+
+                        // Trigger an external re-filter if the current item was in the change set.
                         RequestFilter?.Invoke();
+                        break;
+                    }
                 }
             }
         }

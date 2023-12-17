@@ -13,6 +13,7 @@ using osu.Framework.Graphics.Containers;
 using osu.Framework.Localisation;
 using osu.Framework.Testing;
 using osu.Framework.Utils;
+using osu.Game.Configuration;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Overlays;
 using osu.Game.Overlays.Mods;
@@ -37,6 +38,9 @@ namespace osu.Game.Tests.Visual.UserInterface
         private RulesetStore rulesetStore = null!;
 
         private TestModSelectOverlay modSelectOverlay = null!;
+
+        [Resolved]
+        private OsuConfigManager configManager { get; set; } = null!;
 
         [BackgroundDependencyLoader]
         private void load()
@@ -566,17 +570,33 @@ namespace osu.Game.Tests.Visual.UserInterface
         }
 
         [Test]
-        public void TestSearchFocusChangeViaKey()
+        public void TestTextSearchActiveByDefault()
         {
+            configManager.SetValue(OsuSetting.ModSelectTextSearchStartsActive, true);
             createScreen();
 
-            const Key focus_switch_key = Key.Tab;
+            AddUntilStep("search text box focused", () => modSelectOverlay.SearchTextBox.HasFocus);
 
-            AddStep("press tab", () => InputManager.Key(focus_switch_key));
-            AddAssert("focused", () => modSelectOverlay.SearchTextBox.HasFocus);
+            AddStep("press tab", () => InputManager.Key(Key.Tab));
+            AddAssert("search text box unfocused", () => !modSelectOverlay.SearchTextBox.HasFocus);
 
-            AddStep("press tab", () => InputManager.Key(focus_switch_key));
-            AddAssert("lost focus", () => !modSelectOverlay.SearchTextBox.HasFocus);
+            AddStep("press tab", () => InputManager.Key(Key.Tab));
+            AddAssert("search text box focused", () => modSelectOverlay.SearchTextBox.HasFocus);
+        }
+
+        [Test]
+        public void TestTextSearchNotActiveByDefault()
+        {
+            configManager.SetValue(OsuSetting.ModSelectTextSearchStartsActive, false);
+            createScreen();
+
+            AddUntilStep("search text box not focused", () => !modSelectOverlay.SearchTextBox.HasFocus);
+
+            AddStep("press tab", () => InputManager.Key(Key.Tab));
+            AddAssert("search text box focused", () => modSelectOverlay.SearchTextBox.HasFocus);
+
+            AddStep("press tab", () => InputManager.Key(Key.Tab));
+            AddAssert("search text box unfocused", () => !modSelectOverlay.SearchTextBox.HasFocus);
         }
 
         [Test]
@@ -787,7 +807,8 @@ namespace osu.Game.Tests.Visual.UserInterface
                 InputManager.MoveMouseTo(this.ChildrenOfType<ModPresetPanel>().Single(preset => preset.Preset.Value.Name == "Half Time 0.5x"));
                 InputManager.Click(MouseButton.Left);
             });
-            AddAssert("difficulty multiplier display shows correct value", () => modSelectOverlay.ChildrenOfType<ScoreMultiplierDisplay>().Single().Current.Value, () => Is.EqualTo(0.5));
+            AddAssert("difficulty multiplier display shows correct value",
+                () => modSelectOverlay.ChildrenOfType<ScoreMultiplierDisplay>().Single().Current.Value, () => Is.EqualTo(0.1).Within(Precision.DOUBLE_EPSILON));
 
             // this is highly unorthodox in a test, but because the `ModSettingChangeTracker` machinery heavily leans on events and object disposal and re-creation,
             // it is instrumental in the reproduction of the failure scenario that this test is supposed to cover.
@@ -796,7 +817,8 @@ namespace osu.Game.Tests.Visual.UserInterface
             AddStep("open customisation area", () => modSelectOverlay.CustomisationButton!.TriggerClick());
             AddStep("reset half time speed to default", () => modSelectOverlay.ChildrenOfType<ModSettingsArea>().Single()
                                                                               .ChildrenOfType<RevertToDefaultButton<double>>().Single().TriggerClick());
-            AddUntilStep("difficulty multiplier display shows correct value", () => modSelectOverlay.ChildrenOfType<ScoreMultiplierDisplay>().Single().Current.Value, () => Is.EqualTo(0.7));
+            AddUntilStep("difficulty multiplier display shows correct value",
+                () => modSelectOverlay.ChildrenOfType<ScoreMultiplierDisplay>().Single().Current.Value, () => Is.EqualTo(0.3).Within(Precision.DOUBLE_EPSILON));
         }
 
         private void waitForColumnLoad() => AddUntilStep("all column content loaded", () =>

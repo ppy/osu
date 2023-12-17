@@ -61,5 +61,18 @@ namespace osu.Game.Beatmaps
         /// The basic star rating for this beatmap (with no mods applied).
         /// </summary>
         double StarRating { get; }
+
+        /// <summary>
+        /// The number of hitobjects in the beatmap with a distinct end time.
+        /// </summary>
+        /// <remarks>
+        /// Canonically, these are hitobjects are either sliders or spinners.
+        /// </remarks>
+        int EndTimeObjectCount { get; }
+
+        /// <summary>
+        /// The total number of hitobjects in the beatmap.
+        /// </summary>
+        int TotalObjectCount { get; }
     }
 }
