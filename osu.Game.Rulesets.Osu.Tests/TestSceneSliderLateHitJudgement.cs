@@ -281,6 +281,37 @@ namespace osu.Game.Rulesets.Osu.Tests
         }
 
         /// <summary>
+        /// Same as <see cref="TestHitLateInRangeDoesNotHitOutOfRangeTick"/> except the tracking is limited to the ball
+        /// because the tick was missed.
+        /// </summary>
+        [Test]
+        public void TestHitLateInRangeDoesNotHitOutOfRangeTickAndTrackingLimitedToBall()
+        {
+            performTest(new List<ReplayFrame>
+            {
+                new OsuReplayFrame(time_slider_start + 150, slider_start_position, OsuAction.LeftButton),
+                new OsuReplayFrame(time_slider_end + 150, slider_start_position, OsuAction.LeftButton),
+            }, s =>
+            {
+                s.Path = new SliderPath(PathType.PERFECT_CURVE, new[]
+                {
+                    Vector2.Zero,
+                    new Vector2(50, 50),
+                    new Vector2(20, 0),
+                });
+
+                s.TickDistanceMultiplier = 0.25f;
+                s.SliderVelocityMultiplier = 3;
+            });
+
+            assertHeadJudgement(HitResult.Meh);
+            assertTickJudgement(0, HitResult.LargeTickMiss);
+            assertTickJudgement(1, HitResult.LargeTickMiss);
+            assertTailJudgement(HitResult.LargeTickHit);
+            assertSliderJudgement(HitResult.IgnoreHit);
+        }
+
+        /// <summary>
         /// If the head circle is hit and the mouse is in range of the follow circle,
         /// then a tick not within the follow radius from the cursor position should not be hit.
         /// </summary>

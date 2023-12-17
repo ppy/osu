@@ -126,8 +126,10 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
                     nested.MissForcefully();
             }
 
-            // Enable tracking, since the mouse is within the follow area (if it were expanded).
-            updateTracking(true);
+            // If all ticks were hit so far, enable tracking the full extent.
+            // If any ticks were missed, assume tracking would've broken at some point, and should only activate if the cursor is within the slider ball.
+            // For the second case, this may be the last chance we have to enable tracking before other objects get judged, otherwise the same would normally happen via Update().
+            updateTracking(allTicksInRange || isMouseInFollowArea(false));
         }
 
         public void TryJudgeNestedObject(DrawableOsuHitObject nestedObject, double timeOffset)
