@@ -97,7 +97,7 @@ namespace osu.Game.Rulesets
         /// Returns a fresh instance of the mod matching the specified acronym.
         /// </summary>
         /// <param name="acronym">The acronym to query for .</param>
-        public Mod? CreateModFromAcronym(string acronym)
+        public virtual Mod? CreateModFromAcronym(string acronym)
         {
             return AllMods.FirstOrDefault(m => m.Acronym == acronym)?.CreateInstance();
         }
