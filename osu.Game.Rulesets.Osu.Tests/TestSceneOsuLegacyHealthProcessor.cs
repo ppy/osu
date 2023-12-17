@@ -10,7 +10,7 @@ using osu.Game.Rulesets.Osu.Scoring;
 namespace osu.Game.Rulesets.Osu.Tests
 {
     [TestFixture]
-    public class TestSceneOsuHealthProcessor
+    public class TestSceneOsuLegacyHealthProcessor
     {
         [Test]
         public void TestNoBreak()
