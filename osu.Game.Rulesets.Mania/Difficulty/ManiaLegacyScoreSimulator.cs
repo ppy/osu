@@ -51,7 +51,7 @@ namespace osu.Game.Rulesets.Mania.Difficulty
             int originalColumns = ManiaBeatmapConverter.GetColumnCount(difficulty);
             int actualColumns = originalColumns;
 
-            actualColumns = mods.OfType<ManiaKeyMod>().SingleOrDefault()?.KeyCount.Value ?? actualColumns;
+            actualColumns = mods.OfType<ManiaModKeyCount>().SingleOrDefault()?.KeyCount.Value ?? actualColumns;
             if (mods.Any(m => m is ManiaModDualStages))
                 actualColumns *= 2;
 
