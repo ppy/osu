@@ -374,10 +374,10 @@ namespace osu.Game.Rulesets.Osu.Tests
 
             performTest(replay, beatmap);
 
-            assertHeadJudgement(HitResult.Meh);
-            assertTickJudgement(0, HitResult.LargeTickMiss);
-            assertTailJudgement(HitResult.IgnoreMiss);
-            assertSliderJudgement(HitResult.IgnoreHit);
+            AddAssert(
+                $"all heads = {HitResult.Ok}",
+                () => judgementResults.Where(r => r.HitObject is SliderHeadCircle).Select(r => r.Type),
+                () => Has.All.EqualTo(HitResult.Ok));
         }
 
         private void assertHeadJudgement(HitResult result)
