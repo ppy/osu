@@ -163,7 +163,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
 
             if (!slider.HeadCircle.Judged)
             {
-                if (slider.Tracking.Value)
+                if (Tracking)
                 {
                     // Attempt to preserve correct ordering of judgements as best we can by forcing an un-judged head to be missed when the user has clearly skipped it.
                     slider.HeadCircle.MissForcefully();
@@ -175,7 +175,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
                 }
             }
 
-            if (slider.Tracking.Value)
+            if (Tracking)
                 nestedObject.HitForcefully();
             else if (timeOffset >= 0)
                 nestedObject.MissForcefully();
