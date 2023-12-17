@@ -1,11 +1,11 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using System;
 using System.Linq;
 using NUnit.Framework;
 using osu.Game.Beatmaps.Legacy;
 using osu.Game.Rulesets;
+using osu.Game.Rulesets.Mods;
 
 namespace osu.Game.Tests.Beatmaps
 {
@@ -19,25 +19,22 @@ namespace osu.Game.Tests.Beatmaps
         /// </summary>
         protected abstract Ruleset CreateRuleset();
 
-        protected void TestFromLegacy(LegacyMods legacyMods, Type[] expectedMods)
+        protected void TestFromLegacy(LegacyMods legacyMods, Mod[] expectedMods)
         {
             var ruleset = CreateRuleset();
-            var mods = ruleset.ConvertFromLegacyMods(legacyMods).ToList();
-            Assert.AreEqual(expectedMods.Length, mods.Count);
+            var actualMods = ruleset.ConvertFromLegacyMods(legacyMods).ToList();
+            Assert.AreEqual(expectedMods.Length, actualMods.Count);
 
-            foreach (var modType in expectedMods)
+            foreach (var expectedMod in expectedMods)
             {
-                Assert.IsNotNull(mods.SingleOrDefault(mod => mod.GetType() == modType));
+                Assert.Contains(expectedMod, actualMods);
             }
         }
 
-        protected void TestToLegacy(LegacyMods expectedLegacyMods, Type[] providedModTypes)
+        protected void TestToLegacy(LegacyMods expectedLegacyMods, Mod[] mods)
         {
             var ruleset = CreateRuleset();
-            var modInstances = ruleset.CreateAllMods()
-                                      .Where(mod => providedModTypes.Contains(mod.GetType()))
-                                      .ToArray();
-            var actualLegacyMods = ruleset.ConvertToLegacyMods(modInstances);
+            var actualLegacyMods = ruleset.ConvertToLegacyMods(mods);
             Assert.AreEqual(expectedLegacyMods, actualLegacyMods);
         }
     }
