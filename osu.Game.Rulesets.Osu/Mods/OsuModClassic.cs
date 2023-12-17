@@ -18,7 +18,7 @@ using osu.Game.Rulesets.UI;
 
 namespace osu.Game.Rulesets.Osu.Mods
 {
-    public class OsuModClassic : ModClassic, IApplicableToHitObject, IApplicableToDrawableHitObject, IApplicableToDrawableRuleset<OsuHitObject>
+    public class OsuModClassic : ModClassic, IApplicableToHitObject, IApplicableToDrawableHitObject, IApplicableToDrawableRuleset<OsuHitObject>, IApplicableHealthProcessor
     {
         public override Type[] IncompatibleMods => base.IncompatibleMods.Append(typeof(OsuModStrictTracking)).ToArray();
 
@@ -33,6 +33,9 @@ namespace osu.Game.Rulesets.Osu.Mods
 
         [SettingSource("Fade out hit circles earlier", "Make hit circles fade out into a miss, rather than after it.")]
         public Bindable<bool> FadeHitCircleEarly { get; } = new Bindable<bool>(true);
+
+        [SettingSource("Classic health", "More closely resembles the original HP drain mechanics.")]
+        public Bindable<bool> ClassicHealth { get; } = new Bindable<bool>(true);
 
         private bool usingHiddenFading;
 
@@ -115,5 +118,7 @@ namespace osu.Game.Rulesets.Osu.Mods
                 }
             };
         }
+
+        public HealthProcessor? CreateHealthProcessor(double drainStartTime) => ClassicHealth.Value ? new OsuLegacyHealthProcessor(drainStartTime) : null;
     }
 }
