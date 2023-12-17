@@ -80,10 +80,11 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
 
             Vector2 mousePositionInSlider = slider.ToLocalSpace(screenSpaceMousePosition.Value) - slider.OriginPosition;
 
-            // When the head is hit and the mouse is in the expanded follow area, force a hit on every nested hitobject
-            // from the start of the slider that is within the follow area.
+            // When the head is hit late:
+            // - If the cursor has at all times been within range of the expanded follow area, hit all nested objects that have been passed through.
+            // - If the cursor has at some point left the expanded follow area, miss those nested objects instead.
 
-            bool forceMiss = false;
+            bool allTicksInRange = true;
 
             foreach (var nested in slider.NestedHitObjects.OfType<DrawableOsuHitObject>())
             {
@@ -102,13 +103,27 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
                 // When the first nested object that is further outside the follow area is reached,
                 // forcefully miss all other nested objects that would otherwise be valid to be hit.
                 // This covers a case of a slider overlapping itself that requires tracking to a tick on an outer edge.
-                if (forceMiss || (objectPosition - mousePositionInSlider).LengthSquared > radius * radius)
+                if ((objectPosition - mousePositionInSlider).LengthSquared > radius * radius)
                 {
-                    nested.MissForcefully();
-                    forceMiss = true;
+                    allTicksInRange = false;
+                    break;
                 }
-                else
+            }
+
+            foreach (var nested in slider.NestedHitObjects.OfType<DrawableOsuHitObject>())
+            {
+                // Skip nested objects that are already judged.
+                if (nested.Judged)
+                    continue;
+
+                // Stop the process when a nested object is reached that can't be hit before the current time.
+                if (nested.HitObject.StartTime > Time.Current)
+                    break;
+
+                if (allTicksInRange)
                     nested.HitForcefully();
+                else
+                    nested.MissForcefully();
             }
 
             // Enable tracking, since the mouse is within the follow area (if it were expanded).

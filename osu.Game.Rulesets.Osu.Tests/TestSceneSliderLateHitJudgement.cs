@@ -220,7 +220,7 @@ namespace osu.Game.Rulesets.Osu.Tests
         /// If any hitobject does not meet this criteria, ALL hitobjects after that one should be missed.
         /// </summary>
         [Test]
-        public void TestHitLateInRangeDoesNotHitAfterAnyOutOfRange()
+        public void TestHitLateDoesNotHitTicksIfAnyOutOfRange()
         {
             performTest(new List<ReplayFrame>
             {
@@ -241,25 +241,8 @@ namespace osu.Game.Rulesets.Osu.Tests
 
             assertHeadJudgement(HitResult.Meh);
 
-            // The first few ticks that are in the follow range of the head should be hit.
-            assertTickJudgement(0, HitResult.LargeTickHit); // This tick is hidden under the slider head :(
-            assertTickJudgement(1, HitResult.LargeTickHit);
-            assertTickJudgement(2, HitResult.LargeTickHit);
-
-            // Every other tick should be missed
-            assertTickJudgement(3, HitResult.LargeTickMiss);
-            assertTickJudgement(4, HitResult.LargeTickMiss);
-            assertTickJudgement(5, HitResult.LargeTickMiss);
-            assertTickJudgement(6, HitResult.LargeTickMiss);
-            assertTickJudgement(7, HitResult.LargeTickMiss);
-            assertTickJudgement(8, HitResult.LargeTickMiss);
-            assertTickJudgement(9, HitResult.LargeTickMiss);
-            assertTickJudgement(10, HitResult.LargeTickMiss);
-
-            // In particular, these three are in the follow range of the head, but should not be hit
-            // because the slider was at some point outside the follow range of the head.
-            assertTickJudgement(11, HitResult.LargeTickMiss);
-            assertTickJudgement(12, HitResult.LargeTickMiss);
+            // At least one tick was out of range, so they all should be missed.
+            assertAllTickJudgements(HitResult.LargeTickMiss);
 
             // This particular test actually starts tracking the slider just before the end, so the tail should be hit because of its leniency.
             assertTailJudgement(HitResult.LargeTickHit);
