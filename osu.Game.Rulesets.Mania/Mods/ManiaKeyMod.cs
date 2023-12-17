@@ -3,6 +3,7 @@
 
 using Humanizer;
 using osu.Framework.Bindables;
+using osu.Framework.Graphics.Sprites;
 using osu.Framework.Localisation;
 using osu.Game.Beatmaps;
 using osu.Game.Configuration;
@@ -16,6 +17,7 @@ namespace osu.Game.Rulesets.Mania.Mods
         public override string Name => "Key Count";
         public override string Acronym => "XK";
         public override string ExtendedIconInformation => $"{KeyCount.Value}K";
+        public override IconUsage? Icon => FontAwesome.Solid.Hashtag;
         public override ModType Type => ModType.Conversion;
         public override LocalisableString Description => @"Play with a different amount of keys.";
         public override string SettingDescription => "keys".ToQuantity(KeyCount.Value);
