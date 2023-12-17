@@ -283,15 +283,17 @@ namespace osu.Game.Tests.Visual.Navigation
             openSkinEditor();
         }
 
-        [Test]
-        public void TestOpenSkinEditorGameplaySceneWhenDifferentRulesetActive()
+        [TestCase(1)]
+        [TestCase(2)]
+        [TestCase(3)]
+        public void TestOpenSkinEditorGameplaySceneWhenDifferentRulesetActive(int rulesetId)
         {
             BeatmapSetInfo beatmapSet = null!;
 
             AddStep("import beatmap", () => beatmapSet = BeatmapImportHelper.LoadQuickOszIntoOsu(Game).GetResultSafely());
-            AddStep("select mania difficulty", () =>
+            AddStep($"select difficulty for ruleset w/ ID {rulesetId}", () =>
             {
-                var beatmap = beatmapSet.Beatmaps.First(b => b.Ruleset.OnlineID == 3);
+                var beatmap = beatmapSet.Beatmaps.First(b => b.Ruleset.OnlineID == rulesetId);
                 Game.Beatmap.Value = Game.BeatmapManager.GetWorkingBeatmap(beatmap);
             });
 
