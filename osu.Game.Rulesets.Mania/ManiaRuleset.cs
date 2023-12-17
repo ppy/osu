@@ -121,31 +121,31 @@ namespace osu.Game.Rulesets.Mania
                 yield return new ManiaModHidden();
 
             if (mods.HasFlagFast(LegacyMods.Key1))
-                yield return new ManiaModKey1();
+                yield return new ManiaKeyMod { KeyCount = { Value = 1 } };
 
             if (mods.HasFlagFast(LegacyMods.Key2))
-                yield return new ManiaModKey2();
+                yield return new ManiaKeyMod { KeyCount = { Value = 2 } };
 
             if (mods.HasFlagFast(LegacyMods.Key3))
-                yield return new ManiaModKey3();
+                yield return new ManiaKeyMod { KeyCount = { Value = 3 } };
 
             if (mods.HasFlagFast(LegacyMods.Key4))
-                yield return new ManiaModKey4();
+                yield return new ManiaKeyMod { KeyCount = { Value = 4 } };
 
             if (mods.HasFlagFast(LegacyMods.Key5))
-                yield return new ManiaModKey5();
+                yield return new ManiaKeyMod { KeyCount = { Value = 5 } };
 
             if (mods.HasFlagFast(LegacyMods.Key6))
-                yield return new ManiaModKey6();
+                yield return new ManiaKeyMod { KeyCount = { Value = 6 } };
 
             if (mods.HasFlagFast(LegacyMods.Key7))
-                yield return new ManiaModKey7();
+                yield return new ManiaKeyMod { KeyCount = { Value = 7 } };
 
             if (mods.HasFlagFast(LegacyMods.Key8))
-                yield return new ManiaModKey8();
+                yield return new ManiaKeyMod { KeyCount = { Value = 8 } };
 
             if (mods.HasFlagFast(LegacyMods.Key9))
-                yield return new ManiaModKey9();
+                yield return new ManiaKeyMod { KeyCount = { Value = 9 } };
 
             if (mods.HasFlagFast(LegacyMods.KeyCoop))
                 yield return new ManiaModDualStages();
@@ -171,40 +171,20 @@ namespace osu.Game.Rulesets.Mania
             {
                 switch (mod)
                 {
-                    case ManiaModKey1:
-                        value |= LegacyMods.Key1;
-                        break;
-
-                    case ManiaModKey2:
-                        value |= LegacyMods.Key2;
-                        break;
-
-                    case ManiaModKey3:
-                        value |= LegacyMods.Key3;
-                        break;
-
-                    case ManiaModKey4:
-                        value |= LegacyMods.Key4;
-                        break;
-
-                    case ManiaModKey5:
-                        value |= LegacyMods.Key5;
-                        break;
-
-                    case ManiaModKey6:
-                        value |= LegacyMods.Key6;
-                        break;
-
-                    case ManiaModKey7:
-                        value |= LegacyMods.Key7;
-                        break;
-
-                    case ManiaModKey8:
-                        value |= LegacyMods.Key8;
-                        break;
-
-                    case ManiaModKey9:
-                        value |= LegacyMods.Key9;
+                    case ManiaKeyMod keyCountMod:
+                        value |= keyCountMod.KeyCount.Value switch
+                        {
+                            1 => LegacyMods.Key1,
+                            2 => LegacyMods.Key2,
+                            3 => LegacyMods.Key3,
+                            4 => LegacyMods.Key4,
+                            5 => LegacyMods.Key5,
+                            6 => LegacyMods.Key6,
+                            7 => LegacyMods.Key7,
+                            8 => LegacyMods.Key8,
+                            9 => LegacyMods.Key9,
+                            _ => 0,
+                        };
                         break;
 
                     case ManiaModDualStages:
@@ -256,6 +236,7 @@ namespace osu.Game.Rulesets.Mania
                     return new Mod[]
                     {
                         new ManiaModRandom(),
+                        new ManiaKeyMod(),
                         new ManiaModDualStages(),
                         new ManiaModMirror(),
                         new ManiaModDifficultyAdjust(),
@@ -263,18 +244,6 @@ namespace osu.Game.Rulesets.Mania
                         new ManiaModInvert(),
                         new ManiaModConstantSpeed(),
                         new ManiaModHoldOff(),
-                        new MultiMod(
-                            new ManiaModKey1(),
-                            new ManiaModKey2(),
-                            new ManiaModKey3(),
-                            new ManiaModKey4(),
-                            new ManiaModKey5(),
-                            new ManiaModKey6(),
-                            new ManiaModKey7(),
-                            new ManiaModKey8(),
-                            new ManiaModKey9(),
-                            new ManiaModKey10()
-                        ),
                     };
 
                 case ModType.Automation:

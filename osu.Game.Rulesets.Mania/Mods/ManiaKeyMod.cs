@@ -1,20 +1,32 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using System;
-using System.Linq;
+using Humanizer;
+using osu.Framework.Bindables;
+using osu.Framework.Localisation;
 using osu.Game.Beatmaps;
+using osu.Game.Configuration;
 using osu.Game.Rulesets.Mania.Beatmaps;
 using osu.Game.Rulesets.Mods;
 
 namespace osu.Game.Rulesets.Mania.Mods
 {
-    public abstract class ManiaKeyMod : Mod, IApplicableToBeatmapConverter
+    public class ManiaKeyMod : Mod, IApplicableToBeatmapConverter
     {
-        public override string Acronym => Name;
-        public abstract int KeyCount { get; }
+        public override string Name => "Key Count";
+        public override string Acronym => "XK";
+        public override string ExtendedIconInformation => $"{KeyCount.Value}K";
         public override ModType Type => ModType.Conversion;
+        public override LocalisableString Description => @"Play with a different amount of keys.";
+        public override string SettingDescription => "keys".ToQuantity(KeyCount.Value);
         public override double ScoreMultiplier => 1; // TODO: Implement the mania key mod score multiplier
+
+        [SettingSource("Key count", "Number of keys")]
+        public Bindable<int> KeyCount { get; } = new BindableInt(4)
+        {
+            MinValue = 1,
+            MaxValue = 10,
+        };
 
         public void ApplyToBeatmapConverter(IBeatmapConverter beatmapConverter)
         {
@@ -24,21 +36,7 @@ namespace osu.Game.Rulesets.Mania.Mods
             if (mbc.IsForCurrentRuleset)
                 return;
 
-            mbc.TargetColumns = KeyCount;
+            mbc.TargetColumns = KeyCount.Value;
         }
-
-        public override Type[] IncompatibleMods => new[]
-        {
-            typeof(ManiaModKey1),
-            typeof(ManiaModKey2),
-            typeof(ManiaModKey3),
-            typeof(ManiaModKey4),
-            typeof(ManiaModKey5),
-            typeof(ManiaModKey6),
-            typeof(ManiaModKey7),
-            typeof(ManiaModKey8),
-            typeof(ManiaModKey9),
-            typeof(ManiaModKey10),
-        }.Except(new[] { GetType() }).ToArray();
     }
 }
