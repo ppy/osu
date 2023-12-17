@@ -341,6 +341,45 @@ namespace osu.Game.Rulesets.Osu.Tests
             assertSliderJudgement(HitResult.IgnoreHit);
         }
 
+        /// <summary>
+        /// Late hit and release on each slider head of a slider stream.
+        /// </summary>
+        [Test]
+        public void TestLateHitSliderStream()
+        {
+            var beatmap = new Beatmap<OsuHitObject>();
+
+            for (int i = 0; i < 20; i++)
+            {
+                beatmap.HitObjects.Add(new Slider
+                {
+                    StartTime = time_slider_start + 75 * i, // 200BPM @ 1/4
+                    Position = new Vector2(256 - slider_path_length / 2, 192),
+                    TickDistanceMultiplier = 3,
+                    Path = new SliderPath(PathType.LINEAR, new[]
+                    {
+                        Vector2.Zero,
+                        new Vector2(20, 0),
+                    }),
+                });
+            }
+
+            var replay = new List<ReplayFrame>();
+
+            for (int i = 0; i < 20; i++)
+            {
+                replay.Add(new OsuReplayFrame(time_slider_start + 75 * i + 75, slider_start_position, i % 2 == 0 ? OsuAction.LeftButton : OsuAction.RightButton));
+                replay.Add(new OsuReplayFrame(time_slider_start + 75 * i + 140, slider_start_position));
+            }
+
+            performTest(replay, beatmap);
+
+            assertHeadJudgement(HitResult.Meh);
+            assertTickJudgement(0, HitResult.LargeTickMiss);
+            assertTailJudgement(HitResult.IgnoreMiss);
+            assertSliderJudgement(HitResult.IgnoreHit);
+        }
+
         private void assertHeadJudgement(HitResult result)
         {
             AddAssert(
@@ -406,21 +445,36 @@ namespace osu.Game.Rulesets.Osu.Tests
 
             adjustSliderFunc?.Invoke(slider);
 
+            var beatmap = new Beatmap<OsuHitObject>
+            {
+                HitObjects = { slider },
+                BeatmapInfo =
+                {
+                    Difficulty = new BeatmapDifficulty
+                    {
+                        SliderMultiplier = 4,
+                        SliderTickRate = 3
+                    },
+                    Ruleset = new OsuRuleset().RulesetInfo,
+                }
+            };
+
+            performTest(frames, beatmap);
+        }
+
+        private void performTest(List<ReplayFrame> frames, Beatmap<OsuHitObject> beatmap)
+        {
+            beatmap.BeatmapInfo.Ruleset = new OsuRuleset().RulesetInfo;
+            beatmap.BeatmapInfo.StackLeniency = 0;
+            beatmap.BeatmapInfo.Difficulty = new BeatmapDifficulty
+            {
+                SliderMultiplier = 4,
+                SliderTickRate = 3,
+            };
+
             AddStep("load player", () =>
             {
-                Beatmap.Value = CreateWorkingBeatmap(new Beatmap<OsuHitObject>
-                {
-                    HitObjects = { slider },
-                    BeatmapInfo =
-                    {
-                        Difficulty = new BeatmapDifficulty
-                        {
-                            SliderMultiplier = 4,
-                            SliderTickRate = 3
-                        },
-                        Ruleset = new OsuRuleset().RulesetInfo,
-                    }
-                });
+                Beatmap.Value = CreateWorkingBeatmap(beatmap);
 
                 var p = new ScoreAccessibleReplayPlayer(new Score { Replay = new Replay { Frames = frames } });
 
