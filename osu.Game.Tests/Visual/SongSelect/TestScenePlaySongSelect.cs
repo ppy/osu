@@ -466,7 +466,7 @@ namespace osu.Game.Tests.Visual.SongSelect
 
             AddStep("Force realm refresh", () => Realm.Run(r => r.Refresh()));
 
-            AddUntilStep("has selection", () => songSelect!.Carousel.SelectedBeatmapInfo?.BeatmapSet?.OnlineID == originalOnlineSetID);
+            AddUntilStep("has selection", () => songSelect!.Carousel.SelectedBeatmapInfo?.BeatmapSet?.OnlineID, () => Is.EqualTo(originalOnlineSetID));
 
             Task<Live<BeatmapSetInfo>?> updateTask = null!;
 
@@ -480,7 +480,7 @@ namespace osu.Game.Tests.Visual.SongSelect
 
             AddStep("Force realm refresh", () => Realm.Run(r => r.Refresh()));
 
-            AddUntilStep("retained selection", () => songSelect!.Carousel.SelectedBeatmapInfo?.BeatmapSet?.OnlineID == originalOnlineSetID);
+            AddUntilStep("retained selection", () => songSelect!.Carousel.SelectedBeatmapInfo?.BeatmapSet?.OnlineID, () => Is.EqualTo(originalOnlineSetID));
         }
 
         [Test]
