@@ -26,7 +26,7 @@ namespace osu.Game.Database
             if (score.IsLegacyScore)
                 return false;
 
-            if (score.TotalScoreVersion > 30000004)
+            if (score.TotalScoreVersion > 30000005)
                 return false;
 
             // Recalculate the old-style standardised score to see if this was an old lazer score.
