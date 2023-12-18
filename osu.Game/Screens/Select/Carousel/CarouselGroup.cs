@@ -62,7 +62,7 @@ namespace osu.Game.Screens.Select.Carousel
             }
 
             if (!i.Filtered.Value)
-                TotalItemsNotFiltered--;
+                TotalItemsNotFiltered++;
         }
 
         public CarouselGroup(List<CarouselItem>? items = null)

@@ -168,7 +168,10 @@ namespace osu.Game.Screens.Select
             applyActiveCriteria(false);
 
             if (loadedTestBeatmaps)
+            {
                 invalidateAfterChange();
+                BeatmapSetsLoaded = true;
+            }
 
             // Restore selection
             if (selectedBeatmapBefore != null && newRoot.BeatmapSetsByID.TryGetValue(selectedBeatmapBefore.BeatmapSet!.ID, out var newSelectionCandidates))
