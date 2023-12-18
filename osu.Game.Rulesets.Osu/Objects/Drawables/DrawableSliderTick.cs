@@ -14,13 +14,11 @@ using osu.Framework.Graphics.Containers;
 
 namespace osu.Game.Rulesets.Osu.Objects.Drawables
 {
-    public partial class DrawableSliderTick : DrawableOsuHitObject, IRequireTracking
+    public partial class DrawableSliderTick : DrawableOsuHitObject
     {
         public const double ANIM_DURATION = 150;
 
         private const float default_tick_size = 16;
-
-        public bool Tracking { get; set; }
 
         public override bool DisplayResult => false;
 
@@ -73,21 +71,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
             Position = HitObject.Position - DrawableSlider.HitObject.Position;
         }
 
-        protected override void CheckForResult(bool userTriggered, double timeOffset)
-        {
-            // shared implementation with DrawableSliderRepeat.
-            if (timeOffset >= 0)
-            {
-                // Attempt to preserve correct ordering of judgements as best we can by forcing
-                // an un-judged head to be missed when the user has clearly skipped it.
-                //
-                // This check is applied to all nested slider objects apart from the head (ticks, repeats, tail).
-                if (Tracking && !DrawableSlider.HeadCircle.Judged)
-                    DrawableSlider.HeadCircle.MissForcefully();
-
-                ApplyResult(r => r.Type = Tracking ? r.Judgement.MaxResult : r.Judgement.MinResult);
-            }
-        }
+        protected override void CheckForResult(bool userTriggered, double timeOffset) => DrawableSlider.SliderInputManager.TryJudgeNestedObject(this, timeOffset);
 
         protected override void UpdateInitialTransforms()
         {
@@ -107,7 +91,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
 
                 case ArmedState.Miss:
                     this.FadeOut(ANIM_DURATION);
-                    this.FadeColour(Color4.Red, ANIM_DURATION / 2);
+                    this.TransformBindableTo(AccentColour, Color4.Red, 0);
                     break;
 
                 case ArmedState.Hit:
