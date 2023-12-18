@@ -151,7 +151,7 @@ namespace osu.Game
             Logger.Log($"Found {beatmapSetIds.Count} beatmap sets which require reprocessing.");
 
             // Technically this is doing more than just star ratings, but easier for the end user to understand.
-            var notification = showProgressNotification("Reprocessing star rating for beatmaps", "beatmaps' star ratings have been updated");
+            var notification = showProgressNotification(beatmapSetIds.Count, "Reprocessing star rating for beatmaps", "beatmaps' star ratings have been updated");
 
             int processedCount = 0;
             int failedCount = 0;
@@ -205,7 +205,7 @@ namespace osu.Game
 
             Logger.Log($"Found {beatmapIds.Count} beatmaps which require statistics population.");
 
-            var notification = showProgressNotification("Populating missing statistics for beatmaps", "beatmaps have been populated with missing statistics");
+            var notification = showProgressNotification(beatmapIds.Count, "Populating missing statistics for beatmaps", "beatmaps have been populated with missing statistics");
 
             int processedCount = 0;
             int failedCount = 0;
@@ -266,7 +266,7 @@ namespace osu.Game
 
             Logger.Log($"Found {scoreIds.Count} scores which require statistics population.");
 
-            var notification = showProgressNotification("Populating missing statistics for scores", "scores have been populated with missing statistics");
+            var notification = showProgressNotification(scoreIds.Count, "Populating missing statistics for scores", "scores have been populated with missing statistics");
 
             int processedCount = 0;
             int failedCount = 0;
@@ -325,7 +325,7 @@ namespace osu.Game
             if (scoreIds.Count == 0)
                 return;
 
-            var notification = showProgressNotification("Upgrading scores to new scoring algorithm", "scores have been upgraded to the new scoring algorithm");
+            var notification = showProgressNotification(scoreIds.Count, "Upgrading scores to new scoring algorithm", "scores have been upgraded to the new scoring algorithm");
 
             int processedCount = 0;
             int failedCount = 0;
@@ -405,9 +405,12 @@ namespace osu.Game
             }
         }
 
-        private ProgressNotification? showProgressNotification(string running, string completed)
+        private ProgressNotification? showProgressNotification(int totalCount, string running, string completed)
         {
             if (notificationOverlay == null)
+                return null;
+
+            if (totalCount < 10)
                 return null;
 
             ProgressNotification notification = new ProgressNotification
