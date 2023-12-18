@@ -508,6 +508,11 @@ namespace osu.Game.Overlays.Mods
 
             modSettingsArea.ResizeHeightTo(modAreaHeight, transition_duration, Easing.InOutCubic);
             TopLevelContent.MoveToY(-modAreaHeight, transition_duration, Easing.InOutCubic);
+
+            if (customisationVisible.Value)
+                GetContainingInputManager().ChangeFocus(modSettingsArea);
+            else
+                Scheduler.Add(() => GetContainingInputManager().ChangeFocus(null));
         }
 
         /// <summary>
@@ -622,7 +627,7 @@ namespace osu.Game.Overlays.Mods
             }
 
             if (textSearchStartsActive.Value)
-                SearchTextBox.TakeFocus();
+                SearchTextBox.HoldFocus = true;
         }
 
         protected override void PopOut()
@@ -761,11 +766,9 @@ namespace osu.Game.Overlays.Mods
                 return false;
 
             // TODO: should probably eventually support typical platform search shortcuts (`Ctrl-F`, `/`)
-            if (SearchTextBox.HasFocus)
-                SearchTextBox.KillFocus();
-            else
+            SearchTextBox.HoldFocus = !SearchTextBox.HoldFocus;
+            if (SearchTextBox.HoldFocus)
                 SearchTextBox.TakeFocus();
-
             return true;
         }
 
