@@ -397,7 +397,7 @@ namespace osu.Game.Graphics.UserInterface
 
             protected override DropdownSearchBar CreateSearchBar() => new OsuDropdownSearchBar
             {
-                Padding = new MarginPadding { Right = 36 },
+                Padding = new MarginPadding { Right = 26 },
             };
 
             private partial class OsuDropdownSearchBar : DropdownSearchBar
