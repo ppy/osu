@@ -168,7 +168,7 @@ namespace osu.Game.Screens.Select
             applyActiveCriteria(false);
 
             if (loadedTestBeatmaps)
-                invalidateAfterChange(true);
+                invalidateAfterChange();
 
             // Restore selection
             if (selectedBeatmapBefore != null && newRoot.BeatmapSetsByID.TryGetValue(selectedBeatmapBefore.BeatmapSet!.ID, out var newSelectionCandidates))
@@ -298,7 +298,7 @@ namespace osu.Game.Screens.Select
                         removeBeatmapSet(id);
                 }
 
-                invalidateAfterChange(!BeatmapSetsLoaded);
+                invalidateAfterChange();
                 BeatmapSetsLoaded = true;
                 return;
             }
@@ -349,7 +349,7 @@ namespace osu.Game.Screens.Select
                 }
             }
 
-            invalidateAfterChange(!BeatmapSetsLoaded);
+            invalidateAfterChange();
         }
 
         private void beatmapsChanged(IRealmCollection<BeatmapInfo> sender, ChangeSet? changes)
@@ -378,7 +378,7 @@ namespace osu.Game.Screens.Select
             }
 
             if (changed)
-                invalidateAfterChange(true);
+                invalidateAfterChange();
         }
 
         private IQueryable<BeatmapSetInfo> getBeatmapSets(Realm realm) => realm.All<BeatmapSetInfo>().Where(s => !s.DeletePending && !s.Protected);
@@ -386,7 +386,7 @@ namespace osu.Game.Screens.Select
         public void RemoveBeatmapSet(BeatmapSetInfo beatmapSet) => Schedule(() =>
         {
             removeBeatmapSet(beatmapSet.ID);
-            invalidateAfterChange(true);
+            invalidateAfterChange();
         });
 
         private void removeBeatmapSet(Guid beatmapSetID)
@@ -409,7 +409,7 @@ namespace osu.Game.Screens.Select
         public void UpdateBeatmapSet(BeatmapSetInfo beatmapSet) => Schedule(() =>
         {
             updateBeatmapSet(beatmapSet);
-            invalidateAfterChange(true);
+            invalidateAfterChange();
         });
 
         private void updateBeatmapSet(BeatmapSetInfo beatmapSet)
@@ -752,15 +752,14 @@ namespace osu.Game.Screens.Select
             }
         }
 
-        private void invalidateAfterChange(bool invokeSetsChangedEvent)
+        private void invalidateAfterChange()
         {
             itemsCache.Invalidate();
 
             if (!Scroll.UserScrolling)
                 ScrollToSelected(true);
 
-            if (invokeSetsChangedEvent)
-                BeatmapSetsChanged?.Invoke();
+            BeatmapSetsChanged?.Invoke();
         }
 
         private float? scrollTarget;
