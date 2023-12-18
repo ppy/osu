@@ -66,6 +66,7 @@ namespace osu.Game.Collections
         {
             if (changes == null)
             {
+                filters.Clear();
                 filters.Add(allBeatmapsItem);
                 filters.AddRange(collections.Select(c => new CollectionFilterMenuItem(c.ToLive(realm))));
                 if (ShowManageCollectionsItem)
