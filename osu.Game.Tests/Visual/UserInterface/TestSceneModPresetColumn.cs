@@ -463,7 +463,7 @@ namespace osu.Game.Tests.Visual.UserInterface
                 Description = "Just to shake things up",
                 Mods = new Mod[]
                 {
-                    new ManiaModKey4(),
+                    new ManiaModKeyCount(),
                     new ManiaModFadeIn()
                 },
                 Ruleset = rulesets.GetRuleset(3).AsNonNull()
