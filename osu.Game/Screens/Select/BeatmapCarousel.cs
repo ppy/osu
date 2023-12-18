@@ -168,7 +168,7 @@ namespace osu.Game.Screens.Select
             applyActiveCriteria(false);
 
             if (loadedTestBeatmaps)
-                signalBeatmapsLoaded();
+                invalidateAfterChange(true);
 
             // Restore selection
             if (selectedBeatmapBefore != null && newRoot.BeatmapSetsByID.TryGetValue(selectedBeatmapBefore.BeatmapSet!.ID, out var newSelectionCandidates))
@@ -298,7 +298,8 @@ namespace osu.Game.Screens.Select
                         removeBeatmapSet(id);
                 }
 
-                signalBeatmapsLoaded();
+                invalidateAfterChange(!BeatmapSetsLoaded);
+                BeatmapSetsLoaded = true;
                 return;
             }
 
@@ -393,12 +394,7 @@ namespace osu.Game.Screens.Select
                 root.RemoveItem(set);
             }
 
-            itemsCache.Invalidate();
-
-            if (!Scroll.UserScrolling)
-                ScrollToSelected(true);
-
-            BeatmapSetsChanged?.Invoke();
+            invalidateAfterChange(true);
         });
 
         public void UpdateBeatmapSet(BeatmapSetInfo beatmapSet) => Schedule(() =>
@@ -465,12 +461,7 @@ namespace osu.Game.Screens.Select
                 }
             }
 
-            itemsCache.Invalidate();
-
-            if (!Scroll.UserScrolling)
-                ScrollToSelected(true);
-
-            BeatmapSetsChanged?.Invoke();
+            invalidateAfterChange(true);
         });
 
         /// <summary>
@@ -748,15 +739,15 @@ namespace osu.Game.Screens.Select
             }
         }
 
-        private void signalBeatmapsLoaded()
+        private void invalidateAfterChange(bool invokeSetsChangedEvent)
         {
-            if (!BeatmapSetsLoaded)
-            {
-                BeatmapSetsChanged?.Invoke();
-                BeatmapSetsLoaded = true;
-            }
-
             itemsCache.Invalidate();
+
+            if (!Scroll.UserScrolling)
+                ScrollToSelected(true);
+
+            if (invokeSetsChangedEvent)
+                BeatmapSetsChanged?.Invoke();
         }
 
         private float? scrollTarget;
