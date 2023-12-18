@@ -14,6 +14,8 @@ namespace osu.Game.Screens.Select.Carousel
 
         public IReadOnlyList<CarouselItem> Items => items;
 
+        public int TotalItemsNotFiltered { get; private set; }
+
         private readonly List<CarouselItem> items = new List<CarouselItem>();
 
         /// <summary>
@@ -30,6 +32,9 @@ namespace osu.Game.Screens.Select.Carousel
         public virtual void RemoveItem(CarouselItem i)
         {
             items.Remove(i);
+
+            if (!i.Filtered.Value)
+                TotalItemsNotFiltered--;
 
             // it's important we do the deselection after removing, so any further actions based on
             // State.ValueChanged make decisions post-removal.
@@ -55,6 +60,9 @@ namespace osu.Game.Screens.Select.Carousel
                 // criteria may be null for initial population. the filtering will be applied post-add.
                 items.Add(i);
             }
+
+            if (!i.Filtered.Value)
+                TotalItemsNotFiltered--;
         }
 
         public CarouselGroup(List<CarouselItem>? items = null)
@@ -84,7 +92,14 @@ namespace osu.Game.Screens.Select.Carousel
         {
             base.Filter(criteria);
 
-            items.ForEach(c => c.Filter(criteria));
+            TotalItemsNotFiltered = 0;
+
+            foreach (var c in items)
+            {
+                c.Filter(criteria);
+                if (!c.Filtered.Value)
+                    TotalItemsNotFiltered++;
+            }
 
             // Sorting is expensive, so only perform if it's actually changed.
             if (lastCriteria?.Sort != criteria.Sort)
