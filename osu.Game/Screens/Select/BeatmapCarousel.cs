@@ -64,7 +64,7 @@ namespace osu.Game.Screens.Select
         /// <summary>
         /// The total count of non-filtered beatmaps displayed.
         /// </summary>
-        public int CountDisplayed => beatmapSets.Where(s => !s.Filtered.Value).Sum(s => s.Beatmaps.Count(b => !b.Filtered.Value));
+        public int CountDisplayed => beatmapSets.Where(s => !s.Filtered.Value).Sum(s => s.TotalItemsNotFiltered);
 
         /// <summary>
         /// The currently selected beatmap set.
@@ -168,7 +168,10 @@ namespace osu.Game.Screens.Select
             applyActiveCriteria(false);
 
             if (loadedTestBeatmaps)
-                signalBeatmapsLoaded();
+            {
+                invalidateAfterChange();
+                BeatmapSetsLoaded = true;
+            }
 
             // Restore selection
             if (selectedBeatmapBefore != null && newRoot.BeatmapSetsByID.TryGetValue(selectedBeatmapBefore.BeatmapSet!.ID, out var newSelectionCandidates))
@@ -289,7 +292,7 @@ namespace osu.Game.Screens.Select
                 foreach (var id in realmSets)
                 {
                     if (!root.BeatmapSetsByID.ContainsKey(id))
-                        UpdateBeatmapSet(realm.Realm.Find<BeatmapSetInfo>(id)!.Detach());
+                        updateBeatmapSet(realm.Realm.Find<BeatmapSetInfo>(id)!.Detach());
                 }
 
                 foreach (var id in root.BeatmapSetsByID.Keys)
@@ -298,15 +301,16 @@ namespace osu.Game.Screens.Select
                         removeBeatmapSet(id);
                 }
 
-                signalBeatmapsLoaded();
+                invalidateAfterChange();
+                BeatmapSetsLoaded = true;
                 return;
             }
 
             foreach (int i in changes.NewModifiedIndices)
-                UpdateBeatmapSet(sender[i].Detach());
+                updateBeatmapSet(sender[i].Detach());
 
             foreach (int i in changes.InsertedIndices)
-                UpdateBeatmapSet(sender[i].Detach());
+                updateBeatmapSet(sender[i].Detach());
 
             if (changes.DeletedIndices.Length > 0 && SelectedBeatmapInfo != null)
             {
@@ -347,6 +351,8 @@ namespace osu.Game.Screens.Select
                     SelectBeatmap(sender[modifiedAndInserted.First()].Beatmaps.First());
                 }
             }
+
+            invalidateAfterChange();
         }
 
         private void beatmapsChanged(IRealmCollection<BeatmapInfo> sender, ChangeSet? changes)
@@ -354,6 +360,8 @@ namespace osu.Game.Screens.Select
             // we only care about actual changes in hidden status.
             if (changes == null)
                 return;
+
+            bool changed = false;
 
             foreach (int i in changes.InsertedIndices)
             {
@@ -367,17 +375,24 @@ namespace osu.Game.Screens.Select
                 if (root.BeatmapSetsByID.TryGetValue(beatmapSet.ID, out var existingSets)
                     && existingSets.SelectMany(s => s.Beatmaps).All(b => b.BeatmapInfo.ID != beatmapInfo.ID))
                 {
-                    UpdateBeatmapSet(beatmapSet.Detach());
+                    updateBeatmapSet(beatmapSet.Detach());
+                    changed = true;
                 }
             }
+
+            if (changed)
+                invalidateAfterChange();
         }
 
         private IQueryable<BeatmapSetInfo> getBeatmapSets(Realm realm) => realm.All<BeatmapSetInfo>().Where(s => !s.DeletePending && !s.Protected);
 
-        public void RemoveBeatmapSet(BeatmapSetInfo beatmapSet) =>
+        public void RemoveBeatmapSet(BeatmapSetInfo beatmapSet) => Schedule(() =>
+        {
             removeBeatmapSet(beatmapSet.ID);
+            invalidateAfterChange();
+        });
 
-        private void removeBeatmapSet(Guid beatmapSetID) => Schedule(() =>
+        private void removeBeatmapSet(Guid beatmapSetID)
         {
             if (!root.BeatmapSetsByID.TryGetValue(beatmapSetID, out var existingSets))
                 return;
@@ -392,16 +407,15 @@ namespace osu.Game.Screens.Select
 
                 root.RemoveItem(set);
             }
-
-            itemsCache.Invalidate();
-
-            if (!Scroll.UserScrolling)
-                ScrollToSelected(true);
-
-            BeatmapSetsChanged?.Invoke();
-        });
+        }
 
         public void UpdateBeatmapSet(BeatmapSetInfo beatmapSet) => Schedule(() =>
+        {
+            updateBeatmapSet(beatmapSet);
+            invalidateAfterChange();
+        });
+
+        private void updateBeatmapSet(BeatmapSetInfo beatmapSet)
         {
             Guid? previouslySelectedID = null;
 
@@ -464,14 +478,7 @@ namespace osu.Game.Screens.Select
                         select((CarouselItem?)newSet.Beatmaps.FirstOrDefault(b => b.BeatmapInfo.ID == previouslySelectedID) ?? newSet);
                 }
             }
-
-            itemsCache.Invalidate();
-
-            if (!Scroll.UserScrolling)
-                ScrollToSelected(true);
-
-            BeatmapSetsChanged?.Invoke();
-        });
+        }
 
         /// <summary>
         /// Selects a given beatmap on the carousel.
@@ -748,15 +755,14 @@ namespace osu.Game.Screens.Select
             }
         }
 
-        private void signalBeatmapsLoaded()
+        private void invalidateAfterChange()
         {
-            if (!BeatmapSetsLoaded)
-            {
-                BeatmapSetsChanged?.Invoke();
-                BeatmapSetsLoaded = true;
-            }
-
             itemsCache.Invalidate();
+
+            if (!Scroll.UserScrolling)
+                ScrollToSelected(true);
+
+            BeatmapSetsChanged?.Invoke();
         }
 
         private float? scrollTarget;
