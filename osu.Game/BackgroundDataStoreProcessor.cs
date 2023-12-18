@@ -67,6 +67,7 @@ namespace osu.Game
 
                 checkForOutdatedStarRatings();
                 processBeatmapSetsWithMissingMetrics();
+                // Note that the previous method will also update these on a fresh run.
                 processBeatmapsWithMissingObjectCounts();
                 processScoresWithMissingStatistics();
                 convertLegacyTotalScoreToStandardised();
