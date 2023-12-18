@@ -293,12 +293,23 @@ namespace osu.Game.Database
                     // Roughly corresponds to integrating f(combo) = combo ^ COMBO_EXPONENT (omitting constants)
                     double maximumAchievableComboPortionInStandardisedScore = Math.Pow(maximumLegacyCombo, 1 + ScoreProcessor.COMBO_EXPONENT);
 
-                    double comboPortionInScoreV1 = maximumAchievableComboPortionInScoreV1 * comboProportion / score.Accuracy;
-
                     // This is - roughly - how much score, in the combo portion, the longest combo on this particular play would gain in score V1.
                     double comboPortionFromLongestComboInScoreV1 = Math.Pow(score.MaxCombo, 2);
                     // Same for standardised score.
                     double comboPortionFromLongestComboInStandardisedScore = Math.Pow(score.MaxCombo, 1 + ScoreProcessor.COMBO_EXPONENT);
+
+                    // We estimate the combo portion of the score in score V1 terms.
+                    // The division by accuracy is supposed to lessen the impact of accuracy on the combo portion,
+                    // but in some edge cases it cannot sanely undo it.
+                    // Therefore the resultant value is clamped from both sides for sanity.
+                    // The clamp from below to `comboPortionFromLongestComboInScoreV1` targets near-FC scores wherein
+                    // the player had bad accuracy at the end of their longest combo, which causes the division by accuracy
+                    // to underestimate the combo portion.
+                    // The clamp from above to `maximumAchievableComboPortionInScoreV1` targets FC scores wherein
+                    // the player had bad accuracy at the start of the map, which causes the division by accuracy
+                    // to overestimate the combo portion.
+                    double comboPortionInScoreV1 = Math.Clamp(maximumAchievableComboPortionInScoreV1 * comboProportion / score.Accuracy,
+                        comboPortionFromLongestComboInScoreV1, maximumAchievableComboPortionInScoreV1);
 
                     // Calculate how many times the longest combo the user has achieved in the play can repeat
                     // without exceeding the combo portion in score V1 as achieved by the player.
