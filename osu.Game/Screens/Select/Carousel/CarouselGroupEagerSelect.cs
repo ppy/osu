@@ -3,6 +3,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace osu.Game.Screens.Select.Carousel
 {
@@ -100,7 +101,7 @@ namespace osu.Game.Screens.Select.Carousel
             if (State.Value != CarouselItemState.Selected) return;
 
             // we only perform eager selection if none of our items are in a selected state already.
-            if (LastSelected?.State.Value == CarouselItemState.Selected || TotalItemsNotFiltered == 0) return;
+            if (Items.Any(i => i.State.Value == CarouselItemState.Selected)) return;
 
             PerformSelection();
         }
