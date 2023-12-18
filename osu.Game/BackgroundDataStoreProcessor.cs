@@ -380,7 +380,8 @@ namespace osu.Game
             notification.Text = notification.Text.ToString().Split('(').First().TrimEnd() + $" ({processedCount} of {totalCount})";
             notification.Progress = (float)processedCount / totalCount;
 
-            // TODO add log output
+            if (processedCount % 100 == 0)
+                Logger.Log(notification.Text.ToString());
         }
 
         private void completeNotification(ProgressNotification? notification, int processedCount, int totalCount, int? failedCount = null)
