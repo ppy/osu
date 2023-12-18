@@ -293,7 +293,6 @@ namespace osu.Game
                         r.Find<ScoreInfo>(id)!.MaximumStatisticsJson = JsonConvert.SerializeObject(score.MaximumStatistics);
                     });
 
-                    Logger.Log($"Populated maximum statistics for score {id}");
                     ++processedCount;
                 }
                 catch (ObjectDisposedException)
@@ -354,7 +353,6 @@ namespace osu.Game
                         s.TotalScoreVersion = LegacyScoreEncoder.LATEST_VERSION;
                     });
 
-                    Logger.Log($"Converted total score for score {id}");
                     ++processedCount;
                 }
                 catch (ObjectDisposedException)
