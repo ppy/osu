@@ -75,6 +75,7 @@ namespace osu.Game.Rulesets.Catch.Difficulty
 
             attributes.BonusScoreRatio = legacyBonusScore == 0 ? 0 : (double)standardisedBonusScore / legacyBonusScore;
             attributes.BonusScore = legacyBonusScore;
+            attributes.MaxCombo = combo;
 
             return attributes;
         }
