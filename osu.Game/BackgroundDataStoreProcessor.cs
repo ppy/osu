@@ -279,20 +279,17 @@ namespace osu.Game
             if (scoreIds.Count == 0)
                 return;
 
-            ProgressNotification notification = new ProgressNotification { State = ProgressNotificationState.Active };
-
-            notificationOverlay?.Post(notification);
+            var notification = showProgressNotification("Upgrading scores to new scoring algorithm", "scores have been upgraded to the new scoring algorithm");
 
             int processedCount = 0;
             int failedCount = 0;
 
             foreach (var id in scoreIds)
             {
-                if (notification.State == ProgressNotificationState.Cancelled)
+                if (notification?.State == ProgressNotificationState.Cancelled)
                     break;
 
-                notification.Text = $"Upgrading scores to new scoring algorithm ({processedCount} of {scoreIds.Count})";
-                notification.Progress = (float)processedCount / scoreIds.Count;
+                updateNotificationProgress(notification, processedCount, scoreIds.Count);
 
                 sleepIfRequired();
 
@@ -325,22 +322,56 @@ namespace osu.Game
                 }
             }
 
-            if (processedCount == scoreIds.Count)
+            completeNotification(notification, processedCount, scoreIds.Count, failedCount);
+        }
+
+        private void updateNotificationProgress(ProgressNotification? notification, int processedCount, int totalCount)
+        {
+            if (notification == null)
+                return;
+
+            notification.Text = notification.Text.ToString().Split('(').First().TrimEnd() + $" ({processedCount} of {totalCount})";
+            notification.Progress = (float)processedCount / totalCount;
+        }
+
+        private void completeNotification(ProgressNotification? notification, int processedCount, int totalCount, int? failedCount = null)
+        {
+            if (notification == null)
+                return;
+
+            if (processedCount == totalCount)
             {
-                notification.CompletionText = $"{processedCount} score(s) have been upgraded to the new scoring algorithm";
+                notification.CompletionText = $"{processedCount} {notification.CompletionText}";
                 notification.Progress = 1;
                 notification.State = ProgressNotificationState.Completed;
             }
             else
             {
-                notification.Text = $"{processedCount} of {scoreIds.Count} score(s) have been upgraded to the new scoring algorithm.";
+                notification.Text = $"{processedCount} of {totalCount} {notification.CompletionText}";
 
                 // We may have arrived here due to user cancellation or completion with failures.
                 if (failedCount > 0)
-                    notification.Text += $" Check logs for issues with {failedCount} failed upgrades.";
+                    notification.Text += $" Check logs for issues with {failedCount} failed items.";
 
                 notification.State = ProgressNotificationState.Cancelled;
             }
+        }
+
+        private ProgressNotification? showProgressNotification(string running, string completed)
+        {
+            if (notificationOverlay == null)
+                return null;
+
+            ProgressNotification notification = new ProgressNotification
+            {
+                Text = running,
+                CompletionText = completed,
+                State = ProgressNotificationState.Active
+            };
+
+            notificationOverlay?.Post(notification);
+
+            return notification;
         }
 
         private void sleepIfRequired()
