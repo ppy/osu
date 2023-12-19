@@ -18,7 +18,7 @@ namespace osu.Game.Rulesets.Taiko.UI
     /// <summary>
     /// A circle explodes from the hit target to indicate a hitobject has been hit.
     /// </summary>
-    internal partial class HitExplosion : PoolableDrawable
+    internal partial class HitExplosion : PoolableDrawable, IVisualiseSecondHit
     {
         public override bool RemoveWhenNotAlive => true;
         public override bool RemoveCompletedTransforms => false;
@@ -84,13 +84,13 @@ namespace osu.Game.Rulesets.Taiko.UI
             ClearTransforms(true);
 
             using (BeginAbsoluteSequence(resultTime))
-                (skinnable.Drawable as IAnimatableHitExplosion)?.Animate(JudgedObject);
+                (skinnable.Drawable as IAnimatableTaikoJudgement)?.Animate(JudgedObject);
 
             if (secondHitTime != null)
             {
                 using (BeginAbsoluteSequence(secondHitTime.Value))
                 {
-                    (skinnable.Drawable as IAnimatableHitExplosion)?.AnimateSecondHit();
+                    (skinnable.Drawable as IAnimatableTaikoJudgement)?.AnimateSecondHit();
                 }
             }
 
@@ -114,9 +114,9 @@ namespace osu.Game.Rulesets.Taiko.UI
             throw new ArgumentOutOfRangeException(nameof(result), $"Invalid result type: {result}");
         }
 
-        public void VisualiseSecondHit(JudgementResult judgementResult)
+        public void VisualiseSecondHit(JudgementResult? judgementResult)
         {
-            secondHitTime = judgementResult.TimeAbsolute;
+            secondHitTime = judgementResult?.TimeAbsolute;
             runAnimation();
         }
     }

@@ -6,9 +6,10 @@ using osu.Game.Rulesets.Objects.Drawables;
 namespace osu.Game.Rulesets.Taiko.UI
 {
     /// <summary>
-    /// A skinnable element of a hit explosion that supports playing an animation from the current point in time.
+    /// A skinnable judgement element which supports playing an animation from the current point in time.
+    /// Also supports switching to a "strong" judgement type.
     /// </summary>
-    public interface IAnimatableHitExplosion
+    public interface IAnimatableTaikoJudgement
     {
         /// <summary>
         /// Shows the hit explosion for the supplied <paramref name="drawableHitObject"/>.

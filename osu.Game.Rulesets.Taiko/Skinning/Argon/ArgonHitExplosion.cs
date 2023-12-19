@@ -13,7 +13,7 @@ using osuTK.Graphics;
 
 namespace osu.Game.Rulesets.Taiko.Skinning.Argon
 {
-    public partial class ArgonHitExplosion : CompositeDrawable, IAnimatableHitExplosion
+    public partial class ArgonHitExplosion : CompositeDrawable, IAnimatableTaikoJudgement
     {
         private readonly TaikoSkinComponents component;
 

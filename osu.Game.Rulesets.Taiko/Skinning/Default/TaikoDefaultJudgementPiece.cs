@@ -6,9 +6,9 @@ using osu.Game.Rulesets.Scoring;
 
 namespace osu.Game.Rulesets.Taiko.Skinning.Default
 {
-    public partial class DefaultJudgementPiece : Rulesets.Judgements.DefaultJudgementPiece
+    public partial class TaikoDefaultJudgementPiece : Rulesets.Judgements.DefaultJudgementPiece
     {
-        public DefaultJudgementPiece(HitResult result)
+        public TaikoDefaultJudgementPiece(HitResult result)
             : base(result)
         {
             RelativePositionAxes = Axes.Both;

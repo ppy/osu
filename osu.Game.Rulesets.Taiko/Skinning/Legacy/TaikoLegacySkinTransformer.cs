@@ -24,16 +24,31 @@ namespace osu.Game.Rulesets.Taiko.Skinning.Legacy
         public TaikoLegacySkinTransformer(ISkin skin)
             : base(skin)
         {
-            hasExplosion = new Lazy<bool>(() => GetTexture(getHitName(TaikoSkinComponents.TaikoExplosionGreat)) != null);
+            hasExplosion = new Lazy<bool>(() => GetTexture(getHitName(HitResult.Great)) != null);
         }
 
         public override Drawable? GetDrawableComponent(ISkinComponentLookup lookup)
         {
-            if (lookup is GameplaySkinComponentLookup<HitResult>)
+            if (lookup is GameplaySkinComponentLookup<HitResult> hitResultLookup)
             {
-                // if a taiko skin is providing explosion sprites, hide the judgements completely
+                // if a taiko skin is providing explosion sprites, use a slightly customised judgement version.
                 if (hasExplosion.Value)
-                    return Drawable.Empty().With(d => d.Expire());
+                {
+                    bool isMiss = hitResultLookup.Component == HitResult.Miss;
+                    string hitName = getHitName(hitResultLookup.Component);
+                    var hitSprite = this.GetAnimation(hitName, true, false);
+
+                    if (hitSprite != null)
+                    {
+                        hitSprite.Anchor = hitSprite.Origin = Anchor.Centre;
+
+                        var strongHitSprite = isMiss ? null : this.GetAnimation($"{hitName}k", true, false);
+                        if (strongHitSprite != null)
+                            strongHitSprite.Anchor = strongHitSprite.Origin = Anchor.Centre;
+
+                        return new LegacyTaikoJudgementPiece(hitResultLookup.Component, hitSprite, strongHitSprite);
+                    }
+                }
             }
 
             if (lookup is TaikoSkinComponentLookup taikoComponent)
@@ -95,25 +110,9 @@ namespace osu.Game.Rulesets.Taiko.Skinning.Legacy
                         return null;
 
                     case TaikoSkinComponents.TaikoExplosionMiss:
-                        var missSprite = this.GetAnimation(getHitName(taikoComponent.Component), true, false);
-                        if (missSprite != null)
-                            return new LegacyHitExplosion(missSprite);
-
-                        return null;
-
                     case TaikoSkinComponents.TaikoExplosionOk:
                     case TaikoSkinComponents.TaikoExplosionGreat:
-                        string hitName = getHitName(taikoComponent.Component);
-                        var hitSprite = this.GetAnimation(hitName, true, false);
-
-                        if (hitSprite != null)
-                        {
-                            var strongHitSprite = this.GetAnimation($"{hitName}k", true, false);
-
-                            return new LegacyHitExplosion(hitSprite, strongHitSprite);
-                        }
-
-                        return null;
+                        return Drawable.Empty().With(d => d.Expire());
 
                     case TaikoSkinComponents.TaikoExplosionKiai:
                         // suppress the default kiai explosion if the skin brings its own sprites.
@@ -146,21 +145,22 @@ namespace osu.Game.Rulesets.Taiko.Skinning.Legacy
             return base.GetDrawableComponent(lookup);
         }
 
-        private string getHitName(TaikoSkinComponents component)
+        private string getHitName(HitResult component)
         {
             switch (component)
             {
-                case TaikoSkinComponents.TaikoExplosionMiss:
+                case HitResult.Miss:
                     return "taiko-hit0";
 
-                case TaikoSkinComponents.TaikoExplosionOk:
+                case HitResult.Ok:
                     return "taiko-hit100";
 
-                case TaikoSkinComponents.TaikoExplosionGreat:
+                case HitResult.Great:
                     return "taiko-hit300";
-            }
 
-            throw new ArgumentOutOfRangeException(nameof(component), $"Invalid component type: {component}");
+                default:
+                    return string.Empty;
+            }
         }
 
         public override ISample? GetSample(ISampleInfo sampleInfo)
