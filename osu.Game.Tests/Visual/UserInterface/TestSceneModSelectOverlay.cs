@@ -572,7 +572,7 @@ namespace osu.Game.Tests.Visual.UserInterface
         [Test]
         public void TestTextSearchActiveByDefault()
         {
-            configManager.SetValue(OsuSetting.ModSelectTextSearchStartsActive, true);
+            AddStep("text search starts active", () => configManager.SetValue(OsuSetting.ModSelectTextSearchStartsActive, true));
             createScreen();
 
             AddUntilStep("search text box focused", () => modSelectOverlay.SearchTextBox.HasFocus);
@@ -587,7 +587,7 @@ namespace osu.Game.Tests.Visual.UserInterface
         [Test]
         public void TestTextSearchNotActiveByDefault()
         {
-            configManager.SetValue(OsuSetting.ModSelectTextSearchStartsActive, false);
+            AddStep("text search does not start active", () => configManager.SetValue(OsuSetting.ModSelectTextSearchStartsActive, false));
             createScreen();
 
             AddUntilStep("search text box not focused", () => !modSelectOverlay.SearchTextBox.HasFocus);
@@ -597,6 +597,31 @@ namespace osu.Game.Tests.Visual.UserInterface
 
             AddStep("press tab", () => InputManager.Key(Key.Tab));
             AddAssert("search text box unfocused", () => !modSelectOverlay.SearchTextBox.HasFocus);
+        }
+
+        [Test]
+        public void TestTextSearchDoesNotBlockCustomisationPanelKeyboardInteractions()
+        {
+            AddStep("text search starts active", () => configManager.SetValue(OsuSetting.ModSelectTextSearchStartsActive, true));
+            createScreen();
+
+            AddUntilStep("search text box focused", () => modSelectOverlay.SearchTextBox.HasFocus);
+
+            AddStep("select DT", () => SelectedMods.Value = new Mod[] { new OsuModDoubleTime() });
+            AddAssert("DT selected", () => modSelectOverlay.ChildrenOfType<ModPanel>().Count(panel => panel.Active.Value), () => Is.EqualTo(1));
+
+            AddStep("open customisation area", () => modSelectOverlay.CustomisationButton!.TriggerClick());
+            assertCustomisationToggleState(false, true);
+            AddStep("hover over mod settings slider", () =>
+            {
+                var slider = modSelectOverlay.ChildrenOfType<ModSettingsArea>().Single().ChildrenOfType<OsuSliderBar<double>>().First();
+                InputManager.MoveMouseTo(slider);
+            });
+            AddStep("press right arrow", () => InputManager.PressKey(Key.Right));
+            AddAssert("DT speed changed", () => !SelectedMods.Value.OfType<OsuModDoubleTime>().Single().SpeedChange.IsDefault);
+
+            AddStep("close customisation area", () => InputManager.PressKey(Key.Escape));
+            AddUntilStep("search text box reacquired focus", () => modSelectOverlay.SearchTextBox.HasFocus);
         }
 
         [Test]

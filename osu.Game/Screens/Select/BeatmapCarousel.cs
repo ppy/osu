@@ -269,8 +269,30 @@ namespace osu.Game.Screens.Select
             if (changes == null)
                 return;
 
-            foreach (int i in changes.InsertedIndices)
-                removeBeatmapSet(sender[i].ID);
+            var removeableSets = changes.InsertedIndices.Select(i => sender[i].ID).ToHashSet();
+
+            // This schedule is required to retain selection of beatmaps over an ImportAsUpdate operation.
+            // This is covered by TestPlaySongSelect.TestSelectionRetainedOnBeatmapUpdate.
+            //
+            // In short, we have specialised logic in `beatmapSetsChanged` (directly below) to infer that an
+            // update operation has occurred. For this to work, we need to confirm the `DeletePending` flag
+            // of the current selection.
+            //
+            // If we don't schedule the following code, it is possible for the `deleteBeatmapSetsChanged` handler
+            // to be invoked before the `beatmapSetsChanged` handler (realm call order seems non-deterministic)
+            // which will lead to the currently selected beatmap changing via `CarouselGroupEagerSelect`.
+            //
+            // We need a better path forward here. A few ideas:
+            // - Avoid the necessity of having realm subscriptions on deleted/hidden items, maybe by storing all guids in realm
+            //   to a local list so we can better look them up on receiving `DeletedIndices`.
+            // - Add a new property on `BeatmapSetInfo` to link to the pre-update set, and use that to handle the update case.
+            Schedule(() =>
+            {
+                foreach (var set in removeableSets)
+                    removeBeatmapSet(set);
+
+                invalidateAfterChange();
+            });
         }
 
         private void beatmapSetsChanged(IRealmCollection<BeatmapSetInfo> sender, ChangeSet? changes)
@@ -320,7 +342,7 @@ namespace osu.Game.Screens.Select
                 // To handle the beatmap update flow, attempt to track selection changes across delete-insert transactions.
                 // When an update occurs, the previous beatmap set is either soft or hard deleted.
                 // Check if the current selection was potentially deleted by re-querying its validity.
-                bool selectedSetMarkedDeleted = realm.Run(r => r.Find<BeatmapSetInfo>(SelectedBeatmapSet.ID))?.DeletePending != false;
+                bool selectedSetMarkedDeleted = sender.Realm.Find<BeatmapSetInfo>(SelectedBeatmapSet.ID)?.DeletePending != false;
 
                 int[] modifiedAndInserted = changes.NewModifiedIndices.Concat(changes.InsertedIndices).ToArray();
 

@@ -196,7 +196,7 @@ namespace osu.Game
 
             realmAccess.Run(r =>
             {
-                foreach (var b in r.All<BeatmapInfo>().Where(b => b.TotalObjectCount == 0))
+                foreach (var b in r.All<BeatmapInfo>().Where(b => b.TotalObjectCount < 0 || b.EndTimeObjectCount < 0))
                     beatmapIds.Add(b.ID);
             });
 
