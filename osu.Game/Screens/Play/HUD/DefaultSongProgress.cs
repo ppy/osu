@@ -5,6 +5,8 @@ using System.Collections.Generic;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
+using osu.Framework.Graphics.Containers;
+using osu.Framework.Utils;
 using osu.Game.Configuration;
 using osu.Game.Graphics;
 using osu.Game.Localisation.HUD;
@@ -26,6 +28,7 @@ namespace osu.Game.Screens.Play.HUD
         private readonly DefaultSongProgressBar bar;
         private readonly DefaultSongProgressGraph graph;
         private readonly SongProgressInfo info;
+        private readonly Container content;
 
         [SettingSource(typeof(SongProgressStrings), nameof(SongProgressStrings.ShowGraph), nameof(SongProgressStrings.ShowGraphDescription))]
         public Bindable<bool> ShowGraph { get; } = new BindableBool(true);
@@ -36,31 +39,36 @@ namespace osu.Game.Screens.Play.HUD
         public DefaultSongProgress()
         {
             RelativeSizeAxes = Axes.X;
+            AutoSizeAxes = Axes.Y;
             Anchor = Anchor.BottomRight;
             Origin = Anchor.BottomRight;
 
-            Children = new Drawable[]
+            Child = content = new Container
             {
-                info = new SongProgressInfo
+                RelativeSizeAxes = Axes.X,
+                Children = new Drawable[]
                 {
-                    Origin = Anchor.BottomLeft,
-                    Anchor = Anchor.BottomLeft,
-                    RelativeSizeAxes = Axes.X,
-                },
-                graph = new DefaultSongProgressGraph
-                {
-                    RelativeSizeAxes = Axes.X,
-                    Origin = Anchor.BottomLeft,
-                    Anchor = Anchor.BottomLeft,
-                    Height = graph_height,
-                    Margin = new MarginPadding { Bottom = bottom_bar_height },
-                },
-                bar = new DefaultSongProgressBar(bottom_bar_height, graph_height, handle_size)
-                {
-                    Anchor = Anchor.BottomLeft,
-                    Origin = Anchor.BottomLeft,
-                    OnSeek = time => player?.Seek(time),
-                },
+                    info = new SongProgressInfo
+                    {
+                        Origin = Anchor.BottomLeft,
+                        Anchor = Anchor.BottomLeft,
+                        RelativeSizeAxes = Axes.X,
+                    },
+                    graph = new DefaultSongProgressGraph
+                    {
+                        RelativeSizeAxes = Axes.X,
+                        Origin = Anchor.BottomLeft,
+                        Anchor = Anchor.BottomLeft,
+                        Height = graph_height,
+                        Margin = new MarginPadding { Bottom = bottom_bar_height },
+                    },
+                    bar = new DefaultSongProgressBar(bottom_bar_height, graph_height, handle_size)
+                    {
+                        Anchor = Anchor.BottomLeft,
+                        Origin = Anchor.BottomLeft,
+                        OnSeek = time => player?.Seek(time),
+                    },
+                }
             };
         }
 
@@ -101,7 +109,12 @@ namespace osu.Game.Screens.Play.HUD
         protected override void Update()
         {
             base.Update();
-            Height = bottom_bar_height + graph_height + handle_size.Y + info.Height - graph.Y;
+
+            // to prevent unnecessary invalidations of the song progress graph due to changes in size, apply tolerance when updating the height.
+            float newHeight = bottom_bar_height + graph_height + handle_size.Y + info.Height - graph.Y;
+
+            if (!Precision.AlmostEquals(Height, newHeight, 5f))
+                content.Height = newHeight;
         }
 
         private void updateBarVisibility()

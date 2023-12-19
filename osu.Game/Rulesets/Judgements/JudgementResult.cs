@@ -1,10 +1,7 @@
-// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
 using System;
-using JetBrains.Annotations;
 using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Objects.Drawables;
 using osu.Game.Rulesets.Scoring;
@@ -24,13 +21,11 @@ namespace osu.Game.Rulesets.Judgements
         /// <summary>
         /// The <see cref="HitObject"/> which was judged.
         /// </summary>
-        [NotNull]
         public readonly HitObject HitObject;
 
         /// <summary>
         /// The <see cref="Judgement"/> which this <see cref="JudgementResult"/> applies for.
         /// </summary>
-        [NotNull]
         public readonly Judgement Judgement;
 
         /// <summary>
@@ -58,6 +53,11 @@ namespace osu.Game.Rulesets.Judgements
         /// The end time of <see cref="HitObject"/> is returned if this result is not populated yet.
         /// </remarks>
         public double TimeAbsolute => RawTime != null ? Math.Min(RawTime.Value, HitObject.GetEndTime() + HitObject.MaximumJudgementOffset) : HitObject.GetEndTime();
+
+        /// <summary>
+        /// The gameplay rate at the time this <see cref="JudgementResult"/> occurred.
+        /// </summary>
+        public double? GameplayRate { get; internal set; }
 
         /// <summary>
         /// The combo prior to this <see cref="JudgementResult"/> occurring.
@@ -99,7 +99,7 @@ namespace osu.Game.Rulesets.Judgements
         /// </summary>
         /// <param name="hitObject">The <see cref="HitObject"/> which was judged.</param>
         /// <param name="judgement">The <see cref="Judgement"/> to refer to for scoring information.</param>
-        public JudgementResult([NotNull] HitObject hitObject, [NotNull] Judgement judgement)
+        public JudgementResult(HitObject hitObject, Judgement judgement)
         {
             HitObject = hitObject;
             Judgement = judgement;

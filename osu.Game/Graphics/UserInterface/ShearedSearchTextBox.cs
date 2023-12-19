@@ -1,7 +1,5 @@
-// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
-
-#nullable disable
 
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
@@ -10,6 +8,7 @@ using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.UserInterface;
+using osu.Framework.Localisation;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Overlays;
 using osu.Game.Overlays.Mods;
@@ -36,6 +35,14 @@ namespace osu.Game.Graphics.UserInterface
             get => textBox.HoldFocus;
             set => textBox.HoldFocus = value;
         }
+
+        public LocalisableString PlaceholderText
+        {
+            get => textBox.PlaceholderText;
+            set => textBox.PlaceholderText = value;
+        }
+
+        public new bool HasFocus => textBox.HasFocus;
 
         public void TakeFocus() => textBox.TakeFocus();
 
@@ -103,7 +110,7 @@ namespace osu.Game.Graphics.UserInterface
                 BackgroundFocused = colourProvider.Background4;
                 BackgroundUnfocused = colourProvider.Background4;
 
-                Placeholder.Font = OsuFont.GetFont(size: CalculatedTextSize, weight: FontWeight.SemiBold);
+                Placeholder.Font = OsuFont.GetFont(size: FontSize, weight: FontWeight.SemiBold);
                 PlaceholderText = CommonStrings.InputSearch;
 
                 CornerRadius = corner_radius;

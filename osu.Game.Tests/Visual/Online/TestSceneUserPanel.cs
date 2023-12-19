@@ -9,8 +9,10 @@ using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
+using osu.Game.Beatmaps;
 using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Rulesets;
+using osu.Game.Rulesets.Osu;
 using osu.Game.Scoring;
 using osu.Game.Tests.Beatmaps;
 using osu.Game.Users;
@@ -22,7 +24,7 @@ namespace osu.Game.Tests.Visual.Online
     public partial class TestSceneUserPanel : OsuTestScene
     {
         private readonly Bindable<UserActivity> activity = new Bindable<UserActivity>();
-        private readonly Bindable<UserStatus> status = new Bindable<UserStatus>();
+        private readonly Bindable<UserStatus?> status = new Bindable<UserStatus?>();
 
         private UserGridPanel boundPanel1;
         private TestUserListPanel boundPanel2;
@@ -64,7 +66,7 @@ namespace osu.Game.Tests.Visual.Online
                         Id = 3103765,
                         CountryCode = CountryCode.JP,
                         CoverUrl = @"https://osu.ppy.sh/images/headers/profile-covers/c6.jpg",
-                        Status = { Value = new UserStatusOnline() }
+                        Status = { Value = UserStatus.Online }
                     }) { Width = 300 },
                     boundPanel1 = new UserGridPanel(new APIUser
                     {
@@ -97,16 +99,16 @@ namespace osu.Game.Tests.Visual.Online
         [Test]
         public void TestUserStatus()
         {
-            AddStep("online", () => status.Value = new UserStatusOnline());
-            AddStep("do not disturb", () => status.Value = new UserStatusDoNotDisturb());
-            AddStep("offline", () => status.Value = new UserStatusOffline());
+            AddStep("online", () => status.Value = UserStatus.Online);
+            AddStep("do not disturb", () => status.Value = UserStatus.DoNotDisturb);
+            AddStep("offline", () => status.Value = UserStatus.Offline);
             AddStep("null status", () => status.Value = null);
         }
 
         [Test]
         public void TestUserActivity()
         {
-            AddStep("set online status", () => status.Value = new UserStatusOnline());
+            AddStep("set online status", () => status.Value = UserStatus.Online);
 
             AddStep("idle", () => activity.Value = null);
             AddStep("watching replay", () => activity.Value = new UserActivity.WatchingReplay(createScore(@"nats")));
@@ -116,25 +118,25 @@ namespace osu.Game.Tests.Visual.Online
             AddStep("solo (osu!catch)", () => activity.Value = soloGameStatusForRuleset(2));
             AddStep("solo (osu!mania)", () => activity.Value = soloGameStatusForRuleset(3));
             AddStep("choosing", () => activity.Value = new UserActivity.ChoosingBeatmap());
-            AddStep("editing beatmap", () => activity.Value = new UserActivity.EditingBeatmap(null));
-            AddStep("modding beatmap", () => activity.Value = new UserActivity.ModdingBeatmap(null));
-            AddStep("testing beatmap", () => activity.Value = new UserActivity.TestingBeatmap(null, null));
+            AddStep("editing beatmap", () => activity.Value = new UserActivity.EditingBeatmap(new BeatmapInfo()));
+            AddStep("modding beatmap", () => activity.Value = new UserActivity.ModdingBeatmap(new BeatmapInfo()));
+            AddStep("testing beatmap", () => activity.Value = new UserActivity.TestingBeatmap(new BeatmapInfo(), new OsuRuleset().RulesetInfo));
         }
 
         [Test]
         public void TestUserActivityChange()
         {
             AddAssert("visit message is visible", () => boundPanel2.LastVisitMessage.IsPresent);
-            AddStep("set online status", () => status.Value = new UserStatusOnline());
+            AddStep("set online status", () => status.Value = UserStatus.Online);
             AddAssert("visit message is not visible", () => !boundPanel2.LastVisitMessage.IsPresent);
             AddStep("set choosing activity", () => activity.Value = new UserActivity.ChoosingBeatmap());
-            AddStep("set offline status", () => status.Value = new UserStatusOffline());
+            AddStep("set offline status", () => status.Value = UserStatus.Offline);
             AddAssert("visit message is visible", () => boundPanel2.LastVisitMessage.IsPresent);
-            AddStep("set online status", () => status.Value = new UserStatusOnline());
+            AddStep("set online status", () => status.Value = UserStatus.Online);
             AddAssert("visit message is not visible", () => !boundPanel2.LastVisitMessage.IsPresent);
         }
 
-        private UserActivity soloGameStatusForRuleset(int rulesetId) => new UserActivity.InSoloGame(null, rulesetStore.GetRuleset(rulesetId));
+        private UserActivity soloGameStatusForRuleset(int rulesetId) => new UserActivity.InSoloGame(new BeatmapInfo(), rulesetStore.GetRuleset(rulesetId)!);
 
         private ScoreInfo createScore(string name) => new ScoreInfo(new TestBeatmap(Ruleset.Value).BeatmapInfo)
         {

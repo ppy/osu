@@ -8,6 +8,7 @@ using System.Linq;
 using NUnit.Framework;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
+using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Input;
 using osu.Framework.Testing;
@@ -58,9 +59,34 @@ namespace osu.Game.Tests.Visual.Multiplayer
         }
 
         [Test]
+        public void TestSelectAllButtonUpdatesStateWhenSearchTermChanged()
+        {
+            createFreeModSelect();
+
+            AddStep("apply search term", () => freeModSelectOverlay.SearchTerm = "ea");
+
+            AddAssert("select all button enabled", () => this.ChildrenOfType<SelectAllModsButton>().Single().Enabled.Value);
+
+            AddStep("click select all button", navigateAndClick<SelectAllModsButton>);
+            AddAssert("select all button disabled", () => !this.ChildrenOfType<SelectAllModsButton>().Single().Enabled.Value);
+
+            AddStep("change search term", () => freeModSelectOverlay.SearchTerm = "e");
+
+            AddAssert("select all button enabled", () => this.ChildrenOfType<SelectAllModsButton>().Single().Enabled.Value);
+
+            void navigateAndClick<T>() where T : Drawable
+            {
+                InputManager.MoveMouseTo(this.ChildrenOfType<T>().Single());
+                InputManager.Click(MouseButton.Left);
+            }
+        }
+
+        [Test]
         public void TestSelectDeselectAllViaKeyboard()
         {
             createFreeModSelect();
+
+            AddStep("kill search bar focus", () => freeModSelectOverlay.SearchTextBox.KillFocus());
 
             AddStep("press ctrl+a", () => InputManager.Keys(PlatformAction.SelectAll));
             AddUntilStep("all mods selected", assertAllAvailableModsSelected);
@@ -107,6 +133,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
         private bool assertAllAvailableModsSelected()
         {
             var allAvailableMods = availableMods.Value
+                                                .Where(pair => pair.Key != ModType.System)
                                                 .SelectMany(pair => pair.Value)
                                                 .Where(mod => mod.UserPlayable && mod.HasImplementation)
                                                 .ToList();

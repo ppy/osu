@@ -15,7 +15,7 @@ using osuTK;
 
 namespace osu.Game.Rulesets.Osu.Objects.Drawables
 {
-    public partial class DrawableSliderTail : DrawableOsuHitObject, IRequireTracking
+    public partial class DrawableSliderTail : DrawableOsuHitObject
     {
         public new SliderTailCircle HitObject => (SliderTailCircle)base.HitObject;
 
@@ -35,8 +35,6 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
         /// </summary>
         public bool SamplePlaysOnlyOnHit { get; set; } = true;
 
-        public bool Tracking { get; set; }
-
         public SkinnableDrawable CirclePiece { get; private set; }
 
         private Container scaleContainer;
@@ -55,7 +53,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
         private void load()
         {
             Origin = Anchor.Centre;
-            Size = new Vector2(OsuHitObject.OBJECT_RADIUS * 2);
+            Size = OsuHitObject.OBJECT_DIMENSIONS;
 
             AddRangeInternal(new Drawable[]
             {
@@ -123,11 +121,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
             }
         }
 
-        protected override void CheckForResult(bool userTriggered, double timeOffset)
-        {
-            if (!userTriggered && timeOffset >= 0)
-                ApplyResult(r => r.Type = Tracking ? r.Judgement.MaxResult : r.Judgement.MinResult);
-        }
+        protected override void CheckForResult(bool userTriggered, double timeOffset) => DrawableSlider.SliderInputManager.TryJudgeNestedObject(this, timeOffset);
 
         protected override void OnApply()
         {

@@ -3,6 +3,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Shapes;
@@ -18,6 +19,7 @@ using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Online.Chat;
 using osu.Game.Resources.Localisation.Web;
 using osu.Game.Localisation;
+using osu.Game.Online.Multiplayer;
 
 namespace osu.Game.Users
 {
@@ -60,6 +62,9 @@ namespace osu.Game.Users
 
         [Resolved]
         protected OsuColour Colours { get; private set; } = null!;
+
+        [Resolved]
+        private MultiplayerClient? multiplayerClient { get; set; }
 
         [BackgroundDependencyLoader]
         private void load()
@@ -115,6 +120,16 @@ namespace osu.Game.Users
                         channelManager?.OpenPrivateChannel(User);
                         chatOverlay?.Show();
                     }));
+                }
+
+                if (
+                    // TODO: uncomment this once lazer / osu-web is updating online states
+                    // User.IsOnline &&
+                    multiplayerClient?.Room != null &&
+                    multiplayerClient.Room.Users.All(u => u.UserID != User.Id)
+                )
+                {
+                    items.Add(new OsuMenuItem(ContextMenuStrings.InvitePlayer, MenuItemType.Standard, () => multiplayerClient.InvitePlayer(User.Id)));
                 }
 
                 return items.ToArray();

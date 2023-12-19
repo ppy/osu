@@ -1,11 +1,10 @@
-// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
-
-#nullable disable
 
 using System;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
+using osu.Framework.Extensions.ObjectExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Sprites;
@@ -30,7 +29,7 @@ namespace osu.Game.Screens.Play.HUD
         private readonly Bindable<bool> valid = new Bindable<bool>();
 
         [Resolved]
-        private ScoreProcessor scoreProcessor { get; set; }
+        private ScoreProcessor scoreProcessor { get; set; } = null!;
 
         public UnstableRateCounter()
         {
@@ -77,10 +76,11 @@ namespace osu.Game.Screens.Play.HUD
         {
             base.Dispose(isDisposing);
 
-            if (scoreProcessor == null) return;
-
-            scoreProcessor.NewJudgement -= updateDisplay;
-            scoreProcessor.JudgementReverted -= updateDisplay;
+            if (scoreProcessor.IsNotNull())
+            {
+                scoreProcessor.NewJudgement -= updateDisplay;
+                scoreProcessor.JudgementReverted -= updateDisplay;
+            }
         }
 
         private partial class TextComponent : CompositeDrawable, IHasText

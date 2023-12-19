@@ -9,6 +9,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using osu.Framework.Allocation;
+using osu.Framework.Graphics.Primitives;
 using osu.Game.Rulesets.Mania.Beatmaps;
 using osu.Game.Rulesets.Mania.Objects;
 using osu.Game.Rulesets.Objects;
@@ -24,6 +25,22 @@ namespace osu.Game.Rulesets.Mania.UI
         public IReadOnlyList<Stage> Stages => stages;
 
         private readonly List<Stage> stages = new List<Stage>();
+
+        public override Quad SkinnableComponentScreenSpaceDrawQuad
+        {
+            get
+            {
+                RectangleF totalArea = RectangleF.Empty;
+
+                for (int i = 0; i < Stages.Count; ++i)
+                {
+                    var stageArea = Stages[i].ScreenSpaceDrawQuad.AABBFloat;
+                    totalArea = i == 0 ? stageArea : RectangleF.Union(totalArea, stageArea);
+                }
+
+                return totalArea;
+            }
+        }
 
         public override bool ReceivePositionalInputAt(Vector2 screenSpacePos) => stages.Any(s => s.ReceivePositionalInputAt(screenSpacePos));
 

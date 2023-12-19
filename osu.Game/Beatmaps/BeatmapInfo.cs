@@ -120,6 +120,10 @@ namespace osu.Game.Beatmaps
         [JsonIgnore]
         public bool Hidden { get; set; }
 
+        public int EndTimeObjectCount { get; set; }
+
+        public int TotalObjectCount { get; set; }
+
         /// <summary>
         /// Reset any fetched online linking information (and history).
         /// </summary>
@@ -170,6 +174,11 @@ namespace osu.Game.Beatmaps
         public int GridSize { get; set; }
 
         public double TimelineZoom { get; set; } = 1.0;
+
+        /// <summary>
+        /// The time in milliseconds when last exiting the editor with this beatmap loaded.
+        /// </summary>
+        public double? EditorTimestamp { get; set; }
 
         [Ignored]
         public CountdownType Countdown { get; set; } = CountdownType.Normal;
@@ -227,6 +236,22 @@ namespace osu.Game.Beatmaps
                 c.BeatmapMD5Hashes.Remove(previousMD5Hash);
                 c.BeatmapMD5Hashes.Add(MD5Hash);
             }
+        }
+
+        /// <summary>
+        /// Local scores are retained separate from a beatmap's lifetime, matched via <see cref="ScoreInfo.BeatmapHash"/>.
+        /// Therefore we need to detach / reattach scores when a beatmap is edited or imported.
+        /// </summary>
+        /// <param name="realm">A realm instance in an active write transaction.</param>
+        public void UpdateLocalScores(Realm realm)
+        {
+            // first disassociate any scores which are already attached and no longer valid.
+            foreach (var score in Scores)
+                score.BeatmapInfo = null;
+
+            // then attach any scores which match the new hash.
+            foreach (var score in realm.All<ScoreInfo>().Where(s => s.BeatmapHash == Hash))
+                score.BeatmapInfo = this;
         }
 
         IBeatmapMetadataInfo IBeatmapInfo.Metadata => Metadata;

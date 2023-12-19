@@ -130,7 +130,6 @@ namespace osu.Game.Overlays.Mods
         {
             const double fade_in_duration = 400;
 
-            base.PopIn();
             this.FadeIn(fade_in_duration, Easing.OutQuint);
 
             Header.MoveToY(0, fade_in_duration, Easing.OutQuint);

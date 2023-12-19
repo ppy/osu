@@ -33,7 +33,7 @@ namespace osu.Game.Rulesets.Osu.UI
 
         private readonly OsuInputManager osuInputManager;
 
-        private Bindable<bool> mouseDisabled = null!;
+        private Bindable<bool> tapsDisabled = null!;
 
         public OsuTouchInputMapper(OsuInputManager inputManager)
         {
@@ -43,9 +43,7 @@ namespace osu.Game.Rulesets.Osu.UI
         [BackgroundDependencyLoader]
         private void load(OsuConfigManager config)
         {
-            // The mouse button disable setting affects touch. It's a bit weird.
-            // This is mostly just doing the same as what is done in RulesetInputManager to match behaviour.
-            mouseDisabled = config.GetBindable<bool>(OsuSetting.MouseDisableButtons);
+            tapsDisabled = config.GetBindable<bool>(OsuSetting.TouchDisableGameplayTaps);
         }
 
         // Required to handle touches outside of the playfield when screen scaling is enabled.
@@ -64,7 +62,7 @@ namespace osu.Game.Rulesets.Osu.UI
                 : OsuAction.LeftButton;
 
             // Ignore any taps which trigger an action which is already handled. But track them for potential positional input in the future.
-            bool shouldResultInAction = osuInputManager.AllowGameplayInputs && !mouseDisabled.Value && trackedTouches.All(t => t.Action != action);
+            bool shouldResultInAction = osuInputManager.AllowGameplayInputs && !tapsDisabled.Value && trackedTouches.All(t => t.Action != action);
 
             // If we can actually accept as an action, check whether this tap was on a circle's receptor.
             // This case gets special handling to allow for empty-space stream tapping.

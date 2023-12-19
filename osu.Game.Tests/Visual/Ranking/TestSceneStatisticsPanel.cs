@@ -13,6 +13,7 @@ using osu.Framework.Graphics.Shapes;
 using osu.Game.Beatmaps;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
+using osu.Game.Online.Solo;
 using osu.Game.Rulesets;
 using osu.Game.Rulesets.Difficulty;
 using osu.Game.Rulesets.Mods;
@@ -23,6 +24,7 @@ using osu.Game.Rulesets.Osu.Objects;
 using osu.Game.Rulesets.Scoring;
 using osu.Game.Rulesets.UI;
 using osu.Game.Tests.Resources;
+using osu.Game.Users;
 using osuTK;
 
 namespace osu.Game.Tests.Visual.Ranking
@@ -30,19 +32,20 @@ namespace osu.Game.Tests.Visual.Ranking
     public partial class TestSceneStatisticsPanel : OsuTestScene
     {
         [Test]
-        public void TestScoreWithTimeStatistics()
+        public void TestScoreWithPositionStatistics()
         {
             var score = TestResources.CreateTestScoreInfo();
-            score.HitEvents = TestSceneHitEventTimingDistributionGraph.CreateDistributedHitEvents();
+            score.OnlineID = 1234;
+            score.HitEvents = CreatePositionDistributedHitEvents();
 
             loadPanel(score);
         }
 
         [Test]
-        public void TestScoreWithPositionStatistics()
+        public void TestScoreWithTimeStatistics()
         {
             var score = TestResources.CreateTestScoreInfo();
-            score.HitEvents = createPositionDistributedHitEvents();
+            score.HitEvents = TestSceneHitEventTimingDistributionGraph.CreateDistributedHitEvents();
 
             loadPanel(score);
         }
@@ -79,28 +82,67 @@ namespace osu.Game.Tests.Visual.Ranking
 
         private void loadPanel(ScoreInfo score) => AddStep("load panel", () =>
         {
-            Child = new StatisticsPanel
+            Child = new SoloStatisticsPanel(score)
             {
                 RelativeSizeAxes = Axes.Both,
                 State = { Value = Visibility.Visible },
-                Score = { Value = score }
+                Score = { Value = score },
+                StatisticsUpdate =
+                {
+                    Value = new SoloStatisticsUpdate(score, new UserStatistics
+                    {
+                        Level = new UserStatistics.LevelInfo
+                        {
+                            Current = 5,
+                            Progress = 20,
+                        },
+                        GlobalRank = 38000,
+                        CountryRank = 12006,
+                        PP = 2134,
+                        RankedScore = 21123849,
+                        Accuracy = 0.985,
+                        PlayCount = 13375,
+                        PlayTime = 354490,
+                        TotalScore = 128749597,
+                        TotalHits = 0,
+                        MaxCombo = 1233,
+                    }, new UserStatistics
+                    {
+                        Level = new UserStatistics.LevelInfo
+                        {
+                            Current = 5,
+                            Progress = 30,
+                        },
+                        GlobalRank = 36000,
+                        CountryRank = 12000,
+                        PP = (decimal)2134.5,
+                        RankedScore = 23897015,
+                        Accuracy = 0.984,
+                        PlayCount = 13376,
+                        PlayTime = 35789,
+                        TotalScore = 132218497,
+                        TotalHits = 0,
+                        MaxCombo = 1233,
+                    })
+                }
             };
         });
 
-        private static List<HitEvent> createPositionDistributedHitEvents()
+        public static List<HitEvent> CreatePositionDistributedHitEvents()
         {
-            var hitEvents = new List<HitEvent>();
+            var hitEvents = TestSceneHitEventTimingDistributionGraph.CreateDistributedHitEvents();
+
             // Use constant seed for reproducibility
             var random = new Random(0);
 
-            for (int i = 0; i < 500; i++)
+            for (int i = 0; i < hitEvents.Count; i++)
             {
                 double angle = random.NextDouble() * 2 * Math.PI;
                 double radius = random.NextDouble() * 0.5f * OsuHitObject.OBJECT_RADIUS;
 
                 var position = new Vector2((float)(radius * Math.Cos(angle)), (float)(radius * Math.Sin(angle)));
 
-                hitEvents.Add(new HitEvent(0, HitResult.Perfect, new HitCircle(), new HitCircle(), position));
+                hitEvents[i] = hitEvents[i].With(position);
             }
 
             return hitEvents;
@@ -161,6 +203,7 @@ namespace osu.Game.Tests.Visual.Ranking
 
                 public IBeatmap Beatmap { get; }
 
+                // ReSharper disable once NotNullOrRequiredMemberIsNotInitialized
                 public TestBeatmapConverter(IBeatmap beatmap)
                 {
                     Beatmap = beatmap;

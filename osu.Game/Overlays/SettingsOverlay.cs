@@ -12,14 +12,16 @@ using osu.Game.Overlays.Settings.Sections.Input;
 using osuTK.Graphics;
 using System.Collections.Generic;
 using osu.Framework.Bindables;
+using osu.Framework.Graphics.Sprites;
 using osu.Framework.Localisation;
+using osu.Game.Graphics;
 using osu.Game.Localisation;
 
 namespace osu.Game.Overlays
 {
     public partial class SettingsOverlay : SettingsPanel, INamedOverlayComponent
     {
-        public string IconTexture => "Icons/Hexacons/settings";
+        public IconUsage Icon => HexaconsIcons.Settings;
         public LocalisableString Title => SettingsStrings.HeaderTitle;
         public LocalisableString Description => SettingsStrings.HeaderDescription;
 

@@ -29,7 +29,14 @@ namespace osu.Game.Rulesets.Mods
         /// </remarks>
         private readonly BindableNumber<float> sliderDisplayCurrent = new BindableNumber<float>();
 
-        protected override Drawable CreateControl() => new SliderControl(sliderDisplayCurrent);
+        protected sealed override Drawable CreateControl() => new SliderControl(sliderDisplayCurrent, CreateSlider);
+
+        protected virtual RoundedSliderBar<float> CreateSlider(BindableNumber<float> current) => new RoundedSliderBar<float>
+        {
+            RelativeSizeAxes = Axes.X,
+            Current = current,
+            KeyboardStep = 0.1f,
+        };
 
         /// <summary>
         /// Guards against beatmap values displayed on slider bars being transferred to user override.
@@ -100,16 +107,11 @@ namespace osu.Game.Rulesets.Mods
                 set => current.Current = value;
             }
 
-            public SliderControl(BindableNumber<float> currentNumber)
+            public SliderControl(BindableNumber<float> currentNumber, Func<BindableNumber<float>, RoundedSliderBar<float>> createSlider)
             {
                 InternalChildren = new Drawable[]
                 {
-                    new RoundedSliderBar<float>
-                    {
-                        RelativeSizeAxes = Axes.X,
-                        Current = currentNumber,
-                        KeyboardStep = 0.1f,
-                    }
+                    createSlider(currentNumber)
                 };
 
                 AutoSizeAxes = Axes.Y;

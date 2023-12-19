@@ -15,11 +15,6 @@ namespace osu.Game.Localisation
         public static LocalisableString UserInterfaceSectionHeader => new TranslatableString(getKey(@"user_interface_section_header"), @"User Interface");
 
         /// <summary>
-        /// "General"
-        /// </summary>
-        public static LocalisableString GeneralHeader => new TranslatableString(getKey(@"general_header"), @"General");
-
-        /// <summary>
         /// "Rotate cursor when dragging"
         /// </summary>
         public static LocalisableString CursorRotation => new TranslatableString(getKey(@"cursor_rotation"), @"Rotate cursor when dragging");
@@ -108,6 +103,11 @@ namespace osu.Game.Localisation
         /// "Mod select hotkey style"
         /// </summary>
         public static LocalisableString ModSelectHotkeyStyle => new TranslatableString(getKey(@"mod_select_hotkey_style"), @"Mod select hotkey style");
+
+        /// <summary>
+        /// "Automatically focus search text box in mod select"
+        /// </summary>
+        public static LocalisableString ModSelectTextSearchStartsActive => new TranslatableString(getKey(@"mod_select_text_search_starts_active"), @"Automatically focus search text box in mod select");
 
         /// <summary>
         /// "no limit"

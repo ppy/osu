@@ -138,7 +138,7 @@ namespace osu.Game.Tests.Visual.Editing
                 InputManager.MoveMouseTo(button);
                 InputManager.Click(MouseButton.Left);
             });
-            AddUntilStep("save prompt shown", () => DialogOverlay.CurrentDialog is SaveBeforeGameplayTestDialog);
+            AddUntilStep("save prompt shown", () => DialogOverlay.CurrentDialog is SaveRequiredPopupDialog);
 
             AddStep("dismiss prompt", () =>
             {
@@ -165,7 +165,7 @@ namespace osu.Game.Tests.Visual.Editing
                 InputManager.MoveMouseTo(button);
                 InputManager.Click(MouseButton.Left);
             });
-            AddUntilStep("save prompt shown", () => DialogOverlay.CurrentDialog is SaveBeforeGameplayTestDialog);
+            AddUntilStep("save prompt shown", () => DialogOverlay.CurrentDialog is SaveRequiredPopupDialog);
 
             AddStep("save changes", () => DialogOverlay.CurrentDialog.PerformOkAction());
 
@@ -209,10 +209,14 @@ namespace osu.Game.Tests.Visual.Editing
         public override void TearDownSteps()
         {
             base.TearDownSteps();
-            AddStep("delete imported", () =>
+            AddStep("delete imported", () => Realm.Write(r =>
             {
-                beatmaps.Delete(importedBeatmapSet);
-            });
+                // delete from realm directly rather than via `BeatmapManager` to avoid cross-test pollution
+                // (`BeatmapManager.Delete()` uses soft deletion, which can lead to beatmap reuse between test cases).
+                r.RemoveAll<BeatmapMetadata>();
+                r.RemoveAll<BeatmapInfo>();
+                r.RemoveAll<BeatmapSetInfo>();
+            }));
         }
     }
 }

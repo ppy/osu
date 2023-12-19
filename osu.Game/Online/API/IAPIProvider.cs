@@ -4,6 +4,7 @@
 using System;
 using System.Threading.Tasks;
 using osu.Framework.Bindables;
+using osu.Game.Localisation;
 using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Online.Notifications;
 using osu.Game.Users;
@@ -26,6 +27,11 @@ namespace osu.Game.Online.API
         /// The current user's activity.
         /// </summary>
         IBindable<UserActivity> Activity { get; }
+
+        /// <summary>
+        /// The language supplied by this provider to API requests.
+        /// </summary>
+        Language Language { get; }
 
         /// <summary>
         /// Retrieve the OAuth access token.

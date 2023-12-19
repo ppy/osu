@@ -1,4 +1,4 @@
-﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
@@ -16,7 +16,7 @@ namespace osu.Game.Screens.Select
     public static class FilterQueryParser
     {
         private static readonly Regex query_syntax_regex = new Regex(
-            @"\b(?<key>\w+)(?<op>(:|=|(>|<)(:|=)?))(?<value>("".*"")|(\S*))",
+            @"\b(?<key>\w+)(?<op>(:|=|(>|<)(:|=)?))(?<value>("".*""[!]?)|(\S*))",
             RegexOptions.Compiled | RegexOptions.IgnoreCase);
 
         internal static void ApplyQueries(FilterCriteria criteria, string query)
@@ -77,6 +77,12 @@ namespace osu.Game.Screens.Select
                 case "artist":
                     return TryUpdateCriteriaText(ref criteria.Artist, op, value);
 
+                case "title":
+                    return TryUpdateCriteriaText(ref criteria.Title, op, value);
+
+                case "diff":
+                    return TryUpdateCriteriaText(ref criteria.DifficultyName, op, value);
+
                 default:
                     return criteria.RulesetCriteria?.TryParseCustomKeywordCriteria(key, op, value) ?? false;
             }
@@ -113,8 +119,7 @@ namespace osu.Game.Screens.Select
             value.EndsWith("ms", StringComparison.Ordinal) ? 1 :
             value.EndsWith('s') ? 1000 :
             value.EndsWith('m') ? 60000 :
-            value.EndsWith('h') ? 3600000 :
-            value.EndsWith('d') ? 86400000 : 1000;
+            value.EndsWith('h') ? 3600000 : 1000;
 
         private static bool tryParseFloatWithPoint(string value, out float result) =>
             float.TryParse(value, NumberStyles.AllowDecimalPoint, CultureInfo.InvariantCulture, out result);
@@ -166,7 +171,7 @@ namespace osu.Game.Screens.Select
             switch (op)
             {
                 case Operator.Equal:
-                    textFilter.SearchTerm = value.Trim('"');
+                    textFilter.SearchTerm = value;
                     return true;
 
                 default:

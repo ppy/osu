@@ -1,7 +1,5 @@
-// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
-
-#nullable disable
 
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
@@ -17,10 +15,10 @@ namespace osu.Game.Rulesets.Mania.Edit.Blueprints
         where T : ManiaHitObject
     {
         [Resolved]
-        private Playfield playfield { get; set; }
+        private Playfield playfield { get; set; } = null!;
 
         [Resolved]
-        private IScrollingInfo scrollingInfo { get; set; }
+        private IScrollingInfo scrollingInfo { get; set; } = null!;
 
         protected ScrollingHitObjectContainer HitObjectContainer => ((ManiaPlayfield)playfield).GetColumn(HitObject.Column).HitObjectContainer;
 
@@ -39,7 +37,7 @@ namespace osu.Game.Rulesets.Mania.Edit.Blueprints
             foreach (var child in InternalChildren)
                 child.Anchor = child.Origin = anchor;
 
-            Position = Parent.ToLocalSpace(HitObjectContainer.ScreenSpacePositionAtTime(HitObject.StartTime)) - AnchorPosition;
+            Position = Parent!.ToLocalSpace(HitObjectContainer.ScreenSpacePositionAtTime(HitObject.StartTime)) - AnchorPosition;
             Width = HitObjectContainer.DrawWidth;
         }
     }

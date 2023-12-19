@@ -1,7 +1,5 @@
-// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
-
-#nullable disable
 
 using System;
 using System.Collections.Generic;
@@ -42,10 +40,12 @@ namespace osu.Game.Rulesets.Objects
 
         private readonly List<Vector2> calculatedPath = new List<Vector2>();
         private readonly List<double> cumulativeLength = new List<double>();
-        private readonly List<int> segmentEnds = new List<int>();
         private readonly Cached pathCache = new Cached();
 
         private double calculatedLength;
+
+        private readonly List<int> segmentEnds = new List<int>();
+        private double[] segmentEndDistances = Array.Empty<double>();
 
         /// <summary>
         /// Creates a new <see cref="SliderPath"/>.
@@ -198,13 +198,28 @@ namespace osu.Game.Rulesets.Objects
         }
 
         /// <summary>
-        /// Returns the progress values at which segments of the path end.
+        /// Returns the progress values at which (control point) segments of the path end.
+        /// Ranges from 0 (beginning of the path) to 1 (end of the path) to infinity (beyond the end of the path).
         /// </summary>
+        /// <remarks>
+        /// <see cref="PositionAt"/> truncates the progression values to [0,1],
+        /// so you can't use this method in conjunction with that one to retrieve the positions of segment ends beyond the end of the path.
+        /// </remarks>
+        /// <example>
+        /// <para>
+        /// In case <see cref="Distance"/> is less than <see cref="CalculatedDistance"/>,
+        /// the last segment ends after the end of the path, hence it returns a value greater than 1.
+        /// </para>
+        /// <para>
+        /// In case <see cref="Distance"/> is greater than <see cref="CalculatedDistance"/>,
+        /// the last segment ends before the end of the path, hence it returns a value less than 1.
+        /// </para>
+        /// </example>
         public IEnumerable<double> GetSegmentEnds()
         {
             ensureValid();
 
-            return segmentEnds.Select(i => cumulativeLength[i] / calculatedLength);
+            return segmentEndDistances.Select(d => d / Distance);
         }
 
         private void invalidate()
@@ -245,16 +260,26 @@ namespace osu.Game.Rulesets.Objects
 
                 // The current vertex ends the segment
                 var segmentVertices = vertices.AsSpan().Slice(start, i - start + 1);
-                var segmentType = ControlPoints[start].Type ?? PathType.Linear;
+                var segmentType = ControlPoints[start].Type ?? PathType.LINEAR;
 
-                foreach (Vector2 t in calculateSubPath(segmentVertices, segmentType))
+                // No need to calculate path when there is only 1 vertex
+                if (segmentVertices.Length == 1)
+                    calculatedPath.Add(segmentVertices[0]);
+                else if (segmentVertices.Length > 1)
                 {
-                    if (calculatedPath.Count == 0 || calculatedPath.Last() != t)
+                    List<Vector2> subPath = calculateSubPath(segmentVertices, segmentType);
+                    // Skip the first vertex if it is the same as the last vertex from the previous segment
+                    int skipFirst = calculatedPath.Count > 0 && subPath.Count > 0 && calculatedPath.Last() == subPath[0] ? 1 : 0;
+
+                    foreach (Vector2 t in subPath.Skip(skipFirst))
                         calculatedPath.Add(t);
                 }
 
-                // Remember the index of the segment end
-                segmentEnds.Add(calculatedPath.Count - 1);
+                if (i > 0)
+                {
+                    // Remember the index of the segment end
+                    segmentEnds.Add(calculatedPath.Count - 1);
+                }
 
                 // Start the new segment at the current vertex
                 start = i;
@@ -263,16 +288,16 @@ namespace osu.Game.Rulesets.Objects
 
         private List<Vector2> calculateSubPath(ReadOnlySpan<Vector2> subControlPoints, PathType type)
         {
-            switch (type)
+            switch (type.Type)
             {
-                case PathType.Linear:
-                    return PathApproximator.ApproximateLinear(subControlPoints);
+                case SplineType.Linear:
+                    return PathApproximator.LinearToPiecewiseLinear(subControlPoints);
 
-                case PathType.PerfectCurve:
+                case SplineType.PerfectCurve:
                     if (subControlPoints.Length != 3)
                         break;
 
-                    List<Vector2> subPath = PathApproximator.ApproximateCircularArc(subControlPoints);
+                    List<Vector2> subPath = PathApproximator.CircularArcToPiecewiseLinear(subControlPoints);
 
                     // If for some reason a circular arc could not be fit to the 3 given points, fall back to a numerically stable bezier approximation.
                     if (subPath.Count == 0)
@@ -280,11 +305,11 @@ namespace osu.Game.Rulesets.Objects
 
                     return subPath;
 
-                case PathType.Catmull:
-                    return PathApproximator.ApproximateCatmull(subControlPoints);
+                case SplineType.Catmull:
+                    return PathApproximator.CatmullToPiecewiseLinear(subControlPoints);
             }
 
-            return PathApproximator.ApproximateBezier(subControlPoints);
+            return PathApproximator.BSplineToPiecewiseLinear(subControlPoints, type.Degree ?? subControlPoints.Length);
         }
 
         private void calculateLength()
@@ -300,10 +325,18 @@ namespace osu.Game.Rulesets.Objects
                 cumulativeLength.Add(calculatedLength);
             }
 
+            // Store the distances of the segment ends now, because after shortening the indices may be out of range
+            segmentEndDistances = new double[segmentEnds.Count];
+
+            for (int i = 0; i < segmentEnds.Count; i++)
+            {
+                segmentEndDistances[i] = cumulativeLength[segmentEnds[i]];
+            }
+
             if (ExpectedDistance.Value is double expectedDistance && calculatedLength != expectedDistance)
             {
-                // In osu-stable, if the last two control points of a slider are equal, extension is not performed.
-                if (ControlPoints.Count >= 2 && ControlPoints[^1].Position == ControlPoints[^2].Position && expectedDistance > calculatedLength)
+                // In osu-stable, if the last two path points of a slider are equal, extension is not performed.
+                if (calculatedPath.Count >= 2 && calculatedPath[^1] == calculatedPath[^2] && expectedDistance > calculatedLength)
                 {
                     cumulativeLength.Add(calculatedLength);
                     return;
@@ -321,10 +354,6 @@ namespace osu.Game.Rulesets.Objects
                     {
                         cumulativeLength.RemoveAt(cumulativeLength.Count - 1);
                         calculatedPath.RemoveAt(pathEndIndex--);
-
-                        // Shorten the last segment to the expected distance
-                        if (segmentEnds.Count > 0)
-                            segmentEnds[^1]--;
                     }
                 }
 

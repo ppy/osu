@@ -43,6 +43,9 @@ namespace osu.Game.Graphics
         [Resolved]
         private GameHost host { get; set; }
 
+        [Resolved]
+        private Clipboard clipboard { get; set; }
+
         private Storage storage;
 
         [Resolved]
@@ -116,7 +119,7 @@ namespace osu.Game.Graphics
 
                 using (var image = await host.TakeScreenshotAsync().ConfigureAwait(false))
                 {
-                    host.GetClipboard()?.SetImage(image);
+                    clipboard.SetImage(image);
 
                     (string filename, var stream) = getWritableStream();
 
