@@ -11,14 +11,14 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders
     public partial class SliderCircleOverlay : CompositeDrawable
     {
         protected readonly HitCirclePiece CirclePiece;
+        protected readonly Slider Slider;
 
-        private readonly Slider slider;
-        private readonly SliderPosition position;
         private readonly HitCircleOverlapMarker marker;
+        private readonly SliderPosition position;
 
         public SliderCircleOverlay(Slider slider, SliderPosition position)
         {
-            this.slider = slider;
+            Slider = slider;
             this.position = position;
 
             InternalChildren = new Drawable[]
@@ -32,7 +32,7 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders
         {
             base.Update();
 
-            var circle = position == SliderPosition.Start ? (HitCircle)slider.HeadCircle : slider.TailCircle;
+            var circle = position == SliderPosition.Start ? (HitCircle)Slider.HeadCircle : Slider.TailCircle;
 
             CirclePiece.UpdateFrom(circle);
             marker.UpdateFrom(circle);
