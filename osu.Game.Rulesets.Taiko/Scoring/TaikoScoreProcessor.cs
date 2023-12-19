@@ -33,6 +33,17 @@ namespace osu.Game.Rulesets.Taiko.Scoring
                    * strongScaleValue(result);
         }
 
+        protected override double GetNumericResultFor(JudgementResult result)
+        {
+            switch (result.Type)
+            {
+                case HitResult.Ok:
+                    return 150;
+            }
+
+            return base.GetNumericResultFor(result);
+        }
+
         private double strongScaleValue(JudgementResult result)
         {
             if (result.HitObject is StrongNestedHitObject strong)
