@@ -53,9 +53,9 @@ body:
         If the game has not yet been closed since you found the bug:
           1. Head on to game settings and click on "Export logs"
           2. Click the notification to locate the file
-          3. Drag the generated `.zip` files into the github issue window 
+          3. Drag the generated `.zip` files into the github issue window
 
-        ![export logs button](https://github.com/ppy/osu/assets/191335/0866443f-0728-47bc-9dbd-f2b79ac802d5)
+        ![export logs button](https://github.com/ppy/osu/assets/191335/cbfa5550-b7ed-4c5c-8dd0-8b87cc90ad9b)
 
         ### Mobile platforms
 
