@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.Linq;
 using NUnit.Framework;
 using osu.Framework.Screens;
+using osu.Game.Audio;
 using osu.Game.Beatmaps;
 using osu.Game.Replays;
 using osu.Game.Rulesets.Judgements;
@@ -160,6 +161,10 @@ namespace osu.Game.Rulesets.Osu.Tests
                 Position = new Vector2(256 - slider_path_length / 2, 192),
                 TickDistanceMultiplier = 3,
                 ClassicSliderBehaviour = classic,
+                Samples = new[]
+                {
+                    new HitSampleInfo(HitSampleInfo.HIT_NORMAL)
+                },
                 Path = new SliderPath(PathType.LINEAR, new[]
                 {
                     Vector2.Zero,
