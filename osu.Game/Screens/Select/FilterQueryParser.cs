@@ -1,4 +1,4 @@
-// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
@@ -443,16 +443,15 @@ namespace osu.Game.Screens.Select
             return tryUpdateCriteriaRange(ref dateRange, reverseInequalityOperator(op), dateTimeOffset);
         }
 
-        // Function to reverse an Operator
+        /// <summary>
+        /// Function to reverse an inequality Operator (i.e. when multiplying both sides of an inequality by a negative number, the operator must be flipped)
+        /// </summary>
         private static Operator reverseInequalityOperator(Operator ope)
         {
             switch (ope)
             {
                 default:
                     throw new ArgumentOutOfRangeException(nameof(ope), $"Unsupported operator {ope}");
-
-                case Operator.Equal:
-                    return Operator.Equal;
 
                 case Operator.Greater:
                     return Operator.Less;
