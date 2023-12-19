@@ -110,7 +110,7 @@ namespace osu.Game.Screens.Select.Carousel
         /// Finds the item this group would select next if it attempted selection
         /// </summary>
         /// <returns>An unfiltered item nearest to the last selected one or null if all items are filtered</returns>
-        protected virtual CarouselItem? GetNextToSelect()
+        public virtual CarouselItem? GetNextToSelect()
         {
             if (Items.Count == 0)
                 return null;
