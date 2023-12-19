@@ -464,7 +464,7 @@ namespace osu.Game.Tests.Visual.SongSelect
                 manager.Import(testBeatmapSetInfo);
             }, 10);
 
-            AddUntilStep("has selection", () => songSelect!.Carousel.SelectedBeatmapInfo?.BeatmapSet?.OnlineID == originalOnlineSetID);
+            AddUntilStep("has selection", () => songSelect!.Carousel.SelectedBeatmapInfo?.BeatmapSet?.OnlineID, () => Is.EqualTo(originalOnlineSetID));
 
             Task<Live<BeatmapSetInfo>?> updateTask = null!;
 
@@ -476,7 +476,7 @@ namespace osu.Game.Tests.Visual.SongSelect
             });
             AddUntilStep("wait for update completion", () => updateTask.IsCompleted);
 
-            AddUntilStep("retained selection", () => songSelect!.Carousel.SelectedBeatmapInfo?.BeatmapSet?.OnlineID == originalOnlineSetID);
+            AddUntilStep("retained selection", () => songSelect!.Carousel.SelectedBeatmapInfo?.BeatmapSet?.OnlineID, () => Is.EqualTo(originalOnlineSetID));
         }
 
         [Test]
