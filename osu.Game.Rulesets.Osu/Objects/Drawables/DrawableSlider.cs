@@ -129,7 +129,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
                     drawableHitObject.AccentColour.Value = colour.NewValue;
             }, true);
 
-            Tracking.BindValueChanged(updateSlidingSample);
+            TrackingInValidTimeRange.BindValueChanged(updateSlidingSample);
         }
 
         protected override void OnApply()
@@ -166,9 +166,9 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
             slidingSample?.Stop();
         }
 
-        private void updateSlidingSample(ValueChangedEvent<bool> tracking)
+        private void updateSlidingSample(ValueChangedEvent<bool> trackingInValidTimeRange)
         {
-            if (tracking.NewValue)
+            if (trackingInValidTimeRange.NewValue)
                 slidingSample?.Play();
             else
                 slidingSample?.Stop();
@@ -231,12 +231,14 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
         }
 
         public readonly Bindable<bool> Tracking = new Bindable<bool>();
+        public readonly Bindable<bool> TrackingInValidTimeRange = new Bindable<bool>();
 
         protected override void Update()
         {
             base.Update();
 
             Tracking.Value = SliderInputManager.Tracking;
+            TrackingInValidTimeRange.Value = SliderInputManager.TrackingInValidTimeRange;
 
             if (Tracking.Value && slidingSample != null)
                 // keep the sliding sample playing at the current tracking position

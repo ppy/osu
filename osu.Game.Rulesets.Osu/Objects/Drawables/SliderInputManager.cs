@@ -22,6 +22,11 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
         public bool Tracking { get; private set; }
 
         /// <summary>
+        /// Whether the slider is currently being tracked in valid time range.
+        /// </summary>
+        public bool TrackingInValidTimeRange { get; private set; }
+
+        /// <summary>
         /// The point in time after which we can accept any key for tracking. Before this time, we may need to restrict tracking to the key used to hit the head circle.
         ///
         /// This is a requirement to stop the case where a player holds down one key (from before the slider) and taps the second key while maintaining full scoring (tracking) of sliders.
@@ -235,6 +240,9 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
                 && isValidTrackingPosition
                 // valid action
                 && (actions?.Any(isValidTrackingAction) ?? false);
+
+            // whether the sliding sample should be played
+            TrackingInValidTimeRange = Tracking && Time.Current >= slider.HitObject.StartTime;
 
             lastPressedActions.Clear();
             if (actions != null)
