@@ -77,6 +77,8 @@ namespace osu.Game.Beatmaps
                 beatmap.StarRating = calculator.Calculate().StarRating;
                 beatmap.Length = working.Beatmap.CalculatePlayableLength();
                 beatmap.BPM = 60000 / working.Beatmap.GetMostCommonBeatLength();
+                beatmap.EndTimeObjectCount = working.Beatmap.HitObjects.Count(h => h is IHasDuration);
+                beatmap.TotalObjectCount = working.Beatmap.HitObjects.Count;
             }
 
             // And invalidate again afterwards as re-fetching the most up-to-date database metadata will be required.
