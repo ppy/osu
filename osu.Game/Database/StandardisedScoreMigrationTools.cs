@@ -305,11 +305,10 @@ namespace osu.Game.Database
                     // The clamp from below to `comboPortionFromLongestComboInScoreV1` targets near-FC scores wherein
                     // the player had bad accuracy at the end of their longest combo, which causes the division by accuracy
                     // to underestimate the combo portion.
-                    // The clamp from above to `maximumAchievableComboPortionInScoreV1` targets FC scores wherein
-                    // the player had bad accuracy at the start of the map, which causes the division by accuracy
-                    // to overestimate the combo portion.
-                    double comboPortionInScoreV1 = Math.Clamp(maximumAchievableComboPortionInScoreV1 * comboProportion / score.Accuracy,
-                        comboPortionFromLongestComboInScoreV1, maximumAchievableComboPortionInScoreV1);
+                    // Ideally, this would be clamped from above to `maximumAchievableComboPortionInScoreV1` too,
+                    // but in practice this appears to fail for some scores (https://github.com/ppy/osu/pull/25876#issuecomment-1862248413).
+                    // TODO: investigate the above more closely
+                    double comboPortionInScoreV1 = Math.Max(maximumAchievableComboPortionInScoreV1 * comboProportion / score.Accuracy, comboPortionFromLongestComboInScoreV1);
 
                     // Calculate how many times the longest combo the user has achieved in the play can repeat
                     // without exceeding the combo portion in score V1 as achieved by the player.
