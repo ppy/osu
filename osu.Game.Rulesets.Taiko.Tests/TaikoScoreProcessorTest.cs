@@ -13,7 +13,7 @@ using osu.Game.Rulesets.Taiko.Scoring;
 namespace osu.Game.Rulesets.Taiko.Tests
 {
     [TestFixture]
-    public class TestSceneTaikoScoreProcessor
+    public class TaikoScoreProcessorTest
     {
         [Test]
         public void TestInaccurateHitScore()
