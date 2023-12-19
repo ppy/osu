@@ -3,9 +3,9 @@
 
 using System.Linq;
 using osu.Framework.Allocation;
-using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
+using osu.Framework.Graphics.Effects;
 using osu.Framework.Graphics.Shapes;
 using osu.Game.Beatmaps;
 using osu.Game.Graphics;
@@ -67,12 +67,24 @@ namespace osu.Game.Screens.Select
 
         public BeatmapDetails()
         {
+            CornerRadius = 10;
+            Masking = true;
+
+            EdgeEffect = new EdgeEffectParameters
+            {
+                Type = EdgeEffectType.Glow,
+                Hollow = true,
+                Colour = new Color4(130, 204, 255, 15),
+                Radius = 10,
+            };
+
             Children = new Drawable[]
             {
                 new Box
                 {
                     RelativeSizeAxes = Axes.Both,
-                    Colour = Color4.Black.Opacity(0.5f),
+                    Colour = new Color4(130, 204, 255, 40),
+                    Blending = BlendingParameters.Additive,
                 },
                 new Container
                 {
@@ -122,7 +134,8 @@ namespace osu.Game.Screens.Select
                                             },
                                             new OsuScrollContainer
                                             {
-                                                RelativeSizeAxes = Axes.Both,
+                                                RelativeSizeAxes = Axes.X,
+                                                Height = 250,
                                                 Width = 0.5f,
                                                 ScrollbarVisible = false,
                                                 Padding = new MarginPadding { Left = spacing / 2 },
@@ -271,11 +284,6 @@ namespace osu.Game.Screens.Select
 
                 InternalChildren = new Drawable[]
                 {
-                    new Box
-                    {
-                        RelativeSizeAxes = Axes.Both,
-                        Colour = Color4.Black.Opacity(0.5f),
-                    },
                     content = new Container
                     {
                         RelativeSizeAxes = Axes.X,

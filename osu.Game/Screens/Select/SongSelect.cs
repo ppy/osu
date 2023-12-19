@@ -240,7 +240,7 @@ namespace osu.Game.Screens.Select
                                         Origin = Anchor.BottomLeft,
                                         Anchor = Anchor.BottomLeft,
                                         RelativeSizeAxes = Axes.Both,
-                                        Padding = new MarginPadding { Top = left_area_padding },
+                                        Padding = new MarginPadding { Top = 5 },
                                         Children = new Drawable[]
                                         {
                                             new LeftSideInteractionContainer(() => Carousel.ScrollToSelected())
@@ -264,7 +264,7 @@ namespace osu.Game.Screens.Select
                                                 Padding = new MarginPadding(10)
                                                 {
                                                     Left = left_area_padding,
-                                                    Right = left_area_padding * 2,
+                                                    Right = left_area_padding * 2 + 5,
                                                 },
                                                 Y = WEDGE_HEIGHT,
                                                 Children = new Drawable[]

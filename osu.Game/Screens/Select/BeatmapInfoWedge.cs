@@ -61,7 +61,7 @@ namespace osu.Game.Screens.Select
             {
                 Type = EdgeEffectType.Glow,
                 Colour = new Color4(130, 204, 255, 150),
-                Radius = 20,
+                Radius = 15,
                 Roundness = 15,
             };
         }
