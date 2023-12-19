@@ -44,6 +44,8 @@ namespace osu.Game.Screens.Select.Carousel
 
         private Task? beatmapsLoadTask;
 
+        private MenuItem[]? mainMenuItems;
+
         [Resolved]
         private BeatmapManager manager { get; set; } = null!;
 
@@ -57,8 +59,11 @@ namespace osu.Game.Screens.Select.Carousel
         }
 
         [BackgroundDependencyLoader]
-        private void load(BeatmapSetOverlay? beatmapOverlay)
+        private void load(BeatmapSetOverlay? beatmapOverlay, SongSelect? songSelect)
         {
+            if (songSelect != null)
+                mainMenuItems = songSelect.CreateForwardNavigationMenuItemsForBeatmap(() => (((CarouselBeatmapSet)Item!).GetNextToSelect() as CarouselBeatmap)!.BeatmapInfo);
+
             restoreHiddenRequested = s =>
             {
                 foreach (var b in s.Beatmaps)
@@ -221,6 +226,9 @@ namespace osu.Game.Screens.Select.Carousel
 
                 if (Item?.State.Value == CarouselItemState.NotSelected)
                     items.Add(new OsuMenuItem("Expand", MenuItemType.Highlighted, () => Item.State.Value = CarouselItemState.Selected));
+
+                if (mainMenuItems != null)
+                    items.AddRange(mainMenuItems);
 
                 if (beatmapSet.OnlineID > 0 && viewDetails != null)
                     items.Add(new OsuMenuItem("Details...", MenuItemType.Standard, () => viewDetails(beatmapSet.OnlineID)));

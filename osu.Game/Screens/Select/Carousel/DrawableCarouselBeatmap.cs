@@ -91,7 +91,7 @@ namespace osu.Game.Screens.Select.Carousel
 
             if (songSelect != null)
             {
-                mainMenuItems = songSelect.CreateForwardNavigationMenuItemsForBeatmap(beatmapInfo);
+                mainMenuItems = songSelect.CreateForwardNavigationMenuItemsForBeatmap(() => beatmapInfo);
                 selectRequested = b => songSelect.FinaliseSelection(b);
             }
 
