@@ -162,7 +162,7 @@ namespace osu.Game.Screens.Select
                 BleedBottom = Footer.HEIGHT,
                 SelectionChanged = updateSelectedBeatmap,
                 BeatmapSetsChanged = carouselBeatmapsLoaded,
-                FilterApplied = updateVisibleBeatmapCount,
+                FilterApplied = () => Scheduler.AddOnce(updateVisibleBeatmapCount),
                 GetRecommendedBeatmap = s => recommender?.GetRecommendedBeatmap(s),
             }, c => carouselContainer.Child = c);
 
@@ -843,7 +843,7 @@ namespace osu.Game.Screens.Select
         private void carouselBeatmapsLoaded()
         {
             bindBindables();
-            updateVisibleBeatmapCount();
+            Scheduler.AddOnce(updateVisibleBeatmapCount);
 
             Carousel.AllowSelection = true;
 
@@ -877,7 +877,8 @@ namespace osu.Game.Screens.Select
         {
             // Intentionally not localised until we have proper support for this (see https://github.com/ppy/osu-framework/pull/4918
             // but also in this case we want support for formatting a number within a string).
-            FilterControl.InformationalText = Carousel.CountDisplayed != 1 ? $"{Carousel.CountDisplayed:#,0} matches" : $"{Carousel.CountDisplayed:#,0} match";
+            int carouselCountDisplayed = Carousel.CountDisplayed;
+            FilterControl.InformationalText = carouselCountDisplayed != 1 ? $"{carouselCountDisplayed:#,0} matches" : $"{carouselCountDisplayed:#,0} match";
         }
 
         private bool boundLocalBindables;

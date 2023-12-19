@@ -128,8 +128,6 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
                 foreach (var drawableHitObject in NestedHitObjects)
                     drawableHitObject.AccentColour.Value = colour.NewValue;
             }, true);
-
-            Tracking.BindValueChanged(updateSlidingSample);
         }
 
         protected override void OnApply()
@@ -164,14 +162,6 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
         {
             base.StopAllSamples();
             slidingSample?.Stop();
-        }
-
-        private void updateSlidingSample(ValueChangedEvent<bool> tracking)
-        {
-            if (tracking.NewValue)
-                slidingSample?.Play();
-            else
-                slidingSample?.Stop();
         }
 
         protected override void AddNestedHitObject(DrawableHitObject hitObject)
@@ -238,9 +228,18 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
 
             Tracking.Value = SliderInputManager.Tracking;
 
-            if (Tracking.Value && slidingSample != null)
-                // keep the sliding sample playing at the current tracking position
-                slidingSample.Balance.Value = CalculateSamplePlaybackBalance(CalculateDrawableRelativePosition(Ball));
+            if (slidingSample != null)
+            {
+                if (Tracking.Value && Time.Current >= HitObject.StartTime)
+                {
+                    // keep the sliding sample playing at the current tracking position
+                    if (!slidingSample.IsPlaying)
+                        slidingSample.Play();
+                    slidingSample.Balance.Value = CalculateSamplePlaybackBalance(CalculateDrawableRelativePosition(Ball));
+                }
+                else if (slidingSample.IsPlaying)
+                    slidingSample.Stop();
+            }
 
             double completionProgress = Math.Clamp((Time.Current - HitObject.StartTime) / HitObject.Duration, 0, 1);
 
