@@ -253,7 +253,7 @@ namespace osu.Game.Screens.Select
                     return true;
 
                 default:
-                    throw new ArgumentOutOfRangeException();
+                    throw new ArgumentOutOfRangeException(nameof(Sort), Sort, "Unknown sort mode");
             }
         }
 
