@@ -320,7 +320,7 @@ namespace osu.Game.Screens.Select
                 // To handle the beatmap update flow, attempt to track selection changes across delete-insert transactions.
                 // When an update occurs, the previous beatmap set is either soft or hard deleted.
                 // Check if the current selection was potentially deleted by re-querying its validity.
-                bool selectedSetMarkedDeleted = realm.Run(r => r.Find<BeatmapSetInfo>(SelectedBeatmapSet.ID))?.DeletePending != false;
+                bool selectedSetMarkedDeleted = sender.Realm.Find<BeatmapSetInfo>(SelectedBeatmapSet.ID)?.DeletePending != false;
 
                 int[] modifiedAndInserted = changes.NewModifiedIndices.Concat(changes.InsertedIndices).ToArray();
 
