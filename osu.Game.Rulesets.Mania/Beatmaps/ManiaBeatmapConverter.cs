@@ -59,23 +59,26 @@ namespace osu.Game.Rulesets.Mania.Beatmaps
         {
             double roundedCircleSize = Math.Round(difficulty.CircleSize);
 
-            if (new ManiaRuleset().RulesetInfo.Equals(difficulty.SourceRuleset))
+            if (difficulty.SourceRuleset.ShortName == ManiaRuleset.SHORT_NAME)
                 return (int)Math.Max(1, roundedCircleSize);
 
             double roundedOverallDifficulty = Math.Round(difficulty.OverallDifficulty);
 
-            int countSliderOrSpinner = difficulty.EndTimeObjectCount;
+            if (difficulty.TotalObjectCount > 0 && difficulty.EndTimeObjectCount >= 0)
+            {
+                int countSliderOrSpinner = difficulty.EndTimeObjectCount;
 
-            // In osu!stable, this division appears as if it happens on floats, but due to release-mode
-            // optimisations, it actually ends up happening on doubles.
-            double percentSpecialObjects = (double)countSliderOrSpinner / difficulty.TotalObjectCount;
+                // In osu!stable, this division appears as if it happens on floats, but due to release-mode
+                // optimisations, it actually ends up happening on doubles.
+                double percentSpecialObjects = (double)countSliderOrSpinner / difficulty.TotalObjectCount;
 
-            if (percentSpecialObjects < 0.2)
-                return 7;
-            if (percentSpecialObjects < 0.3 || roundedCircleSize >= 5)
-                return roundedOverallDifficulty > 5 ? 7 : 6;
-            if (percentSpecialObjects > 0.6)
-                return roundedOverallDifficulty > 4 ? 5 : 4;
+                if (percentSpecialObjects < 0.2)
+                    return 7;
+                if (percentSpecialObjects < 0.3 || roundedCircleSize >= 5)
+                    return roundedOverallDifficulty > 5 ? 7 : 6;
+                if (percentSpecialObjects > 0.6)
+                    return roundedOverallDifficulty > 4 ? 5 : 4;
+            }
 
             return Math.Max(4, Math.Min((int)roundedOverallDifficulty + 1, 7));
         }
