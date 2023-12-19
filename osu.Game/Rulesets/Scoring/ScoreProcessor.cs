@@ -227,12 +227,12 @@ namespace osu.Game.Rulesets.Scoring
 
             if (result.Judgement.MaxResult.AffectsAccuracy())
             {
-                currentMaximumBaseScore += Judgement.ToNumericResult(result.Judgement.MaxResult);
+                currentMaximumBaseScore += GetMaxNumericResultFor(result);
                 currentAccuracyJudgementCount++;
             }
 
             if (result.Type.AffectsAccuracy())
-                currentBaseScore += Judgement.ToNumericResult(result.Type);
+                currentBaseScore += GetNumericResultFor(result);
 
             if (result.Type.IsBonus())
                 currentBonusPortion += GetBonusScoreChange(result);
@@ -276,12 +276,12 @@ namespace osu.Game.Rulesets.Scoring
 
             if (result.Judgement.MaxResult.AffectsAccuracy())
             {
-                currentMaximumBaseScore -= Judgement.ToNumericResult(result.Judgement.MaxResult);
+                currentMaximumBaseScore -= GetMaxNumericResultFor(result);
                 currentAccuracyJudgementCount--;
             }
 
             if (result.Type.AffectsAccuracy())
-                currentBaseScore -= Judgement.ToNumericResult(result.Type);
+                currentBaseScore -= GetNumericResultFor(result);
 
             if (result.Type.IsBonus())
                 currentBonusPortion -= GetBonusScoreChange(result);
@@ -297,9 +297,21 @@ namespace osu.Game.Rulesets.Scoring
             updateScore();
         }
 
-        protected virtual double GetBonusScoreChange(JudgementResult result) => Judgement.ToNumericResult(result.Type);
+        protected virtual double GetBonusScoreChange(JudgementResult result) => GetNumericResultFor(result);
 
-        protected virtual double GetComboScoreChange(JudgementResult result) => Judgement.ToNumericResult(result.Judgement.MaxResult) * Math.Pow(result.ComboAfterJudgement, COMBO_EXPONENT);
+        protected virtual double GetComboScoreChange(JudgementResult result) => GetMaxNumericResultFor(result) * Math.Pow(result.ComboAfterJudgement, COMBO_EXPONENT);
+
+        /// <summary>
+        /// Retrieves the numeric score representation for a <see cref="JudgementResult"/>.
+        /// </summary>
+        /// <param name="result">The <see cref="JudgementResult"/>.</param>
+        protected virtual double GetNumericResultFor(JudgementResult result) => result.Judgement.NumericResultFor(result);
+
+        /// <summary>
+        /// Retrieves the maximum numeric score representation for a <see cref="JudgementResult"/>.
+        /// </summary>
+        /// <param name="result">The <see cref="JudgementResult"/>.</param>
+        protected virtual double GetMaxNumericResultFor(JudgementResult result) => result.Judgement.MaxNumericResult;
 
         protected virtual void ApplyScoreChange(JudgementResult result)
         {
