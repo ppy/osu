@@ -6,6 +6,7 @@
 using System;
 using osu.Framework.Graphics;
 using osu.Framework.Input.Events;
+using osu.Framework.Utils;
 using osu.Game.Rulesets.Edit;
 using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Objects.Types;
@@ -25,7 +26,7 @@ namespace osu.Game.Rulesets.Taiko.Edit.Blueprints
 
         private readonly IHasDuration spanPlacementObject;
 
-        protected override bool IsValidForPlacement => spanPlacementObject.Duration > 0;
+        protected override bool IsValidForPlacement => Precision.DefinitelyBigger(spanPlacementObject.Duration, 0);
 
         public TaikoSpanPlacementBlueprint(HitObject hitObject)
             : base(hitObject)
