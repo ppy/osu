@@ -64,21 +64,43 @@ namespace osu.Game.Screens.Select.Details
             }
         }
 
-        public AdvancedStats()
+        public AdvancedStats(int columns = 1)
         {
-            Child = new FillFlowContainer
+            switch (columns)
             {
-                RelativeSizeAxes = Axes.X,
-                AutoSizeAxes = Axes.Y,
-                Children = new[]
-                {
-                    FirstValue = new StatisticRow(), // circle size/key amount
-                    HpDrain = new StatisticRow { Title = BeatmapsetsStrings.ShowStatsDrain },
-                    Accuracy = new StatisticRow { Title = BeatmapsetsStrings.ShowStatsAccuracy },
-                    ApproachRate = new StatisticRow { Title = BeatmapsetsStrings.ShowStatsAr },
-                    starDifficulty = new StatisticRow(10, true) { Title = BeatmapsetsStrings.ShowStatsStars },
-                },
-            };
+                case 1:
+                    Child = new FillFlowContainer
+                    {
+                        RelativeSizeAxes = Axes.X,
+                        AutoSizeAxes = Axes.Y,
+                        Children = new[]
+                        {
+                            FirstValue = new StatisticRow(), // circle size/key amount
+                            HpDrain = new StatisticRow { Title = BeatmapsetsStrings.ShowStatsDrain },
+                            Accuracy = new StatisticRow { Title = BeatmapsetsStrings.ShowStatsAccuracy },
+                            ApproachRate = new StatisticRow { Title = BeatmapsetsStrings.ShowStatsAr },
+                            starDifficulty = new StatisticRow(10, true) { Title = BeatmapsetsStrings.ShowStatsStars },
+                        },
+                    };
+                    break;
+
+                case 2:
+                    Child = new FillFlowContainer
+                    {
+                        RelativeSizeAxes = Axes.X,
+                        AutoSizeAxes = Axes.Y,
+                        Direction = FillDirection.Full,
+                        Children = new[]
+                        {
+                            FirstValue = new StatisticRow { Width = 0.5f }, // circle size/key amount
+                            HpDrain = new StatisticRow { Title = BeatmapsetsStrings.ShowStatsDrain, Width = 0.5f },
+                            Accuracy = new StatisticRow { Title = BeatmapsetsStrings.ShowStatsAccuracy, Width = 0.5f },
+                            ApproachRate = new StatisticRow { Title = BeatmapsetsStrings.ShowStatsAr, Width = 0.5f },
+                            starDifficulty = new StatisticRow(10, true) { Title = BeatmapsetsStrings.ShowStatsStars, Width = 0.5f },
+                        },
+                    };
+                    break;
+            }
         }
 
         [BackgroundDependencyLoader]
