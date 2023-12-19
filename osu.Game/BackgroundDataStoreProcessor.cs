@@ -67,6 +67,7 @@ namespace osu.Game
 
                 checkForOutdatedStarRatings();
                 processBeatmapSetsWithMissingMetrics();
+                // Note that the previous method will also update these on a fresh run.
                 processBeatmapsWithMissingObjectCounts();
                 processScoresWithMissingStatistics();
                 convertLegacyTotalScoreToStandardised();
@@ -144,12 +145,24 @@ namespace osu.Game
                 }
             });
 
+            if (beatmapSetIds.Count == 0)
+                return;
+
             Logger.Log($"Found {beatmapSetIds.Count} beatmap sets which require reprocessing.");
 
-            int i = 0;
+            // Technically this is doing more than just star ratings, but easier for the end user to understand.
+            var notification = showProgressNotification(beatmapSetIds.Count, "Reprocessing star rating for beatmaps", "beatmaps' star ratings have been updated");
+
+            int processedCount = 0;
+            int failedCount = 0;
 
             foreach (var id in beatmapSetIds)
             {
+                if (notification?.State == ProgressNotificationState.Cancelled)
+                    break;
+
+                updateNotificationProgress(notification, processedCount, beatmapSetIds.Count);
+
                 sleepIfRequired();
 
                 realmAccess.Run(r =>
@@ -160,16 +173,19 @@ namespace osu.Game
                     {
                         try
                         {
-                            Logger.Log($"Background processing {set} ({++i} / {beatmapSetIds.Count})");
                             beatmapUpdater.Process(set);
+                            ++processedCount;
                         }
                         catch (Exception e)
                         {
                             Logger.Log($"Background processing failed on {set}: {e}");
+                            ++failedCount;
                         }
                     }
                 });
             }
+
+            completeNotification(notification, processedCount, beatmapSetIds.Count, failedCount);
         }
 
         private void processBeatmapsWithMissingObjectCounts()
@@ -184,12 +200,23 @@ namespace osu.Game
                     beatmapIds.Add(b.ID);
             });
 
-            Logger.Log($"Found {beatmapIds.Count} beatmaps which require reprocessing.");
+            if (beatmapIds.Count == 0)
+                return;
 
-            int i = 0;
+            Logger.Log($"Found {beatmapIds.Count} beatmaps which require statistics population.");
+
+            var notification = showProgressNotification(beatmapIds.Count, "Populating missing statistics for beatmaps", "beatmaps have been populated with missing statistics");
+
+            int processedCount = 0;
+            int failedCount = 0;
 
             foreach (var id in beatmapIds)
             {
+                if (notification?.State == ProgressNotificationState.Cancelled)
+                    break;
+
+                updateNotificationProgress(notification, processedCount, beatmapIds.Count);
+
                 sleepIfRequired();
 
                 realmAccess.Run(r =>
@@ -200,16 +227,19 @@ namespace osu.Game
                     {
                         try
                         {
-                            Logger.Log($"Background processing {beatmap} ({++i} / {beatmapIds.Count})");
                             beatmapUpdater.ProcessObjectCounts(beatmap);
+                            ++processedCount;
                         }
                         catch (Exception e)
                         {
                             Logger.Log($"Background processing failed on {beatmap}: {e}");
+                            ++failedCount;
                         }
                     }
                 });
             }
+
+            completeNotification(notification, processedCount, beatmapIds.Count, failedCount);
         }
 
         private void processScoresWithMissingStatistics()
@@ -231,10 +261,23 @@ namespace osu.Game
                 }
             });
 
-            Logger.Log($"Found {scoreIds.Count} scores which require reprocessing.");
+            if (scoreIds.Count == 0)
+                return;
+
+            Logger.Log($"Found {scoreIds.Count} scores which require statistics population.");
+
+            var notification = showProgressNotification(scoreIds.Count, "Populating missing statistics for scores", "scores have been populated with missing statistics");
+
+            int processedCount = 0;
+            int failedCount = 0;
 
             foreach (var id in scoreIds)
             {
+                if (notification?.State == ProgressNotificationState.Cancelled)
+                    break;
+
+                updateNotificationProgress(notification, processedCount, scoreIds.Count);
+
                 sleepIfRequired();
 
                 try
@@ -250,7 +293,7 @@ namespace osu.Game
                         r.Find<ScoreInfo>(id)!.MaximumStatisticsJson = JsonConvert.SerializeObject(score.MaximumStatistics);
                     });
 
-                    Logger.Log($"Populated maximum statistics for score {id}");
+                    ++processedCount;
                 }
                 catch (ObjectDisposedException)
                 {
@@ -260,8 +303,11 @@ namespace osu.Game
                 {
                     Logger.Log(@$"Failed to populate maximum statistics for {id}: {e}");
                     realmAccess.Write(r => r.Find<ScoreInfo>(id)!.BackgroundReprocessingFailed = true);
+                    ++failedCount;
                 }
             }
+
+            completeNotification(notification, processedCount, scoreIds.Count, failedCount);
         }
 
         private void convertLegacyTotalScoreToStandardised()
@@ -279,20 +325,17 @@ namespace osu.Game
             if (scoreIds.Count == 0)
                 return;
 
-            ProgressNotification notification = new ProgressNotification { State = ProgressNotificationState.Active };
-
-            notificationOverlay?.Post(notification);
+            var notification = showProgressNotification(scoreIds.Count, "Upgrading scores to new scoring algorithm", "scores have been upgraded to the new scoring algorithm");
 
             int processedCount = 0;
             int failedCount = 0;
 
             foreach (var id in scoreIds)
             {
-                if (notification.State == ProgressNotificationState.Cancelled)
+                if (notification?.State == ProgressNotificationState.Cancelled)
                     break;
 
-                notification.Text = $"Upgrading scores to new scoring algorithm ({processedCount} of {scoreIds.Count})";
-                notification.Progress = (float)processedCount / scoreIds.Count;
+                updateNotificationProgress(notification, processedCount, scoreIds.Count);
 
                 sleepIfRequired();
 
@@ -310,7 +353,6 @@ namespace osu.Game
                         s.TotalScoreVersion = LegacyScoreEncoder.LATEST_VERSION;
                     });
 
-                    Logger.Log($"Converted total score for score {id}");
                     ++processedCount;
                 }
                 catch (ObjectDisposedException)
@@ -325,22 +367,62 @@ namespace osu.Game
                 }
             }
 
-            if (processedCount == scoreIds.Count)
+            completeNotification(notification, processedCount, scoreIds.Count, failedCount);
+        }
+
+        private void updateNotificationProgress(ProgressNotification? notification, int processedCount, int totalCount)
+        {
+            if (notification == null)
+                return;
+
+            notification.Text = notification.Text.ToString().Split('(').First().TrimEnd() + $" ({processedCount} of {totalCount})";
+            notification.Progress = (float)processedCount / totalCount;
+
+            if (processedCount % 100 == 0)
+                Logger.Log(notification.Text.ToString());
+        }
+
+        private void completeNotification(ProgressNotification? notification, int processedCount, int totalCount, int? failedCount = null)
+        {
+            if (notification == null)
+                return;
+
+            if (processedCount == totalCount)
             {
-                notification.CompletionText = $"{processedCount} score(s) have been upgraded to the new scoring algorithm";
+                notification.CompletionText = $"{processedCount} {notification.CompletionText}";
                 notification.Progress = 1;
                 notification.State = ProgressNotificationState.Completed;
             }
             else
             {
-                notification.Text = $"{processedCount} of {scoreIds.Count} score(s) have been upgraded to the new scoring algorithm.";
+                notification.Text = $"{processedCount} of {totalCount} {notification.CompletionText}";
 
                 // We may have arrived here due to user cancellation or completion with failures.
                 if (failedCount > 0)
-                    notification.Text += $" Check logs for issues with {failedCount} failed upgrades.";
+                    notification.Text += $" Check logs for issues with {failedCount} failed items.";
 
                 notification.State = ProgressNotificationState.Cancelled;
             }
+        }
+
+        private ProgressNotification? showProgressNotification(int totalCount, string running, string completed)
+        {
+            if (notificationOverlay == null)
+                return null;
+
+            if (totalCount < 10)
+                return null;
+
+            ProgressNotification notification = new ProgressNotification
+            {
+                Text = running,
+                CompletionText = completed,
+                State = ProgressNotificationState.Active
+            };
+
+            notificationOverlay?.Post(notification);
+
+            return notification;
         }
 
         private void sleepIfRequired()
