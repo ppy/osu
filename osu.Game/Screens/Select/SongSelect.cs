@@ -13,6 +13,8 @@ using osu.Framework.Bindables;
 using osu.Framework.Extensions.ObjectExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
+using osu.Framework.Graphics.Effects;
+using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.UserInterface;
 using osu.Framework.Input.Bindings;
@@ -35,6 +37,7 @@ using osu.Game.Screens.Backgrounds;
 using osu.Game.Screens.Edit;
 using osu.Game.Screens.Menu;
 using osu.Game.Screens.Play;
+using osu.Game.Screens.Select.Details;
 using osu.Game.Screens.Select.Options;
 using osu.Game.Skinning;
 using osuTK;
@@ -45,7 +48,7 @@ namespace osu.Game.Screens.Select
 {
     public abstract partial class SongSelect : ScreenWithBeatmapBackground, IKeyBindingHandler<GlobalAction>
     {
-        public static readonly float WEDGE_HEIGHT = 245;
+        public static readonly float WEDGE_HEIGHT = 200;
 
         protected const float BACKGROUND_BLUR = 20;
         private const float left_area_padding = 20;
@@ -131,6 +134,8 @@ namespace osu.Game.Screens.Select
         private double audioFeedbackLastPlaybackTime;
 
         private IDisposable? modSelectOverlayRegistration;
+
+        private AdvancedStats advancedStats = null!;
 
         [Resolved]
         private MusicController music { get; set; } = null!;
@@ -254,11 +259,55 @@ namespace osu.Game.Screens.Select
                                             },
                                             new Container
                                             {
+                                                RelativeSizeAxes = Axes.X,
+                                                Height = 90,
+                                                Padding = new MarginPadding(10)
+                                                {
+                                                    Left = left_area_padding,
+                                                    Right = left_area_padding * 2,
+                                                },
+                                                Y = WEDGE_HEIGHT,
+                                                Children = new Drawable[]
+                                                {
+                                                    new Container
+                                                    {
+                                                        RelativeSizeAxes = Axes.Both,
+                                                        Masking = true,
+                                                        CornerRadius = 10,
+                                                        EdgeEffect = new EdgeEffectParameters
+                                                        {
+                                                            Type = EdgeEffectType.Glow,
+                                                            Hollow = true,
+                                                            Colour = new Color4(130, 204, 255, 15),
+                                                            Radius = 10,
+                                                        },
+                                                        Children = new Drawable[]
+                                                        {
+                                                            new Box
+                                                            {
+                                                                Colour = new Color4(130, 204, 255, 40),
+                                                                Blending = BlendingParameters.Additive,
+                                                                RelativeSizeAxes = Axes.Both,
+                                                            },
+                                                            advancedStats = new AdvancedStats(2)
+                                                            {
+                                                                RelativeSizeAxes = Axes.X,
+                                                                AutoSizeAxes = Axes.Y,
+                                                                Width = 0.8f,
+                                                                Anchor = Anchor.Centre,
+                                                                Origin = Anchor.Centre,
+                                                            },
+                                                        }
+                                                    },
+                                                }
+                                            },
+                                            new Container
+                                            {
                                                 RelativeSizeAxes = Axes.Both,
                                                 Padding = new MarginPadding
                                                 {
                                                     Bottom = Footer.HEIGHT,
-                                                    Top = WEDGE_HEIGHT,
+                                                    Top = WEDGE_HEIGHT + 70,
                                                     Left = left_area_padding,
                                                     Right = left_area_padding * 2,
                                                 },
@@ -796,6 +845,8 @@ namespace osu.Game.Screens.Select
             BeatmapDetails.Beatmap = beatmap;
 
             ModSelect.Beatmap = beatmap;
+
+            advancedStats.BeatmapInfo = beatmap.BeatmapInfo;
 
             bool beatmapSelected = beatmap is not DummyWorkingBeatmap;
 

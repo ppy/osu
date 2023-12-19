@@ -28,7 +28,6 @@ namespace osu.Game.Screens.Select
         private const float spacing = 10;
         private const float transition_duration = 250;
 
-        private readonly AdvancedStats advanced;
         private readonly UserRatings ratingsDisplay;
         private readonly MetadataSection description, source, tags;
         private readonly Container failRetryContainer;
@@ -109,12 +108,6 @@ namespace osu.Game.Screens.Select
                                                 Padding = new MarginPadding { Right = spacing / 2 },
                                                 Children = new[]
                                                 {
-                                                    new DetailBox().WithChild(advanced = new AdvancedStats
-                                                    {
-                                                        RelativeSizeAxes = Axes.X,
-                                                        AutoSizeAxes = Axes.Y,
-                                                        Padding = new MarginPadding { Horizontal = spacing, Top = spacing * 2, Bottom = spacing },
-                                                    }),
                                                     new DetailBox().WithChild(new OnlineViewContainer(string.Empty)
                                                     {
                                                         RelativeSizeAxes = Axes.X,
@@ -180,7 +173,6 @@ namespace osu.Game.Screens.Select
 
         private void updateStatistics()
         {
-            advanced.BeatmapInfo = BeatmapInfo;
             description.Metadata = BeatmapInfo?.DifficultyName ?? string.Empty;
             source.Metadata = BeatmapInfo?.Metadata.Source ?? string.Empty;
             tags.Metadata = BeatmapInfo?.Metadata.Tags ?? string.Empty;

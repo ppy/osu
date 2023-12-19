@@ -305,7 +305,7 @@ namespace osu.Game.Screens.Select
                             },
                             infoLabelContainer = new FillFlowContainer
                             {
-                                Margin = new MarginPadding { Top = 20 },
+                                Margin = new MarginPadding { Top = 8 },
                                 Spacing = new Vector2(20, 0),
                                 AutoSizeAxes = Axes.Both,
                             }
