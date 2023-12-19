@@ -311,23 +311,36 @@ namespace osu.Game.Screens.Select.Details
                             Font = OsuFont.GetFont(size: 12)
                         },
                     },
-                    bar = new Bar
+                    new Container
                     {
-                        Origin = Anchor.CentreLeft,
-                        Anchor = Anchor.CentreLeft,
-                        RelativeSizeAxes = Axes.X,
-                        Height = 5,
-                        BackgroundColour = Color4.White.Opacity(0.5f),
+                        RelativeSizeAxes = Axes.Both,
                         Padding = new MarginPadding { Left = name_width + 10, Right = value_width + 10 },
-                    },
-                    ModBar = new Bar
-                    {
-                        Origin = Anchor.CentreLeft,
-                        Anchor = Anchor.CentreLeft,
-                        RelativeSizeAxes = Axes.X,
-                        Alpha = 0.5f,
-                        Height = 5,
-                        Padding = new MarginPadding { Left = name_width + 10, Right = value_width + 10 },
+                        Children = new Drawable[]
+                        {
+                            new Container
+                            {
+                                Origin = Anchor.CentreLeft,
+                                Anchor = Anchor.CentreLeft,
+                                RelativeSizeAxes = Axes.X,
+                                Height = 5,
+
+                                CornerRadius = 2,
+                                Masking = true,
+                                Children = new Drawable[]
+                                {
+                                    bar = new Bar
+                                    {
+                                        RelativeSizeAxes = Axes.Both,
+                                        BackgroundColour = Color4.White.Opacity(0.5f),
+                                    },
+                                    ModBar = new Bar
+                                    {
+                                        RelativeSizeAxes = Axes.Both,
+                                        Alpha = 0.5f,
+                                    },
+                                }
+                            },
+                        }
                     },
                     new Container
                     {
