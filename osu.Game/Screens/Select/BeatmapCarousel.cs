@@ -290,6 +290,8 @@ namespace osu.Game.Screens.Select
             {
                 foreach (var set in removeableSets)
                     removeBeatmapSet(set);
+
+                invalidateAfterChange();
             });
         }
 
