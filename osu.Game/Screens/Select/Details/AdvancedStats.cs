@@ -92,11 +92,35 @@ namespace osu.Game.Screens.Select.Details
                         Direction = FillDirection.Full,
                         Children = new[]
                         {
-                            FirstValue = new StatisticRow { Width = 0.5f }, // circle size/key amount
-                            HpDrain = new StatisticRow { Title = BeatmapsetsStrings.ShowStatsDrain, Width = 0.5f },
-                            Accuracy = new StatisticRow { Title = BeatmapsetsStrings.ShowStatsAccuracy, Width = 0.5f },
-                            ApproachRate = new StatisticRow { Title = BeatmapsetsStrings.ShowStatsAr, Width = 0.5f },
-                            starDifficulty = new StatisticRow(10, true) { Title = BeatmapsetsStrings.ShowStatsStars, Width = 0.5f },
+                            FirstValue = new StatisticRow
+                            {
+                                Width = 0.5f,
+                                Padding = new MarginPadding { Right = 5, Vertical = 2.5f },
+                            }, // circle size/key amount
+                            HpDrain = new StatisticRow
+                            {
+                                Title = BeatmapsetsStrings.ShowStatsDrain,
+                                Width = 0.5f,
+                                Padding = new MarginPadding { Left = 5, Vertical = 2.5f },
+                            },
+                            Accuracy = new StatisticRow
+                            {
+                                Title = BeatmapsetsStrings.ShowStatsAccuracy,
+                                Width = 0.5f,
+                                Padding = new MarginPadding { Right = 5, Vertical = 2.5f },
+                            },
+                            ApproachRate = new StatisticRow
+                            {
+                                Title = BeatmapsetsStrings.ShowStatsAr,
+                                Width = 0.5f,
+                                Padding = new MarginPadding { Left = 5, Vertical = 2.5f },
+                            },
+                            starDifficulty = new StatisticRow(10, true)
+                            {
+                                Title = BeatmapsetsStrings.ShowStatsStars,
+                                Width = 0.5f,
+                                Padding = new MarginPadding { Right = 5, Vertical = 2.5f },
+                            },
                         },
                     };
                     break;

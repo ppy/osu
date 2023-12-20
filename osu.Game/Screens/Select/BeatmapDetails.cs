@@ -5,7 +5,6 @@ using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
-using osu.Framework.Graphics.Effects;
 using osu.Framework.Graphics.Shapes;
 using osu.Game.Beatmaps;
 using osu.Game.Graphics;
@@ -19,7 +18,6 @@ using osu.Game.Overlays.BeatmapSet;
 using osu.Game.Resources.Localisation.Web;
 using osu.Game.Screens.Select.Details;
 using osuTK;
-using osuTK.Graphics;
 
 namespace osu.Game.Screens.Select
 {
@@ -70,21 +68,12 @@ namespace osu.Game.Screens.Select
             CornerRadius = 10;
             Masking = true;
 
-            EdgeEffect = new EdgeEffectParameters
-            {
-                Type = EdgeEffectType.Glow,
-                Hollow = true,
-                Colour = new Color4(130, 204, 255, 15),
-                Radius = 10,
-            };
-
             Children = new Drawable[]
             {
                 new Box
                 {
                     RelativeSizeAxes = Axes.Both,
-                    Colour = new Color4(130, 204, 255, 40),
-                    Blending = BlendingParameters.Additive,
+                    Colour = Colour4.Black.Opacity(0.3f),
                 },
                 new Container
                 {
