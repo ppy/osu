@@ -455,30 +455,13 @@ namespace osu.Game.Screens.Select
 
         private void updateBeatmapSet(BeatmapSetInfo beatmapSet)
         {
-            Guid? previouslySelectedID = null;
-
             originalBeatmapSetsDetached.RemoveAll(set => set.ID == beatmapSet.ID);
             originalBeatmapSetsDetached.Add(beatmapSet.Detach());
 
-            // If the selected beatmap is about to be removed, store its ID so it can be re-selected if required
-            if (selectedBeatmapSet?.BeatmapSet.ID == beatmapSet.ID)
-                previouslySelectedID = selectedBeatmap?.BeatmapInfo.ID;
-
-            var removedSets = root.RemoveItemsByID(beatmapSet.ID);
-
-            foreach (var removedSet in removedSets)
-            {
-                // If we don't remove this here, it may remain in a hidden state until scrolled off screen.
-                // Doesn't really affect anything during actual user interaction, but makes testing annoying.
-                var removedDrawable = Scroll.FirstOrDefault(c => c.Item == removedSet);
-                if (removedDrawable != null)
-                    expirePanelImmediately(removedDrawable);
-            }
+            var newSets = new List<CarouselBeatmapSet>();
 
             if (beatmapsSplitOut)
             {
-                var newSets = new List<CarouselBeatmapSet>();
-
                 foreach (var beatmap in beatmapSet.Beatmaps)
                 {
                     var newSet = createCarouselSet(new BeatmapSetInfo(new[] { beatmap })
@@ -489,18 +472,7 @@ namespace osu.Game.Screens.Select
                     });
 
                     if (newSet != null)
-                    {
                         newSets.Add(newSet);
-                        root.AddItem(newSet);
-                    }
-                }
-
-                // check if we can/need to maintain our current selection.
-                if (previouslySelectedID != null)
-                {
-                    var toSelect = newSets.FirstOrDefault(s => s.Beatmaps.Any(b => b.BeatmapInfo.ID == previouslySelectedID))
-                                   ?? newSets.FirstOrDefault();
-                    select(toSelect);
                 }
             }
             else
@@ -508,13 +480,18 @@ namespace osu.Game.Screens.Select
                 var newSet = createCarouselSet(beatmapSet);
 
                 if (newSet != null)
-                {
-                    root.AddItem(newSet);
+                    newSets.Add(newSet);
+            }
 
-                    // check if we can/need to maintain our current selection.
-                    if (previouslySelectedID != null)
-                        select((CarouselItem?)newSet.Beatmaps.FirstOrDefault(b => b.BeatmapInfo.ID == previouslySelectedID) ?? newSet);
-                }
+            var removedSets = root.ReplaceItem(beatmapSet, newSets);
+
+            // If we don't remove these here, it may remain in a hidden state until scrolled off screen.
+            // Doesn't really affect anything during actual user interaction, but makes testing annoying.
+            foreach (var removedSet in removedSets)
+            {
+                var removedDrawable = Scroll.FirstOrDefault(c => c.Item == removedSet);
+                if (removedDrawable != null)
+                    expirePanelImmediately(removedDrawable);
             }
         }
 
@@ -1205,6 +1182,44 @@ namespace osu.Game.Screens.Select
                     BeatmapSetsByID.Add(set.BeatmapSet.ID, new List<CarouselBeatmapSet> { set });
 
                 base.AddItem(i);
+            }
+
+            /// <summary>
+            /// A special method to handle replace operations (general for updating a beatmap).
+            /// Avoids event-driven selection flip-flopping during the remove/add process.
+            /// </summary>
+            /// <param name="oldItem">The beatmap set to be replaced.</param>
+            /// <param name="newItems">All new items to replace the removed beatmap set.</param>
+            /// <returns>All removed items, for any further processing.</returns>
+            public IEnumerable<CarouselBeatmapSet> ReplaceItem(BeatmapSetInfo oldItem, List<CarouselBeatmapSet> newItems)
+            {
+                // Without doing this, the removal of the old beatmap will cause carousel's eager selection
+                // logic to invoke, causing one unnecessary selection.
+                DisableSelection = true;
+                var removedSets = RemoveItemsByID(oldItem.ID);
+                DisableSelection = false;
+
+                foreach (var set in newItems)
+                    AddItem(set);
+
+                Guid? previouslySelectedID = null;
+
+                var selectedBeatmap = (LastSelected as CarouselBeatmap)?.BeatmapInfo;
+
+                // If the selected beatmap is about to be removed, store its ID so it can be re-selected if required
+                if (selectedBeatmap?.BeatmapSet?.ID == oldItem.ID)
+                    previouslySelectedID = selectedBeatmap.ID;
+
+                // check if we can/need to maintain our current selection.
+                if (previouslySelectedID != null)
+                {
+                    var toSelect = newItems.FirstOrDefault(s => s.Beatmaps.Any(b => b.BeatmapInfo.ID == previouslySelectedID))
+                                   ?? newItems.First();
+
+                    toSelect.State.Value = CarouselItemState.Selected;
+                }
+
+                return removedSets;
             }
 
             public IEnumerable<CarouselBeatmapSet> RemoveItemsByID(Guid beatmapSetID)
