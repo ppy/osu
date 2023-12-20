@@ -200,11 +200,9 @@ namespace osu.Game.Rulesets.Mania.Tests
             });
 
             assertHeadJudgement(HitResult.Perfect);
-            // judgement combo offset by perfect bonus judgement. see logic in DrawableNote.CheckForResult.
             assertComboAtJudgement(0, 1);
             assertTailJudgement(HitResult.Meh);
             assertComboAtJudgement(1, 0);
-            // judgement combo offset by perfect bonus judgement. see logic in DrawableNote.CheckForResult.
             assertComboAtJudgement(3, 1);
         }
 
