@@ -34,8 +34,6 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
 
         private Drawable scaleContainer;
 
-        public override bool DisplayResult => false;
-
         public DrawableSliderRepeat()
             : base(null)
         {

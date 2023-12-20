@@ -20,8 +20,6 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
 
         private const float default_tick_size = 16;
 
-        public override bool DisplayResult => false;
-
         protected DrawableSlider DrawableSlider => (DrawableSlider)ParentHitObject;
 
         private SkinnableDrawable scaleContainer;
