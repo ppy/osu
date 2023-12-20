@@ -62,25 +62,23 @@ namespace osu.Game.Rulesets.Osu.Skinning.Argon
         /// </remarks>
         public virtual void PlayAnimation()
         {
-            switch (Result)
+            if (Result.IsHit())
             {
-                default:
-                    JudgementText
-                        .FadeInFromZero(300, Easing.OutQuint)
-                        .ScaleTo(Vector2.One)
-                        .ScaleTo(new Vector2(1.2f), 1800, Easing.OutQuint);
-                    break;
+                JudgementText
+                    .FadeInFromZero(300, Easing.OutQuint)
+                    .ScaleTo(Vector2.One)
+                    .ScaleTo(new Vector2(1.2f), 1800, Easing.OutQuint);
+            }
+            else
+            {
+                this.ScaleTo(1.6f);
+                this.ScaleTo(1, 100, Easing.In);
 
-                case HitResult.Miss:
-                    this.ScaleTo(1.6f);
-                    this.ScaleTo(1, 100, Easing.In);
+                this.MoveTo(Vector2.Zero);
+                this.MoveToOffset(new Vector2(0, 100), 800, Easing.InQuint);
 
-                    this.MoveTo(Vector2.Zero);
-                    this.MoveToOffset(new Vector2(0, 100), 800, Easing.InQuint);
-
-                    this.RotateTo(0);
-                    this.RotateTo(40, 800, Easing.InQuint);
-                    break;
+                this.RotateTo(0);
+                this.RotateTo(40, 800, Easing.InQuint);
             }
 
             this.FadeOutFromOne(800);

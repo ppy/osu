@@ -50,7 +50,7 @@ namespace osu.Game.Skinning
                 });
             }
 
-            if (result != HitResult.Miss)
+            if (result.IsHit())
             {
                 //new judgement shows old as a temporary effect
                 AddInternal(temporaryOldStyle = new LegacyJudgementPieceOld(result, createMainDrawable, 1.05f, true)
