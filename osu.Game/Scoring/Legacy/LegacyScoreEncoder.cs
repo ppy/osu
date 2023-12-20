@@ -32,9 +32,10 @@ namespace osu.Game.Scoring.Legacy
         /// <item><description>30000003: First version after converting legacy total score to standardised.</description></item>
         /// <item><description>30000004: Fixed mod multipliers during legacy score conversion. Reconvert all scores.</description></item>
         /// <item><description>30000005: Introduce combo exponent in the osu! gamemode. Reconvert all scores.</description></item>
+        /// <item><description>30000006: Fix edge cases in conversion after combo exponent introduction that lead to NaNs. Reconvert all scores.</description></item>
         /// </list>
         /// </remarks>
-        public const int LATEST_VERSION = 30000005;
+        public const int LATEST_VERSION = 30000006;
 
         /// <summary>
         /// The first stable-compatible YYYYMMDD format version given to lazer usage of replays.
