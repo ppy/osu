@@ -16,7 +16,7 @@ using osu.Game.Rulesets.UI;
 
 namespace osu.Game.Rulesets.Osu.Mods
 {
-    public class OsuModAutopilot : Mod, IApplicableFailOverride, IUpdatableByPlayfield, IApplicableToDrawableRuleset<OsuHitObject>
+    public class OsuModAutopilot : Mod, IUpdatableByPlayfield, IApplicableToDrawableRuleset<OsuHitObject>
     {
         public override string Name => "Autopilot";
         public override string Acronym => "AP";
@@ -36,10 +36,6 @@ namespace osu.Game.Rulesets.Osu.Mods
             typeof(OsuModRepel),
             typeof(ModTouchDevice)
         };
-
-        public bool PerformFail() => false;
-
-        public bool RestartOnFail => false;
 
         private OsuInputManager inputManager = null!;
 
