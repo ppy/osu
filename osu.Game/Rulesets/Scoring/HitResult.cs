@@ -272,6 +272,9 @@ namespace osu.Game.Rulesets.Scoring
         /// <summary>
         /// Whether a <see cref="HitResult"/> represents a miss of any type.
         /// </summary>
+        /// <remarks>
+        /// Of note, both <see cref="IsMiss"/> and <see cref="IsHit"/> return <see langword="false"/> for <see cref="HitResult.None"/>.
+        /// </remarks>
         public static bool IsMiss(this HitResult result)
         {
             switch (result)
@@ -291,6 +294,9 @@ namespace osu.Game.Rulesets.Scoring
         /// <summary>
         /// Whether a <see cref="HitResult"/> represents a successful hit.
         /// </summary>
+        /// <remarks>
+        /// Of note, both <see cref="IsMiss"/> and <see cref="IsHit"/> return <see langword="false"/> for <see cref="HitResult.None"/>.
+        /// </remarks>
         public static bool IsHit(this HitResult result)
         {
             switch (result)
