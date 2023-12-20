@@ -28,8 +28,6 @@ namespace osu.Game.Rulesets.Osu.Scoring
                 case HitResult.Ok:
                 case HitResult.Meh:
                 case HitResult.Miss:
-                case HitResult.LargeTickMiss:
-                case HitResult.IgnoreMiss:
                     return true;
             }
 
