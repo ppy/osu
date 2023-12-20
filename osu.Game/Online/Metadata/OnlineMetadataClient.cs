@@ -208,7 +208,7 @@ namespace osu.Game.Online.Metadata
 
             Debug.Assert(connection != null);
             await connection.InvokeAsync(nameof(IMetadataServer.BeginWatchingUserPresence)).ConfigureAwait(false);
-            isWatchingUserPresence.Value = true;
+            Schedule(() => isWatchingUserPresence.Value = true);
         }
 
         public override async Task EndWatchingUserPresence()
@@ -218,14 +218,14 @@ namespace osu.Game.Online.Metadata
                 if (connector?.IsConnected.Value != true)
                     throw new OperationCanceledException();
 
-                // must happen synchronously before any remote calls to avoid mis-ordering.
+                // must be scheduled before any remote calls to avoid mis-ordering.
                 Schedule(() => userStates.Clear());
                 Debug.Assert(connection != null);
                 await connection.InvokeAsync(nameof(IMetadataServer.EndWatchingUserPresence)).ConfigureAwait(false);
             }
             finally
             {
-                isWatchingUserPresence.Value = false;
+                Schedule(() => isWatchingUserPresence.Value = false);
             }
         }
 
