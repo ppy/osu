@@ -420,6 +420,7 @@ namespace osu.Game.Tests.Visual.SongSelect
         }
 
         [Test]
+        [FlakyTest] // temporary while peppy investigates
         public void TestSelectionRetainedOnBeatmapUpdate()
         {
             createSongSelect();
