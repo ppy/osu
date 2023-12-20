@@ -17,7 +17,6 @@ using osu.Game.Scoring.Legacy;
 using osu.Game.Online.API;
 using osu.Game.Online.API.Requests;
 using osu.Game.Online.API.Requests.Responses;
-using osu.Game.Rulesets.Judgements;
 using osu.Game.Rulesets.Scoring;
 using Realms;
 
@@ -125,13 +124,14 @@ namespace osu.Game.Scoring
             var beatmap = score.BeatmapInfo!.Detach();
             var ruleset = score.Ruleset.Detach();
             var rulesetInstance = ruleset.CreateInstance();
+            var scoreProcessor = rulesetInstance.CreateScoreProcessor();
 
             Debug.Assert(rulesetInstance != null);
 
             // Populate the maximum statistics.
             HitResult maxBasicResult = rulesetInstance.GetHitResults()
                                                       .Select(h => h.result)
-                                                      .Where(h => h.IsBasic()).MaxBy(Judgement.ToNumericResult);
+                                                      .Where(h => h.IsBasic()).MaxBy(scoreProcessor.GetRawAccuracyScore);
 
             foreach ((HitResult result, int count) in score.Statistics)
             {

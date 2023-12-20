@@ -7,7 +7,7 @@ using System.Linq;
 using osu.Game.Beatmaps;
 using osu.Game.Rulesets.Catch.Mods;
 using osu.Game.Rulesets.Catch.Objects;
-using osu.Game.Rulesets.Judgements;
+using osu.Game.Rulesets.Catch.Scoring;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Objects.Types;
@@ -18,6 +18,8 @@ namespace osu.Game.Rulesets.Catch.Difficulty
 {
     internal class CatchLegacyScoreSimulator : ILegacyScoreSimulator
     {
+        private readonly ScoreProcessor scoreProcessor = new CatchScoreProcessor();
+
         private int legacyBonusScore;
         private int standardisedBonusScore;
         private int combo;
@@ -134,7 +136,7 @@ namespace osu.Game.Rulesets.Catch.Difficulty
             if (isBonus)
             {
                 legacyBonusScore += scoreIncrease;
-                standardisedBonusScore += Judgement.ToNumericResult(bonusResult);
+                standardisedBonusScore += scoreProcessor.GetRawBonusScore(bonusResult);
             }
             else
                 attributes.AccuracyScore += scoreIncrease;

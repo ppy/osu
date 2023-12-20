@@ -57,14 +57,14 @@ namespace osu.Game.Database
             // We are constructing a "best possible" score from the statistics provided because it's the best we can do.
             List<HitResult> sortedHits = score.Statistics
                                               .Where(kvp => kvp.Key.AffectsCombo())
-                                              .OrderByDescending(kvp => Judgement.ToNumericResult(kvp.Key))
+                                              .OrderByDescending(kvp => processor.GetRawComboScore(kvp.Key))
                                               .SelectMany(kvp => Enumerable.Repeat(kvp.Key, kvp.Value))
                                               .ToList();
 
             // Attempt to use maximum statistics from the database.
             var maximumJudgements = score.MaximumStatistics
                                          .Where(kvp => kvp.Key.AffectsCombo())
-                                         .OrderByDescending(kvp => Judgement.ToNumericResult(kvp.Key))
+                                         .OrderByDescending(kvp => processor.GetRawComboScore(kvp.Key))
                                          .SelectMany(kvp => Enumerable.Repeat(new FakeJudgement(kvp.Key), kvp.Value))
                                          .ToList();
 
@@ -169,10 +169,10 @@ namespace osu.Game.Database
         public static long GetOldStandardised(ScoreInfo score)
         {
             double accuracyScore =
-                (double)score.Statistics.Where(kvp => kvp.Key.AffectsAccuracy()).Sum(kvp => Judgement.ToNumericResult(kvp.Key) * kvp.Value)
-                / score.MaximumStatistics.Where(kvp => kvp.Key.AffectsAccuracy()).Sum(kvp => Judgement.ToNumericResult(kvp.Key) * kvp.Value);
+                (double)score.Statistics.Where(kvp => kvp.Key.AffectsAccuracy()).Sum(kvp => numericScoreFor(kvp.Key) * kvp.Value)
+                / score.MaximumStatistics.Where(kvp => kvp.Key.AffectsAccuracy()).Sum(kvp => numericScoreFor(kvp.Key) * kvp.Value);
             double comboScore = (double)score.MaxCombo / score.MaximumStatistics.Where(kvp => kvp.Key.AffectsCombo()).Sum(kvp => kvp.Value);
-            double bonusScore = score.Statistics.Where(kvp => kvp.Key.IsBonus()).Sum(kvp => Judgement.ToNumericResult(kvp.Key) * kvp.Value);
+            double bonusScore = score.Statistics.Where(kvp => kvp.Key.IsBonus()).Sum(kvp => numericScoreFor(kvp.Key) * kvp.Value);
 
             double accuracyPortion = 0.3;
 
@@ -193,6 +193,42 @@ namespace osu.Game.Database
                 modMultiplier *= mod.ScoreMultiplier;
 
             return (long)Math.Round((1000000 * (accuracyPortion * accuracyScore + (1 - accuracyPortion) * comboScore) + bonusScore) * modMultiplier);
+
+            static int numericScoreFor(HitResult result)
+            {
+                switch (result)
+                {
+                    default:
+                        return 0;
+
+                    case HitResult.SmallTickHit:
+                        return 10;
+
+                    case HitResult.LargeTickHit:
+                        return 30;
+
+                    case HitResult.Meh:
+                        return 50;
+
+                    case HitResult.Ok:
+                        return 100;
+
+                    case HitResult.Good:
+                        return 200;
+
+                    case HitResult.Great:
+                        return 300;
+
+                    case HitResult.Perfect:
+                        return 315;
+
+                    case HitResult.SmallBonus:
+                        return 10;
+
+                    case HitResult.LargeBonus:
+                        return 50;
+                }
+            }
         }
 
         /// <summary>
