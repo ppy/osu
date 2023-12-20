@@ -29,8 +29,6 @@ namespace osu.Game.Rulesets.Osu.Mods
         {
             typeof(OsuModSpunOut),
             typeof(ModRelax),
-            typeof(ModFailCondition),
-            typeof(ModNoFail),
             typeof(ModAutoplay),
             typeof(OsuModMagnetised),
             typeof(OsuModRepel),
