@@ -45,7 +45,7 @@ namespace osu.Game.Screens.Select.Carousel
                       .ForEach(AddItem);
         }
 
-        protected override CarouselItem? GetNextToSelect()
+        public override CarouselItem? GetNextToSelect()
         {
             if (LastSelected == null || LastSelected.Filtered.Value)
             {
