@@ -65,22 +65,32 @@ namespace osu.Game.Skinning
             }
             else
             {
-                this.ScaleTo(1.6f);
-                this.ScaleTo(1, 100, Easing.In);
+                bool isTick = result != HitResult.Miss;
 
-                decimal? legacyVersion = skin.GetConfig<SkinConfiguration.LegacySetting, decimal>(SkinConfiguration.LegacySetting.Version)?.Value;
-
-                if (legacyVersion >= 2.0m)
+                if (isTick)
                 {
-                    this.MoveTo(new Vector2(0, -5));
-                    this.MoveToOffset(new Vector2(0, 80), fade_out_delay + fade_out_length, Easing.In);
+                    this.ScaleTo(0.6f);
+                    this.ScaleTo(0.3f, 100, Easing.In);
                 }
+                else
+                {
+                    this.ScaleTo(1.6f);
+                    this.ScaleTo(1, 100, Easing.In);
 
-                float rotation = RNG.NextSingle(-8.6f, 8.6f);
+                    decimal? legacyVersion = skin.GetConfig<SkinConfiguration.LegacySetting, decimal>(SkinConfiguration.LegacySetting.Version)?.Value;
 
-                this.RotateTo(0);
-                this.RotateTo(rotation, fade_in_length)
-                    .Then().RotateTo(rotation * 2, fade_out_delay + fade_out_length - fade_in_length, Easing.In);
+                    if (legacyVersion >= 2.0m)
+                    {
+                        this.MoveTo(new Vector2(0, -5));
+                        this.MoveToOffset(new Vector2(0, 80), fade_out_delay + fade_out_length, Easing.In);
+                    }
+
+                    float rotation = RNG.NextSingle(-8.6f, 8.6f);
+
+                    this.RotateTo(0);
+                    this.RotateTo(rotation, fade_in_length)
+                        .Then().RotateTo(rotation * 2, fade_out_delay + fade_out_length - fade_in_length, Easing.In);
+                }
             }
         }
 
