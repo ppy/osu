@@ -1193,6 +1193,12 @@ namespace osu.Game.Screens.Select
             /// <returns>All removed items, for any further processing.</returns>
             public IEnumerable<CarouselBeatmapSet> ReplaceItem(BeatmapSetInfo oldItem, List<CarouselBeatmapSet> newItems)
             {
+                var previousSelection = (LastSelected as CarouselBeatmapSet)?.Beatmaps
+                                                                            .FirstOrDefault(s => s.State.Value == CarouselItemState.Selected)
+                                                                            ?.BeatmapInfo;
+
+                bool wasSelected = previousSelection?.BeatmapSet?.ID == oldItem.ID;
+
                 // Without doing this, the removal of the old beatmap will cause carousel's eager selection
                 // logic to invoke, causing one unnecessary selection.
                 DisableSelection = true;
@@ -1202,21 +1208,14 @@ namespace osu.Game.Screens.Select
                 foreach (var set in newItems)
                     AddItem(set);
 
-                Guid? previouslySelectedID = null;
-
-                var selectedBeatmap = (LastSelected as CarouselBeatmap)?.BeatmapInfo;
-
-                // If the selected beatmap is about to be removed, store its ID so it can be re-selected if required
-                if (selectedBeatmap?.BeatmapSet?.ID == oldItem.ID)
-                    previouslySelectedID = selectedBeatmap.ID;
-
-                // check if we can/need to maintain our current selection.
-                if (previouslySelectedID != null)
+                // Check if we can/need to maintain our current selection.
+                if (wasSelected)
                 {
-                    var toSelect = newItems.FirstOrDefault(s => s.Beatmaps.Any(b => b.BeatmapInfo.ID == previouslySelectedID))
-                                   ?? newItems.First();
+                    CarouselBeatmap? matchingBeatmap = newItems.SelectMany(s => s.Beatmaps)
+                                                               .FirstOrDefault(b => b.BeatmapInfo.ID == previousSelection?.ID);
 
-                    toSelect.State.Value = CarouselItemState.Selected;
+                    if (matchingBeatmap != null)
+                        matchingBeatmap.State.Value = CarouselItemState.Selected;
                 }
 
                 return removedSets;
