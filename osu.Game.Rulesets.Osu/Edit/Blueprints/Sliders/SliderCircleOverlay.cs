@@ -32,7 +32,8 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders
         {
             base.Update();
 
-            var circle = position == SliderPosition.Start ? (HitCircle)Slider.HeadCircle : Slider.TailCircle;
+            var circle = position == SliderPosition.Start ? (HitCircle)Slider.HeadCircle :
+                Slider.RepeatCount % 2 == 0 ? Slider.TailCircle : Slider.LastRepeat;
 
             CirclePiece.UpdateFrom(circle);
             marker.UpdateFrom(circle);

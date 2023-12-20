@@ -65,7 +65,7 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders.Components
         {
             Color4 colour = colours.Yellow;
 
-            if (IsHovered && Slider.RepeatCount % 2 == 0)
+            if (IsHovered)
                 colour = colour.Lighten(1);
 
             CirclePiece.Colour = colour;
@@ -73,8 +73,7 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders.Components
 
         protected override bool OnDragStart(DragStartEvent e)
         {
-            // Disable dragging if the slider has an uneven number of repeats because the slider tail will be on the wrong side of the path.
-            if (e.Button == MouseButton.Right || !inputManager.CurrentState.Keyboard.ShiftPressed || Slider.RepeatCount % 2 == 1)
+            if (e.Button == MouseButton.Right || !inputManager.CurrentState.Keyboard.ShiftPressed)
                 return false;
 
             isDragging = true;
