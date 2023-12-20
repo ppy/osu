@@ -62,14 +62,7 @@ namespace osu.Game.Rulesets.Osu.Skinning.Argon
         /// </remarks>
         public virtual void PlayAnimation()
         {
-            if (Result.IsHit())
-            {
-                JudgementText
-                    .FadeInFromZero(300, Easing.OutQuint)
-                    .ScaleTo(Vector2.One)
-                    .ScaleTo(new Vector2(1.2f), 1800, Easing.OutQuint);
-            }
-            else
+            if (Result.IsMiss())
             {
                 this.ScaleTo(1.6f);
                 this.ScaleTo(1, 100, Easing.In);
@@ -79,6 +72,13 @@ namespace osu.Game.Rulesets.Osu.Skinning.Argon
 
                 this.RotateTo(0);
                 this.RotateTo(40, 800, Easing.InQuint);
+            }
+            else
+            {
+                JudgementText
+                    .FadeInFromZero(300, Easing.OutQuint)
+                    .ScaleTo(Vector2.One)
+                    .ScaleTo(new Vector2(1.2f), 1800, Easing.OutQuint);
             }
 
             this.FadeOutFromOne(800);

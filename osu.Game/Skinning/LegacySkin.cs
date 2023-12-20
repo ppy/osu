@@ -453,7 +453,7 @@ namespace osu.Game.Skinning
 
         private Drawable? getJudgementAnimation(HitResult result)
         {
-            if (!result.IsHit())
+            if (result.IsMiss())
                 return this.GetAnimation("hit0", true, false);
 
             switch (result)
