@@ -163,6 +163,54 @@ namespace osu.Game.Rulesets.Osu.Tests.Editor
             checkControlPointSelected(1, false);
         }
 
+        [Test]
+        public void TestDragSliderTail()
+        {
+            AddStep($"move mouse to slider tail", () =>
+            {
+                Vector2 position = slider.EndPosition + new Vector2(10, 0);
+                InputManager.MoveMouseTo(drawableObject.Parent!.ToScreenSpace(position));
+            });
+            AddStep("shift + drag", () =>
+            {
+                InputManager.PressKey(Key.ShiftLeft);
+                InputManager.PressButton(MouseButton.Left);
+            });
+            moveMouseToControlPoint(1);
+            AddStep("release", () =>
+            {
+                InputManager.ReleaseButton(MouseButton.Left);
+                InputManager.ReleaseKey(Key.ShiftLeft);
+            });
+
+            AddAssert("expected distance halved",
+                () => Precision.AlmostEquals(slider.Path.Distance, 172.2, 0.1));
+
+            AddStep($"move mouse to slider tail", () =>
+            {
+                Vector2 position = slider.EndPosition + new Vector2(10, 0);
+                InputManager.MoveMouseTo(drawableObject.Parent!.ToScreenSpace(position));
+            });
+            AddStep("shift + drag", () =>
+            {
+                InputManager.PressKey(Key.ShiftLeft);
+                InputManager.PressButton(MouseButton.Left);
+            });
+            AddStep($"move mouse beyond last control point", () =>
+            {
+                Vector2 position = slider.Position + slider.Path.ControlPoints[2].Position + new Vector2(50, 0);
+                InputManager.MoveMouseTo(drawableObject.Parent!.ToScreenSpace(position));
+            });
+            AddStep("release", () =>
+            {
+                InputManager.ReleaseButton(MouseButton.Left);
+                InputManager.ReleaseKey(Key.ShiftLeft);
+            });
+
+            AddAssert("expected distance is calculated distance",
+                () => Precision.AlmostEquals(slider.Path.Distance, slider.Path.CalculatedDistance, 0.1));
+        }
+
         private void moveHitObject()
         {
             AddStep("move hitobject", () =>
