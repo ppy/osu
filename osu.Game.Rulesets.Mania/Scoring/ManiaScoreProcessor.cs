@@ -32,7 +32,7 @@ namespace osu.Game.Rulesets.Mania.Scoring
         }
 
         protected override double GetComboScoreChange(JudgementResult result)
-            => Judgement.ToNumericResult(result.Type) * Math.Min(Math.Max(0.5, Math.Log(result.ComboAfterJudgement, combo_base)), Math.Log(400, combo_base));
+            => GetNumericResultFor(result) * Math.Min(Math.Max(0.5, Math.Log(result.ComboAfterJudgement, combo_base)), Math.Log(400, combo_base));
 
         private class JudgementOrderComparer : IComparer<HitObject>
         {
