@@ -377,8 +377,8 @@ namespace osu.Game.Database
 
                 case 3:
                     return (long)Math.Round((
-                        990000 * comboProportion
-                        + 10000 * Math.Pow(score.Accuracy, 2 + 2 * score.Accuracy)
+                        850000 * comboProportion
+                        + 150000 * Math.Pow(score.Accuracy, 2 + 2 * score.Accuracy)
                         + bonusProportion) * modMultiplier);
 
                 default:
