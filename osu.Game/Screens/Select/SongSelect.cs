@@ -91,11 +91,11 @@ namespace osu.Game.Screens.Select
         /// Creates any "action" menu items for the provided beatmap (ie. "Select", "Play", "Edit").
         /// These will always be placed at the top of the context menu, with common items added below them.
         /// </summary>
-        /// <param name="beatmap">The beatmap to create items for.</param>
+        /// <param name="getBeatmap">The beatmap to create items for.</param>
         /// <returns>The menu items.</returns>
-        public virtual MenuItem[] CreateForwardNavigationMenuItemsForBeatmap(BeatmapInfo beatmap) => new MenuItem[]
+        public virtual MenuItem[] CreateForwardNavigationMenuItemsForBeatmap(Func<BeatmapInfo> getBeatmap) => new MenuItem[]
         {
-            new OsuMenuItem(@"Select", MenuItemType.Highlighted, () => FinaliseSelection(beatmap))
+            new OsuMenuItem(@"Select", MenuItemType.Highlighted, () => FinaliseSelection(getBeatmap()))
         };
 
         [Resolved]
