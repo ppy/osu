@@ -52,9 +52,17 @@ namespace osu.Game.Skinning
             if (animation?.FrameCount > 1 && !forceTransforms)
                 return;
 
-            switch (result)
+            if (result.IsMiss())
             {
-                case HitResult.Miss:
+                bool isTick = result != HitResult.Miss;
+
+                if (isTick)
+                {
+                    this.ScaleTo(0.6f);
+                    this.ScaleTo(0.3f, 100, Easing.In);
+                }
+                else
+                {
                     this.ScaleTo(1.6f);
                     this.ScaleTo(1, 100, Easing.In);
 
@@ -71,20 +79,19 @@ namespace osu.Game.Skinning
                     this.RotateTo(0);
                     this.RotateTo(rotation, fade_in_length)
                         .Then().RotateTo(rotation * 2, fade_out_delay + fade_out_length - fade_in_length, Easing.In);
-                    break;
+                }
+            }
+            else
+            {
+                this.ScaleTo(0.6f).Then()
+                    .ScaleTo(1.1f, fade_in_length * 0.8f).Then() // t = 0.8
+                    .Delay(fade_in_length * 0.2f) // t = 1.0
+                    .ScaleTo(0.9f, fade_in_length * 0.2f).Then() // t = 1.2
 
-                default:
-
-                    this.ScaleTo(0.6f).Then()
-                        .ScaleTo(1.1f, fade_in_length * 0.8f).Then() // t = 0.8
-                        .Delay(fade_in_length * 0.2f) // t = 1.0
-                        .ScaleTo(0.9f, fade_in_length * 0.2f).Then() // t = 1.2
-
-                        // stable dictates scale of 0.9->1 over time 1.0 to 1.4, but we are already at 1.2.
-                        // so we need to force the current value to be correct at 1.2 (0.95) then complete the
-                        // second half of the transform.
-                        .ScaleTo(0.95f).ScaleTo(finalScale, fade_in_length * 0.2f); // t = 1.4
-                    break;
+                    // stable dictates scale of 0.9->1 over time 1.0 to 1.4, but we are already at 1.2.
+                    // so we need to force the current value to be correct at 1.2 (0.95) then complete the
+                    // second half of the transform.
+                    .ScaleTo(0.95f).ScaleTo(finalScale, fade_in_length * 0.2f); // t = 1.4
             }
         }
 
