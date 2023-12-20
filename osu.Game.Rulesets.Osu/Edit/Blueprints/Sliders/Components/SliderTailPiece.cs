@@ -1,12 +1,15 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System.Linq;
 using osu.Framework.Allocation;
+using osu.Framework.Caching;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Input;
 using osu.Framework.Input.Events;
 using osu.Framework.Utils;
 using osu.Game.Graphics;
+using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Osu.Objects;
 using osu.Game.Screens.Edit;
 using osuTK;
@@ -24,6 +27,8 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders.Components
 
         private InputManager inputManager = null!;
 
+        private readonly Cached<SliderPath> fullPathCache = new Cached<SliderPath>();
+
         [Resolved(CanBeNull = true)]
         private EditorBeatmap? editorBeatmap { get; set; }
 
@@ -33,6 +38,7 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders.Components
         public SliderTailPiece(Slider slider, SliderPosition position)
             : base(slider, position)
         {
+            Slider.Path.ControlPoints.CollectionChanged += (_, _) => fullPathCache.Invalidate();
         }
 
         protected override void LoadComplete()
@@ -78,17 +84,18 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders.Components
 
         protected override void OnDrag(DragEvent e)
         {
-            double proposedDistance = Slider.Path.Distance + e.Delta.X;
+            double oldDistance = Slider.Path.Distance;
+            double proposedDistance = findClosestPathDistance(e);
 
             proposedDistance = MathHelper.Clamp(proposedDistance, 0, Slider.Path.CalculatedDistance);
             proposedDistance = MathHelper.Clamp(proposedDistance,
-                0.1 * Slider.Path.Distance / Slider.SliderVelocityMultiplier,
-                10 * Slider.Path.Distance / Slider.SliderVelocityMultiplier);
+                0.1 * oldDistance / Slider.SliderVelocityMultiplier,
+                10 * oldDistance / Slider.SliderVelocityMultiplier);
 
-            if (Precision.AlmostEquals(proposedDistance, Slider.Path.Distance))
+            if (Precision.AlmostEquals(proposedDistance, oldDistance))
                 return;
 
-            Slider.SliderVelocityMultiplier *= proposedDistance / Slider.Path.Distance;
+            Slider.SliderVelocityMultiplier *= proposedDistance / oldDistance;
             Slider.Path.ExpectedDistance.Value = proposedDistance;
             editorBeatmap?.Update(Slider);
         }
@@ -99,6 +106,49 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders.Components
             {
                 editorBeatmap?.EndChange();
             }
+        }
+
+        /// <summary>
+        /// Finds the expected distance value for which the slider end is closest to the mouse position.
+        /// </summary>
+        private double findClosestPathDistance(DragEvent e)
+        {
+            const double step1 = 10;
+            const double step2 = 0.1;
+
+            var desiredPosition = e.MousePosition - Slider.Position;
+
+            if (!fullPathCache.IsValid)
+                fullPathCache.Value = new SliderPath(Slider.Path.ControlPoints.ToArray());
+
+            // Do a linear search to find the closest point on the path to the mouse position.
+            double bestValue = 0;
+            double minDistance = double.MaxValue;
+
+            for (double d = 0; d <= fullPathCache.Value.CalculatedDistance; d += step1)
+            {
+                double t = d / fullPathCache.Value.CalculatedDistance;
+                float dist = Vector2.Distance(fullPathCache.Value.PositionAt(t), desiredPosition);
+
+                if (dist >= minDistance) continue;
+
+                minDistance = dist;
+                bestValue = d;
+            }
+
+            // Do another linear search to fine-tune the result.
+            for (double d = bestValue - step1; d <= bestValue + step1; d += step2)
+            {
+                double t = d / fullPathCache.Value.CalculatedDistance;
+                float dist = Vector2.Distance(fullPathCache.Value.PositionAt(t), desiredPosition);
+
+                if (dist >= minDistance) continue;
+
+                minDistance = dist;
+                bestValue = d;
+            }
+
+            return bestValue;
         }
     }
 }
