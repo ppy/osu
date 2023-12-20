@@ -86,6 +86,7 @@ namespace osu.Game.Rulesets.Scoring
         /// Indicates a large tick miss.
         /// </summary>
         [EnumMember(Value = "large_tick_miss")]
+        [Description(@"x")]
         [Order(10)]
         LargeTickMiss,
 
@@ -117,6 +118,7 @@ namespace osu.Game.Rulesets.Scoring
         /// Indicates a miss that should be ignored for scoring purposes.
         /// </summary>
         [EnumMember(Value = "ignore_miss")]
+        [Description("x")]
         [Order(13)]
         IgnoreMiss,
 
@@ -260,6 +262,25 @@ namespace osu.Game.Rulesets.Scoring
             {
                 case HitResult.SmallBonus:
                 case HitResult.LargeBonus:
+                    return true;
+
+                default:
+                    return false;
+            }
+        }
+
+        /// <summary>
+        /// Whether a <see cref="HitResult"/> represents a miss of any type.
+        /// </summary>
+        public static bool IsMiss(this HitResult result)
+        {
+            switch (result)
+            {
+                case HitResult.IgnoreMiss:
+                case HitResult.Miss:
+                case HitResult.SmallTickMiss:
+                case HitResult.LargeTickMiss:
+                case HitResult.ComboBreak:
                     return true;
 
                 default:
