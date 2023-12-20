@@ -166,7 +166,7 @@ namespace osu.Game.Rulesets.Osu.Tests.Editor
         [Test]
         public void TestDragSliderTail()
         {
-            AddStep($"move mouse to slider tail", () =>
+            AddStep("move mouse to slider tail", () =>
             {
                 Vector2 position = slider.EndPosition + new Vector2(10, 0);
                 InputManager.MoveMouseTo(drawableObject.Parent!.ToScreenSpace(position));
@@ -186,7 +186,7 @@ namespace osu.Game.Rulesets.Osu.Tests.Editor
             AddAssert("expected distance halved",
                 () => Precision.AlmostEquals(slider.Path.Distance, 172.2, 0.1));
 
-            AddStep($"move mouse to slider tail", () =>
+            AddStep("move mouse to slider tail", () =>
             {
                 Vector2 position = slider.EndPosition + new Vector2(10, 0);
                 InputManager.MoveMouseTo(drawableObject.Parent!.ToScreenSpace(position));
@@ -196,7 +196,7 @@ namespace osu.Game.Rulesets.Osu.Tests.Editor
                 InputManager.PressKey(Key.ShiftLeft);
                 InputManager.PressButton(MouseButton.Left);
             });
-            AddStep($"move mouse beyond last control point", () =>
+            AddStep("move mouse beyond last control point", () =>
             {
                 Vector2 position = slider.Position + slider.Path.ControlPoints[2].Position + new Vector2(50, 0);
                 InputManager.MoveMouseTo(drawableObject.Parent!.ToScreenSpace(position));
