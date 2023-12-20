@@ -270,6 +270,25 @@ namespace osu.Game.Rulesets.Scoring
         }
 
         /// <summary>
+        /// Whether a <see cref="HitResult"/> represents a miss of any type.
+        /// </summary>
+        public static bool IsMiss(this HitResult result)
+        {
+            switch (result)
+            {
+                case HitResult.IgnoreMiss:
+                case HitResult.Miss:
+                case HitResult.SmallTickMiss:
+                case HitResult.LargeTickMiss:
+                case HitResult.ComboBreak:
+                    return true;
+
+                default:
+                    return false;
+            }
+        }
+
+        /// <summary>
         /// Whether a <see cref="HitResult"/> represents a successful hit.
         /// </summary>
         public static bool IsHit(this HitResult result)
