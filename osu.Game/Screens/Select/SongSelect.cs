@@ -13,7 +13,6 @@ using osu.Framework.Bindables;
 using osu.Framework.Extensions.ObjectExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
-using osu.Framework.Graphics.Effects;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.UserInterface;
@@ -274,28 +273,20 @@ namespace osu.Game.Screens.Select
                                                         RelativeSizeAxes = Axes.Both,
                                                         Masking = true,
                                                         CornerRadius = 10,
-                                                        EdgeEffect = new EdgeEffectParameters
-                                                        {
-                                                            Type = EdgeEffectType.Glow,
-                                                            Hollow = true,
-                                                            Colour = new Color4(130, 204, 255, 15),
-                                                            Radius = 10,
-                                                        },
                                                         Children = new Drawable[]
                                                         {
                                                             new Box
                                                             {
-                                                                Colour = new Color4(130, 204, 255, 40),
-                                                                Blending = BlendingParameters.Additive,
                                                                 RelativeSizeAxes = Axes.Both,
+                                                                Colour = Colour4.Black.Opacity(0.3f),
                                                             },
                                                             advancedStats = new AdvancedStats(2)
                                                             {
                                                                 RelativeSizeAxes = Axes.X,
                                                                 AutoSizeAxes = Axes.Y,
-                                                                Width = 0.8f,
                                                                 Anchor = Anchor.Centre,
                                                                 Origin = Anchor.Centre,
+                                                                Padding = new MarginPadding(10)
                                                             },
                                                         }
                                                     },
