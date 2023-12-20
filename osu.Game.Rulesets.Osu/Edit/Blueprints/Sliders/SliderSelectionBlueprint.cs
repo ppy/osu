@@ -72,7 +72,7 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders
             {
                 BodyPiece = new SliderBodyPiece(),
                 HeadOverlay = CreateCircleOverlay(HitObject, SliderPosition.Start),
-                TailPiece = new SliderTailPiece(HitObject, SliderPosition.End),
+                TailPiece = CreateTailPiece(HitObject, SliderPosition.End),
             };
         }
 
@@ -415,5 +415,6 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders
             BodyPiece.ReceivePositionalInputAt(screenSpacePos) || ControlPointVisualiser?.Pieces.Any(p => p.ReceivePositionalInputAt(screenSpacePos)) == true;
 
         protected virtual SliderCircleOverlay CreateCircleOverlay(Slider slider, SliderPosition position) => new SliderCircleOverlay(slider, position);
+        protected virtual SliderTailPiece CreateTailPiece(Slider slider, SliderPosition position) => new SliderTailPiece(slider, position);
     }
 }
