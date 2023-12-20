@@ -26,13 +26,50 @@ namespace osu.Game.Rulesets.Mania.Scoring
 
         protected override double ComputeTotalScore(double comboProgress, double accuracyProgress, double bonusPortion)
         {
-            return 10000 * comboProgress
-                   + 990000 * Math.Pow(Accuracy.Value, 2 + 2 * Accuracy.Value) * accuracyProgress
+            return 150000 * comboProgress
+                   + 850000 * Math.Pow(Accuracy.Value, 2 + 2 * Accuracy.Value) * accuracyProgress
                    + bonusPortion;
         }
 
+        protected override double GetNumericResultFor(JudgementResult result)
+        {
+            switch (result.Type)
+            {
+                case HitResult.Perfect:
+                    return 305;
+            }
+
+            return base.GetNumericResultFor(result);
+        }
+
+        protected override double GetMaxNumericResultFor(JudgementResult result)
+        {
+            switch (result.Judgement.MaxResult)
+            {
+                case HitResult.Perfect:
+                    return 305;
+            }
+
+            return base.GetMaxNumericResultFor(result);
+        }
+
         protected override double GetComboScoreChange(JudgementResult result)
-            => GetNumericResultFor(result) * Math.Min(Math.Max(0.5, Math.Log(result.ComboAfterJudgement, combo_base)), Math.Log(400, combo_base));
+        {
+            double numericResult;
+
+            switch (result.Type)
+            {
+                case HitResult.Perfect:
+                    numericResult = 300;
+                    break;
+
+                default:
+                    numericResult = GetNumericResultFor(result);
+                    break;
+            }
+
+            return numericResult * Math.Min(Math.Max(0.5, Math.Log(result.ComboAfterJudgement, combo_base)), Math.Log(400, combo_base));
+        }
 
         private class JudgementOrderComparer : IComparer<HitObject>
         {
