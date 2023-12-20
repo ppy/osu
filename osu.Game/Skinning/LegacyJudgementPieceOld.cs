@@ -87,6 +87,7 @@ namespace osu.Game.Skinning
                     .ScaleTo(1.1f, fade_in_length * 0.8f).Then() // t = 0.8
                     .Delay(fade_in_length * 0.2f) // t = 1.0
                     .ScaleTo(0.9f, fade_in_length * 0.2f).Then() // t = 1.2
+
                     // stable dictates scale of 0.9->1 over time 1.0 to 1.4, but we are already at 1.2.
                     // so we need to force the current value to be correct at 1.2 (0.95) then complete the
                     // second half of the transform.
