@@ -61,7 +61,7 @@ namespace osu.Game.Screens.Select
             {
                 Type = EdgeEffectType.Glow,
                 Colour = new Color4(130, 204, 255, 150),
-                Radius = 20,
+                Radius = 15,
                 Roundness = 15,
             };
         }
@@ -305,7 +305,7 @@ namespace osu.Game.Screens.Select
                             },
                             infoLabelContainer = new FillFlowContainer
                             {
-                                Margin = new MarginPadding { Top = 20 },
+                                Margin = new MarginPadding { Top = 8 },
                                 Spacing = new Vector2(20, 0),
                                 AutoSizeAxes = Axes.Both,
                             }

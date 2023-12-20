@@ -64,21 +64,67 @@ namespace osu.Game.Screens.Select.Details
             }
         }
 
-        public AdvancedStats()
+        public AdvancedStats(int columns = 1)
         {
-            Child = new FillFlowContainer
+            switch (columns)
             {
-                RelativeSizeAxes = Axes.X,
-                AutoSizeAxes = Axes.Y,
-                Children = new[]
-                {
-                    FirstValue = new StatisticRow(), // circle size/key amount
-                    HpDrain = new StatisticRow { Title = BeatmapsetsStrings.ShowStatsDrain },
-                    Accuracy = new StatisticRow { Title = BeatmapsetsStrings.ShowStatsAccuracy },
-                    ApproachRate = new StatisticRow { Title = BeatmapsetsStrings.ShowStatsAr },
-                    starDifficulty = new StatisticRow(10, true) { Title = BeatmapsetsStrings.ShowStatsStars },
-                },
-            };
+                case 1:
+                    Child = new FillFlowContainer
+                    {
+                        RelativeSizeAxes = Axes.X,
+                        AutoSizeAxes = Axes.Y,
+                        Children = new[]
+                        {
+                            FirstValue = new StatisticRow(), // circle size/key amount
+                            HpDrain = new StatisticRow { Title = BeatmapsetsStrings.ShowStatsDrain },
+                            Accuracy = new StatisticRow { Title = BeatmapsetsStrings.ShowStatsAccuracy },
+                            ApproachRate = new StatisticRow { Title = BeatmapsetsStrings.ShowStatsAr },
+                            starDifficulty = new StatisticRow(10, true) { Title = BeatmapsetsStrings.ShowStatsStars },
+                        },
+                    };
+                    break;
+
+                case 2:
+                    Child = new FillFlowContainer
+                    {
+                        RelativeSizeAxes = Axes.X,
+                        AutoSizeAxes = Axes.Y,
+                        Direction = FillDirection.Full,
+                        Children = new[]
+                        {
+                            FirstValue = new StatisticRow
+                            {
+                                Width = 0.5f,
+                                Padding = new MarginPadding { Right = 5, Vertical = 2.5f },
+                            }, // circle size/key amount
+                            HpDrain = new StatisticRow
+                            {
+                                Title = BeatmapsetsStrings.ShowStatsDrain,
+                                Width = 0.5f,
+                                Padding = new MarginPadding { Left = 5, Vertical = 2.5f },
+                            },
+                            Accuracy = new StatisticRow
+                            {
+                                Title = BeatmapsetsStrings.ShowStatsAccuracy,
+                                Width = 0.5f,
+                                Padding = new MarginPadding { Right = 5, Vertical = 2.5f },
+                            },
+                            ApproachRate = new StatisticRow
+                            {
+                                Title = BeatmapsetsStrings.ShowStatsAr,
+                                Width = 0.5f,
+                                Padding = new MarginPadding { Left = 5, Vertical = 2.5f },
+                            },
+                            starDifficulty = new StatisticRow(10, true)
+                            {
+                                Title = BeatmapsetsStrings.ShowStatsStars,
+                                Width = 0.5f,
+                                Padding = new MarginPadding { Right = 5, Vertical = 2.5f },
+                            },
+                        },
+                    };
+                    break;
+            }
         }
 
         [BackgroundDependencyLoader]
@@ -289,23 +335,36 @@ namespace osu.Game.Screens.Select.Details
                             Font = OsuFont.GetFont(size: 12)
                         },
                     },
-                    bar = new Bar
+                    new Container
                     {
-                        Origin = Anchor.CentreLeft,
-                        Anchor = Anchor.CentreLeft,
-                        RelativeSizeAxes = Axes.X,
-                        Height = 5,
-                        BackgroundColour = Color4.White.Opacity(0.5f),
+                        RelativeSizeAxes = Axes.Both,
                         Padding = new MarginPadding { Left = name_width + 10, Right = value_width + 10 },
-                    },
-                    ModBar = new Bar
-                    {
-                        Origin = Anchor.CentreLeft,
-                        Anchor = Anchor.CentreLeft,
-                        RelativeSizeAxes = Axes.X,
-                        Alpha = 0.5f,
-                        Height = 5,
-                        Padding = new MarginPadding { Left = name_width + 10, Right = value_width + 10 },
+                        Children = new Drawable[]
+                        {
+                            new Container
+                            {
+                                Origin = Anchor.CentreLeft,
+                                Anchor = Anchor.CentreLeft,
+                                RelativeSizeAxes = Axes.X,
+                                Height = 5,
+
+                                CornerRadius = 2,
+                                Masking = true,
+                                Children = new Drawable[]
+                                {
+                                    bar = new Bar
+                                    {
+                                        RelativeSizeAxes = Axes.Both,
+                                        BackgroundColour = Color4.White.Opacity(0.5f),
+                                    },
+                                    ModBar = new Bar
+                                    {
+                                        RelativeSizeAxes = Axes.Both,
+                                        Alpha = 0.5f,
+                                    },
+                                }
+                            },
+                        }
                     },
                     new Container
                     {
