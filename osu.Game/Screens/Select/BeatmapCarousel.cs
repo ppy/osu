@@ -301,6 +301,9 @@ namespace osu.Game.Screens.Select
             if (loadedTestBeatmaps)
                 return;
 
+            var setsRequiringUpdate = new HashSet<BeatmapSetInfo>();
+            var setsRequiringRemoval = new HashSet<Guid>();
+
             if (changes == null)
             {
                 // During initial population, we must manually account for the fact that our original query was done on an async thread.
@@ -314,67 +317,80 @@ namespace osu.Game.Screens.Select
                 foreach (var id in realmSets)
                 {
                     if (!root.BeatmapSetsByID.ContainsKey(id))
-                        updateBeatmapSet(realm.Realm.Find<BeatmapSetInfo>(id)!.Detach());
+                        setsRequiringUpdate.Add(realm.Realm.Find<BeatmapSetInfo>(id)!.Detach());
                 }
 
                 foreach (var id in root.BeatmapSetsByID.Keys)
                 {
                     if (!realmSets.Contains(id))
-                        removeBeatmapSet(id);
+                        setsRequiringRemoval.Add(id);
                 }
+            }
+            else
+            {
+                foreach (int i in changes.NewModifiedIndices)
+                    setsRequiringUpdate.Add(sender[i].Detach());
 
-                invalidateAfterChange();
-                BeatmapSetsLoaded = true;
-                return;
+                foreach (int i in changes.InsertedIndices)
+                    setsRequiringUpdate.Add(sender[i].Detach());
             }
 
-            foreach (int i in changes.NewModifiedIndices)
-                updateBeatmapSet(sender[i].Detach());
-
-            foreach (int i in changes.InsertedIndices)
-                updateBeatmapSet(sender[i].Detach());
-
-            if (changes.DeletedIndices.Length > 0 && SelectedBeatmapInfo != null)
+            // All local operations must be scheduled.
+            //
+            // If we don't schedule, beatmaps getting changed while song select is suspended (ie. last played being updated)
+            // will cause unexpected sounds and operations to occur in the background.
+            Schedule(() =>
             {
-                // If SelectedBeatmapInfo is non-null, the set should also be non-null.
-                Debug.Assert(SelectedBeatmapSet != null);
-
-                // To handle the beatmap update flow, attempt to track selection changes across delete-insert transactions.
-                // When an update occurs, the previous beatmap set is either soft or hard deleted.
-                // Check if the current selection was potentially deleted by re-querying its validity.
-                bool selectedSetMarkedDeleted = sender.Realm.Find<BeatmapSetInfo>(SelectedBeatmapSet.ID)?.DeletePending != false;
-
-                int[] modifiedAndInserted = changes.NewModifiedIndices.Concat(changes.InsertedIndices).ToArray();
-
-                if (selectedSetMarkedDeleted && modifiedAndInserted.Any())
+                try
                 {
-                    // If it is no longer valid, make the bold assumption that an updated version will be available in the modified/inserted indices.
-                    // This relies on the full update operation being in a single transaction, so please don't change that.
-                    foreach (int i in modifiedAndInserted)
+                    foreach (var set in setsRequiringRemoval)
+                        removeBeatmapSet(set);
+
+                    foreach (var set in setsRequiringUpdate)
+                        updateBeatmapSet(set);
+
+                    if (changes?.DeletedIndices.Length > 0 && SelectedBeatmapInfo != null)
                     {
-                        var beatmapSetInfo = sender[i];
+                        // If SelectedBeatmapInfo is non-null, the set should also be non-null.
+                        Debug.Assert(SelectedBeatmapSet != null);
 
-                        foreach (var beatmapInfo in beatmapSetInfo.Beatmaps)
+                        // To handle the beatmap update flow, attempt to track selection changes across delete-insert transactions.
+                        // When an update occurs, the previous beatmap set is either soft or hard deleted.
+                        // Check if the current selection was potentially deleted by re-querying its validity.
+                        bool selectedSetMarkedDeleted = realm.Run(r => r.Find<BeatmapSetInfo>(SelectedBeatmapSet.ID)?.DeletePending != false);
+
+                        if (selectedSetMarkedDeleted && setsRequiringUpdate.Any())
                         {
-                            if (!((IBeatmapMetadataInfo)beatmapInfo.Metadata).Equals(SelectedBeatmapInfo.Metadata))
-                                continue;
-
-                            // Best effort matching. We can't use ID because in the update flow a new version will get its own GUID.
-                            if (beatmapInfo.DifficultyName == SelectedBeatmapInfo.DifficultyName)
+                            // If it is no longer valid, make the bold assumption that an updated version will be available in the modified/inserted indices.
+                            // This relies on the full update operation being in a single transaction, so please don't change that.
+                            foreach (var set in setsRequiringUpdate)
                             {
-                                SelectBeatmap(beatmapInfo);
-                                return;
+                                foreach (var beatmapInfo in set.Beatmaps)
+                                {
+                                    if (!((IBeatmapMetadataInfo)beatmapInfo.Metadata).Equals(SelectedBeatmapInfo.Metadata))
+                                        continue;
+
+                                    // Best effort matching. We can't use ID because in the update flow a new version will get its own GUID.
+                                    if (beatmapInfo.DifficultyName == SelectedBeatmapInfo.DifficultyName)
+                                    {
+                                        SelectBeatmap(beatmapInfo);
+                                        return;
+                                    }
+                                }
                             }
+
+                            // If a direct selection couldn't be made, it's feasible that the difficulty name (or beatmap metadata) changed.
+                            // Let's attempt to follow set-level selection anyway.
+                            SelectBeatmap(setsRequiringUpdate.First().Beatmaps.First());
                         }
                     }
-
-                    // If a direct selection couldn't be made, it's feasible that the difficulty name (or beatmap metadata) changed.
-                    // Let's attempt to follow set-level selection anyway.
-                    SelectBeatmap(sender[modifiedAndInserted.First()].Beatmaps.First());
                 }
-            }
-
-            invalidateAfterChange();
+                finally
+                {
+                    BeatmapSetsLoaded = true;
+                    invalidateAfterChange();
+                }
+            });
         }
 
         private void beatmapsChanged(IRealmCollection<BeatmapInfo> sender, ChangeSet? changes)
