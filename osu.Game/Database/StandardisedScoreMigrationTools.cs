@@ -26,7 +26,7 @@ namespace osu.Game.Database
             if (score.IsLegacyScore)
                 return false;
 
-            if (score.TotalScoreVersion > 30000004)
+            if (score.TotalScoreVersion > 30000002)
                 return false;
 
             // Recalculate the old-style standardised score to see if this was an old lazer score.
@@ -293,12 +293,22 @@ namespace osu.Game.Database
                     // Roughly corresponds to integrating f(combo) = combo ^ COMBO_EXPONENT (omitting constants)
                     double maximumAchievableComboPortionInStandardisedScore = Math.Pow(maximumLegacyCombo, 1 + ScoreProcessor.COMBO_EXPONENT);
 
-                    double comboPortionInScoreV1 = maximumAchievableComboPortionInScoreV1 * comboProportion / score.Accuracy;
-
                     // This is - roughly - how much score, in the combo portion, the longest combo on this particular play would gain in score V1.
                     double comboPortionFromLongestComboInScoreV1 = Math.Pow(score.MaxCombo, 2);
                     // Same for standardised score.
                     double comboPortionFromLongestComboInStandardisedScore = Math.Pow(score.MaxCombo, 1 + ScoreProcessor.COMBO_EXPONENT);
+
+                    // We estimate the combo portion of the score in score V1 terms.
+                    // The division by accuracy is supposed to lessen the impact of accuracy on the combo portion,
+                    // but in some edge cases it cannot sanely undo it.
+                    // Therefore the resultant value is clamped from both sides for sanity.
+                    // The clamp from below to `comboPortionFromLongestComboInScoreV1` targets near-FC scores wherein
+                    // the player had bad accuracy at the end of their longest combo, which causes the division by accuracy
+                    // to underestimate the combo portion.
+                    // Ideally, this would be clamped from above to `maximumAchievableComboPortionInScoreV1` too,
+                    // but in practice this appears to fail for some scores (https://github.com/ppy/osu/pull/25876#issuecomment-1862248413).
+                    // TODO: investigate the above more closely
+                    double comboPortionInScoreV1 = Math.Max(maximumAchievableComboPortionInScoreV1 * comboProportion / score.Accuracy, comboPortionFromLongestComboInScoreV1);
 
                     // Calculate how many times the longest combo the user has achieved in the play can repeat
                     // without exceeding the combo portion in score V1 as achieved by the player.
