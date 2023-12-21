@@ -31,7 +31,12 @@ namespace osu.Game.Rulesets.Mania.Scoring
                    + bonusPortion;
         }
 
-        public override int GetRawAccuracyScore(HitResult result)
+        protected override double GetComboScoreChange(JudgementResult result)
+        {
+            return getBaseComboScoreForResult(result.Type) * Math.Min(Math.Max(0.5, Math.Log(result.ComboAfterJudgement, combo_base)), Math.Log(400, combo_base));
+        }
+
+        public override int GetBaseScoreForResult(HitResult result)
         {
             switch (result)
             {
@@ -39,10 +44,10 @@ namespace osu.Game.Rulesets.Mania.Scoring
                     return 305;
             }
 
-            return base.GetRawAccuracyScore(result);
+            return base.GetBaseScoreForResult(result);
         }
 
-        public override int GetRawComboScore(HitResult result)
+        private int getBaseComboScoreForResult(HitResult result)
         {
             switch (result)
             {
@@ -50,11 +55,8 @@ namespace osu.Game.Rulesets.Mania.Scoring
                     return 300;
             }
 
-            return base.GetRawComboScore(result);
+            return GetBaseScoreForResult(result);
         }
-
-        protected override double GetComboScoreChange(JudgementResult result)
-            => GetRawComboScore(result.Type) * Math.Min(Math.Max(0.5, Math.Log(result.ComboAfterJudgement, combo_base)), Math.Log(400, combo_base));
 
         private class JudgementOrderComparer : IComparer<HitObject>
         {

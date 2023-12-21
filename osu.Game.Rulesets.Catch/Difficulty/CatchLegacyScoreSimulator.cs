@@ -136,7 +136,7 @@ namespace osu.Game.Rulesets.Catch.Difficulty
             if (isBonus)
             {
                 legacyBonusScore += scoreIncrease;
-                standardisedBonusScore += scoreProcessor.GetRawBonusScore(bonusResult);
+                standardisedBonusScore += scoreProcessor.GetBaseScoreForResult(bonusResult);
             }
             else
                 attributes.AccuracyScore += scoreIncrease;

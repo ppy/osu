@@ -313,7 +313,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
             updateBonusScore();
         }
 
-        private static readonly int score_per_tick = new OsuScoreProcessor().GetRawBonusScore(new SpinnerBonusTick.OsuSpinnerBonusTickJudgement().MaxResult);
+        private static readonly int score_per_tick = new OsuScoreProcessor().GetBaseScoreForResult(new SpinnerBonusTick.OsuSpinnerBonusTickJudgement().MaxResult);
 
         private void updateBonusScore()
         {

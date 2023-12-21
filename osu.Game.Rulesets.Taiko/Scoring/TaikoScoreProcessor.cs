@@ -28,12 +28,12 @@ namespace osu.Game.Rulesets.Taiko.Scoring
 
         protected override double GetComboScoreChange(JudgementResult result)
         {
-            return GetRawComboScore(result.Type)
+            return GetBaseScoreForResult(result.Type)
                    * Math.Min(Math.Max(0.5, Math.Log(result.ComboAfterJudgement, combo_base)), Math.Log(400, combo_base))
                    * strongScaleValue(result);
         }
 
-        public override int GetRawAccuracyScore(HitResult result)
+        public override int GetBaseScoreForResult(HitResult result)
         {
             switch (result)
             {
@@ -41,18 +41,7 @@ namespace osu.Game.Rulesets.Taiko.Scoring
                     return 150;
             }
 
-            return base.GetRawAccuracyScore(result);
-        }
-
-        public override int GetRawComboScore(HitResult result)
-        {
-            switch (result)
-            {
-                case HitResult.Ok:
-                    return 150;
-            }
-
-            return base.GetRawComboScore(result);
+            return base.GetBaseScoreForResult(result);
         }
 
         private double strongScaleValue(JudgementResult result)

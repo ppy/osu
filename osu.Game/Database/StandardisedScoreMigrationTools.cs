@@ -57,14 +57,14 @@ namespace osu.Game.Database
             // We are constructing a "best possible" score from the statistics provided because it's the best we can do.
             List<HitResult> sortedHits = score.Statistics
                                               .Where(kvp => kvp.Key.AffectsCombo())
-                                              .OrderByDescending(kvp => processor.GetRawComboScore(kvp.Key))
+                                              .OrderByDescending(kvp => processor.GetBaseScoreForResult(kvp.Key))
                                               .SelectMany(kvp => Enumerable.Repeat(kvp.Key, kvp.Value))
                                               .ToList();
 
             // Attempt to use maximum statistics from the database.
             var maximumJudgements = score.MaximumStatistics
                                          .Where(kvp => kvp.Key.AffectsCombo())
-                                         .OrderByDescending(kvp => processor.GetRawComboScore(kvp.Key))
+                                         .OrderByDescending(kvp => processor.GetBaseScoreForResult(kvp.Key))
                                          .SelectMany(kvp => Enumerable.Repeat(new FakeJudgement(kvp.Key), kvp.Value))
                                          .ToList();
 
