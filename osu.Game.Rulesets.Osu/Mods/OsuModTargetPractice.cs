@@ -56,6 +56,14 @@ namespace osu.Game.Rulesets.Osu.Mods
         [SettingSource("Metronome ticks", "Whether a metronome beat should play in the background")]
         public Bindable<bool> Metronome { get; } = new BindableBool(true);
 
+        [SettingSource("Circles per beat", "The amount of circles per beat")]
+        public BindableNumber<double> BeatLengthDivisor { get; } = new BindableDouble(1)
+        {
+            MinValue = 1,
+            MaxValue = 4,
+            Precision = 1,
+        };
+
         #region Constants
 
         /// <summary>
@@ -214,7 +222,7 @@ namespace osu.Game.Rulesets.Osu.Mods
             {
                 double beat = beats[i];
 
-                if (!definitelyBigger(beats[i + 1] - beat, beatmap.ControlPointInfo.TimingPointAt(beat).BeatLength / 2))
+                if (!definitelyBigger(beats[i + 1] - beat, beatmap.ControlPointInfo.TimingPointAt(beat).BeatLength / 2 / BeatLengthDivisor.Value))
                     beats.RemoveAt(i);
             }
 
@@ -375,7 +383,7 @@ namespace osu.Game.Rulesets.Osu.Mods
             {
                 beats.Add(Math.Floor(currentTime));
                 i++;
-                currentTime = timingPoint.Time + i * timingPoint.BeatLength;
+                currentTime = timingPoint.Time + i * (timingPoint.BeatLength / BeatLengthDivisor.Value);
             }
 
             return beats;
