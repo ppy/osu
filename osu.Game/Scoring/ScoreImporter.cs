@@ -106,7 +106,7 @@ namespace osu.Game.Scoring
             else if (model.IsLegacyScore)
             {
                 model.LegacyTotalScore = model.TotalScore;
-                model.TotalScore = StandardisedScoreMigrationTools.ConvertFromLegacyTotalScore(model, beatmaps());
+                StandardisedScoreMigrationTools.UpdateFromLegacy(model, beatmaps());
             }
         }
 

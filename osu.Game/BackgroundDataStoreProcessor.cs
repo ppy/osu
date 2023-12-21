@@ -340,15 +340,12 @@ namespace osu.Game
 
                 try
                 {
-                    var score = scoreManager.Query(s => s.ID == id);
-                    long newTotalScore = StandardisedScoreMigrationTools.ConvertFromLegacyTotalScore(score, beatmapManager);
-
                     // Can't use async overload because we're not on the update thread.
                     // ReSharper disable once MethodHasAsyncOverload
                     realmAccess.Write(r =>
                     {
                         ScoreInfo s = r.Find<ScoreInfo>(id)!;
-                        s.TotalScore = newTotalScore;
+                        StandardisedScoreMigrationTools.UpdateFromLegacy(s, beatmapManager);
                         s.TotalScoreVersion = LegacyScoreEncoder.LATEST_VERSION;
                     });
 

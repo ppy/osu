@@ -232,12 +232,35 @@ namespace osu.Game.Database
         }
 
         /// <summary>
+        /// Updates a legacy <see cref="ScoreInfo"/> to standardised scoring.
+        /// </summary>
+        /// <param name="score">The score to update.</param>
+        /// <param name="beatmaps">A <see cref="BeatmapManager"/> used for <see cref="WorkingBeatmap"/> lookups.</param>
+        public static void UpdateFromLegacy(ScoreInfo score, BeatmapManager beatmaps)
+        {
+            score.TotalScore = convertFromLegacyTotalScore(score, beatmaps);
+            score.Accuracy = ComputeAccuracy(score);
+        }
+
+        /// <summary>
+        /// Updates a legacy <see cref="ScoreInfo"/> to standardised scoring.
+        /// </summary>
+        /// <param name="score">The score to update.</param>
+        /// <param name="difficulty">The beatmap difficulty.</param>
+        /// <param name="attributes">The legacy scoring attributes for the beatmap which the score was set on.</param>
+        public static void UpdateFromLegacy(ScoreInfo score, LegacyBeatmapConversionDifficultyInfo difficulty, LegacyScoreAttributes attributes)
+        {
+            score.TotalScore = convertFromLegacyTotalScore(score, difficulty, attributes);
+            score.Accuracy = ComputeAccuracy(score);
+        }
+
+        /// <summary>
         /// Converts from <see cref="ScoreInfo.LegacyTotalScore"/> to the new standardised scoring of <see cref="ScoreProcessor"/>.
         /// </summary>
         /// <param name="score">The score to convert the total score of.</param>
         /// <param name="beatmaps">A <see cref="BeatmapManager"/> used for <see cref="WorkingBeatmap"/> lookups.</param>
         /// <returns>The standardised total score.</returns>
-        public static long ConvertFromLegacyTotalScore(ScoreInfo score, BeatmapManager beatmaps)
+        private static long convertFromLegacyTotalScore(ScoreInfo score, BeatmapManager beatmaps)
         {
             if (!score.IsLegacyScore)
                 return score.TotalScore;
@@ -260,7 +283,7 @@ namespace osu.Game.Database
             ILegacyScoreSimulator sv1Simulator = legacyRuleset.CreateLegacyScoreSimulator();
             LegacyScoreAttributes attributes = sv1Simulator.Simulate(beatmap, playableBeatmap);
 
-            return ConvertFromLegacyTotalScore(score, LegacyBeatmapConversionDifficultyInfo.FromBeatmap(beatmap.Beatmap), attributes);
+            return convertFromLegacyTotalScore(score, LegacyBeatmapConversionDifficultyInfo.FromBeatmap(beatmap.Beatmap), attributes);
         }
 
         /// <summary>
@@ -270,7 +293,7 @@ namespace osu.Game.Database
         /// <param name="difficulty">The beatmap difficulty.</param>
         /// <param name="attributes">The legacy scoring attributes for the beatmap which the score was set on.</param>
         /// <returns>The standardised total score.</returns>
-        public static long ConvertFromLegacyTotalScore(ScoreInfo score, LegacyBeatmapConversionDifficultyInfo difficulty, LegacyScoreAttributes attributes)
+        private static long convertFromLegacyTotalScore(ScoreInfo score, LegacyBeatmapConversionDifficultyInfo difficulty, LegacyScoreAttributes attributes)
         {
             if (!score.IsLegacyScore)
                 return score.TotalScore;
@@ -420,6 +443,19 @@ namespace osu.Game.Database
                 default:
                     return score.TotalScore;
             }
+        }
+
+        public static double ComputeAccuracy(ScoreInfo scoreInfo)
+        {
+            Ruleset ruleset = scoreInfo.Ruleset.CreateInstance();
+            ScoreProcessor scoreProcessor = ruleset.CreateScoreProcessor();
+
+            int baseScore = scoreInfo.Statistics.Where(kvp => kvp.Key.AffectsAccuracy())
+                                     .Sum(kvp => kvp.Value * scoreProcessor.GetBaseScoreForResult(kvp.Key));
+            int maxBaseScore = scoreInfo.MaximumStatistics.Where(kvp => kvp.Key.AffectsAccuracy())
+                                        .Sum(kvp => kvp.Value * scoreProcessor.GetBaseScoreForResult(kvp.Key));
+
+            return maxBaseScore == 0 ? 1 : baseScore / (double)maxBaseScore;
         }
 
         /// <summary>
