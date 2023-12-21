@@ -131,7 +131,7 @@ namespace osu.Game.Scoring
             // Populate the maximum statistics.
             HitResult maxBasicResult = rulesetInstance.GetHitResults()
                                                       .Select(h => h.result)
-                                                      .Where(h => h.IsBasic()).MaxBy(scoreProcessor.GetRawAccuracyScore);
+                                                      .Where(h => h.IsBasic()).MaxBy(scoreProcessor.GetBaseScoreForResult);
 
             foreach ((HitResult result, int count) in score.Statistics)
             {

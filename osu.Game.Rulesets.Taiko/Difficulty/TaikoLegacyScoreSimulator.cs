@@ -193,7 +193,7 @@ namespace osu.Game.Rulesets.Taiko.Difficulty
             if (isBonus)
             {
                 legacyBonusScore += scoreIncrease;
-                standardisedBonusScore += scoreProcessor.GetRawBonusScore(bonusResult);
+                standardisedBonusScore += scoreProcessor.GetBaseScoreForResult(bonusResult);
             }
             else
                 attributes.AccuracyScore += scoreIncrease;
