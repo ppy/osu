@@ -48,7 +48,7 @@ namespace osu.Game.Tests.Gameplay
             // Apply a judgement
             scoreProcessor.ApplyResult(new JudgementResult(new HitObject(), new TestJudgement(HitResult.LargeBonus)) { Type = HitResult.LargeBonus });
 
-            Assert.That(scoreProcessor.TotalScore.Value, Is.EqualTo(Judgement.LARGE_BONUS_SCORE));
+            Assert.That(scoreProcessor.TotalScore.Value, Is.EqualTo(scoreProcessor.GetBaseScoreForResult(HitResult.LargeBonus)));
         }
 
         [Test]
