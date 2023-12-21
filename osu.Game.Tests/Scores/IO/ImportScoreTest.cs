@@ -196,6 +196,7 @@ namespace osu.Game.Tests.Scores.IO
                         User = new APIUser { Username = "Test user" },
                         BeatmapInfo = beatmap.Beatmaps.First(),
                         Ruleset = new OsuRuleset().RulesetInfo,
+                        Version = "12345",
                         Mods = new Mod[] { new OsuModHardRock(), new OsuModDoubleTime() },
                     };
 
@@ -203,6 +204,7 @@ namespace osu.Game.Tests.Scores.IO
 
                     Assert.IsTrue(imported.Mods.Any(m => m is OsuModHardRock));
                     Assert.IsTrue(imported.Mods.Any(m => m is OsuModDoubleTime));
+                    Assert.That(imported.Version, Is.EqualTo(toImport.Version));
                 }
                 finally
                 {
