@@ -50,17 +50,16 @@ namespace osu.Game.Skinning
 
             // legacy judgements don't play any transforms if they are an animation.... UNLESS they are the temporary displayed judgement from new piece.
             if (animation?.FrameCount > 1 && !forceTransforms)
+            {
+                if (isMissedTick())
+                    applyMissedTickScaling();
                 return;
+            }
 
             if (result.IsMiss())
             {
-                bool isTick = result != HitResult.Miss;
-
-                if (isTick)
-                {
-                    this.ScaleTo(0.6f);
-                    this.ScaleTo(0.3f, 100, Easing.In);
-                }
+                if (isMissedTick())
+                    applyMissedTickScaling();
                 else
                 {
                     this.ScaleTo(1.6f);
@@ -93,6 +92,14 @@ namespace osu.Game.Skinning
                     // second half of the transform.
                     .ScaleTo(0.95f).ScaleTo(finalScale, fade_in_length * 0.2f); // t = 1.4
             }
+        }
+
+        private bool isMissedTick() => result.IsMiss() && result != HitResult.Miss;
+
+        private void applyMissedTickScaling()
+        {
+            this.ScaleTo(0.6f);
+            this.ScaleTo(0.3f, 100, Easing.In);
         }
 
         public Drawable GetAboveHitObjectsProxiedContent() => CreateProxy();
