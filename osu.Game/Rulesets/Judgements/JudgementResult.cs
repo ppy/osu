@@ -112,6 +112,6 @@ namespace osu.Game.Rulesets.Judgements
             RawTime = null;
         }
 
-        public override string ToString() => $"{Type} (Score:{Judgement.NumericResultFor(this)} HP:{Judgement.HealthIncreaseFor(this)} {Judgement})";
+        public override string ToString() => $"{Type} ({Judgement})";
     }
 }
