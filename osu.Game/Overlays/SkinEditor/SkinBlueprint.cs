@@ -136,9 +136,10 @@ namespace osu.Game.Overlays.SkinEditor
         {
             base.Update();
 
+            Vector2 scale = drawable.DrawInfo.MatrixInverse.ExtractScale().Xy;
             drawableQuad = drawable.ToScreenSpace(
                 drawable.DrawRectangle
-                        .Inflate(SkinSelectionHandler.INFLATE_SIZE));
+                        .Inflate(SkinSelectionHandler.INFLATE_SIZE * scale));
 
             var localSpaceQuad = ToLocalSpace(drawableQuad);
 
