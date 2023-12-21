@@ -50,7 +50,7 @@ namespace osu.Game.Scoring
         /// The version of the client this score was set using.
         /// Sourced from <see cref="OsuGameBase.Version"/> at the point of score submission.
         /// </summary>
-        public string Version { get; set; } = string.Empty;
+        public string ClientVersion { get; set; } = string.Empty;
 
         /// <summary>
         /// The <see cref="osu.Game.Beatmaps.BeatmapInfo.Hash"/> at the point in time when the score was set.
