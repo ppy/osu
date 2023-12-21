@@ -31,44 +31,31 @@ namespace osu.Game.Rulesets.Mania.Scoring
                    + bonusPortion;
         }
 
-        protected override double GetNumericResultFor(JudgementResult result)
-        {
-            switch (result.Type)
-            {
-                case HitResult.Perfect:
-                    return 305;
-            }
-
-            return base.GetNumericResultFor(result);
-        }
-
-        protected override double GetMaxNumericResultFor(JudgementResult result)
-        {
-            switch (result.Judgement.MaxResult)
-            {
-                case HitResult.Perfect:
-                    return 305;
-            }
-
-            return base.GetMaxNumericResultFor(result);
-        }
-
         protected override double GetComboScoreChange(JudgementResult result)
         {
-            double numericResult;
+            return getBaseComboScoreForResult(result.Type) * Math.Min(Math.Max(0.5, Math.Log(result.ComboAfterJudgement, combo_base)), Math.Log(400, combo_base));
+        }
 
-            switch (result.Type)
+        public override int GetBaseScoreForResult(HitResult result)
+        {
+            switch (result)
             {
                 case HitResult.Perfect:
-                    numericResult = 300;
-                    break;
-
-                default:
-                    numericResult = GetNumericResultFor(result);
-                    break;
+                    return 305;
             }
 
-            return numericResult * Math.Min(Math.Max(0.5, Math.Log(result.ComboAfterJudgement, combo_base)), Math.Log(400, combo_base));
+            return base.GetBaseScoreForResult(result);
+        }
+
+        private int getBaseComboScoreForResult(HitResult result)
+        {
+            switch (result)
+            {
+                case HitResult.Perfect:
+                    return 300;
+            }
+
+            return GetBaseScoreForResult(result);
         }
 
         private class JudgementOrderComparer : IComparer<HitObject>

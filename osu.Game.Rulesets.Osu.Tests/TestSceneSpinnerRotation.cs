@@ -58,10 +58,7 @@ namespace osu.Game.Rulesets.Osu.Tests
             double trackerRotationTolerance = 0;
 
             addSeekStep(5000);
-            AddStep("calculate rotation tolerance", () =>
-            {
-                trackerRotationTolerance = Math.Abs(drawableSpinner.RotationTracker.Rotation * 0.1f);
-            });
+            AddStep("calculate rotation tolerance", () => { trackerRotationTolerance = Math.Abs(drawableSpinner.RotationTracker.Rotation * 0.1f); });
             AddAssert("is disc rotation not almost 0", () => drawableSpinner.RotationTracker.Rotation, () => Is.Not.EqualTo(0).Within(100));
             AddAssert("is disc rotation absolute not almost 0", () => drawableSpinner.Result.TotalRotation, () => Is.Not.EqualTo(0).Within(100));
 
@@ -133,9 +130,11 @@ namespace osu.Game.Rulesets.Osu.Tests
 
             AddAssert("player score matching expected bonus score", () =>
             {
+                var scoreProcessor = ((ScoreExposedPlayer)Player).ScoreProcessor;
+
                 // multipled by 2 to nullify the score multiplier. (autoplay mod selected)
-                long totalScore = ((ScoreExposedPlayer)Player).ScoreProcessor.TotalScore.Value * 2;
-                return totalScore == (int)(drawableSpinner.Result.TotalRotation / 360) * new SpinnerTick().CreateJudgement().MaxNumericResult;
+                long totalScore = scoreProcessor.TotalScore.Value * 2;
+                return totalScore == (int)(drawableSpinner.Result.TotalRotation / 360) * scoreProcessor.GetBaseScoreForResult(new SpinnerTick().CreateJudgement().MaxResult);
             });
 
             addSeekStep(0);

@@ -57,14 +57,14 @@ namespace osu.Game.Database
             // We are constructing a "best possible" score from the statistics provided because it's the best we can do.
             List<HitResult> sortedHits = score.Statistics
                                               .Where(kvp => kvp.Key.AffectsCombo())
-                                              .OrderByDescending(kvp => Judgement.ToNumericResult(kvp.Key))
+                                              .OrderByDescending(kvp => processor.GetBaseScoreForResult(kvp.Key))
                                               .SelectMany(kvp => Enumerable.Repeat(kvp.Key, kvp.Value))
                                               .ToList();
 
             // Attempt to use maximum statistics from the database.
             var maximumJudgements = score.MaximumStatistics
                                          .Where(kvp => kvp.Key.AffectsCombo())
-                                         .OrderByDescending(kvp => Judgement.ToNumericResult(kvp.Key))
+                                         .OrderByDescending(kvp => processor.GetBaseScoreForResult(kvp.Key))
                                          .SelectMany(kvp => Enumerable.Repeat(new FakeJudgement(kvp.Key), kvp.Value))
                                          .ToList();
 
@@ -169,10 +169,10 @@ namespace osu.Game.Database
         public static long GetOldStandardised(ScoreInfo score)
         {
             double accuracyScore =
-                (double)score.Statistics.Where(kvp => kvp.Key.AffectsAccuracy()).Sum(kvp => Judgement.ToNumericResult(kvp.Key) * kvp.Value)
-                / score.MaximumStatistics.Where(kvp => kvp.Key.AffectsAccuracy()).Sum(kvp => Judgement.ToNumericResult(kvp.Key) * kvp.Value);
+                (double)score.Statistics.Where(kvp => kvp.Key.AffectsAccuracy()).Sum(kvp => numericScoreFor(kvp.Key) * kvp.Value)
+                / score.MaximumStatistics.Where(kvp => kvp.Key.AffectsAccuracy()).Sum(kvp => numericScoreFor(kvp.Key) * kvp.Value);
             double comboScore = (double)score.MaxCombo / score.MaximumStatistics.Where(kvp => kvp.Key.AffectsCombo()).Sum(kvp => kvp.Value);
-            double bonusScore = score.Statistics.Where(kvp => kvp.Key.IsBonus()).Sum(kvp => Judgement.ToNumericResult(kvp.Key) * kvp.Value);
+            double bonusScore = score.Statistics.Where(kvp => kvp.Key.IsBonus()).Sum(kvp => numericScoreFor(kvp.Key) * kvp.Value);
 
             double accuracyPortion = 0.3;
 
@@ -193,6 +193,65 @@ namespace osu.Game.Database
                 modMultiplier *= mod.ScoreMultiplier;
 
             return (long)Math.Round((1000000 * (accuracyPortion * accuracyScore + (1 - accuracyPortion) * comboScore) + bonusScore) * modMultiplier);
+
+            static int numericScoreFor(HitResult result)
+            {
+                switch (result)
+                {
+                    default:
+                        return 0;
+
+                    case HitResult.SmallTickHit:
+                        return 10;
+
+                    case HitResult.LargeTickHit:
+                        return 30;
+
+                    case HitResult.Meh:
+                        return 50;
+
+                    case HitResult.Ok:
+                        return 100;
+
+                    case HitResult.Good:
+                        return 200;
+
+                    case HitResult.Great:
+                        return 300;
+
+                    case HitResult.Perfect:
+                        return 315;
+
+                    case HitResult.SmallBonus:
+                        return 10;
+
+                    case HitResult.LargeBonus:
+                        return 50;
+                }
+            }
+        }
+
+        /// <summary>
+        /// Updates a legacy <see cref="ScoreInfo"/> to standardised scoring.
+        /// </summary>
+        /// <param name="score">The score to update.</param>
+        /// <param name="beatmaps">A <see cref="BeatmapManager"/> used for <see cref="WorkingBeatmap"/> lookups.</param>
+        public static void UpdateFromLegacy(ScoreInfo score, BeatmapManager beatmaps)
+        {
+            score.TotalScore = convertFromLegacyTotalScore(score, beatmaps);
+            score.Accuracy = ComputeAccuracy(score);
+        }
+
+        /// <summary>
+        /// Updates a legacy <see cref="ScoreInfo"/> to standardised scoring.
+        /// </summary>
+        /// <param name="score">The score to update.</param>
+        /// <param name="difficulty">The beatmap difficulty.</param>
+        /// <param name="attributes">The legacy scoring attributes for the beatmap which the score was set on.</param>
+        public static void UpdateFromLegacy(ScoreInfo score, LegacyBeatmapConversionDifficultyInfo difficulty, LegacyScoreAttributes attributes)
+        {
+            score.TotalScore = convertFromLegacyTotalScore(score, difficulty, attributes);
+            score.Accuracy = ComputeAccuracy(score);
         }
 
         /// <summary>
@@ -201,7 +260,7 @@ namespace osu.Game.Database
         /// <param name="score">The score to convert the total score of.</param>
         /// <param name="beatmaps">A <see cref="BeatmapManager"/> used for <see cref="WorkingBeatmap"/> lookups.</param>
         /// <returns>The standardised total score.</returns>
-        public static long ConvertFromLegacyTotalScore(ScoreInfo score, BeatmapManager beatmaps)
+        private static long convertFromLegacyTotalScore(ScoreInfo score, BeatmapManager beatmaps)
         {
             if (!score.IsLegacyScore)
                 return score.TotalScore;
@@ -224,7 +283,7 @@ namespace osu.Game.Database
             ILegacyScoreSimulator sv1Simulator = legacyRuleset.CreateLegacyScoreSimulator();
             LegacyScoreAttributes attributes = sv1Simulator.Simulate(beatmap, playableBeatmap);
 
-            return ConvertFromLegacyTotalScore(score, LegacyBeatmapConversionDifficultyInfo.FromBeatmap(beatmap.Beatmap), attributes);
+            return convertFromLegacyTotalScore(score, LegacyBeatmapConversionDifficultyInfo.FromBeatmap(beatmap.Beatmap), attributes);
         }
 
         /// <summary>
@@ -234,7 +293,7 @@ namespace osu.Game.Database
         /// <param name="difficulty">The beatmap difficulty.</param>
         /// <param name="attributes">The legacy scoring attributes for the beatmap which the score was set on.</param>
         /// <returns>The standardised total score.</returns>
-        public static long ConvertFromLegacyTotalScore(ScoreInfo score, LegacyBeatmapConversionDifficultyInfo difficulty, LegacyScoreAttributes attributes)
+        private static long convertFromLegacyTotalScore(ScoreInfo score, LegacyBeatmapConversionDifficultyInfo difficulty, LegacyScoreAttributes attributes)
         {
             if (!score.IsLegacyScore)
                 return score.TotalScore;
@@ -384,6 +443,19 @@ namespace osu.Game.Database
                 default:
                     return score.TotalScore;
             }
+        }
+
+        public static double ComputeAccuracy(ScoreInfo scoreInfo)
+        {
+            Ruleset ruleset = scoreInfo.Ruleset.CreateInstance();
+            ScoreProcessor scoreProcessor = ruleset.CreateScoreProcessor();
+
+            int baseScore = scoreInfo.Statistics.Where(kvp => kvp.Key.AffectsAccuracy())
+                                     .Sum(kvp => kvp.Value * scoreProcessor.GetBaseScoreForResult(kvp.Key));
+            int maxBaseScore = scoreInfo.MaximumStatistics.Where(kvp => kvp.Key.AffectsAccuracy())
+                                        .Sum(kvp => kvp.Value * scoreProcessor.GetBaseScoreForResult(kvp.Key));
+
+            return maxBaseScore == 0 ? 1 : baseScore / (double)maxBaseScore;
         }
 
         /// <summary>
