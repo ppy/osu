@@ -41,6 +41,9 @@ namespace osu.Game.Tests.Visual.Gameplay
 
         private BeatmapSetInfo? importedSet;
 
+        [Resolved]
+        private OsuGameBase osu { get; set; } = null!;
+
         [BackgroundDependencyLoader]
         private void load(GameHost host, AudioManager audio)
         {
@@ -153,6 +156,7 @@ namespace osu.Game.Tests.Visual.Gameplay
 
             AddUntilStep("results displayed", () => Player.GetChildScreen() is ResultsScreen);
             AddUntilStep("score in database", () => Realm.Run(r => r.Find<ScoreInfo>(Player.Score.ScoreInfo.ID) != null));
+            AddUntilStep("score has correct version", () => Realm.Run(r => r.Find<ScoreInfo>(Player.Score.ScoreInfo.ID)!.ClientVersion), () => Is.EqualTo(osu.Version));
         }
 
         [Test]

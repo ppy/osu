@@ -109,6 +109,9 @@ namespace osu.Game.Screens.Play
         [Resolved]
         private MusicController musicController { get; set; }
 
+        [Resolved]
+        private OsuGameBase game { get; set; }
+
         public GameplayState GameplayState { get; private set; }
 
         private Ruleset ruleset;
@@ -1155,7 +1158,11 @@ namespace osu.Game.Screens.Play
         /// <returns>The <see cref="Scoring.Score"/>.</returns>
         protected virtual Score CreateScore(IBeatmap beatmap) => new Score
         {
-            ScoreInfo = new ScoreInfo { User = api.LocalUser.Value },
+            ScoreInfo = new ScoreInfo
+            {
+                User = api.LocalUser.Value,
+                ClientVersion = game.Version,
+            },
         };
 
         /// <summary>
