@@ -90,8 +90,9 @@ namespace osu.Game.Database
         /// 36   2023-10-26    Add LegacyOnlineID to ScoreInfo. Move osu_scores_*_high IDs stored in OnlineID to LegacyOnlineID. Reset anomalous OnlineIDs.
         /// 38   2023-12-10    Add EndTimeObjectCount and TotalObjectCount to BeatmapInfo.
         /// 39   2023-12-19    Migrate any EndTimeObjectCount and TotalObjectCount values of 0 to -1 to better identify non-calculated values.
+        /// 40   2023-12-21    Add ScoreInfo.Version to keep track of which build scores were set on.
         /// </summary>
-        private const int schema_version = 39;
+        private const int schema_version = 40;
 
         /// <summary>
         /// Lock object which is held during <see cref="BlockAllOperations"/> sections, blocking realm retrieval during blocking periods.
