@@ -459,6 +459,11 @@ namespace osu.Game.Localisation
         /// </summary>
         public static LocalisableString EditorToggleMoveControl => new TranslatableString(getKey(@"editor_toggle_move_control"), @"Toggle movement control");
 
+        /// <summary>
+        /// "Boss Key"
+        /// </summary>
+        public static LocalisableString BossKey => new TranslatableString(getKey(@"boss_key"), @"Boss Key");
+
         private static string getKey(string key) => $@"{prefix}:{key}";
     }
 }
