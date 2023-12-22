@@ -36,7 +36,7 @@ namespace osu.Game.Rulesets.Scoring
         private double greatIncrease;
         private double okIncrease;
         private double mehIncrease;
-        private double missIncrease;
+        private double missIncrease = -1;
 
         private double previousObjectTime;
 
@@ -45,12 +45,11 @@ namespace osu.Game.Rulesets.Scoring
             Beatmap = beatmap;
 
             minimumMissesToDie = IBeatmapDifficultyInfo.DifficultyRange(beatmap.Difficulty.DrainRate, 16, 8, 4);
-            minimumMillisecondsToDie = IBeatmapDifficultyInfo.DifficultyRange(beatmap.Difficulty.DrainRate, 6000, 3000, 1500);
+            minimumMillisecondsToDie = IBeatmapDifficultyInfo.DifficultyRange(beatmap.Difficulty.DrainRate, 4000, 2000, 1000);
 
             greatIncrease = IBeatmapDifficultyInfo.DifficultyRange(beatmap.Difficulty.DrainRate, 1, 0.5, 0.25);
             okIncrease = IBeatmapDifficultyInfo.DifficultyRange(beatmap.Difficulty.DrainRate, 0, 0, -0.05);
             mehIncrease = IBeatmapDifficultyInfo.DifficultyRange(beatmap.Difficulty.DrainRate, 0, -0.25, -0.5);
-            missIncrease = -1;
 
             previousObjectTime = beatmap.HitObjects[0].StartTime;
 
@@ -67,11 +66,42 @@ namespace osu.Game.Rulesets.Scoring
         protected override double GetHealthIncreaseFor(JudgementResult result)
         {
             double ratio = GetHealthIncreaseRatio(result.Type);
+            double objectValue = GetHealthObjectValue(result.Type);
             double deltaTime = result.HitObject.GetEndTime() - previousObjectTime;
             if(deltaTime <= 0)
                 return 0;
 
-            return ratio / (minimumMissesToDie + minimumMillisecondsToDie / deltaTime);
+            return ratio / (minimumMissesToDie / objectValue  + minimumMillisecondsToDie / deltaTime);
+        }
+
+        private double GetHealthObjectValue(HitResult result) {
+            switch (result)
+            {
+                default:
+                    return 1;
+
+                case HitResult.SmallTickHit:
+                case HitResult.SmallTickMiss:
+                    return 1/4;
+
+                case HitResult.LargeTickHit:
+                case HitResult.LargeTickMiss:
+                    return 1/2;
+
+                case HitResult.Miss:
+                case HitResult.Meh:
+                case HitResult.Ok:
+                case HitResult.Good:
+                case HitResult.Great:
+                case HitResult.Perfect:
+                    return 1;
+
+                case HitResult.SmallBonus:
+                    return 1/2;
+
+                case HitResult.LargeBonus:
+                    return 1;
+            }
         }
 
         private double GetHealthIncreaseRatio(HitResult result) {
@@ -81,17 +111,12 @@ namespace osu.Game.Rulesets.Scoring
                     return 0;
 
                 case HitResult.SmallTickHit:
-                    return greatIncrease/4;
+                case HitResult.LargeTickHit:
+                case HitResult.Great:
+                    return greatIncrease;
 
                 case HitResult.SmallTickMiss:
-                    return missIncrease/4;
-
-                case HitResult.LargeTickHit:
-                    return greatIncrease/2;
-
                 case HitResult.LargeTickMiss:
-                    return missIncrease/2;
-
                 case HitResult.Miss:
                     return missIncrease;
 
@@ -104,15 +129,10 @@ namespace osu.Game.Rulesets.Scoring
                 case HitResult.Good:
                     return (okIncrease + greatIncrease)/2;
 
-                case HitResult.Great:
-                    return greatIncrease;
-
                 case HitResult.Perfect:
                     return greatIncrease * 1.05;
 
                 case HitResult.SmallBonus:
-                    return greatIncrease * 0.5;
-
                 case HitResult.LargeBonus:
                     return greatIncrease;
             }
