@@ -283,7 +283,7 @@ namespace osu.Game.Screens.OnlinePlay
             }
 
             if (beatmap != null)
-                difficultyIconContainer.Child = new DifficultyIcon(beatmap, ruleset) { Size = new Vector2(icon_height) };
+                difficultyIconContainer.Child = new DifficultyIcon(beatmap, ruleset, requiredMods) { Size = new Vector2(icon_height) };
             else
                 difficultyIconContainer.Clear();
 
