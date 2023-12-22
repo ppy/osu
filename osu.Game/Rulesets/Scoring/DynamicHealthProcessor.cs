@@ -36,6 +36,7 @@ namespace osu.Game.Rulesets.Scoring
         private double greatIncrease;
         private double okIncrease;
         private double mehIncrease;
+        private double missIncrease;
 
         private double previousObjectTime;
 
@@ -49,6 +50,7 @@ namespace osu.Game.Rulesets.Scoring
             greatIncrease = IBeatmapDifficultyInfo.DifficultyRange(beatmap.Difficulty.DrainRate, 1, 0.5, 0.25);
             okIncrease = IBeatmapDifficultyInfo.DifficultyRange(beatmap.Difficulty.DrainRate, 0, 0, -0.05);
             mehIncrease = IBeatmapDifficultyInfo.DifficultyRange(beatmap.Difficulty.DrainRate, 0, -0.25, -0.5);
+            missIncrease = -1;
 
             previousObjectTime = beatmap.HitObjects[0].StartTime;
 
@@ -82,16 +84,16 @@ namespace osu.Game.Rulesets.Scoring
                     return greatIncrease/4;
 
                 case HitResult.SmallTickMiss:
-                    return -0.25;
+                    return missIncrease/4;
 
                 case HitResult.LargeTickHit:
                     return greatIncrease/2;
 
                 case HitResult.LargeTickMiss:
-                    return -0.5;
+                    return missIncrease/2;
 
                 case HitResult.Miss:
-                    return -1;
+                    return missIncrease;
 
                 case HitResult.Meh:
                     return mehIncrease;
