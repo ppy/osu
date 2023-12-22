@@ -4,6 +4,7 @@
 #nullable disable
 
 using System;
+using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
@@ -12,6 +13,8 @@ using osu.Framework.Graphics.Cursor;
 using osu.Framework.Graphics.Shapes;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
+using osu.Game.Rulesets;
+using osu.Game.Rulesets.Mods;
 using osuTK;
 
 namespace osu.Game.Beatmaps.Drawables
@@ -24,7 +27,7 @@ namespace osu.Game.Beatmaps.Drawables
         private OsuSpriteText drainRate;
         private OsuSpriteText circleSize;
         private OsuSpriteText approachRate;
-        private OsuSpriteText BPM;
+        private OsuSpriteText bpm;
         private OsuSpriteText maxCombo;
         private OsuSpriteText length;
 
@@ -66,7 +69,7 @@ namespace osu.Game.Beatmaps.Drawables
                             Origin = Anchor.Centre,
                         },
                         // Difficulty stats
-                        new FillFlowContainer()
+                        new FillFlowContainer
                         {
                             Anchor = Anchor.Centre,
                             Origin = Anchor.Centre,
@@ -81,7 +84,7 @@ namespace osu.Game.Beatmaps.Drawables
                                     Origin = Anchor.Centre,
                                     Font = OsuFont.GetFont(size: 14, weight: FontWeight.Bold),
                                 },
-                                overallDifficulty = new OsuSpriteText
+                                circleSize = new OsuSpriteText
                                 {
                                     Anchor = Anchor.Centre,
                                     Origin = Anchor.Centre,
@@ -93,13 +96,13 @@ namespace osu.Game.Beatmaps.Drawables
                                     Origin = Anchor.Centre,
                                     Font = OsuFont.GetFont(size: 14),
                                 },
-                                circleSize = new OsuSpriteText
+                                approachRate = new OsuSpriteText
                                 {
                                     Anchor = Anchor.Centre,
                                     Origin = Anchor.Centre,
                                     Font = OsuFont.GetFont(size: 14),
                                 },
-                                approachRate = new OsuSpriteText
+                                overallDifficulty = new OsuSpriteText
                                 {
                                     Anchor = Anchor.Centre,
                                     Origin = Anchor.Centre,
@@ -108,7 +111,7 @@ namespace osu.Game.Beatmaps.Drawables
                             }
                         },
                         // Misc stats
-                        new FillFlowContainer()
+                        new FillFlowContainer
                         {
                             Anchor = Anchor.Centre,
                             Origin = Anchor.Centre,
@@ -129,7 +132,7 @@ namespace osu.Game.Beatmaps.Drawables
                                     Origin = Anchor.Centre,
                                     Font = OsuFont.GetFont(size: 14),
                                 },
-                                BPM = new OsuSpriteText
+                                bpm = new OsuSpriteText
                                 {
                                     Anchor = Anchor.Centre,
                                     Origin = Anchor.Centre,
@@ -155,20 +158,44 @@ namespace osu.Game.Beatmaps.Drawables
             if (displayedContent != null)
                 starRating.Current.UnbindFrom(displayedContent.Difficulty);
 
-            // Header row
             displayedContent = content;
+
+            // Header row
             starRating.Current.BindTarget = displayedContent.Difficulty;
             difficultyName.Text = displayedContent.BeatmapInfo.DifficultyName;
 
+            double rate = 1;
+
+            if (displayedContent.Mods != null)
+            {
+                foreach (var mod in displayedContent.Mods.OfType<IApplicableToRate>())
+                    rate = mod.ApplyToRate(0, rate);
+            }
+
+            double bpmAdjusted = displayedContent.BeatmapInfo.BPM * rate;
+
+            BeatmapDifficulty originalDifficulty = new BeatmapDifficulty(displayedContent.BeatmapInfo.Difficulty);
+
+            if (displayedContent.Mods != null)
+            {
+                foreach (var mod in displayedContent.Mods.OfType<IApplicableToDifficulty>())
+                {
+                    mod.ApplyToDifficulty(originalDifficulty);
+                }
+            }
+
+            Ruleset ruleset = displayedContent.Ruleset.CreateInstance();
+            BeatmapDifficulty adjustedDifficulty = ruleset.GetRateAdjustedDisplayDifficulty(originalDifficulty, rate);
+
             // Difficulty row
-            overallDifficulty.Text = "OD: " + displayedContent.BeatmapInfo.Difficulty.OverallDifficulty.ToString("0.##");
-            drainRate.Text = "| HP: " + displayedContent.BeatmapInfo.Difficulty.DrainRate.ToString("0.##");
-            circleSize.Text = "| CS: " + displayedContent.BeatmapInfo.Difficulty.CircleSize.ToString("0.##");
-            approachRate.Text = "| AR: " + displayedContent.BeatmapInfo.Difficulty.ApproachRate.ToString("0.##");
+            circleSize.Text = "CS: " + adjustedDifficulty.CircleSize.ToString("0.##");
+            drainRate.Text = "| HP: " + adjustedDifficulty.DrainRate.ToString("0.##");
+            approachRate.Text = "| AR: " + adjustedDifficulty.ApproachRate.ToString("0.##");
+            overallDifficulty.Text = "| OD: " + adjustedDifficulty.OverallDifficulty.ToString("0.##");
 
             // Misc row
-            length.Text = "Length: " + TimeSpan.FromMilliseconds(displayedContent.BeatmapInfo.Length).ToString("mm\\:ss");
-            BPM.Text = "| BPM: " + displayedContent.BeatmapInfo.BPM;
+            length.Text = "Length: " + TimeSpan.FromMilliseconds(displayedContent.BeatmapInfo.Length / rate).ToString("mm\\:ss");
+            bpm.Text = "| BPM: " + bpmAdjusted;
             maxCombo.Text = "| Max Combo: " + displayedContent.BeatmapInfo.TotalObjectCount;
         }
 
@@ -183,11 +210,15 @@ namespace osu.Game.Beatmaps.Drawables
     {
         public readonly IBeatmapInfo BeatmapInfo;
         public readonly IBindable<StarDifficulty> Difficulty;
+        public readonly IRulesetInfo Ruleset;
+        public readonly Mod[] Mods;
 
-        public DifficultyIconTooltipContent(IBeatmapInfo beatmapInfo, IBindable<StarDifficulty> difficulty)
+        public DifficultyIconTooltipContent(IBeatmapInfo beatmapInfo, IBindable<StarDifficulty> difficulty, IRulesetInfo rulesetInfo, Mod[] mods)
         {
             BeatmapInfo = beatmapInfo;
             Difficulty = difficulty;
+            Ruleset = rulesetInfo;
+            Mods = mods;
         }
     }
 }
