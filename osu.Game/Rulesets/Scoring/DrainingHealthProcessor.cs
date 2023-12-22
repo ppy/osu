@@ -61,7 +61,9 @@ namespace osu.Game.Rulesets.Scoring
         /// </summary>
         protected readonly double DrainLenience;
 
-        private readonly List<(double time, double health)> healthIncreases = new List<(double, double)>();
+        private readonly List<HealthIncrease> healthIncreases = new List<HealthIncrease>();
+        private readonly Dictionary<int, double> densityMultiplierByGroup = new Dictionary<int, double>();
+
         private double gameplayEndTime;
         private double targetMinimumHealth;
 
@@ -133,13 +135,32 @@ namespace osu.Game.Rulesets.Scoring
         {
             base.ApplyResultInternal(result);
 
-            if (!result.Type.IsBonus())
-                healthIncreases.Add((result.HitObject.GetEndTime() + result.TimeOffset, GetHealthIncreaseFor(result)));
+            if (IsSimulating && !result.Type.IsBonus())
+            {
+                healthIncreases.Add(new HealthIncrease(
+                    result.HitObject.GetEndTime() + result.TimeOffset,
+                    GetHealthIncreaseFor(result),
+                    GetDensityGroup(result.HitObject)));
+            }
         }
+
+        protected override double GetHealthIncreaseFor(JudgementResult result) => base.GetHealthIncreaseFor(result) * getDensityMultiplier(GetDensityGroup(result.HitObject));
+
+        private double getDensityMultiplier(int? group)
+        {
+            if (group == null)
+                return 1;
+
+            return densityMultiplierByGroup.TryGetValue(group.Value, out double multiplier) ? multiplier : 1;
+        }
+
+        protected virtual int? GetDensityGroup(HitObject hitObject) => null;
 
         protected override void Reset(bool storeResults)
         {
             base.Reset(storeResults);
+
+            densityMultiplierByGroup.Clear();
 
             if (storeResults)
                 DrainRate = ComputeDrainRate();
@@ -151,6 +172,24 @@ namespace osu.Game.Rulesets.Scoring
         {
             if (healthIncreases.Count <= 1)
                 return 0;
+
+            // Normalise the health gain during sections with higher densities.
+            (int group, double avgIncrease)[] avgIncreasesByGroup = healthIncreases
+                                                                    .Where(i => i.Group != null)
+                                                                    .GroupBy(i => i.Group)
+                                                                    .Select(g => ((int)g.Key!, g.Sum(i => i.Amount) / (g.Max(i => i.Time) - g.Min(i => i.Time) + 1)))
+                                                                    .ToArray();
+
+            if (avgIncreasesByGroup.Length > 1)
+            {
+                double overallAverageIncrease = avgIncreasesByGroup.Average(g => g.avgIncrease);
+
+                foreach ((int group, double avgIncrease) in avgIncreasesByGroup)
+                {
+                    // Reduce the health increase for groups that return more health than average.
+                    densityMultiplierByGroup[group] = Math.Min(1, overallAverageIncrease / avgIncrease);
+                }
+            }
 
             int adjustment = 1;
             double result = 1;
@@ -165,8 +204,8 @@ namespace osu.Game.Rulesets.Scoring
 
                 for (int i = 0; i < healthIncreases.Count; i++)
                 {
-                    double currentTime = healthIncreases[i].time;
-                    double lastTime = i > 0 ? healthIncreases[i - 1].time : DrainStartTime;
+                    double currentTime = healthIncreases[i].Time;
+                    double lastTime = i > 0 ? healthIncreases[i - 1].Time : DrainStartTime;
 
                     while (currentBreak < Beatmap.Breaks.Count && Beatmap.Breaks[currentBreak].EndTime <= currentTime)
                     {
@@ -177,10 +216,12 @@ namespace osu.Game.Rulesets.Scoring
                         currentBreak++;
                     }
 
+                    double multiplier = getDensityMultiplier(healthIncreases[i].Group);
+
                     // Apply health adjustments
                     currentHealth -= (currentTime - lastTime) * result;
                     lowestHealth = Math.Min(lowestHealth, currentHealth);
-                    currentHealth = Math.Min(1, currentHealth + healthIncreases[i].health);
+                    currentHealth = Math.Min(1, currentHealth + healthIncreases[i].Amount * multiplier);
 
                     // Common scenario for when the drain rate is definitely too harsh
                     if (lowestHealth < 0)
@@ -198,5 +239,7 @@ namespace osu.Game.Rulesets.Scoring
 
             return result;
         }
+
+        private record struct HealthIncrease(double Time, double Amount, int? Group);
     }
 }

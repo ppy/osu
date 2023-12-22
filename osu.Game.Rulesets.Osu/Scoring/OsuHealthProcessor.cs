@@ -3,6 +3,8 @@
 
 using osu.Game.Beatmaps;
 using osu.Game.Rulesets.Judgements;
+using osu.Game.Rulesets.Objects;
+using osu.Game.Rulesets.Objects.Types;
 using osu.Game.Rulesets.Osu.Objects;
 using osu.Game.Rulesets.Scoring;
 
@@ -14,6 +16,8 @@ namespace osu.Game.Rulesets.Osu.Scoring
             : base(drainStartTime, drainLenience)
         {
         }
+
+        protected override int? GetDensityGroup(HitObject hitObject) => (hitObject as IHasComboInformation)?.ComboIndex;
 
         protected override double GetHealthIncreaseFor(JudgementResult result)
         {
