@@ -15,9 +15,9 @@ namespace osu.Game.Rulesets.Scoring
 {
     /// <summary>
     /// A <see cref="HealthProcessor"/> which adapts the impact of objects based on density.<br />
-    /// At HP=0, you need at least 16 miss and at least 6 seconds to go from 100% to 0% health.<br />
-    /// At HP=5, you need at least 8 miss and at least 3 seconds to go from 100% to 0% health.<br />
-    /// At HP=10, you need at least 4 miss and at least 1.5 seconds to go from 100% to 0% health.<br />
+    /// At HP=0, you need at least 16 miss and at least 4 seconds to go from 100% to 0% health.<br />
+    /// At HP=5, you need at least 8 miss and at least 2 seconds to go from 100% to 0% health.<br />
+    /// At HP=10, you need at least 4 miss and at least 1 seconds to go from 100% to 0% health.<br />
     /// </summary>
     public partial class DynamicHealthProcessor : HealthProcessor
     {
@@ -27,7 +27,14 @@ namespace osu.Game.Rulesets.Scoring
         /// </summary>
         protected IBeatmap Beatmap { get; private set; }
 
+        /// <summary>
+        /// minimum amount of misses required to go from 100% to 0% health.
+        /// </summary>
         private double minimumMissesToDie;
+
+        /// <summary>
+        /// minimum amount of milliseconds required to go from 100% to 0% health.
+        /// </summary>
         private double minimumMillisecondsToDie;
 
         /// <summary>
@@ -48,8 +55,8 @@ namespace osu.Game.Rulesets.Scoring
             minimumMillisecondsToDie = IBeatmapDifficultyInfo.DifficultyRange(beatmap.Difficulty.DrainRate, 4000, 2000, 1000);
 
             greatIncrease = IBeatmapDifficultyInfo.DifficultyRange(beatmap.Difficulty.DrainRate, 1, 0.5, 0.25);
-            okIncrease = IBeatmapDifficultyInfo.DifficultyRange(beatmap.Difficulty.DrainRate, 0, 0, -0.05);
-            mehIncrease = IBeatmapDifficultyInfo.DifficultyRange(beatmap.Difficulty.DrainRate, 0, -0.25, -0.5);
+            okIncrease = IBeatmapDifficultyInfo.DifficultyRange(beatmap.Difficulty.DrainRate, 0, 0, -0.1);
+            mehIncrease = IBeatmapDifficultyInfo.DifficultyRange(beatmap.Difficulty.DrainRate, -0.25, -0.25, -0.5);
 
             previousObjectTime = beatmap.HitObjects[0].StartTime;
 
