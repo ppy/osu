@@ -31,6 +31,29 @@ namespace osu.Game.Rulesets.Mania.Tests.Mods
         public void TestHoldNote(bool shouldMiss) => CreateHitObjectTest(new HitObjectTestData(new HoldNote { StartTime = 1000, EndTime = 3000 }), shouldMiss);
 
         [Test]
+        public void TestGreatHit() => CreateModTest(new ModTestData
+        {
+            Mod = new ManiaModPerfect(),
+            PassCondition = () => ((PerfectModTestPlayer)Player).CheckFailed(false),
+            Autoplay = false,
+            Beatmap = new Beatmap
+            {
+                HitObjects = new List<HitObject>
+                {
+                    new Note
+                    {
+                        StartTime = 1000,
+                    }
+                },
+            },
+            ReplayFrames = new List<ReplayFrame>
+            {
+                new ManiaReplayFrame(1020, ManiaAction.Key1),
+                new ManiaReplayFrame(2000)
+            }
+        });
+
+        [Test]
         public void TestBreakOnHoldNote() => CreateModTest(new ModTestData
         {
             Mod = new ManiaModPerfect(),
