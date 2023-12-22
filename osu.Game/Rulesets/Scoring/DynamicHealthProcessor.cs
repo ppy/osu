@@ -3,13 +3,11 @@
 
 #nullable disable
 
-using System;
 using System.Collections.Generic;
 using System.Linq;
 using osu.Game.Beatmaps;
 using osu.Game.Rulesets.Judgements;
 using osu.Game.Rulesets.Objects;
-using osu.Game.Utils;
 
 namespace osu.Game.Rulesets.Scoring
 {
@@ -135,7 +133,7 @@ namespace osu.Game.Rulesets.Scoring
                     return okIncrease;
 
                 case HitResult.Good:
-                    return (okIncrease + greatIncrease)/2;
+                    return (okIncrease + greatIncrease) / 2;
 
                 case HitResult.Perfect:
                     return greatIncrease * 1.05;
