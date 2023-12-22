@@ -21,7 +21,6 @@ namespace osu.Game.Rulesets.Scoring
     /// </summary>
     public partial class DynamicHealthProcessor : HealthProcessor
     {
-
         /// <summary>
         /// The beatmap.
         /// </summary>
@@ -72,16 +71,17 @@ namespace osu.Game.Rulesets.Scoring
 
         protected override double GetHealthIncreaseFor(JudgementResult result)
         {
-            double ratio = GetHealthIncreaseRatio(result.Type);
-            double objectValue = GetHealthObjectValue(result.Type);
+            double ratio = getHealthIncreaseRatio(result.Type);
+            double objectValue = getHealthObjectValue(result.Type);
             double deltaTime = result.HitObject.GetEndTime() - previousObjectTime;
-            if(deltaTime <= 0)
+            if (deltaTime <= 0)
                 return 0;
 
-            return ratio / (minimumMissesToDie / objectValue  + minimumMillisecondsToDie / deltaTime);
+            return ratio / (minimumMissesToDie / objectValue + minimumMillisecondsToDie / deltaTime);
         }
 
-        private double GetHealthObjectValue(HitResult result) {
+        private double getHealthObjectValue(HitResult result)
+        {
             switch (result)
             {
                 default:
@@ -89,11 +89,11 @@ namespace osu.Game.Rulesets.Scoring
 
                 case HitResult.SmallTickHit:
                 case HitResult.SmallTickMiss:
-                    return 1/4;
+                    return 0.25;
 
                 case HitResult.LargeTickHit:
                 case HitResult.LargeTickMiss:
-                    return 1/2;
+                    return 0.5;
 
                 case HitResult.Miss:
                 case HitResult.Meh:
@@ -104,14 +104,15 @@ namespace osu.Game.Rulesets.Scoring
                     return 1;
 
                 case HitResult.SmallBonus:
-                    return 1/2;
+                    return 0.5;
 
                 case HitResult.LargeBonus:
                     return 1;
             }
         }
 
-        private double GetHealthIncreaseRatio(HitResult result) {
+        private double getHealthIncreaseRatio(HitResult result)
+        {
             switch (result)
             {
                 default:
