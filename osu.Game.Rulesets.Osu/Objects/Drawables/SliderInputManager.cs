@@ -65,7 +65,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
         protected override void Update()
         {
             base.Update();
-            updateTracking(isMouseInFollowArea(Tracking));
+            updateTracking(IsMouseInFollowArea(Tracking));
         }
 
         public void PostProcessHeadJudgement(DrawableSliderHead head)
@@ -73,7 +73,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
             if (!head.Judged || !head.Result.IsHit)
                 return;
 
-            if (!isMouseInFollowArea(true))
+            if (!IsMouseInFollowArea(true))
                 return;
 
             Debug.Assert(screenSpaceMousePosition != null);
@@ -129,7 +129,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
             // If all ticks were hit so far, enable tracking the full extent.
             // If any ticks were missed, assume tracking would've broken at some point, and should only activate if the cursor is within the slider ball.
             // For the second case, this may be the last chance we have to enable tracking before other objects get judged, otherwise the same would normally happen via Update().
-            updateTracking(allTicksInRange || isMouseInFollowArea(false));
+            updateTracking(allTicksInRange || IsMouseInFollowArea(false));
         }
 
         public void TryJudgeNestedObject(DrawableOsuHitObject nestedObject, double timeOffset)
@@ -174,7 +174,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
         /// Whether the mouse is currently in the follow area.
         /// </summary>
         /// <param name="expanded">Whether to test against the maximum area of the follow circle.</param>
-        private bool isMouseInFollowArea(bool expanded)
+        public bool IsMouseInFollowArea(bool expanded)
         {
             if (screenSpaceMousePosition is not Vector2 pos)
                 return false;
