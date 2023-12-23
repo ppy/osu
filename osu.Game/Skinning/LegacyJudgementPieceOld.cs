@@ -67,7 +67,7 @@ namespace osu.Game.Skinning
 
                     decimal? legacyVersion = skin.GetConfig<SkinConfiguration.LegacySetting, decimal>(SkinConfiguration.LegacySetting.Version)?.Value;
 
-                    if (legacyVersion >= 2.0m)
+                    if (legacyVersion > 1.0m)
                     {
                         this.MoveTo(new Vector2(0, -5));
                         this.MoveToOffset(new Vector2(0, 80), fade_out_delay + fade_out_length, Easing.In);
