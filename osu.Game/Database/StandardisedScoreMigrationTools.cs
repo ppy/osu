@@ -312,14 +312,20 @@ namespace osu.Game.Database
 
             double legacyAccScore = maximumLegacyAccuracyScore * score.Accuracy;
             // We can not separate the ComboScore from the BonusScore, so we keep the bonus in the ratio.
-            double comboProportion =
-                ((double)score.LegacyTotalScore - legacyAccScore) / (maximumLegacyComboScore + maximumLegacyBonusScore);
+            // Note that `maximumLegacyComboScore + maximumLegacyBonusScore` can actually be 0
+            // when playing a beatmap with no bonus objects, with mods that have a 0.0x multiplier on stable (relax/autopilot).
+            // In such cases, just assume 0.
+            double comboProportion = maximumLegacyComboScore + maximumLegacyBonusScore > 0
+                ? ((double)score.LegacyTotalScore - legacyAccScore) / (maximumLegacyComboScore + maximumLegacyBonusScore)
+                : 0;
 
             // We assume the bonus proportion only makes up the rest of the score that exceeds maximumLegacyBaseScore.
             long maximumLegacyBaseScore = maximumLegacyAccuracyScore + maximumLegacyComboScore;
             double bonusProportion = Math.Max(0, ((long)score.LegacyTotalScore - maximumLegacyBaseScore) * maximumLegacyBonusRatio);
 
             double modMultiplier = score.Mods.Select(m => m.ScoreMultiplier).Aggregate(1.0, (c, n) => c * n);
+
+            long convertedTotalScore;
 
             switch (score.Ruleset.OnlineID)
             {
@@ -417,32 +423,42 @@ namespace osu.Game.Database
 
                     double newComboScoreProportion = estimatedComboPortionInStandardisedScore / maximumAchievableComboPortionInStandardisedScore;
 
-                    return (long)Math.Round((
+                    convertedTotalScore = (long)Math.Round((
                         500000 * newComboScoreProportion * score.Accuracy
                         + 500000 * Math.Pow(score.Accuracy, 5)
                         + bonusProportion) * modMultiplier);
+                    break;
 
                 case 1:
-                    return (long)Math.Round((
+                    convertedTotalScore = (long)Math.Round((
                         250000 * comboProportion
                         + 750000 * Math.Pow(score.Accuracy, 3.6)
                         + bonusProportion) * modMultiplier);
+                    break;
 
                 case 2:
-                    return (long)Math.Round((
+                    convertedTotalScore = (long)Math.Round((
                         600000 * comboProportion
                         + 400000 * score.Accuracy
                         + bonusProportion) * modMultiplier);
+                    break;
 
                 case 3:
-                    return (long)Math.Round((
+                    convertedTotalScore = (long)Math.Round((
                         850000 * comboProportion
                         + 150000 * Math.Pow(score.Accuracy, 2 + 2 * score.Accuracy)
                         + bonusProportion) * modMultiplier);
+                    break;
 
                 default:
-                    return score.TotalScore;
+                    convertedTotalScore = score.TotalScore;
+                    break;
             }
+
+            if (convertedTotalScore < 0)
+                throw new InvalidOperationException($"Total score conversion operation returned invalid total of {convertedTotalScore}");
+
+            return convertedTotalScore;
         }
 
         public static double ComputeAccuracy(ScoreInfo scoreInfo)
