@@ -47,6 +47,12 @@ namespace osu.Game.Scoring
         public BeatmapInfo? BeatmapInfo { get; set; }
 
         /// <summary>
+        /// The version of the client this score was set using.
+        /// Sourced from <see cref="OsuGameBase.Version"/> at the point of score submission.
+        /// </summary>
+        public string ClientVersion { get; set; } = string.Empty;
+
+        /// <summary>
         /// The <see cref="osu.Game.Beatmaps.BeatmapInfo.Hash"/> at the point in time when the score was set.
         /// </summary>
         public string BeatmapHash { get; set; } = string.Empty;

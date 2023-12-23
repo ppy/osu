@@ -20,6 +20,7 @@ using osu.Game.IO;
 using osu.Game.IO.Archives;
 using osu.Game.Overlays.Notifications;
 using osu.Game.Rulesets;
+using osu.Game.Rulesets.Objects.Types;
 using Realms;
 
 namespace osu.Game.Beatmaps
@@ -387,7 +388,7 @@ namespace osu.Game.Beatmaps
                         OverallDifficulty = decodedDifficulty.OverallDifficulty,
                         ApproachRate = decodedDifficulty.ApproachRate,
                         SliderMultiplier = decodedDifficulty.SliderMultiplier,
-                        SliderTickRate = decodedDifficulty.SliderTickRate,
+                        SliderTickRate = decodedDifficulty.SliderTickRate
                     };
 
                     var metadata = new BeatmapMetadata
@@ -425,6 +426,8 @@ namespace osu.Game.Beatmaps
                         GridSize = decodedInfo.GridSize,
                         TimelineZoom = decodedInfo.TimelineZoom,
                         MD5Hash = memoryStream.ComputeMD5Hash(),
+                        EndTimeObjectCount = decoded.HitObjects.Count(h => h is IHasDuration),
+                        TotalObjectCount = decoded.HitObjects.Count
                     };
 
                     beatmaps.Add(beatmap);

@@ -46,32 +46,22 @@ body:
       value: |
         ## Logs
 
-        Attaching log files is required for every reported bug. See instructions below on how to find them.
-
-        **Logs are reset when you reopen the game.** If the game crashed or has been closed since you found the bug, retrieve the logs using the file explorer instead.
+        Attaching log files is required for **every** issue, regardless of whether you deem them required or not. See instructions below on how to find them.
 
         ### Desktop platforms
 
         If the game has not yet been closed since you found the bug:
-          1. Head on to game settings and click on "Open osu! folder"
-          2. Then open the `logs` folder located there
+          1. Head on to game settings and click on "Export logs"
+          2. Click the notification to locate the file
+          3. Drag the generated `.zip` files into the github issue window
 
-        The default places to find the logs on desktop platforms are as follows:
-          - `%AppData%/osu/logs` *on Windows*
-          - `~/.local/share/osu/logs` *on Linux*
-          - `~/Library/Application Support/osu/logs` *on macOS*
-
-        If you have selected a custom location for the game files, you can find the `logs` folder there.
+        ![export logs button](https://github.com/ppy/osu/assets/191335/cbfa5550-b7ed-4c5c-8dd0-8b87cc90ad9b)
 
         ### Mobile platforms
 
         The places to find the logs on mobile platforms are as follows:
           - *On Android*, navigate to `Android/data/sh.ppy.osulazer/files/logs` using a file browser app.
           - *On iOS*, connect your device to a PC and copy the `logs` directory from the app's document storage using iTunes. (https://support.apple.com/en-us/HT201301#copy-to-computer)
-
-        ---
-
-        After locating the `logs` folder, select all log files inside and drag them into the "Logs" box below.
 
   - type: textarea
     attributes:

@@ -373,7 +373,7 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders.Components
                 curveTypeItems.Add(createMenuItemForPathType(PathType.LINEAR));
                 curveTypeItems.Add(createMenuItemForPathType(PathType.PERFECT_CURVE));
                 curveTypeItems.Add(createMenuItemForPathType(PathType.BEZIER));
-                curveTypeItems.Add(createMenuItemForPathType(PathType.BSpline(3)));
+                curveTypeItems.Add(createMenuItemForPathType(PathType.BSpline(4)));
 
                 if (selectedPieces.Any(piece => piece.ControlPoint.Type?.Type == SplineType.Catmull))
                     curveTypeItems.Add(createMenuItemForPathType(PathType.CATMULL));

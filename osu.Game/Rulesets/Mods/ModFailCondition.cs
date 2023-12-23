@@ -11,7 +11,7 @@ namespace osu.Game.Rulesets.Mods
 {
     public abstract class ModFailCondition : Mod, IApplicableToHealthProcessor, IApplicableFailOverride
     {
-        public override Type[] IncompatibleMods => new[] { typeof(ModNoFail), typeof(ModRelax) };
+        public override Type[] IncompatibleMods => new[] { typeof(ModNoFail) };
 
         [SettingSource("Restart on fail", "Automatically restarts when failed.")]
         public BindableBool Restart { get; } = new BindableBool();

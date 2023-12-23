@@ -45,14 +45,6 @@ namespace osu.Game.Screens.Play.HUD
         {
         }
 
-        /// <summary>
-        /// Triggered when a <see cref="Judgement"/> resulted in the player losing health.
-        /// Calls to this method are debounced.
-        /// </summary>
-        protected virtual void Miss()
-        {
-        }
-
         [Resolved]
         private HUDOverlay? hudOverlay { get; set; }
 
@@ -66,7 +58,9 @@ namespace osu.Game.Screens.Play.HUD
             health = HealthProcessor.Health.GetBoundCopy();
             health.BindValueChanged(h =>
             {
-                finishInitialAnimation();
+                if (initialIncrease != null)
+                    FinishInitialAnimation(h.OldValue);
+
                 Current.Value = h.NewValue;
             });
 
@@ -98,16 +92,16 @@ namespace osu.Game.Screens.Play.HUD
                 Scheduler.AddOnce(Flash);
 
                 if (newValue >= health.Value)
-                    finishInitialAnimation();
+                    FinishInitialAnimation(health.Value);
             }, increase_delay, true);
         }
 
-        private void finishInitialAnimation()
+        protected virtual void FinishInitialAnimation(double value)
         {
             if (initialIncrease == null)
                 return;
 
-            initialIncrease?.Cancel();
+            initialIncrease.Cancel();
             initialIncrease = null;
 
             // aside from the repeating `initialIncrease` scheduled task,
@@ -122,8 +116,6 @@ namespace osu.Game.Screens.Play.HUD
         {
             if (judgement.IsHit && judgement.Type != HitResult.IgnoreHit)
                 Scheduler.AddOnce(Flash);
-            else if (judgement.Judgement.HealthIncreaseFor(judgement) < 0)
-                Scheduler.AddOnce(Miss);
         }
 
         protected override void Dispose(bool isDisposing)
