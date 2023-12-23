@@ -233,12 +233,10 @@ namespace osu.Game.Screens.Play.PlayerSettings
             {
                 case GlobalAction.IncreaseOffset:
                     Current.Value += amount;
-
                     return true;
 
                 case GlobalAction.DecreaseOffset:
                     Current.Value -= amount;
-
                     return true;
             }
 
@@ -249,25 +247,29 @@ namespace osu.Game.Screens.Play.PlayerSettings
         {
         }
 
+        public static LocalisableString GetOffsetExplanatoryText(double offset)
+        {
+            return offset == 0
+                ? LocalisableString.Interpolate($@"{offset:0.0} ms")
+                : LocalisableString.Interpolate($@"{offset:0.0} ms {getEarlyLateText(offset)}");
+
+            LocalisableString getEarlyLateText(double value)
+            {
+                Debug.Assert(value != 0);
+
+                return value > 0
+                    ? BeatmapOffsetControlStrings.HitObjectsAppearEarlier
+                    : BeatmapOffsetControlStrings.HitObjectsAppearLater;
+            }
+        }
+
         public partial class OffsetSliderBar : PlayerSliderBar<double>
         {
             protected override Drawable CreateControl() => new CustomSliderBar();
 
             protected partial class CustomSliderBar : SliderBar
             {
-                public override LocalisableString TooltipText =>
-                    Current.Value == 0
-                        ? LocalisableString.Interpolate($@"{base.TooltipText} ms")
-                        : LocalisableString.Interpolate($@"{base.TooltipText} ms {getEarlyLateText(Current.Value)}");
-
-                private LocalisableString getEarlyLateText(double value)
-                {
-                    Debug.Assert(value != 0);
-
-                    return value > 0
-                        ? BeatmapOffsetControlStrings.HitObjectsAppearEarlier
-                        : BeatmapOffsetControlStrings.HitObjectsAppearLater;
-                }
+                public override LocalisableString TooltipText => GetOffsetExplanatoryText(Current.Value);
             }
         }
     }
