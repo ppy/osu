@@ -30,7 +30,7 @@ namespace osu.Game.Rulesets.Mods
         public override IconUsage? Icon => OsuIcon.ModCinema;
         public override LocalisableString Description => "Watch the video without visual distractions.";
 
-        public override Type[] IncompatibleMods => base.IncompatibleMods.Append(typeof(ModAutoplay)).ToArray();
+        public override Type[] IncompatibleMods => base.IncompatibleMods.Concat(new[] { typeof(ModAutoplay), typeof(ModNoFail) }).ToArray();
 
         public void ApplyToHUD(HUDOverlay overlay)
         {
