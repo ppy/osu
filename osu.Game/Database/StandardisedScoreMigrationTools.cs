@@ -321,6 +321,8 @@ namespace osu.Game.Database
 
             double modMultiplier = score.Mods.Select(m => m.ScoreMultiplier).Aggregate(1.0, (c, n) => c * n);
 
+            long convertedTotalScore;
+
             switch (score.Ruleset.OnlineID)
             {
                 case 0:
@@ -417,32 +419,42 @@ namespace osu.Game.Database
 
                     double newComboScoreProportion = estimatedComboPortionInStandardisedScore / maximumAchievableComboPortionInStandardisedScore;
 
-                    return (long)Math.Round((
+                    convertedTotalScore = (long)Math.Round((
                         500000 * newComboScoreProportion * score.Accuracy
                         + 500000 * Math.Pow(score.Accuracy, 5)
                         + bonusProportion) * modMultiplier);
+                    break;
 
                 case 1:
-                    return (long)Math.Round((
+                    convertedTotalScore = (long)Math.Round((
                         250000 * comboProportion
                         + 750000 * Math.Pow(score.Accuracy, 3.6)
                         + bonusProportion) * modMultiplier);
+                    break;
 
                 case 2:
-                    return (long)Math.Round((
+                    convertedTotalScore = (long)Math.Round((
                         600000 * comboProportion
                         + 400000 * score.Accuracy
                         + bonusProportion) * modMultiplier);
+                    break;
 
                 case 3:
-                    return (long)Math.Round((
+                    convertedTotalScore = (long)Math.Round((
                         850000 * comboProportion
                         + 150000 * Math.Pow(score.Accuracy, 2 + 2 * score.Accuracy)
                         + bonusProportion) * modMultiplier);
+                    break;
 
                 default:
-                    return score.TotalScore;
+                    convertedTotalScore = score.TotalScore;
+                    break;
             }
+
+            if (convertedTotalScore < 0)
+                throw new InvalidOperationException($"Total score conversion operation returned invalid total of {convertedTotalScore}");
+
+            return convertedTotalScore;
         }
 
         public static double ComputeAccuracy(ScoreInfo scoreInfo)
