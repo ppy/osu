@@ -232,6 +232,14 @@ namespace osu.Game.Overlays.Profile.Header
             bool expanded = coverToggle.CoverExpanded.Value;
 
             cover.ResizeHeightTo(expanded ? 250 : 0, transition_duration, Easing.OutQuint);
+
+            // Without this a very tiny slither of the cover will be visible even with a size of zero.
+            // Integer masking woes, no doubt.
+            if (expanded)
+                cover.FadeIn(transition_duration, Easing.OutQuint);
+            else
+                cover.FadeOut(transition_duration, Easing.InQuint);
+
             avatar.ResizeTo(new Vector2(expanded ? 120 : content_height), transition_duration, Easing.OutQuint);
             avatar.TransformTo(nameof(avatar.CornerRadius), expanded ? 40f : 20f, transition_duration, Easing.OutQuint);
             flow.TransformTo(nameof(flow.Spacing), new Vector2(expanded ? 20f : 10f), transition_duration, Easing.OutQuint);
