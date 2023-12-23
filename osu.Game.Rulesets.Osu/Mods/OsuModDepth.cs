@@ -20,7 +20,7 @@ namespace osu.Game.Rulesets.Osu.Mods
     public class OsuModDepth : ModWithVisibilityAdjustment, IUpdatableByPlayfield, IApplicableToDrawableRuleset<OsuHitObject>
     {
         public override string Name => "Depth";
-        public override string Acronym => "DH";
+        public override string Acronym => "DP";
         public override IconUsage? Icon => FontAwesome.Solid.Cube;
         public override ModType Type => ModType.Fun;
         public override LocalisableString Description => "3D. Almost.";
