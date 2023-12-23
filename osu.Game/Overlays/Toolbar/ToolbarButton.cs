@@ -208,8 +208,9 @@ namespace osu.Game.Overlays.Toolbar
         {
             string keyBindingString = keyCombinationProvider.GetReadableString(keyCombination);
 
-            if (!string.IsNullOrEmpty(keyBindingString))
-                keyBindingTooltip.Text = $" ({keyBindingString})";
+            keyBindingTooltip.Text = !string.IsNullOrEmpty(keyBindingString)
+                ? $" ({keyBindingString})"
+                : string.Empty;
         }
     }
 
