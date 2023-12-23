@@ -25,6 +25,9 @@ namespace osu.Game.Screens.Play
 
         public override bool PropagateNonPositionalInputSubTree => true;
 
+        // Disable interaction for now to avoid any funny business with slider bar dragging.
+        public override bool PropagatePositionalInputSubTree => false;
+
         private BeatmapOffsetControl offsetControl = null!;
 
         private OsuTextFlowContainer text = null!;
