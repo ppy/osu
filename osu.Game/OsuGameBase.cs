@@ -527,14 +527,21 @@ namespace osu.Game
             {
                 ManualResetEventSlim readyToRun = new ManualResetEventSlim();
 
+                bool success = false;
+
                 Scheduler.Add(() =>
                 {
-                    realmBlocker = realm.BlockAllOperations("migration");
+                    try
+                    {
+                        realmBlocker = realm.BlockAllOperations("migration");
+                        success = true;
+                    }
+                    catch { }
 
                     readyToRun.Set();
                 }, false);
 
-                if (!readyToRun.Wait(30000))
+                if (!readyToRun.Wait(30000) || !success)
                     throw new TimeoutException("Attempting to block for migration took too long.");
 
                 bool? cleanupSucceded = (Storage as OsuStorage)?.Migrate(Host.GetStorage(path));
