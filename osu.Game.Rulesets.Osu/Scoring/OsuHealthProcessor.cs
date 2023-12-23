@@ -44,7 +44,7 @@ namespace osu.Game.Rulesets.Osu.Scoring
                     break;
             }
 
-            // The tail has a special IgnoreMiss judgement
+            // The slider tail has a special judgement that can't accurately be described above.
             if (result.HitObject is SliderTailCircle && !result.IsHit)
                 setComboResult(ComboResult.Good);
 
