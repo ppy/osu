@@ -312,8 +312,12 @@ namespace osu.Game.Database
 
             double legacyAccScore = maximumLegacyAccuracyScore * score.Accuracy;
             // We can not separate the ComboScore from the BonusScore, so we keep the bonus in the ratio.
-            double comboProportion =
-                ((double)score.LegacyTotalScore - legacyAccScore) / (maximumLegacyComboScore + maximumLegacyBonusScore);
+            // Note that `maximumLegacyComboScore + maximumLegacyBonusScore` can actually be 0
+            // when playing a beatmap with no bonus objects, with mods that have a 0.0x multiplier on stable (relax/autopilot).
+            // In such cases, just assume 0.
+            double comboProportion = maximumLegacyComboScore + maximumLegacyBonusScore > 0
+                ? ((double)score.LegacyTotalScore - legacyAccScore) / (maximumLegacyComboScore + maximumLegacyBonusScore)
+                : 0;
 
             // We assume the bonus proportion only makes up the rest of the score that exceeds maximumLegacyBaseScore.
             long maximumLegacyBaseScore = maximumLegacyAccuracyScore + maximumLegacyComboScore;
