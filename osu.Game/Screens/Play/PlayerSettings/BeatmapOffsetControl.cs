@@ -227,7 +227,10 @@ namespace osu.Game.Screens.Play.PlayerSettings
 
         public bool OnPressed(KeyBindingPressEvent<GlobalAction> e)
         {
-            double amount = e.AltPressed ? 1 : 5;
+            // To match stable, this should adjust by 5 ms, or 1 ms when holding alt.
+            // But that is hard to make work with global actions due to the operating mode.
+            // Let's use the more precise as a default for now.
+            const double amount = 1;
 
             switch (e.Action)
             {
