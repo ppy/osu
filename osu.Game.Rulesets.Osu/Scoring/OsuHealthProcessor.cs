@@ -17,8 +17,6 @@ namespace osu.Game.Rulesets.Osu.Scoring
         {
         }
 
-        protected override int? GetDensityGroup(HitObject hitObject) => (hitObject as IHasComboInformation)?.ComboIndex;
-
         protected override double GetHealthIncreaseFor(JudgementResult result)
         {
             switch (result.Type)
