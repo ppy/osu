@@ -86,6 +86,7 @@ namespace osu.Game.Rulesets.Scoring
         /// Indicates a large tick miss.
         /// </summary>
         [EnumMember(Value = "large_tick_miss")]
+        [Description(@"x")]
         [Order(10)]
         LargeTickMiss,
 
@@ -117,6 +118,7 @@ namespace osu.Game.Rulesets.Scoring
         /// Indicates a miss that should be ignored for scoring purposes.
         /// </summary>
         [EnumMember(Value = "ignore_miss")]
+        [Description("x")]
         [Order(13)]
         IgnoreMiss,
 
@@ -139,9 +141,12 @@ namespace osu.Game.Rulesets.Scoring
 
         /// <summary>
         /// A special result used as a padding value for legacy rulesets. It is a hit type and affects combo, but does not affect the base score (does not affect accuracy).
+        ///
+        /// DO NOT USE FOR ANYTHING EVER.
         /// </summary>
         /// <remarks>
-        /// DO NOT USE.
+        /// This is used when dealing with legacy scores, which historically only have counts stored for 300/100/50/miss.
+        /// For these scores, we pad the hit statistics with `LegacyComboIncrease` to meet the correct max combo for the score.
         /// </remarks>
         [EnumMember(Value = "legacy_combo_increase")]
         [Order(99)]
@@ -265,8 +270,33 @@ namespace osu.Game.Rulesets.Scoring
         }
 
         /// <summary>
+        /// Whether a <see cref="HitResult"/> represents a miss of any type.
+        /// </summary>
+        /// <remarks>
+        /// Of note, both <see cref="IsMiss"/> and <see cref="IsHit"/> return <see langword="false"/> for <see cref="HitResult.None"/>.
+        /// </remarks>
+        public static bool IsMiss(this HitResult result)
+        {
+            switch (result)
+            {
+                case HitResult.IgnoreMiss:
+                case HitResult.Miss:
+                case HitResult.SmallTickMiss:
+                case HitResult.LargeTickMiss:
+                case HitResult.ComboBreak:
+                    return true;
+
+                default:
+                    return false;
+            }
+        }
+
+        /// <summary>
         /// Whether a <see cref="HitResult"/> represents a successful hit.
         /// </summary>
+        /// <remarks>
+        /// Of note, both <see cref="IsMiss"/> and <see cref="IsHit"/> return <see langword="false"/> for <see cref="HitResult.None"/>.
+        /// </remarks>
         public static bool IsHit(this HitResult result)
         {
             switch (result)

@@ -109,6 +109,9 @@ namespace osu.Game.Screens.Play
         [Resolved]
         private MusicController musicController { get; set; }
 
+        [Resolved]
+        private OsuGameBase game { get; set; }
+
         public GameplayState GameplayState { get; private set; }
 
         private Ruleset ruleset;
@@ -227,7 +230,8 @@ namespace osu.Game.Screens.Play
 
             dependencies.CacheAs(ScoreProcessor);
 
-            HealthProcessor = ruleset.CreateHealthProcessor(playableBeatmap.HitObjects[0].StartTime);
+            HealthProcessor = gameplayMods.OfType<IApplicableHealthProcessor>().FirstOrDefault()?.CreateHealthProcessor(playableBeatmap.HitObjects[0].StartTime);
+            HealthProcessor ??= ruleset.CreateHealthProcessor(playableBeatmap.HitObjects[0].StartTime);
             HealthProcessor.ApplyBeatmap(playableBeatmap);
 
             dependencies.CacheAs(HealthProcessor);
@@ -457,6 +461,12 @@ namespace osu.Game.Screens.Play
                         OnRetry = () => Restart(),
                         OnQuit = () => PerformExit(true),
                     },
+                    new GameplayOffsetControl
+                    {
+                        Margin = new MarginPadding(20),
+                        Anchor = Anchor.CentreRight,
+                        Origin = Anchor.CentreRight,
+                    }
                 },
             };
 
@@ -1154,7 +1164,11 @@ namespace osu.Game.Screens.Play
         /// <returns>The <see cref="Scoring.Score"/>.</returns>
         protected virtual Score CreateScore(IBeatmap beatmap) => new Score
         {
-            ScoreInfo = new ScoreInfo { User = api.LocalUser.Value },
+            ScoreInfo = new ScoreInfo
+            {
+                User = api.LocalUser.Value,
+                ClientVersion = game.Version,
+            },
         };
 
         /// <summary>

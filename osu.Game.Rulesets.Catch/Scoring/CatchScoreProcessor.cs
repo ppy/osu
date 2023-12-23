@@ -33,7 +33,7 @@ namespace osu.Game.Rulesets.Catch.Scoring
         }
 
         protected override double GetComboScoreChange(JudgementResult result)
-            => Judgement.ToNumericResult(result.Type) * Math.Min(Math.Max(0.5, Math.Log(result.ComboAfterJudgement, combo_base)), Math.Log(combo_cap, combo_base));
+            => GetBaseScoreForResult(result.Type) * Math.Min(Math.Max(0.5, Math.Log(result.ComboAfterJudgement, combo_base)), Math.Log(combo_cap, combo_base));
 
         public override ScoreRank RankFromAccuracy(double accuracy)
         {

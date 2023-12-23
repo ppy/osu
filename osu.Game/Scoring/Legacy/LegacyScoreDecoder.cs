@@ -125,6 +125,7 @@ namespace osu.Game.Scoring.Legacy
                         score.ScoreInfo.Statistics = readScore.Statistics;
                         score.ScoreInfo.MaximumStatistics = readScore.MaximumStatistics;
                         score.ScoreInfo.Mods = readScore.Mods.Select(m => m.ToMod(currentRuleset)).ToArray();
+                        score.ScoreInfo.ClientVersion = readScore.ClientVersion;
                     });
                 }
             }

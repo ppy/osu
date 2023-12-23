@@ -9,6 +9,8 @@ using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
+using osu.Framework.Input.Bindings;
+using osu.Framework.Input.Events;
 using osu.Framework.Localisation;
 using osu.Framework.Utils;
 using osu.Game.Beatmaps;
@@ -16,6 +18,7 @@ using osu.Game.Database;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.Sprites;
+using osu.Game.Input.Bindings;
 using osu.Game.Localisation;
 using osu.Game.Overlays.Settings;
 using osu.Game.Rulesets.Mods;
@@ -26,7 +29,7 @@ using osuTK;
 
 namespace osu.Game.Screens.Play.PlayerSettings
 {
-    public partial class BeatmapOffsetControl : CompositeDrawable
+    public partial class BeatmapOffsetControl : CompositeDrawable, IKeyBindingHandler<GlobalAction>
     {
         public Bindable<ScoreInfo?> ReferenceScore { get; } = new Bindable<ScoreInfo?>();
 
@@ -47,6 +50,12 @@ namespace osu.Game.Screens.Play.PlayerSettings
 
         [Resolved]
         private OsuColour colours { get; set; } = null!;
+
+        [Resolved]
+        private Player? player { get; set; }
+
+        [Resolved]
+        private IGameplayClock? gameplayClock { get; set; }
 
         private double lastPlayAverage;
         private double lastPlayBeatmapOffset;
@@ -86,28 +95,6 @@ namespace osu.Game.Screens.Play.PlayerSettings
                     },
                 }
             };
-        }
-
-        public partial class OffsetSliderBar : PlayerSliderBar<double>
-        {
-            protected override Drawable CreateControl() => new CustomSliderBar();
-
-            protected partial class CustomSliderBar : SliderBar
-            {
-                public override LocalisableString TooltipText =>
-                    Current.Value == 0
-                        ? LocalisableString.Interpolate($@"{base.TooltipText} ms")
-                        : LocalisableString.Interpolate($@"{base.TooltipText} ms {getEarlyLateText(Current.Value)}");
-
-                private LocalisableString getEarlyLateText(double value)
-                {
-                    Debug.Assert(value != 0);
-
-                    return value > 0
-                        ? BeatmapOffsetControlStrings.HitObjectsAppearEarlier
-                        : BeatmapOffsetControlStrings.HitObjectsAppearLater;
-                }
-            }
         }
 
         protected override void LoadComplete()
@@ -242,6 +229,69 @@ namespace osu.Game.Screens.Play.PlayerSettings
         {
             base.Dispose(isDisposing);
             beatmapOffsetSubscription?.Dispose();
+        }
+
+        public bool OnPressed(KeyBindingPressEvent<GlobalAction> e)
+        {
+            // General limitations to ensure players don't do anything too weird.
+            // These match stable for now.
+            if (player is SubmittingPlayer)
+            {
+                // TODO: the blocking conditions should probably display a message.
+                if (player?.IsBreakTime.Value == false && gameplayClock?.CurrentTime - gameplayClock?.StartTime > 10000)
+                    return false;
+
+                if (gameplayClock?.IsPaused.Value == true)
+                    return false;
+            }
+
+            // To match stable, this should adjust by 5 ms, or 1 ms when holding alt.
+            // But that is hard to make work with global actions due to the operating mode.
+            // Let's use the more precise as a default for now.
+            const double amount = 1;
+
+            switch (e.Action)
+            {
+                case GlobalAction.IncreaseOffset:
+                    Current.Value += amount;
+                    return true;
+
+                case GlobalAction.DecreaseOffset:
+                    Current.Value -= amount;
+                    return true;
+            }
+
+            return false;
+        }
+
+        public void OnReleased(KeyBindingReleaseEvent<GlobalAction> e)
+        {
+        }
+
+        public static LocalisableString GetOffsetExplanatoryText(double offset)
+        {
+            return offset == 0
+                ? LocalisableString.Interpolate($@"{offset:0.0} ms")
+                : LocalisableString.Interpolate($@"{offset:0.0} ms {getEarlyLateText(offset)}");
+
+            LocalisableString getEarlyLateText(double value)
+            {
+                Debug.Assert(value != 0);
+
+                return value > 0
+                    ? BeatmapOffsetControlStrings.HitObjectsAppearEarlier
+                    : BeatmapOffsetControlStrings.HitObjectsAppearLater;
+            }
+        }
+
+        public partial class OffsetSliderBar : PlayerSliderBar<double>
+        {
+            protected override Drawable CreateControl() => new CustomSliderBar();
+
+            protected partial class CustomSliderBar : SliderBar
+            {
+                public override LocalisableString TooltipText => GetOffsetExplanatoryText(Current.Value);
+            }
         }
     }
 }

@@ -15,6 +15,15 @@ namespace osu.Game.Rulesets.Mania.Scoring
         {
         }
 
+        protected override double ComputeDrainRate()
+        {
+            // Base call is run only to compute HP recovery (namely, `HpMultiplierNormal`).
+            // This closely mirrors (broken) behaviour of stable and as such is preserved unchanged.
+            base.ComputeDrainRate();
+
+            return 0;
+        }
+
         protected override IEnumerable<HitObject> EnumerateTopLevelHitObjects() => Beatmap.HitObjects;
 
         protected override IEnumerable<HitObject> EnumerateNestedHitObjects(HitObject hitObject) => hitObject.NestedHitObjects;

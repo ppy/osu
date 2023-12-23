@@ -17,6 +17,7 @@ using osu.Game.Rulesets.Judgements;
 using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Objects.Drawables;
 using osu.Game.Rulesets.Osu.Judgements;
+using osu.Game.Rulesets.Osu.Scoring;
 using osu.Game.Rulesets.Osu.Skinning;
 using osu.Game.Rulesets.Osu.Skinning.Default;
 using osu.Game.Rulesets.Scoring;
@@ -312,7 +313,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
             updateBonusScore();
         }
 
-        private static readonly int score_per_tick = new SpinnerBonusTick.OsuSpinnerBonusTickJudgement().MaxNumericResult;
+        private static readonly int score_per_tick = new OsuScoreProcessor().GetBaseScoreForResult(new SpinnerBonusTick.OsuSpinnerBonusTickJudgement().MaxResult);
 
         private void updateBonusScore()
         {

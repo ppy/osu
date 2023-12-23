@@ -26,6 +26,7 @@ using osu.Game.Screens.Edit.Components;
 using osu.Game.Screens.Menu;
 using osu.Game.Screens.Play;
 using osu.Game.Screens.Select;
+using osu.Game.Users;
 using osu.Game.Utils;
 using osuTK;
 
@@ -56,10 +57,10 @@ namespace osu.Game.Overlays.SkinEditor
         private MusicController music { get; set; } = null!;
 
         [Resolved]
-        private IBindable<RulesetInfo> ruleset { get; set; } = null!;
+        private Bindable<IReadOnlyList<Mod>> mods { get; set; } = null!;
 
         [Resolved]
-        private Bindable<IReadOnlyList<Mod>> mods { get; set; } = null!;
+        private Bindable<RulesetInfo> ruleset { get; set; } = null!;
 
         [Resolved]
         private IBindable<WorkingBeatmap> beatmap { get; set; } = null!;
@@ -139,6 +140,12 @@ namespace osu.Game.Overlays.SkinEditor
         {
             performer?.PerformFromScreen(screen =>
             {
+                if (beatmap.Value is DummyWorkingBeatmap)
+                {
+                    // presume we don't have anything good to play and just bail.
+                    return;
+                }
+
                 // If we're playing the intro, switch away to another beatmap.
                 if (beatmap.Value.BeatmapSetInfo.Protected)
                 {
@@ -150,6 +157,10 @@ namespace osu.Game.Overlays.SkinEditor
                 if (screen is Player)
                     return;
 
+                // the validity of the current game-wide beatmap + ruleset combination is enforced by song select.
+                // if we're anywhere else, the state is unknown and may not make sense, so forcibly set something that does.
+                if (screen is not PlaySongSelect)
+                    ruleset.Value = beatmap.Value.BeatmapInfo.Ruleset;
                 var replayGeneratingMod = ruleset.Value.CreateInstance().GetAutoplayMod();
 
                 IReadOnlyList<Mod> usableMods = mods.Value;
@@ -285,6 +296,12 @@ namespace osu.Game.Overlays.SkinEditor
 
         private partial class EndlessPlayer : ReplayPlayer
         {
+            protected override UserActivity? InitialActivity => null;
+
+            public override bool DisallowExternalBeatmapRulesetChanges => true;
+
+            public override bool? AllowGlobalTrackControl => false;
+
             public EndlessPlayer(Func<IBeatmap, IReadOnlyList<Mod>, Score> createScore)
                 : base(createScore, new PlayerConfiguration
                 {
@@ -294,9 +311,20 @@ namespace osu.Game.Overlays.SkinEditor
             {
             }
 
+            protected override void LoadComplete()
+            {
+                base.LoadComplete();
+
+                if (!LoadedBeatmapSuccessfully)
+                    Scheduler.AddDelayed(this.Exit, 3000);
+            }
+
             protected override void Update()
             {
                 base.Update();
+
+                if (!LoadedBeatmapSuccessfully)
+                    return;
 
                 if (GameplayState.HasPassed)
                     GameplayClockContainer.Seek(0);

@@ -36,8 +36,8 @@
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
     <PackageReference Include="Realm" Version="11.5.0" />
-    <PackageReference Include="ppy.osu.Framework" Version="2023.1201.1" />
-    <PackageReference Include="ppy.osu.Game.Resources" Version="2023.1127.0" />
+    <PackageReference Include="ppy.osu.Framework" Version="2023.1219.0" />
+    <PackageReference Include="ppy.osu.Game.Resources" Version="2023.1215.0" />
     <PackageReference Include="Sentry" Version="3.40.0" />
     <!-- Held back due to 0.34.0 failing AOT compilation on ZstdSharp.dll dependency. -->
     <PackageReference Include="SharpCompress" Version="0.33.0" />
