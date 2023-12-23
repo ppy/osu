@@ -6,6 +6,7 @@
 using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.Diagnostics;
+using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Extensions;
@@ -218,6 +219,7 @@ namespace osu.Game.Overlays.Dashboard
             {
                 panel.Anchor = Anchor.TopCentre;
                 panel.Origin = Anchor.TopCentre;
+                panel.CanSpectate.Value = playingUsers.Contains(user.Id);
             });
 
         public partial class OnlineUserPanel : CompositeDrawable, IFilterable
