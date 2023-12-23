@@ -9,6 +9,8 @@ using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
+using osu.Framework.Input.Bindings;
+using osu.Framework.Input.Events;
 using osu.Framework.Localisation;
 using osu.Framework.Utils;
 using osu.Game.Beatmaps;
@@ -16,6 +18,7 @@ using osu.Game.Database;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.Sprites;
+using osu.Game.Input.Bindings;
 using osu.Game.Localisation;
 using osu.Game.Overlays.Settings;
 using osu.Game.Rulesets.Mods;
@@ -26,7 +29,7 @@ using osuTK;
 
 namespace osu.Game.Screens.Play.PlayerSettings
 {
-    public partial class BeatmapOffsetControl : CompositeDrawable
+    public partial class BeatmapOffsetControl : CompositeDrawable, IKeyBindingHandler<GlobalAction>
     {
         public Bindable<ScoreInfo?> ReferenceScore { get; } = new Bindable<ScoreInfo?>();
 
@@ -86,28 +89,6 @@ namespace osu.Game.Screens.Play.PlayerSettings
                     },
                 }
             };
-        }
-
-        public partial class OffsetSliderBar : PlayerSliderBar<double>
-        {
-            protected override Drawable CreateControl() => new CustomSliderBar();
-
-            protected partial class CustomSliderBar : SliderBar
-            {
-                public override LocalisableString TooltipText =>
-                    Current.Value == 0
-                        ? LocalisableString.Interpolate($@"{base.TooltipText} ms")
-                        : LocalisableString.Interpolate($@"{base.TooltipText} ms {getEarlyLateText(Current.Value)}");
-
-                private LocalisableString getEarlyLateText(double value)
-                {
-                    Debug.Assert(value != 0);
-
-                    return value > 0
-                        ? BeatmapOffsetControlStrings.HitObjectsAppearEarlier
-                        : BeatmapOffsetControlStrings.HitObjectsAppearLater;
-                }
-            }
         }
 
         protected override void LoadComplete()
@@ -242,6 +223,52 @@ namespace osu.Game.Screens.Play.PlayerSettings
         {
             base.Dispose(isDisposing);
             beatmapOffsetSubscription?.Dispose();
+        }
+
+        public bool OnPressed(KeyBindingPressEvent<GlobalAction> e)
+        {
+            double amount = e.AltPressed ? 1 : 5;
+
+            switch (e.Action)
+            {
+                case GlobalAction.IncreaseOffset:
+                    Current.Value += amount;
+
+                    return true;
+
+                case GlobalAction.DecreaseOffset:
+                    Current.Value -= amount;
+
+                    return true;
+            }
+
+            return false;
+        }
+
+        public void OnReleased(KeyBindingReleaseEvent<GlobalAction> e)
+        {
+        }
+
+        public partial class OffsetSliderBar : PlayerSliderBar<double>
+        {
+            protected override Drawable CreateControl() => new CustomSliderBar();
+
+            protected partial class CustomSliderBar : SliderBar
+            {
+                public override LocalisableString TooltipText =>
+                    Current.Value == 0
+                        ? LocalisableString.Interpolate($@"{base.TooltipText} ms")
+                        : LocalisableString.Interpolate($@"{base.TooltipText} ms {getEarlyLateText(Current.Value)}");
+
+                private LocalisableString getEarlyLateText(double value)
+                {
+                    Debug.Assert(value != 0);
+
+                    return value > 0
+                        ? BeatmapOffsetControlStrings.HitObjectsAppearEarlier
+                        : BeatmapOffsetControlStrings.HitObjectsAppearLater;
+                }
+            }
         }
     }
 }
