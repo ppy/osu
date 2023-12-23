@@ -51,6 +51,12 @@ namespace osu.Game.Screens.Play.PlayerSettings
         [Resolved]
         private OsuColour colours { get; set; } = null!;
 
+        [Resolved]
+        private Player? player { get; set; }
+
+        [Resolved]
+        private IGameplayClock? gameplayClock { get; set; }
+
         private double lastPlayAverage;
         private double lastPlayBeatmapOffset;
         private HitEventTimingDistributionGraph? lastPlayGraph;
@@ -227,6 +233,18 @@ namespace osu.Game.Screens.Play.PlayerSettings
 
         public bool OnPressed(KeyBindingPressEvent<GlobalAction> e)
         {
+            // General limitations to ensure players don't do anything too weird.
+            // These match stable for now.
+            if (player is SubmittingPlayer)
+            {
+                // TODO: the blocking conditions should probably display a message.
+                if (player?.IsBreakTime.Value == false && gameplayClock?.CurrentTime - gameplayClock?.StartTime > 10000)
+                    return false;
+
+                if (gameplayClock?.IsPaused.Value == true)
+                    return false;
+            }
+
             // To match stable, this should adjust by 5 ms, or 1 ms when holding alt.
             // But that is hard to make work with global actions due to the operating mode.
             // Let's use the more precise as a default for now.
