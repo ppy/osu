@@ -461,7 +461,6 @@ namespace osu.Game.Skinning
                 case HitResult.LargeTickMiss:
                     return this.GetAnimation("slidertickmiss", true, false);
 
-                case HitResult.ComboBreak:
                 case HitResult.IgnoreMiss:
                     return this.GetAnimation("sliderendmiss", true, false);
 
