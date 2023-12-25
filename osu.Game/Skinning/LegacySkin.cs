@@ -453,11 +453,17 @@ namespace osu.Game.Skinning
 
         private Drawable? getJudgementAnimation(HitResult result)
         {
-            if (result.IsMiss())
-                return this.GetAnimation("hit0", true, false);
-
             switch (result)
             {
+                case HitResult.Miss:
+                    return this.GetAnimation("hit0", true, false);
+
+                case HitResult.LargeTickMiss:
+                    return this.GetAnimation("slidertickmiss", true, false);
+
+                case HitResult.IgnoreMiss:
+                    return this.GetAnimation("sliderendmiss", true, false);
+
                 case HitResult.Meh:
                     return this.GetAnimation("hit50", true, false);
 
