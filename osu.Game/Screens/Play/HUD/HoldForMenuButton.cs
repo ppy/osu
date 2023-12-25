@@ -33,6 +33,11 @@ namespace osu.Game.Screens.Play.HUD
 
         public readonly Bindable<bool> ReplayLoaded = new Bindable<bool>();
 
+        /// <summary>
+        /// Disable the entering animation and stay fully hidden until the cursor is nearby.
+        /// </summary>
+        public readonly Bindable<bool> AutoHide = new Bindable<bool>();
+
         private HoldButton button;
 
         public Action Action { get; set; }
@@ -41,6 +46,7 @@ namespace osu.Game.Screens.Play.HUD
 
         public HoldForMenuButton()
         {
+            Alpha = .001f;
             Direction = FillDirection.Horizontal;
             Spacing = new Vector2(20, 0);
             Margin = new MarginPadding(10);
@@ -53,6 +59,7 @@ namespace osu.Game.Screens.Play.HUD
             {
                 text = new OsuSpriteText
                 {
+                    Alpha = 0f,
                     Font = OsuFont.GetFont(weight: FontWeight.Bold),
                     Anchor = Anchor.CentreLeft,
                     Origin = Anchor.CentreLeft
@@ -78,7 +85,12 @@ namespace osu.Game.Screens.Play.HUD
                     : "press for menu";
             }, true);
 
-            text.FadeInFromZero(500, Easing.OutQuint).Delay(1500).FadeOut(500, Easing.OutQuint);
+            if (!AutoHide.Value)
+            {
+                text.FadeInFromZero(500, Easing.OutQuint)
+                    .Delay(1500)
+                    .FadeOut(500, Easing.OutQuint);
+            }
 
             base.LoadComplete();
         }
@@ -99,9 +111,11 @@ namespace osu.Game.Screens.Play.HUD
                 Alpha = 1;
             else
             {
+                float minAlpha = AutoHide.Value ? .001f : .07f;
+
                 Alpha = Interpolation.ValueAt(
                     Math.Clamp(Clock.ElapsedFrameTime, 0, 200),
-                    Alpha, Math.Clamp(1 - positionalAdjust, 0.04f, 1), 0, 200, Easing.OutQuint);
+                    Alpha, Math.Clamp(1 - positionalAdjust, minAlpha, 1), 0, 200, Easing.OutQuint);
             }
         }
 

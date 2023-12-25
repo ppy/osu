@@ -158,7 +158,7 @@ namespace osu.Game.Screens.Play
                     Direction = FillDirection.Vertical,
                     Children = new Drawable[]
                     {
-                        HoldToQuit = CreateHoldForMenuButton(),
+                        HoldToQuit = CreateHoldForMenuButton(touchDevice: mods.Any(m => m is ModTouchDevice)),
                     }
                 },
                 LeaderboardFlow = new FillFlowContainer
@@ -354,10 +354,11 @@ namespace osu.Game.Screens.Play
             ShowHealth = { BindTarget = ShowHealthBar }
         };
 
-        protected HoldForMenuButton CreateHoldForMenuButton() => new HoldForMenuButton
+        protected HoldForMenuButton CreateHoldForMenuButton(bool touchDevice) => new HoldForMenuButton
         {
             Anchor = Anchor.BottomRight,
             Origin = Anchor.BottomRight,
+            AutoHide = { Value = !touchDevice },
         };
 
         protected ModDisplay CreateModsContainer() => new ModDisplay
