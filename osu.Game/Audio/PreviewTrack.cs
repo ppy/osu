@@ -96,10 +96,13 @@ namespace osu.Game.Audio
 
             hasStarted = false;
 
-            Track.Stop();
+            if (!Track.HasCompleted)
+            {
+                Track.Stop();
 
-            // Ensure the track is reset immediately on stopping, so the next time it is started it has a correct time value.
-            Track.Seek(0);
+                // Ensure the track is reset immediately on stopping, so the next time it is started it has a correct time value.
+                Track.Seek(0);
+            }
 
             Stopped?.Invoke();
         }
