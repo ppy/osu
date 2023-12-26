@@ -21,7 +21,7 @@ namespace osu.Game.Screens.Edit.Timing
     public partial class ControlPointTable : EditorTable
     {
         [Resolved]
-        private Bindable<ControlPointGroup> selectedGroup { get; set; } = null!;
+        private Bindable<ControlPointGroup?> selectedGroup { get; set; } = null!;
 
         [Resolved]
         private EditorClock clock { get; set; } = null!;
@@ -32,6 +32,8 @@ namespace osu.Game.Screens.Edit.Timing
         {
             set
             {
+                int selectedIndex = GetIndexForObject(selectedGroup.Value);
+
                 Content = null;
                 BackgroundFlow.Clear();
 
@@ -53,7 +55,11 @@ namespace osu.Game.Screens.Edit.Timing
                 Columns = createHeaders();
                 Content = value.Select(createContent).ToArray().ToRectangular();
 
-                updateSelectedGroup();
+                if (!SetSelectedRow(selectedGroup.Value))
+                {
+                    // Some operations completely obliterate references, so best-effort reselect based on index.
+                    selectedGroup.Value = GetObjectAtIndex(selectedIndex) as ControlPointGroup;
+                }
             }
         }
 
@@ -61,10 +67,8 @@ namespace osu.Game.Screens.Edit.Timing
         {
             base.LoadComplete();
 
-            selectedGroup.BindValueChanged(_ => updateSelectedGroup(), true);
+            selectedGroup.BindValueChanged(_ => SetSelectedRow(selectedGroup.Value), true);
         }
-
-        private void updateSelectedGroup() => SetSelectedRow(selectedGroup.Value);
 
         private TableColumn[] createHeaders()
         {
