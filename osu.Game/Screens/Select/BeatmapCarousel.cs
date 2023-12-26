@@ -643,7 +643,7 @@ namespace osu.Game.Screens.Select
             while (randomSelectedBeatmaps.Any())
             {
                 var beatmap = randomSelectedBeatmaps[^1];
-                randomSelectedBeatmaps.Remove(beatmap);
+                randomSelectedBeatmaps.RemoveAt(randomSelectedBeatmaps.Count - 1);
 
                 if (!beatmap.Filtered.Value && beatmap.BeatmapInfo.BeatmapSet?.DeletePending != true)
                 {
