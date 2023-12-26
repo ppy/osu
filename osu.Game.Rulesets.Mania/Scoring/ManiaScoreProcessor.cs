@@ -33,29 +33,18 @@ namespace osu.Game.Rulesets.Mania.Scoring
 
         protected override double GetComboScoreChange(JudgementResult result)
         {
-            return getBaseComboScoreForResult(result.Type) * Math.Min(Math.Max(0.5, Math.Log(result.ComboAfterJudgement, combo_base)), Math.Log(400, combo_base));
+            return GetBaseScoreForResult(result.Type) * Math.Min(Math.Max(0.5, Math.Log(result.ComboAfterJudgement, combo_base)), Math.Log(400, combo_base));
         }
 
         public override int GetBaseScoreForResult(HitResult result)
         {
             switch (result)
             {
-                case HitResult.Perfect:
-                    return 305;
+                case HitResult.SmallBonus:
+                    return 1;
             }
 
             return base.GetBaseScoreForResult(result);
-        }
-
-        private int getBaseComboScoreForResult(HitResult result)
-        {
-            switch (result)
-            {
-                case HitResult.Perfect:
-                    return 300;
-            }
-
-            return GetBaseScoreForResult(result);
         }
 
         private class JudgementOrderComparer : IComparer<HitObject>

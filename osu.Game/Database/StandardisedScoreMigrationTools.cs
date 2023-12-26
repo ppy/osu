@@ -444,10 +444,13 @@ namespace osu.Game.Database
                     break;
 
                 case 3:
+                    var scoreProcessor = ruleset.CreateScoreProcessor();
+                    double bonus = score.Statistics.GetValueOrDefault(HitResult.Perfect) * scoreProcessor.GetBaseScoreForResult(HitResult.Perfect);
+
                     convertedTotalScore = (long)Math.Round((
                         850000 * comboProportion
                         + 150000 * Math.Pow(score.Accuracy, 2 + 2 * score.Accuracy)
-                        + bonusProportion) * modMultiplier);
+                        + bonus) * modMultiplier);
                     break;
 
                 default:
