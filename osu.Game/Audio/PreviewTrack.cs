@@ -96,6 +96,7 @@ namespace osu.Game.Audio
 
             hasStarted = false;
 
+            // This pre-check is important, fixes a BASS deadlock in some scenarios.
             if (!Track.HasCompleted)
             {
                 Track.Stop();
