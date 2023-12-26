@@ -47,7 +47,9 @@ namespace osu.Game.Overlays
             [BackgroundDependencyLoader]
             private void load()
             {
-                Size = new Vector2(SettingsSidebar.DEFAULT_WIDTH);
+                Size = new Vector2(SettingsSidebar.EXPANDED_WIDTH);
+
+                Padding = new MarginPadding(5);
 
                 AddRange(new Drawable[]
                 {
@@ -61,7 +63,8 @@ namespace osu.Game.Overlays
                             {
                                 Anchor = Anchor.Centre,
                                 Origin = Anchor.Centre,
-                                Size = new Vector2(15),
+                                Y = -5,
+                                Size = new Vector2(30),
                                 Shadow = true,
                                 Icon = FontAwesome.Solid.ChevronLeft
                             },
@@ -69,8 +72,8 @@ namespace osu.Game.Overlays
                             {
                                 Anchor = Anchor.Centre,
                                 Origin = Anchor.Centre,
-                                Y = 15,
-                                Font = OsuFont.GetFont(size: 12, weight: FontWeight.Bold),
+                                Y = 30,
+                                Font = OsuFont.GetFont(size: 16, weight: FontWeight.Regular),
                                 Text = @"back",
                             },
                         }
@@ -80,6 +83,8 @@ namespace osu.Game.Overlays
 
             protected override void UpdateState()
             {
+                base.UpdateState();
+
                 content.FadeColour(IsHovered ? ColourProvider.Light1 : ColourProvider.Light3, FADE_DURATION, Easing.OutQuint);
             }
         }

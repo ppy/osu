@@ -111,12 +111,11 @@ namespace osu.Game.Overlays.Settings
         private void load()
         {
             selectionIndicator.Colour = ColourProvider.Highlight1;
-            Hover.Colour = ColourProvider.Light4;
         }
 
         protected override void UpdateState()
         {
-            Hover.FadeTo(IsHovered ? 0.1f : 0, FADE_DURATION, Easing.OutQuint);
+            base.UpdateState();
 
             if (Selected)
             {
