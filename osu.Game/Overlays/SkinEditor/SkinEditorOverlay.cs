@@ -316,7 +316,7 @@ namespace osu.Game.Overlays.SkinEditor
                 base.LoadComplete();
 
                 if (!LoadedBeatmapSuccessfully)
-                    Scheduler.AddDelayed(this.Exit, RESULTS_DISPLAY_DELAY);
+                    Scheduler.AddDelayed(this.Exit, 1000);
             }
 
             protected override void Update()
