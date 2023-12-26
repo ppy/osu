@@ -33,7 +33,7 @@ namespace osu.Game.Overlays
 
         public const float TRANSITION_LENGTH = 600;
 
-        private const float sidebar_width = SettingsSidebar.DEFAULT_WIDTH;
+        private const float sidebar_width = SettingsSidebar.EXPANDED_WIDTH;
 
         /// <summary>
         /// The width of the settings panel content, excluding the sidebar.
