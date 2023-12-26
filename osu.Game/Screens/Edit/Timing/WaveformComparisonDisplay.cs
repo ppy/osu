@@ -219,7 +219,7 @@ namespace osu.Game.Screens.Edit.Timing
                 // offset to the required beat index.
                 double time = selectedGroupStartTime + index * timingPoint.BeatLength;
 
-                float offset = (float)(time - visible_width / 2) / trackLength * scale;
+                float offset = (float)(time - visible_width / 2 + Editor.WAVEFORM_VISUAL_OFFSET) / trackLength * scale;
 
                 row.Alpha = time < selectedGroupStartTime || time > selectedGroupEndTime ? 0.2f : 1;
                 row.WaveformOffsetTo(-offset, animated);
