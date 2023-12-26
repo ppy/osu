@@ -66,16 +66,16 @@ namespace osu.Game.Overlays.Settings
             {
                 textIconContent = new Container
                 {
-                    Width = SettingsSidebar.CONTRACTED_WIDTH,
-                    RelativeSizeAxes = Axes.Y,
+                    RelativeSizeAxes = Axes.Both,
                     Colour = OsuColour.Gray(0.6f),
                     Children = new Drawable[]
                     {
                         iconContainer = new ConstrainedIconContainer
                         {
-                            Anchor = Anchor.Centre,
-                            Origin = Anchor.Centre,
+                            Anchor = Anchor.CentreLeft,
+                            Origin = Anchor.CentreLeft,
                             Size = new Vector2(20),
+                            Margin = new MarginPadding { Left = 25 }
                         },
                         headerText = new OsuSpriteText
                         {
