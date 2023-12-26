@@ -467,7 +467,7 @@ namespace osu.Game.Tests.Visual.SongSelect
             for (int i = 0; i < random_select_count; i++)
             {
                 prevRandom();
-                AddAssert("correct random last selected", () => selectedSets.Peek() == carousel.SelectedBeatmapSet);
+                AddAssert("correct random last selected", () => selectedSets.Peek(), () => Is.EqualTo(carousel.SelectedBeatmapSet));
             }
         }
 
