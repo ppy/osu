@@ -77,7 +77,7 @@ namespace osu.Game.Online.API
             APIEndpointUrl = endpointConfiguration.APIEndpointUrl;
             WebsiteRootUrl = endpointConfiguration.WebsiteRootUrl;
 
-            authentication = new OAuth(endpointConfiguration.APIClientID, endpointConfiguration.APIClientSecret, APIEndpointUrl);
+            authentication = new OAuth(this, endpointConfiguration.APIClientID, endpointConfiguration.APIClientSecret);
             log = Logger.GetLogger(LoggingTarget.Network);
 
             ProvidedUsername = config.Get<string>(OsuSetting.Username);

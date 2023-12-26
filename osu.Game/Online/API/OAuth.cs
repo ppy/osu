@@ -7,16 +7,20 @@ using System;
 using System.Diagnostics;
 using System.Net.Http;
 using System.Net.Sockets;
+using System.Threading.Tasks;
+using JetBrains.Annotations;
 using Newtonsoft.Json;
 using osu.Framework.Bindables;
+using osu.Framework.Extensions;
+using osu.Framework.IO.Network;
 
 namespace osu.Game.Online.API
 {
     public class OAuth
     {
+        private readonly IAPIProvider api;
         private readonly string clientId;
         private readonly string clientSecret;
-        private readonly string endpoint;
 
         public readonly Bindable<OAuthToken> Token = new Bindable<OAuthToken>();
 
@@ -26,15 +30,14 @@ namespace osu.Game.Online.API
             set => Token.Value = string.IsNullOrEmpty(value) ? null : OAuthToken.Parse(value);
         }
 
-        internal OAuth(string clientId, string clientSecret, string endpoint)
+        internal OAuth(IAPIProvider api, string clientId, string clientSecret)
         {
             Debug.Assert(clientId != null);
             Debug.Assert(clientSecret != null);
-            Debug.Assert(endpoint != null);
 
+            this.api = api;
             this.clientId = clientId;
             this.clientSecret = clientSecret;
-            this.endpoint = endpoint;
         }
 
         internal void AuthenticateWithLogin(string username, string password)
@@ -44,39 +47,42 @@ namespace osu.Game.Online.API
 
             var accessTokenRequest = new AccessTokenRequestPassword(username, password)
             {
-                Url = $@"{endpoint}/oauth/token",
-                Method = HttpMethod.Post,
                 ClientId = clientId,
                 ClientSecret = clientSecret
             };
 
-            using (accessTokenRequest)
+            TaskCompletionSource<OAuthToken> response = new TaskCompletionSource<OAuthToken>();
+
+            accessTokenRequest.Success += token => response.SetResult(token);
+            accessTokenRequest.Failure += e =>
             {
                 try
                 {
-                    accessTokenRequest.Perform();
+                    // attempt to decode a displayable error string.
+                    var error = JsonConvert.DeserializeObject<OAuthError>(accessTokenRequest.ResponseString ?? string.Empty);
+                    if (error != null)
+                        response.SetException(new APIException(error.UserDisplayableError, e));
                 }
-                catch (Exception ex)
+                catch
                 {
-                    Token.Value = null;
-
-                    var throwableException = ex;
-
-                    try
-                    {
-                        // attempt to decode a displayable error string.
-                        var error = JsonConvert.DeserializeObject<OAuthError>(accessTokenRequest.GetResponseString() ?? string.Empty);
-                        if (error != null)
-                            throwableException = new APIException(error.UserDisplayableError, ex);
-                    }
-                    catch
-                    {
-                    }
-
-                    throw throwableException;
+                    response.SetException(e);
                 }
+            };
 
-                Token.Value = accessTokenRequest.ResponseObject;
+            try
+            {
+                accessTokenRequest.Perform(api);
+                Token.Value = response.Task.GetResultSafely();
+            }
+            catch (AggregateException e)
+            {
+                Token.Value = null;
+                throw e.GetBaseException();
+            }
+            catch
+            {
+                Token.Value = null;
+                throw;
             }
         }
 
@@ -86,19 +92,14 @@ namespace osu.Game.Online.API
             {
                 var refreshRequest = new AccessTokenRequestRefresh(refresh)
                 {
-                    Url = $@"{endpoint}/oauth/token",
-                    Method = HttpMethod.Post,
                     ClientId = clientId,
                     ClientSecret = clientSecret
                 };
 
-                using (refreshRequest)
-                {
-                    refreshRequest.Perform();
+                refreshRequest.Perform(api);
 
-                    Token.Value = refreshRequest.ResponseObject;
-                    return true;
-                }
+                Token.Value = refreshRequest.Response;
+                return true;
             }
             catch (SocketException)
             {
@@ -169,11 +170,13 @@ namespace osu.Game.Online.API
                 GrantType = @"refresh_token";
             }
 
-            protected override void PrePerform()
+            protected override WebRequest CreateWebRequest()
             {
-                AddParameter("refresh_token", RefreshToken);
+                var req = base.CreateWebRequest();
 
-                base.PrePerform();
+                req.AddParameter("refresh_token", RefreshToken);
+
+                return req;
             }
         }
 
@@ -189,30 +192,43 @@ namespace osu.Game.Online.API
                 GrantType = @"password";
             }
 
-            protected override void PrePerform()
+            protected override WebRequest CreateWebRequest()
             {
-                AddParameter("username", Username);
-                AddParameter("password", Password);
+                var req = base.CreateWebRequest();
 
-                base.PrePerform();
+                req.AddParameter("username", Username);
+                req.AddParameter("password", Password);
+
+                return req;
             }
         }
 
-        private class AccessTokenRequest : OsuJsonWebRequest<OAuthToken>
+        private abstract class AccessTokenRequest : APIRequest<OAuthToken>
         {
+            [CanBeNull]
+            public string ResponseString => WebRequest?.GetResponseString();
+
             protected string GrantType;
 
             internal string ClientId;
             internal string ClientSecret;
 
-            protected override void PrePerform()
-            {
-                AddParameter("grant_type", GrantType);
-                AddParameter("client_id", ClientId);
-                AddParameter("client_secret", ClientSecret);
-                AddParameter("scope", "*");
+            protected override string Target => "oauth/token";
 
-                base.PrePerform();
+            // Override Uri directly because this is not an /api/v2/ request.
+            protected override string Uri => $"{API.APIEndpointUrl}/{Target}";
+
+            protected override WebRequest CreateWebRequest()
+            {
+                var req = base.CreateWebRequest();
+
+                req.Method = HttpMethod.Post;
+                req.AddParameter("grant_type", GrantType);
+                req.AddParameter("client_id", ClientId);
+                req.AddParameter("client_secret", ClientSecret);
+                req.AddParameter("scope", "*");
+
+                return req;
             }
         }
 
