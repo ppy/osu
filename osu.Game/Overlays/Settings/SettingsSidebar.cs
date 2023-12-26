@@ -13,9 +13,12 @@ namespace osu.Game.Overlays.Settings
         public const float DEFAULT_WIDTH = 70;
         public const int EXPANDED_WIDTH = 200;
 
+        protected override bool ExpandOnHover => false;
+
         public SettingsSidebar()
             : base(DEFAULT_WIDTH, EXPANDED_WIDTH)
         {
+            Expanded.Value = true;
         }
 
         [BackgroundDependencyLoader]
