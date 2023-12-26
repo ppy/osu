@@ -227,8 +227,10 @@ namespace osu.Game.Screens.Play
             {
                 elapsedGameplayClockTime += GameplayClock.ElapsedFrameTime;
 
-                elapsedValidationTime ??= elapsedGameplayClockTime;
-                elapsedValidationTime += GameplayClock.Rate * Time.Elapsed;
+                if (elapsedValidationTime == null)
+                    elapsedValidationTime = elapsedGameplayClockTime;
+                else
+                    elapsedValidationTime += GameplayClock.Rate * Time.Elapsed;
 
                 if (Math.Abs(elapsedGameplayClockTime - elapsedValidationTime!.Value) > 300)
                 {
