@@ -285,7 +285,6 @@ namespace osu.Game.Overlays
                             return;
 
                         SectionsContainer.ScrollTo(section);
-                        Sidebar.Expanded.Value = false;
                     },
                 };
             }
