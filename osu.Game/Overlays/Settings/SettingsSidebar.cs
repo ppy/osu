@@ -10,13 +10,13 @@ namespace osu.Game.Overlays.Settings
 {
     public partial class SettingsSidebar : ExpandingContainer
     {
-        public const float DEFAULT_WIDTH = 70;
+        public const float CONTRACTED_WIDTH = 70;
         public const int EXPANDED_WIDTH = 170;
 
         protected override bool ExpandOnHover => false;
 
         public SettingsSidebar()
-            : base(DEFAULT_WIDTH, EXPANDED_WIDTH)
+            : base(CONTRACTED_WIDTH, EXPANDED_WIDTH)
         {
             Expanded.Value = true;
         }

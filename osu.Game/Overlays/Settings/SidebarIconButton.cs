@@ -66,7 +66,7 @@ namespace osu.Game.Overlays.Settings
             {
                 textIconContent = new Container
                 {
-                    Width = SettingsSidebar.DEFAULT_WIDTH,
+                    Width = SettingsSidebar.CONTRACTED_WIDTH,
                     RelativeSizeAxes = Axes.Y,
                     Colour = OsuColour.Gray(0.6f),
                     Children = new Drawable[]
