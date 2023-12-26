@@ -41,6 +41,7 @@ namespace osu.Game.Tests.Visual.Settings
         public void TestBasic()
         {
             AddStep("do nothing", () => { });
+            AddToggleStep("toggle visibility", visible => settings.State.Value = visible ? Visibility.Visible : Visibility.Hidden);
         }
 
         [Test]
