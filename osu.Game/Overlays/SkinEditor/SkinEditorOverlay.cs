@@ -100,9 +100,6 @@ namespace osu.Game.Overlays.SkinEditor
         {
             globallyDisableBeatmapSkinSetting();
 
-            if (lastTargetScreen is MainMenu)
-                PresentGameplay();
-
             if (skinEditor != null)
             {
                 skinEditor.Show();
@@ -121,6 +118,9 @@ namespace osu.Game.Overlays.SkinEditor
                     return;
 
                 AddInternal(editor);
+
+                if (lastTargetScreen is MainMenu)
+                    PresentGameplay();
 
                 Debug.Assert(lastTargetScreen != null);
 
@@ -316,7 +316,7 @@ namespace osu.Game.Overlays.SkinEditor
                 base.LoadComplete();
 
                 if (!LoadedBeatmapSuccessfully)
-                    Scheduler.AddDelayed(this.Exit, 3000);
+                    Scheduler.AddDelayed(this.Exit, RESULTS_DISPLAY_DELAY);
             }
 
             protected override void Update()
