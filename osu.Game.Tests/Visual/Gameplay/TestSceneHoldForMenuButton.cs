@@ -22,7 +22,7 @@ namespace osu.Game.Tests.Visual.Gameplay
 
         private HoldForMenuButton holdForMenuButton;
 
-        private void setupSteps(bool autoHide)
+        private void setupSteps(bool alwaysShow)
         {
             AddStep("create button", () =>
             {
@@ -36,7 +36,7 @@ namespace osu.Game.Tests.Visual.Gameplay
                     Origin = Anchor.CentreRight,
                     Anchor = Anchor.CentreRight,
                     Action = () => exitAction = true,
-                    AutoHide = { Value = autoHide },
+                    AlwaysShow = { Value = alwaysShow },
                 };
             });
         }
@@ -44,7 +44,7 @@ namespace osu.Game.Tests.Visual.Gameplay
         [Test]
         public void TestFullMovementAndTrigger()
         {
-            setupSteps(autoHide: false);
+            setupSteps(alwaysShow: true);
             AddStep("Trigger text fade in", () => InputManager.MoveMouseTo(holdForMenuButton));
             AddUntilStep("Text visible", () => getSpriteText().IsPresent && !exitAction);
             AddStep("Trigger text fade out", () => InputManager.MoveMouseTo(Vector2.One));
@@ -67,7 +67,7 @@ namespace osu.Game.Tests.Visual.Gameplay
         [Test]
         public void TestAutoHide()
         {
-            setupSteps(autoHide: true);
+            setupSteps(alwaysShow: false);
             AddAssert("Container initially invisible", () => holdForMenuButton.Alpha < .01f);
             AddStep("Trigger fade in", () => InputManager.MoveMouseTo(holdForMenuButton));
             AddUntilStep("Container visible", () => holdForMenuButton.Alpha >= 1f && !exitAction);
@@ -86,10 +86,10 @@ namespace osu.Game.Tests.Visual.Gameplay
         [Test]
         public void TestPartialFadeOnNoInput()
         {
-            setupSteps(autoHide: false);
+            setupSteps(alwaysShow: true);
             AddStep("move mouse away", () => InputManager.MoveMouseTo(Vector2.One));
             AddUntilStep("wait for text fade out", () => !getSpriteText().IsPresent);
-            AddUntilStep("wait for button fade out", () => holdForMenuButton.Alpha < 1f);
+            AddUntilStep("wait for button fade out", () => holdForMenuButton.Alpha < 0.1f);
         }
 
         private SpriteText getSpriteText() => holdForMenuButton.Children.OfType<SpriteText>().First();

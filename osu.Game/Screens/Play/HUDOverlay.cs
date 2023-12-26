@@ -85,6 +85,7 @@ namespace osu.Game.Screens.Play
         private Bindable<bool> configSettingsOverlay;
 
         private readonly BindableBool replayLoaded = new BindableBool();
+        private readonly BindableBool touchActive = new BindableBool();
 
         private static bool hasShownNotificationOnce;
 
@@ -158,7 +159,7 @@ namespace osu.Game.Screens.Play
                     Direction = FillDirection.Vertical,
                     Children = new Drawable[]
                     {
-                        HoldToQuit = CreateHoldForMenuButton(touchDevice: mods.Any(m => m is ModTouchDevice)),
+                        HoldToQuit = CreateHoldForMenuButton(),
                     }
                 },
                 LeaderboardFlow = new FillFlowContainer
@@ -177,7 +178,7 @@ namespace osu.Game.Screens.Play
         }
 
         [BackgroundDependencyLoader(true)]
-        private void load(OsuConfigManager config, INotificationOverlay notificationOverlay)
+        private void load(OsuConfigManager config, INotificationOverlay notificationOverlay, SessionStatics statics)
         {
             if (drawableRuleset != null)
             {
@@ -189,6 +190,8 @@ namespace osu.Game.Screens.Play
             configVisibilityMode = config.GetBindable<HUDVisibilityMode>(OsuSetting.HUDVisibilityMode);
             configLeaderboardVisibility = config.GetBindable<bool>(OsuSetting.GameplayLeaderboard);
             configSettingsOverlay = config.GetBindable<bool>(OsuSetting.ReplaySettingsOverlay);
+
+            statics.BindWith(Static.TouchInputActive, touchActive);
 
             if (configVisibilityMode.Value == HUDVisibilityMode.Never && !hasShownNotificationOnce)
             {
@@ -354,11 +357,11 @@ namespace osu.Game.Screens.Play
             ShowHealth = { BindTarget = ShowHealthBar }
         };
 
-        protected HoldForMenuButton CreateHoldForMenuButton(bool touchDevice) => new HoldForMenuButton
+        protected HoldForMenuButton CreateHoldForMenuButton() => new HoldForMenuButton
         {
             Anchor = Anchor.BottomRight,
             Origin = Anchor.BottomRight,
-            AutoHide = { Value = !touchDevice },
+            AlwaysShow = { BindTarget = touchActive },
         };
 
         protected ModDisplay CreateModsContainer() => new ModDisplay

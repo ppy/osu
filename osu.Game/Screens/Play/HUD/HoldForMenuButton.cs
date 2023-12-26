@@ -34,9 +34,9 @@ namespace osu.Game.Screens.Play.HUD
         public readonly Bindable<bool> ReplayLoaded = new Bindable<bool>();
 
         /// <summary>
-        /// Disable the entering animation and stay fully hidden until the cursor is nearby.
+        /// When enabled, show an enter animation and afterwards stay partially faded, otherwise be completely hidden until cursor is nearby.
         /// </summary>
-        public readonly Bindable<bool> AutoHide = new Bindable<bool>();
+        public readonly Bindable<bool> AlwaysShow = new Bindable<bool>(true);
 
         private HoldButton button;
 
@@ -85,8 +85,9 @@ namespace osu.Game.Screens.Play.HUD
                     : "press for menu";
             }, true);
 
-            if (!AutoHide.Value)
+            if (AlwaysShow.Value)
             {
+                Alpha = 1f;
                 text.FadeInFromZero(500, Easing.OutQuint)
                     .Delay(1500)
                     .FadeOut(500, Easing.OutQuint);
@@ -111,7 +112,7 @@ namespace osu.Game.Screens.Play.HUD
                 Alpha = 1;
             else
             {
-                float minAlpha = AutoHide.Value ? .001f : .07f;
+                float minAlpha = AlwaysShow.Value ? .08f : .001f;
 
                 Alpha = Interpolation.ValueAt(
                     Math.Clamp(Clock.ElapsedFrameTime, 0, 200),
