@@ -60,6 +60,8 @@ namespace osu.Game.Overlays.Settings
             RelativeSizeAxes = Axes.X;
             Height = 46;
 
+            Padding = new MarginPadding(5);
+
             AddRange(new Drawable[]
             {
                 textIconContent = new Container
