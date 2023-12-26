@@ -109,8 +109,13 @@ namespace osu.Game.Screens.Edit.Timing
             controlPointGroups.BindTo(Beatmap.ControlPointInfo.Groups);
             controlPointGroups.BindCollectionChanged((_, _) =>
             {
-                table.ControlGroups = controlPointGroups;
-                changeHandler?.SaveState();
+                // This callback can happen many times in a change operation. It gets expensive.
+                // We really should be handling the `CollectionChanged` event properly.
+                Scheduler.AddOnce(() =>
+                {
+                    table.ControlGroups = controlPointGroups;
+                    changeHandler?.SaveState();
+                });
             }, true);
 
             table.OnRowSelected += drawable => scroll.ScrollIntoView(drawable);
