@@ -208,6 +208,14 @@ namespace osu.Game.Screens.Play
 
         private Task submitScore(Score score)
         {
+            var masterClock = GameplayClockContainer as MasterGameplayClockContainer;
+
+            if (masterClock?.PlaybackRateValid.Value != true)
+            {
+                Logger.Log("Score submission cancelled due to audio playback rate discrepancy.");
+                return Task.CompletedTask;
+            }
+
             // token may be null if the request failed but gameplay was still allowed (see HandleTokenRetrievalFailure).
             if (token == null)
             {
