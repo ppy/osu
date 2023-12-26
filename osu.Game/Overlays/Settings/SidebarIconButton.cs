@@ -69,17 +69,17 @@ namespace osu.Game.Overlays.Settings
                     Colour = OsuColour.Gray(0.6f),
                     Children = new Drawable[]
                     {
-                        headerText = new OsuSpriteText
-                        {
-                            Position = new Vector2(SettingsSidebar.DEFAULT_WIDTH + 10, 0),
-                            Anchor = Anchor.CentreLeft,
-                            Origin = Anchor.CentreLeft,
-                        },
                         iconContainer = new ConstrainedIconContainer
                         {
                             Anchor = Anchor.Centre,
                             Origin = Anchor.Centre,
                             Size = new Vector2(20),
+                        },
+                        headerText = new OsuSpriteText
+                        {
+                            Position = new Vector2(60, 0),
+                            Anchor = Anchor.CentreLeft,
+                            Origin = Anchor.CentreLeft,
                         },
                     }
                 },
