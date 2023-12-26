@@ -58,7 +58,7 @@ namespace osu.Game.Screens.Edit
             return -1;
         }
 
-        protected bool SetSelectedRow(object? item)
+        protected virtual bool SetSelectedRow(object? item)
         {
             bool foundSelection = false;
 
