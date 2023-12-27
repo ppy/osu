@@ -24,6 +24,7 @@ namespace osu.Game.Online.API.Requests.Responses
 
         public override bool Equals(object? obj) => obj is APISystemTitle other && Equals(other);
 
+        // ReSharper disable NonReadonlyMemberInGetHashCode
         public override int GetHashCode() => HashCode.Combine(Image, Url);
     }
 }
