@@ -181,7 +181,7 @@ namespace osu.Game.Overlays
             Scheduler.AddDelayed(loadSections, TRANSITION_LENGTH / 3);
 
             Sidebar?.MoveToX(0, TRANSITION_LENGTH, Easing.OutQuint);
-            this.FadeTo(1, TRANSITION_LENGTH, Easing.OutQuint);
+            this.FadeTo(1, TRANSITION_LENGTH / 2, Easing.OutQuint);
 
             searchTextBox.TakeFocus();
             searchTextBox.HoldFocus = true;
@@ -197,7 +197,7 @@ namespace osu.Game.Overlays
             ContentContainer.MoveToX(-WIDTH + ExpandedPosition, TRANSITION_LENGTH, Easing.OutQuint);
 
             Sidebar?.MoveToX(-sidebar_width, TRANSITION_LENGTH, Easing.OutQuint);
-            this.FadeTo(0, TRANSITION_LENGTH, Easing.OutQuint);
+            this.FadeTo(0, TRANSITION_LENGTH / 2, Easing.OutQuint);
 
             searchTextBox.HoldFocus = false;
             if (searchTextBox.HasFocus)
