@@ -113,7 +113,7 @@ namespace osu.Game.Overlays.Toolbar
                         {
                             Anchor = Anchor.CentreLeft,
                             Origin = Anchor.CentreLeft,
-                            Size = new Vector2(26),
+                            Size = new Vector2(20),
                             Alpha = 0,
                         },
                         DrawableText = new OsuSpriteText
