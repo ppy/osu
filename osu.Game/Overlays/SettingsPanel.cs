@@ -59,7 +59,7 @@ namespace osu.Game.Overlays
         protected override string PopInSampleName => "UI/settings-pop-in";
         protected override double PopInOutSampleBalance => -OsuGameBase.SFX_STEREO_STRENGTH;
 
-        private readonly bool showSidebar;
+        private readonly bool showBackButton;
 
         private LoadingLayer loading;
 
@@ -72,9 +72,9 @@ namespace osu.Game.Overlays
         [Cached]
         private OverlayColourProvider colourProvider = new OverlayColourProvider(OverlayColourScheme.Purple);
 
-        protected SettingsPanel(bool showSidebar)
+        protected SettingsPanel(bool showBackButton)
         {
-            this.showSidebar = showSidebar;
+            this.showBackButton = showBackButton;
             RelativeSizeAxes = Axes.Y;
             AutoSizeAxes = Axes.X;
         }
@@ -146,10 +146,11 @@ namespace osu.Game.Overlays
                 }
             });
 
-            if (showSidebar)
+            AddInternal(Sidebar = new SettingsSidebar(showBackButton)
             {
-                AddInternal(Sidebar = new SettingsSidebar { Width = sidebar_width });
-            }
+                BackButtonAction = Hide,
+                Width = sidebar_width
+            });
 
             CreateSections()?.ForEach(AddSection);
         }
