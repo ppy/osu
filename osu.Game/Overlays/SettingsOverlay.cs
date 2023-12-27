@@ -21,7 +21,7 @@ namespace osu.Game.Overlays
 {
     public partial class SettingsOverlay : SettingsPanel, INamedOverlayComponent
     {
-        public IconUsage Icon => HexaconsIcons.Settings;
+        public IconUsage Icon => OsuIcon.Settings;
         public LocalisableString Title => SettingsStrings.HeaderTitle;
         public LocalisableString Description => SettingsStrings.HeaderDescription;
 

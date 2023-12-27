@@ -82,7 +82,7 @@ namespace osu.Game.Overlays.Wiki
             {
                 Title = PageTitleStrings.MainWikiControllerDefault;
                 Description = NamedOverlayComponentStrings.WikiDescription;
-                Icon = HexaconsIcons.Wiki;
+                Icon = OsuIcon.Wiki;
             }
         }
     }
