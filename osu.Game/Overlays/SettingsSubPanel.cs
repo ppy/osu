@@ -37,7 +37,7 @@ namespace osu.Game.Overlays
 
         public partial class BackButton : SidebarButton
         {
-            private Container content;
+            private Drawable content;
 
             public BackButton()
                 : base(HoverSampleSet.Default)
@@ -49,30 +49,31 @@ namespace osu.Game.Overlays
             {
                 Size = new Vector2(SettingsSidebar.EXPANDED_WIDTH);
 
-                Padding = new MarginPadding(5);
+                Padding = new MarginPadding(40);
 
                 AddRange(new Drawable[]
                 {
-                    content = new Container
+                    content = new FillFlowContainer
                     {
                         Anchor = Anchor.Centre,
                         Origin = Anchor.Centre,
+                        Direction = FillDirection.Vertical,
+                        AutoSizeAxes = Axes.Both,
+                        Spacing = new Vector2(5),
                         Children = new Drawable[]
                         {
                             new SpriteIcon
                             {
-                                Anchor = Anchor.Centre,
-                                Origin = Anchor.Centre,
-                                Y = -5,
+                                Anchor = Anchor.TopCentre,
+                                Origin = Anchor.TopCentre,
                                 Size = new Vector2(30),
                                 Shadow = true,
                                 Icon = FontAwesome.Solid.ChevronLeft
                             },
                             new OsuSpriteText
                             {
-                                Anchor = Anchor.Centre,
-                                Origin = Anchor.Centre,
-                                Y = 30,
+                                Anchor = Anchor.TopCentre,
+                                Origin = Anchor.TopCentre,
                                 Font = OsuFont.GetFont(size: 16, weight: FontWeight.Regular),
                                 Text = @"back",
                             },
