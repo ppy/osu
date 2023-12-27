@@ -11,6 +11,7 @@ using osu.Framework.Allocation;
 using osu.Framework.Logging;
 using osu.Framework.Screens;
 using osu.Game.Beatmaps;
+using osu.Game.Configuration;
 using osu.Game.Database;
 using osu.Game.Online.API;
 using osu.Game.Online.Multiplayer;
@@ -36,6 +37,9 @@ namespace osu.Game.Screens.Play
 
         [Resolved]
         private SpectatorClient spectatorClient { get; set; }
+
+        [Resolved]
+        private SessionStatics statics { get; set; }
 
         private TaskCompletionSource<bool> scoreSubmissionSource;
 
@@ -176,6 +180,7 @@ namespace osu.Game.Screens.Play
         {
             bool exiting = base.OnExiting(e);
             submitFromFailOrQuit();
+            statics.SetValue(Static.LastLocalUserScore, Score.ScoreInfo.DeepClone());
             return exiting;
         }
 
