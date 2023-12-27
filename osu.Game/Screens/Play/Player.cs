@@ -477,6 +477,10 @@ namespace osu.Game.Screens.Play
                 skipOutroOverlay.Expire();
             }
 
+            if (!Configuration.AllowBreakSkipping || !DrawableRuleset.AllowGameplayOverlays)
+                // Disallow break skipping, by making the `SkipBreak` function useless.
+                breakTracker.SkipBreak = () => { };
+
             if (GameplayClockContainer is MasterGameplayClockContainer master)
                 HUDOverlay.PlayerSettingsOverlay.PlaybackSettings.UserPlaybackRate.BindTarget = master.UserPlaybackRate;
 
