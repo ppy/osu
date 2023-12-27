@@ -164,11 +164,11 @@ namespace osu.Game.Overlays.Toolbar
                                         {
                                             new ToolbarNewsButton(),
                                             new ToolbarChangelogButton(),
+                                            new ToolbarWikiButton(),
                                             new ToolbarRankingsButton(),
                                             new ToolbarBeatmapListingButton(),
                                             new ToolbarChatButton(),
                                             new ToolbarSocialButton(),
-                                            new ToolbarWikiButton(),
                                             new ToolbarMusicButton(),
                                             //new ToolbarButton
                                             //{
