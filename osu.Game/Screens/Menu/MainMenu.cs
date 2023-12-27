@@ -76,6 +76,9 @@ namespace osu.Game.Screens.Menu
         [Resolved(canBeNull: true)]
         private IDialogOverlay dialogOverlay { get; set; }
 
+        [Resolved(canBeNull: true)]
+        private VersionManager versionManager { get; set; }
+
         protected override BackgroundScreen CreateBackground() => new BackgroundScreenDefault();
 
         protected override bool PlayExitSound => false;
@@ -91,6 +94,7 @@ namespace osu.Game.Screens.Menu
         private ParallaxContainer buttonsContainer;
         private SongTicker songTicker;
         private Container logoTarget;
+        private SystemTitle systemTitle;
 
         private Sample reappearSampleSwoosh;
 
@@ -153,6 +157,7 @@ namespace osu.Game.Screens.Menu
                     Margin = new MarginPadding { Right = 15, Top = 5 }
                 },
                 new KiaiMenuFountains(),
+                systemTitle = new SystemTitle(),
                 holdToExitGameOverlay?.CreateProxy() ?? Empty()
             });
 
@@ -261,6 +266,16 @@ namespace osu.Game.Screens.Menu
 
                 return originalAction.Invoke();
             }
+        }
+
+        protected override void Update()
+        {
+            base.Update();
+
+            systemTitle.Margin = new MarginPadding
+            {
+                Bottom = (versionManager?.DrawHeight + 5) ?? 0
+            };
         }
 
         protected override void LogoSuspending(OsuLogo logo)
