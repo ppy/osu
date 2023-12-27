@@ -30,6 +30,8 @@ namespace osu.Desktop
         [STAThread]
         public static void Main(string[] args)
         {
+            NVAPI.ThreadedOptimisations = true;
+
             // run Squirrel first, as the app may exit after these run
             if (OperatingSystem.IsWindows())
             {
