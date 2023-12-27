@@ -10,6 +10,7 @@ using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.UserInterface;
 using osu.Framework.Localisation;
+using osu.Framework.Utils;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Graphics.UserInterface;
@@ -108,13 +109,13 @@ namespace osu.Game.Overlays.Mods
 
             Current.BindValueChanged(e =>
             {
-                if (e.NewValue > Current.Default)
+                if (Precision.DefinitelyBigger(e.NewValue, Current.Default))
                 {
                     MainBackground
                         .FadeColour(colours.ForModType(ModType.DifficultyIncrease), transition_duration, Easing.OutQuint);
                     counter.FadeColour(ColourProvider.Background5, transition_duration, Easing.OutQuint);
                 }
-                else if (e.NewValue < Current.Default)
+                else if (Precision.DefinitelyBigger(Current.Default, e.NewValue))
                 {
                     MainBackground
                         .FadeColour(colours.ForModType(ModType.DifficultyReduction), transition_duration, Easing.OutQuint);
@@ -130,6 +131,11 @@ namespace osu.Game.Overlays.Mods
                     .FadeOutFromOne()
                     .FadeTo(0.15f, 60, Easing.OutQuint)
                     .Then().FadeOut(500, Easing.OutQuint);
+
+                if (Precision.DefinitelyBigger(1.0, Current.Value) && Current.Value >= 0.995)
+                    Current.Value = 0.99;
+                if (Precision.DefinitelyBigger(Current.Value, 1.0) && Current.Value < 1.005)
+                    Current.Value = 1.01;
 
                 const float move_amount = 4;
                 if (e.NewValue > e.OldValue)
