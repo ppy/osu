@@ -7,6 +7,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
+using osu.Framework.Extensions.ObjectExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Input.Bindings;
@@ -172,6 +173,9 @@ namespace osu.Game.Screens.Play.PlayerSettings
             referenceScoreContainer.Clear();
 
             if (score.NewValue == null)
+                return;
+
+            if (!score.NewValue.BeatmapInfo.AsNonNull().Equals(beatmap.Value.BeatmapInfo))
                 return;
 
             if (score.NewValue.Mods.Any(m => !m.UserPlayable || m is IHasNoTimedInputs))
