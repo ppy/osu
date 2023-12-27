@@ -5,6 +5,7 @@ using System;
 using System.Diagnostics;
 using osu.Framework;
 using osu.Framework.Allocation;
+using osu.Framework.Audio;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Timing;
@@ -44,6 +45,8 @@ namespace osu.Game.Beatmaps
 
         private readonly DecouplingFramedClock decoupledTrack;
 
+        private IBindable<bool>? usingGlobalMixer;
+
         [Resolved]
         private OsuConfigManager config { get; set; } = null!;
 
@@ -69,7 +72,7 @@ namespace osu.Game.Beatmaps
             {
                 // Audio timings in general with newer BASS versions don't match stable.
                 // This only seems to be required on windows. We need to eventually figure out why, with a bit of luck.
-                platformOffsetClock = new OffsetCorrectionClock(interpolatedTrack, ExternalPauseFrequencyAdjust) { Offset = RuntimeInfo.OS == RuntimeInfo.Platform.Windows ? 15 : 0 };
+                platformOffsetClock = new OffsetCorrectionClock(interpolatedTrack, ExternalPauseFrequencyAdjust);
 
                 // User global offset (set in settings) should also be applied.
                 userGlobalOffsetClock = new OffsetCorrectionClock(platformOffsetClock, ExternalPauseFrequencyAdjust);
@@ -80,6 +83,23 @@ namespace osu.Game.Beatmaps
             else
             {
                 finalClockSource = interpolatedTrack;
+            }
+        }
+
+        [BackgroundDependencyLoader]
+        private void load(AudioManager audioManager)
+        {
+            if (platformOffsetClock != null)
+            {
+                if (RuntimeInfo.OS == RuntimeInfo.Platform.Windows)
+                {
+                    usingGlobalMixer = audioManager.UsingGlobalMixer.GetBoundCopy();
+                    usingGlobalMixer.BindValueChanged(usingMixer =>
+                    {
+                        // known "good" values, aka defaults which work for the majority of users.
+                        platformOffsetClock.Offset = usingMixer.NewValue ? -35 : 15;
+                    });
+                }
             }
         }
 
