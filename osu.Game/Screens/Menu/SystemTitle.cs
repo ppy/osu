@@ -1,7 +1,9 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System;
 using System.Threading;
+using System.Threading.Tasks;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
@@ -10,6 +12,7 @@ using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.Textures;
 using osu.Framework.Input.Events;
 using osu.Framework.Platform;
+using osu.Game.Online.API.Requests;
 using osu.Game.Online.API.Requests.Responses;
 
 namespace osu.Game.Screens.Menu
@@ -57,6 +60,26 @@ namespace osu.Game.Screens.Menu
             base.LoadComplete();
 
             Current.BindValueChanged(_ => loadNewImage(), true);
+
+            checkForUpdates();
+            Scheduler.AddDelayed(checkForUpdates, TimeSpan.FromMinutes(15).TotalMilliseconds, true);
+        }
+
+        private void checkForUpdates()
+        {
+            var request = new GetSystemTitleRequest();
+            Task.Run(() => request.Perform())
+                .ContinueWith(r =>
+                {
+                    if (r.IsCompletedSuccessfully)
+                        Schedule(() => Current.Value = request.ResponseObject);
+
+                    // if the request failed, "observe" the exception.
+                    // it isn't very important why this failed, as it's only for display.
+                    // the inner error will be logged by framework mechanisms anyway.
+                    if (r.IsFaulted)
+                        _ = r.Exception;
+                });
         }
 
         private void loadNewImage()
