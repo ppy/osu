@@ -93,7 +93,7 @@ namespace osu.Game.Screens.Menu
 
             LoadComponentAsync(new SystemTitleImage(Current.Value), loaded =>
             {
-                if (loaded.SystemTitle != Current.Value)
+                if (!loaded.SystemTitle.Equals(Current.Value))
                     loaded.Dispose();
 
                 loaded.FadeInFromZero(500, Easing.OutQuint);
