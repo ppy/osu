@@ -103,6 +103,10 @@ namespace osu.Game.Overlays.SkinEditor
             if (skinEditor != null)
             {
                 skinEditor.Show();
+
+                if (lastTargetScreen is MainMenu)
+                    PresentGameplay();
+
                 return;
             }
 
@@ -252,7 +256,7 @@ namespace osu.Game.Overlays.SkinEditor
 
             Debug.Assert(skinEditor != null);
 
-            if (!target.IsLoaded)
+            if (!target.IsLoaded || !skinEditor.IsLoaded)
             {
                 Scheduler.AddOnce(setTarget, target);
                 return;
