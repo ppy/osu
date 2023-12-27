@@ -49,7 +49,7 @@ namespace osu.Game.Overlays
         protected override Drawable CreateFooter() => new SettingsFooter();
 
         public SettingsOverlay()
-            : base(true)
+            : base(false)
         {
         }
 
@@ -72,16 +72,19 @@ namespace osu.Game.Overlays
             switch (state.NewValue)
             {
                 case Visibility.Visible:
-                    Sidebar?.FadeColour(Color4.DarkGray, 300, Easing.OutQuint);
+                    Sidebar.Expanded.Value = false;
+                    Sidebar.FadeColour(Color4.DarkGray, 300, Easing.OutQuint);
 
                     SectionsContainer.FadeOut(300, Easing.OutQuint);
                     ContentContainer.MoveToX(-PANEL_WIDTH, 500, Easing.OutQuint);
 
                     lastOpenedSubPanel = panel;
+
                     break;
 
                 case Visibility.Hidden:
-                    Sidebar?.FadeColour(Color4.White, 300, Easing.OutQuint);
+                    Sidebar.Expanded.Value = true;
+                    Sidebar.FadeColour(Color4.White, 300, Easing.OutQuint);
 
                     SectionsContainer.FadeIn(500, Easing.OutQuint);
                     ContentContainer.MoveToX(0, 500, Easing.OutQuint);
