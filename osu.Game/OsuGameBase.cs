@@ -479,6 +479,7 @@ namespace osu.Game
             AddFont(Resources, @"Fonts/Venera/Venera-Black");
 
             Fonts.AddStore(new HexaconsIcons.HexaconsStore(Textures));
+            Fonts.AddStore(new OsuIcon.OsuIconStore(Textures));
         }
 
         protected override IReadOnlyDependencyContainer CreateChildDependencies(IReadOnlyDependencyContainer parent) =>
