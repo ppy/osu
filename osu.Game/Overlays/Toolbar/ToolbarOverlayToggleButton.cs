@@ -46,7 +46,7 @@ namespace osu.Game.Overlays.Toolbar
 
         public ToolbarOverlayToggleButton()
         {
-            Add(stateBackground = new Box
+            BackgroundContent.Add(stateBackground = new Box
             {
                 RelativeSizeAxes = Axes.Both,
                 Colour = OsuColour.Gray(150).Opacity(180),
