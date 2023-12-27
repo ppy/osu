@@ -97,7 +97,7 @@ namespace osu.Game.Beatmaps
                     usingGlobalMixer.BindValueChanged(usingMixer =>
                     {
                         // known "good" values, aka defaults which work for the majority of users.
-                        platformOffsetClock.Offset = usingMixer.NewValue ? -35 : 15;
+                        platformOffsetClock.Offset = usingMixer.NewValue ? -45 : 15;
                     });
                 }
             }
