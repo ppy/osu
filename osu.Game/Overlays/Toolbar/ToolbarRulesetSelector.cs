@@ -41,6 +41,7 @@ namespace osu.Game.Overlays.Toolbar
                 new OpaqueBackground
                 {
                     Depth = 1,
+                    Masking = true,
                 },
                 ModeButtonLine = new Container
                 {
