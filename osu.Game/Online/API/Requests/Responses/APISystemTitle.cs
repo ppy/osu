@@ -5,7 +5,7 @@ using Newtonsoft.Json;
 
 namespace osu.Game.Online.API.Requests.Responses
 {
-    public class APISystemTitle
+    public record APISystemTitle
     {
         [JsonProperty(@"image")]
         public string Image { get; set; } = string.Empty;
