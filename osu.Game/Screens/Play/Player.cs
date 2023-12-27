@@ -404,7 +404,8 @@ namespace osu.Game.Screens.Play
                         new ComboEffects(ScoreProcessor),
                         breakTracker = new BreakTracker(DrawableRuleset.GameplayStartTime, ScoreProcessor)
                         {
-                            Breaks = working.Beatmap.Breaks
+                            Breaks = working.Beatmap.Breaks,
+                            SkipBreak = performRequestedBreakSkip
                         }
                     }),
             }
@@ -626,6 +627,20 @@ namespace osu.Game.Screens.Play
             }
 
             return true;
+        }
+
+        private void performRequestedBreakSkip()
+        {
+            double endTime = breakTracker.CurrentBreak.EndTime - 1000;
+
+            if (GameplayClockContainer.CurrentTime >= endTime)
+                return;
+
+            samplePlaybackDisabled.Value = true;
+
+            Seek(endTime);
+
+            updateSampleDisabledState();
         }
 
         private void performUserRequestedSkip()
