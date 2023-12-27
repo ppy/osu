@@ -7,7 +7,6 @@ using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Extensions.EnumExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
-using osu.Framework.Graphics.Effects;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Input;
@@ -74,6 +73,8 @@ namespace osu.Game.Overlays.Toolbar
         private readonly SpriteText keyBindingTooltip;
         protected FillFlowContainer Flow;
 
+        protected readonly Container BackgroundContent;
+
         [Resolved]
         private RealmAccess realm { get; set; } = null!;
 
@@ -82,21 +83,33 @@ namespace osu.Game.Overlays.Toolbar
             Width = Toolbar.HEIGHT;
             RelativeSizeAxes = Axes.Y;
 
+            Padding = new MarginPadding(3);
+
             Children = new Drawable[]
             {
-                HoverBackground = new Box
+                BackgroundContent = new Container
                 {
                     RelativeSizeAxes = Axes.Both,
-                    Colour = OsuColour.Gray(80).Opacity(180),
-                    Blending = BlendingParameters.Additive,
-                    Alpha = 0,
-                },
-                flashBackground = new Box
-                {
-                    RelativeSizeAxes = Axes.Both,
-                    Alpha = 0,
-                    Colour = Color4.White.Opacity(100),
-                    Blending = BlendingParameters.Additive,
+                    Masking = true,
+                    CornerRadius = 6,
+                    CornerExponent = 3f,
+                    Children = new Drawable[]
+                    {
+                        HoverBackground = new Box
+                        {
+                            RelativeSizeAxes = Axes.Both,
+                            Colour = OsuColour.Gray(80).Opacity(180),
+                            Blending = BlendingParameters.Additive,
+                            Alpha = 0,
+                        },
+                        flashBackground = new Box
+                        {
+                            RelativeSizeAxes = Axes.Both,
+                            Alpha = 0,
+                            Colour = Color4.White.Opacity(100),
+                            Blending = BlendingParameters.Additive,
+                        },
+                    }
                 },
                 Flow = new FillFlowContainer
                 {
@@ -219,14 +232,6 @@ namespace osu.Game.Overlays.Toolbar
         public OpaqueBackground()
         {
             RelativeSizeAxes = Axes.Both;
-            Masking = true;
-            MaskingSmoothness = 0;
-            EdgeEffect = new EdgeEffectParameters
-            {
-                Type = EdgeEffectType.Shadow,
-                Colour = Color4.Black.Opacity(40),
-                Radius = 5,
-            };
 
             Children = new Drawable[]
             {
