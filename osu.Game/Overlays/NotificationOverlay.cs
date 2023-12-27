@@ -227,7 +227,7 @@ namespace osu.Game.Overlays
         protected override void PopIn()
         {
             this.MoveToX(0, TRANSITION_LENGTH, Easing.OutQuint);
-            mainContent.FadeTo(1, TRANSITION_LENGTH, Easing.OutQuint);
+            mainContent.FadeTo(1, TRANSITION_LENGTH / 2, Easing.OutQuint);
             mainContent.FadeEdgeEffectTo(WaveContainer.SHADOW_OPACITY, WaveContainer.APPEAR_DURATION, Easing.Out);
 
             toastTray.FlushAllToasts();
@@ -240,7 +240,7 @@ namespace osu.Game.Overlays
             markAllRead();
 
             this.MoveToX(WIDTH, TRANSITION_LENGTH, Easing.OutQuint);
-            mainContent.FadeTo(0, TRANSITION_LENGTH, Easing.OutQuint);
+            mainContent.FadeTo(0, TRANSITION_LENGTH / 2, Easing.OutQuint);
             mainContent.FadeEdgeEffectTo(0, WaveContainer.DISAPPEAR_DURATION, Easing.In);
         }
 
