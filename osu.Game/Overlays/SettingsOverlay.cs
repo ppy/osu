@@ -49,7 +49,7 @@ namespace osu.Game.Overlays
         protected override Drawable CreateFooter() => new SettingsFooter();
 
         public SettingsOverlay()
-            : base(true)
+            : base(false)
         {
         }
 

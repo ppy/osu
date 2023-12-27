@@ -111,7 +111,7 @@ namespace osu.Game.Tests.Visual.Settings
 
             AddStep("Press back", () => settings
                                         .ChildrenOfType<KeyBindingPanel>().FirstOrDefault()?
-                                        .ChildrenOfType<SettingsSubPanel.BackButton>().FirstOrDefault()?.TriggerClick());
+                                        .ChildrenOfType<SettingsSidebar.BackButton>().FirstOrDefault()?.TriggerClick());
 
             AddUntilStep("top-level textbox focused", () => settings.SectionsContainer.ChildrenOfType<SettingsSearchTextBox>().FirstOrDefault()?.HasFocus == true);
         }
