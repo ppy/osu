@@ -201,6 +201,8 @@ namespace osu.Game
 
         private RulesetConfigCache rulesetConfigCache;
 
+        private SessionAverageHitErrorTracker hitErrorTracker;
+
         protected SpectatorClient SpectatorClient { get; private set; }
 
         protected MultiplayerClient MultiplayerClient { get; private set; }
@@ -350,7 +352,7 @@ namespace osu.Game
                 dependencies.CacheAs(powerStatus);
 
             dependencies.Cache(SessionStatics = new SessionStatics());
-            dependencies.Cache(new SessionAverageHitErrorTracker());
+            dependencies.Cache(hitErrorTracker = new SessionAverageHitErrorTracker());
             dependencies.Cache(Colours = new OsuColour());
 
             RegisterImportHandler(BeatmapManager);
@@ -410,6 +412,7 @@ namespace osu.Game
             });
 
             base.Content.Add(new TouchInputInterceptor());
+            base.Content.Add(hitErrorTracker);
 
             KeyBindingStore = new RealmKeyBindingStore(realm, keyCombinationProvider);
             KeyBindingStore.Register(globalBindings, RulesetStore.AvailableRulesets);
