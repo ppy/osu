@@ -99,6 +99,8 @@ namespace osu.Game.Screens.Edit.Compose.Components
 
         private Vector2 hexToPixel(Vector2 hex)
         {
+            // Taken from <https://www.redblobgames.com/grids/hexagons/#hex-to-pixel>
+            // with modifications for the different definition of size.
             return new Vector2(Spacing * (hex.X - hex.Y / 2), Spacing * one_over_sqrt3 * 1.5f * hex.Y);
         }
     }
