@@ -27,14 +27,26 @@ namespace osu.Game.Utils
             point.X -= origin.X;
             point.Y -= origin.Y;
 
-            Vector2 ret;
-            ret.X = point.X * MathF.Cos(MathUtils.DegreesToRadians(angle)) + point.Y * MathF.Sin(MathUtils.DegreesToRadians(angle));
-            ret.Y = point.X * -MathF.Sin(MathUtils.DegreesToRadians(angle)) + point.Y * MathF.Cos(MathUtils.DegreesToRadians(angle));
+            Vector2 ret = RotateVector(point, angle);
+            Matrix2
 
             ret.X += origin.X;
             ret.Y += origin.Y;
 
             return ret;
+        }
+
+        /// <summary>
+        /// Rotate a vector around the origin.
+        /// </summary>
+        /// <param name="vector">The vector.</param>
+        /// <param name="angle">The angle to rotate (in degrees).</param>
+        public static Vector2 RotateVector(Vector2 vector, float angle)
+        {
+            return new Vector2(
+                vector.X * MathF.Cos(MathUtils.DegreesToRadians(angle)) + vector.Y * MathF.Sin(MathUtils.DegreesToRadians(angle)),
+                vector.X * -MathF.Sin(MathUtils.DegreesToRadians(angle)) + vector.Y * MathF.Cos(MathUtils.DegreesToRadians(angle))
+            );
         }
 
         /// <summary>

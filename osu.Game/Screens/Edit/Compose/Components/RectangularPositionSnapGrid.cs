@@ -9,6 +9,7 @@ using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Layout;
 using osu.Framework.Utils;
+using osu.Game.Utils;
 using osuTK;
 
 namespace osu.Game.Screens.Edit.Compose.Components
@@ -215,11 +216,11 @@ namespace osu.Game.Screens.Edit.Compose.Components
 
         public Vector2 GetSnappedPosition(Vector2 original)
         {
-            Vector2 relativeToStart = original - StartPosition;
+            Vector2 relativeToStart = GeometryUtils.RotateVector(original - StartPosition, GridLineRotation);
             Vector2 offset = Vector2.Divide(relativeToStart, Spacing);
             Vector2 roundedOffset = new Vector2(MathF.Round(offset.X), MathF.Round(offset.Y));
 
-            return StartPosition + Vector2.Multiply(roundedOffset, Spacing);
+            return StartPosition + GeometryUtils.RotateVector(Vector2.Multiply(roundedOffset, Spacing), -GridLineRotation);
         }
     }
 }
