@@ -126,7 +126,7 @@ namespace osu.Game.Screens.Menu
                             Anchor = Anchor.Centre,
                             Origin = Anchor.Centre,
                             Size = new Vector2(32),
-                            Position = new Vector2(0, 0),
+                            Position = new Vector2(0, -4),
                             Icon = symbol
                         },
                         new OsuSpriteText
@@ -186,7 +186,7 @@ namespace osu.Game.Screens.Menu
         {
             icon.ClearTransforms();
             icon.RotateTo(0, 500, Easing.Out);
-            icon.MoveTo(Vector2.Zero, 500, Easing.Out);
+            icon.MoveTo(new Vector2(0, -4), 500, Easing.Out);
             icon.ScaleTo(Vector2.One, 200, Easing.Out);
 
             if (State == ButtonState.Expanded)
