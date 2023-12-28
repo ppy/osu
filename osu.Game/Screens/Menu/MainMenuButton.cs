@@ -1,4 +1,4 @@
-﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
@@ -125,7 +125,7 @@ namespace osu.Game.Screens.Menu
                             Shadow = true,
                             Anchor = Anchor.Centre,
                             Origin = Anchor.Centre,
-                            Size = new Vector2(30),
+                            Size = new Vector2(32),
                             Position = new Vector2(0, 0),
                             Icon = symbol
                         },
