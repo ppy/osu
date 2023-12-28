@@ -242,8 +242,6 @@ namespace osu.Game.Screens.Menu
 
             if (storage is OsuStorage osuStorage && osuStorage.Error != OsuStorageError.None)
                 dialogOverlay?.Push(new StorageErrorDialog(osuStorage, osuStorage.Error));
-
-            menuTip.ShowNextTip();
         }
 
         [CanBeNull]
@@ -359,6 +357,7 @@ namespace osu.Game.Screens.Menu
 
             musicController.EnsurePlayingSomething();
 
+            // Cycle tip on resuming
             menuTip.ShowNextTip();
 
             bottomElementsFlow
