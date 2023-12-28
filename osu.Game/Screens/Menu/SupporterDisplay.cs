@@ -8,6 +8,8 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.Sprites;
+using osu.Framework.Input.Events;
+using osu.Framework.Threading;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
 using osu.Game.Online.API;
@@ -113,8 +115,47 @@ namespace osu.Game.Screens.Menu
                 .Delay(1000)
                 .FadeInFromZero(800, Easing.OutQuint);
 
-            Scheduler.AddDelayed(() =>
+            scheduleDismissal();
+        }
+
+        protected override bool OnClick(ClickEvent e)
+        {
+            dismissalDelegate?.Cancel();
+
+            supportFlow.BypassAutoSizeAxes = Axes.X;
+            this.FadeOut(500, Easing.OutQuint);
+            return base.OnClick(e);
+        }
+
+        protected override bool OnHover(HoverEvent e)
+        {
+            backgroundBox.FadeTo(0.6f, 500, Easing.OutQuint);
+            return base.OnHover(e);
+        }
+
+        protected override void OnHoverLost(HoverLostEvent e)
+        {
+            backgroundBox.FadeTo(0.4f, 500, Easing.OutQuint);
+            base.OnHoverLost(e);
+        }
+
+        private ScheduledDelegate? dismissalDelegate;
+
+        private void scheduleDismissal()
+        {
+            dismissalDelegate?.Cancel();
+            dismissalDelegate = Scheduler.AddDelayed(() =>
             {
+                // If the user is hovering they may want to interact with the link.
+                // Give them more time.
+                if (IsHovered)
+                {
+                    scheduleDismissal();
+                    return;
+                }
+
+                dismissalDelegate?.Cancel();
+
                 AutoSizeEasing = Easing.In;
                 supportFlow.BypassAutoSizeAxes = Axes.X;
                 this
