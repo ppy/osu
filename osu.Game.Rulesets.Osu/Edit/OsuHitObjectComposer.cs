@@ -24,6 +24,7 @@ using osu.Game.Rulesets.Edit.Tools;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Osu.Objects;
+using osu.Game.Rulesets.Osu.UI;
 using osu.Game.Rulesets.UI;
 using osu.Game.Screens.Edit.Components.TernaryButtons;
 using osu.Game.Screens.Edit.Compose.Components;
@@ -217,6 +218,10 @@ namespace osu.Game.Rulesets.Osu.Edit
                 if (rectangularGridSnapToggle.Value == TernaryState.True)
                 {
                     Vector2 pos = rectangularPositionSnapGrid.GetSnappedPosition(rectangularPositionSnapGrid.ToLocalSpace(result.ScreenSpacePosition));
+
+                    // A rotated grid can produce a position that is outside of the playfield.
+                    // We need to clamp the position to the playfield bounds to ensure that the snapped position is always in bounds.
+                    pos = Vector2.Clamp(pos, Vector2.Zero, OsuPlayfield.BASE_SIZE);
 
                     result.ScreenSpacePosition = rectangularPositionSnapGrid.ToScreenSpace(pos);
                 }
