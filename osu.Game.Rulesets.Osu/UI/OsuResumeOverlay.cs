@@ -71,6 +71,12 @@ namespace osu.Game.Rulesets.Osu.UI
                 RelativePositionAxes = Axes.Both;
             }
 
+            protected override float CalculateCursorScale()
+            {
+                // Force minimum cursor size so it's easily clickable
+                return Math.Max(1f, base.CalculateCursorScale());
+            }
+
             protected override bool OnHover(HoverEvent e)
             {
                 updateColour();
