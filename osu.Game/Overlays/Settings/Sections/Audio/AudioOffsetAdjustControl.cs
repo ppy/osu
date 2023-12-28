@@ -143,7 +143,7 @@ namespace osu.Game.Overlays.Settings.Sections.Audio
                         break;
                 }
 
-                suggestedOffset.Value = averageHitErrorHistory.Count < 3 ? null : -averageHitErrorHistory.Average();
+                suggestedOffset.Value = averageHitErrorHistory.Any() ? -averageHitErrorHistory.Average() : null;
             }
 
             private float getXPositionForAverage(double average) => (float)(Math.Clamp(-average, current.MinValue, current.MaxValue) / (2 * current.MaxValue));
@@ -152,7 +152,7 @@ namespace osu.Game.Overlays.Settings.Sections.Audio
             {
                 hintText.Text = suggestedOffset.Value == null
                     ? @"Play a few beatmaps to receive a suggested offset!"
-                    : $@"Based on the last {averageHitErrorHistory.Count} plays, the suggested offset is {suggestedOffset.Value:N0} ms.";
+                    : $@"Based on the last {averageHitErrorHistory.Count} play(s), the suggested offset is {suggestedOffset.Value:N0} ms.";
                 applySuggestion.Enabled.Value = suggestedOffset.Value != null;
             }
         }
