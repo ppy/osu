@@ -2,6 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using osu.Framework.Allocation;
+using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
@@ -21,6 +22,8 @@ namespace osu.Game.Screens.Menu
         private OsuConfigManager config { get; set; } = null!;
 
         private LinkFlowContainer textFlow = null!;
+
+        private Bindable<bool> showMenuTips = null!;
 
         [BackgroundDependencyLoader]
         private void load()
@@ -56,9 +59,21 @@ namespace osu.Game.Screens.Menu
             };
         }
 
+        protected override void LoadComplete()
+        {
+            base.LoadComplete();
+
+            showMenuTips = config.GetBindable<bool>(OsuSetting.MenuTips);
+            showMenuTips.BindValueChanged(_ => ShowNextTip(), true);
+        }
+
         public void ShowNextTip()
         {
-            if (!config.Get<bool>(OsuSetting.MenuTips)) return;
+            if (!showMenuTips.Value)
+            {
+                this.FadeOut(100, Easing.OutQuint);
+                return;
+            }
 
             static void formatRegular(SpriteText t) => t.Font = OsuFont.GetFont(size: 16, weight: FontWeight.Regular);
             static void formatSemiBold(SpriteText t) => t.Font = OsuFont.GetFont(size: 16, weight: FontWeight.SemiBold);
