@@ -94,7 +94,6 @@ namespace osu.Game.Screens.Menu
         private ParallaxContainer buttonsContainer;
         private SongTicker songTicker;
         private Container logoTarget;
-        private SystemTitle systemTitle;
         private MenuTip menuTip;
         private FillFlowContainer bottomElementsFlow;
 
@@ -173,7 +172,7 @@ namespace osu.Game.Screens.Menu
                             Anchor = Anchor.TopCentre,
                             Origin = Anchor.TopCentre,
                         },
-                        systemTitle = new SystemTitle
+                        new SystemTitle
                         {
                             Anchor = Anchor.TopCentre,
                             Origin = Anchor.TopCentre,
