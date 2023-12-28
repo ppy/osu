@@ -1,10 +1,7 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
 using NUnit.Framework;
-using osu.Framework.Graphics;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Testing;
 using osu.Game.Overlays.Dialog;
@@ -15,18 +12,17 @@ namespace osu.Game.Tests.Visual.UserInterface
 {
     public partial class TestScenePopupDialog : OsuManualInputManagerTestScene
     {
-        private TestPopupDialog dialog;
+        private TestPopupDialog dialog = null!;
 
         [SetUpSteps]
         public void SetUpSteps()
         {
             AddStep("new popup", () =>
             {
-                Add(dialog = new TestPopupDialog
+                Child = dialog = new TestPopupDialog
                 {
-                    RelativeSizeAxes = Axes.Both,
                     State = { Value = Framework.Graphics.Containers.Visibility.Visible },
-                });
+                };
             });
         }
 
