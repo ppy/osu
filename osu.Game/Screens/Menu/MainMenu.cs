@@ -165,7 +165,7 @@ namespace osu.Game.Screens.Menu
                     Direction = FillDirection.Vertical,
                     Anchor = Anchor.BottomCentre,
                     Origin = Anchor.BottomCentre,
-                    Spacing = new Vector2(15),
+                    Spacing = new Vector2(5),
                     Children = new Drawable[]
                     {
                         menuTip = new MenuTip

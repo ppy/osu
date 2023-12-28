@@ -4,12 +4,14 @@
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
+using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Utils;
 using osu.Game.Configuration;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
 using osuTK;
+using osuTK.Graphics;
 
 namespace osu.Game.Screens.Menu
 {
@@ -27,14 +29,29 @@ namespace osu.Game.Screens.Menu
 
             InternalChildren = new Drawable[]
             {
+                new Container
+                {
+                    RelativeSizeAxes = Axes.Both,
+                    Masking = true,
+                    CornerExponent = 2.5f,
+                    CornerRadius = 15,
+                    Children = new Drawable[]
+                    {
+                        new Box
+                        {
+                            Colour = Color4.Black,
+                            RelativeSizeAxes = Axes.Both,
+                            Alpha = 0.4f,
+                        },
+                    }
+                },
                 textFlow = new LinkFlowContainer
                 {
-                    Width = 700,
+                    Width = 600,
                     AutoSizeAxes = Axes.Y,
                     TextAnchor = Anchor.TopCentre,
-                    Anchor = Anchor.TopCentre,
-                    Origin = Anchor.TopCentre,
                     Spacing = new Vector2(0, 2),
+                    Margin = new MarginPadding(10)
                 },
             };
         }
@@ -43,12 +60,10 @@ namespace osu.Game.Screens.Menu
         {
             if (!config.Get<bool>(OsuSetting.MenuTips)) return;
 
-            static void formatRegular(SpriteText t) => t.Font = OsuFont.GetFont(size: 20, weight: FontWeight.Regular);
-            static void formatSemiBold(SpriteText t) => t.Font = OsuFont.GetFont(size: 20, weight: FontWeight.SemiBold);
+            static void formatRegular(SpriteText t) => t.Font = OsuFont.GetFont(size: 16, weight: FontWeight.Regular);
+            static void formatSemiBold(SpriteText t) => t.Font = OsuFont.GetFont(size: 16, weight: FontWeight.SemiBold);
 
             string tip = getRandomTip();
-
-            AutoSizeAxes = Axes.Both;
 
             textFlow.Clear();
             textFlow.AddParagraph("a tip for you:", formatSemiBold);
@@ -57,8 +72,7 @@ namespace osu.Game.Screens.Menu
             this.FadeInFromZero(200, Easing.OutQuint)
                 .Delay(1000 + 80 * tip.Length)
                 .Then()
-                .FadeOutFromOne(2000, Easing.OutQuint)
-                .Finally(_ => AutoSizeAxes = Axes.X);
+                .FadeOutFromOne(2000, Easing.OutQuint);
         }
 
         private string getRandomTip()
