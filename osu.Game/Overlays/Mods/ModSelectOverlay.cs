@@ -565,6 +565,9 @@ namespace osu.Game.Overlays.Mods
                                                      .ToArray();
 
             SelectedMods.Value = ComputeNewModsFromSelection(SelectedMods.Value, candidateSelection);
+
+            if (SearchTextBox.HasFocus)
+                SearchTextBox.SelectAll();
         }
 
         #region Transition handling
