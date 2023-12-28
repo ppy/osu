@@ -219,7 +219,7 @@ namespace osu.Game.Rulesets.Osu.Edit
                 {
                     Vector2 pos = rectangularPositionSnapGrid.GetSnappedPosition(rectangularPositionSnapGrid.ToLocalSpace(result.ScreenSpacePosition));
 
-                    // A rotated grid can produce a position that is outside of the playfield.
+                    // A grid which doesn't perfectly fit the playfield can produce a position that is outside of the playfield.
                     // We need to clamp the position to the playfield bounds to ensure that the snapped position is always in bounds.
                     pos = Vector2.Clamp(pos, Vector2.Zero, OsuPlayfield.BASE_SIZE);
 
