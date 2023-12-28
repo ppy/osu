@@ -12,7 +12,6 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Screens;
-using osu.Framework.Utils;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
 using osu.Game.Online.API;
@@ -122,10 +121,6 @@ namespace osu.Game.Screens.Menu
             textFlow.NewParagraph();
             textFlow.NewParagraph();
 
-            textFlow.AddParagraph("today's tip:", formatSemiBold);
-            textFlow.AddParagraph(getRandomTip(), formatRegular);
-            textFlow.NewParagraph();
-
             textFlow.NewParagraph();
 
             iconColour = colours.Yellow;
@@ -227,31 +222,6 @@ namespace osu.Game.Screens.Menu
                     if (nextScreen != null)
                         this.Push(nextScreen);
                 });
-        }
-
-        private string getRandomTip()
-        {
-            string[] tips =
-            {
-                "You can press Ctrl-T anywhere in the game to toggle the toolbar!",
-                "You can press Ctrl-O anywhere in the game to access options!",
-                "All settings are dynamic and take effect in real-time. Try pausing and changing the skin while playing!",
-                "New features are coming online every update. Make sure to stay up-to-date!",
-                "If you find the UI too large or small, try adjusting UI scale in settings!",
-                "Try adjusting the \"Screen Scaling\" mode to change your gameplay or UI area, even in fullscreen!",
-                "What used to be \"osu!direct\" is available to all users just like on the website. You can access it anywhere using Ctrl-B!",
-                "Seeking in replays is available by dragging on the difficulty bar at the bottom of the screen!",
-                "Multithreading support means that even with low \"FPS\" your input and judgements will be accurate!",
-                "Try scrolling down in the mod select panel to find a bunch of new fun mods!",
-                "Most of the web content (profiles, rankings, etc.) are available natively in-game from the icons on the toolbar!",
-                "Get more details, hide or delete a beatmap by right-clicking on its panel at song select!",
-                "All delete operations are temporary until exiting. Restore accidentally deleted content from the maintenance settings!",
-                "Check out the \"playlists\" system, which lets users create their own custom and permanent leaderboards!",
-                "Toggle advanced frame / thread statistics with Ctrl-F11!",
-                "Take a look under the hood at performance counters and enable verbose performance logging with Ctrl-F2!",
-            };
-
-            return tips[RNG.Next(0, tips.Length)];
         }
     }
 }

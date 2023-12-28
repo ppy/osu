@@ -31,8 +31,6 @@ namespace osu.Game.Screens.Menu
         [BackgroundDependencyLoader]
         private void load(OsuGame? game)
         {
-            Anchor = Anchor.BottomCentre;
-            Origin = Anchor.BottomCentre;
             AutoSizeAxes = Axes.Both;
 
             InternalChild = content = new OsuClickableContainer
