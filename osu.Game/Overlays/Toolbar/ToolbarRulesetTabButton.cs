@@ -1,14 +1,16 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using osu.Framework.Allocation;
+using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Effects;
 using osu.Framework.Graphics.UserInterface;
 using osu.Framework.Input.Events;
+using osu.Game.Graphics;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Localisation;
 using osu.Game.Rulesets;
-using osuTK.Graphics;
 
 namespace osu.Game.Overlays.Toolbar
 {
@@ -41,27 +43,31 @@ namespace osu.Game.Overlays.Toolbar
         {
             protected override HoverSounds CreateHoverSounds(HoverSampleSet sampleSet) => new HoverSounds();
 
+            [Resolved]
+            private OsuColour colours { get; set; } = null!;
+
+            public RulesetButton()
+            {
+                Padding = new MarginPadding(3)
+                {
+                    Bottom = 5
+                };
+            }
+
             public bool Active
             {
-                set
+                set => Scheduler.AddOnce(() =>
                 {
                     if (value)
                     {
-                        IconContainer.Colour = Color4.White;
-                        IconContainer.EdgeEffect = new EdgeEffectParameters
-                        {
-                            Type = EdgeEffectType.Glow,
-                            Colour = new Color4(255, 194, 224, 100),
-                            Radius = 15,
-                            Roundness = 15,
-                        };
+                        IconContainer.Colour = Color4Extensions.FromHex("#00FFAA");
                     }
                     else
                     {
-                        IconContainer.Colour = new Color4(255, 194, 224, 255);
+                        IconContainer.Colour = colours.GrayF;
                         IconContainer.EdgeEffect = new EdgeEffectParameters();
                     }
-                }
+                });
             }
 
             protected override bool OnClick(ClickEvent e)
