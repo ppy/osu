@@ -32,9 +32,8 @@ namespace osu.Game.Screens.Edit.Compose.Components
 
         protected readonly LayoutValue GridCache = new LayoutValue(Invalidation.RequiredParentSizeToFit);
 
-        protected LinedPositionSnapGrid(Vector2 startPosition)
+        protected LinedPositionSnapGrid()
         {
-            StartPosition = startPosition;
             Masking = true;
 
             AddLayout(GridCache);

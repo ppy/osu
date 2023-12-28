@@ -42,11 +42,6 @@ namespace osu.Game.Screens.Edit.Compose.Components
             }
         }
 
-        public TriangularPositionSnapGrid(Vector2 startPosition)
-            : base(startPosition)
-        {
-        }
-
         private const float sqrt3 = 1.73205080757f;
         private const float sqrt3_over2 = 0.86602540378f;
         private const float one_over_sqrt3 = 0.57735026919f;

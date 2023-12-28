@@ -66,7 +66,7 @@ namespace osu.Game.Rulesets.Osu.Edit
         protected readonly OsuDistanceSnapProvider DistanceSnapProvider = new OsuDistanceSnapProvider();
 
         [Cached]
-        protected readonly GridToolboxGroup GridToolboxGroup = new GridToolboxGroup();
+        protected readonly OsuGridToolboxGroup OsuGridToolboxGroup = new OsuGridToolboxGroup();
 
         [Cached]
         protected readonly FreehandSliderToolboxGroup FreehandlSliderToolboxGroup = new FreehandSliderToolboxGroup();
@@ -86,7 +86,7 @@ namespace osu.Game.Rulesets.Osu.Edit
                 {
                     RelativeSizeAxes = Axes.Both
                 },
-                rectangularPositionSnapGrid = new OsuRectangularPositionSnapGrid
+                rectangularPositionSnapGrid = new RectangularPositionSnapGrid
                 {
                     RelativeSizeAxes = Axes.Both
                 }
@@ -102,16 +102,16 @@ namespace osu.Game.Rulesets.Osu.Edit
             // we may be entering the screen with a selection already active
             updateDistanceSnapGrid();
 
-            GridToolboxGroup.StartPositionX.ValueChanged += x =>
-                rectangularPositionSnapGrid.StartPosition = new Vector2(x.NewValue, rectangularPositionSnapGrid.StartPosition.Y);
-            GridToolboxGroup.StartPositionY.ValueChanged += y =>
-                rectangularPositionSnapGrid.StartPosition = new Vector2(rectangularPositionSnapGrid.StartPosition.X, y.NewValue);
-            GridToolboxGroup.Spacing.ValueChanged += s => rectangularPositionSnapGrid.Spacing = new Vector2(s.NewValue);
-            GridToolboxGroup.GridLinesRotation.ValueChanged += r => rectangularPositionSnapGrid.GridLineRotation = r.NewValue;
+            OsuGridToolboxGroup.StartPositionX.BindValueChanged(x =>
+                rectangularPositionSnapGrid.StartPosition = new Vector2(x.NewValue, rectangularPositionSnapGrid.StartPosition.Y), true);
+            OsuGridToolboxGroup.StartPositionY.BindValueChanged(y =>
+                rectangularPositionSnapGrid.StartPosition = new Vector2(rectangularPositionSnapGrid.StartPosition.X, y.NewValue), true);
+            OsuGridToolboxGroup.Spacing.BindValueChanged(s => rectangularPositionSnapGrid.Spacing = new Vector2(s.NewValue), true);
+            OsuGridToolboxGroup.GridLinesRotation.BindValueChanged(r => rectangularPositionSnapGrid.GridLineRotation = r.NewValue, true);
 
             RightToolbox.AddRange(new EditorToolboxGroup[]
                 {
-                    GridToolboxGroup,
+                    OsuGridToolboxGroup,
                     new TransformToolboxGroup { RotationHandler = BlueprintContainer.SelectionHandler.RotationHandler, },
                     FreehandlSliderToolboxGroup
                 }

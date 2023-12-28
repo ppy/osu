@@ -42,11 +42,6 @@ namespace osu.Game.Screens.Edit.Compose.Components
             }
         }
 
-        public RectangularPositionSnapGrid(Vector2 startPosition)
-            : base(startPosition)
-        {
-        }
-
         protected override void CreateContent()
         {
             var drawSize = DrawSize;
