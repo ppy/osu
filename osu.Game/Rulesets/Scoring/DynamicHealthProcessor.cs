@@ -102,7 +102,7 @@ namespace osu.Game.Rulesets.Scoring
             }
 
             maxDrainPerObject = IBeatmapDifficultyInfo.DifficultyRange(beatmap.Difficulty.DrainRate, 0.1, 0.2, 0.25);
-            maxDrainRate = IBeatmapDifficultyInfo.DifficultyRange(beatmap.Difficulty.DrainRate, 1.0 / 12000, 1.0 / 9000, 1.0 / 5000);
+            maxDrainRate = IBeatmapDifficultyInfo.DifficultyRange(beatmap.Difficulty.DrainRate, 1.0 / 12500, 1.0 / 7500, 1.0 / 5000);
 
             maxHPcostPerMiss = 0.025;
             maxMissCostRate = 1.0 / 4000;
