@@ -138,8 +138,8 @@ namespace osu.Game.Screens.Menu
             [BackgroundDependencyLoader]
             private void load(LargeTextureStore textureStore)
             {
-                var texture = textureStore.Get(SystemTitle.Image);
-                if (SystemTitle.Image.Contains(@"@2x"))
+                Texture? texture = textureStore.Get(SystemTitle.Image);
+                if (texture != null && SystemTitle.Image.Contains(@"@2x"))
                     texture.ScaleAdjust *= 2;
 
                 AutoSizeAxes = Axes.Both;
