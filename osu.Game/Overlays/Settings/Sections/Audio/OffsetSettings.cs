@@ -15,7 +15,7 @@ namespace osu.Game.Overlays.Settings.Sections.Audio
     {
         protected override LocalisableString Header => AudioSettingsStrings.OffsetHeader;
 
-        public override IEnumerable<LocalisableString> FilterTerms => base.FilterTerms.Concat(new LocalisableString[] { "universal", "uo", "timing", "delay", "latency" });
+        public override IEnumerable<LocalisableString> FilterTerms => base.FilterTerms.Concat(new LocalisableString[] { "universal", "uo", "timing", "delay", "latency", "wizard" });
 
         [BackgroundDependencyLoader]
         private void load(OsuConfigManager config)
@@ -26,10 +26,6 @@ namespace osu.Game.Overlays.Settings.Sections.Audio
                 {
                     Current = config.GetBindable<double>(OsuSetting.AudioOffset),
                 },
-                new SettingsButton
-                {
-                    Text = AudioSettingsStrings.OffsetWizard
-                }
             };
         }
     }
