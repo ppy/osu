@@ -160,11 +160,11 @@ namespace osu.Game.Screens.Play.PlayerSettings
                     // Apply to all difficulties in a beatmap set for now (they generally always share timing).
                     foreach (var b in setInfo.Beatmaps)
                     {
-                        BeatmapUserSettings settings = b.UserSettings;
+                        BeatmapUserSettings userSettings = b.UserSettings;
                         double val = Current.Value;
 
-                        if (settings.Offset != val)
-                            settings.Offset = val;
+                        if (userSettings.Offset != val)
+                            userSettings.Offset = val;
                     }
                 });
             }
