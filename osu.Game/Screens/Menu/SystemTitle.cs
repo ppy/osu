@@ -11,7 +11,6 @@ using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.Textures;
 using osu.Framework.Input.Events;
-using osu.Framework.Platform;
 using osu.Framework.Threading;
 using osu.Game.Graphics.Containers;
 using osu.Game.Online.API.Requests;
@@ -30,7 +29,7 @@ namespace osu.Game.Screens.Menu
         private ScheduledDelegate? openUrlAction;
 
         [BackgroundDependencyLoader]
-        private void load(GameHost? gameHost)
+        private void load(OsuGame? game)
         {
             Anchor = Anchor.BottomCentre;
             Origin = Anchor.BottomCentre;
@@ -48,7 +47,7 @@ namespace osu.Game.Screens.Menu
                     openUrlAction = Scheduler.AddDelayed(() =>
                     {
                         if (!string.IsNullOrEmpty(Current.Value?.Url))
-                            gameHost?.OpenUrlExternally(Current.Value.Url);
+                            game?.HandleLink(Current.Value.Url);
                     }, 250);
                 }
             };
