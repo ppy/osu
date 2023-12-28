@@ -180,7 +180,7 @@ namespace osu.Game.Screens.Play
         {
             bool exiting = base.OnExiting(e);
             submitFromFailOrQuit();
-            statics.SetValue(Static.LastLocalUserScore, Score.ScoreInfo.DeepClone());
+            statics.SetValue(Static.LastLocalUserScore, Score?.ScoreInfo.DeepClone());
             return exiting;
         }
 
