@@ -11,6 +11,7 @@ using osu.Framework.Allocation;
 using osu.Framework.Logging;
 using osu.Framework.Screens;
 using osu.Game.Beatmaps;
+using osu.Game.Configuration;
 using osu.Game.Database;
 using osu.Game.Online.API;
 using osu.Game.Online.Multiplayer;
@@ -36,6 +37,9 @@ namespace osu.Game.Screens.Play
 
         [Resolved]
         private SpectatorClient spectatorClient { get; set; }
+
+        [Resolved]
+        private SessionStatics statics { get; set; }
 
         private TaskCompletionSource<bool> scoreSubmissionSource;
 
@@ -176,6 +180,7 @@ namespace osu.Game.Screens.Play
         {
             bool exiting = base.OnExiting(e);
             submitFromFailOrQuit();
+            statics.SetValue(Static.LastLocalUserScore, Score?.ScoreInfo.DeepClone());
             return exiting;
         }
 
@@ -208,6 +213,14 @@ namespace osu.Game.Screens.Play
 
         private Task submitScore(Score score)
         {
+            var masterClock = GameplayClockContainer as MasterGameplayClockContainer;
+
+            if (masterClock?.PlaybackRateValid.Value != true)
+            {
+                Logger.Log("Score submission cancelled due to audio playback rate discrepancy.");
+                return Task.CompletedTask;
+            }
+
             // token may be null if the request failed but gameplay was still allowed (see HandleTokenRetrievalFailure).
             if (token == null)
             {

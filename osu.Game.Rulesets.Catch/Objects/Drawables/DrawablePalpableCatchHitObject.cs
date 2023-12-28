@@ -1,10 +1,12 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
+using osu.Game.Rulesets.Catch.UI;
 using osuTK;
 using osuTK.Graphics;
 
@@ -70,7 +72,10 @@ namespace osu.Game.Rulesets.Catch.Objects.Drawables
 
         private void updateXPosition(ValueChangedEvent<float> _)
         {
-            X = OriginalXBindable.Value + XOffsetBindable.Value;
+            // same as `CatchHitObject.EffectiveX`.
+            // not using that property directly to support scenarios where `HitObject` may not necessarily be present
+            // for this pooled drawable.
+            X = Math.Clamp(OriginalXBindable.Value + XOffsetBindable.Value, 0, CatchPlayfield.WIDTH);
         }
 
         protected override void OnApply()

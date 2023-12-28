@@ -19,7 +19,7 @@ namespace osu.Game.Rulesets.Mods
         public override ModType Type => ModType.DifficultyReduction;
         public override LocalisableString Description => "You can't fail, no matter what.";
         public override double ScoreMultiplier => 0.5;
-        public override Type[] IncompatibleMods => new[] { typeof(ModFailCondition) };
+        public override Type[] IncompatibleMods => new[] { typeof(ModFailCondition), typeof(ModCinema) };
 
         private readonly Bindable<bool> showHealthBar = new Bindable<bool>();
 

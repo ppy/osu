@@ -8,11 +8,11 @@ using osu.Game.Rulesets.Objects;
 
 namespace osu.Game.Tests.Visual
 {
-    public abstract partial class ModPerfectTestScene : ModTestScene
+    public abstract partial class ModFailConditionTestScene : ModTestScene
     {
-        private readonly ModPerfect mod;
+        private readonly ModFailCondition mod;
 
-        protected ModPerfectTestScene(ModPerfect mod)
+        protected ModFailConditionTestScene(ModFailCondition mod)
         {
             this.mod = mod;
         }
@@ -26,15 +26,15 @@ namespace osu.Game.Tests.Visual
                 HitObjects = { testData.HitObject }
             },
             Autoplay = !shouldMiss,
-            PassCondition = () => ((PerfectModTestPlayer)Player).CheckFailed(shouldMiss && testData.FailOnMiss)
+            PassCondition = () => ((ModFailConditionTestPlayer)Player).CheckFailed(shouldMiss && testData.FailOnMiss)
         });
 
-        protected override TestPlayer CreateModPlayer(Ruleset ruleset) => new PerfectModTestPlayer();
+        protected override TestPlayer CreateModPlayer(Ruleset ruleset) => new ModFailConditionTestPlayer(CurrentTestData, AllowFail);
 
-        private partial class PerfectModTestPlayer : TestPlayer
+        protected partial class ModFailConditionTestPlayer : ModTestPlayer
         {
-            public PerfectModTestPlayer()
-                : base(showResults: false)
+            public ModFailConditionTestPlayer(ModTestData data, bool allowFail)
+                : base(data, allowFail)
             {
             }
 

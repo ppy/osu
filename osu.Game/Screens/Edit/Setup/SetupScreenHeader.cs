@@ -80,7 +80,7 @@ namespace osu.Game.Screens.Edit.Setup
             {
                 Title = EditorSetupStrings.BeatmapSetup.ToLower();
                 Description = EditorSetupStrings.BeatmapSetupDescription;
-                Icon = HexaconsIcons.Social;
+                Icon = OsuIcon.Beatmap;
             }
         }
 

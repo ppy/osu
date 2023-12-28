@@ -76,6 +76,9 @@ namespace osu.Game.Screens.Menu
         [Resolved(canBeNull: true)]
         private IDialogOverlay dialogOverlay { get; set; }
 
+        [Resolved(canBeNull: true)]
+        private VersionManager versionManager { get; set; }
+
         protected override BackgroundScreen CreateBackground() => new BackgroundScreenDefault();
 
         protected override bool PlayExitSound => false;
@@ -91,6 +94,9 @@ namespace osu.Game.Screens.Menu
         private ParallaxContainer buttonsContainer;
         private SongTicker songTicker;
         private Container logoTarget;
+        private MenuTip menuTip;
+        private FillFlowContainer bottomElementsFlow;
+        private SupporterDisplay supporterDisplay;
 
         private Sample reappearSampleSwoosh;
 
@@ -153,6 +159,33 @@ namespace osu.Game.Screens.Menu
                     Margin = new MarginPadding { Right = 15, Top = 5 }
                 },
                 new KiaiMenuFountains(),
+                bottomElementsFlow = new FillFlowContainer
+                {
+                    AutoSizeAxes = Axes.Both,
+                    Direction = FillDirection.Vertical,
+                    Anchor = Anchor.BottomCentre,
+                    Origin = Anchor.BottomCentre,
+                    Spacing = new Vector2(5),
+                    Children = new Drawable[]
+                    {
+                        menuTip = new MenuTip
+                        {
+                            Anchor = Anchor.TopCentre,
+                            Origin = Anchor.TopCentre,
+                        },
+                        new SystemTitle
+                        {
+                            Anchor = Anchor.TopCentre,
+                            Origin = Anchor.TopCentre,
+                        }
+                    }
+                },
+                supporterDisplay = new SupporterDisplay
+                {
+                    Margin = new MarginPadding(5),
+                    Anchor = Anchor.BottomLeft,
+                    Origin = Anchor.BottomLeft,
+                },
                 holdToExitGameOverlay?.CreateProxy() ?? Empty()
             });
 
@@ -263,6 +296,16 @@ namespace osu.Game.Screens.Menu
             }
         }
 
+        protected override void Update()
+        {
+            base.Update();
+
+            bottomElementsFlow.Margin = new MarginPadding
+            {
+                Bottom = (versionManager?.DrawHeight + 5) ?? 0
+            };
+        }
+
         protected override void LogoSuspending(OsuLogo logo)
         {
             var seq = logo.FadeOut(300, Easing.InSine)
@@ -299,6 +342,13 @@ namespace osu.Game.Screens.Menu
             buttonsContainer.MoveTo(new Vector2(-800, 0), FADE_OUT_DURATION, Easing.InSine);
 
             sideFlashes.FadeOut(64, Easing.OutQuint);
+
+            bottomElementsFlow
+                .ScaleTo(0.9f, 1000, Easing.OutQuint)
+                .FadeOut(500, Easing.OutQuint);
+
+            supporterDisplay
+                .FadeOut(500, Easing.OutQuint);
         }
 
         public override void OnResuming(ScreenTransitionEvent e)
@@ -315,6 +365,13 @@ namespace osu.Game.Screens.Menu
             preloadSongSelect();
 
             musicController.EnsurePlayingSomething();
+
+            // Cycle tip on resuming
+            menuTip.ShowNextTip();
+
+            bottomElementsFlow
+                .ScaleTo(1, 1000, Easing.OutQuint)
+                .FadeIn(1000, Easing.OutQuint);
         }
 
         public override bool OnExiting(ScreenExitEvent e)
@@ -352,6 +409,13 @@ namespace osu.Game.Screens.Menu
             songTicker.Hide();
 
             this.FadeOut(3000);
+
+            bottomElementsFlow
+                .FadeOut(500, Easing.OutQuint);
+
+            supporterDisplay
+                .FadeOut(500, Easing.OutQuint);
+
             return base.OnExiting(e);
         }
 

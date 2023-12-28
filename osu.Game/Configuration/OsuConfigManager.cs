@@ -96,6 +96,7 @@ namespace osu.Game.Configuration
 
             SetDefault(OsuSetting.MenuVoice, true);
             SetDefault(OsuSetting.MenuMusic, true);
+            SetDefault(OsuSetting.MenuTips, true);
 
             SetDefault(OsuSetting.AudioOffset, 0, -500.0, 500.0, 1);
 
@@ -350,6 +351,7 @@ namespace osu.Game.Configuration
         VolumeInactive,
         MenuMusic,
         MenuVoice,
+        MenuTips,
         CursorRotation,
         MenuParallax,
         Prefer24HourTime,

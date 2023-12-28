@@ -21,7 +21,7 @@ namespace osu.Game.Overlays.Toolbar
         {
             TooltipMain = ToolbarStrings.HomeHeaderTitle;
             TooltipSub = ToolbarStrings.HomeHeaderDescription;
-            SetIcon(HexaconsIcons.Home);
+            SetIcon(OsuIcon.Home);
         }
     }
 }
