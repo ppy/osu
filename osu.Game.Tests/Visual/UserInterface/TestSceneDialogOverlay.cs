@@ -93,6 +93,30 @@ namespace osu.Game.Tests.Visual.UserInterface
         }
 
         [Test]
+        public void TestTooMuchText()
+        {
+            AddStep("dialog #1", () => overlay.Push(new TestPopupDialog
+            {
+                Icon = FontAwesome.Regular.TrashAlt,
+                HeaderText = @"Confirm deletion ofConfirm deletion ofConfirm deletion ofConfirm deletion ofConfirm deletion ofConfirm deletion of",
+                BodyText = @"Ayase Rie - Yuima-ru*World TVver.Ayase Rie - Yuima-ru*World TVver.Ayase Rie - Yuima-ru*World TVver.Ayase Rie - Yuima-ru*World TVver.Ayase Rie - Yuima-ru*World TVver.Ayase Rie - Yuima-ru*World TVver.Ayase Rie - Yuima-ru*World TVver.Ayase Rie - Yuima-ru*World TVver.Ayase Rie - Yuima-ru*World TVver. ",
+                Buttons = new PopupDialogButton[]
+                {
+                    new PopupDialogOkButton
+                    {
+                        Text = @"I never want to see this again.",
+                        Action = () => Console.WriteLine(@"OK"),
+                    },
+                    new PopupDialogCancelButton
+                    {
+                        Text = @"Firetruck, I still want quick ranks!",
+                        Action = () => Console.WriteLine(@"Cancel"),
+                    },
+                },
+            }));
+        }
+
+        [Test]
         public void TestPushBeforeLoad()
         {
             PopupDialog dialog = null;
