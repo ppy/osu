@@ -28,7 +28,6 @@ namespace osu.Game.Utils
             point.Y -= origin.Y;
 
             Vector2 ret = RotateVector(point, angle);
-            Matrix2
 
             ret.X += origin.X;
             ret.Y += origin.Y;
