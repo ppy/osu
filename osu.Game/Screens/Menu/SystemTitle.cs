@@ -12,6 +12,8 @@ using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.Textures;
 using osu.Framework.Input.Events;
 using osu.Framework.Platform;
+using osu.Framework.Threading;
+using osu.Game.Graphics.Containers;
 using osu.Game.Online.API.Requests;
 using osu.Game.Online.API.Requests.Responses;
 
@@ -25,6 +27,8 @@ namespace osu.Game.Screens.Menu
         private CancellationTokenSource? cancellationTokenSource;
         private SystemTitleImage? currentImage;
 
+        private ScheduledDelegate? openUrlAction;
+
         [BackgroundDependencyLoader]
         private void load(GameHost? gameHost)
         {
@@ -32,27 +36,50 @@ namespace osu.Game.Screens.Menu
             Origin = Anchor.BottomCentre;
             AutoSizeAxes = Axes.Both;
 
-            InternalChild = content = new ClickableContainer
+            InternalChild = content = new OsuClickableContainer
             {
                 AutoSizeAxes = Axes.Both,
                 Action = () =>
                 {
-                    if (!string.IsNullOrEmpty(Current.Value?.Url))
-                        gameHost?.OpenUrlExternally(Current.Value.Url);
+                    // Delay slightly to allow animation to play out.
+                    openUrlAction?.Cancel();
+                    openUrlAction = Scheduler.AddDelayed(() =>
+                    {
+                        if (!string.IsNullOrEmpty(Current.Value?.Url))
+                            gameHost?.OpenUrlExternally(Current.Value.Url);
+                    }, 250);
                 }
             };
         }
 
         protected override bool OnHover(HoverEvent e)
         {
-            content.ScaleTo(1.1f, 500, Easing.OutBounce);
+            content.ScaleTo(1.05f, 2000, Easing.OutQuint);
             return base.OnHover(e);
         }
 
         protected override void OnHoverLost(HoverLostEvent e)
         {
-            content.ScaleTo(1f, 500, Easing.OutBounce);
+            content.ScaleTo(1f, 500, Easing.OutQuint);
             base.OnHoverLost(e);
+        }
+
+        protected override bool OnClick(ClickEvent e)
+        {
+            //hover.FlashColour(FlashColour, 800, Easing.OutQuint);
+            return base.OnClick(e);
+        }
+
+        protected override bool OnMouseDown(MouseDownEvent e)
+        {
+            content.ScaleTo(0.95f, 500, Easing.OutQuint);
+            return base.OnMouseDown(e);
+        }
+
+        protected override void OnMouseUp(MouseUpEvent e)
+        {
+            content.ScaleTo(1, 500, Easing.OutElastic);
+            base.OnMouseUp(e);
         }
 
         protected override void LoadComplete()
