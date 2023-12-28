@@ -183,7 +183,7 @@ namespace osu.Game.Overlays.Toolbar
 
         protected override bool OnClick(ClickEvent e)
         {
-            flashBackground.FadeOutFromOne(800, Easing.OutQuint);
+            flashBackground.FadeIn(50).Then().FadeOutFromOne(800, Easing.OutQuint);
             tooltipContainer.FadeOut(100);
             return base.OnClick(e);
         }
