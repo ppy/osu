@@ -86,6 +86,7 @@ namespace osu.Game.Rulesets.Mods
             flashlight.Depth = float.MinValue;
 
             flashlight.Combo.BindTo(Combo);
+            flashlight.GetPlayfieldScale = () => drawableRuleset.Playfield.Scale;
 
             drawableRuleset.Overlays.Add(flashlight);
         }
@@ -101,6 +102,8 @@ namespace osu.Game.Rulesets.Mods
             protected override DrawNode CreateDrawNode() => new FlashlightDrawNode(this);
 
             public override bool RemoveCompletedTransforms => false;
+
+            internal Func<Vector2>? GetPlayfieldScale;
 
             private readonly float defaultFlashlightSize;
             private readonly float sizeMultiplier;
@@ -141,9 +144,17 @@ namespace osu.Game.Rulesets.Mods
 
             protected abstract string FragmentShader { get; }
 
-            protected float GetSize()
+            public float GetSize()
             {
                 float size = defaultFlashlightSize * sizeMultiplier;
+
+                if (GetPlayfieldScale != null)
+                {
+                    Vector2 playfieldScale = GetPlayfieldScale();
+                    float rulesetScaleAvg = (playfieldScale.X + playfieldScale.Y) / 2f;
+
+                    size *= rulesetScaleAvg;
+                }
 
                 if (isBreakTime.Value)
                     size *= 2.5f;
