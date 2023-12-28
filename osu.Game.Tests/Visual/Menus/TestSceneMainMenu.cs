@@ -24,6 +24,11 @@ namespace osu.Game.Tests.Visual.Menus
                 Image = @"https://assets.ppy.sh/main-menu/wf2023-vote@2x.png",
                 Url = @"https://osu.ppy.sh/community/contests/189",
             });
+            AddStep("set title with nonexistent image", () => Game.ChildrenOfType<SystemTitle>().Single().Current.Value = new APISystemTitle
+            {
+                Image = @"https://test.invalid/@2x", // .invalid TLD reserved by https://datatracker.ietf.org/doc/html/rfc2606#section-2
+                Url = @"https://osu.ppy.sh/community/contests/189",
+            });
             AddStep("unset system title", () => Game.ChildrenOfType<SystemTitle>().Single().Current.Value = null);
         }
     }
