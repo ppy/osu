@@ -1,4 +1,4 @@
-// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
@@ -31,6 +31,9 @@ namespace osu.Game.Screens.Menu
     /// </summary>
     public partial class MainMenuButton : BeatSyncedContainer, IStateful<ButtonState>
     {
+        public const float BOUNCE_COMPRESSION = 0.9f;
+        public const float HOVER_SCALE = 1.2f;
+        public const float BOUNCE_ROTATION = 8;
         public event Action<ButtonState>? StateChanged;
 
         public readonly Key[] TriggerKeys;
@@ -153,14 +156,14 @@ namespace osu.Game.Screens.Menu
 
             double duration = timingPoint.BeatLength / 2;
 
-            icon.RotateTo(rightward ? 10 : -10, duration * 2, Easing.InOutSine);
+            icon.RotateTo(rightward ? BOUNCE_ROTATION : -BOUNCE_ROTATION, duration * 2, Easing.InOutSine);
 
             icon.Animate(
                 i => i.MoveToY(-10, duration, Easing.Out),
-                i => i.ScaleTo(1, duration, Easing.Out)
+                i => i.ScaleTo(HOVER_SCALE, duration, Easing.Out)
             ).Then(
                 i => i.MoveToY(0, duration, Easing.In),
-                i => i.ScaleTo(new Vector2(1, 0.9f), duration, Easing.In)
+                i => i.ScaleTo(new Vector2(HOVER_SCALE, HOVER_SCALE * BOUNCE_COMPRESSION), duration, Easing.In)
             );
 
             rightward = !rightward;
@@ -177,8 +180,8 @@ namespace osu.Game.Screens.Menu
             double duration = TimeUntilNextBeat;
 
             icon.ClearTransforms();
-            icon.RotateTo(rightward ? -10 : 10, duration, Easing.InOutSine);
-            icon.ScaleTo(new Vector2(1, 0.9f), duration, Easing.Out);
+            icon.RotateTo(rightward ? -BOUNCE_ROTATION : BOUNCE_ROTATION, duration, Easing.InOutSine);
+            icon.ScaleTo(new Vector2(HOVER_SCALE, HOVER_SCALE * BOUNCE_COMPRESSION), duration, Easing.Out);
             return true;
         }
 
