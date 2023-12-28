@@ -86,7 +86,6 @@ namespace osu.Game.Screens.Menu
             Current.BindValueChanged(_ => loadNewImage(), true);
 
             checkForUpdates();
-            Scheduler.AddDelayed(checkForUpdates, TimeSpan.FromMinutes(15).TotalMilliseconds, true);
         }
 
         private void checkForUpdates()
@@ -103,6 +102,8 @@ namespace osu.Game.Screens.Menu
                     // the inner error will be logged by framework mechanisms anyway.
                     if (r.IsFaulted)
                         _ = r.Exception;
+
+                    Scheduler.AddDelayed(checkForUpdates, TimeSpan.FromMinutes(15).TotalMilliseconds);
                 });
         }
 
