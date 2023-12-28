@@ -103,7 +103,7 @@ namespace osu.Game.Screens.Menu
                     if (r.IsFaulted)
                         _ = r.Exception;
 
-                    Scheduler.AddDelayed(checkForUpdates, TimeSpan.FromMinutes(15).TotalMilliseconds);
+                    Scheduler.AddDelayed(checkForUpdates, TimeSpan.FromMinutes(5).TotalMilliseconds);
                 });
         }
 
