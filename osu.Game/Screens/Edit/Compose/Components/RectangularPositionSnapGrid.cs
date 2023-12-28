@@ -2,8 +2,6 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
-using osu.Framework.Graphics;
-using osu.Framework.Layout;
 using osu.Game.Utils;
 using osuTK;
 
@@ -25,7 +23,7 @@ namespace osu.Game.Screens.Edit.Compose.Components
                     throw new ArgumentException("Grid spacing must be positive.");
 
                 spacing = value;
-                gridCache.Invalidate();
+                GridCache.Invalidate();
             }
         }
 
@@ -40,11 +38,9 @@ namespace osu.Game.Screens.Edit.Compose.Components
             set
             {
                 gridLineRotation = value;
-                gridCache.Invalidate();
+                GridCache.Invalidate();
             }
         }
-
-        private readonly LayoutValue gridCache = new LayoutValue(Invalidation.RequiredParentSizeToFit);
 
         public RectangularPositionSnapGrid(Vector2 startPosition)
             : base(startPosition)
