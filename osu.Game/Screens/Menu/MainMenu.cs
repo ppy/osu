@@ -399,6 +399,10 @@ namespace osu.Game.Screens.Menu
             songTicker.Hide();
 
             this.FadeOut(3000);
+
+            bottomElementsFlow
+                .FadeOut(500, Easing.OutQuint);
+
             return base.OnExiting(e);
         }
 
