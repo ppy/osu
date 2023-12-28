@@ -121,7 +121,6 @@ namespace osu.Game.Screens.Menu
                 if (!loaded.SystemTitle.Equals(Current.Value))
                     loaded.Dispose();
 
-                loaded.FadeInFromZero(500, Easing.OutQuint);
                 content.Add(currentImage = loaded);
             }, (cancellationTokenSource ??= new CancellationTokenSource()).Token);
         }
@@ -154,16 +153,25 @@ namespace osu.Game.Screens.Menu
                     {
                         Texture = texture,
                         Blending = BlendingParameters.Additive,
-                        Alpha = 0,
                     },
                 };
             }
 
-            public void Flash()
+            protected override void LoadComplete()
+            {
+                base.LoadComplete();
+
+                this.FadeInFromZero(500, Easing.OutQuint);
+                flash.FadeOutFromOne(4000, Easing.OutQuint);
+            }
+
+            public Drawable Flash()
             {
                 flash.FadeInFromZero(50)
                      .Then()
                      .FadeOut(500, Easing.OutQuint);
+
+                return this;
             }
         }
     }
