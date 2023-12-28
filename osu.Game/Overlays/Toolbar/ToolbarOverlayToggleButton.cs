@@ -53,7 +53,7 @@ namespace osu.Game.Overlays.Toolbar
                 RelativeSizeAxes = Axes.Both,
                 Colour = colours.Carmine.Opacity(180),
                 Blending = BlendingParameters.Additive,
-                Depth = 2,
+                Depth = float.MaxValue,
                 Alpha = 0,
             });
 
@@ -65,11 +65,11 @@ namespace osu.Game.Overlays.Toolbar
             switch (state.NewValue)
             {
                 case Visibility.Hidden:
-                    stateBackground.FadeOut(200);
+                    stateBackground.FadeOut(200, Easing.OutQuint);
                     break;
 
                 case Visibility.Visible:
-                    stateBackground.FadeIn(200);
+                    stateBackground.FadeIn(200, Easing.OutQuint);
                     break;
             }
         }
