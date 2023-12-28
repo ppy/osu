@@ -41,6 +41,8 @@ namespace osu.Game.Screens.Menu
                 AutoSizeAxes = Axes.Both,
                 Action = () =>
                 {
+                    currentImage?.Flash();
+
                     // Delay slightly to allow animation to play out.
                     openUrlAction?.Cancel();
                     openUrlAction = Scheduler.AddDelayed(() =>
@@ -64,12 +66,6 @@ namespace osu.Game.Screens.Menu
             base.OnHoverLost(e);
         }
 
-        protected override bool OnClick(ClickEvent e)
-        {
-            //hover.FlashColour(FlashColour, 800, Easing.OutQuint);
-            return base.OnClick(e);
-        }
-
         protected override bool OnMouseDown(MouseDownEvent e)
         {
             content.ScaleTo(0.95f, 500, Easing.OutQuint);
@@ -78,7 +74,9 @@ namespace osu.Game.Screens.Menu
 
         protected override void OnMouseUp(MouseUpEvent e)
         {
-            content.ScaleTo(1, 500, Easing.OutElastic);
+            content
+                .ScaleTo(0.95f)
+                .ScaleTo(1, 500, Easing.OutElastic);
             base.OnMouseUp(e);
         }
 
@@ -129,9 +127,11 @@ namespace osu.Game.Screens.Menu
         }
 
         [LongRunningLoad]
-        private partial class SystemTitleImage : Sprite
+        private partial class SystemTitleImage : CompositeDrawable
         {
             public readonly APISystemTitle SystemTitle;
+
+            private Sprite flash = null!;
 
             public SystemTitleImage(APISystemTitle systemTitle)
             {
@@ -144,7 +144,26 @@ namespace osu.Game.Screens.Menu
                 var texture = textureStore.Get(SystemTitle.Image);
                 if (SystemTitle.Image.Contains(@"@2x"))
                     texture.ScaleAdjust *= 2;
-                Texture = texture;
+
+                AutoSizeAxes = Axes.Both;
+
+                InternalChildren = new Drawable[]
+                {
+                    new Sprite { Texture = texture },
+                    flash = new Sprite
+                    {
+                        Texture = texture,
+                        Blending = BlendingParameters.Additive,
+                        Alpha = 0,
+                    },
+                };
+            }
+
+            public void Flash()
+            {
+                flash.FadeInFromZero(50)
+                     .Then()
+                     .FadeOut(500, Easing.OutQuint);
             }
         }
     }
