@@ -5,12 +5,11 @@ using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
-using osu.Game.Configuration;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Scoring;
 using osu.Game.Scoring;
 
-namespace osu.Game.Overlays.Settings.Sections.Audio
+namespace osu.Game.Configuration
 {
     /// <summary>
     /// Tracks the local user's average hit error during the ongoing play session.
