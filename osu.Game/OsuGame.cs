@@ -995,7 +995,10 @@ namespace osu.Game
             }, topMostOverlayContent.Add);
 
             if (!args?.Any(a => a == @"--no-version-overlay") ?? true)
-                loadComponentSingleFile(versionManager = new VersionManager { Depth = int.MinValue }, ScreenContainer.Add);
+            {
+                dependencies.Cache(versionManager = new VersionManager { Depth = int.MinValue });
+                loadComponentSingleFile(versionManager, ScreenContainer.Add);
+            }
 
             loadComponentSingleFile(osuLogo, _ =>
             {
