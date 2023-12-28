@@ -40,7 +40,7 @@ namespace osu.Game.Overlays.Toolbar
         [BackgroundDependencyLoader]
         private void load(OsuColour colours, IAPIProvider api, LoginOverlay? login)
         {
-            Add(new OpaqueBackground { Depth = 1 });
+            BackgroundContent.Add(new OpaqueBackground { Depth = 1 });
 
             Flow.Add(new Container
             {

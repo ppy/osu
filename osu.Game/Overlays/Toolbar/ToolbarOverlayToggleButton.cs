@@ -3,6 +3,7 @@
 
 #nullable disable
 
+using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
@@ -14,7 +15,7 @@ namespace osu.Game.Overlays.Toolbar
 {
     public partial class ToolbarOverlayToggleButton : ToolbarButton
     {
-        private readonly Box stateBackground;
+        private Box stateBackground;
 
         private OverlayContainer stateContainer;
 
@@ -44,12 +45,13 @@ namespace osu.Game.Overlays.Toolbar
             }
         }
 
-        public ToolbarOverlayToggleButton()
+        [BackgroundDependencyLoader]
+        private void load(OsuColour colours)
         {
-            Add(stateBackground = new Box
+            BackgroundContent.Add(stateBackground = new Box
             {
                 RelativeSizeAxes = Axes.Both,
-                Colour = OsuColour.Gray(150).Opacity(180),
+                Colour = colours.Carmine.Opacity(180),
                 Blending = BlendingParameters.Additive,
                 Depth = 2,
                 Alpha = 0,
