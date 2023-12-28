@@ -7,6 +7,7 @@ using osu.Framework.Testing;
 using osu.Framework.Utils;
 using osu.Game.Rulesets.Osu.Edit;
 using osu.Game.Rulesets.Osu.Edit.Blueprints.HitCircles;
+using osu.Game.Screens.Edit.Compose.Components;
 using osu.Game.Tests.Visual;
 using osuTK;
 using osuTK.Input;
@@ -69,7 +70,7 @@ namespace osu.Game.Rulesets.Osu.Tests.Editor
             AddStep("choose placement tool", () => InputManager.Key(Key.Number2));
             AddStep("move cursor to (1, 1)", () =>
             {
-                var composer = Editor.ChildrenOfType<OsuRectangularPositionSnapGrid>().Single();
+                var composer = Editor.ChildrenOfType<RectangularPositionSnapGrid>().Single();
                 InputManager.MoveMouseTo(composer.ToScreenSpace(new Vector2(1, 1)));
             });
 
@@ -83,7 +84,7 @@ namespace osu.Game.Rulesets.Osu.Tests.Editor
         public void TestGridSizeToggling()
         {
             AddStep("enable rectangular grid", () => InputManager.Key(Key.Y));
-            AddUntilStep("rectangular grid visible", () => this.ChildrenOfType<OsuRectangularPositionSnapGrid>().Any());
+            AddUntilStep("rectangular grid visible", () => this.ChildrenOfType<RectangularPositionSnapGrid>().Any());
             gridSizeIs(4);
 
             nextGridSizeIs(8);
@@ -99,7 +100,7 @@ namespace osu.Game.Rulesets.Osu.Tests.Editor
         }
 
         private void gridSizeIs(int size)
-            => AddAssert($"grid size is {size}", () => this.ChildrenOfType<OsuRectangularPositionSnapGrid>().Single().Spacing == new Vector2(size)
+            => AddAssert($"grid size is {size}", () => this.ChildrenOfType<RectangularPositionSnapGrid>().Single().Spacing == new Vector2(size)
                                                        && EditorBeatmap.BeatmapInfo.GridSize == size);
     }
 }

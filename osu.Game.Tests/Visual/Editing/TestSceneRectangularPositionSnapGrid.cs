@@ -52,9 +52,10 @@ namespace osu.Game.Tests.Visual.Editing
         {
             RectangularPositionSnapGrid grid = null;
 
-            AddStep("create grid", () => Child = grid = new RectangularPositionSnapGrid(position)
+            AddStep("create grid", () => Child = grid = new RectangularPositionSnapGrid()
             {
                 RelativeSizeAxes = Axes.Both,
+                StartPosition = position,
                 Spacing = spacing,
                 GridLineRotation = rotation
             });

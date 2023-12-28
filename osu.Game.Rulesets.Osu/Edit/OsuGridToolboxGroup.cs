@@ -1,35 +1,40 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
+using osu.Framework.Input.Bindings;
+using osu.Framework.Input.Events;
 using osu.Game.Graphics.UserInterface;
+using osu.Game.Input.Bindings;
+using osu.Game.Rulesets.Edit;
+using osu.Game.Rulesets.Osu.UI;
 using osu.Game.Screens.Edit;
 
-namespace osu.Game.Rulesets.Edit
+namespace osu.Game.Rulesets.Osu.Edit
 {
-    public partial class GridToolboxGroup : EditorToolboxGroup
+    public partial class OsuGridToolboxGroup : EditorToolboxGroup, IKeyBindingHandler<GlobalAction>
     {
+        private static readonly int[] grid_sizes = { 4, 8, 16, 32 };
+
+        private int currentGridSizeIndex = grid_sizes.Length - 1;
+
         [Resolved]
         private EditorBeatmap editorBeatmap { get; set; } = null!;
 
-        public GridToolboxGroup()
-            : base("grid")
-        {
-        }
-
-        public BindableFloat StartPositionX { get; } = new BindableFloat(256f)
+        public BindableFloat StartPositionX { get; } = new BindableFloat(OsuPlayfield.BASE_SIZE.X / 2)
         {
             MinValue = 0f,
-            MaxValue = 512f,
+            MaxValue = OsuPlayfield.BASE_SIZE.X,
             Precision = 1f
         };
 
-        public BindableFloat StartPositionY { get; } = new BindableFloat(192)
+        public BindableFloat StartPositionY { get; } = new BindableFloat(OsuPlayfield.BASE_SIZE.Y / 2)
         {
             MinValue = 0f,
-            MaxValue = 384f,
+            MaxValue = OsuPlayfield.BASE_SIZE.Y,
             Precision = 1f
         };
 
@@ -42,8 +47,8 @@ namespace osu.Game.Rulesets.Edit
 
         public BindableFloat GridLinesRotation { get; } = new BindableFloat(0f)
         {
-            MinValue = -180f,
-            MaxValue = 180f,
+            MinValue = -45f,
+            MaxValue = 45f,
             Precision = 1f
         };
 
@@ -51,6 +56,11 @@ namespace osu.Game.Rulesets.Edit
         private ExpandableSlider<float> startPositionYSlider = null!;
         private ExpandableSlider<float> spacingSlider = null!;
         private ExpandableSlider<float> gridLinesRotationSlider = null!;
+
+        public OsuGridToolboxGroup()
+            : base("grid")
+        {
+        }
 
         [BackgroundDependencyLoader]
         private void load()
@@ -74,6 +84,11 @@ namespace osu.Game.Rulesets.Edit
                     Current = GridLinesRotation
                 }
             };
+
+            int gridSizeIndex = Array.IndexOf(grid_sizes, editorBeatmap.BeatmapInfo.GridSize);
+            if (gridSizeIndex >= 0)
+                currentGridSizeIndex = gridSizeIndex;
+            updateSpacing();
         }
 
         protected override void LoadComplete()
@@ -103,6 +118,36 @@ namespace osu.Game.Rulesets.Edit
                 gridLinesRotationSlider.ContractedLabelText = $"R: {rotation.NewValue:N0}";
                 gridLinesRotationSlider.ExpandedLabelText = $"Rotation: {rotation.NewValue:N0}";
             }, true);
+        }
+
+        private void nextGridSize()
+        {
+            currentGridSizeIndex = (currentGridSizeIndex + 1) % grid_sizes.Length;
+            updateSpacing();
+        }
+
+        private void updateSpacing()
+        {
+            int gridSize = grid_sizes[currentGridSizeIndex];
+
+            editorBeatmap.BeatmapInfo.GridSize = gridSize;
+            Spacing.Value = gridSize;
+        }
+
+        public bool OnPressed(KeyBindingPressEvent<GlobalAction> e)
+        {
+            switch (e.Action)
+            {
+                case GlobalAction.EditorCycleGridDisplayMode:
+                    nextGridSize();
+                    return true;
+            }
+
+            return false;
+        }
+
+        public void OnReleased(KeyBindingReleaseEvent<GlobalAction> e)
+        {
         }
     }
 }
