@@ -66,6 +66,9 @@ namespace osu.Game.Rulesets.Osu.Edit
         protected readonly OsuDistanceSnapProvider DistanceSnapProvider = new OsuDistanceSnapProvider();
 
         [Cached]
+        protected readonly GridToolboxGroup GridToolboxGroup = new GridToolboxGroup();
+
+        [Cached]
         protected readonly FreehandSliderToolboxGroup FreehandlSliderToolboxGroup = new FreehandSliderToolboxGroup();
 
         [BackgroundDependencyLoader]
@@ -99,8 +102,16 @@ namespace osu.Game.Rulesets.Osu.Edit
             // we may be entering the screen with a selection already active
             updateDistanceSnapGrid();
 
+            GridToolboxGroup.StartPositionX.ValueChanged += x =>
+                rectangularPositionSnapGrid.StartPosition = new Vector2(x.NewValue, rectangularPositionSnapGrid.StartPosition.Y);
+            GridToolboxGroup.StartPositionY.ValueChanged += y =>
+                rectangularPositionSnapGrid.StartPosition = new Vector2(rectangularPositionSnapGrid.StartPosition.X, y.NewValue);
+            GridToolboxGroup.Spacing.ValueChanged += s => rectangularPositionSnapGrid.Spacing = new Vector2(s.NewValue);
+            GridToolboxGroup.GridLinesRotation.ValueChanged += r => rectangularPositionSnapGrid.GridLineRotation = r.NewValue;
+
             RightToolbox.AddRange(new EditorToolboxGroup[]
                 {
+                    GridToolboxGroup,
                     new TransformToolboxGroup { RotationHandler = BlueprintContainer.SelectionHandler.RotationHandler, },
                     FreehandlSliderToolboxGroup
                 }
