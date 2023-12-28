@@ -135,7 +135,7 @@ namespace osu.Game.Screens.Menu
                             AllowMultiline = false,
                             Anchor = Anchor.Centre,
                             Origin = Anchor.Centre,
-                            Position = new Vector2(0, 35),
+                            Position = new Vector2(-3, 35),
                             Text = text
                         }
                     }
