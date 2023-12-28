@@ -29,6 +29,8 @@ namespace osu.Game.Tests.Visual.UserInterface
         [Test]
         public void TestDangerousButton([Values(false, true)] bool atEdge)
         {
+            AddStep("finish transforms", () => dialog.FinishTransforms(true));
+
             if (atEdge)
             {
                 AddStep("move mouse to button edge", () =>
