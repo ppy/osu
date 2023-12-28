@@ -50,7 +50,7 @@ namespace osu.Game.Rulesets.Scoring
 
             Health.Value += GetHealthIncreaseFor(result);
 
-            if (meetsAnyFailCondition(result))
+            if (MeetsAnyFailCondition(result))
                 TriggerFailure();
         }
 
@@ -77,7 +77,7 @@ namespace osu.Game.Rulesets.Scoring
         /// Whether the current state of <see cref="HealthProcessor"/> or the provided <paramref name="result"/> meets any fail condition.
         /// </summary>
         /// <param name="result">The judgement result.</param>
-        private bool meetsAnyFailCondition(JudgementResult result)
+        protected bool MeetsAnyFailCondition(JudgementResult result)
         {
             if (DefaultFailCondition)
                 return true;
