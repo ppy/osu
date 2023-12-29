@@ -994,7 +994,7 @@ namespace osu.Game
                 Margin = new MarginPadding(5),
             }, topMostOverlayContent.Add);
 
-            if (!args?.Any(a => a == @"--no-version-overlay") ?? true)
+            if (!IsDeployedBuild)
             {
                 dependencies.Cache(versionManager = new VersionManager { Depth = int.MinValue });
                 loadComponentSingleFile(versionManager, ScreenContainer.Add);
