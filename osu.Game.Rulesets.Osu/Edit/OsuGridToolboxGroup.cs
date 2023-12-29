@@ -16,6 +16,7 @@ using osu.Game.Rulesets.Edit;
 using osu.Game.Rulesets.Osu.UI;
 using osu.Game.Screens.Edit;
 using osu.Game.Screens.Edit.Components.RadioButtons;
+using osuTK;
 
 namespace osu.Game.Rulesets.Osu.Edit
 {
@@ -28,6 +29,9 @@ namespace osu.Game.Rulesets.Osu.Edit
         [Resolved]
         private EditorBeatmap editorBeatmap { get; set; } = null!;
 
+        /// <summary>
+        /// X position of the grid's origin.
+        /// </summary>
         public BindableFloat StartPositionX { get; } = new BindableFloat(OsuPlayfield.BASE_SIZE.X / 2)
         {
             MinValue = 0f,
@@ -35,6 +39,9 @@ namespace osu.Game.Rulesets.Osu.Edit
             Precision = 1f
         };
 
+        /// <summary>
+        /// Y position of the grid's origin.
+        /// </summary>
         public BindableFloat StartPositionY { get; } = new BindableFloat(OsuPlayfield.BASE_SIZE.Y / 2)
         {
             MinValue = 0f,
@@ -42,6 +49,9 @@ namespace osu.Game.Rulesets.Osu.Edit
             Precision = 1f
         };
 
+        /// <summary>
+        /// The spacing between grid lines.
+        /// </summary>
         public BindableFloat Spacing { get; } = new BindableFloat(4f)
         {
             MinValue = 4f,
@@ -49,12 +59,27 @@ namespace osu.Game.Rulesets.Osu.Edit
             Precision = 1f
         };
 
+        /// <summary>
+        /// Rotation of the grid lines in degrees.
+        /// </summary>
         public BindableFloat GridLinesRotation { get; } = new BindableFloat(0f)
         {
             MinValue = -45f,
             MaxValue = 45f,
             Precision = 1f
         };
+
+        /// <summary>
+        /// Read-only bindable representing the grid's origin.
+        /// Equivalent to <code>new Vector2(StartPositionX, StartPositionY)</code>
+        /// </summary>
+        public Bindable<Vector2> StartPosition { get; } = new Bindable<Vector2>();
+
+        /// <summary>
+        /// Read-only bindable representing the grid's spacing in both the X and Y dimension.
+        /// Equivalent to <code>new Vector2(Spacing)</code>
+        /// </summary>
+        public Bindable<Vector2> SpacingVector { get; } = new Bindable<Vector2>();
 
         public Bindable<PositionSnapGridType> GridType { get; } = new Bindable<PositionSnapGridType>();
 
@@ -124,18 +149,21 @@ namespace osu.Game.Rulesets.Osu.Edit
             {
                 startPositionXSlider.ContractedLabelText = $"X: {x.NewValue:N0}";
                 startPositionXSlider.ExpandedLabelText = $"X Offset: {x.NewValue:N0}";
+                StartPosition.Value = new Vector2(x.NewValue, StartPosition.Value.Y);
             }, true);
 
             StartPositionY.BindValueChanged(y =>
             {
                 startPositionYSlider.ContractedLabelText = $"Y: {y.NewValue:N0}";
                 startPositionYSlider.ExpandedLabelText = $"Y Offset: {y.NewValue:N0}";
+                StartPosition.Value = new Vector2(StartPosition.Value.X, y.NewValue);
             }, true);
 
             Spacing.BindValueChanged(spacing =>
             {
                 spacingSlider.ContractedLabelText = $"S: {spacing.NewValue:N0}";
                 spacingSlider.ExpandedLabelText = $"Spacing: {spacing.NewValue:N0}";
+                SpacingVector.Value = new Vector2(spacing.NewValue);
             }, true);
 
             GridLinesRotation.BindValueChanged(rotation =>
