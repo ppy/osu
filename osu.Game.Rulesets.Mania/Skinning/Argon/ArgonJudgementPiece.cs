@@ -19,6 +19,8 @@ namespace osu.Game.Rulesets.Mania.Skinning.Argon
 {
     public partial class ArgonJudgementPiece : JudgementPiece, IAnimatableJudgement
     {
+        private const float judgement_y_position = 160;
+
         private RingExplosion? ringExplosion;
 
         [Resolved]
@@ -30,7 +32,7 @@ namespace osu.Game.Rulesets.Mania.Skinning.Argon
             AutoSizeAxes = Axes.Both;
 
             Origin = Anchor.Centre;
-            Y = 160;
+            Y = judgement_y_position;
         }
 
         [BackgroundDependencyLoader]
@@ -76,6 +78,7 @@ namespace osu.Game.Rulesets.Mania.Skinning.Argon
                     this.ScaleTo(1.6f);
                     this.ScaleTo(1, 100, Easing.In);
 
+                    this.MoveToY(judgement_y_position);
                     this.MoveToOffset(new Vector2(0, 100), 800, Easing.InQuint);
 
                     this.RotateTo(0);
