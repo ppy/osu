@@ -195,7 +195,7 @@ namespace osu.Game.Rulesets.Mods
         /// <summary>
         /// Whether all settings in this mod are set to their default state.
         /// </summary>
-        protected virtual bool UsesDefaultConfiguration => SettingsBindables.All(s => s.IsDefault);
+        public virtual bool UsesDefaultConfiguration => SettingsBindables.All(s => s.IsDefault);
 
         /// <summary>
         /// Creates a copy of this <see cref="Mod"/> initialised to a default state.
