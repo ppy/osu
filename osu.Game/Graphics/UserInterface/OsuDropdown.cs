@@ -384,6 +384,9 @@ namespace osu.Game.Graphics.UserInterface
                 var hoveredColour = colourProvider?.Light4 ?? colours.PinkDarker;
                 var unhoveredColour = colourProvider?.Background5 ?? Color4.Black.Opacity(0.5f);
 
+                Colour = Color4.White;
+                Alpha = Enabled.Value ? 1 : 0.3f;
+
                 if (SearchBar.State.Value == Visibility.Visible)
                 {
                     Icon.Colour = hovered ? hoveredColour.Lighten(0.5f) : Colour4.White;
