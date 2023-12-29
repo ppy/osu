@@ -101,7 +101,7 @@ namespace osu.Game.Screens.Menu
                 "If you find the UI too large or small, try adjusting UI scale in settings!",
                 "Try adjusting the \"Screen Scaling\" mode to change your gameplay or UI area, even in fullscreen!",
                 "What used to be \"osu!direct\" is available to all users just like on the website. You can access it anywhere using Ctrl-B!",
-                "Seeking in replays is available by dragging on the difficulty bar at the bottom of the screen or by using the left and right arrow keys!",
+                "Seeking in replays is available by dragging on the progress bar at the bottom of the screen or by using the left and right arrow keys!",
                 "Multithreading support means that even with low \"FPS\" your input and judgements will be accurate!",
                 "Try scrolling right in mod select to find a bunch of new fun mods!",
                 "Most of the web content (profiles, rankings, etc.) are available natively in-game from the icons on the toolbar!",
