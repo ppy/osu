@@ -2,9 +2,12 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
+using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
+using osu.Framework.Graphics.Shapes;
+using osu.Framework.Graphics.Sprites;
 using osu.Framework.Input.Bindings;
 using osu.Framework.Input.Events;
 using osu.Game.Graphics.UserInterface;
@@ -12,6 +15,7 @@ using osu.Game.Input.Bindings;
 using osu.Game.Rulesets.Edit;
 using osu.Game.Rulesets.Osu.UI;
 using osu.Game.Screens.Edit;
+using osu.Game.Screens.Edit.Components.RadioButtons;
 
 namespace osu.Game.Rulesets.Osu.Edit
 {
@@ -52,10 +56,13 @@ namespace osu.Game.Rulesets.Osu.Edit
             Precision = 1f
         };
 
+        public Bindable<PositionSnapGridType> GridType { get; } = new Bindable<PositionSnapGridType>();
+
         private ExpandableSlider<float> startPositionXSlider = null!;
         private ExpandableSlider<float> startPositionYSlider = null!;
         private ExpandableSlider<float> spacingSlider = null!;
         private ExpandableSlider<float> gridLinesRotationSlider = null!;
+        private EditorRadioButtonCollection gridTypeButtons = null!;
 
         public OsuGridToolboxGroup()
             : base("grid")
@@ -82,7 +89,20 @@ namespace osu.Game.Rulesets.Osu.Edit
                 gridLinesRotationSlider = new ExpandableSlider<float>
                 {
                     Current = GridLinesRotation
-                }
+                },
+                gridTypeButtons = new EditorRadioButtonCollection
+                {
+                    RelativeSizeAxes = Axes.X,
+                    Items = new[]
+                    {
+                        new RadioButton("Square",
+                            () => GridType.Value = PositionSnapGridType.Square,
+                            () => new SpriteIcon { Icon = FontAwesome.Regular.Square }),
+                        new RadioButton("Triangle",
+                            () => GridType.Value = PositionSnapGridType.Triangle,
+                            () => new Triangle())
+                    }
+                },
             };
 
             int gridSizeIndex = Array.IndexOf(grid_sizes, editorBeatmap.BeatmapInfo.GridSize);
@@ -94,6 +114,8 @@ namespace osu.Game.Rulesets.Osu.Edit
         protected override void LoadComplete()
         {
             base.LoadComplete();
+
+            gridTypeButtons.Items.First().Select();
 
             StartPositionX.BindValueChanged(x =>
             {
@@ -149,5 +171,11 @@ namespace osu.Game.Rulesets.Osu.Edit
         public void OnReleased(KeyBindingReleaseEvent<GlobalAction> e)
         {
         }
+    }
+
+    public enum PositionSnapGridType
+    {
+        Square,
+        Triangle,
     }
 }
