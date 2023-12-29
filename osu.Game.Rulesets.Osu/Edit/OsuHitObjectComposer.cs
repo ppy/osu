@@ -135,6 +135,14 @@ namespace osu.Game.Rulesets.Osu.Edit
                     positionSnapGrid = triangularPositionSnapGrid;
                     break;
 
+                case PositionSnapGridType.Circle:
+                    var circularPositionSnapGrid = new CircularPositionSnapGrid();
+
+                    OsuGridToolboxGroup.Spacing.BindValueChanged(s => circularPositionSnapGrid.Spacing = s.NewValue, true);
+
+                    positionSnapGrid = circularPositionSnapGrid;
+                    break;
+
                 default:
                     throw new NotImplementedException($"{OsuGridToolboxGroup.GridType} has an incorrect value.");
             }

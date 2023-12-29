@@ -100,7 +100,10 @@ namespace osu.Game.Rulesets.Osu.Edit
                             () => new SpriteIcon { Icon = FontAwesome.Regular.Square }),
                         new RadioButton("Triangle",
                             () => GridType.Value = PositionSnapGridType.Triangle,
-                            () => new Triangle())
+                            () => new Triangle()),
+                        new RadioButton("Circle",
+                            () => GridType.Value = PositionSnapGridType.Circle,
+                            () => new SpriteIcon { Icon = FontAwesome.Regular.Circle }),
                     }
                 },
             };
@@ -177,5 +180,6 @@ namespace osu.Game.Rulesets.Osu.Edit
     {
         Square,
         Triangle,
+        Circle,
     }
 }
