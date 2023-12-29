@@ -2,6 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
+using osu.Framework.Bindables;
 using osu.Game.Utils;
 using osuTK;
 
@@ -9,37 +10,23 @@ namespace osu.Game.Screens.Edit.Compose.Components
 {
     public partial class TriangularPositionSnapGrid : LinedPositionSnapGrid
     {
-        private float spacing = 1;
-
         /// <summary>
         /// The spacing between grid lines of this <see cref="TriangularPositionSnapGrid"/>.
         /// </summary>
-        public float Spacing
+        public BindableFloat Spacing { get; } = new BindableFloat(1f)
         {
-            get => spacing;
-            set
-            {
-                if (spacing <= 0)
-                    throw new ArgumentException("Grid spacing must be positive.");
-
-                spacing = value;
-                GridCache.Invalidate();
-            }
-        }
-
-        private float gridLineRotation;
+            MinValue = 0f,
+        };
 
         /// <summary>
         /// The rotation in degrees of the grid lines of this <see cref="TriangularPositionSnapGrid"/>.
         /// </summary>
-        public float GridLineRotation
+        public BindableFloat GridLineRotation { get; } = new BindableFloat();
+
+        public TriangularPositionSnapGrid()
         {
-            get => gridLineRotation;
-            set
-            {
-                gridLineRotation = value;
-                GridCache.Invalidate();
-            }
+            Spacing.BindValueChanged(_ => GridCache.Invalidate());
+            GridLineRotation.BindValueChanged(_ => GridCache.Invalidate());
         }
 
         private const float sqrt3 = 1.73205080757f;
@@ -49,10 +36,10 @@ namespace osu.Game.Screens.Edit.Compose.Components
         protected override void CreateContent()
         {
             var drawSize = DrawSize;
-            float stepSpacing = Spacing * sqrt3_over2;
-            var step1 = GeometryUtils.RotateVector(new Vector2(stepSpacing, 0), -GridLineRotation - 30);
-            var step2 = GeometryUtils.RotateVector(new Vector2(stepSpacing, 0), -GridLineRotation - 90);
-            var step3 = GeometryUtils.RotateVector(new Vector2(stepSpacing, 0), -GridLineRotation - 150);
+            float stepSpacing = Spacing.Value * sqrt3_over2;
+            var step1 = GeometryUtils.RotateVector(new Vector2(stepSpacing, 0), -GridLineRotation.Value - 30);
+            var step2 = GeometryUtils.RotateVector(new Vector2(stepSpacing, 0), -GridLineRotation.Value - 90);
+            var step3 = GeometryUtils.RotateVector(new Vector2(stepSpacing, 0), -GridLineRotation.Value - 150);
 
             GenerateGridLines(step1, drawSize);
             GenerateGridLines(-step1, drawSize);
@@ -68,16 +55,16 @@ namespace osu.Game.Screens.Edit.Compose.Components
 
         public override Vector2 GetSnappedPosition(Vector2 original)
         {
-            Vector2 relativeToStart = GeometryUtils.RotateVector(original - StartPosition, GridLineRotation);
+            Vector2 relativeToStart = GeometryUtils.RotateVector(original - StartPosition.Value, GridLineRotation.Value);
             Vector2 hex = pixelToHex(relativeToStart);
 
-            return StartPosition + GeometryUtils.RotateVector(hexToPixel(hex), -GridLineRotation);
+            return StartPosition.Value + GeometryUtils.RotateVector(hexToPixel(hex), -GridLineRotation.Value);
         }
 
         private Vector2 pixelToHex(Vector2 pixel)
         {
-            float x = pixel.X / Spacing;
-            float y = pixel.Y / Spacing;
+            float x = pixel.X / Spacing.Value;
+            float y = pixel.Y / Spacing.Value;
             // Algorithm from Charles Chambers
             // with modifications and comments by Chris Cox 2023
             // <https://gitlab.com/chriscox/hex-coordinates>
@@ -96,7 +83,7 @@ namespace osu.Game.Screens.Edit.Compose.Components
         {
             // Taken from <https://www.redblobgames.com/grids/hexagons/#hex-to-pixel>
             // with modifications for the different definition of size.
-            return new Vector2(Spacing * (hex.X - hex.Y / 2), Spacing * one_over_sqrt3 * 1.5f * hex.Y);
+            return new Vector2(Spacing.Value * (hex.X - hex.Y / 2), Spacing.Value * one_over_sqrt3 * 1.5f * hex.Y);
         }
     }
 }

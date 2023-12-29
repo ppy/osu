@@ -120,8 +120,8 @@ namespace osu.Game.Rulesets.Osu.Edit
                 case PositionSnapGridType.Square:
                     var rectangularPositionSnapGrid = new RectangularPositionSnapGrid();
 
-                    OsuGridToolboxGroup.Spacing.BindValueChanged(s => rectangularPositionSnapGrid.Spacing = new Vector2(s.NewValue), true);
-                    OsuGridToolboxGroup.GridLinesRotation.BindValueChanged(r => rectangularPositionSnapGrid.GridLineRotation = r.NewValue, true);
+                    rectangularPositionSnapGrid.Spacing.BindTo(OsuGridToolboxGroup.SpacingVector);
+                    rectangularPositionSnapGrid.GridLineRotation.BindTo(OsuGridToolboxGroup.GridLinesRotation);
 
                     positionSnapGrid = rectangularPositionSnapGrid;
                     break;
@@ -129,8 +129,8 @@ namespace osu.Game.Rulesets.Osu.Edit
                 case PositionSnapGridType.Triangle:
                     var triangularPositionSnapGrid = new TriangularPositionSnapGrid();
 
-                    OsuGridToolboxGroup.Spacing.BindValueChanged(s => triangularPositionSnapGrid.Spacing = s.NewValue, true);
-                    OsuGridToolboxGroup.GridLinesRotation.BindValueChanged(r => triangularPositionSnapGrid.GridLineRotation = r.NewValue, true);
+                    triangularPositionSnapGrid.Spacing.BindTo(OsuGridToolboxGroup.Spacing);
+                    triangularPositionSnapGrid.GridLineRotation.BindTo(OsuGridToolboxGroup.GridLinesRotation);
 
                     positionSnapGrid = triangularPositionSnapGrid;
                     break;
@@ -138,7 +138,7 @@ namespace osu.Game.Rulesets.Osu.Edit
                 case PositionSnapGridType.Circle:
                     var circularPositionSnapGrid = new CircularPositionSnapGrid();
 
-                    OsuGridToolboxGroup.Spacing.BindValueChanged(s => circularPositionSnapGrid.Spacing = s.NewValue, true);
+                    circularPositionSnapGrid.Spacing.BindTo(OsuGridToolboxGroup.Spacing);
 
                     positionSnapGrid = circularPositionSnapGrid;
                     break;
@@ -147,18 +147,11 @@ namespace osu.Game.Rulesets.Osu.Edit
                     throw new NotImplementedException($"{OsuGridToolboxGroup.GridType} has an incorrect value.");
             }
 
-            bindPositionSnapGridStartPosition(positionSnapGrid);
+            // Bind the start position to the toolbox sliders.
+            positionSnapGrid.StartPosition.BindTo(OsuGridToolboxGroup.StartPosition);
+
             positionSnapGrid.RelativeSizeAxes = Axes.Both;
             LayerBelowRuleset.Add(positionSnapGrid);
-            return;
-
-            void bindPositionSnapGridStartPosition(PositionSnapGrid snapGrid)
-            {
-                OsuGridToolboxGroup.StartPositionX.BindValueChanged(x =>
-                    snapGrid.StartPosition = new Vector2(x.NewValue, snapGrid.StartPosition.Y), true);
-                OsuGridToolboxGroup.StartPositionY.BindValueChanged(y =>
-                    snapGrid.StartPosition = new Vector2(snapGrid.StartPosition.X, y.NewValue), true);
-            }
         }
 
         protected override ComposeBlueprintContainer CreateBlueprintContainer()

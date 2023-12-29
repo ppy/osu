@@ -16,7 +16,7 @@ namespace osu.Game.Screens.Edit.Compose.Components
         protected void GenerateGridLines(Vector2 step, Vector2 drawSize)
         {
             int index = 0;
-            var currentPosition = StartPosition;
+            var currentPosition = StartPosition.Value;
 
             // Make lines the same width independent of display resolution.
             float lineWidth = DrawWidth / ScreenSpaceDrawQuad.Width;
@@ -42,7 +42,7 @@ namespace osu.Game.Screens.Edit.Compose.Components
                 generatedLines.Add(gridLine);
 
                 index += 1;
-                currentPosition = StartPosition + index * step;
+                currentPosition = StartPosition.Value + index * step;
             }
 
             if (generatedLines.Count == 0)

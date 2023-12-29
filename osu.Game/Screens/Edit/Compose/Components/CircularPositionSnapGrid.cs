@@ -4,33 +4,28 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Utils;
-using osu.Game.Utils;
 using osuTK;
 
 namespace osu.Game.Screens.Edit.Compose.Components
 {
     public partial class CircularPositionSnapGrid : PositionSnapGrid
     {
-        private float spacing = 1;
-
         /// <summary>
         /// The spacing between grid lines of this <see cref="CircularPositionSnapGrid"/>.
         /// </summary>
-        public float Spacing
+        public BindableFloat Spacing { get; } = new BindableFloat(1f)
         {
-            get => spacing;
-            set
-            {
-                if (spacing <= 0)
-                    throw new ArgumentException("Grid spacing must be positive.");
+            MinValue = 0f,
+        };
 
-                spacing = value;
-                GridCache.Invalidate();
-            }
+        public CircularPositionSnapGrid()
+        {
+            Spacing.BindValueChanged(_ => GridCache.Invalidate());
         }
 
         protected override void CreateContent()
@@ -39,11 +34,11 @@ namespace osu.Game.Screens.Edit.Compose.Components
 
             // Calculate the maximum distance from the origin to the edge of the grid.
             float maxDist = MathF.Max(
-                MathF.Max(StartPosition.Length, (StartPosition - drawSize).Length),
-                MathF.Max((StartPosition - new Vector2(drawSize.X, 0)).Length, (StartPosition - new Vector2(0, drawSize.Y)).Length)
+                MathF.Max(StartPosition.Value.Length, (StartPosition.Value - drawSize).Length),
+                MathF.Max((StartPosition.Value - new Vector2(drawSize.X, 0)).Length, (StartPosition.Value - new Vector2(0, drawSize.Y)).Length)
             );
 
-            generateCircles((int)(maxDist / Spacing) + 1);
+            generateCircles((int)(maxDist / Spacing.Value) + 1);
 
             GenerateOutline(drawSize);
         }
@@ -58,7 +53,7 @@ namespace osu.Game.Screens.Edit.Compose.Components
             for (int i = 0; i < count; i++)
             {
                 // Add a minimum diameter so the center circle is clearly visible.
-                float diameter = MathF.Max(lineWidth * 1.5f, i * Spacing * 2);
+                float diameter = MathF.Max(lineWidth * 1.5f, i * Spacing.Value * 2);
 
                 var gridCircle = new CircularContainer
                 {
@@ -69,7 +64,7 @@ namespace osu.Game.Screens.Edit.Compose.Components
                     RelativeSizeAxes = Axes.None,
                     Width = diameter,
                     Height = diameter,
-                    Position = StartPosition,
+                    Position = StartPosition.Value,
                     Masking = true,
                     Child = new Box
                     {
@@ -92,15 +87,15 @@ namespace osu.Game.Screens.Edit.Compose.Components
 
         public override Vector2 GetSnappedPosition(Vector2 original)
         {
-            Vector2 relativeToStart = original - StartPosition;
+            Vector2 relativeToStart = original - StartPosition.Value;
 
             if (relativeToStart.LengthSquared < Precision.FLOAT_EPSILON)
-                return StartPosition;
+                return StartPosition.Value;
 
             float length = relativeToStart.Length;
-            float wantedLength = MathF.Round(length / Spacing) * Spacing;
+            float wantedLength = MathF.Round(length / Spacing.Value) * Spacing.Value;
 
-            return StartPosition + Vector2.Multiply(relativeToStart, wantedLength / length);
+            return StartPosition.Value + Vector2.Multiply(relativeToStart, wantedLength / length);
         }
     }
 }

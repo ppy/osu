@@ -1,6 +1,7 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
@@ -11,26 +12,18 @@ namespace osu.Game.Screens.Edit.Compose.Components
 {
     public abstract partial class PositionSnapGrid : CompositeDrawable
     {
-        private Vector2 startPosition;
-
         /// <summary>
         /// The position of the origin of this <see cref="PositionSnapGrid"/> in local coordinates.
         /// </summary>
-        public Vector2 StartPosition
-        {
-            get => startPosition;
-            set
-            {
-                startPosition = value;
-                GridCache.Invalidate();
-            }
-        }
+        public Bindable<Vector2> StartPosition { get; } = new Bindable<Vector2>(Vector2.Zero);
 
         protected readonly LayoutValue GridCache = new LayoutValue(Invalidation.RequiredParentSizeToFit);
 
         protected PositionSnapGrid()
         {
             Masking = true;
+
+            StartPosition.BindValueChanged(_ => GridCache.Invalidate());
 
             AddLayout(GridCache);
         }
