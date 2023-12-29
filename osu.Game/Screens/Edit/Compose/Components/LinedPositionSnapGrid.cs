@@ -5,61 +5,18 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using osu.Framework.Graphics;
-using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
-using osu.Framework.Layout;
 using osu.Framework.Utils;
 using osuTK;
 
 namespace osu.Game.Screens.Edit.Compose.Components
 {
-    public abstract partial class LinedPositionSnapGrid : CompositeDrawable
+    public abstract partial class LinedPositionSnapGrid : PositionSnapGrid
     {
-        private Vector2 startPosition;
-
-        /// <summary>
-        /// The position of the origin of this <see cref="TriangularPositionSnapGrid"/> in local coordinates.
-        /// </summary>
-        public Vector2 StartPosition
-        {
-            get => startPosition;
-            set
-            {
-                startPosition = value;
-                GridCache.Invalidate();
-            }
-        }
-
-        protected readonly LayoutValue GridCache = new LayoutValue(Invalidation.RequiredParentSizeToFit);
-
-        protected LinedPositionSnapGrid()
-        {
-            Masking = true;
-
-            AddLayout(GridCache);
-        }
-
-        protected override void Update()
-        {
-            base.Update();
-
-            if (!GridCache.IsValid)
-            {
-                ClearInternal();
-
-                if (DrawWidth > 0 && DrawHeight > 0)
-                    CreateContent();
-
-                GridCache.Validate();
-            }
-        }
-
-        protected abstract void CreateContent();
-
         protected void GenerateGridLines(Vector2 step, Vector2 drawSize)
         {
             int index = 0;
-            var currentPosition = startPosition;
+            var currentPosition = StartPosition;
 
             // Make lines the same width independent of display resolution.
             float lineWidth = DrawWidth / ScreenSpaceDrawQuad.Width;
@@ -85,7 +42,7 @@ namespace osu.Game.Screens.Edit.Compose.Components
                 generatedLines.Add(gridLine);
 
                 index += 1;
-                currentPosition = startPosition + index * step;
+                currentPosition = StartPosition + index * step;
             }
 
             if (generatedLines.Count == 0)
@@ -120,53 +77,5 @@ namespace osu.Game.Screens.Edit.Compose.Components
                                                                 !Precision.AlmostEquals(b, 0) &&
                                                                 Math.Sign(a) != Math.Sign(b);
         }
-
-        protected void GenerateOutline(Vector2 drawSize)
-        {
-            // Make lines the same width independent of display resolution.
-            float lineWidth = DrawWidth / ScreenSpaceDrawQuad.Width;
-
-            AddRangeInternal(new[]
-            {
-                new Box
-                {
-                    Colour = Colour4.White,
-                    Alpha = 0.3f,
-                    Origin = Anchor.CentreLeft,
-                    RelativeSizeAxes = Axes.X,
-                    Height = lineWidth,
-                    Y = 0,
-                },
-                new Box
-                {
-                    Colour = Colour4.White,
-                    Alpha = 0.3f,
-                    Origin = Anchor.CentreLeft,
-                    RelativeSizeAxes = Axes.X,
-                    Height = lineWidth,
-                    Y = drawSize.Y,
-                },
-                new Box
-                {
-                    Colour = Colour4.White,
-                    Alpha = 0.3f,
-                    Origin = Anchor.TopCentre,
-                    RelativeSizeAxes = Axes.Y,
-                    Width = lineWidth,
-                    X = 0,
-                },
-                new Box
-                {
-                    Colour = Colour4.White,
-                    Alpha = 0.3f,
-                    Origin = Anchor.TopCentre,
-                    RelativeSizeAxes = Axes.Y,
-                    Width = lineWidth,
-                    X = drawSize.X,
-                },
-            });
-        }
-
-        public abstract Vector2 GetSnappedPosition(Vector2 original);
     }
 }

@@ -86,10 +86,6 @@ namespace osu.Game.Rulesets.Osu.Edit
                 distanceSnapGridContainer = new Container
                 {
                     RelativeSizeAxes = Axes.Both
-                },
-                rectangularPositionSnapGrid = new RectangularPositionSnapGrid
-                {
-                    RelativeSizeAxes = Axes.Both
                 }
             });
 
@@ -103,12 +99,7 @@ namespace osu.Game.Rulesets.Osu.Edit
             // we may be entering the screen with a selection already active
             updateDistanceSnapGrid();
 
-            OsuGridToolboxGroup.StartPositionX.BindValueChanged(x =>
-                rectangularPositionSnapGrid.StartPosition = new Vector2(x.NewValue, rectangularPositionSnapGrid.StartPosition.Y), true);
-            OsuGridToolboxGroup.StartPositionY.BindValueChanged(y =>
-                rectangularPositionSnapGrid.StartPosition = new Vector2(rectangularPositionSnapGrid.StartPosition.X, y.NewValue), true);
-            OsuGridToolboxGroup.Spacing.BindValueChanged(s => rectangularPositionSnapGrid.Spacing = new Vector2(s.NewValue), true);
-            OsuGridToolboxGroup.GridLinesRotation.BindValueChanged(r => rectangularPositionSnapGrid.GridLineRotation = r.NewValue, true);
+            OsuGridToolboxGroup.GridType.BindValueChanged(updatePositionSnapGrid, true);
 
             RightToolbox.AddRange(new EditorToolboxGroup[]
                 {
@@ -117,6 +108,49 @@ namespace osu.Game.Rulesets.Osu.Edit
                     FreehandlSliderToolboxGroup
                 }
             );
+        }
+
+        private void updatePositionSnapGrid(ValueChangedEvent<PositionSnapGridType> obj)
+        {
+            if (positionSnapGrid != null)
+                LayerBelowRuleset.Remove(positionSnapGrid, true);
+
+            switch (obj.NewValue)
+            {
+                case PositionSnapGridType.Square:
+                    var rectangularPositionSnapGrid = new RectangularPositionSnapGrid();
+
+                    OsuGridToolboxGroup.Spacing.BindValueChanged(s => rectangularPositionSnapGrid.Spacing = new Vector2(s.NewValue), true);
+                    OsuGridToolboxGroup.GridLinesRotation.BindValueChanged(r => rectangularPositionSnapGrid.GridLineRotation = r.NewValue, true);
+
+                    positionSnapGrid = rectangularPositionSnapGrid;
+                    break;
+
+                case PositionSnapGridType.Triangle:
+                    var triangularPositionSnapGrid = new TriangularPositionSnapGrid();
+
+                    OsuGridToolboxGroup.Spacing.BindValueChanged(s => triangularPositionSnapGrid.Spacing = s.NewValue, true);
+                    OsuGridToolboxGroup.GridLinesRotation.BindValueChanged(r => triangularPositionSnapGrid.GridLineRotation = r.NewValue, true);
+
+                    positionSnapGrid = triangularPositionSnapGrid;
+                    break;
+
+                default:
+                    throw new NotImplementedException($"{OsuGridToolboxGroup.GridType} has an incorrect value.");
+            }
+
+            bindPositionSnapGridStartPosition(positionSnapGrid);
+            positionSnapGrid.RelativeSizeAxes = Axes.Both;
+            LayerBelowRuleset.Add(positionSnapGrid);
+            return;
+
+            void bindPositionSnapGridStartPosition(PositionSnapGrid snapGrid)
+            {
+                OsuGridToolboxGroup.StartPositionX.BindValueChanged(x =>
+                    snapGrid.StartPosition = new Vector2(x.NewValue, snapGrid.StartPosition.Y), true);
+                OsuGridToolboxGroup.StartPositionY.BindValueChanged(y =>
+                    snapGrid.StartPosition = new Vector2(snapGrid.StartPosition.X, y.NewValue), true);
+            }
         }
 
         protected override ComposeBlueprintContainer CreateBlueprintContainer()
@@ -159,7 +193,7 @@ namespace osu.Game.Rulesets.Osu.Edit
         private readonly Cached distanceSnapGridCache = new Cached();
         private double? lastDistanceSnapGridTime;
 
-        private RectangularPositionSnapGrid rectangularPositionSnapGrid;
+        private PositionSnapGrid positionSnapGrid;
 
         protected override void Update()
         {
@@ -217,13 +251,13 @@ namespace osu.Game.Rulesets.Osu.Edit
             {
                 if (rectangularGridSnapToggle.Value == TernaryState.True)
                 {
-                    Vector2 pos = rectangularPositionSnapGrid.GetSnappedPosition(rectangularPositionSnapGrid.ToLocalSpace(result.ScreenSpacePosition));
+                    Vector2 pos = positionSnapGrid.GetSnappedPosition(positionSnapGrid.ToLocalSpace(result.ScreenSpacePosition));
 
                     // A grid which doesn't perfectly fit the playfield can produce a position that is outside of the playfield.
                     // We need to clamp the position to the playfield bounds to ensure that the snapped position is always in bounds.
                     pos = Vector2.Clamp(pos, Vector2.Zero, OsuPlayfield.BASE_SIZE);
 
-                    result.ScreenSpacePosition = rectangularPositionSnapGrid.ToScreenSpace(pos);
+                    result.ScreenSpacePosition = positionSnapGrid.ToScreenSpace(pos);
                 }
             }
 
