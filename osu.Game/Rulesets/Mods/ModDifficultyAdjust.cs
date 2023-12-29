@@ -95,5 +95,27 @@ namespace osu.Game.Rulesets.Mods
             if (DrainRate.Value != null) difficulty.DrainRate = DrainRate.Value.Value;
             if (OverallDifficulty.Value != null) difficulty.OverallDifficulty = OverallDifficulty.Value.Value;
         }
+
+        public override bool IsRedundant(IBeatmap beatmap)
+        {
+            var difficulty = beatmap.Difficulty;
+
+            if (DrainRate.Value != null)
+            {
+                // Rounding due to some float problems
+                float roundedDrainRate = (float)Math.Round(DrainRate.Value.Value, 1);
+
+                if (roundedDrainRate != difficulty.DrainRate) return false;
+            }
+
+            if (OverallDifficulty.Value != null)
+            {
+                float roundedOverallDifficulty = (float)Math.Round(OverallDifficulty.Value.Value, 1);
+
+                if (roundedOverallDifficulty != difficulty.OverallDifficulty) return false;
+            }
+
+            return true;
+        }
     }
 }
