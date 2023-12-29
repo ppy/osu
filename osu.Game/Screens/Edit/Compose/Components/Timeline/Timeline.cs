@@ -141,12 +141,13 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
             waveformOpacity = config.GetBindable<float>(OsuSetting.EditorWaveformOpacity);
 
             track.BindTo(editorClock.Track);
-            track.BindValueChanged(_ =>
+            // schedule added as without it, `beatmap.Value.Track.Length` can be 0 immediately after a track switch.
+            track.BindValueChanged(_ => Schedule(() =>
             {
                 waveform.Waveform = beatmap.Value.Waveform;
                 waveform.RelativePositionAxes = Axes.X;
                 waveform.X = -(float)(Editor.WAVEFORM_VISUAL_OFFSET / beatmap.Value.Track.Length);
-            }, true);
+            }), true);
 
             Zoom = (float)(defaultTimelineZoom * editorBeatmap.BeatmapInfo.TimelineZoom);
         }
