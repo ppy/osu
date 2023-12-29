@@ -103,7 +103,7 @@ namespace osu.Game.Screens.Menu
                 "What used to be \"osu!direct\" is available to all users just like on the website. You can access it anywhere using Ctrl-B!",
                 "Seeking in replays is available by dragging on the difficulty bar at the bottom of the screen!",
                 "Multithreading support means that even with low \"FPS\" your input and judgements will be accurate!",
-                "Try scrolling down in the mod select panel to find a bunch of new fun mods!",
+                "Try scrolling right in mod select to find a bunch of new fun mods!",
                 "Most of the web content (profiles, rankings, etc.) are available natively in-game from the icons on the toolbar!",
                 "Get more details, hide or delete a beatmap by right-clicking on its panel at song select!",
                 "All delete operations are temporary until exiting. Restore accidentally deleted content from the maintenance settings!",
