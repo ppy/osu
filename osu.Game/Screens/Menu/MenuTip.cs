@@ -112,12 +112,13 @@ namespace osu.Game.Screens.Menu
                 "Take a look under the hood at performance counters and enable verbose performance logging with Ctrl-F2!",
                 "Most mods are customisable. Click on Mod Customisation in mod select to change how they work!",
                 "You can press Ctrl-Shift-F anywhere in the game to toggle FPS Counter!",
-                "You can press Ctrl-H in replay to toggle Replay settings!",
+                "During replay, you can press Ctrl-H to toggle Replay settings!",
                 "Each \"Rulesets\" have their own settings. You can configure it in settings!",
-                "You can copy the used mods from scores by right-clicking on them!",
+                "You can easily copy the mods from the score they used by right-clicking on it!",
                 "You can hold Ctrl while selecting a beatmap to watch a perfect automated play through!",
-                "Don't like a certain element in-game? Customise it using the \"Skin Editor\" by pressing Ctrl-Shift-S!",
-                "Are you sensitive to latency? Test your limits using the \"Latency Certifier\" in the settings!",
+                "Don't like a certain element in-game? Customise it using the \"Skin editor\"! Or by pressing Ctrl-Shift-S!",
+                "Are you sensitive to latency? Test your limits using the \"Latency Certifier\" in settings!",
+                "Be sure to check out other \"Rulesets\" that the community has made!",
             };
 
             return tips[RNG.Next(0, tips.Length)];
