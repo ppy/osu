@@ -11,6 +11,7 @@ using osu.Framework.Bindables;
 using osu.Framework.Extensions.TypeExtensions;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Localisation;
+using osu.Game.Beatmaps;
 using osu.Game.Configuration;
 using osu.Game.Extensions;
 using osu.Game.Rulesets.UI;
@@ -331,5 +332,18 @@ namespace osu.Game.Rulesets.Mods
 
             public int GetHashCode(IBindable obj) => obj.GetUnderlyingSettingValue().GetHashCode();
         }
+
+        /// <summary>
+        /// Checks if this mod is redundant.
+        /// </summary>
+        /// <returns>Whether this mod is redundant.</returns>
+        public virtual bool IsRedundant() => false;
+
+        /// <summary>
+        /// Checks if this mod is redundant based on a <see cref="IBeatmap"/> implementation.
+        /// </summary>
+        /// <param name="beatmap">The <see cref="IBeatmap"/> implementation to test against.</param>
+        /// <returns>Whether this mod is redundant.</returns>
+        public virtual bool IsRedundant(IBeatmap beatmap) => IsRedundant();
     }
 }
