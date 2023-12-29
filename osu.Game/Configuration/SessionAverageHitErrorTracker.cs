@@ -17,10 +17,13 @@ namespace osu.Game.Configuration
     [Cached]
     public partial class SessionAverageHitErrorTracker : Component
     {
-        public IBindableList<double> AverageHitErrorHistory => averageHitErrorHistory;
-        private readonly BindableList<double> averageHitErrorHistory = new BindableList<double>();
+        public IBindableList<DataPoint> AverageHitErrorHistory => averageHitErrorHistory;
+        private readonly BindableList<DataPoint> averageHitErrorHistory = new BindableList<DataPoint>();
 
         private readonly Bindable<ScoreInfo?> latestScore = new Bindable<ScoreInfo?>();
+
+        [Resolved]
+        private OsuConfigManager configManager { get; set; } = null!;
 
         [BackgroundDependencyLoader]
         private void load(SessionStatics statics)
@@ -46,9 +49,25 @@ namespace osu.Game.Configuration
             // keep a sane maximum number of entries.
             if (averageHitErrorHistory.Count >= 50)
                 averageHitErrorHistory.RemoveAt(0);
-            averageHitErrorHistory.Add(averageError);
+
+            double globalOffset = configManager.Get<double>(OsuSetting.AudioOffset);
+            averageHitErrorHistory.Add(new DataPoint(averageError, globalOffset));
         }
 
         public void ClearHistory() => averageHitErrorHistory.Clear();
+
+        public readonly struct DataPoint
+        {
+            public double AverageHitError { get; }
+            public double GlobalAudioOffset { get; }
+
+            public double SuggestedGlobalAudioOffset => GlobalAudioOffset - AverageHitError;
+
+            public DataPoint(double averageHitError, double globalOffset)
+            {
+                AverageHitError = averageHitError;
+                GlobalAudioOffset = globalOffset;
+            }
+        }
     }
 }

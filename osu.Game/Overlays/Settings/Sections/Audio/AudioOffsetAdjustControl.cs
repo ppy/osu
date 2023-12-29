@@ -42,7 +42,7 @@ namespace osu.Game.Overlays.Settings.Sections.Audio
 
             private readonly BindableNumberWithCurrent<double> current = new BindableNumberWithCurrent<double>();
 
-            private readonly IBindableList<double> averageHitErrorHistory = new BindableList<double>();
+            private readonly IBindableList<SessionAverageHitErrorTracker.DataPoint> averageHitErrorHistory = new BindableList<SessionAverageHitErrorTracker.DataPoint>();
 
             private readonly Bindable<double?> suggestedOffset = new Bindable<double?>();
 
@@ -112,7 +112,7 @@ namespace osu.Game.Overlays.Settings.Sections.Audio
                 switch (e.Action)
                 {
                     case NotifyCollectionChangedAction.Add:
-                        foreach (double average in e.NewItems!)
+                        foreach (SessionAverageHitErrorTracker.DataPoint dataPoint in e.NewItems!)
                         {
                             notchContainer.ForEach(n => n.Alpha *= 0.95f);
                             notchContainer.Add(new Box
@@ -122,16 +122,16 @@ namespace osu.Game.Overlays.Settings.Sections.Audio
                                 RelativePositionAxes = Axes.X,
                                 Anchor = Anchor.Centre,
                                 Origin = Anchor.Centre,
-                                X = getXPositionForAverage(average)
+                                X = getXPositionForOffset(dataPoint.SuggestedGlobalAudioOffset)
                             });
                         }
 
                         break;
 
                     case NotifyCollectionChangedAction.Remove:
-                        foreach (double average in e.OldItems!)
+                        foreach (SessionAverageHitErrorTracker.DataPoint dataPoint in e.OldItems!)
                         {
-                            var notch = notchContainer.FirstOrDefault(n => n.X == getXPositionForAverage(average));
+                            var notch = notchContainer.FirstOrDefault(n => n.X == getXPositionForOffset(dataPoint.SuggestedGlobalAudioOffset));
                             Debug.Assert(notch != null);
                             notchContainer.Remove(notch, true);
                         }
@@ -143,10 +143,10 @@ namespace osu.Game.Overlays.Settings.Sections.Audio
                         break;
                 }
 
-                suggestedOffset.Value = averageHitErrorHistory.Any() ? -averageHitErrorHistory.Average() : null;
+                suggestedOffset.Value = averageHitErrorHistory.Any() ? -averageHitErrorHistory.Average(dataPoint => dataPoint.SuggestedGlobalAudioOffset) : null;
             }
 
-            private float getXPositionForAverage(double average) => (float)(Math.Clamp(-average, current.MinValue, current.MaxValue) / (2 * current.MaxValue));
+            private float getXPositionForOffset(double offset) => (float)(Math.Clamp(offset, current.MinValue, current.MaxValue) / (2 * current.MaxValue));
 
             private void updateHintText()
             {
