@@ -363,6 +363,7 @@ namespace osu.Game.Graphics.UserInterface
                 base.LoadComplete();
 
                 SearchBar.State.ValueChanged += _ => updateColour();
+                Enabled.BindValueChanged(_ => updateColour());
                 updateColour();
             }
 
