@@ -293,7 +293,7 @@ namespace osu.Game.Online.Leaderboards
 
         protected virtual IEnumerable<LeaderboardScoreStatistic> GetStatistics(ScoreInfo model) => new[]
         {
-            new LeaderboardScoreStatistic(FontAwesome.Solid.Link, BeatmapsetsStrings.ShowScoreboardHeadersCombo, model.MaxCombo.ToString()),
+            new LeaderboardScoreStatistic(FontAwesome.Solid.Link, BeatmapsetsStrings.ShowScoreboardHeadersCombo, $"{model.MaxCombo}/{model.GetMaximumAchievableCombo()}"),
             new LeaderboardScoreStatistic(FontAwesome.Solid.Crosshairs, BeatmapsetsStrings.ShowScoreboardHeadersAccuracy, model.DisplayAccuracy)
         };
 
