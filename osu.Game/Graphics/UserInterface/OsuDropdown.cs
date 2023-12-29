@@ -32,10 +32,11 @@ namespace osu.Game.Graphics.UserInterface
 
         public bool OnPressed(KeyBindingPressEvent<GlobalAction> e)
         {
-            if (e.Repeat) return false;
-
-            if (e.Action == GlobalAction.Back)
-                return Back();
+            if (e.Action == GlobalAction.Back && Menu.State == MenuState.Open)
+            {
+                Menu.Close();
+                return true;
+            }
 
             return false;
         }
@@ -48,8 +49,6 @@ namespace osu.Game.Graphics.UserInterface
 
         protected partial class OsuDropdownMenu : DropdownMenu
         {
-            public override bool HandleNonPositionalInput => State == MenuState.Open;
-
             private Sample? sampleOpen;
             private Sample? sampleClose;
 
@@ -400,28 +399,30 @@ namespace osu.Game.Graphics.UserInterface
                 Padding = new MarginPadding { Right = 26 },
             };
 
-            private partial class OsuDropdownSearchBar : DropdownSearchBar
+            private partial class OsuDropdownSearchBar : DropdownSearchBar, IKeyBindingHandler<GlobalAction>
             {
                 protected override void PopIn() => this.FadeIn();
 
                 protected override void PopOut() => this.FadeOut();
 
-                protected override TextBox CreateTextBox() => new DropdownSearchTextBox
+                protected override TextBox CreateTextBox() => new SearchTextBox
                 {
                     FontSize = OsuFont.Default.Size,
                 };
 
-                private partial class DropdownSearchTextBox : SearchTextBox
+                public bool OnPressed(KeyBindingPressEvent<GlobalAction> e)
                 {
-                    public override bool OnPressed(KeyBindingPressEvent<GlobalAction> e)
+                    if (e.Action == GlobalAction.Back && !string.IsNullOrEmpty(SearchTerm.Value))
                     {
-                        if (e.Action == GlobalAction.Back)
-                            // this method is blocking Dropdown from receiving the back action, despite this text box residing in a separate input manager.
-                            // to fix this properly, a local global action container needs to be added as well, but for simplicity, just don't handle the back action here.
-                            return false;
-
-                        return base.OnPressed(e);
+                        SearchTerm.Value = string.Empty;
+                        return true;
                     }
+
+                    return false;
+                }
+
+                public void OnReleased(KeyBindingReleaseEvent<GlobalAction> e)
+                {
                 }
             }
         }
