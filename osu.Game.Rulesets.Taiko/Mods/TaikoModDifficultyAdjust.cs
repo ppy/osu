@@ -1,6 +1,7 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System;
 using System.Linq;
 using osu.Game.Beatmaps;
 using osu.Game.Configuration;
@@ -38,6 +39,20 @@ namespace osu.Game.Rulesets.Taiko.Mods
             base.ApplySettings(difficulty);
 
             if (ScrollSpeed.Value != null) difficulty.SliderMultiplier *= ScrollSpeed.Value.Value;
+        }
+
+        public override bool IsRedundant(IBeatmap beatmap)
+        {
+            if (!base.IsRedundant(beatmap)) return false;
+
+            if (ScrollSpeed.Value != null)
+            {
+                float roundedScrollSpeed = (float)Math.Round(ScrollSpeed.Value.Value, 2);
+
+                if (roundedScrollSpeed != 1) return false;
+            }
+
+            return true;
         }
     }
 }
