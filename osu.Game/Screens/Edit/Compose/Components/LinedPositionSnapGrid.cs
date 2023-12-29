@@ -48,7 +48,7 @@ namespace osu.Game.Screens.Edit.Compose.Components
             if (generatedLines.Count == 0)
                 return;
 
-            generatedLines.First().Alpha = 0.3f;
+            generatedLines.First().Alpha = 0.2f;
 
             AddRangeInternal(generatedLines);
         }
