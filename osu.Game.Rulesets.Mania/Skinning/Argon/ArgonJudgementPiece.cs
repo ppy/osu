@@ -76,7 +76,6 @@ namespace osu.Game.Rulesets.Mania.Skinning.Argon
                     this.ScaleTo(1.6f);
                     this.ScaleTo(1, 100, Easing.In);
 
-                    this.MoveTo(Vector2.Zero);
                     this.MoveToOffset(new Vector2(0, 100), 800, Easing.InQuint);
 
                     this.RotateTo(0);
