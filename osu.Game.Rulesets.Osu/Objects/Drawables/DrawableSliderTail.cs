@@ -6,10 +6,12 @@
 using System.Diagnostics;
 using JetBrains.Annotations;
 using osu.Framework.Allocation;
+using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Game.Rulesets.Objects.Drawables;
 using osu.Game.Rulesets.Objects.Types;
+using osu.Game.Rulesets.Osu.Configuration;
 using osu.Game.Skinning;
 using osuTK;
 
@@ -17,6 +19,9 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
 {
     public partial class DrawableSliderTail : DrawableOsuHitObject
     {
+        [Resolved(CanBeNull = true)]
+        private OsuRulesetConfigManager config { get; set; }
+
         public new SliderTailCircle HitObject => (SliderTailCircle)base.HitObject;
 
         [CanBeNull]
@@ -34,6 +39,8 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
 
         private Container scaleContainer;
 
+        private readonly Bindable<bool> showSliderTailCircle = new Bindable<bool>();
+
         public DrawableSliderTail()
             : base(null)
         {
@@ -47,6 +54,8 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
         [BackgroundDependencyLoader]
         private void load()
         {
+            config?.BindWith(OsuRulesetSetting.ShowSliderTailCircle, showSliderTailCircle);
+
             Origin = Anchor.Centre;
             Size = OsuHitObject.OBJECT_DIMENSIONS;
 
@@ -90,7 +99,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
             CirclePiece
                 .FadeOut()
                 .Delay(delayFadeIn ? (Slider?.TimePreempt ?? 0) / 3 : 0)
-                .FadeIn(HitObject.TimeFadeIn);
+                .FadeTo(showSliderTailCircle.Value ? 1 : 0, HitObject.TimeFadeIn);
         }
 
         protected override void UpdateHitStateTransforms(ArmedState state)
