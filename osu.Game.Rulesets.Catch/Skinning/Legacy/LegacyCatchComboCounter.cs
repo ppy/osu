@@ -5,6 +5,7 @@ using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Extensions.ObjectExtensions;
 using osu.Framework.Graphics;
+using osu.Framework.Graphics.Containers;
 using osu.Game.Graphics.Containers;
 using osu.Game.Rulesets.Catch.Objects;
 using osu.Game.Rulesets.Catch.UI;
@@ -14,7 +15,6 @@ using osu.Game.Rulesets.UI;
 using osu.Game.Screens.Play;
 using osu.Game.Skinning;
 using osuTK;
-using osuTK.Graphics;
 
 namespace osu.Game.Rulesets.Catch.Skinning.Legacy
 {
@@ -22,7 +22,7 @@ namespace osu.Game.Rulesets.Catch.Skinning.Legacy
     /// A combo counter implementation that visually behaves almost similar to stable's osu!catch combo counter.
     /// </summary>
     // todo: maybe make this inherit LegacyComboCounter at some point
-    public partial class LegacyCatchComboCounter : UprightAspectMaintainingContainer, ISerialisableDrawable
+    public partial class LegacyCatchComboCounter : CompositeDrawable, ISerialisableDrawable
     {
         private readonly LegacyRollingCounter counter;
 
@@ -41,21 +41,25 @@ namespace osu.Game.Rulesets.Catch.Skinning.Legacy
             AlwaysPresent = true;
             Alpha = 0f;
 
-            InternalChildren = new Drawable[]
+            InternalChild = new UprightAspectMaintainingContainer
             {
-                explosion = new LegacyRollingCounter(LegacyFont.Combo)
+                AutoSizeAxes = Axes.Both,
+                Children = new[]
                 {
-                    Alpha = 0.65f,
-                    Blending = BlendingParameters.Additive,
-                    Anchor = Anchor.Centre,
-                    Origin = Anchor.Centre,
-                    Scale = new Vector2(1.5f),
-                },
-                counter = new LegacyRollingCounter(LegacyFont.Combo)
-                {
-                    Anchor = Anchor.Centre,
-                    Origin = Anchor.Centre,
-                },
+                    explosion = new LegacyRollingCounter(LegacyFont.Combo)
+                    {
+                        Alpha = 0.65f,
+                        Blending = BlendingParameters.Additive,
+                        Anchor = Anchor.Centre,
+                        Origin = Anchor.Centre,
+                        Scale = new Vector2(1.5f),
+                    },
+                    counter = new LegacyRollingCounter(LegacyFont.Combo)
+                    {
+                        Anchor = Anchor.Centre,
+                        Origin = Anchor.Centre,
+                    },
+                }
             };
 
             UsesFixedAnchor = true;
@@ -140,10 +144,6 @@ namespace osu.Game.Rulesets.Catch.Skinning.Legacy
                          .ScaleTo(1.9f, 400, Easing.Out)
                          .FadeOutFromOne(400);
             }
-        }
-
-        public void UpdateCombo(int combo, Color4? hitObjectColour = null)
-        {
         }
     }
 }
