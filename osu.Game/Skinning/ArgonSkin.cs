@@ -111,14 +111,13 @@ namespace osu.Game.Skinning
                             return songSelectComponents;
 
                         case SkinComponentsContainerLookup.TargetArea.MainHUDComponents:
-                            var skinnableTargetWrapper = new DefaultSkinComponentsContainer(container =>
+                            var mainHUDComponents = new DefaultSkinComponentsContainer(container =>
                             {
                                 var health = container.OfType<ArgonHealthDisplay>().FirstOrDefault();
                                 var healthLine = container.OfType<BoxElement>().FirstOrDefault();
                                 var wedgePieces = container.OfType<ArgonWedgePiece>().ToArray();
                                 var score = container.OfType<ArgonScoreCounter>().FirstOrDefault();
                                 var accuracy = container.OfType<ArgonAccuracyCounter>().FirstOrDefault();
-                                var combo = container.OfType<ArgonComboCounter>().FirstOrDefault();
                                 var songProgress = container.OfType<ArgonSongProgress>().FirstOrDefault();
                                 var keyCounter = container.OfType<ArgonKeyCounterDisplay>().FirstOrDefault();
 
@@ -192,13 +191,6 @@ namespace osu.Game.Skinning
                                             keyCounter.Origin = Anchor.BottomRight;
                                             keyCounter.Position = new Vector2(-(hitError.Width + padding), -(padding * 2 + song_progress_offset_height));
                                         }
-
-                                        if (combo != null && hitError != null)
-                                        {
-                                            combo.Anchor = Anchor.BottomLeft;
-                                            combo.Origin = Anchor.BottomLeft;
-                                            combo.Position = new Vector2((hitError.Width + padding), -(padding * 2 + song_progress_offset_height));
-                                        }
                                     }
                                 }
                             })
@@ -224,10 +216,6 @@ namespace osu.Game.Skinning
                                         CornerRadius = { Value = 0.5f }
                                     },
                                     new ArgonAccuracyCounter(),
-                                    new ArgonComboCounter
-                                    {
-                                        Scale = new Vector2(1.3f)
-                                    },
                                     new BarHitErrorMeter(),
                                     new BarHitErrorMeter(),
                                     new ArgonSongProgress(),
@@ -235,7 +223,7 @@ namespace osu.Game.Skinning
                                 }
                             };
 
-                            return skinnableTargetWrapper;
+                            return mainHUDComponents;
                     }
 
                     return null;

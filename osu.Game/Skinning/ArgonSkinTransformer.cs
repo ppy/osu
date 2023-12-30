@@ -2,23 +2,15 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System.Linq;
-using osu.Framework.Audio.Sample;
 using osu.Framework.Graphics;
-using osu.Game.Audio;
-using osu.Game.Rulesets.Objects.Legacy;
+using osu.Game.Screens.Play.HUD;
 using osuTK;
-using static osu.Game.Skinning.SkinConfiguration;
 
 namespace osu.Game.Skinning
 {
-    public class LegacySkinTransformer : SkinTransformer
+    public class ArgonSkinTransformer : SkinTransformer
     {
-        /// <summary>
-        /// Whether the skin being transformed is able to provide legacy resources for the ruleset.
-        /// </summary>
-        public virtual bool IsProvidingLegacyResources => this.HasFont(LegacyFont.Combo);
-
-        public LegacySkinTransformer(ISkin skin)
+        public ArgonSkinTransformer(ISkin skin)
             : base(skin)
         {
         }
@@ -31,21 +23,22 @@ namespace osu.Game.Skinning
                     switch (containerLookup.Target)
                     {
                         case SkinComponentsContainerLookup.TargetArea.MainHUDComponents when containerLookup.Ruleset != null:
-                            var rulesetHUDComponents = base.GetDrawableComponent(lookup);
+                            var rulesetHUDComponents = Skin.GetDrawableComponent(lookup);
 
                             rulesetHUDComponents ??= new DefaultSkinComponentsContainer(container =>
                             {
-                                var combo = container.OfType<LegacyComboCounter>().FirstOrDefault();
+                                var combo = container.OfType<ArgonComboCounter>().FirstOrDefault();
 
                                 if (combo != null)
                                 {
                                     combo.Anchor = Anchor.BottomLeft;
                                     combo.Origin = Anchor.BottomLeft;
-                                    combo.Scale = new Vector2(1.28f);
+                                    combo.Position = new Vector2(36, -66);
+                                    combo.Scale = new Vector2(1.3f);
                                 }
                             })
                             {
-                                new LegacyComboCounter()
+                                new ArgonComboCounter(),
                             };
 
                             return rulesetHUDComponents;
@@ -55,18 +48,6 @@ namespace osu.Game.Skinning
             }
 
             return base.GetDrawableComponent(lookup);
-        }
-
-        public override ISample? GetSample(ISampleInfo sampleInfo)
-        {
-            if (!(sampleInfo is ConvertHitObjectParser.LegacyHitSampleInfo legacySample))
-                return Skin.GetSample(sampleInfo);
-
-            var playLayeredHitSounds = GetConfig<LegacySetting, bool>(LegacySetting.LayeredHitSounds);
-            if (legacySample.IsLayered && playLayeredHitSounds?.Value == false)
-                return new SampleVirtual();
-
-            return base.GetSample(sampleInfo);
         }
     }
 }

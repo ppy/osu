@@ -7,16 +7,16 @@ using osu.Game.Skinning;
 
 namespace osu.Game.Rulesets.Taiko.Skinning.Argon
 {
-    public class TaikoArgonSkinTransformer : SkinTransformer
+    public class TaikoArgonSkinTransformer : ArgonSkinTransformer
     {
         public TaikoArgonSkinTransformer(ISkin skin)
             : base(skin)
         {
         }
 
-        public override Drawable? GetDrawableComponent(ISkinComponentLookup component)
+        public override Drawable? GetDrawableComponent(ISkinComponentLookup lookup)
         {
-            switch (component)
+            switch (lookup)
             {
                 case GameplaySkinComponentLookup<HitResult> resultComponent:
                     // This should eventually be moved to a skin setting, when supported.
@@ -75,7 +75,7 @@ namespace osu.Game.Rulesets.Taiko.Skinning.Argon
                     break;
             }
 
-            return base.GetDrawableComponent(component);
+            return base.GetDrawableComponent(lookup);
         }
     }
 }
