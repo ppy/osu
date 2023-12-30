@@ -119,6 +119,98 @@ namespace osu.Game.Tests.Mods
             Assert.That(applied.OverallDifficulty, Is.EqualTo(10));
         }
 
+        [Test]
+        public void TestRedundancyOnNullValues()
+        {
+            Beatmap beatmap = new Beatmap();
+
+            Assert.That(testMod.DrainRate.Value, Is.Null);
+
+            Assert.That(testMod.OverallDifficulty.Value, Is.Null);
+
+            Assert.True(testMod.IsRedundant(beatmap));
+        }
+
+        [Test]
+        public void TestRedundancyOnSameValuesApplied()
+        {
+            Beatmap beatmap = new Beatmap
+            {
+                BeatmapInfo = new BeatmapInfo
+                {
+                    Difficulty = new BeatmapDifficulty
+                    {
+                        DrainRate = 8,
+                        OverallDifficulty = 8
+                    }
+                }
+            };
+
+            testMod.DrainRate.Value = 8;
+            testMod.OverallDifficulty.Value = 8;
+
+            Assert.True(testMod.IsRedundant(beatmap));
+        }
+
+        [Test]
+        public void TestNonRedundancyOnDifferentDrainRate()
+        {
+            Beatmap beatmap = new Beatmap
+            {
+                BeatmapInfo = new BeatmapInfo
+                {
+                    Difficulty = new BeatmapDifficulty
+                    {
+                        DrainRate = 8
+                    }
+                }
+            };
+
+            testMod.DrainRate.Value = 10;
+
+            Assert.False(testMod.IsRedundant(beatmap));
+        }
+
+        [Test]
+        public void TestNonRedundancyOnDifferentOverallDifficulty()
+        {
+            Beatmap beatmap = new Beatmap
+            {
+                BeatmapInfo = new BeatmapInfo
+                {
+                    Difficulty = new BeatmapDifficulty
+                    {
+                        OverallDifficulty = 8
+                    }
+                }
+            };
+
+            testMod.OverallDifficulty.Value = 10;
+
+            Assert.False(testMod.IsRedundant(beatmap));
+        }
+
+        [Test]
+        public void TestNonRedundancyOnSameDrainRateButDifferentOverallDifficulty()
+        {
+            Beatmap beatmap = new Beatmap
+            {
+                BeatmapInfo = new BeatmapInfo
+                {
+                    Difficulty = new BeatmapDifficulty
+                    {
+                        DrainRate = 8,
+                        OverallDifficulty = 8
+                    }
+                }
+            };
+
+            testMod.DrainRate.Value = 8;
+            testMod.OverallDifficulty.Value = 10;
+
+            Assert.False(testMod.IsRedundant(beatmap));
+        }
+
         /// <summary>
         /// Applies a <see cref="BeatmapDifficulty"/> to the mod and returns a new <see cref="BeatmapDifficulty"/>
         /// representing the result if the mod were applied to a fresh <see cref="BeatmapDifficulty"/> instance.
