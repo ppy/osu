@@ -145,7 +145,7 @@ namespace osu.Game.Overlays.Settings.Sections.Audio
                         break;
                 }
 
-                SuggestedOffset.Value = averageHitErrorHistory.Any() ? -averageHitErrorHistory.Average(dataPoint => dataPoint.SuggestedGlobalAudioOffset) : null;
+                SuggestedOffset.Value = averageHitErrorHistory.Any() ? averageHitErrorHistory.Average(dataPoint => dataPoint.SuggestedGlobalAudioOffset) : null;
             }
 
             private float getXPositionForOffset(double offset) => (float)(Math.Clamp(offset, current.MinValue, current.MaxValue) / (2 * current.MaxValue));
