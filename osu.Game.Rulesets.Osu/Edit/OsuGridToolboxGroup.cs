@@ -133,10 +133,10 @@ namespace osu.Game.Rulesets.Osu.Edit
                 },
             };
 
+            Spacing.Value = editorBeatmap.BeatmapInfo.GridSize;
             int gridSizeIndex = Array.IndexOf(grid_sizes, editorBeatmap.BeatmapInfo.GridSize);
             if (gridSizeIndex >= 0)
                 currentGridSizeIndex = gridSizeIndex;
-            updateSpacing();
         }
 
         protected override void LoadComplete()
@@ -164,6 +164,7 @@ namespace osu.Game.Rulesets.Osu.Edit
                 spacingSlider.ContractedLabelText = $"S: {spacing.NewValue:N0}";
                 spacingSlider.ExpandedLabelText = $"Spacing: {spacing.NewValue:N0}";
                 SpacingVector.Value = new Vector2(spacing.NewValue);
+                editorBeatmap.BeatmapInfo.GridSize = (int)spacing.NewValue;
             }, true);
 
             GridLinesRotation.BindValueChanged(rotation =>
@@ -176,15 +177,7 @@ namespace osu.Game.Rulesets.Osu.Edit
         private void nextGridSize()
         {
             currentGridSizeIndex = (currentGridSizeIndex + 1) % grid_sizes.Length;
-            updateSpacing();
-        }
-
-        private void updateSpacing()
-        {
-            int gridSize = grid_sizes[currentGridSizeIndex];
-
-            editorBeatmap.BeatmapInfo.GridSize = gridSize;
-            Spacing.Value = gridSize;
+            Spacing.Value = grid_sizes[currentGridSizeIndex];
         }
 
         public bool OnPressed(KeyBindingPressEvent<GlobalAction> e)
