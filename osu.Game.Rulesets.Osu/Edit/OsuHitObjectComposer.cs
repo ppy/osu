@@ -104,7 +104,7 @@ namespace osu.Game.Rulesets.Osu.Edit
             RightToolbox.AddRange(new EditorToolboxGroup[]
                 {
                     OsuGridToolboxGroup,
-                    new TransformToolboxGroup { RotationHandler = BlueprintContainer.SelectionHandler.RotationHandler, },
+                    new TransformToolboxGroup { RotationHandler = BlueprintContainer.SelectionHandler.RotationHandler, GridToolbox = OsuGridToolboxGroup },
                     FreehandlSliderToolboxGroup
                 }
             );

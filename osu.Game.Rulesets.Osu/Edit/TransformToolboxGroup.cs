@@ -24,6 +24,8 @@ namespace osu.Game.Rulesets.Osu.Edit
 
         public SelectionRotationHandler RotationHandler { get; init; } = null!;
 
+        public OsuGridToolboxGroup GridToolbox { get; init; } = null!;
+
         public TransformToolboxGroup()
             : base("transform")
         {
@@ -41,7 +43,7 @@ namespace osu.Game.Rulesets.Osu.Edit
                 {
                     rotateButton = new EditorToolButton("Rotate",
                         () => new SpriteIcon { Icon = FontAwesome.Solid.Undo },
-                        () => new PreciseRotationPopover(RotationHandler)),
+                        () => new PreciseRotationPopover(RotationHandler, GridToolbox)),
                     // TODO: scale
                 }
             };
