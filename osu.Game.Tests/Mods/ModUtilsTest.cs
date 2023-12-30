@@ -6,6 +6,7 @@ using System.Linq;
 using Moq;
 using NUnit.Framework;
 using osu.Framework.Localisation;
+using osu.Game.Beatmaps;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Osu.Mods;
 using osu.Game.Utils;
@@ -131,6 +132,24 @@ namespace osu.Game.Tests.Mods
         {
             var mod = new Mock<CustomMod1>();
             Assert.That(ModUtils.CheckAllowed(new[] { mod.Object }, new[] { typeof(Mod) }), Is.False);
+        }
+
+        [Test]
+        public void TestRemoveRedundantMods()
+        {
+            var mod1 = new OsuModAutoplay();
+            var mod2 = new OsuModDifficultyAdjust();
+
+            Assert.That(ModUtils.RemoveRedundantMods(new Mod[] { mod1, mod2 }, out var removed, new Beatmap()), Is.True);
+            Assert.That(removed, Is.Not.Null);
+            if (removed != null)
+            {
+                Assert.That(removed.Contains(mod1), Is.False);
+                Assert.That(removed.Contains(mod2), Is.True);
+            }
+
+            Assert.That(ModUtils.RemoveRedundantMods(new Mod[] { mod1 }, out var removed2, new Beatmap()), Is.False);
+            Assert.That(removed2, Is.Null);
         }
 
         private static readonly object[] invalid_mod_test_scenarios =
