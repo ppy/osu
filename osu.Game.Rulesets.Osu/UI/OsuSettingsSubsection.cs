@@ -40,7 +40,7 @@ namespace osu.Game.Rulesets.Osu.UI
                 },
                 new SettingsCheckbox
                 {
-                    LabelText = "Slider tail circle",
+                    LabelText = RulesetSettingsStrings.SliderTailCircle,
                     Current = config.GetBindable<bool>(OsuRulesetSetting.ShowSliderTailCircle)
                 },
                 new SettingsCheckbox
