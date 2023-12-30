@@ -32,6 +32,8 @@ namespace osu.Game.Rulesets.Catch.Skinning.Legacy
 
         private int lastDisplayedCombo;
 
+        bool ISerialisableDrawable.SupportsClosestAnchor => false;
+
         public LegacyCatchComboCounter()
         {
             AutoSizeAxes = Axes.Both;
@@ -55,6 +57,8 @@ namespace osu.Game.Rulesets.Catch.Skinning.Legacy
                     Origin = Anchor.Centre,
                 },
             };
+
+            UsesFixedAnchor = true;
         }
 
         [Resolved]
