@@ -1,6 +1,8 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using osu.Framework.Allocation;
+using osu.Framework.Input.Events;
 using osu.Game.Rulesets.Edit;
 using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Osu.Edit.Blueprints.HitCircles;
@@ -8,14 +10,24 @@ using osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders;
 using osu.Game.Rulesets.Osu.Edit.Blueprints.Spinners;
 using osu.Game.Rulesets.Osu.Objects;
 using osu.Game.Screens.Edit.Compose.Components;
+using osuTK;
 
 namespace osu.Game.Rulesets.Osu.Edit
 {
     public partial class OsuBlueprintContainer : ComposeBlueprintContainer
     {
+        private OsuGridToolboxGroup gridToolbox = null!;
+
         public OsuBlueprintContainer(HitObjectComposer composer)
             : base(composer)
         {
+        }
+
+        [BackgroundDependencyLoader]
+        private void load(OsuGridToolboxGroup gridToolbox)
+        {
+            this.gridToolbox = gridToolbox;
+            gridToolbox.GridFromPointsClicked += OnGridFromPointsClicked;
         }
 
         protected override SelectionHandler<HitObject> CreateSelectionHandler() => new OsuSelectionHandler();
@@ -35,6 +47,36 @@ namespace osu.Game.Rulesets.Osu.Edit
             }
 
             return base.CreateHitObjectBlueprintFor(hitObject);
+        }
+
+        private bool isPlacingGridFromPoints;
+        private Vector2? gridFromPointsStart;
+
+        private void OnGridFromPointsClicked()
+        {
+            isPlacingGridFromPoints = true;
+            gridFromPointsStart = null;
+        }
+
+        protected override bool OnClick(ClickEvent e)
+        {
+            if (!isPlacingGridFromPoints)
+                return base.OnClick(e);
+
+            var pos = ToLocalSpace(Composer.FindSnappedPositionAndTime(e.ScreenSpaceMousePosition).ScreenSpacePosition);
+
+            if (!gridFromPointsStart.HasValue)
+            {
+                gridFromPointsStart = pos;
+            }
+            else
+            {
+                gridToolbox.SetGridFromPoints(gridFromPointsStart.Value, pos);
+                isPlacingGridFromPoints = false;
+                gridFromPointsStart = null;
+            }
+
+            return true;
         }
     }
 }

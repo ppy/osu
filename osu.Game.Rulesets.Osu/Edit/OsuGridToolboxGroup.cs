@@ -1,6 +1,7 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System;
 using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
@@ -12,6 +13,7 @@ using osu.Framework.Input.Bindings;
 using osu.Framework.Input.Events;
 using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.UserInterface;
+using osu.Game.Graphics.UserInterfaceV2;
 using osu.Game.Input.Bindings;
 using osu.Game.Rulesets.Edit;
 using osu.Game.Rulesets.Osu.UI;
@@ -90,12 +92,25 @@ namespace osu.Game.Rulesets.Osu.Edit
         private ExpandableSlider<float> gridLinesRotationSlider = null!;
         private EditorRadioButtonCollection gridTypeButtons = null!;
 
+        public event Action? GridFromPointsClicked;
+
         public OsuGridToolboxGroup()
             : base("grid")
         {
         }
 
         private const float max_automatic_spacing = 64;
+
+        public void SetGridFromPoints(Vector2 point1, Vector2 point2)
+        {
+            StartPositionX.Value = point1.X;
+            StartPositionY.Value = point1.Y;
+            GridLinesRotation.Value = (MathHelper.RadiansToDegrees(MathF.Atan2(point2.Y - point1.Y, point2.X - point1.X)) + 405) % 90 - 45;
+            float dist = Vector2.Distance(point1, point2);
+            while (dist > Spacing.MaxValue)
+                dist /= 2;
+            Spacing.Value = dist;
+        }
 
         [BackgroundDependencyLoader]
         private void load()
@@ -129,6 +144,12 @@ namespace osu.Game.Rulesets.Osu.Edit
                     Spacing = new Vector2(0f, 10f),
                     Children = new Drawable[]
                     {
+                        new RoundedButton
+                        {
+                            Action = () => GridFromPointsClicked?.Invoke(),
+                            RelativeSizeAxes = Axes.X,
+                            Text = "Grid from points",
+                        },
                         gridTypeButtons = new EditorRadioButtonCollection
                         {
                             RelativeSizeAxes = Axes.X,
