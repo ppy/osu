@@ -322,6 +322,9 @@ namespace osu.Game.Rulesets.Scoring
                 case HitResult.LargeTickHit:
                     return 30;
 
+                case HitResult.SliderTailHit:
+                    return 150;
+
                 case HitResult.Meh:
                     return 50;
 
