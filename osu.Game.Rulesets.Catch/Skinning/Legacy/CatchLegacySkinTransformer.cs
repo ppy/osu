@@ -2,9 +2,11 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System.Diagnostics;
+using System.Linq;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Game.Skinning;
+using osuTK;
 using osuTK.Graphics;
 
 namespace osu.Game.Rulesets.Catch.Skinning.Legacy
@@ -34,8 +36,25 @@ namespace osu.Game.Rulesets.Catch.Skinning.Legacy
                     {
                         case SkinComponentsContainerLookup.TargetArea.MainHUDComponents when containerLookup.Ruleset != null:
                             Debug.Assert(containerLookup.Ruleset.ShortName == CatchRuleset.SHORT_NAME);
-                            // todo: remove CatchSkinComponents.CatchComboCounter and refactor LegacyCatchComboCounter to be added here instead.
-                            return Skin.GetDrawableComponent(lookup);
+
+                            var rulesetHUDComponents = Skin.GetDrawableComponent(lookup);
+
+                            rulesetHUDComponents ??= new DefaultSkinComponentsContainer(container =>
+                            {
+                                var combo = container.OfType<LegacyCatchComboCounter>().FirstOrDefault();
+
+                                if (combo != null)
+                                {
+                                    combo.Anchor = Anchor.CentreLeft;
+                                    combo.Origin = Anchor.Centre;
+                                    combo.Scale = new Vector2(0.8f);
+                                }
+                            })
+                            {
+                                new LegacyCatchComboCounter(),
+                            };
+
+                            return rulesetHUDComponents;
                     }
 
                     break;
