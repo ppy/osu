@@ -171,7 +171,7 @@ namespace osu.Game.Overlays.Profile.Header
 
             bottomLinkContainer.AddIcon(icon, text =>
             {
-                text.Font = text.Font.With(size: 10);
+                text.Font = text.Font.With(icon.Family, 10, icon.Weight);
                 text.Colour = iconColour;
             });
 
