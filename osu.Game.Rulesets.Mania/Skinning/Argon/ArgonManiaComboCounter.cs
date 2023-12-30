@@ -7,9 +7,7 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Sprites;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
-using osu.Game.Rulesets.Mania.UI;
 using osu.Game.Rulesets.Scoring;
-using osu.Game.Rulesets.UI;
 using osu.Game.Rulesets.UI.Scrolling;
 using osu.Game.Screens.Play.HUD;
 using osu.Game.Skinning;
@@ -24,15 +22,11 @@ namespace osu.Game.Rulesets.Mania.Skinning.Argon
         protected override double RollingDuration => 500;
         protected override Easing RollingEasing => Easing.OutQuint;
 
-        private DrawableManiaRuleset maniaRuleset = null!;
-
         bool ISerialisableDrawable.SupportsClosestAnchor => false;
 
         [BackgroundDependencyLoader]
-        private void load(DrawableRuleset ruleset, ScoreProcessor scoreProcessor)
+        private void load(ScoreProcessor scoreProcessor)
         {
-            maniaRuleset = (DrawableManiaRuleset)ruleset;
-
             Current.BindTo(scoreProcessor.Combo);
             Current.BindValueChanged(combo =>
             {
@@ -50,6 +44,9 @@ namespace osu.Game.Rulesets.Mania.Skinning.Argon
             UsesFixedAnchor = true;
         }
 
+        [Resolved]
+        private IScrollingInfo scrollingInfo { get; set; } = null!;
+
         private IBindable<ScrollingDirection> direction = null!;
 
         protected override void LoadComplete()
@@ -57,7 +54,7 @@ namespace osu.Game.Rulesets.Mania.Skinning.Argon
             base.LoadComplete();
             text.Alpha = Current.Value > 0 ? 1 : 0;
 
-            direction = maniaRuleset.ScrollingInfo.Direction.GetBoundCopy();
+            direction = scrollingInfo.Direction.GetBoundCopy();
             direction.BindValueChanged(_ => updateAnchor());
 
             // two schedules are required so that updateAnchor is executed in the next frame,
