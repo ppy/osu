@@ -363,6 +363,7 @@ namespace osu.Game.Graphics.UserInterface
                 base.LoadComplete();
 
                 SearchBar.State.ValueChanged += _ => updateColour();
+                Enabled.BindValueChanged(_ => updateColour());
                 updateColour();
             }
 
@@ -382,6 +383,9 @@ namespace osu.Game.Graphics.UserInterface
                 bool hovered = Enabled.Value && IsHovered;
                 var hoveredColour = colourProvider?.Light4 ?? colours.PinkDarker;
                 var unhoveredColour = colourProvider?.Background5 ?? Color4.Black.Opacity(0.5f);
+
+                Colour = Color4.White;
+                Alpha = Enabled.Value ? 1 : 0.3f;
 
                 if (SearchBar.State.Value == Visibility.Visible)
                 {
