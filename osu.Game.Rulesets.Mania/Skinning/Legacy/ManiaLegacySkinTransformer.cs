@@ -5,9 +5,12 @@
 
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
+using System.Linq;
 using osu.Framework.Audio.Sample;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
+using osu.Framework.Testing;
 using osu.Game.Audio;
 using osu.Game.Beatmaps;
 using osu.Game.Rulesets.Mania.Beatmaps;
@@ -78,6 +81,34 @@ namespace osu.Game.Rulesets.Mania.Skinning.Legacy
         {
             switch (lookup)
             {
+                case SkinComponentsContainerLookup containerLookup:
+                    switch (containerLookup.Target)
+                    {
+                        case SkinComponentsContainerLookup.TargetArea.MainHUDComponents when containerLookup.Ruleset != null:
+                            Debug.Assert(containerLookup.Ruleset.ShortName == ManiaRuleset.SHORT_NAME);
+
+                            var rulesetHUDComponents = Skin.GetDrawableComponent(lookup);
+
+                            rulesetHUDComponents ??= new DefaultSkinComponentsContainer(container =>
+                            {
+                                var combo = container.ChildrenOfType<LegacyManiaComboCounter>().FirstOrDefault();
+
+                                if (combo != null)
+                                {
+                                    combo.Anchor = Anchor.TopCentre;
+                                    combo.Origin = Anchor.Centre;
+                                    combo.Y = this.GetManiaSkinConfig<float>(LegacyManiaSkinConfigurationLookups.ComboPosition)?.Value ?? 0;
+                                }
+                            })
+                            {
+                                new LegacyManiaComboCounter(),
+                            };
+
+                            return rulesetHUDComponents;
+                    }
+
+                    break;
+
                 case GameplaySkinComponentLookup<HitResult> resultComponent:
                     return getResult(resultComponent.Component);
 
