@@ -18,9 +18,11 @@ using osu.Game.Online.API.Requests.Responses;
 
 namespace osu.Game.Screens.Menu
 {
-    public partial class SystemTitle : CompositeDrawable
+    public partial class SystemTitle : VisibilityContainer
     {
         internal Bindable<APISystemTitle?> Current { get; } = new Bindable<APISystemTitle?>();
+
+        private const float transition_duration = 500;
 
         private Container content = null!;
         private CancellationTokenSource? cancellationTokenSource;
@@ -32,9 +34,13 @@ namespace osu.Game.Screens.Menu
         private void load(OsuGame? game)
         {
             AutoSizeAxes = Axes.Both;
+            AutoSizeDuration = transition_duration;
+            AutoSizeEasing = Easing.OutQuint;
 
             InternalChild = content = new OsuClickableContainer
             {
+                Anchor = Anchor.Centre,
+                Origin = Anchor.Centre,
                 AutoSizeAxes = Axes.Both,
                 Action = () =>
                 {
@@ -50,6 +56,10 @@ namespace osu.Game.Screens.Menu
                 }
             };
         }
+
+        protected override void PopIn() => content.FadeInFromZero(transition_duration, Easing.OutQuint);
+
+        protected override void PopOut() => content.FadeOut(transition_duration, Easing.OutQuint);
 
         protected override bool OnHover(HoverEvent e)
         {

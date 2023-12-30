@@ -144,11 +144,24 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
             track.BindValueChanged(_ =>
             {
                 waveform.Waveform = beatmap.Value.Waveform;
-                waveform.RelativePositionAxes = Axes.X;
-                waveform.X = -(float)(Editor.WAVEFORM_VISUAL_OFFSET / beatmap.Value.Track.Length);
+                Scheduler.AddOnce(applyVisualOffset, beatmap);
             }, true);
 
             Zoom = (float)(defaultTimelineZoom * editorBeatmap.BeatmapInfo.TimelineZoom);
+        }
+
+        private void applyVisualOffset(IBindable<WorkingBeatmap> beatmap)
+        {
+            waveform.RelativePositionAxes = Axes.X;
+
+            if (beatmap.Value.Track.Length > 0)
+                waveform.X = -(float)(Editor.WAVEFORM_VISUAL_OFFSET / beatmap.Value.Track.Length);
+            else
+            {
+                // sometimes this can be the case immediately after a track switch.
+                // reschedule with the hope that the track length eventually populates.
+                Scheduler.AddOnce(applyVisualOffset, beatmap);
+            }
         }
 
         protected override void LoadComplete()
