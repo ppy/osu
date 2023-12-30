@@ -1,4 +1,4 @@
-﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
@@ -266,7 +266,7 @@ namespace osu.Game.Graphics
         public readonly Color4 Yellow = Color4Extensions.FromHex(@"ffcc22");
         public readonly Color4 YellowDark = Color4Extensions.FromHex(@"eeaa00");
         public readonly Color4 YellowDarker = Color4Extensions.FromHex(@"cc6600");
-
+        public readonly Color4 GreenLightest = Color4Extensions.FromHex(@"00ffaa");
         public readonly Color4 GreenLighter = Color4Extensions.FromHex(@"eeffcc");
         public readonly Color4 GreenLight = Color4Extensions.FromHex(@"b3d944");
         public readonly Color4 Green = Color4Extensions.FromHex(@"88b300");
