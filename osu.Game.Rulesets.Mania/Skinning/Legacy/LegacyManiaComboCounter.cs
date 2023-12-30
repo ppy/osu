@@ -3,9 +3,8 @@
 
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
+using osu.Framework.Extensions.EnumExtensions;
 using osu.Framework.Graphics;
-using osu.Game.Rulesets.Mania.UI;
-using osu.Game.Rulesets.UI;
 using osu.Game.Rulesets.UI.Scrolling;
 using osu.Game.Skinning;
 using osuTK;
@@ -15,15 +14,11 @@ namespace osu.Game.Rulesets.Mania.Skinning.Legacy
 {
     public partial class LegacyManiaComboCounter : LegacyComboCounter, ISerialisableDrawable
     {
-        private DrawableManiaRuleset maniaRuleset = null!;
-
         bool ISerialisableDrawable.SupportsClosestAnchor => false;
 
         [BackgroundDependencyLoader]
-        private void load(ISkinSource skin, DrawableRuleset ruleset)
+        private void load(ISkinSource skin)
         {
-            maniaRuleset = (DrawableManiaRuleset)ruleset;
-
             DisplayedCountText.Anchor = Anchor.Centre;
             DisplayedCountText.Origin = Anchor.Centre;
 
@@ -34,13 +29,16 @@ namespace osu.Game.Rulesets.Mania.Skinning.Legacy
             UsesFixedAnchor = true;
         }
 
+        [Resolved]
+        private IScrollingInfo scrollingInfo { get; set; } = null!;
+
         private IBindable<ScrollingDirection> direction = null!;
 
         protected override void LoadComplete()
         {
             base.LoadComplete();
 
-            direction = maniaRuleset.ScrollingInfo.Direction.GetBoundCopy();
+            direction = scrollingInfo.Direction.GetBoundCopy();
             direction.BindValueChanged(_ => updateAnchor());
 
             // two schedules are required so that updateAnchor is executed in the next frame,
@@ -50,8 +48,12 @@ namespace osu.Game.Rulesets.Mania.Skinning.Legacy
 
         private void updateAnchor()
         {
-            Anchor &= ~(Anchor.y0 | Anchor.y2);
-            Anchor |= direction.Value == ScrollingDirection.Up ? Anchor.y2 : Anchor.y0;
+            // if the anchor isn't a vertical center, set top or bottom anchor based on scroll direction
+            if (!Anchor.HasFlagFast(Anchor.y1))
+            {
+                Anchor &= ~(Anchor.y0 | Anchor.y2);
+                Anchor |= direction.Value == ScrollingDirection.Up ? Anchor.y2 : Anchor.y0;
+            }
 
             // since we flip the vertical anchor when changing scroll direction,
             // we can use the sign of the Y value as an indicator to make the combo counter displayed correctly.
