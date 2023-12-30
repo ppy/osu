@@ -71,6 +71,17 @@ namespace osu.Game.Utils
         }
 
         /// <summary>
+        /// Given a flip axis vector, a surrounding quad for all selected objects, and a position,
+        /// will return the flipped position in screen space coordinates.
+        /// </summary>
+        public static Vector2 GetFlippedPosition(Vector2 axis, Quad quad, Vector2 position)
+        {
+            var centre = quad.Centre;
+
+            return position - 2 * Vector2.Dot(position - centre, axis) * axis;
+        }
+
+        /// <summary>
         /// Given a scale vector, a surrounding quad for all selected objects, and a position,
         /// will return the scaled position in screen space coordinates.
         /// </summary>
