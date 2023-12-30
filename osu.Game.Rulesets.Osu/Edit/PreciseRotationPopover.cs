@@ -8,7 +8,6 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Sprites;
 using osu.Game.Graphics.UserInterfaceV2;
-using osu.Game.Rulesets.Osu.UI;
 using osu.Game.Screens.Edit.Components.RadioButtons;
 using osu.Game.Screens.Edit.Compose.Components;
 using osuTK;
@@ -19,14 +18,17 @@ namespace osu.Game.Rulesets.Osu.Edit
     {
         private readonly SelectionRotationHandler rotationHandler;
 
+        private readonly OsuGridToolboxGroup gridToolbox;
+
         private readonly Bindable<PreciseRotationInfo> rotationInfo = new Bindable<PreciseRotationInfo>(new PreciseRotationInfo(0, RotationOrigin.PlayfieldCentre));
 
         private SliderWithTextBoxInput<float> angleInput = null!;
         private EditorRadioButtonCollection rotationOrigin = null!;
 
-        public PreciseRotationPopover(SelectionRotationHandler rotationHandler)
+        public PreciseRotationPopover(SelectionRotationHandler rotationHandler, OsuGridToolboxGroup gridToolbox)
         {
             this.rotationHandler = rotationHandler;
+            this.gridToolbox = gridToolbox;
 
             AllowableAnchors = new[] { Anchor.CentreLeft, Anchor.CentreRight };
         }
@@ -78,7 +80,7 @@ namespace osu.Game.Rulesets.Osu.Edit
 
             rotationInfo.BindValueChanged(rotation =>
             {
-                rotationHandler.Update(rotation.NewValue.Degrees, rotation.NewValue.Origin == RotationOrigin.PlayfieldCentre ? OsuPlayfield.BASE_SIZE / 2 : null);
+                rotationHandler.Update(rotation.NewValue.Degrees, rotation.NewValue.Origin == RotationOrigin.PlayfieldCentre ? gridToolbox.StartPosition.Value : null);
             });
         }
 
