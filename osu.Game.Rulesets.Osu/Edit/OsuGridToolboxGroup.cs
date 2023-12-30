@@ -64,8 +64,8 @@ namespace osu.Game.Rulesets.Osu.Edit
         /// </summary>
         public BindableFloat GridLinesRotation { get; } = new BindableFloat(0f)
         {
-            MinValue = -45f,
-            MaxValue = 45f,
+            MinValue = -90f,
+            MaxValue = 90f,
         };
 
         /// <summary>
@@ -103,9 +103,9 @@ namespace osu.Game.Rulesets.Osu.Edit
             StartPositionY.Value = point1.Y;
 
             // Get the angle between the two points and normalize to the valid range.
-            float period = GridType.Value == PositionSnapGridType.Triangle ? 60 : 90;
+            const float period = 180;
             GridLinesRotation.Value = (MathHelper.RadiansToDegrees(MathF.Atan2(point2.Y - point1.Y, point2.X - point1.X))
-                                       + 360 + period / 2) % period - period / 2;
+                                       + period * 1.5f) % period - period * 0.5f;
 
             // Divide the distance so that there is a good density of grid lines.
             float dist = Vector2.Distance(point1, point2);
