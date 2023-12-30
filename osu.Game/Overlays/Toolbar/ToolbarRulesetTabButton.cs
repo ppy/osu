@@ -1,8 +1,7 @@
-﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
 using osu.Framework.Allocation;
-using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Effects;
 using osu.Framework.Graphics.UserInterface;
@@ -11,6 +10,7 @@ using osu.Game.Graphics;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Localisation;
 using osu.Game.Rulesets;
+using osuTK.Graphics;
 
 namespace osu.Game.Overlays.Toolbar
 {
@@ -26,8 +26,8 @@ namespace osu.Game.Overlays.Toolbar
             Child = ruleset = new RulesetButton
             {
                 Active = false,
+                TooltipMainText = value.CreateInstance().Description
             };
-
             var rInstance = value.CreateInstance();
 
             ruleset.TooltipMain = rInstance.Description;
@@ -41,6 +41,8 @@ namespace osu.Game.Overlays.Toolbar
 
         private partial class RulesetButton : ToolbarButton
         {
+            private Color4 rulesetcolour;
+
             protected override HoverSounds CreateHoverSounds(HoverSampleSet sampleSet) => new HoverSounds();
 
             [Resolved]
@@ -53,6 +55,7 @@ namespace osu.Game.Overlays.Toolbar
                     Bottom = 5
                 };
             }
+            public string TooltipMainText { get; set; } = "";
 
             public bool Active
             {
@@ -60,7 +63,24 @@ namespace osu.Game.Overlays.Toolbar
                 {
                     if (value)
                     {
-                        IconContainer.Colour = Color4Extensions.FromHex("#00FFAA");
+                        string tooltipMainText = TooltipMainText;
+                        if (tooltipMainText == "osu!")
+                        {
+                            rulesetcolour = colours.PinkLight;
+                        }
+                        else if (tooltipMainText == "osu!mania")
+                        {
+                            rulesetcolour = colours.Purple1;
+                        }
+                        else if (tooltipMainText == "osu!catch")
+                        {
+                            rulesetcolour = colours.Blue;
+                        }
+                        else
+                        {
+                            rulesetcolour = colours.GreenLightest;
+                        }
+                        IconContainer.Colour = rulesetcolour;
                     }
                     else
                     {
