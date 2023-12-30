@@ -265,6 +265,16 @@ namespace osu.Game.Tests.Visual.Gameplay
         }
 
         [Test]
+        public void TestRemovingRedundantModsOnEnteringGameplay()
+        {
+            OsuModDifficultyAdjust playerMod = null;
+            AddStep("load player", () => { resetPlayer(true, () => SelectedMods.Value = new[] { playerMod = new OsuModDifficultyAdjust() }); });
+
+            AddUntilStep("wait for player to become current", () => player.IsCurrentScreen());
+            AddAssert("player mods has been removed", () => !player.Mods.Value.Contains(playerMod));
+        }
+
+        [Test]
         public void TestMutedNotificationMasterVolume()
         {
             addVolumeSteps("master volume", () => audioManager.Volume.Value = 0, () => audioManager.Volume.Value == 0.5);
