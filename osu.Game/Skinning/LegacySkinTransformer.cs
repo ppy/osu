@@ -35,7 +35,7 @@ namespace osu.Game.Skinning
 
                             rulesetHUDComponents ??= new DefaultSkinComponentsContainer(container =>
                             {
-                                var combo = container.OfType<LegacyComboCounter>().FirstOrDefault();
+                                var combo = container.OfType<LegacyDefaultComboCounter>().FirstOrDefault();
 
                                 if (combo != null)
                                 {
@@ -45,7 +45,7 @@ namespace osu.Game.Skinning
                                 }
                             })
                             {
-                                new LegacyComboCounter()
+                                new LegacyDefaultComboCounter()
                             };
 
                             return rulesetHUDComponents;
