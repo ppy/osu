@@ -58,12 +58,17 @@ namespace osu.Game.Rulesets.Osu.Edit
             gridFromPointsStart = null;
         }
 
+        protected override bool OnMouseDown(MouseDownEvent e)
+        {
+            return isPlacingGridFromPoints || base.OnMouseDown(e);
+        }
+
         protected override bool OnClick(ClickEvent e)
         {
             if (!isPlacingGridFromPoints)
                 return base.OnClick(e);
 
-            var pos = ToLocalSpace(Composer.FindSnappedPositionAndTime(e.ScreenSpaceMousePosition).ScreenSpacePosition);
+            var pos = ToLocalSpace(Composer.FindSnappedPositionAndTime(e.ScreenSpaceMousePosition, ~SnapType.GlobalGrids).ScreenSpacePosition);
 
             if (!gridFromPointsStart.HasValue)
             {
@@ -74,6 +79,25 @@ namespace osu.Game.Rulesets.Osu.Edit
                 gridToolbox.SetGridFromPoints(gridFromPointsStart.Value, pos);
                 isPlacingGridFromPoints = false;
                 gridFromPointsStart = null;
+            }
+
+            return true;
+        }
+
+        protected override bool OnMouseMove(MouseMoveEvent e)
+        {
+            if (!isPlacingGridFromPoints)
+                return base.OnMouseMove(e);
+
+            var pos = ToLocalSpace(Composer.FindSnappedPositionAndTime(e.ScreenSpaceMousePosition, ~SnapType.GlobalGrids).ScreenSpacePosition);
+
+            if (!gridFromPointsStart.HasValue)
+            {
+                gridToolbox.StartPosition.Value = pos;
+            }
+            else
+            {
+                gridToolbox.SetGridFromPoints(gridFromPointsStart.Value, pos);
             }
 
             return true;
