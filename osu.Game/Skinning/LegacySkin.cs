@@ -152,6 +152,9 @@ namespace osu.Game.Skinning
                 case LegacyManiaSkinConfigurationLookups.HitPosition:
                     return SkinUtils.As<TValue>(new Bindable<float>(existing.HitPosition));
 
+                case LegacyManiaSkinConfigurationLookups.ComboPosition:
+                    return SkinUtils.As<TValue>(new Bindable<float>(existing.ComboPosition));
+
                 case LegacyManiaSkinConfigurationLookups.ScorePosition:
                     return SkinUtils.As<TValue>(new Bindable<float>(existing.ScorePosition));
 
@@ -188,6 +191,9 @@ namespace osu.Game.Skinning
                 case LegacyManiaSkinConfigurationLookups.ColumnLightColour:
                     Debug.Assert(maniaLookup.ColumnIndex != null);
                     return SkinUtils.As<TValue>(getCustomColour(existing, $"ColourLight{maniaLookup.ColumnIndex + 1}"));
+
+                case LegacyManiaSkinConfigurationLookups.ComboBreakColour:
+                    return SkinUtils.As<TValue>(getCustomColour(existing, "ColourBreak"));
 
                 case LegacyManiaSkinConfigurationLookups.MinimumColumnWidth:
                     return SkinUtils.As<TValue>(new Bindable<float>(existing.MinimumColumnWidth));
