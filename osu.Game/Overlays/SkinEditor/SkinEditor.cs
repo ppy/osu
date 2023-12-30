@@ -441,6 +441,9 @@ namespace osu.Game.Overlays.SkinEditor
                 drawableComponent.Origin = Anchor.TopCentre;
                 drawableComponent.Anchor = Anchor.TopCentre;
                 drawableComponent.Y = targetContainer.DrawSize.Y / 2;
+
+                if (!component.SupportsClosestAnchor)
+                    component.UsesFixedAnchor = true;
             }
 
             try

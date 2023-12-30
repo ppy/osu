@@ -233,7 +233,8 @@ namespace osu.Game.Overlays.SkinEditor
         {
             var closestItem = new TernaryStateRadioMenuItem("Closest", MenuItemType.Standard, _ => applyClosestAnchors())
             {
-                State = { Value = GetStateFromSelection(selection, c => !c.Item.UsesFixedAnchor) }
+                State = { Value = GetStateFromSelection(selection, c => !c.Item.UsesFixedAnchor), },
+                Action = { Disabled = selection.Any(c => !c.Item.SupportsClosestAnchor) },
             };
 
             yield return new OsuMenuItem("Anchor")
