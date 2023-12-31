@@ -22,9 +22,9 @@ namespace osu.Game.Rulesets.Osu.Edit
 {
     public partial class OsuGridToolboxGroup : EditorToolboxGroup, IKeyBindingHandler<GlobalAction>
     {
-        private static readonly int[] grid_sizes = { 4, 8, 16, 32 };
+        private static readonly PositionSnapGridType[] grid_types = Enum.GetValues(typeof(PositionSnapGridType)).Cast<PositionSnapGridType>().ToArray();
 
-        private int currentGridSizeIndex = grid_sizes.Length - 1;
+        private int currentGridTypeIndex;
 
         [Resolved]
         private EditorBeatmap editorBeatmap { get; set; } = null!;
@@ -134,9 +134,6 @@ namespace osu.Game.Rulesets.Osu.Edit
             };
 
             Spacing.Value = editorBeatmap.BeatmapInfo.GridSize;
-            int gridSizeIndex = Array.IndexOf(grid_sizes, editorBeatmap.BeatmapInfo.GridSize);
-            if (gridSizeIndex >= 0)
-                currentGridSizeIndex = gridSizeIndex;
         }
 
         protected override void LoadComplete()
@@ -174,10 +171,11 @@ namespace osu.Game.Rulesets.Osu.Edit
             }, true);
         }
 
-        private void nextGridSize()
+        private void nextGridType()
         {
-            currentGridSizeIndex = (currentGridSizeIndex + 1) % grid_sizes.Length;
-            Spacing.Value = grid_sizes[currentGridSizeIndex];
+            currentGridTypeIndex = (currentGridTypeIndex + 1) % grid_types.Length;
+            GridType.Value = grid_types[currentGridTypeIndex];
+            gridTypeButtons.Items[currentGridTypeIndex].Select();
         }
 
         public bool OnPressed(KeyBindingPressEvent<GlobalAction> e)
@@ -185,7 +183,7 @@ namespace osu.Game.Rulesets.Osu.Edit
             switch (e.Action)
             {
                 case GlobalAction.EditorCycleGridDisplayMode:
-                    nextGridSize();
+                    nextGridType();
                     return true;
             }
 
