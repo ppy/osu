@@ -52,11 +52,15 @@ namespace osu.Game.Tests.Visual.Editing
         {
             TriangularPositionSnapGrid grid = null;
 
-            AddStep("create grid", () => Child = grid = new TriangularPositionSnapGrid(position)
+            AddStep("create grid", () =>
             {
-                RelativeSizeAxes = Axes.Both,
-                Spacing = spacing,
-                GridLineRotation = rotation
+                Child = grid = new TriangularPositionSnapGrid
+                {
+                    RelativeSizeAxes = Axes.Both,
+                };
+                grid.StartPosition.Value = position;
+                grid.Spacing.Value = spacing;
+                grid.GridLineRotation.Value = rotation;
             });
 
             AddStep("add snapping cursor", () => Add(new SnappingCursorContainer
