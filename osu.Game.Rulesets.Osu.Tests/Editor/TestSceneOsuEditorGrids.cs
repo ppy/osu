@@ -168,26 +168,21 @@ namespace osu.Game.Rulesets.Osu.Tests.Editor
         }
 
         [Test]
-        public void TestGridSizeToggling()
+        public void TestGridTypeToggling()
         {
             AddStep("enable rectangular grid", () => InputManager.Key(Key.T));
             AddUntilStep("rectangular grid visible", () => this.ChildrenOfType<RectangularPositionSnapGrid>().Any());
-            gridSizeIs(4);
+            gridActive<RectangularPositionSnapGrid>(true);
 
-            nextGridSizeIs(8);
-            nextGridSizeIs(16);
-            nextGridSizeIs(32);
-            nextGridSizeIs(4);
+            nextGridTypeIs<TriangularPositionSnapGrid>();
+            nextGridTypeIs<CircularPositionSnapGrid>();
+            nextGridTypeIs<RectangularPositionSnapGrid>();
         }
 
-        private void nextGridSizeIs(int size)
+        private void nextGridTypeIs<T>() where T : PositionSnapGrid
         {
-            AddStep("toggle to next grid size", () => InputManager.Key(Key.G));
-            gridSizeIs(size);
+            AddStep("toggle to next grid type", () => InputManager.Key(Key.G));
+            gridActive<T>(true);
         }
-
-        private void gridSizeIs(int size)
-            => AddAssert($"grid size is {size}", () => this.ChildrenOfType<RectangularPositionSnapGrid>().Single().Spacing.Value == new Vector2(size)
-                                                       && EditorBeatmap.BeatmapInfo.GridSize == size);
     }
 }
