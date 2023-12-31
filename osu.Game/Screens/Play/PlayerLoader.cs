@@ -394,14 +394,18 @@ namespace osu.Game.Screens.Play
             if (!this.IsCurrentScreen())
                 return;
 
-            var validMods = Mods.Value.ToArray();
-
-            if (ModUtils.RemoveRedundantMods(validMods, out var removed, Beatmap.Value.Beatmap))
-                validMods = validMods.Except(removed).ToArray();
-
-            Mods.Value = validMods;
-
             CurrentPlayer = createPlayer();
+
+            if (CurrentPlayer is not ReplayPlayer)
+            {
+                var validMods = Mods.Value.ToArray();
+
+                if (ModUtils.RemoveRedundantMods(validMods, out var removed, Beatmap.Value.Beatmap))
+                    validMods = validMods.Except(removed).ToArray();
+
+                Mods.Value = validMods;
+            }
+
             CurrentPlayer.Configuration.AutomaticallySkipIntro |= quickRestart;
             CurrentPlayer.RestartCount = restartCount++;
             CurrentPlayer.RestartRequested = restartRequested;
