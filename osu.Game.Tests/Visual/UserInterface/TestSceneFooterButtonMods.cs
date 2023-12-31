@@ -5,10 +5,12 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using NUnit.Framework;
+using osu.Framework.Localisation;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Osu.Mods;
 using osu.Game.Screens.Select;
+using osu.Game.Utils;
 
 namespace osu.Game.Tests.Visual.UserInterface
 {
@@ -74,7 +76,7 @@ namespace osu.Game.Tests.Visual.UserInterface
         private bool assertModsMultiplier(IEnumerable<Mod> mods)
         {
             double multiplier = mods.Aggregate(1.0, (current, mod) => current * mod.ScoreMultiplier);
-            string expectedValue = multiplier.Equals(1.0) ? string.Empty : $"{multiplier:N2}x";
+            string expectedValue = multiplier == 1 ? string.Empty : ModUtils.FormatScoreMultiplier(multiplier).ToString();
 
             return expectedValue == footerButtonMods.MultiplierText.Current.Value;
         }
