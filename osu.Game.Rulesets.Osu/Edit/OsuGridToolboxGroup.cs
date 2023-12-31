@@ -107,19 +107,23 @@ namespace osu.Game.Rulesets.Osu.Edit
             {
                 startPositionXSlider = new ExpandableSlider<float>
                 {
-                    Current = StartPositionX
+                    Current = StartPositionX,
+                    KeyboardStep = 1,
                 },
                 startPositionYSlider = new ExpandableSlider<float>
                 {
-                    Current = StartPositionY
+                    Current = StartPositionY,
+                    KeyboardStep = 1,
                 },
                 spacingSlider = new ExpandableSlider<float>
                 {
-                    Current = Spacing
+                    Current = Spacing,
+                    KeyboardStep = 1,
                 },
                 gridLinesRotationSlider = new ExpandableSlider<float>
                 {
-                    Current = GridLinesRotation
+                    Current = GridLinesRotation,
+                    KeyboardStep = 1,
                 },
                 gridTypeButtons = new EditorRadioButtonCollection
                 {
