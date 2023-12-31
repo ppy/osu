@@ -56,6 +56,9 @@ namespace osu.Game.Rulesets.Osu.Edit
         {
             isPlacingGridFromPoints = true;
             gridFromPointsStart = null;
+
+            // Deselect all objects because we cant snap to objects which are selected.
+            DeselectAll();
         }
 
         protected override bool OnMouseDown(MouseDownEvent e)
