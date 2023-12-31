@@ -81,13 +81,12 @@ namespace osu.Game.Rulesets.Osu.Edit
             // Give a bit of breathing room around the playfield content.
             PlayfieldContentContainer.Padding = new MarginPadding(10);
 
-            LayerBelowRuleset.AddRange(new Drawable[]
-            {
+            LayerBelowRuleset.Add(
                 distanceSnapGridContainer = new Container
                 {
                     RelativeSizeAxes = Axes.Both
                 }
-            });
+            );
 
             selectedHitObjects = EditorBeatmap.SelectedHitObjects.GetBoundCopy();
             selectedHitObjects.CollectionChanged += (_, _) => updateDistanceSnapGrid();
@@ -100,6 +99,15 @@ namespace osu.Game.Rulesets.Osu.Edit
             updateDistanceSnapGrid();
 
             OsuGridToolboxGroup.GridType.BindValueChanged(updatePositionSnapGrid, true);
+            OsuGridToolboxGroup.GridFromPointsClicked += () => gridFromPointsTool.BeginPlacement();
+
+            LayerAboveRuleset.Add(
+                // Place it above the playfield and blueprints, so it takes priority when handling input.
+                gridFromPointsTool = new GridFromPointsTool
+                {
+                    RelativeSizeAxes = Axes.Both,
+                }
+            );
 
             RightToolbox.AddRange(new EditorToolboxGroup[]
                 {
@@ -109,6 +117,8 @@ namespace osu.Game.Rulesets.Osu.Edit
                 }
             );
         }
+
+        private GridFromPointsTool gridFromPointsTool;
 
         private void updatePositionSnapGrid(ValueChangedEvent<PositionSnapGridType> obj)
         {
@@ -278,7 +288,7 @@ namespace osu.Game.Rulesets.Osu.Edit
 
             foreach (var b in blueprints)
             {
-                if (b.IsSelected)
+                if (b.IsSelected && !gridFromPointsTool.IsPlacing)
                     continue;
 
                 var snapPositions = b.ScreenSpaceSnapPoints;

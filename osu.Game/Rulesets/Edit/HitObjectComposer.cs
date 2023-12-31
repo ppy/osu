@@ -76,6 +76,8 @@ namespace osu.Game.Rulesets.Edit
 
         protected readonly Container LayerBelowRuleset = new Container { RelativeSizeAxes = Axes.Both };
 
+        protected readonly Container LayerAboveRuleset = new Container { RelativeSizeAxes = Axes.Both };
+
         protected InputManager InputManager { get; private set; }
 
         private EditorRadioButtonCollection toolboxCollection;
@@ -137,7 +139,8 @@ namespace osu.Game.Rulesets.Edit
                         drawableRulesetWrapper,
                         // layers above playfield
                         drawableRulesetWrapper.CreatePlayfieldAdjustmentContainer()
-                                              .WithChild(BlueprintContainer = CreateBlueprintContainer())
+                                              .WithChild(BlueprintContainer = CreateBlueprintContainer()),
+                        drawableRulesetWrapper.CreatePlayfieldAdjustmentContainer().WithChild(LayerAboveRuleset),
                     }
                 },
                 new Container
