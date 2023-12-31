@@ -70,11 +70,11 @@ namespace osu.Game.Overlays.Toolbar
                         }
                         else if (tooltipMainText == "osu!mania")
                         {
-                            rulesetcolour = colours.Purple1;
+                            rulesetcolour = colours.Purple0;
                         }
                         else if (tooltipMainText == "osu!catch")
                         {
-                            rulesetcolour = colours.Blue;
+                            rulesetcolour = colours.Blue0;
                         }
                         else
                         {
