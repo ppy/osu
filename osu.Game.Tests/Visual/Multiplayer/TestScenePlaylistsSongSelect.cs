@@ -154,6 +154,13 @@ namespace osu.Game.Tests.Visual.Multiplayer
             });
         }
 
+        [Test]
+        public void TestRedudantModsRemovalWhenCreatingItem()
+        {
+            AddStep("set mods", () => { SelectedMods.Value = new Mod[] { new OsuModDifficultyAdjust(), new OsuModHidden() }; });
+            AddStep("create item", () => songSelect.BeatmapDetails.CreateNewItem());
+            AddAssert("redundant mod has been removed", () => SelectedRoom.Value.Playlist.First().RequiredMods.Length == 1);
+        }
         private partial class TestPlaylistsSongSelect : PlaylistsSongSelect
         {
             public new MatchBeatmapDetailArea BeatmapDetails => (MatchBeatmapDetailArea)base.BeatmapDetails;
