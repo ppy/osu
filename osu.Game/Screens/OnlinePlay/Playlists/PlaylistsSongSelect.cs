@@ -7,6 +7,7 @@ using osu.Game.Online.API;
 using osu.Game.Online.Rooms;
 using osu.Game.Screens.OnlinePlay.Components;
 using osu.Game.Screens.Select;
+using osu.Game.Utils;
 
 namespace osu.Game.Screens.OnlinePlay.Playlists
 {
@@ -42,6 +43,13 @@ namespace osu.Game.Screens.OnlinePlay.Playlists
 
         private void createNewItem()
         {
+            var validMods = Mods.Value.ToArray();
+
+            if (ModUtils.RemoveRedundantMods(validMods, out var removed, Beatmap.Value.Beatmap))
+                validMods = validMods.Except(removed).ToArray();
+
+            Mods.Value = validMods;
+
             PlaylistItem item = new PlaylistItem(Beatmap.Value.BeatmapInfo)
             {
                 ID = Playlist.Count == 0 ? 0 : Playlist.Max(p => p.ID) + 1,
