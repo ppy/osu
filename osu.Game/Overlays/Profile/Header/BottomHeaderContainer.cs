@@ -145,7 +145,7 @@ namespace osu.Game.Overlays.Profile.Header
             bool anyInfoAdded = false;
 
             anyInfoAdded |= tryAddInfo(FontAwesome.Solid.MapMarker, user.Location);
-            anyInfoAdded |= tryAddInfo(OsuIcon.Heart, user.Interests);
+            anyInfoAdded |= tryAddInfo(FontAwesome.Solid.Heart, user.Interests);
             anyInfoAdded |= tryAddInfo(FontAwesome.Solid.Suitcase, user.Occupation);
 
             if (anyInfoAdded)
