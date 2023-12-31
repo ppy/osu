@@ -19,7 +19,7 @@ using osu.Game.Graphics.Sprites;
 using osuTK;
 using osuTK.Graphics;
 using osu.Game.Input.Bindings;
-using osu.Framework.Utils;
+using osu.Game.Utils;
 
 namespace osu.Game.Screens.Select
 {
@@ -88,17 +88,11 @@ namespace osu.Game.Screens.Select
         private void updateMultiplierText() => Schedule(() =>
         {
             double multiplier = Current.Value?.Aggregate(1.0, (current, mod) => current * mod.ScoreMultiplier) ?? 1;
+            MultiplierText.Text = multiplier == 1 ? string.Empty : ModUtils.FormatScoreMultiplier(multiplier);
 
-            if (Precision.DefinitelyBigger(1.0, multiplier) && multiplier >= 0.995)
-                MultiplierText.Text = $"{0.99:N2}x";
-            else if (Precision.DefinitelyBigger(multiplier, 1.0) && multiplier < 1.005)
-                MultiplierText.Text = $"{1.01:N2}x";
-            else
-                MultiplierText.Text = multiplier.Equals(1.0) ? string.Empty : $"{multiplier:N2}x";
-
-            if (Precision.DefinitelyBigger(multiplier, 1.0))
+            if (multiplier > 1)
                 MultiplierText.FadeColour(highMultiplierColour, 200);
-            else if (Precision.DefinitelyBigger(1.0, multiplier))
+            else if (multiplier < 1)
                 MultiplierText.FadeColour(lowMultiplierColour, 200);
             else
                 MultiplierText.FadeColour(Color4.White, 200);
