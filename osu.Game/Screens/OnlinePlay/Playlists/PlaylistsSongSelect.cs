@@ -2,9 +2,11 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System.Linq;
+using osu.Framework.Allocation;
 using osu.Framework.Screens;
 using osu.Game.Online.API;
 using osu.Game.Online.Rooms;
+using osu.Game.Overlays;
 using osu.Game.Screens.OnlinePlay.Components;
 using osu.Game.Screens.Select;
 using osu.Game.Utils;
@@ -13,6 +15,9 @@ namespace osu.Game.Screens.OnlinePlay.Playlists
 {
     public partial class PlaylistsSongSelect : OnlinePlaySongSelect
     {
+        [Resolved]
+        private INotificationOverlay? notificationOverlay { get; set; }
+
         public PlaylistsSongSelect(Room room)
             : base(room)
         {
@@ -46,7 +51,17 @@ namespace osu.Game.Screens.OnlinePlay.Playlists
             var validMods = Mods.Value.ToArray();
 
             if (ModUtils.RemoveRedundantMods(validMods, out var removed, Beatmap.Value.Beatmap))
+            {
                 validMods = validMods.Except(removed).ToArray();
+
+                string[] removedModsNames = new string[removed.Count];
+                for (int i = 0; i < removed.Count; i++)
+                {
+                    removedModsNames[i] = removed[i].Name;
+                }
+
+                notificationOverlay?.Post(new RedundantModsNotification(removedModsNames));
+            }
 
             Mods.Value = validMods;
 

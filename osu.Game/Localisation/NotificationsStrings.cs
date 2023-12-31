@@ -113,6 +113,11 @@ Please try changing your audio device to a working setting.");
         /// </summary>
         public static LocalisableString MismatchingBeatmapForReplay => new TranslatableString(getKey(@"mismatching_beatmap_for_replay"), @"Your local copy of the beatmap for this replay appears to be different than expected. You may need to update or re-download it.");
 
+        /// <summary>
+        /// "It seems you enabled some redundant mods. These mods were removed: {0}"
+        /// </summary>
+        public static LocalisableString RedundantModsRemoved(string removedMods) => new TranslatableString(getKey(@"redundant_mods_removed"), @"It seems you enabled some redundant mods. These mods were removed: {0}.", removedMods);
+
         private static string getKey(string key) => $@"{prefix}:{key}";
     }
 }

@@ -12,6 +12,7 @@ using osu.Game.Graphics.UserInterface;
 using osu.Game.Online.API;
 using osu.Game.Online.Multiplayer;
 using osu.Game.Online.Rooms;
+using osu.Game.Overlays;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Screens.Select;
 using osu.Game.Utils;
@@ -25,6 +26,9 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
 
         [Resolved]
         private OngoingOperationTracker operationTracker { get; set; } = null!;
+
+        [Resolved]
+        private INotificationOverlay? notificationOverlay { get; set; }
 
         private readonly IBindable<bool> operationInProgress = new Bindable<bool>();
         private readonly PlaylistItem? itemToEdit;
@@ -76,7 +80,17 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
             var validMods = Mods.Value.ToArray();
 
             if (ModUtils.RemoveRedundantMods(validMods, out var removed, Beatmap.Value.Beatmap))
+            {
                 validMods = validMods.Except(removed).ToArray();
+
+                string[] removedModsNames = new string[removed.Count];
+                for (int i = 0; i < removed.Count; i++)
+                {
+                    removedModsNames[i] = removed[i].Name;
+                }
+
+                notificationOverlay?.Post(new RedundantModsNotification(removedModsNames));
+            }
 
             item.RequiredMods = validMods.Select(m => new APIMod(m)).ToArray();
 

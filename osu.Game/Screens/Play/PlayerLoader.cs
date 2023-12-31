@@ -402,7 +402,17 @@ namespace osu.Game.Screens.Play
                 var validMods = Mods.Value.ToArray();
 
                 if (ModUtils.RemoveRedundantMods(validMods, out var removed, Beatmap.Value.Beatmap))
+                {
                     validMods = validMods.Except(removed).ToArray();
+
+                    string[] removedModsNames = new string[removed.Count];
+                    for (int i = 0; i < removed.Count; i++)
+                    {
+                        removedModsNames[i] = removed[i].Name;
+                    }
+
+                    notificationOverlay?.Post(new RedundantModsNotification(removedModsNames));
+                }
 
                 Mods.Value = validMods;
             }
