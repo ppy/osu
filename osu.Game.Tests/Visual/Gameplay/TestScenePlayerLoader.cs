@@ -270,8 +270,18 @@ namespace osu.Game.Tests.Visual.Gameplay
             OsuModDifficultyAdjust playerMod = null;
             AddStep("load player", () => { resetPlayer(true, () => SelectedMods.Value = new[] { playerMod = new OsuModDifficultyAdjust() }); });
 
-            AddUntilStep("wait for player to become current", () => player.IsCurrentScreen());
-            AddAssert("player mods has been removed", () => !player.Mods.Value.Contains(playerMod));
+            AddUntilStep("wait for non-null player", () => player != null);
+            AddAssert("redundant mods have been removed", () => !player.Mods.Value.Contains(playerMod));
+        }
+
+        [Test]
+        public void TestRemovingRedundantModsWithAutoplayMod()
+        {
+            OsuModDifficultyAdjust playerMod = null;
+            AddStep("load player with autoplay mod", () => { resetPlayer(true, () => SelectedMods.Value = new Mod[] { playerMod = new OsuModDifficultyAdjust(), new OsuModAutoplay() }); });
+
+            AddUntilStep("wait for non-null player", () => player != null);
+            AddAssert("redundant mods have been removed", () => !player.Mods.Value.Contains(playerMod));
         }
 
         [Test]
