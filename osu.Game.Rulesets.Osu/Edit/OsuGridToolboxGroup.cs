@@ -100,6 +100,8 @@ namespace osu.Game.Rulesets.Osu.Edit
         {
         }
 
+        private const float max_automatic_spacing = 64;
+
         [BackgroundDependencyLoader]
         private void load()
         {
@@ -196,11 +198,9 @@ namespace osu.Game.Rulesets.Osu.Edit
             }, true);
         }
 
-        private void nextGridType()
+        private void nextGridSize()
         {
-            currentGridTypeIndex = (currentGridTypeIndex + 1) % grid_types.Length;
-            GridType.Value = grid_types[currentGridTypeIndex];
-            gridTypeButtons.Items[currentGridTypeIndex].Select();
+            Spacing.Value = Spacing.Value * 2 >= max_automatic_spacing ? Spacing.Value / 8 : Spacing.Value * 2;
         }
 
         public bool OnPressed(KeyBindingPressEvent<GlobalAction> e)
@@ -208,7 +208,7 @@ namespace osu.Game.Rulesets.Osu.Edit
             switch (e.Action)
             {
                 case GlobalAction.EditorCycleGridDisplayMode:
-                    nextGridType();
+                    nextGridSize();
                     return true;
             }
 
