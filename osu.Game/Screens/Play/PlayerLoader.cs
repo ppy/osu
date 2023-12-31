@@ -25,6 +25,7 @@ using osu.Game.Input;
 using osu.Game.Localisation;
 using osu.Game.Overlays;
 using osu.Game.Overlays.Notifications;
+using osu.Game.Rulesets.Mods;
 using osu.Game.Screens.Menu;
 using osu.Game.Screens.Play.PlayerSettings;
 using osu.Game.Skinning;
@@ -396,7 +397,7 @@ namespace osu.Game.Screens.Play
 
             CurrentPlayer = createPlayer();
 
-            if (CurrentPlayer is not ReplayPlayer)
+            if (CurrentPlayer is not ReplayPlayer || Mods.Value.OfType<ICreateReplayData>().Any())
             {
                 var validMods = Mods.Value.ToArray();
 
