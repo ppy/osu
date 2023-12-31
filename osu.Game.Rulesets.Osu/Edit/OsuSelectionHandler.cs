@@ -1,7 +1,6 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using System;
 using System.Collections.Generic;
 using System.Linq;
 using osu.Framework.Allocation;
@@ -107,9 +106,13 @@ namespace osu.Game.Rulesets.Osu.Edit
         {
             var hitObjects = selectedMovableObjects;
 
+            // If we're flipping over the origin, we take the grid origin position from the grid toolbox.
             var flipQuad = flipOverOrigin ? new Quad(gridToolbox.StartPositionX.Value, gridToolbox.StartPositionY.Value, 0, 0) : GeometryUtils.GetSurroundingQuad(hitObjects);
-            var flipAxis = flipOverOrigin ? new Vector2(MathF.Cos(MathHelper.DegreesToRadians(gridToolbox.GridLinesRotation.Value)), MathF.Sin(MathHelper.DegreesToRadians(gridToolbox.GridLinesRotation.Value))) : Vector2.UnitX;
+            // If we're flipping over the origin, we take the grid rotation from the grid toolbox.
+            // We want to normalize the rotation angle to -45 to 45 degrees, so horizontal vs vertical flip is not mixed up by the rotation and it stays intuitive to use.
+            var flipAxis = flipOverOrigin ? GeometryUtils.RotateVector(Vector2.UnitX, -((gridToolbox.GridLinesRotation.Value + 405) % 90 - 45)) : Vector2.UnitX;
             flipAxis = direction == Direction.Vertical ? flipAxis.PerpendicularLeft : flipAxis;
+
             var controlPointFlipQuad = new Quad();
 
             bool didFlip = false;
