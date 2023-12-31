@@ -310,6 +310,13 @@ namespace osu.Game.Tests.Mods
                 Assert.That(invalid?.Select(t => t.GetType()), Is.EquivalentTo(expectedInvalid));
         }
 
+        [Test]
+        public void TestFormatScoreMultiplier()
+        {
+            Assert.AreEqual(ModUtils.FormatScoreMultiplier(0.9999).ToString(), "0.99x");
+            Assert.AreEqual(ModUtils.FormatScoreMultiplier(1.0001).ToString(), "1.01x");
+        }
+
         public abstract class CustomMod1 : Mod, IModCompatibilitySpecification
         {
         }
@@ -337,6 +344,16 @@ namespace osu.Game.Tests.Mods
             public override double ScoreMultiplier => 1;
             public override bool HasImplementation => true;
             public override bool ValidForMultiplayerAsFreeMod => false;
+        }
+
+        public class EditableMod : Mod
+        {
+            public override string Name => string.Empty;
+            public override LocalisableString Description => string.Empty;
+            public override string Acronym => string.Empty;
+            public override double ScoreMultiplier => Multiplier;
+
+            public double Multiplier = 1;
         }
 
         public interface IModCompatibilitySpecification
