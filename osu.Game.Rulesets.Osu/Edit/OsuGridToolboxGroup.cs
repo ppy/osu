@@ -6,10 +6,12 @@ using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
+using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Input.Bindings;
 using osu.Framework.Input.Events;
+using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Input.Bindings;
 using osu.Game.Rulesets.Edit;
@@ -17,6 +19,7 @@ using osu.Game.Rulesets.Osu.UI;
 using osu.Game.Screens.Edit;
 using osu.Game.Screens.Edit.Components.RadioButtons;
 using osuTK;
+using osuTK.Graphics;
 
 namespace osu.Game.Rulesets.Osu.Edit
 {
@@ -28,6 +31,9 @@ namespace osu.Game.Rulesets.Osu.Edit
 
         [Resolved]
         private EditorBeatmap editorBeatmap { get; set; } = null!;
+
+        [Resolved]
+        private IExpandingContainer? expandingContainer { get; set; }
 
         /// <summary>
         /// X position of the grid's origin.
@@ -125,7 +131,7 @@ namespace osu.Game.Rulesets.Osu.Edit
                             () => new SpriteIcon { Icon = FontAwesome.Regular.Square }),
                         new RadioButton("Triangle",
                             () => GridType.Value = PositionSnapGridType.Triangle,
-                            () => new Triangle()),
+                            () => new OutlineTriangle(true, 20)),
                         new RadioButton("Circle",
                             () => GridType.Value = PositionSnapGridType.Circle,
                             () => new SpriteIcon { Icon = FontAwesome.Regular.Circle }),
@@ -134,6 +140,36 @@ namespace osu.Game.Rulesets.Osu.Edit
             };
 
             Spacing.Value = editorBeatmap.BeatmapInfo.GridSize;
+        }
+
+        public partial class OutlineTriangle : BufferedContainer
+        {
+            public OutlineTriangle(bool outlineOnly, float size)
+                : base(cachedFrameBuffer: true)
+            {
+                Size = new Vector2(size);
+
+                InternalChildren = new Drawable[]
+                {
+                    new EquilateralTriangle { RelativeSizeAxes = Axes.Both },
+                };
+
+                if (outlineOnly)
+                {
+                    AddInternal(new EquilateralTriangle
+                    {
+                        Anchor = Anchor.TopCentre,
+                        Origin = Anchor.Centre,
+                        RelativePositionAxes = Axes.Y,
+                        Y = 0.48f,
+                        Colour = Color4.Black,
+                        Size = new Vector2(size - 7),
+                        Blending = BlendingParameters.None,
+                    });
+                }
+
+                Blending = BlendingParameters.Additive;
+            }
         }
 
         protected override void LoadComplete()
