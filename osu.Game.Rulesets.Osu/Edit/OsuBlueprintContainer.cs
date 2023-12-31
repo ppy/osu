@@ -11,6 +11,7 @@ using osu.Game.Rulesets.Osu.Edit.Blueprints.Spinners;
 using osu.Game.Rulesets.Osu.Objects;
 using osu.Game.Screens.Edit.Compose.Components;
 using osuTK;
+using osuTK.Input;
 
 namespace osu.Game.Rulesets.Osu.Edit
 {
@@ -63,26 +64,21 @@ namespace osu.Game.Rulesets.Osu.Edit
 
         protected override bool OnMouseDown(MouseDownEvent e)
         {
-            return isPlacingGridFromPoints || base.OnMouseDown(e);
-        }
-
-        protected override bool OnClick(ClickEvent e)
-        {
             if (!isPlacingGridFromPoints)
-                return base.OnClick(e);
+                return base.OnMouseDown(e);
 
-            var pos = ToLocalSpace(Composer.FindSnappedPositionAndTime(e.ScreenSpaceMousePosition, ~SnapType.GlobalGrids).ScreenSpacePosition);
+            var pos = snappedLocalPosition(e);
 
             if (!gridFromPointsStart.HasValue)
-            {
                 gridFromPointsStart = pos;
-            }
             else
             {
                 gridToolbox.SetGridFromPoints(gridFromPointsStart.Value, pos);
                 isPlacingGridFromPoints = false;
-                gridFromPointsStart = null;
             }
+
+            if (e.Button == MouseButton.Right)
+                isPlacingGridFromPoints = false;
 
             return true;
         }
@@ -92,18 +88,16 @@ namespace osu.Game.Rulesets.Osu.Edit
             if (!isPlacingGridFromPoints)
                 return base.OnMouseMove(e);
 
-            var pos = ToLocalSpace(Composer.FindSnappedPositionAndTime(e.ScreenSpaceMousePosition, ~SnapType.GlobalGrids).ScreenSpacePosition);
+            var pos = snappedLocalPosition(e);
 
             if (!gridFromPointsStart.HasValue)
-            {
                 gridToolbox.StartPosition.Value = pos;
-            }
             else
-            {
                 gridToolbox.SetGridFromPoints(gridFromPointsStart.Value, pos);
-            }
 
             return true;
         }
+
+        private Vector2 snappedLocalPosition(UIEvent e) => ToLocalSpace(Composer.FindSnappedPositionAndTime(e.ScreenSpaceMousePosition, ~SnapType.GlobalGrids).ScreenSpacePosition);
     }
 }
