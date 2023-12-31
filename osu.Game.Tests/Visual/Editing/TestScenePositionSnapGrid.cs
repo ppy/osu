@@ -16,7 +16,7 @@ using osuTK.Graphics;
 
 namespace osu.Game.Tests.Visual.Editing
 {
-    public partial class TestSceneRectangularPositionSnapGrid : OsuManualInputManagerTestScene
+    public partial class TestScenePositionSnapGrid : OsuManualInputManagerTestScene
     {
         private Container content;
         protected override Container<Drawable> Content => content;
@@ -42,8 +42,8 @@ namespace osu.Game.Tests.Visual.Editing
         private static readonly object[][] test_cases =
         {
             new object[] { new Vector2(0, 0), new Vector2(10, 10), 0f },
-            new object[] { new Vector2(240, 180), new Vector2(10, 15), 30f },
-            new object[] { new Vector2(160, 120), new Vector2(30, 20), -30f },
+            new object[] { new Vector2(240, 180), new Vector2(10, 15), 10f },
+            new object[] { new Vector2(160, 120), new Vector2(30, 20), -10f },
             new object[] { new Vector2(480, 360), new Vector2(100, 100), 0f },
         };
 
@@ -61,6 +61,51 @@ namespace osu.Game.Tests.Visual.Editing
                 grid.StartPosition.Value = position;
                 grid.Spacing.Value = spacing;
                 grid.GridLineRotation.Value = rotation;
+            });
+
+            AddStep("add snapping cursor", () => Add(new SnappingCursorContainer
+            {
+                RelativeSizeAxes = Axes.Both,
+                GetSnapPosition = pos => grid.GetSnappedPosition(grid.ToLocalSpace(pos))
+            }));
+        }
+
+        [TestCaseSource(nameof(test_cases))]
+        public void TestTriangularGrid(Vector2 position, Vector2 spacing, float rotation)
+        {
+            TriangularPositionSnapGrid grid = null;
+
+            AddStep("create grid", () =>
+            {
+                Child = grid = new TriangularPositionSnapGrid
+                {
+                    RelativeSizeAxes = Axes.Both,
+                };
+                grid.StartPosition.Value = position;
+                grid.Spacing.Value = spacing.X;
+                grid.GridLineRotation.Value = rotation;
+            });
+
+            AddStep("add snapping cursor", () => Add(new SnappingCursorContainer
+            {
+                RelativeSizeAxes = Axes.Both,
+                GetSnapPosition = pos => grid.GetSnappedPosition(grid.ToLocalSpace(pos))
+            }));
+        }
+
+        [TestCaseSource(nameof(test_cases))]
+        public void TestCircularGrid(Vector2 position, Vector2 spacing, float rotation)
+        {
+            CircularPositionSnapGrid grid = null;
+
+            AddStep("create grid", () =>
+            {
+                Child = grid = new CircularPositionSnapGrid
+                {
+                    RelativeSizeAxes = Axes.Both,
+                };
+                grid.StartPosition.Value = position;
+                grid.Spacing.Value = spacing.X;
             });
 
             AddStep("add snapping cursor", () => Add(new SnappingCursorContainer
