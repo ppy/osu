@@ -9,10 +9,12 @@ using osu.Framework.Bindables;
 using osu.Framework.Logging;
 using osu.Framework.Screens;
 using osu.Game.Graphics.UserInterface;
+using osu.Game.Online.API;
 using osu.Game.Online.Multiplayer;
 using osu.Game.Online.Rooms;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Screens.Select;
+using osu.Game.Utils;
 
 namespace osu.Game.Screens.OnlinePlay.Multiplayer
 {
@@ -70,6 +72,13 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
                 Logger.Log($"{nameof(SelectItem)} aborted due to {nameof(operationInProgress)}");
                 return false;
             }
+
+            var validMods = Mods.Value.ToArray();
+
+            if (ModUtils.RemoveRedundantMods(validMods, out var removed, Beatmap.Value.Beatmap))
+                validMods = validMods.Except(removed).ToArray();
+
+            item.RequiredMods = validMods.Select(m => new APIMod(m)).ToArray();
 
             // If the client is already in a room, update via the client.
             // Otherwise, update the playlist directly in preparation for it to be submitted to the API on match creation.
