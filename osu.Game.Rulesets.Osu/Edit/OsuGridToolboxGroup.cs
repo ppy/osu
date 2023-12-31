@@ -264,6 +264,10 @@ namespace osu.Game.Rulesets.Osu.Edit
                 case GlobalAction.EditorCycleGridDisplayMode:
                     nextGridSize();
                     return true;
+
+                case GlobalAction.EditorCycleGridType:
+                    nextGridType();
+                    return true;
             }
 
             return false;
