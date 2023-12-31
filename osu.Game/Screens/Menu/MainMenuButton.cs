@@ -31,6 +31,9 @@ namespace osu.Game.Screens.Menu
     /// </summary>
     public partial class MainMenuButton : BeatSyncedContainer, IStateful<ButtonState>
     {
+        public const float BOUNCE_COMPRESSION = 0.9f;
+        public const float HOVER_SCALE = 1.2f;
+        public const float BOUNCE_ROTATION = 8;
         public event Action<ButtonState>? StateChanged;
 
         public readonly Key[] TriggerKeys;
@@ -125,8 +128,9 @@ namespace osu.Game.Screens.Menu
                             Shadow = true,
                             Anchor = Anchor.Centre,
                             Origin = Anchor.Centre,
-                            Size = new Vector2(30),
+                            Size = new Vector2(32),
                             Position = new Vector2(0, 0),
+                            Margin = new MarginPadding { Top = -4 },
                             Icon = symbol
                         },
                         new OsuSpriteText
@@ -136,6 +140,7 @@ namespace osu.Game.Screens.Menu
                             Anchor = Anchor.Centre,
                             Origin = Anchor.Centre,
                             Position = new Vector2(0, 35),
+                            Margin = new MarginPadding { Left = -3 },
                             Text = text
                         }
                     }
@@ -153,14 +158,14 @@ namespace osu.Game.Screens.Menu
 
             double duration = timingPoint.BeatLength / 2;
 
-            icon.RotateTo(rightward ? 10 : -10, duration * 2, Easing.InOutSine);
+            icon.RotateTo(rightward ? BOUNCE_ROTATION : -BOUNCE_ROTATION, duration * 2, Easing.InOutSine);
 
             icon.Animate(
                 i => i.MoveToY(-10, duration, Easing.Out),
-                i => i.ScaleTo(1, duration, Easing.Out)
+                i => i.ScaleTo(HOVER_SCALE, duration, Easing.Out)
             ).Then(
                 i => i.MoveToY(0, duration, Easing.In),
-                i => i.ScaleTo(new Vector2(1, 0.9f), duration, Easing.In)
+                i => i.ScaleTo(new Vector2(HOVER_SCALE, HOVER_SCALE * BOUNCE_COMPRESSION), duration, Easing.In)
             );
 
             rightward = !rightward;
@@ -177,8 +182,8 @@ namespace osu.Game.Screens.Menu
             double duration = TimeUntilNextBeat;
 
             icon.ClearTransforms();
-            icon.RotateTo(rightward ? -10 : 10, duration, Easing.InOutSine);
-            icon.ScaleTo(new Vector2(1, 0.9f), duration, Easing.Out);
+            icon.RotateTo(rightward ? -BOUNCE_ROTATION : BOUNCE_ROTATION, duration, Easing.InOutSine);
+            icon.ScaleTo(new Vector2(HOVER_SCALE, HOVER_SCALE * BOUNCE_COMPRESSION), duration, Easing.Out);
             return true;
         }
 
