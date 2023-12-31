@@ -115,6 +115,22 @@ namespace osu.Game.Tests.Visual.Multiplayer
             assertFreeModNotShown(requiredMod);
         }
 
+        [Test]
+        public void TestRedudantModsRemovalWhenSelectingBeatmap()
+        {
+            BeatmapInfo selectedBeatmap = null;
+            OsuModDifficultyAdjust mod = null;
+
+            AddStep("select beatmap",
+                () => songSelect.Carousel.SelectBeatmap(selectedBeatmap = beatmaps.First()));
+            AddUntilStep("wait for selection", () => Beatmap.Value.BeatmapInfo.Equals(selectedBeatmap));
+
+            AddStep("set mods", () => SelectedMods.Value = new Mod[] { mod = new OsuModDifficultyAdjust(), new OsuModHidden() });
+            AddStep("finalise selection", () => songSelect.FinaliseSelection());
+            AddUntilStep("song select exited", () => !songSelect.IsCurrentScreen());
+            AddAssert("mod has been removed", () => SelectedRoom.Value.Playlist.Last().RequiredMods.Length == 1);
+        }
+
         private void assertFreeModNotShown(Type type)
         {
             AddAssert($"{type.ReadableName()} not displayed in freemod overlay",
