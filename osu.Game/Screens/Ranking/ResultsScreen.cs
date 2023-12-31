@@ -19,6 +19,7 @@ using osu.Framework.Input.Events;
 using osu.Framework.Screens;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
+using osu.Game.Graphics.Sprites;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Input.Bindings;
 using osu.Game.Online.API;
@@ -204,17 +205,31 @@ namespace osu.Game.Screens.Ranking
 
             if (lastFetchCompleted)
             {
-                APIRequest nextPageRequest = null;
-
-                if (ScorePanelList.IsScrolledToStart)
-                    nextPageRequest = FetchNextPage(-1, fetchScoresCallback);
-                else if (ScorePanelList.IsScrolledToEnd)
-                    nextPageRequest = FetchNextPage(1, fetchScoresCallback);
-
-                if (nextPageRequest != null)
+                if (ScorePanelList.IsEmpty)
                 {
-                    lastFetchCompleted = false;
-                    api.Queue(nextPageRequest);
+                    // This can happen if a beatmap part of a playlist hasn't been played yet.
+                    VerticalScrollContent.Add(new OsuSpriteText
+                    {
+                        Anchor = Anchor.Centre,
+                        Origin = Anchor.Centre,
+                        Font = OsuFont.GetFont(size: 32, weight: FontWeight.Regular),
+                        Text = "no scores yet!",
+                    });
+                }
+                else
+                {
+                    APIRequest nextPageRequest = null;
+
+                    if (ScorePanelList.IsScrolledToStart)
+                        nextPageRequest = FetchNextPage(-1, fetchScoresCallback);
+                    else if (ScorePanelList.IsScrolledToEnd)
+                        nextPageRequest = FetchNextPage(1, fetchScoresCallback);
+
+                    if (nextPageRequest != null)
+                    {
+                        lastFetchCompleted = false;
+                        api.Queue(nextPageRequest);
+                    }
                 }
             }
         }
