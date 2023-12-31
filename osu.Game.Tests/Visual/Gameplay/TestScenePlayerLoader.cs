@@ -96,6 +96,8 @@ namespace osu.Game.Tests.Visual.Gameplay
             });
 
             AddUntilStep("wait for no notifications", () => notificationOverlay.UnreadCount.Value, () => Is.EqualTo(0));
+
+            AddStep("reset mods", () => SelectedMods.Value = Array.Empty<Mod>());
         }
 
         /// <summary>
@@ -272,6 +274,8 @@ namespace osu.Game.Tests.Visual.Gameplay
 
             AddUntilStep("wait for non-null player", () => player != null);
             AddAssert("redundant mods have been removed", () => !player.Mods.Value.Contains(playerMod));
+
+            clickNotification();
         }
 
         [Test]
@@ -282,6 +286,19 @@ namespace osu.Game.Tests.Visual.Gameplay
 
             AddUntilStep("wait for non-null player", () => player != null);
             AddAssert("redundant mods have been removed", () => !player.Mods.Value.Contains(playerMod));
+
+            clickNotification();
+        }
+
+        [Test]
+        public void TestRedundantModsNotification()
+        {
+            AddStep("load player", () => { resetPlayer(true, () => SelectedMods.Value = new[] { new OsuModDifficultyAdjust() }); });
+
+            AddUntilStep("wait for non-null player", () => player != null);
+            AddAssert("check for notification", () => notificationOverlay.UnreadCount.Value, () => Is.EqualTo(1));
+
+            clickNotification();
         }
 
         [Test]
