@@ -22,6 +22,13 @@ namespace osu.Game.Rulesets.Osu.Edit
 
         private Vector2? startPosition;
 
+        protected override void LoadComplete()
+        {
+            base.LoadComplete();
+
+            gridToolboxGroup.GridFromPointsClicked += BeginPlacement;
+        }
+
         public void BeginPlacement()
         {
             IsPlacing = true;

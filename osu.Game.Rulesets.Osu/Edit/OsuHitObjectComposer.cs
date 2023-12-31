@@ -63,6 +63,8 @@ namespace osu.Game.Rulesets.Osu.Edit
 
         private Bindable<HitObject> placementObject;
 
+        private GridFromPointsTool gridFromPointsTool;
+
         [Cached(typeof(IDistanceSnapProvider))]
         protected readonly OsuDistanceSnapProvider DistanceSnapProvider = new OsuDistanceSnapProvider();
 
@@ -99,7 +101,6 @@ namespace osu.Game.Rulesets.Osu.Edit
             updateDistanceSnapGrid();
 
             OsuGridToolboxGroup.GridType.BindValueChanged(updatePositionSnapGrid, true);
-            OsuGridToolboxGroup.GridFromPointsClicked += () => gridFromPointsTool.BeginPlacement();
 
             LayerAboveRuleset.Add(
                 // Place it above the playfield and blueprints, so it takes priority when handling input.
@@ -117,8 +118,6 @@ namespace osu.Game.Rulesets.Osu.Edit
                 }
             );
         }
-
-        private GridFromPointsTool gridFromPointsTool;
 
         private void updatePositionSnapGrid(ValueChangedEvent<PositionSnapGridType> obj)
         {
