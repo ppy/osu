@@ -165,7 +165,9 @@ namespace osu.Game
 
                 // the last dialog encountered has been dismissed but the screen has not changed, abort.
                 Cancel();
+#if DEBUG
                 notifications.Post(new SimpleNotification { Text = @"An action was interrupted due to a dialog being displayed." });
+#endif
                 return true;
             }
 
