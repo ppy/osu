@@ -42,15 +42,15 @@ namespace osu.Game.Tests.Visual.Playlists
         private int totalCount;
         private ScoreInfo userScore;
 
-        [SetUpSteps]
-        public override void SetUpSteps()
+        // We don't use SetUpSteps for this because one of the tests shouldn't receive any scores.
+        public void InitialiseUserScoresAndBeatmap(bool noScores = false)
         {
             base.SetUpSteps();
 
             // Previous test instances of the results screen may still exist at this point so wait for
             // those screens to be cleaned up by the base SetUpSteps before re-initialising test state.
-            // The the screen also holds a leased Beatmap bindable so reassigning it must happen after
-            // the screen as been exited.
+            // The screen also holds a leased Beatmap bindable so reassigning it must happen after
+            // the screen has been exited.
             AddStep("initialise user scores and beatmap", () =>
             {
                 lowestScoreId = 1;
@@ -63,7 +63,7 @@ namespace osu.Game.Tests.Visual.Playlists
                 userScore.Statistics = new Dictionary<HitResult, int>();
                 userScore.MaximumStatistics = new Dictionary<HitResult, int>();
 
-                bindHandler();
+                bindHandler(noScores: noScores);
 
                 // Beatmap is required to be an actual beatmap so the scores can get their scores correctly
                 // calculated for standardised scoring, else the tests that rely on ordering will fall over.
@@ -74,6 +74,8 @@ namespace osu.Game.Tests.Visual.Playlists
         [Test]
         public void TestShowWithUserScore()
         {
+            InitialiseUserScoresAndBeatmap();
+
             AddStep("bind user score info handler", () => bindHandler(userScore: userScore));
 
             createResults(() => userScore);
@@ -86,6 +88,8 @@ namespace osu.Game.Tests.Visual.Playlists
         [Test]
         public void TestShowNullUserScore()
         {
+            InitialiseUserScoresAndBeatmap();
+
             createResults();
 
             AddAssert("top score selected", () => this.ChildrenOfType<ScorePanel>().OrderByDescending(p => p.Score.TotalScore).First().State == PanelState.Expanded);
@@ -94,6 +98,8 @@ namespace osu.Game.Tests.Visual.Playlists
         [Test]
         public void TestShowUserScoreWithDelay()
         {
+            InitialiseUserScoresAndBeatmap();
+
             AddStep("bind user score info handler", () => bindHandler(true, userScore));
 
             createResults(() => userScore);
@@ -105,6 +111,8 @@ namespace osu.Game.Tests.Visual.Playlists
         [Test]
         public void TestShowNullUserScoreWithDelay()
         {
+            InitialiseUserScoresAndBeatmap();
+
             AddStep("bind delayed handler", () => bindHandler(true));
 
             createResults();
@@ -115,6 +123,8 @@ namespace osu.Game.Tests.Visual.Playlists
         [Test]
         public void TestFetchWhenScrolledToTheRight()
         {
+            InitialiseUserScoresAndBeatmap();
+
             createResults();
 
             AddStep("bind delayed handler", () => bindHandler(true));
@@ -137,6 +147,8 @@ namespace osu.Game.Tests.Visual.Playlists
         [Test]
         public void TestFetchWhenScrolledToTheLeft()
         {
+            InitialiseUserScoresAndBeatmap();
+
             AddStep("bind user score info handler", () => bindHandler(userScore: userScore));
 
             createResults(() => userScore);
@@ -158,7 +170,16 @@ namespace osu.Game.Tests.Visual.Playlists
             }
         }
 
-        private void createResults(Func<ScoreInfo> getScore = null)
+        [Test]
+        public void TestShowWithNoScores()
+        {
+            InitialiseUserScoresAndBeatmap(noScores: true);
+
+            createResults(noScores: true);
+            AddAssert("no scores visible", () => resultsScreen.ScorePanelList.GetScorePanels().Count() == 0);
+        }
+
+        private void createResults(Func<ScoreInfo> getScore = null, bool noScores = false)
         {
             AddStep("load results", () =>
             {
@@ -169,11 +190,13 @@ namespace osu.Game.Tests.Visual.Playlists
             });
 
             AddUntilStep("wait for screen to load", () => resultsScreen.IsLoaded);
-            waitForDisplay();
+            waitForDisplay(noScores);
         }
 
-        private void waitForDisplay()
+        private void waitForDisplay(bool noScores = false)
         {
+            if (noScores) return;
+
             AddUntilStep("wait for scores loaded", () =>
                 requestComplete
                 // request handler may need to fire more than once to get scores.
@@ -183,7 +206,7 @@ namespace osu.Game.Tests.Visual.Playlists
             AddWaitStep("wait for display", 5);
         }
 
-        private void bindHandler(bool delayed = false, ScoreInfo userScore = null, bool failRequests = false) => ((DummyAPIAccess)API).HandleRequest = request =>
+        private void bindHandler(bool delayed = false, ScoreInfo userScore = null, bool failRequests = false, bool noScores = false) => ((DummyAPIAccess)API).HandleRequest = request =>
         {
             // pre-check for requests we should be handling (as they are scheduled below).
             switch (request)
@@ -219,7 +242,7 @@ namespace osu.Game.Tests.Visual.Playlists
                         break;
 
                     case IndexPlaylistScoresRequest i:
-                        triggerSuccess(i, createIndexResponse(i));
+                        triggerSuccess(i, createIndexResponse(i, noScores));
                         break;
                 }
             }, delay);
@@ -301,9 +324,11 @@ namespace osu.Game.Tests.Visual.Playlists
             return multiplayerUserScore;
         }
 
-        private IndexedMultiplayerScores createIndexResponse(IndexPlaylistScoresRequest req)
+        private IndexedMultiplayerScores createIndexResponse(IndexPlaylistScoresRequest req, bool noScores = false)
         {
             var result = new IndexedMultiplayerScores();
+
+            if (noScores) return result;
 
             string sort = req.IndexParams?.Properties["sort"].ToObject<string>() ?? "score_desc";
 
