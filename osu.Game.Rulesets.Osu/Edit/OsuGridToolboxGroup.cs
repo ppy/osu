@@ -25,6 +25,10 @@ namespace osu.Game.Rulesets.Osu.Edit
 {
     public partial class OsuGridToolboxGroup : EditorToolboxGroup, IKeyBindingHandler<GlobalAction>
     {
+        private static readonly PositionSnapGridType[] grid_types = Enum.GetValues(typeof(PositionSnapGridType)).Cast<PositionSnapGridType>().ToArray();
+
+        private int currentGridTypeIndex;
+
         [Resolved]
         private EditorBeatmap editorBeatmap { get; set; } = null!;
 
@@ -244,6 +248,13 @@ namespace osu.Game.Rulesets.Osu.Edit
         private void nextGridSize()
         {
             Spacing.Value = Spacing.Value * 2 >= max_automatic_spacing ? Spacing.Value / 8 : Spacing.Value * 2;
+        }
+
+        private void nextGridType()
+        {
+            currentGridTypeIndex = (currentGridTypeIndex + 1) % grid_types.Length;
+            GridType.Value = grid_types[currentGridTypeIndex];
+            gridTypeButtons.Items[currentGridTypeIndex].Select();
         }
 
         public bool OnPressed(KeyBindingPressEvent<GlobalAction> e)
