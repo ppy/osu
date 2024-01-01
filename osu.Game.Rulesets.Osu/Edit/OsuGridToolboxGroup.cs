@@ -110,7 +110,7 @@ namespace osu.Game.Rulesets.Osu.Edit
 
             // Divide the distance so that there is a good density of grid lines.
             float dist = Vector2.Distance(point1, point2);
-            while (dist > 32)
+            while (dist >= max_automatic_spacing)
                 dist /= 2;
             Spacing.Value = dist;
         }
