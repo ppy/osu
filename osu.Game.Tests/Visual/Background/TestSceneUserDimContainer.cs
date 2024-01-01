@@ -49,7 +49,7 @@ namespace osu.Game.Tests.Visual.Background
         });
 
         private const float test_user_dim = 0.6f;
-        private const float test_user_dim_lightened = test_user_dim - UserDimContainer.BREAK_LIGHTEN_AMOUNT;
+        private const float test_user_dim_lightened = test_user_dim - UserDimContainer.LIGHTEN_AMOUNT;
 
         [TestCase(test_user_dim, test_user_dim_lightened)]
         [TestCase(0.2f, 0.0f)]

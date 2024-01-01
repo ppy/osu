@@ -17,9 +17,10 @@ namespace osu.Game.Graphics.Containers
     public abstract partial class UserDimContainer : Container
     {
         /// <summary>
-        /// Amount of lightening to apply to current dim level during break times.
+        /// Amount of lightening to apply to current dim level during break times and if a beatmap has storyboard or video
+        /// (both depending on the respective setting being turned on).
         /// </summary>
-        public const float BREAK_LIGHTEN_AMOUNT = 0.3f;
+        public const float LIGHTEN_AMOUNT = 0.3f;
 
         public const double BACKGROUND_FADE_DURATION = 800;
 
@@ -49,13 +50,22 @@ namespace osu.Game.Graphics.Containers
         /// </summary>
         public Bindable<float> DimWhenUserSettingsIgnored { get; } = new Bindable<float>();
 
+        /// <summary>
+        /// Whether the beatmap has storyboard or video.
+        /// </summary>
+        public readonly Bindable<bool> BeatmapHasStoryboardOrVideo = new Bindable<bool>();
+
         protected Bindable<bool> LightenDuringBreaks { get; private set; } = null!;
+
+        protected Bindable<bool> LightenIfBeatmapHasStoryboardOrVideo { get; private set; } = null!;
 
         protected Bindable<bool> ShowStoryboard { get; private set; } = null!;
 
-        private float breakLightening => LightenDuringBreaks.Value && IsBreakTime.Value ? BREAK_LIGHTEN_AMOUNT : 0;
+        private float breakLightening => LightenDuringBreaks.Value && IsBreakTime.Value ? LIGHTEN_AMOUNT : 0;
 
-        protected virtual float DimLevel => Math.Max(!IgnoreUserSettings.Value ? (float)UserDimLevel.Value - breakLightening : DimWhenUserSettingsIgnored.Value, 0);
+        private float contentLightening => LightenIfBeatmapHasStoryboardOrVideo.Value && BeatmapHasStoryboardOrVideo.Value ? LIGHTEN_AMOUNT : 0;
+
+        protected virtual float DimLevel => Math.Max(!IgnoreUserSettings.Value ? (float)UserDimLevel.Value - breakLightening - contentLightening : DimWhenUserSettingsIgnored.Value, 0);
 
         protected override Container<Drawable> Content => dimContent;
 
@@ -74,11 +84,14 @@ namespace osu.Game.Graphics.Containers
         {
             UserDimLevel = config.GetBindable<double>(OsuSetting.DimLevel);
             LightenDuringBreaks = config.GetBindable<bool>(OsuSetting.LightenDuringBreaks);
+            LightenIfBeatmapHasStoryboardOrVideo = config.GetBindable<bool>(OsuSetting.LightenIfBeatmapHasStoryboardOrVideo);
             ShowStoryboard = config.GetBindable<bool>(OsuSetting.ShowStoryboard);
 
             UserDimLevel.ValueChanged += _ => UpdateVisuals();
             DimWhenUserSettingsIgnored.ValueChanged += _ => UpdateVisuals();
             LightenDuringBreaks.ValueChanged += _ => UpdateVisuals();
+            LightenIfBeatmapHasStoryboardOrVideo.ValueChanged += _ => UpdateVisuals();
+            BeatmapHasStoryboardOrVideo.ValueChanged += _ => UpdateVisuals();
             IsBreakTime.ValueChanged += _ => UpdateVisuals();
             ShowStoryboard.ValueChanged += _ => UpdateVisuals();
             IgnoreUserSettings.ValueChanged += _ => UpdateVisuals();

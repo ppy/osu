@@ -89,6 +89,8 @@ namespace osu.Game.Screens.Play
 
         private readonly Bindable<bool> storyboardReplacesBackground = new Bindable<bool>();
 
+        private readonly Bindable<bool> beatmapHasStoryboardOrVideo = new Bindable<bool>();
+
         public IBindable<bool> LocalUserPlaying => localUserPlaying;
 
         private readonly Bindable<bool> localUserPlaying = new Bindable<bool>();
@@ -1077,6 +1079,8 @@ namespace osu.Game.Screens.Play
 
                 b.StoryboardReplacesBackground.BindTo(storyboardReplacesBackground);
 
+                b.BeatmapHasStoryboardOrVideo.BindTo(beatmapHasStoryboardOrVideo);
+
                 failAnimationContainer.Background = b;
             });
 
@@ -1084,8 +1088,10 @@ namespace osu.Game.Screens.Play
             ShowingOverlayComponents.BindTo(HUDOverlay.ShowHud);
 
             DimmableStoryboard.IsBreakTime.BindTo(breakTracker.IsBreakTime);
+            DimmableStoryboard.BeatmapHasStoryboardOrVideo.BindTo(beatmapHasStoryboardOrVideo);
 
             storyboardReplacesBackground.Value = Beatmap.Value.Storyboard.ReplacesBackground && Beatmap.Value.Storyboard.HasDrawable;
+            beatmapHasStoryboardOrVideo.Value = Beatmap.Value.Storyboard.Layers.Sum(layer => layer.Elements.Count) != 0;
 
             foreach (var mod in GameplayState.Mods.OfType<IApplicableToPlayer>())
                 mod.ApplyToPlayer(this);

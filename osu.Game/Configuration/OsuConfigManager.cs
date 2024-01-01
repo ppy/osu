@@ -132,6 +132,7 @@ namespace osu.Game.Configuration
             SetDefault(OsuSetting.DimLevel, 0.7, 0, 1, 0.01);
             SetDefault(OsuSetting.BlurLevel, 0, 0, 1, 0.01);
             SetDefault(OsuSetting.LightenDuringBreaks, true);
+            SetDefault(OsuSetting.LightenIfBeatmapHasStoryboardOrVideo, false);
 
             SetDefault(OsuSetting.HitLighting, true);
 
@@ -324,6 +325,7 @@ namespace osu.Game.Configuration
         BlurLevel,
         EditorDim,
         LightenDuringBreaks,
+        LightenIfBeatmapHasStoryboardOrVideo,
         ShowStoryboard,
         KeyOverlay,
         GameplayLeaderboard,

@@ -39,6 +39,11 @@ namespace osu.Game.Overlays.Settings.Sections.Gameplay
                 },
                 new SettingsCheckbox
                 {
+                    LabelText = GameplaySettingsStrings.LightenIfBeatmapHasStoryboardOrVideo,
+                    Current = config.GetBindable<bool>(OsuSetting.LightenIfBeatmapHasStoryboardOrVideo),
+                },
+                new SettingsCheckbox
+                {
                     LabelText = GameplaySettingsStrings.FadePlayfieldWhenHealthLow,
                     Current = config.GetBindable<bool>(OsuSetting.FadePlayfieldWhenHealthLow),
                 },

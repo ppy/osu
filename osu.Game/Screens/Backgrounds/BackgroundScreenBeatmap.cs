@@ -51,6 +51,11 @@ namespace osu.Game.Screens.Backgrounds
         /// </summary>
         public readonly Bindable<float> DimWhenUserSettingsIgnored = new Bindable<float>();
 
+        /// <summary>
+        /// Whether the beatmap has storyboard or video.
+        /// </summary>
+        public readonly Bindable<bool> BeatmapHasStoryboardOrVideo = new Bindable<bool>();
+
         internal readonly IBindable<bool> IsBreakTime = new Bindable<bool>();
 
         private readonly DimmableBackground dimmable;
@@ -68,6 +73,7 @@ namespace osu.Game.Screens.Backgrounds
             dimmable.IsBreakTime.BindTo(IsBreakTime);
             dimmable.BlurAmount.BindTo(BlurAmount);
             dimmable.DimWhenUserSettingsIgnored.BindTo(DimWhenUserSettingsIgnored);
+            dimmable.BeatmapHasStoryboardOrVideo.BindTo(BeatmapHasStoryboardOrVideo);
         }
 
         [BackgroundDependencyLoader]

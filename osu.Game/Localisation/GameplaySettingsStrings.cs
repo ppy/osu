@@ -55,6 +55,11 @@ namespace osu.Game.Localisation
         public static LocalisableString LightenDuringBreaks => new TranslatableString(getKey(@"lighten_during_breaks"), @"Lighten playfield during breaks");
 
         /// <summary>
+        /// "Lighten playfield if beatmap has storyboard / video"
+        /// </summary>
+        public static LocalisableString LightenIfBeatmapHasStoryboardOrVideo => new TranslatableString(getKey(@"lighten_if_beatmap_has_storyboard_or_video"), @"Lighten playfield if beatmap has storyboard / video");
+
+        /// <summary>
         /// "HUD overlay visibility mode"
         /// </summary>
         public static LocalisableString HUDVisibilityMode => new TranslatableString(getKey(@"hud_visibility_mode"), @"HUD overlay visibility mode");
