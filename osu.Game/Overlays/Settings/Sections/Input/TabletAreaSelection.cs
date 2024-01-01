@@ -240,6 +240,7 @@ namespace osu.Game.Overlays.Settings.Sections.Input
 
         protected override void OnDrag(DragEvent e)
         {
+            // only allow dragging of the tablet area if the Shift key is being pressed.
             if (e.ShiftPressed)
             {
                 var newPos = Position + e.Delta;
