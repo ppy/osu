@@ -1,7 +1,6 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using System;
 using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
@@ -25,10 +24,6 @@ namespace osu.Game.Rulesets.Osu.Edit
 {
     public partial class OsuGridToolboxGroup : EditorToolboxGroup, IKeyBindingHandler<GlobalAction>
     {
-        private static readonly PositionSnapGridType[] grid_types = Enum.GetValues(typeof(PositionSnapGridType)).Cast<PositionSnapGridType>().ToArray();
-
-        private int currentGridTypeIndex;
-
         [Resolved]
         private EditorBeatmap editorBeatmap { get; set; } = null!;
 
