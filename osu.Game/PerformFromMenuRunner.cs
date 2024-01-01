@@ -8,6 +8,7 @@ using System.Collections.Generic;
 using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
+using osu.Framework.Logging;
 using osu.Framework.Screens;
 using osu.Framework.Threading;
 using osu.Game.Overlays;
@@ -165,9 +166,9 @@ namespace osu.Game
 
                 // the last dialog encountered has been dismissed but the screen has not changed, abort.
                 Cancel();
-#if DEBUG
-                notifications.Post(new SimpleNotification { Text = @"An action was interrupted due to a dialog being displayed." });
-#endif
+
+                Logger.Log("An action was interrupted due to a dialog being displayed.", level: LogLevel.Debug);
+
                 return true;
             }
 
