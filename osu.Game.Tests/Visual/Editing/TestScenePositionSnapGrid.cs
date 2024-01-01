@@ -70,51 +70,6 @@ namespace osu.Game.Tests.Visual.Editing
             }));
         }
 
-        [TestCaseSource(nameof(test_cases))]
-        public void TestTriangularGrid(Vector2 position, Vector2 spacing, float rotation)
-        {
-            TriangularPositionSnapGrid grid = null;
-
-            AddStep("create grid", () =>
-            {
-                Child = grid = new TriangularPositionSnapGrid
-                {
-                    RelativeSizeAxes = Axes.Both,
-                };
-                grid.StartPosition.Value = position;
-                grid.Spacing.Value = spacing.X;
-                grid.GridLineRotation.Value = rotation;
-            });
-
-            AddStep("add snapping cursor", () => Add(new SnappingCursorContainer
-            {
-                RelativeSizeAxes = Axes.Both,
-                GetSnapPosition = pos => grid.GetSnappedPosition(grid.ToLocalSpace(pos))
-            }));
-        }
-
-        [TestCaseSource(nameof(test_cases))]
-        public void TestCircularGrid(Vector2 position, Vector2 spacing, float rotation)
-        {
-            CircularPositionSnapGrid grid = null;
-
-            AddStep("create grid", () =>
-            {
-                Child = grid = new CircularPositionSnapGrid
-                {
-                    RelativeSizeAxes = Axes.Both,
-                };
-                grid.StartPosition.Value = position;
-                grid.Spacing.Value = spacing.X;
-            });
-
-            AddStep("add snapping cursor", () => Add(new SnappingCursorContainer
-            {
-                RelativeSizeAxes = Axes.Both,
-                GetSnapPosition = pos => grid.GetSnappedPosition(grid.ToLocalSpace(pos))
-            }));
-        }
-
         private partial class SnappingCursorContainer : CompositeDrawable
         {
             public Func<Vector2, Vector2> GetSnapPosition;

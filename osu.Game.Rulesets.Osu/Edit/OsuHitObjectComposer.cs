@@ -99,7 +99,7 @@ namespace osu.Game.Rulesets.Osu.Edit
             // we may be entering the screen with a selection already active
             updateDistanceSnapGrid();
 
-            OsuGridToolboxGroup.GridType.BindValueChanged(updatePositionSnapGrid, true);
+            updatePositionSnapGrid();
 
             RightToolbox.AddRange(new EditorToolboxGroup[]
                 {
@@ -110,45 +110,18 @@ namespace osu.Game.Rulesets.Osu.Edit
             );
         }
 
-        private void updatePositionSnapGrid(ValueChangedEvent<PositionSnapGridType> obj)
+        private void updatePositionSnapGrid()
         {
             if (positionSnapGrid != null)
                 LayerBelowRuleset.Remove(positionSnapGrid, true);
 
-            switch (obj.NewValue)
-            {
-                case PositionSnapGridType.Square:
-                    var rectangularPositionSnapGrid = new RectangularPositionSnapGrid();
+            var rectangularPositionSnapGrid = new RectangularPositionSnapGrid();
 
-                    rectangularPositionSnapGrid.Spacing.BindTo(OsuGridToolboxGroup.SpacingVector);
-                    rectangularPositionSnapGrid.GridLineRotation.BindTo(OsuGridToolboxGroup.GridLinesRotation);
+            rectangularPositionSnapGrid.StartPosition.BindTo(OsuGridToolboxGroup.StartPosition);
+            rectangularPositionSnapGrid.Spacing.BindTo(OsuGridToolboxGroup.SpacingVector);
+            rectangularPositionSnapGrid.GridLineRotation.BindTo(OsuGridToolboxGroup.GridLinesRotation);
 
-                    positionSnapGrid = rectangularPositionSnapGrid;
-                    break;
-
-                case PositionSnapGridType.Triangle:
-                    var triangularPositionSnapGrid = new TriangularPositionSnapGrid();
-
-                    triangularPositionSnapGrid.Spacing.BindTo(OsuGridToolboxGroup.Spacing);
-                    triangularPositionSnapGrid.GridLineRotation.BindTo(OsuGridToolboxGroup.GridLinesRotation);
-
-                    positionSnapGrid = triangularPositionSnapGrid;
-                    break;
-
-                case PositionSnapGridType.Circle:
-                    var circularPositionSnapGrid = new CircularPositionSnapGrid();
-
-                    circularPositionSnapGrid.Spacing.BindTo(OsuGridToolboxGroup.Spacing);
-
-                    positionSnapGrid = circularPositionSnapGrid;
-                    break;
-
-                default:
-                    throw new NotImplementedException($"{OsuGridToolboxGroup.GridType} has an incorrect value.");
-            }
-
-            // Bind the start position to the toolbox sliders.
-            positionSnapGrid.StartPosition.BindTo(OsuGridToolboxGroup.StartPosition);
+            positionSnapGrid = rectangularPositionSnapGrid;
 
             positionSnapGrid.RelativeSizeAxes = Axes.Both;
             LayerBelowRuleset.Add(positionSnapGrid);
