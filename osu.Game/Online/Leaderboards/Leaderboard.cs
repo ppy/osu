@@ -360,6 +360,14 @@ namespace osu.Game.Online.Leaderboards
             }
         }
 
+        /// <summary>
+        /// Whether the leaderboard is displaying scores (at least one).
+        /// </summary>
+        public bool HasScores()
+        {
+            return state == LeaderboardState.Success;
+        }
+
         #endregion
 
         #region Fade handling

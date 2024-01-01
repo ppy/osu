@@ -11,6 +11,7 @@ using osu.Framework.Graphics.UserInterface;
 using osu.Framework.Input.Events;
 using osu.Framework.Screens;
 using osu.Game.Beatmaps;
+using osu.Game.Configuration;
 using osu.Game.Graphics;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Localisation;
@@ -88,6 +89,9 @@ namespace osu.Game.Screens.Select
 
         private ModAutoplay? getAutoplayMod() => Ruleset.Value.CreateInstance().GetAutoplayMod();
 
+        [Resolved]
+        private OsuConfigManager config { get; set; } = null!;
+
         protected override bool OnStart()
         {
             if (playerLoader != null) return false;
@@ -115,6 +119,12 @@ namespace osu.Game.Screens.Select
 
                 Mods.Value = mods;
             }
+
+            // Default to local leaderboard if the currently selected leaderboard doesn't have scores or is unavailable
+            // perhaps because it requires sign in, requires the beatmap to be ranked, etc.
+            bool isLeaderboardSelected = config.Get<PlayBeatmapDetailArea.TabType>(OsuSetting.BeatmapDetailTab) != PlayBeatmapDetailArea.TabType.Details;
+            if (isLeaderboardSelected && !playBeatmapDetailArea.Leaderboard.HasScores())
+                config.SetValue(OsuSetting.BeatmapDetailTab, PlayBeatmapDetailArea.TabType.Local);
 
             SampleConfirm?.Play();
 
