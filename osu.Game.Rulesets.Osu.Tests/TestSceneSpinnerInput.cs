@@ -277,7 +277,7 @@ namespace osu.Game.Rulesets.Osu.Tests
 
         private void assertTicksHit(int count)
         {
-            AddAssert($"{count} ticks hit", () => judgementResults.Where(r => r.HitObject is SpinnerTick).Count(r => r.IsHit), () => Is.EqualTo(count));
+            AddAssert($"{count} ticks hit", () => judgementResults.Where(r => r.HitObject is SpinnerTick && !(r.HitObject is SpinnerHealthTick)).Count(r => r.IsHit), () => Is.EqualTo(count));
         }
 
         private void assertSpinnerHit(bool shouldBeHit)

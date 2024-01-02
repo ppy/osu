@@ -210,6 +210,9 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
         {
             switch (hitObject)
             {
+                case SpinnerHealthTick hpTick:
+                    return new DrawableSpinnerHealthTick(hpTick);
+
                 case SpinnerBonusTick bonusTick:
                     return new DrawableSpinnerBonusTick(bonusTick);
 
@@ -291,7 +294,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
             // Ticks can theoretically be judged at any point in the spinner's duration.
             // A tick must be alive to correctly play back samples,
             // but for performance reasons, we only want to keep the next tick alive.
-            var next = NestedHitObjects.FirstOrDefault(h => !h.Judged);
+            var next = NestedHitObjects.FirstOrDefault(h => !h.Judged && !(h is DrawableSpinnerHealthTick));
 
             // See default `LifetimeStart` as set in `DrawableSpinnerTick`.
             if (next?.LifetimeStart == double.MaxValue)
@@ -331,7 +334,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
 
             while (completedFullSpins.Value != spins)
             {
-                var tick = ticks.FirstOrDefault(t => !t.Result.HasResult);
+                var tick = ticks.FirstOrDefault(t => !t.Result.HasResult && !(t is DrawableSpinnerHealthTick));
 
                 // tick may be null if we've hit the spin limit.
                 if (tick == null)
@@ -342,6 +345,10 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
                 }
                 else
                     tick.TriggerResult(true);
+
+                // Find and trigger the next HP tick
+                var hpTick = ticks.FirstOrDefault(t => !t.Result.HasResult && t is DrawableSpinnerHealthTick);
+                hpTick?.TriggerResult(true);
 
                 completedFullSpins.Value++;
             }

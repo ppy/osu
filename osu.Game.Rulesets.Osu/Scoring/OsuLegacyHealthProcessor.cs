@@ -82,6 +82,10 @@ namespace osu.Game.Rulesets.Osu.Scoring
                 case HitResult.LargeBonus:
                     increase = 0.01;
                     break;
+
+                case HitResult.IgnoreHit:
+                    increase = 0.05;
+                    break;
             }
 
             return HpMultiplierNormal * increase;

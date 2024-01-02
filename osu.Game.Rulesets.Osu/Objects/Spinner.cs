@@ -52,6 +52,11 @@ namespace osu.Game.Rulesets.Osu.Objects
         private const int bonus_spins_gap = 2;
 
         /// <summary>
+        /// The maximum RPM at which HP will be restored.
+        /// </summary>
+        private const int hp_ticks_per_minute = 500;
+
+        /// <summary>
         /// Number of spins available to give bonus, beyond <see cref="SpinsRequired"/>.
         /// </summary>
         public int MaximumBonusSpins { get; protected set; } = 1;
@@ -92,6 +97,16 @@ namespace osu.Game.Rulesets.Osu.Objects
                 AddNested(i < SpinsRequiredForBonus
                     ? new SpinnerTick { StartTime = startTime, SpinnerDuration = Duration }
                     : new SpinnerBonusTick { StartTime = startTime, SpinnerDuration = Duration, Samples = new[] { CreateHitSampleInfo("spinnerbonus") } });
+            }
+
+            // Add ticks that give HP across the whole spinner duration
+            int maxSpinsForHp = (int)(hp_ticks_per_minute * Duration / 60000);
+
+            for (int i = 0; i < maxSpinsForHp; i++)
+            {
+                double startTime = StartTime + (float)(i + 1) / maxSpinsForHp * Duration;
+
+                AddNested(new SpinnerHealthTick { StartTime = startTime, SpinnerDuration = Duration });
             }
         }
 
