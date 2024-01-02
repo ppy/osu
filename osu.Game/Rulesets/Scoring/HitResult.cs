@@ -399,6 +399,9 @@ namespace osu.Game.Rulesets.Scoring
             if (maxResult.IsBonus() && minResult != HitResult.IgnoreMiss)
                 throw new ArgumentOutOfRangeException(nameof(minResult), $"{HitResult.IgnoreMiss} is the only valid minimum result for a {maxResult} judgement.");
 
+            if (maxResult == HitResult.HealthBonus && minResult != HitResult.IgnoreMiss)
+                throw new ArgumentOutOfRangeException(nameof(minResult), $"{HitResult.IgnoreMiss} is the only valid minimum result for a {maxResult} judgement.");
+
             if (minResult == HitResult.IgnoreMiss)
                 return;
 
