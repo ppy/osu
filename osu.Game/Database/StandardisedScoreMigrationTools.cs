@@ -316,7 +316,7 @@ namespace osu.Game.Database
             // when playing a beatmap with no bonus objects, with mods that have a 0.0x multiplier on stable (relax/autopilot).
             // In such cases, just assume 0.
             double comboProportion = maximumLegacyComboScore + maximumLegacyBonusScore > 0
-                ? ((double)score.LegacyTotalScore - legacyAccScore) / (maximumLegacyComboScore + maximumLegacyBonusScore)
+                ? Math.Max((double)score.LegacyTotalScore - legacyAccScore, 0) / (maximumLegacyComboScore + maximumLegacyBonusScore)
                 : 0;
 
             // We assume the bonus proportion only makes up the rest of the score that exceeds maximumLegacyBaseScore.
