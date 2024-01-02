@@ -350,6 +350,7 @@ namespace osu.Game.Scoring
                 {
                     case HitResult.SmallTickHit:
                     case HitResult.LargeTickHit:
+                    case HitResult.SliderTailHit:
                     case HitResult.LargeBonus:
                     case HitResult.SmallBonus:
                         if (MaximumStatistics.TryGetValue(r.result, out int count) && count > 0)

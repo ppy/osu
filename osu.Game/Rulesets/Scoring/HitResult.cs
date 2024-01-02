@@ -140,6 +140,13 @@ namespace osu.Game.Rulesets.Scoring
         ComboBreak,
 
         /// <summary>
+        /// A special judgement similar to <see cref="LargeTickHit"/> that's used to increase the valuation of the final tick of a slider.
+        /// </summary>
+        [EnumMember(Value = "slider_tail_hit")]
+        [Order(16)]
+        SliderTailHit,
+
+        /// <summary>
         /// A special result used as a padding value for legacy rulesets. It is a hit type and affects combo, but does not affect the base score (does not affect accuracy).
         ///
         /// DO NOT USE FOR ANYTHING EVER.
@@ -188,6 +195,7 @@ namespace osu.Game.Rulesets.Scoring
                 case HitResult.LargeTickMiss:
                 case HitResult.LegacyComboIncrease:
                 case HitResult.ComboBreak:
+                case HitResult.SliderTailHit:
                     return true;
 
                 default:
@@ -246,6 +254,7 @@ namespace osu.Game.Rulesets.Scoring
                 case HitResult.LargeTickMiss:
                 case HitResult.SmallTickHit:
                 case HitResult.SmallTickMiss:
+                case HitResult.SliderTailHit:
                     return true;
 
                 default:
@@ -329,6 +338,9 @@ namespace osu.Game.Rulesets.Scoring
                 case HitResult.ComboBreak:
                     return true;
 
+                case HitResult.SliderTailHit:
+                    return true;
+
                 default:
                     // Note that IgnoreHit and IgnoreMiss are excluded as they do not affect score.
                     return result >= HitResult.Miss && result < HitResult.IgnoreMiss;
@@ -382,6 +394,9 @@ namespace osu.Game.Rulesets.Scoring
 
             if (minResult == HitResult.IgnoreMiss)
                 return;
+
+            if (maxResult == HitResult.SliderTailHit && minResult != HitResult.LargeTickMiss)
+                throw new ArgumentOutOfRangeException(nameof(minResult), $"{HitResult.LargeTickMiss} is the only valid minimum result for a {maxResult} judgement.");
 
             if (maxResult == HitResult.LargeTickHit && minResult != HitResult.LargeTickMiss)
                 throw new ArgumentOutOfRangeException(nameof(minResult), $"{HitResult.LargeTickMiss} is the only valid minimum result for a {maxResult} judgement.");
