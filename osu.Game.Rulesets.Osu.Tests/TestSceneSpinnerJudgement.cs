@@ -104,7 +104,7 @@ namespace osu.Game.Rulesets.Osu.Tests
         private void assertResult<T>(int index, HitResult expectedResult)
         {
             AddAssert($"{typeof(T).ReadableName()} ({index}) judged as {expectedResult}",
-                () => judgementResults.Where(j => j.HitObject is T && !(j.HitObject is SpinnerHealthTick)).OrderBy(j => j.HitObject.StartTime).ElementAt(index).Type,
+                () => judgementResults.Where(j => j.HitObject is T && j.HitObject is not SpinnerHealthTick).OrderBy(j => j.HitObject.StartTime).ElementAt(index).Type,
                 () => Is.EqualTo(expectedResult));
         }
 

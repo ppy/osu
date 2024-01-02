@@ -278,6 +278,7 @@ namespace osu.Game.Rulesets.Scoring
             {
                 case HitResult.SmallBonus:
                 case HitResult.LargeBonus:
+                case HitResult.HealthBonus:
                     return true;
 
                 default:

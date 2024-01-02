@@ -294,7 +294,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
             // Ticks can theoretically be judged at any point in the spinner's duration.
             // A tick must be alive to correctly play back samples,
             // but for performance reasons, we only want to keep the next tick alive.
-            var next = NestedHitObjects.FirstOrDefault(h => !h.Judged && !(h is DrawableSpinnerHealthTick));
+            var next = NestedHitObjects.FirstOrDefault(h => !h.Judged && h is not DrawableSpinnerHealthTick);
 
             // See default `LifetimeStart` as set in `DrawableSpinnerTick`.
             if (next?.LifetimeStart == double.MaxValue)
@@ -334,21 +334,21 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
 
             while (completedFullSpins.Value != spins)
             {
-                var tick = ticks.FirstOrDefault(t => !t.Result.HasResult && !(t is DrawableSpinnerHealthTick));
+                var tick = ticks.FirstOrDefault(t => !t.Result.HasResult && t is not DrawableSpinnerHealthTick);
 
                 // tick may be null if we've hit the spin limit.
                 if (tick == null)
                 {
+                    // Find and trigger the next HP tick
+                    var hpTick = ticks.FirstOrDefault(t => !t.Result.HasResult && Time.Current >= t.StartTimeBindable.Value);
+                    hpTick?.TriggerResult(true);
+
                     // we still want to play a sound. this will probably be a new sound in the future, but for now let's continue playing the bonus sound.
                     // TODO: this doesn't concurrency. i can't figure out how to make it concurrency. samples are bad and need a refactor.
                     maxBonusSample.Play();
                 }
                 else
                     tick.TriggerResult(true);
-
-                // Find and trigger the next HP tick
-                var hpTick = ticks.FirstOrDefault(t => !t.Result.HasResult && t is DrawableSpinnerHealthTick);
-                hpTick?.TriggerResult(true);
 
                 completedFullSpins.Value++;
             }

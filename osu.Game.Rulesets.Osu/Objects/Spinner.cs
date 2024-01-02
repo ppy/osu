@@ -102,7 +102,7 @@ namespace osu.Game.Rulesets.Osu.Objects
             // Add ticks that give HP across the whole spinner duration
             int maxSpinsForHp = (int)(hp_ticks_per_minute * Duration / 60000);
 
-            for (int i = 0; i < maxSpinsForHp; i++)
+            for (int i = totalSpins; i < maxSpinsForHp; i++)
             {
                 double startTime = StartTime + (float)(i + 1) / maxSpinsForHp * Duration;
 

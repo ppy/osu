@@ -134,7 +134,7 @@ namespace osu.Game.Rulesets.Scoring
         {
             base.ApplyResultInternal(result);
 
-            if (IsSimulating && !result.Type.IsBonus() && result.Type.IsScorable())
+            if (IsSimulating && !result.Type.IsBonus())
             {
                 healthIncreases.Add(new HealthIncrease(
                     result.HitObject.GetEndTime() + result.TimeOffset,
