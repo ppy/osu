@@ -12,7 +12,7 @@ namespace osu.Game.Rulesets.Osu.Objects
 
         public class OsuSpinnerHealthTickJudgement : OsuSpinnerTickJudgement
         {
-            public override HitResult MaxResult => HitResult.IgnoreHit;
+            public override HitResult MaxResult => HitResult.HealthBonus;
         }
     }
 }

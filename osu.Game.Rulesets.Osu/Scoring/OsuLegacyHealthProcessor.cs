@@ -83,7 +83,7 @@ namespace osu.Game.Rulesets.Osu.Scoring
                     increase = 0.01;
                     break;
 
-                case HitResult.IgnoreHit:
+                case HitResult.HealthBonus:
                     increase = 0.05;
                     break;
             }
