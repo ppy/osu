@@ -5,6 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using osu.Framework.Allocation;
+using osu.Framework.Bindables;
 using osu.Framework.Extensions.LocalisationExtensions;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.UserInterface;
@@ -23,6 +24,7 @@ using osu.Game.Screens.Play;
 using osu.Game.Screens.Ranking;
 using osu.Game.Users;
 using osu.Game.Utils;
+using osu.Game.Online.Leaderboards;
 using osuTK.Input;
 
 namespace osu.Game.Screens.Select
@@ -47,11 +49,13 @@ namespace osu.Game.Screens.Select
         private PlayBeatmapDetailArea playBeatmapDetailArea = null!;
 
         [BackgroundDependencyLoader]
-        private void load(OsuColour colours)
+        private void load(OsuColour colours, OsuConfigManager config)
         {
             BeatmapOptions.AddButton(ButtonSystemStrings.Edit.ToSentence(), @"beatmap", FontAwesome.Solid.PencilAlt, colours.Yellow, () => Edit());
 
             AddInternal(new SongSelectTouchInputDetector());
+
+            beatmapDetailTab = config.GetBindable<PlayBeatmapDetailArea.TabType>(OsuSetting.BeatmapDetailTab);
         }
 
         protected void PresentScore(ScoreInfo score) =>
@@ -89,8 +93,7 @@ namespace osu.Game.Screens.Select
 
         private ModAutoplay? getAutoplayMod() => Ruleset.Value.CreateInstance().GetAutoplayMod();
 
-        [Resolved]
-        private OsuConfigManager config { get; set; } = null!;
+        private Bindable<PlayBeatmapDetailArea.TabType> beatmapDetailTab = null!;
 
         protected override bool OnStart()
         {
@@ -122,9 +125,9 @@ namespace osu.Game.Screens.Select
 
             // Default to local leaderboard if the currently selected leaderboard doesn't have scores or is unavailable
             // perhaps because it requires sign in, requires the beatmap to be ranked, etc.
-            bool isLeaderboardSelected = config.Get<PlayBeatmapDetailArea.TabType>(OsuSetting.BeatmapDetailTab) != PlayBeatmapDetailArea.TabType.Details;
-            if (isLeaderboardSelected && !playBeatmapDetailArea.Leaderboard.HasScores())
-                config.SetValue(OsuSetting.BeatmapDetailTab, PlayBeatmapDetailArea.TabType.Local);
+            bool isLeaderboardSelected = beatmapDetailTab.Value != PlayBeatmapDetailArea.TabType.Details;
+            if (isLeaderboardSelected && !(playBeatmapDetailArea.Leaderboard.State == LeaderboardState.Success))
+                beatmapDetailTab.Value = PlayBeatmapDetailArea.TabType.Local;
 
             SampleConfirm?.Play();
 
