@@ -30,7 +30,6 @@ namespace osu.Game.Overlays.Login
         [Resolved]
         private OsuColour colours { get; set; } = null!;
 
-        private UserRankPanel panel = null!;
         private UserDropdown dropdown = null!;
 
         /// <summary>
@@ -131,7 +130,7 @@ namespace osu.Game.Overlays.Login
                                 Text = LoginPanelStrings.SignedIn,
                                 Font = OsuFont.GetFont(size: 18, weight: FontWeight.Bold),
                             },
-                            panel = new UserRankPanel(api.LocalUser.Value)
+                            new UserRankPanel(api.LocalUser.Value)
                             {
                                 RelativeSizeAxes = Axes.X,
                                 Action = RequestHide
