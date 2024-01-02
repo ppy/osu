@@ -23,6 +23,8 @@ using osu.Game.Localisation;
 using osu.Game.Online.Multiplayer;
 using osu.Game.Screens;
 using osu.Game.Screens.Play;
+using osu.Game.Users.Drawables;
+using osuTK;
 
 namespace osu.Game.Users
 {
@@ -77,22 +79,17 @@ namespace osu.Game.Users
         {
             Masking = true;
 
-            AddRange(new[]
+            Add(new Box
             {
-                new Box
-                {
-                    RelativeSizeAxes = Axes.Both,
-                    Colour = ColourProvider?.Background5 ?? Colours.Gray1
-                },
-                Background = new UserCoverBackground
-                {
-                    RelativeSizeAxes = Axes.Both,
-                    Anchor = Anchor.Centre,
-                    Origin = Anchor.Centre,
-                    User = User,
-                },
-                CreateLayout()
+                RelativeSizeAxes = Axes.Both,
+                Colour = ColourProvider?.Background5 ?? Colours.Gray1
             });
+
+            var background = CreateBackground();
+            if (background != null)
+                Add(background);
+
+            Add(CreateLayout());
 
             base.Action = ViewProfile = () =>
             {
@@ -108,6 +105,22 @@ namespace osu.Game.Users
             Font = OsuFont.GetFont(size: 16, weight: FontWeight.Bold),
             Shadow = false,
             Text = User.Username,
+        };
+
+        protected virtual Drawable? CreateBackground() => Background = new UserCoverBackground
+        {
+            RelativeSizeAxes = Axes.Both,
+            Anchor = Anchor.Centre,
+            Origin = Anchor.Centre,
+            User = User
+        };
+
+        protected UpdateableAvatar CreateAvatar() => new UpdateableAvatar(User, false);
+
+        protected UpdateableFlag CreateFlag() => new UpdateableFlag(User.CountryCode)
+        {
+            Size = new Vector2(36, 26),
+            Action = Action,
         };
 
         public MenuItem[] ContextMenuItems
