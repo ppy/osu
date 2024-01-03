@@ -23,7 +23,6 @@ namespace osu.Game.Online.Metadata
         public override IBindable<bool> IsWatchingUserPresence => isWatchingUserPresence;
         private readonly BindableBool isWatchingUserPresence = new BindableBool();
 
-        // ReSharper disable once InconsistentlySynchronizedField
         public override IBindableDictionary<int, UserPresence> UserStates => userStates;
         private readonly BindableDictionary<int, UserPresence> userStates = new BindableDictionary<int, UserPresence>();
 
@@ -192,7 +191,7 @@ namespace osu.Game.Online.Metadata
         {
             Schedule(() =>
             {
-                if (presence != null)
+                if (presence?.Status != null)
                     userStates[userId] = presence.Value;
                 else
                     userStates.Remove(userId);
