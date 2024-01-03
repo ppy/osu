@@ -9,6 +9,7 @@ using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
+using osu.Framework.Utils;
 using osu.Game.Beatmaps;
 using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Overlays;
@@ -155,6 +156,23 @@ namespace osu.Game.Tests.Visual.Online
             AddAssert("visit message is visible", () => boundPanel2.LastVisitMessage.IsPresent);
             AddStep("set online status", () => status.Value = UserStatus.Online);
             AddAssert("visit message is not visible", () => !boundPanel2.LastVisitMessage.IsPresent);
+        }
+
+        [Test]
+        public void TestUserStatisticsChange()
+        {
+            AddStep("update statistics", () =>
+            {
+                API.UpdateStatistics(new UserStatistics
+                {
+                    GlobalRank = RNG.Next(100000),
+                    CountryRank = RNG.Next(100000)
+                });
+            });
+            AddStep("set statistics to empty", () =>
+            {
+                API.UpdateStatistics(new UserStatistics());
+            });
         }
 
         private UserActivity soloGameStatusForRuleset(int rulesetId) => new UserActivity.InSoloGame(new BeatmapInfo(), rulesetStore.GetRuleset(rulesetId)!);
