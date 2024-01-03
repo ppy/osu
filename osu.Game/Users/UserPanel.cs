@@ -100,19 +100,22 @@ namespace osu.Game.Users
 
         protected abstract Drawable CreateLayout();
 
-        protected OsuSpriteText CreateUsername() => new OsuSpriteText
-        {
-            Font = OsuFont.GetFont(size: 16, weight: FontWeight.Bold),
-            Shadow = false,
-            Text = User.Username,
-        };
-
+        /// <summary>
+        /// Panel background container. Can be null if a panel doesn't want a background under it's layout
+        /// </summary>
         protected virtual Drawable? CreateBackground() => Background = new UserCoverBackground
         {
             RelativeSizeAxes = Axes.Both,
             Anchor = Anchor.Centre,
             Origin = Anchor.Centre,
             User = User
+        };
+
+        protected OsuSpriteText CreateUsername() => new OsuSpriteText
+        {
+            Font = OsuFont.GetFont(size: 16, weight: FontWeight.Bold),
+            Shadow = false,
+            Text = User.Username,
         };
 
         protected UpdateableAvatar CreateAvatar() => new UpdateableAvatar(User, false);
