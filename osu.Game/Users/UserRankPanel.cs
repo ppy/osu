@@ -7,6 +7,7 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Input.Events;
 using osu.Framework.Localisation;
+using osu.Game.Online.API;
 using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Overlays.Profile.Header.Components;
 using osu.Game.Resources.Localisation.Web;
@@ -23,6 +24,12 @@ namespace osu.Game.Users
         private const int padding = 10;
         private const int main_content_height = 80;
 
+        [Resolved]
+        private IAPIProvider api { get; set; } = null!;
+
+        private ProfileValueDisplay globalRankDisplay = null!;
+        private ProfileValueDisplay countryRankDisplay = null!;
+
         public UserRankPanel(APIUser user)
             : base(user)
         {
@@ -34,6 +41,12 @@ namespace osu.Game.Users
         private void load()
         {
             BorderColour = ColourProvider?.Light1 ?? Colours.GreyVioletLighter;
+
+            api.Statistics.ValueChanged += e =>
+            {
+                globalRankDisplay.Content = e.NewValue?.GlobalRank?.ToLocalisableString("\\##,##0") ?? (LocalisableString)"-";
+                countryRankDisplay.Content = e.NewValue?.CountryRank?.ToLocalisableString("\\##,##0") ?? (LocalisableString)"-";
+            };
         }
 
         protected override Drawable CreateLayout()
@@ -166,12 +179,12 @@ namespace osu.Game.Users
                             {
                                 new Drawable[]
                                 {
-                                    new ProfileValueDisplay(true)
+                                    globalRankDisplay = new ProfileValueDisplay(true)
                                     {
                                         Title = UsersStrings.ShowRankGlobalSimple,
                                         Content = User.Statistics?.GlobalRank?.ToLocalisableString("\\##,##0") ?? (LocalisableString)"-"
                                     },
-                                    new ProfileValueDisplay(true)
+                                    countryRankDisplay = new ProfileValueDisplay(true)
                                     {
                                         Title = UsersStrings.ShowRankCountrySimple,
                                         Content = User.Statistics?.CountryRank?.ToLocalisableString("\\##,##0") ?? (LocalisableString)"-"
