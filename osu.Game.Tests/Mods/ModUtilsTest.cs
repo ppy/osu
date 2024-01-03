@@ -315,6 +315,10 @@ namespace osu.Game.Tests.Mods
         {
             Assert.AreEqual(ModUtils.FormatScoreMultiplier(0.9999).ToString(), "0.99x");
             Assert.AreEqual(ModUtils.FormatScoreMultiplier(1.0001).ToString(), "1.01x");
+            Assert.AreEqual(ModUtils.FormatScoreMultiplier(0.899999999999999).ToString(), "0.90x");
+            Assert.AreEqual(ModUtils.FormatScoreMultiplier(1.099999999999999).ToString(), "1.10x");
+            Assert.AreEqual(ModUtils.FormatScoreMultiplier(0.900000000000001).ToString(), "0.90x");
+            Assert.AreEqual(ModUtils.FormatScoreMultiplier(1.100000000000001).ToString(), "1.10x");
         }
 
         public abstract class CustomMod1 : Mod, IModCompatibilitySpecification
