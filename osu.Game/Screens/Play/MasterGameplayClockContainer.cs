@@ -41,6 +41,12 @@ namespace osu.Game.Screens.Play
         };
 
         /// <summary>
+        /// Whether the audio playback rate should be validated.
+        /// Mostly disabled for tests.
+        /// </summary>
+        internal bool ShouldValidatePlaybackRate { get; init; }
+
+        /// <summary>
         /// Whether the audio playback is within acceptable ranges.
         /// Will become false if audio playback is not going as expected.
         /// </summary>
@@ -223,6 +229,9 @@ namespace osu.Game.Screens.Play
 
         private void checkPlaybackValidity()
         {
+            if (!ShouldValidatePlaybackRate)
+                return;
+
             if (GameplayClock.IsRunning)
             {
                 elapsedGameplayClockTime += GameplayClock.ElapsedFrameTime;
