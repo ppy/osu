@@ -96,6 +96,7 @@ namespace osu.Game.Users
                                 {
                                     new[]
                                     {
+                                        // padding
                                         Empty(),
                                         Empty(),
                                         Empty(),
@@ -103,7 +104,7 @@ namespace osu.Game.Users
                                     },
                                     new[]
                                     {
-                                        Empty(),
+                                        Empty(), // padding
                                         CreateAvatar().With(avatar =>
                                         {
                                             avatar.Size = new Vector2(60);
@@ -138,6 +139,7 @@ namespace osu.Game.Users
                                                             Children = new Drawable[]
                                                             {
                                                                 CreateFlag(),
+                                                                // supporter icon is being added later
                                                             }
                                                         }
                                                     },
@@ -152,7 +154,7 @@ namespace osu.Game.Users
                                                 }
                                             }
                                         },
-                                        Empty()
+                                        Empty() // padding
                                     }
                                 }
                             }
