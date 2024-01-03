@@ -3,6 +3,8 @@
 
 #nullable disable
 
+#pragma warning disable IDE1006 // Naming rule violation
+
 using System;
 using System.Diagnostics.CodeAnalysis;
 using System.Runtime.InteropServices;
