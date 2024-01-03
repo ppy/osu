@@ -349,6 +349,8 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
             addItemButton.Alpha = localUserCanAddItem ? 1 : 0;
 
             Scheduler.AddOnce(UpdateMods);
+
+            Activity.Value = new UserActivity.InLobby(Room);
         }
 
         private bool localUserCanAddItem => client.IsHost || Room.QueueMode.Value != QueueMode.HostOnly;
