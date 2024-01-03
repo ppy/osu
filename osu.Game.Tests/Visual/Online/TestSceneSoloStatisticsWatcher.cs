@@ -268,6 +268,26 @@ namespace osu.Game.Tests.Visual.Online
             AddAssert("update not received", () => update == null);
         }
 
+        [Test]
+        public void TestGlobalStatisticsUpdatedAfterRegistrationAddedAndScoreProcessed()
+        {
+            int userId = getUserId();
+            long scoreId = getScoreId();
+            setUpUser(userId);
+
+            var ruleset = new OsuRuleset().RulesetInfo;
+
+            SoloStatisticsUpdate? update = null;
+            registerForUpdates(scoreId, ruleset, receivedUpdate => update = receivedUpdate);
+
+            feignScoreProcessing(userId, ruleset, 5_000_000);
+
+            AddStep("signal score processed", () => ((ISpectatorClient)spectatorClient).UserScoreProcessed(userId, scoreId));
+            AddUntilStep("update received", () => update != null);
+            AddAssert("local user values are correct", () => dummyAPI.LocalUser.Value.Statistics.TotalScore, () => Is.EqualTo(5_000_000));
+            AddAssert("statistics values are correct", () => dummyAPI.Statistics.Value!.TotalScore, () => Is.EqualTo(5_000_000));
+        }
+
         private int nextUserId = 2000;
         private long nextScoreId = 50000;
 
