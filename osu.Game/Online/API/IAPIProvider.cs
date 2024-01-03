@@ -29,6 +29,11 @@ namespace osu.Game.Online.API
         IBindable<UserActivity> Activity { get; }
 
         /// <summary>
+        /// The current user's online statistics.
+        /// </summary>
+        IBindable<UserStatistics?> Statistics { get; }
+
+        /// <summary>
         /// The language supplied by this provider to API requests.
         /// </summary>
         Language Language { get; }
@@ -110,6 +115,11 @@ namespace osu.Game.Online.API
         /// Log out the current user.
         /// </summary>
         void Logout();
+
+        /// <summary>
+        /// Sets Statistics bindable.
+        /// </summary>
+        void UpdateStatistics(UserStatistics newStatistics);
 
         /// <summary>
         /// Constructs a new <see cref="IHubClientConnector"/>. May be null if not supported.
