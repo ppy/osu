@@ -153,30 +153,30 @@ namespace osu.Desktop
             }
         }
 
-        public static bool ThreadedOptimisations
+        public static NvThreadControlSetting ThreadedOptimisations
         {
             get
             {
                 if (!Available)
-                    return false;
+                    return NvThreadControlSetting.OGL_THREAD_CONTROL_DEFAULT;
 
                 IntPtr profileHandle;
                 if (!getProfile(out profileHandle, out _, out bool _))
-                    return false;
+                    return NvThreadControlSetting.OGL_THREAD_CONTROL_DEFAULT;
 
                 // Get the threaded optimisations setting
                 NvSetting setting;
                 if (!getSetting(NvSettingID.OGL_THREAD_CONTROL_ID, profileHandle, out setting))
-                    return false;
+                    return NvThreadControlSetting.OGL_THREAD_CONTROL_DEFAULT;
 
-                return setting.U32CurrentValue != (uint)NvThreadControlSetting.OGL_THREAD_CONTROL_DISABLE;
+                return (NvThreadControlSetting)setting.U32CurrentValue;
             }
             set
             {
                 if (!Available)
                     return;
 
-                bool success = setSetting(NvSettingID.OGL_THREAD_CONTROL_ID, (uint)(value ? NvThreadControlSetting.OGL_THREAD_CONTROL_ENABLE : NvThreadControlSetting.OGL_THREAD_CONTROL_DISABLE));
+                bool success = setSetting(NvSettingID.OGL_THREAD_CONTROL_ID, (uint)value);
 
                 Logger.Log(success ? $"Threaded optimizations set to \"{value}\"!" : "Threaded optimizations set failed!");
             }
