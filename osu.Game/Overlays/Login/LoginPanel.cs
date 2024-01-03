@@ -143,6 +143,8 @@ namespace osu.Game.Overlays.Login
                     panel.Status.BindTo(api.LocalUser.Value.Status);
                     panel.Activity.BindTo(api.LocalUser.Value.Activity);
 
+                    panel.Status.BindValueChanged(_ => updateDropdownCurrent(), true);
+
                     dropdown.Current.BindValueChanged(action =>
                     {
                         switch (action.NewValue)
@@ -173,6 +175,24 @@ namespace osu.Game.Overlays.Login
             if (form != null)
                 ScheduleAfterChildren(() => GetContainingInputManager()?.ChangeFocus(form));
         });
+
+        private void updateDropdownCurrent()
+        {
+            switch (panel.Status.Value)
+            {
+                case UserStatus.Online:
+                    dropdown.Current.Value = UserAction.Online;
+                    break;
+
+                case UserStatus.DoNotDisturb:
+                    dropdown.Current.Value = UserAction.DoNotDisturb;
+                    break;
+
+                case UserStatus.Offline:
+                    dropdown.Current.Value = UserAction.AppearOffline;
+                    break;
+            }
+        }
 
         public override bool AcceptsFocus => true;
 
