@@ -523,6 +523,9 @@ namespace osu.Game.Online.API
         public void UpdateStatistics(UserStatistics newStatistics)
         {
             statistics.Value = newStatistics;
+
+            if (IsLoggedIn)
+                localUser.Value.Statistics = newStatistics;
         }
 
         private static APIUser createGuestUser() => new GuestUser();

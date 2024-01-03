@@ -137,6 +137,9 @@ namespace osu.Game.Online.API
         public void UpdateStatistics(UserStatistics newStatistics)
         {
             Statistics.Value = newStatistics;
+
+            if (IsLoggedIn)
+                LocalUser.Value.Statistics = newStatistics;
         }
 
         public IHubClientConnector? GetHubConnector(string clientName, string endpoint, bool preferMessagePack) => null;
