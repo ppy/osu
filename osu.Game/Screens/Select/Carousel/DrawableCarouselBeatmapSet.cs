@@ -5,6 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
@@ -46,6 +47,8 @@ namespace osu.Game.Screens.Select.Carousel
 
         private MenuItem[]? mainMenuItems;
 
+        private double timeSinceUnpool;
+
         [Resolved]
         private BeatmapManager manager { get; set; } = null!;
 
@@ -54,6 +57,7 @@ namespace osu.Game.Screens.Select.Carousel
             base.FreeAfterUse();
 
             Item = null;
+            timeSinceUnpool = 0;
 
             ClearTransforms();
         }
@@ -92,13 +96,21 @@ namespace osu.Game.Screens.Select.Carousel
                 // algorithm for this is taken from ScrollContainer.
                 // while it doesn't necessarily need to match 1:1, as we are emulating scroll in some cases this feels most correct.
                 Y = (float)Interpolation.Lerp(targetY, Y, Math.Exp(-0.01 * Time.Elapsed));
+
+            loadContentIfRequired();
         }
+
+        private CancellationTokenSource? loadCancellation;
 
         protected override void UpdateItem()
         {
+            loadCancellation?.Cancel();
+            loadCancellation = null;
+
             base.UpdateItem();
 
             Content.Clear();
+            Header.Clear();
 
             beatmapContainer = null;
             beatmapsLoadTask = null;
@@ -107,31 +119,7 @@ namespace osu.Game.Screens.Select.Carousel
                 return;
 
             beatmapSet = ((CarouselBeatmapSet)Item).BeatmapSet;
-
-            DelayedLoadWrapper background;
-            DelayedLoadWrapper mainFlow;
-
-            Header.Children = new Drawable[]
-            {
-                // Choice of background image matches BSS implementation (always uses the lowest `beatmap_id` from the set).
-                background = new DelayedLoadWrapper(() => new SetPanelBackground(manager.GetWorkingBeatmap(beatmapSet.Beatmaps.MinBy(b => b.OnlineID)))
-                {
-                    RelativeSizeAxes = Axes.Both,
-                }, 200)
-                {
-                    RelativeSizeAxes = Axes.Both
-                },
-                mainFlow = new DelayedLoadWrapper(() => new SetPanelContent((CarouselBeatmapSet)Item), 50)
-                {
-                    RelativeSizeAxes = Axes.Both
-                },
-            };
-
-            background.DelayedLoadComplete += fadeContentIn;
-            mainFlow.DelayedLoadComplete += fadeContentIn;
         }
-
-        private void fadeContentIn(Drawable d) => d.FadeInFromZero(150);
 
         protected override void Deselected()
         {
@@ -187,6 +175,43 @@ namespace osu.Game.Screens.Select.Carousel
                     Content.Child = loaded;
                     updateBeatmapYPositions();
                 });
+            }
+        }
+
+        private void loadContentIfRequired()
+        {
+            // Using DelayedLoadWrappers would only allow us to load content when on screen, but we want to preload while off-screen
+            // to provide a better user experience.
+
+            // This is tracking time that this drawable is updating since the last pool.
+            // This is intended to provide a debounce so very fast scrolls (from one end to the other of the carousel)
+            // don't cause huge overheads.
+            const double time_updating_before_load = 150;
+
+            Debug.Assert(Item != null);
+
+            if (loadCancellation == null && (timeSinceUnpool += Time.Elapsed) > time_updating_before_load)
+            {
+                loadCancellation = new CancellationTokenSource();
+
+                LoadComponentAsync(new SetPanelBackground(manager.GetWorkingBeatmap(beatmapSet.Beatmaps.MinBy(b => b.OnlineID)))
+                {
+                    RelativeSizeAxes = Axes.Both,
+                }, background =>
+                {
+                    Header.Add(background);
+                    background.FadeInFromZero(150);
+                }, loadCancellation.Token);
+
+                LoadComponentAsync(new SetPanelContent((CarouselBeatmapSet)Item)
+                {
+                    Depth = float.MinValue,
+                    RelativeSizeAxes = Axes.Both,
+                }, mainFlow =>
+                {
+                    Header.Add(mainFlow);
+                    mainFlow.FadeInFromZero(150);
+                }, loadCancellation.Token);
             }
         }
 
