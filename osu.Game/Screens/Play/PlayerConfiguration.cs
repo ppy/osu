@@ -31,6 +31,11 @@ namespace osu.Game.Screens.Play
         public bool AllowSkipping { get; set; } = true;
 
         /// <summary>
+        /// Whether the player should be allowed to skip breaks.
+        /// </summary>
+        public bool AllowBreakSkipping { get; set; } = true;
+
+        /// <summary>
         /// Whether the intro should be skipped by default.
         /// </summary>
         public bool AutomaticallySkipIntro { get; set; }

@@ -43,6 +43,14 @@ namespace osu.Game.Utils
             var nearest = periods[nearestIndex];
             return time >= nearest.Start && time <= nearest.End;
         }
+
+        public Period? GetPeriodIfAny(double time)
+        {
+            if (IsInAny(time))
+                return periods[nearestIndex];
+
+            return null;
+        }
     }
 
     public readonly struct Period

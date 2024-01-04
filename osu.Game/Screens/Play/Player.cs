@@ -404,7 +404,8 @@ namespace osu.Game.Screens.Play
                         new ComboEffects(ScoreProcessor),
                         breakTracker = new BreakTracker(DrawableRuleset.GameplayStartTime, ScoreProcessor)
                         {
-                            Breaks = working.Beatmap.Breaks
+                            Breaks = working.Beatmap.Breaks,
+                            SkipBreak = performRequestedBreakSkip
                         }
                     }),
             }
@@ -475,6 +476,10 @@ namespace osu.Game.Screens.Play
                 skipIntroOverlay.Expire();
                 skipOutroOverlay.Expire();
             }
+
+            if (!Configuration.AllowBreakSkipping || !DrawableRuleset.AllowGameplayOverlays)
+                // Disallow break skipping, by making the `SkipBreak` function useless.
+                breakTracker.SkipBreak = () => { };
 
             if (GameplayClockContainer is MasterGameplayClockContainer master)
                 HUDOverlay.PlayerSettingsOverlay.PlaybackSettings.UserPlaybackRate.BindTarget = master.UserPlaybackRate;
@@ -626,6 +631,20 @@ namespace osu.Game.Screens.Play
             }
 
             return true;
+        }
+
+        private void performRequestedBreakSkip()
+        {
+            double endTime = breakTracker.CurrentBreak.EndTime - 1000;
+
+            if (GameplayClockContainer.CurrentTime >= endTime)
+                return;
+
+            samplePlaybackDisabled.Value = true;
+
+            Seek(endTime);
+
+            updateSampleDisabledState();
         }
 
         private void performUserRequestedSkip()
