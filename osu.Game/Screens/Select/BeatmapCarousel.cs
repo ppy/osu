@@ -96,12 +96,12 @@ namespace osu.Game.Screens.Select
         /// <summary>
         /// Extend the range to retain already loaded pooled drawables.
         /// </summary>
-        private const float distance_offscreen_before_unload = 1024;
+        private const float distance_offscreen_before_unload = 2048;
 
         /// <summary>
         /// Extend the range to update positions / retrieve pooled drawables outside of visible range.
         /// </summary>
-        private const float distance_offscreen_to_preload = 512; // todo: adjust this appropriately once we can make set panel contents load while off-screen.
+        private const float distance_offscreen_to_preload = 768;
 
         /// <summary>
         /// Whether carousel items have completed asynchronously loaded.
