@@ -36,6 +36,8 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
 
         private ShakeContainer shakeContainer;
 
+        private Vector2? childAnchorPosition;
+
         protected override IEnumerable<Drawable> DimmablePieces => new Drawable[]
         {
             HeadCircle,
@@ -254,10 +256,15 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
 
             if (DrawSize != Vector2.Zero)
             {
-                var childAnchorPosition = Vector2.Divide(OriginPosition, DrawSize);
-                foreach (var obj in NestedHitObjects)
-                    obj.RelativeAnchorPosition = childAnchorPosition;
-                Ball.RelativeAnchorPosition = childAnchorPosition;
+                Vector2 pos = Vector2.Divide(OriginPosition, DrawSize);
+
+                if (pos != childAnchorPosition)
+                {
+                    childAnchorPosition = pos;
+                    foreach (var obj in NestedHitObjects)
+                        obj.RelativeAnchorPosition = pos;
+                    Ball.RelativeAnchorPosition = pos;
+                }
             }
         }
 
