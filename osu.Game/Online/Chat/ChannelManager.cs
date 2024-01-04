@@ -247,7 +247,7 @@ namespace osu.Game.Online.Chat
             string command = parameters[0];
             string content = parameters.Length == 2 ? parameters[1] : string.Empty;
 
-            switch (command)
+            switch (command.ToLowerInvariant())
             {
                 case "np":
                     AddInternal(new NowPlayingCommand(target));
