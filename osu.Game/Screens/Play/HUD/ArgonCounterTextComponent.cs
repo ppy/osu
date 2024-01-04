@@ -2,6 +2,8 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
+using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
 using osu.Framework.Allocation;
@@ -137,33 +139,48 @@ namespace osu.Game.Screens.Play.HUD
             [BackgroundDependencyLoader]
             private void load(TextureStore textures)
             {
+                const string font_name = @"argon-counter";
+
                 Spacing = new Vector2(-2f, 0f);
-                Font = new FontUsage(@"argon-counter", 1);
-                glyphStore = new GlyphStore(textures, getLookup);
+                Font = new FontUsage(font_name, 1);
+                glyphStore = new GlyphStore(font_name, textures, getLookup);
             }
 
             protected override TextBuilder CreateTextBuilder(ITexturedGlyphLookupStore store) => base.CreateTextBuilder(glyphStore);
 
             private class GlyphStore : ITexturedGlyphLookupStore
             {
+                private readonly string fontName;
                 private readonly TextureStore textures;
                 private readonly Func<char, string> getLookup;
 
-                public GlyphStore(TextureStore textures, Func<char, string> getLookup)
+                private readonly Dictionary<char, ITexturedCharacterGlyph?> cache = new Dictionary<char, ITexturedCharacterGlyph?>();
+
+                public GlyphStore(string fontName, TextureStore textures, Func<char, string> getLookup)
                 {
+                    this.fontName = fontName;
                     this.textures = textures;
                     this.getLookup = getLookup;
                 }
 
                 public ITexturedCharacterGlyph? Get(string? fontName, char character)
                 {
+                    // We only service one font.
+                    Debug.Assert(fontName == this.fontName);
+
+                    if (cache.TryGetValue(character, out var cached))
+                        return cached;
+
                     string lookup = getLookup(character);
                     var texture = textures.Get($"Gameplay/Fonts/{fontName}-{lookup}");
 
-                    if (texture == null)
-                        return null;
+                    TexturedCharacterGlyph? glyph = null;
 
-                    return new TexturedCharacterGlyph(new CharacterGlyph(character, 0, 0, texture.Width, texture.Height, null), texture, 0.125f);
+                    if (texture != null)
+                        glyph = new TexturedCharacterGlyph(new CharacterGlyph(character, 0, 0, texture.Width, texture.Height, null), texture, 0.125f);
+
+                    cache[character] = glyph;
+                    return glyph;
                 }
 
                 public Task<ITexturedCharacterGlyph?> GetAsync(string fontName, char character) => Task.Run(() => Get(fontName, character));
