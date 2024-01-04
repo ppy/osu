@@ -413,7 +413,6 @@ namespace osu.Game.Rulesets.Scoring
             TotalScore.Value = 0;
             Accuracy.Value = 1;
             Combo.Value = 0;
-            rank.Disabled = false;
             rank.Value = ScoreRank.X;
             HighestCombo.Value = 0;
         }
