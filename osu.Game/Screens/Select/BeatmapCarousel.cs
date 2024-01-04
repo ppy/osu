@@ -108,6 +108,7 @@ namespace osu.Game.Screens.Select
         /// </summary>
         public bool BeatmapSetsLoaded { get; private set; }
 
+        [Cached]
         protected readonly CarouselScrollContainer Scroll;
 
         private readonly NoResultsPlaceholder noResultsPlaceholder;
@@ -1251,7 +1252,7 @@ namespace osu.Game.Screens.Select
             }
         }
 
-        protected partial class CarouselScrollContainer : UserTrackingScrollContainer<DrawableCarouselItem>
+        public partial class CarouselScrollContainer : UserTrackingScrollContainer<DrawableCarouselItem>
         {
             private bool rightMouseScrollBlocked;
 
