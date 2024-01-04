@@ -86,7 +86,9 @@ namespace osu.Game.Rulesets.Scoring
         /// <summary>
         /// The current rank.
         /// </summary>
-        public readonly Bindable<ScoreRank> Rank = new Bindable<ScoreRank>(ScoreRank.X);
+        public IBindable<ScoreRank> Rank => rank;
+
+        private readonly Bindable<ScoreRank> rank = new Bindable<ScoreRank>(ScoreRank.X);
 
         /// <summary>
         /// The highest combo achieved by this score.
@@ -186,9 +188,9 @@ namespace osu.Game.Rulesets.Scoring
             Combo.ValueChanged += combo => HighestCombo.Value = Math.Max(HighestCombo.Value, combo.NewValue);
             Accuracy.ValueChanged += accuracy =>
             {
-                Rank.Value = RankFromAccuracy(accuracy.NewValue);
+                rank.Value = RankFromAccuracy(accuracy.NewValue);
                 foreach (var mod in Mods.Value.OfType<IApplicableToScoreProcessor>())
-                    Rank.Value = mod.AdjustRank(Rank.Value, accuracy.NewValue);
+                    rank.Value = mod.AdjustRank(Rank.Value, accuracy.NewValue);
             };
 
             Mods.ValueChanged += mods =>
@@ -411,8 +413,8 @@ namespace osu.Game.Rulesets.Scoring
             TotalScore.Value = 0;
             Accuracy.Value = 1;
             Combo.Value = 0;
-            Rank.Disabled = false;
-            Rank.Value = ScoreRank.X;
+            rank.Disabled = false;
+            rank.Value = ScoreRank.X;
             HighestCombo.Value = 0;
         }
 
@@ -448,7 +450,7 @@ namespace osu.Game.Rulesets.Scoring
                 return;
 
             score.Passed = false;
-            Rank.Value = ScoreRank.F;
+            rank.Value = ScoreRank.F;
 
             PopulateScore(score);
         }
