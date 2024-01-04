@@ -275,7 +275,7 @@ Phasellus eu nunc nec ligula semper fringilla. Aliquam magna neque, placerat sed
             AddStep("set content", () =>
             {
                 markdownContainer.Text = @"
-This is a paragraph containing `inline code` synatax.
+This is a paragraph containing `inline code` syntax.
 Oh wow I do love the `WikiMarkdownContainer`, it is very cool!
 
 This is a line before the fenced code block:
