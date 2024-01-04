@@ -112,7 +112,7 @@ namespace osu.Game.Tests.Chat
             });
 
             AddStep("post message", () => channelManager.PostMessage("Something interesting"));
-            AddUntilStep("message postesd", () => !channel.Messages.Any(m => m is LocalMessage));
+            AddUntilStep("message posted", () => !channel.Messages.Any(m => m is LocalMessage));
 
             AddStep("post /help command", () => channelManager.PostCommand("help", channel));
             AddStep("post /me command with no action", () => channelManager.PostCommand("me", channel));
@@ -144,6 +144,23 @@ namespace osu.Game.Tests.Chat
             });
 
             AddAssert("channel has no more messages", () => channel.Messages, () => Is.Empty);
+        }
+
+        [Test]
+        public void TestCommandNameCaseInsensitivity()
+        {
+            Channel channel = null;
+
+            AddStep("join channel and select it", () =>
+            {
+                channelManager.JoinChannel(channel = createChannel(1, ChannelType.Public));
+                channelManager.CurrentChannel.Value = channel;
+            });
+
+            AddStep("post /me command", () => channelManager.PostCommand("ME DANCES"));
+            AddUntilStep("/me command received", () => channel.Messages.Last().Content.Contains("DANCES"));
+            AddStep("post /help command", () => channelManager.PostCommand("HeLp"));
+            AddUntilStep("/help command received", () => channel.Messages.Last().Content.Contains("Supported commands"));
         }
 
         private void handlePostMessageRequest(PostMessageRequest request)
