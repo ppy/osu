@@ -19,7 +19,7 @@ namespace osu.Game.Overlays
 {
     public partial class WikiOverlay : OnlineOverlay<WikiHeader>
     {
-        private const string index_path = @"main_page";
+        private const string index_path = "Main_page";
 
         public string CurrentPath => path.Value;
 
@@ -161,7 +161,7 @@ namespace osu.Game.Overlays
             path.Value = "error";
 
             LoadDisplay(articlePage = new WikiArticlePage($@"{api.WebsiteRootUrl}/wiki/",
-                $"Something went wrong when trying to fetch page \"{originalPath}\".\n\n[Return to the main page](Main_Page)."));
+                $"Something went wrong when trying to fetch page \"{originalPath}\".\n\n[Return to the main page](Main_page)."));
         }
 
         private void showParentPage()
