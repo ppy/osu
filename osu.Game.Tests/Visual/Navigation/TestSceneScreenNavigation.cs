@@ -799,11 +799,7 @@ namespace osu.Game.Tests.Visual.Navigation
                 });
             });
 
-            AddStep("attempt exit", () =>
-            {
-                for (int i = 0; i < 2; ++i)
-                    Game.ScreenStack.CurrentScreen.Exit();
-            });
+            AddRepeatStep("attempt force exit", () => Game.ScreenStack.CurrentScreen.Exit(), 2);
             AddUntilStep("stopped at exit confirm", () => Game.ChildrenOfType<DialogOverlay>().Single().CurrentDialog is ConfirmExitDialog);
         }
 
