@@ -43,7 +43,7 @@ namespace osu.Game.Overlays
         /// <summary>
         /// Whether user control of the global track should be allowed.
         /// </summary>
-        public readonly BindableBool AllowTrackControl = new BindableBool(true);
+        public readonly BindableBool AllowTrackControl = new BindableBool(false);
 
         /// <summary>
         /// Fired when the global <see cref="WorkingBeatmap"/> has changed.
