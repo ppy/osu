@@ -188,6 +188,10 @@ namespace osu.Game.Rulesets.Scoring
             Combo.ValueChanged += combo => HighestCombo.Value = Math.Max(HighestCombo.Value, combo.NewValue);
             Accuracy.ValueChanged += accuracy =>
             {
+                // Once failed, we shouldn't update the rank anymore.
+                if (rank.Value == ScoreRank.F)
+                    return;
+
                 rank.Value = RankFromAccuracy(accuracy.NewValue);
                 foreach (var mod in Mods.Value.OfType<IApplicableToScoreProcessor>())
                     rank.Value = mod.AdjustRank(Rank.Value, accuracy.NewValue);
