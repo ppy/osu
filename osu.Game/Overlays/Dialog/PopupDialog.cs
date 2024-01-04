@@ -32,7 +32,7 @@ namespace osu.Game.Overlays.Dialog
         private readonly Vector2 ringMinifiedSize = new Vector2(20f);
 
         private readonly Box flashLayer;
-        private Sample flashSample = null!;
+        private Sample? flashSample;
 
         private readonly Container content;
         private readonly Container ring;
@@ -267,7 +267,7 @@ namespace osu.Game.Overlays.Dialog
             flashLayer.FadeInFromZero(80, Easing.OutQuint)
                       .Then()
                       .FadeOutFromOne(1500, Easing.OutQuint);
-            flashSample.Play();
+            flashSample?.Play();
         }
 
         protected override bool OnKeyDown(KeyDownEvent e)
