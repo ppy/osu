@@ -8,9 +8,11 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using osu.Framework.Allocation;
+using osu.Framework.Extensions.IEnumerableExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Cursor;
+using osu.Framework.Graphics.Primitives;
 using osu.Framework.Graphics.UserInterface;
 using osu.Framework.Utils;
 using osu.Game.Beatmaps;
@@ -178,39 +180,44 @@ namespace osu.Game.Screens.Select.Carousel
             }
         }
 
+        [Resolved]
+        private BeatmapCarousel.CarouselScrollContainer scrollContainer { get; set; } = null!;
+
         private void loadContentIfRequired()
         {
+            Quad containingSsdq = scrollContainer.ScreenSpaceDrawQuad;
+
             // Using DelayedLoadWrappers would only allow us to load content when on screen, but we want to preload while off-screen
             // to provide a better user experience.
 
             // This is tracking time that this drawable is updating since the last pool.
             // This is intended to provide a debounce so very fast scrolls (from one end to the other of the carousel)
             // don't cause huge overheads.
-            const double time_updating_before_load = 150;
+            //
+            // We increase the delay based on distance from centre, so the beatmaps the user is currently looking at load first.
+            float timeUpdatingBeforeLoad = 50 + Math.Abs(containingSsdq.Centre.Y - ScreenSpaceDrawQuad.Centre.Y) / containingSsdq.Height * 100;
 
             Debug.Assert(Item != null);
 
-            if (loadCancellation == null && (timeSinceUnpool += Time.Elapsed) > time_updating_before_load)
+            if (loadCancellation == null && (timeSinceUnpool += Time.Elapsed) > timeUpdatingBeforeLoad)
             {
                 loadCancellation = new CancellationTokenSource();
 
-                LoadComponentAsync(new SetPanelBackground(manager.GetWorkingBeatmap(beatmapSet.Beatmaps.MinBy(b => b.OnlineID)))
+                LoadComponentsAsync(new CompositeDrawable[]
                 {
-                    RelativeSizeAxes = Axes.Both,
-                }, background =>
+                    new SetPanelBackground(manager.GetWorkingBeatmap(beatmapSet.Beatmaps.MinBy(b => b.OnlineID)))
+                    {
+                        RelativeSizeAxes = Axes.Both,
+                    },
+                    new SetPanelContent((CarouselBeatmapSet)Item)
+                    {
+                        Depth = float.MinValue,
+                        RelativeSizeAxes = Axes.Both,
+                    }
+                }, drawables =>
                 {
-                    Header.Add(background);
-                    background.FadeInFromZero(150);
-                }, loadCancellation.Token);
-
-                LoadComponentAsync(new SetPanelContent((CarouselBeatmapSet)Item)
-                {
-                    Depth = float.MinValue,
-                    RelativeSizeAxes = Axes.Both,
-                }, mainFlow =>
-                {
-                    Header.Add(mainFlow);
-                    mainFlow.FadeInFromZero(150);
+                    Header.AddRange(drawables);
+                    drawables.ForEach(d => d.FadeInFromZero(150));
                 }, loadCancellation.Token);
             }
         }
