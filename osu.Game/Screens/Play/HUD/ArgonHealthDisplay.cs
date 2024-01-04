@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
+using osu.Framework.Caching;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Extensions.ObjectExtensions;
 using osu.Framework.Graphics;
@@ -68,11 +69,11 @@ namespace osu.Game.Screens.Play.HUD
             get => glowBarValue;
             set
             {
-                if (glowBarValue == value)
+                if (Precision.AlmostEquals(glowBarValue, value, 0.0001))
                     return;
 
                 glowBarValue = value;
-                Scheduler.AddOnce(updatePathVertices);
+                pathVerticesCache.Invalidate();
             }
         }
 
@@ -83,11 +84,11 @@ namespace osu.Game.Screens.Play.HUD
             get => healthBarValue;
             set
             {
-                if (healthBarValue == value)
+                if (Precision.AlmostEquals(healthBarValue, value, 0.0001))
                     return;
 
                 healthBarValue = value;
-                Scheduler.AddOnce(updatePathVertices);
+                pathVerticesCache.Invalidate();
             }
         }
 
@@ -99,6 +100,8 @@ namespace osu.Game.Screens.Play.HUD
         private const float curve_smoothness = 10;
 
         private readonly LayoutValue drawSizeLayout = new LayoutValue(Invalidation.DrawSize);
+
+        private readonly Cached pathVerticesCache = new Cached();
 
         public ArgonHealthDisplay()
         {
@@ -207,6 +210,9 @@ namespace osu.Game.Screens.Play.HUD
                 updatePath();
                 drawSizeLayout.Validate();
             }
+
+            if (!pathVerticesCache.IsValid)
+                updatePathVertices();
 
             mainBar.Alpha = (float)Interpolation.DampContinuously(mainBar.Alpha, Current.Value > 0 ? 1 : 0, 40, Time.Elapsed);
             glowBar.Alpha = (float)Interpolation.DampContinuously(glowBar.Alpha, GlowBarValue > 0 ? 1 : 0, 40, Time.Elapsed);
@@ -346,6 +352,8 @@ namespace osu.Game.Screens.Play.HUD
 
             mainBar.Vertices = healthBarVertices.Select(v => v - healthBarVertices[0]).ToList();
             mainBar.Position = healthBarVertices[0];
+
+            pathVerticesCache.Validate();
         }
 
         protected override void Dispose(bool isDisposing)
