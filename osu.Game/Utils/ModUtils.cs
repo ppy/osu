@@ -8,6 +8,7 @@ using System.Linq;
 using osu.Game.Online.API;
 using osu.Game.Rulesets;
 using osu.Game.Rulesets.Mods;
+using osu.Game.Beatmaps;
 
 namespace osu.Game.Utils
 {
@@ -225,6 +226,30 @@ namespace osu.Game.Utils
             }
 
             return proposedWereValid;
+        }
+
+        /// <summary>
+        /// Checks if there are redundant <see cref="Mod"/>s in a combination.
+        /// </summary>
+        /// <param name="combination">The <see cref="Mod"/>s combination to check.</param>
+        /// <param name="removedMods">The set of <see cref="Mod"/>s to be removed.</param>
+        /// <param name="beatmap">The <see cref="IBeatmap"/> implementation to test against.</param>
+        /// <returns>Whether there are redundant <see cref="Mod"/>s in the combination.</returns>
+        public static bool RemoveRedundantMods(IEnumerable<Mod> combination, [NotNullWhen(true)] out List<Mod>? removedMods, IBeatmap beatmap)
+        {
+            var mods = FlattenMods(combination).ToArray();
+            removedMods = null;
+
+            foreach (var mod in mods)
+            {
+                if (mod.IsRedundant(beatmap))
+                {
+                    removedMods ??= new List<Mod>();
+                    removedMods.Add(mod);
+                }
+            }
+
+            return removedMods != null;
         }
     }
 }

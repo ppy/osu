@@ -3,6 +3,7 @@
 
 using System;
 using System.Diagnostics;
+using System.Linq;
 using System.Threading.Tasks;
 using ManagedBass.Fx;
 using osu.Framework.Allocation;
@@ -24,6 +25,7 @@ using osu.Game.Input;
 using osu.Game.Localisation;
 using osu.Game.Overlays;
 using osu.Game.Overlays.Notifications;
+using osu.Game.Rulesets.Mods;
 using osu.Game.Screens.Menu;
 using osu.Game.Screens.Play.PlayerSettings;
 using osu.Game.Skinning;
@@ -390,6 +392,27 @@ namespace osu.Game.Screens.Play
                 return;
 
             CurrentPlayer = createPlayer();
+
+            if (CurrentPlayer is not ReplayPlayer || Mods.Value.OfType<ICreateReplayData>().Any())
+            {
+                var validMods = Mods.Value.ToArray();
+
+                if (ModUtils.RemoveRedundantMods(validMods, out var removed, Beatmap.Value.Beatmap))
+                {
+                    validMods = validMods.Except(removed).ToArray();
+
+                    string[] removedModsNames = new string[removed.Count];
+                    for (int i = 0; i < removed.Count; i++)
+                    {
+                        removedModsNames[i] = removed[i].Name;
+                    }
+
+                    notificationOverlay?.Post(new RedundantModsNotification(removedModsNames));
+                }
+
+                Mods.Value = validMods;
+            }
+
             CurrentPlayer.Configuration.AutomaticallySkipIntro |= quickRestart;
             CurrentPlayer.RestartCount = restartCount++;
             CurrentPlayer.RestartRequested = restartRequested;

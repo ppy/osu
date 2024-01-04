@@ -96,6 +96,8 @@ namespace osu.Game.Tests.Visual.Gameplay
             });
 
             AddUntilStep("wait for no notifications", () => notificationOverlay.UnreadCount.Value, () => Is.EqualTo(0));
+
+            AddStep("reset mods", () => SelectedMods.Value = Array.Empty<Mod>());
         }
 
         /// <summary>
@@ -262,6 +264,41 @@ namespace osu.Game.Tests.Visual.Gameplay
             AddUntilStep("wait for loader to become current", () => loader.IsCurrentScreen());
             AddStep("set test mod in loader", () => loader.Mods.Value = new[] { testMod });
             AddAssert("test mod is displayed", () => (TestMod)loader.DisplayedMods.Single() == testMod);
+        }
+
+        [Test]
+        public void TestRemovingRedundantModsOnEnteringGameplay()
+        {
+            OsuModDifficultyAdjust playerMod = null;
+            AddStep("load player", () => { resetPlayer(true, () => SelectedMods.Value = new[] { playerMod = new OsuModDifficultyAdjust() }); });
+
+            AddUntilStep("wait for non-null player", () => player != null);
+            AddAssert("redundant mods have been removed", () => !player.Mods.Value.Contains(playerMod));
+
+            clickNotification();
+        }
+
+        [Test]
+        public void TestRemovingRedundantModsWithAutoplayMod()
+        {
+            OsuModDifficultyAdjust playerMod = null;
+            AddStep("load player with autoplay mod", () => { resetPlayer(true, () => SelectedMods.Value = new Mod[] { playerMod = new OsuModDifficultyAdjust(), new OsuModAutoplay() }); });
+
+            AddUntilStep("wait for non-null player", () => player != null);
+            AddAssert("redundant mods have been removed", () => !player.Mods.Value.Contains(playerMod));
+
+            clickNotification();
+        }
+
+        [Test]
+        public void TestRedundantModsNotification()
+        {
+            AddStep("load player", () => { resetPlayer(true, () => SelectedMods.Value = new[] { new OsuModDifficultyAdjust() }); });
+
+            AddUntilStep("wait for non-null player", () => player != null);
+            AddAssert("check for notification", () => notificationOverlay.UnreadCount.Value, () => Is.EqualTo(1));
+
+            clickNotification();
         }
 
         [Test]

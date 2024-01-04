@@ -72,6 +72,111 @@ namespace osu.Game.Rulesets.Osu.Tests.Mods
             PassCondition = () => checkSomeHit() && checkObjectsPreempt(450)
         });
 
+        [Test]
+        public void TestRedundancyOnNullValues() => CreateModTest(new ModTestData
+        {
+            Mod = new OsuModDifficultyAdjust(),
+            Beatmap = new Beatmap
+            {
+                HitObjects = new List<HitObject>
+                {
+                    new HitCircle { StartTime = 1000 },
+                    new HitCircle { StartTime = 2000 }
+                }
+            },
+            PassCondition = () => checkRedundancy()
+        });
+
+        [Test]
+        public void TestRedundancyOnSameValues() => CreateModTest(new ModTestData
+        {
+            Mod = new OsuModDifficultyAdjust { CircleSize = { Value = 8 }, ApproachRate = { Value = 8 } },
+            Beatmap = new Beatmap
+            {
+                BeatmapInfo = new BeatmapInfo
+                {
+                    Difficulty = new BeatmapDifficulty
+                    {
+                        CircleSize = 8,
+                        ApproachRate = 8
+                    }
+                },
+                HitObjects = new List<HitObject>
+                {
+                    new HitCircle { StartTime = 1000 },
+                    new HitCircle { StartTime = 2000 }
+                }
+            },
+            PassCondition = () => checkRedundancy()
+        });
+
+        [Test]
+        public void TestNonRedundancyOnDifferentCircleSize() => CreateModTest(new ModTestData
+        {
+            Mod = new OsuModDifficultyAdjust { CircleSize = { Value = 10 } },
+            Beatmap = new Beatmap
+            {
+                BeatmapInfo = new BeatmapInfo
+                {
+                    Difficulty = new BeatmapDifficulty
+                    {
+                        CircleSize = 8
+                    }
+                },
+                HitObjects = new List<HitObject>
+                {
+                    new HitCircle { StartTime = 1000 },
+                    new HitCircle { StartTime = 2000 }
+                }
+            },
+            PassCondition = () => !checkRedundancy()
+        });
+
+        [Test]
+        public void TestNonRedundancyOnDifferentApproachRate() => CreateModTest(new ModTestData
+        {
+            Mod = new OsuModDifficultyAdjust { ApproachRate = { Value = 10 } },
+            Beatmap = new Beatmap
+            {
+                BeatmapInfo = new BeatmapInfo
+                {
+                    Difficulty = new BeatmapDifficulty
+                    {
+                        ApproachRate = 8
+                    }
+                },
+                HitObjects = new List<HitObject>
+                {
+                    new HitCircle { StartTime = 1000 },
+                    new HitCircle { StartTime = 2000 }
+                }
+            },
+            PassCondition = () => !checkRedundancy()
+        });
+
+        [Test]
+        public void TestNonRedundancyOnSameCSButDifferentAR() => CreateModTest(new ModTestData
+        {
+            Mod = new OsuModDifficultyAdjust { CircleSize = { Value = 8 }, ApproachRate = { Value = 10 } },
+            Beatmap = new Beatmap
+            {
+                BeatmapInfo = new BeatmapInfo
+                {
+                    Difficulty = new BeatmapDifficulty
+                    {
+                        CircleSize = 8,
+                        ApproachRate = 8
+                    }
+                },
+                HitObjects = new List<HitObject>
+                {
+                    new HitCircle { StartTime = 1000 },
+                    new HitCircle { StartTime = 2000 }
+                }
+            },
+            PassCondition = () => !checkRedundancy()
+        });
+
         private bool checkObjectsPreempt(double target)
         {
             var objects = Player.ChildrenOfType<DrawableHitCircle>();
@@ -93,6 +198,11 @@ namespace osu.Game.Rulesets.Osu.Tests.Mods
         private bool checkSomeHit()
         {
             return Player.ScoreProcessor.JudgedHits >= 2;
+        }
+
+        private bool checkRedundancy()
+        {
+            return CurrentTestData.Mods.Single(mod => mod.GetType() == typeof(OsuModDifficultyAdjust)).IsRedundant(CurrentTestData.Beatmap);
         }
     }
 }

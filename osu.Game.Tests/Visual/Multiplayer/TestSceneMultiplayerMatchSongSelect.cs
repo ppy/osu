@@ -11,13 +11,16 @@ using osu.Framework.Allocation;
 using osu.Framework.Audio;
 using osu.Framework.Bindables;
 using osu.Framework.Extensions.TypeExtensions;
+using osu.Framework.Graphics;
 using osu.Framework.Platform;
 using osu.Framework.Screens;
 using osu.Framework.Testing;
 using osu.Game.Beatmaps;
 using osu.Game.Database;
 using osu.Game.Online.Rooms;
+using osu.Game.Overlays;
 using osu.Game.Overlays.Mods;
+using osu.Game.Overlays.Notifications;
 using osu.Game.Rulesets;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Osu;
@@ -41,6 +44,21 @@ namespace osu.Game.Tests.Visual.Multiplayer
         private TestMultiplayerMatchSongSelect songSelect;
 
         private Live<BeatmapSetInfo> importedBeatmapSet;
+
+        [Cached(typeof(INotificationOverlay))]
+        private readonly NotificationOverlay notificationOverlay;
+
+        public TestSceneMultiplayerMatchSongSelect()
+        {
+            AddRange(new Drawable[]
+            {
+                notificationOverlay = new NotificationOverlay
+                {
+                    Anchor = Anchor.TopRight,
+                    Origin = Anchor.TopRight
+                }
+            });
+        }
 
         [BackgroundDependencyLoader]
         private void load(GameHost host, AudioManager audio)
@@ -113,6 +131,50 @@ namespace osu.Game.Tests.Visual.Multiplayer
 
             assertFreeModNotShown(allowedMod);
             assertFreeModNotShown(requiredMod);
+        }
+
+        [Test]
+        public void TestRedudantModsRemovalWhenSelectingBeatmap()
+        {
+            BeatmapInfo selectedBeatmap = null;
+            OsuModDifficultyAdjust mod = null;
+
+            AddStep("select beatmap",
+                () => songSelect.Carousel.SelectBeatmap(selectedBeatmap = beatmaps.First()));
+            AddUntilStep("wait for selection", () => Beatmap.Value.BeatmapInfo.Equals(selectedBeatmap));
+
+            AddStep("set mods", () => SelectedMods.Value = new Mod[] { mod = new OsuModDifficultyAdjust(), new OsuModHidden() });
+            AddStep("finalise selection", () => songSelect.FinaliseSelection());
+            AddUntilStep("song select exited", () => !songSelect.IsCurrentScreen());
+            AddAssert("mod has been removed", () => SelectedRoom.Value.Playlist.Last().RequiredMods.Length == 1);
+
+            clickNotification();
+        }
+
+        [Test]
+        public void TestRedundantModsNotification()
+        {
+            BeatmapInfo selectedBeatmap = null;
+
+            AddStep("select beatmap",
+                () => songSelect.Carousel.SelectBeatmap(selectedBeatmap = beatmaps.First()));
+            AddUntilStep("wait for selection", () => Beatmap.Value.BeatmapInfo.Equals(selectedBeatmap));
+
+            AddStep("set redundant mod", () => SelectedMods.Value = new[] { new OsuModDifficultyAdjust() });
+            AddStep("finalise selection", () => songSelect.FinaliseSelection());
+            AddUntilStep("song select exited", () => !songSelect.IsCurrentScreen());
+            AddAssert("check for notification", () => notificationOverlay.UnreadCount.Value, () => Is.EqualTo(1));
+
+            clickNotification();
+        }
+
+        private void clickNotification()
+        {
+            Notification notification = null;
+
+            AddUntilStep("wait for notification", () => (notification = notificationOverlay.ChildrenOfType<Notification>().FirstOrDefault()) != null);
+            AddStep("open notification overlay", () => notificationOverlay.Show());
+            AddStep("click notification", () => notification.TriggerClick());
         }
 
         private void assertFreeModNotShown(Type type)

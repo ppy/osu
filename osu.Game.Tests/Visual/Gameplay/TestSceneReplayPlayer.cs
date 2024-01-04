@@ -7,7 +7,9 @@ using osu.Framework.Screens;
 using osu.Framework.Testing;
 using osu.Game.Beatmaps;
 using osu.Game.Rulesets;
+using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Osu;
+using osu.Game.Rulesets.Osu.Mods;
 using osu.Game.Scoring;
 using osu.Game.Screens.Play;
 using osu.Game.Tests.Beatmaps;
@@ -155,6 +157,24 @@ namespace osu.Game.Tests.Visual.Gameplay
             });
 
             AddAssert("Jumped forwards", () => Player.GameplayClockContainer.CurrentTime - lastTime > 500);
+        }
+
+        [Test]
+        public void TestNotRemovingRedundantMods()
+        {
+            var redundantMod = new OsuModDifficultyAdjust();
+
+            AddStep("create player with redundant mod", () =>
+            {
+                var ruleset = new OsuRuleset();
+                Beatmap.Value = CreateWorkingBeatmap(ruleset.RulesetInfo);
+                SelectedMods.Value = new Mod[] { redundantMod, new OsuModAutoplay() };
+                Player = new TestReplayPlayer(false);
+            });
+
+            AddStep("load player", () => LoadScreen(Player));
+
+            AddAssert("redundant mod was not removed", () => Player.Mods.Value.Contains(redundantMod));
         }
 
         private void loadPlayerWithBeatmap(IBeatmap? beatmap = null)

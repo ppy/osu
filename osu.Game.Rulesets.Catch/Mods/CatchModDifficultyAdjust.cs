@@ -1,6 +1,7 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System;
 using System.Linq;
 using osu.Framework.Bindables;
 using osu.Game.Beatmaps;
@@ -59,6 +60,29 @@ namespace osu.Game.Rulesets.Catch.Mods
 
             if (CircleSize.Value != null) difficulty.CircleSize = CircleSize.Value.Value;
             if (ApproachRate.Value != null) difficulty.ApproachRate = ApproachRate.Value.Value;
+        }
+
+        public override bool IsRedundant(IBeatmap beatmap)
+        {
+            if (!base.IsRedundant(beatmap)) return false;
+
+            var difficulty = beatmap.Difficulty;
+
+            if (CircleSize.Value != null)
+            {
+                float roundedCircleSize = (float)Math.Round(CircleSize.Value.Value, 1);
+
+                if (roundedCircleSize != difficulty.CircleSize) return false;
+            }
+
+            if (ApproachRate.Value != null)
+            {
+                float roundedApproachRate = (float)Math.Round(ApproachRate.Value.Value, 1);
+
+                if (roundedApproachRate != difficulty.ApproachRate) return false;
+            }
+
+            return !HardRockOffsets.Value;
         }
 
         public void ApplyToBeatmapProcessor(IBeatmapProcessor beatmapProcessor)
