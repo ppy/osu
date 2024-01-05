@@ -132,12 +132,13 @@ namespace osu.Game.Screens.Menu
                 "osu! is being developed with the support of the open source community, and you can participate too!",
                 "There are many community-developed \"rulesets\" in osu!, some of which provide new game modes, and some of which add new features to the game!",
                 "Hit F8 at any time to activate the in-game chat window. You can check out the commands available in chat by typing !help or /help",
-                "Hit F12 anywhere in-game to take a screenshot.",
+                "Take a screenshot from within osu! by hitting F12.",
                 "Got a bug? Come to osu!'s GitHub repository to submit issues!",
                 "You can play songs together with other players in multiplayer mode!",
                 "Say goodbye to pressing F5 refreshing the beatmaps list!",
                 "A lot of the components in osu! bounce along with the BPM of the music being played!",
-                "If you find that some strings are not translated, go to osu!'s Crowdin and look for them!"
+                "If you find that some strings are not translated, go to osu!'s Crowdin and look for them!",
+                "Quickly retry a beatmap by holding Ctrl-R or \" ` \"(under the esc key) for a short time! You can also use a custom key."
             };
 
             return tips[RNG.Next(0, tips.Length)];
