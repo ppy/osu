@@ -121,7 +121,23 @@ namespace osu.Game.Screens.Menu
                 "Press Ctrl-Shift-F to toggle the FPS Counter. But make sure not to pay too much attention to it!",
                 "While watching a replay, press Ctrl-H to toggle replay settings!",
                 "You can easily copy the mods from scores on a leaderboard by right-clicking on them!",
-                "Ctrl-Enter at song select will start a beatmap in autoplay mode!"
+                "Ctrl-Enter at song select will start a beatmap in autoplay mode!",
+                "Don't ignore unranked maps. If you find some you like and leave constructive comments, there is a much higher chance of them being ranked!",
+                "Make sure to take breaks every so often. Your hands have to serve you in life for more than just osu! spinners.",
+                "The wiki has a wealth of information in it. Seriously, read it.",
+                "For fast combos, try toggling between left and right mouse button, or use keyboard alternative Z/X!",
+                "Customise your osu! experience with new skins! Download them from the Skinning forum.",
+                "Press F8 anywhere in game to join osu! chat, or press F9 to see the dashboard!",
+                "Press F6 to control media playback!",
+                "osu! is being developed with the support of the open source community, and you can participate too!",
+                "There are many community-developed \"rulesets\" in osu!, some of which provide new game modes, and some of which add new features to the game!",
+                "Hit F8 at any time to activate the in-game chat window. You can check out the commands available in chat by typing !help or /help",
+                "Hit F12 anywhere in-game to take a screenshot.",
+                "Got a bug? Come to osu!'s GitHub repository to submit issues!",
+                "You can play songs together with other players in multiplayer mode!",
+                "Say goodbye to pressing F5 refreshing the beatmaps list!",
+                "A lot of the components in osu! bounce along with the BPM of the music being played!",
+                "If you find that some strings are not translated, go to osu!'s Crowdin and look for them!"
             };
 
             return tips[RNG.Next(0, tips.Length)];
