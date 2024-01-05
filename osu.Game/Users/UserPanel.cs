@@ -3,6 +3,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Shapes;
@@ -12,12 +13,16 @@ using osu.Game.Overlays;
 using osu.Framework.Graphics.UserInterface;
 using osu.Game.Graphics.UserInterface;
 using osu.Framework.Graphics.Cursor;
+using osu.Framework.Screens;
 using osu.Game.Graphics.Containers;
 using osu.Game.Online.API;
 using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Online.Chat;
 using osu.Game.Resources.Localisation.Web;
 using osu.Game.Localisation;
+using osu.Game.Online.Multiplayer;
+using osu.Game.Screens;
+using osu.Game.Screens.Play;
 
 namespace osu.Game.Users
 {
@@ -59,7 +64,13 @@ namespace osu.Game.Users
         protected OverlayColourProvider? ColourProvider { get; private set; }
 
         [Resolved]
+        private IPerformFromScreenRunner? performer { get; set; }
+
+        [Resolved]
         protected OsuColour Colours { get; private set; } = null!;
+
+        [Resolved]
+        private MultiplayerClient? multiplayerClient { get; set; }
 
         [BackgroundDependencyLoader]
         private void load()
@@ -108,13 +119,26 @@ namespace osu.Game.Users
                     new OsuMenuItem(ContextMenuStrings.ViewProfile, MenuItemType.Highlighted, ViewProfile)
                 };
 
-                if (!User.Equals(api.LocalUser.Value))
+                if (User.Equals(api.LocalUser.Value))
+                    return items.ToArray();
+
+                items.Add(new OsuMenuItem(UsersStrings.CardSendMessage, MenuItemType.Standard, () =>
                 {
-                    items.Add(new OsuMenuItem(UsersStrings.CardSendMessage, MenuItemType.Standard, () =>
+                    channelManager?.OpenPrivateChannel(User);
+                    chatOverlay?.Show();
+                }));
+
+                if (User.IsOnline)
+                {
+                    items.Add(new OsuMenuItem(ContextMenuStrings.SpectatePlayer, MenuItemType.Standard, () =>
                     {
-                        channelManager?.OpenPrivateChannel(User);
-                        chatOverlay?.Show();
+                        performer?.PerformFromScreen(s => s.Push(new SoloSpectatorScreen(User)));
                     }));
+
+                    if (multiplayerClient?.Room?.Users.All(u => u.UserID != User.Id) == true)
+                    {
+                        items.Add(new OsuMenuItem(ContextMenuStrings.InvitePlayer, MenuItemType.Standard, () => multiplayerClient.InvitePlayer(User.Id)));
+                    }
                 }
 
                 return items.ToArray();

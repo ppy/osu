@@ -29,6 +29,7 @@ using osu.Game.Rulesets.Catch;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Osu;
 using osu.Game.Rulesets.Osu.Mods;
+using osu.Game.Scoring;
 using osu.Game.Screens.OnlinePlay.Components;
 using osu.Game.Screens.OnlinePlay.Lounge;
 using osu.Game.Screens.OnlinePlay.Lounge.Components;
@@ -690,10 +691,19 @@ namespace osu.Game.Tests.Visual.Multiplayer
             }
 
             AddUntilStep("wait for results", () => multiplayerComponents.CurrentScreen is ResultsScreen);
+
+            AddAssert("check is fail", () =>
+            {
+                var scoreInfo = ((ResultsScreen)multiplayerComponents.CurrentScreen).Score;
+
+                return !scoreInfo.Passed && scoreInfo.Rank == ScoreRank.F;
+            });
         }
 
         [Test]
-        [FlakyTest] // See above
+        [Ignore("Failing too often, needs revisiting in some future.")]
+        // This test is failing even after 10 retries (see https://github.com/ppy/osu/actions/runs/6700910613/job/18208272419)
+        // Something is stopping the ready button from changing states, over multiple runs.
         public void TestGameplayExitFlow()
         {
             Bindable<double>? holdDelay = null;

@@ -75,7 +75,7 @@ namespace osu.Desktop.LegacyIpc
                 case LegacyIpcDifficultyCalculationRequest req:
                     try
                     {
-                        WorkingBeatmap beatmap = new FlatFileWorkingBeatmap(req.BeatmapFile);
+                        WorkingBeatmap beatmap = new FlatWorkingBeatmap(req.BeatmapFile);
                         var ruleset = beatmap.BeatmapInfo.Ruleset.CreateInstance();
                         Mod[] mods = ruleset.ConvertFromLegacyMods((LegacyMods)req.Mods).ToArray();
 

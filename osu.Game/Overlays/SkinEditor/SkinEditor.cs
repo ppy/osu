@@ -8,6 +8,7 @@ using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using Newtonsoft.Json;
+using osu.Framework;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
@@ -150,21 +151,23 @@ namespace osu.Game.Overlays.SkinEditor
                                         {
                                             new MenuItem(CommonStrings.MenuBarFile)
                                             {
-                                                Items = new[]
+                                                Items = new OsuMenuItem[]
                                                 {
                                                     new EditorMenuItem(Web.CommonStrings.ButtonsSave, MenuItemType.Standard, () => Save()),
+                                                    new EditorMenuItem(CommonStrings.Export, MenuItemType.Standard, () => skins.ExportCurrentSkin()) { Action = { Disabled = !RuntimeInfo.IsDesktop } },
+                                                    new OsuMenuItemSpacer(),
                                                     new EditorMenuItem(CommonStrings.RevertToDefault, MenuItemType.Destructive, () => dialogOverlay?.Push(new RevertConfirmDialog(revert))),
-                                                    new EditorMenuItemSpacer(),
+                                                    new OsuMenuItemSpacer(),
                                                     new EditorMenuItem(CommonStrings.Exit, MenuItemType.Standard, () => skinEditorOverlay?.Hide()),
                                                 },
                                             },
                                             new MenuItem(CommonStrings.MenuBarEdit)
                                             {
-                                                Items = new[]
+                                                Items = new OsuMenuItem[]
                                                 {
                                                     undoMenuItem = new EditorMenuItem(CommonStrings.Undo, MenuItemType.Standard, Undo),
                                                     redoMenuItem = new EditorMenuItem(CommonStrings.Redo, MenuItemType.Standard, Redo),
-                                                    new EditorMenuItemSpacer(),
+                                                    new OsuMenuItemSpacer(),
                                                     cutMenuItem = new EditorMenuItem(CommonStrings.Cut, MenuItemType.Standard, Cut),
                                                     copyMenuItem = new EditorMenuItem(CommonStrings.Copy, MenuItemType.Standard, Copy),
                                                     pasteMenuItem = new EditorMenuItem(CommonStrings.Paste, MenuItemType.Standard, Paste),
@@ -356,7 +359,7 @@ namespace osu.Game.Overlays.SkinEditor
                     {
                         new SettingsDropdown<SkinComponentsContainerLookup?>
                         {
-                            Items = availableTargets.Select(t => t.Lookup),
+                            Items = availableTargets.Select(t => t.Lookup).Distinct(),
                             Current = selectedTarget,
                         }
                     }
@@ -366,14 +369,14 @@ namespace osu.Game.Overlays.SkinEditor
             // If the new target has a ruleset, let's show ruleset-specific items at the top, and the rest below.
             if (target.NewValue.Ruleset != null)
             {
-                componentsSidebar.Add(new SkinComponentToolbox(skinComponentsContainer)
+                componentsSidebar.Add(new SkinComponentToolbox(skinComponentsContainer, target.NewValue.Ruleset)
                 {
                     RequestPlacement = requestPlacement
                 });
             }
 
             // Remove the ruleset from the lookup to get base components.
-            componentsSidebar.Add(new SkinComponentToolbox(getTarget(new SkinComponentsContainerLookup(target.NewValue.Target)))
+            componentsSidebar.Add(new SkinComponentToolbox(skinComponentsContainer, null)
             {
                 RequestPlacement = requestPlacement
             });
@@ -406,7 +409,14 @@ namespace osu.Game.Overlays.SkinEditor
                 cp.Colour = colours.Yellow;
             });
 
+            changeHandler?.Dispose();
+
             skins.EnsureMutableSkin();
+
+            var targetContainer = getTarget(selectedTarget.Value);
+
+            if (targetContainer != null)
+                changeHandler = new SkinEditorChangeHandler(targetContainer);
             hasBegunMutating = true;
         }
 
@@ -500,6 +510,9 @@ namespace osu.Game.Overlays.SkinEditor
 
         protected void Paste()
         {
+            if (!canPaste.Value)
+                return;
+
             changeHandler?.BeginChange();
 
             var drawableInfo = JsonConvert.DeserializeObject<SerialisedDrawableInfo[]>(clipboard.Content.Value);

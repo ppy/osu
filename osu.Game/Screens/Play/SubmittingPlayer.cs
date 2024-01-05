@@ -11,6 +11,7 @@ using osu.Framework.Allocation;
 using osu.Framework.Logging;
 using osu.Framework.Screens;
 using osu.Game.Beatmaps;
+using osu.Game.Configuration;
 using osu.Game.Database;
 using osu.Game.Online.API;
 using osu.Game.Online.Multiplayer;
@@ -37,11 +38,27 @@ namespace osu.Game.Screens.Play
         [Resolved]
         private SpectatorClient spectatorClient { get; set; }
 
+        [Resolved]
+        private SessionStatics statics { get; set; }
+
+        private readonly object scoreSubmissionLock = new object();
         private TaskCompletionSource<bool> scoreSubmissionSource;
 
         protected SubmittingPlayer(PlayerConfiguration configuration = null)
             : base(configuration)
         {
+        }
+
+        [BackgroundDependencyLoader]
+        private void load()
+        {
+            if (DrawableRuleset == null)
+            {
+                // base load must have failed (e.g. due to an unknown mod); bail.
+                return;
+            }
+
+            AddInternal(new PlayerTouchInputDetector());
         }
 
         protected override void LoadAsyncComplete()
@@ -153,10 +170,23 @@ namespace osu.Game.Screens.Play
             spectatorClient.BeginPlaying(token, GameplayState, Score);
         }
 
+        protected override void OnFail()
+        {
+            base.OnFail();
+
+            submitFromFailOrQuit();
+        }
+
         public override bool OnExiting(ScreenExitEvent e)
         {
             bool exiting = base.OnExiting(e);
+            submitFromFailOrQuit();
+            statics.SetValue(Static.LastLocalUserScore, Score?.ScoreInfo.DeepClone());
+            return exiting;
+        }
 
+        private void submitFromFailOrQuit()
+        {
             if (LoadedBeatmapSuccessfully)
             {
                 Task.Run(async () =>
@@ -165,8 +195,6 @@ namespace osu.Game.Screens.Play
                     spectatorClient.EndPlaying(GameplayState);
                 }).FireAndForget();
             }
-
-            return exiting;
         }
 
         /// <summary>
@@ -186,18 +214,34 @@ namespace osu.Game.Screens.Play
 
         private Task submitScore(Score score)
         {
+            var masterClock = GameplayClockContainer as MasterGameplayClockContainer;
+
+            if (masterClock?.PlaybackRateValid.Value != true)
+            {
+                Logger.Log("Score submission cancelled due to audio playback rate discrepancy.");
+                return Task.CompletedTask;
+            }
+
             // token may be null if the request failed but gameplay was still allowed (see HandleTokenRetrievalFailure).
             if (token == null)
+            {
+                Logger.Log("No token, skipping score submission");
                 return Task.CompletedTask;
+            }
 
-            if (scoreSubmissionSource != null)
-                return scoreSubmissionSource.Task;
+            lock (scoreSubmissionLock)
+            {
+                if (scoreSubmissionSource != null)
+                    return scoreSubmissionSource.Task;
+
+                scoreSubmissionSource = new TaskCompletionSource<bool>();
+            }
 
             // if the user never hit anything, this score should not be counted in any way.
             if (!score.ScoreInfo.Statistics.Any(s => s.Key.IsHit() && s.Value > 0))
                 return Task.CompletedTask;
 
-            scoreSubmissionSource = new TaskCompletionSource<bool>();
+            Logger.Log($"Beginning score submission (token:{token.Value})...");
             var request = CreateSubmissionRequest(score, token.Value);
 
             request.Success += s =>
@@ -206,11 +250,12 @@ namespace osu.Game.Screens.Play
                 score.ScoreInfo.Position = s.Position;
 
                 scoreSubmissionSource.SetResult(true);
+                Logger.Log($"Score submission completed! (token:{token.Value} id:{s.ID})");
             };
 
             request.Failure += e =>
             {
-                Logger.Error(e, $"Failed to submit score ({e.Message})");
+                Logger.Error(e, $"Failed to submit score (token:{token.Value}): {e.Message}");
                 scoreSubmissionSource.SetResult(false);
             };
 

@@ -46,6 +46,8 @@ namespace osu.Game.Screens.Play
 
         public override bool DisallowExternalBeatmapRulesetChanges => true;
 
+        public override bool? AllowGlobalTrackControl => false;
+
         // Here because IsHovered will not update unless we do so.
         public override bool HandlePositionalInput => true;
 
@@ -245,7 +247,7 @@ namespace osu.Game.Screens.Play
 
             contentIn();
 
-            MetadataInfo.Delay(750).FadeIn(500);
+            MetadataInfo.Delay(750).FadeIn(500, Easing.OutQuint);
 
             // after an initial delay, start the debounced load check.
             // this will continue to execute even after resuming back on restart.
@@ -260,10 +262,6 @@ namespace osu.Game.Screens.Play
             base.OnResuming(e);
 
             Debug.Assert(CurrentPlayer != null);
-
-            var lastScore = CurrentPlayer.Score;
-
-            AudioSettings.ReferenceScore.Value = lastScore?.ScoreInfo;
 
             // prepare for a retry.
             CurrentPlayer = null;
@@ -412,13 +410,15 @@ namespace osu.Game.Screens.Play
             quickRestart = quickRestartRequested;
             hideOverlays = true;
             ValidForResume = true;
+
+            this.MakeCurrent();
         }
 
         private void contentIn()
         {
             MetadataInfo.Loading = true;
 
-            content.FadeInFromZero(400);
+            content.FadeInFromZero(500, Easing.OutQuint);
             content.ScaleTo(1, 650, Easing.OutQuint).Then().Schedule(prepareNewPlayer);
 
             settingsScroll.FadeInFromZero(500, Easing.Out)

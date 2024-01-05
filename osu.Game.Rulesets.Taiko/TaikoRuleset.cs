@@ -34,6 +34,7 @@ using osu.Game.Screens.Ranking.Statistics;
 using osu.Game.Skinning;
 using osu.Game.Rulesets.Configuration;
 using osu.Game.Configuration;
+using osu.Game.Rulesets.Scoring.Legacy;
 using osu.Game.Rulesets.Taiko.Configuration;
 
 namespace osu.Game.Rulesets.Taiko
@@ -114,21 +115,8 @@ namespace osu.Game.Rulesets.Taiko
             if (mods.HasFlagFast(LegacyMods.Relax))
                 yield return new TaikoModRelax();
 
-            if (mods.HasFlagFast(LegacyMods.Random))
-                yield return new TaikoModRandom();
-
             if (mods.HasFlagFast(LegacyMods.ScoreV2))
                 yield return new ModScoreV2();
-        }
-
-        public override LegacyMods ConvertToLegacyMods(Mod[] mods)
-        {
-            var value = base.ConvertToLegacyMods(mods);
-
-            if (mods.OfType<TaikoModRandom>().Any())
-                value |= LegacyMods.Random;
-
-            return value;
         }
 
         public override IEnumerable<Mod> GetModsFor(ModType type)
@@ -262,6 +250,19 @@ namespace osu.Game.Rulesets.Taiko
                     new UnstableRate(timedHitEvents)
                 }), true)
             };
+        }
+
+        /// <seealso cref="TaikoHitWindows"/>
+        public override BeatmapDifficulty GetRateAdjustedDisplayDifficulty(IBeatmapDifficultyInfo difficulty, double rate)
+        {
+            BeatmapDifficulty adjustedDifficulty = new BeatmapDifficulty(difficulty);
+
+            var greatHitWindowRange = TaikoHitWindows.TAIKO_RANGES.Single(range => range.Result == HitResult.Great);
+            double greatHitWindow = IBeatmapDifficultyInfo.DifficultyRange(adjustedDifficulty.OverallDifficulty, greatHitWindowRange.Min, greatHitWindowRange.Average, greatHitWindowRange.Max);
+            greatHitWindow /= rate;
+            adjustedDifficulty.OverallDifficulty = (float)IBeatmapDifficultyInfo.InverseDifficultyRange(greatHitWindow, greatHitWindowRange.Min, greatHitWindowRange.Average, greatHitWindowRange.Max);
+
+            return adjustedDifficulty;
         }
     }
 }

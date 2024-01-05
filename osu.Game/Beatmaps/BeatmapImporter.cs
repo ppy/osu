@@ -20,6 +20,7 @@ using osu.Game.IO;
 using osu.Game.IO.Archives;
 using osu.Game.Overlays.Notifications;
 using osu.Game.Rulesets;
+using osu.Game.Rulesets.Objects.Types;
 using Realms;
 
 namespace osu.Game.Beatmaps
@@ -152,6 +153,8 @@ namespace osu.Game.Beatmaps
             if (archive != null)
                 beatmapSet.Beatmaps.AddRange(createBeatmapDifficulties(beatmapSet, realm));
 
+            beatmapSet.DateAdded = getDateAdded(archive);
+
             foreach (BeatmapInfo b in beatmapSet.Beatmaps)
             {
                 b.BeatmapSet = beatmapSet;
@@ -278,7 +281,7 @@ namespace osu.Game.Beatmaps
 
         public override string HumanisedModelName => "beatmap";
 
-        protected override BeatmapSetInfo? CreateModel(ArchiveReader reader)
+        protected override BeatmapSetInfo? CreateModel(ArchiveReader reader, ImportParameters parameters)
         {
             // let's make sure there are actually .osu files to import.
             string? mapName = reader.Filenames.FirstOrDefault(f => f.EndsWith(".osu", StringComparison.OrdinalIgnoreCase));
@@ -305,9 +308,34 @@ namespace osu.Game.Beatmaps
             return new BeatmapSetInfo
             {
                 OnlineID = beatmap.BeatmapInfo.BeatmapSet?.OnlineID ?? -1,
-                // Metadata = beatmap.Metadata,
-                DateAdded = DateTimeOffset.UtcNow
             };
+        }
+
+        /// <summary>
+        /// Determine the date a given beatmapset has been added to the game.
+        /// For legacy imports, we can use the oldest file write time for any `.osu` file in the directory.
+        /// For any other import types, use "now".
+        /// </summary>
+        private DateTimeOffset getDateAdded(ArchiveReader? reader)
+        {
+            DateTimeOffset dateAdded = DateTimeOffset.UtcNow;
+
+            if (reader is DirectoryArchiveReader legacyReader)
+            {
+                var beatmaps = reader.Filenames.Where(f => f.EndsWith(".osu", StringComparison.OrdinalIgnoreCase));
+
+                dateAdded = File.GetLastWriteTimeUtc(legacyReader.GetFullPath(beatmaps.First()));
+
+                foreach (string beatmapName in beatmaps)
+                {
+                    var currentDateAdded = File.GetLastWriteTimeUtc(legacyReader.GetFullPath(beatmapName));
+
+                    if (currentDateAdded < dateAdded)
+                        dateAdded = currentDateAdded;
+                }
+            }
+
+            return dateAdded;
         }
 
         /// <summary>
@@ -360,7 +388,7 @@ namespace osu.Game.Beatmaps
                         OverallDifficulty = decodedDifficulty.OverallDifficulty,
                         ApproachRate = decodedDifficulty.ApproachRate,
                         SliderMultiplier = decodedDifficulty.SliderMultiplier,
-                        SliderTickRate = decodedDifficulty.SliderTickRate,
+                        SliderTickRate = decodedDifficulty.SliderTickRate
                     };
 
                     var metadata = new BeatmapMetadata
@@ -398,6 +426,8 @@ namespace osu.Game.Beatmaps
                         GridSize = decodedInfo.GridSize,
                         TimelineZoom = decodedInfo.TimelineZoom,
                         MD5Hash = memoryStream.ComputeMD5Hash(),
+                        EndTimeObjectCount = decoded.HitObjects.Count(h => h is IHasDuration),
+                        TotalObjectCount = decoded.HitObjects.Count
                     };
 
                     beatmaps.Add(beatmap);

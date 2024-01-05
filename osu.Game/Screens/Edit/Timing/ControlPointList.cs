@@ -109,8 +109,13 @@ namespace osu.Game.Screens.Edit.Timing
             controlPointGroups.BindTo(Beatmap.ControlPointInfo.Groups);
             controlPointGroups.BindCollectionChanged((_, _) =>
             {
-                table.ControlGroups = controlPointGroups;
-                changeHandler?.SaveState();
+                // This callback can happen many times in a change operation. It gets expensive.
+                // We really should be handling the `CollectionChanged` event properly.
+                Scheduler.AddOnce(() =>
+                {
+                    table.ControlGroups = controlPointGroups;
+                    changeHandler?.SaveState();
+                });
             }, true);
 
             table.OnRowSelected += drawable => scroll.ScrollIntoView(drawable);
@@ -147,13 +152,25 @@ namespace osu.Game.Screens.Edit.Timing
                 trackedType = null;
             else
             {
-                // If the selected group only has one control point, update the tracking type.
-                if (selectedGroup.Value.ControlPoints.Count == 1)
-                    trackedType = selectedGroup.Value?.ControlPoints.Single().GetType();
-                // If the selected group has more than one control point, choose the first as the tracking type
-                // if we don't already have a singular tracked type.
-                else if (trackedType == null)
-                    trackedType = selectedGroup.Value?.ControlPoints.FirstOrDefault()?.GetType();
+                switch (selectedGroup.Value.ControlPoints.Count)
+                {
+                    // If the selected group has no control points, clear the tracked type.
+                    // Otherwise the user will be unable to select a group with no control points.
+                    case 0:
+                        trackedType = null;
+                        break;
+
+                    // If the selected group only has one control point, update the tracking type.
+                    case 1:
+                        trackedType = selectedGroup.Value?.ControlPoints.Single().GetType();
+                        break;
+
+                    // If the selected group has more than one control point, choose the first as the tracking type
+                    // if we don't already have a singular tracked type.
+                    default:
+                        trackedType ??= selectedGroup.Value?.ControlPoints.FirstOrDefault()?.GetType();
+                        break;
+                }
             }
 
             if (trackedType != null)

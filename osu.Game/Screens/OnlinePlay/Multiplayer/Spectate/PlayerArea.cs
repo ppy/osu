@@ -67,7 +67,6 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Spectate
             SpectatorPlayerClock = clock;
 
             RelativeSizeAxes = Axes.Both;
-            Masking = true;
 
             AudioContainer audioContainer;
             InternalChildren = new Drawable[]

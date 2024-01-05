@@ -17,7 +17,6 @@ using osu.Game.Scoring.Legacy;
 using osu.Game.Online.API;
 using osu.Game.Online.API.Requests;
 using osu.Game.Online.API.Requests.Responses;
-using osu.Game.Rulesets.Judgements;
 using osu.Game.Rulesets.Scoring;
 using Realms;
 
@@ -42,7 +41,7 @@ namespace osu.Game.Scoring
             this.api = api;
         }
 
-        protected override ScoreInfo? CreateModel(ArchiveReader archive)
+        protected override ScoreInfo? CreateModel(ArchiveReader archive, ImportParameters parameters)
         {
             string name = archive.Filenames.First(f => f.EndsWith(".osr", StringComparison.OrdinalIgnoreCase));
 
@@ -52,9 +51,23 @@ namespace osu.Game.Scoring
                 {
                     return new DatabasedLegacyScoreDecoder(rulesets, beatmaps()).Parse(stream).ScoreInfo;
                 }
-                catch (LegacyScoreDecoder.BeatmapNotFoundException e)
+                catch (LegacyScoreDecoder.BeatmapNotFoundException notFound)
                 {
-                    Logger.Log($@"Score '{name}' failed to import: no corresponding beatmap with the hash '{e.Hash}' could be found.", LoggingTarget.Database);
+                    Logger.Log($@"Score '{archive.Name}' failed to import: no corresponding beatmap with the hash '{notFound.Hash}' could be found.", LoggingTarget.Database);
+
+                    if (!parameters.Batch)
+                    {
+                        // In the case of a missing beatmap, let's attempt to resolve it and show a prompt to the user to download the required beatmap.
+                        var req = new GetBeatmapRequest(new BeatmapInfo { MD5Hash = notFound.Hash });
+                        req.Success += res => PostNotification?.Invoke(new MissingBeatmapNotification(res, archive, notFound.Hash));
+                        api.Queue(req);
+                    }
+
+                    return null;
+                }
+                catch (Exception e)
+                {
+                    Logger.Log($@"Failed to parse headers of score '{archive.Name}': {e}.", LoggingTarget.Database);
                     return null;
                 }
             }
@@ -93,7 +106,7 @@ namespace osu.Game.Scoring
             else if (model.IsLegacyScore)
             {
                 model.LegacyTotalScore = model.TotalScore;
-                model.TotalScore = StandardisedScoreMigrationTools.ConvertFromLegacyTotalScore(model, beatmaps());
+                StandardisedScoreMigrationTools.UpdateFromLegacy(model, beatmaps());
             }
         }
 
@@ -111,13 +124,14 @@ namespace osu.Game.Scoring
             var beatmap = score.BeatmapInfo!.Detach();
             var ruleset = score.Ruleset.Detach();
             var rulesetInstance = ruleset.CreateInstance();
+            var scoreProcessor = rulesetInstance.CreateScoreProcessor();
 
             Debug.Assert(rulesetInstance != null);
 
             // Populate the maximum statistics.
             HitResult maxBasicResult = rulesetInstance.GetHitResults()
                                                       .Select(h => h.result)
-                                                      .Where(h => h.IsBasic()).MaxBy(Judgement.ToNumericResult);
+                                                      .Where(h => h.IsBasic()).MaxBy(scoreProcessor.GetBaseScoreForResult);
 
             foreach ((HitResult result, int count) in score.Statistics)
             {
@@ -168,6 +182,12 @@ namespace osu.Game.Scoring
             base.PostImport(model, realm, parameters);
 
             populateUserDetails(model);
+
+            Debug.Assert(model.BeatmapInfo != null);
+
+            // This needs to be run after user detail population to ensure we have a valid user id.
+            if (api.IsLoggedIn && api.LocalUser.Value.OnlineID == model.UserID && (model.BeatmapInfo.LastPlayed == null || model.Date > model.BeatmapInfo.LastPlayed))
+                model.BeatmapInfo.LastPlayed = model.Date;
         }
 
         /// <summary>
@@ -176,6 +196,9 @@ namespace osu.Game.Scoring
         /// </summary>
         private void populateUserDetails(ScoreInfo model)
         {
+            if (model.RealmUser.OnlineID == APIUser.SYSTEM_USER_ID)
+                return;
+
             string username = model.RealmUser.Username;
 
             if (usernameLookupCache.TryGetValue(username, out var existing))

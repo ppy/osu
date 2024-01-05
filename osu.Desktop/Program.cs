@@ -30,6 +30,11 @@ namespace osu.Desktop
         [STAThread]
         public static void Main(string[] args)
         {
+            // NVIDIA profiles are based on the executable name of a process.
+            // Lazer and stable share the same executable name.
+            // Stable sets this setting to "Off", which may not be what we want, so let's force it back to the default "Auto" on startup.
+            NVAPI.ThreadedOptimisations = NvThreadControlSetting.OGL_THREAD_CONTROL_DEFAULT;
+
             // run Squirrel first, as the app may exit after these run
             if (OperatingSystem.IsWindows())
             {
@@ -85,7 +90,7 @@ namespace osu.Desktop
                 }
             }
 
-            using (DesktopGameHost host = Host.GetSuitableDesktopHost(gameName, new HostOptions { BindIPC = true }))
+            using (DesktopGameHost host = Host.GetSuitableDesktopHost(gameName, new HostOptions { BindIPC = !tournamentClient }))
             {
                 if (!host.IsPrimaryInstance)
                 {

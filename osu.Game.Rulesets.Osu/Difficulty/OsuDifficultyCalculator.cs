@@ -26,12 +26,9 @@ namespace osu.Game.Rulesets.Osu.Difficulty
 
         public override int Version => 20220902;
 
-        private readonly IWorkingBeatmap workingBeatmap;
-
         public OsuDifficultyCalculator(IRulesetInfo ruleset, IWorkingBeatmap beatmap)
             : base(ruleset, beatmap)
         {
-            workingBeatmap = beatmap;
         }
 
         protected override DifficultyAttributes CreateDifficultyAttributes(IBeatmap beatmap, Mod[] mods, Skill[] skills, double clockRate)
@@ -113,15 +110,6 @@ namespace osu.Game.Rulesets.Osu.Difficulty
                 SliderCount = sliderCount,
                 SpinnerCount = spinnerCount,
             };
-
-            if (ComputeLegacyScoringValues)
-            {
-                OsuLegacyScoreSimulator sv1Simulator = new OsuLegacyScoreSimulator();
-                sv1Simulator.Simulate(workingBeatmap, beatmap, mods);
-                attributes.LegacyAccuracyScore = sv1Simulator.AccuracyScore;
-                attributes.LegacyComboScore = sv1Simulator.ComboScore;
-                attributes.LegacyBonusScoreRatio = sv1Simulator.BonusScoreRatio;
-            }
 
             return attributes;
         }

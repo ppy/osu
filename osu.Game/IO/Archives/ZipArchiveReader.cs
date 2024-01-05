@@ -31,7 +31,7 @@ namespace osu.Game.IO.Archives
         {
             ZipArchiveEntry entry = archive.Entries.SingleOrDefault(e => e.Key == name);
             if (entry == null)
-                throw new FileNotFoundException();
+                return null;
 
             var owner = MemoryAllocator.Default.Allocate<byte>((int)entry.Size);
 

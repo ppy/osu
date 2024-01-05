@@ -87,6 +87,34 @@ namespace osu.Game.Tests.Beatmaps.Formats
             }
         }
 
+        [Test]
+        public void TestDecodeLegacyOnlineID()
+        {
+            var decoder = new TestLegacyScoreDecoder();
+
+            using (var resourceStream = TestResources.OpenResource("Replays/taiko-replay-with-legacy-online-id.osr"))
+            {
+                var score = decoder.Parse(resourceStream);
+
+                Assert.That(score.ScoreInfo.OnlineID, Is.EqualTo(-1));
+                Assert.That(score.ScoreInfo.LegacyOnlineID, Is.EqualTo(255));
+            }
+        }
+
+        [Test]
+        public void TestDecodeNewOnlineID()
+        {
+            var decoder = new TestLegacyScoreDecoder();
+
+            using (var resourceStream = TestResources.OpenResource("Replays/taiko-replay-with-new-online-id.osr"))
+            {
+                var score = decoder.Parse(resourceStream);
+
+                Assert.That(score.ScoreInfo.OnlineID, Is.EqualTo(258));
+                Assert.That(score.ScoreInfo.LegacyOnlineID, Is.EqualTo(-1));
+            }
+        }
+
         [TestCase(3, true)]
         [TestCase(6, false)]
         [TestCase(LegacyBeatmapDecoder.LATEST_VERSION, false)]
@@ -191,6 +219,8 @@ namespace osu.Game.Tests.Beatmaps.Formats
             {
                 new OsuModDoubleTime { SpeedChange = { Value = 1.1 } }
             };
+            scoreInfo.OnlineID = 123123;
+            scoreInfo.ClientVersion = "2023.1221.0";
 
             var beatmap = new TestBeatmap(ruleset);
             var score = new Score
@@ -209,9 +239,11 @@ namespace osu.Game.Tests.Beatmaps.Formats
 
             Assert.Multiple(() =>
             {
+                Assert.That(decodedAfterEncode.ScoreInfo.OnlineID, Is.EqualTo(123123));
                 Assert.That(decodedAfterEncode.ScoreInfo.Statistics, Is.EqualTo(scoreInfo.Statistics));
                 Assert.That(decodedAfterEncode.ScoreInfo.MaximumStatistics, Is.EqualTo(scoreInfo.MaximumStatistics));
                 Assert.That(decodedAfterEncode.ScoreInfo.Mods, Is.EqualTo(scoreInfo.Mods));
+                Assert.That(decodedAfterEncode.ScoreInfo.ClientVersion, Is.EqualTo("2023.1221.0"));
             });
         }
 

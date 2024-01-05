@@ -6,6 +6,9 @@ using osu.Game.Rulesets.Mania.Judgements;
 
 namespace osu.Game.Rulesets.Mania.Objects
 {
+    /// <summary>
+    /// The tail note of a <see cref="HoldNote"/>.
+    /// </summary>
     public class TailNote : Note
     {
         /// <summary>

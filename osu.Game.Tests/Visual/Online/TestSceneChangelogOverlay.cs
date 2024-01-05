@@ -154,7 +154,14 @@ namespace osu.Game.Tests.Visual.Online
                         Type = ChangelogEntryType.Misc,
                         Category = "Code quality",
                         Title = "Clean up another thing"
-                    }
+                    },
+                    new APIChangelogEntry
+                    {
+                        Type = ChangelogEntryType.Add,
+                        Category = "osu!",
+                        Title = "Add entry with news url",
+                        Url = "https://osu.ppy.sh/home/news/2023-07-27-summer-splash"
+                    },
                 }
             });
 

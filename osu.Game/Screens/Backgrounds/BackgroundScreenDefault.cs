@@ -3,11 +3,14 @@
 
 #nullable disable
 
+using System.Diagnostics;
 using System.Threading;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Logging;
+using osu.Framework.Platform;
+using osu.Framework.Screens;
 using osu.Framework.Threading;
 using osu.Framework.Utils;
 using osu.Game.Beatmaps;
@@ -33,6 +36,9 @@ namespace osu.Game.Screens.Backgrounds
 
         [Resolved]
         private IBindable<WorkingBeatmap> beatmap { get; set; }
+
+        [Resolved]
+        private GameHost gameHost { get; set; }
 
         protected virtual bool AllowStoryboardBackground => true;
 
@@ -69,6 +75,34 @@ namespace osu.Game.Screens.Backgrounds
 
             // helper function required for AddOnce usage.
             void next() => Next();
+        }
+
+        private ScheduledDelegate storyboardUnloadDelegate;
+
+        public override void OnSuspending(ScreenTransitionEvent e)
+        {
+            var backgroundScreenStack = Parent as BackgroundScreenStack;
+            Debug.Assert(backgroundScreenStack != null);
+
+            if (background is BeatmapBackgroundWithStoryboard storyboardBackground)
+                storyboardUnloadDelegate = gameHost.UpdateThread.Scheduler.AddDelayed(storyboardBackground.UnloadStoryboard, TRANSITION_LENGTH);
+
+            base.OnSuspending(e);
+        }
+
+        public override void OnResuming(ScreenTransitionEvent e)
+        {
+            if (background is BeatmapBackgroundWithStoryboard storyboardBackground)
+            {
+                if (storyboardUnloadDelegate?.Completed == false)
+                    storyboardUnloadDelegate.Cancel();
+                else
+                    storyboardBackground.LoadStoryboard();
+
+                storyboardUnloadDelegate = null;
+            }
+
+            base.OnResuming(e);
         }
 
         private ScheduledDelegate nextTask;

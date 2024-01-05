@@ -41,7 +41,7 @@ namespace osu.Game.Screens.OnlinePlay.Match
         [Cached(typeof(IBindable<PlaylistItem>))]
         public readonly Bindable<PlaylistItem> SelectedItem = new Bindable<PlaylistItem>();
 
-        public override bool? AllowTrackAdjustments => true;
+        public override bool? ApplyModTrackAdjustments => true;
 
         protected override BackgroundScreen CreateBackground() => new RoomBackgroundScreen(Room.Playlist.FirstOrDefault())
         {
@@ -371,8 +371,11 @@ namespace osu.Game.Screens.OnlinePlay.Match
                 return true;
 
             // if the dialog is already displayed, block exiting until the user explicitly makes a decision.
-            if (dialogOverlay.CurrentDialog is ConfirmDiscardChangesDialog)
+            if (dialogOverlay.CurrentDialog is ConfirmDiscardChangesDialog discardChangesDialog)
+            {
+                discardChangesDialog.Flash();
                 return false;
+            }
 
             dialogOverlay.Push(new ConfirmDiscardChangesDialog(() =>
             {
@@ -452,7 +455,7 @@ namespace osu.Game.Screens.OnlinePlay.Match
             // Retrieve the corresponding local beatmap, since we can't directly use the playlist's beatmap info
             var localBeatmap = beatmap == null ? null : beatmapManager.QueryBeatmap(b => b.OnlineID == beatmap.OnlineID);
 
-            Beatmap.Value = beatmapManager.GetWorkingBeatmap(localBeatmap);
+            UserModsSelectOverlay.Beatmap = Beatmap.Value = beatmapManager.GetWorkingBeatmap(localBeatmap);
         }
 
         protected virtual void UpdateMods()

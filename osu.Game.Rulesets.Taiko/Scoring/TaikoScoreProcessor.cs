@@ -28,9 +28,20 @@ namespace osu.Game.Rulesets.Taiko.Scoring
 
         protected override double GetComboScoreChange(JudgementResult result)
         {
-            return Judgement.ToNumericResult(result.Type)
+            return GetBaseScoreForResult(result.Type)
                    * Math.Min(Math.Max(0.5, Math.Log(result.ComboAfterJudgement, combo_base)), Math.Log(400, combo_base))
                    * strongScaleValue(result);
+        }
+
+        public override int GetBaseScoreForResult(HitResult result)
+        {
+            switch (result)
+            {
+                case HitResult.Ok:
+                    return 150;
+            }
+
+            return base.GetBaseScoreForResult(result);
         }
 
         private double strongScaleValue(JudgementResult result)

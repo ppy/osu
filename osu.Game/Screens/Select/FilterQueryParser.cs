@@ -76,6 +76,9 @@ namespace osu.Game.Screens.Select
                 case "title":
                     return TryUpdateCriteriaText(ref criteria.Title, op, value);
 
+                case "diff":
+                    return TryUpdateCriteriaText(ref criteria.DifficultyName, op, value);
+
                 default:
                     return criteria.RulesetCriteria?.TryParseCustomKeywordCriteria(key, op, value) ?? false;
             }

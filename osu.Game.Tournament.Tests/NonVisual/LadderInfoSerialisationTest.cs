@@ -35,8 +35,8 @@ namespace osu.Game.Tournament.Tests.NonVisual
                 PlayersPerTeam = { Value = 4 },
                 Teams =
                 {
-                    match.Team1.Value,
-                    match.Team2.Value,
+                    match.Team1.Value!,
+                    match.Team2.Value!,
                 },
                 Rounds =
                 {

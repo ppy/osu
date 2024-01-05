@@ -5,34 +5,29 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using osu.Game.Beatmaps;
-using osu.Game.Rulesets.Judgements;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Objects.Types;
+using osu.Game.Rulesets.Osu.Mods;
 using osu.Game.Rulesets.Osu.Objects;
+using osu.Game.Rulesets.Osu.Scoring;
 using osu.Game.Rulesets.Scoring;
+using osu.Game.Rulesets.Scoring.Legacy;
 
 namespace osu.Game.Rulesets.Osu.Difficulty
 {
     internal class OsuLegacyScoreSimulator : ILegacyScoreSimulator
     {
-        public int AccuracyScore { get; private set; }
-
-        public int ComboScore { get; private set; }
-
-        public double BonusScoreRatio => legacyBonusScore == 0 ? 0 : (double)modernBonusScore / legacyBonusScore;
+        private readonly ScoreProcessor scoreProcessor = new OsuScoreProcessor();
 
         private int legacyBonusScore;
-        private int modernBonusScore;
+        private int standardisedBonusScore;
         private int combo;
 
         private double scoreMultiplier;
-        private IBeatmap playableBeatmap = null!;
 
-        public void Simulate(IWorkingBeatmap workingBeatmap, IBeatmap playableBeatmap, IReadOnlyList<Mod> mods)
+        public LegacyScoreAttributes Simulate(IWorkingBeatmap workingBeatmap, IBeatmap playableBeatmap)
         {
-            this.playableBeatmap = playableBeatmap;
-
             IBeatmap baseBeatmap = workingBeatmap.Beatmap;
 
             int countNormal = 0;
@@ -73,13 +68,21 @@ namespace osu.Game.Rulesets.Osu.Difficulty
                  + baseBeatmap.Difficulty.CircleSize
                  + Math.Clamp((float)objectCount / drainLength * 8, 0, 16)) / 38 * 5);
 
-            scoreMultiplier = difficultyPeppyStars * mods.Aggregate(1.0, (current, mod) => current * mod.ScoreMultiplier);
+            scoreMultiplier = difficultyPeppyStars;
+
+            LegacyScoreAttributes attributes = new LegacyScoreAttributes();
 
             foreach (var obj in playableBeatmap.HitObjects)
-                simulateHit(obj);
+                simulateHit(obj, ref attributes);
+
+            attributes.BonusScoreRatio = legacyBonusScore == 0 ? 0 : (double)standardisedBonusScore / legacyBonusScore;
+            attributes.BonusScore = legacyBonusScore;
+            attributes.MaxCombo = combo;
+
+            return attributes;
         }
 
-        private void simulateHit(HitObject hitObject)
+        private void simulateHit(HitObject hitObject, ref LegacyScoreAttributes attributes)
         {
             bool increaseCombo = true;
             bool addScoreComboMultiplier = false;
@@ -122,7 +125,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
 
                 case Slider:
                     foreach (var nested in hitObject.NestedHitObjects)
-                        simulateHit(nested);
+                        simulateHit(nested, ref attributes);
 
                     scoreIncrease = 300;
                     increaseCombo = false;
@@ -133,22 +136,27 @@ namespace osu.Game.Rulesets.Osu.Difficulty
                     // The spinner object applies a lenience because gameplay mechanics differ from osu-stable.
                     // We'll redo the calculations to match osu-stable here...
                     const double maximum_rotations_per_second = 477.0 / 60;
-                    double minimumRotationsPerSecond = IBeatmapDifficultyInfo.DifficultyRange(playableBeatmap.Difficulty.OverallDifficulty, 3, 5, 7.5);
+
+                    // Normally, this value depends on the final overall difficulty. For simplicity, we'll only consider the worst case that maximises bonus score.
+                    // As we're primarily concerned with computing the maximum theoretical final score,
+                    // this will have the final effect of slightly underestimating bonus score achieved on stable when converting from score V1.
+                    const double minimum_rotations_per_second = 3;
+
                     double secondsDuration = spinner.Duration / 1000;
 
                     // The total amount of half spins possible for the entire spinner.
                     int totalHalfSpinsPossible = (int)(secondsDuration * maximum_rotations_per_second * 2);
                     // The amount of half spins that are required to successfully complete the spinner (i.e. get a 300).
-                    int halfSpinsRequiredForCompletion = (int)(secondsDuration * minimumRotationsPerSecond);
+                    int halfSpinsRequiredForCompletion = (int)(secondsDuration * minimum_rotations_per_second);
                     // To be able to receive bonus points, the spinner must be rotated another 1.5 times.
                     int halfSpinsRequiredBeforeBonus = halfSpinsRequiredForCompletion + 3;
 
                     for (int i = 0; i <= totalHalfSpinsPossible; i++)
                     {
                         if (i > halfSpinsRequiredBeforeBonus && (i - halfSpinsRequiredBeforeBonus) % 2 == 0)
-                            simulateHit(new SpinnerBonusTick());
+                            simulateHit(new SpinnerBonusTick(), ref attributes);
                         else if (i > 1 && i % 2 == 0)
-                            simulateHit(new SpinnerTick());
+                            simulateHit(new SpinnerTick(), ref attributes);
                     }
 
                     scoreIncrease = 300;
@@ -159,19 +167,72 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             if (addScoreComboMultiplier)
             {
                 // ReSharper disable once PossibleLossOfFraction (intentional to match osu-stable...)
-                ComboScore += (int)(Math.Max(0, combo - 1) * (scoreIncrease / 25 * scoreMultiplier));
+                attributes.ComboScore += (int)(Math.Max(0, combo - 1) * (scoreIncrease / 25 * scoreMultiplier));
             }
 
             if (isBonus)
             {
                 legacyBonusScore += scoreIncrease;
-                modernBonusScore += Judgement.ToNumericResult(bonusResult);
+                standardisedBonusScore += scoreProcessor.GetBaseScoreForResult(bonusResult);
             }
             else
-                AccuracyScore += scoreIncrease;
+                attributes.AccuracyScore += scoreIncrease;
 
             if (increaseCombo)
                 combo++;
+        }
+
+        public double GetLegacyScoreMultiplier(IReadOnlyList<Mod> mods, LegacyBeatmapConversionDifficultyInfo difficulty)
+        {
+            bool scoreV2 = mods.Any(m => m is ModScoreV2);
+
+            double multiplier = 1.0;
+
+            foreach (var mod in mods)
+            {
+                switch (mod)
+                {
+                    case OsuModNoFail:
+                        multiplier *= scoreV2 ? 1.0 : 0.5;
+                        break;
+
+                    case OsuModEasy:
+                        multiplier *= 0.5;
+                        break;
+
+                    case OsuModHalfTime:
+                    case OsuModDaycore:
+                        multiplier *= 0.3;
+                        break;
+
+                    case OsuModHidden:
+                        multiplier *= 1.06;
+                        break;
+
+                    case OsuModHardRock:
+                        multiplier *= scoreV2 ? 1.10 : 1.06;
+                        break;
+
+                    case OsuModDoubleTime:
+                    case OsuModNightcore:
+                        multiplier *= scoreV2 ? 1.20 : 1.12;
+                        break;
+
+                    case OsuModFlashlight:
+                        multiplier *= 1.12;
+                        break;
+
+                    case OsuModSpunOut:
+                        multiplier *= 0.9;
+                        break;
+
+                    case OsuModRelax:
+                    case OsuModAutopilot:
+                        return 0;
+                }
+            }
+
+            return multiplier;
         }
     }
 }

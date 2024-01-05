@@ -8,6 +8,7 @@ using osu.Game.Overlays;
 using osu.Game.Overlays.SkinEditor;
 using osu.Game.Rulesets;
 using osu.Game.Rulesets.Osu;
+using osu.Game.Skinning;
 
 namespace osu.Game.Tests.Visual.Gameplay
 {
@@ -19,7 +20,9 @@ namespace osu.Game.Tests.Visual.Gameplay
         [Test]
         public void TestToggleEditor()
         {
-            AddStep("show available components", () => SetContents(_ => new SkinComponentToolbox
+            var skinComponentsContainer = new SkinComponentsContainer(new SkinComponentsContainerLookup(SkinComponentsContainerLookup.TargetArea.SongSelect));
+
+            AddStep("show available components", () => SetContents(_ => new SkinComponentToolbox(skinComponentsContainer, null)
             {
                 Anchor = Anchor.TopRight,
                 Origin = Anchor.TopRight,

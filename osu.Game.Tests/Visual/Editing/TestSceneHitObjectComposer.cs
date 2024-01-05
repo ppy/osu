@@ -8,7 +8,7 @@ using System.Linq;
 using NUnit.Framework;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
-using osu.Framework.Graphics.Containers;
+using osu.Framework.Graphics.Cursor;
 using osu.Framework.Testing;
 using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.ControlPoints;
@@ -57,7 +57,7 @@ namespace osu.Game.Tests.Visual.Editing
                         new Slider
                         {
                             Position = new Vector2(128, 256),
-                            Path = new SliderPath(PathType.Linear, new[]
+                            Path = new SliderPath(PathType.LINEAR, new[]
                             {
                                 Vector2.Zero,
                                 new Vector2(216, 0),
@@ -178,7 +178,7 @@ namespace osu.Game.Tests.Visual.Editing
             AddAssert("distance spacing increased by 0.5", () => editorBeatmap.BeatmapInfo.DistanceSpacing == originalSpacing + 0.5);
         }
 
-        public partial class EditorBeatmapContainer : Container
+        public partial class EditorBeatmapContainer : PopoverContainer
         {
             private readonly IWorkingBeatmap working;
 

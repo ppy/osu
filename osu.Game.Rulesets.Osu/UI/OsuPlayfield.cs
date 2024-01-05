@@ -20,7 +20,6 @@ using osu.Game.Rulesets.Osu.Configuration;
 using osu.Game.Rulesets.Osu.Objects;
 using osu.Game.Rulesets.Osu.Objects.Drawables;
 using osu.Game.Rulesets.Osu.Objects.Drawables.Connections;
-using osu.Game.Rulesets.Osu.Scoring;
 using osu.Game.Rulesets.Osu.UI.Cursor;
 using osu.Game.Rulesets.Scoring;
 using osu.Game.Rulesets.UI;
@@ -66,8 +65,21 @@ namespace osu.Game.Rulesets.Osu.UI
 
             HitPolicy = new StartTimeOrderedHitPolicy();
 
-            var hitWindows = new OsuHitWindows();
-            foreach (var result in Enum.GetValues<HitResult>().Where(r => r > HitResult.None && hitWindows.IsHitResultAllowed(r)))
+            foreach (var result in Enum.GetValues<HitResult>().Where(r =>
+                     {
+                         switch (r)
+                         {
+                             case HitResult.Great:
+                             case HitResult.Ok:
+                             case HitResult.Meh:
+                             case HitResult.Miss:
+                             case HitResult.LargeTickMiss:
+                             case HitResult.IgnoreMiss:
+                                 return true;
+                         }
+
+                         return false;
+                     }))
                 poolDictionary.Add(result, new DrawableJudgementPool(result, onJudgementLoaded));
 
             AddRangeInternal(poolDictionary.Values);
@@ -89,7 +101,7 @@ namespace osu.Game.Rulesets.Osu.UI
 
         protected override void OnNewDrawableHitObject(DrawableHitObject drawable)
         {
-            ((DrawableOsuHitObject)drawable).CheckHittable = hitPolicy.IsHittable;
+            ((DrawableOsuHitObject)drawable).CheckHittable = hitPolicy.CheckHittable;
 
             Debug.Assert(!drawable.IsLoaded, $"Already loaded {nameof(DrawableHitObject)} is added to {nameof(OsuPlayfield)}");
             drawable.OnLoadComplete += onDrawableHitObjectLoaded;
@@ -170,7 +182,10 @@ namespace osu.Game.Rulesets.Osu.UI
             if (!judgedObject.DisplayResult || !DisplayJudgements.Value)
                 return;
 
-            DrawableOsuJudgement explosion = poolDictionary[result.Type].Get(doj => doj.Apply(result, judgedObject));
+            if (!poolDictionary.TryGetValue(result.Type, out var pool))
+                return;
+
+            DrawableOsuJudgement explosion = pool.Get(doj => doj.Apply(result, judgedObject));
 
             judgementLayer.Add(explosion);
 

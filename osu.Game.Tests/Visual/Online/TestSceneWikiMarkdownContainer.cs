@@ -10,7 +10,6 @@ using NUnit.Framework;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
-using osu.Framework.Graphics.Containers.Markdown;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Testing;
@@ -276,7 +275,7 @@ Phasellus eu nunc nec ligula semper fringilla. Aliquam magna neque, placerat sed
             AddStep("set content", () =>
             {
                 markdownContainer.Text = @"
-This is a paragraph containing `inline code` synatax.
+This is a paragraph containing `inline code` syntax.
 Oh wow I do love the `WikiMarkdownContainer`, it is very cool!
 
 This is a line before the fenced code block:
@@ -298,7 +297,7 @@ This is a line after the fenced code block!
         {
             public LinkInline Link;
 
-            public override MarkdownTextFlowContainer CreateTextFlow() => new TestMarkdownTextFlowContainer
+            public override OsuMarkdownTextFlowContainer CreateTextFlow() => new TestMarkdownTextFlowContainer
             {
                 UrlAdded = link => Link = link,
             };
