@@ -109,6 +109,8 @@ namespace osu.Game.Screens.Menu
             // prevent user from changing beatmap while the intro is still running.
             beatmap = Beatmap.BeginLease(false);
 
+            musicController.AllowTrackControl.Value = false;
+
             MenuVoice = config.GetBindable<bool>(OsuSetting.MenuVoice);
             MenuMusic = config.GetBindable<bool>(OsuSetting.MenuMusic);
 
