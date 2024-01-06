@@ -7,5 +7,6 @@ namespace osu.Game.Rulesets.Mania.Mods
 {
     public class ManiaModClassic : ModClassic
     {
+        public override double ScoreMultiplier => 1;
     }
 }

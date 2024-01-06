@@ -444,10 +444,12 @@ namespace osu.Game.Database
                     break;
 
                 case 3:
-                    convertedTotalScore = (long)Math.Round((
-                        850000 * comboProportion
-                        + 150000 * Math.Pow(score.Accuracy, 2 + 2 * score.Accuracy)
-                        + bonusProportion) * modMultiplier);
+                    // Keep the whole comboProportion (with a Classic mod multiplier of 1.00)
+                    // Nerf high scores' ratio by multiplying by 2 their difference from the score cap
+                    // Keep a max nerf of 95% of the original score
+                    convertedTotalScore = Math.floor(
+                        Math.max(1000000-2*(1000000-(1000000*comboProportion)), comboProportion * 0.95) * modMultiplier
+                    );
                     break;
 
                 default:
