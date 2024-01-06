@@ -125,8 +125,8 @@ namespace osu.Game.Screens.Select
 
             // Default to local leaderboard if the currently selected leaderboard doesn't have scores or is unavailable
             // perhaps because it requires sign in, requires the beatmap to be ranked, etc.
-            bool isLeaderboardSelected = beatmapDetailTab.Value != PlayBeatmapDetailArea.TabType.Details;
-            if (isLeaderboardSelected && !(playBeatmapDetailArea.Leaderboard.State == LeaderboardState.Success))
+            // Also default to local if the details tab is selected so the leaderboard with the new score is visible after returning to song select.
+            if (playBeatmapDetailArea.Leaderboard.State != LeaderboardState.Success || beatmapDetailTab.Value == PlayBeatmapDetailArea.TabType.Details)
                 beatmapDetailTab.Value = PlayBeatmapDetailArea.TabType.Local;
 
             SampleConfirm?.Play();
