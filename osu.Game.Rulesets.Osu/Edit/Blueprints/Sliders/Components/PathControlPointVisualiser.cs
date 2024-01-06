@@ -410,8 +410,10 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders.Components
 
             var item = new TernaryStateRadioMenuItem(type?.Description ?? "Inherit", MenuItemType.Standard, _ =>
             {
+                changeHandler?.BeginChange();
                 foreach (var p in Pieces.Where(p => p.IsSelected.Value))
                     updatePathType(p, type);
+                changeHandler?.EndChange();
             });
 
             if (countOfState == totalCount)
