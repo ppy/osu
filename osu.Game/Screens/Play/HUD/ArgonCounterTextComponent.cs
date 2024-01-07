@@ -4,7 +4,6 @@
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
-using System.Linq;
 using System.Threading.Tasks;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
@@ -35,14 +34,7 @@ namespace osu.Game.Screens.Play.HUD
         public LocalisableString Text
         {
             get => textPart.Text;
-            set
-            {
-                int remainingCount = RequiredDisplayDigits.Value - value.ToString().Count(char.IsDigit);
-                string remainingText = remainingCount > 0 ? new string('#', remainingCount) : string.Empty;
-
-                wireframesPart.Text = remainingText + value;
-                textPart.Text = value;
-            }
+            set => textPart.Text = value;
         }
 
         public ArgonCounterTextComponent(Anchor anchor, LocalisableString? label = null)
@@ -83,6 +75,8 @@ namespace osu.Game.Screens.Play.HUD
                     }
                 }
             };
+
+            RequiredDisplayDigits.BindValueChanged(digits => wireframesPart.Text = new string('#', digits.NewValue));
         }
 
         private string textLookup(char c)
