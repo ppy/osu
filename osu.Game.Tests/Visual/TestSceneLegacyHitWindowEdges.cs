@@ -28,7 +28,9 @@ namespace osu.Game.Tests.Visual
     public partial class TestSceneLegacyHitWindowEdges : RateAdjustedBeatmapTestScene
     {
         private static readonly List<double> input_edge_deltas = new() { 1.0, 0.7, 0.50001, 0.5, 0.49999, 0.2, 0.0 };
-        private readonly List<HitResult> correctResults = new() { HitResult.Great, HitResult.Great, HitResult.Great, HitResult.Great, HitResult.Ok, HitResult.Ok, HitResult.Ok }; // ground-truth osu!stable judgement results
+        // ground-truth osu!stable judgement results
+        private readonly List<HitResult> correctResults = new() { HitResult.Great, HitResult.Great, HitResult.Great, HitResult.Great, HitResult.Ok, HitResult.Ok, HitResult.Ok };
+        private readonly List<HitResult> correctResultsMania = new() { HitResult.Great, HitResult.Great, HitResult.Great, HitResult.Great, HitResult.Good, HitResult.Good, HitResult.Good };
         private static readonly int hit_objects_count = input_edge_deltas.Count * 2;
 
         private static readonly Vector2 circle_position = Vector2.Zero;
@@ -239,7 +241,7 @@ namespace osu.Game.Tests.Visual
 
             for (int i = 0; i < hit_objects_count; i++)
             {
-                assertJudgement(i);
+                assertJudgementMania(i);
             }
         }
 
@@ -249,6 +251,14 @@ namespace osu.Game.Tests.Visual
                 $"check judgement no. {i}",
                 () => judgementResults[i].Type,
                 () => Is.EqualTo(correctResults[i % (hit_objects_count / 2)]));
+        }
+
+        private void assertJudgementMania(int i)
+        {
+            AddAssert(
+                $"check judgement no. {i}",
+                () => judgementResults[i].Type,
+                () => Is.EqualTo(correctResultsMania[i % (hit_objects_count / 2)]));
         }
 
         private static List<ReplayFrame> generateOsuFrames(float overallDifficulty)
