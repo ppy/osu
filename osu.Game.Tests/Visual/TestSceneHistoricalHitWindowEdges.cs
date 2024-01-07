@@ -11,24 +11,21 @@ using osu.Game.Rulesets.Judgements;
 using osu.Game.Rulesets.Mania;
 using osu.Game.Rulesets.Mania.Objects;
 using osu.Game.Rulesets.Mania.Replays;
-using osu.Game.Rulesets.Mania.Scoring;
 using osu.Game.Rulesets.Osu;
 using osu.Game.Rulesets.Osu.Objects;
 using osu.Game.Rulesets.Osu.Replays;
-using osu.Game.Rulesets.Osu.Scoring;
 using osu.Game.Rulesets.Replays;
 using osu.Game.Rulesets.Scoring;
 using osu.Game.Rulesets.Taiko;
 using osu.Game.Rulesets.Taiko.Objects;
 using osu.Game.Rulesets.Taiko.Replays;
-using osu.Game.Rulesets.Taiko.Scoring;
 using osu.Game.Scoring;
 using osu.Game.Screens.Play;
 using osuTK;
 
 namespace osu.Game.Tests.Visual
 {
-    public partial class TestSceneHistoricalHitWindowEdges : RateAdjustedBeatmapTestScene
+    public partial class TestSceneLegacyHitWindowEdges : RateAdjustedBeatmapTestScene
     {
         private static readonly List<double> input_edge_deltas = new() { 1.0, 0.7, 0.50001, 0.5, 0.49999, 0.2, 0.0 };
         private readonly List<HitResult> correctResults = new() { HitResult.Great, HitResult.Great, HitResult.Great, HitResult.Great, HitResult.Ok, HitResult.Ok, HitResult.Ok }; // ground-truth osu!stable judgement results
@@ -41,7 +38,44 @@ namespace osu.Game.Tests.Visual
 
         private readonly List<JudgementResult> judgementResults = new();
 
-        private static double get300HitWindow(HitWindows hitWindows, float overallDifficulty)
+        private class OsuStableHitWindows : HitWindows
+        {
+            internal static readonly DifficultyRange[] OSU_STABLE_RANGES =
+            {
+                new DifficultyRange(HitResult.Great, 80, 50, 20),
+                new DifficultyRange(HitResult.Ok, 140, 100, 60),
+                new DifficultyRange(HitResult.Meh, 200, 150, 100),
+                new DifficultyRange(HitResult.Miss, 400, 400, 400),
+            };
+            protected override DifficultyRange[] GetRanges() => OSU_STABLE_RANGES;
+        }
+
+        private class TaikoStableHitWindows : HitWindows
+        {
+            internal static readonly DifficultyRange[] TAIKO_STABLE_RANGES =
+            {
+                new DifficultyRange(HitResult.Great, 50, 35, 20),
+                new DifficultyRange(HitResult.Ok, 120, 80, 50),
+                new DifficultyRange(HitResult.Miss, 135, 95, 70),
+            };
+            protected override DifficultyRange[] GetRanges() => TAIKO_STABLE_RANGES;
+        }
+
+        private class ManiaStableHitWindows : HitWindows
+        {
+            internal static readonly DifficultyRange[] MANIA_STABLE_NOMOD_RANGES = // will not work as in-game on non-100% speed rate, since in-game, osu!mania keeps OD hit windows constant with speed rate
+            {
+                new DifficultyRange(HitResult.Perfect, 16, 16, 16),
+                new DifficultyRange(HitResult.Great, 64, 49, 34),
+                new DifficultyRange(HitResult.Good, 97, 72, 67),
+                new DifficultyRange(HitResult.Ok, 127, 112, 97),
+                new DifficultyRange(HitResult.Meh, 188, 173, 158),
+                new DifficultyRange(HitResult.Miss, 400, 400, 400), // no idea whether this is correct, but these values are not used in the test scene anyways
+            };
+            protected override DifficultyRange[] GetRanges() => MANIA_STABLE_NOMOD_RANGES;
+        }
+
+        private static double getStableIntegral300HitWindow(HitWindows hitWindows, float overallDifficulty)
         {
             hitWindows.SetDifficulty(overallDifficulty);
             double hitWindow300 = hitWindows.WindowFor(HitResult.Great);
@@ -219,7 +253,7 @@ namespace osu.Game.Tests.Visual
 
         private static List<ReplayFrame> generateOsuFrames(float overallDifficulty)
         {
-            double hitWindow300 = get300HitWindow(new OsuHitWindows(), overallDifficulty);
+            double hitWindow300 = getStableIntegral300HitWindow(new OsuStableHitWindows(), overallDifficulty);
 
             List<ReplayFrame> frames = new();
 
@@ -242,7 +276,7 @@ namespace osu.Game.Tests.Visual
 
         private static List<ReplayFrame> generateTaikoFrames(float overallDifficulty)
         {
-            double hitWindow300 = get300HitWindow(new TaikoHitWindows(), overallDifficulty);
+            double hitWindow300 = getStableIntegral300HitWindow(new TaikoStableHitWindows(), overallDifficulty);
 
             List<ReplayFrame> frames = new();
 
@@ -265,7 +299,7 @@ namespace osu.Game.Tests.Visual
 
         private static List<ReplayFrame> generateManiaFrames(float overallDifficulty)
         {
-            double hitWindow300 = get300HitWindow(new ManiaHitWindows(), overallDifficulty) + 1; // in osu!stable, mania, unlike standard and taiko, used a <= comparison instead of a < comparison to make a judgement; since both sides of the comparison were integers, this is the same as a < comparison with 1 added to the right hand side; this is equivalent to using a 1ms wider hit window
+            double hitWindow300 = getStableIntegral300HitWindow(new ManiaStableHitWindows(), overallDifficulty) + 1; // in osu!stable, mania, unlike standard and taiko, used a <= comparison instead of a < comparison to make a judgement; since both sides of the comparison were integers, this is the same as a < comparison with 1 added to the right hand side; this is equivalent to using a 1ms wider hit window
 
             List<ReplayFrame> frames = new();
 
