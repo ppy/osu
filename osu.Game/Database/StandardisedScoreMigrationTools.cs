@@ -519,13 +519,13 @@ namespace osu.Game.Database
 
             if (assumedLengthOfRemainingCombos > 0)
             {
-                while (remainingCombo > 0)
-                {
-                    int comboLength = Math.Min(assumedLengthOfRemainingCombos, remainingCombo);
+                int assumedCombosCount = (int)Math.Floor((double)remainingCombo / assumedLengthOfRemainingCombos);
+                totalDroppedScore += assumedCombosCount * estimateDroppedComboScoreAfterMiss(assumedLengthOfRemainingCombos);
 
-                    remainingCombo -= comboLength;
-                    totalDroppedScore += estimateDroppedComboScoreAfterMiss(comboLength);
-                }
+                remainingCombo -= assumedCombosCount * assumedLengthOfRemainingCombos;
+
+                if (remainingCombo > 0)
+                    totalDroppedScore += estimateDroppedComboScoreAfterMiss(remainingCombo);
             }
             else
             {
