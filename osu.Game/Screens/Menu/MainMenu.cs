@@ -5,6 +5,7 @@
 
 using System;
 using System.Diagnostics;
+using System.Linq;
 using JetBrains.Annotations;
 using osu.Framework.Allocation;
 using osu.Framework.Audio;
@@ -25,6 +26,7 @@ using osu.Game.Input.Bindings;
 using osu.Game.IO;
 using osu.Game.Online.API;
 using osu.Game.Overlays;
+using osu.Game.Overlays.Dialog;
 using osu.Game.Overlays.SkinEditor;
 using osu.Game.Rulesets;
 using osu.Game.Screens.Backgrounds;
@@ -392,7 +394,12 @@ namespace osu.Game.Screens.Menu
             if (requiresConfirmation)
             {
                 if (dialogOverlay.CurrentDialog is ConfirmExitDialog exitDialog)
-                    exitDialog.PerformOkAction();
+                {
+                    if (exitDialog.Buttons.OfType<PopupDialogOkButton>().FirstOrDefault() != null)
+                        exitDialog.PerformOkAction();
+                    else
+                        exitDialog.Flash();
+                }
                 else
                 {
                     dialogOverlay.Push(new ConfirmExitDialog(() =>
