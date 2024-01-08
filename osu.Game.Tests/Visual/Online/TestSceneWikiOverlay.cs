@@ -107,12 +107,12 @@ namespace osu.Game.Tests.Visual.Online
                 };
             });
 
-        // From https://osu.ppy.sh/api/v2/wiki/en/Main_Page
+        // From https://osu.ppy.sh/api/v2/wiki/en/Main_page
         private APIWikiPage responseMainPage => new APIWikiPage
         {
-            Title = "Main Page",
+            Title = "Main page",
             Layout = "main_page",
-            Path = "Main_Page",
+            Path = "Main_page",
             Locale = "en",
             Subtitle = null,
             Markdown =
