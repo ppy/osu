@@ -49,6 +49,8 @@ namespace osu.Game.Screens.Menu
 
         public override bool AllowExternalScreenChange => true;
 
+        public override bool? AllowGlobalTrackControl => true;
+
         private Screen songSelect;
 
         private MenuSideFlashes sideFlashes;
@@ -240,8 +242,6 @@ namespace osu.Game.Screens.Menu
             if (e.Last is IntroScreen && musicController.TrackLoaded)
             {
                 var track = musicController.CurrentTrack;
-
-                musicController.AllowTrackControl.Value = true;
 
                 // presume the track is the current beatmap's track. not sure how correct this assumption is but it has worked until now.
                 if (!track.IsRunning)
