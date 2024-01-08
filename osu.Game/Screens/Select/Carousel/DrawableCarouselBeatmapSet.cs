@@ -213,6 +213,7 @@ namespace osu.Game.Screens.Select.Carousel
 
             LoadComponentsAsync(new CompositeDrawable[]
             {
+                // Choice of background image matches BSS implementation (always uses the lowest `beatmap_id` from the set).
                 new SetPanelBackground(manager.GetWorkingBeatmap(beatmapSet.Beatmaps.MinBy(b => b.OnlineID)))
                 {
                     RelativeSizeAxes = Axes.Both,
