@@ -104,6 +104,9 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             double approachRateFactor = 0.0;
             if (attributes.ApproachRate > 10.33)
                 approachRateFactor = 0.3 * (attributes.ApproachRate - 10.33);
+            // for testing
+            else if (attributes.ApproachRate < 8.0)
+                approachRateFactor = 0.05 * (8.0 - attributes.ApproachRate);
 
             if (score.Mods.Any(h => h is OsuModRelax))
                 approachRateFactor = 0.0;
@@ -112,6 +115,12 @@ namespace osu.Game.Rulesets.Osu.Difficulty
 
             if (score.Mods.Any(m => m is OsuModBlinds))
                 aimValue *= 1.3 + (totalHits * (0.0016 / (1 + 2 * effectiveMissCount)) * Math.Pow(accuracy, 16)) * (1 - 0.003 * attributes.DrainRate * attributes.DrainRate);
+            // for testing
+            else if (score.Mods.Any(h => h is OsuModHidden))
+            {
+                // We want to give more reward for lower AR when it comes to aim and HD. This nerfs high AR and buffs lower AR.
+                aimValue *= 1.0 + 0.04 * (12.0 - attributes.ApproachRate);
+            }
 
             // We assume 15% of sliders in a map are difficult since there's no way to tell from the performance calculator.
             double estimateDifficultSliders = attributes.SliderCount * 0.15;
@@ -158,6 +167,12 @@ namespace osu.Game.Rulesets.Osu.Difficulty
                 // Increasing the speed value by object count for Blinds isn't ideal, so the minimum buff is given.
                 speedValue *= 1.12;
             }
+            // for testing
+            else if (score.Mods.Any(m => m is OsuModHidden))
+            {
+                // We want to give more reward for lower AR when it comes to aim and HD. This nerfs high AR and buffs lower AR.
+                speedValue *= 1.0 + 0.04 * (12.0 - attributes.ApproachRate);
+            }
 
             // Calculate accuracy assuming the worst case scenario
             double relevantTotalDiff = totalHits - attributes.SpeedNoteCount;
@@ -203,6 +218,9 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             // Increasing the accuracy value by object count for Blinds isn't ideal, so the minimum buff is given.
             if (score.Mods.Any(m => m is OsuModBlinds))
                 accuracyValue *= 1.14;
+            // For testing
+            else if (score.Mods.Any(m => m is OsuModHidden))
+                accuracyValue *= 1.08;
 
             if (score.Mods.Any(m => m is OsuModFlashlight))
                 accuracyValue *= 1.02;

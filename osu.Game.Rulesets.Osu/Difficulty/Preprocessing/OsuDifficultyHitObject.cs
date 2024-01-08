@@ -4,6 +4,8 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Channels;
+using osu.Framework.Extensions.ObjectExtensions;
 using osu.Game.Rulesets.Difficulty.Preprocessing;
 using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Osu.Mods;
@@ -83,6 +85,11 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Preprocessing
         /// </summary>
         public double HitWindowGreat { get; private set; }
 
+        /// <summary>
+        /// Objects that was visible after the note was hit together with cumulative overlapping difficulty.
+        /// </summary>
+        public IList<OverlapObject> OverlapObjects { get; private set; }
+
         private readonly OsuHitObject? lastLastObject;
         private readonly OsuHitObject lastObject;
         public readonly double Preempt;
@@ -107,6 +114,57 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Preprocessing
             }
 
             setDistances(clockRate);
+
+            OverlapObjects = new List<OverlapObject>();
+
+            double totalOverlapnessDifficulty = 0;
+
+            OsuDifficultyHitObject prevObject = this;
+
+            foreach (var loopObj in retrieveCurrentVisibleObjects(this))
+            {
+                double currentOverlapness = calculateOverlapness(this, loopObj); // overlapness with this object
+                double instantOverlapness = 0.5 + calculateOverlapness(prevObject, loopObj); // overlapness between current and prev to make streams have 0 buff
+
+                double angleFactor = 1;
+                if (loopObj.Angle != null) angleFactor += (-Math.Cos((double)loopObj.Angle) + 1) / 2; // =2 for wide angles, =1 for acute angles
+                instantOverlapness = Math.Min(1, instantOverlapness * angleFactor); // wide angles are more predictable
+
+                totalOverlapnessDifficulty += currentOverlapness * (1 - instantOverlapness); // wide angles will have close-to-zero buff
+
+                OverlapObjects.Add(new OverlapObject(loopObj, totalOverlapnessDifficulty));
+                prevObject = loopObj;
+            }
+        }
+
+        private static double calculateOverlapness(OsuDifficultyHitObject odho1, OsuDifficultyHitObject odho2)
+        {
+            OsuHitObject o1 = odho1.BaseObject, o2 = odho2.BaseObject;
+
+            double distance = Vector2.Distance(o1.StackedPosition, o2.StackedPosition);
+
+            if (distance > o1.Radius * 2)
+                return 0;
+            if (distance < o1.Radius)
+                return 1;
+            return 1 - Math.Pow((distance - o1.Radius) / o1.Radius, 2);
+        }
+
+        private static IEnumerable<OsuDifficultyHitObject> retrieveCurrentVisibleObjects(OsuDifficultyHitObject current)
+        {
+
+            for (int i = 0; i < current.Count; i++)
+            {
+                OsuDifficultyHitObject hitObject = (OsuDifficultyHitObject)current.Previous(i);
+
+                if (hitObject.IsNull() ||
+                    // (hitObject.StartTime - current.StartTime) > reading_window_size ||
+                    //current.StartTime < hitObject.StartTime - hitObject.Preempt)
+                    hitObject.StartTime < current.StartTime - current.Preempt)
+                    break;
+
+                yield return hitObject;
+            }
         }
 
         public double OpacityAt(double time, bool hidden)
@@ -322,6 +380,18 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Preprocessing
             }
 
             return pos;
+        }
+
+        public struct OverlapObject
+        {
+            public OsuDifficultyHitObject HitObject;
+            public double Overlapness;
+
+            public OverlapObject(OsuDifficultyHitObject hitObject, double overlapness)
+            {
+                HitObject = hitObject;
+                Overlapness = overlapness;
+            }
         }
     }
 }

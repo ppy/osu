@@ -8,12 +8,17 @@ using osu.Game.Rulesets.Difficulty.Preprocessing;
 using osu.Game.Rulesets.Osu.Difficulty.Preprocessing;
 using osu.Game.Rulesets.Osu.Mods;
 using osu.Game.Rulesets.Osu.Objects;
+using osuTK;
 
 namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
 {
     public static class ReadingEvaluator
     {
         private const double reading_window_size = 3000;
+
+        private const double hidden_multiplier = 0.0;
+        private const double density_multiplier = 0.0;
+        private const double overlap_multiplier = 25.0;
 
         public static double EvaluateDifficultyOf(DifficultyHitObject current, bool hidden)
         {
@@ -27,6 +32,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
             var clockRateEstimate = current.BaseObject.StartTime / currObj.StartTime;
 
             double pastObjectDifficultyInfluence = 1.0;
+            double screenOverlapDifficulty = 0;
 
             foreach (var loopObj in retrievePastVisibleObjects(currObj))
             {
@@ -39,7 +45,22 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
                 loopDifficulty *= getTimeNerfFactor(timeBetweenCurrAndLoopObj);
 
                 pastObjectDifficultyInfluence += loopDifficulty;
+
+                double lastOverlapness = 0;
+                foreach (var overlapObj in loopObj.OverlapObjects)
+                {
+                    if (overlapObj.HitObject.StartTime + overlapObj.HitObject.Preempt > currObj.StartTime) break;
+                    lastOverlapness = overlapObj.Overlapness;
+                }
+                screenOverlapDifficulty += lastOverlapness;
             }
+
+            if (screenOverlapDifficulty > 0)
+            {
+                Console.WriteLine($"Object {currObj.StartTime}, overlapness = {screenOverlapDifficulty:0.##}");
+            }
+
+            // Console.WriteLine($"Object {currObj.StartTime}, overlapness = {overlapDifficulty:0.##}");
 
             double noteDensityDifficulty = Math.Pow(4 * Math.Log(Math.Max(1, pastObjectDifficultyInfluence - 3)), 2.3);
 
@@ -56,7 +77,10 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
                                     (8 + visibleObjectFactor) * currVelocity;
             }
 
-            double difficulty = hiddenDifficulty + noteDensityDifficulty;
+            double difficulty = hidden_multiplier * hiddenDifficulty + density_multiplier * noteDensityDifficulty + overlap_multiplier * screenOverlapDifficulty;
+
+            // Console.WriteLine($"Object {currObj.StartTime}, {hiddenDifficulty:0.##} + {noteDensityDifficulty:0.##} + {overlapDifficulty:0.##}");
+
             difficulty *= getConstantAngleNerfFactor(currObj);
 
             return difficulty;
@@ -139,11 +163,23 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
             return Math.Pow(Math.Min(1, 2 / constantAngleCount), 2);
         }
 
+        private static double getOverlapness(OsuDifficultyHitObject odho1, OsuDifficultyHitObject odho2)
+        {
+            OsuHitObject o1 = (OsuHitObject)odho1.BaseObject, o2 = (OsuHitObject)odho2.BaseObject;
+
+            double distance = Vector2.Distance(o1.StackedPosition, o2.StackedPosition);
+
+            if (distance > o1.Radius * 2)
+                return 0;
+            if (distance < o1.Radius)
+                return 1;
+            return 1 - Math.Pow((distance - o1.Radius) / o1.Radius, 2);
+        }
         private static double getTimeNerfFactor(double deltaTime)
         {
             return Math.Clamp(2 - deltaTime / (reading_window_size / 2), 0, 1);
         }
 
-        private static double logistic(double x) => 1 / (1 + Math.Pow(Math.E, -x));
+        private static double logistic(double x) => 1 / (1 + Math.Exp(-x));
     }
 }
