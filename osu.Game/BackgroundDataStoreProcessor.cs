@@ -13,6 +13,7 @@ using osu.Framework.Graphics;
 using osu.Framework.Logging;
 using osu.Game.Beatmaps;
 using osu.Game.Database;
+using osu.Game.Extensions;
 using osu.Game.Online.API;
 using osu.Game.Overlays;
 using osu.Game.Overlays.Notifications;
@@ -28,7 +29,7 @@ namespace osu.Game
     /// </summary>
     public partial class BackgroundDataStoreProcessor : Component
     {
-        protected Task ProcessingTask = null!;
+        protected Task ProcessingTask { get; private set; } = null!;
 
         [Resolved]
         private RulesetStore rulesetStore { get; set; } = null!;
@@ -316,10 +317,17 @@ namespace osu.Game
         {
             Logger.Log("Querying for scores that need total score conversion...");
 
-            HashSet<Guid> scoreIds = realmAccess.Run(r => new HashSet<Guid>(r.All<ScoreInfo>()
-                                                                             .Where(s => !s.BackgroundReprocessingFailed && s.BeatmapInfo != null
-                                                                                                                         && s.TotalScoreVersion < LegacyScoreEncoder.LATEST_VERSION)
-                                                                             .AsEnumerable().Select(s => s.ID)));
+            HashSet<Guid> scoreIds = realmAccess.Run(r => new HashSet<Guid>(
+                r.All<ScoreInfo>()
+                 .Where(s => !s.BackgroundReprocessingFailed
+                             && s.BeatmapInfo != null
+                             && s.IsLegacyScore
+                             && s.TotalScoreVersion < LegacyScoreEncoder.LATEST_VERSION)
+                 .AsEnumerable()
+                 // must be done after materialisation, as realm doesn't want to support
+                 // nested property predicates
+                 .Where(s => s.Ruleset.IsLegacyRuleset())
+                 .Select(s => s.ID)));
 
             Logger.Log($"Found {scoreIds.Count} scores which require total score conversion.");
 
