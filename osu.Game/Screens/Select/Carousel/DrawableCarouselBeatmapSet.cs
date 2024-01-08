@@ -199,27 +199,34 @@ namespace osu.Game.Screens.Select.Carousel
 
             Debug.Assert(Item != null);
 
-            if (loadCancellation == null && (timeSinceUnpool += Time.Elapsed) > timeUpdatingBeforeLoad)
-            {
-                loadCancellation = new CancellationTokenSource();
+            // A load is already in progress if the cancellation token is non-null.
+            if (loadCancellation != null)
+                return;
 
-                LoadComponentsAsync(new CompositeDrawable[]
+            timeSinceUnpool += Time.Elapsed;
+
+            // We only trigger a load after this set has been in an updating state for a set amount of time.
+            if (timeSinceUnpool <= timeUpdatingBeforeLoad)
+                return;
+
+            loadCancellation = new CancellationTokenSource();
+
+            LoadComponentsAsync(new CompositeDrawable[]
+            {
+                new SetPanelBackground(manager.GetWorkingBeatmap(beatmapSet.Beatmaps.MinBy(b => b.OnlineID)))
                 {
-                    new SetPanelBackground(manager.GetWorkingBeatmap(beatmapSet.Beatmaps.MinBy(b => b.OnlineID)))
-                    {
-                        RelativeSizeAxes = Axes.Both,
-                    },
-                    new SetPanelContent((CarouselBeatmapSet)Item)
-                    {
-                        Depth = float.MinValue,
-                        RelativeSizeAxes = Axes.Both,
-                    }
-                }, drawables =>
+                    RelativeSizeAxes = Axes.Both,
+                },
+                new SetPanelContent((CarouselBeatmapSet)Item)
                 {
-                    Header.AddRange(drawables);
-                    drawables.ForEach(d => d.FadeInFromZero(150));
-                }, loadCancellation.Token);
-            }
+                    Depth = float.MinValue,
+                    RelativeSizeAxes = Axes.Both,
+                }
+            }, drawables =>
+            {
+                Header.AddRange(drawables);
+                drawables.ForEach(d => d.FadeInFromZero(150));
+            }, loadCancellation.Token);
         }
 
         private void updateBeatmapYPositions()
