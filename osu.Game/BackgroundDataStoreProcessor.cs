@@ -28,6 +28,8 @@ namespace osu.Game
     /// </summary>
     public partial class BackgroundDataStoreProcessor : Component
     {
+        protected Task ProcessingTask = null!;
+
         [Resolved]
         private RulesetStore rulesetStore { get; set; } = null!;
 
@@ -61,7 +63,7 @@ namespace osu.Game
         {
             base.LoadComplete();
 
-            Task.Factory.StartNew(() =>
+            ProcessingTask = Task.Factory.StartNew(() =>
             {
                 Logger.Log("Beginning background data store processing..");
 
