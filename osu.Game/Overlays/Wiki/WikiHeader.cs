@@ -17,8 +17,6 @@ namespace osu.Game.Overlays.Wiki
 {
     public partial class WikiHeader : BreadcrumbControlOverlayHeader
     {
-        private const string index_path = "Main_page";
-
         public static LocalisableString IndexPageString => LayoutStrings.HeaderHelpIndex;
 
         public readonly Bindable<APIWikiPage> WikiPageData = new Bindable<APIWikiPage>();
@@ -45,7 +43,7 @@ namespace osu.Game.Overlays.Wiki
 
             TabControl.AddItem(IndexPageString);
 
-            if (e.NewValue.Path == index_path)
+            if (e.NewValue.Path == WikiOverlay.INDEX_PATH)
             {
                 Current.Value = IndexPageString;
                 return;
