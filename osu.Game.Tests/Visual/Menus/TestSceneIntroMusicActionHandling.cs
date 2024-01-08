@@ -24,7 +24,7 @@ namespace osu.Game.Tests.Visual.Menus
         {
             AddUntilStep("Wait for music", () => Game?.MusicController.IsPlaying == true);
 
-            // Check that pause dosesn't work during intro sequence.
+            // Check that pause doesn't work during intro sequence.
             AddStep("Toggle playback", () => globalActionContainer.TriggerPressed(GlobalAction.MusicPlay));
             AddAssert("Still playing before menu", () => Game?.MusicController.IsPlaying == true);
             AddUntilStep("Wait for main menu", () => Game?.ScreenStack.CurrentScreen is MainMenu menu && menu.IsLoaded);
