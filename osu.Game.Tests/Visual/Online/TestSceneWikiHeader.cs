@@ -24,8 +24,8 @@ namespace osu.Game.Tests.Visual.Online
         [Cached]
         private readonly Bindable<APIWikiPage> wikiPageData = new Bindable<APIWikiPage>(new APIWikiPage
         {
-            Title = "Main Page",
-            Path = "Main_Page",
+            Title = "Main page",
+            Path = "Main_page",
         });
 
         private TestHeader header;
