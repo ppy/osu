@@ -92,6 +92,9 @@ namespace osu.Game.Screens.Select
         {
             if (playerLoader != null) return false;
 
+            if (!this.IsCurrentScreen())
+                return false;
+
             modsAtGameplayStart = Mods.Value;
 
             // Ctrl+Enter should start map with autoplay enabled.
