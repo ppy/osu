@@ -9,39 +9,31 @@ using osu.Game.Screens.Menu;
 
 namespace osu.Game.Tests.Visual.Menus
 {
-    public partial class TestSceneIntroMusicActionHandling : OsuTestScene
+    public partial class TestSceneIntroMusicActionHandling : OsuGameTestScene
     {
-        private OsuGameTestScene.TestOsuGame? game;
+        private GlobalActionContainer globalActionContainer => Game.ChildrenOfType<GlobalActionContainer>().First();
 
-        private GlobalActionContainer globalActionContainer => game.ChildrenOfType<GlobalActionContainer>().First();
+        public override void SetUpSteps()
+        {
+            CreateNewGame();
+            // we do not want to progress to main menu immediately, hence the override and lack of `ConfirmAtMainMenu()` call here.
+        }
 
         [Test]
         public void TestPauseDuringIntro()
         {
-            AddStep("Create new game instance", () =>
-            {
-                if (game?.Parent != null)
-                    Remove(game, true);
-
-                RecycleLocalStorage(false);
-
-                AddGame(game = new OsuGameTestScene.TestOsuGame(LocalStorage, API));
-            });
-
-            AddUntilStep("Wait for load", () => game?.IsLoaded ?? false);
-            AddUntilStep("Wait for intro", () => game?.ScreenStack.CurrentScreen is IntroScreen);
-            AddUntilStep("Wait for music", () => game?.MusicController.IsPlaying == true);
+            AddUntilStep("Wait for music", () => Game?.MusicController.IsPlaying == true);
 
             // Check that pause dosesn't work during intro sequence.
             AddStep("Toggle playback", () => globalActionContainer.TriggerPressed(GlobalAction.MusicPlay));
-            AddAssert("Still playing before menu", () => game?.MusicController.IsPlaying == true);
-            AddUntilStep("Wait for main menu", () => game?.ScreenStack.CurrentScreen is MainMenu menu && menu.IsLoaded);
+            AddAssert("Still playing before menu", () => Game?.MusicController.IsPlaying == true);
+            AddUntilStep("Wait for main menu", () => Game?.ScreenStack.CurrentScreen is MainMenu menu && menu.IsLoaded);
 
             // Check that toggling after intro still works.
             AddStep("Toggle playback", () => globalActionContainer.TriggerPressed(GlobalAction.MusicPlay));
-            AddUntilStep("Music paused", () => game?.MusicController.IsPlaying == false && game?.MusicController.UserPauseRequested == true);
+            AddUntilStep("Music paused", () => Game?.MusicController.IsPlaying == false && Game?.MusicController.UserPauseRequested == true);
             AddStep("Toggle playback", () => globalActionContainer.TriggerPressed(GlobalAction.MusicPlay));
-            AddUntilStep("Music resumed", () => game?.MusicController.IsPlaying == true && game?.MusicController.UserPauseRequested == false);
+            AddUntilStep("Music resumed", () => Game?.MusicController.IsPlaying == true && Game?.MusicController.UserPauseRequested == false);
         }
     }
 }
