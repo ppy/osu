@@ -11,6 +11,7 @@ using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
+using osu.Framework.Layout;
 using osu.Game.Audio;
 using osu.Game.Graphics.Containers;
 using osu.Game.Rulesets.Objects;
@@ -35,8 +36,6 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
         public SkinnableDrawable Body { get; private set; }
 
         private ShakeContainer shakeContainer;
-
-        private Vector2? childAnchorPosition;
 
         protected override IEnumerable<Drawable> DimmablePieces => new Drawable[]
         {
@@ -68,6 +67,8 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
         private Container<DrawableSliderRepeat> repeatContainer;
         private PausableSkinnableSound slidingSample;
 
+        private readonly LayoutValue drawSizeLayout;
+
         public DrawableSlider()
             : this(null)
         {
@@ -84,6 +85,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
                 AlwaysPresent = true,
                 Alpha = 0
             };
+            AddLayout(drawSizeLayout = new LayoutValue(Invalidation.DrawSize | Invalidation.MiscGeometry));
         }
 
         [BackgroundDependencyLoader]
@@ -121,11 +123,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
                 }
             });
 
-            PositionBindable.BindValueChanged(_ =>
-            {
-                Position = HitObject.StackedPosition;
-                childAnchorPosition = null;
-            });
+            PositionBindable.BindValueChanged(_ => Position = HitObject.StackedPosition);
             StackHeightBindable.BindValueChanged(_ => Position = HitObject.StackedPosition);
             ScaleBindable.BindValueChanged(scale => Ball.Scale = new Vector2(scale.NewValue));
 
@@ -258,17 +256,14 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
             Size = SliderBody?.Size ?? Vector2.Zero;
             OriginPosition = SliderBody?.PathOffset ?? Vector2.Zero;
 
-            if (DrawSize != Vector2.Zero)
+            if (!drawSizeLayout.IsValid)
             {
                 Vector2 pos = Vector2.Divide(OriginPosition, DrawSize);
+                foreach (var obj in NestedHitObjects)
+                    obj.RelativeAnchorPosition = pos;
+                Ball.RelativeAnchorPosition = pos;
 
-                if (pos != childAnchorPosition)
-                {
-                    childAnchorPosition = pos;
-                    foreach (var obj in NestedHitObjects)
-                        obj.RelativeAnchorPosition = pos;
-                    Ball.RelativeAnchorPosition = pos;
-                }
+                drawSizeLayout.Validate();
             }
         }
 
