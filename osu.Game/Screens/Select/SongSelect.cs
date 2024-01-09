@@ -660,7 +660,8 @@ namespace osu.Game.Screens.Select
 
             logo.Action = () =>
             {
-                FinaliseSelection();
+                if (this.IsCurrentScreen())
+                    FinaliseSelection();
                 return false;
             };
         }
