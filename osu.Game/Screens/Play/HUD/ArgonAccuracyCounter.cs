@@ -90,6 +90,7 @@ namespace osu.Game.Screens.Play.HUD
                         percentText = new ArgonCounterTextComponent(Anchor.TopLeft)
                         {
                             Text = @"%",
+                            RequiredDisplayDigits = { Value = 1 },
                             WireframeOpacity = { BindTarget = WireframeOpacity }
                         },
                     }
