@@ -2,6 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using osu.Framework.Extensions;
@@ -98,15 +99,11 @@ namespace osu.Game.Database
             // can potentially be run asynchronously, although we will need to consider operation order for disk deletion vs realm removal.
             realm.Write(r =>
             {
-                // TODO: consider using a realm native query to avoid iterating all files (https://github.com/realm/realm-dotnet/issues/2659#issuecomment-927823707)
-                var files = r.All<RealmFile>().ToList();
-
-                foreach (var file in files)
+                foreach (var file in r.All<RealmFile>().Filter("Usages.@count = 0"))
                 {
                     totalFiles++;
 
-                    if (file.BacklinksCount > 0)
-                        continue;
+                    Debug.Assert(file.BacklinksCount == 0);
 
                     try
                     {
