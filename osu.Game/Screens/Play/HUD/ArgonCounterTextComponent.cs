@@ -159,7 +159,8 @@ namespace osu.Game.Screens.Play.HUD
                 public ITexturedCharacterGlyph? Get(string? fontName, char character)
                 {
                     // We only service one font.
-                    Debug.Assert(fontName == this.fontName);
+                    if (fontName != this.fontName)
+                        return null;
 
                     if (cache.TryGetValue(character, out var cached))
                         return cached;
