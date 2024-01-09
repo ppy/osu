@@ -98,7 +98,7 @@ namespace osu.Game.Database
             // can potentially be run asynchronously, although we will need to consider operation order for disk deletion vs realm removal.
             realm.Write(r =>
             {
-                foreach (var file in r.All<RealmFile>().Filter("Usages.@count = 0"))
+                foreach (var file in r.All<RealmFile>().Filter(@$"{nameof(RealmFile.Usages)}.@count = 0"))
                 {
                     totalFiles++;
 
