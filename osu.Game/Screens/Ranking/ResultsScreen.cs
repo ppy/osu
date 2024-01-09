@@ -206,25 +206,17 @@ namespace osu.Game.Screens.Ranking
 
             if (lastFetchCompleted)
             {
-                if (ScorePanelList.IsEmpty)
-                {
-                    // This can happen if a beatmap part of a playlist hasn't been played yet.
-                    VerticalScrollContent.Add(new MessagePlaceholder(LeaderboardStrings.NoRecordsYet));
-                }
-                else
-                {
-                    APIRequest nextPageRequest = null;
+                APIRequest nextPageRequest = null;
 
-                    if (ScorePanelList.IsScrolledToStart)
-                        nextPageRequest = FetchNextPage(-1, fetchScoresCallback);
-                    else if (ScorePanelList.IsScrolledToEnd)
-                        nextPageRequest = FetchNextPage(1, fetchScoresCallback);
+                if (ScorePanelList.IsScrolledToStart)
+                    nextPageRequest = FetchNextPage(-1, fetchScoresCallback);
+                else if (ScorePanelList.IsScrolledToEnd)
+                    nextPageRequest = FetchNextPage(1, fetchScoresCallback);
 
-                    if (nextPageRequest != null)
-                    {
-                        lastFetchCompleted = false;
-                        api.Queue(nextPageRequest);
-                    }
+                if (nextPageRequest != null)
+                {
+                    lastFetchCompleted = false;
+                    api.Queue(nextPageRequest);
                 }
             }
         }
@@ -255,6 +247,12 @@ namespace osu.Game.Screens.Ranking
                 addScore(s);
 
             lastFetchCompleted = true;
+
+            if (ScorePanelList.IsEmpty)
+            {
+                // This can happen if for example a beatmap that is part of a playlist hasn't been played yet.
+                VerticalScrollContent.Add(new MessagePlaceholder(LeaderboardStrings.NoRecordsYet));
+            }
         });
 
         public override void OnEntering(ScreenTransitionEvent e)
