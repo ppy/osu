@@ -158,7 +158,6 @@ namespace osu.Game.Screens.Play.HUD
             base.LoadComplete();
 
             HealthProcessor.NewJudgement += onNewJudgement;
-            Current.BindValueChanged(onCurrentChanged, true);
 
             // we're about to set `RelativeSizeAxes` depending on the value of `UseRelativeSize`.
             // setting `RelativeSizeAxes` internally transforms absolute sizing to relative and back to keep the size the same,
@@ -173,31 +172,6 @@ namespace osu.Game.Screens.Play.HUD
 
         private void onNewJudgement(JudgementResult result) => pendingMissAnimation |= !result.IsHit;
 
-        private void onCurrentChanged(ValueChangedEvent<double> valueChangedEvent)
-            // schedule display updates one frame later to ensure we know the judgement result causing this change (if there is one).
-            => Scheduler.AddOnce(updateDisplay);
-
-        private void updateDisplay()
-        {
-            double newHealth = Current.Value;
-
-            if (newHealth >= GlowBarValue)
-                finishMissDisplay();
-
-            double time = newHealth > GlowBarValue ? 500 : 250;
-
-            // TODO: this should probably use interpolation in update.
-            this.TransformTo(nameof(HealthBarValue), newHealth, time, Easing.OutQuint);
-
-            if (pendingMissAnimation && newHealth < GlowBarValue)
-                triggerMissDisplay();
-
-            pendingMissAnimation = false;
-
-            if (!displayingMiss)
-                this.TransformTo(nameof(GlowBarValue), newHealth, time, Easing.OutQuint);
-        }
-
         protected override void Update()
         {
             base.Update();
@@ -210,6 +184,19 @@ namespace osu.Game.Screens.Play.HUD
 
             mainBar.Alpha = (float)Interpolation.DampContinuously(mainBar.Alpha, Current.Value > 0 ? 1 : 0, 40, Time.Elapsed);
             glowBar.Alpha = (float)Interpolation.DampContinuously(glowBar.Alpha, GlowBarValue > 0 ? 1 : 0, 40, Time.Elapsed);
+
+            double newHealth = Current.Value;
+
+            if (newHealth >= GlowBarValue)
+                finishMissDisplay();
+
+            if (pendingMissAnimation && newHealth < GlowBarValue)
+                triggerMissDisplay();
+            pendingMissAnimation = false;
+
+            HealthBarValue = Interpolation.DampContinuously(HealthBarValue, newHealth, 50, Time.Elapsed);
+            if (!displayingMiss)
+                GlowBarValue = Interpolation.DampContinuously(GlowBarValue, newHealth, 50, Time.Elapsed);
         }
 
         protected override void FinishInitialAnimation(double value)
