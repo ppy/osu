@@ -137,7 +137,7 @@ namespace osu.Game.Overlays
             wikiData.Value = response;
             path.Value = response.Path;
 
-            if (response.Layout == INDEX_PATH.ToLowerInvariant())
+            if (response.Layout.Equals(INDEX_PATH, StringComparison.OrdinalIgnoreCase))
             {
                 LoadDisplay(new WikiMainPage
                 {
