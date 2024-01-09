@@ -311,13 +311,22 @@ namespace osu.Game.Database
             long maximumLegacyBonusScore = attributes.BonusScore;
 
             double legacyAccScore = maximumLegacyAccuracyScore * score.Accuracy;
-            // We can not separate the ComboScore from the BonusScore, so we keep the bonus in the ratio.
-            // Note that `maximumLegacyComboScore + maximumLegacyBonusScore` can actually be 0
-            // when playing a beatmap with no bonus objects, with mods that have a 0.0x multiplier on stable (relax/autopilot).
-            // In such cases, just assume 0.
-            double comboProportion = maximumLegacyComboScore + maximumLegacyBonusScore > 0
-                ? Math.Max((double)score.LegacyTotalScore - legacyAccScore, 0) / (maximumLegacyComboScore + maximumLegacyBonusScore)
-                : 0;
+
+            double comboProportion;
+
+            if (maximumLegacyComboScore + maximumLegacyBonusScore > 0)
+            {
+                // We can not separate the ComboScore from the BonusScore, so we keep the bonus in the ratio.
+                comboProportion = Math.Max((double)score.LegacyTotalScore - legacyAccScore, 0) / (maximumLegacyComboScore + maximumLegacyBonusScore);
+            }
+            else
+            {
+                // Two possible causes:
+                // the beatmap has no bonus objects *AND*
+                // either the active mods have a zero mod multiplier, in which case assume 0,
+                // or the *beatmap* has a zero `difficultyPeppyStars` (or just no combo-giving objects), in which case assume 1.
+                comboProportion = legacyModMultiplier == 0 ? 0 : 1;
+            }
 
             // We assume the bonus proportion only makes up the rest of the score that exceeds maximumLegacyBaseScore.
             long maximumLegacyBaseScore = maximumLegacyAccuracyScore + maximumLegacyComboScore;
@@ -465,9 +474,14 @@ namespace osu.Game.Database
                     break;
 
                 case 3:
+                    // in the mania case accuracy actually changes between score V1 and score V2 / standardised
+                    // (PERFECT weighting changes from 300 to 305),
+                    // so for better accuracy recompute accuracy locally based on hit statistics and use that instead,
+                    double scoreV2Accuracy = ComputeAccuracy(score);
+
                     convertedTotalScore = (long)Math.Round((
                         850000 * comboProportion
-                        + 150000 * Math.Pow(score.Accuracy, 2 + 2 * score.Accuracy)
+                        + 150000 * Math.Pow(scoreV2Accuracy, 2 + 2 * scoreV2Accuracy)
                         + bonusProportion) * modMultiplier);
                     break;
 
