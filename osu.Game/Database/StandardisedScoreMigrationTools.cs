@@ -311,13 +311,22 @@ namespace osu.Game.Database
             long maximumLegacyBonusScore = attributes.BonusScore;
 
             double legacyAccScore = maximumLegacyAccuracyScore * score.Accuracy;
-            // We can not separate the ComboScore from the BonusScore, so we keep the bonus in the ratio.
-            // Note that `maximumLegacyComboScore + maximumLegacyBonusScore` can actually be 0
-            // when playing a beatmap with no bonus objects, with mods that have a 0.0x multiplier on stable (relax/autopilot).
-            // In such cases, just assume 0.
-            double comboProportion = maximumLegacyComboScore + maximumLegacyBonusScore > 0
-                ? Math.Max((double)score.LegacyTotalScore - legacyAccScore, 0) / (maximumLegacyComboScore + maximumLegacyBonusScore)
-                : 0;
+
+            double comboProportion;
+
+            if (maximumLegacyComboScore + maximumLegacyBonusScore > 0)
+            {
+                // We can not separate the ComboScore from the BonusScore, so we keep the bonus in the ratio.
+                comboProportion = Math.Max((double)score.LegacyTotalScore - legacyAccScore, 0) / (maximumLegacyComboScore + maximumLegacyBonusScore);
+            }
+            else
+            {
+                // Two possible causes:
+                // the beatmap has no bonus objects *AND*
+                // either the active mods have a zero mod multiplier, in which case assume 0,
+                // or the *beatmap* has a zero `difficultyPeppyStars` (or just no combo-giving objects), in which case assume 1.
+                comboProportion = legacyModMultiplier == 0 ? 0 : 1;
+            }
 
             // We assume the bonus proportion only makes up the rest of the score that exceeds maximumLegacyBaseScore.
             long maximumLegacyBaseScore = maximumLegacyAccuracyScore + maximumLegacyComboScore;
