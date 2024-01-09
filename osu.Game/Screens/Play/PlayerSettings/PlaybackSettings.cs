@@ -31,8 +31,6 @@ namespace osu.Game.Screens.Play.PlayerSettings
 
         private readonly OsuSpriteText multiplierText;
 
-        private readonly IconButton play;
-
         private readonly BindableBool isPaused = new BindableBool();
 
         [Resolved]
@@ -46,6 +44,8 @@ namespace osu.Game.Screens.Play.PlayerSettings
         {
             const double seek_amount = 5000;
             const double seek_fast_amount = 10000;
+
+            IconButton play;
 
             Children = new Drawable[]
             {
