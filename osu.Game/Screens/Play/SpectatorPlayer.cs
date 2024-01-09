@@ -68,6 +68,8 @@ namespace osu.Game.Screens.Play
                         master.UserPlaybackRate.Value = 1;
                 }
             }, true);
+
+            HUDOverlay.PlayerSettingsOverlay.PlaybackSettings.AllowControls.Value = false;
         }
 
         /// <summary>
