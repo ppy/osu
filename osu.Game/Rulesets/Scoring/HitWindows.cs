@@ -86,7 +86,7 @@ namespace osu.Game.Rulesets.Scoring
         {
             foreach (var range in GetRanges())
             {
-                double value = ValueFor(difficulty, range);
+                double value = HitWindowValueFor(difficulty, range);
 
                 switch (range.Result)
                 {
@@ -123,7 +123,7 @@ namespace osu.Game.Rulesets.Scoring
         /// <param name="difficulty">The difficulty parameter.</param>
         /// <param name="range">The range of difficulty values.</param>
         /// <returns>Value to which the difficulty parameter maps in the specified range.</returns>
-        public virtual double ValueFor(double difficulty, DifficultyRange range)
+        protected virtual double HitWindowValueFor(double difficulty, DifficultyRange range)
         {
             return IBeatmapDifficultyInfo.DifficultyRange(difficulty, (range.Min, range.Average, range.Max));
         }
@@ -152,7 +152,7 @@ namespace osu.Game.Rulesets.Scoring
         /// <param name="timeOffset">The time offset.</param>
         /// <param name="result">The <see cref="HitResult"/>.</param>
         /// <returns>Whether the time offset is contained within the hit window of the hit result.</returns>
-        public virtual bool Contains(double timeOffset, HitResult result)
+        protected virtual bool Contains(double timeOffset, HitResult result)
         {
             return timeOffset <= WindowFor(result);
         }
@@ -206,12 +206,12 @@ namespace osu.Game.Rulesets.Scoring
 
         public class LegacyHitWindows : HitWindows
         {
-            public override double ValueFor(double difficulty, DifficultyRange range)
+            protected override double HitWindowValueFor(double difficulty, DifficultyRange range)
             {
-                return Math.Floor(base.ValueFor(difficulty, range)) - 0.5; // represents the "true" hit windows in osu!stable;  osu!stable rounded input times to integers (which is equivalent to the 0.5ms shift here), and hit windows were floored
+                return Math.Floor(base.HitWindowValueFor(difficulty, range)) - 0.5; // represents the "true" hit windows in osu!stable;  osu!stable rounded input times to integers (which is equivalent to the 0.5ms shift here), and hit windows were floored
             }
 
-            public override bool Contains(double timeOffset, HitResult result)
+            protected override bool Contains(double timeOffset, HitResult result)
             {
                 return timeOffset < WindowFor(result); // together with the overridden ValueFor, this implements a formula equivalent to osu!stable judgement (except for exactly half-integers, which are now always considered out if at the edge of a hit window)
             }
@@ -219,9 +219,9 @@ namespace osu.Game.Rulesets.Scoring
 
         public class InclusiveLegacyHitWindows : LegacyHitWindows
         {
-            public override double ValueFor(double difficulty, DifficultyRange range)
+            protected override double HitWindowValueFor(double difficulty, DifficultyRange range)
             {
-                return base.ValueFor(difficulty, range) + 1.0; // abs(round(hit_error)) <= floor(hit_window) is equivalent to abs(round(hit_error)) < floor(hit_window) + 1 = floor(hit_window + 1), because both sides of the inequality are integers; therefore, we can use exclusive legacy hit windows with 1ms wider hit windows
+                return base.HitWindowValueFor(difficulty, range) + 1.0; // abs(round(hit_error)) <= floor(hit_window) is equivalent to abs(round(hit_error)) < floor(hit_window) + 1 = floor(hit_window + 1), because both sides of the inequality are integers; therefore, we can use exclusive legacy hit windows with 1ms wider hit windows
             }
         }
 
