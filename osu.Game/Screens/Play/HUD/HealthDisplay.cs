@@ -8,6 +8,7 @@ using osu.Framework.Extensions.ObjectExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Threading;
+using osu.Framework.Utils;
 using osu.Game.Rulesets.Judgements;
 using osu.Game.Rulesets.Scoring;
 using osu.Game.Rulesets.UI;
@@ -75,19 +76,17 @@ namespace osu.Game.Screens.Play.HUD
 
             // Health changes every frame in draining situations.
             // Manually handle value changes to avoid bindable event flow overhead.
-            if (health.Value != Current.Value)
+            if (!Precision.AlmostEquals(health.Value, Current.Value, 0.001f))
             {
                 if (initialIncrease != null)
                     FinishInitialAnimation(Current.Value);
 
+                HealthChanged(Current.Value > health.Value);
                 Current.Value = health.Value;
-
-                if (health.Value > Current.Value)
-                    HealthIncreased();
             }
         }
 
-        protected virtual void HealthIncreased()
+        protected virtual void HealthChanged(bool increase)
         {
         }
 

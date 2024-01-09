@@ -3,7 +3,6 @@
 
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Extensions.Color4Extensions;
@@ -58,8 +57,7 @@ namespace osu.Game.Screens.Play.HUD
 
         private bool displayingMiss => resetMissBarDelegate != null;
 
-        private readonly List<Vector2> missBarVertices = new List<Vector2>();
-        private readonly List<Vector2> healthBarVertices = new List<Vector2>();
+        private readonly List<Vector2> vertices = new List<Vector2>();
 
         private double glowBarValue;
 
@@ -156,23 +154,27 @@ namespace osu.Game.Screens.Play.HUD
                 drawSizeLayout.Validate();
             }
 
+            healthBarValue = Interpolation.DampContinuously(healthBarValue, Current.Value, 50, Time.Elapsed);
+            if (!displayingMiss)
+                glowBarValue = Interpolation.DampContinuously(glowBarValue, Current.Value, 50, Time.Elapsed);
+
             mainBar.Alpha = (float)Interpolation.DampContinuously(mainBar.Alpha, Current.Value > 0 ? 1 : 0, 40, Time.Elapsed);
             glowBar.Alpha = (float)Interpolation.DampContinuously(glowBar.Alpha, glowBarValue > 0 ? 1 : 0, 40, Time.Elapsed);
 
-            double newHealth = Current.Value;
+            updatePathVertices();
+        }
 
-            if (newHealth >= glowBarValue)
+        protected override void HealthChanged(bool increase)
+        {
+            if (Current.Value >= glowBarValue)
                 finishMissDisplay();
 
-            if (pendingMissAnimation && newHealth < glowBarValue)
+            if (pendingMissAnimation && Current.Value < glowBarValue)
                 triggerMissDisplay();
+
             pendingMissAnimation = false;
 
-            healthBarValue = Interpolation.DampContinuously(healthBarValue, newHealth, 50, Time.Elapsed);
-            if (!displayingMiss)
-                glowBarValue = Interpolation.DampContinuously(glowBarValue, newHealth, 50, Time.Elapsed);
-
-            updatePathVertices();
+            base.HealthChanged(increase);
         }
 
         protected override void FinishInitialAnimation(double value)
@@ -265,7 +267,6 @@ namespace osu.Game.Screens.Play.HUD
             if (DrawWidth - padding < rescale_cutoff)
                 rescalePathProportionally();
 
-            List<Vector2> vertices = new List<Vector2>();
             barPath.GetPathToProgress(vertices, 0.0, 1.0);
 
             background.Vertices = vertices;
@@ -295,20 +296,23 @@ namespace osu.Game.Screens.Play.HUD
 
         private void updatePathVertices()
         {
-            barPath.GetPathToProgress(healthBarVertices, 0.0, healthBarValue);
-            barPath.GetPathToProgress(missBarVertices, healthBarValue, Math.Max(glowBarValue, healthBarValue));
+            barPath.GetPathToProgress(vertices, 0.0, healthBarValue);
+            if (vertices.Count == 0) vertices.Add(Vector2.Zero);
+            Vector2 initialVertex = vertices[0];
+            for (int i = 0; i < vertices.Count; i++)
+                vertices[i] -= initialVertex;
 
-            if (healthBarVertices.Count == 0)
-                healthBarVertices.Add(Vector2.Zero);
+            mainBar.Vertices = vertices;
+            mainBar.Position = initialVertex;
 
-            if (missBarVertices.Count == 0)
-                missBarVertices.Add(Vector2.Zero);
+            barPath.GetPathToProgress(vertices, healthBarValue, Math.Max(glowBarValue, healthBarValue));
+            if (vertices.Count == 0) vertices.Add(Vector2.Zero);
+            initialVertex = vertices[0];
+            for (int i = 0; i < vertices.Count; i++)
+                vertices[i] -= initialVertex;
 
-            glowBar.Vertices = missBarVertices.Select(v => v - missBarVertices[0]).ToList();
-            glowBar.Position = missBarVertices[0];
-
-            mainBar.Vertices = healthBarVertices.Select(v => v - healthBarVertices[0]).ToList();
-            mainBar.Position = healthBarVertices[0];
+            glowBar.Vertices = vertices;
+            glowBar.Position = initialVertex;
         }
 
         protected override void Dispose(bool isDisposing)
