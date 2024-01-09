@@ -74,7 +74,8 @@ namespace osu.Game.Screens.Play.HUD
 
         private int getDigitsRequiredForDisplayCount()
         {
-            int digitsRequired = 1;
+            // one for the single presumed starting digit, one for the "x" at the end.
+            int digitsRequired = 2;
             long c = DisplayedCount;
             while ((c /= 10) > 0)
                 digitsRequired++;
