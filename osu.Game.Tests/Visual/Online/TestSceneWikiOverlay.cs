@@ -11,7 +11,6 @@ using osu.Game.Online.API;
 using osu.Game.Online.API.Requests;
 using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Overlays;
-using osu.Game.Overlays.Wiki;
 
 namespace osu.Game.Tests.Visual.Online
 {
