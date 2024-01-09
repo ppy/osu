@@ -69,8 +69,8 @@ namespace osu.Game.Tests.Visual.Online
         {
             AddStep("set current path", () => markdownContainer.CurrentPath = $"{API.WebsiteRootUrl}/wiki/Article_styling_criteria/");
 
-            AddStep("set '/wiki/Main_Page''", () => markdownContainer.Text = "[wiki main page](/wiki/Main_Page)");
-            AddAssert("check url", () => markdownContainer.Link.Url == $"{API.WebsiteRootUrl}/wiki/Main_Page");
+            AddStep("set '/wiki/Main_page''", () => markdownContainer.Text = "[wiki main page](/wiki/Main_page)");
+            AddAssert("check url", () => markdownContainer.Link.Url == $"{API.WebsiteRootUrl}/wiki/Main_page");
 
             AddStep("set '../FAQ''", () => markdownContainer.Text = "[FAQ](../FAQ)");
             AddAssert("check url", () => markdownContainer.Link.Url == $"{API.WebsiteRootUrl}/wiki/FAQ");
