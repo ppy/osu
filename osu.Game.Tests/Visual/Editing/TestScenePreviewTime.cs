@@ -31,5 +31,15 @@ namespace osu.Game.Tests.Visual.Editing
             AddStep("set preview time to 1000", () => EditorBeatmap.PreviewTime.Value = 1000);
             AddAssert("preview time line should show", () => Editor.ChildrenOfType<PreviewTimePart>().Single().Children.Single().Alpha == 1);
         }
+
+        [Test]
+        public void TestScenePreviewTimeRollbackAfterUndo()
+        {
+            AddStep("set preview time to -1", () => EditorBeatmap.PreviewTime.Value = -1);
+            AddStep("seek to 1000", () => EditorClock.Seek(1000));
+            AddStep("set current time as preview point", () => Editor.SetPreviewPointToCurrentTime());
+            AddStep("Do undo", () => Editor.Undo());
+            AddAssert("preview time is -1", () => EditorBeatmap.PreviewTime.Value == -1);
+        }
     }
 }

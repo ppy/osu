@@ -73,6 +73,8 @@ namespace osu.Game.Screens.Edit
                         editorBeatmap.ControlPointInfo.Add(newGroup.Time, point);
                 }
             }
+
+            editorBeatmap.PreviewTime.Value = getNewBeatmap().Metadata.PreviewTime;
         }
 
         private void processHitObjects(DiffResult result, Func<IBeatmap> getNewBeatmap)
