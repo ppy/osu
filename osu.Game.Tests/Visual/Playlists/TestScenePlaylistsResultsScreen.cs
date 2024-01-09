@@ -79,6 +79,7 @@ namespace osu.Game.Tests.Visual.Playlists
             AddStep("bind user score info handler", () => bindHandler(userScore: userScore));
 
             createResults(() => userScore);
+            waitForDisplay();
 
             AddAssert("user score selected", () => this.ChildrenOfType<ScorePanel>().Single(p => p.Score.OnlineID == userScore.OnlineID).State == PanelState.Expanded);
             AddAssert($"score panel position is {real_user_position}",
@@ -91,6 +92,7 @@ namespace osu.Game.Tests.Visual.Playlists
             InitialiseUserScoresAndBeatmap();
 
             createResults();
+            waitForDisplay();
 
             AddAssert("top score selected", () => this.ChildrenOfType<ScorePanel>().OrderByDescending(p => p.Score.TotalScore).First().State == PanelState.Expanded);
         }
@@ -103,6 +105,7 @@ namespace osu.Game.Tests.Visual.Playlists
             AddStep("bind user score info handler", () => bindHandler(true, userScore));
 
             createResults(() => userScore);
+            waitForDisplay();
 
             AddAssert("more than 1 panel displayed", () => this.ChildrenOfType<ScorePanel>().Count() > 1);
             AddAssert("user score selected", () => this.ChildrenOfType<ScorePanel>().Single(p => p.Score.OnlineID == userScore.OnlineID).State == PanelState.Expanded);
@@ -116,6 +119,7 @@ namespace osu.Game.Tests.Visual.Playlists
             AddStep("bind delayed handler", () => bindHandler(true));
 
             createResults();
+            waitForDisplay();
 
             AddAssert("top score selected", () => this.ChildrenOfType<ScorePanel>().OrderByDescending(p => p.Score.TotalScore).First().State == PanelState.Expanded);
         }
@@ -126,6 +130,7 @@ namespace osu.Game.Tests.Visual.Playlists
             InitialiseUserScoresAndBeatmap();
 
             createResults();
+            waitForDisplay();
 
             AddStep("bind delayed handler", () => bindHandler(true));
 
@@ -152,6 +157,7 @@ namespace osu.Game.Tests.Visual.Playlists
             AddStep("bind user score info handler", () => bindHandler(userScore: userScore));
 
             createResults(() => userScore);
+            waitForDisplay();
 
             AddStep("bind delayed handler", () => bindHandler(true));
 
@@ -174,12 +180,11 @@ namespace osu.Game.Tests.Visual.Playlists
         public void TestShowWithNoScores()
         {
             InitialiseUserScoresAndBeatmap(noScores: true);
-
-            createResults(noScores: true);
+            createResults();
             AddAssert("no scores visible", () => resultsScreen.ScorePanelList.GetScorePanels().Count() == 0);
         }
 
-        private void createResults(Func<ScoreInfo> getScore = null, bool noScores = false)
+        private void createResults(Func<ScoreInfo> getScore = null)
         {
             AddStep("load results", () =>
             {
@@ -190,13 +195,10 @@ namespace osu.Game.Tests.Visual.Playlists
             });
 
             AddUntilStep("wait for screen to load", () => resultsScreen.IsLoaded);
-            waitForDisplay(noScores);
         }
 
-        private void waitForDisplay(bool noScores = false)
+        private void waitForDisplay()
         {
-            if (noScores) return;
-
             AddUntilStep("wait for scores loaded", () =>
                 requestComplete
                 // request handler may need to fire more than once to get scores.
