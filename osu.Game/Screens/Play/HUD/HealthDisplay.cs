@@ -56,13 +56,6 @@ namespace osu.Game.Screens.Play.HUD
 
             // Don't bind directly so we can animate the startup procedure.
             health = HealthProcessor.Health.GetBoundCopy();
-            health.BindValueChanged(h =>
-            {
-                if (initialIncrease != null)
-                    FinishInitialAnimation(h.OldValue);
-
-                Current.Value = h.NewValue;
-            });
 
             if (hudOverlay != null)
                 showHealthBar.BindTo(hudOverlay.ShowHealthBar);
@@ -74,6 +67,28 @@ namespace osu.Game.Screens.Play.HUD
                 startInitialAnimation();
             else
                 Current.Value = health.Value;
+        }
+
+        protected override void Update()
+        {
+            base.Update();
+
+            // Health changes every frame in draining situations.
+            // Manually handle value changes to avoid bindable event flow overhead.
+            if (health.Value != Current.Value)
+            {
+                if (initialIncrease != null)
+                    FinishInitialAnimation(Current.Value);
+
+                Current.Value = health.Value;
+
+                if (health.Value > Current.Value)
+                    HealthIncreased();
+            }
+        }
+
+        protected virtual void HealthIncreased()
+        {
         }
 
         private void startInitialAnimation()
