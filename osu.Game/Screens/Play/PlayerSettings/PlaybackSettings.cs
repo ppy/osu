@@ -11,6 +11,7 @@ using osu.Game.Beatmaps;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Graphics.UserInterface;
+using osu.Game.Screens.Edit.Timing;
 using osuTK;
 
 namespace osu.Game.Screens.Play.PlayerSettings
@@ -64,14 +65,14 @@ namespace osu.Game.Screens.Play.PlayerSettings
                             Spacing = new Vector2(5, 0),
                             Children = new Drawable[]
                             {
-                                new IconButton
+                                new SeekButton
                                 {
                                     Anchor = Anchor.Centre,
                                     Origin = Anchor.Centre,
                                     Icon = FontAwesome.Solid.FastBackward,
                                     Action = () => seek(-1, seek_fast_amount),
                                 },
-                                new IconButton
+                                new SeekButton
                                 {
                                     Anchor = Anchor.Centre,
                                     Origin = Anchor.Centre,
@@ -96,14 +97,14 @@ namespace osu.Game.Screens.Play.PlayerSettings
                                         }
                                     }
                                 },
-                                new IconButton
+                                new SeekButton
                                 {
                                     Anchor = Anchor.Centre,
                                     Origin = Anchor.Centre,
                                     Icon = FontAwesome.Solid.Forward,
                                     Action = () => seek(1, seek_amount),
                                 },
-                                new IconButton
+                                new SeekButton
                                 {
                                     Anchor = Anchor.Centre,
                                     Origin = Anchor.Centre,
@@ -150,6 +151,14 @@ namespace osu.Game.Screens.Play.PlayerSettings
             base.LoadComplete();
             rateSlider.Current.BindValueChanged(multiplier => multiplierText.Text = $"{multiplier.NewValue:0.0}x", true);
             gameplayClock?.IsPaused.BindTo(isPaused);
+        }
+
+        private partial class SeekButton : IconButton
+        {
+            public SeekButton()
+            {
+                AddInternal(new RepeatingButtonBehaviour(this));
+            }
         }
     }
 }
