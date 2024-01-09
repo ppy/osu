@@ -36,10 +36,11 @@ namespace osu.Game.Scoring.Legacy
         /// <item><description>30000007: Adjust osu!mania combo and accuracy portions and judgement scoring values. Reconvert all scores.</description></item>
         /// <item><description>30000008: Add accuracy conversion. Reconvert all scores.</description></item>
         /// <item><description>30000009: Fix edge cases in conversion for scores which have 0.0x mod multiplier on stable. Reconvert all scores.</description></item>
-        /// <item><description>30000010: Re-do catch scoring to mirror stable Score V2 as closely as feasible. Reconvert all scores.</description></item>
+        /// <item><description>30000010: Fix mania score V1 conversion using score V1 accuracy rather than V2 accuracy. Reconvert all scores.</description></item>
+        /// <item><description>30000011: Re-do catch scoring to mirror stable Score V2 as closely as feasible. Reconvert all scores.</description></item>
         /// </list>
         /// </remarks>
-        public const int LATEST_VERSION = 30000010;
+        public const int LATEST_VERSION = 30000011;
 
         /// <summary>
         /// The first stable-compatible YYYYMMDD format version given to lazer usage of replays.

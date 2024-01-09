@@ -21,6 +21,7 @@ using osu.Game.Rulesets.Osu.Judgements;
 using osu.Game.Rulesets.Scoring;
 using osu.Game.Rulesets.Taiko;
 using osu.Game.Scoring;
+using osu.Game.Screens.Play;
 using osu.Game.Screens.Ranking;
 using osu.Game.Tests.Beatmaps;
 
@@ -358,6 +359,11 @@ namespace osu.Game.Tests.Visual.Gameplay
             {
                 AllowImportCompletion = new SemaphoreSlim(1);
             }
+
+            protected override GameplayClockContainer CreateGameplayClockContainer(WorkingBeatmap beatmap, double gameplayStart) => new MasterGameplayClockContainer(beatmap, gameplayStart)
+            {
+                ShouldValidatePlaybackRate = false,
+            };
 
             protected override async Task ImportScore(Score score)
             {

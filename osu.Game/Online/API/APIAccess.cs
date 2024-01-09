@@ -62,6 +62,9 @@ namespace osu.Game.Online.API
 
         private Bindable<UserActivity> activity { get; } = new Bindable<UserActivity>();
 
+        private Bindable<UserStatus?> configStatus { get; } = new Bindable<UserStatus?>();
+        private Bindable<UserStatus?> localUserStatus { get; } = new Bindable<UserStatus?>();
+
         protected bool HasLogin => authentication.Token.Value != null || (!string.IsNullOrEmpty(ProvidedUsername) && !string.IsNullOrEmpty(password));
 
         private readonly CancellationTokenSource cancellationToken = new CancellationTokenSource();
@@ -85,11 +88,19 @@ namespace osu.Game.Online.API
             authentication.TokenString = config.Get<string>(OsuSetting.Token);
             authentication.Token.ValueChanged += onTokenChanged;
 
+            config.BindWith(OsuSetting.UserOnlineStatus, configStatus);
+
             localUser.BindValueChanged(u =>
             {
                 u.OldValue?.Activity.UnbindFrom(activity);
                 u.NewValue.Activity.BindTo(activity);
+
+                if (u.OldValue != null)
+                    localUserStatus.UnbindFrom(u.OldValue.Status);
+                localUserStatus.BindTo(u.NewValue.Status);
             }, true);
+
+            localUserStatus.BindValueChanged(val => configStatus.Value = val.NewValue);
 
             var thread = new Thread(run)
             {
@@ -200,6 +211,7 @@ namespace osu.Game.Online.API
                 setLocalUser(new APIUser
                 {
                     Username = ProvidedUsername,
+                    Status = { Value = configStatus.Value ?? UserStatus.Online }
                 });
             }
 
@@ -246,8 +258,7 @@ namespace osu.Game.Online.API
             };
             userReq.Success += user =>
             {
-                // todo: save/pull from settings
-                user.Status.Value = UserStatus.Online;
+                user.Status.Value = configStatus.Value ?? UserStatus.Online;
 
                 setLocalUser(user);
 
