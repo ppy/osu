@@ -69,19 +69,9 @@ namespace osu.Game.Tests.Visual.Playlists
             });
         }
 
-        public void SetUpRequestHandler(bool noScores = false)
-        {
-            AddStep("set up request handler", () =>
-            {
-                bindHandler(noScores: noScores);
-            });
-        }
-
         [Test]
         public void TestShowWithUserScore()
         {
-            SetUpRequestHandler();
-
             AddStep("bind user score info handler", () => bindHandler(userScore: userScore));
 
             createResults(() => userScore);
@@ -95,7 +85,7 @@ namespace osu.Game.Tests.Visual.Playlists
         [Test]
         public void TestShowNullUserScore()
         {
-            SetUpRequestHandler();
+            AddStep("bind user score info handler", () => bindHandler());
 
             createResults();
             waitForDisplay();
@@ -106,8 +96,6 @@ namespace osu.Game.Tests.Visual.Playlists
         [Test]
         public void TestShowUserScoreWithDelay()
         {
-            SetUpRequestHandler();
-
             AddStep("bind user score info handler", () => bindHandler(true, userScore));
 
             createResults(() => userScore);
@@ -120,8 +108,6 @@ namespace osu.Game.Tests.Visual.Playlists
         [Test]
         public void TestShowNullUserScoreWithDelay()
         {
-            SetUpRequestHandler();
-
             AddStep("bind delayed handler", () => bindHandler(true));
 
             createResults();
@@ -133,12 +119,10 @@ namespace osu.Game.Tests.Visual.Playlists
         [Test]
         public void TestFetchWhenScrolledToTheRight()
         {
-            SetUpRequestHandler();
+            AddStep("bind delayed handler", () => bindHandler(true));
 
             createResults();
             waitForDisplay();
-
-            AddStep("bind delayed handler", () => bindHandler(true));
 
             for (int i = 0; i < 2; i++)
             {
@@ -158,8 +142,6 @@ namespace osu.Game.Tests.Visual.Playlists
         [Test]
         public void TestFetchWhenScrolledToTheLeft()
         {
-            SetUpRequestHandler();
-
             AddStep("bind user score info handler", () => bindHandler(userScore: userScore));
 
             createResults(() => userScore);
@@ -185,7 +167,7 @@ namespace osu.Game.Tests.Visual.Playlists
         [Test]
         public void TestShowWithNoScores()
         {
-            SetUpRequestHandler(true);
+            AddStep("bind user score info handler", () => bindHandler(noScores: true));
             createResults();
             AddAssert("no scores visible", () => resultsScreen.ScorePanelList.GetScorePanels().Count() == 0);
         }
