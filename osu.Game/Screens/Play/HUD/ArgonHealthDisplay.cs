@@ -63,33 +63,7 @@ namespace osu.Game.Screens.Play.HUD
 
         private double glowBarValue;
 
-        public double GlowBarValue
-        {
-            get => glowBarValue;
-            set
-            {
-                if (glowBarValue == value)
-                    return;
-
-                glowBarValue = value;
-                Scheduler.AddOnce(updatePathVertices);
-            }
-        }
-
         private double healthBarValue;
-
-        public double HealthBarValue
-        {
-            get => healthBarValue;
-            set
-            {
-                if (healthBarValue == value)
-                    return;
-
-                healthBarValue = value;
-                Scheduler.AddOnce(updatePathVertices);
-            }
-        }
 
         public const float MAIN_PATH_RADIUS = 10f;
 
@@ -183,27 +157,29 @@ namespace osu.Game.Screens.Play.HUD
             }
 
             mainBar.Alpha = (float)Interpolation.DampContinuously(mainBar.Alpha, Current.Value > 0 ? 1 : 0, 40, Time.Elapsed);
-            glowBar.Alpha = (float)Interpolation.DampContinuously(glowBar.Alpha, GlowBarValue > 0 ? 1 : 0, 40, Time.Elapsed);
+            glowBar.Alpha = (float)Interpolation.DampContinuously(glowBar.Alpha, glowBarValue > 0 ? 1 : 0, 40, Time.Elapsed);
 
             double newHealth = Current.Value;
 
-            if (newHealth >= GlowBarValue)
+            if (newHealth >= glowBarValue)
                 finishMissDisplay();
 
-            if (pendingMissAnimation && newHealth < GlowBarValue)
+            if (pendingMissAnimation && newHealth < glowBarValue)
                 triggerMissDisplay();
             pendingMissAnimation = false;
 
-            HealthBarValue = Interpolation.DampContinuously(HealthBarValue, newHealth, 50, Time.Elapsed);
+            healthBarValue = Interpolation.DampContinuously(healthBarValue, newHealth, 50, Time.Elapsed);
             if (!displayingMiss)
-                GlowBarValue = Interpolation.DampContinuously(GlowBarValue, newHealth, 50, Time.Elapsed);
+                glowBarValue = Interpolation.DampContinuously(glowBarValue, newHealth, 50, Time.Elapsed);
+
+            updatePathVertices();
         }
 
         protected override void FinishInitialAnimation(double value)
         {
             base.FinishInitialAnimation(value);
-            this.TransformTo(nameof(HealthBarValue), value, 500, Easing.OutQuint);
-            this.TransformTo(nameof(GlowBarValue), value, 250, Easing.OutQuint);
+            this.TransformTo(nameof(healthBarValue), value, 500, Easing.OutQuint);
+            this.TransformTo(nameof(glowBarValue), value, 250, Easing.OutQuint);
         }
 
         protected override void Flash()
@@ -232,7 +208,7 @@ namespace osu.Game.Screens.Play.HUD
 
             this.Delay(500).Schedule(() =>
             {
-                this.TransformTo(nameof(GlowBarValue), Current.Value, 300, Easing.OutQuint);
+                this.TransformTo(nameof(glowBarValue), Current.Value, 300, Easing.OutQuint);
                 finishMissDisplay();
             }, out resetMissBarDelegate);
 
