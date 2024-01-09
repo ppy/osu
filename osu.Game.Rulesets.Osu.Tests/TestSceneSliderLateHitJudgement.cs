@@ -34,6 +34,9 @@ namespace osu.Game.Rulesets.Osu.Tests
         private const double time_slider_start = 1000;
         private const double time_slider_end = 1500;
 
+        private const double hit_window_ok_final_frame = 99.49999;
+        private const double hit_window_meh_final_frame = 149.49999;
+
         private static readonly Vector2 slider_start_position = new Vector2(256 - slider_path_length / 2, 192);
         private static readonly Vector2 slider_end_position = new Vector2(256 + slider_path_length / 2, 192);
 
@@ -52,8 +55,8 @@ namespace osu.Game.Rulesets.Osu.Tests
         {
             performTest(new List<ReplayFrame>
             {
-                new OsuReplayFrame(time_slider_start + 100, slider_start_position, OsuAction.LeftButton),
-                new OsuReplayFrame(time_slider_end + 100, slider_end_position, OsuAction.LeftButton),
+                new OsuReplayFrame(time_slider_start + hit_window_ok_final_frame, slider_start_position, OsuAction.LeftButton),
+                new OsuReplayFrame(time_slider_end + hit_window_ok_final_frame, slider_end_position, OsuAction.LeftButton),
             });
 
             assertHeadJudgement(HitResult.Ok);
@@ -70,8 +73,8 @@ namespace osu.Game.Rulesets.Osu.Tests
         {
             performTest(new List<ReplayFrame>
             {
-                new OsuReplayFrame(time_slider_start + 100, slider_start_position, OsuAction.LeftButton),
-                new OsuReplayFrame(time_slider_end + 100, slider_end_position, OsuAction.LeftButton),
+                new OsuReplayFrame(time_slider_start + hit_window_ok_final_frame, slider_start_position, OsuAction.LeftButton),
+                new OsuReplayFrame(time_slider_end + hit_window_ok_final_frame, slider_end_position, OsuAction.LeftButton),
             }, s =>
             {
                 s.SliderVelocityMultiplier = 2;
@@ -91,8 +94,8 @@ namespace osu.Game.Rulesets.Osu.Tests
         {
             performTest(new List<ReplayFrame>
             {
-                new OsuReplayFrame(time_slider_start + 150, slider_start_position, OsuAction.LeftButton),
-                new OsuReplayFrame(time_slider_end + 150, slider_end_position, OsuAction.LeftButton),
+                new OsuReplayFrame(time_slider_start + hit_window_meh_final_frame, slider_start_position, OsuAction.LeftButton),
+                new OsuReplayFrame(time_slider_end + hit_window_meh_final_frame, slider_end_position, OsuAction.LeftButton),
             }, s =>
             {
                 s.TickDistanceMultiplier = 0.2f;
@@ -116,8 +119,8 @@ namespace osu.Game.Rulesets.Osu.Tests
         {
             performTest(new List<ReplayFrame>
             {
-                new OsuReplayFrame(time_slider_start + 150, slider_start_position, OsuAction.LeftButton),
-                new OsuReplayFrame(time_slider_end + 150, slider_end_position, OsuAction.LeftButton),
+                new OsuReplayFrame(time_slider_start + hit_window_meh_final_frame, slider_start_position, OsuAction.LeftButton),
+                new OsuReplayFrame(time_slider_end + hit_window_meh_final_frame, slider_end_position, OsuAction.LeftButton),
             }, s =>
             {
                 s.SliderVelocityMultiplier = 2;
@@ -140,8 +143,8 @@ namespace osu.Game.Rulesets.Osu.Tests
         {
             performTest(new List<ReplayFrame>
             {
-                new OsuReplayFrame(time_slider_start + 151, slider_start_position, OsuAction.LeftButton),
-                new OsuReplayFrame(time_slider_end + 151, slider_end_position, OsuAction.LeftButton),
+                new OsuReplayFrame(time_slider_start + hit_window_meh_final_frame + 1, slider_start_position, OsuAction.LeftButton),
+                new OsuReplayFrame(time_slider_end + hit_window_meh_final_frame + 1, slider_end_position, OsuAction.LeftButton),
             }, s =>
             {
                 s.TickDistanceMultiplier = 0.2f;
@@ -165,8 +168,8 @@ namespace osu.Game.Rulesets.Osu.Tests
         {
             performTest(new List<ReplayFrame>
             {
-                new OsuReplayFrame(time_slider_start + 150, slider_start_position, OsuAction.LeftButton),
-                new OsuReplayFrame(time_slider_end + 150, slider_start_position, OsuAction.LeftButton),
+                new OsuReplayFrame(time_slider_start + hit_window_meh_final_frame, slider_start_position, OsuAction.LeftButton),
+                new OsuReplayFrame(time_slider_end + hit_window_meh_final_frame, slider_start_position, OsuAction.LeftButton),
             }, s =>
             {
                 s.Path = new SliderPath(PathType.LINEAR, new[]
@@ -195,8 +198,8 @@ namespace osu.Game.Rulesets.Osu.Tests
         {
             performTest(new List<ReplayFrame>
             {
-                new OsuReplayFrame(time_slider_start + 150, slider_start_position, OsuAction.LeftButton),
-                new OsuReplayFrame(time_slider_end + 150, slider_start_position, OsuAction.LeftButton),
+                new OsuReplayFrame(time_slider_start + hit_window_meh_final_frame, slider_start_position, OsuAction.LeftButton),
+                new OsuReplayFrame(time_slider_end + hit_window_meh_final_frame, slider_start_position, OsuAction.LeftButton),
             }, s =>
             {
                 s.Path = new SliderPath(PathType.LINEAR, new[]
@@ -224,8 +227,8 @@ namespace osu.Game.Rulesets.Osu.Tests
         {
             performTest(new List<ReplayFrame>
             {
-                new OsuReplayFrame(time_slider_start + 150, slider_start_position, OsuAction.LeftButton),
-                new OsuReplayFrame(time_slider_end + 150, slider_start_position, OsuAction.LeftButton),
+                new OsuReplayFrame(time_slider_start + hit_window_meh_final_frame, slider_start_position, OsuAction.LeftButton),
+                new OsuReplayFrame(time_slider_end + hit_window_meh_final_frame, slider_start_position, OsuAction.LeftButton),
             }, s =>
             {
                 s.Path = new SliderPath(PathType.PERFECT_CURVE, new[]
@@ -259,8 +262,8 @@ namespace osu.Game.Rulesets.Osu.Tests
         {
             performTest(new List<ReplayFrame>
             {
-                new OsuReplayFrame(time_slider_start + 150, slider_start_position, OsuAction.LeftButton),
-                new OsuReplayFrame(time_slider_end + 150, slider_start_position, OsuAction.LeftButton),
+                new OsuReplayFrame(time_slider_start + hit_window_meh_final_frame, slider_start_position, OsuAction.LeftButton),
+                new OsuReplayFrame(time_slider_end + hit_window_meh_final_frame, slider_start_position, OsuAction.LeftButton),
             }, s =>
             {
                 s.Path = new SliderPath(PathType.PERFECT_CURVE, new[]
@@ -289,8 +292,8 @@ namespace osu.Game.Rulesets.Osu.Tests
         {
             performTest(new List<ReplayFrame>
             {
-                new OsuReplayFrame(time_slider_start + 150, slider_start_position, OsuAction.LeftButton),
-                new OsuReplayFrame(time_slider_end + 150, slider_start_position, OsuAction.LeftButton),
+                new OsuReplayFrame(time_slider_start + hit_window_meh_final_frame, slider_start_position, OsuAction.LeftButton),
+                new OsuReplayFrame(time_slider_end + hit_window_meh_final_frame, slider_start_position, OsuAction.LeftButton),
             }, s =>
             {
                 s.Path = new SliderPath(PathType.PERFECT_CURVE, new[]
@@ -320,8 +323,8 @@ namespace osu.Game.Rulesets.Osu.Tests
         {
             performTest(new List<ReplayFrame>
             {
-                new OsuReplayFrame(time_slider_start + 150, slider_start_position - new Vector2(20), OsuAction.LeftButton),
-                new OsuReplayFrame(time_slider_end + 150, slider_start_position - new Vector2(20), OsuAction.LeftButton),
+                new OsuReplayFrame(time_slider_start + hit_window_meh_final_frame, slider_start_position - new Vector2(20), OsuAction.LeftButton),
+                new OsuReplayFrame(time_slider_end + hit_window_meh_final_frame, slider_start_position - new Vector2(20), OsuAction.LeftButton),
             }, s =>
             {
                 s.Path = new SliderPath(PathType.PERFECT_CURVE, new[]

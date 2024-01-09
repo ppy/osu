@@ -18,6 +18,7 @@ using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Objects.Types;
 using osu.Game.Rulesets.Osu.Objects;
 using osu.Game.Rulesets.Osu.Replays;
+using osu.Game.Rulesets.Osu.Scoring;
 using osu.Game.Rulesets.Replays;
 using osu.Game.Rulesets.Scoring;
 using osu.Game.Scoring;
@@ -474,7 +475,7 @@ namespace osu.Game.Rulesets.Osu.Tests
             }
         }
 
-        private class TestHitWindows : HitWindows
+        private class TestHitWindows : OsuHitWindows
         {
             private static readonly DifficultyRange[] ranges =
             {

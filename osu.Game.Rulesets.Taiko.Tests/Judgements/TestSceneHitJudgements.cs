@@ -171,7 +171,7 @@ namespace osu.Game.Rulesets.Taiko.Tests.Judgements
             beatmap.ControlPointInfo.Add(0, new TimingControlPoint { BeatLength = 6 });
             beatmap.ControlPointInfo.Add(0, new EffectControlPoint { ScrollSpeed = 10 });
 
-            var hitWindows = new HitWindows();
+            var hitWindows = new TaikoHitWindows();
             hitWindows.SetDifficulty(beatmap.Difficulty.OverallDifficulty);
 
             PerformTest(new List<ReplayFrame>

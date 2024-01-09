@@ -28,9 +28,9 @@ namespace osu.Game.Tests.Visual
     public partial class TestSceneLegacyHitWindowEdges : RateAdjustedBeatmapTestScene
     {
         private static readonly List<double> input_edge_deltas = new() { 1.0, 0.7, 0.50001, 0.5, 0.49999, 0.2, 0.0 };
-        // ground-truth osu!stable judgement results
-        private readonly List<HitResult> correctResults = new() { HitResult.Great, HitResult.Great, HitResult.Great, HitResult.Great, HitResult.Ok, HitResult.Ok, HitResult.Ok };
-        private readonly List<HitResult> correctResultsMania = new() { HitResult.Great, HitResult.Great, HitResult.Great, HitResult.Great, HitResult.Good, HitResult.Good, HitResult.Good };
+        // ground-truth osu!stable judgement results (except for 0.5, which is intentionally different for simplicity and consistency)
+        private readonly List<HitResult> correctResults = new() { HitResult.Great, HitResult.Great, HitResult.Great, HitResult.Ok, HitResult.Ok, HitResult.Ok, HitResult.Ok };
+        private readonly List<HitResult> correctResultsMania = new() { HitResult.Great, HitResult.Great, HitResult.Great, HitResult.Good, HitResult.Good, HitResult.Good, HitResult.Good };
         private static readonly int hit_objects_count = input_edge_deltas.Count * 2;
 
         private static readonly Vector2 circle_position = Vector2.Zero;
