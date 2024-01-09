@@ -136,7 +136,7 @@ namespace osu.Game.Screens.Play.PlayerSettings
                 },
             };
 
-            isPaused.BindValueChanged(e => play.Icon = e.NewValue ? FontAwesome.Regular.PauseCircle : FontAwesome.Regular.PlayCircle, true);
+            isPaused.BindValueChanged(e => play.Icon = !e.NewValue ? FontAwesome.Regular.PauseCircle : FontAwesome.Regular.PlayCircle, true);
 
             void seek(int direction, double amount)
             {
