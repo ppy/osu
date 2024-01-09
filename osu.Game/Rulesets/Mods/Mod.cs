@@ -3,6 +3,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Reflection;
 using Newtonsoft.Json;
@@ -156,6 +157,10 @@ namespace osu.Game.Rulesets.Mods
         [JsonIgnore]
         public virtual bool ValidForMultiplayerAsFreeMod => true;
 
+        /// <inheritdoc/>
+        [JsonIgnore]
+        public virtual bool AlwaysValidForSubmission => false;
+
         /// <summary>
         /// Whether this mod requires configuration to apply changes to the game.
         /// </summary>
@@ -190,7 +195,7 @@ namespace osu.Game.Rulesets.Mods
         /// <summary>
         /// Whether all settings in this mod are set to their default state.
         /// </summary>
-        protected virtual bool UsesDefaultConfiguration => SettingsBindables.All(s => s.IsDefault);
+        public virtual bool UsesDefaultConfiguration => SettingsBindables.All(s => s.IsDefault);
 
         /// <summary>
         /// Creates a copy of this <see cref="Mod"/> initialised to a default state.
@@ -280,7 +285,7 @@ namespace osu.Game.Rulesets.Mods
                 if (!(target is IParseable parseable))
                     throw new InvalidOperationException($"Bindable type {target.GetType().ReadableName()} is not {nameof(IParseable)}.");
 
-                parseable.Parse(source);
+                parseable.Parse(source, CultureInfo.InvariantCulture);
             }
         }
 

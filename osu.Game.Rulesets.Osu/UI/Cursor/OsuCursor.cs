@@ -70,10 +70,10 @@ namespace osu.Game.Rulesets.Osu.UI.Cursor
             };
 
             userCursorScale = config.GetBindable<float>(OsuSetting.GameplayCursorSize);
-            userCursorScale.ValueChanged += _ => calculateCursorScale();
+            userCursorScale.ValueChanged += _ => cursorScale.Value = CalculateCursorScale();
 
             autoCursorScale = config.GetBindable<bool>(OsuSetting.AutoCursorSize);
-            autoCursorScale.ValueChanged += _ => calculateCursorScale();
+            autoCursorScale.ValueChanged += _ => cursorScale.Value = CalculateCursorScale();
 
             cursorScale.BindValueChanged(e => cursorScaleContainer.Scale = new Vector2(e.NewValue), true);
         }
@@ -81,10 +81,10 @@ namespace osu.Game.Rulesets.Osu.UI.Cursor
         protected override void LoadComplete()
         {
             base.LoadComplete();
-            calculateCursorScale();
+            cursorScale.Value = CalculateCursorScale();
         }
 
-        private void calculateCursorScale()
+        protected virtual float CalculateCursorScale()
         {
             float scale = userCursorScale.Value;
 
@@ -94,7 +94,7 @@ namespace osu.Game.Rulesets.Osu.UI.Cursor
                 scale *= GetScaleForCircleSize(state.Beatmap.Difficulty.CircleSize);
             }
 
-            cursorScale.Value = scale;
+            return scale;
         }
 
         protected override void SkinChanged(ISkinSource skin)

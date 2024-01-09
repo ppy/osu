@@ -153,6 +153,15 @@ namespace osu.Game.Online.Leaderboards
         public void RefetchScores() => Scheduler.AddOnce(refetchScores);
 
         /// <summary>
+        /// Clear all scores from the display.
+        /// </summary>
+        public void ClearScores()
+        {
+            cancelPendingWork();
+            SetScores(null);
+        }
+
+        /// <summary>
         /// Call when a retrieval or display failure happened to show a relevant message to the user.
         /// </summary>
         /// <param name="state">The state to display.</param>
@@ -220,9 +229,7 @@ namespace osu.Game.Online.Leaderboards
         {
             Debug.Assert(ThreadSafety.IsUpdateThread);
 
-            cancelPendingWork();
-
-            SetScores(null);
+            ClearScores();
             setState(LeaderboardState.Retrieving);
 
             currentFetchCancellationSource = new CancellationTokenSource();

@@ -61,7 +61,7 @@ namespace osu.Game.Screens.Select
             {
                 Type = EdgeEffectType.Glow,
                 Colour = new Color4(130, 204, 255, 150),
-                Radius = 20,
+                Radius = 15,
                 Roundness = 15,
             };
         }
@@ -161,6 +161,7 @@ namespace osu.Game.Screens.Select
             private ILocalisedBindableString artistBinding;
             private FillFlowContainer infoLabelContainer;
             private Container bpmLabelContainer;
+            private Container lengthLabelContainer;
 
             private readonly WorkingBeatmap working;
             private readonly RulesetInfo ruleset;
@@ -302,7 +303,7 @@ namespace osu.Game.Screens.Select
                             },
                             infoLabelContainer = new FillFlowContainer
                             {
-                                Margin = new MarginPadding { Top = 20 },
+                                Margin = new MarginPadding { Top = 8 },
                                 Spacing = new Vector2(20, 0),
                                 AutoSizeAxes = Axes.Both,
                             }
@@ -338,10 +339,10 @@ namespace osu.Game.Screens.Select
                 {
                     settingChangeTracker?.Dispose();
 
-                    refreshBPMLabel();
+                    refreshBPMAndLengthLabel();
 
                     settingChangeTracker = new ModSettingChangeTracker(m.NewValue);
-                    settingChangeTracker.SettingChanged += _ => refreshBPMLabel();
+                    settingChangeTracker.SettingChanged += _ => refreshBPMAndLengthLabel();
                 }, true);
             }
 
@@ -367,12 +368,10 @@ namespace osu.Game.Screens.Select
 
                     infoLabelContainer.Children = new Drawable[]
                     {
-                        new InfoLabel(new BeatmapStatistic
+                        lengthLabelContainer = new Container
                         {
-                            Name = BeatmapsetsStrings.ShowStatsTotalLength(playableBeatmap.CalculateDrainLength().ToFormattedDuration()),
-                            CreateIcon = () => new BeatmapStatisticIcon(BeatmapStatisticsIconType.Length),
-                            Content = working.BeatmapInfo.Length.ToFormattedDuration().ToString(),
-                        }),
+                            AutoSizeAxes = Axes.Both,
+                        },
                         bpmLabelContainer = new Container
                         {
                             AutoSizeAxes = Axes.Both,
@@ -391,7 +390,7 @@ namespace osu.Game.Screens.Select
                 }
             }
 
-            private void refreshBPMLabel()
+            private void refreshBPMAndLengthLabel()
             {
                 var beatmap = working.Beatmap;
 
@@ -416,6 +415,16 @@ namespace osu.Game.Screens.Select
                     Name = BeatmapsetsStrings.ShowStatsBpm,
                     CreateIcon = () => new BeatmapStatisticIcon(BeatmapStatisticsIconType.Bpm),
                     Content = labelText
+                });
+
+                double drainLength = Math.Round(beatmap.CalculateDrainLength() / rate);
+                double hitLength = Math.Round(beatmap.BeatmapInfo.Length / rate);
+
+                lengthLabelContainer.Child = new InfoLabel(new BeatmapStatistic
+                {
+                    Name = BeatmapsetsStrings.ShowStatsTotalLength(drainLength.ToFormattedDuration()),
+                    CreateIcon = () => new BeatmapStatisticIcon(BeatmapStatisticsIconType.Length),
+                    Content = hitLength.ToFormattedDuration().ToString(),
                 });
             }
 

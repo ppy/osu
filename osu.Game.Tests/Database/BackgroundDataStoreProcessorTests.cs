@@ -127,8 +127,11 @@ namespace osu.Game.Tests.Database
             });
         }
 
+        [TestCase(30000001)]
         [TestCase(30000002)]
         [TestCase(30000003)]
+        [TestCase(30000004)]
+        [TestCase(30000005)]
         public void TestScoreUpgradeSuccess(int scoreVersion)
         {
             ScoreInfo scoreInfo = null!;

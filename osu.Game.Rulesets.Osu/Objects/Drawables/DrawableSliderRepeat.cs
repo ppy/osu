@@ -17,7 +17,7 @@ using osuTK;
 
 namespace osu.Game.Rulesets.Osu.Objects.Drawables
 {
-    public partial class DrawableSliderRepeat : DrawableOsuHitObject, ITrackSnaking, IRequireTracking
+    public partial class DrawableSliderRepeat : DrawableOsuHitObject, ITrackSnaking
     {
         public new SliderRepeat HitObject => (SliderRepeat)base.HitObject;
 
@@ -33,10 +33,6 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
         public SkinnableDrawable Arrow { get; private set; }
 
         private Drawable scaleContainer;
-
-        public override bool DisplayResult => false;
-
-        public bool Tracking { get; set; }
 
         public DrawableSliderRepeat()
             : base(null)
@@ -85,21 +81,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
             Position = HitObject.Position - DrawableSlider.Position;
         }
 
-        protected override void CheckForResult(bool userTriggered, double timeOffset)
-        {
-            // shared implementation with DrawableSliderTick.
-            if (timeOffset >= 0)
-            {
-                // Attempt to preserve correct ordering of judgements as best we can by forcing
-                // an un-judged head to be missed when the user has clearly skipped it.
-                //
-                // This check is applied to all nested slider objects apart from the head (ticks, repeats, tail).
-                if (Tracking && !DrawableSlider.HeadCircle.Judged)
-                    DrawableSlider.HeadCircle.MissForcefully();
-
-                ApplyResult(r => r.Type = Tracking ? r.Judgement.MaxResult : r.Judgement.MinResult);
-            }
-        }
+        protected override void CheckForResult(bool userTriggered, double timeOffset) => DrawableSlider.SliderInputManager.TryJudgeNestedObject(this, timeOffset);
 
         protected override void UpdateInitialTransforms()
         {

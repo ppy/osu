@@ -345,6 +345,16 @@ namespace osu.Game.Localisation
         public static LocalisableString ExportReplay => new TranslatableString(getKey(@"export_replay"), @"Export replay");
 
         /// <summary>
+        /// "Increase offset"
+        /// </summary>
+        public static LocalisableString IncreaseOffset => new TranslatableString(getKey(@"increase_offset"), @"Increase offset");
+
+        /// <summary>
+        /// "Decrease offset"
+        /// </summary>
+        public static LocalisableString DecreaseOffset => new TranslatableString(getKey(@"decrease_offset"), @"Decrease offset");
+
+        /// <summary>
         /// "Toggle rotate control"
         /// </summary>
         public static LocalisableString EditorToggleRotateControl => new TranslatableString(getKey(@"editor_toggle_rotate_control"), @"Toggle rotate control");

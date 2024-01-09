@@ -5,12 +5,12 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using osu.Game.Beatmaps;
-using osu.Game.Rulesets.Judgements;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Objects.Types;
 using osu.Game.Rulesets.Osu.Mods;
 using osu.Game.Rulesets.Osu.Objects;
+using osu.Game.Rulesets.Osu.Scoring;
 using osu.Game.Rulesets.Scoring;
 using osu.Game.Rulesets.Scoring.Legacy;
 
@@ -18,6 +18,8 @@ namespace osu.Game.Rulesets.Osu.Difficulty
 {
     internal class OsuLegacyScoreSimulator : ILegacyScoreSimulator
     {
+        private readonly ScoreProcessor scoreProcessor = new OsuScoreProcessor();
+
         private int legacyBonusScore;
         private int standardisedBonusScore;
         private int combo;
@@ -74,6 +76,8 @@ namespace osu.Game.Rulesets.Osu.Difficulty
                 simulateHit(obj, ref attributes);
 
             attributes.BonusScoreRatio = legacyBonusScore == 0 ? 0 : (double)standardisedBonusScore / legacyBonusScore;
+            attributes.BonusScore = legacyBonusScore;
+            attributes.MaxCombo = combo;
 
             return attributes;
         }
@@ -169,7 +173,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             if (isBonus)
             {
                 legacyBonusScore += scoreIncrease;
-                standardisedBonusScore += Judgement.ToNumericResult(bonusResult);
+                standardisedBonusScore += scoreProcessor.GetBaseScoreForResult(bonusResult);
             }
             else
                 attributes.AccuracyScore += scoreIncrease;

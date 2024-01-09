@@ -7,6 +7,7 @@ using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Extensions.Color4Extensions;
+using osu.Framework.Extensions.ObjectExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Colour;
 using osu.Framework.Graphics.Containers;
@@ -15,6 +16,7 @@ using osu.Framework.Layout;
 using osu.Framework.Threading;
 using osu.Framework.Utils;
 using osu.Game.Configuration;
+using osu.Game.Rulesets.Judgements;
 using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Objects.Types;
 using osu.Game.Skinning;
@@ -35,13 +37,8 @@ namespace osu.Game.Screens.Play.HUD
             Precision = 1
         };
 
-        [SettingSource("Bar length")]
-        public BindableFloat BarLength { get; } = new BindableFloat(0.98f)
-        {
-            MinValue = 0.2f,
-            MaxValue = 1,
-            Precision = 0.01f,
-        };
+        [SettingSource("Use relative size")]
+        public BindableBool UseRelativeSize { get; } = new BindableBool(true);
 
         private BarPath mainBar = null!;
 
@@ -58,6 +55,8 @@ namespace osu.Game.Screens.Play.HUD
         private static readonly Colour4 main_bar_glow_colour = Color4Extensions.FromHex("#7ED7FD").Opacity(0.5f);
 
         private ScheduledDelegate? resetMissBarDelegate;
+
+        private bool displayingMiss => resetMissBarDelegate != null;
 
         private readonly List<Vector2> missBarVertices = new List<Vector2>();
         private readonly List<Vector2> healthBarVertices = new List<Vector2>();
@@ -92,12 +91,30 @@ namespace osu.Game.Screens.Play.HUD
             }
         }
 
-        private const float main_path_radius = 10f;
+        public const float MAIN_PATH_RADIUS = 10f;
+
+        private const float curve_start_offset = 70;
+        private const float curve_end_offset = 40;
+        private const float padding = MAIN_PATH_RADIUS * 2;
+        private const float curve_smoothness = 10;
+
+        private readonly LayoutValue drawSizeLayout = new LayoutValue(Invalidation.DrawSize);
+
+        public ArgonHealthDisplay()
+        {
+            AddLayout(drawSizeLayout);
+
+            // sane default width specification.
+            // this only matters if the health display isn't part of the default skin
+            // (in which case width will be set to 300 via `ArgonSkin.GetDrawableComponent()`),
+            // and if the user hasn't applied their own modifications
+            // (which are applied via `SerialisedDrawableInfo.ApplySerialisedInfo()`).
+            Width = 0.98f;
+        }
 
         [BackgroundDependencyLoader]
         private void load()
         {
-            RelativeSizeAxes = Axes.X;
             AutoSizeAxes = Axes.Y;
 
             InternalChild = new Container
@@ -107,7 +124,7 @@ namespace osu.Game.Screens.Play.HUD
                 {
                     background = new BackgroundPath
                     {
-                        PathRadius = main_path_radius,
+                        PathRadius = MAIN_PATH_RADIUS,
                     },
                     glowBar = new BarPath
                     {
@@ -127,49 +144,79 @@ namespace osu.Game.Screens.Play.HUD
                         Blending = BlendingParameters.Additive,
                         BarColour = main_bar_colour,
                         GlowColour = main_bar_glow_colour,
-                        PathRadius = main_path_radius,
+                        PathRadius = MAIN_PATH_RADIUS,
                         GlowPortion = 0.6f,
                     },
                 }
             };
         }
 
+        private bool pendingMissAnimation;
+
         protected override void LoadComplete()
         {
             base.LoadComplete();
 
-            Current.BindValueChanged(_ => Scheduler.AddOnce(updateCurrent), true);
+            HealthProcessor.NewJudgement += onNewJudgement;
+            Current.BindValueChanged(onCurrentChanged, true);
 
-            BarLength.BindValueChanged(l => Width = l.NewValue, true);
-            BarHeight.BindValueChanged(_ => updatePath());
-            updatePath();
+            // we're about to set `RelativeSizeAxes` depending on the value of `UseRelativeSize`.
+            // setting `RelativeSizeAxes` internally transforms absolute sizing to relative and back to keep the size the same,
+            // but that is not what we want in this case, since the width at this point is valid in the *target* sizing mode.
+            // to counteract this, store the numerical value here, and restore it after setting the correct initial relative sizing axes.
+            float previousWidth = Width;
+            UseRelativeSize.BindValueChanged(v => RelativeSizeAxes = v.NewValue ? Axes.X : Axes.None, true);
+            Width = previousWidth;
+
+            BarHeight.BindValueChanged(_ => updatePath(), true);
         }
 
-        protected override bool OnInvalidate(Invalidation invalidation, InvalidationSource source)
+        private void onNewJudgement(JudgementResult result) => pendingMissAnimation |= !result.IsHit;
+
+        private void onCurrentChanged(ValueChangedEvent<double> valueChangedEvent)
+            // schedule display updates one frame later to ensure we know the judgement result causing this change (if there is one).
+            => Scheduler.AddOnce(updateDisplay);
+
+        private void updateDisplay()
         {
-            if ((invalidation & Invalidation.DrawSize) > 0)
-                updatePath();
+            double newHealth = Current.Value;
 
-            return base.OnInvalidate(invalidation, source);
-        }
+            if (newHealth >= GlowBarValue)
+                finishMissDisplay();
 
-        private void updateCurrent()
-        {
-            if (Current.Value >= GlowBarValue) finishMissDisplay();
-
-            double time = Current.Value > GlowBarValue ? 500 : 250;
+            double time = newHealth > GlowBarValue ? 500 : 250;
 
             // TODO: this should probably use interpolation in update.
-            this.TransformTo(nameof(HealthBarValue), Current.Value, time, Easing.OutQuint);
-            if (resetMissBarDelegate == null) this.TransformTo(nameof(GlowBarValue), Current.Value, time, Easing.OutQuint);
+            this.TransformTo(nameof(HealthBarValue), newHealth, time, Easing.OutQuint);
+
+            if (pendingMissAnimation && newHealth < GlowBarValue)
+                triggerMissDisplay();
+
+            pendingMissAnimation = false;
+
+            if (!displayingMiss)
+                this.TransformTo(nameof(GlowBarValue), newHealth, time, Easing.OutQuint);
         }
 
         protected override void Update()
         {
             base.Update();
 
+            if (!drawSizeLayout.IsValid)
+            {
+                updatePath();
+                drawSizeLayout.Validate();
+            }
+
             mainBar.Alpha = (float)Interpolation.DampContinuously(mainBar.Alpha, Current.Value > 0 ? 1 : 0, 40, Time.Elapsed);
             glowBar.Alpha = (float)Interpolation.DampContinuously(glowBar.Alpha, GlowBarValue > 0 ? 1 : 0, 40, Time.Elapsed);
+        }
+
+        protected override void FinishInitialAnimation(double value)
+        {
+            base.FinishInitialAnimation(value);
+            this.TransformTo(nameof(HealthBarValue), value, 500, Easing.OutQuint);
+            this.TransformTo(nameof(GlowBarValue), value, 250, Easing.OutQuint);
         }
 
         protected override void Flash()
@@ -179,7 +226,7 @@ namespace osu.Game.Screens.Play.HUD
             mainBar.TransformTo(nameof(BarPath.GlowColour), main_bar_glow_colour.Opacity(0.8f))
                    .TransformTo(nameof(BarPath.GlowColour), main_bar_glow_colour, 300, Easing.OutQuint);
 
-            if (resetMissBarDelegate == null)
+            if (!displayingMiss)
             {
                 glowBar.TransformTo(nameof(BarPath.BarColour), Colour4.White, 30, Easing.OutQuint)
                        .Then()
@@ -191,20 +238,10 @@ namespace osu.Game.Screens.Play.HUD
             }
         }
 
-        protected override void Miss()
+        private void triggerMissDisplay()
         {
-            base.Miss();
-
-            if (resetMissBarDelegate != null)
-            {
-                resetMissBarDelegate.Cancel();
-                resetMissBarDelegate = null;
-            }
-            else
-            {
-                // Reset any ongoing animation immediately, else things get weird.
-                this.TransformTo(nameof(GlowBarValue), HealthBarValue);
-            }
+            resetMissBarDelegate?.Cancel();
+            resetMissBarDelegate = null;
 
             this.Delay(500).Schedule(() =>
             {
@@ -221,7 +258,7 @@ namespace osu.Game.Screens.Play.HUD
 
         private void finishMissDisplay()
         {
-            if (resetMissBarDelegate == null)
+            if (!displayingMiss)
                 return;
 
             if (Current.Value > 0)
@@ -236,25 +273,34 @@ namespace osu.Game.Screens.Play.HUD
 
         private void updatePath()
         {
-            float barLength = DrawWidth - main_path_radius * 2;
-            float curveStart = barLength - 70;
-            float curveEnd = barLength - 40;
+            float usableWidth = DrawWidth - padding;
 
-            const float curve_smoothness = 10;
+            if (usableWidth < 0) enforceMinimumWidth();
+
+            // the display starts curving at `curve_start_offset` units from the right and ends curving at `curve_end_offset`.
+            // to ensure that the curve is symmetric when it starts being narrow enough, add a `curve_end_offset` to the left side too.
+            const float rescale_cutoff = curve_start_offset + curve_end_offset;
+
+            float barLength = Math.Max(DrawWidth - padding, rescale_cutoff);
+            float curveStart = barLength - curve_start_offset;
+            float curveEnd = barLength - curve_end_offset;
 
             Vector2 diagonalDir = (new Vector2(curveEnd, BarHeight.Value) - new Vector2(curveStart, 0)).Normalized();
 
             barPath = new SliderPath(new[]
             {
-                new PathControlPoint(new Vector2(0, 0), PathType.Linear),
-                new PathControlPoint(new Vector2(curveStart - curve_smoothness, 0), PathType.Bezier),
+                new PathControlPoint(new Vector2(0, 0), PathType.LINEAR),
+                new PathControlPoint(new Vector2(curveStart - curve_smoothness, 0), PathType.BEZIER),
                 new PathControlPoint(new Vector2(curveStart, 0)),
-                new PathControlPoint(new Vector2(curveStart, 0) + diagonalDir * curve_smoothness, PathType.Linear),
-                new PathControlPoint(new Vector2(curveEnd, BarHeight.Value) - diagonalDir * curve_smoothness, PathType.Bezier),
+                new PathControlPoint(new Vector2(curveStart, 0) + diagonalDir * curve_smoothness, PathType.LINEAR),
+                new PathControlPoint(new Vector2(curveEnd, BarHeight.Value) - diagonalDir * curve_smoothness, PathType.BEZIER),
                 new PathControlPoint(new Vector2(curveEnd, BarHeight.Value)),
-                new PathControlPoint(new Vector2(curveEnd + curve_smoothness, BarHeight.Value), PathType.Linear),
+                new PathControlPoint(new Vector2(curveEnd + curve_smoothness, BarHeight.Value), PathType.LINEAR),
                 new PathControlPoint(new Vector2(barLength, BarHeight.Value)),
             });
+
+            if (DrawWidth - padding < rescale_cutoff)
+                rescalePathProportionally();
 
             List<Vector2> vertices = new List<Vector2>();
             barPath.GetPathToProgress(vertices, 0.0, 1.0);
@@ -264,6 +310,24 @@ namespace osu.Game.Screens.Play.HUD
             glowBar.Vertices = vertices;
 
             updatePathVertices();
+
+            void enforceMinimumWidth()
+            {
+                // Switch to absolute in order to be able to define a minimum width.
+                // Then switch back is required. Framework will handle the conversion for us.
+                Axes relativeAxes = RelativeSizeAxes;
+                RelativeSizeAxes = Axes.None;
+
+                Width = padding;
+
+                RelativeSizeAxes = relativeAxes;
+            }
+
+            void rescalePathProportionally()
+            {
+                foreach (var point in barPath.ControlPoints)
+                    point.Position = new Vector2(point.Position.X / barLength * (DrawWidth - padding), point.Position.Y);
+            }
         }
 
         private void updatePathVertices()
@@ -282,6 +346,14 @@ namespace osu.Game.Screens.Play.HUD
 
             mainBar.Vertices = healthBarVertices.Select(v => v - healthBarVertices[0]).ToList();
             mainBar.Position = healthBarVertices[0];
+        }
+
+        protected override void Dispose(bool isDisposing)
+        {
+            base.Dispose(isDisposing);
+
+            if (HealthProcessor.IsNotNull())
+                HealthProcessor.NewJudgement -= onNewJudgement;
         }
 
         private partial class BackgroundPath : SmoothPath

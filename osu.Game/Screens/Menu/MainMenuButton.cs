@@ -1,8 +1,6 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
 using System;
 using System.Linq;
 using osu.Framework;
@@ -33,7 +31,10 @@ namespace osu.Game.Screens.Menu
     /// </summary>
     public partial class MainMenuButton : BeatSyncedContainer, IStateful<ButtonState>
     {
-        public event Action<ButtonState> StateChanged;
+        public const float BOUNCE_COMPRESSION = 0.9f;
+        public const float HOVER_SCALE = 1.2f;
+        public const float BOUNCE_ROTATION = 8;
+        public event Action<ButtonState>? StateChanged;
 
         public readonly Key[] TriggerKeys;
 
@@ -44,17 +45,28 @@ namespace osu.Game.Screens.Menu
         private readonly string sampleName;
 
         /// <summary>
-        /// The menu state for which we are visible for.
+        /// The menu state for which we are visible for (assuming only one).
         /// </summary>
-        public ButtonSystemState VisibleState = ButtonSystemState.TopLevel;
+        public ButtonSystemState VisibleState
+        {
+            set
+            {
+                VisibleStateMin = value;
+                VisibleStateMax = value;
+            }
+        }
 
-        private readonly Action clickAction;
-        private Sample sampleClick;
-        private Sample sampleHover;
+        public ButtonSystemState VisibleStateMin = ButtonSystemState.TopLevel;
+        public ButtonSystemState VisibleStateMax = ButtonSystemState.TopLevel;
+
+        private readonly Action? clickAction;
+        private Sample? sampleClick;
+        private Sample? sampleHover;
+        private SampleChannel? sampleChannel;
 
         public override bool ReceivePositionalInputAt(Vector2 screenSpacePos) => box.ReceivePositionalInputAt(screenSpacePos);
 
-        public MainMenuButton(LocalisableString text, string sampleName, IconUsage symbol, Color4 colour, Action clickAction = null, float extraWidth = 0, params Key[] triggerKeys)
+        public MainMenuButton(LocalisableString text, string sampleName, IconUsage symbol, Color4 colour, Action? clickAction = null, float extraWidth = 0, params Key[] triggerKeys)
         {
             this.sampleName = sampleName;
             this.clickAction = clickAction;
@@ -116,8 +128,9 @@ namespace osu.Game.Screens.Menu
                             Shadow = true,
                             Anchor = Anchor.Centre,
                             Origin = Anchor.Centre,
-                            Size = new Vector2(30),
+                            Size = new Vector2(32),
                             Position = new Vector2(0, 0),
+                            Margin = new MarginPadding { Top = -4 },
                             Icon = symbol
                         },
                         new OsuSpriteText
@@ -127,6 +140,7 @@ namespace osu.Game.Screens.Menu
                             Anchor = Anchor.Centre,
                             Origin = Anchor.Centre,
                             Position = new Vector2(0, 35),
+                            Margin = new MarginPadding { Left = -3 },
                             Text = text
                         }
                     }
@@ -144,14 +158,14 @@ namespace osu.Game.Screens.Menu
 
             double duration = timingPoint.BeatLength / 2;
 
-            icon.RotateTo(rightward ? 10 : -10, duration * 2, Easing.InOutSine);
+            icon.RotateTo(rightward ? BOUNCE_ROTATION : -BOUNCE_ROTATION, duration * 2, Easing.InOutSine);
 
             icon.Animate(
                 i => i.MoveToY(-10, duration, Easing.Out),
-                i => i.ScaleTo(1, duration, Easing.Out)
+                i => i.ScaleTo(HOVER_SCALE, duration, Easing.Out)
             ).Then(
                 i => i.MoveToY(0, duration, Easing.In),
-                i => i.ScaleTo(new Vector2(1, 0.9f), duration, Easing.In)
+                i => i.ScaleTo(new Vector2(HOVER_SCALE, HOVER_SCALE * BOUNCE_COMPRESSION), duration, Easing.In)
             );
 
             rightward = !rightward;
@@ -168,8 +182,8 @@ namespace osu.Game.Screens.Menu
             double duration = TimeUntilNextBeat;
 
             icon.ClearTransforms();
-            icon.RotateTo(rightward ? -10 : 10, duration, Easing.InOutSine);
-            icon.ScaleTo(new Vector2(1, 0.9f), duration, Easing.Out);
+            icon.RotateTo(rightward ? -BOUNCE_ROTATION : BOUNCE_ROTATION, duration, Easing.InOutSine);
+            icon.ScaleTo(new Vector2(HOVER_SCALE, HOVER_SCALE * BOUNCE_COMPRESSION), duration, Easing.Out);
             return true;
         }
 
@@ -225,7 +239,8 @@ namespace osu.Game.Screens.Menu
 
         private void trigger()
         {
-            sampleClick?.Play();
+            sampleChannel = sampleClick?.GetChannel();
+            sampleChannel?.Play();
 
             clickAction?.Invoke();
 
@@ -236,6 +251,8 @@ namespace osu.Game.Screens.Menu
 
         public override bool HandleNonPositionalInput => state == ButtonState.Expanded;
         public override bool HandlePositionalInput => state != ButtonState.Exploded && box.Scale.X >= 0.8f;
+
+        public void StopSamplePlayback() => sampleChannel?.Stop();
 
         protected override void Update()
         {
@@ -311,9 +328,9 @@ namespace osu.Game.Screens.Menu
                         break;
 
                     default:
-                        if (value == VisibleState)
+                        if (value <= VisibleStateMax && value >= VisibleStateMin)
                             State = ButtonState.Expanded;
-                        else if (value < VisibleState)
+                        else if (value < VisibleStateMin)
                             State = ButtonState.Contracted;
                         else
                             State = ButtonState.Exploded;

@@ -32,9 +32,9 @@ namespace osu.Game.Rulesets.Mods
                 value -= 1;
 
                 if (SpeedChange.Value >= 1)
-                    value /= 5;
-
-                return 1 + value;
+                    return 1 + value / 5;
+                else
+                    return 0.6 + value;
             }
         }
 

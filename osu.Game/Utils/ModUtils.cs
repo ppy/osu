@@ -5,6 +5,8 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
+using osu.Framework.Extensions.LocalisationExtensions;
+using osu.Framework.Localisation;
 using osu.Game.Online.API;
 using osu.Game.Rulesets;
 using osu.Game.Rulesets.Mods;
@@ -121,7 +123,7 @@ namespace osu.Game.Utils
             if (!CheckCompatibleSet(mods, out invalidMods))
                 return false;
 
-            return checkValid(mods, m => m.Type != ModType.System && m.HasImplementation, out invalidMods);
+            return checkValid(mods, m => m.HasImplementation, out invalidMods);
         }
 
         /// <summary>
@@ -225,6 +227,22 @@ namespace osu.Game.Utils
             }
 
             return proposedWereValid;
+        }
+
+        /// <summary>
+        /// Given a value of a score multiplier, returns a string version with special handling for a value near 1.00x.
+        /// </summary>
+        /// <param name="scoreMultiplier">The value of the score multiplier.</param>
+        /// <returns>A formatted score multiplier with a trailing "x" symbol</returns>
+        public static LocalisableString FormatScoreMultiplier(double scoreMultiplier)
+        {
+            // Round multiplier values away from 1.00x to two significant digits.
+            if (scoreMultiplier > 1)
+                scoreMultiplier = Math.Ceiling(Math.Round(scoreMultiplier * 100, 12)) / 100;
+            else
+                scoreMultiplier = Math.Floor(Math.Round(scoreMultiplier * 100, 12)) / 100;
+
+            return scoreMultiplier.ToLocalisableString("0.00x");
         }
     }
 }

@@ -4,7 +4,6 @@
 using System;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
-using osu.Framework.Extensions.LocalisationExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
@@ -15,6 +14,7 @@ using osu.Game.Graphics.Sprites;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Localisation;
 using osu.Game.Rulesets.Mods;
+using osu.Game.Utils;
 using osuTK;
 
 namespace osu.Game.Overlays.Mods
@@ -147,7 +147,7 @@ namespace osu.Game.Overlays.Mods
         {
             protected override double RollingDuration => 500;
 
-            protected override LocalisableString FormatCount(double count) => count.ToLocalisableString(@"0.00x");
+            protected override LocalisableString FormatCount(double count) => ModUtils.FormatScoreMultiplier(count);
 
             protected override OsuSpriteText CreateSpriteText() => new OsuSpriteText
             {
