@@ -446,9 +446,30 @@ namespace osu.Game.Database
                     break;
 
                 case 2:
+                    // compare logic in `CatchScoreProcessor`.
+
+                    // this could technically be slightly incorrect in the case of stable scores.
+                    // because large droplet misses are counted as full misses in stable scores,
+                    // `score.MaximumStatistics.GetValueOrDefault(Great)` will be equal to the count of fruits *and* large droplets
+                    // rather than just fruits (which was the intent).
+                    // this is not fixable without introducing an extra legacy score attribute dedicated for catch,
+                    // and this is a ballpark conversion process anyway, so attempt to trudge on.
+                    int fruitTinyScaleDivisor = score.MaximumStatistics.GetValueOrDefault(HitResult.SmallTickHit) + score.MaximumStatistics.GetValueOrDefault(HitResult.Great);
+                    double fruitTinyScale = fruitTinyScaleDivisor == 0
+                        ? 0
+                        : (double)score.MaximumStatistics.GetValueOrDefault(HitResult.SmallTickHit) / fruitTinyScaleDivisor;
+
+                    const int max_tiny_droplets_portion = 400000;
+
+                    double comboPortion = 1000000 - max_tiny_droplets_portion + max_tiny_droplets_portion * (1 - fruitTinyScale);
+                    double dropletsPortion = max_tiny_droplets_portion * fruitTinyScale;
+                    double dropletsHit = score.MaximumStatistics.GetValueOrDefault(HitResult.SmallTickHit) == 0
+                        ? 0
+                        : (double)score.Statistics.GetValueOrDefault(HitResult.SmallTickHit) / score.MaximumStatistics.GetValueOrDefault(HitResult.SmallTickHit);
+
                     convertedTotalScore = (long)Math.Round((
-                        600000 * comboProportion
-                        + 400000 * score.Accuracy
+                        comboPortion * estimateComboProportionForCatch(attributes.MaxCombo, score.MaxCombo, score.Statistics.GetValueOrDefault(HitResult.Miss))
+                        + dropletsPortion * dropletsHit
                         + bonusProportion) * modMultiplier);
                     break;
 
@@ -473,6 +494,94 @@ namespace osu.Game.Database
                 throw new InvalidOperationException($"Total score conversion operation returned invalid total of {convertedTotalScore}");
 
             return convertedTotalScore;
+        }
+
+        /// <summary>
+        /// <para>
+        /// For catch, the general method of calculating the combo proportion used for other rulesets is generally useless.
+        /// This is because in stable score V1, catch has quadratic score progression,
+        /// while in stable score V2, score progression is logarithmic up to 200 combo and then linear.
+        /// </para>
+        /// <para>
+        /// This means that applying the naive rescale method to scores with lots of short combos (think 10x 100-long combos on a 1000-object map)
+        /// by linearly rescaling the combo portion as given by score V1 leads to horribly underestimating it.
+        /// Therefore this method attempts to counteract this by calculating the best case estimate for the combo proportion that takes all of the above into account.
+        /// </para>
+        /// <para>
+        /// The general idea is that aside from the <paramref name="scoreMaxCombo"/> which the player is known to have hit,
+        /// the remaining misses are evenly distributed across the rest of the objects that give combo.
+        /// This is therefore a worst-case estimate.
+        /// </para>
+        /// </summary>
+        private static double estimateComboProportionForCatch(int beatmapMaxCombo, int scoreMaxCombo, int scoreMissCount)
+        {
+            if (beatmapMaxCombo == 0)
+                return 1;
+
+            if (scoreMaxCombo == 0)
+                return 0;
+
+            if (beatmapMaxCombo == scoreMaxCombo)
+                return 1;
+
+            double estimatedBestCaseTotal = estimateBestCaseComboTotal(beatmapMaxCombo);
+
+            int remainingCombo = beatmapMaxCombo - (scoreMaxCombo + scoreMissCount);
+            double totalDroppedScore = 0;
+
+            int assumedLengthOfRemainingCombos = (int)Math.Floor((double)remainingCombo / scoreMissCount);
+
+            if (assumedLengthOfRemainingCombos > 0)
+            {
+                int assumedCombosCount = (int)Math.Floor((double)remainingCombo / assumedLengthOfRemainingCombos);
+                totalDroppedScore += assumedCombosCount * estimateDroppedComboScoreAfterMiss(assumedLengthOfRemainingCombos);
+
+                remainingCombo -= assumedCombosCount * assumedLengthOfRemainingCombos;
+
+                if (remainingCombo > 0)
+                    totalDroppedScore += estimateDroppedComboScoreAfterMiss(remainingCombo);
+            }
+            else
+            {
+                // there are so many misses that attempting to evenly divide remaining combo results in 0 length per combo,
+                // i.e. all remaining judgements are combo breaks.
+                // in that case, presume every single remaining object is a miss and did not give any combo score.
+                totalDroppedScore = estimatedBestCaseTotal - estimateBestCaseComboTotal(scoreMaxCombo);
+            }
+
+            return estimatedBestCaseTotal == 0
+                ? 1
+                : 1 - Math.Clamp(totalDroppedScore / estimatedBestCaseTotal, 0, 1);
+
+            double estimateBestCaseComboTotal(int maxCombo)
+            {
+                if (maxCombo == 0)
+                    return 1;
+
+                double estimatedTotal = 0.5 * Math.Min(maxCombo, 2);
+
+                if (maxCombo <= 2)
+                    return estimatedTotal;
+
+                // int_2^x log_4(t) dt
+                estimatedTotal += (Math.Min(maxCombo, 200) * (Math.Log(Math.Min(maxCombo, 200)) - 1) + 2 - Math.Log(4)) / Math.Log(4);
+
+                if (maxCombo <= 200)
+                    return estimatedTotal;
+
+                estimatedTotal += (maxCombo - 200) * Math.Log(200) / Math.Log(4);
+                return estimatedTotal;
+            }
+
+            double estimateDroppedComboScoreAfterMiss(int lengthOfComboAfterMiss)
+            {
+                if (lengthOfComboAfterMiss >= 200)
+                    lengthOfComboAfterMiss = 200;
+
+                // int_0^x (log_4(200) - log_4(t)) dt
+                // note that this is an pessimistic estimate, i.e. it may subtract too much if the miss happened before reaching 200 combo
+                return lengthOfComboAfterMiss * (1 + Math.Log(200) - Math.Log(lengthOfComboAfterMiss)) / Math.Log(4);
+            }
         }
 
         public static double ComputeAccuracy(ScoreInfo scoreInfo)
