@@ -136,7 +136,7 @@ namespace osu.Game.Screens.Play.PlayerSettings
 
             void seek(int direction, double amount)
             {
-                double target = Math.Clamp((gameplayClock?.CurrentTime ?? 0) + (direction * amount), 0, gameplayState.Beatmap.GetLastObjectTime());
+                double target = Math.Clamp((gameplayClock?.CurrentTime ?? 0) + (direction * amount), 0, gameplayState?.Beatmap.GetLastObjectTime() ?? 0);
                 gameplayClock?.Seek(target);
             }
         }
