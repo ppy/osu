@@ -36,6 +36,8 @@ namespace osu.Game.Screens.Play.HUD
 
         private BindableNumber<double> health = null!;
 
+        protected bool InitialAnimationPlaying => initialIncrease != null;
+
         private ScheduledDelegate? initialIncrease;
 
         /// <summary>
@@ -64,25 +66,35 @@ namespace osu.Game.Screens.Play.HUD
             // this probably shouldn't be operating on `this.`
             showHealthBar.BindValueChanged(healthBar => this.FadeTo(healthBar.NewValue ? 1 : 0, HUDOverlay.FADE_DURATION, HUDOverlay.FADE_EASING), true);
 
+            initialHealthValue = health.Value;
+
             if (PlayInitialIncreaseAnimation)
                 startInitialAnimation();
             else
                 Current.Value = health.Value;
         }
 
+        private double lastValue;
+        private double initialHealthValue;
+
         protected override void Update()
         {
             base.Update();
 
-            // Health changes every frame in draining situations.
-            // Manually handle value changes to avoid bindable event flow overhead.
-            if (!Precision.AlmostEquals(health.Value, Current.Value, 0.001f))
+            if (!InitialAnimationPlaying || health.Value != initialHealthValue)
             {
+                Current.Value = health.Value;
+
                 if (initialIncrease != null)
                     FinishInitialAnimation(Current.Value);
+            }
 
-                HealthChanged(Current.Value > health.Value);
-                Current.Value = health.Value;
+            // Health changes every frame in draining situations.
+            // Manually handle value changes to avoid bindable event flow overhead.
+            if (!Precision.AlmostEquals(lastValue, Current.Value, 0.001f))
+            {
+                HealthChanged(Current.Value > lastValue);
+                lastValue = Current.Value;
             }
         }
 
