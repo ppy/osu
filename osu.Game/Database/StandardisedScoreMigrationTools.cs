@@ -453,9 +453,14 @@ namespace osu.Game.Database
                     break;
 
                 case 3:
+                    // in the mania case accuracy actually changes between score V1 and score V2 / standardised
+                    // (PERFECT weighting changes from 300 to 305),
+                    // so for better accuracy recompute accuracy locally based on hit statistics and use that instead,
+                    double scoreV2Accuracy = ComputeAccuracy(score);
+
                     convertedTotalScore = (long)Math.Round((
                         850000 * comboProportion
-                        + 150000 * Math.Pow(score.Accuracy, 2 + 2 * score.Accuracy)
+                        + 150000 * Math.Pow(scoreV2Accuracy, 2 + 2 * scoreV2Accuracy)
                         + bonusProportion) * modMultiplier);
                     break;
 
