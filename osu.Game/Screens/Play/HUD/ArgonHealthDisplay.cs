@@ -188,15 +188,9 @@ namespace osu.Game.Screens.Play.HUD
         {
             base.Flash();
 
-            mainBar.TransformTo(nameof(BarPath.GlowColour), main_bar_glow_colour.Opacity(0.8f))
-                   .TransformTo(nameof(BarPath.GlowColour), main_bar_glow_colour, 300, Easing.OutQuint);
-
             if (!displayingMiss)
             {
-                glowBar.TransformTo(nameof(BarPath.BarColour), Colour4.White, 30, Easing.OutQuint)
-                       .Then()
-                       .TransformTo(nameof(BarPath.BarColour), main_bar_colour, 1000, Easing.OutQuint);
-
+                // TODO: REMOVE THIS. It's recreating textures.
                 glowBar.TransformTo(nameof(BarPath.GlowColour), Colour4.White, 30, Easing.OutQuint)
                        .Then()
                        .TransformTo(nameof(BarPath.GlowColour), main_bar_glow_colour, 300, Easing.OutQuint);
@@ -214,9 +208,11 @@ namespace osu.Game.Screens.Play.HUD
                 finishMissDisplay();
             }, out resetMissBarDelegate);
 
+            // TODO: REMOVE THIS. It's recreating textures.
             glowBar.TransformTo(nameof(BarPath.BarColour), new Colour4(255, 147, 147, 255), 100, Easing.OutQuint).Then()
                    .TransformTo(nameof(BarPath.BarColour), new Colour4(255, 93, 93, 255), 800, Easing.OutQuint);
 
+            // TODO: REMOVE THIS. It's recreating textures.
             glowBar.TransformTo(nameof(BarPath.GlowColour), new Colour4(253, 0, 0, 255).Lighten(0.2f))
                    .TransformTo(nameof(BarPath.GlowColour), new Colour4(253, 0, 0, 255), 800, Easing.OutQuint);
         }
@@ -228,6 +224,7 @@ namespace osu.Game.Screens.Play.HUD
 
             if (Current.Value > 0)
             {
+                // TODO: REMOVE THIS. It's recreating textures.
                 glowBar.TransformTo(nameof(BarPath.BarColour), main_bar_colour, 300, Easing.In);
                 glowBar.TransformTo(nameof(BarPath.GlowColour), main_bar_glow_colour, 300, Easing.In);
             }
