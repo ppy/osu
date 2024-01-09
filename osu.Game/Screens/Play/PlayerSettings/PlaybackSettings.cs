@@ -32,6 +32,8 @@ namespace osu.Game.Screens.Play.PlayerSettings
 
         private readonly IconButton play;
 
+        private readonly BindableBool isPaused = new BindableBool();
+
         [Resolved]
         private GameplayClockContainer? gameplayClock { get; set; }
 
@@ -134,6 +136,8 @@ namespace osu.Game.Screens.Play.PlayerSettings
                 },
             };
 
+            isPaused.BindValueChanged(e => play.Icon = e.NewValue ? FontAwesome.Regular.PauseCircle : FontAwesome.Regular.PlayCircle, true);
+
             void seek(int direction, double amount)
             {
                 double target = Math.Clamp((gameplayClock?.CurrentTime ?? 0) + (direction * amount), 0, gameplayState?.Beatmap.GetLastObjectTime() ?? 0);
@@ -145,12 +149,7 @@ namespace osu.Game.Screens.Play.PlayerSettings
         {
             base.LoadComplete();
             rateSlider.Current.BindValueChanged(multiplier => multiplierText.Text = $"{multiplier.NewValue:0.0}x", true);
-        }
-
-        protected override void Update()
-        {
-            base.Update();
-            play.Icon = gameplayClock?.IsRunning == true ? FontAwesome.Regular.PauseCircle : FontAwesome.Regular.PlayCircle;
+            gameplayClock?.IsPaused.BindTo(isPaused);
         }
     }
 }
