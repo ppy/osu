@@ -79,10 +79,11 @@ namespace osu.Game.Skinning
             marker.Position = fill.Position + new Vector2(fill.DrawWidth, isNewStyle ? fill.DrawHeight / 2 : 0);
         }
 
-        protected override void HealthIncreased()
+        protected override void HealthChanged(bool increase)
         {
-            marker.Bulge();
-            base.HealthIncreased();
+            if (increase)
+                marker.Bulge();
+            base.HealthChanged(increase);
         }
 
         protected override void Flash() => marker.Flash(Current.Value >= epic_cutoff);
