@@ -169,10 +169,11 @@ namespace osu.Game.Screens.Play.HUD
             if (Current.Value >= glowBarValue)
                 finishMissDisplay();
 
-            if (pendingMissAnimation && Current.Value < glowBarValue)
+            if (pendingMissAnimation)
+            {
                 triggerMissDisplay();
-
-            pendingMissAnimation = false;
+                pendingMissAnimation = false;
+            }
 
             base.HealthChanged(increase);
         }
