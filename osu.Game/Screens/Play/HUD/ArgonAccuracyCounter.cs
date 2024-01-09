@@ -83,6 +83,7 @@ namespace osu.Game.Screens.Play.HUD
                         },
                         fractionPart = new ArgonCounterTextComponent(Anchor.TopLeft)
                         {
+                            RequiredDisplayDigits = { Value = 2 },
                             WireframeOpacity = { BindTarget = WireframeOpacity },
                             Scale = new Vector2(0.5f),
                         },
