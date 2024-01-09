@@ -42,8 +42,8 @@ namespace osu.Game.Tests.Visual.Playlists
         private int totalCount;
         private ScoreInfo userScore;
 
-        // We don't use SetUpSteps for this because one of the tests shouldn't receive any scores.
-        public void InitialiseUserScoresAndBeatmap(bool noScores = false)
+        [SetUpSteps]
+        public override void SetUpSteps()
         {
             base.SetUpSteps();
 
@@ -63,18 +63,24 @@ namespace osu.Game.Tests.Visual.Playlists
                 userScore.Statistics = new Dictionary<HitResult, int>();
                 userScore.MaximumStatistics = new Dictionary<HitResult, int>();
 
-                bindHandler(noScores: noScores);
-
                 // Beatmap is required to be an actual beatmap so the scores can get their scores correctly
                 // calculated for standardised scoring, else the tests that rely on ordering will fall over.
                 Beatmap.Value = CreateWorkingBeatmap(Ruleset.Value);
             });
         }
 
+        public void SetUpRequestHandler(bool noScores = false)
+        {
+            AddStep("set up request handler", () =>
+            {
+                bindHandler(noScores: noScores);
+            });
+        }
+
         [Test]
         public void TestShowWithUserScore()
         {
-            InitialiseUserScoresAndBeatmap();
+            SetUpRequestHandler();
 
             AddStep("bind user score info handler", () => bindHandler(userScore: userScore));
 
@@ -89,7 +95,7 @@ namespace osu.Game.Tests.Visual.Playlists
         [Test]
         public void TestShowNullUserScore()
         {
-            InitialiseUserScoresAndBeatmap();
+            SetUpRequestHandler();
 
             createResults();
             waitForDisplay();
@@ -100,7 +106,7 @@ namespace osu.Game.Tests.Visual.Playlists
         [Test]
         public void TestShowUserScoreWithDelay()
         {
-            InitialiseUserScoresAndBeatmap();
+            SetUpRequestHandler();
 
             AddStep("bind user score info handler", () => bindHandler(true, userScore));
 
@@ -114,7 +120,7 @@ namespace osu.Game.Tests.Visual.Playlists
         [Test]
         public void TestShowNullUserScoreWithDelay()
         {
-            InitialiseUserScoresAndBeatmap();
+            SetUpRequestHandler();
 
             AddStep("bind delayed handler", () => bindHandler(true));
 
@@ -127,7 +133,7 @@ namespace osu.Game.Tests.Visual.Playlists
         [Test]
         public void TestFetchWhenScrolledToTheRight()
         {
-            InitialiseUserScoresAndBeatmap();
+            SetUpRequestHandler();
 
             createResults();
             waitForDisplay();
@@ -152,7 +158,7 @@ namespace osu.Game.Tests.Visual.Playlists
         [Test]
         public void TestFetchWhenScrolledToTheLeft()
         {
-            InitialiseUserScoresAndBeatmap();
+            SetUpRequestHandler();
 
             AddStep("bind user score info handler", () => bindHandler(userScore: userScore));
 
@@ -179,7 +185,7 @@ namespace osu.Game.Tests.Visual.Playlists
         [Test]
         public void TestShowWithNoScores()
         {
-            InitialiseUserScoresAndBeatmap(noScores: true);
+            SetUpRequestHandler(true);
             createResults();
             AddAssert("no scores visible", () => resultsScreen.ScorePanelList.GetScorePanels().Count() == 0);
         }
