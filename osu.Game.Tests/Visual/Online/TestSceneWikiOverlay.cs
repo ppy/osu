@@ -11,6 +11,7 @@ using osu.Game.Online.API;
 using osu.Game.Online.API.Requests;
 using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Overlays;
+using osu.Game.Overlays.Wiki;
 
 namespace osu.Game.Tests.Visual.Online
 {
@@ -111,8 +112,8 @@ namespace osu.Game.Tests.Visual.Online
         private APIWikiPage responseMainPage => new APIWikiPage
         {
             Title = "Main page",
-            Layout = "main_page",
-            Path = "Main_page",
+            Layout = WikiOverlay.INDEX_PATH.ToLowerInvariant(), // custom classes are always lower snake.
+            Path = WikiOverlay.INDEX_PATH,
             Locale = "en",
             Subtitle = null,
             Markdown =
