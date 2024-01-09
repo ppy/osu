@@ -33,10 +33,10 @@ namespace osu.Game.Screens.Play.PlayerSettings
         private readonly IconButton play;
 
         [Resolved]
-        private GameplayClockContainer gameplayClock { get; set; } = null!;
+        private GameplayClockContainer? gameplayClock { get; set; }
 
         [Resolved]
-        private GameplayState gameplayState { get; set; } = null!;
+        private GameplayState? gameplayState { get; set; }
 
         public PlaybackSettings()
             : base("playback")
@@ -150,7 +150,7 @@ namespace osu.Game.Screens.Play.PlayerSettings
         protected override void Update()
         {
             base.Update();
-            play.Icon = gameplayClock.IsRunning ? FontAwesome.Regular.PauseCircle : FontAwesome.Regular.PlayCircle;
+            play.Icon = gameplayClock?.IsRunning == true ? FontAwesome.Regular.PauseCircle : FontAwesome.Regular.PlayCircle;
         }
     }
 }
