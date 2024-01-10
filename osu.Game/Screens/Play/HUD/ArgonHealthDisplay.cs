@@ -5,6 +5,7 @@ using System;
 using System.Collections.Generic;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
+using osu.Framework.Caching;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Extensions.ObjectExtensions;
 using osu.Framework.Graphics;
@@ -71,6 +72,8 @@ namespace osu.Game.Screens.Play.HUD
         private const float curve_smoothness = 10;
 
         private readonly LayoutValue drawSizeLayout = new LayoutValue(Invalidation.DrawSize);
+
+        private readonly Cached pathVerticesCache = new Cached();
 
         public ArgonHealthDisplay()
         {
@@ -311,6 +314,8 @@ namespace osu.Game.Screens.Play.HUD
 
             glowBar.Vertices = vertices;
             glowBar.Position = initialVertex;
+
+            pathVerticesCache.Validate();
         }
 
         protected override void Dispose(bool isDisposing)

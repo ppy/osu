@@ -599,7 +599,9 @@ namespace osu.Game.Rulesets.Objects.Drawables
             float balanceAdjustAmount = positionalHitsoundsLevel.Value * 2;
             double returnedValue = balanceAdjustAmount * (position - 0.5f);
 
-            return returnedValue;
+            // Rounded to reduce the overhead of audio adjustments (which are currently bindable heavy).
+            // Balance is very hard to perceive in small increments anyways.
+            return Math.Round(returnedValue, 2);
         }
 
         /// <summary>
