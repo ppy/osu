@@ -10,7 +10,7 @@
     <EmbedAssembliesIntoApk>true</EmbedAssembliesIntoApk>
   </PropertyGroup>
   <ItemGroup>
-    <PackageReference Include="ppy.osu.Framework.Android" Version="2023.1227.1" />
+    <PackageReference Include="ppy.osu.Framework.Android" Version="2024.110.0" />
   </ItemGroup>
   <PropertyGroup>
     <!-- Fody does not handle Android build well, and warns when unchanged.
