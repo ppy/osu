@@ -1,11 +1,17 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System.Collections.Generic;
 using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Screens;
 using osu.Game.Beatmaps;
+using osu.Game.Online.Spectator;
 using osu.Game.Overlays;
+using osu.Game.Rulesets.Objects;
+using osu.Game.Rulesets.Replays;
+using osu.Game.Rulesets.Scoring;
+using osu.Game.Scoring;
 using osu.Game.Screens.Play;
 using osu.Game.Users;
 
@@ -15,17 +21,19 @@ namespace osu.Game.Screens.Edit.GameplayTest
     {
         private readonly Editor editor;
         private readonly EditorState editorState;
+        private readonly IBeatmap playableBeatmap;
 
         protected override UserActivity InitialActivity => new UserActivity.TestingBeatmap(Beatmap.Value.BeatmapInfo, Ruleset.Value);
 
         [Resolved]
         private MusicController musicController { get; set; } = null!;
 
-        public EditorPlayer(Editor editor)
+        public EditorPlayer(Editor editor, IBeatmap playableBeatmap)
             : base(new PlayerConfiguration { ShowResults = false })
         {
             this.editor = editor;
             editorState = editor.GetState();
+            this.playableBeatmap = playableBeatmap;
         }
 
         protected override GameplayClockContainer CreateGameplayClockContainer(WorkingBeatmap beatmap, double gameplayStart)
@@ -43,6 +51,22 @@ namespace osu.Game.Screens.Edit.GameplayTest
         protected override void LoadComplete()
         {
             base.LoadComplete();
+
+            var frame = new ReplayFrame { Header = new FrameHeader(new ScoreInfo(), new ScoreProcessorStatistics()) };
+
+            foreach (var hitObject in enumerateHitObjects(playableBeatmap.HitObjects.Where(h => h.StartTime < editorState.Time)))
+            {
+                var judgement = hitObject.CreateJudgement();
+
+                if (!frame.Header.Statistics.ContainsKey(judgement.MaxResult))
+                    frame.Header.Statistics.Add(judgement.MaxResult, 0);
+
+                frame.Header.Statistics[judgement.MaxResult]++;
+            }
+
+            HealthProcessor.ResetFromReplayFrame(frame);
+            ScoreProcessor.ResetFromReplayFrame(frame);
+
             ScoreProcessor.HasCompleted.BindValueChanged(completed =>
             {
                 if (completed.NewValue)
@@ -54,6 +78,17 @@ namespace osu.Game.Screens.Edit.GameplayTest
                     }, RESULTS_DISPLAY_DELAY);
                 }
             });
+
+            static IEnumerable<HitObject> enumerateHitObjects(IEnumerable<HitObject> hitObjects)
+            {
+                foreach (var hitObject in hitObjects)
+                {
+                    foreach (var nested in hitObject.NestedHitObjects)
+                        yield return nested;
+
+                    yield return hitObject;
+                }
+            }
         }
 
         protected override void PrepareReplay()

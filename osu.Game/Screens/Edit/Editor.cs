@@ -452,7 +452,7 @@ namespace osu.Game.Screens.Edit
                 pushEditorPlayer();
             }
 
-            void pushEditorPlayer() => this.Push(new EditorPlayerLoader(this));
+            void pushEditorPlayer() => this.Push(new EditorPlayerLoader(this, playableBeatmap));
         }
 
         /// <summary>
