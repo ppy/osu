@@ -159,5 +159,11 @@ namespace osu.Game.Tests.Visual.Gameplay
                 Type = HitResult.Perfect
             });
         }
+
+        protected override void Update()
+        {
+            base.Update();
+            healthProcessor.Health.Value -= 0.0001f * Time.Elapsed;
+        }
     }
 }
