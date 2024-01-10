@@ -328,14 +328,17 @@ namespace osu.Game.Screens.Play.HUD
 
         private partial class BackgroundPath : SmoothPath
         {
+            private static readonly Color4 colour_white = Color4.White.Opacity(0.8f);
+            private static readonly Color4 colour_black = Color4.Black.Opacity(0.2f);
+
             protected override Color4 ColourAt(float position)
             {
                 if (position <= 0.16f)
-                    return Color4.White.Opacity(0.8f);
+                    return colour_white;
 
                 return Interpolation.ValueAt(position,
-                    Color4.White.Opacity(0.8f),
-                    Color4.Black.Opacity(0.2f),
+                    colour_white,
+                    colour_black,
                     -0.5f, 1f, Easing.OutQuint);
             }
         }
@@ -374,12 +377,14 @@ namespace osu.Game.Screens.Play.HUD
 
             public float GlowPortion { get; init; }
 
+            private static readonly Colour4 transparent_black = Colour4.Black.Opacity(0.0f);
+
             protected override Color4 ColourAt(float position)
             {
                 if (position >= GlowPortion)
                     return BarColour;
 
-                return Interpolation.ValueAt(position, Colour4.Black.Opacity(0.0f), GlowColour, 0.0, GlowPortion, Easing.InQuint);
+                return Interpolation.ValueAt(position, transparent_black, GlowColour, 0.0, GlowPortion, Easing.InQuint);
             }
         }
     }
