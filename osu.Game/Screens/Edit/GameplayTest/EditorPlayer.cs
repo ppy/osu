@@ -83,7 +83,7 @@ namespace osu.Game.Screens.Edit.GameplayTest
             {
                 foreach (var hitObject in hitObjects)
                 {
-                    foreach (var nested in hitObject.NestedHitObjects)
+                    foreach (var nested in enumerateHitObjects(hitObject.NestedHitObjects))
                         yield return nested;
 
                     yield return hitObject;
