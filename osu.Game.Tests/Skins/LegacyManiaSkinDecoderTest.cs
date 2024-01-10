@@ -126,6 +126,7 @@ namespace osu.Game.Tests.Skins
                 var configs = decoder.Decode(stream);
 
                 Assert.That(configs.Count, Is.EqualTo(1));
+                Assert.That(configs[0].ColumnLineWidth.Length, Is.EqualTo(5));
                 Assert.That(configs[0].ColumnLineWidth[0], Is.EqualTo(3));
                 Assert.That(configs[0].ColumnLineWidth[1], Is.EqualTo(0)); // malformed entry, should be parsed as zero
                 Assert.That(configs[0].ColumnLineWidth[2], Is.EqualTo(3));
