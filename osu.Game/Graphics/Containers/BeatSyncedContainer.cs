@@ -108,16 +108,19 @@ namespace osu.Game.Graphics.Containers
 
             double beatLength = timingPoint.BeatLength / Divisor;
 
+            // ensure the assumed latency in beatmaps is the same at different playback rates
+            double time = timingPoint.Time + 20 - (20 * Clock.Rate);
+
             while (beatLength < MinimumBeatLength)
                 beatLength *= 2;
 
-            int beatIndex = (int)((currentTrackTime - timingPoint.Time) / beatLength) - (timingPoint.OmitFirstBarLine ? 1 : 0);
+            int beatIndex = (int)((currentTrackTime - time) / beatLength) - (timingPoint.OmitFirstBarLine ? 1 : 0);
 
             // The beats before the start of the first control point are off by 1, this should do the trick
-            if (currentTrackTime < timingPoint.Time)
+            if (currentTrackTime < time)
                 beatIndex--;
 
-            TimeUntilNextBeat = (timingPoint.Time - currentTrackTime) % beatLength;
+            TimeUntilNextBeat = (time - currentTrackTime) % beatLength;
             if (TimeUntilNextBeat <= 0)
                 TimeUntilNextBeat += beatLength;
 
