@@ -40,7 +40,10 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             double aimRatingNoSliders = Math.Sqrt(skills[1].DifficultyValue()) * difficulty_multiplier;
             double speedRating = Math.Sqrt(skills[2].DifficultyValue()) * difficulty_multiplier;
             double speedNotes = ((Speed)skills[2]).RelevantNoteCount();
-            double flashlightRating = Math.Sqrt(skills[3].DifficultyValue()) * difficulty_multiplier;
+            double flashlightRating = 0.0;
+
+            if (mods.Any(m => m is OsuModFlashlight))
+                flashlightRating = Math.Sqrt(skills[3].DifficultyValue()) * difficulty_multiplier;
 
             double sliderFactor = aimRating > 0 ? aimRatingNoSliders / aimRating : 1;
 
