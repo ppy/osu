@@ -20,32 +20,17 @@ namespace osu.Game.Screens.Play.HUD.ArgonHealthDisplayParts
 {
     public partial class ArgonHealthDisplayBar : Box
     {
-        private float endProgress = 1f;
+        private Vector2 progressRange = new Vector2(0f, 1f);
 
-        public float EndProgress
+        public Vector2 ProgressRange
         {
-            get => endProgress;
+            get => progressRange;
             set
             {
-                if (endProgress == value)
+                if (progressRange == value)
                     return;
 
-                endProgress = value;
-                Invalidate(Invalidation.DrawNode);
-            }
-        }
-
-        private float startProgress;
-
-        public float StartProgress
-        {
-            get => startProgress;
-            set
-            {
-                if (startProgress == value)
-                    return;
-
-                startProgress = value;
+                progressRange = value;
                 Invalidate(Invalidation.DrawNode);
             }
         }
@@ -149,8 +134,7 @@ namespace osu.Game.Screens.Play.HUD.ArgonHealthDisplayParts
             }
 
             private Vector2 size;
-            private float startProgress;
-            private float endProgress;
+            private Vector2 progressRange;
             private float pathRadius;
             private float padding;
             private float glowPortion;
@@ -162,8 +146,7 @@ namespace osu.Game.Screens.Play.HUD.ArgonHealthDisplayParts
                 base.ApplyState();
 
                 size = Source.DrawSize;
-                endProgress = Source.endProgress;
-                startProgress = Math.Min(Source.startProgress, endProgress);
+                progressRange = new Vector2(Math.Min(Source.progressRange.X, Source.progressRange.Y), Source.progressRange.Y);
                 pathRadius = Source.PathRadius;
                 padding = Source.PathPadding;
                 glowPortion = Source.GlowPortion;
@@ -192,8 +175,7 @@ namespace osu.Game.Screens.Play.HUD.ArgonHealthDisplayParts
                     GlowColour = new Vector4(glowColour.R, glowColour.G, glowColour.B, glowColour.A),
                     GlowPortion = glowPortion,
                     Size = size,
-                    StartProgress = startProgress,
-                    EndProgress = endProgress,
+                    ProgressRange = progressRange,
                     PathRadius = pathRadius,
                     Padding = padding
                 };
@@ -215,8 +197,7 @@ namespace osu.Game.Screens.Play.HUD.ArgonHealthDisplayParts
                 public UniformVector4 BarColour;
                 public UniformVector4 GlowColour;
                 public UniformVector2 Size;
-                public UniformFloat StartProgress;
-                public UniformFloat EndProgress;
+                public UniformVector2 ProgressRange;
                 public UniformFloat PathRadius;
                 public UniformFloat Padding;
                 public UniformFloat GlowPortion;
