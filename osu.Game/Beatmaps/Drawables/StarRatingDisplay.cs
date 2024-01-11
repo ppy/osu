@@ -2,18 +2,22 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
+using System.Collections.Generic;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Extensions.LocalisationExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
+using osu.Framework.Graphics.Cursor;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.UserInterface;
+using osu.Framework.Localisation;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Overlays;
+using osu.Game.Overlays.Difficulty;
 using osuTK;
 using osuTK.Graphics;
 
@@ -46,6 +50,8 @@ namespace osu.Game.Beatmaps.Drawables
         /// This bindable gets transformed on change rather than instantaneous, if animation is enabled.
         /// </summary>
         public IBindable<double> DisplayedStars => displayedStars;
+
+        private readonly Bindable<IReadOnlyDictionary<string, LocalisableString>> currentDisplayableAttributes = new Bindable<IReadOnlyDictionary<string, LocalisableString>>();
 
         [Resolved]
         private OsuColour colours { get; set; } = null!;
@@ -84,7 +90,7 @@ namespace osu.Game.Beatmaps.Drawables
                     break;
             }
 
-            InternalChild = new CircularContainer
+            InternalChild = new TooltipCircularContainer
             {
                 Masking = true,
                 AutoSizeAxes = Axes.Both,
@@ -150,9 +156,15 @@ namespace osu.Game.Beatmaps.Drawables
                     this.TransformBindableTo(displayedStars, c.NewValue.Stars, 750, Easing.OutQuint);
                 else
                     displayedStars.Value = c.NewValue.Stars;
+
+                if (c.NewValue.Attributes != null)
+                    currentDisplayableAttributes.Value = c.NewValue.Attributes.ToDisplayableAttributes();
             });
 
             displayedStars.Value = Current.Value.Stars;
+
+            if (Current.Value.Attributes != null)
+                currentDisplayableAttributes.Value = Current.Value.Attributes.ToDisplayableAttributes();
 
             displayedStars.BindValueChanged(s =>
             {
@@ -168,7 +180,24 @@ namespace osu.Game.Beatmaps.Drawables
                 // displaying.
                 textContainer.Width = 24 + Math.Max(starsText.Text.ToString().Length - 4, 0) * 6;
             }, true);
+
+            currentDisplayableAttributes.BindValueChanged(s =>
+            {
+                if (s.NewValue == null)
+                    return;
+
+                ((TooltipCircularContainer)InternalChild).TooltipContent = s.NewValue;
+            }, true);
         }
+    }
+
+    public partial class TooltipCircularContainer : CircularContainer, IHasCustomTooltip<IReadOnlyDictionary<string, LocalisableString>>
+    {
+        public override bool HandlePositionalInput => true;
+
+        public ITooltip<IReadOnlyDictionary<string, LocalisableString>> GetCustomTooltip() => new DisplayableAttributesTooltip();
+
+        public IReadOnlyDictionary<string, LocalisableString>? TooltipContent { get; set; }
     }
 
     public enum StarRatingDisplaySize
