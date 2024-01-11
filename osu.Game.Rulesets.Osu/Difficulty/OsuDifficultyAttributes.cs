@@ -96,7 +96,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
 
             if (FlashlightDifficulty > 0.0)
             {
-                dictionary["Flashlight"] = FlashlightDifficulty.ToString("F");
+                dictionary["Flashlight"] = FlashlightDifficulty.ToLocalisableString("0.00");
             }
 
             return dictionary;
