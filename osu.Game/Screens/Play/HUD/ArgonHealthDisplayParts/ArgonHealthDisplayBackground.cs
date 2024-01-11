@@ -33,7 +33,7 @@ namespace osu.Game.Screens.Play.HUD.ArgonHealthDisplayParts
             }
         }
 
-        private float startProgress = 0f;
+        private float startProgress;
 
         public float StartProgress
         {
@@ -161,7 +161,7 @@ namespace osu.Game.Screens.Play.HUD.ArgonHealthDisplayParts
                 public UniformFloat EndProgress;
                 public UniformFloat PathRadius;
                 public UniformFloat Padding;
-                private UniformPadding8 pad;
+                private readonly UniformPadding8 pad;
             }
         }
     }
