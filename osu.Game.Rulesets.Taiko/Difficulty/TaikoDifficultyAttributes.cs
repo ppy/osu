@@ -3,6 +3,8 @@
 
 using System.Collections.Generic;
 using Newtonsoft.Json;
+using osu.Framework.Extensions.LocalisationExtensions;
+using osu.Framework.Localisation;
 using osu.Game.Beatmaps;
 using osu.Game.Rulesets.Difficulty;
 
@@ -42,6 +44,13 @@ namespace osu.Game.Rulesets.Taiko.Difficulty
         /// </remarks>
         [JsonProperty("great_hit_window")]
         public double GreatHitWindow { get; set; }
+
+        public override IReadOnlyDictionary<string, LocalisableString> ToDisplayableAttributes() => new Dictionary<string, LocalisableString>
+        {
+            { "Stamina", StaminaDifficulty.ToLocalisableString("0.00") },
+            { "Rhythm", RhythmDifficulty.ToLocalisableString("0.00") },
+            { "Colour", ColourDifficulty.ToLocalisableString("0.00") }
+        };
 
         public override IEnumerable<(int attributeId, object value)> ToDatabaseAttributes()
         {
