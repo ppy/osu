@@ -3,7 +3,6 @@
 
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Caching;
@@ -59,38 +58,11 @@ namespace osu.Game.Screens.Play.HUD
 
         private bool displayingMiss => resetMissBarDelegate != null;
 
-        private readonly List<Vector2> missBarVertices = new List<Vector2>();
-        private readonly List<Vector2> healthBarVertices = new List<Vector2>();
+        private readonly List<Vector2> vertices = new List<Vector2>();
 
         private double glowBarValue;
 
-        public double GlowBarValue
-        {
-            get => glowBarValue;
-            set
-            {
-                if (Precision.AlmostEquals(glowBarValue, value, 0.0001))
-                    return;
-
-                glowBarValue = value;
-                pathVerticesCache.Invalidate();
-            }
-        }
-
         private double healthBarValue;
-
-        public double HealthBarValue
-        {
-            get => healthBarValue;
-            set
-            {
-                if (Precision.AlmostEquals(healthBarValue, value, 0.0001))
-                    return;
-
-                healthBarValue = value;
-                pathVerticesCache.Invalidate();
-            }
-        }
 
         public const float MAIN_PATH_RADIUS = 10f;
 
@@ -161,7 +133,6 @@ namespace osu.Game.Screens.Play.HUD
             base.LoadComplete();
 
             HealthProcessor.NewJudgement += onNewJudgement;
-            Current.BindValueChanged(onCurrentChanged, true);
 
             // we're about to set `RelativeSizeAxes` depending on the value of `UseRelativeSize`.
             // setting `RelativeSizeAxes` internally transforms absolute sizing to relative and back to keep the size the same,
@@ -176,31 +147,6 @@ namespace osu.Game.Screens.Play.HUD
 
         private void onNewJudgement(JudgementResult result) => pendingMissAnimation |= !result.IsHit;
 
-        private void onCurrentChanged(ValueChangedEvent<double> valueChangedEvent)
-            // schedule display updates one frame later to ensure we know the judgement result causing this change (if there is one).
-            => Scheduler.AddOnce(updateDisplay);
-
-        private void updateDisplay()
-        {
-            double newHealth = Current.Value;
-
-            if (newHealth >= GlowBarValue)
-                finishMissDisplay();
-
-            double time = newHealth > GlowBarValue ? 500 : 250;
-
-            // TODO: this should probably use interpolation in update.
-            this.TransformTo(nameof(HealthBarValue), newHealth, time, Easing.OutQuint);
-
-            if (pendingMissAnimation && newHealth < GlowBarValue)
-                triggerMissDisplay();
-
-            pendingMissAnimation = false;
-
-            if (!displayingMiss)
-                this.TransformTo(nameof(GlowBarValue), newHealth, time, Easing.OutQuint);
-        }
-
         protected override void Update()
         {
             base.Update();
@@ -211,33 +157,44 @@ namespace osu.Game.Screens.Play.HUD
                 drawSizeLayout.Validate();
             }
 
-            if (!pathVerticesCache.IsValid)
-                updatePathVertices();
+            healthBarValue = Interpolation.DampContinuously(healthBarValue, Current.Value, 50, Time.Elapsed);
+            if (!displayingMiss)
+                glowBarValue = Interpolation.DampContinuously(glowBarValue, Current.Value, 50, Time.Elapsed);
 
             mainBar.Alpha = (float)Interpolation.DampContinuously(mainBar.Alpha, Current.Value > 0 ? 1 : 0, 40, Time.Elapsed);
-            glowBar.Alpha = (float)Interpolation.DampContinuously(glowBar.Alpha, GlowBarValue > 0 ? 1 : 0, 40, Time.Elapsed);
+            glowBar.Alpha = (float)Interpolation.DampContinuously(glowBar.Alpha, glowBarValue > 0 ? 1 : 0, 40, Time.Elapsed);
+
+            updatePathVertices();
+        }
+
+        protected override void HealthChanged(bool increase)
+        {
+            if (Current.Value >= glowBarValue)
+                finishMissDisplay();
+
+            if (pendingMissAnimation)
+            {
+                triggerMissDisplay();
+                pendingMissAnimation = false;
+            }
+
+            base.HealthChanged(increase);
         }
 
         protected override void FinishInitialAnimation(double value)
         {
             base.FinishInitialAnimation(value);
-            this.TransformTo(nameof(HealthBarValue), value, 500, Easing.OutQuint);
-            this.TransformTo(nameof(GlowBarValue), value, 250, Easing.OutQuint);
+            this.TransformTo(nameof(healthBarValue), value, 500, Easing.OutQuint);
+            this.TransformTo(nameof(glowBarValue), value, 250, Easing.OutQuint);
         }
 
         protected override void Flash()
         {
             base.Flash();
 
-            mainBar.TransformTo(nameof(BarPath.GlowColour), main_bar_glow_colour.Opacity(0.8f))
-                   .TransformTo(nameof(BarPath.GlowColour), main_bar_glow_colour, 300, Easing.OutQuint);
-
             if (!displayingMiss)
             {
-                glowBar.TransformTo(nameof(BarPath.BarColour), Colour4.White, 30, Easing.OutQuint)
-                       .Then()
-                       .TransformTo(nameof(BarPath.BarColour), main_bar_colour, 1000, Easing.OutQuint);
-
+                // TODO: REMOVE THIS. It's recreating textures.
                 glowBar.TransformTo(nameof(BarPath.GlowColour), Colour4.White, 30, Easing.OutQuint)
                        .Then()
                        .TransformTo(nameof(BarPath.GlowColour), main_bar_glow_colour, 300, Easing.OutQuint);
@@ -251,13 +208,15 @@ namespace osu.Game.Screens.Play.HUD
 
             this.Delay(500).Schedule(() =>
             {
-                this.TransformTo(nameof(GlowBarValue), Current.Value, 300, Easing.OutQuint);
+                this.TransformTo(nameof(glowBarValue), Current.Value, 300, Easing.OutQuint);
                 finishMissDisplay();
             }, out resetMissBarDelegate);
 
+            // TODO: REMOVE THIS. It's recreating textures.
             glowBar.TransformTo(nameof(BarPath.BarColour), new Colour4(255, 147, 147, 255), 100, Easing.OutQuint).Then()
                    .TransformTo(nameof(BarPath.BarColour), new Colour4(255, 93, 93, 255), 800, Easing.OutQuint);
 
+            // TODO: REMOVE THIS. It's recreating textures.
             glowBar.TransformTo(nameof(BarPath.GlowColour), new Colour4(253, 0, 0, 255).Lighten(0.2f))
                    .TransformTo(nameof(BarPath.GlowColour), new Colour4(253, 0, 0, 255), 800, Easing.OutQuint);
         }
@@ -269,6 +228,7 @@ namespace osu.Game.Screens.Play.HUD
 
             if (Current.Value > 0)
             {
+                // TODO: REMOVE THIS. It's recreating textures.
                 glowBar.TransformTo(nameof(BarPath.BarColour), main_bar_colour, 300, Easing.In);
                 glowBar.TransformTo(nameof(BarPath.GlowColour), main_bar_glow_colour, 300, Easing.In);
             }
@@ -308,7 +268,6 @@ namespace osu.Game.Screens.Play.HUD
             if (DrawWidth - padding < rescale_cutoff)
                 rescalePathProportionally();
 
-            List<Vector2> vertices = new List<Vector2>();
             barPath.GetPathToProgress(vertices, 0.0, 1.0);
 
             background.Vertices = vertices;
@@ -338,20 +297,23 @@ namespace osu.Game.Screens.Play.HUD
 
         private void updatePathVertices()
         {
-            barPath.GetPathToProgress(healthBarVertices, 0.0, healthBarValue);
-            barPath.GetPathToProgress(missBarVertices, healthBarValue, Math.Max(glowBarValue, healthBarValue));
+            barPath.GetPathToProgress(vertices, 0.0, healthBarValue);
+            if (vertices.Count == 0) vertices.Add(Vector2.Zero);
+            Vector2 initialVertex = vertices[0];
+            for (int i = 0; i < vertices.Count; i++)
+                vertices[i] -= initialVertex;
 
-            if (healthBarVertices.Count == 0)
-                healthBarVertices.Add(Vector2.Zero);
+            mainBar.Vertices = vertices;
+            mainBar.Position = initialVertex;
 
-            if (missBarVertices.Count == 0)
-                missBarVertices.Add(Vector2.Zero);
+            barPath.GetPathToProgress(vertices, healthBarValue, Math.Max(glowBarValue, healthBarValue));
+            if (vertices.Count == 0) vertices.Add(Vector2.Zero);
+            initialVertex = vertices[0];
+            for (int i = 0; i < vertices.Count; i++)
+                vertices[i] -= initialVertex;
 
-            glowBar.Vertices = missBarVertices.Select(v => v - missBarVertices[0]).ToList();
-            glowBar.Position = missBarVertices[0];
-
-            mainBar.Vertices = healthBarVertices.Select(v => v - healthBarVertices[0]).ToList();
-            mainBar.Position = healthBarVertices[0];
+            glowBar.Vertices = vertices;
+            glowBar.Position = initialVertex;
 
             pathVerticesCache.Validate();
         }
@@ -366,14 +328,17 @@ namespace osu.Game.Screens.Play.HUD
 
         private partial class BackgroundPath : SmoothPath
         {
+            private static readonly Color4 colour_white = Color4.White.Opacity(0.8f);
+            private static readonly Color4 colour_black = Color4.Black.Opacity(0.2f);
+
             protected override Color4 ColourAt(float position)
             {
                 if (position <= 0.16f)
-                    return Color4.White.Opacity(0.8f);
+                    return colour_white;
 
                 return Interpolation.ValueAt(position,
-                    Color4.White.Opacity(0.8f),
-                    Color4.Black.Opacity(0.2f),
+                    colour_white,
+                    colour_black,
                     -0.5f, 1f, Easing.OutQuint);
             }
         }
@@ -412,12 +377,14 @@ namespace osu.Game.Screens.Play.HUD
 
             public float GlowPortion { get; init; }
 
+            private static readonly Colour4 transparent_black = Colour4.Black.Opacity(0.0f);
+
             protected override Color4 ColourAt(float position)
             {
                 if (position >= GlowPortion)
                     return BarColour;
 
-                return Interpolation.ValueAt(position, Colour4.Black.Opacity(0.0f), GlowColour, 0.0, GlowPortion, Easing.InQuint);
+                return Interpolation.ValueAt(position, transparent_black, GlowColour, 0.0, GlowPortion, Easing.InQuint);
             }
         }
     }
