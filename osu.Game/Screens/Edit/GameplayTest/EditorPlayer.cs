@@ -57,10 +57,7 @@ namespace osu.Game.Screens.Edit.GameplayTest
             foreach (var hitObject in enumerateHitObjects(playableBeatmap.HitObjects.Where(h => h.StartTime < editorState.Time)))
             {
                 var judgement = hitObject.CreateJudgement();
-
-                if (!frame.Header.Statistics.ContainsKey(judgement.MaxResult))
-                    frame.Header.Statistics.Add(judgement.MaxResult, 0);
-
+                frame.Header.Statistics.TryAdd(judgement.MaxResult, 0);
                 frame.Header.Statistics[judgement.MaxResult]++;
             }
 
