@@ -19,6 +19,7 @@ using osu.Game.Configuration;
 using osu.Game.Rulesets.Judgements;
 using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Objects.Types;
+using osu.Game.Screens.Play.HUD.ArgonHealthDisplayParts;
 using osu.Game.Skinning;
 using osuTK;
 using osuTK.Graphics;
@@ -100,6 +101,14 @@ namespace osu.Game.Screens.Play.HUD
                     background = new BackgroundPath
                     {
                         PathRadius = MAIN_PATH_RADIUS,
+                        Alpha = 0,
+                        AlwaysPresent = true
+                    },
+                    new ArgonHealthDisplayBackground
+                    {
+                        RelativeSizeAxes = Axes.Both,
+                        PathRadius = MAIN_PATH_RADIUS,
+                        PathPadding = MAIN_PATH_RADIUS
                     },
                     glowBar = new BarPath
                     {
@@ -121,7 +130,7 @@ namespace osu.Game.Screens.Play.HUD
                         GlowColour = main_bar_glow_colour,
                         PathRadius = MAIN_PATH_RADIUS,
                         GlowPortion = 0.6f,
-                    },
+                    }
                 }
             };
         }
