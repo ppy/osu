@@ -3,7 +3,6 @@
 
 #nullable disable
 
-using System;
 using System.Runtime.InteropServices;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
@@ -18,36 +17,6 @@ namespace osu.Game.Screens.Play.HUD.ArgonHealthDisplayParts
 {
     public partial class ArgonHealthDisplayBackground : Box
     {
-        private float endProgress = 1f;
-
-        public float EndProgress
-        {
-            get => endProgress;
-            set
-            {
-                if (endProgress == value)
-                    return;
-
-                endProgress = value;
-                Invalidate(Invalidation.DrawNode);
-            }
-        }
-
-        private float startProgress;
-
-        public float StartProgress
-        {
-            get => startProgress;
-            set
-            {
-                if (startProgress == value)
-                    return;
-
-                startProgress = value;
-                Invalidate(Invalidation.DrawNode);
-            }
-        }
-
         private float radius = 10f;
 
         public float PathRadius
@@ -102,8 +71,6 @@ namespace osu.Game.Screens.Play.HUD.ArgonHealthDisplayParts
             }
 
             private Vector2 size;
-            private float startProgress;
-            private float endProgress;
             private float pathRadius;
             private float padding;
 
@@ -112,8 +79,6 @@ namespace osu.Game.Screens.Play.HUD.ArgonHealthDisplayParts
                 base.ApplyState();
 
                 size = Source.DrawSize;
-                endProgress = Source.endProgress;
-                startProgress = Math.Min(Source.startProgress, endProgress);
                 pathRadius = Source.PathRadius;
                 padding = Source.PathPadding;
             }
@@ -136,8 +101,6 @@ namespace osu.Game.Screens.Play.HUD.ArgonHealthDisplayParts
                 parametersBuffer.Data = new ArgonBarPathBackgroundParameters
                 {
                     Size = size,
-                    StartProgress = startProgress,
-                    EndProgress = endProgress,
                     PathRadius = pathRadius,
                     Padding = padding
                 };
@@ -157,11 +120,8 @@ namespace osu.Game.Screens.Play.HUD.ArgonHealthDisplayParts
             private record struct ArgonBarPathBackgroundParameters
             {
                 public UniformVector2 Size;
-                public UniformFloat StartProgress;
-                public UniformFloat EndProgress;
                 public UniformFloat PathRadius;
                 public UniformFloat Padding;
-                private readonly UniformPadding8 pad;
             }
         }
     }
