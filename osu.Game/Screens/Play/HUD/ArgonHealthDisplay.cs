@@ -249,9 +249,8 @@ namespace osu.Game.Screens.Play.HUD
 
         private void updatePathProgress()
         {
-            mainBar.EndProgress = (float)healthBarValue;
-            glowBar.StartProgress = (float)healthBarValue;
-            glowBar.EndProgress = (float)Math.Max(glowBarValue, healthBarValue);
+            mainBar.ProgressRange = new Vector2(0f, (float)healthBarValue);
+            glowBar.ProgressRange = new Vector2((float)healthBarValue, (float)Math.Max(glowBarValue, healthBarValue));
         }
 
         protected override void Dispose(bool isDisposing)
