@@ -54,11 +54,14 @@ namespace osu.Game.Screens.Play
         {
             base.LoadComplete();
 
-            var playerSettingsOverlay = new PlaybackSettings { Expanded = { Value = false } };
-            HUDOverlay.PlayerSettingsOverlay.Add(playerSettingsOverlay);
+            if (HUDOverlay != null)
+            {
+                var playerSettingsOverlay = new PlaybackSettings { Expanded = { Value = false } };
+                HUDOverlay.PlayerSettingsOverlay.Add(playerSettingsOverlay);
 
-            if (GameplayClockContainer is MasterGameplayClockContainer master)
-                playerSettingsOverlay.UserPlaybackRate.BindTarget = master.UserPlaybackRate;
+                if (GameplayClockContainer is MasterGameplayClockContainer master)
+                    playerSettingsOverlay.UserPlaybackRate.BindTarget = master.UserPlaybackRate;
+            }
         }
 
         protected override void PrepareReplay()
