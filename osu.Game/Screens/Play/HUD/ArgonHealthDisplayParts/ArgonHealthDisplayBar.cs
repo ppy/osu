@@ -116,12 +116,6 @@ namespace osu.Game.Screens.Play.HUD.ArgonHealthDisplayParts
             TextureShader = shaders.Load(VertexShaderDescriptor.TEXTURE_2, "ArgonBarPath");
         }
 
-        protected override void Update()
-        {
-            base.Update();
-            Invalidate(Invalidation.DrawNode);
-        }
-
         protected override DrawNode CreateDrawNode() => new ArgonBarPathDrawNode(this);
 
         private class ArgonBarPathDrawNode : SpriteDrawNode
