@@ -50,21 +50,6 @@ namespace osu.Game.Screens.Play.HUD.ArgonHealthDisplayParts
             }
         }
 
-        private float padding = 10f;
-
-        public float PathPadding
-        {
-            get => padding;
-            set
-            {
-                if (padding == value)
-                    return;
-
-                padding = value;
-                Invalidate(Invalidation.DrawNode);
-            }
-        }
-
         private float glowPortion;
 
         public float GlowPortion
@@ -130,7 +115,6 @@ namespace osu.Game.Screens.Play.HUD.ArgonHealthDisplayParts
             private Vector2 size;
             private Vector2 progressRange;
             private float pathRadius;
-            private float padding;
             private float glowPortion;
             private Color4 barColour;
             private Color4 glowColour;
@@ -142,7 +126,6 @@ namespace osu.Game.Screens.Play.HUD.ArgonHealthDisplayParts
                 size = Source.DrawSize;
                 progressRange = new Vector2(Math.Min(Source.progressRange.X, Source.progressRange.Y), Source.progressRange.Y);
                 pathRadius = Source.PathRadius;
-                padding = Source.PathPadding;
                 glowPortion = Source.GlowPortion;
                 barColour = Source.barColour;
                 glowColour = Source.glowColour;
@@ -170,8 +153,7 @@ namespace osu.Game.Screens.Play.HUD.ArgonHealthDisplayParts
                     GlowPortion = glowPortion,
                     Size = size,
                     ProgressRange = progressRange,
-                    PathRadius = pathRadius,
-                    Padding = padding
+                    PathRadius = pathRadius
                 };
 
                 shader.BindUniformBlock("m_ArgonBarPathParameters", parametersBuffer);
@@ -193,9 +175,8 @@ namespace osu.Game.Screens.Play.HUD.ArgonHealthDisplayParts
                 public UniformVector2 Size;
                 public UniformVector2 ProgressRange;
                 public UniformFloat PathRadius;
-                public UniformFloat Padding;
                 public UniformFloat GlowPortion;
-                private readonly UniformPadding4 pad;
+                private readonly UniformPadding8 pad;
             }
         }
     }
