@@ -5,7 +5,7 @@ using osu.Game.Rulesets.Scoring;
 
 namespace osu.Game.Rulesets.Taiko.Scoring
 {
-    public class TaikoHitWindows : HitWindows.LegacyHitWindows
+    public class TaikoHitWindows : HitWindows.ExclusiveLegacyHitWindows
     {
         internal static readonly DifficultyRange[] TAIKO_RANGES =
         {

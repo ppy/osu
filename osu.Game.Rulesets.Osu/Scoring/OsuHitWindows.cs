@@ -5,7 +5,7 @@ using osu.Game.Rulesets.Scoring;
 
 namespace osu.Game.Rulesets.Osu.Scoring
 {
-    public class OsuHitWindows : HitWindows.LegacyHitWindows
+    public class OsuHitWindows : HitWindows.ExclusiveLegacyHitWindows
     {
         /// <summary>
         /// osu! ruleset has a fixed miss window regardless of difficulty settings.
