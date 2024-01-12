@@ -89,6 +89,7 @@ namespace osu.Game.Screens.Play.HUD
                     new Container
                     {
                         RelativeSizeAxes = Axes.Both,
+                        // since we are using bigger path radius we need to expand the draw area outwards to preserve the curve placement
                         Padding = new MarginPadding(-30f),
                         Child = glowBar = new ArgonHealthDisplayBar
                         {
