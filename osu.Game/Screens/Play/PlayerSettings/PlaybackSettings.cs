@@ -27,7 +27,6 @@ namespace osu.Game.Screens.Play.PlayerSettings
             Precision = 0.1,
         };
 
-        public readonly Bindable<bool> AllowControls = new BindableBool(true);
 
         private readonly PlayerSliderBar<double> rateSlider;
 
@@ -73,7 +72,6 @@ namespace osu.Game.Screens.Play.PlayerSettings
                                     Origin = Anchor.Centre,
                                     Icon = FontAwesome.Solid.FastBackward,
                                     Action = () => seek(-1, seek_fast_amount),
-                                    Enabled = { BindTarget = AllowControls },
                                 },
                                 new SeekButton
                                 {
@@ -81,7 +79,6 @@ namespace osu.Game.Screens.Play.PlayerSettings
                                     Origin = Anchor.Centre,
                                     Icon = FontAwesome.Solid.Backward,
                                     Action = () => seek(-1, seek_amount),
-                                    Enabled = { BindTarget = AllowControls },
                                 },
                                 play = new IconButton
                                 {
@@ -100,7 +97,6 @@ namespace osu.Game.Screens.Play.PlayerSettings
                                                 gameplayClock.Start();
                                         }
                                     },
-                                    Enabled = { BindTarget = AllowControls },
                                 },
                                 new SeekButton
                                 {
@@ -108,7 +104,6 @@ namespace osu.Game.Screens.Play.PlayerSettings
                                     Origin = Anchor.Centre,
                                     Icon = FontAwesome.Solid.Forward,
                                     Action = () => seek(1, seek_amount),
-                                    Enabled = { BindTarget = AllowControls },
                                 },
                                 new SeekButton
                                 {
@@ -116,7 +111,6 @@ namespace osu.Game.Screens.Play.PlayerSettings
                                     Origin = Anchor.Centre,
                                     Icon = FontAwesome.Solid.FastForward,
                                     Action = () => seek(1, seek_fast_amount),
-                                    Enabled = { BindTarget = AllowControls },
                                 },
                             },
                         },

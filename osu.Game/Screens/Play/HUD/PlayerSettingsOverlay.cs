@@ -12,9 +12,11 @@ namespace osu.Game.Screens.Play.HUD
     {
         private const int fade_duration = 200;
 
-        public readonly PlaybackSettings PlaybackSettings;
-
         public readonly VisualSettings VisualSettings;
+
+        protected override Container<Drawable> Content => content;
+
+        private readonly FillFlowContainer content;
 
         public PlayerSettingsOverlay()
         {
@@ -22,7 +24,7 @@ namespace osu.Game.Screens.Play.HUD
             Origin = Anchor.TopRight;
             AutoSizeAxes = Axes.Both;
 
-            Child = new FillFlowContainer<PlayerSettingsGroup>
+            InternalChild = content = new FillFlowContainer
             {
                 Anchor = Anchor.TopRight,
                 Origin = Anchor.TopRight,
@@ -31,7 +33,6 @@ namespace osu.Game.Screens.Play.HUD
                 Spacing = new Vector2(0, 20),
                 Children = new PlayerSettingsGroup[]
                 {
-                    PlaybackSettings = new PlaybackSettings { Expanded = { Value = false } },
                     VisualSettings = new VisualSettings { Expanded = { Value = false } },
                     new AudioSettings { Expanded = { Value = false } }
                 }
