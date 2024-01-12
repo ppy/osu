@@ -140,7 +140,7 @@ namespace osu.Game.Overlays.Settings.Sections.Input
             /// <param name="fullState">A <see cref="KeyCombination"/> generated from the full input state.</param>
             /// <param name="triggerKey">The key which triggered this update, and should be used as the binding.</param>
             public void UpdateKeyCombination(KeyCombination fullState, InputKey triggerKey) =>
-                UpdateKeyCombination(new KeyCombination(fullState.Keys.Where(KeyCombination.IsModifierKey).Append(triggerKey)));
+                UpdateKeyCombination(new KeyCombination(fullState.Keys.Where(KeyCombination.IsModifierKey).Append(triggerKey).ToArray()));
 
             public void UpdateKeyCombination(KeyCombination newCombination)
             {
