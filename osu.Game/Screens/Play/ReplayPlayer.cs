@@ -15,6 +15,7 @@ using osu.Game.Input.Bindings;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Scoring;
 using osu.Game.Screens.Play.HUD;
+using osu.Game.Screens.Play.PlayerSettings;
 using osu.Game.Screens.Ranking;
 using osu.Game.Users;
 
@@ -47,6 +48,17 @@ namespace osu.Game.Screens.Play
             : base(configuration)
         {
             this.createScore = createScore;
+        }
+
+        protected override void LoadComplete()
+        {
+            base.LoadComplete();
+
+            var playerSettingsOverlay = new PlaybackSettings { Expanded = { Value = false } };
+            HUDOverlay.PlayerSettingsOverlay.Add(playerSettingsOverlay);
+
+            if (GameplayClockContainer is MasterGameplayClockContainer master)
+                playerSettingsOverlay.UserPlaybackRate.BindTarget = master.UserPlaybackRate;
         }
 
         protected override void PrepareReplay()
