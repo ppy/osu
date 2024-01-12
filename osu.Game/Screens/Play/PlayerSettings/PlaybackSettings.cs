@@ -27,7 +27,6 @@ namespace osu.Game.Screens.Play.PlayerSettings
             Precision = 0.1,
         };
 
-
         private readonly PlayerSliderBar<double> rateSlider;
 
         private readonly OsuSpriteText multiplierText;
