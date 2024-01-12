@@ -84,9 +84,7 @@ namespace osu.Game.Screens.Play.HUD
                 {
                     new ArgonHealthDisplayBackground
                     {
-                        RelativeSizeAxes = Axes.Both,
-                        PathRadius = MAIN_PATH_RADIUS,
-                        PathPadding = MAIN_PATH_RADIUS
+                        RelativeSizeAxes = Axes.Both
                     },
                     new Container
                     {
@@ -100,7 +98,6 @@ namespace osu.Game.Screens.Play.HUD
                             Blending = BlendingParameters.Additive,
                             Colour = ColourInfo.GradientHorizontal(Color4.White.Opacity(0.8f), Color4.White),
                             PathRadius = 40f,
-                            PathPadding = 40f,
                             GlowPortion = 0.9f,
                         }
                     },
@@ -111,7 +108,6 @@ namespace osu.Game.Screens.Play.HUD
                         BarColour = main_bar_colour,
                         GlowColour = main_bar_glow_colour,
                         PathRadius = MAIN_PATH_RADIUS,
-                        PathPadding = MAIN_PATH_RADIUS,
                         GlowPortion = 0.6f,
                     }
                 }
