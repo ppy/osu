@@ -316,6 +316,8 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders
 
         private void updateSlider()
         {
+            controlPointVisualiser.EnsureValidPathTypes();
+
             if (state == SliderPlacementState.Drawing)
                 HitObject.Path.ExpectedDistance.Value = (float)HitObject.Path.CalculatedDistance;
             else
