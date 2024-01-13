@@ -213,6 +213,12 @@ namespace osu.Game.Screens.Play
             if (playableBeatmap == null)
                 return;
 
+            if (gameplayMods.Any(m => ruleset.AllMods.All(rulesetMod => m.GetType() != rulesetMod.GetType())))
+            {
+                Logger.Log($@"Gameplay was started with a mod belonging to a ruleset different than '{ruleset.Description}'.", level: LogLevel.Important);
+                return;
+            }
+
             mouseWheelDisabled = config.GetBindable<bool>(OsuSetting.MouseDisableWheel);
 
             if (game != null)
