@@ -9,15 +9,18 @@ using System.Collections.Specialized;
 using System.Diagnostics;
 using System.Linq;
 using Humanizer;
+using JetBrains.Annotations;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Cursor;
+using osu.Framework.Graphics.Primitives;
 using osu.Framework.Graphics.UserInterface;
 using osu.Framework.Input;
 using osu.Framework.Input.Bindings;
 using osu.Framework.Input.Events;
+using osu.Framework.Utils;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Rulesets.Edit;
 using osu.Game.Rulesets.Objects;
@@ -52,6 +55,9 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders.Components
         [Resolved(CanBeNull = true)]
         private IDistanceSnapProvider distanceSnapProvider { get; set; }
 
+        [UsedImplicitly]
+        private readonly IBindable<int> hitObjectVersion;
+
         public PathControlPointVisualiser(T hitObject, bool allowSelection)
         {
             this.hitObject = hitObject;
@@ -64,6 +70,48 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders.Components
                 Connections = new Container<PathControlPointConnectionPiece<T>> { RelativeSizeAxes = Axes.Both },
                 Pieces = new Container<PathControlPointPiece<T>> { RelativeSizeAxes = Axes.Both }
             };
+
+            hitObjectVersion = hitObject.Path.Version.GetBoundCopy();
+
+            // schedule ensure that updates are only applied after all operations from a single frame are applied.
+            // this avoids inadvertently changing the hit object path type for batch operations.
+            hitObjectVersion.BindValueChanged(_ => Scheduler.AddOnce(cachePointsAndEnsureValidPathTypes));
+        }
+
+        /// <summary>
+        /// Caches the PointsInSegment of Pieces and handles correction of invalid path types.
+        /// </summary>
+        private void cachePointsAndEnsureValidPathTypes()
+        {
+            List<PathControlPoint> pointsInCurrentSegment = new List<PathControlPoint>();
+
+            foreach (var controlPoint in controlPoints)
+            {
+                if (controlPoint.Type != null)
+                    pointsInCurrentSegment = new List<PathControlPoint>();
+
+                pointsInCurrentSegment.Add(controlPoint);
+
+                // Pieces might not be ordered so we need to find the piece corresponding to the current control point.
+                Pieces.Single(o => o.ControlPoint == controlPoint).PointsInSegment = pointsInCurrentSegment;
+            }
+
+            foreach (var piece in Pieces)
+            {
+                if (piece.ControlPoint.Type != PathType.PERFECT_CURVE)
+                    return;
+
+                if (piece.PointsInSegment.Count > 3)
+                    piece.ControlPoint.Type = PathType.BEZIER;
+
+                if (piece.PointsInSegment.Count != 3)
+                    return;
+
+                ReadOnlySpan<Vector2> points = piece.PointsInSegment.Select(p => p.Position).ToArray();
+                RectangleF boundingBox = PathApproximator.CircularArcBoundingBox(points);
+                if (boundingBox.Width >= 640 || boundingBox.Height >= 480)
+                    piece.ControlPoint.Type = PathType.BEZIER;
+            }
         }
 
         protected override void LoadComplete()
