@@ -244,7 +244,13 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
                 else if (slidingSample.IsPlaying)
                     slidingSample.Stop();
             }
+        }
 
+        protected override void UpdateAfterChildren()
+        {
+            base.UpdateAfterChildren();
+
+            // It's important that this is done in UpdateAfterChildren so that the SliderBody has a chance to update its Size and PathOffset on Update.
             double completionProgress = Math.Clamp((Time.Current - HitObject.StartTime) / HitObject.Duration, 0, 1);
 
             Ball.UpdateProgress(completionProgress);
