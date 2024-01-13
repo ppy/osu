@@ -218,6 +218,7 @@ namespace osu.Game.Rulesets.Osu.Objects
                         {
                             RepeatIndex = e.SpanIndex,
                             StartTime = e.Time,
+                            Position = EndPosition,
                             StackHeight = StackHeight,
                             ClassicSliderBehaviour = ClassicSliderBehaviour,
                         });
@@ -244,6 +245,9 @@ namespace osu.Game.Rulesets.Osu.Objects
 
             if (HeadCircle != null)
                 HeadCircle.Position = Position;
+
+            if (TailCircle != null)
+                TailCircle.Position = EndPosition;
         }
 
         protected void UpdateNestedSamples()

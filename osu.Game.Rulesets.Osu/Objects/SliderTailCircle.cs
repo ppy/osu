@@ -1,11 +1,9 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using System;
 using osu.Game.Rulesets.Judgements;
 using osu.Game.Rulesets.Osu.Judgements;
 using osu.Game.Rulesets.Scoring;
-using osuTK;
 
 namespace osu.Game.Rulesets.Osu.Objects
 {
@@ -16,12 +14,6 @@ namespace osu.Game.Rulesets.Osu.Objects
         /// If <c>false</c>, this <see cref="SliderHeadCircle"/> will be judged as a <see cref="SliderTick"/> instead.
         /// </summary>
         public bool ClassicSliderBehaviour;
-
-        public override Vector2 Position
-        {
-            get => Slider.EndPosition;
-            set => throw new NotImplementedException();
-        }
 
         public SliderTailCircle(Slider slider)
             : base(slider)
