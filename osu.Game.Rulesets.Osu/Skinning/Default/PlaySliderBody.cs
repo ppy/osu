@@ -18,8 +18,6 @@ namespace osu.Game.Rulesets.Osu.Skinning.Default
 
         protected IBindable<Color4> AccentColourBindable { get; private set; } = null!;
 
-        private IBindable<int> pathVersion = null!;
-
         [Resolved(CanBeNull = true)]
         private OsuRulesetConfigManager? config { get; set; }
 
@@ -33,8 +31,8 @@ namespace osu.Game.Rulesets.Osu.Skinning.Default
             ScaleBindable = drawableSlider.ScaleBindable.GetBoundCopy();
             ScaleBindable.BindValueChanged(scale => PathRadius = OsuHitObject.OBJECT_RADIUS * scale.NewValue, true);
 
-            pathVersion = drawableSlider.PathVersion.GetBoundCopy();
-            pathVersion.BindValueChanged(_ => Refresh());
+            drawableObject.DefaultsApplied += _ => Refresh();
+            drawableObject.HitObjectApplied += _ => Refresh();
 
             AccentColourBindable = drawableObject.AccentColour.GetBoundCopy();
             AccentColourBindable.BindValueChanged(accent => AccentColour = GetBodyAccentColour(skin, accent.NewValue), true);
