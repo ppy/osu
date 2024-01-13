@@ -37,8 +37,6 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders.Components
         public Action<DragEvent> DragInProgress;
         public Action DragEnded;
 
-        public List<PathControlPoint> PointsInSegment;
-
         public readonly BindableBool IsSelected = new BindableBool();
         public readonly PathControlPoint ControlPoint;
 

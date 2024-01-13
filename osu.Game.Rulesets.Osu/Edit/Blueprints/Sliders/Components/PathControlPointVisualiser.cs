@@ -9,7 +9,6 @@ using System.Collections.Specialized;
 using System.Diagnostics;
 using System.Linq;
 using Humanizer;
-using JetBrains.Annotations;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
@@ -55,9 +54,6 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders.Components
         [Resolved(CanBeNull = true)]
         private IDistanceSnapProvider distanceSnapProvider { get; set; }
 
-        [UsedImplicitly]
-        private readonly IBindable<int> hitObjectVersion;
-
         public PathControlPointVisualiser(T hitObject, bool allowSelection)
         {
             this.hitObject = hitObject;
@@ -70,8 +66,6 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders.Components
                 Connections = new Container<PathControlPointConnectionPiece<T>> { RelativeSizeAxes = Axes.Both },
                 Pieces = new Container<PathControlPointPiece<T>> { RelativeSizeAxes = Axes.Both }
             };
-
-            hitObjectVersion = hitObject.Path.Version.GetBoundCopy();
         }
 
         protected override void LoadComplete()
@@ -85,20 +79,20 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders.Components
 
             // schedule ensure that updates are only applied after all operations from a single frame are applied.
             // this avoids inadvertently changing the hit object path type for batch operations.
-            hitObject.Path.Validating += cachePointsAndEnsureValidPathTypes;
+            hitObject.Path.Validating += ensureValidPathTypes;
         }
 
         protected override void Dispose(bool isDisposing)
         {
             base.Dispose(isDisposing);
 
-            hitObject.Path.Validating -= cachePointsAndEnsureValidPathTypes;
+            hitObject.Path.Validating -= ensureValidPathTypes;
         }
 
         /// <summary>
-        /// Caches the PointsInSegment of Pieces and handles correction of invalid path types.
+        /// Handles correction of invalid path types.
         /// </summary>
-        private void cachePointsAndEnsureValidPathTypes()
+        private void ensureValidPathTypes()
         {
             List<PathControlPoint> pointsInCurrentSegment = new List<PathControlPoint>();
 
@@ -107,31 +101,33 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders.Components
                 if (controlPoint.Type != null)
                 {
                     pointsInCurrentSegment.Add(controlPoint);
-                    pointsInCurrentSegment = new List<PathControlPoint>();
+                    ensureValidPathType(pointsInCurrentSegment);
+                    pointsInCurrentSegment.Clear();
                 }
 
                 pointsInCurrentSegment.Add(controlPoint);
-
-                // Pieces might not be ordered so we need to find the piece corresponding to the current control point.
-                Pieces.Single(o => o.ControlPoint == controlPoint).PointsInSegment = pointsInCurrentSegment;
             }
 
-            foreach (var piece in Pieces)
-            {
-                if (piece.ControlPoint.Type != PathType.PERFECT_CURVE)
-                    continue;
+            ensureValidPathType(pointsInCurrentSegment);
+        }
 
-                if (piece.PointsInSegment.Count > 3)
-                    piece.ControlPoint.Type = PathType.BEZIER;
+        private void ensureValidPathType(IReadOnlyList<PathControlPoint> segment)
+        {
+            var first = segment[0];
 
-                if (piece.PointsInSegment.Count != 3)
-                    continue;
+            if (first.Type != PathType.PERFECT_CURVE)
+                return;
 
-                ReadOnlySpan<Vector2> points = piece.PointsInSegment.Select(p => p.Position).ToArray();
-                RectangleF boundingBox = PathApproximator.CircularArcBoundingBox(points);
-                if (boundingBox.Width >= 640 || boundingBox.Height >= 480)
-                    piece.ControlPoint.Type = PathType.BEZIER;
-            }
+            if (segment.Count > 3)
+                first.Type = PathType.BEZIER;
+
+            if (segment.Count != 3)
+                return;
+
+            ReadOnlySpan<Vector2> points = segment.Select(p => p.Position).ToArray();
+            RectangleF boundingBox = PathApproximator.CircularArcBoundingBox(points);
+            if (boundingBox.Width >= 640 || boundingBox.Height >= 480)
+                first.Type = PathType.BEZIER;
         }
 
         /// <summary>
@@ -298,7 +294,8 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders.Components
         /// <param name="type">The path type we want to assign to the given control point piece.</param>
         private void updatePathType(PathControlPointPiece<T> piece, PathType? type)
         {
-            int indexInSegment = piece.PointsInSegment.IndexOf(piece.ControlPoint);
+            var pointsInSegment = hitObject.Path.PointsInSegment(piece.ControlPoint);
+            int indexInSegment = pointsInSegment.IndexOf(piece.ControlPoint);
 
             if (type?.Type == SplineType.PerfectCurve)
             {
@@ -307,8 +304,8 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders.Components
                 // and one segment of the previous type.
                 int thirdPointIndex = indexInSegment + 2;
 
-                if (piece.PointsInSegment.Count > thirdPointIndex + 1)
-                    piece.PointsInSegment[thirdPointIndex].Type = piece.PointsInSegment[0].Type;
+                if (pointsInSegment.Count > thirdPointIndex + 1)
+                    pointsInSegment[thirdPointIndex].Type = pointsInSegment[0].Type;
             }
 
             hitObject.Path.ExpectedDistance.Value = null;
