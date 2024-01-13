@@ -51,12 +51,24 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders.Components
             base.LoadComplete();
 
             hitObjectPosition = hitObject.PositionBindable.GetBoundCopy();
-            hitObjectPosition.BindValueChanged(_ => updateConnectingPath());
+            hitObjectPosition.BindValueChanged(_ => pathRequiresUpdate = true);
 
             pathVersion = hitObject.Path.Version.GetBoundCopy();
-            pathVersion.BindValueChanged(_ => updateConnectingPath());
+            pathVersion.BindValueChanged(_ => pathRequiresUpdate = true);
 
             updateConnectingPath();
+        }
+
+        private bool pathRequiresUpdate;
+
+        protected override void Update()
+        {
+            base.Update();
+
+            if (!pathRequiresUpdate) return;
+
+            updateConnectingPath();
+            pathRequiresUpdate = false;
         }
 
         /// <summary>
