@@ -44,7 +44,7 @@ namespace osu.Game.Screens.Play
         /// Whether the audio playback rate should be validated.
         /// Mostly disabled for tests.
         /// </summary>
-        internal bool ShouldValidatePlaybackRate { get; init; } = true;
+        internal bool ShouldValidatePlaybackRate { get; init; }
 
         /// <summary>
         /// Whether the audio playback is within acceptable ranges.
