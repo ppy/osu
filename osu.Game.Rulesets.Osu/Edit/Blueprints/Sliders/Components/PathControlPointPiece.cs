@@ -5,19 +5,15 @@
 
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using JetBrains.Annotations;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Cursor;
-using osu.Framework.Graphics.Primitives;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Input.Events;
 using osu.Framework.Localisation;
-using osu.Framework.Utils;
 using osu.Game.Graphics;
 using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Objects.Types;
@@ -56,26 +52,10 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders.Components
         private IBindable<Vector2> hitObjectPosition;
         private IBindable<float> hitObjectScale;
 
-        [UsedImplicitly]
-        private readonly IBindable<int> hitObjectVersion;
-
         public PathControlPointPiece(T hitObject, PathControlPoint controlPoint)
         {
             this.hitObject = hitObject;
             ControlPoint = controlPoint;
-
-            // we don't want to run the path type update on construction as it may inadvertently change the hit object.
-            cachePoints(hitObject);
-
-            hitObjectVersion = hitObject.Path.Version.GetBoundCopy();
-
-            // schedule ensure that updates are only applied after all operations from a single frame are applied.
-            // this avoids inadvertently changing the hit object path type for batch operations.
-            hitObjectVersion.BindValueChanged(_ => Scheduler.AddOnce(() =>
-            {
-                cachePoints(hitObject);
-                updatePathType();
-            }));
 
             controlPoint.Changed += updateMarkerDisplay;
 
@@ -213,28 +193,6 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders.Components
         protected override void OnDrag(DragEvent e) => DragInProgress?.Invoke(e);
 
         protected override void OnDragEnd(DragEndEvent e) => DragEnded?.Invoke();
-
-        private void cachePoints(T hitObject) => PointsInSegment = hitObject.Path.PointsInSegment(ControlPoint);
-
-        /// <summary>
-        /// Handles correction of invalid path types.
-        /// </summary>
-        private void updatePathType()
-        {
-            if (ControlPoint.Type != PathType.PERFECT_CURVE)
-                return;
-
-            if (PointsInSegment.Count > 3)
-                ControlPoint.Type = PathType.BEZIER;
-
-            if (PointsInSegment.Count != 3)
-                return;
-
-            ReadOnlySpan<Vector2> points = PointsInSegment.Select(p => p.Position).ToArray();
-            RectangleF boundingBox = PathApproximator.CircularArcBoundingBox(points);
-            if (boundingBox.Width >= 640 || boundingBox.Height >= 480)
-                ControlPoint.Type = PathType.BEZIER;
-        }
 
         /// <summary>
         /// Updates the state of the circular control point marker.
