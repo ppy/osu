@@ -25,6 +25,8 @@ namespace osu.Game.Rulesets.Objects
 
         private readonly Bindable<int> version = new Bindable<int>();
 
+        public event Action? Validating;
+
         /// <summary>
         /// The user-set distance of the path. If non-null, <see cref="Distance"/> will match this value,
         /// and the path will be shortened/lengthened to match this length.
@@ -232,6 +234,8 @@ namespace osu.Game.Rulesets.Objects
         {
             if (pathCache.IsValid)
                 return;
+
+            Validating?.Invoke();
 
             calculatePath();
             calculateLength();

@@ -72,10 +72,27 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders.Components
             };
 
             hitObjectVersion = hitObject.Path.Version.GetBoundCopy();
+        }
+
+        protected override void LoadComplete()
+        {
+            base.LoadComplete();
+
+            inputManager = GetContainingInputManager();
+
+            controlPoints.CollectionChanged += onControlPointsChanged;
+            controlPoints.BindTo(hitObject.Path.ControlPoints);
 
             // schedule ensure that updates are only applied after all operations from a single frame are applied.
             // this avoids inadvertently changing the hit object path type for batch operations.
-            hitObjectVersion.BindValueChanged(_ => Scheduler.AddOnce(cachePointsAndEnsureValidPathTypes));
+            hitObject.Path.Validating += cachePointsAndEnsureValidPathTypes;
+        }
+
+        protected override void Dispose(bool isDisposing)
+        {
+            base.Dispose(isDisposing);
+
+            hitObject.Path.Validating -= cachePointsAndEnsureValidPathTypes;
         }
 
         /// <summary>
@@ -88,7 +105,10 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders.Components
             foreach (var controlPoint in controlPoints)
             {
                 if (controlPoint.Type != null)
+                {
+                    pointsInCurrentSegment.Add(controlPoint);
                     pointsInCurrentSegment = new List<PathControlPoint>();
+                }
 
                 pointsInCurrentSegment.Add(controlPoint);
 
@@ -99,29 +119,19 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders.Components
             foreach (var piece in Pieces)
             {
                 if (piece.ControlPoint.Type != PathType.PERFECT_CURVE)
-                    return;
+                    continue;
 
                 if (piece.PointsInSegment.Count > 3)
                     piece.ControlPoint.Type = PathType.BEZIER;
 
                 if (piece.PointsInSegment.Count != 3)
-                    return;
+                    continue;
 
                 ReadOnlySpan<Vector2> points = piece.PointsInSegment.Select(p => p.Position).ToArray();
                 RectangleF boundingBox = PathApproximator.CircularArcBoundingBox(points);
                 if (boundingBox.Width >= 640 || boundingBox.Height >= 480)
                     piece.ControlPoint.Type = PathType.BEZIER;
             }
-        }
-
-        protected override void LoadComplete()
-        {
-            base.LoadComplete();
-
-            inputManager = GetContainingInputManager();
-
-            controlPoints.CollectionChanged += onControlPointsChanged;
-            controlPoints.BindTo(hitObject.Path.ControlPoints);
         }
 
         /// <summary>
