@@ -76,23 +76,12 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders.Components
 
             controlPoints.CollectionChanged += onControlPointsChanged;
             controlPoints.BindTo(hitObject.Path.ControlPoints);
-
-            // schedule ensure that updates are only applied after all operations from a single frame are applied.
-            // this avoids inadvertently changing the hit object path type for batch operations.
-            hitObject.Path.Validating += ensureValidPathTypes;
-        }
-
-        protected override void Dispose(bool isDisposing)
-        {
-            base.Dispose(isDisposing);
-
-            hitObject.Path.Validating -= ensureValidPathTypes;
         }
 
         /// <summary>
         /// Handles correction of invalid path types.
         /// </summary>
-        private void ensureValidPathTypes()
+        public void EnsureValidPathTypes()
         {
             List<PathControlPoint> pointsInCurrentSegment = new List<PathControlPoint>();
 
@@ -113,6 +102,9 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders.Components
 
         private void ensureValidPathType(IReadOnlyList<PathControlPoint> segment)
         {
+            if (segment.Count == 0)
+                return;
+
             var first = segment[0];
 
             if (first.Type != PathType.PERFECT_CURVE)
@@ -394,6 +386,8 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders.Components
             // Maintain the path types in case they got defaulted to bezier at some point during the drag.
             for (int i = 0; i < hitObject.Path.ControlPoints.Count; i++)
                 hitObject.Path.ControlPoints[i].Type = dragPathTypes[i];
+
+            EnsureValidPathTypes();
         }
 
         public void DragEnded() => changeHandler?.EndChange();
@@ -467,6 +461,8 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders.Components
             {
                 foreach (var p in Pieces.Where(p => p.IsSelected.Value))
                     updatePathType(p, type);
+
+                EnsureValidPathTypes();
             });
 
             if (countOfState == totalCount)
