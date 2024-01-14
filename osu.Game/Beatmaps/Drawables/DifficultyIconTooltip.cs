@@ -189,14 +189,14 @@ namespace osu.Game.Beatmaps.Drawables
 
             // Difficulty row
             circleSize.Text = "CS: " + adjustedDifficulty.CircleSize.ToString("0.##");
-            drainRate.Text = "| HP: " + adjustedDifficulty.DrainRate.ToString("0.##");
-            approachRate.Text = "| AR: " + adjustedDifficulty.ApproachRate.ToString("0.##");
-            overallDifficulty.Text = "| OD: " + adjustedDifficulty.OverallDifficulty.ToString("0.##");
+            drainRate.Text = " HP: " + adjustedDifficulty.DrainRate.ToString("0.##");
+            approachRate.Text = " AR: " + adjustedDifficulty.ApproachRate.ToString("0.##");
+            overallDifficulty.Text = " OD: " + adjustedDifficulty.OverallDifficulty.ToString("0.##");
 
             // Misc row
             length.Text = "Length: " + TimeSpan.FromMilliseconds(displayedContent.BeatmapInfo.Length / rate).ToString("mm\\:ss");
-            bpm.Text = "| BPM: " + bpmAdjusted;
-            maxCombo.Text = "| Max Combo: " + displayedContent.BeatmapInfo.TotalObjectCount;
+            bpm.Text = " BPM: " + bpmAdjusted;
+            maxCombo.Text = " Max Combo: " + displayedContent.BeatmapInfo.TotalObjectCount;
         }
 
         public void Move(Vector2 pos) => Position = pos;
