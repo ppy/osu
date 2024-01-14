@@ -48,7 +48,7 @@ namespace osu.Game.Overlays.Toolbar
                 {
                     RelativeSizeAxes = Axes.Y,
                     AutoSizeAxes = Axes.X,
-                    Padding = new MarginPadding(3),
+                    Padding = new MarginPadding(ToolbarButton.PADDING),
                     Children = new Drawable[]
                     {
                         new Container

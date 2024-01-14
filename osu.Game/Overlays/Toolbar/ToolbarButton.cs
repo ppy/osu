@@ -26,6 +26,8 @@ namespace osu.Game.Overlays.Toolbar
 {
     public abstract partial class ToolbarButton : OsuClickableContainer, IKeyBindingHandler<GlobalAction>
     {
+        public const float PADDING = 3;
+
         protected GlobalAction? Hotkey { get; set; }
 
         public void SetIcon(Drawable icon)
@@ -90,7 +92,7 @@ namespace osu.Game.Overlays.Toolbar
                 {
                     Width = Toolbar.HEIGHT,
                     RelativeSizeAxes = Axes.Y,
-                    Padding = new MarginPadding(3),
+                    Padding = new MarginPadding(PADDING),
                     Children = new Drawable[]
                     {
                         BackgroundContent = new Container
