@@ -34,7 +34,7 @@ namespace osu.Game.Overlays.Toolbar
 
         public ToolbarUserButton()
         {
-            AutoSizeAxes = Axes.X;
+            ButtonContent.AutoSizeAxes = Axes.X;
         }
 
         [BackgroundDependencyLoader]
