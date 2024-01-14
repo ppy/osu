@@ -48,7 +48,7 @@ namespace osu.Game.Overlays.Toolbar
 
             public RulesetButton()
             {
-                ButtonContent.Padding = new MarginPadding(3)
+                ButtonContent.Padding = new MarginPadding(PADDING)
                 {
                     Bottom = 5
                 };
