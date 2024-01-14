@@ -146,14 +146,6 @@ namespace osu.Game.Screens.Select
             }
         }
 
-        public override void OnSuspending(ScreenTransitionEvent e)
-        {
-            // Scores will be refreshed on arriving at this screen.
-            // Clear them to avoid animation overload on returning to song select.
-            playBeatmapDetailArea.Leaderboard.ClearScores();
-            base.OnSuspending(e);
-        }
-
         public override void OnResuming(ScreenTransitionEvent e)
         {
             base.OnResuming(e);
