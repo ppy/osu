@@ -50,6 +50,12 @@ namespace osu.Game.Skinning
             Spacing = new Vector2(-skin.GetFontOverlap(font), 0);
 
             glyphStore = new LegacyGlyphStore(fontPrefix, skin, MaxSizePerGlyph);
+
+            // cache common lookups ahead of time.
+            foreach (char c in FixedWidthExcludeCharacters)
+                glyphStore.Get(fontPrefix, c);
+            for (int i = 0; i < 10; i++)
+                glyphStore.Get(fontPrefix, (char)('0' + i));
         }
 
         protected override TextBuilder CreateTextBuilder(ITexturedGlyphLookupStore store) => base.CreateTextBuilder(glyphStore);
