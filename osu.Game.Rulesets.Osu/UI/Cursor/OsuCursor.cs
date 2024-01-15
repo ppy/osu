@@ -57,17 +57,7 @@ namespace osu.Game.Rulesets.Osu.UI.Cursor
         [BackgroundDependencyLoader]
         private void load()
         {
-            InternalChild = cursorScaleContainer = new Container
-            {
-                RelativeSizeAxes = Axes.Both,
-                Origin = Anchor.Centre,
-                Anchor = Anchor.Centre,
-                Child = cursorSprite = new SkinnableDrawable(new OsuSkinComponentLookup(OsuSkinComponents.Cursor), _ => new DefaultCursor(), confineMode: ConfineMode.NoScaling)
-                {
-                    Origin = Anchor.Centre,
-                    Anchor = Anchor.Centre,
-                }
-            };
+            InternalChild = CreateCursorContent();
 
             userCursorScale = config.GetBindable<float>(OsuSetting.GameplayCursorSize);
             userCursorScale.ValueChanged += _ => cursorScale.Value = CalculateCursorScale();
@@ -83,6 +73,18 @@ namespace osu.Game.Rulesets.Osu.UI.Cursor
             base.LoadComplete();
             cursorScale.Value = CalculateCursorScale();
         }
+
+        protected virtual Drawable CreateCursorContent() => cursorScaleContainer = new Container
+        {
+            RelativeSizeAxes = Axes.Both,
+            Origin = Anchor.Centre,
+            Anchor = Anchor.Centre,
+            Child = cursorSprite = new SkinnableDrawable(new OsuSkinComponentLookup(OsuSkinComponents.Cursor), _ => new DefaultCursor(), confineMode: ConfineMode.NoScaling)
+            {
+                Origin = Anchor.Centre,
+                Anchor = Anchor.Centre,
+            },
+        };
 
         protected virtual float CalculateCursorScale()
         {
