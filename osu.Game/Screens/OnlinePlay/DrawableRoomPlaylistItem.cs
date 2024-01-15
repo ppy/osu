@@ -365,7 +365,7 @@ namespace osu.Game.Screens.OnlinePlay
                                     AutoSizeAxes = Axes.Both,
                                     Margin = new MarginPadding { Left = 8, Right = 8 },
                                 },
-                                mainFillFlow = new MainFlow(() => SelectedItem.Value == Model)
+                                mainFillFlow = new MainFlow(() => SelectedItem.Value == Model || !AllowSelection)
                                 {
                                     Anchor = Anchor.CentreLeft,
                                     Origin = Anchor.CentreLeft,
@@ -671,13 +671,13 @@ namespace osu.Game.Screens.OnlinePlay
 
         public partial class MainFlow : FillFlowContainer
         {
-            private readonly Func<bool> isSelected;
+            private readonly Func<bool> allowInteraction;
 
-            public override bool PropagatePositionalInputSubTree => isSelected();
+            public override bool PropagatePositionalInputSubTree => allowInteraction();
 
-            public MainFlow(Func<bool> isSelected)
+            public MainFlow(Func<bool> allowInteraction)
             {
-                this.isSelected = isSelected;
+                this.allowInteraction = allowInteraction;
             }
         }
     }
