@@ -58,6 +58,8 @@ namespace osu.Game.Screens.Play.HUD
 
         public const float MAIN_PATH_RADIUS = 10f;
         private const float padding = MAIN_PATH_RADIUS * 2;
+        private const float glow_path_radius = 40f;
+        private const float main_path_glow_portion = 0.6f;
 
         private readonly LayoutValue drawSizeLayout = new LayoutValue(Invalidation.DrawSize);
 
@@ -90,7 +92,7 @@ namespace osu.Game.Screens.Play.HUD
                     {
                         RelativeSizeAxes = Axes.Both,
                         // since we are using bigger path radius we need to expand the draw area outwards to preserve the curve placement
-                        Padding = new MarginPadding(-30f),
+                        Padding = new MarginPadding(MAIN_PATH_RADIUS - glow_path_radius),
                         Child = glowBar = new ArgonHealthDisplayBar
                         {
                             RelativeSizeAxes = Axes.Both,
@@ -98,8 +100,8 @@ namespace osu.Game.Screens.Play.HUD
                             GlowColour = main_bar_glow_colour,
                             Blending = BlendingParameters.Additive,
                             Colour = ColourInfo.GradientHorizontal(Color4.White.Opacity(0.8f), Color4.White),
-                            PathRadius = 40f,
-                            GlowPortion = 0.9f,
+                            PathRadius = glow_path_radius,
+                            GlowPortion = (glow_path_radius - MAIN_PATH_RADIUS * (1f - main_path_glow_portion)) / glow_path_radius,
                         }
                     },
                     mainBar = new ArgonHealthDisplayBar
@@ -109,7 +111,7 @@ namespace osu.Game.Screens.Play.HUD
                         BarColour = main_bar_colour,
                         GlowColour = main_bar_glow_colour,
                         PathRadius = MAIN_PATH_RADIUS,
-                        GlowPortion = 0.6f,
+                        GlowPortion = main_path_glow_portion
                     }
                 }
             };
