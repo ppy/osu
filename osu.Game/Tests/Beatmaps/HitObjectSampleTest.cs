@@ -132,8 +132,8 @@ namespace osu.Game.Tests.Beatmaps
         public AudioManager AudioManager => Audio;
         public IResourceStore<byte[]> Files => userSkinResourceStore;
         public new IResourceStore<byte[]> Resources => base.Resources;
-        public IResourceStore<TextureUpload> CreateTextureLoaderStore(IResourceStore<byte[]> underlyingStore) => null;
-        RealmAccess IStorageResourceProvider.RealmAccess => null;
+        public IResourceStore<TextureUpload> CreateTextureLoaderStore(IResourceStore<byte[]> underlyingStore) => null!;
+        RealmAccess IStorageResourceProvider.RealmAccess => null!;
 
         #endregion
 

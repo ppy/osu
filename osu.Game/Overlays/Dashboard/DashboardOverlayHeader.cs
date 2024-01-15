@@ -19,7 +19,7 @@ namespace osu.Game.Overlays.Dashboard
             {
                 Title = PageTitleStrings.MainHomeControllerIndex;
                 Description = NamedOverlayComponentStrings.DashboardDescription;
-                Icon = HexaconsIcons.Social;
+                Icon = OsuIcon.Global;
             }
         }
     }

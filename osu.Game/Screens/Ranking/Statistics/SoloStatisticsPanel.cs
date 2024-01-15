@@ -37,7 +37,6 @@ namespace osu.Game.Screens.Ranking.Statistics
                     RelativeSizeAxes = Axes.X,
                     Anchor = Anchor.Centre,
                     Origin = Anchor.Centre,
-                    Width = 0.5f,
                     StatisticsUpdate = { BindTarget = StatisticsUpdate }
                 })).ToArray();
             }

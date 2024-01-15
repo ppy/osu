@@ -154,7 +154,7 @@ namespace osu.Game.Tests.Visual.UserInterface
             public TestTitle()
             {
                 Title = "title";
-                Icon = HexaconsIcons.Devtools;
+                Icon = OsuIcon.ChangelogB;
             }
         }
     }

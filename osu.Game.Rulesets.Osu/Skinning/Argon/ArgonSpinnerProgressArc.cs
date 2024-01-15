@@ -59,7 +59,7 @@ namespace osu.Game.Rulesets.Osu.Skinning.Argon
                     RelativeSizeAxes = Axes.Both,
                     InnerRadius = arc_radius,
                     RoundedCaps = true,
-                    GlowColour = new Color4(171, 255, 255, 255)
+                    GlowColour = new Color4(171, 255, 255, 180)
                 }
             };
         }

@@ -25,6 +25,11 @@ namespace osu.Game.Localisation
         public static LocalisableString MenuCursorSize => new TranslatableString(getKey(@"menu_cursor_size"), @"Menu cursor size");
 
         /// <summary>
+        /// "Menu tips"
+        /// </summary>
+        public static LocalisableString ShowMenuTips => new TranslatableString(getKey(@"show_menu_tips"), @"Menu tips");
+
+        /// <summary>
         /// "Parallax"
         /// </summary>
         public static LocalisableString Parallax => new TranslatableString(getKey(@"parallax"), @"Parallax");
@@ -154,6 +159,6 @@ namespace osu.Game.Localisation
         /// </summary>
         public static LocalisableString TrueRandom => new TranslatableString(getKey(@"true_random"), @"True Random");
 
-        private static string getKey(string key) => $"{prefix}:{key}";
+        private static string getKey(string key) => $@"{prefix}:{key}";
     }
 }

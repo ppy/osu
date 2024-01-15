@@ -26,9 +26,6 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
     {
         protected override bool PauseOnFocusLost => false;
 
-        // Disallow fails in multiplayer for now.
-        protected override bool CheckModsAllowFailure() => false;
-
         protected override UserActivity InitialActivity => new UserActivity.InMultiplayerGame(Beatmap.Value.BeatmapInfo, Ruleset.Value);
 
         [Resolved]
@@ -55,6 +52,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
             {
                 AllowPause = false,
                 AllowRestart = false,
+                AllowFailAnimation = false,
                 AllowSkipping = room.AutoSkip.Value,
                 AutomaticallySkipIntro = room.AutoSkip.Value,
                 AlwaysShowLeaderboard = true,

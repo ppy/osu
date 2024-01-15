@@ -5,6 +5,7 @@
 
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Sprites;
+using osu.Game.Graphics;
 
 namespace osu.Game.Rulesets.Edit.Tools
 {
@@ -15,7 +16,7 @@ namespace osu.Game.Rulesets.Edit.Tools
         {
         }
 
-        public override Drawable CreateIcon() => new SpriteIcon { Icon = FontAwesome.Solid.MousePointer };
+        public override Drawable CreateIcon() => new SpriteIcon { Icon = OsuIcon.EditorSelect };
 
         public override PlacementBlueprint CreatePlacementBlueprint() => null;
     }
