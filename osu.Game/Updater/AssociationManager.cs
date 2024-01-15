@@ -2,6 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
+using System.IO;
 using System.Reflection;
 using System.Runtime.InteropServices;
 using System.Runtime.Versioning;
@@ -72,7 +73,7 @@ namespace osu.Game.Updater
         public void InitializeFileAssociations()
         {
             Logger.Log("Setting up file associations!");
-            string programPath = Assembly.GetExecutingAssembly().Location;
+            string programPath = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location) + "\\osu!.exe";
 
             foreach (string extension in associated_extensions)
             {
