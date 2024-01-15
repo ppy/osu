@@ -139,7 +139,7 @@ namespace osu.Game.Overlays.Login
                         },
                     };
 
-                    panel.Status.BindValueChanged(_ => updateDropdownCurrent(), true);
+                    api.LocalUser.Value.Status.BindValueChanged(e => updateDropdownCurrent(e.NewValue), true);
 
                     dropdown.Current.BindValueChanged(action =>
                     {
@@ -172,9 +172,9 @@ namespace osu.Game.Overlays.Login
                 ScheduleAfterChildren(() => GetContainingInputManager()?.ChangeFocus(form));
         });
 
-        private void updateDropdownCurrent()
+        private void updateDropdownCurrent(UserStatus? status)
         {
-            switch (panel.Status.Value)
+            switch (status)
             {
                 case UserStatus.Online:
                     dropdown.Current.Value = UserAction.Online;
