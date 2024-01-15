@@ -323,6 +323,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
                 var location = (drawQuad.TopLeft + drawQuad.BottomLeft) / 2 + new Vector2(drawQuad.Width * 0.2f, 0);
                 InputManager.MoveMouseTo(location);
             });
+            AddUntilStep("wait for text load", () => playlist.ChildrenOfType<DrawableLinkCompiler>().Any());
             AddAssert("first item title not hovered", () => playlist.ChildrenOfType<DrawableLinkCompiler>().First().IsHovered, () => Is.False);
             AddStep("click left mouse", () => InputManager.Click(MouseButton.Left));
             AddUntilStep("first item selected", () => playlist.ChildrenOfType<DrawableRoomPlaylistItem>().First().IsSelectedItem, () => Is.True);
