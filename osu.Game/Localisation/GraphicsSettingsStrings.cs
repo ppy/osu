@@ -152,14 +152,13 @@ namespace osu.Game.Localisation
         /// <summary>
         /// "In order to change the renderer, the game will close. Please open it again."
         /// </summary>
-        public static LocalisableString ChangeRendererConfirmation =>
-            new TranslatableString(getKey(@"change_renderer_configuration"), @"In order to change the renderer, the game will close. Please open it again.");
+        public static LocalisableString ChangeRendererConfirmation => new TranslatableString(getKey(@"change_renderer_configuration"), @"In order to change the renderer, the game will close. Please open it again.");
 
         /// <summary>
-        /// "Minimise on focus loss"
+        /// "Minimise osu! when switching to another app"
         /// </summary>
-        public static LocalisableString MinimiseOnFocusLoss => new TranslatableString(getKey(@"minimise_on_focus_loss"), @"Minimise on focus loss");
+        public static LocalisableString MinimiseOnFocusLoss => new TranslatableString(getKey(@"minimise_on_focus_loss"), @"Minimise osu! when switching to another app");
 
-        private static string getKey(string key) => $"{prefix}:{key}";
+        private static string getKey(string key) => $@"{prefix}:{key}";
     }
 }
