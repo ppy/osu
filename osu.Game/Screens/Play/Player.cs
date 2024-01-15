@@ -1243,7 +1243,7 @@ namespace osu.Game.Screens.Play
                     b.IgnoreUserSettings.Value = true;
 
                     b.IsBreakTime.UnbindFrom(breakTracker.IsBreakTime);
-                    b.IsBreakTime.Value = true;
+                    b.IsBreakTime.Value = false;
                 });
                 storyboardReplacesBackground.Value = false;
             }
