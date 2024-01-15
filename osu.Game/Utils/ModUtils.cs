@@ -247,7 +247,7 @@ namespace osu.Game.Utils
 
                 foreach (var rulesetModType in rulesetModsTypes)
                 {
-                    if (rulesetModType == proposedModType)
+                    if (rulesetModType.IsAssignableFrom(proposedModType))
                     {
                         found = true;
                         break;
