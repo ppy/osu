@@ -51,6 +51,7 @@ namespace osu.Game.Overlays.Settings.Sections.Graphics
         private SettingsDropdown<Size> resolutionDropdown = null!;
         private SettingsDropdown<Display> displayDropdown = null!;
         private SettingsDropdown<WindowMode> windowModeDropdown = null!;
+        private SettingsCheckbox minimiseOnFocusLossCheckbox = null!;
         private SettingsCheckbox safeAreaConsiderationsCheckbox = null!;
 
         private Bindable<float> scalingPositionX = null!;
@@ -105,6 +106,12 @@ namespace osu.Game.Overlays.Settings.Sections.Graphics
                     ShowsDefaultIndicator = false,
                     ItemSource = resolutions,
                     Current = sizeFullscreen
+                },
+                minimiseOnFocusLossCheckbox = new SettingsCheckbox
+                {
+                    LabelText = GraphicsSettingsStrings.MinimiseOnFocusLoss,
+                    Current = config.GetBindable<bool>(FrameworkSetting.MinimiseOnFocusLossInFullscreen),
+                    Keywords = new[] { "alt-tab", "minimize", "focus", "hide" },
                 },
                 safeAreaConsiderationsCheckbox = new SettingsCheckbox
                 {
@@ -255,6 +262,7 @@ namespace osu.Game.Overlays.Settings.Sections.Graphics
         {
             resolutionDropdown.CanBeShown.Value = resolutions.Count > 1 && windowModeDropdown.Current.Value == WindowMode.Fullscreen;
             displayDropdown.CanBeShown.Value = displayDropdown.Items.Count() > 1;
+            minimiseOnFocusLossCheckbox.CanBeShown.Value = RuntimeInfo.IsDesktop && windowModeDropdown.Current.Value == WindowMode.Fullscreen;
             safeAreaConsiderationsCheckbox.CanBeShown.Value = host.Window?.SafeAreaPadding.Value.Total != Vector2.Zero;
         }
 
