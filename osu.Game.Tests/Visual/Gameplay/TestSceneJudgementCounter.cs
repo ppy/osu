@@ -148,6 +148,16 @@ namespace osu.Game.Tests.Visual.Gameplay
         }
 
         [Test]
+        public void TestNoDuplicates()
+        {
+            AddStep("create counter", () => Child = counterDisplay = new TestJudgementCounterDisplay());
+            AddStep("Show all judgements", () => counterDisplay.Mode.Value = JudgementCounterDisplay.DisplayMode.All);
+            AddAssert("Check no duplicates",
+                () => counterDisplay.CounterFlow.ChildrenOfType<JudgementCounter>().Count(),
+                () => Is.EqualTo(counterDisplay.CounterFlow.ChildrenOfType<JudgementCounter>().Select(c => c.ResultName.Text).Distinct().Count()));
+        }
+
+        [Test]
         public void TestCycleDisplayModes()
         {
             AddStep("create counter", () => Child = counterDisplay = new TestJudgementCounterDisplay());
