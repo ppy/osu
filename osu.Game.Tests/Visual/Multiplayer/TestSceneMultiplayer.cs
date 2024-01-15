@@ -29,6 +29,7 @@ using osu.Game.Rulesets.Catch;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Osu;
 using osu.Game.Rulesets.Osu.Mods;
+using osu.Game.Scoring;
 using osu.Game.Screens.OnlinePlay.Components;
 using osu.Game.Screens.OnlinePlay.Lounge;
 using osu.Game.Screens.OnlinePlay.Lounge.Components;
@@ -690,6 +691,13 @@ namespace osu.Game.Tests.Visual.Multiplayer
             }
 
             AddUntilStep("wait for results", () => multiplayerComponents.CurrentScreen is ResultsScreen);
+
+            AddAssert("check is fail", () =>
+            {
+                var scoreInfo = ((ResultsScreen)multiplayerComponents.CurrentScreen).Score;
+
+                return !scoreInfo.Passed && scoreInfo.Rank == ScoreRank.F;
+            });
         }
 
         [Test]
