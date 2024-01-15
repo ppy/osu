@@ -250,7 +250,10 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
         {
             base.UpdateAfterChildren();
 
-            // It's important that this is done in UpdateAfterChildren so that the SliderBody has a chance to update its Size and PathOffset on Update.
+            // During slider path editing, the PlaySliderBody is scheduled to refresh once in the Update phase.
+            // It is crucial to perform the code below in UpdateAfterChildren. This ensures that the SliderBody has the opportunity
+            // to update its Size and PathOffset beforehand, ensuring correct placement.
+
             double completionProgress = Math.Clamp((Time.Current - HitObject.StartTime) / HitObject.Duration, 0, 1);
 
             Ball.UpdateProgress(completionProgress);
