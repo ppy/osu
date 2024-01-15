@@ -59,6 +59,12 @@ namespace osu.Game.Tests.Visual
         [SetUpSteps]
         public virtual void SetUpSteps()
         {
+            CreateNewGame();
+            ConfirmAtMainMenu();
+        }
+
+        protected void CreateNewGame()
+        {
             AddStep("Create new game instance", () =>
             {
                 if (Game?.Parent != null)
@@ -71,8 +77,6 @@ namespace osu.Game.Tests.Visual
 
             AddUntilStep("Wait for load", () => Game.IsLoaded);
             AddUntilStep("Wait for intro", () => Game.ScreenStack.CurrentScreen is IntroScreen);
-
-            ConfirmAtMainMenu();
         }
 
         [TearDownSteps]

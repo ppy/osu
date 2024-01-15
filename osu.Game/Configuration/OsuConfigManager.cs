@@ -20,6 +20,7 @@ using osu.Game.Rulesets.Scoring;
 using osu.Game.Screens.Select;
 using osu.Game.Screens.Select.Filter;
 using osu.Game.Skinning;
+using osu.Game.Users;
 
 namespace osu.Game.Configuration
 {
@@ -96,6 +97,7 @@ namespace osu.Game.Configuration
 
             SetDefault(OsuSetting.MenuVoice, true);
             SetDefault(OsuSetting.MenuMusic, true);
+            SetDefault(OsuSetting.MenuTips, true);
 
             SetDefault(OsuSetting.AudioOffset, 0, -500.0, 500.0, 1);
 
@@ -192,6 +194,7 @@ namespace osu.Game.Configuration
             SetDefault(OsuSetting.LastProcessedMetadataId, -1);
 
             SetDefault(OsuSetting.ComboColourNormalisationAmount, 0.2f, 0f, 1f, 0.01f);
+            SetDefault<UserStatus?>(OsuSetting.UserOnlineStatus, null);
         }
 
         protected override bool CheckLookupContainsPrivateInformation(OsuSetting lookup)
@@ -350,6 +353,7 @@ namespace osu.Game.Configuration
         VolumeInactive,
         MenuMusic,
         MenuVoice,
+        MenuTips,
         CursorRotation,
         MenuParallax,
         Prefer24HourTime,
@@ -418,5 +422,6 @@ namespace osu.Game.Configuration
         EditorShowSpeedChanges,
         TouchDisableGameplayTaps,
         ModSelectTextSearchStartsActive,
+        UserOnlineStatus,
     }
 }

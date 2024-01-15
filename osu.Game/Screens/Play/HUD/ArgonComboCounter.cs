@@ -57,6 +57,31 @@ namespace osu.Game.Screens.Play.HUD
             });
         }
 
+        public override int DisplayedCount
+        {
+            get => base.DisplayedCount;
+            set
+            {
+                base.DisplayedCount = value;
+                updateWireframe();
+            }
+        }
+
+        private void updateWireframe()
+        {
+            text.RequiredDisplayDigits.Value = getDigitsRequiredForDisplayCount();
+        }
+
+        private int getDigitsRequiredForDisplayCount()
+        {
+            // one for the single presumed starting digit, one for the "x" at the end.
+            int digitsRequired = 2;
+            long c = DisplayedCount;
+            while ((c /= 10) > 0)
+                digitsRequired++;
+            return digitsRequired;
+        }
+
         protected override LocalisableString FormatCount(int count) => $@"{count}x";
 
         protected override IHasText CreateText() => text = new ArgonCounterTextComponent(Anchor.TopLeft, MatchesStrings.MatchScoreStatsCombo.ToUpper())
