@@ -111,7 +111,7 @@ namespace osu.Game.Overlays.Settings.Sections.Graphics
                 {
                     LabelText = GraphicsSettingsStrings.MinimiseOnFocusLoss,
                     Current = config.GetBindable<bool>(FrameworkSetting.MinimiseOnFocusLossInFullscreen),
-                    Keywords = new[] { "alt-tab" },
+                    Keywords = new[] { "alt-tab", "minimize", "focus", "hide" },
                 },
                 safeAreaConsiderationsCheckbox = new SettingsCheckbox
                 {
