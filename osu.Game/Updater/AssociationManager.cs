@@ -72,7 +72,7 @@ namespace osu.Game.Updater
         public void InitializeFileAssociations()
         {
             Logger.Log("Setting up file associations!");
-            string programPath = Assembly.GetEntryAssembly()?.Location ?? throw new InvalidOperationException("Could not get entry assembly location.");
+            string programPath = Assembly.GetExecutingAssembly().Location;
 
             foreach (string extension in associated_extensions)
             {
