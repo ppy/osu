@@ -1033,12 +1033,6 @@ namespace osu.Game.Tests.Visual.Multiplayer
                 }
             });
 
-            AddStep("join other user and make host", () =>
-            {
-                multiplayerClient.AddUser(new APIUser { Id = 1234 });
-                multiplayerClient.TransferHost(1234);
-            });
-
             AddStep("select hidden", () => multiplayerClient.ChangeUserMods(new[] { new APIMod { Acronym = "HD" } }));
             AddStep("make user ready", () => multiplayerClient.ChangeState(MultiplayerUserState.Ready));
             AddStep("press edit on second item", () => this.ChildrenOfType<DrawableRoomPlaylistItem>().Single(i => i.Item.RulesetID == 1)
@@ -1047,14 +1041,9 @@ namespace osu.Game.Tests.Visual.Multiplayer
             AddUntilStep("wait for song select", () => InputManager.ChildrenOfType<MultiplayerMatchSongSelect>().FirstOrDefault()?.BeatmapSetsLoaded == true);
             AddAssert("ruleset is taiko", () => Ruleset.Value.OnlineID == 1);
 
-            AddStep("start match by other user", () =>
-            {
-                multiplayerClient.ChangeUserState(1234, MultiplayerUserState.Ready);
-                multiplayerClient.StartMatch().WaitSafely();
-            });
+            AddStep("start match", () => multiplayerClient.StartMatch().WaitSafely());
 
             AddUntilStep("wait for loading", () => multiplayerClient.ClientRoom?.State == MultiplayerRoomState.WaitingForLoad);
-            AddStep("set player loaded", () => multiplayerClient.ChangeUserState(1234, MultiplayerUserState.Loaded));
             AddUntilStep("wait for gameplay to start", () => multiplayerClient.ClientRoom?.State == MultiplayerRoomState.Playing);
             AddAssert("hidden is selected", () => SelectedMods.Value, () => Has.One.TypeOf(typeof(OsuModHidden)));
         }
