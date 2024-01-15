@@ -3,6 +3,7 @@
 
 using System;
 using System.IO;
+using System.Linq;
 using System.Reflection;
 using System.Runtime.InteropServices;
 using System.Runtime.Versioning;
@@ -127,10 +128,12 @@ namespace osu.Game.Updater
             SHChangeNotify(0x8000000, 0x1000, IntPtr.Zero, IntPtr.Zero); // Notify Explorer that the file associations have changed
         }
 
-        public bool IsAssociated(string extension)
+        public bool IsAssociated(string extension, string programPath)
         {
             RegistryKey? key = Registry.CurrentUser.OpenSubKey($"Software\\Classes\\{extension}");
-            return key != null;
+
+            // Check if the value set is equal to the path of the executable
+            return key?.OpenSubKey("shell\\\\open\\\\command")?.GetValue("")?.ToString() == $"\"{programPath}\" \"%1\"";
         }
 
         /// <summary>
@@ -141,16 +144,10 @@ namespace osu.Game.Updater
         /// </returns>
         public bool EnsureAssociationsSet()
         {
-            // Loop through all of the extensions and check if they are associated
-            foreach (string extension in associated_extensions)
-            {
-                if (!IsAssociated(extension))
-                {
-                    return false; // If any of them are not associated, return false
-                }
-            }
+            string programPath = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location) + "\\osu!.exe";
 
-            return true; // If all of them are associated, return true
+            // Loop through all of the extensions and check if they are associated
+            return associated_extensions.All(extension => IsAssociated(extension, programPath));
         }
     }
 }
