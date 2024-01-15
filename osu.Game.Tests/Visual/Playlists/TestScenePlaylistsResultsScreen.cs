@@ -201,7 +201,8 @@ namespace osu.Game.Tests.Visual.Playlists
         {
             AddStep("bind user score info handler", () => bindHandler(noScores: true));
             createResults();
-            AddAssert("no scores visible", () => resultsScreen.ScorePanelList.GetScorePanels().Count() == 0);
+            AddAssert("no scores visible", () => !resultsScreen.ScorePanelList.GetScorePanels().Any());
+            AddAssert("placeholder shown", () => this.ChildrenOfType<MessagePlaceholder>().Count(), () => Is.EqualTo(1));
         }
 
         private void createResults(Func<ScoreInfo> getScore = null)
