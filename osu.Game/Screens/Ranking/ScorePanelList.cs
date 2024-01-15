@@ -49,8 +49,6 @@ namespace osu.Game.Screens.Ranking
 
         public bool AllPanelsVisible => flow.All(p => p.IsPresent);
 
-        public bool IsEmpty => flow.Count == 0;
-
         /// <summary>
         /// The current scroll position.
         /// </summary>
