@@ -93,6 +93,16 @@ namespace osu.Game.Updater
         public void CreateFileAssociation(string extension, string programPath)
         {
             Logger.Log("Creating file association for " + extension);
+
+            // Check if the extension has a file explorer override, if so, delete the override
+            RegistryKey? fileExplorerKey = Registry.CurrentUser.OpenSubKey("Software\\Microsoft\\Windows\\CurrentVersion\\Explorer\\FileExts\\" + extension, true);
+
+            if (fileExplorerKey != null)
+            {
+                fileExplorerKey.DeleteSubKey("UserChoice", false);
+                fileExplorerKey.Close();
+            }
+
             RegistryKey key = Registry.CurrentUser.CreateSubKey($"Software\\Classes\\{extension}");
             key.CreateSubKey("shell\\\\open\\\\command").SetValue("", $"\"{programPath}\" \"%1\"");
             key.Close();
