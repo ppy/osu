@@ -1041,6 +1041,9 @@ namespace osu.Game
             // dependency on notification overlay, dependent by settings overlay
             loadComponentSingleFile(CreateUpdateManager(), Add, true);
 
+            // dependency on notification overlay
+            if (OperatingSystem.IsWindows()) loadComponentSingleFile(new AssociationManager(), Add, true);
+
             // overlay elements
             loadComponentSingleFile(FirstRunOverlay = new FirstRunSetupOverlay(), overlayContent.Add, true);
             loadComponentSingleFile(new ManageCollectionsDialog(), overlayContent.Add, true);
