@@ -17,6 +17,7 @@ using osu.Game.Graphics.UserInterface;
 using osu.Game.Online.API;
 using osu.Game.Online.API.Requests;
 using osu.Game.Online.API.Requests.Responses;
+using osu.Game.Online.Placeholders;
 using osu.Game.Online.Rooms;
 using osu.Game.Rulesets.Osu;
 using osu.Game.Rulesets.Scoring;
@@ -137,6 +138,37 @@ namespace osu.Game.Tests.Visual.Playlists
                 AddAssert($"count increased by {scores_per_result}", () => this.ChildrenOfType<ScorePanel>().Count() >= beforePanelCount + scores_per_result);
                 AddAssert("right loading spinner hidden", () => resultsScreen.RightSpinner.State.Value == Visibility.Hidden);
             }
+        }
+
+        [Test]
+        public void TestNoMoreScoresToTheRight()
+        {
+            AddStep("bind delayed handler with scores", () => bindHandler(delayed: true));
+
+            createResults();
+            waitForDisplay();
+
+            int beforePanelCount = 0;
+
+            AddStep("get panel count", () => beforePanelCount = this.ChildrenOfType<ScorePanel>().Count());
+            AddStep("scroll to right", () => resultsScreen.ScorePanelList.ChildrenOfType<OsuScrollContainer>().Single().ScrollToEnd(false));
+
+            AddAssert("right loading spinner shown", () => resultsScreen.RightSpinner.State.Value == Visibility.Visible);
+            waitForDisplay();
+
+            AddAssert($"count increased by {scores_per_result}", () => this.ChildrenOfType<ScorePanel>().Count() >= beforePanelCount + scores_per_result);
+            AddAssert("right loading spinner hidden", () => resultsScreen.RightSpinner.State.Value == Visibility.Hidden);
+
+            AddStep("get panel count", () => beforePanelCount = this.ChildrenOfType<ScorePanel>().Count());
+            AddStep("bind delayed handler with no scores", () => bindHandler(delayed: true, noScores: true));
+            AddStep("scroll to right", () => resultsScreen.ScorePanelList.ChildrenOfType<OsuScrollContainer>().Single().ScrollToEnd(false));
+
+            AddAssert("right loading spinner shown", () => resultsScreen.RightSpinner.State.Value == Visibility.Visible);
+            waitForDisplay();
+
+            AddAssert("count not increased", () => this.ChildrenOfType<ScorePanel>().Count() == beforePanelCount);
+            AddAssert("right loading spinner hidden", () => resultsScreen.RightSpinner.State.Value == Visibility.Hidden);
+            AddAssert("no placeholders shown", () => this.ChildrenOfType<MessagePlaceholder>().Count(), () => Is.Zero);
         }
 
         [Test]
