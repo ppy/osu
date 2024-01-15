@@ -248,7 +248,7 @@ namespace osu.Game.Screens.Ranking
 
             lastFetchCompleted = true;
 
-            if (!scores.Any())
+            if (ScorePanelList.IsEmpty)
             {
                 // This can happen if for example a beatmap that is part of a playlist hasn't been played yet.
                 VerticalScrollContent.Add(new MessagePlaceholder(LeaderboardStrings.NoRecordsYet));
