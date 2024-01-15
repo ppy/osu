@@ -551,6 +551,14 @@ namespace osu.Game.Tests.Visual.UserInterface
             AddStep("press enter again", () => InputManager.Key(Key.Enter));
             AddAssert("hidden deselected", () => !getPanelForMod(typeof(OsuModHidden)).Active.Value);
 
+            AddStep("apply search matching nothing", () => modSelectOverlay.SearchTerm = "ZZZ");
+            AddStep("press enter", () => InputManager.Key(Key.Enter));
+            AddAssert("all text not selected in textbox", () =>
+            {
+                var textBox = modSelectOverlay.ChildrenOfType<SearchTextBox>().Single();
+                return textBox.SelectedText != textBox.Text;
+            });
+
             AddStep("clear search", () => modSelectOverlay.SearchTerm = string.Empty);
             AddStep("press enter", () => InputManager.Key(Key.Enter));
             AddAssert("mod select hidden", () => modSelectOverlay.State.Value == Visibility.Hidden);
