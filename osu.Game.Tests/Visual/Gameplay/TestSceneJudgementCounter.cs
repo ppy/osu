@@ -173,7 +173,7 @@ namespace osu.Game.Tests.Visual.Gameplay
 
         private int hiddenCount()
         {
-            var num = counterDisplay.CounterFlow.Children.First(child => child.Result.Type == HitResult.LargeTickHit);
+            var num = counterDisplay.CounterFlow.Children.First(child => child.Result.Types.Contains(HitResult.LargeTickHit));
             return num.Result.ResultCount.Value;
         }
 
