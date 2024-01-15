@@ -20,6 +20,10 @@ namespace osu.Game.Rulesets.Mania.Difficulty
         private const double tail_multiplier = 1.5; // Lazer LN tails have 1.5x the hit window of a Note or an LN head.
         private const double tail_deviation_multiplier = 1.8; // Empirical testing shows that players get ~1.8x the deviation on tails.
 
+        // Multipliers for legacy LN hit windows. These are made slightly more lenient for some reason.
+        private const double legacy_max_multiplier = 1.2;
+        private const double legacy_300_multiplier = 1.1;
+
         private int countPerfect;
         private int countGreat;
         private int countGood;
@@ -93,10 +97,10 @@ namespace osu.Game.Rulesets.Mania.Difficulty
 
             // We increased the deviation of tails for estimation accuracy, but for difficulty scaling we actually
             // only care about the deviation on notes and heads, as that's the "accuracy skill" of the player.
-            // Increasing the tail multiplier will decrease this value.
-            double noteHeadUr = estimatedUr.Value / Math.Sqrt(noteHeadPortion + tailPortion * Math.Pow(tail_deviation_multiplier, 2));
+            // Increasing the tail multiplier will decrease this value, buffing plays with more LNs.
+            double noteUnstableRate = estimatedUr.Value / Math.Sqrt(noteHeadPortion + tailPortion * Math.Pow(tail_deviation_multiplier, 2));
 
-            difficultyValue *= Math.Max(1 - Math.Pow(noteHeadUr / 500, 1.9), 0);
+            difficultyValue *= Math.Max(1 - Math.Pow(noteUnstableRate / 500, 1.9), 0);
 
             return difficultyValue;
         }
@@ -108,7 +112,7 @@ namespace osu.Game.Rulesets.Mania.Difficulty
         /// Returns the estimated unstable rate of the score, assuming the average hit location is in the center of the hit window.
         /// <exception cref="MathNet.Numerics.Optimization.MaximumIterationsException">
         /// Thrown when the optimization algorithm fails to converge.
-        /// This happens only on extreme cases. We tested up to 100 Million misses, the algorithm converges with default settings.
+        /// This will never happen in any sane (humanly achievable) case. When tested up to 100 Million misses, the algorithm converges with default settings.
         /// </exception>
         /// <returns>
         /// Returns Estimated UR, or null if the score is a miss-only score.
@@ -118,10 +122,6 @@ namespace osu.Game.Rulesets.Mania.Difficulty
         {
             if (totalSuccessfulJudgements == 0 || noteCount + holdNoteCount == 0)
                 return null;
-
-            // Lazer LN heads are the same as Notes, so return NoteCount + HoldNoteCount for lazer scores.
-            double logNoteCount = Math.Log(isLegacyScore ? noteCount : noteCount + holdNoteCount);
-            double logHoldCount = Math.Log(holdNoteCount);
 
             double noteHeadPortion = (double)(noteCount + holdNoteCount) / (noteCount + holdNoteCount * 2);
             double tailPortion = (double)holdNoteCount / (noteCount + holdNoteCount * 2);
@@ -135,11 +135,11 @@ namespace osu.Game.Rulesets.Mania.Difficulty
                 double dNote = d / Math.Sqrt(noteHeadPortion + tailPortion * Math.Pow(tail_deviation_multiplier, 2));
                 double dTail = dNote * tail_deviation_multiplier;
 
-                JudgementProbs pNotes = logPNote(dNote);
+                JudgementProbs pNotes = logJudgementProbsNote(dNote);
                 // Since lazer tails have the same hit behaviour as Notes, return pNote instead of pHold for them.
-                JudgementProbs pHolds = isLegacyScore ? legacyLogPHold(dNote, dTail) : logPNote(dTail, tail_multiplier);
+                JudgementProbs pHolds = isLegacyScore ? logJudgementProbsLegacyHold(dNote, dTail) : logJudgementProbsNote(dTail, tail_multiplier);
 
-                return -totalProb(pNotes, pHolds, logNoteCount, logHoldCount);
+                return -calculateLikelihoodOfDeviation(pNotes, pHolds, noteCount, holdNoteCount);
             }
 
             // Finding the minimum of the function returns the most likely deviation for the hit results. UR is deviation * 10.
@@ -218,16 +218,16 @@ namespace osu.Game.Rulesets.Mania.Difficulty
 
         // Log Judgement Probabilities of a Note given a deviation.
         // The multiplier is for lazer LN tails, which are 1.5x as lenient.
-        private JudgementProbs logPNote(double d, double multiplier = 1)
+        private JudgementProbs logJudgementProbsNote(double d, double multiplier = 1)
         {
             JudgementProbs probabilities = new JudgementProbs
             {
-                PMax = logDiff(0, logPcNote(hitWindows[0] * multiplier, d)),
-                P300 = logDiff(logPcNote(hitWindows[0] * multiplier, d), logPcNote(hitWindows[1] * multiplier, d)),
-                P200 = logDiff(logPcNote(hitWindows[1] * multiplier, d), logPcNote(hitWindows[2] * multiplier, d)),
-                P100 = logDiff(logPcNote(hitWindows[2] * multiplier, d), logPcNote(hitWindows[3] * multiplier, d)),
-                P50 = logDiff(logPcNote(hitWindows[3] * multiplier, d), logPcNote(hitWindows[4] * multiplier, d)),
-                P0 = logPcNote(hitWindows[4] * multiplier, d)
+                PMax = logDiff(0, logCompProbHitNote(hitWindows[0] * multiplier, d)),
+                P300 = logDiff(logCompProbHitNote(hitWindows[0] * multiplier, d), logCompProbHitNote(hitWindows[1] * multiplier, d)),
+                P200 = logDiff(logCompProbHitNote(hitWindows[1] * multiplier, d), logCompProbHitNote(hitWindows[2] * multiplier, d)),
+                P100 = logDiff(logCompProbHitNote(hitWindows[2] * multiplier, d), logCompProbHitNote(hitWindows[3] * multiplier, d)),
+                P50 = logDiff(logCompProbHitNote(hitWindows[3] * multiplier, d), logCompProbHitNote(hitWindows[4] * multiplier, d)),
+                P0 = logCompProbHitNote(hitWindows[4] * multiplier, d)
             };
 
             return probabilities;
@@ -235,33 +235,36 @@ namespace osu.Game.Rulesets.Mania.Difficulty
 
         // Log Judgement Probabilities of a Legacy Hold given a deviation.
         // This is only used for Legacy Holds, which has a different hit behaviour from Notes and lazer LNs.
-        private JudgementProbs legacyLogPHold(double dHead, double dTail)
+        private JudgementProbs logJudgementProbsLegacyHold(double dHead, double dTail)
         {
             JudgementProbs probabilities = new JudgementProbs
             {
-                PMax = logDiff(0, logPcHold(hitWindows[0] * 1.2, dHead, dTail)),
-                P300 = logDiff(logPcHold(hitWindows[0] * 1.2, dHead, dTail), logPcHold(hitWindows[1] * 1.1, dHead, dTail)),
-                P200 = logDiff(logPcHold(hitWindows[1] * 1.1, dHead, dTail), logPcHold(hitWindows[2], dHead, dTail)),
-                P100 = logDiff(logPcHold(hitWindows[2], dHead, dTail), logPcHold(hitWindows[3], dHead, dTail)),
-                P50 = logDiff(logPcHold(hitWindows[3], dHead, dTail), logPcHold(hitWindows[4], dHead, dTail)),
-                P0 = logPcHold(hitWindows[4], dHead, dTail)
+                PMax = logDiff(0, logCompProbHitLegacyHold(hitWindows[0] * legacy_max_multiplier, dHead, dTail)),
+                P300 = logDiff(logCompProbHitLegacyHold(hitWindows[0] * legacy_max_multiplier, dHead, dTail), logCompProbHitLegacyHold(hitWindows[1] * legacy_300_multiplier, dHead, dTail)),
+                P200 = logDiff(logCompProbHitLegacyHold(hitWindows[1] * legacy_300_multiplier, dHead, dTail), logCompProbHitLegacyHold(hitWindows[2], dHead, dTail)),
+                P100 = logDiff(logCompProbHitLegacyHold(hitWindows[2], dHead, dTail), logCompProbHitLegacyHold(hitWindows[3], dHead, dTail)),
+                P50 = logDiff(logCompProbHitLegacyHold(hitWindows[3], dHead, dTail), logCompProbHitLegacyHold(hitWindows[4], dHead, dTail)),
+                P0 = logCompProbHitLegacyHold(hitWindows[4], dHead, dTail)
             };
 
             return probabilities;
         }
 
         /// <summary>
-        /// Combines pNotes and pHolds/pTails into a single probability value for each judgement, and compares them to the judgements of the play.
+        /// Combines the probability of getting each judgement on both note types into a single probability value for each judgement,
+        /// and compares them to the judgements of the play using a binomial likelihood formula.
         /// </summary>
-        private double totalProb(JudgementProbs firstProbs, JudgementProbs secondProbs, double firstObjectCount, double secondObjectCount)
+        private double calculateLikelihoodOfDeviation(JudgementProbs noteProbabilities, JudgementProbs lnProbabilities, double noteCount, double lnCount)
         {
-            // firstObjectCount can be either Notes, or Notes + Holds, as stable LN heads don't behave like Notes but lazer LN heads do.
-            double pMax = logSum(firstProbs.PMax + firstObjectCount, secondProbs.PMax + secondObjectCount) - Math.Log(totalJudgements);
-            double p300 = logSum(firstProbs.P300 + firstObjectCount, secondProbs.P300 + secondObjectCount) - Math.Log(totalJudgements);
-            double p200 = logSum(firstProbs.P200 + firstObjectCount, secondProbs.P200 + secondObjectCount) - Math.Log(totalJudgements);
-            double p100 = logSum(firstProbs.P100 + firstObjectCount, secondProbs.P100 + secondObjectCount) - Math.Log(totalJudgements);
-            double p50 = logSum(firstProbs.P50 + firstObjectCount, secondProbs.P50 + secondObjectCount) - Math.Log(totalJudgements);
-            double p0 = logSum(firstProbs.P0 + firstObjectCount, secondProbs.P0 + secondObjectCount) - Math.Log(totalJudgements);
+            // Lazer mechanics treat the heads of LNs like notes.
+            double noteProbCount = isLegacyScore ? noteCount : noteCount + lnCount;
+
+            double pMax = logSum(noteProbabilities.PMax + Math.Log(noteProbCount), lnProbabilities.PMax + Math.Log(lnCount)) - Math.Log(totalJudgements);
+            double p300 = logSum(noteProbabilities.P300 + Math.Log(noteProbCount), lnProbabilities.P300 + Math.Log(lnCount)) - Math.Log(totalJudgements);
+            double p200 = logSum(noteProbabilities.P200 + Math.Log(noteProbCount), lnProbabilities.P200 + Math.Log(lnCount)) - Math.Log(totalJudgements);
+            double p100 = logSum(noteProbabilities.P100 + Math.Log(noteProbCount), lnProbabilities.P100 + Math.Log(lnCount)) - Math.Log(totalJudgements);
+            double p50 = logSum(noteProbabilities.P50 + Math.Log(noteProbCount), lnProbabilities.P50 + Math.Log(lnCount)) - Math.Log(totalJudgements);
+            double p0 = logSum(noteProbabilities.P0 + Math.Log(noteProbCount), lnProbabilities.P0 + Math.Log(lnCount)) - Math.Log(totalJudgements);
 
             double totalProb = Math.Exp(
                 (countPerfect * pMax
@@ -281,7 +284,7 @@ namespace osu.Game.Rulesets.Mania.Difficulty
         /// <returns>
         /// A value from 0 (log of 1, 0% chance) to negative infinity (log of 0, 100% chance).
         /// </returns>
-        private double logPcNote(double window, double deviation) => logErfc(window / (deviation * Math.Sqrt(2)));
+        private double logCompProbHitNote(double window, double deviation) => logErfc(window / (deviation * Math.Sqrt(2)));
 
         /// <summary>
         /// The log complementary probability of getting a certain judgement with a certain deviation.
@@ -290,7 +293,7 @@ namespace osu.Game.Rulesets.Mania.Difficulty
         /// <returns>
         /// A value from 0 (log of 1, 0% chance) to negative infinity (log of 0, 100% chance).
         /// </returns>
-        private double logPcHold(double window, double headDeviation, double tailDeviation)
+        private double logCompProbHitLegacyHold(double window, double headDeviation, double tailDeviation)
         {
             double root2 = Math.Sqrt(2);
 
@@ -329,7 +332,7 @@ namespace osu.Game.Rulesets.Mania.Difficulty
         {
             double maxVal = Math.Max(firstLog, secondLog);
 
-            // Avoid negative infinity - negative infinity (NaN) by checking if the higher value is negative infinity. See comment in logSum.
+            // Avoid negative infinity - negative infinity (NaN) by checking if the higher value is negative infinity.
             if (double.IsNegativeInfinity(maxVal))
             {
                 return maxVal;
