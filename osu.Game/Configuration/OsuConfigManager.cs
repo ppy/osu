@@ -17,6 +17,7 @@ using osu.Game.Localisation;
 using osu.Game.Overlays;
 using osu.Game.Overlays.Mods.Input;
 using osu.Game.Rulesets.Scoring;
+using osu.Game.Screens.OnlinePlay.Lounge.Components;
 using osu.Game.Screens.Select;
 using osu.Game.Screens.Select.Filter;
 using osu.Game.Skinning;
@@ -190,6 +191,8 @@ namespace osu.Game.Configuration
             SetDefault(OsuSetting.EditorAutoSeekOnPlacement, true);
             SetDefault(OsuSetting.EditorLimitedDistanceSnap, false);
             SetDefault(OsuSetting.EditorShowSpeedChanges, false);
+
+            SetDefault(OsuSetting.MultiplayerRoomFilter, RoomPermissionsFilter.All);
 
             SetDefault(OsuSetting.LastProcessedMetadataId, -1);
 
@@ -423,5 +426,6 @@ namespace osu.Game.Configuration
         TouchDisableGameplayTaps,
         ModSelectTextSearchStartsActive,
         UserOnlineStatus,
+        MultiplayerRoomFilter
     }
 }
