@@ -542,6 +542,11 @@ namespace osu.Game.Tests.Visual.UserInterface
 
             AddStep("press enter", () => InputManager.Key(Key.Enter));
             AddAssert("hidden selected", () => getPanelForMod(typeof(OsuModHidden)).Active.Value);
+            AddAssert("all text selected in textbox", () =>
+            {
+                var textBox = modSelectOverlay.ChildrenOfType<SearchTextBox>().Single();
+                return textBox.SelectedText == textBox.Text;
+            });
 
             AddStep("press enter again", () => InputManager.Key(Key.Enter));
             AddAssert("hidden deselected", () => !getPanelForMod(typeof(OsuModHidden)).Active.Value);
