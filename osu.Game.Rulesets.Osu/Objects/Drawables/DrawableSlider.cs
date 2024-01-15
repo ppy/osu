@@ -250,7 +250,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
         {
             base.UpdateAfterChildren();
 
-            // During slider path editing, the PlaySliderBody is scheduled to refresh once in the Update phase.
+            // During slider path editing, the PlaySliderBody is scheduled to refresh once on Update.
             // It is crucial to perform the code below in UpdateAfterChildren. This ensures that the SliderBody has the opportunity
             // to update its Size and PathOffset beforehand, ensuring correct placement.
 
