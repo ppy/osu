@@ -101,6 +101,11 @@ namespace osu.Game.Updater
             {
                 fileExplorerKey.DeleteSubKey("UserChoice", false);
                 fileExplorerKey.Close();
+                Logger.Log("Deleted file explorer override for " + extension);
+            }
+            else
+            {
+                Logger.Log("File explorer override for " + extension + " does not exist!");
             }
 
             RegistryKey key = Registry.CurrentUser.CreateSubKey($"Software\\Classes\\{extension}");
