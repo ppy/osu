@@ -14,10 +14,12 @@ using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Cursor;
+using osu.Framework.Graphics.Primitives;
 using osu.Framework.Graphics.UserInterface;
 using osu.Framework.Input;
 using osu.Framework.Input.Bindings;
 using osu.Framework.Input.Events;
+using osu.Framework.Utils;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Rulesets.Edit;
 using osu.Game.Rulesets.Objects;
@@ -74,6 +76,50 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders.Components
 
             controlPoints.CollectionChanged += onControlPointsChanged;
             controlPoints.BindTo(hitObject.Path.ControlPoints);
+        }
+
+        /// <summary>
+        /// Handles correction of invalid path types.
+        /// </summary>
+        public void EnsureValidPathTypes()
+        {
+            List<PathControlPoint> pointsInCurrentSegment = new List<PathControlPoint>();
+
+            foreach (var controlPoint in controlPoints)
+            {
+                if (controlPoint.Type != null)
+                {
+                    pointsInCurrentSegment.Add(controlPoint);
+                    ensureValidPathType(pointsInCurrentSegment);
+                    pointsInCurrentSegment.Clear();
+                }
+
+                pointsInCurrentSegment.Add(controlPoint);
+            }
+
+            ensureValidPathType(pointsInCurrentSegment);
+        }
+
+        private void ensureValidPathType(IReadOnlyList<PathControlPoint> segment)
+        {
+            if (segment.Count == 0)
+                return;
+
+            var first = segment[0];
+
+            if (first.Type != PathType.PERFECT_CURVE)
+                return;
+
+            if (segment.Count > 3)
+                first.Type = PathType.BEZIER;
+
+            if (segment.Count != 3)
+                return;
+
+            ReadOnlySpan<Vector2> points = segment.Select(p => p.Position).ToArray();
+            RectangleF boundingBox = PathApproximator.CircularArcBoundingBox(points);
+            if (boundingBox.Width >= 640 || boundingBox.Height >= 480)
+                first.Type = PathType.BEZIER;
         }
 
         /// <summary>
@@ -240,7 +286,8 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders.Components
         /// <param name="type">The path type we want to assign to the given control point piece.</param>
         private void updatePathType(PathControlPointPiece<T> piece, PathType? type)
         {
-            int indexInSegment = piece.PointsInSegment.IndexOf(piece.ControlPoint);
+            var pointsInSegment = hitObject.Path.PointsInSegment(piece.ControlPoint);
+            int indexInSegment = pointsInSegment.IndexOf(piece.ControlPoint);
 
             if (type?.Type == SplineType.PerfectCurve)
             {
@@ -249,8 +296,8 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders.Components
                 // and one segment of the previous type.
                 int thirdPointIndex = indexInSegment + 2;
 
-                if (piece.PointsInSegment.Count > thirdPointIndex + 1)
-                    piece.PointsInSegment[thirdPointIndex].Type = piece.PointsInSegment[0].Type;
+                if (pointsInSegment.Count > thirdPointIndex + 1)
+                    pointsInSegment[thirdPointIndex].Type = pointsInSegment[0].Type;
             }
 
             hitObject.Path.ExpectedDistance.Value = null;
@@ -339,6 +386,8 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders.Components
             // Maintain the path types in case they got defaulted to bezier at some point during the drag.
             for (int i = 0; i < hitObject.Path.ControlPoints.Count; i++)
                 hitObject.Path.ControlPoints[i].Type = dragPathTypes[i];
+
+            EnsureValidPathTypes();
         }
 
         public void DragEnded() => changeHandler?.EndChange();
@@ -412,6 +461,8 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders.Components
             {
                 foreach (var p in Pieces.Where(p => p.IsSelected.Value))
                     updatePathType(p, type);
+
+                EnsureValidPathTypes();
             });
 
             if (countOfState == totalCount)
