@@ -17,7 +17,7 @@ using osuTK;
 
 namespace osu.Game.Rulesets.Osu.Objects.Drawables
 {
-    public partial class DrawableSliderRepeat : DrawableOsuHitObject, ITrackSnaking
+    public partial class DrawableSliderRepeat : DrawableOsuHitObject
     {
         public new SliderRepeat HitObject => (SliderRepeat)base.HitObject;
 
