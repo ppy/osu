@@ -230,6 +230,38 @@ namespace osu.Game.Utils
         }
 
         /// <summary>
+        /// Verifies all mods provided belong to the given ruleset.
+        /// </summary>
+        /// <param name="ruleset">The ruleset to check the proposed mods against.</param>
+        /// <param name="proposedMods">The mods proposed for checking.</param>
+        /// <returns>Whether all <paramref name="proposedMods"/> belong to the given <paramref name="ruleset"/>.</returns>
+        public static bool CheckModsBelongToRuleset(Ruleset ruleset, IEnumerable<Mod> proposedMods)
+        {
+            var rulesetModsTypes = ruleset.AllMods.Select(m => m.GetType()).ToList();
+
+            foreach (var proposedMod in proposedMods)
+            {
+                bool found = false;
+
+                var proposedModType = proposedMod.GetType();
+
+                foreach (var rulesetModType in rulesetModsTypes)
+                {
+                    if (rulesetModType == proposedModType)
+                    {
+                        found = true;
+                        break;
+                    }
+                }
+
+                if (!found)
+                    return true;
+            }
+
+            return true;
+        }
+
+        /// <summary>
         /// Given a value of a score multiplier, returns a string version with special handling for a value near 1.00x.
         /// </summary>
         /// <param name="scoreMultiplier">The value of the score multiplier.</param>
