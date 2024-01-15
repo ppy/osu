@@ -1078,7 +1078,7 @@ namespace osu.Game.Screens.Play
                 b.FadeColour(Color4.White, 250);
 
                 // bind component bindables.
-                b.IsBreakTime.BindTo(breakTracker.IsBreakTime);
+                ((IBindable<bool>)b.IsBreakTime).BindTo(breakTracker.IsBreakTime);
 
                 b.StoryboardReplacesBackground.BindTo(storyboardReplacesBackground);
 
@@ -1238,7 +1238,13 @@ namespace osu.Game.Screens.Play
 
             if (this.IsCurrentScreen())
             {
-                ApplyToBackground(b => b.IgnoreUserSettings.Value = true);
+                ApplyToBackground(b =>
+                {
+                    b.IgnoreUserSettings.Value = true;
+
+                    b.IsBreakTime.UnbindFrom(breakTracker.IsBreakTime);
+                    b.IsBreakTime.Value = true;
+                });
                 storyboardReplacesBackground.Value = false;
             }
         }
