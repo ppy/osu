@@ -2,6 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
+using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
@@ -49,7 +50,7 @@ namespace osu.Game.Screens.Play.HUD.JudgementCounter
                 AutoSizeAxes = Axes.Both
             };
 
-            foreach (var result in judgementCountController.Results)
+            foreach (var result in judgementCountController.Counters)
                 CounterFlow.Add(createCounter(result));
         }
 
@@ -88,7 +89,9 @@ namespace osu.Game.Screens.Play.HUD.JudgementCounter
                 if (index == 0 && !ShowMaxJudgement.Value)
                     return false;
 
-                if (counter.Result.Type.IsBasic())
+                var hitResult = counter.Result.Types.First();
+
+                if (hitResult.IsBasic())
                     return true;
 
                 switch (Mode.Value)
@@ -97,7 +100,7 @@ namespace osu.Game.Screens.Play.HUD.JudgementCounter
                         return false;
 
                     case DisplayMode.Normal:
-                        return !counter.Result.Type.IsBonus();
+                        return !hitResult.IsBonus();
 
                     case DisplayMode.All:
                         return true;
