@@ -20,7 +20,7 @@ namespace osu.Game.Rulesets.Scoring
         /// </summary>
         [Description(@"")]
         [EnumMember(Value = "none")]
-        [Order(14)]
+        [Order(15)]
         None,
 
         /// <summary>
@@ -71,7 +71,7 @@ namespace osu.Game.Rulesets.Scoring
         /// Indicates small tick miss.
         /// </summary>
         [EnumMember(Value = "small_tick_miss")]
-        [Order(11)]
+        [Order(12)]
         SmallTickMiss,
 
         /// <summary>
@@ -87,7 +87,7 @@ namespace osu.Game.Rulesets.Scoring
         /// </summary>
         [EnumMember(Value = "large_tick_miss")]
         [Description("-")]
-        [Order(10)]
+        [Order(11)]
         LargeTickMiss,
 
         /// <summary>
@@ -103,7 +103,7 @@ namespace osu.Game.Rulesets.Scoring
         /// </summary>
         [Description("S Bonus")]
         [EnumMember(Value = "small_bonus")]
-        [Order(9)]
+        [Order(10)]
         SmallBonus,
 
         /// <summary>
@@ -111,7 +111,7 @@ namespace osu.Game.Rulesets.Scoring
         /// </summary>
         [Description("L Bonus")]
         [EnumMember(Value = "large_bonus")]
-        [Order(8)]
+        [Order(9)]
         LargeBonus,
 
         /// <summary>
@@ -119,14 +119,14 @@ namespace osu.Game.Rulesets.Scoring
         /// </summary>
         [EnumMember(Value = "ignore_miss")]
         [Description("-")]
-        [Order(13)]
+        [Order(14)]
         IgnoreMiss,
 
         /// <summary>
         /// Indicates a hit that should be ignored for scoring purposes.
         /// </summary>
         [EnumMember(Value = "ignore_hit")]
-        [Order(12)]
+        [Order(13)]
         IgnoreHit,
 
         /// <summary>
@@ -136,14 +136,14 @@ namespace osu.Game.Rulesets.Scoring
         /// May be paired with <see cref="IgnoreHit"/>.
         /// </remarks>
         [EnumMember(Value = "combo_break")]
-        [Order(15)]
+        [Order(16)]
         ComboBreak,
 
         /// <summary>
         /// A special judgement similar to <see cref="LargeTickHit"/> that's used to increase the valuation of the final tick of a slider.
         /// </summary>
         [EnumMember(Value = "slider_tail_hit")]
-        [Order(16)]
+        [Order(8)]
         SliderTailHit,
 
         /// <summary>
