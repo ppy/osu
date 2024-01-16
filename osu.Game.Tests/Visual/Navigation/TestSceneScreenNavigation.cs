@@ -35,6 +35,7 @@ using osu.Game.Screens.OnlinePlay.Lounge;
 using osu.Game.Screens.OnlinePlay.Match.Components;
 using osu.Game.Screens.OnlinePlay.Playlists;
 using osu.Game.Screens.Play;
+using osu.Game.Screens.Play.HUD;
 using osu.Game.Screens.Ranking;
 using osu.Game.Screens.Select;
 using osu.Game.Screens.Select.Carousel;
@@ -832,6 +833,24 @@ namespace osu.Game.Tests.Visual.Navigation
             pushEscape();
 
             AddAssert("exit dialog is shown", () => Game.Dependencies.Get<IDialogOverlay>().CurrentDialog is ConfirmExitDialog);
+        }
+
+        [Test]
+        public void TestQuickSkinEditorDoesntNukeSkin()
+        {
+            AddStep("import beatmap", () => BeatmapImportHelper.LoadQuickOszIntoOsu(Game).WaitSafely());
+
+            AddStep("open", () => InputManager.Key(Key.Space));
+            AddStep("skin", () => InputManager.Key(Key.E));
+            AddStep("editor", () => InputManager.Key(Key.S));
+            AddStep("and close immediately", () => InputManager.Key(Key.Escape));
+
+            AddStep("open again", () => InputManager.Key(Key.S));
+
+            Player player = null;
+
+            AddUntilStep("wait for player", () => (player = Game.ScreenStack.CurrentScreen as Player) != null);
+            AddUntilStep("wait for gameplay still has health bar", () => player.ChildrenOfType<ArgonHealthDisplay>().Any());
         }
 
         [Test]
