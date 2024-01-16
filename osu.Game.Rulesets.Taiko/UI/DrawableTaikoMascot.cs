@@ -19,7 +19,7 @@ namespace osu.Game.Rulesets.Taiko.UI
     public partial class DrawableTaikoMascot : BeatSyncedContainer
     {
         public readonly Bindable<TaikoMascotAnimationState> State;
-        public readonly Bindable<JudgementResult?> LastResult;
+        public readonly Bindable<Judgement?> LastResult;
 
         private readonly Dictionary<TaikoMascotAnimationState, TaikoMascotAnimation> animations;
 
@@ -33,7 +33,7 @@ namespace osu.Game.Rulesets.Taiko.UI
             Origin = Anchor = Anchor.BottomLeft;
 
             State = new Bindable<TaikoMascotAnimationState>(startingState);
-            LastResult = new Bindable<JudgementResult?>();
+            LastResult = new Bindable<Judgement?>();
 
             animations = new Dictionary<TaikoMascotAnimationState, TaikoMascotAnimation>();
         }
@@ -50,7 +50,7 @@ namespace osu.Game.Rulesets.Taiko.UI
             };
 
             if (gameplayState != null)
-                ((IBindable<JudgementResult>)LastResult).BindTo(gameplayState.LastJudgementResult);
+                ((IBindable<Judgement>)LastResult).BindTo(gameplayState.LastJudgementResult);
         }
 
         protected override void LoadComplete()
@@ -63,7 +63,7 @@ namespace osu.Game.Rulesets.Taiko.UI
             LastResult.BindValueChanged(onNewResult);
         }
 
-        private void onNewResult(ValueChangedEvent<JudgementResult?> resultChangedEvent)
+        private void onNewResult(ValueChangedEvent<Judgement?> resultChangedEvent)
         {
             var result = resultChangedEvent.NewValue;
             if (result == null)
@@ -115,10 +115,10 @@ namespace osu.Game.Rulesets.Taiko.UI
             currentAnimation.Show();
         }
 
-        private bool triggerComboClear(JudgementResult judgementResult)
-            => (judgementResult.ComboAtJudgement + 1) % 50 == 0 && judgementResult.Type.AffectsCombo() && judgementResult.IsHit;
+        private bool triggerComboClear(Judgement judgement)
+            => (judgement.ComboAtJudgement + 1) % 50 == 0 && judgement.Type.AffectsCombo() && judgement.IsHit;
 
-        private bool triggerSwellClear(JudgementResult judgementResult)
-            => judgementResult.Judgement is TaikoSwellJudgement && judgementResult.IsHit;
+        private bool triggerSwellClear(Judgement judgement)
+            => judgement.JudgementCriteria is TaikoSwellJudgementCriteria && judgement.IsHit;
     }
 }

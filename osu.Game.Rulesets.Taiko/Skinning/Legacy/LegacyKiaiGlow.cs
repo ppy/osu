@@ -53,7 +53,7 @@ namespace osu.Game.Rulesets.Taiko.Skinning.Legacy
             isKiaiActive = effectPoint.KiaiMode;
         }
 
-        private void onNewJudgement(JudgementResult result)
+        private void onNewJudgement(Judgement result)
         {
             if (!result.IsHit || !isKiaiActive)
                 return;

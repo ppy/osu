@@ -8,7 +8,7 @@ namespace osu.Game.Rulesets.Catch.Objects
 {
     public class Fruit : PalpableCatchHitObject
     {
-        public override Judgement CreateJudgement() => new CatchJudgement();
+        public override JudgementCriteria CreateJudgement() => new CatchJudgementCriteria();
 
         public static FruitVisualRepresentation GetVisualRepresentation(int indexInBeatmap) => (FruitVisualRepresentation)(indexInBeatmap % 4);
     }

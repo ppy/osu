@@ -38,13 +38,13 @@ namespace osu.Game.Rulesets.Mods
         /// judgement is applied to <paramref name="healthProcessor"/>.
         /// </summary>
         /// <param name="healthProcessor">The loaded <see cref="HealthProcessor"/>.</param>
-        /// <param name="result">The latest <see cref="JudgementResult"/>.</param>
+        /// <param name="result">The latest <see cref="Judgement"/>.</param>
         /// <returns>Whether the fail condition has been met.</returns>
         /// <remarks>
         /// This method should only be used to trigger failures based on <paramref name="result"/>.
         /// Using outside values to evaluate failure may introduce event ordering discrepancies, use
         /// an <see cref="IApplicableMod"/> with <see cref="TriggerFailure"/> instead.
         /// </remarks>
-        protected abstract bool FailCondition(HealthProcessor healthProcessor, JudgementResult result);
+        protected abstract bool FailCondition(HealthProcessor healthProcessor, Judgement result);
     }
 }

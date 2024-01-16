@@ -55,7 +55,7 @@ namespace osu.Game.Tests.Visual.Gameplay
             AddRepeatStep("Revert UR", () =>
             {
                 scoreProcessor.RevertResult(
-                    new JudgementResult(new HitCircle { HitWindows = hitWindows }, new Judgement())
+                    new Judgement(new HitCircle { HitWindows = hitWindows }, new JudgementCriteria())
                     {
                         GameplayRate = 1.0,
                         TimeOffset = 25,
@@ -125,7 +125,7 @@ namespace osu.Game.Tests.Visual.Gameplay
                 prev = placement;
             }
 
-            scoreProcessor.ApplyResult(new JudgementResult(new HitCircle { HitWindows = hitWindows }, new Judgement())
+            scoreProcessor.ApplyResult(new Judgement(new HitCircle { HitWindows = hitWindows }, new JudgementCriteria())
             {
                 TimeOffset = placement,
                 GameplayRate = gameplayRate,

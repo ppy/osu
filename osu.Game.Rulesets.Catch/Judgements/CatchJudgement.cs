@@ -1,20 +1,27 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using osu.Game.Rulesets.Catch.UI;
 using osu.Game.Rulesets.Judgements;
-using osu.Game.Rulesets.Objects.Types;
-using osu.Game.Rulesets.Scoring;
+using osu.Game.Rulesets.Objects;
 
 namespace osu.Game.Rulesets.Catch.Judgements
 {
     public class CatchJudgement : Judgement
     {
-        public override HitResult MaxResult => HitResult.Great;
+        /// <summary>
+        /// The catcher animation state prior to this judgement.
+        /// </summary>
+        public CatcherAnimationState CatcherAnimationState;
 
         /// <summary>
-        /// Whether fruit on the platter should explode or drop.
-        /// Note that this is only checked if the owning object is also <see cref="IHasComboInformation.LastInCombo" />
+        /// Whether the catcher was hyper dashing prior to this judgement.
         /// </summary>
-        public virtual bool ShouldExplodeFor(JudgementResult result) => result.IsHit;
+        public bool CatcherHyperDash;
+
+        public CatchJudgement(HitObject hitObject, JudgementCriteria judgementCriteria)
+            : base(hitObject, judgementCriteria)
+        {
+        }
     }
 }

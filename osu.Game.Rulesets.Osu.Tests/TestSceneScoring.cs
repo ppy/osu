@@ -200,9 +200,9 @@ namespace osu.Game.Rulesets.Osu.Tests
             }
 
             protected override ScoreProcessor CreateScoreProcessor() => new OsuScoreProcessor();
-            protected override JudgementResult CreatePerfectJudgementResult() => new OsuJudgementResult(new HitCircle(), new OsuJudgement()) { Type = HitResult.Great };
-            protected override JudgementResult CreateNonPerfectJudgementResult() => new OsuJudgementResult(new HitCircle(), new OsuJudgement()) { Type = HitResult.Ok };
-            protected override JudgementResult CreateMissJudgementResult() => new OsuJudgementResult(new HitCircle(), new OsuJudgement()) { Type = HitResult.Miss };
+            protected override Judgement CreatePerfectJudgementResult() => new OsuJudgement(new HitCircle(), new OsuJudgementCriteria()) { Type = HitResult.Great };
+            protected override Judgement CreateNonPerfectJudgementResult() => new OsuJudgement(new HitCircle(), new OsuJudgementCriteria()) { Type = HitResult.Ok };
+            protected override Judgement CreateMissJudgementResult() => new OsuJudgement(new HitCircle(), new OsuJudgementCriteria()) { Type = HitResult.Miss };
         }
     }
 }

@@ -136,7 +136,7 @@ namespace osu.Game.Screens.Play.HUD
             BarHeight.BindValueChanged(_ => updateContentSize(), true);
         }
 
-        private void onNewJudgement(JudgementResult result) => pendingMissAnimation |= !result.IsHit;
+        private void onNewJudgement(Judgement result) => pendingMissAnimation |= !result.IsHit;
 
         protected override void Update()
         {

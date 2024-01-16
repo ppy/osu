@@ -36,7 +36,7 @@ namespace osu.Game.Rulesets.Osu.Tests
 
         private const float slider_path_length = 25;
 
-        private readonly List<JudgementResult> judgementResults = new List<JudgementResult>();
+        private readonly List<Judgement> judgementResults = new List<Judgement>();
 
         [TestCase(30, 0)]
         [TestCase(30, 1)]
@@ -462,7 +462,7 @@ namespace osu.Game.Rulesets.Osu.Tests
             AddAssert("All judgements max", () =>
             {
                 return judgementResults.Select(j => (j.HitObject, j.Type));
-            }, () => Is.EqualTo(judgementResults.Select(j => (j.HitObject, j.Judgement.MaxResult))));
+            }, () => Is.EqualTo(judgementResults.Select(j => (j.HitObject, j.JudgementCriteria.MaxResult))));
         }
 
         private void assertHeadMissTailTracked()

@@ -20,7 +20,7 @@ namespace osu.Game.Rulesets.Osu.Scoring
         {
         }
 
-        protected override double GetHealthIncreaseFor(JudgementResult result)
+        protected override double GetHealthIncreaseFor(Judgement result)
         {
             if (IsSimulating)
                 return getHealthIncreaseFor(result);
@@ -74,7 +74,7 @@ namespace osu.Game.Rulesets.Osu.Scoring
             currentComboResult = ComboResult.Perfect;
         }
 
-        private double getHealthIncreaseFor(JudgementResult result)
+        private double getHealthIncreaseFor(Judgement result)
         {
             switch (result.Type)
             {

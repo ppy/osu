@@ -107,10 +107,10 @@ namespace osu.Game.Rulesets.Catch.UI
 
         private bool checkIfWeCanCatch(CatchHitObject obj) => Catcher.CanCatch(obj);
 
-        private void onNewResult(DrawableHitObject judgedObject, JudgementResult result)
+        private void onNewResult(DrawableHitObject judgedObject, Judgement result)
             => CatcherArea.OnNewResult((DrawableCatchHitObject)judgedObject, result);
 
-        private void onRevertResult(JudgementResult result)
+        private void onRevertResult(Judgement result)
             => CatcherArea.OnRevertResult(result);
     }
 }

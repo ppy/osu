@@ -99,7 +99,7 @@ namespace osu.Game.Rulesets.Catch.Skinning.Argon
 
                 if (!(entry.HitObject is Droplet))
                 {
-                    float scale = Math.Clamp(entry.JudgementResult.ComboAtJudgement / 200f, 0.35f, 1.125f);
+                    float scale = Math.Clamp(entry.Judgement.ComboAtJudgement / 200f, 0.35f, 1.125f);
 
                     tallExplosion
                         .ScaleTo(new Vector2(1.1f, 20 * scale), 200, Easing.OutQuint)

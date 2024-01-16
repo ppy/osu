@@ -13,7 +13,7 @@ namespace osu.Game.Rulesets.Mania.UI
         /// <summary>
         /// Begins animating this <see cref="IHitExplosion"/>.
         /// </summary>
-        /// <param name="result">The type of <see cref="JudgementResult"/> that caused this explosion.</param>
-        void Animate(JudgementResult result);
+        /// <param name="result">The type of <see cref="Judgement"/> that caused this explosion.</param>
+        void Animate(Judgement result);
     }
 }

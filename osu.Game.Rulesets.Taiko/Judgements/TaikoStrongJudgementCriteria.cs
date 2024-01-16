@@ -5,10 +5,11 @@ using osu.Game.Rulesets.Scoring;
 
 namespace osu.Game.Rulesets.Taiko.Judgements
 {
-    public class TaikoDrumRollTickJudgement : TaikoJudgement
+    public class TaikoStrongJudgementCriteria : TaikoJudgementCriteria
     {
-        public override HitResult MaxResult => HitResult.SmallBonus;
+        public override HitResult MaxResult => HitResult.LargeBonus;
 
+        // MainObject already changes the HP
         protected override double HealthIncreaseFor(HitResult result) => 0;
     }
 }

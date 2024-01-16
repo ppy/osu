@@ -6,7 +6,7 @@ using osu.Game.Rulesets.Scoring;
 
 namespace osu.Game.Rulesets.Mania.Judgements
 {
-    public class ManiaJudgement : Judgement
+    public class ManiaJudgementCriteria : JudgementCriteria
     {
         protected override double HealthIncreaseFor(HitResult result)
         {

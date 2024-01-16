@@ -29,7 +29,7 @@ namespace osu.Game.Rulesets.Osu.Tests.Mods
         public void TestSpinnerAutoCompleted()
         {
             DrawableSpinner? spinner = null;
-            JudgementResult? lastResult = null;
+            Judgement? lastResult = null;
 
             CreateModTest(new ModTestData
             {
@@ -95,7 +95,7 @@ namespace osu.Game.Rulesets.Osu.Tests.Mods
         public void TestSpinnerGetsNoBonusScore()
         {
             DrawableSpinner? spinner = null;
-            List<JudgementResult> results = new List<JudgementResult>();
+            List<Judgement> results = new List<Judgement>();
 
             CreateModTest(new ModTestData
             {
@@ -120,7 +120,7 @@ namespace osu.Game.Rulesets.Osu.Tests.Mods
                     }
 
                     // we should only be checking the bonus/progress after the spinner has fully completed.
-                    if (results.OfType<OsuSpinnerJudgementResult>().All(r => r.TimeCompleted == null))
+                    if (results.OfType<OsuSpinnerJudgement>().All(r => r.TimeCompleted == null))
                         return false;
 
                     return

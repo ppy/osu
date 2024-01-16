@@ -175,11 +175,11 @@ namespace osu.Game.Rulesets.Catch.Tests
 
             protected override ScoreProcessor CreateScoreProcessor() => new CatchScoreProcessor();
 
-            protected override JudgementResult CreatePerfectJudgementResult() => new CatchJudgementResult(new Fruit(), new CatchJudgement()) { Type = HitResult.Great };
+            protected override Judgement CreatePerfectJudgementResult() => new CatchJudgement(new Fruit(), new CatchJudgementCriteria()) { Type = HitResult.Great };
 
-            protected override JudgementResult CreateNonPerfectJudgementResult() => throw new NotSupportedException("catch does not have \"non-perfect\" judgements.");
+            protected override Judgement CreateNonPerfectJudgementResult() => throw new NotSupportedException("catch does not have \"non-perfect\" judgements.");
 
-            protected override JudgementResult CreateMissJudgementResult() => new CatchJudgementResult(new Fruit(), new CatchJudgement()) { Type = HitResult.Miss };
+            protected override Judgement CreateMissJudgementResult() => new CatchJudgement(new Fruit(), new CatchJudgementCriteria()) { Type = HitResult.Miss };
         }
     }
 }

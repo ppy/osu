@@ -8,7 +8,7 @@ namespace osu.Game.Rulesets.Taiko.Objects
 {
     public class SwellTick : TaikoHitObject
     {
-        public override Judgement CreateJudgement() => new IgnoreJudgement();
+        public override JudgementCriteria CreateJudgement() => new IgnoreJudgementCriteria();
 
         protected override HitWindows CreateHitWindows() => HitWindows.Empty;
     }

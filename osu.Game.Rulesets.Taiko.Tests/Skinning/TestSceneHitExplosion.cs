@@ -35,7 +35,7 @@ namespace osu.Game.Rulesets.Taiko.Tests.Skinning
             AddStep("create hit", () => SetContents(_ => getContentFor(createStrongHit(type))));
             AddStep("visualise second hit",
                 () => this.ChildrenOfType<HitExplosion>()
-                          .ForEach(e => e.VisualiseSecondHit(new JudgementResult(new HitObject { StartTime = Time.Current }, new Judgement()))));
+                          .ForEach(e => e.VisualiseSecondHit(new Judgement(new HitObject { StartTime = Time.Current }, new JudgementCriteria()))));
         }
 
         private Drawable getContentFor(DrawableTestHit hit)

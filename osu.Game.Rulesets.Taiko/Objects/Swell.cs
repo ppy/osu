@@ -38,7 +38,7 @@ namespace osu.Game.Rulesets.Taiko.Objects
             }
         }
 
-        public override Judgement CreateJudgement() => new TaikoSwellJudgement();
+        public override JudgementCriteria CreateJudgement() => new TaikoSwellJudgementCriteria();
 
         protected override HitWindows CreateHitWindows() => HitWindows.Empty;
     }

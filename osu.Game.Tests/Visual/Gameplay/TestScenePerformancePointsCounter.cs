@@ -29,7 +29,7 @@ namespace osu.Game.Tests.Visual.Gameplay
         private ScoreProcessor scoreProcessor;
 
         private int iteration;
-        private Bindable<JudgementResult> lastJudgementResult = new Bindable<JudgementResult>();
+        private Bindable<Judgement> lastJudgementResult = new Bindable<Judgement>();
         private PerformancePointsCounter counter;
 
         [SetUpSteps]
@@ -42,7 +42,7 @@ namespace osu.Game.Tests.Visual.Gameplay
             var beatmap = CreateWorkingBeatmap(ruleset.RulesetInfo)
                 .GetPlayableBeatmap(ruleset.RulesetInfo);
 
-            lastJudgementResult = new Bindable<JudgementResult>();
+            lastJudgementResult = new Bindable<Judgement>();
 
             gameplayState = new GameplayState(beatmap, ruleset);
             gameplayState.LastJudgementResult.BindTo(lastJudgementResult);
@@ -91,7 +91,7 @@ namespace osu.Game.Tests.Visual.Gameplay
             {
                 previousValue = counter.Current.Value;
 
-                scoreProcessor.RevertResult(new JudgementResult(new HitObject(), new OsuJudgement()));
+                scoreProcessor.RevertResult(new Judgement(new HitObject(), new OsuJudgementCriteria()));
             });
 
             AddUntilStep("counter decreased", () => counter.Current.Value < previousValue);
@@ -120,10 +120,10 @@ namespace osu.Game.Tests.Visual.Gameplay
             scoreInfo.Accuracy = 1;
             scoreInfo.Statistics[HitResult.Great] = iteration * 1000;
 
-            lastJudgementResult.Value = new OsuJudgementResult(new HitObject
+            lastJudgementResult.Value = new OsuJudgement(new HitObject
             {
                 StartTime = iteration * 10000,
-            }, new OsuJudgement())
+            }, new OsuJudgementCriteria())
             {
                 Type = HitResult.Perfect,
             };

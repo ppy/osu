@@ -120,7 +120,7 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
 
         public override bool OnPressed(KeyBindingPressEvent<TaikoAction> e) => false;
 
-        private void onNewResult(DrawableHitObject obj, JudgementResult result)
+        private void onNewResult(DrawableHitObject obj, Judgement result)
         {
             if (!(obj is DrawableDrumRollTick))
                 return;
@@ -143,7 +143,7 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
             if (timeOffset < 0)
                 return;
 
-            ApplyResult(r => r.Type = r.Judgement.MaxResult);
+            ApplyResult(r => r.Type = r.JudgementCriteria.MaxResult);
         }
 
         protected override void UpdateHitStateTransforms(ArmedState state)
@@ -192,7 +192,7 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
                 if (!ParentHitObject.Judged)
                     return;
 
-                ApplyResult(r => r.Type = ParentHitObject.IsHit ? r.Judgement.MaxResult : r.Judgement.MinResult);
+                ApplyResult(r => r.Type = ParentHitObject.IsHit ? r.JudgementCriteria.MaxResult : r.JudgementCriteria.MinResult);
             }
 
             public override bool OnPressed(KeyBindingPressEvent<TaikoAction> e) => false;

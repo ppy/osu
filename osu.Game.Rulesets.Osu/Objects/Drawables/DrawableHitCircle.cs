@@ -155,7 +155,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
             if (!userTriggered)
             {
                 if (!HitObject.HitWindows.CanBeHit(timeOffset))
-                    ApplyResult(r => r.Type = r.Judgement.MinResult);
+                    ApplyResult(r => r.Type = r.JudgementCriteria.MinResult);
 
                 return;
             }
@@ -171,7 +171,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
 
             ApplyResult(r =>
             {
-                var circleResult = (OsuHitCircleJudgementResult)r;
+                var circleResult = (OsuHitCircleJudgement)r;
 
                 // Todo: This should also consider misses, but they're a little more interesting to handle, since we don't necessarily know the position at the time of a miss.
                 if (result.IsHit())
@@ -237,7 +237,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
 
         public Drawable ProxiedLayer => ApproachCircle;
 
-        protected override JudgementResult CreateResult(Judgement judgement) => new OsuHitCircleJudgementResult(HitObject, judgement);
+        protected override Judgement CreateResult(JudgementCriteria judgementCriteria) => new OsuHitCircleJudgement(HitObject, judgementCriteria);
 
         public partial class HitReceptor : CompositeDrawable, IKeyBindingHandler<OsuAction>
         {

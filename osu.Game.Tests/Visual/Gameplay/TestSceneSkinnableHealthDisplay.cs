@@ -47,7 +47,7 @@ namespace osu.Game.Tests.Visual.Gameplay
         {
             AddRepeatStep("apply miss judgement", delegate
             {
-                healthProcessor.ApplyResult(new JudgementResult(new HitObject(), new Judgement()) { Type = HitResult.Miss });
+                healthProcessor.ApplyResult(new Judgement(new HitObject(), new JudgementCriteria()) { Type = HitResult.Miss });
             }, 5);
 
             AddRepeatStep(@"decrease hp slightly", delegate
@@ -63,7 +63,7 @@ namespace osu.Game.Tests.Visual.Gameplay
             AddRepeatStep(@"increase hp with flash", delegate
             {
                 healthProcessor.Health.Value += 0.1f;
-                healthProcessor.ApplyResult(new JudgementResult(new HitCircle(), new OsuJudgement())
+                healthProcessor.ApplyResult(new Judgement(new HitCircle(), new OsuJudgementCriteria())
                 {
                     Type = HitResult.Perfect
                 });

@@ -58,9 +58,9 @@ namespace osu.Game.Screens.Play
         /// <summary>
         /// A bindable tracking the last judgement result applied to any hit object.
         /// </summary>
-        public IBindable<JudgementResult> LastJudgementResult => lastJudgementResult;
+        public IBindable<Judgement> LastJudgementResult => lastJudgementResult;
 
-        private readonly Bindable<JudgementResult> lastJudgementResult = new Bindable<JudgementResult>();
+        private readonly Bindable<Judgement> lastJudgementResult = new Bindable<Judgement>();
 
         public GameplayState(IBeatmap beatmap, Ruleset ruleset, IReadOnlyList<Mod>? mods = null, Score? score = null, ScoreProcessor? scoreProcessor = null)
         {
@@ -79,9 +79,9 @@ namespace osu.Game.Screens.Play
         }
 
         /// <summary>
-        /// Applies the score change of a <see cref="JudgementResult"/> to this <see cref="GameplayState"/>.
+        /// Applies the score change of a <see cref="Judgement"/> to this <see cref="GameplayState"/>.
         /// </summary>
-        /// <param name="result">The <see cref="JudgementResult"/> to apply.</param>
-        public void ApplyResult(JudgementResult result) => lastJudgementResult.Value = result;
+        /// <param name="result">The <see cref="Judgement"/> to apply.</param>
+        public void ApplyResult(Judgement result) => lastJudgementResult.Value = result;
     }
 }

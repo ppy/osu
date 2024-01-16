@@ -112,7 +112,7 @@ namespace osu.Game.Rulesets.Mania.Objects
             });
         }
 
-        public override Judgement CreateJudgement() => new IgnoreJudgement();
+        public override JudgementCriteria CreateJudgement() => new IgnoreJudgementCriteria();
 
         protected override HitWindows CreateHitWindows() => HitWindows.Empty;
 

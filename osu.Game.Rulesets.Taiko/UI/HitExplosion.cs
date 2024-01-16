@@ -114,9 +114,9 @@ namespace osu.Game.Rulesets.Taiko.UI
             throw new ArgumentOutOfRangeException(nameof(result), $"Invalid result type: {result}");
         }
 
-        public void VisualiseSecondHit(JudgementResult judgementResult)
+        public void VisualiseSecondHit(Judgement judgement)
         {
-            secondHitTime = judgementResult.TimeAbsolute;
+            secondHitTime = judgement.TimeAbsolute;
             runAnimation();
         }
     }

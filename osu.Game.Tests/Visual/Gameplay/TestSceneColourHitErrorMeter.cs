@@ -23,7 +23,7 @@ namespace osu.Game.Tests.Visual.Gameplay
     {
         private DependencyProvidingContainer dependencyContainer = null!;
 
-        private readonly Bindable<JudgementResult> lastJudgementResult = new Bindable<JudgementResult>();
+        private readonly Bindable<Judgement> lastJudgementResult = new Bindable<Judgement>();
         private ScoreProcessor scoreProcessor = null!;
 
         private int iteration;
@@ -102,10 +102,10 @@ namespace osu.Game.Tests.Visual.Gameplay
 
         private void applyOneJudgement()
         {
-            lastJudgementResult.Value = new OsuJudgementResult(new HitObject
+            lastJudgementResult.Value = new OsuJudgement(new HitObject
             {
                 StartTime = iteration * 10000,
-            }, new OsuJudgement())
+            }, new OsuJudgementCriteria())
             {
                 Type = HitResult.Great,
             };

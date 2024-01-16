@@ -30,7 +30,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
     {
         public new Spinner HitObject => (Spinner)base.HitObject;
 
-        public new OsuSpinnerJudgementResult Result => (OsuSpinnerJudgementResult)base.Result;
+        public new OsuSpinnerJudgement Result => (OsuSpinnerJudgement)base.Result;
 
         public SkinnableDrawable Body { get; private set; }
 
@@ -242,7 +242,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
             }
         }
 
-        protected override JudgementResult CreateResult(Judgement judgement) => new OsuSpinnerJudgementResult(HitObject, judgement);
+        protected override Judgement CreateResult(JudgementCriteria judgementCriteria) => new OsuSpinnerJudgement(HitObject, judgementCriteria);
 
         protected override void CheckForResult(bool userTriggered, double timeOffset)
         {
@@ -267,7 +267,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
                 else if (Progress > .75)
                     r.Type = HitResult.Meh;
                 else if (Time.Current >= HitObject.EndTime)
-                    r.Type = r.Judgement.MinResult;
+                    r.Type = r.JudgementCriteria.MinResult;
             });
         }
 
@@ -313,7 +313,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
             updateBonusScore();
         }
 
-        private static readonly int score_per_tick = new OsuScoreProcessor().GetBaseScoreForResult(new SpinnerBonusTick.OsuSpinnerBonusTickJudgement().MaxResult);
+        private static readonly int score_per_tick = new OsuScoreProcessor().GetBaseScoreForResult(new SpinnerBonusTick.OsuSpinnerBonusTickJudgementCriteria().MaxResult);
 
         private void updateBonusScore()
         {

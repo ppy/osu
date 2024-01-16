@@ -49,7 +49,7 @@ namespace osu.Game.Rulesets.Catch.UI
             ComboCounter?.UpdateCombo(currentCombo);
         }
 
-        public void OnNewResult(DrawableCatchHitObject judgedObject, JudgementResult result)
+        public void OnNewResult(DrawableCatchHitObject judgedObject, Judgement result)
         {
             if (!result.Type.AffectsCombo() || !result.HasResult)
                 return;
@@ -63,7 +63,7 @@ namespace osu.Game.Rulesets.Catch.UI
             updateCombo(result.ComboAtJudgement + 1, judgedObject.AccentColour.Value);
         }
 
-        public void OnRevertResult(JudgementResult result)
+        public void OnRevertResult(Judgement result)
         {
             if (!result.Type.AffectsCombo() || !result.HasResult)
                 return;

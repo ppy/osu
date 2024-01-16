@@ -144,7 +144,7 @@ namespace osu.Game.Tests.Gameplay
             setTime(10); // Decrease health slightly
             assertHealthNotEqualTo(1);
 
-            AddStep("apply hit result", () => processor.ApplyResult(new JudgementResult(beatmap.HitObjects[0], new Judgement()) { Type = HitResult.Perfect }));
+            AddStep("apply hit result", () => processor.ApplyResult(new Judgement(beatmap.HitObjects[0], new JudgementCriteria()) { Type = HitResult.Perfect }));
             assertHealthEqualTo(1);
         }
 
@@ -152,11 +152,11 @@ namespace osu.Game.Tests.Gameplay
         public void TestHealthRemovedOnRevert()
         {
             var beatmap = createBeatmap(0, 1000);
-            JudgementResult result = null;
+            Judgement result = null;
 
             createProcessor(beatmap);
             setTime(10); // Decrease health slightly
-            AddStep("apply hit result", () => processor.ApplyResult(result = new JudgementResult(beatmap.HitObjects[0], new Judgement()) { Type = HitResult.Perfect }));
+            AddStep("apply hit result", () => processor.ApplyResult(result = new Judgement(beatmap.HitObjects[0], new JudgementCriteria()) { Type = HitResult.Perfect }));
 
             AddStep("revert hit result", () => processor.RevertResult(result));
             assertHealthNotEqualTo(1);
@@ -170,9 +170,9 @@ namespace osu.Game.Tests.Gameplay
 
             AddStep("setup fail conditions", () => processor.FailConditions += ((_, result) => result.Type == HitResult.Miss));
 
-            AddStep("apply perfect hit result", () => processor.ApplyResult(new JudgementResult(beatmap.HitObjects[0], new Judgement()) { Type = HitResult.Perfect }));
+            AddStep("apply perfect hit result", () => processor.ApplyResult(new Judgement(beatmap.HitObjects[0], new JudgementCriteria()) { Type = HitResult.Perfect }));
             AddAssert("not failed", () => !processor.HasFailed);
-            AddStep("apply miss hit result", () => processor.ApplyResult(new JudgementResult(beatmap.HitObjects[0], new Judgement()) { Type = HitResult.Miss }));
+            AddStep("apply miss hit result", () => processor.ApplyResult(new Judgement(beatmap.HitObjects[0], new JudgementCriteria()) { Type = HitResult.Miss }));
             AddAssert("failed", () => processor.HasFailed);
         }
 
@@ -189,11 +189,11 @@ namespace osu.Game.Tests.Gameplay
                 processor.FailConditions += ((_, result) => result.Type == HitResult.Meh);
             });
 
-            AddStep("apply perfect hit result", () => processor.ApplyResult(new JudgementResult(beatmap.HitObjects[0], new Judgement()) { Type = HitResult.Perfect }));
+            AddStep("apply perfect hit result", () => processor.ApplyResult(new Judgement(beatmap.HitObjects[0], new JudgementCriteria()) { Type = HitResult.Perfect }));
             AddAssert("not failed", () => !processor.HasFailed);
 
             AddStep($"apply {resultApplied.ToString().ToLowerInvariant()} hit result",
-                () => processor.ApplyResult(new JudgementResult(beatmap.HitObjects[0], new Judgement()) { Type = resultApplied }));
+                () => processor.ApplyResult(new Judgement(beatmap.HitObjects[0], new JudgementCriteria()) { Type = resultApplied }));
             AddAssert("failed", () => processor.HasFailed);
         }
 
@@ -358,14 +358,14 @@ namespace osu.Game.Tests.Gameplay
                 this.maxResult = maxResult;
             }
 
-            public override Judgement CreateJudgement() => new TestJudgement(maxResult);
+            public override JudgementCriteria CreateJudgement() => new TestJudgementCriteria(maxResult);
             protected override HitWindows CreateHitWindows() => new HitWindows();
 
-            private class TestJudgement : Judgement
+            private class TestJudgementCriteria : JudgementCriteria
             {
                 public override HitResult MaxResult { get; }
 
-                public TestJudgement(HitResult maxResult)
+                public TestJudgementCriteria(HitResult maxResult)
                 {
                     MaxResult = maxResult;
                 }

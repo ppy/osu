@@ -41,7 +41,7 @@ namespace osu.Game.Screens.Play.HUD
         private ScheduledDelegate? initialIncrease;
 
         /// <summary>
-        /// Triggered when a <see cref="Judgement"/> is a successful hit, signaling the health display to perform a flash animation (if designed to do so).
+        /// Triggered when a <see cref="JudgementCriteria"/> is a successful hit, signaling the health display to perform a flash animation (if designed to do so).
         /// Calls to this method are debounced.
         /// </summary>
         protected virtual void Flash()
@@ -138,7 +138,7 @@ namespace osu.Game.Screens.Play.HUD
             FinishTransforms(targetMember: $"{Current.GetHashCode()}.{nameof(Current.Value)}");
         }
 
-        private void onNewJudgement(JudgementResult judgement)
+        private void onNewJudgement(Judgement judgement)
         {
             if (judgement.IsHit && judgement.Type != HitResult.IgnoreHit)
                 Scheduler.AddOnce(Flash);

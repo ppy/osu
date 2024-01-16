@@ -76,17 +76,17 @@ namespace osu.Game.Rulesets.Objects.Drawables
         public override bool PropagateNonPositionalInputSubTree => HandleUserInput;
 
         /// <summary>
-        /// Invoked by this or a nested <see cref="DrawableHitObject"/> after a <see cref="JudgementResult"/> has been applied.
+        /// Invoked by this or a nested <see cref="DrawableHitObject"/> after a <see cref="Judgement"/> has been applied.
         /// </summary>
-        public event Action<DrawableHitObject, JudgementResult> OnNewResult;
+        public event Action<DrawableHitObject, Judgement> OnNewResult;
 
         /// <summary>
-        /// Invoked by this or a nested <see cref="DrawableHitObject"/> prior to a <see cref="JudgementResult"/> being reverted.
+        /// Invoked by this or a nested <see cref="DrawableHitObject"/> prior to a <see cref="Judgement"/> being reverted.
         /// </summary>
         /// <remarks>
         /// This is only invoked if this <see cref="DrawableHitObject"/> is alive when the result is reverted.
         /// </remarks>
-        public event Action<DrawableHitObject, JudgementResult> OnRevertResult;
+        public event Action<DrawableHitObject, Judgement> OnRevertResult;
 
         /// <summary>
         /// Invoked when a new nested hit object is created by <see cref="CreateNestedHitObject" />.
@@ -101,7 +101,7 @@ namespace osu.Game.Rulesets.Objects.Drawables
         /// <summary>
         /// The scoring result of this <see cref="DrawableHitObject"/>.
         /// </summary>
-        public JudgementResult Result => Entry?.Result;
+        public Judgement Result => Entry?.Result;
 
         /// <summary>
         /// Whether this <see cref="DrawableHitObject"/> has been hit. This occurs if <see cref="Result"/> is hit.
@@ -396,7 +396,7 @@ namespace osu.Game.Rulesets.Objects.Drawables
 
         private void onSamplesChanged(object sender, NotifyCollectionChangedEventArgs e) => LoadSamples();
 
-        private void onNewResult(DrawableHitObject drawableHitObject, JudgementResult result) => OnNewResult?.Invoke(drawableHitObject, result);
+        private void onNewResult(DrawableHitObject drawableHitObject, Judgement result) => OnNewResult?.Invoke(drawableHitObject, result);
 
         private void onRevertResult()
         {
@@ -404,7 +404,7 @@ namespace osu.Game.Rulesets.Objects.Drawables
             OnRevertResult?.Invoke(this, Result);
         }
 
-        private void onNestedRevertResult(DrawableHitObject drawableHitObject, JudgementResult result) => OnRevertResult?.Invoke(drawableHitObject, result);
+        private void onNestedRevertResult(DrawableHitObject drawableHitObject, Judgement result) => OnRevertResult?.Invoke(drawableHitObject, result);
 
         private void onApplyCustomUpdateState(DrawableHitObject drawableHitObject, ArmedState state) => ApplyCustomUpdateState?.Invoke(drawableHitObject, state);
 
@@ -512,7 +512,7 @@ namespace osu.Game.Rulesets.Objects.Drawables
         /// </summary>
         /// <remarks>
         /// This is called once before every <see cref="UpdateHitStateTransforms"/>. This is to ensure a good state in the case
-        /// the <see cref="JudgementResult.TimeOffset"/> was negative and potentially altered the pre-hit transforms.
+        /// the <see cref="Judgement.TimeOffset"/> was negative and potentially altered the pre-hit transforms.
         /// </remarks>
         protected virtual void UpdateInitialTransforms()
         {
@@ -684,10 +684,10 @@ namespace osu.Game.Rulesets.Objects.Drawables
 
         /// <summary>
         /// Applies the <see cref="Result"/> of this <see cref="DrawableHitObject"/>, notifying responders such as
-        /// the <see cref="ScoreProcessor"/> of the <see cref="JudgementResult"/>.
+        /// the <see cref="ScoreProcessor"/> of the <see cref="Judgement"/>.
         /// </summary>
-        /// <param name="application">The callback that applies changes to the <see cref="JudgementResult"/>.</param>
-        protected void ApplyResult(Action<JudgementResult> application)
+        /// <param name="application">The callback that applies changes to the <see cref="Judgement"/>.</param>
+        protected void ApplyResult(Action<Judgement> application)
         {
             if (Result.HasResult)
                 throw new InvalidOperationException("Cannot apply result on a hitobject that already has a result.");
@@ -695,14 +695,14 @@ namespace osu.Game.Rulesets.Objects.Drawables
             application?.Invoke(Result);
 
             if (!Result.HasResult)
-                throw new InvalidOperationException($"{GetType().ReadableName()} applied a {nameof(JudgementResult)} but did not update {nameof(JudgementResult.Type)}.");
+                throw new InvalidOperationException($"{GetType().ReadableName()} applied a {nameof(Judgement)} but did not update {nameof(Judgement.Type)}.");
 
-            HitResultExtensions.ValidateHitResultPair(Result.Judgement.MaxResult, Result.Judgement.MinResult);
+            HitResultExtensions.ValidateHitResultPair(Result.JudgementCriteria.MaxResult, Result.JudgementCriteria.MinResult);
 
-            if (!Result.Type.IsValidHitResult(Result.Judgement.MinResult, Result.Judgement.MaxResult))
+            if (!Result.Type.IsValidHitResult(Result.JudgementCriteria.MinResult, Result.JudgementCriteria.MaxResult))
             {
                 throw new InvalidOperationException(
-                    $"{GetType().ReadableName()} applied an invalid hit result (was: {Result.Type}, expected: [{Result.Judgement.MinResult} ... {Result.Judgement.MaxResult}]).");
+                    $"{GetType().ReadableName()} applied an invalid hit result (was: {Result.Type}, expected: [{Result.JudgementCriteria.MinResult} ... {Result.JudgementCriteria.MaxResult}]).");
             }
 
             Result.RawTime = Time.Current;
@@ -747,16 +747,16 @@ namespace osu.Game.Rulesets.Objects.Drawables
         }
 
         /// <summary>
-        /// Creates the <see cref="JudgementResult"/> that represents the scoring result for this <see cref="DrawableHitObject"/>.
+        /// Creates the <see cref="Judgement"/> that represents the scoring result for this <see cref="DrawableHitObject"/>.
         /// </summary>
-        /// <param name="judgement">The <see cref="Judgement"/> that provides the scoring information.</param>
-        protected virtual JudgementResult CreateResult(Judgement judgement) => new JudgementResult(HitObject, judgement);
+        /// <param name="judgementCriteria">The <see cref="JudgementCriteria"/> that provides the scoring information.</param>
+        protected virtual Judgement CreateResult(JudgementCriteria judgementCriteria) => new Judgement(HitObject, judgementCriteria);
 
         private void ensureEntryHasResult()
         {
             Debug.Assert(Entry != null);
             Entry.Result ??= CreateResult(HitObject.CreateJudgement())
-                             ?? throw new InvalidOperationException($"{GetType().ReadableName()} must provide a {nameof(JudgementResult)} through {nameof(CreateResult)}.");
+                             ?? throw new InvalidOperationException($"{GetType().ReadableName()} must provide a {nameof(Judgement)} through {nameof(CreateResult)}.");
         }
 
         protected override void Dispose(bool isDisposing)

@@ -147,7 +147,7 @@ namespace osu.Game.Rulesets.Scoring
             }
         }
 
-        protected sealed override double GetHealthIncreaseFor(JudgementResult result) => GetHealthIncreaseFor(result.HitObject, result.Type);
+        protected sealed override double GetHealthIncreaseFor(Judgement result) => GetHealthIncreaseFor(result.HitObject, result.Type);
 
         protected abstract IEnumerable<HitObject> EnumerateTopLevelHitObjects();
 

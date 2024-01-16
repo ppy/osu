@@ -308,21 +308,21 @@ namespace osu.Game.Rulesets.Taiko.UI
 
         #endregion
 
-        internal void OnNewResult(DrawableHitObject judgedObject, JudgementResult result)
+        internal void OnNewResult(DrawableHitObject judgedObject, Judgement result)
         {
             if (!DisplayJudgements.Value)
                 return;
             if (!judgedObject.DisplayResult)
                 return;
 
-            switch (result.Judgement)
+            switch (result.JudgementCriteria)
             {
-                case TaikoStrongJudgement:
+                case TaikoStrongJudgementCriteria:
                     if (result.IsHit)
                         hitExplosionContainer.Children.FirstOrDefault(e => e.JudgedObject == ((DrawableStrongNestedHit)judgedObject).ParentHitObject)?.VisualiseSecondHit(result);
                     break;
 
-                case TaikoDrumRollTickJudgement:
+                case TaikoDrumRollTickJudgementCriteria:
                     if (!result.IsHit)
                         break;
 

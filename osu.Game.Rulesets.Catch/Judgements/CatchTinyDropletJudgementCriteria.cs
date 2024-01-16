@@ -5,8 +5,8 @@ using osu.Game.Rulesets.Scoring;
 
 namespace osu.Game.Rulesets.Catch.Judgements
 {
-    public class CatchDropletJudgement : CatchJudgement
+    public class CatchTinyDropletJudgementCriteria : CatchJudgementCriteria
     {
-        public override HitResult MaxResult => HitResult.LargeTickHit;
+        public override HitResult MaxResult => HitResult.SmallTickHit;
     }
 }

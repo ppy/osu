@@ -35,6 +35,6 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
         /// Apply a judgement result.
         /// </summary>
         /// <param name="hit">Whether this tick was reached.</param>
-        internal void TriggerResult(bool hit) => ApplyResult(r => r.Type = hit ? r.Judgement.MaxResult : r.Judgement.MinResult);
+        internal void TriggerResult(bool hit) => ApplyResult(r => r.Type = hit ? r.JudgementCriteria.MaxResult : r.JudgementCriteria.MinResult);
     }
 }

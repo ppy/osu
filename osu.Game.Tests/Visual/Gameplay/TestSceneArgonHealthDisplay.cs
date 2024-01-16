@@ -150,12 +150,12 @@ namespace osu.Game.Tests.Visual.Gameplay
 
         private void applyMiss()
         {
-            healthProcessor.ApplyResult(new JudgementResult(new HitObject(), new Judgement()) { Type = HitResult.Miss });
+            healthProcessor.ApplyResult(new Judgement(new HitObject(), new JudgementCriteria()) { Type = HitResult.Miss });
         }
 
         private void applyPerfectHit()
         {
-            healthProcessor.ApplyResult(new JudgementResult(new HitCircle(), new OsuJudgement())
+            healthProcessor.ApplyResult(new Judgement(new HitCircle(), new OsuJudgementCriteria())
             {
                 Type = HitResult.Perfect
             });

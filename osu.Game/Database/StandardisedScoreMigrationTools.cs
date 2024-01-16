@@ -65,7 +65,7 @@ namespace osu.Game.Database
             var maximumJudgements = score.MaximumStatistics
                                          .Where(kvp => kvp.Key.AffectsCombo())
                                          .OrderByDescending(kvp => processor.GetBaseScoreForResult(kvp.Key))
-                                         .SelectMany(kvp => Enumerable.Repeat(new FakeJudgement(kvp.Key), kvp.Value))
+                                         .SelectMany(kvp => Enumerable.Repeat(new FakeJudgementCriteria(kvp.Key), kvp.Value))
                                          .ToList();
 
             // Some older scores may not have maximum statistics populated correctly.
@@ -73,7 +73,7 @@ namespace osu.Game.Database
             if (maximumJudgements.Count != sortedHits.Count)
             {
                 maximumJudgements = sortedHits
-                                    .Select(r => new FakeJudgement(getMaxJudgementFor(r, maxRulesetJudgement)))
+                                    .Select(r => new FakeJudgementCriteria(getMaxJudgementFor(r, maxRulesetJudgement)))
                                     .ToList();
             }
 
@@ -99,7 +99,7 @@ namespace osu.Game.Database
                 if (processor.Combo.Value == maxCombo)
                     insertMiss();
 
-                processor.ApplyResult(new JudgementResult(null!, maximumJudgements[maxJudgementIndex++])
+                processor.ApplyResult(new Judgement(null!, maximumJudgements[maxJudgementIndex++])
                 {
                     Type = result
                 });
@@ -114,7 +114,7 @@ namespace osu.Game.Database
                                  .SelectMany(kvp => Enumerable.Repeat(kvp.Key, kvp.Value));
 
             foreach (var result in bonusHits)
-                processor.ApplyResult(new JudgementResult(null!, new FakeJudgement(result)) { Type = result });
+                processor.ApplyResult(new Judgement(null!, new FakeJudgementCriteria(result)) { Type = result });
 
             // Not true for all scores for whatever reason. Oh well.
             // Debug.Assert(processor.HighestCombo.Value == score.MaxCombo);
@@ -125,7 +125,7 @@ namespace osu.Game.Database
             {
                 if (misses.Count > 0)
                 {
-                    processor.ApplyResult(new JudgementResult(null!, maximumJudgements[maxJudgementIndex++])
+                    processor.ApplyResult(new Judgement(null!, maximumJudgements[maxJudgementIndex++])
                     {
                         Type = misses.Dequeue(),
                     });
@@ -134,7 +134,7 @@ namespace osu.Game.Database
                 {
                     // We ran out of misses. But we can't let max combo increase beyond the known value,
                     // so let's forge a miss.
-                    processor.ApplyResult(new JudgementResult(null!, new FakeJudgement(getMaxJudgementFor(HitResult.Miss, maxRulesetJudgement)))
+                    processor.ApplyResult(new Judgement(null!, new FakeJudgementCriteria(getMaxJudgementFor(HitResult.Miss, maxRulesetJudgement)))
                     {
                         Type = HitResult.Miss,
                     });
@@ -631,21 +631,21 @@ namespace osu.Game.Database
 
         private class FakeHit : HitObject
         {
-            private readonly Judgement judgement;
+            private readonly JudgementCriteria judgementCriteria;
 
-            public override Judgement CreateJudgement() => judgement;
+            public override JudgementCriteria CreateJudgement() => judgementCriteria;
 
-            public FakeHit(Judgement judgement)
+            public FakeHit(JudgementCriteria judgementCriteria)
             {
-                this.judgement = judgement;
+                this.judgementCriteria = judgementCriteria;
             }
         }
 
-        private class FakeJudgement : Judgement
+        private class FakeJudgementCriteria : JudgementCriteria
         {
             public override HitResult MaxResult { get; }
 
-            public FakeJudgement(HitResult maxResult)
+            public FakeJudgementCriteria(HitResult maxResult)
             {
                 MaxResult = maxResult;
             }

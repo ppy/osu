@@ -7,7 +7,7 @@ using osu.Game.Rulesets.Taiko.Judgements;
 namespace osu.Game.Rulesets.Taiko.Objects.Drawables
 {
     /// <summary>
-    /// Used as a nested hitobject to provide <see cref="TaikoStrongJudgement"/>s for <see cref="DrawableTaikoStrongableHitObject{TObject,TStrongNestedObject}"/>s.
+    /// Used as a nested hitobject to provide <see cref="TaikoStrongJudgementCriteria"/>s for <see cref="DrawableTaikoStrongableHitObject{TObject,TStrongNestedObject}"/>s.
     /// </summary>
     public abstract partial class DrawableStrongNestedHit : DrawableTaikoHitObject
     {
@@ -27,7 +27,7 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
             // it can happen that the hit window of the nested strong hit extends past the lifetime of the parent object.
             // this is a safety to prevent such cases from causing the nested hit to never be judged and as such prevent gameplay from completing.
             if (!Judged && Time.Current > ParentHitObject?.HitObject.GetEndTime())
-                ApplyResult(r => r.Type = r.Judgement.MinResult);
+                ApplyResult(r => r.Type = r.JudgementCriteria.MinResult);
         }
     }
 }

@@ -24,9 +24,9 @@ namespace osu.Game.Rulesets.Taiko.Scoring
                    + bonusPortion;
         }
 
-        protected override double GetBonusScoreChange(JudgementResult result) => base.GetBonusScoreChange(result) * strongScaleValue(result);
+        protected override double GetBonusScoreChange(Judgement result) => base.GetBonusScoreChange(result) * strongScaleValue(result);
 
-        protected override double GetComboScoreChange(JudgementResult result)
+        protected override double GetComboScoreChange(Judgement result)
         {
             return GetBaseScoreForResult(result.Type)
                    * Math.Min(Math.Max(0.5, Math.Log(result.ComboAfterJudgement, combo_base)), Math.Log(400, combo_base))
@@ -44,7 +44,7 @@ namespace osu.Game.Rulesets.Taiko.Scoring
             return base.GetBaseScoreForResult(result);
         }
 
-        private double strongScaleValue(JudgementResult result)
+        private double strongScaleValue(Judgement result)
         {
             if (result.HitObject is StrongNestedHitObject strong)
                 return strong.Parent is DrumRollTick ? 3 : 7;

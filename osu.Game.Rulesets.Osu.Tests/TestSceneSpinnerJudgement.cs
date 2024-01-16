@@ -24,7 +24,7 @@ namespace osu.Game.Rulesets.Osu.Tests
         private const double time_spinner_start = 2000;
         private const double time_spinner_end = 4000;
 
-        private List<JudgementResult> judgementResults = new List<JudgementResult>();
+        private List<Judgement> judgementResults = new List<Judgement>();
         private ScoreAccessibleReplayPlayer currentPlayer = null!;
 
         [Test]
@@ -32,7 +32,7 @@ namespace osu.Game.Rulesets.Osu.Tests
         {
             performTest(new List<ReplayFrame>());
 
-            AddAssert("all min judgements", () => judgementResults.All(result => result.Type == result.Judgement.MinResult));
+            AddAssert("all min judgements", () => judgementResults.All(result => result.Type == result.JudgementCriteria.MinResult));
         }
 
         [TestCase(1)]
@@ -53,7 +53,7 @@ namespace osu.Game.Rulesets.Osu.Tests
         {
             performTest(generateReplay(20));
 
-            AddAssert("all max judgements", () => judgementResults.All(result => result.Type == result.Judgement.MaxResult));
+            AddAssert("all max judgements", () => judgementResults.All(result => result.Type == result.JudgementCriteria.MaxResult));
         }
 
         private static List<ReplayFrame> generateReplay(int spins) => new SpinFramesGenerator(time_spinner_start)
@@ -93,7 +93,7 @@ namespace osu.Game.Rulesets.Osu.Tests
                 };
 
                 LoadScreen(currentPlayer = p);
-                judgementResults = new List<JudgementResult>();
+                judgementResults = new List<Judgement>();
             });
 
             AddUntilStep("Beatmap at 0", () => Beatmap.Value.Track.CurrentTime == 0);

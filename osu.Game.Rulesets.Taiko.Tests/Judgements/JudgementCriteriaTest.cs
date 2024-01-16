@@ -21,10 +21,10 @@ using osu.Game.Tests.Visual;
 
 namespace osu.Game.Rulesets.Taiko.Tests.Judgements
 {
-    public partial class JudgementTest : RateAdjustedBeatmapTestScene
+    public partial class JudgementCriteriaTest : RateAdjustedBeatmapTestScene
     {
         private ScoreAccessibleReplayPlayer currentPlayer = null!;
-        protected List<JudgementResult> JudgementResults { get; private set; } = null!;
+        protected List<Judgement> JudgementResults { get; private set; } = null!;
 
         protected void AssertJudgementCount(int count)
         {
@@ -56,7 +56,7 @@ namespace osu.Game.Rulesets.Taiko.Tests.Judgements
                 };
 
                 LoadScreen(currentPlayer = p);
-                JudgementResults = new List<JudgementResult>();
+                JudgementResults = new List<Judgement>();
             });
 
             AddUntilStep("Beatmap at 0", () => Beatmap.Value.Track.CurrentTime == 0);

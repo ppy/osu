@@ -23,7 +23,7 @@ namespace osu.Game.Rulesets.Catch.Objects
         /// </summary>
         private const float base_scoring_distance = 100;
 
-        public override Judgement CreateJudgement() => new IgnoreJudgement();
+        public override JudgementCriteria CreateJudgement() => new IgnoreJudgementCriteria();
 
         public int RepeatCount { get; set; }
 

@@ -8,6 +8,6 @@ namespace osu.Game.Rulesets.Osu.Objects
 {
     public class HitCircle : OsuHitObject
     {
-        public override Judgement CreateJudgement() => new OsuJudgement();
+        public override JudgementCriteria CreateJudgement() => new OsuJudgementCriteria();
     }
 }

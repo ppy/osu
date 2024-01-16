@@ -55,7 +55,7 @@ namespace osu.Game.Screens.Play.HUD.HitErrorMeters
             };
         }
 
-        protected override void OnNewJudgement(JudgementResult judgement)
+        protected override void OnNewJudgement(Judgement judgement)
         {
             if (!judgement.Type.IsScorable() || judgement.Type.IsBonus())
                 return;

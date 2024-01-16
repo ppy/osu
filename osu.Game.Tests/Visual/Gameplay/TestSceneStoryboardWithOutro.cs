@@ -38,7 +38,7 @@ namespace osu.Game.Tests.Visual.Gameplay
 
         private bool showResults = true;
 
-        private event Func<HealthProcessor, JudgementResult, bool> currentFailConditions;
+        private event Func<HealthProcessor, Judgement, bool> currentFailConditions;
 
         [SetUpSteps]
         public override void SetUpSteps()
@@ -227,9 +227,9 @@ namespace osu.Game.Tests.Visual.Gameplay
 
             public bool IsScoreShown => !this.IsCurrentScreen() && this.GetChildScreen() is ResultsScreen;
 
-            private event Func<HealthProcessor, JudgementResult, bool> failConditions;
+            private event Func<HealthProcessor, Judgement, bool> failConditions;
 
-            public OutroPlayer(Func<HealthProcessor, JudgementResult, bool> failConditions, bool showResults = true)
+            public OutroPlayer(Func<HealthProcessor, Judgement, bool> failConditions, bool showResults = true)
                 : base(showResults: showResults)
             {
                 this.failConditions = failConditions;

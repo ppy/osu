@@ -20,14 +20,14 @@ namespace osu.Game.Rulesets.Osu.Objects
         {
         }
 
-        public override Judgement CreateJudgement() => ClassicSliderBehaviour ? new LegacyTailJudgement() : new TailJudgement();
+        public override JudgementCriteria CreateJudgement() => ClassicSliderBehaviour ? new LegacyTailJudgementCriteria() : new TailJudgementCriteria();
 
-        public class LegacyTailJudgement : OsuJudgement
+        public class LegacyTailJudgementCriteria : OsuJudgementCriteria
         {
             public override HitResult MaxResult => HitResult.SmallTickHit;
         }
 
-        public class TailJudgement : SliderEndJudgement
+        public class TailJudgementCriteria : SliderEndJudgementCriteria
         {
             public override HitResult MaxResult => HitResult.SliderTailHit;
             public override HitResult MinResult => HitResult.IgnoreMiss;

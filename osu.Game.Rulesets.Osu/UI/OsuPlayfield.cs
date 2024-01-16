@@ -163,7 +163,7 @@ namespace osu.Game.Rulesets.Osu.UI
             FollowPoints.RemoveFollowPoints((OsuHitObject)hitObject);
         }
 
-        private void onNewResult(DrawableHitObject judgedObject, JudgementResult result)
+        private void onNewResult(DrawableHitObject judgedObject, Judgement result)
         {
             // Hitobjects that block future hits should miss previous hitobjects if they're hit out-of-order.
             hitPolicy.HandleHit(judgedObject);

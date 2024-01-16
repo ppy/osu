@@ -14,6 +14,6 @@ namespace osu.Game.Rulesets.Osu.Objects
         /// </summary>
         public bool ClassicSliderBehaviour;
 
-        public override Judgement CreateJudgement() => ClassicSliderBehaviour ? new SliderTickJudgement() : base.CreateJudgement();
+        public override JudgementCriteria CreateJudgement() => ClassicSliderBehaviour ? new SliderTickJudgementCriteria() : base.CreateJudgement();
     }
 }

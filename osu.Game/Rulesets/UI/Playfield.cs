@@ -35,12 +35,12 @@ namespace osu.Game.Rulesets.UI
         /// <summary>
         /// Invoked when a <see cref="DrawableHitObject"/> is judged.
         /// </summary>
-        public event Action<DrawableHitObject, JudgementResult> NewResult;
+        public event Action<DrawableHitObject, Judgement> NewResult;
 
         /// <summary>
         /// Invoked when a judgement result is reverted.
         /// </summary>
-        public event Action<JudgementResult> RevertResult;
+        public event Action<Judgement> RevertResult;
 
         /// <summary>
         /// The <see cref="DrawableHitObject"/> contained in this Playfield.
@@ -471,7 +471,7 @@ namespace osu.Game.Rulesets.UI
 
         #endregion
 
-        private void onNewResult(DrawableHitObject drawable, JudgementResult result)
+        private void onNewResult(DrawableHitObject drawable, Judgement result)
         {
             Debug.Assert(result != null && drawable.Entry?.Result == result && result.RawTime != null);
             judgedEntries.Push(drawable.Entry.AsNonNull());

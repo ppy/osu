@@ -100,12 +100,12 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
         /// <summary>
         /// Causes this <see cref="DrawableOsuHitObject"/> to get hit, disregarding all conditions in implementations of <see cref="DrawableHitObject.CheckForResult"/>.
         /// </summary>
-        public void HitForcefully() => ApplyResult(r => r.Type = r.Judgement.MaxResult);
+        public void HitForcefully() => ApplyResult(r => r.Type = r.JudgementCriteria.MaxResult);
 
         /// <summary>
         /// Causes this <see cref="DrawableOsuHitObject"/> to get missed, disregarding all conditions in implementations of <see cref="DrawableHitObject.CheckForResult"/>.
         /// </summary>
-        public void MissForcefully() => ApplyResult(r => r.Type = r.Judgement.MinResult);
+        public void MissForcefully() => ApplyResult(r => r.Type = r.JudgementCriteria.MinResult);
 
         private RectangleF parentScreenSpaceRectangle => ((DrawableOsuHitObject)ParentHitObject)?.parentScreenSpaceRectangle ?? Parent!.ScreenSpaceDrawQuad.AABBFloat;
 
@@ -115,6 +115,6 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
         /// <param name="drawable">The drawable to calculate its relative position.</param>
         protected float CalculateDrawableRelativePosition(Drawable drawable) => (drawable.ScreenSpaceDrawQuad.Centre.X - parentScreenSpaceRectangle.X) / parentScreenSpaceRectangle.Width;
 
-        protected override JudgementResult CreateResult(Judgement judgement) => new OsuJudgementResult(HitObject, judgement);
+        protected override Judgement CreateResult(JudgementCriteria judgementCriteria) => new OsuJudgement(HitObject, judgementCriteria);
     }
 }

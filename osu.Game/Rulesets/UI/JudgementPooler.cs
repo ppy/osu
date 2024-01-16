@@ -66,7 +66,7 @@ namespace osu.Game.Rulesets.UI
                 var judgement = base.CreateNewDrawable();
 
                 // just a placeholder to initialise the correct drawable hierarchy for this pool.
-                judgement.Apply(new JudgementResult(new HitObject(), new Judgement()) { Type = result }, null);
+                judgement.Apply(new Judgement(new HitObject(), new JudgementCriteria()) { Type = result }, null);
 
                 onLoaded?.Invoke(judgement);
 

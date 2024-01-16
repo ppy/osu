@@ -8,7 +8,7 @@ using osu.Game.Rulesets.Osu.Objects.Drawables;
 
 namespace osu.Game.Rulesets.Osu.Judgements
 {
-    public class OsuSpinnerJudgementResult : OsuJudgementResult
+    public class OsuSpinnerJudgement : OsuJudgement
     {
         /// <summary>
         /// The <see cref="Spinner"/>.
@@ -37,8 +37,8 @@ namespace osu.Game.Rulesets.Osu.Judgements
         /// </summary>
         public double? TimeCompleted;
 
-        public OsuSpinnerJudgementResult(HitObject hitObject, Judgement judgement)
-            : base(hitObject, judgement)
+        public OsuSpinnerJudgement(HitObject hitObject, JudgementCriteria judgementCriteria)
+            : base(hitObject, judgementCriteria)
         {
         }
     }

@@ -194,7 +194,7 @@ namespace osu.Game.Rulesets.Mania.UI
 
         public void Add(BarLine barLine) => base.Add(barLine);
 
-        internal void OnNewResult(DrawableHitObject judgedObject, JudgementResult result)
+        internal void OnNewResult(DrawableHitObject judgedObject, Judgement result)
         {
             if (!judgedObject.DisplayResult || !DisplayJudgements.Value)
                 return;
