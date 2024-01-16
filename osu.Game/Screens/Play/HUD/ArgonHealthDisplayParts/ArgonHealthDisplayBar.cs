@@ -1,8 +1,6 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
 using System;
 using System.Runtime.InteropServices;
 using osu.Framework.Allocation;
@@ -107,6 +105,8 @@ namespace osu.Game.Screens.Play.HUD.ArgonHealthDisplayParts
         {
             protected new ArgonHealthDisplayBar Source => (ArgonHealthDisplayBar)base.Source;
 
+            private IUniformBuffer<ArgonBarPathParameters>? parametersBuffer;
+
             public ArgonBarPathDrawNode(ArgonHealthDisplayBar source)
                 : base(source)
             {
@@ -138,8 +138,6 @@ namespace osu.Game.Screens.Play.HUD.ArgonHealthDisplayParts
 
                 base.Draw(renderer);
             }
-
-            private IUniformBuffer<ArgonBarPathParameters> parametersBuffer;
 
             protected override void BindUniformResources(IShader shader, IRenderer renderer)
             {
