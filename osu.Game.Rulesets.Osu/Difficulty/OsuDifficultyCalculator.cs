@@ -25,6 +25,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
         private const double difficulty_multiplier = 0.0675;
 
         public override int Version => 20220902;
+        public double SumPower => 1.1;
 
         public OsuDifficultyCalculator(IRulesetInfo ruleset, IWorkingBeatmap beatmap)
             : base(ruleset, beatmap)
@@ -65,14 +66,14 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             if (mods.Any(h => h is OsuModFlashlight))
                 baseFlashlightPerformance = Math.Pow(flashlightRating, 2.0) * 25.0;
 
-            double baseReadingPerformance = Math.Pow(5 * Math.Max(1, readingRating / 0.0675) - 4, 3) / 100000;
+            double baseReadingPerformance = Math.Pow(readingRating, 2.0) * 25.0;
 
             double basePerformance =
                 Math.Pow(
-                    Math.Pow(baseAimPerformance, 1.1) +
-                    Math.Pow(baseSpeedPerformance, 1.1) +
-                    Math.Pow(baseFlashlightPerformance, 1.1) +
-                    Math.Pow(baseReadingPerformance, 1.1), 1.0 / 1.1
+                    Math.Pow(baseAimPerformance, SumPower) +
+                    Math.Pow(baseSpeedPerformance, SumPower) +
+                    Math.Pow(baseFlashlightPerformance, SumPower) +
+                    Math.Pow(baseReadingPerformance, SumPower), 1.0 / SumPower
                 );
 
             double starRating = basePerformance > 0.00001

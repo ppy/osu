@@ -119,7 +119,14 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Preprocessing
 
             double totalOverlapnessDifficulty = 0;
 
+            double prevTimeWithoutOverlap = 0;
+            double timeWithoutOverlap = 0;
+
             OsuDifficultyHitObject prevObject = this;
+
+            bool log = false;
+
+            if (log) Console.WriteLine($"Checking for object {hitObject.StartTime}");
 
             foreach (var loopObj in retrieveCurrentVisibleObjects(this))
             {
@@ -130,24 +137,76 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Preprocessing
                 if (loopObj.Angle != null) angleFactor += (-Math.Cos((double)loopObj.Angle) + 1) / 2; // =2 for wide angles, =1 for acute angles
                 instantOverlapness = Math.Min(1, instantOverlapness * angleFactor); // wide angles are more predictable
 
-                totalOverlapnessDifficulty += currentOverlapness * (1 - instantOverlapness); // wide angles will have close-to-zero buff
+                if (log) Console.WriteLine($"Base overlapness - {currentOverlapness}");
 
+                currentOverlapness *= (1 - instantOverlapness) * 2; // wide angles will have close-to-zero buff
+
+                if (log) Console.WriteLine($"Adjusted overlapness - {currentOverlapness}");
+
+                if (currentOverlapness > 0)
+                {
+                    double difference = Math.Min(timeWithoutOverlap, prevTimeWithoutOverlap) / Math.Max(timeWithoutOverlap, prevTimeWithoutOverlap);
+                    if (Math.Max(timeWithoutOverlap, prevTimeWithoutOverlap) == 0) difference = 0;
+
+                    currentOverlapness *= differenceActuation(difference);
+
+                    if (log) Console.WriteLine($"Overlapness [{prevTimeWithoutOverlap} -> {timeWithoutOverlap}], difference {difference}, actuation {differenceActuation(difference)}, result {currentOverlapness}");
+
+                    prevTimeWithoutOverlap = timeWithoutOverlap;
+                    timeWithoutOverlap = 0;
+                }
+
+                else
+                {
+                    timeWithoutOverlap += prevObject.DeltaTime;
+
+                    if (log) Console.WriteLine($"No overlapness, adding {prevObject.DeltaTime}, result {timeWithoutOverlap}");
+                }
+
+                totalOverlapnessDifficulty += currentOverlapness;
                 OverlapObjects.Add(new OverlapObject(loopObj, totalOverlapnessDifficulty));
                 prevObject = loopObj;
+
+                if (log) Console.WriteLine($"Added object with difficulty {totalOverlapnessDifficulty}\n");
             }
+
+            if (log) Console.WriteLine("\n");
+        }
+
+        private static double differenceActuation(double difference)
+        {
+            if (difference < 0.75) return 1.0;
+            if (difference > 0.9) return 0.0;
+
+            return (Math.Cos((difference - 0.75) * Math.PI / 0.15) + 1) / 2; // drops from 1 to 0 as difference increase from 0.75 to 0.9
         }
 
         private static double calculateOverlapness(OsuDifficultyHitObject odho1, OsuDifficultyHitObject odho2)
         {
+            const double area_coef = 0.7;
+
             OsuHitObject o1 = odho1.BaseObject, o2 = odho2.BaseObject;
 
             double distance = Vector2.Distance(o1.StackedPosition, o2.StackedPosition);
+            double radius = o1.Radius;
 
-            if (distance > o1.Radius * 2)
+            double distance_sqr = distance * distance;
+            double radius_sqr = radius * radius;
+
+            if (distance > radius * 2)
                 return 0;
-            if (distance < o1.Radius)
-                return 1;
-            return 1 - Math.Pow((distance - o1.Radius) / o1.Radius, 2);
+
+            double s1 = Math.Acos(distance / (2 * radius)) * radius_sqr; // Area of sector
+            double s2 = distance * Math.Sqrt(radius_sqr - distance_sqr / 4) / 2; // Area of triangle
+
+            double overlappingAreaNormalized = (s1 - s2) * 2 / (Math.PI * radius_sqr);
+
+            const double stack_distance_ratio = 0.1414213562373;
+
+            double perfectStackBuff = (stack_distance_ratio - distance / radius) / stack_distance_ratio; // scale from 0 on normal stack to 1 on perfect stack
+            perfectStackBuff = Math.Max(perfectStackBuff, 0); // can't be negative
+
+            return overlappingAreaNormalized * area_coef + perfectStackBuff * (1 - area_coef);
         }
 
         private static IEnumerable<OsuDifficultyHitObject> retrieveCurrentVisibleObjects(OsuDifficultyHitObject current)
