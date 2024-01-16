@@ -294,6 +294,7 @@ namespace osu.Game.Tests.Visual.Gameplay
             createPlayerTest(createRuleset: () => new OsuRuleset(), createMods: () => new Mod[] { new TaikoModHidden() });
 
             AddUntilStep("wait for token request", () => Player.TokenCreationRequested);
+            AddAssert("gameplay not loaded", () => Player.DrawableRuleset == null);
 
             AddStep("exit", () => Player.Exit());
             AddAssert("ensure no submission", () => Player.SubmittedScore == null);
