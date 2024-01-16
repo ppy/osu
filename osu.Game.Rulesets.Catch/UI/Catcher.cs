@@ -209,9 +209,9 @@ namespace osu.Game.Rulesets.Catch.UI
                    fruit.EffectiveX <= X + halfCatchWidth;
         }
 
-        public void OnNewResult(DrawableCatchHitObject drawableObject, JudgementResult result)
+        public void OnNewResult(DrawableCatchHitObject drawableObject, Judgement result)
         {
-            var catchResult = (CatchJudgementResult)result;
+            var catchResult = (CatchJudgement)result;
             catchResult.CatcherAnimationState = CurrentState;
             catchResult.CatcherHyperDash = HyperDashing;
 
@@ -259,16 +259,16 @@ namespace osu.Game.Rulesets.Catch.UI
 
             if (palpableObject.HitObject.LastInCombo)
             {
-                if (result.Judgement is CatchJudgement catchJudgement && catchJudgement.ShouldExplodeFor(result))
+                if (result.JudgementInfo is CatchJudgementInfo catchJudgement && catchJudgement.ShouldExplodeFor(result))
                     Explode();
                 else
                     Drop();
             }
         }
 
-        public void OnRevertResult(JudgementResult result)
+        public void OnRevertResult(Judgement result)
         {
-            var catchResult = (CatchJudgementResult)result;
+            var catchResult = (CatchJudgement)result;
 
             CurrentState = catchResult.CatcherAnimationState;
 
@@ -398,8 +398,8 @@ namespace osu.Game.Rulesets.Catch.UI
             return position;
         }
 
-        private void addLighting(JudgementResult judgementResult, Color4 colour, float x) =>
-            hitExplosionContainer.Add(new HitExplosionEntry(Time.Current, judgementResult, colour, x));
+        private void addLighting(Judgement judgement, Color4 colour, float x) =>
+            hitExplosionContainer.Add(new HitExplosionEntry(Time.Current, judgement, colour, x));
 
         private CaughtObject? getCaughtObject(PalpableCatchHitObject source)
         {

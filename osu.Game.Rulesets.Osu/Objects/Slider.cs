@@ -275,11 +275,11 @@ namespace osu.Game.Rulesets.Osu.Objects
             TailSamples = this.GetNodeSamples(repeatCount + 1);
         }
 
-        public override Judgement CreateJudgement() => ClassicSliderBehaviour
+        public override JudgementInfo CreateJudgement() => ClassicSliderBehaviour
             // Final combo is provided by the slider itself - see logic in `DrawableSlider.CheckForResult()`
-            ? new OsuJudgement()
+            ? new OsuJudgementInfo()
             // Final combo is provided by the tail circle - see `SliderTailCircle`
-            : new OsuIgnoreJudgement();
+            : new OsuIgnoreJudgementInfo();
 
         protected override HitWindows CreateHitWindows() => HitWindows.Empty;
     }

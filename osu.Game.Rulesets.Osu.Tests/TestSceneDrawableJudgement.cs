@@ -84,10 +84,10 @@ namespace osu.Game.Rulesets.Osu.Tests
                         Children = new Drawable[]
                         {
                             pool,
-                            pool.Get(j => j.Apply(new JudgementResult(new HitObject
+                            pool.Get(j => j.Apply(new Judgement(new HitObject
                             {
                                 StartTime = Time.Current
-                            }, new Judgement())
+                            }, new JudgementInfo())
                             {
                                 Type = result,
                             }, null)).With(j =>

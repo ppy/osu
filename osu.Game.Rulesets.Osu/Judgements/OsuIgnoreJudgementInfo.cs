@@ -3,10 +3,10 @@
 
 using osu.Game.Rulesets.Scoring;
 
-namespace osu.Game.Rulesets.Catch.Judgements
+namespace osu.Game.Rulesets.Osu.Judgements
 {
-    public class CatchDropletJudgement : CatchJudgement
+    public class OsuIgnoreJudgementInfo : OsuJudgementInfo
     {
-        public override HitResult MaxResult => HitResult.LargeTickHit;
+        public override HitResult MaxResult => HitResult.IgnoreHit;
     }
 }

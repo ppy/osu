@@ -2,12 +2,17 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using osu.Game.Rulesets.Judgements;
-using osu.Game.Rulesets.Scoring;
+using osu.Game.Rulesets.Objects;
 
 namespace osu.Game.Rulesets.Osu.Judgements
 {
     public class OsuJudgement : Judgement
     {
-        public override HitResult MaxResult => HitResult.Great;
+        public ComboResult ComboType;
+
+        public OsuJudgement(HitObject hitObject, JudgementInfo judgementInfo)
+            : base(hitObject, judgementInfo)
+        {
+        }
     }
 }

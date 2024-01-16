@@ -92,7 +92,7 @@ namespace osu.Game.Rulesets.Mania.Skinning.Argon
             }
         }
 
-        public void Animate(JudgementResult result)
+        public void Animate(Judgement result)
         {
             this.FadeOutFromOne(PoolableHitExplosion.DURATION, Easing.Out);
         }

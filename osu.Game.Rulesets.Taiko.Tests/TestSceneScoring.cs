@@ -208,9 +208,9 @@ namespace osu.Game.Rulesets.Taiko.Tests
             }
 
             protected override ScoreProcessor CreateScoreProcessor() => new TaikoScoreProcessor();
-            protected override JudgementResult CreatePerfectJudgementResult() => new JudgementResult(new Hit(), new TaikoJudgement()) { Type = HitResult.Great };
-            protected override JudgementResult CreateNonPerfectJudgementResult() => new JudgementResult(new Hit(), new TaikoJudgement()) { Type = HitResult.Ok };
-            protected override JudgementResult CreateMissJudgementResult() => new JudgementResult(new Hit(), new TaikoJudgement()) { Type = HitResult.Miss };
+            protected override Judgement CreatePerfectJudgementResult() => new Judgement(new Hit(), new TaikoJudgementInfo()) { Type = HitResult.Great };
+            protected override Judgement CreateNonPerfectJudgementResult() => new Judgement(new Hit(), new TaikoJudgementInfo()) { Type = HitResult.Ok };
+            protected override Judgement CreateMissJudgementResult() => new Judgement(new Hit(), new TaikoJudgementInfo()) { Type = HitResult.Miss };
         }
     }
 }

@@ -15,7 +15,7 @@ using osu.Game.Rulesets.Taiko.Scoring;
 
 namespace osu.Game.Rulesets.Taiko.Tests.Judgements
 {
-    public partial class TestSceneHitJudgements : JudgementTest
+    public partial class TestSceneHitJudgements : JudgementInfoTest
     {
         [Test]
         public void TestHitCentreHit()

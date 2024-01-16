@@ -12,7 +12,7 @@ namespace osu.Game.Rulesets.Mania.UI
 {
     public partial class DrawableManiaJudgement : DrawableJudgement
     {
-        public DrawableManiaJudgement(JudgementResult result, DrawableHitObject judgedObject)
+        public DrawableManiaJudgement(Judgement result, DrawableHitObject judgedObject)
             : base(result, judgedObject)
         {
         }

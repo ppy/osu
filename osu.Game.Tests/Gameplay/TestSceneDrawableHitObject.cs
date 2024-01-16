@@ -175,7 +175,7 @@ namespace osu.Game.Tests.Gameplay
                 var hitObject = new HitObject { StartTime = Time.Current };
                 lifetimeEntry = new HitObjectLifetimeEntry(hitObject)
                 {
-                    Result = new JudgementResult(hitObject, hitObject.CreateJudgement())
+                    Result = new Judgement(hitObject, hitObject.CreateJudgement())
                     {
                         Type = HitResult.Great
                     }

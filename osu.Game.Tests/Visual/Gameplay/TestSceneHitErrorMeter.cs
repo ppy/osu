@@ -256,7 +256,7 @@ namespace osu.Game.Tests.Visual.Gameplay
 
         private void newJudgement(double offset = 0, HitResult result = HitResult.Perfect)
         {
-            scoreProcessor.ApplyResult(new JudgementResult(new HitCircle { HitWindows = drawableRuleset.HitWindows }, new Judgement())
+            scoreProcessor.ApplyResult(new Judgement(new HitCircle { HitWindows = drawableRuleset.HitWindows }, new JudgementInfo())
             {
                 TimeOffset = offset == 0 ? RNG.Next(-150, 150) : offset,
                 Type = result,
@@ -270,13 +270,13 @@ namespace osu.Game.Tests.Visual.Gameplay
 
             public override IEnumerable<HitObject> Objects => new[] { new HitCircle { HitWindows = HitWindows } };
 
-            public override event Action<JudgementResult> NewResult
+            public override event Action<Judgement> NewResult
             {
                 add => throw new InvalidOperationException($"{nameof(NewResult)} operations not supported in test context");
                 remove => throw new InvalidOperationException($"{nameof(NewResult)} operations not supported in test context");
             }
 
-            public override event Action<JudgementResult> RevertResult
+            public override event Action<Judgement> RevertResult
             {
                 add => throw new InvalidOperationException($"{nameof(RevertResult)} operations not supported in test context");
                 remove => throw new InvalidOperationException($"{nameof(RevertResult)} operations not supported in test context");

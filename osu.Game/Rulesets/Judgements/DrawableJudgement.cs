@@ -18,13 +18,13 @@ using osuTK;
 namespace osu.Game.Rulesets.Judgements
 {
     /// <summary>
-    /// A drawable object which visualises the hit result of a <see cref="Judgements.Judgement"/>.
+    /// A drawable object which visualises the hit result of a <see cref="JudgementInfo"/>.
     /// </summary>
     public partial class DrawableJudgement : PoolableDrawable
     {
         private const float judgement_size = 128;
 
-        public JudgementResult Result { get; private set; }
+        public Judgement Result { get; private set; }
 
         public DrawableHitObject JudgedObject { get; private set; }
 
@@ -38,11 +38,11 @@ namespace osu.Game.Rulesets.Judgements
         public Drawable ProxiedAboveHitObjectsContent => proxiedAboveHitObjectsContent.Value;
 
         /// <summary>
-        /// Creates a drawable which visualises a <see cref="Judgements.Judgement"/>.
+        /// Creates a drawable which visualises a <see cref="JudgementInfo"/>.
         /// </summary>
         /// <param name="result">The judgement to visualise.</param>
         /// <param name="judgedObject">The object which was judged.</param>
-        public DrawableJudgement(JudgementResult result, DrawableHitObject judgedObject)
+        public DrawableJudgement(Judgement result, DrawableHitObject judgedObject)
             : this()
         {
             Apply(result, judgedObject);
@@ -97,7 +97,7 @@ namespace osu.Game.Rulesets.Judgements
         /// </summary>
         /// <param name="result">The applicable judgement.</param>
         /// <param name="judgedObject">The drawable object.</param>
-        public void Apply([NotNull] JudgementResult result, [CanBeNull] DrawableHitObject judgedObject)
+        public void Apply([NotNull] Judgement result, [CanBeNull] DrawableHitObject judgedObject)
         {
             Result = result;
             JudgedObject = judgedObject;

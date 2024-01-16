@@ -28,7 +28,7 @@ namespace osu.Game.Rulesets.Mania.Tests.Skinning
                     AddStep("Show " + result.GetDescription(), () =>
                     {
                         SetContents(_ =>
-                            new DrawableManiaJudgement(new JudgementResult(new HitObject { StartTime = Time.Current }, new Judgement())
+                            new DrawableManiaJudgement(new Judgement(new HitObject { StartTime = Time.Current }, new JudgementInfo())
                             {
                                 Type = result
                             }, null)

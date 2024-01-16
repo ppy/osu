@@ -16,7 +16,7 @@ namespace osu.Game.Rulesets.Taiko.Tests.Mods
     {
         private Func<bool> checkAllMaxResultJudgements(int count) => ()
             => Player.ScoreProcessor.JudgedHits >= count
-               && Player.Results.All(result => result.Type == result.Judgement.MaxResult);
+               && Player.Results.All(result => result.Type == result.JudgementInfo.MaxResult);
 
         [Test]
         public void TestDefaultBeatmapTest() => CreateModTest(new ModTestData

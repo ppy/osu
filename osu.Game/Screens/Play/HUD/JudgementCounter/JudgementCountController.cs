@@ -57,7 +57,7 @@ namespace osu.Game.Screens.Play.HUD.JudgementCounter
             scoreProcessor.JudgementReverted += judgement => updateCount(judgement, true);
         }
 
-        private void updateCount(JudgementResult judgement, bool revert)
+        private void updateCount(Judgement judgement, bool revert)
         {
             if (!results.TryGetValue(judgement.Type, out var count))
                 return;

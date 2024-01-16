@@ -29,7 +29,7 @@ namespace osu.Game.Tests.Visual.Gameplay
 
         protected override Container<Drawable> Content => content;
 
-        private readonly Bindable<JudgementResult> lastJudgementResult = new Bindable<JudgementResult>();
+        private readonly Bindable<Judgement> lastJudgementResult = new Bindable<Judgement>();
 
         private int iteration;
 
@@ -61,10 +61,10 @@ namespace osu.Game.Tests.Visual.Gameplay
 
         private void applyOneJudgement(HitResult result)
         {
-            lastJudgementResult.Value = new OsuJudgementResult(new HitObject
+            lastJudgementResult.Value = new OsuJudgement(new HitObject
             {
                 StartTime = iteration * 10000
-            }, new OsuJudgement())
+            }, new OsuJudgementInfo())
             {
                 Type = result,
             };

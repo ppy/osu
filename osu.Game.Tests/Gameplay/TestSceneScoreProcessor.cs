@@ -32,7 +32,7 @@ namespace osu.Game.Tests.Gameplay
             scoreProcessor.ApplyBeatmap(beatmap);
 
             // Apply a miss judgement
-            scoreProcessor.ApplyResult(new JudgementResult(new HitObject(), new TestJudgement()) { Type = HitResult.Miss });
+            scoreProcessor.ApplyResult(new Judgement(new HitObject(), new TestJudgementInfo()) { Type = HitResult.Miss });
 
             Assert.That(scoreProcessor.TotalScore.Value, Is.EqualTo(0));
         }
@@ -46,7 +46,7 @@ namespace osu.Game.Tests.Gameplay
             scoreProcessor.ApplyBeatmap(beatmap);
 
             // Apply a judgement
-            scoreProcessor.ApplyResult(new JudgementResult(new HitObject(), new TestJudgement(HitResult.LargeBonus)) { Type = HitResult.LargeBonus });
+            scoreProcessor.ApplyResult(new Judgement(new HitObject(), new TestJudgementInfo(HitResult.LargeBonus)) { Type = HitResult.LargeBonus });
 
             Assert.That(scoreProcessor.TotalScore.Value, Is.EqualTo(scoreProcessor.GetBaseScoreForResult(HitResult.LargeBonus)));
         }
@@ -59,7 +59,7 @@ namespace osu.Game.Tests.Gameplay
             var scoreProcessor = new ScoreProcessor(new OsuRuleset());
             scoreProcessor.ApplyBeatmap(beatmap);
 
-            scoreProcessor.ApplyResult(new JudgementResult(beatmap.HitObjects[0], new TestJudgement(HitResult.Great)) { Type = HitResult.Great });
+            scoreProcessor.ApplyResult(new Judgement(beatmap.HitObjects[0], new TestJudgementInfo(HitResult.Great)) { Type = HitResult.Great });
             Assert.That(scoreProcessor.TotalScore.Value, Is.EqualTo(1_000_000));
             Assert.That(scoreProcessor.JudgedHits, Is.EqualTo(1));
             Assert.That(scoreProcessor.Combo.Value, Is.EqualTo(1));
@@ -129,10 +129,10 @@ namespace osu.Game.Tests.Gameplay
             var scoreProcessor = new ScoreProcessor(new OsuRuleset());
             scoreProcessor.ApplyBeatmap(beatmap);
 
-            scoreProcessor.ApplyResult(new JudgementResult(beatmap.HitObjects[0], beatmap.HitObjects[0].CreateJudgement()) { Type = HitResult.Ok });
-            scoreProcessor.ApplyResult(new JudgementResult(beatmap.HitObjects[1], beatmap.HitObjects[1].CreateJudgement()) { Type = HitResult.LargeTickHit });
-            scoreProcessor.ApplyResult(new JudgementResult(beatmap.HitObjects[2], beatmap.HitObjects[2].CreateJudgement()) { Type = HitResult.SmallTickMiss });
-            scoreProcessor.ApplyResult(new JudgementResult(beatmap.HitObjects[3], beatmap.HitObjects[3].CreateJudgement()) { Type = HitResult.SmallBonus });
+            scoreProcessor.ApplyResult(new Judgement(beatmap.HitObjects[0], beatmap.HitObjects[0].CreateJudgement()) { Type = HitResult.Ok });
+            scoreProcessor.ApplyResult(new Judgement(beatmap.HitObjects[1], beatmap.HitObjects[1].CreateJudgement()) { Type = HitResult.LargeTickHit });
+            scoreProcessor.ApplyResult(new Judgement(beatmap.HitObjects[2], beatmap.HitObjects[2].CreateJudgement()) { Type = HitResult.SmallTickMiss });
+            scoreProcessor.ApplyResult(new Judgement(beatmap.HitObjects[3], beatmap.HitObjects[3].CreateJudgement()) { Type = HitResult.SmallBonus });
 
             var score = new ScoreInfo { Ruleset = new OsuRuleset().RulesetInfo };
             scoreProcessor.FailScore(score);
@@ -169,19 +169,19 @@ namespace osu.Game.Tests.Gameplay
             Assert.That(scoreProcessor.MinimumAccuracy.Value, Is.EqualTo(0));
             Assert.That(scoreProcessor.MaximumAccuracy.Value, Is.EqualTo(1));
 
-            scoreProcessor.ApplyResult(new JudgementResult(beatmap.HitObjects[0], beatmap.HitObjects[0].CreateJudgement()) { Type = HitResult.Ok });
-            scoreProcessor.ApplyResult(new JudgementResult(beatmap.HitObjects[1], beatmap.HitObjects[1].CreateJudgement()) { Type = HitResult.Great });
+            scoreProcessor.ApplyResult(new Judgement(beatmap.HitObjects[0], beatmap.HitObjects[0].CreateJudgement()) { Type = HitResult.Ok });
+            scoreProcessor.ApplyResult(new Judgement(beatmap.HitObjects[1], beatmap.HitObjects[1].CreateJudgement()) { Type = HitResult.Great });
 
             Assert.That(scoreProcessor.Accuracy.Value, Is.EqualTo((double)(100 + 300) / (2 * 300)).Within(Precision.DOUBLE_EPSILON));
             Assert.That(scoreProcessor.MinimumAccuracy.Value, Is.EqualTo((double)(100 + 300) / (4 * 300)).Within(Precision.DOUBLE_EPSILON));
             Assert.That(scoreProcessor.MaximumAccuracy.Value, Is.EqualTo((double)(100 + 3 * 300) / (4 * 300)).Within(Precision.DOUBLE_EPSILON));
         }
 
-        private class TestJudgement : Judgement
+        private class TestJudgementInfo : JudgementInfo
         {
             public override HitResult MaxResult { get; }
 
-            public TestJudgement(HitResult maxResult = HitResult.Perfect)
+            public TestJudgementInfo(HitResult maxResult = HitResult.Perfect)
             {
                 MaxResult = maxResult;
             }
@@ -196,7 +196,7 @@ namespace osu.Game.Tests.Gameplay
                 this.maxResult = maxResult;
             }
 
-            public override Judgement CreateJudgement() => new TestJudgement(maxResult);
+            public override JudgementInfo CreateJudgement() => new TestJudgementInfo(maxResult);
         }
     }
 }

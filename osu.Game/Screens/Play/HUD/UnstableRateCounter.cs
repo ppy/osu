@@ -44,7 +44,7 @@ namespace osu.Game.Screens.Play.HUD
                 DrawableCount.FadeTo(e.NewValue ? 1 : alpha_when_invalid, 1000, Easing.OutQuint));
         }
 
-        private bool changesUnstableRate(JudgementResult judgement)
+        private bool changesUnstableRate(Judgement judgement)
             => !(judgement.HitObject.HitWindows is HitWindows.EmptyHitWindows) && judgement.IsHit;
 
         protected override void LoadComplete()
@@ -56,7 +56,7 @@ namespace osu.Game.Screens.Play.HUD
             updateDisplay();
         }
 
-        private void updateDisplay(JudgementResult _) => Scheduler.AddOnce(updateDisplay);
+        private void updateDisplay(Judgement _) => Scheduler.AddOnce(updateDisplay);
 
         private void updateDisplay()
         {

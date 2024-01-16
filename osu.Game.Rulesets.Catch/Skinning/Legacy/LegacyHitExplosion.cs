@@ -72,7 +72,7 @@ namespace osu.Game.Rulesets.Catch.Skinning.Legacy
 
                 if (!(entry.HitObject is Droplet))
                 {
-                    float scale = Math.Clamp(entry.JudgementResult.ComboAtJudgement / 200f, 0.35f, 1.125f);
+                    float scale = Math.Clamp(entry.Judgement.ComboAtJudgement / 200f, 0.35f, 1.125f);
 
                     explosion1.Scale = new Vector2(1, 0.9f);
                     explosion1.Position = new Vector2(explosionOffset, 0);

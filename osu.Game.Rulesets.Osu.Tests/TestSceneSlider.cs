@@ -405,7 +405,7 @@ namespace osu.Game.Rulesets.Osu.Tests
 
         private float judgementOffsetDirection = 1;
 
-        private void onNewResult(DrawableHitObject judgedObject, JudgementResult result)
+        private void onNewResult(DrawableHitObject judgedObject, Judgement result)
         {
             if (!(judgedObject is DrawableOsuHitObject osuObject))
                 return;

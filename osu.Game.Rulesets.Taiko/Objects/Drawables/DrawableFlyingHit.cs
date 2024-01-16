@@ -25,7 +25,7 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
         protected override void LoadComplete()
         {
             base.LoadComplete();
-            ApplyResult(r => r.Type = r.Judgement.MaxResult);
+            ApplyResult(r => r.Type = r.JudgementInfo.MaxResult);
         }
 
         protected override void LoadSamples()

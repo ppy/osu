@@ -28,7 +28,7 @@ namespace osu.Game.Rulesets.Taiko.Tests.Skinning
                 }));
 
             AddToggleStep("Toggle passing", passing => this.ChildrenOfType<LegacyTaikoScroller>().ForEach(s => s.LastResult.Value =
-                new JudgementResult(new HitObject(), new Judgement()) { Type = passing ? HitResult.Great : HitResult.Miss }));
+                new Judgement(new HitObject(), new JudgementInfo()) { Type = passing ? HitResult.Great : HitResult.Miss }));
 
             AddToggleStep("toggle playback direction", reversed => this.reversed = reversed);
         }

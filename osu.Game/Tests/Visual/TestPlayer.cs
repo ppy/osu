@@ -46,7 +46,7 @@ namespace osu.Game.Tests.Visual
 
         public new bool PauseCooldownActive => base.PauseCooldownActive;
 
-        public readonly List<JudgementResult> Results = new List<JudgementResult>();
+        public readonly List<Judgement> Results = new List<Judgement>();
 
         [Resolved]
         private SpectatorClient spectatorClient { get; set; }

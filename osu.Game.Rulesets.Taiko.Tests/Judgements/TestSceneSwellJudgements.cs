@@ -11,7 +11,7 @@ using osu.Game.Rulesets.Taiko.Replays;
 
 namespace osu.Game.Rulesets.Taiko.Tests.Judgements
 {
-    public partial class TestSceneSwellJudgements : JudgementTest
+    public partial class TestSceneSwellJudgements : JudgementInfoTest
     {
         [Test]
         public void TestHitAllSwell()

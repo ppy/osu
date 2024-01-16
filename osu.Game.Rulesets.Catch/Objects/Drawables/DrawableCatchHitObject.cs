@@ -56,14 +56,14 @@ namespace osu.Game.Rulesets.Catch.Objects.Drawables
         [CanBeNull]
         public Func<CatchHitObject, bool> CheckPosition;
 
-        protected override JudgementResult CreateResult(Judgement judgement) => new CatchJudgementResult(HitObject, judgement);
+        protected override Judgement CreateResult(JudgementInfo judgementInfo) => new CatchJudgement(HitObject, judgementInfo);
 
         protected override void CheckForResult(bool userTriggered, double timeOffset)
         {
             if (CheckPosition == null) return;
 
             if (timeOffset >= 0 && Result != null)
-                ApplyResult(r => r.Type = CheckPosition.Invoke(HitObject) ? r.Judgement.MaxResult : r.Judgement.MinResult);
+                ApplyResult(r => r.Type = CheckPosition.Invoke(HitObject) ? r.JudgementInfo.MaxResult : r.JudgementInfo.MinResult);
         }
 
         protected override void UpdateHitStateTransforms(ArmedState state)

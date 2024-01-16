@@ -43,8 +43,8 @@ namespace osu.Game.Rulesets.UI
     public abstract partial class DrawableRuleset<TObject> : DrawableRuleset, IProvideCursor, ICanAttachHUDPieces
         where TObject : HitObject
     {
-        public override event Action<JudgementResult> NewResult;
-        public override event Action<JudgementResult> RevertResult;
+        public override event Action<Judgement> NewResult;
+        public override event Action<Judgement> RevertResult;
 
         /// <summary>
         /// The selected variant.
@@ -414,14 +414,14 @@ namespace osu.Game.Rulesets.UI
     public abstract partial class DrawableRuleset : CompositeDrawable
     {
         /// <summary>
-        /// Invoked when a <see cref="JudgementResult"/> has been applied by a <see cref="DrawableHitObject"/>.
+        /// Invoked when a <see cref="Judgement"/> has been applied by a <see cref="DrawableHitObject"/>.
         /// </summary>
-        public abstract event Action<JudgementResult> NewResult;
+        public abstract event Action<Judgement> NewResult;
 
         /// <summary>
-        /// Invoked when a <see cref="JudgementResult"/> is being reverted by a <see cref="DrawableHitObject"/>.
+        /// Invoked when a <see cref="Judgement"/> is being reverted by a <see cref="DrawableHitObject"/>.
         /// </summary>
-        public abstract event Action<JudgementResult> RevertResult;
+        public abstract event Action<Judgement> RevertResult;
 
         /// <summary>
         /// Whether a replay is currently loaded.

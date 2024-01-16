@@ -144,7 +144,7 @@ namespace osu.Game.Rulesets.Mania.UI
             }
         }
 
-        public void Animate(JudgementResult result)
+        public void Animate(Judgement result)
         {
             // scale roughly in-line with visual appearance of notes
             Vector2 scale = new Vector2(1, 0.6f);

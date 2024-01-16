@@ -3,10 +3,10 @@
 
 using osu.Game.Rulesets.Scoring;
 
-namespace osu.Game.Rulesets.Osu.Judgements
+namespace osu.Game.Rulesets.Judgements
 {
-    public class SliderTickJudgement : OsuJudgement
+    public class IgnoreJudgementInfo : JudgementInfo
     {
-        public override HitResult MaxResult => HitResult.LargeTickHit;
+        public override HitResult MaxResult => HitResult.IgnoreHit;
     }
 }

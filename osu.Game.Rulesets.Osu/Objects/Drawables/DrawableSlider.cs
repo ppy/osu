@@ -310,7 +310,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
             {
                 // If only the nested hitobjects are judged, then the slider's own judgement is ignored for scoring purposes.
                 // But the slider needs to still be judged with a reasonable hit/miss result for visual purposes (hit/miss transforms, etc).
-                ApplyResult(r => r.Type = NestedHitObjects.Any(h => h.Result.IsHit) ? r.Judgement.MaxResult : r.Judgement.MinResult);
+                ApplyResult(r => r.Type = NestedHitObjects.Any(h => h.Result.IsHit) ? r.JudgementInfo.MaxResult : r.JudgementInfo.MinResult);
             }
         }
 
