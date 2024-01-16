@@ -719,7 +719,10 @@ namespace osu.Game.Overlays.Mods
                     ModState? firstMod = columnFlow.Columns.OfType<ModColumn>().FirstOrDefault(m => m.IsPresent)?.AvailableMods.FirstOrDefault(x => x.Visible);
 
                     if (firstMod is not null)
+                    {
                         firstMod.Active.Value = !firstMod.Active.Value;
+                        SearchTextBox.SelectAll();
+                    }
 
                     return true;
                 }

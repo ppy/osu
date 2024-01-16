@@ -244,6 +244,15 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
                 else if (slidingSample.IsPlaying)
                     slidingSample.Stop();
             }
+        }
+
+        protected override void UpdateAfterChildren()
+        {
+            base.UpdateAfterChildren();
+
+            // During slider path editing, the PlaySliderBody is scheduled to refresh once on Update.
+            // It is crucial to perform the code below in UpdateAfterChildren. This ensures that the SliderBody has the opportunity
+            // to update its Size and PathOffset beforehand, ensuring correct placement.
 
             double completionProgress = Math.Clamp((Time.Current - HitObject.StartTime) / HitObject.Duration, 0, 1);
 
