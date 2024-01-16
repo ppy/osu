@@ -15,6 +15,7 @@ using osu.Framework;
 using osu.Framework.Logging;
 using osu.Game.Updater;
 using osu.Desktop.Windows;
+using osu.Game.Configuration;
 using osu.Game.IO;
 using osu.Game.IPC;
 using osu.Game.Online.Multiplayer;
@@ -109,7 +110,7 @@ namespace osu.Desktop
             }
         }
 
-        public override bool RestartAppWhenExited()
+        public override bool Restart()
         {
             switch (RuntimeInfo.OS)
             {
@@ -125,7 +126,10 @@ namespace osu.Desktop
                     return true;
             }
 
-            return base.RestartAppWhenExited();
+            SessionStatics.SetValue(Static.RestartRequested, true);
+            AttemptExit();
+
+            return base.Restart();
         }
 
         protected override void LoadComplete()
