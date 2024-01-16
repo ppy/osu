@@ -255,7 +255,7 @@ namespace osu.Game.Utils
                 }
 
                 if (!found)
-                    return true;
+                    return false;
             }
 
             return true;
