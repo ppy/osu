@@ -106,5 +106,71 @@ namespace osu.Game.Rulesets.Taiko.Tests
                 Assert.That(healthProcessor.HasFailed, Is.True);
             });
         }
+
+        [Test]
+        public void TestDrumRollOnly()
+        {
+            var beatmap = new TaikoBeatmap
+            {
+                HitObjects =
+                {
+                    new DrumRoll { Duration = 2000 }
+                }
+            };
+
+            foreach (var ho in beatmap.HitObjects)
+                ho.ApplyDefaults(beatmap.ControlPointInfo, beatmap.Difficulty);
+
+            var healthProcessor = new TaikoHealthProcessor();
+            healthProcessor.ApplyBeatmap(beatmap);
+
+            foreach (var nested in beatmap.HitObjects[0].NestedHitObjects)
+            {
+                var nestedJudgement = nested.CreateJudgement();
+                healthProcessor.ApplyResult(new JudgementResult(nested, nestedJudgement) { Type = nestedJudgement.MaxResult });
+            }
+
+            var judgement = beatmap.HitObjects[0].CreateJudgement();
+            healthProcessor.ApplyResult(new JudgementResult(beatmap.HitObjects[0], judgement) { Type = judgement.MaxResult });
+
+            Assert.Multiple(() =>
+            {
+                Assert.That(healthProcessor.Health.Value, Is.EqualTo(1));
+                Assert.That(healthProcessor.HasFailed, Is.False);
+            });
+        }
+
+        [Test]
+        public void TestSwellOnly()
+        {
+            var beatmap = new TaikoBeatmap
+            {
+                HitObjects =
+                {
+                    new DrumRoll { Duration = 2000 }
+                }
+            };
+
+            foreach (var ho in beatmap.HitObjects)
+                ho.ApplyDefaults(beatmap.ControlPointInfo, beatmap.Difficulty);
+
+            var healthProcessor = new TaikoHealthProcessor();
+            healthProcessor.ApplyBeatmap(beatmap);
+
+            foreach (var nested in beatmap.HitObjects[0].NestedHitObjects)
+            {
+                var nestedJudgement = nested.CreateJudgement();
+                healthProcessor.ApplyResult(new JudgementResult(nested, nestedJudgement) { Type = nestedJudgement.MaxResult });
+            }
+
+            var judgement = beatmap.HitObjects[0].CreateJudgement();
+            healthProcessor.ApplyResult(new JudgementResult(beatmap.HitObjects[0], judgement) { Type = judgement.MaxResult });
+
+            Assert.Multiple(() =>
+            {
+                Assert.That(healthProcessor.Health.Value, Is.EqualTo(1));
+                Assert.That(healthProcessor.HasFailed, Is.False);
+            });
+        }
     }
 }
