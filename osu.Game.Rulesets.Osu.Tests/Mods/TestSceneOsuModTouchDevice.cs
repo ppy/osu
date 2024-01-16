@@ -73,7 +73,7 @@ namespace osu.Game.Rulesets.Osu.Tests.Mods
         {
             AddStep("set touch input active", () => statics.SetValue(Static.TouchInputActive, true));
             loadPlayer();
-            AddAssert("touch device mod activated", () => currentPlayer.Score.ScoreInfo.Mods, () => Has.One.InstanceOf<OsuModTouchDevice>());
+            AddUntilStep("touch device mod activated", () => currentPlayer.Score.ScoreInfo.Mods, () => Has.One.InstanceOf<OsuModTouchDevice>());
         }
 
         [Test]
