@@ -309,9 +309,23 @@ namespace osu.Game.Overlays.Volume
         private const double max_acceleration = 5;
         private const double acceleration_multiplier = 1.8;
 
+        private const float mouse_drag_divisor = 20;
+
         private ScheduledDelegate accelerationDebounce;
 
         private void resetAcceleration() => accelerationModifier = 1;
+
+        protected override bool OnDragStart(DragStartEvent e)
+        {
+            adjust(-e.Delta.Y / mouse_drag_divisor, true);
+            return true;
+        }
+
+        protected override void OnDrag(DragEvent e)
+        {
+            adjust(-e.Delta.Y / mouse_drag_divisor, true);
+            base.OnDrag(e);
+        }
 
         private void adjust(double delta, bool isPrecise)
         {
