@@ -66,7 +66,7 @@ namespace osu.Game.Rulesets.Scoring
         /// </summary>
         /// <param name="result">The <see cref="JudgementResult"/>.</param>
         /// <returns>The health increase.</returns>
-        protected virtual double GetHealthIncreaseFor(JudgementResult result) => result.Judgement.HealthIncreaseFor(result);
+        protected virtual double GetHealthIncreaseFor(JudgementResult result) => result.HealthIncrease;
 
         /// <summary>
         /// The default conditions for failing.
