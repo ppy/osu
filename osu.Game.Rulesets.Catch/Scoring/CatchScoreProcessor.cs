@@ -71,7 +71,7 @@ namespace osu.Game.Rulesets.Catch.Scoring
             return base.GetBaseScoreForResult(result);
         }
 
-        protected override double GetComboScoreChange(JudgementResult result)
+        protected override double GetComboScoreChange(Judgement result)
         {
             double baseIncrease = 0;
 

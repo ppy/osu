@@ -395,7 +395,7 @@ namespace osu.Game.Screens.Play.HUD.HitErrorMeters
             }
         }
 
-        protected override void OnNewJudgement(JudgementResult judgement)
+        protected override void OnNewJudgement(Judgement judgement)
         {
             const int arrow_move_duration = 800;
 

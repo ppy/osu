@@ -130,7 +130,7 @@ namespace osu.Game.Rulesets.Scoring
             base.ApplyBeatmap(beatmap);
         }
 
-        protected override void ApplyResultInternal(JudgementResult result)
+        protected override void ApplyResultInternal(Judgement result)
         {
             base.ApplyResultInternal(result);
 

@@ -72,7 +72,7 @@ namespace osu.Game.Rulesets.Mods
 
         public ScoreRank AdjustRank(ScoreRank rank, double accuracy) => rank;
 
-        protected override bool FailCondition(HealthProcessor healthProcessor, JudgementResult result) => false;
+        protected override bool FailCondition(HealthProcessor healthProcessor, Judgement result) => false;
 
         public enum AccuracyMode
         {

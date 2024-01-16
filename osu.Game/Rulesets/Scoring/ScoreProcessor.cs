@@ -214,7 +214,7 @@ namespace osu.Game.Rulesets.Scoring
             beatmapApplied = true;
         }
 
-        protected sealed override void ApplyResultInternal(JudgementResult result)
+        protected sealed override void ApplyResultInternal(Judgement result)
         {
             result.ComboAtJudgement = Combo.Value;
             result.HighestComboAtJudgement = HighestCombo.Value;
@@ -231,9 +231,9 @@ namespace osu.Game.Rulesets.Scoring
 
             result.ComboAfterJudgement = Combo.Value;
 
-            if (result.Judgement.MaxResult.AffectsAccuracy())
+            if (result.JudgementInfo.MaxResult.AffectsAccuracy())
             {
-                currentMaximumBaseScore += GetBaseScoreForResult(result.Judgement.MaxResult);
+                currentMaximumBaseScore += GetBaseScoreForResult(result.JudgementInfo.MaxResult);
                 currentAccuracyJudgementCount++;
             }
 
@@ -260,14 +260,14 @@ namespace osu.Game.Rulesets.Scoring
         }
 
         /// <summary>
-        /// Creates the <see cref="HitEvent"/> that describes a <see cref="JudgementResult"/>.
+        /// Creates the <see cref="HitEvent"/> that describes a <see cref="Judgement"/>.
         /// </summary>
-        /// <param name="result">The <see cref="JudgementResult"/> to describe.</param>
+        /// <param name="result">The <see cref="Judgement"/> to describe.</param>
         /// <returns>The <see cref="HitEvent"/>.</returns>
-        protected virtual HitEvent CreateHitEvent(JudgementResult result)
+        protected virtual HitEvent CreateHitEvent(Judgement result)
             => new HitEvent(result.TimeOffset, result.GameplayRate, result.Type, result.HitObject, lastHitObject, null);
 
-        protected sealed override void RevertResultInternal(JudgementResult result)
+        protected sealed override void RevertResultInternal(Judgement result)
         {
             if (!TrackHitEvents)
                 throw new InvalidOperationException(@$"Rewind is not supported when {nameof(TrackHitEvents)} is disabled.");
@@ -280,9 +280,9 @@ namespace osu.Game.Rulesets.Scoring
 
             ScoreResultCounts[result.Type] = ScoreResultCounts.GetValueOrDefault(result.Type) - 1;
 
-            if (result.Judgement.MaxResult.AffectsAccuracy())
+            if (result.JudgementInfo.MaxResult.AffectsAccuracy())
             {
-                currentMaximumBaseScore -= GetBaseScoreForResult(result.Judgement.MaxResult);
+                currentMaximumBaseScore -= GetBaseScoreForResult(result.JudgementInfo.MaxResult);
                 currentAccuracyJudgementCount--;
             }
 
@@ -307,13 +307,13 @@ namespace osu.Game.Rulesets.Scoring
         /// Gets the final score change to be applied to the bonus portion of the score.
         /// </summary>
         /// <param name="result">The judgement result.</param>
-        protected virtual double GetBonusScoreChange(JudgementResult result) => GetBaseScoreForResult(result.Type);
+        protected virtual double GetBonusScoreChange(Judgement result) => GetBaseScoreForResult(result.Type);
 
         /// <summary>
         /// Gets the final score change to be applied to the combo portion of the score.
         /// </summary>
         /// <param name="result">The judgement result.</param>
-        protected virtual double GetComboScoreChange(JudgementResult result) => GetBaseScoreForResult(result.Judgement.MaxResult) * Math.Pow(result.ComboAfterJudgement, COMBO_EXPONENT);
+        protected virtual double GetComboScoreChange(Judgement result) => GetBaseScoreForResult(result.JudgementInfo.MaxResult) * Math.Pow(result.ComboAfterJudgement, COMBO_EXPONENT);
 
         public virtual int GetBaseScoreForResult(HitResult result)
         {
@@ -352,11 +352,11 @@ namespace osu.Game.Rulesets.Scoring
             }
         }
 
-        protected virtual void ApplyScoreChange(JudgementResult result)
+        protected virtual void ApplyScoreChange(Judgement result)
         {
         }
 
-        protected virtual void RemoveScoreChange(JudgementResult result)
+        protected virtual void RemoveScoreChange(Judgement result)
         {
         }
 

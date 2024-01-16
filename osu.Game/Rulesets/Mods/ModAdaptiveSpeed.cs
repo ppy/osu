@@ -213,7 +213,7 @@ namespace osu.Game.Rulesets.Mods
             }
         }
 
-        private bool shouldProcessResult(JudgementResult result)
+        private bool shouldProcessResult(Judgement result)
         {
             if (!result.Type.AffectsAccuracy()) return false;
             if (!precedingEndTimes.ContainsKey(result.HitObject)) return false;
@@ -221,7 +221,7 @@ namespace osu.Game.Rulesets.Mods
             return true;
         }
 
-        private double getRelativeRateChange(JudgementResult result)
+        private double getRelativeRateChange(Judgement result)
         {
             if (!result.IsHit)
                 return rate_change_on_miss;

@@ -41,7 +41,7 @@ namespace osu.Game.Rulesets.Osu.Tests
 
         private const float slider_path_length = 200;
 
-        private readonly List<JudgementResult> judgementResults = new List<JudgementResult>();
+        private readonly List<Judgement> judgementResults = new List<Judgement>();
 
         /// <summary>
         /// If the head circle is hit and the mouse is in range of the follow circle,

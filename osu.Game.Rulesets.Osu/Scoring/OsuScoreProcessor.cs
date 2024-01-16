@@ -14,7 +14,7 @@ namespace osu.Game.Rulesets.Osu.Scoring
         {
         }
 
-        protected override HitEvent CreateHitEvent(JudgementResult result)
-            => base.CreateHitEvent(result).With((result as OsuHitCircleJudgementResult)?.CursorPositionAtHit);
+        protected override HitEvent CreateHitEvent(Judgement result)
+            => base.CreateHitEvent(result).With((result as OsuHitCircleJudgement)?.CursorPositionAtHit);
     }
 }

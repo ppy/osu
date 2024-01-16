@@ -26,7 +26,7 @@ namespace osu.Game.Rulesets.Osu.Tests
     [HeadlessTest]
     public partial class TestSceneSliderFollowCircleInput : RateAdjustedBeatmapTestScene
     {
-        private List<JudgementResult>? judgementResults;
+        private List<Judgement>? judgementResults;
         private ScoreAccessibleReplayPlayer? currentPlayer;
 
         [Test]
@@ -72,7 +72,7 @@ namespace osu.Game.Rulesets.Osu.Tests
             AddAssert("Tracking kept", assertMaxJudge);
         }
 
-        private bool assertMaxJudge() => judgementResults?.Any() == true && judgementResults.All(t => t.Type == t.Judgement.MaxResult);
+        private bool assertMaxJudge() => judgementResults?.Any() == true && judgementResults.All(t => t.Type == t.JudgementInfo.MaxResult);
 
         private void performTest(Beatmap<OsuHitObject> beatmap, List<ReplayFrame> frames)
         {
@@ -91,7 +91,7 @@ namespace osu.Game.Rulesets.Osu.Tests
                 };
 
                 LoadScreen(currentPlayer = p);
-                judgementResults = new List<JudgementResult>();
+                judgementResults = new List<Judgement>();
             });
 
             AddUntilStep("Beatmap at 0", () => Beatmap.Value.Track.CurrentTime == 0);

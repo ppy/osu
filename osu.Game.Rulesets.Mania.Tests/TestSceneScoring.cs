@@ -186,11 +186,11 @@ namespace osu.Game.Rulesets.Mania.Tests
 
             protected override ScoreProcessor CreateScoreProcessor() => new ManiaScoreProcessor();
 
-            protected override JudgementResult CreatePerfectJudgementResult() => new JudgementResult(new Note(), new ManiaJudgement()) { Type = HitResult.Perfect };
+            protected override Judgement CreatePerfectJudgementResult() => new Judgement(new Note(), new ManiaJudgementInfo()) { Type = HitResult.Perfect };
 
-            protected override JudgementResult CreateNonPerfectJudgementResult() => new JudgementResult(new Note(), new ManiaJudgement()) { Type = HitResult.Ok };
+            protected override Judgement CreateNonPerfectJudgementResult() => new Judgement(new Note(), new ManiaJudgementInfo()) { Type = HitResult.Ok };
 
-            protected override JudgementResult CreateMissJudgementResult() => new JudgementResult(new Note(), new ManiaJudgement()) { Type = HitResult.Miss };
+            protected override Judgement CreateMissJudgementResult() => new Judgement(new Note(), new ManiaJudgementInfo()) { Type = HitResult.Miss };
         }
     }
 }

@@ -154,7 +154,7 @@ namespace osu.Game.Rulesets.Mania.UI
             maniaObject.CheckHittable = hitPolicy.IsHittable;
         }
 
-        internal void OnNewResult(DrawableHitObject judgedObject, JudgementResult result)
+        internal void OnNewResult(DrawableHitObject judgedObject, Judgement result)
         {
             if (result.IsHit)
                 hitPolicy.HandleHit(judgedObject);

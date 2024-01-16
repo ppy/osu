@@ -8,7 +8,7 @@ using osuTK;
 
 namespace osu.Game.Rulesets.Osu.Judgements
 {
-    public class OsuHitCircleJudgementResult : OsuJudgementResult
+    public class OsuHitCircleJudgement : OsuJudgement
     {
         /// <summary>
         /// The <see cref="HitCircle"/>.
@@ -20,8 +20,8 @@ namespace osu.Game.Rulesets.Osu.Judgements
         /// </summary>
         public Vector2? CursorPositionAtHit;
 
-        public OsuHitCircleJudgementResult(HitObject hitObject, Judgement judgement)
-            : base(hitObject, judgement)
+        public OsuHitCircleJudgement(HitObject hitObject, JudgementInfo judgementInfo)
+            : base(hitObject, judgementInfo)
         {
         }
     }

@@ -9,16 +9,16 @@ namespace osu.Game.Rulesets.Mania.Mods
 {
     public class ManiaModPerfect : ModPerfect
     {
-        protected override bool FailCondition(HealthProcessor healthProcessor, JudgementResult result)
+        protected override bool FailCondition(HealthProcessor healthProcessor, Judgement result)
         {
-            if (!isRelevantResult(result.Judgement.MinResult) && !isRelevantResult(result.Judgement.MaxResult) && !isRelevantResult(result.Type))
+            if (!isRelevantResult(result.JudgementInfo.MinResult) && !isRelevantResult(result.JudgementInfo.MaxResult) && !isRelevantResult(result.Type))
                 return false;
 
             // Mania allows imperfect "Great" hits without failing.
-            if (result.Judgement.MaxResult == HitResult.Perfect)
+            if (result.JudgementInfo.MaxResult == HitResult.Perfect)
                 return result.Type < HitResult.Great;
 
-            return result.Type != result.Judgement.MaxResult;
+            return result.Type != result.JudgementInfo.MaxResult;
         }
 
         private bool isRelevantResult(HitResult result) => result.AffectsAccuracy() || result.AffectsCombo();

@@ -15,7 +15,7 @@ namespace osu.Game.Rulesets.Mania.UI
     {
         public const double DURATION = 200;
 
-        public JudgementResult Result { get; private set; }
+        public Judgement Result { get; private set; }
 
         private SkinnableDrawable skinnableExplosion;
 
@@ -33,7 +33,7 @@ namespace osu.Game.Rulesets.Mania.UI
             };
         }
 
-        public void Apply(JudgementResult result)
+        public void Apply(Judgement result)
         {
             Result = result;
         }

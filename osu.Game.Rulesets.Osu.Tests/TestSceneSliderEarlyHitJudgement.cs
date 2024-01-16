@@ -37,7 +37,7 @@ namespace osu.Game.Rulesets.Osu.Tests
 
         private const float slider_path_length = 200;
 
-        private readonly List<JudgementResult> judgementResults = new List<JudgementResult>();
+        private readonly List<Judgement> judgementResults = new List<Judgement>();
 
         [Test]
         public void TestHitEarlyMoveIntoFollowRegion()

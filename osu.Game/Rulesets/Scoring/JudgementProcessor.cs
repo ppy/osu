@@ -19,12 +19,12 @@ namespace osu.Game.Rulesets.Scoring
         /// <summary>
         /// Invoked when a new judgement has occurred. This occurs after the judgement has been processed by this <see cref="JudgementProcessor"/>.
         /// </summary>
-        public event Action<JudgementResult>? NewJudgement;
+        public event Action<Judgement>? NewJudgement;
 
         /// <summary>
         /// Invoked when a judgement is reverted, usually due to rewinding gameplay.
         /// </summary>
-        public event Action<JudgementResult>? JudgementReverted;
+        public event Action<Judgement>? JudgementReverted;
 
         /// <summary>
         /// The maximum number of hits that can be judged.
@@ -41,12 +41,12 @@ namespace osu.Game.Rulesets.Scoring
         /// </summary>
         public int JudgedHits { get; private set; }
 
-        private JudgementResult? lastAppliedResult;
+        private Judgement? lastAppliedResult;
 
         private readonly BindableBool hasCompleted = new BindableBool();
 
         /// <summary>
-        /// Whether all <see cref="Judgement"/>s have been processed.
+        /// Whether all <see cref="JudgementInfo"/>s have been processed.
         /// </summary>
         public IBindable<bool> HasCompleted => hasCompleted;
 
@@ -62,10 +62,10 @@ namespace osu.Game.Rulesets.Scoring
         }
 
         /// <summary>
-        /// Applies the score change of a <see cref="JudgementResult"/> to this <see cref="ScoreProcessor"/>.
+        /// Applies the score change of a <see cref="Judgement"/> to this <see cref="ScoreProcessor"/>.
         /// </summary>
-        /// <param name="result">The <see cref="JudgementResult"/> to apply.</param>
-        public void ApplyResult(JudgementResult result)
+        /// <param name="result">The <see cref="Judgement"/> to apply.</param>
+        public void ApplyResult(Judgement result)
         {
 #pragma warning disable CS0618
             if (result.Type == HitResult.LegacyComboIncrease)
@@ -81,10 +81,10 @@ namespace osu.Game.Rulesets.Scoring
         }
 
         /// <summary>
-        /// Reverts the score change of a <see cref="JudgementResult"/> that was applied to this <see cref="ScoreProcessor"/>.
+        /// Reverts the score change of a <see cref="Judgement"/> that was applied to this <see cref="ScoreProcessor"/>.
         /// </summary>
         /// <param name="result">The judgement scoring result.</param>
-        public void RevertResult(JudgementResult result)
+        public void RevertResult(Judgement result)
         {
             JudgedHits--;
 
@@ -94,19 +94,19 @@ namespace osu.Game.Rulesets.Scoring
         }
 
         /// <summary>
-        /// Applies the score change of a <see cref="JudgementResult"/> to this <see cref="ScoreProcessor"/>.
+        /// Applies the score change of a <see cref="Judgement"/> to this <see cref="ScoreProcessor"/>.
         /// </summary>
         /// <remarks>
         /// Any changes applied via this method can be reverted via <see cref="RevertResultInternal"/>.
         /// </remarks>
-        /// <param name="result">The <see cref="JudgementResult"/> to apply.</param>
-        protected abstract void ApplyResultInternal(JudgementResult result);
+        /// <param name="result">The <see cref="Judgement"/> to apply.</param>
+        protected abstract void ApplyResultInternal(Judgement result);
 
         /// <summary>
-        /// Reverts the score change of a <see cref="JudgementResult"/> that was applied to this <see cref="ScoreProcessor"/> via <see cref="ApplyResultInternal"/>.
+        /// Reverts the score change of a <see cref="Judgement"/> that was applied to this <see cref="ScoreProcessor"/> via <see cref="ApplyResultInternal"/>.
         /// </summary>
         /// <param name="result">The judgement scoring result.</param>
-        protected abstract void RevertResultInternal(JudgementResult result);
+        protected abstract void RevertResultInternal(Judgement result);
 
         /// <summary>
         /// Resets this <see cref="JudgementProcessor"/> to a default state.
@@ -153,7 +153,7 @@ namespace osu.Game.Rulesets.Scoring
 
                 var result = CreateResult(obj, judgement);
                 if (result == null)
-                    throw new InvalidOperationException($"{GetType().ReadableName()} must provide a {nameof(JudgementResult)} through {nameof(CreateResult)}.");
+                    throw new InvalidOperationException($"{GetType().ReadableName()} must provide a {nameof(Judgement)} through {nameof(CreateResult)}.");
 
                 result.Type = GetSimulatedHitResult(judgement);
                 ApplyResult(result);
@@ -186,18 +186,18 @@ namespace osu.Game.Rulesets.Scoring
         }
 
         /// <summary>
-        /// Creates the <see cref="JudgementResult"/> that represents the scoring result for a <see cref="HitObject"/>.
+        /// Creates the <see cref="Judgement"/> that represents the scoring result for a <see cref="HitObject"/>.
         /// </summary>
         /// <param name="hitObject">The <see cref="HitObject"/> which was judged.</param>
-        /// <param name="judgement">The <see cref="Judgement"/> that provides the scoring information.</param>
-        protected virtual JudgementResult CreateResult(HitObject hitObject, Judgement judgement) => new JudgementResult(hitObject, judgement);
+        /// <param name="judgementInfo">The <see cref="JudgementInfo"/> that provides the scoring information.</param>
+        protected virtual Judgement CreateResult(HitObject hitObject, JudgementInfo judgementInfo) => new Judgement(hitObject, judgementInfo);
 
         /// <summary>
         /// Gets a simulated <see cref="HitResult"/> for a judgement. Used during <see cref="SimulateAutoplay"/> to simulate a "perfect" play.
         /// </summary>
-        /// <param name="judgement">The judgement to simulate a <see cref="HitResult"/> for.</param>
+        /// <param name="judgementInfo">The judgement to simulate a <see cref="HitResult"/> for.</param>
         /// <returns>The simulated <see cref="HitResult"/> for the judgement.</returns>
-        protected virtual HitResult GetSimulatedHitResult(Judgement judgement) => judgement.MaxResult;
+        protected virtual HitResult GetSimulatedHitResult(JudgementInfo judgementInfo) => judgementInfo.MaxResult;
 
         protected override void Update()
         {

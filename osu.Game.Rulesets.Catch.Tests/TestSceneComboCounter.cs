@@ -74,11 +74,11 @@ namespace osu.Game.Rulesets.Catch.Tests
             AddRepeatStep("perform hit", () => performJudgement(HitResult.Great), 5);
         }
 
-        private void performJudgement(HitResult type, Judgement? judgement = null)
+        private void performJudgement(HitResult type, JudgementInfo? judgement = null)
         {
             var judgedObject = new DrawableFruit(new Fruit()) { AccentColour = { Value = judgedObjectColour } };
 
-            var result = new JudgementResult(judgedObject.HitObject, judgement ?? new Judgement()) { Type = type };
+            var result = new Judgement(judgedObject.HitObject, judgement ?? new JudgementInfo()) { Type = type };
             scoreProcessor.ApplyResult(result);
 
             foreach (var counter in CreatedDrawables.Cast<CatchComboDisplay>())

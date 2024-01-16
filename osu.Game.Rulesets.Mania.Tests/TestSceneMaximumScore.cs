@@ -23,7 +23,7 @@ namespace osu.Game.Rulesets.Mania.Tests
     {
         private ScoreAccessibleReplayPlayer currentPlayer = null!;
 
-        private List<JudgementResult> judgementResults = new List<JudgementResult>();
+        private List<Judgement> judgementResults = new List<Judgement>();
 
         [Test]
         public void TestSimultaneousTickAndNote()
@@ -53,7 +53,7 @@ namespace osu.Game.Rulesets.Mania.Tests
 
             AddAssert("all objects perfectly judged",
                 () => judgementResults.Select(result => result.Type),
-                () => Is.EquivalentTo(judgementResults.Select(result => result.Judgement.MaxResult)));
+                () => Is.EquivalentTo(judgementResults.Select(result => result.JudgementInfo.MaxResult)));
             AddAssert("score is correct", () => currentPlayer.ScoreProcessor.TotalScore.Value, () => Is.EqualTo(1_000_000));
         }
 
@@ -86,7 +86,7 @@ namespace osu.Game.Rulesets.Mania.Tests
 
             AddAssert("all objects perfectly judged",
                 () => judgementResults.Select(result => result.Type),
-                () => Is.EquivalentTo(judgementResults.Select(result => result.Judgement.MaxResult)));
+                () => Is.EquivalentTo(judgementResults.Select(result => result.JudgementInfo.MaxResult)));
             AddAssert("score is correct", () => currentPlayer.ScoreProcessor.TotalScore.Value, () => Is.EqualTo(1_000_000));
         }
 
@@ -119,7 +119,7 @@ namespace osu.Game.Rulesets.Mania.Tests
                 };
 
                 LoadScreen(currentPlayer = p);
-                judgementResults = new List<JudgementResult>();
+                judgementResults = new List<Judgement>();
             });
 
             AddUntilStep("Beatmap at 0", () => Beatmap.Value.Track.CurrentTime == 0);

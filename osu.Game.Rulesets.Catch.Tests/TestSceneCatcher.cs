@@ -60,8 +60,8 @@ namespace osu.Game.Rulesets.Catch.Tests
         [Test]
         public void TestCatcherHyperStateReverted()
         {
-            JudgementResult result1 = null;
-            JudgementResult result2 = null;
+            Judgement result1 = null;
+            Judgement result2 = null;
             AddStep("catch hyper fruit", () =>
             {
                 result1 = attemptCatch(new Fruit { HyperDashTarget = new Fruit { X = 100 } });
@@ -85,7 +85,7 @@ namespace osu.Game.Rulesets.Catch.Tests
         [Test]
         public void TestCatcherAnimationStateReverted()
         {
-            JudgementResult result = null;
+            Judgement result = null;
             AddStep("catch kiai fruit", () =>
             {
                 result = attemptCatch(new TestKiaiFruit());
@@ -271,7 +271,7 @@ namespace osu.Game.Rulesets.Catch.Tests
                 attemptCatch(hitObject());
         }
 
-        private JudgementResult attemptCatch(CatchHitObject hitObject)
+        private Judgement attemptCatch(CatchHitObject hitObject)
         {
             hitObject.ApplyDefaults(new ControlPointInfo(), new BeatmapDifficulty());
             var drawableObject = createDrawableObject(hitObject);
@@ -280,7 +280,7 @@ namespace osu.Game.Rulesets.Catch.Tests
             return result;
         }
 
-        private void applyResult(DrawableCatchHitObject drawableObject, JudgementResult result)
+        private void applyResult(DrawableCatchHitObject drawableObject, Judgement result)
         {
             // Load DHO to set colour of hit explosion correctly
             Add(drawableObject);
@@ -291,9 +291,9 @@ namespace osu.Game.Rulesets.Catch.Tests
             };
         }
 
-        private JudgementResult createResult(CatchHitObject hitObject)
+        private Judgement createResult(CatchHitObject hitObject)
         {
-            return new CatchJudgementResult(hitObject, hitObject.CreateJudgement())
+            return new CatchJudgement(hitObject, hitObject.CreateJudgement())
             {
                 Type = catcher.CanCatch(hitObject) ? HitResult.Great : HitResult.Miss
             };

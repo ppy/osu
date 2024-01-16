@@ -66,7 +66,7 @@ namespace osu.Game.Rulesets.Mania.Skinning.Legacy
                 explosion.Anchor = direction.NewValue == ScrollingDirection.Up ? Anchor.TopCentre : Anchor.BottomCentre;
         }
 
-        public void Animate(JudgementResult result)
+        public void Animate(Judgement result)
         {
             (explosion as IFramedAnimation)?.GotoFrame(0);
 

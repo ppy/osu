@@ -82,13 +82,13 @@ namespace osu.Game.Tests.NonVisual
             public List<HitObject> HitObjects;
             public override IEnumerable<HitObject> Objects => HitObjects;
 
-            public override event Action<JudgementResult> NewResult
+            public override event Action<Judgement> NewResult
             {
                 add => throw new InvalidOperationException($"{nameof(NewResult)} operations not supported in test context");
                 remove => throw new InvalidOperationException($"{nameof(NewResult)} operations not supported in test context");
             }
 
-            public override event Action<JudgementResult> RevertResult
+            public override event Action<Judgement> RevertResult
             {
                 add => throw new InvalidOperationException($"{nameof(RevertResult)} operations not supported in test context");
                 remove => throw new InvalidOperationException($"{nameof(RevertResult)} operations not supported in test context");

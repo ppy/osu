@@ -38,7 +38,7 @@ namespace osu.Game.Rulesets.Mania.Tests
         private const double time_tail = 4000;
         private const double time_after_tail = 5250;
 
-        private List<JudgementResult> judgementResults = new List<JudgementResult>();
+        private List<Judgement> judgementResults = new List<Judgement>();
 
         /// <summary>
         ///     -----[           ]-----
@@ -562,7 +562,7 @@ namespace osu.Game.Rulesets.Mania.Tests
                 };
 
                 LoadScreen(currentPlayer = p);
-                judgementResults = new List<JudgementResult>();
+                judgementResults = new List<Judgement>();
             });
 
             AddUntilStep("Beatmap at 0", () => Beatmap.Value.Track.CurrentTime == 0);

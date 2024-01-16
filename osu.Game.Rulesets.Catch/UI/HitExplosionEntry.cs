@@ -13,12 +13,12 @@ namespace osu.Game.Rulesets.Catch.UI
         /// <summary>
         /// The judgement result that triggered this explosion.
         /// </summary>
-        public JudgementResult JudgementResult { get; }
+        public Judgement Judgement { get; }
 
         /// <summary>
         /// The hitobject which triggered this explosion.
         /// </summary>
-        public CatchHitObject HitObject => (CatchHitObject)JudgementResult.HitObject;
+        public CatchHitObject HitObject => (CatchHitObject)Judgement.HitObject;
 
         /// <summary>
         /// The accent colour of the object caught.
@@ -30,11 +30,11 @@ namespace osu.Game.Rulesets.Catch.UI
         /// </summary>
         public float Position { get; }
 
-        public HitExplosionEntry(double startTime, JudgementResult judgementResult, Color4 objectColour, float position)
+        public HitExplosionEntry(double startTime, Judgement judgement, Color4 objectColour, float position)
         {
             LifetimeStart = startTime;
             Position = position;
-            JudgementResult = judgementResult;
+            Judgement = judgement;
             ObjectColour = objectColour;
         }
     }

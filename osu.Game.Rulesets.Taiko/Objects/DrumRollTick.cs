@@ -32,7 +32,7 @@ namespace osu.Game.Rulesets.Taiko.Objects
             Parent = parent;
         }
 
-        public override Judgement CreateJudgement() => new TaikoDrumRollTickJudgement();
+        public override JudgementInfo CreateJudgement() => new TaikoDrumRollTickJudgementInfo();
 
         protected override HitWindows CreateHitWindows() => HitWindows.Empty;
 

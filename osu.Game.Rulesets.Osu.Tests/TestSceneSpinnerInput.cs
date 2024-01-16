@@ -34,7 +34,7 @@ namespace osu.Game.Rulesets.Osu.Tests
         private const double time_spinner_start = 1500;
         private const double time_spinner_end = 8000;
 
-        private readonly List<JudgementResult> judgementResults = new List<JudgementResult>();
+        private readonly List<Judgement> judgementResults = new List<Judgement>();
 
         private ScoreAccessibleReplayPlayer currentPlayer = null!;
         private ManualClock? manualClock;

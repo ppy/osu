@@ -14,13 +14,13 @@ namespace osu.Game.Rulesets.Osu.Objects
         /// </summary>
         public double SpinnerDuration { get; set; }
 
-        public override Judgement CreateJudgement() => new OsuSpinnerTickJudgement();
+        public override JudgementInfo CreateJudgement() => new OsuSpinnerTickJudgementInfo();
 
         protected override HitWindows CreateHitWindows() => HitWindows.Empty;
 
         public override double MaximumJudgementOffset => SpinnerDuration;
 
-        public class OsuSpinnerTickJudgement : OsuJudgement
+        public class OsuSpinnerTickJudgementInfo : OsuJudgementInfo
         {
             public override HitResult MaxResult => HitResult.SmallBonus;
         }

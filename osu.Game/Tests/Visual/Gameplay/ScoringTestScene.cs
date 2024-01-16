@@ -337,9 +337,9 @@ namespace osu.Game.Tests.Visual.Gameplay
         protected abstract class ProcessorBasedScoringAlgorithm : IScoringAlgorithm
         {
             protected abstract ScoreProcessor CreateScoreProcessor();
-            protected abstract JudgementResult CreatePerfectJudgementResult();
-            protected abstract JudgementResult CreateNonPerfectJudgementResult();
-            protected abstract JudgementResult CreateMissJudgementResult();
+            protected abstract Judgement CreatePerfectJudgementResult();
+            protected abstract Judgement CreateNonPerfectJudgementResult();
+            protected abstract Judgement CreateMissJudgementResult();
 
             private readonly ScoreProcessor scoreProcessor;
             private readonly ScoringMode mode;

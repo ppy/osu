@@ -56,7 +56,7 @@ namespace osu.Game.Screens.Play.HUD
 
         private readonly CancellationTokenSource loadCancellationSource = new CancellationTokenSource();
 
-        private JudgementResult lastJudgement;
+        private Judgement lastJudgement;
         private PerformanceCalculator performanceCalculator;
         private ScoreInfo scoreInfo;
 
@@ -121,7 +121,7 @@ namespace osu.Game.Screens.Play.HUD
             }
         }
 
-        private void onJudgementChanged(JudgementResult judgement)
+        private void onJudgementChanged(Judgement judgement)
         {
             lastJudgement = judgement;
 
@@ -139,7 +139,7 @@ namespace osu.Game.Screens.Play.HUD
         }
 
         [CanBeNull]
-        private DifficultyAttributes getAttributeAtTime(JudgementResult judgement)
+        private DifficultyAttributes getAttributeAtTime(Judgement judgement)
         {
             if (timedAttributes == null || timedAttributes.Count == 0)
                 return null;

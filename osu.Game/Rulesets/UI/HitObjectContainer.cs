@@ -26,7 +26,7 @@ namespace osu.Game.Rulesets.UI
         /// <summary>
         /// Invoked when a <see cref="DrawableHitObject"/> is judged.
         /// </summary>
-        public event Action<DrawableHitObject, JudgementResult> NewResult;
+        public event Action<DrawableHitObject, Judgement> NewResult;
 
         /// <summary>
         /// Invoked when a <see cref="HitObject"/> becomes used by a <see cref="DrawableHitObject"/>.
@@ -146,7 +146,7 @@ namespace osu.Game.Rulesets.UI
 
         #endregion
 
-        private void onNewResult(DrawableHitObject d, JudgementResult r) => NewResult?.Invoke(d, r);
+        private void onNewResult(DrawableHitObject d, Judgement r) => NewResult?.Invoke(d, r);
 
         #region Comparator + StartTime tracking
 

@@ -135,7 +135,7 @@ namespace osu.Game.Rulesets.Mania.Tests
         }
 
         private ScoreAccessibleReplayPlayer currentPlayer;
-        private List<JudgementResult> judgementResults;
+        private List<Judgement> judgementResults;
 
         private void performTest(List<ManiaHitObject> hitObjects, List<ReplayFrame> frames)
         {
@@ -163,7 +163,7 @@ namespace osu.Game.Rulesets.Mania.Tests
                 };
 
                 LoadScreen(currentPlayer = p);
-                judgementResults = new List<JudgementResult>();
+                judgementResults = new List<Judgement>();
             });
 
             AddUntilStep("Beatmap at 0", () => Beatmap.Value.Track.CurrentTime == 0);

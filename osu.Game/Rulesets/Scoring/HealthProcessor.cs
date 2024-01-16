@@ -19,7 +19,7 @@ namespace osu.Game.Rulesets.Scoring
         /// <summary>
         /// Additional conditions on top of <see cref="DefaultFailCondition"/> that cause a failing state.
         /// </summary>
-        public event Func<HealthProcessor, JudgementResult, bool>? FailConditions;
+        public event Func<HealthProcessor, Judgement, bool>? FailConditions;
 
         /// <summary>
         /// The current health.
@@ -40,7 +40,7 @@ namespace osu.Game.Rulesets.Scoring
                 HasFailed = true;
         }
 
-        protected override void ApplyResultInternal(JudgementResult result)
+        protected override void ApplyResultInternal(Judgement result)
         {
             result.HealthAtJudgement = Health.Value;
             result.FailedAtJudgement = HasFailed;
@@ -54,7 +54,7 @@ namespace osu.Game.Rulesets.Scoring
                 TriggerFailure();
         }
 
-        protected override void RevertResultInternal(JudgementResult result)
+        protected override void RevertResultInternal(Judgement result)
         {
             Health.Value = result.HealthAtJudgement;
 
@@ -62,11 +62,11 @@ namespace osu.Game.Rulesets.Scoring
         }
 
         /// <summary>
-        /// Retrieves the health increase for a <see cref="JudgementResult"/>.
+        /// Retrieves the health increase for a <see cref="Judgement"/>.
         /// </summary>
-        /// <param name="result">The <see cref="JudgementResult"/>.</param>
+        /// <param name="result">The <see cref="Judgement"/>.</param>
         /// <returns>The health increase.</returns>
-        protected virtual double GetHealthIncreaseFor(JudgementResult result) => result.Judgement.HealthIncreaseFor(result);
+        protected virtual double GetHealthIncreaseFor(Judgement result) => result.JudgementInfo.HealthIncreaseFor(result);
 
         /// <summary>
         /// The default conditions for failing.
@@ -77,7 +77,7 @@ namespace osu.Game.Rulesets.Scoring
         /// Whether the current state of <see cref="HealthProcessor"/> or the provided <paramref name="result"/> meets any fail condition.
         /// </summary>
         /// <param name="result">The judgement result.</param>
-        private bool meetsAnyFailCondition(JudgementResult result)
+        private bool meetsAnyFailCondition(Judgement result)
         {
             if (DefaultFailCondition)
                 return true;

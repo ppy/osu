@@ -79,7 +79,7 @@ namespace osu.Game.Rulesets.Osu.Mods
             {
             }
 
-            public override Judgement CreateJudgement() => new OsuJudgement();
+            public override JudgementInfo CreateJudgement() => new OsuJudgementInfo();
         }
 
         private partial class StrictTrackingDrawableSliderTail : DrawableSliderTail

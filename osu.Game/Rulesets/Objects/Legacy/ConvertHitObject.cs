@@ -16,7 +16,7 @@ namespace osu.Game.Rulesets.Objects.Legacy
 
         public int ComboOffset { get; set; }
 
-        public override Judgement CreateJudgement() => new IgnoreJudgement();
+        public override JudgementInfo CreateJudgement() => new IgnoreJudgementInfo();
 
         protected override HitWindows CreateHitWindows() => HitWindows.Empty;
     }

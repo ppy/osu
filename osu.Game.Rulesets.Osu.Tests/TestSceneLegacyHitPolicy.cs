@@ -723,7 +723,7 @@ namespace osu.Game.Rulesets.Osu.Tests
             => AddAssert($"input #{inputIndex} resulted in {action}", () => testPolicy.ClickActions[inputIndex], () => Is.EqualTo(action));
 
         private ScoreAccessibleReplayPlayer currentPlayer = null!;
-        private List<JudgementResult> judgementResults = null!;
+        private List<Judgement> judgementResults = null!;
         private TestLegacyHitPolicy testPolicy = null!;
 
         private void performTest(List<OsuHitObject> hitObjects, List<ReplayFrame> frames, IEnumerable<Mod>? extraMods = null, [CallerMemberName] string testCaseName = "")
@@ -830,7 +830,7 @@ namespace osu.Game.Rulesets.Osu.Tests
                 };
 
                 LoadScreen(currentPlayer = p);
-                judgementResults = new List<JudgementResult>();
+                judgementResults = new List<Judgement>();
             });
 
             AddUntilStep("Beatmap at 0", () => Beatmap.Value.Track.CurrentTime == 0);

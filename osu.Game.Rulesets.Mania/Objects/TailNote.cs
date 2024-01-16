@@ -18,7 +18,7 @@ namespace osu.Game.Rulesets.Mania.Objects
         /// </summary>
         public const double RELEASE_WINDOW_LENIENCE = 1.5;
 
-        public override Judgement CreateJudgement() => new ManiaJudgement();
+        public override JudgementInfo CreateJudgement() => new ManiaJudgementInfo();
 
         public override double MaximumJudgementOffset => base.MaximumJudgementOffset * RELEASE_WINDOW_LENIENCE;
     }
