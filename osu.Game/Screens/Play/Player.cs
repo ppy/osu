@@ -461,12 +461,6 @@ namespace osu.Game.Screens.Play
                         OnRetry = () => Restart(),
                         OnQuit = () => PerformExit(true),
                     },
-                    new GameplayOffsetControl
-                    {
-                        Margin = new MarginPadding(20),
-                        Anchor = Anchor.CentreRight,
-                        Origin = Anchor.CentreRight,
-                    }
                 },
             };
 

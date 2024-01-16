@@ -21,7 +21,9 @@ using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Input.Bindings;
+using osu.Game.Localisation;
 using osu.Game.Online.API;
+using osu.Game.Online.Placeholders;
 using osu.Game.Scoring;
 using osu.Game.Screens.Play;
 using osu.Game.Screens.Ranking.Statistics;
@@ -245,6 +247,12 @@ namespace osu.Game.Screens.Ranking
                 addScore(s);
 
             lastFetchCompleted = true;
+
+            if (ScorePanelList.IsEmpty)
+            {
+                // This can happen if for example a beatmap that is part of a playlist hasn't been played yet.
+                VerticalScrollContent.Add(new MessagePlaceholder(LeaderboardStrings.NoRecordsYet));
+            }
         });
 
         public override void OnEntering(ScreenTransitionEvent e)
