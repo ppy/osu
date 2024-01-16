@@ -1,8 +1,6 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
 using System.Runtime.InteropServices;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
@@ -29,6 +27,8 @@ namespace osu.Game.Screens.Play.HUD.ArgonHealthDisplayParts
         {
             protected new ArgonHealthDisplayBackground Source => (ArgonHealthDisplayBackground)base.Source;
 
+            private IUniformBuffer<ArgonBarPathBackgroundParameters>? parametersBuffer;
+
             public ArgonBarPathDrawNode(ArgonHealthDisplayBackground source)
                 : base(source)
             {
@@ -39,21 +39,15 @@ namespace osu.Game.Screens.Play.HUD.ArgonHealthDisplayParts
             public override void ApplyState()
             {
                 base.ApplyState();
-
                 size = Source.DrawSize;
             }
-
-            private IUniformBuffer<ArgonBarPathBackgroundParameters> parametersBuffer;
 
             protected override void BindUniformResources(IShader shader, IRenderer renderer)
             {
                 base.BindUniformResources(shader, renderer);
 
                 parametersBuffer ??= renderer.CreateUniformBuffer<ArgonBarPathBackgroundParameters>();
-                parametersBuffer.Data = new ArgonBarPathBackgroundParameters
-                {
-                    Size = size
-                };
+                parametersBuffer.Data = new ArgonBarPathBackgroundParameters { Size = size };
 
                 shader.BindUniformBlock("m_ArgonBarPathBackgroundParameters", parametersBuffer);
             }
