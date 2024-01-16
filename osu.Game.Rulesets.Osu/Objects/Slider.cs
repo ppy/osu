@@ -98,7 +98,7 @@ namespace osu.Game.Rulesets.Osu.Objects
             set
             {
                 repeatCount = value;
-                updateNestedPositions();
+                endPositionCache.Invalidate();
             }
         }
 
@@ -165,7 +165,7 @@ namespace osu.Game.Rulesets.Osu.Objects
         public Slider()
         {
             SamplesBindable.CollectionChanged += (_, _) => UpdateNestedSamples();
-            Path.Version.ValueChanged += _ => updateNestedPositions();
+            Path.Version.ValueChanged += _ => endPositionCache.Invalidate();
         }
 
         protected override void ApplyDefaultsToSelf(ControlPointInfo controlPointInfo, IBeatmapDifficultyInfo difficulty)

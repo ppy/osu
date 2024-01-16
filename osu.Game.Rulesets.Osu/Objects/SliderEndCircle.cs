@@ -14,16 +14,16 @@ namespace osu.Game.Rulesets.Osu.Objects
     /// </summary>
     public abstract class SliderEndCircle : HitCircle
     {
-        private readonly Slider slider;
+        protected readonly Slider Slider;
 
         protected SliderEndCircle(Slider slider)
         {
-            this.slider = slider;
+            Slider = slider;
         }
 
         public int RepeatIndex { get; set; }
 
-        public double SpanDuration => slider.SpanDuration;
+        public double SpanDuration => Slider.SpanDuration;
 
         protected override void ApplyDefaultsToSelf(ControlPointInfo controlPointInfo, IBeatmapDifficultyInfo difficulty)
         {
@@ -40,7 +40,7 @@ namespace osu.Game.Rulesets.Osu.Objects
             else
             {
                 // The first end circle should fade in with the slider.
-                TimePreempt += StartTime - slider.StartTime;
+                TimePreempt += StartTime - Slider.StartTime;
             }
         }
 
