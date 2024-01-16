@@ -51,7 +51,6 @@ namespace osu.Game.Rulesets.Osu.Tests.Mods
         public void TestUserAlreadyHasTouchDeviceActive()
         {
             loadPlayer();
-            // it is presumed that a previous screen (i.e. song select) will set this up
             AddStep("set up touchscreen user", () =>
             {
                 currentPlayer.Score.ScoreInfo.Mods = currentPlayer.Score.ScoreInfo.Mods.Append(new OsuModTouchDevice()).ToArray();
@@ -66,6 +65,14 @@ namespace osu.Game.Rulesets.Osu.Tests.Mods
                 InputManager.BeginTouch(touch);
                 InputManager.EndTouch(touch);
             });
+            AddAssert("touch device mod activated", () => currentPlayer.Score.ScoreInfo.Mods, () => Has.One.InstanceOf<OsuModTouchDevice>());
+        }
+
+        [Test]
+        public void TestTouchActivePriorToPlayerLoad()
+        {
+            AddStep("set touch input active", () => statics.SetValue(Static.TouchInputActive, true));
+            loadPlayer();
             AddAssert("touch device mod activated", () => currentPlayer.Score.ScoreInfo.Mods, () => Has.One.InstanceOf<OsuModTouchDevice>());
         }
 
