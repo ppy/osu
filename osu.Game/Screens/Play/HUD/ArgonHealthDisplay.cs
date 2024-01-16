@@ -136,7 +136,12 @@ namespace osu.Game.Screens.Play.HUD
             BarHeight.BindValueChanged(_ => updateContentSize(), true);
         }
 
-        private void onNewJudgement(JudgementResult result) => pendingMissAnimation |= !result.IsHit;
+        private void onNewJudgement(JudgementResult result)
+        {
+            // Check the health increase because cases like osu!catch bananas fire `IgnoreMiss`,
+            // which counts as a miss but doesn't actually subtract any health.
+            pendingMissAnimation |= !result.IsHit && result.HealthIncrease < 0;
+        }
 
         protected override void Update()
         {
