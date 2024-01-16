@@ -164,7 +164,8 @@ namespace osu.Game.Online.Leaderboards
                                         {
                                             Anchor = Anchor.BottomLeft,
                                             Origin = Anchor.BottomLeft,
-                                            AutoSizeAxes = Axes.Both,
+                                            AutoSizeAxes = Axes.X,
+                                            Height = 28,
                                             Direction = FillDirection.Horizontal,
                                             Spacing = new Vector2(10f, 0f),
                                             Children = new Drawable[]
