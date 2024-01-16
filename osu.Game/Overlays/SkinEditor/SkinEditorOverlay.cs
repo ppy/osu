@@ -136,10 +136,15 @@ namespace osu.Game.Overlays.SkinEditor
             globallyReenableBeatmapSkinSetting();
         }
 
-        public void PresentGameplay()
+        public void PresentGameplay() => presentGameplay(false);
+
+        private void presentGameplay(bool attemptedBeatmapSwitch)
         {
             performer?.PerformFromScreen(screen =>
             {
+                if (State.Value != Visibility.Visible)
+                    return;
+
                 if (beatmap.Value is DummyWorkingBeatmap)
                 {
                     // presume we don't have anything good to play and just bail.
@@ -149,8 +154,12 @@ namespace osu.Game.Overlays.SkinEditor
                 // If we're playing the intro, switch away to another beatmap.
                 if (beatmap.Value.BeatmapSetInfo.Protected)
                 {
-                    music.NextTrack();
-                    Schedule(PresentGameplay);
+                    if (!attemptedBeatmapSwitch)
+                    {
+                        music.NextTrack();
+                        Schedule(() => presentGameplay(true));
+                    }
+
                     return;
                 }
 
