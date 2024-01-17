@@ -7,6 +7,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Input.Bindings;
 using osu.Framework.Input.Events;
@@ -50,18 +51,19 @@ namespace osu.Game.Screens.Play
             this.createScore = createScore;
         }
 
-        protected override void LoadComplete()
+        [BackgroundDependencyLoader]
+        private void load()
         {
-            base.LoadComplete();
-
-            if (HUDOverlay != null)
+            var playbackSettings = new PlaybackSettings
             {
-                var playerSettingsOverlay = new PlaybackSettings { Expanded = { Value = false } };
-                HUDOverlay.PlayerSettingsOverlay.Add(playerSettingsOverlay);
+                Depth = float.MaxValue,
+                Expanded = { Value = false }
+            };
 
-                if (GameplayClockContainer is MasterGameplayClockContainer master)
-                    playerSettingsOverlay.UserPlaybackRate.BindTarget = master.UserPlaybackRate;
-            }
+            if (GameplayClockContainer is MasterGameplayClockContainer master)
+                playbackSettings.UserPlaybackRate.BindTo(master.UserPlaybackRate);
+
+            HUDOverlay.PlayerSettingsOverlay.Insert(-1, playbackSettings);
         }
 
         protected override void PrepareReplay()
