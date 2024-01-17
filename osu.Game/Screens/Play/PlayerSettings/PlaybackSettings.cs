@@ -22,9 +22,9 @@ namespace osu.Game.Screens.Play.PlayerSettings
 
         public readonly Bindable<double> UserPlaybackRate = new BindableDouble(1)
         {
-            MinValue = 0.5,
+            MinValue = 0.05,
             MaxValue = 2,
-            Precision = 0.1,
+            Precision = 0.01,
         };
 
         private readonly PlayerSliderBar<double> rateSlider;
@@ -149,7 +149,7 @@ namespace osu.Game.Screens.Play.PlayerSettings
         protected override void LoadComplete()
         {
             base.LoadComplete();
-            rateSlider.Current.BindValueChanged(multiplier => multiplierText.Text = $"{multiplier.NewValue:0.0}x", true);
+            rateSlider.Current.BindValueChanged(multiplier => multiplierText.Text = $"{multiplier.NewValue:0.00}x", true);
 
             if (gameplayClock != null)
                 isPaused.BindTarget = gameplayClock.IsPaused;
