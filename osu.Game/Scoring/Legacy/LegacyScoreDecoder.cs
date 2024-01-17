@@ -4,6 +4,7 @@
 #nullable disable
 
 using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
@@ -19,6 +20,7 @@ using osu.Game.Replays.Legacy;
 using osu.Game.Rulesets;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Replays;
+using osu.Game.Rulesets.Scoring;
 using SharpCompress.Compressors.LZMA;
 
 namespace osu.Game.Scoring.Legacy
@@ -130,6 +132,8 @@ namespace osu.Game.Scoring.Legacy
                 }
             }
 
+            PopulateMaximumStatistics(score.ScoreInfo, workingBeatmap);
+
             if (score.ScoreInfo.IsLegacyScore || compressedScoreInfo == null)
                 PopulateLegacyAccuracyAndRank(score.ScoreInfo);
             else
@@ -168,6 +172,70 @@ namespace osu.Game.Scoring.Legacy
                 using (var reader = new StreamReader(lzma))
                     readFunc(reader);
             }
+        }
+
+        /// <summary>
+        /// Populates the <see cref="ScoreInfo.MaximumStatistics"/> for a given <see cref="ScoreInfo"/>.
+        /// </summary>
+        /// <param name="score">The score to populate the statistics of.</param>
+        /// <param name="workingBeatmap">The corresponding <see cref="WorkingBeatmap"/>.</param>
+        internal static void PopulateMaximumStatistics(ScoreInfo score, WorkingBeatmap workingBeatmap)
+        {
+            Debug.Assert(score.BeatmapInfo != null);
+
+            if (score.MaximumStatistics.Select(kvp => kvp.Value).Sum() > 0)
+                return;
+
+            var ruleset = score.Ruleset.Detach();
+            var rulesetInstance = ruleset.CreateInstance();
+            var scoreProcessor = rulesetInstance.CreateScoreProcessor();
+
+            Debug.Assert(rulesetInstance != null);
+
+            // Populate the maximum statistics.
+            HitResult maxBasicResult = rulesetInstance.GetHitResults()
+                                                      .Select(h => h.result)
+                                                      .Where(h => h.IsBasic()).MaxBy(scoreProcessor.GetBaseScoreForResult);
+
+            foreach ((HitResult result, int count) in score.Statistics)
+            {
+                switch (result)
+                {
+                    case HitResult.LargeTickHit:
+                    case HitResult.LargeTickMiss:
+                        score.MaximumStatistics[HitResult.LargeTickHit] = score.MaximumStatistics.GetValueOrDefault(HitResult.LargeTickHit) + count;
+                        break;
+
+                    case HitResult.SmallTickHit:
+                    case HitResult.SmallTickMiss:
+                        score.MaximumStatistics[HitResult.SmallTickHit] = score.MaximumStatistics.GetValueOrDefault(HitResult.SmallTickHit) + count;
+                        break;
+
+                    case HitResult.IgnoreHit:
+                    case HitResult.IgnoreMiss:
+                    case HitResult.SmallBonus:
+                    case HitResult.LargeBonus:
+                        break;
+
+                    default:
+                        score.MaximumStatistics[maxBasicResult] = score.MaximumStatistics.GetValueOrDefault(maxBasicResult) + count;
+                        break;
+                }
+            }
+
+            if (!score.IsLegacyScore)
+                return;
+
+#pragma warning disable CS0618
+            // In osu! and osu!mania, some judgements affect combo but aren't stored to scores.
+            // A special hit result is used to pad out the combo value to match, based on the max combo from the difficulty attributes.
+            var calculator = rulesetInstance.CreateDifficultyCalculator(workingBeatmap);
+            var attributes = calculator.Calculate(score.Mods);
+
+            int maxComboFromStatistics = score.MaximumStatistics.Where(kvp => kvp.Key.AffectsCombo()).Select(kvp => kvp.Value).DefaultIfEmpty(0).Sum();
+            if (attributes.MaxCombo > maxComboFromStatistics)
+                score.MaximumStatistics[HitResult.LegacyComboIncrease] = attributes.MaxCombo - maxComboFromStatistics;
+#pragma warning restore CS0618
         }
 
         /// <summary>
