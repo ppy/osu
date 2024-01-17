@@ -2,6 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
+using NUnit.Framework;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Game.Rulesets.Osu.Objects;
@@ -163,7 +164,10 @@ namespace osu.Game.Rulesets.Osu.Skinning.Legacy
                         return null;
 
                     case OsuSkinComponents.ApproachCircle:
-                        return new LegacyApproachCircle();
+                        if (IsProvidingLegacyResources)
+                            return new LegacyApproachCircle();
+
+                        return null;
 
                     default:
                         throw new UnsupportedSkinComponentException(lookup);
