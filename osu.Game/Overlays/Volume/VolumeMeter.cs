@@ -313,7 +313,7 @@ namespace osu.Game.Overlays.Volume
 
         private void resetAcceleration() => accelerationModifier = 1;
 
-        private float dragDelta = 0;
+        private float dragDelta;
 
         protected override bool OnDragStart(DragStartEvent e)
         {
