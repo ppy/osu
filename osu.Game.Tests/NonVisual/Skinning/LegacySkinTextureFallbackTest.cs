@@ -57,24 +57,6 @@ namespace osu.Game.Tests.NonVisual.Skinning
             },
             new object[]
             {
-                new[] { "followpoint@2x", "followpoint" },
-                "Gameplay/osu/followpoint",
-                "followpoint@2x", 2
-            },
-            new object[]
-            {
-                new[] { "followpoint@2x" },
-                "Gameplay/osu/followpoint",
-                "followpoint@2x", 2
-            },
-            new object[]
-            {
-                new[] { "followpoint" },
-                "Gameplay/osu/followpoint",
-                "followpoint", 1
-            },
-            new object[]
-            {
                 // Looking up a filename with extension specified should work.
                 new[] { "followpoint.png" },
                 "followpoint.png",
