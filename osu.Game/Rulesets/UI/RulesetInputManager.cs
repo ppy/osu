@@ -167,7 +167,6 @@ namespace osu.Game.Rulesets.UI
             var triggers = KeyBindingContainer.DefaultKeyBindings
                                               .Select(b => b.GetAction<T>())
                                               .Distinct()
-                                              .OrderBy(action => action)
                                               .Select(action => new KeyCounterActionTrigger<T>(action))
                                               .ToArray();
 
