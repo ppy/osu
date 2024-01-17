@@ -95,6 +95,11 @@ namespace osu.Game.Rulesets.Judgements
         public bool IsHit => Type.IsHit();
 
         /// <summary>
+        /// The increase in health resulting from this judgement result.
+        /// </summary>
+        public double HealthIncrease => Judgement.HealthIncreaseFor(this);
+
+        /// <summary>
         /// Creates a new <see cref="JudgementResult"/>.
         /// </summary>
         /// <param name="hitObject">The <see cref="HitObject"/> which was judged.</param>

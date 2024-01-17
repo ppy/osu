@@ -241,8 +241,9 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
 
             // update local mods based on room's reported status for the local user (omitting the base call implementation).
             // this makes the server authoritative, and avoids the local user potentially setting mods that the server is not aware of (ie. if the match was started during the selection being changed).
-            var ruleset = Ruleset.Value.CreateInstance();
-            Mods.Value = client.LocalUser.Mods.Select(m => m.ToMod(ruleset)).Concat(SelectedItem.Value.RequiredMods.Select(m => m.ToMod(ruleset))).ToList();
+            var rulesetInstance = Rulesets.GetRuleset(SelectedItem.Value.RulesetID)?.CreateInstance();
+            Debug.Assert(rulesetInstance != null);
+            Mods.Value = client.LocalUser.Mods.Select(m => m.ToMod(rulesetInstance)).Concat(SelectedItem.Value.RequiredMods.Select(m => m.ToMod(rulesetInstance))).ToList();
         }
 
         [Resolved(canBeNull: true)]

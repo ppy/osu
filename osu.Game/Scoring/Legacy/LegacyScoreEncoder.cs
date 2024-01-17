@@ -13,6 +13,7 @@ using osu.Game.Extensions;
 using osu.Game.IO.Legacy;
 using osu.Game.IO.Serialization;
 using osu.Game.Replays.Legacy;
+using osu.Game.Rulesets.Objects.Legacy;
 using osu.Game.Rulesets.Replays;
 using osu.Game.Rulesets.Replays.Types;
 using SharpCompress.Compressors.LZMA;
@@ -38,9 +39,13 @@ namespace osu.Game.Scoring.Legacy
         /// <item><description>30000009: Fix edge cases in conversion for scores which have 0.0x mod multiplier on stable. Reconvert all scores.</description></item>
         /// <item><description>30000010: Fix mania score V1 conversion using score V1 accuracy rather than V2 accuracy. Reconvert all scores.</description></item>
         /// <item><description>30000011: Re-do catch scoring to mirror stable Score V2 as closely as feasible. Reconvert all scores.</description></item>
+        /// <item><description>
+        /// 30000012: Fix incorrect total score conversion on selected beatmaps after implementing the more correct
+        /// <see cref="LegacyRulesetExtensions.CalculateDifficultyPeppyStars"/> method. Reconvert all scores.
+        /// </description></item>
         /// </list>
         /// </remarks>
-        public const int LATEST_VERSION = 30000011;
+        public const int LATEST_VERSION = 30000012;
 
         /// <summary>
         /// The first stable-compatible YYYYMMDD format version given to lazer usage of replays.
