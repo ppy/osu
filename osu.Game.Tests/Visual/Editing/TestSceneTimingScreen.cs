@@ -180,7 +180,7 @@ namespace osu.Game.Tests.Visual.Editing
         }
 
         [Test]
-        public void TestEditThenClickAway()
+        public void TestEditThenClickAwayAppliesChanges()
         {
             AddStep("Add two control points", () =>
             {
