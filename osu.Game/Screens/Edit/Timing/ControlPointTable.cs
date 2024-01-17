@@ -44,11 +44,12 @@ namespace osu.Game.Screens.Edit.Timing
                 {
                     BackgroundFlow.Add(new RowBackground(group)
                     {
-                        Action = () =>
+                        // schedule to give time for any modified focused text box to lose focus and commit changes (e.g. BPM / time signature textboxes) before switching to new point.
+                        Action = () => Schedule(() =>
                         {
                             SetSelectedRow(group);
                             clock.SeekSmoothlyTo(group.Time);
-                        }
+                        })
                     });
                 }
 
