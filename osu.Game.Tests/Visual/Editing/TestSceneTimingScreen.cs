@@ -202,7 +202,7 @@ namespace osu.Game.Tests.Visual.Editing
                 InputManager.MoveMouseTo(timeSignatureTextBox);
                 InputManager.Click(MouseButton.Left);
 
-                Debug.Assert(!timeSignatureTextBox.Current.Value.Equals("1"));
+                Debug.Assert(!timeSignatureTextBox.Current.Value.Equals("1", StringComparison.Ordinal));
                 timeSignatureTextBox.Current.Value = "1";
             });
 
