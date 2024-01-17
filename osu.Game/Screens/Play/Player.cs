@@ -38,6 +38,7 @@ using osu.Game.Screens.Play.HUD;
 using osu.Game.Screens.Ranking;
 using osu.Game.Skinning;
 using osu.Game.Users;
+using osu.Game.Utils;
 using osuTK.Graphics;
 
 namespace osu.Game.Screens.Play
@@ -212,6 +213,12 @@ namespace osu.Game.Screens.Play
 
             if (playableBeatmap == null)
                 return;
+
+            if (!ModUtils.CheckModsBelongToRuleset(ruleset, gameplayMods))
+            {
+                Logger.Log($@"Gameplay was started with a mod belonging to a ruleset different than '{ruleset.Description}'.", level: LogLevel.Important);
+                return;
+            }
 
             mouseWheelDisabled = config.GetBindable<bool>(OsuSetting.MouseDisableWheel);
 
@@ -461,12 +468,6 @@ namespace osu.Game.Screens.Play
                         OnRetry = () => Restart(),
                         OnQuit = () => PerformExit(true),
                     },
-                    new GameplayOffsetControl
-                    {
-                        Margin = new MarginPadding(20),
-                        Anchor = Anchor.CentreRight,
-                        Origin = Anchor.CentreRight,
-                    }
                 },
             };
 
@@ -475,9 +476,6 @@ namespace osu.Game.Screens.Play
                 skipIntroOverlay.Expire();
                 skipOutroOverlay.Expire();
             }
-
-            if (GameplayClockContainer is MasterGameplayClockContainer master)
-                HUDOverlay.PlayerSettingsOverlay.PlaybackSettings.UserPlaybackRate.BindTarget = master.UserPlaybackRate;
 
             return container;
         }
@@ -1078,7 +1076,7 @@ namespace osu.Game.Screens.Play
                 b.FadeColour(Color4.White, 250);
 
                 // bind component bindables.
-                b.IsBreakTime.BindTo(breakTracker.IsBreakTime);
+                ((IBindable<bool>)b.IsBreakTime).BindTo(breakTracker.IsBreakTime);
 
                 b.StoryboardReplacesBackground.BindTo(storyboardReplacesBackground);
 
@@ -1238,7 +1236,13 @@ namespace osu.Game.Screens.Play
 
             if (this.IsCurrentScreen())
             {
-                ApplyToBackground(b => b.IgnoreUserSettings.Value = true);
+                ApplyToBackground(b =>
+                {
+                    b.IgnoreUserSettings.Value = true;
+
+                    b.IsBreakTime.UnbindFrom(breakTracker.IsBreakTime);
+                    b.IsBreakTime.Value = false;
+                });
                 storyboardReplacesBackground.Value = false;
             }
         }

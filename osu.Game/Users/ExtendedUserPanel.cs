@@ -3,7 +3,6 @@
 
 #nullable disable
 
-using osuTK;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Extensions;
@@ -52,14 +51,6 @@ namespace osu.Game.Users
             // Colour should be applied immediately on first load.
             statusIcon.FinishTransforms();
         }
-
-        protected UpdateableAvatar CreateAvatar() => new UpdateableAvatar(User, false);
-
-        protected UpdateableFlag CreateFlag() => new UpdateableFlag(User.CountryCode)
-        {
-            Size = new Vector2(36, 26),
-            Action = Action,
-        };
 
         protected Container CreateStatusIcon() => statusIcon = new StatusIcon();
 

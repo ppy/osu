@@ -46,12 +46,10 @@ namespace osu.Game.Rulesets.Osu.Tests.Editor
             moveMouseToObject(() => slider);
 
             AddStep("seek after end", () => EditorClock.Seek(750));
-            AddUntilStep("wait for seek", () => !EditorClock.IsSeeking);
             AddStep("left click", () => InputManager.Click(MouseButton.Left));
             AddAssert("slider not selected", () => EditorBeatmap.SelectedHitObjects.Count == 0);
 
             AddStep("seek to visible", () => EditorClock.Seek(650));
-            AddUntilStep("wait for seek", () => !EditorClock.IsSeeking);
             AddStep("left click", () => InputManager.Click(MouseButton.Left));
             AddUntilStep("slider selected", () => EditorBeatmap.SelectedHitObjects.Single() == slider);
         }

@@ -18,10 +18,12 @@ using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Osu;
 using osu.Game.Rulesets.Osu.Judgements;
+using osu.Game.Rulesets.Osu.Mods;
 using osu.Game.Rulesets.Osu.Objects;
 using osu.Game.Rulesets.Scoring;
 using osu.Game.Rulesets.Taiko;
 using osu.Game.Rulesets.UI;
+using osu.Game.Scoring;
 using osu.Game.Scoring.Legacy;
 using osu.Game.Tests.Beatmaps;
 
@@ -383,6 +385,42 @@ namespace osu.Game.Tests.Rulesets.Scoring
             scoreProcessor.ApplyResult(judgementResult);
 
             Assert.That(scoreProcessor.Accuracy.Value, Is.Not.EqualTo(1));
+        }
+
+        [Test]
+        public void TestNormalGrades()
+        {
+            scoreProcessor.ApplyBeatmap(new Beatmap());
+
+            Assert.That(scoreProcessor.Rank.Value, Is.EqualTo(ScoreRank.X));
+
+            scoreProcessor.Accuracy.Value = 0.99f;
+            Assert.That(scoreProcessor.Rank.Value, Is.EqualTo(ScoreRank.S));
+        }
+
+        [Test]
+        public void TestSilverGrades()
+        {
+            scoreProcessor.ApplyBeatmap(new Beatmap());
+            Assert.That(scoreProcessor.Rank.Value, Is.EqualTo(ScoreRank.X));
+
+            scoreProcessor.Mods.Value = new[] { new OsuModHidden() };
+            Assert.That(scoreProcessor.Rank.Value, Is.EqualTo(ScoreRank.XH));
+
+            scoreProcessor.Accuracy.Value = 0.99f;
+            Assert.That(scoreProcessor.Rank.Value, Is.EqualTo(ScoreRank.SH));
+        }
+
+        [Test]
+        public void TestSilverGradesModsAppliedFirst()
+        {
+            scoreProcessor.Mods.Value = new[] { new OsuModHidden() };
+            scoreProcessor.ApplyBeatmap(new Beatmap());
+
+            Assert.That(scoreProcessor.Rank.Value, Is.EqualTo(ScoreRank.XH));
+
+            scoreProcessor.Accuracy.Value = 0.99f;
+            Assert.That(scoreProcessor.Rank.Value, Is.EqualTo(ScoreRank.SH));
         }
 
         private class TestJudgement : Judgement
