@@ -38,6 +38,7 @@ namespace osu.Game.Overlays.Login
         public Action? RequestHide;
 
         private readonly IBindable<APIState> apiState = new Bindable<APIState>();
+        private readonly Bindable<UserStatus?> userStatus = new Bindable<UserStatus?>();
 
         [Resolved]
         private IAPIProvider api { get; set; } = null!;
@@ -139,7 +140,8 @@ namespace osu.Game.Overlays.Login
                         },
                     };
 
-                    api.LocalUser.Value.Status.BindValueChanged(e => updateDropdownCurrent(e.NewValue), true);
+                    userStatus.BindTo(api.LocalUser.Value.Status);
+                    userStatus.BindValueChanged(e => updateDropdownCurrent(e.NewValue), true);
 
                     dropdown.Current.BindValueChanged(action =>
                     {
