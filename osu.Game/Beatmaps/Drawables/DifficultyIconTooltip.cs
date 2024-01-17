@@ -157,10 +157,10 @@ namespace osu.Game.Beatmaps.Drawables
             starRating.Current.BindTarget = displayedContent.Difficulty;
             difficultyName.Text = displayedContent.BeatmapInfo.DifficultyName;
 
-            // Don't show difficulty stats if showTooltip is false
-            if (!displayedContent.ShowTooltip) return;
+            // Don't show difficulty stats if showExtendedTooltip is false
+            if (!displayedContent.ShowExtendedTooltip) return;
 
-            // Show the difficulty stats if showTooltip is true
+            // Show the difficulty stats if showExtendedTooltip is true
             difficultyFillFlowContainer.Show();
             miscFillFlowContainer.Show();
 
@@ -212,15 +212,15 @@ namespace osu.Game.Beatmaps.Drawables
         public readonly IBindable<StarDifficulty> Difficulty;
         public readonly IRulesetInfo Ruleset;
         public readonly Mod[] Mods;
-        public readonly bool ShowTooltip;
+        public readonly bool ShowExtendedTooltip;
 
-        public DifficultyIconTooltipContent(IBeatmapInfo beatmapInfo, IBindable<StarDifficulty> difficulty, IRulesetInfo rulesetInfo, Mod[] mods, bool showTooltip = false)
+        public DifficultyIconTooltipContent(IBeatmapInfo beatmapInfo, IBindable<StarDifficulty> difficulty, IRulesetInfo rulesetInfo, Mod[] mods, bool showExtendedTooltip = false)
         {
             BeatmapInfo = beatmapInfo;
             Difficulty = difficulty;
             Ruleset = rulesetInfo;
             Mods = mods;
-            ShowTooltip = showTooltip;
+            ShowExtendedTooltip = showExtendedTooltip;
         }
     }
 }
