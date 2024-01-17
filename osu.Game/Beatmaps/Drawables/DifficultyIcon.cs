@@ -36,13 +36,16 @@ namespace osu.Game.Beatmaps.Drawables
         /// </summary>
         public bool ShowTooltip { get; set; } = true;
 
+        /// <summary>
+        /// Whether to include the difficulty stats in the tooltip or not. Defaults to false. Has no effect if <see cref="ShowTooltip"/> is false.
+        /// </summary>
+        public bool ShowExtendedTooltip { get; set; }
+
         private readonly IBeatmapInfo? beatmap;
 
         private readonly IRulesetInfo ruleset;
 
         private readonly Mod[]? mods;
-
-        private readonly bool showExtendedTooltip;
 
         private Drawable background = null!;
 
@@ -65,13 +68,11 @@ namespace osu.Game.Beatmaps.Drawables
         /// <param name="beatmap">The beatmap to be displayed in the tooltip, and to be used for the initial star rating value.</param>
         /// <param name="mods">An array of mods to account for in the calculations</param>
         /// <param name="ruleset">An optional ruleset to be used for the icon display, in place of the beatmap's ruleset.</param>
-        /// <param name="showExtendedTooltip">Whether to include the difficulty stats in the tooltip or not. Defaults to false</param>
-        public DifficultyIcon(IBeatmapInfo beatmap, IRulesetInfo? ruleset = null, Mod[]? mods = null, bool showExtendedTooltip = false)
+        public DifficultyIcon(IBeatmapInfo beatmap, IRulesetInfo? ruleset = null, Mod[]? mods = null)
             : this(ruleset ?? beatmap.Ruleset)
         {
             this.beatmap = beatmap;
             this.mods = mods;
-            this.showExtendedTooltip = showExtendedTooltip;
 
             Current.Value = new StarDifficulty(beatmap.StarRating, 0);
         }
@@ -138,6 +139,6 @@ namespace osu.Game.Beatmaps.Drawables
             GetCustomTooltip() => new DifficultyIconTooltip();
 
         DifficultyIconTooltipContent IHasCustomTooltip<DifficultyIconTooltipContent>.
-            TooltipContent => (ShowTooltip && beatmap != null ? new DifficultyIconTooltipContent(beatmap, Current, ruleset, mods, showExtendedTooltip) : null)!;
+            TooltipContent => (ShowTooltip && beatmap != null ? new DifficultyIconTooltipContent(beatmap, Current, ruleset, mods, ShowExtendedTooltip) : null)!;
     }
 }
