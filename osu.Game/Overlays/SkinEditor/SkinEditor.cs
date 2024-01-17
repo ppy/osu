@@ -47,7 +47,7 @@ namespace osu.Game.Overlays.SkinEditor
 
         protected override bool StartHidden => true;
 
-        private Drawable targetScreen = null!;
+        private Drawable? targetScreen;
 
         private OsuTextFlowContainer headerText = null!;
 
@@ -541,7 +541,13 @@ namespace osu.Game.Overlays.SkinEditor
             if (!hasBegunMutating)
                 return;
 
+            if (targetScreen?.IsLoaded != true)
+                return;
+
             SkinComponentsContainer[] targetContainers = availableTargets.ToArray();
+
+            if (!targetContainers.All(c => c.ComponentsLoaded))
+                return;
 
             foreach (var t in targetContainers)
                 currentSkin.Value.UpdateDrawableTarget(t);
