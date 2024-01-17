@@ -21,8 +21,7 @@ namespace osu.Game.Screens.Play.HUD
     {
         private ArgonCounterTextComponent text = null!;
 
-        protected override double RollingDuration => 500;
-        protected override Easing RollingEasing => Easing.OutQuint;
+        protected override double RollingDuration => 250;
 
         [SettingSource("Wireframe opacity", "Controls the opacity of the wire frames behind the digits.")]
         public BindableFloat WireframeOpacity { get; } = new BindableFloat(0.25f)
