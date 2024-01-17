@@ -40,7 +40,6 @@ namespace osu.Game.Scoring.Legacy
             };
 
             WorkingBeatmap workingBeatmap;
-            byte[] compressedScoreInfo = null;
 
             using (SerializationReader sr = new SerializationReader(stream))
             {
@@ -109,6 +108,8 @@ namespace osu.Game.Scoring.Legacy
                 else if (version >= 20121008)
                     scoreInfo.LegacyOnlineID = sr.ReadInt32();
 
+                byte[] compressedScoreInfo = null;
+
                 if (version >= 30000001)
                     compressedScoreInfo = sr.ReadByteArray();
 
@@ -133,11 +134,8 @@ namespace osu.Game.Scoring.Legacy
             }
 
             PopulateMaximumStatistics(score.ScoreInfo, workingBeatmap);
-
-            if (score.ScoreInfo.IsLegacyScore || compressedScoreInfo == null)
-                PopulateLegacyAccuracyAndRank(score.ScoreInfo);
-            else
-                populateLazerAccuracyAndRank(score.ScoreInfo);
+            score.ScoreInfo.Accuracy = StandardisedScoreMigrationTools.ComputeAccuracy(score.ScoreInfo);
+            score.ScoreInfo.Rank = StandardisedScoreMigrationTools.ComputeRank(score.ScoreInfo);
 
             // before returning for database import, we must restore the database-sourced BeatmapInfo.
             // if not, the clone operation in GetPlayableBeatmap will cause a dereference and subsequent database exception.

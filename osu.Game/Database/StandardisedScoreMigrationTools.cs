@@ -597,6 +597,17 @@ namespace osu.Game.Database
             return maxBaseScore == 0 ? 1 : baseScore / (double)maxBaseScore;
         }
 
+        public static ScoreRank ComputeRank(ScoreInfo scoreInfo)
+        {
+            Ruleset ruleset = scoreInfo.Ruleset.CreateInstance();
+            var rank = ruleset.CreateScoreProcessor().RankFromScore(scoreInfo.Accuracy, scoreInfo.Statistics);
+
+            foreach (var mod in scoreInfo.Mods.OfType<IApplicableToScoreProcessor>())
+                rank = mod.AdjustRank(rank, scoreInfo.Accuracy);
+
+            return rank;
+        }
+
         /// <summary>
         /// Used to populate the <paramref name="score"/> model using data parsed from its corresponding replay file.
         /// </summary>
