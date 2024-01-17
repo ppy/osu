@@ -307,7 +307,7 @@ namespace osu.Game.Screens.Play.PlayerSettings
             }
         }
 
-        public partial class OffsetSliderBar : PlayerSliderBar<double>
+        private partial class OffsetSliderBar : PlayerSliderBar<double>
         {
             protected override Drawable CreateControl() => new CustomSliderBar();
 

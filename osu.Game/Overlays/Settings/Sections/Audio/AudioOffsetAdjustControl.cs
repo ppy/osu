@@ -12,12 +12,14 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.UserInterface;
+using osu.Framework.Localisation;
 using osu.Game.Configuration;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Graphics.UserInterfaceV2;
 using osu.Game.Localisation;
+using osu.Game.Screens.Play.PlayerSettings;
 using osuTK;
 
 namespace osu.Game.Overlays.Settings.Sections.Audio
@@ -67,7 +69,7 @@ namespace osu.Game.Overlays.Settings.Sections.Audio
                     Direction = FillDirection.Vertical,
                     Children = new Drawable[]
                     {
-                        new TimeSlider
+                        new OffsetSliderBar
                         {
                             RelativeSizeAxes = Axes.X,
                             Current = { BindTarget = Current },
@@ -156,6 +158,11 @@ namespace osu.Game.Overlays.Settings.Sections.Audio
                     ? @"Play a few beatmaps to receive a suggested offset!"
                     : $@"Based on the last {averageHitErrorHistory.Count} play(s), the suggested offset is {SuggestedOffset.Value:N0} ms.";
                 applySuggestion.Enabled.Value = SuggestedOffset.Value != null;
+            }
+
+            private partial class OffsetSliderBar : RoundedSliderBar<double>
+            {
+                public override LocalisableString TooltipText => BeatmapOffsetControl.GetOffsetExplanatoryText(Current.Value);
             }
         }
     }
