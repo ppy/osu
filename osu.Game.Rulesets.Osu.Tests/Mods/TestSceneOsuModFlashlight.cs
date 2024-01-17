@@ -77,5 +77,83 @@ namespace osu.Game.Rulesets.Osu.Tests.Mods
                 Autoplay = false,
             });
         }
+
+        [Test]
+        public void TestSliderDoesDimAfterStartTimeIfHitEarly()
+        {
+            bool sliderDimmed = false;
+
+            CreateModTest(new ModTestData
+            {
+                Mod = new OsuModFlashlight(),
+                PassCondition = () =>
+                {
+                    sliderDimmed |=
+                        Player.GameplayClockContainer.CurrentTime >= 1000 && Player.ChildrenOfType<ModFlashlight<OsuHitObject>.Flashlight>().Single().FlashlightDim > 0;
+                    return Player.GameplayState.HasPassed && sliderDimmed;
+                },
+                Beatmap = new OsuBeatmap
+                {
+                    HitObjects = new List<OsuHitObject>
+                    {
+                        new Slider
+                        {
+                            StartTime = 1000,
+                            Path = new SliderPath(new[]
+                            {
+                                new PathControlPoint(),
+                                new PathControlPoint(new Vector2(100))
+                            })
+                        }
+                    },
+                },
+                ReplayFrames = new List<ReplayFrame>
+                {
+                    new OsuReplayFrame(990, new Vector2(), OsuAction.LeftButton),
+                    new OsuReplayFrame(2000, new Vector2(100), OsuAction.LeftButton),
+                    new OsuReplayFrame(2001, new Vector2(100)),
+                },
+                Autoplay = false,
+            });
+        }
+
+        [Test]
+        public void TestSliderDoesDimAfterStartTimeIfHitLate()
+        {
+            bool sliderDimmed = false;
+
+            CreateModTest(new ModTestData
+            {
+                Mod = new OsuModFlashlight(),
+                PassCondition = () =>
+                {
+                    sliderDimmed |=
+                        Player.GameplayClockContainer.CurrentTime >= 1000 && Player.ChildrenOfType<ModFlashlight<OsuHitObject>.Flashlight>().Single().FlashlightDim > 0;
+                    return Player.GameplayState.HasPassed && sliderDimmed;
+                },
+                Beatmap = new OsuBeatmap
+                {
+                    HitObjects = new List<OsuHitObject>
+                    {
+                        new Slider
+                        {
+                            StartTime = 1000,
+                            Path = new SliderPath(new[]
+                            {
+                                new PathControlPoint(),
+                                new PathControlPoint(new Vector2(100))
+                            })
+                        }
+                    },
+                },
+                ReplayFrames = new List<ReplayFrame>
+                {
+                    new OsuReplayFrame(1100, new Vector2(), OsuAction.LeftButton),
+                    new OsuReplayFrame(2000, new Vector2(100), OsuAction.LeftButton),
+                    new OsuReplayFrame(2001, new Vector2(100)),
+                },
+                Autoplay = false,
+            });
+        }
     }
 }
