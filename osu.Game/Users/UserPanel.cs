@@ -98,6 +98,8 @@ namespace osu.Game.Users
             };
         }
 
+        // TODO: this whole api is messy. half these Create methods are expected to by the implementation and half are implictly called.
+
         protected abstract Drawable CreateLayout();
 
         /// <summary>
