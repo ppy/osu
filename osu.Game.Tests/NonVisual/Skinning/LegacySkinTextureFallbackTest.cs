@@ -127,8 +127,50 @@ namespace osu.Game.Tests.NonVisual.Skinning
             Assert.IsNull(texture);
         }
 
+        [Test]
+        public void TestDisallowHighResolutionSprites()
+        {
+            var textureStore = new TestTextureStore("hitcircle", "hitcircle@2x");
+            var legacySkin = new TestLegacySkin(textureStore) { HighResolutionSprites = false };
+
+            var texture = legacySkin.GetTexture("hitcircle");
+
+            Assert.IsNotNull(texture);
+            Assert.That(texture.ScaleAdjust, Is.EqualTo(1));
+
+            var twoTimesTexture = legacySkin.GetTexture("hitcircle@2x");
+
+            Assert.IsNotNull(twoTimesTexture);
+            Assert.That(twoTimesTexture.ScaleAdjust, Is.EqualTo(1));
+
+            Assert.AreNotEqual(texture, twoTimesTexture);
+        }
+
+        [Test]
+        public void TestAllowHighResolutionSprites()
+        {
+            var textureStore = new TestTextureStore("hitcircle", "hitcircle@2x");
+            var legacySkin = new TestLegacySkin(textureStore) { HighResolutionSprites = true };
+
+            var texture = legacySkin.GetTexture("hitcircle");
+
+            Assert.IsNotNull(texture);
+            Assert.That(texture.ScaleAdjust, Is.EqualTo(2));
+
+            var twoTimesTexture = legacySkin.GetTexture("hitcircle@2x");
+
+            Assert.IsNotNull(twoTimesTexture);
+            Assert.That(twoTimesTexture.ScaleAdjust, Is.EqualTo(2));
+
+            Assert.AreEqual(texture, twoTimesTexture);
+        }
+
         private class TestLegacySkin : LegacySkin
         {
+            public bool HighResolutionSprites { get; set; } = true;
+
+            protected override bool AllowHighResolutionSprites => HighResolutionSprites;
+
             public TestLegacySkin(IResourceStore<TextureUpload> textureStore)
                 : base(new SkinInfo(), new TestResourceProvider(textureStore), null, string.Empty)
             {

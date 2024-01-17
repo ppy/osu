@@ -477,6 +477,11 @@ namespace osu.Game.Skinning
             return null;
         }
 
+        /// <summary>
+        /// Whether high-resolution textures ("@2x"-suffixed) are allowed to be used by <see cref="GetTexture"/> when available.
+        /// </summary>
+        protected virtual bool AllowHighResolutionSprites => true;
+
         public override Texture? GetTexture(string componentName, WrapMode wrapModeS, WrapMode wrapModeT)
         {
             switch (componentName)
@@ -488,15 +493,22 @@ namespace osu.Game.Skinning
 
             foreach (string name in getFallbackNames(componentName))
             {
-                // some component names (especially user-controlled ones, like `HitX` in mania)
-                // may contain `@2x` scale specifications.
-                // stable happens to check for that and strip them, so do the same to match stable behaviour.
-                string lookupName = name.Replace(@"@2x", string.Empty);
+                string lookupName = name;
+                Texture? texture = null;
+                float ratio = 1;
 
-                float ratio = 2;
-                string twoTimesFilename = $"{Path.ChangeExtension(lookupName, null)}@2x{Path.GetExtension(lookupName)}";
+                if (AllowHighResolutionSprites)
+                {
+                    // some component names (especially user-controlled ones, like `HitX` in mania)
+                    // may contain `@2x` scale specifications.
+                    // stable happens to check for that and strip them, so do the same to match stable behaviour.
+                    lookupName = name.Replace(@"@2x", string.Empty);
 
-                var texture = Textures?.Get(twoTimesFilename, wrapModeS, wrapModeT);
+                    string twoTimesFilename = $"{Path.ChangeExtension(lookupName, null)}@2x{Path.GetExtension(lookupName)}";
+
+                    texture = Textures?.Get(twoTimesFilename, wrapModeS, wrapModeT);
+                    ratio = 2;
+                }
 
                 if (texture == null)
                 {
