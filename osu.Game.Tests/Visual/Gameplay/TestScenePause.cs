@@ -93,15 +93,12 @@ namespace osu.Game.Tests.Visual.Gameplay
 
                     double currentTime = masterClock.CurrentTime;
 
-                    bool goingForward = currentTime >= (masterClock.LastStopTime ?? lastStopTime);
+                    bool goingForward = currentTime >= lastStopTime;
 
                     alwaysGoingForward &= goingForward;
 
                     if (!goingForward)
                         Logger.Log($"Went too far backwards (last stop: {lastStopTime:N1} current: {currentTime:N1})");
-
-                    if (masterClock.LastStopTime != null)
-                        lastStopTime = masterClock.LastStopTime.Value;
                 };
             });
 
