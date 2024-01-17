@@ -13,6 +13,7 @@ using osu.Game.Graphics.Sprites;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Screens.Edit.Timing;
 using osuTK;
+using osu.Game.Localisation;
 
 namespace osu.Game.Screens.Play.PlayerSettings
 {
@@ -71,6 +72,7 @@ namespace osu.Game.Screens.Play.PlayerSettings
                                     Origin = Anchor.Centre,
                                     Icon = FontAwesome.Solid.FastBackward,
                                     Action = () => seek(-1, seek_fast_amount),
+                                    TooltipText = PlayerSettingsOverlayStrings.SeekBackwardSeconds(seek_fast_amount / 1000),
                                 },
                                 new SeekButton
                                 {
@@ -78,6 +80,7 @@ namespace osu.Game.Screens.Play.PlayerSettings
                                     Origin = Anchor.Centre,
                                     Icon = FontAwesome.Solid.Backward,
                                     Action = () => seek(-1, seek_amount),
+                                    TooltipText = PlayerSettingsOverlayStrings.SeekBackwardSeconds(seek_amount / 1000),
                                 },
                                 play = new IconButton
                                 {
@@ -103,6 +106,7 @@ namespace osu.Game.Screens.Play.PlayerSettings
                                     Origin = Anchor.Centre,
                                     Icon = FontAwesome.Solid.Forward,
                                     Action = () => seek(1, seek_amount),
+                                    TooltipText = PlayerSettingsOverlayStrings.SeekForwardSeconds(seek_amount / 1000),
                                 },
                                 new SeekButton
                                 {
@@ -110,6 +114,7 @@ namespace osu.Game.Screens.Play.PlayerSettings
                                     Origin = Anchor.Centre,
                                     Icon = FontAwesome.Solid.FastForward,
                                     Action = () => seek(1, seek_fast_amount),
+                                    TooltipText = PlayerSettingsOverlayStrings.SeekForwardSeconds(seek_fast_amount / 1000),
                                 },
                             },
                         },
@@ -137,7 +142,19 @@ namespace osu.Game.Screens.Play.PlayerSettings
                 },
             };
 
-            isPaused.BindValueChanged(e => play.Icon = !e.NewValue ? FontAwesome.Regular.PauseCircle : FontAwesome.Regular.PlayCircle, true);
+            isPaused.BindValueChanged(paused =>
+            {
+                if (!paused.NewValue)
+                {
+                    play.TooltipText = ToastStrings.PauseTrack;
+                    play.Icon = FontAwesome.Regular.PauseCircle;
+                }
+                else
+                {
+                    play.TooltipText = ToastStrings.PlayTrack;
+                    play.Icon = FontAwesome.Regular.PlayCircle;
+                }
+            }, true);
 
             void seek(int direction, double amount)
             {
