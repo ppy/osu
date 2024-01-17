@@ -2,11 +2,11 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using osu.Framework.Allocation;
+using osu.Framework.Bindables;
 using osu.Framework.Extensions.LocalisationExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Input.Events;
-using osu.Framework.Localisation;
 using osu.Game.Online.API;
 using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Overlays.Profile.Header.Components;
@@ -30,6 +30,8 @@ namespace osu.Game.Users
         private ProfileValueDisplay globalRankDisplay = null!;
         private ProfileValueDisplay countryRankDisplay = null!;
 
+        private readonly IBindable<UserStatistics?> statistics = new Bindable<UserStatistics?>();
+
         public UserRankPanel(APIUser user)
             : base(user)
         {
@@ -42,11 +44,12 @@ namespace osu.Game.Users
         {
             BorderColour = ColourProvider?.Light1 ?? Colours.GreyVioletLighter;
 
-            api.Statistics.ValueChanged += e =>
+            statistics.BindTo(api.Statistics);
+            statistics.BindValueChanged(stats =>
             {
-                globalRankDisplay.Content = e.NewValue?.GlobalRank?.ToLocalisableString("\\##,##0") ?? (LocalisableString)"-";
-                countryRankDisplay.Content = e.NewValue?.CountryRank?.ToLocalisableString("\\##,##0") ?? (LocalisableString)"-";
-            };
+                globalRankDisplay.Content = stats.NewValue?.GlobalRank?.ToLocalisableString("\\##,##0") ?? "-";
+                countryRankDisplay.Content = stats.NewValue?.CountryRank?.ToLocalisableString("\\##,##0") ?? "-";
+            }, true);
         }
 
         protected override Drawable CreateLayout()
@@ -184,12 +187,10 @@ namespace osu.Game.Users
                                     globalRankDisplay = new ProfileValueDisplay(true)
                                     {
                                         Title = UsersStrings.ShowRankGlobalSimple,
-                                        Content = User.Statistics?.GlobalRank?.ToLocalisableString("\\##,##0") ?? (LocalisableString)"-"
                                     },
                                     countryRankDisplay = new ProfileValueDisplay(true)
                                     {
                                         Title = UsersStrings.ShowRankCountrySimple,
-                                        Content = User.Statistics?.CountryRank?.ToLocalisableString("\\##,##0") ?? (LocalisableString)"-"
                                     }
                                 }
                             }
