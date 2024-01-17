@@ -252,7 +252,7 @@ namespace osu.Game.Tests.Beatmaps.Formats
         }
 
         [Test]
-        public void AccuracyAndRankOfStableScorePreserved()
+        public void AccuracyOfStableScoreRecomputed()
         {
             var memoryStream = new MemoryStream();
 
@@ -261,15 +261,16 @@ namespace osu.Game.Tests.Beatmaps.Formats
             // and we want to emulate a stable score here
             using (var sw = new SerializationWriter(memoryStream, true))
             {
-                sw.Write((byte)0); // ruleset id (osu!)
+                sw.Write((byte)3); // ruleset id (mania).
+                                   // mania is used intentionally as it is the only ruleset wherein default accuracy calculation is changed in lazer
                 sw.Write(20240116); // version (anything below `LegacyScoreEncoder.FIRST_LAZER_VERSION` is stable)
                 sw.Write(string.Empty.ComputeMD5Hash()); // beatmap hash, irrelevant to this test
                 sw.Write("username"); // irrelevant to this test
                 sw.Write(string.Empty.ComputeMD5Hash()); // score hash, irrelevant to this test
-                sw.Write((ushort)198); // count300
-                sw.Write((ushort)1); // count100
+                sw.Write((ushort)1); // count300
+                sw.Write((ushort)0); // count100
                 sw.Write((ushort)0); // count50
-                sw.Write((ushort)0); // countGeki
+                sw.Write((ushort)198); // countGeki (perfects / "rainbow 300s" in mania)
                 sw.Write((ushort)0); // countKatu
                 sw.Write((ushort)1); // countMiss
                 sw.Write(12345678); // total score, irrelevant to this test
@@ -287,8 +288,8 @@ namespace osu.Game.Tests.Beatmaps.Formats
 
             Assert.Multiple(() =>
             {
-                Assert.That(decoded.ScoreInfo.Accuracy, Is.EqualTo((double)(198 * 300 + 100) / (200 * 300)));
-                Assert.That(decoded.ScoreInfo.Rank, Is.EqualTo(ScoreRank.A));
+                Assert.That(decoded.ScoreInfo.Accuracy, Is.EqualTo((double)(198 * 305 + 300) / (200 * 305)));
+                Assert.That(decoded.ScoreInfo.Rank, Is.EqualTo(ScoreRank.S));
             });
         }
 
