@@ -138,10 +138,31 @@ namespace osu.Game.Tests.NonVisual.Skinning
             Assert.IsNotNull(texture);
             Assert.That(texture.ScaleAdjust, Is.EqualTo(1));
 
-            texture = legacySkin.GetTexture("hitcircle@2x");
+            var twoTimesTexture = legacySkin.GetTexture("hitcircle@2x");
+
+            Assert.IsNotNull(twoTimesTexture);
+            Assert.That(twoTimesTexture.ScaleAdjust, Is.EqualTo(1));
+
+            Assert.AreNotEqual(texture, twoTimesTexture);
+        }
+
+        [Test]
+        public void TestAllowHighResolutionSprites()
+        {
+            var textureStore = new TestTextureStore("hitcircle", "hitcircle@2x");
+            var legacySkin = new TestLegacySkin(textureStore) { HighResolutionSprites = true };
+
+            var texture = legacySkin.GetTexture("hitcircle");
 
             Assert.IsNotNull(texture);
-            Assert.That(texture.ScaleAdjust, Is.EqualTo(1));
+            Assert.That(texture.ScaleAdjust, Is.EqualTo(2));
+
+            var twoTimesTexture = legacySkin.GetTexture("hitcircle@2x");
+
+            Assert.IsNotNull(twoTimesTexture);
+            Assert.That(twoTimesTexture.ScaleAdjust, Is.EqualTo(2));
+
+            Assert.AreEqual(texture, twoTimesTexture);
         }
 
         private class TestLegacySkin : LegacySkin
