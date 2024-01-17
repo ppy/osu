@@ -63,7 +63,7 @@ namespace osu.Game.Screens.Play
             if (GameplayClockContainer is MasterGameplayClockContainer master)
                 playbackSettings.UserPlaybackRate.BindTo(master.UserPlaybackRate);
 
-            HUDOverlay.PlayerSettingsOverlay.Insert(-1, playbackSettings);
+            HUDOverlay.PlayerSettingsOverlay.AddAtStart(playbackSettings);
         }
 
         protected override void PrepareReplay()
