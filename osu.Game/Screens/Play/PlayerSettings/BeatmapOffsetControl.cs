@@ -86,7 +86,7 @@ namespace osu.Game.Screens.Play.PlayerSettings
                     new OffsetSliderBar
                     {
                         KeyboardStep = 5,
-                        LabelText = BeatmapOffsetControlStrings.BeatmapOffset,
+                        LabelText = BeatmapOffsetControlStrings.AudioOffsetThisBeatmap,
                         Current = Current,
                     },
                     referenceScoreContainer = new FillFlowContainer
