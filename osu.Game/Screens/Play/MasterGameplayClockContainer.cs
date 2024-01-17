@@ -35,9 +35,9 @@ namespace osu.Game.Screens.Play
 
         public readonly BindableNumber<double> UserPlaybackRate = new BindableDouble(1)
         {
-            MinValue = 0.5,
+            MinValue = 0.05,
             MaxValue = 2,
-            Precision = 0.1,
+            Precision = 0.01,
         };
 
         /// <summary>
@@ -274,7 +274,7 @@ namespace osu.Game.Screens.Play
 
             track.BindAdjustments(AdjustmentsFromMods);
             track.AddAdjustment(AdjustableProperty.Frequency, GameplayClock.ExternalPauseFrequencyAdjust);
-            track.AddAdjustment(AdjustableProperty.Tempo, UserPlaybackRate);
+            track.AddAdjustment(AdjustableProperty.Frequency, UserPlaybackRate);
 
             speedAdjustmentsApplied = true;
         }
@@ -286,7 +286,7 @@ namespace osu.Game.Screens.Play
 
             track.UnbindAdjustments(AdjustmentsFromMods);
             track.RemoveAdjustment(AdjustableProperty.Frequency, GameplayClock.ExternalPauseFrequencyAdjust);
-            track.RemoveAdjustment(AdjustableProperty.Tempo, UserPlaybackRate);
+            track.RemoveAdjustment(AdjustableProperty.Frequency, UserPlaybackRate);
 
             speedAdjustmentsApplied = false;
         }

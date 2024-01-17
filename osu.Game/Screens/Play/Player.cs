@@ -470,9 +470,6 @@ namespace osu.Game.Screens.Play
                 skipOutroOverlay.Expire();
             }
 
-            if (GameplayClockContainer is MasterGameplayClockContainer master)
-                HUDOverlay.PlayerSettingsOverlay.PlaybackSettings.UserPlaybackRate.BindTarget = master.UserPlaybackRate;
-
             return container;
         }
 
