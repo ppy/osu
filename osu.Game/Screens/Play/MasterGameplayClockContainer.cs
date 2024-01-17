@@ -274,7 +274,7 @@ namespace osu.Game.Screens.Play
 
             track.BindAdjustments(AdjustmentsFromMods);
             track.AddAdjustment(AdjustableProperty.Frequency, GameplayClock.ExternalPauseFrequencyAdjust);
-            track.AddAdjustment(AdjustableProperty.Tempo, UserPlaybackRate);
+            track.AddAdjustment(AdjustableProperty.Frequency, UserPlaybackRate);
 
             speedAdjustmentsApplied = true;
         }
@@ -286,7 +286,7 @@ namespace osu.Game.Screens.Play
 
             track.UnbindAdjustments(AdjustmentsFromMods);
             track.RemoveAdjustment(AdjustableProperty.Frequency, GameplayClock.ExternalPauseFrequencyAdjust);
-            track.RemoveAdjustment(AdjustableProperty.Tempo, UserPlaybackRate);
+            track.RemoveAdjustment(AdjustableProperty.Frequency, UserPlaybackRate);
 
             speedAdjustmentsApplied = false;
         }
