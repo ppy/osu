@@ -42,6 +42,8 @@ namespace osu.Game.Beatmaps.Drawables
 
         private readonly Mod[]? mods;
 
+        private readonly bool showTooltip;
+
         private Drawable background = null!;
 
         private readonly Container iconContainer;
@@ -61,13 +63,15 @@ namespace osu.Game.Beatmaps.Drawables
         /// Creates a new <see cref="DifficultyIcon"/>. Will use provided beatmap's <see cref="BeatmapInfo.StarRating"/> for initial value.
         /// </summary>
         /// <param name="beatmap">The beatmap to be displayed in the tooltip, and to be used for the initial star rating value.</param>
-        /// <param name="mods">The mods type beat</param>
+        /// <param name="mods">An array of mods to account for in the calculations</param>
         /// <param name="ruleset">An optional ruleset to be used for the icon display, in place of the beatmap's ruleset.</param>
-        public DifficultyIcon(IBeatmapInfo beatmap, IRulesetInfo? ruleset = null, Mod[]? mods = null)
+        /// <param name="showTooltip">Whether to display a tooltip on hover. Defaults to false.</param>
+        public DifficultyIcon(IBeatmapInfo beatmap, IRulesetInfo? ruleset = null, Mod[]? mods = null, bool showTooltip = false)
             : this(ruleset ?? beatmap.Ruleset)
         {
             this.beatmap = beatmap;
             this.mods = mods;
+            this.showTooltip = showTooltip;
 
             Current.Value = new StarDifficulty(beatmap.StarRating, 0);
         }
@@ -134,6 +138,6 @@ namespace osu.Game.Beatmaps.Drawables
             GetCustomTooltip() => new DifficultyIconTooltip();
 
         DifficultyIconTooltipContent IHasCustomTooltip<DifficultyIconTooltipContent>.
-            TooltipContent => (ShowTooltip && beatmap != null ? new DifficultyIconTooltipContent(beatmap, Current, ruleset, mods) : null)!;
+            TooltipContent => (ShowTooltip && beatmap != null ? new DifficultyIconTooltipContent(beatmap, Current, ruleset, mods, showTooltip) : null)!;
     }
 }

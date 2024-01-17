@@ -31,6 +31,9 @@ namespace osu.Game.Beatmaps.Drawables
         private OsuSpriteText maxCombo;
         private OsuSpriteText length;
 
+        private FillFlowContainer difficultyFillFlowContainer;
+        private FillFlowContainer miscFillFlowContainer;
+
         [BackgroundDependencyLoader]
         private void load(OsuColour colours)
         {
@@ -69,21 +72,16 @@ namespace osu.Game.Beatmaps.Drawables
                             Origin = Anchor.Centre,
                         },
                         // Difficulty stats
-                        new FillFlowContainer
+                        difficultyFillFlowContainer = new FillFlowContainer
                         {
                             Anchor = Anchor.Centre,
                             Origin = Anchor.Centre,
+                            Alpha = 0,
                             AutoSizeAxes = Axes.Both,
                             Direction = FillDirection.Horizontal,
                             Spacing = new Vector2(5),
                             Children = new Drawable[]
                             {
-                                new OsuSpriteText
-                                {
-                                    Anchor = Anchor.Centre,
-                                    Origin = Anchor.Centre,
-                                    Font = OsuFont.GetFont(size: 14, weight: FontWeight.Bold),
-                                },
                                 circleSize = new OsuSpriteText
                                 {
                                     Anchor = Anchor.Centre,
@@ -111,21 +109,16 @@ namespace osu.Game.Beatmaps.Drawables
                             }
                         },
                         // Misc stats
-                        new FillFlowContainer
+                        miscFillFlowContainer = new FillFlowContainer
                         {
                             Anchor = Anchor.Centre,
                             Origin = Anchor.Centre,
+                            Alpha = 0,
                             AutoSizeAxes = Axes.Both,
                             Direction = FillDirection.Horizontal,
                             Spacing = new Vector2(5),
                             Children = new Drawable[]
                             {
-                                new OsuSpriteText
-                                {
-                                    Anchor = Anchor.Centre,
-                                    Origin = Anchor.Centre,
-                                    Font = OsuFont.GetFont(size: 14, weight: FontWeight.Bold),
-                                },
                                 length = new OsuSpriteText
                                 {
                                     Anchor = Anchor.Centre,
@@ -164,6 +157,13 @@ namespace osu.Game.Beatmaps.Drawables
             starRating.Current.BindTarget = displayedContent.Difficulty;
             difficultyName.Text = displayedContent.BeatmapInfo.DifficultyName;
 
+            // Don't show difficulty stats if showTooltip is false
+            if (!displayedContent.ShowTooltip) return;
+
+            // Show the difficulty stats if showTooltip is true
+            difficultyFillFlowContainer.Show();
+            miscFillFlowContainer.Show();
+
             double rate = 1;
 
             if (displayedContent.Mods != null)
@@ -195,7 +195,7 @@ namespace osu.Game.Beatmaps.Drawables
 
             // Misc row
             length.Text = "Length: " + TimeSpan.FromMilliseconds(displayedContent.BeatmapInfo.Length / rate).ToString("mm\\:ss");
-            bpm.Text = " BPM: " + bpmAdjusted;
+            bpm.Text = " BPM: " + Math.Round(bpmAdjusted, 0);
             maxCombo.Text = " Max Combo: " + displayedContent.BeatmapInfo.TotalObjectCount;
         }
 
@@ -212,13 +212,15 @@ namespace osu.Game.Beatmaps.Drawables
         public readonly IBindable<StarDifficulty> Difficulty;
         public readonly IRulesetInfo Ruleset;
         public readonly Mod[] Mods;
+        public readonly bool ShowTooltip;
 
-        public DifficultyIconTooltipContent(IBeatmapInfo beatmapInfo, IBindable<StarDifficulty> difficulty, IRulesetInfo rulesetInfo, Mod[] mods)
+        public DifficultyIconTooltipContent(IBeatmapInfo beatmapInfo, IBindable<StarDifficulty> difficulty, IRulesetInfo rulesetInfo, Mod[] mods, bool showTooltip = false)
         {
             BeatmapInfo = beatmapInfo;
             Difficulty = difficulty;
             Ruleset = rulesetInfo;
             Mods = mods;
+            ShowTooltip = showTooltip;
         }
     }
 }
