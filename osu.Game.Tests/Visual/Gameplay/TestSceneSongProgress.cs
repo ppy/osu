@@ -45,10 +45,7 @@ namespace osu.Game.Tests.Visual.Gameplay
                 },
                 gameplayClockContainer = new MasterGameplayClockContainer(Beatmap.Value, skip_target_time)
                 {
-                    Child = frameStabilityContainer = new FrameStabilityContainer
-                    {
-                        MaxCatchUpFrames = 1
-                    }
+                    Child = frameStabilityContainer = new FrameStabilityContainer()
                 }
             });
 
