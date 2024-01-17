@@ -54,6 +54,9 @@ namespace osu.Game.Screens.Play
         [BackgroundDependencyLoader]
         private void load()
         {
+            if (!LoadedBeatmapSuccessfully)
+                return;
+
             var playbackSettings = new PlaybackSettings
             {
                 Depth = float.MaxValue,
