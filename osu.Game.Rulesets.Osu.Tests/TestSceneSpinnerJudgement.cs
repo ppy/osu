@@ -53,7 +53,7 @@ namespace osu.Game.Rulesets.Osu.Tests
         {
             performTest(generateReplay(20));
 
-            AddAssert("all max judgements", () => judgementResults.All(result => result.Type == result.Judgement.MaxResult));
+            AddAssert("all max judgements", () => judgementResults.All(result => result.HitObject is SpinnerHealthTick || result.Type == result.Judgement.MaxResult));
         }
 
         private static List<ReplayFrame> generateReplay(int spins) => new SpinFramesGenerator(time_spinner_start)

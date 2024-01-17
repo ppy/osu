@@ -238,7 +238,7 @@ namespace osu.Game.Tests.Rulesets.Scoring
         [TestCase(HitResult.SliderTailHit, false)]
         [TestCase(HitResult.SmallBonus, true)]
         [TestCase(HitResult.LargeBonus, true)]
-        [TestCase(HitResult.HealthBonus, false)]
+        [TestCase(HitResult.HealthBonus, true)]
         public void TestIsBonus(HitResult hitResult, bool expectedReturnValue)
         {
             Assert.AreEqual(expectedReturnValue, hitResult.IsBonus());
