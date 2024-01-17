@@ -41,5 +41,7 @@ namespace osu.Game.Screens.Play.HUD
 
         protected override void PopIn() => this.FadeIn(fade_duration);
         protected override void PopOut() => this.FadeOut(fade_duration);
+
+        public void Insert(int i, PlayerSettingsGroup drawable) => content.Insert(i, drawable);
     }
 }
