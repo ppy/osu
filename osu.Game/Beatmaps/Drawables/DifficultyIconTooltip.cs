@@ -158,7 +158,12 @@ namespace osu.Game.Beatmaps.Drawables
             difficultyName.Text = displayedContent.BeatmapInfo.DifficultyName;
 
             // Don't show difficulty stats if showExtendedTooltip is false
-            if (!displayedContent.ShowExtendedTooltip) return;
+            if (!displayedContent.ShowExtendedTooltip)
+            {
+                difficultyFillFlowContainer.Hide();
+                miscFillFlowContainer.Hide();
+                return;
+            }
 
             // Show the difficulty stats if showExtendedTooltip is true
             difficultyFillFlowContainer.Show();
