@@ -159,8 +159,8 @@ namespace osu.Game.Rulesets.Taiko.Skinning.Legacy
                     const float up_time = 50;
 
                     target.Animate(
-                        t => t.FadeTo(Math.Min(target.Alpha + alpha_amount, 1), down_time)
-                    ).Then(
+                        t => t.FadeTo(Math.Min(target.Alpha + alpha_amount, 1), down_time, Easing.Out)
+                    ).Delay(100).Then(
                         t => t.FadeOut(up_time)
                     );
                 }
