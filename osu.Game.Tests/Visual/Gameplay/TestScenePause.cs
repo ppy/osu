@@ -122,7 +122,7 @@ namespace osu.Game.Tests.Visual.Gameplay
 
             resumeAndConfirm();
 
-            AddAssert("Resumed without seeking forward", () => Player.LastResumeTime, () => Is.LessThanOrEqualTo(Player.LastPauseTime));
+            AddAssert("continued playing forward", () => Player.LastResumeTime, () => Is.GreaterThanOrEqualTo(Player.LastPauseTime));
 
             AddUntilStep("player playing", () => Player.LocalUserPlaying.Value);
         }
