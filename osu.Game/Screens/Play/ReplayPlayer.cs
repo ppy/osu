@@ -12,6 +12,7 @@ using osu.Framework.Bindables;
 using osu.Framework.Input.Bindings;
 using osu.Framework.Input.Events;
 using osu.Game.Beatmaps;
+using osu.Game.Configuration;
 using osu.Game.Input.Bindings;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Scoring;
@@ -52,7 +53,7 @@ namespace osu.Game.Screens.Play
         }
 
         [BackgroundDependencyLoader]
-        private void load()
+        private void load(OsuConfigManager config)
         {
             if (!LoadedBeatmapSuccessfully)
                 return;
@@ -60,7 +61,7 @@ namespace osu.Game.Screens.Play
             var playbackSettings = new PlaybackSettings
             {
                 Depth = float.MaxValue,
-                Expanded = { Value = false }
+                Expanded = { BindTarget = config.GetBindable<bool>(OsuSetting.ReplayPlaybackControlsExpanded) }
             };
 
             if (GameplayClockContainer is MasterGameplayClockContainer master)
