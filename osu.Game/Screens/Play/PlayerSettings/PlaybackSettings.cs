@@ -11,9 +11,9 @@ using osu.Game.Beatmaps;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Graphics.UserInterface;
+using osu.Game.Localisation;
 using osu.Game.Screens.Edit.Timing;
 using osuTK;
-using osu.Game.Localisation;
 
 namespace osu.Game.Screens.Play.PlayerSettings
 {
@@ -28,25 +28,30 @@ namespace osu.Game.Screens.Play.PlayerSettings
             Precision = 0.01,
         };
 
-        private readonly PlayerSliderBar<double> rateSlider;
+        private PlayerSliderBar<double> rateSlider = null!;
 
-        private readonly OsuSpriteText multiplierText;
+        private OsuSpriteText multiplierText = null!;
 
-        private readonly BindableBool isPaused = new BindableBool();
-
-        [Resolved]
-        private GameplayClockContainer? gameplayClock { get; set; }
+        private readonly IBindable<bool> isPaused = new BindableBool();
 
         [Resolved]
-        private GameplayState? gameplayState { get; set; }
+        private GameplayClockContainer gameplayClock { get; set; } = null!;
+
+        [Resolved]
+        private GameplayState gameplayState { get; set; } = null!;
+
+        private IconButton pausePlay = null!;
 
         public PlaybackSettings()
             : base("playback")
         {
+        }
+
+        [BackgroundDependencyLoader]
+        private void load()
+        {
             const double seek_amount = 5000;
             const double seek_fast_amount = 10000;
-
-            IconButton play;
 
             Children = new Drawable[]
             {
@@ -82,7 +87,7 @@ namespace osu.Game.Screens.Play.PlayerSettings
                                     Action = () => seek(-1, seek_amount),
                                     TooltipText = PlayerSettingsOverlayStrings.SeekBackwardSeconds(seek_amount / 1000),
                                 },
-                                play = new IconButton
+                                pausePlay = new IconButton
                                 {
                                     Anchor = Anchor.Centre,
                                     Origin = Anchor.Centre,
@@ -91,13 +96,10 @@ namespace osu.Game.Screens.Play.PlayerSettings
                                     Icon = FontAwesome.Regular.PlayCircle,
                                     Action = () =>
                                     {
-                                        if (gameplayClock != null)
-                                        {
-                                            if (gameplayClock.IsRunning)
-                                                gameplayClock.Stop();
-                                            else
-                                                gameplayClock.Start();
-                                        }
+                                        if (gameplayClock.IsRunning)
+                                            gameplayClock.Stop();
+                                        else
+                                            gameplayClock.Start();
                                     },
                                 },
                                 new SeekButton
@@ -141,26 +143,6 @@ namespace osu.Game.Screens.Play.PlayerSettings
                     },
                 },
             };
-
-            isPaused.BindValueChanged(paused =>
-            {
-                if (!paused.NewValue)
-                {
-                    play.TooltipText = ToastStrings.PauseTrack;
-                    play.Icon = FontAwesome.Regular.PauseCircle;
-                }
-                else
-                {
-                    play.TooltipText = ToastStrings.PlayTrack;
-                    play.Icon = FontAwesome.Regular.PlayCircle;
-                }
-            }, true);
-
-            void seek(int direction, double amount)
-            {
-                double target = Math.Clamp((gameplayClock?.CurrentTime ?? 0) + (direction * amount), 0, gameplayState?.Beatmap.GetLastObjectTime() ?? 0);
-                gameplayClock?.Seek(target);
-            }
         }
 
         protected override void LoadComplete()
@@ -168,8 +150,26 @@ namespace osu.Game.Screens.Play.PlayerSettings
             base.LoadComplete();
             rateSlider.Current.BindValueChanged(multiplier => multiplierText.Text = $"{multiplier.NewValue:0.00}x", true);
 
-            if (gameplayClock != null)
-                isPaused.BindTarget = gameplayClock.IsPaused;
+            isPaused.BindTo(gameplayClock.IsPaused);
+            isPaused.BindValueChanged(paused =>
+            {
+                if (!paused.NewValue)
+                {
+                    pausePlay.TooltipText = ToastStrings.PauseTrack;
+                    pausePlay.Icon = FontAwesome.Regular.PauseCircle;
+                }
+                else
+                {
+                    pausePlay.TooltipText = ToastStrings.PlayTrack;
+                    pausePlay.Icon = FontAwesome.Regular.PlayCircle;
+                }
+            }, true);
+        }
+
+        private void seek(int direction, double amount)
+        {
+            double target = Math.Clamp(gameplayClock.CurrentTime + (direction * amount), 0, gameplayState.Beatmap.GetLastObjectTime());
+            gameplayClock.Seek(target);
         }
 
         private partial class SeekButton : IconButton
