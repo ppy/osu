@@ -222,7 +222,8 @@ namespace osu.Game.Rulesets.Taiko.UI
 
             // Padding is required to be updated for elements which are based on "absolute" X sized elements.
             // This is basically allowing for correct alignment as relative pieces move around them.
-            rightArea.Padding = new MarginPadding { Left = inputDrum.Width };
+            // 24px offset was obtained via visual comparison with stable.
+            rightArea.Padding = new MarginPadding { Left = inputDrum.Width - 24 };
             barLineContent.Padding = new MarginPadding { Left = HitTarget.DrawWidth / 2 };
             hitObjectContent.Padding = new MarginPadding { Left = HitTarget.DrawWidth / 2 };
             overlayContent.Padding = new MarginPadding { Left = HitTarget.DrawWidth / 2 };
