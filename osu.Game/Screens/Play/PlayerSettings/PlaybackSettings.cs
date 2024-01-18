@@ -2,6 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
+using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
@@ -87,13 +88,20 @@ namespace osu.Game.Screens.Play.PlayerSettings
                                     Action = () => seek(-1, seek_amount),
                                     TooltipText = PlayerSettingsOverlayStrings.SeekBackwardSeconds(seek_amount / 1000),
                                 },
+                                new SeekButton
+                                {
+                                    Anchor = Anchor.Centre,
+                                    Origin = Anchor.Centre,
+                                    Icon = FontAwesome.Solid.StepBackward,
+                                    Action = () => seekFrame(-1),
+                                    TooltipText = PlayerSettingsOverlayStrings.StepBackward,
+                                },
                                 pausePlay = new IconButton
                                 {
                                     Anchor = Anchor.Centre,
                                     Origin = Anchor.Centre,
                                     Scale = new Vector2(1.4f),
                                     IconScale = new Vector2(1.4f),
-                                    Icon = FontAwesome.Regular.PlayCircle,
                                     Action = () =>
                                     {
                                         if (gameplayClock.IsRunning)
@@ -101,6 +109,14 @@ namespace osu.Game.Screens.Play.PlayerSettings
                                         else
                                             gameplayClock.Start();
                                     },
+                                },
+                                new SeekButton
+                                {
+                                    Anchor = Anchor.Centre,
+                                    Origin = Anchor.Centre,
+                                    Icon = FontAwesome.Solid.StepForward,
+                                    Action = () => seekFrame(1),
+                                    TooltipText = PlayerSettingsOverlayStrings.StepForward,
                                 },
                                 new SeekButton
                                 {
@@ -164,6 +180,21 @@ namespace osu.Game.Screens.Play.PlayerSettings
                     pausePlay.Icon = FontAwesome.Regular.PlayCircle;
                 }
             }, true);
+        }
+
+        private void seekFrame(int direction)
+        {
+            gameplayClock.Stop();
+
+            var frames = gameplayState.Score.Replay.Frames;
+
+            if (frames.Count == 0)
+                return;
+
+            gameplayClock.Seek(direction < 0
+                ? (frames.LastOrDefault(f => f.Time < gameplayClock.CurrentTime) ?? frames.First()).Time
+                : (frames.FirstOrDefault(f => f.Time > gameplayClock.CurrentTime) ?? frames.Last()).Time
+            );
         }
 
         private void seek(int direction, double amount)
