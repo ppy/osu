@@ -122,7 +122,7 @@ namespace osu.Game.Rulesets.UI
                 // if waiting on frames, run one update loop to determine if frames have arrived.
                 state = PlaybackState.Valid;
             }
-            else if (IsPaused.Value)
+            else if (IsPaused.Value && !hasReplayAttached)
             {
                 // time should not advance while paused, nor should anything run.
                 state = PlaybackState.NotValid;
