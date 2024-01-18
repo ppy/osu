@@ -1,7 +1,6 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using System;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
@@ -153,16 +152,12 @@ namespace osu.Game.Rulesets.Taiko.Skinning.Legacy
 
                 if (target != null)
                 {
-                    const float alpha_amount = 1;
-
                     const float down_time = 80;
                     const float up_time = 50;
 
-                    target.Animate(
-                        t => t.FadeTo(Math.Min(target.Alpha + alpha_amount, 1), down_time, Easing.Out)
-                    ).Delay(100).Then(
-                        t => t.FadeOut(up_time)
-                    );
+                    target
+                        .FadeTo(1, down_time * (1 - target.Alpha), Easing.Out)
+                        .Delay(100).FadeOut(up_time);
                 }
 
                 return false;
