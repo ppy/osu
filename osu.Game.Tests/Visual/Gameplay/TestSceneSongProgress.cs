@@ -3,6 +3,7 @@
 
 using System;
 using System.Linq;
+using System.Threading;
 using NUnit.Framework;
 using osu.Framework.Allocation;
 using osu.Framework.Extensions.IEnumerableExtensions;
@@ -45,12 +46,24 @@ namespace osu.Game.Tests.Visual.Gameplay
                 },
                 gameplayClockContainer = new MasterGameplayClockContainer(Beatmap.Value, skip_target_time)
                 {
-                    Child = frameStabilityContainer = new FrameStabilityContainer()
+                    Child = frameStabilityContainer = new FrameStabilityContainer
+                    {
+                        Child = new FakeLoad()
+                    }
                 }
             });
 
             Dependencies.CacheAs<IGameplayClock>(gameplayClockContainer);
             Dependencies.CacheAs<IFrameStableClock>(frameStabilityContainer);
+        }
+
+        private partial class FakeLoad : Drawable
+        {
+            protected override void Update()
+            {
+                base.Update();
+                Thread.Sleep(1);
+            }
         }
 
         [SetUpSteps]
