@@ -34,8 +34,6 @@ namespace osu.Game.Rulesets.UI
         /// </summary>
         internal bool FrameStablePlayback { get; set; } = true;
 
-        protected override bool RequiresChildrenUpdate => base.RequiresChildrenUpdate && state != PlaybackState.NotValid;
-
         private readonly Bindable<bool> isCatchingUp = new Bindable<bool>();
 
         private readonly Bindable<bool> waitingOnFrames = new Bindable<bool>();
