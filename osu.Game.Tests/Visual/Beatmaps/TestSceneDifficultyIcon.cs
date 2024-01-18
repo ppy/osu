@@ -4,11 +4,7 @@
 #nullable disable
 
 using NUnit.Framework;
-using osu.Framework.Allocation;
-using osu.Framework.Audio;
-using osu.Framework.Platform;
 using osu.Game.Beatmaps.Drawables;
-using osu.Game.Rulesets;
 using osu.Game.Rulesets.Osu;
 using osu.Game.Tests.Beatmaps;
 
@@ -17,7 +13,7 @@ namespace osu.Game.Tests.Visual.Beatmaps
     public partial class TestSceneDifficultyIcon : OsuTestScene
     {
         [Test]
-        public void createDifficultyIcon()
+        public void CreateDifficultyIcon()
         {
             DifficultyIcon difficultyIcon = null;
 
