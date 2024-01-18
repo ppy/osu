@@ -207,7 +207,6 @@ namespace osu.Game.Screens.Play
             musicController.ResetTrackAdjustments();
 
             track.BindAdjustments(AdjustmentsFromMods);
-            track.AddAdjustment(AdjustableProperty.Frequency, GameplayClock.ExternalPauseFrequencyAdjust);
             track.AddAdjustment(AdjustableProperty.Frequency, UserPlaybackRate);
 
             speedAdjustmentsApplied = true;
@@ -219,7 +218,6 @@ namespace osu.Game.Screens.Play
                 return;
 
             track.UnbindAdjustments(AdjustmentsFromMods);
-            track.RemoveAdjustment(AdjustableProperty.Frequency, GameplayClock.ExternalPauseFrequencyAdjust);
             track.RemoveAdjustment(AdjustableProperty.Frequency, UserPlaybackRate);
 
             speedAdjustmentsApplied = false;
