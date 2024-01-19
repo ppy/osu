@@ -280,7 +280,7 @@ namespace osu.Game.Scoring.Legacy
         {
             scoreInfo.Accuracy = StandardisedScoreMigrationTools.ComputeAccuracy(scoreInfo);
 
-            var rank = currentRuleset.CreateScoreProcessor().RankFromAccuracy(scoreInfo.Accuracy);
+            var rank = currentRuleset.CreateScoreProcessor().RankFromScore(scoreInfo.Accuracy, scoreInfo.Statistics);
 
             foreach (var mod in scoreInfo.Mods.OfType<IApplicableToScoreProcessor>())
                 rank = mod.AdjustRank(rank, scoreInfo.Accuracy);

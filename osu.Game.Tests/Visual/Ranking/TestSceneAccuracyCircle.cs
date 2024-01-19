@@ -2,6 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
+using System.Collections.Generic;
 using NUnit.Framework;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
@@ -96,6 +97,14 @@ namespace osu.Game.Tests.Visual.Ranking
         {
             var scoreProcessor = ruleset.CreateScoreProcessor();
 
+            var statistics = new Dictionary<HitResult, int>
+            {
+                { HitResult.Miss, 1 },
+                { HitResult.Meh, 50 },
+                { HitResult.Good, 100 },
+                { HitResult.Great, 300 },
+            };
+
             return new ScoreInfo
             {
                 User = new APIUser
@@ -109,15 +118,9 @@ namespace osu.Game.Tests.Visual.Ranking
                 TotalScore = 2845370,
                 Accuracy = accuracy,
                 MaxCombo = 999,
-                Rank = scoreProcessor.RankFromAccuracy(accuracy),
+                Rank = scoreProcessor.RankFromScore(accuracy, statistics),
                 Date = DateTimeOffset.Now,
-                Statistics =
-                {
-                    { HitResult.Miss, 1 },
-                    { HitResult.Meh, 50 },
-                    { HitResult.Good, 100 },
-                    { HitResult.Great, 300 },
-                }
+                Statistics = statistics,
             };
         }
     }
