@@ -23,6 +23,7 @@ namespace osu.Game.Users
     {
         private const int padding = 10;
         private const int main_content_height = 80;
+        private const float avatar_size = 60f;
 
         [Resolved]
         private IAPIProvider api { get; set; } = null!;
@@ -103,7 +104,7 @@ namespace osu.Game.Users
                                         {
                                             CreateAvatar().With(avatar =>
                                             {
-                                                avatar.Size = new Vector2(60);
+                                                avatar.Size = new Vector2(avatar_size);
                                                 avatar.Masking = true;
                                                 avatar.CornerRadius = 6;
                                             }),
@@ -162,27 +163,35 @@ namespace osu.Game.Users
                         Margin = new MarginPadding { Top = main_content_height },
                         RelativeSizeAxes = Axes.X,
                         AutoSizeAxes = Axes.Y,
-                        Padding = new MarginPadding { Left = 80, Vertical = padding },
+                        Padding = new MarginPadding { Vertical = padding },
                         Child = new GridContainer
                         {
                             RelativeSizeAxes = Axes.X,
                             AutoSizeAxes = Axes.Y,
                             ColumnDimensions = new[]
                             {
+                                new Dimension(GridSizeMode.Absolute, size: avatar_size + padding * 2),
+                                new Dimension(GridSizeMode.AutoSize),
                                 new Dimension(),
-                                new Dimension()
                             },
                             RowDimensions = new[] { new Dimension(GridSizeMode.AutoSize) },
                             Content = new[]
                             {
                                 new Drawable[]
                                 {
+                                    new UserRulesetDisplay(User)
+                                    {
+                                        Anchor = Anchor.TopCentre,
+                                        Origin = Anchor.TopCentre,
+                                    },
                                     globalRankDisplay = new ProfileValueDisplay(true)
                                     {
                                         Title = UsersStrings.ShowRankGlobalSimple,
                                     },
                                     countryRankDisplay = new ProfileValueDisplay(true)
                                     {
+                                        Anchor = Anchor.TopCentre,
+                                        Origin = Anchor.TopCentre,
                                         Title = UsersStrings.ShowRankCountrySimple,
                                     }
                                 }
