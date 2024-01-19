@@ -51,7 +51,12 @@ namespace osu.Game.Rulesets.Taiko.UI
 
             // Position the taiko playfield exactly one playfield from the top of the screen, if there is enough space for it.
             // Note that the relative height cannot exceed one-third - if that limit is hit, the playfield will be exactly centered.
-            Y = relativeHeight;
+            float playfieldPosition = relativeHeight;
+
+            // arbitrary offset to make playfield position match stable.
+            playfieldPosition += 0.022f;
+
+            Y = playfieldPosition;
 
             Scale = new Vector2(Math.Max((Parent!.ChildSize.Y / 768f) * (relativeHeight / base_relative_height), 1f));
             Width = 1 / Scale.X;
