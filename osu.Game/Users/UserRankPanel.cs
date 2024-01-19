@@ -79,85 +79,78 @@ namespace osu.Game.Users
                                 User = User,
                                 Alpha = 0.3f
                             },
-                            new GridContainer
+                            new Container
                             {
-                                AutoSizeAxes = Axes.Y,
                                 RelativeSizeAxes = Axes.X,
-                                ColumnDimensions = new[]
+                                AutoSizeAxes = Axes.Y,
+                                Padding = new MarginPadding(padding),
+                                Child = new GridContainer
                                 {
-                                    new Dimension(GridSizeMode.Absolute, padding),
-                                    new Dimension(GridSizeMode.AutoSize),
-                                    new Dimension(),
-                                    new Dimension(GridSizeMode.Absolute, padding),
-                                },
-                                RowDimensions = new[]
-                                {
-                                    new Dimension(GridSizeMode.Absolute, padding),
-                                    new Dimension(GridSizeMode.AutoSize),
-                                },
-                                Content = new[]
-                                {
-                                    new[]
+                                    RelativeSizeAxes = Axes.X,
+                                    AutoSizeAxes = Axes.Y,
+                                    ColumnDimensions = new[]
                                     {
-                                        // padding
-                                        Empty(),
-                                        Empty(),
-                                        Empty(),
-                                        Empty()
+                                        new Dimension(GridSizeMode.AutoSize),
+                                        new Dimension(),
                                     },
-                                    new[]
+                                    RowDimensions = new[]
                                     {
-                                        Empty(), // padding
-                                        CreateAvatar().With(avatar =>
+                                        new Dimension(GridSizeMode.AutoSize),
+                                    },
+                                    Content = new[]
+                                    {
+                                        new Drawable[]
                                         {
-                                            avatar.Size = new Vector2(60);
-                                            avatar.Masking = true;
-                                            avatar.CornerRadius = 6;
-                                        }),
-                                        new Container
-                                        {
-                                            RelativeSizeAxes = Axes.Both,
-                                            Padding = new MarginPadding { Left = padding },
-                                            Child = new GridContainer
+                                            CreateAvatar().With(avatar =>
+                                            {
+                                                avatar.Size = new Vector2(60);
+                                                avatar.Masking = true;
+                                                avatar.CornerRadius = 6;
+                                            }),
+                                            new Container
                                             {
                                                 RelativeSizeAxes = Axes.Both,
-                                                ColumnDimensions = new[]
+                                                Padding = new MarginPadding { Left = padding },
+                                                Child = new GridContainer
                                                 {
-                                                    new Dimension()
-                                                },
-                                                RowDimensions = new[]
-                                                {
-                                                    new Dimension(GridSizeMode.AutoSize),
-                                                    new Dimension()
-                                                },
-                                                Content = new[]
-                                                {
-                                                    new Drawable[]
+                                                    RelativeSizeAxes = Axes.Both,
+                                                    ColumnDimensions = new[]
                                                     {
-                                                        details = new FillFlowContainer
-                                                        {
-                                                            AutoSizeAxes = Axes.Both,
-                                                            Direction = FillDirection.Horizontal,
-                                                            Spacing = new Vector2(6),
-                                                            Children = new Drawable[]
-                                                            {
-                                                                CreateFlag(),
-                                                                // supporter icon is being added later
-                                                            }
-                                                        }
+                                                        new Dimension()
                                                     },
-                                                    new Drawable[]
+                                                    RowDimensions = new[]
                                                     {
-                                                        CreateUsername().With(username =>
+                                                        new Dimension(GridSizeMode.AutoSize),
+                                                        new Dimension()
+                                                    },
+                                                    Content = new[]
+                                                    {
+                                                        new Drawable[]
                                                         {
-                                                            username.Anchor = Anchor.CentreLeft;
-                                                            username.Origin = Anchor.CentreLeft;
-                                                        })
+                                                            details = new FillFlowContainer
+                                                            {
+                                                                AutoSizeAxes = Axes.Both,
+                                                                Direction = FillDirection.Horizontal,
+                                                                Spacing = new Vector2(6),
+                                                                Children = new Drawable[]
+                                                                {
+                                                                    CreateFlag(),
+                                                                    // supporter icon is being added later
+                                                                }
+                                                            }
+                                                        },
+                                                        new Drawable[]
+                                                        {
+                                                            CreateUsername().With(username =>
+                                                            {
+                                                                username.Anchor = Anchor.CentreLeft;
+                                                                username.Origin = Anchor.CentreLeft;
+                                                            })
+                                                        }
                                                     }
                                                 }
                                             }
-                                        },
-                                        Empty() // padding
+                                        }
                                     }
                                 }
                             }
