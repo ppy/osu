@@ -28,9 +28,9 @@ namespace osu.Game.Rulesets.Taiko.UI
     public partial class TaikoPlayfield : ScrollingPlayfield
     {
         /// <summary>
-        /// Default height of a <see cref="TaikoPlayfield"/> when inside a <see cref="DrawableTaikoRuleset"/>.
+        /// Base height of a <see cref="TaikoPlayfield"/> when inside a <see cref="DrawableTaikoRuleset"/>.
         /// </summary>
-        public const float DEFAULT_HEIGHT = 200;
+        public const float BASE_HEIGHT = 200;
 
         /// <summary>
         /// Whether the hit target should be nudged further towards the left area, matching the stable "classic" position.
