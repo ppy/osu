@@ -53,7 +53,7 @@ namespace osu.Game.Rulesets.Taiko.Skinning.Legacy
 
             // Relying on RelativeSizeAxes.Both + FillMode.Fit doesn't work due to the precise pixel layout requirements.
             // This is a bit ugly but makes the non-legacy implementations a lot cleaner to implement.
-            content.Scale = new Vector2(DrawHeight / TaikoPlayfield.DEFAULT_HEIGHT);
+            content.Scale = new Vector2(DrawHeight / TaikoPlayfield.BASE_HEIGHT);
         }
     }
 }
