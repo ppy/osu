@@ -53,7 +53,7 @@ namespace osu.Game.Rulesets.Taiko.UI
             // Note that the relative height cannot exceed one-third - if that limit is hit, the playfield will be exactly centered.
             Y = relativeHeight;
 
-            Scale = new Vector2(Math.Max(relativeHeight / base_relative_height, 1f));
+            Scale = new Vector2(Math.Max((Parent!.ChildSize.Y / 768f) * (relativeHeight / base_relative_height), 1f));
             Width = 1 / Scale.X;
         }
     }
