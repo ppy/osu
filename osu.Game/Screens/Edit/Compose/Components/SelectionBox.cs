@@ -27,7 +27,6 @@ namespace osu.Game.Screens.Edit.Compose.Components
         [Resolved]
         private SelectionRotationHandler? rotationHandler { get; set; }
 
-        public Func<Vector2, Anchor, bool>? OnScale;
         public Func<Direction, bool, bool>? OnFlip;
         public Func<bool>? OnReverse;
 
@@ -353,7 +352,6 @@ namespace osu.Game.Screens.Edit.Compose.Components
             var handle = new SelectionBoxScaleHandle
             {
                 Anchor = anchor,
-                HandleScale = (delta, a) => OnScale?.Invoke(delta, a)
             };
 
             handle.OperationStarted += operationStarted;

@@ -3,7 +3,6 @@
 
 using System.Collections.Generic;
 using System.Linq;
-using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Primitives;
 using osu.Framework.Graphics.UserInterface;
@@ -25,15 +24,6 @@ namespace osu.Game.Rulesets.Osu.Edit
 {
     public partial class OsuSelectionHandler : EditorSelectionHandler
     {
-        [Resolved(CanBeNull = true)]
-        private IDistanceSnapProvider? snapProvider { get; set; }
-
-        /// <summary>
-        /// During a transform, the initial path types of a single selected slider are stored so they
-        /// can be maintained throughout the operation.
-        /// </summary>
-        private List<PathType?>? referencePathTypes;
-
         protected override void OnSelectionChanged()
         {
             base.OnSelectionChanged();
@@ -44,12 +34,6 @@ namespace osu.Game.Rulesets.Osu.Edit
             SelectionBox.CanFlipY = SelectionBox.CanScaleY = quad.Height > 0;
             SelectionBox.CanScaleDiagonally = SelectionBox.CanScaleX && SelectionBox.CanScaleY;
             SelectionBox.CanReverse = EditorBeatmap.SelectedHitObjects.Count > 1 || EditorBeatmap.SelectedHitObjects.Any(s => s is Slider);
-        }
-
-        protected override void OnOperationEnded()
-        {
-            base.OnOperationEnded();
-            referencePathTypes = null;
         }
 
         protected override bool OnKeyDown(KeyDownEvent e)
@@ -135,96 +119,9 @@ namespace osu.Game.Rulesets.Osu.Edit
             return didFlip;
         }
 
-        public override bool HandleScale(Vector2 scale, Anchor reference)
-        {
-            adjustScaleFromAnchor(ref scale, reference);
-
-            var hitObjects = selectedMovableObjects;
-
-            // for the time being, allow resizing of slider paths only if the slider is
-            // the only hit object selected. with a group selection, it's likely the user
-            // is not looking to change the duration of the slider but expand the whole pattern.
-            if (hitObjects.Length == 1 && hitObjects.First() is Slider slider)
-                scaleSlider(slider, scale);
-            else
-                scaleHitObjects(hitObjects, reference, scale);
-
-            moveSelectionInBounds();
-            return true;
-        }
-
-        private static void adjustScaleFromAnchor(ref Vector2 scale, Anchor reference)
-        {
-            // cancel out scale in axes we don't care about (based on which drag handle was used).
-            if ((reference & Anchor.x1) > 0) scale.X = 0;
-            if ((reference & Anchor.y1) > 0) scale.Y = 0;
-
-            // reverse the scale direction if dragging from top or left.
-            if ((reference & Anchor.x0) > 0) scale.X = -scale.X;
-            if ((reference & Anchor.y0) > 0) scale.Y = -scale.Y;
-        }
-
         public override SelectionRotationHandler CreateRotationHandler() => new OsuSelectionRotationHandler();
 
-        private void scaleSlider(Slider slider, Vector2 scale)
-        {
-            referencePathTypes ??= slider.Path.ControlPoints.Select(p => p.Type).ToList();
-
-            Quad sliderQuad = GeometryUtils.GetSurroundingQuad(slider.Path.ControlPoints.Select(p => p.Position));
-
-            // Limit minimum distance between control points after scaling to almost 0. Less than 0 causes the slider to flip, exactly 0 causes a crash through division by 0.
-            scale = Vector2.ComponentMax(new Vector2(Precision.FLOAT_EPSILON), sliderQuad.Size + scale) - sliderQuad.Size;
-
-            Vector2 pathRelativeDeltaScale = new Vector2(
-                sliderQuad.Width == 0 ? 0 : 1 + scale.X / sliderQuad.Width,
-                sliderQuad.Height == 0 ? 0 : 1 + scale.Y / sliderQuad.Height);
-
-            Queue<Vector2> oldControlPoints = new Queue<Vector2>();
-
-            foreach (var point in slider.Path.ControlPoints)
-            {
-                oldControlPoints.Enqueue(point.Position);
-                point.Position *= pathRelativeDeltaScale;
-            }
-
-            // Maintain the path types in case they were defaulted to bezier at some point during scaling
-            for (int i = 0; i < slider.Path.ControlPoints.Count; ++i)
-                slider.Path.ControlPoints[i].Type = referencePathTypes[i];
-
-            // Snap the slider's length to the current beat divisor
-            // to calculate the final resulting duration / bounding box before the final checks.
-            slider.SnapTo(snapProvider);
-
-            //if sliderhead or sliderend end up outside playfield, revert scaling.
-            Quad scaledQuad = GeometryUtils.GetSurroundingQuad(new OsuHitObject[] { slider });
-            (bool xInBounds, bool yInBounds) = isQuadInBounds(scaledQuad);
-
-            if (xInBounds && yInBounds && slider.Path.HasValidLength)
-                return;
-
-            foreach (var point in slider.Path.ControlPoints)
-                point.Position = oldControlPoints.Dequeue();
-
-            // Snap the slider's length again to undo the potentially-invalid length applied by the previous snap.
-            slider.SnapTo(snapProvider);
-        }
-
-        private void scaleHitObjects(OsuHitObject[] hitObjects, Anchor reference, Vector2 scale)
-        {
-            scale = getClampedScale(hitObjects, reference, scale);
-            Quad selectionQuad = GeometryUtils.GetSurroundingQuad(hitObjects);
-
-            foreach (var h in hitObjects)
-                h.Position = GeometryUtils.GetScaledPosition(reference, scale, selectionQuad, h.Position);
-        }
-
-        private (bool X, bool Y) isQuadInBounds(Quad quad)
-        {
-            bool xInBounds = (quad.TopLeft.X >= 0) && (quad.BottomRight.X <= DrawWidth);
-            bool yInBounds = (quad.TopLeft.Y >= 0) && (quad.BottomRight.Y <= DrawHeight);
-
-            return (xInBounds, yInBounds);
-        }
+        public override SelectionScaleHandler CreateScaleHandler() => new OsuSelectionScaleHandler();
 
         private void moveSelectionInBounds()
         {
@@ -246,43 +143,6 @@ namespace osu.Game.Rulesets.Osu.Edit
 
             foreach (var h in hitObjects)
                 h.Position += delta;
-        }
-
-        /// <summary>
-        /// Clamp scale for multi-object-scaling where selection does not exceed playfield bounds or flip.
-        /// </summary>
-        /// <param name="hitObjects">The hitobjects to be scaled</param>
-        /// <param name="reference">The anchor from which the scale operation is performed</param>
-        /// <param name="scale">The scale to be clamped</param>
-        /// <returns>The clamped scale vector</returns>
-        private Vector2 getClampedScale(OsuHitObject[] hitObjects, Anchor reference, Vector2 scale)
-        {
-            float xOffset = ((reference & Anchor.x0) > 0) ? -scale.X : 0;
-            float yOffset = ((reference & Anchor.y0) > 0) ? -scale.Y : 0;
-
-            Quad selectionQuad = GeometryUtils.GetSurroundingQuad(hitObjects);
-
-            //todo: this is not always correct for selections involving sliders. This approximation assumes each point is scaled independently, but sliderends move with the sliderhead.
-            Quad scaledQuad = new Quad(selectionQuad.TopLeft.X + xOffset, selectionQuad.TopLeft.Y + yOffset, selectionQuad.Width + scale.X, selectionQuad.Height + scale.Y);
-
-            //max Size -> playfield bounds
-            if (scaledQuad.TopLeft.X < 0)
-                scale.X += scaledQuad.TopLeft.X;
-            if (scaledQuad.TopLeft.Y < 0)
-                scale.Y += scaledQuad.TopLeft.Y;
-
-            if (scaledQuad.BottomRight.X > DrawWidth)
-                scale.X -= scaledQuad.BottomRight.X - DrawWidth;
-            if (scaledQuad.BottomRight.Y > DrawHeight)
-                scale.Y -= scaledQuad.BottomRight.Y - DrawHeight;
-
-            //min Size -> almost 0. Less than 0 causes the quad to flip, exactly 0 causes scaling to get stuck at minimum scale.
-            Vector2 scaledSize = selectionQuad.Size + scale;
-            Vector2 minSize = new Vector2(Precision.FLOAT_EPSILON);
-
-            scale = Vector2.ComponentMax(minSize, scaledSize) - selectionQuad.Size;
-
-            return scale;
         }
 
         /// <summary>
