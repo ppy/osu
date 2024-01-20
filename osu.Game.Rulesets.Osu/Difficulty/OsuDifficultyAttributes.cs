@@ -39,10 +39,22 @@ namespace osu.Game.Rulesets.Osu.Difficulty
         public double FlashlightDifficulty { get; set; }
 
         /// <summary>
-        /// The difficulty corresponding to the reading skill.
+        /// The difficulty corresponding to the reading skill. Low AR branch.
         /// </summary>
-        [JsonProperty("reading_difficulty")]
-        public double ReadingDifficulty { get; set; }
+        [JsonProperty("reading_low_ar_difficulty")]
+        public double ReadingDifficultyLowAR { get; set; }
+
+        /// <summary>
+        /// The difficulty corresponding to the reading skill. High AR branch.
+        /// </summary>
+        [JsonProperty("reading_high_ar_difficulty")]
+        public double ReadingDifficultyHighAR { get; set; }
+
+        /// <summary>
+        /// The difficulty corresponding to the reading skill. Hidden mod branch.
+        /// </summary>
+        [JsonProperty("reading_hidden_difficulty")]
+        public double ReadingDifficultyHidden { get; set; }
 
         /// <summary>
         /// Describes how much of <see cref="AimDifficulty"/> is contributed to by hitcircles or sliders.

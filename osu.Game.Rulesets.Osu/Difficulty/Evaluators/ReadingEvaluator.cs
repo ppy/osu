@@ -15,22 +15,16 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
     {
         private const double reading_window_size = 3000;
 
-        private const double hidden_multiplier = 0.0;
-        private const double density_multiplier = 1.0;
         private const double overlap_multiplier = 0.5;
 
-        public static double EvaluateDifficultyOf(DifficultyHitObject current, bool hidden)
+        public static double EvaluateDensityDifficultyOf(DifficultyHitObject current)
         {
             if (current.BaseObject is Spinner || current.Index == 0)
                 return 0;
 
             var currObj = (OsuDifficultyHitObject)current;
-            double currVelocity = currObj.LazyJumpDistance / currObj.StrainTime;
 
-            // Maybe I should just pass in clockrate...
-            var clockRateEstimate = current.BaseObject.StartTime / currObj.StartTime;
-
-            double pastObjectDifficultyInfluence = 1.0;
+            double pastObjectDifficultyInfluence = 0;
             double screenOverlapDifficulty = 0;
 
             foreach (var loopObj in retrievePastVisibleObjects(currObj))
@@ -40,7 +34,8 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
                 // Small distances means objects may be cheesed, so it doesn't matter whether they are arranged confusingly.
                 loopDifficulty *= logistic((loopObj.MinimumJumpDistance - 90) / 15);
 
-                double timeBetweenCurrAndLoopObj = (currObj.BaseObject.StartTime - loopObj.BaseObject.StartTime) / clockRateEstimate;
+                //double timeBetweenCurrAndLoopObj = (currObj.BaseObject.StartTime - loopObj.BaseObject.StartTime) / clockRateEstimate;
+                double timeBetweenCurrAndLoopObj = currObj.StartTime - loopObj.StartTime;
                 loopDifficulty *= getTimeNerfFactor(timeBetweenCurrAndLoopObj);
 
                 pastObjectDifficultyInfluence += loopDifficulty;
@@ -54,39 +49,60 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
                 screenOverlapDifficulty += lastOverlapness;
             }
 
-            if (screenOverlapDifficulty > 0)
-            {
-                Console.WriteLine($"Object {currObj.StartTime}, overlapness = {screenOverlapDifficulty:0.##}");
-            }
+            //if (screenOverlapDifficulty > 0)
+            //{
+            //    Console.WriteLine($"Object {currObj.StartTime}, overlapness = {screenOverlapDifficulty:0.##}");
+            //}
 
-            double noteDensityDifficulty = Math.Pow(4 * Math.Log(Math.Max(1, pastObjectDifficultyInfluence - 3)), 2.3);
-
-            double hiddenDifficulty = 0;
-
-            if (hidden)
-            {
-                double timeSpentInvisible = getDurationSpentInvisible(currObj) / clockRateEstimate;
-                double timeDifficultyFactor = 1000 / pastObjectDifficultyInfluence;
-
-                double visibleObjectFactor = Math.Clamp(retrieveCurrentVisibleObjects(currObj).Count - 2, 0, 15);
-
-                hiddenDifficulty += Math.Pow(visibleObjectFactor * timeSpentInvisible / timeDifficultyFactor, 1) +
-                                    (8 + visibleObjectFactor) * currVelocity;
-            }
-
-            double difficulty = density_multiplier * noteDensityDifficulty;
+            double difficulty = Math.Pow(4 * Math.Log(Math.Max(1, pastObjectDifficultyInfluence)), 2.3);
 
             screenOverlapDifficulty = Math.Max(0, screenOverlapDifficulty - 0.5); // make overlap value =1 cost significantly less
-            difficulty *= 1 + overlap_multiplier * screenOverlapDifficulty;
-
             difficulty *= getConstantAngleNerfFactor(currObj);
 
-
-            difficulty += hidden_multiplier * hiddenDifficulty;
+            difficulty *= 1 + overlap_multiplier * screenOverlapDifficulty;
 
             // Console.WriteLine($"Object {currObj.StartTime}, {hiddenDifficulty:0.##} + {noteDensityDifficulty:0.##} + {overlapDifficulty:0.##}");
 
             return difficulty;
+        }
+
+        public static double EvaluateHighARDifficultyOf(DifficultyHitObject current, bool applyFollowLineAdjust = false)
+        {
+            // follow lines make high AR easier, so apply nerf if object isn't new combo
+            // double adjustedApproachTime = osuCurrObj.Preempt;
+            // if (applyFollowLineAdjust) adjustedApproachTime += Math.Max(0, (osuCurrObj.FollowLineTime - 200) / 25);
+
+            var currObj = (OsuDifficultyHitObject)current;
+
+            return highArCurve(currObj.Preempt);
+        }
+
+        public static double EvaluateHiddenDifficultyOf(DifficultyHitObject current)
+        {
+            var currObj = (OsuDifficultyHitObject)current;
+
+            // Maybe I should just pass in clockrate...
+            double clockRateEstimate = current.BaseObject.StartTime / currObj.StartTime;
+            double currVelocity = currObj.LazyJumpDistance / currObj.StrainTime;
+
+            double hdDifficulty = 0;
+
+            double timeSpentInvisible = getDurationSpentInvisible(currObj) / clockRateEstimate;
+
+            // Apollo version
+            // double timeDifficultyFactor = pastObjectDifficultyInfluence / 1000;
+
+            double visibleObjectFactor = Math.Clamp(retrieveCurrentVisibleObjects(currObj).Count - 2, 0, 15);
+
+            hdDifficulty += Math.Pow(visibleObjectFactor * timeSpentInvisible, 1) +
+                            (8 + visibleObjectFactor) * currVelocity;
+
+            return hdDifficulty;
+        }
+
+        public static double EvaluatePredictabilityOf(DifficultyHitObject current)
+        {
+            return 0;
         }
 
         // Returns a list of objects that are visible on screen at
@@ -170,6 +186,17 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
             return Math.Clamp(2 - deltaTime / (reading_window_size / 2), 0, 1);
         }
 
+        // https://www.desmos.com/calculator/hbj7swzlth
+        private static double highArCurve(double preempt)
+        {
+            double value = Math.Pow(4, 3 - 0.01 * preempt); // 1 for 300ms, 0.25 for 400ms, 0.0625 for 500ms
+            value = softmin(value, 2, 1.7); // use softmin to achieve full-memory cap, 2 times more than AR11 (300ms)
+            return value;
+        }
         private static double logistic(double x) => 1 / (1 + Math.Exp(-x));
+
+        // We are using mutiply and divide instead of add and subtract, so values won't be negative
+        // https://www.desmos.com/calculator/fv5xerwpd2
+        private static double softmin(double a, double b, double power = Math.E) => a * b / Math.Log(Math.Pow(power, a) + Math.Pow(power, b), power);
     }
 }

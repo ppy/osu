@@ -15,6 +15,8 @@ namespace osu.Game.Rulesets.Osu.Difficulty
     {
         public const double PERFORMANCE_BASE_MULTIPLIER = 1.14; // This is being adjusted to keep the final pp value scaled around what it used to be when changing things.
 
+        public static double SumPower => 1.1; // Maybe it should just use OsuDifficultyCalculator SumPower
+
         private double accuracy;
         private int scoreMaxCombo;
         private int countGreat;
@@ -68,11 +70,11 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             double readingValue = computeReadingValue(score, osuAttributes);
             double totalValue =
                 Math.Pow(
-                    Math.Pow(aimValue, 1.1) +
-                    Math.Pow(speedValue, 1.1) +
-                    Math.Pow(accuracyValue, 1.1) +
-                    Math.Pow(flashlightValue, 1.1) +
-                    Math.Pow(readingValue, 1.1), 1.0 / 1.1
+                    Math.Pow(aimValue, SumPower) +
+                    Math.Pow(speedValue, SumPower) +
+                    Math.Pow(accuracyValue, SumPower) +
+                    Math.Pow(flashlightValue, SumPower) +
+                    Math.Pow(readingValue, SumPower), 1.0 / SumPower
                 ) * multiplier;
 
             return new OsuPerformanceAttributes
@@ -102,8 +104,8 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             aimValue *= getComboScalingFactor(attributes);
 
             double approachRateFactor = 0.0;
-            if (attributes.ApproachRate > 10.33)
-                approachRateFactor = 0.3 * (attributes.ApproachRate - 10.33);
+            //if (attributes.ApproachRate > 10.33)
+            //    approachRateFactor = 0.3 * (attributes.ApproachRate - 10.33);
             // for testing
             //else if (attributes.ApproachRate < 8.0)
             //    approachRateFactor = 0.05 * (8.0 - attributes.ApproachRate);
@@ -157,8 +159,8 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             speedValue *= getComboScalingFactor(attributes);
 
             double approachRateFactor = 0.0;
-            if (attributes.ApproachRate > 10.33)
-                approachRateFactor = 0.3 * (attributes.ApproachRate - 10.33);
+            //if (attributes.ApproachRate > 10.33)
+            //    approachRateFactor = 0.3 * (attributes.ApproachRate - 10.33);
 
             speedValue *= 1.0 + approachRateFactor * lengthBonus; // Buff for longer maps with high AR.
 
@@ -255,12 +257,28 @@ namespace osu.Game.Rulesets.Osu.Difficulty
 
         private double computeReadingValue(ScoreInfo score, OsuDifficultyAttributes attributes)
         {
-            double rawReading = attributes.ReadingDifficulty;
+            // Taking the highest value
+            double readingARValue = Math.Max(computeReadingLowARValue(score, attributes), computeReadingHighARValue(score, attributes));
+            double readingHDValue = computeReadingHiddenValue(score, attributes);
+            // Here would be also readingSliderValue
+
+            double totalReadingValue =
+                Math.Pow(
+                    Math.Pow(readingARValue, SumPower) +
+                    Math.Pow(readingHDValue, SumPower), 1.0 / SumPower);
+
+            return totalReadingValue;
+        }
+
+        private double computeReadingLowARValue(ScoreInfo score, OsuDifficultyAttributes attributes)
+        {
+            double rawReading = attributes.ReadingDifficultyLowAR;
 
             if (score.Mods.Any(m => m is OsuModTouchDevice))
                 rawReading = Math.Pow(rawReading, 0.8);
 
-            double readingValue = Math.Pow(rawReading, 2.0) * 25.0;
+            // double readingValue = Math.Pow(rawReading, 2.0) * 25.0;
+            double readingValue = Math.Pow(rawReading, 2.0) * 25.0; // I need to change the curve
 
             // Penalize misses by assessing # of misses relative to the total # of objects. Default a 3% reduction for any # of misses.
             if (effectiveMissCount > 0)
@@ -268,12 +286,41 @@ namespace osu.Game.Rulesets.Osu.Difficulty
 
             readingValue *= getComboScalingFactor(attributes);
 
-            // Scale the reading value with accuracy _harshly_.
+            // Scale the reading value with accuracy _harshly_. Additional note: it would have it's own curve in Statistical Accuracy rework.
             readingValue *= accuracy * accuracy;
             // It is important to also consider accuracy difficulty when doing that.
-            readingValue *= 0.98 + Math.Pow(attributes.OverallDifficulty, 2) / 2500;
+            readingValue *= Math.Pow(0.98 + Math.Pow(attributes.OverallDifficulty, 2) / 2500, 2);
 
             return readingValue;
+        }
+
+        private double computeReadingHighARValue(ScoreInfo score, OsuDifficultyAttributes attributes)
+        {
+            // Copied from aim
+            double highARValue = Math.Pow(5.0 * Math.Max(1.0, attributes.ReadingDifficultyHighAR / 0.0675) - 4.0, 3.0) / 100000.0;
+
+            // High AR should have length bonus, even more agressive than normal aim
+            double lengthBonus = 0.95 + 0.4 * Math.Min(1.0, totalHits / 2000.0) +
+                                 (totalHits > 2000 ? Math.Log10(totalHits / 2000.0) * 0.5 : 0.0);
+            highARValue *= lengthBonus * lengthBonus;
+
+            // Penalize misses by assessing # of misses relative to the total # of objects. Default a 3% reduction for any # of misses.
+            if (effectiveMissCount > 0)
+                highARValue *= 0.97 * Math.Pow(1 - Math.Pow(effectiveMissCount / totalHits, 0.775), effectiveMissCount);
+
+            highARValue *= getComboScalingFactor(attributes);
+
+            // Same as Aim
+            highARValue *= accuracy;
+            // It is important to consider accuracy difficulty when scaling with accuracy.
+            highARValue *= 0.98 + Math.Pow(attributes.OverallDifficulty, 2) / 2500;
+
+            return highARValue;
+        }
+
+        private double computeReadingHiddenValue(ScoreInfo score, OsuDifficultyAttributes attributes)
+        {
+            return 0;
         }
 
         private double calculateEffectiveMissCount(OsuDifficultyAttributes attributes)

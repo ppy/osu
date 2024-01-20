@@ -93,6 +93,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Preprocessing
         private readonly OsuHitObject? lastLastObject;
         private readonly OsuHitObject lastObject;
         public readonly double Preempt;
+        public readonly double FollowLineTime;
 
         public OsuDifficultyHitObject(HitObject hitObject, HitObject lastObject, HitObject? lastLastObject, double clockRate, List<DifficultyHitObject> objects, int index)
             : base(hitObject, lastObject, clockRate, objects, index)
@@ -183,7 +184,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Preprocessing
 
         private static double calculateOverlapness(OsuDifficultyHitObject odho1, OsuDifficultyHitObject odho2)
         {
-            const double area_coef = 0.7;
+            const double area_coef = 0.8;
 
             OsuHitObject o1 = odho1.BaseObject, o2 = odho2.BaseObject;
 
@@ -201,6 +202,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Preprocessing
 
             double overlappingAreaNormalized = (s1 - s2) * 2 / (Math.PI * radius_sqr);
 
+            // don't ask me how i get this value, looks oddly similar to PI - 3
             const double stack_distance_ratio = 0.1414213562373;
 
             double perfectStackBuff = (stack_distance_ratio - distance / radius) / stack_distance_ratio; // scale from 0 on normal stack to 1 on perfect stack

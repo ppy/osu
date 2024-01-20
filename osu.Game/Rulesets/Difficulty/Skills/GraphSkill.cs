@@ -25,7 +25,7 @@ namespace osu.Game.Rulesets.Difficulty.Skills
         /// </summary>
         protected virtual int SectionLength => 400;
 
-        protected double CurrentSectionPeak; // We also keep track of the peak level in the current section.
+        public double CurrentSectionPeak { get; protected set; } // We also keep track of the peak level in the current section.
 
         protected double CurrentSectionEnd;
 
