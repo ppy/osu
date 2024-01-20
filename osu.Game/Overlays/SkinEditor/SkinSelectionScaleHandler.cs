@@ -151,11 +151,11 @@ namespace osu.Game.Overlays.SkinEditor
                 switch (adjustAxis)
                 {
                     case Axes.X:
-                        b.Width = originalWidths[b] * currentScale.X;
+                        b.Width = MathF.Abs(originalWidths[b] * currentScale.X);
                         break;
 
                     case Axes.Y:
-                        b.Height = originalHeights[b] * currentScale.Y;
+                        b.Height = MathF.Abs(originalHeights[b] * currentScale.Y);
                         break;
 
                     case Axes.Both:
