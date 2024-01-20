@@ -5,7 +5,6 @@ using System;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Input.Events;
-using osu.Framework.Logging;
 using osuTK;
 using osuTK.Input;
 
@@ -94,7 +93,6 @@ namespace osu.Game.Screens.Edit.Compose.Components
         private Vector2 convertDragEventToScaleMultiplier(DragEvent e)
         {
             Vector2 scale = e.MousePosition - e.MouseDownPosition;
-            Logger.Log($"Raw scale {scale}");
             adjustScaleFromAnchor(ref scale);
             return Vector2.Divide(scale, scaleHandler!.OriginalSurroundingQuad!.Value.Size) + Vector2.One;
         }
@@ -116,7 +114,6 @@ namespace osu.Game.Screens.Edit.Compose.Components
                 ? new Vector2(MathF.Max(rawScale.X, rawScale.Y))
                 : rawScale;
 
-            Logger.Log($"Raw scale adjusted {newScale}, origin {getOriginPosition()}");
             scaleHandler!.Update(newScale, getOriginPosition());
         }
     }
