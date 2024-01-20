@@ -14,9 +14,23 @@ namespace osu.Game.Screens.Edit.Compose.Components
     public partial class SelectionScaleHandler : Component
     {
         /// <summary>
-        /// Whether the scale can currently be performed.
+        /// Whether horizontal scaling (from the left or right edge) support should be enabled.
         /// </summary>
-        public Bindable<bool> CanScale { get; private set; } = new BindableBool();
+        public Bindable<bool> CanScaleX { get; private set; } = new BindableBool();
+
+        /// <summary>
+        /// Whether vertical scaling (from the top or bottom edge) support should be enabled.
+        /// </summary>
+        public Bindable<bool> CanScaleY { get; private set; } = new BindableBool();
+
+        /// <summary>
+        /// Whether diagonal scaling (from a corner) support should be enabled.
+        /// </summary>
+        /// <remarks>
+        /// There are some cases where we only want to allow proportional resizing, and not allow
+        /// one or both explicit directions of scale.
+        /// </remarks>
+        public Bindable<bool> CanScaleDiagonally { get; private set; } = new BindableBool();
 
         public Quad? OriginalSurroundingQuad { get; protected set; }
 

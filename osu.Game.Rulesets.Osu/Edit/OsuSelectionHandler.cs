@@ -30,9 +30,8 @@ namespace osu.Game.Rulesets.Osu.Edit
 
             Quad quad = selectedMovableObjects.Length > 0 ? GeometryUtils.GetSurroundingQuad(selectedMovableObjects) : new Quad();
 
-            SelectionBox.CanFlipX = SelectionBox.CanScaleX = quad.Width > 0;
-            SelectionBox.CanFlipY = SelectionBox.CanScaleY = quad.Height > 0;
-            SelectionBox.CanScaleDiagonally = SelectionBox.CanScaleX && SelectionBox.CanScaleY;
+            SelectionBox.CanFlipX = quad.Width > 0;
+            SelectionBox.CanFlipY = quad.Height > 0;
             SelectionBox.CanReverse = EditorBeatmap.SelectedHitObjects.Count > 1 || EditorBeatmap.SelectedHitObjects.Any(s => s is Slider);
         }
 

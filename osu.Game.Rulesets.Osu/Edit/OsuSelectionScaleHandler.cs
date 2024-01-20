@@ -47,7 +47,10 @@ namespace osu.Game.Rulesets.Osu.Edit
         private void updateState()
         {
             var quad = GeometryUtils.GetSurroundingQuad(selectedMovableObjects);
-            CanScale.Value = quad.Width > 0 || quad.Height > 0;
+
+            CanScaleX.Value = quad.Width > 0;
+            CanScaleY.Value = quad.Height > 0;
+            CanScaleDiagonally.Value = CanScaleX.Value && CanScaleY.Value;
         }
 
         private OsuHitObject[]? objectsInScale;
@@ -98,7 +101,7 @@ namespace osu.Game.Rulesets.Osu.Edit
 
                 foreach (var ho in objectsInScale)
                 {
-                    ho.Position = GeometryUtils.GetScaledPositionMultiply(scale, actualOrigin, originalPositions[ho]);
+                    ho.Position = GeometryUtils.GetScaledPosition(scale, actualOrigin, originalPositions[ho]);
                 }
             }
 

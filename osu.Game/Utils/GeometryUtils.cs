@@ -83,7 +83,7 @@ namespace osu.Game.Utils
         /// Given a scale multiplier, an origin, and a position,
         /// will return the scaled position in screen space coordinates.
         /// </summary>
-        public static Vector2 GetScaledPositionMultiply(Vector2 scale, Vector2 origin, Vector2 position)
+        public static Vector2 GetScaledPosition(Vector2 scale, Vector2 origin, Vector2 position)
         {
             return origin + (position - origin) * scale;
         }
