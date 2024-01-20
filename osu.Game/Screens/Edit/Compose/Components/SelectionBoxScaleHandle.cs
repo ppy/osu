@@ -111,7 +111,7 @@ namespace osu.Game.Screens.Edit.Compose.Components
         private void applyScale(bool shouldKeepAspectRatio)
         {
             var newScale = shouldKeepAspectRatio
-                ? new Vector2(MathF.Max(rawScale.X, rawScale.Y))
+                ? new Vector2((rawScale.X + rawScale.Y) * 0.5f)
                 : rawScale;
 
             scaleHandler!.Update(newScale, getOriginPosition());
