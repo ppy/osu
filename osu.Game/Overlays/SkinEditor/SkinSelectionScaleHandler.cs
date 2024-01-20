@@ -61,6 +61,9 @@ namespace osu.Game.Overlays.SkinEditor
         private Dictionary<Drawable, Vector2>? originalScales;
         private Dictionary<Drawable, Vector2>? originalPositions;
 
+        private bool isFlippedX;
+        private bool isFlippedY;
+
         public override void Begin()
         {
             if (objectsInScale != null)
@@ -75,6 +78,9 @@ namespace osu.Game.Overlays.SkinEditor
             originalPositions = objectsInScale.ToDictionary(d => d, d => d.ToScreenSpace(d.OriginPosition));
             OriginalSurroundingQuad = GeometryUtils.GetSurroundingQuad(objectsInScale.SelectMany(d => d.ScreenSpaceDrawQuad.GetVertices().ToArray()));
             defaultOrigin = OriginalSurroundingQuad.Value.Centre;
+
+            isFlippedX = false;
+            isFlippedY = false;
         }
 
         public override void Update(Vector2 scale, Vector2? origin = null)
@@ -85,29 +91,21 @@ namespace osu.Game.Overlays.SkinEditor
             Debug.Assert(originalWidths != null && originalHeights != null && originalScales != null && originalPositions != null && defaultOrigin != null && OriginalSurroundingQuad != null);
 
             var actualOrigin = origin ?? defaultOrigin.Value;
-
             Axes adjustAxis = scale.X == 0 ? Axes.Y : scale.Y == 0 ? Axes.X : Axes.Both;
 
             if ((adjustAxis == Axes.Y && !allSelectedSupportManualSizing(Axes.Y)) ||
                 (adjustAxis == Axes.X && !allSelectedSupportManualSizing(Axes.X)))
                 return;
 
-            // the selection quad is always upright, so use an AABB rect to make mutating the values easier.
-            var selectionRect = OriginalSurroundingQuad.Value.AABBFloat;
-
             // If the selection has no area we cannot scale it
-            if (selectionRect.Area == 0)
+            if (OriginalSurroundingQuad.Value.Width == 0 || OriginalSurroundingQuad.Value.Height == 0)
                 return;
-
-            // copy to mutate, as we will need to compare to the original later on.
-            var adjustedRect = selectionRect;
 
             // for now aspect lock scale adjustments that occur at corners..
             if (adjustAxis == Axes.Both)
             {
                 // project scale vector along diagonal
-                Vector2 diag = new Vector2(1, 1).Normalized();
-                scale = Vector2.Dot(scale, diag) * diag;
+                scale = new Vector2((scale.X + scale.Y) * 0.5f);
             }
             // ..or if any of the selection have been rotated.
             // this is to avoid requiring skew logic (which would likely not be the user's expected transform anyway).
@@ -115,66 +113,54 @@ namespace osu.Game.Overlays.SkinEditor
             {
                 if (adjustAxis == Axes.Y)
                     // if dragging from the horizontal centre, only a vertical component is available.
-                    scale.X = scale.Y / selectionRect.Height * selectionRect.Width;
+                    scale.X = scale.Y;
                 else
                     // in all other cases (arbitrarily) use the horizontal component for aspect lock.
-                    scale.Y = scale.X / selectionRect.Width * selectionRect.Height;
+                    scale.Y = scale.X;
             }
 
-            adjustedRect.Location = GeometryUtils.GetScaledPosition(scale, actualOrigin, OriginalSurroundingQuad!.Value.TopLeft);
-            adjustedRect.Size = OriginalSurroundingQuad!.Value.Size * scale;
+            bool flippedX = scale.X < 0;
+            bool flippedY = scale.Y < 0;
+            Axes toFlip = Axes.None;
 
-            if (adjustedRect.Width <= 0 || adjustedRect.Height <= 0)
+            if (flippedX != isFlippedX)
             {
-                Axes toFlip = Axes.None;
+                isFlippedX = flippedX;
+                toFlip |= Axes.X;
+            }
 
-                if (adjustedRect.Width <= 0) toFlip |= Axes.X;
-                if (adjustedRect.Height <= 0) toFlip |= Axes.Y;
+            if (flippedY != isFlippedY)
+            {
+                isFlippedY = flippedY;
+                toFlip |= Axes.Y;
+            }
 
+            if (toFlip != Axes.None)
+            {
                 PerformFlipFromScaleHandles?.Invoke(toFlip);
                 return;
             }
 
-            // scale adjust applied to each individual item should match that of the quad itself.
-            var scaledDelta = new Vector2(
-                adjustedRect.Width / selectionRect.Width,
-                adjustedRect.Height / selectionRect.Height
-            );
-
             foreach (var b in objectsInScale)
             {
-                // each drawable's relative position should be maintained in the scaled quad.
-                var screenPosition = originalPositions[b];
+                UpdatePosition(b, GeometryUtils.GetScaledPosition(scale, actualOrigin, originalPositions[b]));
 
-                var relativePositionInOriginal =
-                    new Vector2(
-                        (screenPosition.X - selectionRect.TopLeft.X) / selectionRect.Width,
-                        (screenPosition.Y - selectionRect.TopLeft.Y) / selectionRect.Height
-                    );
-
-                var newPositionInAdjusted = new Vector2(
-                    adjustedRect.TopLeft.X + adjustedRect.Width * relativePositionInOriginal.X,
-                    adjustedRect.TopLeft.Y + adjustedRect.Height * relativePositionInOriginal.Y
-                );
-
-                UpdatePosition(b, newPositionInAdjusted);
-
-                var currentScaledDelta = scaledDelta;
+                var currentScale = scale;
                 if (Precision.AlmostEquals(MathF.Abs(b.Rotation) % 180, 90))
-                    currentScaledDelta = new Vector2(scaledDelta.Y, scaledDelta.X);
+                    currentScale = new Vector2(scale.Y, scale.X);
 
                 switch (adjustAxis)
                 {
                     case Axes.X:
-                        b.Width = originalWidths[b] * currentScaledDelta.X;
+                        b.Width = originalWidths[b] * currentScale.X;
                         break;
 
                     case Axes.Y:
-                        b.Height = originalHeights[b] * currentScaledDelta.Y;
+                        b.Height = originalHeights[b] * currentScale.Y;
                         break;
 
                     case Axes.Both:
-                        b.Scale = originalScales[b] * currentScaledDelta;
+                        b.Scale = originalScales[b] * currentScale;
                         break;
                 }
             }
