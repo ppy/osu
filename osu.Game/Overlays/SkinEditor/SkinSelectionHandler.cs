@@ -218,9 +218,6 @@ namespace osu.Game.Overlays.SkinEditor
         {
             base.OnSelectionChanged();
 
-            SelectionBox.CanScaleX = allSelectedSupportManualSizing(Axes.X);
-            SelectionBox.CanScaleY = allSelectedSupportManualSizing(Axes.Y);
-            SelectionBox.CanScaleDiagonally = true;
             SelectionBox.CanFlipX = true;
             SelectionBox.CanFlipY = true;
             SelectionBox.CanReverse = false;
