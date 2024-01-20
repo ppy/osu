@@ -83,7 +83,7 @@ namespace osu.Game.Overlays.SkinEditor
             isFlippedY = false;
         }
 
-        public override void Update(Vector2 scale, Vector2? origin = null)
+        public override void Update(Vector2 scale, Vector2? origin = null, Axes adjustAxis = Axes.Both)
         {
             if (objectsInScale == null)
                 throw new InvalidOperationException($"Cannot {nameof(Update)} a scale operation without calling {nameof(Begin)} first!");
@@ -91,7 +91,6 @@ namespace osu.Game.Overlays.SkinEditor
             Debug.Assert(originalWidths != null && originalHeights != null && originalScales != null && originalPositions != null && defaultOrigin != null && OriginalSurroundingQuad != null);
 
             var actualOrigin = origin ?? defaultOrigin.Value;
-            Axes adjustAxis = scale.X == 1 ? Axes.Y : scale.Y == 1 ? Axes.X : Axes.Both;
 
             if ((adjustAxis == Axes.Y && !allSelectedSupportManualSizing(Axes.Y)) ||
                 (adjustAxis == Axes.X && !allSelectedSupportManualSizing(Axes.X)))

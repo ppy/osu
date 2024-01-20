@@ -46,10 +46,11 @@ namespace osu.Game.Screens.Edit.Compose.Components
         /// The origin point to scale from.
         /// If the default <see langword="null"/> value is supplied, a sane implementation-defined default will be used.
         /// </param>
-        public void ScaleSelection(Vector2 scale, Vector2? origin = null)
+        /// <param name="adjustAxis">The axes to adjust the scale in.</param>
+        public void ScaleSelection(Vector2 scale, Vector2? origin = null, Axes adjustAxis = Axes.Both)
         {
             Begin();
-            Update(scale, origin);
+            Update(scale, origin, adjustAxis);
             Commit();
         }
 
@@ -83,7 +84,8 @@ namespace osu.Game.Screens.Edit.Compose.Components
         /// The origin point to scale from.
         /// If the default <see langword="null"/> value is supplied, a sane implementation-defined default will be used.
         /// </param>
-        public virtual void Update(Vector2 scale, Vector2? origin = null)
+        /// <param name="adjustAxis">The axes to adjust the scale in.</param>
+        public virtual void Update(Vector2 scale, Vector2? origin = null, Axes adjustAxis = Axes.Both)
         {
         }
 
