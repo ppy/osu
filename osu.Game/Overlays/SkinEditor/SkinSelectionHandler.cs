@@ -7,10 +7,8 @@ using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Extensions.EnumExtensions;
 using osu.Framework.Graphics;
-using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Primitives;
 using osu.Framework.Graphics.UserInterface;
-using osu.Framework.Utils;
 using osu.Game.Extensions;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Rulesets.Edit;
@@ -31,148 +29,16 @@ namespace osu.Game.Overlays.SkinEditor
             UpdatePosition = updateDrawablePosition
         };
 
-        private bool allSelectedSupportManualSizing(Axes axis) => SelectedItems.All(b => (b as CompositeDrawable)?.AutoSizeAxes.HasFlagFast(axis) == false);
-
-        public override bool HandleScale(Vector2 scale, Anchor anchor)
+        public override SelectionScaleHandler CreateScaleHandler()
         {
-            Axes adjustAxis;
-
-            switch (anchor)
+            var scaleHandler = new SkinSelectionScaleHandler
             {
-                // for corners, adjust scale.
-                case Anchor.TopLeft:
-                case Anchor.TopRight:
-                case Anchor.BottomLeft:
-                case Anchor.BottomRight:
-                    adjustAxis = Axes.Both;
-                    break;
+                UpdatePosition = updateDrawablePosition
+            };
 
-                // for edges, adjust size.
-                // autosize elements can't be easily handled so just disable sizing for now.
-                case Anchor.TopCentre:
-                case Anchor.BottomCentre:
-                    if (!allSelectedSupportManualSizing(Axes.Y))
-                        return false;
+            scaleHandler.PerformFlipFromScaleHandles += a => SelectionBox.PerformFlipFromScaleHandles(a);
 
-                    adjustAxis = Axes.Y;
-                    break;
-
-                case Anchor.CentreLeft:
-                case Anchor.CentreRight:
-                    if (!allSelectedSupportManualSizing(Axes.X))
-                        return false;
-
-                    adjustAxis = Axes.X;
-                    break;
-
-                default:
-                    throw new ArgumentOutOfRangeException(nameof(anchor), anchor, null);
-            }
-
-            // convert scale to screen space
-            scale = ToScreenSpace(scale) - ToScreenSpace(Vector2.Zero);
-
-            adjustScaleFromAnchor(ref scale, anchor);
-
-            // the selection quad is always upright, so use an AABB rect to make mutating the values easier.
-            var selectionRect = getSelectionQuad().AABBFloat;
-
-            // If the selection has no area we cannot scale it
-            if (selectionRect.Area == 0)
-                return false;
-
-            // copy to mutate, as we will need to compare to the original later on.
-            var adjustedRect = selectionRect;
-            bool isRotated = false;
-
-            // for now aspect lock scale adjustments that occur at corners..
-            if (!anchor.HasFlagFast(Anchor.x1) && !anchor.HasFlagFast(Anchor.y1))
-            {
-                // project scale vector along diagonal
-                Vector2 diag = (selectionRect.TopLeft - selectionRect.BottomRight).Normalized();
-                scale = Vector2.Dot(scale, diag) * diag;
-            }
-            // ..or if any of the selection have been rotated.
-            // this is to avoid requiring skew logic (which would likely not be the user's expected transform anyway).
-            else if (SelectedBlueprints.Any(b => !Precision.AlmostEquals(((Drawable)b.Item).Rotation % 90, 0)))
-            {
-                isRotated = true;
-                if (anchor.HasFlagFast(Anchor.x1))
-                    // if dragging from the horizontal centre, only a vertical component is available.
-                    scale.X = scale.Y / selectionRect.Height * selectionRect.Width;
-                else
-                    // in all other cases (arbitrarily) use the horizontal component for aspect lock.
-                    scale.Y = scale.X / selectionRect.Width * selectionRect.Height;
-            }
-
-            if (anchor.HasFlagFast(Anchor.x0)) adjustedRect.X -= scale.X;
-            if (anchor.HasFlagFast(Anchor.y0)) adjustedRect.Y -= scale.Y;
-
-            // Maintain the selection's centre position if dragging from the centre anchors and selection is rotated.
-            if (isRotated && anchor.HasFlagFast(Anchor.x1)) adjustedRect.X -= scale.X / 2;
-            if (isRotated && anchor.HasFlagFast(Anchor.y1)) adjustedRect.Y -= scale.Y / 2;
-
-            adjustedRect.Width += scale.X;
-            adjustedRect.Height += scale.Y;
-
-            if (adjustedRect.Width <= 0 || adjustedRect.Height <= 0)
-            {
-                Axes toFlip = Axes.None;
-
-                if (adjustedRect.Width <= 0) toFlip |= Axes.X;
-                if (adjustedRect.Height <= 0) toFlip |= Axes.Y;
-
-                SelectionBox.PerformFlipFromScaleHandles(toFlip);
-                return true;
-            }
-
-            // scale adjust applied to each individual item should match that of the quad itself.
-            var scaledDelta = new Vector2(
-                adjustedRect.Width / selectionRect.Width,
-                adjustedRect.Height / selectionRect.Height
-            );
-
-            foreach (var b in SelectedBlueprints)
-            {
-                var drawableItem = (Drawable)b.Item;
-
-                // each drawable's relative position should be maintained in the scaled quad.
-                var screenPosition = b.ScreenSpaceSelectionPoint;
-
-                var relativePositionInOriginal =
-                    new Vector2(
-                        (screenPosition.X - selectionRect.TopLeft.X) / selectionRect.Width,
-                        (screenPosition.Y - selectionRect.TopLeft.Y) / selectionRect.Height
-                    );
-
-                var newPositionInAdjusted = new Vector2(
-                    adjustedRect.TopLeft.X + adjustedRect.Width * relativePositionInOriginal.X,
-                    adjustedRect.TopLeft.Y + adjustedRect.Height * relativePositionInOriginal.Y
-                );
-
-                updateDrawablePosition(drawableItem, newPositionInAdjusted);
-
-                var currentScaledDelta = scaledDelta;
-                if (Precision.AlmostEquals(MathF.Abs(drawableItem.Rotation) % 180, 90))
-                    currentScaledDelta = new Vector2(scaledDelta.Y, scaledDelta.X);
-
-                switch (adjustAxis)
-                {
-                    case Axes.X:
-                        drawableItem.Width *= currentScaledDelta.X;
-                        break;
-
-                    case Axes.Y:
-                        drawableItem.Height *= currentScaledDelta.Y;
-                        break;
-
-                    case Axes.Both:
-                        drawableItem.Scale *= currentScaledDelta;
-                        break;
-                }
-            }
-
-            return true;
+            return scaleHandler;
         }
 
         public override bool HandleFlip(Direction direction, bool flipOverOrigin)
@@ -409,17 +275,6 @@ namespace osu.Game.Overlays.SkinEditor
             var previousAnchor = drawable.AnchorPosition;
             drawable.Anchor = anchor;
             drawable.Position -= drawable.AnchorPosition - previousAnchor;
-        }
-
-        private static void adjustScaleFromAnchor(ref Vector2 scale, Anchor reference)
-        {
-            // cancel out scale in axes we don't care about (based on which drag handle was used).
-            if ((reference & Anchor.x1) > 0) scale.X = 0;
-            if ((reference & Anchor.y1) > 0) scale.Y = 0;
-
-            // reverse the scale direction if dragging from top or left.
-            if ((reference & Anchor.x0) > 0) scale.X = -scale.X;
-            if ((reference & Anchor.y0) > 0) scale.Y = -scale.Y;
         }
     }
 }
