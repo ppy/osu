@@ -10,7 +10,6 @@ using osu.Framework.Graphics.Primitives;
 using osu.Framework.Allocation;
 using System.Collections.Generic;
 using osu.Framework.Graphics.Rendering;
-using osu.Framework.Graphics.Rendering.Vertices;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 
@@ -196,8 +195,6 @@ namespace osu.Game.Graphics.Backgrounds
             private float texelSize;
             private bool masking;
 
-            private IVertexBatch<TexturedVertex2D>? vertexBatch;
-
             public TrianglesDrawNode(TrianglesV2 source)
                 : base(source)
             {
@@ -235,12 +232,6 @@ namespace osu.Game.Graphics.Backgrounds
                 if (Source.AimCount == 0 || thickness == 0)
                     return;
 
-                if (vertexBatch == null || vertexBatch.Size != Source.AimCount)
-                {
-                    vertexBatch?.Dispose();
-                    vertexBatch = renderer.CreateQuadBatch<TexturedVertex2D>(Source.AimCount, 1);
-                }
-
                 borderDataBuffer ??= renderer.CreateUniformBuffer<TriangleBorderData>();
                 borderDataBuffer.Data = borderDataBuffer.Data with
                 {
@@ -273,7 +264,7 @@ namespace osu.Game.Graphics.Backgrounds
                         triangleQuad.Height
                     ) / relativeSize;
 
-                    renderer.DrawQuad(texture, drawQuad, DrawColourInfo.Colour.Interpolate(triangleQuad), new RectangleF(0, 0, 1, 1), vertexBatch.AddAction, textureCoords: textureCoords);
+                    renderer.DrawQuad(texture, drawQuad, DrawColourInfo.Colour.Interpolate(triangleQuad), new RectangleF(0, 0, 1, 1), textureCoords: textureCoords);
                 }
 
                 shader.Unbind();
@@ -296,7 +287,6 @@ namespace osu.Game.Graphics.Backgrounds
             {
                 base.Dispose(isDisposing);
 
-                vertexBatch?.Dispose();
                 borderDataBuffer?.Dispose();
             }
         }
