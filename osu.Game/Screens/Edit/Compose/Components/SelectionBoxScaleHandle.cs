@@ -100,8 +100,8 @@ namespace osu.Game.Screens.Edit.Compose.Components
         private void adjustScaleFromAnchor(ref Vector2 scale)
         {
             // cancel out scale in axes we don't care about (based on which drag handle was used).
-            if ((originalAnchor & Anchor.x1) > 0) scale.X = 1;
-            if ((originalAnchor & Anchor.y1) > 0) scale.Y = 1;
+            if ((originalAnchor & Anchor.x1) > 0) scale.X = 0;
+            if ((originalAnchor & Anchor.y1) > 0) scale.Y = 0;
 
             // reverse the scale direction if dragging from top or left.
             if ((originalAnchor & Anchor.x0) > 0) scale.X = -scale.X;
