@@ -91,7 +91,7 @@ namespace osu.Game.Overlays.SkinEditor
             Debug.Assert(originalWidths != null && originalHeights != null && originalScales != null && originalPositions != null && defaultOrigin != null && OriginalSurroundingQuad != null);
 
             var actualOrigin = origin ?? defaultOrigin.Value;
-            Axes adjustAxis = scale.X == 0 ? Axes.Y : scale.Y == 0 ? Axes.X : Axes.Both;
+            Axes adjustAxis = scale.X == 1 ? Axes.Y : scale.Y == 1 ? Axes.X : Axes.Both;
 
             if ((adjustAxis == Axes.Y && !allSelectedSupportManualSizing(Axes.Y)) ||
                 (adjustAxis == Axes.X && !allSelectedSupportManualSizing(Axes.X)))
