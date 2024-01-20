@@ -5,6 +5,7 @@ using System;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Input.Events;
+using osu.Framework.Logging;
 using osuTK;
 using osuTK.Input;
 
@@ -24,12 +25,16 @@ namespace osu.Game.Screens.Edit.Compose.Components
             Size = new Vector2(10);
         }
 
+        private Anchor originalAnchor;
+
         protected override bool OnDragStart(DragStartEvent e)
         {
             if (e.Button != MouseButton.Left)
                 return false;
 
             if (scaleHandler == null) return false;
+
+            originalAnchor = Anchor;
 
             scaleHandler.Begin();
             return true;
@@ -40,10 +45,10 @@ namespace osu.Game.Screens.Edit.Compose.Components
             var quad = scaleHandler!.OriginalSurroundingQuad!.Value;
             Vector2 origin = quad.TopLeft;
 
-            if ((Anchor & Anchor.x0) > 0)
+            if ((originalAnchor & Anchor.x0) > 0)
                 origin.X += quad.Width;
 
-            if ((Anchor & Anchor.y0) > 0)
+            if ((originalAnchor & Anchor.y0) > 0)
                 origin.Y += quad.Height;
 
             return origin;
@@ -89,6 +94,7 @@ namespace osu.Game.Screens.Edit.Compose.Components
         private Vector2 convertDragEventToScaleMultiplier(DragEvent e)
         {
             Vector2 scale = e.MousePosition - e.MouseDownPosition;
+            Logger.Log($"Raw scale {scale}");
             adjustScaleFromAnchor(ref scale);
             return Vector2.Divide(scale, scaleHandler!.OriginalSurroundingQuad!.Value.Size) + Vector2.One;
         }
@@ -96,12 +102,12 @@ namespace osu.Game.Screens.Edit.Compose.Components
         private void adjustScaleFromAnchor(ref Vector2 scale)
         {
             // cancel out scale in axes we don't care about (based on which drag handle was used).
-            if ((Anchor & Anchor.x1) > 0) scale.X = 1;
-            if ((Anchor & Anchor.y1) > 0) scale.Y = 1;
+            if ((originalAnchor & Anchor.x1) > 0) scale.X = 1;
+            if ((originalAnchor & Anchor.y1) > 0) scale.Y = 1;
 
             // reverse the scale direction if dragging from top or left.
-            if ((Anchor & Anchor.x0) > 0) scale.X = -scale.X;
-            if ((Anchor & Anchor.y0) > 0) scale.Y = -scale.Y;
+            if ((originalAnchor & Anchor.x0) > 0) scale.X = -scale.X;
+            if ((originalAnchor & Anchor.y0) > 0) scale.Y = -scale.Y;
         }
 
         private void applyScale(bool shouldKeepAspectRatio)
@@ -110,6 +116,7 @@ namespace osu.Game.Screens.Edit.Compose.Components
                 ? new Vector2(MathF.Max(rawScale.X, rawScale.Y))
                 : rawScale;
 
+            Logger.Log($"Raw scale adjusted {newScale}, origin {getOriginPosition()}");
             scaleHandler!.Update(newScale, getOriginPosition());
         }
     }
