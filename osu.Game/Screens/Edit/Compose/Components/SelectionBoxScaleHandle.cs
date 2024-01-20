@@ -48,14 +48,14 @@ namespace osu.Game.Screens.Edit.Compose.Components
 
             rawScale = convertDragEventToScaleMultiplier(e);
 
-            applyScale(shouldKeepAspectRatio: e.ShiftPressed);
+            applyScale(shouldLockAspectRatio: e.ShiftPressed);
         }
 
         protected override bool OnKeyDown(KeyDownEvent e)
         {
             if (IsDragged && (e.Key == Key.ShiftLeft || e.Key == Key.ShiftRight))
             {
-                applyScale(shouldKeepAspectRatio: true);
+                applyScale(shouldLockAspectRatio: true);
                 return true;
             }
 
@@ -67,7 +67,7 @@ namespace osu.Game.Screens.Edit.Compose.Components
             base.OnKeyUp(e);
 
             if (IsDragged && (e.Key == Key.ShiftLeft || e.Key == Key.ShiftRight))
-                applyScale(shouldKeepAspectRatio: false);
+                applyScale(shouldLockAspectRatio: false);
         }
 
         protected override void OnDragEnd(DragEndEvent e)
@@ -93,9 +93,9 @@ namespace osu.Game.Screens.Edit.Compose.Components
             if ((originalAnchor & Anchor.y0) > 0) scale.Y = -scale.Y;
         }
 
-        private void applyScale(bool shouldKeepAspectRatio)
+        private void applyScale(bool shouldLockAspectRatio)
         {
-            var newScale = shouldKeepAspectRatio
+            var newScale = shouldLockAspectRatio
                 ? new Vector2((rawScale.X + rawScale.Y) * 0.5f)
                 : rawScale;
 
