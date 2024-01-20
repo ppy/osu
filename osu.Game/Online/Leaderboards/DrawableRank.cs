@@ -50,6 +50,7 @@ namespace osu.Game.Online.Leaderboards
                             ColourDark = rankColour.Darken(0.1f),
                             ColourLight = rankColour.Lighten(0.1f),
                             Velocity = 0.25f,
+                            Masking = true
                         },
                         new OsuSpriteText
                         {
