@@ -130,7 +130,7 @@ namespace osu.Game.Tests.Visual.Editing
                 OriginalSurroundingQuad = new Quad(targetContainer!.X, targetContainer.Y, targetContainer.Width, targetContainer.Height);
             }
 
-            public override void Update(Vector2 scale, Vector2? origin = null)
+            public override void Update(Vector2 scale, Vector2? origin = null, Axes adjustAxis = Axes.Both)
             {
                 if (targetContainer == null)
                     throw new InvalidOperationException($"Cannot {nameof(Update)} a scale operation without calling {nameof(Begin)} first!");
