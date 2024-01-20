@@ -7,6 +7,7 @@ using System.Diagnostics;
 using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
+using osu.Framework.Graphics;
 using osu.Framework.Graphics.Primitives;
 using osu.Framework.Utils;
 using osu.Game.Rulesets.Edit;
@@ -82,7 +83,7 @@ namespace osu.Game.Rulesets.Osu.Edit
                 obj => obj.Path.ControlPoints.Select(p => p.Type).ToArray());
         }
 
-        public override void Update(Vector2 scale, Vector2? origin = null)
+        public override void Update(Vector2 scale, Vector2? origin = null, Axes adjustAxis = Axes.Both)
         {
             if (objectsInScale == null)
                 throw new InvalidOperationException($"Cannot {nameof(Update)} a scale operation without calling {nameof(Begin)} first!");

@@ -38,20 +38,6 @@ namespace osu.Game.Screens.Edit.Compose.Components
             return true;
         }
 
-        private Vector2 getOriginPosition()
-        {
-            var quad = scaleHandler!.OriginalSurroundingQuad!.Value;
-            Vector2 origin = quad.TopLeft;
-
-            if ((originalAnchor & Anchor.x0) > 0)
-                origin.X += quad.Width;
-
-            if ((originalAnchor & Anchor.y0) > 0)
-                origin.Y += quad.Height;
-
-            return origin;
-        }
-
         private Vector2 rawScale;
 
         protected override void OnDrag(DragEvent e)
@@ -113,7 +99,38 @@ namespace osu.Game.Screens.Edit.Compose.Components
                 ? new Vector2((rawScale.X + rawScale.Y) * 0.5f)
                 : rawScale;
 
-            scaleHandler!.Update(newScale, getOriginPosition());
+            scaleHandler!.Update(newScale, getOriginPosition(), getAdjustAxis());
+        }
+
+        private Vector2 getOriginPosition()
+        {
+            var quad = scaleHandler!.OriginalSurroundingQuad!.Value;
+            Vector2 origin = quad.TopLeft;
+
+            if ((originalAnchor & Anchor.x0) > 0)
+                origin.X += quad.Width;
+
+            if ((originalAnchor & Anchor.y0) > 0)
+                origin.Y += quad.Height;
+
+            return origin;
+        }
+
+        private Axes getAdjustAxis()
+        {
+            switch (originalAnchor)
+            {
+                case Anchor.TopCentre:
+                case Anchor.BottomCentre:
+                    return Axes.Y;
+
+                case Anchor.CentreLeft:
+                case Anchor.CentreRight:
+                    return Axes.X;
+
+                default:
+                    return Axes.Both;
+            }
         }
     }
 }
