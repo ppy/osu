@@ -100,23 +100,15 @@ namespace osu.Game.Overlays.SkinEditor
             if (OriginalSurroundingQuad.Value.Width == 0 || OriginalSurroundingQuad.Value.Height == 0)
                 return;
 
-            // for now aspect lock scale adjustments that occur at corners..
+            // for now aspect lock scale adjustments that occur at corners.
             if (adjustAxis == Axes.Both)
             {
                 // project scale vector along diagonal
                 scale = new Vector2((scale.X + scale.Y) * 0.5f);
             }
-            // ..or if any of the selection have been rotated.
-            // this is to avoid requiring skew logic (which would likely not be the user's expected transform anyway).
-            else if (objectsInScale.Any(b => !Precision.AlmostEquals(b.Rotation % 90, 0)))
-            {
-                if (adjustAxis == Axes.Y)
-                    // if dragging from the horizontal centre, only a vertical component is available.
-                    scale.X = scale.Y;
-                else
-                    // in all other cases (arbitrarily) use the horizontal component for aspect lock.
-                    scale.Y = scale.X;
-            }
+            // If any of the selection have been rotated and the adjust axis is not both,
+            // we would require skew logic to achieve a correct image editor-like scale.
+            // For now we just ignore, because it would likely not be the user's expected transform anyway.
 
             bool flippedX = scale.X < 0;
             bool flippedY = scale.Y < 0;
