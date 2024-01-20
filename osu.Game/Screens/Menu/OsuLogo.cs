@@ -192,6 +192,7 @@ namespace osu.Game.Screens.Menu
                                                                             ColourLight = Color4Extensions.FromHex(@"ff7db7"),
                                                                             ColourDark = Color4Extensions.FromHex(@"de5b95"),
                                                                             RelativeSizeAxes = Axes.Both,
+                                                                            Masking = true
                                                                         },
                                                                     }
                                                                 },
