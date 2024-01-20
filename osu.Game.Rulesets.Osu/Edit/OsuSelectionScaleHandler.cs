@@ -177,10 +177,14 @@ namespace osu.Game.Rulesets.Osu.Edit
             var br1 = Vector2.Divide(-origin, selectionQuad.BottomRight - origin);
             var br2 = Vector2.Divide(OsuPlayfield.BASE_SIZE - origin, selectionQuad.BottomRight - origin);
 
-            scale.X = selectionQuad.TopLeft.X - origin.X < 0 ? MathHelper.Clamp(scale.X, tl2.X, tl1.X) : MathHelper.Clamp(scale.X, tl1.X, tl2.X);
-            scale.Y = selectionQuad.TopLeft.Y - origin.Y < 0 ? MathHelper.Clamp(scale.Y, tl2.Y, tl1.Y) : MathHelper.Clamp(scale.Y, tl1.Y, tl2.Y);
-            scale.X = selectionQuad.BottomRight.X - origin.X < 0 ? MathHelper.Clamp(scale.X, br2.X, br1.X) : MathHelper.Clamp(scale.X, br1.X, br2.X);
-            scale.Y = selectionQuad.BottomRight.Y - origin.Y < 0 ? MathHelper.Clamp(scale.Y, br2.Y, br1.Y) : MathHelper.Clamp(scale.Y, br1.Y, br2.Y);
+            if (!Precision.AlmostEquals(selectionQuad.TopLeft.X - origin.X, 0))
+                scale.X = selectionQuad.TopLeft.X - origin.X < 0 ? MathHelper.Clamp(scale.X, tl2.X, tl1.X) : MathHelper.Clamp(scale.X, tl1.X, tl2.X);
+            if (!Precision.AlmostEquals(selectionQuad.TopLeft.Y - origin.Y, 0))
+                scale.Y = selectionQuad.TopLeft.Y - origin.Y < 0 ? MathHelper.Clamp(scale.Y, tl2.Y, tl1.Y) : MathHelper.Clamp(scale.Y, tl1.Y, tl2.Y);
+            if (!Precision.AlmostEquals(selectionQuad.BottomRight.X - origin.X, 0))
+                scale.X = selectionQuad.BottomRight.X - origin.X < 0 ? MathHelper.Clamp(scale.X, br2.X, br1.X) : MathHelper.Clamp(scale.X, br1.X, br2.X);
+            if (!Precision.AlmostEquals(selectionQuad.BottomRight.Y - origin.Y, 0))
+                scale.Y = selectionQuad.BottomRight.Y - origin.Y < 0 ? MathHelper.Clamp(scale.Y, br2.Y, br1.Y) : MathHelper.Clamp(scale.Y, br1.Y, br2.Y);
 
             return scale;
         }
