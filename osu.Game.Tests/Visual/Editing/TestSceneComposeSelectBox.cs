@@ -10,9 +10,11 @@ using NUnit.Framework;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
+using osu.Framework.Graphics.Primitives;
 using osu.Framework.Testing;
 using osu.Framework.Threading;
 using osu.Game.Screens.Edit.Compose.Components;
+using osu.Game.Utils;
 using osuTK;
 using osuTK.Input;
 
@@ -26,9 +28,13 @@ namespace osu.Game.Tests.Visual.Editing
         [Cached(typeof(SelectionRotationHandler))]
         private TestSelectionRotationHandler rotationHandler;
 
+        [Cached(typeof(SelectionScaleHandler))]
+        private TestSelectionScaleHandler scaleHandler;
+
         public TestSceneComposeSelectBox()
         {
             rotationHandler = new TestSelectionRotationHandler(() => selectionArea);
+            scaleHandler = new TestSelectionScaleHandler(() => selectionArea);
         }
 
         [SetUp]
@@ -45,13 +51,8 @@ namespace osu.Game.Tests.Visual.Editing
                     {
                         RelativeSizeAxes = Axes.Both,
 
-                        CanScaleX = true,
-                        CanScaleY = true,
-                        CanScaleDiagonally = true,
                         CanFlipX = true,
                         CanFlipY = true,
-
-                        OnScale = handleScale
                     }
                 }
             };
@@ -59,27 +60,6 @@ namespace osu.Game.Tests.Visual.Editing
             InputManager.MoveMouseTo(selectionBox);
             InputManager.ReleaseButton(MouseButton.Left);
         });
-
-        private bool handleScale(Vector2 amount, Anchor reference)
-        {
-            if ((reference & Anchor.y1) == 0)
-            {
-                int directionY = (reference & Anchor.y0) > 0 ? -1 : 1;
-                if (directionY < 0)
-                    selectionArea.Y += amount.Y;
-                selectionArea.Height += directionY * amount.Y;
-            }
-
-            if ((reference & Anchor.x1) == 0)
-            {
-                int directionX = (reference & Anchor.x0) > 0 ? -1 : 1;
-                if (directionX < 0)
-                    selectionArea.X += amount.X;
-                selectionArea.Width += directionX * amount.X;
-            }
-
-            return true;
-        }
 
         private partial class TestSelectionRotationHandler : SelectionRotationHandler
         {
@@ -122,6 +102,51 @@ namespace osu.Game.Tests.Visual.Editing
 
                 targetContainer = null;
                 initialRotation = null;
+            }
+        }
+
+        private partial class TestSelectionScaleHandler : SelectionScaleHandler
+        {
+            private readonly Func<Container> getTargetContainer;
+
+            public TestSelectionScaleHandler(Func<Container> getTargetContainer)
+            {
+                this.getTargetContainer = getTargetContainer;
+
+                CanScaleX.Value = true;
+                CanScaleY.Value = true;
+                CanScaleDiagonally.Value = true;
+            }
+
+            [CanBeNull]
+            private Container targetContainer;
+
+            public override void Begin()
+            {
+                if (targetContainer != null)
+                    throw new InvalidOperationException($"Cannot {nameof(Begin)} a scale operation while another is in progress!");
+
+                targetContainer = getTargetContainer();
+                OriginalSurroundingQuad = new Quad(targetContainer!.X, targetContainer.Y, targetContainer.Width, targetContainer.Height);
+            }
+
+            public override void Update(Vector2 scale, Vector2? origin = null)
+            {
+                if (targetContainer == null)
+                    throw new InvalidOperationException($"Cannot {nameof(Update)} a scale operation without calling {nameof(Begin)} first!");
+
+                Vector2 actualOrigin = origin ?? Vector2.Zero;
+
+                targetContainer.Position = GeometryUtils.GetScaledPosition(scale, actualOrigin, OriginalSurroundingQuad!.Value.TopLeft);
+                targetContainer.Size = OriginalSurroundingQuad!.Value.Size * scale;
+            }
+
+            public override void Commit()
+            {
+                if (targetContainer == null)
+                    throw new InvalidOperationException($"Cannot {nameof(Commit)} a scale operation without calling {nameof(Begin)} first!");
+
+                targetContainer = null;
             }
         }
 
