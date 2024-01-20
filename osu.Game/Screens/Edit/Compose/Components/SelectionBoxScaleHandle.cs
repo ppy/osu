@@ -4,6 +4,7 @@
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Input.Events;
+using osu.Framework.Utils;
 using osuTK;
 using osuTK.Input;
 
@@ -79,7 +80,12 @@ namespace osu.Game.Screens.Edit.Compose.Components
         {
             Vector2 scale = e.MousePosition - e.MouseDownPosition;
             adjustScaleFromAnchor(ref scale);
-            return Vector2.Divide(scale, scaleHandler!.OriginalSurroundingQuad!.Value.Size) + Vector2.One;
+
+            var surroundingQuad = scaleHandler!.OriginalSurroundingQuad!.Value;
+            scale.X = Precision.AlmostEquals(surroundingQuad.Width, 0) ? 0 : scale.X / surroundingQuad.Width;
+            scale.Y = Precision.AlmostEquals(surroundingQuad.Height, 0) ? 0 : scale.Y / surroundingQuad.Height;
+
+            return scale + Vector2.One;
         }
 
         private void adjustScaleFromAnchor(ref Vector2 scale)
