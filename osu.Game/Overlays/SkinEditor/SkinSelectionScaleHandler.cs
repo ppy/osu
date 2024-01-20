@@ -76,7 +76,7 @@ namespace osu.Game.Overlays.SkinEditor
             originalHeights = objectsInScale.ToDictionary(d => d, d => d.Height);
             originalScales = objectsInScale.ToDictionary(d => d, d => d.Scale);
             originalPositions = objectsInScale.ToDictionary(d => d, d => d.ToScreenSpace(d.OriginPosition));
-            OriginalSurroundingQuad = GeometryUtils.GetSurroundingQuad(objectsInScale.SelectMany(d => d.ScreenSpaceDrawQuad.GetVertices().ToArray()));
+            OriginalSurroundingQuad = ToLocalSpace(GeometryUtils.GetSurroundingQuad(objectsInScale.SelectMany(d => d.ScreenSpaceDrawQuad.GetVertices().ToArray())));
             defaultOrigin = OriginalSurroundingQuad.Value.Centre;
 
             isFlippedX = false;
@@ -90,7 +90,7 @@ namespace osu.Game.Overlays.SkinEditor
 
             Debug.Assert(originalWidths != null && originalHeights != null && originalScales != null && originalPositions != null && defaultOrigin != null && OriginalSurroundingQuad != null);
 
-            var actualOrigin = origin ?? defaultOrigin.Value;
+            var actualOrigin = ToScreenSpace(origin ?? defaultOrigin.Value);
 
             if ((adjustAxis == Axes.Y && !allSelectedSupportManualSizing(Axes.Y)) ||
                 (adjustAxis == Axes.X && !allSelectedSupportManualSizing(Axes.X)))
