@@ -255,6 +255,7 @@ namespace osu.Game.Overlays.Toolbar
                     RelativeSizeAxes = Axes.Both,
                     ColourLight = OsuColour.Gray(40),
                     ColourDark = OsuColour.Gray(20),
+                    Masking = true
                 },
             };
         }
