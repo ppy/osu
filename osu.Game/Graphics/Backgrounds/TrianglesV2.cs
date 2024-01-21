@@ -34,9 +34,9 @@ namespace osu.Game.Graphics.Backgrounds
 
         /// <summary>
         /// If enabled, only the portion of triangles that falls within this <see cref="Drawable"/>'s
-        /// shape is drawn to the screen.
+        /// shape is drawn to the screen. Default is true.
         /// </summary>
-        public bool Masking { get; set; }
+        public bool Masking { get; set; } = true;
 
         private readonly BindableFloat spawnRatio = new BindableFloat(1f);
 

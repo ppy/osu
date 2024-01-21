@@ -150,7 +150,6 @@ namespace osu.Game.Overlays.Dialog
                                     ColourLight = Color4Extensions.FromHex(@"271e26"),
                                     ColourDark = Color4Extensions.FromHex(@"1e171e"),
                                     TriangleScale = 4,
-                                    Masking = true
                                 },
                                 flashLayer = new Box
                                 {

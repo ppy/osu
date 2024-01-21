@@ -68,7 +68,6 @@ namespace osu.Game.Graphics.UserInterfaceV2
                 SpawnRatio = 0.6f,
                 RelativeSizeAxes = Axes.Both,
                 Depth = float.MaxValue,
-                Masking = true
             });
 
             updateColours();
