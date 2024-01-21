@@ -36,7 +36,7 @@ namespace osu.Game.Graphics.Backgrounds
         /// If enabled, only the portion of triangles that falls within this <see cref="Drawable"/>'s
         /// shape is drawn to the screen. Default is true.
         /// </summary>
-        public bool Masking { get; set; } = true;
+        public bool ClampToDrawable { get; set; } = true;
 
         private readonly BindableFloat spawnRatio = new BindableFloat(1f);
 
@@ -193,7 +193,7 @@ namespace osu.Game.Graphics.Backgrounds
             private Vector2 size;
             private float thickness;
             private float texelSize;
-            private bool masking;
+            private bool clamp;
 
             public TrianglesDrawNode(TrianglesV2 source)
                 : base(source)
@@ -208,7 +208,7 @@ namespace osu.Game.Graphics.Backgrounds
                 texture = Source.texture;
                 size = Source.DrawSize;
                 thickness = Source.Thickness;
-                masking = Source.Masking;
+                clamp = Source.ClampToDrawable;
 
                 Quad triangleQuad = new Quad(
                     Vector2Extensions.Transform(Vector2.Zero, DrawInfo.Matrix),
@@ -248,7 +248,7 @@ namespace osu.Game.Graphics.Backgrounds
                 {
                     Vector2 topLeft = particle.Position - new Vector2(relativeSize.X * 0.5f, 0f);
 
-                    Quad triangleQuad = masking ? clampToDrawable(topLeft, relativeSize) : new Quad(topLeft.X, topLeft.Y, relativeSize.X, relativeSize.Y);
+                    Quad triangleQuad = clamp ? clampToDrawable(topLeft, relativeSize) : new Quad(topLeft.X, topLeft.Y, relativeSize.X, relativeSize.Y);
 
                     var drawQuad = new Quad(
                         Vector2Extensions.Transform(triangleQuad.TopLeft * size, DrawInfo.Matrix),
