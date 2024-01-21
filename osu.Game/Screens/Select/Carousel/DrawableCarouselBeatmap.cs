@@ -110,7 +110,6 @@ namespace osu.Game.Screens.Select.Carousel
                     RelativeSizeAxes = Axes.Both,
                     ColourLight = Color4Extensions.FromHex(@"3a7285"),
                     ColourDark = Color4Extensions.FromHex(@"123744"),
-                    Masking = true
                 },
                 new FillFlowContainer
                 {
