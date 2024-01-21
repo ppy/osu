@@ -128,7 +128,7 @@ namespace osu.Game.Tests.Visual.Background
             AddStep("White colour", () => box.Colour = triangles.Colour = maskedTriangles.Colour = Color4.White);
             AddStep("Vertical gradient", () => box.Colour = triangles.Colour = maskedTriangles.Colour = ColourInfo.GradientVertical(Color4.White, Color4.Red));
             AddStep("Horizontal gradient", () => box.Colour = triangles.Colour = maskedTriangles.Colour = ColourInfo.GradientHorizontal(Color4.White, Color4.Red));
-            AddToggleStep("Masking", m => maskedTriangles.Masking = m);
+            AddToggleStep("ClampToDrawable", c => maskedTriangles.ClampToDrawable = c);
         }
     }
 }
