@@ -95,7 +95,7 @@ namespace osu.Game.Overlays.Mods
                                     Height = header_height,
                                     Shear = new Vector2(-ShearedOverlayContainer.SHEAR, 0),
                                     Velocity = 0.7f,
-                                    Masking = false
+                                    ClampToDrawable = false
                                 },
                                 headerText = new OsuTextFlowContainer(t =>
                                 {
