@@ -153,6 +153,9 @@ namespace osu.Game.Rulesets.Objects.Pooling
 
         protected override bool CheckChildrenLife()
         {
+            if (!IsPresent)
+                return false;
+
             bool aliveChanged = base.CheckChildrenLife();
             aliveChanged |= lifetimeManager.Update(Time.Current - PastLifetimeExtension, Time.Current + FutureLifetimeExtension);
             return aliveChanged;
