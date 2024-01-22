@@ -240,9 +240,10 @@ namespace osu.Game.Database
             var ruleset = score.Ruleset.CreateInstance();
             var scoreProcessor = ruleset.CreateScoreProcessor();
 
-            score.TotalScore = convertFromLegacyTotalScore(score, ruleset, beatmap);
+            // warning: ordering is important here - both total score and ranks are dependent on accuracy!
             score.Accuracy = computeAccuracy(score, scoreProcessor);
             score.Rank = computeRank(score, scoreProcessor);
+            score.TotalScore = convertFromLegacyTotalScore(score, ruleset, beatmap);
         }
 
         /// <summary>
@@ -260,9 +261,10 @@ namespace osu.Game.Database
         {
             var scoreProcessor = ruleset.CreateScoreProcessor();
 
-            score.TotalScore = convertFromLegacyTotalScore(score, ruleset, difficulty, attributes);
+            // warning: ordering is important here - both total score and ranks are dependent on accuracy!
             score.Accuracy = computeAccuracy(score, scoreProcessor);
             score.Rank = computeRank(score, scoreProcessor);
+            score.TotalScore = convertFromLegacyTotalScore(score, ruleset, difficulty, attributes);
         }
 
         /// <summary>
@@ -484,14 +486,9 @@ namespace osu.Game.Database
                     break;
 
                 case 3:
-                    // in the mania case accuracy actually changes between score V1 and score V2 / standardised
-                    // (PERFECT weighting changes from 300 to 305),
-                    // so for better accuracy recompute accuracy locally based on hit statistics and use that instead,
-                    double scoreV2Accuracy = ComputeAccuracy(score);
-
                     convertedTotalScore = (long)Math.Round((
                         850000 * comboProportion
-                        + 150000 * Math.Pow(scoreV2Accuracy, 2 + 2 * scoreV2Accuracy)
+                        + 150000 * Math.Pow(score.Accuracy, 2 + 2 * score.Accuracy)
                         + bonusProportion) * modMultiplier);
                     break;
 
@@ -593,8 +590,6 @@ namespace osu.Game.Database
                 return lengthOfComboAfterMiss * (1 + Math.Log(200) - Math.Log(lengthOfComboAfterMiss)) / Math.Log(4);
             }
         }
-
-        public static double ComputeAccuracy(ScoreInfo scoreInfo) => computeAccuracy(scoreInfo, scoreInfo.Ruleset.CreateInstance().CreateScoreProcessor());
 
         private static double computeAccuracy(ScoreInfo scoreInfo, ScoreProcessor scoreProcessor)
         {
