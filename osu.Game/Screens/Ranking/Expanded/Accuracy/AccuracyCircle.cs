@@ -124,10 +124,6 @@ namespace osu.Game.Screens.Ranking.Expanded.Accuracy
             accuracyX = scoreProcessor.AccuracyCutoffFromRank(ScoreRank.X);
             accuracyS = scoreProcessor.AccuracyCutoffFromRank(ScoreRank.S);
 
-            // Some rulesets require no misses to get an S rank.
-            // if (score.Accuracy >= accuracyS && score.Rank == ScoreRank.A)
-            //     accuracyS = score.Accuracy + 0.0001;
-
             accuracyA = scoreProcessor.AccuracyCutoffFromRank(ScoreRank.A);
             accuracyB = scoreProcessor.AccuracyCutoffFromRank(ScoreRank.B);
             accuracyC = scoreProcessor.AccuracyCutoffFromRank(ScoreRank.C);
