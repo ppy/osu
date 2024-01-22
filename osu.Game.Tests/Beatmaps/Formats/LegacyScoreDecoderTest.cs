@@ -294,6 +294,47 @@ namespace osu.Game.Tests.Beatmaps.Formats
         }
 
         [Test]
+        public void RankOfStableScoreUsesLazerDefinitions()
+        {
+            var memoryStream = new MemoryStream();
+
+            // local partial implementation of legacy score encoder
+            // this is done half for readability, half because `LegacyScoreEncoder` forces `LATEST_VERSION`
+            // and we want to emulate a stable score here
+            using (var sw = new SerializationWriter(memoryStream, true))
+            {
+                sw.Write((byte)0); // ruleset id (osu!)
+                sw.Write(20240116); // version (anything below `LegacyScoreEncoder.FIRST_LAZER_VERSION` is stable)
+                sw.Write(string.Empty.ComputeMD5Hash()); // beatmap hash, irrelevant to this test
+                sw.Write("username"); // irrelevant to this test
+                sw.Write(string.Empty.ComputeMD5Hash()); // score hash, irrelevant to this test
+                sw.Write((ushort)195); // count300
+                sw.Write((ushort)1); // count100
+                sw.Write((ushort)4); // count50
+                sw.Write((ushort)0); // countGeki
+                sw.Write((ushort)0); // countKatu
+                sw.Write((ushort)0); // countMiss
+                sw.Write(12345678); // total score, irrelevant to this test
+                sw.Write((ushort)1000); // max combo, irrelevant to this test
+                sw.Write(false); // full combo, irrelevant to this test
+                sw.Write((int)LegacyMods.Hidden); // mods
+                sw.Write(string.Empty); // hp graph, irrelevant
+                sw.Write(DateTime.Now); // date, irrelevant
+                sw.Write(Array.Empty<byte>()); // replay data, irrelevant
+                sw.Write((long)1234); // legacy online ID, irrelevant
+            }
+
+            memoryStream.Seek(0, SeekOrigin.Begin);
+            var decoded = new TestLegacyScoreDecoder().Parse(memoryStream);
+
+            Assert.Multiple(() =>
+            {
+                // In stable this would be an A because there are over 1% 50s. But that's not a thing in lazer.
+                Assert.That(decoded.ScoreInfo.Rank, Is.EqualTo(ScoreRank.S));
+            });
+        }
+
+        [Test]
         public void AccuracyOfLazerScorePreserved()
         {
             var ruleset = new OsuRuleset().RulesetInfo;
