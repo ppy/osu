@@ -100,11 +100,6 @@ namespace osu.Game.Scoring
             // this requires: max combo, statistics, max statistics (where available), and mods to already be populated on the score.
             if (StandardisedScoreMigrationTools.ShouldMigrateToNewStandardised(model))
                 model.TotalScore = StandardisedScoreMigrationTools.GetNewStandardised(model);
-            else if (model.IsLegacyScore)
-            {
-                model.LegacyTotalScore = model.TotalScore;
-                StandardisedScoreMigrationTools.UpdateFromLegacy(model, beatmaps());
-            }
         }
 
         // Very naive local caching to improve performance of large score imports (where the username is usually the same for most or all scores).

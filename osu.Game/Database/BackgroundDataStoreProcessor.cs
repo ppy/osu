@@ -355,8 +355,7 @@ namespace osu.Game.Database
                     realmAccess.Write(r =>
                     {
                         ScoreInfo s = r.Find<ScoreInfo>(id)!;
-                        // TODO: ensure that this is also updating rank (as it will set TotalScoreVersion to latest).
-                        StandardisedScoreMigrationTools.UpdateFromLegacy(s, beatmapManager);
+                        StandardisedScoreMigrationTools.UpdateFromLegacy(s, beatmapManager.GetWorkingBeatmap(s.BeatmapInfo));
                         s.TotalScoreVersion = LegacyScoreEncoder.LATEST_VERSION;
                     });
 
@@ -412,8 +411,7 @@ namespace osu.Game.Database
                     realmAccess.Write(r =>
                     {
                         ScoreInfo s = r.Find<ScoreInfo>(id)!;
-                        // TODO: uncomment when ready
-                        // s.Rank = StandardisedScoreMigrationTools.ComputeRank(s, beatmapManager);
+                        s.Rank = StandardisedScoreMigrationTools.ComputeRank(s);
                     });
 
                     ++processedCount;

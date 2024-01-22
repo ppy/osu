@@ -3,7 +3,6 @@
 
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Linq;
 using osu.Framework.Logging;
 using osu.Game.Beatmaps;
@@ -235,38 +234,48 @@ namespace osu.Game.Database
         /// Updates a legacy <see cref="ScoreInfo"/> to standardised scoring.
         /// </summary>
         /// <param name="score">The score to update.</param>
-        /// <param name="beatmaps">A <see cref="BeatmapManager"/> used for <see cref="WorkingBeatmap"/> lookups.</param>
-        public static void UpdateFromLegacy(ScoreInfo score, BeatmapManager beatmaps)
+        /// <param name="beatmap">The <see cref="WorkingBeatmap"/> applicable for this score.</param>
+        public static void UpdateFromLegacy(ScoreInfo score, WorkingBeatmap beatmap)
         {
-            score.TotalScore = convertFromLegacyTotalScore(score, beatmaps);
-            score.Accuracy = ComputeAccuracy(score);
+            var ruleset = score.Ruleset.CreateInstance();
+            var scoreProcessor = ruleset.CreateScoreProcessor();
+
+            score.TotalScore = convertFromLegacyTotalScore(score, ruleset, beatmap);
+            score.Accuracy = computeAccuracy(score, scoreProcessor);
+            score.Rank = computeRank(score, scoreProcessor);
         }
 
         /// <summary>
         /// Updates a legacy <see cref="ScoreInfo"/> to standardised scoring.
         /// </summary>
+        /// <remarks>
+        /// This overload is intended for server-side flows.
+        /// See: https://github.com/ppy/osu-queue-score-statistics/blob/3681e92ac91c6c61922094bdbc7e92e6217dd0fc/osu.Server.Queues.ScoreStatisticsProcessor/Commands/Queue/BatchInserter.cs
+        /// </remarks>
         /// <param name="score">The score to update.</param>
+        /// <param name="ruleset">The <see cref="Ruleset"/> in which the score was set.</param>
         /// <param name="difficulty">The beatmap difficulty.</param>
         /// <param name="attributes">The legacy scoring attributes for the beatmap which the score was set on.</param>
-        public static void UpdateFromLegacy(ScoreInfo score, LegacyBeatmapConversionDifficultyInfo difficulty, LegacyScoreAttributes attributes)
+        public static void UpdateFromLegacy(ScoreInfo score, Ruleset ruleset, LegacyBeatmapConversionDifficultyInfo difficulty, LegacyScoreAttributes attributes)
         {
-            score.TotalScore = convertFromLegacyTotalScore(score, difficulty, attributes);
-            score.Accuracy = ComputeAccuracy(score);
+            var scoreProcessor = ruleset.CreateScoreProcessor();
+
+            score.TotalScore = convertFromLegacyTotalScore(score, ruleset, difficulty, attributes);
+            score.Accuracy = computeAccuracy(score, scoreProcessor);
+            score.Rank = computeRank(score, scoreProcessor);
         }
 
         /// <summary>
         /// Converts from <see cref="ScoreInfo.LegacyTotalScore"/> to the new standardised scoring of <see cref="ScoreProcessor"/>.
         /// </summary>
         /// <param name="score">The score to convert the total score of.</param>
-        /// <param name="beatmaps">A <see cref="BeatmapManager"/> used for <see cref="WorkingBeatmap"/> lookups.</param>
+        /// <param name="ruleset">The <see cref="Ruleset"/> in which the score was set.</param>
+        /// <param name="beatmap">The <see cref="WorkingBeatmap"/> applicable for this score.</param>
         /// <returns>The standardised total score.</returns>
-        private static long convertFromLegacyTotalScore(ScoreInfo score, BeatmapManager beatmaps)
+        private static long convertFromLegacyTotalScore(ScoreInfo score, Ruleset ruleset, WorkingBeatmap beatmap)
         {
             if (!score.IsLegacyScore)
                 return score.TotalScore;
-
-            WorkingBeatmap beatmap = beatmaps.GetWorkingBeatmap(score.BeatmapInfo);
-            Ruleset ruleset = score.Ruleset.CreateInstance();
 
             if (ruleset is not ILegacyRuleset legacyRuleset)
                 return score.TotalScore;
@@ -283,26 +292,27 @@ namespace osu.Game.Database
             ILegacyScoreSimulator sv1Simulator = legacyRuleset.CreateLegacyScoreSimulator();
             LegacyScoreAttributes attributes = sv1Simulator.Simulate(beatmap, playableBeatmap);
 
-            return convertFromLegacyTotalScore(score, LegacyBeatmapConversionDifficultyInfo.FromBeatmap(beatmap.Beatmap), attributes);
+            return convertFromLegacyTotalScore(score, ruleset, LegacyBeatmapConversionDifficultyInfo.FromBeatmap(beatmap.Beatmap), attributes);
         }
 
         /// <summary>
         /// Converts from <see cref="ScoreInfo.LegacyTotalScore"/> to the new standardised scoring of <see cref="ScoreProcessor"/>.
         /// </summary>
         /// <param name="score">The score to convert the total score of.</param>
+        /// <param name="ruleset">The <see cref="Ruleset"/> in which the score was set.</param>
         /// <param name="difficulty">The beatmap difficulty.</param>
         /// <param name="attributes">The legacy scoring attributes for the beatmap which the score was set on.</param>
         /// <returns>The standardised total score.</returns>
-        private static long convertFromLegacyTotalScore(ScoreInfo score, LegacyBeatmapConversionDifficultyInfo difficulty, LegacyScoreAttributes attributes)
+        private static long convertFromLegacyTotalScore(ScoreInfo score, Ruleset ruleset, LegacyBeatmapConversionDifficultyInfo difficulty, LegacyScoreAttributes attributes)
         {
             if (!score.IsLegacyScore)
                 return score.TotalScore;
 
-            Debug.Assert(score.LegacyTotalScore != null);
-
-            Ruleset ruleset = score.Ruleset.CreateInstance();
             if (ruleset is not ILegacyRuleset legacyRuleset)
                 return score.TotalScore;
+
+            // ensure legacy total score is saved for later.
+            score.LegacyTotalScore = score.TotalScore;
 
             double legacyModMultiplier = legacyRuleset.CreateLegacyScoreSimulator().GetLegacyScoreMultiplier(score.Mods, difficulty);
             int maximumLegacyAccuracyScore = attributes.AccuracyScore;
@@ -584,11 +594,10 @@ namespace osu.Game.Database
             }
         }
 
-        public static double ComputeAccuracy(ScoreInfo scoreInfo)
-        {
-            Ruleset ruleset = scoreInfo.Ruleset.CreateInstance();
-            ScoreProcessor scoreProcessor = ruleset.CreateScoreProcessor();
+        public static double ComputeAccuracy(ScoreInfo scoreInfo) => computeAccuracy(scoreInfo, scoreInfo.Ruleset.CreateInstance().CreateScoreProcessor());
 
+        private static double computeAccuracy(ScoreInfo scoreInfo, ScoreProcessor scoreProcessor)
+        {
             int baseScore = scoreInfo.Statistics.Where(kvp => kvp.Key.AffectsAccuracy())
                                      .Sum(kvp => kvp.Value * scoreProcessor.GetBaseScoreForResult(kvp.Key));
             int maxBaseScore = scoreInfo.MaximumStatistics.Where(kvp => kvp.Key.AffectsAccuracy())
@@ -597,10 +606,11 @@ namespace osu.Game.Database
             return maxBaseScore == 0 ? 1 : baseScore / (double)maxBaseScore;
         }
 
-        public static ScoreRank ComputeRank(ScoreInfo scoreInfo)
+        public static ScoreRank ComputeRank(ScoreInfo scoreInfo) => computeRank(scoreInfo, scoreInfo.Ruleset.CreateInstance().CreateScoreProcessor());
+
+        private static ScoreRank computeRank(ScoreInfo scoreInfo, ScoreProcessor scoreProcessor)
         {
-            Ruleset ruleset = scoreInfo.Ruleset.CreateInstance();
-            var rank = ruleset.CreateScoreProcessor().RankFromScore(scoreInfo.Accuracy, scoreInfo.Statistics);
+            var rank = scoreProcessor.RankFromScore(scoreInfo.Accuracy, scoreInfo.Statistics);
 
             foreach (var mod in scoreInfo.Mods.OfType<IApplicableToScoreProcessor>())
                 rank = mod.AdjustRank(rank, scoreInfo.Accuracy);
