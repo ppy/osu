@@ -49,8 +49,10 @@ namespace osu.Game.Rulesets.Judgements
                 this.ScaleTo(1.2f, 100, Easing.In);
 
                 this.FadeOutFromOne(400);
+                return;
             }
-            else if (Result.IsMiss())
+
+            if (Result.IsMiss())
             {
                 this.ScaleTo(1.6f);
                 this.ScaleTo(1, 100, Easing.In);
@@ -60,9 +62,9 @@ namespace osu.Game.Rulesets.Judgements
 
                 this.RotateTo(0);
                 this.RotateTo(40, 800, Easing.InQuint);
-
-                this.FadeOutFromOne(800);
             }
+
+            this.FadeOutFromOne(800);
         }
 
         public Drawable? GetAboveHitObjectsProxiedContent() => null;
