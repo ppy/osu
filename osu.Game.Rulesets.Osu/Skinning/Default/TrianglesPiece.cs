@@ -15,6 +15,7 @@ namespace osu.Game.Rulesets.Osu.Skinning.Default
         {
             TriangleScale = 1.2f;
             HideAlphaDiscrepancies = false;
+            ClampToDrawable = false;
         }
 
         protected override void Update()

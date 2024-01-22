@@ -40,7 +40,7 @@ namespace osu.Game.Tests.Visual.Background
 
             AddSliderStep("Triangle scale", 0f, 10f, 1f, s => triangles.TriangleScale = s);
             AddSliderStep("Seed", 0, 1000, 0, s => triangles.Reset(s));
-            AddToggleStep("Masking", m => triangles.Masking = m);
+            AddToggleStep("ClampToDrawable", c => triangles.ClampToDrawable = c);
         }
     }
 }
