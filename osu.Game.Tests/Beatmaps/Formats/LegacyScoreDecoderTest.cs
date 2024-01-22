@@ -10,7 +10,6 @@ using System.IO;
 using System.Linq;
 using NUnit.Framework;
 using osu.Framework.Extensions;
-using osu.Framework.Utils;
 using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.Formats;
 using osu.Game.Beatmaps.Legacy;
@@ -23,6 +22,7 @@ using osu.Game.Rulesets.Mania.Mods;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Osu;
 using osu.Game.Rulesets.Osu.Mods;
+using osu.Game.Rulesets.Osu.Objects;
 using osu.Game.Rulesets.Osu.Replays;
 using osu.Game.Rulesets.Osu.UI;
 using osu.Game.Rulesets.Replays;
@@ -59,14 +59,14 @@ namespace osu.Game.Tests.Beatmaps.Formats
                 Assert.AreEqual(2, score.ScoreInfo.Statistics[HitResult.Great]);
                 Assert.AreEqual(1, score.ScoreInfo.Statistics[HitResult.Good]);
 
-                Assert.AreEqual(829_931, score.ScoreInfo.TotalScore);
+                Assert.AreEqual(829_931, score.ScoreInfo.LegacyTotalScore);
                 Assert.AreEqual(3, score.ScoreInfo.MaxCombo);
 
                 Assert.IsTrue(score.ScoreInfo.Mods.Any(m => m is ManiaModClassic));
                 Assert.IsTrue(score.ScoreInfo.APIMods.Any(m => m.Acronym == "CL"));
                 Assert.IsTrue(score.ScoreInfo.ModsJson.Contains("CL"));
 
-                Assert.IsTrue(Precision.AlmostEquals(0.8889, score.ScoreInfo.Accuracy, 0.0001));
+                Assert.That((2 * 300d + 1 * 200) / (3 * 305d), Is.EqualTo(score.ScoreInfo.Accuracy).Within(0.0001));
                 Assert.AreEqual(ScoreRank.B, score.ScoreInfo.Rank);
 
                 Assert.That(score.Replay.Frames, Is.Not.Empty);
@@ -289,7 +289,7 @@ namespace osu.Game.Tests.Beatmaps.Formats
             Assert.Multiple(() =>
             {
                 Assert.That(decoded.ScoreInfo.Accuracy, Is.EqualTo((double)(198 * 305 + 300) / (200 * 305)));
-                Assert.That(decoded.ScoreInfo.Rank, Is.EqualTo(ScoreRank.S));
+                Assert.That(decoded.ScoreInfo.Rank, Is.EqualTo(ScoreRank.SH));
             });
         }
 
@@ -330,12 +330,12 @@ namespace osu.Game.Tests.Beatmaps.Formats
             Assert.Multiple(() =>
             {
                 // In stable this would be an A because there are over 1% 50s. But that's not a thing in lazer.
-                Assert.That(decoded.ScoreInfo.Rank, Is.EqualTo(ScoreRank.S));
+                Assert.That(decoded.ScoreInfo.Rank, Is.EqualTo(ScoreRank.SH));
             });
         }
 
         [Test]
-        public void AccuracyOfLazerScorePreserved()
+        public void AccuracyRankAndTotalScoreOfLazerScorePreserved()
         {
             var ruleset = new OsuRuleset().RulesetInfo;
 
@@ -363,6 +363,8 @@ namespace osu.Game.Tests.Beatmaps.Formats
 
             Assert.Multiple(() =>
             {
+                Assert.That(decodedAfterEncode.ScoreInfo.TotalScore, Is.EqualTo(284_537));
+                Assert.That(decodedAfterEncode.ScoreInfo.LegacyTotalScore, Is.Null);
                 Assert.That(decodedAfterEncode.ScoreInfo.Accuracy, Is.EqualTo((double)(199 * 300 + 30) / (200 * 300 + 30)));
                 Assert.That(decodedAfterEncode.ScoreInfo.Rank, Is.EqualTo(ScoreRank.A));
             });
@@ -457,6 +459,12 @@ namespace osu.Game.Tests.Beatmaps.Formats
                     Ruleset = new OsuRuleset().RulesetInfo,
                     Difficulty = new BeatmapDifficulty(),
                     BeatmapVersion = beatmapVersion,
+                },
+                // needs to have at least one objects so that `StandardisedScoreMigrationTools` doesn't die
+                // when trying to recompute total score.
+                HitObjects =
+                {
+                    new HitCircle()
                 }
             });
         }
