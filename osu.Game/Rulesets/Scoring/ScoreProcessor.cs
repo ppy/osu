@@ -505,7 +505,7 @@ namespace osu.Game.Rulesets.Scoring
         /// <summary>
         /// Given an accuracy (0..1), return the correct <see cref="ScoreRank"/>.
         /// </summary>
-        public virtual ScoreRank RankFromScore(double accuracy, Dictionary<HitResult, int> results)
+        public virtual ScoreRank RankFromScore(double accuracy, IReadOnlyDictionary<HitResult, int> results)
         {
             if (accuracy == accuracy_cutoff_x)
                 return ScoreRank.X;

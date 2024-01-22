@@ -35,7 +35,7 @@ namespace osu.Game.Rulesets.Taiko.Scoring
                    * strongScaleValue(result);
         }
 
-        public override ScoreRank RankFromScore(double accuracy, Dictionary<HitResult, int> results)
+        public override ScoreRank RankFromScore(double accuracy, IReadOnlyDictionary<HitResult, int> results)
         {
             ScoreRank rank = base.RankFromScore(accuracy, results);
 

@@ -89,7 +89,7 @@ namespace osu.Game.Rulesets.Catch.Scoring
             return baseIncrease * Math.Min(Math.Max(0.5, Math.Log(result.ComboAfterJudgement, combo_base)), Math.Log(combo_cap, combo_base));
         }
 
-        public override ScoreRank RankFromScore(double accuracy, Dictionary<HitResult, int> results)
+        public override ScoreRank RankFromScore(double accuracy, IReadOnlyDictionary<HitResult, int> results)
         {
             if (accuracy == accuracy_cutoff_x)
                 return ScoreRank.X;
