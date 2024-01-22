@@ -99,6 +99,9 @@ namespace osu.Game.Screens.Play
 
         private readonly SkinComponentsContainer mainComponents;
 
+        [CanBeNull]
+        private readonly SkinComponentsContainer rulesetComponents;
+
         /// <summary>
         /// A flow which sits at the left side of the screen to house leaderboard (and related) components.
         /// Will automatically be positioned to avoid colliding with top scoring elements.
@@ -111,7 +114,6 @@ namespace osu.Game.Screens.Play
 
         public HUDOverlay([CanBeNull] DrawableRuleset drawableRuleset, IReadOnlyList<Mod> mods, bool alwaysShowLeaderboard = true)
         {
-            Drawable rulesetComponents;
             this.drawableRuleset = drawableRuleset;
             this.mods = mods;
 
@@ -125,8 +127,8 @@ namespace osu.Game.Screens.Play
                 clicksPerSecondController = new ClicksPerSecondController(),
                 InputCountController = new InputCountController(),
                 mainComponents = new HUDComponentsContainer { AlwaysPresent = true, },
-                rulesetComponents = drawableRuleset != null
-                    ? new HUDComponentsContainer(drawableRuleset.Ruleset.RulesetInfo) { AlwaysPresent = true, }
+                drawableRuleset != null
+                    ? (rulesetComponents = new HUDComponentsContainer(drawableRuleset.Ruleset.RulesetInfo) { AlwaysPresent = true, })
                     : Empty(),
                 playfieldComponents = drawableRuleset != null
                     ? new SkinComponentsContainer(new SkinComponentsContainerLookup(SkinComponentsContainerLookup.TargetArea.Playfield, drawableRuleset.Ruleset.RulesetInfo)) { AlwaysPresent = true, }
@@ -170,7 +172,10 @@ namespace osu.Game.Screens.Play
                 },
             };
 
-            hideTargets = new List<Drawable> { mainComponents, rulesetComponents, playfieldComponents, topRightElements };
+            hideTargets = new List<Drawable> { mainComponents, playfieldComponents, topRightElements };
+
+            if (rulesetComponents != null)
+                hideTargets.Add(rulesetComponents);
 
             if (!alwaysShowLeaderboard)
                 hideTargets.Add(LeaderboardFlow);
@@ -256,13 +261,37 @@ namespace osu.Game.Screens.Play
 
             // LINQ cast can be removed when IDrawable interface includes Anchor / RelativeSizeAxes.
             foreach (var element in mainComponents.Components.Cast<Drawable>())
+                processDrawable(element);
+
+            if (rulesetComponents != null)
+            {
+                foreach (var element in rulesetComponents.Components.Cast<Drawable>())
+                    processDrawable(element);
+            }
+
+            if (lowestTopScreenSpaceRight.HasValue)
+                topRightElements.Y = MathHelper.Clamp(ToLocalSpace(new Vector2(0, lowestTopScreenSpaceRight.Value)).Y, 0, DrawHeight - topRightElements.DrawHeight);
+            else
+                topRightElements.Y = 0;
+
+            if (lowestTopScreenSpaceLeft.HasValue)
+                LeaderboardFlow.Y = MathHelper.Clamp(ToLocalSpace(new Vector2(0, lowestTopScreenSpaceLeft.Value)).Y, 0, DrawHeight - LeaderboardFlow.DrawHeight);
+            else
+                LeaderboardFlow.Y = 0;
+
+            if (highestBottomScreenSpace.HasValue)
+                bottomRightElements.Y = BottomScoringElementsHeight = -MathHelper.Clamp(DrawHeight - ToLocalSpace(highestBottomScreenSpace.Value).Y, 0, DrawHeight - bottomRightElements.DrawHeight);
+            else
+                bottomRightElements.Y = 0;
+
+            void processDrawable(Drawable element)
             {
                 // for now align some top components with the bottom-edge of the lowest top-anchored hud element.
                 if (element.Anchor.HasFlagFast(Anchor.y0))
                 {
                     // health bars are excluded for the sake of hacky legacy skins which extend the health bar to take up the full screen area.
                     if (element is LegacyHealthDisplay)
-                        continue;
+                        return;
 
                     float bottom = element.ScreenSpaceDrawQuad.BottomRight.Y;
 
@@ -288,21 +317,6 @@ namespace osu.Game.Screens.Play
                         highestBottomScreenSpace = topLeft;
                 }
             }
-
-            if (lowestTopScreenSpaceRight.HasValue)
-                topRightElements.Y = MathHelper.Clamp(ToLocalSpace(new Vector2(0, lowestTopScreenSpaceRight.Value)).Y, 0, DrawHeight - topRightElements.DrawHeight);
-            else
-                topRightElements.Y = 0;
-
-            if (lowestTopScreenSpaceLeft.HasValue)
-                LeaderboardFlow.Y = MathHelper.Clamp(ToLocalSpace(new Vector2(0, lowestTopScreenSpaceLeft.Value)).Y, 0, DrawHeight - LeaderboardFlow.DrawHeight);
-            else
-                LeaderboardFlow.Y = 0;
-
-            if (highestBottomScreenSpace.HasValue)
-                bottomRightElements.Y = BottomScoringElementsHeight = -MathHelper.Clamp(DrawHeight - ToLocalSpace(highestBottomScreenSpace.Value).Y, 0, DrawHeight - bottomRightElements.DrawHeight);
-            else
-                bottomRightElements.Y = 0;
         }
 
         private void updateVisibility()
