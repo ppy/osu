@@ -1240,9 +1240,14 @@ namespace osu.Game.Screens.Play
                 {
                     b.IgnoreUserSettings.Value = true;
 
-                    b.IsBreakTime.UnbindFrom(breakTracker.IsBreakTime);
-                    b.IsBreakTime.Value = false;
+                    // May be null if the load never completed.
+                    if (breakTracker != null)
+                    {
+                        b.IsBreakTime.UnbindFrom(breakTracker.IsBreakTime);
+                        b.IsBreakTime.Value = false;
+                    }
                 });
+
                 storyboardReplacesBackground.Value = false;
             }
         }
