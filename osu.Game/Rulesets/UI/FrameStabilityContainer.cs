@@ -25,9 +25,9 @@ namespace osu.Game.Rulesets.UI
         public ReplayInputHandler? ReplayInputHandler { get; set; }
 
         /// <summary>
-        /// The number of frames (per parent frame) which can be run in an attempt to catch-up to real-time.
+        /// The number of CPU milliseconds to spend at most during seek catch-up.
         /// </summary>
-        public int MaxCatchUpFrames { get; set; } = 5;
+        private const double max_catchup_milliseconds = 10;
 
         /// <summary>
         /// Whether to enable frame-stable playback.
@@ -58,6 +58,8 @@ namespace osu.Game.Rulesets.UI
         /// This gets exposed to children as an <see cref="IGameplayClock"/>.
         /// </summary>
         private readonly FramedClock framedClock;
+
+        private readonly Stopwatch stopwatch = new Stopwatch();
 
         /// <summary>
         /// The current direction of playback to be exposed to frame stable children.
@@ -97,7 +99,7 @@ namespace osu.Game.Rulesets.UI
 
         public override bool UpdateSubTree()
         {
-            int loops = MaxCatchUpFrames;
+            stopwatch.Restart();
 
             do
             {
@@ -110,7 +112,7 @@ namespace osu.Game.Rulesets.UI
 
                 base.UpdateSubTree();
                 UpdateSubTreeMasking(this, ScreenSpaceDrawQuad.AABBFloat);
-            } while (state == PlaybackState.RequiresCatchUp && loops-- > 0);
+            } while (state == PlaybackState.RequiresCatchUp && stopwatch.ElapsedMilliseconds < max_catchup_milliseconds);
 
             return true;
         }
