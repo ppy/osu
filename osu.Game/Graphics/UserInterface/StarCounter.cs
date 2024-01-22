@@ -115,7 +115,7 @@ namespace osu.Game.Graphics.UserInterface
 
                 star.ClearTransforms(true);
 
-                double delay = (current <= newValue ? Math.Max(i - current, 0) : Math.Max(current - 1 - i, 0)) * AnimationDelay;
+                double delay = Math.Max(current <= newValue ? i - current : current - 1 - i, 0) * AnimationDelay;
 
                 using (star.BeginDelayedSequence(delay))
                     star.DisplayAt(getStarScale(i, newValue));
