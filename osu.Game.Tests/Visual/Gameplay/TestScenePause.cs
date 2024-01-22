@@ -93,15 +93,12 @@ namespace osu.Game.Tests.Visual.Gameplay
 
                     double currentTime = masterClock.CurrentTime;
 
-                    bool goingForward = currentTime >= (masterClock.LastStopTime ?? lastStopTime);
+                    bool goingForward = currentTime >= lastStopTime;
 
                     alwaysGoingForward &= goingForward;
 
                     if (!goingForward)
                         Logger.Log($"Went too far backwards (last stop: {lastStopTime:N1} current: {currentTime:N1})");
-
-                    if (masterClock.LastStopTime != null)
-                        lastStopTime = masterClock.LastStopTime.Value;
                 };
             });
 
@@ -125,7 +122,7 @@ namespace osu.Game.Tests.Visual.Gameplay
 
             resumeAndConfirm();
 
-            AddAssert("Resumed without seeking forward", () => Player.LastResumeTime, () => Is.LessThanOrEqualTo(Player.LastPauseTime));
+            AddAssert("continued playing forward", () => Player.LastResumeTime, () => Is.GreaterThanOrEqualTo(Player.LastPauseTime));
 
             AddUntilStep("player playing", () => Player.LocalUserPlaying.Value);
         }
