@@ -27,11 +27,6 @@ namespace osu.Game.Beatmaps
     {
         private readonly bool applyOffsets;
 
-        /// <summary>
-        /// The total frequency adjustment from pause transforms. Should eventually be handled in a better way.
-        /// </summary>
-        public readonly BindableDouble ExternalPauseFrequencyAdjust = new BindableDouble(1);
-
         private readonly OffsetCorrectionClock? userGlobalOffsetClock;
         private readonly OffsetCorrectionClock? platformOffsetClock;
         private readonly OffsetCorrectionClock? userBeatmapOffsetClock;
@@ -69,13 +64,13 @@ namespace osu.Game.Beatmaps
             {
                 // Audio timings in general with newer BASS versions don't match stable.
                 // This only seems to be required on windows. We need to eventually figure out why, with a bit of luck.
-                platformOffsetClock = new OffsetCorrectionClock(interpolatedTrack, ExternalPauseFrequencyAdjust) { Offset = RuntimeInfo.OS == RuntimeInfo.Platform.Windows ? 15 : 0 };
+                platformOffsetClock = new OffsetCorrectionClock(interpolatedTrack) { Offset = RuntimeInfo.OS == RuntimeInfo.Platform.Windows ? 15 : 0 };
 
                 // User global offset (set in settings) should also be applied.
-                userGlobalOffsetClock = new OffsetCorrectionClock(platformOffsetClock, ExternalPauseFrequencyAdjust);
+                userGlobalOffsetClock = new OffsetCorrectionClock(platformOffsetClock);
 
                 // User per-beatmap offset will be applied to this final clock.
-                finalClockSource = userBeatmapOffsetClock = new OffsetCorrectionClock(userGlobalOffsetClock, ExternalPauseFrequencyAdjust);
+                finalClockSource = userBeatmapOffsetClock = new OffsetCorrectionClock(userGlobalOffsetClock);
             }
             else
             {

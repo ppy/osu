@@ -67,7 +67,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
         private Container<DrawableSliderRepeat> repeatContainer;
         private PausableSkinnableSound slidingSample;
 
-        private readonly LayoutValue drawSizeLayout;
+        private readonly LayoutValue relativeAnchorPositionLayout;
 
         public DrawableSlider()
             : this(null)
@@ -85,7 +85,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
                 AlwaysPresent = true,
                 Alpha = 0
             };
-            AddLayout(drawSizeLayout = new LayoutValue(Invalidation.DrawSize | Invalidation.MiscGeometry));
+            AddLayout(relativeAnchorPositionLayout = new LayoutValue(Invalidation.DrawSize | Invalidation.MiscGeometry));
         }
 
         [BackgroundDependencyLoader]
@@ -190,6 +190,8 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
                     repeatContainer.Add(repeat);
                     break;
             }
+
+            relativeAnchorPositionLayout.Invalidate();
         }
 
         protected override void ClearNestedHitObjects()
@@ -265,14 +267,14 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
             Size = SliderBody?.Size ?? Vector2.Zero;
             OriginPosition = SliderBody?.PathOffset ?? Vector2.Zero;
 
-            if (!drawSizeLayout.IsValid)
+            if (!relativeAnchorPositionLayout.IsValid)
             {
                 Vector2 pos = Vector2.Divide(OriginPosition, DrawSize);
                 foreach (var obj in NestedHitObjects)
                     obj.RelativeAnchorPosition = pos;
                 Ball.RelativeAnchorPosition = pos;
 
-                drawSizeLayout.Validate();
+                relativeAnchorPositionLayout.Validate();
             }
         }
 
