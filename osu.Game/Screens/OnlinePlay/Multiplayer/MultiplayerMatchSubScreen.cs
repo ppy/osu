@@ -247,13 +247,15 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
         [Resolved(canBeNull: true)]
         private IDialogOverlay dialogOverlay { get; set; }
 
+        private bool exitConfirmed;
+
         public override bool OnExiting(ScreenExitEvent e)
         {
             // room has not been created yet or we're offline; exit immediately.
             if (client.Room == null || !IsConnected)
                 return base.OnExiting(e);
 
-            if (dialogOverlay != null)
+            if (!exitConfirmed && dialogOverlay != null)
             {
                 if (dialogOverlay.CurrentDialog is ConfirmDialog confirmDialog)
                     confirmDialog.PerformOkAction();
@@ -261,6 +263,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
                 {
                     dialogOverlay.Push(new ConfirmDialog("Are you sure you want to leave this multiplayer match?", () =>
                     {
+                        exitConfirmed = true;
                         if (this.IsCurrentScreen())
                             this.Exit();
                     }));
