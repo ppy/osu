@@ -13,7 +13,7 @@ namespace osu.Game.Screens.OnlinePlay
 
         public virtual string ShortTitle => Title;
 
-        protected override bool PlayExitSound => false;
+        protected sealed override bool PlayExitSound => false;
 
         [Resolved]
         protected IRoomManager? RoomManager { get; private set; }
