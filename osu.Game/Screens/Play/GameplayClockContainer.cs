@@ -78,8 +78,6 @@ namespace osu.Game.Screens.Play
 
             isPaused.Value = false;
 
-            PrepareStart();
-
             // The case which caused this to be added is FrameStabilityContainer, which manages its own current and elapsed time.
             // Because we generally update our own current time quicker than children can query it (via Start/Seek/Update),
             // this means that the first frame ever exposed to children may have a non-zero current time.
@@ -97,14 +95,6 @@ namespace osu.Game.Screens.Play
 
                 StartGameplayClock();
             });
-        }
-
-        /// <summary>
-        /// When <see cref="Start"/> is called, this will be run to give an opportunity to prepare the clock at the correct
-        /// start location.
-        /// </summary>
-        protected virtual void PrepareStart()
-        {
         }
 
         /// <summary>
