@@ -4,27 +4,58 @@
 #nullable disable
 
 using NUnit.Framework;
+using osu.Framework.Graphics;
+using osu.Framework.Graphics.Containers;
+using osu.Framework.Utils;
 using osu.Game.Beatmaps.Drawables;
 using osu.Game.Rulesets.Osu;
 using osu.Game.Tests.Beatmaps;
+using osuTK;
 
 namespace osu.Game.Tests.Visual.Beatmaps
 {
     public partial class TestSceneDifficultyIcon : OsuTestScene
     {
+        private FillFlowContainer fill;
+
+        protected override void LoadComplete()
+        {
+            base.LoadComplete();
+
+            Child = fill = new FillFlowContainer
+            {
+                AutoSizeAxes = Axes.Y,
+                Width = 300,
+                Direction = FillDirection.Full,
+                Anchor = Anchor.Centre,
+                Origin = Anchor.Centre,
+            };
+        }
+
         [Test]
         public void CreateDifficultyIcon()
         {
             DifficultyIcon difficultyIcon = null;
 
-            AddStep("create difficulty icon", () =>
+            AddRepeatStep("create difficulty icon", () =>
             {
-                Child = difficultyIcon = new DifficultyIcon(new TestBeatmap(new OsuRuleset().RulesetInfo).BeatmapInfo, new OsuRuleset().RulesetInfo)
+                var rulesetInfo = new OsuRuleset().RulesetInfo;
+                var beatmapInfo = new TestBeatmap(rulesetInfo).BeatmapInfo;
+
+                beatmapInfo.Difficulty.ApproachRate = RNG.Next(0, 10);
+                beatmapInfo.Difficulty.CircleSize = RNG.Next(0, 10);
+                beatmapInfo.Difficulty.OverallDifficulty = RNG.Next(0, 10);
+                beatmapInfo.Difficulty.DrainRate = RNG.Next(0, 10);
+                beatmapInfo.StarRating = RNG.NextSingle(0, 10);
+                beatmapInfo.BPM = RNG.Next(60, 300);
+
+                fill.Add(difficultyIcon = new DifficultyIcon(beatmapInfo, rulesetInfo)
                 {
+                    Scale = new Vector2(2),
                     ShowTooltip = true,
                     ShowExtendedTooltip = true
-                };
-            });
+                });
+            }, 10);
 
             AddStep("hide extended tooltip", () => difficultyIcon.ShowExtendedTooltip = false);
 
