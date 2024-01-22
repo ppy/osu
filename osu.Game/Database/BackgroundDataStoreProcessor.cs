@@ -12,7 +12,6 @@ using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Logging;
 using osu.Game.Beatmaps;
-using osu.Game.Database;
 using osu.Game.Extensions;
 using osu.Game.Online.API;
 using osu.Game.Overlays;
@@ -22,7 +21,7 @@ using osu.Game.Scoring;
 using osu.Game.Scoring.Legacy;
 using osu.Game.Screens.Play;
 
-namespace osu.Game
+namespace osu.Game.Database
 {
     /// <summary>
     /// Performs background updating of data stores at startup.
