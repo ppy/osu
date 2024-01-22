@@ -43,7 +43,7 @@ namespace osu.Game.Rulesets.Taiko.Scoring
             {
                 case ScoreRank.S:
                 case ScoreRank.X:
-                    if (results.GetValueOrDefault(HitResult.Miss) == 0)
+                    if (results.GetValueOrDefault(HitResult.Miss) > 0)
                         rank = ScoreRank.A;
                     break;
             }
