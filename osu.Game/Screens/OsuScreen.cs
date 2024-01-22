@@ -223,7 +223,12 @@ namespace osu.Game.Screens
 
         public override bool OnExiting(ScreenExitEvent e)
         {
-            if (ValidForResume && PlayExitSound)
+            // Only play the exit sound if we are the last screen in the exit sequence.
+            // This stops many sample playbacks from stacking when a huge screen purge happens (ie. returning to menu via the home button
+            // from a deeply nested screen).
+            bool arrivingAtFinalDestination = e.Next == e.Destination;
+
+            if (ValidForResume && PlayExitSound && arrivingAtFinalDestination)
                 sampleExit?.Play();
 
             if (ValidForResume && logo != null)
