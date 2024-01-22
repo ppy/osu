@@ -40,8 +40,6 @@ namespace osu.Game.Screens.OnlinePlay.Lounge
     {
         public override string Title => "Lounge";
 
-        protected override bool PlayExitSound => false;
-
         protected override BackgroundScreen CreateBackground() => new LoungeBackgroundScreen
         {
             SelectedRoom = { BindTarget = SelectedRoom }
