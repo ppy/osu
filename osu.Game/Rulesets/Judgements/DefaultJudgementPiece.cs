@@ -45,11 +45,10 @@ namespace osu.Game.Rulesets.Judgements
             if (Result == HitResult.IgnoreMiss || Result == HitResult.LargeTickMiss)
             {
                 this.RotateTo(-45);
-                this.ScaleTo(1.8f);
+                this.ScaleTo(1.6f);
                 this.ScaleTo(1.2f, 100, Easing.In);
 
-                this.MoveTo(Vector2.Zero);
-                this.MoveToOffset(new Vector2(0, 10), 800, Easing.InQuint);
+                this.FadeOutFromOne(400);
             }
             else if (Result.IsMiss())
             {
@@ -61,9 +60,9 @@ namespace osu.Game.Rulesets.Judgements
 
                 this.RotateTo(0);
                 this.RotateTo(40, 800, Easing.InQuint);
-            }
 
-            this.FadeOutFromOne(800);
+                this.FadeOutFromOne(800);
+            }
         }
 
         public Drawable? GetAboveHitObjectsProxiedContent() => null;
