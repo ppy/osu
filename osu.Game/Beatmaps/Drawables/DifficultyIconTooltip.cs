@@ -28,7 +28,6 @@ namespace osu.Game.Beatmaps.Drawables
         private OsuSpriteText circleSize;
         private OsuSpriteText approachRate;
         private OsuSpriteText bpm;
-        private OsuSpriteText maxCombo;
         private OsuSpriteText length;
 
         private FillFlowContainer difficultyFillFlowContainer;
@@ -64,12 +63,12 @@ namespace osu.Game.Beatmaps.Drawables
                         {
                             Anchor = Anchor.Centre,
                             Origin = Anchor.Centre,
-                            Font = OsuFont.GetFont(size: 16, weight: FontWeight.Bold),
+                            Font = OsuFont.GetFont(size: 16, weight: FontWeight.Bold)
                         },
                         starRating = new StarRatingDisplay(default, StarRatingDisplaySize.Small)
                         {
                             Anchor = Anchor.Centre,
-                            Origin = Anchor.Centre,
+                            Origin = Anchor.Centre
                         },
                         // Difficulty stats
                         difficultyFillFlowContainer = new FillFlowContainer
@@ -86,26 +85,26 @@ namespace osu.Game.Beatmaps.Drawables
                                 {
                                     Anchor = Anchor.Centre,
                                     Origin = Anchor.Centre,
-                                    Font = OsuFont.GetFont(size: 14),
+                                    Font = OsuFont.GetFont(size: 14)
                                 },
                                 drainRate = new OsuSpriteText
                                 {
                                     Anchor = Anchor.Centre,
                                     Origin = Anchor.Centre,
-                                    Font = OsuFont.GetFont(size: 14),
+                                    Font = OsuFont.GetFont(size: 14)
                                 },
                                 approachRate = new OsuSpriteText
                                 {
                                     Anchor = Anchor.Centre,
                                     Origin = Anchor.Centre,
-                                    Font = OsuFont.GetFont(size: 14),
+                                    Font = OsuFont.GetFont(size: 14)
                                 },
                                 overallDifficulty = new OsuSpriteText
                                 {
                                     Anchor = Anchor.Centre,
                                     Origin = Anchor.Centre,
-                                    Font = OsuFont.GetFont(size: 14),
-                                },
+                                    Font = OsuFont.GetFont(size: 14)
+                                }
                             }
                         },
                         // Misc stats
@@ -123,19 +122,13 @@ namespace osu.Game.Beatmaps.Drawables
                                 {
                                     Anchor = Anchor.Centre,
                                     Origin = Anchor.Centre,
-                                    Font = OsuFont.GetFont(size: 14),
+                                    Font = OsuFont.GetFont(size: 14)
                                 },
                                 bpm = new OsuSpriteText
                                 {
                                     Anchor = Anchor.Centre,
                                     Origin = Anchor.Centre,
-                                    Font = OsuFont.GetFont(size: 14),
-                                },
-                                maxCombo = new OsuSpriteText
-                                {
-                                    Anchor = Anchor.Centre,
-                                    Origin = Anchor.Centre,
-                                    Font = OsuFont.GetFont(size: 14),
+                                    Font = OsuFont.GetFont(size: 14)
                                 },
                             }
                         }
@@ -201,7 +194,6 @@ namespace osu.Game.Beatmaps.Drawables
             // Misc row
             length.Text = "Length: " + TimeSpan.FromMilliseconds(displayedContent.BeatmapInfo.Length / rate).ToString("mm\\:ss");
             bpm.Text = " BPM: " + Math.Round(bpmAdjusted, 0);
-            maxCombo.Text = " Max Combo: " + displayedContent.BeatmapInfo.TotalObjectCount;
         }
 
         public void Move(Vector2 pos) => Position = pos;
