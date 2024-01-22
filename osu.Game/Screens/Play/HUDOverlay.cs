@@ -172,7 +172,10 @@ namespace osu.Game.Screens.Play
                 },
             };
 
-            hideTargets = new List<Drawable> { mainComponents, rulesetComponents, playfieldComponents, topRightElements };
+            hideTargets = new List<Drawable> { mainComponents, playfieldComponents, topRightElements };
+
+            if (rulesetComponents != null)
+                hideTargets.Add(rulesetComponents);
 
             if (!alwaysShowLeaderboard)
                 hideTargets.Add(LeaderboardFlow);
