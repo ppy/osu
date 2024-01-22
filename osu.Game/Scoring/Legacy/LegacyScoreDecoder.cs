@@ -11,6 +11,7 @@ using Newtonsoft.Json;
 using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.Formats;
 using osu.Game.Beatmaps.Legacy;
+using osu.Game.Database;
 using osu.Game.IO.Legacy;
 using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Replays;
@@ -37,6 +38,7 @@ namespace osu.Game.Scoring.Legacy
             };
 
             WorkingBeatmap workingBeatmap;
+            byte[] compressedScoreInfo = null;
 
             using (SerializationReader sr = new SerializationReader(stream))
             {
@@ -105,8 +107,6 @@ namespace osu.Game.Scoring.Legacy
                 else if (version >= 20121008)
                     scoreInfo.LegacyOnlineID = sr.ReadInt32();
 
-                byte[] compressedScoreInfo = null;
-
                 if (version >= 30000001)
                     compressedScoreInfo = sr.ReadByteArray();
 
@@ -130,7 +130,10 @@ namespace osu.Game.Scoring.Legacy
                 }
             }
 
-            PopulateAccuracy(score.ScoreInfo);
+            if (score.ScoreInfo.IsLegacyScore || compressedScoreInfo == null)
+                PopulateLegacyAccuracyAndRank(score.ScoreInfo);
+            else
+                populateLazerAccuracyAndRank(score.ScoreInfo);
 
             // before returning for database import, we must restore the database-sourced BeatmapInfo.
             // if not, the clone operation in GetPlayableBeatmap will cause a dereference and subsequent database exception.
@@ -174,7 +177,7 @@ namespace osu.Game.Scoring.Legacy
         /// Legacy use only.
         /// </remarks>
         /// <param name="score">The <see cref="ScoreInfo"/> to populate.</param>
-        public static void PopulateAccuracy(ScoreInfo score)
+        public static void PopulateLegacyAccuracyAndRank(ScoreInfo score)
         {
             int countMiss = score.GetCountMiss() ?? 0;
             int count50 = score.GetCount50() ?? 0;
@@ -271,6 +274,18 @@ namespace osu.Game.Scoring.Legacy
                     break;
                 }
             }
+        }
+
+        private void populateLazerAccuracyAndRank(ScoreInfo scoreInfo)
+        {
+            scoreInfo.Accuracy = StandardisedScoreMigrationTools.ComputeAccuracy(scoreInfo);
+
+            var rank = currentRuleset.CreateScoreProcessor().RankFromAccuracy(scoreInfo.Accuracy);
+
+            foreach (var mod in scoreInfo.Mods.OfType<IApplicableToScoreProcessor>())
+                rank = mod.AdjustRank(rank, scoreInfo.Accuracy);
+
+            scoreInfo.Rank = rank;
         }
 
         private void readLegacyReplay(Replay replay, StreamReader reader)

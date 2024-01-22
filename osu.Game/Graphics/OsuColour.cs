@@ -95,6 +95,7 @@ namespace osu.Game.Graphics
 
                 case HitResult.SmallTickHit:
                 case HitResult.LargeTickHit:
+                case HitResult.SliderTailHit:
                 case HitResult.Great:
                     return Blue;
 

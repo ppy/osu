@@ -15,7 +15,6 @@ using osu.Framework.Graphics.Primitives;
 using osu.Framework.Allocation;
 using System.Collections.Generic;
 using osu.Framework.Graphics.Rendering;
-using osu.Framework.Graphics.Rendering.Vertices;
 using osu.Framework.Lists;
 using osu.Framework.Bindables;
 
@@ -79,9 +78,9 @@ namespace osu.Game.Graphics.Backgrounds
 
         /// <summary>
         /// If enabled, only the portion of triangles that falls within this <see cref="Drawable"/>'s
-        /// shape is drawn to the screen.
+        /// shape is drawn to the screen. Default is true.
         /// </summary>
-        public bool Masking { get; set; }
+        public bool ClampToDrawable { get; set; } = true;
 
         /// <summary>
         /// Whether we should drop-off alpha values of triangles more quickly to improve
@@ -258,13 +257,12 @@ namespace osu.Game.Graphics.Backgrounds
 
             private IShader shader;
             private Texture texture;
-            private bool masking;
+            private bool clamp;
 
             private readonly List<TriangleParticle> parts = new List<TriangleParticle>();
             private readonly Vector2 triangleSize = new Vector2(1f, equilateral_triangle_ratio) * triangle_size;
 
             private Vector2 size;
-            private IVertexBatch<TexturedVertex2D> vertexBatch;
 
             public TrianglesDrawNode(Triangles source)
                 : base(source)
@@ -278,7 +276,7 @@ namespace osu.Game.Graphics.Backgrounds
                 shader = Source.shader;
                 texture = Source.texture;
                 size = Source.DrawSize;
-                masking = Source.Masking;
+                clamp = Source.ClampToDrawable;
 
                 parts.Clear();
                 parts.AddRange(Source.parts);
@@ -289,12 +287,6 @@ namespace osu.Game.Graphics.Backgrounds
             protected override void Draw(IRenderer renderer)
             {
                 base.Draw(renderer);
-
-                if (Source.AimCount > 0 && (vertexBatch == null || vertexBatch.Size != Source.AimCount))
-                {
-                    vertexBatch?.Dispose();
-                    vertexBatch = renderer.CreateQuadBatch<TexturedVertex2D>(Source.AimCount, 1);
-                }
 
                 borderDataBuffer ??= renderer.CreateUniformBuffer<TriangleBorderData>();
                 borderDataBuffer.Data = borderDataBuffer.Data with
@@ -314,7 +306,7 @@ namespace osu.Game.Graphics.Backgrounds
 
                     Vector2 topLeft = particle.Position - new Vector2(relativeSize.X * 0.5f, 0f);
 
-                    Quad triangleQuad = masking ? clampToDrawable(topLeft, relativeSize) : new Quad(topLeft.X, topLeft.Y, relativeSize.X, relativeSize.Y);
+                    Quad triangleQuad = clamp ? clampToDrawable(topLeft, relativeSize) : new Quad(topLeft.X, topLeft.Y, relativeSize.X, relativeSize.Y);
 
                     var drawQuad = new Quad(
                         Vector2Extensions.Transform(triangleQuad.TopLeft * size, DrawInfo.Matrix),
@@ -333,7 +325,7 @@ namespace osu.Game.Graphics.Backgrounds
                         triangleQuad.Height
                     ) / relativeSize;
 
-                    renderer.DrawQuad(texture, drawQuad, colourInfo, new RectangleF(0, 0, 1, 1), vertexBatch.AddAction, textureCoords: textureCoords);
+                    renderer.DrawQuad(texture, drawQuad, colourInfo, new RectangleF(0, 0, 1, 1), textureCoords: textureCoords);
                 }
 
                 shader.Unbind();
@@ -356,7 +348,6 @@ namespace osu.Game.Graphics.Backgrounds
             {
                 base.Dispose(isDisposing);
 
-                vertexBatch?.Dispose();
                 borderDataBuffer?.Dispose();
             }
         }

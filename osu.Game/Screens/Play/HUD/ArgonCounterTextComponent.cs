@@ -137,6 +137,12 @@ namespace osu.Game.Screens.Play.HUD
                 Spacing = new Vector2(-2f, 0f);
                 Font = new FontUsage(font_name, 1);
                 glyphStore = new GlyphStore(font_name, textures, getLookup);
+
+                // cache common lookups ahead of time.
+                foreach (char c in new[] { '.', '%', 'x' })
+                    glyphStore.Get(font_name, c);
+                for (int i = 0; i < 10; i++)
+                    glyphStore.Get(font_name, (char)('0' + i));
             }
 
             protected override TextBuilder CreateTextBuilder(ITexturedGlyphLookupStore store) => base.CreateTextBuilder(glyphStore);

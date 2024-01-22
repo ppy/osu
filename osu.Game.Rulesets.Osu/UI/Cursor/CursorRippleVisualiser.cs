@@ -33,6 +33,8 @@ namespace osu.Game.Rulesets.Osu.UI.Cursor
         private void load(OsuRulesetConfigManager? rulesetConfig)
         {
             rulesetConfig?.BindWith(OsuRulesetSetting.ShowCursorRipples, showRipples);
+
+            AddInternal(ripplePool);
         }
 
         public bool OnPressed(KeyBindingPressEvent<OsuAction> e)

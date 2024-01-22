@@ -313,6 +313,33 @@ namespace osu.Game.Overlays.Volume
 
         private void resetAcceleration() => accelerationModifier = 1;
 
+        private float dragDelta;
+
+        protected override bool OnDragStart(DragStartEvent e)
+        {
+            dragDelta = 0;
+            adjustFromDrag(e.Delta);
+            return true;
+        }
+
+        protected override void OnDrag(DragEvent e)
+        {
+            adjustFromDrag(e.Delta);
+            base.OnDrag(e);
+        }
+
+        private void adjustFromDrag(Vector2 delta)
+        {
+            const float mouse_drag_divisor = 200;
+
+            dragDelta += delta.Y / mouse_drag_divisor;
+
+            if (Math.Abs(dragDelta) < 0.01) return;
+
+            Volume -= dragDelta;
+            dragDelta = 0;
+        }
+
         private void adjust(double delta, bool isPrecise)
         {
             if (delta == 0)
