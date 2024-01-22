@@ -107,11 +107,11 @@ namespace osu.Game.Screens.Play
                     return true;
 
                 case GlobalAction.SeekReplayBackward:
-                    SeekInDirection(-1);
+                    SeekInDirection(-5);
                     return true;
 
                 case GlobalAction.SeekReplayForward:
-                    SeekInDirection(1);
+                    SeekInDirection(5);
                     return true;
 
                 case GlobalAction.TogglePauseReplay:
