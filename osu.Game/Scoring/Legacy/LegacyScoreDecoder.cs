@@ -134,8 +134,7 @@ namespace osu.Game.Scoring.Legacy
             }
 
             PopulateMaximumStatistics(score.ScoreInfo, workingBeatmap);
-            score.ScoreInfo.Accuracy = StandardisedScoreMigrationTools.ComputeAccuracy(score.ScoreInfo);
-            score.ScoreInfo.Rank = StandardisedScoreMigrationTools.ComputeRank(score.ScoreInfo);
+            StandardisedScoreMigrationTools.UpdateFromLegacy(score.ScoreInfo, workingBeatmap);
 
             // before returning for database import, we must restore the database-sourced BeatmapInfo.
             // if not, the clone operation in GetPlayableBeatmap will cause a dereference and subsequent database exception.
@@ -340,18 +339,6 @@ namespace osu.Game.Scoring.Legacy
                     break;
                 }
             }
-        }
-
-        private void populateLazerAccuracyAndRank(ScoreInfo scoreInfo)
-        {
-            scoreInfo.Accuracy = StandardisedScoreMigrationTools.ComputeAccuracy(scoreInfo);
-
-            var rank = currentRuleset.CreateScoreProcessor().RankFromScore(scoreInfo.Accuracy, scoreInfo.Statistics);
-
-            foreach (var mod in scoreInfo.Mods.OfType<IApplicableToScoreProcessor>())
-                rank = mod.AdjustRank(rank, scoreInfo.Accuracy);
-
-            scoreInfo.Rank = rank;
         }
 
         private void readLegacyReplay(Replay replay, StreamReader reader)
