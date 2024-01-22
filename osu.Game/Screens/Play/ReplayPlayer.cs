@@ -7,6 +7,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Input.Bindings;
 using osu.Framework.Input.Events;
@@ -15,6 +16,7 @@ using osu.Game.Input.Bindings;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Scoring;
 using osu.Game.Screens.Play.HUD;
+using osu.Game.Screens.Play.PlayerSettings;
 using osu.Game.Screens.Ranking;
 using osu.Game.Users;
 
@@ -47,6 +49,24 @@ namespace osu.Game.Screens.Play
             : base(configuration)
         {
             this.createScore = createScore;
+        }
+
+        [BackgroundDependencyLoader]
+        private void load()
+        {
+            if (!LoadedBeatmapSuccessfully)
+                return;
+
+            var playbackSettings = new PlaybackSettings
+            {
+                Depth = float.MaxValue,
+                Expanded = { Value = false }
+            };
+
+            if (GameplayClockContainer is MasterGameplayClockContainer master)
+                playbackSettings.UserPlaybackRate.BindTo(master.UserPlaybackRate);
+
+            HUDOverlay.PlayerSettingsOverlay.AddAtStart(playbackSettings);
         }
 
         protected override void PrepareReplay()

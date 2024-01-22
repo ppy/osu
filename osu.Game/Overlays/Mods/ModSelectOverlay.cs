@@ -447,7 +447,7 @@ namespace osu.Game.Overlays.Mods
         private void filterMods()
         {
             foreach (var modState in AllAvailableMods)
-                modState.ValidForSelection.Value = modState.Mod.HasImplementation && IsValidMod.Invoke(modState.Mod);
+                modState.ValidForSelection.Value = modState.Mod.Type != ModType.System && modState.Mod.HasImplementation && IsValidMod.Invoke(modState.Mod);
         }
 
         private void updateMultiplier()
@@ -719,7 +719,10 @@ namespace osu.Game.Overlays.Mods
                     ModState? firstMod = columnFlow.Columns.OfType<ModColumn>().FirstOrDefault(m => m.IsPresent)?.AvailableMods.FirstOrDefault(x => x.Visible);
 
                     if (firstMod is not null)
+                    {
                         firstMod.Active.Value = !firstMod.Active.Value;
+                        SearchTextBox.SelectAll();
+                    }
 
                     return true;
                 }

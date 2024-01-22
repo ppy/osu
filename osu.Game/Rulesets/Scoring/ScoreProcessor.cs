@@ -186,16 +186,7 @@ namespace osu.Game.Rulesets.Scoring
             Ruleset = ruleset;
 
             Combo.ValueChanged += combo => HighestCombo.Value = Math.Max(HighestCombo.Value, combo.NewValue);
-            Accuracy.ValueChanged += accuracy =>
-            {
-                // Once failed, we shouldn't update the rank anymore.
-                if (rank.Value == ScoreRank.F)
-                    return;
-
-                rank.Value = RankFromAccuracy(accuracy.NewValue);
-                foreach (var mod in Mods.Value.OfType<IApplicableToScoreProcessor>())
-                    rank.Value = mod.AdjustRank(Rank.Value, accuracy.NewValue);
-            };
+            Accuracy.ValueChanged += _ => updateRank();
 
             Mods.ValueChanged += mods =>
             {
@@ -205,6 +196,7 @@ namespace osu.Game.Rulesets.Scoring
                     scoreMultiplier *= m.ScoreMultiplier;
 
                 updateScore();
+                updateRank();
             };
         }
 
@@ -372,6 +364,17 @@ namespace osu.Game.Rulesets.Scoring
             TotalScore.Value = (long)Math.Round(ComputeTotalScore(comboProgress, accuracyProcess, currentBonusPortion) * scoreMultiplier);
         }
 
+        private void updateRank()
+        {
+            // Once failed, we shouldn't update the rank anymore.
+            if (rank.Value == ScoreRank.F)
+                return;
+
+            rank.Value = RankFromAccuracy(Accuracy.Value);
+            foreach (var mod in Mods.Value.OfType<IApplicableToScoreProcessor>())
+                rank.Value = mod.AdjustRank(Rank.Value, Accuracy.Value);
+        }
+
         protected virtual double ComputeTotalScore(double comboProgress, double accuracyProgress, double bonusPortion)
         {
             return 500000 * Accuracy.Value * comboProgress +
@@ -417,8 +420,8 @@ namespace osu.Game.Rulesets.Scoring
             TotalScore.Value = 0;
             Accuracy.Value = 1;
             Combo.Value = 0;
-            rank.Value = ScoreRank.X;
             HighestCombo.Value = 0;
+            updateRank();
         }
 
         /// <summary>
