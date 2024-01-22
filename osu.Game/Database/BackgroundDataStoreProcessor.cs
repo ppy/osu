@@ -383,6 +383,7 @@ namespace osu.Game.Database
             HashSet<Guid> scoreIds = realmAccess.Run(r => new HashSet<Guid>(
                 r.All<ScoreInfo>()
                  .Where(s => s.TotalScoreVersion < LegacyScoreEncoder.LATEST_VERSION)
+                 .AsEnumerable() // need to materialise here as realm cannot support `.Select()`.
                  .Select(s => s.ID)));
 
             Logger.Log($"Found {scoreIds.Count} scores which require rank upgrades.");
@@ -412,6 +413,7 @@ namespace osu.Game.Database
                     {
                         ScoreInfo s = r.Find<ScoreInfo>(id)!;
                         s.Rank = StandardisedScoreMigrationTools.ComputeRank(s);
+                        s.TotalScoreVersion = LegacyScoreEncoder.LATEST_VERSION;
                     });
 
                     ++processedCount;
