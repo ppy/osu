@@ -73,6 +73,7 @@ namespace osu.Game.Database
                 processBeatmapsWithMissingObjectCounts();
                 processScoresWithMissingStatistics();
                 convertLegacyTotalScoreToStandardised();
+                upgradeScoreRanks();
             }, TaskCreationOptions.LongRunning).ContinueWith(t =>
             {
                 if (t.Exception?.InnerException is ObjectDisposedException)
@@ -354,6 +355,7 @@ namespace osu.Game.Database
                     realmAccess.Write(r =>
                     {
                         ScoreInfo s = r.Find<ScoreInfo>(id)!;
+                        // TODO: ensure that this is also updating rank (as it will set TotalScoreVersion to latest).
                         StandardisedScoreMigrationTools.UpdateFromLegacy(s, beatmapManager);
                         s.TotalScoreVersion = LegacyScoreEncoder.LATEST_VERSION;
                     });
@@ -367,6 +369,62 @@ namespace osu.Game.Database
                 catch (Exception e)
                 {
                     Logger.Log($"Failed to convert total score for {id}: {e}");
+                    realmAccess.Write(r => r.Find<ScoreInfo>(id)!.BackgroundReprocessingFailed = true);
+                    ++failedCount;
+                }
+            }
+
+            completeNotification(notification, processedCount, scoreIds.Count, failedCount);
+        }
+
+        private void upgradeScoreRanks()
+        {
+            Logger.Log("Querying for scores that need rank upgrades...");
+
+            HashSet<Guid> scoreIds = realmAccess.Run(r => new HashSet<Guid>(
+                r.All<ScoreInfo>()
+                 .Where(s => s.TotalScoreVersion < LegacyScoreEncoder.LATEST_VERSION)
+                 .Select(s => s.ID)));
+
+            Logger.Log($"Found {scoreIds.Count} scores which require rank upgrades.");
+
+            if (scoreIds.Count == 0)
+                return;
+
+            var notification = showProgressNotification(scoreIds.Count, "Adjusting ranks of scores", "scores now have more correct ranks");
+
+            int processedCount = 0;
+            int failedCount = 0;
+
+            foreach (var id in scoreIds)
+            {
+                if (notification?.State == ProgressNotificationState.Cancelled)
+                    break;
+
+                updateNotificationProgress(notification, processedCount, scoreIds.Count);
+
+                sleepIfRequired();
+
+                try
+                {
+                    // Can't use async overload because we're not on the update thread.
+                    // ReSharper disable once MethodHasAsyncOverload
+                    realmAccess.Write(r =>
+                    {
+                        ScoreInfo s = r.Find<ScoreInfo>(id)!;
+                        // TODO: uncomment when ready
+                        // s.Rank = StandardisedScoreMigrationTools.ComputeRank(s, beatmapManager);
+                    });
+
+                    ++processedCount;
+                }
+                catch (ObjectDisposedException)
+                {
+                    throw;
+                }
+                catch (Exception e)
+                {
+                    Logger.Log($"Failed to update rank score {id}: {e}");
                     realmAccess.Write(r => r.Find<ScoreInfo>(id)!.BackgroundReprocessingFailed = true);
                     ++failedCount;
                 }
