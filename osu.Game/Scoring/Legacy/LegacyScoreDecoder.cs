@@ -187,8 +187,6 @@ namespace osu.Game.Scoring.Legacy
             var rulesetInstance = ruleset.CreateInstance();
             var scoreProcessor = rulesetInstance.CreateScoreProcessor();
 
-            Debug.Assert(rulesetInstance != null);
-
             // Populate the maximum statistics.
             HitResult maxBasicResult = rulesetInstance.GetHitResults()
                                                       .Select(h => h.result)
