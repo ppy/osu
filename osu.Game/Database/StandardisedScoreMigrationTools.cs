@@ -231,7 +231,10 @@ namespace osu.Game.Database
         }
 
         /// <summary>
-        /// Updates a legacy <see cref="ScoreInfo"/> to standardised scoring.
+        /// Updates a <see cref="ScoreInfo"/> to standardised scoring.
+        /// This will recompite the score's <see cref="ScoreInfo.Accuracy"/> (always), <see cref="ScoreInfo.Rank"/> (always),
+        /// and <see cref="ScoreInfo.TotalScore"/> (if the score comes from stable).
+        /// The total score from stable - if any applicable - will be stored to <see cref="ScoreInfo.LegacyTotalScore"/>.
         /// </summary>
         /// <param name="score">The score to update.</param>
         /// <param name="beatmap">The <see cref="WorkingBeatmap"/> applicable for this score.</param>
@@ -247,7 +250,10 @@ namespace osu.Game.Database
         }
 
         /// <summary>
-        /// Updates a legacy <see cref="ScoreInfo"/> to standardised scoring.
+        /// Updates a <see cref="ScoreInfo"/> to standardised scoring.
+        /// This will recompute the score's <see cref="ScoreInfo.Accuracy"/> (always), <see cref="ScoreInfo.Rank"/> (always),
+        /// and <see cref="ScoreInfo.TotalScore"/> (if the score comes from stable).
+        /// The total score from stable - if any applicable - will be stored to <see cref="ScoreInfo.LegacyTotalScore"/>.
         /// </summary>
         /// <remarks>
         /// This overload is intended for server-side flows.
