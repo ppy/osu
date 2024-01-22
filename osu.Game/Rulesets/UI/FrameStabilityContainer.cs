@@ -34,8 +34,6 @@ namespace osu.Game.Rulesets.UI
         /// </summary>
         internal bool FrameStablePlayback { get; set; } = true;
 
-        protected override bool RequiresChildrenUpdate => base.RequiresChildrenUpdate && state != PlaybackState.NotValid;
-
         private readonly Bindable<bool> isCatchingUp = new Bindable<bool>();
 
         private readonly Bindable<bool> waitingOnFrames = new Bindable<bool>();
@@ -126,7 +124,7 @@ namespace osu.Game.Rulesets.UI
                 // if waiting on frames, run one update loop to determine if frames have arrived.
                 state = PlaybackState.Valid;
             }
-            else if (IsPaused.Value)
+            else if (IsPaused.Value && !hasReplayAttached)
             {
                 // time should not advance while paused, nor should anything run.
                 state = PlaybackState.NotValid;
