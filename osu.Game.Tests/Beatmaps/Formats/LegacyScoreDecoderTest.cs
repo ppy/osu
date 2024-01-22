@@ -293,7 +293,7 @@ namespace osu.Game.Tests.Beatmaps.Formats
         }
 
         [Test]
-        public void AccuracyAndRankOfLazerScorePreserved()
+        public void AccuracyOfLazerScorePreserved()
         {
             var ruleset = new OsuRuleset().RulesetInfo;
 
@@ -322,7 +322,7 @@ namespace osu.Game.Tests.Beatmaps.Formats
             Assert.Multiple(() =>
             {
                 Assert.That(decodedAfterEncode.ScoreInfo.Accuracy, Is.EqualTo((double)(199 * 300 + 30) / (200 * 300 + 30)));
-                Assert.That(decodedAfterEncode.ScoreInfo.Rank, Is.EqualTo(ScoreRank.SH));
+                Assert.That(decodedAfterEncode.ScoreInfo.Rank, Is.EqualTo(ScoreRank.A));
             });
         }
 
