@@ -3,47 +3,39 @@
 
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
-using osu.Framework.Graphics;
+using osu.Framework.Graphics.Sprites;
+using osu.Framework.Graphics.Textures;
 using osu.Game.Rulesets.Objects.Drawables;
+using osu.Game.Rulesets.Osu.Objects;
 using osu.Game.Skinning;
 using osuTK;
 using osuTK.Graphics;
 
 namespace osu.Game.Rulesets.Osu.Skinning.Default
 {
-    public partial class DefaultApproachCircle : SkinnableSprite
+    public partial class DefaultApproachCircle : Sprite
     {
-        private readonly IBindable<Color4> accentColour = new Bindable<Color4>();
-
         [Resolved]
         private DrawableHitObject drawableObject { get; set; } = null!;
 
-        public DefaultApproachCircle()
-            : base("Gameplay/osu/approachcircle")
-        {
-        }
+        private IBindable<Color4> accentColour = null!;
 
         [BackgroundDependencyLoader]
-        private void load()
+        private void load(TextureStore textures)
         {
-            accentColour.BindTo(drawableObject.AccentColour);
+            Texture = textures.Get(@"Gameplay/osu/approachcircle").WithMaximumSize(OsuHitObject.OBJECT_DIMENSIONS * 2);
+
+            // account for the sprite being used for the default approach circle being taken from stable,
+            // when hitcircles have 5px padding on each size. this should be removed if we update the sprite.
+            Scale = new Vector2(128 / 118f);
         }
 
         protected override void LoadComplete()
         {
             base.LoadComplete();
-            accentColour.BindValueChanged(colour => Colour = colour.NewValue, true);
-        }
 
-        protected override Drawable CreateDefault(ISkinComponentLookup lookup)
-        {
-            var drawable = base.CreateDefault(lookup);
-
-            // Although this is a non-legacy component, osu-resources currently stores approach circle as a legacy-like texture.
-            // See LegacyApproachCircle for documentation as to why this is required.
-            drawable.Scale = new Vector2(128 / 118f);
-
-            return drawable;
+            accentColour = drawableObject.AccentColour.GetBoundCopy();
+            accentColour.BindValueChanged(colour => Colour = LegacyColourCompatibility.DisallowZeroAlpha(colour.NewValue), true);
         }
     }
 }
