@@ -28,6 +28,8 @@ namespace osu.Game.Online.API
 
         public Bindable<UserActivity> Activity { get; } = new Bindable<UserActivity>();
 
+        public Bindable<UserStatistics?> Statistics { get; } = new Bindable<UserStatistics?>();
+
         public Language Language => Language.en;
 
         public string AccessToken => "token";
@@ -122,14 +124,21 @@ namespace osu.Game.Online.API
             }
             else
             {
-                state.Value = APIState.Online;
+                onSuccessfulLogin();
                 requiredSecondFactorAuth = true;
             }
         }
 
-        public void AuthenticateSecondFactor(string code)
+        public void AuthenticateSecondFactor(string code) => onSuccessfulLogin();
+
+        private void onSuccessfulLogin()
         {
             state.Value = APIState.Online;
+            Statistics.Value = new UserStatistics
+            {
+                GlobalRank = 1,
+                CountryRank = 1
+            };
         }
 
         public void Logout()
@@ -138,6 +147,14 @@ namespace osu.Game.Online.API
             // must happen after `state.Value` is changed such that subscribers to that bindable's value changes see the correct user.
             // compare: `APIAccess.Logout()`.
             LocalUser.Value = new GuestUser();
+        }
+
+        public void UpdateStatistics(UserStatistics newStatistics)
+        {
+            Statistics.Value = newStatistics;
+
+            if (IsLoggedIn)
+                LocalUser.Value.Statistics = newStatistics;
         }
 
         public IHubClientConnector? GetHubConnector(string clientName, string endpoint, bool preferMessagePack) => null;
@@ -155,6 +172,7 @@ namespace osu.Game.Online.API
         IBindable<APIUser> IAPIProvider.LocalUser => LocalUser;
         IBindableList<APIUser> IAPIProvider.Friends => Friends;
         IBindable<UserActivity> IAPIProvider.Activity => Activity;
+        IBindable<UserStatistics?> IAPIProvider.Statistics => Statistics;
 
         /// <summary>
         /// Skip 2FA requirement for next login.

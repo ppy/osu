@@ -93,10 +93,33 @@ namespace osu.Game.Beatmaps.Formats
             // The parsing order of hitobjects matters in mania difficulty calculation
             this.beatmap.HitObjects = this.beatmap.HitObjects.OrderBy(h => h.StartTime).ToList();
 
+            postProcessBreaks(this.beatmap);
+
             foreach (var hitObject in this.beatmap.HitObjects)
             {
                 applyDefaults(hitObject);
                 applySamples(hitObject);
+            }
+        }
+
+        /// <summary>
+        /// Processes the beatmap such that a new combo is started the first hitobject following each break.
+        /// </summary>
+        private void postProcessBreaks(Beatmap beatmap)
+        {
+            int currentBreak = 0;
+            bool forceNewCombo = false;
+
+            foreach (var h in beatmap.HitObjects.OfType<ConvertHitObject>())
+            {
+                while (currentBreak < beatmap.Breaks.Count && beatmap.Breaks[currentBreak].EndTime < h.StartTime)
+                {
+                    forceNewCombo = true;
+                    currentBreak++;
+                }
+
+                h.NewCombo |= forceNewCombo;
+                forceNewCombo = false;
             }
         }
 

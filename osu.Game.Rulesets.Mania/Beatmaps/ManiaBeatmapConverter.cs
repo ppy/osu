@@ -57,29 +57,30 @@ namespace osu.Game.Rulesets.Mania.Beatmaps
 
         public static int GetColumnCount(LegacyBeatmapConversionDifficultyInfo difficulty)
         {
-            if (new ManiaRuleset().RulesetInfo.Equals(difficulty.SourceRuleset))
-                return GetColumnCountForNonConvert(difficulty);
-
             double roundedCircleSize = Math.Round(difficulty.CircleSize);
+
+            if (difficulty.SourceRuleset.ShortName == ManiaRuleset.SHORT_NAME)
+                return (int)Math.Max(1, roundedCircleSize);
+
             double roundedOverallDifficulty = Math.Round(difficulty.OverallDifficulty);
 
-            int countSliderOrSpinner = difficulty.TotalObjectCount - difficulty.CircleCount;
-            float percentSpecialObjects = (float)countSliderOrSpinner / difficulty.TotalObjectCount;
+            if (difficulty.TotalObjectCount > 0 && difficulty.EndTimeObjectCount >= 0)
+            {
+                int countSliderOrSpinner = difficulty.EndTimeObjectCount;
 
-            if (percentSpecialObjects < 0.2)
-                return 7;
-            if (percentSpecialObjects < 0.3 || roundedCircleSize >= 5)
-                return roundedOverallDifficulty > 5 ? 7 : 6;
-            if (percentSpecialObjects > 0.6)
-                return roundedOverallDifficulty > 4 ? 5 : 4;
+                // In osu!stable, this division appears as if it happens on floats, but due to release-mode
+                // optimisations, it actually ends up happening on doubles.
+                double percentSpecialObjects = (double)countSliderOrSpinner / difficulty.TotalObjectCount;
+
+                if (percentSpecialObjects < 0.2)
+                    return 7;
+                if (percentSpecialObjects < 0.3 || roundedCircleSize >= 5)
+                    return roundedOverallDifficulty > 5 ? 7 : 6;
+                if (percentSpecialObjects > 0.6)
+                    return roundedOverallDifficulty > 4 ? 5 : 4;
+            }
 
             return Math.Max(4, Math.Min((int)roundedOverallDifficulty + 1, 7));
-        }
-
-        public static int GetColumnCountForNonConvert(IBeatmapDifficultyInfo difficulty)
-        {
-            double roundedCircleSize = Math.Round(difficulty.CircleSize);
-            return (int)Math.Max(1, roundedCircleSize);
         }
 
         public override bool CanConvert() => Beatmap.HitObjects.All(h => h is IHasXPosition);
@@ -174,9 +175,9 @@ namespace osu.Game.Rulesets.Mania.Beatmaps
 
             switch (original)
             {
-                case IHasDistance:
+                case IHasPath:
                 {
-                    var generator = new DistanceObjectPatternGenerator(Random, original, beatmap, lastPattern, originalBeatmap);
+                    var generator = new PathObjectPatternGenerator(Random, original, beatmap, lastPattern, originalBeatmap);
                     conversion = generator;
 
                     var positionData = original as IHasPosition;

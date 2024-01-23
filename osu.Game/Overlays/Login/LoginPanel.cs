@@ -30,7 +30,6 @@ namespace osu.Game.Overlays.Login
         [Resolved]
         private OsuColour colours { get; set; } = null!;
 
-        private UserGridPanel panel = null!;
         private UserDropdown dropdown = null!;
 
         /// <summary>
@@ -39,6 +38,7 @@ namespace osu.Game.Overlays.Login
         public Action? RequestHide;
 
         private readonly IBindable<APIState> apiState = new Bindable<APIState>();
+        private readonly Bindable<UserStatus?> userStatus = new Bindable<UserStatus?>();
 
         [Resolved]
         private IAPIProvider api { get; set; } = null!;
@@ -135,7 +135,7 @@ namespace osu.Game.Overlays.Login
                                 Text = LoginPanelStrings.SignedIn,
                                 Font = OsuFont.GetFont(size: 18, weight: FontWeight.Bold),
                             },
-                            panel = new UserGridPanel(api.LocalUser.Value)
+                            new UserRankPanel(api.LocalUser.Value)
                             {
                                 RelativeSizeAxes = Axes.X,
                                 Action = RequestHide
@@ -144,25 +144,25 @@ namespace osu.Game.Overlays.Login
                         },
                     };
 
-                    panel.Status.BindTo(api.LocalUser.Value.Status);
-                    panel.Activity.BindTo(api.LocalUser.Value.Activity);
+                    userStatus.BindTo(api.LocalUser.Value.Status);
+                    userStatus.BindValueChanged(e => updateDropdownCurrent(e.NewValue), true);
 
                     dropdown.Current.BindValueChanged(action =>
                     {
                         switch (action.NewValue)
                         {
                             case UserAction.Online:
-                                api.LocalUser.Value.Status.Value = new UserStatusOnline();
+                                api.LocalUser.Value.Status.Value = UserStatus.Online;
                                 dropdown.StatusColour = colours.Green;
                                 break;
 
                             case UserAction.DoNotDisturb:
-                                api.LocalUser.Value.Status.Value = new UserStatusDoNotDisturb();
+                                api.LocalUser.Value.Status.Value = UserStatus.DoNotDisturb;
                                 dropdown.StatusColour = colours.Red;
                                 break;
 
                             case UserAction.AppearOffline:
-                                api.LocalUser.Value.Status.Value = new UserStatusOffline();
+                                api.LocalUser.Value.Status.Value = UserStatus.Offline;
                                 dropdown.StatusColour = colours.Gray7;
                                 break;
 
@@ -177,6 +177,24 @@ namespace osu.Game.Overlays.Login
             if (form != null)
                 ScheduleAfterChildren(() => GetContainingInputManager()?.ChangeFocus(form));
         });
+
+        private void updateDropdownCurrent(UserStatus? status)
+        {
+            switch (status)
+            {
+                case UserStatus.Online:
+                    dropdown.Current.Value = UserAction.Online;
+                    break;
+
+                case UserStatus.DoNotDisturb:
+                    dropdown.Current.Value = UserAction.DoNotDisturb;
+                    break;
+
+                case UserStatus.Offline:
+                    dropdown.Current.Value = UserAction.AppearOffline;
+                    break;
+            }
+        }
 
         public override bool AcceptsFocus => true;
 

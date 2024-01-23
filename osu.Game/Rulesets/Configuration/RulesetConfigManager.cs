@@ -84,7 +84,7 @@ namespace osu.Game.Rulesets.Configuration
 
             if (setting != null)
             {
-                bindable.Parse(setting.Value);
+                bindable.Parse(setting.Value, CultureInfo.InvariantCulture);
             }
             else
             {

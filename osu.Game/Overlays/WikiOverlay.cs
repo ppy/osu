@@ -19,11 +19,11 @@ namespace osu.Game.Overlays
 {
     public partial class WikiOverlay : OnlineOverlay<WikiHeader>
     {
-        private const string index_path = @"main_page";
+        public const string INDEX_PATH = @"Main_page";
 
         public string CurrentPath => path.Value;
 
-        private readonly Bindable<string> path = new Bindable<string>(index_path);
+        private readonly Bindable<string> path = new Bindable<string>(INDEX_PATH);
 
         private readonly Bindable<APIWikiPage> wikiData = new Bindable<APIWikiPage>();
 
@@ -43,7 +43,7 @@ namespace osu.Game.Overlays
         {
         }
 
-        public void ShowPage(string pagePath = index_path)
+        public void ShowPage(string pagePath = INDEX_PATH)
         {
             path.Value = pagePath.Trim('/');
             Show();
@@ -137,7 +137,7 @@ namespace osu.Game.Overlays
             wikiData.Value = response;
             path.Value = response.Path;
 
-            if (response.Layout == index_path)
+            if (response.Layout.Equals(INDEX_PATH, StringComparison.OrdinalIgnoreCase))
             {
                 LoadDisplay(new WikiMainPage
                 {
@@ -161,7 +161,7 @@ namespace osu.Game.Overlays
             path.Value = "error";
 
             LoadDisplay(articlePage = new WikiArticlePage($@"{api.WebsiteRootUrl}/wiki/",
-                $"Something went wrong when trying to fetch page \"{originalPath}\".\n\n[Return to the main page](Main_Page)."));
+                $"Something went wrong when trying to fetch page \"{originalPath}\".\n\n[Return to the main page]({INDEX_PATH})."));
         }
 
         private void showParentPage()

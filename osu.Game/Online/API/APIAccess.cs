@@ -55,6 +55,7 @@ namespace osu.Game.Online.API
         public IBindable<APIUser> LocalUser => localUser;
         public IBindableList<APIUser> Friends => friends;
         public IBindable<UserActivity> Activity => activity;
+        public IBindable<UserStatistics> Statistics => statistics;
 
         public Language Language => game.CurrentLanguage.Value;
 
@@ -63,6 +64,11 @@ namespace osu.Game.Online.API
         private BindableList<APIUser> friends { get; } = new BindableList<APIUser>();
 
         private Bindable<UserActivity> activity { get; } = new Bindable<UserActivity>();
+
+        private Bindable<UserStatus?> configStatus { get; } = new Bindable<UserStatus?>();
+        private Bindable<UserStatus?> localUserStatus { get; } = new Bindable<UserStatus?>();
+
+        private Bindable<UserStatistics> statistics { get; } = new Bindable<UserStatistics>();
 
         protected bool HasLogin => authentication.Token.Value != null || (!string.IsNullOrEmpty(ProvidedUsername) && !string.IsNullOrEmpty(password));
 
@@ -87,11 +93,19 @@ namespace osu.Game.Online.API
             authentication.TokenString = config.Get<string>(OsuSetting.Token);
             authentication.Token.ValueChanged += onTokenChanged;
 
+            config.BindWith(OsuSetting.UserOnlineStatus, configStatus);
+
             localUser.BindValueChanged(u =>
             {
                 u.OldValue?.Activity.UnbindFrom(activity);
                 u.NewValue.Activity.BindTo(activity);
+
+                if (u.OldValue != null)
+                    localUserStatus.UnbindFrom(u.OldValue.Status);
+                localUserStatus.BindTo(u.NewValue.Status);
             }, true);
+
+            localUserStatus.BindValueChanged(val => configStatus.Value = val.NewValue);
 
             var thread = new Thread(run)
             {
@@ -201,6 +215,7 @@ namespace osu.Game.Online.API
                 setLocalUser(new APIUser
                 {
                     Username = ProvidedUsername,
+                    Status = { Value = configStatus.Value ?? UserStatus.Online }
                 });
             }
 
@@ -272,8 +287,7 @@ namespace osu.Game.Online.API
             };
             userReq.Success += user =>
             {
-                // todo: save/pull from settings
-                user.Status.Value = new UserStatusOnline();
+                user.Status.Value = configStatus.Value ?? UserStatus.Online;
 
                 setLocalUser(user);
 
@@ -540,9 +554,21 @@ namespace osu.Game.Online.API
             flushQueue();
         }
 
+        public void UpdateStatistics(UserStatistics newStatistics)
+        {
+            statistics.Value = newStatistics;
+
+            if (IsLoggedIn)
+                localUser.Value.Statistics = newStatistics;
+        }
+
         private static APIUser createGuestUser() => new GuestUser();
 
-        private void setLocalUser(APIUser user) => Scheduler.Add(() => localUser.Value = user, false);
+        private void setLocalUser(APIUser user) => Scheduler.Add(() =>
+        {
+            localUser.Value = user;
+            statistics.Value = user.Statistics;
+        }, false);
 
         protected override void Dispose(bool isDisposing)
         {

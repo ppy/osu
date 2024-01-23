@@ -149,8 +149,8 @@ namespace osu.Game.Tests.Skins
 
         private class TestSkin : Skin
         {
-            public TestSkin(SkinInfo skin, IStorageResourceProvider? resources, IResourceStore<byte[]>? storage = null, string configurationFilename = "skin.ini")
-                : base(skin, resources, storage, configurationFilename)
+            public TestSkin(SkinInfo skin, IStorageResourceProvider? resources, IResourceStore<byte[]>? fallbackStore = null, string configurationFilename = "skin.ini")
+                : base(skin, resources, fallbackStore, configurationFilename)
             {
             }
 

@@ -44,7 +44,15 @@ namespace osu.Game.Screens.Play
         /// <summary>
         /// Action that is invoked when <see cref="GlobalAction.Back"/> is triggered.
         /// </summary>
-        protected virtual Action BackAction => () => InternalButtons.LastOrDefault()?.TriggerClick();
+        protected virtual Action BackAction => () =>
+        {
+            // We prefer triggering the button click as it will animate...
+            // but sometimes buttons aren't present (see FailOverlay's constructor as an example).
+            if (Buttons.Any())
+                Buttons.Last().TriggerClick();
+            else
+                OnQuit?.Invoke();
+        };
 
         /// <summary>
         /// Action that is invoked when <see cref="GlobalAction.Select"/> is triggered.

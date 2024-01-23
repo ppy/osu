@@ -62,7 +62,7 @@ namespace osu.Game.Rulesets.Osu.Tests
                 Position = new Vector2(0, 0),
                 SliderVelocityMultiplier = 10f,
                 RepeatCount = repeatCount,
-                Path = new SliderPath(PathType.Linear, new[]
+                Path = new SliderPath(PathType.LINEAR, new[]
                 {
                     Vector2.Zero,
                     new Vector2(sliderLength, 0),
@@ -103,7 +103,7 @@ namespace osu.Game.Rulesets.Osu.Tests
                 Position = new Vector2(0, 0),
                 SliderVelocityMultiplier = 10f,
                 RepeatCount = repeatCount,
-                Path = new SliderPath(PathType.Linear, new[]
+                Path = new SliderPath(PathType.LINEAR, new[]
                 {
                     Vector2.Zero,
                     new Vector2(sliderLength, 0),
@@ -145,7 +145,7 @@ namespace osu.Game.Rulesets.Osu.Tests
                 StartTime = time_slider_start,
                 Position = new Vector2(0, 0),
                 SliderVelocityMultiplier = 10f,
-                Path = new SliderPath(PathType.Linear, new[]
+                Path = new SliderPath(PathType.LINEAR, new[]
                 {
                     Vector2.Zero,
                     new Vector2(slider_path_length * 10, 0),
@@ -467,13 +467,13 @@ namespace osu.Game.Rulesets.Osu.Tests
 
         private void assertHeadMissTailTracked()
         {
-            AddAssert("Tracking retained", () => judgementResults[^2].Type, () => Is.EqualTo(HitResult.LargeTickHit));
+            AddAssert("Tracking retained", () => judgementResults[^2].Type, () => Is.EqualTo(HitResult.SliderTailHit));
             AddAssert("Slider head missed", () => judgementResults.First().IsHit, () => Is.False);
         }
 
         private void assertMidSliderJudgements()
         {
-            AddAssert("Tracking acquired", () => judgementResults[^2].Type, () => Is.EqualTo(HitResult.LargeTickHit));
+            AddAssert("Tracking acquired", () => judgementResults[^2].Type, () => Is.EqualTo(HitResult.SliderTailHit));
         }
 
         private void assertMidSliderJudgementFail()
@@ -488,7 +488,7 @@ namespace osu.Game.Rulesets.Osu.Tests
                 StartTime = time_slider_start,
                 Position = new Vector2(0, 0),
                 SliderVelocityMultiplier = 0.1f,
-                Path = new SliderPath(PathType.PerfectCurve, new[]
+                Path = new SliderPath(PathType.PERFECT_CURVE, new[]
                 {
                     Vector2.Zero,
                     new Vector2(slider_path_length, 0),
@@ -507,7 +507,11 @@ namespace osu.Game.Rulesets.Osu.Tests
                     HitObjects = { slider },
                     BeatmapInfo =
                     {
-                        Difficulty = new BeatmapDifficulty { SliderTickRate = tickRate ?? 3 },
+                        Difficulty = new BeatmapDifficulty
+                        {
+                            SliderTickRate = tickRate ?? 3,
+                            SliderMultiplier = 1,
+                        },
                         Ruleset = new OsuRuleset().RulesetInfo,
                     },
                     ControlPointInfo = cpi,

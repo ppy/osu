@@ -21,6 +21,8 @@ namespace osu.Game.Skinning
         /// </summary>
         public const float DEFAULT_COLUMN_SIZE = 30 * POSITION_SCALE_FACTOR;
 
+        public const float DEFAULT_HIT_POSITION = (480 - 402) * POSITION_SCALE_FACTOR;
+
         public readonly int Keys;
 
         public Dictionary<string, Color4> CustomColours { get; } = new Dictionary<string, Color4>();
@@ -35,7 +37,7 @@ namespace osu.Game.Skinning
         public readonly float[] ExplosionWidth;
         public readonly float[] HoldNoteLightWidth;
 
-        public float HitPosition = (480 - 402) * POSITION_SCALE_FACTOR;
+        public float HitPosition = DEFAULT_HIT_POSITION;
         public float LightPosition = (480 - 413) * POSITION_SCALE_FACTOR;
         public float ScorePosition = 300 * POSITION_SCALE_FACTOR;
         public bool ShowJudgementLine = true;

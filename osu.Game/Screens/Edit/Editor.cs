@@ -14,6 +14,7 @@ using osu.Framework.Audio.Track;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
+using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.UserInterface;
 using osu.Framework.Input;
 using osu.Framework.Input.Bindings;
@@ -39,6 +40,7 @@ using osu.Game.Overlays.Notifications;
 using osu.Game.Overlays.OSD;
 using osu.Game.Rulesets;
 using osu.Game.Rulesets.Edit;
+using osu.Game.Rulesets.Objects;
 using osu.Game.Screens.Edit.Components.Menus;
 using osu.Game.Screens.Edit.Compose;
 using osu.Game.Screens.Edit.Compose.Components.Timeline;
@@ -58,6 +60,19 @@ namespace osu.Game.Screens.Edit
     [Cached]
     public partial class Editor : ScreenWithBeatmapBackground, IKeyBindingHandler<GlobalAction>, IKeyBindingHandler<PlatformAction>, IBeatSnapProvider, ISamplePlaybackDisabler, IBeatSyncProvider
     {
+        /// <summary>
+        /// An offset applied to waveform visuals to align them with expectations.
+        /// </summary>
+        /// <remarks>
+        /// Historically, osu! beatmaps have an assumption of full system latency baked in.
+        /// This comes from a culmination of stable's platform offset, average hardware playback
+        /// latency, and users having their universal offsets tweaked to previous beatmaps.
+        ///
+        /// Coming to this value involved running various tests with existing users / beatmaps.
+        /// This included both visual and audible comparisons. Ballpark confidence is ≈2 ms.
+        /// </remarks>
+        public const float WAVEFORM_VISUAL_OFFSET = 20;
+
         public override float BackgroundParallaxAmount => 0.1f;
 
         public override bool AllowBackButton => false;
@@ -321,7 +336,7 @@ namespace osu.Game.Screens.Edit
                                         {
                                             undoMenuItem = new EditorMenuItem(CommonStrings.Undo, MenuItemType.Standard, Undo),
                                             redoMenuItem = new EditorMenuItem(CommonStrings.Redo, MenuItemType.Standard, Redo),
-                                            new EditorMenuItemSpacer(),
+                                            new OsuMenuItemSpacer(),
                                             cutMenuItem = new EditorMenuItem(CommonStrings.Cut, MenuItemType.Standard, Cut),
                                             copyMenuItem = new EditorMenuItem(CommonStrings.Copy, MenuItemType.Standard, Copy),
                                             pasteMenuItem = new EditorMenuItem(CommonStrings.Paste, MenuItemType.Standard, Paste),
@@ -1005,12 +1020,12 @@ namespace osu.Game.Screens.Edit
         {
             createDifficultyCreationMenu(),
             createDifficultySwitchMenu(),
-            new EditorMenuItemSpacer(),
+            new OsuMenuItemSpacer(),
             new EditorMenuItem(EditorStrings.DeleteDifficulty, MenuItemType.Standard, deleteDifficulty) { Action = { Disabled = Beatmap.Value.BeatmapSetInfo.Beatmaps.Count < 2 } },
-            new EditorMenuItemSpacer(),
+            new OsuMenuItemSpacer(),
             new EditorMenuItem(WebCommonStrings.ButtonsSave, MenuItemType.Standard, () => Save()),
             createExportMenu(),
-            new EditorMenuItemSpacer(),
+            new OsuMenuItemSpacer(),
             new EditorMenuItem(CommonStrings.Exit, MenuItemType.Standard, this.Exit)
         };
 
@@ -1130,7 +1145,7 @@ namespace osu.Game.Screens.Edit
             foreach (var rulesetBeatmaps in groupedOrderedBeatmaps)
             {
                 if (difficultyItems.Count > 0)
-                    difficultyItems.Add(new EditorMenuItemSpacer());
+                    difficultyItems.Add(new OsuMenuItemSpacer());
 
                 foreach (var beatmap in rulesetBeatmaps)
                 {
@@ -1148,6 +1163,45 @@ namespace osu.Game.Screens.Edit
         {
             updateSampleDisabledState();
             loader?.CancelPendingDifficultySwitch();
+        }
+
+        public void HandleTimestamp(string timestamp)
+        {
+            if (!EditorTimestampParser.TryParse(timestamp, out var timeSpan, out string selection))
+            {
+                Schedule(() => notifications?.Post(new SimpleErrorNotification
+                {
+                    Icon = FontAwesome.Solid.ExclamationTriangle,
+                    Text = EditorStrings.FailedToParseEditorLink
+                }));
+                return;
+            }
+
+            editorBeatmap.SelectedHitObjects.Clear();
+
+            if (clock.IsRunning)
+                clock.Stop();
+
+            double position = timeSpan.Value.TotalMilliseconds;
+
+            if (string.IsNullOrEmpty(selection))
+            {
+                clock.SeekSmoothlyTo(position);
+                return;
+            }
+
+            // Seek to the next closest HitObject instead
+            HitObject nextObject = editorBeatmap.HitObjects.FirstOrDefault(x => x.StartTime >= position);
+
+            if (nextObject != null)
+                position = nextObject.StartTime;
+
+            clock.SeekSmoothlyTo(position);
+
+            Mode.Value = EditorScreenMode.Compose;
+
+            // Delegate handling the selection to the ruleset.
+            currentScreen.Dependencies.Get<HitObjectComposer>().SelectFromTimestamp(position, selection);
         }
 
         public double SnapTime(double time, double? referenceTime) => editorBeatmap.SnapTime(time, referenceTime);

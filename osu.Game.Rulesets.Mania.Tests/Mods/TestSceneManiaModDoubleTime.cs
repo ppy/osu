@@ -3,6 +3,7 @@
 
 using System.Collections.Generic;
 using NUnit.Framework;
+using osu.Framework.Utils;
 using osu.Game.Beatmaps;
 using osu.Game.Rulesets.Mania.Mods;
 using osu.Game.Rulesets.Mania.Objects;
@@ -25,8 +26,8 @@ namespace osu.Game.Rulesets.Mania.Tests.Mods
         public void TestHitWindowWithoutDoubleTime() => CreateModTest(new ModTestData
         {
             PassCondition = () => Player.ScoreProcessor.JudgedHits > 0
-                                  && Player.ScoreProcessor.Accuracy.Value == 1
-                                  && Player.ScoreProcessor.TotalScore.Value == 1_000_000,
+                                  && Precision.AlmostEquals(Player.ScoreProcessor.Accuracy.Value, 0.9836, 0.01)
+                                  && Player.ScoreProcessor.TotalScore.Value == 946_049,
             Autoplay = false,
             Beatmap = new Beatmap
             {
@@ -53,7 +54,7 @@ namespace osu.Game.Rulesets.Mania.Tests.Mods
                 Mod = doubleTime,
                 PassCondition = () => Player.ScoreProcessor.JudgedHits > 0
                                       && Player.ScoreProcessor.Accuracy.Value == 1
-                                      && Player.ScoreProcessor.TotalScore.Value == (long)(1_000_010 * doubleTime.ScoreMultiplier),
+                                      && Player.ScoreProcessor.TotalScore.Value == (long)(1_000_000 * doubleTime.ScoreMultiplier),
                 Autoplay = false,
                 Beatmap = new Beatmap
                 {

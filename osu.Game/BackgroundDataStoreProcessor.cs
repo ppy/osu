@@ -3,7 +3,6 @@
 
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -14,6 +13,7 @@ using osu.Framework.Graphics;
 using osu.Framework.Logging;
 using osu.Game.Beatmaps;
 using osu.Game.Database;
+using osu.Game.Extensions;
 using osu.Game.Online.API;
 using osu.Game.Overlays;
 using osu.Game.Overlays.Notifications;
@@ -29,6 +29,8 @@ namespace osu.Game
     /// </summary>
     public partial class BackgroundDataStoreProcessor : Component
     {
+        protected Task ProcessingTask { get; private set; } = null!;
+
         [Resolved]
         private RulesetStore rulesetStore { get; set; } = null!;
 
@@ -62,12 +64,14 @@ namespace osu.Game
         {
             base.LoadComplete();
 
-            Task.Factory.StartNew(() =>
+            ProcessingTask = Task.Factory.StartNew(() =>
             {
                 Logger.Log("Beginning background data store processing..");
 
                 checkForOutdatedStarRatings();
                 processBeatmapSetsWithMissingMetrics();
+                // Note that the previous method will also update these on a fresh run.
+                processBeatmapsWithMissingObjectCounts();
                 processScoresWithMissingStatistics();
                 convertLegacyTotalScoreToStandardised();
             }, TaskCreationOptions.LongRunning).ContinueWith(t =>
@@ -134,28 +138,34 @@ namespace osu.Game
                 // of other possible ways), but for now avoid queueing if the user isn't logged in at startup.
                 if (api.IsLoggedIn)
                 {
-                    foreach (var b in r.All<BeatmapInfo>().Where(b => b.StarRating < 0 || (b.OnlineID > 0 && b.LastOnlineUpdate == null)))
-                    {
-                        Debug.Assert(b.BeatmapSet != null);
-                        beatmapSetIds.Add(b.BeatmapSet.ID);
-                    }
+                    foreach (var b in r.All<BeatmapInfo>().Where(b => (b.StarRating < 0 || (b.OnlineID > 0 && b.LastOnlineUpdate == null)) && b.BeatmapSet != null))
+                        beatmapSetIds.Add(b.BeatmapSet!.ID);
                 }
                 else
                 {
-                    foreach (var b in r.All<BeatmapInfo>().Where(b => b.StarRating < 0))
-                    {
-                        Debug.Assert(b.BeatmapSet != null);
-                        beatmapSetIds.Add(b.BeatmapSet.ID);
-                    }
+                    foreach (var b in r.All<BeatmapInfo>().Where(b => b.StarRating < 0 && b.BeatmapSet != null))
+                        beatmapSetIds.Add(b.BeatmapSet!.ID);
                 }
             });
 
+            if (beatmapSetIds.Count == 0)
+                return;
+
             Logger.Log($"Found {beatmapSetIds.Count} beatmap sets which require reprocessing.");
 
-            int i = 0;
+            // Technically this is doing more than just star ratings, but easier for the end user to understand.
+            var notification = showProgressNotification(beatmapSetIds.Count, "Reprocessing star rating for beatmaps", "beatmaps' star ratings have been updated");
+
+            int processedCount = 0;
+            int failedCount = 0;
 
             foreach (var id in beatmapSetIds)
             {
+                if (notification?.State == ProgressNotificationState.Cancelled)
+                    break;
+
+                updateNotificationProgress(notification, processedCount, beatmapSetIds.Count);
+
                 sleepIfRequired();
 
                 realmAccess.Run(r =>
@@ -166,16 +176,73 @@ namespace osu.Game
                     {
                         try
                         {
-                            Logger.Log($"Background processing {set} ({++i} / {beatmapSetIds.Count})");
                             beatmapUpdater.Process(set);
+                            ++processedCount;
                         }
                         catch (Exception e)
                         {
                             Logger.Log($"Background processing failed on {set}: {e}");
+                            ++failedCount;
                         }
                     }
                 });
             }
+
+            completeNotification(notification, processedCount, beatmapSetIds.Count, failedCount);
+        }
+
+        private void processBeatmapsWithMissingObjectCounts()
+        {
+            Logger.Log("Querying for beatmaps with missing hitobject counts to reprocess...");
+
+            HashSet<Guid> beatmapIds = new HashSet<Guid>();
+
+            realmAccess.Run(r =>
+            {
+                foreach (var b in r.All<BeatmapInfo>().Where(b => b.TotalObjectCount < 0 || b.EndTimeObjectCount < 0))
+                    beatmapIds.Add(b.ID);
+            });
+
+            if (beatmapIds.Count == 0)
+                return;
+
+            Logger.Log($"Found {beatmapIds.Count} beatmaps which require statistics population.");
+
+            var notification = showProgressNotification(beatmapIds.Count, "Populating missing statistics for beatmaps", "beatmaps have been populated with missing statistics");
+
+            int processedCount = 0;
+            int failedCount = 0;
+
+            foreach (var id in beatmapIds)
+            {
+                if (notification?.State == ProgressNotificationState.Cancelled)
+                    break;
+
+                updateNotificationProgress(notification, processedCount, beatmapIds.Count);
+
+                sleepIfRequired();
+
+                realmAccess.Run(r =>
+                {
+                    var beatmap = r.Find<BeatmapInfo>(id);
+
+                    if (beatmap != null)
+                    {
+                        try
+                        {
+                            beatmapUpdater.ProcessObjectCounts(beatmap);
+                            ++processedCount;
+                        }
+                        catch (Exception e)
+                        {
+                            Logger.Log($"Background processing failed on {beatmap}: {e}");
+                            ++failedCount;
+                        }
+                    }
+                });
+            }
+
+            completeNotification(notification, processedCount, beatmapIds.Count, failedCount);
         }
 
         private void processScoresWithMissingStatistics()
@@ -197,10 +264,23 @@ namespace osu.Game
                 }
             });
 
-            Logger.Log($"Found {scoreIds.Count} scores which require reprocessing.");
+            if (scoreIds.Count == 0)
+                return;
+
+            Logger.Log($"Found {scoreIds.Count} scores which require statistics population.");
+
+            var notification = showProgressNotification(scoreIds.Count, "Populating missing statistics for scores", "scores have been populated with missing statistics");
+
+            int processedCount = 0;
+            int failedCount = 0;
 
             foreach (var id in scoreIds)
             {
+                if (notification?.State == ProgressNotificationState.Cancelled)
+                    break;
+
+                updateNotificationProgress(notification, processedCount, scoreIds.Count);
+
                 sleepIfRequired();
 
                 try
@@ -216,7 +296,7 @@ namespace osu.Game
                         r.Find<ScoreInfo>(id)!.MaximumStatisticsJson = JsonConvert.SerializeObject(score.MaximumStatistics);
                     });
 
-                    Logger.Log($"Populated maximum statistics for score {id}");
+                    ++processedCount;
                 }
                 catch (ObjectDisposedException)
                 {
@@ -226,57 +306,59 @@ namespace osu.Game
                 {
                     Logger.Log(@$"Failed to populate maximum statistics for {id}: {e}");
                     realmAccess.Write(r => r.Find<ScoreInfo>(id)!.BackgroundReprocessingFailed = true);
+                    ++failedCount;
                 }
             }
+
+            completeNotification(notification, processedCount, scoreIds.Count, failedCount);
         }
 
         private void convertLegacyTotalScoreToStandardised()
         {
             Logger.Log("Querying for scores that need total score conversion...");
 
-            HashSet<Guid> scoreIds = realmAccess.Run(r => new HashSet<Guid>(r.All<ScoreInfo>()
-                                                                             .Where(s => !s.BackgroundReprocessingFailed && s.BeatmapInfo != null
-                                                                                                                         && (s.TotalScoreVersion == 30000002
-                                                                                                                             || s.TotalScoreVersion == 30000003))
-                                                                             .AsEnumerable().Select(s => s.ID)));
+            HashSet<Guid> scoreIds = realmAccess.Run(r => new HashSet<Guid>(
+                r.All<ScoreInfo>()
+                 .Where(s => !s.BackgroundReprocessingFailed
+                             && s.BeatmapInfo != null
+                             && s.IsLegacyScore
+                             && s.TotalScoreVersion < LegacyScoreEncoder.LATEST_VERSION)
+                 .AsEnumerable()
+                 // must be done after materialisation, as realm doesn't want to support
+                 // nested property predicates
+                 .Where(s => s.Ruleset.IsLegacyRuleset())
+                 .Select(s => s.ID)));
 
             Logger.Log($"Found {scoreIds.Count} scores which require total score conversion.");
 
             if (scoreIds.Count == 0)
                 return;
 
-            ProgressNotification notification = new ProgressNotification { State = ProgressNotificationState.Active };
-
-            notificationOverlay?.Post(notification);
+            var notification = showProgressNotification(scoreIds.Count, "Upgrading scores to new scoring algorithm", "scores have been upgraded to the new scoring algorithm");
 
             int processedCount = 0;
             int failedCount = 0;
 
             foreach (var id in scoreIds)
             {
-                if (notification.State == ProgressNotificationState.Cancelled)
+                if (notification?.State == ProgressNotificationState.Cancelled)
                     break;
 
-                notification.Text = $"Upgrading scores to new scoring algorithm ({processedCount} of {scoreIds.Count})";
-                notification.Progress = (float)processedCount / scoreIds.Count;
+                updateNotificationProgress(notification, processedCount, scoreIds.Count);
 
                 sleepIfRequired();
 
                 try
                 {
-                    var score = scoreManager.Query(s => s.ID == id);
-                    long newTotalScore = StandardisedScoreMigrationTools.ConvertFromLegacyTotalScore(score, beatmapManager);
-
                     // Can't use async overload because we're not on the update thread.
                     // ReSharper disable once MethodHasAsyncOverload
                     realmAccess.Write(r =>
                     {
                         ScoreInfo s = r.Find<ScoreInfo>(id)!;
-                        s.TotalScore = newTotalScore;
+                        StandardisedScoreMigrationTools.UpdateFromLegacy(s, beatmapManager);
                         s.TotalScoreVersion = LegacyScoreEncoder.LATEST_VERSION;
                     });
 
-                    Logger.Log($"Converted total score for score {id}");
                     ++processedCount;
                 }
                 catch (ObjectDisposedException)
@@ -291,22 +373,62 @@ namespace osu.Game
                 }
             }
 
-            if (processedCount == scoreIds.Count)
+            completeNotification(notification, processedCount, scoreIds.Count, failedCount);
+        }
+
+        private void updateNotificationProgress(ProgressNotification? notification, int processedCount, int totalCount)
+        {
+            if (notification == null)
+                return;
+
+            notification.Text = notification.Text.ToString().Split('(').First().TrimEnd() + $" ({processedCount} of {totalCount})";
+            notification.Progress = (float)processedCount / totalCount;
+
+            if (processedCount % 100 == 0)
+                Logger.Log(notification.Text.ToString());
+        }
+
+        private void completeNotification(ProgressNotification? notification, int processedCount, int totalCount, int? failedCount = null)
+        {
+            if (notification == null)
+                return;
+
+            if (processedCount == totalCount)
             {
-                notification.CompletionText = $"{processedCount} score(s) have been upgraded to the new scoring algorithm";
+                notification.CompletionText = $"{processedCount} {notification.CompletionText}";
                 notification.Progress = 1;
                 notification.State = ProgressNotificationState.Completed;
             }
             else
             {
-                notification.Text = $"{processedCount} of {scoreIds.Count} score(s) have been upgraded to the new scoring algorithm.";
+                notification.Text = $"{processedCount} of {totalCount} {notification.CompletionText}";
 
                 // We may have arrived here due to user cancellation or completion with failures.
                 if (failedCount > 0)
-                    notification.Text += $" Check logs for issues with {failedCount} failed upgrades.";
+                    notification.Text += $" Check logs for issues with {failedCount} failed items.";
 
                 notification.State = ProgressNotificationState.Cancelled;
             }
+        }
+
+        private ProgressNotification? showProgressNotification(int totalCount, string running, string completed)
+        {
+            if (notificationOverlay == null)
+                return null;
+
+            if (totalCount < 10)
+                return null;
+
+            ProgressNotification notification = new ProgressNotification
+            {
+                Text = running,
+                CompletionText = completed,
+                State = ProgressNotificationState.Active
+            };
+
+            notificationOverlay?.Post(notification);
+
+            return notification;
         }
 
         private void sleepIfRequired()

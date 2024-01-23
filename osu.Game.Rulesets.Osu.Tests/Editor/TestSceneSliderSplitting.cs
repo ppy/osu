@@ -45,9 +45,9 @@ namespace osu.Game.Rulesets.Osu.Tests.Editor
                     Position = new Vector2(0, 50),
                     Path = new SliderPath(new[]
                     {
-                        new PathControlPoint(Vector2.Zero, PathType.PerfectCurve),
+                        new PathControlPoint(Vector2.Zero, PathType.PERFECT_CURVE),
                         new PathControlPoint(new Vector2(150, 150)),
-                        new PathControlPoint(new Vector2(300, 0), PathType.PerfectCurve),
+                        new PathControlPoint(new Vector2(300, 0), PathType.PERFECT_CURVE),
                         new PathControlPoint(new Vector2(400, 0)),
                         new PathControlPoint(new Vector2(400, 150))
                     })
@@ -73,20 +73,20 @@ namespace osu.Game.Rulesets.Osu.Tests.Editor
 
             AddAssert("slider split", () => slider is not null && EditorBeatmap.HitObjects.Count == 2 &&
                                             sliderCreatedFor((Slider)EditorBeatmap.HitObjects[0], 0, EditorBeatmap.HitObjects[1].StartTime - split_gap,
-                                                (new Vector2(0, 50), PathType.PerfectCurve),
+                                                (new Vector2(0, 50), PathType.PERFECT_CURVE),
                                                 (new Vector2(150, 200), null),
                                                 (new Vector2(300, 50), null)
                                             ) && sliderCreatedFor((Slider)EditorBeatmap.HitObjects[1], slider.StartTime, endTime + split_gap,
-                                                (new Vector2(300, 50), PathType.PerfectCurve),
+                                                (new Vector2(300, 50), PathType.PERFECT_CURVE),
                                                 (new Vector2(400, 50), null),
                                                 (new Vector2(400, 200), null)
                                             ));
 
             AddStep("undo", () => Editor.Undo());
             AddAssert("original slider restored", () => EditorBeatmap.HitObjects.Count == 1 && sliderCreatedFor((Slider)EditorBeatmap.HitObjects[0], 0, endTime,
-                (new Vector2(0, 50), PathType.PerfectCurve),
+                (new Vector2(0, 50), PathType.PERFECT_CURVE),
                 (new Vector2(150, 200), null),
-                (new Vector2(300, 50), PathType.PerfectCurve),
+                (new Vector2(300, 50), PathType.PERFECT_CURVE),
                 (new Vector2(400, 50), null),
                 (new Vector2(400, 200), null)
             ));
@@ -104,11 +104,11 @@ namespace osu.Game.Rulesets.Osu.Tests.Editor
                     Position = new Vector2(0, 50),
                     Path = new SliderPath(new[]
                     {
-                        new PathControlPoint(Vector2.Zero, PathType.PerfectCurve),
+                        new PathControlPoint(Vector2.Zero, PathType.PERFECT_CURVE),
                         new PathControlPoint(new Vector2(150, 150)),
-                        new PathControlPoint(new Vector2(300, 0), PathType.Bezier),
+                        new PathControlPoint(new Vector2(300, 0), PathType.BEZIER),
                         new PathControlPoint(new Vector2(400, 0)),
-                        new PathControlPoint(new Vector2(400, 150), PathType.Catmull),
+                        new PathControlPoint(new Vector2(400, 150), PathType.CATMULL),
                         new PathControlPoint(new Vector2(300, 200)),
                         new PathControlPoint(new Vector2(400, 250))
                     })
@@ -139,15 +139,15 @@ namespace osu.Game.Rulesets.Osu.Tests.Editor
 
             AddAssert("slider split", () => slider is not null && EditorBeatmap.HitObjects.Count == 3 &&
                                             sliderCreatedFor((Slider)EditorBeatmap.HitObjects[0], 0, EditorBeatmap.HitObjects[1].StartTime - split_gap,
-                                                (new Vector2(0, 50), PathType.PerfectCurve),
+                                                (new Vector2(0, 50), PathType.PERFECT_CURVE),
                                                 (new Vector2(150, 200), null),
                                                 (new Vector2(300, 50), null)
                                             ) && sliderCreatedFor((Slider)EditorBeatmap.HitObjects[1], EditorBeatmap.HitObjects[0].GetEndTime() + split_gap, slider.StartTime - split_gap,
-                                                (new Vector2(300, 50), PathType.Bezier),
+                                                (new Vector2(300, 50), PathType.BEZIER),
                                                 (new Vector2(400, 50), null),
                                                 (new Vector2(400, 200), null)
                                             ) && sliderCreatedFor((Slider)EditorBeatmap.HitObjects[2], EditorBeatmap.HitObjects[1].GetEndTime() + split_gap, endTime + split_gap * 2,
-                                                (new Vector2(400, 200), PathType.Catmull),
+                                                (new Vector2(400, 200), PathType.CATMULL),
                                                 (new Vector2(300, 250), null),
                                                 (new Vector2(400, 300), null)
                                             ));
@@ -165,9 +165,9 @@ namespace osu.Game.Rulesets.Osu.Tests.Editor
                     Position = new Vector2(0, 50),
                     Path = new SliderPath(new[]
                     {
-                        new PathControlPoint(Vector2.Zero, PathType.PerfectCurve),
+                        new PathControlPoint(Vector2.Zero, PathType.PERFECT_CURVE),
                         new PathControlPoint(new Vector2(150, 150)),
-                        new PathControlPoint(new Vector2(300, 0), PathType.PerfectCurve),
+                        new PathControlPoint(new Vector2(300, 0), PathType.PERFECT_CURVE),
                         new PathControlPoint(new Vector2(400, 0)),
                         new PathControlPoint(new Vector2(400, 150))
                     })

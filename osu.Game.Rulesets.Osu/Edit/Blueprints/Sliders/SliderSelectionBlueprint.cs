@@ -40,9 +40,6 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders
         protected PathControlPointVisualiser<Slider> ControlPointVisualiser { get; private set; }
 
         [Resolved(CanBeNull = true)]
-        private IPositionSnapProvider positionSnapProvider { get; set; }
-
-        [Resolved(CanBeNull = true)]
         private IDistanceSnapProvider distanceSnapProvider { get; set; }
 
         [Resolved(CanBeNull = true)]
@@ -191,21 +188,30 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders
         [CanBeNull]
         private PathControlPoint placementControlPoint;
 
-        protected override bool OnDragStart(DragStartEvent e) => placementControlPoint != null;
+        protected override bool OnDragStart(DragStartEvent e)
+        {
+            if (placementControlPoint == null)
+                return base.OnDragStart(e);
+
+            ControlPointVisualiser?.DragStarted(placementControlPoint);
+            return true;
+        }
 
         protected override void OnDrag(DragEvent e)
         {
+            base.OnDrag(e);
+
             if (placementControlPoint != null)
-            {
-                var result = positionSnapProvider?.FindSnappedPositionAndTime(ToScreenSpace(e.MousePosition));
-                placementControlPoint.Position = ToLocalSpace(result?.ScreenSpacePosition ?? ToScreenSpace(e.MousePosition)) - HitObject.Position;
-            }
+                ControlPointVisualiser?.DragInProgress(e);
         }
 
         protected override void OnMouseUp(MouseUpEvent e)
         {
             if (placementControlPoint != null)
             {
+                if (IsDragged)
+                    ControlPointVisualiser?.DragEnded();
+
                 placementControlPoint = null;
                 changeHandler?.EndChange();
             }
@@ -248,6 +254,8 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders
             // Move the control points from the insertion index onwards to make room for the insertion
             controlPoints.Insert(insertionIndex, pathControlPoint);
 
+            ControlPointVisualiser?.EnsureValidPathTypes();
+
             HitObject.SnapTo(distanceSnapProvider);
 
             return pathControlPoint;
@@ -268,6 +276,8 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders
 
                 controlPoints.Remove(c);
             }
+
+            ControlPointVisualiser?.EnsureValidPathTypes();
 
             // Snap the slider to the current beat divisor before checking length validity.
             HitObject.SnapTo(distanceSnapProvider);
