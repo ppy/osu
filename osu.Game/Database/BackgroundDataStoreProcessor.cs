@@ -383,7 +383,10 @@ namespace osu.Game.Database
             HashSet<Guid> scoreIds = realmAccess.Run(r => new HashSet<Guid>(
                 r.All<ScoreInfo>()
                  .Where(s => s.TotalScoreVersion < LegacyScoreEncoder.LATEST_VERSION)
-                 .AsEnumerable() // need to materialise here as realm cannot support `.Select()`.
+                 .AsEnumerable()
+                 // must be done after materialisation, as realm doesn't support
+                 // filtering on nested property predicates or projection via `.Select()`
+                 .Where(s => s.Ruleset.IsLegacyRuleset())
                  .Select(s => s.ID)));
 
             Logger.Log($"Found {scoreIds.Count} scores which require rank upgrades.");
