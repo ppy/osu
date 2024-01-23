@@ -178,6 +178,7 @@ namespace osu.Game.Tests.Visual
                 LocalConfig.SetValue(OsuSetting.ShowFirstRunSetup, false);
 
                 API.Login("Rhythm Champion", "osu!");
+                ((DummyAPIAccess)API).AuthenticateSecondFactor("abcdefgh");
 
                 Dependencies.Get<SessionStatics>().SetValue(Static.MutedAudioNotificationShownOnce, true);
 
