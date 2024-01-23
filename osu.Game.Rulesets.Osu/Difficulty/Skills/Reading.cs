@@ -4,6 +4,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using osu.Framework.Utils;
 using osu.Game.Rulesets.Difficulty.Preprocessing;
 using osu.Game.Rulesets.Difficulty.Skills;
 using osu.Game.Rulesets.Mods;
@@ -43,6 +44,8 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
             CurrentSectionPeak = Math.Max(currentDifficulty, CurrentSectionPeak);
         }
 
+        private double reducedNoteCount => 5;
+        private double reducedNoteBaseline => 0.7;
         public override double DifficultyValue()
         {
             double difficulty = 0;
@@ -52,6 +55,12 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
             var peaks = difficulties.Where(p => p > 0);
 
             List<double> values = peaks.OrderByDescending(d => d).ToList();
+
+            for (int i = 0; i < Math.Min(values.Count, reducedNoteCount); i++)
+            {
+                double scale = Math.Log10(Interpolation.Lerp(1, 10, Math.Clamp(i / reducedNoteCount, 0, 1)));
+                values[i] *= Interpolation.Lerp(reducedNoteBaseline, 1.0, scale);
+            }
 
             // Difficulty is the weighted sum of the highest strains from every section.
             // We're sorting from highest to lowest strain.
@@ -121,7 +130,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
         private double currentStrain;
         // private double currentRhythm;
 
-        private double skillMultiplier => 12;
+        private double skillMultiplier => 13;
         private double strainDecayBase => 0.15;
 
         private double strainDecay(double ms) => Math.Pow(strainDecayBase, ms / 1000);
@@ -145,7 +154,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
 
     public class HighARSpeedComponent : OsuStrainSkill
     {
-        private double skillMultiplier => 900;
+        private double skillMultiplier => 650;
         private double strainDecayBase => 0.3;
 
         private double currentStrain;

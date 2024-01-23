@@ -15,7 +15,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
     {
         private const double reading_window_size = 3000;
 
-        private const double overlap_multiplier = 1;
+        private const double overlap_multiplier = 0.8;
 
         public static double EvaluateDensityDifficultyOf(DifficultyHitObject current)
         {

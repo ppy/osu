@@ -71,6 +71,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
 
             double baseReadingLowARPerformance = Math.Pow(readingLowARRating, 2.5) * 17.0;
             double baseReadingHighARPerformance = Math.Pow(5 * Math.Max(1, readingHighARRating / 0.0675) - 4, 3) / 100000;
+
             double baseReadingHiddenPerformance = Math.Pow(readingHiddenRating, 2.0) * 25.0;
 
             double basePerformance =

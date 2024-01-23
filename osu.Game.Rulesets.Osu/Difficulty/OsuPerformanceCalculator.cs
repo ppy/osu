@@ -258,7 +258,10 @@ namespace osu.Game.Rulesets.Osu.Difficulty
         private double computeReadingValue(ScoreInfo score, OsuDifficultyAttributes attributes)
         {
             // Taking the highest value for AR reading
-            double readingARValue = Math.Max(computeReadingLowARValue(score, attributes), computeReadingHighARValue(score, attributes));
+            //double readingARValue = Math.Max(computeReadingLowARValue(score, attributes), computeReadingHighARValue(score, attributes));
+            double readingARValue = Math.Pow(
+                    Math.Pow(computeReadingLowARValue(score, attributes), SumPower) +
+                    Math.Pow(computeReadingHighARValue(score, attributes), SumPower), 1.0 / SumPower);
             double readingHDValue = computeReadingHiddenValue(score, attributes);
             // Here would be also readingSliderValue
 
