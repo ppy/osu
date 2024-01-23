@@ -415,7 +415,7 @@ namespace osu.Game.Screens.Ranking.Expanded.Accuracy
                                 .FadeOut(800, Easing.Out);
 
                             accuracyCircle
-                                .FillTo(accuracyS - 0.0001, 70, Easing.OutQuint);
+                                .FillTo(accuracyS - NOTCH_WIDTH_PERCENTAGE / 2 - visual_alignment_offset, 70, Easing.OutQuint);
 
                             badges.Single(b => b.Rank == ScoreRank.S)
                                   .FadeOut(70, Easing.OutQuint);
