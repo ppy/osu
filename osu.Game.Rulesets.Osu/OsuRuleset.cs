@@ -320,16 +320,21 @@ namespace osu.Game.Rulesets.Osu
                     RelativeSizeAxes = Axes.X,
                     Height = 250
                 }, true),
+                new StatisticItem("Timing Statistics", () => new SimpleStatisticTable(2, new SimpleStatisticItem[]
+                {
+                    new AverageHitError(timedHitEvents),
+                    new UnstableRate(timedHitEvents)
+                }), true),
                 new StatisticItem("Accuracy Heatmap", () => new AccuracyHeatmap(score, playableBeatmap)
                 {
                     RelativeSizeAxes = Axes.X,
                     Height = 250
                 }, true),
-                new StatisticItem("Statistics", () => new SimpleStatisticTable(2, new SimpleStatisticItem[]
+                new StatisticItem("Aim Statistics", () => new SimpleStatisticTable(2, new SimpleStatisticItem[]
                 {
-                    new AverageHitError(timedHitEvents),
-                    new UnstableRate(timedHitEvents)
-                }), true)
+                    new AverageAimError(timedHitEvents),
+                    new AimError(timedHitEvents)
+                }), true),
             };
         }
 
