@@ -29,7 +29,8 @@ namespace osu.Game.Tests.Visual.Background
                     ColourDark = Color4.Gray,
                     Anchor = Anchor.Centre,
                     Origin = Anchor.Centre,
-                    Size = new Vector2(0.9f)
+                    Size = new Vector2(0.9f),
+                    ClampAxes = Axes.None
                 }
             };
         }
@@ -40,7 +41,10 @@ namespace osu.Game.Tests.Visual.Background
 
             AddSliderStep("Triangle scale", 0f, 10f, 1f, s => triangles.TriangleScale = s);
             AddSliderStep("Seed", 0, 1000, 0, s => triangles.Reset(s));
-            AddToggleStep("ClampToDrawable", c => triangles.ClampToDrawable = c);
+            AddStep("ClampAxes X", () => triangles.ClampAxes = Axes.X);
+            AddStep("ClampAxes Y", () => triangles.ClampAxes = Axes.Y);
+            AddStep("ClampAxes Both", () => triangles.ClampAxes = Axes.Both);
+            AddStep("ClampAxes None", () => triangles.ClampAxes = Axes.None);
         }
     }
 }
