@@ -257,7 +257,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
 
         private double computeReadingValue(ScoreInfo score, OsuDifficultyAttributes attributes)
         {
-            // Taking the highest value
+            // Taking the highest value for AR reading
             double readingARValue = Math.Max(computeReadingLowARValue(score, attributes), computeReadingHighARValue(score, attributes));
             double readingHDValue = computeReadingHiddenValue(score, attributes);
             // Here would be also readingSliderValue
@@ -277,8 +277,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             if (score.Mods.Any(m => m is OsuModTouchDevice))
                 rawReading = Math.Pow(rawReading, 0.8);
 
-            // double readingValue = Math.Pow(rawReading, 2.0) * 25.0;
-            double readingValue = Math.Pow(rawReading, 2.0) * 25.0; // I need to change the curve
+            double readingValue = Math.Pow(rawReading, 2.5) * 17.0;
 
             // Penalize misses by assessing # of misses relative to the total # of objects. Default a 3% reduction for any # of misses.
             if (effectiveMissCount > 0)
@@ -310,8 +309,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
 
             highARValue *= getComboScalingFactor(attributes);
 
-            // Same as Aim
-            highARValue *= accuracy;
+            highARValue *= accuracy * accuracy;
             // It is important to consider accuracy difficulty when scaling with accuracy.
             highARValue *= 0.98 + Math.Pow(attributes.OverallDifficulty, 2) / 2500;
 

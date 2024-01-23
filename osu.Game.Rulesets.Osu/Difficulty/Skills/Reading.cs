@@ -9,7 +9,6 @@ using osu.Game.Rulesets.Difficulty.Skills;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Osu.Difficulty.Evaluators;
 using osu.Game.Rulesets.Osu.Difficulty.Preprocessing;
-using osu.Game.Rulesets.Osu.Mods;
 
 namespace osu.Game.Rulesets.Osu.Difficulty.Skills
 {
@@ -17,7 +16,8 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
     public class ReadingLowAR : GraphSkill
     {
         private readonly List<double> difficulties = new List<double>();
-        private const double skill_multiplier = 2.4;
+        //private double skillMultiplier => 5.5;
+        private double skillMultiplier => 2.3;
 
         public ReadingLowAR(Mod[] mods)
             : base(mods)
@@ -26,7 +26,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
 
         public override void Process(DifficultyHitObject current)
         {
-            double currentDifficulty = ReadingEvaluator.EvaluateDensityDifficultyOf(current) * skill_multiplier;
+            double currentDifficulty = ReadingEvaluator.EvaluateDensityDifficultyOf(current) * skillMultiplier;
 
             difficulties.Add(currentDifficulty);
 
@@ -132,7 +132,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
         {
             currentStrain *= strainDecay(current.DeltaTime);
 
-            double aimDifficulty = AimEvaluator.EvaluateDifficultyOf(current, true);
+            double aimDifficulty = AimEvaluator.EvaluateDifficultyOf(current, true, ((OsuDifficultyHitObject)current).Preempt);
             aimDifficulty *= ReadingEvaluator.EvaluateHighARDifficultyOf(current);
             currentStrain += aimDifficulty * skillMultiplier;
 
