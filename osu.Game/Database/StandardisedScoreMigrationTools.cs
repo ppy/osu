@@ -3,6 +3,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using osu.Framework.Logging;
 using osu.Game.Beatmaps;
@@ -316,11 +317,10 @@ namespace osu.Game.Database
             if (!score.IsLegacyScore)
                 return score.TotalScore;
 
+            Debug.Assert(score.LegacyTotalScore != null);
+
             if (ruleset is not ILegacyRuleset legacyRuleset)
                 return score.TotalScore;
-
-            // ensure legacy total score is saved for later.
-            score.LegacyTotalScore = score.TotalScore;
 
             double legacyModMultiplier = legacyRuleset.CreateLegacyScoreSimulator().GetLegacyScoreMultiplier(score.Mods, difficulty);
             int maximumLegacyAccuracyScore = attributes.AccuracyScore;
