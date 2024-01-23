@@ -4,6 +4,7 @@
 using System;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
+using osu.Game.Rulesets.Taiko.Beatmaps;
 using osu.Game.Rulesets.UI;
 
 namespace osu.Game.Rulesets.Taiko.UI
@@ -12,10 +13,21 @@ namespace osu.Game.Rulesets.Taiko.UI
     {
         private const float default_relative_height = TaikoPlayfield.DEFAULT_HEIGHT / 768;
 
+        public const float DEFAULT_ASPECT = 16f / 9f;
         public const float MAXIMUM_ASPECT = 16f / 9f;
         public const float MINIMUM_ASPECT = 5f / 4f;
 
         public readonly IBindable<bool> LockPlayfieldAspectRange = new BindableBool(true);
+
+        public static double AspectRatioToTimeRange(float aspectRatio)
+        {
+            const float default_time_range = 7000 / TaikoBeatmapConverter.VELOCITY_MULTIPLIER;
+
+            // This is the fraction of the width that should not contribute to time range.
+            const float ratio_compensator = 380f / 1366f;
+
+            return (aspectRatio - ratio_compensator) / (DEFAULT_ASPECT - ratio_compensator) * default_time_range;
+        }
 
         protected override void Update()
         {
