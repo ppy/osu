@@ -10,6 +10,7 @@ using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Testing;
+using osu.Game.Online.API;
 using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Overlays;
 using osu.Game.Overlays.AccountCreation;
@@ -59,7 +60,11 @@ namespace osu.Game.Tests.Visual.Online
             AddStep("click button", () => accountCreation.ChildrenOfType<SettingsButton>().Single().TriggerClick());
             AddUntilStep("warning screen is present", () => accountCreation.ChildrenOfType<ScreenWarning>().SingleOrDefault()?.IsPresent == true);
 
-            AddStep("log back in", () => API.Login("dummy", "password"));
+            AddStep("log back in", () =>
+            {
+                API.Login("dummy", "password");
+                ((DummyAPIAccess)API).AuthenticateSecondFactor("abcdefgh");
+            });
             AddUntilStep("overlay is hidden", () => accountCreation.State.Value == Visibility.Hidden);
         }
     }
