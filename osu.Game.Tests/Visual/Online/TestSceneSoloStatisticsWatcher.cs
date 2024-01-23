@@ -177,7 +177,11 @@ namespace osu.Game.Tests.Visual.Online
             AddWaitStep("wait a bit", 5);
             AddAssert("update not received", () => update == null);
 
-            AddStep("log in user", () => dummyAPI.Login("user", "password"));
+            AddStep("log in user", () =>
+            {
+                dummyAPI.Login("user", "password");
+                dummyAPI.AuthenticateSecondFactor("abcdefgh");
+            });
         }
 
         [Test]
