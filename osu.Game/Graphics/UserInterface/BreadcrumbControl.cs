@@ -33,7 +33,7 @@ namespace osu.Game.Graphics.UserInterface
 
             Current.ValueChanged += index =>
             {
-                foreach (var t in TabContainer.Children.OfType<BreadcrumbTabItem>())
+                foreach (var t in TabContainer.OfType<BreadcrumbTabItem>())
                 {
                     int tIndex = TabContainer.IndexOf(t);
                     int tabIndex = TabContainer.IndexOf(TabMap[index.NewValue]);
