@@ -89,6 +89,12 @@ namespace osu.Game.Tests.Visual.Menus
             AddStep("enter password", () => loginOverlay.ChildrenOfType<OsuPasswordTextBox>().First().Text = "password");
             AddStep("submit", () => loginOverlay.ChildrenOfType<OsuButton>().First(b => b.Text.ToString() == "Sign in").TriggerClick());
 
+            assertAPIState(APIState.RequiresSecondFactorAuth);
+            AddUntilStep("wait for second factor auth form", () => loginOverlay.ChildrenOfType<SecondFactorAuthForm>().SingleOrDefault(), () => Is.Not.Null);
+
+            AddStep("enter code", () => loginOverlay.ChildrenOfType<OsuTextBox>().First().Text = "88800088");
+            assertAPIState(APIState.Online);
+
             AddStep("click on flag", () =>
             {
                 InputManager.MoveMouseTo(loginOverlay.ChildrenOfType<UpdateableFlag>().First());
