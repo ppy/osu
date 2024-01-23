@@ -100,12 +100,11 @@ namespace osu.Game.Updater
             Logger.Log("Creating file association for " + extension);
 
             // Check if the extension has a file explorer override, if so, delete the override
-            RegistryKey? fileExplorerKey = Registry.CurrentUser.OpenSubKey(@"Software\Microsoft\Windows\CurrentVersion\Explorer\FileExts\" + extension, true);
+            using RegistryKey? fileExplorerKey = Registry.CurrentUser.OpenSubKey(@"Software\Microsoft\Windows\CurrentVersion\Explorer\FileExts\" + extension, true);
 
             if (fileExplorerKey != null)
             {
                 fileExplorerKey.DeleteSubKey("UserChoice", false);
-                fileExplorerKey.Close();
                 Logger.Log("Deleted file explorer override for " + extension);
             }
             else
@@ -113,17 +112,16 @@ namespace osu.Game.Updater
                 Logger.Log("File explorer override for " + extension + " does not exist!");
             }
 
-            RegistryKey key = Registry.CurrentUser.CreateSubKey($@"Software\Classes\{extension}");
+            using RegistryKey key = Registry.CurrentUser.CreateSubKey($@"Software\Classes\{extension}");
             key.SetValue("", description);
             key.CreateSubKey(@"shell\open\command").SetValue("", $"\"{programPath}\" \"%1\"");
-            key.Close();
             Logger.Log("Created file association for " + extension);
         }
 
         public void RemoveFileAssociation(string extension)
         {
             Logger.Log("Removing file association for " + extension);
-            RegistryKey? key = Registry.CurrentUser.OpenSubKey($@"Software\Classes\{extension}");
+            using RegistryKey? key = Registry.CurrentUser.OpenSubKey($@"Software\Classes\{extension}");
 
             if (key != null)
             {
@@ -151,7 +149,7 @@ namespace osu.Game.Updater
 
         public bool IsAssociated(string extension, string programPath)
         {
-            RegistryKey? key = Registry.CurrentUser.OpenSubKey($@"Software\Classes\{extension}");
+            using RegistryKey? key = Registry.CurrentUser.OpenSubKey($@"Software\Classes\{extension}");
 
             // Check if the value set is equal to the path of the executable
             return key?.OpenSubKey(@"shell\open\command")?.GetValue("")?.ToString() == $"\"{programPath}\" \"%1\"";
