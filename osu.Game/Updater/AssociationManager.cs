@@ -33,7 +33,6 @@ namespace osu.Game.Updater
             { ".osz", "osu! beatmap" },
             { ".osr", "osu! replay" },
             { ".osk", "osu! skin" },
-            { ".osu", "osu! difficulty" },
             { ".olz", "osu! beatmap" }
         };
 
