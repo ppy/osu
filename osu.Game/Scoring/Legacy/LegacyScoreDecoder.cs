@@ -134,6 +134,10 @@ namespace osu.Game.Scoring.Legacy
             }
 
             PopulateMaximumStatistics(score.ScoreInfo, workingBeatmap);
+
+            if (score.ScoreInfo.IsLegacyScore)
+                score.ScoreInfo.LegacyTotalScore = score.ScoreInfo.TotalScore;
+
             StandardisedScoreMigrationTools.UpdateFromLegacy(score.ScoreInfo, workingBeatmap);
 
             // before returning for database import, we must restore the database-sourced BeatmapInfo.
