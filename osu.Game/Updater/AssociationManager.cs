@@ -2,6 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Reflection;
@@ -24,13 +25,16 @@ namespace osu.Game.Updater
         [DllImport("Shell32.dll")]
         private static extern int SHChangeNotify(int eventId, int flags, IntPtr item1, IntPtr item2);
 
-        private static readonly string[] associated_extensions =
+        /// <summary>
+        /// A dictionary of extensions and their descriptions
+        /// </summary>
+        private static readonly Dictionary<string, string> associated_extensions = new Dictionary<string, string>
         {
-            ".osz",
-            ".osr",
-            ".osk",
-            ".osu",
-            ".osr",
+            { ".osz", "osu! beatmap" },
+            { ".osr", "osu! replay" },
+            { ".osk", "osu! skin" },
+            { ".osu", "osu! difficulty" },
+            { ".olz", "osu! beatmap" }
         };
 
         [Resolved]
@@ -76,9 +80,9 @@ namespace osu.Game.Updater
             Logger.Log("Setting up file associations!");
             string programPath = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location) + "\\osu!.exe";
 
-            foreach (string extension in associated_extensions)
+            foreach (string extension in associated_extensions.Keys)
             {
-                CreateFileAssociation(extension, programPath);
+                CreateFileAssociation(extension, associated_extensions[extension], programPath);
             }
 
             SHChangeNotify(0x8000000, 0x1000, IntPtr.Zero, IntPtr.Zero); // Notify Explorer that the file associations have changed
@@ -88,9 +92,10 @@ namespace osu.Game.Updater
         /// Create an association for a specific extension
         /// </summary>
         /// <param name="extension"></param>
+        /// <param name="description"></param>
         /// <param name="programPath"></param>
         /// <exception cref="InvalidOperationException"></exception>
-        public void CreateFileAssociation(string extension, string programPath)
+        public void CreateFileAssociation(string extension, string description, string programPath)
         {
             Logger.Log("Creating file association for " + extension);
 
@@ -109,6 +114,7 @@ namespace osu.Game.Updater
             }
 
             RegistryKey key = Registry.CurrentUser.CreateSubKey($"Software\\Classes\\{extension}");
+            key.SetValue("", description);
             key.CreateSubKey("shell\\\\open\\\\command").SetValue("", $"\"{programPath}\" \"%1\"");
             key.Close();
             Logger.Log("Created file association for " + extension);
@@ -135,7 +141,7 @@ namespace osu.Game.Updater
         /// </summary>
         public void RemoveFileAssociations()
         {
-            foreach (string extension in associated_extensions)
+            foreach (string extension in associated_extensions.Keys)
             {
                 RemoveFileAssociation(extension);
             }
@@ -162,7 +168,7 @@ namespace osu.Game.Updater
             string programPath = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location) + "\\osu!.exe";
 
             // Loop through all of the extensions and check if they are associated
-            return associated_extensions.All(extension => IsAssociated(extension, programPath));
+            return associated_extensions.All(extension => IsAssociated(extension.Key, programPath));
         }
     }
 }
