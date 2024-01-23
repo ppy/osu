@@ -55,6 +55,11 @@ namespace osu.Game.Rulesets.Judgements
         public double TimeAbsolute => RawTime != null ? Math.Min(RawTime.Value, HitObject.GetEndTime() + HitObject.MaximumJudgementOffset) : HitObject.GetEndTime();
 
         /// <summary>
+        /// The gameplay rate at the time this <see cref="JudgementResult"/> occurred.
+        /// </summary>
+        public double? GameplayRate { get; internal set; }
+
+        /// <summary>
         /// The combo prior to this <see cref="JudgementResult"/> occurring.
         /// </summary>
         public int ComboAtJudgement { get; internal set; }
@@ -90,6 +95,11 @@ namespace osu.Game.Rulesets.Judgements
         public bool IsHit => Type.IsHit();
 
         /// <summary>
+        /// The increase in health resulting from this judgement result.
+        /// </summary>
+        public double HealthIncrease => Judgement.HealthIncreaseFor(this);
+
+        /// <summary>
         /// Creates a new <see cref="JudgementResult"/>.
         /// </summary>
         /// <param name="hitObject">The <see cref="HitObject"/> which was judged.</param>
@@ -107,6 +117,6 @@ namespace osu.Game.Rulesets.Judgements
             RawTime = null;
         }
 
-        public override string ToString() => $"{Type} (Score:{Judgement.NumericResultFor(this)} HP:{Judgement.HealthIncreaseFor(this)} {Judgement})";
+        public override string ToString() => $"{Type} ({Judgement})";
     }
 }

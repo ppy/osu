@@ -41,7 +41,7 @@ namespace osu.Game.Screens.Play.HUD
 
         protected override bool IsRollingProportional => true;
 
-        protected override double RollingDuration => 1000;
+        protected override double RollingDuration => 500;
 
         private const float alpha_when_invalid = 0.3f;
 

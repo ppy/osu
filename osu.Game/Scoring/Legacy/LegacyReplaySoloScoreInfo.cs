@@ -35,12 +35,16 @@ namespace osu.Game.Scoring.Legacy
         [JsonProperty("maximum_statistics")]
         public Dictionary<HitResult, int> MaximumStatistics { get; set; } = new Dictionary<HitResult, int>();
 
+        [JsonProperty("client_version")]
+        public string ClientVersion = string.Empty;
+
         public static LegacyReplaySoloScoreInfo FromScore(ScoreInfo score) => new LegacyReplaySoloScoreInfo
         {
             OnlineID = score.OnlineID,
             Mods = score.APIMods,
             Statistics = score.Statistics.Where(kvp => kvp.Value != 0).ToDictionary(kvp => kvp.Key, kvp => kvp.Value),
             MaximumStatistics = score.MaximumStatistics.Where(kvp => kvp.Value != 0).ToDictionary(kvp => kvp.Key, kvp => kvp.Value),
+            ClientVersion = score.ClientVersion,
         };
     }
 }

@@ -20,7 +20,7 @@ namespace osu.Game.Rulesets.Scoring
         /// </summary>
         [Description(@"")]
         [EnumMember(Value = "none")]
-        [Order(14)]
+        [Order(15)]
         None,
 
         /// <summary>
@@ -71,7 +71,7 @@ namespace osu.Game.Rulesets.Scoring
         /// Indicates small tick miss.
         /// </summary>
         [EnumMember(Value = "small_tick_miss")]
-        [Order(11)]
+        [Order(12)]
         SmallTickMiss,
 
         /// <summary>
@@ -86,7 +86,8 @@ namespace osu.Game.Rulesets.Scoring
         /// Indicates a large tick miss.
         /// </summary>
         [EnumMember(Value = "large_tick_miss")]
-        [Order(10)]
+        [Description("-")]
+        [Order(11)]
         LargeTickMiss,
 
         /// <summary>
@@ -102,7 +103,7 @@ namespace osu.Game.Rulesets.Scoring
         /// </summary>
         [Description("S Bonus")]
         [EnumMember(Value = "small_bonus")]
-        [Order(9)]
+        [Order(10)]
         SmallBonus,
 
         /// <summary>
@@ -110,21 +111,22 @@ namespace osu.Game.Rulesets.Scoring
         /// </summary>
         [Description("L Bonus")]
         [EnumMember(Value = "large_bonus")]
-        [Order(8)]
+        [Order(9)]
         LargeBonus,
 
         /// <summary>
         /// Indicates a miss that should be ignored for scoring purposes.
         /// </summary>
         [EnumMember(Value = "ignore_miss")]
-        [Order(13)]
+        [Description("-")]
+        [Order(14)]
         IgnoreMiss,
 
         /// <summary>
         /// Indicates a hit that should be ignored for scoring purposes.
         /// </summary>
         [EnumMember(Value = "ignore_hit")]
-        [Order(12)]
+        [Order(13)]
         IgnoreHit,
 
         /// <summary>
@@ -134,14 +136,24 @@ namespace osu.Game.Rulesets.Scoring
         /// May be paired with <see cref="IgnoreHit"/>.
         /// </remarks>
         [EnumMember(Value = "combo_break")]
-        [Order(15)]
+        [Order(16)]
         ComboBreak,
 
         /// <summary>
+        /// A special judgement similar to <see cref="LargeTickHit"/> that's used to increase the valuation of the final tick of a slider.
+        /// </summary>
+        [EnumMember(Value = "slider_tail_hit")]
+        [Order(8)]
+        SliderTailHit,
+
+        /// <summary>
         /// A special result used as a padding value for legacy rulesets. It is a hit type and affects combo, but does not affect the base score (does not affect accuracy).
+        ///
+        /// DO NOT USE FOR ANYTHING EVER.
         /// </summary>
         /// <remarks>
-        /// DO NOT USE.
+        /// This is used when dealing with legacy scores, which historically only have counts stored for 300/100/50/miss.
+        /// For these scores, we pad the hit statistics with `LegacyComboIncrease` to meet the correct max combo for the score.
         /// </remarks>
         [EnumMember(Value = "legacy_combo_increase")]
         [Order(99)]
@@ -183,6 +195,7 @@ namespace osu.Game.Rulesets.Scoring
                 case HitResult.LargeTickMiss:
                 case HitResult.LegacyComboIncrease:
                 case HitResult.ComboBreak:
+                case HitResult.SliderTailHit:
                     return true;
 
                 default:
@@ -241,6 +254,7 @@ namespace osu.Game.Rulesets.Scoring
                 case HitResult.LargeTickMiss:
                 case HitResult.SmallTickHit:
                 case HitResult.SmallTickMiss:
+                case HitResult.SliderTailHit:
                     return true;
 
                 default:
@@ -265,8 +279,33 @@ namespace osu.Game.Rulesets.Scoring
         }
 
         /// <summary>
+        /// Whether a <see cref="HitResult"/> represents a miss of any type.
+        /// </summary>
+        /// <remarks>
+        /// Of note, both <see cref="IsMiss"/> and <see cref="IsHit"/> return <see langword="false"/> for <see cref="HitResult.None"/>.
+        /// </remarks>
+        public static bool IsMiss(this HitResult result)
+        {
+            switch (result)
+            {
+                case HitResult.IgnoreMiss:
+                case HitResult.Miss:
+                case HitResult.SmallTickMiss:
+                case HitResult.LargeTickMiss:
+                case HitResult.ComboBreak:
+                    return true;
+
+                default:
+                    return false;
+            }
+        }
+
+        /// <summary>
         /// Whether a <see cref="HitResult"/> represents a successful hit.
         /// </summary>
+        /// <remarks>
+        /// Of note, both <see cref="IsMiss"/> and <see cref="IsHit"/> return <see langword="false"/> for <see cref="HitResult.None"/>.
+        /// </remarks>
         public static bool IsHit(this HitResult result)
         {
             switch (result)
@@ -297,6 +336,9 @@ namespace osu.Game.Rulesets.Scoring
 
                 // ComboBreak is its own type that affects score via combo.
                 case HitResult.ComboBreak:
+                    return true;
+
+                case HitResult.SliderTailHit:
                     return true;
 
                 default:
@@ -352,6 +394,9 @@ namespace osu.Game.Rulesets.Scoring
 
             if (minResult == HitResult.IgnoreMiss)
                 return;
+
+            if (maxResult == HitResult.SliderTailHit && minResult != HitResult.LargeTickMiss)
+                throw new ArgumentOutOfRangeException(nameof(minResult), $"{HitResult.LargeTickMiss} is the only valid minimum result for a {maxResult} judgement.");
 
             if (maxResult == HitResult.LargeTickHit && minResult != HitResult.LargeTickMiss)
                 throw new ArgumentOutOfRangeException(nameof(minResult), $"{HitResult.LargeTickMiss} is the only valid minimum result for a {maxResult} judgement.");

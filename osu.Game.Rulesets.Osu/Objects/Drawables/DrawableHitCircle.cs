@@ -28,7 +28,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
 {
     public partial class DrawableHitCircle : DrawableOsuHitObject, IHasApproachCircle
     {
-        public OsuAction? HitAction => HitArea.HitAction;
+        public OsuAction? HitAction => HitArea?.HitAction;
         protected virtual OsuSkinComponents CirclePieceComponent => OsuSkinComponents.HitCircle;
 
         public SkinnableDrawable ApproachCircle { get; private set; }

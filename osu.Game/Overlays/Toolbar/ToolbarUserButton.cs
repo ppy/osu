@@ -34,14 +34,12 @@ namespace osu.Game.Overlays.Toolbar
 
         public ToolbarUserButton()
         {
-            AutoSizeAxes = Axes.X;
+            ButtonContent.AutoSizeAxes = Axes.X;
         }
 
         [BackgroundDependencyLoader]
         private void load(OsuColour colours, IAPIProvider api, LoginOverlay? login)
         {
-            Add(new OpaqueBackground { Depth = 1 });
-
             Flow.Add(new Container
             {
                 Masking = true,

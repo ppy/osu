@@ -5,6 +5,7 @@
 
 using System;
 using System.Diagnostics;
+using System.Linq;
 using JetBrains.Annotations;
 using osu.Framework.Allocation;
 using osu.Framework.Audio;
@@ -25,6 +26,8 @@ using osu.Game.Input.Bindings;
 using osu.Game.IO;
 using osu.Game.Online.API;
 using osu.Game.Overlays;
+using osu.Game.Overlays.Dialog;
+using osu.Game.Overlays.SkinEditor;
 using osu.Game.Rulesets;
 using osu.Game.Screens.Backgrounds;
 using osu.Game.Screens.Edit;
@@ -47,6 +50,8 @@ namespace osu.Game.Screens.Menu
         public override bool AllowBackButton => false;
 
         public override bool AllowExternalScreenChange => true;
+
+        public override bool? AllowGlobalTrackControl => true;
 
         private Screen songSelect;
 
@@ -75,6 +80,9 @@ namespace osu.Game.Screens.Menu
         [Resolved(canBeNull: true)]
         private IDialogOverlay dialogOverlay { get; set; }
 
+        [Resolved(canBeNull: true)]
+        private VersionManager versionManager { get; set; }
+
         protected override BackgroundScreen CreateBackground() => new BackgroundScreenDefault();
 
         protected override bool PlayExitSound => false;
@@ -90,8 +98,15 @@ namespace osu.Game.Screens.Menu
         private ParallaxContainer buttonsContainer;
         private SongTicker songTicker;
         private Container logoTarget;
+        private SystemTitle systemTitle;
+        private MenuTip menuTip;
+        private FillFlowContainer bottomElementsFlow;
+        private SupporterDisplay supporterDisplay;
 
         private Sample reappearSampleSwoosh;
+
+        [Resolved(canBeNull: true)]
+        private SkinEditorOverlay skinEditor { get; set; }
 
         [BackgroundDependencyLoader(true)]
         private void load(BeatmapListingOverlay beatmapListing, SettingsOverlay settings, OsuConfigManager config, SessionStatics statics, AudioManager audio)
@@ -120,10 +135,14 @@ namespace osu.Game.Screens.Menu
                     {
                         Buttons = new ButtonSystem
                         {
-                            OnEdit = delegate
+                            OnEditBeatmap = () =>
                             {
                                 Beatmap.SetDefault();
                                 this.Push(new EditorLoader());
+                            },
+                            OnEditSkin = () =>
+                            {
+                                skinEditor?.Show();
                             },
                             OnSolo = loadSoloSongSelect,
                             OnMultiplayer = () => this.Push(new Multiplayer()),
@@ -145,6 +164,33 @@ namespace osu.Game.Screens.Menu
                     Margin = new MarginPadding { Right = 15, Top = 5 }
                 },
                 new KiaiMenuFountains(),
+                bottomElementsFlow = new FillFlowContainer
+                {
+                    AutoSizeAxes = Axes.Both,
+                    Direction = FillDirection.Vertical,
+                    Anchor = Anchor.BottomCentre,
+                    Origin = Anchor.BottomCentre,
+                    Spacing = new Vector2(5),
+                    Children = new Drawable[]
+                    {
+                        menuTip = new MenuTip
+                        {
+                            Anchor = Anchor.TopCentre,
+                            Origin = Anchor.TopCentre,
+                        },
+                        systemTitle = new SystemTitle
+                        {
+                            Anchor = Anchor.TopCentre,
+                            Origin = Anchor.TopCentre,
+                        }
+                    }
+                },
+                supporterDisplay = new SupporterDisplay
+                {
+                    Margin = new MarginPadding(5),
+                    Anchor = Anchor.BottomLeft,
+                    Origin = Anchor.BottomLeft,
+                },
                 holdToExitGameOverlay?.CreateProxy() ?? Empty()
             });
 
@@ -155,10 +201,12 @@ namespace osu.Game.Screens.Menu
                     case ButtonSystemState.Initial:
                     case ButtonSystemState.Exit:
                         ApplyToBackground(b => b.FadeColour(Color4.White, 500, Easing.OutSine));
+                        systemTitle.State.Value = Visibility.Hidden;
                         break;
 
                     default:
                         ApplyToBackground(b => b.FadeColour(OsuColour.Gray(0.8f), 500, Easing.OutSine));
+                        systemTitle.State.Value = Visibility.Visible;
                         break;
                 }
             };
@@ -255,6 +303,16 @@ namespace osu.Game.Screens.Menu
             }
         }
 
+        protected override void Update()
+        {
+            base.Update();
+
+            bottomElementsFlow.Margin = new MarginPadding
+            {
+                Bottom = (versionManager?.DrawHeight + 5) ?? 0
+            };
+        }
+
         protected override void LogoSuspending(OsuLogo logo)
         {
             var seq = logo.FadeOut(300, Easing.InSine)
@@ -291,6 +349,13 @@ namespace osu.Game.Screens.Menu
             buttonsContainer.MoveTo(new Vector2(-800, 0), FADE_OUT_DURATION, Easing.InSine);
 
             sideFlashes.FadeOut(64, Easing.OutQuint);
+
+            bottomElementsFlow
+                .ScaleTo(0.9f, 1000, Easing.OutQuint)
+                .FadeOut(500, Easing.OutQuint);
+
+            supporterDisplay
+                .FadeOut(500, Easing.OutQuint);
         }
 
         public override void OnResuming(ScreenTransitionEvent e)
@@ -307,6 +372,13 @@ namespace osu.Game.Screens.Menu
             preloadSongSelect();
 
             musicController.EnsurePlayingSomething();
+
+            // Cycle tip on resuming
+            menuTip.ShowNextTip();
+
+            bottomElementsFlow
+                .ScaleTo(1, 1000, Easing.OutQuint)
+                .FadeIn(1000, Easing.OutQuint);
         }
 
         public override bool OnExiting(ScreenExitEvent e)
@@ -322,7 +394,12 @@ namespace osu.Game.Screens.Menu
             if (requiresConfirmation)
             {
                 if (dialogOverlay.CurrentDialog is ConfirmExitDialog exitDialog)
-                    exitDialog.PerformOkAction();
+                {
+                    if (exitDialog.Buttons.OfType<PopupDialogOkButton>().FirstOrDefault() != null)
+                        exitDialog.PerformOkAction();
+                    else
+                        exitDialog.Flash();
+                }
                 else
                 {
                     dialogOverlay.Push(new ConfirmExitDialog(() =>
@@ -344,6 +421,13 @@ namespace osu.Game.Screens.Menu
             songTicker.Hide();
 
             this.FadeOut(3000);
+
+            bottomElementsFlow
+                .FadeOut(500, Easing.OutQuint);
+
+            supporterDisplay
+                .FadeOut(500, Easing.OutQuint);
+
             return base.OnExiting(e);
         }
 
