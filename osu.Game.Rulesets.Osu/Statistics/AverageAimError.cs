@@ -30,7 +30,7 @@ namespace osu.Game.Rulesets.Osu.Statistics
 
         private double? calculateAverageAimError(IEnumerable<HitEvent> hitEvents)
         {
-            IEnumerable<HitEvent> hitCircleEvents = hitEvents.Where(e => e.HitObject is HitCircle && !(e.HitObject is SliderTailCircle) && e.Result.IsHit());
+            IEnumerable<HitEvent> hitCircleEvents = hitEvents.Where(e => e.HitObject is HitCircle && !(e.HitObject is SliderTailCircle) && e.Result.IsHit()).ToList();
 
             double nonMissCount = hitCircleEvents.Count(e => e.Result.IsHit());
 

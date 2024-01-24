@@ -33,7 +33,7 @@ namespace osu.Game.Rulesets.Osu.Statistics
 
         private double? calculateAimError(IEnumerable<HitEvent> hitEvents, IBeatmap playableBeatmap)
         {
-            IEnumerable<HitEvent> hitCircleEvents = hitEvents.Where(e => e.HitObject is HitCircle && !(e.HitObject is SliderTailCircle));
+            IEnumerable<HitEvent> hitCircleEvents = hitEvents.Where(e => e.HitObject is HitCircle && !(e.HitObject is SliderTailCircle)).ToList();
 
             double nonMissCount = hitCircleEvents.Count(e => e.Result.IsHit());
             double missCount = hitCircleEvents.Count() - nonMissCount;
@@ -54,7 +54,7 @@ namespace osu.Game.Rulesets.Osu.Statistics
             // We don't get data for miss locations, so we estimate the total variance using the Rayleigh distribution.
             // Deriving the Rayleigh distribution in this form results in a 2 in the denominator,
             // but it is removed to take the variance across both axes, instead of across just one.
-            double variance = (missCount * Math.Pow(radius, 2) + hitPoints.Aggregate(0.0, (current, point) => current + point.LengthSquared)) / nonMissCount;
+            double variance = (missCount * Math.Pow(radius, 2) + hitPoints.Sum(point => point.LengthSquared)) / nonMissCount;
 
             return Math.Sqrt(variance) * 10;
         }
