@@ -119,6 +119,8 @@ namespace osu.Game.Updater
 
         public void RemoveFileAssociation(string extension)
         {
+            if (string.IsNullOrWhiteSpace(extension)) throw new ArgumentNullException(nameof(extension));
+
             Logger.Log("Removing file association for " + extension);
             using RegistryKey? key = Registry.CurrentUser.OpenSubKey($@"Software\Classes\{extension}");
 
