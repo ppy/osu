@@ -5,10 +5,12 @@ using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Input.Events;
+using osu.Framework.Logging;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Online.API;
+using osu.Game.Online.API.Requests;
 using osu.Game.Overlays.Settings;
 using osu.Game.Resources.Localisation.Web;
 using osuTK;
@@ -83,7 +85,9 @@ namespace osu.Game.Overlays.Login
             explainText.AddText(". You can also ");
             explainText.AddLink(UserVerificationStrings.BoxInfoReissueLink, () =>
             {
-                // TODO: request another code.
+                var reissueRequest = new ReissueVerificationCodeRequest();
+                reissueRequest.Failure += ex => Logger.Error(ex, @"Failed to retrieve new verification code.");
+                api.Perform(reissueRequest);
             });
             explainText.AddText(" or ");
             explainText.AddLink(UserVerificationStrings.BoxInfoLogoutLink, () => { api.Logout(); });
