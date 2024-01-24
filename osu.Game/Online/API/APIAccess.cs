@@ -11,8 +11,10 @@ using System.Net.Http;
 using System.Net.Sockets;
 using System.Threading;
 using System.Threading.Tasks;
+using JetBrains.Annotations;
 using Newtonsoft.Json.Linq;
 using osu.Framework.Bindables;
+using osu.Framework.Extensions;
 using osu.Framework.Extensions.ExceptionExtensions;
 using osu.Framework.Extensions.ObjectExtensions;
 using osu.Framework.Graphics;
@@ -76,6 +78,11 @@ namespace osu.Game.Online.API
 
         private readonly Logger log;
 
+        private string webSocketEndpointUrl;
+
+        [CanBeNull]
+        private OsuClientWebSocket webSocket;
+
         public APIAccess(OsuGameBase game, OsuConfigManager config, EndpointConfiguration endpointConfiguration, string versionHash)
         {
             this.game = game;
@@ -84,6 +91,7 @@ namespace osu.Game.Online.API
 
             APIEndpointUrl = endpointConfiguration.APIEndpointUrl;
             WebsiteRootUrl = endpointConfiguration.WebsiteRootUrl;
+            webSocketEndpointUrl = endpointConfiguration.NotificationsWebSocketEndpointUrl;
 
             authentication = new OAuth(endpointConfiguration.APIClientID, endpointConfiguration.APIClientSecret, APIEndpointUrl);
             log = Logger.GetLogger(LoggingTarget.Network);
@@ -267,7 +275,10 @@ namespace osu.Game.Online.API
 
                 setLocalUser(me);
 
-                state.Value = me.SessionVerified ? APIState.Online : APIState.RequiresSecondFactorAuth;
+                if (me.SessionVerified)
+                    state.Value = APIState.Online;
+                else
+                    setUpSecondFactorAuthentication();
                 failureCount = 0;
             };
 
@@ -348,6 +359,42 @@ namespace osu.Game.Online.API
 
             ProvidedUsername = username;
             this.password = password;
+        }
+
+        private void setUpSecondFactorAuthentication()
+        {
+            if (state.Value == APIState.RequiresSecondFactorAuth)
+                return;
+
+            state.Value = APIState.RequiresSecondFactorAuth;
+
+            try
+            {
+                webSocket?.DisposeAsync().AsTask().WaitSafely();
+                var newSocket = new OsuClientWebSocket(this, webSocketEndpointUrl);
+                newSocket.MessageReceived += async msg =>
+                {
+                    if (msg.Event == @"verified")
+                    {
+                        state.Value = APIState.Online;
+                        await newSocket.DisposeAsync().ConfigureAwait(false);
+                        if (webSocket == newSocket)
+                            webSocket = null;
+                    }
+                };
+                newSocket.Closed += ex =>
+                {
+                    Logger.Error(ex, "Connection with account verification endpoint closed unexpectedly. Please supply account verification code manually.", LoggingTarget.Network);
+                    return Task.CompletedTask;
+                };
+                webSocket = newSocket;
+
+                webSocket.ConnectAsync(cancellationToken.Token).WaitSafely();
+            }
+            catch (Exception ex)
+            {
+                Logger.Error(ex, "Failed to set up connection with account verification endpoint. Please supply account verification code manually.", LoggingTarget.Network);
+            }
         }
 
         public void AuthenticateSecondFactor(string code)
@@ -579,6 +626,7 @@ namespace osu.Game.Online.API
 
             flushQueue();
             cancellationToken.Cancel();
+            webSocket?.DisposeAsync().AsTask().WaitSafely();
         }
     }
 
