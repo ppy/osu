@@ -52,7 +52,9 @@ namespace osu.Game.Rulesets.Osu.Statistics
             double radius = OsuHitObject.OBJECT_RADIUS * LegacyRulesetExtensions.CalculateScaleFromCircleSize(playableBeatmap.Difficulty.CircleSize, true);
 
             // We don't get data for miss locations, so we estimate the total variance using the Rayleigh distribution.
-            double variance = (missCount * Math.Pow(radius, 2) + hitPoints.Aggregate(0.0, (current, point) => current + point.LengthSquared)) / (2 * nonMissCount);
+            // Deriving the Rayleigh distribution in this form results in a 2 in the denominator,
+            // but it is removed to take the variance across both axes, instead of across just one.
+            double variance = (missCount * Math.Pow(radius, 2) + hitPoints.Aggregate(0.0, (current, point) => current + point.LengthSquared)) / nonMissCount;
 
             return Math.Sqrt(variance) * 10;
         }
