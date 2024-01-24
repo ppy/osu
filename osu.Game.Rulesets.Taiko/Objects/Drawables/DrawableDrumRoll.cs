@@ -143,7 +143,7 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
             if (timeOffset < 0)
                 return;
 
-            ApplyResult(r => r.Type = r.Judgement.MaxResult);
+            ApplyResult(static r => r.Type = r.Judgement.MaxResult);
         }
 
         protected override void UpdateHitStateTransforms(ArmedState state)
@@ -192,7 +192,10 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
                 if (!ParentHitObject.Judged)
                     return;
 
-                ApplyResult(r => r.Type = ParentHitObject.IsHit ? r.Judgement.MaxResult : r.Judgement.MinResult);
+                ApplyResult(static (r, parentHitObject) =>
+                {
+                    r.Type = parentHitObject.IsHit ? r.Judgement.MaxResult : r.Judgement.MinResult;
+                }, ParentHitObject);
             }
 
             public override bool OnPressed(KeyBindingPressEvent<TaikoAction> e) => false;

@@ -292,10 +292,10 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
             if (HitObject.ClassicSliderBehaviour)
             {
                 // Classic behaviour means a slider is judged proportionally to the number of nested hitobjects hit. This is the classic osu!stable scoring.
-                ApplyResult(r =>
+                ApplyResult(static (r, nestedHitObjects) =>
                 {
-                    int totalTicks = NestedHitObjects.Count;
-                    int hitTicks = NestedHitObjects.Count(h => h.IsHit);
+                    int totalTicks = nestedHitObjects.Count;
+                    int hitTicks = nestedHitObjects.Count(h => h.IsHit);
 
                     if (hitTicks == totalTicks)
                         r.Type = HitResult.Great;
@@ -306,13 +306,16 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
                         double hitFraction = (double)hitTicks / totalTicks;
                         r.Type = hitFraction >= 0.5 ? HitResult.Ok : HitResult.Meh;
                     }
-                });
+                }, NestedHitObjects);
             }
             else
             {
                 // If only the nested hitobjects are judged, then the slider's own judgement is ignored for scoring purposes.
                 // But the slider needs to still be judged with a reasonable hit/miss result for visual purposes (hit/miss transforms, etc).
-                ApplyResult(r => r.Type = NestedHitObjects.Any(h => h.Result.IsHit) ? r.Judgement.MaxResult : r.Judgement.MinResult);
+                ApplyResult(static (r, nestedHitObjects) =>
+                {
+                    r.Type = nestedHitObjects.Any(h => h.Result.IsHit) ? r.Judgement.MaxResult : r.Judgement.MinResult;
+                }, NestedHitObjects);
             }
         }
 

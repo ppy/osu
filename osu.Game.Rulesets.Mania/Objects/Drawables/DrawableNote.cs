@@ -89,7 +89,7 @@ namespace osu.Game.Rulesets.Mania.Objects.Drawables
             if (!userTriggered)
             {
                 if (!HitObject.HitWindows.CanBeHit(timeOffset))
-                    ApplyResult(r => r.Type = r.Judgement.MinResult);
+                    ApplyResult(static r => r.Type = r.Judgement.MinResult);
 
                 return;
             }
@@ -100,7 +100,7 @@ namespace osu.Game.Rulesets.Mania.Objects.Drawables
 
             result = GetCappedResult(result);
 
-            ApplyResult(r => r.Type = result);
+            ApplyResult(static (r, result) => r.Type = result, result);
         }
 
         /// <summary>

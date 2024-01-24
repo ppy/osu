@@ -258,17 +258,17 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
             foreach (var tick in ticks.Where(t => !t.Result.HasResult))
                 tick.TriggerResult(false);
 
-            ApplyResult(r =>
+            ApplyResult(static (r, spinner) =>
             {
-                if (Progress >= 1)
+                if (spinner.Progress >= 1)
                     r.Type = HitResult.Great;
-                else if (Progress > .9)
+                else if (spinner.Progress > .9)
                     r.Type = HitResult.Ok;
-                else if (Progress > .75)
+                else if (spinner.Progress > .75)
                     r.Type = HitResult.Meh;
-                else if (Time.Current >= HitObject.EndTime)
+                else if (spinner.Time.Current >= spinner.HitObject.EndTime)
                     r.Type = r.Judgement.MinResult;
-            });
+            }, this);
         }
 
         protected override void Update()

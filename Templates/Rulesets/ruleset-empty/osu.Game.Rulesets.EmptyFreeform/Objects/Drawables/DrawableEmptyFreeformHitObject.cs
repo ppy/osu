@@ -26,7 +26,7 @@ namespace osu.Game.Rulesets.EmptyFreeform.Objects.Drawables
         {
             if (timeOffset >= 0)
                 // todo: implement judgement logic
-                ApplyResult(r => r.Type = HitResult.Perfect);
+                ApplyResult(static r => r.Type = HitResult.Perfect);
         }
 
         protected override void UpdateHitStateTransforms(ArmedState state)
