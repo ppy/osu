@@ -62,6 +62,8 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
                 values[i] *= Interpolation.Lerp(reducedNoteBaseline, 1.0, scale);
             }
 
+            values = values.OrderByDescending(d => d).ToList();
+
             // Difficulty is the weighted sum of the highest strains from every section.
             // We're sorting from highest to lowest strain.
             for (int i = 0; i < values.Count; i++)
@@ -171,13 +173,15 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
 
         protected override double StrainValueAt(DifficultyHitObject current)
         {
-            currentStrain *= strainDecay(((OsuDifficultyHitObject)current).StrainTime);
+            OsuDifficultyHitObject currODHO = (OsuDifficultyHitObject)current;
+
+            currentStrain *= strainDecay(currODHO.StrainTime);
 
             double speedDifficulty = SpeedEvaluator.EvaluateDifficultyOf(current) * skillMultiplier;
             speedDifficulty *= ReadingEvaluator.EvaluateHighARDifficultyOf(current);
             currentStrain += speedDifficulty;
 
-            currentRhythm = RhythmEvaluator.EvaluateDifficultyOf(current);
+            currentRhythm = currODHO.RhythmDifficulty;
             // currentRhythm *= currentRhythm; // Squaring is broken cuz rhythm is broken ((((
 
             double totalStrain = currentStrain * currentRhythm;
@@ -185,30 +189,53 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
         }
     }
 
-    public class ReadingHidden : OsuStrainSkill
+    public class ReadingHidden : GraphSkill
     {
         public ReadingHidden(Mod[] mods)
             : base(mods)
         {
         }
 
-        private double currentStrain;
+        private readonly List<double> difficulties = new List<double>();
+        private double skillMultiplier => 2.3;
 
-        private double skillMultiplier => 5;
-        private double strainDecayBase => 0.15;
-
-        private double strainDecay(double ms) => Math.Pow(strainDecayBase, ms / 1000);
-
-        protected override double CalculateInitialStrain(double time, DifficultyHitObject current) => currentStrain * strainDecay(time - current.Previous(0).StartTime);
-
-        protected override double StrainValueAt(DifficultyHitObject current)
+        public override void Process(DifficultyHitObject current)
         {
-            currentStrain *= strainDecay(current.DeltaTime);
+            double currentDifficulty = ReadingEvaluator.EvaluateHiddenDifficultyOf(current) * skillMultiplier;
 
-            double hdDifficulty = 0;
+            difficulties.Add(currentDifficulty);
 
-            currentStrain += hdDifficulty * skillMultiplier;
-            return currentStrain;
+            if (current.Index == 0)
+                CurrentSectionEnd = Math.Ceiling(current.StartTime / SectionLength) * SectionLength;
+
+            while (current.StartTime > CurrentSectionEnd)
+            {
+                StrainPeaks.Add(CurrentSectionPeak);
+                CurrentSectionPeak = 0;
+                CurrentSectionEnd += SectionLength;
+            }
+
+            CurrentSectionPeak = Math.Max(currentDifficulty, CurrentSectionPeak);
+        }
+
+        public override double DifficultyValue()
+        {
+            double difficulty = 0;
+
+            // Sections with 0 difficulty are excluded to avoid worst-case time complexity of the following sort (e.g. /b/2351871).
+            // These sections will not contribute to the difficulty.
+            var peaks = difficulties.Where(p => p > 0);
+
+            List<double> values = peaks.OrderByDescending(d => d).ToList();
+
+            // Difficulty is the weighted sum of the highest strains from every section.
+            // We're sorting from highest to lowest strain.
+            for (int i = 0; i < values.Count; i++)
+            {
+                difficulty += values[i] / (i + 1);
+            }
+
+            return difficulty;
         }
     }
 }

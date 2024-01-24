@@ -45,7 +45,8 @@ namespace osu.Game.Rulesets.Osu.Difficulty
 
             double readingLowARRating = Math.Sqrt(skills[4].DifficultyValue()) * difficulty_multiplier;
             double readingHighARRating = Math.Sqrt(skills[5].DifficultyValue()) * difficulty_multiplier;
-            double readingHiddenRating = Math.Sqrt(skills[6].DifficultyValue()) * difficulty_multiplier;
+            double readingSlidersRating = 0;
+            double hiddenRating = Math.Sqrt(skills[6].DifficultyValue()) * difficulty_multiplier;
 
             double sliderFactor = aimRating > 0 ? aimRatingNoSliders / aimRating : 1;
 
@@ -64,24 +65,31 @@ namespace osu.Game.Rulesets.Osu.Difficulty
 
             double baseAimPerformance = Math.Pow(5 * Math.Max(1, aimRating / 0.0675) - 4, 3) / 100000;
             double baseSpeedPerformance = Math.Pow(5 * Math.Max(1, speedRating / 0.0675) - 4, 3) / 100000;
-            double baseFlashlightPerformance = 0.0;
 
+            // Cognition
+            double baseFlashlightPerformance = 0.0;
             if (mods.Any(h => h is OsuModFlashlight))
                 baseFlashlightPerformance = Math.Pow(flashlightRating, 2.0) * 25.0;
 
             double baseReadingLowARPerformance = Math.Pow(readingLowARRating, 2.5) * 17.0;
             double baseReadingHighARPerformance = Math.Pow(5 * Math.Max(1, readingHighARRating / 0.0675) - 4, 3) / 100000;
+            double baseReadingARPerformance = Math.Pow(Math.Pow(baseReadingLowARPerformance, SumPower) + Math.Pow(baseReadingHighARPerformance, SumPower), 1.0 / SumPower);
 
-            double baseReadingHiddenPerformance = Math.Pow(readingHiddenRating, 2.0) * 25.0;
+            double baseFlashlightARPerformance = Math.Pow(Math.Pow(baseFlashlightPerformance, 1.8) + Math.Pow(baseReadingARPerformance, 1.8), 1.0 / 1.8);
+
+            double baseReadingHiddenPerformance = 0;
+            if (mods.Any(h => h is OsuModHidden))
+                baseReadingHiddenPerformance = Math.Pow(hiddenRating, 2.0) * 25.0;
+
+            double baseReadingSliderPerformance = 0;
+            double baseReadingNonARPerformance = baseReadingHiddenPerformance + baseReadingSliderPerformance;
 
             double basePerformance =
                 Math.Pow(
                     Math.Pow(baseAimPerformance, SumPower) +
                     Math.Pow(baseSpeedPerformance, SumPower) +
-                    Math.Pow(baseFlashlightPerformance, SumPower) +
-                    Math.Pow(baseReadingLowARPerformance, SumPower) +
-                    Math.Pow(baseReadingHighARPerformance, SumPower) +
-                    Math.Pow(baseReadingHiddenPerformance, SumPower)
+                    Math.Pow(baseFlashlightARPerformance, SumPower) +
+                    Math.Pow(baseReadingNonARPerformance, SumPower)
                     , 1.0 / SumPower
                 );
 
@@ -109,10 +117,11 @@ namespace osu.Game.Rulesets.Osu.Difficulty
                 AimDifficulty = aimRating,
                 SpeedDifficulty = speedRating,
                 SpeedNoteCount = speedNotes,
-                FlashlightDifficulty = flashlightRating,
                 ReadingDifficultyLowAR = readingLowARRating,
                 ReadingDifficultyHighAR = readingHighARRating,
-                ReadingDifficultyHidden = readingHiddenRating,
+                ReadingDifficultySliders = readingSlidersRating,
+                HiddenDifficulty = hiddenRating,
+                FlashlightDifficulty = flashlightRating,
                 SliderFactor = sliderFactor,
                 ApproachRate = preempt > 1200 ? (1800 - preempt) / 120 : (1200 - preempt) / 150 + 5,
                 OverallDifficulty = (80 - hitWindowGreat) / 6,

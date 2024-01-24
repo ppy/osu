@@ -33,12 +33,6 @@ namespace osu.Game.Rulesets.Osu.Difficulty
         public double SpeedNoteCount { get; set; }
 
         /// <summary>
-        /// The difficulty corresponding to the flashlight skill.
-        /// </summary>
-        [JsonProperty("flashlight_difficulty")]
-        public double FlashlightDifficulty { get; set; }
-
-        /// <summary>
         /// The difficulty corresponding to the reading skill. Low AR branch.
         /// </summary>
         [JsonProperty("reading_low_ar_difficulty")]
@@ -51,10 +45,22 @@ namespace osu.Game.Rulesets.Osu.Difficulty
         public double ReadingDifficultyHighAR { get; set; }
 
         /// <summary>
+        /// The difficulty corresponding to the reading skill. Sliders branch.
+        /// </summary>
+        [JsonProperty("reading_sliders_difficulty")]
+        public double ReadingDifficultySliders { get; set; }
+
+        /// <summary>
         /// The difficulty corresponding to the reading skill. Hidden mod branch.
         /// </summary>
         [JsonProperty("reading_hidden_difficulty")]
-        public double ReadingDifficultyHidden { get; set; }
+        public double HiddenDifficulty { get; set; }
+
+        /// <summary>
+        /// The difficulty corresponding to the flashlight skill.
+        /// </summary>
+        [JsonProperty("flashlight_difficulty")]
+        public double FlashlightDifficulty { get; set; }
 
         /// <summary>
         /// Describes how much of <see cref="AimDifficulty"/> is contributed to by hitcircles or sliders.
@@ -118,6 +124,12 @@ namespace osu.Game.Rulesets.Osu.Difficulty
 
             yield return (ATTRIB_ID_SLIDER_FACTOR, SliderFactor);
             yield return (ATTRIB_ID_SPEED_NOTE_COUNT, SpeedNoteCount);
+            yield return (ATTRIB_ID_READING_LOW_AR, ReadingDifficultyLowAR);
+            yield return (ATTRIB_ID_READING_HIGH_AR, ReadingDifficultyHighAR);
+            yield return (ATTRIB_ID_READING_SLIDERS, ReadingDifficultySliders);
+
+            if (ShouldSerializeHiddenDifficulty())
+                yield return (ATTRIB_ID_READING_HIDDEN, HiddenDifficulty);
         }
 
         public override void FromDatabaseAttributes(IReadOnlyDictionary<int, double> values, IBeatmapOnlineInfo onlineInfo)
@@ -129,9 +141,14 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             OverallDifficulty = values[ATTRIB_ID_OVERALL_DIFFICULTY];
             ApproachRate = values[ATTRIB_ID_APPROACH_RATE];
             StarRating = values[ATTRIB_ID_DIFFICULTY];
-            FlashlightDifficulty = values.GetValueOrDefault(ATTRIB_ID_FLASHLIGHT);
             SliderFactor = values[ATTRIB_ID_SLIDER_FACTOR];
             SpeedNoteCount = values[ATTRIB_ID_SPEED_NOTE_COUNT];
+
+            ReadingDifficultyLowAR = values[ATTRIB_ID_READING_LOW_AR];
+            ReadingDifficultyHighAR = values[ATTRIB_ID_READING_HIGH_AR];
+            ReadingDifficultySliders = values[ATTRIB_ID_READING_SLIDERS];
+            HiddenDifficulty = values.GetValueOrDefault(ATTRIB_ID_READING_HIDDEN);
+            FlashlightDifficulty = values.GetValueOrDefault(ATTRIB_ID_FLASHLIGHT);
 
             DrainRate = onlineInfo.DrainRate;
             HitCircleCount = onlineInfo.CircleCount;
@@ -147,6 +164,9 @@ namespace osu.Game.Rulesets.Osu.Difficulty
 
         [UsedImplicitly]
         public bool ShouldSerializeFlashlightDifficulty() => Mods.Any(m => m is ModFlashlight);
+
+        [UsedImplicitly]
+        public bool ShouldSerializeHiddenDifficulty() => Mods.Any(m => m is ModHidden);
 
         #endregion
     }

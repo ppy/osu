@@ -66,15 +66,23 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             double aimValue = computeAimValue(score, osuAttributes);
             double speedValue = computeSpeedValue(score, osuAttributes);
             double accuracyValue = computeAccuracyValue(score, osuAttributes);
+
+            // Cognition
+
             double flashlightValue = computeFlashlightValue(score, osuAttributes);
-            double readingValue = computeReadingValue(score, osuAttributes);
+            double readingARValue = computeReadingARValue(score, osuAttributes);
+            // Reduce AR reading bonus if FL is present
+            double flashlightARValue = Math.Pow(Math.Pow(flashlightValue, 1.8) + Math.Pow(readingARValue, 1.8), 1.0 / 1.8);
+
+            double readingNonARValue = computeReadingNonARValue(score, osuAttributes);
+            double cognitionValue = Math.Pow(Math.Pow(flashlightARValue, SumPower) + Math.Pow(readingNonARValue, SumPower), 1.0 / SumPower);
+
             double totalValue =
                 Math.Pow(
                     Math.Pow(aimValue, SumPower) +
                     Math.Pow(speedValue, SumPower) +
                     Math.Pow(accuracyValue, SumPower) +
-                    Math.Pow(flashlightValue, SumPower) +
-                    Math.Pow(readingValue, SumPower), 1.0 / SumPower
+                    Math.Pow(cognitionValue, SumPower), 1.0 / SumPower
                 ) * multiplier;
 
             return new OsuPerformanceAttributes
@@ -82,8 +90,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
                 Aim = aimValue,
                 Speed = speedValue,
                 Accuracy = accuracyValue,
-                Flashlight = flashlightValue,
-                Reading = readingValue,
+                Cognition = cognitionValue,
                 EffectiveMissCount = effectiveMissCount,
                 Total = totalValue
             };
@@ -118,11 +125,11 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             if (score.Mods.Any(m => m is OsuModBlinds))
                 aimValue *= 1.3 + (totalHits * (0.0016 / (1 + 2 * effectiveMissCount)) * Math.Pow(accuracy, 16)) * (1 - 0.003 * attributes.DrainRate * attributes.DrainRate);
             // for testing
-            else if (score.Mods.Any(h => h is OsuModHidden))
-            {
-                // We want to give more reward for lower AR when it comes to aim and HD. This nerfs high AR and buffs lower AR.
-                aimValue *= 1.0 + 0.04 * (12.0 - attributes.ApproachRate);
-            }
+            //else if (score.Mods.Any(h => h is OsuModHidden))
+            //{
+            //    // We want to give more reward for lower AR when it comes to aim and HD. This nerfs high AR and buffs lower AR.
+            //    aimValue *= 1.0 + 0.04 * (12.0 - attributes.ApproachRate);
+            //}
 
             // We assume 15% of sliders in a map are difficult since there's no way to tell from the performance calculator.
             double estimateDifficultSliders = attributes.SliderCount * 0.15;
@@ -170,11 +177,11 @@ namespace osu.Game.Rulesets.Osu.Difficulty
                 speedValue *= 1.12;
             }
             // for testing
-            else if (score.Mods.Any(m => m is OsuModHidden))
-            {
-                // We want to give more reward for lower AR when it comes to aim and HD. This nerfs high AR and buffs lower AR.
-                speedValue *= 1.0 + 0.04 * (12.0 - attributes.ApproachRate);
-            }
+            //else if (score.Mods.Any(m => m is OsuModHidden))
+            //{
+            //    // We want to give more reward for lower AR when it comes to aim and HD. This nerfs high AR and buffs lower AR.
+            //    speedValue *= 1.0 + 0.04 * (12.0 - attributes.ApproachRate);
+            //}
 
             // Calculate accuracy assuming the worst case scenario
             double relevantTotalDiff = totalHits - attributes.SpeedNoteCount;
@@ -221,8 +228,8 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             if (score.Mods.Any(m => m is OsuModBlinds))
                 accuracyValue *= 1.14;
             // For testing
-            else if (score.Mods.Any(m => m is OsuModHidden))
-                accuracyValue *= 1.08;
+            //else if (score.Mods.Any(m => m is OsuModHidden))
+            //    accuracyValue *= 1.08;
 
             if (score.Mods.Any(m => m is OsuModFlashlight))
                 accuracyValue *= 1.02;
@@ -255,22 +262,22 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             return flashlightValue;
         }
 
-        private double computeReadingValue(ScoreInfo score, OsuDifficultyAttributes attributes)
+        private double computeReadingARValue(ScoreInfo score, OsuDifficultyAttributes attributes)
         {
-            // Taking the highest value for AR reading
             //double readingARValue = Math.Max(computeReadingLowARValue(score, attributes), computeReadingHighARValue(score, attributes));
-            double readingARValue = Math.Pow(
+            double readingValue = Math.Pow(
                     Math.Pow(computeReadingLowARValue(score, attributes), SumPower) +
                     Math.Pow(computeReadingHighARValue(score, attributes), SumPower), 1.0 / SumPower);
+
+            return readingValue;
+        }
+
+        private double computeReadingNonARValue(ScoreInfo score, OsuDifficultyAttributes attributes)
+        {
             double readingHDValue = computeReadingHiddenValue(score, attributes);
-            // Here would be also readingSliderValue
+            double readingSlidersValue = 0;
 
-            double totalReadingValue =
-                Math.Pow(
-                    Math.Pow(readingARValue, SumPower) +
-                    Math.Pow(readingHDValue, SumPower), 1.0 / SumPower);
-
-            return totalReadingValue;
+            return readingHDValue + readingSlidersValue;
         }
 
         private double computeReadingLowARValue(ScoreInfo score, OsuDifficultyAttributes attributes)
@@ -321,7 +328,24 @@ namespace osu.Game.Rulesets.Osu.Difficulty
 
         private double computeReadingHiddenValue(ScoreInfo score, OsuDifficultyAttributes attributes)
         {
-            return 0;
+            if (!score.Mods.Any(h => h is OsuModHidden))
+                return 0.0;
+
+            double rawReading = attributes.HiddenDifficulty;
+            double readingValue = Math.Pow(rawReading, 2.0) * 25.0;
+
+            // Penalize misses by assessing # of misses relative to the total # of objects. Default a 3% reduction for any # of misses.
+            if (effectiveMissCount > 0)
+                readingValue *= 0.97 * Math.Pow(1 - Math.Pow(effectiveMissCount / totalHits, 0.775), Math.Pow(effectiveMissCount, .875));
+
+            readingValue *= getComboScalingFactor(attributes);
+
+            // Scale the reading value with accuracy _harshly_. Additional note: it would have it's own curve in Statistical Accuracy rework.
+            readingValue *= accuracy * accuracy;
+            // It is important to also consider accuracy difficulty when doing that.
+            readingValue *= 0.98 + Math.Pow(attributes.OverallDifficulty, 2) / 2500;
+
+            return readingValue;
         }
 
         private double calculateEffectiveMissCount(OsuDifficultyAttributes attributes)

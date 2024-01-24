@@ -4,10 +4,10 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Threading.Channels;
 using osu.Framework.Extensions.ObjectExtensions;
 using osu.Game.Rulesets.Difficulty.Preprocessing;
 using osu.Game.Rulesets.Objects;
+using osu.Game.Rulesets.Osu.Difficulty.Evaluators;
 using osu.Game.Rulesets.Osu.Mods;
 using osu.Game.Rulesets.Osu.Objects;
 using osu.Game.Rulesets.Scoring;
@@ -86,7 +86,12 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Preprocessing
         public double HitWindowGreat { get; private set; }
 
         /// <summary>
-        /// Objects that was visible after the note was hit together with cumulative overlapping difficulty.
+        /// Rhythm difficulty of the object. Saved for optimization, rhythm calculation is very expensive.
+        /// </summary>
+        public double RhythmDifficulty { get; private set; }
+
+        /// <summary>
+        /// Objects that was visible after the note was hit together with cumulative overlapping difficulty. Saved for optimization to avoid O(x^4) time complexity.
         /// </summary>
         public IList<OverlapObject> OverlapObjects { get; private set; }
 
@@ -116,6 +121,8 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Preprocessing
 
             setDistances(clockRate);
 
+            RhythmDifficulty = RhythmEvaluator.EvaluateDifficultyOf(this);
+
             OverlapObjects = new List<OverlapObject>();
 
             double totalOverlapnessDifficulty = 0;
@@ -126,7 +133,6 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Preprocessing
             OsuDifficultyHitObject prevObject = this;
 
             bool log = false;
-
             if (log) Console.WriteLine($"Checking for object {hitObject.StartTime}");
 
             foreach (var loopObj in retrieveCurrentVisibleObjects(this))

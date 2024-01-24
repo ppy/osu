@@ -17,15 +17,9 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
 
         private const double overlap_multiplier = 0.8;
 
-        public static double EvaluateDensityDifficultyOf(DifficultyHitObject current)
+        private static double calculateDenstityOf(OsuDifficultyHitObject currObj)
         {
-            if (current.BaseObject is Spinner || current.Index == 0)
-                return 0;
-
-            var currObj = (OsuDifficultyHitObject)current;
-
             double pastObjectDifficultyInfluence = 0;
-            double screenOverlapDifficulty = 0;
 
             foreach (var loopObj in retrievePastVisibleObjects(currObj))
             {
@@ -39,7 +33,17 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
                 loopDifficulty *= getTimeNerfFactor(timeBetweenCurrAndLoopObj);
 
                 pastObjectDifficultyInfluence += loopDifficulty;
+            }
 
+            return pastObjectDifficultyInfluence;
+        }
+
+        private static double calculateOverlapDifficultyOf(OsuDifficultyHitObject currObj)
+        {
+            double screenOverlapDifficulty = 0;
+
+            foreach (var loopObj in retrievePastVisibleObjects(currObj))
+            {
                 double lastOverlapness = 0;
                 foreach (var overlapObj in loopObj.OverlapObjects)
                 {
@@ -49,10 +53,17 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
                 screenOverlapDifficulty += lastOverlapness;
             }
 
-            //if (screenOverlapDifficulty > 0)
-            //{
-            //    Console.WriteLine($"Object {currObj.StartTime}, overlapness = {screenOverlapDifficulty:0.##}");
-            //}
+            return screenOverlapDifficulty;
+        }
+        public static double EvaluateDensityDifficultyOf(DifficultyHitObject current)
+        {
+            if (current.BaseObject is Spinner || current.Index == 0)
+                return 0;
+
+            var currObj = (OsuDifficultyHitObject)current;
+
+            double pastObjectDifficultyInfluence = calculateDenstityOf(currObj);
+            double screenOverlapDifficulty = calculateOverlapDifficultyOf(currObj);
 
             double difficulty = Math.Pow(4 * Math.Log(Math.Max(1, pastObjectDifficultyInfluence)), 2.3);
 
@@ -88,13 +99,11 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
             double hdDifficulty = 0;
 
             double timeSpentInvisible = getDurationSpentInvisible(currObj) / clockRateEstimate;
-
-            // Apollo version
-            // double timeDifficultyFactor = pastObjectDifficultyInfluence / 1000;
+            double timeDifficultyFactor = calculateDenstityOf(currObj) / 1000;
 
             double visibleObjectFactor = Math.Clamp(retrieveCurrentVisibleObjects(currObj).Count - 2, 0, 15);
 
-            hdDifficulty += Math.Pow(visibleObjectFactor * timeSpentInvisible, 1) +
+            hdDifficulty += Math.Pow(visibleObjectFactor * timeSpentInvisible * timeDifficultyFactor, 1) +
                             (8 + visibleObjectFactor) * currVelocity;
 
             return hdDifficulty;
