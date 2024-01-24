@@ -44,5 +44,10 @@ namespace osu.Game.Online
         /// The endpoint for the SignalR metadata server.
         /// </summary>
         public string MetadataEndpointUrl { get; set; }
+
+        /// <summary>
+        /// The endpoint for the notifications websocket.
+        /// </summary>
+        public string NotificationsWebSocketEndpointUrl { get; set; }
     }
 }

@@ -13,6 +13,7 @@ namespace osu.Game.Online
             SpectatorEndpointUrl = "https://spectator.ppy.sh/spectator";
             MultiplayerEndpointUrl = "https://spectator.ppy.sh/multiplayer";
             MetadataEndpointUrl = "https://spectator.ppy.sh/metadata";
+            NotificationsWebSocketEndpointUrl = "wss://notify.ppy.sh";
         }
     }
 }
