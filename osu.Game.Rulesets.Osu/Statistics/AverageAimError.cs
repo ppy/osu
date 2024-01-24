@@ -23,19 +23,21 @@ namespace osu.Game.Rulesets.Osu.Statistics
         /// </summary>
         /// <param name="hitEvents">Sequence of <see cref="HitEvent"/>s to calculate the unstable rate based on.</param>
         public AverageAimError(IEnumerable<HitEvent> hitEvents)
-            : base("Average Hit Error")
+            : base("Average Aim Error")
         {
             Value = calculateAverageAimError(hitEvents);
         }
 
         private double? calculateAverageAimError(IEnumerable<HitEvent> hitEvents)
         {
-            IEnumerable<HitEvent> rawHitPositions = hitEvents.Where(affectsAimError);
+            IEnumerable<HitEvent> hitCircleEvents = hitEvents.Where(e => e.HitObject is HitCircle && !(e.HitObject is SliderTailCircle) && e.Result.IsHit());
 
-            if (!rawHitPositions.Any())
+            double nonMissCount = hitCircleEvents.Count(e => e.Result.IsHit());
+
+            if (nonMissCount == 0)
                 return null;
 
-            foreach (var e in rawHitPositions)
+            foreach (var e in hitCircleEvents)
             {
                 if (e.LastHitObject == null || e.Position == null)
                     continue;
@@ -43,7 +45,7 @@ namespace osu.Game.Rulesets.Osu.Statistics
                 addAngleAdjustedPoint(((OsuHitObject)e.LastHitObject).StackedEndPosition, ((OsuHitObject)e.HitObject).StackedEndPosition, e.Position.Value);
             }
 
-            Vector2 averagePosition = new Vector2(hitPoints.Sum(x => x[0]), hitPoints.Sum(x => x[1])) / rawHitPositions.Count();
+            Vector2 averagePosition = new Vector2(hitPoints.Sum(x => x[0]), hitPoints.Sum(x => x[1])) / (float)nonMissCount;
 
             return averagePosition.Length;
         }
@@ -61,8 +63,6 @@ namespace osu.Game.Rulesets.Osu.Statistics
             hitPoints.Add(angleAdjustedPoint);
         }
 
-        private bool affectsAimError(HitEvent hitEvent) => hitEvent.HitObject is HitCircle && !(hitEvent.HitObject is SliderTailCircle) && hitEvent.Result.IsHit();
-
-        protected override string DisplayValue(double? value) => value == null ? "(not available)" : $"{Math.Abs(value.Value):N2} osu!px from center";
+        protected override string DisplayValue(double? value) => value == null ? "(not available)" : $"{Math.Abs(value.Value):N2} osu! pixels from center";
     }
 }

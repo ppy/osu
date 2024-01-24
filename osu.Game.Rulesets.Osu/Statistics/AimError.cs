@@ -4,6 +4,8 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using osu.Game.Beatmaps;
+using osu.Game.Rulesets.Objects.Legacy;
 using osu.Game.Rulesets.Osu.Objects;
 using osu.Game.Rulesets.Scoring;
 using osu.Game.Screens.Ranking.Statistics;
@@ -21,46 +23,37 @@ namespace osu.Game.Rulesets.Osu.Statistics
         /// <summary>
         /// Creates and computes an <see cref="AimError"/> statistic.
         /// </summary>
-        public AimError(IEnumerable<HitEvent> hitEvents)
+        public AimError(IEnumerable<HitEvent> hitEvents, IBeatmap playableBeatmap)
             : base("Aim Error")
         {
-            Value = calculateAimError(hitEvents);
+            Value = calculateAimError(hitEvents, playableBeatmap);
         }
 
-        private double? calculateAimError(IEnumerable<HitEvent> hitEvents)
+        private double? calculateAimError(IEnumerable<HitEvent> hitEvents, IBeatmap playableBeatmap)
         {
-            IEnumerable<HitEvent> rawHitPositions = hitEvents.Where(affectsAimError);
+            IEnumerable<HitEvent> hitCircleEvents = hitEvents.Where(e => e.HitObject is HitCircle && !(e.HitObject is SliderTailCircle));
 
-            if (!rawHitPositions.Any())
+            double nonMissCount = hitCircleEvents.Count(e => e.Result.IsHit());
+            double missCount = hitCircleEvents.Count() - nonMissCount;
+
+            if (nonMissCount == 0)
                 return null;
 
-            foreach (var e in hitEvents.Where(e => e.HitObject is HitCircle && !(e.HitObject is SliderTailCircle)))
+            foreach (var e in hitCircleEvents)
             {
-                if (e.LastHitObject == null || e.Position == null)
+                if (e.Position == null)
                     continue;
 
-                addAngleAdjustedPoint(((OsuHitObject)e.LastHitObject).StackedEndPosition, ((OsuHitObject)e.HitObject).StackedEndPosition, e.Position.Value);
+                hitPoints.Add((e.Position - ((OsuHitObject)e.HitObject).StackedEndPosition).Value);
             }
 
-            Vector2 averagePosition = new Vector2(hitPoints.Sum(x => x[0]), hitPoints.Sum(x => x[1])) / hitEvents.Where(affectsAimError).Count();
+            double radius = OsuHitObject.OBJECT_RADIUS * LegacyRulesetExtensions.CalculateScaleFromCircleSize(playableBeatmap.Difficulty.CircleSize, true);
 
-            return Math.Sqrt(hitPoints.Average(x => (x - averagePosition).LengthSquared)) * 10;
+            // We don't get data for miss locations, so we estimate the total variance using the Rayleigh distribution.
+            double variance = (missCount * Math.Pow(radius, 2) + hitPoints.Aggregate(0.0, (current, point) => current + point.LengthSquared)) / (2 * nonMissCount);
+
+            return Math.Sqrt(variance) * 10;
         }
-
-        private void addAngleAdjustedPoint(Vector2 start, Vector2 end, Vector2 hitPoint)
-        {
-            double angle1 = Math.Atan2(end.Y - hitPoint.Y, hitPoint.X - end.X); // Angle between the end point and the hit point.
-            double angle2 = Math.Atan2(end.Y - start.Y, start.X - end.X); // Angle between the end point and the start point.
-            double finalAngle = angle2 - angle1; // Angle between start, end, and hit points.
-
-            double distanceFromCenter = (hitPoint - end).Length;
-
-            Vector2 angleAdjustedPoint = new Vector2((float)(Math.Sin(finalAngle) * distanceFromCenter), (float)(Math.Cos(finalAngle) * distanceFromCenter));
-
-            hitPoints.Add(angleAdjustedPoint);
-        }
-
-        private bool affectsAimError(HitEvent hitEvent) => hitEvent.HitObject is HitCircle && !(hitEvent.HitObject is SliderTailCircle) && hitEvent.Result.IsHit();
 
         protected override string DisplayValue(double? value) => value == null ? "(not available)" : value.Value.ToString(@"N2");
     }
