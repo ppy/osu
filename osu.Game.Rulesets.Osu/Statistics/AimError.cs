@@ -14,7 +14,7 @@ using osuTK;
 namespace osu.Game.Rulesets.Osu.Statistics
 {
     /// <summary>
-    /// Displays the unstable rate statistic for a given play.
+    /// Displays the aim error statistic for a given play.
     /// </summary>
     public partial class AimError : SimpleStatisticItem<double?>
     {
@@ -23,6 +23,8 @@ namespace osu.Game.Rulesets.Osu.Statistics
         /// <summary>
         /// Creates and computes an <see cref="AimError"/> statistic.
         /// </summary>
+        /// <param name="hitEvents">Sequence of <see cref="HitEvent"/>s to calculate the aim error based on.</param>
+        /// <param name="playableBeatmap">The <see cref="IBeatmap"/> containing the radii of the circles, used to compute the variance of misses.</param>
         public AimError(IEnumerable<HitEvent> hitEvents, IBeatmap playableBeatmap)
             : base("Aim Error")
         {

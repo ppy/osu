@@ -12,7 +12,7 @@ using osuTK;
 namespace osu.Game.Rulesets.Osu.Statistics
 {
     /// <summary>
-    /// Displays the unstable rate statistic for a given play.
+    /// Displays the aim error statistic for a given play.
     /// </summary>
     public partial class AverageAimError : SimpleStatisticItem<double?>
     {
@@ -21,7 +21,7 @@ namespace osu.Game.Rulesets.Osu.Statistics
         /// <summary>
         /// Creates and computes an <see cref="AverageHitError"/> statistic.
         /// </summary>
-        /// <param name="hitEvents">Sequence of <see cref="HitEvent"/>s to calculate the unstable rate based on.</param>
+        /// <param name="hitEvents">Sequence of <see cref="HitEvent"/>s to calculate the aim error based on.</param>
         public AverageAimError(IEnumerable<HitEvent> hitEvents)
             : base("Average Aim Error")
         {
