@@ -266,7 +266,7 @@ namespace osu.Game.Online.API
                 }
             }
 
-            var userReq = new GetUserRequest();
+            var userReq = new GetMeRequest();
             userReq.Failure += ex =>
             {
                 if (ex is APIException)
