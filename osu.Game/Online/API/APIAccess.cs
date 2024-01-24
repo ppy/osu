@@ -230,8 +230,6 @@ namespace osu.Game.Online.API
                 try
                 {
                     authentication.AuthenticateWithLogin(ProvidedUsername, password);
-                    state.Value = APIState.RequiresSecondFactorAuth;
-                    return;
                 }
                 catch (Exception e)
                 {
@@ -240,28 +238,6 @@ namespace osu.Game.Online.API
                     log.Add($@"Login failed for username {ProvidedUsername} ({LastLoginError.Message})!");
 
                     Logout();
-                    return;
-                }
-            }
-
-            if (state.Value == APIState.RequiresSecondFactorAuth)
-            {
-                if (string.IsNullOrEmpty(SecondFactorCode))
-                    return;
-
-                state.Value = APIState.Connecting;
-                LastLoginError = null;
-
-                // TODO: use code to ensure second factor authentication completed.
-                Thread.Sleep(1000);
-                bool success = SecondFactorCode == "00000000";
-                SecondFactorCode = null;
-
-                if (!success)
-                {
-                    state.Value = APIState.RequiresSecondFactorAuth;
-                    LastLoginError = new InvalidOperationException("Second factor auth failed");
-                    SecondFactorCode = null;
                     return;
                 }
             }
@@ -285,14 +261,13 @@ namespace osu.Game.Online.API
                     state.Value = APIState.Failing;
                 }
             };
-            userReq.Success += user =>
+            userReq.Success += me =>
             {
-                user.Status.Value = configStatus.Value ?? UserStatus.Online;
+                me.Status.Value = configStatus.Value ?? UserStatus.Online;
 
-                setLocalUser(user);
+                setLocalUser(me);
 
-                // we're connected!
-                state.Value = APIState.Online;
+                state.Value = me.SessionVerified ? APIState.Online : APIState.RequiresSecondFactorAuth;
                 failureCount = 0;
             };
 
@@ -300,6 +275,34 @@ namespace osu.Game.Online.API
             {
                 state.Value = APIState.Failing;
                 return;
+            }
+
+            if (state.Value == APIState.RequiresSecondFactorAuth)
+            {
+                if (string.IsNullOrEmpty(SecondFactorCode))
+                    return;
+
+                state.Value = APIState.Connecting;
+                LastLoginError = null;
+
+                var verificationRequest = new VerifySessionRequest(SecondFactorCode);
+
+                verificationRequest.Success += () => state.Value = APIState.Online;
+                verificationRequest.Failure += ex =>
+                {
+                    state.Value = APIState.RequiresSecondFactorAuth;
+                    LastLoginError = ex;
+                    SecondFactorCode = null;
+                };
+
+                if (!handleRequest(verificationRequest))
+                {
+                    state.Value = APIState.Failing;
+                    return;
+                }
+
+                if (state.Value != APIState.Online)
+                    return;
             }
 
             var friendsReq = new GetFriendsRequest();
