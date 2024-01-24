@@ -49,7 +49,12 @@ namespace osu.Game.Rulesets.Pippidon.Objects.Drawables
         protected override void CheckForResult(bool userTriggered, double timeOffset)
         {
             if (timeOffset >= 0)
-                ApplyResult(r => r.Type = IsHovered ? HitResult.Perfect : HitResult.Miss);
+            {
+                ApplyResult(static (r, isHovered) =>
+                {
+                    r.Type = isHovered ? HitResult.Perfect : HitResult.Miss;
+                }, IsHovered);
+            }
         }
 
         protected override double InitialLifetimeOffset => time_preempt;

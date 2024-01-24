@@ -206,7 +206,7 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
                 expandingRing.ScaleTo(1f + Math.Min(target_ring_scale - 1f, (target_ring_scale - 1f) * completion * 1.3f), 260, Easing.OutQuint);
 
                 if (numHits == HitObject.RequiredHits)
-                    ApplyResult(r => r.Type = r.Judgement.MaxResult);
+                    ApplyResult(static r => r.Type = r.Judgement.MaxResult);
             }
             else
             {
@@ -227,7 +227,11 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
                         tick.TriggerResult(false);
                 }
 
-                ApplyResult(r => r.Type = numHits == HitObject.RequiredHits ? r.Judgement.MaxResult : r.Judgement.MinResult);
+                ApplyResult(static (r, state) =>
+                {
+                    var (numHits, hitObject) = state;
+                    r.Type = numHits == hitObject.RequiredHits ? r.Judgement.MaxResult : r.Judgement.MinResult;
+                }, (numHits, HitObject));
             }
         }
 

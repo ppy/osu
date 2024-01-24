@@ -687,12 +687,14 @@ namespace osu.Game.Rulesets.Objects.Drawables
         /// the <see cref="ScoreProcessor"/> of the <see cref="JudgementResult"/>.
         /// </summary>
         /// <param name="application">The callback that applies changes to the <see cref="JudgementResult"/>.</param>
-        protected void ApplyResult(Action<JudgementResult> application)
+        /// <param name="state">The state passed to the callback.</param>
+        /// <typeparam name="TState">The type of the state information that is passed to the callback method.</typeparam>
+        protected void ApplyResult<TState>(Action<JudgementResult, TState> application, TState state)
         {
             if (Result.HasResult)
                 throw new InvalidOperationException("Cannot apply result on a hitobject that already has a result.");
 
-            application?.Invoke(Result);
+            application?.Invoke(Result, state);
 
             if (!Result.HasResult)
                 throw new InvalidOperationException($"{GetType().ReadableName()} applied a {nameof(JudgementResult)} but did not update {nameof(JudgementResult.Type)}.");
@@ -713,6 +715,13 @@ namespace osu.Game.Rulesets.Objects.Drawables
 
             OnNewResult?.Invoke(this, Result);
         }
+
+        /// <summary>
+        /// Applies the <see cref="Result"/> of this <see cref="DrawableHitObject"/>, notifying responders such as
+        /// the <see cref="ScoreProcessor"/> of the <see cref="JudgementResult"/>.
+        /// </summary>
+        /// <param name="application">The callback that applies changes to the <see cref="JudgementResult"/>.</param>
+        protected void ApplyResult(Action<JudgementResult> application) => ApplyResult<object>((r, _) => application?.Invoke(r), null);
 
         /// <summary>
         /// Processes this <see cref="DrawableHitObject"/>, checking if a scoring result has occurred.

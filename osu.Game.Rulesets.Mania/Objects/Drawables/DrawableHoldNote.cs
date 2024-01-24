@@ -265,7 +265,7 @@ namespace osu.Game.Rulesets.Mania.Objects.Drawables
             if (Tail.AllJudged)
             {
                 if (Tail.IsHit)
-                    ApplyResult(r => r.Type = r.Judgement.MaxResult);
+                    ApplyResult(static r => r.Type = r.Judgement.MaxResult);
                 else
                     MissForcefully();
             }

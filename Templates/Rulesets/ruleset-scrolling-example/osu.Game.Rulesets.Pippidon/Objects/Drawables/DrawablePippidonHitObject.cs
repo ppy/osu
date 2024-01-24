@@ -49,7 +49,12 @@ namespace osu.Game.Rulesets.Pippidon.Objects.Drawables
         protected override void CheckForResult(bool userTriggered, double timeOffset)
         {
             if (timeOffset >= 0)
-                ApplyResult(r => r.Type = currentLane.Value == HitObject.Lane ? HitResult.Perfect : HitResult.Miss);
+            {
+                ApplyResult(static (r, pippidonHitObject) =>
+                {
+                    r.Type = pippidonHitObject.currentLane.Value == pippidonHitObject.HitObject.Lane ? HitResult.Perfect : HitResult.Miss;
+                }, this);
+            }
         }
 
         protected override void UpdateHitStateTransforms(ArmedState state)

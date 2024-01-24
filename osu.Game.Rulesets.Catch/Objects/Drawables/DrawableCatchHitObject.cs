@@ -63,7 +63,12 @@ namespace osu.Game.Rulesets.Catch.Objects.Drawables
             if (CheckPosition == null) return;
 
             if (timeOffset >= 0 && Result != null)
-                ApplyResult(r => r.Type = CheckPosition.Invoke(HitObject) ? r.Judgement.MaxResult : r.Judgement.MinResult);
+            {
+                ApplyResult(static (r, state) =>
+                {
+                    r.Type = state.CheckPosition.Invoke(state.HitObject) ? r.Judgement.MaxResult : r.Judgement.MinResult;
+                }, this);
+            }
         }
 
         protected override void UpdateHitStateTransforms(ArmedState state)

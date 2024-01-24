@@ -100,12 +100,12 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
         /// <summary>
         /// Causes this <see cref="DrawableOsuHitObject"/> to get hit, disregarding all conditions in implementations of <see cref="DrawableHitObject.CheckForResult"/>.
         /// </summary>
-        public void HitForcefully() => ApplyResult(r => r.Type = r.Judgement.MaxResult);
+        public void HitForcefully() => ApplyResult(static r => r.Type = r.Judgement.MaxResult);
 
         /// <summary>
         /// Causes this <see cref="DrawableOsuHitObject"/> to get missed, disregarding all conditions in implementations of <see cref="DrawableHitObject.CheckForResult"/>.
         /// </summary>
-        public void MissForcefully() => ApplyResult(r => r.Type = r.Judgement.MinResult);
+        public void MissForcefully() => ApplyResult(static r => r.Type = r.Judgement.MinResult);
 
         private RectangleF parentScreenSpaceRectangle => ((DrawableOsuHitObject)ParentHitObject)?.parentScreenSpaceRectangle ?? Parent!.ScreenSpaceDrawQuad.AABBFloat;
 
