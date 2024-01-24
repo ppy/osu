@@ -58,7 +58,7 @@ namespace osu.Game.Rulesets.Osu.Statistics
 
             double distanceFromCenter = (hitPoint - end).Length;
 
-            Vector2 angleAdjustedPoint = new Vector2((float)(Math.Sin(finalAngle) * distanceFromCenter), (float)(Math.Cos(finalAngle) * distanceFromCenter));
+            Vector2 angleAdjustedPoint = new Vector2((float)(Math.Cos(finalAngle) * distanceFromCenter), (float)(Math.Sin(finalAngle) * distanceFromCenter));
 
             hitPoints.Add(angleAdjustedPoint);
         }
