@@ -90,7 +90,7 @@ namespace osu.Game.Tests.Visual.Online
                             else
                             {
                                 int userId = int.Parse(getUserRequest.Lookup);
-                                string rulesetName = getUserRequest.Ruleset.ShortName;
+                                string rulesetName = getUserRequest.Ruleset!.ShortName;
                                 var response = new APIUser
                                 {
                                     Id = userId,
