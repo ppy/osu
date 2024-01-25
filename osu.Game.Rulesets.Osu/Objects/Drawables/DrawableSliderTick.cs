@@ -88,8 +88,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
                     break;
 
                 case ArmedState.Miss:
-                    this.FadeOut(ANIM_DURATION);
-                    this.TransformBindableTo(AccentColour, Color4.Red, 0);
+                    this.FadeOut(ANIM_DURATION, Easing.OutQuint);
                     break;
 
                 case ArmedState.Hit:
