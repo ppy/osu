@@ -25,6 +25,7 @@ namespace osu.Game.Rulesets.Osu.Edit
         private EditorRadioButtonCollection rotationOrigin = null!;
 
         private RadioButton selectionCentreButton = null!;
+
         public PreciseRotationPopover(SelectionRotationHandler rotationHandler)
         {
             this.rotationHandler = rotationHandler;
@@ -67,6 +68,7 @@ namespace osu.Game.Rulesets.Osu.Edit
                     }
                 }
             };
+            selectionCentreButton.TooltipTextWhenDisabled = "We can't rotate a circle around itself! Can we?";
         }
 
         protected override void LoadComplete()

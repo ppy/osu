@@ -97,6 +97,6 @@ namespace osu.Game.Screens.Edit.Components.RadioButtons
             X = 40f
         };
 
-        public LocalisableString TooltipText => Enabled.Value ? string.Empty : "Add at least one timing point first!";
+        public LocalisableString TooltipText => Enabled.Value ? Button.TooltipTextWhenEnabled : Button.TooltipTextWhenDisabled;
     }
 }
