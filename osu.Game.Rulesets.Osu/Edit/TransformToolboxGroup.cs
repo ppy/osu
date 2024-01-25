@@ -11,7 +11,6 @@ using osu.Framework.Input.Events;
 using osu.Game.Input.Bindings;
 using osu.Game.Rulesets.Edit;
 using osu.Game.Screens.Edit.Components;
-using osu.Game.Screens.Edit.Compose.Components;
 using osuTK;
 
 namespace osu.Game.Rulesets.Osu.Edit
@@ -22,7 +21,7 @@ namespace osu.Game.Rulesets.Osu.Edit
 
         private EditorToolButton rotateButton = null!;
 
-        public SelectionRotationHandler RotationHandler { get; init; } = null!;
+        public OsuSelectionRotationHandler RotationHandler { get; init; } = null!;
 
         public TransformToolboxGroup()
             : base("transform")
@@ -53,7 +52,7 @@ namespace osu.Game.Rulesets.Osu.Edit
 
             // bindings to `Enabled` on the buttons are decoupled on purpose
             // due to the weird `OsuButton` behaviour of resetting `Enabled` to `false` when `Action` is set.
-            canRotate.BindTo(RotationHandler.CanRotateSelectionOrigin);
+            canRotate.BindTo(RotationHandler.CanRotatePlayfieldOrigin);
             canRotate.BindValueChanged(_ => rotateButton.Enabled.Value = canRotate.Value, true);
         }
 
