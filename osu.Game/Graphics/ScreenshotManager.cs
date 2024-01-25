@@ -1,8 +1,6 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
 using System;
 using System.IO;
 using System.Threading;
@@ -38,37 +36,36 @@ namespace osu.Game.Graphics
         /// </summary>
         public IBindable<bool> CursorVisibility => cursorVisibility;
 
-        private Bindable<ScreenshotFormat> screenshotFormat;
-        private Bindable<bool> captureMenuCursor;
+        [Resolved]
+        private GameHost host { get; set; } = null!;
 
         [Resolved]
-        private GameHost host { get; set; }
+        private Clipboard clipboard { get; set; } = null!;
 
         [Resolved]
-        private Clipboard clipboard { get; set; }
+        private INotificationOverlay notificationOverlay { get; set; } = null!;
 
-        private Storage storage;
+        private Storage storage = null!;
 
-        [Resolved]
-        private INotificationOverlay notificationOverlay { get; set; }
+        private Sample? shutter;
 
-        private Sample shutter;
-        private Bindable<float> posX;
-        private Bindable<float> posY;
-        private Bindable<float> sizeX;
-        private Bindable<float> sizeY;
-        private Bindable<ScalingMode> scalingMode;
+        private Bindable<ScreenshotFormat> screenshotFormat = null!;
+        private Bindable<bool> captureMenuCursor = null!;
+        private Bindable<float> posX = null!;
+        private Bindable<float> posY = null!;
+        private Bindable<float> sizeX = null!;
+        private Bindable<float> sizeY = null!;
+        private Bindable<ScalingMode> scalingMode = null!;
 
         [BackgroundDependencyLoader]
         private void load(OsuConfigManager config, Storage storage, AudioManager audio)
         {
             this.storage = storage.GetStorageForDirectory(@"screenshots");
 
-            screenshotFormat = config.GetBindable<ScreenshotFormat>(OsuSetting.ScreenshotFormat);
-            captureMenuCursor = config.GetBindable<bool>(OsuSetting.ScreenshotCaptureMenuCursor);
-
             shutter = audio.Samples.Get("UI/shutter");
 
+            screenshotFormat = config.GetBindable<ScreenshotFormat>(OsuSetting.ScreenshotFormat);
+            captureMenuCursor = config.GetBindable<bool>(OsuSetting.ScreenshotCaptureMenuCursor);
             posX = config.GetBindable<float>(OsuSetting.ScalingPositionX);
             posY = config.GetBindable<float>(OsuSetting.ScalingPositionY);
             sizeX = config.GetBindable<float>(OsuSetting.ScalingSizeX);
@@ -84,7 +81,7 @@ namespace osu.Game.Graphics
             switch (e.Action)
             {
                 case GlobalAction.TakeScreenshot:
-                    shutter.Play();
+                    shutter?.Play();
                     TakeScreenshotAsync().FireAndForget();
                     return true;
             }
@@ -148,7 +145,7 @@ namespace osu.Game.Graphics
 
                     clipboard.SetImage(image);
 
-                    (string filename, var stream) = getWritableStream();
+                    (string? filename, Stream? stream) = getWritableStream();
 
                     if (filename == null) return;
 
@@ -191,7 +188,7 @@ namespace osu.Game.Graphics
 
         private static readonly object filename_reservation_lock = new object();
 
-        private (string filename, Stream stream) getWritableStream()
+        private (string? filename, Stream? stream) getWritableStream()
         {
             lock (filename_reservation_lock)
             {
