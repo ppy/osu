@@ -33,7 +33,7 @@ namespace osu.Game.Screens.Play.HUD
 
         public bool UsesFixedAnchor { get; set; }
 
-        protected override LocalisableString FormatCount(long count) => count.ToLocalisableString();
+        protected override LocalisableString FormatCount(long count) => count.ToString();
 
         protected override IHasText CreateText() => scoreText = new ArgonScoreTextComponent(Anchor.TopRight, BeatmapsetsStrings.ShowScoreboardHeadersScore.ToUpper())
         {
