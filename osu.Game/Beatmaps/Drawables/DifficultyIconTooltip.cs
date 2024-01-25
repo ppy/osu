@@ -76,30 +76,10 @@ namespace osu.Game.Beatmaps.Drawables
                             Spacing = new Vector2(5),
                             Children = new Drawable[]
                             {
-                                circleSize = new OsuSpriteText
-                                {
-                                    Anchor = Anchor.Centre,
-                                    Origin = Anchor.Centre,
-                                    Font = OsuFont.GetFont(size: 14)
-                                },
-                                drainRate = new OsuSpriteText
-                                {
-                                    Anchor = Anchor.Centre,
-                                    Origin = Anchor.Centre,
-                                    Font = OsuFont.GetFont(size: 14)
-                                },
-                                approachRate = new OsuSpriteText
-                                {
-                                    Anchor = Anchor.Centre,
-                                    Origin = Anchor.Centre,
-                                    Font = OsuFont.GetFont(size: 14)
-                                },
-                                overallDifficulty = new OsuSpriteText
-                                {
-                                    Anchor = Anchor.Centre,
-                                    Origin = Anchor.Centre,
-                                    Font = OsuFont.GetFont(size: 14)
-                                }
+                                circleSize = new OsuSpriteText { Font = OsuFont.GetFont(size: 14) },
+                                drainRate = new OsuSpriteText { Font = OsuFont.GetFont(size: 14) },
+                                approachRate = new OsuSpriteText { Font = OsuFont.GetFont(size: 14) },
+                                overallDifficulty = new OsuSpriteText { Font = OsuFont.GetFont(size: 14) }
                             }
                         },
                         miscFillFlowContainer = new FillFlowContainer
@@ -112,18 +92,8 @@ namespace osu.Game.Beatmaps.Drawables
                             Spacing = new Vector2(5),
                             Children = new Drawable[]
                             {
-                                length = new OsuSpriteText
-                                {
-                                    Anchor = Anchor.Centre,
-                                    Origin = Anchor.Centre,
-                                    Font = OsuFont.GetFont(size: 14)
-                                },
-                                bpm = new OsuSpriteText
-                                {
-                                    Anchor = Anchor.Centre,
-                                    Origin = Anchor.Centre,
-                                    Font = OsuFont.GetFont(size: 14)
-                                },
+                                length = new OsuSpriteText { Font = OsuFont.GetFont(size: 14) },
+                                bpm = new OsuSpriteText { Font = OsuFont.GetFont(size: 14) },
                             }
                         }
                     }
@@ -168,9 +138,7 @@ namespace osu.Game.Beatmaps.Drawables
             if (displayedContent.Mods != null)
             {
                 foreach (var mod in displayedContent.Mods.OfType<IApplicableToDifficulty>())
-                {
                     mod.ApplyToDifficulty(originalDifficulty);
-                }
             }
 
             Ruleset ruleset = displayedContent.Ruleset.CreateInstance();
