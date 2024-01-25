@@ -61,7 +61,8 @@ namespace osu.Game.Rulesets.Scoring
         /// </summary>
         protected readonly double DrainLenience;
 
-        private readonly List<(double time, double health)> healthIncreases = new List<(double, double)>();
+        private readonly List<HealthIncrease> healthIncreases = new List<HealthIncrease>();
+
         private double gameplayEndTime;
         private double targetMinimumHealth;
 
@@ -133,8 +134,12 @@ namespace osu.Game.Rulesets.Scoring
         {
             base.ApplyResultInternal(result);
 
-            if (!result.Type.IsBonus())
-                healthIncreases.Add((result.HitObject.GetEndTime() + result.TimeOffset, GetHealthIncreaseFor(result)));
+            if (IsSimulating && !result.Type.IsBonus())
+            {
+                healthIncreases.Add(new HealthIncrease(
+                    result.HitObject.GetEndTime() + result.TimeOffset,
+                    GetHealthIncreaseFor(result)));
+            }
         }
 
         protected override void Reset(bool storeResults)
@@ -165,8 +170,8 @@ namespace osu.Game.Rulesets.Scoring
 
                 for (int i = 0; i < healthIncreases.Count; i++)
                 {
-                    double currentTime = healthIncreases[i].time;
-                    double lastTime = i > 0 ? healthIncreases[i - 1].time : DrainStartTime;
+                    double currentTime = healthIncreases[i].Time;
+                    double lastTime = i > 0 ? healthIncreases[i - 1].Time : DrainStartTime;
 
                     while (currentBreak < Beatmap.Breaks.Count && Beatmap.Breaks[currentBreak].EndTime <= currentTime)
                     {
@@ -180,7 +185,7 @@ namespace osu.Game.Rulesets.Scoring
                     // Apply health adjustments
                     currentHealth -= (currentTime - lastTime) * result;
                     lowestHealth = Math.Min(lowestHealth, currentHealth);
-                    currentHealth = Math.Min(1, currentHealth + healthIncreases[i].health);
+                    currentHealth = Math.Min(1, currentHealth + healthIncreases[i].Amount);
 
                     // Common scenario for when the drain rate is definitely too harsh
                     if (lowestHealth < 0)
@@ -198,5 +203,7 @@ namespace osu.Game.Rulesets.Scoring
 
             return result;
         }
+
+        private record struct HealthIncrease(double Time, double Amount);
     }
 }

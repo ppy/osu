@@ -28,7 +28,9 @@ namespace osu.Game.Rulesets.Mods
         }
 
         protected override bool FailCondition(HealthProcessor healthProcessor, JudgementResult result)
-            => result.Type.AffectsAccuracy()
+            => (isRelevantResult(result.Judgement.MinResult) || isRelevantResult(result.Judgement.MaxResult) || isRelevantResult(result.Type))
                && result.Type != result.Judgement.MaxResult;
+
+        private bool isRelevantResult(HitResult result) => result.AffectsAccuracy() || result.AffectsCombo();
     }
 }

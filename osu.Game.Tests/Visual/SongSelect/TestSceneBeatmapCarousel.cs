@@ -455,6 +455,23 @@ namespace osu.Game.Tests.Visual.SongSelect
         }
 
         [Test]
+        public void TestRewind()
+        {
+            const int local_set_count = 3;
+            const int random_select_count = local_set_count * 3;
+            loadBeatmaps(setCount: local_set_count);
+
+            for (int i = 0; i < random_select_count; i++)
+                nextRandom();
+
+            for (int i = 0; i < random_select_count; i++)
+            {
+                prevRandom();
+                AddAssert("correct random last selected", () => selectedSets.Peek(), () => Is.EqualTo(carousel.SelectedBeatmapSet));
+            }
+        }
+
+        [Test]
         public void TestRewindToDeletedBeatmap()
         {
             loadBeatmaps();

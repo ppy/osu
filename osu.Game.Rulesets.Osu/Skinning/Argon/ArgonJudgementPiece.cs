@@ -62,8 +62,18 @@ namespace osu.Game.Rulesets.Osu.Skinning.Argon
         /// </remarks>
         public virtual void PlayAnimation()
         {
-            if (Result.IsMiss())
+            if (Result == HitResult.IgnoreMiss || Result == HitResult.LargeTickMiss)
             {
+                this.RotateTo(-45);
+                this.ScaleTo(1.6f);
+                this.ScaleTo(1.2f, 100, Easing.In);
+
+                this.FadeOutFromOne(400);
+            }
+            else if (Result.IsMiss())
+            {
+                this.FadeOutFromOne(800);
+
                 this.ScaleTo(1.6f);
                 this.ScaleTo(1, 100, Easing.In);
 
@@ -75,13 +85,13 @@ namespace osu.Game.Rulesets.Osu.Skinning.Argon
             }
             else
             {
+                this.FadeOutFromOne(800);
+
                 JudgementText
                     .FadeInFromZero(300, Easing.OutQuint)
                     .ScaleTo(Vector2.One)
                     .ScaleTo(new Vector2(1.2f), 1800, Easing.OutQuint);
             }
-
-            this.FadeOutFromOne(800);
 
             ringExplosion?.PlayAnimation();
         }

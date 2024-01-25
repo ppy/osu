@@ -34,7 +34,7 @@ namespace osu.Game.Rulesets.Osu.Skinning.Default
             ScaleBindable.BindValueChanged(scale => PathRadius = OsuHitObject.OBJECT_RADIUS * scale.NewValue, true);
 
             pathVersion = drawableSlider.PathVersion.GetBoundCopy();
-            pathVersion.BindValueChanged(_ => Refresh());
+            pathVersion.BindValueChanged(_ => Scheduler.AddOnce(Refresh));
 
             AccentColourBindable = drawableObject.AccentColour.GetBoundCopy();
             AccentColourBindable.BindValueChanged(accent => AccentColour = GetBodyAccentColour(skin, accent.NewValue), true);

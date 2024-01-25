@@ -80,6 +80,13 @@ namespace osu.Game
     [Cached(typeof(OsuGame))]
     public partial class OsuGame : OsuGameBase, IKeyBindingHandler<GlobalAction>, ILocalUserPlayInfo, IPerformFromScreenRunner, IOverlayManager, ILinkHandler
     {
+#if DEBUG
+        // Different port allows runnning release and debug builds alongside each other.
+        public const int IPC_PORT = 44824;
+#else
+        public const int IPC_PORT = 44823;
+#endif
+
         /// <summary>
         /// The amount of global offset to apply when a left/right anchored overlay is displayed (ie. settings or notifications).
         /// </summary>
@@ -994,8 +1001,11 @@ namespace osu.Game
                 Margin = new MarginPadding(5),
             }, topMostOverlayContent.Add);
 
-            if (!args?.Any(a => a == @"--no-version-overlay") ?? true)
-                loadComponentSingleFile(versionManager = new VersionManager { Depth = int.MinValue }, ScreenContainer.Add);
+            if (!IsDeployedBuild)
+            {
+                dependencies.Cache(versionManager = new VersionManager { Depth = int.MinValue });
+                loadComponentSingleFile(versionManager, ScreenContainer.Add);
+            }
 
             loadComponentSingleFile(osuLogo, _ =>
             {

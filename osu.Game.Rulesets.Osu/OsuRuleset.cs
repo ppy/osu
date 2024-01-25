@@ -48,6 +48,8 @@ namespace osu.Game.Rulesets.Osu
 
         public override ScoreProcessor CreateScoreProcessor() => new OsuScoreProcessor();
 
+        public override HealthProcessor CreateHealthProcessor(double drainStartTime) => new OsuHealthProcessor(drainStartTime);
+
         public override IBeatmapConverter CreateBeatmapConverter(IBeatmap beatmap) => new OsuBeatmapConverter(beatmap, this);
 
         public override IBeatmapProcessor CreateBeatmapProcessor(IBeatmap beatmap) => new OsuBeatmapProcessor(beatmap);
@@ -209,7 +211,8 @@ namespace osu.Game.Rulesets.Osu
                         new ModAdaptiveSpeed(),
                         new OsuModFreezeFrame(),
                         new OsuModBubbles(),
-                        new OsuModSynesthesia()
+                        new OsuModSynesthesia(),
+                        new OsuModDepth()
                     };
 
                 case ModType.System:
@@ -274,6 +277,7 @@ namespace osu.Game.Rulesets.Osu
 
                 HitResult.LargeTickHit,
                 HitResult.SmallTickHit,
+                HitResult.SliderTailHit,
                 HitResult.SmallBonus,
                 HitResult.LargeBonus,
             };
@@ -286,6 +290,7 @@ namespace osu.Game.Rulesets.Osu
                 case HitResult.LargeTickHit:
                     return "slider tick";
 
+                case HitResult.SliderTailHit:
                 case HitResult.SmallTickHit:
                     return "slider end";
 

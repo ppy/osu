@@ -103,7 +103,6 @@ namespace osu.Game.Beatmaps.Drawables
                     EdgeEffect = new EdgeEffectParameters
                     {
                         Colour = Color4.Black.Opacity(0.06f),
-
                         Type = EdgeEffectType.Shadow,
                         Radius = 3,
                     },

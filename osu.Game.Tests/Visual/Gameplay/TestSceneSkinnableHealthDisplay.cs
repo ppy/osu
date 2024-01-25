@@ -21,7 +21,7 @@ namespace osu.Game.Tests.Visual.Gameplay
         [Cached(typeof(HealthProcessor))]
         private HealthProcessor healthProcessor = new DrainingHealthProcessor(0);
 
-        protected override Drawable CreateArgonImplementation() => new ArgonHealthDisplay { Scale = new Vector2(0.6f), Width = 1f };
+        protected override Drawable CreateArgonImplementation() => new ArgonHealthDisplay { Scale = new Vector2(0.6f), Width = 600, UseRelativeSize = { Value = false } };
         protected override Drawable CreateDefaultImplementation() => new DefaultHealthDisplay { Scale = new Vector2(0.6f) };
         protected override Drawable CreateLegacyImplementation() => new LegacyHealthDisplay { Scale = new Vector2(0.6f) };
 
@@ -33,6 +33,13 @@ namespace osu.Game.Tests.Visual.Gameplay
                 healthProcessor.Health.Value = 1;
                 healthProcessor.Failed += () => false; // health won't be updated if the processor gets into a "fail" state.
             });
+        }
+
+        protected override void Update()
+        {
+            base.Update();
+
+            healthProcessor.Health.Value -= 0.0001f * Time.Elapsed;
         }
 
         [Test]

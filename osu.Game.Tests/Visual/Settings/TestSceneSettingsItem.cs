@@ -40,8 +40,15 @@ namespace osu.Game.Tests.Visual.Settings
             AddStep("change value from default", () => textBox.Current.Value = "non-default");
             AddUntilStep("restore button shown", () => revertToDefaultButton.Alpha > 0);
 
+            AddStep("disable setting", () => textBox.Current.Disabled = true);
+            AddUntilStep("restore button still shown", () => revertToDefaultButton.Alpha > 0);
+
+            AddStep("enable setting", () => textBox.Current.Disabled = false);
             AddStep("restore default", () => textBox.Current.SetDefault());
             AddUntilStep("restore button hidden", () => revertToDefaultButton.Alpha == 0);
+
+            AddStep("disable setting", () => textBox.Current.Disabled = true);
+            AddUntilStep("restore button still hidden", () => revertToDefaultButton.Alpha == 0);
         }
 
         [Test]

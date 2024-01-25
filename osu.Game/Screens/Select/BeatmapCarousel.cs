@@ -96,18 +96,19 @@ namespace osu.Game.Screens.Select
         /// <summary>
         /// Extend the range to retain already loaded pooled drawables.
         /// </summary>
-        private const float distance_offscreen_before_unload = 1024;
+        private const float distance_offscreen_before_unload = 2048;
 
         /// <summary>
         /// Extend the range to update positions / retrieve pooled drawables outside of visible range.
         /// </summary>
-        private const float distance_offscreen_to_preload = 512; // todo: adjust this appropriately once we can make set panel contents load while off-screen.
+        private const float distance_offscreen_to_preload = 768;
 
         /// <summary>
         /// Whether carousel items have completed asynchronously loaded.
         /// </summary>
         public bool BeatmapSetsLoaded { get; private set; }
 
+        [Cached]
         protected readonly CarouselScrollContainer Scroll;
 
         private readonly NoResultsPlaceholder noResultsPlaceholder;
@@ -643,7 +644,7 @@ namespace osu.Game.Screens.Select
             while (randomSelectedBeatmaps.Any())
             {
                 var beatmap = randomSelectedBeatmaps[^1];
-                randomSelectedBeatmaps.Remove(beatmap);
+                randomSelectedBeatmaps.RemoveAt(randomSelectedBeatmaps.Count - 1);
 
                 if (!beatmap.Filtered.Value && beatmap.BeatmapInfo.BeatmapSet?.DeletePending != true)
                 {
@@ -867,7 +868,7 @@ namespace osu.Game.Screens.Select
                 {
                     var toDisplay = visibleItems.GetRange(displayedRange.first, displayedRange.last - displayedRange.first + 1);
 
-                    foreach (var panel in Scroll.Children)
+                    foreach (var panel in Scroll)
                     {
                         Debug.Assert(panel.Item != null);
 
@@ -898,7 +899,7 @@ namespace osu.Game.Screens.Select
 
             // Update externally controlled state of currently visible items (e.g. x-offset and opacity).
             // This is a per-frame update on all drawable panels.
-            foreach (DrawableCarouselItem item in Scroll.Children)
+            foreach (DrawableCarouselItem item in Scroll)
             {
                 updateItem(item);
 
@@ -1093,7 +1094,7 @@ namespace osu.Game.Screens.Select
                         // to enter clamp-special-case mode where it animates completely differently to normal.
                         float scrollChange = scrollTarget.Value - Scroll.Current;
                         Scroll.ScrollTo(scrollTarget.Value, false);
-                        foreach (var i in Scroll.Children)
+                        foreach (var i in Scroll)
                             i.Y += scrollChange;
                         break;
                 }
@@ -1251,7 +1252,7 @@ namespace osu.Game.Screens.Select
             }
         }
 
-        protected partial class CarouselScrollContainer : UserTrackingScrollContainer<DrawableCarouselItem>
+        public partial class CarouselScrollContainer : UserTrackingScrollContainer<DrawableCarouselItem>
         {
             private bool rightMouseScrollBlocked;
 

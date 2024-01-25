@@ -18,10 +18,12 @@ using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Osu;
 using osu.Game.Rulesets.Osu.Judgements;
+using osu.Game.Rulesets.Osu.Mods;
 using osu.Game.Rulesets.Osu.Objects;
 using osu.Game.Rulesets.Scoring;
 using osu.Game.Rulesets.Taiko;
 using osu.Game.Rulesets.UI;
+using osu.Game.Scoring;
 using osu.Game.Scoring.Legacy;
 using osu.Game.Tests.Beatmaps;
 
@@ -84,6 +86,7 @@ namespace osu.Game.Tests.Rulesets.Scoring
         [TestCase(ScoringMode.Standardised, HitResult.SmallTickHit, HitResult.SmallTickHit, 493_652)]
         [TestCase(ScoringMode.Standardised, HitResult.LargeTickMiss, HitResult.LargeTickHit, 0)]
         [TestCase(ScoringMode.Standardised, HitResult.LargeTickHit, HitResult.LargeTickHit, 326_963)]
+        [TestCase(ScoringMode.Standardised, HitResult.SliderTailHit, HitResult.SliderTailHit, 326_963)]
         [TestCase(ScoringMode.Standardised, HitResult.SmallBonus, HitResult.SmallBonus, 1_000_030)]
         [TestCase(ScoringMode.Standardised, HitResult.LargeBonus, HitResult.LargeBonus, 1_000_150)]
         [TestCase(ScoringMode.Classic, HitResult.Miss, HitResult.Great, 0)]
@@ -96,6 +99,7 @@ namespace osu.Game.Tests.Rulesets.Scoring
         [TestCase(ScoringMode.Classic, HitResult.SmallTickHit, HitResult.SmallTickHit, 49_365)]
         [TestCase(ScoringMode.Classic, HitResult.LargeTickMiss, HitResult.LargeTickHit, 0)]
         [TestCase(ScoringMode.Classic, HitResult.LargeTickHit, HitResult.LargeTickHit, 32_696)]
+        [TestCase(ScoringMode.Classic, HitResult.SliderTailHit, HitResult.SliderTailHit, 32_696)]
         [TestCase(ScoringMode.Classic, HitResult.SmallBonus, HitResult.SmallBonus, 100_003)]
         [TestCase(ScoringMode.Classic, HitResult.LargeBonus, HitResult.LargeBonus, 100_015)]
         public void TestFourVariousResultsOneMiss(ScoringMode scoringMode, HitResult hitResult, HitResult maxResult, int expectedScore)
@@ -167,6 +171,7 @@ namespace osu.Game.Tests.Rulesets.Scoring
         [TestCase(HitResult.Perfect, HitResult.Miss)]
         [TestCase(HitResult.SmallTickHit, HitResult.SmallTickMiss)]
         [TestCase(HitResult.LargeTickHit, HitResult.LargeTickMiss)]
+        [TestCase(HitResult.SliderTailHit, HitResult.LargeTickMiss)]
         [TestCase(HitResult.SmallBonus, HitResult.IgnoreMiss)]
         [TestCase(HitResult.LargeBonus, HitResult.IgnoreMiss)]
         public void TestMinResults(HitResult hitResult, HitResult expectedMinResult)
@@ -187,6 +192,7 @@ namespace osu.Game.Tests.Rulesets.Scoring
         [TestCase(HitResult.SmallTickHit, false)]
         [TestCase(HitResult.LargeTickMiss, true)]
         [TestCase(HitResult.LargeTickHit, true)]
+        [TestCase(HitResult.SliderTailHit, true)]
         [TestCase(HitResult.SmallBonus, false)]
         [TestCase(HitResult.LargeBonus, false)]
         public void TestAffectsCombo(HitResult hitResult, bool expectedReturnValue)
@@ -207,6 +213,7 @@ namespace osu.Game.Tests.Rulesets.Scoring
         [TestCase(HitResult.SmallTickHit, true)]
         [TestCase(HitResult.LargeTickMiss, true)]
         [TestCase(HitResult.LargeTickHit, true)]
+        [TestCase(HitResult.SliderTailHit, true)]
         [TestCase(HitResult.SmallBonus, false)]
         [TestCase(HitResult.LargeBonus, false)]
         public void TestAffectsAccuracy(HitResult hitResult, bool expectedReturnValue)
@@ -227,6 +234,7 @@ namespace osu.Game.Tests.Rulesets.Scoring
         [TestCase(HitResult.SmallTickHit, false)]
         [TestCase(HitResult.LargeTickMiss, false)]
         [TestCase(HitResult.LargeTickHit, false)]
+        [TestCase(HitResult.SliderTailHit, false)]
         [TestCase(HitResult.SmallBonus, true)]
         [TestCase(HitResult.LargeBonus, true)]
         public void TestIsBonus(HitResult hitResult, bool expectedReturnValue)
@@ -247,6 +255,7 @@ namespace osu.Game.Tests.Rulesets.Scoring
         [TestCase(HitResult.SmallTickHit, true)]
         [TestCase(HitResult.LargeTickMiss, false)]
         [TestCase(HitResult.LargeTickHit, true)]
+        [TestCase(HitResult.SliderTailHit, true)]
         [TestCase(HitResult.SmallBonus, true)]
         [TestCase(HitResult.LargeBonus, true)]
         public void TestIsHit(HitResult hitResult, bool expectedReturnValue)
@@ -267,6 +276,7 @@ namespace osu.Game.Tests.Rulesets.Scoring
         [TestCase(HitResult.SmallTickHit, true)]
         [TestCase(HitResult.LargeTickMiss, true)]
         [TestCase(HitResult.LargeTickHit, true)]
+        [TestCase(HitResult.SliderTailHit, true)]
         [TestCase(HitResult.SmallBonus, true)]
         [TestCase(HitResult.LargeBonus, true)]
         public void TestIsScorable(HitResult hitResult, bool expectedReturnValue)
@@ -375,6 +385,42 @@ namespace osu.Game.Tests.Rulesets.Scoring
             scoreProcessor.ApplyResult(judgementResult);
 
             Assert.That(scoreProcessor.Accuracy.Value, Is.Not.EqualTo(1));
+        }
+
+        [Test]
+        public void TestNormalGrades()
+        {
+            scoreProcessor.ApplyBeatmap(new Beatmap());
+
+            Assert.That(scoreProcessor.Rank.Value, Is.EqualTo(ScoreRank.X));
+
+            scoreProcessor.Accuracy.Value = 0.99f;
+            Assert.That(scoreProcessor.Rank.Value, Is.EqualTo(ScoreRank.S));
+        }
+
+        [Test]
+        public void TestSilverGrades()
+        {
+            scoreProcessor.ApplyBeatmap(new Beatmap());
+            Assert.That(scoreProcessor.Rank.Value, Is.EqualTo(ScoreRank.X));
+
+            scoreProcessor.Mods.Value = new[] { new OsuModHidden() };
+            Assert.That(scoreProcessor.Rank.Value, Is.EqualTo(ScoreRank.XH));
+
+            scoreProcessor.Accuracy.Value = 0.99f;
+            Assert.That(scoreProcessor.Rank.Value, Is.EqualTo(ScoreRank.SH));
+        }
+
+        [Test]
+        public void TestSilverGradesModsAppliedFirst()
+        {
+            scoreProcessor.Mods.Value = new[] { new OsuModHidden() };
+            scoreProcessor.ApplyBeatmap(new Beatmap());
+
+            Assert.That(scoreProcessor.Rank.Value, Is.EqualTo(ScoreRank.XH));
+
+            scoreProcessor.Accuracy.Value = 0.99f;
+            Assert.That(scoreProcessor.Rank.Value, Is.EqualTo(ScoreRank.SH));
         }
 
         private class TestJudgement : Judgement

@@ -1,8 +1,6 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -10,7 +8,6 @@ using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
-using osu.Framework.Graphics.Pooling;
 using osu.Framework.Graphics.Primitives;
 using osu.Game.Graphics;
 using osu.Game.Rulesets.Objects.Drawables;
@@ -42,29 +39,29 @@ namespace osu.Game.Rulesets.Taiko.UI
 
         public Container UnderlayElements { get; private set; } = null!;
 
-        private Container<HitExplosion> hitExplosionContainer;
-        private Container<KiaiHitExplosion> kiaiExplosionContainer;
-        private JudgementContainer<DrawableTaikoJudgement> judgementContainer;
-        private ScrollingHitObjectContainer drumRollHitContainer;
-        internal Drawable HitTarget;
-        private SkinnableDrawable mascot;
+        private Container<HitExplosion> hitExplosionContainer = null!;
+        private Container<KiaiHitExplosion> kiaiExplosionContainer = null!;
+        private JudgementContainer<DrawableTaikoJudgement> judgementContainer = null!;
+        private ScrollingHitObjectContainer drumRollHitContainer = null!;
+        internal Drawable HitTarget = null!;
+        private SkinnableDrawable mascot = null!;
 
-        private readonly IDictionary<HitResult, DrawablePool<DrawableTaikoJudgement>> judgementPools = new Dictionary<HitResult, DrawablePool<DrawableTaikoJudgement>>();
+        private JudgementPooler<DrawableTaikoJudgement> judgementPooler = null!;
         private readonly IDictionary<HitResult, HitExplosionPool> explosionPools = new Dictionary<HitResult, HitExplosionPool>();
 
-        private ProxyContainer topLevelHitContainer;
-        private InputDrum inputDrum;
-        private Container rightArea;
+        private ProxyContainer topLevelHitContainer = null!;
+        private InputDrum inputDrum = null!;
+        private Container rightArea = null!;
 
         /// <remarks>
         /// <see cref="Playfield.AddNested"/> is purposefully not called on this to prevent i.e. being able to interact
         /// with bar lines in the editor.
         /// </remarks>
-        private BarLinePlayfield barLinePlayfield;
+        private BarLinePlayfield barLinePlayfield = null!;
 
-        private Container barLineContent;
-        private Container hitObjectContent;
-        private Container overlayContent;
+        private Container barLineContent = null!;
+        private Container hitObjectContent = null!;
+        private Container overlayContent = null!;
 
         [BackgroundDependencyLoader]
         private void load(OsuColour colours)
@@ -202,13 +199,12 @@ namespace osu.Game.Rulesets.Taiko.UI
 
             var hitWindows = new TaikoHitWindows();
 
-            foreach (var result in Enum.GetValues<HitResult>().Where(r => hitWindows.IsHitResultAllowed(r)))
-            {
-                judgementPools.Add(result, new DrawablePool<DrawableTaikoJudgement>(15));
-                explosionPools.Add(result, new HitExplosionPool(result));
-            }
+            HitResult[] usableHitResults = Enum.GetValues<HitResult>().Where(r => hitWindows.IsHitResultAllowed(r)).ToArray();
 
-            AddRangeInternal(judgementPools.Values);
+            AddInternal(judgementPooler = new JudgementPooler<DrawableTaikoJudgement>(usableHitResults));
+
+            foreach (var result in usableHitResults)
+                explosionPools.Add(result, new HitExplosionPool(result));
             AddRangeInternal(explosionPools.Values);
         }
 
@@ -339,7 +335,12 @@ namespace osu.Game.Rulesets.Taiko.UI
                     if (!result.Type.IsScorable())
                         break;
 
-                    judgementContainer.Add(judgementPools[result.Type].Get(j => j.Apply(result, judgedObject)));
+                    var judgement = judgementPooler.Get(result.Type, j => j.Apply(result, judgedObject));
+
+                    if (judgement == null)
+                        return;
+
+                    judgementContainer.Add(judgement);
 
                     var type = (judgedObject.HitObject as Hit)?.Type ?? HitType.Centre;
                     addExplosion(judgedObject, result.Type, type);

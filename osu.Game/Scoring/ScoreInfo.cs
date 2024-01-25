@@ -207,6 +207,7 @@ namespace osu.Game.Scoring
 
             clone.Statistics = new Dictionary<HitResult, int>(clone.Statistics);
             clone.MaximumStatistics = new Dictionary<HitResult, int>(clone.MaximumStatistics);
+            clone.HitEvents = new List<HitEvent>(clone.HitEvents);
 
             // Ensure we have fresh mods to avoid any references (ie. after gameplay).
             clone.clearAllMods();
@@ -349,6 +350,7 @@ namespace osu.Game.Scoring
                 {
                     case HitResult.SmallTickHit:
                     case HitResult.LargeTickHit:
+                    case HitResult.SliderTailHit:
                     case HitResult.LargeBonus:
                     case HitResult.SmallBonus:
                         if (MaximumStatistics.TryGetValue(r.result, out int count) && count > 0)

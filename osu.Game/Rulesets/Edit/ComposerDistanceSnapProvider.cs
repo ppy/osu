@@ -16,6 +16,7 @@ using osu.Framework.Input.Events;
 using osu.Framework.Localisation;
 using osu.Framework.Utils;
 using osu.Game.Configuration;
+using osu.Game.Graphics;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Input.Bindings;
 using osu.Game.Overlays;
@@ -169,7 +170,7 @@ namespace osu.Game.Rulesets.Edit
 
         public IEnumerable<TernaryButton> CreateTernaryButtons() => new[]
         {
-            new TernaryButton(DistanceSnapToggle, "Distance Snap", () => new SpriteIcon { Icon = FontAwesome.Solid.Ruler })
+            new TernaryButton(DistanceSnapToggle, "Distance Snap", () => new SpriteIcon { Icon = OsuIcon.EditorDistanceSnap })
         };
 
         protected override bool OnKeyDown(KeyDownEvent e)
