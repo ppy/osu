@@ -17,30 +17,24 @@ namespace osu.Game.Rulesets.Taiko.Skinning.Legacy
         {
             RelativeSizeAxes = Axes.Both;
 
-            InternalChild = new Container
+            InternalChildren = new Drawable[]
             {
-                RelativeSizeAxes = Axes.Both,
-                Anchor = Anchor.Centre,
-                Origin = Anchor.Centre,
-                Children = new Drawable[]
+                new Sprite
                 {
-                    new Sprite
-                    {
-                        Texture = skin.GetTexture("approachcircle"),
-                        Scale = new Vector2(0.83f),
-                        Alpha = 0.47f, // eyeballed to match stable
-                        Anchor = Anchor.Centre,
-                        Origin = Anchor.Centre,
-                    },
-                    new Sprite
-                    {
-                        Texture = skin.GetTexture("taikobigcircle"),
-                        Scale = new Vector2(0.8f),
-                        Alpha = 0.22f, // eyeballed to match stable
-                        Anchor = Anchor.Centre,
-                        Origin = Anchor.Centre,
-                    },
-                }
+                    Texture = skin.GetTexture("approachcircle"),
+                    Scale = new Vector2(0.83f),
+                    Alpha = 0.47f, // eyeballed to match stable
+                    Anchor = Anchor.Centre,
+                    Origin = Anchor.Centre,
+                },
+                new Sprite
+                {
+                    Texture = skin.GetTexture("taikobigcircle"),
+                    Scale = new Vector2(0.8f),
+                    Alpha = 0.22f, // eyeballed to match stable
+                    Anchor = Anchor.Centre,
+                    Origin = Anchor.Centre,
+                },
             };
         }
     }
