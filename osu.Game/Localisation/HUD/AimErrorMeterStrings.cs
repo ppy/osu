@@ -10,24 +10,24 @@ namespace osu.Game.Localisation.HUD
         private const string prefix = @"osu.Game.Resources.Localisation.HUD.AimErrorMeterStrings";
 
         /// <summary>
-        /// "Judgement position size"
+        /// "Hit position size"
         /// </summary>
-        public static LocalisableString JudgementSize => new TranslatableString(getKey(@"judgement_size"), "Judgement position size");
+        public static LocalisableString HitPositionSize => new TranslatableString(getKey(@"hit_position_size"), "Hit position size");
 
         /// <summary>
-        /// "How big of judgement position should be."
+        /// "How big of hit position should be."
         /// </summary>
-        public static LocalisableString JudgementSizeDescription => new TranslatableString(getKey("judgement_size_description"), "How big of judgement position should be.");
+        public static LocalisableString HitPositionSizeDescription => new TranslatableString(getKey("hit_point_size_description"), "How big of hit position should be.");
 
         /// <summary>
-        /// "Judgement position style"
+        /// "Hit position style"
         /// </summary>
-        public static LocalisableString JudgementStyle => new TranslatableString(getKey(@"judgement_style"), "Judgement position style");
+        public static LocalisableString HitPositionStyle => new TranslatableString(getKey(@"hit_position_style"), "Hit position style");
 
         /// <summary>
-        /// "The style of judgement position."
+        /// "The style of hit position."
         /// </summary>
-        public static LocalisableString JudgementStyleDescription => new TranslatableString(getKey("judgement_style_description"), "The style of judgement position.");
+        public static LocalisableString HitPositionStyleDescription => new TranslatableString(getKey("hit_position_style_description"), "The style of hit position.");
 
         /// <summary>
         /// "Average position size"
@@ -50,6 +50,16 @@ namespace osu.Game.Localisation.HUD
         public static LocalisableString AverageStyleDescription => new TranslatableString(getKey("average_style_description"), "The style of average position.");
 
         /// <summary>
+        /// "Position mapping"
+        /// </summary>
+        public static LocalisableString PositionStyle => new TranslatableString(getKey("position_style"), "Position mapping");
+
+        /// <summary>
+        /// "Should hit point relative of last object"
+        /// </summary>
+        public static LocalisableString PositionStyleDescription => new TranslatableString(getKey("position_style_description"), "Should hit point relative of last object");
+
+        /// <summary>
         /// "X"
         /// </summary>
         public static LocalisableString StyleX => new TranslatableString(getKey("style_x"), "X");
@@ -58,6 +68,16 @@ namespace osu.Game.Localisation.HUD
         /// "+"
         /// </summary>
         public static LocalisableString StylePlus => new TranslatableString(getKey("style_plus"), "+");
+
+        /// <summary>
+        /// "Absolute"
+        /// </summary>
+        public static LocalisableString Absolute => new TranslatableString(getKey("absolute"), "Absolute");
+
+        /// <summary>
+        /// "Relative"
+        /// </summary>
+        public static LocalisableString Relative => new TranslatableString(getKey("relative"), "Relative");
 
         private static string getKey(string key) => $"{prefix}:{key}";
     }

@@ -29,16 +29,16 @@ namespace osu.Game.Rulesets.Osu.HUD
     [Cached]
     public partial class AimErrorMeter : HitErrorMeter
     {
-        [SettingSource(typeof(AimErrorMeterStrings), nameof(AimErrorMeterStrings.JudgementSize), nameof(AimErrorMeterStrings.JudgementSizeDescription))]
-        public BindableNumber<float> JudgementSize { get; } = new BindableNumber<float>(7f)
+        [SettingSource(typeof(AimErrorMeterStrings), nameof(AimErrorMeterStrings.HitPositionSize), nameof(AimErrorMeterStrings.HitPositionSizeDescription))]
+        public BindableNumber<float> HitPositionSize { get; } = new BindableNumber<float>(7f)
         {
             MinValue = 0f,
             MaxValue = 12f,
             Precision = 1f
         };
 
-        [SettingSource(typeof(AimErrorMeterStrings), nameof(AimErrorMeterStrings.JudgementStyle), nameof(AimErrorMeterStrings.JudgementStyleDescription))]
-        public Bindable<HitStyle> JudgementStyle { get; } = new Bindable<HitStyle>();
+        [SettingSource(typeof(AimErrorMeterStrings), nameof(AimErrorMeterStrings.HitPositionStyle), nameof(AimErrorMeterStrings.HitPositionStyleDescription))]
+        public Bindable<HitStyle> HitPositionStyle { get; } = new Bindable<HitStyle>();
 
         [SettingSource(typeof(AimErrorMeterStrings), nameof(AimErrorMeterStrings.AverageSize), nameof(AimErrorMeterStrings.AverageSizeDescription))]
         public BindableNumber<float> AverageSize { get; } = new BindableNumber<float>(12f)
@@ -51,8 +51,8 @@ namespace osu.Game.Rulesets.Osu.HUD
         [SettingSource(typeof(AimErrorMeterStrings), nameof(AimErrorMeterStrings.AverageStyle), nameof(AimErrorMeterStrings.AverageStyleDescription))]
         public Bindable<HitStyle> AverageStyle { get; } = new Bindable<HitStyle>(HitStyle.Plus);
 
-        [SettingSource("Position Style")]
-        public Bindable<PositionStyle> HitPositionStyle { get; } = new Bindable<PositionStyle>();
+        [SettingSource(typeof(AimErrorMeterStrings), nameof(AimErrorMeterStrings.PositionStyle), nameof(AimErrorMeterStrings.PositionStyleDescription))]
+        public Bindable<MappingStyle> PositionMappingStyle { get; } = new Bindable<MappingStyle>();
 
         [Resolved]
         private ScoreProcessor scoreProcessor { get; set; } = null!;
@@ -61,8 +61,8 @@ namespace osu.Game.Rulesets.Osu.HUD
         private Container averagePositionRotateContainer = null!;
         private Vector2 averagePosition;
 
-        private readonly DrawablePool<HitPosition> hitPositionPool = new DrawablePool<HitPosition>(20);
-        private Container hitPositionsContainer = null!;
+        private readonly DrawablePool<HitPosition> hitPositionPool = new DrawablePool<HitPosition>(30);
+        private Container hitPositionContainer = null!;
 
         private Container arrowBackgroundContainer = null!;
         private UprightAspectMaintainingContainer rotateFixedContainer = null!;
@@ -220,7 +220,7 @@ namespace osu.Game.Rulesets.Osu.HUD
                         Origin = Anchor.Centre,
                         Children = new Drawable[]
                         {
-                            hitPositionsContainer = new Container
+                            hitPositionContainer = new Container
                             {
                                 RelativeSizeAxes = Axes.Both,
                                 Anchor = Anchor.Centre,
@@ -266,15 +266,15 @@ namespace osu.Game.Rulesets.Osu.HUD
             AverageSize.BindValueChanged(size => averagePositionContainer.Size = new Vector2(size.NewValue), true);
             AverageStyle.BindValueChanged(style => averagePositionRotateContainer.Rotation = style.NewValue == HitStyle.Plus ? 0 : 45, true);
 
-            HitPositionStyle.BindValueChanged(s =>
+            PositionMappingStyle.BindValueChanged(s =>
             {
-                foreach (var hit in hitPositionsContainer)
+                foreach (var hit in hitPositionContainer)
                 {
                     hit.FadeOut(300).Expire();
                     averagePositionContainer.MoveTo(averagePosition = Vector2.Zero, 800, Easing.OutQuint);
                 }
 
-                if (s.NewValue == PositionStyle.Relative)
+                if (s.NewValue == MappingStyle.Relative)
                 {
                     arrowBackgroundContainer.FadeIn(100);
                     rotateFixedContainer.Remove(mainContainer, false);
@@ -295,12 +295,12 @@ namespace osu.Game.Rulesets.Osu.HUD
 
             if (circleJudgement.CursorPositionAtHit == null) return;
 
-            if (hitPositionsContainer.Count > max_concurrent_judgements)
+            if (hitPositionContainer.Count > max_concurrent_judgements)
             {
                 const double quick_fade_time = 300;
 
                 // check with a bit of lenience to avoid precision error in comparison.
-                var old = hitPositionsContainer.FirstOrDefault(j => j.LifetimeEnd > Clock.CurrentTime + quick_fade_time * 1.1);
+                var old = hitPositionContainer.FirstOrDefault(j => j.LifetimeEnd > Clock.CurrentTime + quick_fade_time * 1.1);
 
                 if (old != null)
                 {
@@ -311,7 +311,7 @@ namespace osu.Game.Rulesets.Osu.HUD
 
             Vector2 hitPosition;
 
-            if (HitPositionStyle.Value == PositionStyle.Relative && scoreProcessor.HitEvents.LastOrDefault().LastHitObject != null)
+            if (PositionMappingStyle.Value == MappingStyle.Relative && scoreProcessor.HitEvents.LastOrDefault().LastHitObject != null)
             {
                 var currentHitEvent = scoreProcessor.HitEvents.Last();
 
@@ -329,7 +329,7 @@ namespace osu.Game.Rulesets.Osu.HUD
                 drawableHit.Y = hitPosition.Y;
                 drawableHit.Colour = getColourForPosition(hitPosition);
 
-                hitPositionsContainer.Add(drawableHit);
+                hitPositionContainer.Add(drawableHit);
             });
 
             averagePositionContainer.MoveTo(averagePosition = (hitPosition + averagePosition) / 2, 800, Easing.OutQuint);
@@ -380,7 +380,7 @@ namespace osu.Game.Rulesets.Osu.HUD
         {
             averagePositionContainer.MoveTo(averagePosition = Vector2.Zero, 800, Easing.OutQuint);
 
-            foreach (var h in hitPositionsContainer)
+            foreach (var h in hitPositionContainer)
             {
                 h.ClearTransforms();
                 h.Expire();
@@ -392,9 +392,9 @@ namespace osu.Game.Rulesets.Osu.HUD
             [Resolved]
             private AimErrorMeter aimErrorMeter { get; set; } = null!;
 
-            public readonly BindableNumber<float> JudgementSize = new BindableFloat();
+            public readonly BindableNumber<float> HitPointSize = new BindableFloat();
 
-            public readonly Bindable<HitStyle> JudgementStyle = new Bindable<HitStyle>();
+            public readonly Bindable<HitStyle> HitPointStyle = new Bindable<HitStyle>();
 
             private readonly Container content;
 
@@ -442,10 +442,10 @@ namespace osu.Game.Rulesets.Osu.HUD
             {
                 base.LoadComplete();
 
-                JudgementSize.BindTo(aimErrorMeter.JudgementSize);
-                JudgementSize.BindValueChanged(size => Size = new Vector2(size.NewValue), true);
-                JudgementStyle.BindTo(aimErrorMeter.JudgementStyle);
-                JudgementStyle.BindValueChanged(style => content.Rotation = style.NewValue == HitStyle.X ? 0 : 45, true);
+                HitPointSize.BindTo(aimErrorMeter.HitPositionSize);
+                HitPointSize.BindValueChanged(size => Size = new Vector2(size.NewValue), true);
+                HitPointStyle.BindTo(aimErrorMeter.HitPositionStyle);
+                HitPointStyle.BindValueChanged(style => content.Rotation = style.NewValue == HitStyle.X ? 0 : 45, true);
             }
 
             protected override void PrepareForUse()
@@ -458,7 +458,7 @@ namespace osu.Game.Rulesets.Osu.HUD
                 this
                     .ResizeTo(new Vector2(0))
                     .FadeInFromZero(judgement_fade_in_duration, Easing.OutQuint)
-                    .ResizeTo(new Vector2(JudgementSize.Value), judgement_fade_in_duration, Easing.OutQuint)
+                    .ResizeTo(new Vector2(HitPointSize.Value), judgement_fade_in_duration, Easing.OutQuint)
                     .Then()
                     .FadeOut(judgement_fade_out_duration)
                     .Expire();
@@ -471,12 +471,15 @@ namespace osu.Game.Rulesets.Osu.HUD
             X,
 
             [LocalisableDescription(typeof(AimErrorMeterStrings), nameof(AimErrorMeterStrings.StylePlus))]
-            Plus
+            Plus,
         }
 
-        public enum PositionStyle
+        public enum MappingStyle
         {
+            [LocalisableDescription(typeof(AimErrorMeterStrings), nameof(AimErrorMeterStrings.Absolute))]
             Absolute,
+
+            [LocalisableDescription(typeof(AimErrorMeterStrings), nameof(AimErrorMeterStrings.Relative))]
             Relative,
         }
     }
