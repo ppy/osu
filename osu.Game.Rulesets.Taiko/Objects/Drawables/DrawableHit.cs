@@ -37,6 +37,8 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
 
         private double? lastPressHandleTime;
 
+        private HitResult hitResult;
+
         private readonly Bindable<HitType> type = new Bindable<HitType>();
 
         public DrawableHit()
@@ -99,18 +101,24 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
             if (!userTriggered)
             {
                 if (!HitObject.HitWindows.CanBeHit(timeOffset))
-                    ApplyResult(static r => r.Type = r.Judgement.MinResult);
+                    ApplyResult(static (r, _) => r.Type = r.Judgement.MinResult);
                 return;
             }
 
-            var result = HitObject.HitWindows.ResultFor(timeOffset);
-            if (result == HitResult.None)
+            hitResult = HitObject.HitWindows.ResultFor(timeOffset);
+            if (hitResult == HitResult.None)
                 return;
 
             if (!validActionPressed)
-                ApplyResult(static r => r.Type = r.Judgement.MinResult);
+                ApplyResult(static (r, _) => r.Type = r.Judgement.MinResult);
             else
-                ApplyResult(static (r, result) => r.Type = result, result);
+            {
+                ApplyResult(static (r, hitObject) =>
+                {
+                    var drawableHit = (DrawableHit)hitObject;
+                    r.Type = drawableHit.hitResult;
+                });
+            }
         }
 
         public override bool OnPressed(KeyBindingPressEvent<TaikoAction> e)
@@ -209,19 +217,19 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
 
                 if (!ParentHitObject.Result.IsHit)
                 {
-                    ApplyResult(static r => r.Type = r.Judgement.MinResult);
+                    ApplyResult(static (r, _) => r.Type = r.Judgement.MinResult);
                     return;
                 }
 
                 if (!userTriggered)
                 {
                     if (timeOffset - ParentHitObject.Result.TimeOffset > SECOND_HIT_WINDOW)
-                        ApplyResult(static r => r.Type = r.Judgement.MinResult);
+                        ApplyResult(static (r, _) => r.Type = r.Judgement.MinResult);
                     return;
                 }
 
                 if (Math.Abs(timeOffset - ParentHitObject.Result.TimeOffset) <= SECOND_HIT_WINDOW)
-                    ApplyResult(static r => r.Type = r.Judgement.MaxResult);
+                    ApplyResult(static (r, _) => r.Type = r.Judgement.MaxResult);
             }
 
             public override bool OnPressed(KeyBindingPressEvent<TaikoAction> e)

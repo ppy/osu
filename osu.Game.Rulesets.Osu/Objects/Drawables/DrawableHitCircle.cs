@@ -44,6 +44,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
 
         private Container scaleContainer;
         private InputManager inputManager;
+        private HitResult hitResult;
 
         public DrawableHitCircle()
             : this(null)
@@ -155,34 +156,34 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
             if (!userTriggered)
             {
                 if (!HitObject.HitWindows.CanBeHit(timeOffset))
-                    ApplyResult(static r => r.Type = r.Judgement.MinResult);
+                    ApplyResult(static (r, _) => r.Type = r.Judgement.MinResult);
 
                 return;
             }
 
-            var result = ResultFor(timeOffset);
-            var clickAction = CheckHittable?.Invoke(this, Time.Current, result);
+            hitResult = ResultFor(timeOffset);
+            var clickAction = CheckHittable?.Invoke(this, Time.Current, hitResult);
 
             if (clickAction == ClickAction.Shake)
                 Shake();
 
-            if (result == HitResult.None || clickAction != ClickAction.Hit)
+            if (hitResult == HitResult.None || clickAction != ClickAction.Hit)
                 return;
 
-            ApplyResult(static (r, state) =>
+            ApplyResult(static (r, hitObject) =>
             {
-                var (hitCircle, hitResult) = state;
+                var hitCircle = (DrawableHitCircle)hitObject;
                 var circleResult = (OsuHitCircleJudgementResult)r;
 
                 // Todo: This should also consider misses, but they're a little more interesting to handle, since we don't necessarily know the position at the time of a miss.
-                if (hitResult.IsHit())
+                if (hitCircle.hitResult.IsHit())
                 {
                     var localMousePosition = hitCircle.ToLocalSpace(hitCircle.inputManager.CurrentState.Mouse.Position);
                     circleResult.CursorPositionAtHit = hitCircle.HitObject.StackedPosition + (localMousePosition - hitCircle.DrawSize / 2);
                 }
 
-                circleResult.Type = hitResult;
-            }, (this, result));
+                circleResult.Type = hitCircle.hitResult;
+            });
         }
 
         /// <summary>

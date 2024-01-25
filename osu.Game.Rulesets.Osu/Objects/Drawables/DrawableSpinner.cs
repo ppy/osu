@@ -258,8 +258,9 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
             foreach (var tick in ticks.Where(t => !t.Result.HasResult))
                 tick.TriggerResult(false);
 
-            ApplyResult(static (r, spinner) =>
+            ApplyResult(static (r, hitObject) =>
             {
+                var spinner = (DrawableSpinner)hitObject;
                 if (spinner.Progress >= 1)
                     r.Type = HitResult.Great;
                 else if (spinner.Progress > .9)
@@ -268,7 +269,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
                     r.Type = HitResult.Meh;
                 else if (spinner.Time.Current >= spinner.HitObject.EndTime)
                     r.Type = r.Judgement.MinResult;
-            }, this);
+            });
         }
 
         protected override void Update()
