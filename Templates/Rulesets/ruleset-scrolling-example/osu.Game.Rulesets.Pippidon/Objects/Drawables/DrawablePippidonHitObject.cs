@@ -50,10 +50,11 @@ namespace osu.Game.Rulesets.Pippidon.Objects.Drawables
         {
             if (timeOffset >= 0)
             {
-                ApplyResult(static (r, pippidonHitObject) =>
+                ApplyResult(static (r, hitObject) =>
                 {
+                    var pippidonHitObject = (DrawablePippidonHitObject)hitObject;
                     r.Type = pippidonHitObject.currentLane.Value == pippidonHitObject.HitObject.Lane ? HitResult.Perfect : HitResult.Miss;
-                }, this);
+                });
             }
         }
 

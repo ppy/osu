@@ -50,10 +50,10 @@ namespace osu.Game.Rulesets.Pippidon.Objects.Drawables
         {
             if (timeOffset >= 0)
             {
-                ApplyResult(static (r, isHovered) =>
+                ApplyResult(static (r, hitObject) =>
                 {
-                    r.Type = isHovered ? HitResult.Perfect : HitResult.Miss;
-                }, IsHovered);
+                    r.Type = hitObject.IsHovered ? HitResult.Perfect : HitResult.Miss;
+                });
             }
         }
 

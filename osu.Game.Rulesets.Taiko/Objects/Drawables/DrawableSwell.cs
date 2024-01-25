@@ -41,6 +41,8 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
 
         private double? lastPressHandleTime;
 
+        private int numHits;
+
         public override bool DisplayResult => false;
 
         public DrawableSwell()
@@ -192,7 +194,7 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
 
                 nextTick?.TriggerResult(true);
 
-                int numHits = ticks.Count(r => r.IsHit);
+                numHits = ticks.Count(r => r.IsHit);
 
                 float completion = (float)numHits / HitObject.RequiredHits;
 
@@ -206,14 +208,14 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
                 expandingRing.ScaleTo(1f + Math.Min(target_ring_scale - 1f, (target_ring_scale - 1f) * completion * 1.3f), 260, Easing.OutQuint);
 
                 if (numHits == HitObject.RequiredHits)
-                    ApplyResult(static r => r.Type = r.Judgement.MaxResult);
+                    ApplyResult(static (r, _) => r.Type = r.Judgement.MaxResult);
             }
             else
             {
                 if (timeOffset < 0)
                     return;
 
-                int numHits = 0;
+                numHits = 0;
 
                 foreach (var tick in ticks)
                 {
@@ -227,11 +229,11 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
                         tick.TriggerResult(false);
                 }
 
-                ApplyResult(static (r, state) =>
+                ApplyResult(static (r, hitObject) =>
                 {
-                    var (numHits, hitObject) = state;
-                    r.Type = numHits == hitObject.RequiredHits ? r.Judgement.MaxResult : r.Judgement.MinResult;
-                }, (numHits, HitObject));
+                    var swell = (DrawableSwell)hitObject;
+                    r.Type = swell.numHits == swell.HitObject.RequiredHits ? r.Judgement.MaxResult : r.Judgement.MinResult;
+                });
             }
         }
 

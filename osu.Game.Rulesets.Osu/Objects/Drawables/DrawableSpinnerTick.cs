@@ -11,6 +11,8 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
     {
         public override bool DisplayResult => false;
 
+        private bool hit;
+
         public DrawableSpinnerTick()
             : this(null)
         {
@@ -35,6 +37,14 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
         /// Apply a judgement result.
         /// </summary>
         /// <param name="hit">Whether this tick was reached.</param>
-        internal void TriggerResult(bool hit) => ApplyResult(static (r, hit) => r.Type = hit ? r.Judgement.MaxResult : r.Judgement.MinResult, hit);
+        internal void TriggerResult(bool hit)
+        {
+            this.hit = hit;
+            ApplyResult(static (r, hitObject) =>
+            {
+                var spinnerTick = (DrawableSpinnerTick)hitObject;
+                r.Type = spinnerTick.hit ? r.Judgement.MaxResult : r.Judgement.MinResult;
+            });
+        }
     }
 }
