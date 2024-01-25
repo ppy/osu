@@ -13,6 +13,7 @@ using osu.Framework.Layout;
 using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Objects.Drawables;
 using osu.Game.Rulesets.Objects.Types;
+using osu.Game.Rulesets.UI.Scrolling.Algorithms;
 using osuTK;
 
 namespace osu.Game.Rulesets.UI.Scrolling
@@ -21,6 +22,7 @@ namespace osu.Game.Rulesets.UI.Scrolling
     {
         private readonly IBindable<double> timeRange = new BindableDouble();
         private readonly IBindable<ScrollingDirection> direction = new Bindable<ScrollingDirection>();
+        private readonly IBindable<IScrollAlgorithm> algorithm = new Bindable<IScrollAlgorithm>();
 
         /// <summary>
         /// Whether the scrolling direction is horizontal or vertical.
@@ -59,9 +61,11 @@ namespace osu.Game.Rulesets.UI.Scrolling
         {
             direction.BindTo(scrollingInfo.Direction);
             timeRange.BindTo(scrollingInfo.TimeRange);
+            algorithm.BindTo(scrollingInfo.Algorithm);
 
             direction.ValueChanged += _ => layoutCache.Invalidate();
             timeRange.ValueChanged += _ => layoutCache.Invalidate();
+            algorithm.ValueChanged += _ => layoutCache.Invalidate();
         }
 
         /// <summary>
@@ -73,7 +77,7 @@ namespace osu.Game.Rulesets.UI.Scrolling
         public double TimeAtPosition(float localPosition, double currentTime)
         {
             float scrollPosition = axisInverted ? -localPosition : localPosition;
-            return scrollingInfo.Algorithm.TimeAt(scrollPosition, currentTime, timeRange.Value, scrollLength);
+            return algorithm.Value.TimeAt(scrollPosition, currentTime, timeRange.Value, scrollLength);
         }
 
         /// <summary>
@@ -95,7 +99,7 @@ namespace osu.Game.Rulesets.UI.Scrolling
         /// </summary>
         public float PositionAtTime(double time, double currentTime, double? originTime = null)
         {
-            float scrollPosition = scrollingInfo.Algorithm.PositionAt(time, currentTime, timeRange.Value, scrollLength, originTime);
+            float scrollPosition = algorithm.Value.PositionAt(time, currentTime, timeRange.Value, scrollLength, originTime);
             return axisInverted ? -scrollPosition : scrollPosition;
         }
 
@@ -122,7 +126,7 @@ namespace osu.Game.Rulesets.UI.Scrolling
         /// </summary>
         public float LengthAtTime(double startTime, double endTime)
         {
-            return scrollingInfo.Algorithm.GetLength(startTime, endTime, timeRange.Value, scrollLength);
+            return algorithm.Value.GetLength(startTime, endTime, timeRange.Value, scrollLength);
         }
 
         private float scrollLength => scrollingAxis == Direction.Horizontal ? DrawWidth : DrawHeight;
@@ -169,7 +173,7 @@ namespace osu.Game.Rulesets.UI.Scrolling
             foreach (var entry in Entries)
                 setComputedLifetimeStart(entry);
 
-            scrollingInfo.Algorithm.Reset();
+            algorithm.Value.Reset();
 
             layoutCache.Validate();
         }
@@ -224,7 +228,7 @@ namespace osu.Game.Rulesets.UI.Scrolling
                     break;
             }
 
-            return scrollingInfo.Algorithm.GetDisplayStartTime(entry.HitObject.StartTime, startOffset, timeRange.Value, scrollLength);
+            return algorithm.Value.GetDisplayStartTime(entry.HitObject.StartTime, startOffset, timeRange.Value, scrollLength);
         }
 
         private void setComputedLifetimeStart(HitObjectLifetimeEntry entry)

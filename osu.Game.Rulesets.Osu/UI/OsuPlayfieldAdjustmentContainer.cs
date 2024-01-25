@@ -60,12 +60,12 @@ namespace osu.Game.Rulesets.Osu.UI
                 // game_size = DrawSizePreservingFillContainer.TargetSize = new Vector2(1024, 768)
                 //
                 // Parent is a 4:3 aspect enforced, using height as the constricting dimension
-                // Parent.ChildSize.X = min(game_size.X, game_size.Y * (4 / 3)) * playfield_size_adjust
-                // Parent.ChildSize.X = 819.2
+                // Parent!.ChildSize.X = min(game_size.X, game_size.Y * (4 / 3)) * playfield_size_adjust
+                // Parent!.ChildSize.X = 819.2
                 //
                 // Scale = 819.2 / 512
                 // Scale = 1.6
-                Scale = new Vector2(Parent.ChildSize.X / OsuPlayfield.BASE_SIZE.X);
+                Scale = new Vector2(Parent!.ChildSize.X / OsuPlayfield.BASE_SIZE.X);
                 Position = new Vector2(0, (PlayfieldShift ? 8f : 0f) * Scale.X);
                 // Size = 0.625
                 Size = Vector2.Divide(Vector2.One, Scale);

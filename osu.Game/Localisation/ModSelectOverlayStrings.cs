@@ -44,6 +44,11 @@ namespace osu.Game.Localisation
         /// </summary>
         public static LocalisableString TabToSearch => new TranslatableString(getKey(@"tab_to_search"), @"tab to search...");
 
+        /// <summary>
+        /// "Score Multiplier"
+        /// </summary>
+        public static LocalisableString ScoreMultiplier => new TranslatableString(getKey(@"score_multiplier"), @"Score Multiplier");
+
         private static string getKey(string key) => $@"{prefix}:{key}";
     }
 }

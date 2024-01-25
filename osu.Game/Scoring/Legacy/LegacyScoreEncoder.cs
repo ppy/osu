@@ -13,6 +13,7 @@ using osu.Game.Extensions;
 using osu.Game.IO.Legacy;
 using osu.Game.IO.Serialization;
 using osu.Game.Replays.Legacy;
+using osu.Game.Rulesets.Objects.Legacy;
 using osu.Game.Rulesets.Replays;
 using osu.Game.Rulesets.Replays.Types;
 using SharpCompress.Compressors.LZMA;
@@ -30,9 +31,22 @@ namespace osu.Game.Scoring.Legacy
         /// <item><description>30000001: Appends <see cref="LegacyReplaySoloScoreInfo"/> to the end of scores.</description></item>
         /// <item><description>30000002: Score stored to replay calculated using the Score V2 algorithm. Legacy scores on this version are candidate to Score V1 -> V2 conversion.</description></item>
         /// <item><description>30000003: First version after converting legacy total score to standardised.</description></item>
+        /// <item><description>30000004: Fixed mod multipliers during legacy score conversion. Reconvert all scores.</description></item>
+        /// <item><description>30000005: Introduce combo exponent in the osu! gamemode. Reconvert all scores.</description></item>
+        /// <item><description>30000006: Fix edge cases in conversion after combo exponent introduction that lead to NaNs. Reconvert all scores.</description></item>
+        /// <item><description>30000007: Adjust osu!mania combo and accuracy portions and judgement scoring values. Reconvert all scores.</description></item>
+        /// <item><description>30000008: Add accuracy conversion. Reconvert all scores.</description></item>
+        /// <item><description>30000009: Fix edge cases in conversion for scores which have 0.0x mod multiplier on stable. Reconvert all scores.</description></item>
+        /// <item><description>30000010: Fix mania score V1 conversion using score V1 accuracy rather than V2 accuracy. Reconvert all scores.</description></item>
+        /// <item><description>30000011: Re-do catch scoring to mirror stable Score V2 as closely as feasible. Reconvert all scores.</description></item>
+        /// <item><description>
+        /// 30000012: Fix incorrect total score conversion on selected beatmaps after implementing the more correct
+        /// <see cref="LegacyRulesetExtensions.CalculateDifficultyPeppyStars"/> method. Reconvert all scores.
+        /// </description></item>
+        /// <item><description>30000013: All local scores will use lazer definitions of ranks for consistency. Recalculates the rank of all scores.</description></item>
         /// </list>
         /// </remarks>
-        public const int LATEST_VERSION = 30000003;
+        public const int LATEST_VERSION = 30000013;
 
         /// <summary>
         /// The first stable-compatible YYYYMMDD format version given to lazer usage of replays.
@@ -83,7 +97,7 @@ namespace osu.Game.Scoring.Legacy
                 sw.Write(getHpGraphFormatted());
                 sw.Write(score.ScoreInfo.Date.DateTime);
                 sw.WriteByteArray(createReplayData());
-                sw.Write((long)0);
+                sw.Write(score.ScoreInfo.LegacyOnlineID);
                 writeModSpecificData(score.ScoreInfo, sw);
                 sw.WriteByteArray(createScoreInfoData());
             }

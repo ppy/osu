@@ -32,6 +32,9 @@ namespace osu.Game.Screens.Select.Options
 
         public override bool BlockScreenWideMouse => false;
 
+        protected override string PopInSampleName => "SongSelect/options-pop-in";
+        protected override string PopOutSampleName => "SongSelect/options-pop-out";
+
         public BeatmapOptionsOverlay()
         {
             AutoSizeAxes = Axes.Y;

@@ -24,6 +24,7 @@ namespace osu.Game.Graphics.Containers
         private Sample samplePopOut;
         protected virtual string PopInSampleName => "UI/overlay-pop-in";
         protected virtual string PopOutSampleName => "UI/overlay-pop-out";
+        protected virtual double PopInOutSampleBalance => 0;
 
         protected override bool BlockNonPositionalInput => true;
 
@@ -133,15 +134,21 @@ namespace osu.Game.Graphics.Containers
                         return;
                     }
 
-                    if (didChange)
-                        samplePopIn?.Play();
+                    if (didChange && samplePopIn != null)
+                    {
+                        samplePopIn.Balance.Value = PopInOutSampleBalance;
+                        samplePopIn.Play();
+                    }
 
                     if (BlockScreenWideMouse && DimMainContent) overlayManager?.ShowBlockingOverlay(this);
                     break;
 
                 case Visibility.Hidden:
-                    if (didChange)
-                        samplePopOut?.Play();
+                    if (didChange && samplePopOut != null)
+                    {
+                        samplePopOut.Balance.Value = PopInOutSampleBalance;
+                        samplePopOut.Play();
+                    }
 
                     if (BlockScreenWideMouse) overlayManager?.HideBlockingOverlay(this);
                     break;

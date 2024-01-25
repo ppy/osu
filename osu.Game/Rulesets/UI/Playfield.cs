@@ -23,6 +23,7 @@ using osu.Game.Skinning;
 using osuTK;
 using osu.Game.Rulesets.Objects.Pooling;
 using osu.Framework.Extensions.ObjectExtensions;
+using osu.Framework.Graphics.Primitives;
 
 namespace osu.Game.Rulesets.UI
 {
@@ -93,6 +94,16 @@ namespace osu.Game.Rulesets.UI
         /// Whether judgements should be displayed by this and and all nested <see cref="Playfield"/>s.
         /// </summary>
         public readonly BindableBool DisplayJudgements = new BindableBool(true);
+
+        /// <summary>
+        /// A screen space draw quad which resembles the edges of the playfield for skinning purposes.
+        /// This will allow users / components to snap objects to the "edge" of the playfield.
+        /// </summary>
+        /// <remarks>
+        /// Rulesets which reduce the visible area further than the full relative playfield space itself
+        /// should retarget this to the ScreenSpaceDrawQuad of the appropriate container.
+        /// </remarks>
+        public virtual Quad SkinnableComponentScreenSpaceDrawQuad => ScreenSpaceDrawQuad;
 
         [Resolved(CanBeNull = true)]
         [CanBeNull]

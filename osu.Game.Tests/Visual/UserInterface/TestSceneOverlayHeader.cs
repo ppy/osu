@@ -7,6 +7,7 @@ using osu.Framework.Graphics;
 using osu.Game.Graphics.Sprites;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics.Shapes;
+using osu.Game.Graphics;
 using osuTK.Graphics;
 
 namespace osu.Game.Tests.Visual.UserInterface
@@ -153,7 +154,7 @@ namespace osu.Game.Tests.Visual.UserInterface
             public TestTitle()
             {
                 Title = "title";
-                IconTexture = "Icons/changelog";
+                Icon = OsuIcon.ChangelogB;
             }
         }
     }

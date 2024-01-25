@@ -3,7 +3,6 @@
 
 #nullable disable
 
-using System;
 using System.Collections.Generic;
 using System.Linq;
 using osu.Framework.Allocation;
@@ -14,19 +13,20 @@ using osu.Framework.Graphics;
 using osu.Framework.Input;
 using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.ControlPoints;
-using osu.Game.Configuration;
 using osu.Game.Input.Handlers;
 using osu.Game.Replays;
 using osu.Game.Rulesets.Mania.Beatmaps;
 using osu.Game.Rulesets.Mania.Configuration;
 using osu.Game.Rulesets.Mania.Objects;
 using osu.Game.Rulesets.Mania.Replays;
+using osu.Game.Rulesets.Mania.Skinning;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Objects.Drawables;
 using osu.Game.Rulesets.UI;
 using osu.Game.Rulesets.UI.Scrolling;
 using osu.Game.Scoring;
+using osu.Game.Skinning;
 
 namespace osu.Game.Rulesets.Mania.UI
 {
@@ -52,28 +52,15 @@ namespace osu.Game.Rulesets.Mania.UI
 
         protected new ManiaRulesetConfigManager Config => (ManiaRulesetConfigManager)base.Config;
 
-        public ScrollVisualisationMethod ScrollMethod
-        {
-            get => scrollMethod;
-            set
-            {
-                if (IsLoaded)
-                    throw new InvalidOperationException($"Can't alter {nameof(ScrollMethod)} after ruleset is already loaded");
-
-                scrollMethod = value;
-            }
-        }
-
-        private ScrollVisualisationMethod scrollMethod = ScrollVisualisationMethod.Sequential;
-
-        protected override ScrollVisualisationMethod VisualisationMethod => scrollMethod;
-
         private readonly Bindable<ManiaScrollingDirection> configDirection = new Bindable<ManiaScrollingDirection>();
         private readonly BindableInt configScrollSpeed = new BindableInt();
         private double smoothTimeRange;
 
         // Stores the current speed adjustment active in gameplay.
         private readonly Track speedAdjustmentTrack = new TrackVirtual(0);
+
+        [Resolved]
+        private ISkinSource skin { get; set; }
 
         public DrawableManiaRuleset(Ruleset ruleset, IBeatmap beatmap, IReadOnlyList<Mod> mods = null)
             : base(ruleset, beatmap, mods)
@@ -122,7 +109,20 @@ namespace osu.Game.Rulesets.Mania.UI
             updateTimeRange();
         }
 
-        private void updateTimeRange() => TimeRange.Value = smoothTimeRange * speedAdjustmentTrack.AggregateTempo.Value * speedAdjustmentTrack.AggregateFrequency.Value;
+        private void updateTimeRange()
+        {
+            float hitPosition = skin.GetConfig<ManiaSkinConfigurationLookup, float>(
+                                    new ManiaSkinConfigurationLookup(LegacyManiaSkinConfigurationLookups.HitPosition))?.Value
+                                ?? Stage.HIT_TARGET_POSITION;
+
+            const float length_to_default_hit_position = 768 - LegacyManiaSkinConfiguration.DEFAULT_HIT_POSITION;
+            float lengthToHitPosition = 768 - hitPosition;
+
+            // This scaling factor preserves the scroll speed as the scroll length varies from changes to the hit position.
+            float scale = lengthToHitPosition / length_to_default_hit_position;
+
+            TimeRange.Value = smoothTimeRange * speedAdjustmentTrack.AggregateTempo.Value * speedAdjustmentTrack.AggregateFrequency.Value * scale;
+        }
 
         /// <summary>
         /// Computes a scroll time (in milliseconds) from a scroll speed in the range of 1-40.

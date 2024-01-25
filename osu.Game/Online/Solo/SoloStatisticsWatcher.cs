@@ -127,6 +127,8 @@ namespace osu.Game.Online.Solo
         {
             string rulesetName = callback.Score.Ruleset.ShortName;
 
+            api.UpdateStatistics(updatedStatistics);
+
             if (latestStatistics == null)
                 return;
 

@@ -117,18 +117,16 @@ namespace osu.Game.Rulesets.Mania.Tests
 
         private void createBarLine(bool major)
         {
-            foreach (var stage in stages)
+            var obj = new BarLine
             {
-                var obj = new BarLine
-                {
-                    StartTime = Time.Current + 2000,
-                    Major = major,
-                };
+                StartTime = Time.Current + 2000,
+                Major = major,
+            };
 
-                obj.ApplyDefaults(new ControlPointInfo(), new BeatmapDifficulty());
+            obj.ApplyDefaults(new ControlPointInfo(), new BeatmapDifficulty());
 
+            foreach (var stage in stages)
                 stage.Add(obj);
-            }
         }
 
         private ScrollingTestContainer createStage(ScrollingDirection direction, ManiaAction action)

@@ -213,7 +213,7 @@ namespace osu.Game.Graphics.UserInterface
                 requestDisplay();
             else if (isDisplayed && Time.Current - lastDisplayRequiredTime > 2000 && !IsHovered)
             {
-                mainContent.FadeTo(0, 300, Easing.OutQuint);
+                mainContent.FadeTo(0.7f, 300, Easing.OutQuint);
                 isDisplayed = false;
             }
         }

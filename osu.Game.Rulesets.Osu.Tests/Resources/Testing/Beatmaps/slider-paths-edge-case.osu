@@ -1,0 +1,19 @@
+osu file format v6
+
+[General]
+StackLeniency: 0.7
+
+[Difficulty]
+HPDrainRate:1
+CircleSize:3
+OverallDifficulty:1
+SliderMultiplier:1.1
+SliderTickRate:1
+
+[TimingPoints]
+-41,338.983050847458,4,1,0,70,1,0
+93648,-100,4,1,0,70,0,0
+
+[HitObjects]
+160,208,46060,6,0,B|161:320|161:320|271:320|271:320,1,330,8|0
+352,160,123348,6,0,B|351:48|351:48|241:48|241:48,1,330,8|0

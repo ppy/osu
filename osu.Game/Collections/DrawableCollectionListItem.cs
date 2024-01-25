@@ -36,7 +36,13 @@ namespace osu.Game.Collections
         public DrawableCollectionListItem(Live<BeatmapCollection> item, bool isCreated)
             : base(item)
         {
-            ShowDragHandle.Value = item.IsManaged;
+            // For now we don't support rearranging and always use alphabetical sort.
+            // Change this to:
+            //
+            // ShowDragHandle.Value = item.IsManaged;
+            //
+            // if we want to support user sorting (but changes will need to be made to realm to persist).
+            ShowDragHandle.Value = false;
         }
 
         protected override Drawable CreateContent() => new ItemContent(Model);

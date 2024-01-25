@@ -2,10 +2,10 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
-using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Audio.Track;
 using osu.Framework.Graphics;
+using osu.Framework.Utils;
 using osu.Game.Beatmaps.ControlPoints;
 using osu.Game.Graphics.Containers;
 
@@ -13,6 +13,9 @@ namespace osu.Game.Screens.Menu
 {
     public partial class KiaiMenuFountains : BeatSyncedContainer
     {
+        private StarFountain leftFountain = null!;
+        private StarFountain rightFountain = null!;
+
         [BackgroundDependencyLoader]
         private void load()
         {
@@ -20,13 +23,13 @@ namespace osu.Game.Screens.Menu
 
             Children = new[]
             {
-                new StarFountain
+                leftFountain = new StarFountain
                 {
                     Anchor = Anchor.BottomLeft,
                     Origin = Anchor.BottomLeft,
                     X = 250,
                 },
-                new StarFountain
+                rightFountain = new StarFountain
                 {
                     Anchor = Anchor.BottomRight,
                     Origin = Anchor.BottomRight,
@@ -58,8 +61,25 @@ namespace osu.Game.Screens.Menu
             if (lastTrigger != null && Clock.CurrentTime - lastTrigger < 500)
                 return;
 
-            foreach (var fountain in Children.OfType<StarFountain>())
-                fountain.Shoot();
+            int direction = RNG.Next(-1, 2);
+
+            switch (direction)
+            {
+                case -1:
+                    leftFountain.Shoot(1);
+                    rightFountain.Shoot(-1);
+                    break;
+
+                case 0:
+                    leftFountain.Shoot(0);
+                    rightFountain.Shoot(0);
+                    break;
+
+                case 1:
+                    leftFountain.Shoot(-1);
+                    rightFountain.Shoot(1);
+                    break;
+            }
 
             lastTrigger = Clock.CurrentTime;
         }

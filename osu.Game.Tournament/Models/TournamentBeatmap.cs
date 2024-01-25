@@ -21,6 +21,10 @@ namespace osu.Game.Tournament.Models
 
         public double StarRating { get; set; }
 
+        public int EndTimeObjectCount { get; set; }
+
+        public int TotalObjectCount { get; set; }
+
         public IBeatmapMetadataInfo Metadata { get; set; } = new BeatmapMetadata();
 
         public IBeatmapDifficultyInfo Difficulty { get; set; } = new BeatmapDifficulty();
@@ -41,6 +45,8 @@ namespace osu.Game.Tournament.Models
             Metadata = beatmap.Metadata;
             Difficulty = beatmap.Difficulty;
             Covers = beatmap.BeatmapSet?.Covers ?? new BeatmapSetOnlineCovers();
+            EndTimeObjectCount = beatmap.EndTimeObjectCount;
+            TotalObjectCount = beatmap.TotalObjectCount;
         }
 
         public bool Equals(IBeatmapInfo? other) => other is TournamentBeatmap b && this.MatchesOnlineID(b);

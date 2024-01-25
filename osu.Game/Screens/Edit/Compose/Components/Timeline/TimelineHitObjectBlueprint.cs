@@ -424,12 +424,12 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
 
                                 if (e.CurrentState.Keyboard.ShiftPressed && hitObject is IHasSliderVelocity hasSliderVelocity)
                                 {
-                                    double newVelocity = hasSliderVelocity.SliderVelocity * (repeatHitObject.Duration / proposedDuration);
+                                    double newVelocity = hasSliderVelocity.SliderVelocityMultiplier * (repeatHitObject.Duration / proposedDuration);
 
-                                    if (Precision.AlmostEquals(newVelocity, hasSliderVelocity.SliderVelocity))
+                                    if (Precision.AlmostEquals(newVelocity, hasSliderVelocity.SliderVelocityMultiplier))
                                         return;
 
-                                    hasSliderVelocity.SliderVelocity = newVelocity;
+                                    hasSliderVelocity.SliderVelocityMultiplier = newVelocity;
                                     beatmap.Update(hitObject);
                                 }
                                 else
@@ -438,7 +438,7 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
                                     double lengthOfOneRepeat = repeatHitObject.Duration / (repeatHitObject.RepeatCount + 1);
                                     int proposedCount = Math.Max(0, (int)Math.Round(proposedDuration / lengthOfOneRepeat) - 1);
 
-                                    if (proposedCount == repeatHitObject.RepeatCount || lengthOfOneRepeat == 0)
+                                    if (proposedCount == repeatHitObject.RepeatCount || Precision.AlmostEquals(lengthOfOneRepeat, 0))
                                         return;
 
                                     repeatHitObject.RepeatCount = proposedCount;

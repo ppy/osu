@@ -8,7 +8,7 @@ namespace osu.Game.Overlays.OSD
     public partial class CopyUrlToast : Toast
     {
         public CopyUrlToast()
-            : base(UserInterfaceStrings.GeneralHeader, ToastStrings.UrlCopied, "")
+            : base(CommonStrings.General, ToastStrings.UrlCopied, "")
         {
         }
     }

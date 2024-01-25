@@ -10,9 +10,21 @@ namespace osu.Game.Rulesets.Objects
 {
     public static class SliderEventGenerator
     {
-        // ReSharper disable once MethodOverloadWithOptionalParameter
+        /// <summary>
+        /// Historically, slider's final tick (aka the place where the slider would receive a final judgement) was offset by -36 ms. Originally this was
+        /// done to workaround a technical detail (unimportant), but over the years it has become an expectation of players that you don't need to hold
+        /// until the true end of the slider. This very small amount of leniency makes it easier to jump away from fast sliders to the next hit object.
+        ///
+        /// After discussion on how this should be handled going forward, players have unanimously stated that this lenience should remain in some way.
+        /// These days, this is implemented in the drawable implementation of Slider in the osu! ruleset.
+        ///
+        /// We need to keep the <see cref="SliderEventType.LegacyLastTick"/> *only* for osu!catch conversion, which relies on it to generate tiny ticks
+        /// correctly.
+        /// </summary>
+        public const double TAIL_LENIENCY = -36;
+
         public static IEnumerable<SliderEventDescriptor> Generate(double startTime, double spanDuration, double velocity, double tickDistance, double totalDistance, int spanCount,
-                                                                  double? legacyLastTickOffset, CancellationToken cancellationToken = default)
+                                                                  CancellationToken cancellationToken = default)
         {
             // A very lenient maximum length of a slider for ticks to be generated.
             // This exists for edge cases such as /b/1573664 where the beatmap has been edited by the user, and should never be reached in normal usage.
@@ -76,18 +88,27 @@ namespace osu.Game.Rulesets.Objects
 
             int finalSpanIndex = spanCount - 1;
             double finalSpanStartTime = startTime + finalSpanIndex * spanDuration;
-            double finalSpanEndTime = Math.Max(startTime + totalDuration / 2, (finalSpanStartTime + spanDuration) - (legacyLastTickOffset ?? 0));
-            double finalProgress = (finalSpanEndTime - finalSpanStartTime) / spanDuration;
 
-            if (spanCount % 2 == 0) finalProgress = 1 - finalProgress;
+            // Note that `finalSpanStartTime + spanDuration ≈ startTime + totalDuration`, but we write it like this to match floating point precision
+            // of stable.
+            //
+            // So thinking about this in a saner way, the time of the LegacyLastTick is
+            //
+            // `slider.StartTime + max(slider.Duration / 2, slider.Duration - 36)`
+            //
+            // As a slider gets shorter than 72 ms, the leniency offered falls below the 36 ms `TAIL_LENIENCY` constant.
+            double legacyLastTickTime = Math.Max(startTime + totalDuration / 2, (finalSpanStartTime + spanDuration) + TAIL_LENIENCY);
+            double legacyLastTickProgress = (legacyLastTickTime - finalSpanStartTime) / spanDuration;
+
+            if (spanCount % 2 == 0) legacyLastTickProgress = 1 - legacyLastTickProgress;
 
             yield return new SliderEventDescriptor
             {
                 Type = SliderEventType.LegacyLastTick,
                 SpanIndex = finalSpanIndex,
                 SpanStartTime = finalSpanStartTime,
-                Time = finalSpanEndTime,
-                PathProgress = finalProgress,
+                Time = legacyLastTickTime,
+                PathProgress = legacyLastTickProgress,
             };
 
             yield return new SliderEventDescriptor
@@ -173,6 +194,11 @@ namespace osu.Game.Rulesets.Objects
     public enum SliderEventType
     {
         Tick,
+
+        /// <summary>
+        /// Occurs just before the tail. See <see cref="SliderEventGenerator.TAIL_LENIENCY"/>.
+        /// Should generally be ignored.
+        /// </summary>
         LegacyLastTick,
         Head,
         Tail,

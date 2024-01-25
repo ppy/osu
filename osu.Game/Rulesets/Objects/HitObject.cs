@@ -77,12 +77,6 @@ namespace osu.Game.Rulesets.Objects
         public virtual IList<HitSampleInfo> AuxiliarySamples => ImmutableList<HitSampleInfo>.Empty;
 
         /// <summary>
-        /// Legacy BPM multiplier that introduces floating-point errors for rulesets that depend on it.
-        /// DO NOT USE THIS UNLESS 100% SURE.
-        /// </summary>
-        public double? LegacyBpmMultiplier { get; set; }
-
-        /// <summary>
         /// Whether this <see cref="HitObject"/> is in Kiai time.
         /// </summary>
         [JsonIgnore]

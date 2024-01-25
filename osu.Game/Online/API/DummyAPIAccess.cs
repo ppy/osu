@@ -20,13 +20,15 @@ namespace osu.Game.Online.API
 
         public Bindable<APIUser> LocalUser { get; } = new Bindable<APIUser>(new APIUser
         {
-            Username = @"Dummy",
+            Username = @"Local user",
             Id = DUMMY_USER_ID,
         });
 
         public BindableList<APIUser> Friends { get; } = new BindableList<APIUser>();
 
         public Bindable<UserActivity> Activity { get; } = new Bindable<UserActivity>();
+
+        public Bindable<UserStatistics?> Statistics { get; } = new Bindable<UserStatistics?>();
 
         public Language Language => Language.en;
 
@@ -112,7 +114,13 @@ namespace osu.Game.Online.API
             LocalUser.Value = new APIUser
             {
                 Username = username,
-                Id = 1001,
+                Id = DUMMY_USER_ID,
+            };
+
+            Statistics.Value = new UserStatistics
+            {
+                GlobalRank = 1,
+                CountryRank = 1
             };
 
             state.Value = APIState.Online;
@@ -124,6 +132,14 @@ namespace osu.Game.Online.API
             // must happen after `state.Value` is changed such that subscribers to that bindable's value changes see the correct user.
             // compare: `APIAccess.Logout()`.
             LocalUser.Value = new GuestUser();
+        }
+
+        public void UpdateStatistics(UserStatistics newStatistics)
+        {
+            Statistics.Value = newStatistics;
+
+            if (IsLoggedIn)
+                LocalUser.Value.Statistics = newStatistics;
         }
 
         public IHubClientConnector? GetHubConnector(string clientName, string endpoint, bool preferMessagePack) => null;
@@ -141,6 +157,7 @@ namespace osu.Game.Online.API
         IBindable<APIUser> IAPIProvider.LocalUser => LocalUser;
         IBindableList<APIUser> IAPIProvider.Friends => Friends;
         IBindable<UserActivity> IAPIProvider.Activity => Activity;
+        IBindable<UserStatistics?> IAPIProvider.Statistics => Statistics;
 
         /// <summary>
         /// During the next simulated login, the process will fail immediately.

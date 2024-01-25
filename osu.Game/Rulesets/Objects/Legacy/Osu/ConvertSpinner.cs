@@ -9,7 +9,7 @@ namespace osu.Game.Rulesets.Objects.Legacy.Osu
     /// <summary>
     /// Legacy osu! Spinner-type, used for parsing Beatmaps.
     /// </summary>
-    internal sealed class ConvertSpinner : ConvertHitObject, IHasDuration, IHasPosition, IHasCombo
+    internal sealed class ConvertSpinner : ConvertHitObject, IHasDuration, IHasPosition
     {
         public double Duration { get; set; }
 
@@ -20,9 +20,5 @@ namespace osu.Game.Rulesets.Objects.Legacy.Osu
         public float X => Position.X;
 
         public float Y => Position.Y;
-
-        public bool NewCombo { get; set; }
-
-        public int ComboOffset { get; set; }
     }
 }
