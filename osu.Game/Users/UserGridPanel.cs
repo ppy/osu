@@ -10,6 +10,10 @@ using osuTK;
 
 namespace osu.Game.Users
 {
+    /// <summary>
+    /// A user "card", commonly used in a grid layout or in popovers.
+    /// Comes with a preset height, but width must be specified.
+    /// </summary>
     public partial class UserGridPanel : ExtendedUserPanel
     {
         private const int margin = 10;
@@ -87,6 +91,7 @@ namespace osu.Game.Users
                                                 Children = new Drawable[]
                                                 {
                                                     CreateFlag(),
+                                                    // supporter icon is being added later
                                                 }
                                             }
                                         },
@@ -104,6 +109,7 @@ namespace osu.Game.Users
                         },
                         new[]
                         {
+                            // padding
                             Empty(),
                             Empty()
                         },

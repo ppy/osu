@@ -21,6 +21,7 @@ using osu.Game.Online.API;
 using osu.Game.Rulesets;
 using osu.Game.Rulesets.Difficulty;
 using osu.Game.Rulesets.Osu;
+using osu.Game.Rulesets.Scoring;
 using osu.Game.Scoring;
 using osu.Game.Screens;
 using osu.Game.Screens.Play;
@@ -71,15 +72,16 @@ namespace osu.Game.Tests.Visual.Ranking
 
         private int onlineScoreID = 1;
 
-        [TestCase(1, ScoreRank.X)]
-        [TestCase(0.9999, ScoreRank.S)]
-        [TestCase(0.975, ScoreRank.S)]
-        [TestCase(0.925, ScoreRank.A)]
-        [TestCase(0.85, ScoreRank.B)]
-        [TestCase(0.75, ScoreRank.C)]
-        [TestCase(0.5, ScoreRank.D)]
-        [TestCase(0.2, ScoreRank.D)]
-        public void TestResultsWithPlayer(double accuracy, ScoreRank rank)
+        [TestCase(1, ScoreRank.X, 0)]
+        [TestCase(0.9999, ScoreRank.S, 0)]
+        [TestCase(0.975, ScoreRank.S, 0)]
+        [TestCase(0.975, ScoreRank.A, 1)]
+        [TestCase(0.925, ScoreRank.A, 5)]
+        [TestCase(0.85, ScoreRank.B, 9)]
+        [TestCase(0.75, ScoreRank.C, 11)]
+        [TestCase(0.5, ScoreRank.D, 21)]
+        [TestCase(0.2, ScoreRank.D, 51)]
+        public void TestResultsWithPlayer(double accuracy, ScoreRank rank, int missCount)
         {
             TestResultsScreen screen = null;
 
@@ -91,6 +93,7 @@ namespace osu.Game.Tests.Visual.Ranking
                 score.HitEvents = TestSceneStatisticsPanel.CreatePositionDistributedHitEvents();
                 score.Accuracy = accuracy;
                 score.Rank = rank;
+                score.Statistics[HitResult.Miss] = missCount;
 
                 return screen = createResultsScreen(score);
             });
@@ -362,7 +365,7 @@ namespace osu.Game.Tests.Visual.Ranking
                 {
                     var score = TestResources.CreateTestScoreInfo();
                     score.TotalScore += 10 - i;
-                    score.Hash = $"test{i}";
+                    score.HasOnlineReplay = true;
                     scores.Add(score);
                 }
 

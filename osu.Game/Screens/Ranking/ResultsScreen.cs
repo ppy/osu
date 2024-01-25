@@ -21,7 +21,9 @@ using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Input.Bindings;
+using osu.Game.Localisation;
 using osu.Game.Online.API;
+using osu.Game.Online.Placeholders;
 using osu.Game.Scoring;
 using osu.Game.Screens.Play;
 using osu.Game.Screens.Ranking.Statistics;
@@ -55,7 +57,8 @@ namespace osu.Game.Screens.Ranking
         [Resolved]
         private IAPIProvider api { get; set; }
 
-        private StatisticsPanel statisticsPanel;
+        protected StatisticsPanel StatisticsPanel { get; private set; }
+
         private Drawable bottomPanel;
         private Container<ScorePanel> detachedPanelContainer;
 
@@ -98,7 +101,7 @@ namespace osu.Game.Screens.Ranking
                                 RelativeSizeAxes = Axes.Both,
                                 Children = new Drawable[]
                                 {
-                                    statisticsPanel = CreateStatisticsPanel().With(panel =>
+                                    StatisticsPanel = CreateStatisticsPanel().With(panel =>
                                     {
                                         panel.RelativeSizeAxes = Axes.Both;
                                         panel.Score.BindTarget = SelectedScore;
@@ -107,7 +110,7 @@ namespace osu.Game.Screens.Ranking
                                     {
                                         RelativeSizeAxes = Axes.Both,
                                         SelectedScore = { BindTarget = SelectedScore },
-                                        PostExpandAction = () => statisticsPanel.ToggleVisibility()
+                                        PostExpandAction = () => StatisticsPanel.ToggleVisibility()
                                     },
                                     detachedPanelContainer = new Container<ScorePanel>
                                     {
@@ -155,7 +158,7 @@ namespace osu.Game.Screens.Ranking
             if (Score != null)
             {
                 // only show flair / animation when arriving after watching a play that isn't autoplay.
-                bool shouldFlair = player != null && Score.Mods.All(m => m.UserPlayable);
+                bool shouldFlair = player != null && !Score.User.IsBot;
 
                 ScorePanelList.AddScore(Score, shouldFlair);
             }
@@ -194,7 +197,7 @@ namespace osu.Game.Screens.Ranking
             if (req != null)
                 api.Queue(req);
 
-            statisticsPanel.State.BindValueChanged(onStatisticsStateChanged, true);
+            StatisticsPanel.State.BindValueChanged(onStatisticsStateChanged, true);
         }
 
         protected override void Update()
@@ -234,7 +237,7 @@ namespace osu.Game.Screens.Ranking
         protected virtual APIRequest FetchNextPage(int direction, Action<IEnumerable<ScoreInfo>> scoresCallback) => null;
 
         /// <summary>
-        /// Creates the <see cref="StatisticsPanel"/> to be used to display extended information about scores.
+        /// Creates the <see cref="Statistics.StatisticsPanel"/> to be used to display extended information about scores.
         /// </summary>
         protected virtual StatisticsPanel CreateStatisticsPanel() => new StatisticsPanel();
 
@@ -244,6 +247,12 @@ namespace osu.Game.Screens.Ranking
                 addScore(s);
 
             lastFetchCompleted = true;
+
+            if (ScorePanelList.IsEmpty)
+            {
+                // This can happen if for example a beatmap that is part of a playlist hasn't been played yet.
+                VerticalScrollContent.Add(new MessagePlaceholder(LeaderboardStrings.NoRecordsYet));
+            }
         });
 
         public override void OnEntering(ScreenTransitionEvent e)
@@ -272,9 +281,9 @@ namespace osu.Game.Screens.Ranking
 
         public override bool OnBackButton()
         {
-            if (statisticsPanel.State.Value == Visibility.Visible)
+            if (StatisticsPanel.State.Value == Visibility.Visible)
             {
-                statisticsPanel.Hide();
+                StatisticsPanel.Hide();
                 return true;
             }
 
@@ -328,7 +337,7 @@ namespace osu.Game.Screens.Ranking
                 ScorePanelList.Attach(detachedPanel);
 
                 // Move into its original location in the attached container first, then to the final location.
-                float origLocation = detachedPanel.Parent.ToLocalSpace(screenSpacePos).X;
+                float origLocation = detachedPanel.Parent!.ToLocalSpace(screenSpacePos).X;
                 detachedPanel.MoveToX(origLocation)
                              .Then()
                              .MoveToX(0, 250, Easing.OutElasticQuarter);
@@ -353,7 +362,7 @@ namespace osu.Game.Screens.Ranking
             switch (e.Action)
             {
                 case GlobalAction.Select:
-                    statisticsPanel.ToggleVisibility();
+                    StatisticsPanel.ToggleVisibility();
                     return true;
             }
 

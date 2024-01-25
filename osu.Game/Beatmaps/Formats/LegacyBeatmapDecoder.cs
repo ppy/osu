@@ -1,10 +1,6 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
-#pragma warning disable 618
-
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -32,15 +28,18 @@ namespace osu.Game.Beatmaps.Formats
         public const int EARLY_VERSION_TIMING_OFFSET = 24;
 
         /// <summary>
-        /// A small adjustment to the start time of control points to account for rounding/precision errors.
+        /// A small adjustment to the start time of sample control points to account for rounding/precision errors.
         /// </summary>
-        private const double control_point_leniency = 1;
+        /// <remarks>
+        /// Compare: https://github.com/peppy/osu-stable-reference/blob/master/osu!/GameplayElements/HitObjects/HitObject.cs#L319
+        /// </remarks>
+        private const double control_point_leniency = 5;
 
-        internal static RulesetStore RulesetStore;
+        internal static RulesetStore? RulesetStore;
 
-        private Beatmap beatmap;
+        private Beatmap beatmap = null!;
 
-        private ConvertHitObjectParser parser;
+        private ConvertHitObjectParser? parser;
 
         private LegacySampleBank defaultSampleBank;
         private int defaultSampleVolume = 100;
@@ -94,6 +93,8 @@ namespace osu.Game.Beatmaps.Formats
             // The parsing order of hitobjects matters in mania difficulty calculation
             this.beatmap.HitObjects = this.beatmap.HitObjects.OrderBy(h => h.StartTime).ToList();
 
+            postProcessBreaks(this.beatmap);
+
             foreach (var hitObject in this.beatmap.HitObjects)
             {
                 applyDefaults(hitObject);
@@ -101,19 +102,36 @@ namespace osu.Game.Beatmaps.Formats
             }
         }
 
+        /// <summary>
+        /// Processes the beatmap such that a new combo is started the first hitobject following each break.
+        /// </summary>
+        private void postProcessBreaks(Beatmap beatmap)
+        {
+            int currentBreak = 0;
+            bool forceNewCombo = false;
+
+            foreach (var h in beatmap.HitObjects.OfType<ConvertHitObject>())
+            {
+                while (currentBreak < beatmap.Breaks.Count && beatmap.Breaks[currentBreak].EndTime < h.StartTime)
+                {
+                    forceNewCombo = true;
+                    currentBreak++;
+                }
+
+                h.NewCombo |= forceNewCombo;
+                forceNewCombo = false;
+            }
+        }
+
         private void applyDefaults(HitObject hitObject)
         {
             DifficultyControlPoint difficultyControlPoint = (beatmap.ControlPointInfo as LegacyControlPointInfo)?.DifficultyPointAt(hitObject.StartTime) ?? DifficultyControlPoint.DEFAULT;
 
-            if (difficultyControlPoint is LegacyDifficultyControlPoint legacyDifficultyControlPoint)
-            {
-                hitObject.LegacyBpmMultiplier = legacyDifficultyControlPoint.BpmMultiplier;
-                if (hitObject is IHasGenerateTicks hasGenerateTicks)
-                    hasGenerateTicks.GenerateTicks = legacyDifficultyControlPoint.GenerateTicks;
-            }
+            if (hitObject is IHasGenerateTicks hasGenerateTicks)
+                hasGenerateTicks.GenerateTicks = difficultyControlPoint.GenerateTicks;
 
             if (hitObject is IHasSliderVelocity hasSliderVelocity)
-                hasSliderVelocity.SliderVelocity = difficultyControlPoint.SliderVelocity;
+                hasSliderVelocity.SliderVelocityMultiplier = difficultyControlPoint.SliderVelocity;
 
             hitObject.ApplyDefaults(beatmap.ControlPointInfo, beatmap.Difficulty);
         }
@@ -204,7 +222,8 @@ namespace osu.Game.Beatmaps.Formats
                     break;
 
                 case @"PreviewTime":
-                    metadata.PreviewTime = getOffsetTime(Parsing.ParseInt(pair.Value));
+                    int time = Parsing.ParseInt(pair.Value);
+                    metadata.PreviewTime = time == -1 ? time : getOffsetTime(time);
                     break;
 
                 case @"SampleSet":
@@ -222,7 +241,7 @@ namespace osu.Game.Beatmaps.Formats
                 case @"Mode":
                     int rulesetID = Parsing.ParseInt(pair.Value);
 
-                    beatmap.BeatmapInfo.Ruleset = RulesetStore.GetRuleset(rulesetID) ?? throw new ArgumentException("Ruleset is not available locally.");
+                    beatmap.BeatmapInfo.Ruleset = RulesetStore?.GetRuleset(rulesetID) ?? throw new ArgumentException("Ruleset is not available locally.");
 
                     switch (rulesetID)
                     {
@@ -499,8 +518,9 @@ namespace osu.Game.Beatmaps.Formats
 
             int onlineRulesetID = beatmap.BeatmapInfo.Ruleset.OnlineID;
 
-            addControlPoint(time, new LegacyDifficultyControlPoint(onlineRulesetID, beatLength)
+            addControlPoint(time, new DifficultyControlPoint
             {
+                GenerateTicks = !double.IsNaN(beatLength),
                 SliderVelocity = speedMultiplier,
             }, timingChange);
 

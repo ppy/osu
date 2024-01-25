@@ -74,7 +74,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Spectate
                 );
 
                 // If we don't track the animating state, the animation will also occur when resizing the window.
-                isAnimating &= !Precision.AlmostEquals(Position, targetPos, 0.01f);
+                isAnimating &= !Precision.AlmostEquals(Size, targetSize, 0.5f);
             }
 
             /// <summary>
@@ -95,11 +95,11 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Spectate
             }
 
             private Vector2 getFinalPosition() =>
-                Parent.ToLocalSpace(facade.ScreenSpaceDrawQuad.Centre);
+                Parent!.ToLocalSpace(facade.ScreenSpaceDrawQuad.Centre);
 
             private Vector2 getFinalSize() =>
-                Parent.ToLocalSpace(facade.ScreenSpaceDrawQuad.BottomRight)
-                - Parent.ToLocalSpace(facade.ScreenSpaceDrawQuad.TopLeft);
+                Parent!.ToLocalSpace(facade.ScreenSpaceDrawQuad.BottomRight)
+                - Parent!.ToLocalSpace(facade.ScreenSpaceDrawQuad.TopLeft);
 
             protected override bool OnClick(ClickEvent e)
             {

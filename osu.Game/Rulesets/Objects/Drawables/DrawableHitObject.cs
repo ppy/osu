@@ -160,6 +160,26 @@ namespace osu.Game.Rulesets.Objects.Drawables
         internal bool IsInitialized;
 
         /// <summary>
+        /// The minimum allowable volume for sample playback.
+        /// <see cref="Samples"/> quieter than that will be forcibly played at this volume instead.
+        /// </summary>
+        /// <remarks>
+        /// <para>
+        /// Drawable hitobjects adding their own custom samples, or other sample playback sources
+        /// (i.e. <see cref="GameplaySampleTriggerSource"/>) must enforce this themselves.
+        /// </para>
+        /// <para>
+        /// This sample volume floor is present in stable, although it is set at 8% rather than 5%.
+        /// See: https://github.com/peppy/osu-stable-reference/blob/3ea48705eb67172c430371dcfc8a16a002ed0d3d/osu!/Audio/AudioEngine.cs#L1070,
+        /// https://github.com/peppy/osu-stable-reference/blob/3ea48705eb67172c430371dcfc8a16a002ed0d3d/osu!/Audio/AudioEngine.cs#L1404-L1405.
+        /// The reason why it is 5% here is that the 8% cap was enforced in a silent manner
+        /// (i.e. the minimum selectable volume in the editor was 5%, but it would be played at 8% anyways),
+        /// which is confusing and arbitrary, so we're just doing 5% here at the cost of sacrificing strict parity.
+        /// </para>
+        /// </remarks>
+        public const int MINIMUM_SAMPLE_VOLUME = 5;
+
+        /// <summary>
         /// Creates a new <see cref="DrawableHitObject"/>.
         /// </summary>
         /// <param name="initialHitObject">
@@ -181,7 +201,10 @@ namespace osu.Game.Rulesets.Objects.Drawables
             comboColourBrightness.BindTo(gameplaySettings.ComboColourNormalisationAmount);
 
             // Explicit non-virtual function call in case a DrawableHitObject overrides AddInternal.
-            base.AddInternal(Samples = new PausableSkinnableSound());
+            base.AddInternal(Samples = new PausableSkinnableSound
+            {
+                MinimumSampleVolume = MINIMUM_SAMPLE_VOLUME
+            });
 
             CurrentSkin = skinSource;
             CurrentSkin.SourceChanged += skinSourceChanged;
@@ -260,7 +283,6 @@ namespace osu.Game.Rulesets.Objects.Drawables
             }
 
             StartTimeBindable.BindTo(HitObject.StartTimeBindable);
-            StartTimeBindable.BindValueChanged(onStartTimeChanged);
 
             if (HitObject is IHasComboInformation combo)
             {
@@ -311,9 +333,6 @@ namespace osu.Game.Rulesets.Objects.Drawables
 
             samplesBindable.UnbindFrom(HitObject.SamplesBindable);
 
-            // Changes in start time trigger state updates. When a new hitobject is applied, OnApply() automatically performs a state update anyway.
-            StartTimeBindable.ValueChanged -= onStartTimeChanged;
-
             // When a new hitobject is applied, the samples will be cleared before re-populating.
             // In order to stop this needless update, the event is unbound and re-bound as late as possible in Apply().
             samplesBindable.CollectionChanged -= onSamplesChanged;
@@ -333,6 +352,8 @@ namespace osu.Game.Rulesets.Objects.Drawables
             Entry.NestedEntries.RemoveAll(nestedEntry => nestedEntry is SyntheticHitObjectEntry);
             ClearNestedHitObjects();
 
+            // Changes to `HitObject` properties trigger default application, which triggers `State` updates.
+            // When a new hitobject is applied, `OnApply()` automatically performs a state update.
             HitObject.DefaultsApplied -= onDefaultsApplied;
 
             entry.RevertResult -= onRevertResult;
@@ -375,8 +396,6 @@ namespace osu.Game.Rulesets.Objects.Drawables
 
         private void onSamplesChanged(object sender, NotifyCollectionChangedEventArgs e) => LoadSamples();
 
-        private void onStartTimeChanged(ValueChangedEvent<double> startTime) => updateState(State.Value, true);
-
         private void onNewResult(DrawableHitObject drawableHitObject, JudgementResult result) => OnNewResult?.Invoke(drawableHitObject, result);
 
         private void onRevertResult()
@@ -393,6 +412,15 @@ namespace osu.Game.Rulesets.Objects.Drawables
         {
             Debug.Assert(Entry != null);
             Apply(Entry);
+
+            // Applied defaults indicate a change in hit object state.
+            // We need to update the judgement result time to the new end time
+            // and update state to ensure the hit object fades out at the correct time.
+            if (Result is not null)
+            {
+                Result.TimeOffset = 0;
+                updateState(State.Value, true);
+            }
 
             DefaultsApplied?.Invoke(this);
         }
@@ -571,7 +599,9 @@ namespace osu.Game.Rulesets.Objects.Drawables
             float balanceAdjustAmount = positionalHitsoundsLevel.Value * 2;
             double returnedValue = balanceAdjustAmount * (position - 0.5f);
 
-            return returnedValue;
+            // Rounded to reduce the overhead of audio adjustments (which are currently bindable heavy).
+            // Balance is very hard to perceive in small increments anyways.
+            return Math.Round(returnedValue, 2);
         }
 
         /// <summary>
@@ -667,6 +697,8 @@ namespace osu.Game.Rulesets.Objects.Drawables
             if (!Result.HasResult)
                 throw new InvalidOperationException($"{GetType().ReadableName()} applied a {nameof(JudgementResult)} but did not update {nameof(JudgementResult.Type)}.");
 
+            HitResultExtensions.ValidateHitResultPair(Result.Judgement.MaxResult, Result.Judgement.MinResult);
+
             if (!Result.Type.IsValidHitResult(Result.Judgement.MinResult, Result.Judgement.MaxResult))
             {
                 throw new InvalidOperationException(
@@ -674,6 +706,7 @@ namespace osu.Game.Rulesets.Objects.Drawables
             }
 
             Result.RawTime = Time.Current;
+            Result.GameplayRate = (Clock as IGameplayClock)?.GetTrueGameplayRate() ?? Clock.Rate;
 
             if (Result.HasResult)
                 updateState(Result.IsHit ? ArmedState.Hit : ArmedState.Miss);

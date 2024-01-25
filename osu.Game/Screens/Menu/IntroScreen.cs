@@ -95,6 +95,8 @@ namespace osu.Game.Screens.Menu
             Colour = Color4.Black
         };
 
+        public override bool? AllowGlobalTrackControl => false;
+
         protected IntroScreen([CanBeNull] Func<MainMenu> createNextScreen = null)
         {
             this.createNextScreen = createNextScreen;

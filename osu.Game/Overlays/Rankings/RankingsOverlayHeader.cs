@@ -7,6 +7,7 @@ using osu.Framework.Bindables;
 using osu.Game.Localisation;
 using osu.Game.Resources.Localisation.Web;
 using osu.Framework.Graphics;
+using osu.Game.Graphics;
 using osu.Game.Rulesets;
 using osu.Game.Users;
 
@@ -35,7 +36,7 @@ namespace osu.Game.Overlays.Rankings
             {
                 Title = PageTitleStrings.MainRankingControllerDefault;
                 Description = NamedOverlayComponentStrings.RankingsDescription;
-                IconTexture = "Icons/Hexacons/rankings";
+                Icon = OsuIcon.Ranking;
             }
         }
     }

@@ -94,7 +94,7 @@ namespace osu.Game.Screens.Edit.Timing
             controlPointGroups.BindTo(editorBeatmap.ControlPointInfo.Groups);
             controlPointGroups.BindCollectionChanged((_, _) => updateTimingGroup());
 
-            beatLength.BindValueChanged(_ => regenerateDisplay(true), true);
+            beatLength.BindValueChanged(_ => Scheduler.AddOnce(regenerateDisplay, true), true);
 
             displayLocked.BindValueChanged(locked =>
             {
@@ -186,11 +186,18 @@ namespace osu.Game.Screens.Edit.Timing
                 return;
 
             displayedTime = time;
-            regenerateDisplay(animated);
+            Scheduler.AddOnce(regenerateDisplay, animated);
         }
 
         private void regenerateDisplay(bool animated)
         {
+            // Before a track is loaded, it won't have a valid length, which will break things.
+            if (!beatmap.Value.Track.IsLoaded)
+            {
+                Scheduler.AddOnce(regenerateDisplay, animated);
+                return;
+            }
+
             double index = (displayedTime - selectedGroupStartTime) / timingPoint.BeatLength;
 
             // Chosen as a pretty usable number across all BPMs.
@@ -212,12 +219,12 @@ namespace osu.Game.Screens.Edit.Timing
                 // offset to the required beat index.
                 double time = selectedGroupStartTime + index * timingPoint.BeatLength;
 
-                float offset = (float)(time - visible_width / 2) / trackLength * scale;
+                float offset = (float)(time - visible_width / 2 + Editor.WAVEFORM_VISUAL_OFFSET) / trackLength * scale;
 
                 row.Alpha = time < selectedGroupStartTime || time > selectedGroupEndTime ? 0.2f : 1;
                 row.WaveformOffsetTo(-offset, animated);
                 row.WaveformScale = new Vector2(scale, 1);
-                row.BeatIndex = (int)Math.Floor(index);
+                row.BeatIndex = (int)Math.Round(index);
 
                 index++;
             }
