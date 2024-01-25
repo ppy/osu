@@ -33,9 +33,6 @@ namespace osu.Game.Screens.Edit.Components.RadioButtons
 
         private Drawable icon = null!;
 
-        [Resolved]
-        private EditorBeatmap? editorBeatmap { get; set; }
-
         public EditorRadioButton(RadioButton button)
         {
             Button = button;

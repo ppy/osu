@@ -46,8 +46,8 @@ namespace osu.Game.Rulesets.Osu.Tests.Editor
             {
                 var popover = getPopover();
                 var buttons = popover.ChildrenOfType<EditorRadioButton>();
-                return buttons.Any(btn => btn.Text == "Selection centre" && btn.Enabled.Value is false) &&
-                    buttons.Any(btn => btn.Text == "Playfield centre" && btn.Enabled.Value is true);
+                return buttons.Any(btn => btn.Text == "Selection centre" && !btn.Enabled.Value)
+                       && buttons.Any(btn => btn.Text == "Playfield centre" && btn.Enabled.Value);
             });
             AddStep("press rotate hotkey", () =>
             {
@@ -73,8 +73,8 @@ namespace osu.Game.Rulesets.Osu.Tests.Editor
             {
                 var popover = getPopover();
                 var buttons = popover.ChildrenOfType<EditorRadioButton>();
-                return buttons.Any(btn => btn.Text == "Selection centre" && btn.Enabled.Value is true) &&
-                    buttons.Any(btn => btn.Text == "Playfield centre" && btn.Enabled.Value is true);
+                return buttons.Any(btn => btn.Text == "Selection centre" && btn.Enabled.Value)
+                       && buttons.Any(btn => btn.Text == "Playfield centre" && btn.Enabled.Value);
             });
             AddStep("press rotate hotkey", () =>
             {
