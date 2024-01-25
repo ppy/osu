@@ -244,6 +244,14 @@ namespace osu.Game.Rulesets.Edit
                 if (!timing.NewValue)
                     setSelectTool();
             });
+
+            EditorBeatmap.HasTiming.BindValueChanged(hasTiming =>
+            {
+                foreach (var item in toolboxCollection.Items)
+                {
+                    item.Selected.Disabled = !hasTiming.NewValue;
+                }
+            }, true);
         }
 
         protected override void Update()

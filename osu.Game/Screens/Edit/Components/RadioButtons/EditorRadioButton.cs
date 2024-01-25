@@ -76,8 +76,6 @@ namespace osu.Game.Screens.Edit.Components.RadioButtons
                     Selected?.Invoke(Button);
             };
 
-            editorBeatmap?.HasTiming.BindValueChanged(hasTiming => Button.Selected.Disabled = !hasTiming.NewValue, true);
-
             Button.Selected.BindDisabledChanged(disabled => Enabled.Value = !disabled, true);
             updateSelectionState();
         }
