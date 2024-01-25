@@ -22,6 +22,7 @@ using osu.Game.Overlays;
 using osu.Game.Overlays.Notifications;
 using SixLabors.ImageSharp;
 using SixLabors.ImageSharp.Formats.Jpeg;
+using SixLabors.ImageSharp.PixelFormats;
 using SixLabors.ImageSharp.Processing;
 
 namespace osu.Game.Graphics
@@ -45,32 +46,18 @@ namespace osu.Game.Graphics
         [Resolved]
         private INotificationOverlay notificationOverlay { get; set; } = null!;
 
+        [Resolved]
+        private OsuConfigManager config { get; set; } = null!;
+
         private Storage storage = null!;
 
         private Sample? shutter;
 
-        private Bindable<ScreenshotFormat> screenshotFormat = null!;
-        private Bindable<bool> captureMenuCursor = null!;
-        private Bindable<float> posX = null!;
-        private Bindable<float> posY = null!;
-        private Bindable<float> sizeX = null!;
-        private Bindable<float> sizeY = null!;
-        private Bindable<ScalingMode> scalingMode = null!;
-
         [BackgroundDependencyLoader]
-        private void load(OsuConfigManager config, Storage storage, AudioManager audio)
+        private void load(Storage storage, AudioManager audio)
         {
             this.storage = storage.GetStorageForDirectory(@"screenshots");
-
             shutter = audio.Samples.Get("UI/shutter");
-
-            screenshotFormat = config.GetBindable<ScreenshotFormat>(OsuSetting.ScreenshotFormat);
-            captureMenuCursor = config.GetBindable<bool>(OsuSetting.ScreenshotCaptureMenuCursor);
-            posX = config.GetBindable<float>(OsuSetting.ScalingPositionX);
-            posY = config.GetBindable<float>(OsuSetting.ScalingPositionY);
-            sizeX = config.GetBindable<float>(OsuSetting.ScalingSizeX);
-            sizeY = config.GetBindable<float>(OsuSetting.ScalingSizeY);
-            scalingMode = config.GetBindable<ScalingMode>(OsuSetting.Scaling);
         }
 
         public bool OnPressed(KeyBindingPressEvent<GlobalAction> e)
@@ -99,9 +86,19 @@ namespace osu.Game.Graphics
         {
             Interlocked.Increment(ref screenShotTasks);
 
+            ScreenshotFormat screenshotFormat = config.Get<ScreenshotFormat>(OsuSetting.ScreenshotFormat);
+            bool captureMenuCursor = config.Get<bool>(OsuSetting.ScreenshotCaptureMenuCursor);
+
+            float posX = config.Get<float>(OsuSetting.ScalingPositionX);
+            float posY = config.Get<float>(OsuSetting.ScalingPositionY);
+            float sizeX = config.Get<float>(OsuSetting.ScalingSizeX);
+            float sizeY = config.Get<float>(OsuSetting.ScalingSizeY);
+
+            ScalingMode scalingMode = config.Get<ScalingMode>(OsuSetting.Scaling);
+
             try
             {
-                if (!captureMenuCursor.Value)
+                if (!captureMenuCursor)
                 {
                     cursorVisibility.Value = false;
 
@@ -110,7 +107,7 @@ namespace osu.Game.Graphics
 
                     int framesWaited = 0;
 
-                    using (var framesWaitedEvent = new ManualResetEventSlim(false))
+                    using (ManualResetEventSlim framesWaitedEvent = new ManualResetEventSlim(false))
                     {
                         ScheduledDelegate waitDelegate = host.DrawThread.Scheduler.AddDelayed(() =>
                         {
@@ -126,32 +123,32 @@ namespace osu.Game.Graphics
                     }
                 }
 
-                using (var image = await host.TakeScreenshotAsync().ConfigureAwait(false))
+                using (Image<Rgba32>? image = await host.TakeScreenshotAsync().ConfigureAwait(false))
                 {
-                    if (scalingMode.Value == ScalingMode.Everything)
+                    if (scalingMode == ScalingMode.Everything)
                     {
                         image.Mutate(m =>
                         {
-                            var size = m.GetCurrentSize();
-                            var rect = new Rectangle(Point.Empty, size);
-                            int sx = (size.Width - (int)(size.Width * sizeX.Value)) / 2;
-                            int sy = (size.Height - (int)(size.Height * sizeY.Value)) / 2;
+                            Size size = m.GetCurrentSize();
+                            Rectangle rect = new Rectangle(Point.Empty, size);
+                            int sx = (size.Width - (int)(size.Width * sizeX)) / 2;
+                            int sy = (size.Height - (int)(size.Height * sizeY)) / 2;
                             rect.Inflate(-sx, -sy);
-                            rect.X = (int)(rect.X * posX.Value) * 2;
-                            rect.Y = (int)(rect.Y * posY.Value) * 2;
+                            rect.X = (int)(rect.X * posX) * 2;
+                            rect.Y = (int)(rect.Y * posY) * 2;
                             m.Crop(rect);
                         });
                     }
 
                     clipboard.SetImage(image);
 
-                    (string? filename, Stream? stream) = getWritableStream();
+                    (string? filename, Stream? stream) = getWritableStream(screenshotFormat);
 
                     if (filename == null) return;
 
                     using (stream)
                     {
-                        switch (screenshotFormat.Value)
+                        switch (screenshotFormat)
                         {
                             case ScreenshotFormat.Png:
                                 await image.SaveAsPngAsync(stream).ConfigureAwait(false);
@@ -164,7 +161,7 @@ namespace osu.Game.Graphics
                                 break;
 
                             default:
-                                throw new InvalidOperationException($"Unknown enum member {nameof(ScreenshotFormat)} {screenshotFormat.Value}.");
+                                throw new InvalidOperationException($"Unknown enum member {nameof(ScreenshotFormat)} {screenshotFormat}.");
                         }
                     }
 
@@ -188,12 +185,12 @@ namespace osu.Game.Graphics
 
         private static readonly object filename_reservation_lock = new object();
 
-        private (string? filename, Stream? stream) getWritableStream()
+        private (string? filename, Stream? stream) getWritableStream(ScreenshotFormat format)
         {
             lock (filename_reservation_lock)
             {
-                var dt = DateTime.Now;
-                string fileExt = screenshotFormat.ToString().ToLowerInvariant();
+                DateTime dt = DateTime.Now;
+                string fileExt = format.ToString().ToLowerInvariant();
 
                 string withoutIndex = $"osu_{dt:yyyy-MM-dd_HH-mm-ss}.{fileExt}";
                 if (!storage.Exists(withoutIndex))
