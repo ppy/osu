@@ -236,7 +236,7 @@ namespace osu.Game.Rulesets.Osu.Statistics
             bufferedGrid.ForceRedraw();
         }
 
-        public static Vector2 FindRelativeHitPosition(Vector2 start, Vector2 end, Vector2 hitPoint, float radius, Vector2 localCentre, float localRadius, float rotation)
+        public static Vector2 FindRelativeHitPosition(Vector2 start, Vector2 end, Vector2 hitPoint, float radius, Vector2 localCentre, float innerPortion, float rotation)
         {
             double angle1 = Math.Atan2(end.Y - hitPoint.Y, hitPoint.X - end.X); // Angle between the end point and the hit point.
             double angle2 = Math.Atan2(end.Y - start.Y, start.X - end.X); // Angle between the end point and the start point.
@@ -262,7 +262,7 @@ namespace osu.Game.Rulesets.Osu.Statistics
             double rotatedAngle = finalAngle - MathUtils.DegreesToRadians(rotation);
             var rotatedCoordinate = -1 * new Vector2((float)Math.Cos(rotatedAngle), (float)Math.Sin(rotatedAngle));
 
-            localRadius = localCentre.X * localRadius * normalisedDistance; // The radius inside the inner portion which of the heatmap which the closest point lies.
+            float localRadius = localCentre.X * innerPortion * normalisedDistance; // The radius inside the inner portion which of the heatmap which the closest point lies.
             return localCentre + localRadius * rotatedCoordinate;
         }
 
