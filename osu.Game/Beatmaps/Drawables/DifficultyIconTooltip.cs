@@ -48,7 +48,6 @@ namespace osu.Game.Beatmaps.Drawables
                     Colour = colours.Gray3,
                     RelativeSizeAxes = Axes.Both
                 },
-                // Headers
                 new FillFlowContainer
                 {
                     AutoSizeAxes = Axes.Both,
@@ -70,7 +69,6 @@ namespace osu.Game.Beatmaps.Drawables
                             Anchor = Anchor.Centre,
                             Origin = Anchor.Centre
                         },
-                        // Difficulty stats
                         difficultyFillFlowContainer = new FillFlowContainer
                         {
                             Anchor = Anchor.Centre,
@@ -107,7 +105,6 @@ namespace osu.Game.Beatmaps.Drawables
                                 }
                             }
                         },
-                        // Misc stats
                         miscFillFlowContainer = new FillFlowContainer
                         {
                             Anchor = Anchor.Centre,
@@ -146,11 +143,9 @@ namespace osu.Game.Beatmaps.Drawables
 
             displayedContent = content;
 
-            // Header row
             starRating.Current.BindTarget = displayedContent.Difficulty;
             difficultyName.Text = displayedContent.BeatmapInfo.DifficultyName;
 
-            // Don't show difficulty stats if showExtendedTooltip is false
             if (!displayedContent.ShowExtendedTooltip)
             {
                 difficultyFillFlowContainer.Hide();
@@ -158,7 +153,6 @@ namespace osu.Game.Beatmaps.Drawables
                 return;
             }
 
-            // Show the difficulty stats if showExtendedTooltip is true
             difficultyFillFlowContainer.Show();
             miscFillFlowContainer.Show();
 
@@ -185,13 +179,11 @@ namespace osu.Game.Beatmaps.Drawables
             Ruleset ruleset = displayedContent.Ruleset.CreateInstance();
             BeatmapDifficulty adjustedDifficulty = ruleset.GetRateAdjustedDisplayDifficulty(originalDifficulty, rate);
 
-            // Difficulty row
             circleSize.Text = "CS: " + adjustedDifficulty.CircleSize.ToString("0.##");
             drainRate.Text = " HP: " + adjustedDifficulty.DrainRate.ToString("0.##");
             approachRate.Text = " AR: " + adjustedDifficulty.ApproachRate.ToString("0.##");
             overallDifficulty.Text = " OD: " + adjustedDifficulty.OverallDifficulty.ToString("0.##");
 
-            // Misc row
             length.Text = "Length: " + TimeSpan.FromMilliseconds(displayedContent.BeatmapInfo.Length / rate).ToString("mm\\:ss");
             bpm.Text = " BPM: " + Math.Round(bpmAdjusted, 0);
         }
