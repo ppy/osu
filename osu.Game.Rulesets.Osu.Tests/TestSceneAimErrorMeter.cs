@@ -7,7 +7,6 @@ using osu.Framework.Testing;
 using osu.Game.Rulesets.Scoring;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
-using osu.Game.Rulesets.Osu.Skinning;
 using osu.Game.Tests.Visual;
 using osuTK;
 using osuTK.Graphics;
@@ -17,6 +16,7 @@ using osu.Game.Rulesets.Osu.Objects;
 using NUnit.Framework;
 using osu.Framework.Utils;
 using osu.Framework.Threading;
+using osu.Game.Rulesets.Osu.HUD;
 
 namespace osu.Game.Rulesets.Osu.Tests
 {

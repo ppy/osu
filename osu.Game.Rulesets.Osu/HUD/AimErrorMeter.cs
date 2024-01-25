@@ -24,7 +24,7 @@ using osu.Game.Screens.Play.HUD.HitErrorMeters;
 using osuTK;
 using osuTK.Graphics;
 
-namespace osu.Game.Rulesets.Osu.Skinning
+namespace osu.Game.Rulesets.Osu.HUD
 {
     [Cached]
     public partial class AimErrorMeter : HitErrorMeter
