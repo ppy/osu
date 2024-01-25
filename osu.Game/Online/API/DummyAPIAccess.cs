@@ -8,7 +8,8 @@ using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Game.Localisation;
 using osu.Game.Online.API.Requests.Responses;
-using osu.Game.Online.Notifications;
+using osu.Game.Online.Chat;
+using osu.Game.Online.Notifications.WebSocket;
 using osu.Game.Tests;
 using osu.Game.Users;
 
@@ -29,6 +30,9 @@ namespace osu.Game.Online.API
         public Bindable<UserActivity> Activity { get; } = new Bindable<UserActivity>();
 
         public Bindable<UserStatistics?> Statistics { get; } = new Bindable<UserStatistics?>();
+
+        public DummyNotificationsClient NotificationsClient { get; } = new DummyNotificationsClient();
+        INotificationsClient IAPIProvider.NotificationsClient => NotificationsClient;
 
         public Language Language => Language.en;
 
@@ -159,7 +163,7 @@ namespace osu.Game.Online.API
 
         public IHubClientConnector? GetHubConnector(string clientName, string endpoint, bool preferMessagePack) => null;
 
-        public NotificationsClientConnector GetNotificationsConnector() => new PollingNotificationsClientConnector(this);
+        public IChatClient GetChatClient() => new PollingChatClientConnector(this);
 
         public RegistrationRequest.RegistrationRequestErrors? CreateAccount(string email, string username, string password)
         {

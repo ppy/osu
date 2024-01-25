@@ -11,10 +11,8 @@ using System.Net.Http;
 using System.Net.Sockets;
 using System.Threading;
 using System.Threading.Tasks;
-using JetBrains.Annotations;
 using Newtonsoft.Json.Linq;
 using osu.Framework.Bindables;
-using osu.Framework.Extensions;
 using osu.Framework.Extensions.ExceptionExtensions;
 using osu.Framework.Extensions.ObjectExtensions;
 using osu.Framework.Graphics;
@@ -23,7 +21,7 @@ using osu.Game.Configuration;
 using osu.Game.Localisation;
 using osu.Game.Online.API.Requests;
 using osu.Game.Online.API.Requests.Responses;
-using osu.Game.Online.Notifications;
+using osu.Game.Online.Chat;
 using osu.Game.Online.Notifications.WebSocket;
 using osu.Game.Users;
 
@@ -59,6 +57,8 @@ namespace osu.Game.Online.API
         public IBindable<UserActivity> Activity => activity;
         public IBindable<UserStatistics> Statistics => statistics;
 
+        public INotificationsClient NotificationsClient { get; }
+
         public Language Language => game.CurrentLanguage.Value;
 
         private Bindable<APIUser> localUser { get; } = new Bindable<APIUser>(createGuestUser());
@@ -78,11 +78,6 @@ namespace osu.Game.Online.API
 
         private readonly Logger log;
 
-        private string webSocketEndpointUrl;
-
-        [CanBeNull]
-        private OsuClientWebSocket webSocket;
-
         public APIAccess(OsuGameBase game, OsuConfigManager config, EndpointConfiguration endpointConfiguration, string versionHash)
         {
             this.game = game;
@@ -91,7 +86,7 @@ namespace osu.Game.Online.API
 
             APIEndpointUrl = endpointConfiguration.APIEndpointUrl;
             WebsiteRootUrl = endpointConfiguration.WebsiteRootUrl;
-            webSocketEndpointUrl = endpointConfiguration.NotificationsWebSocketEndpointUrl;
+            NotificationsClient = new WebSocketNotificationsClientConnector(this);
 
             authentication = new OAuth(endpointConfiguration.APIClientID, endpointConfiguration.APIClientSecret, APIEndpointUrl);
             log = Logger.GetLogger(LoggingTarget.Network);
@@ -368,33 +363,11 @@ namespace osu.Game.Online.API
 
             state.Value = APIState.RequiresSecondFactorAuth;
 
-            try
+            NotificationsClient.MessageReceived += msg =>
             {
-                webSocket?.DisposeAsync().AsTask().WaitSafely();
-                var newSocket = new OsuClientWebSocket(this, webSocketEndpointUrl);
-                newSocket.MessageReceived += async msg =>
-                {
-                    if (msg.Event == @"verified")
-                    {
-                        state.Value = APIState.Online;
-                        await newSocket.DisposeAsync().ConfigureAwait(false);
-                        if (webSocket == newSocket)
-                            webSocket = null;
-                    }
-                };
-                newSocket.Closed += ex =>
-                {
-                    Logger.Error(ex, "Connection with account verification endpoint closed unexpectedly. Please supply account verification code manually.", LoggingTarget.Network);
-                    return Task.CompletedTask;
-                };
-                webSocket = newSocket;
-
-                webSocket.ConnectAsync(cancellationToken.Token).WaitSafely();
-            }
-            catch (Exception ex)
-            {
-                Logger.Error(ex, "Failed to set up connection with account verification endpoint. Please supply account verification code manually.", LoggingTarget.Network);
-            }
+                if (msg.Event == @"verified")
+                    state.Value = APIState.Online;
+            };
         }
 
         public void AuthenticateSecondFactor(string code)
@@ -407,8 +380,7 @@ namespace osu.Game.Online.API
         public IHubClientConnector GetHubConnector(string clientName, string endpoint, bool preferMessagePack) =>
             new HubClientConnector(clientName, endpoint, this, versionHash, preferMessagePack);
 
-        public NotificationsClientConnector GetNotificationsConnector() =>
-            new WebSocketNotificationsClientConnector(this);
+        public IChatClient GetChatClient() => new WebSocketChatClient(this);
 
         public RegistrationRequest.RegistrationRequestErrors CreateAccount(string email, string username, string password)
         {
@@ -626,7 +598,6 @@ namespace osu.Game.Online.API
 
             flushQueue();
             cancellationToken.Cancel();
-            webSocket?.DisposeAsync().AsTask().WaitSafely();
         }
     }
 
