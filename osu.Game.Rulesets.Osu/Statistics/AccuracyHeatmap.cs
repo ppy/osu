@@ -225,10 +225,23 @@ namespace osu.Game.Rulesets.Osu.Statistics
             if (pointGrid.Content.Count == 0)
                 return;
 
+            Vector2 localPoint = FindRelativeHitPosition(start, end, hitPoint, radius, new Vector2(points_per_dimension - 1) / 2, inner_portion, rotation);
+
+            // Find the most relevant hit point.
+            int r = Math.Clamp((int)Math.Round(localPoint.Y), 0, points_per_dimension - 1);
+            int c = Math.Clamp((int)Math.Round(localPoint.X), 0, points_per_dimension - 1);
+
+            PeakValue = Math.Max(PeakValue, ((HitPoint)pointGrid.Content[r][c]).Increment());
+
+            bufferedGrid.ForceRedraw();
+        }
+
+        public static Vector2 FindRelativeHitPosition(Vector2 start, Vector2 end, Vector2 hitPoint, float radius, Vector2 localCentre, float localRadius, float rotation)
+        {
             double angle1 = Math.Atan2(end.Y - hitPoint.Y, hitPoint.X - end.X); // Angle between the end point and the hit point.
             double angle2 = Math.Atan2(end.Y - start.Y, start.X - end.X); // Angle between the end point and the start point.
             double finalAngle = angle2 - angle1; // Angle between start, end, and hit points.
-            float normalisedDistance = Vector2.Distance(hitPoint, end) / radius;
+            float normalisedDistance = Vector2.Distance(hitPoint, end) / radius; // Distance between the hit point and the end point.
 
             // Consider two objects placed horizontally, with the start on the left and the end on the right.
             // The above calculated the angle between {end, start}, and the angle between {end, hitPoint}, in the form:
@@ -249,17 +262,8 @@ namespace osu.Game.Rulesets.Osu.Statistics
             double rotatedAngle = finalAngle - MathUtils.DegreesToRadians(rotation);
             var rotatedCoordinate = -1 * new Vector2((float)Math.Cos(rotatedAngle), (float)Math.Sin(rotatedAngle));
 
-            Vector2 localCentre = new Vector2(points_per_dimension - 1) / 2;
-            float localRadius = localCentre.X * inner_portion * normalisedDistance; // The radius inside the inner portion which of the heatmap which the closest point lies.
-            Vector2 localPoint = localCentre + localRadius * rotatedCoordinate;
-
-            // Find the most relevant hit point.
-            int r = Math.Clamp((int)Math.Round(localPoint.Y), 0, points_per_dimension - 1);
-            int c = Math.Clamp((int)Math.Round(localPoint.X), 0, points_per_dimension - 1);
-
-            PeakValue = Math.Max(PeakValue, ((HitPoint)pointGrid.Content[r][c]).Increment());
-
-            bufferedGrid.ForceRedraw();
+            localRadius = localCentre.X * localRadius * normalisedDistance; // The radius inside the inner portion which of the heatmap which the closest point lies.
+            return localCentre + localRadius * rotatedCoordinate;
         }
 
         private partial class HitPoint : Circle
