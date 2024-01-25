@@ -194,7 +194,8 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
 
                 ApplyResult(static (r, hitObject) =>
                 {
-                    r.Type = hitObject.IsHit ? r.Judgement.MaxResult : r.Judgement.MinResult;
+                    var drumRoll = (DrawableDrumRoll)hitObject;
+                    r.Type = drumRoll.ParentHitObject!.IsHit ? r.Judgement.MaxResult : r.Judgement.MinResult;
                 });
             }
 
