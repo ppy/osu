@@ -20,6 +20,7 @@ namespace osu.Game.Screens.Edit.Components.RadioButtons
         /// Tooltip text that will be shown on hover if button is enabled.
         /// </summary>
         public LocalisableString TooltipTextWhenEnabled { get; set; } = string.Empty;
+
         /// <summary>
         /// Tooltip text that will be shown on hover if button is disabled.
         /// </summary>
