@@ -24,6 +24,7 @@ using osu.Game.Overlays;
 using osu.Game.Overlays.Notifications;
 using SixLabors.ImageSharp;
 using SixLabors.ImageSharp.Formats.Jpeg;
+using SixLabors.ImageSharp.Processing;
 
 namespace osu.Game.Graphics
 {
@@ -52,6 +53,9 @@ namespace osu.Game.Graphics
         private INotificationOverlay notificationOverlay { get; set; }
 
         private Sample shutter;
+        private Bindable<float> sizeX;
+        private Bindable<float> sizeY;
+        private Bindable<ScalingMode> scalingMode;
 
         [BackgroundDependencyLoader]
         private void load(OsuConfigManager config, Storage storage, AudioManager audio)
@@ -62,6 +66,10 @@ namespace osu.Game.Graphics
             captureMenuCursor = config.GetBindable<bool>(OsuSetting.ScreenshotCaptureMenuCursor);
 
             shutter = audio.Samples.Get("UI/shutter");
+
+            sizeX = config.GetBindable<float>(OsuSetting.ScalingSizeX);
+            sizeY = config.GetBindable<float>(OsuSetting.ScalingSizeY);
+            scalingMode = config.GetBindable<ScalingMode>(OsuSetting.Scaling);
         }
 
         public bool OnPressed(KeyBindingPressEvent<GlobalAction> e)
@@ -119,6 +127,19 @@ namespace osu.Game.Graphics
 
                 using (var image = await host.TakeScreenshotAsync().ConfigureAwait(false))
                 {
+                    if (scalingMode.Value == ScalingMode.Everything)
+                    {
+                        image.Mutate(m =>
+                        {
+                            var size = m.GetCurrentSize();
+                            var rect = new Rectangle(Point.Empty, size);
+                            int sx = (size.Width - (int)(size.Width * sizeX.Value)) / 2;
+                            int sy = (size.Height - (int)(size.Height * sizeY.Value)) / 2;
+                            rect.Inflate(-sx, -sy);
+                            m.Crop(rect);
+                        });
+                    }
+
                     clipboard.SetImage(image);
 
                     (string filename, var stream) = getWritableStream();
