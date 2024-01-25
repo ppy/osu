@@ -10,7 +10,7 @@ using osuTK;
 
 namespace osu.Game.Rulesets.Judgements
 {
-    public partial class DefaultJudgementPiece : JudgementPiece, IAnimatableJudgement
+    public partial class DefaultJudgementPiece : TextJudgementPiece, IAnimatableJudgement
     {
         public DefaultJudgementPiece(HitResult result)
             : base(result)
