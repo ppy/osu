@@ -212,6 +212,11 @@ namespace osu.Game.Rulesets.Edit
                                       .Select(t => new RadioButton(t.Name, () => toolSelected(t), t.CreateIcon))
                                       .ToList();
 
+            foreach (var item in toolboxCollection.Items)
+            {
+                item.TooltipTextWhenDisabled = "Add at least one timing point first!";
+            }
+
             TernaryStates = CreateTernaryButtons().ToArray();
             togglesCollection.AddRange(TernaryStates.Select(b => new DrawableTernaryButton(b)));
 

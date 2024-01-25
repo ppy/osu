@@ -4,6 +4,7 @@
 using System;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
+using osu.Framework.Localisation;
 
 namespace osu.Game.Screens.Edit.Components.RadioButtons
 {
@@ -11,8 +12,18 @@ namespace osu.Game.Screens.Edit.Components.RadioButtons
     {
         /// <summary>
         /// Whether this <see cref="RadioButton"/> is selected.
+        /// Disable this bindable to disable the button.
         /// </summary>
         public readonly BindableBool Selected;
+
+        /// <summary>
+        /// Tooltip text that will be shown on hover if button is enabled.
+        /// </summary>
+        public LocalisableString TooltipTextWhenEnabled { get; set; } = string.Empty;
+        /// <summary>
+        /// Tooltip text that will be shown on hover if button is disabled.
+        /// </summary>
+        public LocalisableString TooltipTextWhenDisabled { get; set; } = string.Empty;
 
         /// <summary>
         /// The item related to this button.
