@@ -6,7 +6,8 @@ using System.Threading.Tasks;
 using osu.Framework.Bindables;
 using osu.Game.Localisation;
 using osu.Game.Online.API.Requests.Responses;
-using osu.Game.Online.Notifications;
+using osu.Game.Online.Chat;
+using osu.Game.Online.Notifications.WebSocket;
 using osu.Game.Users;
 
 namespace osu.Game.Online.API
@@ -136,9 +137,14 @@ namespace osu.Game.Online.API
         IHubClientConnector? GetHubConnector(string clientName, string endpoint, bool preferMessagePack = true);
 
         /// <summary>
-        /// Constructs a new <see cref="NotificationsClientConnector"/>.
+        /// Accesses the <see cref="INotificationsClient"/> used to receive asynchronous notifications from web.
         /// </summary>
-        NotificationsClientConnector GetNotificationsConnector();
+        INotificationsClient NotificationsClient { get; }
+
+        /// <summary>
+        /// Creates a <see cref="IChatClient"/> instance to use in order to chat.
+        /// </summary>
+        IChatClient GetChatClient();
 
         /// <summary>
         /// Create a new user account. This is a blocking operation.
