@@ -19,8 +19,6 @@ namespace osu.Game.Rulesets.Osu.Edit
 {
     public partial class OsuSelectionRotationHandler : SelectionRotationHandler
     {
-        public BindableBool CanRotatePlayfieldOrigin { get; private set; } = new BindableBool();
-
         [Resolved]
         private IEditorChangeHandler? changeHandler { get; set; }
 
