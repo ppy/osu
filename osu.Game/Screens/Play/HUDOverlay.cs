@@ -5,7 +5,6 @@
 
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using JetBrains.Annotations;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
@@ -259,14 +258,14 @@ namespace osu.Game.Screens.Play
 
             Vector2? highestBottomScreenSpace = null;
 
-            // LINQ cast can be removed when IDrawable interface includes Anchor / RelativeSizeAxes.
-            foreach (var element in mainComponents.Components.Cast<Drawable>())
-                processDrawable(element);
+            // cast can be removed when IDrawable interface includes Anchor / RelativeSizeAxes.
+            foreach (var element in mainComponents.Components)
+                processDrawable(element as Drawable);
 
             if (rulesetComponents != null)
             {
-                foreach (var element in rulesetComponents.Components.Cast<Drawable>())
-                    processDrawable(element);
+                foreach (var element in rulesetComponents.Components)
+                    processDrawable(element as Drawable);
             }
 
             if (lowestTopScreenSpaceRight.HasValue)
