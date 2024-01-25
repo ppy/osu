@@ -44,7 +44,6 @@ namespace osu.Game.Skinning
             const double fade_out_length = 600;
 
             this.FadeInFromZero(fade_in_length);
-            this.Delay(fade_out_delay).FadeOut(fade_out_length);
 
             if (result.IsMiss())
             {
@@ -74,6 +73,8 @@ namespace osu.Game.Skinning
                     this.RotateTo(0);
                     this.RotateTo(rotation, fade_in_length)
                         .Then().RotateTo(rotation * 2, fade_out_delay + fade_out_length - fade_in_length, Easing.In);
+
+                    this.Delay(fade_out_delay).FadeOut(fade_out_length);
                 }
             }
             else
@@ -87,6 +88,8 @@ namespace osu.Game.Skinning
                     // so we need to force the current value to be correct at 1.2 (0.95) then complete the
                     // second half of the transform.
                     .ScaleTo(0.95f).ScaleTo(finalScale, fade_in_length * 0.2f); // t = 1.4
+
+                this.Delay(fade_out_delay).FadeOut(fade_out_length);
             }
         }
 
