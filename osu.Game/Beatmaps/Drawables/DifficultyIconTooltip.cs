@@ -1,8 +1,6 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
 using System;
 using System.Linq;
 using osu.Framework.Allocation;
@@ -21,17 +19,17 @@ namespace osu.Game.Beatmaps.Drawables
 {
     internal partial class DifficultyIconTooltip : VisibilityContainer, ITooltip<DifficultyIconTooltipContent>
     {
-        private OsuSpriteText difficultyName;
-        private StarRatingDisplay starRating;
-        private OsuSpriteText overallDifficulty;
-        private OsuSpriteText drainRate;
-        private OsuSpriteText circleSize;
-        private OsuSpriteText approachRate;
-        private OsuSpriteText bpm;
-        private OsuSpriteText length;
+        private OsuSpriteText difficultyName = null!;
+        private StarRatingDisplay starRating = null!;
+        private OsuSpriteText overallDifficulty = null!;
+        private OsuSpriteText drainRate = null!;
+        private OsuSpriteText circleSize = null!;
+        private OsuSpriteText approachRate = null!;
+        private OsuSpriteText bpm = null!;
+        private OsuSpriteText length = null!;
 
-        private FillFlowContainer difficultyFillFlowContainer;
-        private FillFlowContainer miscFillFlowContainer;
+        private FillFlowContainer difficultyFillFlowContainer = null!;
+        private FillFlowContainer miscFillFlowContainer = null!;
 
         [BackgroundDependencyLoader]
         private void load(OsuColour colours)
@@ -133,7 +131,7 @@ namespace osu.Game.Beatmaps.Drawables
             };
         }
 
-        private DifficultyIconTooltipContent displayedContent;
+        private DifficultyIconTooltipContent? displayedContent;
 
         public void SetContent(DifficultyIconTooltipContent content)
         {
@@ -178,12 +176,12 @@ namespace osu.Game.Beatmaps.Drawables
             Ruleset ruleset = displayedContent.Ruleset.CreateInstance();
             BeatmapDifficulty adjustedDifficulty = ruleset.GetRateAdjustedDisplayDifficulty(originalDifficulty, rate);
 
-            circleSize.Text = "CS: " + adjustedDifficulty.CircleSize.ToString("0.##");
-            drainRate.Text = " HP: " + adjustedDifficulty.DrainRate.ToString("0.##");
-            approachRate.Text = " AR: " + adjustedDifficulty.ApproachRate.ToString("0.##");
-            overallDifficulty.Text = " OD: " + adjustedDifficulty.OverallDifficulty.ToString("0.##");
+            circleSize.Text = @"CS: " + adjustedDifficulty.CircleSize.ToString(@"0.##");
+            drainRate.Text = @" HP: " + adjustedDifficulty.DrainRate.ToString(@"0.##");
+            approachRate.Text = @" AR: " + adjustedDifficulty.ApproachRate.ToString(@"0.##");
+            overallDifficulty.Text = @" OD: " + adjustedDifficulty.OverallDifficulty.ToString(@"0.##");
 
-            length.Text = "Length: " + TimeSpan.FromMilliseconds(displayedContent.BeatmapInfo.Length / rate).ToString("mm\\:ss");
+            length.Text = "Length: " + TimeSpan.FromMilliseconds(displayedContent.BeatmapInfo.Length / rate).ToString(@"mm\:ss");
             bpm.Text = " BPM: " + Math.Round(bpmAdjusted, 0);
         }
 
@@ -199,10 +197,10 @@ namespace osu.Game.Beatmaps.Drawables
         public readonly IBeatmapInfo BeatmapInfo;
         public readonly IBindable<StarDifficulty> Difficulty;
         public readonly IRulesetInfo Ruleset;
-        public readonly Mod[] Mods;
+        public readonly Mod[]? Mods;
         public readonly bool ShowExtendedTooltip;
 
-        public DifficultyIconTooltipContent(IBeatmapInfo beatmapInfo, IBindable<StarDifficulty> difficulty, IRulesetInfo rulesetInfo, Mod[] mods, bool showExtendedTooltip = false)
+        public DifficultyIconTooltipContent(IBeatmapInfo beatmapInfo, IBindable<StarDifficulty> difficulty, IRulesetInfo rulesetInfo, Mod[]? mods, bool showExtendedTooltip = false)
         {
             BeatmapInfo = beatmapInfo;
             Difficulty = difficulty;
