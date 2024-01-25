@@ -77,7 +77,7 @@ namespace osu.Game.Graphics
             {
                 case HitResult.IgnoreMiss:
                 case HitResult.SmallTickMiss:
-                    return Orange1;
+                    return Color4.Gray;
 
                 case HitResult.Miss:
                 case HitResult.LargeTickMiss:
