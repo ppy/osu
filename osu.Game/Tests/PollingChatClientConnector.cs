@@ -24,7 +24,7 @@ namespace osu.Game.Tests
         public event Action<List<Message>>? NewMessages;
         public event Action? PresenceReceived;
 
-        public void FetchInitialMessages()
+        public void RequestPresence()
         {
             // don't really need to do anything special if we poll every second anyway.
         }

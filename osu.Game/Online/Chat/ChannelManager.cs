@@ -91,7 +91,7 @@ namespace osu.Game.Online.Chat
             chatClient.ChannelParted += ch => Schedule(() => leaveChannel(getChannel(ch), false));
             chatClient.NewMessages += msgs => Schedule(() => addMessages(msgs));
             chatClient.PresenceReceived += () => Schedule(initializeChannels);
-            chatClient.FetchInitialMessages();
+            chatClient.RequestPresence();
 
             apiState.BindTo(api.State);
             apiState.BindValueChanged(_ => SendAck(), true);

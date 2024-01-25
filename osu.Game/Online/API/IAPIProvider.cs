@@ -130,8 +130,14 @@ namespace osu.Game.Online.API
         /// <param name="preferMessagePack">Whether to use MessagePack for serialisation if available on this platform.</param>
         IHubClientConnector? GetHubConnector(string clientName, string endpoint, bool preferMessagePack = true);
 
+        /// <summary>
+        /// Accesses the <see cref="INotificationsClient"/> used to receive asynchronous notifications from web.
+        /// </summary>
         INotificationsClient NotificationsClient { get; }
 
+        /// <summary>
+        /// Creates a <see cref="IChatClient"/> instance to use in order to chat.
+        /// </summary>
         IChatClient GetChatClient();
 
         /// <summary>
