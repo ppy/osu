@@ -11,6 +11,7 @@ using osu.Framework.Input.Events;
 using osu.Game.Input.Bindings;
 using osu.Game.Rulesets.Edit;
 using osu.Game.Screens.Edit.Components;
+using osu.Game.Screens.Edit.Compose.Components;
 using osuTK;
 
 namespace osu.Game.Rulesets.Osu.Edit
@@ -21,7 +22,7 @@ namespace osu.Game.Rulesets.Osu.Edit
 
         private EditorToolButton rotateButton = null!;
 
-        public OsuSelectionRotationHandler RotationHandler { get; init; } = null!;
+        public SelectionRotationHandler RotationHandler { get; init; } = null!;
 
         public TransformToolboxGroup()
             : base("transform")
