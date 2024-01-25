@@ -13,9 +13,10 @@ namespace osu.Game.Screens.Edit.Compose.Components
     public partial class SelectionRotationHandler : Component
     {
         /// <summary>
-        /// Whether the rotation can currently be performed.
+        /// Whether rotation anchored by the selection origin can currently be performed.
+        /// This is in constrast to rotation anchored by the entire field.
         /// </summary>
-        public Bindable<bool> CanRotate { get; private set; } = new BindableBool();
+        public Bindable<bool> CanRotateSelectionOrigin { get; private set; } = new BindableBool();
 
         /// <summary>
         /// Performs a single, instant, atomic rotation operation.

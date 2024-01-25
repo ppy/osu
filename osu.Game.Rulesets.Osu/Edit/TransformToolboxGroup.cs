@@ -53,7 +53,7 @@ namespace osu.Game.Rulesets.Osu.Edit
 
             // bindings to `Enabled` on the buttons are decoupled on purpose
             // due to the weird `OsuButton` behaviour of resetting `Enabled` to `false` when `Action` is set.
-            canRotate.BindTo(RotationHandler.CanRotate);
+            canRotate.BindTo(RotationHandler.CanRotateSelectionOrigin);
             canRotate.BindValueChanged(_ => rotateButton.Enabled.Value = canRotate.Value, true);
         }
 

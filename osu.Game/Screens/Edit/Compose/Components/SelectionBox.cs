@@ -174,7 +174,7 @@ namespace osu.Game.Screens.Edit.Compose.Components
         private void load()
         {
             if (rotationHandler != null)
-                canRotate.BindTo(rotationHandler.CanRotate);
+                canRotate.BindTo(rotationHandler.CanRotateSelectionOrigin);
 
             canRotate.BindValueChanged(_ => recreate(), true);
         }
