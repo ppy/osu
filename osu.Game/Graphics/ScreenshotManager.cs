@@ -89,13 +89,6 @@ namespace osu.Game.Graphics
             ScreenshotFormat screenshotFormat = config.Get<ScreenshotFormat>(OsuSetting.ScreenshotFormat);
             bool captureMenuCursor = config.Get<bool>(OsuSetting.ScreenshotCaptureMenuCursor);
 
-            float posX = config.Get<float>(OsuSetting.ScalingPositionX);
-            float posY = config.Get<float>(OsuSetting.ScalingPositionY);
-            float sizeX = config.Get<float>(OsuSetting.ScalingSizeX);
-            float sizeY = config.Get<float>(OsuSetting.ScalingSizeY);
-
-            ScalingMode scalingMode = config.Get<ScalingMode>(OsuSetting.Scaling);
-
             try
             {
                 if (!captureMenuCursor)
@@ -125,17 +118,26 @@ namespace osu.Game.Graphics
 
                 using (Image<Rgba32>? image = await host.TakeScreenshotAsync().ConfigureAwait(false))
                 {
-                    if (scalingMode == ScalingMode.Everything)
+                    if (config.Get<ScalingMode>(OsuSetting.Scaling) == ScalingMode.Everything)
                     {
+                        float posX = config.Get<float>(OsuSetting.ScalingPositionX);
+                        float posY = config.Get<float>(OsuSetting.ScalingPositionY);
+                        float sizeX = config.Get<float>(OsuSetting.ScalingSizeX);
+                        float sizeY = config.Get<float>(OsuSetting.ScalingSizeY);
+
                         image.Mutate(m =>
                         {
-                            Size size = m.GetCurrentSize();
-                            Rectangle rect = new Rectangle(Point.Empty, size);
-                            int sx = (size.Width - (int)(size.Width * sizeX)) / 2;
-                            int sy = (size.Height - (int)(size.Height * sizeY)) / 2;
+                            Rectangle rect = new Rectangle(Point.Empty, m.GetCurrentSize());
+
+                            // Reduce size by user scale settings...
+                            int sx = (rect.Width - (int)(rect.Width * sizeX)) / 2;
+                            int sy = (rect.Height - (int)(rect.Height * sizeY)) / 2;
                             rect.Inflate(-sx, -sy);
+
+                            // ...then adjust the region based on their positional offset.
                             rect.X = (int)(rect.X * posX) * 2;
                             rect.Y = (int)(rect.Y * posY) * 2;
+
                             m.Crop(rect);
                         });
                     }
