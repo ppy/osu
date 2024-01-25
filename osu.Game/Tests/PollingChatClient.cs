@@ -6,34 +6,39 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using osu.Game.Online;
 using osu.Game.Online.API;
 using osu.Game.Online.API.Requests;
 using osu.Game.Online.Chat;
 
-namespace osu.Game.Online.Notifications
+namespace osu.Game.Tests
 {
-    /// <summary>
-    /// An abstract client which receives notification-related events (chat/notifications).
-    /// </summary>
-    public abstract class NotificationsClient : PersistentEndpointClient
+    public class PollingChatClient : PersistentEndpointClient
     {
-        public Action<Channel>? ChannelJoined;
-        public Action<Channel>? ChannelParted;
-        public Action<List<Message>>? NewMessages;
-        public Action? PresenceReceived;
+        public event Action<Channel>? ChannelJoined;
+        public event Action<List<Message>>? NewMessages;
+        public event Action? PresenceReceived;
 
-        protected readonly IAPIProvider API;
+        private readonly IAPIProvider api;
 
         private long lastMessageId;
 
-        protected NotificationsClient(IAPIProvider api)
+        public PollingChatClient(IAPIProvider api)
         {
-            API = api;
+            this.api = api;
         }
 
         public override Task ConnectAsync(CancellationToken cancellationToken)
         {
-            API.Queue(CreateInitialFetchRequest(0));
+            Task.Run(async () =>
+            {
+                while (!cancellationToken.IsCancellationRequested)
+                {
+                    await api.PerformAsync(CreateInitialFetchRequest()).ConfigureAwait(true);
+                    await Task.Delay(1000, cancellationToken).ConfigureAwait(true);
+                }
+            }, cancellationToken);
+
             return Task.CompletedTask;
         }
 
@@ -46,11 +51,11 @@ namespace osu.Game.Online.Notifications
                 if (updates?.Presence != null)
                 {
                     foreach (var channel in updates.Presence)
-                        HandleChannelJoined(channel);
+                        handleChannelJoined(channel);
 
                     //todo: handle left channels
 
-                    HandleMessages(updates.Messages);
+                    handleMessages(updates.Messages);
                 }
 
                 PresenceReceived?.Invoke();
@@ -59,15 +64,13 @@ namespace osu.Game.Online.Notifications
             return fetchReq;
         }
 
-        protected void HandleChannelJoined(Channel channel)
+        private void handleChannelJoined(Channel channel)
         {
             channel.Joined.Value = true;
             ChannelJoined?.Invoke(channel);
         }
 
-        protected void HandleChannelParted(Channel channel) => ChannelParted?.Invoke(channel);
-
-        protected void HandleMessages(List<Message>? messages)
+        private void handleMessages(List<Message>? messages)
         {
             if (messages == null)
                 return;
