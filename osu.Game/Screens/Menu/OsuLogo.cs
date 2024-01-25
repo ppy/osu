@@ -192,7 +192,7 @@ namespace osu.Game.Screens.Menu
                                                                             Origin = Anchor.Centre,
                                                                             Thickness = 0.009f,
                                                                             ScaleAdjust = 3,
-                                                                            SpawnRatio = 1.2f,
+                                                                            SpawnRatio = 1.4f,
                                                                             Colour = ColourInfo.GradientVertical(Color4Extensions.FromHex(@"ff66ab"), Color4Extensions.FromHex(@"b6346f")),
                                                                             RelativeSizeAxes = Axes.Both,
                                                                         },
