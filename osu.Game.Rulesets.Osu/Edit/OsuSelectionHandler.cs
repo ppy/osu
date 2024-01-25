@@ -164,7 +164,7 @@ namespace osu.Game.Rulesets.Osu.Edit
             if ((reference & Anchor.y0) > 0) scale.Y = -scale.Y;
         }
 
-        public override SelectionRotationHandler CreateRotationHandler() => new OsuSelectionRotationHandler();
+        public override OsuSelectionRotationHandler CreateRotationHandler() => new OsuSelectionRotationHandler();
 
         private void scaleSlider(Slider slider, Vector2 scale)
         {
