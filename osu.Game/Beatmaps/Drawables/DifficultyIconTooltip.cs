@@ -44,7 +44,6 @@ namespace osu.Game.Beatmaps.Drawables
             {
                 new Box
                 {
-                    Alpha = 0.9f,
                     Colour = colours.Gray3,
                     RelativeSizeAxes = Axes.Both
                 },
