@@ -208,11 +208,11 @@ namespace osu.Game.Screens.Edit.Compose.Components
             switch (currentType)
             {
                 case BeatDivisorType.Common:
-                    beatDivisor.SetArbitraryDivisor(4);
+                    beatDivisor.SetArbitraryDivisor(4, true);
                     break;
 
                 case BeatDivisorType.Triplets:
-                    beatDivisor.SetArbitraryDivisor(6);
+                    beatDivisor.SetArbitraryDivisor(6, true);
                     break;
 
                 case BeatDivisorType.Custom:

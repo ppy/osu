@@ -4,12 +4,14 @@
 #nullable disable
 
 using System.Collections.Generic;
+using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.UserInterface;
 using osu.Game.Beatmaps.Timing;
 using osu.Game.Rulesets.Scoring;
+using osu.Game.Scoring;
 using osu.Game.Screens.Play.Break;
 
 namespace osu.Game.Screens.Play
@@ -113,7 +115,7 @@ namespace osu.Game.Screens.Play
             if (scoreProcessor != null)
             {
                 info.AccuracyDisplay.Current.BindTo(scoreProcessor.Accuracy);
-                info.GradeDisplay.Current.BindTo(scoreProcessor.Rank);
+                ((IBindable<ScoreRank>)info.GradeDisplay.Current).BindTo(scoreProcessor.Rank);
             }
         }
 

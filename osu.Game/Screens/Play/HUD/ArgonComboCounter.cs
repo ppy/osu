@@ -21,8 +21,7 @@ namespace osu.Game.Screens.Play.HUD
     {
         private ArgonCounterTextComponent text = null!;
 
-        protected override double RollingDuration => 500;
-        protected override Easing RollingEasing => Easing.OutQuint;
+        protected override double RollingDuration => 250;
 
         [SettingSource("Wireframe opacity", "Controls the opacity of the wire frames behind the digits.")]
         public BindableFloat WireframeOpacity { get; } = new BindableFloat(0.25f)
@@ -55,6 +54,31 @@ namespace osu.Game.Screens.Play.HUD
                 if (wasMiss)
                     text.FlashColour(Color4.Red, duration, Easing.OutQuint);
             });
+        }
+
+        public override int DisplayedCount
+        {
+            get => base.DisplayedCount;
+            set
+            {
+                base.DisplayedCount = value;
+                updateWireframe();
+            }
+        }
+
+        private void updateWireframe()
+        {
+            text.RequiredDisplayDigits.Value = getDigitsRequiredForDisplayCount();
+        }
+
+        private int getDigitsRequiredForDisplayCount()
+        {
+            // one for the single presumed starting digit, one for the "x" at the end.
+            int digitsRequired = 2;
+            long c = DisplayedCount;
+            while ((c /= 10) > 0)
+                digitsRequired++;
+            return digitsRequired;
         }
 
         protected override LocalisableString FormatCount(int count) => $@"{count}x";

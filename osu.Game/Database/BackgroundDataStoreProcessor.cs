@@ -12,7 +12,7 @@ using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Logging;
 using osu.Game.Beatmaps;
-using osu.Game.Database;
+using osu.Game.Extensions;
 using osu.Game.Online.API;
 using osu.Game.Overlays;
 using osu.Game.Overlays.Notifications;
@@ -21,13 +21,15 @@ using osu.Game.Scoring;
 using osu.Game.Scoring.Legacy;
 using osu.Game.Screens.Play;
 
-namespace osu.Game
+namespace osu.Game.Database
 {
     /// <summary>
     /// Performs background updating of data stores at startup.
     /// </summary>
     public partial class BackgroundDataStoreProcessor : Component
     {
+        protected Task ProcessingTask { get; private set; } = null!;
+
         [Resolved]
         private RulesetStore rulesetStore { get; set; } = null!;
 
@@ -61,7 +63,7 @@ namespace osu.Game
         {
             base.LoadComplete();
 
-            Task.Factory.StartNew(() =>
+            ProcessingTask = Task.Factory.StartNew(() =>
             {
                 Logger.Log("Beginning background data store processing..");
 
@@ -71,6 +73,7 @@ namespace osu.Game
                 processBeatmapsWithMissingObjectCounts();
                 processScoresWithMissingStatistics();
                 convertLegacyTotalScoreToStandardised();
+                upgradeScoreRanks();
             }, TaskCreationOptions.LongRunning).ContinueWith(t =>
             {
                 if (t.Exception?.InnerException is ObjectDisposedException)
@@ -314,10 +317,17 @@ namespace osu.Game
         {
             Logger.Log("Querying for scores that need total score conversion...");
 
-            HashSet<Guid> scoreIds = realmAccess.Run(r => new HashSet<Guid>(r.All<ScoreInfo>()
-                                                                             .Where(s => !s.BackgroundReprocessingFailed && s.BeatmapInfo != null
-                                                                                                                         && s.TotalScoreVersion < LegacyScoreEncoder.LATEST_VERSION)
-                                                                             .AsEnumerable().Select(s => s.ID)));
+            HashSet<Guid> scoreIds = realmAccess.Run(r => new HashSet<Guid>(
+                r.All<ScoreInfo>()
+                 .Where(s => !s.BackgroundReprocessingFailed
+                             && s.BeatmapInfo != null
+                             && s.IsLegacyScore
+                             && s.TotalScoreVersion < LegacyScoreEncoder.LATEST_VERSION)
+                 .AsEnumerable()
+                 // must be done after materialisation, as realm doesn't want to support
+                 // nested property predicates
+                 .Where(s => s.Ruleset.IsLegacyRuleset())
+                 .Select(s => s.ID)));
 
             Logger.Log($"Found {scoreIds.Count} scores which require total score conversion.");
 
@@ -345,7 +355,7 @@ namespace osu.Game
                     realmAccess.Write(r =>
                     {
                         ScoreInfo s = r.Find<ScoreInfo>(id)!;
-                        StandardisedScoreMigrationTools.UpdateFromLegacy(s, beatmapManager);
+                        StandardisedScoreMigrationTools.UpdateFromLegacy(s, beatmapManager.GetWorkingBeatmap(s.BeatmapInfo));
                         s.TotalScoreVersion = LegacyScoreEncoder.LATEST_VERSION;
                     });
 
@@ -358,6 +368,66 @@ namespace osu.Game
                 catch (Exception e)
                 {
                     Logger.Log($"Failed to convert total score for {id}: {e}");
+                    realmAccess.Write(r => r.Find<ScoreInfo>(id)!.BackgroundReprocessingFailed = true);
+                    ++failedCount;
+                }
+            }
+
+            completeNotification(notification, processedCount, scoreIds.Count, failedCount);
+        }
+
+        private void upgradeScoreRanks()
+        {
+            Logger.Log("Querying for scores that need rank upgrades...");
+
+            HashSet<Guid> scoreIds = realmAccess.Run(r => new HashSet<Guid>(
+                r.All<ScoreInfo>()
+                 .Where(s => s.TotalScoreVersion < LegacyScoreEncoder.LATEST_VERSION)
+                 .AsEnumerable()
+                 // must be done after materialisation, as realm doesn't support
+                 // filtering on nested property predicates or projection via `.Select()`
+                 .Where(s => s.Ruleset.IsLegacyRuleset())
+                 .Select(s => s.ID)));
+
+            Logger.Log($"Found {scoreIds.Count} scores which require rank upgrades.");
+
+            if (scoreIds.Count == 0)
+                return;
+
+            var notification = showProgressNotification(scoreIds.Count, "Adjusting ranks of scores", "scores now have more correct ranks");
+
+            int processedCount = 0;
+            int failedCount = 0;
+
+            foreach (var id in scoreIds)
+            {
+                if (notification?.State == ProgressNotificationState.Cancelled)
+                    break;
+
+                updateNotificationProgress(notification, processedCount, scoreIds.Count);
+
+                sleepIfRequired();
+
+                try
+                {
+                    // Can't use async overload because we're not on the update thread.
+                    // ReSharper disable once MethodHasAsyncOverload
+                    realmAccess.Write(r =>
+                    {
+                        ScoreInfo s = r.Find<ScoreInfo>(id)!;
+                        s.Rank = StandardisedScoreMigrationTools.ComputeRank(s);
+                        s.TotalScoreVersion = LegacyScoreEncoder.LATEST_VERSION;
+                    });
+
+                    ++processedCount;
+                }
+                catch (ObjectDisposedException)
+                {
+                    throw;
+                }
+                catch (Exception e)
+                {
+                    Logger.Log($"Failed to update rank score {id}: {e}");
                     realmAccess.Write(r => r.Find<ScoreInfo>(id)!.BackgroundReprocessingFailed = true);
                     ++failedCount;
                 }

@@ -58,16 +58,22 @@ namespace osu.Game.Skinning
 
             if (result.IsMiss())
             {
+                decimal? legacyVersion = skin.GetConfig<SkinConfiguration.LegacySetting, decimal>(SkinConfiguration.LegacySetting.Version)?.Value;
+
+                // missed ticks / slider end don't get the normal animation.
                 if (isMissedTick())
-                    applyMissedTickScaling();
+                {
+                    this.ScaleTo(1.2f);
+                    this.ScaleTo(1f, 100, Easing.In);
+
+                    this.FadeOutFromOne(400);
+                }
                 else
                 {
                     this.ScaleTo(1.6f);
                     this.ScaleTo(1, 100, Easing.In);
 
-                    decimal? legacyVersion = skin.GetConfig<SkinConfiguration.LegacySetting, decimal>(SkinConfiguration.LegacySetting.Version)?.Value;
-
-                    if (legacyVersion >= 2.0m)
+                    if (legacyVersion > 1.0m)
                     {
                         this.MoveTo(new Vector2(0, -5));
                         this.MoveToOffset(new Vector2(0, 80), fade_out_delay + fade_out_length, Easing.In);

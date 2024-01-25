@@ -35,6 +35,7 @@ using osu.Game.Screens.OnlinePlay.Lounge;
 using osu.Game.Screens.OnlinePlay.Match.Components;
 using osu.Game.Screens.OnlinePlay.Playlists;
 using osu.Game.Screens.Play;
+using osu.Game.Screens.Play.HUD;
 using osu.Game.Screens.Ranking;
 using osu.Game.Screens.Select;
 using osu.Game.Screens.Select.Carousel;
@@ -799,11 +800,7 @@ namespace osu.Game.Tests.Visual.Navigation
                 });
             });
 
-            AddStep("attempt exit", () =>
-            {
-                for (int i = 0; i < 2; ++i)
-                    Game.ScreenStack.CurrentScreen.Exit();
-            });
+            AddRepeatStep("attempt force exit", () => Game.ScreenStack.CurrentScreen.Exit(), 2);
             AddUntilStep("stopped at exit confirm", () => Game.ChildrenOfType<DialogOverlay>().Single().CurrentDialog is ConfirmExitDialog);
         }
 
@@ -836,6 +833,24 @@ namespace osu.Game.Tests.Visual.Navigation
             pushEscape();
 
             AddAssert("exit dialog is shown", () => Game.Dependencies.Get<IDialogOverlay>().CurrentDialog is ConfirmExitDialog);
+        }
+
+        [Test]
+        public void TestQuickSkinEditorDoesntNukeSkin()
+        {
+            AddStep("import beatmap", () => BeatmapImportHelper.LoadQuickOszIntoOsu(Game).WaitSafely());
+
+            AddStep("open", () => InputManager.Key(Key.Space));
+            AddStep("skin", () => InputManager.Key(Key.E));
+            AddStep("editor", () => InputManager.Key(Key.S));
+            AddStep("and close immediately", () => InputManager.Key(Key.Escape));
+
+            AddStep("open again", () => InputManager.Key(Key.S));
+
+            Player player = null;
+
+            AddUntilStep("wait for player", () => (player = Game.ScreenStack.CurrentScreen as Player) != null);
+            AddUntilStep("wait for gameplay still has health bar", () => player.ChildrenOfType<ArgonHealthDisplay>().Any());
         }
 
         [Test]
@@ -940,6 +955,35 @@ namespace osu.Game.Tests.Visual.Navigation
 
             AddStep("exit player", () => player.Exit());
             AddUntilStep("touch device mod still active", () => Game.SelectedMods.Value, () => Has.One.InstanceOf<ModTouchDevice>());
+        }
+
+        [Test]
+        public void TestExitSongSelectAndImmediatelyClickLogo()
+        {
+            Screens.Select.SongSelect songSelect = null;
+            PushAndConfirm(() => songSelect = new TestPlaySongSelect());
+            AddUntilStep("wait for song select", () => songSelect.BeatmapSetsLoaded);
+
+            AddStep("import beatmap", () => BeatmapImportHelper.LoadQuickOszIntoOsu(Game).WaitSafely());
+
+            AddUntilStep("wait for selected", () => !Game.Beatmap.IsDefault);
+
+            AddStep("press escape and then click logo immediately", () =>
+            {
+                InputManager.Key(Key.Escape);
+                clickLogoWhenNotCurrent();
+            });
+
+            void clickLogoWhenNotCurrent()
+            {
+                if (songSelect.IsCurrentScreen())
+                    Scheduler.AddOnce(clickLogoWhenNotCurrent);
+                else
+                {
+                    InputManager.MoveMouseTo(Game.ChildrenOfType<OsuLogo>().Single());
+                    InputManager.Click(MouseButton.Left);
+                }
+            }
         }
 
         private Func<Player> playToResults()

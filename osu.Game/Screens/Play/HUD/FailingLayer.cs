@@ -100,11 +100,11 @@ namespace osu.Game.Screens.Play.HUD
 
         protected override void Update()
         {
+            base.Update();
+
             double target = Math.Clamp(max_alpha * (1 - Current.Value / low_health_threshold), 0, max_alpha);
 
             boxes.Alpha = (float)Interpolation.Lerp(boxes.Alpha, target, Clock.ElapsedFrameTime * 0.01f);
-
-            base.Update();
         }
     }
 }
