@@ -29,11 +29,11 @@ namespace osu.Game.Screens.Edit
         /// Set a divisor, updating the valid divisor range appropriately.
         /// </summary>
         /// <param name="divisor">The intended divisor.</param>
-        /// <param name="force">Ignores the current valid divisor range when true.</param>
-        public void SetArbitraryDivisor(int divisor, bool force = false)
+        /// <param name="preferKnownPresets">Forces changing the valid divisors to a known preset.</param>
+        public void SetArbitraryDivisor(int divisor, bool preferKnownPresets = false)
         {
             // If the current valid divisor range doesn't contain the proposed value, attempt to find one which does.
-            if (force || !ValidDivisors.Value.Presets.Contains(divisor))
+            if (preferKnownPresets || !ValidDivisors.Value.Presets.Contains(divisor))
             {
                 if (BeatDivisorPresetCollection.COMMON.Presets.Contains(divisor))
                     ValidDivisors.Value = BeatDivisorPresetCollection.COMMON;
