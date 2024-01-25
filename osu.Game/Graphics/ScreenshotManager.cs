@@ -53,6 +53,8 @@ namespace osu.Game.Graphics
         private INotificationOverlay notificationOverlay { get; set; }
 
         private Sample shutter;
+        private Bindable<float> posX;
+        private Bindable<float> posY;
         private Bindable<float> sizeX;
         private Bindable<float> sizeY;
         private Bindable<ScalingMode> scalingMode;
@@ -67,6 +69,8 @@ namespace osu.Game.Graphics
 
             shutter = audio.Samples.Get("UI/shutter");
 
+            posX = config.GetBindable<float>(OsuSetting.ScalingPositionX);
+            posY = config.GetBindable<float>(OsuSetting.ScalingPositionY);
             sizeX = config.GetBindable<float>(OsuSetting.ScalingSizeX);
             sizeY = config.GetBindable<float>(OsuSetting.ScalingSizeY);
             scalingMode = config.GetBindable<ScalingMode>(OsuSetting.Scaling);
@@ -136,6 +140,8 @@ namespace osu.Game.Graphics
                             int sx = (size.Width - (int)(size.Width * sizeX.Value)) / 2;
                             int sy = (size.Height - (int)(size.Height * sizeY.Value)) / 2;
                             rect.Inflate(-sx, -sy);
+                            rect.X = (int)(rect.X * posX.Value) * 2;
+                            rect.Y = (int)(rect.Y * posY.Value) * 2;
                             m.Crop(rect);
                         });
                     }
