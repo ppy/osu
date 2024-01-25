@@ -40,14 +40,10 @@ namespace osu.Game.Online.Chat
 
             client.MessageReceived += onMessageReceived;
             client.SendAsync(new StartChatRequest()).WaitSafely();
+            RequestPresence();
         }
 
-        public void FetchInitialMessages()
-        {
-            api.Queue(createInitialFetchRequest());
-        }
-
-        private APIRequest createInitialFetchRequest()
+        public void RequestPresence()
         {
             var fetchReq = new GetUpdatesRequest(0);
 
@@ -64,7 +60,7 @@ namespace osu.Game.Online.Chat
                 PresenceReceived?.Invoke();
             };
 
-            return fetchReq;
+            api.Queue(fetchReq);
         }
 
         private void onMessageReceived(SocketMessage message)
