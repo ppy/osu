@@ -42,35 +42,30 @@ namespace osu.Game.Screens.Play.HUD
             Origin = anchor;
             AutoSizeAxes = Axes.Both;
 
-            InternalChild = new FillFlowContainer
+            InternalChildren = new Drawable[]
             {
-                AutoSizeAxes = Axes.Both,
-                Direction = FillDirection.Vertical,
-                Children = new Drawable[]
+                labelText = new OsuSpriteText
                 {
-                    labelText = new OsuSpriteText
+                    Alpha = 0,
+                    Text = label.GetValueOrDefault(),
+                    Font = OsuFont.Torus.With(size: 12, weight: FontWeight.Bold),
+                    Margin = new MarginPadding { Left = 2.5f },
+                },
+                NumberContainer = new Container
+                {
+                    AutoSizeAxes = Axes.Both,
+                    Children = new[]
                     {
-                        Alpha = 0,
-                        Text = label.GetValueOrDefault(),
-                        Font = OsuFont.Torus.With(size: 12, weight: FontWeight.Bold),
-                        Margin = new MarginPadding { Left = 2.5f },
-                    },
-                    NumberContainer = new Container
-                    {
-                        AutoSizeAxes = Axes.Both,
-                        Children = new[]
+                        wireframesPart = new ArgonCounterSpriteText(wireframesLookup)
                         {
-                            wireframesPart = new ArgonCounterSpriteText(wireframesLookup)
-                            {
-                                Anchor = anchor,
-                                Origin = anchor,
-                            },
-                            textPart = new ArgonCounterSpriteText(textLookup)
-                            {
-                                Anchor = anchor,
-                                Origin = anchor,
-                            },
-                        }
+                            Anchor = anchor,
+                            Origin = anchor,
+                        },
+                        textPart = new ArgonCounterSpriteText(textLookup)
+                        {
+                            Anchor = anchor,
+                            Origin = anchor,
+                        },
                     }
                 }
             };
@@ -110,7 +105,11 @@ namespace osu.Game.Screens.Play.HUD
         {
             base.LoadComplete();
             WireframeOpacity.BindValueChanged(v => wireframesPart.Alpha = v.NewValue, true);
-            ShowLabel.BindValueChanged(s => labelText.Alpha = s.NewValue ? 1 : 0, true);
+            ShowLabel.BindValueChanged(s =>
+            {
+                labelText.Alpha = s.NewValue ? 1 : 0;
+                NumberContainer.Y = s.NewValue ? 12 : 0;
+            }, true);
         }
 
         private partial class ArgonCounterSpriteText : OsuSpriteText

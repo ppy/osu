@@ -102,7 +102,7 @@ namespace osu.Desktop
                 }
             }
 
-            using (DesktopGameHost host = Host.GetSuitableDesktopHost(gameName, new HostOptions { BindIPC = !tournamentClient }))
+            using (DesktopGameHost host = Host.GetSuitableDesktopHost(gameName, new HostOptions { IPCPort = !tournamentClient ? OsuGame.IPC_PORT : null }))
             {
                 if (!host.IsPrimaryInstance)
                 {

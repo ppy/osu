@@ -129,10 +129,8 @@ namespace osu.Game.Tests.Visual.Gameplay
             checkRate(1);
         }
 
-        private const int max_frames_catchup = 50;
-
         private void createStabilityContainer(double gameplayStartTime = double.MinValue) => AddStep("create container", () =>
-            mainContainer.Child = new FrameStabilityContainer(gameplayStartTime) { MaxCatchUpFrames = max_frames_catchup }
+            mainContainer.Child = new FrameStabilityContainer(gameplayStartTime)
                 .WithChild(consumer = new ClockConsumingChild()));
 
         private void seekManualTo(double time) => AddStep($"seek manual clock to {time}", () => manualClock.CurrentTime = time);
