@@ -86,7 +86,7 @@ namespace osu.Game.Online.API
 
             APIEndpointUrl = endpointConfiguration.APIEndpointUrl;
             WebsiteRootUrl = endpointConfiguration.WebsiteRootUrl;
-            NotificationsClient = new WebSocketNotificationsClientConnector(this);
+            NotificationsClient = setUpNotificationsClient();
 
             authentication = new OAuth(endpointConfiguration.APIClientID, endpointConfiguration.APIClientSecret, APIEndpointUrl);
             log = Logger.GetLogger(LoggingTarget.Network);
@@ -117,6 +117,30 @@ namespace osu.Game.Online.API
             };
 
             thread.Start();
+        }
+
+        private WebSocketNotificationsClientConnector setUpNotificationsClient()
+        {
+            var connector = new WebSocketNotificationsClientConnector(this);
+
+            connector.MessageReceived += msg =>
+            {
+                switch (msg.Event)
+                {
+                    case @"verified":
+                        if (state.Value == APIState.RequiresSecondFactorAuth)
+                            state.Value = APIState.Online;
+                        break;
+
+                    case @"logout":
+                        if (state.Value == APIState.Online)
+                            Logout();
+
+                        break;
+                }
+            };
+
+            return connector;
         }
 
         private void onTokenChanged(ValueChangedEvent<OAuthToken> e) => config.SetValue(OsuSetting.Token, config.Get<bool>(OsuSetting.SavePassword) ? authentication.TokenString : string.Empty);
@@ -270,10 +294,7 @@ namespace osu.Game.Online.API
 
                 setLocalUser(me);
 
-                if (me.SessionVerified)
-                    state.Value = APIState.Online;
-                else
-                    setUpSecondFactorAuthentication();
+                state.Value = me.SessionVerified ? APIState.Online : APIState.RequiresSecondFactorAuth;
                 failureCount = 0;
             };
 
@@ -354,20 +375,6 @@ namespace osu.Game.Online.API
 
             ProvidedUsername = username;
             this.password = password;
-        }
-
-        private void setUpSecondFactorAuthentication()
-        {
-            if (state.Value == APIState.RequiresSecondFactorAuth)
-                return;
-
-            state.Value = APIState.RequiresSecondFactorAuth;
-
-            NotificationsClient.MessageReceived += msg =>
-            {
-                if (msg.Event == @"verified")
-                    state.Value = APIState.Online;
-            };
         }
 
         public void AuthenticateSecondFactor(string code)
