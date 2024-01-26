@@ -31,6 +31,8 @@ namespace osu.Game.Rulesets.Taiko.UI
         /// </summary>
         public const float BASE_HEIGHT = 200;
 
+        public const float INPUT_DRUM_WIDTH = 180f;
+
         /// <summary>
         /// Whether the hit target should be nudged further towards the left area, matching the stable "classic" position.
         /// </summary>
@@ -49,7 +51,6 @@ namespace osu.Game.Rulesets.Taiko.UI
 
         private ProxyContainer topLevelHitContainer = null!;
         private InputDrum inputDrum = null!;
-        private Container rightArea = null!;
 
         /// <remarks>
         /// <see cref="Playfield.AddNested"/> is purposefully not called on this to prevent i.e. being able to interact
@@ -66,8 +67,8 @@ namespace osu.Game.Rulesets.Taiko.UI
             {
                 Anchor = Anchor.CentreLeft,
                 Origin = Anchor.CentreLeft,
-                AutoSizeAxes = Axes.X,
                 RelativeSizeAxes = Axes.Y,
+                Width = INPUT_DRUM_WIDTH,
             };
 
             InternalChildren = new[]
@@ -76,8 +77,8 @@ namespace osu.Game.Rulesets.Taiko.UI
                 new Container
                 {
                     Name = "Left overlay",
-                    RelativeSizeAxes = Axes.Both,
-                    FillMode = FillMode.Fit,
+                    RelativeSizeAxes = Axes.Y,
+                    Width = INPUT_DRUM_WIDTH,
                     BorderColour = colours.Gray0,
                     Children = new[]
                     {
@@ -93,10 +94,11 @@ namespace osu.Game.Rulesets.Taiko.UI
                     RelativeSizeAxes = Axes.None,
                     Y = 0.2f
                 },
-                rightArea = new Container
+                new Container
                 {
                     Name = "Right area",
                     RelativeSizeAxes = Axes.Both,
+                    Padding = new MarginPadding { Left = INPUT_DRUM_WIDTH },
                     Children = new Drawable[]
                     {
                         new Container
@@ -218,14 +220,6 @@ namespace osu.Game.Rulesets.Taiko.UI
 
             var taikoObject = (DrawableTaikoHitObject)drawableHitObject;
             topLevelHitContainer.Add(taikoObject.CreateProxiedContent());
-        }
-
-        protected override void Update()
-        {
-            base.Update();
-
-            // todo: input drum width should be constant.
-            rightArea.Padding = new MarginPadding { Left = inputDrum.DrawWidth };
         }
 
         #region Pooling support
