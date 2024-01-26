@@ -26,8 +26,10 @@ using osu.Game.Scoring;
 using osu.Game.Screens;
 using osu.Game.Screens.Play;
 using osu.Game.Screens.Ranking;
+using osu.Game.Screens.Ranking.Expanded.Accuracy;
 using osu.Game.Screens.Ranking.Expanded.Statistics;
 using osu.Game.Screens.Ranking.Statistics;
+using osu.Game.Skinning;
 using osu.Game.Tests.Resources;
 using osuTK;
 using osuTK.Input;
@@ -44,6 +46,9 @@ namespace osu.Game.Tests.Visual.Ranking
         [Resolved]
         private RealmAccess realm { get; set; }
 
+        [Resolved]
+        private SkinManager skins { get; set; }
+
         protected override void LoadComplete()
         {
             base.LoadComplete();
@@ -58,6 +63,9 @@ namespace osu.Game.Tests.Visual.Ranking
                     Beatmap.Value = beatmaps.GetWorkingBeatmap(beatmapInfo);
             });
         }
+
+        [SetUp]
+        public void SetUp() => Schedule(() => skins.CurrentSkinInfo.SetDefault());
 
         [Test]
         public void TestScaling()
@@ -130,6 +138,46 @@ namespace osu.Game.Tests.Visual.Ranking
             loadResultsScreen(() => screen = createUnrankedSoloResultsScreen());
             AddUntilStep("wait for loaded", () => screen.IsLoaded);
             AddAssert("retry overlay present", () => screen.RetryOverlay != null);
+        }
+
+        [Test]
+        public void TestResultsWithFailingRank()
+        {
+            TestResultsScreen screen = null;
+
+            loadResultsScreen(() =>
+            {
+                var score = TestResources.CreateTestScoreInfo();
+
+                score.OnlineID = onlineScoreID++;
+                score.HitEvents = TestSceneStatisticsPanel.CreatePositionDistributedHitEvents();
+                score.Rank = ScoreRank.F;
+                return screen = createResultsScreen(score);
+            });
+            AddUntilStep("wait for loaded", () => screen.IsLoaded);
+            AddAssert("retry overlay present", () => screen.RetryOverlay != null);
+            AddAssert("no badges displayed", () => this.ChildrenOfType<RankBadge>().All(b => !b.IsPresent));
+        }
+
+        [Test]
+        public void TestResultsWithFailingRankOnLegacySkin()
+        {
+            TestResultsScreen screen = null;
+
+            AddStep("set legacy skin", () => skins.CurrentSkinInfo.Value = skins.DefaultClassicSkin.SkinInfo);
+
+            loadResultsScreen(() =>
+            {
+                var score = TestResources.CreateTestScoreInfo();
+
+                score.OnlineID = onlineScoreID++;
+                score.HitEvents = TestSceneStatisticsPanel.CreatePositionDistributedHitEvents();
+                score.Rank = ScoreRank.F;
+                return screen = createResultsScreen(score);
+            });
+            AddUntilStep("wait for loaded", () => screen.IsLoaded);
+            AddAssert("retry overlay present", () => screen.RetryOverlay != null);
+            AddAssert("no badges displayed", () => this.ChildrenOfType<RankBadge>().All(b => !b.IsPresent));
         }
 
         [Test]
