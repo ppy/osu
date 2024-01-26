@@ -13,20 +13,28 @@ namespace osu.Game.Rulesets.Taiko.UI
     {
         private const float default_relative_height = TaikoPlayfield.DEFAULT_HEIGHT / 768;
 
-        public const float DEFAULT_ASPECT = 16f / 9f;
-        public const float MAXIMUM_ASPECT = 16f / 9f;
-        public const float MINIMUM_ASPECT = 5f / 4f;
+        private const float MAXIMUM_ASPECT = 16f / 9f;
+        private const float MINIMUM_ASPECT = 5f / 4f;
 
         public readonly IBindable<bool> LockPlayfieldAspectRange = new BindableBool(true);
 
-        public static double AspectRatioToTimeRange(float aspectRatio)
+        private static double aspectRatioToTimeRange(float aspectRatio)
         {
+            const float default_aspect = 16f / 9f;
+
+            // This value is taken by visual comparison with stable
             const float default_time_range = 7000 / TaikoBeatmapConverter.VELOCITY_MULTIPLIER;
 
             // This is the fraction of the width that should not contribute to time range.
-            const float ratio_compensator = 380f / 1366f;
+            const float non_playable_portion = 380f / 1366f;
 
-            return (aspectRatio - ratio_compensator) / (DEFAULT_ASPECT - ratio_compensator) * default_time_range;
+            return (aspectRatio - non_playable_portion) / (default_aspect - non_playable_portion) * default_time_range;
+        }
+
+        public double ComputeTimeRange()
+        {
+            float aspectRatio = Math.Clamp(Parent!.ChildSize.X / Parent!.ChildSize.Y, MINIMUM_ASPECT, MAXIMUM_ASPECT);
+            return aspectRatioToTimeRange(aspectRatio);
         }
 
         protected override void Update()

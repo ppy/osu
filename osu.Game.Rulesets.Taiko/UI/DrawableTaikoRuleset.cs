@@ -69,12 +69,7 @@ namespace osu.Game.Rulesets.Taiko.UI
 
         protected virtual double ComputeTimeRange()
         {
-            float aspectRatio = Math.Clamp(
-                DrawWidth / DrawHeight,
-                TaikoPlayfieldAdjustmentContainer.MINIMUM_ASPECT,
-                TaikoPlayfieldAdjustmentContainer.MAXIMUM_ASPECT);
-
-            return TaikoPlayfieldAdjustmentContainer.AspectRatioToTimeRange(aspectRatio);
+            return ((TaikoPlayfieldAdjustmentContainer)PlayfieldAdjustmentContainer).ComputeTimeRange();
         }
 
         protected override void UpdateAfterChildren()
