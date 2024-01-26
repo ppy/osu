@@ -53,9 +53,6 @@ namespace osu.Game.Screens.Edit.Setup
                 sourceTextBox = createTextBox<LabelledTextBox>(BeatmapsetsStrings.ShowInfoSource, metadata.Source),
                 tagsTextBox = createTextBox<LabelledTextBox>(BeatmapsetsStrings.ShowInfoTags, metadata.Tags)
             };
-
-            foreach (var item in Children.OfType<LabelledTextBox>())
-                item.OnCommit += onCommit;
         }
 
         private TTextBox createTextBox<TTextBox>(LocalisableString label, string initialValue)
@@ -77,6 +74,10 @@ namespace osu.Game.Screens.Edit.Setup
 
             ArtistTextBox.Current.BindValueChanged(artist => transferIfRomanised(artist.NewValue, RomanisedArtistTextBox));
             TitleTextBox.Current.BindValueChanged(title => transferIfRomanised(title.NewValue, RomanisedTitleTextBox));
+
+            foreach (var item in Children.OfType<LabelledTextBox>())
+                item.OnCommit += onCommit;
+
             updateReadOnlyState();
         }
 
@@ -86,7 +87,6 @@ namespace osu.Game.Screens.Edit.Setup
                 target.Current.Value = value;
 
             updateReadOnlyState();
-            Scheduler.AddOnce(updateMetadata);
         }
 
         private void updateReadOnlyState()
@@ -101,7 +101,7 @@ namespace osu.Game.Screens.Edit.Setup
 
             // for now, update on commit rather than making BeatmapMetadata bindables.
             // after switching database engines we can reconsider if switching to bindables is a good direction.
-            Scheduler.AddOnce(updateMetadata);
+            updateMetadata();
         }
 
         private void updateMetadata()
