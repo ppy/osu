@@ -32,6 +32,7 @@ namespace osu.Game.Tests
         public PollingChatClientConnector(IAPIProvider api)
             : base(api)
         {
+            Start();
         }
 
         protected sealed override Task<PersistentEndpointClient> BuildConnectionAsync(CancellationToken cancellationToken)
