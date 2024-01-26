@@ -49,7 +49,7 @@ namespace osu.Game.Screens.Play
 
         private const float duration = 2500;
 
-        private SkinnableSound failSample = null!;
+        private SkinnableSamples failSample = null!;
 
         [Resolved]
         private OsuConfigManager config { get; set; } = null!;
@@ -77,7 +77,7 @@ namespace osu.Game.Screens.Play
         private void load(AudioManager audio, IBindable<WorkingBeatmap> beatmap)
         {
             track = beatmap.Value.Track;
-            AddInternal(failSample = new SkinnableSound(new SampleInfo("Gameplay/failsound")));
+            AddInternal(failSample = new SkinnableSamples(new SampleInfo("Gameplay/failsound")));
 
             AddRangeInternal(new Drawable[]
             {

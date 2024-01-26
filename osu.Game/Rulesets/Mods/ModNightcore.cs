@@ -74,10 +74,10 @@ namespace osu.Game.Rulesets.Mods
 
         public partial class NightcoreBeatContainer : BeatSyncedContainer
         {
-            private PausableSkinnableSound? hatSample;
-            private PausableSkinnableSound? clapSample;
-            private PausableSkinnableSound? kickSample;
-            private PausableSkinnableSound? finishSample;
+            private PausableSkinnableSamples? hatSample;
+            private PausableSkinnableSamples? clapSample;
+            private PausableSkinnableSamples? kickSample;
+            private PausableSkinnableSamples? finishSample;
 
             private int? firstBeat;
 
@@ -91,10 +91,10 @@ namespace osu.Game.Rulesets.Mods
             {
                 InternalChildren = new Drawable[]
                 {
-                    hatSample = new PausableSkinnableSound(new SampleInfo("Gameplay/nightcore-hat")),
-                    clapSample = new PausableSkinnableSound(new SampleInfo("Gameplay/nightcore-clap")),
-                    kickSample = new PausableSkinnableSound(new SampleInfo("Gameplay/nightcore-kick")),
-                    finishSample = new PausableSkinnableSound(new SampleInfo("Gameplay/nightcore-finish")),
+                    hatSample = new PausableSkinnableSamples(new SampleInfo("Gameplay/nightcore-hat")),
+                    clapSample = new PausableSkinnableSamples(new SampleInfo("Gameplay/nightcore-clap")),
+                    kickSample = new PausableSkinnableSamples(new SampleInfo("Gameplay/nightcore-kick")),
+                    finishSample = new PausableSkinnableSamples(new SampleInfo("Gameplay/nightcore-finish")),
                 };
             }
 

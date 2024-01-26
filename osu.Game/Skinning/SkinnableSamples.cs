@@ -16,9 +16,10 @@ using osu.Game.Audio;
 namespace osu.Game.Skinning
 {
     /// <summary>
-    /// A sound consisting of one or more samples to be played.
+    /// A group of (generally gameplay) samples to be played together as one.
+    /// Unlike <see cref="SkinnableSample"/>, this uses <see cref="IPooledSampleProvider"/> internally to retrieve all samples from pools when available.
     /// </summary>
-    public partial class SkinnableSound : SkinReloadableDrawable, IAdjustableAudioComponent
+    public partial class SkinnableSamples : SkinReloadableDrawable, IAdjustableAudioComponent
     {
         /// <summary>
         /// The minimum allowable volume for <see cref="Samples"/>.
@@ -40,38 +41,38 @@ namespace osu.Game.Skinning
         protected bool PlayWhenZeroVolume => Looping;
 
         /// <summary>
-        /// All raw <see cref="DrawableSamples"/>s contained in this <see cref="SkinnableSound"/>.
+        /// All raw <see cref="DrawableSamples"/>s contained in this <see cref="SkinnableSamples"/>.
         /// </summary>
         protected IEnumerable<DrawableSample> DrawableSamples => samplesContainer.Select(c => c.Sample).Where(s => s != null);
 
-        private readonly AudioContainer<PoolableSkinnableSample> samplesContainer;
+        private readonly AudioContainer<SkinnableSample> samplesContainer;
 
         [Resolved]
         private IPooledSampleProvider? samplePool { get; set; }
 
         /// <summary>
-        /// Creates a new <see cref="SkinnableSound"/>.
+        /// Creates a new <see cref="SkinnableSamples"/>.
         /// </summary>
-        public SkinnableSound()
+        public SkinnableSamples()
         {
-            InternalChild = samplesContainer = new AudioContainer<PoolableSkinnableSample>();
+            InternalChild = samplesContainer = new AudioContainer<SkinnableSample>();
         }
 
         /// <summary>
-        /// Creates a new <see cref="SkinnableSound"/> with some initial samples.
+        /// Creates a new <see cref="SkinnableSamples"/> with some initial samples.
         /// </summary>
         /// <param name="samples">The initial samples.</param>
-        public SkinnableSound(IEnumerable<ISampleInfo> samples)
+        public SkinnableSamples(IEnumerable<ISampleInfo> samples)
             : this()
         {
             this.samples = samples.ToArray();
         }
 
         /// <summary>
-        /// Creates a new <see cref="SkinnableSound"/> with an initial sample.
+        /// Creates a new <see cref="SkinnableSamples"/> with an initial sample.
         /// </summary>
         /// <param name="sample">The initial sample.</param>
-        public SkinnableSound(ISampleInfo sample)
+        public SkinnableSamples(ISampleInfo sample)
             : this(new[] { sample })
         {
         }
@@ -160,7 +161,7 @@ namespace osu.Game.Skinning
 
             foreach (var s in samples)
             {
-                var sample = samplePool?.GetPooledSample(s) ?? new PoolableSkinnableSample(s);
+                var sample = samplePool?.GetPooledSample(s) ?? new SkinnableSample(s);
                 sample.Looping = Looping;
                 sample.Volume.Value = Math.Max(s.Volume, MinimumSampleVolume) / 100.0;
 
@@ -198,7 +199,7 @@ namespace osu.Game.Skinning
         {
             get
             {
-                foreach (PoolableSkinnableSample s in samplesContainer)
+                foreach (SkinnableSample s in samplesContainer)
                 {
                     if (s.Playing)
                         return true;
@@ -212,7 +213,7 @@ namespace osu.Game.Skinning
         {
             get
             {
-                foreach (PoolableSkinnableSample s in samplesContainer)
+                foreach (SkinnableSample s in samplesContainer)
                 {
                     if (s.Played)
                         return true;

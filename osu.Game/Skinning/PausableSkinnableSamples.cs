@@ -13,22 +13,22 @@ using osu.Game.Audio;
 
 namespace osu.Game.Skinning
 {
-    public partial class PausableSkinnableSound : SkinnableSound
+    public partial class PausableSkinnableSamples : SkinnableSamples
     {
         public double Length => !DrawableSamples.Any() ? 0 : DrawableSamples.Max(sample => sample.Length);
 
         public bool RequestedPlaying { get; private set; }
 
-        public PausableSkinnableSound()
+        public PausableSkinnableSamples()
         {
         }
 
-        public PausableSkinnableSound([NotNull] IEnumerable<ISampleInfo> samples)
+        public PausableSkinnableSamples([NotNull] IEnumerable<ISampleInfo> samples)
             : base(samples)
         {
         }
 
-        public PausableSkinnableSound([NotNull] ISampleInfo sample)
+        public PausableSkinnableSamples([NotNull] ISampleInfo sample)
             : base(sample)
         {
         }

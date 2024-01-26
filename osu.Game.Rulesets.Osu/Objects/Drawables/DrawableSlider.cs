@@ -65,7 +65,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
         private Container<DrawableSliderTail> tailContainer;
         private Container<DrawableSliderTick> tickContainer;
         private Container<DrawableSliderRepeat> repeatContainer;
-        private PausableSkinnableSound slidingSample;
+        private PausableSkinnableSamples slidingSample;
 
         private readonly LayoutValue relativeAnchorPositionLayout;
 
@@ -116,7 +116,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
                 headContainer = new Container<DrawableSliderHead> { RelativeSizeAxes = Axes.Both },
                 OverlayElementContainer = new Container { RelativeSizeAxes = Axes.Both, },
                 Ball,
-                slidingSample = new PausableSkinnableSound
+                slidingSample = new PausableSkinnableSamples
                 {
                     Looping = true,
                     MinimumSampleVolume = MINIMUM_SAMPLE_VOLUME,

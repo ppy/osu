@@ -92,12 +92,12 @@ namespace osu.Game.Screens.Ranking.Expanded.Accuracy
         private Container<RankBadge> badges;
         private RankText rankText;
 
-        private PoolableSkinnableSample scoreTickSound;
-        private PoolableSkinnableSample badgeTickSound;
-        private PoolableSkinnableSample badgeMaxSound;
-        private PoolableSkinnableSample swooshUpSound;
-        private PoolableSkinnableSample rankImpactSound;
-        private PoolableSkinnableSample rankApplauseSound;
+        private SkinnableSample scoreTickSound;
+        private SkinnableSample badgeTickSound;
+        private SkinnableSample badgeMaxSound;
+        private SkinnableSample swooshUpSound;
+        private SkinnableSample rankImpactSound;
+        private SkinnableSample rankApplauseSound;
 
         private readonly Bindable<double> tickPlaybackRate = new Bindable<double>();
 
@@ -261,12 +261,12 @@ namespace osu.Game.Screens.Ranking.Expanded.Accuracy
 
                 AddRangeInternal(new Drawable[]
                 {
-                    rankImpactSound = new PoolableSkinnableSample(new SampleInfo(impactSampleName)),
-                    rankApplauseSound = new PoolableSkinnableSample(new SampleInfo(@"applause", applauseSampleName)),
-                    scoreTickSound = new PoolableSkinnableSample(new SampleInfo(@"Results/score-tick")),
-                    badgeTickSound = new PoolableSkinnableSample(new SampleInfo(@"Results/badge-dink")),
-                    badgeMaxSound = new PoolableSkinnableSample(new SampleInfo(@"Results/badge-dink-max")),
-                    swooshUpSound = new PoolableSkinnableSample(new SampleInfo(@"Results/swoosh-up")),
+                    rankImpactSound = new SkinnableSample(new SampleInfo(impactSampleName)),
+                    rankApplauseSound = new SkinnableSample(new SampleInfo(@"applause", applauseSampleName)),
+                    scoreTickSound = new SkinnableSample(new SampleInfo(@"Results/score-tick")),
+                    badgeTickSound = new SkinnableSample(new SampleInfo(@"Results/badge-dink")),
+                    badgeMaxSound = new SkinnableSample(new SampleInfo(@"Results/badge-dink-max")),
+                    swooshUpSound = new SkinnableSample(new SampleInfo(@"Results/swoosh-up")),
                 });
             }
         }

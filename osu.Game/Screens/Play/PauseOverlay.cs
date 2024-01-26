@@ -27,7 +27,7 @@ namespace osu.Game.Screens.Play
 
         public override LocalisableString Header => GameplayMenuOverlayStrings.PausedHeader;
 
-        private SkinnableSound pauseLoop;
+        private SkinnableSamples pauseLoop;
 
         protected override Action BackAction => () =>
         {
@@ -44,7 +44,7 @@ namespace osu.Game.Screens.Play
             AddButton(GameplayMenuOverlayStrings.Retry, colours.YellowDark, () => OnRetry?.Invoke());
             AddButton(GameplayMenuOverlayStrings.Quit, new Color4(170, 27, 39, 255), () => OnQuit?.Invoke());
 
-            AddInternal(pauseLoop = new SkinnableSound(new SampleInfo("Gameplay/pause-loop"))
+            AddInternal(pauseLoop = new SkinnableSamples(new SampleInfo("Gameplay/pause-loop"))
             {
                 Looping = true,
                 Volume = { Value = 0 }

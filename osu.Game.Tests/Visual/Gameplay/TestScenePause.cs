@@ -336,7 +336,7 @@ namespace osu.Game.Tests.Visual.Gameplay
         {
             AddStep("seek before gameplay", () => Player.GameplayClockContainer.Seek(-5000));
 
-            SkinnableSound getLoop() => Player.ChildrenOfType<PauseOverlay>().FirstOrDefault()?.ChildrenOfType<SkinnableSound>().FirstOrDefault();
+            SkinnableSamples getLoop() => Player.ChildrenOfType<PauseOverlay>().FirstOrDefault()?.ChildrenOfType<SkinnableSamples>().FirstOrDefault();
 
             pauseAndConfirm();
             AddAssert("loop is playing", () => getLoop().IsPlaying);

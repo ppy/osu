@@ -61,7 +61,7 @@ namespace osu.Game.Screens.Menu
 
         private const int exit_delay = 3000;
 
-        private SkinnableSound skinnableSeeya;
+        private SkinnableSamples skinnableSeeya;
         private ISample seeya;
 
         protected virtual string SeeyaSampleName => "Intro/seeya";
@@ -115,7 +115,7 @@ namespace osu.Game.Screens.Menu
             MenuMusic = config.GetBindable<bool>(OsuSetting.MenuMusic);
 
             if (api.LocalUser.Value.IsSupporter)
-                AddInternal(skinnableSeeya = new SkinnableSound(new SampleInfo(SeeyaSampleName)));
+                AddInternal(skinnableSeeya = new SkinnableSamples(new SampleInfo(SeeyaSampleName)));
             else
                 seeya = audio.Samples.Get(SeeyaSampleName);
 

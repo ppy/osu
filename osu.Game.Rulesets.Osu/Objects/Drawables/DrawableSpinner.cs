@@ -39,7 +39,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
         private SpinnerSpmCalculator spmCalculator;
 
         private Container<DrawableSpinnerTick> ticks;
-        private PausableSkinnableSound spinningSample;
+        private PausableSkinnableSamples spinningSample;
 
         private Bindable<bool> isSpinning;
         private bool spinnerFrequencyModulate;
@@ -47,7 +47,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
         private const float spinning_sample_initial_frequency = 1.0f;
         private const float spinning_sample_modulated_base_frequency = 0.5f;
 
-        private PausableSkinnableSound maxBonusSample;
+        private PausableSkinnableSamples maxBonusSample;
 
         /// <summary>
         /// The amount of bonus score gained from spinning after the required number of spins, for display purposes.
@@ -107,14 +107,14 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
                         RotationTracker = new SpinnerRotationTracker(this)
                     }
                 },
-                spinningSample = new PausableSkinnableSound
+                spinningSample = new PausableSkinnableSamples
                 {
                     Volume = { Value = 0 },
                     MinimumSampleVolume = MINIMUM_SAMPLE_VOLUME,
                     Looping = true,
                     Frequency = { Value = spinning_sample_initial_frequency }
                 },
-                maxBonusSample = new PausableSkinnableSound
+                maxBonusSample = new PausableSkinnableSamples
                 {
                     MinimumSampleVolume = MINIMUM_SAMPLE_VOLUME,
                 }

@@ -9,7 +9,7 @@ namespace osu.Game.Audio
 {
     /// <summary>
     /// Allows a component to disable sample playback dynamically as required.
-    /// Automatically handled by <see cref="PausableSkinnableSound"/>.
+    /// Automatically handled by <see cref="PausableSkinnableSamples"/>.
     /// May also be manually handled locally to particular components.
     /// </summary>
     [Cached]

@@ -80,7 +80,7 @@ namespace osu.Game.Screens.Play
         private AudioFilter lowPassFilter = null!;
         private AudioFilter highPassFilter = null!;
 
-        private SkinnableSound sampleRestart = null!;
+        private SkinnableSamples sampleRestart = null!;
 
         [Cached]
         private OverlayColourProvider colourProvider = new OverlayColourProvider(OverlayColourScheme.Purple);
@@ -206,7 +206,7 @@ namespace osu.Game.Screens.Play
                 idleTracker = new IdleTracker(750),
                 lowPassFilter = new AudioFilter(audio.TrackMixer),
                 highPassFilter = new AudioFilter(audio.TrackMixer, BQFType.HighPass),
-                sampleRestart = new SkinnableSound(new SampleInfo(@"Gameplay/restart", @"pause-retry-click"))
+                sampleRestart = new SkinnableSamples(new SampleInfo(@"Gameplay/restart", @"pause-retry-click"))
             };
 
             if (Beatmap.Value.BeatmapInfo.EpilepsyWarning)
