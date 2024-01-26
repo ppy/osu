@@ -34,19 +34,19 @@ namespace osu.Game.Rulesets.Osu.Skinning.Legacy
         [BackgroundDependencyLoader]
         private void load(DrawableHitObject drawableObject, ISkinSource skinSource)
         {
+            const string lookup_name = @"reversearrow";
+
             drawableRepeat = (DrawableSliderRepeat)drawableObject;
 
             AutoSizeAxes = Axes.Both;
 
-            string lookupName = new OsuSkinComponentLookup(OsuSkinComponents.ReverseArrow).LookupName;
-
-            var skin = skinSource.FindProvider(s => s.GetTexture(lookupName) != null);
+            var skin = skinSource.FindProvider(s => s.GetTexture(lookup_name) != null);
 
             InternalChild = arrow = new Sprite
             {
                 Anchor = Anchor.Centre,
                 Origin = Anchor.Centre,
-                Texture = skin?.GetTexture(lookupName)?.WithMaximumSize(maxSize: OsuHitObject.OBJECT_DIMENSIONS * 2),
+                Texture = skin?.GetTexture(lookup_name)?.WithMaximumSize(maxSize: OsuHitObject.OBJECT_DIMENSIONS * 2),
             };
 
             textureIsDefaultSkin = skin is ISkinTransformer transformer && transformer.Skin is DefaultLegacySkin;
