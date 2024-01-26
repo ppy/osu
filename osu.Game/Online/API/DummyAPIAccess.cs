@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Game.Localisation;
+using osu.Game.Online.API.Requests;
 using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Online.Chat;
 using osu.Game.Online.Notifications.WebSocket;
@@ -133,7 +134,26 @@ namespace osu.Game.Online.API
             }
         }
 
-        public void AuthenticateSecondFactor(string code) => onSuccessfulLogin();
+        public void AuthenticateSecondFactor(string code)
+        {
+            var request = new VerifySessionRequest(code);
+            request.Failure += e =>
+            {
+                state.Value = APIState.RequiresSecondFactorAuth;
+                LastLoginError = e;
+            };
+
+            state.Value = APIState.Connecting;
+            LastLoginError = null;
+
+            // if no handler installed / handler can't handle verification, just assume that the server would verify for simplicity.
+            if (HandleRequest?.Invoke(request) != true)
+                onSuccessfulLogin();
+
+            // if a handler did handle this, make sure the verification actually passed.
+            if (request.CompletionState == APIRequestCompletionState.Completed)
+                onSuccessfulLogin();
+        }
 
         private void onSuccessfulLogin()
         {
