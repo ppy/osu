@@ -65,7 +65,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
 
             double aimValue = computeAimValue(score, osuAttributes);
             double speedValue = computeSpeedValue(score, osuAttributes);
-            double accuracyValue = computeAccuracyValue(score, osuAttributes);
+            double mechanicalValue = Math.Pow(Math.Pow(aimValue, SumPower) + Math.Pow(speedValue, SumPower), 1.0 / SumPower);
 
             // Cognition
 
@@ -76,13 +76,15 @@ namespace osu.Game.Rulesets.Osu.Difficulty
 
             double readingNonARValue = computeReadingNonARValue(score, osuAttributes);
             double cognitionValue = Math.Pow(Math.Pow(flashlightARValue, SumPower) + Math.Pow(readingNonARValue, SumPower), 1.0 / SumPower);
+            cognitionValue = AdjustCognitionPerformance(mechanicalValue, cognitionValue, totalHits);
+
+            double accuracyValue = computeAccuracyValue(score, osuAttributes);
 
             double totalValue =
                 Math.Pow(
-                    Math.Pow(aimValue, SumPower) +
-                    Math.Pow(speedValue, SumPower) +
-                    Math.Pow(accuracyValue, SumPower) +
-                    Math.Pow(cognitionValue, SumPower), 1.0 / SumPower
+                    Math.Pow(mechanicalValue, SumPower) +
+                    Math.Pow(cognitionValue, SumPower) +
+                    Math.Pow(accuracyValue, SumPower), 1.0 / SumPower
                 ) * multiplier;
 
             return new OsuPerformanceAttributes
@@ -365,8 +367,25 @@ namespace osu.Game.Rulesets.Osu.Difficulty
 
             return Math.Max(countMiss, comboBasedMissCount);
         }
-
         private double getComboScalingFactor(OsuDifficultyAttributes attributes) => attributes.MaxCombo <= 0 ? 1.0 : Math.Min(Math.Pow(scoreMaxCombo, 0.8) / Math.Pow(attributes.MaxCombo, 0.8), 1.0);
         private int totalHits => countGreat + countOk + countMeh + countMiss;
+
+        // Adjusts cognition performance accounting for full-memory
+        public static double AdjustCognitionPerformance(double mechanicalPerformance, double cognitionPerformance, int hitsCount)
+        {
+            // Assuming that less than 25 mechanical pp is not worthy for memory
+            mechanicalPerformance += 25;
+
+            // Agressive length bonus, pretty bad but makes the work done
+            mechanicalPerformance *= 1.0 + hitsCount / 400.0;
+
+            // Avoid it being broken on millions of pp, ruins it being continious, but it will never happen on normal circumstances
+            if (mechanicalPerformance > 10000 || cognitionPerformance > 10000) cognitionPerformance = Math.Min(mechanicalPerformance, cognitionPerformance);
+            else cognitionPerformance = 100 * softmin(mechanicalPerformance / 100, cognitionPerformance / 100, 100);
+
+            return cognitionPerformance;
+        }
+
+        private static double softmin(double a, double b, double power = Math.E) => a * b / Math.Log(Math.Pow(power, a) + Math.Pow(power, b), power);
     }
 }

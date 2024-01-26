@@ -84,19 +84,6 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             double baseReadingSliderPerformance = 0;
             double baseReadingNonARPerformance = baseReadingHiddenPerformance + baseReadingSliderPerformance;
 
-            double basePerformance =
-                Math.Pow(
-                    Math.Pow(baseAimPerformance, SumPower) +
-                    Math.Pow(baseSpeedPerformance, SumPower) +
-                    Math.Pow(baseFlashlightARPerformance, SumPower) +
-                    Math.Pow(baseReadingNonARPerformance, SumPower)
-                    , 1.0 / SumPower
-                );
-
-            double starRating = basePerformance > 0.00001
-                ? Math.Cbrt(OsuPerformanceCalculator.PERFORMANCE_BASE_MULTIPLIER) * 0.027 * (Math.Cbrt(100000 / Math.Pow(2, 1 / 1.1) * basePerformance) + 4)
-                : 0;
-
             double preempt = IBeatmapDifficultyInfo.DifficultyRange(beatmap.Difficulty.ApproachRate, 1800, 1200, 450) / clockRate;
             double drainRate = beatmap.Difficulty.DrainRate;
             int maxCombo = beatmap.GetMaxCombo();
@@ -104,6 +91,22 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             int hitCirclesCount = beatmap.HitObjects.Count(h => h is HitCircle);
             int sliderCount = beatmap.HitObjects.Count(h => h is Slider);
             int spinnerCount = beatmap.HitObjects.Count(h => h is Spinner);
+
+            // Limit cognition by full memorisation difficulty
+            double mechanicalPerformance = Math.Pow(Math.Pow(baseAimPerformance, SumPower) + Math.Pow(baseSpeedPerformance, SumPower), 1.0 / SumPower);
+            double cognitionPerformance = Math.Pow(Math.Pow(baseFlashlightARPerformance, SumPower) + Math.Pow(baseReadingNonARPerformance, SumPower), 1.0 / SumPower);
+            cognitionPerformance = OsuPerformanceCalculator.AdjustCognitionPerformance(mechanicalPerformance, cognitionPerformance, hitCirclesCount + sliderCount);
+
+            double basePerformance =
+                Math.Pow(
+                    Math.Pow(mechanicalPerformance, SumPower) +
+                    Math.Pow(cognitionPerformance, SumPower)
+                    , 1.0 / SumPower
+                );
+
+            double starRating = basePerformance > 0.00001
+                ? Math.Cbrt(OsuPerformanceCalculator.PERFORMANCE_BASE_MULTIPLIER) * 0.027 * (Math.Cbrt(100000 / Math.Pow(2, 1 / 1.1) * basePerformance) + 4)
+                : 0;
 
             HitWindows hitWindows = new OsuHitWindows();
             hitWindows.SetDifficulty(beatmap.Difficulty.OverallDifficulty);
