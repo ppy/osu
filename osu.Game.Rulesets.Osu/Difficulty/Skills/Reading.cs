@@ -197,7 +197,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
         }
 
         private readonly List<double> difficulties = new List<double>();
-        private double skillMultiplier => 2.3;
+        private double skillMultiplier => 2.1;
 
         public override void Process(DifficultyHitObject current)
         {
