@@ -90,6 +90,7 @@ namespace osu.Game.Skinning
 
             sampleContainer.Clear();
             Sample = null;
+            activeChannel = null;
         }
 
         private void updateSample()
