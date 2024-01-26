@@ -37,7 +37,7 @@ namespace osu.Game.Rulesets.Taiko.Skinning.Argon
 
         public ArgonInputDrum()
         {
-            RelativeSizeAxes = Axes.Y;
+            RelativeSizeAxes = Axes.X;
         }
 
         [BackgroundDependencyLoader]

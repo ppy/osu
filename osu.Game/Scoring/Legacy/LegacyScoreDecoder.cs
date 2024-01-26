@@ -4,6 +4,7 @@
 #nullable disable
 
 using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
@@ -19,6 +20,7 @@ using osu.Game.Replays.Legacy;
 using osu.Game.Rulesets;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Replays;
+using osu.Game.Rulesets.Scoring;
 using SharpCompress.Compressors.LZMA;
 
 namespace osu.Game.Scoring.Legacy
@@ -38,7 +40,6 @@ namespace osu.Game.Scoring.Legacy
             };
 
             WorkingBeatmap workingBeatmap;
-            byte[] compressedScoreInfo = null;
 
             using (SerializationReader sr = new SerializationReader(stream))
             {
@@ -107,6 +108,8 @@ namespace osu.Game.Scoring.Legacy
                 else if (version >= 20121008)
                     scoreInfo.LegacyOnlineID = sr.ReadInt32();
 
+                byte[] compressedScoreInfo = null;
+
                 if (version >= 30000001)
                     compressedScoreInfo = sr.ReadByteArray();
 
@@ -130,10 +133,12 @@ namespace osu.Game.Scoring.Legacy
                 }
             }
 
-            if (score.ScoreInfo.IsLegacyScore || compressedScoreInfo == null)
-                PopulateLegacyAccuracyAndRank(score.ScoreInfo);
-            else
-                populateLazerAccuracyAndRank(score.ScoreInfo);
+            PopulateMaximumStatistics(score.ScoreInfo, workingBeatmap);
+
+            if (score.ScoreInfo.IsLegacyScore)
+                score.ScoreInfo.LegacyTotalScore = score.ScoreInfo.TotalScore;
+
+            StandardisedScoreMigrationTools.UpdateFromLegacy(score.ScoreInfo, workingBeatmap);
 
             // before returning for database import, we must restore the database-sourced BeatmapInfo.
             // if not, the clone operation in GetPlayableBeatmap will cause a dereference and subsequent database exception.
@@ -171,121 +176,65 @@ namespace osu.Game.Scoring.Legacy
         }
 
         /// <summary>
-        /// Populates the accuracy of a given <see cref="ScoreInfo"/> from its contained statistics.
+        /// Populates the <see cref="ScoreInfo.MaximumStatistics"/> for a given <see cref="ScoreInfo"/>.
         /// </summary>
-        /// <remarks>
-        /// Legacy use only.
-        /// </remarks>
-        /// <param name="score">The <see cref="ScoreInfo"/> to populate.</param>
-        public static void PopulateLegacyAccuracyAndRank(ScoreInfo score)
+        /// <param name="score">The score to populate the statistics of.</param>
+        /// <param name="workingBeatmap">The corresponding <see cref="WorkingBeatmap"/>.</param>
+        internal static void PopulateMaximumStatistics(ScoreInfo score, WorkingBeatmap workingBeatmap)
         {
-            int countMiss = score.GetCountMiss() ?? 0;
-            int count50 = score.GetCount50() ?? 0;
-            int count100 = score.GetCount100() ?? 0;
-            int count300 = score.GetCount300() ?? 0;
-            int countGeki = score.GetCountGeki() ?? 0;
-            int countKatu = score.GetCountKatu() ?? 0;
+            Debug.Assert(score.BeatmapInfo != null);
 
-            switch (score.Ruleset.OnlineID)
+            if (score.MaximumStatistics.Select(kvp => kvp.Value).Sum() > 0)
+                return;
+
+            var ruleset = score.Ruleset.Detach();
+            var rulesetInstance = ruleset.CreateInstance();
+            var scoreProcessor = rulesetInstance.CreateScoreProcessor();
+
+            // Populate the maximum statistics.
+            HitResult maxBasicResult = rulesetInstance.GetHitResults()
+                                                      .Select(h => h.result)
+                                                      .Where(h => h.IsBasic()).MaxBy(scoreProcessor.GetBaseScoreForResult);
+
+            foreach ((HitResult result, int count) in score.Statistics)
             {
-                case 0:
+                switch (result)
                 {
-                    int totalHits = count50 + count100 + count300 + countMiss;
-                    score.Accuracy = totalHits > 0 ? (double)(count50 * 50 + count100 * 100 + count300 * 300) / (totalHits * 300) : 1;
+                    case HitResult.LargeTickHit:
+                    case HitResult.LargeTickMiss:
+                        score.MaximumStatistics[HitResult.LargeTickHit] = score.MaximumStatistics.GetValueOrDefault(HitResult.LargeTickHit) + count;
+                        break;
 
-                    float ratio300 = (float)count300 / totalHits;
-                    float ratio50 = (float)count50 / totalHits;
+                    case HitResult.SmallTickHit:
+                    case HitResult.SmallTickMiss:
+                        score.MaximumStatistics[HitResult.SmallTickHit] = score.MaximumStatistics.GetValueOrDefault(HitResult.SmallTickHit) + count;
+                        break;
 
-                    if (ratio300 == 1)
-                        score.Rank = score.Mods.Any(m => m is ModHidden || m is ModFlashlight) ? ScoreRank.XH : ScoreRank.X;
-                    else if (ratio300 > 0.9 && ratio50 <= 0.01 && countMiss == 0)
-                        score.Rank = score.Mods.Any(m => m is ModHidden || m is ModFlashlight) ? ScoreRank.SH : ScoreRank.S;
-                    else if ((ratio300 > 0.8 && countMiss == 0) || ratio300 > 0.9)
-                        score.Rank = ScoreRank.A;
-                    else if ((ratio300 > 0.7 && countMiss == 0) || ratio300 > 0.8)
-                        score.Rank = ScoreRank.B;
-                    else if (ratio300 > 0.6)
-                        score.Rank = ScoreRank.C;
-                    else
-                        score.Rank = ScoreRank.D;
-                    break;
-                }
+                    case HitResult.IgnoreHit:
+                    case HitResult.IgnoreMiss:
+                    case HitResult.SmallBonus:
+                    case HitResult.LargeBonus:
+                        break;
 
-                case 1:
-                {
-                    int totalHits = count50 + count100 + count300 + countMiss;
-                    score.Accuracy = totalHits > 0 ? (double)(count100 * 150 + count300 * 300) / (totalHits * 300) : 1;
-
-                    float ratio300 = (float)count300 / totalHits;
-                    float ratio50 = (float)count50 / totalHits;
-
-                    if (ratio300 == 1)
-                        score.Rank = score.Mods.Any(m => m is ModHidden || m is ModFlashlight) ? ScoreRank.XH : ScoreRank.X;
-                    else if (ratio300 > 0.9 && ratio50 <= 0.01 && countMiss == 0)
-                        score.Rank = score.Mods.Any(m => m is ModHidden || m is ModFlashlight) ? ScoreRank.SH : ScoreRank.S;
-                    else if ((ratio300 > 0.8 && countMiss == 0) || ratio300 > 0.9)
-                        score.Rank = ScoreRank.A;
-                    else if ((ratio300 > 0.7 && countMiss == 0) || ratio300 > 0.8)
-                        score.Rank = ScoreRank.B;
-                    else if (ratio300 > 0.6)
-                        score.Rank = ScoreRank.C;
-                    else
-                        score.Rank = ScoreRank.D;
-                    break;
-                }
-
-                case 2:
-                {
-                    int totalHits = count50 + count100 + count300 + countMiss + countKatu;
-                    score.Accuracy = totalHits > 0 ? (double)(count50 + count100 + count300) / totalHits : 1;
-
-                    if (score.Accuracy == 1)
-                        score.Rank = score.Mods.Any(m => m is ModHidden || m is ModFlashlight) ? ScoreRank.XH : ScoreRank.X;
-                    else if (score.Accuracy > 0.98)
-                        score.Rank = score.Mods.Any(m => m is ModHidden || m is ModFlashlight) ? ScoreRank.SH : ScoreRank.S;
-                    else if (score.Accuracy > 0.94)
-                        score.Rank = ScoreRank.A;
-                    else if (score.Accuracy > 0.9)
-                        score.Rank = ScoreRank.B;
-                    else if (score.Accuracy > 0.85)
-                        score.Rank = ScoreRank.C;
-                    else
-                        score.Rank = ScoreRank.D;
-                    break;
-                }
-
-                case 3:
-                {
-                    int totalHits = count50 + count100 + count300 + countMiss + countGeki + countKatu;
-                    score.Accuracy = totalHits > 0 ? (double)(count50 * 50 + count100 * 100 + countKatu * 200 + (count300 + countGeki) * 300) / (totalHits * 300) : 1;
-
-                    if (score.Accuracy == 1)
-                        score.Rank = score.Mods.Any(m => m is ModHidden || m is ModFlashlight) ? ScoreRank.XH : ScoreRank.X;
-                    else if (score.Accuracy > 0.95)
-                        score.Rank = score.Mods.Any(m => m is ModHidden || m is ModFlashlight) ? ScoreRank.SH : ScoreRank.S;
-                    else if (score.Accuracy > 0.9)
-                        score.Rank = ScoreRank.A;
-                    else if (score.Accuracy > 0.8)
-                        score.Rank = ScoreRank.B;
-                    else if (score.Accuracy > 0.7)
-                        score.Rank = ScoreRank.C;
-                    else
-                        score.Rank = ScoreRank.D;
-                    break;
+                    default:
+                        score.MaximumStatistics[maxBasicResult] = score.MaximumStatistics.GetValueOrDefault(maxBasicResult) + count;
+                        break;
                 }
             }
-        }
 
-        private void populateLazerAccuracyAndRank(ScoreInfo scoreInfo)
-        {
-            scoreInfo.Accuracy = StandardisedScoreMigrationTools.ComputeAccuracy(scoreInfo);
+            if (!score.IsLegacyScore)
+                return;
 
-            var rank = currentRuleset.CreateScoreProcessor().RankFromAccuracy(scoreInfo.Accuracy);
+#pragma warning disable CS0618
+            // In osu! and osu!mania, some judgements affect combo but aren't stored to scores.
+            // A special hit result is used to pad out the combo value to match, based on the max combo from the difficulty attributes.
+            var calculator = rulesetInstance.CreateDifficultyCalculator(workingBeatmap);
+            var attributes = calculator.Calculate(score.Mods);
 
-            foreach (var mod in scoreInfo.Mods.OfType<IApplicableToScoreProcessor>())
-                rank = mod.AdjustRank(rank, scoreInfo.Accuracy);
-
-            scoreInfo.Rank = rank;
+            int maxComboFromStatistics = score.MaximumStatistics.Where(kvp => kvp.Key.AffectsCombo()).Select(kvp => kvp.Value).DefaultIfEmpty(0).Sum();
+            if (attributes.MaxCombo > maxComboFromStatistics)
+                score.MaximumStatistics[HitResult.LegacyComboIncrease] = attributes.MaxCombo - maxComboFromStatistics;
+#pragma warning restore CS0618
         }
 
         private void readLegacyReplay(Replay replay, StreamReader reader)
