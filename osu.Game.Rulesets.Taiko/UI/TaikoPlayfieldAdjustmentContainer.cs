@@ -13,8 +13,8 @@ namespace osu.Game.Rulesets.Taiko.UI
     {
         private const float default_relative_height = TaikoPlayfield.DEFAULT_HEIGHT / 768;
 
-        private const float MAXIMUM_ASPECT = 16f / 9f;
-        private const float MINIMUM_ASPECT = 5f / 4f;
+        private const float maximum_aspect = 16f / 9f;
+        private const float minimum_aspect = 5f / 4f;
 
         public readonly IBindable<bool> LockPlayfieldAspectRange = new BindableBool(true);
 
@@ -33,7 +33,7 @@ namespace osu.Game.Rulesets.Taiko.UI
 
         public double ComputeTimeRange()
         {
-            float aspectRatio = Math.Clamp(Parent!.ChildSize.X / Parent!.ChildSize.Y, MINIMUM_ASPECT, MAXIMUM_ASPECT);
+            float aspectRatio = Math.Clamp(Parent!.ChildSize.X / Parent!.ChildSize.Y, minimum_aspect, maximum_aspect);
             return aspectRatioToTimeRange(aspectRatio);
         }
 
@@ -52,10 +52,10 @@ namespace osu.Game.Rulesets.Taiko.UI
             {
                 float currentAspect = Parent!.ChildSize.X / Parent!.ChildSize.Y;
 
-                if (currentAspect > MAXIMUM_ASPECT)
-                    height *= currentAspect / MAXIMUM_ASPECT;
-                else if (currentAspect < MINIMUM_ASPECT)
-                    height *= currentAspect / MINIMUM_ASPECT;
+                if (currentAspect > maximum_aspect)
+                    height *= currentAspect / maximum_aspect;
+                else if (currentAspect < minimum_aspect)
+                    height *= currentAspect / minimum_aspect;
             }
 
             // Limit the maximum relative height of the playfield to one-third of available area to avoid it masking out on extreme resolutions.
