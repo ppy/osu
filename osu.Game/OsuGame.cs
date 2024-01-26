@@ -80,6 +80,13 @@ namespace osu.Game
     [Cached(typeof(OsuGame))]
     public partial class OsuGame : OsuGameBase, IKeyBindingHandler<GlobalAction>, ILocalUserPlayInfo, IPerformFromScreenRunner, IOverlayManager, ILinkHandler
     {
+#if DEBUG
+        // Different port allows runnning release and debug builds alongside each other.
+        public const int IPC_PORT = 44824;
+#else
+        public const int IPC_PORT = 44823;
+#endif
+
         /// <summary>
         /// The amount of global offset to apply when a left/right anchored overlay is displayed (ie. settings or notifications).
         /// </summary>
