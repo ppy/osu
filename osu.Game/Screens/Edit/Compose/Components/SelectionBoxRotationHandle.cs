@@ -62,6 +62,9 @@ namespace osu.Game.Screens.Edit.Compose.Components
 
         protected override bool OnDragStart(DragStartEvent e)
         {
+            if (e.Button != MouseButton.Left)
+                return false;
+
             if (rotationHandler == null) return false;
 
             rotationHandler.Begin();

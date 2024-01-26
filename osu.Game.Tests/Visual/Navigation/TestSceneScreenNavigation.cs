@@ -143,13 +143,13 @@ namespace osu.Game.Tests.Visual.Navigation
 
             PushAndConfirm(() => songSelect = new TestPlaySongSelect());
 
-            AddStep("set filter", () => songSelect.ChildrenOfType<SearchTextBox>().Single().Current.Value = "test");
+            AddStep("set filter", () => filterControlTextBox().Current.Value = "test");
             AddStep("press back", () => InputManager.Click(MouseButton.Button1));
 
             AddAssert("still at song select", () => Game.ScreenStack.CurrentScreen == songSelect);
-            AddAssert("filter cleared", () => string.IsNullOrEmpty(songSelect.ChildrenOfType<SearchTextBox>().Single().Current.Value));
+            AddAssert("filter cleared", () => string.IsNullOrEmpty(filterControlTextBox().Current.Value));
 
-            AddStep("set filter again", () => songSelect.ChildrenOfType<SearchTextBox>().Single().Current.Value = "test");
+            AddStep("set filter again", () => filterControlTextBox().Current.Value = "test");
             AddStep("open collections dropdown", () =>
             {
                 InputManager.MoveMouseTo(songSelect.ChildrenOfType<CollectionDropdown>().Single());
@@ -163,10 +163,12 @@ namespace osu.Game.Tests.Visual.Navigation
                                                            .ChildrenOfType<Dropdown<CollectionFilterMenuItem>.DropdownMenu>().Single().State == MenuState.Closed);
 
             AddStep("press back a second time", () => InputManager.Click(MouseButton.Button1));
-            AddAssert("filter cleared", () => string.IsNullOrEmpty(songSelect.ChildrenOfType<SearchTextBox>().Single().Current.Value));
+            AddAssert("filter cleared", () => string.IsNullOrEmpty(filterControlTextBox().Current.Value));
 
             AddStep("press back a third time", () => InputManager.Click(MouseButton.Button1));
             ConfirmAtMainMenu();
+
+            TextBox filterControlTextBox() => songSelect.ChildrenOfType<FilterControl.FilterControlTextBox>().Single();
         }
 
         [Test]
@@ -797,11 +799,7 @@ namespace osu.Game.Tests.Visual.Navigation
                 });
             });
 
-            AddStep("attempt exit", () =>
-            {
-                for (int i = 0; i < 2; ++i)
-                    Game.ScreenStack.CurrentScreen.Exit();
-            });
+            AddRepeatStep("attempt force exit", () => Game.ScreenStack.CurrentScreen.Exit(), 2);
             AddUntilStep("stopped at exit confirm", () => Game.ChildrenOfType<DialogOverlay>().Single().CurrentDialog is ConfirmExitDialog);
         }
 
@@ -938,6 +936,35 @@ namespace osu.Game.Tests.Visual.Navigation
 
             AddStep("exit player", () => player.Exit());
             AddUntilStep("touch device mod still active", () => Game.SelectedMods.Value, () => Has.One.InstanceOf<ModTouchDevice>());
+        }
+
+        [Test]
+        public void TestExitSongSelectAndImmediatelyClickLogo()
+        {
+            Screens.Select.SongSelect songSelect = null;
+            PushAndConfirm(() => songSelect = new TestPlaySongSelect());
+            AddUntilStep("wait for song select", () => songSelect.BeatmapSetsLoaded);
+
+            AddStep("import beatmap", () => BeatmapImportHelper.LoadQuickOszIntoOsu(Game).WaitSafely());
+
+            AddUntilStep("wait for selected", () => !Game.Beatmap.IsDefault);
+
+            AddStep("press escape and then click logo immediately", () =>
+            {
+                InputManager.Key(Key.Escape);
+                clickLogoWhenNotCurrent();
+            });
+
+            void clickLogoWhenNotCurrent()
+            {
+                if (songSelect.IsCurrentScreen())
+                    Scheduler.AddOnce(clickLogoWhenNotCurrent);
+                else
+                {
+                    InputManager.MoveMouseTo(Game.ChildrenOfType<OsuLogo>().Single());
+                    InputManager.Click(MouseButton.Left);
+                }
+            }
         }
 
         private Func<Player> playToResults()

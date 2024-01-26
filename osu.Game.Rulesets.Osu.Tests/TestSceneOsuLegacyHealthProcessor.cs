@@ -10,12 +10,12 @@ using osu.Game.Rulesets.Osu.Scoring;
 namespace osu.Game.Rulesets.Osu.Tests
 {
     [TestFixture]
-    public class TestSceneOsuHealthProcessor
+    public class TestSceneOsuLegacyHealthProcessor
     {
         [Test]
         public void TestNoBreak()
         {
-            OsuHealthProcessor hp = new OsuHealthProcessor(-1000);
+            OsuLegacyHealthProcessor hp = new OsuLegacyHealthProcessor(-1000);
             hp.ApplyBeatmap(new Beatmap<OsuHitObject>
             {
                 HitObjects =
@@ -31,7 +31,7 @@ namespace osu.Game.Rulesets.Osu.Tests
         [Test]
         public void TestSingleBreak()
         {
-            OsuHealthProcessor hp = new OsuHealthProcessor(-1000);
+            OsuLegacyHealthProcessor hp = new OsuLegacyHealthProcessor(-1000);
             hp.ApplyBeatmap(new Beatmap<OsuHitObject>
             {
                 HitObjects =
@@ -51,7 +51,7 @@ namespace osu.Game.Rulesets.Osu.Tests
         [Test]
         public void TestOverlappingBreak()
         {
-            OsuHealthProcessor hp = new OsuHealthProcessor(-1000);
+            OsuLegacyHealthProcessor hp = new OsuLegacyHealthProcessor(-1000);
             hp.ApplyBeatmap(new Beatmap<OsuHitObject>
             {
                 HitObjects =
@@ -72,7 +72,7 @@ namespace osu.Game.Rulesets.Osu.Tests
         [Test]
         public void TestSequentialBreak()
         {
-            OsuHealthProcessor hp = new OsuHealthProcessor(-1000);
+            OsuLegacyHealthProcessor hp = new OsuLegacyHealthProcessor(-1000);
             hp.ApplyBeatmap(new Beatmap<OsuHitObject>
             {
                 HitObjects =

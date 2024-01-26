@@ -11,6 +11,7 @@ using osu.Framework.Allocation;
 using osu.Framework.Logging;
 using osu.Framework.Screens;
 using osu.Game.Beatmaps;
+using osu.Game.Configuration;
 using osu.Game.Database;
 using osu.Game.Online.API;
 using osu.Game.Online.Multiplayer;
@@ -37,6 +38,10 @@ namespace osu.Game.Screens.Play
         [Resolved]
         private SpectatorClient spectatorClient { get; set; }
 
+        [Resolved]
+        private SessionStatics statics { get; set; }
+
+        private readonly object scoreSubmissionLock = new object();
         private TaskCompletionSource<bool> scoreSubmissionSource;
 
         protected SubmittingPlayer(PlayerConfiguration configuration = null)
@@ -55,6 +60,11 @@ namespace osu.Game.Screens.Play
 
             AddInternal(new PlayerTouchInputDetector());
         }
+
+        protected override GameplayClockContainer CreateGameplayClockContainer(WorkingBeatmap beatmap, double gameplayStart) => new MasterGameplayClockContainer(beatmap, gameplayStart)
+        {
+            ShouldValidatePlaybackRate = true,
+        };
 
         protected override void LoadAsyncComplete()
         {
@@ -176,6 +186,7 @@ namespace osu.Game.Screens.Play
         {
             bool exiting = base.OnExiting(e);
             submitFromFailOrQuit();
+            statics.SetValue(Static.LastLocalUserScore, Score?.ScoreInfo.DeepClone());
             return exiting;
         }
 
@@ -208,6 +219,14 @@ namespace osu.Game.Screens.Play
 
         private Task submitScore(Score score)
         {
+            var masterClock = GameplayClockContainer as MasterGameplayClockContainer;
+
+            if (masterClock?.PlaybackRateValid.Value != true)
+            {
+                Logger.Log("Score submission cancelled due to audio playback rate discrepancy.");
+                return Task.CompletedTask;
+            }
+
             // token may be null if the request failed but gameplay was still allowed (see HandleTokenRetrievalFailure).
             if (token == null)
             {
@@ -215,16 +234,19 @@ namespace osu.Game.Screens.Play
                 return Task.CompletedTask;
             }
 
-            if (scoreSubmissionSource != null)
-                return scoreSubmissionSource.Task;
+            lock (scoreSubmissionLock)
+            {
+                if (scoreSubmissionSource != null)
+                    return scoreSubmissionSource.Task;
+
+                scoreSubmissionSource = new TaskCompletionSource<bool>();
+            }
 
             // if the user never hit anything, this score should not be counted in any way.
             if (!score.ScoreInfo.Statistics.Any(s => s.Key.IsHit() && s.Value > 0))
                 return Task.CompletedTask;
 
             Logger.Log($"Beginning score submission (token:{token.Value})...");
-
-            scoreSubmissionSource = new TaskCompletionSource<bool>();
             var request = CreateSubmissionRequest(score, token.Value);
 
             request.Success += s =>

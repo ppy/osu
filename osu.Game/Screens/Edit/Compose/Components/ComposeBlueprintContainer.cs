@@ -225,7 +225,7 @@ namespace osu.Game.Screens.Edit.Compose.Components
         protected virtual IEnumerable<TernaryButton> CreateTernaryButtons()
         {
             //TODO: this should only be enabled (visible?) for rulesets that provide combo-supporting HitObjects.
-            yield return new TernaryButton(NewCombo, "New combo", () => new SpriteIcon { Icon = FontAwesome.Regular.DotCircle });
+            yield return new TernaryButton(NewCombo, "New combo", () => new SpriteIcon { Icon = OsuIcon.EditorNewComboA });
 
             foreach (var kvp in SelectionHandler.SelectionSampleStates)
                 yield return new TernaryButton(kvp.Value, kvp.Key.Replace("hit", string.Empty).Titleize(), () => getIconForSample(kvp.Key));
@@ -272,10 +272,10 @@ namespace osu.Game.Screens.Edit.Compose.Components
                     return new SpriteIcon { Icon = FontAwesome.Solid.Hands };
 
                 case HitSampleInfo.HIT_WHISTLE:
-                    return new SpriteIcon { Icon = FontAwesome.Solid.Bullhorn };
+                    return new SpriteIcon { Icon = OsuIcon.EditorWhistle };
 
                 case HitSampleInfo.HIT_FINISH:
-                    return new SpriteIcon { Icon = FontAwesome.Solid.DrumSteelpan };
+                    return new SpriteIcon { Icon = OsuIcon.EditorFinish };
             }
 
             return null;

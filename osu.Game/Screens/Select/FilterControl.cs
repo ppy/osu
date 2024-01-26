@@ -250,7 +250,7 @@ namespace osu.Game.Screens.Select
 
         protected override bool OnHover(HoverEvent e) => true;
 
-        private partial class FilterControlTextBox : SeekLimitedSearchTextBox
+        internal partial class FilterControlTextBox : SeekLimitedSearchTextBox
         {
             private const float filter_text_size = 12;
 

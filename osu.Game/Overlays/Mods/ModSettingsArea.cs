@@ -32,6 +32,8 @@ namespace osu.Game.Overlays.Mods
         [Resolved]
         private OverlayColourProvider colourProvider { get; set; } = null!;
 
+        public override bool AcceptsFocus => true;
+
         public ModSettingsArea()
         {
             RelativeSizeAxes = Axes.X;

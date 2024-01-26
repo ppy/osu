@@ -167,6 +167,29 @@ namespace osu.Game.Tests.Visual.Collections
         }
 
         [Test]
+        public void TestCollectionNameCollisionsWithBuiltInItems()
+        {
+            AddStep("add dropdown", () =>
+            {
+                Add(new CollectionDropdown
+                {
+                    Anchor = Anchor.TopRight,
+                    Origin = Anchor.TopRight,
+                    RelativeSizeAxes = Axes.X,
+                    Width = 0.4f,
+                });
+            });
+            AddStep("add two collections which collide with default items", () => Realm.Write(r => r.Add(new[]
+            {
+                new BeatmapCollection(name: "All beatmaps"),
+                new BeatmapCollection(name: "Manage collections...")
+                {
+                    BeatmapMD5Hashes = { beatmapManager.GetAllUsableBeatmapSets().First().Beatmaps[0].MD5Hash }
+                },
+            })));
+        }
+
+        [Test]
         public void TestRemoveCollectionViaButton()
         {
             AddStep("add two collections", () => Realm.Write(r => r.Add(new[]

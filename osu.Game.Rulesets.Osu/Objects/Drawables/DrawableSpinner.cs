@@ -17,6 +17,7 @@ using osu.Game.Rulesets.Judgements;
 using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Objects.Drawables;
 using osu.Game.Rulesets.Osu.Judgements;
+using osu.Game.Rulesets.Osu.Scoring;
 using osu.Game.Rulesets.Osu.Skinning;
 using osu.Game.Rulesets.Osu.Skinning.Default;
 using osu.Game.Rulesets.Scoring;
@@ -46,7 +47,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
         private const float spinning_sample_initial_frequency = 1.0f;
         private const float spinning_sample_modulated_base_frequency = 0.5f;
 
-        private SkinnableSound maxBonusSample;
+        private PausableSkinnableSound maxBonusSample;
 
         /// <summary>
         /// The amount of bonus score gained from spinning after the required number of spins, for display purposes.
@@ -113,7 +114,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
                     Looping = true,
                     Frequency = { Value = spinning_sample_initial_frequency }
                 },
-                maxBonusSample = new SkinnableSound
+                maxBonusSample = new PausableSkinnableSound
                 {
                     MinimumSampleVolume = MINIMUM_SAMPLE_VOLUME,
                 }
@@ -312,7 +313,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
             updateBonusScore();
         }
 
-        private static readonly int score_per_tick = new SpinnerBonusTick.OsuSpinnerBonusTickJudgement().MaxNumericResult;
+        private static readonly int score_per_tick = new OsuScoreProcessor().GetBaseScoreForResult(new SpinnerBonusTick.OsuSpinnerBonusTickJudgement().MaxResult);
 
         private void updateBonusScore()
         {

@@ -4,12 +4,10 @@
 #nullable disable
 
 using System.Diagnostics;
-using System.Linq;
 using JetBrains.Annotations;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
-using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Objects.Drawables;
 using osu.Game.Rulesets.Objects.Types;
 using osu.Game.Skinning;
@@ -17,7 +15,7 @@ using osuTK;
 
 namespace osu.Game.Rulesets.Osu.Objects.Drawables
 {
-    public partial class DrawableSliderTail : DrawableOsuHitObject, IRequireTracking
+    public partial class DrawableSliderTail : DrawableOsuHitObject
     {
         public new SliderTailCircle HitObject => (SliderTailCircle)base.HitObject;
 
@@ -27,17 +25,10 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
         protected DrawableSlider DrawableSlider => (DrawableSlider)ParentHitObject;
 
         /// <summary>
-        /// The judgement text is provided by the <see cref="DrawableSlider"/>.
-        /// </summary>
-        public override bool DisplayResult => false;
-
-        /// <summary>
         /// Whether the hit samples only play on successful hits.
         /// If <c>false</c>, the hit samples will also play on misses.
         /// </summary>
         public bool SamplePlaysOnlyOnHit { get; set; } = true;
-
-        public bool Tracking { get; set; }
 
         public SkinnableDrawable CirclePiece { get; private set; }
 
@@ -125,36 +116,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
             }
         }
 
-        protected override void CheckForResult(bool userTriggered, double timeOffset)
-        {
-            if (userTriggered)
-                return;
-
-            // Ensure the tail can only activate after all previous ticks/repeats already have.
-            //
-            // This covers the edge case where the lenience may allow the tail to activate before
-            // the last tick, changing ordering of score/combo awarding.
-            var lastTick = DrawableSlider.NestedHitObjects.LastOrDefault(o => o.HitObject is SliderTick || o.HitObject is SliderRepeat);
-            if (lastTick?.Judged == false)
-                return;
-
-            if (timeOffset < SliderEventGenerator.TAIL_LENIENCY)
-                return;
-
-            // Attempt to preserve correct ordering of judgements as best we can by forcing
-            // an un-judged head to be missed when the user has clearly skipped it.
-            //
-            // This check is applied to all nested slider objects apart from the head (ticks, repeats, tail).
-            if (Tracking && !DrawableSlider.HeadCircle.Judged)
-                DrawableSlider.HeadCircle.MissForcefully();
-
-            // The player needs to have engaged in tracking at any point after the tail leniency cutoff.
-            // An actual tick miss should only occur if reaching the tick itself.
-            if (Tracking)
-                ApplyResult(r => r.Type = r.Judgement.MaxResult);
-            else if (timeOffset > 0)
-                ApplyResult(r => r.Type = r.Judgement.MinResult);
-        }
+        protected override void CheckForResult(bool userTriggered, double timeOffset) => DrawableSlider.SliderInputManager.TryJudgeNestedObject(this, timeOffset);
 
         protected override void OnApply()
         {

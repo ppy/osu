@@ -219,6 +219,8 @@ namespace osu.Game.Tests.Beatmaps.Formats
             {
                 new OsuModDoubleTime { SpeedChange = { Value = 1.1 } }
             };
+            scoreInfo.OnlineID = 123123;
+            scoreInfo.ClientVersion = "2023.1221.0";
 
             var beatmap = new TestBeatmap(ruleset);
             var score = new Score
@@ -237,9 +239,11 @@ namespace osu.Game.Tests.Beatmaps.Formats
 
             Assert.Multiple(() =>
             {
+                Assert.That(decodedAfterEncode.ScoreInfo.OnlineID, Is.EqualTo(123123));
                 Assert.That(decodedAfterEncode.ScoreInfo.Statistics, Is.EqualTo(scoreInfo.Statistics));
                 Assert.That(decodedAfterEncode.ScoreInfo.MaximumStatistics, Is.EqualTo(scoreInfo.MaximumStatistics));
                 Assert.That(decodedAfterEncode.ScoreInfo.Mods, Is.EqualTo(scoreInfo.Mods));
+                Assert.That(decodedAfterEncode.ScoreInfo.ClientVersion, Is.EqualTo("2023.1221.0"));
             });
         }
 

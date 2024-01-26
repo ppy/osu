@@ -231,7 +231,7 @@ namespace osu.Game.Rulesets.Osu.Skinning
                 points.AddRange(Source.SmokePoints.Skip(firstVisiblePointIndex).Take(futurePointIndex - firstVisiblePointIndex));
             }
 
-            public sealed override void Draw(IRenderer renderer)
+            protected sealed override void Draw(IRenderer renderer)
             {
                 base.Draw(renderer);
 

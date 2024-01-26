@@ -61,6 +61,12 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
             CheckHittable = (d, t, r) => DrawableSlider.CheckHittable?.Invoke(d, t, r) ?? ClickAction.Hit;
         }
 
+        protected override void CheckForResult(bool userTriggered, double timeOffset)
+        {
+            base.CheckForResult(userTriggered, timeOffset);
+            DrawableSlider.SliderInputManager.PostProcessHeadJudgement(this);
+        }
+
         protected override HitResult ResultFor(double timeOffset)
         {
             Debug.Assert(HitObject != null);
