@@ -7,19 +7,15 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Colour;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
-using osu.Framework.Graphics.UserInterface;
 using osu.Framework.Input.Events;
-using osu.Framework.Threading;
 using osu.Framework.Utils;
 using osu.Game.Graphics;
 using osuTK;
 
 namespace osu.Game.Screens.Play.HUD
 {
-    public partial class ArgonSongProgressBar : SliderBar<double>
+    public partial class ArgonSongProgressBar : SongProgressBar
     {
-        public Action<double>? OnSeek { get; set; }
-
         // Parent will handle restricting the area of valid input.
         public override bool ReceivePositionalInputAt(Vector2 screenSpacePos) => true;
 
@@ -33,35 +29,12 @@ namespace osu.Game.Screens.Play.HUD
         private readonly ColourInfo mainColour;
         private ColourInfo catchUpColour;
 
-        public double StartTime
-        {
-            private get => CurrentNumber.MinValue;
-            set => CurrentNumber.MinValue = value;
-        }
-
-        public double EndTime
-        {
-            private get => CurrentNumber.MaxValue;
-            set => CurrentNumber.MaxValue = value;
-        }
-
-        public double CurrentTime
-        {
-            private get => CurrentNumber.Value;
-            set => CurrentNumber.Value = value;
-        }
-
         public double TrackTime { private get; set; }
 
         private double length => EndTime - StartTime;
 
-        public bool Interactive { get; set; }
-
         public ArgonSongProgressBar(float barHeight)
         {
-            StartTime = 0;
-            EndTime = 1;
-
             RelativeSizeAxes = Axes.X;
             Height = this.barHeight = barHeight;
 
@@ -136,11 +109,6 @@ namespace osu.Game.Screens.Play.HUD
             base.OnHoverLost(e);
         }
 
-        protected override void UpdateValue(float value)
-        {
-            // Handled in Update
-        }
-
         protected override void Update()
         {
             base.Update();
@@ -165,18 +133,6 @@ namespace osu.Game.Screens.Play.HUD
                 Easing.OutQuint);
 
             catchupBar.Alpha = Math.Max(1, catchupBar.Length);
-        }
-
-        private ScheduledDelegate? scheduledSeek;
-
-        protected override void OnUserChange(double value)
-        {
-            scheduledSeek?.Cancel();
-            scheduledSeek = Schedule(() =>
-            {
-                if (Interactive)
-                    OnSeek?.Invoke(value);
-            });
         }
 
         private partial class RoundedBar : Container
