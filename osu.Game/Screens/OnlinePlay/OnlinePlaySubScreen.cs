@@ -13,6 +13,8 @@ namespace osu.Game.Screens.OnlinePlay
 
         public virtual string ShortTitle => Title;
 
+        protected sealed override bool PlayExitSound => false;
+
         [Resolved]
         protected IRoomManager? RoomManager { get; private set; }
 

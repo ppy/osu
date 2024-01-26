@@ -10,6 +10,16 @@ namespace osu.Game.Localisation
         private const string prefix = @"osu.Game.Resources.Localisation.PlaybackSettings";
 
         /// <summary>
+        /// "Step backward one frame"
+        /// </summary>
+        public static LocalisableString StepBackward => new TranslatableString(getKey(@"step_backward_frame"), @"Step backward one frame");
+
+        /// <summary>
+        /// "Step forward one frame"
+        /// </summary>
+        public static LocalisableString StepForward => new TranslatableString(getKey(@"step_forward_frame"), @"Step forward one frame");
+
+        /// <summary>
         /// "Seek backward {0} seconds"
         /// </summary>
         public static LocalisableString SeekBackwardSeconds(double arg0) => new TranslatableString(getKey(@"seek_backward_seconds"), @"Seek backward {0} seconds", arg0);

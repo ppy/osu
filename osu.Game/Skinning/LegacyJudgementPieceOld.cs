@@ -63,14 +63,10 @@ namespace osu.Game.Skinning
                 // missed ticks / slider end don't get the normal animation.
                 if (isMissedTick())
                 {
-                    this.ScaleTo(1.6f);
-                    this.ScaleTo(1, 100, Easing.In);
+                    this.ScaleTo(1.2f);
+                    this.ScaleTo(1f, 100, Easing.In);
 
-                    if (legacyVersion > 1.0m)
-                    {
-                        this.MoveTo(new Vector2(0, -2f));
-                        this.MoveToOffset(new Vector2(0, 10), fade_out_delay + fade_out_length, Easing.In);
-                    }
+                    this.FadeOutFromOne(400);
                 }
                 else
                 {
