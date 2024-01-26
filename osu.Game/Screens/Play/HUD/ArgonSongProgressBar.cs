@@ -3,7 +3,6 @@
 
 using System;
 using osu.Framework.Allocation;
-using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Colour;
 using osu.Framework.Graphics.Containers;
@@ -52,23 +51,14 @@ namespace osu.Game.Screens.Play.HUD
             set => CurrentNumber.Value = value;
         }
 
-        public double TrackTime
-        {
-            private get => currentTrackTime.Value;
-            set => currentTrackTime.Value = value;
-        }
+        public double TrackTime { private get; set; }
 
         private double length => EndTime - StartTime;
-
-        private readonly BindableNumber<double> currentTrackTime;
 
         public bool Interactive { get; set; }
 
         public ArgonSongProgressBar(float barHeight)
         {
-            currentTrackTime = new BindableDouble();
-            setupAlternateValue();
-
             StartTime = 0;
             EndTime = 1;
 
@@ -105,13 +95,6 @@ namespace osu.Game.Screens.Play.HUD
                     RelativeSizeAxes = Axes.Both
                 },
             };
-        }
-
-        private void setupAlternateValue()
-        {
-            CurrentNumber.MaxValueChanged += v => currentTrackTime.MaxValue = v;
-            CurrentNumber.MinValueChanged += v => currentTrackTime.MinValue = v;
-            CurrentNumber.PrecisionChanged += v => currentTrackTime.Precision = v;
         }
 
         private float normalizedReference
