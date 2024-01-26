@@ -49,18 +49,18 @@ namespace osu.Game.Tests.Visual.Gameplay
                 skinnableSamples.Play();
             });
 
-            AddUntilStep("wait for sample to start playing", () => skinnableSamples.IsPlaying);
+            AddUntilStep("wait for sample to start playing", () => skinnableSamples.IsActivelyPlaying);
 
             AddStep("stop sample", () => skinnableSamples.Stop());
 
-            AddUntilStep("wait for sample to stop playing", () => !skinnableSamples.IsPlaying);
+            AddUntilStep("wait for sample to stop playing", () => !skinnableSamples.IsActivelyPlaying);
 
             AddStep("disable sample playback", () => skinSource.SamplePlaybackDisabled.Value = true);
 
             AddStep("enable sample playback", () => skinSource.SamplePlaybackDisabled.Value = false);
 
             AddWaitStep("wait a bit", 5);
-            AddAssert("sample not playing", () => !skinnableSamples.IsPlaying);
+            AddAssert("sample not playing", () => !skinnableSamples.IsActivelyPlaying);
         }
 
         [Test]
@@ -72,13 +72,13 @@ namespace osu.Game.Tests.Visual.Gameplay
                 skinnableSamples.Play();
             });
 
-            AddUntilStep("wait for sample to start playing", () => skinnableSamples.IsPlaying);
+            AddUntilStep("wait for sample to start playing", () => skinnableSamples.IsActivelyPlaying);
 
             AddStep("disable sample playback", () => skinSource.SamplePlaybackDisabled.Value = true);
-            AddUntilStep("wait for sample to stop playing", () => !skinnableSamples.IsPlaying);
+            AddUntilStep("wait for sample to stop playing", () => !skinnableSamples.IsActivelyPlaying);
 
             AddStep("enable sample playback", () => skinSource.SamplePlaybackDisabled.Value = false);
-            AddUntilStep("wait for sample to start playing", () => skinnableSamples.IsPlaying);
+            AddUntilStep("wait for sample to start playing", () => skinnableSamples.IsActivelyPlaying);
         }
 
         [Test]
@@ -86,17 +86,17 @@ namespace osu.Game.Tests.Visual.Gameplay
         {
             AddStep("start sample", () => skinnableSamples.Play());
 
-            AddAssert("sample playing", () => skinnableSamples.IsPlaying);
+            AddAssert("sample playing", () => skinnableSamples.IsActivelyPlaying);
 
             AddStep("disable sample playback", () => skinSource.SamplePlaybackDisabled.Value = true);
 
-            AddUntilStep("sample not playing", () => !skinnableSamples.IsPlaying);
+            AddUntilStep("sample not playing", () => !skinnableSamples.IsActivelyPlaying);
 
             AddStep("enable sample playback", () => skinSource.SamplePlaybackDisabled.Value = false);
 
-            AddAssert("sample not playing", () => !skinnableSamples.IsPlaying);
-            AddAssert("sample not playing", () => !skinnableSamples.IsPlaying);
-            AddAssert("sample not playing", () => !skinnableSamples.IsPlaying);
+            AddAssert("sample not playing", () => !skinnableSamples.IsActivelyPlaying);
+            AddAssert("sample not playing", () => !skinnableSamples.IsActivelyPlaying);
+            AddAssert("sample not playing", () => !skinnableSamples.IsActivelyPlaying);
         }
 
         [Test]
@@ -127,10 +127,10 @@ namespace osu.Game.Tests.Visual.Gameplay
                 sample = skinnableSamples.ChildrenOfType<DrawableSample>().Single();
             });
 
-            AddAssert("sample playing", () => skinnableSamples.IsPlaying);
+            AddAssert("sample playing", () => skinnableSamples.IsActivelyPlaying);
 
             AddStep("disable sample playback", () => skinSource.SamplePlaybackDisabled.Value = true);
-            AddUntilStep("wait for sample to stop playing", () => !skinnableSamples.IsPlaying);
+            AddUntilStep("wait for sample to stop playing", () => !skinnableSamples.IsActivelyPlaying);
 
             AddStep("trigger skin change", () => skinSource.TriggerSourceChanged());
 
@@ -141,11 +141,11 @@ namespace osu.Game.Tests.Visual.Gameplay
                 return sample != oldSample;
             });
 
-            AddAssert("new sample stopped", () => !skinnableSamples.IsPlaying);
+            AddAssert("new sample stopped", () => !skinnableSamples.IsActivelyPlaying);
             AddStep("enable sample playback", () => skinSource.SamplePlaybackDisabled.Value = false);
 
             AddWaitStep("wait a bit", 5);
-            AddAssert("new sample not played", () => !skinnableSamples.IsPlaying);
+            AddAssert("new sample not played", () => !skinnableSamples.IsActivelyPlaying);
         }
 
         [Cached(typeof(ISkinSource))]

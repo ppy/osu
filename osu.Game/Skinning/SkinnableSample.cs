@@ -126,7 +126,7 @@ namespace osu.Game.Skinning
             activeChannel.Looping = Looping;
             activeChannel.Play();
 
-            Played = true;
+            WasPlayed = true;
         }
 
         /// <summary>
@@ -143,7 +143,10 @@ namespace osu.Game.Skinning
         /// </summary>
         public bool Playing => activeChannel?.Playing ?? false;
 
-        public bool Played { get; private set; }
+        /// <summary>
+        /// Whether the sample was ever started. Becomes <c>true</c> on <see cref="Play"/> and never changes after that point.
+        /// </summary>
+        public bool WasPlayed { get; private set; }
 
         private bool looping;
 

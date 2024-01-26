@@ -54,13 +54,13 @@ namespace osu.Game.Tests.Visual.Gameplay
             AddAssert("sample playback still disabled", () => sampleDisabler.SamplePlaybackDisabled.Value);
 
             AddUntilStep("seek finished, sample playback enabled", () => !sampleDisabler.SamplePlaybackDisabled.Value);
-            AddUntilStep("any sample is playing", () => Player.ChildrenOfType<SkinnableSamples>().Any(s => s.IsPlaying));
+            AddUntilStep("any sample is playing", () => Player.ChildrenOfType<SkinnableSamples>().Any(s => s.IsActivelyPlaying));
         }
 
         private IEnumerable<SkinnableSamples> allSounds => Player.ChildrenOfType<SkinnableSamples>();
         private IEnumerable<SkinnableSamples> allLoopingSounds => allSounds.Where(sound => sound.Looping);
 
-        private bool allStopped(IEnumerable<SkinnableSamples> sounds) => sounds.All(sound => !sound.IsPlaying);
+        private bool allStopped(IEnumerable<SkinnableSamples> sounds) => sounds.All(sound => !sound.IsActivelyPlaying);
 
         protected override bool Autoplay => true;
 

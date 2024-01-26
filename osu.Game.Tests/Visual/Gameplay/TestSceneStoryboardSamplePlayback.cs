@@ -128,9 +128,9 @@ namespace osu.Game.Tests.Visual.Gameplay
             waitUntilStoryboardSamplesPlay();
         }
 
-        private void waitUntilStoryboardSamplesPlay() => AddUntilStep("any storyboard samples playing", () => allStoryboardSamples.Any(sound => sound.IsPlaying));
+        private void waitUntilStoryboardSamplesPlay() => AddUntilStep("any storyboard samples playing", () => allStoryboardSamples.Any(sound => sound.IsActivelyPlaying));
 
-        private void allStoryboardSamplesStopped() => AddAssert("all storyboard samples stopped immediately", () => allStoryboardSamples.All(sound => !sound.IsPlaying));
+        private void allStoryboardSamplesStopped() => AddAssert("all storyboard samples stopped immediately", () => allStoryboardSamples.All(sound => !sound.IsActivelyPlaying));
 
         private void skipIntro() => AddStep("skip intro", () => InputManager.Key(Key.Space));
 

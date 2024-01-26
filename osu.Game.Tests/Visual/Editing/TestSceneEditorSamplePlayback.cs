@@ -45,8 +45,8 @@ namespace osu.Game.Tests.Visual.Editing
                 return true;
             });
 
-            AddAssert("non-looping samples are playing", () => onceOffSamples.Length == 4 && loopingSamples.All(s => s.Played || s.Playing));
-            AddAssert("looping samples are not playing", () => loopingSamples.Length == 1 && loopingSamples.All(s => s.Played && !s.Playing));
+            AddAssert("non-looping samples are playing", () => onceOffSamples.Length == 4 && loopingSamples.All(s => s.WasPlayed || s.Playing));
+            AddAssert("looping samples are not playing", () => loopingSamples.Length == 1 && loopingSamples.All(s => s.WasPlayed && !s.Playing));
         }
     }
 }

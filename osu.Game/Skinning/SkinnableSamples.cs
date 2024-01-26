@@ -130,7 +130,7 @@ namespace osu.Game.Skinning
         public void Play()
         {
             cancelPendingStart();
-            RequestedPlaying = true;
+            IsPlaying = true;
 
             if (samplePlaybackDisabled.Value)
                 return;
@@ -144,7 +144,7 @@ namespace osu.Game.Skinning
         public void Stop()
         {
             cancelPendingStart();
-            RequestedPlaying = false;
+            IsPlaying = false;
             stop();
         }
 
@@ -178,7 +178,7 @@ namespace osu.Game.Skinning
 
         private void updateSamples()
         {
-            bool wasPlaying = IsPlaying;
+            bool wasPlaying = IsActivelyPlaying;
 
             // Remove all pooled samples (return them to the pool), and dispose the rest.
             samplesContainer.RemoveAll(s => s.IsInPool, false);
@@ -199,8 +199,6 @@ namespace osu.Game.Skinning
 
         #region Pausing support
 
-        public bool RequestedPlaying { get; private set; }
-
         private readonly IBindable<bool> samplePlaybackDisabled = new Bindable<bool>();
 
         private ScheduledDelegate? scheduledStart;
@@ -218,7 +216,7 @@ namespace osu.Game.Skinning
 
         protected virtual void SamplePlaybackDisabledChanged(ValueChangedEvent<bool> disabled)
         {
-            if (!RequestedPlaying) return;
+            if (!IsPlaying) return;
 
             // let non-looping samples that have already been started play out to completion (sounds better than abruptly cutting off).
             if (!Looping) return;
@@ -232,7 +230,7 @@ namespace osu.Game.Skinning
                 // schedule so we don't start playing a sample which is no longer alive.
                 scheduledStart = Schedule(() =>
                 {
-                    if (RequestedPlaying)
+                    if (IsPlaying)
                         play();
                 });
             }
@@ -267,9 +265,17 @@ namespace osu.Game.Skinning
         public void RemoveAllAdjustments(AdjustableProperty type) => samplesContainer.RemoveAllAdjustments(type);
 
         /// <summary>
+        /// Whether sample playback was requested via a call to <see cref="Play"/>.
+        ///
+        /// Importantly, this will ignore the current gameplay paused state (samples may be queued to be played after unpause).
+        /// For the imminent playback state, use <see cref="IsActivelyPlaying"/>.
+        /// </summary>
+        public bool IsPlaying { get; private set; }
+
+        /// <summary>
         /// Whether any samples are currently playing.
         /// </summary>
-        public bool IsPlaying
+        public bool IsActivelyPlaying
         {
             get
             {
@@ -283,13 +289,16 @@ namespace osu.Game.Skinning
             }
         }
 
-        public bool IsPlayed
+        /// <summary>
+        /// Whether the sample was ever started. Becomes <c>true</c> on <see cref="Play"/> and never changes after that point.
+        /// </summary>
+        public bool WasPlayed
         {
             get
             {
                 foreach (SkinnableSample s in samplesContainer)
                 {
-                    if (s.Played)
+                    if (s.WasPlayed)
                         return true;
                 }
 

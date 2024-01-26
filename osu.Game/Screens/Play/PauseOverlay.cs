@@ -23,7 +23,7 @@ namespace osu.Game.Screens.Play
     {
         public Action OnResume;
 
-        public override bool IsPresent => base.IsPresent || pauseLoop.IsPlaying;
+        public override bool IsPresent => base.IsPresent || pauseLoop.IsActivelyPlaying;
 
         public override LocalisableString Header => GameplayMenuOverlayStrings.PausedHeader;
 
