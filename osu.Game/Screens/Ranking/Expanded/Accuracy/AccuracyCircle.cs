@@ -351,24 +351,28 @@ namespace osu.Game.Screens.Ranking.Expanded.Accuracy
 
                 int badgeNum = 0;
 
-                foreach (var badge in badges)
+                if (score.Rank != ScoreRank.F)
                 {
-                    if (badge.Accuracy > score.Accuracy)
-                        continue;
-
-                    using (BeginDelayedSequence(inverseEasing(ACCURACY_TRANSFORM_EASING, Math.Min(accuracyX - virtual_ss_percentage, badge.Accuracy) / targetAccuracy) * ACCURACY_TRANSFORM_DURATION))
+                    foreach (var badge in badges)
                     {
-                        badge.Appear();
+                        if (badge.Accuracy > score.Accuracy)
+                            continue;
 
-                        if (withFlair)
+                        using (BeginDelayedSequence(
+                                   inverseEasing(ACCURACY_TRANSFORM_EASING, Math.Min(accuracyX - virtual_ss_percentage, badge.Accuracy) / targetAccuracy) * ACCURACY_TRANSFORM_DURATION))
                         {
-                            Schedule(() =>
-                            {
-                                var dink = badgeNum < badges.Count - 1 ? badgeTickSound : badgeMaxSound;
+                            badge.Appear();
 
-                                dink.FrequencyTo(1 + badgeNum++ * 0.05);
-                                dink.Play();
-                            });
+                            if (withFlair)
+                            {
+                                Schedule(() =>
+                                {
+                                    var dink = badgeNum < badges.Count - 1 ? badgeTickSound : badgeMaxSound;
+
+                                    dink.FrequencyTo(1 + badgeNum++ * 0.05);
+                                    dink.Play();
+                                });
+                            }
                         }
                     }
                 }
