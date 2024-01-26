@@ -239,11 +239,11 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
                 if (Tracking.Value && Time.Current >= HitObject.StartTime)
                 {
                     // keep the sliding sample playing at the current tracking position
-                    if (!slidingSample.IsActivelyPlaying)
+                    if (!slidingSample.IsPlaying)
                         slidingSample.Play();
                     slidingSample.Balance.Value = CalculateSamplePlaybackBalance(CalculateDrawableRelativePosition(Ball));
                 }
-                else if (slidingSample.IsActivelyPlaying)
+                else if (slidingSample.IsPlaying)
                     slidingSample.Stop();
             }
         }
