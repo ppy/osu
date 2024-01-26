@@ -5,7 +5,6 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using osu.Framework.Allocation;
-using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Primitives;
@@ -33,11 +32,6 @@ namespace osu.Game.Rulesets.Taiko.UI
 
         public const float INPUT_DRUM_WIDTH = 180f;
 
-        /// <summary>
-        /// Whether the hit target should be nudged further towards the left area, matching the stable "classic" position.
-        /// </summary>
-        public Bindable<bool> ClassicHitTargetPosition = new BindableBool();
-
         public Container UnderlayElements { get; private set; } = null!;
 
         private Container<HitExplosion> hitExplosionContainer = null!;
@@ -62,6 +56,7 @@ namespace osu.Game.Rulesets.Taiko.UI
         private void load(OsuColour colours)
         {
             const float hit_target_width = BASE_HEIGHT;
+            const float hit_target_offset = -24f;
 
             inputDrum = new InputDrum
             {
@@ -106,6 +101,7 @@ namespace osu.Game.Rulesets.Taiko.UI
                             Name = "Elements behind hit objects",
                             RelativeSizeAxes = Axes.Y,
                             Width = hit_target_width,
+                            X = hit_target_offset,
                             Children = new[]
                             {
                                 new SkinnableDrawable(new TaikoSkinComponentLookup(TaikoSkinComponents.KiaiGlow), _ => Empty())
@@ -126,7 +122,7 @@ namespace osu.Game.Rulesets.Taiko.UI
                         {
                             Name = "Bar line content",
                             RelativeSizeAxes = Axes.Both,
-                            Padding = new MarginPadding { Left = hit_target_width / 2 },
+                            Padding = new MarginPadding { Left = hit_target_width / 2 + hit_target_offset },
                             Children = new Drawable[]
                             {
                                 UnderlayElements = new Container
@@ -140,7 +136,7 @@ namespace osu.Game.Rulesets.Taiko.UI
                         {
                             Name = "Masked hit objects content",
                             RelativeSizeAxes = Axes.Both,
-                            Padding = new MarginPadding { Left = hit_target_width / 2 },
+                            Padding = new MarginPadding { Left = hit_target_width / 2 + hit_target_offset },
                             Masking = true,
                             Child = HitObjectContainer,
                         },
@@ -148,7 +144,7 @@ namespace osu.Game.Rulesets.Taiko.UI
                         {
                             Name = "Overlay content",
                             RelativeSizeAxes = Axes.Both,
-                            Padding = new MarginPadding { Left = hit_target_width / 2 },
+                            Padding = new MarginPadding { Left = hit_target_width / 2 + hit_target_offset },
                             Children = new Drawable[]
                             {
                                 drumRollHitContainer = new DrumRollHitContainer(),
