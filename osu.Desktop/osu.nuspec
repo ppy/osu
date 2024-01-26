@@ -7,7 +7,8 @@
         <authors>ppy Pty Ltd</authors>
         <owners>Dean Herbert</owners>
         <projectUrl>https://osu.ppy.sh/</projectUrl>
-        <iconUrl>https://puu.sh/tYyXZ/9a01a5d1b0.ico</iconUrl>
+        <iconUrl>https://github.com/ppy/osu/blob/master/assets/lazer-nuget.png?raw=true</iconUrl>
+        <icon>icon.png</icon>
         <requireLicenseAcceptance>false</requireLicenseAcceptance>
         <description>A free-to-win rhythm game. Rhythm is just a *click* away!</description>
         <releaseNotes>testing</releaseNotes>
