@@ -10,6 +10,7 @@ using osu.Framework.Audio;
 using osu.Framework.Bindables;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
+using osu.Framework.Graphics.Audio;
 using osu.Framework.Graphics.Colour;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.UserInterface;
@@ -98,6 +99,7 @@ namespace osu.Game.Screens.Ranking.Expanded.Accuracy
         private PoolableSkinnableSample swooshUpSound;
         private PoolableSkinnableSample rankImpactSound;
         private PoolableSkinnableSample rankApplauseSound;
+        private DrawableSample rankFailSound;
 
         private readonly Bindable<double> tickPlaybackRate = new Bindable<double>();
 
@@ -133,7 +135,7 @@ namespace osu.Game.Screens.Ranking.Expanded.Accuracy
         }
 
         [BackgroundDependencyLoader]
-        private void load()
+        private void load(AudioManager audio)
         {
             InternalChildren = new Drawable[]
             {
@@ -267,6 +269,7 @@ namespace osu.Game.Screens.Ranking.Expanded.Accuracy
                     badgeTickSound = new PoolableSkinnableSample(new SampleInfo(@"Results/badge-dink")),
                     badgeMaxSound = new PoolableSkinnableSample(new SampleInfo(@"Results/badge-dink-max")),
                     swooshUpSound = new PoolableSkinnableSample(new SampleInfo(@"Results/swoosh-up")),
+                    rankFailSound = new DrawableSample(audio.Samples.Get(results_applause_d_sound)),
                 });
             }
         }
@@ -396,8 +399,16 @@ namespace osu.Game.Screens.Ranking.Expanded.Accuracy
                     {
                         Schedule(() =>
                         {
-                            rankApplauseSound.VolumeTo(applause_volume);
-                            rankApplauseSound.Play();
+                            if (score.Rank != ScoreRank.F)
+                            {
+                                rankApplauseSound.VolumeTo(applause_volume);
+                                rankApplauseSound.Play();
+                            }
+                            else
+                            {
+                                rankFailSound.VolumeTo(applause_volume);
+                                rankFailSound.Play();
+                            }
                         });
                     }
                 }
@@ -440,6 +451,8 @@ namespace osu.Game.Screens.Ranking.Expanded.Accuracy
             }
         }
 
+        private const string results_applause_d_sound = @"Results/applause-d";
+
         private string applauseSampleName
         {
             get
@@ -448,7 +461,7 @@ namespace osu.Game.Screens.Ranking.Expanded.Accuracy
                 {
                     default:
                     case ScoreRank.D:
-                        return @"Results/applause-d";
+                        return results_applause_d_sound;
 
                     case ScoreRank.C:
                         return @"Results/applause-c";
