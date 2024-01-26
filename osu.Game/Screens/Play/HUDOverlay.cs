@@ -258,14 +258,13 @@ namespace osu.Game.Screens.Play
 
             Vector2? highestBottomScreenSpace = null;
 
-            // cast can be removed when IDrawable interface includes Anchor / RelativeSizeAxes.
             foreach (var element in mainComponents.Components)
-                processDrawable(element as Drawable);
+                processDrawable(element);
 
             if (rulesetComponents != null)
             {
                 foreach (var element in rulesetComponents.Components)
-                    processDrawable(element as Drawable);
+                    processDrawable(element);
             }
 
             if (lowestTopScreenSpaceRight.HasValue)
@@ -283,33 +282,36 @@ namespace osu.Game.Screens.Play
             else
                 bottomRightElements.Y = 0;
 
-            void processDrawable(Drawable element)
+            void processDrawable(ISerialisableDrawable element)
             {
+                // Cast can be removed when IDrawable interface includes Anchor / RelativeSizeAxes.
+                Drawable drawable = (Drawable)element;
+
                 // for now align some top components with the bottom-edge of the lowest top-anchored hud element.
-                if (element.Anchor.HasFlagFast(Anchor.y0))
+                if (drawable.Anchor.HasFlagFast(Anchor.y0))
                 {
                     // health bars are excluded for the sake of hacky legacy skins which extend the health bar to take up the full screen area.
                     if (element is LegacyHealthDisplay)
                         return;
 
-                    float bottom = element.ScreenSpaceDrawQuad.BottomRight.Y;
+                    float bottom = drawable.ScreenSpaceDrawQuad.BottomRight.Y;
 
-                    bool isRelativeX = element.RelativeSizeAxes == Axes.X;
+                    bool isRelativeX = drawable.RelativeSizeAxes == Axes.X;
 
-                    if (element.Anchor.HasFlagFast(Anchor.TopRight) || isRelativeX)
+                    if (drawable.Anchor.HasFlagFast(Anchor.TopRight) || isRelativeX)
                     {
                         if (lowestTopScreenSpaceRight == null || bottom > lowestTopScreenSpaceRight.Value)
                             lowestTopScreenSpaceRight = bottom;
                     }
 
-                    if (element.Anchor.HasFlagFast(Anchor.TopLeft) || isRelativeX)
+                    if (drawable.Anchor.HasFlagFast(Anchor.TopLeft) || isRelativeX)
                     {
                         if (lowestTopScreenSpaceLeft == null || bottom > lowestTopScreenSpaceLeft.Value)
                             lowestTopScreenSpaceLeft = bottom;
                     }
                 }
                 // and align bottom-right components with the top-edge of the highest bottom-anchored hud element.
-                else if (element.Anchor.HasFlagFast(Anchor.BottomRight) || (element.Anchor.HasFlagFast(Anchor.y2) && element.RelativeSizeAxes == Axes.X))
+                else if (drawable.Anchor.HasFlagFast(Anchor.BottomRight) || (drawable.Anchor.HasFlagFast(Anchor.y2) && drawable.RelativeSizeAxes == Axes.X))
                 {
                     var topLeft = element.ScreenSpaceDrawQuad.TopLeft;
                     if (highestBottomScreenSpace == null || topLeft.Y < highestBottomScreenSpace.Value.Y)
