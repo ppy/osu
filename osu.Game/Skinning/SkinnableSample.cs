@@ -113,7 +113,7 @@ namespace osu.Game.Skinning
         }
 
         /// <summary>
-        /// Plays the sample.
+        /// Plays the sample. Will not stop previous concurrent playbacks of the sample.
         /// </summary>
         public void Play()
         {
@@ -121,6 +121,14 @@ namespace osu.Game.Skinning
 
             if (Sample == null)
                 return;
+
+            // Avoid spinning up a new channel if we're a looping sample.
+            if (activeChannel?.Looping == true)
+            {
+                if (!activeChannel.Playing)
+                    activeChannel.Play();
+                return;
+            }
 
             activeChannel = Sample.GetChannel();
             activeChannel.Looping = Looping;
