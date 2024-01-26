@@ -268,11 +268,8 @@ namespace osu.Game.Rulesets.Osu.HUD
 
             PositionMappingStyle.BindValueChanged(s =>
             {
-                foreach (var hit in hitPositionContainer)
-                {
-                    hit.FadeOut(300).Expire();
-                    averagePositionContainer.MoveTo(averagePosition = Vector2.Zero, 800, Easing.OutQuint);
-                }
+                // reset hit position to let it re-stat in the new mode
+                Clear();
 
                 if (s.NewValue == MappingStyle.Relative)
                 {
@@ -283,6 +280,8 @@ namespace osu.Game.Rulesets.Osu.HUD
                 else
                 {
                     arrowBackgroundContainer.FadeOut(100);
+                    // consider that component rotate is meaningless and will cause confusing in absolute mode.
+                    // so let component in rotate fixed when in absolute mapping mode.
                     RemoveInternal(mainContainer, false);
                     rotateFixedContainer.Add(mainContainer);
                 }
@@ -309,19 +308,25 @@ namespace osu.Game.Rulesets.Osu.HUD
                 }
             }
 
+            // the Vector2 for component is X (-0.5, 0.5), Y (-0.5, 0.5)
             Vector2 hitPosition;
 
             if (PositionMappingStyle.Value == MappingStyle.Relative && scoreProcessor.HitEvents.LastOrDefault().LastHitObject != null)
             {
                 var currentHitEvent = scoreProcessor.HitEvents.Last();
 
+                // let local center in (0.5, 0.5) to prevent localRadius in calculate will get zero.
+                // then manual subtraction 0.5 to match component mapping.
                 hitPosition = AccuracyHeatmap.FindRelativeHitPosition(((OsuHitObject)currentHitEvent.LastHitObject).StackedEndPosition, ((OsuHitObject)currentHitEvent.HitObject).StackedEndPosition,
                     circleJudgement.CursorPositionAtHit.Value, objectRadius, new Vector2(0.5f), inner_portion, 45) - new Vector2(0.5f);
             }
             else
             {
-                hitPosition = roundPosition((circleJudgement.CursorPositionAtHit.Value - ((OsuHitObject)circleJudgement.HitObject).StackedPosition) / objectRadius / 2 * inner_portion);
+                // get relative position between mouse position and current object.
+                hitPosition = (circleJudgement.CursorPositionAtHit.Value - ((OsuHitObject)circleJudgement.HitObject).StackedPosition) / objectRadius / 2 * inner_portion;
             }
+
+            hitPosition = Vector2.Clamp(hitPosition, new Vector2(-0.5f), new Vector2(0.5f));
 
             hitPositionPool.Get(drawableHit =>
             {
@@ -333,29 +338,6 @@ namespace osu.Game.Rulesets.Osu.HUD
             });
 
             averagePositionContainer.MoveTo(averagePosition = (hitPosition + averagePosition) / 2, 800, Easing.OutQuint);
-        }
-
-        private static Vector2 roundPosition(Vector2 position)
-        {
-            if (position.X > 0.5f)
-            {
-                position.X = 0.5f;
-            }
-            else if (position.X < -0.5f)
-            {
-                position.X = -0.5f;
-            }
-
-            if (position.Y > 0.5f)
-            {
-                position.Y = 0.5f;
-            }
-            else if (position.Y < -0.5f)
-            {
-                position.Y = -0.5f;
-            }
-
-            return position;
         }
 
         private Color4 getColourForPosition(Vector2 position)
