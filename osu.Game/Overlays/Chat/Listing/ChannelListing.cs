@@ -63,7 +63,7 @@ namespace osu.Game.Overlays.Chat.Listing
             flow.ChildrenEnumerable = newChannels.Where(c => c.Type == ChannelType.Public)
                                                  .Select(c => new ChannelListingItem(c));
 
-            foreach (var item in flow.Children)
+            foreach (var item in flow)
             {
                 item.OnRequestJoin += channel => OnRequestJoin?.Invoke(channel);
                 item.OnRequestLeave += channel => OnRequestLeave?.Invoke(channel);

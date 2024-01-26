@@ -6,13 +6,12 @@ using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Game.Rulesets.Taiko.Beatmaps;
 using osu.Game.Rulesets.UI;
+using osuTK;
 
 namespace osu.Game.Rulesets.Taiko.UI
 {
     public partial class TaikoPlayfieldAdjustmentContainer : PlayfieldAdjustmentContainer
     {
-        private const float default_relative_height = TaikoPlayfield.DEFAULT_HEIGHT / 768;
-
         private const float maximum_aspect = 16f / 9f;
         private const float minimum_aspect = 5f / 4f;
 
@@ -37,11 +36,22 @@ namespace osu.Game.Rulesets.Taiko.UI
             return aspectRatioToTimeRange(aspectRatio);
         }
 
+        public TaikoPlayfieldAdjustmentContainer()
+        {
+            RelativeSizeAxes = Axes.X;
+            RelativePositionAxes = Axes.Y;
+            Height = TaikoPlayfield.BASE_HEIGHT;
+        }
+
         protected override void Update()
         {
             base.Update();
 
-            float height = default_relative_height;
+            const float base_relative_height = TaikoPlayfield.BASE_HEIGHT / 768;
+            // Matches stable, see https://github.com/peppy/osu-stable-reference/blob/7519cafd1823f1879c0d9c991ba0e5c7fd3bfa02/osu!/GameModes/Play/Rulesets/Taiko/RulesetTaiko.cs#L514
+            const float base_position = 135f / 480f;
+
+            float relativeHeight = base_relative_height;
 
             // Players coming from stable expect to be able to change the aspect ratio regardless of the window size.
             // We originally wanted to limit this more, but there was considerable pushback from the community.
@@ -53,19 +63,18 @@ namespace osu.Game.Rulesets.Taiko.UI
                 float currentAspect = Parent!.ChildSize.X / Parent!.ChildSize.Y;
 
                 if (currentAspect > maximum_aspect)
-                    height *= currentAspect / maximum_aspect;
+                    relativeHeight *= currentAspect / maximum_aspect;
                 else if (currentAspect < minimum_aspect)
-                    height *= currentAspect / minimum_aspect;
+                    relativeHeight *= currentAspect / minimum_aspect;
             }
 
             // Limit the maximum relative height of the playfield to one-third of available area to avoid it masking out on extreme resolutions.
-            height = Math.Min(height, 1f / 3f);
-            Height = height;
+            relativeHeight = Math.Min(relativeHeight, 1f / 3f);
 
-            // Position the taiko playfield exactly one playfield from the top of the screen, if there is enough space for it.
-            // Note that the relative height cannot exceed one-third - if that limit is hit, the playfield will be exactly centered.
-            RelativePositionAxes = Axes.Y;
-            Y = height;
+            Y = base_position;
+
+            Scale = new Vector2(Math.Max((Parent!.ChildSize.Y / 768f) * (relativeHeight / base_relative_height), 1f));
+            Width = 1 / Scale.X;
         }
     }
 }

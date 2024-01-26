@@ -4,7 +4,6 @@
 #nullable disable
 
 using osu.Framework.Bindables;
-using osu.Framework.Extensions.LocalisationExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Localisation;
 using osu.Game.Graphics.Sprites;
@@ -39,7 +38,7 @@ namespace osu.Game.Graphics.UserInterface
         protected override double GetProportionalDuration(long currentValue, long newValue) =>
             currentValue > newValue ? currentValue - newValue : newValue - currentValue;
 
-        protected override LocalisableString FormatCount(long count) => count.ToLocalisableString(formatString);
+        protected override LocalisableString FormatCount(long count) => count.ToString(formatString);
 
         protected override OsuSpriteText CreateSpriteText()
             => base.CreateSpriteText().With(s => s.Font = s.Font.With(fixedWidth: true));
