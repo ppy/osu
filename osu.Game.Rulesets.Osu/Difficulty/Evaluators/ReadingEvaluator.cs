@@ -72,46 +72,114 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
 
             difficulty *= 1 + overlap_multiplier * screenOverlapDifficulty;
 
-            // Console.WriteLine($"Object {currObj.StartTime}, {hiddenDifficulty:0.##} + {noteDensityDifficulty:0.##} + {overlapDifficulty:0.##}");
-
             return difficulty;
         }
 
-        public static double EvaluateHighARDifficultyOf(DifficultyHitObject current, bool applyFollowLineAdjust = false)
+        public static double EvaluateHighARDifficultyOf(DifficultyHitObject current, bool applyAdjust = false)
         {
-            // follow lines make high AR easier, so apply nerf if object isn't new combo
-            // double adjustedApproachTime = osuCurrObj.Preempt;
-            // if (applyFollowLineAdjust) adjustedApproachTime += Math.Max(0, (osuCurrObj.FollowLineTime - 200) / 25);
-
             var currObj = (OsuDifficultyHitObject)current;
 
-            return highArCurve(currObj.Preempt);
+            double result = highArCurve(currObj.Preempt);
+
+            if (applyAdjust)
+            {
+                double inpredictability = EvaluateInpredictabilityOf(current);
+
+                // follow lines make high AR easier, so apply nerf if object isn't new combo
+                inpredictability *= 1 + 0.1 * (800 - currObj.FollowLineTime) / 800;
+
+                result *= 0.85 + 0.75 * inpredictability;
+            }
+
+            return result;
         }
 
         public static double EvaluateHiddenDifficultyOf(DifficultyHitObject current)
         {
             var currObj = (OsuDifficultyHitObject)current;
 
-            // Maybe I should just pass in clockrate...
-            double clockRateEstimate = current.BaseObject.StartTime / currObj.StartTime;
-            double currVelocity = currObj.LazyJumpDistance / currObj.StrainTime;
+            double aimDifficulty = AimEvaluator.EvaluateDifficultyOf(current, false);
 
             double hdDifficulty = 0;
 
-            double timeSpentInvisible = getDurationSpentInvisible(currObj) / clockRateEstimate;
+            double timeSpentInvisible = getDurationSpentInvisible(currObj) / currObj.ClockRate;
             double timeDifficultyFactor = calculateDenstityOf(currObj) / 1000;
 
             double visibleObjectFactor = Math.Clamp(retrieveCurrentVisibleObjects(currObj).Count - 2, 0, 15);
 
             hdDifficulty += Math.Pow(visibleObjectFactor * timeSpentInvisible * timeDifficultyFactor, 1) +
-                            (8 + visibleObjectFactor) * currVelocity;
+                            (8 + visibleObjectFactor) * aimDifficulty;
+
+            hdDifficulty *= 0.95 + 0.15 * EvaluateInpredictabilityOf(current); // Max multiplier is 1.1
 
             return hdDifficulty;
         }
 
-        public static double EvaluatePredictabilityOf(DifficultyHitObject current)
+        // Returns value from 0 to 1, where 0 is very predictable and 1 is very unpredictable
+        public static double EvaluateInpredictabilityOf(DifficultyHitObject current)
         {
-            return 0;
+            // make the sum equal to 1
+            const double velocity_change_part = 0.3;
+            const double angle_change_part = 0.6;
+            const double rhythm_change_part = 0.1;
+
+            if (current.BaseObject is Spinner || current.Index == 0 || current.Previous(0).BaseObject is Spinner)
+                return 0;
+
+            var osuCurrObj = (OsuDifficultyHitObject)current;
+            var osuLastObj = (OsuDifficultyHitObject)current.Previous(0);
+
+            double velocityChangeBonus = 0;
+
+            double currVelocity = osuCurrObj.LazyJumpDistance / osuCurrObj.StrainTime;
+            double prevVelocity = osuLastObj.LazyJumpDistance / osuLastObj.StrainTime;
+
+            // https://www.desmos.com/calculator/kqxmqc8pkg
+            if (currVelocity > 0 || prevVelocity > 0)
+            {
+                double velocityChange = Math.Max(0,
+                Math.Min(
+                    Math.Abs(prevVelocity - currVelocity) - 0.5 * Math.Min(currVelocity, prevVelocity),
+                    Math.Max(((OsuHitObject)osuCurrObj.BaseObject).Radius / Math.Max(osuCurrObj.StrainTime, osuLastObj.StrainTime), Math.Min(currVelocity, prevVelocity))
+                    )); // Stealed from xexxar
+                velocityChangeBonus = velocityChange / Math.Max(currVelocity, prevVelocity); // maxiumum is 0.4
+                velocityChangeBonus /= 0.4;
+            }
+
+            double angleChangeBonus = 0;
+
+            if (osuCurrObj.Angle != null && osuLastObj.Angle != null && currVelocity > 0 && prevVelocity > 0)
+            {
+                angleChangeBonus = Math.Pow(Math.Sin((double)((osuCurrObj.Angle - osuLastObj.Angle) / 2)), 2); // Also stealed from xexxar
+                angleChangeBonus *= Math.Min(currVelocity, prevVelocity) / Math.Max(currVelocity, prevVelocity); // Prevent cheesing
+            }
+
+            double rhythmChangeBonus = 0;
+
+            if (current.Index > 1)
+            {
+                var osuLastLastObj = (OsuDifficultyHitObject)current.Previous(1);
+
+                double currDelta = osuCurrObj.StrainTime;
+                double lastDelta = osuLastObj.StrainTime;
+
+                if (osuLastObj.BaseObject is Slider sliderCurr)
+                {
+                    currDelta -= sliderCurr.Duration / osuCurrObj.ClockRate;
+                    currDelta = Math.Max(0, currDelta);
+                }
+
+                if (osuLastLastObj.BaseObject is Slider sliderLast)
+                {
+                    lastDelta -= sliderLast.Duration / osuLastObj.ClockRate;
+                    lastDelta = Math.Max(0, lastDelta);
+                }
+
+                rhythmChangeBonus = 1 - Math.Min(currDelta, lastDelta) / Math.Max(currDelta, lastDelta);
+            }
+
+            double result = velocity_change_part * velocityChangeBonus + angle_change_part * angleChangeBonus + rhythm_change_part * rhythmChangeBonus;
+            return result;
         }
 
         // Returns a list of objects that are visible on screen at
@@ -198,7 +266,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
         // https://www.desmos.com/calculator/hbj7swzlth
         private static double highArCurve(double preempt)
         {
-            double value = Math.Pow(4, 3 - 0.01 * preempt); // 1 for 300ms, 0.25 for 400ms, 0.0625 for 500ms
+            double value = Math.Pow(3, 3 - 0.01 * preempt); // 1 for 300ms, 0.25 for 400ms, 0.0625 for 500ms
             value = softmin(value, 2, 1.7); // use softmin to achieve full-memory cap, 2 times more than AR11 (300ms)
             return value;
         }

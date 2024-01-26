@@ -144,7 +144,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
             currentStrain *= strainDecay(current.DeltaTime);
 
             double aimDifficulty = AimEvaluator.EvaluateDifficultyOf(current, true, ((OsuDifficultyHitObject)current).Preempt);
-            aimDifficulty *= ReadingEvaluator.EvaluateHighARDifficultyOf(current);
+            aimDifficulty *= ReadingEvaluator.EvaluateHighARDifficultyOf(current, true);
             currentStrain += aimDifficulty * skillMultiplier;
 
             // currentRhythm = RhythmEvaluator.EvaluateDifficultyOf(current);
@@ -178,7 +178,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
             currentStrain *= strainDecay(currODHO.StrainTime);
 
             double speedDifficulty = SpeedEvaluator.EvaluateDifficultyOf(current) * skillMultiplier;
-            speedDifficulty *= ReadingEvaluator.EvaluateHighARDifficultyOf(current);
+            speedDifficulty *= ReadingEvaluator.EvaluateHighARDifficultyOf(current, false);
             currentStrain += speedDifficulty;
 
             currentRhythm = currODHO.RhythmDifficulty;

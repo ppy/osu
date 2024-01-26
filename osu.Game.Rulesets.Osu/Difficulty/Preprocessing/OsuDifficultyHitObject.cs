@@ -99,6 +99,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Preprocessing
         private readonly OsuHitObject lastObject;
         public readonly double Preempt;
         public readonly double FollowLineTime;
+        public readonly double ClockRate;
 
         public OsuDifficultyHitObject(HitObject hitObject, HitObject lastObject, HitObject? lastLastObject, double clockRate, List<DifficultyHitObject> objects, int index)
             : base(hitObject, lastObject, clockRate, objects, index)
@@ -106,6 +107,9 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Preprocessing
             this.lastLastObject = lastLastObject as OsuHitObject;
             this.lastObject = (OsuHitObject)lastObject;
             Preempt = BaseObject.TimePreempt / clockRate;
+            FollowLineTime = 800 / clockRate; // 800ms is follow line appear time
+            FollowLineTime *= ((OsuHitObject)hitObject).NewCombo ? 0 : 1; // no follow lines when NC
+            ClockRate = clockRate;
 
             // Capped to 25ms to prevent difficulty calculation breaking from simultaneous objects.
             StrainTime = Math.Max(DeltaTime, min_delta_time);
