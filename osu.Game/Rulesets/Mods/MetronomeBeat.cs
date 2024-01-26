@@ -15,7 +15,7 @@ namespace osu.Game.Rulesets.Mods
     {
         private readonly double firstHitTime;
 
-        private readonly PausableSkinnableSamples sample;
+        private readonly SkinnableSamples sample;
 
         /// <param name="firstHitTime">Start time of the first hit object, used for providing a count down.</param>
         public MetronomeBeat(double firstHitTime)
@@ -24,7 +24,7 @@ namespace osu.Game.Rulesets.Mods
             AllowMistimedEventFiring = false;
             Divisor = 1;
 
-            InternalChild = sample = new PausableSkinnableSamples(new SampleInfo("Gameplay/catch-banana"));
+            InternalChild = sample = new SkinnableSamples(new SampleInfo("Gameplay/catch-banana"));
         }
 
         protected override void OnNewBeat(int beatIndex, TimingControlPoint timingPoint, EffectControlPoint effectPoint, ChannelAmplitudes amplitudes)

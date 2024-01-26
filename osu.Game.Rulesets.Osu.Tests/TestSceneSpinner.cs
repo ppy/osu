@@ -90,8 +90,8 @@ namespace osu.Game.Rulesets.Osu.Tests
             AddUntilStep("Pitch starts low", () => getSpinningSample().Frequency.Value < 0.8);
             AddUntilStep("Pitch increases", () => getSpinningSample().Frequency.Value > 0.8);
 
-            PausableSkinnableSamples getSpinningSample() =>
-                drawableSpinner.ChildrenOfType<PausableSkinnableSamples>().FirstOrDefault(s => s.Samples.Any(i => i.LookupNames.Any(l => l.Contains("spinnerspin"))));
+            SkinnableSamples getSpinningSample() =>
+                drawableSpinner.ChildrenOfType<SkinnableSamples>().FirstOrDefault(s => s.Samples.Any(i => i.LookupNames.Any(l => l.Contains("spinnerspin"))));
         }
 
         [TestCase(false)]

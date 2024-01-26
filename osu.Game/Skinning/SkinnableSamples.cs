@@ -11,6 +11,7 @@ using osu.Framework.Extensions.IEnumerableExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Audio;
 using osu.Framework.Graphics.Containers;
+using osu.Framework.Threading;
 using osu.Game.Audio;
 
 namespace osu.Game.Skinning
@@ -18,9 +19,15 @@ namespace osu.Game.Skinning
     /// <summary>
     /// A group of (generally gameplay) samples to be played together as one.
     /// Unlike <see cref="SkinnableSample"/>, this uses <see cref="IPooledSampleProvider"/> internally to retrieve all samples from pools when available.
+    /// Playback is automatically paused when a <see cref="ISamplePlaybackDisabler"/> is cached.
     /// </summary>
     public partial class SkinnableSamples : SkinReloadableDrawable, IAdjustableAudioComponent
     {
+        /// <summary>
+        /// The length in milliseconds of the longest sample.
+        /// </summary>
+        public double Length => !DrawableSamples.Any() ? 0 : DrawableSamples.Max(sample => sample.Length);
+
         /// <summary>
         /// The minimum allowable volume for <see cref="Samples"/>.
         /// <see cref="Samples"/> that specify a lower <see cref="ISampleInfo.Volume"/> will be forcibly pulled up to this volume.
@@ -51,11 +58,12 @@ namespace osu.Game.Skinning
         private IPooledSampleProvider? samplePool { get; set; }
 
         /// <summary>
-        /// Creates a new <see cref="SkinnableSamples"/>.
+        /// Creates a new <see cref="SkinnableSamples"/> with an initial sample.
         /// </summary>
-        public SkinnableSamples()
+        /// <param name="sample">The initial sample.</param>
+        public SkinnableSamples(ISampleInfo sample)
+            : this(new[] { sample })
         {
-            InternalChild = samplesContainer = new AudioContainer<SkinnableSample>();
         }
 
         /// <summary>
@@ -65,16 +73,15 @@ namespace osu.Game.Skinning
         public SkinnableSamples(IEnumerable<ISampleInfo> samples)
             : this()
         {
-            this.samples = samples.ToArray();
+            Samples = samples.ToArray();
         }
 
         /// <summary>
-        /// Creates a new <see cref="SkinnableSamples"/> with an initial sample.
+        /// Creates a new <see cref="SkinnableSamples"/>.
         /// </summary>
-        /// <param name="sample">The initial sample.</param>
-        public SkinnableSamples(ISampleInfo sample)
-            : this(new[] { sample })
+        public SkinnableSamples()
         {
+            InternalChild = samplesContainer = new AudioContainer<SkinnableSample>();
         }
 
         private ISampleInfo[] samples = Array.Empty<ISampleInfo>();
@@ -120,7 +127,37 @@ namespace osu.Game.Skinning
         /// <summary>
         /// Plays the samples.
         /// </summary>
-        public virtual void Play()
+        public void Play()
+        {
+            cancelPendingStart();
+            RequestedPlaying = true;
+
+            if (samplePlaybackDisabled.Value)
+                return;
+
+            play();
+        }
+
+        /// <summary>
+        /// Stops the samples.
+        /// </summary>
+        public void Stop()
+        {
+            cancelPendingStart();
+            RequestedPlaying = false;
+            stop();
+        }
+
+        protected override void LoadAsyncComplete()
+        {
+            // ensure samples are constructed before SkinChanged() is called via base.LoadAsyncComplete().
+            if (!samplesContainer.Any())
+                updateSamples();
+
+            base.LoadAsyncComplete();
+        }
+
+        private void play()
         {
             FlushPendingSkinChanges();
 
@@ -134,19 +171,7 @@ namespace osu.Game.Skinning
             });
         }
 
-        protected override void LoadAsyncComplete()
-        {
-            // ensure samples are constructed before SkinChanged() is called via base.LoadAsyncComplete().
-            if (!samplesContainer.Any())
-                updateSamples();
-
-            base.LoadAsyncComplete();
-        }
-
-        /// <summary>
-        /// Stops the samples.
-        /// </summary>
-        public virtual void Stop()
+        private void stop()
         {
             samplesContainer.ForEach(c => c.Stop());
         }
@@ -171,6 +196,55 @@ namespace osu.Game.Skinning
             if (wasPlaying && Looping)
                 Play();
         }
+
+        #region Pausing support
+
+        public bool RequestedPlaying { get; private set; }
+
+        private readonly IBindable<bool> samplePlaybackDisabled = new Bindable<bool>();
+
+        private ScheduledDelegate? scheduledStart;
+
+        [BackgroundDependencyLoader]
+        private void load(ISamplePlaybackDisabler? samplePlaybackDisabler)
+        {
+            // if in a gameplay context, pause sample playback when gameplay is paused.
+            if (samplePlaybackDisabler != null)
+            {
+                samplePlaybackDisabled.BindTo(samplePlaybackDisabler.SamplePlaybackDisabled);
+                samplePlaybackDisabled.BindValueChanged(SamplePlaybackDisabledChanged);
+            }
+        }
+
+        protected virtual void SamplePlaybackDisabledChanged(ValueChangedEvent<bool> disabled)
+        {
+            if (!RequestedPlaying) return;
+
+            // let non-looping samples that have already been started play out to completion (sounds better than abruptly cutting off).
+            if (!Looping) return;
+
+            cancelPendingStart();
+
+            if (disabled.NewValue)
+                stop();
+            else
+            {
+                // schedule so we don't start playing a sample which is no longer alive.
+                scheduledStart = Schedule(() =>
+                {
+                    if (RequestedPlaying)
+                        play();
+                });
+            }
+        }
+
+        private void cancelPendingStart()
+        {
+            scheduledStart?.Cancel();
+            scheduledStart = null;
+        }
+
+        #endregion
 
         #region Re-expose AudioContainer
 

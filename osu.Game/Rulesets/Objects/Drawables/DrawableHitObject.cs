@@ -59,7 +59,7 @@ namespace osu.Game.Rulesets.Objects.Drawables
         /// </summary>
         public readonly Bindable<Color4> AccentColour = new Bindable<Color4>(Color4.Gray);
 
-        protected PausableSkinnableSamples Samples { get; private set; }
+        protected SkinnableSamples Samples { get; private set; }
 
         public virtual IEnumerable<HitSampleInfo> GetSamples() => HitObject.Samples;
 
@@ -201,7 +201,7 @@ namespace osu.Game.Rulesets.Objects.Drawables
             comboColourBrightness.BindTo(gameplaySettings.ComboColourNormalisationAmount);
 
             // Explicit non-virtual function call in case a DrawableHitObject overrides AddInternal.
-            base.AddInternal(Samples = new PausableSkinnableSamples
+            base.AddInternal(Samples = new SkinnableSamples
             {
                 MinimumSampleVolume = MINIMUM_SAMPLE_VOLUME
             });

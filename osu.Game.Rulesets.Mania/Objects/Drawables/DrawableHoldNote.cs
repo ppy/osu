@@ -41,7 +41,7 @@ namespace osu.Game.Rulesets.Mania.Objects.Drawables
         private Container<DrawableHoldNoteTail> tailContainer;
         private Container<DrawableHoldNoteBody> bodyContainer;
 
-        private PausableSkinnableSamples slidingSample;
+        private SkinnableSamples slidingSample;
 
         /// <summary>
         /// Contains the size of the hold note covering the whole head/tail bounds. The size of this container changes as the hold note is being pressed.
@@ -108,7 +108,7 @@ namespace osu.Game.Rulesets.Mania.Objects.Drawables
                     RelativeSizeAxes = Axes.X
                 },
                 tailContainer = new Container<DrawableHoldNoteTail> { RelativeSizeAxes = Axes.Both },
-                slidingSample = new PausableSkinnableSamples
+                slidingSample = new SkinnableSamples
                 {
                     Looping = true,
                     MinimumSampleVolume = MINIMUM_SAMPLE_VOLUME,

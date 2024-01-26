@@ -10,7 +10,7 @@ using osu.Game.Skinning;
 
 namespace osu.Game.Storyboards.Drawables
 {
-    public partial class DrawableStoryboardSample : PausableSkinnableSamples
+    public partial class DrawableStoryboardSample : SkinnableSamples
     {
         /// <summary>
         /// The amount of time allowable beyond the start time of the sample, for the sample to start.

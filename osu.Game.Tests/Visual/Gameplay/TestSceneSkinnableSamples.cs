@@ -21,7 +21,7 @@ namespace osu.Game.Tests.Visual.Gameplay
     public partial class TestSceneSkinnableSamples : OsuTestScene
     {
         private TestSkinSourceContainer skinSource = null!;
-        private PausableSkinnableSamples skinnableSamples = null!;
+        private SkinnableSamples skinnableSamples = null!;
 
         private const string sample_lookup = "Gameplay/normal-sliderslide";
 
@@ -36,7 +36,7 @@ namespace osu.Game.Tests.Visual.Gameplay
                 };
 
                 // has to be added after the hierarchy above else the `ISkinSource` dependency won't be cached.
-                skinSource.Add(skinnableSamples = new PausableSkinnableSamples(new SampleInfo(sample_lookup)));
+                skinSource.Add(skinnableSamples = new SkinnableSamples(new SampleInfo(sample_lookup)));
             });
         }
 
