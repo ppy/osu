@@ -42,21 +42,33 @@ namespace osu.Game.Overlays.Toolbar
             clockDisplayMode = config.GetBindable<ToolbarClockDisplayMode>(OsuSetting.ToolbarClockDisplayMode);
             prefer24HourTime = config.GetBindable<bool>(OsuSetting.Prefer24HourTime);
 
+            Padding = new MarginPadding(3);
+
             Children = new Drawable[]
             {
-                hoverBackground = new Box
+                new Container
                 {
                     RelativeSizeAxes = Axes.Both,
-                    Colour = OsuColour.Gray(80).Opacity(180),
-                    Blending = BlendingParameters.Additive,
-                    Alpha = 0,
-                },
-                flashBackground = new Box
-                {
-                    RelativeSizeAxes = Axes.Both,
-                    Alpha = 0,
-                    Colour = Color4.White.Opacity(100),
-                    Blending = BlendingParameters.Additive,
+                    Masking = true,
+                    CornerRadius = 6,
+                    CornerExponent = 3f,
+                    Children = new Drawable[]
+                    {
+                        hoverBackground = new Box
+                        {
+                            RelativeSizeAxes = Axes.Both,
+                            Colour = OsuColour.Gray(80).Opacity(180),
+                            Blending = BlendingParameters.Additive,
+                            Alpha = 0,
+                        },
+                        flashBackground = new Box
+                        {
+                            RelativeSizeAxes = Axes.Both,
+                            Alpha = 0,
+                            Colour = Color4.White.Opacity(100),
+                            Blending = BlendingParameters.Additive,
+                        },
+                    }
                 },
                 new FillFlowContainer
                 {

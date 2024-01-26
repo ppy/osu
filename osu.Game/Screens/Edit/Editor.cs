@@ -60,6 +60,19 @@ namespace osu.Game.Screens.Edit
     [Cached]
     public partial class Editor : ScreenWithBeatmapBackground, IKeyBindingHandler<GlobalAction>, IKeyBindingHandler<PlatformAction>, IBeatSnapProvider, ISamplePlaybackDisabler, IBeatSyncProvider
     {
+        /// <summary>
+        /// An offset applied to waveform visuals to align them with expectations.
+        /// </summary>
+        /// <remarks>
+        /// Historically, osu! beatmaps have an assumption of full system latency baked in.
+        /// This comes from a culmination of stable's platform offset, average hardware playback
+        /// latency, and users having their universal offsets tweaked to previous beatmaps.
+        ///
+        /// Coming to this value involved running various tests with existing users / beatmaps.
+        /// This included both visual and audible comparisons. Ballpark confidence is ≈2 ms.
+        /// </remarks>
+        public const float WAVEFORM_VISUAL_OFFSET = 20;
+
         public override float BackgroundParallaxAmount => 0.1f;
 
         public override bool AllowBackButton => false;

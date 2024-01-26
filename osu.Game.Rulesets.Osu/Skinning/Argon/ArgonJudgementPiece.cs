@@ -62,25 +62,32 @@ namespace osu.Game.Rulesets.Osu.Skinning.Argon
         /// </remarks>
         public virtual void PlayAnimation()
         {
-            switch (Result)
+            if (Result == HitResult.IgnoreMiss || Result == HitResult.LargeTickMiss)
             {
-                default:
-                    JudgementText
-                        .FadeInFromZero(300, Easing.OutQuint)
-                        .ScaleTo(Vector2.One)
-                        .ScaleTo(new Vector2(1.2f), 1800, Easing.OutQuint);
-                    break;
+                this.RotateTo(-45);
+                this.ScaleTo(1.8f);
+                this.ScaleTo(1.2f, 100, Easing.In);
 
-                case HitResult.Miss:
-                    this.ScaleTo(1.6f);
-                    this.ScaleTo(1, 100, Easing.In);
+                this.MoveTo(Vector2.Zero);
+                this.MoveToOffset(new Vector2(0, 10), 800, Easing.InQuint);
+            }
+            else if (Result.IsMiss())
+            {
+                this.ScaleTo(1.6f);
+                this.ScaleTo(1, 100, Easing.In);
 
-                    this.MoveTo(Vector2.Zero);
-                    this.MoveToOffset(new Vector2(0, 100), 800, Easing.InQuint);
+                this.MoveTo(Vector2.Zero);
+                this.MoveToOffset(new Vector2(0, 100), 800, Easing.InQuint);
 
-                    this.RotateTo(0);
-                    this.RotateTo(40, 800, Easing.InQuint);
-                    break;
+                this.RotateTo(0);
+                this.RotateTo(40, 800, Easing.InQuint);
+            }
+            else
+            {
+                JudgementText
+                    .FadeInFromZero(300, Easing.OutQuint)
+                    .ScaleTo(Vector2.One)
+                    .ScaleTo(new Vector2(1.2f), 1800, Easing.OutQuint);
             }
 
             this.FadeOutFromOne(800);

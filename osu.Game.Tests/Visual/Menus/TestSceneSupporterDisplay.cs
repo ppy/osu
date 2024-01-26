@@ -1,19 +1,27 @@
-﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using osu.Framework.Allocation;
+using NUnit.Framework;
+using osu.Framework.Graphics;
 using osu.Game.Online.API;
 using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Screens.Menu;
 
 namespace osu.Game.Tests.Visual.Menus
 {
-    public partial class TestSceneDisclaimer : ScreenTestScene
+    public partial class TestSceneSupporterDisplay : OsuTestScene
     {
-        [BackgroundDependencyLoader]
-        private void load()
+        [Test]
+        public void TestBasic()
         {
-            AddStep("load disclaimer", () => LoadScreen(new Disclaimer()));
+            AddStep("create display", () =>
+            {
+                Child = new SupporterDisplay
+                {
+                    Anchor = Anchor.Centre,
+                    Origin = Anchor.Centre,
+                };
+            });
 
             AddStep("toggle support", () =>
             {

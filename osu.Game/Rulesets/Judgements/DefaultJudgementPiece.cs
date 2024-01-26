@@ -38,18 +38,29 @@ namespace osu.Game.Rulesets.Judgements
         /// </remarks>
         public virtual void PlayAnimation()
         {
-            switch (Result)
+            // TODO: make these better. currently they are using a text `-` and it's not centered properly.
+            // Should be an explicit drawable.
+            //
+            // When this is done, remove the [Description] attributes from HitResults which were added for this purpose.
+            if (Result == HitResult.IgnoreMiss || Result == HitResult.LargeTickMiss)
             {
-                case HitResult.Miss:
-                    this.ScaleTo(1.6f);
-                    this.ScaleTo(1, 100, Easing.In);
+                this.RotateTo(-45);
+                this.ScaleTo(1.8f);
+                this.ScaleTo(1.2f, 100, Easing.In);
 
-                    this.MoveTo(Vector2.Zero);
-                    this.MoveToOffset(new Vector2(0, 100), 800, Easing.InQuint);
+                this.MoveTo(Vector2.Zero);
+                this.MoveToOffset(new Vector2(0, 10), 800, Easing.InQuint);
+            }
+            else if (Result.IsMiss())
+            {
+                this.ScaleTo(1.6f);
+                this.ScaleTo(1, 100, Easing.In);
 
-                    this.RotateTo(0);
-                    this.RotateTo(40, 800, Easing.InQuint);
-                    break;
+                this.MoveTo(Vector2.Zero);
+                this.MoveToOffset(new Vector2(0, 100), 800, Easing.InQuint);
+
+                this.RotateTo(0);
+                this.RotateTo(40, 800, Easing.InQuint);
             }
 
             this.FadeOutFromOne(800);

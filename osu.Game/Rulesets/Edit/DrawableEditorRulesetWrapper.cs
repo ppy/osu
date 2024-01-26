@@ -1,6 +1,7 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System;
 using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Extensions.ObjectExtensions;
@@ -26,6 +27,9 @@ namespace osu.Game.Rulesets.Edit
         [Resolved]
         private EditorBeatmap beatmap { get; set; } = null!;
 
+        [Resolved]
+        private EditorClock editorClock { get; set; } = null!;
+
         public DrawableEditorRulesetWrapper(DrawableRuleset<TObject> drawableRuleset)
         {
             this.drawableRuleset = drawableRuleset;
@@ -38,7 +42,6 @@ namespace osu.Game.Rulesets.Edit
         [BackgroundDependencyLoader]
         private void load()
         {
-            drawableRuleset.FrameStablePlayback = false;
             Playfield.DisplayJudgements.Value = false;
         }
 
@@ -63,6 +66,22 @@ namespace osu.Game.Rulesets.Edit
             }
 
             Scheduler.AddOnce(regenerateAutoplay);
+        }
+
+        protected override void Update()
+        {
+            base.Update();
+
+            // Whenever possible, we want to stay in frame stability playback.
+            // Without doing so, we run into bugs with some gameplay elements not behaving as expected.
+            //
+            // Note that this is not using EditorClock.IsSeeking as that would exit frame stability
+            // on all seeks. The intention here is to retain frame stability for small seeks.
+            //
+            // I still think no gameplay elements should require frame stability in the first place, but maybe that ship has sailed already..
+            bool shouldBypassFrameStability = Math.Abs(drawableRuleset.FrameStableClock.CurrentTime - editorClock.CurrentTime) > 1000;
+
+            drawableRuleset.FrameStablePlayback = !shouldBypassFrameStability;
         }
 
         private void regenerateAutoplay()

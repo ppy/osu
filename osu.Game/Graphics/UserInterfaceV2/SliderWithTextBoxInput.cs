@@ -121,7 +121,7 @@ namespace osu.Game.Graphics.UserInterfaceV2
                         break;
 
                     default:
-                        slider.Current.Parse(textBox.Current.Value);
+                        slider.Current.Parse(textBox.Current.Value, CultureInfo.CurrentCulture);
                         break;
                 }
             }

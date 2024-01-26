@@ -31,7 +31,7 @@ namespace osu.Game.Overlays
 {
     public partial class ChatOverlay : OsuFocusedOverlayContainer, INamedOverlayComponent, IKeyBindingHandler<PlatformAction>
     {
-        public IconUsage Icon => HexaconsIcons.Messaging;
+        public IconUsage Icon => OsuIcon.Chat;
         public LocalisableString Title => ChatStrings.HeaderTitle;
         public LocalisableString Description => ChatStrings.HeaderDescription;
 

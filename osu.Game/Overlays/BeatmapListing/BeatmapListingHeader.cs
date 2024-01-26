@@ -24,7 +24,7 @@ namespace osu.Game.Overlays.BeatmapListing
             {
                 Title = PageTitleStrings.MainBeatmapsetsControllerIndex;
                 Description = NamedOverlayComponentStrings.BeatmapListingDescription;
-                Icon = HexaconsIcons.Beatmap;
+                Icon = OsuIcon.Beatmap;
             }
         }
     }

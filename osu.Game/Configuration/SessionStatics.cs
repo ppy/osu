@@ -9,6 +9,7 @@ using osu.Game.Input;
 using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Overlays;
 using osu.Game.Overlays.Mods;
+using osu.Game.Scoring;
 
 namespace osu.Game.Configuration
 {
@@ -27,6 +28,7 @@ namespace osu.Game.Configuration
             SetDefault(Static.LastModSelectPanelSamplePlaybackTime, (double?)null);
             SetDefault<APISeasonalBackgrounds>(Static.SeasonalBackgrounds, null);
             SetDefault(Static.TouchInputActive, RuntimeInfo.IsMobile);
+            SetDefault<ScoreInfo>(Static.LastLocalUserScore, null);
         }
 
         /// <summary>
@@ -73,5 +75,10 @@ namespace osu.Game.Configuration
         /// Used in touchscreen detection scenarios (<see cref="TouchInputInterceptor"/>).
         /// </summary>
         TouchInputActive,
+
+        /// <summary>
+        /// Stores the local user's last score (can be completed or aborted).
+        /// </summary>
+        LastLocalUserScore,
     }
 }

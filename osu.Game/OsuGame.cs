@@ -994,8 +994,11 @@ namespace osu.Game
                 Margin = new MarginPadding(5),
             }, topMostOverlayContent.Add);
 
-            if (!args?.Any(a => a == @"--no-version-overlay") ?? true)
-                loadComponentSingleFile(versionManager = new VersionManager { Depth = int.MinValue }, ScreenContainer.Add);
+            if (!IsDeployedBuild)
+            {
+                dependencies.Cache(versionManager = new VersionManager { Depth = int.MinValue });
+                loadComponentSingleFile(versionManager, ScreenContainer.Add);
+            }
 
             loadComponentSingleFile(osuLogo, _ =>
             {
@@ -1190,7 +1193,7 @@ namespace osu.Game
                 }
                 else if (recentLogCount == short_term_display_limit)
                 {
-                    string logFile = $@"{entry.Target.Value.ToString().ToLowerInvariant()}.log";
+                    string logFile = Logger.GetLogger(entry.Target.Value).Filename;
 
                     Schedule(() => Notifications.Post(new SimpleNotification
                     {
@@ -1198,7 +1201,7 @@ namespace osu.Game
                         Text = NotificationsStrings.SubsequentMessagesLogged,
                         Activated = () =>
                         {
-                            Storage.GetStorageForDirectory(@"logs").PresentFileExternally(logFile);
+                            Logger.Storage.PresentFileExternally(logFile);
                             return true;
                         }
                     }));

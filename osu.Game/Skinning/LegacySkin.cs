@@ -5,6 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
+using System.Globalization;
 using System.IO;
 using System.Linq;
 using JetBrains.Annotations;
@@ -330,7 +331,7 @@ namespace osu.Game.Skinning
 
                     var bindable = new Bindable<TValue>();
                     if (val != null)
-                        bindable.Parse(val);
+                        bindable.Parse(val, CultureInfo.InvariantCulture);
                     return bindable;
                 }
             }
@@ -456,6 +457,12 @@ namespace osu.Game.Skinning
             {
                 case HitResult.Miss:
                     return this.GetAnimation("hit0", true, false);
+
+                case HitResult.LargeTickMiss:
+                    return this.GetAnimation("slidertickmiss", true, false);
+
+                case HitResult.IgnoreMiss:
+                    return this.GetAnimation("sliderendmiss", true, false);
 
                 case HitResult.Meh:
                     return this.GetAnimation("hit50", true, false);

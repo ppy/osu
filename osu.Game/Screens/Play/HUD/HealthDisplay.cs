@@ -8,6 +8,7 @@ using osu.Framework.Extensions.ObjectExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Threading;
+using osu.Framework.Utils;
 using osu.Game.Rulesets.Judgements;
 using osu.Game.Rulesets.Scoring;
 using osu.Game.Rulesets.UI;
@@ -30,10 +31,12 @@ namespace osu.Game.Screens.Play.HUD
         public Bindable<double> Current { get; } = new BindableDouble
         {
             MinValue = 0,
-            MaxValue = 1
+            MaxValue = 1,
         };
 
         private BindableNumber<double> health = null!;
+
+        protected bool InitialAnimationPlaying => initialIncrease != null;
 
         private ScheduledDelegate? initialIncrease;
 
@@ -56,11 +59,6 @@ namespace osu.Game.Screens.Play.HUD
 
             // Don't bind directly so we can animate the startup procedure.
             health = HealthProcessor.Health.GetBoundCopy();
-            health.BindValueChanged(h =>
-            {
-                finishInitialAnimation();
-                Current.Value = h.NewValue;
-            });
 
             if (hudOverlay != null)
                 showHealthBar.BindTo(hudOverlay.ShowHealthBar);
@@ -68,10 +66,40 @@ namespace osu.Game.Screens.Play.HUD
             // this probably shouldn't be operating on `this.`
             showHealthBar.BindValueChanged(healthBar => this.FadeTo(healthBar.NewValue ? 1 : 0, HUDOverlay.FADE_DURATION, HUDOverlay.FADE_EASING), true);
 
+            initialHealthValue = health.Value;
+
             if (PlayInitialIncreaseAnimation)
                 startInitialAnimation();
             else
                 Current.Value = health.Value;
+        }
+
+        private double lastValue;
+        private double initialHealthValue;
+
+        protected override void Update()
+        {
+            base.Update();
+
+            if (!InitialAnimationPlaying || health.Value != initialHealthValue)
+            {
+                Current.Value = health.Value;
+
+                if (initialIncrease != null)
+                    FinishInitialAnimation(Current.Value);
+            }
+
+            // Health changes every frame in draining situations.
+            // Manually handle value changes to avoid bindable event flow overhead.
+            if (!Precision.AlmostEquals(lastValue, Current.Value, 0.001f))
+            {
+                HealthChanged(Current.Value > lastValue);
+                lastValue = Current.Value;
+            }
+        }
+
+        protected virtual void HealthChanged(bool increase)
+        {
         }
 
         private void startInitialAnimation()
@@ -90,16 +118,16 @@ namespace osu.Game.Screens.Play.HUD
                 Scheduler.AddOnce(Flash);
 
                 if (newValue >= health.Value)
-                    finishInitialAnimation();
+                    FinishInitialAnimation(health.Value);
             }, increase_delay, true);
         }
 
-        private void finishInitialAnimation()
+        protected virtual void FinishInitialAnimation(double value)
         {
             if (initialIncrease == null)
                 return;
 
-            initialIncrease?.Cancel();
+            initialIncrease.Cancel();
             initialIncrease = null;
 
             // aside from the repeating `initialIncrease` scheduled task,
