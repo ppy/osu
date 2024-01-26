@@ -686,7 +686,7 @@ namespace osu.Game.Rulesets.Objects.Drawables
         /// Applies the <see cref="Result"/> of this <see cref="DrawableHitObject"/>, notifying responders such as
         /// the <see cref="ScoreProcessor"/> of the <see cref="JudgementResult"/>.
         /// </summary>
-        /// <param name="application">The callback that applies changes to the <see cref="JudgementResult"/>.</param>
+        /// <param name="application">The callback that applies changes to the <see cref="JudgementResult"/>. Using a `static` delegate is recommended to avoid allocation overhead.</param>
         protected void ApplyResult(Action<JudgementResult, DrawableHitObject> application)
         {
             if (Result.HasResult)
