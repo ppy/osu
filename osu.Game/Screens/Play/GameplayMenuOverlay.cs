@@ -5,6 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using osu.Framework.Allocation;
+using osu.Framework.Bindables;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
@@ -13,6 +14,7 @@ using osu.Framework.Graphics.Shapes;
 using osu.Framework.Input.Bindings;
 using osu.Framework.Input.Events;
 using osu.Framework.Localisation;
+using osu.Game.Audio;
 using osu.Game.Beatmaps;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
@@ -25,7 +27,7 @@ using osu.Game.Localisation;
 
 namespace osu.Game.Screens.Play
 {
-    public abstract partial class GameplayMenuOverlay : OverlayContainer, IKeyBindingHandler<GlobalAction>
+    public abstract partial class GameplayMenuOverlay : OverlayContainer, IKeyBindingHandler<GlobalAction>, ISamplePlaybackDisabler
     {
         protected const int TRANSITION_DURATION = 200;
 
@@ -270,5 +272,8 @@ namespace osu.Game.Screens.Play
 
             return base.Handle(e);
         }
+
+        // Locally allow samples to playback without considering gameplay pause state.
+        public IBindable<bool> SamplePlaybackDisabled { get; } = new Bindable<bool>();
     }
 }
