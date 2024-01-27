@@ -79,6 +79,25 @@ namespace osu.Game.Rulesets.UI
         }
 
         /// <summary>
+        /// All the <see cref="HitObjectLifetimeEntry"/>s contained in this <see cref="Playfield"/> and all <see cref="NestedPlayfields"/>.
+        /// </summary>
+        public IEnumerable<HitObjectLifetimeEntry> AllEntries
+        {
+            get
+            {
+                if (HitObjectContainer == null)
+                    return Enumerable.Empty<HitObjectLifetimeEntry>();
+
+                var enumerable = HitObjectContainer.Entries;
+
+                if (nestedPlayfields.Count != 0)
+                    enumerable = enumerable.Concat(NestedPlayfields.SelectMany(p => p.AllEntries));
+
+                return enumerable;
+            }
+        }
+
+        /// <summary>
         /// All <see cref="Playfield"/>s nested inside this <see cref="Playfield"/>.
         /// </summary>
         public IEnumerable<Playfield> NestedPlayfields => nestedPlayfields;
