@@ -93,9 +93,10 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             int spinnerCount = beatmap.HitObjects.Count(h => h is Spinner);
 
             // Limit cognition by full memorisation difficulty
-            double mechanicalPerformance = Math.Pow(Math.Pow(baseAimPerformance, SumPower) + Math.Pow(baseSpeedPerformance, SumPower), 1.0 / SumPower);
             double cognitionPerformance = Math.Pow(Math.Pow(baseFlashlightARPerformance, SumPower) + Math.Pow(baseReadingNonARPerformance, SumPower), 1.0 / SumPower);
-            cognitionPerformance = OsuPerformanceCalculator.AdjustCognitionPerformance(mechanicalPerformance, cognitionPerformance, hitCirclesCount + sliderCount);
+            double mechanicalPerformance = Math.Pow(Math.Pow(baseAimPerformance, SumPower) + Math.Pow(baseSpeedPerformance, SumPower), 1.0 / SumPower);
+            double potentialFlashlightPerformance = OsuPerformanceCalculator.ComputePerfectFlashlightValue(flashlightRating, hitCirclesCount + sliderCount);
+            cognitionPerformance = OsuPerformanceCalculator.AdjustCognitionPerformance(cognitionPerformance, mechanicalPerformance, potentialFlashlightPerformance);
 
             double basePerformance =
                 Math.Pow(
