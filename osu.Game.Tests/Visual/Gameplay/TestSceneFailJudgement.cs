@@ -24,7 +24,7 @@ namespace osu.Game.Tests.Visual.Gameplay
             AddUntilStep("player is playing", () => Player.LocalUserPlaying.Value);
             AddUntilStep("wait for fail", () => Player.GameplayState.ShownFailAnimation);
             AddAssert("player is not playing", () => !Player.LocalUserPlaying.Value);
-            AddUntilStep("wait for multiple judgements", () => ((FailPlayer)Player).ScoreProcessor.JudgedHits > 1);
+            AddUntilStep("wait for multiple judgements", () => ((FailPlayer)Player).DrawableRuleset.Playfield.AllEntries.Count(e => e.Judged) > 1);
             AddAssert("total number of results == 1", () =>
             {
                 var score = new ScoreInfo { Ruleset = Ruleset.Value };
