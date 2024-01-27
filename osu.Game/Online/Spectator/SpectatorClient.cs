@@ -251,7 +251,7 @@ namespace osu.Game.Online.Spectator
 
                 if (state.HasPassed)
                     currentState.State = SpectatedUserState.Passed;
-                else if (state.ShownFailAnimation)
+                else if (state.HasFailed)
                     currentState.State = SpectatedUserState.Failed;
                 else
                     currentState.State = SpectatedUserState.Quit;

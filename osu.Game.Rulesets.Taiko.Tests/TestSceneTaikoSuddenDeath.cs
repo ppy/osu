@@ -45,7 +45,7 @@ namespace osu.Game.Rulesets.Taiko.Tests
                 Player.ScoreProcessor.NewJudgement += _ => judged = true;
             });
             AddUntilStep("swell judged", () => judged);
-            AddAssert("not failed", () => !Player.GameplayState.ShownFailAnimation);
+            AddAssert("not failed", () => !Player.GameplayState.HasFailed);
         }
     }
 }
