@@ -91,6 +91,7 @@ namespace osu.Game.Users
                                                 Children = new Drawable[]
                                                 {
                                                     CreateFlag(),
+                                                    // supporter icon is being added later
                                                 }
                                             }
                                         },
@@ -108,6 +109,7 @@ namespace osu.Game.Users
                         },
                         new[]
                         {
+                            // padding
                             Empty(),
                             Empty()
                         },

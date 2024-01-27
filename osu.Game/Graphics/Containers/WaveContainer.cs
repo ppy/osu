@@ -122,7 +122,7 @@ namespace osu.Game.Graphics.Containers
 
         protected override void PopIn()
         {
-            foreach (var w in wavesContainer.Children)
+            foreach (var w in wavesContainer)
                 w.Show();
 
             contentContainer.MoveToY(0, APPEAR_DURATION, Easing.OutQuint);
@@ -132,7 +132,7 @@ namespace osu.Game.Graphics.Containers
 
         protected override void PopOut()
         {
-            foreach (var w in wavesContainer.Children)
+            foreach (var w in wavesContainer)
                 w.Hide();
 
             contentContainer.MoveToY(2, DISAPPEAR_DURATION, Easing.In);
