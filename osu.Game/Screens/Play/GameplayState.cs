@@ -46,9 +46,12 @@ namespace osu.Game.Screens.Play
         public bool HasPassed { get; set; }
 
         /// <summary>
-        /// Whether the user failed during gameplay. This is only set when the gameplay session has completed due to the fail.
+        /// Whether the user failed during gameplay and the fail animation has been displayed.
         /// </summary>
-        public bool HasFailed { get; set; }
+        /// <remarks>
+        /// In multiplayer, this is never set to <c>true</c> even if the player reached zero health, due to <see cref="PlayerConfiguration.AllowFailAnimation"/> being turned off.
+        /// </remarks>
+        public bool ShownFailAnimation { get; set; }
 
         /// <summary>
         /// Whether the user quit gameplay without having either passed or failed.

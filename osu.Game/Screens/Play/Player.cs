@@ -489,7 +489,7 @@ namespace osu.Game.Screens.Play
 
         private void updateGameplayState()
         {
-            bool inGameplay = !DrawableRuleset.HasReplayLoaded.Value && !DrawableRuleset.IsPaused.Value && !breakTracker.IsBreakTime.Value && !GameplayState.HasFailed;
+            bool inGameplay = !DrawableRuleset.HasReplayLoaded.Value && !DrawableRuleset.IsPaused.Value && !breakTracker.IsBreakTime.Value && !GameplayState.ShownFailAnimation;
             OverlayActivationMode.Value = inGameplay ? OverlayActivation.Disabled : OverlayActivation.UserTriggered;
             localUserPlaying.Value = inGameplay;
         }
@@ -586,7 +586,7 @@ namespace osu.Game.Screens.Play
             if (showDialogFirst && !pauseOrFailDialogVisible)
             {
                 // if the fail animation is currently in progress, accelerate it (it will show the pause dialog on completion).
-                if (ValidForResume && GameplayState.HasFailed)
+                if (ValidForResume && GameplayState.ShownFailAnimation)
                 {
                     failAnimationContainer.FinishTransforms(true);
                     return false;
@@ -733,7 +733,7 @@ namespace osu.Game.Screens.Play
             }
 
             // Only show the completion screen if the player hasn't failed
-            if (GameplayState.HasFailed)
+            if (GameplayState.ShownFailAnimation)
                 return;
 
             GameplayState.HasPassed = true;
@@ -922,11 +922,11 @@ namespace osu.Game.Screens.Play
 
             if (Configuration.AllowFailAnimation)
             {
-                Debug.Assert(!GameplayState.HasFailed);
+                Debug.Assert(!GameplayState.ShownFailAnimation);
                 Debug.Assert(!GameplayState.HasPassed);
                 Debug.Assert(!GameplayState.HasQuit);
 
-                GameplayState.HasFailed = true;
+                GameplayState.ShownFailAnimation = true;
 
                 updateGameplayState();
 
@@ -1002,13 +1002,13 @@ namespace osu.Game.Screens.Play
             // replays cannot be paused and exit immediately
             && !DrawableRuleset.HasReplayLoaded.Value
             // cannot pause if we are already in a fail state
-            && !GameplayState.HasFailed;
+            && !GameplayState.ShownFailAnimation;
 
         private bool canResume =>
             // cannot resume from a non-paused state
             GameplayClockContainer.IsPaused.Value
             // cannot resume if we are already in a fail state
-            && !GameplayState.HasFailed
+            && !GameplayState.ShownFailAnimation
             // already resuming
             && !IsResuming;
 
@@ -1142,7 +1142,7 @@ namespace osu.Game.Screens.Play
             {
                 Debug.Assert(resultsDisplayDelegate == null);
 
-                if (!GameplayState.HasFailed)
+                if (!GameplayState.ShownFailAnimation)
                     GameplayState.HasQuit = true;
 
                 if (DrawableRuleset.ReplayScore == null)

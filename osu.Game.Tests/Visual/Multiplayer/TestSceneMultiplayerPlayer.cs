@@ -40,7 +40,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
             AddUntilStep("wait for gameplay start", () => player.LocalUserPlaying.Value);
             AddStep("set health zero", () => player.ChildrenOfType<HealthProcessor>().Single().Health.Value = 0);
             AddUntilStep("wait for fail", () => player.ChildrenOfType<HealthProcessor>().Single().HasFailed);
-            AddAssert("fail animation not shown", () => !player.GameplayState.HasFailed);
+            AddAssert("fail animation not shown", () => !player.GameplayState.ShownFailAnimation);
 
             // ensure that even after reaching a failed state, score processor keeps accounting for new hit results.
             // the testing method used here (autopilot + hold key) is sort-of dodgy, but works enough.

@@ -224,7 +224,7 @@ namespace osu.Game.Tests.Visual.Gameplay
         [Test]
         public void TestPauseAfterFail()
         {
-            AddUntilStep("wait for fail", () => Player.GameplayState.HasFailed);
+            AddUntilStep("wait for fail", () => Player.GameplayState.ShownFailAnimation);
             AddUntilStep("fail overlay shown", () => Player.FailOverlayVisible);
 
             confirmClockRunning(false);
@@ -240,7 +240,7 @@ namespace osu.Game.Tests.Visual.Gameplay
         [Test]
         public void TestExitFromFailedGameplayAfterFailAnimation()
         {
-            AddUntilStep("wait for fail", () => Player.GameplayState.HasFailed);
+            AddUntilStep("wait for fail", () => Player.GameplayState.ShownFailAnimation);
             AddUntilStep("wait for fail overlay shown", () => Player.FailOverlayVisible);
 
             confirmClockRunning(false);
@@ -252,7 +252,7 @@ namespace osu.Game.Tests.Visual.Gameplay
         [Test]
         public void TestExitFromFailedGameplayDuringFailAnimation()
         {
-            AddUntilStep("wait for fail", () => Player.GameplayState.HasFailed);
+            AddUntilStep("wait for fail", () => Player.GameplayState.ShownFailAnimation);
 
             // will finish the fail animation and show the fail/pause screen.
             pauseViaBackAction();
@@ -266,7 +266,7 @@ namespace osu.Game.Tests.Visual.Gameplay
         [Test]
         public void TestQuickRetryFromFailedGameplay()
         {
-            AddUntilStep("wait for fail", () => Player.GameplayState.HasFailed);
+            AddUntilStep("wait for fail", () => Player.GameplayState.ShownFailAnimation);
             AddStep("quick retry", () => Player.GameplayClockContainer.ChildrenOfType<HotkeyRetryOverlay>().First().Action?.Invoke());
 
             confirmExited();
@@ -275,7 +275,7 @@ namespace osu.Game.Tests.Visual.Gameplay
         [Test]
         public void TestQuickExitFromFailedGameplay()
         {
-            AddUntilStep("wait for fail", () => Player.GameplayState.HasFailed);
+            AddUntilStep("wait for fail", () => Player.GameplayState.ShownFailAnimation);
             exitViaQuickExitAction();
 
             confirmExited();
@@ -380,7 +380,7 @@ namespace osu.Game.Tests.Visual.Gameplay
         {
             confirmClockRunning(false);
             confirmNotExited();
-            AddAssert("player not failed", () => !Player.GameplayState.HasFailed);
+            AddAssert("player not failed", () => !Player.GameplayState.ShownFailAnimation);
             AddAssert("pause overlay shown", () => Player.PauseOverlayVisible);
         }
 
