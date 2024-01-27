@@ -392,7 +392,7 @@ namespace osu.Game.Tests.Visual.Navigation
                 return (player = Game.ScreenStack.CurrentScreen as Player) != null;
             });
 
-            AddUntilStep("wait for fail", () => player.GameplayState.ShownFailAnimation);
+            AddUntilStep("wait for fail", () => player.GameplayState.HasFailed);
 
             AddUntilStep("wait for track stop", () => !Game.MusicController.IsPlaying);
             AddAssert("Ensure time before preview point", () => Game.MusicController.CurrentTrack.CurrentTime < beatmap().BeatmapInfo.Metadata.PreviewTime);

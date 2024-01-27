@@ -43,7 +43,7 @@ namespace osu.Game.Tests.Visual.Mods
                         Position = new Vector2(i * 50)
                     }).Cast<HitObject>().ToList()
                 },
-                PassCondition = () => Player.GameplayState.ShownFailAnimation && Player.ScoreProcessor.JudgedHits >= 3
+                PassCondition = () => Player.GameplayState.HasFailed && Player.ScoreProcessor.JudgedHits >= 3
             });
 
         [Test]
@@ -64,7 +64,7 @@ namespace osu.Game.Tests.Visual.Mods
                         Position = new Vector2(i * 50)
                     }).Cast<HitObject>().ToList()
                 },
-                PassCondition = () => Player.GameplayState.ShownFailAnimation && Player.ScoreProcessor.JudgedHits >= 1
+                PassCondition = () => Player.GameplayState.HasFailed && Player.ScoreProcessor.JudgedHits >= 1
             });
     }
 }

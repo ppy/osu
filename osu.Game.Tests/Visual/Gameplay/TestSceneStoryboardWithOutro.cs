@@ -102,7 +102,7 @@ namespace osu.Game.Tests.Visual.Gameplay
                 AddStep("set storyboard duration to 0.6s", () => currentStoryboardDuration = 600);
             });
 
-            AddUntilStep("wait for fail", () => Player.GameplayState.ShownFailAnimation);
+            AddUntilStep("wait for fail", () => Player.GameplayState.HasFailed);
             AddUntilStep("storyboard ends", () => Player.GameplayClockContainer.CurrentTime >= currentStoryboardDuration);
             AddUntilStep("wait for fail overlay", () => Player.FailOverlay.State.Value == Visibility.Visible);
         }
@@ -116,7 +116,7 @@ namespace osu.Game.Tests.Visual.Gameplay
                 AddStep("set storyboard duration to 0s", () => currentStoryboardDuration = 0);
             });
             AddUntilStep("storyboard ends", () => Player.GameplayClockContainer.CurrentTime >= currentStoryboardDuration);
-            AddUntilStep("wait for fail", () => Player.GameplayState.ShownFailAnimation);
+            AddUntilStep("wait for fail", () => Player.GameplayState.HasFailed);
 
             AddUntilStep("wait for fail overlay", () => Player.FailOverlay.State.Value == Visibility.Visible);
             AddUntilStep("wait for button clickable", () => Player.ChildrenOfType<SaveFailedScoreButton>().First().ChildrenOfType<OsuClickableContainer>().First().Enabled.Value);

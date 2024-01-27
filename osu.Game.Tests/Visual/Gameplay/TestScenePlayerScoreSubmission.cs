@@ -171,7 +171,7 @@ namespace osu.Game.Tests.Visual.Gameplay
 
             AddUntilStep("wait for token request", () => Player.TokenCreationRequested);
 
-            AddUntilStep("wait for fail", () => Player.GameplayState.ShownFailAnimation);
+            AddUntilStep("wait for fail", () => Player.GameplayState.HasFailed);
             AddStep("exit", () => Player.Exit());
 
             AddAssert("ensure no submission", () => Player.SubmittedScore == null);
@@ -188,7 +188,7 @@ namespace osu.Game.Tests.Visual.Gameplay
 
             addFakeHit();
 
-            AddUntilStep("wait for fail", () => Player.GameplayState.ShownFailAnimation);
+            AddUntilStep("wait for fail", () => Player.GameplayState.HasFailed);
 
             AddUntilStep("wait for submission", () => Player.SubmittedScore != null);
             AddAssert("ensure failing submission", () => Player.SubmittedScore.ScoreInfo.Passed == false);

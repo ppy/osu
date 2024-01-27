@@ -37,7 +37,7 @@ namespace osu.Game.Screens.Play
             if (!touchActive.Value)
                 return;
 
-            if (gameplayState.HasPassed || gameplayState.ShownFailAnimation || gameplayState.HasQuit)
+            if (gameplayState.HasPassed || gameplayState.HasFailed || gameplayState.HasQuit)
                 return;
 
             if (gameplayState.Score.ScoreInfo.Mods.OfType<ModTouchDevice>().Any())
