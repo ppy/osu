@@ -22,16 +22,16 @@ namespace osu.Game.Screens.Play.HUD
         private readonly float barHeight;
 
         private readonly RoundedBar playfieldBar;
-        private readonly RoundedBar catchupBar;
+        private readonly RoundedBar audioBar;
 
         private readonly Box background;
 
         private readonly ColourInfo mainColour;
         private ColourInfo catchUpColour;
 
-        public double TrackTime { private get; set; }
+        public double Progress { get; set; }
 
-        private double length => EndTime - StartTime;
+        private double trackTime => (EndTime - StartTime) * Progress;
 
         public ArgonSongProgressBar(float barHeight)
         {
@@ -49,13 +49,12 @@ namespace osu.Game.Screens.Play.HUD
                     Alpha = 0,
                     Colour = OsuColour.Gray(0.2f),
                 },
-                catchupBar = new RoundedBar
+                audioBar = new RoundedBar
                 {
                     Name = "Audio bar",
                     Anchor = Anchor.BottomLeft,
                     Origin = Anchor.BottomLeft,
                     CornerRadius = 5,
-                    AlwaysPresent = true,
                     RelativeSizeAxes = Axes.Both
                 },
                 playfieldBar = new RoundedBar
@@ -68,17 +67,6 @@ namespace osu.Game.Screens.Play.HUD
                     RelativeSizeAxes = Axes.Both
                 },
             };
-        }
-
-        private float normalizedReference
-        {
-            get
-            {
-                if (EndTime - StartTime == 0)
-                    return 1;
-
-                return (float)((TrackTime - StartTime) / length);
-            }
         }
 
         [BackgroundDependencyLoader]
@@ -113,26 +101,24 @@ namespace osu.Game.Screens.Play.HUD
         {
             base.Update();
 
-            playfieldBar.Length = (float)Interpolation.Lerp(playfieldBar.Length, NormalizedValue, Math.Clamp(Time.Elapsed / 40, 0, 1));
-            catchupBar.Length = (float)Interpolation.Lerp(catchupBar.Length, normalizedReference, Math.Clamp(Time.Elapsed / 40, 0, 1));
+            playfieldBar.Length = (float)Interpolation.Lerp(playfieldBar.Length, Progress, Math.Clamp(Time.Elapsed / 40, 0, 1));
+            audioBar.Length = (float)Interpolation.Lerp(audioBar.Length, NormalizedValue, Math.Clamp(Time.Elapsed / 40, 0, 1));
 
-            if (TrackTime < CurrentTime)
-                ChangeChildDepth(catchupBar, -1);
+            if (trackTime > CurrentTime)
+                ChangeChildDepth(audioBar, -1);
             else
-                ChangeChildDepth(catchupBar, 0);
+                ChangeChildDepth(audioBar, 0);
 
-            float timeDelta = (float)(Math.Abs(CurrentTime - TrackTime));
+            float timeDelta = (float)Math.Abs(CurrentTime - trackTime);
 
             const float colour_transition_threshold = 20000;
 
-            catchupBar.AccentColour = Interpolation.ValueAt(
+            audioBar.AccentColour = Interpolation.ValueAt(
                 Math.Min(timeDelta, colour_transition_threshold),
                 mainColour,
                 catchUpColour,
                 0, colour_transition_threshold,
                 Easing.OutQuint);
-
-            catchupBar.Alpha = Math.Max(1, catchupBar.Length);
         }
 
         private partial class RoundedBar : Container
