@@ -1,6 +1,7 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System;
 using System.Collections.Generic;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
@@ -96,7 +97,7 @@ namespace osu.Game.Screens.Play.HUD
             if (objects == null)
                 return;
 
-            double currentTime = FrameStableClock.CurrentTime;
+            double currentTime = Math.Min(FrameStableClock.CurrentTime, LastHitTime);
 
             bool isInIntro = currentTime < FirstHitTime;
 
