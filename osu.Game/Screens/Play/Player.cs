@@ -357,6 +357,9 @@ namespace osu.Game.Screens.Play
 
             DrawableRuleset.NewResult += r =>
             {
+                if (GameplayState.ShownFailAnimation)
+                    return;
+
                 HealthProcessor.ApplyResult(r);
                 ScoreProcessor.ApplyResult(r);
                 GameplayState.ApplyResult(r);
@@ -364,6 +367,9 @@ namespace osu.Game.Screens.Play
 
             DrawableRuleset.RevertResult += r =>
             {
+                if (GameplayState.ShownFailAnimation)
+                    return;
+
                 HealthProcessor.RevertResult(r);
                 ScoreProcessor.RevertResult(r);
             };
