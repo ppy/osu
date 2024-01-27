@@ -187,7 +187,6 @@ namespace osu.Game.Screens.Menu
                                                                         },
                                                                         triangles = new TrianglesV2
                                                                         {
-                                                                            ClampAxes = Axes.X,
                                                                             Anchor = Anchor.Centre,
                                                                             Origin = Anchor.Centre,
                                                                             Thickness = 0.009f,
