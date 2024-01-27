@@ -211,9 +211,6 @@ namespace osu.Game.Rulesets.Scoring
             result.ComboAtJudgement = Combo.Value;
             result.HighestComboAtJudgement = HighestCombo.Value;
 
-            if (result.FailedAtJudgement)
-                return;
-
             ScoreResultCounts[result.Type] = ScoreResultCounts.GetValueOrDefault(result.Type) + 1;
 
             if (result.Type.IncreasesCombo())
@@ -266,9 +263,6 @@ namespace osu.Game.Rulesets.Scoring
 
             Combo.Value = result.ComboAtJudgement;
             HighestCombo.Value = result.HighestComboAtJudgement;
-
-            if (result.FailedAtJudgement)
-                return;
 
             ScoreResultCounts[result.Type] = ScoreResultCounts.GetValueOrDefault(result.Type) - 1;
 
