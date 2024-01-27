@@ -22,7 +22,7 @@ namespace osu.Game.Tests.Visual.Gameplay
         protected override void AddCheckSteps()
         {
             AddUntilStep("player is playing", () => Player.LocalUserPlaying.Value);
-            AddUntilStep("wait for fail", () => Player.GameplayState.HasFailed);
+            AddUntilStep("wait for fail", () => Player.GameplayState.ShownFailAnimation);
             AddAssert("player is not playing", () => !Player.LocalUserPlaying.Value);
             AddUntilStep("wait for multiple judgements", () => ((FailPlayer)Player).ScoreProcessor.JudgedHits > 1);
             AddAssert("total number of results == 1", () =>
