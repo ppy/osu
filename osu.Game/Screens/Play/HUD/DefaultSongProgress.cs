@@ -98,7 +98,6 @@ namespace osu.Game.Screens.Play.HUD
 
         protected override void UpdateProgress(double progress, bool isIntro)
         {
-            bar.CurrentTime = GameplayClock.CurrentTime;
             graph.Progress = isIntro ? 0 : (int)(graph.ColumnCount * progress);
         }
 

@@ -98,7 +98,7 @@ namespace osu.Game.Screens.Play.HUD
             base.Update();
 
             handleBase.Height = Height - handleContainer.Height;
-            float newX = (float)Interpolation.Lerp(handleBase.X, NormalizedValue * DrawWidth, Math.Clamp(Time.Elapsed / 40, 0, 1));
+            float newX = (float)Interpolation.Lerp(handleBase.X, AudioProgress * DrawWidth, Math.Clamp(Time.Elapsed / 40, 0, 1));
 
             fill.Width = newX;
             handleBase.X = newX;
