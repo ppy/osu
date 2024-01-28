@@ -40,8 +40,16 @@ namespace osu.Game.Rulesets.Osu.Edit
 
         private void updateState()
         {
-            var quad = GeometryUtils.GetSurroundingQuad(selectedMovableObjects);
-            CanRotate.Value = quad.Width > 0 || quad.Height > 0;
+            if (selectedMovableObjects.Count() == 1 && selectedMovableObjects.First() is HitCircle)
+            {
+                // Allow rotation for a single hit circle
+                CanRotate.Value = true;
+            }
+            else
+            {
+                var quad = GeometryUtils.GetSurroundingQuad(selectedMovableObjects);
+                CanRotate.Value = quad.Width > 0 || quad.Height > 0;
+            }
         }
 
         private OsuHitObject[]? objectsInRotation;

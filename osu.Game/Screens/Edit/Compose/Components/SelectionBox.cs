@@ -173,9 +173,6 @@ namespace osu.Game.Screens.Edit.Compose.Components
         [BackgroundDependencyLoader]
         private void load()
         {
-            if (rotationHandler != null)
-                canRotate.BindTo(rotationHandler.CanRotate);
-
             canRotate.BindValueChanged(_ => recreate(), true);
         }
 
