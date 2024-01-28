@@ -41,7 +41,7 @@ namespace osu.Game.Screens.Play.HUD
             CornerRadius = 5;
             Masking = true;
 
-            Children = new Drawable[]
+            InternalChildren = new Drawable[]
             {
                 background = new Box
                 {
@@ -105,9 +105,9 @@ namespace osu.Game.Screens.Play.HUD
             audioBar.Length = (float)Interpolation.Lerp(audioBar.Length, NormalizedValue, Math.Clamp(Time.Elapsed / 40, 0, 1));
 
             if (trackTime > CurrentTime)
-                ChangeChildDepth(audioBar, -1);
+                ChangeInternalChildDepth(audioBar, -1);
             else
-                ChangeChildDepth(audioBar, 0);
+                ChangeInternalChildDepth(audioBar, 0);
 
             float timeDelta = (float)Math.Abs(CurrentTime - trackTime);
 
