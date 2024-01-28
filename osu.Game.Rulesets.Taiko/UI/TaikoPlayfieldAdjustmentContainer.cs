@@ -21,11 +21,9 @@ namespace osu.Game.Rulesets.Taiko.UI
         {
             const float default_aspect = 16f / 9f;
 
-            // This value is taken by visual comparison with stable
-            const float default_time_range = 7000 / TaikoBeatmapConverter.VELOCITY_MULTIPLIER;
-
-            // This is the fraction of the width that should not contribute to time range.
-            const float non_playable_portion = 380f / 1366f;
+            // These values are taken purely by visual comparison with stable
+            const float default_time_range = 6933 / TaikoBeatmapConverter.VELOCITY_MULTIPLIER;
+            const float non_playable_portion = 1f / 3f;
 
             return (aspectRatio - non_playable_portion) / (default_aspect - non_playable_portion) * default_time_range;
         }
