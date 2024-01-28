@@ -17,7 +17,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
 
         private const double overlap_multiplier = 0.8;
 
-        private static double calculateDenstityOf(OsuDifficultyHitObject currObj)
+        public static double CalculateDenstityOf(OsuDifficultyHitObject currObj)
         {
             double pastObjectDifficultyInfluence = 0;
 
@@ -38,7 +38,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
             return pastObjectDifficultyInfluence;
         }
 
-        private static double calculateOverlapDifficultyOf(OsuDifficultyHitObject currObj)
+        public static double CalculateOverlapDifficultyOf(OsuDifficultyHitObject currObj)
         {
             double screenOverlapDifficulty = 0;
 
@@ -62,15 +62,19 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
 
             var currObj = (OsuDifficultyHitObject)current;
 
-            double pastObjectDifficultyInfluence = calculateDenstityOf(currObj);
-            double screenOverlapDifficulty = calculateOverlapDifficultyOf(currObj);
+            double pastObjectDifficultyInfluence = CalculateDenstityOf(currObj);
+            double screenOverlapDifficulty = CalculateOverlapDifficultyOf(currObj);
 
             double difficulty = Math.Pow(4 * Math.Log(Math.Max(1, pastObjectDifficultyInfluence)), 2.3);
 
             screenOverlapDifficulty = Math.Max(0, screenOverlapDifficulty - 0.5); // make overlap value =1 cost significantly less
-            difficulty *= getConstantAngleNerfFactor(currObj);
 
-            difficulty *= 1 + overlap_multiplier * screenOverlapDifficulty;
+            double overlapBonus = overlap_multiplier * screenOverlapDifficulty * difficulty;
+
+            difficulty *= getConstantAngleNerfFactor(currObj);
+            difficulty += overlapBonus;
+
+            //difficulty *= 1 + overlap_multiplier * screenOverlapDifficulty;
 
             return difficulty;
         }
@@ -103,12 +107,16 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
             double hdDifficulty = 0;
 
             double timeSpentInvisible = getDurationSpentInvisible(currObj) / currObj.ClockRate;
-            double timeDifficultyFactor = calculateDenstityOf(currObj) / 1000;
+
+            double density = 1 + Math.Max(0, CalculateDenstityOf(currObj) - 1);
+            density *= getConstantAngleNerfFactor(currObj);
+
+            double timeDifficultyFactor = density / 1000;
 
             double visibleObjectFactor = Math.Clamp(retrieveCurrentVisibleObjects(currObj).Count - 2, 0, 15);
 
             hdDifficulty += Math.Pow(visibleObjectFactor * timeSpentInvisible * timeDifficultyFactor, 1) +
-                            (8 + visibleObjectFactor) * aimDifficulty;
+                            (6 + visibleObjectFactor) * aimDifficulty;
 
             hdDifficulty *= 0.95 + 0.15 * EvaluateInpredictabilityOf(current); // Max multiplier is 1.1
 
@@ -175,11 +183,26 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
                     lastDelta = Math.Max(0, lastDelta);
                 }
 
-                rhythmChangeBonus = 1 - Math.Min(currDelta, lastDelta) / Math.Max(currDelta, lastDelta);
+                rhythmChangeBonus = getRhythmDifference(currDelta, lastDelta);
             }
 
             double result = velocity_change_part * velocityChangeBonus + angle_change_part * angleChangeBonus + rhythm_change_part * rhythmChangeBonus;
             return result;
+        }
+
+        public static double EvaluateLowDensityBonusOf(DifficultyHitObject current)
+        {
+            //var currObj = (OsuDifficultyHitObject)current;
+
+            //// Density = 2 in general means 3 notes on screen (it's not including current note)
+            //double density = CalculateDenstityOf(currObj);
+
+            //// We are considering density = 1.5 as starting point, 1.0 is noticably uncomfy and 0.5 is severely uncomfy
+            //double bonus = 1.5 - density;
+            //if (bonus <= 0) return 0;
+
+            //return Math.Pow(bonus, 2);
+            return 0;
         }
 
         // Returns a list of objects that are visible on screen at
@@ -237,6 +260,13 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
             int index = 0;
             double currentTimeGap = 0;
 
+            OsuDifficultyHitObject prevLoopObj = current;
+
+            OsuDifficultyHitObject? prevLoopObj1 = null;
+            OsuDifficultyHitObject? prevLoopObj2 = null;
+
+            double prevConstantAngle = 0;
+
             while (currentTimeGap < time_limit)
             {
                 var loopObj = (OsuDifficultyHitObject)current.Previous(index);
@@ -246,18 +276,52 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
 
                 double longIntervalFactor = Math.Clamp(1 - (loopObj.StrainTime - time_limit_low) / (time_limit - time_limit_low), 0, 1);
 
-                if (loopObj.Angle.IsNotNull() && current.Angle.IsNotNull())
+                if (loopObj.Angle.IsNotNull() && prevLoopObj.Angle.IsNotNull())
                 {
-                    double angleDifference = Math.Abs(current.Angle.Value - loopObj.Angle.Value);
-                    constantAngleCount += Math.Cos(4 * Math.Min(Math.PI / 8, angleDifference)) * longIntervalFactor;
+                    double angleDifference = Math.Abs(prevLoopObj.Angle.Value - loopObj.Angle.Value);
+
+                    // Nerf alternating angles case
+                    if (prevLoopObj1.IsNotNull() && prevLoopObj2.IsNotNull() && prevLoopObj1.Angle.IsNotNull() && prevLoopObj2.Angle.IsNotNull())
+                    {
+                        // Normalized difference
+                        double angleDifference1 = Math.Abs(prevLoopObj1.Angle.Value - loopObj.Angle.Value) / Math.PI;
+                        double angleDifference2 = Math.Abs(prevLoopObj2.Angle.Value - prevLoopObj.Angle.Value) / Math.PI;
+
+                        // Will be close to 1 if angleDifference1 and angleDifference2 was both close to 0
+                        double alternatingFactor = Math.Pow((1 - angleDifference1) * (1 - angleDifference2), 2);
+
+                        // Be sure to nerf only same rhythms
+                        double rhythmFactor = 1 - getRhythmDifference(loopObj.StrainTime, prevLoopObj.StrainTime); // 0 on different rhythm, 1 on same rhythm
+                        rhythmFactor *= 1 - getRhythmDifference(prevLoopObj.StrainTime, prevLoopObj1.StrainTime);
+                        rhythmFactor *= 1 - getRhythmDifference(prevLoopObj1.StrainTime, prevLoopObj2.StrainTime);
+
+                        double acuteAngleFactor = 1 - Math.Min(loopObj.Angle.Value, prevLoopObj.Angle.Value) / Math.PI;
+
+                        double prevAngleAdjust = Math.Max(angleDifference - angleDifference1, 0);
+
+                        prevAngleAdjust *= alternatingFactor; // Nerf if alternating
+                        prevAngleAdjust *= rhythmFactor; // Nerf if same rhythms
+                        prevAngleAdjust *= acuteAngleFactor;
+
+                        angleDifference -= prevAngleAdjust;
+                    }
+
+                    double currConstantAngle = Math.Cos(4 * Math.Min(Math.PI / 8, angleDifference)) * longIntervalFactor;
+                    constantAngleCount += Math.Min(currConstantAngle, prevConstantAngle);
+                    prevConstantAngle = currConstantAngle;
                 }
 
                 currentTimeGap = current.StartTime - loopObj.StartTime;
                 index++;
+
+                prevLoopObj2 = prevLoopObj1;
+                prevLoopObj1 = prevLoopObj;
+                prevLoopObj = loopObj;
             }
 
             return Math.Pow(Math.Min(1, 2 / constantAngleCount), 2);
         }
+
         private static double getTimeNerfFactor(double deltaTime)
         {
             return Math.Clamp(2 - deltaTime / (reading_window_size / 2), 0, 1);
@@ -270,6 +334,8 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
             value = softmin(value, 2, 1.7); // use softmin to achieve full-memory cap, 2 times more than AR11 (300ms)
             return value;
         }
+
+        private static double getRhythmDifference(double t1, double t2) => 1 - Math.Min(t1, t2) / Math.Max(t1, t2);
         private static double logistic(double x) => 1 / (1 + Math.Exp(-x));
 
         // We are using mutiply and divide instead of add and subtract, so values won't be negative

@@ -16,8 +16,6 @@ namespace osu.Game.Rulesets.Osu.Difficulty
     {
         public const double PERFORMANCE_BASE_MULTIPLIER = 1.14; // This is being adjusted to keep the final pp value scaled around what it used to be when changing things.
 
-        public static double SumPower => 1.1; // Maybe it should just use OsuDifficultyCalculator SumPower
-
         private double accuracy;
         private int scoreMaxCombo;
         private int countGreat;
@@ -64,9 +62,11 @@ namespace osu.Game.Rulesets.Osu.Difficulty
                 effectiveMissCount = Math.Min(effectiveMissCount + countOk * okMultiplier + countMeh * mehMultiplier, totalHits);
             }
 
+            double power = OsuDifficultyCalculator.SumPower;
+
             double aimValue = computeAimValue(score, osuAttributes);
             double speedValue = computeSpeedValue(score, osuAttributes);
-            double mechanicalValue = Math.Pow(Math.Pow(aimValue, SumPower) + Math.Pow(speedValue, SumPower), 1.0 / SumPower);
+            double mechanicalValue = Math.Pow(Math.Pow(aimValue, power) + Math.Pow(speedValue, power), 1.0 / power);
 
             // Cognition
 
@@ -77,19 +77,20 @@ namespace osu.Game.Rulesets.Osu.Difficulty
                 flashlightValue = 0.0;
             double readingARValue = computeReadingARValue(score, osuAttributes);
             // Reduce AR reading bonus if FL is present
-            double flashlightARValue = Math.Pow(Math.Pow(flashlightValue, 1.8) + Math.Pow(readingARValue, 1.8), 1.0 / 1.8);
+            double flPower = OsuDifficultyCalculator.FLSumPower;
+            double flashlightARValue = Math.Pow(Math.Pow(flashlightValue, flPower) + Math.Pow(readingARValue, flPower), 1.0 / flPower);
 
             double readingNonARValue = computeReadingNonARValue(score, osuAttributes);
-            double cognitionValue = Math.Pow(Math.Pow(flashlightARValue, SumPower) + Math.Pow(readingNonARValue, SumPower), 1.0 / SumPower);
+            double cognitionValue = Math.Pow(Math.Pow(flashlightARValue, power) + Math.Pow(readingNonARValue, power), 1.0 / power);
             cognitionValue = AdjustCognitionPerformance(cognitionValue, mechanicalValue, potentialFlashlightValue);
 
             double accuracyValue = computeAccuracyValue(score, osuAttributes);
 
             double totalValue =
                 Math.Pow(
-                    Math.Pow(mechanicalValue, SumPower) +
-                    Math.Pow(cognitionValue, SumPower) +
-                    Math.Pow(accuracyValue, SumPower), 1.0 / SumPower
+                    Math.Pow(mechanicalValue, power) +
+                    Math.Pow(cognitionValue, power) +
+                    Math.Pow(accuracyValue, power), 1.0 / power
                 ) * multiplier;
 
             return new OsuPerformanceAttributes
@@ -247,9 +248,10 @@ namespace osu.Game.Rulesets.Osu.Difficulty
         private double computeReadingARValue(ScoreInfo score, OsuDifficultyAttributes attributes)
         {
             //double readingARValue = Math.Max(computeReadingLowARValue(score, attributes), computeReadingHighARValue(score, attributes));
+            double power = OsuDifficultyCalculator.SumPower;
             double readingValue = Math.Pow(
-                    Math.Pow(computeReadingLowARValue(score, attributes), SumPower) +
-                    Math.Pow(computeReadingHighARValue(score, attributes), SumPower), 1.0 / SumPower);
+                    Math.Pow(computeReadingLowARValue(score, attributes), power) +
+                    Math.Pow(computeReadingHighARValue(score, attributes), power), 1.0 / power);
 
             return readingValue;
         }

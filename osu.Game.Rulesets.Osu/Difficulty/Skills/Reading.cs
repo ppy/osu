@@ -17,8 +17,8 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
     public class ReadingLowAR : GraphSkill
     {
         private readonly List<double> difficulties = new List<double>();
-        //private double skillMultiplier => 5.5;
-        private double skillMultiplier => 2.3;
+        //private double skillMultiplier => 2.3;
+        private double skillMultiplier => 2;
 
         public ReadingLowAR(Mod[] mods)
             : base(mods)
@@ -132,7 +132,8 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
         private double currentStrain;
         // private double currentRhythm;
 
-        private double skillMultiplier => 13;
+        //private double skillMultiplier => 13;
+        private double skillMultiplier => 14;
         private double strainDecayBase => 0.15;
 
         private double strainDecay(double ms) => Math.Pow(strainDecayBase, ms / 1000);
@@ -145,18 +146,24 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
 
             double aimDifficulty = AimEvaluator.EvaluateDifficultyOf(current, true, ((OsuDifficultyHitObject)current).Preempt);
             aimDifficulty *= ReadingEvaluator.EvaluateHighARDifficultyOf(current, true);
-            currentStrain += aimDifficulty * skillMultiplier;
-
-            // currentRhythm = RhythmEvaluator.EvaluateDifficultyOf(current);
+            aimDifficulty *= skillMultiplier;
 
             double totalStrain = currentStrain;
+            currentStrain += aimDifficulty;
+
+            // Warning: this line is unstable, so increasing amount of objects can decrease pp
+            totalStrain += aimDifficulty * (1 + ReadingEvaluator.EvaluateLowDensityBonusOf(current));
+
+
+            //Console.WriteLine($"{current.StartTime} - {ReadingEvaluator.EvaluateLowDensityBonusOf(current)}");
+
             return totalStrain;
         }
     }
 
     public class HighARSpeedComponent : OsuStrainSkill
     {
-        private double skillMultiplier => 650;
+        private double skillMultiplier => 675;
         private double strainDecayBase => 0.3;
 
         private double currentStrain;
@@ -197,7 +204,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
         }
 
         private readonly List<double> difficulties = new List<double>();
-        private double skillMultiplier => 2.1;
+        private double skillMultiplier => 2.3;
 
         public override void Process(DifficultyHitObject current)
         {

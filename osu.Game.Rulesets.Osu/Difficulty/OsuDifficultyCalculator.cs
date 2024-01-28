@@ -22,10 +22,11 @@ namespace osu.Game.Rulesets.Osu.Difficulty
 {
     public class OsuDifficultyCalculator : DifficultyCalculator
     {
-        private const double difficulty_multiplier = 0.0675;
+        private const double difficulty_multiplier = 0.067;
 
         public override int Version => 20220902;
         public static double SumPower => 1.1;
+        public static double FLSumPower => 1.6;
 
         public OsuDifficultyCalculator(IRulesetInfo ruleset, IWorkingBeatmap beatmap)
             : base(ruleset, beatmap)
@@ -75,7 +76,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             double baseReadingHighARPerformance = Math.Pow(5 * Math.Max(1, readingHighARRating / 0.0675) - 4, 3) / 100000;
             double baseReadingARPerformance = Math.Pow(Math.Pow(baseReadingLowARPerformance, SumPower) + Math.Pow(baseReadingHighARPerformance, SumPower), 1.0 / SumPower);
 
-            double baseFlashlightARPerformance = Math.Pow(Math.Pow(baseFlashlightPerformance, 1.8) + Math.Pow(baseReadingARPerformance, 1.8), 1.0 / 1.8);
+            double baseFlashlightARPerformance = Math.Pow(Math.Pow(baseFlashlightPerformance, FLSumPower) + Math.Pow(baseReadingARPerformance, FLSumPower), 1.0 / FLSumPower);
 
             double baseReadingHiddenPerformance = 0;
             if (mods.Any(h => h is OsuModHidden))
