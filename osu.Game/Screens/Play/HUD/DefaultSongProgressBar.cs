@@ -86,11 +86,14 @@ namespace osu.Game.Screens.Play.HUD
             };
         }
 
-        protected override void LoadComplete()
+        public override bool Interactive
         {
-            base.LoadComplete();
-
-            InteractiveBindable.BindValueChanged(i => handleBase.FadeTo(i.NewValue ? 1 : 0, 200), true);
+            get => base.Interactive;
+            set
+            {
+                base.Interactive = value;
+                handleBase.FadeTo(value ? 1 : 0, 200);
+            }
         }
 
         protected override void Update()

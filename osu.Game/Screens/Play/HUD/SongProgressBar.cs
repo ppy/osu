@@ -3,7 +3,6 @@
 
 using System;
 using osu.Framework.Allocation;
-using osu.Framework.Bindables;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Input.Events;
 using osu.Framework.Threading;
@@ -35,13 +34,7 @@ namespace osu.Game.Screens.Play.HUD
         /// <summary>
         /// Whether the progress bar should allow interaction, ie. to perform seek operations.
         /// </summary>
-        public bool Interactive
-        {
-            get => InteractiveBindable.Value;
-            set => InteractiveBindable.Value = value;
-        }
-
-        protected readonly BindableBool InteractiveBindable = new BindableBool();
+        public virtual bool Interactive { get; set; }
 
         public double StartTime { get; set; }
 
