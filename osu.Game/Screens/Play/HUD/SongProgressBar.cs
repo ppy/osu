@@ -10,7 +10,7 @@ using osuTK;
 
 namespace osu.Game.Screens.Play.HUD
 {
-    public abstract partial class SongProgressBar : Container
+    public abstract partial class SongProgressBar : CompositeDrawable
     {
         /// <summary>
         /// Action which is invoked when a seek is requested, with the proposed millisecond value for the seek operation.

@@ -27,7 +27,7 @@ namespace osu.Game.Screens.Play.HUD
             RelativeSizeAxes = Axes.X;
             Height = barHeight + handleBarHeight + handleSize.Y;
 
-            Children = new Drawable[]
+            InternalChildren = new Drawable[]
             {
                 new Box
                 {
