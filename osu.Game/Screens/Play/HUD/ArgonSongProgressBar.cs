@@ -48,6 +48,7 @@ namespace osu.Game.Screens.Play.HUD
                     RelativeSizeAxes = Axes.Both,
                     Alpha = 0,
                     Colour = OsuColour.Gray(0.2f),
+                    Depth = float.MaxValue,
                 },
                 audioBar = new RoundedBar
                 {
@@ -102,14 +103,14 @@ namespace osu.Game.Screens.Play.HUD
             base.Update();
 
             playfieldBar.Length = (float)Interpolation.Lerp(playfieldBar.Length, Progress, Math.Clamp(Time.Elapsed / 40, 0, 1));
-            audioBar.Length = (float)Interpolation.Lerp(audioBar.Length, NormalizedValue, Math.Clamp(Time.Elapsed / 40, 0, 1));
+            audioBar.Length = (float)Interpolation.Lerp(audioBar.Length, AudioProgress, Math.Clamp(Time.Elapsed / 40, 0, 1));
 
-            if (trackTime > CurrentTime)
+            if (trackTime > AudioTime)
                 ChangeInternalChildDepth(audioBar, -1);
             else
-                ChangeInternalChildDepth(audioBar, 0);
+                ChangeInternalChildDepth(audioBar, 1);
 
-            float timeDelta = (float)Math.Abs(CurrentTime - trackTime);
+            float timeDelta = (float)Math.Abs(AudioTime - trackTime);
 
             const float colour_transition_threshold = 20000;
 

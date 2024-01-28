@@ -71,7 +71,13 @@ namespace osu.Game.Screens.Play.HUD
 
         protected double LastHitTime { get; private set; }
 
+        /// <summary>
+        /// Called every update frame with current progress information.
+        /// </summary>
+        /// <param name="progress">Current (visual) progress through the beatmap (0..1).</param>
+        /// <param name="isIntro">If <c>true</c>, progress is (0..1) through the intro.</param>
         protected abstract void UpdateProgress(double progress, bool isIntro);
+
         protected virtual void UpdateObjects(IEnumerable<HitObject> objects) { }
 
         [BackgroundDependencyLoader]

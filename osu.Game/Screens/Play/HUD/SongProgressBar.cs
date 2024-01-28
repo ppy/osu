@@ -2,6 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
+using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Input.Events;
@@ -12,6 +13,20 @@ namespace osu.Game.Screens.Play.HUD
 {
     public abstract partial class SongProgressBar : CompositeDrawable
     {
+        /// <summary>
+        /// The current seek position of the audio, on a (0..1) range.
+        /// This is generally the seek target, which will eventually match the gameplay clock when it catches up.
+        /// </summary>
+        protected double AudioProgress => length == 0 ? 1 : AudioTime / length;
+
+        /// <summary>
+        /// The current (non-frame-stable) audio time.
+        /// </summary>
+        protected double AudioTime => Math.Clamp(GameplayClock.CurrentTime - StartTime, 0.0, length);
+
+        [Resolved]
+        protected IGameplayClock GameplayClock { get; private set; } = null!;
+
         /// <summary>
         /// Action which is invoked when a seek is requested, with the proposed millisecond value for the seek operation.
         /// </summary>
@@ -32,11 +47,7 @@ namespace osu.Game.Screens.Play.HUD
 
         public double EndTime { get; set; } = 1.0;
 
-        public double CurrentTime { get; set; }
-
         private double length => EndTime - StartTime;
-
-        protected double NormalizedValue => length == 0 ? 1 : Math.Clamp(CurrentTime - StartTime, 0.0, length) / length;
 
         private bool handleClick;
 
