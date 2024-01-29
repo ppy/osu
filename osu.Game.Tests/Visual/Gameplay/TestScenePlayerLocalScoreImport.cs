@@ -184,7 +184,11 @@ namespace osu.Game.Tests.Visual.Gameplay
             CreateTest();
 
             AddUntilStep("wait for track to start running", () => Beatmap.Value.Track.IsRunning);
-            AddStep("log back in", () => API.Login("username", "password"));
+            AddStep("log back in", () =>
+            {
+                API.Login("username", "password");
+                ((DummyAPIAccess)API).AuthenticateSecondFactor("abcdefgh");
+            });
 
             AddStep("seek to completion", () => Player.GameplayClockContainer.Seek(Player.DrawableRuleset.Objects.Last().GetEndTime()));
 
