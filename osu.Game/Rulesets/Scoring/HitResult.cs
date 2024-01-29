@@ -86,7 +86,6 @@ namespace osu.Game.Rulesets.Scoring
         /// Indicates a large tick miss.
         /// </summary>
         [EnumMember(Value = "large_tick_miss")]
-        [Description("-")]
         [Order(11)]
         LargeTickMiss,
 
@@ -118,7 +117,6 @@ namespace osu.Game.Rulesets.Scoring
         /// Indicates a miss that should be ignored for scoring purposes.
         /// </summary>
         [EnumMember(Value = "ignore_miss")]
-        [Description("-")]
         [Order(14)]
         IgnoreMiss,
 
