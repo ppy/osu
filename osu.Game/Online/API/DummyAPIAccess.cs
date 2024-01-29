@@ -148,7 +148,7 @@ namespace osu.Game.Online.API
 
         public IHubClientConnector? GetHubConnector(string clientName, string endpoint, bool preferMessagePack) => null;
 
-        public IChatClient GetChatClient() => new PollingChatClientConnector(this);
+        public IChatClient GetChatClient() => new TestChatClientConnector(this);
 
         public RegistrationRequest.RegistrationRequestErrors? CreateAccount(string email, string username, string password)
         {
