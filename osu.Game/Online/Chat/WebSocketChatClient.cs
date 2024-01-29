@@ -5,9 +5,10 @@ using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Threading;
+using System.Threading.Tasks;
 using Newtonsoft.Json;
 using osu.Framework.Bindables;
-using osu.Framework.Extensions;
 using osu.Framework.Logging;
 using osu.Game.Online.API;
 using osu.Game.Online.API.Requests;
@@ -26,21 +27,49 @@ namespace osu.Game.Online.Chat
         private readonly INotificationsClient client;
         private readonly ConcurrentDictionary<long, Channel> channelsMap = new ConcurrentDictionary<long, Channel>();
 
+        private CancellationTokenSource? chatStartCancellationSource;
+
         public WebSocketChatClient(IAPIProvider api)
         {
             this.api = api;
             client = api.NotificationsClient;
-            client.IsConnected.BindValueChanged(start, true);
+            client.IsConnected.BindValueChanged(onConnectedChanged, true);
         }
 
-        private void start(ValueChangedEvent<bool> connected)
+        private void onConnectedChanged(ValueChangedEvent<bool> connected)
         {
-            if (!connected.NewValue)
-                return;
+            if (connected.NewValue)
+            {
+                client.MessageReceived += onMessageReceived;
+                attemptToStartChat();
+                RequestPresence();
+            }
+            else
+                chatStartCancellationSource?.Cancel();
+        }
 
-            client.MessageReceived += onMessageReceived;
-            client.SendAsync(new StartChatRequest()).WaitSafely();
-            RequestPresence();
+        private void attemptToStartChat()
+        {
+            chatStartCancellationSource?.Cancel();
+            chatStartCancellationSource = new CancellationTokenSource();
+
+            Task.Factory.StartNew(async () =>
+            {
+                while (!chatStartCancellationSource.IsCancellationRequested)
+                {
+                    try
+                    {
+                        await client.SendAsync(new StartChatRequest()).ConfigureAwait(false);
+                        Logger.Log(@"Now listening to websocket chat messages.", LoggingTarget.Network);
+                        chatStartCancellationSource.Cancel();
+                    }
+                    catch (Exception ex)
+                    {
+                        Logger.Log($@"Could not start listening to websocket chat messages: {ex}", LoggingTarget.Network);
+                        await Task.Delay(5000).ConfigureAwait(false);
+                    }
+                }
+            }, chatStartCancellationSource.Token);
         }
 
         public void RequestPresence()
@@ -137,7 +166,7 @@ namespace osu.Game.Online.Chat
 
         public void Dispose()
         {
-            client.IsConnected.ValueChanged -= start;
+            client.IsConnected.ValueChanged -= onConnectedChanged;
             client.MessageReceived -= onMessageReceived;
         }
     }
