@@ -62,7 +62,7 @@ namespace osu.Game.Screens.Ranking.Expanded.Accuracy
         /// <summary>
         /// Relative width of the rank circles.
         /// </summary>
-        public const float RANK_CIRCLE_RADIUS = 0.06f;
+        public const float RANK_CIRCLE_RADIUS = 0.05f;
 
         /// <summary>
         /// Relative width of the circle showing the accuracy.

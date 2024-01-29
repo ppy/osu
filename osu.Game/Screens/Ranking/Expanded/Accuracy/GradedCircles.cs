@@ -43,7 +43,7 @@ namespace osu.Game.Screens.Ranking.Expanded.Accuracy
             Origin = Anchor.Centre;
             RelativeSizeAxes = Axes.Both;
             Size = new Vector2(0.8f);
-            Padding = new MarginPadding(2);
+            Padding = new MarginPadding(2.5f);
             InternalChildren = new Drawable[]
             {
                 dProgress = new GradedCircle(0.0, accuracyC)
