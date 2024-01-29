@@ -76,9 +76,9 @@ namespace osu.Game.Screens.Ranking.Expanded.Accuracy
         private const double virtual_ss_percentage = 0.01;
 
         /// <summary>
-        /// The width of a <see cref="RankNotch"/> in terms of accuracy.
+        /// The width of a solid "notch" in terms of accuracy that appears at the ends of the rank circles to add separation.
         /// </summary>
-        public const double NOTCH_WIDTH_PERCENTAGE = 1.0 / 360;
+        public const float NOTCH_WIDTH_PERCENTAGE = 2f / 360;
 
         /// <summary>
         /// The easing for the circle filling transforms.
@@ -174,7 +174,8 @@ namespace osu.Game.Screens.Ranking.Expanded.Accuracy
                             RelativeSizeAxes = Axes.Both,
                             Colour = OsuColour.ForRank(ScoreRank.D),
                             InnerRadius = RANK_CIRCLE_RADIUS,
-                            Current = { Value = accuracyC }
+                            Current = { Value = accuracyC - NOTCH_WIDTH_PERCENTAGE },
+                            Rotation = NOTCH_WIDTH_PERCENTAGE * 0.5f * 360
                         },
                         new CircularProgress
                         {
@@ -183,8 +184,8 @@ namespace osu.Game.Screens.Ranking.Expanded.Accuracy
                             RelativeSizeAxes = Axes.Both,
                             Colour = OsuColour.ForRank(ScoreRank.C),
                             InnerRadius = RANK_CIRCLE_RADIUS,
-                            Current = { Value = accuracyB - accuracyC },
-                            Rotation = (float)accuracyC * 360
+                            Current = { Value = accuracyB - accuracyC - NOTCH_WIDTH_PERCENTAGE },
+                            Rotation = (float)accuracyC * 360 + NOTCH_WIDTH_PERCENTAGE * 0.5f * 360
                         },
                         new CircularProgress
                         {
@@ -193,8 +194,8 @@ namespace osu.Game.Screens.Ranking.Expanded.Accuracy
                             RelativeSizeAxes = Axes.Both,
                             Colour = OsuColour.ForRank(ScoreRank.B),
                             InnerRadius = RANK_CIRCLE_RADIUS,
-                            Current = { Value = accuracyA - accuracyB },
-                            Rotation = (float)accuracyB * 360
+                            Current = { Value = accuracyA - accuracyB - NOTCH_WIDTH_PERCENTAGE },
+                            Rotation = (float)accuracyB * 360 + NOTCH_WIDTH_PERCENTAGE * 0.5f * 360
                         },
                         new CircularProgress
                         {
@@ -203,8 +204,8 @@ namespace osu.Game.Screens.Ranking.Expanded.Accuracy
                             RelativeSizeAxes = Axes.Both,
                             Colour = OsuColour.ForRank(ScoreRank.A),
                             InnerRadius = RANK_CIRCLE_RADIUS,
-                            Current = { Value = accuracyS - accuracyA },
-                            Rotation = (float)accuracyA * 360
+                            Current = { Value = accuracyS - accuracyA - NOTCH_WIDTH_PERCENTAGE },
+                            Rotation = (float)accuracyA * 360 + NOTCH_WIDTH_PERCENTAGE * 0.5f * 360
                         },
                         new CircularProgress
                         {
@@ -213,8 +214,8 @@ namespace osu.Game.Screens.Ranking.Expanded.Accuracy
                             RelativeSizeAxes = Axes.Both,
                             Colour = OsuColour.ForRank(ScoreRank.S),
                             InnerRadius = RANK_CIRCLE_RADIUS,
-                            Current = { Value = accuracyX - accuracyS - virtual_ss_percentage },
-                            Rotation = (float)accuracyS * 360
+                            Current = { Value = accuracyX - accuracyS - virtual_ss_percentage - NOTCH_WIDTH_PERCENTAGE },
+                            Rotation = (float)accuracyS * 360 + NOTCH_WIDTH_PERCENTAGE * 0.5f * 360
                         },
                         new CircularProgress
                         {
@@ -223,15 +224,9 @@ namespace osu.Game.Screens.Ranking.Expanded.Accuracy
                             RelativeSizeAxes = Axes.Both,
                             Colour = OsuColour.ForRank(ScoreRank.X),
                             InnerRadius = RANK_CIRCLE_RADIUS,
-                            Current = { Value = 1f - (accuracyX - virtual_ss_percentage) },
-                            Rotation = (float)(accuracyX - virtual_ss_percentage) * 360
+                            Current = { Value = 1f - (accuracyX - virtual_ss_percentage) - NOTCH_WIDTH_PERCENTAGE },
+                            Rotation = (float)(accuracyX - virtual_ss_percentage) * 360 + NOTCH_WIDTH_PERCENTAGE * 0.5f * 360
                         },
-                        new RankNotch((float)accuracyX),
-                        new RankNotch((float)(accuracyX - virtual_ss_percentage)),
-                        new RankNotch((float)accuracyS),
-                        new RankNotch((float)accuracyA),
-                        new RankNotch((float)accuracyB),
-                        new RankNotch((float)accuracyC),
                         new BufferedContainer
                         {
                             Name = "Graded circle mask",
