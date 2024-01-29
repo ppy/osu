@@ -1,6 +1,7 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System.Threading.Tasks;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
@@ -17,11 +18,13 @@ using osuTK;
 
 namespace osu.Game.Overlays.Login
 {
-    public partial class SecondFactorAuthForm : FillFlowContainer
+    public partial class SecondFactorAuthForm : Container
     {
         private OsuTextBox codeTextBox = null!;
         private LinkFlowContainer explainText = null!;
         private ErrorTextFlowContainer errorText = null!;
+
+        private LoadingLayer loading = null!;
 
         [Resolved]
         private IAPIProvider api { get; set; } = null!;
@@ -31,8 +34,6 @@ namespace osu.Game.Overlays.Login
         {
             RelativeSizeAxes = Axes.X;
             AutoSizeAxes = Axes.Y;
-            Direction = FillDirection.Vertical;
-            Spacing = new Vector2(0, SettingsSection.ITEM_SPACING);
 
             Children = new Drawable[]
             {
@@ -40,42 +41,56 @@ namespace osu.Game.Overlays.Login
                 {
                     RelativeSizeAxes = Axes.X,
                     AutoSizeAxes = Axes.Y,
-                    Padding = new MarginPadding { Horizontal = SettingsPanel.CONTENT_MARGINS },
                     Direction = FillDirection.Vertical,
-                    Spacing = new Vector2(0f, SettingsSection.ITEM_SPACING),
+                    Spacing = new Vector2(0, SettingsSection.ITEM_SPACING),
                     Children = new Drawable[]
                     {
-                        new OsuTextFlowContainer(s => s.Font = OsuFont.GetFont(weight: FontWeight.Regular))
+                        new FillFlowContainer
                         {
                             RelativeSizeAxes = Axes.X,
                             AutoSizeAxes = Axes.Y,
-                            Text = "An email has been sent to you with a verification code. Enter the code.",
+                            Padding = new MarginPadding { Horizontal = SettingsPanel.CONTENT_MARGINS },
+                            Direction = FillDirection.Vertical,
+                            Spacing = new Vector2(0f, SettingsSection.ITEM_SPACING),
+                            Children = new Drawable[]
+                            {
+                                new OsuTextFlowContainer(s => s.Font = OsuFont.GetFont(weight: FontWeight.Regular))
+                                {
+                                    RelativeSizeAxes = Axes.X,
+                                    AutoSizeAxes = Axes.Y,
+                                    Text = "An email has been sent to you with a verification code. Enter the code.",
+                                },
+                                codeTextBox = new OsuTextBox
+                                {
+                                    PlaceholderText = "Enter code",
+                                    RelativeSizeAxes = Axes.X,
+                                    TabbableContentContainer = this,
+                                },
+                                explainText = new LinkFlowContainer(s => s.Font = OsuFont.GetFont(weight: FontWeight.Regular))
+                                {
+                                    RelativeSizeAxes = Axes.X,
+                                    AutoSizeAxes = Axes.Y,
+                                },
+                                errorText = new ErrorTextFlowContainer
+                                {
+                                    RelativeSizeAxes = Axes.X,
+                                    AutoSizeAxes = Axes.Y,
+                                    Alpha = 0,
+                                },
+                            },
                         },
-                        codeTextBox = new OsuTextBox
+                        new LinkFlowContainer
                         {
-                            PlaceholderText = "Enter code",
-                            RelativeSizeAxes = Axes.X,
-                            TabbableContentContainer = this,
-                        },
-                        explainText = new LinkFlowContainer(s => s.Font = OsuFont.GetFont(weight: FontWeight.Regular))
-                        {
+                            Padding = new MarginPadding { Horizontal = SettingsPanel.CONTENT_MARGINS },
                             RelativeSizeAxes = Axes.X,
                             AutoSizeAxes = Axes.Y,
                         },
-                        errorText = new ErrorTextFlowContainer
-                        {
-                            RelativeSizeAxes = Axes.X,
-                            AutoSizeAxes = Axes.Y,
-                            Alpha = 0,
-                        },
-                    },
+                    }
                 },
-                new LinkFlowContainer
+                loading = new LoadingLayer(true)
                 {
-                    Padding = new MarginPadding { Horizontal = SettingsPanel.CONTENT_MARGINS },
-                    RelativeSizeAxes = Axes.X,
-                    AutoSizeAxes = Axes.Y,
-                },
+                    Padding = new MarginPadding { Vertical = -SettingsSection.ITEM_SPACING },
+                }
             };
 
             explainText.AddParagraph(UserVerificationStrings.BoxInfoCheckSpam);
@@ -85,9 +100,20 @@ namespace osu.Game.Overlays.Login
             explainText.AddText(". You can also ");
             explainText.AddLink(UserVerificationStrings.BoxInfoReissueLink, () =>
             {
+                loading.Show();
+
                 var reissueRequest = new ReissueVerificationCodeRequest();
-                reissueRequest.Failure += ex => Logger.Error(ex, @"Failed to retrieve new verification code.");
-                api.Perform(reissueRequest);
+                reissueRequest.Failure += ex =>
+                {
+                    Logger.Error(ex, @"Failed to retrieve new verification code.");
+                    loading.Hide();
+                };
+                reissueRequest.Success += () =>
+                {
+                    loading.Hide();
+                };
+
+                Task.Run(() => api.Perform(reissueRequest));
             });
             explainText.AddText(" or ");
             explainText.AddLink(UserVerificationStrings.BoxInfoLogoutLink, () => { api.Logout(); });
