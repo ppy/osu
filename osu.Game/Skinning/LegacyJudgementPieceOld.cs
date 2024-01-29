@@ -18,14 +18,16 @@ namespace osu.Game.Skinning
         private readonly HitResult result;
 
         private readonly float finalScale;
+        private readonly bool forceTransforms;
 
         [Resolved]
         private ISkinSource skin { get; set; } = null!;
 
-        public LegacyJudgementPieceOld(HitResult result, Func<Drawable> createMainDrawable, float finalScale = 1f)
+        public LegacyJudgementPieceOld(HitResult result, Func<Drawable> createMainDrawable, float finalScale = 1f, bool forceTransforms = false)
         {
             this.result = result;
             this.finalScale = finalScale;
+            this.forceTransforms = forceTransforms;
 
             AutoSizeAxes = Axes.Both;
             Origin = Anchor.Centre;
@@ -44,6 +46,10 @@ namespace osu.Game.Skinning
             const double fade_out_length = 600;
 
             this.FadeInFromZero(fade_in_length);
+
+            // legacy judgements don't play any transforms if they are an animation.... UNLESS they are the temporary displayed judgement from new piece.
+            if (animation?.FrameCount > 1 && !forceTransforms)
+                return;
 
             if (result.IsMiss())
             {
@@ -94,12 +100,6 @@ namespace osu.Game.Skinning
         }
 
         private bool isMissedTick() => result.IsMiss() && result != HitResult.Miss;
-
-        private void applyMissedTickScaling()
-        {
-            this.ScaleTo(0.6f);
-            this.ScaleTo(0.3f, 100, Easing.In);
-        }
 
         public Drawable GetAboveHitObjectsProxiedContent() => CreateProxy();
     }
