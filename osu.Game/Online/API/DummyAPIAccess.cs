@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Game.Localisation;
+using osu.Game.Online.API.Requests;
 using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Online.Chat;
 using osu.Game.Online.Notifications.WebSocket;
@@ -61,6 +62,7 @@ namespace osu.Game.Online.API
 
         private bool shouldFailNextLogin;
         private bool stayConnectingNextLogin;
+        private bool requiredSecondFactorAuth = true;
 
         /// <summary>
         /// The current connectivity state of the API.
@@ -121,13 +123,46 @@ namespace osu.Game.Online.API
                 Id = DUMMY_USER_ID,
             };
 
+            if (requiredSecondFactorAuth)
+            {
+                state.Value = APIState.RequiresSecondFactorAuth;
+            }
+            else
+            {
+                onSuccessfulLogin();
+                requiredSecondFactorAuth = true;
+            }
+        }
+
+        public void AuthenticateSecondFactor(string code)
+        {
+            var request = new VerifySessionRequest(code);
+            request.Failure += e =>
+            {
+                state.Value = APIState.RequiresSecondFactorAuth;
+                LastLoginError = e;
+            };
+
+            state.Value = APIState.Connecting;
+            LastLoginError = null;
+
+            // if no handler installed / handler can't handle verification, just assume that the server would verify for simplicity.
+            if (HandleRequest?.Invoke(request) != true)
+                onSuccessfulLogin();
+
+            // if a handler did handle this, make sure the verification actually passed.
+            if (request.CompletionState == APIRequestCompletionState.Completed)
+                onSuccessfulLogin();
+        }
+
+        private void onSuccessfulLogin()
+        {
+            state.Value = APIState.Online;
             Statistics.Value = new UserStatistics
             {
                 GlobalRank = 1,
                 CountryRank = 1
             };
-
-            state.Value = APIState.Online;
         }
 
         public void Logout()
@@ -162,6 +197,11 @@ namespace osu.Game.Online.API
         IBindableList<APIUser> IAPIProvider.Friends => Friends;
         IBindable<UserActivity> IAPIProvider.Activity => Activity;
         IBindable<UserStatistics?> IAPIProvider.Statistics => Statistics;
+
+        /// <summary>
+        /// Skip 2FA requirement for next login.
+        /// </summary>
+        public void SkipSecondFactor() => requiredSecondFactorAuth = false;
 
         /// <summary>
         /// During the next simulated login, the process will fail immediately.

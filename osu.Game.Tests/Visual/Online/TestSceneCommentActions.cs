@@ -67,6 +67,7 @@ namespace osu.Game.Tests.Visual.Online
             Schedule(() =>
             {
                 API.Login("test", "test");
+                dummyAPI.AuthenticateSecondFactor("abcdefgh");
                 Child = commentsContainer = new CommentsContainer();
             });
         }
