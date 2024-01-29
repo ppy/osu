@@ -13,6 +13,7 @@ using osu.Game.Beatmaps;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Scoring;
+using osu.Game.Rulesets.Judgements;
 using osu.Game.Scoring;
 
 namespace osu.Game.Rulesets.Difficulty
@@ -36,11 +37,52 @@ namespace osu.Game.Rulesets.Difficulty
             PerformanceAttributes[] performanceArray = await Task.WhenAll(
                 // compute actual performance
                 performanceCache.CalculatePerformanceAsync(score, cancellationToken),
+                // compute performance for a full combo
+                getFCPerformance(score, cancellationToken),
                 // compute performance for perfect play
                 getPerfectPerformance(score, cancellationToken)
             ).ConfigureAwait(false);
 
-            return new PerformanceBreakdown(performanceArray[0] ?? new PerformanceAttributes(), performanceArray[1] ?? new PerformanceAttributes());
+            return new PerformanceBreakdown(performanceArray[0] ?? new PerformanceAttributes(), performanceArray[1] ?? new PerformanceAttributes(), performanceArray[2] ?? new PerformanceAttributes());
+        }
+
+        [ItemCanBeNull]
+        private Task<PerformanceAttributes> getFCPerformance(ScoreInfo score, CancellationToken cancellationToken = default)
+        {
+            return Task.Run(async () =>
+            {
+                Ruleset ruleset = score.Ruleset.CreateInstance();
+                ScoreInfo fcPlay = score.DeepClone();
+                fcPlay.Passed = true;
+                // Update the play to be a full combo
+                fcPlay.MaxCombo = calculateMaxCombo(playableBeatmap);
+
+                // Only recalculate accuracy if it's different
+                if (fcPlay.Statistics[HitResult.Miss] > 0)
+                {
+                    HitResult bestResult = HitResult.Miss;
+
+                    foreach (var hitResult in ruleset.GetHitResults())
+                    {
+                        if (Judgement.ToNumericResult(hitResult.result) > Judgement.ToNumericResult(bestResult))
+                            bestResult = hitResult.result;
+                    }
+
+                    fcPlay.Statistics[bestResult] += fcPlay.Statistics[HitResult.Miss];
+                    fcPlay.Statistics[HitResult.Miss] = 0;
+                    // Recalculate Accuracy with converted misses
+                    fcPlay.CalculateAccuracy();
+                }
+
+                var difficulty = await difficultyCache.GetDifficultyAsync(
+                    playableBeatmap.BeatmapInfo,
+                    score.Ruleset,
+                    score.Mods,
+                    cancellationToken
+                ).ConfigureAwait(false);
+
+                return difficulty == null ? null : ruleset.CreatePerformanceCalculator()?.Calculate(fcPlay, difficulty.Value.Attributes.AsNonNull());
+            }, cancellationToken);
         }
 
         [ItemCanBeNull]
