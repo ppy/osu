@@ -13,7 +13,6 @@ namespace osu.Game.Online
             SpectatorEndpointUrl = $@"{APIEndpointUrl}/signalr/spectator";
             MultiplayerEndpointUrl = $@"{APIEndpointUrl}/signalr/multiplayer";
             MetadataEndpointUrl = $@"{APIEndpointUrl}/signalr/metadata";
-            NotificationsWebSocketEndpointUrl = "wss://dev.ppy.sh/home/notifications/feed";
         }
     }
 }
