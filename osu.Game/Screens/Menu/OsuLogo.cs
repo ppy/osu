@@ -10,6 +10,7 @@ using osu.Framework.Audio.Sample;
 using osu.Framework.Audio.Track;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
+using osu.Framework.Graphics.Colour;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.Sprites;
@@ -31,15 +32,13 @@ namespace osu.Game.Screens.Menu
     /// </summary>
     public partial class OsuLogo : BeatSyncedContainer
     {
-        public readonly Color4 OsuPink = Color4Extensions.FromHex(@"e967a1");
-
         private const double transition_length = 300;
 
         /// <summary>
         /// The osu! logo sprite has a shadow included in its texture.
         /// This adjustment vector is used to match the precise edge of the border of the logo.
         /// </summary>
-        public static readonly Vector2 SCALE_ADJUST = new Vector2(0.96f);
+        public static readonly Vector2 SCALE_ADJUST = new Vector2(0.94f);
 
         private readonly Sprite logo;
         private readonly CircularContainer logoContainer;
@@ -58,7 +57,7 @@ namespace osu.Game.Screens.Menu
         private Sample sampleDownbeat;
 
         private readonly Container colourAndTriangles;
-        private readonly Triangles triangles;
+        private readonly TrianglesV2 triangles;
 
         /// <summary>
         /// Return value decides whether the logo should play its own sample for the click action.
@@ -184,13 +183,16 @@ namespace osu.Game.Screens.Menu
                                                                         new Box
                                                                         {
                                                                             RelativeSizeAxes = Axes.Both,
-                                                                            Colour = OsuPink,
+                                                                            Colour = ColourInfo.GradientVertical(Color4Extensions.FromHex(@"ff66ab"), Color4Extensions.FromHex(@"cc5289")),
                                                                         },
-                                                                        triangles = new Triangles
+                                                                        triangles = new TrianglesV2
                                                                         {
-                                                                            TriangleScale = 4,
-                                                                            ColourLight = Color4Extensions.FromHex(@"ff7db7"),
-                                                                            ColourDark = Color4Extensions.FromHex(@"de5b95"),
+                                                                            Anchor = Anchor.Centre,
+                                                                            Origin = Anchor.Centre,
+                                                                            Thickness = 0.009f,
+                                                                            ScaleAdjust = 3,
+                                                                            SpawnRatio = 1.4f,
+                                                                            Colour = ColourInfo.GradientVertical(Color4Extensions.FromHex(@"ff66ab"), Color4Extensions.FromHex(@"b6346f")),
                                                                             RelativeSizeAxes = Axes.Both,
                                                                         },
                                                                     }

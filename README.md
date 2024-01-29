@@ -22,7 +22,7 @@ A few resources are available as starting points to getting involved and underst
 
 - Detailed release changelogs are available on the [official osu! site](https://osu.ppy.sh/home/changelog/lazer).
 - You can learn more about our approach to [project management](https://github.com/ppy/osu/wiki/Project-management).
-- Track our current efforts [towards full "ranked play" support](https://github.com/orgs/ppy/projects/13?query=is%3Aopen+sort%3Aupdated-desc).
+- Track our current efforts [towards improving the game](https://github.com/orgs/ppy/projects/7/views/6).
 
 ## Running osu!
 
