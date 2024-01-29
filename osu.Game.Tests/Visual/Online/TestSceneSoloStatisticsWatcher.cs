@@ -90,7 +90,7 @@ namespace osu.Game.Tests.Visual.Online
                             else
                             {
                                 int userId = int.Parse(getUserRequest.Lookup);
-                                string rulesetName = getUserRequest.Ruleset.ShortName;
+                                string rulesetName = getUserRequest.Ruleset!.ShortName;
                                 var response = new APIUser
                                 {
                                     Id = userId,
@@ -177,7 +177,11 @@ namespace osu.Game.Tests.Visual.Online
             AddWaitStep("wait a bit", 5);
             AddAssert("update not received", () => update == null);
 
-            AddStep("log in user", () => dummyAPI.Login("user", "password"));
+            AddStep("log in user", () =>
+            {
+                dummyAPI.Login("user", "password");
+                dummyAPI.AuthenticateSecondFactor("abcdefgh");
+            });
         }
 
         [Test]
