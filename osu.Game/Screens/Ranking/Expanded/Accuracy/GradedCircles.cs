@@ -31,7 +31,7 @@ namespace osu.Game.Screens.Ranking.Expanded.Accuracy
                     Colour = OsuColour.ForRank(ScoreRank.D),
                     InnerRadius = AccuracyCircle.RANK_CIRCLE_RADIUS,
                     Current = { Value = accuracyC - AccuracyCircle.NOTCH_WIDTH_PERCENTAGE },
-                    Rotation = AccuracyCircle.NOTCH_WIDTH_PERCENTAGE * 0.5f * 360
+                    Rotation = AccuracyCircle.NOTCH_WIDTH_PERCENTAGE * 180
                 },
                 new CircularProgress
                 {
@@ -41,7 +41,7 @@ namespace osu.Game.Screens.Ranking.Expanded.Accuracy
                     Colour = OsuColour.ForRank(ScoreRank.C),
                     InnerRadius = AccuracyCircle.RANK_CIRCLE_RADIUS,
                     Current = { Value = accuracyB - accuracyC - AccuracyCircle.NOTCH_WIDTH_PERCENTAGE },
-                    Rotation = (float)accuracyC * 360 + AccuracyCircle.NOTCH_WIDTH_PERCENTAGE * 0.5f * 360
+                    Rotation = (float)(accuracyC + AccuracyCircle.NOTCH_WIDTH_PERCENTAGE * 0.5f) * 360
                 },
                 new CircularProgress
                 {
@@ -51,7 +51,7 @@ namespace osu.Game.Screens.Ranking.Expanded.Accuracy
                     Colour = OsuColour.ForRank(ScoreRank.B),
                     InnerRadius = AccuracyCircle.RANK_CIRCLE_RADIUS,
                     Current = { Value = accuracyA - accuracyB - AccuracyCircle.NOTCH_WIDTH_PERCENTAGE },
-                    Rotation = (float)accuracyB * 360 + AccuracyCircle.NOTCH_WIDTH_PERCENTAGE * 0.5f * 360
+                    Rotation = (float)(accuracyB + AccuracyCircle.NOTCH_WIDTH_PERCENTAGE * 0.5f) * 360
                 },
                 new CircularProgress
                 {
@@ -61,7 +61,7 @@ namespace osu.Game.Screens.Ranking.Expanded.Accuracy
                     Colour = OsuColour.ForRank(ScoreRank.A),
                     InnerRadius = AccuracyCircle.RANK_CIRCLE_RADIUS,
                     Current = { Value = accuracyS - accuracyA - AccuracyCircle.NOTCH_WIDTH_PERCENTAGE },
-                    Rotation = (float)accuracyA * 360 + AccuracyCircle.NOTCH_WIDTH_PERCENTAGE * 0.5f * 360
+                    Rotation = (float)(accuracyA + AccuracyCircle.NOTCH_WIDTH_PERCENTAGE * 0.5f) * 360
                 },
                 new CircularProgress
                 {
@@ -71,7 +71,7 @@ namespace osu.Game.Screens.Ranking.Expanded.Accuracy
                     Colour = OsuColour.ForRank(ScoreRank.S),
                     InnerRadius = AccuracyCircle.RANK_CIRCLE_RADIUS,
                     Current = { Value = accuracyX - accuracyS - AccuracyCircle.VIRTUAL_SS_PERCENTAGE - AccuracyCircle.NOTCH_WIDTH_PERCENTAGE },
-                    Rotation = (float)accuracyS * 360 + AccuracyCircle.NOTCH_WIDTH_PERCENTAGE * 0.5f * 360
+                    Rotation = (float)(accuracyS + AccuracyCircle.NOTCH_WIDTH_PERCENTAGE * 0.5f) * 360
                 },
                 new CircularProgress
                 {
@@ -81,7 +81,7 @@ namespace osu.Game.Screens.Ranking.Expanded.Accuracy
                     Colour = OsuColour.ForRank(ScoreRank.X),
                     InnerRadius = AccuracyCircle.RANK_CIRCLE_RADIUS,
                     Current = { Value = 1f - (accuracyX - AccuracyCircle.VIRTUAL_SS_PERCENTAGE) - AccuracyCircle.NOTCH_WIDTH_PERCENTAGE },
-                    Rotation = (float)(accuracyX - AccuracyCircle.VIRTUAL_SS_PERCENTAGE) * 360 + AccuracyCircle.NOTCH_WIDTH_PERCENTAGE * 0.5f * 360
+                    Rotation = (float)(accuracyX - AccuracyCircle.VIRTUAL_SS_PERCENTAGE + AccuracyCircle.NOTCH_WIDTH_PERCENTAGE * 0.5f) * 360
                 },
                 new BufferedContainer
                 {
