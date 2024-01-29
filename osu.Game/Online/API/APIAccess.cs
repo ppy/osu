@@ -269,69 +269,79 @@ namespace osu.Game.Online.API
                 }
             }
 
-            if (state.Value != APIState.RequiresSecondFactorAuth)
+            switch (state.Value)
             {
-                var userReq = new GetMeRequest();
-                userReq.Failure += ex =>
+                case APIState.RequiresSecondFactorAuth:
                 {
-                    if (ex is APIException)
+                    if (string.IsNullOrEmpty(SecondFactorCode))
+                        return;
+
+                    state.Value = APIState.Connecting;
+                    LastLoginError = null;
+
+                    var verificationRequest = new VerifySessionRequest(SecondFactorCode);
+
+                    verificationRequest.Success += () => state.Value = APIState.Online;
+                    verificationRequest.Failure += ex =>
                     {
+                        state.Value = APIState.RequiresSecondFactorAuth;
                         LastLoginError = ex;
-                        log.Add($@"Login failed for username {ProvidedUsername} on user retrieval ({LastLoginError.Message})!");
-                        Logout();
-                    }
-                    else if (ex is WebException webException && webException.Message == @"Unauthorized")
-                    {
-                        log.Add(@"Login no longer valid");
-                        Logout();
-                    }
-                    else
+                        SecondFactorCode = null;
+                    };
+
+                    if (!handleRequest(verificationRequest))
                     {
                         state.Value = APIState.Failing;
+                        return;
                     }
-                };
-                userReq.Success += me =>
-                {
-                    me.Status.Value = configStatus.Value ?? UserStatus.Online;
 
-                    setLocalUser(me);
+                    if (state.Value != APIState.Online)
+                        return;
 
-                    state.Value = me.SessionVerified ? APIState.Online : APIState.RequiresSecondFactorAuth;
-                    failureCount = 0;
-                };
-
-                if (!handleRequest(userReq))
-                {
-                    state.Value = APIState.Failing;
-                    return;
-                }
-            }
-            else
-            {
-                if (string.IsNullOrEmpty(SecondFactorCode))
-                    return;
-
-                state.Value = APIState.Connecting;
-                LastLoginError = null;
-
-                var verificationRequest = new VerifySessionRequest(SecondFactorCode);
-
-                verificationRequest.Success += () => state.Value = APIState.Online;
-                verificationRequest.Failure += ex =>
-                {
-                    state.Value = APIState.RequiresSecondFactorAuth;
-                    LastLoginError = ex;
-                    SecondFactorCode = null;
-                };
-
-                if (!handleRequest(verificationRequest))
-                {
-                    state.Value = APIState.Failing;
-                    return;
+                    break;
                 }
 
-                if (state.Value != APIState.Online)
-                    return;
+                default:
+                {
+                    var userReq = new GetMeRequest();
+
+                    userReq.Failure += ex =>
+                    {
+                        if (ex is APIException)
+                        {
+                            LastLoginError = ex;
+                            log.Add($@"Login failed for username {ProvidedUsername} on user retrieval ({LastLoginError.Message})!");
+                            Logout();
+                        }
+                        else if (ex is WebException webException && webException.Message == @"Unauthorized")
+                        {
+                            log.Add(@"Login no longer valid");
+                            Logout();
+                        }
+                        else
+                        {
+                            state.Value = APIState.Failing;
+                        }
+                    };
+
+                    userReq.Success += me =>
+                    {
+                        me.Status.Value = configStatus.Value ?? UserStatus.Online;
+
+                        setLocalUser(me);
+
+                        state.Value = me.SessionVerified ? APIState.Online : APIState.RequiresSecondFactorAuth;
+                        failureCount = 0;
+                    };
+
+                    if (!handleRequest(userReq))
+                    {
+                        state.Value = APIState.Failing;
+                        return;
+                    }
+
+                    break;
+                }
             }
 
             var friendsReq = new GetFriendsRequest();
