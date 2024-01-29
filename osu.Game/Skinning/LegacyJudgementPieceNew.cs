@@ -53,7 +53,7 @@ namespace osu.Game.Skinning
             if (!result.IsMiss())
             {
                 //new judgement shows old as a temporary effect
-                AddInternal(temporaryOldStyle = new LegacyJudgementPieceOld(result, createMainDrawable, 1.05f)
+                AddInternal(temporaryOldStyle = new LegacyJudgementPieceOld(result, createMainDrawable, 1.05f, true)
                 {
                     Blending = BlendingParameters.Additive,
                     Anchor = Anchor.Centre,
