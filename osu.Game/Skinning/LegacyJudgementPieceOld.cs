@@ -46,15 +46,10 @@ namespace osu.Game.Skinning
             const double fade_out_length = 600;
 
             this.FadeInFromZero(fade_in_length);
-            this.Delay(fade_out_delay).FadeOut(fade_out_length);
 
             // legacy judgements don't play any transforms if they are an animation.... UNLESS they are the temporary displayed judgement from new piece.
             if (animation?.FrameCount > 1 && !forceTransforms)
-            {
-                if (isMissedTick())
-                    applyMissedTickScaling();
                 return;
-            }
 
             if (result.IsMiss())
             {
@@ -84,6 +79,8 @@ namespace osu.Game.Skinning
                     this.RotateTo(0);
                     this.RotateTo(rotation, fade_in_length)
                         .Then().RotateTo(rotation * 2, fade_out_delay + fade_out_length - fade_in_length, Easing.In);
+
+                    this.Delay(fade_out_delay).FadeOut(fade_out_length);
                 }
             }
             else
@@ -97,16 +94,12 @@ namespace osu.Game.Skinning
                     // so we need to force the current value to be correct at 1.2 (0.95) then complete the
                     // second half of the transform.
                     .ScaleTo(0.95f).ScaleTo(finalScale, fade_in_length * 0.2f); // t = 1.4
+
+                this.Delay(fade_out_delay).FadeOut(fade_out_length);
             }
         }
 
         private bool isMissedTick() => result.IsMiss() && result != HitResult.Miss;
-
-        private void applyMissedTickScaling()
-        {
-            this.ScaleTo(0.6f);
-            this.ScaleTo(0.3f, 100, Easing.In);
-        }
 
         public Drawable GetAboveHitObjectsProxiedContent() => CreateProxy();
     }
