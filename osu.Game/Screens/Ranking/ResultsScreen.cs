@@ -6,6 +6,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using JetBrains.Annotations;
 using osu.Framework.Allocation;
 using osu.Framework.Audio;
 using osu.Framework.Audio.Sample;
@@ -45,6 +46,7 @@ namespace osu.Game.Screens.Ranking
 
         public readonly Bindable<ScoreInfo> SelectedScore = new Bindable<ScoreInfo>();
 
+        [CanBeNull]
         public readonly ScoreInfo Score;
 
         protected ScorePanelList ScorePanelList { get; private set; }
@@ -69,7 +71,7 @@ namespace osu.Game.Screens.Ranking
 
         private Sample popInSample;
 
-        protected ResultsScreen(ScoreInfo score, bool allowRetry, bool allowWatchingReplay = true)
+        protected ResultsScreen([CanBeNull] ScoreInfo score, bool allowRetry, bool allowWatchingReplay = true)
         {
             Score = score;
             this.allowRetry = allowRetry;
@@ -274,6 +276,11 @@ namespace osu.Game.Screens.Ranking
         {
             if (base.OnExiting(e))
                 return true;
+
+            // This is a stop-gap safety against components holding references to gameplay after exiting the gameplay flow.
+            // Right now, HitEvents are only used up to the results screen. If this changes in the future we need to remove
+            // HitObject references from HitEvent.
+            Score?.HitEvents.Clear();
 
             this.FadeOut(100);
             return false;
