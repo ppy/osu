@@ -98,7 +98,7 @@ namespace osu.Game.Rulesets.Osu
                 base.ReloadMappings(realmKeyBindings);
 
                 if (!AllowGameplayInputs)
-                    KeyBindings = KeyBindings.Where(b => b.GetAction<OsuAction>() == OsuAction.Smoke).ToList();
+                    KeyBindings = KeyBindings.Where(static b => b.GetAction<OsuAction>() == OsuAction.Smoke).ToList();
             }
         }
     }

@@ -768,6 +768,13 @@ namespace osu.Game.Rulesets.Objects.Drawables
 
             if (CurrentSkin != null)
                 CurrentSkin.SourceChanged -= skinSourceChanged;
+
+            // Safeties against shooting in foot in cases where these are bound by external entities (like playfield) that don't clean up.
+            OnNestedDrawableCreated = null;
+            OnNewResult = null;
+            OnRevertResult = null;
+            DefaultsApplied = null;
+            HitObjectApplied = null;
         }
 
         public Bindable<double> AnimationStartTime { get; } = new BindableDouble();
