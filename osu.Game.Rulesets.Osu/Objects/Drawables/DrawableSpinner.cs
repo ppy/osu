@@ -153,7 +153,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
         {
             if (tracking.NewValue)
             {
-                if (!spinningSample.IsPlaying)
+                if (!spinningSample.RequestedPlaying)
                     spinningSample.Play();
 
                 spinningSample.VolumeTo(1, 300);
