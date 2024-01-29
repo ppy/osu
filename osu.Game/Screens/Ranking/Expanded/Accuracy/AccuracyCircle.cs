@@ -77,7 +77,7 @@ namespace osu.Game.Screens.Ranking.Expanded.Accuracy
         /// <summary>
         /// The width of a solid "notch" in terms of accuracy that appears at the ends of the rank circles to add separation.
         /// </summary>
-        public const float NOTCH_WIDTH_PERCENTAGE = 2f / 360;
+        public const double NOTCH_WIDTH_PERCENTAGE = 2.0 / 360;
 
         /// <summary>
         /// The easing for the circle filling transforms.
@@ -211,7 +211,8 @@ namespace osu.Game.Screens.Ranking.Expanded.Accuracy
                 });
             }
 
-            gradedCircles.Transform();
+            using (BeginDelayedSequence(RANK_CIRCLE_TRANSFORM_DELAY))
+                gradedCircles.TransformTo(nameof(GradedCircles.Progress), 1.0, RANK_CIRCLE_TRANSFORM_DURATION, ACCURACY_TRANSFORM_EASING);
 
             using (BeginDelayedSequence(ACCURACY_TRANSFORM_DELAY))
             {

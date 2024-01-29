@@ -1,6 +1,7 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.UserInterface;
@@ -10,15 +11,31 @@ using osuTK;
 
 namespace osu.Game.Screens.Ranking.Expanded.Accuracy
 {
-    public partial class GradedCircles : BufferedContainer
+    public partial class GradedCircles : CompositeDrawable
     {
+        private double progress;
+
         public double Progress
         {
-            get => innerMask.Current.Value;
-            set => innerMask.Current.Value = value;
+            get => progress;
+            set
+            {
+                progress = value;
+                dProgress.RevealProgress = value;
+                cProgress.RevealProgress = value;
+                bProgress.RevealProgress = value;
+                aProgress.RevealProgress = value;
+                sProgress.RevealProgress = value;
+                xProgress.RevealProgress = value;
+            }
         }
 
-        private readonly CircularProgress innerMask;
+        private readonly GradedCircle dProgress;
+        private readonly GradedCircle cProgress;
+        private readonly GradedCircle bProgress;
+        private readonly GradedCircle aProgress;
+        private readonly GradedCircle sProgress;
+        private readonly GradedCircle xProgress;
 
         public GradedCircles(double accuracyC, double accuracyB, double accuracyA, double accuracyS, double accuracyX)
         {
@@ -27,93 +44,56 @@ namespace osu.Game.Screens.Ranking.Expanded.Accuracy
             RelativeSizeAxes = Axes.Both;
             Size = new Vector2(0.8f);
             Padding = new MarginPadding(2);
-            Children = new Drawable[]
+            InternalChildren = new Drawable[]
             {
-                new CircularProgress
+                dProgress = new GradedCircle(0.0, accuracyC)
                 {
-                    Anchor = Anchor.Centre,
-                    Origin = Anchor.Centre,
-                    RelativeSizeAxes = Axes.Both,
                     Colour = OsuColour.ForRank(ScoreRank.D),
-                    InnerRadius = AccuracyCircle.RANK_CIRCLE_RADIUS,
-                    Current = { Value = accuracyC - AccuracyCircle.NOTCH_WIDTH_PERCENTAGE },
-                    Rotation = AccuracyCircle.NOTCH_WIDTH_PERCENTAGE * 180
                 },
-                new CircularProgress
+                cProgress = new GradedCircle(accuracyC, accuracyB)
                 {
-                    Anchor = Anchor.Centre,
-                    Origin = Anchor.Centre,
-                    RelativeSizeAxes = Axes.Both,
                     Colour = OsuColour.ForRank(ScoreRank.C),
-                    InnerRadius = AccuracyCircle.RANK_CIRCLE_RADIUS,
-                    Current = { Value = accuracyB - accuracyC - AccuracyCircle.NOTCH_WIDTH_PERCENTAGE },
-                    Rotation = (float)(accuracyC + AccuracyCircle.NOTCH_WIDTH_PERCENTAGE * 0.5f) * 360
                 },
-                new CircularProgress
+                bProgress = new GradedCircle(accuracyB, accuracyA)
                 {
-                    Anchor = Anchor.Centre,
-                    Origin = Anchor.Centre,
-                    RelativeSizeAxes = Axes.Both,
                     Colour = OsuColour.ForRank(ScoreRank.B),
-                    InnerRadius = AccuracyCircle.RANK_CIRCLE_RADIUS,
-                    Current = { Value = accuracyA - accuracyB - AccuracyCircle.NOTCH_WIDTH_PERCENTAGE },
-                    Rotation = (float)(accuracyB + AccuracyCircle.NOTCH_WIDTH_PERCENTAGE * 0.5f) * 360
                 },
-                new CircularProgress
+                aProgress = new GradedCircle(accuracyA, accuracyS)
                 {
-                    Anchor = Anchor.Centre,
-                    Origin = Anchor.Centre,
-                    RelativeSizeAxes = Axes.Both,
                     Colour = OsuColour.ForRank(ScoreRank.A),
-                    InnerRadius = AccuracyCircle.RANK_CIRCLE_RADIUS,
-                    Current = { Value = accuracyS - accuracyA - AccuracyCircle.NOTCH_WIDTH_PERCENTAGE },
-                    Rotation = (float)(accuracyA + AccuracyCircle.NOTCH_WIDTH_PERCENTAGE * 0.5f) * 360
                 },
-                new CircularProgress
+                sProgress = new GradedCircle(accuracyS, accuracyX - AccuracyCircle.VIRTUAL_SS_PERCENTAGE)
                 {
-                    Anchor = Anchor.Centre,
-                    Origin = Anchor.Centre,
-                    RelativeSizeAxes = Axes.Both,
                     Colour = OsuColour.ForRank(ScoreRank.S),
-                    InnerRadius = AccuracyCircle.RANK_CIRCLE_RADIUS,
-                    Current = { Value = accuracyX - accuracyS - AccuracyCircle.VIRTUAL_SS_PERCENTAGE - AccuracyCircle.NOTCH_WIDTH_PERCENTAGE },
-                    Rotation = (float)(accuracyS + AccuracyCircle.NOTCH_WIDTH_PERCENTAGE * 0.5f) * 360
                 },
-                new CircularProgress
+                xProgress = new GradedCircle(accuracyX - AccuracyCircle.VIRTUAL_SS_PERCENTAGE, 1.0)
                 {
-                    Anchor = Anchor.Centre,
-                    Origin = Anchor.Centre,
-                    RelativeSizeAxes = Axes.Both,
-                    Colour = OsuColour.ForRank(ScoreRank.X),
-                    InnerRadius = AccuracyCircle.RANK_CIRCLE_RADIUS,
-                    Current = { Value = 1f - (accuracyX - AccuracyCircle.VIRTUAL_SS_PERCENTAGE) - AccuracyCircle.NOTCH_WIDTH_PERCENTAGE },
-                    Rotation = (float)(accuracyX - AccuracyCircle.VIRTUAL_SS_PERCENTAGE + AccuracyCircle.NOTCH_WIDTH_PERCENTAGE * 0.5f) * 360
-                },
-                new BufferedContainer
-                {
-                    Name = "Graded circle mask",
-                    RelativeSizeAxes = Axes.Both,
-                    Padding = new MarginPadding(1),
-                    Blending = new BlendingParameters
-                    {
-                        Source = BlendingType.DstColor,
-                        Destination = BlendingType.OneMinusSrcColor,
-                        SourceAlpha = BlendingType.One,
-                        DestinationAlpha = BlendingType.SrcAlpha
-                    },
-                    Child = innerMask = new CircularProgress
-                    {
-                        RelativeSizeAxes = Axes.Both,
-                        InnerRadius = AccuracyCircle.RANK_CIRCLE_RADIUS - 0.02f,
-                    }
+                    Colour = OsuColour.ForRank(ScoreRank.X)
                 }
             };
         }
 
-        public void Transform()
+        private partial class GradedCircle : CircularProgress
         {
-            using (BeginDelayedSequence(AccuracyCircle.RANK_CIRCLE_TRANSFORM_DELAY))
-                innerMask.FillTo(1f, AccuracyCircle.RANK_CIRCLE_TRANSFORM_DURATION, AccuracyCircle.ACCURACY_TRANSFORM_EASING);
+            public double RevealProgress
+            {
+                set => Current.Value = Math.Clamp(value, startProgress, endProgress) - startProgress;
+            }
+
+            private readonly double startProgress;
+            private readonly double endProgress;
+
+            public GradedCircle(double startProgress, double endProgress)
+            {
+                this.startProgress = startProgress + AccuracyCircle.NOTCH_WIDTH_PERCENTAGE * 0.5;
+                this.endProgress = endProgress - AccuracyCircle.NOTCH_WIDTH_PERCENTAGE * 0.5;
+
+                Anchor = Anchor.Centre;
+                Origin = Anchor.Centre;
+                RelativeSizeAxes = Axes.Both;
+                InnerRadius = AccuracyCircle.RANK_CIRCLE_RADIUS;
+                Rotation = (float)this.startProgress * 360;
+            }
         }
     }
 }
