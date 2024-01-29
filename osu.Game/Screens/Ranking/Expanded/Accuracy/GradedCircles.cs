@@ -12,6 +12,12 @@ namespace osu.Game.Screens.Ranking.Expanded.Accuracy
 {
     public partial class GradedCircles : BufferedContainer
     {
+        public double Progress
+        {
+            get => innerMask.Current.Value;
+            set => innerMask.Current.Value = value;
+        }
+
         private readonly CircularProgress innerMask;
 
         public GradedCircles(double accuracyC, double accuracyB, double accuracyA, double accuracyS, double accuracyX)
