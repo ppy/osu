@@ -193,7 +193,7 @@ namespace osu.Game.Tests.Visual.Navigation
                 case ScorePresentType.Results:
                     AddUntilStep("wait for results", () => lastWaitedScreen != Game.ScreenStack.CurrentScreen && Game.ScreenStack.CurrentScreen is ResultsScreen);
                     AddStep("store last waited screen", () => lastWaitedScreen = Game.ScreenStack.CurrentScreen);
-                    AddUntilStep("correct score displayed", () => ((ResultsScreen)Game.ScreenStack.CurrentScreen).Score.Equals(getImport()));
+                    AddUntilStep("correct score displayed", () => ((ResultsScreen)Game.ScreenStack.CurrentScreen).Score!.Equals(getImport()));
                     AddAssert("correct ruleset selected", () => Game.Ruleset.Value.Equals(getImport().Ruleset));
                     break;
 
