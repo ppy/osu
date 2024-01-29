@@ -169,45 +169,62 @@ namespace osu.Game.Screens.Ranking.Expanded.Accuracy
                     {
                         new CircularProgress
                         {
-                            RelativeSizeAxes = Axes.Both,
-                            Colour = OsuColour.ForRank(ScoreRank.X),
-                            InnerRadius = RANK_CIRCLE_RADIUS,
-                            Current = { Value = accuracyX }
-                        },
-                        new CircularProgress
-                        {
-                            RelativeSizeAxes = Axes.Both,
-                            Colour = OsuColour.ForRank(ScoreRank.S),
-                            InnerRadius = RANK_CIRCLE_RADIUS,
-                            Current = { Value = accuracyX - virtual_ss_percentage }
-                        },
-                        new CircularProgress
-                        {
-                            RelativeSizeAxes = Axes.Both,
-                            Colour = OsuColour.ForRank(ScoreRank.A),
-                            InnerRadius = RANK_CIRCLE_RADIUS,
-                            Current = { Value = accuracyS }
-                        },
-                        new CircularProgress
-                        {
-                            RelativeSizeAxes = Axes.Both,
-                            Colour = OsuColour.ForRank(ScoreRank.B),
-                            InnerRadius = RANK_CIRCLE_RADIUS,
-                            Current = { Value = accuracyA }
-                        },
-                        new CircularProgress
-                        {
-                            RelativeSizeAxes = Axes.Both,
-                            Colour = OsuColour.ForRank(ScoreRank.C),
-                            InnerRadius = RANK_CIRCLE_RADIUS,
-                            Current = { Value = accuracyB }
-                        },
-                        new CircularProgress
-                        {
+                            Anchor = Anchor.Centre,
+                            Origin = Anchor.Centre,
                             RelativeSizeAxes = Axes.Both,
                             Colour = OsuColour.ForRank(ScoreRank.D),
                             InnerRadius = RANK_CIRCLE_RADIUS,
                             Current = { Value = accuracyC }
+                        },
+                        new CircularProgress
+                        {
+                            Anchor = Anchor.Centre,
+                            Origin = Anchor.Centre,
+                            RelativeSizeAxes = Axes.Both,
+                            Colour = OsuColour.ForRank(ScoreRank.C),
+                            InnerRadius = RANK_CIRCLE_RADIUS,
+                            Current = { Value = accuracyB - accuracyC },
+                            Rotation = (float)accuracyC * 360
+                        },
+                        new CircularProgress
+                        {
+                            Anchor = Anchor.Centre,
+                            Origin = Anchor.Centre,
+                            RelativeSizeAxes = Axes.Both,
+                            Colour = OsuColour.ForRank(ScoreRank.B),
+                            InnerRadius = RANK_CIRCLE_RADIUS,
+                            Current = { Value = accuracyA - accuracyB },
+                            Rotation = (float)accuracyB * 360
+                        },
+                        new CircularProgress
+                        {
+                            Anchor = Anchor.Centre,
+                            Origin = Anchor.Centre,
+                            RelativeSizeAxes = Axes.Both,
+                            Colour = OsuColour.ForRank(ScoreRank.A),
+                            InnerRadius = RANK_CIRCLE_RADIUS,
+                            Current = { Value = accuracyS - accuracyA },
+                            Rotation = (float)accuracyA * 360
+                        },
+                        new CircularProgress
+                        {
+                            Anchor = Anchor.Centre,
+                            Origin = Anchor.Centre,
+                            RelativeSizeAxes = Axes.Both,
+                            Colour = OsuColour.ForRank(ScoreRank.S),
+                            InnerRadius = RANK_CIRCLE_RADIUS,
+                            Current = { Value = accuracyX - accuracyS - virtual_ss_percentage },
+                            Rotation = (float)accuracyS * 360
+                        },
+                        new CircularProgress
+                        {
+                            Anchor = Anchor.Centre,
+                            Origin = Anchor.Centre,
+                            RelativeSizeAxes = Axes.Both,
+                            Colour = OsuColour.ForRank(ScoreRank.X),
+                            InnerRadius = RANK_CIRCLE_RADIUS,
+                            Current = { Value = 1f - (accuracyX - virtual_ss_percentage) },
+                            Rotation = (float)(accuracyX - virtual_ss_percentage) * 360
                         },
                         new RankNotch((float)accuracyX),
                         new RankNotch((float)(accuracyX - virtual_ss_percentage)),
