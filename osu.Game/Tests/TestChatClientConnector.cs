@@ -11,7 +11,7 @@ using osu.Game.Online.Chat;
 
 namespace osu.Game.Tests
 {
-    public class PollingChatClientConnector : PersistentEndpointClientConnector, IChatClient
+    public class TestChatClientConnector : PersistentEndpointClientConnector, IChatClient
     {
         public event Action<Channel>? ChannelJoined;
 
@@ -29,7 +29,7 @@ namespace osu.Game.Tests
             // don't really need to do anything special if we poll every second anyway.
         }
 
-        public PollingChatClientConnector(IAPIProvider api)
+        public TestChatClientConnector(IAPIProvider api)
             : base(api)
         {
             Start();
