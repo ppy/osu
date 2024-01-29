@@ -10,7 +10,7 @@ using osu.Game.Rulesets.Scoring;
 
 namespace osu.Game.Rulesets.Judgements
 {
-    public abstract partial class JudgementPiece : CompositeDrawable
+    public abstract partial class TextJudgementPiece : CompositeDrawable
     {
         protected readonly HitResult Result;
 
@@ -19,7 +19,7 @@ namespace osu.Game.Rulesets.Judgements
         [Resolved]
         private OsuColour colours { get; set; } = null!;
 
-        protected JudgementPiece(HitResult result)
+        protected TextJudgementPiece(HitResult result)
         {
             Result = result;
         }
