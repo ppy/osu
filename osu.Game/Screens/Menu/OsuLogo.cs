@@ -486,5 +486,12 @@ namespace osu.Game.Screens.Menu
             defaultProxyTarget.Add(this);
             defaultProxyTarget.Add(proxy = CreateProxy());
         }
+
+        public void ChangeAnchor(Anchor anchor)
+        {
+            var previousAnchor = AnchorPosition;
+            Anchor = anchor;
+            Position -= AnchorPosition - previousAnchor;
+        }
     }
 }
