@@ -8,6 +8,7 @@ using osu.Framework;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
+using osu.Framework.Input.Events;
 using osu.Game.Graphics;
 using osuTK;
 
@@ -145,6 +146,9 @@ namespace osu.Game.Screens.Menu
                     }
                 }
             }
+
+            // Block clicks on the background area from triggering a back operation.
+            protected override bool OnClick(ClickEvent e) => true;
 
             public event Action<ButtonAreaBackgroundState> StateChanged;
         }

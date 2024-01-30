@@ -238,6 +238,12 @@ namespace osu.Game.Screens.Menu
             return base.OnMidiDown(e);
         }
 
+        protected override bool OnClick(ClickEvent e)
+        {
+            goBack();
+            return true;
+        }
+
         public bool OnPressed(KeyBindingPressEvent<GlobalAction> e)
         {
             if (e.Repeat)
