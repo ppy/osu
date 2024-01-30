@@ -44,7 +44,16 @@ namespace osu.Game.Rulesets.Mania.UI
 
         private readonly Drawable barLineContainer;
 
-        public override bool ReceivePositionalInputAt(Vector2 screenSpacePos) => Columns.Any(c => c.ReceivePositionalInputAt(screenSpacePos));
+        public override bool ReceivePositionalInputAt(Vector2 screenSpacePos)
+        {
+            foreach (var c in Columns)
+            {
+                if (c.ReceivePositionalInputAt(screenSpacePos))
+                    return true;
+            }
+
+            return false;
+        }
 
         private readonly int firstColumnIndex;
 

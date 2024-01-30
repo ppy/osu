@@ -42,7 +42,16 @@ namespace osu.Game.Rulesets.Mania.UI
             }
         }
 
-        public override bool ReceivePositionalInputAt(Vector2 screenSpacePos) => stages.Any(s => s.ReceivePositionalInputAt(screenSpacePos));
+        public override bool ReceivePositionalInputAt(Vector2 screenSpacePos)
+        {
+            foreach (var s in stages)
+            {
+                if (s.ReceivePositionalInputAt(screenSpacePos))
+                    return true;
+            }
+
+            return false;
+        }
 
         public ManiaPlayfield(List<StageDefinition> stageDefinitions)
         {
