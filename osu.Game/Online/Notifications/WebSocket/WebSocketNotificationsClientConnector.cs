@@ -29,14 +29,11 @@ namespace osu.Game.Online.Notifications.WebSocket
 
         protected override async Task<PersistentEndpointClient> BuildConnectionAsync(CancellationToken cancellationToken)
         {
-            var tcs = new TaskCompletionSource<string>();
-
             var req = new GetNotificationsRequest();
-            req.Success += bundle => tcs.SetResult(bundle.Endpoint);
-            req.Failure += ex => tcs.SetException(ex);
-            api.Queue(req);
-
-            string endpoint = await tcs.Task.ConfigureAwait(false);
+            // must use `PerformAsync()`, since we may not be fully online yet
+            // (see `APIState.RequiresSecondFactorAuth` - in this state queued requests will not execute).
+            await api.PerformAsync(req).ConfigureAwait(false);
+            string endpoint = req.Response!.Endpoint;
 
             ClientWebSocket socket = new ClientWebSocket();
             socket.Options.SetRequestHeader(@"Authorization", @$"Bearer {api.AccessToken}");
