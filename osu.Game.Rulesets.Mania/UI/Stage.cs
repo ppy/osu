@@ -2,7 +2,6 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
-using System.Collections.Generic;
 using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Extensions.ObjectExtensions;
@@ -37,7 +36,7 @@ namespace osu.Game.Rulesets.Mania.UI
 
         public const float HIT_TARGET_POSITION = 110;
 
-        public IReadOnlyList<Column> Columns => columnFlow.Content;
+        public Column[] Columns => columnFlow.Content;
         private readonly ColumnFlow<Column> columnFlow;
 
         private readonly JudgementContainer<DrawableManiaJudgement> judgements;
@@ -184,13 +183,13 @@ namespace osu.Game.Rulesets.Mania.UI
             NewResult += OnNewResult;
         }
 
-        public override void Add(HitObject hitObject) => Columns.ElementAt(((ManiaHitObject)hitObject).Column - firstColumnIndex).Add(hitObject);
+        public override void Add(HitObject hitObject) => Columns[((ManiaHitObject)hitObject).Column - firstColumnIndex].Add(hitObject);
 
-        public override bool Remove(HitObject hitObject) => Columns.ElementAt(((ManiaHitObject)hitObject).Column - firstColumnIndex).Remove(hitObject);
+        public override bool Remove(HitObject hitObject) => Columns[((ManiaHitObject)hitObject).Column - firstColumnIndex].Remove(hitObject);
 
-        public override void Add(DrawableHitObject h) => Columns.ElementAt(((ManiaHitObject)h.HitObject).Column - firstColumnIndex).Add(h);
+        public override void Add(DrawableHitObject h) => Columns[((ManiaHitObject)h.HitObject).Column - firstColumnIndex].Add(h);
 
-        public override bool Remove(DrawableHitObject h) => Columns.ElementAt(((ManiaHitObject)h.HitObject).Column - firstColumnIndex).Remove(h);
+        public override bool Remove(DrawableHitObject h) => Columns[((ManiaHitObject)h.HitObject).Column - firstColumnIndex].Remove(h);
 
         public void Add(BarLine barLine) => base.Add(barLine);
 
