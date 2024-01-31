@@ -114,7 +114,7 @@ namespace osu.Game.Rulesets.Osu.Mods
                     return;
 
                 Debug.Assert(circle.HitObject.HitWindows != null);
-                requiresHit |= circle.HitObject.HitWindows.CanBeHit(time - circle.HitObject.StartTime);
+                requiresHit |= circle.HitObject.HitWindows.CanEverBeHit(time - circle.HitObject.StartTime);
             }
 
             void changeState(bool down)

@@ -154,7 +154,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
 
             if (!userTriggered)
             {
-                if (!HitObject.HitWindows.CanBeHit(timeOffset))
+                if (!HitObject.HitWindows.CanEverBeHit(timeOffset))
                     ApplyResult(r => r.Type = r.Judgement.MinResult);
 
                 return;

@@ -1,7 +1,10 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using osu.Framework.Bindables;
+using osu.Game.Configuration;
 using osu.Game.Rulesets.Mods;
+using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Objects.Drawables;
 using osu.Game.Rulesets.Taiko.Objects;
 using osu.Game.Rulesets.Taiko.Objects.Drawables;
@@ -10,8 +13,11 @@ using osu.Game.Rulesets.UI;
 
 namespace osu.Game.Rulesets.Taiko.Mods
 {
-    public class TaikoModClassic : ModClassic, IApplicableToDrawableRuleset<TaikoHitObject>, IApplicableToDrawableHitObject
+    public class TaikoModClassic : ModClassic, IApplicableToDrawableRuleset<TaikoHitObject>, IApplicableToDrawableHitObject, IApplicableToHitObject
     {
+        [SettingSource("Legacy hit windows", "Uses half-integer legacy hit windows.")]
+        public Bindable<bool> LegacyHitWindows { get; } = new BindableBool(true);
+
         public void ApplyToDrawableRuleset(DrawableRuleset<TaikoHitObject> drawableRuleset)
         {
             var drawableTaikoRuleset = (DrawableTaikoRuleset)drawableRuleset;
@@ -25,6 +31,17 @@ namespace osu.Game.Rulesets.Taiko.Mods
         {
             if (drawable is DrawableTaikoHitObject hit)
                 hit.SnapJudgementLocation = true;
+        }
+
+        public void ApplyToHitObject(HitObject hitObject)
+        {
+            switch (hitObject)
+            {
+                case Hit hit:
+                    if (LegacyHitWindows.Value)
+                        hit.HitWindows.SetLegacy(true);
+                    break;
+            }
         }
     }
 }

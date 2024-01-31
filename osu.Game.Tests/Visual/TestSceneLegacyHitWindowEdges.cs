@@ -9,14 +9,17 @@ using osu.Game.Beatmaps;
 using osu.Game.Replays;
 using osu.Game.Rulesets.Judgements;
 using osu.Game.Rulesets.Mania;
+using osu.Game.Rulesets.Mania.Mods;
 using osu.Game.Rulesets.Mania.Objects;
 using osu.Game.Rulesets.Mania.Replays;
 using osu.Game.Rulesets.Osu;
+using osu.Game.Rulesets.Osu.Mods;
 using osu.Game.Rulesets.Osu.Objects;
 using osu.Game.Rulesets.Osu.Replays;
 using osu.Game.Rulesets.Replays;
 using osu.Game.Rulesets.Scoring;
 using osu.Game.Rulesets.Taiko;
+using osu.Game.Rulesets.Taiko.Mods;
 using osu.Game.Rulesets.Taiko.Objects;
 using osu.Game.Rulesets.Taiko.Replays;
 using osu.Game.Scoring;
@@ -225,6 +228,7 @@ namespace osu.Game.Tests.Visual
                 });
 
                 var p = new ScoreAccessibleReplayPlayer(new Score { Replay = new Replay { Frames = generateOsuFrames(overallDifficulty) } });
+                SelectedMods.Value = new[] { new OsuModClassic() };
 
                 p.OnLoadComplete += _ =>
                 {
@@ -263,6 +267,7 @@ namespace osu.Game.Tests.Visual
                 });
 
                 var p = new ScoreAccessibleReplayPlayer(new Score { Replay = new Replay { Frames = generateTaikoFrames(overallDifficulty) } });
+                SelectedMods.Value = new[] { new TaikoModClassic() };
 
                 p.OnLoadComplete += _ =>
                 {
@@ -301,6 +306,7 @@ namespace osu.Game.Tests.Visual
                 });
 
                 var p = new ScoreAccessibleReplayPlayer(new Score { Replay = new Replay { Frames = generateManiaFrames(overallDifficulty) } });
+                SelectedMods.Value = new[] { new ManiaModClassic() };
 
                 p.OnLoadComplete += _ =>
                 {
@@ -338,15 +344,15 @@ namespace osu.Game.Tests.Visual
 
         private class OsuStableHitWindows : HitWindows
         {
-            internal static readonly DifficultyRange[] OSU_STABLE_RANGES =
+            internal static readonly HitWindowRange[] OSU_STABLE_RANGES =
             {
-                new DifficultyRange(HitResult.Great, 80, 50, 20),
-                new DifficultyRange(HitResult.Ok, 140, 100, 60),
-                new DifficultyRange(HitResult.Meh, 200, 150, 100),
-                new DifficultyRange(HitResult.Miss, 400, 400, 400)
+                new HitWindowRange(HitResult.Great, 80, 50, 20),
+                new HitWindowRange(HitResult.Ok, 140, 100, 60),
+                new HitWindowRange(HitResult.Meh, 200, 150, 100),
+                new HitWindowRange(HitResult.Miss, 400, 400, 400)
             };
 
-            protected override DifficultyRange[] GetRanges()
+            protected override HitWindowRange[] GetRanges()
             {
                 return OSU_STABLE_RANGES;
             }
@@ -354,14 +360,14 @@ namespace osu.Game.Tests.Visual
 
         private class TaikoStableHitWindows : HitWindows
         {
-            internal static readonly DifficultyRange[] TAIKO_STABLE_RANGES =
+            internal static readonly HitWindowRange[] TAIKO_STABLE_RANGES =
             {
-                new DifficultyRange(HitResult.Great, 50, 35, 20),
-                new DifficultyRange(HitResult.Ok, 120, 80, 50),
-                new DifficultyRange(HitResult.Miss, 135, 95, 70)
+                new HitWindowRange(HitResult.Great, 50, 35, 20),
+                new HitWindowRange(HitResult.Ok, 120, 80, 50),
+                new HitWindowRange(HitResult.Miss, 135, 95, 70)
             };
 
-            protected override DifficultyRange[] GetRanges()
+            protected override HitWindowRange[] GetRanges()
             {
                 return TAIKO_STABLE_RANGES;
             }
@@ -369,18 +375,18 @@ namespace osu.Game.Tests.Visual
 
         private class ManiaStableHitWindows : HitWindows
         {
-            internal static readonly DifficultyRange[]
+            internal static readonly HitWindowRange[]
                 MANIA_STABLE_NOMOD_RANGES = // will not work as in-game on non-100% speed rate, since in-game, osu!mania keeps OD hit windows constant with speed rate
                 {
-                    new DifficultyRange(HitResult.Perfect, 16, 16, 16),
-                    new DifficultyRange(HitResult.Great, 64, 49, 34),
-                    new DifficultyRange(HitResult.Good, 97, 82, 67),
-                    new DifficultyRange(HitResult.Ok, 127, 112, 97),
-                    new DifficultyRange(HitResult.Meh, 151, 136, 121),
-                    new DifficultyRange(HitResult.Miss, 188, 173, 158)
+                    new HitWindowRange(HitResult.Perfect, 16, 16, 16),
+                    new HitWindowRange(HitResult.Great, 64, 49, 34),
+                    new HitWindowRange(HitResult.Good, 97, 82, 67),
+                    new HitWindowRange(HitResult.Ok, 127, 112, 97),
+                    new HitWindowRange(HitResult.Meh, 151, 136, 121),
+                    new HitWindowRange(HitResult.Miss, 188, 173, 158)
                 };
 
-            protected override DifficultyRange[] GetRanges()
+            protected override HitWindowRange[] GetRanges()
             {
                 return MANIA_STABLE_NOMOD_RANGES;
             }

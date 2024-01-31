@@ -28,6 +28,9 @@ namespace osu.Game.Rulesets.Osu.Mods
         [SettingSource("Apply classic note lock", "Applies note lock to the full hit window.")]
         public Bindable<bool> ClassicNoteLock { get; } = new BindableBool(true);
 
+        [SettingSource("Legacy hit windows", "Uses half-integer legacy hit windows.")]
+        public Bindable<bool> LegacyHitWindows { get; } = new BindableBool(true);
+
         [SettingSource("Always play a slider's tail sample", "Always plays a slider's tail sample regardless of whether it was hit or not.")]
         public Bindable<bool> AlwaysPlayTailSample { get; } = new BindableBool(true);
 
@@ -45,6 +48,11 @@ namespace osu.Game.Rulesets.Osu.Mods
             {
                 case Slider slider:
                     slider.ClassicSliderBehaviour = NoSliderHeadAccuracy.Value;
+                    break;
+
+                case HitCircle hitCircle:
+                    if (LegacyHitWindows.Value)
+                        hitCircle.HitWindows.SetLegacy(true);
                     break;
             }
         }
