@@ -81,6 +81,7 @@ namespace osu.Game.Overlays.SkinEditor
         private readonly Bindable<SkinComponentsContainerLookup?> selectedTarget = new Bindable<SkinComponentsContainerLookup?>();
 
         private bool hasBegunMutating;
+        private bool userMutated;
 
         private Container? content;
 
@@ -258,6 +259,7 @@ namespace osu.Game.Overlays.SkinEditor
             // probably something which will be factored out in a future database refactor so not too concerning for now.
             currentSkin.BindValueChanged(_ =>
             {
+                userMutated = false;
                 hasBegunMutating = false;
                 Scheduler.AddOnce(skinChanged);
             }, true);
@@ -277,8 +279,7 @@ namespace osu.Game.Overlays.SkinEditor
             }, keep, update));
         }
 
-        // figured out the issue, I just can't figure out how I would know if the user has mutated the state (a player has changed something in the editor)
-        public bool ShouldRequest() => true;
+        public bool ShouldRequest() => userMutated;
 
         public bool OnPressed(KeyBindingPressEvent<PlatformAction> e)
         {
@@ -766,7 +767,13 @@ namespace osu.Game.Overlays.SkinEditor
             (beginChangeHandler = changeHandler)?.BeginChange();
         }
 
-        public void EndChange() => beginChangeHandler?.EndChange();
+        public void EndChange()
+        {
+            userMutated = true;
+
+            beginChangeHandler?.EndChange();
+        }
+
         public void SaveState() => changeHandler?.SaveState();
 
         #endregion
