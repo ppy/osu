@@ -138,8 +138,7 @@ namespace osu.Game.Rulesets.Scoring
         ComboBreak,
 
         /// <summary>
-        /// A special tick judgement to increase the valuation of the final tick of a slider.
-        /// The default minimum result is <see cref="IgnoreMiss"/>, but may be overridden to <see cref="LargeTickMiss"/>.
+        /// A special judgement similar to <see cref="LargeTickHit"/> that's used to increase the valuation of the final tick of a slider.
         /// </summary>
         [EnumMember(Value = "slider_tail_hit")]
         [Order(8)]

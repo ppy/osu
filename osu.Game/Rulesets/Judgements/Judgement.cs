@@ -73,10 +73,8 @@ namespace osu.Game.Rulesets.Judgements
                         return HitResult.SmallTickMiss;
 
                     case HitResult.LargeTickHit:
-                        return HitResult.LargeTickMiss;
-
                     case HitResult.SliderTailHit:
-                        return HitResult.IgnoreMiss;
+                        return HitResult.LargeTickMiss;
 
                     default:
                         return HitResult.Miss;
