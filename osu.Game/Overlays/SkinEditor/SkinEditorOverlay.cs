@@ -96,6 +96,15 @@ namespace osu.Game.Overlays.SkinEditor
             return false;
         }
 
+        public bool ShouldRequest()
+        {
+            if (skinEditor == null) return false;
+
+            return skinEditor.ShouldRequest();
+        }
+
+        public void RequestChange(Action callback) => skinEditor?.RequestChange(callback);
+
         protected override void PopIn()
         {
             globallyDisableBeatmapSkinSetting();

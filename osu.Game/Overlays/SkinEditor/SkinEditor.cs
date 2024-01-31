@@ -71,6 +71,10 @@ namespace osu.Game.Overlays.SkinEditor
         [Resolved]
         private SkinEditorOverlay? skinEditorOverlay { get; set; }
 
+        [Resolved]
+        private IDialogOverlay? dialogOverlay { get; set; }
+
+
         [Cached]
         private readonly OverlayColourProvider colourProvider = new OverlayColourProvider(OverlayColourScheme.Blue);
 
@@ -99,9 +103,6 @@ namespace osu.Game.Overlays.SkinEditor
 
         [Resolved]
         private OnScreenDisplay? onScreenDisplay { get; set; }
-
-        [Resolved]
-        private IDialogOverlay? dialogOverlay { get; set; }
 
         public SkinEditor()
         {
@@ -264,6 +265,23 @@ namespace osu.Game.Overlays.SkinEditor
             SelectedComponents.BindCollectionChanged((_, _) => Scheduler.AddOnce(populateSettings), true);
 
             selectedTarget.BindValueChanged(targetChanged, true);
+        }
+
+        public void RequestChange(Action callback)
+        {
+            requestSaveConfirmation(() =>
+            {
+                Save();
+
+                callback.Invoke();
+            }, callback);
+        }
+
+        public bool ShouldRequest() => hasBegunMutating;
+
+        private void requestSaveConfirmation(Action confirmed, Action cancelled)
+        {
+            dialogOverlay?.Push(new ConfirmDialog("Do you wish to save your work?", confirmed, cancelled));
         }
 
         public bool OnPressed(KeyBindingPressEvent<PlatformAction> e)

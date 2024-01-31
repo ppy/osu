@@ -6,6 +6,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+
 using JetBrains.Annotations;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
@@ -54,6 +55,8 @@ namespace osu.Game.Overlays.Settings.Sections
         [BackgroundDependencyLoader(permitNulls: true)]
         private void load([CanBeNull] SkinEditorOverlay skinEditor)
         {
+            Bindable<Live<SkinInfo>> held = skins.CurrentSkinInfo.GetUnboundCopy();
+
             Children = new Drawable[]
             {
                 skinDropdown = new SkinSettingsDropdown
@@ -61,7 +64,7 @@ namespace osu.Game.Overlays.Settings.Sections
                     AlwaysShowSearchBar = true,
                     AllowNonContiguousMatching = true,
                     LabelText = SkinSettingsStrings.CurrentSkin,
-                    Current = skins.CurrentSkinInfo,
+                    Current = held,
                     Keywords = new[] { @"skins" },
                 },
                 new SettingsButton
@@ -72,6 +75,24 @@ namespace osu.Game.Overlays.Settings.Sections
                 new ExportSkinButton(),
                 new DeleteSkinButton(),
             };
+
+            held.BindValueChanged(_ =>
+            {
+                Logger logger = Logger.GetLogger("Debug");
+
+                logger.Add(skinEditor.ShouldRequest().ToString());
+                if (skinEditor.ShouldRequest())
+                {
+                    skinEditor.RequestChange(() =>
+                    {
+                        skins.CurrentSkinInfo.Value = held.Value;
+                    });
+
+                    return;
+                }
+
+                skins.CurrentSkinInfo.Value = held.Value;
+            });
         }
 
         protected override void LoadComplete()

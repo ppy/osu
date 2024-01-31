@@ -174,6 +174,11 @@ namespace osu.Game.Localisation
         /// </summary>
         public static LocalisableString General => new TranslatableString(getKey(@"general"), @"General");
 
+        /// <summary>
+        /// "Do you wish to save your work?"
+        /// </summary>
+        public static LocalisableString DoYouWishToSave => new TranslatableString(getKey(@"do_you_wish_to_save"), @"Do you wish to save your work?");
+
         private static string getKey(string key) => $@"{prefix}:{key}";
     }
 }
