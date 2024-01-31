@@ -35,7 +35,7 @@ namespace osu.Game.Rulesets.Objects.Pooling
         /// <remarks>
         /// The enumeration order is undefined.
         /// </remarks>
-        public IEnumerable<(TEntry Entry, TDrawable Drawable)> AliveEntries => aliveDrawableMap.Select(x => (x.Key, x.Value));
+        public IEnumerable<(TEntry Entry, TDrawable Drawable)> AliveEntries => AliveDrawableMap.Select(x => (x.Key, x.Value));
 
         /// <summary>
         /// Whether to remove an entry when clock goes backward and crossed its <see cref="LifetimeEntry.LifetimeStart"/>.
@@ -53,7 +53,7 @@ namespace osu.Game.Rulesets.Objects.Pooling
         /// </summary>
         internal double FutureLifetimeExtension { get; set; }
 
-        private readonly Dictionary<TEntry, TDrawable> aliveDrawableMap = new Dictionary<TEntry, TDrawable>();
+        public readonly Dictionary<TEntry, TDrawable> AliveDrawableMap = new Dictionary<TEntry, TDrawable>();
         private readonly HashSet<TEntry> allEntries = new HashSet<TEntry>();
 
         private readonly LifetimeEntryManager lifetimeManager = new LifetimeEntryManager();
@@ -101,10 +101,10 @@ namespace osu.Game.Rulesets.Objects.Pooling
         private void entryBecameAlive(LifetimeEntry lifetimeEntry)
         {
             var entry = (TEntry)lifetimeEntry;
-            Debug.Assert(!aliveDrawableMap.ContainsKey(entry));
+            Debug.Assert(!AliveDrawableMap.ContainsKey(entry));
 
             TDrawable drawable = GetDrawable(entry);
-            aliveDrawableMap[entry] = drawable;
+            AliveDrawableMap[entry] = drawable;
             AddDrawable(entry, drawable);
         }
 
@@ -119,10 +119,10 @@ namespace osu.Game.Rulesets.Objects.Pooling
         private void entryBecameDead(LifetimeEntry lifetimeEntry)
         {
             var entry = (TEntry)lifetimeEntry;
-            Debug.Assert(aliveDrawableMap.ContainsKey(entry));
+            Debug.Assert(AliveDrawableMap.ContainsKey(entry));
 
-            TDrawable drawable = aliveDrawableMap[entry];
-            aliveDrawableMap.Remove(entry);
+            TDrawable drawable = AliveDrawableMap[entry];
+            AliveDrawableMap.Remove(entry);
             RemoveDrawable(entry, drawable);
         }
 
@@ -148,7 +148,7 @@ namespace osu.Game.Rulesets.Objects.Pooling
             foreach (var entry in Entries.ToArray())
                 Remove(entry);
 
-            Debug.Assert(aliveDrawableMap.Count == 0);
+            Debug.Assert(AliveDrawableMap.Count == 0);
         }
 
         protected override bool CheckChildrenLife()
