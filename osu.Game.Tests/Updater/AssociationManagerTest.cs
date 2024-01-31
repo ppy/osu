@@ -15,21 +15,18 @@ namespace osu.Game.Tests.Updater
         AssociationManager manager = new AssociationManager();
 
         [Test]
-        [SupportedOSPlatform("windows")]
         public void TestRemoveAssociations()
         {
             manager.RemoveFileAssociations();
         }
 
         [Test]
-        [SupportedOSPlatform("windows")]
         public void TestSetAssociations()
         {
             manager.InitializeFileAssociations();
         }
 
         [Test]
-        [SupportedOSPlatform("windows")]
         public void TestEnsureAssociations()
         {
             bool isensured = manager.EnsureAssociationsSet();
