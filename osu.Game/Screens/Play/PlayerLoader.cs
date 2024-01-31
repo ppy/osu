@@ -544,14 +544,14 @@ namespace osu.Game.Screens.Play
 
         private int restartCount;
 
-        private const double volume_requirement = 0.01;
+        private const double volume_requirement = 1e-3; // -60 dB
 
         private void showMuteWarningIfNeeded()
         {
             if (!muteWarningShownOnce.Value)
             {
                 // Checks if the notification has not been shown yet and also if master volume is muted, track/music volume is muted or if the whole game is muted.
-                if (volumeOverlay?.IsMuted.Value == true || audioManager.Volume.Value <= volume_requirement || audioManager.VolumeTrack.Value <= volume_requirement)
+                if (volumeOverlay?.IsMuted.Value == true || audioManager.Volume.Value * audioManager.VolumeTrack.Value <= volume_requirement)
                 {
                     notificationOverlay?.Post(new MutedNotification());
                     muteWarningShownOnce.Value = true;
@@ -581,11 +581,20 @@ namespace osu.Game.Screens.Play
                     volumeOverlay.IsMuted.Value = false;
 
                     // Check values before resetting, as the user may have only had mute enabled, in which case we might not need to adjust volumes.
-                    // Note that we only restore halfway to ensure the user isn't suddenly overloaded by unexpectedly high volume.
-                    if (audioManager.Volume.Value <= volume_requirement)
-                        audioManager.Volume.Value = 0.5f;
-                    if (audioManager.VolumeTrack.Value <= volume_requirement)
-                        audioManager.VolumeTrack.Value = 0.5f;
+                    // Note that we only restore to -30 dB to ensure the user isn't suddenly overloaded by unexpectedly high volume.
+                    if (audioManager.Volume.Value * audioManager.VolumeTrack.Value <= volume_requirement)
+                    {
+                        // Prioritize increasing music over master volume as to avoid also increasing effects volume.
+                        const double target = 0.031622776601684; // 10 ^ (-30 / 20)
+                        double result = target / Math.Max(0.01, audioManager.Volume.Value);
+                        if (result > 1)
+                        {
+                            audioManager.Volume.Value = target;
+                            audioManager.VolumeTrack.Value = 1;
+                        }
+                        else
+                            audioManager.VolumeTrack.Value = result;
+                    }
 
                     return true;
                 };

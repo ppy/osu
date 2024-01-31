@@ -264,15 +264,23 @@ namespace osu.Game.Tests.Visual.Gameplay
         }
 
         [Test]
-        public void TestMutedNotificationMasterVolume()
+        public void TestMutedNotificationHighMasterVolume()
         {
-            addVolumeSteps("master volume", () => audioManager.Volume.Value = 0, () => audioManager.Volume.Value == 0.5);
+            addVolumeSteps("high master volume", () =>
+            {
+                audioManager.Volume.Value = 0.1;
+                audioManager.VolumeTrack.Value = 0.01;
+            }, () => audioManager.Volume.Value == 0.1 && audioManager.VolumeTrack.Value == 0.32);
         }
 
         [Test]
-        public void TestMutedNotificationTrackVolume()
+        public void TestMutedNotificationLowMasterVolume()
         {
-            addVolumeSteps("music volume", () => audioManager.VolumeTrack.Value = 0, () => audioManager.VolumeTrack.Value == 0.5);
+            addVolumeSteps("low master volume", () =>
+            {
+                audioManager.Volume.Value = 0.01;
+                audioManager.VolumeTrack.Value = 0.1;
+            }, () => audioManager.Volume.Value == 0.03 && audioManager.VolumeTrack.Value == 1);
         }
 
         [Test]
