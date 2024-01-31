@@ -186,9 +186,9 @@ namespace osu.Game.Rulesets.UI.Scrolling
             // to prevent hit objects displayed in a wrong position for one frame.
             // Only AliveEntries need to be considered for layout (reduces overhead in the case of scroll speed changes).
             // We are not using AliveObjects directly to avoid selection/sorting overhead since we don't care about the order at which positions will be updated.
-            foreach (var entry in AliveEntries)
+            foreach (var entry in AliveDrawableMap)
             {
-                var obj = entry.Drawable;
+                var obj = entry.Value;
 
                 updatePosition(obj, Time.Current);
 
