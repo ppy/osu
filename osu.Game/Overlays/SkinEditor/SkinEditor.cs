@@ -75,7 +75,6 @@ namespace osu.Game.Overlays.SkinEditor
         [Resolved]
         private IDialogOverlay? dialogOverlay { get; set; }
 
-
         [Cached]
         private readonly OverlayColourProvider colourProvider = new OverlayColourProvider(OverlayColourScheme.Blue);
 
@@ -278,7 +277,8 @@ namespace osu.Game.Overlays.SkinEditor
             }, keep, update));
         }
 
-        public bool ShouldRequest() => hasBegunMutating;
+        // figured out the issue, I just can't figure out how I would know if the user has mutated the state (a player has changed something in the editor)
+        public bool ShouldRequest() => true;
 
         public bool OnPressed(KeyBindingPressEvent<PlatformAction> e)
         {
@@ -431,6 +431,7 @@ namespace osu.Game.Overlays.SkinEditor
 
             if (targetContainer != null)
                 changeHandler = new SkinEditorChangeHandler(targetContainer);
+
             hasBegunMutating = true;
         }
 
