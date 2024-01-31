@@ -33,6 +33,7 @@ using osu.Game.Screens.Edit;
 using osu.Game.Screens.Edit.Components;
 using osu.Game.Screens.Edit.Components.Menus;
 using osu.Game.Skinning;
+using osu.Framework.Graphics.Sprites;
 
 namespace osu.Game.Overlays.SkinEditor
 {
@@ -267,22 +268,17 @@ namespace osu.Game.Overlays.SkinEditor
             selectedTarget.BindValueChanged(targetChanged, true);
         }
 
-        public void RequestChange(Action callback)
+        public void RequestChange(Action? update, Action? keep)
         {
-            requestSaveConfirmation(() =>
+            dialogOverlay?.Push(new SaveChangesDialog(() =>
             {
                 Save();
 
-                callback.Invoke();
-            }, callback);
+                update?.Invoke();
+            }, keep, update));
         }
 
         public bool ShouldRequest() => hasBegunMutating;
-
-        private void requestSaveConfirmation(Action confirmed, Action cancelled)
-        {
-            dialogOverlay?.Push(new ConfirmDialog("Do you wish to save your work?", confirmed, cancelled));
-        }
 
         public bool OnPressed(KeyBindingPressEvent<PlatformAction> e)
         {
@@ -719,6 +715,36 @@ namespace osu.Game.Overlays.SkinEditor
                 HeaderText = CommonStrings.RevertToDefault;
                 BodyText = SkinEditorStrings.RevertToDefaultDescription;
                 DangerousAction = revert;
+            }
+        }
+
+        public partial class SaveChangesDialog : PopupDialog
+        {
+            public SaveChangesDialog(Action? save, Action? keep, Action? cancel)
+            {
+                HeaderText = EditorDialogsStrings.SaveDialogHeader;
+
+                Icon = FontAwesome.Regular.Save;
+
+                Buttons = new PopupDialogButton[]
+                {
+                    new PopupDialogOkButton
+                    {
+                        Text = EditorDialogsStrings.Save,
+                        Action = () => save?.Invoke()
+                    },
+                    new PopupDialogCancelButton
+                    {
+                        // Do I make a new localizable for this? it wont fit here.
+                        Text = EditorDialogsStrings.KeepEditing,
+                        Action = () => keep?.Invoke()
+                    },
+                    new PopupDialogDangerousButton
+                    {
+                        Text = EditorDialogsStrings.ForgetAllChanges,
+                        Action = () => cancel?.Invoke()
+                    }
+                };
             }
         }
 

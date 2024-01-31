@@ -103,7 +103,7 @@ namespace osu.Game.Overlays.SkinEditor
             return skinEditor.ShouldRequest();
         }
 
-        public void RequestChange(Action callback) => skinEditor?.RequestChange(callback);
+        public void RequestChange(Action? update, Action? keep) => skinEditor?.RequestChange(update, keep);
 
         protected override void PopIn()
         {

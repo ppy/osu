@@ -76,22 +76,18 @@ namespace osu.Game.Overlays.Settings.Sections
                 new DeleteSkinButton(),
             };
 
+            Action update = () => skins.CurrentSkinInfo.Value = held.Value;
+
             held.BindValueChanged(_ =>
             {
-                Logger logger = Logger.GetLogger("Debug");
-
-                logger.Add(skinEditor.ShouldRequest().ToString());
                 if (skinEditor.ShouldRequest())
                 {
-                    skinEditor.RequestChange(() =>
-                    {
-                        skins.CurrentSkinInfo.Value = held.Value;
-                    });
+                    skinEditor.RequestChange(update, null);
 
                     return;
                 }
 
-                skins.CurrentSkinInfo.Value = held.Value;
+                update.Invoke();
             });
         }
 
