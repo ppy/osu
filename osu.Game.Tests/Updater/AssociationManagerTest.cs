@@ -9,13 +9,15 @@ using osu.Game.Updater;
 namespace osu.Game.Tests.Updater
 {
     [TestFixture]
+    [SupportedOSPlatform("windows")]
     public class AssociationManagerTest
     {
+        AssociationManager manager = new AssociationManager();
+
         [Test]
         [SupportedOSPlatform("windows")]
         public void TestRemoveAssociations()
         {
-            var manager = new AssociationManager();
             manager.RemoveFileAssociations();
         }
 
@@ -23,7 +25,6 @@ namespace osu.Game.Tests.Updater
         [SupportedOSPlatform("windows")]
         public void TestSetAssociations()
         {
-            var manager = new AssociationManager();
             manager.InitializeFileAssociations();
         }
 
@@ -31,7 +32,6 @@ namespace osu.Game.Tests.Updater
         [SupportedOSPlatform("windows")]
         public void TestEnsureAssociations()
         {
-            var manager = new AssociationManager();
             bool isensured = manager.EnsureAssociationsSet();
 
             if (isensured)
