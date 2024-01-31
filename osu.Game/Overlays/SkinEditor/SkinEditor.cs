@@ -735,16 +735,15 @@ namespace osu.Game.Overlays.SkinEditor
                         Text = EditorDialogsStrings.Save,
                         Action = () => save?.Invoke()
                     },
-                    new PopupDialogCancelButton
-                    {
-                        // Do I make a new localizable for this? it wont fit here.
-                        Text = EditorDialogsStrings.KeepEditing,
-                        Action = () => keep?.Invoke()
-                    },
                     new PopupDialogDangerousButton
                     {
                         Text = EditorDialogsStrings.ForgetAllChanges,
                         Action = () => cancel?.Invoke()
+                    },
+                    new PopupDialogCancelButton
+                    {
+                        Text = EditorDialogsStrings.ContinueEditing,
+                        Action = () => keep?.Invoke()
                     }
                 };
             }
