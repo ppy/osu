@@ -2,6 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Runtime.InteropServices;
 using System.Threading.Tasks;
@@ -46,7 +47,7 @@ namespace osu.Game.Updater
                 version = version.Split('-').First();
                 string latestTagName = latest.TagName.Split('-').First();
 
-                if (latestTagName != version)
+                if (latestTagName != version && tryGetBestUrl(latest, out string? url))
                 {
                     Notifications.Post(new SimpleNotification
                     {
@@ -55,7 +56,7 @@ namespace osu.Game.Updater
                         Icon = FontAwesome.Solid.Download,
                         Activated = () =>
                         {
-                            host.OpenUrlExternally(getBestUrl(latest));
+                            host.OpenUrlExternally(url);
                             return true;
                         }
                     });
@@ -72,8 +73,9 @@ namespace osu.Game.Updater
             return false;
         }
 
-        private string getBestUrl(GitHubRelease release)
+        private bool tryGetBestUrl(GitHubRelease release, [NotNullWhen(true)] out string? url)
         {
+            url = null;
             GitHubAsset? bestAsset = null;
 
             switch (RuntimeInfo.OS)
@@ -94,15 +96,18 @@ namespace osu.Game.Updater
                 case RuntimeInfo.Platform.iOS:
                     // iOS releases are available via testflight. this link seems to work well enough for now.
                     // see https://stackoverflow.com/a/32960501
-                    return "itms-beta://beta.itunes.apple.com/v1/app/1447765923";
+                    url = "itms-beta://beta.itunes.apple.com/v1/app/1447765923";
+                    break;
 
                 case RuntimeInfo.Platform.Android:
-                    // on our testing device this causes the download to magically disappear.
+                    // on our testing device using the .apk URL causes the download to magically disappear.
                     //bestAsset = release.Assets?.Find(f => f.Name.EndsWith(".apk"));
+                    url = release.HtmlUrl;
                     break;
             }
 
-            return bestAsset?.BrowserDownloadUrl ?? release.HtmlUrl;
+            url ??= bestAsset?.BrowserDownloadUrl;
+            return url != null;
         }
     }
 }
