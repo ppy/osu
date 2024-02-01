@@ -456,7 +456,7 @@ namespace osu.Desktop
         [MarshalAs(UnmanagedType.ByValTStr, SizeConst = NVAPI.UNICODE_STRING_MAX)]
         public string ProfileName;
 
-        [MarshalAs(UnmanagedType.ByValArray)]
+        [MarshalAs(UnmanagedType.ByValArray, SizeConst = 32)]
         public uint[] GPUSupport;
 
         public uint IsPredefined;
