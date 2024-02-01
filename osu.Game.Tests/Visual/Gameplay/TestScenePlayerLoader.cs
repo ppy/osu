@@ -24,9 +24,11 @@ using osu.Game.Rulesets.Osu;
 using osu.Game.Rulesets.Osu.Mods;
 using osu.Game.Rulesets.Scoring;
 using osu.Game.Scoring;
+using osu.Game.Screens.Menu;
 using osu.Game.Screens.Play;
 using osu.Game.Screens.Play.PlayerSettings;
 using osu.Game.Utils;
+using osuTK;
 using osuTK.Input;
 
 namespace osu.Game.Tests.Visual.Gameplay
@@ -53,6 +55,9 @@ namespace osu.Game.Tests.Visual.Gameplay
         [Cached]
         private readonly VolumeOverlay volumeOverlay;
 
+        [Cached]
+        private readonly OsuLogo logo;
+
         [Cached(typeof(BatteryInfo))]
         private readonly LocalBatteryInfo batteryInfo = new LocalBatteryInfo();
 
@@ -76,7 +81,14 @@ namespace osu.Game.Tests.Visual.Gameplay
                     Anchor = Anchor.TopLeft,
                     Origin = Anchor.TopLeft,
                 },
-                changelogOverlay = new ChangelogOverlay()
+                changelogOverlay = new ChangelogOverlay(),
+                logo = new OsuLogo
+                {
+                    Anchor = Anchor.BottomRight,
+                    Origin = Anchor.BottomRight,
+                    Scale = new Vector2(0.5f),
+                    Position = new Vector2(128f),
+                },
             });
         }
 
@@ -202,6 +214,36 @@ namespace osu.Game.Tests.Visual.Gameplay
 
             AddStep("hide overlay", () => changelogOverlay.Hide());
             AddUntilStep("loads after idle", () => !loader.IsCurrentScreen());
+        }
+
+        [Test]
+        public void TestLoadNotBlockedOnOsuLogo()
+        {
+            AddStep("load dummy beatmap", () => resetPlayer(false));
+            AddUntilStep("wait for current", () => loader.IsCurrentScreen());
+
+            AddUntilStep("wait for load ready", () =>
+            {
+                moveMouse();
+                return player?.LoadState == LoadState.Ready;
+            });
+
+            // move mouse in logo while waiting for load to still proceed (it shouldn't be blocked when hovering logo).
+            AddUntilStep("move mouse in logo", () =>
+            {
+                moveMouse();
+                return !loader.IsCurrentScreen();
+            });
+
+            void moveMouse()
+            {
+                notificationOverlay.State.Value = Visibility.Hidden;
+
+                InputManager.MoveMouseTo(
+                    logo.ScreenSpaceDrawQuad.TopLeft
+                    + (logo.ScreenSpaceDrawQuad.BottomRight - logo.ScreenSpaceDrawQuad.TopLeft)
+                    * RNG.NextSingle(0.3f, 0.7f));
+            }
         }
 
         [Test]
