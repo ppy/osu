@@ -771,7 +771,6 @@ namespace osu.Game.Overlays.SkinEditor
 
         public void EndChange()
         {
-            // We will modify the "Mutated" value here, to handle most changes
             Mutated = true;
 
             beginChangeHandler?.EndChange();
