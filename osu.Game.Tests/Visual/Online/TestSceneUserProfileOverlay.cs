@@ -52,7 +52,11 @@ namespace osu.Game.Tests.Visual.Online
             AddStep("show user", () => profile.ShowUser(new APIUser { Id = 1 }));
             AddToggleStep("toggle visibility", visible => profile.State.Value = visible ? Visibility.Visible : Visibility.Hidden);
             AddStep("log out", () => dummyAPI.Logout());
-            AddStep("log back in", () => dummyAPI.Login("username", "password"));
+            AddStep("log back in", () =>
+            {
+                dummyAPI.Login("username", "password");
+                dummyAPI.AuthenticateSecondFactor("abcdefgh");
+            });
         }
 
         [Test]
@@ -98,7 +102,11 @@ namespace osu.Game.Tests.Visual.Online
             });
             AddStep("logout", () => dummyAPI.Logout());
             AddStep("show user", () => profile.ShowUser(new APIUser { Id = 1 }));
-            AddStep("login", () => dummyAPI.Login("username", "password"));
+            AddStep("login", () =>
+            {
+                dummyAPI.Login("username", "password");
+                dummyAPI.AuthenticateSecondFactor("abcdefgh");
+            });
             AddWaitStep("wait some", 3);
             AddStep("complete request", () => pendingRequest.TriggerSuccess(TEST_USER));
         }
