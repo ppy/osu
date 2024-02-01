@@ -94,15 +94,18 @@ namespace osu.Game.Updater
                     break;
 
                 case RuntimeInfo.Platform.iOS:
-                    // iOS releases are available via testflight. this link seems to work well enough for now.
-                    // see https://stackoverflow.com/a/32960501
-                    url = "itms-beta://beta.itunes.apple.com/v1/app/1447765923";
+                    if (release.Assets?.Exists(f => f.Name.EndsWith(".ipa", StringComparison.Ordinal)) == true)
+                        // iOS releases are available via testflight. this link seems to work well enough for now.
+                        // see https://stackoverflow.com/a/32960501
+                        url = "itms-beta://beta.itunes.apple.com/v1/app/1447765923";
+
                     break;
 
                 case RuntimeInfo.Platform.Android:
-                    // on our testing device using the .apk URL causes the download to magically disappear.
-                    //bestAsset = release.Assets?.Find(f => f.Name.EndsWith(".apk"));
-                    url = release.HtmlUrl;
+                    if (release.Assets?.Exists(f => f.Name.EndsWith(".apk", StringComparison.Ordinal)) == true)
+                        // on our testing device using the .apk URL causes the download to magically disappear.
+                        url = release.HtmlUrl;
+
                     break;
             }
 
