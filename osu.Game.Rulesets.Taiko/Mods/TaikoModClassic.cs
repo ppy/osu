@@ -2,9 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using osu.Game.Rulesets.Mods;
-using osu.Game.Rulesets.Objects.Drawables;
 using osu.Game.Rulesets.Taiko.Objects;
-using osu.Game.Rulesets.Taiko.Objects.Drawables;
 using osu.Game.Rulesets.Taiko.UI;
 using osu.Game.Rulesets.UI;
 
