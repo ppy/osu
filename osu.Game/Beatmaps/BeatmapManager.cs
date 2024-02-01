@@ -47,6 +47,8 @@ namespace osu.Game.Beatmaps
 
         public ProcessBeatmapDelegate? ProcessBeatmap { private get; set; }
 
+        private readonly Queue<Task> execution;
+
         public override bool PauseImports
         {
             get => base.PauseImports;
@@ -89,6 +91,8 @@ namespace osu.Game.Beatmaps
             {
                 PostNotification = obj => PostNotification?.Invoke(obj)
             };
+
+            execution = new Queue<Task>();
         }
 
         protected virtual WorkingBeatmapCache CreateWorkingBeatmapCache(AudioManager audioManager, IResourceStore<byte[]> resources, IResourceStore<byte[]> storage, WorkingBeatmap? defaultBeatmap,
@@ -301,8 +305,11 @@ namespace osu.Game.Beatmaps
         /// <param name="beatmapInfo">The <see cref="BeatmapInfo"/> to save the content against. The file referenced by <see cref="BeatmapInfo.Path"/> will be replaced.</param>
         /// <param name="beatmapContent">The <see cref="IBeatmap"/> content to write.</param>
         /// <param name="beatmapSkin">The beatmap <see cref="ISkin"/> content to write, null if to be omitted.</param>
-        public virtual void Save(BeatmapInfo beatmapInfo, IBeatmap beatmapContent, ISkin? beatmapSkin = null) =>
-            save(beatmapInfo, beatmapContent, beatmapSkin, transferCollections: true);
+        public virtual void Save(BeatmapInfo beatmapInfo, IBeatmap beatmapContent, ISkin? beatmapSkin = null)
+        {
+            execution.Enqueue(new Task(() => save(beatmapInfo, beatmapContent, beatmapSkin, transferCollections: true)));
+            Task.WhenAll(execution);
+        }
 
         public void DeleteAllVideos()
         {
@@ -408,9 +415,25 @@ namespace osu.Game.Beatmaps
         public Task<Live<BeatmapSetInfo>?> ImportAsUpdate(ProgressNotification notification, ImportTask importTask, BeatmapSetInfo original) =>
             beatmapImporter.ImportAsUpdate(notification, importTask, original);
 
-        public Task Export(BeatmapSetInfo beatmap) => beatmapExporter.ExportAsync(beatmap.ToLive(Realm));
+        public Task Export(BeatmapSetInfo beatmap)
+        {
+            Task task = beatmapExporter.ExportAsync(beatmap.ToLive(Realm));
 
-        public Task ExportLegacy(BeatmapSetInfo beatmap) => legacyBeatmapExporter.ExportAsync(beatmap.ToLive(Realm));
+            execution.Enqueue(task);
+            Task.WhenAll(execution);
+
+            return task;
+        }
+
+        public Task ExportLegacy(BeatmapSetInfo beatmap)
+        {
+            Task task = legacyBeatmapExporter.ExportAsync(beatmap.ToLive(Realm));
+
+            execution.Enqueue(task);
+            Task.WhenAll(execution);
+
+            return task;
+        }
 
         private void updateHashAndMarkDirty(BeatmapSetInfo setInfo)
         {
