@@ -27,6 +27,7 @@ using osu.Game.Rulesets.Scoring;
 using osu.Game.Rulesets.UI;
 using osu.Game.Scoring;
 using osu.Game.Screens.Edit.Setup;
+using osu.Game.Screens.Play.PlayerSettings;
 using osu.Game.Screens.Ranking.Statistics;
 using osu.Game.Skinning;
 using osu.Game.Users;
@@ -402,5 +403,7 @@ namespace osu.Game.Rulesets
         /// Can be overridden to alter the difficulty section to the editor beatmap setup screen.
         /// </summary>
         public virtual DifficultySection? CreateEditorDifficultySection() => null;
+    
+        public virtual AnalysisSettings? CreateAnalysisSettings(DrawableRuleset drawableRuleset) => null;
     }
 }
