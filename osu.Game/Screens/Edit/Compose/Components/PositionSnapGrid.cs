@@ -21,8 +21,6 @@ namespace osu.Game.Screens.Edit.Compose.Components
 
         protected PositionSnapGrid()
         {
-            Masking = true;
-
             StartPosition.BindValueChanged(_ => GridCache.Invalidate());
 
             AddLayout(GridCache);
