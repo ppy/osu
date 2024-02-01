@@ -1,15 +1,12 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Game.Screens.Play.HUD;
 using osu.Game.Rulesets.Mods;
 using System.Collections.Generic;
 using System.Linq;
-using JetBrains.Annotations;
 using osu.Framework.Allocation;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics.UserInterface;
@@ -31,27 +28,13 @@ namespace osu.Game.Screens.Select
             set => modDisplay.Current = value;
         }
 
-        protected readonly OsuSpriteText MultiplierText;
-        private readonly ModDisplay modDisplay;
+        protected OsuSpriteText MultiplierText { get; private set; } = null!;
+        private ModDisplay modDisplay = null!;
+
+        private ModSettingChangeTracker? modSettingChangeTracker;
+
         private Color4 lowMultiplierColour;
         private Color4 highMultiplierColour;
-
-        public FooterButtonMods()
-        {
-            ButtonContentContainer.Add(modDisplay = new ModDisplay
-            {
-                Anchor = Anchor.Centre,
-                Origin = Anchor.Centre,
-                Scale = new Vector2(0.8f),
-                ExpansionMode = ExpansionMode.AlwaysContracted,
-            });
-            ButtonContentContainer.Add(MultiplierText = new OsuSpriteText
-            {
-                Anchor = Anchor.Centre,
-                Origin = Anchor.Centre,
-                Font = OsuFont.GetFont(weight: FontWeight.Bold),
-            });
-        }
 
         [BackgroundDependencyLoader]
         private void load(OsuColour colours)
@@ -62,10 +45,24 @@ namespace osu.Game.Screens.Select
             highMultiplierColour = colours.Green;
             Text = @"mods";
             Hotkey = GlobalAction.ToggleModSelection;
-        }
 
-        [CanBeNull]
-        private ModSettingChangeTracker modSettingChangeTracker;
+            ButtonContentContainer.AddRange(new Drawable[]
+            {
+                modDisplay = new ModDisplay
+                {
+                    Anchor = Anchor.Centre,
+                    Origin = Anchor.Centre,
+                    Scale = new Vector2(0.8f),
+                    ExpansionMode = ExpansionMode.AlwaysContracted,
+                },
+                MultiplierText = new OsuSpriteText
+                {
+                    Anchor = Anchor.Centre,
+                    Origin = Anchor.Centre,
+                    Font = OsuFont.GetFont(weight: FontWeight.Bold),
+                }
+            });
+        }
 
         protected override void LoadComplete()
         {
