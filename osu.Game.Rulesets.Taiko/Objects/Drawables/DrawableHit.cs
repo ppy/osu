@@ -7,12 +7,14 @@ using System;
 using System.Diagnostics;
 using System.Linq;
 using JetBrains.Annotations;
+using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Input.Events;
 using osu.Game.Rulesets.Objects.Drawables;
 using osu.Game.Rulesets.Scoring;
 using osu.Game.Rulesets.Taiko.Skinning.Default;
+using osu.Game.Rulesets.Taiko.Configuration;
 using osu.Game.Skinning;
 
 namespace osu.Game.Rulesets.Taiko.Objects.Drawables
@@ -39,6 +41,8 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
 
         private readonly Bindable<HitType> type = new Bindable<HitType>();
 
+        private readonly Bindable<bool> snapJudgementLocation = new Bindable<bool>();
+
         public DrawableHit()
             : this(null)
         {
@@ -48,6 +52,12 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
             : base(hit)
         {
             FillMode = FillMode.Fit;
+        }
+
+        [BackgroundDependencyLoader(true)]
+        private void load(TaikoRulesetConfigManager rulesetConfig)
+        {
+            rulesetConfig?.BindWith(TaikoRulesetSetting.SnapJudgementLocation, snapJudgementLocation);
         }
 
         protected override void OnApply()
@@ -163,7 +173,7 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
                     const float gravity_time = 300;
                     const float gravity_travel_height = 200;
 
-                    if (SnapJudgementLocation)
+                    if (snapJudgementLocation.Value)
                         MainPiece.MoveToX(-X);
 
                     this.ScaleTo(0.8f, gravity_time * 2, Easing.OutQuad);

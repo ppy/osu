@@ -30,6 +30,11 @@ namespace osu.Game.Rulesets.Taiko
                 {
                     LabelText = RulesetSettingsStrings.TouchControlScheme,
                     Current = config.GetBindable<TaikoTouchControlScheme>(TaikoRulesetSetting.TouchControlScheme)
+                },
+                new SettingsCheckbox
+                {
+                    LabelText = "Snap notes to judgement location",
+                    Current = config.GetBindable<bool>(TaikoRulesetSetting.SnapJudgementLocation),
                 }
             };
         }
