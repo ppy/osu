@@ -15,18 +15,29 @@ namespace osu.Game.Screens.Edit.Compose.Components
     {
         protected void GenerateGridLines(Vector2 step, Vector2 drawSize)
         {
+            if (Precision.AlmostEquals(step, Vector2.Zero))
+                return;
+
             int index = 0;
-            var currentPosition = StartPosition.Value;
 
             // Make lines the same width independent of display resolution.
             float lineWidth = DrawWidth / ScreenSpaceDrawQuad.Width;
-            float lineLength = drawSize.Length * 2;
+            float rotation = MathHelper.RadiansToDegrees(MathF.Atan2(step.Y, step.X));
 
             List<Box> generatedLines = new List<Box>();
 
-            while (lineDefinitelyIntersectsBox(currentPosition, step.PerpendicularLeft, drawSize) ||
-                   isMovingTowardsBox(currentPosition, step, drawSize))
+            while (true)
             {
+                Vector2 currentPosition = StartPosition.Value + index++ * step;
+
+                if (!lineDefinitelyIntersectsBox(currentPosition, step.PerpendicularLeft, drawSize, out var p1, out var p2))
+                {
+                    if (!isMovingTowardsBox(currentPosition, step, drawSize))
+                        break;
+
+                    continue;
+                }
+
                 var gridLine = new Box
                 {
                     Colour = Colour4.White,
@@ -34,15 +45,12 @@ namespace osu.Game.Screens.Edit.Compose.Components
                     Origin = Anchor.Centre,
                     RelativeSizeAxes = Axes.None,
                     Width = lineWidth,
-                    Height = lineLength,
-                    Position = currentPosition,
-                    Rotation = MathHelper.RadiansToDegrees(MathF.Atan2(step.Y, step.X)),
+                    Height = Vector2.Distance(p1, p2),
+                    Position = (p1 + p2) / 2,
+                    Rotation = rotation,
                 };
 
                 generatedLines.Add(gridLine);
-
-                index += 1;
-                currentPosition = StartPosition.Value + index * step;
             }
 
             if (generatedLines.Count == 0)
@@ -59,23 +67,99 @@ namespace osu.Game.Screens.Edit.Compose.Components
                    (currentPosition + step - box).LengthSquared < (currentPosition - box).LengthSquared;
         }
 
-        private bool lineDefinitelyIntersectsBox(Vector2 lineStart, Vector2 lineDir, Vector2 box)
+        /// <summary>
+        /// Determines if the line starting at <paramref name="lineStart"/> and going in the direction of <paramref name="lineDir"/>
+        /// definitely intersects the box on (0, 0) with the given width and height and returns the intersection points if it does.
+        /// </summary>
+        /// <param name="lineStart">The start point of the line.</param>
+        /// <param name="lineDir">The direction of the line.</param>
+        /// <param name="box">The width and height of the box.</param>
+        /// <param name="p1">The first intersection point.</param>
+        /// <param name="p2">The second intersection point.</param>
+        /// <returns>Whether the line definitely intersects the box.</returns>
+        private bool lineDefinitelyIntersectsBox(Vector2 lineStart, Vector2 lineDir, Vector2 box, out Vector2 p1, out Vector2 p2)
         {
-            var p2 = lineStart + lineDir;
+            p1 = Vector2.Zero;
+            p2 = Vector2.Zero;
 
-            double d1 = det(Vector2.Zero);
-            double d2 = det(new Vector2(box.X, 0));
-            double d3 = det(new Vector2(0, box.Y));
-            double d4 = det(box);
+            if (Precision.AlmostEquals(lineDir.X, 0))
+            {
+                // If the line is vertical, we only need to check if the X coordinate of the line is within the box.
+                if (!Precision.DefinitelyBigger(lineStart.X, 0) || !Precision.DefinitelyBigger(box.X, lineStart.X))
+                    return false;
 
-            return definitelyDifferentSign(d1, d2) || definitelyDifferentSign(d3, d4) ||
-                   definitelyDifferentSign(d1, d3) || definitelyDifferentSign(d2, d4);
+                p1 = new Vector2(lineStart.X, 0);
+                p2 = new Vector2(lineStart.X, box.Y);
+                return true;
+            }
 
-            double det(Vector2 p) => (p.X - lineStart.X) * (p2.Y - lineStart.Y) - (p.Y - lineStart.Y) * (p2.X - lineStart.X);
+            if (Precision.AlmostEquals(lineDir.Y, 0))
+            {
+                // If the line is horizontal, we only need to check if the Y coordinate of the line is within the box.
+                if (!Precision.DefinitelyBigger(lineStart.Y, 0) || !Precision.DefinitelyBigger(box.Y, lineStart.Y))
+                    return false;
 
-            bool definitelyDifferentSign(double a, double b) => !Precision.AlmostEquals(a, 0) &&
-                                                                !Precision.AlmostEquals(b, 0) &&
-                                                                Math.Sign(a) != Math.Sign(b);
+                p1 = new Vector2(0, lineStart.Y);
+                p2 = new Vector2(box.X, lineStart.Y);
+                return true;
+            }
+
+            float m = lineDir.Y / lineDir.X;
+            float mInv = lineDir.X / lineDir.Y; // Use this to improve numerical stability if X is close to zero.
+            float b = lineStart.Y - m * lineStart.X;
+
+            // Calculate intersection points with the sides of the box.
+            var p = new List<Vector2>(4);
+
+            if (0 <= b && b <= box.Y)
+                p.Add(new Vector2(0, b));
+            if (0 <= (box.Y - b) * mInv && (box.Y - b) * mInv <= box.X)
+                p.Add(new Vector2((box.Y - b) * mInv, box.Y));
+            if (0 <= m * box.X + b && m * box.X + b <= box.Y)
+                p.Add(new Vector2(box.X, m * box.X + b));
+            if (0 <= -b * mInv && -b * mInv <= box.X)
+                p.Add(new Vector2(-b * mInv, 0));
+
+            switch (p.Count)
+            {
+                case 4:
+                    // If there are 4 intersection points, the line is a diagonal of the box.
+                    if (m > 0)
+                    {
+                        p1 = Vector2.Zero;
+                        p2 = box;
+                    }
+                    else
+                    {
+                        p1 = new Vector2(0, box.Y);
+                        p2 = new Vector2(box.X, 0);
+                    }
+
+                    break;
+
+                case 3:
+                    // If there are 3 intersection points, the line goes through a corner of the box.
+                    if (p[0] == p[1])
+                    {
+                        p1 = p[0];
+                        p2 = p[2];
+                    }
+                    else
+                    {
+                        p1 = p[0];
+                        p2 = p[1];
+                    }
+
+                    break;
+
+                case 2:
+                    p1 = p[0];
+                    p2 = p[1];
+
+                    break;
+            }
+
+            return !Precision.AlmostEquals(p1, p2);
         }
     }
 }
