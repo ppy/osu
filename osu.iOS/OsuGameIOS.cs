@@ -15,7 +15,7 @@ namespace osu.iOS
     {
         public override Version AssemblyVersion => new Version(NSBundle.MainBundle.InfoDictionary["CFBundleVersion"].ToString());
 
-        protected override UpdateManager CreateUpdateManager() => new SimpleUpdateManager();
+        protected override UpdateManager CreateUpdateManager() => new SimpleGameUpdateManager();
 
         protected override BatteryInfo CreateBatteryInfo() => new IOSBatteryInfo();
 

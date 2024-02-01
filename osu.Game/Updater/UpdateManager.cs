@@ -6,7 +6,6 @@ using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Sprites;
-using osu.Game.Configuration;
 using osu.Game.Graphics;
 using osu.Game.Overlays;
 using osu.Game.Overlays.Notifications;
@@ -15,9 +14,9 @@ using osuTK;
 namespace osu.Game.Updater
 {
     /// <summary>
-    /// An update manager which only shows notifications after an update completes.
+    /// A base with provides a common foundation for any UpdateManagers
     /// </summary>
-    public partial class UpdateManager : CompositeDrawable
+    public abstract partial class UpdateManager : CompositeDrawable
     {
         /// <summary>
         /// Whether this UpdateManager should be or is capable of checking for updates.
@@ -27,39 +26,21 @@ namespace osu.Game.Updater
                                          GetType() != typeof(UpdateManager);
 
         [Resolved]
-        private OsuConfigManager config { get; set; } = null!;
-
-        [Resolved]
         private OsuGameBase game { get; set; } = null!;
 
         [Resolved]
         protected INotificationOverlay Notifications { get; private set; } = null!;
+
+        private readonly object updateTaskLock = new object();
+
+        private Task<bool>? updateCheckTask;
 
         protected override void LoadComplete()
         {
             base.LoadComplete();
 
             Schedule(() => Task.Run(CheckForUpdateAsync));
-
-            string version = game.Version;
-
-            string lastVersion = config.Get<string>(OsuSetting.Version);
-
-            if (game.IsDeployedBuild && version != lastVersion)
-            {
-                // only show a notification if we've previously saved a version to the config file (ie. not the first run).
-                if (!string.IsNullOrEmpty(lastVersion))
-                    Notifications.Post(new UpdateCompleteNotification(version));
-            }
-
-            // debug / local compilations will reset to a non-release string.
-            // can be useful to check when an install has transitioned between release and otherwise (see OsuConfigManager's migrations).
-            config.SetValue(OsuSetting.Version, version);
         }
-
-        private readonly object updateTaskLock = new object();
-
-        private Task<bool>? updateCheckTask;
 
         public async Task<bool> CheckForUpdateAsync()
         {
@@ -84,31 +65,6 @@ namespace osu.Game.Updater
         /// </summary>
         /// <returns>Whether any update is waiting. May return true if an error occured (there is potentially an update available).</returns>
         protected virtual Task<bool> PerformUpdateCheck() => Task.FromResult(false);
-
-        private partial class UpdateCompleteNotification : SimpleNotification
-        {
-            private readonly string version;
-
-            public UpdateCompleteNotification(string version)
-            {
-                this.version = version;
-                Text = $"You are now running osu! {version}.\nClick to see what's new!";
-            }
-
-            [BackgroundDependencyLoader]
-            private void load(OsuColour colours, ChangelogOverlay changelog, INotificationOverlay notificationOverlay)
-            {
-                Icon = FontAwesome.Solid.CheckSquare;
-                IconContent.Colour = colours.BlueDark;
-
-                Activated = delegate
-                {
-                    notificationOverlay.Hide();
-                    changelog.ShowBuild(OsuGameBase.CLIENT_STREAM_NAME, version);
-                    return true;
-                };
-            }
-        }
 
         public partial class UpdateApplicationCompleteNotification : ProgressCompletionNotification
         {

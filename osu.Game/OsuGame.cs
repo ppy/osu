@@ -55,6 +55,7 @@ using osu.Game.Overlays.SkinEditor;
 using osu.Game.Overlays.Toolbar;
 using osu.Game.Overlays.Volume;
 using osu.Game.Performance;
+using osu.Game.Rulesets;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Scoring;
 using osu.Game.Screens;
@@ -783,7 +784,7 @@ namespace osu.Game
 
         protected virtual Loader CreateLoader() => new Loader();
 
-        protected virtual UpdateManager CreateUpdateManager() => new UpdateManager();
+        protected virtual UpdateManager CreateUpdateManager() => new GameUpdateManager();
 
         protected virtual HighPerformanceSession CreateHighPerformanceSession() => new HighPerformanceSession();
 
@@ -1047,6 +1048,7 @@ namespace osu.Game
 
             // dependency on notification overlay, dependent by settings overlay
             loadComponentSingleFile(CreateUpdateManager(), Add, true);
+            loadComponentSingleFile(new RulesetUpdater(RulesetStore.AvailableRulesets), Add, false);
 
             // overlay elements
             loadComponentSingleFile(FirstRunOverlay = new FirstRunSetupOverlay(), overlayContent.Add, true);
