@@ -75,20 +75,6 @@ namespace osu.Game.Overlays.Settings.Sections
                 new ExportSkinButton(),
                 new DeleteSkinButton(),
             };
-
-            Action update = () => skins.CurrentSkinInfo.Value = held.Value;
-
-            held.BindValueChanged(_ =>
-            {
-                if (skinEditor.ShouldRequest())
-                {
-                    skinEditor.RequestChange(update, null);
-
-                    return;
-                }
-
-                update.Invoke();
-            });
         }
 
         protected override void LoadComplete()

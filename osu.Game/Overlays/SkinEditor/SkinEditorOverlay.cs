@@ -42,7 +42,7 @@ namespace osu.Game.Overlays.SkinEditor
 
         protected override bool BlockNonPositionalInput => true;
 
-        private SkinEditor? skinEditor;
+        public SkinEditor? SkinEditor { get; private set; }
 
         [Resolved]
         private IPerformFromScreenRunner? performer { get; set; }
@@ -86,7 +86,7 @@ namespace osu.Game.Overlays.SkinEditor
             switch (e.Action)
             {
                 case GlobalAction.Back:
-                    if (skinEditor?.State.Value != Visibility.Visible)
+                    if (SkinEditor?.State.Value != Visibility.Visible)
                         break;
 
                     Hide();
@@ -96,15 +96,6 @@ namespace osu.Game.Overlays.SkinEditor
             return false;
         }
 
-        public bool ShouldRequest()
-        {
-            if (skinEditor == null) return false;
-
-            return skinEditor.ShouldRequest();
-        }
-
-        public void RequestChange(Action? update, Action? keep) => skinEditor?.RequestChange(update, keep);
-
         protected override void PopIn()
         {
             globallyDisableBeatmapSkinSetting();
@@ -112,9 +103,9 @@ namespace osu.Game.Overlays.SkinEditor
             if (lastTargetScreen is MainMenu)
                 PresentGameplay();
 
-            if (skinEditor != null)
+            if (SkinEditor != null)
             {
-                skinEditor.Show();
+                SkinEditor.Show();
                 return;
             }
 
@@ -122,11 +113,11 @@ namespace osu.Game.Overlays.SkinEditor
 
             editor.State.BindValueChanged(_ => updateComponentVisibility());
 
-            skinEditor = editor;
+            SkinEditor = editor;
 
             LoadComponentAsync(editor, _ =>
             {
-                if (editor != skinEditor)
+                if (editor != SkinEditor)
                     return;
 
                 AddInternal(editor);
@@ -139,8 +130,8 @@ namespace osu.Game.Overlays.SkinEditor
 
         protected override void PopOut()
         {
-            skinEditor?.Save(false);
-            skinEditor?.Hide();
+            SkinEditor?.Save(false);
+            SkinEditor?.Hide();
 
             globallyReenableBeatmapSkinSetting();
         }
@@ -207,7 +198,7 @@ namespace osu.Game.Overlays.SkinEditor
 
         private void updateScreenSizing()
         {
-            if (skinEditor?.State.Value != Visibility.Visible) return;
+            if (SkinEditor?.State.Value != Visibility.Visible) return;
 
             const float padding = 10;
 
@@ -225,9 +216,9 @@ namespace osu.Game.Overlays.SkinEditor
 
         private void updateComponentVisibility()
         {
-            Debug.Assert(skinEditor != null);
+            Debug.Assert(SkinEditor != null);
 
-            if (skinEditor.State.Value == Visibility.Visible)
+            if (SkinEditor.State.Value == Visibility.Visible)
             {
                 Scheduler.AddOnce(updateScreenSizing);
 
@@ -254,7 +245,7 @@ namespace osu.Game.Overlays.SkinEditor
         {
             lastTargetScreen = screen;
 
-            if (skinEditor == null) return;
+            if (SkinEditor == null) return;
 
             // ensure the toolbar is re-hidden even if a new screen decides to try and show it.
             updateComponentVisibility();
@@ -268,7 +259,7 @@ namespace osu.Game.Overlays.SkinEditor
             if (target == null)
                 return;
 
-            Debug.Assert(skinEditor != null);
+            Debug.Assert(SkinEditor != null);
 
             if (!target.IsLoaded)
             {
@@ -276,16 +267,16 @@ namespace osu.Game.Overlays.SkinEditor
                 return;
             }
 
-            if (skinEditor.State.Value == Visibility.Visible)
+            if (SkinEditor.State.Value == Visibility.Visible)
             {
-                skinEditor.Save(false);
-                skinEditor.UpdateTargetScreen(target);
+                SkinEditor.Save(false);
+                SkinEditor.UpdateTargetScreen(target);
             }
             else
             {
-                skinEditor.Hide();
-                skinEditor.Expire();
-                skinEditor = null;
+                SkinEditor.Hide();
+                SkinEditor.Expire();
+                SkinEditor = null;
             }
         }
 

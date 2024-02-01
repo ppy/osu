@@ -81,7 +81,6 @@ namespace osu.Game.Overlays.SkinEditor
         private readonly Bindable<SkinComponentsContainerLookup?> selectedTarget = new Bindable<SkinComponentsContainerLookup?>();
 
         private bool hasBegunMutating;
-        private bool userMutated;
 
         private Container? content;
 
@@ -104,6 +103,8 @@ namespace osu.Game.Overlays.SkinEditor
 
         [Resolved]
         private OnScreenDisplay? onScreenDisplay { get; set; }
+
+        public bool Mutated { get; private set; } = false;
 
         public SkinEditor()
         {
@@ -259,7 +260,7 @@ namespace osu.Game.Overlays.SkinEditor
             // probably something which will be factored out in a future database refactor so not too concerning for now.
             currentSkin.BindValueChanged(_ =>
             {
-                userMutated = false;
+                Mutated = false;
                 hasBegunMutating = false;
                 Scheduler.AddOnce(skinChanged);
             }, true);
@@ -278,8 +279,6 @@ namespace osu.Game.Overlays.SkinEditor
                 update?.Invoke();
             }, keep, update));
         }
-
-        public bool ShouldRequest() => userMutated;
 
         public bool OnPressed(KeyBindingPressEvent<PlatformAction> e)
         {
@@ -768,7 +767,7 @@ namespace osu.Game.Overlays.SkinEditor
 
         public void EndChange()
         {
-            userMutated = true;
+            Mutated = true;
 
             beginChangeHandler?.EndChange();
         }
