@@ -62,6 +62,12 @@ namespace osu.Game.Tests.Visual.Ranking
                 if (beatmapInfo != null)
                     Beatmap.Value = beatmaps.GetWorkingBeatmap(beatmapInfo);
             });
+
+            AddToggleStep("toggle skin", v =>
+            {
+                if (skins != null)
+                    skins.CurrentSkinInfo.Value = v ? skins.DefaultClassicSkin.SkinInfo : skins.CurrentSkinInfo.Default;
+            });
         }
 
         [SetUp]
