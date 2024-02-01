@@ -268,8 +268,6 @@ namespace osu.Game.Overlays.SkinEditor
             SelectedComponents.BindCollectionChanged((_, _) => Scheduler.AddOnce(populateSettings), true);
 
             selectedTarget.BindValueChanged(targetChanged, true);
-
-
         }
 
         public void RequestChange(Action? update, Action? keep)
