@@ -20,6 +20,21 @@ namespace osu.Game.Localisation
         public static LocalisableString StepForward => new TranslatableString(getKey(@"step_forward_frame"), @"Step forward one frame");
 
         /// <summary>
+        /// "Hit markers"
+        /// </summary>
+        public static LocalisableString HitMarkers => new TranslatableString(getKey(@"hit_markers"), @"Hit markers");
+
+        /// <summary>
+        /// "Aim markers"
+        /// </summary>
+        public static LocalisableString AimMarkers => new TranslatableString(getKey(@"aim_markers"), @"Aim markers");
+
+        /// <summary>
+        /// "Hide cursor"
+        /// </summary>
+        public static LocalisableString HideCursor => new TranslatableString(getKey(@"hide_cursor"), @"Hide cursor");
+
+        /// <summary>
         /// "Seek backward {0} seconds"
         /// </summary>
         public static LocalisableString SeekBackwardSeconds(double arg0) => new TranslatableString(getKey(@"seek_backward_seconds"), @"Seek backward {0} seconds", arg0);
