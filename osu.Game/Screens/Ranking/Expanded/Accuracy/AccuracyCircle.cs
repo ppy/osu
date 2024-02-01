@@ -137,7 +137,7 @@ namespace osu.Game.Screens.Ranking.Expanded.Accuracy
         }
 
         [BackgroundDependencyLoader]
-        private void load(AudioManager audio)
+        private void load()
         {
             InternalChildren = new Drawable[]
             {
