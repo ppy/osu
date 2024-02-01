@@ -95,7 +95,7 @@ namespace osu.Game.Overlays.Toolbar
 
         private void onlineStateChanged(ValueChangedEvent<APIState> state) => Schedule(() =>
         {
-            failingIcon.FadeTo(state.NewValue == APIState.Failing ? 1 : 0, 200, Easing.OutQuint);
+            failingIcon.FadeTo(state.NewValue == APIState.Failing || state.NewValue == APIState.RequiresSecondFactorAuth ? 1 : 0, 200, Easing.OutQuint);
 
             switch (state.NewValue)
             {
