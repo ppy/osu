@@ -75,6 +75,39 @@ namespace osu.Game.Overlays.Settings.Sections
                 new ExportSkinButton(),
                 new DeleteSkinButton(),
             };
+            bool cancel = false;
+
+            held.BindValueChanged((changeEvent) =>
+            {
+                // We're doing this to cancel the next event if we keep the changes
+                // If we don't do this it'll get in an infinite bindable loop
+                if (cancel)
+                {
+                    cancel = false;
+
+                    return;
+                }
+
+                SkinEditor.SkinEditor editor = skinEditor.SkinEditor;
+
+                // We just test if the editor isnt null and the user has mutated something, if they have we can
+                // proceed and request the change dialog
+                if (editor != null && editor.Mutated)
+                {
+                    editor.RequestChange(update, () =>
+                    {
+                        cancel = true;
+
+                        held.Value = changeEvent.OldValue;
+                    });
+
+                    return;
+                }
+
+                update();
+            }, true);
+
+            void update() => skins.CurrentSkinInfo.Value = held.Value;
         }
 
         protected override void LoadComplete()
