@@ -10,7 +10,6 @@ using osu.Framework.Audio;
 using osu.Framework.Bindables;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
-using osu.Framework.Graphics.Audio;
 using osu.Framework.Graphics.Colour;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.UserInterface;
@@ -86,6 +85,9 @@ namespace osu.Game.Screens.Ranking.Expanded.Accuracy
         /// </summary>
         public static readonly Easing ACCURACY_TRANSFORM_EASING = Easing.OutPow10;
 
+        [Resolved]
+        private SkinManager skins { get; set; }
+
         private readonly ScoreInfo score;
 
         private CircularProgress accuracyCircle;
@@ -99,7 +101,7 @@ namespace osu.Game.Screens.Ranking.Expanded.Accuracy
         private PoolableSkinnableSample swooshUpSound;
         private PoolableSkinnableSample rankImpactSound;
         private PoolableSkinnableSample rankApplauseSound;
-        private DrawableSample rankFailSound;
+        private PoolableSkinnableSample rankLegacyApplauseSound;
 
         private readonly Bindable<double> tickPlaybackRate = new Bindable<double>();
 
@@ -264,12 +266,12 @@ namespace osu.Game.Screens.Ranking.Expanded.Accuracy
                 AddRangeInternal(new Drawable[]
                 {
                     rankImpactSound = new PoolableSkinnableSample(new SampleInfo(impactSampleName)),
-                    rankApplauseSound = new PoolableSkinnableSample(new SampleInfo(@"applause", applauseSampleName)),
+                    rankApplauseSound = new PoolableSkinnableSample(new SampleInfo(applauseSampleName)),
+                    rankLegacyApplauseSound = new PoolableSkinnableSample(new SampleInfo("applause")),
                     scoreTickSound = new PoolableSkinnableSample(new SampleInfo(@"Results/score-tick")),
                     badgeTickSound = new PoolableSkinnableSample(new SampleInfo(@"Results/badge-dink")),
                     badgeMaxSound = new PoolableSkinnableSample(new SampleInfo(@"Results/badge-dink-max")),
                     swooshUpSound = new PoolableSkinnableSample(new SampleInfo(@"Results/swoosh-up")),
-                    rankFailSound = new DrawableSample(audio.Samples.Get(results_applause_d_sound)),
                 });
             }
         }
@@ -399,15 +401,19 @@ namespace osu.Game.Screens.Ranking.Expanded.Accuracy
                     {
                         Schedule(() =>
                         {
-                            if (score.Rank != ScoreRank.F)
+                            if (skins.CurrentSkin.Value is LegacySkin)
                             {
-                                rankApplauseSound.VolumeTo(applause_volume);
-                                rankApplauseSound.Play();
+                                // only play legacy "applause" sound if score rank is B or higher.
+                                if (score.Rank >= ScoreRank.B)
+                                {
+                                    rankLegacyApplauseSound.VolumeTo(applause_volume);
+                                    rankLegacyApplauseSound.Play();
+                                }
                             }
                             else
                             {
-                                rankFailSound.VolumeTo(applause_volume);
-                                rankFailSound.Play();
+                                rankApplauseSound.VolumeTo(applause_volume);
+                                rankApplauseSound.Play();
                             }
                         });
                     }
@@ -451,8 +457,6 @@ namespace osu.Game.Screens.Ranking.Expanded.Accuracy
             }
         }
 
-        private const string results_applause_d_sound = @"Results/applause-d";
-
         private string applauseSampleName
         {
             get
@@ -461,7 +465,7 @@ namespace osu.Game.Screens.Ranking.Expanded.Accuracy
                 {
                     default:
                     case ScoreRank.D:
-                        return results_applause_d_sound;
+                        return @"Results/applause-d";
 
                     case ScoreRank.C:
                         return @"Results/applause-c";
