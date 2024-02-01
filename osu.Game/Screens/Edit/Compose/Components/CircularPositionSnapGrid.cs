@@ -82,7 +82,12 @@ namespace osu.Game.Screens.Edit.Compose.Components
 
             generatedCircles.First().Alpha = 0.8f;
 
-            AddRangeInternal(generatedCircles);
+            AddInternal(new Container
+            {
+                Masking = true,
+                RelativeSizeAxes = Axes.Both,
+                Children = generatedCircles,
+            });
         }
 
         public override Vector2 GetSnappedPosition(Vector2 original)
