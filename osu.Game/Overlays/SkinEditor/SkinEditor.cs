@@ -436,7 +436,6 @@ namespace osu.Game.Overlays.SkinEditor
                 changeHandler.TransactionEnded += () => Mutated = true;
             }
 
-
             hasBegunMutating = true;
         }
 
