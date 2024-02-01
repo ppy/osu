@@ -1,8 +1,6 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
 using System;
 using System.Linq;
 using System.Runtime.InteropServices;
@@ -22,10 +20,10 @@ namespace osu.Game.Updater
     /// </summary>
     public partial class SimpleUpdateManager : UpdateManager
     {
-        private string version;
+        private string version = null!;
 
         [Resolved]
-        private GameHost host { get; set; }
+        private GameHost host { get; set; } = null!;
 
         [BackgroundDependencyLoader]
         private void load(OsuGameBase game)
@@ -76,7 +74,7 @@ namespace osu.Game.Updater
 
         private string getBestUrl(GitHubRelease release)
         {
-            GitHubAsset bestAsset = null;
+            GitHubAsset? bestAsset = null;
 
             switch (RuntimeInfo.OS)
             {
