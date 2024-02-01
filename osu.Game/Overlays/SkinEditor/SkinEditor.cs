@@ -268,6 +268,8 @@ namespace osu.Game.Overlays.SkinEditor
             SelectedComponents.BindCollectionChanged((_, _) => Scheduler.AddOnce(populateSettings), true);
 
             selectedTarget.BindValueChanged(targetChanged, true);
+
+
         }
 
         public void RequestChange(Action? update, Action? keep)
@@ -362,6 +364,7 @@ namespace osu.Game.Overlays.SkinEditor
             changeHandler = new SkinEditorChangeHandler(skinComponentsContainer);
             changeHandler.CanUndo.BindValueChanged(v => undoMenuItem.Action.Disabled = !v.NewValue, true);
             changeHandler.CanRedo.BindValueChanged(v => redoMenuItem.Action.Disabled = !v.NewValue, true);
+            changeHandler.TransactionEnded += () => Mutated = true;
 
             content.Child = new SkinBlueprintContainer(skinComponentsContainer);
 
@@ -430,7 +433,11 @@ namespace osu.Game.Overlays.SkinEditor
             var targetContainer = getTarget(selectedTarget.Value);
 
             if (targetContainer != null)
+            {
                 changeHandler = new SkinEditorChangeHandler(targetContainer);
+                changeHandler.TransactionEnded += () => Mutated = true;
+            }
+
 
             hasBegunMutating = true;
         }
@@ -767,6 +774,7 @@ namespace osu.Game.Overlays.SkinEditor
 
         public void EndChange()
         {
+            // We will modify the "Mutated" value here, to handle most changes
             Mutated = true;
 
             beginChangeHandler?.EndChange();
