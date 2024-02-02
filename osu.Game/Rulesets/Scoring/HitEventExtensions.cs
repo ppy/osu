@@ -11,7 +11,7 @@ namespace osu.Game.Rulesets.Scoring
     public static class HitEventExtensions
     {
         /// <summary>
-        /// Calculates the "unstable rate" for a sequence of <see cref="HitEvent"/>s.
+        /// Calculates the "unstable rate" for a sequence of <see cref="HitEvent"/>s using Welford's online algorithm.
         /// </summary>
         /// <returns>
         /// A non-null <see langword="double"/> value if unstable rate could be calculated,
@@ -21,9 +21,30 @@ namespace osu.Game.Rulesets.Scoring
         {
             Debug.Assert(hitEvents.All(ev => ev.GameplayRate != null));
 
-            // Division by gameplay rate is to account for TimeOffset scaling with gameplay rate.
-            double[] timeOffsets = hitEvents.Where(affectsUnstableRate).Select(ev => ev.TimeOffset / ev.GameplayRate!.Value).ToArray();
-            return 10 * standardDeviation(timeOffsets);
+            double currentValue;
+            int k = 0;
+            double m = 0;
+            double s = 0;
+            double mNext;
+
+            foreach (var e in hitEvents)
+            {
+                if (!affectsUnstableRate(e))
+                    continue;
+
+                // Division by gameplay rate is to account for TimeOffset scaling with gameplay rate.
+                currentValue = e.TimeOffset / e.GameplayRate!.Value;
+
+                k++;
+                mNext = m + (currentValue - m) / k;
+                s += (currentValue - m) * (currentValue - mNext);
+                m = mNext;
+            }
+
+            if (k == 0)
+                return null;
+
+            return 10.0 * Math.Sqrt(s / k);
         }
 
         /// <summary>
@@ -44,15 +65,5 @@ namespace osu.Game.Rulesets.Scoring
         }
 
         private static bool affectsUnstableRate(HitEvent e) => !(e.HitObject.HitWindows is HitWindows.EmptyHitWindows) && e.Result.IsHit();
-
-        private static double? standardDeviation(double[] timeOffsets)
-        {
-            if (timeOffsets.Length == 0)
-                return null;
-
-            double mean = timeOffsets.Average();
-            double squares = timeOffsets.Select(offset => Math.Pow(offset - mean, 2)).Sum();
-            return Math.Sqrt(squares / timeOffsets.Length);
-        }
     }
 }
