@@ -21,30 +21,28 @@ namespace osu.Game.Rulesets.Scoring
         {
             Debug.Assert(hitEvents.All(ev => ev.GameplayRate != null));
 
-            double currentValue;
-            int k = 0;
+            int count = 0;
             double m = 0;
             double s = 0;
-            double mNext;
 
             foreach (var e in hitEvents)
             {
                 if (!affectsUnstableRate(e))
                     continue;
 
-                // Division by gameplay rate is to account for TimeOffset scaling with gameplay rate.
-                currentValue = e.TimeOffset / e.GameplayRate!.Value;
+                count++;
 
-                k++;
-                mNext = m + (currentValue - m) / k;
+                // Division by gameplay rate is to account for TimeOffset scaling with gameplay rate.
+                double currentValue = e.TimeOffset / e.GameplayRate!.Value;
+                double mNext = m + (currentValue - m) / count;
                 s += (currentValue - m) * (currentValue - mNext);
                 m = mNext;
             }
 
-            if (k == 0)
+            if (count == 0)
                 return null;
 
-            return 10.0 * Math.Sqrt(s / k);
+            return 10.0 * Math.Sqrt(s / count);
         }
 
         /// <summary>
