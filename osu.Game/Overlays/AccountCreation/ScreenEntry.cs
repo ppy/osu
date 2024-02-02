@@ -47,7 +47,7 @@ namespace osu.Game.Overlays.AccountCreation
         private GameHost? host { get; set; }
 
         [Resolved]
-        private OsuGame game { get; set; } = null!;
+        private OsuGame? game { get; set; }
 
         [BackgroundDependencyLoader]
         private void load()
@@ -208,7 +208,7 @@ namespace osu.Game.Overlays.AccountCreation
                                 if (!string.IsNullOrEmpty(errors.Message))
                                     passwordDescription.AddErrors(new[] { errors.Message });
 
-                                game.OpenUrlExternally($"{errors.Redirect}?username={usernameTextBox.Text}&email={emailTextBox.Text}", true);
+                                game?.OpenUrlExternally($"{errors.Redirect}?username={usernameTextBox.Text}&email={emailTextBox.Text}", true);
                             }
                         }
                         else
