@@ -30,7 +30,7 @@ namespace osu.Game.Tests.Visual.OnlinePlay
         /// <summary>
         /// All dependencies required for online play components and screens.
         /// </summary>
-        protected OnlinePlayTestSceneDependencies OnlinePlayDependencies => dependencies.OnlinePlayDependencies;
+        protected OnlinePlayTestSceneDependencies OnlinePlayDependencies => dependencies.OnlinePlayDependencies!;
 
         protected override Container<Drawable> Content => content;
 
@@ -48,12 +48,7 @@ namespace osu.Game.Tests.Visual.OnlinePlay
         }
 
         protected sealed override IReadOnlyDependencyContainer CreateChildDependencies(IReadOnlyDependencyContainer parent)
-        {
-            return dependencies = new DelegatedDependencyContainer(base.CreateChildDependencies(parent))
-            {
-                OnlinePlayDependencies = initDependencies()
-            };
-        }
+            => dependencies = new DelegatedDependencyContainer(base.CreateChildDependencies(parent));
 
         public override void SetUpSteps()
         {
@@ -62,7 +57,9 @@ namespace osu.Game.Tests.Visual.OnlinePlay
             AddStep("setup dependencies", () =>
             {
                 // Reset the room dependencies to a fresh state.
-                dependencies.OnlinePlayDependencies = initDependencies();
+                dependencies.OnlinePlayDependencies = CreateOnlinePlayDependencies();
+                drawableDependenciesContainer.Clear();
+                drawableDependenciesContainer.AddRange(dependencies.OnlinePlayDependencies.DrawableComponents);
 
                 var handler = OnlinePlayDependencies.RequestsHandler;
 
@@ -88,14 +85,6 @@ namespace osu.Game.Tests.Visual.OnlinePlay
             });
         }
 
-        private OnlinePlayTestSceneDependencies initDependencies()
-        {
-            var newDependencies = CreateOnlinePlayDependencies();
-            drawableDependenciesContainer.Clear();
-            drawableDependenciesContainer.AddRange(newDependencies.DrawableComponents);
-            return newDependencies;
-        }
-
         /// <summary>
         /// Creates the room dependencies. Called every <see cref="SetUpSteps"/>.
         /// </summary>
@@ -112,7 +101,7 @@ namespace osu.Game.Tests.Visual.OnlinePlay
             /// <summary>
             /// The online play dependencies.
             /// </summary>
-            public OnlinePlayTestSceneDependencies OnlinePlayDependencies { get; set; } = null!;
+            public OnlinePlayTestSceneDependencies? OnlinePlayDependencies { get; set; }
 
             private readonly IReadOnlyDependencyContainer parent;
             private readonly DependencyContainer injectableDependencies;
@@ -128,10 +117,10 @@ namespace osu.Game.Tests.Visual.OnlinePlay
             }
 
             public object Get(Type type)
-                => OnlinePlayDependencies.Get(type) ?? parent.Get(type);
+                => OnlinePlayDependencies?.Get(type) ?? parent.Get(type);
 
             public object Get(Type type, CacheInfo info)
-                => OnlinePlayDependencies.Get(type, info) ?? parent.Get(type, info);
+                => OnlinePlayDependencies?.Get(type, info) ?? parent.Get(type, info);
 
             public void Inject<T>(T instance)
                 where T : class, IDependencyInjectionCandidate
