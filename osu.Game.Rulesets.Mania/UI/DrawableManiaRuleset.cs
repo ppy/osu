@@ -9,8 +9,10 @@ using osu.Framework.Allocation;
 using osu.Framework.Audio.Track;
 using osu.Framework.Bindables;
 using osu.Framework.Extensions.IEnumerableExtensions;
+using osu.Framework.Extensions.ObjectExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Input;
+using osu.Framework.Threading;
 using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.ControlPoints;
 using osu.Game.Input.Handlers;
@@ -59,8 +61,7 @@ namespace osu.Game.Rulesets.Mania.UI
         // Stores the current speed adjustment active in gameplay.
         private readonly Track speedAdjustmentTrack = new TrackVirtual(0);
 
-        [Resolved]
-        private ISkinSource skin { get; set; }
+        private ISkinSource currentSkin;
 
         public DrawableManiaRuleset(Ruleset ruleset, IBeatmap beatmap, IReadOnlyList<Mod> mods = null)
             : base(ruleset, beatmap, mods)
@@ -72,8 +73,12 @@ namespace osu.Game.Rulesets.Mania.UI
         }
 
         [BackgroundDependencyLoader]
-        private void load()
+        private void load(ISkinSource source)
         {
+            currentSkin = source;
+            currentSkin.SourceChanged += onSkinChange;
+            skinChanged();
+
             foreach (var mod in Mods.OfType<IApplicableToTrack>())
                 mod.ApplyToTrack(speedAdjustmentTrack);
 
@@ -109,12 +114,28 @@ namespace osu.Game.Rulesets.Mania.UI
             updateTimeRange();
         }
 
+        private ScheduledDelegate pendingSkinChange;
+        private float hitPosition;
+
+        private void onSkinChange()
+        {
+            // schedule required to avoid calls after disposed.
+            // note that this has the side-effect of components only performing a skin change when they are alive.
+            pendingSkinChange?.Cancel();
+            pendingSkinChange = Scheduler.Add(skinChanged);
+        }
+
+        private void skinChanged()
+        {
+            hitPosition = currentSkin.GetConfig<ManiaSkinConfigurationLookup, float>(
+                              new ManiaSkinConfigurationLookup(LegacyManiaSkinConfigurationLookups.HitPosition))?.Value
+                          ?? Stage.HIT_TARGET_POSITION;
+
+            pendingSkinChange = null;
+        }
+
         private void updateTimeRange()
         {
-            float hitPosition = skin.GetConfig<ManiaSkinConfigurationLookup, float>(
-                                    new ManiaSkinConfigurationLookup(LegacyManiaSkinConfigurationLookups.HitPosition))?.Value
-                                ?? Stage.HIT_TARGET_POSITION;
-
             const float length_to_default_hit_position = 768 - LegacyManiaSkinConfiguration.DEFAULT_HIT_POSITION;
             float lengthToHitPosition = 768 - hitPosition;
 
@@ -144,5 +165,13 @@ namespace osu.Game.Rulesets.Mania.UI
         protected override ReplayInputHandler CreateReplayInputHandler(Replay replay) => new ManiaFramedReplayInputHandler(replay);
 
         protected override ReplayRecorder CreateReplayRecorder(Score score) => new ManiaReplayRecorder(score);
+
+        protected override void Dispose(bool isDisposing)
+        {
+            base.Dispose(isDisposing);
+
+            if (currentSkin.IsNotNull())
+                currentSkin.SourceChanged -= onSkinChange;
+        }
     }
 }
