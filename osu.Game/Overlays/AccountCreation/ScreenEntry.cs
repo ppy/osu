@@ -5,6 +5,7 @@ using System;
 using System.Linq;
 using System.Threading.Tasks;
 using osu.Framework.Allocation;
+using osu.Framework.Bindables;
 using osu.Framework.Extensions.LocalisationExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
@@ -36,6 +37,8 @@ namespace osu.Game.Overlays.AccountCreation
 
         [Resolved]
         private IAPIProvider api { get; set; } = null!;
+
+        private IBindable<APIState> apiState = null!;
 
         private ShakeContainer registerShake = null!;
         private ITextPart characterCheckText = null!;
@@ -142,6 +145,8 @@ namespace osu.Game.Overlays.AccountCreation
 
             passwordTextBox.Current.BindValueChanged(_ => updateCharacterCheckTextColour(), true);
             characterCheckText.DrawablePartsRecreated += _ => updateCharacterCheckTextColour();
+
+            apiState = api.State.GetBoundCopy();
         }
 
         private void updateCharacterCheckTextColour()
@@ -220,6 +225,12 @@ namespace osu.Game.Overlays.AccountCreation
                         loadingLayer.Hide();
                         return;
                     }
+
+                    apiState.BindValueChanged(state =>
+                    {
+                        if (state.NewValue == APIState.RequiresSecondFactorAuth)
+                            this.Push(new ScreenEmailVerification());
+                    });
 
                     api.Login(usernameTextBox.Text, passwordTextBox.Text);
                 });
