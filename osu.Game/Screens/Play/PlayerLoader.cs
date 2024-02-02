@@ -544,7 +544,7 @@ namespace osu.Game.Screens.Play
 
         private int restartCount;
 
-        private const double volume_requirement = 1e-3; // -60 dB
+        private const double volume_requirement = 0.01;
 
         private void showMuteWarningIfNeeded()
         {
@@ -581,11 +581,11 @@ namespace osu.Game.Screens.Play
                     volumeOverlay.IsMuted.Value = false;
 
                     // Check values before resetting, as the user may have only had mute enabled, in which case we might not need to adjust volumes.
-                    // Note that we only restore to -30 dB to ensure the user isn't suddenly overloaded by unexpectedly high volume.
+                    // Note that we only restore to -20 dB to ensure the user isn't suddenly overloaded by unexpectedly high volume.
                     if (audioManager.Volume.Value * audioManager.VolumeTrack.Value <= volume_requirement)
                     {
                         // Prioritize increasing music over master volume as to avoid also increasing effects volume.
-                        const double target = 0.031622776601684; // 10 ^ (-30 / 20)
+                        const double target = 0.1;
                         double result = target / Math.Max(0.01, audioManager.Volume.Value);
                         if (result > 1)
                         {
