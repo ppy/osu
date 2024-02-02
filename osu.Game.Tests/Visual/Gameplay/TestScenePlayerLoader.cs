@@ -266,7 +266,7 @@ namespace osu.Game.Tests.Visual.Gameplay
         [Test]
         public void TestMutedNotificationHighMasterVolume()
         {
-            addVolumeSteps("high master volume", () =>
+            addVolumeSteps("master and music volumes", () =>
             {
                 audioManager.Volume.Value = 0.15;
                 audioManager.VolumeTrack.Value = 0.01;
@@ -276,7 +276,7 @@ namespace osu.Game.Tests.Visual.Gameplay
         [Test]
         public void TestMutedNotificationLowMasterVolume()
         {
-            addVolumeSteps("low master volume", () =>
+            addVolumeSteps("master and music volumes", () =>
             {
                 audioManager.Volume.Value = 0.01;
                 audioManager.VolumeTrack.Value = 0.15;
