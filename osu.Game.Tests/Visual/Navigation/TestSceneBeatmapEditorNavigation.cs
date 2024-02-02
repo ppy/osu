@@ -79,7 +79,7 @@ namespace osu.Game.Tests.Visual.Navigation
 
             AddStep("exit", () => Game.ChildrenOfType<Editor>().Single().Exit());
 
-            AddAssert("save dialog displayed", () => Game.ChildrenOfType<DialogOverlay>().Single().CurrentDialog is PromptForSaveDialog);
+            AddUntilStep("save dialog displayed", () => Game.ChildrenOfType<DialogOverlay>().SingleOrDefault()?.CurrentDialog is PromptForSaveDialog);
         }
 
         [Test]
