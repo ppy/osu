@@ -289,9 +289,10 @@ namespace osu.Game.Tests.Visual.Gameplay
             addVolumeSteps("mute button", () =>
             {
                 // Importantly, in the case the volume is muted but the user has a volume level set, it should be retained.
+                audioManager.Volume.Value = 0.5f;
                 audioManager.VolumeTrack.Value = 0.5f;
                 volumeOverlay.IsMuted.Value = true;
-            }, () => !volumeOverlay.IsMuted.Value && audioManager.VolumeTrack.Value == 0.5f);
+            }, () => !volumeOverlay.IsMuted.Value && audioManager.Volume.Value == 0.5f && audioManager.VolumeTrack.Value == 0.5f);
         }
 
         /// <remarks>
