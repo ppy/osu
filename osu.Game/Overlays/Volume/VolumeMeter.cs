@@ -5,6 +5,7 @@
 
 using System;
 using System.Globalization;
+using JetBrains.Annotations;
 using osu.Framework;
 using osu.Framework.Allocation;
 using osu.Framework.Audio;
@@ -48,6 +49,7 @@ namespace osu.Game.Overlays.Volume
         private Sample notchSample;
         private double sampleLastPlaybackTime;
 
+        [CanBeNull]
         public event Action<SelectionState> StateChanged;
 
         private SelectionState state;
