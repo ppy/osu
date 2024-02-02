@@ -72,7 +72,7 @@ namespace osu.Game.Localisation
         /// <summary>
         /// "Based on the last {0} play(s), the suggested offset is {1} ms"
         /// </summary>
-        public static LocalisableString SuggestedOffsetValueReceived(int plays, double? value) => new TranslatableString(getKey(@"suggested_offset_value_received"), @"Based on the last {0} play(s), the suggested offset is {1} ms", plays, value);
+        public static LocalisableString SuggestedOffsetValueReceived(int plays, string value) => new TranslatableString(getKey(@"suggested_offset_value_received"), @"Based on the last {0} play(s), the suggested offset is {1} ms", plays, value);
 
         /// <summary>
         /// "Apply suggested offset"

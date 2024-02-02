@@ -156,7 +156,7 @@ namespace osu.Game.Overlays.Settings.Sections.Audio
             {
                 hintText.Text = SuggestedOffset.Value == null
                     ? AudioSettingsStrings.SuggestedOffsetNote
-                    : AudioSettingsStrings.SuggestedOffsetValueReceived(averageHitErrorHistory.Count, SuggestedOffset.Value);
+                    : AudioSettingsStrings.SuggestedOffsetValueReceived(averageHitErrorHistory.Count, $"{SuggestedOffset.Value:N0}");
                 applySuggestion.Enabled.Value = SuggestedOffset.Value != null;
             }
 
