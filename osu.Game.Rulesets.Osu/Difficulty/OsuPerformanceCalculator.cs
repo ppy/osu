@@ -4,8 +4,8 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Xml.Linq;
 using osu.Game.Rulesets.Difficulty;
+using osu.Game.Rulesets.Osu.Difficulty.Skills;
 using osu.Game.Rulesets.Osu.Mods;
 using osu.Game.Rulesets.Scoring;
 using osu.Game.Scoring;
@@ -43,6 +43,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             effectiveMissCount = calculateEffectiveMissCount(osuAttributes);
 
             double multiplier = PERFORMANCE_BASE_MULTIPLIER;
+            double power = OsuDifficultyCalculator.SUM_POWER;
 
             if (score.Mods.Any(m => m is OsuModNoFail))
                 multiplier *= Math.Max(0.90, 1.0 - 0.02 * effectiveMissCount);
@@ -62,8 +63,6 @@ namespace osu.Game.Rulesets.Osu.Difficulty
                 effectiveMissCount = Math.Min(effectiveMissCount + countOk * okMultiplier + countMeh * mehMultiplier, totalHits);
             }
 
-            double power = OsuDifficultyCalculator.SumPower;
-
             double aimValue = computeAimValue(score, osuAttributes);
             double speedValue = computeSpeedValue(score, osuAttributes);
             double mechanicalValue = Math.Pow(Math.Pow(aimValue, power) + Math.Pow(speedValue, power), 1.0 / power);
@@ -75,12 +74,22 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             double flashlightValue = potentialFlashlightValue;
             if (!score.Mods.Any(h => h is OsuModFlashlight))
                 flashlightValue = 0.0;
-            double readingARValue = computeReadingARValue(score, osuAttributes);
+
+            double lowARValue = computeReadingLowARValue(score, osuAttributes);
+            double readingHDValue = computeReadingHiddenValue(score, osuAttributes);
+            double readingSlidersValue = 0;
+
+            double highARValue = computeReadingHighARValue(score, osuAttributes);
+
+            double readingARValue = Math.Pow(
+                    Math.Pow(lowARValue, power) +
+                    Math.Pow(highARValue, power), 1.0 / power);
+
             // Reduce AR reading bonus if FL is present
-            double flPower = OsuDifficultyCalculator.FLSumPower;
+            double flPower = OsuDifficultyCalculator.FL_SUM_POWER;
             double flashlightARValue = Math.Pow(Math.Pow(flashlightValue, flPower) + Math.Pow(readingARValue, flPower), 1.0 / flPower);
 
-            double readingNonARValue = computeReadingNonARValue(score, osuAttributes);
+            double readingNonARValue = readingHDValue + readingSlidersValue;
             double cognitionValue = Math.Pow(Math.Pow(flashlightARValue, power) + Math.Pow(readingNonARValue, power), 1.0 / power);
             cognitionValue = AdjustCognitionPerformance(cognitionValue, mechanicalValue, potentialFlashlightValue);
 
@@ -106,7 +115,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
 
         private double computeAimValue(ScoreInfo score, OsuDifficultyAttributes attributes)
         {
-            double aimValue = Math.Pow(5.0 * Math.Max(1.0, attributes.AimDifficulty / 0.0675) - 4.0, 3.0) / 100000.0;
+            double aimValue = OsuStrainSkill.DifficultyToPerformance(attributes.AimDifficulty);
 
             double lengthBonus = 0.95 + 0.4 * Math.Min(1.0, totalHits / 2000.0) +
                                  (totalHits > 2000 ? Math.Log10(totalHits / 2000.0) * 0.5 : 0.0);
@@ -143,7 +152,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             if (score.Mods.Any(h => h is OsuModRelax))
                 return 0.0;
 
-            double speedValue = Math.Pow(5.0 * Math.Max(1.0, attributes.SpeedDifficulty / 0.0675) - 4.0, 3.0) / 100000.0;
+            double speedValue = OsuStrainSkill.DifficultyToPerformance(attributes.SpeedDifficulty);
 
             double lengthBonus = 0.95 + 0.4 * Math.Min(1.0, totalHits / 2000.0) +
                                  (totalHits > 2000 ? Math.Log10(totalHits / 2000.0) * 0.5 : 0.0);
@@ -245,25 +254,6 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             return flashlightValue;
         }
 
-        private double computeReadingARValue(ScoreInfo score, OsuDifficultyAttributes attributes)
-        {
-            //double readingARValue = Math.Max(computeReadingLowARValue(score, attributes), computeReadingHighARValue(score, attributes));
-            double power = OsuDifficultyCalculator.SumPower;
-            double readingValue = Math.Pow(
-                    Math.Pow(computeReadingLowARValue(score, attributes), power) +
-                    Math.Pow(computeReadingHighARValue(score, attributes), power), 1.0 / power);
-
-            return readingValue;
-        }
-
-        private double computeReadingNonARValue(ScoreInfo score, OsuDifficultyAttributes attributes)
-        {
-            double readingHDValue = computeReadingHiddenValue(score, attributes);
-            double readingSlidersValue = 0;
-
-            return readingHDValue + readingSlidersValue;
-        }
-
         private double computeReadingLowARValue(ScoreInfo score, OsuDifficultyAttributes attributes)
         {
             double rawReading = attributes.ReadingDifficultyLowAR;
@@ -289,8 +279,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
 
         private double computeReadingHighARValue(ScoreInfo score, OsuDifficultyAttributes attributes)
         {
-            // Copied from aim
-            double highARValue = Math.Pow(5.0 * Math.Max(1.0, attributes.ReadingDifficultyHighAR / 0.0675) - 4.0, 3.0) / 100000.0;
+            double highARValue = OsuStrainSkill.DifficultyToPerformance(attributes.ReadingDifficultyHighAR);
 
             // High AR should have length bonus, even more agressive than normal aim
             double lengthBonus = 0.95 + 0.4 * Math.Min(1.0, totalHits / 2000.0) +
@@ -303,11 +292,48 @@ namespace osu.Game.Rulesets.Osu.Difficulty
 
             highARValue *= getComboScalingFactor(attributes);
 
-            highARValue *= accuracy * accuracy;
-            // It is important to consider accuracy difficulty when scaling with accuracy.
-            highARValue *= 0.98 + Math.Pow(attributes.OverallDifficulty, 2) / 2500;
+            // Approximate how much of high AR difficulty is aim
+            double aimPerformance = OsuStrainSkill.DifficultyToPerformance(attributes.AimDifficulty);
+            double speedPerformance = OsuStrainSkill.DifficultyToPerformance(attributes.SpeedDifficulty);
 
-            return highARValue;
+            double aimRatio = aimPerformance / (aimPerformance + speedPerformance);
+
+            // Aim part calculation
+            double aimPartValue = highARValue * aimRatio;
+            {
+                // We assume 15% of sliders in a map are difficult since there's no way to tell from the performance calculator.
+                double estimateDifficultSliders = attributes.SliderCount * 0.15;
+
+                if (attributes.SliderCount > 0)
+                {
+                    double estimateSliderEndsDropped = Math.Clamp(Math.Min(countOk + countMeh + countMiss, attributes.MaxCombo - scoreMaxCombo), 0, estimateDifficultSliders);
+                    double sliderNerfFactor = (1 - attributes.SliderFactor) * Math.Pow(1 - estimateSliderEndsDropped / estimateDifficultSliders, 3) + attributes.SliderFactor;
+                    aimPartValue *= sliderNerfFactor;
+                }
+
+                aimPartValue *= accuracy;
+                // It is important to consider accuracy difficulty when scaling with accuracy.
+                aimPartValue *= 0.98 + Math.Pow(attributes.OverallDifficulty, 2) / 2500;
+            }
+
+            // Speed part calculation
+            double speedPartValue = highARValue * (1 - aimRatio);
+            {
+                // Calculate accuracy assuming the worst case scenario
+                double relevantTotalDiff = totalHits - attributes.SpeedNoteCount;
+                double relevantCountGreat = Math.Max(0, countGreat - relevantTotalDiff);
+                double relevantCountOk = Math.Max(0, countOk - Math.Max(0, relevantTotalDiff - countGreat));
+                double relevantCountMeh = Math.Max(0, countMeh - Math.Max(0, relevantTotalDiff - countGreat - countOk));
+                double relevantAccuracy = attributes.SpeedNoteCount == 0 ? 0 : (relevantCountGreat * 6.0 + relevantCountOk * 2.0 + relevantCountMeh) / (attributes.SpeedNoteCount * 6.0);
+
+                // Scale the speed value with accuracy and OD.
+                speedPartValue *= (0.95 + Math.Pow(attributes.OverallDifficulty, 2) / 750) * Math.Pow((accuracy + relevantAccuracy) / 2.0, (14.5 - Math.Max(attributes.OverallDifficulty, 8)) / 2);
+
+                // Scale the speed value with # of 50s to punish doubletapping.
+                speedPartValue *= Math.Pow(0.99, countMeh < totalHits / 500.0 ? 0 : countMeh - totalHits / 500.0);
+            }
+
+            return aimPartValue + speedPartValue;
         }
 
         private double computeReadingHiddenValue(ScoreInfo score, OsuDifficultyAttributes attributes)
@@ -316,6 +342,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
                 return 0.0;
 
             double rawReading = attributes.HiddenDifficulty;
+            //double readingValue = Math.Pow(rawReading, 2.0) * 25.0;
             double readingValue = Math.Pow(rawReading, 2.0) * 25.0;
 
             // Penalize misses by assessing # of misses relative to the total # of objects. Default a 3% reduction for any # of misses.

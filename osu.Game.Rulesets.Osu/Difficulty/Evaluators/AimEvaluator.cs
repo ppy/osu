@@ -24,7 +24,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
         /// <item><description>and slider difficulty.</description></item>
         /// </list>
         /// </summary>
-        public static double EvaluateDifficultyOf(DifficultyHitObject current, bool withSliderTravelDistance, double clampPreemptTime = 0)
+        public static double EvaluateDifficultyOf(DifficultyHitObject current, bool withSliderTravelDistance)
         {
             if (current.BaseObject is Spinner || current.Index <= 1 || current.Previous(0).BaseObject is Spinner)
                 return 0;
@@ -120,17 +120,6 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
 
             // Add in acute angle bonus or wide angle bonus + velocity change bonus, whichever is larger.
             aimStrain += Math.Max(acuteAngleBonus * acute_angle_multiplier, wideAngleBonus * wide_angle_multiplier + velocityChangeBonus * velocity_change_multiplier);
-
-            if (clampPreemptTime > 0)
-            {
-                // Scale if AR is too high for high AR calc
-                double multiplier = osuCurrObj.StrainTime / Math.Min(osuCurrObj.StrainTime, clampPreemptTime - 150); // 150ms is considered as reaction time
-                double multiplierIfAR11 = osuCurrObj.StrainTime / Math.Min(osuCurrObj.StrainTime, 150);
-
-                multiplier = Math.Min(multiplier, multiplierIfAR11);
-
-                aimStrain *= multiplier;
-            }
 
             // Add in additional slider velocity bonus.
             if (withSliderTravelDistance)

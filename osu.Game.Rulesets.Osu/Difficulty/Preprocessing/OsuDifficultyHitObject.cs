@@ -95,11 +95,25 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Preprocessing
         /// </summary>
         public IList<OverlapObject> OverlapObjects { get; private set; }
 
+        /// <summary>
+        /// Time in ms between appearence of this <see cref="OsuDifficultyHitObject"/> and moment to click on it.
+        /// </summary>
+        public readonly double Preempt;
+
+        /// <summary>
+        /// Preempt of follow line for this <see cref="OsuDifficultyHitObject"/> adjusted by clockrate.
+        /// Will be equal to 0 if object is New Combo.
+        /// </summary>
+        public readonly double FollowLineTime;
+
+        /// <summary>
+        /// Playback rate of beatmap.
+        /// Will be equal 1.5 on DT and 0.75 on HT.
+        /// </summary>
+        public readonly double ClockRate;
+
         private readonly OsuHitObject? lastLastObject;
         private readonly OsuHitObject lastObject;
-        public readonly double Preempt;
-        public readonly double FollowLineTime;
-        public readonly double ClockRate;
 
         public OsuDifficultyHitObject(HitObject hitObject, HitObject lastObject, HitObject? lastLastObject, double clockRate, List<DifficultyHitObject> objects, int index)
             : base(hitObject, lastObject, clockRate, objects, index)

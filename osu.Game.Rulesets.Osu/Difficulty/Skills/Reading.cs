@@ -9,7 +9,6 @@ using osu.Game.Rulesets.Difficulty.Preprocessing;
 using osu.Game.Rulesets.Difficulty.Skills;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Osu.Difficulty.Evaluators;
-using osu.Game.Rulesets.Osu.Difficulty.Preprocessing;
 
 namespace osu.Game.Rulesets.Osu.Difficulty.Skills
 {
@@ -75,65 +74,15 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
         }
     }
 
-    public class ReadingHighAR : GraphSkill
+    public class ReadingHidden : OsuStrainSkill
     {
-        public ReadingHighAR(Mod[] mods)
-            : base(mods)
-        {
-            aimComponent = new HighARAimComponent(mods);
-            speedComponent = new HighARSpeedComponent(mods);
-        }
-
-        private HighARAimComponent aimComponent;
-        private HighARSpeedComponent speedComponent;
-
-        private readonly List<double> difficulties = new List<double>();
-
-        public override void Process(DifficultyHitObject current)
-        {
-            aimComponent.Process(current);
-            speedComponent.Process(current);
-
-            double power = OsuDifficultyCalculator.SumPower;
-            double mergedDifficulty = Math.Pow(
-                Math.Pow(aimComponent.CurrentSectionPeak, power) +
-                Math.Pow(speedComponent.CurrentSectionPeak, power), 1.0 / power);
-
-            difficulties.Add(mergedDifficulty);
-
-            if (current.Index == 0)
-                CurrentSectionEnd = Math.Ceiling(current.StartTime / SectionLength) * SectionLength;
-
-            while (current.StartTime > CurrentSectionEnd)
-            {
-                StrainPeaks.Add(CurrentSectionPeak);
-                CurrentSectionPeak = 0;
-                CurrentSectionEnd += SectionLength;
-            }
-
-            CurrentSectionPeak = Math.Max(mergedDifficulty, CurrentSectionPeak);
-        }
-        public override double DifficultyValue()
-        {
-            double power = OsuDifficultyCalculator.SumPower;
-            return Math.Pow(
-                Math.Pow(aimComponent.DifficultyValue(), power) +
-                Math.Pow(speedComponent.DifficultyValue(), power), 1.0 / power);
-        }
-    }
-
-    public class HighARAimComponent : OsuStrainSkill
-    {
-        public HighARAimComponent(Mod[] mods)
+        public ReadingHidden(Mod[] mods)
             : base(mods)
         {
         }
 
         private double currentStrain;
-        // private double currentRhythm;
-
-        //private double skillMultiplier => 13;
-        private double skillMultiplier => 14;
+        private double skillMultiplier => 5;
         private double strainDecayBase => 0.15;
 
         private double strainDecay(double ms) => Math.Pow(strainDecayBase, ms / 1000);
@@ -144,105 +93,14 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
         {
             currentStrain *= strainDecay(current.DeltaTime);
 
-            double aimDifficulty = AimEvaluator.EvaluateDifficultyOf(current, true, ((OsuDifficultyHitObject)current).Preempt);
-            aimDifficulty *= ReadingEvaluator.EvaluateHighARDifficultyOf(current, true);
-            aimDifficulty *= skillMultiplier;
+            // We're not using slider aim because we assuming that HD doesn't makes sliders harder (what is not true, but we will ignore this for now)
+            double hiddenDifficulty = AimEvaluator.EvaluateDifficultyOf(current, false);
+            hiddenDifficulty *= ReadingHiddenEvaluator.EvaluateDifficultyOf(current);
+            hiddenDifficulty *= skillMultiplier;
 
-            double totalStrain = currentStrain;
-            currentStrain += aimDifficulty;
+            currentStrain += hiddenDifficulty;
 
-            // Warning: this line is unstable, so increasing amount of objects can decrease pp
-            totalStrain += aimDifficulty * (1 + ReadingEvaluator.EvaluateLowDensityBonusOf(current));
-
-
-            //Console.WriteLine($"{current.StartTime} - {ReadingEvaluator.EvaluateLowDensityBonusOf(current)}");
-
-            return totalStrain;
-        }
-    }
-
-    public class HighARSpeedComponent : OsuStrainSkill
-    {
-        private double skillMultiplier => 675;
-        private double strainDecayBase => 0.3;
-
-        private double currentStrain;
-        private double currentRhythm;
-
-        public HighARSpeedComponent(Mod[] mods)
-            : base(mods)
-        {
-        }
-
-        private double strainDecay(double ms) => Math.Pow(strainDecayBase, ms / 1000);
-
-        protected override double CalculateInitialStrain(double time, DifficultyHitObject current) => (currentStrain * currentRhythm) * strainDecay(time - current.Previous(0).StartTime);
-
-        protected override double StrainValueAt(DifficultyHitObject current)
-        {
-            OsuDifficultyHitObject currODHO = (OsuDifficultyHitObject)current;
-
-            currentStrain *= strainDecay(currODHO.StrainTime);
-
-            double speedDifficulty = SpeedEvaluator.EvaluateDifficultyOf(current) * skillMultiplier;
-            speedDifficulty *= ReadingEvaluator.EvaluateHighARDifficultyOf(current, false);
-            currentStrain += speedDifficulty;
-
-            currentRhythm = currODHO.RhythmDifficulty;
-            // currentRhythm *= currentRhythm; // Squaring is broken cuz rhythm is broken ((((
-
-            double totalStrain = currentStrain * currentRhythm;
-            return totalStrain;
-        }
-    }
-
-    public class ReadingHidden : GraphSkill
-    {
-        public ReadingHidden(Mod[] mods)
-            : base(mods)
-        {
-        }
-
-        private readonly List<double> difficulties = new List<double>();
-        private double skillMultiplier => 2.3;
-
-        public override void Process(DifficultyHitObject current)
-        {
-            double currentDifficulty = ReadingEvaluator.EvaluateHiddenDifficultyOf(current) * skillMultiplier;
-
-            difficulties.Add(currentDifficulty);
-
-            if (current.Index == 0)
-                CurrentSectionEnd = Math.Ceiling(current.StartTime / SectionLength) * SectionLength;
-
-            while (current.StartTime > CurrentSectionEnd)
-            {
-                StrainPeaks.Add(CurrentSectionPeak);
-                CurrentSectionPeak = 0;
-                CurrentSectionEnd += SectionLength;
-            }
-
-            CurrentSectionPeak = Math.Max(currentDifficulty, CurrentSectionPeak);
-        }
-
-        public override double DifficultyValue()
-        {
-            double difficulty = 0;
-
-            // Sections with 0 difficulty are excluded to avoid worst-case time complexity of the following sort (e.g. /b/2351871).
-            // These sections will not contribute to the difficulty.
-            var peaks = difficulties.Where(p => p > 0);
-
-            List<double> values = peaks.OrderByDescending(d => d).ToList();
-
-            // Difficulty is the weighted sum of the highest strains from every section.
-            // We're sorting from highest to lowest strain.
-            for (int i = 0; i < values.Count; i++)
-            {
-                difficulty += values[i] / (i + 1);
-            }
-
-            return difficulty;
+            return currentStrain;
         }
     }
 }

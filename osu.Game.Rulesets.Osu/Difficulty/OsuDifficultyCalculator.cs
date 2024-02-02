@@ -22,11 +22,10 @@ namespace osu.Game.Rulesets.Osu.Difficulty
 {
     public class OsuDifficultyCalculator : DifficultyCalculator
     {
-        private const double difficulty_multiplier = 0.067;
-
+        public const double DIFFICULTY_MULTIPLIER = 0.067;
+        public const double SUM_POWER = 1.1;
+        public const double FL_SUM_POWER = 1.6;
         public override int Version => 20220902;
-        public static double SumPower => 1.1;
-        public static double FLSumPower => 1.6;
 
         public OsuDifficultyCalculator(IRulesetInfo ruleset, IWorkingBeatmap beatmap)
             : base(ruleset, beatmap)
@@ -38,16 +37,16 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             if (beatmap.HitObjects.Count == 0)
                 return new OsuDifficultyAttributes { Mods = mods };
 
-            double aimRating = Math.Sqrt(skills[0].DifficultyValue()) * difficulty_multiplier;
-            double aimRatingNoSliders = Math.Sqrt(skills[1].DifficultyValue()) * difficulty_multiplier;
-            double speedRating = Math.Sqrt(skills[2].DifficultyValue()) * difficulty_multiplier;
+            double aimRating = Math.Sqrt(skills[0].DifficultyValue()) * DIFFICULTY_MULTIPLIER;
+            double aimRatingNoSliders = Math.Sqrt(skills[1].DifficultyValue()) * DIFFICULTY_MULTIPLIER;
+            double speedRating = Math.Sqrt(skills[2].DifficultyValue()) * DIFFICULTY_MULTIPLIER;
             double speedNotes = ((Speed)skills[2]).RelevantNoteCount();
-            double flashlightRating = Math.Sqrt(skills[3].DifficultyValue()) * difficulty_multiplier;
+            double flashlightRating = Math.Sqrt(skills[3].DifficultyValue()) * DIFFICULTY_MULTIPLIER;
 
-            double readingLowARRating = Math.Sqrt(skills[4].DifficultyValue()) * difficulty_multiplier;
-            double readingHighARRating = Math.Sqrt(skills[5].DifficultyValue()) * difficulty_multiplier;
+            double readingLowARRating = Math.Sqrt(skills[4].DifficultyValue()) * DIFFICULTY_MULTIPLIER;
+            double readingHighARRating = Math.Sqrt(skills[5].DifficultyValue()) * DIFFICULTY_MULTIPLIER;
             double readingSlidersRating = 0;
-            double hiddenRating = Math.Sqrt(skills[6].DifficultyValue()) * difficulty_multiplier;
+            double hiddenRating = Math.Sqrt(skills[6].DifficultyValue()) * DIFFICULTY_MULTIPLIER;
 
             double sliderFactor = aimRating > 0 ? aimRatingNoSliders / aimRating : 1;
 
@@ -64,8 +63,8 @@ namespace osu.Game.Rulesets.Osu.Difficulty
                 flashlightRating *= 0.7;
             }
 
-            double baseAimPerformance = Math.Pow(5 * Math.Max(1, aimRating / 0.0675) - 4, 3) / 100000;
-            double baseSpeedPerformance = Math.Pow(5 * Math.Max(1, speedRating / 0.0675) - 4, 3) / 100000;
+            double baseAimPerformance = OsuStrainSkill.DifficultyToPerformance(aimRating);
+            double baseSpeedPerformance = OsuStrainSkill.DifficultyToPerformance(speedRating);
 
             // Cognition
             double baseFlashlightPerformance = 0.0;
@@ -73,10 +72,10 @@ namespace osu.Game.Rulesets.Osu.Difficulty
                 baseFlashlightPerformance = Math.Pow(flashlightRating, 2.0) * 25.0;
 
             double baseReadingLowARPerformance = Math.Pow(readingLowARRating, 2.5) * 17.0;
-            double baseReadingHighARPerformance = Math.Pow(5 * Math.Max(1, readingHighARRating / 0.0675) - 4, 3) / 100000;
-            double baseReadingARPerformance = Math.Pow(Math.Pow(baseReadingLowARPerformance, SumPower) + Math.Pow(baseReadingHighARPerformance, SumPower), 1.0 / SumPower);
+            double baseReadingHighARPerformance = OsuStrainSkill.DifficultyToPerformance(readingHighARRating);
+            double baseReadingARPerformance = Math.Pow(Math.Pow(baseReadingLowARPerformance, SUM_POWER) + Math.Pow(baseReadingHighARPerformance, SUM_POWER), 1.0 / SUM_POWER);
 
-            double baseFlashlightARPerformance = Math.Pow(Math.Pow(baseFlashlightPerformance, FLSumPower) + Math.Pow(baseReadingARPerformance, FLSumPower), 1.0 / FLSumPower);
+            double baseFlashlightARPerformance = Math.Pow(Math.Pow(baseFlashlightPerformance, FL_SUM_POWER) + Math.Pow(baseReadingARPerformance, FL_SUM_POWER), 1.0 / FL_SUM_POWER);
 
             double baseReadingHiddenPerformance = 0;
             if (mods.Any(h => h is OsuModHidden))
@@ -86,6 +85,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             double baseReadingNonARPerformance = baseReadingHiddenPerformance + baseReadingSliderPerformance;
 
             double preempt = IBeatmapDifficultyInfo.DifficultyRange(beatmap.Difficulty.ApproachRate, 1800, 1200, 450) / clockRate;
+
             double drainRate = beatmap.Difficulty.DrainRate;
             int maxCombo = beatmap.GetMaxCombo();
 
@@ -94,16 +94,16 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             int spinnerCount = beatmap.HitObjects.Count(h => h is Spinner);
 
             // Limit cognition by full memorisation difficulty
-            double cognitionPerformance = Math.Pow(Math.Pow(baseFlashlightARPerformance, SumPower) + Math.Pow(baseReadingNonARPerformance, SumPower), 1.0 / SumPower);
-            double mechanicalPerformance = Math.Pow(Math.Pow(baseAimPerformance, SumPower) + Math.Pow(baseSpeedPerformance, SumPower), 1.0 / SumPower);
+            double cognitionPerformance = Math.Pow(Math.Pow(baseFlashlightARPerformance, SUM_POWER) + Math.Pow(baseReadingNonARPerformance, SUM_POWER), 1.0 / SUM_POWER);
+            double mechanicalPerformance = Math.Pow(Math.Pow(baseAimPerformance, SUM_POWER) + Math.Pow(baseSpeedPerformance, SUM_POWER), 1.0 / SUM_POWER);
             double potentialFlashlightPerformance = OsuPerformanceCalculator.ComputePerfectFlashlightValue(flashlightRating, hitCirclesCount + sliderCount);
             cognitionPerformance = OsuPerformanceCalculator.AdjustCognitionPerformance(cognitionPerformance, mechanicalPerformance, potentialFlashlightPerformance);
 
             double basePerformance =
                 Math.Pow(
-                    Math.Pow(mechanicalPerformance, SumPower) +
-                    Math.Pow(cognitionPerformance, SumPower)
-                    , 1.0 / SumPower
+                    Math.Pow(mechanicalPerformance, SUM_POWER) +
+                    Math.Pow(cognitionPerformance, SUM_POWER)
+                    , 1.0 / SUM_POWER
                 );
 
             double starRating = basePerformance > 0.00001
@@ -114,6 +114,8 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             hitWindows.SetDifficulty(beatmap.Difficulty.OverallDifficulty);
 
             double hitWindowGreat = hitWindows.WindowFor(HitResult.Great) / clockRate;
+
+            //var test = ((ReadingHighAR)skills[5]).GetAimSpeed();
 
             OsuDifficultyAttributes attributes = new OsuDifficultyAttributes
             {
@@ -128,7 +130,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
                 HiddenDifficulty = hiddenRating,
                 FlashlightDifficulty = flashlightRating,
                 SliderFactor = sliderFactor,
-                ApproachRate = preempt > 1200 ? (1800 - preempt) / 120 : (1200 - preempt) / 150 + 5,
+                ApproachRate = IBeatmapDifficultyInfo.InverseDifficultyRange(preempt, 1800, 1200, 450),
                 OverallDifficulty = (80 - hitWindowGreat) / 6,
                 DrainRate = drainRate,
                 MaxCombo = maxCombo,

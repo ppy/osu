@@ -11,6 +11,7 @@ using osu.Game.Rulesets.Osu.Objects;
 
 namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
 {
+    // Main class with some util functions
     public static class ReadingEvaluator
     {
         private const double reading_window_size = 3000;
@@ -26,7 +27,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
                 double loopDifficulty = currObj.OpacityAt(loopObj.BaseObject.StartTime, false);
 
                 // Small distances means objects may be cheesed, so it doesn't matter whether they are arranged confusingly.
-                loopDifficulty *= logistic((loopObj.MinimumJumpDistance - 90) / 15);
+                loopDifficulty *= logistic((loopObj.MinimumJumpDistance - 60) / 10);
 
                 //double timeBetweenCurrAndLoopObj = (currObj.BaseObject.StartTime - loopObj.BaseObject.StartTime) / clockRateEstimate;
                 double timeBetweenCurrAndLoopObj = currObj.StartTime - loopObj.StartTime;
@@ -79,57 +80,13 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
             return difficulty;
         }
 
-        public static double EvaluateHighARDifficultyOf(DifficultyHitObject current, bool applyAdjust = false)
-        {
-            var currObj = (OsuDifficultyHitObject)current;
-
-            double result = highArCurve(currObj.Preempt);
-
-            if (applyAdjust)
-            {
-                double inpredictability = EvaluateInpredictabilityOf(current);
-
-                // follow lines make high AR easier, so apply nerf if object isn't new combo
-                inpredictability *= 1 + 0.1 * (800 - currObj.FollowLineTime) / 800;
-
-                result *= 0.85 + 0.75 * inpredictability;
-            }
-
-            return result;
-        }
-
-        public static double EvaluateHiddenDifficultyOf(DifficultyHitObject current)
-        {
-            var currObj = (OsuDifficultyHitObject)current;
-
-            double aimDifficulty = AimEvaluator.EvaluateDifficultyOf(current, false);
-
-            double hdDifficulty = 0;
-
-            double timeSpentInvisible = getDurationSpentInvisible(currObj) / currObj.ClockRate;
-
-            double density = 1 + Math.Max(0, CalculateDenstityOf(currObj) - 1);
-            density *= getConstantAngleNerfFactor(currObj);
-
-            double timeDifficultyFactor = density / 1000;
-
-            double visibleObjectFactor = Math.Clamp(retrieveCurrentVisibleObjects(currObj).Count - 2, 0, 15);
-
-            hdDifficulty += Math.Pow(visibleObjectFactor * timeSpentInvisible * timeDifficultyFactor, 1) +
-                            (6 + visibleObjectFactor) * aimDifficulty;
-
-            hdDifficulty *= 0.95 + 0.15 * EvaluateInpredictabilityOf(current); // Max multiplier is 1.1
-
-            return hdDifficulty;
-        }
-
         // Returns value from 0 to 1, where 0 is very predictable and 1 is very unpredictable
         public static double EvaluateInpredictabilityOf(DifficultyHitObject current)
         {
             // make the sum equal to 1
-            const double velocity_change_part = 0.3;
-            const double angle_change_part = 0.6;
-            const double rhythm_change_part = 0.1;
+            const double velocity_change_part = 0.25;
+            const double angle_change_part = 0.45;
+            const double rhythm_change_part = 0.3;
 
             if (current.BaseObject is Spinner || current.Index == 0 || current.Previous(0).BaseObject is Spinner)
                 return 0;
@@ -137,22 +94,18 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
             var osuCurrObj = (OsuDifficultyHitObject)current;
             var osuLastObj = (OsuDifficultyHitObject)current.Previous(0);
 
-            double velocityChangeBonus = 0;
+            // Rhythm difference punishment for velocity and angle bonuses
+            double rhythmSimilarity = 1 - getRhythmDifference(osuCurrObj.StrainTime, osuLastObj.StrainTime);
+
+            // Make differentiation going from 1/4 to 1/2 and bigger difference
+            // To 1/3 to 1/2 and smaller difference
+            rhythmSimilarity = Math.Clamp(rhythmSimilarity, 0.5, 0.75);
+            rhythmSimilarity = 4 * (rhythmSimilarity - 0.5);
+
+            double velocityChangeBonus = getVelocityChangeFactor(osuCurrObj, osuLastObj) * rhythmSimilarity;
 
             double currVelocity = osuCurrObj.LazyJumpDistance / osuCurrObj.StrainTime;
             double prevVelocity = osuLastObj.LazyJumpDistance / osuLastObj.StrainTime;
-
-            // https://www.desmos.com/calculator/kqxmqc8pkg
-            if (currVelocity > 0 || prevVelocity > 0)
-            {
-                double velocityChange = Math.Max(0,
-                Math.Min(
-                    Math.Abs(prevVelocity - currVelocity) - 0.5 * Math.Min(currVelocity, prevVelocity),
-                    Math.Max(((OsuHitObject)osuCurrObj.BaseObject).Radius / Math.Max(osuCurrObj.StrainTime, osuLastObj.StrainTime), Math.Min(currVelocity, prevVelocity))
-                    )); // Stealed from xexxar
-                velocityChangeBonus = velocityChange / Math.Max(currVelocity, prevVelocity); // maxiumum is 0.4
-                velocityChangeBonus /= 0.4;
-            }
 
             double angleChangeBonus = 0;
 
@@ -162,6 +115,9 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
                 angleChangeBonus *= Math.Min(currVelocity, prevVelocity) / Math.Max(currVelocity, prevVelocity); // Prevent cheesing
             }
 
+            angleChangeBonus *= rhythmSimilarity;
+
+            // This bonus only awards rhythm changes if they're not filled with sliderends
             double rhythmChangeBonus = 0;
 
             if (current.Index > 1)
@@ -190,19 +146,26 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
             return result;
         }
 
-        public static double EvaluateLowDensityBonusOf(DifficultyHitObject current)
+        private static double getVelocityChangeFactor(OsuDifficultyHitObject osuCurrObj, OsuDifficultyHitObject osuLastObj)
         {
-            //var currObj = (OsuDifficultyHitObject)current;
+            double currVelocity = osuCurrObj.LazyJumpDistance / osuCurrObj.StrainTime;
+            double prevVelocity = osuLastObj.LazyJumpDistance / osuLastObj.StrainTime;
 
-            //// Density = 2 in general means 3 notes on screen (it's not including current note)
-            //double density = CalculateDenstityOf(currObj);
+            double velocityChangeFactor = 0;
 
-            //// We are considering density = 1.5 as starting point, 1.0 is noticably uncomfy and 0.5 is severely uncomfy
-            //double bonus = 1.5 - density;
-            //if (bonus <= 0) return 0;
+            // https://www.desmos.com/calculator/kqxmqc8pkg
+            if (currVelocity > 0 || prevVelocity > 0)
+            {
+                double velocityChange = Math.Max(0,
+                Math.Min(
+                    Math.Abs(prevVelocity - currVelocity) - 0.5 * Math.Min(currVelocity, prevVelocity),
+                    Math.Max(((OsuHitObject)osuCurrObj.BaseObject).Radius / Math.Max(osuCurrObj.StrainTime, osuLastObj.StrainTime), Math.Min(currVelocity, prevVelocity))
+                    )); // Stealed from xexxar
+                velocityChangeFactor = velocityChange / Math.Max(currVelocity, prevVelocity); // maxiumum is 0.4
+                velocityChangeFactor /= 0.4;
+            }
 
-            //return Math.Pow(bonus, 2);
-            return 0;
+            return velocityChangeFactor;
         }
 
         // Returns a list of objects that are visible on screen at
@@ -220,35 +183,6 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
 
                 yield return hitObject;
             }
-        }
-
-        private static List<OsuDifficultyHitObject> retrieveCurrentVisibleObjects(OsuDifficultyHitObject current)
-        {
-            List<OsuDifficultyHitObject> objects = new List<OsuDifficultyHitObject>();
-
-            for (int i = 0; i < current.Count; i++)
-            {
-                OsuDifficultyHitObject hitObject = (OsuDifficultyHitObject)current.Next(i);
-
-                if (hitObject.IsNull() ||
-                    (hitObject.StartTime - current.StartTime) > reading_window_size ||
-                    current.StartTime < hitObject.StartTime - hitObject.Preempt)
-                    break;
-
-                objects.Add(hitObject);
-            }
-
-            return objects;
-        }
-
-        private static double getDurationSpentInvisible(OsuDifficultyHitObject current)
-        {
-            var baseObject = (OsuHitObject)current.BaseObject;
-
-            double fadeOutStartTime = baseObject.StartTime - baseObject.TimePreempt + baseObject.TimeFadeIn;
-            double fadeOutDuration = baseObject.TimePreempt * OsuModHidden.FADE_OUT_DURATION_MULTIPLIER;
-
-            return (fadeOutStartTime + fadeOutDuration) - (baseObject.StartTime - baseObject.TimePreempt);
         }
 
         private static double getConstantAngleNerfFactor(OsuDifficultyHitObject current)
@@ -327,19 +261,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
             return Math.Clamp(2 - deltaTime / (reading_window_size / 2), 0, 1);
         }
 
-        // https://www.desmos.com/calculator/hbj7swzlth
-        private static double highArCurve(double preempt)
-        {
-            double value = Math.Pow(3, 3 - 0.01 * preempt); // 1 for 300ms, 0.25 for 400ms, 0.0625 for 500ms
-            value = softmin(value, 2, 1.7); // use softmin to achieve full-memory cap, 2 times more than AR11 (300ms)
-            return value;
-        }
-
         private static double getRhythmDifference(double t1, double t2) => 1 - Math.Min(t1, t2) / Math.Max(t1, t2);
         private static double logistic(double x) => 1 / (1 + Math.Exp(-x));
-
-        // We are using mutiply and divide instead of add and subtract, so values won't be negative
-        // https://www.desmos.com/calculator/fv5xerwpd2
-        private static double softmin(double a, double b, double power = Math.E) => a * b / Math.Log(Math.Pow(power, a) + Math.Pow(power, b), power);
     }
 }
