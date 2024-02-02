@@ -584,10 +584,10 @@ namespace osu.Game.Screens.Play
                     // Note that we only restore to -20 dB to ensure the user isn't suddenly overloaded by unexpectedly high volume.
                     if (Math.Floor(audioManager.Volume.Value * audioManager.VolumeTrack.Value * 100) / 100 <= volume_requirement)
                     {
-                        const double target = 0.1;
-
                         // Prioritize increasing music over master volume as to avoid also increasing effects volume.
+                        const double target = 0.1;
                         double result = target / Math.Max(0.01, audioManager.Volume.Value);
+
                         if (result > 1)
                         {
                             audioManager.Volume.Value = target;
