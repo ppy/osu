@@ -1,8 +1,6 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
 using System;
 using System.Linq;
 using System.Threading.Tasks;
@@ -28,28 +26,28 @@ namespace osu.Game.Overlays.AccountCreation
 {
     public partial class ScreenEntry : AccountCreationScreen
     {
-        private ErrorTextFlowContainer usernameDescription;
-        private ErrorTextFlowContainer emailAddressDescription;
-        private ErrorTextFlowContainer passwordDescription;
+        private ErrorTextFlowContainer usernameDescription = null!;
+        private ErrorTextFlowContainer emailAddressDescription = null!;
+        private ErrorTextFlowContainer passwordDescription = null!;
 
-        private OsuTextBox usernameTextBox;
-        private OsuTextBox emailTextBox;
-        private OsuPasswordTextBox passwordTextBox;
-
-        [Resolved]
-        private IAPIProvider api { get; set; }
-
-        private ShakeContainer registerShake;
-        private ITextPart characterCheckText;
-
-        private OsuTextBox[] textboxes;
-        private LoadingLayer loadingLayer;
+        private OsuTextBox usernameTextBox = null!;
+        private OsuTextBox emailTextBox = null!;
+        private OsuPasswordTextBox passwordTextBox = null!;
 
         [Resolved]
-        private GameHost host { get; set; }
+        private IAPIProvider api { get; set; } = null!;
+
+        private ShakeContainer registerShake = null!;
+        private ITextPart characterCheckText = null!;
+
+        private OsuTextBox[] textboxes = null!;
+        private LoadingLayer loadingLayer = null!;
 
         [Resolved]
-        private OsuGame game { get; set; }
+        private GameHost? host { get; set; }
+
+        [Resolved]
+        private OsuGame game { get; set; } = null!;
 
         [BackgroundDependencyLoader]
         private void load()
@@ -180,7 +178,7 @@ namespace osu.Game.Overlays.AccountCreation
             Task.Run(() =>
             {
                 bool success;
-                RegistrationRequest.RegistrationRequestErrors errors = null;
+                RegistrationRequest.RegistrationRequestErrors? errors = null;
 
                 try
                 {
@@ -241,6 +239,6 @@ namespace osu.Game.Overlays.AccountCreation
             return false;
         }
 
-        private OsuTextBox nextUnfilledTextBox() => textboxes.FirstOrDefault(t => string.IsNullOrEmpty(t.Text));
+        private OsuTextBox? nextUnfilledTextBox() => textboxes.FirstOrDefault(t => string.IsNullOrEmpty(t.Text));
     }
 }
