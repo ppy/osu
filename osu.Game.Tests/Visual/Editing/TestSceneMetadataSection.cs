@@ -42,7 +42,7 @@ namespace osu.Game.Tests.Visual.Editing
 
             createSection();
 
-            TextBox textbox = null!;
+            TextBox textbox;
 
             AddStep("focus first textbox", () =>
             {
@@ -81,7 +81,7 @@ namespace osu.Game.Tests.Visual.Editing
 
             createSection();
 
-            TextBox textbox = null!;
+            TextBox textbox;
 
             AddStep("focus first textbox", () =>
             {
