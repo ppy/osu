@@ -138,7 +138,7 @@ namespace osu.Desktop
                     return false;
 
                 // Make sure that this is a laptop.
-                var gpus = new IntPtr[64];
+                IntPtr[] gpus = new IntPtr[64];
                 if (checkError(EnumPhysicalGPUs(gpus, out int gpuCount)))
                     return false;
 
