@@ -91,7 +91,7 @@ namespace osu.Game.Overlays.Settings.Sections.Audio
                         applySuggestion = new RoundedButton
                         {
                             RelativeSizeAxes = Axes.X,
-                            Text = "Apply suggested offset",
+                            Text = AudioSettingsStrings.ApplySuggestedOffset,
                             Action = () =>
                             {
                                 if (SuggestedOffset.Value.HasValue)
@@ -155,8 +155,8 @@ namespace osu.Game.Overlays.Settings.Sections.Audio
             private void updateHintText()
             {
                 hintText.Text = SuggestedOffset.Value == null
-                    ? @"Play a few beatmaps to receive a suggested offset!"
-                    : $@"Based on the last {averageHitErrorHistory.Count} play(s), the suggested offset is {SuggestedOffset.Value:N0} ms.";
+                    ? AudioSettingsStrings.SuggestedOffsetNote
+                    : AudioSettingsStrings.SuggestedOffsetValueReceived(averageHitErrorHistory.Count, SuggestedOffset.Value);
                 applySuggestion.Enabled.Value = SuggestedOffset.Value != null;
             }
 

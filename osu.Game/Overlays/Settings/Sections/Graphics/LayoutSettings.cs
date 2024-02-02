@@ -115,7 +115,7 @@ namespace osu.Game.Overlays.Settings.Sections.Graphics
                 },
                 safeAreaConsiderationsCheckbox = new SettingsCheckbox
                 {
-                    LabelText = "Shrink game to avoid cameras and notches",
+                    LabelText = GraphicsSettingsStrings.ShrinkGameOnMobile,
                     Current = osuConfig.GetBindable<bool>(OsuSetting.SafeAreaConsiderations),
                 },
                 new SettingsSlider<float, UIScaleSlider>

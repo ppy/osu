@@ -159,6 +159,11 @@ namespace osu.Game.Localisation
         /// </summary>
         public static LocalisableString MinimiseOnFocusLoss => new TranslatableString(getKey(@"minimise_on_focus_loss"), @"Minimise osu! when switching to another app");
 
+        /// <summary>
+        /// "Shrink game to avoid cameras and notches"
+        /// </summary>
+        public static LocalisableString ShrinkGameOnMobile => new TranslatableString(getKey(@"shrink_game_on_mobile"), @"Shrink game to avoid cameras and notches");
+
         private static string getKey(string key) => $@"{prefix}:{key}";
     }
 }
