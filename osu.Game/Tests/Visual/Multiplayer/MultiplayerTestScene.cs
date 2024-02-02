@@ -57,7 +57,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
             {
                 AddStep("join room", () =>
                 {
-                    SelectedRoom!.Value = CreateRoom();
+                    SelectedRoom.Value = CreateRoom();
                     RoomManager.CreateRoom(SelectedRoom.Value);
                 });
 
