@@ -1,7 +1,6 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics;
 using osu.Game.Rulesets.Osu;
 using osu.Game.Rulesets.Scoring;
@@ -25,12 +24,11 @@ namespace osu.Game.Tests.Visual.Ranking
             double accuracyB = scoreProcessor.AccuracyCutoffFromRank(ScoreRank.B);
             double accuracyC = scoreProcessor.AccuracyCutoffFromRank(ScoreRank.C);
 
-            Add(new Container
+            Add(ring = new GradedCircles(accuracyC, accuracyB, accuracyA, accuracyS, accuracyX)
             {
                 Anchor = Anchor.Centre,
                 Origin = Anchor.Centre,
-                Size = new Vector2(400),
-                Child = ring = new GradedCircles(accuracyC, accuracyB, accuracyA, accuracyS, accuracyX)
+                Size = new Vector2(400)
             });
         }
 
