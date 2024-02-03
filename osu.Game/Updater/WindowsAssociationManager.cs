@@ -78,7 +78,7 @@ namespace osu.Game.Updater
             localisationParameters.ValueChanged += _ => updateDescriptions();
         }
 
-        internal void InstallAssociations()
+        public void InstallAssociations()
         {
             try
             {
@@ -132,7 +132,9 @@ namespace osu.Game.Updater
             }
         }
 
-        internal void UninstallAssociations()
+        public void UninstallAssociations() => UninstallAssociations(programIdPrefix);
+
+        public static void UninstallAssociations(string programIdPrefix)
         {
             try
             {
@@ -154,7 +156,7 @@ namespace osu.Game.Updater
             }
         }
 
-        internal void NotifyShellUpdate() => SHChangeNotify(EventId.SHCNE_ASSOCCHANGED, Flags.SHCNF_IDLIST, IntPtr.Zero, IntPtr.Zero);
+        internal static void NotifyShellUpdate() => SHChangeNotify(EventId.SHCNE_ASSOCCHANGED, Flags.SHCNF_IDLIST, IntPtr.Zero, IntPtr.Zero);
 
         #region Native interop
 
