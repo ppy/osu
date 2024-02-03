@@ -7,7 +7,6 @@ using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.UserInterface;
 using osu.Game.Graphics;
 using osu.Game.Scoring;
-using osuTK;
 
 namespace osu.Game.Screens.Ranking.Expanded.Accuracy
 {
@@ -39,11 +38,6 @@ namespace osu.Game.Screens.Ranking.Expanded.Accuracy
 
         public GradedCircles(double accuracyC, double accuracyB, double accuracyA, double accuracyS, double accuracyX)
         {
-            Anchor = Anchor.Centre;
-            Origin = Anchor.Centre;
-            RelativeSizeAxes = Axes.Both;
-            Size = new Vector2(0.8f);
-            Padding = new MarginPadding(2.5f);
             InternalChildren = new Drawable[]
             {
                 dProgress = new GradedCircle(0.0, accuracyC)

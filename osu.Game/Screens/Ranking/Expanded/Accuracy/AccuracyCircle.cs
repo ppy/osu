@@ -20,6 +20,7 @@ using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Scoring;
 using osu.Game.Scoring;
 using osu.Game.Skinning;
+using osuTK;
 using osuTK.Graphics;
 
 namespace osu.Game.Screens.Ranking.Expanded.Accuracy
@@ -156,7 +157,18 @@ namespace osu.Game.Screens.Ranking.Expanded.Accuracy
                     Colour = ColourInfo.GradientVertical(Color4Extensions.FromHex("#7CF6FF"), Color4Extensions.FromHex("#BAFFA9")),
                     InnerRadius = accuracy_circle_radius,
                 },
-                gradedCircles = new GradedCircles(accuracyC, accuracyB, accuracyA, accuracyS, accuracyX),
+                new Container
+                {
+                    Anchor = Anchor.Centre,
+                    Origin = Anchor.Centre,
+                    RelativeSizeAxes = Axes.Both,
+                    Size = new Vector2(0.8f),
+                    Padding = new MarginPadding(2.5f),
+                    Child = gradedCircles = new GradedCircles(accuracyC, accuracyB, accuracyA, accuracyS, accuracyX)
+                    {
+                        RelativeSizeAxes = Axes.Both
+                    }
+                },
                 badges = new Container<RankBadge>
                 {
                     Name = "Rank badges",
