@@ -166,7 +166,7 @@ namespace osu.Game.Rulesets.Osu.UI.Cursor
                     return;
                 }
 
-                foreach (Vector2 pos2 in resampler.AddPosition(position))
+                if (resampler.AddPosition(position) is Vector2 pos2)
                 {
                     Trace.Assert(lastPosition.HasValue);
 
