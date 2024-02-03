@@ -134,8 +134,13 @@ namespace osu.Desktop
 
             LoadComponentAsync(new DiscordRichPresence(), Add);
 
-            if (RuntimeInfo.OS == RuntimeInfo.Platform.Windows)
+            if (RuntimeInfo.OS == RuntimeInfo.Platform.Windows && OperatingSystem.IsWindows())
+            {
                 LoadComponentAsync(new GameplayWinKeyBlocker(), Add);
+
+                string? executableLocation = Path.GetDirectoryName(typeof(OsuGameDesktop).Assembly.Location);
+                LoadComponentAsync(new WindowsAssociationManager(Path.Join(executableLocation, @"osu!.exe"), "osu"), Add);
+            }
 
             LoadComponentAsync(new ElevatedPrivilegesChecker(), Add);
 
