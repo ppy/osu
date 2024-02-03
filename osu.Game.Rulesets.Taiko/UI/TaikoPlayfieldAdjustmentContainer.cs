@@ -12,8 +12,8 @@ namespace osu.Game.Rulesets.Taiko.UI
 {
     public partial class TaikoPlayfieldAdjustmentContainer : PlayfieldAdjustmentContainer
     {
-        public const float MAXIMUM_ASPECT = 16f / 9f;
-        public const float MINIMUM_ASPECT = 5f / 4f;
+        public BindableFloat MaximumAspect = new BindableFloat(16f / 9f);
+        public BindableFloat MinimumAspect = new BindableFloat(5f / 4f);
 
         private const float stable_gamefield_height = 480f;
 
@@ -46,10 +46,10 @@ namespace osu.Game.Rulesets.Taiko.UI
             {
                 float currentAspect = Parent!.ChildSize.X / Parent!.ChildSize.Y;
 
-                if (currentAspect > MAXIMUM_ASPECT)
-                    relativeHeight *= currentAspect / MAXIMUM_ASPECT;
-                else if (currentAspect < MINIMUM_ASPECT)
-                    relativeHeight *= currentAspect / MINIMUM_ASPECT;
+                if (currentAspect > MaximumAspect.Value)
+                    relativeHeight *= currentAspect / MaximumAspect.Value;
+                else if (currentAspect < MinimumAspect.Value)
+                    relativeHeight *= currentAspect / MinimumAspect.Value;
             }
 
             // Limit the maximum relative height of the playfield to one-third of available area to avoid it masking out on extreme resolutions.
@@ -64,7 +64,7 @@ namespace osu.Game.Rulesets.Taiko.UI
             float currentAspect = Parent!.ChildSize.X / Parent!.ChildSize.Y;
 
             if (LockPlayfieldAspectRange.Value)
-                currentAspect = Math.Clamp(currentAspect, MINIMUM_ASPECT, MAXIMUM_ASPECT);
+                currentAspect = Math.Clamp(currentAspect, MinimumAspect.Value, MaximumAspect.Value);
 
             // in a game resolution of 1024x768, stable's scrolling system consists of objects being placed 600px (widthScaled - 40) away from their hit location.
             // however, the point at which the object renders at the end of the screen is exactly x=640, but stable makes the object start moving from beyond the screen instead of the boundary point.
