@@ -52,7 +52,7 @@ namespace osu.Game.Screens.Play
         public const double RESULTS_DISPLAY_DELAY = 1000.0;
 
         /// <summary>
-        /// The delay upon resuming from pause menu if ruleset.ResumeDelayed is on
+        /// The delay upon resuming from pause screen if ruleset.ResumeDelayed is on
         /// </summary>
         public const double RESUME_DELAY = 500.0;
 

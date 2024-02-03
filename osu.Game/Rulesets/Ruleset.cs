@@ -302,7 +302,7 @@ namespace osu.Game.Rulesets
         public virtual IEnumerable<int> AvailableVariants => new[] { 0 };
 
         /// <summary>
-        /// Should resuming from pause menu add a delay
+        /// Should resuming from pause screen add a delay
         /// </summary>
         public virtual bool ResumeDelayed => false;
 
