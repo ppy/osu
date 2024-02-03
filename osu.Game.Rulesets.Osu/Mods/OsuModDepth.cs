@@ -75,8 +75,10 @@ namespace osu.Game.Rulesets.Osu.Mods
         {
             double time = playfield.Time.Current;
 
-            foreach (var drawable in playfield.HitObjectContainer.AliveObjects)
+            foreach (var entry in playfield.HitObjectContainer.AliveEntries)
             {
+                var drawable = entry.Value;
+
                 switch (drawable)
                 {
                     case DrawableHitCircle circle:
