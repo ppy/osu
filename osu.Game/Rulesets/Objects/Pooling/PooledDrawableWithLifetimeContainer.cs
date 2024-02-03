@@ -2,12 +2,13 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
 using System.Diagnostics;
 using System.Linq;
+using osu.Framework.Extensions.ListExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Performance;
+using osu.Framework.Lists;
 
 namespace osu.Game.Rulesets.Objects.Pooling
 {
@@ -36,7 +37,7 @@ namespace osu.Game.Rulesets.Objects.Pooling
         /// <remarks>
         /// The enumeration order is undefined.
         /// </remarks>
-        public readonly ReadOnlyDictionary<TEntry, TDrawable> AliveEntries;
+        public readonly SlimReadOnlyDictionaryWrapper<TEntry, TDrawable> AliveEntries;
 
         /// <summary>
         /// Whether to remove an entry when clock goes backward and crossed its <see cref="LifetimeEntry.LifetimeStart"/>.
@@ -65,7 +66,7 @@ namespace osu.Game.Rulesets.Objects.Pooling
             lifetimeManager.EntryBecameDead += entryBecameDead;
             lifetimeManager.EntryCrossedBoundary += entryCrossedBoundary;
 
-            AliveEntries = new ReadOnlyDictionary<TEntry, TDrawable>(aliveDrawableMap);
+            AliveEntries = aliveDrawableMap.AsSlimReadOnly();
         }
 
         /// <summary>
