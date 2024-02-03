@@ -12,6 +12,7 @@ using osu.Framework.Platform;
 using osu.Game;
 using osu.Game.IPC;
 using osu.Game.Tournament;
+using osu.Game.Updater;
 using SDL2;
 using Squirrel;
 
@@ -180,6 +181,7 @@ namespace osu.Desktop
             {
                 tools.RemoveShortcutForThisExe();
                 tools.RemoveUninstallerRegistryEntry();
+                WindowsAssociationManager.UninstallAssociations(@"osu");
             }, onEveryRun: (_, _, _) =>
             {
                 // While setting the `ProcessAppUserModelId` fixes duplicate icons/shortcuts on the taskbar, it currently

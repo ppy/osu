@@ -100,7 +100,7 @@ namespace osu.Game.Tests.Visual.Updater
         [Test]
         public void TestNotifyShell()
         {
-            AddStep("notify shell of changes", () => associationManager.NotifyShellUpdate());
+            AddStep("notify shell of changes", WindowsAssociationManager.NotifyShellUpdate);
         }
     }
 }
