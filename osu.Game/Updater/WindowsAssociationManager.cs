@@ -69,6 +69,7 @@ namespace osu.Game.Updater
         private void load()
         {
             localisationParameters = localisation.CurrentParameters.GetBoundCopy();
+            InstallAssociations();
         }
 
         protected override void LoadComplete()
