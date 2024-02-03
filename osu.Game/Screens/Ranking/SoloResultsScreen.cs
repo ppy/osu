@@ -3,6 +3,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
@@ -45,12 +46,16 @@ namespace osu.Game.Screens.Ranking
         {
             base.LoadComplete();
 
+            Debug.Assert(Score != null);
+
             if (ShowUserStatistics)
                 statisticsSubscription = soloStatisticsWatcher.RegisterForStatisticsUpdateAfter(Score, update => statisticsUpdate.Value = update);
         }
 
         protected override StatisticsPanel CreateStatisticsPanel()
         {
+            Debug.Assert(Score != null);
+
             if (ShowUserStatistics)
             {
                 return new SoloStatisticsPanel(Score)
@@ -64,6 +69,8 @@ namespace osu.Game.Screens.Ranking
 
         protected override APIRequest? FetchScores(Action<IEnumerable<ScoreInfo>>? scoresCallback)
         {
+            Debug.Assert(Score != null);
+
             if (Score.BeatmapInfo!.OnlineID <= 0 || Score.BeatmapInfo.Status <= BeatmapOnlineStatus.Pending)
                 return null;
 
