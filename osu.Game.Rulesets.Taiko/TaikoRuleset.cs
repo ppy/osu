@@ -67,6 +67,8 @@ namespace osu.Game.Rulesets.Taiko
 
         public override string RulesetAPIVersionSupported => CURRENT_RULESET_API_VERSION;
 
+        public override bool ResumeDelayed => true;
+
         public override IEnumerable<KeyBinding> GetDefaultKeyBindings(int variant = 0) => new[]
         {
             new KeyBinding(InputKey.MouseRight, TaikoAction.LeftRim),

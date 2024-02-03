@@ -302,6 +302,11 @@ namespace osu.Game.Rulesets
         public virtual IEnumerable<int> AvailableVariants => new[] { 0 };
 
         /// <summary>
+        /// Should resuming from pause menu add a delay
+        /// </summary>
+        public virtual bool ResumeDelayed => false;
+
+        /// <summary>
         /// Get a list of default keys for the specified variant.
         /// </summary>
         /// <param name="variant">A variant.</param>

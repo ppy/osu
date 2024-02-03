@@ -52,6 +52,11 @@ namespace osu.Game.Screens.Play
         public const double RESULTS_DISPLAY_DELAY = 1000.0;
 
         /// <summary>
+        /// The delay upon resuming from pause menu if ruleset.ResumeDelayed is on
+        /// </summary>
+        public const double RESUME_DELAY = 500.0;
+
+        /// <summary>
         /// Raised after <see cref="StartGameplay"/> is called.
         /// </summary>
         public event Action OnGameplayStarted;
@@ -1031,6 +1036,8 @@ namespace osu.Game.Screens.Play
             return true;
         }
 
+        private ScheduledDelegate resumeDelegate;
+
         public void Resume()
         {
             if (!canResume) return;
@@ -1038,17 +1045,26 @@ namespace osu.Game.Screens.Play
             IsResuming = true;
             PauseOverlay.Hide();
 
+            void completeResume()
+            {
+                IsResuming = false;
+                GameplayClockContainer.Start();
+            }
+
+            void delayedResume()
+            {
+                resumeDelegate?.Cancel();
+                resumeDelegate = new ScheduledDelegate(completeResume, Time.Current + RESUME_DELAY);
+                Scheduler.Add(resumeDelegate);
+            }
+
             // breaks and time-based conditions may allow instant resume.
             if (breakTracker.IsBreakTime.Value)
                 completeResume();
+            else if (ruleset.ResumeDelayed)
+                DrawableRuleset.RequestResume(delayedResume);
             else
                 DrawableRuleset.RequestResume(completeResume);
-
-            void completeResume()
-            {
-                GameplayClockContainer.Start();
-                IsResuming = false;
-            }
         }
 
         #endregion
