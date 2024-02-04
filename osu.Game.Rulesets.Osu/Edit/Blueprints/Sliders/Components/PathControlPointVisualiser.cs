@@ -301,10 +301,14 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders.Components
             if (pointsInSegment.Count >= 6 && oldPathType == PathType.BEZIER)
                 return PathType.BSpline(4);
 
-            // Allow changing to inherited only if it doesn't break previous segment's perfect circle
-            var previousSegmentStarter = hitObject.Path.GetPreviousSegmentStarter(piece.ControlPoint);
-            if (previousSegmentStarter?.Type != PathType.PERFECT_CURVE
-                && oldPathType == PathType.CATMULL)
+            // Allow changing to inherited only if it there exists a segment behind the point which isn't a finished perfect curve
+            int? previousSegmentIndex = hitObject.Path.GetPreviousSegmentStarterIndex(piece.ControlPoint);
+            int currentSegmentIndex = hitObject.Path.ControlPoints.IndexOf(piece.ControlPoint);
+            bool isPreviousSegmentPerfectCurve = previousSegmentIndex != null
+                && hitObject.Path.ControlPoints[(int)previousSegmentIndex]?.Type == PathType.PERFECT_CURVE;
+            bool doesPreviousSegmentHaveExactlyTwoPoints = previousSegmentIndex == currentSegmentIndex - 2;
+            bool isPreviousSegmentAFinishedPerfectCurve = isPreviousSegmentPerfectCurve && doesPreviousSegmentHaveExactlyTwoPoints;
+            if (!isPreviousSegmentAFinishedPerfectCurve && currentSegmentIndex != 0 && oldPathType == PathType.CATMULL)
                 return null;
 
             PathType? newPathType = oldPathType switch

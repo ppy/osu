@@ -343,6 +343,7 @@ namespace osu.Game.Rulesets.Osu.Tests.Editor
         public void TestCyclePathTypeDoesNotBreakPreviousPerfectCurve()
         {
             moveMouseToControlPoint(2);
+
             for (int iteration = 0; iteration < 6; iteration++)
             {
                 AddStep("shift + click", () =>
@@ -352,6 +353,7 @@ namespace osu.Game.Rulesets.Osu.Tests.Editor
                     InputManager.ReleaseKey(Key.ShiftLeft);
                 });
             }
+
             assertControlPointType(0, PathType.PERFECT_CURVE, true);
         }
 
@@ -367,6 +369,7 @@ namespace osu.Game.Rulesets.Osu.Tests.Editor
             });
             assertControlPointType(0, PathType.LINEAR, true);
             moveMouseToControlPoint(2);
+
             for (int iteration = 0; iteration < 3; iteration++)
             {
                 AddStep("shift + click", () =>
@@ -376,6 +379,7 @@ namespace osu.Game.Rulesets.Osu.Tests.Editor
                     InputManager.ReleaseKey(Key.ShiftLeft);
                 });
             }
+
             assertControlPointType(2, null, true);
         }
 

@@ -197,7 +197,7 @@ namespace osu.Game.Rulesets.Objects
             return pointsInCurrentSegment;
         }
 
-        public PathControlPoint? GetPreviousSegmentStarter(PathControlPoint controlPoint)
+        public int? GetPreviousSegmentStarterIndex(PathControlPoint controlPoint)
         {
             int currentSegmentIndex = ControlPoints.IndexOf(controlPoint);
             if (currentSegmentIndex <= 0)
@@ -206,10 +206,10 @@ namespace osu.Game.Rulesets.Objects
             for (int i = currentSegmentIndex - 1; i >= 0; i--)
             {
                 if (ControlPoints[i].Type != null)
-                    return ControlPoints[i];
+                    return i;
             }
 
-            return ControlPoints[0];
+            return 0;
         }
 
         /// <summary>
