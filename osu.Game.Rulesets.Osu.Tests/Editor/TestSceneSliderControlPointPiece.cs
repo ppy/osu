@@ -327,7 +327,7 @@ namespace osu.Game.Rulesets.Osu.Tests.Editor
         }
 
         [Test]
-        public void TestCycleControlPointChangesType()
+        public void TestCyclePathTypeChangesPathType()
         {
             moveMouseToControlPoint(0);
             AddStep("shift + click", () =>
@@ -340,7 +340,7 @@ namespace osu.Game.Rulesets.Osu.Tests.Editor
         }
 
         [Test]
-        public void TestCycleControlPointDoesNotBreakPreviousPerfectCircle()
+        public void TestCyclePathTypeDoesNotBreakPreviousPerfectCurve()
         {
             moveMouseToControlPoint(2);
             for (int iteration = 0; iteration < 6; iteration++)
@@ -356,7 +356,7 @@ namespace osu.Game.Rulesets.Osu.Tests.Editor
         }
 
         [Test]
-        public void TestCycleControlPointCanBecomeInherited()
+        public void TestCyclePathTypeCanBecomeInherited()
         {
             moveMouseToControlPoint(0);
             AddStep("shift + click", () =>
@@ -380,23 +380,7 @@ namespace osu.Game.Rulesets.Osu.Tests.Editor
         }
 
         [Test]
-        public void TestCycleControlPointCanBecomeBSpline()
-        {
-            AddStep("change point 0 type to bezier", () => slider.Path.ControlPoints[0].Type = PathType.BEZIER);
-            AddStep("change point 2 to inherited", () => slider.Path.ControlPoints[2].Type = null);
-            AddStep("add point", () => slider.Path.ControlPoints.Add(new PathControlPoint(new Vector2(500, 10))));
-            moveMouseToControlPoint(0);
-            AddStep("shift + click", () =>
-            {
-                InputManager.PressKey(Key.ShiftLeft);
-                InputManager.Click(MouseButton.Left);
-                InputManager.ReleaseKey(Key.ShiftLeft);
-            });
-            assertControlPointType(0, PathType.BSpline(4), true);
-        }
-
-        [Test]
-        public void TestCycleControlPointCanAvoidBSpline()
+        public void TestCyclePathTypeBSpline()
         {
             AddStep("change point 0 type to bezier", () => slider.Path.ControlPoints[0].Type = PathType.BEZIER);
             AddStep("change point 2 to inherited", () => slider.Path.ControlPoints[2].Type = null);
@@ -408,6 +392,15 @@ namespace osu.Game.Rulesets.Osu.Tests.Editor
                 InputManager.ReleaseKey(Key.ShiftLeft);
             });
             assertControlPointType(0, PathType.BSpline(4), false);
+            AddStep("change point 0 type to bezier", () => slider.Path.ControlPoints[0].Type = PathType.BEZIER);
+            AddStep("add point", () => slider.Path.ControlPoints.Add(new PathControlPoint(new Vector2(500, 10))));
+            AddStep("shift + click", () =>
+            {
+                InputManager.PressKey(Key.ShiftLeft);
+                InputManager.Click(MouseButton.Left);
+                InputManager.ReleaseKey(Key.ShiftLeft);
+            });
+            assertControlPointType(0, PathType.BSpline(4), true);
         }
 
         [Test]

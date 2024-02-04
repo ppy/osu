@@ -272,9 +272,7 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders.Components
         private void selectionRequested(PathControlPointPiece<T> piece, MouseButtonEvent e)
         {
             if (e.Button == MouseButton.Left && inputManager.CurrentState.Keyboard.ControlPressed)
-            {
                 piece.IsSelected.Toggle();
-            }
             else if (e.Button == MouseButton.Left && inputManager.CurrentState.Keyboard.ShiftPressed)
             {
                 PathType? newPathtype = cyclePathType(piece);
@@ -297,9 +295,7 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders.Components
             // Only allow changing to perfect curve if there's less than 2 inherited points in the segment
             var pointsInSegment = hitObject.Path.PointsInSegment(piece.ControlPoint);
             if (pointsInSegment.Count <= 3 && oldPathType == PathType.BEZIER)
-            {
                 return PathType.PERFECT_CURVE;
-            }
 
             // Only allow change to B-Spline if it looks different than Bezier
             if (pointsInSegment.Count >= 6 && oldPathType == PathType.BEZIER)
