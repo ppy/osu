@@ -15,7 +15,9 @@ namespace osu.Game.Rulesets.Taiko.Mods
         public void ApplyToDrawableRuleset(DrawableRuleset<TaikoHitObject> drawableRuleset)
         {
             var drawableTaikoRuleset = (DrawableTaikoRuleset)drawableRuleset;
-            drawableTaikoRuleset.LockPlayfieldAspectRange.Value = false;
+            drawableTaikoRuleset.MaximumAspect.Value = 22f / 9f;
+            drawableTaikoRuleset.MinimumAspect.Value = 5f / 4f;
+            drawableTaikoRuleset.TrimOnOverflow.Value = true;
         }
 
         public void ApplyToDrawableHitObject(DrawableHitObject drawable)
