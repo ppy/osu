@@ -305,7 +305,7 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders.Components
             int? previousSegmentIndex = hitObject.Path.GetPreviousSegmentStarterIndex(piece.ControlPoint);
             int currentSegmentIndex = hitObject.Path.ControlPoints.IndexOf(piece.ControlPoint);
             bool isPreviousSegmentPerfectCurve = previousSegmentIndex != null
-                && hitObject.Path.ControlPoints[(int)previousSegmentIndex]?.Type == PathType.PERFECT_CURVE;
+                                                 && hitObject.Path.ControlPoints[(int)previousSegmentIndex].Type == PathType.PERFECT_CURVE;
             bool doesPreviousSegmentHaveExactlyTwoPoints = previousSegmentIndex == currentSegmentIndex - 2;
             bool isPreviousSegmentAFinishedPerfectCurve = isPreviousSegmentPerfectCurve && doesPreviousSegmentHaveExactlyTwoPoints;
             if (!isPreviousSegmentAFinishedPerfectCurve && currentSegmentIndex != 0 && oldPathType == PathType.CATMULL)
