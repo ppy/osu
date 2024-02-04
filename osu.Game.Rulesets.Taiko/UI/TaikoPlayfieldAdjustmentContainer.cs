@@ -18,6 +18,8 @@ namespace osu.Game.Rulesets.Taiko.UI
 
         public BindableFloat MinimumAspect = new BindableFloat(5f / 4f);
 
+        public BindableFloat CurrentAspect = new BindableFloat(16f / 9f);
+
         public BindableBool TrimOnOverflow = new BindableBool(false);
 
         public TaikoPlayfieldAdjustmentContainer()
@@ -45,22 +47,22 @@ namespace osu.Game.Rulesets.Taiko.UI
             //
             // As a middle-ground, the aspect ratio can still be adjusted in the downwards direction but has a maximum limit.
             // This is still a bit weird, because readability changes with window size, but it is what it is.
-            float currentAspect = Parent!.ChildSize.X / Parent!.ChildSize.Y;
+            CurrentAspect.Value = Parent!.ChildSize.X / Parent!.ChildSize.Y;
 
-            if (currentAspect > MaximumAspect.Value)
+            if (CurrentAspect.Value > MaximumAspect.Value)
             {
                 if (TrimOnOverflow.Value)
                 {
-                    widthScale = MaximumAspect.Value / currentAspect;
+                    widthScale = MaximumAspect.Value / CurrentAspect.Value;
                 }
                 else
                 {
-                    relativeHeight *= currentAspect / MaximumAspect.Value;
+                    relativeHeight *= CurrentAspect.Value / MaximumAspect.Value;
                 }
             }
-            else if (currentAspect < MinimumAspect.Value)
+            else if (CurrentAspect.Value < MinimumAspect.Value)
             {
-                relativeHeight *= currentAspect / MinimumAspect.Value;
+                relativeHeight *= CurrentAspect.Value / MinimumAspect.Value;
             }
 
 
