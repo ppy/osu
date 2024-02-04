@@ -11,7 +11,7 @@ using osu.Game.Overlays.Mods;
 namespace osu.Game.Tests.Visual.UserInterface
 {
     [TestFixture]
-    public partial class TestSceneScoreMultiplierDisplay : OsuTestScene
+    public partial class TestSceneRankingInformationDisplay : OsuTestScene
     {
         [Cached]
         private OverlayColourProvider colourProvider = new OverlayColourProvider(OverlayColourScheme.Green);
@@ -19,22 +19,24 @@ namespace osu.Game.Tests.Visual.UserInterface
         [Test]
         public void TestBasic()
         {
-            ScoreMultiplierDisplay multiplierDisplay = null!;
+            RankingInformationDisplay onlinePropertiesDisplay = null!;
 
-            AddStep("create content", () => Child = multiplierDisplay = new ScoreMultiplierDisplay
+            AddStep("create content", () => Child = onlinePropertiesDisplay = new RankingInformationDisplay
             {
                 Anchor = Anchor.Centre,
                 Origin = Anchor.Centre
             });
 
-            AddStep("set multiplier below 1", () => multiplierDisplay.Current.Value = 0.5);
-            AddStep("set multiplier to 1", () => multiplierDisplay.Current.Value = 1);
-            AddStep("set multiplier above 1", () => multiplierDisplay.Current.Value = 1.5);
+            AddToggleStep("toggle ranked", ranked => onlinePropertiesDisplay.Ranked.Value = ranked);
+
+            AddStep("set multiplier below 1", () => onlinePropertiesDisplay.ModMultiplier.Value = 0.5);
+            AddStep("set multiplier to 1", () => onlinePropertiesDisplay.ModMultiplier.Value = 1);
+            AddStep("set multiplier above 1", () => onlinePropertiesDisplay.ModMultiplier.Value = 1.5);
 
             AddSliderStep("set multiplier", 0, 2, 1d, multiplier =>
             {
-                if (multiplierDisplay.IsNotNull())
-                    multiplierDisplay.Current.Value = multiplier;
+                if (onlinePropertiesDisplay.IsNotNull())
+                    onlinePropertiesDisplay.ModMultiplier.Value = multiplier;
             });
         }
     }
