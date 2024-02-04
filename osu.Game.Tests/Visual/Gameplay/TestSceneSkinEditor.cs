@@ -10,6 +10,7 @@ using osu.Framework.Allocation;
 using osu.Framework.Extensions.IEnumerableExtensions;
 using osu.Framework.Extensions.ObjectExtensions;
 using osu.Framework.Graphics;
+using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.UserInterface;
 using osu.Framework.Input;
 using osu.Framework.Testing;
@@ -29,6 +30,9 @@ namespace osu.Game.Tests.Visual.Gameplay
 {
     public partial class TestSceneSkinEditor : PlayerTestScene
     {
+        [Resolved]
+        private SkinManager skins { get; set; } = null!;
+
         private SkinEditor skinEditor = null!;
 
         protected override bool Autoplay => true;
@@ -367,6 +371,21 @@ namespace osu.Game.Tests.Visual.Gameplay
             AddAssert("three hit error meters present",
                 () => skinEditor.ChildrenOfType<SkinBlueprint>().Count(b => b.Item is BarHitErrorMeter),
                 () => Is.EqualTo(3));
+        }
+
+        [Test]
+        public void TestSkinBindable()
+        {
+            AddAssert("skin editor open", () => skinEditor.State.Value, () => Is.EqualTo(Visibility.Visible));
+            AddAssert("skin bindable disabled", () => skins.CurrentSkinInfo.Disabled, () => Is.True);
+
+            AddStep("hide skin editor", () => skinEditor.State.Value = Visibility.Hidden);
+            AddAssert("skin bindable enabled", () => skins.CurrentSkinInfo.Disabled, () => Is.False);
+
+            AddStep("select protected skin", () => skins.CurrentSkinInfo.Value = skins.DefaultClassicSkin.SkinInfo);
+            AddStep("show skin editor", () => skinEditor.State.Value = Visibility.Visible);
+            AddAssert("skin bindable disabled", () => skins.CurrentSkinInfo.Disabled, () => Is.True);
+            AddAssert("skin set to mutable", () => skins.CurrentSkinInfo.Value.Value.Protected, () => Is.False);
         }
 
         protected override Ruleset CreatePlayerRuleset() => new OsuRuleset();
