@@ -4,6 +4,7 @@
 #nullable disable
 
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Audio;
@@ -85,9 +86,6 @@ namespace osu.Game.Screens.Ranking.Expanded.Accuracy
         /// </summary>
         public static readonly Easing ACCURACY_TRANSFORM_EASING = Easing.OutPow10;
 
-        [Resolved]
-        private SkinManager skins { get; set; }
-
         private readonly ScoreInfo score;
 
         private CircularProgress accuracyCircle;
@@ -101,7 +99,6 @@ namespace osu.Game.Screens.Ranking.Expanded.Accuracy
         private PoolableSkinnableSample swooshUpSound;
         private PoolableSkinnableSample rankImpactSound;
         private PoolableSkinnableSample rankApplauseSound;
-        private PoolableSkinnableSample rankLegacyApplauseSound;
 
         private readonly Bindable<double> tickPlaybackRate = new Bindable<double>();
 
@@ -263,11 +260,15 @@ namespace osu.Game.Screens.Ranking.Expanded.Accuracy
                 if (isFailedSDueToMisses)
                     AddInternal(failedSRankText = new RankText(ScoreRank.S));
 
+                var applauseSamples = new List<string> { applauseSampleName };
+                if (score.Rank >= ScoreRank.B)
+                    // when rank is B or higher, play legacy applause sample on legacy skins.
+                    applauseSamples.Insert(0, @"applause");
+
                 AddRangeInternal(new Drawable[]
                 {
                     rankImpactSound = new PoolableSkinnableSample(new SampleInfo(impactSampleName)),
-                    rankApplauseSound = new PoolableSkinnableSample(new SampleInfo(applauseSampleName)),
-                    rankLegacyApplauseSound = new PoolableSkinnableSample(new SampleInfo("applause")),
+                    rankApplauseSound = new PoolableSkinnableSample(new SampleInfo(applauseSamples.ToArray())),
                     scoreTickSound = new PoolableSkinnableSample(new SampleInfo(@"Results/score-tick")),
                     badgeTickSound = new PoolableSkinnableSample(new SampleInfo(@"Results/badge-dink")),
                     badgeMaxSound = new PoolableSkinnableSample(new SampleInfo(@"Results/badge-dink-max")),
@@ -401,20 +402,8 @@ namespace osu.Game.Screens.Ranking.Expanded.Accuracy
                     {
                         Schedule(() =>
                         {
-                            if (skins.CurrentSkin.Value is LegacySkin)
-                            {
-                                // only play legacy "applause" sound if score rank is B or higher.
-                                if (score.Rank >= ScoreRank.B)
-                                {
-                                    rankLegacyApplauseSound.VolumeTo(applause_volume);
-                                    rankLegacyApplauseSound.Play();
-                                }
-                            }
-                            else
-                            {
-                                rankApplauseSound.VolumeTo(applause_volume);
-                                rankApplauseSound.Play();
-                            }
+                            rankApplauseSound.VolumeTo(applause_volume);
+                            rankApplauseSound.Play();
                         });
                     }
                 }
