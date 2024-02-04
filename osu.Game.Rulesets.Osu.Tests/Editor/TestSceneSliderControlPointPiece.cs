@@ -326,6 +326,114 @@ namespace osu.Game.Rulesets.Osu.Tests.Editor
             assertControlPointType(3, PathType.BEZIER);
         }
 
+        [Test]
+        public void TestCycleControlPointChangesType()
+        {
+            moveMouseToControlPoint(0);
+            AddStep("shift + click", () =>
+            {
+                InputManager.PressKey(Key.ShiftLeft);
+                InputManager.Click(MouseButton.Left);
+                InputManager.ReleaseKey(Key.ShiftLeft);
+            });
+            assertControlPointType(0, PathType.PERFECT_CURVE, false);
+        }
+
+        [Test]
+        public void TestCycleControlPointDoesNotBreakPreviousPerfectCircle()
+        {
+            moveMouseToControlPoint(2);
+            for (int iteration = 0; iteration < 6; iteration++)
+            {
+                AddStep("shift + click", () =>
+                {
+                    InputManager.PressKey(Key.ShiftLeft);
+                    InputManager.Click(MouseButton.Left);
+                    InputManager.ReleaseKey(Key.ShiftLeft);
+                });
+            }
+            assertControlPointType(0, PathType.PERFECT_CURVE, true);
+        }
+
+        [Test]
+        public void TestCycleControlPointCanBecomeInherited()
+        {
+            moveMouseToControlPoint(0);
+            AddStep("shift + click", () =>
+            {
+                InputManager.PressKey(Key.ShiftLeft);
+                InputManager.Click(MouseButton.Left);
+                InputManager.ReleaseKey(Key.ShiftLeft);
+            });
+            assertControlPointType(0, PathType.LINEAR, true);
+            moveMouseToControlPoint(2);
+            for (int iteration = 0; iteration < 3; iteration++)
+            {
+                AddStep("shift + click", () =>
+                {
+                    InputManager.PressKey(Key.ShiftLeft);
+                    InputManager.Click(MouseButton.Left);
+                    InputManager.ReleaseKey(Key.ShiftLeft);
+                });
+            }
+            assertControlPointType(2, null, true);
+        }
+
+        [Test]
+        public void TestCycleControlPointCanBecomeBSpline()
+        {
+            AddStep("change point 0 type to bezier", () => slider.Path.ControlPoints[0].Type = PathType.BEZIER);
+            AddStep("change point 2 to inherited", () => slider.Path.ControlPoints[2].Type = null);
+            AddStep("add point", () => slider.Path.ControlPoints.Add(new PathControlPoint(new Vector2(500, 10))));
+            moveMouseToControlPoint(0);
+            AddStep("shift + click", () =>
+            {
+                InputManager.PressKey(Key.ShiftLeft);
+                InputManager.Click(MouseButton.Left);
+                InputManager.ReleaseKey(Key.ShiftLeft);
+            });
+            assertControlPointType(0, PathType.BSpline(4), true);
+        }
+
+        [Test]
+        public void TestCycleControlPointCanAvoidBSpline()
+        {
+            AddStep("change point 0 type to bezier", () => slider.Path.ControlPoints[0].Type = PathType.BEZIER);
+            AddStep("change point 2 to inherited", () => slider.Path.ControlPoints[2].Type = null);
+            moveMouseToControlPoint(0);
+            AddStep("shift + click", () =>
+            {
+                InputManager.PressKey(Key.ShiftLeft);
+                InputManager.Click(MouseButton.Left);
+                InputManager.ReleaseKey(Key.ShiftLeft);
+            });
+            assertControlPointType(0, PathType.BSpline(4), false);
+        }
+
+        [Test]
+        public void TestCycleControlPointAvoidsInvalidPerfectCurve()
+        {
+            AddStep("change point 0 type to bezier", () => slider.Path.ControlPoints[0].Type = PathType.BEZIER);
+            AddStep("change point 2 to inherited", () => slider.Path.ControlPoints[2].Type = null);
+            moveMouseToControlPoint(0);
+            AddStep("shift + click", () =>
+            {
+                InputManager.PressKey(Key.ShiftLeft);
+                InputManager.Click(MouseButton.Left);
+                InputManager.ReleaseKey(Key.ShiftLeft);
+            });
+            assertControlPointType(0, PathType.PERFECT_CURVE, false);
+            AddStep("change point 0 type to bezier", () => slider.Path.ControlPoints[0].Type = PathType.BEZIER);
+            AddStep("change point 2 to perfect curve", () => slider.Path.ControlPoints[2].Type = PathType.PERFECT_CURVE);
+            AddStep("shift + click", () =>
+            {
+                InputManager.PressKey(Key.ShiftLeft);
+                InputManager.Click(MouseButton.Left);
+                InputManager.ReleaseKey(Key.ShiftLeft);
+            });
+            assertControlPointType(0, PathType.PERFECT_CURVE, true);
+        }
+
         private void addMovementStep(Vector2 relativePosition)
         {
             AddStep($"move mouse to {relativePosition}", () =>
@@ -344,7 +452,12 @@ namespace osu.Game.Rulesets.Osu.Tests.Editor
             });
         }
 
-        private void assertControlPointType(int index, PathType type) => AddAssert($"control point {index} is {type}", () => slider.Path.ControlPoints[index].Type == type);
+        private void assertControlPointType(int index, PathType type) => assertControlPointType(index, type, true);
+
+        private void assertControlPointType(int index, PathType? type, bool shouldBeType)
+        {
+            AddAssert($"control point {index} is {(shouldBeType ? "" : "not ")}{type?.ToString() ?? "Inherited"}", () => (slider.Path.ControlPoints[index].Type == type) == shouldBeType);
+        }
 
         private void assertControlPointPosition(int index, Vector2 position) =>
             AddAssert($"control point {index} at {position}", () => Precision.AlmostEquals(position, slider.Path.ControlPoints[index].Position, 1));
