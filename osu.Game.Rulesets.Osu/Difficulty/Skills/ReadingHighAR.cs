@@ -8,6 +8,7 @@ using osu.Game.Rulesets.Difficulty.Skills;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Osu.Difficulty.Evaluators;
 using osu.Game.Rulesets.Osu.Difficulty.Preprocessing;
+using osu.Game.Rulesets.Osu.Objects;
 
 namespace osu.Game.Rulesets.Osu.Difficulty.Skills
 {
@@ -27,6 +28,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
         private HighARSpeedComponent speedComponent;
 
         private readonly List<double> difficulties = new List<double>();
+        private int objectsCount = 0;
 
         public override void Process(DifficultyHitObject current)
         {
@@ -34,6 +36,9 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
             speedComponent.Process(current);
 
             aimComponentNoAdjust.Process(current);
+
+            if (current.BaseObject is not Spinner)
+                objectsCount++;
 
             double power = OsuDifficultyCalculator.SUM_POWER;
             double mergedDifficulty = Math.Pow(
@@ -67,6 +72,10 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
 
             double power = OsuDifficultyCalculator.SUM_POWER;
             double totalPerformance = Math.Pow(Math.Pow(aimPerformance, power) + Math.Pow(speedPerformance, power), 1.0 / power);
+
+            // First half of length bonus is in SR to not inflate short AR11 maps
+            double lengthBonus = OsuPerformanceCalculator.CalculateDefaultLengthBonus(objectsCount);
+            totalPerformance *= lengthBonus;
 
             double adjustedDifficulty = OsuStrainSkill.PerformanceToDifficulty(totalPerformance);
 
