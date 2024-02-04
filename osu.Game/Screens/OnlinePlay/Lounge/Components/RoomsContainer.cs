@@ -141,9 +141,18 @@ namespace osu.Game.Screens.OnlinePlay.Lounge.Components
 
         private void removeRooms(IEnumerable<Room> rooms)
         {
-            foreach (var r in rooms)
+            foreach (var room in rooms)
             {
-                roomFlow.RemoveAll(d => d.Room == r, true);
+                var drawableRoom = roomFlow.SingleOrDefault(d => d.Room == room);
+                if (drawableRoom == null)
+                    continue;
+
+                // expire to trigger async disposal. the room still has to exist somewhere so we move it to internal content of RoomsContainer until next frame.
+                drawableRoom.Hide();
+                drawableRoom.Expire();
+
+                roomFlow.Remove(drawableRoom, false);
+                AddInternal(drawableRoom);
 
                 // selection may have a lease due to being in a sub screen.
                 if (!SelectedRoom.Disabled)
