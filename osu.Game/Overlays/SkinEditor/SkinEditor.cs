@@ -53,6 +53,8 @@ namespace osu.Game.Overlays.SkinEditor
 
         private Bindable<Skin> currentSkin = null!;
 
+        private LeasedBindable<Live<SkinInfo>>? leasedSkinInfo;
+
         [Resolved]
         private OsuGame? game { get; set; }
 
@@ -411,7 +413,11 @@ namespace osu.Game.Overlays.SkinEditor
 
             changeHandler?.Dispose();
 
-            skins.EnsureMutableSkin();
+            // Since skinChanged is scheduled, it has a chance to be called right after PopOut is called, therefore leasedSkinInfo may be null here.
+            if (leasedSkinInfo != null)
+                leasedSkinInfo.Value = skins.GetMutableSkin();
+            else
+                skins.CurrentSkinInfo.Value = skins.GetMutableSkin();
 
             var targetContainer = getTarget(selectedTarget.Value);
 
@@ -570,11 +576,18 @@ namespace osu.Game.Overlays.SkinEditor
         protected override void PopIn()
         {
             this.FadeIn(TRANSITION_DURATION, Easing.OutQuint);
+
+            // skin editor doesn't handle saving or asking user about unsaved changes when switching skins.
+            // for the time being, disable switching skins in skin editor.
+            leasedSkinInfo = skins.CurrentSkinInfo.BeginLease(false);
         }
 
         protected override void PopOut()
         {
             this.FadeOut(TRANSITION_DURATION, Easing.OutQuint);
+
+            leasedSkinInfo?.Return();
+            leasedSkinInfo = null;
         }
 
         public void DeleteItems(ISerialisableDrawable[] items)

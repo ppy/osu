@@ -594,6 +594,12 @@ namespace osu.Game
                 return;
             }
 
+            if (SkinManager.CurrentSkinInfo.Disabled)
+            {
+                Logger.Log("The requested skin cannot be selected right now.", level: LogLevel.Important);
+                return;
+            }
+
             SkinManager.CurrentSkinInfo.Value = databasedSkin;
         }
 
