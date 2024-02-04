@@ -20,6 +20,11 @@ namespace osu.Game.Localisation
         public static LocalisableString Connecting => new TranslatableString(getKey(@"connecting"), @"Connecting...");
 
         /// <summary>
+        /// "Verification required"
+        /// </summary>
+        public static LocalisableString VerificationRequired => new TranslatableString(getKey(@"verification_required"), @"Verification required");
+
+        /// <summary>
         /// "home"
         /// </summary>
         public static LocalisableString HomeHeaderTitle => new TranslatableString(getKey(@"home_header_title"), @"home");
