@@ -156,18 +156,16 @@ namespace osu.Game.Skinning
         public Skin GetSkin(SkinInfo skinInfo) => skinInfo.CreateInstance(this);
 
         /// <summary>
-        /// Ensure that the current skin is in a state it can accept user modifications.
+        /// Returns a skin instance representing the current skin but in a state it can accept user modifications.
         /// This will create a copy of any internal skin and being tracking in the database if not already.
         /// </summary>
-        /// <returns>
-        /// Whether a new skin was created to allow for mutation.
-        /// </returns>
-        public bool EnsureMutableSkin()
+        /// <returns>A mutable version of the current skin, represented by a live instance of its <see cref="SkinInfo"/>.</returns>
+        public Live<SkinInfo> GetMutableSkin()
         {
             return CurrentSkinInfo.Value.PerformRead(s =>
             {
                 if (!s.Protected)
-                    return false;
+                    return CurrentSkinInfo.Value;
 
                 string[] existingSkinNames = Realm.Run(r => r.All<SkinInfo>()
                                                              .Where(skin => !skin.DeletePending)
@@ -192,11 +190,10 @@ namespace osu.Game.Skinning
                     // save once to ensure the required json content is populated.
                     // currently this only happens on save.
                     result.PerformRead(skin => Save(skin.CreateInstance(this)));
-                    CurrentSkinInfo.Value = result;
-                    return true;
+                    return result;
                 }
 
-                return false;
+                return CurrentSkinInfo.Value;
             });
         }
 
@@ -207,7 +204,7 @@ namespace osu.Game.Skinning
         public bool Save(Skin skin)
         {
             if (!skin.SkinInfo.IsManaged)
-                throw new InvalidOperationException($"Attempting to save a skin which is not yet tracked. Call {nameof(EnsureMutableSkin)} first.");
+                throw new InvalidOperationException($"Attempting to save a skin which is not yet tracked. Use {nameof(GetMutableSkin)} first.");
 
             return skinImporter.Save(skin);
         }

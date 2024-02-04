@@ -223,7 +223,7 @@ namespace osu.Game.Tests.Skins.IO
         {
             var skinManager = osu.Dependencies.Get<SkinManager>();
 
-            skinManager.EnsureMutableSkin();
+            skinManager.CurrentSkinInfo.Value = skinManager.GetMutableSkin();
 
             MemoryStream exportStream = new MemoryStream();
 
@@ -255,8 +255,7 @@ namespace osu.Game.Tests.Skins.IO
             var skinManager = osu.Dependencies.Get<SkinManager>();
 
             skinManager.CurrentSkinInfo.Value = skinManager.DefaultClassicSkin.SkinInfo;
-
-            skinManager.EnsureMutableSkin();
+            skinManager.CurrentSkinInfo.Value = skinManager.GetMutableSkin();
 
             MemoryStream exportStream = new MemoryStream();
 
