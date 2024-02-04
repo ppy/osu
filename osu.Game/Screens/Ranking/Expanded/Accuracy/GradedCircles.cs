@@ -79,8 +79,8 @@ namespace osu.Game.Screens.Ranking.Expanded.Accuracy
 
             public GradedCircle(double startProgress, double endProgress)
             {
-                this.startProgress = startProgress + AccuracyCircle.NOTCH_WIDTH_PERCENTAGE * 0.5;
-                this.endProgress = endProgress - AccuracyCircle.NOTCH_WIDTH_PERCENTAGE * 0.5;
+                this.startProgress = startProgress + AccuracyCircle.GRADE_SPACING_PERCENTAGE * 0.5;
+                this.endProgress = endProgress - AccuracyCircle.GRADE_SPACING_PERCENTAGE * 0.5;
 
                 Anchor = Anchor.Centre;
                 Origin = Anchor.Centre;

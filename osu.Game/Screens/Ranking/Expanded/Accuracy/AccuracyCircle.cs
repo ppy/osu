@@ -76,9 +76,9 @@ namespace osu.Game.Screens.Ranking.Expanded.Accuracy
         public const double VIRTUAL_SS_PERCENTAGE = 0.01;
 
         /// <summary>
-        /// The width of a solid "notch" in terms of accuracy that appears at the ends of the rank circles to add separation.
+        /// The width of spacing in terms of accuracy between the grade circles.
         /// </summary>
-        public const double NOTCH_WIDTH_PERCENTAGE = 2.0 / 360;
+        public const double GRADE_SPACING_PERCENTAGE = 2.0 / 360;
 
         /// <summary>
         /// The easing for the circle filling transforms.
@@ -241,10 +241,10 @@ namespace osu.Game.Screens.Ranking.Expanded.Accuracy
                 // to prevent ambiguity on what grade it's pointing at.
                 foreach (double p in notchPercentages)
                 {
-                    if (Precision.AlmostEquals(p, targetAccuracy, NOTCH_WIDTH_PERCENTAGE / 2))
+                    if (Precision.AlmostEquals(p, targetAccuracy, GRADE_SPACING_PERCENTAGE / 2))
                     {
                         int tippingDirection = targetAccuracy - p >= 0 ? 1 : -1; // We "round up" here to match rank criteria
-                        targetAccuracy = p + tippingDirection * (NOTCH_WIDTH_PERCENTAGE / 2);
+                        targetAccuracy = p + tippingDirection * (GRADE_SPACING_PERCENTAGE / 2);
                         break;
                     }
                 }
@@ -253,7 +253,7 @@ namespace osu.Game.Screens.Ranking.Expanded.Accuracy
                 if (score.Rank == ScoreRank.X || score.Rank == ScoreRank.XH)
                     targetAccuracy = 1;
                 else
-                    targetAccuracy = Math.Min(accuracyX - VIRTUAL_SS_PERCENTAGE - NOTCH_WIDTH_PERCENTAGE / 2, targetAccuracy);
+                    targetAccuracy = Math.Min(accuracyX - VIRTUAL_SS_PERCENTAGE - GRADE_SPACING_PERCENTAGE / 2, targetAccuracy);
 
                 // The accuracy circle gauge visually fills up a bit too much.
                 // This wouldn't normally matter but we want it to align properly with the inner graded circle in the above cases.
@@ -349,7 +349,7 @@ namespace osu.Game.Screens.Ranking.Expanded.Accuracy
                                 .FadeOut(800, Easing.Out);
 
                             accuracyCircle
-                                .FillTo(accuracyS - NOTCH_WIDTH_PERCENTAGE / 2 - visual_alignment_offset, 70, Easing.OutQuint);
+                                .FillTo(accuracyS - GRADE_SPACING_PERCENTAGE / 2 - visual_alignment_offset, 70, Easing.OutQuint);
 
                             badges.Single(b => b.Rank == getRank(ScoreRank.S))
                                   .FadeOut(70, Easing.OutQuint);
