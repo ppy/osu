@@ -146,7 +146,7 @@ namespace osu.Game.Screens.OnlinePlay.Lounge.Components
                 roomFlow.RemoveAll(d => d.Room == r, true);
 
                 // selection may have a lease due to being in a sub screen.
-                if (!SelectedRoom.Disabled)
+                if (SelectedRoom.Value == r && !SelectedRoom.Disabled)
                     SelectedRoom.Value = null;
             }
         }
