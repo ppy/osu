@@ -272,9 +272,48 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders.Components
         private void selectionRequested(PathControlPointPiece<T> piece, MouseButtonEvent e)
         {
             if (e.Button == MouseButton.Left && inputManager.CurrentState.Keyboard.ControlPressed)
-                piece.IsSelected.Toggle();
+            {
+                PathType? newPathtype = cyclePathType(piece);
+                updatePathType(piece, newPathtype);
+                EnsureValidPathTypes();
+            }
             else
                 SetSelectionTo(piece.ControlPoint);
+        }
+
+        private PathType? cyclePathType(PathControlPointPiece<T> piece)
+        {
+            var oldPathType = piece.ControlPoint.Type;
+
+            // Only allow changing to perfect curve if there's less than 2 inherited points
+            var pointsInSegment = hitObject.Path.PointsInSegment(piece.ControlPoint);
+            if (pointsInSegment.Count <= 3 && oldPathType == PathType.BEZIER)
+            {
+                return PathType.PERFECT_CURVE;
+            }
+
+            // Only change to B-Spline if it looks different than Bezier
+            if (pointsInSegment.Count >= 6 && oldPathType == PathType.BEZIER)
+                return PathType.BSpline(4);
+
+            // Allow changing to inherited point only if it doesn't break previous segment's perfect circle
+            PathControlPoint previousSegmentStarter = hitObject.Path.GetPreviousSegmentStarter(piece.ControlPoint);
+            if (previousSegmentStarter != null
+                && previousSegmentStarter.Type != PathType.PERFECT_CURVE
+                && oldPathType == PathType.CATMULL)
+                return null;
+
+            PathType? newPathType = oldPathType switch
+            {
+                var _ when oldPathType == null => PathType.BEZIER,
+                var _ when oldPathType == PathType.BEZIER => PathType.LINEAR,
+                var _ when oldPathType == PathType.PERFECT_CURVE => PathType.LINEAR,
+                var _ when oldPathType == PathType.LINEAR => PathType.CATMULL,
+                var _ when oldPathType == PathType.CATMULL => PathType.BEZIER,
+                var _ when ((PathType)oldPathType).Type == SplineType.BSpline => PathType.LINEAR,
+                _ => (PathType)oldPathType
+            };
+            return newPathType;
         }
 
         /// <summary>
