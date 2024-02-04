@@ -416,7 +416,7 @@ namespace osu.Game.Overlays.SkinEditor
             // Since skinChanged is scheduled, it has a chance to be called right after PopOut is called, therefore leasedSkinInfo may be null here.
             if (leasedSkinInfo != null)
                 leasedSkinInfo.Value = skins.GetMutableSkin();
-            else
+            else if (!skins.CurrentSkinInfo.Disabled)
                 skins.CurrentSkinInfo.Value = skins.GetMutableSkin();
 
             var targetContainer = getTarget(selectedTarget.Value);
@@ -576,6 +576,10 @@ namespace osu.Game.Overlays.SkinEditor
         protected override void PopIn()
         {
             this.FadeIn(TRANSITION_DURATION, Easing.OutQuint);
+
+            // required for tests which create more than one skin editor at once.
+            if (skins.CurrentSkinInfo.Disabled)
+                return;
 
             // skin editor doesn't handle saving or asking user about unsaved changes when switching skins.
             // for the time being, disable switching skins in skin editor.
