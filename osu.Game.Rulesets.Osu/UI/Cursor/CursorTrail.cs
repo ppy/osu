@@ -4,6 +4,7 @@
 #nullable disable
 
 using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.Runtime.InteropServices;
 using osu.Framework.Allocation;
@@ -166,12 +167,14 @@ namespace osu.Game.Rulesets.Osu.UI.Cursor
                     return;
                 }
 
-                foreach (Vector2 pos2 in resampler.AddPosition(position))
+                var positions = (IList<Vector2>)resampler.AddPosition(position);
+
+                if (positions.Count != 0)
                 {
                     Trace.Assert(lastPosition.HasValue);
 
                     Vector2 pos1 = lastPosition.Value;
-                    Vector2 diff = pos2 - pos1;
+                    Vector2 diff = positions[0] - pos1;
                     float distance = diff.Length;
                     Vector2 direction = diff / distance;
 
