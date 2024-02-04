@@ -20,14 +20,14 @@ namespace osu.Game.Tests.Visual.Gameplay
         public void TestAllSamplesStopDuringSeek()
         {
             DrawableSlider? slider = null;
-            PoolableSkinnableSample[] samples = null!;
+            SkinnableSample[] samples = null!;
             ISamplePlaybackDisabler sampleDisabler = null!;
 
             AddUntilStep("get variables", () =>
             {
                 sampleDisabler = Player;
                 slider = Player.ChildrenOfType<DrawableSlider>().MinBy(s => s.HitObject.StartTime);
-                samples = slider.ChildrenOfType<PoolableSkinnableSample>().ToArray();
+                samples = slider.ChildrenOfType<SkinnableSample>().ToArray();
 
                 return slider != null;
             });
@@ -54,13 +54,13 @@ namespace osu.Game.Tests.Visual.Gameplay
             AddAssert("sample playback still disabled", () => sampleDisabler.SamplePlaybackDisabled.Value);
 
             AddUntilStep("seek finished, sample playback enabled", () => !sampleDisabler.SamplePlaybackDisabled.Value);
-            AddUntilStep("any sample is playing", () => Player.ChildrenOfType<PausableSkinnableSound>().Any(s => s.IsPlaying));
+            AddUntilStep("any sample is playing", () => Player.ChildrenOfType<SkinnableSamples>().Any(s => s.IsActivelyPlaying));
         }
 
-        private IEnumerable<PausableSkinnableSound> allSounds => Player.ChildrenOfType<PausableSkinnableSound>();
-        private IEnumerable<PausableSkinnableSound> allLoopingSounds => allSounds.Where(sound => sound.Looping);
+        private IEnumerable<SkinnableSamples> allSounds => Player.ChildrenOfType<SkinnableSamples>();
+        private IEnumerable<SkinnableSamples> allLoopingSounds => allSounds.Where(sound => sound.Looping);
 
-        private bool allStopped(IEnumerable<PausableSkinnableSound> sounds) => sounds.All(sound => !sound.IsPlaying);
+        private bool allStopped(IEnumerable<SkinnableSamples> sounds) => sounds.All(sound => !sound.IsActivelyPlaying);
 
         protected override bool Autoplay => true;
 

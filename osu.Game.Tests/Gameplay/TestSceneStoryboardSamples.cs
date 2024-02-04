@@ -86,7 +86,7 @@ namespace osu.Game.Tests.Gameplay
 
             AddStep("reset clock", () => gameplayContainer.Reset(startClock: true));
 
-            AddUntilStep("sample played", () => sample.RequestedPlaying);
+            AddUntilStep("sample played", () => sample.IsPlaying);
             AddUntilStep("sample has lifetime end", () => sample.LifetimeEnd < double.MaxValue);
         }
 
@@ -118,7 +118,7 @@ namespace osu.Game.Tests.Gameplay
 
             AddStep("start time", () => gameplayContainer.Start());
 
-            AddUntilStep("sample not played", () => !sample.RequestedPlaying);
+            AddUntilStep("sample not played", () => !sample.IsPlaying);
             AddUntilStep("sample has lifetime end", () => sample.LifetimeEnd < double.MaxValue);
         }
 
@@ -149,7 +149,7 @@ namespace osu.Game.Tests.Gameplay
 
             AddStep("reset clock", () => gameplayContainer.Reset(startClock: true));
 
-            AddUntilStep("sample played", () => sample.IsPlayed);
+            AddUntilStep("sample played", () => sample.WasPlayed);
             AddUntilStep("sample has lifetime end", () => sample.LifetimeEnd < double.MaxValue);
 
             AddStep("restore default", () => config.GetBindable<bool>(OsuSetting.BeatmapHitsounds).SetDefault());

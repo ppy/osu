@@ -17,7 +17,7 @@ namespace osu.Game.Screens.Play
     {
         private readonly ScoreProcessor processor;
 
-        private SkinnableSound comboBreakSample;
+        private SkinnableSamples comboBreakSample;
 
         private Bindable<bool> alwaysPlayFirst;
 
@@ -31,7 +31,7 @@ namespace osu.Game.Screens.Play
         [BackgroundDependencyLoader]
         private void load(OsuConfigManager config)
         {
-            InternalChild = comboBreakSample = new SkinnableSound(new SampleInfo("Gameplay/combobreak"));
+            InternalChild = comboBreakSample = new SkinnableSamples(new SampleInfo("Gameplay/combobreak"));
             alwaysPlayFirst = config.GetBindable<bool>(OsuSetting.AlwaysPlayFirstComboBreak);
         }
 

@@ -65,7 +65,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
         private Container<DrawableSliderTail> tailContainer;
         private Container<DrawableSliderTick> tickContainer;
         private Container<DrawableSliderRepeat> repeatContainer;
-        private PausableSkinnableSound slidingSample;
+        private SkinnableSamples slidingSample;
 
         private readonly LayoutValue relativeAnchorPositionLayout;
 
@@ -116,7 +116,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
                 headContainer = new Container<DrawableSliderHead> { RelativeSizeAxes = Axes.Both },
                 OverlayElementContainer = new Container { RelativeSizeAxes = Axes.Both, },
                 Ball,
-                slidingSample = new PausableSkinnableSound
+                slidingSample = new SkinnableSamples
                 {
                     Looping = true,
                     MinimumSampleVolume = MINIMUM_SAMPLE_VOLUME,
@@ -239,11 +239,11 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
                 if (Tracking.Value && Time.Current >= HitObject.StartTime)
                 {
                     // keep the sliding sample playing at the current tracking position
-                    if (!slidingSample.RequestedPlaying)
+                    if (!slidingSample.IsPlaying)
                         slidingSample.Play();
                     slidingSample.Balance.Value = CalculateSamplePlaybackBalance(CalculateDrawableRelativePosition(Ball));
                 }
-                else if (slidingSample.IsPlaying || slidingSample.RequestedPlaying)
+                else if (slidingSample.IsPlaying)
                     slidingSample.Stop();
             }
         }

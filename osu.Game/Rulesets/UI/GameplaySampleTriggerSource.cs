@@ -28,7 +28,7 @@ namespace osu.Game.Rulesets.UI
 
         private int nextHitSoundIndex;
 
-        private readonly Container<SkinnableSound> hitSounds;
+        private readonly Container<SkinnableSamples> hitSounds;
 
         private HitObjectLifetimeEntry? mostValidObject;
 
@@ -43,10 +43,10 @@ namespace osu.Game.Rulesets.UI
 
             InternalChild = AudioContainer = new AudioContainer
             {
-                Child = hitSounds = new Container<SkinnableSound>
+                Child = hitSounds = new Container<SkinnableSamples>
                 {
                     Name = "concurrent sample pool",
-                    ChildrenEnumerable = Enumerable.Range(0, max_concurrent_hitsounds).Select(_ => new PausableSkinnableSound
+                    ChildrenEnumerable = Enumerable.Range(0, max_concurrent_hitsounds).Select(_ => new SkinnableSamples
                     {
                         MinimumSampleVolume = DrawableHitObject.MINIMUM_SAMPLE_VOLUME
                     })
@@ -78,9 +78,9 @@ namespace osu.Game.Rulesets.UI
             hitSound.Play();
         });
 
-        protected virtual void ApplySampleInfo(SkinnableSound hitSound, ISampleInfo[] samples)
+        protected virtual void ApplySampleInfo(SkinnableSamples hitSamples, ISampleInfo[] samples)
         {
-            hitSound.Samples = samples;
+            hitSamples.Samples = samples;
         }
 
         public void StopAllPlayback() => Schedule(() =>
@@ -154,14 +154,14 @@ namespace osu.Game.Rulesets.UI
             }
         }
 
-        protected SkinnableSound GetNextSample()
+        protected SkinnableSamples GetNextSample()
         {
-            SkinnableSound hitSound = hitSounds[nextHitSoundIndex];
+            SkinnableSamples hitSamples = hitSounds[nextHitSoundIndex];
 
             // round robin over available samples to allow for concurrent playback.
             nextHitSoundIndex = (nextHitSoundIndex + 1) % max_concurrent_hitsounds;
 
-            return hitSound;
+            return hitSamples;
         }
     }
 }

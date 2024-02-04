@@ -19,7 +19,7 @@ namespace osu.Game.Skinning
     /// <summary>
     /// A sample corresponding to an <see cref="ISampleInfo"/> that supports being pooled and responding to skin changes.
     /// </summary>
-    public partial class PoolableSkinnableSample : SkinReloadableDrawable, IAdjustableAudioComponent
+    public partial class SkinnableSample : SkinReloadableDrawable, IAdjustableAudioComponent
     {
         /// <summary>
         /// The currently-loaded <see cref="DrawableSample"/>.
@@ -32,19 +32,19 @@ namespace osu.Game.Skinning
         private SampleChannel activeChannel;
 
         /// <summary>
-        /// Creates a new <see cref="PoolableSkinnableSample"/> with no applied <see cref="ISampleInfo"/>.
+        /// Creates a new <see cref="SkinnableSample"/> with no applied <see cref="ISampleInfo"/>.
         /// An <see cref="ISampleInfo"/> can be applied later via <see cref="Apply"/>.
         /// </summary>
-        public PoolableSkinnableSample()
+        public SkinnableSample()
         {
             InternalChild = sampleContainer = new AudioContainer<DrawableSample> { RelativeSizeAxes = Axes.Both };
         }
 
         /// <summary>
-        /// Creates a new <see cref="PoolableSkinnableSample"/> with an applied <see cref="ISampleInfo"/>.
+        /// Creates a new <see cref="SkinnableSample"/> with an applied <see cref="ISampleInfo"/>.
         /// </summary>
         /// <param name="sampleInfo">The <see cref="ISampleInfo"/> to attach.</param>
-        public PoolableSkinnableSample(ISampleInfo sampleInfo)
+        public SkinnableSample(ISampleInfo sampleInfo)
             : this()
         {
             Apply(sampleInfo);
@@ -52,14 +52,14 @@ namespace osu.Game.Skinning
 
         /// <summary>
         /// Applies an <see cref="ISampleInfo"/> that describes the sample to retrieve.
-        /// Only one <see cref="ISampleInfo"/> can ever be applied to a <see cref="PoolableSkinnableSample"/>.
+        /// Only one <see cref="ISampleInfo"/> can ever be applied to a <see cref="SkinnableSample"/>.
         /// </summary>
         /// <param name="sampleInfo">The <see cref="ISampleInfo"/> to apply.</param>
-        /// <exception cref="InvalidOperationException">If an <see cref="ISampleInfo"/> has already been applied to this <see cref="PoolableSkinnableSample"/>.</exception>
+        /// <exception cref="InvalidOperationException">If an <see cref="ISampleInfo"/> has already been applied to this <see cref="SkinnableSample"/>.</exception>
         public void Apply(ISampleInfo sampleInfo)
         {
             if (this.sampleInfo != null)
-                throw new InvalidOperationException($"A {nameof(PoolableSkinnableSample)} cannot be applied multiple {nameof(ISampleInfo)}s.");
+                throw new InvalidOperationException($"A {nameof(SkinnableSample)} cannot be applied multiple {nameof(ISampleInfo)}s.");
 
             this.sampleInfo = sampleInfo;
 
@@ -90,6 +90,7 @@ namespace osu.Game.Skinning
 
             sampleContainer.Clear();
             Sample = null;
+            activeChannel = null;
         }
 
         private void updateSample()
@@ -112,7 +113,7 @@ namespace osu.Game.Skinning
         }
 
         /// <summary>
-        /// Plays the sample.
+        /// Plays the sample. Will not stop previous concurrent playbacks of the sample.
         /// </summary>
         public void Play()
         {
@@ -121,11 +122,19 @@ namespace osu.Game.Skinning
             if (Sample == null)
                 return;
 
+            // Avoid spinning up a new channel if we're a looping sample.
+            if (activeChannel?.Looping == true)
+            {
+                if (!activeChannel.Playing)
+                    activeChannel.Play();
+                return;
+            }
+
             activeChannel = Sample.GetChannel();
             activeChannel.Looping = Looping;
             activeChannel.Play();
 
-            Played = true;
+            WasPlayed = true;
         }
 
         /// <summary>
@@ -142,7 +151,10 @@ namespace osu.Game.Skinning
         /// </summary>
         public bool Playing => activeChannel?.Playing ?? false;
 
-        public bool Played { get; private set; }
+        /// <summary>
+        /// Whether the sample was ever started. Becomes <c>true</c> on <see cref="Play"/> and never changes after that point.
+        /// </summary>
+        public bool WasPlayed { get; private set; }
 
         private bool looping;
 

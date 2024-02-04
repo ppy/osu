@@ -58,11 +58,11 @@ namespace osu.Game.Rulesets.Taiko.UI
 
         public override void Play() => throw new InvalidOperationException(@"Use override with HitType parameter instead");
 
-        protected override void ApplySampleInfo(SkinnableSound hitSound, ISampleInfo[] samples)
+        protected override void ApplySampleInfo(SkinnableSamples hitSamples, ISampleInfo[] samples)
         {
-            base.ApplySampleInfo(hitSound, samples);
+            base.ApplySampleInfo(hitSamples, samples);
 
-            hitSound.Balance.Value = -0.05 + RNG.NextDouble(0.1);
+            hitSamples.Balance.Value = -0.05 + RNG.NextDouble(0.1);
         }
     }
 

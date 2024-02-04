@@ -27,7 +27,7 @@ namespace osu.Game.Screens.Menu
         protected override string BeatmapFile => "welcome.osz";
         private const double delay_step_two = 2142;
 
-        private SkinnableSound skinnableWelcome;
+        private SkinnableSamples skinnableWelcome;
         private ISample welcome;
 
         private ISample pianoReverb;
@@ -44,7 +44,7 @@ namespace osu.Game.Screens.Menu
             if (MenuVoice.Value)
             {
                 if (api.LocalUser.Value.IsSupporter)
-                    AddInternal(skinnableWelcome = new SkinnableSound(new SampleInfo(@"Intro/Welcome/welcome")));
+                    AddInternal(skinnableWelcome = new SkinnableSamples(new SampleInfo(@"Intro/Welcome/welcome")));
                 else
                     welcome = audio.Samples.Get(@"Intro/Welcome/welcome");
             }

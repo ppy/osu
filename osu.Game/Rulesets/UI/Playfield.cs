@@ -450,11 +450,11 @@ namespace osu.Game.Rulesets.UI
             return pool;
         }
 
-        private readonly Dictionary<ISampleInfo, DrawablePool<PoolableSkinnableSample>> samplePools = new Dictionary<ISampleInfo, DrawablePool<PoolableSkinnableSample>>();
+        private readonly Dictionary<ISampleInfo, DrawablePool<SkinnableSample>> samplePools = new Dictionary<ISampleInfo, DrawablePool<SkinnableSample>>();
 
-        public PoolableSkinnableSample GetPooledSample(ISampleInfo sampleInfo) => prepareSamplePool(sampleInfo).Get();
+        public SkinnableSample GetPooledSample(ISampleInfo sampleInfo) => prepareSamplePool(sampleInfo).Get();
 
-        private DrawablePool<PoolableSkinnableSample> prepareSamplePool(ISampleInfo sampleInfo)
+        private DrawablePool<SkinnableSample> prepareSamplePool(ISampleInfo sampleInfo)
         {
             if (samplePools.TryGetValue(sampleInfo, out var pool)) return pool;
 
@@ -463,7 +463,7 @@ namespace osu.Game.Rulesets.UI
             return pool;
         }
 
-        private partial class DrawableSamplePool : DrawablePool<PoolableSkinnableSample>
+        private partial class DrawableSamplePool : DrawablePool<SkinnableSample>
         {
             private readonly ISampleInfo sampleInfo;
 
@@ -473,7 +473,7 @@ namespace osu.Game.Rulesets.UI
                 this.sampleInfo = sampleInfo;
             }
 
-            protected override PoolableSkinnableSample CreateNewDrawable() => base.CreateNewDrawable().With(d => d.Apply(sampleInfo));
+            protected override SkinnableSample CreateNewDrawable() => base.CreateNewDrawable().With(d => d.Apply(sampleInfo));
         }
 
         #endregion

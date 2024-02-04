@@ -60,7 +60,7 @@ namespace osu.Game.Rulesets.Objects.Drawables
         /// </summary>
         public readonly Bindable<Color4> AccentColour = new Bindable<Color4>(Color4.Gray);
 
-        protected PausableSkinnableSound Samples { get; private set; }
+        protected SkinnableSamples Samples { get; private set; }
 
         public virtual IEnumerable<HitSampleInfo> GetSamples() => HitObject.Samples;
 
@@ -202,7 +202,7 @@ namespace osu.Game.Rulesets.Objects.Drawables
             comboColourBrightness.BindTo(gameplaySettings.ComboColourNormalisationAmount);
 
             // Explicit non-virtual function call in case a DrawableHitObject overrides AddInternal.
-            base.AddInternal(Samples = new PausableSkinnableSound
+            base.AddInternal(Samples = new SkinnableSamples
             {
                 MinimumSampleVolume = MINIMUM_SAMPLE_VOLUME
             });
@@ -677,7 +677,7 @@ namespace osu.Game.Rulesets.Objects.Drawables
                 nested.OnKilled();
 
             // failsafe to ensure looping samples don't get stuck in a playing state.
-            // this could occur in a non-frame-stable context where DrawableHitObjects get killed before a SkinnableSound has the chance to be stopped.
+            // this could occur in a non-frame-stable context where DrawableHitObjects get killed before a SkinnableSamples has the chance to be stopped.
             StopAllSamples();
 
             UpdateResult(false);

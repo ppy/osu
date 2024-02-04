@@ -336,13 +336,13 @@ namespace osu.Game.Tests.Visual.Gameplay
         {
             AddStep("seek before gameplay", () => Player.GameplayClockContainer.Seek(-5000));
 
-            SkinnableSound getLoop() => Player.ChildrenOfType<PauseOverlay>().FirstOrDefault()?.ChildrenOfType<SkinnableSound>().FirstOrDefault();
+            SkinnableSamples getLoop() => Player.ChildrenOfType<PauseOverlay>().FirstOrDefault()?.ChildrenOfType<SkinnableSamples>().FirstOrDefault();
 
             pauseAndConfirm();
-            AddAssert("loop is playing", () => getLoop().IsPlaying);
+            AddAssert("loop is playing", () => getLoop().IsActivelyPlaying);
 
             resumeAndConfirm();
-            AddUntilStep("loop is stopped", () => !getLoop().IsPlaying);
+            AddUntilStep("loop is stopped", () => !getLoop().IsActivelyPlaying);
 
             AddUntilStep("pause again", () =>
             {
@@ -350,10 +350,10 @@ namespace osu.Game.Tests.Visual.Gameplay
                 return !Player.GameplayClockContainer.IsRunning;
             });
 
-            AddAssert("loop is playing", () => getLoop().IsPlaying);
+            AddAssert("loop is playing", () => getLoop().IsActivelyPlaying);
 
             resumeAndConfirm();
-            AddUntilStep("loop is stopped", () => !getLoop().IsPlaying);
+            AddUntilStep("loop is stopped", () => !getLoop().IsActivelyPlaying);
         }
 
         private void pauseAndConfirm()

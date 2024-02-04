@@ -21,14 +21,14 @@ namespace osu.Game.Tests.Visual.Editing
         public void TestSlidingSampleStopsOnSeek()
         {
             DrawableSlider slider = null;
-            PoolableSkinnableSample[] loopingSamples = null;
-            PoolableSkinnableSample[] onceOffSamples = null;
+            SkinnableSample[] loopingSamples = null;
+            SkinnableSample[] onceOffSamples = null;
 
             AddStep("get first slider", () =>
             {
                 slider = Editor.ChildrenOfType<DrawableSlider>().OrderBy(s => s.HitObject.StartTime).First();
-                onceOffSamples = slider.ChildrenOfType<PoolableSkinnableSample>().Where(s => !s.Looping).ToArray();
-                loopingSamples = slider.ChildrenOfType<PoolableSkinnableSample>().Where(s => s.Looping).ToArray();
+                onceOffSamples = slider.ChildrenOfType<SkinnableSample>().Where(s => !s.Looping).ToArray();
+                loopingSamples = slider.ChildrenOfType<SkinnableSample>().Where(s => s.Looping).ToArray();
             });
 
             AddStep("start playback", () => EditorClock.Start());
@@ -45,8 +45,8 @@ namespace osu.Game.Tests.Visual.Editing
                 return true;
             });
 
-            AddAssert("non-looping samples are playing", () => onceOffSamples.Length == 4 && loopingSamples.All(s => s.Played || s.Playing));
-            AddAssert("looping samples are not playing", () => loopingSamples.Length == 1 && loopingSamples.All(s => s.Played && !s.Playing));
+            AddAssert("non-looping samples are playing", () => onceOffSamples.Length == 4 && loopingSamples.All(s => s.WasPlayed || s.Playing));
+            AddAssert("looping samples are not playing", () => loopingSamples.Length == 1 && loopingSamples.All(s => s.WasPlayed && !s.Playing));
         }
     }
 }
