@@ -37,6 +37,10 @@ namespace osu.Game.Rulesets.Taiko.UI
 
         public readonly BindableBool TrimOnOverflow = new BindableBool(false);
 
+        public readonly BindableFloat MinimumRelativeHeight = new BindableFloat(0f);
+
+        public readonly BindableFloat MaximumRelativeHeight = new BindableFloat(1f / 3f);
+
         public readonly BindableFloat CurrentAspect = new BindableFloat(16f / 9f);
 
         public new TaikoInputManager KeyBindingInputManager => (TaikoInputManager)base.KeyBindingInputManager;
@@ -98,7 +102,9 @@ namespace osu.Game.Rulesets.Taiko.UI
             MaximumAspect = { BindTarget = MaximumAspect },
             MinimumAspect = { BindTarget = MinimumAspect },
             TrimOnOverflow = { BindTarget = TrimOnOverflow },
-            CurrentAspect = { BindTarget = CurrentAspect }
+            CurrentAspect = { BindTarget = CurrentAspect },
+            MaximumRelativeHeight = { BindTarget = MaximumRelativeHeight },
+            MinimumRelativeHeight = { BindTarget = MinimumRelativeHeight }
         };
 
         protected override PassThroughInputManager CreateInputManager() => new TaikoInputManager(Ruleset.RulesetInfo);

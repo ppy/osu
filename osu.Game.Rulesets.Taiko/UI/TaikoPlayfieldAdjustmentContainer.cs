@@ -20,6 +20,10 @@ namespace osu.Game.Rulesets.Taiko.UI
 
         public BindableFloat CurrentAspect = new BindableFloat(16f / 9f);
 
+        public BindableFloat MaximumRelativeHeight = new BindableFloat(1f / 3f);
+
+        public BindableFloat MinimumRelativeHeight = new BindableFloat(0f);
+
         public BindableBool TrimOnOverflow = new BindableBool(false);
 
         public TaikoPlayfieldAdjustmentContainer()
@@ -67,7 +71,7 @@ namespace osu.Game.Rulesets.Taiko.UI
 
 
             // Limit the maximum relative height of the playfield to one-third of available area to avoid it masking out on extreme resolutions.
-            relativeHeight = Math.Min(relativeHeight, 1f / 3f);
+            relativeHeight = Math.Clamp(relativeHeight, MinimumRelativeHeight.Value, MaximumRelativeHeight.Value);
 
             Scale = new Vector2(Math.Max((Parent!.ChildSize.Y / 768f) * (relativeHeight / base_relative_height), 1f));
             Width = 1 / Scale.X * widthScale;

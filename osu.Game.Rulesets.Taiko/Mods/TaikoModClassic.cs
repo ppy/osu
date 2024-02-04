@@ -52,6 +52,21 @@ namespace osu.Game.Rulesets.Taiko.Mods
                 hiddenFadeOutDuration.BindTo(hidden.FadeOutDuration);
                 drawableRuleset.OnUpdate += adjustHidden;
             }
+
+            if (mods.OfType<TaikoModHardRock>().Any())
+            {
+                // For hardrock, the playfield time range is clamped to within classicMaxTimeRange and the equivalent
+                // time range for a 16:10 aspect ratio.
+                drawableTaikoRuleset.TrimOnOverflow.Value = false;
+
+                // Apply stable aspect ratio limits for hardrock (visually taken)
+                drawableTaikoRuleset.MaximumAspect.Value = 1.963f;
+                drawableTaikoRuleset.MinimumAspect.Value = 1.64f;
+
+                // Visually taken from different aspect ratios
+                drawableTaikoRuleset.MinimumRelativeHeight.Value = 0.26f;
+                drawableTaikoRuleset.MaximumRelativeHeight.Value = 0.26f;
+            }
         }
 
         public void ApplyToDrawableHitObject(DrawableHitObject drawable)
