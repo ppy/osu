@@ -30,5 +30,7 @@ namespace osu.Game.Rulesets.Mania.Skinning
             Lookup = lookup;
             ColumnIndex = columnIndex;
         }
+
+        public override string ToString() => $"[{nameof(ManiaSkinConfigurationLookup)} lookup:{Lookup} col:{ColumnIndex}]";
     }
 }

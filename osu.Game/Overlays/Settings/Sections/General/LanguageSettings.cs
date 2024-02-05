@@ -23,6 +23,7 @@ namespace osu.Game.Overlays.Settings.Sections.General
                 {
                     LabelText = GeneralSettingsStrings.LanguageDropdown,
                     Current = game.CurrentLanguage,
+                    AlwaysShowSearchBar = true,
                 },
                 new SettingsCheckbox
                 {

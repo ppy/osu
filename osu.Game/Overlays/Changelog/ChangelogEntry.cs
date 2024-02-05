@@ -12,6 +12,7 @@ using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Sprites;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
+using osu.Game.Online;
 using osu.Game.Online.API.Requests.Responses;
 using osuTK;
 using osuTK.Graphics;
@@ -28,6 +29,9 @@ namespace osu.Game.Overlays.Changelog
 
         [Resolved]
         private OverlayColourProvider colourProvider { get; set; } = null!;
+
+        [Resolved]
+        private ILinkHandler? linkHandler { get; set; }
 
         private FontUsage fontLarge;
         private FontUsage fontMedium;
@@ -86,11 +90,21 @@ namespace osu.Game.Overlays.Changelog
                 }
             };
 
-            title.AddText(entry.Title, t =>
+            if (string.IsNullOrEmpty(entry.Url))
             {
-                t.Font = fontLarge;
-                t.Colour = entryColour;
-            });
+                title.AddText(entry.Title, t =>
+                {
+                    t.Font = fontLarge;
+                    t.Colour = entryColour;
+                });
+            }
+            else
+            {
+                title.AddLink(entry.Title, () => linkHandler?.HandleLink(entry.Url), entry.Url, t =>
+                {
+                    t.Font = fontLarge;
+                });
+            }
 
             if (!string.IsNullOrEmpty(entry.Repository) && !string.IsNullOrEmpty(entry.GithubUrl))
                 addRepositoryReference(title, entryColour);

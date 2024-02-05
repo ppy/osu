@@ -3,10 +3,12 @@
 
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Game.Beatmaps;
+using osu.Game.Extensions;
 using osu.Game.Online.API;
 using osu.Game.Online.API.Requests;
 using osu.Game.Online.Solo;
@@ -44,12 +46,16 @@ namespace osu.Game.Screens.Ranking
         {
             base.LoadComplete();
 
+            Debug.Assert(Score != null);
+
             if (ShowUserStatistics)
                 statisticsSubscription = soloStatisticsWatcher.RegisterForStatisticsUpdateAfter(Score, update => statisticsUpdate.Value = update);
         }
 
         protected override StatisticsPanel CreateStatisticsPanel()
         {
+            Debug.Assert(Score != null);
+
             if (ShowUserStatistics)
             {
                 return new SoloStatisticsPanel(Score)
@@ -63,11 +69,13 @@ namespace osu.Game.Screens.Ranking
 
         protected override APIRequest? FetchScores(Action<IEnumerable<ScoreInfo>>? scoresCallback)
         {
+            Debug.Assert(Score != null);
+
             if (Score.BeatmapInfo!.OnlineID <= 0 || Score.BeatmapInfo.Status <= BeatmapOnlineStatus.Pending)
                 return null;
 
             getScoreRequest = new GetScoresRequest(Score.BeatmapInfo, Score.Ruleset);
-            getScoreRequest.Success += r => scoresCallback?.Invoke(r.Scores.Where(s => s.OnlineID != Score.OnlineID).Select(s => s.ToScoreInfo(rulesets, Beatmap.Value.BeatmapInfo)));
+            getScoreRequest.Success += r => scoresCallback?.Invoke(r.Scores.Where(s => !s.MatchesOnlineID(Score)).Select(s => s.ToScoreInfo(rulesets, Beatmap.Value.BeatmapInfo)));
             return getScoreRequest;
         }
 

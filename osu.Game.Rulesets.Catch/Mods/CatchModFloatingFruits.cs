@@ -24,13 +24,12 @@ namespace osu.Game.Rulesets.Catch.Mods
 
         public void ApplyToDrawableRuleset(DrawableRuleset<CatchHitObject> drawableRuleset)
         {
-            drawableRuleset.PlayfieldAdjustmentContainer.Anchor = Anchor.Centre;
-            drawableRuleset.PlayfieldAdjustmentContainer.Origin = Anchor.Centre;
-
             IsDisabled.BindValueChanged(s =>
             {
                 drawableRuleset.PlayfieldAdjustmentContainer.Scale = s.NewValue ? new Vector2(1, 1) : new Vector2(1, -1);
             }, true);
+
+            drawableRuleset.PlayfieldAdjustmentContainer.Y = 1 - drawableRuleset.PlayfieldAdjustmentContainer.Y;
         }
     }
 }

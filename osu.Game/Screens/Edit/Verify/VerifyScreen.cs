@@ -56,5 +56,11 @@ namespace osu.Game.Screens.Edit.Verify
                 }
             };
         }
+
+        protected override void PopIn()
+        {
+            base.PopIn();
+            IssueList.Refresh();
+        }
     }
 }

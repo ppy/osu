@@ -55,7 +55,7 @@ namespace osu.Game.Screens.Edit.Compose.Components
         [Resolved(CanBeNull = true)]
         protected IEditorChangeHandler ChangeHandler { get; private set; }
 
-        protected SelectionRotationHandler RotationHandler { get; private set; }
+        public SelectionRotationHandler RotationHandler { get; private set; }
 
         protected SelectionHandler()
         {

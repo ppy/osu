@@ -6,6 +6,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using JetBrains.Annotations;
 using osu.Framework.Allocation;
 using osu.Framework.Audio;
 using osu.Framework.Audio.Sample;
@@ -21,7 +22,9 @@ using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Input.Bindings;
+using osu.Game.Localisation;
 using osu.Game.Online.API;
+using osu.Game.Online.Placeholders;
 using osu.Game.Scoring;
 using osu.Game.Screens.Play;
 using osu.Game.Screens.Ranking.Statistics;
@@ -43,6 +46,7 @@ namespace osu.Game.Screens.Ranking
 
         public readonly Bindable<ScoreInfo> SelectedScore = new Bindable<ScoreInfo>();
 
+        [CanBeNull]
         public readonly ScoreInfo Score;
 
         protected ScorePanelList ScorePanelList { get; private set; }
@@ -67,7 +71,7 @@ namespace osu.Game.Screens.Ranking
 
         private Sample popInSample;
 
-        protected ResultsScreen(ScoreInfo score, bool allowRetry, bool allowWatchingReplay = true)
+        protected ResultsScreen([CanBeNull] ScoreInfo score, bool allowRetry, bool allowWatchingReplay = true)
         {
             Score = score;
             this.allowRetry = allowRetry;
@@ -156,7 +160,7 @@ namespace osu.Game.Screens.Ranking
             if (Score != null)
             {
                 // only show flair / animation when arriving after watching a play that isn't autoplay.
-                bool shouldFlair = player != null && Score.Mods.All(m => m.UserPlayable);
+                bool shouldFlair = player != null && !Score.User.IsBot;
 
                 ScorePanelList.AddScore(Score, shouldFlair);
             }
@@ -245,6 +249,12 @@ namespace osu.Game.Screens.Ranking
                 addScore(s);
 
             lastFetchCompleted = true;
+
+            if (ScorePanelList.IsEmpty)
+            {
+                // This can happen if for example a beatmap that is part of a playlist hasn't been played yet.
+                VerticalScrollContent.Add(new MessagePlaceholder(LeaderboardStrings.NoRecordsYet));
+            }
         });
 
         public override void OnEntering(ScreenTransitionEvent e)
@@ -266,6 +276,11 @@ namespace osu.Game.Screens.Ranking
         {
             if (base.OnExiting(e))
                 return true;
+
+            // This is a stop-gap safety against components holding references to gameplay after exiting the gameplay flow.
+            // Right now, HitEvents are only used up to the results screen. If this changes in the future we need to remove
+            // HitObject references from HitEvent.
+            Score?.HitEvents.Clear();
 
             this.FadeOut(100);
             return false;
@@ -329,7 +344,7 @@ namespace osu.Game.Screens.Ranking
                 ScorePanelList.Attach(detachedPanel);
 
                 // Move into its original location in the attached container first, then to the final location.
-                float origLocation = detachedPanel.Parent.ToLocalSpace(screenSpacePos).X;
+                float origLocation = detachedPanel.Parent!.ToLocalSpace(screenSpacePos).X;
                 detachedPanel.MoveToX(origLocation)
                              .Then()
                              .MoveToX(0, 250, Easing.OutElasticQuarter);

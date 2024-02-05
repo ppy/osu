@@ -5,21 +5,38 @@ using osu.Framework.Audio;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Localisation;
+using osu.Game.Configuration;
+using osu.Game.Overlays.Settings;
 
 namespace osu.Game.Rulesets.Mods
 {
-    public abstract class ModDaycore : ModHalfTime
+    public abstract class ModDaycore : ModRateAdjust
     {
         public override string Name => "Daycore";
         public override string Acronym => "DC";
         public override IconUsage? Icon => null;
+        public override ModType Type => ModType.DifficultyReduction;
         public override LocalisableString Description => "Whoaaaaa...";
+        public override bool Ranked => UsesDefaultConfiguration;
+
+        [SettingSource("Speed decrease", "The actual decrease to apply", SettingControlType = typeof(MultiplierSettingsSlider))]
+        public override BindableNumber<double> SpeedChange { get; } = new BindableDouble(0.75)
+        {
+            MinValue = 0.5,
+            MaxValue = 0.99,
+            Precision = 0.01,
+        };
 
         private readonly BindableNumber<double> tempoAdjust = new BindableDouble(1);
         private readonly BindableNumber<double> freqAdjust = new BindableDouble(1);
+        private readonly RateAdjustModHelper rateAdjustHelper;
 
         protected ModDaycore()
         {
+            rateAdjustHelper = new RateAdjustModHelper(SpeedChange);
+
+            // intentionally not deferring the speed change handling to `RateAdjustModHelper`
+            // as the expected result of operation is not the same (daycore should preserve constant pitch).
             SpeedChange.BindValueChanged(val =>
             {
                 tempoAdjust.Value = IsDisabled.Value ? tempoAdjust.Value = val.NewValue : tempoAdjust.Value = val.NewValue / SpeedChange.Default;
@@ -33,9 +50,10 @@ namespace osu.Game.Rulesets.Mods
 
         public override void ApplyToTrack(IAdjustableAudioComponent track)
         {
-            // base.ApplyToTrack() intentionally not called (different tempo adjustment is applied)
             track.AddAdjustment(AdjustableProperty.Frequency, freqAdjust);
             track.AddAdjustment(AdjustableProperty.Tempo, tempoAdjust);
         }
+
+        public override double ScoreMultiplier => rateAdjustHelper.ScoreMultiplier;
     }
 }

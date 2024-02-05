@@ -91,7 +91,7 @@ namespace osu.Game.Rulesets.Mania.Tests
         {
             foreach (var stage in stages)
             {
-                for (int i = 0; i < stage.Columns.Count; i++)
+                for (int i = 0; i < stage.Columns.Length; i++)
                 {
                     var obj = new Note { Column = i, StartTime = Time.Current + 2000 };
                     obj.ApplyDefaults(new ControlPointInfo(), new BeatmapDifficulty());
@@ -105,7 +105,7 @@ namespace osu.Game.Rulesets.Mania.Tests
         {
             foreach (var stage in stages)
             {
-                for (int i = 0; i < stage.Columns.Count; i++)
+                for (int i = 0; i < stage.Columns.Length; i++)
                 {
                     var obj = new HoldNote { Column = i, StartTime = Time.Current + 2000, Duration = 500 };
                     obj.ApplyDefaults(new ControlPointInfo(), new BeatmapDifficulty());
@@ -117,18 +117,16 @@ namespace osu.Game.Rulesets.Mania.Tests
 
         private void createBarLine(bool major)
         {
-            foreach (var stage in stages)
+            var obj = new BarLine
             {
-                var obj = new BarLine
-                {
-                    StartTime = Time.Current + 2000,
-                    Major = major,
-                };
+                StartTime = Time.Current + 2000,
+                Major = major,
+            };
 
-                obj.ApplyDefaults(new ControlPointInfo(), new BeatmapDifficulty());
+            obj.ApplyDefaults(new ControlPointInfo(), new BeatmapDifficulty());
 
+            foreach (var stage in stages)
                 stage.Add(obj);
-            }
         }
 
         private ScrollingTestContainer createStage(ScrollingDirection direction, ManiaAction action)

@@ -7,8 +7,10 @@ using System.Threading.Tasks;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Game.Localisation;
+using osu.Game.Online.API.Requests;
 using osu.Game.Online.API.Requests.Responses;
-using osu.Game.Online.Notifications;
+using osu.Game.Online.Chat;
+using osu.Game.Online.Notifications.WebSocket;
 using osu.Game.Tests;
 using osu.Game.Users;
 
@@ -20,13 +22,18 @@ namespace osu.Game.Online.API
 
         public Bindable<APIUser> LocalUser { get; } = new Bindable<APIUser>(new APIUser
         {
-            Username = @"Dummy",
+            Username = @"Local user",
             Id = DUMMY_USER_ID,
         });
 
         public BindableList<APIUser> Friends { get; } = new BindableList<APIUser>();
 
         public Bindable<UserActivity> Activity { get; } = new Bindable<UserActivity>();
+
+        public Bindable<UserStatistics?> Statistics { get; } = new Bindable<UserStatistics?>();
+
+        public DummyNotificationsClient NotificationsClient { get; } = new DummyNotificationsClient();
+        INotificationsClient IAPIProvider.NotificationsClient => NotificationsClient;
 
         public Language Language => Language.en;
 
@@ -55,6 +62,7 @@ namespace osu.Game.Online.API
 
         private bool shouldFailNextLogin;
         private bool stayConnectingNextLogin;
+        private bool requiredSecondFactorAuth = true;
 
         /// <summary>
         /// The current connectivity state of the API.
@@ -112,10 +120,49 @@ namespace osu.Game.Online.API
             LocalUser.Value = new APIUser
             {
                 Username = username,
-                Id = 1001,
+                Id = DUMMY_USER_ID,
             };
 
+            if (requiredSecondFactorAuth)
+            {
+                state.Value = APIState.RequiresSecondFactorAuth;
+            }
+            else
+            {
+                onSuccessfulLogin();
+                requiredSecondFactorAuth = true;
+            }
+        }
+
+        public void AuthenticateSecondFactor(string code)
+        {
+            var request = new VerifySessionRequest(code);
+            request.Failure += e =>
+            {
+                state.Value = APIState.RequiresSecondFactorAuth;
+                LastLoginError = e;
+            };
+
+            state.Value = APIState.Connecting;
+            LastLoginError = null;
+
+            // if no handler installed / handler can't handle verification, just assume that the server would verify for simplicity.
+            if (HandleRequest?.Invoke(request) != true)
+                onSuccessfulLogin();
+
+            // if a handler did handle this, make sure the verification actually passed.
+            if (request.CompletionState == APIRequestCompletionState.Completed)
+                onSuccessfulLogin();
+        }
+
+        private void onSuccessfulLogin()
+        {
             state.Value = APIState.Online;
+            Statistics.Value = new UserStatistics
+            {
+                GlobalRank = 1,
+                CountryRank = 1
+            };
         }
 
         public void Logout()
@@ -126,9 +173,17 @@ namespace osu.Game.Online.API
             LocalUser.Value = new GuestUser();
         }
 
+        public void UpdateStatistics(UserStatistics newStatistics)
+        {
+            Statistics.Value = newStatistics;
+
+            if (IsLoggedIn)
+                LocalUser.Value.Statistics = newStatistics;
+        }
+
         public IHubClientConnector? GetHubConnector(string clientName, string endpoint, bool preferMessagePack) => null;
 
-        public NotificationsClientConnector GetNotificationsConnector() => new PollingNotificationsClientConnector(this);
+        public IChatClient GetChatClient() => new TestChatClientConnector(this);
 
         public RegistrationRequest.RegistrationRequestErrors? CreateAccount(string email, string username, string password)
         {
@@ -141,6 +196,12 @@ namespace osu.Game.Online.API
         IBindable<APIUser> IAPIProvider.LocalUser => LocalUser;
         IBindableList<APIUser> IAPIProvider.Friends => Friends;
         IBindable<UserActivity> IAPIProvider.Activity => Activity;
+        IBindable<UserStatistics?> IAPIProvider.Statistics => Statistics;
+
+        /// <summary>
+        /// Skip 2FA requirement for next login.
+        /// </summary>
+        public void SkipSecondFactor() => requiredSecondFactorAuth = false;
 
         /// <summary>
         /// During the next simulated login, the process will fail immediately.

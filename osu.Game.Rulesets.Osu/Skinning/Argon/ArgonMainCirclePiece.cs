@@ -48,7 +48,7 @@ namespace osu.Game.Rulesets.Osu.Skinning.Argon
 
         private Bindable<bool> configHitLighting = null!;
 
-        private static readonly Vector2 circle_size = new Vector2(OsuHitObject.OBJECT_RADIUS * 2);
+        private static readonly Vector2 circle_size = OsuHitObject.OBJECT_DIMENSIONS;
 
         [Resolved]
         private DrawableHitObject drawableObject { get; set; } = null!;

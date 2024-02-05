@@ -1,8 +1,6 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
 using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.Diagnostics;
@@ -23,17 +21,17 @@ namespace osu.Game.Tournament.Screens.Ladder.Components
 {
     public partial class LadderEditorSettings : CompositeDrawable
     {
-        private SettingsDropdown<TournamentRound> roundDropdown;
-        private PlayerCheckbox losersCheckbox;
-        private DateTextBox dateTimeBox;
-        private SettingsTeamDropdown team1Dropdown;
-        private SettingsTeamDropdown team2Dropdown;
+        private SettingsDropdown<TournamentRound?> roundDropdown = null!;
+        private PlayerCheckbox losersCheckbox = null!;
+        private DateTextBox dateTimeBox = null!;
+        private SettingsTeamDropdown team1Dropdown = null!;
+        private SettingsTeamDropdown team2Dropdown = null!;
 
         [Resolved]
-        private LadderEditorInfo editorInfo { get; set; }
+        private LadderEditorInfo editorInfo { get; set; } = null!;
 
         [Resolved]
-        private LadderInfo ladderInfo { get; set; }
+        private LadderInfo ladderInfo { get; set; } = null!;
 
         [BackgroundDependencyLoader]
         private void load()
@@ -77,7 +75,7 @@ namespace osu.Game.Tournament.Screens.Ladder.Components
             };
         }
 
-        private void roundDropdownChanged(ValueChangedEvent<TournamentRound> round)
+        private void roundDropdownChanged(ValueChangedEvent<TournamentRound?> round)
         {
             if (editorInfo.Selected.Value?.Date.Value < round.NewValue?.StartDate.Value)
             {
@@ -101,11 +99,11 @@ namespace osu.Game.Tournament.Screens.Ladder.Components
         {
         }
 
-        private partial class SettingsRoundDropdown : SettingsDropdown<TournamentRound>
+        private partial class SettingsRoundDropdown : SettingsDropdown<TournamentRound?>
         {
             public SettingsRoundDropdown(BindableList<TournamentRound> rounds)
             {
-                Current = new Bindable<TournamentRound>();
+                Current = new Bindable<TournamentRound?>();
 
                 foreach (var r in rounds.Prepend(new TournamentRound()))
                     add(r);

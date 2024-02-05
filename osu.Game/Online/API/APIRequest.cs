@@ -7,6 +7,7 @@ using System;
 using System.Globalization;
 using JetBrains.Annotations;
 using Newtonsoft.Json;
+using osu.Framework.Extensions.TypeExtensions;
 using osu.Framework.IO.Network;
 using osu.Framework.Logging;
 using osu.Game.Extensions;
@@ -46,7 +47,7 @@ namespace osu.Game.Online.API
             if (WebRequest != null)
             {
                 Response = ((OsuJsonWebRequest<T>)WebRequest).ResponseObject;
-                Logger.Log($"{GetType()} finished with response size of {WebRequest.ResponseStream.Length:#,0} bytes", LoggingTarget.Network);
+                Logger.Log($"{GetType().ReadableName()} finished with response size of {WebRequest.ResponseStream.Length:#,0} bytes", LoggingTarget.Network);
             }
         }
 

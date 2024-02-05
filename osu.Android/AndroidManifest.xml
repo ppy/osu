@@ -1,5 +1,20 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android" package="sh.ppy.osulazer" android:installLocation="auto">
-	<uses-sdk android:minSdkVersion="21" android:targetSdkVersion="31" />
-	<application android:allowBackup="true" android:supportsRtl="true" android:label="osu!" android:icon="@drawable/lazer" />
+	<uses-sdk android:minSdkVersion="21" android:targetSdkVersion="33" />
+	<application android:allowBackup="true"
+				 android:supportsRtl="true"
+				 android:label="osu!"
+				 android:icon="@mipmap/ic_launcher"
+				 android:roundIcon="@mipmap/ic_launcher" />
+	<!-- for editor usage -->
+	<uses-permission android:name="android.permission.READ_MEDIA_IMAGES" />
+	<uses-permission android:name="android.permission.READ_MEDIA_AUDIO" />
+	<!--
+		READ_MEDIA_* permissions are available only on API 33 or greater. Devices with older android versions
+		don't understand the new permissions, so request the old READ_EXTERNAL_STORAGE permission to get storage access.
+		Since the old permission has no effect on >= API 33, don't request it.
+
+		Care needs to be taken to ensure runtime permission checks target the correct permission for the API level.
+	-->
+	<uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" android:maxSdkVersion="32"/>
 </manifest>

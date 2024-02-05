@@ -34,7 +34,7 @@ namespace osu.Game.Rulesets.Mania.Mods
             foreach (Column column in maniaPlayfield.Stages.SelectMany(stage => stage.Columns))
             {
                 HitObjectContainer hoc = column.HitObjectArea.HitObjectContainer;
-                Container hocParent = (Container)hoc.Parent;
+                Container hocParent = (Container)hoc.Parent!;
                 PlayfieldCoveringWrapper pcw;
 
                 hocParent.Remove(hoc, false);
@@ -47,7 +47,7 @@ namespace osu.Game.Rulesets.Mania.Mods
 
                 IsDisabled.BindValueChanged(s =>
                 {
-                    pcw.Coverage = s.NewValue ? 0f : 0.5f;
+                    pcw.Coverage = s.NewValue ? 0f : Coverage.Value;
                 });
             }
         }

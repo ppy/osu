@@ -2,6 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using osu.Framework.Graphics;
+using osu.Framework.Input.Events;
 
 namespace osu.Game.Graphics.Containers
 {
@@ -44,6 +45,12 @@ namespace osu.Game.Graphics.Containers
         {
             UserScrolling = false;
             base.ScrollIntoView(target, animated);
+        }
+
+        protected override void ScrollFromMouseEvent(MouseEvent e)
+        {
+            UserScrolling = true;
+            base.ScrollFromMouseEvent(e);
         }
 
         public new void ScrollTo(float value, bool animated = true, double? distanceDecay = null)
