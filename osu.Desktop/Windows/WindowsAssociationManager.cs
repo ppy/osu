@@ -2,6 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
+using System.IO;
 using System.Runtime.InteropServices;
 using System.Runtime.Versioning;
 using Microsoft.Win32;
@@ -31,6 +32,14 @@ namespace osu.Desktop.Windows
         /// </summary>
         public const string SHELL_OPEN_COMMAND = @"Shell\Open\Command";
 
+        public static readonly string EXE_PATH = Path.ChangeExtension(typeof(WindowsAssociationManager).Assembly.Location, ".exe");
+
+        /// <summary>
+        /// Program ID prefix used for file associations. Should be relatively short since the full program ID has a 39 character limit,
+        /// see https://learn.microsoft.com/en-us/windows/win32/com/-progid--key.
+        /// </summary>
+        public const string PROGRAM_ID_PREFIX = "osu";
+
         private static readonly FileAssociation[] file_associations =
         {
             new FileAssociation(@".osz", WindowsAssociationManagerStrings.OsuBeatmap, Icons.Lazer),
@@ -49,20 +58,6 @@ namespace osu.Desktop.Windows
         private LocalisationManager localisation { get; set; } = null!;
 
         private IBindable<LocalisationParameters> localisationParameters = null!;
-
-        private readonly string exePath;
-        private readonly string programIdPrefix;
-
-        /// <param name="exePath">Path to the executable to register.</param>
-        /// <param name="programIdPrefix">
-        /// Program ID prefix used for file associations. Should be relatively short since the full program ID has a 39 character limit,
-        /// see https://learn.microsoft.com/en-us/windows/win32/com/-progid--key.
-        /// </param>
-        public WindowsAssociationManager(string exePath, string programIdPrefix)
-        {
-            this.exePath = exePath;
-            this.programIdPrefix = programIdPrefix;
-        }
 
         [BackgroundDependencyLoader]
         private void load()
@@ -87,10 +82,10 @@ namespace osu.Desktop.Windows
                         return;
 
                     foreach (var association in file_associations)
-                        association.Install(classes, exePath, programIdPrefix);
+                        association.Install(classes, EXE_PATH, PROGRAM_ID_PREFIX);
 
                     foreach (var association in uri_associations)
-                        association.Install(classes, exePath);
+                        association.Install(classes, EXE_PATH);
                 }
 
                 updateDescriptions();
@@ -112,7 +107,7 @@ namespace osu.Desktop.Windows
                 foreach (var association in file_associations)
                 {
                     var b = localisation.GetLocalisedBindableString(association.Description);
-                    association.UpdateDescription(classes, programIdPrefix, b.Value);
+                    association.UpdateDescription(classes, PROGRAM_ID_PREFIX, b.Value);
                     b.UnbindAll();
                 }
 
@@ -131,7 +126,7 @@ namespace osu.Desktop.Windows
             }
         }
 
-        public void UninstallAssociations() => UninstallAssociations(programIdPrefix);
+        public void UninstallAssociations() => UninstallAssociations(PROGRAM_ID_PREFIX);
 
         public static void UninstallAssociations(string programIdPrefix)
         {
