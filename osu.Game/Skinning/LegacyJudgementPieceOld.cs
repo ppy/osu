@@ -62,7 +62,7 @@ namespace osu.Game.Skinning
                     this.ScaleTo(1.2f);
                     this.ScaleTo(1f, 100, Easing.In);
 
-                    this.FadeOutFromOne(400);
+                    this.Delay(fade_out_delay / 2).FadeOut(fade_out_length);
                 }
                 else
                 {
