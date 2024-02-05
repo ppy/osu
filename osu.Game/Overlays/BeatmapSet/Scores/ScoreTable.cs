@@ -180,10 +180,12 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
 
             if (showPerformancePoints)
             {
-                if (score.PP != null)
-                    content.Add(new StatisticText(score.PP, format: @"N0"));
-                else
+                if (!score.Ranked)
+                    content.Add(new UnrankedPerformancePointsPlaceholder { Font = OsuFont.GetFont(size: text_size) });
+                else if (score.PP == null)
                     content.Add(new UnprocessedPerformancePointsPlaceholder { Size = new Vector2(text_size) });
+                else
+                    content.Add(new StatisticText(score.PP, format: @"N0"));
             }
 
             content.Add(new ScoreboardTime(score.Date, text_size)
