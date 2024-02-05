@@ -19,6 +19,7 @@ namespace osu.Game.Rulesets.Mods
         public override ModType Type => ModType.DifficultyIncrease;
         public override double ScoreMultiplier => 1;
         public override LocalisableString Description => "SS or quit.";
+        public override bool Ranked => UsesDefaultConfiguration;
 
         public override Type[] IncompatibleMods => base.IncompatibleMods.Concat(new[] { typeof(ModSuddenDeath), typeof(ModAccuracyChallenge) }).ToArray();
 
