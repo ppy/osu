@@ -74,15 +74,15 @@ namespace osu.Game.Overlays
             path.BindValueChanged(_ => updatePage());
             wikiData.BindTo(Header.WikiPageData);
 
-            currentLanguage.BindTo(Header.LanguageDropdown.Current);
-            currentLanguage.BindValueChanged(_ => updatePage());
-            languageConfig.BindValueChanged(s =>
+            if (LanguageExtensions.TryParseCultureCode(languageConfig.Value, out var language))
             {
-                if (LanguageExtensions.TryParseCultureCode(s.NewValue, out var language))
-                {
-                    currentLanguage.Value = language;
-                }
-            }, true);
+                currentLanguage.Value = language;
+            }
+
+            bindCurrentLanguageToDropDown();
+            Header.LanguageDropdown.DropDownUpdated += bindCurrentLanguageToDropDown;
+
+            currentLanguage.BindValueChanged(_ => updatePage());
         }
 
         protected override void PopIn()
@@ -129,19 +129,17 @@ namespace osu.Game.Overlays
                 return;
 
             string[] values = path.Value.Split('/', 2);
-            string requestPath;
-            Language requestLanguage = currentLanguage.Value;
 
             // Parse the language first to determine whether the currently requested language is consistent with the content language.
             if (values.Length > 1 && LanguageExtensions.TryParseCultureCode(values[0], out var language))
             {
-                requestPath = values[1];
-                requestLanguage = language;
+                path.Value = values[1];
+                currentLanguage.Value = language;
+                return;
             }
-            else
-            {
-                requestPath = path.Value;
-            }
+
+            Language requestLanguage = currentLanguage.Value;
+            string requestPath = path.Value;
 
             // the path could change as a result of redirecting to a newer location of the same page.
             // we already have the correct wiki data, so we can safely return here.
@@ -173,6 +171,7 @@ namespace osu.Game.Overlays
         private void onSuccess(APIWikiPage response)
         {
             wikiData.Value = response;
+            Header.LanguageDropdown.Current.UnbindBindings();
             Header.LanguageDropdown.UpdateDropdown(response.AvailableLocales);
             path.Value = response.Path;
 
@@ -212,6 +211,12 @@ namespace osu.Game.Overlays
         {
             string parentPath = string.Join("/", path.Value.Split('/').SkipLast(1));
             ShowPage(parentPath);
+        }
+
+        private void bindCurrentLanguageToDropDown()
+        {
+            Header.LanguageDropdown.Current.Value = currentLanguage.Value;
+            currentLanguage.BindTo(Header.LanguageDropdown.Current);
         }
 
         protected override void Dispose(bool isDisposing)
