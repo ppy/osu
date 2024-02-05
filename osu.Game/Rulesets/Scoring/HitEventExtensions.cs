@@ -11,8 +11,11 @@ namespace osu.Game.Rulesets.Scoring
     public static class HitEventExtensions
     {
         /// <summary>
-        /// Calculates the "unstable rate" for a sequence of <see cref="HitEvent"/>s using Welford's online algorithm.
+        /// Calculates the "unstable rate" for a sequence of <see cref="HitEvent"/>s.
         /// </summary>
+        /// <remarks>
+        /// Uses <a href="https://en.wikipedia.org/wiki/Algorithms_for_calculating_variance#Welford's_online_algorithm">Welford's online algorithm</a>.
+        /// </remarks>
         /// <returns>
         /// A non-null <see langword="double"/> value if unstable rate could be calculated,
         /// and <see langword="null"/> if unstable rate cannot be calculated due to <paramref name="hitEvents"/> being empty.
