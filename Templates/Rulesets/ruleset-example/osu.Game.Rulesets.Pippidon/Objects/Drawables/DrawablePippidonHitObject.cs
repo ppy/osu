@@ -9,7 +9,6 @@ using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.Textures;
 using osu.Game.Audio;
 using osu.Game.Rulesets.Objects.Drawables;
-using osu.Game.Rulesets.Scoring;
 using osuTK;
 using osuTK.Graphics;
 
@@ -50,10 +49,10 @@ namespace osu.Game.Rulesets.Pippidon.Objects.Drawables
         {
             if (timeOffset >= 0)
             {
-                ApplyResult(static (r, hitObject) =>
-                {
-                    r.Type = hitObject.IsHovered ? HitResult.Perfect : HitResult.Miss;
-                });
+                if (IsHovered)
+                    ApplyMaxResult();
+                else
+                    ApplyMinResult();
             }
         }
 

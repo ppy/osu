@@ -38,8 +38,6 @@ namespace osu.Game.Rulesets.Mania.Objects.Drawables
 
         private Drawable headPiece;
 
-        private HitResult hitResult;
-
         public DrawableNote()
             : this(null)
         {
@@ -96,18 +94,13 @@ namespace osu.Game.Rulesets.Mania.Objects.Drawables
                 return;
             }
 
-            hitResult = HitObject.HitWindows.ResultFor(timeOffset);
+            var result = HitObject.HitWindows.ResultFor(timeOffset);
 
-            if (hitResult == HitResult.None)
+            if (result == HitResult.None)
                 return;
 
-            hitResult = GetCappedResult(hitResult);
-
-            ApplyResult(static (r, hitObject) =>
-            {
-                var note = (DrawableNote)hitObject;
-                r.Type = note.hitResult;
-            });
+            result = GetCappedResult(result);
+            ApplyResult(result);
         }
 
         /// <summary>

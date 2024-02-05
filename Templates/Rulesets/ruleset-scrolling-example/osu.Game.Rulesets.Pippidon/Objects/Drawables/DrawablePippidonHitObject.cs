@@ -10,7 +10,6 @@ using osu.Framework.Graphics.Textures;
 using osu.Game.Audio;
 using osu.Game.Rulesets.Objects.Drawables;
 using osu.Game.Rulesets.Pippidon.UI;
-using osu.Game.Rulesets.Scoring;
 using osuTK;
 using osuTK.Graphics;
 
@@ -50,11 +49,10 @@ namespace osu.Game.Rulesets.Pippidon.Objects.Drawables
         {
             if (timeOffset >= 0)
             {
-                ApplyResult(static (r, hitObject) =>
-                {
-                    var pippidonHitObject = (DrawablePippidonHitObject)hitObject;
-                    r.Type = pippidonHitObject.currentLane.Value == pippidonHitObject.HitObject.Lane ? HitResult.Perfect : HitResult.Miss;
-                });
+                if (currentLane.Value == HitObject.Lane)
+                    ApplyMaxResult();
+                else
+                    ApplyMinResult();
             }
         }
 
