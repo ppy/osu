@@ -22,8 +22,8 @@ namespace osu.Game.Rulesets.Scoring
             Debug.Assert(hitEvents.All(ev => ev.GameplayRate != null));
 
             int count = 0;
-            double m = 0;
-            double s = 0;
+            double mean = 0;
+            double sumOfSquares = 0;
 
             foreach (var e in hitEvents)
             {
@@ -34,15 +34,15 @@ namespace osu.Game.Rulesets.Scoring
 
                 // Division by gameplay rate is to account for TimeOffset scaling with gameplay rate.
                 double currentValue = e.TimeOffset / e.GameplayRate!.Value;
-                double mNext = m + (currentValue - m) / count;
-                s += (currentValue - m) * (currentValue - mNext);
-                m = mNext;
+                double nextMean = mean + (currentValue - mean) / count;
+                sumOfSquares += (currentValue - mean) * (currentValue - nextMean);
+                mean = nextMean;
             }
 
             if (count == 0)
                 return null;
 
-            return 10.0 * Math.Sqrt(s / count);
+            return 10.0 * Math.Sqrt(sumOfSquares / count);
         }
 
         /// <summary>
