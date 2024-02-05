@@ -8,6 +8,7 @@ using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Extensions.IEnumerableExtensions;
+using osu.Framework.Extensions.LocalisationExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
@@ -156,7 +157,7 @@ namespace osu.Game.Overlays.Settings.Sections.Audio
             {
                 hintText.Text = SuggestedOffset.Value == null
                     ? AudioSettingsStrings.SuggestedOffsetNote
-                    : AudioSettingsStrings.SuggestedOffsetValueReceived(averageHitErrorHistory.Count, $"{SuggestedOffset.Value:N0}");
+                    : AudioSettingsStrings.SuggestedOffsetValueReceived(averageHitErrorHistory.Count, SuggestedOffset.Value.ToLocalisableString(@"N0"));
                 applySuggestion.Enabled.Value = SuggestedOffset.Value != null;
             }
 
