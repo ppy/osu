@@ -67,19 +67,14 @@ namespace osu.Game.Localisation
         public static LocalisableString LightweightLinkingNotSupported => new TranslatableString(getKey(@"lightweight_linking_not_supported"), @"Lightweight linking of files is not supported on your operating system yet, so a copy of all files will be made during import.");
 
         /// <summary>
-        /// "A second copy of all files will be made during import. To avoid this, please make sure the lazer data folder is on the same drive as your previous osu! install {0}."
+        /// "A second copy of all files will be made during import. To avoid this, please make sure the lazer data folder is on the same drive as your previous osu! install (and the file system is NTFS)."
         /// </summary>
-        public static LocalisableString SecondCopyWillBeMade(LocalisableString extra) => new TranslatableString(getKey(@"second_copy_will_be_made"), @"A second copy of all files will be made during import. To avoid this, please make sure the lazer data folder is on the same drive as your previous osu! install {0}.", extra);
+        public static LocalisableString SecondCopyWillBeMadeWindows => new TranslatableString(getKey(@"second_copy_will_be_made_windows"), @"A second copy of all files will be made during import. To avoid this, please make sure the lazer data folder is on the same drive as your previous osu! install (and the file system is NTFS).");
 
         /// <summary>
-        /// "(and the file system is NTFS)"
+        /// "A second copy of all files will be made during import. To avoid this, please make sure the lazer data folder is on the same drive as your previous osu! install (and the file system supports hard links)."
         /// </summary>
-        public static LocalisableString ToAvoidEnsureNtfs => new TranslatableString(getKey(@"to_avoid_ensure_ntfs"), @"(and the file system is NTFS)");
-
-        /// <summary>
-        /// "(and the file system supports hard links)"
-        /// </summary>
-        public static LocalisableString ToAvoidEnsureHardLinksSupport => new TranslatableString(getKey(@"to_avoid_ensure_hard_links_support"), @"(and the file system supports hard links)");
+        public static LocalisableString SecondCopyWillBeMadeOtherPlatforms => new TranslatableString(getKey(@"second_copy_will_be_made_other_platforms"), @"A second copy of all files will be made during import. To avoid this, please make sure the lazer data folder is on the same drive as your previous osu! install (and the file system supports hard links).");
 
         private static string getKey(string key) => $@"{prefix}:{key}";
     }
