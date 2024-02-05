@@ -49,8 +49,19 @@ namespace osu.Game.Rulesets.Osu.Mods
         {
             // Hide judgment displays and follow points as they won't make any sense.
             // Judgements can potentially be turned on in a future where they display at a position relative to their drawable counterpart.
-            drawableRuleset.Playfield.DisplayJudgements.Value = false;
-            (drawableRuleset.Playfield as OsuPlayfield)?.FollowPoints.Hide();
+            IsDisabled.BindValueChanged(s =>
+            {
+                if (s.NewValue)
+                {
+                    drawableRuleset.Playfield.DisplayJudgements.Value = true;
+                    (drawableRuleset.Playfield as OsuPlayfield)?.FollowPoints.Show();
+                }
+                else
+                {
+                    drawableRuleset.Playfield.DisplayJudgements.Value = false;
+                    (drawableRuleset.Playfield as OsuPlayfield)?.FollowPoints.Hide();
+                }
+            });
         }
 
         private void applyTransform(DrawableHitObject drawable, ArmedState state)
@@ -97,7 +108,9 @@ namespace osu.Game.Rulesets.Osu.Mods
             // Circles are always moving at the constant speed. They'll fade out before reaching the camera even at extreme conditions (AR 11, max depth).
             double speed = MaxDepth.Value / hitObject.TimePreempt;
             double appearTime = hitObject.StartTime - hitObject.TimePreempt;
-            float z = MaxDepth.Value - (float)((Math.Max(time, appearTime) - appearTime) * speed);
+
+            // set depth to 0 when need disable mod.
+            float z = IsDisabled.Value ? 0 : MaxDepth.Value - (float)((Math.Max(time, appearTime) - appearTime) * speed);
 
             float scale = scaleForDepth(z);
             drawable.Position = toPlayfieldPosition(scale, hitObject.StackedPosition);
