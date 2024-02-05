@@ -138,7 +138,7 @@ namespace osu.Desktop
                 LoadComponentAsync(new GameplayWinKeyBlocker(), Add);
 
             if (OperatingSystem.IsWindows() && IsDeployedBuild)
-                LoadComponentAsync(new WindowsAssociationManager(Path.ChangeExtension(typeof(OsuGameDesktop).Assembly.Location, ".exe"), "osu"), Add);
+                LoadComponentAsync(new WindowsAssociationManager(), Add);
 
             LoadComponentAsync(new ElevatedPrivilegesChecker(), Add);
 
