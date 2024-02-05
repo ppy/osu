@@ -9,6 +9,7 @@ using osu.Framework.Allocation;
 using osu.Framework.Configuration;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Testing;
+using osu.Game.Localisation;
 using osu.Game.Online.API;
 using osu.Game.Online.API.Requests;
 using osu.Game.Online.API.Requests.Responses;
@@ -79,9 +80,23 @@ namespace osu.Game.Tests.Visual.Online
         [Test]
         public void TestLanguageChange()
         {
+            Language requestLanguage = new Language();
+
             frameworkConfigManager.SetValue(FrameworkSetting.Locale, "zh");
-            setUpWikiResponse(responseArticleZhPage);
+            AddStep("Set request detect", () =>
+            {
+                dummyAPI.HandleRequest = request =>
+                {
+                    if (!(request is GetWikiRequest getWikiRequest))
+                        return false;
+
+                    requestLanguage = getWikiRequest.Language;
+                    getWikiRequest.TriggerSuccess(responseArticleZhPage);
+                    return true;
+                };
+            });
             AddStep("Show article page", () => wiki.ShowPage("Article_styling_criteria"));
+            AddUntilStep("request path has local param", () => requestLanguage == Language.zh);
         }
 
         [Test]
