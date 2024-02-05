@@ -14,8 +14,12 @@ namespace osu.Game.Rulesets.Mods
     {
         public readonly IBindableNumber<double> SpeedChange;
 
-        private BindableNumber<double> speedChange = new BindableNumber<double>();
+        private readonly BindableNumber<double> speedChange = new BindableNumber<double>();
 
+        /// <summary>
+        /// Use with mods containing <see cref="ICanBeToggledDuringReplay"/>.
+        /// When it set to true, speed change will be 1.0.
+        /// </summary>
         public BindableBool DisableSpeedChange = new BindableBool();
 
         private IAdjustableAudioComponent? track;
