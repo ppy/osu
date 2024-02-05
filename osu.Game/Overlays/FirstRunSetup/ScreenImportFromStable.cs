@@ -326,13 +326,4 @@ namespace osu.Game.Overlays.FirstRunSetup
             }
         }
     }
-
-    public enum FileSystemAddition
-    {
-        [LocalisableDescription(typeof(FirstRunOverlayImportFromStableScreenStrings), nameof(FirstRunOverlayImportFromStableScreenStrings.ToAvoidEnsureNtfs))]
-        ToAvoidEnsureNtfs,
-
-        [LocalisableDescription(typeof(FirstRunOverlayImportFromStableScreenStrings), nameof(FirstRunOverlayImportFromStableScreenStrings.ToAvoidEnsureHardLinksSupport))]
-        ToAvoidEnsureHardLinksSupport,
-    }
 }
