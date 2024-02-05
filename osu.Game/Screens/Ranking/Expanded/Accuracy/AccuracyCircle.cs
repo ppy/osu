@@ -21,6 +21,7 @@ using osu.Game.Rulesets.Scoring;
 using osu.Game.Scoring;
 using osu.Game.Skinning;
 using osuTK;
+using osuTK.Graphics;
 
 namespace osu.Game.Screens.Ranking.Expanded.Accuracy
 {
@@ -29,13 +30,6 @@ namespace osu.Game.Screens.Ranking.Expanded.Accuracy
     /// </summary>
     public partial class AccuracyCircle : CompositeDrawable
     {
-        private static readonly double accuracy_x = ScoreProcessor.AccuracyCutoffFromRank(ScoreRank.X);
-        private static readonly double accuracy_s = ScoreProcessor.AccuracyCutoffFromRank(ScoreRank.S);
-        private static readonly double accuracy_a = ScoreProcessor.AccuracyCutoffFromRank(ScoreRank.A);
-        private static readonly double accuracy_b = ScoreProcessor.AccuracyCutoffFromRank(ScoreRank.B);
-        private static readonly double accuracy_c = ScoreProcessor.AccuracyCutoffFromRank(ScoreRank.C);
-        private static readonly double accuracy_d = ScoreProcessor.AccuracyCutoffFromRank(ScoreRank.D);
-
         /// <summary>
         /// Duration for the transforms causing this component to appear.
         /// </summary>
@@ -110,12 +104,32 @@ namespace osu.Game.Screens.Ranking.Expanded.Accuracy
         private double lastTickPlaybackTime;
         private bool isTicking;
 
+        private readonly double accuracyX;
+        private readonly double accuracyS;
+        private readonly double accuracyA;
+        private readonly double accuracyB;
+        private readonly double accuracyC;
+        private readonly double accuracyD;
         private readonly bool withFlair;
+
+        private readonly bool isFailedSDueToMisses;
+        private RankText failedSRankText;
 
         public AccuracyCircle(ScoreInfo score, bool withFlair = false)
         {
             this.score = score;
             this.withFlair = withFlair;
+
+            ScoreProcessor scoreProcessor = score.Ruleset.CreateInstance().CreateScoreProcessor();
+            accuracyX = scoreProcessor.AccuracyCutoffFromRank(ScoreRank.X);
+            accuracyS = scoreProcessor.AccuracyCutoffFromRank(ScoreRank.S);
+
+            accuracyA = scoreProcessor.AccuracyCutoffFromRank(ScoreRank.A);
+            accuracyB = scoreProcessor.AccuracyCutoffFromRank(ScoreRank.B);
+            accuracyC = scoreProcessor.AccuracyCutoffFromRank(ScoreRank.C);
+            accuracyD = scoreProcessor.AccuracyCutoffFromRank(ScoreRank.D);
+
+            isFailedSDueToMisses = score.Accuracy >= accuracyS && score.Rank == ScoreRank.A;
         }
 
         [BackgroundDependencyLoader]
@@ -158,49 +172,49 @@ namespace osu.Game.Screens.Ranking.Expanded.Accuracy
                             RelativeSizeAxes = Axes.Both,
                             Colour = OsuColour.ForRank(ScoreRank.X),
                             InnerRadius = RANK_CIRCLE_RADIUS,
-                            Current = { Value = accuracy_x }
+                            Current = { Value = accuracyX }
                         },
                         new CircularProgress
                         {
                             RelativeSizeAxes = Axes.Both,
                             Colour = OsuColour.ForRank(ScoreRank.S),
                             InnerRadius = RANK_CIRCLE_RADIUS,
-                            Current = { Value = accuracy_x - virtual_ss_percentage }
+                            Current = { Value = accuracyX - virtual_ss_percentage }
                         },
                         new CircularProgress
                         {
                             RelativeSizeAxes = Axes.Both,
                             Colour = OsuColour.ForRank(ScoreRank.A),
                             InnerRadius = RANK_CIRCLE_RADIUS,
-                            Current = { Value = accuracy_s }
+                            Current = { Value = accuracyS }
                         },
                         new CircularProgress
                         {
                             RelativeSizeAxes = Axes.Both,
                             Colour = OsuColour.ForRank(ScoreRank.B),
                             InnerRadius = RANK_CIRCLE_RADIUS,
-                            Current = { Value = accuracy_a }
+                            Current = { Value = accuracyA }
                         },
                         new CircularProgress
                         {
                             RelativeSizeAxes = Axes.Both,
                             Colour = OsuColour.ForRank(ScoreRank.C),
                             InnerRadius = RANK_CIRCLE_RADIUS,
-                            Current = { Value = accuracy_b }
+                            Current = { Value = accuracyB }
                         },
                         new CircularProgress
                         {
                             RelativeSizeAxes = Axes.Both,
                             Colour = OsuColour.ForRank(ScoreRank.D),
                             InnerRadius = RANK_CIRCLE_RADIUS,
-                            Current = { Value = accuracy_c }
+                            Current = { Value = accuracyC }
                         },
-                        new RankNotch((float)accuracy_x),
-                        new RankNotch((float)(accuracy_x - virtual_ss_percentage)),
-                        new RankNotch((float)accuracy_s),
-                        new RankNotch((float)accuracy_a),
-                        new RankNotch((float)accuracy_b),
-                        new RankNotch((float)accuracy_c),
+                        new RankNotch((float)accuracyX),
+                        new RankNotch((float)(accuracyX - virtual_ss_percentage)),
+                        new RankNotch((float)accuracyS),
+                        new RankNotch((float)accuracyA),
+                        new RankNotch((float)accuracyB),
+                        new RankNotch((float)accuracyC),
                         new BufferedContainer
                         {
                             Name = "Graded circle mask",
@@ -228,13 +242,13 @@ namespace osu.Game.Screens.Ranking.Expanded.Accuracy
                     Padding = new MarginPadding { Vertical = -15, Horizontal = -20 },
                     Children = new[]
                     {
+                        new RankBadge(accuracyD, Interpolation.Lerp(accuracyD, accuracyC, 0.5), getRank(ScoreRank.D)),
+                        new RankBadge(accuracyC, Interpolation.Lerp(accuracyC, accuracyB, 0.5), getRank(ScoreRank.C)),
+                        new RankBadge(accuracyB, Interpolation.Lerp(accuracyB, accuracyA, 0.5), getRank(ScoreRank.B)),
                         // The S and A badges are moved down slightly to prevent collision with the SS badge.
-                        new RankBadge(accuracy_x, accuracy_x, getRank(ScoreRank.X)),
-                        new RankBadge(accuracy_s, Interpolation.Lerp(accuracy_s, (accuracy_x - virtual_ss_percentage), 0.25), getRank(ScoreRank.S)),
-                        new RankBadge(accuracy_a, Interpolation.Lerp(accuracy_a, accuracy_s, 0.25), getRank(ScoreRank.A)),
-                        new RankBadge(accuracy_b, Interpolation.Lerp(accuracy_b, accuracy_a, 0.5), getRank(ScoreRank.B)),
-                        new RankBadge(accuracy_c, Interpolation.Lerp(accuracy_c, accuracy_b, 0.5), getRank(ScoreRank.C)),
-                        new RankBadge(accuracy_d, Interpolation.Lerp(accuracy_d, accuracy_c, 0.5), getRank(ScoreRank.D)),
+                        new RankBadge(accuracyA, Interpolation.Lerp(accuracyA, accuracyS, 0.25), getRank(ScoreRank.A)),
+                        new RankBadge(accuracyS, Interpolation.Lerp(accuracyS, (accuracyX - virtual_ss_percentage), 0.25), getRank(ScoreRank.S)),
+                        new RankBadge(accuracyX, accuracyX, getRank(ScoreRank.X)),
                     }
                 },
                 rankText = new RankText(score.Rank)
@@ -242,6 +256,9 @@ namespace osu.Game.Screens.Ranking.Expanded.Accuracy
 
             if (withFlair)
             {
+                if (isFailedSDueToMisses)
+                    AddInternal(failedSRankText = new RankText(ScoreRank.S));
+
                 AddRangeInternal(new Drawable[]
                 {
                     rankImpactSound = new PoolableSkinnableSample(new SampleInfo(impactSampleName)),
@@ -280,10 +297,10 @@ namespace osu.Game.Screens.Ranking.Expanded.Accuracy
                 double targetAccuracy = score.Accuracy;
                 double[] notchPercentages =
                 {
-                    accuracy_s,
-                    accuracy_a,
-                    accuracy_b,
-                    accuracy_c,
+                    accuracyS,
+                    accuracyA,
+                    accuracyB,
+                    accuracyC,
                 };
 
                 // Ensure the gauge overshoots or undershoots a bit so it doesn't land in the gaps of the inner graded circle (caused by `RankNotch`es),
@@ -302,7 +319,7 @@ namespace osu.Game.Screens.Ranking.Expanded.Accuracy
                 if (score.Rank == ScoreRank.X || score.Rank == ScoreRank.XH)
                     targetAccuracy = 1;
                 else
-                    targetAccuracy = Math.Min(accuracy_x - virtual_ss_percentage - NOTCH_WIDTH_PERCENTAGE / 2, targetAccuracy);
+                    targetAccuracy = Math.Min(accuracyX - virtual_ss_percentage - NOTCH_WIDTH_PERCENTAGE / 2, targetAccuracy);
 
                 // The accuracy circle gauge visually fills up a bit too much.
                 // This wouldn't normally matter but we want it to align properly with the inner graded circle in the above cases.
@@ -339,7 +356,7 @@ namespace osu.Game.Screens.Ranking.Expanded.Accuracy
                     if (badge.Accuracy > score.Accuracy)
                         continue;
 
-                    using (BeginDelayedSequence(inverseEasing(ACCURACY_TRANSFORM_EASING, Math.Min(accuracy_x - virtual_ss_percentage, badge.Accuracy) / targetAccuracy) * ACCURACY_TRANSFORM_DURATION))
+                    using (BeginDelayedSequence(inverseEasing(ACCURACY_TRANSFORM_EASING, Math.Min(accuracyX - virtual_ss_percentage, badge.Accuracy) / targetAccuracy) * ACCURACY_TRANSFORM_DURATION))
                     {
                         badge.Appear();
 
@@ -378,6 +395,31 @@ namespace osu.Game.Screens.Ranking.Expanded.Accuracy
                             rankApplauseSound.VolumeTo(applause_volume);
                             rankApplauseSound.Play();
                         });
+                    }
+                }
+
+                if (isFailedSDueToMisses)
+                {
+                    const double adjust_duration = 200;
+
+                    using (BeginDelayedSequence(TEXT_APPEAR_DELAY - adjust_duration))
+                    {
+                        failedSRankText.FadeIn(adjust_duration);
+
+                        using (BeginDelayedSequence(adjust_duration))
+                        {
+                            failedSRankText
+                                .FadeColour(Color4.Red, 800, Easing.Out)
+                                .RotateTo(10, 1000, Easing.Out)
+                                .MoveToY(100, 1000, Easing.In)
+                                .FadeOut(800, Easing.Out);
+
+                            accuracyCircle
+                                .FillTo(accuracyS - NOTCH_WIDTH_PERCENTAGE / 2 - visual_alignment_offset, 70, Easing.OutQuint);
+
+                            badges.Single(b => b.Rank == getRank(ScoreRank.S))
+                                  .FadeOut(70, Easing.OutQuint);
+                        }
                     }
                 }
             }

@@ -53,22 +53,12 @@ namespace osu.Game.Online.Rooms
         [Key(9)]
         public DateTimeOffset? PlayedAt { get; set; }
 
+        [Key(10)]
+        public double StarRating { get; set; }
+
+        [SerializationConstructor]
         public MultiplayerPlaylistItem()
         {
-        }
-
-        public MultiplayerPlaylistItem(PlaylistItem item)
-        {
-            ID = item.ID;
-            OwnerID = item.OwnerID;
-            BeatmapID = item.Beatmap.OnlineID;
-            BeatmapChecksum = item.Beatmap.MD5Hash;
-            RulesetID = item.RulesetID;
-            RequiredMods = item.RequiredMods.ToArray();
-            AllowedMods = item.AllowedMods.ToArray();
-            Expired = item.Expired;
-            PlaylistOrder = item.PlaylistOrder ?? 0;
-            PlayedAt = item.PlayedAt;
         }
     }
 }

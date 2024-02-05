@@ -120,13 +120,13 @@ namespace osu.Game.Tests.Visual.Online
                 };
             });
 
-        // From https://osu.ppy.sh/api/v2/wiki/en/Main_Page
+        // From https://osu.ppy.sh/api/v2/wiki/en/Main_page
         private APIWikiPage responseMainPage => new APIWikiPage
         {
             AvailableLocales = new[] { "en" },
-            Title = "Main Page",
-            Layout = "main_page",
-            Path = "Main_Page",
+            Title = "Main page",
+            Layout = WikiOverlay.INDEX_PATH.ToLowerInvariant(), // custom classes are always lower snake.
+            Path = WikiOverlay.INDEX_PATH,
             Locale = "en",
             Subtitle = null,
             Markdown =

@@ -34,14 +34,12 @@ namespace osu.Game.Overlays.Toolbar
 
         public ToolbarUserButton()
         {
-            AutoSizeAxes = Axes.X;
+            ButtonContent.AutoSizeAxes = Axes.X;
         }
 
         [BackgroundDependencyLoader]
         private void load(OsuColour colours, IAPIProvider api, LoginOverlay? login)
         {
-            Add(new OpaqueBackground { Depth = 1 });
-
             Flow.Add(new Container
             {
                 Masking = true,
@@ -97,7 +95,7 @@ namespace osu.Game.Overlays.Toolbar
 
         private void onlineStateChanged(ValueChangedEvent<APIState> state) => Schedule(() =>
         {
-            failingIcon.FadeTo(state.NewValue == APIState.Failing ? 1 : 0, 200, Easing.OutQuint);
+            failingIcon.FadeTo(state.NewValue == APIState.Failing || state.NewValue == APIState.RequiresSecondFactorAuth ? 1 : 0, 200, Easing.OutQuint);
 
             switch (state.NewValue)
             {
@@ -109,6 +107,13 @@ namespace osu.Game.Overlays.Toolbar
                 case APIState.Failing:
                     TooltipText = ToolbarStrings.AttemptingToReconnect;
                     spinner.Show();
+                    failingIcon.Icon = FontAwesome.Solid.ExclamationTriangle;
+                    break;
+
+                case APIState.RequiresSecondFactorAuth:
+                    TooltipText = ToolbarStrings.VerificationRequired;
+                    spinner.Show();
+                    failingIcon.Icon = FontAwesome.Solid.Key;
                     break;
 
                 case APIState.Offline:

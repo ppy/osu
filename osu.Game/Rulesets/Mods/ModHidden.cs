@@ -14,11 +14,10 @@ namespace osu.Game.Rulesets.Mods
         public override string Acronym => "HD";
         public override IconUsage? Icon => OsuIcon.ModHidden;
         public override ModType Type => ModType.DifficultyIncrease;
+        public override bool Ranked => UsesDefaultConfiguration;
 
         public void ApplyToScoreProcessor(ScoreProcessor scoreProcessor)
         {
-            // Default value of ScoreProcessor's Rank in Hidden Mod should be SS+
-            scoreProcessor.Rank.Value = ScoreRank.XH;
         }
 
         public ScoreRank AdjustRank(ScoreRank rank, double accuracy)

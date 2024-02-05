@@ -29,10 +29,11 @@ namespace osu.Game.Screens.Edit
         /// Set a divisor, updating the valid divisor range appropriately.
         /// </summary>
         /// <param name="divisor">The intended divisor.</param>
-        public void SetArbitraryDivisor(int divisor)
+        /// <param name="preferKnownPresets">Forces changing the valid divisors to a known preset.</param>
+        public void SetArbitraryDivisor(int divisor, bool preferKnownPresets = false)
         {
             // If the current valid divisor range doesn't contain the proposed value, attempt to find one which does.
-            if (!ValidDivisors.Value.Presets.Contains(divisor))
+            if (preferKnownPresets || !ValidDivisors.Value.Presets.Contains(divisor))
             {
                 if (BeatDivisorPresetCollection.COMMON.Presets.Contains(divisor))
                     ValidDivisors.Value = BeatDivisorPresetCollection.COMMON;
@@ -59,16 +60,18 @@ namespace osu.Game.Screens.Edit
                 Value = 1;
         }
 
-        public void Next()
+        public void SelectNext()
         {
             var presets = ValidDivisors.Value.Presets;
-            Value = presets.Cast<int?>().SkipWhile(preset => preset != Value).ElementAtOrDefault(1) ?? presets[0];
+            if (presets.Cast<int?>().SkipWhile(preset => preset != Value).ElementAtOrDefault(1) is int newValue)
+                Value = newValue;
         }
 
-        public void Previous()
+        public void SelectPrevious()
         {
             var presets = ValidDivisors.Value.Presets;
-            Value = presets.Cast<int?>().TakeWhile(preset => preset != Value).LastOrDefault() ?? presets[^1];
+            if (presets.Cast<int?>().TakeWhile(preset => preset != Value).LastOrDefault() is int newValue)
+                Value = newValue;
         }
 
         protected override int DefaultPrecision => 1;

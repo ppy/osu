@@ -28,11 +28,13 @@ using osu.Game.Rulesets.Osu.Objects;
 using osu.Game.Rulesets.Osu.Replays;
 using osu.Game.Rulesets.Osu.Scoring;
 using osu.Game.Rulesets.Osu.Skinning.Argon;
+using osu.Game.Rulesets.Osu.Skinning.Default;
 using osu.Game.Rulesets.Osu.Skinning.Legacy;
 using osu.Game.Rulesets.Osu.Statistics;
 using osu.Game.Rulesets.Osu.UI;
 using osu.Game.Rulesets.Replays.Types;
 using osu.Game.Rulesets.Scoring;
+using osu.Game.Rulesets.Scoring.Legacy;
 using osu.Game.Rulesets.UI;
 using osu.Game.Scoring;
 using osu.Game.Screens.Edit.Setup;
@@ -46,6 +48,8 @@ namespace osu.Game.Rulesets.Osu
         public override DrawableRuleset CreateDrawableRulesetWith(IBeatmap beatmap, IReadOnlyList<Mod>? mods = null) => new DrawableOsuRuleset(this, beatmap, mods);
 
         public override ScoreProcessor CreateScoreProcessor() => new OsuScoreProcessor();
+
+        public override HealthProcessor CreateHealthProcessor(double drainStartTime) => new OsuHealthProcessor(drainStartTime);
 
         public override IBeatmapConverter CreateBeatmapConverter(IBeatmap beatmap) => new OsuBeatmapConverter(beatmap, this);
 
@@ -113,6 +117,9 @@ namespace osu.Game.Rulesets.Osu
 
             if (mods.HasFlagFast(LegacyMods.TouchDevice))
                 yield return new OsuModTouchDevice();
+
+            if (mods.HasFlagFast(LegacyMods.ScoreV2))
+                yield return new ModScoreV2();
         }
 
         public override LegacyMods ConvertToLegacyMods(Mod[] mods)
@@ -204,13 +211,16 @@ namespace osu.Game.Rulesets.Osu
                         new MultiMod(new OsuModMagnetised(), new OsuModRepel()),
                         new ModAdaptiveSpeed(),
                         new OsuModFreezeFrame(),
-                        new OsuModBubbles()
+                        new OsuModBubbles(),
+                        new OsuModSynesthesia(),
+                        new OsuModDepth()
                     };
 
                 case ModType.System:
                     return new Mod[]
                     {
                         new OsuModTouchDevice(),
+                        new ModScoreV2(),
                     };
 
                 default:
@@ -245,12 +255,17 @@ namespace osu.Game.Rulesets.Osu
 
                 case ArgonSkin:
                     return new OsuArgonSkinTransformer(skin);
+
+                case TrianglesSkin:
+                    return new OsuTrianglesSkinTransformer(skin);
             }
 
             return null;
         }
 
         public int LegacyID => 0;
+
+        public ILegacyScoreSimulator CreateLegacyScoreSimulator() => new OsuLegacyScoreSimulator();
 
         public override IConvertibleReplayFrame CreateConvertibleReplayFrame() => new OsuReplayFrame();
 
@@ -266,6 +281,7 @@ namespace osu.Game.Rulesets.Osu
 
                 HitResult.LargeTickHit,
                 HitResult.SmallTickHit,
+                HitResult.SliderTailHit,
                 HitResult.SmallBonus,
                 HitResult.LargeBonus,
             };
@@ -278,6 +294,7 @@ namespace osu.Game.Rulesets.Osu
                 case HitResult.LargeTickHit:
                     return "slider tick";
 
+                case HitResult.SliderTailHit:
                 case HitResult.SmallTickHit:
                     return "slider end";
 
@@ -291,59 +308,53 @@ namespace osu.Game.Rulesets.Osu
             return base.GetDisplayNameForHitResult(result);
         }
 
-        public override StatisticRow[] CreateStatisticsForScore(ScoreInfo score, IBeatmap playableBeatmap)
+        public override StatisticItem[] CreateStatisticsForScore(ScoreInfo score, IBeatmap playableBeatmap)
         {
             var timedHitEvents = score.HitEvents.Where(e => e.HitObject is HitCircle && !(e.HitObject is SliderTailCircle)).ToList();
 
             return new[]
             {
-                new StatisticRow
+                new StatisticItem("Performance Breakdown", () => new PerformanceBreakdownChart(score, playableBeatmap)
                 {
-                    Columns = new[]
-                    {
-                        new StatisticItem("Performance Breakdown", () => new PerformanceBreakdownChart(score, playableBeatmap)
-                        {
-                            RelativeSizeAxes = Axes.X,
-                            AutoSizeAxes = Axes.Y
-                        }),
-                    }
-                },
-                new StatisticRow
+                    RelativeSizeAxes = Axes.X,
+                    AutoSizeAxes = Axes.Y
+                }),
+                new StatisticItem("Timing Distribution", () => new HitEventTimingDistributionGraph(timedHitEvents)
                 {
-                    Columns = new[]
-                    {
-                        new StatisticItem("Timing Distribution", () => new HitEventTimingDistributionGraph(timedHitEvents)
-                        {
-                            RelativeSizeAxes = Axes.X,
-                            Height = 250
-                        }, true),
-                    }
-                },
-                new StatisticRow
+                    RelativeSizeAxes = Axes.X,
+                    Height = 250
+                }, true),
+                new StatisticItem("Accuracy Heatmap", () => new AccuracyHeatmap(score, playableBeatmap)
                 {
-                    Columns = new[]
-                    {
-                        new StatisticItem("Accuracy Heatmap", () => new AccuracyHeatmap(score, playableBeatmap)
-                        {
-                            RelativeSizeAxes = Axes.X,
-                            Height = 250
-                        }, true),
-                    }
-                },
-                new StatisticRow
+                    RelativeSizeAxes = Axes.X,
+                    Height = 250
+                }, true),
+                new StatisticItem("Statistics", () => new SimpleStatisticTable(2, new SimpleStatisticItem[]
                 {
-                    Columns = new[]
-                    {
-                        new StatisticItem(string.Empty, () => new SimpleStatisticTable(3, new SimpleStatisticItem[]
-                        {
-                            new AverageHitError(timedHitEvents),
-                            new UnstableRate(timedHitEvents)
-                        }), true)
-                    }
-                }
+                    new AverageHitError(timedHitEvents),
+                    new UnstableRate(timedHitEvents)
+                }), true)
             };
         }
 
         public override RulesetSetupSection CreateEditorSetupSection() => new OsuSetupSection();
+
+        /// <seealso cref="OsuHitObject.ApplyDefaultsToSelf"/>
+        /// <seealso cref="OsuHitWindows"/>
+        public override BeatmapDifficulty GetRateAdjustedDisplayDifficulty(IBeatmapDifficultyInfo difficulty, double rate)
+        {
+            BeatmapDifficulty adjustedDifficulty = new BeatmapDifficulty(difficulty);
+
+            double preempt = IBeatmapDifficultyInfo.DifficultyRange(adjustedDifficulty.ApproachRate, OsuHitObject.PREEMPT_MAX, OsuHitObject.PREEMPT_MID, OsuHitObject.PREEMPT_MIN);
+            preempt /= rate;
+            adjustedDifficulty.ApproachRate = (float)IBeatmapDifficultyInfo.InverseDifficultyRange(preempt, OsuHitObject.PREEMPT_MAX, OsuHitObject.PREEMPT_MID, OsuHitObject.PREEMPT_MIN);
+
+            var greatHitWindowRange = OsuHitWindows.OSU_RANGES.Single(range => range.Result == HitResult.Great);
+            double greatHitWindow = IBeatmapDifficultyInfo.DifficultyRange(adjustedDifficulty.OverallDifficulty, greatHitWindowRange.Min, greatHitWindowRange.Average, greatHitWindowRange.Max);
+            greatHitWindow /= rate;
+            adjustedDifficulty.OverallDifficulty = (float)IBeatmapDifficultyInfo.InverseDifficultyRange(greatHitWindow, greatHitWindowRange.Min, greatHitWindowRange.Average, greatHitWindowRange.Max);
+
+            return adjustedDifficulty;
+        }
     }
 }

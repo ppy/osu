@@ -29,16 +29,18 @@ namespace osu.Game.Overlays
 
         public DialogOverlay()
         {
-            RelativeSizeAxes = Axes.Both;
+            AutoSizeAxes = Axes.Y;
 
             Child = dialogContainer = new Container
             {
-                RelativeSizeAxes = Axes.Both,
+                RelativeSizeAxes = Axes.X,
+                AutoSizeAxes = Axes.Y,
             };
 
-            Width = 0.4f;
-            Anchor = Anchor.BottomCentre;
-            Origin = Anchor.BottomCentre;
+            Width = 500;
+
+            Anchor = Anchor.Centre;
+            Origin = Anchor.Centre;
         }
 
         [BackgroundDependencyLoader]
@@ -99,7 +101,6 @@ namespace osu.Game.Overlays
 
         protected override void PopIn()
         {
-            base.PopIn();
             lowPassFilter.CutoffTo(300, 100, Easing.OutCubic);
         }
 

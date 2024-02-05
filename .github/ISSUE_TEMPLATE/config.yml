@@ -2,7 +2,7 @@ blank_issues_enabled: false
 contact_links:
     - name: Help
       url: https://github.com/ppy/osu/discussions/categories/q-a
-      about: osu! not working as you'd expect? Not sure it's a bug? Check the Q&A section!
+      about: osu! not working or performing as you'd expect? Not sure it's a bug? Check the Q&A section!
     - name: Suggestions or feature request
       url: https://github.com/ppy/osu/discussions/categories/ideas
       about: Got something you think should change or be added? Search for or start a new discussion!

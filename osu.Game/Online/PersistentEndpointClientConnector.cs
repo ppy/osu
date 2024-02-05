@@ -69,6 +69,7 @@ namespace osu.Game.Online
                     break;
 
                 case APIState.Online:
+                case APIState.RequiresSecondFactorAuth:
                     await connect().ConfigureAwait(true);
                     break;
             }
@@ -83,7 +84,7 @@ namespace osu.Game.Online
 
             try
             {
-                while (apiState.Value == APIState.Online)
+                while (apiState.Value == APIState.RequiresSecondFactorAuth || apiState.Value == APIState.Online)
                 {
                     // ensure any previous connection was disposed.
                     // this will also create a new cancellation token source.
@@ -158,6 +159,8 @@ namespace osu.Game.Online
             if (!hasBeenCancelled)
                 await Task.Run(connect, default).ConfigureAwait(false);
         }
+
+        protected Task Disconnect() => disconnect(true);
 
         private async Task disconnect(bool takeLock)
         {

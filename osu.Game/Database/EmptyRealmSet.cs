@@ -19,8 +19,8 @@ namespace osu.Game.Database
         IEnumerator IEnumerable.GetEnumerator() => emptySet.GetEnumerator();
         public int Count => emptySet.Count;
         public T this[int index] => emptySet[index];
-        public int IndexOf(object item) => emptySet.IndexOf((T)item);
-        public bool Contains(object item) => emptySet.Contains((T)item);
+        public int IndexOf(object? item) => item == null ? -1 : emptySet.IndexOf((T)item);
+        public bool Contains(object? item) => item != null && emptySet.Contains((T)item);
 
         public event NotifyCollectionChangedEventHandler? CollectionChanged
         {

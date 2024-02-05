@@ -85,15 +85,15 @@ namespace osu.Game.Screens.OnlinePlay.Components
             StarDifficulty minDifficulty;
             StarDifficulty maxDifficulty;
 
-            if (DifficultyRange.Value != null)
+            if (DifficultyRange.Value != null && Playlist.Count == 0)
             {
+                // When Playlist is empty (in lounge) we take retrieved range
                 minDifficulty = new StarDifficulty(DifficultyRange.Value.Min, 0);
                 maxDifficulty = new StarDifficulty(DifficultyRange.Value.Max, 0);
             }
             else
             {
-                // In multiplayer rooms, the beatmaps of playlist items will not be populated to a point this can be correct.
-                // Either populating them via BeatmapLookupCache or polling the API for the room's DifficultyRange will be required.
+                // When Playlist is not empty (in room) we compute actual range
                 var orderedDifficulties = Playlist.Select(p => p.Beatmap).OrderBy(b => b.StarRating).ToArray();
 
                 minDifficulty = new StarDifficulty(orderedDifficulties.Length > 0 ? orderedDifficulties[0].StarRating : 0, 0);

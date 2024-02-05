@@ -1,7 +1,5 @@
-// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
-
-#nullable disable
 
 using System;
 using System.Collections.Generic;
@@ -48,15 +46,17 @@ namespace osu.Game.Rulesets.Mania.Difficulty
             HitWindows hitWindows = new ManiaHitWindows();
             hitWindows.SetDifficulty(beatmap.Difficulty.OverallDifficulty);
 
-            return new ManiaDifficultyAttributes
+            ManiaDifficultyAttributes attributes = new ManiaDifficultyAttributes
             {
                 StarRating = skills[0].DifficultyValue() * star_scaling_factor,
                 Mods = mods,
                 // In osu-stable mania, rate-adjustment mods don't affect the hit window.
                 // This is done the way it is to introduce fractional differences in order to match osu-stable for the time being.
                 GreatHitWindow = Math.Ceiling((int)(getHitWindow300(mods) * clockRate) / clockRate),
-                MaxCombo = beatmap.HitObjects.Sum(maxComboForObject)
+                MaxCombo = beatmap.HitObjects.Sum(maxComboForObject),
             };
+
+            return attributes;
         }
 
         private static int maxComboForObject(HitObject hitObject)

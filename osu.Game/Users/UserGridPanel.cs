@@ -1,8 +1,6 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
@@ -12,6 +10,10 @@ using osuTK;
 
 namespace osu.Game.Users
 {
+    /// <summary>
+    /// A user "card", commonly used in a grid layout or in popovers.
+    /// Comes with a preset height, but width must be specified.
+    /// </summary>
     public partial class UserGridPanel : ExtendedUserPanel
     {
         private const int margin = 10;
@@ -89,6 +91,7 @@ namespace osu.Game.Users
                                                 Children = new Drawable[]
                                                 {
                                                     CreateFlag(),
+                                                    // supporter icon is being added later
                                                 }
                                             }
                                         },
@@ -106,6 +109,7 @@ namespace osu.Game.Users
                         },
                         new[]
                         {
+                            // padding
                             Empty(),
                             Empty()
                         },

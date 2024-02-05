@@ -1,7 +1,5 @@
-// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
-
-#nullable disable
 
 using System.Collections.Generic;
 using System.Linq;
@@ -111,6 +109,11 @@ namespace osu.Game.Beatmaps
         /// This is cached to <see cref="BeatmapInfo.Length"/>, so using that is preferable when available.
         /// </remarks>
         public static double CalculatePlayableLength(this IBeatmap beatmap) => CalculatePlayableLength(beatmap.HitObjects);
+
+        /// <summary>
+        /// Find the total milliseconds between the first and last hittable objects, excluding any break time.
+        /// </summary>
+        public static double CalculateDrainLength(this IBeatmap beatmap) => CalculatePlayableLength(beatmap.HitObjects) - beatmap.TotalBreakTime;
 
         /// <summary>
         /// Find the timestamps in milliseconds of the start and end of the playable region.

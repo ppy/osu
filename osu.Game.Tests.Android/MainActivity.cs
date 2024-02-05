@@ -1,8 +1,6 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
 using System.Reflection;
 using Android.App;
 using Android.OS;
@@ -15,7 +13,7 @@ namespace osu.Game.Tests.Android
     {
         protected override Framework.Game CreateGame() => new OsuTestBrowser();
 
-        protected override void OnCreate(Bundle savedInstanceState)
+        protected override void OnCreate(Bundle? savedInstanceState)
         {
             base.OnCreate(savedInstanceState);
 
