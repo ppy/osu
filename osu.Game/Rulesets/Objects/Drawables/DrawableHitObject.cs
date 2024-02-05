@@ -697,7 +697,10 @@ namespace osu.Game.Rulesets.Objects.Drawables
         /// the <see cref="ScoreProcessor"/> of the <see cref="JudgementResult"/>.
         /// </summary>
         /// <param name="application">The callback that applies changes to the <see cref="JudgementResult"/>. Using a `static` delegate is recommended to avoid allocation overhead.</param>
-        /// <param name="state">The state.</param>
+        /// <param name="state">
+        /// Use this parameter to pass any data that <paramref name="application"/> requires
+        /// to apply a result, so that it can remain a `static` delegate and thus not allocate.
+        /// </param>
         protected void ApplyResult<T>(Action<JudgementResult, T> application, T state)
         {
             if (Result.HasResult)
