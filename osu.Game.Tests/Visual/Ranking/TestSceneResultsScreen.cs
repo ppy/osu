@@ -486,7 +486,7 @@ namespace osu.Game.Tests.Visual.Ranking
 
         private class RulesetWithNoPerformanceCalculator : OsuRuleset
         {
-            public override PerformanceCalculator CreatePerformanceCalculator() => null;
+            public override PerformanceCalculator CreatePerformanceCalculator() => null!;
         }
     }
 }
