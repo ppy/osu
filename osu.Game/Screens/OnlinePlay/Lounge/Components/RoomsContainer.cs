@@ -126,7 +126,13 @@ namespace osu.Game.Screens.OnlinePlay.Lounge.Components
                 case NotifyCollectionChangedAction.Remove:
                     Debug.Assert(args.OldItems != null);
 
-                    removeRooms(args.OldItems.Cast<Room>());
+                    // clear operations have a separate path that benefits from async disposal,
+                    // since disposing is quite expensive when performed on a high number of drawables synchronously.
+                    if (args.OldItems.Count == roomFlow.Count)
+                        clearRooms();
+                    else
+                        removeRooms(args.OldItems.Cast<Room>());
+
                     break;
             }
         }
@@ -149,6 +155,15 @@ namespace osu.Game.Screens.OnlinePlay.Lounge.Components
                 if (!SelectedRoom.Disabled)
                     SelectedRoom.Value = null;
             }
+        }
+
+        private void clearRooms()
+        {
+            roomFlow.Clear();
+
+            // selection may have a lease due to being in a sub screen.
+            if (!SelectedRoom.Disabled)
+                SelectedRoom.Value = null;
         }
 
         private void updateSorting()
