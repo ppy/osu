@@ -37,8 +37,6 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
 
         private double? lastPressHandleTime;
 
-        private HitResult hitResult;
-
         private readonly Bindable<HitType> type = new Bindable<HitType>();
 
         public DrawableHit()
@@ -105,20 +103,14 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
                 return;
             }
 
-            hitResult = HitObject.HitWindows.ResultFor(timeOffset);
-            if (hitResult == HitResult.None)
+            var result = HitObject.HitWindows.ResultFor(timeOffset);
+            if (result == HitResult.None)
                 return;
 
             if (!validActionPressed)
                 ApplyMinResult();
             else
-            {
-                ApplyResult(static (r, hitObject) =>
-                {
-                    var drawableHit = (DrawableHit)hitObject;
-                    r.Type = drawableHit.hitResult;
-                });
-            }
+                ApplyResult(result);
         }
 
         public override bool OnPressed(KeyBindingPressEvent<TaikoAction> e)

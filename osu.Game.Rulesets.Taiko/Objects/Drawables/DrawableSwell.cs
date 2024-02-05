@@ -41,8 +41,6 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
 
         private double? lastPressHandleTime;
 
-        private int numHits;
-
         public override bool DisplayResult => false;
 
         public DrawableSwell()
@@ -194,7 +192,7 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
 
                 nextTick?.TriggerResult(true);
 
-                numHits = ticks.Count(r => r.IsHit);
+                int numHits = ticks.Count(r => r.IsHit);
 
                 float completion = (float)numHits / HitObject.RequiredHits;
 
@@ -215,7 +213,7 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
                 if (timeOffset < 0)
                     return;
 
-                numHits = 0;
+                int numHits = 0;
 
                 foreach (var tick in ticks)
                 {
@@ -229,11 +227,10 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
                         tick.TriggerResult(false);
                 }
 
-                ApplyResult(static (r, hitObject) =>
-                {
-                    var swell = (DrawableSwell)hitObject;
-                    r.Type = swell.numHits == swell.HitObject.RequiredHits ? r.Judgement.MaxResult : r.Judgement.MinResult;
-                });
+                if (numHits == HitObject.RequiredHits)
+                    ApplyMaxResult();
+                else
+                    ApplyMinResult();
             }
         }
 

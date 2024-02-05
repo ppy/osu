@@ -160,19 +160,19 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
                 return;
             }
 
-            HitResult hitResult = ResultFor(timeOffset);
-            var clickAction = CheckHittable?.Invoke(this, Time.Current, hitResult);
+            var result = ResultFor(timeOffset);
+            var clickAction = CheckHittable?.Invoke(this, Time.Current, result);
 
             if (clickAction == ClickAction.Shake)
                 Shake();
 
-            if (hitResult == HitResult.None || clickAction != ClickAction.Hit)
+            if (result == HitResult.None || clickAction != ClickAction.Hit)
                 return;
 
             Vector2? hitPosition = null;
 
             // Todo: This should also consider misses, but they're a little more interesting to handle, since we don't necessarily know the position at the time of a miss.
-            if (hitResult.IsHit())
+            if (result.IsHit())
             {
                 var localMousePosition = ToLocalSpace(inputManager.CurrentState.Mouse.Position);
                 hitPosition = HitObject.StackedPosition + (localMousePosition - DrawSize / 2);
@@ -184,7 +184,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
 
                 circleResult.Type = state.result;
                 circleResult.CursorPositionAtHit = state.position;
-            }, (hitResult, hitPosition));
+            }, (result, hitPosition));
         }
 
         /// <summary>

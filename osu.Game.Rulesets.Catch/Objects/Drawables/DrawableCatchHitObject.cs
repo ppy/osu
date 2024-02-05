@@ -64,11 +64,10 @@ namespace osu.Game.Rulesets.Catch.Objects.Drawables
 
             if (timeOffset >= 0 && Result != null)
             {
-                ApplyResult(static (r, hitObject) =>
-                {
-                    var catchHitObject = (DrawableCatchHitObject)hitObject;
-                    r.Type = catchHitObject.CheckPosition!.Invoke(catchHitObject.HitObject) ? r.Judgement.MaxResult : r.Judgement.MinResult;
-                });
+                if (CheckPosition.Invoke(HitObject))
+                    ApplyMaxResult();
+                else
+                    ApplyMinResult();
             }
         }
 

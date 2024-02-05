@@ -15,8 +15,6 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
     {
         public override bool DisplayResult => false;
 
-        private bool hit;
-
         public DrawableSwellTick()
             : this(null)
         {
@@ -31,13 +29,12 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
 
         public void TriggerResult(bool hit)
         {
-            this.hit = hit;
             HitObject.StartTime = Time.Current;
-            ApplyResult(static (r, hitObject) =>
-            {
-                var swellTick = (DrawableSwellTick)hitObject;
-                r.Type = swellTick.hit ? r.Judgement.MaxResult : r.Judgement.MinResult;
-            });
+
+            if (hit)
+                ApplyMaxResult();
+            else
+                ApplyMinResult();
         }
 
         protected override void CheckForResult(bool userTriggered, double timeOffset)
