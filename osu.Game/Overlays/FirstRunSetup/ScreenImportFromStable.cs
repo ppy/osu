@@ -137,6 +137,7 @@ namespace osu.Game.Overlays.FirstRunSetup
                 copyInformation.Text = RuntimeInfo.OS == RuntimeInfo.Platform.Windows
                     ? FirstRunOverlayImportFromStableScreenStrings.SecondCopyWillBeMade(FirstRunOverlayImportFromStableScreenStrings.ToAvoidEnsureNtfs)
                     : FirstRunOverlayImportFromStableScreenStrings.SecondCopyWillBeMade(FirstRunOverlayImportFromStableScreenStrings.ToAvoidEnsureHardLinksSupport);
+                copyInformation.AddText(@" "); // just to ensure correct spacing
                 copyInformation.AddLink(GeneralSettingsStrings.ChangeFolderLocation, () =>
                 {
                     game?.PerformFromScreen(menu => menu.Push(new MigrationSelectScreen()));
