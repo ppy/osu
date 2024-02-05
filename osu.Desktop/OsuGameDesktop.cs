@@ -138,10 +138,7 @@ namespace osu.Desktop
                 LoadComponentAsync(new GameplayWinKeyBlocker(), Add);
 
             if (OperatingSystem.IsWindows() && IsDeployedBuild)
-            {
-                string? executableLocation = Path.GetDirectoryName(typeof(OsuGameDesktop).Assembly.Location);
-                LoadComponentAsync(new WindowsAssociationManager(Path.Join(executableLocation, @"osu!.exe"), "osu"), Add);
-            }
+                LoadComponentAsync(new WindowsAssociationManager(Path.ChangeExtension(typeof(OsuGameDesktop).Assembly.Location, ".exe"), "osu"), Add);
 
             LoadComponentAsync(new ElevatedPrivilegesChecker(), Add);
 
