@@ -39,15 +39,15 @@ namespace osu.Game.Rulesets.Taiko.Edit.Blueprints
             {
                 headPiece = new HitPiece
                 {
-                    Size = new Vector2(TaikoHitObject.DEFAULT_SIZE * TaikoPlayfield.DEFAULT_HEIGHT)
+                    Size = new Vector2(TaikoHitObject.DEFAULT_SIZE * TaikoPlayfield.BASE_HEIGHT)
                 },
                 lengthPiece = new LengthPiece
                 {
-                    Height = TaikoHitObject.DEFAULT_SIZE * TaikoPlayfield.DEFAULT_HEIGHT
+                    Height = TaikoHitObject.DEFAULT_SIZE * TaikoPlayfield.BASE_HEIGHT
                 },
                 tailPiece = new HitPiece
                 {
-                    Size = new Vector2(TaikoHitObject.DEFAULT_SIZE * TaikoPlayfield.DEFAULT_HEIGHT)
+                    Size = new Vector2(TaikoHitObject.DEFAULT_SIZE * TaikoPlayfield.BASE_HEIGHT)
                 }
             };
         }
