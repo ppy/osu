@@ -3,7 +3,7 @@
 
 namespace osu.Desktop.Windows
 {
-    public record Win32Icon
+    public class Win32Icon
     {
         public readonly string Path;
 
