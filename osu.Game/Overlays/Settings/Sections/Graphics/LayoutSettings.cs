@@ -115,7 +115,7 @@ namespace osu.Game.Overlays.Settings.Sections.Graphics
                 },
                 safeAreaConsiderationsCheckbox = new SettingsCheckbox
                 {
-                    LabelText = GraphicsSettingsStrings.ShrinkGameOnMobile,
+                    LabelText = GraphicsSettingsStrings.ShrinkGameToSafeArea,
                     Current = osuConfig.GetBindable<bool>(OsuSetting.SafeAreaConsiderations),
                 },
                 new SettingsSlider<float, UIScaleSlider>
