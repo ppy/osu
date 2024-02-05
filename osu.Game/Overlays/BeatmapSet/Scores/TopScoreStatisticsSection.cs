@@ -125,10 +125,12 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
 
                 ppColumn.Alpha = value.BeatmapInfo!.Status.GrantsPerformancePoints() ? 1 : 0;
 
-                if (value.PP is double pp)
-                    ppColumn.Text = pp.ToLocalisableString(@"N0");
-                else
+                if (!value.Ranked)
+                    ppColumn.Drawable = new UnrankedPerformancePointsPlaceholder { Font = smallFont };
+                else if (value.PP is not double pp)
                     ppColumn.Drawable = new UnprocessedPerformancePointsPlaceholder { Size = new Vector2(smallFont.Size) };
+                else
+                    ppColumn.Text = pp.ToLocalisableString(@"N0");
 
                 statisticsColumns.ChildrenEnumerable = value.GetStatisticsForDisplay().Select(createStatisticsColumn);
                 modsColumn.Mods = value.Mods;

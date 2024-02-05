@@ -216,7 +216,18 @@ namespace osu.Game.Overlays.Profile.Sections.Ranks
             if (!Score.PP.HasValue)
             {
                 if (Score.Beatmap?.Status.GrantsPerformancePoints() == true)
+                {
+                    if (!Score.Ranked)
+                    {
+                        return new UnrankedPerformancePointsPlaceholder
+                        {
+                            Font = OsuFont.GetFont(weight: FontWeight.Bold),
+                            Colour = colourProvider.Highlight1
+                        };
+                    }
+
                     return new UnprocessedPerformancePointsPlaceholder { Size = new Vector2(16), Colour = colourProvider.Highlight1 };
+                }
 
                 return new OsuSpriteText
                 {
