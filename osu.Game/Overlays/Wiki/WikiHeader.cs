@@ -41,6 +41,7 @@ namespace osu.Game.Overlays.Wiki
             return new Container
             {
                 Height = 40,
+                AutoSizeAxes = Axes.X,
                 Child = LanguageDropdown = new WikiLanguageDropdown
                 {
                     Anchor = Anchor.TopRight,

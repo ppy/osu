@@ -18,7 +18,6 @@ namespace osu.Game.Overlays.Wiki
         public WikiLanguageDropdown()
         {
             Width = 300;
-            AutoSizeAxes = Axes.Y;
             ItemSource = AvailableLanguages;
         }
 
