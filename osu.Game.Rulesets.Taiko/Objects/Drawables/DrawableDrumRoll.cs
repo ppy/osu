@@ -143,7 +143,7 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
             if (timeOffset < 0)
                 return;
 
-            ApplyResult(static (r, _) => r.Type = r.Judgement.MaxResult);
+            ApplyMaxResult();
         }
 
         protected override void UpdateHitStateTransforms(ArmedState state)

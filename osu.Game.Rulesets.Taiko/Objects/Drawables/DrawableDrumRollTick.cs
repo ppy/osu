@@ -49,14 +49,14 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
             if (!userTriggered)
             {
                 if (timeOffset > HitObject.HitWindow)
-                    ApplyResult(static (r, _) => r.Type = r.Judgement.MinResult);
+                    ApplyMinResult();
                 return;
             }
 
             if (Math.Abs(timeOffset) > HitObject.HitWindow)
                 return;
 
-            ApplyResult(static (r, _) => r.Type = r.Judgement.MaxResult);
+            ApplyMaxResult();
         }
 
         public override void OnKilled()
@@ -64,7 +64,7 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
             base.OnKilled();
 
             if (Time.Current > HitObject.GetEndTime() && !Judged)
-                ApplyResult(static (r, _) => r.Type = r.Judgement.MinResult);
+                ApplyMinResult();
         }
 
         protected override void UpdateHitStateTransforms(ArmedState state)

@@ -431,7 +431,7 @@ namespace osu.Game.Tests.Visual.Gameplay
             protected override void CheckForResult(bool userTriggered, double timeOffset)
             {
                 if (timeOffset > HitObject.Duration)
-                    ApplyResult(static (r, _) => r.Type = r.Judgement.MaxResult);
+                    ApplyMaxResult();
             }
 
             protected override void UpdateHitStateTransforms(ArmedState state)
@@ -468,7 +468,7 @@ namespace osu.Game.Tests.Visual.Gameplay
             public override void OnKilled()
             {
                 base.OnKilled();
-                ApplyResult(static (r, _) => r.Type = r.Judgement.MinResult);
+                ApplyMinResult();
             }
         }
 
@@ -547,7 +547,7 @@ namespace osu.Game.Tests.Visual.Gameplay
             {
                 base.CheckForResult(userTriggered, timeOffset);
                 if (timeOffset >= 0)
-                    ApplyResult(static (r, _) => r.Type = r.Judgement.MaxResult);
+                    ApplyMaxResult();
             }
         }
 
@@ -596,7 +596,7 @@ namespace osu.Game.Tests.Visual.Gameplay
             {
                 base.CheckForResult(userTriggered, timeOffset);
                 if (timeOffset >= 0)
-                    ApplyResult(static (r, _) => r.Type = r.Judgement.MaxResult);
+                    ApplyMaxResult();
             }
         }
 

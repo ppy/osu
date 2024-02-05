@@ -11,8 +11,6 @@ namespace osu.Game.Rulesets.Mania.Objects.Drawables
 
         public override bool DisplayResult => false;
 
-        private bool hit;
-
         public DrawableHoldNoteBody()
             : this(null)
         {
@@ -27,12 +25,10 @@ namespace osu.Game.Rulesets.Mania.Objects.Drawables
         {
             if (AllJudged) return;
 
-            this.hit = hit;
-            ApplyResult(static (r, hitObject) =>
-            {
-                var holdNoteBody = (DrawableHoldNoteBody)hitObject;
-                r.Type = holdNoteBody.hit ? r.Judgement.MaxResult : r.Judgement.MinResult;
-            });
+            if (hit)
+                ApplyMaxResult();
+            else
+                ApplyMinResult();
         }
     }
 }

@@ -208,7 +208,7 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
                 expandingRing.ScaleTo(1f + Math.Min(target_ring_scale - 1f, (target_ring_scale - 1f) * completion * 1.3f), 260, Easing.OutQuint);
 
                 if (numHits == HitObject.RequiredHits)
-                    ApplyResult(static (r, _) => r.Type = r.Judgement.MaxResult);
+                    ApplyMaxResult();
             }
             else
             {

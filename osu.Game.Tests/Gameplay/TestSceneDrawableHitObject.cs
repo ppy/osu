@@ -216,7 +216,7 @@ namespace osu.Game.Tests.Gameplay
                     LifetimeStart = LIFETIME_ON_APPLY;
             }
 
-            public void MissForcefully() => ApplyResult(static (r, _) => r.Type = HitResult.Miss);
+            public void MissForcefully() => ApplyResult(HitResult.Miss);
 
             protected override void UpdateHitStateTransforms(ArmedState state)
             {

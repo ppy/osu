@@ -91,12 +91,13 @@ namespace osu.Game.Rulesets.Mania.Objects.Drawables
             if (!userTriggered)
             {
                 if (!HitObject.HitWindows.CanBeHit(timeOffset))
-                    ApplyResult(static (r, _) => r.Type = r.Judgement.MinResult);
+                    ApplyMinResult();
 
                 return;
             }
 
             hitResult = HitObject.HitWindows.ResultFor(timeOffset);
+
             if (hitResult == HitResult.None)
                 return;
 
