@@ -43,7 +43,7 @@ namespace osu.Game.Rulesets.Osu.Skinning.Argon
             this.ScaleTo(1.4f);
             this.ScaleTo(1f, 150, Easing.Out);
 
-            this.FadeOutFromOne(400);
+            this.FadeOutFromOne(600);
         }
 
         public Drawable? GetAboveHitObjectsProxiedContent() => piece.CreateProxy();

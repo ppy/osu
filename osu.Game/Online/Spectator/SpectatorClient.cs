@@ -264,13 +264,12 @@ namespace osu.Game.Online.Spectator
         {
             Debug.Assert(ThreadSafety.IsUpdateThread);
 
-            if (watchedUsersRefCounts.ContainsKey(userId))
+            if (!watchedUsersRefCounts.TryAdd(userId, 1))
             {
                 watchedUsersRefCounts[userId]++;
                 return;
             }
 
-            watchedUsersRefCounts.Add(userId, 1);
             WatchUserInternal(userId);
         }
 

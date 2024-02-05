@@ -6,8 +6,8 @@ using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
+using osu.Framework.Graphics.Cursor;
 using osu.Framework.Graphics.Shapes;
-using osu.Framework.Graphics.UserInterface;
 using osu.Framework.Localisation;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
@@ -22,15 +22,13 @@ namespace osu.Game.Overlays.Mods
     /// <summary>
     /// On the mod select overlay, this provides a local updating view of the aggregate score multiplier coming from mods.
     /// </summary>
-    public partial class ScoreMultiplierDisplay : ModFooterInformationDisplay, IHasCurrentValue<double>
+    public partial class RankingInformationDisplay : ModFooterInformationDisplay
     {
         public const float HEIGHT = 42;
 
-        public Bindable<double> Current
-        {
-            get => current.Current;
-            set => current.Current = value;
-        }
+        public Bindable<double> ModMultiplier = new BindableDouble(1);
+
+        public Bindable<bool> Ranked { get; } = new BindableBool(true);
 
         private readonly BindableWithCurrent<double> current = new BindableWithCurrent<double>();
 
@@ -39,15 +37,10 @@ namespace osu.Game.Overlays.Mods
         private RollingCounter<double> counter = null!;
 
         private Box flashLayer = null!;
+        private TextWithTooltip rankedText = null!;
 
         [Resolved]
         private OsuColour colours { get; set; } = null!;
-
-        public ScoreMultiplierDisplay()
-        {
-            Current.Default = 1d;
-            Current.Value = 1d;
-        }
 
         [BackgroundDependencyLoader]
         private void load()
@@ -75,13 +68,20 @@ namespace osu.Game.Overlays.Mods
 
             LeftContent.AddRange(new Drawable[]
             {
-                new OsuSpriteText
+                new Container
                 {
+                    Width = 50,
+                    RelativeSizeAxes = Axes.Y,
+                    Margin = new MarginPadding(10),
                     Anchor = Anchor.Centre,
                     Origin = Anchor.Centre,
-                    Shear = new Vector2(-ShearedOverlayContainer.SHEAR, 0),
-                    Text = ModSelectOverlayStrings.ScoreMultiplier,
-                    Font = OsuFont.Default.With(size: 17, weight: FontWeight.SemiBold)
+                    Child = rankedText = new TextWithTooltip
+                    {
+                        Anchor = Anchor.Centre,
+                        Origin = Anchor.Centre,
+                        Shear = new Vector2(-ShearedOverlayContainer.SHEAR, 0),
+                        Font = OsuFont.Default.With(size: 17, weight: FontWeight.SemiBold)
+                    }
                 }
             });
 
@@ -97,7 +97,7 @@ namespace osu.Game.Overlays.Mods
                     Shear = new Vector2(-ShearedOverlayContainer.SHEAR, 0),
                     Anchor = Anchor.Centre,
                     Origin = Anchor.Centre,
-                    Current = { BindTarget = Current }
+                    Current = { BindTarget = ModMultiplier }
                 }
             });
         }
@@ -106,30 +106,22 @@ namespace osu.Game.Overlays.Mods
         {
             base.LoadComplete();
 
-            Current.BindValueChanged(e =>
+            ModMultiplier.BindValueChanged(e =>
             {
-                if (e.NewValue > Current.Default)
+                if (e.NewValue > ModMultiplier.Default)
                 {
-                    MainBackground
-                        .FadeColour(colours.ForModType(ModType.DifficultyIncrease), transition_duration, Easing.OutQuint);
-                    counter.FadeColour(ColourProvider.Background5, transition_duration, Easing.OutQuint);
+                    counter.FadeColour(colours.ForModType(ModType.DifficultyIncrease), transition_duration, Easing.OutQuint);
                 }
-                else if (e.NewValue < Current.Default)
+                else if (e.NewValue < ModMultiplier.Default)
                 {
-                    MainBackground
-                        .FadeColour(colours.ForModType(ModType.DifficultyReduction), transition_duration, Easing.OutQuint);
-                    counter.FadeColour(ColourProvider.Background5, transition_duration, Easing.OutQuint);
+                    counter.FadeColour(colours.ForModType(ModType.DifficultyReduction), transition_duration, Easing.OutQuint);
                 }
                 else
                 {
-                    MainBackground.FadeColour(ColourProvider.Background4, transition_duration, Easing.OutQuint);
                     counter.FadeColour(Colour4.White, transition_duration, Easing.OutQuint);
                 }
 
-                flashLayer
-                    .FadeOutFromOne()
-                    .FadeTo(0.15f, 60, Easing.OutQuint)
-                    .Then().FadeOut(500, Easing.OutQuint);
+                flash();
 
                 const float move_amount = 4;
                 if (e.NewValue > e.OldValue)
@@ -140,10 +132,43 @@ namespace osu.Game.Overlays.Mods
 
             // required to prevent the counter initially rolling up from 0 to 1
             // due to `Current.Value` having a nonstandard default value of 1.
-            counter.SetCountWithoutRolling(Current.Value);
+            counter.SetCountWithoutRolling(ModMultiplier.Value);
+
+            Ranked.BindValueChanged(e =>
+            {
+                flash();
+
+                if (e.NewValue)
+                {
+                    rankedText.Text = ModSelectOverlayStrings.Ranked;
+                    rankedText.TooltipText = ModSelectOverlayStrings.RankedExplanation;
+                    rankedText.FadeColour(Colour4.White, transition_duration, Easing.OutQuint);
+                    FrontBackground.FadeColour(ColourProvider.Background3, transition_duration, Easing.OutQuint);
+                }
+                else
+                {
+                    rankedText.Text = ModSelectOverlayStrings.Unranked;
+                    rankedText.TooltipText = ModSelectOverlayStrings.UnrankedExplanation;
+                    rankedText.FadeColour(ColourProvider.Background5, transition_duration, Easing.OutQuint);
+                    FrontBackground.FadeColour(colours.Orange1, transition_duration, Easing.OutQuint);
+                }
+            }, true);
         }
 
-        private partial class EffectCounter : RollingCounter<double>
+        private void flash()
+        {
+            flashLayer
+                .FadeOutFromOne()
+                .FadeTo(0.15f, 60, Easing.OutQuint)
+                .Then().FadeOut(500, Easing.OutQuint);
+        }
+
+        private partial class TextWithTooltip : OsuSpriteText, IHasTooltip
+        {
+            public LocalisableString TooltipText { get; set; }
+        }
+
+        private partial class EffectCounter : RollingCounter<double>, IHasTooltip
         {
             protected override double RollingDuration => 250;
 
@@ -155,6 +180,8 @@ namespace osu.Game.Overlays.Mods
                 Origin = Anchor.Centre,
                 Font = OsuFont.Default.With(size: 17, weight: FontWeight.SemiBold)
             };
+
+            public LocalisableString TooltipText => ModSelectOverlayStrings.ScoreMultiplier;
         }
     }
 }

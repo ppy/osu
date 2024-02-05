@@ -116,7 +116,7 @@ namespace osu.Game.Beatmaps
         ITrackStore IBeatmapResourceProvider.Tracks => trackStore;
         IRenderer IStorageResourceProvider.Renderer => host?.Renderer ?? new DummyRenderer();
         AudioManager IStorageResourceProvider.AudioManager => audioManager;
-        RealmAccess IStorageResourceProvider.RealmAccess => null;
+        RealmAccess IStorageResourceProvider.RealmAccess => null!;
         IResourceStore<byte[]> IStorageResourceProvider.Files => files;
         IResourceStore<byte[]> IStorageResourceProvider.Resources => resources;
         IResourceStore<TextureUpload> IStorageResourceProvider.CreateTextureLoaderStore(IResourceStore<byte[]> underlyingStore) => host?.CreateTextureLoaderStore(underlyingStore);

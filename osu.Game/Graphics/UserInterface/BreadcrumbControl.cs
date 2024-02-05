@@ -10,6 +10,7 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.UserInterface;
 using System.Linq;
+using JetBrains.Annotations;
 using osu.Framework.Graphics.Sprites;
 
 namespace osu.Game.Graphics.UserInterface
@@ -48,6 +49,7 @@ namespace osu.Game.Graphics.UserInterface
         {
             protected virtual float ChevronSize => 10;
 
+            [CanBeNull]
             public event Action<Visibility> StateChanged;
 
             public readonly SpriteIcon Chevron;
