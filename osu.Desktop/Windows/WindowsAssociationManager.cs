@@ -13,7 +13,7 @@ using osu.Framework.Logging;
 using osu.Game.Resources.Icons;
 using osu.Game.Localisation;
 
-namespace osu.Game.Updater
+namespace osu.Desktop.Windows
 {
     [SupportedOSPlatform("windows")]
     public partial class WindowsAssociationManager : Component
