@@ -10,7 +10,6 @@ using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Localisation;
 using osu.Framework.Logging;
-using osu.Game.Resources.Icons;
 using osu.Game.Localisation;
 
 namespace osu.Desktop.Windows
@@ -194,7 +193,7 @@ namespace osu.Desktop.Windows
                 using (var programKey = classes.CreateSubKey(programId))
                 {
                     using (var defaultIconKey = programKey.CreateSubKey(DEFAULT_ICON))
-                        defaultIconKey.SetValue(null, Icon.RegistryString);
+                        defaultIconKey.SetValue(null, Icon.Path);
 
                     using (var openCommandKey = programKey.CreateSubKey(SHELL_OPEN_COMMAND))
                         openCommandKey.SetValue(null, $@"""{exePath}"" ""%1""");
@@ -249,7 +248,7 @@ namespace osu.Desktop.Windows
                     protocolKey.SetValue(URL_PROTOCOL, string.Empty);
 
                     using (var defaultIconKey = protocolKey.CreateSubKey(DEFAULT_ICON))
-                        defaultIconKey.SetValue(null, Icon.RegistryString);
+                        defaultIconKey.SetValue(null, Icon.Path);
 
                     using (var openCommandKey = protocolKey.CreateSubKey(SHELL_OPEN_COMMAND))
                         openCommandKey.SetValue(null, $@"""{exePath}"" ""%1""");
