@@ -4,6 +4,7 @@
 #nullable disable
 
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Audio;
@@ -259,10 +260,15 @@ namespace osu.Game.Screens.Ranking.Expanded.Accuracy
                 if (isFailedSDueToMisses)
                     AddInternal(failedSRankText = new RankText(ScoreRank.S));
 
+                var applauseSamples = new List<string> { applauseSampleName };
+                if (score.Rank >= ScoreRank.B)
+                    // when rank is B or higher, play legacy applause sample on legacy skins.
+                    applauseSamples.Insert(0, @"applause");
+
                 AddRangeInternal(new Drawable[]
                 {
                     rankImpactSound = new PoolableSkinnableSample(new SampleInfo(impactSampleName)),
-                    rankApplauseSound = new PoolableSkinnableSample(new SampleInfo(@"applause", applauseSampleName)),
+                    rankApplauseSound = new PoolableSkinnableSample(new SampleInfo(applauseSamples.ToArray())),
                     scoreTickSound = new PoolableSkinnableSample(new SampleInfo(@"Results/score-tick")),
                     badgeTickSound = new PoolableSkinnableSample(new SampleInfo(@"Results/badge-dink")),
                     badgeMaxSound = new PoolableSkinnableSample(new SampleInfo(@"Results/badge-dink-max")),
@@ -351,24 +357,28 @@ namespace osu.Game.Screens.Ranking.Expanded.Accuracy
 
                 int badgeNum = 0;
 
-                foreach (var badge in badges)
+                if (score.Rank != ScoreRank.F)
                 {
-                    if (badge.Accuracy > score.Accuracy)
-                        continue;
-
-                    using (BeginDelayedSequence(inverseEasing(ACCURACY_TRANSFORM_EASING, Math.Min(accuracyX - virtual_ss_percentage, badge.Accuracy) / targetAccuracy) * ACCURACY_TRANSFORM_DURATION))
+                    foreach (var badge in badges)
                     {
-                        badge.Appear();
+                        if (badge.Accuracy > score.Accuracy)
+                            continue;
 
-                        if (withFlair)
+                        using (BeginDelayedSequence(
+                                   inverseEasing(ACCURACY_TRANSFORM_EASING, Math.Min(accuracyX - virtual_ss_percentage, badge.Accuracy) / targetAccuracy) * ACCURACY_TRANSFORM_DURATION))
                         {
-                            Schedule(() =>
-                            {
-                                var dink = badgeNum < badges.Count - 1 ? badgeTickSound : badgeMaxSound;
+                            badge.Appear();
 
-                                dink.FrequencyTo(1 + badgeNum++ * 0.05);
-                                dink.Play();
-                            });
+                            if (withFlair)
+                            {
+                                Schedule(() =>
+                                {
+                                    var dink = badgeNum < badges.Count - 1 ? badgeTickSound : badgeMaxSound;
+
+                                    dink.FrequencyTo(1 + badgeNum++ * 0.05);
+                                    dink.Play();
+                                });
+                            }
                         }
                     }
                 }
