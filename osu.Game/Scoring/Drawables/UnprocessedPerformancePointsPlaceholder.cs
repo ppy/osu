@@ -21,7 +21,7 @@ namespace osu.Game.Scoring.Drawables
         {
             Anchor = Anchor.Centre;
             Origin = Anchor.Centre;
-            Icon = FontAwesome.Solid.ExclamationTriangle;
+            Icon = FontAwesome.Solid.Sync;
         }
     }
 }
