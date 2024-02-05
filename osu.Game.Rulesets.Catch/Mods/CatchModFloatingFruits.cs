@@ -27,9 +27,8 @@ namespace osu.Game.Rulesets.Catch.Mods
             IsDisabled.BindValueChanged(s =>
             {
                 drawableRuleset.PlayfieldAdjustmentContainer.Scale = s.NewValue ? new Vector2(1, 1) : new Vector2(1, -1);
+                drawableRuleset.PlayfieldAdjustmentContainer.Y = 1 - drawableRuleset.PlayfieldAdjustmentContainer.Y;
             }, true);
-
-            drawableRuleset.PlayfieldAdjustmentContainer.Y = 1 - drawableRuleset.PlayfieldAdjustmentContainer.Y;
         }
     }
 }
