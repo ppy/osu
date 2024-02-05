@@ -162,7 +162,7 @@ namespace osu.Game.Localisation
         /// <summary>
         /// "Shrink game to avoid cameras and notches"
         /// </summary>
-        public static LocalisableString ShrinkGameOnMobile => new TranslatableString(getKey(@"shrink_game_on_mobile"), @"Shrink game to avoid cameras and notches");
+        public static LocalisableString ShrinkGameToSafeArea => new TranslatableString(getKey(@"shrink_game_to_safe_area"), @"Shrink game to avoid cameras and notches");
 
         private static string getKey(string key) => $@"{prefix}:{key}";
     }
