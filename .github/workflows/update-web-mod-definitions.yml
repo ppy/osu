@@ -12,10 +12,10 @@ jobs:
     name: Update osu-web mod definitions
     runs-on: ubuntu-latest
     steps:
-    - name: Install .NET 6.0.x
+    - name: Install .NET 8.0.x
       uses: actions/setup-dotnet@v3
       with:
-        dotnet-version: "6.0.x"
+        dotnet-version: "8.0.x"
 
     - name: Checkout ppy/osu
       uses: actions/checkout@v3

@@ -61,7 +61,7 @@ namespace osu.Game.Online.Chat
                     {
                         await client.SendAsync(new StartChatRequest()).ConfigureAwait(false);
                         Logger.Log(@"Now listening to websocket chat messages.", LoggingTarget.Network);
-                        chatStartCancellationSource.Cancel();
+                        await chatStartCancellationSource.CancelAsync().ConfigureAwait(false);
                     }
                     catch (Exception ex)
                     {
