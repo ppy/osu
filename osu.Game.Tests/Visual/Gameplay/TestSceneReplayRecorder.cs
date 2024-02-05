@@ -120,7 +120,7 @@ namespace osu.Game.Tests.Visual.Gameplay
         protected override void Update()
         {
             base.Update();
-            playbackManager?.ReplayInputHandler.SetFrameFromTime(Time.Current - 100);
+            playbackManager?.ReplayInputHandler?.SetFrameFromTime(Time.Current - 100);
         }
 
         [TearDownSteps]
