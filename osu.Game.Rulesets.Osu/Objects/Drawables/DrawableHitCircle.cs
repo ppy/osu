@@ -198,6 +198,9 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
             CirclePiece.FadeInFromZero(HitObject.TimeFadeIn);
 
             ApproachCircle.FadeTo(0.9f, Math.Min(HitObject.TimeFadeIn * 2, HitObject.TimePreempt));
+
+            // Due to OsuModApproachDifferent clear the Transforms for ApproachCircle, so let we scale it back.
+            // Shouldn't change game behavior.
             ApproachCircle.ScaleTo(4).ScaleTo(1f, HitObject.TimePreempt);
             ApproachCircle.Expire(true);
         }
