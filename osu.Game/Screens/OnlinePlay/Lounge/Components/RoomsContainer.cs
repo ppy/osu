@@ -126,6 +126,8 @@ namespace osu.Game.Screens.OnlinePlay.Lounge.Components
                 case NotifyCollectionChangedAction.Remove:
                     Debug.Assert(args.OldItems != null);
 
+                    // clear operations have a separate path that benefits from async disposal,
+                    // since disposing is quite expensive when performed on a high number of drawables synchronously.
                     if (args.OldItems.Count == roomFlow.Count)
                         clearRooms();
                     else
