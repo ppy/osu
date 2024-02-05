@@ -136,7 +136,7 @@ namespace osu.Game.Rulesets.Osu.Tests
                 if (auto && !userTriggered && timeOffset > hitOffset && CheckHittable?.Invoke(this, Time.Current, HitResult.Great) == ClickAction.Hit)
                 {
                     // force success
-                    ApplyResult(static (r, _) => r.Type = HitResult.Great);
+                    ApplyResult(HitResult.Great);
                 }
                 else
                     base.CheckForResult(userTriggered, timeOffset);

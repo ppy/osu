@@ -682,17 +682,28 @@ namespace osu.Game.Rulesets.Objects.Drawables
             UpdateResult(false);
         }
 
+        protected void ApplyMaxResult() => ApplyResult((r, _) => r.Type = r.Judgement.MaxResult);
+        protected void ApplyMinResult() => ApplyResult((r, _) => r.Type = r.Judgement.MinResult);
+
+        protected void ApplyResult(HitResult type) => ApplyResult(static (result, state) => result.Type = state, type);
+
+        [Obsolete("Use overload with state, preferrably with static delegates to avoid allocation overhead.")] // Can be removed 2024-07-26
+        protected void ApplyResult(Action<JudgementResult> application) => ApplyResult((r, _) => application(r), this);
+
+        protected void ApplyResult(Action<JudgementResult, DrawableHitObject> application) => ApplyResult(application, this);
+
         /// <summary>
         /// Applies the <see cref="Result"/> of this <see cref="DrawableHitObject"/>, notifying responders such as
         /// the <see cref="ScoreProcessor"/> of the <see cref="JudgementResult"/>.
         /// </summary>
         /// <param name="application">The callback that applies changes to the <see cref="JudgementResult"/>. Using a `static` delegate is recommended to avoid allocation overhead.</param>
-        protected void ApplyResult(Action<JudgementResult, DrawableHitObject> application)
+        /// <param name="state">The state.</param>
+        protected void ApplyResult<T>(Action<JudgementResult, T> application, T state)
         {
             if (Result.HasResult)
                 throw new InvalidOperationException("Cannot apply result on a hitobject that already has a result.");
 
-            application?.Invoke(Result, this);
+            application?.Invoke(Result, state);
 
             if (!Result.HasResult)
                 throw new InvalidOperationException($"{GetType().ReadableName()} applied a {nameof(JudgementResult)} but did not update {nameof(JudgementResult.Type)}.");
@@ -737,7 +748,7 @@ namespace osu.Game.Rulesets.Objects.Drawables
         /// Checks if a scoring result has occurred for this <see cref="DrawableHitObject"/>.
         /// </summary>
         /// <remarks>
-        /// If a scoring result has occurred, this method must invoke <see cref="ApplyResult"/> to update the result and notify responders.
+        /// If a scoring result has occurred, this method must invoke <see cref="ApplyResult{T}"/> to update the result and notify responders.
         /// </remarks>
         /// <param name="userTriggered">Whether the user triggered this check.</param>
         /// <param name="timeOffset">The offset from the end time of the <see cref="HitObject"/> at which this check occurred.

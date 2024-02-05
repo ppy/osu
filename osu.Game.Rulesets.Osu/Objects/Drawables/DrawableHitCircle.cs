@@ -44,7 +44,6 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
 
         private Container scaleContainer;
         private InputManager inputManager;
-        private HitResult hitResult;
 
         public DrawableHitCircle()
             : this(null)
@@ -156,12 +155,12 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
             if (!userTriggered)
             {
                 if (!HitObject.HitWindows.CanBeHit(timeOffset))
-                    ApplyResult(static (r, _) => r.Type = r.Judgement.MinResult);
+                    ApplyMinResult();
 
                 return;
             }
 
-            hitResult = ResultFor(timeOffset);
+            HitResult hitResult = ResultFor(timeOffset);
             var clickAction = CheckHittable?.Invoke(this, Time.Current, hitResult);
 
             if (clickAction == ClickAction.Shake)
@@ -170,20 +169,22 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
             if (hitResult == HitResult.None || clickAction != ClickAction.Hit)
                 return;
 
-            ApplyResult(static (r, hitObject) =>
+            Vector2? hitPosition = null;
+
+            // Todo: This should also consider misses, but they're a little more interesting to handle, since we don't necessarily know the position at the time of a miss.
+            if (hitResult.IsHit())
             {
-                var hitCircle = (DrawableHitCircle)hitObject;
+                var localMousePosition = ToLocalSpace(inputManager.CurrentState.Mouse.Position);
+                hitPosition = HitObject.StackedPosition + (localMousePosition - DrawSize / 2);
+            }
+
+            ApplyResult<(HitResult result, Vector2? position)>((r, state) =>
+            {
                 var circleResult = (OsuHitCircleJudgementResult)r;
 
-                // Todo: This should also consider misses, but they're a little more interesting to handle, since we don't necessarily know the position at the time of a miss.
-                if (hitCircle.hitResult.IsHit())
-                {
-                    var localMousePosition = hitCircle.ToLocalSpace(hitCircle.inputManager.CurrentState.Mouse.Position);
-                    circleResult.CursorPositionAtHit = hitCircle.HitObject.StackedPosition + (localMousePosition - hitCircle.DrawSize / 2);
-                }
-
-                circleResult.Type = hitCircle.hitResult;
-            });
+                circleResult.Type = state.result;
+                circleResult.CursorPositionAtHit = state.position;
+            }, (hitResult, hitPosition));
         }
 
         /// <summary>
