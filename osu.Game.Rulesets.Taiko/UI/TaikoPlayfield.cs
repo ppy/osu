@@ -5,7 +5,6 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using osu.Framework.Allocation;
-using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Primitives;
@@ -21,21 +20,17 @@ using osu.Game.Rulesets.Taiko.Judgements;
 using osu.Game.Rulesets.Taiko.Objects;
 using osu.Game.Rulesets.Taiko.Scoring;
 using osu.Game.Skinning;
-using osuTK;
 
 namespace osu.Game.Rulesets.Taiko.UI
 {
     public partial class TaikoPlayfield : ScrollingPlayfield
     {
         /// <summary>
-        /// Default height of a <see cref="TaikoPlayfield"/> when inside a <see cref="DrawableTaikoRuleset"/>.
+        /// Base height of a <see cref="TaikoPlayfield"/> when inside a <see cref="DrawableTaikoRuleset"/>.
         /// </summary>
-        public const float DEFAULT_HEIGHT = 200;
+        public const float BASE_HEIGHT = 200;
 
-        /// <summary>
-        /// Whether the hit target should be nudged further towards the left area, matching the stable "classic" position.
-        /// </summary>
-        public Bindable<bool> ClassicHitTargetPosition = new BindableBool();
+        public const float INPUT_DRUM_WIDTH = 180f;
 
         public Container UnderlayElements { get; private set; } = null!;
 
@@ -44,14 +39,12 @@ namespace osu.Game.Rulesets.Taiko.UI
         private JudgementContainer<DrawableTaikoJudgement> judgementContainer = null!;
         private ScrollingHitObjectContainer drumRollHitContainer = null!;
         internal Drawable HitTarget = null!;
-        private SkinnableDrawable mascot = null!;
 
         private JudgementPooler<DrawableTaikoJudgement> judgementPooler = null!;
         private readonly IDictionary<HitResult, HitExplosionPool> explosionPools = new Dictionary<HitResult, HitExplosionPool>();
 
         private ProxyContainer topLevelHitContainer = null!;
         private InputDrum inputDrum = null!;
-        private Container rightArea = null!;
 
         /// <remarks>
         /// <see cref="Playfield.AddNested"/> is purposefully not called on this to prevent i.e. being able to interact
@@ -59,19 +52,18 @@ namespace osu.Game.Rulesets.Taiko.UI
         /// </remarks>
         private BarLinePlayfield barLinePlayfield = null!;
 
-        private Container barLineContent = null!;
-        private Container hitObjectContent = null!;
-        private Container overlayContent = null!;
-
         [BackgroundDependencyLoader]
         private void load(OsuColour colours)
         {
+            const float hit_target_width = BASE_HEIGHT;
+            const float hit_target_offset = -24f;
+
             inputDrum = new InputDrum
             {
                 Anchor = Anchor.CentreLeft,
                 Origin = Anchor.CentreLeft,
-                AutoSizeAxes = Axes.X,
                 RelativeSizeAxes = Axes.Y,
+                Width = INPUT_DRUM_WIDTH,
             };
 
             InternalChildren = new[]
@@ -80,8 +72,8 @@ namespace osu.Game.Rulesets.Taiko.UI
                 new Container
                 {
                     Name = "Left overlay",
-                    RelativeSizeAxes = Axes.Both,
-                    FillMode = FillMode.Fit,
+                    RelativeSizeAxes = Axes.Y,
+                    Width = INPUT_DRUM_WIDTH,
                     BorderColour = colours.Gray0,
                     Children = new[]
                     {
@@ -89,7 +81,7 @@ namespace osu.Game.Rulesets.Taiko.UI
                         inputDrum.CreateProxy(),
                     }
                 },
-                mascot = new SkinnableDrawable(new TaikoSkinComponentLookup(TaikoSkinComponents.Mascot), _ => Empty())
+                new SkinnableDrawable(new TaikoSkinComponentLookup(TaikoSkinComponents.Mascot), _ => Empty())
                 {
                     Origin = Anchor.BottomLeft,
                     Anchor = Anchor.TopLeft,
@@ -97,18 +89,19 @@ namespace osu.Game.Rulesets.Taiko.UI
                     RelativeSizeAxes = Axes.None,
                     Y = 0.2f
                 },
-                rightArea = new Container
+                new Container
                 {
                     Name = "Right area",
                     RelativeSizeAxes = Axes.Both,
-                    RelativePositionAxes = Axes.Both,
+                    Padding = new MarginPadding { Left = INPUT_DRUM_WIDTH },
                     Children = new Drawable[]
                     {
                         new Container
                         {
-                            Name = "Elements before hit objects",
-                            RelativeSizeAxes = Axes.Both,
-                            FillMode = FillMode.Fit,
+                            Name = "Elements behind hit objects",
+                            RelativeSizeAxes = Axes.Y,
+                            Width = hit_target_width,
+                            X = hit_target_offset,
                             Children = new[]
                             {
                                 new SkinnableDrawable(new TaikoSkinComponentLookup(TaikoSkinComponents.KiaiGlow), _ => Empty())
@@ -125,10 +118,11 @@ namespace osu.Game.Rulesets.Taiko.UI
                                 }
                             }
                         },
-                        barLineContent = new Container
+                        new Container
                         {
                             Name = "Bar line content",
                             RelativeSizeAxes = Axes.Both,
+                            Padding = new MarginPadding { Left = hit_target_width / 2 + hit_target_offset },
                             Children = new Drawable[]
                             {
                                 UnderlayElements = new Container
@@ -138,17 +132,19 @@ namespace osu.Game.Rulesets.Taiko.UI
                                 barLinePlayfield = new BarLinePlayfield(),
                             }
                         },
-                        hitObjectContent = new Container
+                        new Container
                         {
                             Name = "Masked hit objects content",
                             RelativeSizeAxes = Axes.Both,
+                            Padding = new MarginPadding { Left = hit_target_width / 2 + hit_target_offset },
                             Masking = true,
                             Child = HitObjectContainer,
                         },
-                        overlayContent = new Container
+                        new Container
                         {
-                            Name = "Elements after hit objects",
+                            Name = "Overlay content",
                             RelativeSizeAxes = Axes.Both,
+                            Padding = new MarginPadding { Left = hit_target_width / 2 + hit_target_offset },
                             Children = new Drawable[]
                             {
                                 drumRollHitContainer = new DrumRollHitContainer(),
@@ -220,20 +216,6 @@ namespace osu.Game.Rulesets.Taiko.UI
 
             var taikoObject = (DrawableTaikoHitObject)drawableHitObject;
             topLevelHitContainer.Add(taikoObject.CreateProxiedContent());
-        }
-
-        protected override void Update()
-        {
-            base.Update();
-
-            // Padding is required to be updated for elements which are based on "absolute" X sized elements.
-            // This is basically allowing for correct alignment as relative pieces move around them.
-            rightArea.Padding = new MarginPadding { Left = inputDrum.Width };
-            barLineContent.Padding = new MarginPadding { Left = HitTarget.DrawWidth / 2 };
-            hitObjectContent.Padding = new MarginPadding { Left = HitTarget.DrawWidth / 2 };
-            overlayContent.Padding = new MarginPadding { Left = HitTarget.DrawWidth / 2 };
-
-            mascot.Scale = new Vector2(DrawHeight / DEFAULT_HEIGHT);
         }
 
         #region Pooling support

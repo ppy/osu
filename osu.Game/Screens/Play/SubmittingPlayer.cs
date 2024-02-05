@@ -132,7 +132,18 @@ namespace osu.Game.Screens.Play
                     if (string.IsNullOrEmpty(exception.Message))
                         Logger.Error(exception, "Failed to retrieve a score submission token.");
                     else
-                        Logger.Log($"You are not able to submit a score: {exception.Message}", level: LogLevel.Important);
+                    {
+                        switch (exception.Message)
+                        {
+                            case "expired token":
+                                Logger.Log("Score submission failed because your system clock is set incorrectly. Please check your system time, date and timezone.", level: LogLevel.Important);
+                                break;
+
+                            default:
+                                Logger.Log($"You are not able to submit a score: {exception.Message}", level: LogLevel.Important);
+                                break;
+                        }
+                    }
 
                     Schedule(() =>
                     {

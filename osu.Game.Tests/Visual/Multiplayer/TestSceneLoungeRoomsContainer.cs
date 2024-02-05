@@ -58,7 +58,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
                                                               .SkipWhile(r => r.Room.Category.Value == RoomCategory.Spotlight)
                                                               .All(r => r.Room.Category.Value == RoomCategory.Normal));
 
-            AddStep("remove first room", () => RoomManager.RemoveRoom(RoomManager.Rooms.FirstOrDefault(r => r.RoomID.Value == 0)));
+            AddStep("remove first room", () => RoomManager.RemoveRoom(RoomManager.Rooms.First(r => r.RoomID.Value == 0)));
             AddAssert("has 4 rooms", () => container.Rooms.Count == 4);
             AddAssert("first room removed", () => container.Rooms.All(r => r.Room.RoomID.Value != 0));
 
