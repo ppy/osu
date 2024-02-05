@@ -126,7 +126,11 @@ namespace osu.Game.Screens.OnlinePlay.Lounge.Components
                 case NotifyCollectionChangedAction.Remove:
                     Debug.Assert(args.OldItems != null);
 
-                    removeRooms(args.OldItems.Cast<Room>());
+                    if (args.OldItems.Count == roomFlow.Count)
+                        clearRooms();
+                    else
+                        removeRooms(args.OldItems.Cast<Room>());
+
                     break;
             }
         }
@@ -141,23 +145,23 @@ namespace osu.Game.Screens.OnlinePlay.Lounge.Components
 
         private void removeRooms(IEnumerable<Room> rooms)
         {
-            foreach (var room in rooms)
+            foreach (var r in rooms)
             {
-                var drawableRoom = roomFlow.SingleOrDefault(d => d.Room == room);
-                if (drawableRoom == null)
-                    continue;
-
-                // expire to trigger async disposal. the room still has to exist somewhere so we move it to internal content of RoomsContainer until next frame.
-                drawableRoom.Hide();
-                drawableRoom.Expire();
-
-                roomFlow.Remove(drawableRoom, false);
-                AddInternal(drawableRoom);
+                roomFlow.RemoveAll(d => d.Room == r, true);
 
                 // selection may have a lease due to being in a sub screen.
                 if (!SelectedRoom.Disabled)
                     SelectedRoom.Value = null;
             }
+        }
+
+        private void clearRooms()
+        {
+            roomFlow.Clear();
+
+            // selection may have a lease due to being in a sub screen.
+            if (!SelectedRoom.Disabled)
+                SelectedRoom.Value = null;
         }
 
         private void updateSorting()
