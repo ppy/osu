@@ -272,20 +272,16 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
                 {
                     case OsuAction.LeftButton:
                     case OsuAction.RightButton:
-                        // Only update closest press position while the object hasn't been hit yet.
-                        if (HitAction == null)
+                        if (ClosestPressPosition is Vector2 curClosest)
                         {
-                            if (ClosestPressPosition is Vector2 curClosest)
-                            {
-                                float oldDist = Vector2.DistanceSquared(curClosest, ScreenSpaceDrawQuad.Centre);
-                                float newDist = Vector2.DistanceSquared(e.ScreenSpaceMousePosition, ScreenSpaceDrawQuad.Centre);
+                            float oldDist = Vector2.DistanceSquared(curClosest, ScreenSpaceDrawQuad.Centre);
+                            float newDist = Vector2.DistanceSquared(e.ScreenSpaceMousePosition, ScreenSpaceDrawQuad.Centre);
 
-                                if (newDist < oldDist)
-                                    ClosestPressPosition = e.ScreenSpaceMousePosition;
-                            }
-                            else
+                            if (newDist < oldDist)
                                 ClosestPressPosition = e.ScreenSpaceMousePosition;
                         }
+                        else
+                            ClosestPressPosition = e.ScreenSpaceMousePosition;
 
                         if (IsHovered)
                         {
