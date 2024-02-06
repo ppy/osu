@@ -197,7 +197,9 @@ namespace osu.Game.Rulesets.Osu.Statistics
 
                     var point = new HitPoint(pointType, this)
                     {
-                        BaseColour = pointType == HitPointType.Hit ? new Color4(102, 255, 204, 255) : new Color4(255, 102, 102, 255)
+                        BaseColour = pointType == HitPointType.Hit
+                            ? new Color4(102, 255, 204, 255)
+                            : new Color4(255, 102, 102, 255)
                     };
 
                     points[r][c] = point;
@@ -250,12 +252,15 @@ namespace osu.Game.Rulesets.Osu.Statistics
             var rotatedCoordinate = -1 * new Vector2((float)Math.Cos(rotatedAngle), (float)Math.Sin(rotatedAngle));
 
             Vector2 localCentre = new Vector2(points_per_dimension - 1) / 2;
-            float localRadius = localCentre.X * inner_portion * normalisedDistance; // The radius inside the inner portion which of the heatmap which the closest point lies.
+            float localRadius = localCentre.X * inner_portion * normalisedDistance;
             Vector2 localPoint = localCentre + localRadius * rotatedCoordinate;
 
             // Find the most relevant hit point.
-            int r = Math.Clamp((int)Math.Round(localPoint.Y), 0, points_per_dimension - 1);
-            int c = Math.Clamp((int)Math.Round(localPoint.X), 0, points_per_dimension - 1);
+            int r = (int)Math.Round(localPoint.Y);
+            int c = (int)Math.Round(localPoint.X);
+
+            if (r < 0 || r >= points_per_dimension || c < 0 || c >= points_per_dimension)
+                return;
 
             PeakValue = Math.Max(PeakValue, ((HitPoint)pointGrid.Content[r][c]).Increment());
 
@@ -298,28 +303,35 @@ namespace osu.Game.Rulesets.Osu.Statistics
             {
                 base.Update();
 
-                // the point at which alpha is saturated and we begin to adjust colour lightness.
-                const float lighten_cutoff = 0.95f;
-
-                // the amount of lightness to attribute regardless of relative value to peak point.
-                const float non_relative_portion = 0.2f;
-
-                float amount = 0;
-
-                // give some amount of alpha regardless of relative count
-                amount += non_relative_portion * Math.Min(1, count / 10f);
-
-                // add relative portion
-                amount += (1 - non_relative_portion) * (count / heatmap.PeakValue);
-
-                // apply easing
-                amount = (float)Interpolation.ApplyEasing(Easing.OutQuint, Math.Min(1, amount));
-
-                Debug.Assert(amount <= 1);
-
-                Alpha = Math.Min(amount / lighten_cutoff, 1);
                 if (pointType == HitPointType.Hit)
+                {
+                    // the point at which alpha is saturated and we begin to adjust colour lightness.
+                    const float lighten_cutoff = 0.95f;
+
+                    // the amount of lightness to attribute regardless of relative value to peak point.
+                    const float non_relative_portion = 0.2f;
+
+                    float amount = 0;
+
+                    // give some amount of alpha regardless of relative count
+                    amount += non_relative_portion * Math.Min(1, count / 10f);
+
+                    // add relative portion
+                    amount += (1 - non_relative_portion) * (count / heatmap.PeakValue);
+
+                    // apply easing
+                    amount = (float)Interpolation.ApplyEasing(Easing.OutQuint, Math.Min(1, amount));
+
+                    Debug.Assert(amount <= 1);
+
+                    Alpha = Math.Min(amount / lighten_cutoff, 1);
                     Colour = BaseColour.Lighten(Math.Max(0, amount - lighten_cutoff));
+                }
+                else
+                {
+                    Alpha = 0.8f;
+                    Colour = BaseColour;
+                }
             }
         }
 

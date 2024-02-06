@@ -10,7 +10,6 @@ using JetBrains.Annotations;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
-using osu.Framework.Input;
 using osu.Framework.Input.Bindings;
 using osu.Framework.Input.Events;
 using osu.Game.Graphics.Containers;
@@ -43,7 +42,6 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
         Drawable IHasApproachCircle.ApproachCircle => ApproachCircle;
 
         private Container scaleContainer;
-        private InputManager inputManager;
 
         public DrawableHitCircle()
             : this(null)
@@ -73,14 +71,8 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
                     {
                         HitArea = new HitReceptor
                         {
-                            Hit = () =>
-                            {
-                                if (AllJudged)
-                                    return false;
-
-                                UpdateResult(true);
-                                return true;
-                            },
+                            CanBeHit = () => !AllJudged,
+                            Hit = () => UpdateResult(true)
                         },
                         shakeContainer = new ShakeContainer
                         {
@@ -112,13 +104,6 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
             PositionBindable.BindValueChanged(_ => UpdatePosition());
             StackHeightBindable.BindValueChanged(_ => UpdatePosition());
             ScaleBindable.BindValueChanged(scale => scaleContainer.Scale = new Vector2(scale.NewValue));
-        }
-
-        protected override void LoadComplete()
-        {
-            base.LoadComplete();
-
-            inputManager = GetContainingInputManager();
         }
 
         public override double LifetimeStart
@@ -155,7 +140,15 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
             if (!userTriggered)
             {
                 if (!HitObject.HitWindows.CanBeHit(timeOffset))
-                    ApplyMinResult();
+                {
+                    ApplyResult((r, position) =>
+                    {
+                        var circleResult = (OsuHitCircleJudgementResult)r;
+
+                        circleResult.Type = r.Judgement.MinResult;
+                        circleResult.CursorPositionAtHit = position;
+                    }, computeHitPosition());
+                }
 
                 return;
             }
@@ -169,22 +162,21 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
             if (result == HitResult.None || clickAction != ClickAction.Hit)
                 return;
 
-            Vector2? hitPosition = null;
-
-            // Todo: This should also consider misses, but they're a little more interesting to handle, since we don't necessarily know the position at the time of a miss.
-            if (result.IsHit())
-            {
-                var localMousePosition = ToLocalSpace(inputManager.CurrentState.Mouse.Position);
-                hitPosition = HitObject.StackedPosition + (localMousePosition - DrawSize / 2);
-            }
-
             ApplyResult<(HitResult result, Vector2? position)>((r, state) =>
             {
                 var circleResult = (OsuHitCircleJudgementResult)r;
 
                 circleResult.Type = state.result;
                 circleResult.CursorPositionAtHit = state.position;
-            }, (result, hitPosition));
+            }, (result, computeHitPosition()));
+        }
+
+        private Vector2? computeHitPosition()
+        {
+            if (HitArea.ClosestPressPosition is Vector2 screenSpaceHitPosition)
+                return HitObject.StackedPosition + (ToLocalSpace(screenSpaceHitPosition) - DrawSize / 2);
+
+            return null;
         }
 
         /// <summary>
@@ -227,6 +219,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
                     break;
 
                 case ArmedState.Idle:
+                    HitArea.ClosestPressPosition = null;
                     HitArea.HitAction = null;
                     break;
 
@@ -247,9 +240,11 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
             // IsHovered is used
             public override bool HandlePositionalInput => true;
 
-            public Func<bool> Hit;
+            public Func<bool> CanBeHit;
+            public Action Hit;
 
             public OsuAction? HitAction;
+            public Vector2? ClosestPressPosition;
 
             public HitReceptor()
             {
@@ -264,12 +259,31 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
 
             public bool OnPressed(KeyBindingPressEvent<OsuAction> e)
             {
+                if (!(CanBeHit?.Invoke() ?? false))
+                    return false;
+
                 switch (e.Action)
                 {
                     case OsuAction.LeftButton:
                     case OsuAction.RightButton:
-                        if (IsHovered && (Hit?.Invoke() ?? false))
+                        // Only update closest press position while the object hasn't been hit yet.
+                        if (HitAction == null)
                         {
+                            if (ClosestPressPosition is Vector2 curClosest)
+                            {
+                                float oldDist = Vector2.DistanceSquared(curClosest, ScreenSpaceDrawQuad.Centre);
+                                float newDist = Vector2.DistanceSquared(e.ScreenSpaceMousePosition, ScreenSpaceDrawQuad.Centre);
+
+                                if (newDist < oldDist)
+                                    ClosestPressPosition = e.ScreenSpaceMousePosition;
+                            }
+                            else
+                                ClosestPressPosition = e.ScreenSpaceMousePosition;
+                        }
+
+                        if (IsHovered)
+                        {
+                            Hit?.Invoke();
                             HitAction ??= e.Action;
                             return true;
                         }
