@@ -251,7 +251,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
 
             public bool OnPressed(KeyBindingPressEvent<OsuAction> e)
             {
-                if (CanBeHit())
+                if (!CanBeHit())
                     return false;
 
                 switch (e.Action)
