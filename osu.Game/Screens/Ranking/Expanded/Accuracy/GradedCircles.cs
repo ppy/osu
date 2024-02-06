@@ -20,49 +20,45 @@ namespace osu.Game.Screens.Ranking.Expanded.Accuracy
             set
             {
                 progress = value;
-                dProgress.RevealProgress = value;
-                cProgress.RevealProgress = value;
-                bProgress.RevealProgress = value;
-                aProgress.RevealProgress = value;
-                sProgress.RevealProgress = value;
-                xProgress.RevealProgress = value;
+
+                foreach (var circle in circles)
+                    circle.RevealProgress = value;
             }
         }
 
-        private readonly GradedCircle dProgress;
-        private readonly GradedCircle cProgress;
-        private readonly GradedCircle bProgress;
-        private readonly GradedCircle aProgress;
-        private readonly GradedCircle sProgress;
-        private readonly GradedCircle xProgress;
+        private readonly Container<GradedCircle> circles;
 
         public GradedCircles(double accuracyC, double accuracyB, double accuracyA, double accuracyS, double accuracyX)
         {
-            InternalChildren = new Drawable[]
+            InternalChild = circles = new Container<GradedCircle>
             {
-                dProgress = new GradedCircle(0.0, accuracyC)
+                RelativeSizeAxes = Axes.Both,
+                Children = new[]
                 {
-                    Colour = OsuColour.ForRank(ScoreRank.D),
-                },
-                cProgress = new GradedCircle(accuracyC, accuracyB)
-                {
-                    Colour = OsuColour.ForRank(ScoreRank.C),
-                },
-                bProgress = new GradedCircle(accuracyB, accuracyA)
-                {
-                    Colour = OsuColour.ForRank(ScoreRank.B),
-                },
-                aProgress = new GradedCircle(accuracyA, accuracyS)
-                {
-                    Colour = OsuColour.ForRank(ScoreRank.A),
-                },
-                sProgress = new GradedCircle(accuracyS, accuracyX - AccuracyCircle.VIRTUAL_SS_PERCENTAGE)
-                {
-                    Colour = OsuColour.ForRank(ScoreRank.S),
-                },
-                xProgress = new GradedCircle(accuracyX - AccuracyCircle.VIRTUAL_SS_PERCENTAGE, 1.0)
-                {
-                    Colour = OsuColour.ForRank(ScoreRank.X)
+                    new GradedCircle(0.0, accuracyC)
+                    {
+                        Colour = OsuColour.ForRank(ScoreRank.D),
+                    },
+                    new GradedCircle(accuracyC, accuracyB)
+                    {
+                        Colour = OsuColour.ForRank(ScoreRank.C),
+                    },
+                    new GradedCircle(accuracyB, accuracyA)
+                    {
+                        Colour = OsuColour.ForRank(ScoreRank.B),
+                    },
+                    new GradedCircle(accuracyA, accuracyS)
+                    {
+                        Colour = OsuColour.ForRank(ScoreRank.A),
+                    },
+                    new GradedCircle(accuracyS, accuracyX - AccuracyCircle.VIRTUAL_SS_PERCENTAGE)
+                    {
+                        Colour = OsuColour.ForRank(ScoreRank.S),
+                    },
+                    new GradedCircle(accuracyX - AccuracyCircle.VIRTUAL_SS_PERCENTAGE, 1.0)
+                    {
+                        Colour = OsuColour.ForRank(ScoreRank.X)
+                    }
                 }
             };
         }
