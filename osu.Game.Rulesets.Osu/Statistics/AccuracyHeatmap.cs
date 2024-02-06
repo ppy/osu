@@ -9,6 +9,7 @@ using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
+using osu.Framework.Graphics.Sprites;
 using osu.Framework.Utils;
 using osu.Game.Beatmaps;
 using osu.Game.Graphics;
@@ -191,18 +192,22 @@ namespace osu.Game.Rulesets.Osu.Statistics
 
                 for (int c = 0; c < points_per_dimension; c++)
                 {
-                    HitPointType pointType = Vector2.Distance(new Vector2(c + 0.5f, r + 0.5f), centre) <= innerRadius
-                        ? HitPointType.Hit
-                        : HitPointType.Miss;
+                    bool isHit = Vector2.Distance(new Vector2(c + 0.5f, r + 0.5f), centre) <= innerRadius;
 
-                    var point = new HitPoint(pointType, this)
+                    if (isHit)
                     {
-                        BaseColour = pointType == HitPointType.Hit
-                            ? new Color4(102, 255, 204, 255)
-                            : new Color4(255, 102, 102, 255)
-                    };
-
-                    points[r][c] = point;
+                        points[r][c] = new HitPoint(this)
+                        {
+                            BaseColour = new Color4(102, 255, 204, 255)
+                        };
+                    }
+                    else
+                    {
+                        points[r][c] = new MissPoint
+                        {
+                            BaseColour = new Color4(255, 102, 102, 255)
+                        };
+                    }
                 }
             }
 
@@ -262,33 +267,21 @@ namespace osu.Game.Rulesets.Osu.Statistics
             if (r < 0 || r >= points_per_dimension || c < 0 || c >= points_per_dimension)
                 return;
 
-            PeakValue = Math.Max(PeakValue, ((HitPoint)pointGrid.Content[r][c]).Increment());
+            PeakValue = Math.Max(PeakValue, ((GridPoint)pointGrid.Content[r][c]).Increment());
 
             bufferedGrid.ForceRedraw();
         }
 
-        private partial class HitPoint : Circle
+        private abstract partial class GridPoint : CompositeDrawable
         {
             /// <summary>
             /// The base colour which will be lightened/darkened depending on the value of this <see cref="HitPoint"/>.
             /// </summary>
             public Color4 BaseColour;
 
-            private readonly HitPointType pointType;
-            private readonly AccuracyHeatmap heatmap;
+            public override bool IsPresent => Count > 0;
 
-            public override bool IsPresent => count > 0;
-
-            public HitPoint(HitPointType pointType, AccuracyHeatmap heatmap)
-            {
-                this.pointType = pointType;
-                this.heatmap = heatmap;
-
-                RelativeSizeAxes = Axes.Both;
-                Alpha = 1;
-            }
-
-            private int count;
+            protected int Count { get; private set; }
 
             /// <summary>
             /// Increment the value of this point by one.
@@ -296,49 +289,69 @@ namespace osu.Game.Rulesets.Osu.Statistics
             /// <returns>The value after incrementing.</returns>
             public int Increment()
             {
-                return ++count;
+                return ++Count;
+            }
+        }
+
+        private partial class MissPoint : GridPoint
+        {
+            public MissPoint()
+            {
+                RelativeSizeAxes = Axes.Both;
+
+                InternalChild = new SpriteIcon
+                {
+                    RelativeSizeAxes = Axes.Both,
+                    Icon = FontAwesome.Solid.Times
+                };
+            }
+
+            protected override void Update()
+            {
+                Alpha = 0.8f;
+                Colour = BaseColour;
+            }
+        }
+
+        private partial class HitPoint : GridPoint
+        {
+            private readonly AccuracyHeatmap heatmap;
+
+            public HitPoint(AccuracyHeatmap heatmap)
+            {
+                this.heatmap = heatmap;
+
+                RelativeSizeAxes = Axes.Both;
+
+                InternalChild = new Circle { RelativeSizeAxes = Axes.Both };
             }
 
             protected override void Update()
             {
                 base.Update();
 
-                if (pointType == HitPointType.Hit)
-                {
-                    // the point at which alpha is saturated and we begin to adjust colour lightness.
-                    const float lighten_cutoff = 0.95f;
+                // the point at which alpha is saturated and we begin to adjust colour lightness.
+                const float lighten_cutoff = 0.95f;
 
-                    // the amount of lightness to attribute regardless of relative value to peak point.
-                    const float non_relative_portion = 0.2f;
+                // the amount of lightness to attribute regardless of relative value to peak point.
+                const float non_relative_portion = 0.2f;
 
-                    float amount = 0;
+                float amount = 0;
 
-                    // give some amount of alpha regardless of relative count
-                    amount += non_relative_portion * Math.Min(1, count / 10f);
+                // give some amount of alpha regardless of relative count
+                amount += non_relative_portion * Math.Min(1, Count / 10f);
 
-                    // add relative portion
-                    amount += (1 - non_relative_portion) * (count / heatmap.PeakValue);
+                // add relative portion
+                amount += (1 - non_relative_portion) * (Count / heatmap.PeakValue);
 
-                    // apply easing
-                    amount = (float)Interpolation.ApplyEasing(Easing.OutQuint, Math.Min(1, amount));
+                // apply easing
+                amount = (float)Interpolation.ApplyEasing(Easing.OutQuint, Math.Min(1, amount));
 
-                    Debug.Assert(amount <= 1);
+                Debug.Assert(amount <= 1);
 
-                    Alpha = Math.Min(amount / lighten_cutoff, 1);
-                    Colour = BaseColour.Lighten(Math.Max(0, amount - lighten_cutoff));
-                }
-                else
-                {
-                    Alpha = 0.8f;
-                    Colour = BaseColour;
-                }
+                Alpha = Math.Min(amount / lighten_cutoff, 1);
+                Colour = BaseColour.Lighten(Math.Max(0, amount - lighten_cutoff));
             }
-        }
-
-        private enum HitPointType
-        {
-            Hit,
-            Miss
         }
     }
 }
