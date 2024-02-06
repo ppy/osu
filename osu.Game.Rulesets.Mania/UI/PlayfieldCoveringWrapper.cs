@@ -1,6 +1,7 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Extensions.Color4Extensions;
@@ -8,6 +9,7 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Colour;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
+using osu.Framework.Utils;
 using osu.Game.Rulesets.UI.Scrolling;
 using osuTK;
 using osuTK.Graphics;
@@ -103,11 +105,20 @@ namespace osu.Game.Rulesets.Mania.UI
         {
             base.LoadComplete();
 
-            Coverage.BindValueChanged(c =>
-            {
-                filled.Height = c.NewValue;
-                gradient.Y = -c.NewValue;
-            }, true);
+            updateHeight(Coverage.Value);
+        }
+
+        protected override void Update()
+        {
+            base.Update();
+
+            updateHeight((float)Interpolation.DampContinuously(filled.Height, Coverage.Value, 25, Math.Abs(Time.Elapsed)));
+        }
+
+        private void updateHeight(float height)
+        {
+            filled.Height = height;
+            gradient.Y = -height;
         }
 
         private void onScrollDirectionChanged(ValueChangedEvent<ScrollingDirection> direction)
