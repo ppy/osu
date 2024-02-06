@@ -1,12 +1,9 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
-using JetBrains.Annotations;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
@@ -27,33 +24,29 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
 {
     public partial class DrawableHitCircle : DrawableOsuHitObject, IHasApproachCircle
     {
-        public OsuAction? HitAction => HitArea?.HitAction;
+        public OsuAction? HitAction => HitArea.HitAction;
         protected virtual OsuSkinComponents CirclePieceComponent => OsuSkinComponents.HitCircle;
 
-        public SkinnableDrawable ApproachCircle { get; private set; }
-        public HitReceptor HitArea { get; private set; }
-        public SkinnableDrawable CirclePiece { get; private set; }
+        public SkinnableDrawable ApproachCircle { get; private set; } = null!;
+        public HitReceptor HitArea { get; private set; } = null!;
+        public SkinnableDrawable CirclePiece { get; private set; } = null!;
 
-        protected override IEnumerable<Drawable> DimmablePieces => new[]
-        {
-            CirclePiece,
-        };
+        protected override IEnumerable<Drawable> DimmablePieces => new[] { CirclePiece };
 
         Drawable IHasApproachCircle.ApproachCircle => ApproachCircle;
 
-        private Container scaleContainer;
+        private Container scaleContainer = null!;
+        private ShakeContainer shakeContainer = null!;
 
         public DrawableHitCircle()
             : this(null)
         {
         }
 
-        public DrawableHitCircle([CanBeNull] HitCircle h = null)
+        public DrawableHitCircle(HitCircle? h = null)
             : base(h)
         {
         }
-
-        private ShakeContainer shakeContainer;
 
         [BackgroundDependencyLoader]
         private void load()
@@ -219,8 +212,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
                     break;
 
                 case ArmedState.Idle:
-                    HitArea.ClosestPressPosition = null;
-                    HitArea.HitAction = null;
+                    HitArea.Reset();
                     break;
 
                 case ArmedState.Miss:
@@ -240,11 +232,11 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
             // IsHovered is used
             public override bool HandlePositionalInput => true;
 
-            public Func<bool> CanBeHit;
-            public Action Hit;
+            public required Func<bool> CanBeHit { get; set; }
+            public required Action Hit { get; set; }
 
-            public OsuAction? HitAction;
-            public Vector2? ClosestPressPosition;
+            public OsuAction? HitAction { get; private set; }
+            public Vector2? ClosestPressPosition { get; private set; }
 
             public HitReceptor()
             {
@@ -259,7 +251,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
 
             public bool OnPressed(KeyBindingPressEvent<OsuAction> e)
             {
-                if (!(CanBeHit?.Invoke() ?? false))
+                if (CanBeHit())
                     return false;
 
                 switch (e.Action)
@@ -283,7 +275,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
 
                         if (IsHovered)
                         {
-                            Hit?.Invoke();
+                            Hit();
                             HitAction ??= e.Action;
                             return true;
                         }
@@ -297,13 +289,19 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
             public void OnReleased(KeyBindingReleaseEvent<OsuAction> e)
             {
             }
+
+            public void Reset()
+            {
+                HitAction = null;
+                ClosestPressPosition = null;
+            }
         }
 
         private partial class ProxyableSkinnableDrawable : SkinnableDrawable
         {
             public override bool RemoveWhenNotAlive => false;
 
-            public ProxyableSkinnableDrawable(ISkinComponentLookup lookup, Func<ISkinComponentLookup, Drawable> defaultImplementation = null, ConfineMode confineMode = ConfineMode.NoScaling)
+            public ProxyableSkinnableDrawable(ISkinComponentLookup lookup, Func<ISkinComponentLookup, Drawable>? defaultImplementation = null, ConfineMode confineMode = ConfineMode.NoScaling)
                 : base(lookup, defaultImplementation, confineMode)
             {
             }
