@@ -39,5 +39,15 @@ namespace osu.Game.Overlays.Rankings
                 Icon = OsuIcon.Ranking;
             }
         }
+
+        protected override void LoadComplete()
+        {
+            base.LoadComplete();
+
+            Current.BindValueChanged(scope =>
+            {
+                rulesetSelector.FadeTo(scope.NewValue <= RankingsScope.Country ? 1 : 0, 200, Easing.OutQuint);
+            });
+        }
     }
 }
