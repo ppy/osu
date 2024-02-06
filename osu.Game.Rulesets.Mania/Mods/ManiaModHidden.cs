@@ -13,9 +13,9 @@ namespace osu.Game.Rulesets.Mania.Mods
     public class ManiaModHidden : ManiaModWithPlayfieldCover
     {
         /// <summary>
-        /// osu!stable is referenced to 480px.
+        /// osu!stable is referenced to 768px.
         /// </summary>
-        private const float playfield_height = 480;
+        private const float playfield_height = 768;
 
         private const float min_coverage = 160f / playfield_height;
         private const float max_coverage = 400f / playfield_height;
