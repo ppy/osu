@@ -41,7 +41,7 @@ namespace osu.Game.Rulesets.Mania.Mods
                 {
                     c.RelativeSizeAxes = Axes.Both;
                     c.Direction = ExpandDirection;
-                    c.Coverage = Coverage.Value;
+                    c.Coverage.BindTo(Coverage);
                 }));
             }
         }

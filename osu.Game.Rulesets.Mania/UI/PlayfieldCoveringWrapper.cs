@@ -20,6 +20,11 @@ namespace osu.Game.Rulesets.Mania.UI
     public partial class PlayfieldCoveringWrapper : CompositeDrawable
     {
         /// <summary>
+        /// The relative area that should be completely covered. This does not include the fade.
+        /// </summary>
+        public readonly BindableFloat Coverage = new BindableFloat();
+
+        /// <summary>
         /// The complete cover, including gradient and fill.
         /// </summary>
         private readonly Drawable cover;
@@ -94,20 +99,19 @@ namespace osu.Game.Rulesets.Mania.UI
             scrollDirection.BindValueChanged(onScrollDirectionChanged, true);
         }
 
+        protected override void LoadComplete()
+        {
+            base.LoadComplete();
+
+            Coverage.BindValueChanged(c =>
+            {
+                filled.Height = c.NewValue;
+                gradient.Y = -c.NewValue;
+            }, true);
+        }
+
         private void onScrollDirectionChanged(ValueChangedEvent<ScrollingDirection> direction)
             => cover.Rotation = direction.NewValue == ScrollingDirection.Up ? 0 : 180f;
-
-        /// <summary>
-        /// The relative area that should be completely covered. This does not include the fade.
-        /// </summary>
-        public float Coverage
-        {
-            set
-            {
-                filled.Height = value;
-                gradient.Y = -value;
-            }
-        }
 
         /// <summary>
         /// The direction in which the cover expands.
