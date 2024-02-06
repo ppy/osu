@@ -18,7 +18,7 @@
   </ItemGroup>
   <PropertyGroup Label="Project">
     <OutputType>WinExe</OutputType>
-    <TargetFramework>net6.0</TargetFramework>
+    <TargetFramework>net8.0</TargetFramework>
     <RootNamespace>osu.Game.Rulesets.EmptyFreeform.Tests</RootNamespace>
   </PropertyGroup>
 </Project>
