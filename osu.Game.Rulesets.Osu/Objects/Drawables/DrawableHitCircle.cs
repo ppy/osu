@@ -232,10 +232,24 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
             // IsHovered is used
             public override bool HandlePositionalInput => true;
 
+            /// <summary>
+            /// Whether the hitobject can still be hit at the current point in time.
+            /// </summary>
             public required Func<bool> CanBeHit { get; set; }
+
+            /// <summary>
+            /// An action that's invoked to perform the hit.
+            /// </summary>
             public required Action Hit { get; set; }
 
+            /// <summary>
+            /// The <see cref="OsuAction"/> with which the hit was attempted.
+            /// </summary>
             public OsuAction? HitAction { get; private set; }
+
+            /// <summary>
+            /// The closest position to the hit receptor at the point where the hit was attempted.
+            /// </summary>
             public Vector2? ClosestPressPosition { get; private set; }
 
             public HitReceptor()
@@ -290,6 +304,9 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
             {
             }
 
+            /// <summary>
+            /// Resets to a fresh state.
+            /// </summary>
             public void Reset()
             {
                 HitAction = null;
