@@ -61,8 +61,11 @@ namespace osu.Game.Skinning
             {
                 // unfortunately at this level of lookup we can encounter `@2x` scale suffixes in the name,
                 // so straight equality cannot be used.
-                if (name.StartsWith(grayscaleSprite, StringComparison.OrdinalIgnoreCase))
+                if (name.Equals(grayscaleSprite, StringComparison.OrdinalIgnoreCase)
+                    || name.Equals($@"{grayscaleSprite}@2x", StringComparison.OrdinalIgnoreCase))
+                {
                     return true;
+                }
             }
 
             return false;
