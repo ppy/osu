@@ -14,7 +14,7 @@ using osu.Game.Rulesets.UI;
 
 namespace osu.Game.Rulesets.Mania.Mods
 {
-    public abstract class ManiaModPlayfieldCover : ModHidden, IApplicableToDrawableRuleset<ManiaHitObject>
+    public abstract class ManiaModWithPlayfieldCover : ModHidden, IApplicableToDrawableRuleset<ManiaHitObject>
     {
         public override Type[] IncompatibleMods => new[] { typeof(ModFlashlight<ManiaHitObject>) };
 
@@ -23,6 +23,9 @@ namespace osu.Game.Rulesets.Mania.Mods
         /// </summary>
         protected abstract CoverExpandDirection ExpandDirection { get; }
 
+        /// <summary>
+        /// The relative area that should be completely covered. This does not include the fade.
+        /// </summary>
         public abstract BindableNumber<float> Coverage { get; }
 
         public virtual void ApplyToDrawableRuleset(DrawableRuleset<ManiaHitObject> drawableRuleset)

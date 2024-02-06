@@ -15,7 +15,11 @@ namespace osu.Game.Rulesets.Mania.Mods
         public override LocalisableString Description => @"Keys appear out of nowhere!";
         public override double ScoreMultiplier => 1;
 
-        public override Type[] IncompatibleMods => base.IncompatibleMods.Append(typeof(ManiaModHidden)).ToArray();
+        public override Type[] IncompatibleMods => base.IncompatibleMods.Concat(new[]
+        {
+            typeof(ManiaModHidden),
+            typeof(ManiaModCover)
+        }).ToArray();
 
         protected override CoverExpandDirection ExpandDirection => CoverExpandDirection.AlongScroll;
     }
