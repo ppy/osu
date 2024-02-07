@@ -54,7 +54,7 @@ namespace osu.Game.Screens.Play
         /// <summary>
         /// The delay upon resuming from pause screen if ruleset.ResumeDelayed is on
         /// </summary>
-        public const double RESUME_DELAY = 500.0;
+        public const double RESUME_DELAY = 800.0;
 
         /// <summary>
         /// Raised after <see cref="StartGameplay"/> is called.
