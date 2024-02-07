@@ -173,7 +173,7 @@ namespace osu.Desktop.Windows
 
         #endregion
 
-        private record FileAssociation(string Extension, LocalisableString Description, Win32Icon Icon)
+        private record FileAssociation(string Extension, LocalisableString Description, string IconPath)
         {
             private string getProgramId(string prefix) => $@"{prefix}.File{Extension}";
 
@@ -188,7 +188,7 @@ namespace osu.Desktop.Windows
                 using (var programKey = classes.CreateSubKey(programId))
                 {
                     using (var defaultIconKey = programKey.CreateSubKey(DEFAULT_ICON))
-                        defaultIconKey.SetValue(null, Icon.Path);
+                        defaultIconKey.SetValue(null, IconPath);
 
                     using (var openCommandKey = programKey.CreateSubKey(SHELL_OPEN_COMMAND))
                         openCommandKey.SetValue(null, $@"""{exePath}"" ""%1""");
@@ -225,7 +225,7 @@ namespace osu.Desktop.Windows
             }
         }
 
-        private record UriAssociation(string Protocol, LocalisableString Description, Win32Icon Icon)
+        private record UriAssociation(string Protocol, LocalisableString Description, string IconPath)
         {
             /// <summary>
             /// "The <c>URL Protocol</c> string value indicates that this key declares a custom pluggable protocol handler."
@@ -243,7 +243,7 @@ namespace osu.Desktop.Windows
                     protocolKey.SetValue(URL_PROTOCOL, string.Empty);
 
                     using (var defaultIconKey = protocolKey.CreateSubKey(DEFAULT_ICON))
-                        defaultIconKey.SetValue(null, Icon.Path);
+                        defaultIconKey.SetValue(null, IconPath);
 
                     using (var openCommandKey = protocolKey.CreateSubKey(SHELL_OPEN_COMMAND))
                         openCommandKey.SetValue(null, $@"""{exePath}"" ""%1""");
