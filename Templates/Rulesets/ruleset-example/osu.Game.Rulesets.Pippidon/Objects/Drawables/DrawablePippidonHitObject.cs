@@ -9,7 +9,6 @@ using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.Textures;
 using osu.Game.Audio;
 using osu.Game.Rulesets.Objects.Drawables;
-using osu.Game.Rulesets.Scoring;
 using osuTK;
 using osuTK.Graphics;
 
@@ -49,7 +48,12 @@ namespace osu.Game.Rulesets.Pippidon.Objects.Drawables
         protected override void CheckForResult(bool userTriggered, double timeOffset)
         {
             if (timeOffset >= 0)
-                ApplyResult(r => r.Type = IsHovered ? HitResult.Perfect : HitResult.Miss);
+            {
+                if (IsHovered)
+                    ApplyMaxResult();
+                else
+                    ApplyMinResult();
+            }
         }
 
         protected override double InitialLifetimeOffset => time_preempt;

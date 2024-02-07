@@ -25,7 +25,10 @@ namespace osu.Game.Rulesets.Mania.Objects.Drawables
         {
             if (AllJudged) return;
 
-            ApplyResult(r => r.Type = hit ? r.Judgement.MaxResult : r.Judgement.MinResult);
+            if (hit)
+                ApplyMaxResult();
+            else
+                ApplyMinResult();
         }
     }
 }
