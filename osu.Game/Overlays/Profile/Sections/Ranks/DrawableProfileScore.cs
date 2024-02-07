@@ -213,22 +213,36 @@ namespace osu.Game.Overlays.Profile.Sections.Ranks
 
         private Drawable createDrawablePerformance()
         {
-            if (!Score.PP.HasValue)
+            if (Score.PP.HasValue)
             {
-                if (Score.Beatmap?.Status.GrantsPerformancePoints() == true)
+                return new FillFlowContainer
                 {
-                    if (!Score.Ranked)
+                    AutoSizeAxes = Axes.Both,
+                    Direction = FillDirection.Horizontal,
+                    Children = new[]
                     {
-                        return new UnrankedPerformancePointsPlaceholder
+                        new OsuSpriteText
                         {
+                            Anchor = Anchor.BottomLeft,
+                            Origin = Anchor.BottomLeft,
                             Font = OsuFont.GetFont(weight: FontWeight.Bold),
+                            Text = $"{Score.PP:0}",
                             Colour = colourProvider.Highlight1
-                        };
+                        },
+                        new OsuSpriteText
+                        {
+                            Anchor = Anchor.BottomLeft,
+                            Origin = Anchor.BottomLeft,
+                            Font = OsuFont.GetFont(size: 12, weight: FontWeight.Bold),
+                            Text = "pp",
+                            Colour = colourProvider.Light3
+                        }
                     }
+                };
+            }
 
-                    return new UnprocessedPerformancePointsPlaceholder { Size = new Vector2(16), Colour = colourProvider.Highlight1 };
-                }
-
+            if (Score.Beatmap?.Status.GrantsPerformancePoints() != true)
+            {
                 return new OsuSpriteText
                 {
                     Font = OsuFont.GetFont(weight: FontWeight.Bold),
@@ -237,30 +251,16 @@ namespace osu.Game.Overlays.Profile.Sections.Ranks
                 };
             }
 
-            return new FillFlowContainer
+            if (!Score.Ranked)
             {
-                AutoSizeAxes = Axes.Both,
-                Direction = FillDirection.Horizontal,
-                Children = new[]
+                return new UnrankedPerformancePointsPlaceholder
                 {
-                    new OsuSpriteText
-                    {
-                        Anchor = Anchor.BottomLeft,
-                        Origin = Anchor.BottomLeft,
-                        Font = OsuFont.GetFont(weight: FontWeight.Bold),
-                        Text = $"{Score.PP:0}",
-                        Colour = colourProvider.Highlight1
-                    },
-                    new OsuSpriteText
-                    {
-                        Anchor = Anchor.BottomLeft,
-                        Origin = Anchor.BottomLeft,
-                        Font = OsuFont.GetFont(size: 12, weight: FontWeight.Bold),
-                        Text = "pp",
-                        Colour = colourProvider.Light3
-                    }
-                }
-            };
+                    Font = OsuFont.GetFont(weight: FontWeight.Bold),
+                    Colour = colourProvider.Highlight1
+                };
+            }
+
+            return new UnprocessedPerformancePointsPlaceholder { Size = new Vector2(16), Colour = colourProvider.Highlight1 };
         }
 
         private partial class ScoreBeatmapMetadataContainer : BeatmapMetadataContainer
