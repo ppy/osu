@@ -55,24 +55,31 @@ namespace osu.Desktop.Windows
         {
             try
             {
-                using (var classes = Registry.CurrentUser.OpenSubKey(SOFTWARE_CLASSES, writable: true))
-                {
-                    if (classes == null)
-                        return;
-
-                    foreach (var association in file_associations)
-                        association.Install(classes, EXE_PATH, PROGRAM_ID_PREFIX);
-
-                    foreach (var association in uri_associations)
-                        association.Install(classes, EXE_PATH);
-                }
-
+                updateAssociations();
                 updateDescriptions(localisation);
                 NotifyShellUpdate();
             }
             catch (Exception e)
             {
                 Logger.Log(@$"Failed to install file and URI associations: {e.Message}");
+            }
+        }
+
+        /// <summary>
+        /// Installs or updates associations.
+        /// </summary>
+        private static void updateAssociations()
+        {
+            using (var classes = Registry.CurrentUser.OpenSubKey(SOFTWARE_CLASSES, writable: true))
+            {
+                if (classes == null)
+                    return;
+
+                foreach (var association in file_associations)
+                    association.Install(classes, EXE_PATH, PROGRAM_ID_PREFIX);
+
+                foreach (var association in uri_associations)
+                    association.Install(classes, EXE_PATH);
             }
         }
 
