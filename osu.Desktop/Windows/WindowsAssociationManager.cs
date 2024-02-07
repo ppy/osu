@@ -103,6 +103,28 @@ namespace osu.Desktop.Windows
             }
         }
 
+        public static void UninstallAssociations()
+        {
+            try
+            {
+                using var classes = Registry.CurrentUser.OpenSubKey(SOFTWARE_CLASSES, true);
+                if (classes == null)
+                    return;
+
+                foreach (var association in file_associations)
+                    association.Uninstall(classes, PROGRAM_ID_PREFIX);
+
+                foreach (var association in uri_associations)
+                    association.Uninstall(classes);
+
+                NotifyShellUpdate();
+            }
+            catch (Exception e)
+            {
+                Logger.Log($@"Failed to uninstall file and URI associations: {e.Message}");
+            }
+        }
+
         /// <summary>
         /// Installs or updates associations.
         /// </summary>
@@ -141,28 +163,6 @@ namespace osu.Desktop.Windows
                 var b = localisation.GetLocalisedBindableString(s);
                 b.UnbindAll();
                 return b.Value;
-            }
-        }
-
-        public static void UninstallAssociations()
-        {
-            try
-            {
-                using var classes = Registry.CurrentUser.OpenSubKey(SOFTWARE_CLASSES, true);
-                if (classes == null)
-                    return;
-
-                foreach (var association in file_associations)
-                    association.Uninstall(classes, PROGRAM_ID_PREFIX);
-
-                foreach (var association in uri_associations)
-                    association.Uninstall(classes);
-
-                NotifyShellUpdate();
-            }
-            catch (Exception e)
-            {
-                Logger.Log($@"Failed to uninstall file and URI associations: {e.Message}");
             }
         }
 
