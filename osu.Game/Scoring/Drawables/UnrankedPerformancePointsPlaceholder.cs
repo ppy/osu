@@ -5,6 +5,7 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Cursor;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Localisation;
+using osu.Game.Resources.Localisation.Web;
 
 namespace osu.Game.Scoring.Drawables
 {
@@ -13,7 +14,7 @@ namespace osu.Game.Scoring.Drawables
     /// </summary>
     public partial class UnrankedPerformancePointsPlaceholder : SpriteText, IHasTooltip
     {
-        public LocalisableString TooltipText => "pp is not awarded for this score"; // todo: replace with localised string ScoresStrings.StatusNoPp.
+        public LocalisableString TooltipText => ScoresStrings.StatusNoPp;
 
         public UnrankedPerformancePointsPlaceholder()
         {
