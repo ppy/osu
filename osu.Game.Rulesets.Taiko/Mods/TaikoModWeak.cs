@@ -25,10 +25,9 @@ namespace osu.Game.Rulesets.Taiko.Mods
 
             foreach (var obj in taikoBeatmap.HitObjects)
             {
-                if (obj is Hit hit)
+                if (obj is TaikoStrongableHitObject hit)
                     hit.IsStrong = false;
             }
         }
     }
 }
-
