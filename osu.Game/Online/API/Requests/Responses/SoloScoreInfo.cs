@@ -203,6 +203,7 @@ namespace osu.Game.Online.API.Requests.Responses
                 Ruleset = new RulesetInfo { OnlineID = RulesetID },
                 Passed = Passed,
                 TotalScore = TotalScore,
+                LegacyTotalScore = LegacyTotalScore,
                 Accuracy = Accuracy,
                 MaxCombo = MaxCombo,
                 Rank = Rank,

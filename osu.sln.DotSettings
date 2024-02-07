@@ -1042,4 +1042,5 @@ private void load()
 	<s:Boolean x:Key="/Default/UserDictionary/Words/=Unplayed/@EntryIndexedValue">True</s:Boolean>
 	<s:Boolean x:Key="/Default/UserDictionary/Words/=Unproxy/@EntryIndexedValue">True</s:Boolean>
 	<s:Boolean x:Key="/Default/UserDictionary/Words/=Unranked/@EntryIndexedValue">True</s:Boolean>
+	<s:Boolean x:Key="/Default/UserDictionary/Words/=Welford_0027s/@EntryIndexedValue">True</s:Boolean>
 	<s:Boolean x:Key="/Default/UserDictionary/Words/=Zoomable/@EntryIndexedValue">True</s:Boolean></wpf:ResourceDictionary>

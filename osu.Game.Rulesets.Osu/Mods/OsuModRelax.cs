@@ -88,7 +88,7 @@ namespace osu.Game.Rulesets.Osu.Mods
                         if (!slider.HeadCircle.IsHit)
                             handleHitCircle(slider.HeadCircle);
 
-                        requiresHold |= slider.SliderInputManager.IsMouseInFollowArea(true);
+                        requiresHold |= slider.SliderInputManager.IsMouseInFollowArea(slider.Tracking.Value);
                         break;
 
                     case DrawableSpinner spinner:
