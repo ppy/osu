@@ -112,7 +112,7 @@ namespace osu.Desktop.Windows
                 Debug.Assert(classes != null);
 
                 foreach (var association in file_associations)
-                    association.Uninstall(classes, PROGRAM_ID_PREFIX);
+                    association.Uninstall(classes);
 
                 foreach (var association in uri_associations)
                     association.Uninstall(classes);
@@ -146,7 +146,7 @@ namespace osu.Desktop.Windows
             Debug.Assert(classes != null);
 
             foreach (var association in file_associations)
-                association.UpdateDescription(classes, PROGRAM_ID_PREFIX, getLocalisedString(association.Description));
+                association.UpdateDescription(classes, getLocalisedString(association.Description));
 
             foreach (var association in uri_associations)
                 association.UpdateDescription(classes, getLocalisedString(association.Description));
@@ -216,13 +216,13 @@ namespace osu.Desktop.Windows
                 }
             }
 
-            public void UpdateDescription(RegistryKey classes, string programIdPrefix, string description)
+            public void UpdateDescription(RegistryKey classes, string description)
             {
                 using (var programKey = classes.OpenSubKey(programId, true))
                     programKey?.SetValue(null, description);
             }
 
-            public void Uninstall(RegistryKey classes, string programIdPrefix)
+            public void Uninstall(RegistryKey classes)
             {
                 // importantly, we don't delete the default program entry because some other program could have taken it.
 
