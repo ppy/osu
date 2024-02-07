@@ -48,6 +48,8 @@ namespace osu.Game.Rulesets.Catch
 
         public const string SHORT_NAME = "fruits";
 
+        public override bool ResumeDelayed => true;
+
         public override string RulesetAPIVersionSupported => CURRENT_RULESET_API_VERSION;
 
         public override IEnumerable<KeyBinding> GetDefaultKeyBindings(int variant = 0) => new[]
