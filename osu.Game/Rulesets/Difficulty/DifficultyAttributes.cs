@@ -4,6 +4,7 @@
 using System;
 using System.Collections.Generic;
 using Newtonsoft.Json;
+using osu.Framework.Localisation;
 using osu.Game.Beatmaps;
 using osu.Game.Rulesets.Mods;
 
@@ -61,6 +62,11 @@ namespace osu.Game.Rulesets.Difficulty
             Mods = mods;
             StarRating = starRating;
         }
+
+        /// <summary>
+        /// Converts this <see cref="DifficultyAttributes"/> to a key-value pair of attributes for public display.
+        /// </summary>
+        public virtual IReadOnlyDictionary<string, LocalisableString> ToDisplayableAttributes() => new Dictionary<string, LocalisableString>();
 
         /// <summary>
         /// Converts this <see cref="DifficultyAttributes"/> to osu-web compatible database attribute mappings.

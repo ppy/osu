@@ -5,6 +5,8 @@ using System.Collections.Generic;
 using System.Linq;
 using JetBrains.Annotations;
 using Newtonsoft.Json;
+using osu.Framework.Extensions.LocalisationExtensions;
+using osu.Framework.Localisation;
 using osu.Game.Beatmaps;
 using osu.Game.Rulesets.Difficulty;
 using osu.Game.Rulesets.Mods;
@@ -83,6 +85,22 @@ namespace osu.Game.Rulesets.Osu.Difficulty
         /// The number of spinners in the beatmap.
         /// </summary>
         public int SpinnerCount { get; set; }
+
+        public override IReadOnlyDictionary<string, LocalisableString> ToDisplayableAttributes()
+        {
+            var dictionary = new Dictionary<string, LocalisableString>
+            {
+                { "Aim", AimDifficulty.ToLocalisableString("0.00") },
+                { "Speed", SpeedDifficulty.ToLocalisableString("0.00") }
+            };
+
+            if (FlashlightDifficulty > 0.0)
+            {
+                dictionary["Flashlight"] = FlashlightDifficulty.ToLocalisableString("0.00");
+            }
+
+            return dictionary;
+        }
 
         public override IEnumerable<(int attributeId, object value)> ToDatabaseAttributes()
         {
