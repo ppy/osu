@@ -68,6 +68,7 @@ namespace osu.Desktop.Windows
                 }
 
                 updateDescriptions(localisation);
+                NotifyShellUpdate();
             }
             catch (Exception e)
             {
@@ -77,24 +78,15 @@ namespace osu.Desktop.Windows
 
         private static void updateDescriptions(LocalisationManager? localisation)
         {
-            try
-            {
-                using var classes = Registry.CurrentUser.OpenSubKey(SOFTWARE_CLASSES, true);
-                if (classes == null)
-                    return;
+            using var classes = Registry.CurrentUser.OpenSubKey(SOFTWARE_CLASSES, true);
+            if (classes == null)
+                return;
 
-                foreach (var association in file_associations)
-                    association.UpdateDescription(classes, PROGRAM_ID_PREFIX, getLocalisedString(association.Description));
+            foreach (var association in file_associations)
+                association.UpdateDescription(classes, PROGRAM_ID_PREFIX, getLocalisedString(association.Description));
 
-                foreach (var association in uri_associations)
-                    association.UpdateDescription(classes, getLocalisedString(association.Description));
-
-                NotifyShellUpdate();
-            }
-            catch (Exception e)
-            {
-                Logger.Log($@"Failed to update file and URI associations: {e.Message}");
-            }
+            foreach (var association in uri_associations)
+                association.UpdateDescription(classes, getLocalisedString(association.Description));
 
             string getLocalisedString(LocalisableString s)
             {
