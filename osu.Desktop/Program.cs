@@ -174,10 +174,11 @@ namespace osu.Desktop
             {
                 tools.CreateShortcutForThisExe();
                 tools.CreateUninstallerRegistryEntry();
-                WindowsAssociationManager.InstallAssociations(null);
+                WindowsAssociationManager.InstallAssociations();
             }, onAppUpdate: (_, tools) =>
             {
                 tools.CreateUninstallerRegistryEntry();
+                WindowsAssociationManager.UpdateAssociations();
             }, onAppUninstall: (_, tools) =>
             {
                 tools.RemoveShortcutForThisExe();
