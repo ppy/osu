@@ -137,9 +137,6 @@ namespace osu.Desktop
             if (RuntimeInfo.OS == RuntimeInfo.Platform.Windows)
                 LoadComponentAsync(new GameplayWinKeyBlocker(), Add);
 
-            if (OperatingSystem.IsWindows() && IsDeployedBuild)
-                LoadComponentAsync(new WindowsAssociationManager(), Add);
-
             LoadComponentAsync(new ElevatedPrivilegesChecker(), Add);
 
             osuSchemeLinkIPCChannel = new OsuSchemeLinkIPCChannel(Host, this);
