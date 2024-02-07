@@ -6,20 +6,21 @@ using System.Linq;
 using osu.Framework.Localisation;
 using osu.Game.Rulesets.Mania.UI;
 using osu.Framework.Bindables;
+using osu.Framework.Graphics;
 using osu.Game.Rulesets.Scoring;
 
 namespace osu.Game.Rulesets.Mania.Mods
 {
-    public class ManiaModHidden : ManiaModWithPlayfieldCover
+    public partial class ManiaModHidden : ManiaModWithPlayfieldCover
     {
         /// <summary>
         /// osu!stable is referenced to 768px.
         /// </summary>
-        private const float playfield_height = 768;
+        private const float reference_playfield_height = 768;
 
-        private const float min_coverage = 160f / playfield_height;
-        private const float max_coverage = 400f / playfield_height;
-        private const float coverage_increase_per_combo = 0.5f / playfield_height;
+        private const float min_coverage = 160 / reference_playfield_height;
+        private const float max_coverage = 400f / reference_playfield_height;
+        private const float coverage_increase_per_combo = 0.5f / reference_playfield_height;
 
         public override LocalisableString Description => @"Keys fade out before you hit them!";
         public override double ScoreMultiplier => 1;
@@ -42,6 +43,24 @@ namespace osu.Game.Rulesets.Mania.Mods
             combo.UnbindAll();
             combo.BindTo(scoreProcessor.Combo);
             combo.BindValueChanged(c => Coverage.Value = Math.Min(max_coverage, min_coverage + c.NewValue * coverage_increase_per_combo), true);
+        }
+
+        protected override PlayfieldCoveringWrapper CreateCover(Drawable content) => new LegacyPlayfieldCover(content);
+
+        private partial class LegacyPlayfieldCover : PlayfieldCoveringWrapper
+        {
+            public LegacyPlayfieldCover(Drawable content)
+                : base(content)
+            {
+            }
+
+            protected override float GetHeight(float coverage)
+            {
+                if (DrawHeight == 0)
+                    return base.GetHeight(coverage);
+
+                return base.GetHeight(coverage) * reference_playfield_height / DrawHeight;
+            }
         }
     }
 }
