@@ -30,7 +30,7 @@ namespace osu.Desktop.Windows
         /// </summary>
         public const string SHELL_OPEN_COMMAND = @"Shell\Open\Command";
 
-        public static readonly string EXE_PATH = Path.ChangeExtension(typeof(WindowsAssociationManager).Assembly.Location, ".exe");
+        public static readonly string EXE_PATH = Path.ChangeExtension(typeof(WindowsAssociationManager).Assembly.Location, ".exe").Replace('/', '\\');
 
         /// <summary>
         /// Program ID prefix used for file associations. Should be relatively short since the full program ID has a 39 character limit,
