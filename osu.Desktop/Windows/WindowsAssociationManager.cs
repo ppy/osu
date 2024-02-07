@@ -67,7 +67,7 @@ namespace osu.Desktop.Windows
             }
             catch (Exception e)
             {
-                Logger.Log(@$"Failed to install file and URI associations: {e.Message}");
+                Logger.Error(e, @$"Failed to install file and URI associations: {e.Message}");
             }
         }
 
@@ -86,7 +86,7 @@ namespace osu.Desktop.Windows
             }
             catch (Exception e)
             {
-                Logger.Log(@$"Failed to update file and URI associations: {e.Message}");
+                Logger.Error(e, @"Failed to update file and URI associations.");
             }
         }
 
@@ -99,7 +99,7 @@ namespace osu.Desktop.Windows
             }
             catch (Exception e)
             {
-                Logger.Log(@$"Failed to update file and URI association descriptions: {e.Message}");
+                Logger.Error(e, @"Failed to update file and URI association descriptions.");
             }
         }
 
@@ -121,7 +121,7 @@ namespace osu.Desktop.Windows
             }
             catch (Exception e)
             {
-                Logger.Log($@"Failed to uninstall file and URI associations: {e.Message}");
+                Logger.Error(e, @"Failed to uninstall file and URI associations.");
             }
         }
 
