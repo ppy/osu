@@ -35,7 +35,7 @@ namespace osu.Desktop.Windows
         /// Program ID prefix used for file associations. Should be relatively short since the full program ID has a 39 character limit,
         /// see https://learn.microsoft.com/en-us/windows/win32/com/-progid--key.
         /// </summary>
-        public const string PROGRAM_ID_PREFIX = "osu";
+        public const string PROGRAM_ID_PREFIX = "osu.File";
 
         private static readonly FileAssociation[] file_associations =
         {
@@ -136,7 +136,7 @@ namespace osu.Desktop.Windows
                     return;
 
                 foreach (var association in file_associations)
-                    association.Install(classes, EXE_PATH, PROGRAM_ID_PREFIX);
+                    association.Install(classes, EXE_PATH);
 
                 foreach (var association in uri_associations)
                     association.Install(classes, EXE_PATH);
@@ -191,15 +191,13 @@ namespace osu.Desktop.Windows
 
         private record FileAssociation(string Extension, LocalisableString Description, string IconPath)
         {
-            private string getProgramId(string prefix) => $@"{prefix}.File{Extension}";
+            private string programId => $@"{PROGRAM_ID_PREFIX}{Extension}";
 
             /// <summary>
             /// Installs a file extenstion association in accordance with https://learn.microsoft.com/en-us/windows/win32/com/-progid--key
             /// </summary>
-            public void Install(RegistryKey classes, string exePath, string programIdPrefix)
+            public void Install(RegistryKey classes, string exePath)
             {
-                string programId = getProgramId(programIdPrefix);
-
                 // register a program id for the given extension
                 using (var programKey = classes.CreateSubKey(programId))
                 {
@@ -224,14 +222,12 @@ namespace osu.Desktop.Windows
 
             public void UpdateDescription(RegistryKey classes, string programIdPrefix, string description)
             {
-                using (var programKey = classes.OpenSubKey(getProgramId(programIdPrefix), true))
+                using (var programKey = classes.OpenSubKey(programId, true))
                     programKey?.SetValue(null, description);
             }
 
             public void Uninstall(RegistryKey classes, string programIdPrefix)
             {
-                string programId = getProgramId(programIdPrefix);
-
                 // importantly, we don't delete the default program entry because some other program could have taken it.
 
                 using (var extensionKey = classes.OpenSubKey($@"{Extension}\OpenWithProgIds", true))
