@@ -1,7 +1,6 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using System;
 using osu.Framework.Localisation;
 using osu.Game.Beatmaps;
 using osu.Game.Rulesets.Mods;
@@ -17,7 +16,6 @@ namespace osu.Game.Rulesets.Taiko.Mods
         public override LocalisableString Description => @"All strong notes are converted to non-strong";
         public override ModType Type => ModType.Conversion;
         public override double ScoreMultiplier => 1;
-        public override Type[] IncompatibleMods => base.IncompatibleMods;
 
         public void ApplyToBeatmap(IBeatmap beatmap)
         {
