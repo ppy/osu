@@ -138,7 +138,7 @@ namespace osu.Desktop
                     return false;
 
                 // Make sure that this is a laptop.
-                var gpus = new IntPtr[64];
+                IntPtr[] gpus = new IntPtr[64];
                 if (checkError(EnumPhysicalGPUs(gpus, out int gpuCount)))
                     return false;
 
@@ -456,7 +456,7 @@ namespace osu.Desktop
         [MarshalAs(UnmanagedType.ByValTStr, SizeConst = NVAPI.UNICODE_STRING_MAX)]
         public string ProfileName;
 
-        [MarshalAs(UnmanagedType.ByValArray)]
+        [MarshalAs(UnmanagedType.ByValArray, SizeConst = 32)]
         public uint[] GPUSupport;
 
         public uint IsPredefined;
