@@ -51,17 +51,55 @@ namespace osu.Desktop.Windows
             new UriAssociation(@"osump", WindowsAssociationManagerStrings.OsuMultiplayer, Icons.Lazer),
         };
 
-        public static void InstallAssociations(LocalisationManager? localisation)
+        /// <summary>
+        /// Installs file and URI associations.
+        /// </summary>
+        /// <remarks>
+        /// Call <see cref="UpdateDescriptions"/> in a timely fashion to keep descriptions up-to-date and localised.
+        /// </remarks>
+        public static void InstallAssociations()
         {
             try
             {
                 updateAssociations();
-                updateDescriptions(localisation);
+                updateDescriptions(null); // write default descriptions in case `UpdateDescriptions()` is not called.
                 NotifyShellUpdate();
             }
             catch (Exception e)
             {
                 Logger.Log(@$"Failed to install file and URI associations: {e.Message}");
+            }
+        }
+
+        /// <summary>
+        /// Updates associations with latest definitions.
+        /// </summary>
+        /// <remarks>
+        /// Call <see cref="UpdateDescriptions"/> in a timely fashion to keep descriptions up-to-date and localised.
+        /// </remarks>
+        public static void UpdateAssociations()
+        {
+            try
+            {
+                updateAssociations();
+                NotifyShellUpdate();
+            }
+            catch (Exception e)
+            {
+                Logger.Log(@$"Failed to update file and URI associations: {e.Message}");
+            }
+        }
+
+        public static void UpdateDescriptions(LocalisationManager localisationManager)
+        {
+            try
+            {
+                updateDescriptions(localisationManager);
+                NotifyShellUpdate();
+            }
+            catch (Exception e)
+            {
+                Logger.Log(@$"Failed to update file and URI association descriptions: {e.Message}");
             }
         }
 
