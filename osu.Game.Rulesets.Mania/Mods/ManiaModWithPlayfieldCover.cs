@@ -38,7 +38,7 @@ namespace osu.Game.Rulesets.Mania.Mods
                 Container hocParent = (Container)hoc.Parent!;
 
                 hocParent.Remove(hoc, false);
-                hocParent.Add(new PlayfieldCoveringWrapper(hoc).With(c =>
+                hocParent.Add(CreateCover(hoc).With(c =>
                 {
                     c.RelativeSizeAxes = Axes.Both;
                     c.Direction = ExpandDirection;
@@ -46,6 +46,8 @@ namespace osu.Game.Rulesets.Mania.Mods
                 }));
             }
         }
+
+        protected virtual PlayfieldCoveringWrapper CreateCover(Drawable content) => new PlayfieldCoveringWrapper(content);
 
         protected override void ApplyIncreasedVisibilityState(DrawableHitObject hitObject, ArmedState state)
         {

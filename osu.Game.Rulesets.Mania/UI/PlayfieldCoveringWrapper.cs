@@ -43,6 +43,8 @@ namespace osu.Game.Rulesets.Mania.UI
 
         private readonly IBindable<ScrollingDirection> scrollDirection = new Bindable<ScrollingDirection>();
 
+        private float currentCoverage;
+
         public PlayfieldCoveringWrapper(Drawable content)
         {
             InternalChild = new BufferedContainer
@@ -112,14 +114,18 @@ namespace osu.Game.Rulesets.Mania.UI
         {
             base.Update();
 
-            updateHeight((float)Interpolation.DampContinuously(filled.Height, Coverage.Value, 25, Math.Abs(Time.Elapsed)));
+            updateHeight((float)Interpolation.DampContinuously(currentCoverage, Coverage.Value, 25, Math.Abs(Time.Elapsed)));
         }
 
-        private void updateHeight(float height)
+        private void updateHeight(float coverage)
         {
-            filled.Height = height;
-            gradient.Y = -height;
+            filled.Height = GetHeight(coverage);
+            gradient.Y = -GetHeight(coverage);
+
+            currentCoverage = coverage;
         }
+
+        protected virtual float GetHeight(float coverage) => coverage;
 
         private void onScrollDirectionChanged(ValueChangedEvent<ScrollingDirection> direction)
             => cover.Rotation = direction.NewValue == ScrollingDirection.Up ? 0 : 180f;
