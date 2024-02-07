@@ -130,17 +130,15 @@ namespace osu.Desktop.Windows
         /// </summary>
         private static void updateAssociations()
         {
-            using (var classes = Registry.CurrentUser.OpenSubKey(SOFTWARE_CLASSES, writable: true))
-            {
-                if (classes == null)
-                    return;
+            using var classes = Registry.CurrentUser.OpenSubKey(SOFTWARE_CLASSES, true);
+            if (classes == null)
+                return;
 
-                foreach (var association in file_associations)
-                    association.Install(classes, EXE_PATH);
+            foreach (var association in file_associations)
+                association.Install(classes, EXE_PATH);
 
-                foreach (var association in uri_associations)
-                    association.Install(classes, EXE_PATH);
-            }
+            foreach (var association in uri_associations)
+                association.Install(classes, EXE_PATH);
         }
 
         private static void updateDescriptions(LocalisationManager? localisation)
