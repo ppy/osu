@@ -6,9 +6,6 @@ using System.IO;
 using System.Runtime.InteropServices;
 using System.Runtime.Versioning;
 using Microsoft.Win32;
-using osu.Framework.Allocation;
-using osu.Framework.Bindables;
-using osu.Framework.Graphics;
 using osu.Framework.Localisation;
 using osu.Framework.Logging;
 using osu.Game.Localisation;
@@ -16,7 +13,7 @@ using osu.Game.Localisation;
 namespace osu.Desktop.Windows
 {
     [SupportedOSPlatform("windows")]
-    public partial class WindowsAssociationManager : Component
+    public static class WindowsAssociationManager
     {
         public const string SOFTWARE_CLASSES = @"Software\Classes";
 
@@ -54,25 +51,7 @@ namespace osu.Desktop.Windows
             new UriAssociation(@"osump", WindowsAssociationManagerStrings.OsuMultiplayer, Icons.Lazer),
         };
 
-        [Resolved]
-        private LocalisationManager localisation { get; set; } = null!;
-
-        private IBindable<LocalisationParameters> localisationParameters = null!;
-
-        [BackgroundDependencyLoader]
-        private void load()
-        {
-            localisationParameters = localisation.CurrentParameters.GetBoundCopy();
-            InstallAssociations();
-        }
-
-        protected override void LoadComplete()
-        {
-            base.LoadComplete();
-            localisationParameters.ValueChanged += _ => updateDescriptions();
-        }
-
-        public void InstallAssociations()
+        public static void InstallAssociations(LocalisationManager? localisation)
         {
             try
             {
@@ -88,7 +67,7 @@ namespace osu.Desktop.Windows
                         association.Install(classes, EXE_PATH);
                 }
 
-                updateDescriptions();
+                updateDescriptions(localisation);
             }
             catch (Exception e)
             {
@@ -96,7 +75,7 @@ namespace osu.Desktop.Windows
             }
         }
 
-        private void updateDescriptions()
+        private static void updateDescriptions(LocalisationManager? localisation)
         {
             try
             {
@@ -105,18 +84,10 @@ namespace osu.Desktop.Windows
                     return;
 
                 foreach (var association in file_associations)
-                {
-                    var b = localisation.GetLocalisedBindableString(association.Description);
-                    association.UpdateDescription(classes, PROGRAM_ID_PREFIX, b.Value);
-                    b.UnbindAll();
-                }
+                    association.UpdateDescription(classes, PROGRAM_ID_PREFIX, getLocalisedString(association.Description));
 
                 foreach (var association in uri_associations)
-                {
-                    var b = localisation.GetLocalisedBindableString(association.Description);
-                    association.UpdateDescription(classes, b.Value);
-                    b.UnbindAll();
-                }
+                    association.UpdateDescription(classes, getLocalisedString(association.Description));
 
                 NotifyShellUpdate();
             }
@@ -124,11 +95,19 @@ namespace osu.Desktop.Windows
             {
                 Logger.Log($@"Failed to update file and URI associations: {e.Message}");
             }
+
+            string getLocalisedString(LocalisableString s)
+            {
+                if (localisation == null)
+                    return s.ToString();
+
+                var b = localisation.GetLocalisedBindableString(s);
+                b.UnbindAll();
+                return b.Value;
+            }
         }
 
-        public void UninstallAssociations() => UninstallAssociations(PROGRAM_ID_PREFIX);
-
-        public static void UninstallAssociations(string programIdPrefix)
+        public static void UninstallAssociations()
         {
             try
             {
@@ -137,7 +116,7 @@ namespace osu.Desktop.Windows
                     return;
 
                 foreach (var association in file_associations)
-                    association.Uninstall(classes, programIdPrefix);
+                    association.Uninstall(classes, PROGRAM_ID_PREFIX);
 
                 foreach (var association in uri_associations)
                     association.Uninstall(classes);
