@@ -181,7 +181,7 @@ namespace osu.Desktop
             {
                 tools.RemoveShortcutForThisExe();
                 tools.RemoveUninstallerRegistryEntry();
-                WindowsAssociationManager.UninstallAssociations(@"osu");
+                WindowsAssociationManager.UninstallAssociations();
             }, onEveryRun: (_, _, _) =>
             {
                 // While setting the `ProcessAppUserModelId` fixes duplicate icons/shortcuts on the taskbar, it currently
