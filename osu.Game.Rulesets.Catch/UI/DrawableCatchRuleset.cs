@@ -16,6 +16,7 @@ using osu.Game.Rulesets.Objects.Drawables;
 using osu.Game.Rulesets.UI;
 using osu.Game.Rulesets.UI.Scrolling;
 using osu.Game.Scoring;
+using osu.Game.Screens.Play;
 
 namespace osu.Game.Rulesets.Catch.UI
 {
@@ -52,5 +53,7 @@ namespace osu.Game.Rulesets.Catch.UI
         protected override PassThroughInputManager CreateInputManager() => new CatchInputManager(Ruleset.RulesetInfo);
 
         public override DrawableHitObject<CatchHitObject>? CreateDrawableRepresentation(CatchHitObject h) => null;
+
+        protected override ResumeOverlay CreateResumeOverlay() => new DelayedResumeOverlay();
     }
 }
