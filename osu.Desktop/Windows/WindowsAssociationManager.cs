@@ -2,6 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
+using System.Diagnostics;
 using System.IO;
 using System.Runtime.InteropServices;
 using System.Runtime.Versioning;
@@ -108,8 +109,7 @@ namespace osu.Desktop.Windows
             try
             {
                 using var classes = Registry.CurrentUser.OpenSubKey(SOFTWARE_CLASSES, true);
-                if (classes == null)
-                    return;
+                Debug.Assert(classes != null);
 
                 foreach (var association in file_associations)
                     association.Uninstall(classes, PROGRAM_ID_PREFIX);
@@ -131,8 +131,7 @@ namespace osu.Desktop.Windows
         private static void updateAssociations()
         {
             using var classes = Registry.CurrentUser.OpenSubKey(SOFTWARE_CLASSES, true);
-            if (classes == null)
-                return;
+            Debug.Assert(classes != null);
 
             foreach (var association in file_associations)
                 association.Install(classes, EXE_PATH);
@@ -144,8 +143,7 @@ namespace osu.Desktop.Windows
         private static void updateDescriptions(LocalisationManager? localisation)
         {
             using var classes = Registry.CurrentUser.OpenSubKey(SOFTWARE_CLASSES, true);
-            if (classes == null)
-                return;
+            Debug.Assert(classes != null);
 
             foreach (var association in file_associations)
                 association.UpdateDescription(classes, PROGRAM_ID_PREFIX, getLocalisedString(association.Description));
