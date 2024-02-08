@@ -125,6 +125,8 @@ namespace osu.Desktop.Windows
             }
         }
 
+        public static void NotifyShellUpdate() => SHChangeNotify(EventId.SHCNE_ASSOCCHANGED, Flags.SHCNF_IDLIST, IntPtr.Zero, IntPtr.Zero);
+
         /// <summary>
         /// Installs or updates associations.
         /// </summary>
@@ -161,8 +163,6 @@ namespace osu.Desktop.Windows
                 return b.Value;
             }
         }
-
-        internal static void NotifyShellUpdate() => SHChangeNotify(EventId.SHCNE_ASSOCCHANGED, Flags.SHCNF_IDLIST, IntPtr.Zero, IntPtr.Zero);
 
         #region Native interop
 
