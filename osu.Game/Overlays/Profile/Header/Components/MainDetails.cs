@@ -140,6 +140,7 @@ namespace osu.Game.Overlays.Profile.Header.Components
                 scoreRankInfo.Value.RankCount = user?.Statistics?.GradesCount[scoreRankInfo.Key] ?? 0;
 
             detailGlobalRank.UserStatistics.Value = user?.Statistics;
+            detailGlobalRank.User.Value = user;
             detailCountryRank.Content = user?.Statistics?.CountryRank?.ToLocalisableString("\\##,##0") ?? (LocalisableString)"-";
 
             rankGraph.Statistics.Value = user?.Statistics;

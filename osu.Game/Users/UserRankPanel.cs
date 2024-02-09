@@ -30,6 +30,7 @@ namespace osu.Game.Users
         private ProfileValueDisplay countryRankDisplay = null!;
 
         private readonly IBindable<UserStatistics?> statistics = new Bindable<UserStatistics?>();
+        private readonly IBindable<APIUser?> user = new Bindable<APIUser?>();
 
         public UserRankPanel(APIUser user)
             : base(user)
@@ -48,6 +49,8 @@ namespace osu.Game.Users
             {
                 countryRankDisplay.Content = stats.NewValue?.CountryRank?.ToLocalisableString("\\##,##0") ?? "-";
             }, true);
+
+            user.BindTo(api.LocalUser!);
         }
 
         protected override Drawable CreateLayout()
@@ -164,6 +167,9 @@ namespace osu.Game.Users
                                 new GlobalRankDisplay
                                 {
                                     UserStatistics = { BindTarget = statistics },
+                                    // TODO: make highest rank update, as api.LocalUser doesn't update
+                                    // maybe move to statistics in api, so `SoloStatisticsWatcher` can update the value
+                                    User = { BindTarget = user },
                                 },
                                 countryRankDisplay = new ProfileValueDisplay(true)
                                 {
