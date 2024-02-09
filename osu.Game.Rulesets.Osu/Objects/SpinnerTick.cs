@@ -14,7 +14,7 @@ namespace osu.Game.Rulesets.Osu.Objects
         /// </summary>
         public double SpinnerDuration { get; set; }
 
-        public override Judgement CreateJudgement() => new OsuSpinnerTickJudgement();
+        protected override Judgement CreateJudgement() => new OsuSpinnerTickJudgement();
 
         protected override HitWindows CreateHitWindows() => HitWindows.Empty;
 

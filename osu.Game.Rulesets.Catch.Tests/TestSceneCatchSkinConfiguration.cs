@@ -80,7 +80,7 @@ namespace osu.Game.Rulesets.Catch.Tests
         {
             fruit.ApplyDefaults(new ControlPointInfo(), new BeatmapDifficulty());
             var drawableFruit = new DrawableFruit(fruit) { X = x };
-            var judgement = fruit.CreateJudgement();
+            var judgement = fruit.Judgement;
             catcher.OnNewResult(drawableFruit, new CatchJudgementResult(fruit, judgement)
             {
                 Type = judgement.MaxResult

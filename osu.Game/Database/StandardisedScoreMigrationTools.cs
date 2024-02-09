@@ -655,7 +655,7 @@ namespace osu.Game.Database
         {
             private readonly Judgement judgement;
 
-            public override Judgement CreateJudgement() => judgement;
+            protected override Judgement CreateJudgement() => judgement;
 
             public FakeHit(Judgement judgement)
             {

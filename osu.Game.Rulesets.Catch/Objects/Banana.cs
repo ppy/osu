@@ -20,7 +20,7 @@ namespace osu.Game.Rulesets.Catch.Objects
         /// </summary>
         public int BananaIndex;
 
-        public override Judgement CreateJudgement() => new CatchBananaJudgement();
+        protected override Judgement CreateJudgement() => new CatchBananaJudgement();
 
         private static readonly IList<HitSampleInfo> default_banana_samples = new List<HitSampleInfo> { new BananaHitSampleInfo() }.AsReadOnly();
 
