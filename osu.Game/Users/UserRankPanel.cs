@@ -27,7 +27,6 @@ namespace osu.Game.Users
         [Resolved]
         private IAPIProvider api { get; set; } = null!;
 
-        private ProfileValueDisplay globalRankDisplay = null!;
         private ProfileValueDisplay countryRankDisplay = null!;
 
         private readonly IBindable<UserStatistics?> statistics = new Bindable<UserStatistics?>();
@@ -47,7 +46,6 @@ namespace osu.Game.Users
             statistics.BindTo(api.Statistics);
             statistics.BindValueChanged(stats =>
             {
-                globalRankDisplay.Content = stats.NewValue?.GlobalRank?.ToLocalisableString("\\##,##0") ?? "-";
                 countryRankDisplay.Content = stats.NewValue?.CountryRank?.ToLocalisableString("\\##,##0") ?? "-";
             }, true);
         }
@@ -163,9 +161,9 @@ namespace osu.Game.Users
                         {
                             new Drawable[]
                             {
-                                globalRankDisplay = new ProfileValueDisplay(true)
+                                new GlobalRankDisplay
                                 {
-                                    Title = UsersStrings.ShowRankGlobalSimple,
+                                    UserStatistics = { BindTarget = statistics },
                                 },
                                 countryRankDisplay = new ProfileValueDisplay(true)
                                 {

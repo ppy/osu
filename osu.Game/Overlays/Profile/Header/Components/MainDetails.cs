@@ -22,7 +22,7 @@ namespace osu.Game.Overlays.Profile.Header.Components
         private readonly Dictionary<ScoreRank, ScoreRankInfo> scoreRankInfos = new Dictionary<ScoreRank, ScoreRankInfo>();
         private ProfileValueDisplay medalInfo = null!;
         private ProfileValueDisplay ppInfo = null!;
-        private ProfileValueDisplay detailGlobalRank = null!;
+        private GlobalRankDisplay detailGlobalRank = null!;
         private ProfileValueDisplay detailCountryRank = null!;
         private RankGraph rankGraph = null!;
 
@@ -52,10 +52,7 @@ namespace osu.Game.Overlays.Profile.Header.Components
                         Spacing = new Vector2(20),
                         Children = new Drawable[]
                         {
-                            detailGlobalRank = new ProfileValueDisplay(true)
-                            {
-                                Title = UsersStrings.ShowRankGlobalSimple,
-                            },
+                            detailGlobalRank = new GlobalRankDisplay(),
                             detailCountryRank = new ProfileValueDisplay(true)
                             {
                                 Title = UsersStrings.ShowRankCountrySimple,
@@ -142,7 +139,7 @@ namespace osu.Game.Overlays.Profile.Header.Components
             foreach (var scoreRankInfo in scoreRankInfos)
                 scoreRankInfo.Value.RankCount = user?.Statistics?.GradesCount[scoreRankInfo.Key] ?? 0;
 
-            detailGlobalRank.Content = user?.Statistics?.GlobalRank?.ToLocalisableString("\\##,##0") ?? (LocalisableString)"-";
+            detailGlobalRank.UserStatistics.Value = user?.Statistics;
             detailCountryRank.Content = user?.Statistics?.CountryRank?.ToLocalisableString("\\##,##0") ?? (LocalisableString)"-";
 
             rankGraph.Statistics.Value = user?.Statistics;
