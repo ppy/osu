@@ -8,7 +8,7 @@ namespace osu.Game.Rulesets.Osu.Objects
 {
     public class SpinnerBonusTick : SpinnerTick
     {
-        public override Judgement CreateJudgement() => new OsuSpinnerBonusTickJudgement();
+        protected override Judgement CreateJudgement() => new OsuSpinnerBonusTickJudgement();
 
         public class OsuSpinnerBonusTickJudgement : OsuSpinnerTickJudgement
         {

@@ -13,7 +13,7 @@ namespace osu.Game.Rulesets.Catch.Objects
     {
         public override bool LastInCombo => true;
 
-        public override Judgement CreateJudgement() => new IgnoreJudgement();
+        protected override Judgement CreateJudgement() => new IgnoreJudgement();
 
         protected override void CreateNestedHitObjects(CancellationToken cancellationToken)
         {

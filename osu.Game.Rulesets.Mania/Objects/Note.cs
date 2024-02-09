@@ -11,6 +11,6 @@ namespace osu.Game.Rulesets.Mania.Objects
     /// </summary>
     public class Note : ManiaHitObject
     {
-        public override Judgement CreateJudgement() => new ManiaJudgement();
+        protected override Judgement CreateJudgement() => new ManiaJudgement();
     }
 }

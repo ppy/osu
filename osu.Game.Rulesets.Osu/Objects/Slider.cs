@@ -275,7 +275,7 @@ namespace osu.Game.Rulesets.Osu.Objects
             TailSamples = this.GetNodeSamples(repeatCount + 1);
         }
 
-        public override Judgement CreateJudgement() => ClassicSliderBehaviour
+        protected override Judgement CreateJudgement() => ClassicSliderBehaviour
             // Final combo is provided by the slider itself - see logic in `DrawableSlider.CheckForResult()`
             ? new OsuJudgement()
             // Final combo is provided by the tail circle - see `SliderTailCircle`

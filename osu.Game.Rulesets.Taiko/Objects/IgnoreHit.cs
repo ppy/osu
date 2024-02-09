@@ -7,6 +7,6 @@ namespace osu.Game.Rulesets.Taiko.Objects
 {
     public class IgnoreHit : Hit
     {
-        public override Judgement CreateJudgement() => new IgnoreJudgement();
+        protected override Judgement CreateJudgement() => new IgnoreJudgement();
     }
 }

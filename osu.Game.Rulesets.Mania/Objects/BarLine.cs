@@ -19,6 +19,6 @@ namespace osu.Game.Rulesets.Mania.Objects
             set => major.Value = value;
         }
 
-        public override Judgement CreateJudgement() => new IgnoreJudgement();
+        protected override Judgement CreateJudgement() => new IgnoreJudgement();
     }
 }
