@@ -40,9 +40,9 @@ namespace osu.Game.Screens.Ranking
         }
 
         [BackgroundDependencyLoader]
-        private void load(SoloStatisticsWatcher soloStatisticsWatcher)
+        private void load(SoloStatisticsWatcher? soloStatisticsWatcher)
         {
-            if (ShowUserStatistics)
+            if (ShowUserStatistics && soloStatisticsWatcher != null)
             {
                 Debug.Assert(Score != null);
 

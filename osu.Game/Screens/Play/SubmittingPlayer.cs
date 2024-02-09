@@ -43,7 +43,8 @@ namespace osu.Game.Screens.Play
         [Resolved]
         private SessionStatics statics { get; set; }
 
-        [Resolved]
+        [Resolved(canBeNull: true)]
+        [CanBeNull]
         private SoloStatisticsWatcher soloStatisticsWatcher { get; set; }
 
         private readonly object scoreSubmissionLock = new object();
@@ -179,7 +180,7 @@ namespace osu.Game.Screens.Play
 
             await submitScore(score).ConfigureAwait(false);
             spectatorClient.EndPlaying(GameplayState);
-            soloStatisticsWatcher.RegisterForStatisticsUpdateAfter(score.ScoreInfo);
+            soloStatisticsWatcher?.RegisterForStatisticsUpdateAfter(score.ScoreInfo);
         }
 
         [Resolved]
