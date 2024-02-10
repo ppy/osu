@@ -68,6 +68,7 @@ Aside from the above, below is a brief checklist of things to watch out when you
 - Please do not make code changes via the GitHub web interface.
 - Please add tests for your changes. We expect most new features and bugfixes to have test coverage, unless the effort of adding them is prohibitive. The visual testing methodology we use is described in more detail [here](https://github.com/ppy/osu-framework/wiki/Development-and-Testing).
 - Please run tests and code style analysis (via `InspectCode.{ps1,sh}` scripts in the root of this repository) before opening the PR. This is particularly important if you're a first-time contributor, as CI will not run for your PR until we allow it to do so.
+- **Do not run the game in release configuration at any point during your testing** (the sole exception to this being benchmarks). Using release is an unnecessary and harmful practice, and can even lead to you losing your local realm database if you start making changes to the schema. The debug configuration has a completely separated full-stack environment, including a development website instance at https://dev.ppy.sh/. It is permitted to register an account on that development instance for testing purposes and not worry about multi-accounting infractions.
 
 After you're done with your changes and you wish to open the PR, please observe the following recommendations:
 
