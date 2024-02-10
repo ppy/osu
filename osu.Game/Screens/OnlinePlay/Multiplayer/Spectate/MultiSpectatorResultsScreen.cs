@@ -18,6 +18,13 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Spectate
         {
         }
 
+        protected override void LoadComplete()
+        {
+            base.LoadComplete();
+
+            Scheduler.AddDelayed(() => StatisticsPanel.ToggleVisibility(), 1000);
+        }
+
         protected override APIRequest FetchScores(Action<IEnumerable<ScoreInfo>> scoresCallback) => null;
 
         protected override APIRequest FetchNextPage(int direction, Action<IEnumerable<ScoreInfo>> scoresCallback) => null;

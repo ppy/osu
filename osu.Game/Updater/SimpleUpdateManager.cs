@@ -1,4 +1,4 @@
-﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
 #nullable disable
@@ -54,7 +54,7 @@ namespace osu.Game.Updater
                     {
                         Text = $"A newer release of osu! has been found ({version} → {latestTagName}).\n\n"
                                + "Click here to download the new version, which can be installed over the top of your existing installation",
-                        Icon = FontAwesome.Solid.Upload,
+                        Icon = FontAwesome.Solid.Download,
                         Activated = () =>
                         {
                             host.OpenUrlExternally(getBestUrl(latest));

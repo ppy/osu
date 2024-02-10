@@ -3,29 +3,31 @@
 
 #nullable disable
 
-using osuTK;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
+using osu.Framework.Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
+using osu.Framework.Graphics.Cursor;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Users.Drawables;
 using osu.Framework.Input.Events;
+using osu.Framework.Localisation;
 using osu.Game.Online.API.Requests.Responses;
 
 namespace osu.Game.Users
 {
     public abstract partial class ExtendedUserPanel : UserPanel
     {
-        public readonly Bindable<UserStatus> Status = new Bindable<UserStatus>();
+        public readonly Bindable<UserStatus?> Status = new Bindable<UserStatus?>();
 
         public readonly IBindable<UserActivity> Activity = new Bindable<UserActivity>();
 
         protected TextFlowContainer LastVisitMessage { get; private set; }
 
         private StatusIcon statusIcon;
-        private OsuSpriteText statusMessage;
+        private StatusText statusMessage;
 
         protected ExtendedUserPanel(APIUser user)
             : base(user)
@@ -49,14 +51,6 @@ namespace osu.Game.Users
             // Colour should be applied immediately on first load.
             statusIcon.FinishTransforms();
         }
-
-        protected UpdateableAvatar CreateAvatar() => new UpdateableAvatar(User, false);
-
-        protected UpdateableFlag CreateFlag() => new UpdateableFlag(User.CountryCode)
-        {
-            Size = new Vector2(36, 26),
-            Action = Action,
-        };
 
         protected Container CreateStatusIcon() => statusIcon = new StatusIcon();
 
@@ -87,7 +81,7 @@ namespace osu.Game.Users
                 }
             }));
 
-            statusContainer.Add(statusMessage = new OsuSpriteText
+            statusContainer.Add(statusMessage = new StatusText
             {
                 Anchor = alignment,
                 Origin = alignment,
@@ -97,23 +91,25 @@ namespace osu.Game.Users
             return statusContainer;
         }
 
-        private void displayStatus(UserStatus status, UserActivity activity = null)
+        private void displayStatus(UserStatus? status, UserActivity activity = null)
         {
             if (status != null)
             {
-                LastVisitMessage.FadeTo(status is UserStatusOffline && User.LastVisit.HasValue ? 1 : 0);
+                LastVisitMessage.FadeTo(status == UserStatus.Offline && User.LastVisit.HasValue ? 1 : 0);
 
                 // Set status message based on activity (if we have one) and status is not offline
-                if (activity != null && !(status is UserStatusOffline))
+                if (activity != null && status != UserStatus.Offline)
                 {
                     statusMessage.Text = activity.GetStatus();
+                    statusMessage.TooltipText = activity.GetDetails();
                     statusIcon.FadeColour(activity.GetAppropriateColour(Colours), 500, Easing.OutQuint);
                     return;
                 }
 
                 // Otherwise use only status
-                statusMessage.Text = status.Message;
-                statusIcon.FadeColour(status.GetAppropriateColour(Colours), 500, Easing.OutQuint);
+                statusMessage.Text = status.GetLocalisableDescription();
+                statusMessage.TooltipText = string.Empty;
+                statusIcon.FadeColour(status.Value.GetAppropriateColour(Colours), 500, Easing.OutQuint);
 
                 return;
             }
@@ -121,11 +117,11 @@ namespace osu.Game.Users
             // Fallback to web status if local one is null
             if (User.IsOnline)
             {
-                Status.Value = new UserStatusOnline();
+                Status.Value = UserStatus.Online;
                 return;
             }
 
-            Status.Value = new UserStatusOffline();
+            Status.Value = UserStatus.Offline;
         }
 
         protected override bool OnHover(HoverEvent e)
@@ -138,6 +134,11 @@ namespace osu.Game.Users
         {
             BorderThickness = 0;
             base.OnHoverLost(e);
+        }
+
+        private partial class StatusText : OsuSpriteText, IHasTooltip
+        {
+            public LocalisableString TooltipText { get; set; }
         }
     }
 }

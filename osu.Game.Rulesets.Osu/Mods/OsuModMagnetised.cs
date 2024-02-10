@@ -27,7 +27,7 @@ namespace osu.Game.Rulesets.Osu.Mods
         public override ModType Type => ModType.Fun;
         public override LocalisableString Description => "No need to chase the circles – your cursor is a magnet!";
         public override double ScoreMultiplier => 0.5;
-        public override Type[] IncompatibleMods => new[] { typeof(OsuModAutopilot), typeof(OsuModWiggle), typeof(OsuModTransform), typeof(ModAutoplay), typeof(OsuModRelax), typeof(OsuModRepel), typeof(OsuModBubbles) };
+        public override Type[] IncompatibleMods => new[] { typeof(OsuModAutopilot), typeof(OsuModWiggle), typeof(OsuModTransform), typeof(ModAutoplay), typeof(OsuModRelax), typeof(OsuModRepel), typeof(OsuModBubbles), typeof(OsuModDepth) };
 
         [SettingSource("Attraction strength", "How strong the pull is.", 0)]
         public BindableFloat AttractionStrength { get; } = new BindableFloat(0.5f)
@@ -49,8 +49,10 @@ namespace osu.Game.Rulesets.Osu.Mods
         {
             var cursorPos = playfield.Cursor.AsNonNull().ActiveCursor.DrawPosition;
 
-            foreach (var drawable in playfield.HitObjectContainer.AliveObjects)
+            foreach (var entry in playfield.HitObjectContainer.AliveEntries)
             {
+                var drawable = entry.Value;
+
                 switch (drawable)
                 {
                     case DrawableHitCircle circle:

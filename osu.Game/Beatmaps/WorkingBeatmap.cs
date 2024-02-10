@@ -66,6 +66,7 @@ namespace osu.Game.Beatmaps
 
         protected abstract IBeatmap GetBeatmap();
         public abstract Texture GetBackground();
+        public virtual Texture GetPanelBackground() => GetBackground();
         protected abstract Track GetBeatmapTrack();
 
         /// <summary>

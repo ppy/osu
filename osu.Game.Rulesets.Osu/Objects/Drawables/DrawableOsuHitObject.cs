@@ -4,6 +4,8 @@
 #nullable disable
 
 using System;
+using System.Collections.Generic;
+using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
@@ -12,6 +14,8 @@ using osu.Game.Rulesets.Judgements;
 using osu.Game.Rulesets.Objects.Drawables;
 using osu.Game.Rulesets.Osu.Judgements;
 using osu.Game.Rulesets.Osu.Scoring;
+using osu.Game.Rulesets.Osu.UI;
+using osu.Game.Rulesets.Scoring;
 using osuTK;
 using osuTK.Graphics;
 
@@ -30,10 +34,13 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
         protected override float SamplePlaybackPosition => CalculateDrawableRelativePosition(this);
 
         /// <summary>
-        /// Whether this <see cref="DrawableOsuHitObject"/> can be hit, given a time value.
-        /// If non-null, judgements will be ignored (resulting in a shake) whilst the function returns false.
+        /// What action this <see cref="DrawableOsuHitObject"/> should take in response to a
+        /// click at the given time value.
+        /// If non-null, judgements will be ignored for return values of <see cref="ClickAction.Ignore"/>
+        /// and <see cref="ClickAction.Shake"/>, and this hit object will be shaken for return values of
+        /// <see cref="ClickAction.Shake"/>.
         /// </summary>
-        public Func<DrawableHitObject, double, bool> CheckHittable;
+        public Func<DrawableHitObject, double, HitResult, ClickAction> CheckHittable;
 
         protected DrawableOsuHitObject(OsuHitObject hitObject)
             : base(hitObject)
@@ -66,20 +73,17 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
             ScaleBindable.UnbindFrom(HitObject.ScaleBindable);
         }
 
+        protected virtual IEnumerable<Drawable> DimmablePieces => Enumerable.Empty<Drawable>();
+
         protected override void UpdateInitialTransforms()
         {
             base.UpdateInitialTransforms();
 
-            // Dim should only be applied at a top level, as it will be implicitly applied to nested objects.
-            if (ParentHitObject == null)
+            foreach (var piece in DimmablePieces)
             {
-                // Of note, no one noticed this was missing for years, but it definitely feels like it should still exist.
-                // For now this is applied across all skins, and matches stable.
-                // For simplicity, dim colour is applied to the DrawableHitObject itself.
-                // We may need to make a nested container setup if this even causes a usage conflict (ie. with a mod).
-                this.FadeColour(new Color4(195, 195, 195, 255));
-                using (BeginDelayedSequence(InitialLifetimeOffset - OsuHitWindows.MISS_WINDOW))
-                    this.FadeColour(Color4.White, 100);
+                piece.FadeColour(new Color4(195, 195, 195, 255));
+                using (piece.BeginDelayedSequence(InitialLifetimeOffset - OsuHitWindows.MISS_WINDOW))
+                    piece.FadeColour(Color4.White, 100);
             }
         }
 
@@ -94,11 +98,16 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
         public virtual void Shake() { }
 
         /// <summary>
+        /// Causes this <see cref="DrawableOsuHitObject"/> to get hit, disregarding all conditions in implementations of <see cref="DrawableHitObject.CheckForResult"/>.
+        /// </summary>
+        public void HitForcefully() => ApplyMaxResult();
+
+        /// <summary>
         /// Causes this <see cref="DrawableOsuHitObject"/> to get missed, disregarding all conditions in implementations of <see cref="DrawableHitObject.CheckForResult"/>.
         /// </summary>
-        public void MissForcefully() => ApplyResult(r => r.Type = r.Judgement.MinResult);
+        public void MissForcefully() => ApplyMinResult();
 
-        private RectangleF parentScreenSpaceRectangle => ((DrawableOsuHitObject)ParentHitObject)?.parentScreenSpaceRectangle ?? Parent.ScreenSpaceDrawQuad.AABBFloat;
+        private RectangleF parentScreenSpaceRectangle => ((DrawableOsuHitObject)ParentHitObject)?.parentScreenSpaceRectangle ?? Parent!.ScreenSpaceDrawQuad.AABBFloat;
 
         /// <summary>
         /// Calculates the position of the given <paramref name="drawable"/> relative to the playfield area.

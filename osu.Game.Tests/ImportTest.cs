@@ -1,7 +1,5 @@
-// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
-
-#nullable disable
 
 using System;
 using System.Threading;
@@ -11,6 +9,7 @@ using osu.Framework.Allocation;
 using osu.Framework.Extensions;
 using osu.Framework.Platform;
 using osu.Game.Database;
+using osu.Game.Online.API;
 using osu.Game.Tests.Resources;
 
 namespace osu.Game.Tests
@@ -48,12 +47,15 @@ namespace osu.Game.Tests
         public partial class TestOsuGameBase : OsuGameBase
         {
             public RealmAccess Realm => Dependencies.Get<RealmAccess>();
+            public new IAPIProvider API => base.API;
 
             private readonly bool withBeatmap;
 
             public TestOsuGameBase(bool withBeatmap)
             {
                 this.withBeatmap = withBeatmap;
+
+                base.API = new DummyAPIAccess();
             }
 
             [BackgroundDependencyLoader]

@@ -8,6 +8,7 @@ namespace osu.Game.Beatmaps.Drawables.Cards
     /// </summary>
     public enum BeatmapCardSize
     {
+        Nano,
         Normal,
         Extra
     }

@@ -126,7 +126,7 @@ namespace osu.Game.Tests.Gameplay
         public void TestSamplePlaybackWithBeatmapHitsoundsOff()
         {
             GameplayClockContainer gameplayContainer = null;
-            TestDrawableStoryboardSample sample = null;
+            DrawableStoryboardSample sample = null;
 
             AddStep("disable beatmap hitsounds", () => config.SetValue(OsuSetting.BeatmapHitsounds, false));
 
@@ -141,7 +141,7 @@ namespace osu.Game.Tests.Gameplay
                     Child = beatmapSkinSourceContainer
                 });
 
-                beatmapSkinSourceContainer.Add(sample = new TestDrawableStoryboardSample(new StoryboardSampleInfo("test-sample", 1, 1))
+                beatmapSkinSourceContainer.Add(sample = new DrawableStoryboardSample(new StoryboardSampleInfo("test-sample", 1, 1))
                 {
                     Clock = gameplayContainer
                 });
@@ -199,21 +199,13 @@ namespace osu.Game.Tests.Gameplay
             protected internal override ISkin GetSkin() => new TestSkin("test-sample", resources);
         }
 
-        private partial class TestDrawableStoryboardSample : DrawableStoryboardSample
-        {
-            public TestDrawableStoryboardSample(StoryboardSampleInfo sampleInfo)
-                : base(sampleInfo)
-            {
-            }
-        }
-
         #region IResourceStorageProvider
 
         public IRenderer Renderer => host.Renderer;
         public AudioManager AudioManager => Audio;
-        public IResourceStore<byte[]> Files => null;
+        public IResourceStore<byte[]> Files => null!;
         public new IResourceStore<byte[]> Resources => base.Resources;
-        public RealmAccess RealmAccess => null;
+        public RealmAccess RealmAccess => null!;
         public IResourceStore<TextureUpload> CreateTextureLoaderStore(IResourceStore<byte[]> underlyingStore) => null;
 
         #endregion

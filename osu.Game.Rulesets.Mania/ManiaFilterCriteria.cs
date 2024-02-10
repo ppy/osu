@@ -4,6 +4,7 @@
 using osu.Game.Beatmaps;
 using osu.Game.Rulesets.Filter;
 using osu.Game.Rulesets.Mania.Beatmaps;
+using osu.Game.Rulesets.Scoring.Legacy;
 using osu.Game.Screens.Select;
 using osu.Game.Screens.Select.Filter;
 
@@ -15,7 +16,7 @@ namespace osu.Game.Rulesets.Mania
 
         public bool Matches(BeatmapInfo beatmapInfo)
         {
-            return !keys.HasFilter || (beatmapInfo.Ruleset.OnlineID == new ManiaRuleset().LegacyID && keys.IsInRange(ManiaBeatmapConverter.GetColumnCountForNonConvert(beatmapInfo)));
+            return !keys.HasFilter || keys.IsInRange(ManiaBeatmapConverter.GetColumnCount(LegacyBeatmapConversionDifficultyInfo.FromBeatmapInfo(beatmapInfo)));
         }
 
         public bool TryParseCustomKeywordCriteria(string key, Operator op, string value)

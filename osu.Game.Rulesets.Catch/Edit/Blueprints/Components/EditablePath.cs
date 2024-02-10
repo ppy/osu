@@ -74,7 +74,7 @@ namespace osu.Game.Rulesets.Catch.Edit.Blueprints.Components
             path.ConvertFromSliderPath(sliderPath, hitObject.Velocity);
 
             // If the original slider path has non-linear type segments, resample the vertices at nested hit object times to reduce the number of vertices.
-            if (sliderPath.ControlPoints.Any(p => p.Type != null && p.Type != PathType.Linear))
+            if (sliderPath.ControlPoints.Any(p => p.Type != null && p.Type != PathType.LINEAR))
             {
                 path.ResampleVertices(hitObject.NestedHitObjects
                                                .Skip(1).TakeWhile(h => !(h is Fruit)) // Only droplets in the first span are used.
@@ -91,7 +91,7 @@ namespace osu.Game.Rulesets.Catch.Edit.Blueprints.Components
         public void UpdateHitObjectFromPath(JuiceStream hitObject)
         {
             // The SV setting may need to be changed for the current path.
-            var svBindable = hitObject.SliderVelocityBindable;
+            var svBindable = hitObject.SliderVelocityMultiplierBindable;
             double svToVelocityFactor = hitObject.Velocity / svBindable.Value;
             double requiredVelocity = path.ComputeRequiredVelocity();
 

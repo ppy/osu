@@ -68,7 +68,7 @@ namespace osu.Game.Screens.Play
         {
             IBeatmapInfo beatmap = score.ScoreInfo.BeatmapInfo;
 
-            Debug.Assert(beatmap.OnlineID > 0);
+            Debug.Assert(beatmap!.OnlineID > 0);
 
             return new SubmitSoloScoreRequest(score.ScoreInfo, token, beatmap.OnlineID);
         }

@@ -18,7 +18,10 @@ using osu.Game.Configuration;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.Sprites;
+using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Online.Chat;
+using osuTK.Graphics;
+using Message = osu.Game.Online.Chat.Message;
 
 namespace osu.Game.Overlays.Chat
 {
@@ -66,12 +69,31 @@ namespace osu.Game.Overlays.Chat
 
         private Container? highlight;
 
+        /// <summary>
+        /// The colour used to paint the author's username.
+        /// </summary>
+        /// <remarks>
+        /// The colour can be set explicitly by consumers via the property initialiser.
+        /// If unspecified, the colour is by default initialised to:
+        /// <list type="bullet">
+        /// <item><see cref="APIUser.Colour">message.Sender.Colour</see>, if non-empty,</item>
+        /// <item>a random colour from <see cref="default_username_colours"/> if the above is empty.</item>
+        /// </list>
+        /// </remarks>
+        public Color4 UsernameColour { get; init; }
+
         public ChatLine(Message message)
         {
             Message = message;
 
             RelativeSizeAxes = Axes.X;
             AutoSizeAxes = Axes.Y;
+
+            // initialise using sane defaults.
+            // consumers can use the initialiser of `UsernameColour` to override this if they wish to.
+            UsernameColour = !string.IsNullOrEmpty(message.Sender.Colour)
+                ? Color4Extensions.FromHex(message.Sender.Colour)
+                : default_username_colours[message.SenderId % default_username_colours.Length];
         }
 
         [BackgroundDependencyLoader]
@@ -111,6 +133,8 @@ namespace osu.Game.Overlays.Chat
                             Origin = Anchor.TopRight,
                             Anchor = Anchor.TopRight,
                             Margin = new MarginPadding { Horizontal = Spacing },
+                            AccentColour = UsernameColour,
+                            Inverted = !string.IsNullOrEmpty(message.Sender.Colour),
                         },
                         drawableContentFlow = new LinkFlowContainer(styleMessageContent)
                         {
@@ -195,5 +219,44 @@ namespace osu.Game.Overlays.Chat
         {
             drawableTimestamp.Text = message.Timestamp.LocalDateTime.ToLocalisableString(prefer24HourTime.Value ? @"HH:mm:ss" : @"hh:mm:ss tt");
         }
+
+        private static readonly Color4[] default_username_colours =
+        {
+            Color4Extensions.FromHex("588c7e"),
+            Color4Extensions.FromHex("b2a367"),
+            Color4Extensions.FromHex("c98f65"),
+            Color4Extensions.FromHex("bc5151"),
+            Color4Extensions.FromHex("5c8bd6"),
+            Color4Extensions.FromHex("7f6ab7"),
+            Color4Extensions.FromHex("a368ad"),
+            Color4Extensions.FromHex("aa6880"),
+
+            Color4Extensions.FromHex("6fad9b"),
+            Color4Extensions.FromHex("f2e394"),
+            Color4Extensions.FromHex("f2ae72"),
+            Color4Extensions.FromHex("f98f8a"),
+            Color4Extensions.FromHex("7daef4"),
+            Color4Extensions.FromHex("a691f2"),
+            Color4Extensions.FromHex("c894d3"),
+            Color4Extensions.FromHex("d895b0"),
+
+            Color4Extensions.FromHex("53c4a1"),
+            Color4Extensions.FromHex("eace5c"),
+            Color4Extensions.FromHex("ea8c47"),
+            Color4Extensions.FromHex("fc4f4f"),
+            Color4Extensions.FromHex("3d94ea"),
+            Color4Extensions.FromHex("7760ea"),
+            Color4Extensions.FromHex("af52c6"),
+            Color4Extensions.FromHex("e25696"),
+
+            Color4Extensions.FromHex("677c66"),
+            Color4Extensions.FromHex("9b8732"),
+            Color4Extensions.FromHex("8c5129"),
+            Color4Extensions.FromHex("8c3030"),
+            Color4Extensions.FromHex("1f5d91"),
+            Color4Extensions.FromHex("4335a5"),
+            Color4Extensions.FromHex("812a96"),
+            Color4Extensions.FromHex("992861"),
+        };
     }
 }

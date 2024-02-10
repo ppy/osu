@@ -3,7 +3,6 @@
 
 using System.Collections.Generic;
 using System.IO;
-using System.Linq;
 using ManagedBass;
 using osu.Framework.Audio.Callbacks;
 using osu.Game.Extensions;
@@ -15,8 +14,6 @@ namespace osu.Game.Rulesets.Edit.Checks
     {
         private const int ms_threshold = 25;
         private const int min_bytes_threshold = 100;
-
-        private readonly string[] audioExtensions = { "mp3", "ogg", "wav" };
 
         public CheckMetadata Metadata => new CheckMetadata(CheckCategory.Audio, "Too short audio files");
 
@@ -46,7 +43,7 @@ namespace osu.Game.Rulesets.Edit.Checks
                         {
                             // If the file is not likely to be properly parsed by Bass, we don't produce Error issues about it.
                             // Image files and audio files devoid of audio data both fail, for example, but neither would be issues in this check.
-                            if (hasAudioExtension(file.Filename) && probablyHasAudioData(data))
+                            if (AudioCheckUtils.HasAudioExtension(file.Filename) && probablyHasAudioData(data))
                                 yield return new IssueTemplateBadFormat(this).Create(file.Filename);
 
                             continue;
@@ -63,7 +60,6 @@ namespace osu.Game.Rulesets.Edit.Checks
             }
         }
 
-        private bool hasAudioExtension(string filename) => audioExtensions.Any(filename.ToLowerInvariant().EndsWith);
         private bool probablyHasAudioData(Stream data) => data.Length > min_bytes_threshold;
 
         public class IssueTemplateTooShort : IssueTemplate

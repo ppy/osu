@@ -165,7 +165,11 @@ namespace osu.Game.Screens.OnlinePlay
         {
             d.SelectedItem.BindTarget = SelectedItem;
             d.RequestDeletion = i => RequestDeletion?.Invoke(i);
-            d.RequestResults = i => RequestResults?.Invoke(i);
+            d.RequestResults = i =>
+            {
+                SelectedItem.Value = i;
+                RequestResults?.Invoke(i);
+            };
             d.RequestEdit = i => RequestEdit?.Invoke(i);
             d.AllowReordering = AllowReordering;
             d.AllowDeletion = AllowDeletion;

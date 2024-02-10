@@ -7,16 +7,16 @@ using System.Linq;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
 using osu.Game.Beatmaps;
-using osu.Game.Database;
 using osu.Game.Rulesets;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Scoring;
 using osu.Game.Scoring;
+using osu.Game.Users;
 
 namespace osu.Game.Online.API.Requests.Responses
 {
     [Serializable]
-    public class SoloScoreInfo : IHasOnlineID<long>
+    public class SoloScoreInfo : IScoreInfo
     {
         [JsonProperty("beatmap_id")]
         public int BeatmapID { get; set; }
@@ -138,6 +138,24 @@ namespace osu.Game.Online.API.Requests.Responses
 
         #endregion
 
+        #region IScoreInfo
+
+        public long OnlineID => (long?)ID ?? -1;
+
+        IUser IScoreInfo.User => User!;
+        DateTimeOffset IScoreInfo.Date => EndedAt;
+        long IScoreInfo.LegacyOnlineID => (long?)LegacyScoreId ?? -1;
+        IBeatmapInfo IScoreInfo.Beatmap => Beatmap!;
+        IRulesetInfo IScoreInfo.Ruleset => Beatmap!.Ruleset;
+
+        #endregion
+
+        /// <summary>
+        /// Whether this <see cref="ScoreInfo"/> represents a legacy (osu!stable) score.
+        /// </summary>
+        [JsonIgnore]
+        public bool IsLegacyScore => LegacyScoreId != null;
+
         public override string ToString() => $"score_id: {ID} user_id: {UserID}";
 
         /// <summary>
@@ -178,18 +196,21 @@ namespace osu.Game.Online.API.Requests.Responses
             var score = new ScoreInfo
             {
                 OnlineID = OnlineID,
+                LegacyOnlineID = (long?)LegacyScoreId ?? -1,
+                IsLegacyScore = IsLegacyScore,
                 User = User ?? new APIUser { Id = UserID },
                 BeatmapInfo = new BeatmapInfo { OnlineID = BeatmapID },
                 Ruleset = new RulesetInfo { OnlineID = RulesetID },
                 Passed = Passed,
                 TotalScore = TotalScore,
+                LegacyTotalScore = LegacyTotalScore,
                 Accuracy = Accuracy,
                 MaxCombo = MaxCombo,
                 Rank = Rank,
                 Statistics = Statistics,
                 MaximumStatistics = MaximumStatistics,
                 Date = EndedAt,
-                Hash = HasReplay ? "online" : string.Empty, // TODO: temporary?
+                HasOnlineReplay = HasReplay,
                 Mods = mods,
                 PP = PP,
             };
@@ -223,7 +244,5 @@ namespace osu.Game.Online.API.Requests.Responses
             Statistics = score.Statistics.Where(kvp => kvp.Value != 0).ToDictionary(kvp => kvp.Key, kvp => kvp.Value),
             MaximumStatistics = score.MaximumStatistics.Where(kvp => kvp.Value != 0).ToDictionary(kvp => kvp.Key, kvp => kvp.Value),
         };
-
-        public long OnlineID => (long?)ID ?? -1;
     }
 }

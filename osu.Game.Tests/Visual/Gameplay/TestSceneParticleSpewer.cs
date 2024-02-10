@@ -69,13 +69,13 @@ namespace osu.Game.Tests.Visual.Gameplay
                 spewer.Clock = new FramedClock(testClock);
             });
             AddStep("start spewer", () => spewer.Active.Value = true);
-            AddAssert("spawned first particle", () => spewer.TotalCreatedParticles == 1);
+            AddAssert("spawned first particle", () => spewer.TotalCreatedParticles, () => Is.EqualTo(1));
 
             AddStep("move clock forward", () => testClock.CurrentTime = TestParticleSpewer.MAX_DURATION * 3);
-            AddAssert("spawned second particle", () => spewer.TotalCreatedParticles == 2);
+            AddAssert("spawned second particle", () => spewer.TotalCreatedParticles, () => Is.EqualTo(2));
 
             AddStep("move clock backwards", () => testClock.CurrentTime = TestParticleSpewer.MAX_DURATION * -1);
-            AddAssert("spawned third particle", () => spewer.TotalCreatedParticles == 3);
+            AddAssert("spawned third particle", () => spewer.TotalCreatedParticles, () => Is.EqualTo(3));
         }
 
         private TestParticleSpewer createSpewer() =>

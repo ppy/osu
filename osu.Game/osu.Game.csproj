@@ -1,6 +1,6 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup Label="Project">
-    <TargetFramework>net6.0</TargetFramework>
+    <TargetFramework>net8.0</TargetFramework>
     <OutputType>Library</OutputType>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
     <LangVersion>10</LangVersion>
@@ -21,27 +21,28 @@
   <ItemGroup Label="Package References">
     <PackageReference Include="AutoMapper" Version="12.0.1" />
     <PackageReference Include="DiffPlex" Version="1.7.1" />
-    <PackageReference Include="HtmlAgilityPack" Version="1.11.46" />
+    <PackageReference Include="HtmlAgilityPack" Version="1.11.57" />
     <PackageReference Include="Humanizer" Version="2.14.1" />
-    <PackageReference Include="MessagePack" Version="2.4.59" />
-    <PackageReference Include="Microsoft.AspNetCore.SignalR.Client" Version="7.0.2" />
-    <PackageReference Include="Microsoft.AspNetCore.SignalR.Protocols.MessagePack" Version="7.0.2" />
-    <PackageReference Include="Microsoft.AspNetCore.SignalR.Protocols.NewtonsoftJson" Version="7.0.2" />
-    <PackageReference Include="Microsoft.Data.Sqlite.Core" Version="7.0.2" />
+    <PackageReference Include="MessagePack" Version="2.5.140" />
+    <PackageReference Include="Microsoft.AspNetCore.SignalR.Client" Version="7.0.15" />
+    <PackageReference Include="Microsoft.AspNetCore.SignalR.Protocols.MessagePack" Version="7.0.15" />
+    <PackageReference Include="Microsoft.AspNetCore.SignalR.Protocols.NewtonsoftJson" Version="7.0.15" />
+    <PackageReference Include="Microsoft.Data.Sqlite.Core" Version="7.0.12" />
     <PackageReference Include="Microsoft.Extensions.Configuration.Abstractions" Version="7.0.0" />
     <PackageReference Include="Microsoft.Toolkit.HighPerformance" Version="7.1.2" />
     <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
-    <PackageReference Include="ppy.LocalisationAnalyser" Version="2022.809.0">
+    <PackageReference Include="ppy.LocalisationAnalyser" Version="2023.1117.0">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
-    <PackageReference Include="Realm" Version="10.20.0" />
-    <PackageReference Include="ppy.osu.Framework" Version="2023.608.0" />
-    <PackageReference Include="ppy.osu.Game.Resources" Version="2023.510.0" />
-    <PackageReference Include="Sentry" Version="3.28.1" />
-    <PackageReference Include="SharpCompress" Version="0.32.2" />
-    <PackageReference Include="NUnit" Version="3.13.3" />
-    <PackageReference Include="SQLitePCLRaw.bundle_e_sqlite3" Version="2.1.4" />
+    <PackageReference Include="Realm" Version="11.5.0" />
+    <PackageReference Include="ppy.osu.Framework" Version="2024.205.0" />
+    <PackageReference Include="ppy.osu.Game.Resources" Version="2024.129.0" />
+    <PackageReference Include="Sentry" Version="3.41.3" />
+    <!-- Held back due to 0.34.0 failing AOT compilation on ZstdSharp.dll dependency. -->
+    <PackageReference Include="SharpCompress" Version="0.36.0" />
+    <PackageReference Include="NUnit" Version="3.14.0" />
+    <PackageReference Include="SQLitePCLRaw.bundle_e_sqlite3" Version="2.1.7" />
     <PackageReference Include="System.ComponentModel.Annotations" Version="5.0.0" />
     <PackageReference Include="TagLibSharp" Version="2.3.0" />
 

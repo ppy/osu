@@ -1,7 +1,5 @@
-// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
-
-#nullable disable
 
 using Markdig;
 using Markdig.Extensions.Footnotes;
@@ -37,6 +35,13 @@ namespace osu.Game.Graphics.Containers.Markdown
                     break;
 
                 case ListItemBlock listItemBlock:
+                    // `ListBlock.Parent` is annotated as null-returning in xmldoc.
+                    // Unfortunately code analysis sees that the type doesn't have NRT enabled and complains.
+                    // This is fixed upstream in 0.24.0 (https://github.com/xoofx/markdig/commit/6684c8257cbbcba2d34457020876be289d3cd8b9),
+                    // but markdig is a transitive dependency from framework, wherein we are locked to 0.23.0
+                    // (https://github.com/ppy/osu-framework/blob/9746d7d06f48910c05a24687a25f435f30d12f8b/osu.Framework/osu.Framework.csproj#L52C1-L54)
+                    // Therefore...
+                    // ReSharper disable once ConditionalAccessQualifierIsNonNullableAccordingToAPIContract
                     bool isOrdered = ((ListBlock)listItemBlock.Parent)?.IsOrdered == true;
 
                     OsuMarkdownListItem childContainer = CreateListItem(listItemBlock, level, isOrdered);
@@ -58,7 +63,7 @@ namespace osu.Game.Graphics.Containers.Markdown
             Font = OsuFont.GetFont(Typeface.Inter, size: 14, weight: FontWeight.Regular),
         };
 
-        public override MarkdownTextFlowContainer CreateTextFlow() => new OsuMarkdownTextFlowContainer();
+        public override OsuMarkdownTextFlowContainer CreateTextFlow() => new OsuMarkdownTextFlowContainer();
 
         protected override MarkdownHeading CreateHeading(HeadingBlock headingBlock) => new OsuMarkdownHeading(headingBlock);
 

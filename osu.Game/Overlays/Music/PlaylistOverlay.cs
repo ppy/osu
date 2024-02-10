@@ -109,7 +109,7 @@ namespace osu.Game.Overlays.Music
             beatmap.BindValueChanged(working => list.SelectedSet.Value = working.NewValue.BeatmapSetInfo.ToLive(realm), true);
         }
 
-        private void beatmapsChanged(IRealmCollection<BeatmapSetInfo> sender, ChangeSet changes, Exception error)
+        private void beatmapsChanged(IRealmCollection<BeatmapSetInfo> sender, ChangeSet changes)
         {
             if (changes == null)
             {
@@ -122,7 +122,7 @@ namespace osu.Game.Overlays.Music
             foreach (int i in changes.InsertedIndices)
                 beatmapSets.Insert(i, sender[i].ToLive(realm));
 
-            foreach (int i in changes.DeletedIndices.OrderByDescending(i => i))
+            foreach (int i in changes.DeletedIndices.OrderDescending())
                 beatmapSets.RemoveAt(i);
         }
 

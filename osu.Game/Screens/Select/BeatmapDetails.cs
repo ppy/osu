@@ -3,7 +3,6 @@
 
 using System.Linq;
 using osu.Framework.Allocation;
-using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
@@ -19,7 +18,6 @@ using osu.Game.Overlays.BeatmapSet;
 using osu.Game.Resources.Localisation.Web;
 using osu.Game.Screens.Select.Details;
 using osuTK;
-using osuTK.Graphics;
 
 namespace osu.Game.Screens.Select
 {
@@ -28,7 +26,6 @@ namespace osu.Game.Screens.Select
         private const float spacing = 10;
         private const float transition_duration = 250;
 
-        private readonly AdvancedStats advanced;
         private readonly UserRatings ratingsDisplay;
         private readonly MetadataSection description, source, tags;
         private readonly Container failRetryContainer;
@@ -68,12 +65,15 @@ namespace osu.Game.Screens.Select
 
         public BeatmapDetails()
         {
+            CornerRadius = 10;
+            Masking = true;
+
             Children = new Drawable[]
             {
                 new Box
                 {
                     RelativeSizeAxes = Axes.Both,
-                    Colour = Color4.Black.Opacity(0.5f),
+                    Colour = Colour4.Black.Opacity(0.3f),
                 },
                 new Container
                 {
@@ -109,12 +109,6 @@ namespace osu.Game.Screens.Select
                                                 Padding = new MarginPadding { Right = spacing / 2 },
                                                 Children = new[]
                                                 {
-                                                    new DetailBox().WithChild(advanced = new AdvancedStats
-                                                    {
-                                                        RelativeSizeAxes = Axes.X,
-                                                        AutoSizeAxes = Axes.Y,
-                                                        Padding = new MarginPadding { Horizontal = spacing, Top = spacing * 2, Bottom = spacing },
-                                                    }),
                                                     new DetailBox().WithChild(new OnlineViewContainer(string.Empty)
                                                     {
                                                         RelativeSizeAxes = Axes.X,
@@ -129,7 +123,8 @@ namespace osu.Game.Screens.Select
                                             },
                                             new OsuScrollContainer
                                             {
-                                                RelativeSizeAxes = Axes.Both,
+                                                RelativeSizeAxes = Axes.X,
+                                                Height = 250,
                                                 Width = 0.5f,
                                                 ScrollbarVisible = false,
                                                 Padding = new MarginPadding { Left = spacing / 2 },
@@ -141,9 +136,9 @@ namespace osu.Game.Screens.Select
                                                     LayoutEasing = Easing.OutQuad,
                                                     Children = new[]
                                                     {
-                                                        description = new MetadataSectionDescription(searchOnSongSelect),
-                                                        source = new MetadataSectionSource(searchOnSongSelect),
-                                                        tags = new MetadataSectionTags(searchOnSongSelect),
+                                                        description = new MetadataSectionDescription(query => songSelect?.Search(query)),
+                                                        source = new MetadataSectionSource(query => songSelect?.Search(query)),
+                                                        tags = new MetadataSectionTags(query => songSelect?.Search(query)),
                                                     },
                                                 },
                                             },
@@ -176,17 +171,10 @@ namespace osu.Game.Screens.Select
                 },
                 loading = new LoadingLayer(true)
             };
-
-            void searchOnSongSelect(string text)
-            {
-                if (songSelect != null)
-                    songSelect.FilterControl.CurrentTextSearch.Value = text;
-            }
         }
 
         private void updateStatistics()
         {
-            advanced.BeatmapInfo = BeatmapInfo;
             description.Metadata = BeatmapInfo?.DifficultyName ?? string.Empty;
             source.Metadata = BeatmapInfo?.Metadata.Source ?? string.Empty;
             tags.Metadata = BeatmapInfo?.Metadata.Tags ?? string.Empty;
@@ -285,11 +273,6 @@ namespace osu.Game.Screens.Select
 
                 InternalChildren = new Drawable[]
                 {
-                    new Box
-                    {
-                        RelativeSizeAxes = Axes.Both,
-                        Colour = Color4.Black.Opacity(0.5f),
-                    },
                     content = new Container
                     {
                         RelativeSizeAxes = Axes.X,

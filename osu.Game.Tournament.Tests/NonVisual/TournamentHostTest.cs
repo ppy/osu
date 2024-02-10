@@ -1,8 +1,6 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
 using System;
 using System.Threading;
 using System.Threading.Tasks;
@@ -13,7 +11,7 @@ namespace osu.Game.Tournament.Tests.NonVisual
 {
     public abstract class TournamentHostTest
     {
-        public static TournamentGameBase LoadTournament(GameHost host, TournamentGameBase tournament = null)
+        public static TournamentGameBase LoadTournament(GameHost host, TournamentGameBase? tournament = null)
         {
             tournament ??= new TournamentGameBase();
             Task.Factory.StartNew(() => host.Run(tournament), TaskCreationOptions.LongRunning)

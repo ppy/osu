@@ -263,6 +263,11 @@ namespace osu.Game.Tests.Visual.Multiplayer
             return Task.CompletedTask;
         }
 
+        public override Task InvitePlayer(int userId)
+        {
+            return Task.CompletedTask;
+        }
+
         public override Task TransferHost(int userId)
         {
             userId = clone(userId);
@@ -389,6 +394,12 @@ namespace osu.Game.Tests.Visual.Multiplayer
             ChangeUserState(LocalUser.UserID, MultiplayerUserState.Idle);
 
             return Task.CompletedTask;
+        }
+
+        public override async Task AbortMatch()
+        {
+            ChangeUserState(api.LocalUser.Value.Id, MultiplayerUserState.Idle);
+            await ((IMultiplayerClient)this).GameplayAborted(GameplayAbortReason.HostAbortedTheMatch).ConfigureAwait(false);
         }
 
         public async Task AddUserPlaylistItem(int userId, MultiplayerPlaylistItem item)
@@ -635,7 +646,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
 
         private T clone<T>(T incoming)
         {
-            byte[]? serialized = MessagePackSerializer.Serialize(typeof(T), incoming, SignalRUnionWorkaroundResolver.OPTIONS);
+            byte[] serialized = MessagePackSerializer.Serialize(typeof(T), incoming, SignalRUnionWorkaroundResolver.OPTIONS);
             return MessagePackSerializer.Deserialize<T>(serialized, SignalRUnionWorkaroundResolver.OPTIONS);
         }
 
@@ -653,5 +664,11 @@ namespace osu.Game.Tests.Visual.Multiplayer
             PlayedAt = item.PlayedAt,
             StarRating = item.Beatmap.StarRating,
         };
+
+        public override Task DisconnectInternal()
+        {
+            isConnected.Value = false;
+            return Task.CompletedTask;
+        }
     }
 }
