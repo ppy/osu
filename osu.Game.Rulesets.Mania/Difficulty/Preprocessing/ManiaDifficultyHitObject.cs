@@ -10,11 +10,12 @@ namespace osu.Game.Rulesets.Mania.Difficulty.Preprocessing
 {
     public class ManiaDifficultyHitObject : DifficultyHitObject
     {
-        public new ManiaHitObject BaseObject => (ManiaHitObject)base.BaseObject;
+        public new ManiaHitObject BaseObject;
 
         public ManiaDifficultyHitObject(HitObject hitObject, HitObject lastObject, double clockRate, List<DifficultyHitObject> objects, int index)
             : base(hitObject, lastObject, clockRate, objects, index)
         {
+            BaseObject = (ManiaHitObject)base.BaseObject;
         }
     }
 }

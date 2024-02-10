@@ -24,8 +24,6 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Preprocessing
         private const float maximum_slider_radius = NORMALISED_RADIUS * 2.4f;
         private const float assumed_slider_radius = NORMALISED_RADIUS * 1.8f;
 
-        protected new OsuHitObject BaseObject => (OsuHitObject)base.BaseObject;
-
         /// <summary>
         /// Milliseconds elapsed since the start time of the previous <see cref="OsuDifficultyHitObject"/>, with a minimum of 25ms.
         /// </summary>
@@ -85,23 +83,25 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Preprocessing
 
         private readonly OsuHitObject? lastLastObject;
         private readonly OsuHitObject lastObject;
+        private readonly OsuHitObject baseObject;
 
         public OsuDifficultyHitObject(HitObject hitObject, HitObject lastObject, HitObject? lastLastObject, double clockRate, List<DifficultyHitObject> objects, int index)
             : base(hitObject, lastObject, clockRate, objects, index)
         {
             this.lastLastObject = lastLastObject as OsuHitObject;
             this.lastObject = (OsuHitObject)lastObject;
+            baseObject = (OsuHitObject)BaseObject;
 
             // Capped to 25ms to prevent difficulty calculation breaking from simultaneous objects.
             StrainTime = Math.Max(DeltaTime, min_delta_time);
 
-            if (BaseObject is Slider sliderObject)
+            if (baseObject is Slider sliderObject)
             {
                 HitWindowGreat = 2 * sliderObject.HeadCircle.HitWindows.WindowFor(HitResult.Great) / clockRate;
             }
             else
             {
-                HitWindowGreat = 2 * BaseObject.HitWindows.WindowFor(HitResult.Great) / clockRate;
+                HitWindowGreat = 2 * baseObject.HitWindows.WindowFor(HitResult.Great) / clockRate;
             }
 
             setDistances(clockRate);
@@ -109,7 +109,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Preprocessing
 
         public double OpacityAt(double time, bool hidden)
         {
-            if (time > BaseObject.StartTime)
+            if (time > baseObject.StartTime)
             {
                 // Consider a hitobject as being invisible when its start time is passed.
                 // In reality the hitobject will be visible beyond its start time up until its hittable window has passed,
@@ -117,14 +117,14 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Preprocessing
                 return 0.0;
             }
 
-            double fadeInStartTime = BaseObject.StartTime - BaseObject.TimePreempt;
-            double fadeInDuration = BaseObject.TimeFadeIn;
+            double fadeInStartTime = baseObject.StartTime - baseObject.TimePreempt;
+            double fadeInDuration = baseObject.TimeFadeIn;
 
             if (hidden)
             {
                 // Taken from OsuModHidden.
-                double fadeOutStartTime = BaseObject.StartTime - BaseObject.TimePreempt + BaseObject.TimeFadeIn;
-                double fadeOutDuration = BaseObject.TimePreempt * OsuModHidden.FADE_OUT_DURATION_MULTIPLIER;
+                double fadeOutStartTime = baseObject.StartTime - baseObject.TimePreempt + baseObject.TimeFadeIn;
+                double fadeOutDuration = baseObject.TimePreempt * OsuModHidden.FADE_OUT_DURATION_MULTIPLIER;
 
                 return Math.Min
                 (
@@ -138,7 +138,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Preprocessing
 
         private void setDistances(double clockRate)
         {
-            if (BaseObject is Slider currentSlider)
+            if (baseObject is Slider currentSlider)
             {
                 computeSliderCursorPosition(currentSlider);
                 // Bonus for repeat sliders until a better per nested object strain system can be achieved.
@@ -147,21 +147,21 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Preprocessing
             }
 
             // We don't need to calculate either angle or distance when one of the last->curr objects is a spinner
-            if (BaseObject is Spinner || lastObject is Spinner)
+            if (baseObject is Spinner || lastObject is Spinner)
                 return;
 
             // We will scale distances by this factor, so we can assume a uniform CircleSize among beatmaps.
-            float scalingFactor = NORMALISED_RADIUS / (float)BaseObject.Radius;
+            float scalingFactor = NORMALISED_RADIUS / (float)baseObject.Radius;
 
-            if (BaseObject.Radius < 30)
+            if (baseObject.Radius < 30)
             {
-                float smallCircleBonus = Math.Min(30 - (float)BaseObject.Radius, 5) / 50;
+                float smallCircleBonus = Math.Min(30 - (float)baseObject.Radius, 5) / 50;
                 scalingFactor *= 1 + smallCircleBonus;
             }
 
             Vector2 lastCursorPosition = getEndCursorPosition(lastObject);
 
-            LazyJumpDistance = (BaseObject.StackedPosition * scalingFactor - lastCursorPosition * scalingFactor).Length;
+            LazyJumpDistance = (baseObject.StackedPosition * scalingFactor - lastCursorPosition * scalingFactor).Length;
             MinimumJumpTime = StrainTime;
             MinimumJumpDistance = LazyJumpDistance;
 
@@ -192,7 +192,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Preprocessing
                 // Thus, the player is assumed to jump the minimum of these two distances in all cases.
                 //
 
-                float tailJumpDistance = Vector2.Subtract(lastSlider.TailCircle.StackedPosition, BaseObject.StackedPosition).Length * scalingFactor;
+                float tailJumpDistance = Vector2.Subtract(lastSlider.TailCircle.StackedPosition, baseObject.StackedPosition).Length * scalingFactor;
                 MinimumJumpDistance = Math.Max(0, Math.Min(LazyJumpDistance - (maximum_slider_radius - assumed_slider_radius), tailJumpDistance - maximum_slider_radius));
             }
 
@@ -201,7 +201,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Preprocessing
                 Vector2 lastLastCursorPosition = getEndCursorPosition(lastLastObject);
 
                 Vector2 v1 = lastLastCursorPosition - lastObject.StackedPosition;
-                Vector2 v2 = BaseObject.StackedPosition - lastCursorPosition;
+                Vector2 v2 = baseObject.StackedPosition - lastCursorPosition;
 
                 float dot = Vector2.Dot(v1, v2);
                 float det = v1.X * v2.Y - v1.Y * v2.X;
