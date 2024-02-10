@@ -154,17 +154,19 @@ namespace osu.Game.Rulesets.Osu.Objects
             });
         }
 
+        // Preempt time can go below 450ms. Normally, this is achieved via the DT mod which uniformly speeds up all animations game wide regardless of AR.
+        // This uniform speedup is hard to match 1:1, however we can at least make AR>10 (via mods) feel good by extending the upper linear function above.
+        // Note that this doesn't exactly match the AR>10 visuals as they're classically known, but it feels good.
+        // This adjustment is necessary for AR>10, otherwise TimePreempt can become smaller leading to hitcircles not fully fading in.
+        static public double CalculateTimeFadeIn(double timePreempt) => 400 * Math.Min(1, timePreempt / PREEMPT_MIN);
+
         protected override void ApplyDefaultsToSelf(ControlPointInfo controlPointInfo, IBeatmapDifficultyInfo difficulty)
         {
             base.ApplyDefaultsToSelf(controlPointInfo, difficulty);
 
             TimePreempt = (float)IBeatmapDifficultyInfo.DifficultyRange(difficulty.ApproachRate, PREEMPT_MAX, PREEMPT_MID, PREEMPT_MIN);
 
-            // Preempt time can go below 450ms. Normally, this is achieved via the DT mod which uniformly speeds up all animations game wide regardless of AR.
-            // This uniform speedup is hard to match 1:1, however we can at least make AR>10 (via mods) feel good by extending the upper linear function above.
-            // Note that this doesn't exactly match the AR>10 visuals as they're classically known, but it feels good.
-            // This adjustment is necessary for AR>10, otherwise TimePreempt can become smaller leading to hitcircles not fully fading in.
-            TimeFadeIn = 400 * Math.Min(1, TimePreempt / PREEMPT_MIN);
+            TimeFadeIn = CalculateTimeFadeIn(TimePreempt);
 
             Scale = LegacyRulesetExtensions.CalculateScaleFromCircleSize(difficulty.CircleSize, true);
         }
