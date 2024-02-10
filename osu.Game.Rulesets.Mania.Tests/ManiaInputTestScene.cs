@@ -1,8 +1,6 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
 using System.Linq;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
@@ -14,7 +12,8 @@ namespace osu.Game.Rulesets.Mania.Tests
 {
     public abstract partial class ManiaInputTestScene : OsuTestScene
     {
-        private readonly Container<Drawable> content;
+        private readonly Container<Drawable>? content;
+
         protected override Container<Drawable> Content => content ?? base.Content;
 
         protected ManiaInputTestScene(int keys)

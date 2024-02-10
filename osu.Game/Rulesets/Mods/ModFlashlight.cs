@@ -33,6 +33,7 @@ namespace osu.Game.Rulesets.Mods
         public override IconUsage? Icon => OsuIcon.ModFlashlight;
         public override ModType Type => ModType.DifficultyIncrease;
         public override LocalisableString Description => "Restricted view area.";
+        public override bool Ranked => UsesDefaultConfiguration;
 
         [SettingSource("Flashlight size", "Multiplier applied to the default flashlight size.")]
         public abstract BindableFloat SizeMultiplier { get; }
@@ -56,9 +57,6 @@ namespace osu.Game.Rulesets.Mods
         public void ApplyToScoreProcessor(ScoreProcessor scoreProcessor)
         {
             Combo.BindTo(scoreProcessor.Combo);
-
-            // Default value of ScoreProcessor's Rank in Flashlight Mod should be SS+
-            scoreProcessor.Rank.Value = ScoreRank.XH;
         }
 
         public ScoreRank AdjustRank(ScoreRank rank, double accuracy)
@@ -252,7 +250,7 @@ namespace osu.Game.Rulesets.Mods
 
                 private IUniformBuffer<FlashlightParameters>? flashlightParametersBuffer;
 
-                public override void Draw(IRenderer renderer)
+                protected override void Draw(IRenderer renderer)
                 {
                     base.Draw(renderer);
 

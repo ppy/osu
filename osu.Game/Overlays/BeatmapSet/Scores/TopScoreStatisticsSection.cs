@@ -123,7 +123,7 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
                 accuracyColumn.Text = value.DisplayAccuracy;
                 maxComboColumn.Text = value.MaxCombo.ToLocalisableString(@"0\x");
 
-                ppColumn.Alpha = value.BeatmapInfo.Status.GrantsPerformancePoints() ? 1 : 0;
+                ppColumn.Alpha = value.BeatmapInfo!.Status.GrantsPerformancePoints() ? 1 : 0;
 
                 if (value.PP is double pp)
                     ppColumn.Text = pp.ToLocalisableString(@"N0");
@@ -275,7 +275,7 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
                 set
                 {
                     modsContainer.Clear();
-                    modsContainer.Children = value.Select(mod => new ModIcon(mod)
+                    modsContainer.Children = value.AsOrdered().Select(mod => new ModIcon(mod)
                     {
                         AutoSizeAxes = Axes.Both,
                         Scale = new Vector2(0.25f),

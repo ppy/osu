@@ -15,17 +15,10 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v3
 
-      # FIXME: Tools won't run in .NET 6.0 unless you install 3.1.x LTS side by side.
-      # https://itnext.io/how-to-support-multiple-net-sdks-in-github-actions-workflows-b988daa884e
-      - name: Install .NET 3.1.x LTS
+      - name: Install .NET 8.0.x
         uses: actions/setup-dotnet@v3
         with:
-          dotnet-version: "3.1.x"
-
-      - name: Install .NET 6.0.x
-        uses: actions/setup-dotnet@v3
-        with:
-          dotnet-version: "6.0.x"
+          dotnet-version: "8.0.x"
 
       - name: Restore Tools
         run: dotnet tool restore
@@ -79,10 +72,10 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v3
 
-      - name: Install .NET 6.0.x
+      - name: Install .NET 8.0.x
         uses: actions/setup-dotnet@v3
         with:
-          dotnet-version: "6.0.x"
+          dotnet-version: "8.0.x"
 
       - name: Compile
         run: dotnet build -c Debug -warnaserror osu.Desktop.slnf
@@ -108,10 +101,16 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v3
 
-      - name: Install .NET 6.0.x
+      - name: Setup JDK 11
+        uses: actions/setup-java@v3
+        with:
+          distribution: microsoft
+          java-version: 11
+
+      - name: Install .NET 8.0.x
         uses: actions/setup-dotnet@v3
         with:
-          dotnet-version: "6.0.x"
+          dotnet-version: "8.0.x"
 
       - name: Install .NET workloads
         run: dotnet workload install maui-android
@@ -121,31 +120,24 @@ jobs:
 
   build-only-ios:
     name: Build only (iOS)
-    # `macos-13` is required, because Xcode 14.3 is required (see below).
-    # TODO: can be changed to `macos-latest` once `macos-13` becomes latest (currently in beta)
+    # `macos-13` is required, because the newest Microsoft.iOS.Sdk versions require Xcode 14.3.
+    # TODO: can be changed to `macos-latest` once `macos-13` becomes latest (currently in beta: https://github.com/actions/runner-images/tree/main#available-images)
     runs-on: macos-13
     timeout-minutes: 60
     steps:
       - name: Checkout
         uses: actions/checkout@v3
 
-      # newest Microsoft.iOS.Sdk versions require Xcode 14.3.
-      # 14.3 is currently not the default Xcode version (https://github.com/actions/runner-images/blob/main/images/macos/macos-13-Readme.md#xcode),
-      # so set it manually.
-      # TODO: remove when 14.3 becomes the default Xcode version.
-      - name: Set Xcode version
-        shell: bash
-        run: |
-          sudo xcode-select -s "/Applications/Xcode_14.3.app"
-          echo "MD_APPLE_SDK_ROOT=/Applications/Xcode_14.3.app" >> $GITHUB_ENV
-
-      - name: Install .NET 6.0.x
+      - name: Install .NET 8.0.x
         uses: actions/setup-dotnet@v3
         with:
-          dotnet-version: "6.0.x"
+          dotnet-version: "8.0.x"
 
       - name: Install .NET Workloads
         run: dotnet workload install maui-ios
+
+      - name: Select Xcode 15.2
+        run: sudo xcode-select -s /Applications/Xcode_15.2.app/Contents/Developer
 
       - name: Build
         run: dotnet build -c Debug osu.iOS

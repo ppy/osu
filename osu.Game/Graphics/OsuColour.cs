@@ -1,8 +1,6 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
 using System;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics.Colour;
@@ -77,9 +75,13 @@ namespace osu.Game.Graphics
         {
             switch (result)
             {
+                case HitResult.IgnoreMiss:
                 case HitResult.SmallTickMiss:
-                case HitResult.LargeTickMiss:
+                    return Color4.Gray;
+
                 case HitResult.Miss:
+                case HitResult.LargeTickMiss:
+                case HitResult.ComboBreak:
                     return Red;
 
                 case HitResult.Meh:
@@ -93,6 +95,7 @@ namespace osu.Game.Graphics
 
                 case HitResult.SmallTickHit:
                 case HitResult.LargeTickHit:
+                case HitResult.SliderTailHit:
                 case HitResult.Great:
                     return Blue;
 
@@ -163,7 +166,7 @@ namespace osu.Game.Graphics
                     return Pink1;
 
                 case ModType.System:
-                    return Gray7;
+                    return Yellow;
 
                 default:
                     throw new ArgumentOutOfRangeException(nameof(modType), modType, "Unknown mod type");
@@ -398,5 +401,7 @@ namespace osu.Game.Graphics
 
         public Color4 SpotlightColour => Green2;
         public Color4 FeaturedArtistColour => Blue2;
+
+        public Color4 DangerousButtonColour => Pink3;
     }
 }

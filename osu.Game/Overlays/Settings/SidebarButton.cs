@@ -1,9 +1,8 @@
-// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
 using osu.Framework.Allocation;
+using osu.Framework.Graphics;
 using osu.Framework.Input.Events;
 using osu.Game.Graphics.UserInterface;
 
@@ -14,10 +13,10 @@ namespace osu.Game.Overlays.Settings
         protected const double FADE_DURATION = 500;
 
         [Resolved]
-        protected OverlayColourProvider ColourProvider { get; private set; }
+        protected OverlayColourProvider ColourProvider { get; private set; } = null!;
 
-        protected SidebarButton()
-            : base(HoverSampleSet.ButtonSidebar)
+        protected SidebarButton(HoverSampleSet? hoverSounds = HoverSampleSet.ButtonSidebar)
+            : base(hoverSounds)
         {
         }
 
@@ -25,6 +24,7 @@ namespace osu.Game.Overlays.Settings
         private void load()
         {
             BackgroundColour = ColourProvider.Background5;
+            Hover.Colour = ColourProvider.Light4;
         }
 
         protected override void LoadComplete()
@@ -42,6 +42,9 @@ namespace osu.Game.Overlays.Settings
 
         protected override void OnHoverLost(HoverLostEvent e) => UpdateState();
 
-        protected abstract void UpdateState();
+        protected virtual void UpdateState()
+        {
+            Hover.FadeTo(IsHovered ? 0.1f : 0, FADE_DURATION, Easing.OutQuint);
+        }
     }
 }

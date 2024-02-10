@@ -25,7 +25,17 @@ namespace osu.Game.Screens.Play
 
         private readonly Score score;
 
-        protected override bool CheckModsAllowFailure() => false; // todo: better support starting mid-way through beatmap
+        public override bool AllowBackButton => true;
+
+        protected override bool CheckModsAllowFailure()
+        {
+            if (!allowFail)
+                return false;
+
+            return base.CheckModsAllowFailure();
+        }
+
+        private bool allowFail;
 
         protected SpectatorPlayer(Score score, PlayerConfiguration configuration = null)
             : base(configuration)
@@ -59,6 +69,12 @@ namespace osu.Game.Screens.Play
                 }
             }, true);
         }
+
+        /// <summary>
+        /// Should be called when it is apparent that the player being spectated has failed.
+        /// This will subsequently stop blocking the fail screen from displaying (usually done out of safety).
+        /// </summary>
+        public void AllowFail() => allowFail = true;
 
         protected override void StartGameplay()
         {

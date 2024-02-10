@@ -16,14 +16,14 @@ namespace osu.Game.Rulesets.Osu.Skinning.Argon
     {
         private Bindable<Color4> accentColour = null!;
 
-        private const float size = 12;
+        public const float SIZE = 12;
 
         [BackgroundDependencyLoader]
         private void load(DrawableHitObject hitObject)
         {
             Masking = true;
             Origin = Anchor.Centre;
-            Size = new Vector2(size);
+            Size = new Vector2(SIZE);
             BorderThickness = 3;
             BorderColour = Color4.White;
             Child = new Box

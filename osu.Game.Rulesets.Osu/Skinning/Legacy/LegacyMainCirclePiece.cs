@@ -51,7 +51,7 @@ namespace osu.Game.Rulesets.Osu.Skinning.Legacy
             this.priorityLookupPrefix = priorityLookupPrefix;
             this.hasNumber = hasNumber;
 
-            Size = new Vector2(OsuHitObject.OBJECT_RADIUS * 2);
+            Size = OsuHitObject.OBJECT_DIMENSIONS;
         }
 
         [BackgroundDependencyLoader]
@@ -63,12 +63,14 @@ namespace osu.Game.Rulesets.Osu.Skinning.Legacy
             // otherwise fall back to the default prefix "hitcircle".
             string circleName = (priorityLookupPrefix != null && skin.GetTexture(priorityLookupPrefix) != null) ? priorityLookupPrefix : @"hitcircle";
 
+            Vector2 maxSize = OsuHitObject.OBJECT_DIMENSIONS * 2;
+
             // at this point, any further texture fetches should be correctly using the priority source if the base texture was retrieved using it.
             // the conditional above handles the case where a sliderendcircle.png is retrieved from the skin, but sliderendcircleoverlay.png doesn't exist.
             // expected behaviour in this scenario is not showing the overlay, rather than using hitcircleoverlay.png.
             InternalChildren = new[]
             {
-                CircleSprite = new LegacyKiaiFlashingDrawable(() => new Sprite { Texture = skin.GetTexture(circleName) })
+                CircleSprite = new LegacyKiaiFlashingDrawable(() => new Sprite { Texture = skin.GetTexture(circleName)?.WithMaximumSize(maxSize) })
                 {
                     Anchor = Anchor.Centre,
                     Origin = Anchor.Centre,
@@ -77,7 +79,7 @@ namespace osu.Game.Rulesets.Osu.Skinning.Legacy
                 {
                     Anchor = Anchor.Centre,
                     Origin = Anchor.Centre,
-                    Child = OverlaySprite = new LegacyKiaiFlashingDrawable(() => skin.GetAnimation(@$"{circleName}overlay", true, true, frameLength: 1000 / 2d))
+                    Child = OverlaySprite = new LegacyKiaiFlashingDrawable(() => new Sprite { Texture = skin.GetTexture(@$"{circleName}overlay")?.WithMaximumSize(maxSize) })
                     {
                         Anchor = Anchor.Centre,
                         Origin = Anchor.Centre,
@@ -158,7 +160,7 @@ namespace osu.Game.Rulesets.Osu.Skinning.Legacy
                         {
                             decimal? legacyVersion = skin.GetConfig<SkinConfiguration.LegacySetting, decimal>(SkinConfiguration.LegacySetting.Version)?.Value;
 
-                            if (legacyVersion >= 2.0m)
+                            if (legacyVersion > 1.0m)
                                 // legacy skins of version 2.0 and newer only apply very short fade out to the number piece.
                                 hitCircleText.FadeOut(legacy_fade_duration / 4);
                             else

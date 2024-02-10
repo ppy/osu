@@ -23,7 +23,7 @@ namespace osu.Game.Tests.Visual.Settings
         public void TestRestoreDefaultValueButtonVisibility()
         {
             SettingsTextBox textBox = null;
-            RestoreDefaultValueButton<string> restoreDefaultValueButton = null;
+            RevertToDefaultButton<string> revertToDefaultButton = null;
 
             AddStep("create settings item", () =>
             {
@@ -33,22 +33,29 @@ namespace osu.Game.Tests.Visual.Settings
                 };
             });
             AddUntilStep("wait for loaded", () => textBox.IsLoaded);
-            AddStep("retrieve restore default button", () => restoreDefaultValueButton = textBox.ChildrenOfType<RestoreDefaultValueButton<string>>().Single());
+            AddStep("retrieve restore default button", () => revertToDefaultButton = textBox.ChildrenOfType<RevertToDefaultButton<string>>().Single());
 
-            AddAssert("restore button hidden", () => restoreDefaultValueButton.Alpha == 0);
+            AddAssert("restore button hidden", () => revertToDefaultButton.Alpha == 0);
 
             AddStep("change value from default", () => textBox.Current.Value = "non-default");
-            AddUntilStep("restore button shown", () => restoreDefaultValueButton.Alpha > 0);
+            AddUntilStep("restore button shown", () => revertToDefaultButton.Alpha > 0);
 
+            AddStep("disable setting", () => textBox.Current.Disabled = true);
+            AddUntilStep("restore button still shown", () => revertToDefaultButton.Alpha > 0);
+
+            AddStep("enable setting", () => textBox.Current.Disabled = false);
             AddStep("restore default", () => textBox.Current.SetDefault());
-            AddUntilStep("restore button hidden", () => restoreDefaultValueButton.Alpha == 0);
+            AddUntilStep("restore button hidden", () => revertToDefaultButton.Alpha == 0);
+
+            AddStep("disable setting", () => textBox.Current.Disabled = true);
+            AddUntilStep("restore button still hidden", () => revertToDefaultButton.Alpha == 0);
         }
 
         [Test]
         public void TestSetAndClearLabelText()
         {
             SettingsTextBox textBox = null;
-            RestoreDefaultValueButton<string> restoreDefaultValueButton = null;
+            RevertToDefaultButton<string> revertToDefaultButton = null;
             OsuTextBox control = null;
 
             AddStep("create settings item", () =>
@@ -61,25 +68,25 @@ namespace osu.Game.Tests.Visual.Settings
             AddUntilStep("wait for loaded", () => textBox.IsLoaded);
             AddStep("retrieve components", () =>
             {
-                restoreDefaultValueButton = textBox.ChildrenOfType<RestoreDefaultValueButton<string>>().Single();
+                revertToDefaultButton = textBox.ChildrenOfType<RevertToDefaultButton<string>>().Single();
                 control = textBox.ChildrenOfType<OsuTextBox>().Single();
             });
 
-            AddStep("set non-default value", () => restoreDefaultValueButton.Current.Value = "non-default");
-            AddAssert("default value button centre aligned to control size", () => Precision.AlmostEquals(restoreDefaultValueButton.Parent.DrawHeight, control.DrawHeight, 1));
+            AddStep("set non-default value", () => revertToDefaultButton.Current.Value = "non-default");
+            AddAssert("default value button centre aligned to control size", () => Precision.AlmostEquals(revertToDefaultButton.Parent!.DrawHeight, control.DrawHeight, 1));
 
             AddStep("set label", () => textBox.LabelText = "label text");
             AddAssert("default value button centre aligned to label size", () =>
             {
                 var label = textBox.ChildrenOfType<OsuSpriteText>().Single(spriteText => spriteText.Text == "label text");
-                return Precision.AlmostEquals(restoreDefaultValueButton.Parent.DrawHeight, label.DrawHeight, 1);
+                return Precision.AlmostEquals(revertToDefaultButton.Parent!.DrawHeight, label.DrawHeight, 1);
             });
 
             AddStep("clear label", () => textBox.LabelText = default);
-            AddAssert("default value button centre aligned to control size", () => Precision.AlmostEquals(restoreDefaultValueButton.Parent.DrawHeight, control.DrawHeight, 1));
+            AddAssert("default value button centre aligned to control size", () => Precision.AlmostEquals(revertToDefaultButton.Parent!.DrawHeight, control.DrawHeight, 1));
 
             AddStep("set warning text", () => textBox.SetNoticeText("This is some very important warning text! Hopefully it doesn't break the alignment of the default value indicator...", true));
-            AddAssert("default value button centre aligned to control size", () => Precision.AlmostEquals(restoreDefaultValueButton.Parent.DrawHeight, control.DrawHeight, 1));
+            AddAssert("default value button centre aligned to control size", () => Precision.AlmostEquals(revertToDefaultButton.Parent!.DrawHeight, control.DrawHeight, 1));
         }
 
         /// <summary>
@@ -92,7 +99,7 @@ namespace osu.Game.Tests.Visual.Settings
         {
             BindableFloat current = null;
             SettingsSlider<float> sliderBar = null;
-            RestoreDefaultValueButton<float> restoreDefaultValueButton = null;
+            RevertToDefaultButton<float> revertToDefaultButton = null;
 
             AddStep("create settings item", () =>
             {
@@ -107,15 +114,15 @@ namespace osu.Game.Tests.Visual.Settings
                 };
             });
             AddUntilStep("wait for loaded", () => sliderBar.IsLoaded);
-            AddStep("retrieve restore default button", () => restoreDefaultValueButton = sliderBar.ChildrenOfType<RestoreDefaultValueButton<float>>().Single());
+            AddStep("retrieve restore default button", () => revertToDefaultButton = sliderBar.ChildrenOfType<RevertToDefaultButton<float>>().Single());
 
-            AddAssert("restore button hidden", () => restoreDefaultValueButton.Alpha == 0);
+            AddAssert("restore button hidden", () => revertToDefaultButton.Alpha == 0);
 
             AddStep("change value to next closest", () => sliderBar.Current.Value += current.Precision * 0.6f);
-            AddUntilStep("restore button shown", () => restoreDefaultValueButton.Alpha > 0);
+            AddUntilStep("restore button shown", () => revertToDefaultButton.Alpha > 0);
 
             AddStep("restore default", () => sliderBar.Current.SetDefault());
-            AddUntilStep("restore button hidden", () => restoreDefaultValueButton.Alpha == 0);
+            AddUntilStep("restore button hidden", () => revertToDefaultButton.Alpha == 0);
         }
 
         [Test]

@@ -1,7 +1,5 @@
-// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
-
-#nullable disable
 
 using System;
 using System.Collections;
@@ -79,7 +77,7 @@ namespace osu.Game.Tests.Beatmaps.Formats
 
             compareBeatmaps(decoded, decodedAfterEncode);
 
-            ControlPointInfo removeLegacyControlPointTypes(ControlPointInfo controlPointInfo)
+            static ControlPointInfo removeLegacyControlPointTypes(ControlPointInfo controlPointInfo)
             {
                 // emulate non-legacy control points by cloning the non-legacy portion.
                 // the assertion is that the encoder can recreate this losslessly from hitobject data.
@@ -116,6 +114,33 @@ namespace osu.Game.Tests.Beatmaps.Formats
         }
 
         [Test]
+        public void TestEncodeBSplineCurveType()
+        {
+            var beatmap = new Beatmap
+            {
+                HitObjects =
+                {
+                    new Slider
+                    {
+                        Path = new SliderPath(new[]
+                        {
+                            new PathControlPoint(Vector2.Zero, PathType.BSpline(3)),
+                            new PathControlPoint(new Vector2(50)),
+                            new PathControlPoint(new Vector2(100), PathType.BSpline(3)),
+                            new PathControlPoint(new Vector2(150))
+                        })
+                    },
+                }
+            };
+
+            var decodedAfterEncode = decodeFromLegacy(encodeToLegacy((beatmap, new TestLegacySkin(beatmaps_resource_store, string.Empty))), string.Empty);
+            var decodedSlider = (Slider)decodedAfterEncode.beatmap.HitObjects[0];
+            Assert.That(decodedSlider.Path.ControlPoints.Count, Is.EqualTo(4));
+            Assert.That(decodedSlider.Path.ControlPoints[0].Type, Is.EqualTo(PathType.BSpline(3)));
+            Assert.That(decodedSlider.Path.ControlPoints[2].Type, Is.EqualTo(PathType.BSpline(3)));
+        }
+
+        [Test]
         public void TestEncodeMultiSegmentSliderWithFloatingPointError()
         {
             var beatmap = new Beatmap
@@ -127,10 +152,10 @@ namespace osu.Game.Tests.Beatmaps.Formats
                         Position = new Vector2(0.6f),
                         Path = new SliderPath(new[]
                         {
-                            new PathControlPoint(Vector2.Zero, PathType.Bezier),
+                            new PathControlPoint(Vector2.Zero, PathType.BEZIER),
                             new PathControlPoint(new Vector2(0.5f)),
                             new PathControlPoint(new Vector2(0.51f)), // This is actually on the same position as the previous one in legacy beatmaps (truncated to int).
-                            new PathControlPoint(new Vector2(1f), PathType.Bezier),
+                            new PathControlPoint(new Vector2(1f), PathType.BEZIER),
                             new PathControlPoint(new Vector2(2f))
                         })
                     },
@@ -176,8 +201,8 @@ namespace osu.Game.Tests.Beatmaps.Formats
 
         private class TestLegacySkin : LegacySkin
         {
-            public TestLegacySkin(IResourceStore<byte[]> storage, string fileName)
-                : base(new SkinInfo { Name = "Test Skin", Creator = "Craftplacer" }, null, storage, fileName)
+            public TestLegacySkin(IResourceStore<byte[]> fallbackStore, string fileName)
+                : base(new SkinInfo { Name = "Test Skin", Creator = "Craftplacer" }, null, fallbackStore, fileName)
             {
             }
         }

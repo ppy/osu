@@ -107,7 +107,7 @@ namespace osu.Game.Rulesets
                     }
                 }
 
-                availableRulesets.AddRange(detachedRulesets.OrderBy(r => r));
+                availableRulesets.AddRange(detachedRulesets.Order());
             });
         }
 

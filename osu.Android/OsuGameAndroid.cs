@@ -1,17 +1,17 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
 using System;
 using Android.App;
 using Microsoft.Maui.Devices;
 using osu.Framework.Allocation;
 using osu.Framework.Android.Input;
+using osu.Framework.Extensions.ObjectExtensions;
 using osu.Framework.Input.Handlers;
 using osu.Framework.Platform;
 using osu.Game;
 using osu.Game.Overlays.Settings;
+using osu.Game.Overlays.Settings.Sections.Input;
 using osu.Game.Updater;
 using osu.Game.Utils;
 
@@ -32,7 +32,7 @@ namespace osu.Android
         {
             get
             {
-                var packageInfo = Application.Context.ApplicationContext.PackageManager.GetPackageInfo(Application.Context.ApplicationContext.PackageName, 0);
+                var packageInfo = Application.Context.ApplicationContext!.PackageManager!.GetPackageInfo(Application.Context.ApplicationContext.PackageName!, 0).AsNonNull();
 
                 try
                 {
@@ -45,7 +45,7 @@ namespace osu.Android
                     // Basic conversion format (as done in Fastfile): 2020.606.0 -> 202006060
 
                     // https://stackoverflow.com/questions/52977079/android-sdk-28-versioncode-in-packageinfo-has-been-deprecated
-                    string versionName = string.Empty;
+                    string versionName;
 
                     if (OperatingSystem.IsAndroidVersionAtLeast(28))
                     {
@@ -68,7 +68,7 @@ namespace osu.Android
                 {
                 }
 
-                return new Version(packageInfo.VersionName);
+                return new Version(packageInfo.VersionName.AsNonNull());
             }
         }
 
@@ -97,6 +97,9 @@ namespace osu.Android
 
                 case AndroidJoystickHandler jh:
                     return new AndroidJoystickSettings(jh);
+
+                case AndroidTouchHandler th:
+                    return new TouchSettings(th);
 
                 default:
                     return base.CreateSettingsSubsectionFor(handler);

@@ -1,7 +1,5 @@
-// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
-
-#nullable disable
 
 using System;
 using System.Diagnostics;
@@ -19,9 +17,11 @@ using osu.Game.Localisation;
 using osu.Game.Overlays;
 using osu.Game.Overlays.Mods.Input;
 using osu.Game.Rulesets.Scoring;
+using osu.Game.Screens.OnlinePlay.Lounge.Components;
 using osu.Game.Screens.Select;
 using osu.Game.Screens.Select.Filter;
 using osu.Game.Skinning;
+using osu.Game.Users;
 
 namespace osu.Game.Configuration
 {
@@ -39,7 +39,7 @@ namespace osu.Game.Configuration
             SetDefault(OsuSetting.Ruleset, string.Empty);
             SetDefault(OsuSetting.Skin, SkinInfo.ARGON_SKIN.ToString());
 
-            SetDefault(OsuSetting.BeatmapDetailTab, PlayBeatmapDetailArea.TabType.Details);
+            SetDefault(OsuSetting.BeatmapDetailTab, PlayBeatmapDetailArea.TabType.Local);
             SetDefault(OsuSetting.BeatmapDetailModsFilter, false);
 
             SetDefault(OsuSetting.ShowConvertedBeatmaps, true);
@@ -51,6 +51,7 @@ namespace osu.Game.Configuration
 
             SetDefault(OsuSetting.RandomSelectAlgorithm, RandomSelectAlgorithm.RandomPermutation);
             SetDefault(OsuSetting.ModSelectHotkeyStyle, ModSelectHotkeyStyle.Sequential);
+            SetDefault(OsuSetting.ModSelectTextSearchStartsActive, true);
 
             SetDefault(OsuSetting.ChatDisplayHeight, ChatOverlay.DEFAULT_HEIGHT, 0.2f, 1f);
 
@@ -66,7 +67,13 @@ namespace osu.Game.Configuration
             SetDefault(OsuSetting.Username, string.Empty);
             SetDefault(OsuSetting.Token, string.Empty);
 
+#pragma warning disable CS0618 // Type or member is obsolete
+            // this default set MUST remain despite the setting being deprecated, because `SetDefault()` calls are implicitly used to declare the type returned for the lookup.
+            // if this is removed, the setting will be interpreted as a string, and `Migrate()` will fail due to cast failure.
+            // can be removed 20240618
             SetDefault(OsuSetting.AutomaticallyDownloadWhenSpectating, false);
+#pragma warning restore CS0618 // Type or member is obsolete
+            SetDefault(OsuSetting.AutomaticallyDownloadMissingBeatmaps, false);
 
             SetDefault(OsuSetting.SavePassword, false).ValueChanged += enabled =>
             {
@@ -91,6 +98,7 @@ namespace osu.Game.Configuration
 
             SetDefault(OsuSetting.MenuVoice, true);
             SetDefault(OsuSetting.MenuMusic, true);
+            SetDefault(OsuSetting.MenuTips, true);
 
             SetDefault(OsuSetting.AudioOffset, 0, -500.0, 500.0, 1);
 
@@ -103,6 +111,8 @@ namespace osu.Game.Configuration
             SetDefault(OsuSetting.MouseDisableButtons, false);
             SetDefault(OsuSetting.MouseDisableWheel, false);
             SetDefault(OsuSetting.ConfineMouseMode, OsuConfineMouseMode.DuringGameplay);
+
+            SetDefault(OsuSetting.TouchDisableGameplayTaps, false);
 
             // Graphics
             SetDefault(OsuSetting.ShowFpsDisplay, false);
@@ -131,6 +141,8 @@ namespace osu.Game.Configuration
             SetDefault(OsuSetting.ShowHealthDisplayWhenCantFail, true);
             SetDefault(OsuSetting.FadePlayfieldWhenHealthLow, true);
             SetDefault(OsuSetting.KeyOverlay, false);
+            SetDefault(OsuSetting.ReplaySettingsOverlay, true);
+            SetDefault(OsuSetting.ReplayPlaybackControlsExpanded, true);
             SetDefault(OsuSetting.GameplayLeaderboard, true);
             SetDefault(OsuSetting.AlwaysPlayFirstComboBreak, true);
 
@@ -178,10 +190,15 @@ namespace osu.Game.Configuration
             SetDefault(OsuSetting.EditorWaveformOpacity, 0.25f, 0f, 1f, 0.25f);
             SetDefault(OsuSetting.EditorShowHitMarkers, true);
             SetDefault(OsuSetting.EditorAutoSeekOnPlacement, true);
+            SetDefault(OsuSetting.EditorLimitedDistanceSnap, false);
+            SetDefault(OsuSetting.EditorShowSpeedChanges, false);
+
+            SetDefault(OsuSetting.MultiplayerRoomFilter, RoomPermissionsFilter.All);
 
             SetDefault(OsuSetting.LastProcessedMetadataId, -1);
 
             SetDefault(OsuSetting.ComboColourNormalisationAmount, 0.2f, 0f, 1f, 0.01f);
+            SetDefault<UserStatus?>(OsuSetting.UserOnlineStatus, null);
         }
 
         protected override bool CheckLookupContainsPrivateInformation(OsuSetting lookup)
@@ -215,6 +232,12 @@ namespace osu.Game.Configuration
 
             // migrations can be added here using a condition like:
             // if (combined < 20220103) { performMigration() }
+            if (combined < 20230918)
+            {
+#pragma warning disable CS0618 // Type or member is obsolete
+                SetValue(OsuSetting.AutomaticallyDownloadMissingBeatmaps, Get<bool>(OsuSetting.AutomaticallyDownloadWhenSpectating)); // can be removed 20240618
+#pragma warning restore CS0618 // Type or member is obsolete
+            }
         }
 
         public override TrackedSettings CreateTrackedSettings()
@@ -237,6 +260,12 @@ namespace osu.Game.Configuration
                     value: disabledState ? CommonStrings.Disabled.ToLower() : CommonStrings.Enabled.ToLower(),
                     shortcut: LookupKeyBindings(GlobalAction.ToggleGameplayMouseButtons))
                 ),
+                new TrackedSetting<bool>(OsuSetting.GameplayLeaderboard, state => new SettingDescription(
+                    rawValue: state,
+                    name: GlobalActionKeyBindingStrings.ToggleInGameLeaderboard,
+                    value: state ? CommonStrings.Enabled.ToLower() : CommonStrings.Disabled.ToLower(),
+                    shortcut: LookupKeyBindings(GlobalAction.ToggleInGameLeaderboard))
+                ),
                 new TrackedSetting<HUDVisibilityMode>(OsuSetting.HUDVisibilityMode, visibilityMode => new SettingDescription(
                     rawValue: visibilityMode,
                     name: GameplaySettingsStrings.HUDVisibilityMode,
@@ -258,7 +287,7 @@ namespace osu.Game.Configuration
                     string skinName = string.Empty;
 
                     if (Guid.TryParse(skin, out var id))
-                        skinName = LookupSkinName(id) ?? string.Empty;
+                        skinName = LookupSkinName(id);
 
                     return new SettingDescription(
                         rawValue: skinName,
@@ -311,6 +340,10 @@ namespace osu.Game.Configuration
 
         ShowHealthDisplayWhenCantFail,
         FadePlayfieldWhenHealthLow,
+
+        /// <summary>
+        /// Disables mouse buttons clicks during gameplay.
+        /// </summary>
         MouseDisableButtons,
         MouseDisableWheel,
         ConfineMouseMode,
@@ -324,6 +357,7 @@ namespace osu.Game.Configuration
         VolumeInactive,
         MenuMusic,
         MenuVoice,
+        MenuTips,
         CursorRotation,
         MenuParallax,
         Prefer24HourTime,
@@ -377,11 +411,23 @@ namespace osu.Game.Configuration
         EditorShowHitMarkers,
         EditorAutoSeekOnPlacement,
         DiscordRichPresence,
+
+        [Obsolete($"Use {nameof(AutomaticallyDownloadMissingBeatmaps)} instead.")] // can be removed 20240318
         AutomaticallyDownloadWhenSpectating,
+
         ShowOnlineExplicitContent,
         LastProcessedMetadataId,
         SafeAreaConsiderations,
         ComboColourNormalisationAmount,
         ProfileCoverExpanded,
+        EditorLimitedDistanceSnap,
+        ReplaySettingsOverlay,
+        ReplayPlaybackControlsExpanded,
+        AutomaticallyDownloadMissingBeatmaps,
+        EditorShowSpeedChanges,
+        TouchDisableGameplayTaps,
+        ModSelectTextSearchStartsActive,
+        UserOnlineStatus,
+        MultiplayerRoomFilter
     }
 }

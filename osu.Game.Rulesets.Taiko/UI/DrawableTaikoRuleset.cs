@@ -35,7 +35,7 @@ namespace osu.Game.Rulesets.Taiko.UI
 
         public new TaikoInputManager KeyBindingInputManager => (TaikoInputManager)base.KeyBindingInputManager;
 
-        protected override ScrollVisualisationMethod VisualisationMethod => ScrollVisualisationMethod.Overlapping;
+        protected new TaikoPlayfieldAdjustmentContainer PlayfieldAdjustmentContainer => (TaikoPlayfieldAdjustmentContainer)base.PlayfieldAdjustmentContainer;
 
         protected override bool UserScrollSpeedAdjustment => false;
 
@@ -45,6 +45,7 @@ namespace osu.Game.Rulesets.Taiko.UI
             : base(ruleset, beatmap, mods)
         {
             Direction.Value = ScrollingDirection.Left;
+            VisualisationMethod = ScrollVisualisationMethod.Overlapping;
         }
 
         [BackgroundDependencyLoader]
@@ -65,16 +66,10 @@ namespace osu.Game.Rulesets.Taiko.UI
         {
             base.Update();
 
-            // Taiko scrolls at a constant 100px per 1000ms. More notes become visible as the playfield is lengthened.
-            const float scroll_rate = 10;
-
-            // Since the time range will depend on a positional value, it is referenced to the x480 pixel space.
-            // Width is used because it defines how many notes fit on the playfield.
-            // We clamp the ratio to the maximum aspect ratio to keep scroll speed consistent on widths lower than the default.
-            float ratio = Math.Max(DrawSize.X / 768f, TaikoPlayfieldAdjustmentContainer.MAXIMUM_ASPECT);
-
-            TimeRange.Value = (Playfield.HitObjectContainer.DrawWidth / ratio) * scroll_rate;
+            TimeRange.Value = ComputeTimeRange();
         }
+
+        protected virtual double ComputeTimeRange() => PlayfieldAdjustmentContainer.ComputeTimeRange();
 
         protected override void UpdateAfterChildren()
         {
