@@ -1,8 +1,6 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -31,8 +29,8 @@ namespace osu.Game.Tests.Rulesets.Scoring
 {
     public partial class ScoreProcessorTest
     {
-        private ScoreProcessor scoreProcessor;
-        private IBeatmap beatmap;
+        private ScoreProcessor scoreProcessor = null!;
+        private IBeatmap beatmap = null!;
 
         [SetUp]
         public void SetUp()
@@ -86,7 +84,7 @@ namespace osu.Game.Tests.Rulesets.Scoring
         [TestCase(ScoringMode.Standardised, HitResult.SmallTickHit, HitResult.SmallTickHit, 493_652)]
         [TestCase(ScoringMode.Standardised, HitResult.LargeTickMiss, HitResult.LargeTickHit, 0)]
         [TestCase(ScoringMode.Standardised, HitResult.LargeTickHit, HitResult.LargeTickHit, 326_963)]
-        [TestCase(ScoringMode.Standardised, HitResult.SliderTailHit, HitResult.SliderTailHit, 326_963)]
+        [TestCase(ScoringMode.Standardised, HitResult.SliderTailHit, HitResult.SliderTailHit, 371_627)]
         [TestCase(ScoringMode.Standardised, HitResult.SmallBonus, HitResult.SmallBonus, 1_000_030)]
         [TestCase(ScoringMode.Standardised, HitResult.LargeBonus, HitResult.LargeBonus, 1_000_150)]
         [TestCase(ScoringMode.Classic, HitResult.Miss, HitResult.Great, 0)]
@@ -99,7 +97,7 @@ namespace osu.Game.Tests.Rulesets.Scoring
         [TestCase(ScoringMode.Classic, HitResult.SmallTickHit, HitResult.SmallTickHit, 49_365)]
         [TestCase(ScoringMode.Classic, HitResult.LargeTickMiss, HitResult.LargeTickHit, 0)]
         [TestCase(ScoringMode.Classic, HitResult.LargeTickHit, HitResult.LargeTickHit, 32_696)]
-        [TestCase(ScoringMode.Classic, HitResult.SliderTailHit, HitResult.SliderTailHit, 32_696)]
+        [TestCase(ScoringMode.Classic, HitResult.SliderTailHit, HitResult.SliderTailHit, 37_163)]
         [TestCase(ScoringMode.Classic, HitResult.SmallBonus, HitResult.SmallBonus, 100_003)]
         [TestCase(ScoringMode.Classic, HitResult.LargeBonus, HitResult.LargeBonus, 100_015)]
         public void TestFourVariousResultsOneMiss(ScoringMode scoringMode, HitResult hitResult, HitResult maxResult, int expectedScore)
@@ -171,7 +169,7 @@ namespace osu.Game.Tests.Rulesets.Scoring
         [TestCase(HitResult.Perfect, HitResult.Miss)]
         [TestCase(HitResult.SmallTickHit, HitResult.SmallTickMiss)]
         [TestCase(HitResult.LargeTickHit, HitResult.LargeTickMiss)]
-        [TestCase(HitResult.SliderTailHit, HitResult.LargeTickMiss)]
+        [TestCase(HitResult.SliderTailHit, HitResult.IgnoreMiss)]
         [TestCase(HitResult.SmallBonus, HitResult.IgnoreMiss)]
         [TestCase(HitResult.LargeBonus, HitResult.IgnoreMiss)]
         public void TestMinResults(HitResult hitResult, HitResult expectedMinResult)
@@ -476,7 +474,7 @@ namespace osu.Game.Tests.Rulesets.Scoring
 
                 public override IEnumerable<Mod> GetModsFor(ModType type) => throw new NotImplementedException();
 
-                public override DrawableRuleset CreateDrawableRulesetWith(IBeatmap beatmap, IReadOnlyList<Mod> mods = null) => throw new NotImplementedException();
+                public override DrawableRuleset CreateDrawableRulesetWith(IBeatmap beatmap, IReadOnlyList<Mod>? mods = null) => throw new NotImplementedException();
 
                 public override IBeatmapConverter CreateBeatmapConverter(IBeatmap beatmap) => throw new NotImplementedException();
 
