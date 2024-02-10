@@ -35,6 +35,11 @@ namespace osu.Game.Localisation
         public static LocalisableString HideCursor => new TranslatableString(getKey(@"hide_cursor"), @"Hide cursor");
 
         /// <summary>
+        /// "Aim lines"
+        /// </summary>
+        public static LocalisableString AimLines => new TranslatableString(getKey(@"aim_lines"), @"Aim lines");
+
+        /// <summary>
         /// "Seek backward {0} seconds"
         /// </summary>
         public static LocalisableString SeekBackwardSeconds(double arg0) => new TranslatableString(getKey(@"seek_backward_seconds"), @"Seek backward {0} seconds", arg0);

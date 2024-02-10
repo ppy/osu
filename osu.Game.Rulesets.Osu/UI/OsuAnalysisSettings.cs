@@ -4,7 +4,9 @@
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
-using osu.Framework.Logging;
+using osu.Framework.Graphics.Containers;
+using osu.Framework.Input.Events;
+using osu.Game.Graphics.Containers;
 using osu.Game.Localisation;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Osu.Mods;
@@ -15,14 +17,13 @@ namespace osu.Game.Rulesets.Osu.UI
 {
     public partial class OsuAnalysisSettings : AnalysisSettings
     {
-         private static readonly Logger logger = Logger.GetLogger("osu-analysis-settings");
-
         protected new DrawableOsuRuleset drawableRuleset => (DrawableOsuRuleset)base.drawableRuleset;
 
         private readonly PlayerCheckbox hitMarkerToggle;
         private readonly PlayerCheckbox aimMarkerToggle;
         private readonly PlayerCheckbox hideCursorToggle;
-        private readonly PlayerCheckbox? hiddenToggle;
+        private readonly PlayerCheckbox aimLinesToggle;
+        private readonly FillFlowContainer modTogglesContainer;
 
         public OsuAnalysisSettings(DrawableRuleset drawableRuleset)
             : base(drawableRuleset)
@@ -31,18 +32,36 @@ namespace osu.Game.Rulesets.Osu.UI
             {
                 hitMarkerToggle = new PlayerCheckbox { LabelText = PlayerSettingsOverlayStrings.HitMarkers },
                 aimMarkerToggle = new PlayerCheckbox { LabelText = PlayerSettingsOverlayStrings.AimMarkers },
-                hideCursorToggle = new PlayerCheckbox { LabelText = PlayerSettingsOverlayStrings.HideCursor }
+                aimLinesToggle = new PlayerCheckbox { LabelText = PlayerSettingsOverlayStrings.AimLines },
+                hideCursorToggle = new PlayerCheckbox { LabelText = PlayerSettingsOverlayStrings.HideCursor },
+                new OsuScrollContainer(Direction.Horizontal)
+                {
+                    RelativeSizeAxes = Axes.X,
+                    Height = ModSwitchSmall.DEFAULT_SIZE,
+                    ScrollbarOverlapsContent = false,
+                    Child = modTogglesContainer = new FillFlowContainer
+                    {
+                        Anchor = Anchor.BottomLeft,
+                        Origin = Anchor.BottomLeft,
+                        Direction = FillDirection.Horizontal,
+                        RelativeSizeAxes = Axes.Y,
+                        AutoSizeAxes = Axes.X
+                    }
+                }
             };
-
-            // hidden stuff is just here for testing at the moment; to create the mod disabling functionality
             
             foreach (var mod in drawableRuleset.Mods)
             {
-                if (mod is OsuModHidden)
+                if (mod is IToggleableVisibility toggleableMod)
                 {
-                    logger.Add("Hidden is enabled", LogLevel.Debug);
-                    Add(hiddenToggle = new PlayerCheckbox { LabelText = "Disable hidden" });
-                    break;
+                    var modSwitch = new SelectableModSwitchSmall(mod)
+                    {
+                        Anchor = Anchor.Centre,
+                        Origin = Anchor.Centre,
+                        Active = { Value = true }
+                    };
+                    modSwitch.Active.BindValueChanged((v) => onModToggle(toggleableMod, v));
+                    modTogglesContainer.Add(modSwitch);
                 }
             }
         }
@@ -51,8 +70,8 @@ namespace osu.Game.Rulesets.Osu.UI
         {
             drawableRuleset.Playfield.MarkersContainer.HitMarkerEnabled.BindTo(hitMarkerToggle.Current);
             drawableRuleset.Playfield.MarkersContainer.AimMarkersEnabled.BindTo(aimMarkerToggle.Current);
+            drawableRuleset.Playfield.MarkersContainer.AimLinesEnabled.BindTo(aimLinesToggle.Current);
             hideCursorToggle.Current.BindValueChanged(onCursorToggle);
-            hiddenToggle?.Current.BindValueChanged(onHiddenToggle);
         }
 
         private void onCursorToggle(ValueChangedEvent<bool> hide)
@@ -60,21 +79,34 @@ namespace osu.Game.Rulesets.Osu.UI
             // this only hides half the cursor
             if (hide.NewValue)
             {
-                drawableRuleset.Playfield.Cursor.Hide();
+                drawableRuleset.Playfield.Cursor.FadeOut();
             } else
             {
-                drawableRuleset.Playfield.Cursor.Show();
+                drawableRuleset.Playfield.Cursor.FadeIn();
             }
         }
 
-        private void onHiddenToggle(ValueChangedEvent<bool> off)
+        private void onModToggle(IToggleableVisibility mod, ValueChangedEvent<bool> toggled)
         {
-            if (off.NewValue)
+            if (toggled.NewValue)
             {
-                logger.Add("Hidden off", LogLevel.Debug);
+                mod.ToggleOnVisibility(drawableRuleset.Playfield);
             } else
             {
-                logger.Add("Hidden on", LogLevel.Debug);
+                mod.ToggleOffVisibility(drawableRuleset.Playfield);
+            }
+        }
+
+        private partial class SelectableModSwitchSmall : ModSwitchSmall
+        {
+            public SelectableModSwitchSmall(IMod mod)
+                : base(mod)
+            {}
+
+            protected override bool OnClick(ClickEvent e)
+            {
+                Active.Value = !Active.Value;
+                return true;
             }
         }
     }

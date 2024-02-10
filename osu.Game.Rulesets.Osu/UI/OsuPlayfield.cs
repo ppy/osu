@@ -62,7 +62,7 @@ namespace osu.Game.Rulesets.Osu.UI
                 HitObjectContainer,
                 judgementAboveHitObjectLayer = new Container { RelativeSizeAxes = Axes.Both },
                 approachCircles = new ProxyContainer { RelativeSizeAxes = Axes.Both },
-                MarkersContainer = new HitMarkerContainer { RelativeSizeAxes = Axes.Both }
+                MarkersContainer = new HitMarkerContainer(HitObjectContainer) { RelativeSizeAxes = Axes.Both }
             };
 
             HitPolicy = new StartTimeOrderedHitPolicy();
