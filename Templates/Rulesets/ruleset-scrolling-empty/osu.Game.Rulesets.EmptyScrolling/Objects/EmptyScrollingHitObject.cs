@@ -8,6 +8,6 @@ namespace osu.Game.Rulesets.EmptyScrolling.Objects
 {
     public class EmptyScrollingHitObject : HitObject
     {
-        public override Judgement CreateJudgement() => new Judgement();
+        protected override Judgement CreateJudgement() => new Judgement();
     }
 }
