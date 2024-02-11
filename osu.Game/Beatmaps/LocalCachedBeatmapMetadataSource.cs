@@ -49,57 +49,6 @@ namespace osu.Game.Beatmaps
                 prepareLocalCache();
         }
 
-        private void prepareLocalCache()
-        {
-            string cacheFilePath = storage.GetFullPath(cache_database_name);
-            string compressedCacheFilePath = $@"{cacheFilePath}.bz2";
-
-            cacheDownloadRequest = new FileWebRequest(compressedCacheFilePath, $@"https://assets.ppy.sh/client-resources/{cache_database_name}.bz2?{DateTimeOffset.UtcNow:yyyyMMdd}");
-
-            cacheDownloadRequest.Failed += ex =>
-            {
-                File.Delete(compressedCacheFilePath);
-                File.Delete(cacheFilePath);
-
-                Logger.Log($@"{nameof(BeatmapUpdaterMetadataLookup)}'s online cache download failed: {ex}", LoggingTarget.Database);
-            };
-
-            cacheDownloadRequest.Finished += () =>
-            {
-                try
-                {
-                    using (var stream = File.OpenRead(cacheDownloadRequest.Filename))
-                    using (var outStream = File.OpenWrite(cacheFilePath))
-                    using (var bz2 = new BZip2Stream(stream, CompressionMode.Decompress, false))
-                        bz2.CopyTo(outStream);
-
-                    // set to null on completion to allow lookups to begin using the new source
-                    cacheDownloadRequest = null;
-                }
-                catch (Exception ex)
-                {
-                    Logger.Log($@"{nameof(LocalCachedBeatmapMetadataSource)}'s online cache extraction failed: {ex}", LoggingTarget.Database);
-                    File.Delete(cacheFilePath);
-                }
-                finally
-                {
-                    File.Delete(compressedCacheFilePath);
-                }
-            };
-
-            Task.Run(async () =>
-            {
-                try
-                {
-                    await cacheDownloadRequest.PerformAsync().ConfigureAwait(false);
-                }
-                catch
-                {
-                    // Prevent throwing unobserved exceptions, as they will be logged from the network request to the log file anyway.
-                }
-            });
-        }
-
         public bool Available =>
             // no download in progress.
             cacheDownloadRequest == null
@@ -171,6 +120,57 @@ namespace osu.Game.Beatmaps
 
             onlineMetadata = null;
             return false;
+        }
+
+        private void prepareLocalCache()
+        {
+            string cacheFilePath = storage.GetFullPath(cache_database_name);
+            string compressedCacheFilePath = $@"{cacheFilePath}.bz2";
+
+            cacheDownloadRequest = new FileWebRequest(compressedCacheFilePath, $@"https://assets.ppy.sh/client-resources/{cache_database_name}.bz2?{DateTimeOffset.UtcNow:yyyyMMdd}");
+
+            cacheDownloadRequest.Failed += ex =>
+            {
+                File.Delete(compressedCacheFilePath);
+                File.Delete(cacheFilePath);
+
+                Logger.Log($@"{nameof(BeatmapUpdaterMetadataLookup)}'s online cache download failed: {ex}", LoggingTarget.Database);
+            };
+
+            cacheDownloadRequest.Finished += () =>
+            {
+                try
+                {
+                    using (var stream = File.OpenRead(cacheDownloadRequest.Filename))
+                    using (var outStream = File.OpenWrite(cacheFilePath))
+                    using (var bz2 = new BZip2Stream(stream, CompressionMode.Decompress, false))
+                        bz2.CopyTo(outStream);
+
+                    // set to null on completion to allow lookups to begin using the new source
+                    cacheDownloadRequest = null;
+                }
+                catch (Exception ex)
+                {
+                    Logger.Log($@"{nameof(LocalCachedBeatmapMetadataSource)}'s online cache extraction failed: {ex}", LoggingTarget.Database);
+                    File.Delete(cacheFilePath);
+                }
+                finally
+                {
+                    File.Delete(compressedCacheFilePath);
+                }
+            };
+
+            Task.Run(async () =>
+            {
+                try
+                {
+                    await cacheDownloadRequest.PerformAsync().ConfigureAwait(false);
+                }
+                catch
+                {
+                    // Prevent throwing unobserved exceptions, as they will be logged from the network request to the log file anyway.
+                }
+            });
         }
 
         private void logForModel(BeatmapSetInfo set, string message) =>
