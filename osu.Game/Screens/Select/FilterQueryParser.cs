@@ -69,6 +69,7 @@ namespace osu.Game.Screens.Select
 
                 case "creator":
                 case "author":
+                case "mapper":
                     return TryUpdateCriteriaText(ref criteria.Creator, op, value);
 
                 case "artist":
