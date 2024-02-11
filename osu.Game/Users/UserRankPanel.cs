@@ -7,7 +7,8 @@ using osu.Framework.Extensions.LocalisationExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Input.Events;
-using osu.Game.Online.API;
+using osu.Game.Graphics.UserInterface;
+using osu.Game.Online;
 using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Overlays.Profile.Header.Components;
 using osu.Game.Resources.Localisation.Web;
@@ -24,11 +25,9 @@ namespace osu.Game.Users
         private const int padding = 10;
         private const int main_content_height = 80;
 
-        [Resolved]
-        private IAPIProvider api { get; set; } = null!;
-
         private ProfileValueDisplay globalRankDisplay = null!;
         private ProfileValueDisplay countryRankDisplay = null!;
+        private LoadingLayer loadingLayer = null!;
 
         private readonly IBindable<UserStatistics?> statistics = new Bindable<UserStatistics?>();
 
@@ -43,10 +42,19 @@ namespace osu.Game.Users
         private void load()
         {
             BorderColour = ColourProvider?.Light1 ?? Colours.GreyVioletLighter;
+        }
 
-            statistics.BindTo(api.Statistics);
+        [Resolved]
+        private LocalUserStatisticsProvider statisticsProvider { get; set; } = null!;
+
+        protected override void LoadComplete()
+        {
+            base.LoadComplete();
+
+            statistics.BindTo(statisticsProvider.Statistics);
             statistics.BindValueChanged(stats =>
             {
+                loadingLayer.State.Value = stats.NewValue == null ? Visibility.Visible : Visibility.Hidden;
                 globalRankDisplay.Content = stats.NewValue?.GlobalRank?.ToLocalisableString("\\##,##0") ?? "-";
                 countryRankDisplay.Content = stats.NewValue?.CountryRank?.ToLocalisableString("\\##,##0") ?? "-";
             }, true);
@@ -173,7 +181,8 @@ namespace osu.Game.Users
                                 }
                             }
                         }
-                    }
+                    },
+                    loadingLayer = new LoadingLayer(true),
                 }
             };
 

@@ -11,6 +11,7 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Utils;
 using osu.Game.Beatmaps;
+using osu.Game.Online;
 using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Overlays;
 using osu.Game.Rulesets;
@@ -32,7 +33,10 @@ namespace osu.Game.Tests.Visual.Online
         private TestUserListPanel boundPanel2;
 
         [Cached]
-        private OverlayColourProvider colourProvider = new OverlayColourProvider(OverlayColourScheme.Purple);
+        private readonly OverlayColourProvider colourProvider = new OverlayColourProvider(OverlayColourScheme.Purple);
+
+        [Cached]
+        private readonly LocalUserStatisticsProvider statisticsProvider = new LocalUserStatisticsProvider();
 
         [Resolved]
         private IRulesetStore rulesetStore { get; set; }
@@ -163,16 +167,13 @@ namespace osu.Game.Tests.Visual.Online
         {
             AddStep("update statistics", () =>
             {
-                API.UpdateStatistics(new UserStatistics
+                statisticsProvider.UpdateStatistics(new UserStatistics
                 {
                     GlobalRank = RNG.Next(100000),
                     CountryRank = RNG.Next(100000)
-                });
+                }, Ruleset.Value);
             });
-            AddStep("set statistics to empty", () =>
-            {
-                API.UpdateStatistics(new UserStatistics());
-            });
+            AddStep("set statistics to empty", () => statisticsProvider.UpdateStatistics(new UserStatistics(), Ruleset.Value));
         }
 
         private UserActivity soloGameStatusForRuleset(int rulesetId) => new UserActivity.InSoloGame(new BeatmapInfo(), rulesetStore.GetRuleset(rulesetId)!);
