@@ -22,6 +22,8 @@ namespace osu.Game.Online.Solo
     /// </summary>
     public partial class SoloStatisticsWatcher : Component
     {
+        private readonly LocalUserStatisticsProvider? statisticsProvider;
+
         [Resolved]
         private SpectatorClient spectatorClient { get; set; } = null!;
 
@@ -32,6 +34,11 @@ namespace osu.Game.Online.Solo
         private long? lastProcessedScoreId;
 
         private Dictionary<string, UserStatistics>? latestStatistics;
+
+        public SoloStatisticsWatcher(LocalUserStatisticsProvider? statisticsProvider = null)
+        {
+            this.statisticsProvider = statisticsProvider;
+        }
 
         protected override void LoadComplete()
         {
@@ -127,7 +134,7 @@ namespace osu.Game.Online.Solo
         {
             string rulesetName = callback.Score.Ruleset.ShortName;
 
-            api.UpdateStatistics(updatedStatistics);
+            statisticsProvider?.UpdateStatistics(updatedStatistics, callback.Score.Ruleset);
 
             if (latestStatistics == null)
                 return;
