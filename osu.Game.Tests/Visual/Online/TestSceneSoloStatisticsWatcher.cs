@@ -8,6 +8,7 @@ using NUnit.Framework;
 using osu.Framework.Allocation;
 using osu.Framework.Testing;
 using osu.Game.Models;
+using osu.Game.Online;
 using osu.Game.Online.API;
 using osu.Game.Online.API.Requests;
 using osu.Game.Online.API.Requests.Responses;
@@ -25,6 +26,7 @@ namespace osu.Game.Tests.Visual.Online
     {
         protected override bool UseOnlineAPI => false;
 
+        private LocalUserStatisticsProvider statisticsProvider = null!;
         private SoloStatisticsWatcher watcher = null!;
 
         [Resolved]
@@ -109,7 +111,9 @@ namespace osu.Game.Tests.Visual.Online
 
             AddStep("create watcher", () =>
             {
-                Child = watcher = new SoloStatisticsWatcher();
+                Clear();
+                Add(statisticsProvider = new LocalUserStatisticsProvider());
+                Add(watcher = new SoloStatisticsWatcher(statisticsProvider));
             });
         }
 
@@ -289,7 +293,7 @@ namespace osu.Game.Tests.Visual.Online
             AddStep("signal score processed", () => ((ISpectatorClient)spectatorClient).UserScoreProcessed(userId, scoreId));
             AddUntilStep("update received", () => update != null);
             AddAssert("local user values are correct", () => dummyAPI.LocalUser.Value.Statistics.TotalScore, () => Is.EqualTo(5_000_000));
-            AddAssert("statistics values are correct", () => dummyAPI.Statistics.Value!.TotalScore, () => Is.EqualTo(5_000_000));
+            AddAssert("statistics values are correct", () => statisticsProvider.Statistics.Value!.TotalScore, () => Is.EqualTo(5_000_000));
         }
 
         private int nextUserId = 2000;
