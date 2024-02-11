@@ -47,7 +47,11 @@ namespace osu.Game.Tests.Visual.Online
             activity.Value = null;
             status.Value = null;
 
-            Child = new FillFlowContainer
+            Remove(statisticsProvider, false);
+            Clear();
+            Add(statisticsProvider);
+
+            Add(new FillFlowContainer
             {
                 Anchor = Anchor.Centre,
                 Origin = Anchor.Centre,
@@ -113,7 +117,7 @@ namespace osu.Game.Tests.Visual.Online
                         Statistics = new UserStatistics { GlobalRank = null, CountryRank = null }
                     }) { Width = 300 }
                 }
-            };
+            });
 
             boundPanel1.Status.BindTo(status);
             boundPanel1.Activity.BindTo(activity);
