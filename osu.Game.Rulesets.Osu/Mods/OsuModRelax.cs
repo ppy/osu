@@ -38,12 +38,17 @@ namespace osu.Game.Rulesets.Osu.Mods
         private ReplayState<OsuAction> state = null!;
         private double lastStateChangeTime;
 
+        private DrawableOsuRuleset ruleset = null!;
+
         private bool hasReplay;
+        private bool legacyReplay;
 
         public void ApplyToDrawableRuleset(DrawableRuleset<OsuHitObject> drawableRuleset)
         {
+            ruleset = (DrawableOsuRuleset)drawableRuleset;
+
             // grab the input manager for future use.
-            osuInputManager = ((DrawableOsuRuleset)drawableRuleset).KeyBindingInputManager;
+            osuInputManager = ruleset.KeyBindingInputManager;
         }
 
         public void ApplyToPlayer(Player player)
@@ -51,6 +56,7 @@ namespace osu.Game.Rulesets.Osu.Mods
             if (osuInputManager.ReplayInputHandler != null)
             {
                 hasReplay = true;
+                legacyReplay = ruleset.ReplayScore.ScoreInfo.IsLegacyScore;
                 return;
             }
 
@@ -59,7 +65,7 @@ namespace osu.Game.Rulesets.Osu.Mods
 
         public void Update(Playfield playfield)
         {
-            if (hasReplay)
+            if (hasReplay && !legacyReplay)
                 return;
 
             bool requiresHold = false;
@@ -124,6 +130,20 @@ namespace osu.Game.Rulesets.Osu.Mods
 
                 isDownState = down;
                 lastStateChangeTime = time;
+
+                // legacy replays do not contain key-presses with Relax mod, so they need to be triggered by themselves.
+                if (legacyReplay)
+                {
+                    if (!down)
+                    {
+                        osuInputManager.KeyBindingContainer.TriggerReleased(wasLeft ? OsuAction.RightButton : OsuAction.LeftButton);
+                        return;
+                    }
+
+                    osuInputManager.KeyBindingContainer.TriggerPressed(wasLeft ? OsuAction.LeftButton : OsuAction.RightButton);
+                    wasLeft = !wasLeft;
+                    return;
+                }
 
                 state = new ReplayState<OsuAction>
                 {
