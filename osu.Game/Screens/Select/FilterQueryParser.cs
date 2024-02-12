@@ -68,6 +68,8 @@ namespace osu.Game.Screens.Select
                     return TryUpdateCriteriaRange(ref criteria.OnlineStatus, op, value, tryParseEnum);
 
                 case "creator":
+                case "author":
+                case "mapper":
                     return TryUpdateCriteriaText(ref criteria.Creator, op, value);
 
                 case "artist":
