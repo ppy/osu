@@ -39,6 +39,7 @@ namespace osu.Game.Rulesets.Osu.Mods
         private double lastStateChangeTime;
 
         private DrawableOsuRuleset ruleset = null!;
+        private PressHandler pressHandler = null!;
 
         private bool hasReplay;
         private bool legacyReplay;
@@ -56,10 +57,16 @@ namespace osu.Game.Rulesets.Osu.Mods
             if (osuInputManager.ReplayInputHandler != null)
             {
                 hasReplay = true;
+
+                Debug.Assert(ruleset.ReplayScore != null);
                 legacyReplay = ruleset.ReplayScore.ScoreInfo.IsLegacyScore;
+
+                pressHandler = new LegacyReplayPressHandler(this);
+
                 return;
             }
 
+            pressHandler = new PressHandler(this);
             osuInputManager.AllowGameplayInputs = false;
         }
 
@@ -131,20 +138,6 @@ namespace osu.Game.Rulesets.Osu.Mods
                 isDownState = down;
                 lastStateChangeTime = time;
 
-                // legacy replays do not contain key-presses with Relax mod, so they need to be triggered by themselves.
-                if (legacyReplay)
-                {
-                    if (!down)
-                    {
-                        osuInputManager.KeyBindingContainer.TriggerReleased(wasLeft ? OsuAction.RightButton : OsuAction.LeftButton);
-                        return;
-                    }
-
-                    osuInputManager.KeyBindingContainer.TriggerPressed(wasLeft ? OsuAction.LeftButton : OsuAction.RightButton);
-                    wasLeft = !wasLeft;
-                    return;
-                }
-
                 state = new ReplayState<OsuAction>
                 {
                     PressedActions = new List<OsuAction>()
@@ -152,11 +145,53 @@ namespace osu.Game.Rulesets.Osu.Mods
 
                 if (down)
                 {
-                    state.PressedActions.Add(wasLeft ? OsuAction.LeftButton : OsuAction.RightButton);
+                    pressHandler.HandlePress(wasLeft);
                     wasLeft = !wasLeft;
                 }
+                else
+                {
+                    pressHandler.HandleRelease(wasLeft);
+                }
+            }
+        }
 
-                state.Apply(osuInputManager.CurrentState, osuInputManager);
+        private class PressHandler
+        {
+            protected readonly OsuModRelax Mod;
+
+            public PressHandler(OsuModRelax mod)
+            {
+                Mod = mod;
+            }
+
+            public virtual void HandlePress(bool wasLeft)
+            {
+                Mod.state.PressedActions.Add(wasLeft ? OsuAction.LeftButton : OsuAction.RightButton);
+                Mod.state.Apply(Mod.osuInputManager.CurrentState, Mod.osuInputManager);
+            }
+
+            public virtual void HandleRelease(bool wasLeft)
+            {
+                Mod.state.Apply(Mod.osuInputManager.CurrentState, Mod.osuInputManager);
+            }
+        }
+
+        // legacy replays do not contain key-presses with Relax mod, so they need to be triggered by themselves.
+        private class LegacyReplayPressHandler : PressHandler
+        {
+            public LegacyReplayPressHandler(OsuModRelax mod)
+                : base(mod)
+            {
+            }
+
+            public override void HandlePress(bool wasLeft)
+            {
+                Mod.osuInputManager.KeyBindingContainer.TriggerPressed(wasLeft ? OsuAction.LeftButton : OsuAction.RightButton);
+            }
+
+            public override void HandleRelease(bool wasLeft)
+            {
+                Mod.osuInputManager.KeyBindingContainer.TriggerReleased(wasLeft ? OsuAction.RightButton : OsuAction.LeftButton);
             }
         }
     }
