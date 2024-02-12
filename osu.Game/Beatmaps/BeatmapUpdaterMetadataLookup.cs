@@ -2,6 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using osu.Framework.Platform;
@@ -38,6 +39,8 @@ namespace osu.Game.Beatmaps
         /// <param name="preferOnlineFetch">Whether metadata from an online source should be preferred. If <c>true</c>, the local cache will be skipped to ensure the freshest data state possible.</param>
         public void Update(BeatmapSetInfo beatmapSet, bool preferOnlineFetch)
         {
+            var lookupResults = new List<OnlineBeatmapMetadata?>();
+
             foreach (var beatmapInfo in beatmapSet.Beatmaps)
             {
                 if (!tryLookup(beatmapInfo, preferOnlineFetch, out var res))
@@ -46,8 +49,11 @@ namespace osu.Game.Beatmaps
                 if (res == null || shouldDiscardLookupResult(res, beatmapInfo))
                 {
                     beatmapInfo.ResetOnlineInfo();
+                    lookupResults.Add(null); // mark lookup failure
                     continue;
                 }
+
+                lookupResults.Add(res);
 
                 beatmapInfo.OnlineID = res.BeatmapID;
                 beatmapInfo.OnlineMD5Hash = res.MD5Hash;
@@ -62,13 +68,17 @@ namespace osu.Game.Beatmaps
                     beatmapInfo.Status = res.BeatmapStatus;
                     beatmapInfo.Metadata.Author.OnlineID = res.AuthorID;
                 }
+            }
 
-                if (beatmapInfo.BeatmapSet.Beatmaps.All(b => b.MatchesOnlineVersion))
-                {
-                    beatmapInfo.BeatmapSet.Status = res.BeatmapSetStatus ?? BeatmapOnlineStatus.None;
-                    beatmapInfo.BeatmapSet.DateRanked = res.DateRanked;
-                    beatmapInfo.BeatmapSet.DateSubmitted = res.DateSubmitted;
-                }
+            if (beatmapSet.Beatmaps.All(b => b.MatchesOnlineVersion)
+                && lookupResults.All(r => r != null)
+                && lookupResults.Select(r => r!.BeatmapSetID).Distinct().Count() == 1)
+            {
+                var representative = lookupResults.First()!;
+
+                beatmapSet.Status = representative.BeatmapSetStatus ?? BeatmapOnlineStatus.None;
+                beatmapSet.DateRanked = representative.DateRanked;
+                beatmapSet.DateSubmitted = representative.DateSubmitted;
             }
         }
 
