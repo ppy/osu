@@ -41,6 +41,9 @@ namespace osu.Game.Tests.Visual.Gameplay
 
         private BeatmapSetInfo? importedSet;
 
+        [Resolved]
+        private OsuGameBase osu { get; set; } = null!;
+
         [BackgroundDependencyLoader]
         private void load(GameHost host, AudioManager audio)
         {
@@ -153,6 +156,7 @@ namespace osu.Game.Tests.Visual.Gameplay
 
             AddUntilStep("results displayed", () => Player.GetChildScreen() is ResultsScreen);
             AddUntilStep("score in database", () => Realm.Run(r => r.Find<ScoreInfo>(Player.Score.ScoreInfo.ID) != null));
+            AddUntilStep("score has correct version", () => Realm.Run(r => r.Find<ScoreInfo>(Player.Score.ScoreInfo.ID)!.ClientVersion), () => Is.EqualTo(osu.Version));
         }
 
         [Test]
@@ -214,10 +218,18 @@ namespace osu.Game.Tests.Visual.Gameplay
 
             // Files starting with _ are temporary, created by CreateFileSafely call.
             AddUntilStep("wait for export file", () => filePath = LocalStorage.GetFiles("exports").SingleOrDefault(f => !Path.GetFileName(f).StartsWith("_", StringComparison.Ordinal)), () => Is.Not.Null);
-            AddAssert("filesize is non-zero", () =>
+            AddUntilStep("filesize is non-zero", () =>
             {
-                using (var stream = LocalStorage.GetStream(filePath))
-                    return stream.Length;
+                try
+                {
+                    using (var stream = LocalStorage.GetStream(filePath))
+                        return stream.Length;
+                }
+                catch (IOException)
+                {
+                    // file move may still be in progress.
+                    return 0;
+                }
             }, () => Is.Not.Zero);
         }
 

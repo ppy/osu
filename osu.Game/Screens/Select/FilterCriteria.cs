@@ -38,6 +38,7 @@ namespace osu.Game.Screens.Select
         public OptionalTextFilter Creator;
         public OptionalTextFilter Artist;
         public OptionalTextFilter Title;
+        public OptionalTextFilter DifficultyName;
 
         public OptionalRange<double> UserStarDifficulty = new OptionalRange<double>
         {
@@ -68,8 +69,23 @@ namespace osu.Game.Screens.Select
 
                 string remainingText = value;
 
+                // Match either an open difficulty tag to the end of string,
+                // or match a closed one with a whitespace after it.
+                //
+                // To keep things simple, the closing ']' may be included in the match group,
+                // and is trimmed post-match.
+                foreach (Match quotedSegment in Regex.Matches(value, "(^|\\s)\\[(.*)(\\]\\s|$)"))
+                {
+                    DifficultyName = new OptionalTextFilter
+                    {
+                        SearchTerm = quotedSegment.Groups[2].Value.Trim(']')
+                    };
+
+                    remainingText = remainingText.Replace(quotedSegment.Value, string.Empty);
+                }
+
                 // First handle quoted segments to ensure we keep inline spaces in exact matches.
-                foreach (Match quotedSegment in Regex.Matches(searchText, "(\"[^\"]+\"[!]?)"))
+                foreach (Match quotedSegment in Regex.Matches(value, "(\"[^\"]+\"[!]?)"))
                 {
                     terms.Add(new OptionalTextFilter { SearchTerm = quotedSegment.Value });
                     remainingText = remainingText.Replace(quotedSegment.Value, string.Empty);
@@ -160,13 +176,15 @@ namespace osu.Game.Screens.Select
                 {
                     default:
                     case MatchMode.Substring:
-                        return value.Contains(SearchTerm, StringComparison.InvariantCultureIgnoreCase);
+                        // Note that we are using ordinal here to avoid performance issues caused by globalisation concerns.
+                        // See https://github.com/ppy/osu/issues/11571 / https://github.com/dotnet/docs/issues/18423.
+                        return value.Contains(SearchTerm, StringComparison.OrdinalIgnoreCase);
 
                     case MatchMode.IsolatedPhrase:
                         return Regex.IsMatch(value, $@"(^|\s){Regex.Escape(searchTerm)}($|\s)", RegexOptions.IgnoreCase | RegexOptions.CultureInvariant);
 
                     case MatchMode.FullPhrase:
-                        return CultureInfo.InvariantCulture.CompareInfo.Compare(value, searchTerm, CompareOptions.IgnoreCase) == 0;
+                        return CultureInfo.InvariantCulture.CompareInfo.Compare(value, searchTerm, CompareOptions.OrdinalIgnoreCase) == 0;
                 }
             }
 
@@ -199,6 +217,44 @@ namespace osu.Game.Screens.Select
             }
 
             public bool Equals(OptionalTextFilter other) => SearchTerm == other.SearchTerm;
+        }
+
+        /// <summary>
+        /// Given a new filter criteria, decide whether a full sort needs to be performed.
+        /// </summary>
+        /// <param name="newCriteria"></param>
+        /// <returns></returns>
+        public bool RequiresSorting(FilterCriteria newCriteria)
+        {
+            if (Sort != newCriteria.Sort)
+                return true;
+
+            switch (Sort)
+            {
+                // Some sorts are stable across all other changes.
+                // Running these sorts will sort all items, including currently hidden items.
+                case SortMode.Artist:
+                case SortMode.Author:
+                case SortMode.DateSubmitted:
+                case SortMode.DateAdded:
+                case SortMode.DateRanked:
+                case SortMode.Source:
+                case SortMode.Title:
+                    return false;
+
+                // Some sorts use aggregate max comparisons, which will change based on filtered items.
+                // These sorts generally ignore items hidden by filtered state, so we must force a sort under all circumstances here.
+                //
+                // This makes things very slow when typing a text search, and we probably want to consider a way to optimise things going forward.
+                case SortMode.LastPlayed:
+                case SortMode.BPM:
+                case SortMode.Length:
+                case SortMode.Difficulty:
+                    return true;
+
+                default:
+                    throw new ArgumentOutOfRangeException(nameof(Sort), Sort, "Unknown sort mode");
+            }
         }
 
         public enum MatchMode

@@ -107,7 +107,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             yield return (ATTRIB_ID_APPROACH_RATE, ApproachRate);
             yield return (ATTRIB_ID_DIFFICULTY, StarRating);
 
-            if (ShouldSerializeFlashlightRating())
+            if (ShouldSerializeFlashlightDifficulty())
                 yield return (ATTRIB_ID_FLASHLIGHT, FlashlightDifficulty);
 
             yield return (ATTRIB_ID_SLIDER_FACTOR, SliderFactor);
@@ -144,7 +144,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
         // unless the fields are also renamed.
 
         [UsedImplicitly]
-        public bool ShouldSerializeFlashlightRating() => Mods.Any(m => m is ModFlashlight);
+        public bool ShouldSerializeFlashlightDifficulty() => Mods.Any(m => m is ModFlashlight);
 
         #endregion
     }

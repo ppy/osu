@@ -28,9 +28,12 @@ namespace osu.Game.Beatmaps.Formats
         public const int EARLY_VERSION_TIMING_OFFSET = 24;
 
         /// <summary>
-        /// A small adjustment to the start time of control points to account for rounding/precision errors.
+        /// A small adjustment to the start time of sample control points to account for rounding/precision errors.
         /// </summary>
-        private const double control_point_leniency = 1;
+        /// <remarks>
+        /// Compare: https://github.com/peppy/osu-stable-reference/blob/master/osu!/GameplayElements/HitObjects/HitObject.cs#L319
+        /// </remarks>
+        private const double control_point_leniency = 5;
 
         internal static RulesetStore? RulesetStore;
 
@@ -90,10 +93,33 @@ namespace osu.Game.Beatmaps.Formats
             // The parsing order of hitobjects matters in mania difficulty calculation
             this.beatmap.HitObjects = this.beatmap.HitObjects.OrderBy(h => h.StartTime).ToList();
 
+            postProcessBreaks(this.beatmap);
+
             foreach (var hitObject in this.beatmap.HitObjects)
             {
                 applyDefaults(hitObject);
                 applySamples(hitObject);
+            }
+        }
+
+        /// <summary>
+        /// Processes the beatmap such that a new combo is started the first hitobject following each break.
+        /// </summary>
+        private void postProcessBreaks(Beatmap beatmap)
+        {
+            int currentBreak = 0;
+            bool forceNewCombo = false;
+
+            foreach (var h in beatmap.HitObjects.OfType<ConvertHitObject>())
+            {
+                while (currentBreak < beatmap.Breaks.Count && beatmap.Breaks[currentBreak].EndTime < h.StartTime)
+                {
+                    forceNewCombo = true;
+                    currentBreak++;
+                }
+
+                h.NewCombo |= forceNewCombo;
+                forceNewCombo = false;
             }
         }
 

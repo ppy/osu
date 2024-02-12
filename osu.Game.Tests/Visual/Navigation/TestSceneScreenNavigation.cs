@@ -7,15 +7,18 @@ using System;
 using System.Linq;
 using NUnit.Framework;
 using osu.Framework.Allocation;
+using osu.Framework.Configuration;
 using osu.Framework.Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.UserInterface;
+using osu.Framework.Input;
 using osu.Framework.Screens;
 using osu.Framework.Testing;
 using osu.Game.Beatmaps;
 using osu.Game.Collections;
 using osu.Game.Configuration;
+using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Online.API;
 using osu.Game.Online.Leaderboards;
@@ -34,6 +37,7 @@ using osu.Game.Screens.OnlinePlay.Playlists;
 using osu.Game.Screens.Play;
 using osu.Game.Screens.Ranking;
 using osu.Game.Screens.Select;
+using osu.Game.Screens.Select.Carousel;
 using osu.Game.Screens.Select.Leaderboards;
 using osu.Game.Screens.Select.Options;
 using osu.Game.Tests.Beatmaps.IO;
@@ -139,13 +143,13 @@ namespace osu.Game.Tests.Visual.Navigation
 
             PushAndConfirm(() => songSelect = new TestPlaySongSelect());
 
-            AddStep("set filter", () => songSelect.ChildrenOfType<SearchTextBox>().Single().Current.Value = "test");
+            AddStep("set filter", () => filterControlTextBox().Current.Value = "test");
             AddStep("press back", () => InputManager.Click(MouseButton.Button1));
 
             AddAssert("still at song select", () => Game.ScreenStack.CurrentScreen == songSelect);
-            AddAssert("filter cleared", () => string.IsNullOrEmpty(songSelect.ChildrenOfType<SearchTextBox>().Single().Current.Value));
+            AddAssert("filter cleared", () => string.IsNullOrEmpty(filterControlTextBox().Current.Value));
 
-            AddStep("set filter again", () => songSelect.ChildrenOfType<SearchTextBox>().Single().Current.Value = "test");
+            AddStep("set filter again", () => filterControlTextBox().Current.Value = "test");
             AddStep("open collections dropdown", () =>
             {
                 InputManager.MoveMouseTo(songSelect.ChildrenOfType<CollectionDropdown>().Single());
@@ -159,10 +163,47 @@ namespace osu.Game.Tests.Visual.Navigation
                                                            .ChildrenOfType<Dropdown<CollectionFilterMenuItem>.DropdownMenu>().Single().State == MenuState.Closed);
 
             AddStep("press back a second time", () => InputManager.Click(MouseButton.Button1));
-            AddAssert("filter cleared", () => string.IsNullOrEmpty(songSelect.ChildrenOfType<SearchTextBox>().Single().Current.Value));
+            AddAssert("filter cleared", () => string.IsNullOrEmpty(filterControlTextBox().Current.Value));
 
             AddStep("press back a third time", () => InputManager.Click(MouseButton.Button1));
             ConfirmAtMainMenu();
+
+            TextBox filterControlTextBox() => songSelect.ChildrenOfType<FilterControl.FilterControlTextBox>().Single();
+        }
+
+        [Test]
+        public void TestSongSelectScrollHandling()
+        {
+            TestPlaySongSelect songSelect = null;
+            double scrollPosition = 0;
+
+            AddStep("set game volume to max", () => Game.Dependencies.Get<FrameworkConfigManager>().SetValue(FrameworkSetting.VolumeUniversal, 1d));
+            AddUntilStep("wait for volume overlay to hide", () => Game.ChildrenOfType<VolumeOverlay>().SingleOrDefault()?.State.Value, () => Is.EqualTo(Visibility.Hidden));
+            PushAndConfirm(() => songSelect = new TestPlaySongSelect());
+            AddUntilStep("wait for song select", () => songSelect.BeatmapSetsLoaded);
+            AddStep("import beatmap", () => BeatmapImportHelper.LoadQuickOszIntoOsu(Game).WaitSafely());
+            AddUntilStep("wait for selected", () => !Game.Beatmap.IsDefault);
+
+            AddStep("store scroll position", () => scrollPosition = getCarouselScrollPosition());
+
+            AddStep("move to left side", () => InputManager.MoveMouseTo(
+                songSelect.ChildrenOfType<Screens.Select.SongSelect.LeftSideInteractionContainer>().Single().ScreenSpaceDrawQuad.TopLeft + new Vector2(1)));
+            AddStep("scroll down", () => InputManager.ScrollVerticalBy(-1));
+            AddAssert("carousel didn't move", getCarouselScrollPosition, () => Is.EqualTo(scrollPosition));
+
+            AddRepeatStep("alt-scroll down", () =>
+            {
+                InputManager.PressKey(Key.AltLeft);
+                InputManager.ScrollVerticalBy(-1);
+                InputManager.ReleaseKey(Key.AltLeft);
+            }, 5);
+            AddAssert("game volume decreased", () => Game.Dependencies.Get<FrameworkConfigManager>().Get<double>(FrameworkSetting.VolumeUniversal), () => Is.LessThan(1));
+
+            AddStep("move to carousel", () => InputManager.MoveMouseTo(songSelect.ChildrenOfType<BeatmapCarousel>().Single()));
+            AddStep("scroll down", () => InputManager.ScrollVerticalBy(-1));
+            AddAssert("carousel moved", getCarouselScrollPosition, () => Is.Not.EqualTo(scrollPosition));
+
+            double getCarouselScrollPosition() => Game.ChildrenOfType<UserTrackingScrollContainer<DrawableCarouselItem>>().Single().Current;
         }
 
         /// <summary>
@@ -209,6 +250,7 @@ namespace osu.Game.Tests.Visual.Navigation
             AddStep("end spectator before retry", () => Game.SpectatorClient.EndPlaying(player.GameplayState));
 
             AddStep("attempt to retry", () => player.ChildrenOfType<HotkeyRetryOverlay>().First().Action());
+            AddAssert("old player score marked failed", () => player.Score.ScoreInfo.Rank, () => Is.EqualTo(ScoreRank.F));
             AddUntilStep("wait for old player gone", () => Game.ScreenStack.CurrentScreen != player);
 
             AddUntilStep("get new player", () => (player = Game.ScreenStack.CurrentScreen as Player) != null);
@@ -221,6 +263,7 @@ namespace osu.Game.Tests.Visual.Navigation
             var getOriginalPlayer = playToCompletion();
 
             AddStep("attempt to retry", () => getOriginalPlayer().ChildrenOfType<HotkeyRetryOverlay>().First().Action());
+            AddAssert("original play isn't failed", () => getOriginalPlayer().Score.ScoreInfo.Rank, () => Is.Not.EqualTo(ScoreRank.F));
             AddUntilStep("wait for player", () => Game.ScreenStack.CurrentScreen != getOriginalPlayer() && Game.ScreenStack.CurrentScreen is Player);
         }
 
@@ -793,6 +836,110 @@ namespace osu.Game.Tests.Visual.Navigation
             pushEscape();
 
             AddAssert("exit dialog is shown", () => Game.Dependencies.Get<IDialogOverlay>().CurrentDialog is ConfirmExitDialog);
+        }
+
+        [Test]
+        public void TestTouchScreenDetectionAtSongSelect()
+        {
+            AddStep("touch logo", () =>
+            {
+                var button = Game.ChildrenOfType<OsuLogo>().Single();
+                var touch = new Touch(TouchSource.Touch1, button.ScreenSpaceDrawQuad.Centre);
+                InputManager.BeginTouch(touch);
+                InputManager.EndTouch(touch);
+            });
+            AddAssert("touch screen detected active", () => Game.Dependencies.Get<SessionStatics>().Get<bool>(Static.TouchInputActive), () => Is.True);
+
+            AddStep("click settings button", () =>
+            {
+                var button = Game.ChildrenOfType<MainMenuButton>().Last();
+                InputManager.MoveMouseTo(button);
+                InputManager.Click(MouseButton.Left);
+            });
+            AddAssert("touch screen detected inactive", () => Game.Dependencies.Get<SessionStatics>().Get<bool>(Static.TouchInputActive), () => Is.False);
+
+            AddStep("close settings sidebar", () => InputManager.Key(Key.Escape));
+
+            Screens.Select.SongSelect songSelect = null;
+            AddRepeatStep("go to solo", () => InputManager.Key(Key.P), 3);
+            AddUntilStep("wait for song select", () => (songSelect = Game.ScreenStack.CurrentScreen as Screens.Select.SongSelect) != null);
+            AddUntilStep("wait for beatmap sets loaded", () => songSelect.BeatmapSetsLoaded);
+
+            AddStep("switch to osu! ruleset", () =>
+            {
+                InputManager.PressKey(Key.LControl);
+                InputManager.Key(Key.Number1);
+                InputManager.ReleaseKey(Key.LControl);
+            });
+            AddStep("touch beatmap wedge", () =>
+            {
+                var wedge = Game.ChildrenOfType<BeatmapInfoWedge>().Single();
+                var touch = new Touch(TouchSource.Touch2, wedge.ScreenSpaceDrawQuad.Centre);
+                InputManager.BeginTouch(touch);
+                InputManager.EndTouch(touch);
+            });
+            AddUntilStep("touch device mod activated", () => Game.SelectedMods.Value, () => Has.One.InstanceOf<ModTouchDevice>());
+
+            AddStep("switch to mania ruleset", () =>
+            {
+                InputManager.PressKey(Key.LControl);
+                InputManager.Key(Key.Number4);
+                InputManager.ReleaseKey(Key.LControl);
+            });
+            AddUntilStep("touch device mod not activated", () => Game.SelectedMods.Value, () => Has.None.InstanceOf<ModTouchDevice>());
+            AddStep("touch beatmap wedge", () =>
+            {
+                var wedge = Game.ChildrenOfType<BeatmapInfoWedge>().Single();
+                var touch = new Touch(TouchSource.Touch2, wedge.ScreenSpaceDrawQuad.Centre);
+                InputManager.BeginTouch(touch);
+                InputManager.EndTouch(touch);
+            });
+            AddUntilStep("touch device mod not activated", () => Game.SelectedMods.Value, () => Has.None.InstanceOf<ModTouchDevice>());
+
+            AddStep("switch to osu! ruleset", () =>
+            {
+                InputManager.PressKey(Key.LControl);
+                InputManager.Key(Key.Number1);
+                InputManager.ReleaseKey(Key.LControl);
+            });
+            AddUntilStep("touch device mod activated", () => Game.SelectedMods.Value, () => Has.One.InstanceOf<ModTouchDevice>());
+
+            AddStep("click beatmap wedge", () =>
+            {
+                InputManager.MoveMouseTo(Game.ChildrenOfType<BeatmapInfoWedge>().Single());
+                InputManager.Click(MouseButton.Left);
+            });
+            AddUntilStep("touch device mod not activated", () => Game.SelectedMods.Value, () => Has.None.InstanceOf<ModTouchDevice>());
+        }
+
+        [Test]
+        public void TestTouchScreenDetectionInGame()
+        {
+            PushAndConfirm(() => new TestPlaySongSelect());
+            AddStep("import beatmap", () => BeatmapImportHelper.LoadQuickOszIntoOsu(Game).WaitSafely());
+            AddUntilStep("wait for selected", () => !Game.Beatmap.IsDefault);
+            AddStep("select", () => InputManager.Key(Key.Enter));
+
+            Player player = null;
+
+            AddUntilStep("wait for player", () =>
+            {
+                DismissAnyNotifications();
+                return (player = Game.ScreenStack.CurrentScreen as Player) != null;
+            });
+
+            AddUntilStep("wait for track playing", () => Game.Beatmap.Value.Track.IsRunning);
+
+            AddStep("touch", () =>
+            {
+                var touch = new Touch(TouchSource.Touch2, Game.ScreenSpaceDrawQuad.Centre);
+                InputManager.BeginTouch(touch);
+                InputManager.EndTouch(touch);
+            });
+            AddUntilStep("touch device mod added to score", () => player.Score.ScoreInfo.Mods, () => Has.One.InstanceOf<ModTouchDevice>());
+
+            AddStep("exit player", () => player.Exit());
+            AddUntilStep("touch device mod still active", () => Game.SelectedMods.Value, () => Has.One.InstanceOf<ModTouchDevice>());
         }
 
         private Func<Player> playToResults()

@@ -8,7 +8,6 @@ using JetBrains.Annotations;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
-using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Objects.Drawables;
 using osu.Game.Rulesets.Objects.Types;
 using osu.Game.Skinning;
@@ -16,7 +15,7 @@ using osuTK;
 
 namespace osu.Game.Rulesets.Osu.Objects.Drawables
 {
-    public partial class DrawableSliderTail : DrawableOsuHitObject, IRequireTracking
+    public partial class DrawableSliderTail : DrawableOsuHitObject
     {
         public new SliderTailCircle HitObject => (SliderTailCircle)base.HitObject;
 
@@ -26,17 +25,10 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
         protected DrawableSlider DrawableSlider => (DrawableSlider)ParentHitObject;
 
         /// <summary>
-        /// The judgement text is provided by the <see cref="DrawableSlider"/>.
-        /// </summary>
-        public override bool DisplayResult => false;
-
-        /// <summary>
         /// Whether the hit samples only play on successful hits.
         /// If <c>false</c>, the hit samples will also play on misses.
         /// </summary>
         public bool SamplePlaysOnlyOnHit { get; set; } = true;
-
-        public bool Tracking { get; set; }
 
         public SkinnableDrawable CirclePiece { get; private set; }
 
@@ -124,25 +116,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
             }
         }
 
-        protected override void CheckForResult(bool userTriggered, double timeOffset)
-        {
-            if (userTriggered)
-                return;
-
-            // Ensure the tail can only activate after all previous ticks already have.
-            //
-            // This covers the edge case where the lenience may allow the tail to activate before
-            // the last tick, changing ordering of score/combo awarding.
-            if (DrawableSlider.NestedHitObjects.Count > 1 && !DrawableSlider.NestedHitObjects[^2].Judged)
-                return;
-
-            // The player needs to have engaged in tracking at any point after the tail leniency cutoff.
-            // An actual tick miss should only occur if reaching the tick itself.
-            if (timeOffset >= SliderEventGenerator.TAIL_LENIENCY && Tracking)
-                ApplyResult(r => r.Type = r.Judgement.MaxResult);
-            else if (timeOffset > 0)
-                ApplyResult(r => r.Type = r.Judgement.MinResult);
-        }
+        protected override void CheckForResult(bool userTriggered, double timeOffset) => DrawableSlider.SliderInputManager.TryJudgeNestedObject(this, timeOffset);
 
         protected override void OnApply()
         {

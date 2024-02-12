@@ -150,7 +150,11 @@ namespace osu.Game.Scoring
 
         public Task Import(ImportTask[] imports, ImportParameters parameters = default) => scoreImporter.Import(imports, parameters);
 
-        public override bool IsAvailableLocally(ScoreInfo model) => Realm.Run(realm => realm.All<ScoreInfo>().Any(s => s.OnlineID == model.OnlineID));
+        public override bool IsAvailableLocally(ScoreInfo model)
+            => Realm.Run(realm => realm.All<ScoreInfo>()
+                                       // this basically inlines `ModelExtension.MatchesOnlineID(IScoreInfo, IScoreInfo)`,
+                                       // because that method can't be used here, as realm can't translate it to its query language.
+                                       .Any(s => s.OnlineID == model.OnlineID || s.LegacyOnlineID == model.LegacyOnlineID));
 
         public IEnumerable<string> HandledExtensions => scoreImporter.HandledExtensions;
 

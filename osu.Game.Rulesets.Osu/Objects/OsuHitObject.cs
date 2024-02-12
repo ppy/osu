@@ -36,6 +36,16 @@ namespace osu.Game.Rulesets.Osu.Objects
         /// </summary>
         public const double PREEMPT_MIN = 450;
 
+        /// <summary>
+        /// Median preempt time at AR=5.
+        /// </summary>
+        public const double PREEMPT_MID = 1200;
+
+        /// <summary>
+        /// Maximum preempt time at AR=0.
+        /// </summary>
+        public const double PREEMPT_MAX = 1800;
+
         public double TimePreempt = 600;
         public double TimeFadeIn = 400;
 
@@ -149,7 +159,7 @@ namespace osu.Game.Rulesets.Osu.Objects
         {
             base.ApplyDefaultsToSelf(controlPointInfo, difficulty);
 
-            TimePreempt = (float)IBeatmapDifficultyInfo.DifficultyRange(difficulty.ApproachRate, 1800, 1200, PREEMPT_MIN);
+            TimePreempt = (float)IBeatmapDifficultyInfo.DifficultyRange(difficulty.ApproachRate, PREEMPT_MAX, PREEMPT_MID, PREEMPT_MIN);
 
             // Preempt time can go below 450ms. Normally, this is achieved via the DT mod which uniformly speeds up all animations game wide regardless of AR.
             // This uniform speedup is hard to match 1:1, however we can at least make AR>10 (via mods) feel good by extending the upper linear function above.
@@ -162,6 +172,33 @@ namespace osu.Game.Rulesets.Osu.Objects
                     128 + (0.5f * (11 - 5.2450170716245195f)) / 5f;
 
             Scale = (float)Math.Max(1e-3, Scale) / (assumed_height * 0.85f / 384);
+        }
+
+        public void UpdateComboInformation(IHasComboInformation? lastObj)
+        {
+            // Note that this implementation is shared with the osu!catch ruleset's implementation.
+            // If a change is made here, CatchHitObject.cs should also be updated.
+            ComboIndex = lastObj?.ComboIndex ?? 0;
+            ComboIndexWithOffsets = lastObj?.ComboIndexWithOffsets ?? 0;
+            IndexInCurrentCombo = (lastObj?.IndexInCurrentCombo + 1) ?? 0;
+
+            if (this is Spinner)
+            {
+                // For the purpose of combo colours, spinners never start a new combo even if they are flagged as doing so.
+                return;
+            }
+
+            // At decode time, the first hitobject in the beatmap and the first hitobject after a spinner are both enforced to be a new combo,
+            // but this isn't directly enforced by the editor so the extra checks against the last hitobject are duplicated here.
+            if (NewCombo || lastObj == null || lastObj is Spinner)
+            {
+                IndexInCurrentCombo = 0;
+                ComboIndex++;
+                ComboIndexWithOffsets += ComboOffset + 1;
+
+                if (lastObj != null)
+                    lastObj.LastInCombo = true;
+            }
         }
 
         protected override HitWindows CreateHitWindows() => new OsuHitWindows();

@@ -8,6 +8,7 @@ using osu.Framework.Audio;
 using osu.Framework.Audio.Track;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
+using osu.Framework.Logging;
 using osu.Framework.Timing;
 using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.ControlPoints;
@@ -39,9 +40,17 @@ namespace osu.Game.Screens.Play
             Precision = 0.1,
         };
 
+        /// <summary>
+        /// Whether the audio playback is within acceptable ranges.
+        /// Will become false if audio playback is not going as expected.
+        /// </summary>
+        public IBindable<bool> PlaybackRateValid => playbackRateValid;
+
+        private readonly Bindable<bool> playbackRateValid = new Bindable<bool>(true);
+
         private readonly WorkingBeatmap beatmap;
 
-        private readonly Track track;
+        private Track track;
 
         private readonly double skipTargetTime;
 
@@ -54,7 +63,7 @@ namespace osu.Game.Screens.Play
         ///
         /// In the future I want to change this.
         /// </summary>
-        private double? actualStopTime;
+        internal double? LastStopTime;
 
         [Resolved]
         private MusicController musicController { get; set; } = null!;
@@ -100,7 +109,7 @@ namespace osu.Game.Screens.Play
 
         protected override void StopGameplayClock()
         {
-            actualStopTime = GameplayClock.CurrentTime;
+            LastStopTime = GameplayClock.CurrentTime;
 
             if (IsLoaded)
             {
@@ -127,17 +136,18 @@ namespace osu.Game.Screens.Play
         public override void Seek(double time)
         {
             // Safety in case the clock is seeked while stopped.
-            actualStopTime = null;
+            LastStopTime = null;
+            elapsedValidationTime = null;
 
             base.Seek(time);
         }
 
         protected override void PrepareStart()
         {
-            if (actualStopTime != null)
+            if (LastStopTime != null)
             {
-                Seek(actualStopTime.Value);
-                actualStopTime = null;
+                Seek(LastStopTime.Value);
+                LastStopTime = null;
             }
             else
                 base.PrepareStart();
@@ -145,7 +155,7 @@ namespace osu.Game.Screens.Play
 
         protected override void StartGameplayClock()
         {
-            addSourceClockAdjustments();
+            addAdjustmentsToTrack();
 
             base.StartGameplayClock();
 
@@ -186,20 +196,67 @@ namespace osu.Game.Screens.Play
         /// </summary>
         public void StopUsingBeatmapClock()
         {
-            removeSourceClockAdjustments();
+            removeAdjustmentsFromTrack();
 
-            var virtualTrack = new TrackVirtual(beatmap.Track.Length);
-            virtualTrack.Seek(CurrentTime);
+            track = new TrackVirtual(beatmap.Track.Length);
+            track.Seek(CurrentTime);
             if (IsRunning)
-                virtualTrack.Start();
-            ChangeSource(virtualTrack);
+                track.Start();
+            ChangeSource(track);
 
-            addSourceClockAdjustments();
+            addAdjustmentsToTrack();
         }
+
+        protected override void Update()
+        {
+            base.Update();
+            checkPlaybackValidity();
+        }
+
+        #region Clock validation (ensure things are running correctly for local gameplay)
+
+        private double elapsedGameplayClockTime;
+        private double? elapsedValidationTime;
+        private int playbackDiscrepancyCount;
+
+        private const int allowed_playback_discrepancies = 5;
+
+        private void checkPlaybackValidity()
+        {
+            if (GameplayClock.IsRunning)
+            {
+                elapsedGameplayClockTime += GameplayClock.ElapsedFrameTime;
+
+                if (elapsedValidationTime == null)
+                    elapsedValidationTime = elapsedGameplayClockTime;
+                else
+                    elapsedValidationTime += GameplayClock.Rate * Time.Elapsed;
+
+                if (Math.Abs(elapsedGameplayClockTime - elapsedValidationTime!.Value) > 300)
+                {
+                    if (playbackDiscrepancyCount++ > allowed_playback_discrepancies)
+                    {
+                        if (playbackRateValid.Value)
+                        {
+                            playbackRateValid.Value = false;
+                            Logger.Log("System audio playback is not working as expected. Some online functionality will not work.\n\nPlease check your audio drivers.", level: LogLevel.Important);
+                        }
+                    }
+                    else
+                    {
+                        Logger.Log($"Playback discrepancy detected ({playbackDiscrepancyCount} of allowed {allowed_playback_discrepancies}): {elapsedGameplayClockTime:N1} vs {elapsedValidationTime:N1}");
+                    }
+
+                    elapsedValidationTime = null;
+                }
+            }
+        }
+
+        #endregion
 
         private bool speedAdjustmentsApplied;
 
-        private void addSourceClockAdjustments()
+        private void addAdjustmentsToTrack()
         {
             if (speedAdjustmentsApplied)
                 return;
@@ -213,7 +270,7 @@ namespace osu.Game.Screens.Play
             speedAdjustmentsApplied = true;
         }
 
-        private void removeSourceClockAdjustments()
+        private void removeAdjustmentsFromTrack()
         {
             if (!speedAdjustmentsApplied)
                 return;
@@ -228,7 +285,7 @@ namespace osu.Game.Screens.Play
         protected override void Dispose(bool isDisposing)
         {
             base.Dispose(isDisposing);
-            removeSourceClockAdjustments();
+            removeAdjustmentsFromTrack();
         }
 
         ControlPointInfo IBeatSyncProvider.ControlPoints => beatmap.Beatmap.ControlPointInfo;

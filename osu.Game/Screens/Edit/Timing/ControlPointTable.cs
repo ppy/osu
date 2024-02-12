@@ -21,7 +21,7 @@ namespace osu.Game.Screens.Edit.Timing
     public partial class ControlPointTable : EditorTable
     {
         [Resolved]
-        private Bindable<ControlPointGroup> selectedGroup { get; set; } = null!;
+        private Bindable<ControlPointGroup?> selectedGroup { get; set; } = null!;
 
         [Resolved]
         private EditorClock clock { get; set; } = null!;
@@ -32,6 +32,8 @@ namespace osu.Game.Screens.Edit.Timing
         {
             set
             {
+                int selectedIndex = GetIndexForObject(selectedGroup.Value);
+
                 Content = null;
                 BackgroundFlow.Clear();
 
@@ -44,7 +46,7 @@ namespace osu.Game.Screens.Edit.Timing
                     {
                         Action = () =>
                         {
-                            selectedGroup.Value = group;
+                            SetSelectedRow(group);
                             clock.SeekSmoothlyTo(group.Time);
                         }
                     });
@@ -53,7 +55,16 @@ namespace osu.Game.Screens.Edit.Timing
                 Columns = createHeaders();
                 Content = value.Select(createContent).ToArray().ToRectangular();
 
-                updateSelectedGroup();
+                // Attempt to retain selection.
+                if (SetSelectedRow(selectedGroup.Value))
+                    return;
+
+                // Some operations completely obliterate references, so best-effort reselect based on index.
+                if (SetSelectedRow(GetObjectAtIndex(selectedIndex)))
+                    return;
+
+                // Selection could not be retained.
+                selectedGroup.Value = null;
             }
         }
 
@@ -61,10 +72,18 @@ namespace osu.Game.Screens.Edit.Timing
         {
             base.LoadComplete();
 
-            selectedGroup.BindValueChanged(_ => updateSelectedGroup(), true);
+            // Handle external selections.
+            selectedGroup.BindValueChanged(g => SetSelectedRow(g.NewValue), true);
         }
 
-        private void updateSelectedGroup() => SetSelectedRow(selectedGroup.Value);
+        protected override bool SetSelectedRow(object? item)
+        {
+            if (!base.SetSelectedRow(item))
+                return false;
+
+            selectedGroup.Value = item as ControlPointGroup;
+            return true;
+        }
 
         private TableColumn[] createHeaders()
         {

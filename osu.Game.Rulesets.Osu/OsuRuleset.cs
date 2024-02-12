@@ -48,6 +48,8 @@ namespace osu.Game.Rulesets.Osu
 
         public override ScoreProcessor CreateScoreProcessor() => new OsuScoreProcessor();
 
+        public override HealthProcessor CreateHealthProcessor(double drainStartTime) => new OsuHealthProcessor(drainStartTime);
+
         public override IBeatmapConverter CreateBeatmapConverter(IBeatmap beatmap) => new OsuBeatmapConverter(beatmap, this);
 
         public override IBeatmapProcessor CreateBeatmapProcessor(IBeatmap beatmap) => new OsuBeatmapProcessor(beatmap);
@@ -210,7 +212,8 @@ namespace osu.Game.Rulesets.Osu
                         new ModAdaptiveSpeed(),
                         new OsuModFreezeFrame(),
                         new OsuModBubbles(),
-                        new OsuModSynesthesia()
+                        new OsuModSynesthesia(),
+                        new OsuModDepth()
                     };
 
                 case ModType.System:
@@ -330,5 +333,23 @@ namespace osu.Game.Rulesets.Osu
         }
 
         public override RulesetSetupSection CreateEditorSetupSection() => new OsuSetupSection();
+
+        /// <seealso cref="OsuHitObject.ApplyDefaultsToSelf"/>
+        /// <seealso cref="OsuHitWindows"/>
+        public override BeatmapDifficulty GetRateAdjustedDisplayDifficulty(IBeatmapDifficultyInfo difficulty, double rate)
+        {
+            BeatmapDifficulty adjustedDifficulty = new BeatmapDifficulty(difficulty);
+
+            double preempt = IBeatmapDifficultyInfo.DifficultyRange(adjustedDifficulty.ApproachRate, OsuHitObject.PREEMPT_MAX, OsuHitObject.PREEMPT_MID, OsuHitObject.PREEMPT_MIN);
+            preempt /= rate;
+            adjustedDifficulty.ApproachRate = (float)IBeatmapDifficultyInfo.InverseDifficultyRange(preempt, OsuHitObject.PREEMPT_MAX, OsuHitObject.PREEMPT_MID, OsuHitObject.PREEMPT_MIN);
+
+            var greatHitWindowRange = OsuHitWindows.OSU_RANGES.Single(range => range.Result == HitResult.Great);
+            double greatHitWindow = IBeatmapDifficultyInfo.DifficultyRange(adjustedDifficulty.OverallDifficulty, greatHitWindowRange.Min, greatHitWindowRange.Average, greatHitWindowRange.Max);
+            greatHitWindow /= rate;
+            adjustedDifficulty.OverallDifficulty = (float)IBeatmapDifficultyInfo.InverseDifficultyRange(greatHitWindow, greatHitWindowRange.Min, greatHitWindowRange.Average, greatHitWindowRange.Max);
+
+            return adjustedDifficulty;
+        }
     }
 }

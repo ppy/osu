@@ -16,6 +16,7 @@ using osu.Framework.Input.Events;
 using osu.Framework.Localisation;
 using osu.Framework.Utils;
 using osu.Game.Configuration;
+using osu.Game.Graphics;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Input.Bindings;
 using osu.Game.Overlays;
@@ -98,12 +99,6 @@ namespace osu.Game.Rulesets.Edit
                 }
             });
 
-            if (DistanceSpacingMultiplier.Disabled)
-            {
-                distanceSpacingSlider.Hide();
-                return;
-            }
-
             DistanceSpacingMultiplier.Value = editorBeatmap.BeatmapInfo.DistanceSpacing;
             DistanceSpacingMultiplier.BindValueChanged(multiplier =>
             {
@@ -115,6 +110,8 @@ namespace osu.Game.Rulesets.Edit
 
                 editorBeatmap.BeatmapInfo.DistanceSpacing = multiplier.NewValue;
             }, true);
+
+            DistanceSpacingMultiplier.BindDisabledChanged(disabled => distanceSpacingSlider.Alpha = disabled ? 0 : 1, true);
 
             // Manual binding to handle enabling distance spacing when the slider is interacted with.
             distanceSpacingSlider.Current.BindValueChanged(spacing =>
@@ -173,7 +170,7 @@ namespace osu.Game.Rulesets.Edit
 
         public IEnumerable<TernaryButton> CreateTernaryButtons() => new[]
         {
-            new TernaryButton(DistanceSnapToggle, "Distance Snap", () => new SpriteIcon { Icon = FontAwesome.Solid.Ruler })
+            new TernaryButton(DistanceSnapToggle, "Distance Snap", () => new SpriteIcon { Icon = OsuIcon.EditorDistanceSnap })
         };
 
         protected override bool OnKeyDown(KeyDownEvent e)

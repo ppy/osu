@@ -185,10 +185,12 @@ jobs:
 
       - name: Add comment environment
         if: ${{ github.event_name == 'issue_comment' }}
+        env:
+          COMMENT_BODY: ${{ github.event.comment.body }}
         run: |
           # Add comment environment
-          echo '${{ github.event.comment.body }}' | sed -r 's/\r$//' | grep -E '^\w+=' | while read -r line; do
-              opt=$(echo ${line} | cut -d '=' -f1)
+          echo "$COMMENT_BODY" | sed -r 's/\r$//' | grep -E '^\w+=' | while read -r line; do
+              opt=$(echo "${line}" | cut -d '=' -f1)
               sed -i "s;^${opt}=.*$;${line};" "${{ needs.directory.outputs.GENERATOR_ENV }}"
           done
 

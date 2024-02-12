@@ -147,11 +147,11 @@ namespace osu.Game.Tests.Mods
                 new Mod[] { new OsuModDeflate(), new OsuModApproachDifferent() },
                 new[] { typeof(OsuModDeflate), typeof(OsuModApproachDifferent) }
             },
-            // system mod.
+            // system mod not applicable in lazer.
             new object[]
             {
-                new Mod[] { new OsuModHidden(), new OsuModTouchDevice() },
-                new[] { typeof(OsuModTouchDevice) }
+                new Mod[] { new OsuModHidden(), new ModScoreV2() },
+                new[] { typeof(ModScoreV2) }
             },
             // multi mod.
             new object[]

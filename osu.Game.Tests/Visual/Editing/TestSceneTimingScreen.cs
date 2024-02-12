@@ -17,6 +17,7 @@ using osu.Game.Rulesets.Edit;
 using osu.Game.Screens.Edit;
 using osu.Game.Screens.Edit.Timing;
 using osu.Game.Screens.Edit.Timing.RowAttributes;
+using osuTK;
 using osuTK.Input;
 
 namespace osu.Game.Tests.Visual.Editing
@@ -67,6 +68,48 @@ namespace osu.Game.Tests.Visual.Editing
             AddStep("Reload Editor Beatmap", reloadEditorBeatmap);
 
             AddUntilStep("Wait for rows to load", () => Child.ChildrenOfType<EffectRowAttribute>().Any());
+        }
+
+        [Test]
+        public void TestSelectedRetainedOverUndo()
+        {
+            AddStep("Select first timing point", () =>
+            {
+                InputManager.MoveMouseTo(Child.ChildrenOfType<TimingRowAttribute>().First());
+                InputManager.Click(MouseButton.Left);
+            });
+
+            AddUntilStep("Selection changed", () => timingScreen.SelectedGroup.Value.Time == 2170);
+            AddUntilStep("Ensure seeked to correct time", () => EditorClock.CurrentTimeAccurate == 2170);
+
+            AddStep("Adjust offset", () =>
+            {
+                InputManager.MoveMouseTo(timingScreen.ChildrenOfType<TimingAdjustButton>().First().ScreenSpaceDrawQuad.Centre + new Vector2(20, 0));
+                InputManager.Click(MouseButton.Left);
+            });
+
+            AddUntilStep("wait for offset changed", () =>
+            {
+                return timingScreen.SelectedGroup.Value.ControlPoints.Any(c => c is TimingControlPoint) && timingScreen.SelectedGroup.Value.Time > 2170;
+            });
+
+            AddStep("simulate undo", () =>
+            {
+                var clone = editorBeatmap.ControlPointInfo.DeepClone();
+
+                editorBeatmap.ControlPointInfo.Clear();
+
+                foreach (var group in clone.Groups)
+                {
+                    foreach (var cp in group.ControlPoints)
+                        editorBeatmap.ControlPointInfo.Add(group.Time, cp);
+                }
+            });
+
+            AddUntilStep("selection retained", () =>
+            {
+                return timingScreen.SelectedGroup.Value.ControlPoints.Any(c => c is TimingControlPoint) && timingScreen.SelectedGroup.Value.Time > 2170;
+            });
         }
 
         [Test]

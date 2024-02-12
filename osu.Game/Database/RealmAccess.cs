@@ -87,8 +87,12 @@ namespace osu.Game.Database
         /// 33   2023-08-16    Reset default chat toggle key binding to avoid conflict with newly added leaderboard toggle key binding.
         /// 34   2023-08-21    Add BackgroundReprocessingFailed flag to ScoreInfo to track upgrade failures.
         /// 35   2023-10-16    Clear key combinations of keybindings that are assigned to more than one action in a given settings section.
+        /// 36   2023-10-26    Add LegacyOnlineID to ScoreInfo. Move osu_scores_*_high IDs stored in OnlineID to LegacyOnlineID. Reset anomalous OnlineIDs.
+        /// 38   2023-12-10    Add EndTimeObjectCount and TotalObjectCount to BeatmapInfo.
+        /// 39   2023-12-19    Migrate any EndTimeObjectCount and TotalObjectCount values of 0 to -1 to better identify non-calculated values.
+        /// 40   2023-12-21    Add ScoreInfo.Version to keep track of which build scores were set on.
         /// </summary>
-        private const int schema_version = 35;
+        private const int schema_version = 40;
 
         /// <summary>
         /// Lock object which is held during <see cref="BlockAllOperations"/> sections, blocking realm retrieval during blocking periods.
@@ -1075,6 +1079,38 @@ namespace osu.Game.Database
 
                     break;
                 }
+
+                case 36:
+                {
+                    foreach (var score in migration.NewRealm.All<ScoreInfo>())
+                    {
+                        if (score.OnlineID > 0)
+                        {
+                            score.LegacyOnlineID = score.OnlineID;
+                            score.OnlineID = -1;
+                        }
+                        else
+                        {
+                            score.LegacyOnlineID = score.OnlineID = -1;
+                        }
+                    }
+
+                    break;
+                }
+
+                case 39:
+                    foreach (var b in migration.NewRealm.All<BeatmapInfo>())
+                    {
+                        // Either actually no objects, or processing ran and failed.
+                        // Reset to -1 so the next time they become zero we know that processing was attempted.
+                        if (b.TotalObjectCount == 0 && b.EndTimeObjectCount == 0)
+                        {
+                            b.TotalObjectCount = -1;
+                            b.EndTimeObjectCount = -1;
+                        }
+                    }
+
+                    break;
             }
 
             Logger.Log($"Migration completed in {stopwatch.ElapsedMilliseconds}ms");

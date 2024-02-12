@@ -7,15 +7,13 @@ using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Extensions.EnumExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
-using osu.Framework.Graphics.Effects;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.Sprites;
-using osu.Framework.Graphics.Textures;
 using osu.Framework.Input;
 using osu.Framework.Input.Bindings;
 using osu.Framework.Input.Events;
-using osu.Game.Database;
 using osu.Framework.Localisation;
+using osu.Game.Database;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Backgrounds;
 using osu.Game.Graphics.Containers;
@@ -37,15 +35,12 @@ namespace osu.Game.Overlays.Toolbar
         }
 
         [Resolved]
-        private TextureStore textures { get; set; } = null!;
-
-        [Resolved]
         private ReadableKeyCombinationProvider keyCombinationProvider { get; set; } = null!;
 
-        public void SetIcon(string texture) =>
-            SetIcon(new Sprite
+        public void SetIcon(IconUsage icon) =>
+            SetIcon(new SpriteIcon
             {
-                Texture = textures.Get(texture),
+                Icon = icon,
             });
 
         public LocalisableString Text
@@ -78,6 +73,8 @@ namespace osu.Game.Overlays.Toolbar
         private readonly SpriteText keyBindingTooltip;
         protected FillFlowContainer Flow;
 
+        protected readonly Container BackgroundContent;
+
         [Resolved]
         private RealmAccess realm { get; set; } = null!;
 
@@ -86,21 +83,33 @@ namespace osu.Game.Overlays.Toolbar
             Width = Toolbar.HEIGHT;
             RelativeSizeAxes = Axes.Y;
 
+            Padding = new MarginPadding(3);
+
             Children = new Drawable[]
             {
-                HoverBackground = new Box
+                BackgroundContent = new Container
                 {
                     RelativeSizeAxes = Axes.Both,
-                    Colour = OsuColour.Gray(80).Opacity(180),
-                    Blending = BlendingParameters.Additive,
-                    Alpha = 0,
-                },
-                flashBackground = new Box
-                {
-                    RelativeSizeAxes = Axes.Both,
-                    Alpha = 0,
-                    Colour = Color4.White.Opacity(100),
-                    Blending = BlendingParameters.Additive,
+                    Masking = true,
+                    CornerRadius = 6,
+                    CornerExponent = 3f,
+                    Children = new Drawable[]
+                    {
+                        HoverBackground = new Box
+                        {
+                            RelativeSizeAxes = Axes.Both,
+                            Colour = OsuColour.Gray(80).Opacity(180),
+                            Blending = BlendingParameters.Additive,
+                            Alpha = 0,
+                        },
+                        flashBackground = new Box
+                        {
+                            RelativeSizeAxes = Axes.Both,
+                            Alpha = 0,
+                            Colour = Color4.White.Opacity(100),
+                            Blending = BlendingParameters.Additive,
+                        },
+                    }
                 },
                 Flow = new FillFlowContainer
                 {
@@ -117,7 +126,7 @@ namespace osu.Game.Overlays.Toolbar
                         {
                             Anchor = Anchor.CentreLeft,
                             Origin = Anchor.CentreLeft,
-                            Size = new Vector2(26),
+                            Size = new Vector2(20),
                             Alpha = 0,
                         },
                         DrawableText = new OsuSpriteText
@@ -161,19 +170,26 @@ namespace osu.Game.Overlays.Toolbar
             };
         }
 
+        [BackgroundDependencyLoader]
+        private void load()
+        {
+            if (Hotkey != null)
+            {
+                realm.SubscribeToPropertyChanged(r => r.All<RealmKeyBinding>().FirstOrDefault(rkb => rkb.RulesetName == null && rkb.ActionInt == (int)Hotkey.Value), kb => kb.KeyCombinationString, updateKeyBindingTooltip);
+            }
+        }
+
         protected override bool OnMouseDown(MouseDownEvent e) => false;
 
         protected override bool OnClick(ClickEvent e)
         {
-            flashBackground.FadeOutFromOne(800, Easing.OutQuint);
+            flashBackground.FadeIn(50).Then().FadeOutFromOne(800, Easing.OutQuint);
             tooltipContainer.FadeOut(100);
             return base.OnClick(e);
         }
 
         protected override bool OnHover(HoverEvent e)
         {
-            updateKeyBindingTooltip();
-
             HoverBackground.FadeIn(200);
             tooltipContainer.FadeIn(100);
 
@@ -201,19 +217,13 @@ namespace osu.Game.Overlays.Toolbar
         {
         }
 
-        private void updateKeyBindingTooltip()
+        private void updateKeyBindingTooltip(string keyCombination)
         {
-            if (Hotkey == null) return;
+            string keyBindingString = keyCombinationProvider.GetReadableString(keyCombination);
 
-            var realmKeyBinding = realm.Realm.All<RealmKeyBinding>().FirstOrDefault(rkb => rkb.RulesetName == null && rkb.ActionInt == (int)Hotkey.Value);
-
-            if (realmKeyBinding != null)
-            {
-                string keyBindingString = keyCombinationProvider.GetReadableString(realmKeyBinding.KeyCombination);
-
-                if (!string.IsNullOrEmpty(keyBindingString))
-                    keyBindingTooltip.Text = $" ({keyBindingString})";
-            }
+            keyBindingTooltip.Text = !string.IsNullOrEmpty(keyBindingString)
+                ? $" ({keyBindingString})"
+                : string.Empty;
         }
     }
 
@@ -222,14 +232,6 @@ namespace osu.Game.Overlays.Toolbar
         public OpaqueBackground()
         {
             RelativeSizeAxes = Axes.Both;
-            Masking = true;
-            MaskingSmoothness = 0;
-            EdgeEffect = new EdgeEffectParameters
-            {
-                Type = EdgeEffectType.Shadow,
-                Colour = Color4.Black.Opacity(40),
-                Radius = 5,
-            };
 
             Children = new Drawable[]
             {

@@ -58,6 +58,7 @@ using osu.Game.Performance;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Scoring;
 using osu.Game.Screens;
+using osu.Game.Screens.Edit;
 using osu.Game.Screens.Menu;
 using osu.Game.Screens.OnlinePlay.Multiplayer;
 using osu.Game.Screens.Play;
@@ -433,6 +434,9 @@ namespace osu.Game
                     break;
 
                 case LinkAction.OpenEditorTimestamp:
+                    HandleTimestamp(argString);
+                    break;
+
                 case LinkAction.JoinMultiplayerMatch:
                 case LinkAction.Spectate:
                     waitForReady(() => Notifications, _ => Notifications.Post(new SimpleNotification
@@ -549,6 +553,25 @@ namespace osu.Game
         /// <param name="updateStream">The update stream name</param>
         /// <param name="version">The build version of the update stream</param>
         public void ShowChangelogBuild(string updateStream, string version) => waitForReady(() => changelogOverlay, _ => changelogOverlay.ShowBuild(updateStream, version));
+
+        /// <summary>
+        /// Seeks to the provided <paramref name="timestamp"/> if the editor is currently open.
+        /// Can also select objects as indicated by the <paramref name="timestamp"/> (depends on ruleset implementation).
+        /// </summary>
+        public void HandleTimestamp(string timestamp)
+        {
+            if (ScreenStack.CurrentScreen is not Editor editor)
+            {
+                Schedule(() => Notifications.Post(new SimpleErrorNotification
+                {
+                    Icon = FontAwesome.Solid.ExclamationTriangle,
+                    Text = EditorStrings.MustBeInEditorToHandleLinks
+                }));
+                return;
+            }
+
+            editor.HandleTimestamp(timestamp);
+        }
 
         /// <summary>
         /// Present a skin select immediately.
@@ -677,6 +700,9 @@ namespace osu.Game
 
             if (score.OnlineID > 0)
                 databasedScoreInfo = ScoreManager.Query(s => s.OnlineID == score.OnlineID);
+
+            if (score.LegacyOnlineID > 0)
+                databasedScoreInfo ??= ScoreManager.Query(s => s.LegacyOnlineID == score.LegacyOnlineID);
 
             if (score is ScoreInfo scoreInfo)
                 databasedScoreInfo ??= ScoreManager.Query(s => s.Hash == scoreInfo.Hash);
@@ -968,8 +994,11 @@ namespace osu.Game
                 Margin = new MarginPadding(5),
             }, topMostOverlayContent.Add);
 
-            if (!args?.Any(a => a == @"--no-version-overlay") ?? true)
-                loadComponentSingleFile(versionManager = new VersionManager { Depth = int.MinValue }, ScreenContainer.Add);
+            if (!IsDeployedBuild)
+            {
+                dependencies.Cache(versionManager = new VersionManager { Depth = int.MinValue });
+                loadComponentSingleFile(versionManager, ScreenContainer.Add);
+            }
 
             loadComponentSingleFile(osuLogo, _ =>
             {
@@ -1051,6 +1080,7 @@ namespace osu.Game
             Add(difficultyRecommender);
             Add(externalLinkOpener = new ExternalLinkOpener());
             Add(new MusicKeyBindingHandler());
+            Add(new OnlineStatusNotifier(() => ScreenStack.CurrentScreen));
 
             // side overlays which cancel each other.
             var singleDisplaySideOverlays = new OverlayContainer[] { Settings, Notifications, FirstRunOverlay };
@@ -1163,7 +1193,7 @@ namespace osu.Game
                 }
                 else if (recentLogCount == short_term_display_limit)
                 {
-                    string logFile = $@"{entry.Target.Value.ToString().ToLowerInvariant()}.log";
+                    string logFile = Logger.GetLogger(entry.Target.Value).Filename;
 
                     Schedule(() => Notifications.Post(new SimpleNotification
                     {
@@ -1171,7 +1201,7 @@ namespace osu.Game
                         Text = NotificationsStrings.SubsequentMessagesLogged,
                         Activated = () =>
                         {
-                            Storage.GetStorageForDirectory(@"logs").PresentFileExternally(logFile);
+                            Logger.Storage.PresentFileExternally(logFile);
                             return true;
                         }
                     }));

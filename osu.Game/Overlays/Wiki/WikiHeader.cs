@@ -8,6 +8,7 @@ using System.Linq;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Localisation;
+using osu.Game.Graphics;
 using osu.Game.Localisation;
 using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Resources.Localisation.Web;
@@ -81,7 +82,7 @@ namespace osu.Game.Overlays.Wiki
             {
                 Title = PageTitleStrings.MainWikiControllerDefault;
                 Description = NamedOverlayComponentStrings.WikiDescription;
-                IconTexture = "Icons/Hexacons/wiki";
+                Icon = OsuIcon.Wiki;
             }
         }
     }

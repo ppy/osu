@@ -101,15 +101,13 @@ namespace osu.Game.Rulesets.Osu.Skinning.Default
                 rotationTransferred = true;
             }
 
-            currentRotation += delta;
-
-            double rate = gameplayClock?.GetTrueGameplayRate() ?? Clock.Rate;
-
             Debug.Assert(Math.Abs(delta) <= 180);
 
-            // rate has to be applied each frame, because it's not guaranteed to be constant throughout playback
-            // (see: ModTimeRamp)
-            drawableSpinner.Result.TotalRotation += (float)(Math.Abs(delta) * rate);
+            double rate = gameplayClock?.GetTrueGameplayRate() ?? Clock.Rate;
+            delta = (float)(delta * Math.Abs(rate));
+
+            currentRotation += delta;
+            drawableSpinner.Result.History.ReportDelta(Time.Current, delta);
         }
 
         private void resetState(DrawableHitObject obj)

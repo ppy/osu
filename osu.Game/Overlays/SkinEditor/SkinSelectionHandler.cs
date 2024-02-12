@@ -7,13 +7,13 @@ using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Extensions.EnumExtensions;
 using osu.Framework.Graphics;
+using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Primitives;
 using osu.Framework.Graphics.UserInterface;
 using osu.Framework.Utils;
 using osu.Game.Extensions;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Rulesets.Edit;
-using osu.Game.Screens.Edit.Components.Menus;
 using osu.Game.Screens.Edit.Compose.Components;
 using osu.Game.Skinning;
 using osu.Game.Utils;
@@ -31,8 +31,44 @@ namespace osu.Game.Overlays.SkinEditor
             UpdatePosition = updateDrawablePosition
         };
 
+        private bool allSelectedSupportManualSizing(Axes axis) => SelectedItems.All(b => (b as CompositeDrawable)?.AutoSizeAxes.HasFlagFast(axis) == false);
+
         public override bool HandleScale(Vector2 scale, Anchor anchor)
         {
+            Axes adjustAxis;
+
+            switch (anchor)
+            {
+                // for corners, adjust scale.
+                case Anchor.TopLeft:
+                case Anchor.TopRight:
+                case Anchor.BottomLeft:
+                case Anchor.BottomRight:
+                    adjustAxis = Axes.Both;
+                    break;
+
+                // for edges, adjust size.
+                // autosize elements can't be easily handled so just disable sizing for now.
+                case Anchor.TopCentre:
+                case Anchor.BottomCentre:
+                    if (!allSelectedSupportManualSizing(Axes.Y))
+                        return false;
+
+                    adjustAxis = Axes.Y;
+                    break;
+
+                case Anchor.CentreLeft:
+                case Anchor.CentreRight:
+                    if (!allSelectedSupportManualSizing(Axes.X))
+                        return false;
+
+                    adjustAxis = Axes.X;
+                    break;
+
+                default:
+                    throw new ArgumentOutOfRangeException(nameof(anchor), anchor, null);
+            }
+
             // convert scale to screen space
             scale = ToScreenSpace(scale) - ToScreenSpace(Vector2.Zero);
 
@@ -120,7 +156,20 @@ namespace osu.Game.Overlays.SkinEditor
                 if (Precision.AlmostEquals(MathF.Abs(drawableItem.Rotation) % 180, 90))
                     currentScaledDelta = new Vector2(scaledDelta.Y, scaledDelta.X);
 
-                drawableItem.Scale *= currentScaledDelta;
+                switch (adjustAxis)
+                {
+                    case Axes.X:
+                        drawableItem.Width *= currentScaledDelta.X;
+                        break;
+
+                    case Axes.Y:
+                        drawableItem.Height *= currentScaledDelta.Y;
+                        break;
+
+                    case Axes.Both:
+                        drawableItem.Scale *= currentScaledDelta;
+                        break;
+                }
             }
 
             return true;
@@ -169,8 +218,9 @@ namespace osu.Game.Overlays.SkinEditor
         {
             base.OnSelectionChanged();
 
-            SelectionBox.CanScaleX = true;
-            SelectionBox.CanScaleY = true;
+            SelectionBox.CanScaleX = allSelectedSupportManualSizing(Axes.X);
+            SelectionBox.CanScaleY = allSelectedSupportManualSizing(Axes.Y);
+            SelectionBox.CanScaleDiagonally = true;
             SelectionBox.CanFlipX = true;
             SelectionBox.CanFlipY = true;
             SelectionBox.CanReverse = false;
@@ -198,19 +248,41 @@ namespace osu.Game.Overlays.SkinEditor
                 Items = createAnchorItems((d, o) => ((Drawable)d).Origin == o, applyOrigins).ToArray()
             };
 
+            yield return new OsuMenuItemSpacer();
+
             yield return new OsuMenuItem("Reset position", MenuItemType.Standard, () =>
             {
                 foreach (var blueprint in SelectedBlueprints)
                     ((Drawable)blueprint.Item).Position = Vector2.Zero;
             });
 
-            yield return new EditorMenuItemSpacer();
+            yield return new OsuMenuItem("Reset rotation", MenuItemType.Standard, () =>
+            {
+                foreach (var blueprint in SelectedBlueprints)
+                    ((Drawable)blueprint.Item).Rotation = 0;
+            });
+
+            yield return new OsuMenuItem("Reset scale", MenuItemType.Standard, () =>
+            {
+                foreach (var blueprint in SelectedBlueprints)
+                {
+                    var blueprintItem = ((Drawable)blueprint.Item);
+                    blueprintItem.Scale = Vector2.One;
+
+                    if (blueprintItem.RelativeSizeAxes.HasFlagFast(Axes.X))
+                        blueprintItem.Width = 1;
+                    if (blueprintItem.RelativeSizeAxes.HasFlagFast(Axes.Y))
+                        blueprintItem.Height = 1;
+                }
+            });
+
+            yield return new OsuMenuItemSpacer();
 
             yield return new OsuMenuItem("Bring to front", MenuItemType.Standard, () => skinEditor.BringSelectionToFront());
 
             yield return new OsuMenuItem("Send to back", MenuItemType.Standard, () => skinEditor.SendSelectionToBack());
 
-            yield return new EditorMenuItemSpacer();
+            yield return new OsuMenuItemSpacer();
 
             foreach (var item in base.GetContextMenuItemsForSelection(selection))
                 yield return item;

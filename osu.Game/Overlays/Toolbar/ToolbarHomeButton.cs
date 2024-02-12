@@ -2,6 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using osu.Framework.Allocation;
+using osu.Game.Graphics;
 using osu.Game.Input.Bindings;
 using osu.Game.Localisation;
 
@@ -20,7 +21,7 @@ namespace osu.Game.Overlays.Toolbar
         {
             TooltipMain = ToolbarStrings.HomeHeaderTitle;
             TooltipSub = ToolbarStrings.HomeHeaderDescription;
-            SetIcon("Icons/Hexacons/home");
+            SetIcon(OsuIcon.Home);
         }
     }
 }

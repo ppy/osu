@@ -91,7 +91,7 @@ namespace osu.Game.Rulesets.Mania.Skinning.Legacy
             direction.BindTo(scrollingInfo.Direction);
             isHitting.BindTo(holdNote.IsHitting);
 
-            bodySprite = skin.GetAnimation(imageName, wrapMode, wrapMode, true, true).With(d =>
+            bodySprite = skin.GetAnimation(imageName, wrapMode, wrapMode, true, true, frameLength: 30).With(d =>
             {
                 if (d == null)
                     return;
@@ -234,7 +234,7 @@ namespace osu.Game.Rulesets.Mania.Skinning.Legacy
                     break;
 
                 default:
-                    // this is where things get fucked up.
+                    // this is where things get a bit messed up.
                     // honestly there's three modes to handle here but they seem really pointless?
                     // let's wait to see if anyone actually uses them in skins.
                     if (bodySprite != null)
