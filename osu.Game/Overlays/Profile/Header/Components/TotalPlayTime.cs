@@ -8,12 +8,13 @@ using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Cursor;
 using osu.Framework.Localisation;
 using osu.Game.Resources.Localisation.Web;
+using osu.Game.Users;
 
 namespace osu.Game.Overlays.Profile.Header.Components
 {
     public partial class TotalPlayTime : CompositeDrawable, IHasTooltip
     {
-        public readonly Bindable<UserProfileData?> User = new Bindable<UserProfileData?>();
+        public readonly Bindable<UserStatistics?> UserStatistics = new Bindable<UserStatistics?>();
 
         public LocalisableString TooltipText { get; set; }
 
@@ -34,12 +35,12 @@ namespace osu.Game.Overlays.Profile.Header.Components
                 Title = UsersStrings.ShowStatsPlayTime,
             };
 
-            User.BindValueChanged(updateTime, true);
+            UserStatistics.BindValueChanged(updateTime, true);
         }
 
-        private void updateTime(ValueChangedEvent<UserProfileData?> user)
+        private void updateTime(ValueChangedEvent<UserStatistics?> user)
         {
-            int? playTime = user.NewValue?.User.Statistics?.PlayTime;
+            int? playTime = user.NewValue?.PlayTime;
             TooltipText = (playTime ?? 0) / 3600 + " hours";
             info.Content = formatTime(playTime);
         }

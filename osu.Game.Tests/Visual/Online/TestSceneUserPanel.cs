@@ -166,7 +166,9 @@ namespace osu.Game.Tests.Visual.Online
                 API.UpdateStatistics(new UserStatistics
                 {
                     GlobalRank = RNG.Next(100000),
-                    CountryRank = RNG.Next(100000)
+                    CountryRank = RNG.Next(100000),
+                    PlayTime = RNG.Next(0, 100_000_000),
+                    PP = RNG.Next(0, 30000)
                 });
             });
             AddStep("set statistics to empty", () =>

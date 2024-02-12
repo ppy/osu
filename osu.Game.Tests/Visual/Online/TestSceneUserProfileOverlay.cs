@@ -153,6 +153,7 @@ namespace osu.Game.Tests.Visual.Online
                     Mode = @"osu",
                     Data = Enumerable.Range(2345, 45).Concat(Enumerable.Range(2109, 40)).ToArray()
                 },
+                PlayTime = 10_000_000
             },
             TournamentBanners = new[]
             {

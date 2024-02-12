@@ -7,6 +7,7 @@ using osu.Framework.Extensions.LocalisationExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Input.Events;
+using osu.Framework.Localisation;
 using osu.Game.Online.API;
 using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Overlays.Profile.Header.Components;
@@ -29,6 +30,7 @@ namespace osu.Game.Users
 
         private ProfileValueDisplay globalRankDisplay = null!;
         private ProfileValueDisplay countryRankDisplay = null!;
+        private ProfileValueDisplay ppDisplay = null!;
 
         private readonly IBindable<UserStatistics?> statistics = new Bindable<UserStatistics?>();
 
@@ -49,6 +51,7 @@ namespace osu.Game.Users
             {
                 globalRankDisplay.Content = stats.NewValue?.GlobalRank?.ToLocalisableString("\\##,##0") ?? "-";
                 countryRankDisplay.Content = stats.NewValue?.CountryRank?.ToLocalisableString("\\##,##0") ?? "-";
+                ppDisplay.Content = stats.NewValue?.PP?.ToLocalisableString("#,##0") ?? (LocalisableString)"0";
             }, true);
         }
 
@@ -158,7 +161,7 @@ namespace osu.Game.Users
                             new Dimension(),
                             new Dimension()
                         },
-                        RowDimensions = new[] { new Dimension(GridSizeMode.AutoSize) },
+                        RowDimensions = new[] { new Dimension(GridSizeMode.AutoSize), new Dimension(GridSizeMode.AutoSize) },
                         Content = new[]
                         {
                             new Drawable[]
@@ -166,10 +169,22 @@ namespace osu.Game.Users
                                 globalRankDisplay = new ProfileValueDisplay(true)
                                 {
                                     Title = UsersStrings.ShowRankGlobalSimple,
+                                    Margin = new MarginPadding { Bottom = padding }
                                 },
                                 countryRankDisplay = new ProfileValueDisplay(true)
                                 {
-                                    Title = UsersStrings.ShowRankCountrySimple,
+                                    Title = UsersStrings.ShowRankCountrySimple
+                                }
+                            },
+                            new Drawable[]
+                            {
+                                ppDisplay = new ProfileValueDisplay
+                                {
+                                    Title = "pp"
+                                },
+                                new TotalPlayTime
+                                {
+                                    UserStatistics = { BindTarget = statistics }
                                 }
                             }
                         }
