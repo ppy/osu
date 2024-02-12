@@ -59,7 +59,7 @@ namespace osu.Game.Beatmaps
 
         private TextureUpload limitTextureUploadSize(TextureUpload textureUpload)
         {
-            var image = Image.LoadPixelData(textureUpload.Data.ToArray(), textureUpload.Width, textureUpload.Height);
+            var image = Image.LoadPixelData(textureUpload.Data, textureUpload.Width, textureUpload.Height);
 
             // The original texture upload will no longer be returned or used.
             textureUpload.Dispose();
