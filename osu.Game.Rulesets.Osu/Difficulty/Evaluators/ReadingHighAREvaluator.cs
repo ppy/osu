@@ -18,7 +18,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
         {
             var currObj = (OsuDifficultyHitObject)current;
 
-            double result = highArCurve(currObj.Preempt);
+            double result = GetDifficulty(currObj.Preempt);
 
             if (applyAdjust)
             {
@@ -27,7 +27,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
                 // follow lines make high AR easier, so apply nerf if object isn't new combo
                 inpredictability *= 1 + 0.1 * (800 - currObj.FollowLineTime) / 800;
 
-                result *= 0.85 + 1 * inpredictability;
+                result *= 0.9 + 1 * inpredictability;
                 result *= 1.05 - 0.4 * EvaluateFieryAnglePunishmentOf(current);
             }
 
@@ -119,27 +119,30 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
             return zeroFactor * angleSimilarityFactor * angleSharpnessFactor;
         }
 
-        public static double EvaluateLowDensityBonusOf(DifficultyHitObject current)
-        {
-            //var currObj = (OsuDifficultyHitObject)current;
-
-            //// Density = 2 in general means 3 notes on screen (it's not including current note)
-            //double density = CalculateDenstityOf(currObj);
-
-            //// We are considering density = 1.5 as starting point, 1.0 is noticably uncomfy and 0.5 is severely uncomfy
-            //double bonus = 1.5 - density;
-            //if (bonus <= 0) return 0;
-
-            //return Math.Pow(bonus, 2);
-            return 0;
-        }
-
+        // High AR curve
         // https://www.desmos.com/calculator/hbj7swzlth
-        private static double highArCurve(double preempt)
+        public static double GetDifficulty(double preempt)
         {
             double value = Math.Pow(3, 3 - 0.01 * preempt); // 1 for 300ms, 0.25 for 400ms, 0.0625 for 500ms
             value = softmin(value, 2, 1.7); // use softmin to achieve full-memory cap, 2 times more than AR11 (300ms)
             return value;
+        }
+
+        // This is very accurate on preempt > 300ms, breaking starting somewhere around 120ms
+        public static double GetPreempt(double difficulty)
+        {
+            double fixCoef = difficulty / GetDifficulty(highArCurveReversed(difficulty));
+            return highArCurveReversed(difficulty * fixCoef);
+        }
+
+        // This is an approximation cuz high AR curve is unsolvable
+        // https://www.desmos.com/calculator/n9vk18bcyh
+        private static double highArCurveReversed(double value)
+        {
+            double helperValue = value / Math.Pow(1 - Math.Pow(1.7, value - 2), 0.45);
+            double preempt = -(Math.Log(helperValue, 3) - 3) / 0.01;
+
+            return preempt;
         }
 
         // We are using mutiply and divide instead of add and subtract, so values won't be negative

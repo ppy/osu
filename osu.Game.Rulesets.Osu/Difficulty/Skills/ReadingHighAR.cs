@@ -29,9 +29,12 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
 
         private readonly List<double> difficulties = new List<double>();
         private int objectsCount = 0;
+        private double preempt = -1;
 
         public override void Process(DifficultyHitObject current)
         {
+            if (preempt < 0) preempt = ((OsuDifficultyHitObject)current).Preempt;
+
             aimComponent.Process(current);
             speedComponent.Process(current);
 
@@ -61,9 +64,16 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
         }
         public override double DifficultyValue()
         {
-            Console.WriteLine($"Degree of High AR Complexity = {aimComponent.DifficultyValue() / aimComponentNoAdjust.DifficultyValue():0.##}");
+            // Get number how much high AR adjust changed difficulty
+            double difficultyRatio = aimComponent.DifficultyValue() / aimComponentNoAdjust.DifficultyValue();
 
-            // Simulating summing
+            // Calculate how much preempt should change to account for high AR adjust
+            double difficulty = ReadingHighAREvaluator.GetDifficulty(preempt) * difficultyRatio;
+            double adjustedPreempt = ReadingHighAREvaluator.GetPreempt(difficulty);
+
+            Console.WriteLine($"Degree of High AR Complexity = {difficultyRatio:0.##}, {preempt:0} -> {adjustedPreempt:0}");
+
+            // Simulating summing to get the most correct value possible
             double aimValue = Math.Sqrt(aimComponent.DifficultyValue()) * OsuDifficultyCalculator.DIFFICULTY_MULTIPLIER;
             double speedValue = Math.Sqrt(speedComponent.DifficultyValue()) * OsuDifficultyCalculator.DIFFICULTY_MULTIPLIER;
 
@@ -78,8 +88,10 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
             totalPerformance *= lengthBonus;
 
             double adjustedDifficulty = OsuStrainSkill.PerformanceToDifficulty(totalPerformance);
+            double difficultyValue = Math.Pow(adjustedDifficulty / OsuDifficultyCalculator.DIFFICULTY_MULTIPLIER, 2.0);
 
-            return Math.Pow(adjustedDifficulty / OsuDifficultyCalculator.DIFFICULTY_MULTIPLIER, 2.0);
+            return 75 * Math.Sqrt(difficultyValue * difficulty);
+            // return difficultyValue;
         }
     }
 
@@ -94,7 +106,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
         private bool adjustHighAR;
         private double currentStrain;
 
-        private double skillMultiplier => 19;
+        private double skillMultiplier => 18.5;
         private double strainDecayBase => 0.15;
 
         private double strainDecay(double ms) => Math.Pow(strainDecayBase, ms / 1000);
@@ -109,14 +121,9 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
             aimDifficulty *= ReadingHighAREvaluator.EvaluateDifficultyOf(current, adjustHighAR);
             aimDifficulty *= skillMultiplier;
 
-            double totalStrain = currentStrain;
-
             currentStrain += aimDifficulty;
-            totalStrain += aimDifficulty;
 
-            // Console.WriteLine($"{current.BaseObject.StartTime},{aimDifficulty:0.#}");
-
-            return totalStrain;
+            return currentStrain;
         }
     }
 
