@@ -22,7 +22,6 @@ using osu.Game.Resources.Localisation.Web;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.UI;
 using osu.Game.Scoring;
-using osu.Game.Scoring.Drawables;
 using osuTK;
 
 namespace osu.Game.Overlays.BeatmapSet.Scores
@@ -126,9 +125,23 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
                 ppColumn.Alpha = value.BeatmapInfo!.Status.GrantsPerformancePoints() ? 1 : 0;
 
                 if (!value.Ranked)
-                    ppColumn.Drawable = new UnrankedPerformancePointsPlaceholder(ScoresStrings.StatusNoPp) { Font = smallFont };
+                {
+                    ppColumn.Drawable = new SpriteTextWithTooltip
+                    {
+                        Text = "-",
+                        Font = smallFont,
+                        TooltipText = ScoresStrings.StatusNoPp
+                    };
+                }
                 else if (value.PP is not double pp)
-                    ppColumn.Drawable = new UnprocessedPerformancePointsPlaceholder { Size = new Vector2(smallFont.Size) };
+                {
+                    ppColumn.Drawable = new SpriteIconWithTooltip
+                    {
+                        Icon = FontAwesome.Solid.Sync,
+                        Size = new Vector2(smallFont.Size),
+                        TooltipText = ScoresStrings.StatusProcessing,
+                    };
+                }
                 else
                     ppColumn.Text = pp.ToLocalisableString(@"N0");
 

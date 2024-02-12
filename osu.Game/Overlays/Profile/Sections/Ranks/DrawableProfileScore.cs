@@ -8,6 +8,7 @@ using osu.Framework.Extensions.ObjectExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
+using osu.Framework.Graphics.Sprites;
 using osu.Framework.Localisation;
 using osu.Game.Beatmaps;
 using osu.Game.Graphics;
@@ -18,7 +19,6 @@ using osu.Game.Resources.Localisation.Web;
 using osu.Game.Rulesets;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.UI;
-using osu.Game.Scoring.Drawables;
 using osu.Game.Utils;
 using osuTK;
 
@@ -214,6 +214,8 @@ namespace osu.Game.Overlays.Profile.Sections.Ranks
 
         private Drawable createDrawablePerformance()
         {
+            var font = OsuFont.GetFont(weight: FontWeight.Bold);
+
             if (Score.PP.HasValue)
             {
                 return new FillFlowContainer
@@ -226,7 +228,7 @@ namespace osu.Game.Overlays.Profile.Sections.Ranks
                         {
                             Anchor = Anchor.BottomLeft,
                             Origin = Anchor.BottomLeft,
-                            Font = OsuFont.GetFont(weight: FontWeight.Bold),
+                            Font = font,
                             Text = $"{Score.PP:0}",
                             Colour = colourProvider.Highlight1
                         },
@@ -234,7 +236,7 @@ namespace osu.Game.Overlays.Profile.Sections.Ranks
                         {
                             Anchor = Anchor.BottomLeft,
                             Origin = Anchor.BottomLeft,
-                            Font = OsuFont.GetFont(size: 12, weight: FontWeight.Bold),
+                            Font = font.With(size: 12),
                             Text = "pp",
                             Colour = colourProvider.Light3
                         }
@@ -244,23 +246,44 @@ namespace osu.Game.Overlays.Profile.Sections.Ranks
 
             if (Score.Beatmap?.Status.GrantsPerformancePoints() != true)
             {
-                return new UnrankedPerformancePointsPlaceholder(UsersStrings.ShowExtraTopRanksNotRanked)
+                if (Score.Beatmap?.Status == BeatmapOnlineStatus.Loved)
                 {
+                    return new SpriteIconWithTooltip
+                    {
+                        Icon = FontAwesome.Solid.Heart,
+                        Size = new Vector2(font.Size),
+                        TooltipText = UsersStrings.ShowExtraTopRanksNotRanked,
+                        Colour = colourProvider.Highlight1
+                    };
+                }
+
+                return new SpriteTextWithTooltip
+                {
+                    Text = "-",
                     Font = OsuFont.GetFont(weight: FontWeight.Bold),
-                    Colour = colourProvider.Highlight1,
+                    TooltipText = UsersStrings.ShowExtraTopRanksNotRanked,
+                    Colour = colourProvider.Highlight1
                 };
             }
 
             if (!Score.Ranked)
             {
-                return new UnrankedPerformancePointsPlaceholder(ScoresStrings.StatusNoPp)
+                return new SpriteTextWithTooltip
                 {
+                    Text = "-",
                     Font = OsuFont.GetFont(weight: FontWeight.Bold),
-                    Colour = colourProvider.Highlight1,
+                    TooltipText = ScoresStrings.StatusNoPp,
+                    Colour = colourProvider.Highlight1
                 };
             }
 
-            return new UnprocessedPerformancePointsPlaceholder { Size = new Vector2(16), Colour = colourProvider.Highlight1 };
+            return new SpriteIconWithTooltip
+            {
+                Icon = FontAwesome.Solid.Sync,
+                Size = new Vector2(font.Size),
+                TooltipText = ScoresStrings.StatusProcessing,
+                Colour = colourProvider.Highlight1
+            };
         }
 
         private partial class ScoreBeatmapMetadataContainer : BeatmapMetadataContainer
