@@ -102,6 +102,24 @@ namespace osu.Game.Tests.Visual.Online
                 Ranked = true,
             };
 
+            var lovedScore = new SoloScoreInfo
+            {
+                Rank = ScoreRank.B,
+                Beatmap = new APIBeatmap
+                {
+                    BeatmapSet = new APIBeatmapSet
+                    {
+                        Title = "C18H27NO3(extend)",
+                        Artist = "Team Grimoire",
+                    },
+                    DifficultyName = "[4K] Cataclysmic Hypernova",
+                    Status = BeatmapOnlineStatus.Loved,
+                },
+                EndedAt = DateTimeOffset.Now,
+                Accuracy = 0.55879,
+                Ranked = true,
+            };
+
             var unprocessedPPScore = new SoloScoreInfo
             {
                 Rank = ScoreRank.B,
@@ -151,6 +169,7 @@ namespace osu.Game.Tests.Visual.Online
                     new ColourProvidedContainer(OverlayColourScheme.Green, new DrawableProfileScore(firstScore)),
                     new ColourProvidedContainer(OverlayColourScheme.Green, new DrawableProfileScore(secondScore)),
                     new ColourProvidedContainer(OverlayColourScheme.Pink, new DrawableProfileScore(noPPScore)),
+                    new ColourProvidedContainer(OverlayColourScheme.Pink, new DrawableProfileScore(lovedScore)),
                     new ColourProvidedContainer(OverlayColourScheme.Pink, new DrawableProfileScore(unprocessedPPScore)),
                     new ColourProvidedContainer(OverlayColourScheme.Pink, new DrawableProfileScore(unrankedPPScore)),
                     new ColourProvidedContainer(OverlayColourScheme.Pink, new DrawableProfileWeightedScore(firstScore, 0.97)),
