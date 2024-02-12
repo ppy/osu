@@ -191,6 +191,7 @@ namespace osu.Game.Rulesets.Osu.Mods
 
             public override void HandleRelease(bool wasLeft)
             {
+                // this intentionally releases right when `wasLeft` is true because `wasLeft` is set at point of press and not at point of release
                 Mod.osuInputManager.KeyBindingContainer.TriggerReleased(wasLeft ? OsuAction.RightButton : OsuAction.LeftButton);
             }
         }
