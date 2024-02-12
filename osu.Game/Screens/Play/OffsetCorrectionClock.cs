@@ -20,7 +20,7 @@ namespace osu.Game.Screens.Play
 
                 offset = value;
 
-                updateOffset();
+                UpdateOffset();
             }
         }
 
@@ -34,16 +34,16 @@ namespace osu.Game.Screens.Play
         public override void ProcessFrame()
         {
             base.ProcessFrame();
-            updateOffset();
+            UpdateOffset();
         }
 
-        protected virtual void updateOffset()
+        protected virtual void UpdateOffset()
         {
             // we always want to apply the same real-time offset, so it should be adjusted by the difference in playback rate (from realtime) to achieve this.
             base.Offset = Offset * Rate;
         }
 
-        protected void updateLatencyAssumption()
+        protected void UpdateLatencyAssumption()
         {
             // The latency assumption baked into beatmaps should also be adjusted by the difference in playback rate.
             // There should only be one clock that does this.
@@ -58,10 +58,10 @@ namespace osu.Game.Screens.Play
         {
         }
 
-        protected override void updateOffset()
+        protected override void UpdateOffset()
         {
-            base.updateOffset();
-            updateLatencyAssumption();
+            base.UpdateOffset();
+            UpdateLatencyAssumption();
         }
     }
 }
