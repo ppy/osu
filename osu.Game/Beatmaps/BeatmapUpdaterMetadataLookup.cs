@@ -43,7 +43,7 @@ namespace osu.Game.Beatmaps
                 if (!tryLookup(beatmapInfo, preferOnlineFetch, out var res))
                     continue;
 
-                if (res == null)
+                if (res == null || shouldDiscardLookupResult(res, beatmapInfo))
                 {
                     beatmapInfo.ResetOnlineInfo();
                     continue;
@@ -70,6 +70,17 @@ namespace osu.Game.Beatmaps
                     beatmapInfo.BeatmapSet.DateSubmitted = res.DateSubmitted;
                 }
             }
+        }
+
+        private bool shouldDiscardLookupResult(OnlineBeatmapMetadata result, BeatmapInfo beatmapInfo)
+        {
+            if (beatmapInfo.OnlineID > 0 && result.BeatmapID != beatmapInfo.OnlineID)
+                return true;
+
+            if (beatmapInfo.OnlineID == -1 && result.MD5Hash != beatmapInfo.MD5Hash)
+                return true;
+
+            return false;
         }
 
         /// <summary>
