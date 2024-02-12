@@ -58,7 +58,6 @@ namespace osu.Game.Rulesets.Taiko.Mods
                 // This is accurate to 4:3, but slightly off for 5:4
                 drawableTaikoRuleset.MinimumAspect.Value = 1.666f;
 
-                // Visually taken from different aspect ratios
                 drawableTaikoRuleset.MinimumRelativeHeight.Value = 0.26f;
                 drawableTaikoRuleset.MaximumRelativeHeight.Value = 0.26f;
 
@@ -89,7 +88,7 @@ namespace osu.Game.Rulesets.Taiko.Mods
                 hit.SnapJudgementLocation = true;
         }
 
-        // Compensate for aspect ratios narrower than 4:3 by scaling the fade out duration and initial alpha
+        // Adjust hidden initial alpha and fade out duration for different aspect ratios
         private void adjustHidden(
             Drawable drawableRuleset,
             float baseFadeOutDuration,
