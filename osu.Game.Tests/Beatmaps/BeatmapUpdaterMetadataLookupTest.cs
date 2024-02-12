@@ -298,5 +298,59 @@ namespace osu.Game.Tests.Beatmaps
             Assert.That(beatmap.Status, Is.EqualTo(BeatmapOnlineStatus.None));
             Assert.That(beatmap.OnlineID, Is.EqualTo(654321));
         }
+
+        [Test]
+        public void TestPartiallyModifiedSet([Values] bool preferOnlineFetch)
+        {
+            var firstResult = new OnlineBeatmapMetadata
+            {
+                BeatmapID = 654321,
+                BeatmapStatus = BeatmapOnlineStatus.Ranked,
+                BeatmapSetStatus = BeatmapOnlineStatus.Ranked,
+                MD5Hash = @"cafebabe"
+            };
+            var secondResult = new OnlineBeatmapMetadata
+            {
+                BeatmapID = 666666,
+                BeatmapStatus = BeatmapOnlineStatus.Ranked,
+                BeatmapSetStatus = BeatmapOnlineStatus.Ranked,
+                MD5Hash = @"dededede"
+            };
+
+            var targetMock = preferOnlineFetch ? apiMetadataSourceMock : localCachedMetadataSourceMock;
+            targetMock.Setup(src => src.Available).Returns(true);
+            targetMock.Setup(src => src.TryLookup(It.Is<BeatmapInfo>(bi => bi.OnlineID == 654321), out firstResult))
+                      .Returns(true);
+            targetMock.Setup(src => src.TryLookup(It.Is<BeatmapInfo>(bi => bi.OnlineID == 666666), out secondResult))
+                      .Returns(true);
+
+            var firstBeatmap = new BeatmapInfo
+            {
+                OnlineID = 654321,
+                MD5Hash = @"cafebabe",
+            };
+            var secondBeatmap = new BeatmapInfo
+            {
+                OnlineID = 666666,
+                MD5Hash = @"deadbeef"
+            };
+            var beatmapSet = new BeatmapSetInfo(new[]
+            {
+                firstBeatmap,
+                secondBeatmap
+            });
+            firstBeatmap.BeatmapSet = beatmapSet;
+            secondBeatmap.BeatmapSet = beatmapSet;
+
+            metadataLookup.Update(beatmapSet, preferOnlineFetch);
+
+            Assert.That(firstBeatmap.Status, Is.EqualTo(BeatmapOnlineStatus.Ranked));
+            Assert.That(firstBeatmap.OnlineID, Is.EqualTo(654321));
+
+            Assert.That(secondBeatmap.Status, Is.EqualTo(BeatmapOnlineStatus.None));
+            Assert.That(secondBeatmap.OnlineID, Is.EqualTo(666666));
+
+            Assert.That(beatmapSet.Status, Is.EqualTo(BeatmapOnlineStatus.None));
+        }
     }
 }
