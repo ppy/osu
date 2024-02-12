@@ -181,7 +181,7 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
             if (showPerformancePoints)
             {
                 if (!score.Ranked)
-                    content.Add(new UnrankedPerformancePointsPlaceholder { Font = OsuFont.GetFont(size: text_size) });
+                    content.Add(new UnrankedPerformancePointsPlaceholder(ScoresStrings.StatusNoPp) { Font = OsuFont.GetFont(size: text_size) });
                 else if (score.PP == null)
                     content.Add(new UnprocessedPerformancePointsPlaceholder { Size = new Vector2(text_size) });
                 else

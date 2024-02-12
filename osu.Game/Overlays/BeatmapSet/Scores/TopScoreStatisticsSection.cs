@@ -126,7 +126,7 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
                 ppColumn.Alpha = value.BeatmapInfo!.Status.GrantsPerformancePoints() ? 1 : 0;
 
                 if (!value.Ranked)
-                    ppColumn.Drawable = new UnrankedPerformancePointsPlaceholder { Font = smallFont };
+                    ppColumn.Drawable = new UnrankedPerformancePointsPlaceholder(ScoresStrings.StatusNoPp) { Font = smallFont };
                 else if (value.PP is not double pp)
                     ppColumn.Drawable = new UnprocessedPerformancePointsPlaceholder { Size = new Vector2(smallFont.Size) };
                 else

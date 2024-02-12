@@ -14,6 +14,7 @@ using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Online.Leaderboards;
+using osu.Game.Resources.Localisation.Web;
 using osu.Game.Rulesets;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.UI;
@@ -243,20 +244,19 @@ namespace osu.Game.Overlays.Profile.Sections.Ranks
 
             if (Score.Beatmap?.Status.GrantsPerformancePoints() != true)
             {
-                return new OsuSpriteText
+                return new UnrankedPerformancePointsPlaceholder(UsersStrings.ShowExtraTopRanksNotRanked)
                 {
                     Font = OsuFont.GetFont(weight: FontWeight.Bold),
-                    Text = "-",
-                    Colour = colourProvider.Highlight1
+                    Colour = colourProvider.Highlight1,
                 };
             }
 
             if (!Score.Ranked)
             {
-                return new UnrankedPerformancePointsPlaceholder
+                return new UnrankedPerformancePointsPlaceholder(ScoresStrings.StatusNoPp)
                 {
                     Font = OsuFont.GetFont(weight: FontWeight.Bold),
-                    Colour = colourProvider.Highlight1
+                    Colour = colourProvider.Highlight1,
                 };
             }
 
