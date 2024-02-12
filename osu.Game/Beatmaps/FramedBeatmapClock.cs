@@ -28,7 +28,7 @@ namespace osu.Game.Beatmaps
         private readonly bool applyOffsets;
 
         private readonly OffsetCorrectionClock? userGlobalOffsetClock;
-        private readonly OffsetCorrectionClock? platformOffsetClock;
+        private readonly LatencyAssumptionClock? platformOffsetClock;
         private readonly OffsetCorrectionClock? userBeatmapOffsetClock;
 
         private readonly IFrameBasedClock finalClockSource;
@@ -64,7 +64,7 @@ namespace osu.Game.Beatmaps
             {
                 // Audio timings in general with newer BASS versions don't match stable.
                 // This only seems to be required on windows. We need to eventually figure out why, with a bit of luck.
-                platformOffsetClock = new OffsetCorrectionClock(interpolatedTrack) { Offset = RuntimeInfo.OS == RuntimeInfo.Platform.Windows ? 15 : 0 };
+                platformOffsetClock = new LatencyAssumptionClock(interpolatedTrack) { Offset = RuntimeInfo.OS == RuntimeInfo.Platform.Windows ? 15 : 0 };
 
                 // User global offset (set in settings) should also be applied.
                 userGlobalOffsetClock = new OffsetCorrectionClock(platformOffsetClock);
