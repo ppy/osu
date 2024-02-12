@@ -19,15 +19,19 @@ namespace osu.Game.Rulesets.Taiko.Mods
     {
         private IReadOnlyList<Mod> mods = Array.Empty<Mod>();
 
-        private const float default_hidden_fade_out_duration = 0.375f;
+        private const float hd_base_fade_out_duration = 0.375f;
 
-        private const float default_hidden_initial_alpha = 0.75f;
+        private const float hd_base_initial_alpha = 0.75f;
+
+        private const float hdhr_base_fade_out_duration = 0.2f;
+
+        private const float hdhr_base_initial_alpha = 0.2f;
 
         private const float hidden_base_aspect = 4f / 3f;
 
-        private readonly BindableFloat hiddenFadeOutDuration = new BindableFloat(default_hidden_fade_out_duration);
+        private readonly BindableFloat hiddenFadeOutDuration = new BindableFloat(hd_base_fade_out_duration);
 
-        private readonly BindableFloat hiddenInitialAlpha = new BindableFloat(default_hidden_initial_alpha);
+        private readonly BindableFloat hiddenInitialAlpha = new BindableFloat(hd_base_initial_alpha);
 
 
         public void ApplyToDrawableRuleset(DrawableRuleset<TaikoHitObject> drawableRuleset)
@@ -42,16 +46,7 @@ namespace osu.Game.Rulesets.Taiko.Mods
             drawableTaikoRuleset.TrimOnOverflow.Value = true;
 
             TaikoModHidden? hidden = mods.OfType<TaikoModHidden>().FirstOrDefault();
-            if (hidden != null)
-            {
-                // Stable limits the aspect ratio to 4:3
-                drawableTaikoRuleset.MaximumAspect.Value = hidden_base_aspect;
 
-                // Enable aspect ratio adjustment for hidden (see adjustHidden)
-                hiddenInitialAlpha.BindTo(hidden.InitialAlpha);
-                hiddenFadeOutDuration.BindTo(hidden.FadeOutDuration);
-                drawableRuleset.OnUpdate += adjustHidden;
-            }
 
             if (mods.OfType<TaikoModHardRock>().Any())
             {
@@ -61,11 +56,32 @@ namespace osu.Game.Rulesets.Taiko.Mods
 
                 // Apply stable aspect ratio limits for hardrock (visually taken)
                 drawableTaikoRuleset.MaximumAspect.Value = 1.963f;
-                drawableTaikoRuleset.MinimumAspect.Value = 1.64f;
+
+                // This is accurate to 4:3, but slightly off for 5:4
+                drawableTaikoRuleset.MinimumAspect.Value = 1.666f;
 
                 // Visually taken from different aspect ratios
                 drawableTaikoRuleset.MinimumRelativeHeight.Value = 0.26f;
                 drawableTaikoRuleset.MaximumRelativeHeight.Value = 0.26f;
+
+                if (hidden != null)
+                {
+                    hiddenInitialAlpha.BindTo(hidden.InitialAlpha);
+                    hiddenFadeOutDuration.BindTo(hidden.FadeOutDuration);
+                    drawableRuleset.OnUpdate += d => adjustHidden(
+                        d, hdhr_base_fade_out_duration, hdhr_base_initial_alpha, 16f / 9f, 0.8f);
+                }
+            }
+            else if (hidden != null)
+            {
+                // Stable limits the aspect ratio to 4:3
+                drawableTaikoRuleset.MaximumAspect.Value = hidden_base_aspect;
+
+                // Enable aspect ratio adjustment for hidden (see adjustHidden)
+                hiddenInitialAlpha.BindTo(hidden.InitialAlpha);
+                hiddenFadeOutDuration.BindTo(hidden.FadeOutDuration);
+                drawableRuleset.OnUpdate += d => adjustHidden(
+                    d, hd_base_fade_out_duration, hd_base_initial_alpha, hidden_base_aspect);
             }
         }
 
@@ -76,17 +92,26 @@ namespace osu.Game.Rulesets.Taiko.Mods
         }
 
         // Compensate for aspect ratios narrower than 4:3 by scaling the fade out duration and initial alpha
-        private void adjustHidden(Drawable drawableRuleset)
+        private void adjustHidden(
+            Drawable drawableRuleset,
+            float baseFadeOutDuration,
+            float baseInitialAlpha,
+            float baseAspect,
+            float adjustmentRatio = 1f)
         {
             var drawableTaikoRuleset = (DrawableTaikoRuleset)drawableRuleset;
+            float aspect = Math.Clamp(
+                drawableTaikoRuleset.CurrentAspect.Value,
+                drawableTaikoRuleset.MinimumAspect.Value,
+                drawableTaikoRuleset.MaximumAspect.Value);
 
-            if (drawableTaikoRuleset.CurrentAspect.Value < hidden_base_aspect)
-            {
-                hiddenFadeOutDuration.Value =
-                    default_hidden_fade_out_duration * (drawableTaikoRuleset.CurrentAspect.Value / hidden_base_aspect);
-                hiddenInitialAlpha.Value =
-                    default_hidden_initial_alpha * (drawableTaikoRuleset.CurrentAspect.Value / hidden_base_aspect);
-            }
+            float fadeOutDurationAdjustment = aspect / baseAspect - 1;
+            fadeOutDurationAdjustment *= adjustmentRatio;
+            hiddenFadeOutDuration.Value = baseFadeOutDuration + fadeOutDurationAdjustment;
+
+            float initialAlphaAdjustment = aspect / baseAspect - 1;
+            initialAlphaAdjustment *= adjustmentRatio;
+            hiddenInitialAlpha.Value = baseInitialAlpha + initialAlphaAdjustment;
         }
     }
 }
