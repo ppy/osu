@@ -38,6 +38,8 @@ namespace osu.Game.Rulesets.Objects
         /// <summary>
         /// Invoked after <see cref="ApplyDefaults"/> has completed on this <see cref="HitObject"/>.
         /// </summary>
+        // TODO: This has no implicit unbind flow. Currently, if a Playfield manages HitObjects it will leave a bound event on this and cause the
+        // playfield to remain in memory.
         public event Action<HitObject> DefaultsApplied;
 
         public readonly Bindable<double> StartTimeBindable = new BindableDouble();

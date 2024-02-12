@@ -86,7 +86,7 @@ namespace osu.Game.Screens.Play.PlayerSettings
                     new OffsetSliderBar
                     {
                         KeyboardStep = 5,
-                        LabelText = BeatmapOffsetControlStrings.BeatmapOffset,
+                        LabelText = BeatmapOffsetControlStrings.AudioOffsetThisBeatmap,
                         Current = Current,
                     },
                     referenceScoreContainer = new FillFlowContainer
@@ -307,7 +307,7 @@ namespace osu.Game.Screens.Play.PlayerSettings
             }
         }
 
-        public partial class OffsetSliderBar : PlayerSliderBar<double>
+        private partial class OffsetSliderBar : PlayerSliderBar<double>
         {
             protected override Drawable CreateControl() => new CustomSliderBar();
 

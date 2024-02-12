@@ -90,7 +90,7 @@ namespace osu.Game.Tests.Visual.Online
                             else
                             {
                                 int userId = int.Parse(getUserRequest.Lookup);
-                                string rulesetName = getUserRequest.Ruleset.ShortName;
+                                string rulesetName = getUserRequest.Ruleset!.ShortName;
                                 var response = new APIUser
                                 {
                                     Id = userId,
@@ -177,7 +177,11 @@ namespace osu.Game.Tests.Visual.Online
             AddWaitStep("wait a bit", 5);
             AddAssert("update not received", () => update == null);
 
-            AddStep("log in user", () => dummyAPI.Login("user", "password"));
+            AddStep("log in user", () =>
+            {
+                dummyAPI.Login("user", "password");
+                dummyAPI.AuthenticateSecondFactor("abcdefgh");
+            });
         }
 
         [Test]
@@ -266,6 +270,26 @@ namespace osu.Game.Tests.Visual.Online
             AddStep("signal score processed", () => ((ISpectatorClient)spectatorClient).UserScoreProcessed(userId, scoreId));
             AddWaitStep("wait a bit", 5);
             AddAssert("update not received", () => update == null);
+        }
+
+        [Test]
+        public void TestGlobalStatisticsUpdatedAfterRegistrationAddedAndScoreProcessed()
+        {
+            int userId = getUserId();
+            long scoreId = getScoreId();
+            setUpUser(userId);
+
+            var ruleset = new OsuRuleset().RulesetInfo;
+
+            SoloStatisticsUpdate? update = null;
+            registerForUpdates(scoreId, ruleset, receivedUpdate => update = receivedUpdate);
+
+            feignScoreProcessing(userId, ruleset, 5_000_000);
+
+            AddStep("signal score processed", () => ((ISpectatorClient)spectatorClient).UserScoreProcessed(userId, scoreId));
+            AddUntilStep("update received", () => update != null);
+            AddAssert("local user values are correct", () => dummyAPI.LocalUser.Value.Statistics.TotalScore, () => Is.EqualTo(5_000_000));
+            AddAssert("statistics values are correct", () => dummyAPI.Statistics.Value!.TotalScore, () => Is.EqualTo(5_000_000));
         }
 
         private int nextUserId = 2000;

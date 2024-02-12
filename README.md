@@ -22,7 +22,7 @@ A few resources are available as starting points to getting involved and underst
 
 - Detailed release changelogs are available on the [official osu! site](https://osu.ppy.sh/home/changelog/lazer).
 - You can learn more about our approach to [project management](https://github.com/ppy/osu/wiki/Project-management).
-- Track our current efforts [towards full "ranked play" support](https://github.com/orgs/ppy/projects/13?query=is%3Aopen+sort%3Aupdated-desc).
+- Track our current efforts [towards improving the game](https://github.com/orgs/ppy/projects/7/views/6).
 
 ## Running osu!
 
@@ -30,8 +30,8 @@ If you are just looking to give the game a whirl, you can grab the latest releas
 
 ### Latest release:
 
-| [Windows 8.1+ (x64)](https://github.com/ppy/osu/releases/latest/download/install.exe) | macOS 10.15+ ([Intel](https://github.com/ppy/osu/releases/latest/download/osu.app.Intel.zip), [Apple Silicon](https://github.com/ppy/osu/releases/latest/download/osu.app.Apple.Silicon.zip)) | [Linux (x64)](https://github.com/ppy/osu/releases/latest/download/osu.AppImage) | [iOS 13.4+](https://osu.ppy.sh/home/testflight) | [Android 5+](https://github.com/ppy/osu/releases/latest/download/sh.ppy.osulazer.apk) |
-| ------------- | ------------- | ------------- | ------------- | ------------- |
+| [Windows 10+ (x64)](https://github.com/ppy/osu/releases/latest/download/install.exe) | macOS 12+ ([Intel](https://github.com/ppy/osu/releases/latest/download/osu.app.Intel.zip), [Apple Silicon](https://github.com/ppy/osu/releases/latest/download/osu.app.Apple.Silicon.zip)) | [Linux (x64)](https://github.com/ppy/osu/releases/latest/download/osu.AppImage) | [iOS 13.4+](https://osu.ppy.sh/home/testflight) | [Android 5+](https://github.com/ppy/osu/releases/latest/download/sh.ppy.osulazer.apk) |
+|--------------------------------------------------------------------------------------|--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------| ------------- | ------------- | ------------- |
 
 You can also generally download a version for your current device from the [osu! site](https://osu.ppy.sh/home/download).
 

@@ -9,8 +9,10 @@ using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
+using osu.Framework.Utils;
 using osu.Game.Beatmaps;
 using osu.Game.Online.API.Requests.Responses;
+using osu.Game.Overlays;
 using osu.Game.Rulesets;
 using osu.Game.Rulesets.Osu;
 using osu.Game.Scoring;
@@ -28,6 +30,9 @@ namespace osu.Game.Tests.Visual.Online
 
         private UserGridPanel boundPanel1;
         private TestUserListPanel boundPanel2;
+
+        [Cached]
+        private OverlayColourProvider colourProvider = new OverlayColourProvider(OverlayColourScheme.Purple);
 
         [Resolved]
         private IRulesetStore rulesetStore { get; set; }
@@ -85,8 +90,25 @@ namespace osu.Game.Tests.Visual.Online
                         CoverUrl = @"https://assets.ppy.sh/user-profile-covers/8195163/4a8e2ad5a02a2642b631438cfa6c6bd7e2f9db289be881cb27df18331f64144c.jpeg",
                         IsOnline = false,
                         LastVisit = DateTimeOffset.Now
-                    })
-                },
+                    }),
+                    new UserRankPanel(new APIUser
+                    {
+                        Username = @"flyte",
+                        Id = 3103765,
+                        CountryCode = CountryCode.JP,
+                        CoverUrl = @"https://osu.ppy.sh/images/headers/profile-covers/c6.jpg",
+                        Statistics = new UserStatistics { GlobalRank = 12345, CountryRank = 1234 }
+                    }) { Width = 300 },
+                    new UserRankPanel(new APIUser
+                    {
+                        Username = @"peppy",
+                        Id = 2,
+                        Colour = "99EB47",
+                        CountryCode = CountryCode.AU,
+                        CoverUrl = @"https://osu.ppy.sh/images/headers/profile-covers/c3.jpg",
+                        Statistics = new UserStatistics { GlobalRank = null, CountryRank = null }
+                    }) { Width = 300 }
+                }
             };
 
             boundPanel1.Status.BindTo(status);
@@ -134,6 +156,23 @@ namespace osu.Game.Tests.Visual.Online
             AddAssert("visit message is visible", () => boundPanel2.LastVisitMessage.IsPresent);
             AddStep("set online status", () => status.Value = UserStatus.Online);
             AddAssert("visit message is not visible", () => !boundPanel2.LastVisitMessage.IsPresent);
+        }
+
+        [Test]
+        public void TestUserStatisticsChange()
+        {
+            AddStep("update statistics", () =>
+            {
+                API.UpdateStatistics(new UserStatistics
+                {
+                    GlobalRank = RNG.Next(100000),
+                    CountryRank = RNG.Next(100000)
+                });
+            });
+            AddStep("set statistics to empty", () =>
+            {
+                API.UpdateStatistics(new UserStatistics());
+            });
         }
 
         private UserActivity soloGameStatusForRuleset(int rulesetId) => new UserActivity.InSoloGame(new BeatmapInfo(), rulesetStore.GetRuleset(rulesetId)!);

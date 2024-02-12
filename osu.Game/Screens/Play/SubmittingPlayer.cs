@@ -8,6 +8,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using JetBrains.Annotations;
 using osu.Framework.Allocation;
+using osu.Framework.Graphics;
 using osu.Framework.Logging;
 using osu.Framework.Screens;
 using osu.Game.Beatmaps;
@@ -41,6 +42,7 @@ namespace osu.Game.Screens.Play
         [Resolved]
         private SessionStatics statics { get; set; }
 
+        private readonly object scoreSubmissionLock = new object();
         private TaskCompletionSource<bool> scoreSubmissionSource;
 
         protected SubmittingPlayer(PlayerConfiguration configuration = null)
@@ -58,7 +60,21 @@ namespace osu.Game.Screens.Play
             }
 
             AddInternal(new PlayerTouchInputDetector());
+
+            // We probably want to move this display to something more global.
+            // Probably using the OSD somehow.
+            AddInternal(new GameplayOffsetControl
+            {
+                Margin = new MarginPadding(20),
+                Anchor = Anchor.CentreRight,
+                Origin = Anchor.CentreRight,
+            });
         }
+
+        protected override GameplayClockContainer CreateGameplayClockContainer(WorkingBeatmap beatmap, double gameplayStart) => new MasterGameplayClockContainer(beatmap, gameplayStart)
+        {
+            ShouldValidatePlaybackRate = true,
+        };
 
         protected override void LoadAsyncComplete()
         {
@@ -116,7 +132,18 @@ namespace osu.Game.Screens.Play
                     if (string.IsNullOrEmpty(exception.Message))
                         Logger.Error(exception, "Failed to retrieve a score submission token.");
                     else
-                        Logger.Log($"You are not able to submit a score: {exception.Message}", level: LogLevel.Important);
+                    {
+                        switch (exception.Message)
+                        {
+                            case "expired token":
+                                Logger.Log("Score submission failed because your system clock is set incorrectly. Please check your system time, date and timezone.", level: LogLevel.Important);
+                                break;
+
+                            default:
+                                Logger.Log($"You are not able to submit a score: {exception.Message}", level: LogLevel.Important);
+                                break;
+                        }
+                    }
 
                     Schedule(() =>
                     {
@@ -228,16 +255,19 @@ namespace osu.Game.Screens.Play
                 return Task.CompletedTask;
             }
 
-            if (scoreSubmissionSource != null)
-                return scoreSubmissionSource.Task;
+            lock (scoreSubmissionLock)
+            {
+                if (scoreSubmissionSource != null)
+                    return scoreSubmissionSource.Task;
+
+                scoreSubmissionSource = new TaskCompletionSource<bool>();
+            }
 
             // if the user never hit anything, this score should not be counted in any way.
             if (!score.ScoreInfo.Statistics.Any(s => s.Key.IsHit() && s.Value > 0))
                 return Task.CompletedTask;
 
             Logger.Log($"Beginning score submission (token:{token.Value})...");
-
-            scoreSubmissionSource = new TaskCompletionSource<bool>();
             var request = CreateSubmissionRequest(score, token.Value);
 
             request.Success += s =>

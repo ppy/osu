@@ -7,6 +7,7 @@ using System.Linq;
 using osu.Game.Beatmaps;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Objects;
+using osu.Game.Rulesets.Objects.Legacy;
 using osu.Game.Rulesets.Objects.Types;
 using osu.Game.Rulesets.Osu.Mods;
 using osu.Game.Rulesets.Osu.Objects;
@@ -62,13 +63,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
                 drainLength = ((int)Math.Round(baseBeatmap.HitObjects[^1].StartTime) - (int)Math.Round(baseBeatmap.HitObjects[0].StartTime) - breakLength) / 1000;
             }
 
-            int difficultyPeppyStars = (int)Math.Round(
-                (baseBeatmap.Difficulty.DrainRate
-                 + baseBeatmap.Difficulty.OverallDifficulty
-                 + baseBeatmap.Difficulty.CircleSize
-                 + Math.Clamp((float)objectCount / drainLength * 8, 0, 16)) / 38 * 5);
-
-            scoreMultiplier = difficultyPeppyStars;
+            scoreMultiplier = LegacyRulesetExtensions.CalculateDifficultyPeppyStars(baseBeatmap.Difficulty, objectCount, drainLength);
 
             LegacyScoreAttributes attributes = new LegacyScoreAttributes();
 

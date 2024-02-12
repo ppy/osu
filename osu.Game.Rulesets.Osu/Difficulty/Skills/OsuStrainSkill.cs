@@ -45,7 +45,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
 
             if (ReducedSectionCount > 0)
             {
-                strains = strains.OrderByDescending(d => d).ToList();
+                strains = strains.OrderDescending().ToList();
 
                 // We are reducing the highest strains first to account for extreme difficulty spikes
                 for (int i = 0; i < Math.Min(strains.Count, ReducedSectionCount); i++)

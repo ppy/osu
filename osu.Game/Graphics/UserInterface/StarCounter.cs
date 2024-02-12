@@ -101,7 +101,7 @@ namespace osu.Game.Graphics.UserInterface
         public void StopAnimation()
         {
             animate(current);
-            foreach (var star in stars.Children)
+            foreach (var star in stars)
                 star.FinishTransforms(true);
         }
 
