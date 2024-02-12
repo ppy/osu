@@ -69,7 +69,6 @@ namespace osu.Game.Rulesets.Taiko.UI
                 relativeHeight *= CurrentAspect.Value / MinimumAspect.Value;
             }
 
-
             // Limit the maximum relative height of the playfield to one-third of available area to avoid it masking out on extreme resolutions.
             relativeHeight = Math.Clamp(relativeHeight, MinimumRelativeHeight.Value, MaximumRelativeHeight.Value);
 

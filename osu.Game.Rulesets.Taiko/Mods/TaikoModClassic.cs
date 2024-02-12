@@ -33,7 +33,6 @@ namespace osu.Game.Rulesets.Taiko.Mods
 
         private readonly BindableFloat hiddenInitialAlpha = new BindableFloat(hd_base_initial_alpha);
 
-
         public void ApplyToDrawableRuleset(DrawableRuleset<TaikoHitObject> drawableRuleset)
         {
             var drawableTaikoRuleset = (DrawableTaikoRuleset)drawableRuleset;
@@ -46,7 +45,6 @@ namespace osu.Game.Rulesets.Taiko.Mods
             drawableTaikoRuleset.TrimOnOverflow.Value = true;
 
             TaikoModHidden? hidden = mods.OfType<TaikoModHidden>().FirstOrDefault();
-
 
             if (mods.OfType<TaikoModHardRock>().Any())
             {
