@@ -198,8 +198,10 @@ namespace osu.Game.Screens.Play
             foreach (var nested in playfield.NestedPlayfields)
                 applyToPlayfield(nested);
 
-            foreach (DrawableHitObject obj in playfield.HitObjectContainer.AliveObjects)
+            foreach (var entry in playfield.HitObjectContainer.AliveEntries)
             {
+                var obj = entry.Value;
+
                 if (appliedObjects.Contains(obj))
                     continue;
 

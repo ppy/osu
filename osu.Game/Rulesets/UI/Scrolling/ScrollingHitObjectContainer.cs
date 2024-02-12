@@ -188,7 +188,7 @@ namespace osu.Game.Rulesets.UI.Scrolling
             // We are not using AliveObjects directly to avoid selection/sorting overhead since we don't care about the order at which positions will be updated.
             foreach (var entry in AliveEntries)
             {
-                var obj = entry.Drawable;
+                var obj = entry.Value;
 
                 updatePosition(obj, Time.Current);
 

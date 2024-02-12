@@ -206,6 +206,12 @@ namespace osu.Game.Tests.Visual.Online
                 Total = 50
             },
             SupportLevel = 2,
+            Location = "Somewhere",
+            Interests = "Rhythm games",
+            Occupation = "Gamer",
+            Twitter = "test_user",
+            Discord = "test_user",
+            Website = "https://google.com",
         };
     }
 }
