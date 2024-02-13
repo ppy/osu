@@ -17,24 +17,29 @@ namespace osu.Game.Rulesets.Catch.UI
 
         public CatchPlayfieldAdjustmentContainer()
         {
-            Anchor = Anchor.TopCentre;
-            Origin = Anchor.TopCentre;
-
-            // playfields in stable are positioned vertically at three fourths the difference between the playfield height and the window height in stable.
-            // we can match that in lazer by using relative coordinates for Y and considering window height to be 1, and playfield height to be 0.8.
-            RelativePositionAxes = Axes.Y;
-            Y = (1 - playfield_size_adjust) / 4 * 3;
-
-            Size = new Vector2(playfield_size_adjust);
+            const float base_game_width = 1024f;
+            const float base_game_height = 768f;
 
             InternalChild = new Container
             {
+                // This container limits vertical visibility of the playfield to ensure fairness between wide and tall resolutions (i.e. tall resolutions should not see more fruits).
+                // Note that the container still extends across the screen horizontally, so that hit explosions at the sides of the playfield do not get cut off.
+                Name = "Visible area",
                 Anchor = Anchor.Centre,
                 Origin = Anchor.Centre,
-                RelativeSizeAxes = Axes.Both,
-                FillMode = FillMode.Fit,
-                FillAspectRatio = 4f / 3,
-                Child = content = new ScalingContainer { RelativeSizeAxes = Axes.Both, }
+                RelativeSizeAxes = Axes.X,
+                Height = base_game_height,
+                Masking = true,
+                Child = new Container
+                {
+                    Name = "Playable area",
+                    Anchor = Anchor.TopCentre,
+                    Origin = Anchor.TopCentre,
+                    // playfields in stable are positioned vertically at three fourths the difference between the playfield height and the window height in stable.
+                    Y = base_game_height * ((1 - playfield_size_adjust) / 4 * 3),
+                    Size = new Vector2(base_game_width, base_game_height) * playfield_size_adjust,
+                    Child = content = new ScalingContainer { RelativeSizeAxes = Axes.Both }
+                },
             };
         }
 
