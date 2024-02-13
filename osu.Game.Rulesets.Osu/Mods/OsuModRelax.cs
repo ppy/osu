@@ -39,7 +39,7 @@ namespace osu.Game.Rulesets.Osu.Mods
         private double lastStateChangeTime;
 
         private DrawableOsuRuleset ruleset = null!;
-        private PressHandler pressHandler = null!;
+        private IPressHandler pressHandler = null!;
 
         private bool hasReplay;
         private bool legacyReplay;
@@ -155,44 +155,52 @@ namespace osu.Game.Rulesets.Osu.Mods
             }
         }
 
-        private class PressHandler
+        private interface IPressHandler
         {
-            protected readonly OsuModRelax Mod;
+            void HandlePress(bool wasLeft);
+            void HandleRelease(bool wasLeft);
+        }
+
+        private class PressHandler : IPressHandler
+        {
+            private readonly OsuModRelax mod;
 
             public PressHandler(OsuModRelax mod)
             {
-                Mod = mod;
+                this.mod = mod;
             }
 
-            public virtual void HandlePress(bool wasLeft)
+            public void HandlePress(bool wasLeft)
             {
-                Mod.state.PressedActions.Add(wasLeft ? OsuAction.LeftButton : OsuAction.RightButton);
-                Mod.state.Apply(Mod.osuInputManager.CurrentState, Mod.osuInputManager);
+                mod.state.PressedActions.Add(wasLeft ? OsuAction.LeftButton : OsuAction.RightButton);
+                mod.state.Apply(mod.osuInputManager.CurrentState, mod.osuInputManager);
             }
 
-            public virtual void HandleRelease(bool wasLeft)
+            public void HandleRelease(bool wasLeft)
             {
-                Mod.state.Apply(Mod.osuInputManager.CurrentState, Mod.osuInputManager);
+                mod.state.Apply(mod.osuInputManager.CurrentState, mod.osuInputManager);
             }
         }
 
         // legacy replays do not contain key-presses with Relax mod, so they need to be triggered by themselves.
-        private class LegacyReplayPressHandler : PressHandler
+        private class LegacyReplayPressHandler : IPressHandler
         {
+            private readonly OsuModRelax mod;
+
             public LegacyReplayPressHandler(OsuModRelax mod)
-                : base(mod)
             {
+                this.mod = mod;
             }
 
-            public override void HandlePress(bool wasLeft)
+            public void HandlePress(bool wasLeft)
             {
-                Mod.osuInputManager.KeyBindingContainer.TriggerPressed(wasLeft ? OsuAction.LeftButton : OsuAction.RightButton);
+                mod.osuInputManager.KeyBindingContainer.TriggerPressed(wasLeft ? OsuAction.LeftButton : OsuAction.RightButton);
             }
 
-            public override void HandleRelease(bool wasLeft)
+            public void HandleRelease(bool wasLeft)
             {
                 // this intentionally releases right when `wasLeft` is true because `wasLeft` is set at point of press and not at point of release
-                Mod.osuInputManager.KeyBindingContainer.TriggerReleased(wasLeft ? OsuAction.RightButton : OsuAction.LeftButton);
+                mod.osuInputManager.KeyBindingContainer.TriggerReleased(wasLeft ? OsuAction.RightButton : OsuAction.LeftButton);
             }
         }
     }
