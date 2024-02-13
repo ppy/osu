@@ -142,6 +142,11 @@ namespace osu.Game.Rulesets.Scoring
             }
         }
 
+        protected override bool CanFailOn(JudgementResult result)
+        {
+            return !result.Judgement.MaxResult.IsBonus() && result.Type != HitResult.IgnoreHit;
+        }
+
         protected override void Reset(bool storeResults)
         {
             base.Reset(storeResults);

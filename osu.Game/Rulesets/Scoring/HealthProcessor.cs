@@ -50,7 +50,7 @@ namespace osu.Game.Rulesets.Scoring
 
             Health.Value += GetHealthIncreaseFor(result);
 
-            if (meetsAnyFailCondition(result))
+            if (CanFailOn(result) && meetsAnyFailCondition(result))
                 TriggerFailure();
         }
 
@@ -67,6 +67,13 @@ namespace osu.Game.Rulesets.Scoring
         /// <param name="result">The <see cref="JudgementResult"/>.</param>
         /// <returns>The health increase.</returns>
         protected virtual double GetHealthIncreaseFor(JudgementResult result) => result.HealthIncrease;
+
+        /// <summary>
+        /// Whether a failure can occur on a given <paramref name="result"/>.
+        /// If the return value of this method is <see langword="false"/>, neither <see cref="DefaultFailCondition"/> nor <see cref="FailConditions"/> will be checked
+        /// after this <paramref name="result"/>.
+        /// </summary>
+        protected virtual bool CanFailOn(JudgementResult result) => true;
 
         /// <summary>
         /// The default conditions for failing.
