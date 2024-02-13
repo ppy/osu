@@ -2,6 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using osu.Framework.Platform;
@@ -38,16 +39,21 @@ namespace osu.Game.Beatmaps
         /// <param name="preferOnlineFetch">Whether metadata from an online source should be preferred. If <c>true</c>, the local cache will be skipped to ensure the freshest data state possible.</param>
         public void Update(BeatmapSetInfo beatmapSet, bool preferOnlineFetch)
         {
+            var lookupResults = new List<OnlineBeatmapMetadata?>();
+
             foreach (var beatmapInfo in beatmapSet.Beatmaps)
             {
                 if (!tryLookup(beatmapInfo, preferOnlineFetch, out var res))
                     continue;
 
-                if (res == null)
+                if (res == null || shouldDiscardLookupResult(res, beatmapInfo))
                 {
                     beatmapInfo.ResetOnlineInfo();
+                    lookupResults.Add(null); // mark lookup failure
                     continue;
                 }
+
+                lookupResults.Add(res);
 
                 beatmapInfo.OnlineID = res.BeatmapID;
                 beatmapInfo.OnlineMD5Hash = res.MD5Hash;
@@ -57,19 +63,34 @@ namespace osu.Game.Beatmaps
                 beatmapInfo.BeatmapSet.OnlineID = res.BeatmapSetID;
 
                 // Some metadata should only be applied if there's no local changes.
-                if (shouldSaveOnlineMetadata(beatmapInfo))
+                if (beatmapInfo.MatchesOnlineVersion)
                 {
                     beatmapInfo.Status = res.BeatmapStatus;
                     beatmapInfo.Metadata.Author.OnlineID = res.AuthorID;
                 }
-
-                if (beatmapInfo.BeatmapSet.Beatmaps.All(shouldSaveOnlineMetadata))
-                {
-                    beatmapInfo.BeatmapSet.Status = res.BeatmapSetStatus ?? BeatmapOnlineStatus.None;
-                    beatmapInfo.BeatmapSet.DateRanked = res.DateRanked;
-                    beatmapInfo.BeatmapSet.DateSubmitted = res.DateSubmitted;
-                }
             }
+
+            if (beatmapSet.Beatmaps.All(b => b.MatchesOnlineVersion)
+                && lookupResults.All(r => r != null)
+                && lookupResults.Select(r => r!.BeatmapSetID).Distinct().Count() == 1)
+            {
+                var representative = lookupResults.First()!;
+
+                beatmapSet.Status = representative.BeatmapSetStatus ?? BeatmapOnlineStatus.None;
+                beatmapSet.DateRanked = representative.DateRanked;
+                beatmapSet.DateSubmitted = representative.DateSubmitted;
+            }
+        }
+
+        private bool shouldDiscardLookupResult(OnlineBeatmapMetadata result, BeatmapInfo beatmapInfo)
+        {
+            if (beatmapInfo.OnlineID > 0 && result.BeatmapID != beatmapInfo.OnlineID)
+                return true;
+
+            if (beatmapInfo.OnlineID == -1 && result.MD5Hash != beatmapInfo.MD5Hash)
+                return true;
+
+            return false;
         }
 
         /// <summary>
@@ -103,12 +124,6 @@ namespace osu.Game.Beatmaps
             result = null;
             return false;
         }
-
-        /// <summary>
-        /// Check whether the provided beatmap is in a state where online "ranked" status metadata should be saved against it.
-        /// Handles the case where a user may have locally modified a beatmap in the editor and expects the local status to stick.
-        /// </summary>
-        private static bool shouldSaveOnlineMetadata(BeatmapInfo beatmapInfo) => beatmapInfo.MatchesOnlineVersion || beatmapInfo.Status != BeatmapOnlineStatus.LocallyModified;
 
         public void Dispose()
         {
