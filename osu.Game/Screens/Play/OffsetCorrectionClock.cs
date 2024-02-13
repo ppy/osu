@@ -2,7 +2,6 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using osu.Framework.Timing;
-using osu.Game.Screens.Edit;
 
 namespace osu.Game.Screens.Play
 {
@@ -20,7 +19,7 @@ namespace osu.Game.Screens.Play
 
                 offset = value;
 
-                UpdateOffset();
+                updateOffset();
             }
         }
 
@@ -34,34 +33,13 @@ namespace osu.Game.Screens.Play
         public override void ProcessFrame()
         {
             base.ProcessFrame();
-            UpdateOffset();
+            updateOffset();
         }
 
-        protected virtual void UpdateOffset()
+        private void updateOffset()
         {
             // we always want to apply the same real-time offset, so it should be adjusted by the difference in playback rate (from realtime) to achieve this.
             base.Offset = Offset * Rate;
-        }
-
-        protected void UpdateLatencyAssumption()
-        {
-            // The latency assumption baked into beatmaps should also be adjusted by the difference in playback rate.
-            // There should only be one clock that does this.
-            base.Offset += Editor.WAVEFORM_VISUAL_OFFSET * (Rate - 1.0);
-        }
-    }
-
-    public class LatencyAssumptionClock : OffsetCorrectionClock
-    {
-        public LatencyAssumptionClock(IClock source)
-            : base(source)
-        {
-        }
-
-        protected override void UpdateOffset()
-        {
-            base.UpdateOffset();
-            UpdateLatencyAssumption();
         }
     }
 }

@@ -28,8 +28,9 @@ namespace osu.Game.Beatmaps
         private readonly bool applyOffsets;
 
         private readonly OffsetCorrectionClock? userGlobalOffsetClock;
-        private readonly LatencyAssumptionClock? platformOffsetClock;
+        private readonly OffsetCorrectionClock? platformOffsetClock;
         private readonly OffsetCorrectionClock? userBeatmapOffsetClock;
+        private readonly LatencyAssumptionClock? latencyAssumptionClock;
 
         private readonly IFrameBasedClock finalClockSource;
 
@@ -64,10 +65,13 @@ namespace osu.Game.Beatmaps
             {
                 // Audio timings in general with newer BASS versions don't match stable.
                 // This only seems to be required on windows. We need to eventually figure out why, with a bit of luck.
-                platformOffsetClock = new LatencyAssumptionClock(interpolatedTrack) { Offset = RuntimeInfo.OS == RuntimeInfo.Platform.Windows ? 15 : 0 };
+                platformOffsetClock = new OffsetCorrectionClock(interpolatedTrack) { Offset = RuntimeInfo.OS == RuntimeInfo.Platform.Windows ? 15 : 0 };
+
+                // Offset to counter-balance delays that occur at different playback rates due to the latency assumption baked into beatmaps.
+                latencyAssumptionClock = new LatencyAssumptionClock(platformOffsetClock);
 
                 // User global offset (set in settings) should also be applied.
-                userGlobalOffsetClock = new OffsetCorrectionClock(platformOffsetClock);
+                userGlobalOffsetClock = new OffsetCorrectionClock(latencyAssumptionClock);
 
                 // User per-beatmap offset will be applied to this final clock.
                 finalClockSource = userBeatmapOffsetClock = new OffsetCorrectionClock(userGlobalOffsetClock);
@@ -121,8 +125,9 @@ namespace osu.Game.Beatmaps
                 Debug.Assert(userGlobalOffsetClock != null);
                 Debug.Assert(userBeatmapOffsetClock != null);
                 Debug.Assert(platformOffsetClock != null);
+                Debug.Assert(latencyAssumptionClock != null);
 
-                return userGlobalOffsetClock.RateAdjustedOffset + userBeatmapOffsetClock.RateAdjustedOffset + platformOffsetClock.RateAdjustedOffset;
+                return userGlobalOffsetClock.RateAdjustedOffset + userBeatmapOffsetClock.RateAdjustedOffset + platformOffsetClock.RateAdjustedOffset + latencyAssumptionClock.Offset;
             }
         }
 
