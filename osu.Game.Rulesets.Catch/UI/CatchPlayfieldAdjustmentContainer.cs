@@ -20,6 +20,9 @@ namespace osu.Game.Rulesets.Catch.UI
             const float base_game_width = 1024f;
             const float base_game_height = 768f;
 
+            Anchor = Anchor.Centre;
+            Origin = Anchor.Centre;
+
             InternalChild = new Container
             {
                 // This container limits vertical visibility of the playfield to ensure fairness between wide and tall resolutions (i.e. tall resolutions should not see more fruits).
