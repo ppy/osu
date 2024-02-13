@@ -187,7 +187,6 @@ namespace osu.Game.Screens.Menu
                                                                         },
                                                                         triangles = new TrianglesV2
                                                                         {
-                                                                            ClampAxes = Axes.X,
                                                                             Anchor = Anchor.Centre,
                                                                             Origin = Anchor.Centre,
                                                                             Thickness = 0.009f,
@@ -486,6 +485,13 @@ namespace osu.Game.Screens.Menu
 
             defaultProxyTarget.Add(this);
             defaultProxyTarget.Add(proxy = CreateProxy());
+        }
+
+        public void ChangeAnchor(Anchor anchor)
+        {
+            var previousAnchor = AnchorPosition;
+            Anchor = anchor;
+            Position -= AnchorPosition - previousAnchor;
         }
     }
 }

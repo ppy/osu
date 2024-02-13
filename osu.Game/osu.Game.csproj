@@ -1,6 +1,6 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup Label="Project">
-    <TargetFramework>net6.0</TargetFramework>
+    <TargetFramework>net8.0</TargetFramework>
     <OutputType>Library</OutputType>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
     <LangVersion>10</LangVersion>
@@ -36,8 +36,8 @@
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
     <PackageReference Include="Realm" Version="11.5.0" />
-    <PackageReference Include="ppy.osu.Framework" Version="2024.127.0" />
-    <PackageReference Include="ppy.osu.Game.Resources" Version="2024.127.0" />
+    <PackageReference Include="ppy.osu.Framework" Version="2024.205.0" />
+    <PackageReference Include="ppy.osu.Game.Resources" Version="2024.207.0" />
     <PackageReference Include="Sentry" Version="3.41.3" />
     <!-- Held back due to 0.34.0 failing AOT compilation on ZstdSharp.dll dependency. -->
     <PackageReference Include="SharpCompress" Version="0.36.0" />

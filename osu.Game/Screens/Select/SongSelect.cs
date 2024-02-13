@@ -642,7 +642,10 @@ namespace osu.Game.Screens.Select
         {
             base.LogoArriving(logo, resuming);
 
-            Vector2 position = new Vector2(0.95f, 0.96f);
+            logo.RelativePositionAxes = Axes.None;
+            logo.ChangeAnchor(Anchor.BottomRight);
+
+            Vector2 position = new Vector2(-76, -36);
 
             if (logo.Alpha > 0.8f)
             {

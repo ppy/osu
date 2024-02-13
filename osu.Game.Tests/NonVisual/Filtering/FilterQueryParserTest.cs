@@ -274,10 +274,12 @@ namespace osu.Game.Tests.NonVisual.Filtering
             Assert.IsTrue(filterCriteria.OnlineStatus.IsUpperInclusive);
         }
 
-        [Test]
-        public void TestApplyCreatorQueries()
+        [TestCase("creator")]
+        [TestCase("author")]
+        [TestCase("mapper")]
+        public void TestApplyCreatorQueries(string keyword)
         {
-            const string query = "beatmap specifically by creator=my_fav";
+            string query = $"beatmap specifically by {keyword}=my_fav";
             var filterCriteria = new FilterCriteria();
             FilterQueryParser.ApplyQueries(filterCriteria, query);
             Assert.AreEqual("beatmap specifically by", filterCriteria.SearchText.Trim());

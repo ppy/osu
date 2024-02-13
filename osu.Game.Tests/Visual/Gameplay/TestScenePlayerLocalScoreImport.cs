@@ -138,8 +138,8 @@ namespace osu.Game.Tests.Visual.Gameplay
             AddUntilStep("results displayed", () => Player.GetChildScreen() is ResultsScreen);
 
             // Player creates new instance of mods after gameplay to ensure any runtime references to drawables etc. are not retained.
-            AddAssert("results screen score has copied mods", () => (Player.GetChildScreen() as ResultsScreen)?.Score.Mods.First(), () => Is.Not.SameAs(playerMods.First()));
-            AddAssert("results screen score has matching", () => (Player.GetChildScreen() as ResultsScreen)?.Score.Mods.First(), () => Is.EqualTo(playerMods.First()));
+            AddAssert("results screen score has copied mods", () => (Player.GetChildScreen() as ResultsScreen)?.Score?.Mods.First(), () => Is.Not.SameAs(playerMods.First()));
+            AddAssert("results screen score has matching", () => (Player.GetChildScreen() as ResultsScreen)?.Score?.Mods.First(), () => Is.EqualTo(playerMods.First()));
 
             AddUntilStep("score in database", () => Realm.Run(r => r.Find<ScoreInfo>(Player.Score.ScoreInfo.ID) != null));
             AddUntilStep("databased score has correct mods", () => Realm.Run(r => r.Find<ScoreInfo>(Player.Score.ScoreInfo.ID))!.Mods.First(), () => Is.EqualTo(playerMods.First()));
@@ -184,7 +184,11 @@ namespace osu.Game.Tests.Visual.Gameplay
             CreateTest();
 
             AddUntilStep("wait for track to start running", () => Beatmap.Value.Track.IsRunning);
-            AddStep("log back in", () => API.Login("username", "password"));
+            AddStep("log back in", () =>
+            {
+                API.Login("username", "password");
+                ((DummyAPIAccess)API).AuthenticateSecondFactor("abcdefgh");
+            });
 
             AddStep("seek to completion", () => Player.GameplayClockContainer.Seek(Player.DrawableRuleset.Objects.Last().GetEndTime()));
 
