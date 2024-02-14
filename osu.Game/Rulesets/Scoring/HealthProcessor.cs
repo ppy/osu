@@ -17,7 +17,7 @@ namespace osu.Game.Rulesets.Scoring
         public event Func<bool>? Failed;
 
         /// <summary>
-        /// Additional conditions on top of <see cref="DefaultFailCondition"/> that cause a failing state.
+        /// Additional conditions on top of <see cref="CheckDefaultFailCondition"/> that cause a failing state.
         /// </summary>
         public event Func<HealthProcessor, JudgementResult, bool>? FailConditions;
 
@@ -50,7 +50,7 @@ namespace osu.Game.Rulesets.Scoring
 
             Health.Value += GetHealthIncreaseFor(result);
 
-            if (CanFailOn(result) && meetsAnyFailCondition(result))
+            if (meetsAnyFailCondition(result))
                 TriggerFailure();
         }
 
@@ -69,16 +69,10 @@ namespace osu.Game.Rulesets.Scoring
         protected virtual double GetHealthIncreaseFor(JudgementResult result) => result.HealthIncrease;
 
         /// <summary>
-        /// Whether a failure can occur on a given <paramref name="result"/>.
-        /// If the return value of this method is <see langword="false"/>, neither <see cref="DefaultFailCondition"/> nor <see cref="FailConditions"/> will be checked
-        /// after this <paramref name="result"/>.
+        /// Checks whether the default conditions for failing are met.
         /// </summary>
-        protected virtual bool CanFailOn(JudgementResult result) => true;
-
-        /// <summary>
-        /// The default conditions for failing.
-        /// </summary>
-        protected virtual bool DefaultFailCondition => Precision.AlmostBigger(Health.MinValue, Health.Value);
+        /// <returns><see langword="true"/> if failure should be invoked.</returns>
+        protected virtual bool CheckDefaultFailCondition(JudgementResult result) => Precision.AlmostBigger(Health.MinValue, Health.Value);
 
         /// <summary>
         /// Whether the current state of <see cref="HealthProcessor"/> or the provided <paramref name="result"/> meets any fail condition.
@@ -86,7 +80,7 @@ namespace osu.Game.Rulesets.Scoring
         /// <param name="result">The judgement result.</param>
         private bool meetsAnyFailCondition(JudgementResult result)
         {
-            if (DefaultFailCondition)
+            if (CheckDefaultFailCondition(result))
                 return true;
 
             if (FailConditions != null)

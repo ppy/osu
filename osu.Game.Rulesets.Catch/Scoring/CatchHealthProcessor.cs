@@ -22,7 +22,7 @@ namespace osu.Game.Rulesets.Catch.Scoring
 
         protected override IEnumerable<HitObject> EnumerateNestedHitObjects(HitObject hitObject) => Enumerable.Empty<HitObject>();
 
-        protected override bool CanFailOn(JudgementResult result)
+        protected override bool CheckDefaultFailCondition(JudgementResult result)
         {
             // matches stable.
             // see: https://github.com/peppy/osu-stable-reference/blob/46cd3a10af7cc6cc96f4eba92ef1812dc8c3a27e/osu!/GameModes/Play/Rulesets/Ruleset.cs#L967
@@ -32,7 +32,7 @@ namespace osu.Game.Rulesets.Catch.Scoring
             if (result.Type == HitResult.SmallTickMiss)
                 return false;
 
-            return base.CanFailOn(result);
+            return base.CheckDefaultFailCondition(result);
         }
 
         protected override double GetHealthIncreaseFor(HitObject hitObject, HitResult result)
