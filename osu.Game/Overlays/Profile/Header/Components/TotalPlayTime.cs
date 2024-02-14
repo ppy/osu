@@ -38,9 +38,9 @@ namespace osu.Game.Overlays.Profile.Header.Components
             UserStatistics.BindValueChanged(updateTime, true);
         }
 
-        private void updateTime(ValueChangedEvent<UserStatistics?> user)
+        private void updateTime(ValueChangedEvent<UserStatistics?> statistics)
         {
-            int? playTime = user.NewValue?.PlayTime;
+            int? playTime = statistics.NewValue?.PlayTime;
             TooltipText = (playTime ?? 0) / 3600 + " hours";
             info.Content = formatTime(playTime);
         }
