@@ -188,7 +188,7 @@ namespace osu.Game.Overlays.Toolbar
                     titleText.FadeOut(250, Easing.OutQuint);
                     deltaValue.FadeIn(250, Easing.OutQuint)
                               .Then().Delay(1000)
-                              .Then().OnComplete(_ =>
+                              .Then().Schedule(() =>
                               {
                                   mainValue.Current.Value = after;
                                   deltaValue.Current.SetDefault();
