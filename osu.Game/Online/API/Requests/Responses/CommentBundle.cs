@@ -11,6 +11,9 @@ namespace osu.Game.Online.API.Requests.Responses
 {
     public class CommentBundle
     {
+        [JsonProperty(@"commentable_meta")]
+        public List<CommentableMeta> CommentableMeta { get; set; } = new List<CommentableMeta>();
+
         [JsonProperty(@"comments")]
         public List<Comment> Comments { get; set; }
 
