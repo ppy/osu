@@ -9,6 +9,7 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Localisation;
+using osu.Framework.Threading;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Graphics.UserInterface;
@@ -98,6 +99,7 @@ namespace osu.Game.Overlays.Toolbar
             private Counter<T> mainValue = null!;
             private Counter<T> deltaValue = null!;
             private OsuSpriteText titleText = null!;
+            private ScheduledDelegate? valueUpdateSchedule;
 
             [Resolved]
             private OsuColour colours { get; set; } = null!;
@@ -159,6 +161,9 @@ namespace osu.Game.Overlays.Toolbar
 
             public void Display(T before, T delta, T after)
             {
+                valueUpdateSchedule?.Cancel();
+                valueUpdateSchedule = null;
+
                 int comparison = valueComparer.Compare(before, after);
 
                 if (comparison > 0)
@@ -186,13 +191,16 @@ namespace osu.Game.Overlays.Toolbar
                 using (BeginDelayedSequence(1200))
                 {
                     titleText.FadeOut(250, Easing.OutQuad);
-                    deltaValue.FadeIn(250, Easing.OutQuad)
-                              .Then().Delay(500)
-                              .Then().Schedule(() =>
-                              {
-                                  mainValue.Current.Value = after;
-                                  deltaValue.Current.SetDefault();
-                              });
+                    deltaValue.FadeIn(250, Easing.OutQuad);
+
+                    using (BeginDelayedSequence(1250))
+                    {
+                        valueUpdateSchedule = Schedule(() =>
+                        {
+                            mainValue.Current.Value = after;
+                            deltaValue.Current.SetDefault();
+                        });
+                    }
                 }
             }
         }
