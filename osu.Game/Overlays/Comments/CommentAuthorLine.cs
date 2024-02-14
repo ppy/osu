@@ -57,7 +57,7 @@ namespace osu.Game.Overlays.Comments
                 Add(new OwnerTitleBadge(ownerMeta.OwnerTitle ?? string.Empty)
                 {
                     // add top space to align with username
-                    Margin = new MarginPadding { Top = 2f },
+                    Margin = new MarginPadding { Top = 1f },
                 });
             }
 
