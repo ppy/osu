@@ -630,6 +630,12 @@ namespace osu.Game
 
             var detachedSet = databasedSet.PerformRead(s => s.Detach());
 
+            if (detachedSet.DeletePending)
+            {
+                Logger.Log("The requested beatmap has since been deleted.", LoggingTarget.Information);
+                return;
+            }
+
             PerformFromScreen(screen =>
             {
                 // Find beatmaps that match our predicate.

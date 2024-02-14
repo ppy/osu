@@ -986,6 +986,29 @@ namespace osu.Game.Tests.Visual.Navigation
             }
         }
 
+        [Test]
+        public void TestPresentBeatmapAfterDeletion()
+        {
+            BeatmapSetInfo beatmap = null;
+
+            Screens.Select.SongSelect songSelect = null;
+            PushAndConfirm(() => songSelect = new TestPlaySongSelect());
+            AddUntilStep("wait for song select", () => songSelect.BeatmapSetsLoaded);
+
+            AddStep("import beatmap", () => BeatmapImportHelper.LoadQuickOszIntoOsu(Game).WaitSafely());
+            AddUntilStep("wait for selected", () => !Game.Beatmap.IsDefault);
+
+            AddStep("delete selected beatmap", () =>
+            {
+                beatmap = Game.Beatmap.Value.BeatmapSetInfo;
+                Game.BeatmapManager.Delete(Game.Beatmap.Value.BeatmapSetInfo);
+            });
+
+            AddUntilStep("nothing selected", () => Game.Beatmap.IsDefault);
+            AddStep("present deleted beatmap", () => Game.PresentBeatmap(beatmap));
+            AddAssert("still nothing selected", () => Game.Beatmap.IsDefault);
+        }
+
         private Func<Player> playToResults()
         {
             var player = playToCompletion();
