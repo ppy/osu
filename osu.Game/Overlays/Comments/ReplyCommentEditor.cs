@@ -6,7 +6,6 @@ using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Localisation;
 using osu.Framework.Logging;
-using osu.Game.Online.API;
 using osu.Game.Online.API.Requests;
 using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Resources.Localisation.Web;
@@ -18,16 +17,17 @@ namespace osu.Game.Overlays.Comments
         [Resolved]
         private CommentsContainer commentsContainer { get; set; } = null!;
 
-        [Resolved]
-        private IAPIProvider api { get; set; } = null!;
-
         private readonly Comment parentComment;
 
         public Action<DrawableComment[]>? OnPost;
 
         protected override LocalisableString FooterText => default;
-        protected override LocalisableString CommitButtonText => CommonStrings.ButtonsReply;
-        protected override LocalisableString TextBoxPlaceholder => CommentsStrings.PlaceholderReply;
+
+        protected override LocalisableString GetButtonText(bool isLoggedIn) =>
+            isLoggedIn ? CommonStrings.ButtonsReply : CommentsStrings.GuestButtonReply;
+
+        protected override LocalisableString GetPlaceholderText(bool isLoggedIn) =>
+            isLoggedIn ? CommentsStrings.PlaceholderReply : AuthorizationStrings.RequireLogin;
 
         public ReplyCommentEditor(Comment parent)
         {
@@ -38,7 +38,8 @@ namespace osu.Game.Overlays.Comments
         {
             base.LoadComplete();
 
-            GetContainingInputManager().ChangeFocus(TextBox);
+            if (!TextBox.ReadOnly)
+                GetContainingInputManager().ChangeFocus(TextBox);
         }
 
         protected override void OnCommit(string text)
@@ -51,7 +52,7 @@ namespace osu.Game.Overlays.Comments
                 Logger.Error(e, "Posting reply comment failed.");
             });
             req.Success += cb => Schedule(processPostedComments, cb);
-            api.Queue(req);
+            API.Queue(req);
         }
 
         private void processPostedComments(CommentBundle cb)
@@ -59,7 +60,7 @@ namespace osu.Game.Overlays.Comments
             foreach (var comment in cb.Comments)
                 comment.ParentComment = parentComment;
 
-            var drawables = cb.Comments.Select(commentsContainer.GetDrawableComment).ToArray();
+            var drawables = cb.Comments.Select(c => commentsContainer.GetDrawableComment(c, cb.CommentableMeta)).ToArray();
             OnPost?.Invoke(drawables);
 
             OnCancel!.Invoke();

@@ -1,8 +1,6 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
 using System;
 using System.Diagnostics;
 using System.Linq;
@@ -16,12 +14,14 @@ using osu.Framework.Graphics.Cursor;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.UserInterface;
+using osu.Framework.Input.Bindings;
 using osu.Framework.Input.Events;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Graphics.UserInterfaceV2;
+using osu.Game.Input.Bindings;
 using osu.Game.Overlays;
 using osuTK;
 using osuTK.Graphics;
@@ -29,14 +29,12 @@ using osuTK.Input;
 
 namespace osu.Game.Screens.Edit.Compose.Components
 {
-    public partial class BeatDivisorControl : CompositeDrawable
+    public partial class BeatDivisorControl : CompositeDrawable, IKeyBindingHandler<GlobalAction>
     {
-        private readonly BindableBeatDivisor beatDivisor = new BindableBeatDivisor();
+        private int? lastCustomDivisor;
 
-        public BeatDivisorControl(BindableBeatDivisor beatDivisor)
-        {
-            this.beatDivisor.BindTo(beatDivisor);
-        }
+        [Resolved]
+        private BindableBeatDivisor beatDivisor { get; set; } = null!;
 
         [BackgroundDependencyLoader]
         private void load(OverlayColourProvider colourProvider)
@@ -101,13 +99,13 @@ namespace osu.Game.Screens.Edit.Compose.Components
                                                     new ChevronButton
                                                     {
                                                         Icon = FontAwesome.Solid.ChevronLeft,
-                                                        Action = beatDivisor.Previous
+                                                        Action = beatDivisor.SelectPrevious
                                                     },
                                                     new DivisorDisplay { BeatDivisor = { BindTarget = beatDivisor } },
                                                     new ChevronButton
                                                     {
                                                         Icon = FontAwesome.Solid.ChevronRight,
-                                                        Action = beatDivisor.Next
+                                                        Action = beatDivisor.SelectNext
                                                     }
                                                 },
                                             },
@@ -184,29 +182,46 @@ namespace osu.Game.Screens.Edit.Compose.Components
             };
         }
 
+        protected override void LoadComplete()
+        {
+            base.LoadComplete();
+
+            beatDivisor.ValidDivisors.BindValueChanged(valid =>
+            {
+                if (valid.NewValue.Type == BeatDivisorType.Custom)
+                    lastCustomDivisor = valid.NewValue.Presets.Last();
+            }, true);
+        }
+
         private void cycleDivisorType(int direction)
         {
-            Debug.Assert(Math.Abs(direction) == 1);
-            int nextDivisorType = (int)beatDivisor.ValidDivisors.Value.Type + direction;
-            if (nextDivisorType > (int)BeatDivisorType.Triplets)
-                nextDivisorType = (int)BeatDivisorType.Common;
-            else if (nextDivisorType < (int)BeatDivisorType.Common)
-                nextDivisorType = (int)BeatDivisorType.Triplets;
+            int totalTypes = Enum.GetValues<BeatDivisorType>().Length;
+            BeatDivisorType currentType = beatDivisor.ValidDivisors.Value.Type;
 
-            switch ((BeatDivisorType)nextDivisorType)
+            Debug.Assert(Math.Abs(direction) == 1);
+
+            cycleOnce();
+
+            if (lastCustomDivisor == null && currentType == BeatDivisorType.Custom)
+                cycleOnce();
+
+            switch (currentType)
             {
                 case BeatDivisorType.Common:
-                    beatDivisor.ValidDivisors.Value = BeatDivisorPresetCollection.COMMON;
+                    beatDivisor.SetArbitraryDivisor(4, true);
                     break;
 
                 case BeatDivisorType.Triplets:
-                    beatDivisor.ValidDivisors.Value = BeatDivisorPresetCollection.TRIPLETS;
+                    beatDivisor.SetArbitraryDivisor(6, true);
                     break;
 
                 case BeatDivisorType.Custom:
-                    beatDivisor.ValidDivisors.Value = BeatDivisorPresetCollection.Custom(beatDivisor.ValidDivisors.Value.Presets.Max());
+                    Debug.Assert(lastCustomDivisor != null);
+                    beatDivisor.SetArbitraryDivisor(lastCustomDivisor.Value);
                     break;
             }
+
+            void cycleOnce() => currentType = (BeatDivisorType)(((int)currentType + totalTypes + direction) % totalTypes);
         }
 
         protected override bool OnKeyDown(KeyDownEvent e)
@@ -220,6 +235,26 @@ namespace osu.Game.Screens.Edit.Compose.Components
             return base.OnKeyDown(e);
         }
 
+        public bool OnPressed(KeyBindingPressEvent<GlobalAction> e)
+        {
+            switch (e.Action)
+            {
+                case GlobalAction.EditorCycleNextBeatSnapDivisor:
+                    beatDivisor.SelectNext();
+                    return true;
+
+                case GlobalAction.EditorCyclePreviousBeatSnapDivisor:
+                    beatDivisor.SelectPrevious();
+                    return true;
+            }
+
+            return false;
+        }
+
+        public void OnReleased(KeyBindingReleaseEvent<GlobalAction> e)
+        {
+        }
+
         internal partial class DivisorDisplay : OsuAnimatedButton, IHasPopover
         {
             public BindableBeatDivisor BeatDivisor { get; } = new BindableBeatDivisor();
@@ -227,6 +262,7 @@ namespace osu.Game.Screens.Edit.Compose.Components
             private readonly OsuSpriteText divisorText;
 
             public DivisorDisplay()
+                : base(HoverSampleSet.Default)
             {
                 Anchor = Anchor.Centre;
                 Origin = Anchor.Centre;
@@ -285,7 +321,7 @@ namespace osu.Game.Screens.Edit.Compose.Components
                     Spacing = new Vector2(10),
                     Children = new Drawable[]
                     {
-                        divisorTextBox = new OsuNumberBox
+                        divisorTextBox = new AutoSelectTextBox
                         {
                             RelativeSizeAxes = Axes.X,
                             PlaceholderText = "Beat divisor"
@@ -304,12 +340,10 @@ namespace osu.Game.Screens.Edit.Compose.Components
             {
                 base.LoadComplete();
                 BeatDivisor.BindValueChanged(_ => updateState(), true);
-                divisorTextBox.OnCommit += (_, _) => setPresets();
-
-                Schedule(() => GetContainingInputManager().ChangeFocus(divisorTextBox));
+                divisorTextBox.OnCommit += (_, _) => setPresetsFromTextBoxEntry();
             }
 
-            private void setPresets()
+            private void setPresetsFromTextBoxEntry()
             {
                 if (!int.TryParse(divisorTextBox.Text, out int divisor) || divisor < 1 || divisor > 64)
                 {
@@ -372,10 +406,10 @@ namespace osu.Game.Screens.Edit.Compose.Components
 
         private partial class TickSliderBar : SliderBar<int>
         {
-            private Marker marker;
+            private Marker marker = null!;
 
             [Resolved]
-            private OsuColour colours { get; set; }
+            private OsuColour colours { get; set; } = null!;
 
             private readonly BindableBeatDivisor beatDivisor;
 
@@ -442,12 +476,12 @@ namespace osu.Game.Screens.Edit.Compose.Components
                 switch (e.Key)
                 {
                     case Key.Right:
-                        beatDivisor.Next();
+                        beatDivisor.SelectNext();
                         OnUserChange(Current.Value);
                         return true;
 
                     case Key.Left:
-                        beatDivisor.Previous();
+                        beatDivisor.SelectPrevious();
                         OnUserChange(Current.Value);
                         return true;
 
@@ -517,7 +551,7 @@ namespace osu.Game.Screens.Edit.Compose.Components
             private partial class Marker : CompositeDrawable
             {
                 [Resolved]
-                private OverlayColourProvider colourProvider { get; set; }
+                private OverlayColourProvider colourProvider { get; set; } = null!;
 
                 [BackgroundDependencyLoader]
                 private void load()
@@ -552,6 +586,17 @@ namespace osu.Game.Screens.Edit.Compose.Components
                         active = value;
                     }
                 }
+            }
+        }
+
+        private partial class AutoSelectTextBox : OsuNumberBox
+        {
+            protected override void LoadComplete()
+            {
+                base.LoadComplete();
+
+                GetContainingInputManager().ChangeFocus(this);
+                SelectAll();
             }
         }
     }

@@ -1,7 +1,5 @@
-// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
-
-#nullable disable
 
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
@@ -39,7 +37,7 @@ namespace osu.Game.Tournament.Screens
             SongBar.Mods = mods.NewValue;
         }
 
-        private void beatmapChanged(ValueChangedEvent<TournamentBeatmap> beatmap)
+        private void beatmapChanged(ValueChangedEvent<TournamentBeatmap?> beatmap)
         {
             SongBar.FadeInFromZero(300, Easing.OutQuint);
             SongBar.Beatmap = beatmap.NewValue;

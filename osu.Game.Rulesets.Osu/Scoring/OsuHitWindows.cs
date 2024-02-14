@@ -12,7 +12,7 @@ namespace osu.Game.Rulesets.Osu.Scoring
         /// </summary>
         public const double MISS_WINDOW = 400;
 
-        private static readonly DifficultyRange[] osu_ranges =
+        internal static readonly DifficultyRange[] OSU_RANGES =
         {
             new DifficultyRange(HitResult.Great, 80, 50, 20),
             new DifficultyRange(HitResult.Ok, 140, 100, 60),
@@ -34,6 +34,6 @@ namespace osu.Game.Rulesets.Osu.Scoring
             return false;
         }
 
-        protected override DifficultyRange[] GetRanges() => osu_ranges;
+        protected override DifficultyRange[] GetRanges() => OSU_RANGES;
     }
 }

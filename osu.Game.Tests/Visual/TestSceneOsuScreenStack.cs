@@ -56,38 +56,38 @@ namespace osu.Game.Tests.Visual
         public void AllowTrackAdjustmentsTest()
         {
             AddStep("push allowing screen", () => stack.Push(loadNewScreen<AllowScreen>()));
-            AddAssert("allows adjustments 1", () => musicController.AllowTrackAdjustments);
+            AddAssert("allows adjustments 1", () => musicController.ApplyModTrackAdjustments);
 
             AddStep("push inheriting screen", () => stack.Push(loadNewScreen<InheritScreen>()));
-            AddAssert("allows adjustments 2", () => musicController.AllowTrackAdjustments);
+            AddAssert("allows adjustments 2", () => musicController.ApplyModTrackAdjustments);
 
             AddStep("push disallowing screen", () => stack.Push(loadNewScreen<DisallowScreen>()));
-            AddAssert("disallows adjustments 3", () => !musicController.AllowTrackAdjustments);
+            AddAssert("disallows adjustments 3", () => !musicController.ApplyModTrackAdjustments);
 
             AddStep("push inheriting screen", () => stack.Push(loadNewScreen<InheritScreen>()));
-            AddAssert("disallows adjustments 4", () => !musicController.AllowTrackAdjustments);
+            AddAssert("disallows adjustments 4", () => !musicController.ApplyModTrackAdjustments);
 
             AddStep("push inheriting screen", () => stack.Push(loadNewScreen<InheritScreen>()));
-            AddAssert("disallows adjustments 5", () => !musicController.AllowTrackAdjustments);
+            AddAssert("disallows adjustments 5", () => !musicController.ApplyModTrackAdjustments);
 
             AddStep("push allowing screen", () => stack.Push(loadNewScreen<AllowScreen>()));
-            AddAssert("allows adjustments 6", () => musicController.AllowTrackAdjustments);
+            AddAssert("allows adjustments 6", () => musicController.ApplyModTrackAdjustments);
 
             // Now start exiting from screens
             AddStep("exit screen", () => stack.Exit());
-            AddAssert("disallows adjustments 7", () => !musicController.AllowTrackAdjustments);
+            AddAssert("disallows adjustments 7", () => !musicController.ApplyModTrackAdjustments);
 
             AddStep("exit screen", () => stack.Exit());
-            AddAssert("disallows adjustments 8", () => !musicController.AllowTrackAdjustments);
+            AddAssert("disallows adjustments 8", () => !musicController.ApplyModTrackAdjustments);
 
             AddStep("exit screen", () => stack.Exit());
-            AddAssert("disallows adjustments 9", () => !musicController.AllowTrackAdjustments);
+            AddAssert("disallows adjustments 9", () => !musicController.ApplyModTrackAdjustments);
 
             AddStep("exit screen", () => stack.Exit());
-            AddAssert("allows adjustments 10", () => musicController.AllowTrackAdjustments);
+            AddAssert("allows adjustments 10", () => musicController.ApplyModTrackAdjustments);
 
             AddStep("exit screen", () => stack.Exit());
-            AddAssert("allows adjustments 11", () => musicController.AllowTrackAdjustments);
+            AddAssert("allows adjustments 11", () => musicController.ApplyModTrackAdjustments);
         }
 
         public partial class TestScreen : ScreenWithBeatmapBackground
@@ -129,12 +129,12 @@ namespace osu.Game.Tests.Visual
 
         private partial class AllowScreen : OsuScreen
         {
-            public override bool? AllowTrackAdjustments => true;
+            public override bool? ApplyModTrackAdjustments => true;
         }
 
         public partial class DisallowScreen : OsuScreen
         {
-            public override bool? AllowTrackAdjustments => false;
+            public override bool? ApplyModTrackAdjustments => false;
         }
 
         private partial class InheritScreen : OsuScreen

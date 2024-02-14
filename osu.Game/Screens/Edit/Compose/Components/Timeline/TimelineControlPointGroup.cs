@@ -1,7 +1,5 @@
-// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
-
-#nullable disable
 
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
@@ -24,7 +22,7 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
             RelativeSizeAxes = Axes.Y;
             AutoSizeAxes = Axes.X;
 
-            Origin = Anchor.TopCentre;
+            Origin = Anchor.TopLeft;
 
             X = (float)group.Time;
         }

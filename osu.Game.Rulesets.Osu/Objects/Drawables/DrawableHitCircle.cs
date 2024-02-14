@@ -4,6 +4,7 @@
 #nullable disable
 
 using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 using JetBrains.Annotations;
 using osu.Framework.Allocation;
@@ -18,6 +19,7 @@ using osu.Game.Rulesets.Objects.Drawables;
 using osu.Game.Rulesets.Osu.Judgements;
 using osu.Game.Rulesets.Osu.Skinning;
 using osu.Game.Rulesets.Osu.Skinning.Default;
+using osu.Game.Rulesets.Osu.UI;
 using osu.Game.Rulesets.Scoring;
 using osu.Game.Skinning;
 using osuTK;
@@ -26,12 +28,17 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
 {
     public partial class DrawableHitCircle : DrawableOsuHitObject, IHasApproachCircle
     {
-        public OsuAction? HitAction => HitArea.HitAction;
+        public OsuAction? HitAction => HitArea?.HitAction;
         protected virtual OsuSkinComponents CirclePieceComponent => OsuSkinComponents.HitCircle;
 
         public SkinnableDrawable ApproachCircle { get; private set; }
         public HitReceptor HitArea { get; private set; }
         public SkinnableDrawable CirclePiece { get; private set; }
+
+        protected override IEnumerable<Drawable> DimmablePieces => new[]
+        {
+            CirclePiece,
+        };
 
         Drawable IHasApproachCircle.ApproachCircle => ApproachCircle;
 
@@ -148,32 +155,36 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
             if (!userTriggered)
             {
                 if (!HitObject.HitWindows.CanBeHit(timeOffset))
-                    ApplyResult(r => r.Type = r.Judgement.MinResult);
+                    ApplyMinResult();
 
                 return;
             }
 
             var result = ResultFor(timeOffset);
+            var clickAction = CheckHittable?.Invoke(this, Time.Current, result);
 
-            if (result == HitResult.None || CheckHittable?.Invoke(this, Time.Current) == false)
-            {
+            if (clickAction == ClickAction.Shake)
                 Shake();
+
+            if (result == HitResult.None || clickAction != ClickAction.Hit)
                 return;
+
+            Vector2? hitPosition = null;
+
+            // Todo: This should also consider misses, but they're a little more interesting to handle, since we don't necessarily know the position at the time of a miss.
+            if (result.IsHit())
+            {
+                var localMousePosition = ToLocalSpace(inputManager.CurrentState.Mouse.Position);
+                hitPosition = HitObject.StackedPosition + (localMousePosition - DrawSize / 2);
             }
 
-            ApplyResult(r =>
+            ApplyResult<(HitResult result, Vector2? position)>((r, state) =>
             {
                 var circleResult = (OsuHitCircleJudgementResult)r;
 
-                // Todo: This should also consider misses, but they're a little more interesting to handle, since we don't necessarily know the position at the time of a miss.
-                if (result.IsHit())
-                {
-                    var localMousePosition = ToLocalSpace(inputManager.CurrentState.Mouse.Position);
-                    circleResult.CursorPositionAtHit = HitObject.StackedPosition + (localMousePosition - DrawSize / 2);
-                }
-
-                circleResult.Type = result;
-            });
+                circleResult.Type = state.result;
+                circleResult.CursorPositionAtHit = state.position;
+            }, (result, hitPosition));
         }
 
         /// <summary>
@@ -189,7 +200,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
 
             CirclePiece.FadeInFromZero(HitObject.TimeFadeIn);
 
-            ApproachCircle.FadeIn(Math.Min(HitObject.TimeFadeIn * 2, HitObject.TimePreempt));
+            ApproachCircle.FadeTo(0.9f, Math.Min(HitObject.TimeFadeIn * 2, HitObject.TimePreempt));
             ApproachCircle.ScaleTo(1f, HitObject.TimePreempt);
             ApproachCircle.Expire(true);
         }
@@ -242,7 +253,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
 
             public HitReceptor()
             {
-                Size = new Vector2(OsuHitObject.OBJECT_RADIUS * 2);
+                Size = OsuHitObject.OBJECT_DIMENSIONS;
 
                 Anchor = Anchor.Centre;
                 Origin = Anchor.Centre;
@@ -259,7 +270,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
                     case OsuAction.RightButton:
                         if (IsHovered && (Hit?.Invoke() ?? false))
                         {
-                            HitAction = e.Action;
+                            HitAction ??= e.Action;
                             return true;
                         }
 

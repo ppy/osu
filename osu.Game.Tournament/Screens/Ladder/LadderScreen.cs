@@ -1,8 +1,6 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
 using System.Collections.Specialized;
 using System.Diagnostics;
 using System.Linq;
@@ -22,13 +20,13 @@ namespace osu.Game.Tournament.Screens.Ladder
 {
     public partial class LadderScreen : TournamentScreen
     {
-        protected Container<DrawableTournamentMatch> MatchesContainer;
-        private Container<Path> paths;
-        private Container headings;
+        protected Container<DrawableTournamentMatch> MatchesContainer = null!;
+        private Container<Path> paths = null!;
+        private Container headings = null!;
 
-        protected LadderDragContainer ScrollContent;
+        protected LadderDragContainer ScrollContent = null!;
 
-        protected Container Content;
+        protected Container Content = null!;
 
         [BackgroundDependencyLoader]
         private void load()
@@ -41,6 +39,7 @@ namespace osu.Game.Tournament.Screens.Ladder
             InternalChild = Content = new Container
             {
                 RelativeSizeAxes = Axes.Both,
+                Masking = true,
                 Children = new Drawable[]
                 {
                     new TourneyVideo("ladder")
@@ -56,12 +55,15 @@ namespace osu.Game.Tournament.Screens.Ladder
                     },
                     ScrollContent = new LadderDragContainer
                     {
-                        RelativeSizeAxes = Axes.Both,
+                        AutoSizeAxes = Axes.Both,
                         Children = new Drawable[]
                         {
                             paths = new Container<Path> { RelativeSizeAxes = Axes.Both },
                             headings = new Container { RelativeSizeAxes = Axes.Both },
-                            MatchesContainer = new Container<DrawableTournamentMatch> { RelativeSizeAxes = Axes.Both },
+                            MatchesContainer = new Container<DrawableTournamentMatch>
+                            {
+                                AutoSizeAxes = Axes.Both
+                            },
                         }
                     },
                 }

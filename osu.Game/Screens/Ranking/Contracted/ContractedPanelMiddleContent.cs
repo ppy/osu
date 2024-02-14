@@ -1,7 +1,5 @@
-// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
-
-#nullable disable
 
 using System.Linq;
 using osu.Framework.Allocation;
@@ -36,7 +34,7 @@ namespace osu.Game.Screens.Ranking.Contracted
         private readonly ScoreInfo score;
 
         [Resolved]
-        private ScoreManager scoreManager { get; set; }
+        private ScoreManager scoreManager { get; set; } = null!;
 
         /// <summary>
         /// Creates a new <see cref="ContractedPanelMiddleContent"/>.

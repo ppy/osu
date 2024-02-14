@@ -1,21 +1,16 @@
-// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
-
-#nullable disable
 
 using System.Collections.Generic;
 using System.Linq;
 using osu.Framework.Bindables;
-using osu.Framework.Input.Bindings;
-using osu.Framework.Input.Events;
 using osu.Game.Graphics.UserInterface;
-using osu.Game.Input.Bindings;
 using osu.Game.Localisation;
 using osu.Game.Rulesets.Mods;
 
 namespace osu.Game.Overlays.Mods
 {
-    public partial class DeselectAllModsButton : ShearedButton, IKeyBindingHandler<GlobalAction>
+    public partial class DeselectAllModsButton : ShearedButton
     {
         private readonly Bindable<IReadOnlyList<Mod>> selectedMods = new Bindable<IReadOnlyList<Mod>>();
 
@@ -38,19 +33,6 @@ namespace osu.Game.Overlays.Mods
         private void updateEnabledState()
         {
             Enabled.Value = selectedMods.Value.Any();
-        }
-
-        public bool OnPressed(KeyBindingPressEvent<GlobalAction> e)
-        {
-            if (e.Repeat || e.Action != GlobalAction.DeselectAllMods)
-                return false;
-
-            TriggerClick();
-            return true;
-        }
-
-        public void OnReleased(KeyBindingReleaseEvent<GlobalAction> e)
-        {
         }
     }
 }

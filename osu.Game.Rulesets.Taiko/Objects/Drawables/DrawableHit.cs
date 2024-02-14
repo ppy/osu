@@ -4,14 +4,12 @@
 #nullable disable
 
 using System;
-using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using JetBrains.Annotations;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Input.Events;
-using osu.Game.Audio;
 using osu.Game.Rulesets.Objects.Drawables;
 using osu.Game.Rulesets.Scoring;
 using osu.Game.Rulesets.Taiko.Skinning.Default;
@@ -37,7 +35,7 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
 
         private bool validActionPressed;
 
-        private bool pressHandledThisFrame;
+        private double? lastPressHandleTime;
 
         private readonly Bindable<HitType> type = new Bindable<HitType>();
 
@@ -78,7 +76,8 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
 
             HitActions = null;
             HitAction = null;
-            validActionPressed = pressHandledThisFrame = false;
+            validActionPressed = false;
+            lastPressHandleTime = null;
         }
 
         private void updateActionsFromType()
@@ -93,40 +92,6 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
             ? new SkinnableDrawable(new TaikoSkinComponentLookup(TaikoSkinComponents.CentreHit), _ => new CentreHitCirclePiece(), confineMode: ConfineMode.ScaleToFit)
             : new SkinnableDrawable(new TaikoSkinComponentLookup(TaikoSkinComponents.RimHit), _ => new RimHitCirclePiece(), confineMode: ConfineMode.ScaleToFit);
 
-        public override IEnumerable<HitSampleInfo> GetSamples()
-        {
-            // normal and claps are always handled by the drum (see DrumSampleMapping).
-            // in addition, whistles are excluded as they are an alternative rim marker.
-
-            var samples = HitObject.Samples.Where(s =>
-                s.Name != HitSampleInfo.HIT_NORMAL
-                && s.Name != HitSampleInfo.HIT_CLAP
-                && s.Name != HitSampleInfo.HIT_WHISTLE);
-
-            if (HitObject.Type == HitType.Rim && HitObject.IsStrong)
-            {
-                // strong + rim always maps to whistle.
-                // TODO: this should really be in the legacy decoder, but can't be because legacy encoding parity would be broken.
-                // when we add a taiko editor, this is probably not going to play nice.
-
-                var corrected = samples.ToList();
-
-                for (int i = 0; i < corrected.Count; i++)
-                {
-                    var s = corrected[i];
-
-                    if (s.Name != HitSampleInfo.HIT_FINISH)
-                        continue;
-
-                    corrected[i] = s.With(HitSampleInfo.HIT_WHISTLE);
-                }
-
-                return corrected;
-            }
-
-            return samples;
-        }
-
         protected override void CheckForResult(bool userTriggered, double timeOffset)
         {
             Debug.Assert(HitObject.HitWindows != null);
@@ -134,7 +99,7 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
             if (!userTriggered)
             {
                 if (!HitObject.HitWindows.CanBeHit(timeOffset))
-                    ApplyResult(r => r.Type = r.Judgement.MinResult);
+                    ApplyMinResult();
                 return;
             }
 
@@ -143,14 +108,14 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
                 return;
 
             if (!validActionPressed)
-                ApplyResult(r => r.Type = r.Judgement.MinResult);
+                ApplyMinResult();
             else
-                ApplyResult(r => r.Type = result);
+                ApplyResult(result);
         }
 
         public override bool OnPressed(KeyBindingPressEvent<TaikoAction> e)
         {
-            if (pressHandledThisFrame)
+            if (lastPressHandleTime == Time.Current)
                 return true;
             if (Judged)
                 return false;
@@ -164,7 +129,7 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
 
             // Regardless of whether we've hit or not, any secondary key presses in the same frame should be discarded
             // E.g. hitting a non-strong centre as a strong should not fall through and perform a hit on the next note
-            pressHandledThisFrame = true;
+            lastPressHandleTime = Time.Current;
             return result;
         }
 
@@ -173,15 +138,6 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
             if (e.Action == HitAction)
                 HitAction = null;
             base.OnReleased(e);
-        }
-
-        protected override void Update()
-        {
-            base.Update();
-
-            // The input manager processes all input prior to us updating, so this is the perfect time
-            // for us to remove the extra press blocking, before input is handled in the next frame
-            pressHandledThisFrame = false;
         }
 
         protected override void UpdateHitStateTransforms(ArmedState state)
@@ -231,7 +187,7 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
             /// The lenience for the second key press.
             /// This does not adjust by map difficulty in ScoreV2 yet.
             /// </summary>
-            private const double second_hit_window = 30;
+            public const double SECOND_HIT_WINDOW = 30;
 
             public StrongNestedHit()
                 : this(null)
@@ -253,19 +209,19 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
 
                 if (!ParentHitObject.Result.IsHit)
                 {
-                    ApplyResult(r => r.Type = r.Judgement.MinResult);
+                    ApplyMinResult();
                     return;
                 }
 
                 if (!userTriggered)
                 {
-                    if (timeOffset - ParentHitObject.Result.TimeOffset > second_hit_window)
-                        ApplyResult(r => r.Type = r.Judgement.MinResult);
+                    if (timeOffset - ParentHitObject.Result.TimeOffset > SECOND_HIT_WINDOW)
+                        ApplyMinResult();
                     return;
                 }
 
-                if (Math.Abs(timeOffset - ParentHitObject.Result.TimeOffset) <= second_hit_window)
-                    ApplyResult(r => r.Type = r.Judgement.MaxResult);
+                if (Math.Abs(timeOffset - ParentHitObject.Result.TimeOffset) <= SECOND_HIT_WINDOW)
+                    ApplyMaxResult();
             }
 
             public override bool OnPressed(KeyBindingPressEvent<TaikoAction> e)

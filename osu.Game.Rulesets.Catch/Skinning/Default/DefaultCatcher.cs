@@ -9,6 +9,7 @@ using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.Textures;
 using osu.Game.Rulesets.Catch.UI;
+using osuTK;
 
 namespace osu.Game.Rulesets.Catch.Skinning.Default
 {
@@ -22,6 +23,7 @@ namespace osu.Game.Rulesets.Catch.Skinning.Default
 
         public DefaultCatcher()
         {
+            Anchor = Anchor.TopCentre;
             RelativeSizeAxes = Axes.Both;
             InternalChild = sprite = new Sprite
             {
@@ -30,6 +32,15 @@ namespace osu.Game.Rulesets.Catch.Skinning.Default
                 RelativeSizeAxes = Axes.Both,
                 FillMode = FillMode.Fit
             };
+        }
+
+        protected override void Update()
+        {
+            base.Update();
+
+            // matches stable's origin position since we're using the same catcher sprite.
+            // see LegacyCatcher for more information.
+            OriginPosition = new Vector2(DrawWidth / 2, 16f);
         }
 
         [BackgroundDependencyLoader]

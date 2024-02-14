@@ -192,6 +192,10 @@ namespace osu.Game.Rulesets
                     case ModAutoplay:
                         value |= LegacyMods.Autoplay;
                         break;
+
+                    case ModScoreV2:
+                        value |= LegacyMods.ScoreV2;
+                        break;
                 }
             }
 
@@ -199,6 +203,8 @@ namespace osu.Game.Rulesets
         }
 
         public ModAutoplay? GetAutoplayMod() => CreateMod<ModAutoplay>();
+
+        public ModTouchDevice? GetTouchDeviceMod() => CreateMod<ModTouchDevice>();
 
         /// <summary>
         /// Create a transformer which adds lookups specific to a ruleset to skin sources.
@@ -372,6 +378,17 @@ namespace osu.Game.Rulesets
         public virtual LocalisableString GetDisplayNameForHitResult(HitResult result) => result.GetLocalisableDescription();
 
         /// <summary>
+        /// Applies changes to difficulty attributes for presenting to a user a rough estimate of how rate adjust mods affect difficulty.
+        /// Importantly, this should NOT BE USED FOR ANY CALCULATIONS.
+        ///
+        /// It is also not always correct, and arguably is never correct depending on your frame of mind.
+        /// </summary>
+        /// <param name="difficulty">>The <see cref="IBeatmapDifficultyInfo"/> that will be adjusted.</param>
+        /// <param name="rate">The rate adjustment multiplier from mods. For example 1.5 for DT.</param>
+        /// <returns>The adjusted difficulty attributes.</returns>
+        public virtual BeatmapDifficulty GetRateAdjustedDisplayDifficulty(IBeatmapDifficultyInfo difficulty, double rate) => new BeatmapDifficulty(difficulty);
+
+        /// <summary>
         /// Creates ruleset-specific beatmap filter criteria to be used on the song select screen.
         /// </summary>
         public virtual IRulesetFilterCriteria? CreateRulesetFilterCriteria() => null;
@@ -380,5 +397,10 @@ namespace osu.Game.Rulesets
         /// Can be overridden to add a ruleset-specific section to the editor beatmap setup screen.
         /// </summary>
         public virtual RulesetSetupSection? CreateEditorSetupSection() => null;
+
+        /// <summary>
+        /// Can be overridden to alter the difficulty section to the editor beatmap setup screen.
+        /// </summary>
+        public virtual DifficultySection? CreateEditorDifficultySection() => null;
     }
 }

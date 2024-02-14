@@ -1,7 +1,5 @@
-// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
-
-#nullable disable
 
 using System;
 using System.Collections.Generic;
@@ -50,7 +48,7 @@ namespace osu.Game.Tests.Gameplay
             // Apply a judgement
             scoreProcessor.ApplyResult(new JudgementResult(new HitObject(), new TestJudgement(HitResult.LargeBonus)) { Type = HitResult.LargeBonus });
 
-            Assert.That(scoreProcessor.TotalScore.Value, Is.EqualTo(Judgement.LARGE_BONUS_SCORE));
+            Assert.That(scoreProcessor.TotalScore.Value, Is.EqualTo(scoreProcessor.GetBaseScoreForResult(HitResult.LargeBonus)));
         }
 
         [Test]

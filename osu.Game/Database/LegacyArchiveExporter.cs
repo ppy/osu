@@ -39,7 +39,7 @@ namespace osu.Game.Database
                 {
                     cancellationToken.ThrowIfCancellationRequested();
 
-                    using (var stream = UserFileStorage.GetStream(file.File.GetStoragePath()))
+                    using (var stream = GetFileContents(model, file))
                     {
                         if (stream == null)
                         {
@@ -65,5 +65,7 @@ namespace osu.Game.Database
                 }
             }
         }
+
+        protected virtual Stream? GetFileContents(TModel model, INamedFileUsage file) => UserFileStorage.GetStream(file.File.GetStoragePath());
     }
 }

@@ -41,7 +41,7 @@ namespace osu.Game.Screens.Play.HUD
 
         protected override bool IsRollingProportional => true;
 
-        protected override double RollingDuration => 1000;
+        protected override double RollingDuration => 500;
 
         private const float alpha_when_invalid = 0.3f;
 
@@ -226,7 +226,7 @@ namespace osu.Game.Screens.Play.HUD
 
             protected override IBeatmap GetBeatmap() => gameplayBeatmap;
 
-            protected override Texture GetBackground() => throw new NotImplementedException();
+            public override Texture GetBackground() => throw new NotImplementedException();
 
             protected override Track GetBeatmapTrack() => throw new NotImplementedException();
 

@@ -23,6 +23,7 @@ using osu.Framework.Screens;
 using osu.Game.Audio;
 using osu.Game.Beatmaps;
 using osu.Game.Input.Bindings;
+using osu.Game.Online.API;
 using osu.Game.Online.Rooms;
 using osu.Game.Overlays;
 using osu.Game.Overlays.Mods;
@@ -40,7 +41,7 @@ namespace osu.Game.Screens.OnlinePlay.Match
         [Cached(typeof(IBindable<PlaylistItem>))]
         public readonly Bindable<PlaylistItem> SelectedItem = new Bindable<PlaylistItem>();
 
-        public override bool? AllowTrackAdjustments => true;
+        public override bool? ApplyModTrackAdjustments => true;
 
         protected override BackgroundScreen CreateBackground() => new RoomBackgroundScreen(Room.Playlist.FirstOrDefault())
         {
@@ -74,7 +75,10 @@ namespace osu.Game.Screens.OnlinePlay.Match
         private BeatmapManager beatmapManager { get; set; }
 
         [Resolved]
-        private RulesetStore rulesets { get; set; }
+        protected RulesetStore Rulesets { get; private set; }
+
+        [Resolved]
+        private IAPIProvider api { get; set; } = null!;
 
         [Resolved(canBeNull: true)]
         protected OnlinePlayScreen ParentScreen { get; private set; }
@@ -284,6 +288,8 @@ namespace osu.Game.Screens.OnlinePlay.Match
         [Resolved(canBeNull: true)]
         private IDialogOverlay dialogOverlay { get; set; }
 
+        protected virtual bool IsConnected => api.State.Value == APIState.Online;
+
         public override bool OnBackButton()
         {
             if (Room.RoomID.Value == null)
@@ -356,12 +362,20 @@ namespace osu.Game.Screens.OnlinePlay.Match
             if (ExitConfirmed)
                 return true;
 
-            if (dialogOverlay == null || Room.RoomID.Value != null || Room.Playlist.Count == 0)
+            if (!IsConnected)
+                return true;
+
+            bool hasUnsavedChanges = Room.RoomID.Value == null && Room.Playlist.Count > 0;
+
+            if (dialogOverlay == null || !hasUnsavedChanges)
                 return true;
 
             // if the dialog is already displayed, block exiting until the user explicitly makes a decision.
-            if (dialogOverlay.CurrentDialog is ConfirmDiscardChangesDialog)
+            if (dialogOverlay.CurrentDialog is ConfirmDiscardChangesDialog discardChangesDialog)
+            {
+                discardChangesDialog.Flash();
                 return false;
+            }
 
             dialogOverlay.Push(new ConfirmDiscardChangesDialog(() =>
             {
@@ -408,7 +422,7 @@ namespace osu.Game.Screens.OnlinePlay.Match
             if (selected == null)
                 return;
 
-            var rulesetInstance = rulesets.GetRuleset(SelectedItem.Value.RulesetID)?.CreateInstance();
+            var rulesetInstance = Rulesets.GetRuleset(SelectedItem.Value.RulesetID)?.CreateInstance();
             Debug.Assert(rulesetInstance != null);
             var allowedMods = SelectedItem.Value.AllowedMods.Select(m => m.ToMod(rulesetInstance));
 
@@ -441,7 +455,7 @@ namespace osu.Game.Screens.OnlinePlay.Match
             // Retrieve the corresponding local beatmap, since we can't directly use the playlist's beatmap info
             var localBeatmap = beatmap == null ? null : beatmapManager.QueryBeatmap(b => b.OnlineID == beatmap.OnlineID);
 
-            Beatmap.Value = beatmapManager.GetWorkingBeatmap(localBeatmap);
+            UserModsSelectOverlay.Beatmap = Beatmap.Value = beatmapManager.GetWorkingBeatmap(localBeatmap);
         }
 
         protected virtual void UpdateMods()
@@ -449,7 +463,7 @@ namespace osu.Game.Screens.OnlinePlay.Match
             if (SelectedItem.Value == null || !this.IsCurrentScreen())
                 return;
 
-            var rulesetInstance = rulesets.GetRuleset(SelectedItem.Value.RulesetID)?.CreateInstance();
+            var rulesetInstance = Rulesets.GetRuleset(SelectedItem.Value.RulesetID)?.CreateInstance();
             Debug.Assert(rulesetInstance != null);
             Mods.Value = UserMods.Value.Concat(SelectedItem.Value.RequiredMods.Select(m => m.ToMod(rulesetInstance))).ToList();
         }
@@ -459,7 +473,7 @@ namespace osu.Game.Screens.OnlinePlay.Match
             if (SelectedItem.Value == null || !this.IsCurrentScreen())
                 return;
 
-            Ruleset.Value = rulesets.GetRuleset(SelectedItem.Value.RulesetID);
+            Ruleset.Value = Rulesets.GetRuleset(SelectedItem.Value.RulesetID);
         }
 
         private void beginHandlingTrack()
@@ -495,7 +509,7 @@ namespace osu.Game.Screens.OnlinePlay.Match
 
         private void cancelTrackLooping()
         {
-            var track = Beatmap?.Value?.Track;
+            var track = Beatmap.Value?.Track;
 
             if (track != null)
                 track.Looping = false;

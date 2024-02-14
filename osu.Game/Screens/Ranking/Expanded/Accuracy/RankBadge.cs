@@ -32,7 +32,7 @@ namespace osu.Game.Screens.Ranking.Expanded.Accuracy
         /// </summary>
         private readonly double displayPosition;
 
-        private readonly ScoreRank rank;
+        public readonly ScoreRank Rank;
 
         private Drawable rankContainer;
         private Drawable overlay;
@@ -47,7 +47,7 @@ namespace osu.Game.Screens.Ranking.Expanded.Accuracy
         {
             Accuracy = accuracy;
             displayPosition = position;
-            this.rank = rank;
+            Rank = rank;
 
             RelativeSizeAxes = Axes.Both;
             Alpha = 0;
@@ -62,7 +62,7 @@ namespace osu.Game.Screens.Ranking.Expanded.Accuracy
                 Size = new Vector2(28, 14),
                 Children = new[]
                 {
-                    new DrawableRank(rank),
+                    new DrawableRank(Rank),
                     overlay = new CircularContainer
                     {
                         RelativeSizeAxes = Axes.Both,
@@ -71,7 +71,7 @@ namespace osu.Game.Screens.Ranking.Expanded.Accuracy
                         EdgeEffect = new EdgeEffectParameters
                         {
                             Type = EdgeEffectType.Glow,
-                            Colour = OsuColour.ForRank(rank).Opacity(0.2f),
+                            Colour = OsuColour.ForRank(Rank).Opacity(0.2f),
                             Radius = 10,
                         },
                         Child = new Box

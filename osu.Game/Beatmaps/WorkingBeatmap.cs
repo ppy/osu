@@ -34,8 +34,6 @@ namespace osu.Game.Beatmaps
 
         public Storyboard Storyboard => storyboard.Value;
 
-        public Texture Background => GetBackground(); // Texture uses ref counting, so we want to return a new instance every usage.
-
         public ISkin Skin => skin.Value;
 
         private AudioManager audioManager { get; }
@@ -67,7 +65,8 @@ namespace osu.Game.Beatmaps
         protected virtual Storyboard GetStoryboard() => new Storyboard { BeatmapInfo = BeatmapInfo };
 
         protected abstract IBeatmap GetBeatmap();
-        protected abstract Texture GetBackground();
+        public abstract Texture GetBackground();
+        public virtual Texture GetPanelBackground() => GetBackground();
         protected abstract Track GetBeatmapTrack();
 
         /// <summary>

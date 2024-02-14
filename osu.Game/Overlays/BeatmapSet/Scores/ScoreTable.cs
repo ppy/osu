@@ -23,8 +23,9 @@ using osuTK.Graphics;
 using osu.Framework.Localisation;
 using osu.Framework.Extensions.LocalisationExtensions;
 using osu.Framework.Graphics.Cursor;
+using osu.Framework.Graphics.Sprites;
 using osu.Game.Resources.Localisation.Web;
-using osu.Game.Scoring.Drawables;
+using osu.Game.Rulesets.Mods;
 
 namespace osu.Game.Overlays.BeatmapSet.Scores
 {
@@ -163,7 +164,7 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
                 },
                 username,
 #pragma warning disable 618
-                new StatisticText(score.MaxCombo, score.BeatmapInfo.MaxCombo, @"0\x"),
+                new StatisticText(score.MaxCombo, score.BeatmapInfo!.MaxCombo, @"0\x"),
 #pragma warning restore 618
             };
 
@@ -179,10 +180,26 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
 
             if (showPerformancePoints)
             {
-                if (score.PP != null)
-                    content.Add(new StatisticText(score.PP, format: @"N0"));
+                if (!score.Ranked)
+                {
+                    content.Add(new SpriteTextWithTooltip
+                    {
+                        Text = "-",
+                        Font = OsuFont.GetFont(size: text_size),
+                        TooltipText = ScoresStrings.StatusNoPp
+                    });
+                }
+                else if (score.PP == null)
+                {
+                    content.Add(new SpriteIconWithTooltip
+                    {
+                        Icon = FontAwesome.Solid.Sync,
+                        Size = new Vector2(text_size),
+                        TooltipText = ScoresStrings.StatusProcessing,
+                    });
+                }
                 else
-                    content.Add(new UnprocessedPerformancePointsPlaceholder { Size = new Vector2(text_size) });
+                    content.Add(new StatisticText(score.PP, format: @"N0"));
             }
 
             content.Add(new ScoreboardTime(score.Date, text_size)
@@ -195,7 +212,7 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
                 Direction = FillDirection.Horizontal,
                 AutoSizeAxes = Axes.Both,
                 Spacing = new Vector2(1),
-                ChildrenEnumerable = score.Mods.Select(m => new ModIcon(m)
+                ChildrenEnumerable = score.Mods.AsOrdered().Select(m => new ModIcon(m)
                 {
                     AutoSizeAxes = Axes.Both,
                     Scale = new Vector2(0.3f)

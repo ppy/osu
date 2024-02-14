@@ -1,8 +1,6 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
 using osu.Framework.Graphics;
 using osu.Game.Storyboards.Drawables;
 
@@ -16,7 +14,7 @@ namespace osu.Game.Storyboards
 
         public double StartTime { get; }
 
-        public StoryboardVideo(string path, int offset)
+        public StoryboardVideo(string path, double offset)
         {
             Path = path;
             StartTime = offset;

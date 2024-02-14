@@ -16,6 +16,8 @@ namespace osu.Game.Tests.Visual.Menus
     [TestFixture]
     public partial class TestSceneToolbarUserButton : OsuManualInputManagerTestScene
     {
+        private DummyAPIAccess dummyAPI => (DummyAPIAccess)API;
+
         public TestSceneToolbarUserButton()
         {
             Container mainContainer;
@@ -69,18 +71,20 @@ namespace osu.Game.Tests.Visual.Menus
         [Test]
         public void TestLoginLogout()
         {
-            AddStep("Log out", () => ((DummyAPIAccess)API).Logout());
-            AddStep("Log in", () => ((DummyAPIAccess)API).Login("wang", "jang"));
+            AddStep("Log out", () => dummyAPI.Logout());
+            AddStep("Log in", () => dummyAPI.Login("wang", "jang"));
+            AddStep("Authenticate via second factor", () => dummyAPI.AuthenticateSecondFactor("abcdefgh"));
         }
 
         [Test]
         public void TestStates()
         {
-            AddStep("Log in", () => ((DummyAPIAccess)API).Login("wang", "jang"));
+            AddStep("Log in", () => dummyAPI.Login("wang", "jang"));
+            AddStep("Authenticate via second factor", () => dummyAPI.AuthenticateSecondFactor("abcdefgh"));
 
             foreach (var state in Enum.GetValues<APIState>())
             {
-                AddStep($"Change state to {state}", () => ((DummyAPIAccess)API).SetState(state));
+                AddStep($"Change state to {state}", () => dummyAPI.SetState(state));
             }
         }
     }

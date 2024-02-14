@@ -44,7 +44,6 @@ namespace osu.Game.Rulesets.Objects.Legacy
             FormatVersion = formatVersion;
         }
 
-        [CanBeNull]
         public override HitObject Parse(string text)
         {
             string[] split = text.Split(',');
@@ -191,7 +190,12 @@ namespace osu.Game.Rulesets.Objects.Legacy
             string[] split = str.Split(':');
 
             var bank = (LegacySampleBank)Parsing.ParseInt(split[0]);
+            if (!Enum.IsDefined(bank))
+                bank = LegacySampleBank.Normal;
+
             var addBank = (LegacySampleBank)Parsing.ParseInt(split[1]);
+            if (!Enum.IsDefined(addBank))
+                addBank = LegacySampleBank.Normal;
 
             string stringBank = bank.ToString().ToLowerInvariant();
             if (stringBank == @"none")
@@ -220,16 +224,19 @@ namespace osu.Game.Rulesets.Objects.Legacy
             {
                 default:
                 case 'C':
-                    return PathType.Catmull;
+                    return PathType.CATMULL;
 
                 case 'B':
-                    return PathType.Bezier;
+                    if (input.Length > 1 && int.TryParse(input.Substring(1), out int degree) && degree > 0)
+                        return PathType.BSpline(degree);
+
+                    return PathType.BEZIER;
 
                 case 'L':
-                    return PathType.Linear;
+                    return PathType.LINEAR;
 
                 case 'P':
-                    return PathType.PerfectCurve;
+                    return PathType.PERFECT_CURVE;
             }
         }
 
@@ -266,8 +273,8 @@ namespace osu.Game.Rulesets.Objects.Legacy
 
             while (++endIndex < pointSplit.Length)
             {
-                // Keep incrementing endIndex while it's not the start of a new segment (indicated by having a type descriptor of length 1).
-                if (pointSplit[endIndex].Length > 1)
+                // Keep incrementing endIndex while it's not the start of a new segment (indicated by having an alpha character at position 0).
+                if (!char.IsLetter(pointSplit[endIndex][0]))
                     continue;
 
                 // Multi-segmented sliders DON'T contain the end point as part of the current segment as it's assumed to be the start of the next segment.
@@ -316,14 +323,14 @@ namespace osu.Game.Rulesets.Objects.Legacy
                 readPoint(endPoint, offset, out vertices[^1]);
 
             // Edge-case rules (to match stable).
-            if (type == PathType.PerfectCurve)
+            if (type == PathType.PERFECT_CURVE)
             {
                 if (vertices.Length != 3)
-                    type = PathType.Bezier;
+                    type = PathType.BEZIER;
                 else if (isLinear(vertices))
                 {
                     // osu-stable special-cased colinear perfect curves to a linear path
-                    type = PathType.Linear;
+                    type = PathType.LINEAR;
                 }
             }
 
@@ -345,10 +352,10 @@ namespace osu.Game.Rulesets.Objects.Legacy
                 if (vertices[endIndex].Position != vertices[endIndex - 1].Position)
                     continue;
 
-                // Legacy Catmull sliders don't support multiple segments, so adjacent Catmull segments should be treated as a single one.
+                // Legacy CATMULL sliders don't support multiple segments, so adjacent CATMULL segments should be treated as a single one.
                 // Importantly, this is not applied to the first control point, which may duplicate the slider path's position
                 // resulting in a duplicate (0,0) control point in the resultant list.
-                if (type == PathType.Catmull && endIndex > 1 && FormatVersion < LegacyBeatmapEncoder.FIRST_LAZER_VERSION)
+                if (type == PathType.CATMULL && endIndex > 1 && FormatVersion < LegacyBeatmapEncoder.FIRST_LAZER_VERSION)
                     continue;
 
                 // The last control point of each segment is not allowed to start a new implicit segment.
@@ -586,7 +593,5 @@ namespace osu.Game.Rulesets.Objects.Legacy
 
             public override int GetHashCode() => HashCode.Combine(base.GetHashCode(), Filename);
         }
-
-#nullable disable
     }
 }

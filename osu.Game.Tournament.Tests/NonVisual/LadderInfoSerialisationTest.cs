@@ -1,7 +1,5 @@
-// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
-
-#nullable disable
 
 using Newtonsoft.Json;
 using NUnit.Framework;
@@ -37,8 +35,8 @@ namespace osu.Game.Tournament.Tests.NonVisual
                 PlayersPerTeam = { Value = 4 },
                 Teams =
                 {
-                    match.Team1.Value,
-                    match.Team2.Value,
+                    match.Team1.Value!,
+                    match.Team2.Value!,
                 },
                 Rounds =
                 {

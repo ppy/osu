@@ -3,9 +3,13 @@
 
 #nullable disable
 
+using osu.Framework;
 using osu.Game.Graphics.UserInterface;
+using osu.Game.Input;
 using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Overlays;
+using osu.Game.Overlays.Mods;
+using osu.Game.Scoring;
 
 namespace osu.Game.Configuration
 {
@@ -21,7 +25,10 @@ namespace osu.Game.Configuration
             SetDefault(Static.LowBatteryNotificationShownOnce, false);
             SetDefault(Static.FeaturedArtistDisclaimerShownOnce, false);
             SetDefault(Static.LastHoverSoundPlaybackTime, (double?)null);
+            SetDefault(Static.LastModSelectPanelSamplePlaybackTime, (double?)null);
             SetDefault<APISeasonalBackgrounds>(Static.SeasonalBackgrounds, null);
+            SetDefault(Static.TouchInputActive, RuntimeInfo.IsMobile);
+            SetDefault<ScoreInfo>(Static.LastLocalUserScore, null);
         }
 
         /// <summary>
@@ -56,5 +63,22 @@ namespace osu.Game.Configuration
         /// Used to debounce hover sounds game-wide to avoid volume saturation, especially in scrolling views with many UI controls like <see cref="SettingsOverlay"/>.
         /// </summary>
         LastHoverSoundPlaybackTime,
+
+        /// <summary>
+        /// The last playback time in milliseconds of an on/off sample (from <see cref="ModSelectPanel"/>).
+        /// Used to debounce <see cref="ModSelectPanel"/> on/off sounds game-wide to avoid volume saturation, especially in activating mod presets with many mods.
+        /// </summary>
+        LastModSelectPanelSamplePlaybackTime,
+
+        /// <summary>
+        /// Whether the last positional input received was a touch input.
+        /// Used in touchscreen detection scenarios (<see cref="TouchInputInterceptor"/>).
+        /// </summary>
+        TouchInputActive,
+
+        /// <summary>
+        /// Stores the local user's last score (can be completed or aborted).
+        /// </summary>
+        LastLocalUserScore,
     }
 }

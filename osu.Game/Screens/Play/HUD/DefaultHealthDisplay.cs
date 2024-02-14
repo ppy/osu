@@ -1,8 +1,6 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
 using System;
 using osu.Framework.Allocation;
 using osu.Framework.Extensions.Color4Extensions;
@@ -10,7 +8,6 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Effects;
 using osu.Game.Graphics;
-using osu.Game.Rulesets.Judgements;
 using osuTK;
 using osuTK.Graphics;
 using osu.Framework.Graphics.Shapes;
@@ -114,20 +111,18 @@ namespace osu.Game.Screens.Play.HUD
             };
         }
 
+        protected override void Flash()
+        {
+            fill.FadeEdgeEffectTo(Math.Min(1, fill.EdgeEffect.Colour.Linear.A + (1f - base_glow_opacity) / glow_max_hits), 50, Easing.OutQuint)
+                .Delay(glow_fade_delay)
+                .FadeEdgeEffectTo(base_glow_opacity, glow_fade_time, Easing.OutQuint);
+        }
+
         [BackgroundDependencyLoader]
         private void load(OsuColour colours)
         {
             AccentColour = colours.BlueLighter;
             GlowColour = colours.BlueDarker;
-        }
-
-        protected override void Flash(JudgementResult result) => Scheduler.AddOnce(flash);
-
-        private void flash()
-        {
-            fill.FadeEdgeEffectTo(Math.Min(1, fill.EdgeEffect.Colour.Linear.A + (1f - base_glow_opacity) / glow_max_hits), 50, Easing.OutQuint)
-                .Delay(glow_fade_delay)
-                .FadeEdgeEffectTo(base_glow_opacity, glow_fade_time, Easing.OutQuint);
         }
 
         protected override void Update()

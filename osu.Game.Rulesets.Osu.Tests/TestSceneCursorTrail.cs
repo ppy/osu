@@ -78,7 +78,7 @@ namespace osu.Game.Rulesets.Osu.Tests
             {
                 RelativeSizeAxes = Axes.Both,
                 Size = new Vector2(0.8f),
-                Child = new MovingCursorInputManager { Child = createContent?.Invoke() }
+                Child = new MovingCursorInputManager { Child = createContent() }
             });
         });
 

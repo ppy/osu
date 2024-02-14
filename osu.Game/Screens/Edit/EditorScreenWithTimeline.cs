@@ -1,43 +1,38 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
-using JetBrains.Annotations;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Overlays;
-using osu.Game.Screens.Edit.Compose.Components;
 using osu.Game.Screens.Edit.Compose.Components.Timeline;
 
 namespace osu.Game.Screens.Edit
 {
+    [Cached]
     public abstract partial class EditorScreenWithTimeline : EditorScreen
     {
-        private const float padding = 10;
+        public const float PADDING = 10;
 
-        private readonly BindableBeatDivisor beatDivisor = new BindableBeatDivisor();
+        public Container TimelineContent { get; private set; } = null!;
 
-        private Container timelineContainer;
+        public Container MainContent { get; private set; } = null!;
+
+        private LoadingSpinner spinner = null!;
 
         protected EditorScreenWithTimeline(EditorScreenMode type)
             : base(type)
         {
         }
 
-        private Container mainContent;
-
-        private LoadingSpinner spinner;
-
         [BackgroundDependencyLoader(true)]
-        private void load(OverlayColourProvider colourProvider, [CanBeNull] BindableBeatDivisor beatDivisor)
+        private void load(OverlayColourProvider colourProvider)
         {
-            if (beatDivisor != null)
-                this.beatDivisor.BindTo(beatDivisor);
-
+            // Grid with only two rows.
+            // First is the timeline area, which should be allowed to expand as required.
+            // Second is the main editor content, including the playfield and side toolbars (but not the bottom).
             Child = new GridContainer
             {
                 RelativeSizeAxes = Axes.Both,
@@ -67,7 +62,7 @@ namespace osu.Game.Screens.Edit
                                     Name = "Timeline content",
                                     RelativeSizeAxes = Axes.X,
                                     AutoSizeAxes = Axes.Y,
-                                    Padding = new MarginPadding { Horizontal = padding, Top = padding },
+                                    Padding = new MarginPadding { Horizontal = PADDING, Top = PADDING },
                                     Child = new GridContainer
                                     {
                                         RelativeSizeAxes = Axes.X,
@@ -76,13 +71,11 @@ namespace osu.Game.Screens.Edit
                                         {
                                             new Drawable[]
                                             {
-                                                timelineContainer = new Container
+                                                TimelineContent = new Container
                                                 {
                                                     RelativeSizeAxes = Axes.X,
                                                     AutoSizeAxes = Axes.Y,
-                                                    Padding = new MarginPadding { Right = 5 },
                                                 },
-                                                new BeatDivisorControl(beatDivisor) { RelativeSizeAxes = Axes.Both }
                                             },
                                         },
                                         RowDimensions = new[]
@@ -101,7 +94,7 @@ namespace osu.Game.Screens.Edit
                     },
                     new Drawable[]
                     {
-                        mainContent = new Container
+                        MainContent = new Container
                         {
                             Name = "Main content",
                             RelativeSizeAxes = Axes.Both,
@@ -124,10 +117,10 @@ namespace osu.Game.Screens.Edit
             {
                 spinner.State.Value = Visibility.Hidden;
 
-                mainContent.Add(content);
+                MainContent.Add(content);
                 content.FadeInFromZero(300, Easing.OutQuint);
 
-                LoadComponentAsync(new TimelineArea(CreateTimelineContent()), timelineContainer.Add);
+                LoadComponentAsync(new TimelineArea(CreateTimelineContent()), TimelineContent.Add);
             });
         }
 

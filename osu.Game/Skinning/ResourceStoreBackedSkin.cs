@@ -46,7 +46,10 @@ namespace osu.Game.Skinning
         public IBindable<TValue>? GetConfig<TLookup, TValue>(TLookup lookup)
             where TLookup : notnull
             where TValue : notnull
-            => null;
+        {
+            Skin.LogLookupDebug(this, lookup, Skin.LookupDebugType.Miss);
+            return null;
+        }
 
         public void Dispose()
         {

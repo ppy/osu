@@ -19,6 +19,7 @@ namespace osu.Game.Screens.Play.HUD
         private readonly ArgonSongProgressGraph graph;
         private readonly ArgonSongProgressBar bar;
         private readonly Container graphContainer;
+        private readonly Container content;
 
         private const float bar_height = 10;
 
@@ -30,43 +31,50 @@ namespace osu.Game.Screens.Play.HUD
 
         public ArgonSongProgress()
         {
+            RelativeSizeAxes = Axes.X;
+            AutoSizeAxes = Axes.Y;
+
             Anchor = Anchor.BottomCentre;
             Origin = Anchor.BottomCentre;
             Masking = true;
             CornerRadius = 5;
-            Children = new Drawable[]
+
+            Child = content = new Container
             {
-                info = new SongProgressInfo
+                RelativeSizeAxes = Axes.X,
+                Children = new Drawable[]
                 {
-                    Origin = Anchor.TopLeft,
-                    Name = "Info",
-                    Anchor = Anchor.TopLeft,
-                    RelativeSizeAxes = Axes.X,
-                    ShowProgress = false
-                },
-                bar = new ArgonSongProgressBar(bar_height)
-                {
-                    Name = "Seek bar",
-                    Origin = Anchor.BottomLeft,
-                    Anchor = Anchor.BottomLeft,
-                    OnSeek = time => player?.Seek(time),
-                },
-                graphContainer = new Container
-                {
-                    Anchor = Anchor.BottomLeft,
-                    Origin = Anchor.BottomLeft,
-                    Masking = true,
-                    CornerRadius = 5,
-                    Child = graph = new ArgonSongProgressGraph
+                    info = new SongProgressInfo
                     {
-                        Name = "Difficulty graph",
-                        RelativeSizeAxes = Axes.Both,
-                        Blending = BlendingParameters.Additive
+                        Origin = Anchor.TopLeft,
+                        Name = "Info",
+                        Anchor = Anchor.TopLeft,
+                        RelativeSizeAxes = Axes.X,
+                        ShowProgress = false
                     },
-                    RelativeSizeAxes = Axes.X,
-                },
+                    bar = new ArgonSongProgressBar(bar_height)
+                    {
+                        Name = "Seek bar",
+                        Origin = Anchor.BottomLeft,
+                        Anchor = Anchor.BottomLeft,
+                        OnSeek = time => player?.Seek(time),
+                    },
+                    graphContainer = new Container
+                    {
+                        Anchor = Anchor.BottomLeft,
+                        Origin = Anchor.BottomLeft,
+                        Masking = true,
+                        CornerRadius = 5,
+                        Child = graph = new ArgonSongProgressGraph
+                        {
+                            Name = "Difficulty graph",
+                            RelativeSizeAxes = Axes.Both,
+                            Blending = BlendingParameters.Additive
+                        },
+                        RelativeSizeAxes = Axes.X,
+                    },
+                }
             };
-            RelativeSizeAxes = Axes.X;
         }
 
         [BackgroundDependencyLoader]
@@ -95,24 +103,18 @@ namespace osu.Game.Screens.Play.HUD
         private void updateGraphVisibility()
         {
             graph.FadeTo(ShowGraph.Value ? 1 : 0, 200, Easing.In);
-            bar.ShowBackground = !ShowGraph.Value;
         }
 
         protected override void Update()
         {
             base.Update();
-            Height = bar.Height + bar_height + info.Height;
+            content.Height = bar.Height + bar_height + info.Height;
             graphContainer.Height = bar.Height;
         }
 
         protected override void UpdateProgress(double progress, bool isIntro)
         {
-            bar.TrackTime = GameplayClock.CurrentTime;
-
-            if (isIntro)
-                bar.CurrentTime = 0;
-            else
-                bar.CurrentTime = FrameStableClock.CurrentTime;
+            bar.Progress = isIntro ? 0 : progress;
         }
     }
 }

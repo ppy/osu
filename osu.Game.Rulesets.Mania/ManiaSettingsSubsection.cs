@@ -41,6 +41,7 @@ namespace osu.Game.Rulesets.Mania
                 },
                 new SettingsCheckbox
                 {
+                    Keywords = new[] { "color" },
                     LabelText = RulesetSettingsStrings.TimingBasedColouring,
                     Current = config.GetBindable<bool>(ManiaRulesetSetting.TimingBasedNoteColouring),
                 }
@@ -49,7 +50,7 @@ namespace osu.Game.Rulesets.Mania
 
         private partial class ManiaScrollSlider : RoundedSliderBar<int>
         {
-            public override LocalisableString TooltipText => RulesetSettingsStrings.ScrollSpeedTooltip(DrawableManiaRuleset.ComputeScrollTime(Current.Value), Current.Value);
+            public override LocalisableString TooltipText => RulesetSettingsStrings.ScrollSpeedTooltip((int)DrawableManiaRuleset.ComputeScrollTime(Current.Value), Current.Value);
         }
     }
 }

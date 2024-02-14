@@ -8,15 +8,17 @@ using osu.Framework.Extensions.ObjectExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
+using osu.Framework.Graphics.Sprites;
 using osu.Framework.Localisation;
 using osu.Game.Beatmaps;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Online.Leaderboards;
+using osu.Game.Resources.Localisation.Web;
 using osu.Game.Rulesets;
+using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.UI;
-using osu.Game.Scoring.Drawables;
 using osu.Game.Utils;
 using osuTK;
 
@@ -48,6 +50,8 @@ namespace osu.Game.Overlays.Profile.Sections.Ranks
         [BackgroundDependencyLoader]
         private void load(RulesetStore rulesets)
         {
+            var ruleset = rulesets.GetRuleset(Score.RulesetID)?.CreateInstance() ?? throw new InvalidOperationException($"Ruleset with ID of {Score.RulesetID} not found locally");
+
             AddInternal(new ProfileItemContainer
             {
                 Children = new Drawable[]
@@ -132,14 +136,9 @@ namespace osu.Game.Overlays.Profile.Sections.Ranks
                                         Origin = Anchor.CentreRight,
                                         Direction = FillDirection.Horizontal,
                                         Spacing = new Vector2(2),
-                                        Children = Score.Mods.Select(mod =>
+                                        Children = Score.Mods.Select(m => m.ToMod(ruleset)).AsOrdered().Select(mod => new ModIcon(mod)
                                         {
-                                            var ruleset = rulesets.GetRuleset(Score.RulesetID) ?? throw new InvalidOperationException($"Ruleset with ID of {Score.RulesetID} not found locally");
-
-                                            return new ModIcon(mod.ToMod(ruleset.CreateInstance()))
-                                            {
-                                                Scale = new Vector2(0.35f)
-                                            };
+                                            Scale = new Vector2(0.35f)
                                         }).ToList(),
                                     }
                                 }
@@ -215,42 +214,75 @@ namespace osu.Game.Overlays.Profile.Sections.Ranks
 
         private Drawable createDrawablePerformance()
         {
-            if (!Score.PP.HasValue)
-            {
-                if (Score.Beatmap?.Status.GrantsPerformancePoints() == true)
-                    return new UnprocessedPerformancePointsPlaceholder { Size = new Vector2(16), Colour = colourProvider.Highlight1 };
+            var font = OsuFont.GetFont(weight: FontWeight.Bold);
 
-                return new OsuSpriteText
+            if (Score.PP.HasValue)
+            {
+                return new FillFlowContainer
                 {
-                    Font = OsuFont.GetFont(weight: FontWeight.Bold),
+                    AutoSizeAxes = Axes.Both,
+                    Direction = FillDirection.Horizontal,
+                    Children = new[]
+                    {
+                        new OsuSpriteText
+                        {
+                            Anchor = Anchor.BottomLeft,
+                            Origin = Anchor.BottomLeft,
+                            Font = font,
+                            Text = $"{Score.PP:0}",
+                            Colour = colourProvider.Highlight1
+                        },
+                        new OsuSpriteText
+                        {
+                            Anchor = Anchor.BottomLeft,
+                            Origin = Anchor.BottomLeft,
+                            Font = font.With(size: 12),
+                            Text = "pp",
+                            Colour = colourProvider.Light3
+                        }
+                    }
+                };
+            }
+
+            if (Score.Beatmap?.Status.GrantsPerformancePoints() != true)
+            {
+                if (Score.Beatmap?.Status == BeatmapOnlineStatus.Loved)
+                {
+                    return new SpriteIconWithTooltip
+                    {
+                        Icon = FontAwesome.Solid.Heart,
+                        Size = new Vector2(font.Size),
+                        TooltipText = UsersStrings.ShowExtraTopRanksNotRanked,
+                        Colour = colourProvider.Highlight1
+                    };
+                }
+
+                return new SpriteTextWithTooltip
+                {
                     Text = "-",
+                    Font = OsuFont.GetFont(weight: FontWeight.Bold),
+                    TooltipText = UsersStrings.ShowExtraTopRanksNotRanked,
                     Colour = colourProvider.Highlight1
                 };
             }
 
-            return new FillFlowContainer
+            if (!Score.Ranked)
             {
-                AutoSizeAxes = Axes.Both,
-                Direction = FillDirection.Horizontal,
-                Children = new[]
+                return new SpriteTextWithTooltip
                 {
-                    new OsuSpriteText
-                    {
-                        Anchor = Anchor.BottomLeft,
-                        Origin = Anchor.BottomLeft,
-                        Font = OsuFont.GetFont(weight: FontWeight.Bold),
-                        Text = $"{Score.PP:0}",
-                        Colour = colourProvider.Highlight1
-                    },
-                    new OsuSpriteText
-                    {
-                        Anchor = Anchor.BottomLeft,
-                        Origin = Anchor.BottomLeft,
-                        Font = OsuFont.GetFont(size: 12, weight: FontWeight.Bold),
-                        Text = "pp",
-                        Colour = colourProvider.Light3
-                    }
-                }
+                    Text = "-",
+                    Font = OsuFont.GetFont(weight: FontWeight.Bold),
+                    TooltipText = ScoresStrings.StatusNoPp,
+                    Colour = colourProvider.Highlight1
+                };
+            }
+
+            return new SpriteIconWithTooltip
+            {
+                Icon = FontAwesome.Solid.Sync,
+                Size = new Vector2(font.Size),
+                TooltipText = ScoresStrings.StatusProcessing,
+                Colour = colourProvider.Highlight1
             };
         }
 

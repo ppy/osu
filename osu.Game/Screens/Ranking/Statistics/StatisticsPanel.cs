@@ -124,20 +124,23 @@ namespace osu.Game.Screens.Ranking.Statistics
                 }
                 else
                 {
-                    FillFlowContainer rows;
+                    FillFlowContainer flow;
                     container = new OsuScrollContainer(Direction.Vertical)
                     {
                         RelativeSizeAxes = Axes.Both,
                         Anchor = Anchor.Centre,
                         Origin = Anchor.Centre,
+                        Masking = false,
+                        ScrollbarOverlapsContent = false,
                         Alpha = 0,
                         Children = new[]
                         {
-                            rows = new FillFlowContainer
+                            flow = new FillFlowContainer
                             {
                                 RelativeSizeAxes = Axes.X,
                                 AutoSizeAxes = Axes.Y,
-                                Spacing = new Vector2(30, 15)
+                                Spacing = new Vector2(30, 15),
+                                Direction = FillDirection.Full,
                             }
                         }
                     };
@@ -146,35 +149,22 @@ namespace osu.Game.Screens.Ranking.Statistics
 
                     foreach (var item in statisticItems)
                     {
-                        var columnContent = new List<Drawable>();
-
                         if (!hitEventsAvailable && item.RequiresHitEvents)
                         {
                             anyRequiredHitEvents = true;
                             continue;
                         }
 
-                        columnContent.Add(new StatisticContainer(item)
-                        {
-                            Anchor = Anchor.Centre,
-                            Origin = Anchor.Centre,
-                        });
-
-                        rows.Add(new GridContainer
+                        flow.Add(new StatisticItemContainer(item)
                         {
                             Anchor = Anchor.TopCentre,
                             Origin = Anchor.TopCentre,
-                            RelativeSizeAxes = Axes.X,
-                            AutoSizeAxes = Axes.Y,
-                            Content = new[] { columnContent.ToArray() },
-                            ColumnDimensions = new[] { new Dimension() },
-                            RowDimensions = new[] { new Dimension(GridSizeMode.AutoSize) }
                         });
                     }
 
                     if (anyRequiredHitEvents)
                     {
-                        rows.Add(new FillFlowContainer
+                        flow.Add(new FillFlowContainer
                         {
                             RelativeSizeAxes = Axes.X,
                             AutoSizeAxes = Axes.Y,
@@ -223,7 +213,7 @@ namespace osu.Game.Screens.Ranking.Statistics
 
         protected override void PopIn()
         {
-            this.FadeIn(150, Easing.OutQuint);
+            this.FadeIn(350, Easing.OutQuint);
 
             popInSample?.Play();
             wasOpened = true;
@@ -231,7 +221,7 @@ namespace osu.Game.Screens.Ranking.Statistics
 
         protected override void PopOut()
         {
-            this.FadeOut(150, Easing.OutQuint);
+            this.FadeOut(250, Easing.OutQuint);
 
             if (wasOpened)
                 popOutSample?.Play();

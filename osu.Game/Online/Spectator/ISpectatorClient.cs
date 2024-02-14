@@ -1,7 +1,5 @@
-// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
-
-#nullable disable
 
 using System.Threading.Tasks;
 
@@ -10,7 +8,7 @@ namespace osu.Game.Online.Spectator
     /// <summary>
     /// An interface defining a spectator client instance.
     /// </summary>
-    public interface ISpectatorClient
+    public interface ISpectatorClient : IStatefulUserHubClient
     {
         /// <summary>
         /// Signals that a user has begun a new play session.

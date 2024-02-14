@@ -23,7 +23,7 @@ namespace osu.Game.Screens.Edit.Compose
     public partial class ComposeScreen : EditorScreenWithTimeline, IGameplaySettings
     {
         [Resolved]
-        private GameHost host { get; set; }
+        private Clipboard hostClipboard { get; set; } = null!;
 
         [Resolved]
         private EditorClock clock { get; set; }
@@ -101,26 +101,31 @@ namespace osu.Game.Screens.Edit.Compose
 
         #region Clipboard operations
 
-        protected override void PerformCut()
+        public override void Cut()
         {
-            base.PerformCut();
+            if (!CanCut.Value)
+                return;
 
             Copy();
             EditorBeatmap.RemoveRange(EditorBeatmap.SelectedHitObjects.ToArray());
         }
 
-        protected override void PerformCopy()
+        public override void Copy()
         {
-            base.PerformCopy();
+            // on stable, pressing Ctrl-C would copy the current timestamp to system clipboard
+            // regardless of whether anything was even selected at all.
+            // UX-wise this is generally strange and unexpected, but make it work anyways to preserve muscle memory.
+            // note that this means that `getTimestamp()` must handle no-selection case, too.
+            hostClipboard.SetText(getTimestamp());
 
-            clipboard.Value = new ClipboardContent(EditorBeatmap).Serialize();
-
-            host.GetClipboard()?.SetText(formatSelectionAsString());
+            if (CanCopy.Value)
+                clipboard.Value = new ClipboardContent(EditorBeatmap).Serialize();
         }
 
-        protected override void PerformPaste()
+        public override void Paste()
         {
-            base.PerformPaste();
+            if (!CanPaste.Value)
+                return;
 
             var objects = clipboard.Value.Deserialize<ClipboardContent>().HitObjects;
 
@@ -147,7 +152,7 @@ namespace osu.Game.Screens.Edit.Compose
             CanPaste.Value = composer.IsLoaded && !string.IsNullOrEmpty(clipboard.Value);
         }
 
-        private string formatSelectionAsString()
+        private string getTimestamp()
         {
             if (composer == null)
                 return string.Empty;

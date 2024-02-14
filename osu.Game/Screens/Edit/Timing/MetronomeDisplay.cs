@@ -34,16 +34,18 @@ namespace osu.Game.Screens.Edit.Timing
 
         private IAdjustableClock metronomeClock = null!;
 
-        private Sample? sampleTick;
-        private Sample? sampleTickDownbeat;
         private Sample? sampleLatch;
 
-        private ScheduledDelegate? tickPlaybackDelegate;
+        private readonly MetronomeTick metronomeTick = new MetronomeTick();
 
         [Resolved]
         private OverlayColourProvider overlayColourProvider { get; set; } = null!;
 
-        public bool EnableClicking { get; set; } = true;
+        public bool EnableClicking
+        {
+            get => metronomeTick.EnableClicking;
+            set => metronomeTick.EnableClicking = value;
+        }
 
         public MetronomeDisplay()
         {
@@ -53,8 +55,6 @@ namespace osu.Game.Screens.Edit.Timing
         [BackgroundDependencyLoader]
         private void load(AudioManager audio)
         {
-            sampleTick = audio.Samples.Get(@"UI/metronome-tick");
-            sampleTickDownbeat = audio.Samples.Get(@"UI/metronome-tick-downbeat");
             sampleLatch = audio.Samples.Get(@"UI/metronome-latch");
 
             const float taper = 25;
@@ -67,8 +67,11 @@ namespace osu.Game.Screens.Edit.Timing
 
             AutoSizeAxes = Axes.Both;
 
+            metronomeTick.Ticked = onTickPlayed;
+
             InternalChildren = new Drawable[]
             {
+                metronomeTick,
                 new Container
                 {
                     Name = @"Taper adjust",
@@ -240,7 +243,7 @@ namespace osu.Game.Screens.Edit.Timing
         {
             base.Update();
 
-            if (BeatSyncSource.ControlPoints == null || BeatSyncSource.Clock == null)
+            if (BeatSyncSource.ControlPoints == null)
                 return;
 
             metronomeClock.Rate = IsBeatSyncedWithTrack ? BeatSyncSource.Clock.Rate : 1;
@@ -259,14 +262,11 @@ namespace osu.Game.Screens.Edit.Timing
                 this.TransformBindableTo(interpolatedBpm, (int)Math.Round(timingPoint.BPM), 600, Easing.OutQuint);
             }
 
-            if (BeatSyncSource.Clock?.IsRunning != true && isSwinging)
+            if (!BeatSyncSource.Clock.IsRunning && isSwinging)
             {
                 swing.ClearTransforms(true);
 
                 isSwinging = false;
-
-                tickPlaybackDelegate?.Cancel();
-                tickPlaybackDelegate = null;
 
                 // instantly latch if pendulum arm is close enough to center (to prevent awkward delayed playback of latch sound)
                 if (Precision.AlmostEquals(swing.Rotation, 0, 1))
@@ -306,27 +306,53 @@ namespace osu.Game.Screens.Edit.Timing
             float targetAngle = currentAngle > 0 ? -angle : angle;
 
             swing.RotateTo(targetAngle, beatLength, Easing.InOutQuad);
+        }
 
-            if (currentAngle != 0 && Math.Abs(currentAngle - targetAngle) > angle * 1.8f && isSwinging)
+        private void onTickPlayed()
+        {
+            // Originally, this flash only occurred when the pendulum correctly passess the centre.
+            // Mappers weren't happy with the metronome tick not playing immediately after starting playback
+            // so now this matches the actual tick sample.
+            stick.FlashColour(overlayColourProvider.Content1, beatLength, Easing.OutQuint);
+        }
+
+        private partial class MetronomeTick : BeatSyncedContainer
+        {
+            public bool EnableClicking;
+
+            private Sample? sampleTick;
+            private Sample? sampleTickDownbeat;
+
+            public Action? Ticked;
+
+            public MetronomeTick()
             {
-                using (BeginDelayedSequence(beatLength / 2))
-                {
-                    stick.FlashColour(overlayColourProvider.Content1, beatLength, Easing.OutQuint);
+                AllowMistimedEventFiring = false;
+            }
 
-                    tickPlaybackDelegate = Schedule(() =>
-                    {
-                        if (!EnableClicking)
-                            return;
+            [BackgroundDependencyLoader]
+            private void load(AudioManager audio)
+            {
+                sampleTick = audio.Samples.Get(@"UI/metronome-tick");
+                sampleTickDownbeat = audio.Samples.Get(@"UI/metronome-tick-downbeat");
+            }
 
-                        var channel = beatIndex % timingPoint.TimeSignature.Numerator == 0 ? sampleTickDownbeat?.GetChannel() : sampleTick?.GetChannel();
+            protected override void OnNewBeat(int beatIndex, TimingControlPoint timingPoint, EffectControlPoint effectPoint, ChannelAmplitudes amplitudes)
+            {
+                base.OnNewBeat(beatIndex, timingPoint, effectPoint, amplitudes);
 
-                        if (channel == null)
-                            return;
+                if (!IsBeatSyncedWithTrack || !EnableClicking)
+                    return;
 
-                        channel.Frequency.Value = RNG.NextDouble(0.98f, 1.02f);
-                        channel.Play();
-                    });
-                }
+                var channel = beatIndex % timingPoint.TimeSignature.Numerator == 0 ? sampleTickDownbeat?.GetChannel() : sampleTick?.GetChannel();
+
+                if (channel == null)
+                    return;
+
+                channel.Frequency.Value = RNG.NextDouble(0.98f, 1.02f);
+                channel.Play();
+
+                Ticked?.Invoke();
             }
         }
     }

@@ -5,7 +5,6 @@ using Markdig.Extensions.Footnotes;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
-using osu.Framework.Graphics.Containers.Markdown;
 using osu.Framework.Graphics.Cursor;
 using osu.Framework.Graphics.Shapes;
 using osu.Game.Overlays;
@@ -62,7 +61,7 @@ namespace osu.Game.Graphics.Containers.Markdown.Footnotes
                 lastFootnote = Text = footnote;
             }
 
-            public override MarkdownTextFlowContainer CreateTextFlow() => new FootnoteMarkdownTextFlowContainer();
+            public override OsuMarkdownTextFlowContainer CreateTextFlow() => new FootnoteMarkdownTextFlowContainer();
         }
 
         private partial class FootnoteMarkdownTextFlowContainer : OsuMarkdownTextFlowContainer

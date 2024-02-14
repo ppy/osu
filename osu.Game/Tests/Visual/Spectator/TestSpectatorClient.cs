@@ -33,7 +33,8 @@ namespace osu.Game.Tests.Visual.Spectator
 
         public int FrameSendAttempts { get; private set; }
 
-        public override IBindable<bool> IsConnected { get; } = new Bindable<bool>(true);
+        public override IBindable<bool> IsConnected => isConnected;
+        private readonly BindableBool isConnected = new BindableBool(true);
 
         public IReadOnlyDictionary<int, ReplayFrame> LastReceivedUserFrames => lastReceivedUserFrames;
 
@@ -124,7 +125,12 @@ namespace osu.Game.Tests.Visual.Spectator
                 if (frames.Count == 0)
                     return;
 
-                var bundle = new FrameDataBundle(new ScoreInfo { Combo = currentFrameIndex }, new ScoreProcessor(rulesetStore.GetRuleset(0)!.CreateInstance()), frames.ToArray());
+                var bundle = new FrameDataBundle(new ScoreInfo
+                {
+                    Combo = currentFrameIndex,
+                    TotalScore = (long)(currentFrameIndex * 123478 * RNG.NextDouble(0.99, 1.01)),
+                    Accuracy = RNG.NextDouble(0.98, 1),
+                }, new ScoreProcessor(rulesetStore.GetRuleset(0)!.CreateInstance()), frames.ToArray());
                 ((ISpectatorClient)this).UserSentFrames(userId, bundle);
 
                 frames.Clear();
@@ -173,6 +179,12 @@ namespace osu.Game.Tests.Visual.Spectator
                 Mods = userModsDictionary[userId],
                 State = SpectatedUserState.Playing
             });
+        }
+
+        protected override async Task DisconnectInternal()
+        {
+            await base.DisconnectInternal().ConfigureAwait(false);
+            isConnected.Value = false;
         }
     }
 }

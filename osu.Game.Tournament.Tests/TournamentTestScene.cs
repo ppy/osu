@@ -1,8 +1,6 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
 using System.Linq;
 using System.Threading;
 using osu.Framework.Allocation;
@@ -10,6 +8,7 @@ using osu.Framework.Platform;
 using osu.Framework.Testing;
 using osu.Framework.Utils;
 using osu.Game.Beatmaps;
+using osu.Game.Overlays;
 using osu.Game.Rulesets;
 using osu.Game.Tests.Visual;
 using osu.Game.Tournament.IO;
@@ -18,18 +17,21 @@ using osu.Game.Tournament.Models;
 
 namespace osu.Game.Tournament.Tests
 {
-    public abstract partial class TournamentTestScene : OsuTestScene
+    public abstract partial class TournamentTestScene : OsuManualInputManagerTestScene
     {
-        private TournamentMatch match;
+        [Cached(typeof(IDialogOverlay))]
+        protected readonly DialogOverlay DialogOverlay = new DialogOverlay { Depth = float.MinValue };
 
         [Cached]
         protected LadderInfo Ladder { get; private set; } = new LadderInfo();
 
-        [Resolved]
-        private RulesetStore rulesetStore { get; set; }
-
         [Cached]
         protected MatchIPCInfo IPCInfo { get; private set; } = new MatchIPCInfo();
+
+        [Resolved]
+        private RulesetStore rulesetStore { get; set; } = null!;
+
+        private TournamentMatch match = null!;
 
         [BackgroundDependencyLoader]
         private void load(TournamentStorage storage)
@@ -38,13 +40,15 @@ namespace osu.Game.Tournament.Tests
 
             match = CreateSampleMatch();
 
-            Ladder.Rounds.Add(match.Round.Value);
+            Ladder.Rounds.Add(match.Round.Value!);
             Ladder.Matches.Add(match);
-            Ladder.Teams.Add(match.Team1.Value);
-            Ladder.Teams.Add(match.Team2.Value);
+            Ladder.Teams.Add(match.Team1.Value!);
+            Ladder.Teams.Add(match.Team2.Value!);
 
             Ruleset.BindTo(Ladder.Ruleset);
             Dependencies.CacheAs(new StableInfo(storage));
+
+            Add(DialogOverlay);
         }
 
         [SetUpSteps]
@@ -63,7 +67,7 @@ namespace osu.Game.Tournament.Tests
                     FlagName = { Value = "JP" },
                     FullName = { Value = "Japan" },
                     LastYearPlacing = { Value = 10 },
-                    Seed = { Value = "Low" },
+                    Seed = { Value = "#12" },
                     SeedingResults =
                     {
                         new SeedingResult
@@ -136,6 +140,7 @@ namespace osu.Game.Tournament.Tests
                     Acronym = { Value = "USA" },
                     FlagName = { Value = "US" },
                     FullName = { Value = "United States" },
+                    Seed = { Value = "#3" },
                     Players =
                     {
                         new TournamentUser { Username = "Hello" },
@@ -148,7 +153,7 @@ namespace osu.Game.Tournament.Tests
             },
             Round =
             {
-                Value = new TournamentRound { Name = { Value = "Quarterfinals" } }
+                Value = new TournamentRound { Name = { Value = "Quarterfinals" } },
             }
         };
 
@@ -167,7 +172,7 @@ namespace osu.Game.Tournament.Tests
 
         public partial class TournamentTestSceneTestRunner : TournamentGameBase, ITestSceneTestRunner
         {
-            private TestSceneTestRunner.TestRunner runner;
+            private TestSceneTestRunner.TestRunner runner = null!;
 
             protected override void LoadAsyncComplete()
             {

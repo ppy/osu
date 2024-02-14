@@ -1,7 +1,5 @@
-// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
-
-#nullable disable
 
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
@@ -24,28 +22,22 @@ namespace osu.Game.Overlays.Music
     public partial class MusicKeyBindingHandler : Component, IKeyBindingHandler<GlobalAction>
     {
         [Resolved]
-        private IBindable<WorkingBeatmap> beatmap { get; set; }
+        private IBindable<WorkingBeatmap> beatmap { get; set; } = null!;
 
         [Resolved]
-        private MusicController musicController { get; set; }
-
-        [Resolved(canBeNull: true)]
-        private OnScreenDisplay onScreenDisplay { get; set; }
+        private MusicController musicController { get; set; } = null!;
 
         [Resolved]
-        private OsuGame game { get; set; }
+        private OnScreenDisplay? onScreenDisplay { get; set; }
 
         public bool OnPressed(KeyBindingPressEvent<GlobalAction> e)
         {
-            if (e.Repeat)
+            if (e.Repeat || !musicController.AllowTrackControl.Value)
                 return false;
 
             switch (e.Action)
             {
                 case GlobalAction.MusicPlay:
-                    if (game.LocalUserPlaying.Value)
-                        return false;
-
                     // use previous state as TogglePause may not update the track's state immediately (state update is run on the audio thread see https://github.com/ppy/osu/issues/9880#issuecomment-674668842)
                     bool wasPlaying = musicController.IsPlaying;
 

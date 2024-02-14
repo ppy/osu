@@ -76,10 +76,10 @@ namespace osu.Game.Graphics.Containers
         /// <remarks>Will only be correct if the logo's <see cref="Drawable.RelativePositionAxes"/> are set to Axes.Both</remarks>
         protected Vector2 ComputeLogoTrackingPosition()
         {
-            var absolutePos = Logo.Parent.ToLocalSpace(LogoFacade.ScreenSpaceDrawQuad.Centre);
+            var absolutePos = Logo.Parent!.ToLocalSpace(LogoFacade.ScreenSpaceDrawQuad.Centre);
 
-            return new Vector2(absolutePos.X / Logo.Parent.RelativeToAbsoluteFactor.X,
-                absolutePos.Y / Logo.Parent.RelativeToAbsoluteFactor.Y);
+            return new Vector2(absolutePos.X / Logo.Parent!.RelativeToAbsoluteFactor.X,
+                absolutePos.Y / Logo.Parent!.RelativeToAbsoluteFactor.Y);
         }
 
         protected override void Update()
