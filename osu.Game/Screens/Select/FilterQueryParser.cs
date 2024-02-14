@@ -121,8 +121,7 @@ namespace osu.Game.Screens.Select
             value.EndsWith("ms", StringComparison.Ordinal) ? 1 :
             value.EndsWith('s') ? 1000 :
             value.EndsWith('m') ? 60000 :
-            value.EndsWith('h') ? 3600000 :
-            value.EndsWith('d') ? 86400000 : 1000;
+            value.EndsWith('h') ? 3600000 : 1000;
 
         private static bool tryParseFloatWithPoint(string value, out float result) =>
             float.TryParse(value, NumberStyles.AllowDecimalPoint, CultureInfo.InvariantCulture, out result);
