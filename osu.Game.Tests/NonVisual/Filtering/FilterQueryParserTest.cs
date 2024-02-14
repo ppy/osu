@@ -532,7 +532,7 @@ namespace osu.Game.Tests.NonVisual.Filtering
         }
 
         [Test]
-        public void TestOutofrangeDateQuery()
+        public void TestOutOfRangeDateQuery()
         {
             const string query = "played<10000y";
             var filterCriteria = new FilterCriteria();
