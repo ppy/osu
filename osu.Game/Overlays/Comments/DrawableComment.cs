@@ -39,6 +39,7 @@ namespace osu.Game.Overlays.Comments
         public Action<DrawableComment, int> RepliesRequested = null!;
 
         public readonly Comment Comment;
+        public readonly IReadOnlyList<CommentableMeta> Meta;
 
         public readonly BindableBool ShowDeleted = new BindableBool();
         public readonly Bindable<CommentsSortCriteria> Sort = new Bindable<CommentsSortCriteria>();
@@ -87,9 +88,10 @@ namespace osu.Game.Overlays.Comments
         [Resolved]
         private OnScreenDisplay? onScreenDisplay { get; set; }
 
-        public DrawableComment(Comment comment)
+        public DrawableComment(Comment comment, IReadOnlyList<CommentableMeta> meta)
         {
             Comment = comment;
+            Meta = meta;
         }
 
         [BackgroundDependencyLoader]
