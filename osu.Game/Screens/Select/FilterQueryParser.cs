@@ -394,7 +394,8 @@ namespace osu.Game.Screens.Select
             if (match == null)
                 return false;
 
-            DateTimeOffset dateTimeOffset = DateTimeOffset.Now;
+            DateTimeOffset? dateTimeOffset = null;
+            DateTimeOffset now = DateTimeOffset.Now;
 
             try
             {
@@ -410,27 +411,27 @@ namespace osu.Game.Screens.Select
                         switch (key)
                         {
                             case "seconds":
-                                dateTimeOffset = dateTimeOffset.AddSeconds(-length);
+                                dateTimeOffset = (dateTimeOffset ?? now).AddSeconds(-length);
                                 break;
 
                             case "minutes":
-                                dateTimeOffset = dateTimeOffset.AddMinutes(-length);
+                                dateTimeOffset = (dateTimeOffset ?? now).AddMinutes(-length);
                                 break;
 
                             case "hours":
-                                dateTimeOffset = dateTimeOffset.AddHours(-length);
+                                dateTimeOffset = (dateTimeOffset ?? now).AddHours(-length);
                                 break;
 
                             case "days":
-                                dateTimeOffset = dateTimeOffset.AddDays(-length);
+                                dateTimeOffset = (dateTimeOffset ?? now).AddDays(-length);
                                 break;
 
                             case "months":
-                                dateTimeOffset = dateTimeOffset.AddMonths(-(int)length);
+                                dateTimeOffset = (dateTimeOffset ?? now).AddMonths(-(int)length);
                                 break;
 
                             case "years":
-                                dateTimeOffset = dateTimeOffset.AddYears(-(int)length);
+                                dateTimeOffset = (dateTimeOffset ?? now).AddYears(-(int)length);
                                 break;
                         }
                     }
@@ -438,11 +439,13 @@ namespace osu.Game.Screens.Select
             }
             catch (ArgumentOutOfRangeException)
             {
-                dateTimeOffset = DateTimeOffset.MinValue;
-                dateTimeOffset = dateTimeOffset.AddMilliseconds(1);
+                dateTimeOffset = DateTimeOffset.MinValue.AddMilliseconds(1);
             }
 
-            return tryUpdateCriteriaRange(ref dateRange, reverseInequalityOperator(op), dateTimeOffset);
+            if (!dateTimeOffset.HasValue)
+                return false;
+
+            return tryUpdateCriteriaRange(ref dateRange, reverseInequalityOperator(op), dateTimeOffset.Value);
         }
 
         // Function to reverse an Operator
