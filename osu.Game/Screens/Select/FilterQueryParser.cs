@@ -403,9 +403,12 @@ namespace osu.Game.Screens.Select
 
                 foreach (string key in keys)
                 {
-                    if (match[key].Success)
+                    if (!match.TryGetValue(key, out var group) || !group.Success)
+                        continue;
+
+                    if (group.Success)
                     {
-                        if (!tryParseDoubleWithPoint(match[key].Value, out double length))
+                        if (!tryParseDoubleWithPoint(group.Value, out double length))
                             return false;
 
                         switch (key)
