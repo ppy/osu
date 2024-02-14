@@ -488,7 +488,8 @@ namespace osu.Game.Tests.NonVisual.Filtering
             new object[] { "0:3:" },
             new object[] { "\"three days\"" },
             new object[] { "0.1y0.1M2d" },
-            new object[] { "0.99y0.99M2d" }
+            new object[] { "0.99y0.99M2d" },
+            new object[] { string.Empty }
         };
 
         [Test]
