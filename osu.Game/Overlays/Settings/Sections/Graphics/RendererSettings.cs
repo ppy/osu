@@ -36,7 +36,7 @@ namespace osu.Game.Overlays.Settings.Sections.Graphics
                 {
                     LabelText = GraphicsSettingsStrings.Renderer,
                     Current = renderer,
-                    Items = host.GetPreferredRenderersForCurrentPlatform().OrderBy(t => t).Where(t => t != RendererType.Vulkan),
+                    Items = host.GetPreferredRenderersForCurrentPlatform().Order().Where(t => t != RendererType.Vulkan),
                     Keywords = new[] { @"compatibility", @"directx" },
                 },
                 // TODO: this needs to be a custom dropdown at some point
@@ -67,10 +67,17 @@ namespace osu.Game.Overlays.Settings.Sections.Graphics
                 if (r.NewValue == RendererType.Automatic && automaticRendererInUse)
                     return;
 
-                dialogOverlay?.Push(new ConfirmDialog(GraphicsSettingsStrings.ChangeRendererConfirmation, () => game?.AttemptExit(), () =>
+                if (game?.RestartAppWhenExited() == true)
                 {
-                    renderer.Value = automaticRendererInUse ? RendererType.Automatic : host.ResolvedRenderer;
-                }));
+                    game.AttemptExit();
+                }
+                else
+                {
+                    dialogOverlay?.Push(new ConfirmDialog(GraphicsSettingsStrings.ChangeRendererConfirmation, () => game?.AttemptExit(), () =>
+                    {
+                        renderer.Value = automaticRendererInUse ? RendererType.Automatic : host.ResolvedRenderer;
+                    }));
+                }
             });
 
             // TODO: remove this once we support SDL+android.

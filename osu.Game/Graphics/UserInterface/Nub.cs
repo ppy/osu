@@ -20,16 +20,16 @@ namespace osu.Game.Graphics.UserInterface
     {
         public const float HEIGHT = 15;
 
-        public const float EXPANDED_SIZE = 50;
+        public const float DEFAULT_EXPANDED_SIZE = 50;
 
         private const float border_width = 3;
 
         private readonly Box fill;
         private readonly Container main;
 
-        public Nub()
+        public Nub(float expandedSize = DEFAULT_EXPANDED_SIZE)
         {
-            Size = new Vector2(EXPANDED_SIZE, HEIGHT);
+            Size = new Vector2(expandedSize, HEIGHT);
 
             InternalChildren = new[]
             {

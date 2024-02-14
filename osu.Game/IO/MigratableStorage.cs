@@ -6,8 +6,8 @@
 using System;
 using System.IO;
 using System.Linq;
-using System.Threading;
 using osu.Framework.Platform;
+using osu.Game.Utils;
 
 namespace osu.Game.IO
 {
@@ -81,7 +81,7 @@ namespace osu.Game.IO
                 if (IgnoreSuffixes.Any(suffix => fi.Name.EndsWith(suffix, StringComparison.Ordinal)))
                     continue;
 
-                allFilesDeleted &= AttemptOperation(() => fi.Delete(), throwOnFailure: false);
+                allFilesDeleted &= FileUtils.AttemptOperation(() => fi.Delete(), throwOnFailure: false);
             }
 
             foreach (DirectoryInfo dir in target.GetDirectories())
@@ -92,11 +92,11 @@ namespace osu.Game.IO
                 if (IgnoreSuffixes.Any(suffix => dir.Name.EndsWith(suffix, StringComparison.Ordinal)))
                     continue;
 
-                allFilesDeleted &= AttemptOperation(() => dir.Delete(true), throwOnFailure: false);
+                allFilesDeleted &= FileUtils.AttemptOperation(() => dir.Delete(true), throwOnFailure: false);
             }
 
             if (target.GetFiles().Length == 0 && target.GetDirectories().Length == 0)
-                allFilesDeleted &= AttemptOperation(target.Delete, throwOnFailure: false);
+                allFilesDeleted &= FileUtils.AttemptOperation(target.Delete, throwOnFailure: false);
 
             return allFilesDeleted;
         }
@@ -115,7 +115,7 @@ namespace osu.Game.IO
                 if (IgnoreSuffixes.Any(suffix => fileInfo.Name.EndsWith(suffix, StringComparison.Ordinal)))
                     continue;
 
-                AttemptOperation(() =>
+                FileUtils.AttemptOperation(() =>
                 {
                     fileInfo.Refresh();
 
@@ -137,36 +137,6 @@ namespace osu.Game.IO
                     continue;
 
                 CopyRecursive(dir, destination.CreateSubdirectory(dir.Name), false);
-            }
-        }
-
-        /// <summary>
-        /// Attempt an IO operation multiple times and only throw if none of the attempts succeed.
-        /// </summary>
-        /// <param name="action">The action to perform.</param>
-        /// <param name="attempts">The number of attempts (250ms wait between each).</param>
-        /// <param name="throwOnFailure">Whether to throw an exception on failure. If <c>false</c>, will silently fail.</param>
-        protected static bool AttemptOperation(Action action, int attempts = 10, bool throwOnFailure = true)
-        {
-            while (true)
-            {
-                try
-                {
-                    action();
-                    return true;
-                }
-                catch (Exception)
-                {
-                    if (attempts-- == 0)
-                    {
-                        if (throwOnFailure)
-                            throw;
-
-                        return false;
-                    }
-                }
-
-                Thread.Sleep(250);
             }
         }
     }

@@ -43,7 +43,7 @@ namespace osu.Game.Rulesets.Mania.Configuration
                 speed => new SettingDescription(
                     rawValue: speed,
                     name: RulesetSettingsStrings.ScrollSpeed,
-                    value: RulesetSettingsStrings.ScrollSpeedTooltip(DrawableManiaRuleset.ComputeScrollTime(speed), speed)
+                    value: RulesetSettingsStrings.ScrollSpeedTooltip((int)DrawableManiaRuleset.ComputeScrollTime(speed), speed)
                 )
             )
         };

@@ -47,9 +47,6 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
         [Resolved]
         private RulesetStore rulesets { get; set; }
 
-        [Resolved]
-        private ScoreManager scoreManager { get; set; }
-
         private GetScoresRequest getScoresRequest;
 
         private CancellationTokenSource loadCancellationSource;
@@ -85,7 +82,7 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
                     MD5Hash = apiBeatmap.MD5Hash
                 };
 
-                var scores = scoreManager.OrderByTotalScore(value.Scores.Select(s => s.ToScoreInfo(rulesets, beatmapInfo))).ToArray();
+                var scores = value.Scores.Select(s => s.ToScoreInfo(rulesets, beatmapInfo)).OrderByTotalScore().ToArray();
                 var topScore = scores.First();
 
                 scoreTable.DisplayScores(scores, apiBeatmap.Status.GrantsPerformancePoints());

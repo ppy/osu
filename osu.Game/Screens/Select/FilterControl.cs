@@ -9,6 +9,7 @@ using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
+using osu.Framework.Input;
 using osu.Framework.Input.Events;
 using osu.Framework.Localisation;
 using osu.Game.Collections;
@@ -23,6 +24,7 @@ using osu.Game.Rulesets;
 using osu.Game.Screens.Select.Filter;
 using osuTK;
 using osuTK.Graphics;
+using osuTK.Input;
 
 namespace osu.Game.Screens.Select
 {
@@ -248,7 +250,7 @@ namespace osu.Game.Screens.Select
 
         protected override bool OnHover(HoverEvent e) => true;
 
-        private partial class FilterControlTextBox : SeekLimitedSearchTextBox
+        internal partial class FilterControlTextBox : SeekLimitedSearchTextBox
         {
             private const float filter_text_size = 12;
 
@@ -273,6 +275,15 @@ namespace osu.Game.Screens.Select
                     Margin = new MarginPadding { Top = 2, Left = 2 },
                     Colour = colours.Yellow
                 });
+            }
+
+            public override bool OnPressed(KeyBindingPressEvent<PlatformAction> e)
+            {
+                // the "cut" platform key binding (shift-delete) conflicts with the beatmap deletion action.
+                if (e.Action == PlatformAction.Cut && e.ShiftPressed && e.CurrentState.Keyboard.Keys.IsPressed(Key.Delete))
+                    return false;
+
+                return base.OnPressed(e);
             }
         }
     }

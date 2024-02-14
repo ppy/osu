@@ -41,7 +41,7 @@ namespace osu.Game.Collections
             realmSubscription = realm.RegisterForNotifications(r => r.All<BeatmapCollection>().OrderBy(c => c.Name), collectionsChanged);
         }
 
-        private void collectionsChanged(IRealmCollection<BeatmapCollection> collections, ChangeSet? changes, Exception error)
+        private void collectionsChanged(IRealmCollection<BeatmapCollection> collections, ChangeSet? changes)
         {
             Items.Clear();
             Items.AddRange(collections.AsEnumerable().Select(c => c.ToLive(realm)));

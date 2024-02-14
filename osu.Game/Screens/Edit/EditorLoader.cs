@@ -42,6 +42,8 @@ namespace osu.Game.Screens.Edit
 
         public override bool DisallowExternalBeatmapRulesetChanges => true;
 
+        public override bool? AllowGlobalTrackControl => false;
+
         [Resolved]
         private BeatmapManager beatmapManager { get; set; }
 

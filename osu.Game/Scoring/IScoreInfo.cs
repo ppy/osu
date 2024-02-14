@@ -1,7 +1,5 @@
-// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
-
-#nullable disable
 
 using System;
 using osu.Game.Beatmaps;
@@ -11,7 +9,7 @@ using osu.Game.Users;
 
 namespace osu.Game.Scoring
 {
-    public interface IScoreInfo : IHasOnlineID<long>, IHasNamedFiles
+    public interface IScoreInfo : IHasOnlineID<long>
     {
         IUser User { get; }
 
@@ -24,13 +22,13 @@ namespace osu.Game.Scoring
 
         double Accuracy { get; }
 
-        bool HasReplay { get; }
+        long LegacyOnlineID { get; }
 
         DateTimeOffset Date { get; }
 
         double? PP { get; }
 
-        IBeatmapInfo Beatmap { get; }
+        IBeatmapInfo? Beatmap { get; }
 
         IRulesetInfo Ruleset { get; }
 

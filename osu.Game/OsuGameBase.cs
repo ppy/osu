@@ -14,6 +14,7 @@ using osu.Framework.Allocation;
 using osu.Framework.Audio;
 using osu.Framework.Audio.Track;
 using osu.Framework.Bindables;
+using osu.Framework.Configuration;
 using osu.Framework.Development;
 using osu.Framework.Extensions;
 using osu.Framework.Graphics;
@@ -27,6 +28,7 @@ using osu.Framework.Input.Handlers.Mouse;
 using osu.Framework.Input.Handlers.Tablet;
 using osu.Framework.Input.Handlers.Touch;
 using osu.Framework.IO.Stores;
+using osu.Framework.Localisation;
 using osu.Framework.Logging;
 using osu.Framework.Platform;
 using osu.Framework.Timing;
@@ -36,11 +38,13 @@ using osu.Game.Beatmaps.ControlPoints;
 using osu.Game.Beatmaps.Formats;
 using osu.Game.Configuration;
 using osu.Game.Database;
+using osu.Game.Extensions;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Cursor;
 using osu.Game.Input;
 using osu.Game.Input.Bindings;
 using osu.Game.IO;
+using osu.Game.Localisation;
 using osu.Game.Online;
 using osu.Game.Online.API;
 using osu.Game.Online.Chat;
@@ -98,7 +102,7 @@ namespace osu.Game
         public virtual bool UseDevelopmentServer => DebugUtils.IsDebugBuild;
 
         public virtual EndpointConfiguration CreateEndpoints() =>
-            UseDevelopmentServer ? new DevelopmentEndpointConfiguration() : new ExperimentalEndpointConfiguration();
+            UseDevelopmentServer ? new DevelopmentEndpointConfiguration() : new ProductionEndpointConfiguration();
 
         public virtual Version AssemblyVersion => Assembly.GetEntryAssembly()?.GetName().Version ?? new Version();
 
@@ -157,6 +161,11 @@ namespace osu.Game
 
         protected Storage Storage { get; set; }
 
+        /// <summary>
+        /// The language in which the game is currently displayed in.
+        /// </summary>
+        public Bindable<Language> CurrentLanguage { get; } = new Bindable<Language>();
+
         protected Bindable<WorkingBeatmap> Beatmap { get; private set; } // cached via load() method
 
         /// <summary>
@@ -191,6 +200,8 @@ namespace osu.Game
 
         private RulesetConfigCache rulesetConfigCache;
 
+        private SessionAverageHitErrorTracker hitErrorTracker;
+
         protected SpectatorClient SpectatorClient { get; private set; }
 
         protected MultiplayerClient MultiplayerClient { get; private set; }
@@ -206,7 +217,7 @@ namespace osu.Game
         /// For now, this is used as a source specifically for beat synced components.
         /// Going forward, it could potentially be used as the single source-of-truth for beatmap timing.
         /// </summary>
-        private readonly FramedBeatmapClock beatmapClock = new FramedBeatmapClock(true);
+        private readonly FramedBeatmapClock beatmapClock = new FramedBeatmapClock(applyOffsets: true, requireDecoupling: false);
 
         protected override Container<Drawable> Content => content;
 
@@ -215,6 +226,10 @@ namespace osu.Game
         private DependencyContainer dependencies;
 
         private readonly BindableNumber<double> globalTrackVolumeAdjust = new BindableNumber<double>(global_track_volume_adjust);
+
+        private Bindable<string> frameworkLocale = null!;
+
+        private IBindable<LocalisationParameters> localisationParameters = null!;
 
         /// <summary>
         /// Number of unhandled exceptions to allow before aborting execution.
@@ -238,7 +253,7 @@ namespace osu.Game
         }
 
         [BackgroundDependencyLoader]
-        private void load(ReadableKeyCombinationProvider keyCombinationProvider)
+        private void load(ReadableKeyCombinationProvider keyCombinationProvider, FrameworkConfigManager frameworkConfig)
         {
             try
             {
@@ -283,7 +298,15 @@ namespace osu.Game
 
             MessageFormatter.WebsiteRootUrl = endpoints.WebsiteRootUrl;
 
-            dependencies.CacheAs(API ??= new APIAccess(LocalConfig, endpoints, VersionHash));
+            frameworkLocale = frameworkConfig.GetBindable<string>(FrameworkSetting.Locale);
+            frameworkLocale.BindValueChanged(_ => updateLanguage());
+
+            localisationParameters = Localisation.CurrentParameters.GetBoundCopy();
+            localisationParameters.BindValueChanged(_ => updateLanguage(), true);
+
+            CurrentLanguage.BindValueChanged(val => frameworkLocale.Value = val.NewValue.ToCultureCode());
+
+            dependencies.CacheAs(API ??= new APIAccess(this, LocalConfig, endpoints, VersionHash));
 
             var defaultBeatmap = new DummyWorkingBeatmap(Audio, Textures);
 
@@ -317,10 +340,6 @@ namespace osu.Game
             dependencies.Cache(beatmapCache = new BeatmapLookupCache());
             base.Content.Add(beatmapCache);
 
-            var scorePerformanceManager = new ScorePerformanceCache();
-            dependencies.Cache(scorePerformanceManager);
-            base.Content.Add(scorePerformanceManager);
-
             dependencies.CacheAs<IRulesetConfigCache>(rulesetConfigCache = new RulesetConfigCache(realm, RulesetStore));
 
             var powerStatus = CreateBatteryInfo();
@@ -328,6 +347,7 @@ namespace osu.Game
                 dependencies.CacheAs(powerStatus);
 
             dependencies.Cache(SessionStatics = new SessionStatics());
+            dependencies.Cache(hitErrorTracker = new SessionAverageHitErrorTracker());
             dependencies.Cache(Colours = new OsuColour());
 
             RegisterImportHandler(BeatmapManager);
@@ -371,19 +391,23 @@ namespace osu.Game
             {
                 SafeAreaOverrideEdges = SafeAreaOverrideEdges,
                 RelativeSizeAxes = Axes.Both,
-                Child = CreateScalingContainer().WithChildren(new Drawable[]
+                Child = CreateScalingContainer().WithChild(globalBindings = new GlobalActionContainer(this)
                 {
-                    (GlobalCursorDisplay = new GlobalCursorDisplay
+                    Children = new Drawable[]
                     {
-                        RelativeSizeAxes = Axes.Both
-                    }).WithChild(content = new OsuTooltipContainer(GlobalCursorDisplay.MenuCursor)
-                    {
-                        RelativeSizeAxes = Axes.Both
-                    }),
-                    // to avoid positional input being blocked by children, ensure the GlobalActionContainer is above everything.
-                    globalBindings = new GlobalActionContainer(this)
+                        (GlobalCursorDisplay = new GlobalCursorDisplay
+                        {
+                            RelativeSizeAxes = Axes.Both
+                        }).WithChild(content = new OsuTooltipContainer(GlobalCursorDisplay.MenuCursor)
+                        {
+                            RelativeSizeAxes = Axes.Both
+                        }),
+                    }
                 })
             });
+
+            base.Content.Add(new TouchInputInterceptor());
+            base.Content.Add(hitErrorTracker);
 
             KeyBindingStore = new RealmKeyBindingStore(realm, keyCombinationProvider);
             KeyBindingStore.Register(globalBindings, RulesetStore.AvailableRulesets);
@@ -393,6 +417,8 @@ namespace osu.Game
             Ruleset.BindValueChanged(onRulesetChanged);
             Beatmap.BindValueChanged(onBeatmapChanged);
         }
+
+        private void updateLanguage() => CurrentLanguage.Value = LanguageExtensions.GetLanguageFor(frameworkLocale.Value, localisationParameters.Value);
 
         private void addFilesWarning()
         {
@@ -417,16 +443,7 @@ namespace osu.Game
             }
         }
 
-        private void onTrackChanged(WorkingBeatmap beatmap, TrackChangeDirection direction)
-        {
-            // FramedBeatmapClock uses a decoupled clock internally which will mutate the source if it is an `IAdjustableClock`.
-            // We don't want this for now, as the intention of beatmapClock is to be a read-only source for beat sync components.
-            //
-            // Encapsulating in a FramedClock will avoid any mutations.
-            var framedClock = new FramedClock(beatmap.Track);
-
-            beatmapClock.ChangeSource(framedClock);
-        }
+        private void onTrackChanged(WorkingBeatmap beatmap, TrackChangeDirection direction) => beatmapClock.ChangeSource(beatmap.Track);
 
         protected virtual void InitialiseFonts()
         {
@@ -460,6 +477,8 @@ namespace osu.Game
             AddFont(Resources, @"Fonts/Venera/Venera-Light");
             AddFont(Resources, @"Fonts/Venera/Venera-Bold");
             AddFont(Resources, @"Fonts/Venera/Venera-Black");
+
+            Fonts.AddStore(new OsuIcon.OsuIconStore(Textures));
         }
 
         protected override IReadOnlyDependencyContainer CreateChildDependencies(IReadOnlyDependencyContainer parent) =>
@@ -492,6 +511,12 @@ namespace osu.Game
                 Scheduler.AddDelayed(AttemptExit, 2000);
         }
 
+        /// <summary>
+        /// If supported by the platform, the game will automatically restart after the next exit.
+        /// </summary>
+        /// <returns>Whether a restart operation was queued.</returns>
+        public virtual bool RestartAppWhenExited() => false;
+
         public bool Migrate(string path)
         {
             Logger.Log($@"Migrating osu! data from ""{Storage.GetFullPath(string.Empty)}"" to ""{path}""...");
@@ -502,14 +527,21 @@ namespace osu.Game
             {
                 ManualResetEventSlim readyToRun = new ManualResetEventSlim();
 
+                bool success = false;
+
                 Scheduler.Add(() =>
                 {
-                    realmBlocker = realm.BlockAllOperations("migration");
+                    try
+                    {
+                        realmBlocker = realm.BlockAllOperations("migration");
+                        success = true;
+                    }
+                    catch { }
 
                     readyToRun.Set();
                 }, false);
 
-                if (!readyToRun.Wait(30000))
+                if (!readyToRun.Wait(30000) || !success)
                     throw new TimeoutException("Attempting to block for migration took too long.");
 
                 bool? cleanupSucceded = (Storage as OsuStorage)?.Migrate(Host.GetStorage(path));
@@ -554,14 +586,14 @@ namespace osu.Game
 
                     case JoystickHandler jh:
                         return new JoystickSettings(jh);
-
-                    case TouchHandler th:
-                        return new TouchSettings(th);
                 }
             }
 
             switch (handler)
             {
+                case TouchHandler th:
+                    return new TouchSettings(th);
+
                 case MidiHandler:
                     return new InputSection.HandlerSection(handler);
 

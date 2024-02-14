@@ -11,7 +11,9 @@ using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Utils;
 using osu.Game.Beatmaps;
+using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
+using osu.Game.Rulesets.Objects.Legacy;
 using osu.Game.Rulesets.Osu.Objects;
 using osu.Game.Scoring;
 using osuTK;
@@ -120,18 +122,22 @@ namespace osu.Game.Rulesets.Osu.Statistics
                                         new OsuSpriteText
                                         {
                                             Text = "Overshoot",
+                                            Font = OsuFont.GetFont(size: 12),
                                             Anchor = Anchor.Centre,
-                                            Origin = Anchor.BottomCentre,
-                                            Padding = new MarginPadding(3),
+                                            Origin = Anchor.BottomLeft,
+                                            Padding = new MarginPadding(2),
+                                            Rotation = -rotation,
                                             RelativePositionAxes = Axes.Both,
                                             Y = -(inner_portion + line_extension) / 2,
                                         },
                                         new OsuSpriteText
                                         {
                                             Text = "Undershoot",
+                                            Font = OsuFont.GetFont(size: 12),
                                             Anchor = Anchor.Centre,
-                                            Origin = Anchor.TopCentre,
-                                            Padding = new MarginPadding(3),
+                                            Origin = Anchor.TopRight,
+                                            Rotation = -rotation,
+                                            Padding = new MarginPadding(2),
                                             RelativePositionAxes = Axes.Both,
                                             Y = (inner_portion + line_extension) / 2,
                                         },
@@ -185,7 +191,7 @@ namespace osu.Game.Rulesets.Osu.Statistics
 
                 for (int c = 0; c < points_per_dimension; c++)
                 {
-                    HitPointType pointType = Vector2.Distance(new Vector2(c, r), centre) <= innerRadius
+                    HitPointType pointType = Vector2.Distance(new Vector2(c + 0.5f, r + 0.5f), centre) <= innerRadius
                         ? HitPointType.Hit
                         : HitPointType.Miss;
 
@@ -203,8 +209,7 @@ namespace osu.Game.Rulesets.Osu.Statistics
             if (score.HitEvents.Count == 0)
                 return;
 
-            // Todo: This should probably not be done like this.
-            float radius = OsuHitObject.OBJECT_RADIUS * (1.0f - 0.7f * (playableBeatmap.Difficulty.CircleSize - 5) / 5) / 2;
+            float radius = OsuHitObject.OBJECT_RADIUS * LegacyRulesetExtensions.CalculateScaleFromCircleSize(playableBeatmap.Difficulty.CircleSize, true);
 
             foreach (var e in score.HitEvents.Where(e => e.HitObject is HitCircle && !(e.HitObject is SliderTailCircle)))
             {

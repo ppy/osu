@@ -1,8 +1,6 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -15,6 +13,7 @@ using Android.Graphics;
 using Android.OS;
 using Android.Views;
 using osu.Framework.Android;
+using osu.Framework.Extensions.ObjectExtensions;
 using osu.Game.Database;
 using Debug = System.Diagnostics.Debug;
 using Uri = Android.Net.Uri;
@@ -51,11 +50,11 @@ namespace osu.Android
         /// <remarks>Adjusted on startup to match expected UX for the current device type (phone/tablet).</remarks>
         public ScreenOrientation DefaultOrientation = ScreenOrientation.Unspecified;
 
-        private OsuGameAndroid game;
+        private OsuGameAndroid game = null!;
 
         protected override Framework.Game CreateGame() => game = new OsuGameAndroid(this);
 
-        protected override void OnCreate(Bundle savedInstanceState)
+        protected override void OnCreate(Bundle? savedInstanceState)
         {
             base.OnCreate(savedInstanceState);
 
@@ -73,9 +72,9 @@ namespace osu.Android
             Debug.Assert(Resources?.DisplayMetrics != null);
 
             Point displaySize = new Point();
-#pragma warning disable 618 // GetSize is deprecated
+#pragma warning disable CA1422 // GetSize is deprecated
             WindowManager.DefaultDisplay.GetSize(displaySize);
-#pragma warning restore 618
+#pragma warning restore CA1422
             float smallestWidthDp = Math.Min(displaySize.X, displaySize.Y) / Resources.DisplayMetrics.Density;
             bool isTablet = smallestWidthDp >= 600f;
 
@@ -92,15 +91,15 @@ namespace osu.Android
             Assembly.Load("osu.Game.Rulesets.Mania");
         }
 
-        protected override void OnNewIntent(Intent intent) => handleIntent(intent);
+        protected override void OnNewIntent(Intent? intent) => handleIntent(intent);
 
-        private void handleIntent(Intent intent)
+        private void handleIntent(Intent? intent)
         {
-            switch (intent.Action)
+            switch (intent?.Action)
             {
                 case Intent.ActionDefault:
                     if (intent.Scheme == ContentResolver.SchemeContent)
-                        handleImportFromUris(intent.Data);
+                        handleImportFromUris(intent.Data.AsNonNull());
                     else if (osu_url_schemes.Contains(intent.Scheme))
                         game.HandleLink(intent.DataString);
                     break;
@@ -114,7 +113,7 @@ namespace osu.Android
                     {
                         var content = intent.ClipData?.GetItemAt(i);
                         if (content != null)
-                            uris.Add(content.Uri);
+                            uris.Add(content.Uri.AsNonNull());
                     }
 
                     handleImportFromUris(uris.ToArray());

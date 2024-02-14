@@ -22,6 +22,8 @@ namespace osu.Game.Tests.Visual.Gameplay
 
         private readonly Bindable<bool> showHealth = new Bindable<bool>();
 
+        private HealthProcessor healthProcessor;
+
         [Resolved]
         private OsuConfigManager config { get; set; }
 
@@ -29,7 +31,7 @@ namespace osu.Game.Tests.Visual.Gameplay
         {
             AddStep("create layer", () =>
             {
-                Child = new HealthProcessorContainer(healthProcessor)
+                Child = new HealthProcessorContainer(this.healthProcessor = healthProcessor)
                 {
                     RelativeSizeAxes = Axes.Both,
                     Child = layer = new FailingLayer()
@@ -50,12 +52,12 @@ namespace osu.Game.Tests.Visual.Gameplay
             AddSliderStep("current health", 0.0, 1.0, 1.0, val =>
             {
                 if (layer != null)
-                    layer.Current.Value = val;
+                    healthProcessor.Health.Value = val;
             });
 
-            AddStep("set health to 0.10", () => layer.Current.Value = 0.1);
+            AddStep("set health to 0.10", () => healthProcessor.Health.Value = 0.1);
             AddUntilStep("layer fade is visible", () => layer.ChildrenOfType<Container>().First().Alpha > 0.1f);
-            AddStep("set health to 1", () => layer.Current.Value = 1f);
+            AddStep("set health to 1", () => healthProcessor.Health.Value = 1f);
             AddUntilStep("layer fade is invisible", () => !layer.ChildrenOfType<Container>().First().IsPresent);
         }
 
@@ -65,7 +67,7 @@ namespace osu.Game.Tests.Visual.Gameplay
             create(new DrainingHealthProcessor(0));
             AddUntilStep("layer is visible", () => layer.IsPresent);
             AddStep("disable layer", () => config.SetValue(OsuSetting.FadePlayfieldWhenHealthLow, false));
-            AddStep("set health to 0.10", () => layer.Current.Value = 0.1);
+            AddStep("set health to 0.10", () => healthProcessor.Health.Value = 0.1);
             AddUntilStep("layer is not visible", () => !layer.IsPresent);
         }
 
@@ -74,7 +76,7 @@ namespace osu.Game.Tests.Visual.Gameplay
         {
             create(new AccumulatingHealthProcessor(1));
             AddUntilStep("layer is not visible", () => !layer.IsPresent);
-            AddStep("set health to 0.10", () => layer.Current.Value = 0.1);
+            AddStep("set health to 0.10", () => healthProcessor.Health.Value = 0.1);
             AddUntilStep("layer is not visible", () => !layer.IsPresent);
         }
 
@@ -82,7 +84,7 @@ namespace osu.Game.Tests.Visual.Gameplay
         public void TestLayerVisibilityWithDrainingProcessor()
         {
             create(new DrainingHealthProcessor(0));
-            AddStep("set health to 0.10", () => layer.Current.Value = 0.1);
+            AddStep("set health to 0.10", () => healthProcessor.Health.Value = 0.1);
             AddWaitStep("wait for potential fade", 10);
             AddAssert("layer is still visible", () => layer.IsPresent);
         }
@@ -92,7 +94,7 @@ namespace osu.Game.Tests.Visual.Gameplay
         {
             create(new DrainingHealthProcessor(0));
 
-            AddStep("set health to 0.10", () => layer.Current.Value = 0.1);
+            AddStep("set health to 0.10", () => healthProcessor.Health.Value = 0.1);
 
             AddStep("don't show health", () => showHealth.Value = false);
             AddStep("disable FadePlayfieldWhenHealthLow", () => config.SetValue(OsuSetting.FadePlayfieldWhenHealthLow, false));

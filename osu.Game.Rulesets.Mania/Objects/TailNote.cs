@@ -1,13 +1,14 @@
-// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
-
-#nullable disable
 
 using osu.Game.Rulesets.Judgements;
 using osu.Game.Rulesets.Mania.Judgements;
 
 namespace osu.Game.Rulesets.Mania.Objects
 {
+    /// <summary>
+    /// The tail note of a <see cref="HoldNote"/>.
+    /// </summary>
     public class TailNote : Note
     {
         /// <summary>

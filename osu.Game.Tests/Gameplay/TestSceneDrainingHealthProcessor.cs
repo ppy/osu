@@ -192,7 +192,8 @@ namespace osu.Game.Tests.Gameplay
             AddStep("apply perfect hit result", () => processor.ApplyResult(new JudgementResult(beatmap.HitObjects[0], new Judgement()) { Type = HitResult.Perfect }));
             AddAssert("not failed", () => !processor.HasFailed);
 
-            AddStep($"apply {resultApplied.ToString().ToLowerInvariant()} hit result", () => processor.ApplyResult(new JudgementResult(beatmap.HitObjects[0], new Judgement()) { Type = resultApplied }));
+            AddStep($"apply {resultApplied.ToString().ToLowerInvariant()} hit result",
+                () => processor.ApplyResult(new JudgementResult(beatmap.HitObjects[0], new Judgement()) { Type = resultApplied }));
             AddAssert("failed", () => processor.HasFailed);
         }
 
@@ -230,6 +231,84 @@ namespace osu.Game.Tests.Gameplay
 
             setTime(5000);
             assertHealthEqualTo(1);
+        }
+
+        [Test]
+        public void TestNoBreakDrainRate()
+        {
+            DrainingHealthProcessor hp = new DrainingHealthProcessor(-1000);
+            hp.ApplyBeatmap(new Beatmap<JudgeableHitObject>
+            {
+                HitObjects =
+                {
+                    new JudgeableHitObject { StartTime = 0 },
+                    new JudgeableHitObject { StartTime = 2000 }
+                }
+            });
+
+            Assert.That(hp.DrainRate, Is.EqualTo(4.5E-5).Within(0.1E-5));
+        }
+
+        [Test]
+        public void TestSingleBreakDrainRate()
+        {
+            DrainingHealthProcessor hp = new DrainingHealthProcessor(-1000);
+            hp.ApplyBeatmap(new Beatmap<JudgeableHitObject>
+            {
+                HitObjects =
+                {
+                    new JudgeableHitObject { StartTime = 0 },
+                    new JudgeableHitObject { StartTime = 2000 }
+                },
+                Breaks =
+                {
+                    new BreakPeriod(500, 1500)
+                }
+            });
+
+            Assert.That(hp.DrainRate, Is.EqualTo(9.1E-5).Within(0.1E-5));
+        }
+
+        [Test]
+        public void TestOverlappingBreakDrainRate()
+        {
+            DrainingHealthProcessor hp = new DrainingHealthProcessor(-1000);
+            hp.ApplyBeatmap(new Beatmap<JudgeableHitObject>
+            {
+                HitObjects =
+                {
+                    new JudgeableHitObject { StartTime = 0 },
+                    new JudgeableHitObject { StartTime = 2000 }
+                },
+                Breaks =
+                {
+                    new BreakPeriod(500, 1400),
+                    new BreakPeriod(750, 1500),
+                }
+            });
+
+            Assert.That(hp.DrainRate, Is.EqualTo(9.1E-5).Within(0.1E-5));
+        }
+
+        [Test]
+        public void TestSequentialBreakDrainRate()
+        {
+            DrainingHealthProcessor hp = new DrainingHealthProcessor(-1000);
+            hp.ApplyBeatmap(new Beatmap<JudgeableHitObject>
+            {
+                HitObjects =
+                {
+                    new JudgeableHitObject { StartTime = 0 },
+                    new JudgeableHitObject { StartTime = 2000 }
+                },
+                Breaks =
+                {
+                    new BreakPeriod(500, 1000),
+                    new BreakPeriod(1000, 1500),
+                }
+            });
+
+            Assert.That(hp.DrainRate, Is.EqualTo(9.1E-5).Within(0.1E-5));
         }
 
         private Beatmap createBeatmap(double startTime, double endTime, params BreakPeriod[] breaks)

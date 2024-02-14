@@ -1,8 +1,6 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
 using System;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
@@ -17,11 +15,11 @@ namespace osu.Game.Screens.Edit.Compose.Components
 {
     public sealed partial class SelectionBoxButton : SelectionBoxControl, IHasTooltip
     {
-        private SpriteIcon icon;
+        private SpriteIcon icon = null!;
 
         private readonly IconUsage iconUsage;
 
-        public Action Action;
+        public Action? Action;
 
         public SelectionBoxButton(IconUsage iconUsage, string tooltip)
         {
@@ -49,6 +47,8 @@ namespace osu.Game.Screens.Edit.Compose.Components
 
         protected override bool OnClick(ClickEvent e)
         {
+            Circle.FlashColour(Colours.GrayF, 300);
+
             TriggerOperationStarted();
             Action?.Invoke();
             TriggerOperationEnded();
