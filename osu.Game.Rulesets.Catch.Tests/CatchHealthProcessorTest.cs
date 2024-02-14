@@ -17,7 +17,7 @@ namespace osu.Game.Rulesets.Catch.Tests
             // hitobject, starting HP, fail expected after miss
             [new Fruit(), 0.01, true],
             [new Droplet(), 0.01, true],
-            [new TinyDroplet(), 0, true],
+            [new TinyDroplet(), 0, false],
             [new Banana(), 0, false],
         ];
 
