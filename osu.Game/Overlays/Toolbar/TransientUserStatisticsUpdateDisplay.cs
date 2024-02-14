@@ -208,8 +208,6 @@ namespace osu.Game.Overlays.Toolbar
         private partial class Counter<T> : RollingCounter<T>
             where T : struct, IEquatable<T>, IFormattable
         {
-            public const double ROLLING_DURATION = 1500;
-
             public FontUsage Font { get; init; } = OsuFont.Default.With(fixedWidth: true);
 
             public string ValuePrefix
@@ -232,7 +230,7 @@ namespace osu.Game.Overlays.Toolbar
                 t.Spacing = new Vector2(-1.5f, 0);
             });
 
-            protected override double RollingDuration => ROLLING_DURATION;
+            protected override double RollingDuration => 1500;
         }
     }
 }
