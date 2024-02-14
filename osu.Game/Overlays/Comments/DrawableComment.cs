@@ -172,7 +172,7 @@ namespace osu.Game.Overlays.Comments
                                             },
                                             Children = new Drawable[]
                                             {
-                                                author = new CommentAuthorLine(Comment),
+                                                author = new CommentAuthorLine(Comment, Meta),
                                                 message = new CommentMarkdownContainer
                                                 {
                                                     RelativeSizeAxes = Axes.X,

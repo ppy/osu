@@ -4,7 +4,6 @@
 using System.Collections.Generic;
 using System.Linq;
 using osu.Framework.Allocation;
-using osu.Framework.Extensions.ObjectExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Cursor;
@@ -23,12 +22,14 @@ namespace osu.Game.Overlays.Comments
     public partial class CommentAuthorLine : FillFlowContainer
     {
         private readonly Comment comment;
+        private readonly IReadOnlyList<CommentableMeta> meta;
 
         private OsuSpriteText deletedLabel = null!;
 
-        public CommentAuthorLine(Comment comment)
+        public CommentAuthorLine(Comment comment, IReadOnlyList<CommentableMeta> meta)
         {
             this.comment = comment;
+            this.meta = meta;
         }
 
         [BackgroundDependencyLoader]
@@ -49,6 +50,17 @@ namespace osu.Game.Overlays.Comments
                     username.AddText(comment.LegacyName!);
             }));
 
+            var ownerMeta = meta.FirstOrDefault(m => m.Id == comment.CommentableId && m.Type == comment.CommentableType);
+
+            if (ownerMeta?.OwnerId != null && ownerMeta.OwnerId == comment.UserId)
+            {
+                Add(new OwnerTitleBadge(ownerMeta.OwnerTitle ?? string.Empty)
+                {
+                    // add top space to align with username
+                    Margin = new MarginPadding { Top = 2f },
+                });
+            }
+
             if (comment.Pinned)
                 Add(new PinnedCommentNotice());
 
@@ -65,6 +77,39 @@ namespace osu.Game.Overlays.Comments
         public void MarkDeleted()
         {
             deletedLabel.Show();
+        }
+
+        private partial class OwnerTitleBadge : CircularContainer
+        {
+            private readonly string title;
+
+            public OwnerTitleBadge(string title)
+            {
+                this.title = title;
+            }
+
+            [BackgroundDependencyLoader]
+            private void load(OverlayColourProvider colourProvider)
+            {
+                AutoSizeAxes = Axes.Both;
+                Masking = true;
+
+                InternalChildren = new Drawable[]
+                {
+                    new Box
+                    {
+                        RelativeSizeAxes = Axes.Both,
+                        Colour = colourProvider.Light1,
+                    },
+                    new OsuSpriteText
+                    {
+                        Text = title,
+                        Font = OsuFont.Default.With(size: 10, weight: FontWeight.Bold),
+                        Margin = new MarginPadding { Vertical = 2, Horizontal = 5 },
+                        Colour = colourProvider.Background6,
+                    },
+                };
+            }
         }
 
         private partial class PinnedCommentNotice : FillFlowContainer
