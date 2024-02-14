@@ -129,7 +129,6 @@ namespace osu.Game.Overlays.Toolbar
                             ValuePrefix = mainValuePrefix,
                             Anchor = Anchor.CentreRight,
                             Origin = Anchor.CentreRight,
-                            Font = OsuFont.GetFont().With(fixedWidth: true),
                         },
                         new Container
                         {
@@ -142,7 +141,7 @@ namespace osu.Game.Overlays.Toolbar
                                 {
                                     Anchor = Anchor.CentreRight,
                                     Origin = Anchor.CentreRight,
-                                    Font = OsuFont.GetFont(size: 12, fixedWidth: true, weight: FontWeight.SemiBold),
+                                    Font = OsuFont.Default.With(size: 12, fixedWidth: true, weight: FontWeight.SemiBold),
                                     AlwaysPresent = true,
                                 },
                                 titleText = new OsuSpriteText
