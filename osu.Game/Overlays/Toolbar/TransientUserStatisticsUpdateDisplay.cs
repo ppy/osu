@@ -84,7 +84,7 @@ namespace osu.Game.Overlays.Toolbar
                 if (update.After.PP != null)
                     pp.Display(update.Before.PP ?? update.After.PP.Value, Math.Abs((update.After.PP - update.Before.PP) ?? 0M), update.After.PP.Value);
 
-                this.Delay(4000).FadeOut(500, Easing.OutQuint);
+                this.Delay(5000).FadeOut(500, Easing.OutQuint);
             });
         }
 
@@ -183,11 +183,11 @@ namespace osu.Game.Overlays.Toolbar
                 titleText.Alpha = 1;
                 deltaValue.Alpha = 0;
 
-                using (BeginDelayedSequence(1000))
+                using (BeginDelayedSequence(1500))
                 {
                     titleText.FadeOut(250, Easing.OutQuint);
                     deltaValue.FadeIn(250, Easing.OutQuint)
-                              .Then().Delay(1000)
+                              .Then().Delay(1500)
                               .Then().Schedule(() =>
                               {
                                   mainValue.Current.Value = after;
