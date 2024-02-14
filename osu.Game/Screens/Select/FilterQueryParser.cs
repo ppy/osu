@@ -431,7 +431,7 @@ namespace osu.Game.Screens.Select
 
             try
             {
-                List<string> keys = new List<string> { "seconds", "minutes", "hours", "days", "months", "years" };
+                List<string> keys = new List<string> { @"seconds", @"minutes", @"hours", @"days", @"months", @"years" };
 
                 foreach (string key in keys)
                 {
@@ -445,27 +445,27 @@ namespace osu.Game.Screens.Select
 
                         switch (key)
                         {
-                            case "seconds":
+                            case @"seconds":
                                 dateTimeOffset = (dateTimeOffset ?? now).AddSeconds(-length);
                                 break;
 
-                            case "minutes":
+                            case @"minutes":
                                 dateTimeOffset = (dateTimeOffset ?? now).AddMinutes(-length);
                                 break;
 
-                            case "hours":
+                            case @"hours":
                                 dateTimeOffset = (dateTimeOffset ?? now).AddHours(-length);
                                 break;
 
-                            case "days":
+                            case @"days":
                                 dateTimeOffset = (dateTimeOffset ?? now).AddDays(-length);
                                 break;
 
-                            case "months":
+                            case @"months":
                                 dateTimeOffset = (dateTimeOffset ?? now).AddMonths(-(int)length);
                                 break;
 
-                            case "years":
+                            case @"years":
                                 dateTimeOffset = (dateTimeOffset ?? now).AddYears(-(int)length);
                                 break;
                         }
