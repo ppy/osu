@@ -127,7 +127,7 @@ namespace osu.Game.Overlays.Toolbar
                             ValuePrefix = mainValuePrefix,
                             Anchor = Anchor.CentreRight,
                             Origin = Anchor.CentreRight,
-                            Font = OsuFont.GetFont(),
+                            Font = OsuFont.GetFont().With(fixedWidth: true),
                         },
                         new Container
                         {
@@ -140,7 +140,7 @@ namespace osu.Game.Overlays.Toolbar
                                 {
                                     Anchor = Anchor.CentreRight,
                                     Origin = Anchor.CentreRight,
-                                    Font = OsuFont.GetFont(size: 12, fixedWidth: false, weight: FontWeight.SemiBold),
+                                    Font = OsuFont.GetFont(size: 12, fixedWidth: true, weight: FontWeight.SemiBold),
                                     AlwaysPresent = true,
                                 },
                                 titleText = new OsuSpriteText
@@ -183,11 +183,11 @@ namespace osu.Game.Overlays.Toolbar
                 titleText.Alpha = 1;
                 deltaValue.Alpha = 0;
 
-                using (BeginDelayedSequence(1500))
+                using (BeginDelayedSequence(1200))
                 {
-                    titleText.FadeOut(250, Easing.OutQuint);
-                    deltaValue.FadeIn(250, Easing.OutQuint)
-                              .Then().Delay(1500)
+                    titleText.FadeOut(250, Easing.OutQuad);
+                    deltaValue.FadeIn(250, Easing.OutQuad)
+                              .Then().Delay(500)
                               .Then().Schedule(() =>
                               {
                                   mainValue.Current.Value = after;
@@ -200,9 +200,9 @@ namespace osu.Game.Overlays.Toolbar
         private partial class Counter<T> : RollingCounter<T>
             where T : struct, IEquatable<T>, IFormattable
         {
-            public const double ROLLING_DURATION = 500;
+            public const double ROLLING_DURATION = 1500;
 
-            public FontUsage Font { get; init; } = OsuFont.Default;
+            public FontUsage Font { get; init; } = OsuFont.Default.With(fixedWidth: true);
 
             public string ValuePrefix
             {
@@ -217,7 +217,13 @@ namespace osu.Game.Overlays.Toolbar
             private string valuePrefix = string.Empty;
 
             protected override LocalisableString FormatCount(T count) => LocalisableString.Format(@"{0}{1:N0}", ValuePrefix, count);
-            protected override OsuSpriteText CreateSpriteText() => base.CreateSpriteText().With(t => t.Font = Font);
+
+            protected override OsuSpriteText CreateSpriteText() => base.CreateSpriteText().With(t =>
+            {
+                t.Font = Font;
+                t.Spacing = new Vector2(-1.5f, 0);
+            });
+
             protected override double RollingDuration => ROLLING_DURATION;
         }
     }
