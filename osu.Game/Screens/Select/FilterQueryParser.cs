@@ -63,7 +63,7 @@ namespace osu.Game.Screens.Select
 
                 case "played":
                 case "lastplayed":
-                    return tryUpdateDateRange(ref criteria.LastPlayed, op, value);
+                    return tryUpdateDateAgoRange(ref criteria.LastPlayed, op, value);
 
                 case "divisor":
                     return TryUpdateCriteriaRange(ref criteria.BeatDivisor, op, value, tryParseInt);
@@ -381,10 +381,42 @@ namespace osu.Game.Screens.Select
             return tryUpdateCriteriaRange(ref criteria.Length, op, totalLength, minScale / 2.0);
         }
 
-        private static bool tryUpdateDateRange(ref FilterCriteria.OptionalRange<DateTimeOffset> dateRange, Operator op, string val)
+        /// <summary>
+        /// This function is intended for parsing "days / months / years ago" type filters.
+        /// </summary>
+        private static bool tryUpdateDateAgoRange(ref FilterCriteria.OptionalRange<DateTimeOffset> dateRange, Operator op, string val)
         {
-            if (op == Operator.Equal)
-                return false;
+            switch (op)
+            {
+                case Operator.Equal:
+                    // an equality filter is difficult to define for support here.
+                    // if "3 months 2 days ago" means a single concrete time instant, such a filter is basically useless.
+                    // if it means a range of 24 hours, then that is annoying to write and also comes with its own implications
+                    // (does it mean "time instant 3 months 2 days ago, within 12 hours of tolerance either direction"?
+                    // does it mean "the full calendar day, from midnight to midnight, 3 months 2 days ago"?)
+                    // as such, for simplicity, just refuse to support this.
+                    return false;
+
+                // for the remaining operators, since the value provided to this function is an "ago" type value
+                // (as in, referring to some amount of time back),
+                // we'll want to flip the operator, such that `>5d` means "more than five days ago", as in "*before* five days ago",
+                // as intended by the user.
+                case Operator.Less:
+                    op = Operator.Greater;
+                    break;
+
+                case Operator.LessOrEqual:
+                    op = Operator.GreaterOrEqual;
+                    break;
+
+                case Operator.Greater:
+                    op = Operator.Less;
+                    break;
+
+                case Operator.GreaterOrEqual:
+                    op = Operator.LessOrEqual;
+                    break;
+            }
 
             GroupCollection? match = null;
 
@@ -448,32 +480,7 @@ namespace osu.Game.Screens.Select
             if (!dateTimeOffset.HasValue)
                 return false;
 
-            return tryUpdateCriteriaRange(ref dateRange, reverseInequalityOperator(op), dateTimeOffset.Value);
-        }
-
-        // Function to reverse an Operator
-        private static Operator reverseInequalityOperator(Operator ope)
-        {
-            switch (ope)
-            {
-                default:
-                    throw new ArgumentOutOfRangeException(nameof(ope), $"Unsupported operator {ope}");
-
-                case Operator.Equal:
-                    return Operator.Equal;
-
-                case Operator.Greater:
-                    return Operator.Less;
-
-                case Operator.GreaterOrEqual:
-                    return Operator.LessOrEqual;
-
-                case Operator.Less:
-                    return Operator.Greater;
-
-                case Operator.LessOrEqual:
-                    return Operator.GreaterOrEqual;
-            }
+            return tryUpdateCriteriaRange(ref dateRange, op, dateTimeOffset.Value);
         }
     }
 }
