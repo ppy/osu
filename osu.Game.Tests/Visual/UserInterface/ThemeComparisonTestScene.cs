@@ -14,18 +14,18 @@ namespace osu.Game.Tests.Visual.UserInterface
 {
     public abstract partial class ThemeComparisonTestScene : OsuGridTestScene
     {
-        private readonly bool showNoColourProvider;
+        private readonly bool showWithoutColourProvider;
 
-        protected ThemeComparisonTestScene(bool showNoColourProvider = true)
-            : base(1, showNoColourProvider ? 2 : 1)
+        protected ThemeComparisonTestScene(bool showWithoutColourProvider = true)
+            : base(1, showWithoutColourProvider ? 2 : 1)
         {
-            this.showNoColourProvider = showNoColourProvider;
+            this.showWithoutColourProvider = showWithoutColourProvider;
         }
 
         [BackgroundDependencyLoader]
         private void load(OsuColour colours)
         {
-            if (showNoColourProvider)
+            if (showWithoutColourProvider)
             {
                 Cell(0, 0).AddRange(new[]
                 {
@@ -43,7 +43,7 @@ namespace osu.Game.Tests.Visual.UserInterface
         {
             var colourProvider = new OverlayColourProvider(colourScheme);
 
-            int col = showNoColourProvider ? 1 : 0;
+            int col = showWithoutColourProvider ? 1 : 0;
 
             Cell(0, col).Clear();
             Cell(0, col).Add(new DependencyProvidingContainer
