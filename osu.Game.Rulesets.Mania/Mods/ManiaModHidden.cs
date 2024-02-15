@@ -21,9 +21,9 @@ namespace osu.Game.Rulesets.Mania.Mods
         /// </summary>
         private const float reference_playfield_height = 768;
 
-        private const float min_coverage = 160f / reference_playfield_height;
-        private const float max_coverage = 400f / reference_playfield_height;
-        private const float coverage_increase_per_combo = 0.5f / reference_playfield_height;
+        public const float MIN_COVERAGE = 160f;
+        public const float MAX_COVERAGE = 400f;
+        private const float coverage_increase_per_combo = 0.5f;
 
         public override LocalisableString Description => @"Keys fade out before you hit them!";
         public override double ScoreMultiplier => 1;
@@ -34,7 +34,7 @@ namespace osu.Game.Rulesets.Mania.Mods
             typeof(ManiaModCover)
         }).ToArray();
 
-        public override BindableNumber<float> Coverage { get; } = new BindableFloat(min_coverage);
+        public override BindableNumber<float> Coverage { get; } = new BindableFloat(MIN_COVERAGE);
         protected override CoverExpandDirection ExpandDirection => CoverExpandDirection.AgainstScroll;
 
         private readonly BindableInt combo = new BindableInt();
@@ -45,7 +45,12 @@ namespace osu.Game.Rulesets.Mania.Mods
 
             combo.UnbindAll();
             combo.BindTo(scoreProcessor.Combo);
-            combo.BindValueChanged(c => Coverage.Value = Math.Min(max_coverage, min_coverage + c.NewValue * coverage_increase_per_combo), true);
+            combo.BindValueChanged(c =>
+            {
+                Coverage.Value = Math.Min(
+                    MAX_COVERAGE / reference_playfield_height,
+                    MIN_COVERAGE / reference_playfield_height + c.NewValue * coverage_increase_per_combo / reference_playfield_height);
+            }, true);
         }
 
         protected override PlayfieldCoveringWrapper CreateCover(Drawable content) => new LegacyPlayfieldCover(content);
