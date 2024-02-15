@@ -9,12 +9,15 @@ using osu.Game.Rulesets.Mania.UI;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Game.Rulesets.Mania.Skinning;
+using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Scoring;
+using osu.Game.Rulesets.UI;
+using osu.Game.Screens.Play;
 using osu.Game.Skinning;
 
 namespace osu.Game.Rulesets.Mania.Mods
 {
-    public partial class ManiaModHidden : ManiaModWithPlayfieldCover
+    public partial class ManiaModHidden : ManiaModWithPlayfieldCover, IApplicableToPlayer, IUpdatableByPlayfield
     {
         /// <summary>
         /// osu!stable is referenced to 768px.
@@ -37,6 +40,7 @@ namespace osu.Game.Rulesets.Mania.Mods
         public override BindableNumber<float> Coverage { get; } = new BindableFloat(MIN_COVERAGE);
         protected override CoverExpandDirection ExpandDirection => CoverExpandDirection.AgainstScroll;
 
+        private readonly IBindable<bool> isBreakTime = new Bindable<bool>();
         private readonly BindableInt combo = new BindableInt();
 
         public override void ApplyToScoreProcessor(ScoreProcessor scoreProcessor)
@@ -45,12 +49,19 @@ namespace osu.Game.Rulesets.Mania.Mods
 
             combo.UnbindAll();
             combo.BindTo(scoreProcessor.Combo);
-            combo.BindValueChanged(c =>
-            {
-                Coverage.Value = Math.Min(
-                    MAX_COVERAGE / reference_playfield_height,
-                    MIN_COVERAGE / reference_playfield_height + c.NewValue * coverage_increase_per_combo / reference_playfield_height);
-            }, true);
+        }
+
+        public void ApplyToPlayer(Player player)
+        {
+            isBreakTime.UnbindAll();
+            isBreakTime.BindTo(player.IsBreakTime);
+        }
+
+        public void Update(Playfield playfield)
+        {
+            Coverage.Value = isBreakTime.Value
+                ? 0
+                : Math.Min(MAX_COVERAGE, MIN_COVERAGE + combo.Value * coverage_increase_per_combo) / reference_playfield_height;
         }
 
         protected override PlayfieldCoveringWrapper CreateCover(Drawable content) => new LegacyPlayfieldCover(content);

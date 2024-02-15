@@ -7,8 +7,12 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Testing;
 using osu.Framework.Utils;
+using osu.Game.Beatmaps;
+using osu.Game.Beatmaps.Timing;
 using osu.Game.Rulesets.Mania.Mods;
+using osu.Game.Rulesets.Mania.Objects;
 using osu.Game.Rulesets.Mania.UI;
+using osu.Game.Rulesets.Objects;
 using osu.Game.Tests.Visual;
 
 namespace osu.Game.Rulesets.Mania.Tests.Mods
@@ -62,6 +66,21 @@ namespace osu.Game.Rulesets.Mania.Tests.Mods
 
             AddStep("set combo to 480", () => Player.ScoreProcessor.Combo.Value = 480);
             AddStep("set playfield width to 0.5", () => Player.Width = 0.5f);
+        }
+
+        [Test]
+        public void TestNoCoverageDuringBreak()
+        {
+            CreateModTest(new ModTestData
+            {
+                Mod = new ManiaModHidden(),
+                Beatmap = new Beatmap
+                {
+                    HitObjects = Enumerable.Range(1, 100).Select(i => (HitObject)new Note { StartTime = 1000 + 200 * i }).ToList(),
+                    Breaks = { new BreakPeriod(2000, 28000) }
+                },
+                PassCondition = () => Player.IsBreakTime.Value && checkCoverage(0)
+            });
         }
 
         private bool checkCoverage(float expected)
