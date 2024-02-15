@@ -30,7 +30,7 @@ namespace osu.Game.Overlays.Profile.Header.Components
                 Content = s.NewValue?.GlobalRank?.ToLocalisableString("\\##,##0") ?? (LocalisableString)"-";
             }, true);
 
-            // needed as statistics doesn't populate User
+            // needed as `UserStatistics` doesn't populate `User`
             User.BindValueChanged(u =>
             {
                 var rankHighest = u.NewValue?.RankHighest;

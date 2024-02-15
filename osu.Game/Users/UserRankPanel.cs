@@ -167,8 +167,8 @@ namespace osu.Game.Users
                                 new GlobalRankDisplay
                                 {
                                     UserStatistics = { BindTarget = statistics },
-                                    // TODO: make highest rank update, as api.LocalUser doesn't update
-                                    // maybe move to statistics in api, so `SoloStatisticsWatcher` can update the value
+                                    // TODO: make highest rank update, as `api.LocalUser` doesn't update
+                                    // maybe move to `UserStatistics` in api, so `SoloStatisticsWatcher` can update the value
                                     User = { BindTarget = user },
                                 },
                                 countryRankDisplay = new ProfileValueDisplay(true)
