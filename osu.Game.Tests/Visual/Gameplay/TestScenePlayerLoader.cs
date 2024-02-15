@@ -268,9 +268,9 @@ namespace osu.Game.Tests.Visual.Gameplay
         {
             addVolumeSteps("master and music volumes", () =>
             {
-                audioManager.Volume.Value = 0.15;
-                audioManager.VolumeTrack.Value = 0.01;
-            }, () => audioManager.Volume.Value == 0.15 && audioManager.VolumeTrack.Value == 0.67);
+                audioManager.Volume.Value = 0.6;
+                audioManager.VolumeTrack.Value = 0.15;
+            }, () => Precision.AlmostEquals(audioManager.Volume.Value, 0.6) && Precision.AlmostEquals(audioManager.VolumeTrack.Value, 0.83));
         }
 
         [Test]
@@ -280,7 +280,7 @@ namespace osu.Game.Tests.Visual.Gameplay
             {
                 audioManager.Volume.Value = 0.01;
                 audioManager.VolumeTrack.Value = 0.15;
-            }, () => audioManager.Volume.Value == 0.1 && audioManager.VolumeTrack.Value == 1);
+            }, () => Precision.AlmostEquals(audioManager.Volume.Value, 0.5) && Precision.AlmostEquals(audioManager.VolumeTrack.Value, 1));
         }
 
         [Test]
