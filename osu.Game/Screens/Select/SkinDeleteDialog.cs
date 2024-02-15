@@ -2,6 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using osu.Framework.Allocation;
+using osu.Game.Database;
 using osu.Game.Skinning;
 using osu.Game.Overlays.Dialog;
 
@@ -9,12 +10,12 @@ namespace osu.Game.Screens.Select
 {
     public partial class SkinDeleteDialog : DangerousActionDialog
     {
-        private readonly Skin skin;
+        private readonly Live<SkinInfo> skin;
 
-        public SkinDeleteDialog(Skin skin)
+        public SkinDeleteDialog(Live<SkinInfo> skin)
         {
             this.skin = skin;
-            BodyText = skin.SkinInfo.Value.Name;
+            BodyText = skin.Value.Name;
         }
 
         [BackgroundDependencyLoader]
@@ -22,7 +23,7 @@ namespace osu.Game.Screens.Select
         {
             DangerousAction = () =>
             {
-                manager.Delete(skin.SkinInfo.Value);
+                manager.Delete(skin.Value);
                 manager.CurrentSkinInfo.SetDefault();
             };
         }

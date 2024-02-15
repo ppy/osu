@@ -3,7 +3,9 @@
 
 using System.Threading.Tasks;
 using osu.Framework.Allocation;
+using osu.Framework.Bindables;
 using osu.Framework.Localisation;
+using osu.Game.Database;
 using osu.Game.Localisation;
 using osu.Game.Skinning;
 
@@ -15,8 +17,13 @@ namespace osu.Game.Overlays.Settings.Sections.Maintenance
 
         private SettingsButton deleteSkinsButton = null!;
 
+        [Resolved]
+        private SkinManager skins { get; set; } = null!;
+
+        private readonly BindableBool performingDeletionOperation = new BindableBool();
+
         [BackgroundDependencyLoader]
-        private void load(SkinManager skins, IDialogOverlay? dialogOverlay)
+        private void load(IDialogOverlay? dialogOverlay)
         {
             Add(deleteSkinsButton = new DangerousSettingsButton
             {
@@ -25,11 +32,24 @@ namespace osu.Game.Overlays.Settings.Sections.Maintenance
                 {
                     dialogOverlay?.Push(new MassDeleteConfirmationDialog(() =>
                     {
-                        deleteSkinsButton.Enabled.Value = false;
-                        Task.Run(() => skins.Delete()).ContinueWith(_ => Schedule(() => deleteSkinsButton.Enabled.Value = true));
+                        performingDeletionOperation.Value = true;
+                        Task.Run(() => skins.Delete()).ContinueWith(_ => Schedule(() => performingDeletionOperation.Value = false));
                     }));
                 }
             });
         }
+
+        private IBindable<Live<SkinInfo>> currentSkinInfo = null!;
+
+        protected override void LoadComplete()
+        {
+            base.LoadComplete();
+
+            currentSkinInfo = skins.CurrentSkinInfo.GetBoundCopy();
+            currentSkinInfo.BindDisabledChanged(_ => updateDisabledState());
+            performingDeletionOperation.BindValueChanged(_ => updateDisabledState(), true);
+        }
+
+        private void updateDisabledState() => deleteSkinsButton.Enabled.Value = !currentSkinInfo.Disabled && !performingDeletionOperation.Value;
     }
 }

@@ -179,7 +179,7 @@ namespace osu.Game.Overlays.Settings.Sections
             [Resolved(CanBeNull = true)]
             private IDialogOverlay dialogOverlay { get; set; }
 
-            private Bindable<Skin> currentSkin;
+            private Bindable<Live<SkinInfo>> currentSkinInfo;
 
             [BackgroundDependencyLoader]
             private void load()
@@ -192,13 +192,16 @@ namespace osu.Game.Overlays.Settings.Sections
             {
                 base.LoadComplete();
 
-                currentSkin = skins.CurrentSkin.GetBoundCopy();
-                currentSkin.BindValueChanged(skin => Enabled.Value = skin.NewValue.SkinInfo.PerformRead(s => !s.Protected), true);
+                currentSkinInfo = skins.CurrentSkinInfo.GetBoundCopy();
+                currentSkinInfo.BindValueChanged(_ => updateEnabledState());
+                currentSkinInfo.BindDisabledChanged(_ => updateEnabledState(), true);
             }
+
+            private void updateEnabledState() => Enabled.Value = !currentSkinInfo.Disabled && currentSkinInfo.Value.PerformRead(s => !s.Protected);
 
             private void delete()
             {
-                dialogOverlay?.Push(new SkinDeleteDialog(currentSkin.Value));
+                dialogOverlay?.Push(new SkinDeleteDialog(currentSkinInfo.Value));
             }
         }
     }
