@@ -118,7 +118,7 @@ namespace osu.Game.Screens.Play
                 token = r.ID;
                 tcs.SetResult(true);
             };
-            req.Failure += handleTokenFailure;
+            req.Failure += ex => handleTokenFailure(ex, displayNotification: true);
 
             api.Queue(req);
 
@@ -128,14 +128,20 @@ namespace osu.Game.Screens.Play
 
             return true;
 
-            void handleTokenFailure(Exception exception)
+            void handleTokenFailure(Exception exception, bool displayNotification = false)
             {
                 tcs.SetResult(false);
 
-                if (HandleTokenRetrievalFailure(exception))
+                bool shouldExit = ShouldExitOnTokenRetrievalFailure(exception);
+
+                if (displayNotification || shouldExit)
                 {
+                    string whatWillHappen = shouldExit
+                        ? "You are not able to submit a score."
+                        : "The following score will not be submitted.";
+
                     if (string.IsNullOrEmpty(exception.Message))
-                        Logger.Error(exception, "Failed to retrieve a score submission token.");
+                        Logger.Error(exception, $"{whatWillHappen} Failed to retrieve a score submission token.");
                     else
                     {
                         switch (exception.Message)
@@ -143,30 +149,27 @@ namespace osu.Game.Screens.Play
                             case @"missing token header":
                             case @"invalid client hash":
                             case @"invalid verification hash":
-                                Logger.Log("You are not able to submit a score. Please ensure that you are using the latest version of the official game releases.", level: LogLevel.Important);
+                                Logger.Log($"{whatWillHappen} Please ensure that you are using the latest version of the official game releases.", level: LogLevel.Important);
                                 break;
 
                             case @"expired token":
-                                Logger.Log("Score submission failed because your system clock is set incorrectly. Please check your system time, date and timezone.", level: LogLevel.Important);
+                                Logger.Log($"{whatWillHappen} Your system clock is set incorrectly. Please check your system time, date and timezone.", level: LogLevel.Important);
                                 break;
 
                             default:
-                                Logger.Log($"You are not able to submit a score: {exception.Message}", level: LogLevel.Important);
+                                Logger.Log($"{whatWillHappen} {exception.Message}", level: LogLevel.Important);
                                 break;
                         }
                     }
+                }
 
+                if (shouldExit)
+                {
                     Schedule(() =>
                     {
                         ValidForResume = false;
                         this.Exit();
                     });
-                }
-                else
-                {
-                    // Gameplay is allowed to continue, but we still should keep track of the error.
-                    // In the future, this should be visible to the user in some way.
-                    Logger.Log($"Score submission token retrieval failed ({exception.Message})");
                 }
             }
         }
@@ -176,7 +179,7 @@ namespace osu.Game.Screens.Play
         /// </summary>
         /// <param name="exception">The error causing the failure.</param>
         /// <returns>Whether gameplay should be immediately exited as a result. Returning false allows the gameplay session to continue. Defaults to true.</returns>
-        protected virtual bool HandleTokenRetrievalFailure(Exception exception) => true;
+        protected virtual bool ShouldExitOnTokenRetrievalFailure(Exception exception) => true;
 
         protected override async Task PrepareScoreForResultsAsync(Score score)
         {
@@ -237,7 +240,7 @@ namespace osu.Game.Screens.Play
 
         /// <summary>
         /// Construct a request to be used for retrieval of the score token.
-        /// Can return null, at which point <see cref="HandleTokenRetrievalFailure"/> will be fired.
+        /// Can return null, at which point <see cref="ShouldExitOnTokenRetrievalFailure"/> will be fired.
         /// </summary>
         [CanBeNull]
         protected abstract APIRequest<APIScoreToken> CreateTokenRequest();
