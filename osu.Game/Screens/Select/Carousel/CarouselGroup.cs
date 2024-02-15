@@ -2,6 +2,8 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System.Collections.Generic;
+using osu.Framework.Extensions.ListExtensions;
+using osu.Framework.Lists;
 
 namespace osu.Game.Screens.Select.Carousel
 {
@@ -12,7 +14,7 @@ namespace osu.Game.Screens.Select.Carousel
     {
         public override DrawableCarouselItem? CreateDrawableRepresentation() => null;
 
-        public IReadOnlyList<CarouselItem> Items => items;
+        public SlimReadOnlyListWrapper<CarouselItem> Items => items.AsSlimReadOnly();
 
         public int TotalItemsNotFiltered { get; private set; }
 
