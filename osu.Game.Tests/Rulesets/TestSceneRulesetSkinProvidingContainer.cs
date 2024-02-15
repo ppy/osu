@@ -43,13 +43,13 @@ namespace osu.Game.Tests.Rulesets
 
             AddStep("setup provider", () =>
             {
-                var rulesetSkinProvider = new RulesetSkinProvidingContainer(Ruleset.Value.CreateInstance(), Beatmap.Value.Beatmap, Beatmap.Value.Skin);
-
-                rulesetSkinProvider.Add(requester = new SkinRequester());
-
+                requester = new SkinRequester();
                 requester.OnLoadAsync += () => textureOnLoad = requester.GetTexture("test-image");
 
-                Child = rulesetSkinProvider;
+                Child = new RulesetSkinProvidingContainer(Ruleset.Value.CreateInstance(), Beatmap.Value.Beatmap, Beatmap.Value.Skin)
+                {
+                    requester
+                };
             });
 
             AddAssert("requester got correct initial texture", () => textureOnLoad != null);
