@@ -2,6 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
+using System.ComponentModel;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Extensions.Color4Extensions;
@@ -13,11 +14,12 @@ using osu.Framework.Utils;
 using osu.Game.Rulesets.UI.Scrolling;
 using osuTK;
 using osuTK.Graphics;
+using Container = osu.Framework.Graphics.Containers.Container;
 
 namespace osu.Game.Rulesets.Mania.UI
 {
     /// <summary>
-    /// A <see cref="Container"/> that has its contents partially hidden by an adjustable "cover". This is intended to be used in a playfield.
+    /// A <see cref="Framework.Graphics.Containers.Container"/> that has its contents partially hidden by an adjustable "cover". This is intended to be used in a playfield.
     /// </summary>
     public partial class PlayfieldCoveringWrapper : CompositeDrawable
     {
@@ -157,11 +159,13 @@ namespace osu.Game.Rulesets.Mania.UI
         /// <summary>
         /// The cover expands along the scrolling direction.
         /// </summary>
+        [Description("Along scroll")]
         AlongScroll,
 
         /// <summary>
         /// The cover expands against the scrolling direction.
         /// </summary>
+        [Description("Against scroll")]
         AgainstScroll
     }
 }
