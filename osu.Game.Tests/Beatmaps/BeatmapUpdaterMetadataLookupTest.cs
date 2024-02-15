@@ -28,7 +28,12 @@ namespace osu.Game.Tests.Beatmaps
         [Test]
         public void TestLocalCacheQueriedFirst()
         {
-            var localLookupResult = new OnlineBeatmapMetadata { BeatmapID = 123456, BeatmapStatus = BeatmapOnlineStatus.Ranked };
+            var localLookupResult = new OnlineBeatmapMetadata
+            {
+                BeatmapID = 123456,
+                BeatmapStatus = BeatmapOnlineStatus.Ranked,
+                BeatmapSetStatus = BeatmapOnlineStatus.Ranked,
+            };
             localCachedMetadataSourceMock.Setup(src => src.Available).Returns(true);
             localCachedMetadataSourceMock.Setup(src => src.TryLookup(It.IsAny<BeatmapInfo>(), out localLookupResult))
                                          .Returns(true);
@@ -42,6 +47,7 @@ namespace osu.Game.Tests.Beatmaps
             metadataLookup.Update(beatmapSet, preferOnlineFetch: false);
 
             Assert.That(beatmap.Status, Is.EqualTo(BeatmapOnlineStatus.Ranked));
+            Assert.That(beatmapSet.Status, Is.EqualTo(BeatmapOnlineStatus.Ranked));
             localCachedMetadataSourceMock.Verify(src => src.TryLookup(beatmap, out It.Ref<OnlineBeatmapMetadata>.IsAny!), Times.Once);
             apiMetadataSourceMock.Verify(src => src.TryLookup(It.IsAny<BeatmapInfo>(), out It.Ref<OnlineBeatmapMetadata>.IsAny!), Times.Never);
         }
@@ -54,7 +60,12 @@ namespace osu.Game.Tests.Beatmaps
             localCachedMetadataSourceMock.Setup(src => src.TryLookup(It.IsAny<BeatmapInfo>(), out localLookupResult))
                                          .Returns(false);
 
-            var onlineLookupResult = new OnlineBeatmapMetadata { BeatmapID = 123456, BeatmapStatus = BeatmapOnlineStatus.Ranked };
+            var onlineLookupResult = new OnlineBeatmapMetadata
+            {
+                BeatmapID = 123456,
+                BeatmapStatus = BeatmapOnlineStatus.Ranked,
+                BeatmapSetStatus = BeatmapOnlineStatus.Ranked,
+            };
             apiMetadataSourceMock.Setup(src => src.Available).Returns(true);
             apiMetadataSourceMock.Setup(src => src.TryLookup(It.IsAny<BeatmapInfo>(), out onlineLookupResult))
                                  .Returns(true);
@@ -66,6 +77,7 @@ namespace osu.Game.Tests.Beatmaps
             metadataLookup.Update(beatmapSet, preferOnlineFetch: false);
 
             Assert.That(beatmap.Status, Is.EqualTo(BeatmapOnlineStatus.Ranked));
+            Assert.That(beatmapSet.Status, Is.EqualTo(BeatmapOnlineStatus.Ranked));
             localCachedMetadataSourceMock.Verify(src => src.TryLookup(beatmap, out It.Ref<OnlineBeatmapMetadata?>.IsAny!), Times.Once);
             apiMetadataSourceMock.Verify(src => src.TryLookup(beatmap, out It.Ref<OnlineBeatmapMetadata?>.IsAny!), Times.Once);
         }
@@ -73,12 +85,22 @@ namespace osu.Game.Tests.Beatmaps
         [Test]
         public void TestPreferOnlineFetch()
         {
-            var localLookupResult = new OnlineBeatmapMetadata { BeatmapID = 123456, BeatmapStatus = BeatmapOnlineStatus.Ranked };
+            var localLookupResult = new OnlineBeatmapMetadata
+            {
+                BeatmapID = 123456,
+                BeatmapStatus = BeatmapOnlineStatus.Ranked,
+                BeatmapSetStatus = BeatmapOnlineStatus.Ranked,
+            };
             localCachedMetadataSourceMock.Setup(src => src.Available).Returns(true);
             localCachedMetadataSourceMock.Setup(src => src.TryLookup(It.IsAny<BeatmapInfo>(), out localLookupResult))
                                          .Returns(true);
 
-            var onlineLookupResult = new OnlineBeatmapMetadata { BeatmapID = 123456, BeatmapStatus = BeatmapOnlineStatus.Graveyard };
+            var onlineLookupResult = new OnlineBeatmapMetadata
+            {
+                BeatmapID = 123456,
+                BeatmapStatus = BeatmapOnlineStatus.Graveyard,
+                BeatmapSetStatus = BeatmapOnlineStatus.Graveyard,
+            };
             apiMetadataSourceMock.Setup(src => src.Available).Returns(true);
             apiMetadataSourceMock.Setup(src => src.TryLookup(It.IsAny<BeatmapInfo>(), out onlineLookupResult))
                                  .Returns(true);
@@ -90,6 +112,7 @@ namespace osu.Game.Tests.Beatmaps
             metadataLookup.Update(beatmapSet, preferOnlineFetch: true);
 
             Assert.That(beatmap.Status, Is.EqualTo(BeatmapOnlineStatus.Graveyard));
+            Assert.That(beatmapSet.Status, Is.EqualTo(BeatmapOnlineStatus.Graveyard));
             localCachedMetadataSourceMock.Verify(src => src.TryLookup(beatmap, out It.Ref<OnlineBeatmapMetadata?>.IsAny!), Times.Never);
             apiMetadataSourceMock.Verify(src => src.TryLookup(beatmap, out It.Ref<OnlineBeatmapMetadata?>.IsAny!), Times.Once);
         }
@@ -97,7 +120,12 @@ namespace osu.Game.Tests.Beatmaps
         [Test]
         public void TestPreferOnlineFetchFallsBackToLocalCacheIfOnlineSourceUnavailable()
         {
-            var localLookupResult = new OnlineBeatmapMetadata { BeatmapID = 123456, BeatmapStatus = BeatmapOnlineStatus.Ranked };
+            var localLookupResult = new OnlineBeatmapMetadata
+            {
+                BeatmapID = 123456,
+                BeatmapStatus = BeatmapOnlineStatus.Ranked,
+                BeatmapSetStatus = BeatmapOnlineStatus.Ranked,
+            };
             localCachedMetadataSourceMock.Setup(src => src.Available).Returns(true);
             localCachedMetadataSourceMock.Setup(src => src.TryLookup(It.IsAny<BeatmapInfo>(), out localLookupResult))
                                          .Returns(true);
@@ -111,6 +139,7 @@ namespace osu.Game.Tests.Beatmaps
             metadataLookup.Update(beatmapSet, preferOnlineFetch: true);
 
             Assert.That(beatmap.Status, Is.EqualTo(BeatmapOnlineStatus.Ranked));
+            Assert.That(beatmapSet.Status, Is.EqualTo(BeatmapOnlineStatus.Ranked));
             localCachedMetadataSourceMock.Verify(src => src.TryLookup(beatmap, out It.Ref<OnlineBeatmapMetadata?>.IsAny!), Times.Once);
             apiMetadataSourceMock.Verify(src => src.TryLookup(beatmap, out It.Ref<OnlineBeatmapMetadata?>.IsAny!), Times.Never);
         }
@@ -135,6 +164,7 @@ namespace osu.Game.Tests.Beatmaps
             metadataLookup.Update(beatmapSet, preferOnlineFetch: false);
 
             Assert.That(beatmap.Status, Is.EqualTo(BeatmapOnlineStatus.None));
+            Assert.That(beatmapSet.Status, Is.EqualTo(BeatmapOnlineStatus.None));
             Assert.That(beatmap.OnlineID, Is.EqualTo(-1));
             localCachedMetadataSourceMock.Verify(src => src.TryLookup(beatmap, out It.Ref<OnlineBeatmapMetadata?>.IsAny!), Times.Once);
             apiMetadataSourceMock.Verify(src => src.TryLookup(beatmap, out It.Ref<OnlineBeatmapMetadata?>.IsAny!), Times.Once);
@@ -163,6 +193,7 @@ namespace osu.Game.Tests.Beatmaps
             metadataLookup.Update(beatmapSet, preferOnlineFetch);
 
             Assert.That(beatmap.Status, Is.EqualTo(BeatmapOnlineStatus.None));
+            Assert.That(beatmapSet.Status, Is.EqualTo(BeatmapOnlineStatus.None));
             Assert.That(beatmap.OnlineID, Is.EqualTo(123456));
         }
 
@@ -192,6 +223,218 @@ namespace osu.Game.Tests.Beatmaps
             metadataLookup.Update(beatmapSet, preferOnlineFetch);
 
             Assert.That(beatmap.OnlineID, Is.EqualTo(123456));
+        }
+
+        [Test]
+        public void TestReturnedMetadataHasDifferentOnlineID([Values] bool preferOnlineFetch)
+        {
+            var lookupResult = new OnlineBeatmapMetadata { BeatmapID = 654321, BeatmapStatus = BeatmapOnlineStatus.Ranked };
+
+            var targetMock = preferOnlineFetch ? apiMetadataSourceMock : localCachedMetadataSourceMock;
+            targetMock.Setup(src => src.Available).Returns(true);
+            targetMock.Setup(src => src.TryLookup(It.IsAny<BeatmapInfo>(), out lookupResult))
+                      .Returns(true);
+
+            var beatmap = new BeatmapInfo { OnlineID = 123456 };
+            var beatmapSet = new BeatmapSetInfo(beatmap.Yield());
+            beatmap.BeatmapSet = beatmapSet;
+
+            metadataLookup.Update(beatmapSet, preferOnlineFetch);
+
+            Assert.That(beatmap.Status, Is.EqualTo(BeatmapOnlineStatus.None));
+            Assert.That(beatmap.OnlineID, Is.EqualTo(-1));
+        }
+
+        [Test]
+        public void TestMetadataLookupForBeatmapWithoutPopulatedIDAndCorrectHash([Values] bool preferOnlineFetch)
+        {
+            var lookupResult = new OnlineBeatmapMetadata
+            {
+                BeatmapID = 654321,
+                BeatmapStatus = BeatmapOnlineStatus.Ranked,
+                MD5Hash = @"deadbeef",
+            };
+
+            var targetMock = preferOnlineFetch ? apiMetadataSourceMock : localCachedMetadataSourceMock;
+            targetMock.Setup(src => src.Available).Returns(true);
+            targetMock.Setup(src => src.TryLookup(It.IsAny<BeatmapInfo>(), out lookupResult))
+                      .Returns(true);
+
+            var beatmap = new BeatmapInfo
+            {
+                MD5Hash = @"deadbeef"
+            };
+            var beatmapSet = new BeatmapSetInfo(beatmap.Yield());
+            beatmap.BeatmapSet = beatmapSet;
+
+            metadataLookup.Update(beatmapSet, preferOnlineFetch);
+
+            Assert.That(beatmap.Status, Is.EqualTo(BeatmapOnlineStatus.Ranked));
+            Assert.That(beatmap.OnlineID, Is.EqualTo(654321));
+        }
+
+        [Test]
+        public void TestMetadataLookupForBeatmapWithoutPopulatedIDAndIncorrectHash([Values] bool preferOnlineFetch)
+        {
+            var lookupResult = new OnlineBeatmapMetadata
+            {
+                BeatmapID = 654321,
+                BeatmapStatus = BeatmapOnlineStatus.Ranked,
+                MD5Hash = @"cafebabe",
+            };
+
+            var targetMock = preferOnlineFetch ? apiMetadataSourceMock : localCachedMetadataSourceMock;
+            targetMock.Setup(src => src.Available).Returns(true);
+            targetMock.Setup(src => src.TryLookup(It.IsAny<BeatmapInfo>(), out lookupResult))
+                      .Returns(true);
+
+            var beatmap = new BeatmapInfo
+            {
+                MD5Hash = @"deadbeef"
+            };
+            var beatmapSet = new BeatmapSetInfo(beatmap.Yield());
+            beatmap.BeatmapSet = beatmapSet;
+
+            metadataLookup.Update(beatmapSet, preferOnlineFetch);
+
+            Assert.That(beatmap.Status, Is.EqualTo(BeatmapOnlineStatus.None));
+            Assert.That(beatmap.OnlineID, Is.EqualTo(-1));
+        }
+
+        [Test]
+        public void TestReturnedMetadataHasDifferentHash([Values] bool preferOnlineFetch)
+        {
+            var lookupResult = new OnlineBeatmapMetadata
+            {
+                BeatmapID = 654321,
+                BeatmapStatus = BeatmapOnlineStatus.Ranked,
+                MD5Hash = @"deadbeef"
+            };
+
+            var targetMock = preferOnlineFetch ? apiMetadataSourceMock : localCachedMetadataSourceMock;
+            targetMock.Setup(src => src.Available).Returns(true);
+            targetMock.Setup(src => src.TryLookup(It.IsAny<BeatmapInfo>(), out lookupResult))
+                      .Returns(true);
+
+            var beatmap = new BeatmapInfo
+            {
+                OnlineID = 654321,
+                MD5Hash = @"cafebabe",
+            };
+            var beatmapSet = new BeatmapSetInfo(beatmap.Yield());
+            beatmap.BeatmapSet = beatmapSet;
+
+            metadataLookup.Update(beatmapSet, preferOnlineFetch);
+
+            Assert.That(beatmap.Status, Is.EqualTo(BeatmapOnlineStatus.None));
+            Assert.That(beatmap.OnlineID, Is.EqualTo(654321));
+        }
+
+        [Test]
+        public void TestPartiallyModifiedSet([Values] bool preferOnlineFetch)
+        {
+            var firstResult = new OnlineBeatmapMetadata
+            {
+                BeatmapID = 654321,
+                BeatmapStatus = BeatmapOnlineStatus.Ranked,
+                BeatmapSetStatus = BeatmapOnlineStatus.Ranked,
+                MD5Hash = @"cafebabe"
+            };
+            var secondResult = new OnlineBeatmapMetadata
+            {
+                BeatmapID = 666666,
+                BeatmapStatus = BeatmapOnlineStatus.Ranked,
+                BeatmapSetStatus = BeatmapOnlineStatus.Ranked,
+                MD5Hash = @"dededede"
+            };
+
+            var targetMock = preferOnlineFetch ? apiMetadataSourceMock : localCachedMetadataSourceMock;
+            targetMock.Setup(src => src.Available).Returns(true);
+            targetMock.Setup(src => src.TryLookup(It.Is<BeatmapInfo>(bi => bi.OnlineID == 654321), out firstResult))
+                      .Returns(true);
+            targetMock.Setup(src => src.TryLookup(It.Is<BeatmapInfo>(bi => bi.OnlineID == 666666), out secondResult))
+                      .Returns(true);
+
+            var firstBeatmap = new BeatmapInfo
+            {
+                OnlineID = 654321,
+                MD5Hash = @"cafebabe",
+            };
+            var secondBeatmap = new BeatmapInfo
+            {
+                OnlineID = 666666,
+                MD5Hash = @"deadbeef"
+            };
+            var beatmapSet = new BeatmapSetInfo(new[]
+            {
+                firstBeatmap,
+                secondBeatmap
+            });
+            firstBeatmap.BeatmapSet = beatmapSet;
+            secondBeatmap.BeatmapSet = beatmapSet;
+
+            metadataLookup.Update(beatmapSet, preferOnlineFetch);
+
+            Assert.That(firstBeatmap.Status, Is.EqualTo(BeatmapOnlineStatus.Ranked));
+            Assert.That(firstBeatmap.OnlineID, Is.EqualTo(654321));
+
+            Assert.That(secondBeatmap.Status, Is.EqualTo(BeatmapOnlineStatus.None));
+            Assert.That(secondBeatmap.OnlineID, Is.EqualTo(666666));
+
+            Assert.That(beatmapSet.Status, Is.EqualTo(BeatmapOnlineStatus.None));
+        }
+
+        [Test]
+        public void TestPartiallyMaliciousSet([Values] bool preferOnlineFetch)
+        {
+            var firstResult = new OnlineBeatmapMetadata
+            {
+                BeatmapID = 654321,
+                BeatmapStatus = BeatmapOnlineStatus.Ranked,
+                BeatmapSetStatus = BeatmapOnlineStatus.Ranked,
+                MD5Hash = @"cafebabe"
+            };
+            var secondResult = new OnlineBeatmapMetadata
+            {
+                BeatmapStatus = BeatmapOnlineStatus.Ranked,
+                BeatmapSetStatus = BeatmapOnlineStatus.Ranked,
+                MD5Hash = @"dededede"
+            };
+
+            var targetMock = preferOnlineFetch ? apiMetadataSourceMock : localCachedMetadataSourceMock;
+            targetMock.Setup(src => src.Available).Returns(true);
+            targetMock.Setup(src => src.TryLookup(It.Is<BeatmapInfo>(bi => bi.OnlineID == 654321), out firstResult))
+                      .Returns(true);
+            targetMock.Setup(src => src.TryLookup(It.Is<BeatmapInfo>(bi => bi.OnlineID == 666666), out secondResult))
+                      .Returns(true);
+
+            var firstBeatmap = new BeatmapInfo
+            {
+                OnlineID = 654321,
+                MD5Hash = @"cafebabe",
+            };
+            var secondBeatmap = new BeatmapInfo
+            {
+                OnlineID = 666666,
+                MD5Hash = @"deadbeef"
+            };
+            var beatmapSet = new BeatmapSetInfo(new[]
+            {
+                firstBeatmap,
+                secondBeatmap
+            });
+            firstBeatmap.BeatmapSet = beatmapSet;
+            secondBeatmap.BeatmapSet = beatmapSet;
+
+            metadataLookup.Update(beatmapSet, preferOnlineFetch);
+
+            Assert.That(firstBeatmap.Status, Is.EqualTo(BeatmapOnlineStatus.Ranked));
+            Assert.That(firstBeatmap.OnlineID, Is.EqualTo(654321));
+
+            Assert.That(secondBeatmap.Status, Is.EqualTo(BeatmapOnlineStatus.None));
+            Assert.That(secondBeatmap.OnlineID, Is.EqualTo(-1));
+
+            Assert.That(beatmapSet.Status, Is.EqualTo(BeatmapOnlineStatus.None));
         }
     }
 }

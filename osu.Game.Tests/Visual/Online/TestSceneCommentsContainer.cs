@@ -170,6 +170,24 @@ namespace osu.Game.Tests.Visual.Online
             });
         }
 
+        [Test]
+        public void TestPostAsOwner()
+        {
+            setUpCommentsResponse(getExampleComments());
+            AddStep("show comments", () => commentsContainer.ShowComments(CommentableType.Beatmapset, 123));
+
+            setUpPostResponse(true);
+            AddStep("enter text", () => editorTextBox.Current.Value = "comm");
+            AddStep("submit", () => commentsContainer.ChildrenOfType<CommentEditor>().Single().ChildrenOfType<RoundedButton>().First().TriggerClick());
+
+            AddUntilStep("comment sent", () =>
+            {
+                string writtenText = editorTextBox.Current.Value;
+                var comment = commentsContainer.ChildrenOfType<DrawableComment>().LastOrDefault();
+                return comment != null && comment.ChildrenOfType<SpriteText>().Any(y => y.Text == writtenText) && comment.ChildrenOfType<SpriteText>().Any(y => y.Text == "MAPPER");
+            });
+        }
+
         private void setUpCommentsResponse(CommentBundle commentBundle)
             => AddStep("set up response", () =>
             {
@@ -183,7 +201,7 @@ namespace osu.Game.Tests.Visual.Online
                 };
             });
 
-        private void setUpPostResponse()
+        private void setUpPostResponse(bool asOwner = false)
             => AddStep("set up response", () =>
             {
                 dummyAPI.HandleRequest = request =>
@@ -191,7 +209,7 @@ namespace osu.Game.Tests.Visual.Online
                     if (!(request is CommentPostRequest req))
                         return false;
 
-                    req.TriggerSuccess(new CommentBundle
+                    var bundle = new CommentBundle
                     {
                         Comments = new List<Comment>
                         {
@@ -202,9 +220,26 @@ namespace osu.Game.Tests.Visual.Online
                                 LegacyName = "FirstUser",
                                 CreatedAt = DateTimeOffset.Now,
                                 VotesCount = 98,
+                                CommentableId = 2001,
+                                CommentableType = "test",
                             }
                         }
-                    });
+                    };
+
+                    if (asOwner)
+                    {
+                        bundle.Comments[0].UserId = 1001;
+                        bundle.Comments[0].User = new APIUser { Id = 1001, Username = "FirstUser" };
+                        bundle.CommentableMeta.Add(new CommentableMeta
+                        {
+                            Id = 2001,
+                            OwnerId = 1001,
+                            OwnerTitle = "MAPPER",
+                            Type = "test",
+                        });
+                    }
+
+                    req.TriggerSuccess(bundle);
                     return true;
                 };
             });
