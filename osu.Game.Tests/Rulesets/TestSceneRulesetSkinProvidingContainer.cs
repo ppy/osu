@@ -48,7 +48,7 @@ namespace osu.Game.Tests.Rulesets
 
                 Child = new RulesetSkinProvidingContainer(Ruleset.Value.CreateInstance(), Beatmap.Value.Beatmap, Beatmap.Value.Skin)
                 {
-                    requester
+                    Child = requester
                 };
             });
 
