@@ -589,7 +589,7 @@ namespace osu.Game.Screens.Play
                     if (aggregateVolumeTrack <= volume_requirement)
                     {
                         // Prioritize increasing music over master volume as to avoid also increasing effects volume.
-                        const double target = 0.1;
+                        const double target = 0.5;
                         double result = target / Math.Max(0.01, audioManager.Volume.Value);
 
                         if (result > 1)
