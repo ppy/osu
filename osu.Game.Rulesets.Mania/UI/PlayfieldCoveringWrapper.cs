@@ -43,7 +43,7 @@ namespace osu.Game.Rulesets.Mania.UI
 
         private readonly IBindable<ScrollingDirection> scrollDirection = new Bindable<ScrollingDirection>();
 
-        private float currentCoverage;
+        private float currentCoverageHeight;
 
         public PlayfieldCoveringWrapper(Drawable content)
         {
@@ -106,23 +106,36 @@ namespace osu.Game.Rulesets.Mania.UI
         protected override void LoadComplete()
         {
             base.LoadComplete();
-
-            updateHeight(Coverage.Value);
+            updateCoverSize(true);
         }
 
         protected override void Update()
         {
             base.Update();
-
-            updateHeight((float)Interpolation.DampContinuously(currentCoverage, Coverage.Value, 25, Math.Abs(Time.Elapsed)));
+            updateCoverSize(false);
         }
 
-        private void updateHeight(float coverage)
+        private void updateCoverSize(bool instant)
         {
-            filled.Height = GetHeight(coverage);
-            gradient.Y = -GetHeight(coverage);
+            float targetCoverage;
+            float targetAlpha;
 
-            currentCoverage = coverage;
+            if (instant)
+            {
+                targetCoverage = Coverage.Value;
+                targetAlpha = Coverage.Value > 0 ? 1 : 0;
+            }
+            else
+            {
+                targetCoverage = (float)Interpolation.DampContinuously(currentCoverageHeight, Coverage.Value, 25, Math.Abs(Time.Elapsed));
+                targetAlpha = (float)Interpolation.DampContinuously(gradient.Alpha, Coverage.Value > 0 ? 1 : 0, 25, Math.Abs(Time.Elapsed));
+            }
+
+            filled.Height = GetHeight(targetCoverage);
+            gradient.Y = -GetHeight(targetCoverage);
+            gradient.Alpha = targetAlpha;
+
+            currentCoverageHeight = targetCoverage;
         }
 
         protected virtual float GetHeight(float coverage) => coverage;
