@@ -98,7 +98,7 @@ namespace osu.Game.Tests.Visual.Online
                         CountryCode = CountryCode.JP,
                         CoverUrl = @"https://osu.ppy.sh/images/headers/profile-covers/c6.jpg",
                         Statistics = new UserStatistics { GlobalRank = 12345, CountryRank = 1234 }
-                    }) { Width = 300 },
+                    }) { Width = 360 },
                     new UserRankPanel(new APIUser
                     {
                         Username = @"peppy",
@@ -107,7 +107,7 @@ namespace osu.Game.Tests.Visual.Online
                         CountryCode = CountryCode.AU,
                         CoverUrl = @"https://osu.ppy.sh/images/headers/profile-covers/c3.jpg",
                         Statistics = new UserStatistics { GlobalRank = null, CountryRank = null }
-                    }) { Width = 300 }
+                    }) { Width = 360 }
                 }
             };
 
@@ -165,8 +165,8 @@ namespace osu.Game.Tests.Visual.Online
             {
                 API.UpdateStatistics(new UserStatistics
                 {
-                    GlobalRank = RNG.Next(100000),
-                    CountryRank = RNG.Next(100000),
+                    GlobalRank = RNG.Next(10_000_000),
+                    CountryRank = RNG.Next(10_000_000),
                     PlayTime = RNG.Next(0, 100_000_000),
                     PP = RNG.Next(0, 30000)
                 });

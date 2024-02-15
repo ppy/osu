@@ -155,7 +155,7 @@ namespace osu.Game.Users
                         Margin = new MarginPadding { Top = main_content_height },
                         RelativeSizeAxes = Axes.X,
                         AutoSizeAxes = Axes.Y,
-                        Padding = new MarginPadding { Left = 80, Vertical = padding },
+                        Padding = new MarginPadding { Left = 80, Right = padding, Vertical = padding },
                         ColumnDimensions = new[]
                         {
                             new Dimension(),
