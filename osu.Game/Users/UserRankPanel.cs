@@ -7,7 +7,6 @@ using osu.Framework.Extensions.LocalisationExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Input.Events;
-using osu.Framework.Localisation;
 using osu.Game.Online.API;
 using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Overlays.Profile.Header.Components;
@@ -51,7 +50,7 @@ namespace osu.Game.Users
             {
                 globalRankDisplay.Content = stats.NewValue?.GlobalRank?.ToLocalisableString("\\##,##0") ?? "-";
                 countryRankDisplay.Content = stats.NewValue?.CountryRank?.ToLocalisableString("\\##,##0") ?? "-";
-                ppDisplay.Content = stats.NewValue?.PP?.ToLocalisableString("#,##0") ?? (LocalisableString)"0";
+                ppDisplay.Content = stats.NewValue?.PP?.ToLocalisableString("#,##0") ?? "0";
             }, true);
         }
 
