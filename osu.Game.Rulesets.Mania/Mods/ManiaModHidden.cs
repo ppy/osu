@@ -3,11 +3,14 @@
 
 using System;
 using System.Linq;
+using osu.Framework.Allocation;
 using osu.Framework.Localisation;
 using osu.Game.Rulesets.Mania.UI;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
+using osu.Game.Rulesets.Mania.Skinning;
 using osu.Game.Rulesets.Scoring;
+using osu.Game.Skinning;
 
 namespace osu.Game.Rulesets.Mania.Mods
 {
@@ -18,7 +21,7 @@ namespace osu.Game.Rulesets.Mania.Mods
         /// </summary>
         private const float reference_playfield_height = 768;
 
-        private const float min_coverage = 160 / reference_playfield_height;
+        private const float min_coverage = 160f / reference_playfield_height;
         private const float max_coverage = 400f / reference_playfield_height;
         private const float coverage_increase_per_combo = 0.5f / reference_playfield_height;
 
@@ -49,17 +52,38 @@ namespace osu.Game.Rulesets.Mania.Mods
 
         private partial class LegacyPlayfieldCover : PlayfieldCoveringWrapper
         {
+            [Resolved]
+            private ISkinSource skin { get; set; } = null!;
+
+            private IBindable<float>? hitPosition;
+
             public LegacyPlayfieldCover(Drawable content)
                 : base(content)
             {
             }
 
+            protected override void LoadComplete()
+            {
+                base.LoadComplete();
+
+                skin.SourceChanged += onSkinChanged;
+                onSkinChanged();
+            }
+
+            private void onSkinChanged()
+            {
+                hitPosition = skin.GetManiaSkinConfig<float>(LegacyManiaSkinConfigurationLookups.HitPosition);
+            }
+
             protected override float GetHeight(float coverage)
             {
-                if (DrawHeight == 0)
+                // In osu!stable, the cover is applied in absolute (x768) coordinates from the hit position.
+                float availablePlayfieldHeight = Math.Abs(reference_playfield_height - (hitPosition?.Value ?? Stage.HIT_TARGET_POSITION));
+
+                if (availablePlayfieldHeight == 0)
                     return base.GetHeight(coverage);
 
-                return base.GetHeight(coverage) * reference_playfield_height / DrawHeight;
+                return base.GetHeight(coverage) * reference_playfield_height / availablePlayfieldHeight;
             }
         }
     }
