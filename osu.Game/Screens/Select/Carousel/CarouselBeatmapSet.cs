@@ -91,19 +91,19 @@ namespace osu.Game.Screens.Select.Carousel
                     break;
 
                 case SortMode.LastPlayed:
-                    comparison = -compareUsingAggregateMax(otherSet, b => (b.LastPlayed ?? DateTimeOffset.MinValue).ToUnixTimeSeconds());
+                    comparison = -compareUsingAggregateMax(otherSet, static b => (b.LastPlayed ?? DateTimeOffset.MinValue).ToUnixTimeSeconds());
                     break;
 
                 case SortMode.BPM:
-                    comparison = compareUsingAggregateMax(otherSet, b => b.BPM);
+                    comparison = compareUsingAggregateMax(otherSet, static b => b.BPM);
                     break;
 
                 case SortMode.Length:
-                    comparison = compareUsingAggregateMax(otherSet, b => b.Length);
+                    comparison = compareUsingAggregateMax(otherSet, static b => b.Length);
                     break;
 
                 case SortMode.Difficulty:
-                    comparison = compareUsingAggregateMax(otherSet, b => b.StarRating);
+                    comparison = compareUsingAggregateMax(otherSet, static b => b.StarRating);
                     break;
 
                 case SortMode.DateSubmitted:
