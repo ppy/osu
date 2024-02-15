@@ -58,6 +58,9 @@ namespace osu.Game.Skinning
         {
         }
 
+        protected override IResourceStore<TextureUpload> CreateTextureLoaderStore(IStorageResourceProvider resources, IResourceStore<byte[]> storage)
+            => new LegacyTextureLoaderStore(base.CreateTextureLoaderStore(resources, storage));
+
         protected override void ParseConfigurationStream(Stream stream)
         {
             base.ParseConfigurationStream(stream);

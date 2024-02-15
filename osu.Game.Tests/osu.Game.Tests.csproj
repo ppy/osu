@@ -10,7 +10,7 @@
   </ItemGroup>
   <PropertyGroup Label="Project">
     <OutputType>WinExe</OutputType>
-    <TargetFramework>net6.0</TargetFramework>
+    <TargetFramework>net8.0</TargetFramework>
   </PropertyGroup>
   <PropertyGroup Label="Code Analysis">
     <CodeAnalysisRuleSet>tests.ruleset</CodeAnalysisRuleSet>
