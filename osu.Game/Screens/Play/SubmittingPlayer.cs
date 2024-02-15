@@ -140,7 +140,13 @@ namespace osu.Game.Screens.Play
                     {
                         switch (exception.Message)
                         {
-                            case "expired token":
+                            case @"missing token header":
+                            case @"invalid client hash":
+                            case @"invalid verification hash":
+                                Logger.Log("You are not able to submit a score. Please ensure that you are using the latest version of the official game releases.", level: LogLevel.Important);
+                                break;
+
+                            case @"expired token":
                                 Logger.Log("Score submission failed because your system clock is set incorrectly. Please check your system time, date and timezone.", level: LogLevel.Important);
                                 break;
 
