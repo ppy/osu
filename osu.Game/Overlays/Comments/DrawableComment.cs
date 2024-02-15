@@ -4,12 +4,10 @@
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics;
 using osu.Game.Graphics;
-using osu.Framework.Graphics.Sprites;
 using osuTK;
 using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Users.Drawables;
 using osu.Game.Graphics.Containers;
-using osu.Framework.Graphics.Cursor;
 using osu.Framework.Bindables;
 using System.Linq;
 using osu.Game.Graphics.Sprites;
@@ -21,7 +19,6 @@ using osu.Framework.Extensions.IEnumerableExtensions;
 using System.Collections.Specialized;
 using System.Diagnostics;
 using osu.Framework.Extensions.LocalisationExtensions;
-using osu.Framework.Localisation;
 using osu.Framework.Logging;
 using osu.Framework.Platform;
 using osu.Game.Graphics.UserInterface;
@@ -42,6 +39,7 @@ namespace osu.Game.Overlays.Comments
         public Action<DrawableComment, int> RepliesRequested = null!;
 
         public readonly Comment Comment;
+        public readonly IReadOnlyList<CommentableMeta> Meta;
 
         public readonly BindableBool ShowDeleted = new BindableBool();
         public readonly Bindable<CommentsSortCriteria> Sort = new Bindable<CommentsSortCriteria>();
@@ -72,7 +70,7 @@ namespace osu.Game.Overlays.Comments
         private LinkFlowContainer actionsContainer = null!;
         private LoadingSpinner actionsLoading = null!;
         private DeletedCommentsCounter deletedCommentsCounter = null!;
-        private OsuSpriteText deletedLabel = null!;
+        private CommentAuthorLine author = null!;
         private GridContainer content = null!;
         private VotePill votePill = null!;
         private Container<CommentEditor> replyEditorContainer = null!;
@@ -90,15 +88,15 @@ namespace osu.Game.Overlays.Comments
         [Resolved]
         private OnScreenDisplay? onScreenDisplay { get; set; }
 
-        public DrawableComment(Comment comment)
+        public DrawableComment(Comment comment, IReadOnlyList<CommentableMeta> meta)
         {
             Comment = comment;
+            Meta = meta;
         }
 
         [BackgroundDependencyLoader]
         private void load(OverlayColourProvider colourProvider, DrawableComment? parentComment)
         {
-            LinkFlowContainer username;
             FillFlowContainer info;
             CommentMarkdownContainer message;
 
@@ -174,27 +172,7 @@ namespace osu.Game.Overlays.Comments
                                             },
                                             Children = new Drawable[]
                                             {
-                                                new FillFlowContainer
-                                                {
-                                                    AutoSizeAxes = Axes.Both,
-                                                    Direction = FillDirection.Horizontal,
-                                                    Spacing = new Vector2(10, 0),
-                                                    Children = new[]
-                                                    {
-                                                        username = new LinkFlowContainer(s => s.Font = OsuFont.GetFont(size: 14, weight: FontWeight.Bold))
-                                                        {
-                                                            AutoSizeAxes = Axes.Both
-                                                        },
-                                                        Comment.Pinned ? new PinnedCommentNotice() : Empty(),
-                                                        new ParentUsername(Comment),
-                                                        deletedLabel = new OsuSpriteText
-                                                        {
-                                                            Alpha = 0f,
-                                                            Font = OsuFont.GetFont(size: 14, weight: FontWeight.Bold),
-                                                            Text = CommentsStrings.Deleted
-                                                        }
-                                                    }
-                                                },
+                                                author = new CommentAuthorLine(Comment, Meta),
                                                 message = new CommentMarkdownContainer
                                                 {
                                                     RelativeSizeAxes = Axes.X,
@@ -218,7 +196,7 @@ namespace osu.Game.Overlays.Comments
                                                             {
                                                                 new DrawableDate(Comment.CreatedAt, 12, false)
                                                                 {
-                                                                    Colour = colourProvider.Foreground1
+                                                                    Colour = colourProvider.Foreground1,
                                                                 }
                                                             }
                                                         },
@@ -311,11 +289,6 @@ namespace osu.Game.Overlays.Comments
                 }
             };
 
-            if (Comment.UserId.HasValue)
-                username.AddUserLink(Comment.User);
-            else
-                username.AddText(Comment.LegacyName!);
-
             if (Comment.EditedAt.HasValue && Comment.EditedUser != null)
             {
                 var font = OsuFont.GetFont(size: 12, weight: FontWeight.Regular);
@@ -400,7 +373,7 @@ namespace osu.Game.Overlays.Comments
         /// </summary>
         private void makeDeleted()
         {
-            deletedLabel.Show();
+            author.MarkDeleted();
             content.FadeColour(OsuColour.Gray(0.5f));
             votePill.Hide();
             actionsContainer.Expire();
@@ -546,71 +519,6 @@ namespace osu.Game.Overlays.Comments
             {
                 Top = 10
             };
-        }
-
-        private partial class PinnedCommentNotice : FillFlowContainer
-        {
-            public PinnedCommentNotice()
-            {
-                AutoSizeAxes = Axes.Both;
-                Direction = FillDirection.Horizontal;
-                Spacing = new Vector2(2, 0);
-                Children = new Drawable[]
-                {
-                    new SpriteIcon
-                    {
-                        Icon = FontAwesome.Solid.Thumbtack,
-                        Size = new Vector2(14),
-                        Anchor = Anchor.CentreLeft,
-                        Origin = Anchor.CentreLeft,
-                    },
-                    new OsuSpriteText
-                    {
-                        Font = OsuFont.GetFont(size: 14, weight: FontWeight.Bold),
-                        Text = CommentsStrings.Pinned,
-                        Anchor = Anchor.CentreLeft,
-                        Origin = Anchor.CentreLeft,
-                    }
-                };
-            }
-        }
-
-        private partial class ParentUsername : FillFlowContainer, IHasTooltip
-        {
-            public LocalisableString TooltipText => getParentMessage();
-
-            private readonly Comment? parentComment;
-
-            public ParentUsername(Comment comment)
-            {
-                parentComment = comment.ParentComment;
-
-                AutoSizeAxes = Axes.Both;
-                Direction = FillDirection.Horizontal;
-                Spacing = new Vector2(3, 0);
-                Alpha = comment.ParentId == null ? 0 : 1;
-                Children = new Drawable[]
-                {
-                    new SpriteIcon
-                    {
-                        Icon = FontAwesome.Solid.Reply,
-                        Size = new Vector2(14),
-                    },
-                    new OsuSpriteText
-                    {
-                        Font = OsuFont.GetFont(size: 14, weight: FontWeight.Bold, italics: true),
-                        Text = parentComment?.User?.Username ?? parentComment?.LegacyName!
-                    }
-                };
-            }
-
-            private LocalisableString getParentMessage()
-            {
-                if (parentComment == null)
-                    return string.Empty;
-
-                return parentComment.HasMessage ? parentComment.Message : parentComment.IsDeleted ? CommentsStrings.Deleted : string.Empty;
-            }
         }
     }
 }
