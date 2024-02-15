@@ -20,6 +20,9 @@ namespace osu.Game.Rulesets.Catch.UI
             const float base_game_width = 1024f;
             const float base_game_height = 768f;
 
+            // extra bottom space for the catcher to not get cut off at tall resolutions lower than 4:3 (e.g. 5:4). number chosen based on testing with maximum catcher scale (i.e. CS 0).
+            const float extra_bottom_space = 200f;
+
             Anchor = Anchor.Centre;
             Origin = Anchor.Centre;
 
@@ -31,7 +34,8 @@ namespace osu.Game.Rulesets.Catch.UI
                 Anchor = Anchor.Centre,
                 Origin = Anchor.Centre,
                 RelativeSizeAxes = Axes.X,
-                Height = base_game_height,
+                Height = base_game_height + extra_bottom_space,
+                Y = extra_bottom_space / 2,
                 Masking = true,
                 Child = new Container
                 {
