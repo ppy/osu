@@ -232,7 +232,6 @@ namespace osu.Game.Online.Metadata
         public override async Task DisconnectRequested()
         {
             await base.DisconnectRequested().ConfigureAwait(false);
-            await EndWatchingUserPresence().ConfigureAwait(false);
             if (connector != null)
                 await connector.Disconnect().ConfigureAwait(false);
         }
