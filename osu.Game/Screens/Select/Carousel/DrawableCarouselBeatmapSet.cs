@@ -136,41 +136,42 @@ namespace osu.Game.Screens.Select.Carousel
             beatmapSet = ((CarouselBeatmapSet)Item).BeatmapSet;
         }
 
+        private const float duration = 500;
+
         protected override void Deselected()
         {
-            const float duration = 500;
-
             base.Deselected();
 
             MovementContainer.MoveToX(0, duration, Easing.OutQuint);
 
             updateBeatmapYPositions();
-
-            // TODO: implement colour sampling of beatmap background for colour box and offset this by 10, hide for now
-            backgroundContainer.MoveToX(0, duration, Easing.OutQuint);
-            mainFlow.MoveToX(0, duration, Easing.OutQuint);
-
-            colourBox.FadeOut(duration, Easing.OutQuint);
-            rightArrow.FadeOut(duration, Easing.OutQuint);
-            backgroundPlaceholder.FadeOut(duration, Easing.OutQuint);
+            updateSelectionState();
         }
 
         protected override void Selected()
         {
-            const float duration = 500;
-
             base.Selected();
 
             MovementContainer.MoveToX(-100, duration, Easing.OutQuint);
 
             updateBeatmapDifficulties();
+            updateSelectionState();
+        }
 
-            backgroundContainer.MoveToX(colour_box_width_expanded, duration, Easing.OutQuint);
-            mainFlow.MoveToX(colour_box_width_expanded, duration, Easing.OutQuint);
+        private void updateSelectionState()
+        {
+            // Header children may not be loaded yet.
+            if (Header.Count == 0) return;
 
-            colourBox.FadeIn(duration, Easing.OutQuint);
-            rightArrow.FadeIn(duration, Easing.OutQuint);
-            backgroundPlaceholder.FadeIn(duration, Easing.OutQuint);
+            var state = Item?.State.Value;
+
+            // TODO: implement colour sampling of beatmap background for colour box and offset this by 10, hide for now
+            backgroundContainer.MoveToX(state == CarouselItemState.Selected ? colour_box_width_expanded : 0, duration, Easing.OutQuint);
+            mainFlow.MoveToX(state == CarouselItemState.Selected ? colour_box_width_expanded : 0, duration, Easing.OutQuint);
+
+            colourBox.FadeTo(state == CarouselItemState.Selected ? 1 : 0, duration, Easing.OutQuint);
+            rightArrow.FadeTo(state == CarouselItemState.Selected ? 1 : 0, duration, Easing.OutQuint);
+            backgroundPlaceholder.FadeTo(state == CarouselItemState.Selected ? 1 : 0, duration, Easing.OutQuint);
         }
 
         private void updateBeatmapDifficulties()
@@ -303,6 +304,7 @@ namespace osu.Game.Screens.Select.Carousel
             {
                 Header.AddRange(drawables);
                 drawables.ForEach(d => d.FadeInFromZero(150));
+                updateSelectionState();
             }, loadCancellation.Token);
         }
 
