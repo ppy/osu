@@ -35,8 +35,6 @@ namespace osu.Game.Tests.Visual.Online
         private Action<GetUsersRequest>? handleGetUsersRequest;
         private Action<GetUserRequest>? handleGetUserRequest;
 
-        private IDisposable? subscription;
-
         private readonly Dictionary<(int userId, string rulesetName), UserStatistics> serverSideStatistics = new Dictionary<(int userId, string rulesetName), UserStatistics>();
 
         [SetUpSteps]
@@ -253,26 +251,6 @@ namespace osu.Game.Tests.Visual.Online
         }
 
         [Test]
-        public void TestStatisticsUpdateNotFiredAfterSubscriptionDisposal()
-        {
-            int userId = getUserId();
-            setUpUser(userId);
-
-            long scoreId = getScoreId();
-            var ruleset = new OsuRuleset().RulesetInfo;
-
-            SoloStatisticsUpdate? update = null;
-            registerForUpdates(scoreId, ruleset, receivedUpdate => update = receivedUpdate);
-            AddStep("unsubscribe", () => subscription!.Dispose());
-
-            feignScoreProcessing(userId, ruleset, 5_000_000);
-
-            AddStep("signal score processed", () => ((ISpectatorClient)spectatorClient).UserScoreProcessed(userId, scoreId));
-            AddWaitStep("wait a bit", 5);
-            AddAssert("update not received", () => update == null);
-        }
-
-        [Test]
         public void TestGlobalStatisticsUpdatedAfterRegistrationAddedAndScoreProcessed()
         {
             int userId = getUserId();
@@ -312,13 +290,20 @@ namespace osu.Game.Tests.Visual.Online
         }
 
         private void registerForUpdates(long scoreId, RulesetInfo rulesetInfo, Action<SoloStatisticsUpdate> onUpdateReady) =>
-            AddStep("register for updates", () => subscription = watcher.RegisterForStatisticsUpdateAfter(
-                new ScoreInfo(Beatmap.Value.BeatmapInfo, new OsuRuleset().RulesetInfo, new RealmUser())
+            AddStep("register for updates", () =>
+            {
+                watcher.RegisterForStatisticsUpdateAfter(
+                    new ScoreInfo(Beatmap.Value.BeatmapInfo, new OsuRuleset().RulesetInfo, new RealmUser())
+                    {
+                        Ruleset = rulesetInfo,
+                        OnlineID = scoreId
+                    });
+                watcher.LatestUpdate.BindValueChanged(update =>
                 {
-                    Ruleset = rulesetInfo,
-                    OnlineID = scoreId
-                },
-                onUpdateReady));
+                    if (update.NewValue?.Score.OnlineID == scoreId)
+                        onUpdateReady.Invoke(update.NewValue);
+                });
+            });
 
         private void feignScoreProcessing(int userId, RulesetInfo rulesetInfo, long newTotalScore)
             => AddStep("feign score processing", () => serverSideStatistics[(userId, rulesetInfo.ShortName)] = new UserStatistics { TotalScore = newTotalScore });
