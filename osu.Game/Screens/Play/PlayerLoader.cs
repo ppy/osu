@@ -585,10 +585,8 @@ namespace osu.Game.Screens.Play
 
                     // Check values before resetting, as the user may have only had mute enabled, in which case we might not need to adjust volumes.
                     // Note that we only restore halfway to ensure the user isn't suddenly overloaded by unexpectedly high volume.
-                    if (audioManager.Volume.Value <= volume_requirement)
-                        audioManager.Volume.Value = 0.5;
-                    if (audioManager.VolumeTrack.Value <= volume_requirement)
-                        audioManager.VolumeTrack.Value = 0.5;
+                    audioManager.Volume.Value = Math.Max(audioManager.Volume.Value, 0.5);
+                    audioManager.VolumeTrack.Value = Math.Max(audioManager.VolumeTrack.Value, 0.5);
 
                     return true;
                 };
