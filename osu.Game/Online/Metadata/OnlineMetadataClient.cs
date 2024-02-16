@@ -233,6 +233,8 @@ namespace osu.Game.Online.Metadata
         {
             await base.DisconnectRequested().ConfigureAwait(false);
             await EndWatchingUserPresence().ConfigureAwait(false);
+            if (connector != null)
+                await connector.Disconnect().ConfigureAwait(false);
         }
 
         protected override void Dispose(bool isDisposing)
