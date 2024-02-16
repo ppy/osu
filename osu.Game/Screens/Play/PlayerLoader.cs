@@ -582,24 +582,12 @@ namespace osu.Game.Screens.Play
 
                     volumeOverlay.IsMuted.Value = false;
 
-                    double aggregateVolumeTrack = audioManager.Volume.Value * audioManager.VolumeTrack.Value;
-
                     // Check values before resetting, as the user may have only had mute enabled, in which case we might not need to adjust volumes.
                     // Note that we only restore halfway to ensure the user isn't suddenly overloaded by unexpectedly high volume.
-                    if (aggregateVolumeTrack <= volume_requirement)
-                    {
-                        // Prioritize increasing music over master volume as to avoid also increasing effects volume.
-                        const double target = 0.5;
-                        double result = target / Math.Max(0.01, audioManager.Volume.Value);
-
-                        if (result > 1)
-                        {
-                            audioManager.Volume.Value = target;
-                            audioManager.VolumeTrack.Value = 1;
-                        }
-                        else
-                            audioManager.VolumeTrack.Value = result;
-                    }
+                    if (audioManager.Volume.Value <= volume_requirement)
+                        audioManager.Volume.Value = 0.5;
+                    if (audioManager.VolumeTrack.Value <= volume_requirement)
+                        audioManager.VolumeTrack.Value = 0.5;
 
                     return true;
                 };
