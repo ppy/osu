@@ -358,7 +358,7 @@ namespace osu.Game.Tests.Gameplay
                 this.maxResult = maxResult;
             }
 
-            protected override Judgement CreateJudgement() => new TestJudgement(maxResult);
+            public override Judgement CreateJudgement() => new TestJudgement(maxResult);
             protected override HitWindows CreateHitWindows() => new HitWindows();
 
             private class TestJudgement : Judgement

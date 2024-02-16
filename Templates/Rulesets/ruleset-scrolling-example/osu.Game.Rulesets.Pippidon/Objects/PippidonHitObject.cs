@@ -13,6 +13,6 @@ namespace osu.Game.Rulesets.Pippidon.Objects
         /// </summary>
         public int Lane;
 
-        protected override Judgement CreateJudgement() => new Judgement();
+        public override Judgement CreateJudgement() => new Judgement();
     }
 }

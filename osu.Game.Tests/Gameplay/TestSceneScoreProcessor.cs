@@ -196,7 +196,7 @@ namespace osu.Game.Tests.Gameplay
                 this.maxResult = maxResult;
             }
 
-            protected override Judgement CreateJudgement() => new TestJudgement(maxResult);
+            public override Judgement CreateJudgement() => new TestJudgement(maxResult);
         }
     }
 }

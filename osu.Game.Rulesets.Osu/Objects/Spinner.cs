@@ -95,7 +95,7 @@ namespace osu.Game.Rulesets.Osu.Objects
             }
         }
 
-        protected override Judgement CreateJudgement() => new OsuJudgement();
+        public override Judgement CreateJudgement() => new OsuJudgement();
 
         protected override HitWindows CreateHitWindows() => HitWindows.Empty;
 

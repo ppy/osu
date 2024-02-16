@@ -46,7 +46,7 @@ namespace osu.Game.Rulesets.Osu.Objects
 
         protected override HitWindows CreateHitWindows() => HitWindows.Empty;
 
-        protected override Judgement CreateJudgement() => new SliderEndJudgement();
+        public override Judgement CreateJudgement() => new SliderEndJudgement();
 
         public class SliderEndJudgement : OsuJudgement
         {

@@ -10,7 +10,7 @@ namespace osu.Game.Rulesets.Pippidon.Objects
 {
     public class PippidonHitObject : HitObject, IHasPosition
     {
-        protected override Judgement CreateJudgement() => new Judgement();
+        public override Judgement CreateJudgement() => new Judgement();
 
         public Vector2 Position { get; set; }
 
