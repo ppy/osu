@@ -80,6 +80,7 @@ namespace osu.Game.Overlays.Mods
         public override IEnumerable<LocalisableString> FilterTerms => new[]
         {
             Mod.Name,
+            Mod.Name.Replace(" ", string.Empty),
             Mod.Acronym,
             Mod.Description
         };
