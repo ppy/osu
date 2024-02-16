@@ -264,13 +264,13 @@ namespace osu.Game.Tests.Visual.Gameplay
         }
 
         [Test]
-        public void TestMutedNotificationHighMasterVolume()
+        public void TestMutedNotificationLowMusicVolume()
         {
             addVolumeSteps("master and music volumes", () =>
             {
-                audioManager.Volume.Value = 0.6;
+                audioManager.Volume.Value = 0.25;
                 audioManager.VolumeTrack.Value = 0.01;
-            }, () => Precision.AlmostEquals(audioManager.Volume.Value, 0.6) && Precision.AlmostEquals(audioManager.VolumeTrack.Value, 0.83));
+            }, () => Precision.AlmostEquals(audioManager.Volume.Value, 0.25) && Precision.AlmostEquals(audioManager.VolumeTrack.Value, 0.5));
         }
 
         [Test]
@@ -279,8 +279,8 @@ namespace osu.Game.Tests.Visual.Gameplay
             addVolumeSteps("master and music volumes", () =>
             {
                 audioManager.Volume.Value = 0.01;
-                audioManager.VolumeTrack.Value = 0.15;
-            }, () => Precision.AlmostEquals(audioManager.Volume.Value, 0.5) && Precision.AlmostEquals(audioManager.VolumeTrack.Value, 1));
+                audioManager.VolumeTrack.Value = 0.25;
+            }, () => Precision.AlmostEquals(audioManager.Volume.Value, 0.5) && Precision.AlmostEquals(audioManager.VolumeTrack.Value, 0.25));
         }
 
         [Test]
@@ -289,10 +289,10 @@ namespace osu.Game.Tests.Visual.Gameplay
             addVolumeSteps("mute button", () =>
             {
                 // Importantly, in the case the volume is muted but the user has a volume level set, it should be retained.
-                audioManager.Volume.Value = 0.5f;
-                audioManager.VolumeTrack.Value = 0.5f;
+                audioManager.Volume.Value = 0.5;
+                audioManager.VolumeTrack.Value = 0.5;
                 volumeOverlay.IsMuted.Value = true;
-            }, () => !volumeOverlay.IsMuted.Value && audioManager.Volume.Value == 0.5f && audioManager.VolumeTrack.Value == 0.5f);
+            }, () => !volumeOverlay.IsMuted.Value && audioManager.Volume.Value == 0.5 && audioManager.VolumeTrack.Value == 0.5);
         }
 
         /// <remarks>
