@@ -35,7 +35,7 @@ If you are just looking to give the game a whirl, you can grab the latest releas
 
 You can also generally download a version for your current device from the [osu! site](https://osu.ppy.sh/home/download).
 
-If your platform is not listed above, there is still a chance you can manually build it by following the instructions below.
+If your platform is unsupported or not listed above, there is still a chance you can run the release or manually build it by following the instructions below.
 
 **For iOS/iPadOS users**: The iOS testflight link fills up very fast (Apple has a hard limit of 10,000 users). We reset it occasionally. Please do not ask about this. Check back regularly for link resets or follow [peppy](https://twitter.com/ppy) on twitter for announcements. Our goal is to get the game on mobile app stores in early 2024.
 
