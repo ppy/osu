@@ -90,7 +90,7 @@ namespace osu.Game.Rulesets.Taiko.Objects
             }
         }
 
-        protected override Judgement CreateJudgement() => new IgnoreJudgement();
+        public override Judgement CreateJudgement() => new IgnoreJudgement();
 
         protected override HitWindows CreateHitWindows() => HitWindows.Empty;
 
@@ -103,7 +103,7 @@ namespace osu.Game.Rulesets.Taiko.Objects
         public class StrongNestedHit : StrongNestedHitObject
         {
             // The strong hit of the drum roll doesn't actually provide any score.
-            protected override Judgement CreateJudgement() => new IgnoreJudgement();
+            public override Judgement CreateJudgement() => new IgnoreJudgement();
 
             public StrongNestedHit(TaikoHitObject parent)
                 : base(parent)

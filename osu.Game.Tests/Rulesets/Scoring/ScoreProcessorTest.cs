@@ -441,7 +441,7 @@ namespace osu.Game.Tests.Rulesets.Scoring
             private readonly HitResult maxResult;
             private readonly HitResult? minResult;
 
-            protected override Judgement CreateJudgement() => new TestJudgement(maxResult, minResult);
+            public override Judgement CreateJudgement() => new TestJudgement(maxResult, minResult);
 
             public TestHitObject(HitResult maxResult, HitResult? minResult = null)
             {

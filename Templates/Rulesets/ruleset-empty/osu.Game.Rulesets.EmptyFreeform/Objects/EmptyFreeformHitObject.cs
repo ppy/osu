@@ -10,7 +10,7 @@ namespace osu.Game.Rulesets.EmptyFreeform.Objects
 {
     public class EmptyFreeformHitObject : HitObject, IHasPosition
     {
-        protected override Judgement CreateJudgement() => new Judgement();
+        public override Judgement CreateJudgement() => new Judgement();
 
         public Vector2 Position { get; set; }
 

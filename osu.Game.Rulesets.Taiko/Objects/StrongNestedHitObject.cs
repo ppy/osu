@@ -20,7 +20,7 @@ namespace osu.Game.Rulesets.Taiko.Objects
             Parent = parent;
         }
 
-        protected override Judgement CreateJudgement() => new TaikoStrongJudgement();
+        public override Judgement CreateJudgement() => new TaikoStrongJudgement();
 
         protected override HitWindows CreateHitWindows() => HitWindows.Empty;
     }

@@ -173,8 +173,12 @@ namespace osu.Game.Rulesets.Objects
         /// <summary>
         /// Creates the <see cref="Judgement"/> that represents the scoring information for this <see cref="HitObject"/>.
         /// </summary>
+        /// <remarks>
+        /// Use <see cref="Judgement"/> to avoid unnecessary allocations.
+        /// This method has been left public for compatibility reasons and eventually will be made protected.
+        /// </remarks>
         [NotNull]
-        protected virtual Judgement CreateJudgement() => new Judgement();
+        public virtual Judgement CreateJudgement() => new Judgement();
 
         /// <summary>
         /// Creates the <see cref="HitWindows"/> for this <see cref="HitObject"/>.

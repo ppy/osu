@@ -8,6 +8,6 @@ namespace osu.Game.Rulesets.Catch.Objects
 {
     public class TinyDroplet : Droplet
     {
-        protected override Judgement CreateJudgement() => new CatchTinyDropletJudgement();
+        public override Judgement CreateJudgement() => new CatchTinyDropletJudgement();
     }
 }

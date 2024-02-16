@@ -8,6 +8,6 @@ namespace osu.Game.Rulesets.Catch.Objects
 {
     public class Droplet : PalpableCatchHitObject
     {
-        protected override Judgement CreateJudgement() => new CatchDropletJudgement();
+        public override Judgement CreateJudgement() => new CatchDropletJudgement();
     }
 }

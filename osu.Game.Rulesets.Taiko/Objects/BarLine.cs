@@ -19,6 +19,6 @@ namespace osu.Game.Rulesets.Taiko.Objects
             set => major.Value = value;
         }
 
-        protected override Judgement CreateJudgement() => new IgnoreJudgement();
+        public override Judgement CreateJudgement() => new IgnoreJudgement();
     }
 }
