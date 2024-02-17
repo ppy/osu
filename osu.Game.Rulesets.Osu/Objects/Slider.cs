@@ -252,23 +252,8 @@ namespace osu.Game.Rulesets.Osu.Objects
 
         protected void UpdateNestedSamples()
         {
-            HitSampleInfo firstSample = null;
-
-            for (int i = 0; i < Samples.Count; i++)
-            {
-                // TODO: remove this when guaranteed sort is present for samples (https://github.com/ppy/osu/issues/1933)
-                if (i == 0)
-                {
-                    firstSample = Samples[i];
-                    continue;
-                }
-
-                if (Samples[i].Name != HitSampleInfo.HIT_NORMAL)
-                    continue;
-
-                firstSample = Samples[i];
-                break;
-            }
+            var firstSample = Samples.FirstOrDefault(s => s.Name == HitSampleInfo.HIT_NORMAL)
+                              ?? Samples.FirstOrDefault(); // TODO: remove this when guaranteed sort is present for samples (https://github.com/ppy/osu/issues/1933)
 
             var sampleList = new List<HitSampleInfo>();
 
