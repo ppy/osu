@@ -42,7 +42,6 @@ namespace osu.Game.Overlays.Toolbar
 
         private partial class RulesetButton : ToolbarButton
         {
-
             protected override HoverSounds CreateHoverSounds(HoverSampleSet sampleSet) => new HoverSounds();
 
             [Resolved]
@@ -55,10 +54,12 @@ namespace osu.Game.Overlays.Toolbar
                     Bottom = 5
                 };
             }
+
             /// <summary>
             /// The icon colour when active
             /// </summary>
             public ColourInfo ActiveColour { get; set; } = Color4Extensions.FromHex("#00FFAA"); //Default colour
+
             public bool Active
             {
                 set => Scheduler.AddOnce(() =>
