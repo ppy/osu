@@ -244,7 +244,8 @@ namespace osu.Game.Screens.OnlinePlay.Match
             LoadComponent(UserModsSelectOverlay = new UserModSelectOverlay(OverlayColourScheme.Plum)
             {
                 SelectedMods = { BindTarget = UserMods },
-                IsValidMod = _ => false
+                IsValidMod = _ => false,
+                AccountForMultiplayerMods = true
             });
         }
 

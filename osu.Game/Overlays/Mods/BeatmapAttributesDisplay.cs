@@ -40,11 +40,16 @@ namespace osu.Game.Overlays.Mods
 
         public Bindable<IBeatmapInfo?> BeatmapInfo { get; } = new Bindable<IBeatmapInfo?>();
 
+        /// <summary>
+        /// Should attribute display account for the multiplayer room global mods.
+        /// </summary>
+        public bool AccountForMultiplayerMods = false;
+
         [Resolved]
         private Bindable<IReadOnlyList<Mod>> mods { get; set; } = null!;
 
         [Resolved(CanBeNull = true)]
-        private IBindable<PlaylistItem>? selectedItem { get; set; }
+        private IBindable<PlaylistItem>? multiplayerRoomItem { get; set; }
 
         public BindableBool Collapsed { get; } = new BindableBool(true);
 
@@ -112,7 +117,7 @@ namespace osu.Game.Overlays.Mods
                 updateValues();
             }, true);
 
-            selectedItem?.BindValueChanged(_ => mods.TriggerChange());
+            multiplayerRoomItem?.BindValueChanged(_ => mods.TriggerChange());
 
             BeatmapInfo.BindValueChanged(_ => updateValues(), true);
 
@@ -176,22 +181,25 @@ namespace osu.Game.Overlays.Mods
             foreach (var mod in mods.Value.OfType<IApplicableToRate>())
                 rate = mod.ApplyToRate(0, rate);
 
-            if (selectedItem != null && selectedItem.Value != null)
-            {
-                var globalMods = selectedItem.Value.RequiredMods.Select(m => m.ToMod(ruleset));
-
-                foreach (var mod in globalMods.OfType<IApplicableToRate>())
-                    rate = mod.ApplyToRate(0, rate);
-            }
-
-            bpmDisplay.Current.Value = BeatmapInfo.Value.BPM * rate;
-
             BeatmapDifficulty originalDifficulty = new BeatmapDifficulty(BeatmapInfo.Value.Difficulty);
 
             foreach (var mod in mods.Value.OfType<IApplicableToDifficulty>())
                 mod.ApplyToDifficulty(originalDifficulty);
 
+            if (AccountForMultiplayerMods && multiplayerRoomItem != null && multiplayerRoomItem.Value != null)
+            {
+                var multiplayerRoomMods = multiplayerRoomItem.Value.RequiredMods.Select(m => m.ToMod(ruleset));
+
+                foreach (var mod in multiplayerRoomMods.OfType<IApplicableToRate>())
+                    rate = mod.ApplyToRate(0, rate);
+
+                foreach (var mod in multiplayerRoomMods.OfType<IApplicableToDifficulty>())
+                    mod.ApplyToDifficulty(originalDifficulty);
+            }
+
             BeatmapDifficulty adjustedDifficulty = ruleset.GetRateAdjustedDisplayDifficulty(originalDifficulty, rate);
+
+            bpmDisplay.Current.Value = BeatmapInfo.Value.BPM * rate;
 
             TooltipContent = new AdjustedAttributesTooltip.Data(originalDifficulty, adjustedDifficulty);
 
