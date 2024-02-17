@@ -25,7 +25,9 @@ using osu.Game.Graphics.Cursor;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Input.Bindings;
 using osu.Game.Localisation;
+using osu.Game.Rulesets;
 using osu.Game.Rulesets.Mods;
+using osu.Game.Online.Rooms;
 using osu.Game.Utils;
 using osuTK;
 using osuTK.Input;
@@ -41,6 +43,12 @@ namespace osu.Game.Overlays.Mods
 
         [Cached]
         public Bindable<IReadOnlyList<Mod>> SelectedMods { get; private set; } = new Bindable<IReadOnlyList<Mod>>(Array.Empty<Mod>());
+
+        [Resolved(CanBeNull = true)]
+        private IBindable<PlaylistItem>? multiplayerRoomItem { get; set; }
+
+        [Resolved]
+        private OsuGameBase game { get; set; } = null!;
 
         /// <summary>
         /// Contains a dictionary with the current <see cref="ModState"/> of all mods applicable for the current ruleset.
@@ -91,6 +99,11 @@ namespace osu.Game.Overlays.Mods
         /// Whether the column with available mod presets should be shown.
         /// </summary>
         protected virtual bool ShowPresets => false;
+
+        /// <summary>
+        /// Should overlay account for the multiplayer room global mods.
+        /// </summary>
+        public bool AccountForMultiplayerMods = false;
 
         protected virtual ModColumn CreateModColumn(ModType modType) => new ModColumn(modType, false);
 
@@ -278,7 +291,8 @@ namespace osu.Game.Overlays.Mods
                         {
                             Anchor = Anchor.BottomRight,
                             Origin = Anchor.BottomRight,
-                            BeatmapInfo = { Value = beatmap?.BeatmapInfo }
+                            BeatmapInfo = { Value = beatmap?.BeatmapInfo },
+                            AccountForMultiplayerMods = AccountForMultiplayerMods
                         },
                     }
                 });
@@ -331,6 +345,8 @@ namespace osu.Game.Overlays.Mods
                     modSettingChangeTracker.SettingChanged += _ => updateRankingInformation();
                 }
             }, true);
+
+            multiplayerRoomItem?.BindValueChanged(_ => SelectedMods.TriggerChange());
 
             customisationVisible.BindValueChanged(_ => updateCustomisationVisualState(), true);
 
@@ -460,8 +476,20 @@ namespace osu.Game.Overlays.Mods
             foreach (var mod in SelectedMods.Value)
                 multiplier *= mod.ScoreMultiplier;
 
-            rankingInformationDisplay.ModMultiplier.Value = multiplier;
             rankingInformationDisplay.Ranked.Value = SelectedMods.Value.All(m => m.Ranked);
+
+            if (AccountForMultiplayerMods && multiplayerRoomItem != null && multiplayerRoomItem.Value != null)
+            {
+                Ruleset ruleset = game.Ruleset.Value.CreateInstance();
+                var multiplayerRoomMods = multiplayerRoomItem.Value.RequiredMods.Select(m => m.ToMod(ruleset));
+
+                foreach (var mod in multiplayerRoomMods)
+                    multiplier *= mod.ScoreMultiplier;
+
+                rankingInformationDisplay.Ranked.Value = rankingInformationDisplay.Ranked.Value && multiplayerRoomMods.All(m => m.Ranked);
+            }
+
+            rankingInformationDisplay.ModMultiplier.Value = multiplier;
         }
 
         private void updateCustomisation()
