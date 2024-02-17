@@ -510,27 +510,12 @@ namespace osu.Game.Screens.Select
             if (beatmapInfo?.Hidden != false)
                 return false;
 
-            foreach (var carouselItem in root.Items)
+            foreach (CarouselBeatmapSet set in beatmapSets)
             {
-                if (carouselItem is not CarouselBeatmapSet set)
-                    continue;
-
                 if (!bypassFilters && set.Filtered.Value)
                     continue;
 
-                CarouselBeatmap? item = null;
-
-                foreach (var setCarouselItem in set.Items)
-                {
-                    if (setCarouselItem is not CarouselBeatmap setCarouselBeatmap)
-                        continue;
-
-                    if (!setCarouselBeatmap.BeatmapInfo.Equals(beatmapInfo))
-                        continue;
-
-                    item = setCarouselBeatmap;
-                    break;
-                }
+                var item = set.Beatmaps.FirstOrDefault(p => p.BeatmapInfo.Equals(beatmapInfo));
 
                 if (item == null)
                     // The beatmap that needs to be selected doesn't exist in this set
