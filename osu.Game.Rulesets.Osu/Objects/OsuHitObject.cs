@@ -2,7 +2,6 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
-using System.Linq;
 using osu.Framework.Bindables;
 using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.ControlPoints;
@@ -149,8 +148,11 @@ namespace osu.Game.Rulesets.Osu.Objects
         {
             StackHeightBindable.BindValueChanged(height =>
             {
-                foreach (var nested in NestedHitObjects.OfType<OsuHitObject>())
-                    nested.StackHeight = height.NewValue;
+                foreach (var nested in NestedHitObjects)
+                {
+                    if (nested is OsuHitObject osuHitObject)
+                        osuHitObject.StackHeight = height.NewValue;
+                }
             });
         }
 
