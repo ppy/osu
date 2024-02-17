@@ -36,6 +36,8 @@ using osu.Game.Rulesets.Configuration;
 using osu.Game.Configuration;
 using osu.Game.Rulesets.Scoring.Legacy;
 using osu.Game.Rulesets.Taiko.Configuration;
+using osu.Framework.Extensions.Color4Extensions;
+using osu.Framework.Graphics.Colour;
 
 namespace osu.Game.Rulesets.Taiko
 {
@@ -185,6 +187,7 @@ namespace osu.Game.Rulesets.Taiko
         public override string PlayingVerb => "Bashing drums";
 
         public override Drawable CreateIcon() => new SpriteIcon { Icon = OsuIcon.RulesetTaiko };
+        public override ColourInfo RulesetColour => Color4Extensions.FromHex("#0ddd4e");
 
         public override HitObjectComposer CreateHitObjectComposer() => new TaikoHitObjectComposer(this);
 

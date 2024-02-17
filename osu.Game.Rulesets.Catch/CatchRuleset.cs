@@ -3,8 +3,10 @@
 
 using System;
 using System.Collections.Generic;
+using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Extensions.EnumExtensions;
 using osu.Framework.Graphics;
+using osu.Framework.Graphics.Colour;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Input.Bindings;
 using osu.Framework.Localisation;
@@ -167,6 +169,7 @@ namespace osu.Game.Rulesets.Catch
         public override string PlayingVerb => "Catching fruit";
 
         public override Drawable CreateIcon() => new SpriteIcon { Icon = OsuIcon.RulesetCatch };
+        public override ColourInfo RulesetColour => Color4Extensions.FromHex("#00EFEF");
 
         protected override IEnumerable<HitResult> GetValidHitResults()
         {
