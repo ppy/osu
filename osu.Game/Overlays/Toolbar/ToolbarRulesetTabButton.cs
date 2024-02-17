@@ -4,6 +4,7 @@
 using osu.Framework.Allocation;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
+using osu.Framework.Graphics.Colour;
 using osu.Framework.Graphics.UserInterface;
 using osu.Framework.Input.Events;
 using osu.Game.Graphics;
@@ -32,6 +33,7 @@ namespace osu.Game.Overlays.Toolbar
             ruleset.TooltipMain = rInstance.Description;
             ruleset.TooltipSub = ToolbarStrings.PlaySomeRuleset(rInstance.Description);
             ruleset.SetIcon(rInstance.CreateIcon());
+            ruleset.ActiveColour = rInstance.RulesetColour;
         }
 
         protected override void OnActivated() => ruleset.Active = true;
@@ -40,6 +42,7 @@ namespace osu.Game.Overlays.Toolbar
 
         private partial class RulesetButton : ToolbarButton
         {
+
             protected override HoverSounds CreateHoverSounds(HoverSampleSet sampleSet) => new HoverSounds();
 
             [Resolved]
@@ -52,12 +55,15 @@ namespace osu.Game.Overlays.Toolbar
                     Bottom = 5
                 };
             }
-
+            /// <summary>
+            /// The icon colour when active
+            /// </summary>
+            public ColourInfo ActiveColour { get; set; } = Color4Extensions.FromHex("#00FFAA"); //Default colour
             public bool Active
             {
                 set => Scheduler.AddOnce(() =>
                 {
-                    IconContainer.Colour = value ? Color4Extensions.FromHex("#00FFAA") : colours.GrayF;
+                    IconContainer.Colour = value ? ActiveColour : colours.GrayF;
                 });
             }
 
