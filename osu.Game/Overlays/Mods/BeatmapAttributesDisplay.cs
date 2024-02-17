@@ -19,6 +19,7 @@ using osu.Game.Graphics.Sprites;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Rulesets;
 using osu.Game.Rulesets.Mods;
+using osu.Game.Online.Rooms;
 using osuTK;
 
 namespace osu.Game.Overlays.Mods
@@ -41,6 +42,9 @@ namespace osu.Game.Overlays.Mods
 
         [Resolved]
         private Bindable<IReadOnlyList<Mod>> mods { get; set; } = null!;
+
+        [Resolved(CanBeNull = true)]
+        private IBindable<PlaylistItem>? selectedItem { get; set; }
 
         public BindableBool Collapsed { get; } = new BindableBool(true);
 
@@ -108,6 +112,8 @@ namespace osu.Game.Overlays.Mods
                 updateValues();
             }, true);
 
+            selectedItem?.BindValueChanged(_ => mods.TriggerChange());
+
             BeatmapInfo.BindValueChanged(_ => updateValues(), true);
 
             Collapsed.BindValueChanged(_ =>
@@ -164,9 +170,19 @@ namespace osu.Game.Overlays.Mods
                     starRatingDisplay.FinishTransforms(true);
             });
 
+            Ruleset ruleset = gameRuleset.Value.CreateInstance();
+
             double rate = 1;
             foreach (var mod in mods.Value.OfType<IApplicableToRate>())
                 rate = mod.ApplyToRate(0, rate);
+
+            if (selectedItem != null && selectedItem.Value != null)
+            {
+                var globalMods = selectedItem.Value.RequiredMods.Select(m => m.ToMod(ruleset));
+
+                foreach (var mod in globalMods.OfType<IApplicableToRate>())
+                    rate = mod.ApplyToRate(0, rate);
+            }
 
             bpmDisplay.Current.Value = BeatmapInfo.Value.BPM * rate;
 
@@ -175,7 +191,6 @@ namespace osu.Game.Overlays.Mods
             foreach (var mod in mods.Value.OfType<IApplicableToDifficulty>())
                 mod.ApplyToDifficulty(originalDifficulty);
 
-            Ruleset ruleset = gameRuleset.Value.CreateInstance();
             BeatmapDifficulty adjustedDifficulty = ruleset.GetRateAdjustedDisplayDifficulty(originalDifficulty, rate);
 
             TooltipContent = new AdjustedAttributesTooltip.Data(originalDifficulty, adjustedDifficulty);
