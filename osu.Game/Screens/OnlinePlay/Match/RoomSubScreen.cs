@@ -241,7 +241,7 @@ namespace osu.Game.Screens.OnlinePlay.Match
                 }
             };
 
-            LoadComponent(UserModsSelectOverlay = new MultiplayerModSelectOverlay()
+            LoadComponent(UserModsSelectOverlay = new MultiplayerModSelectOverlay
             {
                 SelectedMods = { BindTarget = UserMods },
                 IsValidMod = _ => false
