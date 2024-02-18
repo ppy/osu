@@ -1,6 +1,7 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
@@ -168,7 +169,7 @@ namespace osu.Game.Overlays.Mods
             foreach (var mod in mods.Value.OfType<IApplicableToRate>())
                 rate = mod.ApplyToRate(0, rate);
 
-            bpmDisplay.Current.Value = BeatmapInfo.Value.BPM * rate;
+            bpmDisplay.Current.Value = (int)Math.Round(Math.Round(BeatmapInfo.Value.BPM) * rate);
 
             BeatmapDifficulty originalDifficulty = new BeatmapDifficulty(BeatmapInfo.Value.Difficulty);
 
@@ -194,11 +195,11 @@ namespace osu.Game.Overlays.Mods
             RightContent.FadeTo(Collapsed.Value && !IsHovered ? 0 : 1, transition_duration, Easing.OutQuint);
         }
 
-        private partial class BPMDisplay : RollingCounter<double>
+        private partial class BPMDisplay : RollingCounter<int>
         {
             protected override double RollingDuration => 250;
 
-            protected override LocalisableString FormatCount(double count) => count.ToLocalisableString("0 BPM");
+            protected override LocalisableString FormatCount(int count) => count.ToLocalisableString("0 BPM");
 
             protected override OsuSpriteText CreateSpriteText() => new OsuSpriteText
             {
