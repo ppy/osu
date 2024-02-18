@@ -31,18 +31,6 @@ namespace osu.Game.Rulesets.Taiko.UI
     {
         public new BindableDouble TimeRange => base.TimeRange;
 
-        public readonly BindableFloat MaximumAspect = new BindableFloat(16f / 9f);
-
-        public readonly BindableFloat MinimumAspect = new BindableFloat(5f / 4f);
-
-        public readonly BindableBool TrimOnOverflow = new BindableBool(false);
-
-        public readonly BindableFloat MinimumRelativeHeight = new BindableFloat(0f);
-
-        public readonly BindableFloat MaximumRelativeHeight = new BindableFloat(1f / 3f);
-
-        public readonly BindableFloat CurrentAspect = new BindableFloat(16f / 9f);
-
         public new TaikoInputManager KeyBindingInputManager => (TaikoInputManager)base.KeyBindingInputManager;
 
         protected new TaikoPlayfieldAdjustmentContainer PlayfieldAdjustmentContainer => (TaikoPlayfieldAdjustmentContainer)base.PlayfieldAdjustmentContainer;
@@ -97,15 +85,7 @@ namespace osu.Game.Rulesets.Taiko.UI
             return ControlPoints[result];
         }
 
-        public override PlayfieldAdjustmentContainer CreatePlayfieldAdjustmentContainer() => new TaikoPlayfieldAdjustmentContainer
-        {
-            MaximumAspect = { BindTarget = MaximumAspect },
-            MinimumAspect = { BindTarget = MinimumAspect },
-            TrimOnOverflow = { BindTarget = TrimOnOverflow },
-            CurrentAspect = { BindTarget = CurrentAspect },
-            MaximumRelativeHeight = { BindTarget = MaximumRelativeHeight },
-            MinimumRelativeHeight = { BindTarget = MinimumRelativeHeight }
-        };
+        public override PlayfieldAdjustmentContainer CreatePlayfieldAdjustmentContainer() => new TaikoPlayfieldAdjustmentContainer();
 
         protected override PassThroughInputManager CreateInputManager() => new TaikoInputManager(Ruleset.RulesetInfo);
 

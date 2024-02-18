@@ -2,7 +2,6 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
-using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Game.Rulesets.Taiko.Beatmaps;
 using osu.Game.Rulesets.UI;
@@ -14,17 +13,35 @@ namespace osu.Game.Rulesets.Taiko.UI
     {
         private const float stable_gamefield_height = 480f;
 
-        public BindableFloat MaximumAspect = new BindableFloat(16f / 9f);
+        // <summary>
+        // The maximum aspect ratio the playfield can be adjusted to.
+        // </summary>
+        protected internal float MaximumAspect = 16f / 9f;
 
-        public BindableFloat MinimumAspect = new BindableFloat(5f / 4f);
+        // <summary>
+        // The minimum aspect ratio the playfield can be adjusted to.
+        // </summary>
+        protected internal float MinimumAspect = 5f / 4f;
 
-        public BindableFloat CurrentAspect = new BindableFloat(16f / 9f);
+        // <summary>
+        // The current aspect ratio of the playfield. This should be the aspect ratio of the game's resolution.
+        // </summary>
+        protected internal float CurrentAspect { get; private set; } = 16f / 9f;
 
-        public BindableFloat MaximumRelativeHeight = new BindableFloat(1f / 3f);
+        // <summary>
+        // The maximum relative height of the playfield. This is a fraction of the available area.
+        // </summary>
+        protected internal float MaximumRelativeHeight = 1f / 3f;
 
-        public BindableFloat MinimumRelativeHeight = new BindableFloat(0f);
+        // <summary>
+        // The minimum relative height of the playfield. This is a fraction of the available area.
+        // </summary>
+        protected internal float MinimumRelativeHeight = 0f;
 
-        public BindableBool TrimOnOverflow = new BindableBool(false);
+        // <summary>
+        // Whether the playfield should be trimmed when the aspect ratio exceeds the maximum.
+        // </summary>
+        protected internal bool TrimOnOverflow = false;
 
         public TaikoPlayfieldAdjustmentContainer()
         {
@@ -51,26 +68,26 @@ namespace osu.Game.Rulesets.Taiko.UI
             //
             // As a middle-ground, the aspect ratio can still be adjusted in the downwards direction but has a maximum limit.
             // This is still a bit weird, because readability changes with window size, but it is what it is.
-            CurrentAspect.Value = Parent!.ChildSize.X / Parent!.ChildSize.Y;
+            float currentAspect = Parent!.ChildSize.X / Parent!.ChildSize.Y;
 
-            if (CurrentAspect.Value > MaximumAspect.Value)
+            if (currentAspect > MaximumAspect)
             {
-                if (TrimOnOverflow.Value)
+                if (TrimOnOverflow)
                 {
-                    widthScale = MaximumAspect.Value / CurrentAspect.Value;
+                    widthScale = MaximumAspect / currentAspect;
                 }
                 else
                 {
-                    relativeHeight *= CurrentAspect.Value / MaximumAspect.Value;
+                    relativeHeight *= currentAspect / MaximumAspect;
                 }
             }
-            else if (CurrentAspect.Value < MinimumAspect.Value)
+            else if (currentAspect < MinimumAspect)
             {
-                relativeHeight *= CurrentAspect.Value / MinimumAspect.Value;
+                relativeHeight *= currentAspect / MinimumAspect;
             }
 
             // Limit the maximum relative height of the playfield to one-third of available area to avoid it masking out on extreme resolutions.
-            relativeHeight = Math.Clamp(relativeHeight, MinimumRelativeHeight.Value, MaximumRelativeHeight.Value);
+            relativeHeight = Math.Clamp(relativeHeight, MinimumRelativeHeight, MaximumRelativeHeight);
 
             Scale = new Vector2(Math.Max((Parent!.ChildSize.Y / 768f) * (relativeHeight / base_relative_height), 1f));
             Width = 1 / Scale.X * widthScale;
@@ -80,7 +97,7 @@ namespace osu.Game.Rulesets.Taiko.UI
         {
             float currentAspect = Parent!.ChildSize.X / Parent!.ChildSize.Y;
 
-            currentAspect = Math.Clamp(currentAspect, MinimumAspect.Value, MaximumAspect.Value);
+            currentAspect = Math.Clamp(currentAspect, MinimumAspect, MaximumAspect);
 
             // in a game resolution of 1024x768, stable's scrolling system consists of objects being placed 600px (widthScaled - 40) away from their hit location.
             // however, the point at which the object renders at the end of the screen is exactly x=640, but stable makes the object start moving from beyond the screen instead of the boundary point.

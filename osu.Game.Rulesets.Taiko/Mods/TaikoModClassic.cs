@@ -36,13 +36,14 @@ namespace osu.Game.Rulesets.Taiko.Mods
         public void ApplyToDrawableRuleset(DrawableRuleset<TaikoHitObject> drawableRuleset)
         {
             var drawableTaikoRuleset = (DrawableTaikoRuleset)drawableRuleset;
+            var adjustmentContainer = (TaikoPlayfieldAdjustmentContainer)drawableTaikoRuleset.PlayfieldAdjustmentContainer;
 
             // drawableRuleset.Mods should always be non-null here, but just in case.
             mods = drawableRuleset.Mods ?? mods;
 
-            drawableTaikoRuleset.MaximumAspect.Value = 22f / 9f;
-            drawableTaikoRuleset.MinimumAspect.Value = 5f / 4f;
-            drawableTaikoRuleset.TrimOnOverflow.Value = true;
+            adjustmentContainer.MaximumAspect = 22f / 9f;
+            adjustmentContainer.MinimumAspect = 5f / 4f;
+            adjustmentContainer.TrimOnOverflow = true;
 
             TaikoModHidden? hidden = mods.OfType<TaikoModHidden>().FirstOrDefault();
 
@@ -50,16 +51,16 @@ namespace osu.Game.Rulesets.Taiko.Mods
             {
                 // For hardrock, the playfield time range is clamped to within classicMaxTimeRange and the equivalent
                 // time range for a 16:10 aspect ratio.
-                drawableTaikoRuleset.TrimOnOverflow.Value = false;
+                adjustmentContainer.TrimOnOverflow = false;
 
                 // Apply stable aspect ratio limits for hardrock (visually taken)
-                drawableTaikoRuleset.MaximumAspect.Value = 1.963f;
+                adjustmentContainer.MaximumAspect = 1.963f;
 
                 // This is accurate to 4:3, but slightly off for 5:4
-                drawableTaikoRuleset.MinimumAspect.Value = 1.666f;
+                adjustmentContainer.MinimumAspect = 1.666f;
 
-                drawableTaikoRuleset.MinimumRelativeHeight.Value = 0.26f;
-                drawableTaikoRuleset.MaximumRelativeHeight.Value = 0.26f;
+                adjustmentContainer.MinimumRelativeHeight = 0.26f;
+                adjustmentContainer.MaximumRelativeHeight = 0.26f;
 
                 if (hidden != null)
                 {
@@ -72,7 +73,7 @@ namespace osu.Game.Rulesets.Taiko.Mods
             else if (hidden != null)
             {
                 // Stable limits the aspect ratio to 4:3
-                drawableTaikoRuleset.MaximumAspect.Value = hidden_base_aspect;
+                adjustmentContainer.MaximumAspect = hidden_base_aspect;
 
                 // Enable aspect ratio adjustment for hidden (see adjustHidden)
                 hiddenInitialAlpha.BindTo(hidden.InitialAlpha);
@@ -97,10 +98,12 @@ namespace osu.Game.Rulesets.Taiko.Mods
             float adjustmentRatio = 1f)
         {
             var drawableTaikoRuleset = (DrawableTaikoRuleset)drawableRuleset;
+            var adjustmentContainer = (TaikoPlayfieldAdjustmentContainer)drawableTaikoRuleset.PlayfieldAdjustmentContainer;
+
             float aspect = Math.Clamp(
-                drawableTaikoRuleset.CurrentAspect.Value,
-                drawableTaikoRuleset.MinimumAspect.Value,
-                drawableTaikoRuleset.MaximumAspect.Value);
+                adjustmentContainer.CurrentAspect,
+                adjustmentContainer.MinimumAspect,
+                adjustmentContainer.MaximumAspect);
 
             float fadeOutDurationAdjustment = aspect / baseAspect - 1;
             fadeOutDurationAdjustment *= adjustmentRatio;
