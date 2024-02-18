@@ -160,10 +160,8 @@ namespace osu.Game.Overlays.Mods
         protected virtual BeatmapDifficulty GetDifficulty()
         {
             BeatmapDifficulty originalDifficulty = new BeatmapDifficulty(BeatmapInfo.Value!.Difficulty);
-
             foreach (var mod in Mods.Value.OfType<IApplicableToDifficulty>())
                 mod.ApplyToDifficulty(originalDifficulty);
-
             return originalDifficulty;
         }
         private void updateValues() => Scheduler.AddOnce(() =>

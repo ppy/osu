@@ -29,8 +29,7 @@ namespace osu.Game.Overlays.Mods
         {
             Anchor = Anchor.BottomRight,
             Origin = Anchor.BottomRight,
-            BeatmapInfo = { Value = Beatmap?.BeatmapInfo },
-            AccountForMultiplayerMods = true
+            BeatmapInfo = { Value = Beatmap?.BeatmapInfo }
         };
 
         protected override void LoadComplete()
@@ -87,15 +86,12 @@ namespace osu.Game.Overlays.Mods
         {
             double rate = base.GetRate();
             Ruleset ruleset = GameRuleset.Value.CreateInstance();
-
-            if (AccountForMultiplayerMods && multiplayerRoomItem != null && multiplayerRoomItem.Value != null)
+            if (multiplayerRoomItem != null && multiplayerRoomItem.Value != null)
             {
                 var multiplayerRoomMods = multiplayerRoomItem.Value.RequiredMods.Select(m => m.ToMod(ruleset));
-
                 foreach (var mod in multiplayerRoomMods.OfType<IApplicableToRate>())
                     rate = mod.ApplyToRate(0, rate);
             }
-
             return rate;
         }
 
@@ -103,15 +99,12 @@ namespace osu.Game.Overlays.Mods
         {
             BeatmapDifficulty originalDifficulty = base.GetDifficulty();
             Ruleset ruleset = GameRuleset.Value.CreateInstance();
-
             if (multiplayerRoomItem != null && multiplayerRoomItem.Value != null)
             {
                 var multiplayerRoomMods = multiplayerRoomItem.Value.RequiredMods.Select(m => m.ToMod(ruleset));
-
                 foreach (var mod in multiplayerRoomMods.OfType<IApplicableToDifficulty>())
                     mod.ApplyToDifficulty(originalDifficulty);
             }
-
             return originalDifficulty;
         }
     }
