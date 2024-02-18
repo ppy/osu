@@ -19,7 +19,6 @@ using osu.Game.Graphics.Sprites;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Rulesets;
 using osu.Game.Rulesets.Mods;
-using osu.Game.Online.Rooms;
 using osuTK;
 
 namespace osu.Game.Overlays.Mods
