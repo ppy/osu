@@ -25,9 +25,7 @@ using osu.Game.Graphics.Cursor;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Input.Bindings;
 using osu.Game.Localisation;
-using osu.Game.Rulesets;
 using osu.Game.Rulesets.Mods;
-using osu.Game.Online.Rooms;
 using osu.Game.Utils;
 using osuTK;
 using osuTK.Input;
@@ -44,11 +42,6 @@ namespace osu.Game.Overlays.Mods
         [Cached]
         public Bindable<IReadOnlyList<Mod>> SelectedMods { get; private set; } = new Bindable<IReadOnlyList<Mod>>(Array.Empty<Mod>());
 
-        [Resolved(CanBeNull = true)]
-        private IBindable<PlaylistItem>? multiplayerRoomItem { get; set; }
-
-        [Resolved]
-        private OsuGameBase game { get; set; } = null!;
 
         /// <summary>
         /// Contains a dictionary with the current <see cref="ModState"/> of all mods applicable for the current ruleset.
@@ -100,11 +93,6 @@ namespace osu.Game.Overlays.Mods
         /// </summary>
         protected virtual bool ShowPresets => false;
 
-        /// <summary>
-        /// Should overlay account for the multiplayer room global mods.
-        /// </summary>
-        public bool AccountForMultiplayerMods = false;
-
         protected virtual ModColumn CreateModColumn(ModType modType) => new ModColumn(modType, false);
 
         protected virtual IReadOnlyList<Mod> ComputeNewModsFromSelection(IReadOnlyList<Mod> oldSelection, IReadOnlyList<Mod> newSelection) => newSelection;
@@ -138,8 +126,14 @@ namespace osu.Game.Overlays.Mods
         private DeselectAllModsButton deselectAllModsButton = null!;
 
         private Container aboveColumnsContent = null!;
-        private RankingInformationDisplay? rankingInformationDisplay;
-        private BeatmapAttributesDisplay? beatmapAttributesDisplay;
+        protected RankingInformationDisplay? RankingInformationDisplay;
+        protected BeatmapAttributesDisplay? BeatmapAttributesDisplay;
+        protected virtual BeatmapAttributesDisplay GetBeatmapAttributesDisplay => new BeatmapAttributesDisplay
+        {
+            Anchor = Anchor.BottomRight,
+            Origin = Anchor.BottomRight,
+            BeatmapInfo = { Value = Beatmap?.BeatmapInfo }
+        };
 
         protected ShearedButton BackButton { get; private set; } = null!;
         protected ShearedToggleButton? CustomisationButton { get; private set; }
@@ -159,8 +153,8 @@ namespace osu.Game.Overlays.Mods
                 if (beatmap == value) return;
 
                 beatmap = value;
-                if (IsLoaded && beatmapAttributesDisplay != null)
-                    beatmapAttributesDisplay.BeatmapInfo.Value = beatmap?.BeatmapInfo;
+                if (IsLoaded && BeatmapAttributesDisplay != null)
+                    BeatmapAttributesDisplay.BeatmapInfo.Value = beatmap?.BeatmapInfo;
             }
         }
 
@@ -282,18 +276,12 @@ namespace osu.Game.Overlays.Mods
                     },
                     Children = new Drawable[]
                     {
-                        rankingInformationDisplay = new RankingInformationDisplay
+                        RankingInformationDisplay = new RankingInformationDisplay
                         {
                             Anchor = Anchor.BottomRight,
                             Origin = Anchor.BottomRight
                         },
-                        beatmapAttributesDisplay = new BeatmapAttributesDisplay
-                        {
-                            Anchor = Anchor.BottomRight,
-                            Origin = Anchor.BottomRight,
-                            BeatmapInfo = { Value = beatmap?.BeatmapInfo },
-                            AccountForMultiplayerMods = AccountForMultiplayerMods
-                        },
+                        BeatmapAttributesDisplay = GetBeatmapAttributesDisplay
                     }
                 });
             }
@@ -329,7 +317,7 @@ namespace osu.Game.Overlays.Mods
 
             SelectedMods.BindValueChanged(_ =>
             {
-                updateRankingInformation();
+                UpdateRankingInformation();
                 updateFromExternalSelection();
                 updateCustomisation();
 
@@ -342,11 +330,9 @@ namespace osu.Game.Overlays.Mods
                     //
                     // See https://github.com/ppy/osu/pull/23284#issuecomment-1529056988
                     modSettingChangeTracker = new ModSettingChangeTracker(SelectedMods.Value);
-                    modSettingChangeTracker.SettingChanged += _ => updateRankingInformation();
+                    modSettingChangeTracker.SettingChanged += _ => UpdateRankingInformation();
                 }
             }, true);
-
-            multiplayerRoomItem?.BindValueChanged(_ => SelectedMods.TriggerChange());
 
             customisationVisible.BindValueChanged(_ => updateCustomisationVisualState(), true);
 
@@ -371,7 +357,7 @@ namespace osu.Game.Overlays.Mods
 
             SearchTextBox.PlaceholderText = SearchTextBox.HasFocus ? Resources.Localisation.Web.CommonStrings.InputSearch : ModSelectOverlayStrings.TabToSearch;
 
-            if (beatmapAttributesDisplay != null)
+            if (BeatmapAttributesDisplay != null)
             {
                 float rightEdgeOfLastButton = footerButtonFlow.Last().ScreenSpaceDrawQuad.TopRight.X;
 
@@ -383,7 +369,7 @@ namespace osu.Game.Overlays.Mods
 
                 // only update preview panel's collapsed state after we are fully visible, to ensure all the buttons are where we expect them to be.
                 if (Alpha == 1)
-                    beatmapAttributesDisplay.Collapsed.Value = screenIsntWideEnough;
+                    BeatmapAttributesDisplay.Collapsed.Value = screenIsntWideEnough;
 
                 footerContentFlow.LayoutDuration = 200;
                 footerContentFlow.LayoutEasing = Easing.OutQuint;
@@ -466,9 +452,9 @@ namespace osu.Game.Overlays.Mods
                 modState.ValidForSelection.Value = modState.Mod.Type != ModType.System && modState.Mod.HasImplementation && IsValidMod.Invoke(modState.Mod);
         }
 
-        private void updateRankingInformation()
+        protected virtual void UpdateRankingInformation()
         {
-            if (rankingInformationDisplay == null)
+            if (RankingInformationDisplay == null)
                 return;
 
             double multiplier = 1.0;
@@ -476,20 +462,8 @@ namespace osu.Game.Overlays.Mods
             foreach (var mod in SelectedMods.Value)
                 multiplier *= mod.ScoreMultiplier;
 
-            rankingInformationDisplay.Ranked.Value = SelectedMods.Value.All(m => m.Ranked);
-
-            if (AccountForMultiplayerMods && multiplayerRoomItem != null && multiplayerRoomItem.Value != null)
-            {
-                Ruleset ruleset = game.Ruleset.Value.CreateInstance();
-                var multiplayerRoomMods = multiplayerRoomItem.Value.RequiredMods.Select(m => m.ToMod(ruleset));
-
-                foreach (var mod in multiplayerRoomMods)
-                    multiplier *= mod.ScoreMultiplier;
-
-                rankingInformationDisplay.Ranked.Value = rankingInformationDisplay.Ranked.Value && multiplayerRoomMods.All(m => m.Ranked);
-            }
-
-            rankingInformationDisplay.ModMultiplier.Value = multiplier;
+            RankingInformationDisplay.Ranked.Value = SelectedMods.Value.All(m => m.Ranked);
+            RankingInformationDisplay.ModMultiplier.Value = multiplier;
         }
 
         private void updateCustomisation()

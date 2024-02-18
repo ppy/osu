@@ -46,10 +46,7 @@ namespace osu.Game.Overlays.Mods
         public bool AccountForMultiplayerMods = false;
 
         [Resolved]
-        private Bindable<IReadOnlyList<Mod>> mods { get; set; } = null!;
-
-        [Resolved(CanBeNull = true)]
-        private IBindable<PlaylistItem>? multiplayerRoomItem { get; set; }
+        protected Bindable<IReadOnlyList<Mod>> Mods { get; private set; } = null!;
 
         public BindableBool Collapsed { get; } = new BindableBool(true);
 
@@ -61,7 +58,7 @@ namespace osu.Game.Overlays.Mods
         [Resolved]
         private OsuGameBase game { get; set; } = null!;
 
-        private IBindable<RulesetInfo> gameRuleset = null!;
+        protected IBindable<RulesetInfo> GameRuleset = null!;
 
         private CancellationTokenSource? cancellationSource;
         private IBindable<StarDifficulty?> starDifficulty = null!;
@@ -109,15 +106,13 @@ namespace osu.Game.Overlays.Mods
         {
             base.LoadComplete();
 
-            mods.BindValueChanged(_ =>
+            Mods.BindValueChanged(_ =>
             {
                 modSettingChangeTracker?.Dispose();
-                modSettingChangeTracker = new ModSettingChangeTracker(mods.Value);
+                modSettingChangeTracker = new ModSettingChangeTracker(Mods.Value);
                 modSettingChangeTracker.SettingChanged += _ => updateValues();
                 updateValues();
             }, true);
-
-            multiplayerRoomItem?.BindValueChanged(_ => mods.TriggerChange());
 
             BeatmapInfo.BindValueChanged(_ => updateValues(), true);
 
@@ -128,8 +123,8 @@ namespace osu.Game.Overlays.Mods
                 updateCollapsedState();
             });
 
-            gameRuleset = game.Ruleset.GetBoundCopy();
-            gameRuleset.BindValueChanged(_ => updateValues());
+            GameRuleset = game.Ruleset.GetBoundCopy();
+            GameRuleset.BindValueChanged(_ => updateValues());
 
             BeatmapInfo.BindValueChanged(_ => updateValues(), true);
 
@@ -159,6 +154,23 @@ namespace osu.Game.Overlays.Mods
             LeftContent.AutoSizeDuration = Content.AutoSizeDuration = transition_duration;
         }
 
+        protected virtual double GetRate()
+        {
+            double rate = 1;
+            foreach (var mod in Mods.Value.OfType<IApplicableToRate>())
+                rate = mod.ApplyToRate(0, rate);
+            return rate;
+        }
+
+        protected virtual BeatmapDifficulty GetDifficulty()
+        {
+            BeatmapDifficulty originalDifficulty = new BeatmapDifficulty(BeatmapInfo.Value!.Difficulty);
+
+            foreach (var mod in Mods.Value.OfType<IApplicableToDifficulty>())
+                mod.ApplyToDifficulty(originalDifficulty);
+
+            return originalDifficulty;
+        }
         private void updateValues() => Scheduler.AddOnce(() =>
         {
             if (BeatmapInfo.Value == null)
@@ -175,28 +187,10 @@ namespace osu.Game.Overlays.Mods
                     starRatingDisplay.FinishTransforms(true);
             });
 
-            Ruleset ruleset = gameRuleset.Value.CreateInstance();
+            double rate = GetRate();
+            BeatmapDifficulty originalDifficulty = GetDifficulty();
 
-            double rate = 1;
-            foreach (var mod in mods.Value.OfType<IApplicableToRate>())
-                rate = mod.ApplyToRate(0, rate);
-
-            BeatmapDifficulty originalDifficulty = new BeatmapDifficulty(BeatmapInfo.Value.Difficulty);
-
-            foreach (var mod in mods.Value.OfType<IApplicableToDifficulty>())
-                mod.ApplyToDifficulty(originalDifficulty);
-
-            if (AccountForMultiplayerMods && multiplayerRoomItem != null && multiplayerRoomItem.Value != null)
-            {
-                var multiplayerRoomMods = multiplayerRoomItem.Value.RequiredMods.Select(m => m.ToMod(ruleset));
-
-                foreach (var mod in multiplayerRoomMods.OfType<IApplicableToRate>())
-                    rate = mod.ApplyToRate(0, rate);
-
-                foreach (var mod in multiplayerRoomMods.OfType<IApplicableToDifficulty>())
-                    mod.ApplyToDifficulty(originalDifficulty);
-            }
-
+            Ruleset ruleset = GameRuleset.Value.CreateInstance();
             BeatmapDifficulty adjustedDifficulty = ruleset.GetRateAdjustedDisplayDifficulty(originalDifficulty, rate);
 
             bpmDisplay.Current.Value = BeatmapInfo.Value.BPM * rate;
