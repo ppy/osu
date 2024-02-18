@@ -40,11 +40,6 @@ namespace osu.Game.Overlays.Mods
 
         public Bindable<IBeatmapInfo?> BeatmapInfo { get; } = new Bindable<IBeatmapInfo?>();
 
-        /// <summary>
-        /// Should attribute display account for the multiplayer room global mods.
-        /// </summary>
-        public bool AccountForMultiplayerMods = false;
-
         [Resolved]
         protected Bindable<IReadOnlyList<Mod>> Mods { get; private set; } = null!;
 
