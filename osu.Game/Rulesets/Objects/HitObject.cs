@@ -171,11 +171,10 @@ namespace osu.Game.Rulesets.Objects
         private Judgement judgement;
 
         /// <summary>
-        /// Creates the <see cref="Judgement"/> that represents the scoring information for this <see cref="HitObject"/>.
+        /// Should be overridden to create a <see cref="Judgement"/> that represents the scoring information for this <see cref="HitObject"/>.
         /// </summary>
         /// <remarks>
-        /// Use <see cref="Judgement"/> to avoid unnecessary allocations.
-        /// This method has been left public for compatibility reasons and eventually will be made protected.
+        /// For read access, use <see cref="Judgement"/> to avoid unnecessary allocations.
         /// </remarks>
         [NotNull]
         public virtual Judgement CreateJudgement() => new Judgement();
