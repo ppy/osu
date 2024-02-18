@@ -163,6 +163,7 @@ namespace osu.Game.Overlays.Mods
                 mod.ApplyToDifficulty(originalDifficulty);
             return originalDifficulty;
         }
+
         private void updateValues() => Scheduler.AddOnce(() =>
         {
             if (BeatmapInfo.Value == null)

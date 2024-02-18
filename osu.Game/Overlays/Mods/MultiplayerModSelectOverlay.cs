@@ -86,12 +86,14 @@ namespace osu.Game.Overlays.Mods
         {
             double rate = base.GetRate();
             Ruleset ruleset = GameRuleset.Value.CreateInstance();
-            if (multiplayerRoomItem != null && multiplayerRoomItem.Value != null)
+
+            if (multiplayerRoomItem?.Value != null)
             {
                 var multiplayerRoomMods = multiplayerRoomItem.Value.RequiredMods.Select(m => m.ToMod(ruleset));
                 foreach (var mod in multiplayerRoomMods.OfType<IApplicableToRate>())
                     rate = mod.ApplyToRate(0, rate);
             }
+
             return rate;
         }
 
@@ -99,12 +101,14 @@ namespace osu.Game.Overlays.Mods
         {
             BeatmapDifficulty originalDifficulty = base.GetDifficulty();
             Ruleset ruleset = GameRuleset.Value.CreateInstance();
-            if (multiplayerRoomItem != null && multiplayerRoomItem.Value != null)
+
+            if (multiplayerRoomItem?.Value != null)
             {
                 var multiplayerRoomMods = multiplayerRoomItem.Value.RequiredMods.Select(m => m.ToMod(ruleset));
                 foreach (var mod in multiplayerRoomMods.OfType<IApplicableToDifficulty>())
                     mod.ApplyToDifficulty(originalDifficulty);
             }
+
             return originalDifficulty;
         }
     }

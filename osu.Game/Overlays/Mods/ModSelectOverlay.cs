@@ -42,7 +42,6 @@ namespace osu.Game.Overlays.Mods
         [Cached]
         public Bindable<IReadOnlyList<Mod>> SelectedMods { get; private set; } = new Bindable<IReadOnlyList<Mod>>(Array.Empty<Mod>());
 
-
         /// <summary>
         /// Contains a dictionary with the current <see cref="ModState"/> of all mods applicable for the current ruleset.
         /// </summary>
@@ -128,6 +127,7 @@ namespace osu.Game.Overlays.Mods
         private Container aboveColumnsContent = null!;
         protected RankingInformationDisplay? RankingInformationDisplay;
         protected BeatmapAttributesDisplay? BeatmapAttributesDisplay;
+
         protected virtual BeatmapAttributesDisplay GetBeatmapAttributesDisplay => new BeatmapAttributesDisplay
         {
             Anchor = Anchor.BottomRight,
