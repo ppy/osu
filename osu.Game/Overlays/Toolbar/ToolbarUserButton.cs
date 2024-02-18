@@ -78,6 +78,13 @@ namespace osu.Game.Overlays.Toolbar
                 }
             });
 
+            Flow.Add(new TransientUserStatisticsUpdateDisplay
+            {
+                Alpha = 0
+            });
+            Flow.AutoSizeEasing = Easing.OutQuint;
+            Flow.AutoSizeDuration = 250;
+
             apiState = api.State.GetBoundCopy();
             apiState.BindValueChanged(onlineStateChanged, true);
 
