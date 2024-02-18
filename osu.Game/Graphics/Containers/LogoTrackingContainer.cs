@@ -82,9 +82,9 @@ namespace osu.Game.Graphics.Containers
                 absolutePos.Y / Logo.Parent!.RelativeToAbsoluteFactor.Y);
         }
 
-        protected override void Update()
+        protected override void UpdateAfterChildren()
         {
-            base.Update();
+            base.UpdateAfterChildren();
 
             if (Logo == null)
                 return;
