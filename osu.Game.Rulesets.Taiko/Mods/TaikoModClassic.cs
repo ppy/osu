@@ -100,16 +100,13 @@ namespace osu.Game.Rulesets.Taiko.Mods
             var drawableTaikoRuleset = (DrawableTaikoRuleset)drawableRuleset;
             var adjustmentContainer = (TaikoPlayfieldAdjustmentContainer)drawableTaikoRuleset.PlayfieldAdjustmentContainer;
 
-            float aspect = Math.Clamp(
-                adjustmentContainer.CurrentAspect,
-                adjustmentContainer.MinimumAspect,
-                adjustmentContainer.MaximumAspect);
+            float clampedAspect = adjustmentContainer.ClampedCurrentAspect;
 
-            float fadeOutDurationAdjustment = aspect / baseAspect - 1;
+            float fadeOutDurationAdjustment = clampedAspect / baseAspect - 1;
             fadeOutDurationAdjustment *= adjustmentRatio;
             hiddenFadeOutDuration.Value = baseFadeOutDuration + fadeOutDurationAdjustment;
 
-            float initialAlphaAdjustment = aspect / baseAspect - 1;
+            float initialAlphaAdjustment = clampedAspect / baseAspect - 1;
             initialAlphaAdjustment *= adjustmentRatio;
             hiddenInitialAlpha.Value = baseInitialAlpha + initialAlphaAdjustment;
         }
