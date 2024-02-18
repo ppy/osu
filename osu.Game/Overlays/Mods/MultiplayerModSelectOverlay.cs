@@ -51,7 +51,7 @@ namespace osu.Game.Overlays.Mods
 
             RankingInformationDisplay.Ranked.Value = SelectedMods.Value.All(m => m.Ranked);
 
-            if (multiplayerRoomItem != null && multiplayerRoomItem.Value != null)
+            if (multiplayerRoomItem?.Value != null)
             {
                 Ruleset ruleset = game.Ruleset.Value.CreateInstance();
                 var multiplayerRoomMods = multiplayerRoomItem.Value.RequiredMods.Select(m => m.ToMod(ruleset));
@@ -68,11 +68,6 @@ namespace osu.Game.Overlays.Mods
 
     public partial class MultiplayerBeatmapAttributesDisplay : BeatmapAttributesDisplay
     {
-        public MultiplayerBeatmapAttributesDisplay()
-            : base()
-        {
-        }
-
         [Resolved(CanBeNull = true)]
         private IBindable<PlaylistItem>? multiplayerRoomItem { get; set; }
 
