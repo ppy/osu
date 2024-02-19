@@ -137,11 +137,11 @@ namespace osu.Game.Screens.Play
                 if (displayNotification || shouldExit)
                 {
                     string whatWillHappen = shouldExit
-                        ? "You are not able to submit a score."
-                        : "The following score will not be submitted.";
+                        ? "Play in this state is not permitted."
+                        : "Your score will not be submitted.";
 
                     if (string.IsNullOrEmpty(exception.Message))
-                        Logger.Error(exception, $"{whatWillHappen} Failed to retrieve a score submission token.");
+                        Logger.Error(exception, $"Failed to retrieve a score submission token.\n\n{whatWillHappen}");
                     else
                     {
                         switch (exception.Message)
@@ -149,11 +149,11 @@ namespace osu.Game.Screens.Play
                             case @"missing token header":
                             case @"invalid client hash":
                             case @"invalid verification hash":
-                                Logger.Log($"{whatWillHappen} Please ensure that you are using the latest version of the official game releases.", level: LogLevel.Important);
+                                Logger.Log($"Please ensure that you are using the latest version of the official game releases.\n\n{whatWillHappen}", level: LogLevel.Important);
                                 break;
 
                             case @"expired token":
-                                Logger.Log($"{whatWillHappen} Your system clock is set incorrectly. Please check your system time, date and timezone.", level: LogLevel.Important);
+                                Logger.Log($"Your system clock is set incorrectly. Please check your system time, date and timezone.\n\n{whatWillHappen}", level: LogLevel.Important);
                                 break;
 
                             default:
