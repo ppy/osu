@@ -254,7 +254,6 @@ namespace osu.Game.Graphics.UserInterface
                                 Padding = new MarginPadding { Left = 15 },
                                 Origin = Anchor.CentreLeft,
                                 Anchor = Anchor.CentreLeft,
-                                RelativeSizeAxes = Axes.X,
                             },
                         };
                     }
