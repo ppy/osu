@@ -186,6 +186,8 @@ namespace osu.Game.Graphics.UserInterface
                     : base(item)
                 {
                     Foreground.Padding = new MarginPadding(2);
+                    Foreground.AutoSizeAxes = Axes.Y;
+                    Foreground.RelativeSizeAxes = Axes.X;
 
                     Masking = true;
                     CornerRadius = corner_radius;
@@ -247,11 +249,12 @@ namespace osu.Game.Graphics.UserInterface
                                 Origin = Anchor.CentreLeft,
                                 Anchor = Anchor.CentreLeft,
                             },
-                            Label = new OsuSpriteText
+                            Label = new TruncatingSpriteText
                             {
-                                X = 15,
+                                Padding = new MarginPadding { Left = 15 },
                                 Origin = Anchor.CentreLeft,
                                 Anchor = Anchor.CentreLeft,
+                                RelativeSizeAxes = Axes.X,
                             },
                         };
                     }

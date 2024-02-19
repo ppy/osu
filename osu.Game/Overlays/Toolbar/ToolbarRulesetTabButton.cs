@@ -4,7 +4,6 @@
 using osu.Framework.Allocation;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
-using osu.Framework.Graphics.Effects;
 using osu.Framework.Graphics.UserInterface;
 using osu.Framework.Input.Events;
 using osu.Game.Graphics;
@@ -48,7 +47,7 @@ namespace osu.Game.Overlays.Toolbar
 
             public RulesetButton()
             {
-                Padding = new MarginPadding(3)
+                ButtonContent.Padding = new MarginPadding(PADDING)
                 {
                     Bottom = 5
                 };
@@ -58,15 +57,7 @@ namespace osu.Game.Overlays.Toolbar
             {
                 set => Scheduler.AddOnce(() =>
                 {
-                    if (value)
-                    {
-                        IconContainer.Colour = Color4Extensions.FromHex("#00FFAA");
-                    }
-                    else
-                    {
-                        IconContainer.Colour = colours.GrayF;
-                        IconContainer.EdgeEffect = new EdgeEffectParameters();
-                    }
+                    IconContainer.Colour = value ? Color4Extensions.FromHex("#00FFAA") : colours.GrayF;
                 });
             }
 
