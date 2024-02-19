@@ -361,12 +361,12 @@ namespace osu.Game.Beatmaps
         /// </summary>
         public void DeleteVideos(List<BeatmapSetInfo> items, bool silent = false)
         {
-            var noVideosMessage = "No videos found to delete!";
+            const string no_videos_message = "No videos found to delete!";
 
             if (items.Count == 0)
             {
                 if (!silent)
-                    PostNotification?.Invoke(new ProgressCompletionNotification { Text = noVideosMessage });
+                    PostNotification?.Invoke(new ProgressCompletionNotification { Text = no_videos_message });
                 return;
             }
 
@@ -374,7 +374,7 @@ namespace osu.Game.Beatmaps
             {
                 Progress = 0,
                 Text = $"Preparing to delete all {HumanisedModelName} videos...",
-                CompletionText = noVideosMessage,
+                CompletionText = no_videos_message,
                 State = ProgressNotificationState.Active,
             };
 
