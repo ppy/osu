@@ -27,10 +27,10 @@ namespace osu.Game.Users
         [Resolved]
         private IAPIProvider api { get; set; } = null!;
 
+        private ProfileValueDisplay globalRankDisplay = null!;
         private ProfileValueDisplay countryRankDisplay = null!;
 
         private readonly IBindable<UserStatistics?> statistics = new Bindable<UserStatistics?>();
-        private readonly IBindable<APIUser?> user = new Bindable<APIUser?>();
 
         public UserRankPanel(APIUser user)
             : base(user)
@@ -47,10 +47,9 @@ namespace osu.Game.Users
             statistics.BindTo(api.Statistics);
             statistics.BindValueChanged(stats =>
             {
+                globalRankDisplay.Content = stats.NewValue?.GlobalRank?.ToLocalisableString("\\##,##0") ?? "-";
                 countryRankDisplay.Content = stats.NewValue?.CountryRank?.ToLocalisableString("\\##,##0") ?? "-";
             }, true);
-
-            user.BindTo(api.LocalUser!);
         }
 
         protected override Drawable CreateLayout()
@@ -164,12 +163,12 @@ namespace osu.Game.Users
                         {
                             new Drawable[]
                             {
-                                new GlobalRankDisplay
+                                globalRankDisplay = new ProfileValueDisplay(true)
                                 {
-                                    UserStatistics = { BindTarget = statistics },
-                                    // TODO: make highest rank update, as `api.LocalUser` doesn't update
+                                    Title = UsersStrings.ShowRankGlobalSimple,
+                                    // TODO: implement highest rank tooltip
+                                    // `RankHighest` resides in `APIUser`, but `api.LocalUser` doesn't update
                                     // maybe move to `UserStatistics` in api, so `SoloStatisticsWatcher` can update the value
-                                    User = { BindTarget = user },
                                 },
                                 countryRankDisplay = new ProfileValueDisplay(true)
                                 {
