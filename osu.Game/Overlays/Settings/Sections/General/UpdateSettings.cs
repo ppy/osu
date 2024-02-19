@@ -10,6 +10,7 @@ using osu.Framework.Localisation;
 using osu.Framework.Logging;
 using osu.Framework.Platform;
 using osu.Framework.Screens;
+using osu.Framework.Statistics;
 using osu.Game.Configuration;
 using osu.Game.Localisation;
 using osu.Game.Overlays.Notifications;
@@ -107,6 +108,9 @@ namespace osu.Game.Overlays.Settings.Sections.General
 
             try
             {
+                GlobalStatistics.OutputToLog();
+                Logger.Flush();
+
                 var logStorage = Logger.Storage;
 
                 using (var outStream = storage.CreateFileSafely(archive_filename))
