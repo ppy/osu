@@ -34,6 +34,7 @@ namespace osu.Game.Overlays
         private IAPIProvider api { get; set; } = null!;
 
         private Container<Drawable> medalContainer = null!;
+        private MedalAnimation? lastAnimation;
 
         [BackgroundDependencyLoader]
         private void load()
@@ -54,7 +55,7 @@ namespace osu.Game.Overlays
 
             OverlayActivationMode.BindValueChanged(val =>
             {
-                if (val.NewValue == OverlayActivation.All && (queuedMedals.Any() || medalContainer.Any()))
+                if (val.NewValue == OverlayActivation.All && (queuedMedals.Any() || medalContainer.Any() || lastAnimation?.IsLoaded == false))
                     Show();
             }, true);
         }
@@ -89,21 +90,21 @@ namespace osu.Game.Overlays
         {
             base.Update();
 
-            if (medalContainer.Any())
+            if (medalContainer.Any() || lastAnimation?.IsLoaded == false)
                 return;
 
-            if (!queuedMedals.TryDequeue(out var medal))
+            if (!queuedMedals.TryDequeue(out lastAnimation))
             {
                 Hide();
                 return;
             }
 
-            LoadComponentAsync(medal, medalContainer.Add);
+            LoadComponentAsync(lastAnimation, medalContainer.Add);
         }
 
         protected override bool OnClick(ClickEvent e)
         {
-            (medalContainer.FirstOrDefault(anim => anim.IsAlive) as MedalAnimation)?.Dismiss();
+            lastAnimation?.Dismiss();
             return true;
         }
 
@@ -111,7 +112,7 @@ namespace osu.Game.Overlays
         {
             if (e.Action == GlobalAction.Back)
             {
-                (medalContainer.FirstOrDefault(anim => anim.IsAlive) as MedalAnimation)?.Dismiss();
+                lastAnimation?.Dismiss();
                 return true;
             }
 
