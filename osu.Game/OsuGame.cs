@@ -1072,7 +1072,6 @@ namespace osu.Game
             loadComponentSingleFile(beatmapSetOverlay = new BeatmapSetOverlay(), overlayContent.Add, true);
             loadComponentSingleFile(wikiOverlay = new WikiOverlay(), overlayContent.Add, true);
             loadComponentSingleFile(skinEditor = new SkinEditorOverlay(ScreenContainer), overlayContent.Add, true);
-            loadComponentSingleFile(new MedalOverlay(), overlayContent.Add);
 
             loadComponentSingleFile(new LoginOverlay
             {
@@ -1088,6 +1087,7 @@ namespace osu.Game
 
             loadComponentSingleFile(new AccountCreationOverlay(), topMostOverlayContent.Add, true);
             loadComponentSingleFile<IDialogOverlay>(new DialogOverlay(), topMostOverlayContent.Add, true);
+            loadComponentSingleFile(new MedalOverlay(), topMostOverlayContent.Add);
 
             loadComponentSingleFile(CreateHighPerformanceSession(), Add);
 
