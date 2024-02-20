@@ -1,8 +1,6 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
 using osuTK;
 using osuTK.Graphics;
 using osu.Framework.Extensions.Color4Extensions;
@@ -20,6 +18,7 @@ using osu.Framework.Audio;
 using osu.Framework.Graphics.Textures;
 using osu.Framework.Graphics.Shapes;
 using System;
+using System.Diagnostics;
 using osu.Framework.Graphics.Effects;
 using osu.Framework.Utils;
 
@@ -37,9 +36,9 @@ namespace osu.Game.Overlays
         private readonly BackgroundStrip leftStrip, rightStrip;
         private readonly CircularContainer disc;
         private readonly Sprite innerSpin, outerSpin;
-        private DrawableMedal drawableMedal;
 
-        private Sample getSample;
+        private DrawableMedal? drawableMedal;
+        private Sample? getSample;
 
         private readonly Container content;
 
@@ -197,7 +196,7 @@ namespace osu.Game.Overlays
 
             background.FlashColour(Color4.White.Opacity(0.25f), 400);
 
-            getSample.Play();
+            getSample?.Play();
 
             innerSpin.Spin(20000, RotationDirection.Clockwise);
             outerSpin.Spin(40000, RotationDirection.Clockwise);
@@ -215,6 +214,8 @@ namespace osu.Game.Overlays
                     backgroundStrip.FadeIn(step_duration);
                     leftStrip.ResizeWidthTo(1f, step_duration, Easing.OutQuint);
                     rightStrip.ResizeWidthTo(1f, step_duration, Easing.OutQuint);
+
+                    Debug.Assert(drawableMedal != null);
 
                     this.Animate().Schedule(() =>
                     {
@@ -245,7 +246,7 @@ namespace osu.Game.Overlays
 
         public void Dismiss()
         {
-            if (drawableMedal.State != DisplayState.Full)
+            if (drawableMedal != null && drawableMedal.State != DisplayState.Full)
             {
                 // if we haven't yet, play out the animation fully
                 drawableMedal.State = DisplayState.Full;
