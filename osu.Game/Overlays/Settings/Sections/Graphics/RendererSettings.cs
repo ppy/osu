@@ -36,7 +36,7 @@ namespace osu.Game.Overlays.Settings.Sections.Graphics
                 {
                     LabelText = GraphicsSettingsStrings.Renderer,
                     Current = renderer,
-                    Items = host.GetPreferredRenderersForCurrentPlatform().OrderBy(t => t).Where(t => t != RendererType.Vulkan),
+                    Items = host.GetPreferredRenderersForCurrentPlatform().Order().Where(t => t != RendererType.Vulkan),
                     Keywords = new[] { @"compatibility", @"directx" },
                 },
                 // TODO: this needs to be a custom dropdown at some point

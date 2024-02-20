@@ -5,10 +5,11 @@
 
 using System;
 using System.Threading;
+using System.Threading.Tasks;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
-using osu.Framework.Extensions;
 using osu.Framework.Graphics;
+using osu.Game.Beatmaps;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Resources.Localisation.Web;
 using osu.Game.Scoring;
@@ -32,7 +33,7 @@ namespace osu.Game.Screens.Ranking.Expanded.Statistics
         }
 
         [BackgroundDependencyLoader]
-        private void load(ScorePerformanceCache performanceCache)
+        private void load(BeatmapDifficultyCache difficultyCache, CancellationToken? cancellationToken)
         {
             if (score.PP.HasValue)
             {
@@ -40,8 +41,19 @@ namespace osu.Game.Screens.Ranking.Expanded.Statistics
             }
             else
             {
-                performanceCache.CalculatePerformanceAsync(score, cancellationTokenSource.Token)
-                                .ContinueWith(t => Schedule(() => setPerformanceValue(t.GetResultSafely()?.Total)), cancellationTokenSource.Token);
+                Task.Run(async () =>
+                {
+                    var attributes = await difficultyCache.GetDifficultyAsync(score.BeatmapInfo!, score.Ruleset, score.Mods, cancellationToken ?? default).ConfigureAwait(false);
+                    var performanceCalculator = score.Ruleset.CreateInstance().CreatePerformanceCalculator();
+
+                    // Performance calculation requires the beatmap and ruleset to be locally available. If not, return a default value.
+                    if (attributes?.Attributes == null || performanceCalculator == null)
+                        return;
+
+                    var result = await performanceCalculator.CalculateAsync(score, attributes.Value.Attributes, cancellationToken ?? default).ConfigureAwait(false);
+
+                    Schedule(() => setPerformanceValue(result.Total));
+                }, cancellationToken ?? default);
             }
         }
 

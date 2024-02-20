@@ -118,8 +118,6 @@ namespace osu.Game.Screens.OnlinePlay
         [Resolved(CanBeNull = true)]
         private ManageCollectionsDialog manageCollectionsDialog { get; set; }
 
-        protected override bool ShouldBeConsideredForInput(Drawable child) => AllowReordering || AllowDeletion || !AllowSelection || SelectedItem.Value == Model;
-
         public DrawableRoomPlaylistItem(PlaylistItem item)
             : base(item)
         {
@@ -367,7 +365,7 @@ namespace osu.Game.Screens.OnlinePlay
                                     AutoSizeAxes = Axes.Both,
                                     Margin = new MarginPadding { Left = 8, Right = 8 },
                                 },
-                                mainFillFlow = new FillFlowContainer
+                                mainFillFlow = new MainFlow(() => SelectedItem.Value == Model || !AllowSelection)
                                 {
                                     Anchor = Anchor.CentreLeft,
                                     Origin = Anchor.CentreLeft,
@@ -668,6 +666,18 @@ namespace osu.Game.Screens.OnlinePlay
                 }
 
                 public LocalisableString TooltipText => avatar.TooltipText;
+            }
+        }
+
+        public partial class MainFlow : FillFlowContainer
+        {
+            private readonly Func<bool> allowInteraction;
+
+            public override bool PropagatePositionalInputSubTree => allowInteraction();
+
+            public MainFlow(Func<bool> allowInteraction)
+            {
+                this.allowInteraction = allowInteraction;
             }
         }
     }

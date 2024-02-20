@@ -67,6 +67,8 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
             if (!LoadedBeatmapSuccessfully)
                 return;
 
+            ScoreProcessor.ApplyNewJudgementsWhenFailed = true;
+
             LoadComponentAsync(new GameplayChatDisplay(Room)
             {
                 Expanded = { BindTarget = LeaderboardExpandedState },

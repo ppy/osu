@@ -41,7 +41,7 @@ namespace osu.Game.Screens.OnlinePlay.Playlists
         [Resolved]
         private RulesetStore rulesets { get; set; }
 
-        public PlaylistsResultsScreen(ScoreInfo score, long roomId, PlaylistItem playlistItem, bool allowRetry, bool allowWatchingReplay = true)
+        public PlaylistsResultsScreen([CanBeNull] ScoreInfo score, long roomId, PlaylistItem playlistItem, bool allowRetry, bool allowWatchingReplay = true)
             : base(score, allowRetry, allowWatchingReplay)
         {
             this.roomId = roomId;

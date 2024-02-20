@@ -4,6 +4,7 @@
 #nullable disable
 
 using System;
+using JetBrains.Annotations;
 using osu.Framework;
 using osuTK;
 using osu.Framework.Allocation;
@@ -24,6 +25,7 @@ namespace osu.Game.Overlays.MedalSplash
         private const float scale_when_unlocked = 0.76f;
         private const float scale_when_full = 0.6f;
 
+        [CanBeNull]
         public event Action<DisplayState> StateChanged;
 
         private readonly Medal medal;

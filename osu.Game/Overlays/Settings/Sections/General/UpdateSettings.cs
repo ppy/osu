@@ -15,6 +15,7 @@ using osu.Game.Localisation;
 using osu.Game.Overlays.Notifications;
 using osu.Game.Overlays.Settings.Sections.Maintenance;
 using osu.Game.Updater;
+using osu.Game.Utils;
 using SharpCompress.Archives.Zip;
 
 namespace osu.Game.Overlays.Settings.Sections.General
@@ -111,7 +112,8 @@ namespace osu.Game.Overlays.Settings.Sections.General
                 using (var outStream = storage.CreateFileSafely(archive_filename))
                 using (var zip = ZipArchive.Create())
                 {
-                    foreach (string? f in logStorage.GetFiles(string.Empty, "*.log")) zip.AddEntry(f, logStorage.GetStream(f), true);
+                    foreach (string? f in logStorage.GetFiles(string.Empty, "*.log"))
+                        FileUtils.AttemptOperation(z => z.AddEntry(f, logStorage.GetStream(f), true), zip);
 
                     zip.SaveTo(outStream);
                 }

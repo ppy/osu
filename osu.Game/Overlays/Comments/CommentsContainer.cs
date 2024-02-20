@@ -301,7 +301,7 @@ namespace osu.Game.Overlays.Comments
 
             void addNewComment(Comment comment)
             {
-                var drawableComment = GetDrawableComment(comment);
+                var drawableComment = GetDrawableComment(comment, bundle.CommentableMeta);
 
                 if (comment.ParentId == null)
                 {
@@ -333,7 +333,7 @@ namespace osu.Game.Overlays.Comments
                 if (CommentDictionary.ContainsKey(comment.Id))
                     continue;
 
-                topLevelComments.Add(GetDrawableComment(comment));
+                topLevelComments.Add(GetDrawableComment(comment, bundle.CommentableMeta));
             }
 
             if (topLevelComments.Any())
@@ -351,12 +351,12 @@ namespace osu.Game.Overlays.Comments
             }
         }
 
-        public DrawableComment GetDrawableComment(Comment comment)
+        public DrawableComment GetDrawableComment(Comment comment, IReadOnlyList<CommentableMeta> meta)
         {
             if (CommentDictionary.TryGetValue(comment.Id, out var existing))
                 return existing;
 
-            return CommentDictionary[comment.Id] = new DrawableComment(comment)
+            return CommentDictionary[comment.Id] = new DrawableComment(comment, meta)
             {
                 ShowDeleted = { BindTarget = ShowDeleted },
                 Sort = { BindTarget = Sort },

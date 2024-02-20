@@ -7,7 +7,9 @@ using Moq;
 using NUnit.Framework;
 using osu.Framework.Localisation;
 using osu.Game.Rulesets.Mods;
+using osu.Game.Rulesets.Osu;
 using osu.Game.Rulesets.Osu.Mods;
+using osu.Game.Rulesets.Taiko.Mods;
 using osu.Game.Utils;
 
 namespace osu.Game.Tests.Mods
@@ -308,6 +310,16 @@ namespace osu.Game.Tests.Mods
                 Assert.IsNull(invalid);
             else
                 Assert.That(invalid?.Select(t => t.GetType()), Is.EquivalentTo(expectedInvalid));
+        }
+
+        [Test]
+        public void TestModBelongsToRuleset()
+        {
+            Assert.That(ModUtils.CheckModsBelongToRuleset(new OsuRuleset(), Array.Empty<Mod>()));
+            Assert.That(ModUtils.CheckModsBelongToRuleset(new OsuRuleset(), new Mod[] { new OsuModDoubleTime() }));
+            Assert.That(ModUtils.CheckModsBelongToRuleset(new OsuRuleset(), new Mod[] { new OsuModDoubleTime(), new OsuModAccuracyChallenge() }));
+            Assert.That(ModUtils.CheckModsBelongToRuleset(new OsuRuleset(), new Mod[] { new OsuModDoubleTime(), new ModAccuracyChallenge() }), Is.False);
+            Assert.That(ModUtils.CheckModsBelongToRuleset(new OsuRuleset(), new Mod[] { new OsuModDoubleTime(), new TaikoModFlashlight() }), Is.False);
         }
 
         [Test]

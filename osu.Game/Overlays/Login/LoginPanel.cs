@@ -25,12 +25,11 @@ namespace osu.Game.Overlays.Login
     {
         private bool bounding = true;
 
-        private LoginForm? form;
+        private Drawable? form;
 
         [Resolved]
         private OsuColour colours { get; set; } = null!;
 
-        private UserGridPanel panel = null!;
         private UserDropdown dropdown = null!;
 
         /// <summary>
@@ -39,6 +38,7 @@ namespace osu.Game.Overlays.Login
         public Action? RequestHide;
 
         private readonly IBindable<APIState> apiState = new Bindable<APIState>();
+        private readonly Bindable<UserStatus?> userStatus = new Bindable<UserStatus?>();
 
         [Resolved]
         private IAPIProvider api { get; set; } = null!;
@@ -79,6 +79,10 @@ namespace osu.Game.Overlays.Login
                     {
                         RequestHide = RequestHide
                     };
+                    break;
+
+                case APIState.RequiresSecondFactorAuth:
+                    Child = form = new SecondFactorAuthForm();
                     break;
 
                 case APIState.Failing:
@@ -131,7 +135,7 @@ namespace osu.Game.Overlays.Login
                                 Text = LoginPanelStrings.SignedIn,
                                 Font = OsuFont.GetFont(size: 18, weight: FontWeight.Bold),
                             },
-                            panel = new UserGridPanel(api.LocalUser.Value)
+                            new UserRankPanel(api.LocalUser.Value)
                             {
                                 RelativeSizeAxes = Axes.X,
                                 Action = RequestHide
@@ -140,10 +144,8 @@ namespace osu.Game.Overlays.Login
                         },
                     };
 
-                    panel.Status.BindTo(api.LocalUser.Value.Status);
-                    panel.Activity.BindTo(api.LocalUser.Value.Activity);
-
-                    panel.Status.BindValueChanged(_ => updateDropdownCurrent(), true);
+                    userStatus.BindTo(api.LocalUser.Value.Status);
+                    userStatus.BindValueChanged(e => updateDropdownCurrent(e.NewValue), true);
 
                     dropdown.Current.BindValueChanged(action =>
                     {
@@ -176,9 +178,9 @@ namespace osu.Game.Overlays.Login
                 ScheduleAfterChildren(() => GetContainingInputManager()?.ChangeFocus(form));
         });
 
-        private void updateDropdownCurrent()
+        private void updateDropdownCurrent(UserStatus? status)
         {
-            switch (panel.Status.Value)
+            switch (status)
             {
                 case UserStatus.Online:
                     dropdown.Current.Value = UserAction.Online;

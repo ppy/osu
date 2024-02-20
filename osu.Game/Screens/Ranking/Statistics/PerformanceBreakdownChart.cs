@@ -40,9 +40,6 @@ namespace osu.Game.Screens.Ranking.Statistics
         private readonly CancellationTokenSource cancellationTokenSource = new CancellationTokenSource();
 
         [Resolved]
-        private ScorePerformanceCache performanceCache { get; set; }
-
-        [Resolved]
         private BeatmapDifficultyCache difficultyCache { get; set; }
 
         public PerformanceBreakdownChart(ScoreInfo score, IBeatmap playableBeatmap)
@@ -148,7 +145,7 @@ namespace osu.Game.Screens.Ranking.Statistics
 
             spinner.Show();
 
-            new PerformanceBreakdownCalculator(playableBeatmap, difficultyCache, performanceCache)
+            new PerformanceBreakdownCalculator(playableBeatmap, difficultyCache)
                 .CalculateAsync(score, cancellationTokenSource.Token)
                 .ContinueWith(t => Schedule(() => setPerformanceValue(t.GetResultSafely())));
         }

@@ -67,19 +67,19 @@ namespace osu.Game.Screens.Select.Carousel
             {
                 default:
                 case SortMode.Artist:
-                    comparison = string.Compare(BeatmapSet.Metadata.Artist, otherSet.BeatmapSet.Metadata.Artist, StringComparison.OrdinalIgnoreCase);
+                    comparison = string.Compare(BeatmapSet.Metadata.Artist, otherSet.BeatmapSet.Metadata.Artist, StringComparison.Ordinal);
                     break;
 
                 case SortMode.Title:
-                    comparison = string.Compare(BeatmapSet.Metadata.Title, otherSet.BeatmapSet.Metadata.Title, StringComparison.OrdinalIgnoreCase);
+                    comparison = string.Compare(BeatmapSet.Metadata.Title, otherSet.BeatmapSet.Metadata.Title, StringComparison.Ordinal);
                     break;
 
                 case SortMode.Author:
-                    comparison = string.Compare(BeatmapSet.Metadata.Author.Username, otherSet.BeatmapSet.Metadata.Author.Username, StringComparison.OrdinalIgnoreCase);
+                    comparison = string.Compare(BeatmapSet.Metadata.Author.Username, otherSet.BeatmapSet.Metadata.Author.Username, StringComparison.Ordinal);
                     break;
 
                 case SortMode.Source:
-                    comparison = string.Compare(BeatmapSet.Metadata.Source, otherSet.BeatmapSet.Metadata.Source, StringComparison.OrdinalIgnoreCase);
+                    comparison = string.Compare(BeatmapSet.Metadata.Source, otherSet.BeatmapSet.Metadata.Source, StringComparison.Ordinal);
                     break;
 
                 case SortMode.DateAdded:
@@ -91,19 +91,19 @@ namespace osu.Game.Screens.Select.Carousel
                     break;
 
                 case SortMode.LastPlayed:
-                    comparison = -compareUsingAggregateMax(otherSet, b => (b.LastPlayed ?? DateTimeOffset.MinValue).ToUnixTimeSeconds());
+                    comparison = -compareUsingAggregateMax(otherSet, static b => (b.LastPlayed ?? DateTimeOffset.MinValue).ToUnixTimeSeconds());
                     break;
 
                 case SortMode.BPM:
-                    comparison = compareUsingAggregateMax(otherSet, b => b.BPM);
+                    comparison = compareUsingAggregateMax(otherSet, static b => b.BPM);
                     break;
 
                 case SortMode.Length:
-                    comparison = compareUsingAggregateMax(otherSet, b => b.Length);
+                    comparison = compareUsingAggregateMax(otherSet, static b => b.Length);
                     break;
 
                 case SortMode.Difficulty:
-                    comparison = compareUsingAggregateMax(otherSet, b => b.StarRating);
+                    comparison = compareUsingAggregateMax(otherSet, static b => b.StarRating);
                     break;
 
                 case SortMode.DateSubmitted:
@@ -127,12 +127,40 @@ namespace osu.Game.Screens.Select.Carousel
         /// <summary>
         /// All beatmaps which are not filtered and valid for display.
         /// </summary>
-        protected IEnumerable<BeatmapInfo> ValidBeatmaps => Beatmaps.Where(b => !b.Filtered.Value || b.State.Value == CarouselItemState.Selected).Select(b => b.BeatmapInfo);
+        protected IEnumerable<BeatmapInfo> ValidBeatmaps
+        {
+            get
+            {
+                foreach (var item in Items) // iterating over Items directly to not allocate 2 enumerators
+                {
+                    if (item is CarouselBeatmap b && (!b.Filtered.Value || b.State.Value == CarouselItemState.Selected))
+                        yield return b.BeatmapInfo;
+                }
+            }
+        }
+
+        /// <summary>
+        /// Whether there are available beatmaps which are not filtered and valid for display.
+        /// Cheaper alternative to <see cref="ValidBeatmaps"/>.Any()
+        /// </summary>
+        public bool HasValidBeatmaps
+        {
+            get
+            {
+                foreach (var item in Items) // iterating over Items directly to not allocate 2 enumerators
+                {
+                    if (item is CarouselBeatmap b && (!b.Filtered.Value || b.State.Value == CarouselItemState.Selected))
+                        return true;
+                }
+
+                return false;
+            }
+        }
 
         private int compareUsingAggregateMax(CarouselBeatmapSet other, Func<BeatmapInfo, double> func)
         {
-            bool ourBeatmaps = ValidBeatmaps.Any();
-            bool otherBeatmaps = other.ValidBeatmaps.Any();
+            bool ourBeatmaps = HasValidBeatmaps;
+            bool otherBeatmaps = other.HasValidBeatmaps;
 
             if (!ourBeatmaps && !otherBeatmaps) return 0;
             if (!ourBeatmaps) return -1;
