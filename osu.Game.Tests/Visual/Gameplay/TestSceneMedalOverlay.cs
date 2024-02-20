@@ -1,6 +1,7 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System.Linq;
 using Moq;
 using Newtonsoft.Json.Linq;
 using NUnit.Framework;
@@ -51,6 +52,7 @@ namespace osu.Game.Tests.Visual.Gameplay
                 Slug = @"all-intro-doubletime"
             });
             AddUntilStep("overlay shown", () => overlay.State.Value, () => Is.EqualTo(Visibility.Visible));
+            AddUntilStep("wait for load", () => this.ChildrenOfType<MedalAnimation>().Any());
             AddRepeatStep("dismiss", () => InputManager.Key(Key.Escape), 2);
             AddUntilStep("overlay hidden", () => overlay.State.Value, () => Is.EqualTo(Visibility.Hidden));
         }
