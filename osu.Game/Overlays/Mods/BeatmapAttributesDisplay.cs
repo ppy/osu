@@ -41,6 +41,7 @@ namespace osu.Game.Overlays.Mods
 
         [Resolved]
         protected Bindable<IReadOnlyList<Mod>> Mods { get; private set; } = null!;
+        protected virtual IEnumerable<Mod> SelectedMods => Mods.Value;
 
         public BindableBool Collapsed { get; } = new BindableBool(true);
 
@@ -148,22 +149,6 @@ namespace osu.Game.Overlays.Mods
             LeftContent.AutoSizeDuration = Content.AutoSizeDuration = transition_duration;
         }
 
-        protected virtual double GetRate()
-        {
-            double rate = 1;
-            foreach (var mod in Mods.Value.OfType<IApplicableToRate>())
-                rate = mod.ApplyToRate(0, rate);
-            return rate;
-        }
-
-        protected virtual BeatmapDifficulty GetDifficulty()
-        {
-            BeatmapDifficulty originalDifficulty = new BeatmapDifficulty(BeatmapInfo.Value!.Difficulty);
-            foreach (var mod in Mods.Value.OfType<IApplicableToDifficulty>())
-                mod.ApplyToDifficulty(originalDifficulty);
-            return originalDifficulty;
-        }
-
         private void updateValues() => Scheduler.AddOnce(() =>
         {
             if (BeatmapInfo.Value == null)
@@ -180,13 +165,19 @@ namespace osu.Game.Overlays.Mods
                     starRatingDisplay.FinishTransforms(true);
             });
 
-            double rate = GetRate();
-            BeatmapDifficulty originalDifficulty = GetDifficulty();
+            double rate = 1;
+            foreach (var mod in SelectedMods.OfType<IApplicableToRate>())
+                rate = mod.ApplyToRate(0, rate);
+
+            bpmDisplay.Current.Value = BeatmapInfo.Value.BPM * rate;
+
+            BeatmapDifficulty originalDifficulty = new BeatmapDifficulty(BeatmapInfo.Value.Difficulty);
+
+            foreach (var mod in SelectedMods.OfType<IApplicableToDifficulty>())
+                mod.ApplyToDifficulty(originalDifficulty);
 
             Ruleset ruleset = GameRuleset.Value.CreateInstance();
             BeatmapDifficulty adjustedDifficulty = ruleset.GetRateAdjustedDisplayDifficulty(originalDifficulty, rate);
-
-            bpmDisplay.Current.Value = BeatmapInfo.Value.BPM * rate;
 
             TooltipContent = new AdjustedAttributesTooltip.Data(originalDifficulty, adjustedDifficulty);
 

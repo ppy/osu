@@ -114,6 +114,8 @@ namespace osu.Game.Overlays.Mods
 
         public IEnumerable<ModState> AllAvailableMods => AvailableMods.Value.SelectMany(pair => pair.Value);
 
+        protected virtual IEnumerable<Mod> AllSelectedMods => SelectedMods.Value;
+
         private readonly BindableBool customisationVisible = new BindableBool();
         private Bindable<bool> textSearchStartsActive = null!;
 
@@ -317,7 +319,7 @@ namespace osu.Game.Overlays.Mods
 
             SelectedMods.BindValueChanged(_ =>
             {
-                UpdateRankingInformation();
+                updateRankingInformation();
                 updateFromExternalSelection();
                 updateCustomisation();
 
@@ -330,7 +332,7 @@ namespace osu.Game.Overlays.Mods
                     //
                     // See https://github.com/ppy/osu/pull/23284#issuecomment-1529056988
                     modSettingChangeTracker = new ModSettingChangeTracker(SelectedMods.Value);
-                    modSettingChangeTracker.SettingChanged += _ => UpdateRankingInformation();
+                    modSettingChangeTracker.SettingChanged += _ => updateRankingInformation();
                 }
             }, true);
 
@@ -452,17 +454,17 @@ namespace osu.Game.Overlays.Mods
                 modState.ValidForSelection.Value = modState.Mod.Type != ModType.System && modState.Mod.HasImplementation && IsValidMod.Invoke(modState.Mod);
         }
 
-        protected virtual void UpdateRankingInformation()
+        private void updateRankingInformation()
         {
             if (RankingInformationDisplay == null)
                 return;
 
             double multiplier = 1.0;
 
-            foreach (var mod in SelectedMods.Value)
+            foreach (var mod in AllSelectedMods)
                 multiplier *= mod.ScoreMultiplier;
 
-            RankingInformationDisplay.Ranked.Value = SelectedMods.Value.All(m => m.Ranked);
+            RankingInformationDisplay.Ranked.Value = AllSelectedMods.All(m => m.Ranked);
             RankingInformationDisplay.ModMultiplier.Value = multiplier;
         }
 
