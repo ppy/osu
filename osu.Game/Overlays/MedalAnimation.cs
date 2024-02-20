@@ -27,7 +27,7 @@ using osu.Framework.Utils;
 
 namespace osu.Game.Overlays
 {
-    public partial class MedalOverlay : FocusedOverlayContainer
+    public partial class MedalAnimation : VisibilityContainer
     {
         public const float DISC_SIZE = 400;
 
@@ -45,7 +45,7 @@ namespace osu.Game.Overlays
 
         private readonly Container content;
 
-        public MedalOverlay(Medal medal)
+        public MedalAnimation(Medal medal)
         {
             this.medal = medal;
             RelativeSizeAxes = Axes.Both;
