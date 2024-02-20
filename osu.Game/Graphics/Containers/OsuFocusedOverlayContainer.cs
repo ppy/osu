@@ -1,8 +1,6 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
 using osu.Framework.Allocation;
 using osu.Framework.Audio;
 using osu.Framework.Audio.Sample;
@@ -20,10 +18,10 @@ namespace osu.Game.Graphics.Containers
     [Cached(typeof(IPreviewTrackOwner))]
     public abstract partial class OsuFocusedOverlayContainer : FocusedOverlayContainer, IPreviewTrackOwner, IKeyBindingHandler<GlobalAction>
     {
-        private Sample samplePopIn;
-        private Sample samplePopOut;
-        protected virtual string PopInSampleName => "UI/overlay-pop-in";
-        protected virtual string PopOutSampleName => "UI/overlay-pop-out";
+        protected readonly IBindable<OverlayActivation> OverlayActivationMode = new Bindable<OverlayActivation>(OverlayActivation.All);
+
+        protected virtual string PopInSampleName => @"UI/overlay-pop-in";
+        protected virtual string PopOutSampleName => @"UI/overlay-pop-out";
         protected virtual double PopInOutSampleBalance => 0;
 
         protected override bool BlockNonPositionalInput => true;
@@ -34,19 +32,20 @@ namespace osu.Game.Graphics.Containers
         /// </summary>
         protected virtual bool DimMainContent => true;
 
-        [Resolved(CanBeNull = true)]
-        private IOverlayManager overlayManager { get; set; }
+        [Resolved]
+        private IOverlayManager? overlayManager { get; set; }
 
         [Resolved]
-        private PreviewTrackManager previewTrackManager { get; set; }
+        private PreviewTrackManager previewTrackManager { get; set; } = null!;
 
-        protected readonly IBindable<OverlayActivation> OverlayActivationMode = new Bindable<OverlayActivation>(OverlayActivation.All);
+        private Sample? samplePopIn;
+        private Sample? samplePopOut;
 
-        [BackgroundDependencyLoader(true)]
-        private void load(AudioManager audio)
+        [BackgroundDependencyLoader]
+        private void load(AudioManager? audio)
         {
-            samplePopIn = audio.Samples.Get(PopInSampleName);
-            samplePopOut = audio.Samples.Get(PopOutSampleName);
+            samplePopIn = audio?.Samples.Get(PopInSampleName);
+            samplePopOut = audio?.Samples.Get(PopOutSampleName);
         }
 
         protected override void LoadComplete()
