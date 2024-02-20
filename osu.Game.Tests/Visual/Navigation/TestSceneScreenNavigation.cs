@@ -6,6 +6,7 @@
 using System;
 using System.IO;
 using System.Linq;
+using Newtonsoft.Json.Linq;
 using NUnit.Framework;
 using osu.Framework.Allocation;
 using osu.Framework.Configuration;
@@ -24,6 +25,8 @@ using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Online.API;
 using osu.Game.Online.Leaderboards;
+using osu.Game.Online.Notifications.WebSocket;
+using osu.Game.Online.Notifications.WebSocket.Events;
 using osu.Game.Overlays;
 using osu.Game.Overlays.BeatmapListing;
 using osu.Game.Overlays.Mods;
@@ -338,6 +341,28 @@ namespace osu.Game.Tests.Visual.Navigation
 
             AddStep("attempt to exit", () => player().ChildrenOfType<HotkeyExitOverlay>().First().Action());
             AddUntilStep("wait for results", () => Game.ScreenStack.CurrentScreen is ResultsScreen);
+        }
+
+        [Test]
+        public void TestShowMedalAtResults()
+        {
+            playToResults();
+
+            AddStep("award medal", () => ((DummyAPIAccess)API).NotificationsClient.Receive(new SocketMessage
+            {
+                Event = @"new",
+                Data = JObject.FromObject(new NewPrivateNotificationEvent
+                {
+                    Name = @"user_achievement_unlock",
+                    Details = JObject.FromObject(new UserAchievementUnlock
+                    {
+                        Title = "Time And A Half",
+                        Description = "Having a right ol' time. One and a half of them, almost.",
+                        Slug = @"all-intro-doubletime"
+                    })
+                })
+            }));
+            AddUntilStep("medal overlay shown", () => Game.ChildrenOfType<MedalOverlay>().Single().State.Value, () => Is.EqualTo(Visibility.Visible));
         }
 
         [Test]
