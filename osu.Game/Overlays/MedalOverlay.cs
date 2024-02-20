@@ -1,6 +1,7 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System.Collections.Generic;
 using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Extensions.ObjectExtensions;
@@ -28,6 +29,8 @@ namespace osu.Game.Overlays
             showingMedals = false;
             this.FadeOut();
         }
+
+        private readonly Queue<MedalAnimation> queuedMedals = new Queue<MedalAnimation>();
 
         [Resolved]
         private IAPIProvider api { get; set; } = null!;
@@ -71,7 +74,7 @@ namespace osu.Game.Overlays
             Show();
             LoadComponentAsync(new MedalAnimation(medal), animation =>
             {
-                medalContainer.Add(animation);
+                queuedMedals.Enqueue(animation);
                 showingMedals = true;
             });
         }
@@ -80,7 +83,12 @@ namespace osu.Game.Overlays
         {
             base.Update();
 
-            if (showingMedals && !medalContainer.Any())
+            if (!showingMedals || medalContainer.Any())
+                return;
+
+            if (queuedMedals.TryDequeue(out var nextMedal))
+                medalContainer.Add(nextMedal);
+            else
                 Hide();
         }
 
