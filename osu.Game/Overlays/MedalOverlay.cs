@@ -54,7 +54,7 @@ namespace osu.Game.Overlays
 
             OverlayActivationMode.BindValueChanged(val =>
             {
-                if (val.NewValue != OverlayActivation.Disabled && (queuedMedals.Any() || medalContainer.Any()))
+                if (val.NewValue == OverlayActivation.All && (queuedMedals.Any() || medalContainer.Any()))
                     Show();
             }, true);
         }
@@ -81,7 +81,8 @@ namespace osu.Game.Overlays
 
             var medalAnimation = new MedalAnimation(medal);
             queuedMedals.Enqueue(medalAnimation);
-            Scheduler.AddOnce(Show);
+            if (OverlayActivationMode.Value == OverlayActivation.All)
+                Scheduler.AddOnce(Show);
         }
 
         protected override void Update()
