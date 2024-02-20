@@ -1,13 +1,10 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
   <Import Project="..\osu.Android.props" />
   <PropertyGroup>
-    <TargetFramework>net6.0-android</TargetFramework>
+    <TargetFramework>net8.0-android</TargetFramework>
     <OutputType>Exe</OutputType>
     <RootNamespace>osu.Android</RootNamespace>
     <AssemblyName>osu.Android</AssemblyName>
-    <UseMauiEssentials>true</UseMauiEssentials>
-    <!-- This currently causes random lockups during gameplay. https://github.com/mono/mono/issues/18973 -->
-    <EnableLLVM>false</EnableLLVM>
     <Version>0.0.0</Version>
     <ApplicationVersion Condition=" '$(ApplicationVersion)' == '' ">1</ApplicationVersion>
     <ApplicationDisplayVersion Condition=" '$(ApplicationDisplayVersion)' == '' ">$(Version)</ApplicationDisplayVersion>
@@ -18,5 +15,8 @@
     <ProjectReference Include="..\osu.Game.Rulesets.Osu\osu.Game.Rulesets.Osu.csproj" />
     <ProjectReference Include="..\osu.Game.Rulesets.Taiko\osu.Game.Rulesets.Taiko.csproj" />
     <ProjectReference Include="..\osu.Game\osu.Game.csproj" />
+  </ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="Microsoft.Maui.Essentials" Version="8.0.3" />
   </ItemGroup>
 </Project>

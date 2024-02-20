@@ -51,7 +51,7 @@ namespace osu.Game.Screens.Backgrounds
         /// </summary>
         public readonly Bindable<float> DimWhenUserSettingsIgnored = new Bindable<float>();
 
-        internal readonly IBindable<bool> IsBreakTime = new Bindable<bool>();
+        internal readonly Bindable<bool> IsBreakTime = new Bindable<bool>();
 
         private readonly DimmableBackground dimmable;
 

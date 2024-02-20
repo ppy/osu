@@ -343,7 +343,7 @@ namespace osu.Game.Screens.Menu
                 {
                     buttonArea.ButtonSystemState = state;
 
-                    foreach (var b in buttonArea.Children.OfType<MainMenuButton>())
+                    foreach (var b in buttonArea.OfType<MainMenuButton>())
                         b.ButtonSystemState = state;
                 }
 

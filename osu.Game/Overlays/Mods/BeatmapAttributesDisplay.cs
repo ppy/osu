@@ -196,7 +196,7 @@ namespace osu.Game.Overlays.Mods
 
         private partial class BPMDisplay : RollingCounter<double>
         {
-            protected override double RollingDuration => 500;
+            protected override double RollingDuration => 250;
 
             protected override LocalisableString FormatCount(double count) => count.ToLocalisableString("0 BPM");
 

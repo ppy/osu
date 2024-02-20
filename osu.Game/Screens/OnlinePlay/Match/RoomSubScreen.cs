@@ -75,7 +75,7 @@ namespace osu.Game.Screens.OnlinePlay.Match
         private BeatmapManager beatmapManager { get; set; }
 
         [Resolved]
-        private RulesetStore rulesets { get; set; }
+        protected RulesetStore Rulesets { get; private set; }
 
         [Resolved]
         private IAPIProvider api { get; set; } = null!;
@@ -422,7 +422,7 @@ namespace osu.Game.Screens.OnlinePlay.Match
             if (selected == null)
                 return;
 
-            var rulesetInstance = rulesets.GetRuleset(SelectedItem.Value.RulesetID)?.CreateInstance();
+            var rulesetInstance = Rulesets.GetRuleset(SelectedItem.Value.RulesetID)?.CreateInstance();
             Debug.Assert(rulesetInstance != null);
             var allowedMods = SelectedItem.Value.AllowedMods.Select(m => m.ToMod(rulesetInstance));
 
@@ -463,7 +463,7 @@ namespace osu.Game.Screens.OnlinePlay.Match
             if (SelectedItem.Value == null || !this.IsCurrentScreen())
                 return;
 
-            var rulesetInstance = rulesets.GetRuleset(SelectedItem.Value.RulesetID)?.CreateInstance();
+            var rulesetInstance = Rulesets.GetRuleset(SelectedItem.Value.RulesetID)?.CreateInstance();
             Debug.Assert(rulesetInstance != null);
             Mods.Value = UserMods.Value.Concat(SelectedItem.Value.RequiredMods.Select(m => m.ToMod(rulesetInstance))).ToList();
         }
@@ -473,7 +473,7 @@ namespace osu.Game.Screens.OnlinePlay.Match
             if (SelectedItem.Value == null || !this.IsCurrentScreen())
                 return;
 
-            Ruleset.Value = rulesets.GetRuleset(SelectedItem.Value.RulesetID);
+            Ruleset.Value = Rulesets.GetRuleset(SelectedItem.Value.RulesetID);
         }
 
         private void beginHandlingTrack()
@@ -509,7 +509,7 @@ namespace osu.Game.Screens.OnlinePlay.Match
 
         private void cancelTrackLooping()
         {
-            var track = Beatmap?.Value?.Track;
+            var track = Beatmap.Value?.Track;
 
             if (track != null)
                 track.Looping = false;

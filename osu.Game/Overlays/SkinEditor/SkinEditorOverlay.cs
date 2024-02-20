@@ -10,9 +10,11 @@ using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Primitives;
+using osu.Framework.Input;
 using osu.Framework.Input.Bindings;
 using osu.Framework.Input.Events;
 using osu.Framework.Screens;
+using osu.Framework.Testing;
 using osu.Game.Beatmaps;
 using osu.Game.Configuration;
 using osu.Game.Graphics.Containers;
@@ -66,6 +68,7 @@ namespace osu.Game.Overlays.SkinEditor
         private IBindable<WorkingBeatmap> beatmap { get; set; } = null!;
 
         private OsuScreen? lastTargetScreen;
+        private InvokeOnDisposal? nestedInputManagerDisable;
 
         private Vector2 lastDrawSize;
 
@@ -105,6 +108,7 @@ namespace osu.Game.Overlays.SkinEditor
 
             if (skinEditor != null)
             {
+                disableNestedInputManagers();
                 skinEditor.Show();
                 return;
             }
@@ -132,14 +136,21 @@ namespace osu.Game.Overlays.SkinEditor
         {
             skinEditor?.Save(false);
             skinEditor?.Hide();
+            nestedInputManagerDisable?.Dispose();
+            nestedInputManagerDisable = null;
 
             globallyReenableBeatmapSkinSetting();
         }
 
-        public void PresentGameplay()
+        public void PresentGameplay() => presentGameplay(false);
+
+        private void presentGameplay(bool attemptedBeatmapSwitch)
         {
             performer?.PerformFromScreen(screen =>
             {
+                if (State.Value != Visibility.Visible)
+                    return;
+
                 if (beatmap.Value is DummyWorkingBeatmap)
                 {
                     // presume we don't have anything good to play and just bail.
@@ -149,8 +160,12 @@ namespace osu.Game.Overlays.SkinEditor
                 // If we're playing the intro, switch away to another beatmap.
                 if (beatmap.Value.BeatmapSetInfo.Protected)
                 {
-                    music.NextTrack();
-                    Schedule(PresentGameplay);
+                    if (!attemptedBeatmapSwitch)
+                    {
+                        music.NextTrack();
+                        Schedule(() => presentGameplay(true));
+                    }
+
                     return;
                 }
 
@@ -234,6 +249,9 @@ namespace osu.Game.Overlays.SkinEditor
         /// </summary>
         public void SetTarget(OsuScreen screen)
         {
+            nestedInputManagerDisable?.Dispose();
+            nestedInputManagerDisable = null;
+
             lastTargetScreen = screen;
 
             if (skinEditor == null) return;
@@ -262,6 +280,7 @@ namespace osu.Game.Overlays.SkinEditor
             {
                 skinEditor.Save(false);
                 skinEditor.UpdateTargetScreen(target);
+                disableNestedInputManagers();
             }
             else
             {
@@ -269,6 +288,21 @@ namespace osu.Game.Overlays.SkinEditor
                 skinEditor.Expire();
                 skinEditor = null;
             }
+        }
+
+        private void disableNestedInputManagers()
+        {
+            if (lastTargetScreen == null)
+                return;
+
+            var nestedInputManagers = lastTargetScreen.ChildrenOfType<PassThroughInputManager>().Where(manager => manager.UseParentInput).ToArray();
+            foreach (var inputManager in nestedInputManagers)
+                inputManager.UseParentInput = false;
+            nestedInputManagerDisable = new InvokeOnDisposal(() =>
+            {
+                foreach (var inputManager in nestedInputManagers)
+                    inputManager.UseParentInput = true;
+            });
         }
 
         private readonly Bindable<bool> beatmapSkins = new Bindable<bool>();
