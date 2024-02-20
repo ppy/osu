@@ -127,8 +127,8 @@ namespace osu.Game.Overlays.Mods
         private DeselectAllModsButton deselectAllModsButton = null!;
 
         private Container aboveColumnsContent = null!;
-        protected RankingInformationDisplay? RankingInformationDisplay;
-        protected BeatmapAttributesDisplay? BeatmapAttributesDisplay;
+        private RankingInformationDisplay? rankingInformationDisplay;
+        private BeatmapAttributesDisplay? beatmapAttributesDisplay;
 
         protected virtual BeatmapAttributesDisplay GetBeatmapAttributesDisplay => new BeatmapAttributesDisplay
         {
@@ -155,8 +155,8 @@ namespace osu.Game.Overlays.Mods
                 if (beatmap == value) return;
 
                 beatmap = value;
-                if (IsLoaded && BeatmapAttributesDisplay != null)
-                    BeatmapAttributesDisplay.BeatmapInfo.Value = beatmap?.BeatmapInfo;
+                if (IsLoaded && beatmapAttributesDisplay != null)
+                    beatmapAttributesDisplay.BeatmapInfo.Value = beatmap?.BeatmapInfo;
             }
         }
 
@@ -278,12 +278,12 @@ namespace osu.Game.Overlays.Mods
                     },
                     Children = new Drawable[]
                     {
-                        RankingInformationDisplay = new RankingInformationDisplay
+                        rankingInformationDisplay = new RankingInformationDisplay
                         {
                             Anchor = Anchor.BottomRight,
                             Origin = Anchor.BottomRight
                         },
-                        BeatmapAttributesDisplay = GetBeatmapAttributesDisplay
+                        beatmapAttributesDisplay = GetBeatmapAttributesDisplay
                     }
                 });
             }
@@ -359,7 +359,7 @@ namespace osu.Game.Overlays.Mods
 
             SearchTextBox.PlaceholderText = SearchTextBox.HasFocus ? Resources.Localisation.Web.CommonStrings.InputSearch : ModSelectOverlayStrings.TabToSearch;
 
-            if (BeatmapAttributesDisplay != null)
+            if (beatmapAttributesDisplay != null)
             {
                 float rightEdgeOfLastButton = footerButtonFlow.Last().ScreenSpaceDrawQuad.TopRight.X;
 
@@ -371,7 +371,7 @@ namespace osu.Game.Overlays.Mods
 
                 // only update preview panel's collapsed state after we are fully visible, to ensure all the buttons are where we expect them to be.
                 if (Alpha == 1)
-                    BeatmapAttributesDisplay.Collapsed.Value = screenIsntWideEnough;
+                    beatmapAttributesDisplay.Collapsed.Value = screenIsntWideEnough;
 
                 footerContentFlow.LayoutDuration = 200;
                 footerContentFlow.LayoutEasing = Easing.OutQuint;
@@ -456,7 +456,7 @@ namespace osu.Game.Overlays.Mods
 
         private void updateRankingInformation()
         {
-            if (RankingInformationDisplay == null)
+            if (rankingInformationDisplay == null)
                 return;
 
             double multiplier = 1.0;
@@ -464,8 +464,8 @@ namespace osu.Game.Overlays.Mods
             foreach (var mod in AllSelectedMods)
                 multiplier *= mod.ScoreMultiplier;
 
-            RankingInformationDisplay.Ranked.Value = AllSelectedMods.All(m => m.Ranked);
-            RankingInformationDisplay.ModMultiplier.Value = multiplier;
+            rankingInformationDisplay.Ranked.Value = AllSelectedMods.All(m => m.Ranked);
+            rankingInformationDisplay.ModMultiplier.Value = multiplier;
         }
 
         private void updateCustomisation()
