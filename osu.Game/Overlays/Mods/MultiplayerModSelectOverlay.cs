@@ -35,7 +35,6 @@ namespace osu.Game.Overlays.Mods
         protected override void LoadComplete()
         {
             base.LoadComplete();
-
             multiplayerRoomItem?.BindValueChanged(_ => SelectedMods.TriggerChange());
         }
 
