@@ -464,8 +464,8 @@ namespace osu.Game.Overlays.Mods
             foreach (var mod in AllSelectedMods)
                 multiplier *= mod.ScoreMultiplier;
 
-            rankingInformationDisplay.Ranked.Value = AllSelectedMods.All(m => m.Ranked);
             rankingInformationDisplay.ModMultiplier.Value = multiplier;
+            rankingInformationDisplay.Ranked.Value = AllSelectedMods.All(m => m.Ranked);
         }
 
         private void updateCustomisation()

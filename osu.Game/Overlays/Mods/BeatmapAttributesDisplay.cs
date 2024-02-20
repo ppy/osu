@@ -41,6 +41,7 @@ namespace osu.Game.Overlays.Mods
 
         [Resolved]
         protected Bindable<IReadOnlyList<Mod>> Mods { get; private set; } = null!;
+
         protected virtual IEnumerable<Mod> SelectedMods => Mods.Value;
 
         public BindableBool Collapsed { get; } = new BindableBool(true);
