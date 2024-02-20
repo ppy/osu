@@ -24,11 +24,7 @@ namespace osu.Game.Overlays
 
         protected override void PopIn() => this.FadeIn();
 
-        protected override void PopOut()
-        {
-            showingMedals = false;
-            this.FadeOut();
-        }
+        protected override void PopOut() => this.FadeOut();
 
         private readonly Queue<MedalAnimation> queuedMedals = new Queue<MedalAnimation>();
 
@@ -36,7 +32,6 @@ namespace osu.Game.Overlays
         private IAPIProvider api { get; set; } = null!;
 
         private Container<Drawable> medalContainer = null!;
-        private bool showingMedals;
 
         [BackgroundDependencyLoader]
         private void load()
@@ -49,6 +44,17 @@ namespace osu.Game.Overlays
             {
                 RelativeSizeAxes = Axes.Both
             });
+        }
+
+        protected override void LoadComplete()
+        {
+            base.LoadComplete();
+
+            OverlayActivationMode.BindValueChanged(val =>
+            {
+                if (val.NewValue != OverlayActivation.Disabled && queuedMedals.Any())
+                    Show();
+            }, true);
         }
 
         private void handleMedalMessages(SocketMessage obj)
@@ -71,25 +77,25 @@ namespace osu.Game.Overlays
                 Description = details.Description,
             };
 
+            var medalAnimation = new MedalAnimation(medal);
+            queuedMedals.Enqueue(medalAnimation);
             Show();
-            LoadComponentAsync(new MedalAnimation(medal), animation =>
-            {
-                queuedMedals.Enqueue(animation);
-                showingMedals = true;
-            });
         }
 
         protected override void Update()
         {
             base.Update();
 
-            if (!showingMedals || medalContainer.Any())
+            if (medalContainer.Any())
                 return;
 
-            if (queuedMedals.TryDequeue(out var nextMedal))
-                medalContainer.Add(nextMedal);
-            else
+            if (!queuedMedals.TryDequeue(out var medal))
+            {
                 Hide();
+                return;
+            }
+
+            LoadComponentAsync(medal, medalContainer.Add);
         }
 
         protected override bool OnClick(ClickEvent e)
