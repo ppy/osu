@@ -18,11 +18,9 @@ using osu.Framework.Allocation;
 using osu.Framework.Audio.Sample;
 using osu.Framework.Audio;
 using osu.Framework.Graphics.Textures;
-using osuTK.Input;
 using osu.Framework.Graphics.Shapes;
 using System;
 using osu.Framework.Graphics.Effects;
-using osu.Framework.Input.Events;
 using osu.Framework.Utils;
 
 namespace osu.Game.Overlays
@@ -190,17 +188,6 @@ namespace osu.Game.Overlays
             particleContainer.Add(new MedalParticle(RNG.Next(0, 359)));
         }
 
-        protected override bool OnClick(ClickEvent e)
-        {
-            dismiss();
-            return true;
-        }
-
-        protected override void OnFocusLost(FocusLostEvent e)
-        {
-            if (e.CurrentState.Keyboard.Keys.IsPressed(Key.Escape)) dismiss();
-        }
-
         private const double initial_duration = 400;
         private const double step_duration = 900;
 
@@ -256,7 +243,7 @@ namespace osu.Game.Overlays
             this.FadeOut(200);
         }
 
-        private void dismiss()
+        public void Dismiss()
         {
             if (drawableMedal.State != DisplayState.Full)
             {
