@@ -32,6 +32,11 @@ namespace osu.Game.Screens.Ranking.Expanded.Accuracy
     public partial class AccuracyCircle : CompositeDrawable
     {
         /// <summary>
+        /// The total duration of the animation.
+        /// </summary>
+        public const double TOTAL_DURATION = APPEAR_DURATION + ACCURACY_TRANSFORM_DELAY + ACCURACY_TRANSFORM_DURATION;
+
+        /// <summary>
         /// Duration for the transforms causing this component to appear.
         /// </summary>
         public const double APPEAR_DURATION = 200;
