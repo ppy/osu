@@ -20,8 +20,8 @@ namespace osu.Game.Graphics.Containers
     {
         protected readonly IBindable<OverlayActivation> OverlayActivationMode = new Bindable<OverlayActivation>(OverlayActivation.All);
 
-        protected virtual string PopInSampleName => @"UI/overlay-pop-in";
-        protected virtual string PopOutSampleName => @"UI/overlay-pop-out";
+        protected virtual string? PopInSampleName => @"UI/overlay-pop-in";
+        protected virtual string? PopOutSampleName => @"UI/overlay-pop-out";
         protected virtual double PopInOutSampleBalance => 0;
 
         protected override bool BlockNonPositionalInput => true;
@@ -44,8 +44,11 @@ namespace osu.Game.Graphics.Containers
         [BackgroundDependencyLoader]
         private void load(AudioManager? audio)
         {
-            samplePopIn = audio?.Samples.Get(PopInSampleName);
-            samplePopOut = audio?.Samples.Get(PopOutSampleName);
+            if (!string.IsNullOrEmpty(PopInSampleName))
+                samplePopIn = audio?.Samples.Get(PopInSampleName);
+
+            if (!string.IsNullOrEmpty(PopOutSampleName))
+                samplePopOut = audio?.Samples.Get(PopOutSampleName);
         }
 
         protected override void LoadComplete()
