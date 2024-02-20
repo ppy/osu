@@ -1,13 +1,13 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System.Collections.Generic;
 using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Game.Rulesets;
 using osu.Game.Online.Rooms;
-using osu.Game.Beatmaps;
 using osu.Game.Rulesets.Mods;
 
 namespace osu.Game.Overlays.Mods
@@ -39,30 +39,21 @@ namespace osu.Game.Overlays.Mods
             multiplayerRoomItem?.BindValueChanged(_ => SelectedMods.TriggerChange());
         }
 
-        protected override void UpdateRankingInformation()
+        protected override IEnumerable<Mod> AllSelectedMods
         {
-            if (RankingInformationDisplay == null)
-                return;
-
-            double multiplier = 1.0;
-
-            foreach (var mod in SelectedMods.Value)
-                multiplier *= mod.ScoreMultiplier;
-
-            RankingInformationDisplay.Ranked.Value = SelectedMods.Value.All(m => m.Ranked);
-
-            if (multiplayerRoomItem?.Value != null)
+            get
             {
-                Ruleset ruleset = game.Ruleset.Value.CreateInstance();
-                var multiplayerRoomMods = multiplayerRoomItem.Value.RequiredMods.Select(m => m.ToMod(ruleset));
+                IEnumerable<Mod> allMods = SelectedMods.Value;
 
-                foreach (var mod in multiplayerRoomMods)
-                    multiplier *= mod.ScoreMultiplier;
+                if (multiplayerRoomItem?.Value != null)
+                {
+                    Ruleset ruleset = game.Ruleset.Value.CreateInstance();
+                    var multiplayerRoomMods = multiplayerRoomItem.Value.RequiredMods.Select(m => m.ToMod(ruleset));
+                    allMods = allMods.Concat(multiplayerRoomMods);
+                }
 
-                RankingInformationDisplay.Ranked.Value = RankingInformationDisplay.Ranked.Value && multiplayerRoomMods.All(m => m.Ranked);
+                return allMods;
             }
-
-            RankingInformationDisplay.ModMultiplier.Value = multiplier;
         }
     }
 
@@ -77,34 +68,21 @@ namespace osu.Game.Overlays.Mods
             multiplayerRoomItem?.BindValueChanged(_ => Mods.TriggerChange());
         }
 
-        protected override double GetRate()
+        protected override IEnumerable<Mod> SelectedMods
         {
-            double rate = base.GetRate();
-            Ruleset ruleset = GameRuleset.Value.CreateInstance();
-
-            if (multiplayerRoomItem?.Value != null)
+            get
             {
-                var multiplayerRoomMods = multiplayerRoomItem.Value.RequiredMods.Select(m => m.ToMod(ruleset));
-                foreach (var mod in multiplayerRoomMods.OfType<IApplicableToRate>())
-                    rate = mod.ApplyToRate(0, rate);
+                IEnumerable<Mod> selectedMods = Mods.Value;
+
+                if (multiplayerRoomItem?.Value != null)
+                {
+                    Ruleset ruleset = GameRuleset.Value.CreateInstance();
+                    var multiplayerRoomMods = multiplayerRoomItem.Value.RequiredMods.Select(m => m.ToMod(ruleset));
+                    selectedMods = selectedMods.Concat(multiplayerRoomMods);
+                }
+
+                return selectedMods;
             }
-
-            return rate;
-        }
-
-        protected override BeatmapDifficulty GetDifficulty()
-        {
-            BeatmapDifficulty originalDifficulty = base.GetDifficulty();
-            Ruleset ruleset = GameRuleset.Value.CreateInstance();
-
-            if (multiplayerRoomItem?.Value != null)
-            {
-                var multiplayerRoomMods = multiplayerRoomItem.Value.RequiredMods.Select(m => m.ToMod(ruleset));
-                foreach (var mod in multiplayerRoomMods.OfType<IApplicableToDifficulty>())
-                    mod.ApplyToDifficulty(originalDifficulty);
-            }
-
-            return originalDifficulty;
         }
     }
 }
