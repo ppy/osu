@@ -22,6 +22,8 @@ namespace osu.Game.Overlays
         protected override string? PopInSampleName => null;
         protected override string? PopOutSampleName => null;
 
+        public override bool IsPresent => base.IsPresent || Scheduler.HasPendingTasks;
+
         protected override void PopIn() => this.FadeIn();
 
         protected override void PopOut() => this.FadeOut();
@@ -52,7 +54,7 @@ namespace osu.Game.Overlays
 
             OverlayActivationMode.BindValueChanged(val =>
             {
-                if (val.NewValue != OverlayActivation.Disabled && queuedMedals.Any())
+                if (val.NewValue != OverlayActivation.Disabled && (queuedMedals.Any() || medalContainer.Any()))
                     Show();
             }, true);
         }
@@ -79,7 +81,7 @@ namespace osu.Game.Overlays
 
             var medalAnimation = new MedalAnimation(medal);
             queuedMedals.Enqueue(medalAnimation);
-            Show();
+            Scheduler.AddOnce(Show);
         }
 
         protected override void Update()
