@@ -54,8 +54,8 @@ namespace osu.Game.Rulesets.Osu.HUD
         [SettingSource(typeof(AimErrorMeterStrings), nameof(AimErrorMeterStrings.PositionStyle), nameof(AimErrorMeterStrings.PositionStyleDescription))]
         public Bindable<MappingStyle> PositionMappingStyle { get; } = new Bindable<MappingStyle>();
 
-        [Resolved]
-        private ScoreProcessor scoreProcessor { get; set; } = null!;
+        // used for calculate relative position.
+        private Vector2? lastObjectPosition;
 
         private Container averagePositionContainer = null!;
         private Container averagePositionRotateContainer = null!;
@@ -311,13 +311,11 @@ namespace osu.Game.Rulesets.Osu.HUD
             // the Vector2 for component is X (-0.5, 0.5), Y (-0.5, 0.5)
             Vector2 hitPosition;
 
-            if (PositionMappingStyle.Value == MappingStyle.Relative && scoreProcessor.HitEvents.LastOrDefault().LastHitObject != null)
+            if (PositionMappingStyle.Value == MappingStyle.Relative && lastObjectPosition != null)
             {
-                var currentHitEvent = scoreProcessor.HitEvents.Last();
-
                 // let local center in (0.5, 0.5) to prevent localRadius in calculate will get zero.
                 // then manual subtraction 0.5 to match component mapping.
-                hitPosition = AccuracyHeatmap.FindRelativeHitPosition(((OsuHitObject)currentHitEvent.LastHitObject).StackedEndPosition, ((OsuHitObject)currentHitEvent.HitObject).StackedEndPosition,
+                hitPosition = AccuracyHeatmap.FindRelativeHitPosition(lastObjectPosition.Value, ((OsuHitObject)circleJudgement.HitObject).StackedEndPosition,
                     circleJudgement.CursorPositionAtHit.Value, objectRadius, new Vector2(0.5f), inner_portion, 45) - new Vector2(0.5f);
             }
             else
@@ -338,6 +336,7 @@ namespace osu.Game.Rulesets.Osu.HUD
             });
 
             averagePositionContainer.MoveTo(averagePosition = (hitPosition + averagePosition) / 2, 800, Easing.OutQuint);
+            lastObjectPosition = ((OsuHitObject)circleJudgement.HitObject).StackedPosition;
         }
 
         private Color4 getColourForPosition(Vector2 position)
@@ -361,6 +360,7 @@ namespace osu.Game.Rulesets.Osu.HUD
         public override void Clear()
         {
             averagePositionContainer.MoveTo(averagePosition = Vector2.Zero, 800, Easing.OutQuint);
+            lastObjectPosition = null;
 
             foreach (var h in hitPositionContainer)
             {
