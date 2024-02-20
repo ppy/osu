@@ -14,7 +14,7 @@ namespace osu.Game.Tests.Visual.Gameplay
         {
             AddStep(@"display", () =>
             {
-                LoadComponentAsync(new MedalOverlay(new Medal
+                LoadComponentAsync(new MedalAnimation(new Medal
                 {
                     Name = @"Animations",
                     InternalName = @"all-intro-doubletime",
