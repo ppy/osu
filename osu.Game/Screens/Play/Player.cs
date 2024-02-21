@@ -391,7 +391,7 @@ namespace osu.Game.Screens.Play
             IsBreakTime.BindTo(breakTracker.IsBreakTime);
             IsBreakTime.BindValueChanged(onBreakTimeChanged, true);
 
-            loadLeaderboard();
+            loadLeaderboard(config);
         }
 
         protected virtual GameplayClockContainer CreateGameplayClockContainer(WorkingBeatmap beatmap, double gameplayStart) => new MasterGameplayClockContainer(beatmap, gameplayStart);
@@ -867,8 +867,14 @@ namespace osu.Game.Screens.Play
 
         protected readonly Bindable<bool> LeaderboardExpandedState = new BindableBool();
 
-        private void loadLeaderboard()
+        /// <summary>
+        /// Always show the leaderboard in expanded state. Pulled from config.
+        /// </summary>
+        private Bindable<bool> leaderboardAlwaysExpand;
+
+        private void loadLeaderboard(OsuConfigManager config)
         {
+            leaderboardAlwaysExpand = config.GetBindable<bool>(OsuSetting.AlwaysExpandGameplayLeaderboard);
             HUDOverlay.HoldingForHUD.BindValueChanged(_ => updateLeaderboardExpandedState());
             LocalUserPlaying.BindValueChanged(_ => updateLeaderboardExpandedState(), true);
 
@@ -894,7 +900,7 @@ namespace osu.Game.Screens.Play
         protected virtual void AddLeaderboardToHUD(GameplayLeaderboard leaderboard) => HUDOverlay.LeaderboardFlow.Add(leaderboard);
 
         private void updateLeaderboardExpandedState() =>
-            LeaderboardExpandedState.Value = !LocalUserPlaying.Value || HUDOverlay.HoldingForHUD.Value;
+            LeaderboardExpandedState.Value = leaderboardAlwaysExpand.Value || !LocalUserPlaying.Value || HUDOverlay.HoldingForHUD.Value;
 
         #endregion
 
