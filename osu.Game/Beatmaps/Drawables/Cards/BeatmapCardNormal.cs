@@ -111,7 +111,6 @@ namespace osu.Game.Beatmaps.Drawables.Cards
                                                     {
                                                         Text = new RomanisableString(BeatmapSet.TitleUnicode, BeatmapSet.Title),
                                                         Font = OsuFont.Default.With(size: 22.5f, weight: FontWeight.SemiBold),
-                                                        RelativeSizeAxes = Axes.X,
                                                     },
                                                     titleBadgeArea = new FillFlowContainer
                                                     {
@@ -144,7 +143,6 @@ namespace osu.Game.Beatmaps.Drawables.Cards
                                                     {
                                                         Text = createArtistText(),
                                                         Font = OsuFont.Default.With(size: 17.5f, weight: FontWeight.SemiBold),
-                                                        RelativeSizeAxes = Axes.X,
                                                     },
                                                     Empty()
                                                 },

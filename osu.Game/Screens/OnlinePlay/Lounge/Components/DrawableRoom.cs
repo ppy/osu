@@ -1,8 +1,6 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
 using System.Collections.Generic;
 using System.Threading;
 using osu.Framework.Allocation;
@@ -20,7 +18,6 @@ using osu.Game.Database;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.Sprites;
-using osu.Game.Online.Chat;
 using osu.Game.Online.Rooms;
 using osu.Game.Overlays;
 using osu.Game.Screens.OnlinePlay.Components;
@@ -36,18 +33,18 @@ namespace osu.Game.Screens.OnlinePlay.Lounge.Components
 
         public readonly Room Room;
 
-        protected Container ButtonsContainer { get; private set; }
+        protected Container ButtonsContainer { get; private set; } = null!;
 
         private readonly Bindable<MatchType> roomType = new Bindable<MatchType>();
         private readonly Bindable<RoomCategory> roomCategory = new Bindable<RoomCategory>();
         private readonly Bindable<bool> hasPassword = new Bindable<bool>();
 
-        private DrawableRoomParticipantsList drawableRoomParticipantsList;
-        private RoomSpecialCategoryPill specialCategoryPill;
-        private PasswordProtectedIcon passwordIcon;
-        private EndDateInfo endDateInfo;
+        private DrawableRoomParticipantsList? drawableRoomParticipantsList;
+        private RoomSpecialCategoryPill specialCategoryPill = null!;
+        private PasswordProtectedIcon passwordIcon = null!;
+        private EndDateInfo endDateInfo = null!;
 
-        private DelayedLoadWrapper wrapper;
+        private DelayedLoadWrapper wrapper = null!;
 
         public DrawableRoom(Room room)
         {
@@ -182,7 +179,6 @@ namespace osu.Game.Screens.OnlinePlay.Lounge.Components
                                                                 {
                                                                     new TruncatingSpriteText
                                                                     {
-                                                                        RelativeSizeAxes = Axes.X,
                                                                         Font = OsuFont.GetFont(size: 28),
                                                                         Current = { BindTarget = Room.Name }
                                                                     },
@@ -325,13 +321,18 @@ namespace osu.Game.Screens.OnlinePlay.Lounge.Components
         private partial class RoomStatusText : OnlinePlayComposite
         {
             [Resolved]
-            private OsuColour colours { get; set; }
+            private OsuColour colours { get; set; } = null!;
 
             [Resolved]
-            private BeatmapLookupCache beatmapLookupCache { get; set; }
+            private BeatmapLookupCache beatmapLookupCache { get; set; } = null!;
 
-            private SpriteText statusText;
-            private LinkFlowContainer beatmapText;
+            [Resolved]
+            private OsuGame? game { get; set; }
+
+            private SpriteText statusText = null!;
+
+            private OsuHoverContainer beatmapLink = null!;
+            private TruncatingSpriteText beatmapText = null!;
 
             public RoomStatusText()
             {
@@ -340,7 +341,7 @@ namespace osu.Game.Screens.OnlinePlay.Lounge.Components
             }
 
             [BackgroundDependencyLoader]
-            private void load()
+            private void load(OverlayColourProvider colourProvider)
             {
                 InternalChild = new GridContainer
                 {
@@ -363,17 +364,11 @@ namespace osu.Game.Screens.OnlinePlay.Lounge.Components
                                 Font = OsuFont.Default.With(size: 16),
                                 Colour = colours.Lime1
                             },
-                            beatmapText = new LinkFlowContainer(s =>
+                            beatmapLink = new OsuHoverContainer
                             {
-                                s.Font = OsuFont.Default.With(size: 16);
-                                s.Colour = colours.Lime1;
-                            })
-                            {
-                                RelativeSizeAxes = Axes.X,
-                                // workaround to ensure only the first line of text shows, emulating truncation (but without ellipsis at the end).
-                                // TODO: remove when text/link flow can support truncation with ellipsis natively.
-                                Height = 16,
-                                Masking = true
+                                AutoSizeAxes = Axes.Both,
+                                IdleColour = colourProvider.Light2,
+                                Child = beatmapText = new TruncatingSpriteText(),
                             }
                         }
                     }
@@ -386,12 +381,12 @@ namespace osu.Game.Screens.OnlinePlay.Lounge.Components
                 CurrentPlaylistItem.BindValueChanged(onSelectedItemChanged, true);
             }
 
-            private CancellationTokenSource beatmapLookupCancellation;
+            private CancellationTokenSource? beatmapLookupCancellation;
 
-            private void onSelectedItemChanged(ValueChangedEvent<PlaylistItem> item)
+            private void onSelectedItemChanged(ValueChangedEvent<PlaylistItem?> item)
             {
                 beatmapLookupCancellation?.Cancel();
-                beatmapText.Clear();
+                beatmapText.Text = string.Empty;
 
                 if (Type.Value == MatchType.Playlists)
                 {
@@ -416,13 +411,11 @@ namespace osu.Game.Screens.OnlinePlay.Lounge.Components
 
                                       if (retrievedBeatmap != null)
                                       {
-                                          beatmapText.AddLink(retrievedBeatmap.GetDisplayTitleRomanisable(),
-                                              LinkAction.OpenBeatmap,
-                                              retrievedBeatmap.OnlineID.ToString(),
-                                              creationParameters: s => s.Truncate = true);
+                                          beatmapText.Text = retrievedBeatmap.GetDisplayTitleRomanisable();
+                                          beatmapLink.Action = () => game?.ShowBeatmap(retrievedBeatmap.OnlineID);
                                       }
                                       else
-                                          beatmapText.AddText("unknown beatmap");
+                                          beatmapText.Text = "unknown beatmap";
                                   }), cancellationSource.Token);
             }
         }

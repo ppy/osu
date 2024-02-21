@@ -1,8 +1,6 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -26,9 +24,9 @@ using osu.Game.Collections;
 using osu.Game.Database;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
+using osu.Game.Graphics.Sprites;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Online;
-using osu.Game.Online.Chat;
 using osu.Game.Online.Rooms;
 using osu.Game.Overlays;
 using osu.Game.Overlays.BeatmapSet;
@@ -51,17 +49,17 @@ namespace osu.Game.Screens.OnlinePlay
         /// <summary>
         /// Invoked when this item requests to be deleted.
         /// </summary>
-        public Action<PlaylistItem> RequestDeletion;
+        public Action<PlaylistItem>? RequestDeletion;
 
         /// <summary>
         /// Invoked when this item requests its results to be shown.
         /// </summary>
-        public Action<PlaylistItem> RequestResults;
+        public Action<PlaylistItem>? RequestResults;
 
         /// <summary>
         /// Invoked when this item requests to be edited.
         /// </summary>
-        public Action<PlaylistItem> RequestEdit;
+        public Action<PlaylistItem>? RequestEdit;
 
         /// <summary>
         /// The currently-selected item, used to show a border around this item.
@@ -76,47 +74,53 @@ namespace osu.Game.Screens.OnlinePlay
         private readonly DelayedLoadWrapper onScreenLoader = new DelayedLoadWrapper(Empty) { RelativeSizeAxes = Axes.Both };
         private readonly IBindable<bool> valid = new Bindable<bool>();
 
-        private IBeatmapInfo beatmap;
-        private IRulesetInfo ruleset;
+        private IBeatmapInfo? beatmap;
+        private IRulesetInfo? ruleset;
         private Mod[] requiredMods = Array.Empty<Mod>();
 
-        private Container maskingContainer;
-        private Container difficultyIconContainer;
-        private LinkFlowContainer beatmapText;
-        private LinkFlowContainer authorText;
-        private ExplicitContentBeatmapBadge explicitContent;
-        private ModDisplay modDisplay;
-        private FillFlowContainer buttonsFlow;
-        private UpdateableAvatar ownerAvatar;
-        private Drawable showResultsButton;
-        private Drawable editButton;
-        private Drawable removeButton;
-        private PanelBackground panelBackground;
-        private FillFlowContainer mainFillFlow;
+        private Container maskingContainer = null!;
+        private Container difficultyIconContainer = null!;
+
+        private OsuHoverContainer beatmapLink = null!;
+        private TruncatingSpriteText beatmapText = null!;
+
+        private LinkFlowContainer authorText = null!;
+        private ExplicitContentBeatmapBadge explicitContent = null!;
+        private ModDisplay modDisplay = null!;
+        private FillFlowContainer buttonsFlow = null!;
+        private UpdateableAvatar? ownerAvatar;
+        private Drawable? showResultsButton;
+        private Drawable? editButton;
+        private Drawable? removeButton;
+        private PanelBackground panelBackground = null!;
+        private FillFlowContainer mainFillFlow = null!;
 
         [Resolved]
-        private RealmAccess realm { get; set; }
+        private RealmAccess realm { get; set; } = null!;
 
         [Resolved]
-        private RulesetStore rulesets { get; set; }
+        private RulesetStore rulesets { get; set; } = null!;
 
         [Resolved]
-        private BeatmapManager beatmaps { get; set; }
+        private BeatmapManager beatmaps { get; set; } = null!;
 
         [Resolved]
-        private OsuColour colours { get; set; }
+        private OsuColour colours { get; set; } = null!;
 
         [Resolved]
-        private UserLookupCache userLookupCache { get; set; }
+        private UserLookupCache userLookupCache { get; set; } = null!;
 
         [Resolved]
-        private BeatmapLookupCache beatmapLookupCache { get; set; }
+        private BeatmapLookupCache beatmapLookupCache { get; set; } = null!;
 
-        [Resolved(CanBeNull = true)]
-        private BeatmapSetOverlay beatmapOverlay { get; set; }
+        [Resolved]
+        private BeatmapSetOverlay? beatmapOverlay { get; set; }
 
-        [Resolved(CanBeNull = true)]
-        private ManageCollectionsDialog manageCollectionsDialog { get; set; }
+        [Resolved]
+        private ManageCollectionsDialog? manageCollectionsDialog { get; set; }
+
+        [Resolved]
+        private OsuGame? game { get; set; }
 
         public DrawableRoomPlaylistItem(PlaylistItem item)
             : base(item)
@@ -130,9 +134,10 @@ namespace osu.Game.Screens.OnlinePlay
         }
 
         [BackgroundDependencyLoader]
-        private void load()
+        private void load(OverlayColourProvider colourProvider)
         {
             maskingContainer.BorderColour = colours.Yellow;
+            beatmapLink.IdleColour = colourProvider.Light2;
 
             ruleset = rulesets.GetRuleset(Item.RulesetID);
             var rulesetInstance = ruleset?.CreateInstance();
@@ -173,7 +178,11 @@ namespace osu.Game.Screens.OnlinePlay
                         if (showItemOwner)
                         {
                             var foundUser = await userLookupCache.GetUserAsync(Item.OwnerID).ConfigureAwait(false);
-                            Schedule(() => ownerAvatar.User = foundUser);
+                            Schedule(() =>
+                            {
+                                if (ownerAvatar != null)
+                                    ownerAvatar.User = foundUser;
+                            });
                         }
 
                         beatmap = await beatmapLookupCache.GetBeatmapAsync(Item.Beatmap.OnlineID).ConfigureAwait(false);
@@ -287,18 +296,12 @@ namespace osu.Game.Screens.OnlinePlay
 
             panelBackground.Beatmap.Value = beatmap;
 
-            beatmapText.Clear();
+            beatmapText.Text = string.Empty;
 
             if (beatmap != null)
             {
-                beatmapText.AddLink(beatmap.GetDisplayTitleRomanisable(includeCreator: false),
-                    LinkAction.OpenBeatmap,
-                    beatmap.OnlineID.ToString(),
-                    null,
-                    text =>
-                    {
-                        text.Truncate = true;
-                    });
+                beatmapText.Text = beatmap.GetDisplayTitleRomanisable(includeCreator: false);
+                beatmapLink.Action = () => game?.ShowBeatmap(beatmap.OnlineID);
             }
 
             authorText.Clear();
@@ -374,13 +377,13 @@ namespace osu.Game.Screens.OnlinePlay
                                     Direction = FillDirection.Vertical,
                                     Children = new Drawable[]
                                     {
-                                        beatmapText = new LinkFlowContainer(fontParameters)
+                                        beatmapLink = new OsuHoverContainer
                                         {
-                                            RelativeSizeAxes = Axes.X,
-                                            // workaround to ensure only the first line of text shows, emulating truncation (but without ellipsis at the end).
-                                            // TODO: remove when text/link flow can support truncation with ellipsis natively.
-                                            Height = OsuFont.DEFAULT_FONT_SIZE,
-                                            Masking = true
+                                            AutoSizeAxes = Axes.Both,
+                                            Child = beatmapText = new TruncatingSpriteText
+                                            {
+                                                Font = OsuFont.Default.With(weight: FontWeight.SemiBold),
+                                            }
                                         },
                                         new FillFlowContainer
                                         {
@@ -535,7 +538,7 @@ namespace osu.Game.Screens.OnlinePlay
             private readonly IBeatmapInfo beatmap;
 
             [Resolved]
-            private BeatmapManager beatmapManager { get; set; }
+            private BeatmapManager beatmapManager { get; set; } = null!;
 
             // required for download tracking, as this button hides itself. can probably be removed with a bit of consideration.
             public override bool IsPresent => true;
@@ -590,7 +593,7 @@ namespace osu.Game.Screens.OnlinePlay
         // For now, this is the same implementation as in PanelBackground, but supports a beatmap info rather than a working beatmap
         private partial class PanelBackground : Container // todo: should be a buffered container (https://github.com/ppy/osu-framework/issues/3222)
         {
-            public readonly Bindable<IBeatmapInfo> Beatmap = new Bindable<IBeatmapInfo>();
+            public readonly Bindable<IBeatmapInfo?> Beatmap = new Bindable<IBeatmapInfo?>();
 
             public PanelBackground()
             {

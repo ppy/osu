@@ -22,7 +22,6 @@ using osu.Game.Graphics.Cursor;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Models;
 using osu.Game.Online.API;
-using osu.Game.Online.Chat;
 using osu.Game.Online.Rooms;
 using osu.Game.Rulesets;
 using osu.Game.Rulesets.Osu;
@@ -317,18 +316,17 @@ namespace osu.Game.Tests.Visual.Multiplayer
                 p.RequestResults = _ => resultsRequested = true;
             });
 
-            AddStep("move mouse to first item title", () =>
-            {
-                var drawQuad = playlist.ChildrenOfType<LinkFlowContainer>().First().ScreenSpaceDrawQuad;
-                var location = (drawQuad.TopLeft + drawQuad.BottomLeft) / 2 + new Vector2(drawQuad.Width * 0.2f, 0);
-                InputManager.MoveMouseTo(location);
-            });
-            AddUntilStep("wait for text load", () => playlist.ChildrenOfType<DrawableLinkCompiler>().Any());
-            AddAssert("first item title not hovered", () => playlist.ChildrenOfType<DrawableLinkCompiler>().First().IsHovered, () => Is.False);
+            AddUntilStep("wait for content to load", () =>
+                playlist.ChildrenOfType<DifficultyIcon>().FirstOrDefault()?.IsPresent == true &&
+                playlist.ChildrenOfType<DrawableRoomPlaylistItem.MainFlow>().First().IsPresent);
+
+            AddStep("move mouse to first item title", () => InputManager.MoveMouseTo(playlist.ChildrenOfType<OsuHoverContainer>().First()));
+            AddAssert("first item title not hovered", () => playlist.ChildrenOfType<OsuHoverContainer>().First().IsHovered, () => Is.False);
+
             AddStep("click left mouse", () => InputManager.Click(MouseButton.Left));
             AddUntilStep("first item selected", () => playlist.ChildrenOfType<DrawableRoomPlaylistItem>().First().IsSelectedItem, () => Is.True);
             // implies being clickable.
-            AddUntilStep("first item title hovered", () => playlist.ChildrenOfType<DrawableLinkCompiler>().First().IsHovered, () => Is.True);
+            AddUntilStep("first item title hovered", () => playlist.ChildrenOfType<OsuHoverContainer>().First().IsHovered, () => Is.True);
 
             AddStep("move mouse to second item results button", () => InputManager.MoveMouseTo(playlist.ChildrenOfType<GrayButton>().ElementAt(5)));
             AddStep("click left mouse", () => InputManager.Click(MouseButton.Left));

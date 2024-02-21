@@ -254,7 +254,6 @@ namespace osu.Game.Graphics.UserInterface
                                 Padding = new MarginPadding { Left = 15 },
                                 Origin = Anchor.CentreLeft,
                                 Anchor = Anchor.CentreLeft,
-                                RelativeSizeAxes = Axes.X,
                             },
                         };
                     }
@@ -339,7 +338,6 @@ namespace osu.Game.Graphics.UserInterface
                             {
                                 Anchor = Anchor.CentreLeft,
                                 Origin = Anchor.CentreLeft,
-                                RelativeSizeAxes = Axes.X,
                             },
                             Icon = new SpriteIcon
                             {

@@ -102,13 +102,11 @@ namespace osu.Game.Overlays.Dashboard.Home
                                         {
                                             new TruncatingSpriteText
                                             {
-                                                RelativeSizeAxes = Axes.X,
                                                 Font = OsuFont.GetFont(weight: FontWeight.Regular),
                                                 Text = BeatmapSet.Title
                                             },
                                             new TruncatingSpriteText
                                             {
-                                                RelativeSizeAxes = Axes.X,
                                                 Font = OsuFont.GetFont(size: 12, weight: FontWeight.Regular),
                                                 Text = BeatmapSet.Artist
                                             },

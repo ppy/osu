@@ -127,7 +127,6 @@ namespace osu.Game.Overlays.Mods
                                     titleText = new TruncatingSpriteText
                                     {
                                         Font = OsuFont.TorusAlternate.With(size: 18, weight: FontWeight.SemiBold),
-                                        RelativeSizeAxes = Axes.X,
                                         Shear = new Vector2(-ShearedOverlayContainer.SHEAR, 0),
                                         Margin = new MarginPadding
                                         {
@@ -138,7 +137,6 @@ namespace osu.Game.Overlays.Mods
                                     descriptionText = new TruncatingSpriteText
                                     {
                                         Font = OsuFont.Default.With(size: 12),
-                                        RelativeSizeAxes = Axes.X,
                                         Shear = new Vector2(-ShearedOverlayContainer.SHEAR, 0),
                                         ShowTooltip = false, // Tooltip is handled by `IncompatibilityDisplayingModPanel`.
                                     }

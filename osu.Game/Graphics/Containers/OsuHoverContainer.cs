@@ -17,49 +17,38 @@ namespace osu.Game.Graphics.Containers
 
         protected Color4 HoverColour;
 
-        protected Color4 IdleColour = Color4.White;
+        private Color4 idleColour = Color4.White;
+
+        public Color4 IdleColour
+        {
+            get => idleColour;
+            set
+            {
+                idleColour = value;
+                updateColour();
+            }
+        }
 
         protected virtual IEnumerable<Drawable> EffectTargets => new[] { Content };
 
         public OsuHoverContainer(HoverSampleSet sampleSet = HoverSampleSet.Default)
             : base(sampleSet)
         {
-            Enabled.ValueChanged += e =>
-            {
-                if (isHovered)
-                {
-                    if (e.NewValue)
-                        fadeIn();
-                    else
-                        fadeOut();
-                }
-            };
         }
-
-        private bool isHovered;
 
         protected override bool OnHover(HoverEvent e)
         {
-            if (isHovered)
-                return false;
-
-            isHovered = true;
-
             if (!Enabled.Value)
                 return false;
 
-            fadeIn();
+            updateColour();
 
             return base.OnHover(e);
         }
 
         protected override void OnHoverLost(HoverLostEvent e)
         {
-            if (!isHovered)
-                return;
-
-            isHovered = false;
-            fadeOut();
+            updateColour();
 
             base.OnHoverLost(e);
         }
@@ -74,11 +63,14 @@ namespace osu.Game.Graphics.Containers
         protected override void LoadComplete()
         {
             base.LoadComplete();
-            EffectTargets.ForEach(d => d.FadeColour(IdleColour));
+
+            Enabled.BindValueChanged(_ => updateColour(), true);
+            EffectTargets.ForEach(d => d.FinishTransforms());
         }
 
-        private void fadeIn() => EffectTargets.ForEach(d => d.FadeColour(HoverColour, FADE_DURATION, Easing.OutQuint));
-
-        private void fadeOut() => EffectTargets.ForEach(d => d.FadeColour(IdleColour, FADE_DURATION, Easing.OutQuint));
+        private void updateColour()
+        {
+            EffectTargets.ForEach(d => d?.FadeColour(IsHovered && Enabled.Value ? HoverColour : IdleColour, FADE_DURATION, Easing.OutQuint));
+        }
     }
 }

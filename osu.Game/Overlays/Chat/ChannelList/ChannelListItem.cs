@@ -93,7 +93,6 @@ namespace osu.Game.Overlays.Chat.ChannelList
                                     Font = OsuFont.Torus.With(size: 17, weight: FontWeight.SemiBold),
                                     Colour = colourProvider.Light3,
                                     Margin = new MarginPadding { Bottom = 2 },
-                                    RelativeSizeAxes = Axes.X,
                                 },
                                 createMentionPill(),
                                 close = createCloseButton(),
