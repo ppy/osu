@@ -59,7 +59,21 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
             double travelDistance = osuPrevObj?.TravelDistance ?? 0;
             double distance = Math.Min(single_spacing_threshold, travelDistance + osuCurrObj.MinimumJumpDistance);
 
-            return (speedBonus + speedBonus * Math.Pow(distance / single_spacing_threshold, 3.5)) * doubletapness / strainTime;
+            double sliderStreamMultiplier = 1;
+            if (osuPrevObj?.BaseObject is Slider slider)
+            {
+                // Take just slider heads into account because we're computing sliderjumps, not slideraim
+                double sliderStreamDifficulty = 0.06 * (1 + (osuCurrObj.LazyJumpDistance + slider.LazyTravelDistance) / osuCurrObj.StrainTime);
+
+                // Punish too short sliders to prevent cheesing (cheesing is still possible, but it's very rare)
+                double sliderLength = 2 * slider.Velocity * slider.SpanDuration;
+                if (sliderLength < slider.Radius)
+                    sliderStreamDifficulty *= sliderLength / slider.Radius;
+
+                sliderStreamMultiplier += sliderStreamDifficulty;
+            }
+
+            return (speedBonus + speedBonus * Math.Pow(distance / single_spacing_threshold, 3.5)) * doubletapness * sliderStreamMultiplier / strainTime;
         }
     }
 }
