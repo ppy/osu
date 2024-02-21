@@ -144,6 +144,7 @@ namespace osu.Game.Configuration
             SetDefault(OsuSetting.ReplaySettingsOverlay, true);
             SetDefault(OsuSetting.ReplayPlaybackControlsExpanded, true);
             SetDefault(OsuSetting.GameplayLeaderboard, true);
+            SetDefault(OsuSetting.AlwaysExpandGameplayLeaderboard, false);
             SetDefault(OsuSetting.AlwaysPlayFirstComboBreak, true);
 
             SetDefault(OsuSetting.FloatingComments, false);
@@ -428,6 +429,7 @@ namespace osu.Game.Configuration
         TouchDisableGameplayTaps,
         ModSelectTextSearchStartsActive,
         UserOnlineStatus,
-        MultiplayerRoomFilter
+        MultiplayerRoomFilter,
+        AlwaysExpandGameplayLeaderboard,
     }
 }
