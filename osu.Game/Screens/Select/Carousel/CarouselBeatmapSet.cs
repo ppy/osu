@@ -7,6 +7,7 @@ using System.Linq;
 using osu.Framework.Extensions.IEnumerableExtensions;
 using osu.Game.Beatmaps;
 using osu.Game.Screens.Select.Filter;
+using osu.Game.Utils;
 
 namespace osu.Game.Screens.Select.Carousel
 {
@@ -67,19 +68,19 @@ namespace osu.Game.Screens.Select.Carousel
             {
                 default:
                 case SortMode.Artist:
-                    comparison = string.Compare(BeatmapSet.Metadata.Artist, otherSet.BeatmapSet.Metadata.Artist, StringComparison.Ordinal);
+                    comparison = OrdinalSortByCaseStringComparer.INSTANCE.Compare(BeatmapSet.Metadata.Artist, otherSet.BeatmapSet.Metadata.Artist);
                     break;
 
                 case SortMode.Title:
-                    comparison = string.Compare(BeatmapSet.Metadata.Title, otherSet.BeatmapSet.Metadata.Title, StringComparison.Ordinal);
+                    comparison = OrdinalSortByCaseStringComparer.INSTANCE.Compare(BeatmapSet.Metadata.Title, otherSet.BeatmapSet.Metadata.Title);
                     break;
 
                 case SortMode.Author:
-                    comparison = string.Compare(BeatmapSet.Metadata.Author.Username, otherSet.BeatmapSet.Metadata.Author.Username, StringComparison.Ordinal);
+                    comparison = OrdinalSortByCaseStringComparer.INSTANCE.Compare(BeatmapSet.Metadata.Author.Username, otherSet.BeatmapSet.Metadata.Author.Username);
                     break;
 
                 case SortMode.Source:
-                    comparison = string.Compare(BeatmapSet.Metadata.Source, otherSet.BeatmapSet.Metadata.Source, StringComparison.Ordinal);
+                    comparison = OrdinalSortByCaseStringComparer.INSTANCE.Compare(BeatmapSet.Metadata.Source, otherSet.BeatmapSet.Metadata.Source);
                     break;
 
                 case SortMode.DateAdded:
