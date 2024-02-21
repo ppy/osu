@@ -53,7 +53,7 @@ namespace osu.Game.Rulesets.Osu.Tests
         {
             performTest(generateReplay(20));
 
-            AddAssert("all max judgements", () => judgementResults.All(result => result.Type == result.Judgement.MaxResult));
+            AddAssert("all max judgements", () => judgementResults.All(result => result.HitObject is SpinnerHealthTick || result.Type == result.Judgement.MaxResult));
         }
 
         private static List<ReplayFrame> generateReplay(int spins) => new SpinFramesGenerator(time_spinner_start)
@@ -104,7 +104,7 @@ namespace osu.Game.Rulesets.Osu.Tests
         private void assertResult<T>(int index, HitResult expectedResult)
         {
             AddAssert($"{typeof(T).ReadableName()} ({index}) judged as {expectedResult}",
-                () => judgementResults.Where(j => j.HitObject is T).OrderBy(j => j.HitObject.StartTime).ElementAt(index).Type,
+                () => judgementResults.Where(j => j.HitObject is T && j.HitObject is not SpinnerHealthTick).OrderBy(j => j.HitObject.StartTime).ElementAt(index).Type,
                 () => Is.EqualTo(expectedResult));
         }
 

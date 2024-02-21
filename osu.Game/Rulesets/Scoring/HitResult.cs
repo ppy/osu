@@ -146,6 +146,13 @@ namespace osu.Game.Rulesets.Scoring
         SliderTailHit,
 
         /// <summary>
+        /// A judgement similar to <see cref="IgnoreHit"/> that's used to give a health bonus to spinners after reaching the bonus cap.
+        /// </summary>
+        [EnumMember(Value = "health_bonus")]
+        [Order(17)]
+        HealthBonus,
+
+        /// <summary>
         /// A special result used as a padding value for legacy rulesets. It is a hit type and affects combo, but does not affect the base score (does not affect accuracy).
         ///
         /// DO NOT USE FOR ANYTHING EVER.
@@ -270,6 +277,7 @@ namespace osu.Game.Rulesets.Scoring
             {
                 case HitResult.SmallBonus:
                 case HitResult.LargeBonus:
+                case HitResult.HealthBonus:
                     return true;
 
                 default:
@@ -389,6 +397,9 @@ namespace osu.Game.Rulesets.Scoring
                 throw new ArgumentOutOfRangeException(nameof(minResult), $"{minResult} is not a valid minimum result for a {maxResult} judgement.");
 
             if (maxResult.IsBonus() && minResult != HitResult.IgnoreMiss)
+                throw new ArgumentOutOfRangeException(nameof(minResult), $"{HitResult.IgnoreMiss} is the only valid minimum result for a {maxResult} judgement.");
+
+            if (maxResult == HitResult.HealthBonus && minResult != HitResult.IgnoreMiss)
                 throw new ArgumentOutOfRangeException(nameof(minResult), $"{HitResult.IgnoreMiss} is the only valid minimum result for a {maxResult} judgement.");
 
             if (minResult == HitResult.IgnoreMiss)

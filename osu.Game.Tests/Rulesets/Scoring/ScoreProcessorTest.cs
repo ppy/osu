@@ -172,6 +172,7 @@ namespace osu.Game.Tests.Rulesets.Scoring
         [TestCase(HitResult.SliderTailHit, HitResult.IgnoreMiss)]
         [TestCase(HitResult.SmallBonus, HitResult.IgnoreMiss)]
         [TestCase(HitResult.LargeBonus, HitResult.IgnoreMiss)]
+        [TestCase(HitResult.HealthBonus, HitResult.IgnoreMiss)]
         public void TestMinResults(HitResult hitResult, HitResult expectedMinResult)
         {
             Assert.AreEqual(expectedMinResult, new TestJudgement(hitResult).MinResult);
@@ -193,6 +194,7 @@ namespace osu.Game.Tests.Rulesets.Scoring
         [TestCase(HitResult.SliderTailHit, true)]
         [TestCase(HitResult.SmallBonus, false)]
         [TestCase(HitResult.LargeBonus, false)]
+        [TestCase(HitResult.HealthBonus, false)]
         public void TestAffectsCombo(HitResult hitResult, bool expectedReturnValue)
         {
             Assert.AreEqual(expectedReturnValue, hitResult.AffectsCombo());
@@ -214,6 +216,7 @@ namespace osu.Game.Tests.Rulesets.Scoring
         [TestCase(HitResult.SliderTailHit, true)]
         [TestCase(HitResult.SmallBonus, false)]
         [TestCase(HitResult.LargeBonus, false)]
+        [TestCase(HitResult.HealthBonus, false)]
         public void TestAffectsAccuracy(HitResult hitResult, bool expectedReturnValue)
         {
             Assert.AreEqual(expectedReturnValue, hitResult.AffectsAccuracy());
@@ -235,6 +238,7 @@ namespace osu.Game.Tests.Rulesets.Scoring
         [TestCase(HitResult.SliderTailHit, false)]
         [TestCase(HitResult.SmallBonus, true)]
         [TestCase(HitResult.LargeBonus, true)]
+        [TestCase(HitResult.HealthBonus, true)]
         public void TestIsBonus(HitResult hitResult, bool expectedReturnValue)
         {
             Assert.AreEqual(expectedReturnValue, hitResult.IsBonus());
@@ -256,6 +260,7 @@ namespace osu.Game.Tests.Rulesets.Scoring
         [TestCase(HitResult.SliderTailHit, true)]
         [TestCase(HitResult.SmallBonus, true)]
         [TestCase(HitResult.LargeBonus, true)]
+        [TestCase(HitResult.HealthBonus, true)]
         public void TestIsHit(HitResult hitResult, bool expectedReturnValue)
         {
             Assert.AreEqual(expectedReturnValue, hitResult.IsHit());
@@ -277,6 +282,7 @@ namespace osu.Game.Tests.Rulesets.Scoring
         [TestCase(HitResult.SliderTailHit, true)]
         [TestCase(HitResult.SmallBonus, true)]
         [TestCase(HitResult.LargeBonus, true)]
+        [TestCase(HitResult.HealthBonus, false)]
         public void TestIsScorable(HitResult hitResult, bool expectedReturnValue)
         {
             Assert.AreEqual(expectedReturnValue, hitResult.IsScorable());

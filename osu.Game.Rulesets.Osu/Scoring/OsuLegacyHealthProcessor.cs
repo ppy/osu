@@ -30,7 +30,7 @@ namespace osu.Game.Rulesets.Osu.Scoring
                     break;
 
                 case Spinner spinner:
-                    foreach (var nested in spinner.NestedHitObjects.Where(t => t is not SpinnerBonusTick))
+                    foreach (var nested in spinner.NestedHitObjects.Where(t => t is not SpinnerBonusTick && t is not SpinnerHealthTick))
                         yield return nested;
 
                     break;
@@ -71,6 +71,7 @@ namespace osu.Game.Rulesets.Osu.Scoring
                     increase = 0.011;
                     break;
 
+                case HitResult.HealthBonus:
                 case HitResult.Great:
                     increase = 0.03;
                     break;

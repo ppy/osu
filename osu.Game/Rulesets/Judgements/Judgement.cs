@@ -67,6 +67,7 @@ namespace osu.Game.Rulesets.Judgements
                     case HitResult.SmallBonus:
                     case HitResult.LargeBonus:
                     case HitResult.IgnoreHit:
+                    case HitResult.HealthBonus:
                         return HitResult.IgnoreMiss;
 
                     case HitResult.SmallTickHit:

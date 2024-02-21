@@ -14,7 +14,7 @@ namespace osu.Game.Tests.Rulesets.Scoring
         [TestCase(new[] { HitResult.Perfect, HitResult.Great, HitResult.Good, HitResult.Ok, HitResult.Meh }, new[] { HitResult.Miss, HitResult.IgnoreMiss })]
         [TestCase(new[] { HitResult.LargeTickHit }, new[] { HitResult.LargeTickMiss, HitResult.IgnoreMiss })]
         [TestCase(new[] { HitResult.SmallTickHit }, new[] { HitResult.SmallTickMiss, HitResult.IgnoreMiss })]
-        [TestCase(new[] { HitResult.LargeBonus, HitResult.SmallBonus }, new[] { HitResult.IgnoreMiss })]
+        [TestCase(new[] { HitResult.LargeBonus, HitResult.SmallBonus, HitResult.HealthBonus }, new[] { HitResult.IgnoreMiss })]
         [TestCase(new[] { HitResult.IgnoreHit }, new[] { HitResult.IgnoreMiss, HitResult.ComboBreak })]
         public void TestValidResultPairs(HitResult[] maxResults, HitResult[] minResults)
         {

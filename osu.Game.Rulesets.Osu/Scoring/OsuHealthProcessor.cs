@@ -115,6 +115,7 @@ namespace osu.Game.Rulesets.Osu.Scoring
                 case HitResult.Great:
                     return 0.03;
 
+                case HitResult.HealthBonus:
                 case HitResult.SmallBonus:
                     return 0.0085;
 
