@@ -903,11 +903,13 @@ namespace osu.Game.Screens.Select
                 if (Carousel.SelectBeatmap(Beatmap.Value.BeatmapInfo, false))
                     return;
 
-                // prefer not changing ruleset at this point, so look for another difficulty in the currently playing beatmap
-                var found = Beatmap.Value.BeatmapSetInfo.Beatmaps.FirstOrDefault(b => b.Ruleset.Equals(decoupledRuleset.Value));
-
-                if (found != null && Carousel.SelectBeatmap(found, false))
-                    return;
+                // prefer not changing ruleset at this point, so attempt to select the lowest unfiltered difficulty in the currently playing beatmapset.
+                var beatmaps = Beatmap.Value.BeatmapSetInfo.Beatmaps.Where(b => b.Ruleset.Equals(Ruleset.Value)).OrderBy(b => b.StarRating);
+                foreach (var beatmap in beatmaps)
+                {
+                    if (Carousel.SelectBeatmap(beatmap, false))
+                        return;
+                }
             }
 
             // If the current active beatmap could not be selected, select a new random beatmap.
