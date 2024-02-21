@@ -2,7 +2,6 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System.Linq;
-using osu.Framework;
 using osu.Framework.Allocation;
 using osu.Framework.Configuration;
 using osu.Framework.Extensions;
@@ -28,15 +27,16 @@ namespace osu.Game.Overlays.Settings.Sections.Graphics
             var renderer = config.GetBindable<RendererType>(FrameworkSetting.Renderer);
             automaticRendererInUse = renderer.Value == RendererType.Automatic;
 
-            SettingsEnumDropdown<RendererType> rendererDropdown;
-
             Children = new Drawable[]
             {
-                rendererDropdown = new RendererSettingsDropdown
+                new RendererSettingsDropdown
                 {
                     LabelText = GraphicsSettingsStrings.Renderer,
                     Current = renderer,
-                    Items = host.GetPreferredRenderersForCurrentPlatform().Order().Where(t => t != RendererType.Vulkan),
+                    Items = host.GetPreferredRenderersForCurrentPlatform().Order()
+#pragma warning disable CS0612 // Type or member is obsolete
+                                .Where(t => t != RendererType.Vulkan && t != RendererType.OpenGLLegacy),
+#pragma warning restore CS0612 // Type or member is obsolete
                     Keywords = new[] { @"compatibility", @"directx" },
                 },
                 // TODO: this needs to be a custom dropdown at some point
@@ -79,13 +79,6 @@ namespace osu.Game.Overlays.Settings.Sections.Graphics
                     }));
                 }
             });
-
-            // TODO: remove this once we support SDL+android.
-            if (RuntimeInfo.OS == RuntimeInfo.Platform.Android)
-            {
-                rendererDropdown.Items = new[] { RendererType.Automatic, RendererType.OpenGLLegacy };
-                rendererDropdown.SetNoticeText("New renderer support for android is coming soon!", true);
-            }
         }
 
         private partial class RendererSettingsDropdown : SettingsEnumDropdown<RendererType>
