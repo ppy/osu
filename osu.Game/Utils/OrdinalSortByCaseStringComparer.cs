@@ -32,7 +32,7 @@ namespace osu.Game.Utils
     /// </example>
     public class OrdinalSortByCaseStringComparer : IComparer<string>
     {
-        public static readonly OrdinalSortByCaseStringComparer INSTANCE = new OrdinalSortByCaseStringComparer();
+        public static readonly OrdinalSortByCaseStringComparer DEFAULT = new OrdinalSortByCaseStringComparer();
 
         private OrdinalSortByCaseStringComparer()
         {

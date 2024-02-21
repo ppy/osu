@@ -31,7 +31,7 @@ namespace osu.Game.Benchmarks
         public void OrdinalIgnoreCase() => compare(StringComparer.OrdinalIgnoreCase);
 
         [Benchmark]
-        public void OrdinalSortByCase() => compare(OrdinalSortByCaseStringComparer.INSTANCE);
+        public void OrdinalSortByCase() => compare(OrdinalSortByCaseStringComparer.DEFAULT);
 
         [Benchmark]
         public void InvariantCulture() => compare(StringComparer.InvariantCulture);
