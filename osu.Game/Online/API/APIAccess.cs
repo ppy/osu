@@ -91,7 +91,7 @@ namespace osu.Game.Online.API
             authentication = new OAuth(endpointConfiguration.APIClientID, endpointConfiguration.APIClientSecret, APIEndpointUrl);
             log = Logger.GetLogger(LoggingTarget.Network);
 
-            ProvidedUsername = config.Get<bool>(OsuSetting.SaveUsername) ? config.Get<string>(OsuSetting.Username) : string.Empty;
+            ProvidedUsername = config.Get<string>(OsuSetting.Username);
 
             authentication.TokenString = config.Get<string>(OsuSetting.Token);
             authentication.Token.ValueChanged += onTokenChanged;
