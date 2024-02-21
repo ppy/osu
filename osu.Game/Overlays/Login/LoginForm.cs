@@ -150,8 +150,7 @@ namespace osu.Game.Overlays.Login
 
         private void onRememberUsernameChanged(OsuConfigManager config)
         {
-            var checkBox = (SettingsCheckbox)rememberUsername.GetUnderlyingSettingValue();
-            if (checkBox.Current.Value == false)
+            if (rememberUsername.Current.Value == false)
                 config.SetValue(OsuSetting.Username, string.Empty);
         }
 
