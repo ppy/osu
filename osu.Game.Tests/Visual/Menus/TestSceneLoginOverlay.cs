@@ -8,11 +8,13 @@ using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Testing;
+using osu.Game.Configuration;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Online.API;
 using osu.Game.Online.API.Requests;
 using osu.Game.Overlays;
 using osu.Game.Overlays.Login;
+using osu.Game.Overlays.Settings;
 using osu.Game.Users.Drawables;
 using osuTK.Input;
 
@@ -24,6 +26,9 @@ namespace osu.Game.Tests.Visual.Menus
         private DummyAPIAccess dummyAPI => (DummyAPIAccess)API;
 
         private LoginOverlay loginOverlay = null!;
+
+        [Resolved]
+        private OsuConfigManager configManager { get; set; } = null!;
 
         [BackgroundDependencyLoader]
         private void load()
@@ -155,6 +160,37 @@ namespace osu.Game.Tests.Visual.Menus
                 InputManager.Click(MouseButton.Left);
             });
             AddAssert("login overlay is hidden", () => loginOverlay.State.Value == Visibility.Hidden);
+        }
+
+        [Test]
+        public void TestUncheckingRememberUsernameClearsIt()
+        {
+            AddStep("logout", () => API.Logout());
+            AddStep("set username", () => configManager.SetValue(OsuSetting.Username, "test_user"));
+            AddStep("set remember password", () => configManager.SetValue(OsuSetting.SavePassword, true));
+            AddStep("uncheck remember username", () =>
+            {
+                InputManager.MoveMouseTo(loginOverlay.ChildrenOfType<SettingsCheckbox>().First());
+                InputManager.Click(MouseButton.Left);
+            });
+            AddAssert("remember username off", () => configManager.Get<bool>(OsuSetting.SaveUsername), () => Is.False);
+            AddAssert("remember password off", () => configManager.Get<bool>(OsuSetting.SavePassword), () => Is.False);
+            AddAssert("username cleared", () => configManager.Get<string>(OsuSetting.Username), () => Is.Empty);
+        }
+
+        [Test]
+        public void TestUncheckingRememberPasswordClearsToken()
+        {
+            AddStep("logout", () => API.Logout());
+            AddStep("set token", () => configManager.SetValue(OsuSetting.Token, "test_token"));
+            AddStep("set remember password", () => configManager.SetValue(OsuSetting.SavePassword, true));
+            AddStep("uncheck remember token", () =>
+            {
+                InputManager.MoveMouseTo(loginOverlay.ChildrenOfType<SettingsCheckbox>().Last());
+                InputManager.Click(MouseButton.Left);
+            });
+            AddAssert("remember password off", () => configManager.Get<bool>(OsuSetting.SavePassword), () => Is.False);
+            AddAssert("token cleared", () => configManager.Get<string>(OsuSetting.Token), () => Is.Empty);
         }
     }
 }
