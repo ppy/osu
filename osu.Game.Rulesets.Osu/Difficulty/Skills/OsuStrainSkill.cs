@@ -37,6 +37,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
         protected virtual double DifficultyMultiplier => DEFAULT_DIFFICULTY_MULTIPLIER;
 
         protected List<double> objectStrains = new List<double>();
+        protected double difficulty;
 
         protected OsuStrainSkill(Mod[] mods)
             : base(mods)
@@ -45,7 +46,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
 
         public override double DifficultyValue()
         {
-            double difficulty = 0;
+            difficulty = 0;
             double weight = 1;
 
             // Sections with 0 strain are excluded to avoid worst-case time complexity of the following sort (e.g. /b/2351871).
@@ -78,9 +79,9 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
         /// </summary>
         public double CountDifficultStrains()
         {
-            double topStrain = objectStrains.Max();
+            double consistentTopStrain = difficulty / 10; // What would the top strain be if all strain values were identical
 
-            return objectStrains.Sum(s => Math.Pow(s / topStrain, 4));
+            return objectStrains.Sum(s => Math.Pow(1, s / consistentTopStrain, 5));
         }
     }
 }
