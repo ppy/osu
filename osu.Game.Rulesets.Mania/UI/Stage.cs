@@ -1,22 +1,22 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
-using System.Collections.Generic;
+using System;
 using System.Linq;
 using osu.Framework.Allocation;
+using osu.Framework.Extensions.ObjectExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
-using osu.Framework.Graphics.Pooling;
 using osu.Game.Rulesets.Judgements;
 using osu.Game.Rulesets.Mania.Beatmaps;
 using osu.Game.Rulesets.Mania.Objects;
 using osu.Game.Rulesets.Mania.Objects.Drawables;
+using osu.Game.Rulesets.Mania.Scoring;
 using osu.Game.Rulesets.Mania.Skinning;
 using osu.Game.Rulesets.Mania.UI.Components;
 using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Objects.Drawables;
+using osu.Game.Rulesets.Scoring;
 using osu.Game.Rulesets.UI;
 using osu.Game.Rulesets.UI.Scrolling;
 using osu.Game.Skinning;
@@ -36,17 +36,28 @@ namespace osu.Game.Rulesets.Mania.UI
 
         public const float HIT_TARGET_POSITION = 110;
 
-        public IReadOnlyList<Column> Columns => columnFlow.Content;
+        public Column[] Columns => columnFlow.Content;
         private readonly ColumnFlow<Column> columnFlow;
 
         private readonly JudgementContainer<DrawableManiaJudgement> judgements;
-        private readonly DrawablePool<DrawableManiaJudgement> judgementPool;
+        private readonly JudgementPooler<DrawableManiaJudgement> judgementPooler;
 
         private readonly Drawable barLineContainer;
 
-        public override bool ReceivePositionalInputAt(Vector2 screenSpacePos) => Columns.Any(c => c.ReceivePositionalInputAt(screenSpacePos));
+        public override bool ReceivePositionalInputAt(Vector2 screenSpacePos)
+        {
+            foreach (var c in Columns)
+            {
+                if (c.ReceivePositionalInputAt(screenSpacePos))
+                    return true;
+            }
+
+            return false;
+        }
 
         private readonly int firstColumnIndex;
+
+        private ISkinSource currentSkin = null!;
 
         public Stage(int firstColumnIndex, StageDefinition definition, ref ManiaAction normalColumnStartAction, ref ManiaAction specialColumnStartAction)
         {
@@ -65,7 +76,6 @@ namespace osu.Game.Rulesets.Mania.UI
 
             InternalChildren = new Drawable[]
             {
-                judgementPool = new DrawablePool<DrawableManiaJudgement>(2),
                 new Container
                 {
                     Anchor = Anchor.TopCentre,
@@ -104,7 +114,7 @@ namespace osu.Game.Rulesets.Mania.UI
                         {
                             RelativeSizeAxes = Axes.Y,
                         },
-                        new SkinnableDrawable(new ManiaSkinComponentLookup(ManiaSkinComponents.StageForeground), _ => null)
+                        new SkinnableDrawable(new ManiaSkinComponentLookup(ManiaSkinComponents.StageForeground))
                         {
                             RelativeSizeAxes = Axes.Both
                         },
@@ -137,10 +147,12 @@ namespace osu.Game.Rulesets.Mania.UI
                 AddNested(column);
             }
 
+            var hitWindows = new ManiaHitWindows();
+
+            AddInternal(judgementPooler = new JudgementPooler<DrawableManiaJudgement>(Enum.GetValues<HitResult>().Where(r => hitWindows.IsHitResultAllowed(r))));
+
             RegisterPool<BarLine, DrawableBarLine>(50, 200);
         }
-
-        private ISkinSource currentSkin;
 
         [BackgroundDependencyLoader]
         private void load(ISkinSource skin)
@@ -170,7 +182,7 @@ namespace osu.Game.Rulesets.Mania.UI
 
             base.Dispose(isDisposing);
 
-            if (currentSkin != null)
+            if (currentSkin.IsNotNull())
                 currentSkin.SourceChanged -= onSkinChanged;
         }
 
@@ -180,13 +192,13 @@ namespace osu.Game.Rulesets.Mania.UI
             NewResult += OnNewResult;
         }
 
-        public override void Add(HitObject hitObject) => Columns.ElementAt(((ManiaHitObject)hitObject).Column - firstColumnIndex).Add(hitObject);
+        public override void Add(HitObject hitObject) => Columns[((ManiaHitObject)hitObject).Column - firstColumnIndex].Add(hitObject);
 
-        public override bool Remove(HitObject hitObject) => Columns.ElementAt(((ManiaHitObject)hitObject).Column - firstColumnIndex).Remove(hitObject);
+        public override bool Remove(HitObject hitObject) => Columns[((ManiaHitObject)hitObject).Column - firstColumnIndex].Remove(hitObject);
 
-        public override void Add(DrawableHitObject h) => Columns.ElementAt(((ManiaHitObject)h.HitObject).Column - firstColumnIndex).Add(h);
+        public override void Add(DrawableHitObject h) => Columns[((ManiaHitObject)h.HitObject).Column - firstColumnIndex].Add(h);
 
-        public override bool Remove(DrawableHitObject h) => Columns.ElementAt(((ManiaHitObject)h.HitObject).Column - firstColumnIndex).Remove(h);
+        public override bool Remove(DrawableHitObject h) => Columns[((ManiaHitObject)h.HitObject).Column - firstColumnIndex].Remove(h);
 
         public void Add(BarLine barLine) => base.Add(barLine);
 
@@ -196,13 +208,13 @@ namespace osu.Game.Rulesets.Mania.UI
                 return;
 
             judgements.Clear(false);
-            judgements.Add(judgementPool.Get(j =>
+            judgements.Add(judgementPooler.Get(result.Type, j =>
             {
                 j.Apply(result, judgedObject);
 
                 j.Anchor = Anchor.Centre;
                 j.Origin = Anchor.Centre;
-            }));
+            })!);
         }
 
         protected override void Update()

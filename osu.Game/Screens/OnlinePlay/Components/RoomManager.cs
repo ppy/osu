@@ -7,6 +7,7 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
+using JetBrains.Annotations;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Development;
@@ -19,6 +20,7 @@ namespace osu.Game.Screens.OnlinePlay.Components
 {
     public partial class RoomManager : Component, IRoomManager
     {
+        [CanBeNull]
         public event Action RoomsUpdated;
 
         private readonly BindableList<Room> rooms = new BindableList<Room>();

@@ -47,7 +47,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
         private const float spinning_sample_initial_frequency = 1.0f;
         private const float spinning_sample_modulated_base_frequency = 0.5f;
 
-        private SkinnableSound maxBonusSample;
+        private PausableSkinnableSound maxBonusSample;
 
         /// <summary>
         /// The amount of bonus score gained from spinning after the required number of spins, for display purposes.
@@ -114,7 +114,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
                     Looping = true,
                     Frequency = { Value = spinning_sample_initial_frequency }
                 },
-                maxBonusSample = new SkinnableSound
+                maxBonusSample = new PausableSkinnableSound
                 {
                     MinimumSampleVolume = MINIMUM_SAMPLE_VOLUME,
                 }
@@ -153,7 +153,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
         {
             if (tracking.NewValue)
             {
-                if (!spinningSample.IsPlaying)
+                if (!spinningSample.RequestedPlaying)
                     spinningSample.Play();
 
                 spinningSample.VolumeTo(1, 300);
@@ -258,15 +258,16 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
             foreach (var tick in ticks.Where(t => !t.Result.HasResult))
                 tick.TriggerResult(false);
 
-            ApplyResult(r =>
+            ApplyResult(static (r, hitObject) =>
             {
-                if (Progress >= 1)
+                var spinner = (DrawableSpinner)hitObject;
+                if (spinner.Progress >= 1)
                     r.Type = HitResult.Great;
-                else if (Progress > .9)
+                else if (spinner.Progress > .9)
                     r.Type = HitResult.Ok;
-                else if (Progress > .75)
+                else if (spinner.Progress > .75)
                     r.Type = HitResult.Meh;
-                else if (Time.Current >= HitObject.EndTime)
+                else if (spinner.Time.Current >= spinner.HitObject.EndTime)
                     r.Type = r.Judgement.MinResult;
             });
         }

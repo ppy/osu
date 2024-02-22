@@ -48,6 +48,8 @@ namespace osu.Game.Graphics.UserInterface
 
         public void KillFocus() => textBox.KillFocus();
 
+        public bool SelectAll() => textBox.SelectAll();
+
         public ShearedSearchTextBox()
         {
             Height = 42;

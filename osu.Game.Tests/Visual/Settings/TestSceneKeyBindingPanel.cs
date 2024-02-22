@@ -13,7 +13,6 @@ using osu.Game.Graphics.UserInterface;
 using osu.Game.Graphics.UserInterfaceV2;
 using osu.Game.Localisation;
 using osu.Game.Overlays;
-using osu.Game.Overlays.Settings;
 using osu.Game.Overlays.Settings.Sections.Input;
 using osu.Game.Rulesets.Taiko;
 using osuTK.Input;
@@ -152,7 +151,7 @@ namespace osu.Game.Tests.Visual.Settings
             AddStep("click first row with two bindings", () =>
             {
                 multiBindingRow = panel.ChildrenOfType<KeyBindingRow>().First(row => row.Defaults.Count() > 1);
-                InputManager.MoveMouseTo(multiBindingRow);
+                InputManager.MoveMouseTo(multiBindingRow.ChildrenOfType<OsuSpriteText>().First());
                 InputManager.Click(MouseButton.Left);
             });
 
@@ -256,7 +255,7 @@ namespace osu.Game.Tests.Visual.Settings
             AddStep("click first row with two bindings", () =>
             {
                 multiBindingRow = panel.ChildrenOfType<KeyBindingRow>().First(row => row.Defaults.Count() > 1);
-                InputManager.MoveMouseTo(multiBindingRow);
+                InputManager.MoveMouseTo(multiBindingRow.ChildrenOfType<OsuSpriteText>().First());
                 InputManager.Click(MouseButton.Left);
             });
 
@@ -305,7 +304,6 @@ namespace osu.Game.Tests.Visual.Settings
                 section.ChildrenOfType<ResetButton>().Single().TriggerClick();
             });
             AddStep("move mouse to centre", () => InputManager.MoveMouseTo(panel.ScreenSpaceDrawQuad.Centre));
-            AddUntilStep("wait for collapsed", () => panel.ChildrenOfType<SettingsSidebar>().Single().Expanded.Value, () => Is.False);
             scrollToAndStartBinding("Left (rim)");
             AddStep("attempt to bind M1 to two keys", () => InputManager.Click(MouseButton.Left));
 
@@ -325,7 +323,6 @@ namespace osu.Game.Tests.Visual.Settings
                 section.ChildrenOfType<ResetButton>().Single().TriggerClick();
             });
             AddStep("move mouse to centre", () => InputManager.MoveMouseTo(panel.ScreenSpaceDrawQuad.Centre));
-            AddUntilStep("wait for collapsed", () => panel.ChildrenOfType<SettingsSidebar>().Single().Expanded.Value, () => Is.False);
             scrollToAndStartBinding("Left (rim)");
             AddStep("attempt to bind M1 to two keys", () => InputManager.Click(MouseButton.Left));
 
@@ -345,7 +342,6 @@ namespace osu.Game.Tests.Visual.Settings
                 section.ChildrenOfType<ResetButton>().Single().TriggerClick();
             });
             AddStep("move mouse to centre", () => InputManager.MoveMouseTo(panel.ScreenSpaceDrawQuad.Centre));
-            AddUntilStep("wait for collapsed", () => panel.ChildrenOfType<SettingsSidebar>().Single().Expanded.Value, () => Is.False);
             scrollToAndStartBinding("Left (centre)");
             AddStep("clear binding", () =>
             {
@@ -377,7 +373,6 @@ namespace osu.Game.Tests.Visual.Settings
                 section.ChildrenOfType<ResetButton>().Single().TriggerClick();
             });
             AddStep("move mouse to centre", () => InputManager.MoveMouseTo(panel.ScreenSpaceDrawQuad.Centre));
-            AddUntilStep("wait for collapsed", () => panel.ChildrenOfType<SettingsSidebar>().Single().Expanded.Value, () => Is.False);
             scrollToAndStartBinding("Left (centre)");
             AddStep("clear binding", () =>
             {

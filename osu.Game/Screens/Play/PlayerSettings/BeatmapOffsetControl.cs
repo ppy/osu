@@ -7,6 +7,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
+using osu.Framework.Extensions.ObjectExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Input.Bindings;
@@ -20,7 +21,9 @@ using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Input.Bindings;
 using osu.Game.Localisation;
+using osu.Game.Overlays;
 using osu.Game.Overlays.Settings;
+using osu.Game.Overlays.Settings.Sections.Audio;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Scoring;
 using osu.Game.Scoring;
@@ -83,7 +86,7 @@ namespace osu.Game.Screens.Play.PlayerSettings
                     new OffsetSliderBar
                     {
                         KeyboardStep = 5,
-                        LabelText = BeatmapOffsetControlStrings.BeatmapOffset,
+                        LabelText = BeatmapOffsetControlStrings.AudioOffsetThisBeatmap,
                         Current = Current,
                     },
                     referenceScoreContainer = new FillFlowContainer
@@ -157,11 +160,11 @@ namespace osu.Game.Screens.Play.PlayerSettings
                     // Apply to all difficulties in a beatmap set for now (they generally always share timing).
                     foreach (var b in setInfo.Beatmaps)
                     {
-                        BeatmapUserSettings settings = b.UserSettings;
+                        BeatmapUserSettings userSettings = b.UserSettings;
                         double val = Current.Value;
 
-                        if (settings.Offset != val)
-                            settings.Offset = val;
+                        if (userSettings.Offset != val)
+                            userSettings.Offset = val;
                     }
                 });
             }
@@ -172,6 +175,9 @@ namespace osu.Game.Screens.Play.PlayerSettings
             referenceScoreContainer.Clear();
 
             if (score.NewValue == null)
+                return;
+
+            if (!score.NewValue.BeatmapInfo.AsNonNull().Equals(beatmap.Value.BeatmapInfo))
                 return;
 
             if (score.NewValue.Mods.Any(m => !m.UserPlayable || m is IHasNoTimedInputs))
@@ -209,6 +215,8 @@ namespace osu.Game.Screens.Play.PlayerSettings
             lastPlayAverage = average;
             lastPlayBeatmapOffset = Current.Value;
 
+            LinkFlowContainer globalOffsetText;
+
             referenceScoreContainer.AddRange(new Drawable[]
             {
                 lastPlayGraph = new HitEventTimingDistributionGraph(hitEvents)
@@ -222,8 +230,23 @@ namespace osu.Game.Screens.Play.PlayerSettings
                     Text = BeatmapOffsetControlStrings.CalibrateUsingLastPlay,
                     Action = () => Current.Value = lastPlayBeatmapOffset - lastPlayAverage
                 },
+                globalOffsetText = new LinkFlowContainer
+                {
+                    RelativeSizeAxes = Axes.X,
+                    AutoSizeAxes = Axes.Y,
+                }
             });
+
+            if (settings != null)
+            {
+                globalOffsetText.AddText("You can also ");
+                globalOffsetText.AddLink("adjust the global offset", () => settings.ShowAtControl<AudioOffsetAdjustControl>());
+                globalOffsetText.AddText(" based off this play.");
+            }
         }
+
+        [Resolved]
+        private SettingsOverlay? settings { get; set; }
 
         protected override void Dispose(bool isDisposing)
         {
@@ -284,7 +307,7 @@ namespace osu.Game.Screens.Play.PlayerSettings
             }
         }
 
-        public partial class OffsetSliderBar : PlayerSliderBar<double>
+        private partial class OffsetSliderBar : PlayerSliderBar<double>
         {
             protected override Drawable CreateControl() => new CustomSliderBar();
 

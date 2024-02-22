@@ -293,7 +293,7 @@ namespace osu.Game.Rulesets.Catch.Tests
 
         private JudgementResult createResult(CatchHitObject hitObject)
         {
-            return new CatchJudgementResult(hitObject, hitObject.CreateJudgement())
+            return new CatchJudgementResult(hitObject, hitObject.Judgement)
             {
                 Type = catcher.CanCatch(hitObject) ? HitResult.Great : HitResult.Miss
             };
