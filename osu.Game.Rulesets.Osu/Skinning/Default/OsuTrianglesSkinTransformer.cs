@@ -30,28 +30,6 @@ namespace osu.Game.Rulesets.Osu.Skinning.Default
                     }
 
                     break;
-                case OsuSkinComponentLookup osuComponent:
-                    switch (osuComponent.Component)
-                    {
-                        case OsuSkinComponents.HitMarkerLeft:
-                            if (GetTexture(@"hitmarker-left") != null)
-                                return new HitMarker(OsuAction.LeftButton);
-
-                            return null;
-
-                        case OsuSkinComponents.HitMarkerRight:
-                            if (GetTexture(@"hitmarker-right") != null)
-                                return new HitMarker(OsuAction.RightButton);
-
-                            return null;
-
-                        case OsuSkinComponents.AimMarker:
-                            if (GetTexture(@"aimmarker") != null)
-                                return new HitMarker();
-                            
-                            return null;
-                    }
-                    break;
             }
 
             return base.GetDrawableComponent(lookup);
