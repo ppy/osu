@@ -48,8 +48,10 @@ namespace osu.Game.Rulesets.Osu.Mods
         {
             var cursorPos = playfield.Cursor.AsNonNull().ActiveCursor.DrawPosition;
 
-            foreach (var drawable in playfield.HitObjectContainer.AliveObjects)
+            foreach (var entry in playfield.HitObjectContainer.AliveEntries)
             {
+                var drawable = entry.Value;
+
                 var destination = Vector2.Clamp(2 * drawable.Position - cursorPos, Vector2.Zero, OsuPlayfield.BASE_SIZE);
 
                 if (drawable.HitObject is Slider thisSlider)

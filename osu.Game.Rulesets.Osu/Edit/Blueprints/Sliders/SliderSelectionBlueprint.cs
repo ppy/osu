@@ -171,7 +171,8 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders
                     return false; // Allow right click to be handled by context menu
 
                 case MouseButton.Left:
-                    if (e.ControlPressed && IsSelected)
+                    // If there's more than two objects selected, ctrl+click should deselect
+                    if (e.ControlPressed && IsSelected && selectedObjects.Count < 2)
                     {
                         changeHandler?.BeginChange();
                         placementControlPoint = addControlPoint(e.MousePosition);
@@ -415,8 +416,22 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders
             DrawableObject.SliderBody?.ToScreenSpace(DrawableObject.SliderBody.PathEndOffset) ?? BodyPiece.ToScreenSpace(BodyPiece.PathEndLocation)
         };
 
-        public override bool ReceivePositionalInputAt(Vector2 screenSpacePos) =>
-            BodyPiece.ReceivePositionalInputAt(screenSpacePos) || ControlPointVisualiser?.Pieces.Any(p => p.ReceivePositionalInputAt(screenSpacePos)) == true;
+        public override bool ReceivePositionalInputAt(Vector2 screenSpacePos)
+        {
+            if (BodyPiece.ReceivePositionalInputAt(screenSpacePos))
+                return true;
+
+            if (ControlPointVisualiser == null)
+                return false;
+
+            foreach (var p in ControlPointVisualiser.Pieces)
+            {
+                if (p.ReceivePositionalInputAt(screenSpacePos))
+                    return true;
+            }
+
+            return false;
+        }
 
         protected virtual SliderCircleOverlay CreateCircleOverlay(Slider slider, SliderPosition position) => new SliderCircleOverlay(slider, position);
     }

@@ -8,7 +8,6 @@ using osu.Framework.Graphics.Sprites;
 using osu.Game.Rulesets.Objects.Drawables;
 using osu.Game.Rulesets.Osu.Objects;
 using osu.Game.Skinning;
-using osuTK;
 using osuTK.Graphics;
 
 namespace osu.Game.Rulesets.Osu.Skinning.Legacy
@@ -26,10 +25,6 @@ namespace osu.Game.Rulesets.Osu.Skinning.Legacy
             var texture = skin.GetTexture(@"approachcircle");
             Debug.Assert(texture != null);
             Texture = texture.WithMaximumSize(OsuHitObject.OBJECT_DIMENSIONS * 2);
-
-            // account for the sprite being used for the default approach circle being taken from stable,
-            // when hitcircles have 5px padding on each size. this should be removed if we update the sprite.
-            Scale = new Vector2(128 / 118f);
         }
 
         protected override void LoadComplete()
