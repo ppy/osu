@@ -78,8 +78,8 @@ namespace osu.Game.Beatmaps.Drawables
                             {
                                 circleSize = new OsuSpriteText { Font = OsuFont.GetFont(size: 14) },
                                 drainRate = new OsuSpriteText { Font = OsuFont.GetFont(size: 14) },
+                                overallDifficulty = new OsuSpriteText { Font = OsuFont.GetFont(size: 14) },
                                 approachRate = new OsuSpriteText { Font = OsuFont.GetFont(size: 14) },
-                                overallDifficulty = new OsuSpriteText { Font = OsuFont.GetFont(size: 14) }
                             }
                         },
                         miscFillFlowContainer = new FillFlowContainer
