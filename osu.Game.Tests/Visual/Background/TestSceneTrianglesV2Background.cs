@@ -86,7 +86,8 @@ namespace osu.Game.Tests.Visual.Background
                                 {
                                     Anchor = Anchor.Centre,
                                     Origin = Anchor.Centre,
-                                    RelativeSizeAxes = Axes.Both
+                                    RelativeSizeAxes = Axes.Both,
+                                    ClampAxes = Axes.None
                                 }
                             }
                         },
@@ -128,7 +129,10 @@ namespace osu.Game.Tests.Visual.Background
             AddStep("White colour", () => box.Colour = triangles.Colour = maskedTriangles.Colour = Color4.White);
             AddStep("Vertical gradient", () => box.Colour = triangles.Colour = maskedTriangles.Colour = ColourInfo.GradientVertical(Color4.White, Color4.Red));
             AddStep("Horizontal gradient", () => box.Colour = triangles.Colour = maskedTriangles.Colour = ColourInfo.GradientHorizontal(Color4.White, Color4.Red));
-            AddToggleStep("ClampToDrawable", c => maskedTriangles.ClampToDrawable = c);
+            AddStep("ClampAxes X", () => maskedTriangles.ClampAxes = Axes.X);
+            AddStep("ClampAxes Y", () => maskedTriangles.ClampAxes = Axes.Y);
+            AddStep("ClampAxes Both", () => maskedTriangles.ClampAxes = Axes.Both);
+            AddStep("ClampAxes None", () => maskedTriangles.ClampAxes = Axes.None);
         }
     }
 }

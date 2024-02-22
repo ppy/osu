@@ -1,17 +1,17 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using osu.Framework.Utils;
-using osuTK;
 using System;
-using osu.Framework.Graphics.Shaders;
-using osu.Framework.Graphics.Textures;
-using osu.Framework.Graphics.Primitives;
-using osu.Framework.Allocation;
 using System.Collections.Generic;
-using osu.Framework.Graphics.Rendering;
+using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
+using osu.Framework.Graphics.Primitives;
+using osu.Framework.Graphics.Rendering;
+using osu.Framework.Graphics.Shaders;
+using osu.Framework.Graphics.Textures;
+using osu.Framework.Utils;
+using osuTK;
 
 namespace osu.Game.Graphics.Backgrounds
 {
@@ -27,16 +27,18 @@ namespace osu.Game.Graphics.Backgrounds
 
         public float Thickness { get; set; } = 0.02f; // No need for invalidation since it's happening in Update()
 
+        public float ScaleAdjust { get; set; } = 1;
+
         /// <summary>
         /// Whether we should create new triangles as others expire.
         /// </summary>
         protected virtual bool CreateNewTriangles => true;
 
         /// <summary>
-        /// If enabled, only the portion of triangles that falls within this <see cref="Drawable"/>'s
-        /// shape is drawn to the screen. Default is true.
+        /// Controls on which <see cref="Axes"/> the portion of triangles that falls within this <see cref="Drawable"/>'s
+        /// shape is drawn to the screen. Default is Axes.Both.
         /// </summary>
-        public bool ClampToDrawable { get; set; } = true;
+        public Axes ClampAxes { get; set; } = Axes.Both;
 
         private readonly BindableFloat spawnRatio = new BindableFloat(1f);
 
@@ -106,7 +108,7 @@ namespace osu.Game.Graphics.Backgrounds
 
                 parts[i] = newParticle;
 
-                float bottomPos = parts[i].Position.Y + triangle_size * equilateral_triangle_ratio / DrawHeight;
+                float bottomPos = parts[i].Position.Y + triangle_size * ScaleAdjust * equilateral_triangle_ratio / DrawHeight;
                 if (bottomPos < 0)
                     parts.RemoveAt(i);
             }
@@ -149,7 +151,7 @@ namespace osu.Game.Graphics.Backgrounds
             if (randomY)
             {
                 // since triangles are drawn from the top - allow them to be positioned a bit above the screen
-                float maxOffset = triangle_size * equilateral_triangle_ratio / DrawHeight;
+                float maxOffset = triangle_size * ScaleAdjust * equilateral_triangle_ratio / DrawHeight;
                 y = Interpolation.ValueAt(nextRandom(), -maxOffset, 1f, 0f, 1f);
             }
 
@@ -188,12 +190,12 @@ namespace osu.Game.Graphics.Backgrounds
 
             private readonly List<TriangleParticle> parts = new List<TriangleParticle>();
 
-            private readonly Vector2 triangleSize = new Vector2(1f, equilateral_triangle_ratio) * triangle_size;
+            private Vector2 triangleSize;
 
             private Vector2 size;
             private float thickness;
             private float texelSize;
-            private bool clamp;
+            private Axes clampAxes;
 
             public TrianglesDrawNode(TrianglesV2 source)
                 : base(source)
@@ -208,7 +210,8 @@ namespace osu.Game.Graphics.Backgrounds
                 texture = Source.texture;
                 size = Source.DrawSize;
                 thickness = Source.Thickness;
-                clamp = Source.ClampToDrawable;
+                clampAxes = Source.ClampAxes;
+                triangleSize = new Vector2(1f, equilateral_triangle_ratio) * triangle_size * Source.ScaleAdjust;
 
                 Quad triangleQuad = new Quad(
                     Vector2Extensions.Transform(Vector2.Zero, DrawInfo.Matrix),
@@ -248,7 +251,7 @@ namespace osu.Game.Graphics.Backgrounds
                 {
                     Vector2 topLeft = particle.Position - new Vector2(relativeSize.X * 0.5f, 0f);
 
-                    Quad triangleQuad = clamp ? clampToDrawable(topLeft, relativeSize) : new Quad(topLeft.X, topLeft.Y, relativeSize.X, relativeSize.Y);
+                    Quad triangleQuad = getClampedQuad(clampAxes, topLeft, relativeSize);
 
                     var drawQuad = new Quad(
                         Vector2Extensions.Transform(triangleQuad.TopLeft * size, DrawInfo.Matrix),
@@ -270,17 +273,23 @@ namespace osu.Game.Graphics.Backgrounds
                 shader.Unbind();
             }
 
-            private static Quad clampToDrawable(Vector2 topLeft, Vector2 size)
+            private static Quad getClampedQuad(Axes clampAxes, Vector2 topLeft, Vector2 size)
             {
-                float leftClamped = Math.Clamp(topLeft.X, 0f, 1f);
-                float topClamped = Math.Clamp(topLeft.Y, 0f, 1f);
+                Vector2 clampedTopLeft = topLeft;
 
-                return new Quad(
-                    leftClamped,
-                    topClamped,
-                    Math.Clamp(topLeft.X + size.X, 0f, 1f) - leftClamped,
-                    Math.Clamp(topLeft.Y + size.Y, 0f, 1f) - topClamped
-                );
+                if (clampAxes == Axes.X || clampAxes == Axes.Both)
+                {
+                    clampedTopLeft.X = Math.Clamp(topLeft.X, 0f, 1f);
+                    size.X = Math.Clamp(topLeft.X + size.X, 0f, 1f) - clampedTopLeft.X;
+                }
+
+                if (clampAxes == Axes.Y || clampAxes == Axes.Both)
+                {
+                    clampedTopLeft.Y = Math.Clamp(topLeft.Y, 0f, 1f);
+                    size.Y = Math.Clamp(topLeft.Y + size.Y, 0f, 1f) - clampedTopLeft.Y;
+                }
+
+                return new Quad(clampedTopLeft.X, clampedTopLeft.Y, size.X, size.Y);
             }
 
             protected override void Dispose(bool isDisposing)

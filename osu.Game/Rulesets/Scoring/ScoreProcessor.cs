@@ -181,6 +181,8 @@ namespace osu.Game.Rulesets.Scoring
         private readonly List<HitEvent> hitEvents = new List<HitEvent>();
         private HitObject? lastHitObject;
 
+        public bool ApplyNewJudgementsWhenFailed { get; set; }
+
         public ScoreProcessor(Ruleset ruleset)
         {
             Ruleset = ruleset;
@@ -211,7 +213,7 @@ namespace osu.Game.Rulesets.Scoring
             result.ComboAtJudgement = Combo.Value;
             result.HighestComboAtJudgement = HighestCombo.Value;
 
-            if (result.FailedAtJudgement)
+            if (result.FailedAtJudgement && !ApplyNewJudgementsWhenFailed)
                 return;
 
             ScoreResultCounts[result.Type] = ScoreResultCounts.GetValueOrDefault(result.Type) + 1;
@@ -267,7 +269,7 @@ namespace osu.Game.Rulesets.Scoring
             Combo.Value = result.ComboAtJudgement;
             HighestCombo.Value = result.HighestComboAtJudgement;
 
-            if (result.FailedAtJudgement)
+            if (result.FailedAtJudgement && !ApplyNewJudgementsWhenFailed)
                 return;
 
             ScoreResultCounts[result.Type] = ScoreResultCounts.GetValueOrDefault(result.Type) - 1;
@@ -370,7 +372,7 @@ namespace osu.Game.Rulesets.Scoring
             if (rank.Value == ScoreRank.F)
                 return;
 
-            rank.Value = RankFromAccuracy(Accuracy.Value);
+            rank.Value = RankFromScore(Accuracy.Value, ScoreResultCounts);
             foreach (var mod in Mods.Value.OfType<IApplicableToScoreProcessor>())
                 rank.Value = mod.AdjustRank(Rank.Value, Accuracy.Value);
         }
@@ -505,7 +507,7 @@ namespace osu.Game.Rulesets.Scoring
         /// <summary>
         /// Given an accuracy (0..1), return the correct <see cref="ScoreRank"/>.
         /// </summary>
-        public virtual ScoreRank RankFromAccuracy(double accuracy)
+        public virtual ScoreRank RankFromScore(double accuracy, IReadOnlyDictionary<HitResult, int> results)
         {
             if (accuracy == accuracy_cutoff_x)
                 return ScoreRank.X;

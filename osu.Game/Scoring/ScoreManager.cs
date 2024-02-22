@@ -5,6 +5,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Threading;
@@ -26,6 +27,7 @@ namespace osu.Game.Scoring
 {
     public class ScoreManager : ModelManager<ScoreInfo>, IModelImporter<ScoreInfo>
     {
+        private readonly Func<BeatmapManager> beatmaps;
         private readonly OsuConfigManager configManager;
         private readonly ScoreImporter scoreImporter;
         private readonly LegacyScoreExporter scoreExporter;
@@ -44,6 +46,7 @@ namespace osu.Game.Scoring
                             OsuConfigManager configManager = null)
             : base(storage, realm)
         {
+            this.beatmaps = beatmaps;
             this.configManager = configManager;
 
             scoreImporter = new ScoreImporter(rulesets, beatmaps, storage, realm, api)
@@ -171,7 +174,11 @@ namespace osu.Game.Scoring
         /// Populates the <see cref="ScoreInfo.MaximumStatistics"/> for a given <see cref="ScoreInfo"/>.
         /// </summary>
         /// <param name="score">The score to populate the statistics of.</param>
-        public void PopulateMaximumStatistics(ScoreInfo score) => scoreImporter.PopulateMaximumStatistics(score);
+        public void PopulateMaximumStatistics(ScoreInfo score)
+        {
+            Debug.Assert(score.BeatmapInfo != null);
+            LegacyScoreDecoder.PopulateMaximumStatistics(score, beatmaps().GetWorkingBeatmap(score.BeatmapInfo.Detach()));
+        }
 
         #region Implementation of IPresentImports<ScoreInfo>
 

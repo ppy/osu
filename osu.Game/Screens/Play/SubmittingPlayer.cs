@@ -17,6 +17,7 @@ using osu.Game.Database;
 using osu.Game.Online.API;
 using osu.Game.Online.Multiplayer;
 using osu.Game.Online.Rooms;
+using osu.Game.Online.Solo;
 using osu.Game.Online.Spectator;
 using osu.Game.Rulesets.Scoring;
 using osu.Game.Scoring;
@@ -41,6 +42,10 @@ namespace osu.Game.Screens.Play
 
         [Resolved]
         private SessionStatics statics { get; set; }
+
+        [Resolved(canBeNull: true)]
+        [CanBeNull]
+        private SoloStatisticsWatcher soloStatisticsWatcher { get; set; }
 
         private readonly object scoreSubmissionLock = new object();
         private TaskCompletionSource<bool> scoreSubmissionSource;
@@ -132,7 +137,18 @@ namespace osu.Game.Screens.Play
                     if (string.IsNullOrEmpty(exception.Message))
                         Logger.Error(exception, "Failed to retrieve a score submission token.");
                     else
-                        Logger.Log($"You are not able to submit a score: {exception.Message}", level: LogLevel.Important);
+                    {
+                        switch (exception.Message)
+                        {
+                            case "expired token":
+                                Logger.Log("Score submission failed because your system clock is set incorrectly. Please check your system time, date and timezone.", level: LogLevel.Important);
+                                break;
+
+                            default:
+                                Logger.Log($"You are not able to submit a score: {exception.Message}", level: LogLevel.Important);
+                                break;
+                        }
+                    }
 
                     Schedule(() =>
                     {
@@ -164,6 +180,7 @@ namespace osu.Game.Screens.Play
 
             await submitScore(score).ConfigureAwait(false);
             spectatorClient.EndPlaying(GameplayState);
+            soloStatisticsWatcher?.RegisterForStatisticsUpdateAfter(score.ScoreInfo);
         }
 
         [Resolved]

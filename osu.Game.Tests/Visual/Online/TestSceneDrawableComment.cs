@@ -4,62 +4,66 @@
 #nullable disable
 
 using System;
-using NUnit.Framework;
-using osu.Framework.Allocation;
+using System.Linq;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
-using osu.Framework.Graphics.Shapes;
+using osu.Game.Graphics.Containers;
 using osu.Game.Online.API.Requests.Responses;
-using osu.Game.Overlays;
 using osu.Game.Overlays.Comments;
+using osu.Game.Tests.Visual.UserInterface;
 
 namespace osu.Game.Tests.Visual.Online
 {
-    public partial class TestSceneDrawableComment : OsuTestScene
+    public partial class TestSceneDrawableComment : ThemeComparisonTestScene
     {
-        [Cached]
-        private readonly OverlayColourProvider colourProvider = new OverlayColourProvider(OverlayColourScheme.Purple);
-
-        private Container container;
-
-        [SetUp]
-        public void SetUp() => Schedule(() =>
+        public TestSceneDrawableComment()
+            : base(false)
         {
-            Children = new Drawable[]
-            {
-                new Box
-                {
-                    RelativeSizeAxes = Axes.Both,
-                    Colour = colourProvider.Background4,
-                },
-                container = new Container
-                {
-                    RelativeSizeAxes = Axes.X,
-                    AutoSizeAxes = Axes.Y,
-                },
-            };
-        });
-
-        [TestCaseSource(nameof(comments))]
-        public void TestComment(string description, string text)
-        {
-            AddStep(description, () =>
-            {
-                comment.Pinned = description == "Pinned";
-                comment.Message = text;
-                container.Add(new DrawableComment(comment));
-            });
         }
 
-        private static readonly Comment comment = new Comment
+        protected override Drawable CreateContent() => new OsuScrollContainer(Direction.Vertical)
         {
-            Id = 1,
-            LegacyName = "Test User",
-            CreatedAt = DateTimeOffset.Now,
-            VotesCount = 0,
+            RelativeSizeAxes = Axes.Both,
+            Child = new FillFlowContainer
+            {
+                RelativeSizeAxes = Axes.X,
+                AutoSizeAxes = Axes.Y,
+                Direction = FillDirection.Vertical,
+                ChildrenEnumerable = comments.Select(info =>
+                {
+                    var comment = new Comment
+                    {
+                        Id = 1,
+                        UserId = 1000,
+                        User = new APIUser { Id = 1000, Username = "Someone" },
+                        CreatedAt = DateTimeOffset.Now,
+                        VotesCount = 0,
+                        Pinned = info[0] == "Pinned",
+                        Message = info[1],
+                        CommentableId = 2001,
+                        CommentableType = "test"
+                    };
+
+                    return new[]
+                    {
+                        new DrawableComment(comment, Array.Empty<CommentableMeta>()),
+                        new DrawableComment(comment, new[]
+                        {
+                            new CommentableMeta
+                            {
+                                Id = 2001,
+                                OwnerId = comment.UserId,
+                                OwnerTitle = "MAPPER",
+                                Type = "test",
+                            },
+                            new CommentableMeta { Title = "Other Meta" },
+                        }),
+                    };
+                }).SelectMany(c => c)
+            }
         };
 
-        private static object[] comments =
+        private static readonly string[][] comments =
         {
             new[] { "Plain", "This is plain comment" },
             new[] { "Pinned", "This is pinned comment" },
