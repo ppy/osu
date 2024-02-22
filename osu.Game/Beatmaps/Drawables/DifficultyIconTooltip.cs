@@ -113,7 +113,7 @@ namespace osu.Game.Beatmaps.Drawables
             starRating.Current.BindTarget = displayedContent.Difficulty;
             difficultyName.Text = displayedContent.BeatmapInfo.DifficultyName;
 
-            if (!displayedContent.ShowExtendedTooltip)
+            if (displayedContent.TooltipType == DifficultyIconTooltipType.StarRating)
             {
                 difficultyFillFlowContainer.Hide();
                 miscFillFlowContainer.Hide();
@@ -166,15 +166,18 @@ namespace osu.Game.Beatmaps.Drawables
         public readonly IBindable<StarDifficulty> Difficulty;
         public readonly IRulesetInfo Ruleset;
         public readonly Mod[]? Mods;
-        public readonly bool ShowExtendedTooltip;
+        public readonly DifficultyIconTooltipType TooltipType;
 
-        public DifficultyIconTooltipContent(IBeatmapInfo beatmapInfo, IBindable<StarDifficulty> difficulty, IRulesetInfo rulesetInfo, Mod[]? mods, bool showExtendedTooltip = false)
+        public DifficultyIconTooltipContent(IBeatmapInfo beatmapInfo, IBindable<StarDifficulty> difficulty, IRulesetInfo rulesetInfo, Mod[]? mods, DifficultyIconTooltipType tooltipType)
         {
+            if (tooltipType == DifficultyIconTooltipType.None)
+                throw new ArgumentOutOfRangeException(nameof(tooltipType), tooltipType, "Cannot instantiate a tooltip without a type");
+
             BeatmapInfo = beatmapInfo;
             Difficulty = difficulty;
             Ruleset = rulesetInfo;
             Mods = mods;
-            ShowExtendedTooltip = showExtendedTooltip;
+            TooltipType = tooltipType;
         }
     }
 }

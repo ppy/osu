@@ -32,14 +32,9 @@ namespace osu.Game.Beatmaps.Drawables
         }
 
         /// <summary>
-        /// Whether to display a tooltip on hover. Only works if a beatmap was provided at construction time.
+        /// Which type of tooltip to show. Only works if a beatmap was provided at construction time.
         /// </summary>
-        public bool ShowTooltip { get; set; } = true;
-
-        /// <summary>
-        /// Whether to include the difficulty stats in the tooltip or not. Defaults to false. Has no effect if <see cref="ShowTooltip"/> is false.
-        /// </summary>
-        public bool ShowExtendedTooltip { get; set; }
+        public DifficultyIconTooltipType TooltipType { get; set; } = DifficultyIconTooltipType.StarRating;
 
         private readonly IBeatmapInfo? beatmap;
 
@@ -138,6 +133,24 @@ namespace osu.Game.Beatmaps.Drawables
             GetCustomTooltip() => new DifficultyIconTooltip();
 
         DifficultyIconTooltipContent IHasCustomTooltip<DifficultyIconTooltipContent>.
-            TooltipContent => (ShowTooltip && beatmap != null ? new DifficultyIconTooltipContent(beatmap, Current, ruleset, mods, ShowExtendedTooltip) : null)!;
+            TooltipContent => (TooltipType != DifficultyIconTooltipType.None && beatmap != null ? new DifficultyIconTooltipContent(beatmap, Current, ruleset, mods, TooltipType) : null)!;
+    }
+
+    public enum DifficultyIconTooltipType
+    {
+        /// <summary>
+        /// No tooltip.
+        /// </summary>
+        None,
+
+        /// <summary>
+        /// Star rating only.
+        /// </summary>
+        StarRating,
+
+        /// <summary>
+        /// Star rating, OD, HP, CS, AR, length, BPM, and max combo.
+        /// </summary>
+        Extended,
     }
 }
