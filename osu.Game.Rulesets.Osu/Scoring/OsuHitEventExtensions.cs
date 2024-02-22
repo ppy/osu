@@ -16,7 +16,7 @@ namespace osu.Game.Rulesets.Osu.Scoring
         {
             IEnumerable<HitEvent> hitCircleEvents = hitEvents.Where(e => e.HitObject is HitCircle && !(e.HitObject is SliderTailCircle)).ToList();
 
-            Vector2 averageHitError = hitCircleEvents.CalculateAverageAimError()!.Value;
+            Vector2? averageHitError = hitCircleEvents.CalculateAverageAimError();
 
             int eventCount = 0;
             double varianceSum = 0;
