@@ -81,7 +81,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
         {
             double consistentTopStrain = difficulty / 10; // What would the top strain be if all strain values were identical
 
-            return objectStrains.Sum(s => Math.Pow(1, s / consistentTopStrain, 5));
+            return objectStrains.Sum(s => Math.Pow(Math.Min(1, s / consistentTopStrain), 5));
         }
     }
 }
