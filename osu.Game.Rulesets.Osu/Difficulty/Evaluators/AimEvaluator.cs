@@ -14,6 +14,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
         private const double acute_angle_multiplier = 1.95;
         private const double slider_multiplier = 2;
         private const double velocity_change_multiplier = 0.75;
+        private const double slider_jump_multiplier = 0.08;
 
         /// <summary>
         /// Evaluates the difficulty of aiming the current object, based on:
@@ -109,18 +110,23 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
             }
 
             // Add in acute angle bonus or wide angle bonus + velocity change bonus, whichever is larger.
-            aimStrain += Math.Max(acuteAngleBonus * acute_angle_multiplier, wideAngleBonus * wide_angle_multiplier + velocityChangeBonus * velocity_change_multiplier);
+            double aimStrainWithBonuses = aimStrain + Math.Max(acuteAngleBonus * acute_angle_multiplier, wideAngleBonus * wide_angle_multiplier + velocityChangeBonus * velocity_change_multiplier);
+            double angleVelocityBonus = aimStrain > 0 ? aimStrainWithBonuses / aimStrain : 0;
+            aimStrain = aimStrainWithBonuses;
 
             double sliderJumpBonus = 0;
             if (osuLastObj.BaseObject is Slider slider)
             {
                 // Take just slider heads into account because we're computing sliderjumps, not slideraim
-                sliderJumpBonus = 0.1 * osuCurrObj.JumpDistance / osuCurrObj.StrainTime;
+                sliderJumpBonus = slider_jump_multiplier * osuCurrObj.JumpDistance / osuCurrObj.StrainTime;
 
-                // Reward even more if sliders and circles are alternating
+                // Add angle and velocity bonuses
+                sliderJumpBonus *= angleVelocityBonus;
+
+                // Reward more if sliders and circles are alternating (actually it's still lower than several sliders in a row)
                 if (osuLastLastObj?.BaseObject is HitCircle)
                 {
-                    double alternatingBonus = sliderJumpBonus * 0.5;
+                    double alternatingBonus = slider_jump_multiplier * osuLastObj.JumpDistance / osuLastObj.StrainTime;
 
                     if (osuLastObj.StrainTime > osuLastLastObj.StrainTime)
                         alternatingBonus *= Math.Pow(Math.Min(osuCurrObj.StrainTime, osuLastObj.StrainTime) / Math.Max(osuCurrObj.StrainTime, osuLastObj.StrainTime), 2);
