@@ -18,9 +18,9 @@ namespace osu.Game.Screens.Ranking.Statistics
     {
         private readonly ScoreInfo achievedScore;
 
-        internal readonly Bindable<SoloStatisticsUpdate?> DisplayedUserStatisticsUpdate = new Bindable<SoloStatisticsUpdate?>();
+        internal readonly Bindable<UserStatisticsUpdate?> DisplayedUserStatisticsUpdate = new Bindable<UserStatisticsUpdate?>();
 
-        private IBindable<SoloStatisticsUpdate?> latestGlobalStatisticsUpdate = null!;
+        private IBindable<UserStatisticsUpdate?> latestGlobalStatisticsUpdate = null!;
 
         public UserStatisticsPanel(ScoreInfo achievedScore)
         {
@@ -28,7 +28,7 @@ namespace osu.Game.Screens.Ranking.Statistics
         }
 
         [BackgroundDependencyLoader]
-        private void load(SoloStatisticsWatcher? soloStatisticsWatcher)
+        private void load(UserStatisticsWatcher? soloStatisticsWatcher)
         {
             if (soloStatisticsWatcher != null)
             {

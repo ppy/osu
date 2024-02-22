@@ -112,6 +112,6 @@ namespace osu.Game.Tests.Visual.Ranking
         });
 
         private void displayUpdate(UserStatistics before, UserStatistics after) =>
-            AddStep("display update", () => overallRanking.StatisticsUpdate.Value = new SoloStatisticsUpdate(new ScoreInfo(), before, after));
+            AddStep("display update", () => overallRanking.StatisticsUpdate.Value = new UserStatisticsUpdate(new ScoreInfo(), before, after));
     }
 }

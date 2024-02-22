@@ -25,7 +25,7 @@ namespace osu.Game.Tests.Visual.Online
     {
         protected override bool UseOnlineAPI => false;
 
-        private SoloStatisticsWatcher watcher = null!;
+        private UserStatisticsWatcher watcher = null!;
 
         [Resolved]
         private SpectatorClient spectatorClient { get; set; } = null!;
@@ -107,7 +107,7 @@ namespace osu.Game.Tests.Visual.Online
 
             AddStep("create watcher", () =>
             {
-                Child = watcher = new SoloStatisticsWatcher();
+                Child = watcher = new UserStatisticsWatcher();
             });
         }
 
@@ -123,7 +123,7 @@ namespace osu.Game.Tests.Visual.Online
 
             var ruleset = new OsuRuleset().RulesetInfo;
 
-            SoloStatisticsUpdate? update = null;
+            UserStatisticsUpdate? update = null;
             registerForUpdates(scoreId, ruleset, receivedUpdate => update = receivedUpdate);
 
             feignScoreProcessing(userId, ruleset, 5_000_000);
@@ -146,7 +146,7 @@ namespace osu.Game.Tests.Visual.Online
             // note ordering - in this test processing completes *before* the registration is added.
             feignScoreProcessing(userId, ruleset, 5_000_000);
 
-            SoloStatisticsUpdate? update = null;
+            UserStatisticsUpdate? update = null;
             registerForUpdates(scoreId, ruleset, receivedUpdate => update = receivedUpdate);
 
             AddStep("signal score processed", () => ((ISpectatorClient)spectatorClient).UserScoreProcessed(userId, scoreId));
@@ -164,7 +164,7 @@ namespace osu.Game.Tests.Visual.Online
             long scoreId = getScoreId();
             var ruleset = new OsuRuleset().RulesetInfo;
 
-            SoloStatisticsUpdate? update = null;
+            UserStatisticsUpdate? update = null;
             registerForUpdates(scoreId, ruleset, receivedUpdate => update = receivedUpdate);
 
             feignScoreProcessing(userId, ruleset, 5_000_000);
@@ -191,7 +191,7 @@ namespace osu.Game.Tests.Visual.Online
             long scoreId = getScoreId();
             var ruleset = new OsuRuleset().RulesetInfo;
 
-            SoloStatisticsUpdate? update = null;
+            UserStatisticsUpdate? update = null;
             registerForUpdates(scoreId, ruleset, receivedUpdate => update = receivedUpdate);
 
             feignScoreProcessing(userId, ruleset, 5_000_000);
@@ -212,7 +212,7 @@ namespace osu.Game.Tests.Visual.Online
             long scoreId = getScoreId();
             var ruleset = new OsuRuleset().RulesetInfo;
 
-            SoloStatisticsUpdate? update = null;
+            UserStatisticsUpdate? update = null;
             registerForUpdates(scoreId, ruleset, receivedUpdate => update = receivedUpdate);
 
             feignScoreProcessing(userId, ruleset, 5_000_000);
@@ -241,7 +241,7 @@ namespace osu.Game.Tests.Visual.Online
 
             feignScoreProcessing(userId, ruleset, 6_000_000);
 
-            SoloStatisticsUpdate? update = null;
+            UserStatisticsUpdate? update = null;
             registerForUpdates(secondScoreId, ruleset, receivedUpdate => update = receivedUpdate);
 
             AddStep("signal score processed", () => ((ISpectatorClient)spectatorClient).UserScoreProcessed(userId, secondScoreId));
@@ -259,7 +259,7 @@ namespace osu.Game.Tests.Visual.Online
 
             var ruleset = new OsuRuleset().RulesetInfo;
 
-            SoloStatisticsUpdate? update = null;
+            UserStatisticsUpdate? update = null;
             registerForUpdates(scoreId, ruleset, receivedUpdate => update = receivedUpdate);
 
             feignScoreProcessing(userId, ruleset, 5_000_000);
@@ -289,7 +289,7 @@ namespace osu.Game.Tests.Visual.Online
             });
         }
 
-        private void registerForUpdates(long scoreId, RulesetInfo rulesetInfo, Action<SoloStatisticsUpdate> onUpdateReady) =>
+        private void registerForUpdates(long scoreId, RulesetInfo rulesetInfo, Action<UserStatisticsUpdate> onUpdateReady) =>
             AddStep("register for updates", () =>
             {
                 watcher.RegisterForStatisticsUpdateAfter(

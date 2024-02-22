@@ -14,7 +14,7 @@ namespace osu.Game.Screens.Ranking.Statistics.User
     {
         private const float transition_duration = 300;
 
-        public Bindable<SoloStatisticsUpdate?> StatisticsUpdate { get; } = new Bindable<SoloStatisticsUpdate?>();
+        public Bindable<UserStatisticsUpdate?> StatisticsUpdate { get; } = new Bindable<UserStatisticsUpdate?>();
 
         private LoadingLayer loadingLayer = null!;
         private GridContainer content = null!;
@@ -86,7 +86,7 @@ namespace osu.Game.Screens.Ranking.Statistics.User
             FinishTransforms(true);
         }
 
-        private void onUpdateReceived(ValueChangedEvent<SoloStatisticsUpdate?> update)
+        private void onUpdateReceived(ValueChangedEvent<UserStatisticsUpdate?> update)
         {
             if (update.NewValue == null)
             {

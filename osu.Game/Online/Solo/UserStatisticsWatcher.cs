@@ -20,10 +20,10 @@ namespace osu.Game.Online.Solo
     /// <summary>
     /// A persistent component that binds to the spectator server and API in order to deliver updates about the logged in user's gameplay statistics.
     /// </summary>
-    public partial class SoloStatisticsWatcher : Component
+    public partial class UserStatisticsWatcher : Component
     {
-        public IBindable<SoloStatisticsUpdate?> LatestUpdate => latestUpdate;
-        private readonly Bindable<SoloStatisticsUpdate?> latestUpdate = new Bindable<SoloStatisticsUpdate?>();
+        public IBindable<UserStatisticsUpdate?> LatestUpdate => latestUpdate;
+        private readonly Bindable<UserStatisticsUpdate?> latestUpdate = new Bindable<UserStatisticsUpdate?>();
 
         [Resolved]
         private SpectatorClient spectatorClient { get; set; } = null!;
@@ -120,7 +120,7 @@ namespace osu.Game.Online.Solo
             latestStatistics.TryGetValue(rulesetName, out UserStatistics? latestRulesetStatistics);
             latestRulesetStatistics ??= new UserStatistics();
 
-            latestUpdate.Value = new SoloStatisticsUpdate(scoreInfo, latestRulesetStatistics, updatedStatistics);
+            latestUpdate.Value = new UserStatisticsUpdate(scoreInfo, latestRulesetStatistics, updatedStatistics);
             latestStatistics[rulesetName] = updatedStatistics;
         }
 

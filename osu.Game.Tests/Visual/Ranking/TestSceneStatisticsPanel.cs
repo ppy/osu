@@ -89,7 +89,7 @@ namespace osu.Game.Tests.Visual.Ranking
                 Score = { Value = score },
                 DisplayedUserStatisticsUpdate =
                 {
-                    Value = new SoloStatisticsUpdate(score, new UserStatistics
+                    Value = new UserStatisticsUpdate(score, new UserStatistics
                     {
                         Level = new UserStatistics.LevelInfo
                         {
