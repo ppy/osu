@@ -64,7 +64,7 @@ namespace osu.Game.Screens.Ranking.Expanded.Accuracy
         /// <summary>
         /// Relative width of the rank circles.
         /// </summary>
-        public const float RANK_CIRCLE_RADIUS = 0.06f;
+        public const float RANK_CIRCLE_RADIUS = 0.05f;
 
         /// <summary>
         /// Relative width of the circle showing the accuracy.
@@ -74,12 +74,12 @@ namespace osu.Game.Screens.Ranking.Expanded.Accuracy
         /// <summary>
         /// SS is displayed as a 1% region, otherwise it would be invisible.
         /// </summary>
-        private const double virtual_ss_percentage = 0.01;
+        public const double VIRTUAL_SS_PERCENTAGE = 0.01;
 
         /// <summary>
-        /// The width of a <see cref="RankNotch"/> in terms of accuracy.
+        /// The width of spacing in terms of accuracy between the grade circles.
         /// </summary>
-        public const double NOTCH_WIDTH_PERCENTAGE = 1.0 / 360;
+        public const double GRADE_SPACING_PERCENTAGE = 2.0 / 360;
 
         /// <summary>
         /// The easing for the circle filling transforms.
@@ -89,7 +89,7 @@ namespace osu.Game.Screens.Ranking.Expanded.Accuracy
         private readonly ScoreInfo score;
 
         private CircularProgress accuracyCircle;
-        private CircularProgress innerMask;
+        private GradedCircles gradedCircles;
         private Container<RankBadge> badges;
         private RankText rankText;
 
@@ -158,82 +158,16 @@ namespace osu.Game.Screens.Ranking.Expanded.Accuracy
                     Colour = ColourInfo.GradientVertical(Color4Extensions.FromHex("#7CF6FF"), Color4Extensions.FromHex("#BAFFA9")),
                     InnerRadius = accuracy_circle_radius,
                 },
-                new BufferedContainer
+                new Container
                 {
-                    Name = "Graded circles",
                     Anchor = Anchor.Centre,
                     Origin = Anchor.Centre,
                     RelativeSizeAxes = Axes.Both,
                     Size = new Vector2(0.8f),
-                    Padding = new MarginPadding(2),
-                    Children = new Drawable[]
+                    Padding = new MarginPadding(2.5f),
+                    Child = gradedCircles = new GradedCircles(accuracyC, accuracyB, accuracyA, accuracyS, accuracyX)
                     {
-                        new CircularProgress
-                        {
-                            RelativeSizeAxes = Axes.Both,
-                            Colour = OsuColour.ForRank(ScoreRank.X),
-                            InnerRadius = RANK_CIRCLE_RADIUS,
-                            Current = { Value = accuracyX }
-                        },
-                        new CircularProgress
-                        {
-                            RelativeSizeAxes = Axes.Both,
-                            Colour = OsuColour.ForRank(ScoreRank.S),
-                            InnerRadius = RANK_CIRCLE_RADIUS,
-                            Current = { Value = accuracyX - virtual_ss_percentage }
-                        },
-                        new CircularProgress
-                        {
-                            RelativeSizeAxes = Axes.Both,
-                            Colour = OsuColour.ForRank(ScoreRank.A),
-                            InnerRadius = RANK_CIRCLE_RADIUS,
-                            Current = { Value = accuracyS }
-                        },
-                        new CircularProgress
-                        {
-                            RelativeSizeAxes = Axes.Both,
-                            Colour = OsuColour.ForRank(ScoreRank.B),
-                            InnerRadius = RANK_CIRCLE_RADIUS,
-                            Current = { Value = accuracyA }
-                        },
-                        new CircularProgress
-                        {
-                            RelativeSizeAxes = Axes.Both,
-                            Colour = OsuColour.ForRank(ScoreRank.C),
-                            InnerRadius = RANK_CIRCLE_RADIUS,
-                            Current = { Value = accuracyB }
-                        },
-                        new CircularProgress
-                        {
-                            RelativeSizeAxes = Axes.Both,
-                            Colour = OsuColour.ForRank(ScoreRank.D),
-                            InnerRadius = RANK_CIRCLE_RADIUS,
-                            Current = { Value = accuracyC }
-                        },
-                        new RankNotch((float)accuracyX),
-                        new RankNotch((float)(accuracyX - virtual_ss_percentage)),
-                        new RankNotch((float)accuracyS),
-                        new RankNotch((float)accuracyA),
-                        new RankNotch((float)accuracyB),
-                        new RankNotch((float)accuracyC),
-                        new BufferedContainer
-                        {
-                            Name = "Graded circle mask",
-                            RelativeSizeAxes = Axes.Both,
-                            Padding = new MarginPadding(1),
-                            Blending = new BlendingParameters
-                            {
-                                Source = BlendingType.DstColor,
-                                Destination = BlendingType.OneMinusSrcColor,
-                                SourceAlpha = BlendingType.One,
-                                DestinationAlpha = BlendingType.SrcAlpha
-                            },
-                            Child = innerMask = new CircularProgress
-                            {
-                                RelativeSizeAxes = Axes.Both,
-                                InnerRadius = RANK_CIRCLE_RADIUS - 0.02f,
-                            }
-                        }
+                        RelativeSizeAxes = Axes.Both
                     }
                 },
                 badges = new Container<RankBadge>
@@ -248,7 +182,7 @@ namespace osu.Game.Screens.Ranking.Expanded.Accuracy
                         new RankBadge(accuracyB, Interpolation.Lerp(accuracyB, accuracyA, 0.5), getRank(ScoreRank.B)),
                         // The S and A badges are moved down slightly to prevent collision with the SS badge.
                         new RankBadge(accuracyA, Interpolation.Lerp(accuracyA, accuracyS, 0.25), getRank(ScoreRank.A)),
-                        new RankBadge(accuracyS, Interpolation.Lerp(accuracyS, (accuracyX - virtual_ss_percentage), 0.25), getRank(ScoreRank.S)),
+                        new RankBadge(accuracyS, Interpolation.Lerp(accuracyS, (accuracyX - VIRTUAL_SS_PERCENTAGE), 0.25), getRank(ScoreRank.S)),
                         new RankBadge(accuracyX, accuracyX, getRank(ScoreRank.X)),
                     }
                 },
@@ -296,7 +230,7 @@ namespace osu.Game.Screens.Ranking.Expanded.Accuracy
             }
 
             using (BeginDelayedSequence(RANK_CIRCLE_TRANSFORM_DELAY))
-                innerMask.FillTo(1f, RANK_CIRCLE_TRANSFORM_DURATION, ACCURACY_TRANSFORM_EASING);
+                gradedCircles.TransformTo(nameof(GradedCircles.Progress), 1.0, RANK_CIRCLE_TRANSFORM_DURATION, ACCURACY_TRANSFORM_EASING);
 
             using (BeginDelayedSequence(ACCURACY_TRANSFORM_DELAY))
             {
@@ -313,10 +247,10 @@ namespace osu.Game.Screens.Ranking.Expanded.Accuracy
                 // to prevent ambiguity on what grade it's pointing at.
                 foreach (double p in notchPercentages)
                 {
-                    if (Precision.AlmostEquals(p, targetAccuracy, NOTCH_WIDTH_PERCENTAGE / 2))
+                    if (Precision.AlmostEquals(p, targetAccuracy, GRADE_SPACING_PERCENTAGE / 2))
                     {
                         int tippingDirection = targetAccuracy - p >= 0 ? 1 : -1; // We "round up" here to match rank criteria
-                        targetAccuracy = p + tippingDirection * (NOTCH_WIDTH_PERCENTAGE / 2);
+                        targetAccuracy = p + tippingDirection * (GRADE_SPACING_PERCENTAGE / 2);
                         break;
                     }
                 }
@@ -325,7 +259,7 @@ namespace osu.Game.Screens.Ranking.Expanded.Accuracy
                 if (score.Rank == ScoreRank.X || score.Rank == ScoreRank.XH)
                     targetAccuracy = 1;
                 else
-                    targetAccuracy = Math.Min(accuracyX - virtual_ss_percentage - NOTCH_WIDTH_PERCENTAGE / 2, targetAccuracy);
+                    targetAccuracy = Math.Min(accuracyX - VIRTUAL_SS_PERCENTAGE - GRADE_SPACING_PERCENTAGE / 2, targetAccuracy);
 
                 // The accuracy circle gauge visually fills up a bit too much.
                 // This wouldn't normally matter but we want it to align properly with the inner graded circle in the above cases.
@@ -365,7 +299,7 @@ namespace osu.Game.Screens.Ranking.Expanded.Accuracy
                             continue;
 
                         using (BeginDelayedSequence(
-                                   inverseEasing(ACCURACY_TRANSFORM_EASING, Math.Min(accuracyX - virtual_ss_percentage, badge.Accuracy) / targetAccuracy) * ACCURACY_TRANSFORM_DURATION))
+                                   inverseEasing(ACCURACY_TRANSFORM_EASING, Math.Min(accuracyX - VIRTUAL_SS_PERCENTAGE, badge.Accuracy) / targetAccuracy) * ACCURACY_TRANSFORM_DURATION))
                         {
                             badge.Appear();
 
@@ -425,7 +359,7 @@ namespace osu.Game.Screens.Ranking.Expanded.Accuracy
                                 .FadeOut(800, Easing.Out);
 
                             accuracyCircle
-                                .FillTo(accuracyS - NOTCH_WIDTH_PERCENTAGE / 2 - visual_alignment_offset, 70, Easing.OutQuint);
+                                .FillTo(accuracyS - GRADE_SPACING_PERCENTAGE / 2 - visual_alignment_offset, 70, Easing.OutQuint);
 
                             badges.Single(b => b.Rank == getRank(ScoreRank.S))
                                   .FadeOut(70, Easing.OutQuint);
