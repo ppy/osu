@@ -61,16 +61,17 @@ namespace osu.Game.Rulesets.Objects
                     case NotifyCollectionChangedAction.Add:
                         Debug.Assert(args.NewItems != null);
 
-                        foreach (var c in args.NewItems.Cast<PathControlPoint>())
-                            c.Changed += invalidate;
+                        foreach (object? newItem in args.NewItems)
+                            ((PathControlPoint)newItem).Changed += invalidate;
+
                         break;
 
                     case NotifyCollectionChangedAction.Reset:
                     case NotifyCollectionChangedAction.Remove:
                         Debug.Assert(args.OldItems != null);
 
-                        foreach (var c in args.OldItems.Cast<PathControlPoint>())
-                            c.Changed -= invalidate;
+                        foreach (object? oldItem in args.OldItems)
+                            ((PathControlPoint)oldItem).Changed -= invalidate;
                         break;
                 }
 
@@ -269,10 +270,10 @@ namespace osu.Game.Rulesets.Objects
                 {
                     List<Vector2> subPath = calculateSubPath(segmentVertices, segmentType);
                     // Skip the first vertex if it is the same as the last vertex from the previous segment
-                    int skipFirst = calculatedPath.Count > 0 && subPath.Count > 0 && calculatedPath.Last() == subPath[0] ? 1 : 0;
+                    bool skipFirst = calculatedPath.Count > 0 && subPath.Count > 0 && calculatedPath.Last() == subPath[0];
 
-                    foreach (Vector2 t in subPath.Skip(skipFirst))
-                        calculatedPath.Add(t);
+                    for (int j = skipFirst ? 1 : 0; j < subPath.Count; j++)
+                        calculatedPath.Add(subPath[j]);
                 }
 
                 if (i > 0)

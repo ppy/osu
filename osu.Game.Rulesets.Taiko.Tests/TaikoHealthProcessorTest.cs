@@ -126,11 +126,11 @@ namespace osu.Game.Rulesets.Taiko.Tests
 
             foreach (var nested in beatmap.HitObjects[0].NestedHitObjects)
             {
-                var nestedJudgement = nested.CreateJudgement();
+                var nestedJudgement = nested.Judgement;
                 healthProcessor.ApplyResult(new JudgementResult(nested, nestedJudgement) { Type = nestedJudgement.MaxResult });
             }
 
-            var judgement = beatmap.HitObjects[0].CreateJudgement();
+            var judgement = beatmap.HitObjects[0].Judgement;
             healthProcessor.ApplyResult(new JudgementResult(beatmap.HitObjects[0], judgement) { Type = judgement.MaxResult });
 
             Assert.Multiple(() =>
@@ -159,11 +159,11 @@ namespace osu.Game.Rulesets.Taiko.Tests
 
             foreach (var nested in beatmap.HitObjects[0].NestedHitObjects)
             {
-                var nestedJudgement = nested.CreateJudgement();
+                var nestedJudgement = nested.Judgement;
                 healthProcessor.ApplyResult(new JudgementResult(nested, nestedJudgement) { Type = nestedJudgement.MaxResult });
             }
 
-            var judgement = beatmap.HitObjects[0].CreateJudgement();
+            var judgement = beatmap.HitObjects[0].Judgement;
             healthProcessor.ApplyResult(new JudgementResult(beatmap.HitObjects[0], judgement) { Type = judgement.MaxResult });
 
             Assert.Multiple(() =>

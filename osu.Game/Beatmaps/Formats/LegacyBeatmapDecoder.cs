@@ -567,10 +567,9 @@ namespace osu.Game.Beatmaps.Formats
             for (int i = pendingControlPoints.Count - 1; i >= 0; i--)
             {
                 var type = pendingControlPoints[i].GetType();
-                if (pendingControlPointTypes.Contains(type))
+                if (!pendingControlPointTypes.Add(type))
                     continue;
 
-                pendingControlPointTypes.Add(type);
                 beatmap.ControlPointInfo.Add(pendingControlPointsTime, pendingControlPoints[i]);
             }
 
