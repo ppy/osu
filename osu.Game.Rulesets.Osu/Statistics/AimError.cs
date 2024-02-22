@@ -1,15 +1,10 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using System;
 using System.Collections.Generic;
-using System.Linq;
-using osu.Game.Beatmaps;
-using osu.Game.Rulesets.Objects.Legacy;
-using osu.Game.Rulesets.Osu.Objects;
+using osu.Game.Rulesets.Osu.Scoring;
 using osu.Game.Rulesets.Scoring;
 using osu.Game.Screens.Ranking.Statistics;
-using osuTK;
 
 namespace osu.Game.Rulesets.Osu.Statistics
 {
@@ -18,45 +13,14 @@ namespace osu.Game.Rulesets.Osu.Statistics
     /// </summary>
     public partial class AimError : SimpleStatisticItem<double?>
     {
-        private readonly List<Vector2> hitPoints = new List<Vector2>();
-
         /// <summary>
         /// Creates and computes an <see cref="AimError"/> statistic.
         /// </summary>
         /// <param name="hitEvents">Sequence of <see cref="HitEvent"/>s to calculate the aim error based on.</param>
-        /// <param name="playableBeatmap">The <see cref="IBeatmap"/> containing the radii of the circles, used to compute the variance of misses.</param>
-        public AimError(IEnumerable<HitEvent> hitEvents, IBeatmap playableBeatmap)
+        public AimError(IEnumerable<HitEvent> hitEvents)
             : base("Aim Error")
         {
-            Value = calculateAimError(hitEvents, playableBeatmap);
-        }
-
-        private double? calculateAimError(IEnumerable<HitEvent> hitEvents, IBeatmap playableBeatmap)
-        {
-            IEnumerable<HitEvent> hitCircleEvents = hitEvents.Where(e => e.HitObject is HitCircle && !(e.HitObject is SliderTailCircle)).ToList();
-
-            double nonMissCount = hitCircleEvents.Count(e => e.Result.IsHit());
-            double missCount = hitCircleEvents.Count() - nonMissCount;
-
-            if (nonMissCount == 0)
-                return null;
-
-            foreach (var e in hitCircleEvents)
-            {
-                if (e.Position == null)
-                    continue;
-
-                hitPoints.Add((e.Position - ((OsuHitObject)e.HitObject).StackedEndPosition).Value);
-            }
-
-            double radius = OsuHitObject.OBJECT_RADIUS * LegacyRulesetExtensions.CalculateScaleFromCircleSize(playableBeatmap.Difficulty.CircleSize, true);
-
-            // We don't get data for miss locations, so we estimate the total variance using the Rayleigh distribution.
-            // Deriving the Rayleigh distribution in this form results in a 2 in the denominator,
-            // but it is removed to take the variance across both axes, instead of across just one.
-            double variance = (missCount * Math.Pow(radius, 2) + hitPoints.Sum(point => point.LengthSquared)) / nonMissCount;
-
-            return Math.Sqrt(variance) * 10;
+            Value = hitEvents.CalculateAimError();
         }
 
         protected override string DisplayValue(double? value) => value == null ? "(not available)" : value.Value.ToString(@"N2");

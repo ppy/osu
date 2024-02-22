@@ -25,7 +25,7 @@ namespace osu.Game.Rulesets.Osu.Tests
             IBeatmap beatmap = new Beatmap();
             beatmap.Difficulty.CircleSize = 0;
 
-            var aimError = new AimError(events, beatmap);
+            var aimError = new AimError(events);
 
             Assert.IsNotNull(aimError.Value);
             Assert.AreEqual(Math.Sqrt(57) * 10, aimError.Value!.Value);
@@ -51,8 +51,8 @@ namespace osu.Game.Rulesets.Osu.Tests
             IBeatmap beatmap = new Beatmap();
             beatmap.Difficulty.CircleSize = 0;
 
-            var aimErrorWithMiss = new AimError(eventsWithMiss, beatmap);
-            var aimErrorWithoutMiss = new AimError(eventsWithoutMiss, beatmap);
+            var aimErrorWithMiss = new AimError(eventsWithMiss);
+            var aimErrorWithoutMiss = new AimError(eventsWithoutMiss);
 
             Assert.IsTrue(aimErrorWithMiss.Value != null && aimErrorWithoutMiss.Value != null && Precision.DefinitelyBigger(aimErrorWithMiss.Value.Value, aimErrorWithoutMiss.Value.Value));
         }
@@ -70,7 +70,7 @@ namespace osu.Game.Rulesets.Osu.Tests
             IBeatmap beatmap = new Beatmap();
             beatmap.Difficulty.CircleSize = 0;
 
-            var aimError = new AimError(events, beatmap);
+            var aimError = new AimError(events);
 
             Assert.IsNull(aimError.Value);
         }

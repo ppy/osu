@@ -337,7 +337,7 @@ namespace osu.Game.Rulesets.Osu
                 new StatisticItem("Aim Statistics", () => new SimpleStatisticTable(2, new SimpleStatisticItem[]
                 {
                     new AverageAimError(timedHitEvents),
-                    new AimError(timedHitEvents, playableBeatmap)
+                    new AimError(timedHitEvents)
                 }), true),
             };
         }
