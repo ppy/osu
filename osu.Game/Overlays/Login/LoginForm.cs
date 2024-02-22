@@ -13,11 +13,11 @@ using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Graphics.UserInterface;
-using osu.Game.Localisation;
 using osu.Game.Online.API;
 using osu.Game.Overlays.Settings;
 using osu.Game.Resources.Localisation.Web;
 using osuTK;
+using osu.Game.Localisation;
 
 namespace osu.Game.Overlays.Login
 {
@@ -26,7 +26,6 @@ namespace osu.Game.Overlays.Login
         private TextBox username = null!;
         private TextBox password = null!;
         private ShakeContainer shakeSignIn = null!;
-        private SettingsCheckbox rememberUsername = null!;
 
         [Resolved]
         private IAPIProvider api { get; set; } = null!;
@@ -83,7 +82,7 @@ namespace osu.Game.Overlays.Login
                         },
                     },
                 },
-                rememberUsername = new SettingsCheckbox
+                new SettingsCheckbox
                 {
                     LabelText = LoginPanelStrings.RememberUsername,
                     Current = config.GetBindable<bool>(OsuSetting.SaveUsername),
@@ -131,7 +130,6 @@ namespace osu.Game.Overlays.Login
             forgottenPasswordLink.AddLink(LayoutStrings.PopupLoginLoginForgot, $"{api.WebsiteRootUrl}/home/password-reset");
 
             password.OnCommit += (_, _) => performLogin();
-            rememberUsername.SettingChanged += () => onRememberUsernameChanged(config);
 
             if (api.LastLoginError?.Message is string error)
             {
@@ -146,12 +144,6 @@ namespace osu.Game.Overlays.Login
                 api.Login(username.Text, password.Text);
             else
                 shakeSignIn.Shake();
-        }
-
-        private void onRememberUsernameChanged(OsuConfigManager config)
-        {
-            if (rememberUsername.Current.Value == false)
-                config.SetValue(OsuSetting.Username, string.Empty);
         }
 
         protected override bool OnClick(ClickEvent e) => true;
