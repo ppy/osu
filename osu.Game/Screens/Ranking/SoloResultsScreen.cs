@@ -34,8 +34,8 @@ namespace osu.Game.Screens.Ranking
         private IBindable<SoloStatisticsUpdate?> latestUpdate = null!;
         private readonly Bindable<SoloStatisticsUpdate?> statisticsUpdate = new Bindable<SoloStatisticsUpdate?>();
 
-        public SoloResultsScreen(ScoreInfo score, bool allowRetry)
-            : base(score, allowRetry)
+        public SoloResultsScreen(ScoreInfo score)
+            : base(score)
         {
         }
 

@@ -1224,9 +1224,10 @@ namespace osu.Game.Screens.Play
         /// </summary>
         /// <param name="score">The <see cref="ScoreInfo"/> to be displayed in the results screen.</param>
         /// <returns>The <see cref="ResultsScreen"/>.</returns>
-        protected virtual ResultsScreen CreateResults(ScoreInfo score) => new SoloResultsScreen(score, true)
+        protected virtual ResultsScreen CreateResults(ScoreInfo score) => new SoloResultsScreen(score)
         {
-            ShowUserStatistics = true
+            AllowRetry = true,
+            ShowUserStatistics = true,
         };
 
         private void fadeOut(bool instant = false)

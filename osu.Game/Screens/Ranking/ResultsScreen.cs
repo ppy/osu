@@ -63,16 +63,21 @@ namespace osu.Game.Screens.Ranking
 
         private bool lastFetchCompleted;
 
-        private readonly bool allowRetry;
-        private readonly bool allowWatchingReplay;
+        /// <summary>
+        /// Whether the user can retry the beatmap from the results screen.
+        /// </summary>
+        public bool AllowRetry { get; init; }
+
+        /// <summary>
+        /// Whether the user can watch the replay of the completed play from the results screen.
+        /// </summary>
+        public bool AllowWatchingReplay { get; init; } = true;
 
         private Sample popInSample;
 
-        protected ResultsScreen([CanBeNull] ScoreInfo score, bool allowRetry, bool allowWatchingReplay = true)
+        protected ResultsScreen([CanBeNull] ScoreInfo score)
         {
             Score = score;
-            this.allowRetry = allowRetry;
-            this.allowWatchingReplay = allowWatchingReplay;
 
             SelectedScore.Value = score;
         }
@@ -162,7 +167,7 @@ namespace osu.Game.Screens.Ranking
                 ScorePanelList.AddScore(Score, shouldFlair);
             }
 
-            if (allowWatchingReplay)
+            if (AllowWatchingReplay)
             {
                 buttons.Add(new ReplayDownloadButton(SelectedScore.Value)
                 {
@@ -171,7 +176,7 @@ namespace osu.Game.Screens.Ranking
                 });
             }
 
-            if (player != null && allowRetry)
+            if (player != null && AllowRetry)
             {
                 buttons.Add(new RetryButton { Width = 300 });
 

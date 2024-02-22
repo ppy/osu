@@ -399,8 +399,9 @@ namespace osu.Game.Tests.Visual.Ranking
             public HotkeyRetryOverlay RetryOverlay;
 
             public TestResultsScreen(ScoreInfo score)
-                : base(score, true)
+                : base(score)
             {
+                AllowRetry = true;
                 ShowUserStatistics = true;
             }
 
@@ -470,8 +471,9 @@ namespace osu.Game.Tests.Visual.Ranking
             public HotkeyRetryOverlay RetryOverlay;
 
             public UnrankedSoloResultsScreen(ScoreInfo score)
-                : base(score, true)
+                : base(score)
             {
+                AllowRetry = true;
                 Score!.BeatmapInfo!.OnlineID = 0;
                 Score.BeatmapInfo.Status = BeatmapOnlineStatus.Pending;
             }
