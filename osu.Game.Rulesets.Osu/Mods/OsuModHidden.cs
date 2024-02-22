@@ -2,11 +2,9 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
-using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using osu.Framework.Graphics;
-using osu.Framework.Graphics.Transforms;
 using osu.Framework.Bindables;
 using osu.Framework.Localisation;
 using osu.Game.Configuration;
@@ -14,14 +12,13 @@ using osu.Game.Beatmaps;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Objects.Drawables;
-using osu.Game.Rulesets.UI;
 using osu.Game.Rulesets.Osu.Objects.Drawables;
 using osu.Game.Rulesets.Osu.Objects;
 using osu.Game.Rulesets.Osu.Skinning;
 
 namespace osu.Game.Rulesets.Osu.Mods
 {
-    public class OsuModHidden : ModHidden, IHidesApproachCircles, IToggleableVisibility
+    public class OsuModHidden : ModHidden, IHidesApproachCircles
     {
         [SettingSource("Only fade approach circles", "The main object body will not fade when enabled.")]
         public Bindable<bool> OnlyFadeApproachCircles { get; } = new BindableBool();
@@ -31,41 +28,24 @@ namespace osu.Game.Rulesets.Osu.Mods
 
         public override Type[] IncompatibleMods => new[] { typeof(IRequiresApproachCircles), typeof(OsuModSpinIn), typeof(OsuModDepth) };
 
-        private bool toggledOff = false;
-        private IBeatmap? appliedBeatmap;
-        
         public const double FADE_IN_DURATION_MULTIPLIER = 0.4;
         public const double FADE_OUT_DURATION_MULTIPLIER = 0.3;
 
         protected override bool IsFirstAdjustableObject(HitObject hitObject) => !(hitObject is Spinner || hitObject is SpinnerTick);
 
-        public override void ApplyToBeatmap(IBeatmap? beatmap = null)
+        public override void ApplyToBeatmap(IBeatmap beatmap)
         {
-            if (beatmap is not null)
-                appliedBeatmap = beatmap;
-            else if (appliedBeatmap is null)
-                return;
-            else
-                beatmap = appliedBeatmap;
-            
             base.ApplyToBeatmap(beatmap);
 
             foreach (var obj in beatmap.HitObjects.OfType<OsuHitObject>())
                 applyFadeInAdjustment(obj);
-        }
 
-        private static void applyFadeInAdjustment(OsuHitObject osuObject)
-        {
-            osuObject.TimeFadeIn = osuObject.TimePreempt * FADE_IN_DURATION_MULTIPLIER;
-            foreach (var nested in osuObject.NestedHitObjects.OfType<OsuHitObject>())
-                applyFadeInAdjustment(nested);
-        }
-
-        private static void revertFadeInAdjustment(OsuHitObject osuObject)
-        {
-            osuObject.TimeFadeIn = OsuHitObject.CalculateTimeFadeIn(osuObject.TimePreempt);
-            foreach (var nested in osuObject.NestedHitObjects.OfType<OsuHitObject>())
-                revertFadeInAdjustment(nested);
+            static void applyFadeInAdjustment(OsuHitObject osuObject)
+            {
+                osuObject.TimeFadeIn = osuObject.TimePreempt * FADE_IN_DURATION_MULTIPLIER;
+                foreach (var nested in osuObject.NestedHitObjects.OfType<OsuHitObject>())
+                    applyFadeInAdjustment(nested);
+            }
         }
 
         protected override void ApplyIncreasedVisibilityState(DrawableHitObject hitObject, ArmedState state)
@@ -80,7 +60,7 @@ namespace osu.Game.Rulesets.Osu.Mods
 
         private void applyHiddenState(DrawableHitObject drawableObject, bool increaseVisibility)
         {
-            if (!(drawableObject is DrawableOsuHitObject drawableOsuObject) || toggledOff)
+            if (!(drawableObject is DrawableOsuHitObject drawableOsuObject))
                 return;
 
             OsuHitObject hitObject = drawableOsuObject.HitObject;
@@ -203,51 +183,14 @@ namespace osu.Game.Rulesets.Osu.Mods
             }
         }
 
-        private void hideSpinnerApproachCircle(DrawableSpinner spinner)
+        private static void hideSpinnerApproachCircle(DrawableSpinner spinner)
         {
-            if (toggledOff)
-                return;
-
             var approachCircle = (spinner.Body.Drawable as IHasApproachCircle)?.ApproachCircle;
             if (approachCircle == null)
                 return;
 
             using (spinner.BeginAbsoluteSequence(spinner.HitObject.StartTime - spinner.HitObject.TimePreempt))
                 approachCircle.Hide();
-        }
-
-        public void ToggleOffVisibility(Playfield playfield)
-        {
-            if (toggledOff)
-                return;
-            
-            toggledOff = true;
-
-            if (appliedBeatmap is not null)
-                foreach (var obj in appliedBeatmap.HitObjects.OfType<OsuHitObject>())
-                    revertFadeInAdjustment(obj);
-            
-            foreach (var dho in playfield.AllHitObjects)
-            {
-                dho.RefreshStateTransforms();
-            }
-        }
-
-        public void ToggleOnVisibility(Playfield playfield)
-        {
-            if (!toggledOff)
-                return;
-
-            toggledOff = false;
-
-            if (appliedBeatmap is not null)
-                ApplyToBeatmap();
-
-            foreach (var dho in playfield.AllHitObjects)
-            {
-                dho.RefreshStateTransforms();
-                ApplyToDrawableHitObject(dho);
-            }
         }
     }
 }
