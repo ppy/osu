@@ -50,18 +50,12 @@ namespace osu.Game.Tests.Visual.Beatmaps
                 fill.Add(difficultyIcon = new DifficultyIcon(beatmapInfo, rulesetInfo)
                 {
                     Scale = new Vector2(2),
-                    ShowTooltip = true,
-                    ShowExtendedTooltip = true
                 });
             }, 10);
 
-            AddStep("hide extended tooltip", () => difficultyIcon.ShowExtendedTooltip = false);
-
-            AddStep("hide tooltip", () => difficultyIcon.ShowTooltip = false);
-
-            AddStep("show tooltip", () => difficultyIcon.ShowTooltip = true);
-
-            AddStep("show extended tooltip", () => difficultyIcon.ShowExtendedTooltip = true);
+            AddStep("no tooltip", () => difficultyIcon.TooltipType = DifficultyIconTooltipType.None);
+            AddStep("basic tooltip", () => difficultyIcon.TooltipType = DifficultyIconTooltipType.StarRating);
+            AddStep("extended tooltip", () => difficultyIcon.TooltipType = DifficultyIconTooltipType.Extended);
         }
     }
 }

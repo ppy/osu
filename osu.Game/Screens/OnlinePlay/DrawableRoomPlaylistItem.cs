@@ -285,7 +285,7 @@ namespace osu.Game.Screens.OnlinePlay
                 difficultyIconContainer.Child = new DifficultyIcon(beatmap, ruleset, requiredMods)
                 {
                     Size = new Vector2(icon_height),
-                    ShowExtendedTooltip = true
+                    TooltipType = DifficultyIconTooltipType.Extended,
                 };
             }
             else
