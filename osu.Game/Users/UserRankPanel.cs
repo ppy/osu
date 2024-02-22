@@ -166,6 +166,9 @@ namespace osu.Game.Users
                                 globalRankDisplay = new ProfileValueDisplay(true)
                                 {
                                     Title = UsersStrings.ShowRankGlobalSimple,
+                                    // TODO: implement highest rank tooltip
+                                    // `RankHighest` resides in `APIUser`, but `api.LocalUser` doesn't update
+                                    // maybe move to `UserStatistics` in api, so `SoloStatisticsWatcher` can update the value
                                 },
                                 countryRankDisplay = new ProfileValueDisplay(true)
                                 {

@@ -65,35 +65,28 @@ namespace osu.Game.Screens.Edit.Timing
                     {
                         new Drawable[]
                         {
-                            new Container
+                            new GridContainer
                             {
                                 RelativeSizeAxes = Axes.Both,
                                 Padding = new MarginPadding(padding),
-                                Children = new Drawable[]
+                                ColumnDimensions = new[]
                                 {
-                                    new GridContainer
+                                    new Dimension(GridSizeMode.AutoSize),
+                                    new Dimension()
+                                },
+                                Content = new[]
+                                {
+                                    new Drawable[]
                                     {
-                                        RelativeSizeAxes = Axes.Both,
-                                        ColumnDimensions = new[]
+                                        metronome = new MetronomeDisplay
                                         {
-                                            new Dimension(GridSizeMode.AutoSize),
-                                            new Dimension()
+                                            Anchor = Anchor.CentreLeft,
+                                            Origin = Anchor.CentreLeft,
                                         },
-                                        Content = new[]
-                                        {
-                                            new Drawable[]
-                                            {
-                                                metronome = new MetronomeDisplay
-                                                {
-                                                    Anchor = Anchor.CentreLeft,
-                                                    Origin = Anchor.CentreLeft,
-                                                },
-                                                new WaveformComparisonDisplay()
-                                            }
-                                        },
+                                        new WaveformComparisonDisplay()
                                     }
-                                }
-                            },
+                                },
+                            }
                         },
                         new Drawable[]
                         {
