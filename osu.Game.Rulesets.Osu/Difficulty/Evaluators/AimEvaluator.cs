@@ -131,7 +131,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
                     if (osuLastObj.StrainTime > osuLastLastObj.StrainTime)
                         alternatingBonus *= Math.Pow(Math.Min(osuCurrObj.StrainTime, osuLastObj.StrainTime) / Math.Max(osuCurrObj.StrainTime, osuLastObj.StrainTime), 2);
 
-                    sliderJumpBonus *= 1 + alternatingBonus;
+                    sliderJumpBonus += alternatingBonus;
                 }
 
                 // If slider was slower than notes before - punish it
