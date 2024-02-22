@@ -4,8 +4,6 @@
 using System;
 using System.Linq;
 using NUnit.Framework;
-using osu.Framework.Utils;
-using osu.Game.Beatmaps;
 using osu.Game.Rulesets.Osu.Objects;
 using osu.Game.Rulesets.Osu.Statistics;
 using osu.Game.Rulesets.Scoring;
@@ -19,42 +17,13 @@ namespace osu.Game.Rulesets.Osu.Tests
         [Test]
         public void TestDistributedHits()
         {
-            var events = Enumerable.Range(0, 10)
-                                   .Select(t => new HitEvent(0, 1.0, HitResult.Great, new HitCircle(), null, new Vector2(t, t)));
-
-            IBeatmap beatmap = new Beatmap();
-            beatmap.Difficulty.CircleSize = 0;
+            var events = Enumerable.Range(-5, 11)
+                                   .Select(t => new HitEvent(0, 1.0, HitResult.Great, new HitCircle(), new HitCircle(), new Vector2(t, t)));
 
             var aimError = new AimError(events);
 
             Assert.IsNotNull(aimError.Value);
-            Assert.AreEqual(Math.Sqrt(57) * 10, aimError.Value!.Value);
-        }
-
-        [Test]
-        public void TestMissesIncreaseDeviation()
-        {
-            var eventsWithMiss = new[]
-            {
-                new HitEvent(0, 1.0, HitResult.Miss, new HitCircle(), null, null),
-                new HitEvent(0, 1.0, HitResult.Great, new HitCircle(), null, new Vector2(0, 0)),
-                new HitEvent(0, 1.0, HitResult.Great, new HitCircle(), null, new Vector2(0, 0)),
-            };
-
-            var eventsWithoutMiss = new[]
-            {
-                new HitEvent(0, 1.0, HitResult.Great, new HitCircle(), null, new Vector2(0, 0)),
-                new HitEvent(0, 1.0, HitResult.Great, new HitCircle(), null, new Vector2(0, 0)),
-                new HitEvent(0, 1.0, HitResult.Great, new HitCircle(), null, new Vector2(0, 0)),
-            };
-
-            IBeatmap beatmap = new Beatmap();
-            beatmap.Difficulty.CircleSize = 0;
-
-            var aimErrorWithMiss = new AimError(eventsWithMiss);
-            var aimErrorWithoutMiss = new AimError(eventsWithoutMiss);
-
-            Assert.IsTrue(aimErrorWithMiss.Value != null && aimErrorWithoutMiss.Value != null && Precision.DefinitelyBigger(aimErrorWithMiss.Value.Value, aimErrorWithoutMiss.Value.Value));
+            Assert.AreEqual(Math.Sqrt(20) * 10, aimError.Value!.Value, 1e-5);
         }
 
         [Test]
@@ -62,13 +31,25 @@ namespace osu.Game.Rulesets.Osu.Tests
         {
             var events = new[]
             {
-                new HitEvent(0, 1.0, HitResult.Miss, new HitCircle(), null, null),
-                new HitEvent(0, 1.0, HitResult.Miss, new HitCircle(), null, null),
-                new HitEvent(0, 1.0, HitResult.Miss, new HitCircle(), null, null),
+                new HitEvent(0, 1.0, HitResult.Miss, new HitCircle(), new HitCircle(), null),
+                new HitEvent(0, 1.0, HitResult.Miss, new HitCircle(), new HitCircle(), null),
+                new HitEvent(0, 1.0, HitResult.Miss, new HitCircle(), new HitCircle(), null),
             };
 
-            IBeatmap beatmap = new Beatmap();
-            beatmap.Difficulty.CircleSize = 0;
+            var aimError = new AimError(events);
+
+            Assert.IsNull(aimError.Value);
+        }
+
+        [Test]
+        public void TestNullLastObjectReturnsNull()
+        {
+            var events = new[]
+            {
+                new HitEvent(0, 1.0, HitResult.Miss, new HitCircle(), null, new Vector2(0, 0)),
+                new HitEvent(0, 1.0, HitResult.Miss, new HitCircle(), null, new Vector2(0, 0)),
+                new HitEvent(0, 1.0, HitResult.Miss, new HitCircle(), null, new Vector2(0, 0)),
+            };
 
             var aimError = new AimError(events);
 

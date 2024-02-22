@@ -23,7 +23,7 @@ namespace osu.Game.Rulesets.Osu.Scoring
 
             foreach (var e in hitCircleEvents)
             {
-                if (e.Position == null)
+                if (e.LastHitObject == null || e.Position == null)
                     continue;
 
                 eventCount += 1;
@@ -54,7 +54,7 @@ namespace osu.Game.Rulesets.Osu.Scoring
                     continue;
 
                 eventCount += 1;
-                sumOfPointVectors += CalcAngleAdjustedPoint(e) ?? new Vector2(0, 0);
+                sumOfPointVectors += e.CalcAngleAdjustedPoint() ?? new Vector2(0, 0);
             }
 
             if (eventCount == 0)

@@ -24,9 +24,9 @@ namespace osu.Game.Rulesets.Osu.Tests
                 new HitEvent(0, 1.0, HitResult.Great, new HitCircle { Position = new Vector2(1, -1) }, new HitCircle { Position = new Vector2(1, 1) }, new Vector2(1, 0))
             };
 
-            var aimError = new AverageAimError(events);
+            var averageAimError = new AverageAimError(events);
 
-            Assert.AreEqual(1, aimError.Value!.Value);
+            Assert.AreEqual(1, averageAimError.Value!.Value);
         }
 
         [Test]
@@ -39,9 +39,24 @@ namespace osu.Game.Rulesets.Osu.Tests
                 new HitEvent(0, 1.0, HitResult.Miss, new HitCircle(), new HitCircle(), null),
             };
 
-            var aimError = new AverageAimError(events);
+            var averageAimError = new AverageAimError(events);
 
-            Assert.IsNull(aimError.Value);
+            Assert.IsNull(averageAimError.Value);
+        }
+
+        [Test]
+        public void TestNulLastObjectReturnsNull()
+        {
+            var events = new[]
+            {
+                new HitEvent(0, 1.0, HitResult.Miss, new HitCircle(), null, new Vector2(0, 0)),
+                new HitEvent(0, 1.0, HitResult.Miss, new HitCircle(), null, new Vector2(0, 0)),
+                new HitEvent(0, 1.0, HitResult.Miss, new HitCircle(), null, new Vector2(0, 0)),
+            };
+
+            var averageAimError = new AverageAimError(events);
+
+            Assert.IsNull(averageAimError.Value);
         }
     }
 }
