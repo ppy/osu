@@ -58,7 +58,10 @@ namespace osu.Game.Screens.OnlinePlay.Playlists
         protected override ResultsScreen CreateResults(ScoreInfo score)
         {
             Debug.Assert(Room.RoomID.Value != null);
-            return new PlaylistsResultsScreen(score, Room.RoomID.Value.Value, PlaylistItem, true);
+            return new PlaylistsResultsScreen(score, Room.RoomID.Value.Value, PlaylistItem)
+            {
+                AllowRetry = true,
+            };
         }
 
         protected override void Dispose(bool isDisposing)
