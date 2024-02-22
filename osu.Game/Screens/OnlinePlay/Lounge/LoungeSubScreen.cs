@@ -4,8 +4,8 @@
 #nullable disable
 
 using System;
-using System.Diagnostics;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using JetBrains.Annotations;
 using osu.Framework.Allocation;
@@ -19,6 +19,7 @@ using osu.Framework.Input.Events;
 using osu.Framework.Logging;
 using osu.Framework.Screens;
 using osu.Framework.Threading;
+using osu.Game.Configuration;
 using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Input;
@@ -38,8 +39,6 @@ namespace osu.Game.Screens.OnlinePlay.Lounge
     public abstract partial class LoungeSubScreen : OnlinePlaySubScreen
     {
         public override string Title => "Lounge";
-
-        protected override bool PlayExitSound => false;
 
         protected override BackgroundScreen CreateBackground() => new LoungeBackgroundScreen
         {
@@ -76,6 +75,9 @@ namespace osu.Game.Screens.OnlinePlay.Lounge
 
         [CanBeNull]
         private LeasedBindable<Room> selectionLease;
+
+        [Resolved]
+        protected OsuConfigManager Config { get; private set; }
 
         private readonly Bindable<FilterCriteria> filter = new Bindable<FilterCriteria>(new FilterCriteria());
         private readonly IBindable<bool> operationInProgress = new Bindable<bool>();

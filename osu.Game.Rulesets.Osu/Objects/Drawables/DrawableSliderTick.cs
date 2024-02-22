@@ -18,7 +18,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
     {
         public const double ANIM_DURATION = 150;
 
-        private const float default_tick_size = 16;
+        public const float DEFAULT_TICK_SIZE = 16;
 
         protected DrawableSlider DrawableSlider => (DrawableSlider)ParentHitObject;
 
@@ -44,8 +44,8 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
             {
                 Masking = true,
                 Origin = Anchor.Centre,
-                Size = new Vector2(default_tick_size),
-                BorderThickness = default_tick_size / 4,
+                Size = new Vector2(DEFAULT_TICK_SIZE),
+                BorderThickness = DEFAULT_TICK_SIZE / 4,
                 BorderColour = Color4.White,
                 Child = new Box
                 {
@@ -88,8 +88,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
                     break;
 
                 case ArmedState.Miss:
-                    this.FadeOut(ANIM_DURATION);
-                    this.TransformBindableTo(AccentColour, Color4.Red, 0);
+                    this.FadeOut(ANIM_DURATION, Easing.OutQuint);
                     break;
 
                 case ArmedState.Hit:

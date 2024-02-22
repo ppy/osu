@@ -87,7 +87,7 @@ namespace osu.Game.Overlays.Profile
             public ProfileHeaderTitle()
             {
                 Title = PageTitleStrings.MainUsersControllerDefault;
-                Icon = HexaconsIcons.Profile;
+                Icon = OsuIcon.Player;
             }
         }
     }

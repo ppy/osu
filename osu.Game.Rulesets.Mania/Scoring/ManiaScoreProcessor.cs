@@ -22,7 +22,7 @@ namespace osu.Game.Rulesets.Mania.Scoring
         }
 
         protected override IEnumerable<HitObject> EnumerateHitObjects(IBeatmap beatmap)
-            => base.EnumerateHitObjects(beatmap).OrderBy(ho => ho, JudgementOrderComparer.DEFAULT);
+            => base.EnumerateHitObjects(beatmap).Order(JudgementOrderComparer.DEFAULT);
 
         protected override double ComputeTotalScore(double comboProgress, double accuracyProgress, double bonusPortion)
         {

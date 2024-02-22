@@ -91,6 +91,7 @@ namespace osu.Game.Rulesets.Osu.Scoring
                     // When classic slider mechanics are enabled, this result comes from the tail.
                     return 0.02;
 
+                case HitResult.SliderTailHit:
                 case HitResult.LargeTickHit:
                     switch (result.HitObject)
                     {

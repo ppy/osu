@@ -14,31 +14,39 @@ namespace osu.Game.Tests.Visual.UserInterface
 {
     public abstract partial class ThemeComparisonTestScene : OsuGridTestScene
     {
-        protected ThemeComparisonTestScene()
-            : base(1, 2)
+        private readonly bool showWithoutColourProvider;
+
+        protected ThemeComparisonTestScene(bool showWithoutColourProvider = true)
+            : base(1, showWithoutColourProvider ? 2 : 1)
         {
+            this.showWithoutColourProvider = showWithoutColourProvider;
         }
 
         [BackgroundDependencyLoader]
         private void load(OsuColour colours)
         {
-            Cell(0, 0).AddRange(new[]
+            if (showWithoutColourProvider)
             {
-                new Box
+                Cell(0, 0).AddRange(new[]
                 {
-                    RelativeSizeAxes = Axes.Both,
-                    Colour = colours.GreySeaFoam
-                },
-                CreateContent()
-            });
+                    new Box
+                    {
+                        RelativeSizeAxes = Axes.Both,
+                        Colour = colours.GreySeaFoam
+                    },
+                    CreateContent()
+                });
+            }
         }
 
         protected void CreateThemedContent(OverlayColourScheme colourScheme)
         {
             var colourProvider = new OverlayColourProvider(colourScheme);
 
-            Cell(0, 1).Clear();
-            Cell(0, 1).Add(new DependencyProvidingContainer
+            int col = showWithoutColourProvider ? 1 : 0;
+
+            Cell(0, col).Clear();
+            Cell(0, col).Add(new DependencyProvidingContainer
             {
                 RelativeSizeAxes = Axes.Both,
                 CachedDependencies = new (Type, object)[]

@@ -183,7 +183,7 @@ namespace osu.Game.Rulesets.Osu.Tests
                             break;
                     }
 
-                    hitObjectContainer.Add(drawableObject);
+                    hitObjectContainer.Add(drawableObject!);
                     followPointRenderer.AddFollowPoints(objects[i]);
                 }
             });

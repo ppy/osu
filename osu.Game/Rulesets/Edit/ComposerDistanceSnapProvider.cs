@@ -4,7 +4,6 @@
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
-using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Extensions;
@@ -16,6 +15,7 @@ using osu.Framework.Input.Events;
 using osu.Framework.Localisation;
 using osu.Framework.Utils;
 using osu.Game.Configuration;
+using osu.Game.Graphics;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Input.Bindings;
 using osu.Game.Overlays;
@@ -123,12 +123,34 @@ namespace osu.Game.Rulesets.Edit
 
         private (HitObject before, HitObject after)? getObjectsOnEitherSideOfCurrentTime()
         {
-            HitObject? lastBefore = playfield.HitObjectContainer.AliveObjects.LastOrDefault(h => h.HitObject.StartTime < editorClock.CurrentTime)?.HitObject;
+            HitObject? lastBefore = null;
+
+            foreach (var entry in playfield.HitObjectContainer.AliveEntries)
+            {
+                double objTime = entry.Value.HitObject.StartTime;
+
+                if (objTime >= editorClock.CurrentTime)
+                    continue;
+
+                if (objTime > lastBefore?.StartTime)
+                    lastBefore = entry.Value.HitObject;
+            }
 
             if (lastBefore == null)
                 return null;
 
-            HitObject? firstAfter = playfield.HitObjectContainer.AliveObjects.FirstOrDefault(h => h.HitObject.StartTime >= editorClock.CurrentTime)?.HitObject;
+            HitObject? firstAfter = null;
+
+            foreach (var entry in playfield.HitObjectContainer.AliveEntries)
+            {
+                double objTime = entry.Value.HitObject.StartTime;
+
+                if (objTime < editorClock.CurrentTime)
+                    continue;
+
+                if (objTime < firstAfter?.StartTime)
+                    firstAfter = entry.Value.HitObject;
+            }
 
             if (firstAfter == null)
                 return null;
@@ -169,7 +191,7 @@ namespace osu.Game.Rulesets.Edit
 
         public IEnumerable<TernaryButton> CreateTernaryButtons() => new[]
         {
-            new TernaryButton(DistanceSnapToggle, "Distance Snap", () => new SpriteIcon { Icon = FontAwesome.Solid.Ruler })
+            new TernaryButton(DistanceSnapToggle, "Distance Snap", () => new SpriteIcon { Icon = OsuIcon.EditorDistanceSnap })
         };
 
         protected override bool OnKeyDown(KeyDownEvent e)

@@ -7,7 +7,6 @@ using osu.Framework.Allocation;
 using osu.Framework.Audio;
 using osu.Framework.Audio.Track;
 using osu.Framework.Bindables;
-using osu.Framework.Graphics;
 using osu.Framework.Logging;
 using osu.Framework.Timing;
 using osu.Game.Beatmaps;
@@ -35,10 +34,16 @@ namespace osu.Game.Screens.Play
 
         public readonly BindableNumber<double> UserPlaybackRate = new BindableDouble(1)
         {
-            MinValue = 0.5,
+            MinValue = 0.05,
             MaxValue = 2,
-            Precision = 0.1,
+            Precision = 0.01,
         };
+
+        /// <summary>
+        /// Whether the audio playback rate should be validated.
+        /// Mostly disabled for tests.
+        /// </summary>
+        internal bool ShouldValidatePlaybackRate { get; init; }
 
         /// <summary>
         /// Whether the audio playback is within acceptable ranges.
@@ -53,17 +58,6 @@ namespace osu.Game.Screens.Play
         private Track track;
 
         private readonly double skipTargetTime;
-
-        /// <summary>
-        /// Stores the time at which the last <see cref="StopGameplayClock"/> call was triggered.
-        /// This is used to ensure we resume from that precise point in time, ignoring the proceeding frequency ramp.
-        ///
-        /// Optimally, we'd have gameplay ramp down with the frequency, but I believe this was intentionally disabled
-        /// to avoid fails occurring after the pause screen has been shown.
-        ///
-        /// In the future I want to change this.
-        /// </summary>
-        internal double? LastStopTime;
 
         [Resolved]
         private MusicController musicController { get; set; } = null!;
@@ -107,71 +101,17 @@ namespace osu.Game.Screens.Play
             return time;
         }
 
-        protected override void StopGameplayClock()
-        {
-            LastStopTime = GameplayClock.CurrentTime;
-
-            if (IsLoaded)
-            {
-                // During normal operation, the source is stopped after performing a frequency ramp.
-                this.TransformBindableTo(GameplayClock.ExternalPauseFrequencyAdjust, 0, 200, Easing.Out).OnComplete(_ =>
-                {
-                    if (IsPaused.Value)
-                        base.StopGameplayClock();
-                });
-            }
-            else
-            {
-                base.StopGameplayClock();
-
-                // If not yet loaded, we still want to ensure relevant state is correct, as it is used for offset calculations.
-                GameplayClock.ExternalPauseFrequencyAdjust.Value = 0;
-
-                // We must also process underlying gameplay clocks to update rate-adjusted offsets with the new frequency adjustment.
-                // Without doing this, an initial seek may be performed with the wrong offset.
-                GameplayClock.ProcessFrame();
-            }
-        }
-
         public override void Seek(double time)
         {
-            // Safety in case the clock is seeked while stopped.
-            LastStopTime = null;
             elapsedValidationTime = null;
 
             base.Seek(time);
         }
 
-        protected override void PrepareStart()
-        {
-            if (LastStopTime != null)
-            {
-                Seek(LastStopTime.Value);
-                LastStopTime = null;
-            }
-            else
-                base.PrepareStart();
-        }
-
         protected override void StartGameplayClock()
         {
             addAdjustmentsToTrack();
-
             base.StartGameplayClock();
-
-            if (IsLoaded)
-            {
-                this.TransformBindableTo(GameplayClock.ExternalPauseFrequencyAdjust, 1, 200, Easing.In);
-            }
-            else
-            {
-                // If not yet loaded, we still want to ensure relevant state is correct, as it is used for offset calculations.
-                GameplayClock.ExternalPauseFrequencyAdjust.Value = 1;
-
-                // We must also process underlying gameplay clocks to update rate-adjusted offsets with the new frequency adjustment.
-                // Without doing this, an initial seek may be performed with the wrong offset.
-                GameplayClock.ProcessFrame();
-            }
         }
 
         /// <summary>
@@ -223,6 +163,9 @@ namespace osu.Game.Screens.Play
 
         private void checkPlaybackValidity()
         {
+            if (!ShouldValidatePlaybackRate)
+                return;
+
             if (GameplayClock.IsRunning)
             {
                 elapsedGameplayClockTime += GameplayClock.ElapsedFrameTime;
@@ -264,8 +207,7 @@ namespace osu.Game.Screens.Play
             musicController.ResetTrackAdjustments();
 
             track.BindAdjustments(AdjustmentsFromMods);
-            track.AddAdjustment(AdjustableProperty.Frequency, GameplayClock.ExternalPauseFrequencyAdjust);
-            track.AddAdjustment(AdjustableProperty.Tempo, UserPlaybackRate);
+            track.AddAdjustment(AdjustableProperty.Frequency, UserPlaybackRate);
 
             speedAdjustmentsApplied = true;
         }
@@ -276,8 +218,7 @@ namespace osu.Game.Screens.Play
                 return;
 
             track.UnbindAdjustments(AdjustmentsFromMods);
-            track.RemoveAdjustment(AdjustableProperty.Frequency, GameplayClock.ExternalPauseFrequencyAdjust);
-            track.RemoveAdjustment(AdjustableProperty.Tempo, UserPlaybackRate);
+            track.RemoveAdjustment(AdjustableProperty.Frequency, UserPlaybackRate);
 
             speedAdjustmentsApplied = false;
         }
