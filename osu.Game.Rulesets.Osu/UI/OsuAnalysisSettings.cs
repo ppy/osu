@@ -8,7 +8,6 @@ using osu.Framework.Graphics.Containers;
 using osu.Framework.Input.Events;
 using osu.Game.Graphics.Containers;
 using osu.Game.Localisation;
-using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Osu.Mods;
 using osu.Game.Rulesets.UI;
 using osu.Game.Screens.Play.PlayerSettings;
@@ -23,7 +22,6 @@ namespace osu.Game.Rulesets.Osu.UI
         private readonly PlayerCheckbox aimMarkerToggle;
         private readonly PlayerCheckbox hideCursorToggle;
         private readonly PlayerCheckbox aimLinesToggle;
-        private readonly FillFlowContainer modTogglesContainer;
 
         public OsuAnalysisSettings(DrawableRuleset drawableRuleset)
             : base(drawableRuleset)
@@ -33,37 +31,8 @@ namespace osu.Game.Rulesets.Osu.UI
                 hitMarkerToggle = new PlayerCheckbox { LabelText = PlayerSettingsOverlayStrings.HitMarkers },
                 aimMarkerToggle = new PlayerCheckbox { LabelText = PlayerSettingsOverlayStrings.AimMarkers },
                 aimLinesToggle = new PlayerCheckbox { LabelText = PlayerSettingsOverlayStrings.AimLines },
-                hideCursorToggle = new PlayerCheckbox { LabelText = PlayerSettingsOverlayStrings.HideCursor },
-                new OsuScrollContainer(Direction.Horizontal)
-                {
-                    RelativeSizeAxes = Axes.X,
-                    Height = ModSwitchSmall.DEFAULT_SIZE,
-                    ScrollbarOverlapsContent = false,
-                    Child = modTogglesContainer = new FillFlowContainer
-                    {
-                        Anchor = Anchor.BottomLeft,
-                        Origin = Anchor.BottomLeft,
-                        Direction = FillDirection.Horizontal,
-                        RelativeSizeAxes = Axes.Y,
-                        AutoSizeAxes = Axes.X
-                    }
-                }
+                hideCursorToggle = new PlayerCheckbox { LabelText = PlayerSettingsOverlayStrings.HideCursor }
             };
-            
-            foreach (var mod in drawableRuleset.Mods)
-            {
-                if (mod is IToggleableVisibility toggleableMod)
-                {
-                    var modSwitch = new SelectableModSwitchSmall(mod)
-                    {
-                        Anchor = Anchor.Centre,
-                        Origin = Anchor.Centre,
-                        Active = { Value = true }
-                    };
-                    modSwitch.Active.BindValueChanged((v) => onModToggle(toggleableMod, v));
-                    modTogglesContainer.Add(modSwitch);
-                }
-            }
         }
 
         protected override void LoadComplete()
@@ -83,30 +52,6 @@ namespace osu.Game.Rulesets.Osu.UI
             } else
             {
                 drawableRuleset.Playfield.Cursor.FadeIn();
-            }
-        }
-
-        private void onModToggle(IToggleableVisibility mod, ValueChangedEvent<bool> toggled)
-        {
-            if (toggled.NewValue)
-            {
-                mod.ToggleOnVisibility(drawableRuleset.Playfield);
-            } else
-            {
-                mod.ToggleOffVisibility(drawableRuleset.Playfield);
-            }
-        }
-
-        private partial class SelectableModSwitchSmall : ModSwitchSmall
-        {
-            public SelectableModSwitchSmall(IMod mod)
-                : base(mod)
-            {}
-
-            protected override bool OnClick(ClickEvent e)
-            {
-                Active.Value = !Active.Value;
-                return true;
             }
         }
     }
