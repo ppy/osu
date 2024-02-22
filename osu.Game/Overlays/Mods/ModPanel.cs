@@ -77,12 +77,11 @@ namespace osu.Game.Overlays.Mods
         /// <seealso cref="ModState.Visible"/>
         public bool Visible => modState.Visible;
 
-        public override IEnumerable<LocalisableString> FilterTerms => new[]
+        public override IEnumerable<LocalisableString> FilterTerms => new LocalisableString[]
         {
             Mod.Name,
             Mod.Name.Replace(" ", string.Empty),
             Mod.Acronym,
-            Mod.Description
         };
 
         public override bool MatchingFilter
