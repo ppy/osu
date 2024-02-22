@@ -1,7 +1,6 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
@@ -20,6 +19,7 @@ using osu.Game.Graphics.Sprites;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Rulesets;
 using osu.Game.Rulesets.Mods;
+using osu.Game.Utils;
 using osuTK;
 
 namespace osu.Game.Overlays.Mods
@@ -169,7 +169,7 @@ namespace osu.Game.Overlays.Mods
             foreach (var mod in mods.Value.OfType<IApplicableToRate>())
                 rate = mod.ApplyToRate(0, rate);
 
-            bpmDisplay.Current.Value = (int)Math.Round(Math.Round(BeatmapInfo.Value.BPM) * rate);
+            bpmDisplay.Current.Value = FormatUtils.RoundBPM(BeatmapInfo.Value.BPM, rate);
 
             BeatmapDifficulty originalDifficulty = new BeatmapDifficulty(BeatmapInfo.Value.Difficulty);
 
