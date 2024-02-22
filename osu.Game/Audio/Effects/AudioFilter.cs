@@ -4,6 +4,7 @@
 using System.Diagnostics;
 using ManagedBass.Fx;
 using osu.Framework.Audio.Mixing;
+using osu.Framework.Caching;
 using osu.Framework.Graphics;
 
 namespace osu.Game.Audio.Effects
@@ -22,6 +23,8 @@ namespace osu.Game.Audio.Effects
 
         private bool isAttached;
 
+        private readonly Cached filterApplication = new Cached();
+
         private int cutoff;
 
         /// <summary>
@@ -36,7 +39,7 @@ namespace osu.Game.Audio.Effects
                     return;
 
                 cutoff = value;
-                updateFilter(cutoff);
+                filterApplication.Invalidate();
             }
         }
 
@@ -59,6 +62,17 @@ namespace osu.Game.Audio.Effects
             };
 
             Cutoff = getInitialCutoff(type);
+        }
+
+        protected override void Update()
+        {
+            base.Update();
+
+            if (!filterApplication.IsValid)
+            {
+                updateFilter(cutoff);
+                filterApplication.Validate();
+            }
         }
 
         private int getInitialCutoff(BQFType type)
