@@ -82,12 +82,12 @@ namespace osu.Game.Tests.Visual.Ranking
 
         private void loadPanel(ScoreInfo score) => AddStep("load panel", () =>
         {
-            Child = new SoloStatisticsPanel(score)
+            Child = new UserStatisticsPanel(score)
             {
                 RelativeSizeAxes = Axes.Both,
                 State = { Value = Visibility.Visible },
                 Score = { Value = score },
-                StatisticsUpdate =
+                DisplayedUserStatisticsUpdate =
                 {
                     Value = new SoloStatisticsUpdate(score, new UserStatistics
                     {

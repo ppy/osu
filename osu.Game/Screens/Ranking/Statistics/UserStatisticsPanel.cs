@@ -3,25 +3,43 @@
 
 using System.Collections.Generic;
 using System.Linq;
+using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Game.Beatmaps;
+using osu.Game.Extensions;
 using osu.Game.Online.Solo;
 using osu.Game.Scoring;
 using osu.Game.Screens.Ranking.Statistics.User;
 
 namespace osu.Game.Screens.Ranking.Statistics
 {
-    public partial class SoloStatisticsPanel : StatisticsPanel
+    public partial class UserStatisticsPanel : StatisticsPanel
     {
         private readonly ScoreInfo achievedScore;
 
-        public SoloStatisticsPanel(ScoreInfo achievedScore)
+        internal readonly Bindable<SoloStatisticsUpdate?> DisplayedUserStatisticsUpdate = new Bindable<SoloStatisticsUpdate?>();
+
+        private IBindable<SoloStatisticsUpdate?> latestGlobalStatisticsUpdate = null!;
+
+        public UserStatisticsPanel(ScoreInfo achievedScore)
         {
             this.achievedScore = achievedScore;
         }
 
-        public Bindable<SoloStatisticsUpdate?> StatisticsUpdate { get; } = new Bindable<SoloStatisticsUpdate?>();
+        [BackgroundDependencyLoader]
+        private void load(SoloStatisticsWatcher? soloStatisticsWatcher)
+        {
+            if (soloStatisticsWatcher != null)
+            {
+                latestGlobalStatisticsUpdate = soloStatisticsWatcher.LatestUpdate.GetBoundCopy();
+                latestGlobalStatisticsUpdate.BindValueChanged(update =>
+                {
+                    if (update.NewValue?.Score.MatchesOnlineID(achievedScore) == true)
+                        DisplayedUserStatisticsUpdate.Value = update.NewValue;
+                });
+            }
+        }
 
         protected override ICollection<StatisticItem> CreateStatisticItems(ScoreInfo newScore, IBeatmap playableBeatmap)
         {
@@ -37,7 +55,7 @@ namespace osu.Game.Screens.Ranking.Statistics
                     RelativeSizeAxes = Axes.X,
                     Anchor = Anchor.Centre,
                     Origin = Anchor.Centre,
-                    StatisticsUpdate = { BindTarget = StatisticsUpdate }
+                    StatisticsUpdate = { BindTarget = DisplayedUserStatisticsUpdate }
                 })).ToArray();
             }
 

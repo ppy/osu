@@ -61,6 +61,7 @@ namespace osu.Game.Screens.OnlinePlay.Playlists
             return new PlaylistsResultsScreen(score, Room.RoomID.Value.Value, PlaylistItem)
             {
                 AllowRetry = true,
+                ShowUserStatistics = true,
             };
         }
 
