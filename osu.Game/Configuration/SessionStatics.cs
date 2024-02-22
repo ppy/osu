@@ -21,6 +21,7 @@ namespace osu.Game.Configuration
         protected override void InitialiseDefaults()
         {
             SetDefault(Static.LoginOverlayDisplayed, false);
+            SetDefault(Static.RestartRequested, false);
             SetDefault(Static.MutedAudioNotificationShownOnce, false);
             SetDefault(Static.LowBatteryNotificationShownOnce, false);
             SetDefault(Static.FeaturedArtistDisclaimerShownOnce, false);
@@ -80,5 +81,10 @@ namespace osu.Game.Configuration
         /// Stores the local user's last score (can be completed or aborted).
         /// </summary>
         LastLocalUserScore,
+
+        /// <summary>
+        /// Whether the game is in the process of being restarted. This should always be the result of user intention to restart.
+        /// </summary>
+        RestartRequested
     }
 }
