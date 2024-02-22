@@ -2,6 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using NUnit.Framework;
+using osu.Framework.Extensions.IEnumerableExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Utils;
@@ -14,13 +15,13 @@ namespace osu.Game.Tests.Visual.Beatmaps
 {
     public partial class TestSceneDifficultyIcon : OsuTestScene
     {
-        private FillFlowContainer fill = null!;
+        private FillFlowContainer<DifficultyIcon> fill = null!;
 
         protected override void LoadComplete()
         {
             base.LoadComplete();
 
-            Child = fill = new FillFlowContainer
+            Child = fill = new FillFlowContainer<DifficultyIcon>
             {
                 AutoSizeAxes = Axes.Y,
                 Width = 300,
@@ -33,8 +34,6 @@ namespace osu.Game.Tests.Visual.Beatmaps
         [Test]
         public void CreateDifficultyIcon()
         {
-            DifficultyIcon difficultyIcon = null!;
-
             AddRepeatStep("create difficulty icon", () =>
             {
                 var rulesetInfo = new OsuRuleset().RulesetInfo;
@@ -47,15 +46,15 @@ namespace osu.Game.Tests.Visual.Beatmaps
                 beatmapInfo.StarRating = RNG.NextSingle(0, 10);
                 beatmapInfo.BPM = RNG.Next(60, 300);
 
-                fill.Add(difficultyIcon = new DifficultyIcon(beatmapInfo, rulesetInfo)
+                fill.Add(new DifficultyIcon(beatmapInfo, rulesetInfo)
                 {
                     Scale = new Vector2(2),
                 });
             }, 10);
 
-            AddStep("no tooltip", () => difficultyIcon.TooltipType = DifficultyIconTooltipType.None);
-            AddStep("basic tooltip", () => difficultyIcon.TooltipType = DifficultyIconTooltipType.StarRating);
-            AddStep("extended tooltip", () => difficultyIcon.TooltipType = DifficultyIconTooltipType.Extended);
+            AddStep("no tooltip", () => fill.ForEach(icon => icon.TooltipType = DifficultyIconTooltipType.None));
+            AddStep("basic tooltip", () => fill.ForEach(icon => icon.TooltipType = DifficultyIconTooltipType.StarRating));
+            AddStep("extended tooltip", () => fill.ForEach(icon => icon.TooltipType = DifficultyIconTooltipType.Extended));
         }
     }
 }
