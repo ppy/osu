@@ -18,8 +18,9 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
 
         private const double overlap_multiplier = 0.8;
 
-        public static double CalculateDenstityOf(OsuDifficultyHitObject currObj)
+        public static double EvaluateDenstityOf(DifficultyHitObject current)
         {
+            var currObj = (OsuDifficultyHitObject)current;
             double density = 0;
             double densityAnglesNerf = -2; // we have threshold of 2, so 2 or same angles won't be punished
 
@@ -34,8 +35,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
                 double loopDifficulty = currObj.OpacityAt(loopObj.BaseObject.StartTime, false);
 
                 // Small distances means objects may be cheesed, so it doesn't matter whether they are arranged confusingly.
-                // For HD: it's not subtracting anything cuz it's multiplied by the aim difficulty anyways.
-                loopDifficulty *= logistic((loopObj.MinimumJumpDistance - 60) / 10);
+                loopDifficulty *= logistic((loopObj.MinimumJumpDistance - 30) / 10);
 
                 // Reduce density bonus for this object if they're too apart in time
                 // Nerf starts on 1500ms and reaches maximum (*=0) on 3000ms
@@ -123,14 +123,14 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
 
             return screenOverlapDifficulty;
         }
-        public static double EvaluateDensityDifficultyOf(DifficultyHitObject current)
+        public static double EvaluateDifficultyOf(DifficultyHitObject current)
         {
             if (current.BaseObject is Spinner || current.Index == 0)
                 return 0;
 
             var currObj = (OsuDifficultyHitObject)current;
 
-            double pastObjectDifficultyInfluence = CalculateDenstityOf(currObj);
+            double pastObjectDifficultyInfluence = EvaluateDenstityOf(current);
             double screenOverlapDifficulty = CalculateOverlapDifficultyOf(currObj);
 
             double difficulty = Math.Pow(4 * Math.Log(Math.Max(1, pastObjectDifficultyInfluence)), 2.3);

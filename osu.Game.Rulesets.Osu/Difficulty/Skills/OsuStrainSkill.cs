@@ -35,6 +35,10 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
         /// </summary>
         protected virtual double DifficultyMultiplier => DEFAULT_DIFFICULTY_MULTIPLIER;
 
+        protected virtual double StrainDecayBase => 0.15;
+
+        protected double StrainDecay(double ms) => Math.Pow(StrainDecayBase, ms / 1000);
+
         protected OsuStrainSkill(Mod[] mods)
             : base(mods)
         {

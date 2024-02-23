@@ -16,18 +16,31 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
     public class ReadingLowAR : GraphSkill
     {
         private readonly List<double> difficulties = new List<double>();
-        private double skillMultiplier => 2;
+        private double skillMultiplier => 1.3;
+        private double aimComponentMultiplier => 0.7;
+        //private double skillMultiplier => 2;
 
         public ReadingLowAR(Mod[] mods)
             : base(mods)
         {
         }
 
+        private double strainDecayBase => 0.15;
+        private double strainDecay(double ms) => Math.Pow(strainDecayBase, ms / 1000);
+
+        private double currentDensityAimStrain = 0;
+
         public override void Process(DifficultyHitObject current)
         {
-            double currentDifficulty = ReadingEvaluator.EvaluateDensityDifficultyOf(current) * skillMultiplier;
+            double densityFactor = Math.Max(0, Math.Pow(ReadingEvaluator.EvaluateDenstityOf(current), 1.5) - 1);
+            // double density = Math.Max(0, ReadingEvaluator.EvaluateDenstityOf(current));
+            currentDensityAimStrain *= strainDecay(current.DeltaTime);
+            currentDensityAimStrain += densityFactor * AimEvaluator.EvaluateDifficultyOf(current, false) * aimComponentMultiplier;
 
-            difficulties.Add(currentDifficulty);
+            double densityReadingDifficulty = ReadingEvaluator.EvaluateDifficultyOf(current);
+            double totalDensityDifficulty = (currentDensityAimStrain + densityReadingDifficulty) * skillMultiplier;
+
+            difficulties.Add(totalDensityDifficulty);
 
             if (current.Index == 0)
                 CurrentSectionEnd = Math.Ceiling(current.StartTime / SectionLength) * SectionLength;
@@ -39,7 +52,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
                 CurrentSectionEnd += SectionLength;
             }
 
-            CurrentSectionPeak = Math.Max(currentDifficulty, CurrentSectionPeak);
+            CurrentSectionPeak = Math.Max(totalDensityDifficulty, CurrentSectionPeak);
         }
 
         private double reducedNoteCount => 5;
@@ -71,6 +84,8 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
 
             return difficulty;
         }
+
+        public static double DifficultyToPerformance(double difficulty) => Math.Pow(difficulty, 3) * 10.0;
     }
 
     public class ReadingHidden : OsuStrainSkill
@@ -82,15 +97,12 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
 
         private double currentStrain;
         private double skillMultiplier => 5;
-        private double strainDecayBase => 0.15;
 
-        private double strainDecay(double ms) => Math.Pow(strainDecayBase, ms / 1000);
-
-        protected override double CalculateInitialStrain(double time, DifficultyHitObject current) => currentStrain * strainDecay(time - current.Previous(0).StartTime);
+        protected override double CalculateInitialStrain(double time, DifficultyHitObject current) => currentStrain * StrainDecay(time - current.Previous(0).StartTime);
 
         protected override double StrainValueAt(DifficultyHitObject current)
         {
-            currentStrain *= strainDecay(current.DeltaTime);
+            currentStrain *= StrainDecay(current.DeltaTime);
 
             // We're not using slider aim because we assuming that HD doesn't makes sliders harder (what is not true, but we will ignore this for now)
             double hiddenDifficulty = AimEvaluator.EvaluateDifficultyOf(current, false);

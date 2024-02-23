@@ -261,7 +261,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             if (score.Mods.Any(m => m is OsuModTouchDevice))
                 rawReading = Math.Pow(rawReading, 0.8);
 
-            double readingValue = Math.Pow(rawReading, 2.5) * 17.0;
+            double readingValue = ReadingLowAR.DifficultyToPerformance(rawReading);
 
             // Penalize misses by assessing # of misses relative to the total # of objects. Default a 3% reduction for any # of misses.
             if (effectiveMissCount > 0)

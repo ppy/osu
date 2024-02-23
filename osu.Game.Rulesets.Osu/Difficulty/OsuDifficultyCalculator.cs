@@ -71,7 +71,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             if (mods.Any(h => h is OsuModFlashlight))
                 baseFlashlightPerformance = Math.Pow(flashlightRating, 2.0) * 25.0;
 
-            double baseReadingLowARPerformance = Math.Pow(readingLowARRating, 2.5) * 17.0;
+            double baseReadingLowARPerformance = ReadingLowAR.DifficultyToPerformance(readingLowARRating);
             double baseReadingHighARPerformance = OsuStrainSkill.DifficultyToPerformance(readingHighARRating);
             double baseReadingARPerformance = Math.Pow(Math.Pow(baseReadingLowARPerformance, SUM_POWER) + Math.Pow(baseReadingHighARPerformance, SUM_POWER), 1.0 / SUM_POWER);
 

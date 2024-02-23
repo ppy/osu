@@ -123,26 +123,9 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
         // https://www.desmos.com/calculator/hbj7swzlth
         public static double GetDifficulty(double preempt)
         {
-            double value = Math.Pow(3, 3 - 0.01 * preempt); // 1 for 300ms, 0.25 for 400ms, 0.0625 for 500ms
+            double value = Math.Pow(3.5, 3 - 0.01 * preempt); // 1 for 300ms, 0.25 for 400ms, 0.0625 for 500ms
             value = softmin(value, 2, 1.7); // use softmin to achieve full-memory cap, 2 times more than AR11 (300ms)
             return value;
-        }
-
-        // This is very accurate on preempt > 300ms, breaking starting somewhere around 120ms
-        public static double GetPreempt(double difficulty)
-        {
-            double fixCoef = difficulty / GetDifficulty(highArCurveReversed(difficulty));
-            return highArCurveReversed(difficulty * fixCoef);
-        }
-
-        // This is an approximation cuz high AR curve is unsolvable
-        // https://www.desmos.com/calculator/n9vk18bcyh
-        private static double highArCurveReversed(double value)
-        {
-            double helperValue = value / Math.Pow(1 - Math.Pow(1.7, value - 2), 0.45);
-            double preempt = -(Math.Log(helperValue, 3) - 3) / 0.01;
-
-            return preempt;
         }
 
         // We are using mutiply and divide instead of add and subtract, so values won't be negative

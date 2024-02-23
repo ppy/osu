@@ -29,12 +29,9 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
 
         private readonly List<double> difficulties = new List<double>();
         private int objectsCount = 0;
-        private double preempt = -1;
 
         public override void Process(DifficultyHitObject current)
         {
-            if (preempt < 0) preempt = ((OsuDifficultyHitObject)current).Preempt;
-
             aimComponent.Process(current);
             speedComponent.Process(current);
 
@@ -97,17 +94,14 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
         private bool adjustHighAR;
         private double currentStrain;
 
-        private double skillMultiplier => 17.8;
-        private double defaultValueMultiplier => 30;
-        private double strainDecayBase => 0.15;
+        private double skillMultiplier => 17;
+        private double defaultValueMultiplier => 50;
 
-        private double strainDecay(double ms) => Math.Pow(strainDecayBase, ms / 1000);
-
-        protected override double CalculateInitialStrain(double time, DifficultyHitObject current) => currentStrain * strainDecay(time - current.Previous(0).StartTime);
+        protected override double CalculateInitialStrain(double time, DifficultyHitObject current) => currentStrain * StrainDecay(time - current.Previous(0).StartTime);
 
         protected override double StrainValueAt(DifficultyHitObject current)
         {
-            currentStrain *= strainDecay(current.DeltaTime);
+            currentStrain *= StrainDecay(current.DeltaTime);
 
             double aimDifficulty = AimEvaluator.EvaluateDifficultyOf(current, true);
             double readingDifficulty = ReadingHighAREvaluator.EvaluateDifficultyOf(current, adjustHighAR);
@@ -122,8 +116,8 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
 
     public class HighARSpeedComponent : OsuStrainSkill
     {
-        private double skillMultiplier => 850;
-        private double strainDecayBase => 0.3;
+        private double skillMultiplier => 820;
+        protected override double StrainDecayBase => 0.3;
 
         private double currentStrain;
         private double currentRhythm;
@@ -133,15 +127,13 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
         {
         }
 
-        private double strainDecay(double ms) => Math.Pow(strainDecayBase, ms / 1000);
-
-        protected override double CalculateInitialStrain(double time, DifficultyHitObject current) => (currentStrain * currentRhythm) * strainDecay(time - current.Previous(0).StartTime);
+        protected override double CalculateInitialStrain(double time, DifficultyHitObject current) => (currentStrain * currentRhythm) * StrainDecay(time - current.Previous(0).StartTime);
 
         protected override double StrainValueAt(DifficultyHitObject current)
         {
             OsuDifficultyHitObject currODHO = (OsuDifficultyHitObject)current;
 
-            currentStrain *= strainDecay(currODHO.StrainTime);
+            currentStrain *= StrainDecay(currODHO.StrainTime);
 
             double speedDifficulty = SpeedEvaluator.EvaluateDifficultyOf(current) * skillMultiplier;
             speedDifficulty *= Math.Pow(ReadingHighAREvaluator.EvaluateDifficultyOf(current, false), 2);
