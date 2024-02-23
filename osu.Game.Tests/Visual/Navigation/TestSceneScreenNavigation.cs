@@ -4,6 +4,7 @@
 #nullable disable
 
 using System;
+using System.IO;
 using System.Linq;
 using NUnit.Framework;
 using osu.Framework.Allocation;
@@ -18,6 +19,7 @@ using osu.Framework.Testing;
 using osu.Game.Beatmaps;
 using osu.Game.Collections;
 using osu.Game.Configuration;
+using osu.Game.Extensions;
 using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Online.API;
@@ -219,6 +221,67 @@ namespace osu.Game.Tests.Visual.Navigation
             PushAndConfirm(() => songSelect = new TestPlaySongSelect());
             AddStep("Show mods overlay", () => InputManager.Key(Key.F1));
             AddAssert("Overlay was shown", () => songSelect.ModSelectOverlay.State.Value == Visibility.Visible);
+        }
+
+        [Test]
+        public void TestAttemptPlayBeatmapWrongHashFails()
+        {
+            Screens.Select.SongSelect songSelect = null;
+
+            AddStep("import beatmap", () => BeatmapImportHelper.LoadQuickOszIntoOsu(Game).GetResultSafely());
+            PushAndConfirm(() => songSelect = new TestPlaySongSelect());
+            AddUntilStep("wait for song select", () => songSelect.BeatmapSetsLoaded);
+
+            AddUntilStep("wait for selected", () => !Game.Beatmap.IsDefault);
+
+            AddStep("change beatmap files", () =>
+            {
+                foreach (var file in Game.Beatmap.Value.BeatmapSetInfo.Files.Where(f => Path.GetExtension(f.Filename) == ".osu"))
+                {
+                    using (var stream = Game.Storage.GetStream(Path.Combine("files", file.File.GetStoragePath()), FileAccess.ReadWrite))
+                        stream.WriteByte(0);
+                }
+            });
+
+            AddStep("invalidate cache", () =>
+            {
+                ((IWorkingBeatmapCache)Game.BeatmapManager).Invalidate(Game.Beatmap.Value.BeatmapSetInfo);
+            });
+
+            AddStep("select next difficulty", () => InputManager.Key(Key.Down));
+            AddStep("press enter", () => InputManager.Key(Key.Enter));
+
+            AddUntilStep("wait for player loader", () => Game.ScreenStack.CurrentScreen is PlayerLoader);
+            AddUntilStep("wait for song select", () => songSelect.IsCurrentScreen());
+        }
+
+        [Test]
+        public void TestAttemptPlayBeatmapMissingFails()
+        {
+            Screens.Select.SongSelect songSelect = null;
+
+            AddStep("import beatmap", () => BeatmapImportHelper.LoadQuickOszIntoOsu(Game).GetResultSafely());
+            PushAndConfirm(() => songSelect = new TestPlaySongSelect());
+            AddUntilStep("wait for song select", () => songSelect.BeatmapSetsLoaded);
+
+            AddUntilStep("wait for selected", () => !Game.Beatmap.IsDefault);
+
+            AddStep("delete beatmap files", () =>
+            {
+                foreach (var file in Game.Beatmap.Value.BeatmapSetInfo.Files.Where(f => Path.GetExtension(f.Filename) == ".osu"))
+                    Game.Storage.Delete(Path.Combine("files", file.File.GetStoragePath()));
+            });
+
+            AddStep("invalidate cache", () =>
+            {
+                ((IWorkingBeatmapCache)Game.BeatmapManager).Invalidate(Game.Beatmap.Value.BeatmapSetInfo);
+            });
+
+            AddStep("select next difficulty", () => InputManager.Key(Key.Down));
+            AddStep("press enter", () => InputManager.Key(Key.Enter));
+
+            AddUntilStep("wait for player loader", () => Game.ScreenStack.CurrentScreen is PlayerLoader);
+            AddUntilStep("wait for song select", () => songSelect.IsCurrentScreen());
         }
 
         [Test]
