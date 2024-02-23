@@ -1,3 +1,6 @@
+// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
+
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
@@ -61,8 +64,10 @@ namespace osu.Game.Rulesets.Osu.Skinning.Default
             {
                 case OsuAction.LeftButton:
                     return (Colour4.Orange, 20, true);
+
                 case OsuAction.RightButton:
                     return (Colour4.LightGreen, 20, true);
+
                 default:
                     return (Colour4.Gray.Opacity(0.3F), 8, false);
             }

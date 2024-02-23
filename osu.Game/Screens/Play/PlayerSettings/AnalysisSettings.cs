@@ -7,12 +7,12 @@ namespace osu.Game.Screens.Play.PlayerSettings
 {
     public partial class AnalysisSettings : PlayerSettingsGroup
     {
-        protected DrawableRuleset drawableRuleset;
+        protected DrawableRuleset DrawableRuleset;
 
         public AnalysisSettings(DrawableRuleset drawableRuleset)
             : base("Analysis Settings")
         {
-            this.drawableRuleset = drawableRuleset;
+            DrawableRuleset = drawableRuleset;
         }
     }
 }

@@ -358,6 +358,6 @@ namespace osu.Game.Rulesets.Osu
             return adjustedDifficulty;
         }
 
-        public override AnalysisSettings? CreateAnalysisSettings(DrawableRuleset drawableRuleset) => new OsuAnalysisSettings(drawableRuleset);
+        public override AnalysisSettings CreateAnalysisSettings(DrawableRuleset drawableRuleset) => new OsuAnalysisSettings(drawableRuleset);
     }
 }

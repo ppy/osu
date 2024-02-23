@@ -25,12 +25,7 @@ namespace osu.Game.Rulesets.Osu.UI
     {
         private Vector2 lastMousePosition;
         private Vector2? lastlastMousePosition;
-        private double? timePreempt;
-        private double TimePreempt
-        {
-            get => timePreempt ?? default_time_preempt;
-            set => timePreempt = value;
-        }
+        private double timePreempt;
 
         public Bindable<bool> HitMarkerEnabled = new BindableBool();
         public Bindable<bool> AimMarkersEnabled = new BindableBool();
@@ -45,6 +40,7 @@ namespace osu.Game.Rulesets.Osu.UI
         public HitMarkerContainer(HitObjectContainer hitObjectContainer)
         {
             this.hitObjectContainer = hitObjectContainer;
+            timePreempt = default_time_preempt;
         }
 
         public bool OnPressed(KeyBindingPressEvent<OsuAction> e)
@@ -52,7 +48,7 @@ namespace osu.Game.Rulesets.Osu.UI
             if (HitMarkerEnabled.Value && (e.Action == OsuAction.LeftButton || e.Action == OsuAction.RightButton))
             {
                 updateTimePreempt();
-                AddMarker(e.Action);
+                addMarker(e.Action);
             }
 
             return false;
@@ -70,33 +66,35 @@ namespace osu.Game.Rulesets.Osu.UI
             if (AimMarkersEnabled.Value)
             {
                 updateTimePreempt();
-                AddMarker(null);
+                addMarker(null);
             }
 
             if (AimLinesEnabled.Value && lastlastMousePosition != null && lastlastMousePosition != lastMousePosition)
             {
                 if (!AimMarkersEnabled.Value)
                     updateTimePreempt();
-                Add(new AimLineDrawable((Vector2)lastlastMousePosition, lastMousePosition, TimePreempt));
+                Add(new AimLineDrawable((Vector2)lastlastMousePosition, lastMousePosition, timePreempt));
             }
 
             return base.OnMouseMove(e);
         }
 
-        private void AddMarker(OsuAction? action)
+        private void addMarker(OsuAction? action)
         {
             var component = OsuSkinComponents.AimMarker;
-            switch(action)
+
+            switch (action)
             {
                 case OsuAction.LeftButton:
                     component = OsuSkinComponents.HitMarkerLeft;
                     break;
+
                 case OsuAction.RightButton:
                     component = OsuSkinComponents.HitMarkerRight;
                     break;
             }
 
-            Add(new HitMarkerDrawable(action, component, TimePreempt)
+            Add(new HitMarkerDrawable(action, component, timePreempt)
             {
                 Position = lastMousePosition,
                 Origin = Anchor.Centre,
@@ -110,13 +108,14 @@ namespace osu.Game.Rulesets.Osu.UI
             if (hitObject == null)
                 return;
 
-            TimePreempt = hitObject.TimePreempt;
+            timePreempt = hitObject.TimePreempt;
         }
 
         private OsuHitObject? getHitObject()
         {
             foreach (var dho in hitObjectContainer.Objects)
                 return (dho as DrawableOsuHitObject)?.HitObject;
+
             return null;
         }
 
@@ -141,7 +140,7 @@ namespace osu.Game.Rulesets.Osu.UI
                 LifetimeStart = Time.Current;
                 LifetimeEnd = LifetimeStart + lifetimeDuration;
 
-                Scheduler.AddDelayed(() => 
+                Scheduler.AddDelayed(() =>
                 {
                     this.FadeOut(fadeOutTime);
                 }, lifetimeDuration - fadeOutTime);
@@ -186,7 +185,7 @@ namespace osu.Game.Rulesets.Osu.UI
                 LifetimeStart = Time.Current;
                 LifetimeEnd = LifetimeStart + lifetimeDuration;
 
-                Scheduler.AddDelayed(() => 
+                Scheduler.AddDelayed(() =>
                 {
                     this.FadeOut(fadeOutTime);
                 }, lifetimeDuration - fadeOutTime);

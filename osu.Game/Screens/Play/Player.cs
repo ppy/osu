@@ -115,7 +115,7 @@ namespace osu.Game.Screens.Play
 
         public GameplayState GameplayState { get; private set; }
 
-        protected Ruleset ruleset;
+        private Ruleset ruleset;
 
         public BreakOverlay BreakOverlay;
 

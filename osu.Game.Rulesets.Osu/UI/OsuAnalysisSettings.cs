@@ -1,14 +1,9 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
-using osu.Framework.Graphics.Containers;
-using osu.Framework.Input.Events;
-using osu.Game.Graphics.Containers;
 using osu.Game.Localisation;
-using osu.Game.Rulesets.Osu.Mods;
 using osu.Game.Rulesets.UI;
 using osu.Game.Screens.Play.PlayerSettings;
 
@@ -16,7 +11,7 @@ namespace osu.Game.Rulesets.Osu.UI
 {
     public partial class OsuAnalysisSettings : AnalysisSettings
     {
-        protected new DrawableOsuRuleset drawableRuleset => (DrawableOsuRuleset)base.drawableRuleset;
+        protected new DrawableOsuRuleset DrawableRuleset => (DrawableOsuRuleset)base.DrawableRuleset;
 
         private readonly PlayerCheckbox hitMarkerToggle;
         private readonly PlayerCheckbox aimMarkerToggle;
@@ -37,9 +32,9 @@ namespace osu.Game.Rulesets.Osu.UI
 
         protected override void LoadComplete()
         {
-            drawableRuleset.Playfield.MarkersContainer.HitMarkerEnabled.BindTo(hitMarkerToggle.Current);
-            drawableRuleset.Playfield.MarkersContainer.AimMarkersEnabled.BindTo(aimMarkerToggle.Current);
-            drawableRuleset.Playfield.MarkersContainer.AimLinesEnabled.BindTo(aimLinesToggle.Current);
+            DrawableRuleset.Playfield.MarkersContainer.HitMarkerEnabled.BindTo(hitMarkerToggle.Current);
+            DrawableRuleset.Playfield.MarkersContainer.AimMarkersEnabled.BindTo(aimMarkerToggle.Current);
+            DrawableRuleset.Playfield.MarkersContainer.AimLinesEnabled.BindTo(aimLinesToggle.Current);
             hideCursorToggle.Current.BindValueChanged(onCursorToggle);
         }
 
@@ -48,10 +43,11 @@ namespace osu.Game.Rulesets.Osu.UI
             // this only hides half the cursor
             if (hide.NewValue)
             {
-                drawableRuleset.Playfield.Cursor.FadeOut();
-            } else
+                DrawableRuleset.Playfield.Cursor.FadeOut();
+            }
+            else
             {
-                drawableRuleset.Playfield.Cursor.FadeIn();
+                DrawableRuleset.Playfield.Cursor.FadeIn();
             }
         }
     }
