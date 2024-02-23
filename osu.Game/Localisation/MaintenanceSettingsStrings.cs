@@ -105,6 +105,11 @@ namespace osu.Game.Localisation
         public static LocalisableString DeletedAllCollections => new TranslatableString(getKey(@"deleted_all_collections"), @"Deleted all collections!");
 
         /// <summary>
+        /// "No collections found to delete!"
+        /// </summary>
+        public static LocalisableString NoCollectionsFoundToDelete => new TranslatableString(getKey(@"no_collections_found_to_delete"), @"No collections found to delete!");
+
+        /// <summary>
         /// "Deleted all mod presets!"
         /// </summary>
         public static LocalisableString DeletedAllModPresets => new TranslatableString(getKey(@"deleted_all_mod_presets"), @"Deleted all mod presets!");
