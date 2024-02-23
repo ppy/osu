@@ -130,13 +130,6 @@ namespace osu.Game.Overlays.Mods
         private RankingInformationDisplay? rankingInformationDisplay;
         private BeatmapAttributesDisplay? beatmapAttributesDisplay;
 
-        protected virtual BeatmapAttributesDisplay GetBeatmapAttributesDisplay => new BeatmapAttributesDisplay
-        {
-            Anchor = Anchor.BottomRight,
-            Origin = Anchor.BottomRight,
-            BeatmapInfo = { Value = Beatmap?.BeatmapInfo }
-        };
-
         protected ShearedButton BackButton { get; private set; } = null!;
         protected ShearedToggleButton? CustomisationButton { get; private set; }
         protected SelectAllModsButton? SelectAllModsButton { get; set; }
@@ -283,7 +276,12 @@ namespace osu.Game.Overlays.Mods
                             Anchor = Anchor.BottomRight,
                             Origin = Anchor.BottomRight
                         },
-                        beatmapAttributesDisplay = GetBeatmapAttributesDisplay
+                        beatmapAttributesDisplay = CreateBeatmapAttributesDisplay().With(b =>
+                        {
+                            b.Anchor = Anchor.BottomRight;
+                            b.Origin = Anchor.BottomRight;
+                            b.BeatmapInfo.Value = Beatmap?.BeatmapInfo;
+                        }),
                     }
                 });
             }
@@ -292,6 +290,8 @@ namespace osu.Game.Overlays.Mods
 
             textSearchStartsActive = configManager.GetBindable<bool>(OsuSetting.ModSelectTextSearchStartsActive);
         }
+
+        protected virtual BeatmapAttributesDisplay CreateBeatmapAttributesDisplay() => new BeatmapAttributesDisplay();
 
         public override void Hide()
         {
