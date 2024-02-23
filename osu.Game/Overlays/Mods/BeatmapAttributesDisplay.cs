@@ -185,7 +185,7 @@ namespace osu.Game.Overlays.Mods
             RightContent.FadeTo(Collapsed.Value && !IsHovered ? 0 : 1, transition_duration, Easing.OutQuint);
         }
 
-        public partial class BPMDisplay : RollingCounter<double>
+        public partial class BPMDisplay : RollingCounter<int>
         {
             protected override double RollingDuration => 250;
 
