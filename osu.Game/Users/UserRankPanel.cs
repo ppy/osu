@@ -81,117 +81,98 @@ namespace osu.Game.Users
                             },
                             new GridContainer
                             {
-                                AutoSizeAxes = Axes.Y,
-                                RelativeSizeAxes = Axes.X,
+                                RelativeSizeAxes = Axes.Both,
+                                Padding = new MarginPadding(padding),
                                 ColumnDimensions = new[]
                                 {
-                                    new Dimension(GridSizeMode.Absolute, padding),
                                     new Dimension(GridSizeMode.AutoSize),
                                     new Dimension(),
-                                    new Dimension(GridSizeMode.Absolute, padding),
                                 },
                                 RowDimensions = new[]
                                 {
-                                    new Dimension(GridSizeMode.Absolute, padding),
-                                    new Dimension(GridSizeMode.AutoSize),
+                                    new Dimension()
                                 },
                                 Content = new[]
                                 {
-                                    new[]
+                                    new Drawable[]
                                     {
-                                        // padding
-                                        Empty(),
-                                        Empty(),
-                                        Empty(),
-                                        Empty()
-                                    },
-                                    new[]
-                                    {
-                                        Empty(), // padding
                                         CreateAvatar().With(avatar =>
                                         {
                                             avatar.Size = new Vector2(60);
                                             avatar.Masking = true;
                                             avatar.CornerRadius = 6;
                                         }),
-                                        new Container
+                                        new GridContainer
                                         {
                                             RelativeSizeAxes = Axes.Both,
                                             Padding = new MarginPadding { Left = padding },
-                                            Child = new GridContainer
+                                            ColumnDimensions = new[]
                                             {
-                                                RelativeSizeAxes = Axes.Both,
-                                                ColumnDimensions = new[]
+                                                new Dimension()
+                                            },
+                                            RowDimensions = new[]
+                                            {
+                                                new Dimension(GridSizeMode.AutoSize),
+                                                new Dimension()
+                                            },
+                                            Content = new[]
+                                            {
+                                                new Drawable[]
                                                 {
-                                                    new Dimension()
-                                                },
-                                                RowDimensions = new[]
-                                                {
-                                                    new Dimension(GridSizeMode.AutoSize),
-                                                    new Dimension()
-                                                },
-                                                Content = new[]
-                                                {
-                                                    new Drawable[]
+                                                    details = new FillFlowContainer
                                                     {
-                                                        details = new FillFlowContainer
+                                                        AutoSizeAxes = Axes.Both,
+                                                        Direction = FillDirection.Horizontal,
+                                                        Spacing = new Vector2(6),
+                                                        Children = new Drawable[]
                                                         {
-                                                            AutoSizeAxes = Axes.Both,
-                                                            Direction = FillDirection.Horizontal,
-                                                            Spacing = new Vector2(6),
-                                                            Children = new Drawable[]
-                                                            {
-                                                                CreateFlag(),
-                                                                // supporter icon is being added later
-                                                            }
+                                                            CreateFlag(),
+                                                            // supporter icon is being added later
                                                         }
-                                                    },
-                                                    new Drawable[]
-                                                    {
-                                                        CreateUsername().With(username =>
-                                                        {
-                                                            username.Anchor = Anchor.CentreLeft;
-                                                            username.Origin = Anchor.CentreLeft;
-                                                        })
                                                     }
+                                                },
+                                                new Drawable[]
+                                                {
+                                                    CreateUsername().With(username =>
+                                                    {
+                                                        username.Anchor = Anchor.CentreLeft;
+                                                        username.Origin = Anchor.CentreLeft;
+                                                    })
                                                 }
                                             }
-                                        },
-                                        Empty() // padding
+                                        }
                                     }
                                 }
                             }
                         }
                     },
-                    new Container
+                    new GridContainer
                     {
                         Name = "Bottom content",
                         Margin = new MarginPadding { Top = main_content_height },
                         RelativeSizeAxes = Axes.X,
                         AutoSizeAxes = Axes.Y,
                         Padding = new MarginPadding { Left = 80, Vertical = padding },
-                        Child = new GridContainer
+                        ColumnDimensions = new[]
                         {
-                            RelativeSizeAxes = Axes.X,
-                            AutoSizeAxes = Axes.Y,
-                            ColumnDimensions = new[]
+                            new Dimension(),
+                            new Dimension()
+                        },
+                        RowDimensions = new[] { new Dimension(GridSizeMode.AutoSize) },
+                        Content = new[]
+                        {
+                            new Drawable[]
                             {
-                                new Dimension(),
-                                new Dimension()
-                            },
-                            RowDimensions = new[] { new Dimension(GridSizeMode.AutoSize) },
-                            Content = new[]
-                            {
-                                new Drawable[]
+                                globalRankDisplay = new ProfileValueDisplay(true)
                                 {
-                                    globalRankDisplay = new ProfileValueDisplay(true)
-                                    {
-                                        Title = UsersStrings.ShowRankGlobalSimple,
-                                    },
-                                    countryRankDisplay = new ProfileValueDisplay(true)
-                                    {
-                                        Title = UsersStrings.ShowRankCountrySimple,
-                                    }
+                                    Title = UsersStrings.ShowRankGlobalSimple,
+                                    // TODO: implement highest rank tooltip
+                                    // `RankHighest` resides in `APIUser`, but `api.LocalUser` doesn't update
+                                    // maybe move to `UserStatistics` in api, so `SoloStatisticsWatcher` can update the value
+                                },
+                                countryRankDisplay = new ProfileValueDisplay(true)
+                                {
+                                    Title = UsersStrings.ShowRankCountrySimple,
                                 }
                             }
                         }

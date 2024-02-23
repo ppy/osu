@@ -50,7 +50,6 @@ using osu.Game.Online.API;
 using osu.Game.Online.Chat;
 using osu.Game.Online.Metadata;
 using osu.Game.Online.Multiplayer;
-using osu.Game.Online.Solo;
 using osu.Game.Online.Spectator;
 using osu.Game.Overlays;
 using osu.Game.Overlays.Settings;
@@ -207,7 +206,6 @@ namespace osu.Game
         protected MultiplayerClient MultiplayerClient { get; private set; }
 
         private MetadataClient metadataClient;
-        private SoloStatisticsWatcher soloStatisticsWatcher;
 
         private RealmAccess realm;
 
@@ -328,7 +326,6 @@ namespace osu.Game
             dependencies.CacheAs(SpectatorClient = new OnlineSpectatorClient(endpoints));
             dependencies.CacheAs(MultiplayerClient = new OnlineMultiplayerClient(endpoints));
             dependencies.CacheAs(metadataClient = new OnlineMetadataClient(endpoints));
-            dependencies.CacheAs(soloStatisticsWatcher = new SoloStatisticsWatcher());
 
             base.Content.Add(new BeatmapOnlineChangeIngest(beatmapUpdater, realm, metadataClient));
 
@@ -371,7 +368,6 @@ namespace osu.Game
             base.Content.Add(SpectatorClient);
             base.Content.Add(MultiplayerClient);
             base.Content.Add(metadataClient);
-            base.Content.Add(soloStatisticsWatcher);
 
             base.Content.Add(rulesetConfigCache);
 

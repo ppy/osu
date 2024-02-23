@@ -545,7 +545,7 @@ namespace osu.Game.Screens.Play
 
                 if (playable.HitObjects.Count == 0)
                 {
-                    Logger.Log("Beatmap contains no hit objects!", level: LogLevel.Error);
+                    Logger.Log("Beatmap contains no hit objects!", level: LogLevel.Important);
                     return null;
                 }
             }

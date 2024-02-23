@@ -137,6 +137,11 @@ namespace osu.Game.Tests.Visual.Online
                 @"top_ranks",
                 @"medals"
             },
+            RankHighest = new APIUser.UserRankHighest
+            {
+                Rank = 1,
+                UpdatedAt = DateTimeOffset.Now,
+            },
             Statistics = new UserStatistics
             {
                 IsRanked = true,
@@ -206,6 +211,12 @@ namespace osu.Game.Tests.Visual.Online
                 Total = 50
             },
             SupportLevel = 2,
+            Location = "Somewhere",
+            Interests = "Rhythm games",
+            Occupation = "Gamer",
+            Twitter = "test_user",
+            Discord = "test_user",
+            Website = "https://google.com",
         };
     }
 }
