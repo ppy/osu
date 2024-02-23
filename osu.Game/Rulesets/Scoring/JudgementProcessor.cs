@@ -149,7 +149,7 @@ namespace osu.Game.Rulesets.Scoring
 
             foreach (var obj in EnumerateHitObjects(beatmap))
             {
-                var judgement = obj.CreateJudgement();
+                var judgement = obj.Judgement;
 
                 var result = CreateResult(obj, judgement);
                 if (result == null)
