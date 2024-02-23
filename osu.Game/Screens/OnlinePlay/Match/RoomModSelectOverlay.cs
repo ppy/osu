@@ -6,7 +6,6 @@ using System.Diagnostics;
 using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
-using osu.Framework.Graphics;
 using osu.Game.Online.Rooms;
 using osu.Game.Overlays;
 using osu.Game.Overlays.Mods;
@@ -27,13 +26,6 @@ namespace osu.Game.Screens.OnlinePlay.Match
 
         [Resolved]
         private RulesetStore rulesets { get; set; } = null!;
-
-        protected override BeatmapAttributesDisplay GetBeatmapAttributesDisplay => new RoomBeatmapAttributesDisplay
-        {
-            Anchor = Anchor.BottomRight,
-            Origin = Anchor.BottomRight,
-            BeatmapInfo = { Value = Beatmap?.BeatmapInfo }
-        };
 
         private readonly List<Mod> roomMods = new List<Mod>();
 
@@ -57,37 +49,39 @@ namespace osu.Game.Screens.OnlinePlay.Match
         }
 
         protected override IEnumerable<Mod> AllSelectedMods => roomMods.Concat(base.AllSelectedMods);
-    }
 
-    public partial class RoomBeatmapAttributesDisplay : BeatmapAttributesDisplay
-    {
-        [Resolved(CanBeNull = true)]
-        private IBindable<PlaylistItem>? selectedItem { get; set; }
+        protected override BeatmapAttributesDisplay CreateBeatmapAttributesDisplay() => new RoomBeatmapAttributesDisplay();
 
-        [Resolved]
-        private RulesetStore rulesets { get; set; } = null!;
-
-        private readonly List<Mod> roomMods = new List<Mod>();
-
-        protected override void LoadComplete()
+        private partial class RoomBeatmapAttributesDisplay : BeatmapAttributesDisplay
         {
-            base.LoadComplete();
+            [Resolved(CanBeNull = true)]
+            private IBindable<PlaylistItem>? selectedItem { get; set; }
 
-            selectedItem?.BindValueChanged(_ =>
+            [Resolved]
+            private RulesetStore rulesets { get; set; } = null!;
+
+            private readonly List<Mod> roomMods = new List<Mod>();
+
+            protected override void LoadComplete()
             {
-                roomMods.Clear();
+                base.LoadComplete();
 
-                if (selectedItem?.Value != null)
+                selectedItem?.BindValueChanged(_ =>
                 {
-                    var rulesetInstance = rulesets.GetRuleset(selectedItem.Value.RulesetID)?.CreateInstance();
-                    Debug.Assert(rulesetInstance != null);
-                    roomMods.AddRange(selectedItem.Value.RequiredMods.Select(m => m.ToMod(rulesetInstance)));
-                }
+                    roomMods.Clear();
 
-                Mods.TriggerChange();
-            });
+                    if (selectedItem?.Value != null)
+                    {
+                        var rulesetInstance = rulesets.GetRuleset(selectedItem.Value.RulesetID)?.CreateInstance();
+                        Debug.Assert(rulesetInstance != null);
+                        roomMods.AddRange(selectedItem.Value.RequiredMods.Select(m => m.ToMod(rulesetInstance)));
+                    }
+
+                    Mods.TriggerChange();
+                });
+            }
+
+            protected override IEnumerable<Mod> SelectedMods => roomMods.Concat(base.SelectedMods);
         }
-
-        protected override IEnumerable<Mod> SelectedMods => roomMods.Concat(base.SelectedMods);
     }
 }
