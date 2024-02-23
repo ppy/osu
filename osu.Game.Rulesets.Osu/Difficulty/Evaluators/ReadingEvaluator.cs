@@ -3,10 +3,10 @@
 
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using osu.Framework.Extensions.ObjectExtensions;
 using osu.Game.Rulesets.Difficulty.Preprocessing;
 using osu.Game.Rulesets.Osu.Difficulty.Preprocessing;
-using osu.Game.Rulesets.Osu.Mods;
 using osu.Game.Rulesets.Osu.Objects;
 
 namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
@@ -20,23 +20,90 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
 
         public static double CalculateDenstityOf(OsuDifficultyHitObject currObj)
         {
-            double pastObjectDifficultyInfluence = 0;
+            double density = 0;
+            double densityAnglesNerf = -2; // we have threshold of 2, so 2 or same angles won't be punished
 
-            foreach (var loopObj in retrievePastVisibleObjects(currObj))
+            OsuDifficultyHitObject? prevObj0 = null;
+            OsuDifficultyHitObject? prevObj1 = null;
+            OsuDifficultyHitObject? prevObj2 = null;
+
+            double prevConstantAngle = 0;
+
+            foreach (var loopObj in retrievePastVisibleObjects(currObj).Reverse())
             {
                 double loopDifficulty = currObj.OpacityAt(loopObj.BaseObject.StartTime, false);
 
                 // Small distances means objects may be cheesed, so it doesn't matter whether they are arranged confusingly.
+                // For HD: it's not subtracting anything cuz it's multiplied by the aim difficulty anyways.
                 loopDifficulty *= logistic((loopObj.MinimumJumpDistance - 60) / 10);
 
-                //double timeBetweenCurrAndLoopObj = (currObj.BaseObject.StartTime - loopObj.BaseObject.StartTime) / clockRateEstimate;
+                // Reduce density bonus for this object if they're too apart in time
+                // Nerf starts on 1500ms and reaches maximum (*=0) on 3000ms
                 double timeBetweenCurrAndLoopObj = currObj.StartTime - loopObj.StartTime;
                 loopDifficulty *= getTimeNerfFactor(timeBetweenCurrAndLoopObj);
 
-                pastObjectDifficultyInfluence += loopDifficulty;
+                if (prevObj0.IsNull())
+                {
+                    prevObj0 = loopObj;
+                    continue;
+                }
+
+                density += loopDifficulty;
+
+                // Angles nerf
+
+                if (loopObj.Angle.IsNotNull() && prevObj0.Angle.IsNotNull())
+                {
+                    double angleDifference = Math.Abs(prevObj0.Angle.Value - loopObj.Angle.Value);
+
+                    // Nerf alternating angles case
+                    if (prevObj1.IsNotNull() && prevObj2.IsNotNull() && prevObj1.Angle.IsNotNull() && prevObj2.Angle.IsNotNull())
+                    {
+                        // Normalized difference
+                        double angleDifference1 = Math.Abs(prevObj1.Angle.Value - loopObj.Angle.Value) / Math.PI;
+                        double angleDifference2 = Math.Abs(prevObj2.Angle.Value - prevObj0.Angle.Value) / Math.PI;
+
+                        // Will be close to 1 if angleDifference1 and angleDifference2 was both close to 0
+                        double alternatingFactor = Math.Pow((1 - angleDifference1) * (1 - angleDifference2), 2);
+
+                        // Be sure to nerf only same rhythms
+                        double rhythmFactor = 1 - getRhythmDifference(loopObj.StrainTime, prevObj0.StrainTime); // 0 on different rhythm, 1 on same rhythm
+                        rhythmFactor *= 1 - getRhythmDifference(prevObj0.StrainTime, prevObj1.StrainTime);
+                        rhythmFactor *= 1 - getRhythmDifference(prevObj1.StrainTime, prevObj2.StrainTime);
+
+                        double acuteAngleFactor = 1 - Math.Min(loopObj.Angle.Value, prevObj0.Angle.Value) / Math.PI;
+
+                        double prevAngleAdjust = Math.Max(angleDifference - angleDifference1, 0);
+
+                        prevAngleAdjust *= alternatingFactor; // Nerf if alternating
+                        prevAngleAdjust *= rhythmFactor; // Nerf if same rhythms
+                        prevAngleAdjust *= acuteAngleFactor;
+
+                        angleDifference -= prevAngleAdjust;
+                    }
+
+                    // Reduce angles nerf if objects are too apart in time
+                    // Angle nerf is starting being reduced from 200ms (150BPM jump) and it reduced to 0 on 2000ms
+                    double longIntervalFactor = Math.Clamp(1 - (loopObj.StrainTime - 200) / (2000 - 200), 0, 1);
+
+                    // Current angle nerf. Angle difference less than 15 degrees is considered the same
+                    double currConstantAngle = Math.Cos(4 * Math.Min(Math.PI / 12, angleDifference)) * longIntervalFactor;
+
+                    // Apply the nerf only when it's repeated
+                    double currentAngleNerf = Math.Min(currConstantAngle, prevConstantAngle);
+
+                    densityAnglesNerf += Math.Min(currentAngleNerf, loopDifficulty);
+                    prevConstantAngle = currConstantAngle;
+                }
+
+                prevObj2 = prevObj1;
+                prevObj1 = prevObj0;
+                prevObj0 = loopObj;
             }
 
-            return pastObjectDifficultyInfluence;
+            // Apply angles nerf
+            density -= Math.Max(0, densityAnglesNerf);
+            return density;
         }
 
         public static double CalculateOverlapDifficultyOf(OsuDifficultyHitObject currObj)
@@ -71,8 +138,6 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
             screenOverlapDifficulty = Math.Max(0, screenOverlapDifficulty - 0.5); // make overlap value =1 cost significantly less
 
             double overlapBonus = overlap_multiplier * screenOverlapDifficulty * difficulty;
-
-            difficulty *= getConstantAngleNerfFactor(currObj);
             difficulty += overlapBonus;
 
             //difficulty *= 1 + overlap_multiplier * screenOverlapDifficulty;
@@ -183,77 +248,6 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
 
                 yield return hitObject;
             }
-        }
-
-        private static double getConstantAngleNerfFactor(OsuDifficultyHitObject current)
-        {
-            const double time_limit = 2000;
-            const double time_limit_low = 200;
-
-            double constantAngleCount = 0;
-            int index = 0;
-            double currentTimeGap = 0;
-
-            OsuDifficultyHitObject prevLoopObj = current;
-
-            OsuDifficultyHitObject? prevLoopObj1 = null;
-            OsuDifficultyHitObject? prevLoopObj2 = null;
-
-            double prevConstantAngle = 0;
-
-            while (currentTimeGap < time_limit)
-            {
-                var loopObj = (OsuDifficultyHitObject)current.Previous(index);
-
-                if (loopObj.IsNull())
-                    break;
-
-                double longIntervalFactor = Math.Clamp(1 - (loopObj.StrainTime - time_limit_low) / (time_limit - time_limit_low), 0, 1);
-
-                if (loopObj.Angle.IsNotNull() && prevLoopObj.Angle.IsNotNull())
-                {
-                    double angleDifference = Math.Abs(prevLoopObj.Angle.Value - loopObj.Angle.Value);
-
-                    // Nerf alternating angles case
-                    if (prevLoopObj1.IsNotNull() && prevLoopObj2.IsNotNull() && prevLoopObj1.Angle.IsNotNull() && prevLoopObj2.Angle.IsNotNull())
-                    {
-                        // Normalized difference
-                        double angleDifference1 = Math.Abs(prevLoopObj1.Angle.Value - loopObj.Angle.Value) / Math.PI;
-                        double angleDifference2 = Math.Abs(prevLoopObj2.Angle.Value - prevLoopObj.Angle.Value) / Math.PI;
-
-                        // Will be close to 1 if angleDifference1 and angleDifference2 was both close to 0
-                        double alternatingFactor = Math.Pow((1 - angleDifference1) * (1 - angleDifference2), 2);
-
-                        // Be sure to nerf only same rhythms
-                        double rhythmFactor = 1 - getRhythmDifference(loopObj.StrainTime, prevLoopObj.StrainTime); // 0 on different rhythm, 1 on same rhythm
-                        rhythmFactor *= 1 - getRhythmDifference(prevLoopObj.StrainTime, prevLoopObj1.StrainTime);
-                        rhythmFactor *= 1 - getRhythmDifference(prevLoopObj1.StrainTime, prevLoopObj2.StrainTime);
-
-                        double acuteAngleFactor = 1 - Math.Min(loopObj.Angle.Value, prevLoopObj.Angle.Value) / Math.PI;
-
-                        double prevAngleAdjust = Math.Max(angleDifference - angleDifference1, 0);
-
-                        prevAngleAdjust *= alternatingFactor; // Nerf if alternating
-                        prevAngleAdjust *= rhythmFactor; // Nerf if same rhythms
-                        prevAngleAdjust *= acuteAngleFactor;
-
-                        angleDifference -= prevAngleAdjust;
-                    }
-
-                    double currConstantAngle = Math.Cos(4 * Math.Min(Math.PI / 8, angleDifference)) * longIntervalFactor;
-                    constantAngleCount += Math.Min(currConstantAngle, prevConstantAngle);
-                    prevConstantAngle = currConstantAngle;
-                }
-
-                currentTimeGap = current.StartTime - loopObj.StartTime;
-                index++;
-
-                prevLoopObj2 = prevLoopObj1;
-                prevLoopObj1 = prevLoopObj;
-                prevLoopObj = loopObj;
-            }
-
-            return Math.Pow(Math.Min(1, 2 / constantAngleCount), 2);
         }
 
         private static double getTimeNerfFactor(double deltaTime)

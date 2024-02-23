@@ -16,7 +16,6 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
     public class ReadingLowAR : GraphSkill
     {
         private readonly List<double> difficulties = new List<double>();
-        //private double skillMultiplier => 2.3;
         private double skillMultiplier => 2;
 
         public ReadingLowAR(Mod[] mods)

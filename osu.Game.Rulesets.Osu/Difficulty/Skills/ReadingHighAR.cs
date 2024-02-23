@@ -64,15 +64,6 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
         }
         public override double DifficultyValue()
         {
-            // Get number how much high AR adjust changed difficulty
-            double difficultyRatio = aimComponent.DifficultyValue() / aimComponentNoAdjust.DifficultyValue();
-
-            // Calculate how much preempt should change to account for high AR adjust
-            double difficulty = ReadingHighAREvaluator.GetDifficulty(preempt) * difficultyRatio;
-            double adjustedPreempt = ReadingHighAREvaluator.GetPreempt(difficulty);
-
-            Console.WriteLine($"Degree of High AR Complexity = {difficultyRatio:0.##}, {preempt:0} -> {adjustedPreempt:0}");
-
             // Simulating summing to get the most correct value possible
             double aimValue = Math.Sqrt(aimComponent.DifficultyValue()) * OsuDifficultyCalculator.DIFFICULTY_MULTIPLIER;
             double speedValue = Math.Sqrt(speedComponent.DifficultyValue()) * OsuDifficultyCalculator.DIFFICULTY_MULTIPLIER;
@@ -83,15 +74,15 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
             double power = OsuDifficultyCalculator.SUM_POWER;
             double totalPerformance = Math.Pow(Math.Pow(aimPerformance, power) + Math.Pow(speedPerformance, power), 1.0 / power);
 
-            // First half of length bonus is in SR to not inflate short AR11 maps
+            // First half of length bonus is in SR to not inflate Star Rating short AR11 maps
             double lengthBonus = OsuPerformanceCalculator.CalculateDefaultLengthBonus(objectsCount);
             totalPerformance *= lengthBonus;
 
             double adjustedDifficulty = OsuStrainSkill.PerformanceToDifficulty(totalPerformance);
             double difficultyValue = Math.Pow(adjustedDifficulty / OsuDifficultyCalculator.DIFFICULTY_MULTIPLIER, 2.0);
 
-            return 75 * Math.Sqrt(difficultyValue * difficulty);
-            // return difficultyValue;
+            // have the same value as difficultyValue at 500pp point
+            return 75 * Math.Sqrt(difficultyValue);
         }
     }
 
@@ -106,7 +97,8 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
         private bool adjustHighAR;
         private double currentStrain;
 
-        private double skillMultiplier => 18.5;
+        private double skillMultiplier => 17.8;
+        private double defaultValueMultiplier => 30;
         private double strainDecayBase => 0.15;
 
         private double strainDecay(double ms) => Math.Pow(strainDecayBase, ms / 1000);
@@ -118,12 +110,13 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
             currentStrain *= strainDecay(current.DeltaTime);
 
             double aimDifficulty = AimEvaluator.EvaluateDifficultyOf(current, true);
-            aimDifficulty *= ReadingHighAREvaluator.EvaluateDifficultyOf(current, adjustHighAR);
+            double readingDifficulty = ReadingHighAREvaluator.EvaluateDifficultyOf(current, adjustHighAR);
+            aimDifficulty *= Math.Pow(readingDifficulty, 2);
             aimDifficulty *= skillMultiplier;
 
             currentStrain += aimDifficulty;
 
-            return currentStrain;
+            return currentStrain + defaultValueMultiplier * ReadingHighAREvaluator.EvaluateDifficultyOf(current, adjustHighAR);
         }
     }
 
@@ -151,7 +144,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
             currentStrain *= strainDecay(currODHO.StrainTime);
 
             double speedDifficulty = SpeedEvaluator.EvaluateDifficultyOf(current) * skillMultiplier;
-            speedDifficulty *= ReadingHighAREvaluator.EvaluateDifficultyOf(current, false);
+            speedDifficulty *= Math.Pow(ReadingHighAREvaluator.EvaluateDifficultyOf(current, false), 2);
             currentStrain += speedDifficulty;
 
             currentRhythm = currODHO.RhythmDifficulty;
