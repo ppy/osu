@@ -13,7 +13,6 @@ using osu.Framework.Input.Events;
 using osu.Framework.Localisation;
 using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.Drawables;
-using osu.Game.Configuration;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Graphics.UserInterface;
@@ -39,14 +38,9 @@ namespace osu.Game.Overlays.Mods
 
         public Bindable<IBeatmapInfo?> BeatmapInfo { get; } = new Bindable<IBeatmapInfo?>();
 
-        [Resolved]
-        protected Bindable<IReadOnlyList<Mod>> Mods { get; private set; } = null!;
-
-        protected virtual IEnumerable<Mod> SelectedMods => Mods.Value;
+        public Bindable<IReadOnlyList<Mod>> Mods { get; } = new Bindable<IReadOnlyList<Mod>>();
 
         public BindableBool Collapsed { get; } = new BindableBool(true);
-
-        private ModSettingChangeTracker? modSettingChangeTracker;
 
         [Resolved]
         private BeatmapDifficultyCache difficultyCache { get; set; } = null!;
@@ -102,15 +96,8 @@ namespace osu.Game.Overlays.Mods
         {
             base.LoadComplete();
 
-            Mods.BindValueChanged(_ =>
-            {
-                modSettingChangeTracker?.Dispose();
-                modSettingChangeTracker = new ModSettingChangeTracker(Mods.Value);
-                modSettingChangeTracker.SettingChanged += _ => updateValues();
-                updateValues();
-            }, true);
-
-            BeatmapInfo.BindValueChanged(_ => updateValues(), true);
+            Mods.BindValueChanged(_ => updateValues());
+            BeatmapInfo.BindValueChanged(_ => updateValues());
 
             Collapsed.BindValueChanged(_ =>
             {
@@ -122,8 +109,9 @@ namespace osu.Game.Overlays.Mods
             GameRuleset = game.Ruleset.GetBoundCopy();
             GameRuleset.BindValueChanged(_ => updateValues());
 
-            BeatmapInfo.BindValueChanged(_ => updateValues(), true);
+            BeatmapInfo.BindValueChanged(_ => updateValues());
 
+            updateValues();
             updateCollapsedState();
         }
 
@@ -167,14 +155,14 @@ namespace osu.Game.Overlays.Mods
             });
 
             double rate = 1;
-            foreach (var mod in SelectedMods.OfType<IApplicableToRate>())
+            foreach (var mod in Mods.Value.OfType<IApplicableToRate>())
                 rate = mod.ApplyToRate(0, rate);
 
             bpmDisplay.Current.Value = BeatmapInfo.Value.BPM * rate;
 
             BeatmapDifficulty originalDifficulty = new BeatmapDifficulty(BeatmapInfo.Value.Difficulty);
 
-            foreach (var mod in SelectedMods.OfType<IApplicableToDifficulty>())
+            foreach (var mod in Mods.Value.OfType<IApplicableToDifficulty>())
                 mod.ApplyToDifficulty(originalDifficulty);
 
             Ruleset ruleset = GameRuleset.Value.CreateInstance();

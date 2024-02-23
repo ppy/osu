@@ -114,8 +114,6 @@ namespace osu.Game.Overlays.Mods
 
         public IEnumerable<ModState> AllAvailableMods => AvailableMods.Value.SelectMany(pair => pair.Value);
 
-        protected virtual IEnumerable<Mod> AllSelectedMods => SelectedMods.Value;
-
         private readonly BindableBool customisationVisible = new BindableBool();
         private Bindable<bool> textSearchStartsActive = null!;
 
@@ -319,7 +317,7 @@ namespace osu.Game.Overlays.Mods
 
             SelectedMods.BindValueChanged(_ =>
             {
-                updateRankingInformation();
+                UpdateOverlayInformation(SelectedMods.Value);
                 updateFromExternalSelection();
                 updateCustomisation();
 
@@ -332,7 +330,7 @@ namespace osu.Game.Overlays.Mods
                     //
                     // See https://github.com/ppy/osu/pull/23284#issuecomment-1529056988
                     modSettingChangeTracker = new ModSettingChangeTracker(SelectedMods.Value);
-                    modSettingChangeTracker.SettingChanged += _ => updateRankingInformation();
+                    modSettingChangeTracker.SettingChanged += _ => UpdateOverlayInformation(SelectedMods.Value);
                 }
             }, true);
 
@@ -454,18 +452,30 @@ namespace osu.Game.Overlays.Mods
                 modState.ValidForSelection.Value = modState.Mod.Type != ModType.System && modState.Mod.HasImplementation && IsValidMod.Invoke(modState.Mod);
         }
 
-        private void updateRankingInformation()
+        /// <summary>
+        /// Updates any information displayed on the overlay regarding the effects of the selected mods.
+        /// </summary>
+        /// <param name="mods">The list of mods to show effect from. This can be overriden to include effect of mods that are not part of the <see cref="SelectedMods"/> bindable (e.g. room mods in multiplayer/playlists).</param>
+        protected virtual void UpdateOverlayInformation(IReadOnlyList<Mod> mods)
         {
-            if (rankingInformationDisplay == null)
-                return;
+            if (rankingInformationDisplay != null)
+            {
+                double multiplier = 1.0;
 
-            double multiplier = 1.0;
+                foreach (var mod in mods)
+                    multiplier *= mod.ScoreMultiplier;
 
-            foreach (var mod in AllSelectedMods)
-                multiplier *= mod.ScoreMultiplier;
+                rankingInformationDisplay.ModMultiplier.Value = multiplier;
+                rankingInformationDisplay.Ranked.Value = mods.All(m => m.Ranked);
+            }
 
-            rankingInformationDisplay.ModMultiplier.Value = multiplier;
-            rankingInformationDisplay.Ranked.Value = AllSelectedMods.All(m => m.Ranked);
+            if (beatmapAttributesDisplay != null)
+            {
+                if (!ReferenceEquals(beatmapAttributesDisplay.Mods.Value, mods))
+                    beatmapAttributesDisplay.Mods.Value = mods;
+                else
+                    beatmapAttributesDisplay.Mods.TriggerChange(); // mods list may be same but a mod setting has changed, trigger change in that case.
+            }
         }
 
         private void updateCustomisation()

@@ -48,40 +48,7 @@ namespace osu.Game.Screens.OnlinePlay.Match
             });
         }
 
-        protected override IEnumerable<Mod> AllSelectedMods => roomMods.Concat(base.AllSelectedMods);
-
-        protected override BeatmapAttributesDisplay CreateBeatmapAttributesDisplay() => new RoomBeatmapAttributesDisplay();
-
-        private partial class RoomBeatmapAttributesDisplay : BeatmapAttributesDisplay
-        {
-            [Resolved(CanBeNull = true)]
-            private IBindable<PlaylistItem>? selectedItem { get; set; }
-
-            [Resolved]
-            private RulesetStore rulesets { get; set; } = null!;
-
-            private readonly List<Mod> roomMods = new List<Mod>();
-
-            protected override void LoadComplete()
-            {
-                base.LoadComplete();
-
-                selectedItem?.BindValueChanged(_ =>
-                {
-                    roomMods.Clear();
-
-                    if (selectedItem?.Value != null)
-                    {
-                        var rulesetInstance = rulesets.GetRuleset(selectedItem.Value.RulesetID)?.CreateInstance();
-                        Debug.Assert(rulesetInstance != null);
-                        roomMods.AddRange(selectedItem.Value.RequiredMods.Select(m => m.ToMod(rulesetInstance)));
-                    }
-
-                    Mods.TriggerChange();
-                });
-            }
-
-            protected override IEnumerable<Mod> SelectedMods => roomMods.Concat(base.SelectedMods);
-        }
+        protected override void UpdateOverlayInformation(IReadOnlyList<Mod> mods)
+            => base.UpdateOverlayInformation(roomMods.Concat(mods).ToList());
     }
 }
