@@ -286,6 +286,36 @@ namespace osu.Game.Tests.Visual.Multiplayer
             });
         }
 
+        [Test]
+        [FlakyTest] // See above
+        public void TestModSelectOverlay()
+        {
+            AddStep("add playlist item", () =>
+            {
+                SelectedRoom.Value.Playlist.Add(new PlaylistItem(new TestBeatmap(new OsuRuleset().RulesetInfo).BeatmapInfo)
+                {
+                    RulesetID = new OsuRuleset().RulesetInfo.OnlineID,
+                    RequiredMods = new[]
+                    {
+                        new APIMod(new OsuModDoubleTime { SpeedChange = { Value = 2.0 } }),
+                        new APIMod(new OsuModStrictTracking()),
+                    },
+                    AllowedMods = new[]
+                    {
+                        new APIMod(new OsuModFlashlight()),
+                        new APIMod(new OsuModHardRock()),
+                    }
+                });
+            });
+            ClickButtonWhenEnabled<MultiplayerMatchSettingsOverlay.CreateOrUpdateButton>();
+
+            AddUntilStep("wait for join", () => RoomJoined);
+
+            ClickButtonWhenEnabled<RoomSubScreen.UserModSelectButton>();
+            AddAssert("mod select shows unranked", () => this.ChildrenOfType<RankingInformationDisplay>().Single().Ranked.Value == false);
+            AddAssert("mod select shows different multiplier", () => !this.ChildrenOfType<RankingInformationDisplay>().Single().ModMultiplier.IsDefault);
+        }
+
         private partial class TestMultiplayerMatchSubScreen : MultiplayerMatchSubScreen
         {
             [Resolved(canBeNull: true)]
