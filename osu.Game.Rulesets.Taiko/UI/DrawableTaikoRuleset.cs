@@ -69,7 +69,12 @@ namespace osu.Game.Rulesets.Taiko.UI
             TimeRange.Value = ComputeTimeRange();
         }
 
-        protected virtual double ComputeTimeRange() => PlayfieldAdjustmentContainer.ComputeTimeRange();
+        protected virtual double ComputeTimeRange()
+        {
+            // Adjust when we're using constant algorithm to not be sluggish.
+            double multiplier = VisualisationMethod == ScrollVisualisationMethod.Overlapping ? 1 : 4;
+            return PlayfieldAdjustmentContainer.ComputeTimeRange() / multiplier;
+        }
 
         protected override void UpdateAfterChildren()
         {
