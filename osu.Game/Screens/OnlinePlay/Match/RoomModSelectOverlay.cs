@@ -16,32 +16,32 @@ namespace osu.Game.Screens.OnlinePlay.Match
 {
     public partial class RoomModSelectOverlay : UserModSelectOverlay
     {
-        public RoomModSelectOverlay(OverlayColourScheme colourScheme = OverlayColourScheme.Plum)
-            : base(colourScheme)
-        {
-        }
-
-        [Resolved(CanBeNull = true)]
-        private IBindable<PlaylistItem>? selectedItem { get; set; }
+        [Resolved]
+        private IBindable<PlaylistItem> selectedItem { get; set; } = null!;
 
         [Resolved]
         private RulesetStore rulesets { get; set; } = null!;
 
         private readonly List<Mod> roomMods = new List<Mod>();
 
+        public RoomModSelectOverlay()
+            : base(OverlayColourScheme.Plum)
+        {
+        }
+
         protected override void LoadComplete()
         {
             base.LoadComplete();
 
-            selectedItem?.BindValueChanged(_ =>
+            selectedItem.BindValueChanged(_ =>
             {
                 roomMods.Clear();
 
-                if (selectedItem?.Value != null)
+                if (selectedItem.Value is PlaylistItem item)
                 {
-                    var rulesetInstance = rulesets.GetRuleset(selectedItem.Value.RulesetID)?.CreateInstance();
+                    var rulesetInstance = rulesets.GetRuleset(item.RulesetID)?.CreateInstance();
                     Debug.Assert(rulesetInstance != null);
-                    roomMods.AddRange(selectedItem.Value.RequiredMods.Select(m => m.ToMod(rulesetInstance)));
+                    roomMods.AddRange(item.RequiredMods.Select(m => m.ToMod(rulesetInstance)));
                 }
 
                 SelectedMods.TriggerChange();
