@@ -274,12 +274,12 @@ namespace osu.Game.Overlays.Mods
                             Anchor = Anchor.BottomRight,
                             Origin = Anchor.BottomRight
                         },
-                        beatmapAttributesDisplay = CreateBeatmapAttributesDisplay().With(b =>
+                        beatmapAttributesDisplay = new BeatmapAttributesDisplay
                         {
-                            b.Anchor = Anchor.BottomRight;
-                            b.Origin = Anchor.BottomRight;
-                            b.BeatmapInfo.Value = Beatmap?.BeatmapInfo;
-                        }),
+                            Anchor = Anchor.BottomRight,
+                            Origin = Anchor.BottomRight,
+                            BeatmapInfo = { Value = Beatmap?.BeatmapInfo },
+                        },
                     }
                 });
             }
@@ -288,8 +288,6 @@ namespace osu.Game.Overlays.Mods
 
             textSearchStartsActive = configManager.GetBindable<bool>(OsuSetting.ModSelectTextSearchStartsActive);
         }
-
-        protected virtual BeatmapAttributesDisplay CreateBeatmapAttributesDisplay() => new BeatmapAttributesDisplay();
 
         public override void Hide()
         {
