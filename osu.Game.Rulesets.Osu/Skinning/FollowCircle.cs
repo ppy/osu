@@ -31,6 +31,9 @@ namespace osu.Game.Rulesets.Osu.Skinning
                 if (ParentObject.Judged)
                     return;
 
+                if (ParentObject.HitObject?.StartTime is null)
+                    return;
+
                 using (BeginAbsoluteSequence(Math.Max(Time.Current, ParentObject.HitObject?.StartTime ?? 0)))
                 {
                     if (tracking.NewValue)
