@@ -2,6 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
@@ -25,7 +26,7 @@ namespace osu.Game.Screens.OnlinePlay.Match
         private IBindable<PlaylistItem>? selectedItem { get; set; }
 
         [Resolved]
-        private OsuGameBase game { get; set; } = null!;
+        private RulesetStore rulesets { get; set; } = null!;
 
         protected override BeatmapAttributesDisplay GetBeatmapAttributesDisplay => new RoomBeatmapAttributesDisplay
         {
@@ -48,9 +49,9 @@ namespace osu.Game.Screens.OnlinePlay.Match
 
                 if (selectedItem?.Value != null)
                 {
-                    Ruleset ruleset = game.Ruleset.Value.CreateInstance();
-                    var multiplayerRoomMods = selectedItem.Value.RequiredMods.Select(m => m.ToMod(ruleset));
-                    allMods = allMods.Concat(multiplayerRoomMods);
+                    var rulesetInstance = rulesets.GetRuleset(selectedItem.Value.RulesetID)?.CreateInstance();
+                    Debug.Assert(rulesetInstance != null);
+                    allMods = allMods.Concat(selectedItem.Value.RequiredMods.Select(m => m.ToMod(rulesetInstance)));
                 }
 
                 return allMods;
@@ -61,12 +62,15 @@ namespace osu.Game.Screens.OnlinePlay.Match
     public partial class RoomBeatmapAttributesDisplay : BeatmapAttributesDisplay
     {
         [Resolved(CanBeNull = true)]
-        private IBindable<PlaylistItem>? multiplayerRoomItem { get; set; }
+        private IBindable<PlaylistItem>? selectedItem { get; set; }
+
+        [Resolved]
+        private RulesetStore rulesets { get; set; } = null!;
 
         protected override void LoadComplete()
         {
             base.LoadComplete();
-            multiplayerRoomItem?.BindValueChanged(_ => Mods.TriggerChange());
+            selectedItem?.BindValueChanged(_ => Mods.TriggerChange());
         }
 
         protected override IEnumerable<Mod> SelectedMods
@@ -75,11 +79,11 @@ namespace osu.Game.Screens.OnlinePlay.Match
             {
                 IEnumerable<Mod> selectedMods = Mods.Value;
 
-                if (multiplayerRoomItem?.Value != null)
+                if (selectedItem?.Value != null)
                 {
-                    Ruleset ruleset = GameRuleset.Value.CreateInstance();
-                    var multiplayerRoomMods = multiplayerRoomItem.Value.RequiredMods.Select(m => m.ToMod(ruleset));
-                    selectedMods = selectedMods.Concat(multiplayerRoomMods);
+                    var rulesetInstance = rulesets.GetRuleset(selectedItem.Value.RulesetID)?.CreateInstance();
+                    Debug.Assert(rulesetInstance != null);
+                    selectedMods = selectedMods.Concat(selectedItem.Value.RequiredMods.Select(m => m.ToMod(rulesetInstance)));
                 }
 
                 return selectedMods;
