@@ -1,8 +1,6 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
 using System;
 using System.Collections.Generic;
 using osu.Framework.Audio.Sample;
@@ -20,7 +18,7 @@ namespace osu.Game.Screens.Edit
     /// </summary>
     public class EditorBeatmapSkin : ISkin
     {
-        public event Action BeatmapSkinChanged;
+        public event Action? BeatmapSkinChanged;
 
         /// <summary>
         /// The underlying beatmap skin.
@@ -65,10 +63,14 @@ namespace osu.Game.Screens.Edit
 
         #region Delegated ISkin implementation
 
-        public Drawable GetDrawableComponent(ISkinComponentLookup lookup) => Skin.GetDrawableComponent(lookup);
-        public Texture GetTexture(string componentName, WrapMode wrapModeS, WrapMode wrapModeT) => Skin.GetTexture(componentName, wrapModeS, wrapModeT);
-        public ISample GetSample(ISampleInfo sampleInfo) => Skin.GetSample(sampleInfo);
-        public IBindable<TValue> GetConfig<TLookup, TValue>(TLookup lookup) => Skin.GetConfig<TLookup, TValue>(lookup);
+        public Drawable? GetDrawableComponent(ISkinComponentLookup lookup) => Skin.GetDrawableComponent(lookup);
+        public Texture? GetTexture(string componentName, WrapMode wrapModeS, WrapMode wrapModeT) => Skin.GetTexture(componentName, wrapModeS, wrapModeT);
+        public ISample? GetSample(ISampleInfo sampleInfo) => Skin.GetSample(sampleInfo);
+
+        public IBindable<TValue>? GetConfig<TLookup, TValue>(TLookup lookup)
+            where TLookup : notnull
+            where TValue : notnull
+            => Skin.GetConfig<TLookup, TValue>(lookup);
 
         #endregion
     }
