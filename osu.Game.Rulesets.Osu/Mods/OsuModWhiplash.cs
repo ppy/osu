@@ -41,7 +41,7 @@ namespace osu.Game.Rulesets.Osu.Mods
 
             double scaleBpm = getBaseBPM(currentBeatmap);
             double preempt = hitCircle.TimePreempt;
-            double newTimePreempt = (scaleBpm / Math.Max(currentBpm, 1)) * preempt;
+            double newTimePreempt = (scaleBpm / currentBpm) * preempt;
 
             //don't allow AR to go over 11
             updateTimePreempty(hitCircle, Math.Max(newTimePreempt, 300));
