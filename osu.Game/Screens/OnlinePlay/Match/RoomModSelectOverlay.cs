@@ -35,28 +35,28 @@ namespace osu.Game.Screens.OnlinePlay.Match
             BeatmapInfo = { Value = Beatmap?.BeatmapInfo }
         };
 
+        private readonly List<Mod> roomMods = new List<Mod>();
+
         protected override void LoadComplete()
         {
             base.LoadComplete();
-            selectedItem?.BindValueChanged(_ => SelectedMods.TriggerChange());
-        }
 
-        protected override IEnumerable<Mod> AllSelectedMods
-        {
-            get
+            selectedItem?.BindValueChanged(_ =>
             {
-                IEnumerable<Mod> allMods = SelectedMods.Value;
+                roomMods.Clear();
 
                 if (selectedItem?.Value != null)
                 {
                     var rulesetInstance = rulesets.GetRuleset(selectedItem.Value.RulesetID)?.CreateInstance();
                     Debug.Assert(rulesetInstance != null);
-                    allMods = allMods.Concat(selectedItem.Value.RequiredMods.Select(m => m.ToMod(rulesetInstance)));
+                    roomMods.AddRange(selectedItem.Value.RequiredMods.Select(m => m.ToMod(rulesetInstance)));
                 }
 
-                return allMods;
-            }
+                SelectedMods.TriggerChange();
+            });
         }
+
+        protected override IEnumerable<Mod> AllSelectedMods => roomMods.Concat(base.AllSelectedMods);
     }
 
     public partial class RoomBeatmapAttributesDisplay : BeatmapAttributesDisplay
@@ -67,27 +67,27 @@ namespace osu.Game.Screens.OnlinePlay.Match
         [Resolved]
         private RulesetStore rulesets { get; set; } = null!;
 
+        private readonly List<Mod> roomMods = new List<Mod>();
+
         protected override void LoadComplete()
         {
             base.LoadComplete();
-            selectedItem?.BindValueChanged(_ => Mods.TriggerChange());
-        }
 
-        protected override IEnumerable<Mod> SelectedMods
-        {
-            get
+            selectedItem?.BindValueChanged(_ =>
             {
-                IEnumerable<Mod> selectedMods = Mods.Value;
+                roomMods.Clear();
 
                 if (selectedItem?.Value != null)
                 {
                     var rulesetInstance = rulesets.GetRuleset(selectedItem.Value.RulesetID)?.CreateInstance();
                     Debug.Assert(rulesetInstance != null);
-                    selectedMods = selectedMods.Concat(selectedItem.Value.RequiredMods.Select(m => m.ToMod(rulesetInstance)));
+                    roomMods.AddRange(selectedItem.Value.RequiredMods.Select(m => m.ToMod(rulesetInstance)));
                 }
 
-                return selectedMods;
-            }
+                Mods.TriggerChange();
+            });
         }
+
+        protected override IEnumerable<Mod> SelectedMods => roomMods.Concat(base.SelectedMods);
     }
 }
