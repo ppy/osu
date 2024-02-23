@@ -168,7 +168,7 @@ namespace osu.Game.Rulesets.Osu.Skinning.Legacy
                             return new LegacyApproachCircle();
 
                         return null;
-                    
+
                     case OsuSkinComponents.HitMarkerLeft:
                         if (GetTexture(@"hitmarker-left") != null)
                             return new HitMarker(OsuAction.LeftButton);
@@ -184,7 +184,7 @@ namespace osu.Game.Rulesets.Osu.Skinning.Legacy
                     case OsuSkinComponents.AimMarker:
                         if (GetTexture(@"aimmarker") != null)
                             return new HitMarker();
-                        
+
                         return null;
                 }
             }

@@ -72,10 +72,9 @@ namespace osu.Game.Screens.Play
 
             HUDOverlay.PlayerSettingsOverlay.AddAtStart(playbackSettings);
 
-            var analysisSettings = ruleset.CreateAnalysisSettings(DrawableRuleset);
-            if (analysisSettings != null) {
+            var analysisSettings = DrawableRuleset.Ruleset.CreateAnalysisSettings(DrawableRuleset);
+            if (analysisSettings != null)
                 HUDOverlay.PlayerSettingsOverlay.AddAtStart(analysisSettings);
-            }
         }
 
         protected override void PrepareReplay()

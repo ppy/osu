@@ -25,8 +25,9 @@ namespace osu.Game.Rulesets.Osu.Tests
             AddStep("Create hit markers", () =>
             {
                 markerContainers.Clear();
-                SetContents(_ => {
-                    markerContainers.Add(new TestHitMarkerContainer(new HitObjectContainer()) 
+                SetContents(_ =>
+                {
+                    markerContainers.Add(new TestHitMarkerContainer(new HitObjectContainer())
                     {
                         HitMarkerEnabled = { Value = true },
                         AimMarkersEnabled = { Value = true },
@@ -98,8 +99,8 @@ namespace osu.Game.Rulesets.Osu.Tests
         {
             private double? lastClick;
             private double? startTime;
-            private bool finishedDrawing = false;
-            private bool leftOrRight = false;
+            private bool finishedDrawing;
+            private bool leftOrRight;
 
             public TestHitMarkerContainer(HitObjectContainer hitObjectContainer)
                 : base(hitObjectContainer)
