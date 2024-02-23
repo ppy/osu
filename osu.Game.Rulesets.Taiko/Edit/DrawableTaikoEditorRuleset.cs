@@ -26,12 +26,5 @@ namespace osu.Game.Rulesets.Taiko.Edit
 
             ShowSpeedChanges.BindValueChanged(showChanges => VisualisationMethod = showChanges.NewValue ? ScrollVisualisationMethod.Overlapping : ScrollVisualisationMethod.Constant, true);
         }
-
-        protected override double ComputeTimeRange()
-        {
-            // Adjust when we're using constant algorithm to not be sluggish.
-            double multiplier = ShowSpeedChanges.Value ? 1 : 4;
-            return base.ComputeTimeRange() / multiplier;
-        }
     }
 }
