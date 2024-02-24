@@ -44,9 +44,10 @@ namespace osu.Game.Scoring.Legacy
         /// <see cref="LegacyRulesetExtensions.CalculateDifficultyPeppyStars"/> method. Reconvert all scores.
         /// </description></item>
         /// <item><description>30000013: All local scores will use lazer definitions of ranks for consistency. Recalculates the rank of all scores.</description></item>
+        /// <item><description>30000014: Fix edge cases in conversion for osu! scores on selected beatmaps. Reconvert all scores.</description></item>
         /// </list>
         /// </remarks>
-        public const int LATEST_VERSION = 30000013;
+        public const int LATEST_VERSION = 30000014;
 
         /// <summary>
         /// The first stable-compatible YYYYMMDD format version given to lazer usage of replays.
