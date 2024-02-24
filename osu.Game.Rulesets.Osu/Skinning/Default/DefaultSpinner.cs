@@ -126,7 +126,7 @@ namespace osu.Game.Rulesets.Osu.Skinning.Default
         {
             base.Update();
 
-            if (spmContainer.Alpha == 0 && drawableSpinner.Result?.TimeStarted != null)
+            if (spmContainer.Alpha == 0)
                 fadeCounterOnTimeStart();
         }
 
