@@ -37,8 +37,6 @@ namespace osu.Game.Rulesets.Osu.UI
 
         public SmokeContainer Smoke { get; }
 
-        public HitMarkerContainer MarkersContainer { get; }
-
         public FollowPointRenderer FollowPoints { get; }
 
         public static readonly Vector2 BASE_SIZE = new Vector2(512, 384);
@@ -61,8 +59,7 @@ namespace osu.Game.Rulesets.Osu.UI
                 judgementLayer = new JudgementContainer<DrawableOsuJudgement> { RelativeSizeAxes = Axes.Both },
                 HitObjectContainer,
                 judgementAboveHitObjectLayer = new Container { RelativeSizeAxes = Axes.Both },
-                approachCircles = new ProxyContainer { RelativeSizeAxes = Axes.Both },
-                MarkersContainer = new HitMarkerContainer(HitObjectContainer) { RelativeSizeAxes = Axes.Both }
+                approachCircles = new ProxyContainer { RelativeSizeAxes = Axes.Both }
             };
 
             HitPolicy = new StartTimeOrderedHitPolicy();

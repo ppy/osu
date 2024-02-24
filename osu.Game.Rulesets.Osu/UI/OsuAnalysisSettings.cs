@@ -1,10 +1,10 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Game.Localisation;
+using osu.Game.Replays;
 using osu.Game.Rulesets.UI;
 using osu.Game.Screens.Play.PlayerSettings;
 
@@ -29,14 +29,7 @@ namespace osu.Game.Rulesets.Osu.UI
                 aimLinesToggle = new PlayerCheckbox { LabelText = PlayerSettingsOverlayStrings.AimLines },
                 hideCursorToggle = new PlayerCheckbox { LabelText = PlayerSettingsOverlayStrings.HideCursor }
             };
-        }
 
-        [BackgroundDependencyLoader]
-        private void load()
-        {
-            DrawableRuleset.Playfield.MarkersContainer.HitMarkerEnabled.BindTo(hitMarkerToggle.Current);
-            DrawableRuleset.Playfield.MarkersContainer.AimMarkersEnabled.BindTo(aimMarkerToggle.Current);
-            DrawableRuleset.Playfield.MarkersContainer.AimLinesEnabled.BindTo(aimLinesToggle.Current);
             hideCursorToggle.Current.BindValueChanged(onCursorToggle);
         }
 
@@ -51,6 +44,15 @@ namespace osu.Game.Rulesets.Osu.UI
             {
                 DrawableRuleset.Playfield.Cursor.FadeIn();
             }
+        }
+
+        public override AnalysisContainer CreateAnalysisContainer(Replay replay)
+        {
+            var analysisContainer = new OsuAnalysisContainer(replay);
+            analysisContainer.HitMarkerEnabled.BindTo(hitMarkerToggle.Current);
+            analysisContainer.AimMarkersEnabled.BindTo(aimMarkerToggle.Current);
+            analysisContainer.AimLinesEnabled.BindTo(aimLinesToggle.Current);
+            return analysisContainer;
         }
     }
 }

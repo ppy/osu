@@ -291,6 +291,12 @@ namespace osu.Game.Rulesets.UI
         /// </summary>
         protected virtual HitObjectContainer CreateHitObjectContainer() => new HitObjectContainer();
 
+        /// <summary>
+        /// Adds an analysis container to internal children for replays.
+        /// </summary>
+        /// <param name="analysisContainer"></param>
+        public virtual void AddAnalysisContainer(AnalysisContainer analysisContainer) => AddInternal(analysisContainer);
+
         #region Pooling support
 
         private readonly Dictionary<Type, IDrawablePool> pools = new Dictionary<Type, IDrawablePool>();
