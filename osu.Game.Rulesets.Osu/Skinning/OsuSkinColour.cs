@@ -10,6 +10,5 @@ namespace osu.Game.Rulesets.Osu.Skinning
         SliderBall,
         SpinnerBackground,
         StarBreakAdditive,
-        ReplayAimLine,
     }
 }

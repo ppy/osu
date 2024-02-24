@@ -12,7 +12,6 @@ using osu.Framework.Graphics.Pooling;
 using osu.Game.Replays;
 using osu.Game.Rulesets.Objects.Pooling;
 using osu.Game.Rulesets.Osu.Replays;
-using osu.Game.Rulesets.Osu.Skinning;
 using osu.Game.Rulesets.Osu.Skinning.Default;
 using osu.Game.Rulesets.UI;
 using osu.Game.Skinning;
@@ -47,11 +46,8 @@ namespace osu.Game.Rulesets.Osu.UI
         }
 
         [BackgroundDependencyLoader]
-        private void load(ISkinSource skin)
+        private void load()
         {
-            var aimLineColor = skin.GetConfig<OsuSkinColour, Color4>(OsuSkinColour.ReplayAimLine)?.Value ?? Color4.White;
-            aimLineColor.A = 127;
-
             hitMarkersContainer.Hide();
             aimMarkersContainer.Hide();
             aimLinesContainer.Hide();
