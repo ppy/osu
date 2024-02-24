@@ -59,7 +59,7 @@ namespace osu.Game.Rulesets.Osu.UI
                 judgementLayer = new JudgementContainer<DrawableOsuJudgement> { RelativeSizeAxes = Axes.Both },
                 HitObjectContainer,
                 judgementAboveHitObjectLayer = new Container { RelativeSizeAxes = Axes.Both },
-                approachCircles = new ProxyContainer { RelativeSizeAxes = Axes.Both }
+                approachCircles = new ProxyContainer { RelativeSizeAxes = Axes.Both },
             };
 
             HitPolicy = new StartTimeOrderedHitPolicy();
