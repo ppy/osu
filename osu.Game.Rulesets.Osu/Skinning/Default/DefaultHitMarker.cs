@@ -23,7 +23,6 @@ namespace osu.Game.Rulesets.Osu.Skinning.Default
                         Anchor = Anchor.Centre,
                         Origin = Anchor.Centre,
                         Size = new Vector2(3, length),
-                        Rotation = 45,
                         Colour = Colour4.Black.Opacity(0.5F)
                     },
                     new Box
@@ -31,7 +30,7 @@ namespace osu.Game.Rulesets.Osu.Skinning.Default
                         Anchor = Anchor.Centre,
                         Origin = Anchor.Centre,
                         Size = new Vector2(3, length),
-                        Rotation = 135,
+                        Rotation = 90,
                         Colour = Colour4.Black.Opacity(0.5F)
                     }
                 };
@@ -44,7 +43,6 @@ namespace osu.Game.Rulesets.Osu.Skinning.Default
                     Anchor = Anchor.Centre,
                     Origin = Anchor.Centre,
                     Size = new Vector2(1, length),
-                    Rotation = 45,
                     Colour = colour
                 },
                 new Box
@@ -52,7 +50,7 @@ namespace osu.Game.Rulesets.Osu.Skinning.Default
                     Anchor = Anchor.Centre,
                     Origin = Anchor.Centre,
                     Size = new Vector2(1, length),
-                    Rotation = 135,
+                    Rotation = 90,
                     Colour = colour
                 }
             });
@@ -69,7 +67,7 @@ namespace osu.Game.Rulesets.Osu.Skinning.Default
                     return (Colour4.LightGreen, 20, true);
 
                 default:
-                    return (Colour4.Gray.Opacity(0.3F), 8, false);
+                    return (Colour4.Gray.Opacity(0.5F), 8, false);
             }
         }
     }
