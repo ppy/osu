@@ -6,6 +6,7 @@ using System.Diagnostics;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
+using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Objects.Drawables;
 using osu.Game.Rulesets.Osu.Objects.Drawables;
 
@@ -40,6 +41,14 @@ namespace osu.Game.Rulesets.Osu.Skinning
                         OnSliderPress();
                     else
                         OnSliderRelease();
+
+                    // calling one of the above after OnSliderEnd() would result in a lack of a slider end animation
+                    // thus, ensure OnSliderEnd() is called again if the tracking value changed after the first call
+                    if (Time.Current >= ParentObject.HitStateUpdateTime + SliderEventGenerator.TAIL_LENIENCY)
+                    {
+                        FinishTransforms();
+                        OnSliderEnd();
+                    }
                 }
             }, true);
         }
