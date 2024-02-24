@@ -5,7 +5,6 @@ using System;
 using System.Globalization;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
-using osu.Framework.Extensions.ObjectExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Game.Graphics;
@@ -111,42 +110,26 @@ namespace osu.Game.Rulesets.Osu.Skinning.Argon
             {
                 spmCounter.Text = Math.Truncate(spm.NewValue).ToString(@"#0");
             }, true);
-
-            drawableSpinner.ApplyCustomUpdateState += updateStateTransforms;
-            updateStateTransforms(drawableSpinner, drawableSpinner.State.Value);
         }
 
         protected override void Update()
         {
             base.Update();
 
-            if (spmContainer.Alpha == 0)
-                fadeCounterOnTimeStart();
+            updateSpmAlpha();
         }
 
-        private void updateStateTransforms(DrawableHitObject drawableHitObject, ArmedState state)
-        {
-            if (!(drawableHitObject is DrawableSpinner))
-                return;
-
-            fadeCounterOnTimeStart();
-        }
-
-        private void fadeCounterOnTimeStart()
+        private void updateSpmAlpha()
         {
             if (drawableSpinner.Result?.TimeStarted is double startTime)
             {
-                using (BeginAbsoluteSequence(startTime))
-                    spmContainer.FadeIn(drawableSpinner.HitObject.TimeFadeIn);
+                double timeOffset = Math.Clamp(Clock.CurrentTime, startTime, startTime + drawableSpinner.HitObject.TimeFadeIn) - startTime;
+                spmContainer.Alpha = (float)(timeOffset / drawableSpinner.HitObject.TimeFadeIn);
             }
-        }
-
-        protected override void Dispose(bool isDisposing)
-        {
-            base.Dispose(isDisposing);
-
-            if (drawableSpinner.IsNotNull())
-                drawableSpinner.ApplyCustomUpdateState -= updateStateTransforms;
+            else
+            {
+                spmContainer.Alpha = 0;
+            }
         }
     }
 }
