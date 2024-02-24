@@ -117,7 +117,6 @@ namespace osu.Game.Rulesets.Osu.UI
             {
                 lifetimeManager.EntryBecameAlive += entryBecameAlive;
                 lifetimeManager.EntryBecameDead += entryBecameDead;
-                lifetimeManager.EntryCrossedBoundary += entryCrossedBoundary;
 
                 PathRadius = 1f;
                 Colour = new Color4(255, 255, 255, 127);
@@ -151,11 +150,6 @@ namespace osu.Game.Rulesets.Osu.UI
                 {
                     AddVertex(entry.Position);
                 }
-            }
-
-            private void entryCrossedBoundary(LifetimeEntry entry, LifetimeBoundaryKind kind, LifetimeBoundaryCrossingDirection direction)
-            {
-
             }
 
             private sealed class AimLinePointComparator : IComparer<AimPointEntry>
