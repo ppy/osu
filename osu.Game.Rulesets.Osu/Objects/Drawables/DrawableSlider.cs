@@ -39,7 +39,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
 
         protected override IEnumerable<Drawable> DimmablePieces => new Drawable[]
         {
-            HeadCircle,
+            // HeadCircle should not be added to this list, as it handles dimming itself
             TailCircle,
             repeatContainer,
             Body,
