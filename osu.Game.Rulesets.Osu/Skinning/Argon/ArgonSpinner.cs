@@ -120,7 +120,7 @@ namespace osu.Game.Rulesets.Osu.Skinning.Argon
         {
             base.Update();
 
-            if (!spmContainer.IsPresent && drawableSpinner.Result?.TimeStarted != null)
+            if (spmContainer.Alpha != 0 && drawableSpinner.Result?.TimeStarted != null)
                 fadeCounterOnTimeStart();
         }
 
