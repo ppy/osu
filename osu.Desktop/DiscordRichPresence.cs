@@ -92,7 +92,7 @@ namespace osu.Desktop
                 return;
             }
 
-            if (status.Value == UserStatus.Online && activity.Value != null)
+            if (activity.Value != null)
             {
                 bool hideIdentifiableInformation = privacyMode.Value == DiscordRichPresenceMode.Limited;
                 presence.State = truncate(activity.Value.GetStatus(hideIdentifiableInformation));
