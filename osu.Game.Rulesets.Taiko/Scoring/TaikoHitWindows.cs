@@ -11,7 +11,7 @@ namespace osu.Game.Rulesets.Taiko.Scoring
         {
             new HitWindowRange(HitResult.Great, 50, 35, 20),
             new HitWindowRange(HitResult.Ok, 120, 80, 50),
-            new HitWindowRange(HitResult.Miss, 135 + 1, 95 + 1, 70 + 1), // 1 ms more than expected, because osu!stable judged the miss hit window using a <= comparison, and not the < comparison used for the 300 and 100 hit windows; this is equivalent because both sides of the comparison in osu!stable were integers
+            new HitWindowRange(HitResult.Miss, 135, 95, 70),
         };
 
         public override bool IsHitResultAllowed(HitResult result)

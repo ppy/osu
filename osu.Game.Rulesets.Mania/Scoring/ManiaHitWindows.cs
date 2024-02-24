@@ -10,7 +10,7 @@ namespace osu.Game.Rulesets.Mania.Scoring
     {
         internal static readonly HitWindowRange[] MANIA_RANGES =
         {
-            new HitWindowRange(HitResult.Perfect, 16, 16, 16),
+            new HitWindowRange(HitResult.Perfect, 22.4D, 19.4D, 13.9D),
             new HitWindowRange(HitResult.Great, 64, 49, 34),
             new HitWindowRange(HitResult.Good, 97, 82, 67),
             new HitWindowRange(HitResult.Ok, 127, 112, 97),
