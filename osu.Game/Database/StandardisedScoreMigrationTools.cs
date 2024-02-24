@@ -365,6 +365,17 @@ namespace osu.Game.Database
                             + bonusProportion) * modMultiplier);
                     }
 
+                    // see similar check above.
+                    // if there is no legacy combo score, all combo conversion operations below
+                    // are either pointless or wildly wrong.
+                    if (maximumLegacyComboScore + maximumLegacyBonusScore == 0)
+                    {
+                        return (long)Math.Round((
+                            500000 * comboProportion // as above, zero if mods result in zero multiplier, one otherwise
+                            + 500000 * Math.Pow(score.Accuracy, 5)
+                            + bonusProportion) * modMultiplier);
+                    }
+
                     // Assumptions:
                     // - sliders and slider ticks are uniformly distributed in the beatmap, and thus can be ignored without losing much precision.
                     //   We thus consider a map of hit-circles only, which gives objectCount == maximumCombo.
