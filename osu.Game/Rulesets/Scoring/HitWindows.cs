@@ -91,7 +91,7 @@ namespace osu.Game.Rulesets.Scoring
 
             foreach (var range in GetRanges())
             {
-                double value = HitWindowValueFor(difficulty, range);
+                double value = hitWindowValueFor(difficulty, range);
 
                 switch (range.Result)
                 {
@@ -128,7 +128,7 @@ namespace osu.Game.Rulesets.Scoring
         /// <param name="difficulty">The difficulty parameter.</param>
         /// <param name="range">The range of difficulty values.</param>
         /// <returns>Value to which the difficulty parameter maps in the specified range.</returns>
-        protected virtual double HitWindowValueFor(double difficulty, HitWindowRange range)
+        private double hitWindowValueFor(double difficulty, HitWindowRange range)
         {
             double value = IBeatmapDifficultyInfo.DifficultyRange(difficulty, (range.Min, range.Average, range.Max));
 
@@ -226,6 +226,12 @@ namespace osu.Game.Rulesets.Scoring
         /// </summary>
         protected virtual bool LegacyIsInclusive => false;
 
+        /// <summary>
+        /// Re-sets hit windows with legacy or non-legacy values, depending on the boolean parameter.
+        /// SetDifficulty should have been called before calling SetLegacy.
+        /// By default, this will have happened while creating the HitWindows object.
+        /// </summary>
+        /// <param name="isLegacy">The parameter.</param>
         public void SetLegacy(bool isLegacy)
         {
             this.isLegacy = isLegacy;
