@@ -122,14 +122,9 @@ namespace osu.Game.Rulesets.Osu.Skinning.Argon
         private void updateSpmAlpha()
         {
             if (drawableSpinner.Result?.TimeStarted is double startTime)
-            {
-                double timeOffset = Math.Clamp(Clock.CurrentTime, startTime, startTime + drawableSpinner.HitObject.TimeFadeIn) - startTime;
-                spmContainer.Alpha = (float)(timeOffset / drawableSpinner.HitObject.TimeFadeIn);
-            }
+                spmContainer.Alpha = (float)Math.Clamp((Clock.CurrentTime - startTime) / drawableSpinner.HitObject.TimeFadeIn, 0, 1);
             else
-            {
                 spmContainer.Alpha = 0;
-            }
         }
     }
 }
