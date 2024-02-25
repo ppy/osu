@@ -9,7 +9,6 @@ using osu.Game.Rulesets.Mania.Objects;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Objects;
 
-
 namespace osu.Game.Rulesets.Mania.Mods
 {
     public abstract class ManiaKeyMod : Mod, IApplicableToBeatmapConverter, IApplicableAfterBeatmapConversion
