@@ -106,11 +106,12 @@ namespace osu.Game.Rulesets.Osu.Skinning
                     switch (drawableObject)
                     {
                         case DrawableSliderTail:
+                            // As above, use ParentObject for the correct slider end time
+                            using (BeginAbsoluteSequence(ParentObject.HitStateUpdateTime))
+                                OnSliderBreak();
+                            break;
                         case DrawableSliderTick:
                         case DrawableSliderRepeat:
-                            // Despite above comment, ok to use drawableObject.HitStateUpdateTime
-                            // here, since on stable, the break anim plays right when the tail is
-                            // missed, not when the slider ends
                             using (BeginAbsoluteSequence(drawableObject.HitStateUpdateTime))
                                 OnSliderBreak();
                             break;
