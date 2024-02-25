@@ -58,6 +58,7 @@ namespace osu.Game.Rulesets.Osu.Skinning.Default
 
         private void resetState(DrawableHitObject hitObject)
         {
+            lastRecord = default;
             result.Value = 0;
             records.Clear();
         }
