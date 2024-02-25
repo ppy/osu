@@ -4,6 +4,7 @@
 using System;
 using System.Diagnostics;
 using osu.Framework.Allocation;
+using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Game.Rulesets.Objects;
@@ -25,32 +26,7 @@ namespace osu.Game.Rulesets.Osu.Skinning
         [BackgroundDependencyLoader]
         private void load()
         {
-            ((DrawableSlider?)ParentObject)?.Tracking.BindValueChanged(tracking =>
-            {
-                Debug.Assert(ParentObject != null);
-
-                if (ParentObject.Judged)
-                    return;
-
-                if (ParentObject.HitObject?.StartTime is null)
-                    return;
-
-                using (BeginAbsoluteSequence(Math.Max(Time.Current, ParentObject.HitObject?.StartTime ?? 0)))
-                {
-                    if (tracking.NewValue)
-                        OnSliderPress();
-                    else
-                        OnSliderRelease();
-
-                    // calling one of the above after OnSliderEnd() would result in a lack of a slider end animation
-                    // thus, ensure OnSliderEnd() is called again if the tracking value changed after the first call
-                    if (Time.Current >= ParentObject.HitStateUpdateTime + SliderEventGenerator.TAIL_LENIENCY)
-                    {
-                        FinishTransforms();
-                        OnSliderEnd();
-                    }
-                }
-            }, true);
+            ((DrawableSlider?)ParentObject)?.Tracking.BindValueChanged(tracking => onTrackingChange(tracking), true);
         }
 
         protected override void LoadComplete()
@@ -71,6 +47,33 @@ namespace osu.Game.Rulesets.Osu.Skinning
         {
             this.ScaleTo(1f)
                 .FadeOut();
+        }
+
+        private void onTrackingChange(ValueChangedEvent<bool> tracking)
+        {
+            Debug.Assert(ParentObject != null);
+
+            if (ParentObject.Judged)
+                return;
+
+            if (ParentObject.HitObject?.StartTime is null)
+                return;
+
+            using (BeginAbsoluteSequence(Math.Max(Time.Current, ParentObject.HitObject?.StartTime ?? 0)))
+            {
+                if (tracking.NewValue)
+                    OnSliderPress();
+                else
+                    OnSliderRelease();
+
+                // calling one of the above after OnSliderEnd() would result in a lack of a slider end animation
+                // thus, ensure OnSliderEnd() is called again if the tracking value changed after the first call
+                if (Time.Current >= ParentObject.HitStateUpdateTime + SliderEventGenerator.TAIL_LENIENCY)
+                {
+                    FinishTransforms();
+                    OnSliderEnd();
+                }
+            }
         }
 
         private void updateStateTransforms(DrawableHitObject drawableObject, ArmedState state)
