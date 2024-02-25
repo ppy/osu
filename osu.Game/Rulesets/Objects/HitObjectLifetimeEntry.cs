@@ -3,7 +3,6 @@
 
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics.Performance;
 using osu.Game.Rulesets.Judgements;
