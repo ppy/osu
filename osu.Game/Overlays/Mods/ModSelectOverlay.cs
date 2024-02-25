@@ -361,12 +361,7 @@ namespace osu.Game.Overlays.Mods
 
             if (beatmapAttributesDisplay != null)
             {
-                ShearedButton lastFooterButton = null!;
-
-                foreach (var b in footerButtonFlow)
-                    lastFooterButton = b;
-
-                float rightEdgeOfLastButton = lastFooterButton.ScreenSpaceDrawQuad.TopRight.X;
+                float rightEdgeOfLastButton = footerButtonFlow[^1].ScreenSpaceDrawQuad.TopRight.X;
 
                 // this is cheating a bit; the 640 value is hardcoded based on how wide the expanded panel _generally_ is.
                 // due to the transition applied, the raw screenspace quad of the panel cannot be used, as it will trigger an ugly feedback cycle of expanding and collapsing.
