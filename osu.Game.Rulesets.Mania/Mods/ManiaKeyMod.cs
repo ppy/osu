@@ -31,7 +31,6 @@ namespace osu.Game.Rulesets.Mania.Mods
             mbc.TargetColumns = KeyCount;
         }
 
-
         public void ApplyToBeatmap(IBeatmap beatmap)
         {
             if (beatmap.BeatmapInfo.Ruleset.ShortName != "mania")
@@ -148,7 +147,6 @@ namespace osu.Game.Rulesets.Mania.Mods
             {
                 if (hitObject.Column == currentColumn)
                 {
-
                     currentColumn += MoveDirection;
 
                     if (currentColumn >= beatmap.TotalColumns - 1 || currentColumn <= 0)
@@ -170,7 +168,6 @@ namespace osu.Game.Rulesets.Mania.Mods
                 if (newChordScale == 0) newChordScale = 1;
 
                 int noteToDel = group.Count() - newChordScale;
-
 
                 //remove some notes at the same column
                 for (int i = 0; noteToDel > 0 && i < group.Count(); i++)
