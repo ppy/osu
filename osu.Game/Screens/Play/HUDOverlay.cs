@@ -258,13 +258,13 @@ namespace osu.Game.Screens.Play
 
             Vector2? highestBottomScreenSpace = null;
 
-            foreach (var element in mainComponents.Components)
-                processDrawable(element);
+            for (int i = 0; i < mainComponents.Components.Count; i++)
+                processDrawable(mainComponents.Components[i]);
 
             if (rulesetComponents != null)
             {
-                foreach (var element in rulesetComponents.Components)
-                    processDrawable(element);
+                for (int i = 0; i < rulesetComponents.Components.Count; i++)
+                    processDrawable(rulesetComponents.Components[i]);
             }
 
             if (lowestTopScreenSpaceRight.HasValue)
