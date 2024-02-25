@@ -87,10 +87,7 @@ namespace osu.Game.Beatmaps.Formats
         protected string StripComments(string line)
         {
             int index = line.AsSpan().IndexOf("//".AsSpan());
-            if (index > 0)
-                return line.Substring(0, index);
-
-            return line;
+            return index > 0 ? line[..index] : line;
         }
 
         protected void HandleColours<TModel>(TModel output, string line, bool allowAlpha)
@@ -132,12 +129,14 @@ namespace osu.Game.Beatmaps.Formats
 
         protected KeyValuePair<string, string> SplitKeyVal(string line, char separator = ':', bool shouldTrim = true)
         {
-            string[] split = line.Split(separator, 2, shouldTrim ? StringSplitOptions.TrimEntries : StringSplitOptions.None);
+            var span = line.AsSpan();
+            Span<Range> ranges = stackalloc Range[2];
+            span.Split(ranges, separator, shouldTrim ? StringSplitOptions.TrimEntries : StringSplitOptions.None);
 
             return new KeyValuePair<string, string>
             (
-                split[0],
-                split.Length > 1 ? split[1] : string.Empty
+                span.Slice(ranges[0]).ToString(),
+                ranges.Length > 1 ? span.Slice(ranges[1]).ToString() : string.Empty
             );
         }
 
