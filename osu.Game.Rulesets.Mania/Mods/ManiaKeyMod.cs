@@ -33,9 +33,6 @@ namespace osu.Game.Rulesets.Mania.Mods
 
         public void ApplyToBeatmap(IBeatmap beatmap)
         {
-            if (beatmap.BeatmapInfo.Ruleset.ShortName != "mania")
-                return;
-
             var maniaBeatmap = (ManiaBeatmap)beatmap;
 
             while (KeyCount - maniaBeatmap.TotalColumns > 0)
@@ -64,7 +61,6 @@ namespace osu.Game.Rulesets.Mania.Mods
 
                 fixHitobjects(maniaBeatmap);
             }
-            maniaBeatmap.Breaks.Clear();
         }
 
         //TODO: proper 1k upscale
