@@ -456,44 +456,48 @@ namespace osu.Game.Beatmaps.Formats
             }
         }
 
+        private const char comma = ',';
+
         private void handleTimingPoint(string line)
         {
-            string[] split = line.Split(',');
+            var span = line.AsSpan();
+            Span<Range> ranges = stackalloc Range[span.GetSplitCount(comma)];
+            span.Split(ranges, comma);
 
-            double time = getOffsetTime(Parsing.ParseDouble(split[0].Trim()));
+            double time = getOffsetTime(Parsing.ParseDouble(span.Slice(ranges[0]).Trim()));
 
             // beatLength is allowed to be NaN to handle an edge case in which some beatmaps use NaN slider velocity to disable slider tick generation (see LegacyDifficultyControlPoint).
-            double beatLength = Parsing.ParseDouble(split[1].Trim(), allowNaN: true);
+            double beatLength = Parsing.ParseDouble(span.Slice(ranges[1]).Trim(), allowNaN: true);
 
             // If beatLength is NaN, speedMultiplier should still be 1 because all comparisons against NaN are false.
             double speedMultiplier = beatLength < 0 ? 100.0 / -beatLength : 1;
 
             TimeSignature timeSignature = TimeSignature.SimpleQuadruple;
-            if (split.Length >= 3)
-                timeSignature = split[2][0] == '0' ? TimeSignature.SimpleQuadruple : new TimeSignature(Parsing.ParseInt(split[2]));
+            if (ranges.Length >= 3)
+                timeSignature = span.Slice(ranges[2])[0] == '0' ? TimeSignature.SimpleQuadruple : new TimeSignature(Parsing.ParseInt(span.Slice(ranges[2])));
 
             LegacySampleBank sampleSet = defaultSampleBank;
-            if (split.Length >= 4)
-                sampleSet = (LegacySampleBank)Parsing.ParseInt(split[3]);
+            if (ranges.Length >= 4)
+                sampleSet = (LegacySampleBank)Parsing.ParseInt(span.Slice(ranges[3]));
 
             int customSampleBank = 0;
-            if (split.Length >= 5)
-                customSampleBank = Parsing.ParseInt(split[4]);
+            if (ranges.Length >= 5)
+                customSampleBank = Parsing.ParseInt(span.Slice(ranges[4]));
 
             int sampleVolume = defaultSampleVolume;
-            if (split.Length >= 6)
-                sampleVolume = Parsing.ParseInt(split[5]);
+            if (ranges.Length >= 6)
+                sampleVolume = Parsing.ParseInt(span.Slice(ranges[5]));
 
             bool timingChange = true;
-            if (split.Length >= 7)
-                timingChange = split[6][0] == '1';
+            if (ranges.Length >= 7)
+                timingChange = span.Slice(ranges[6])[0] == '1';
 
             bool kiaiMode = false;
             bool omitFirstBarSignature = false;
 
-            if (split.Length >= 8)
+            if (ranges.Length >= 8)
             {
-                LegacyEffectFlags effectFlags = (LegacyEffectFlags)Parsing.ParseInt(split[7]);
+                LegacyEffectFlags effectFlags = (LegacyEffectFlags)Parsing.ParseInt(span.Slice(ranges[7]));
                 kiaiMode = effectFlags.HasFlagFast(LegacyEffectFlags.Kiai);
                 omitFirstBarSignature = effectFlags.HasFlagFast(LegacyEffectFlags.OmitFirstBarLine);
             }
