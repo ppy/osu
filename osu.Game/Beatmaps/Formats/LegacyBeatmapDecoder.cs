@@ -498,10 +498,6 @@ namespace osu.Game.Beatmaps.Formats
                 omitFirstBarSignature = effectFlags.HasFlagFast(LegacyEffectFlags.OmitFirstBarLine);
             }
 
-            string stringSampleSet = sampleSet.ToString().ToLowerInvariant();
-            if (stringSampleSet == @"none")
-                stringSampleSet = HitSampleInfo.BANK_NORMAL;
-
             if (timingChange)
             {
                 if (double.IsNaN(beatLength))
@@ -537,7 +533,7 @@ namespace osu.Game.Beatmaps.Formats
 
             addControlPoint(time, new LegacySampleControlPoint
             {
-                SampleBank = stringSampleSet,
+                SampleBank = sampleSet == LegacySampleBank.None ? HitSampleInfo.BANK_NORMAL : sampleSet.ToString().ToLowerInvariant(),
                 SampleVolume = sampleVolume,
                 CustomSampleBank = customSampleBank,
             }, timingChange);
