@@ -4,7 +4,6 @@
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
-using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
@@ -228,7 +227,9 @@ namespace osu.Game.Rulesets.Osu.Skinning
                 int futurePointIndex = ~Source.SmokePoints.BinarySearch(new SmokePoint { Time = CurrentTime }, new SmokePoint.UpperBoundComparer());
 
                 points.Clear();
-                points.AddRange(Source.SmokePoints.Skip(firstVisiblePointIndex).Take(futurePointIndex - firstVisiblePointIndex));
+
+                for (int i = firstVisiblePointIndex; i < futurePointIndex; i++)
+                    points.Add(Source.SmokePoints[i]);
             }
 
             protected sealed override void Draw(IRenderer renderer)
