@@ -23,29 +23,29 @@ namespace osu.Game.Rulesets.Osu.Skinning.Legacy
 
         private partial class LegacyDrawableSliderPath : DrawableSliderPath
         {
-            private const float shadow_portion = 1 - (OsuLegacySkinTransformer.LEGACY_CIRCLE_RADIUS / OsuHitObject.OBJECT_RADIUS);
-
-            protected new float CalculatedBorderPortion
-                // Roughly matches osu!stable's slider border portions.
-                => base.CalculatedBorderPortion * 0.77f;
-
             protected override Color4 ColourAt(float position)
             {
-                float realBorderPortion = shadow_portion + CalculatedBorderPortion;
-                float realGradientPortion = 1 - realBorderPortion;
+                const float aa_width = 0.5f / 64f;
+                const float shadow_portion = 1 - (OsuLegacySkinTransformer.LEGACY_CIRCLE_RADIUS / OsuHitObject.OBJECT_RADIUS);
+                const float border_portion = 0.1875f;
 
-                if (position <= shadow_portion)
-                    return new Color4(0f, 0f, 0f, 0.25f * position / shadow_portion);
-
-                if (position <= realBorderPortion)
-                    return BorderColour;
-
-                position -= realBorderPortion;
-
+                Color4 shadow = new Color4(0, 0, 0, 0.25f);
                 Color4 outerColour = AccentColour.Darken(0.1f);
                 Color4 innerColour = lighten(AccentColour, 0.5f);
 
-                return LegacyUtils.InterpolateNonLinear(position / realGradientPortion, outerColour, innerColour, 0, 1);
+                if (position <= shadow_portion - aa_width)
+                    return LegacyUtils.InterpolateNonLinear(position, Color4.Black.Opacity(0f), shadow, 0, shadow_portion - aa_width);
+
+                if (position <= shadow_portion + aa_width)
+                    return LegacyUtils.InterpolateNonLinear(position, shadow, BorderColour, shadow_portion - aa_width, shadow_portion + aa_width);
+
+                if (position <= border_portion - aa_width)
+                    return BorderColour;
+
+                if (position <= border_portion + aa_width)
+                    return LegacyUtils.InterpolateNonLinear(position, BorderColour, outerColour, border_portion - aa_width, border_portion + aa_width);
+
+                return LegacyUtils.InterpolateNonLinear(position, outerColour, innerColour, border_portion + aa_width, 1);
             }
 
             /// <summary>
