@@ -59,6 +59,13 @@ namespace osu.Game.Screens.Select.Details
             }
         }
 
+        /// <summary>
+        /// Ruleset to be used for certain elements of display.
+        /// When set, this will override the set <see cref="Beatmap"/>'s own ruleset.
+        /// </summary>
+        /// <remarks>
+        /// No checks are done as to whether the ruleset specified is valid for the currently <see cref="BeatmapInfo"/>.
+        /// </remarks>
         public Bindable<RulesetInfo> Ruleset { get; } = new Bindable<RulesetInfo>();
 
         public AdvancedStats(int columns = 1)
