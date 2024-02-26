@@ -258,14 +258,10 @@ namespace osu.Game.Screens.Play
 
             Vector2? highestBottomScreenSpace = null;
 
-            for (int i = 0; i < mainComponents.Components.Count; i++)
-                processDrawable(mainComponents.Components[i]);
+            processDrawables(mainComponents);
 
             if (rulesetComponents != null)
-            {
-                for (int i = 0; i < rulesetComponents.Components.Count; i++)
-                    processDrawable(rulesetComponents.Components[i]);
-            }
+                processDrawables(rulesetComponents);
 
             if (lowestTopScreenSpaceRight.HasValue)
                 topRightElements.Y = MathHelper.Clamp(ToLocalSpace(new Vector2(0, lowestTopScreenSpaceRight.Value)).Y, 0, DrawHeight - topRightElements.DrawHeight);
@@ -281,6 +277,14 @@ namespace osu.Game.Screens.Play
                 bottomRightElements.Y = BottomScoringElementsHeight = -MathHelper.Clamp(DrawHeight - ToLocalSpace(highestBottomScreenSpace.Value).Y, 0, DrawHeight - bottomRightElements.DrawHeight);
             else
                 bottomRightElements.Y = 0;
+
+            void processDrawables(SkinComponentsContainer components)
+            {
+                // Avoid using foreach due to missing GetEnumerator implementation.
+                // See https://github.com/ppy/osu-framework/blob/e10051e6643731e393b09de40a3a3d209a545031/osu.Framework/Bindables/IBindableList.cs#L41-L44.
+                for (int i = 0; i < components.Components.Count; i++)
+                    processDrawable(components.Components[i]);
+            }
 
             void processDrawable(ISerialisableDrawable element)
             {
