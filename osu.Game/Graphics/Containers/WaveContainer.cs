@@ -122,7 +122,7 @@ namespace osu.Game.Graphics.Containers
 
         protected override void PopIn()
         {
-            foreach (var w in wavesContainer.Children)
+            foreach (var w in wavesContainer)
                 w.Show();
 
             contentContainer.MoveToY(0, APPEAR_DURATION, Easing.OutQuint);
@@ -132,7 +132,7 @@ namespace osu.Game.Graphics.Containers
 
         protected override void PopOut()
         {
-            foreach (var w in wavesContainer.Children)
+            foreach (var w in wavesContainer)
                 w.Hide();
 
             contentContainer.MoveToY(2, DISAPPEAR_DURATION, Easing.In);
@@ -178,7 +178,7 @@ namespace osu.Game.Graphics.Containers
 
                 // We can not use RelativeSizeAxes for Height, because the height
                 // of our parent diminishes as the content moves up.
-                Height = Parent.Parent.DrawSize.Y * 1.5f;
+                Height = Parent!.Parent!.DrawSize.Y * 1.5f;
             }
 
             protected override void PopIn() => Schedule(() => this.MoveToY(FinalPosition, APPEAR_DURATION, easing_show));
@@ -188,7 +188,7 @@ namespace osu.Game.Graphics.Containers
                 double duration = IsLoaded ? DISAPPEAR_DURATION : 0;
 
                 // scheduling is required as parent may not be present at the time this is called.
-                Schedule(() => this.MoveToY(Parent.Parent.DrawSize.Y, duration, easing_hide));
+                Schedule(() => this.MoveToY(Parent!.Parent!.DrawSize.Y, duration, easing_hide));
             }
         }
     }

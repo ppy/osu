@@ -3,7 +3,6 @@
 
 #nullable disable
 
-using System.Diagnostics;
 using osu.Framework.Graphics;
 using osu.Framework.Input.Events;
 using osu.Game.Rulesets.Scoring;
@@ -33,35 +32,19 @@ namespace osu.Game.Rulesets.Mania.Objects.Drawables
 
         public void UpdateResult() => base.UpdateResult(true);
 
-        protected override void CheckForResult(bool userTriggered, double timeOffset)
-        {
-            Debug.Assert(HitObject.HitWindows != null);
-
+        protected override void CheckForResult(bool userTriggered, double timeOffset) =>
             // Factor in the release lenience
-            timeOffset /= TailNote.RELEASE_WINDOW_LENIENCE;
+            base.CheckForResult(userTriggered, timeOffset / TailNote.RELEASE_WINDOW_LENIENCE);
 
-            if (!userTriggered)
-            {
-                if (!HitObject.HitWindows.CanBeHit(timeOffset))
-                    ApplyResult(r => r.Type = r.Judgement.MinResult);
+        protected override HitResult GetCappedResult(HitResult result)
+        {
+            // If the head wasn't hit or the hold note was broken, cap the max score to Meh.
+            bool hasComboBreak = !HoldNote.Head.IsHit || HoldNote.Body.HasHoldBreak;
 
-                return;
-            }
+            if (result > HitResult.Meh && hasComboBreak)
+                return HitResult.Meh;
 
-            var result = HitObject.HitWindows.ResultFor(timeOffset);
-            if (result == HitResult.None)
-                return;
-
-            ApplyResult(r =>
-            {
-                // If the head wasn't hit or the hold note was broken, cap the max score to Meh.
-                bool hasComboBreak = !HoldNote.Head.IsHit || HoldNote.Body.HasHoldBreak;
-
-                if (result > HitResult.Meh && hasComboBreak)
-                    result = HitResult.Meh;
-
-                r.Type = result;
-            });
+            return result;
         }
 
         public override bool OnPressed(KeyBindingPressEvent<ManiaAction> e) => false; // Handled by the hold note

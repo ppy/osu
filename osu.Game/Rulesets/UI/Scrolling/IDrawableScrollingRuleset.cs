@@ -11,5 +11,7 @@ namespace osu.Game.Rulesets.UI.Scrolling
     public interface IDrawableScrollingRuleset
     {
         ScrollVisualisationMethod VisualisationMethod { get; }
+
+        IScrollingInfo ScrollingInfo { get; }
     }
 }

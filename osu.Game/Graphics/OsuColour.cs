@@ -75,9 +75,12 @@ namespace osu.Game.Graphics
         {
             switch (result)
             {
+                case HitResult.IgnoreMiss:
                 case HitResult.SmallTickMiss:
-                case HitResult.LargeTickMiss:
+                    return Color4.Gray;
+
                 case HitResult.Miss:
+                case HitResult.LargeTickMiss:
                 case HitResult.ComboBreak:
                     return Red;
 
@@ -92,6 +95,7 @@ namespace osu.Game.Graphics
 
                 case HitResult.SmallTickHit:
                 case HitResult.LargeTickHit:
+                case HitResult.SliderTailHit:
                 case HitResult.Great:
                     return Blue;
 
@@ -162,7 +166,7 @@ namespace osu.Game.Graphics
                     return Pink1;
 
                 case ModType.System:
-                    return Gray7;
+                    return Yellow;
 
                 default:
                     throw new ArgumentOutOfRangeException(nameof(modType), modType, "Unknown mod type");

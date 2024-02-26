@@ -17,7 +17,7 @@ using osuTK;
 
 namespace osu.Game.Rulesets.Osu.Objects.Drawables
 {
-    public partial class DrawableSliderRepeat : DrawableOsuHitObject, ITrackSnaking
+    public partial class DrawableSliderRepeat : DrawableOsuHitObject
     {
         public new SliderRepeat HitObject => (SliderRepeat)base.HitObject;
 
@@ -33,8 +33,6 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
         public SkinnableDrawable Arrow { get; private set; }
 
         private Drawable scaleContainer;
-
-        public override bool DisplayResult => false;
 
         public DrawableSliderRepeat()
             : base(null)
@@ -83,11 +81,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
             Position = HitObject.Position - DrawableSlider.Position;
         }
 
-        protected override void CheckForResult(bool userTriggered, double timeOffset)
-        {
-            if (HitObject.StartTime <= Time.Current)
-                ApplyResult(r => r.Type = DrawableSlider.Tracking.Value ? r.Judgement.MaxResult : r.Judgement.MinResult);
-        }
+        protected override void CheckForResult(bool userTriggered, double timeOffset) => DrawableSlider.SliderInputManager.TryJudgeNestedObject(this, timeOffset);
 
         protected override void UpdateInitialTransforms()
         {
@@ -118,11 +112,6 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
 
                 case ArmedState.Hit:
                     this.FadeOut(animDuration, Easing.Out);
-
-                    const float final_scale = 1.5f;
-
-                    Arrow.ScaleTo(Scale * final_scale, animDuration, Easing.Out);
-                    CirclePiece.ScaleTo(Scale * final_scale, animDuration, Easing.Out);
                     break;
             }
         }

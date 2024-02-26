@@ -7,7 +7,6 @@ using System.Text;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
-using osu.Framework.Localisation;
 using osu.Game.Beatmaps;
 using osu.Game.Online.API;
 using osu.Game.Rulesets;
@@ -33,9 +32,6 @@ namespace osu.Game.Online.Chat
         [Resolved]
         private IBindable<RulesetInfo> currentRuleset { get; set; } = null!;
 
-        [Resolved]
-        private LocalisationManager localisation { get; set; } = null!;
-
         private readonly Channel? target;
 
         /// <summary>
@@ -52,23 +48,28 @@ namespace osu.Game.Online.Chat
             base.LoadComplete();
 
             string verb;
-            IBeatmapInfo beatmapInfo;
+
+            int beatmapOnlineID;
+            string beatmapDisplayTitle;
 
             switch (api.Activity.Value)
             {
                 case UserActivity.InGame game:
                     verb = "playing";
-                    beatmapInfo = game.BeatmapInfo;
+                    beatmapOnlineID = game.BeatmapID;
+                    beatmapDisplayTitle = game.BeatmapDisplayTitle;
                     break;
 
                 case UserActivity.EditingBeatmap edit:
                     verb = "editing";
-                    beatmapInfo = edit.BeatmapInfo;
+                    beatmapOnlineID = edit.BeatmapID;
+                    beatmapDisplayTitle = edit.BeatmapDisplayTitle;
                     break;
 
                 default:
                     verb = "listening to";
-                    beatmapInfo = currentBeatmap.Value.BeatmapInfo;
+                    beatmapOnlineID = currentBeatmap.Value.BeatmapInfo.OnlineID;
+                    beatmapDisplayTitle = currentBeatmap.Value.BeatmapInfo.GetDisplayTitle();
                     break;
             }
 
@@ -86,9 +87,7 @@ namespace osu.Game.Online.Chat
 
             string getBeatmapPart()
             {
-                string beatmapInfoString = localisation.GetLocalisedBindableString(beatmapInfo.GetDisplayTitleRomanisable()).Value;
-
-                return beatmapInfo.OnlineID > 0 ? $"[{api.WebsiteRootUrl}/b/{beatmapInfo.OnlineID} {beatmapInfoString}]" : beatmapInfoString;
+                return beatmapOnlineID > 0 ? $"[{api.WebsiteRootUrl}/b/{beatmapOnlineID} {beatmapDisplayTitle}]" : beatmapDisplayTitle;
             }
 
             string getRulesetPart()

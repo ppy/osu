@@ -203,7 +203,7 @@ namespace osu.Game.Rulesets.Mania.Tests
             assertComboAtJudgement(0, 1);
             assertTailJudgement(HitResult.Meh);
             assertComboAtJudgement(1, 0);
-            assertComboAtJudgement(2, 1);
+            assertComboAtJudgement(3, 1);
         }
 
         /// <summary>
@@ -380,7 +380,8 @@ namespace osu.Game.Rulesets.Mania.Tests
         [Test]
         public void TestPressAndReleaseJustAfterTailWithNearbyNote()
         {
-            Note note;
+            // Next note within tail lenience
+            Note note = new Note { StartTime = time_tail + 50 };
 
             var beatmap = new Beatmap<ManiaHitObject>
             {
@@ -392,13 +393,7 @@ namespace osu.Game.Rulesets.Mania.Tests
                         Duration = time_tail - time_head,
                         Column = 0,
                     },
-                    {
-                        // Next note within tail lenience
-                        note = new Note
-                        {
-                            StartTime = time_tail + 50
-                        }
-                    }
+                    note
                 },
                 BeatmapInfo =
                 {

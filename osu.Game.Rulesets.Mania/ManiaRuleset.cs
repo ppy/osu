@@ -247,7 +247,7 @@ namespace osu.Game.Rulesets.Mania
                         new ManiaModHardRock(),
                         new MultiMod(new ManiaModSuddenDeath(), new ManiaModPerfect()),
                         new MultiMod(new ManiaModDoubleTime(), new ManiaModNightcore()),
-                        new MultiMod(new ManiaModFadeIn(), new ManiaModHidden()),
+                        new MultiMod(new ManiaModFadeIn(), new ManiaModHidden(), new ManiaModCover()),
                         new ManiaModFlashlight(),
                         new ModAccuracyChallenge(),
                     };
@@ -255,16 +255,6 @@ namespace osu.Game.Rulesets.Mania
                 case ModType.Conversion:
                     return new Mod[]
                     {
-                        new MultiMod(new ManiaModKey4(),
-                            new ManiaModKey5(),
-                            new ManiaModKey6(),
-                            new ManiaModKey7(),
-                            new ManiaModKey8(),
-                            new ManiaModKey9(),
-                            new ManiaModKey10(),
-                            new ManiaModKey1(),
-                            new ManiaModKey2(),
-                            new ManiaModKey3()),
                         new ManiaModRandom(),
                         new ManiaModDualStages(),
                         new ManiaModMirror(),
@@ -272,7 +262,19 @@ namespace osu.Game.Rulesets.Mania
                         new ManiaModClassic(),
                         new ManiaModInvert(),
                         new ManiaModConstantSpeed(),
-                        new ManiaModHoldOff()
+                        new ManiaModHoldOff(),
+                        new MultiMod(
+                            new ManiaModKey1(),
+                            new ManiaModKey2(),
+                            new ManiaModKey3(),
+                            new ManiaModKey4(),
+                            new ManiaModKey5(),
+                            new ManiaModKey6(),
+                            new ManiaModKey7(),
+                            new ManiaModKey8(),
+                            new ManiaModKey9(),
+                            new ManiaModKey10()
+                        ),
                     };
 
                 case ModType.Automation:
@@ -373,7 +375,7 @@ namespace osu.Game.Rulesets.Mania
         /// <returns>The <see cref="PlayfieldType"/> that corresponds to <paramref name="variant"/>.</returns>
         private PlayfieldType getPlayfieldType(int variant)
         {
-            return (PlayfieldType)Enum.GetValues(typeof(PlayfieldType)).Cast<int>().OrderByDescending(i => i).First(v => variant >= v);
+            return (PlayfieldType)Enum.GetValues(typeof(PlayfieldType)).Cast<int>().OrderDescending().First(v => variant >= v);
         }
 
         protected override IEnumerable<HitResult> GetValidHitResults()
@@ -385,6 +387,9 @@ namespace osu.Game.Rulesets.Mania
                 HitResult.Good,
                 HitResult.Ok,
                 HitResult.Meh,
+
+                // HitResult.SmallBonus is used for awarding perfect bonus score but is not included here as
+                // it would be a bit redundant to show this to the user.
             };
         }
 
@@ -415,6 +420,9 @@ namespace osu.Game.Rulesets.Mania
         public override RulesetSetupSection CreateEditorSetupSection() => new ManiaSetupSection();
 
         public override DifficultySection CreateEditorDifficultySection() => new ManiaDifficultySection();
+
+        public int GetKeyCount(IBeatmapInfo beatmapInfo)
+            => ManiaBeatmapConverter.GetColumnCount(LegacyBeatmapConversionDifficultyInfo.FromBeatmapInfo(beatmapInfo));
     }
 
     public enum PlayfieldType

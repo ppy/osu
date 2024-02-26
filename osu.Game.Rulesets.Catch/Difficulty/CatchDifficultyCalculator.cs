@@ -5,6 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using osu.Game.Beatmaps;
+using osu.Game.Rulesets.Catch.Beatmaps;
 using osu.Game.Rulesets.Catch.Difficulty.Preprocessing;
 using osu.Game.Rulesets.Catch.Difficulty.Skills;
 using osu.Game.Rulesets.Catch.Mods;
@@ -56,13 +57,10 @@ namespace osu.Game.Rulesets.Catch.Difficulty
             List<DifficultyHitObject> objects = new List<DifficultyHitObject>();
 
             // In 2B beatmaps, it is possible that a normal Fruit is placed in the middle of a JuiceStream.
-            foreach (var hitObject in beatmap.HitObjects
-                                             .SelectMany(obj => obj is JuiceStream stream ? stream.NestedHitObjects.AsEnumerable() : new[] { obj })
-                                             .Cast<CatchHitObject>()
-                                             .OrderBy(x => x.StartTime))
+            foreach (var hitObject in CatchBeatmap.GetPalpableObjects(beatmap.HitObjects))
             {
                 // We want to only consider fruits that contribute to the combo.
-                if (hitObject is BananaShower || hitObject is TinyDroplet)
+                if (hitObject is Banana || hitObject is TinyDroplet)
                     continue;
 
                 if (lastObject != null)

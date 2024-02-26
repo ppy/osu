@@ -70,9 +70,9 @@ namespace osu.Game.Beatmaps
                 throw new NotImplementedException();
             }
 
-            public override IBeatmapConverter CreateBeatmapConverter(IBeatmap beatmap) => new DummyBeatmapConverter { Beatmap = beatmap };
+            public override IBeatmapConverter CreateBeatmapConverter(IBeatmap beatmap) => new DummyBeatmapConverter(beatmap);
 
-            public override DifficultyCalculator CreateDifficultyCalculator(IWorkingBeatmap beatmap) => null;
+            public override DifficultyCalculator CreateDifficultyCalculator(IWorkingBeatmap beatmap) => throw new NotImplementedException();
 
             public override string Description => "dummy";
 
@@ -80,9 +80,15 @@ namespace osu.Game.Beatmaps
 
             private class DummyBeatmapConverter : IBeatmapConverter
             {
-                public event Action<HitObject, IEnumerable<HitObject>> ObjectConverted;
+                public IBeatmap Beatmap { get; }
 
-                public IBeatmap Beatmap { get; set; }
+                public DummyBeatmapConverter(IBeatmap beatmap)
+                {
+                    Beatmap = beatmap;
+                }
+
+                [CanBeNull]
+                public event Action<HitObject, IEnumerable<HitObject>> ObjectConverted;
 
                 public bool CanConvert() => true;
 

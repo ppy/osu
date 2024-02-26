@@ -108,7 +108,11 @@ namespace osu.Game.Rulesets.Mania.Objects.Drawables
                     RelativeSizeAxes = Axes.X
                 },
                 tailContainer = new Container<DrawableHoldNoteTail> { RelativeSizeAxes = Axes.Both },
-                slidingSample = new PausableSkinnableSound { Looping = true }
+                slidingSample = new PausableSkinnableSound
+                {
+                    Looping = true,
+                    MinimumSampleVolume = MINIMUM_SAMPLE_VOLUME,
+                }
             });
 
             maskedContents.AddRange(new[]
@@ -261,7 +265,7 @@ namespace osu.Game.Rulesets.Mania.Objects.Drawables
             if (Tail.AllJudged)
             {
                 if (Tail.IsHit)
-                    ApplyResult(r => r.Type = r.Judgement.MaxResult);
+                    ApplyMaxResult();
                 else
                     MissForcefully();
             }

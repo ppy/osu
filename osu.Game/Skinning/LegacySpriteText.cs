@@ -1,6 +1,8 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics.Sprites;
@@ -12,8 +14,10 @@ namespace osu.Game.Skinning
 {
     public sealed partial class LegacySpriteText : OsuSpriteText
     {
+        public Vector2? MaxSizePerGlyph { get; init; }
+        public bool FixedWidth { get; init; }
+
         private readonly LegacyFont font;
-        private readonly Vector2? maxSizePerGlyph;
 
         private LegacyGlyphStore glyphStore = null!;
 
@@ -21,10 +25,18 @@ namespace osu.Game.Skinning
 
         protected override char[] FixedWidthExcludeCharacters => new[] { ',', '.', '%', 'x' };
 
-        public LegacySpriteText(LegacyFont font, Vector2? maxSizePerGlyph = null)
+        // ReSharper disable once UnusedMember.Global
+        // being unused is the point here
+        public new FontUsage Font
+        {
+            get => base.Font;
+            set => throw new InvalidOperationException(@"Attempting to use this setter will not work correctly. "
+                                                       + $@"Use specific init-only properties exposed by {nameof(LegacySpriteText)} instead.");
+        }
+
+        public LegacySpriteText(LegacyFont font)
         {
             this.font = font;
-            this.maxSizePerGlyph = maxSizePerGlyph;
 
             Shadow = false;
             UseFullGlyphHeight = false;
@@ -33,10 +45,17 @@ namespace osu.Game.Skinning
         [BackgroundDependencyLoader]
         private void load(ISkinSource skin)
         {
-            Font = new FontUsage(skin.GetFontPrefix(font), 1, fixedWidth: true);
+            string fontPrefix = skin.GetFontPrefix(font);
+            base.Font = new FontUsage(fontPrefix, 1, fixedWidth: FixedWidth);
             Spacing = new Vector2(-skin.GetFontOverlap(font), 0);
 
-            glyphStore = new LegacyGlyphStore(skin, maxSizePerGlyph);
+            glyphStore = new LegacyGlyphStore(fontPrefix, skin, MaxSizePerGlyph);
+
+            // cache common lookups ahead of time.
+            foreach (char c in FixedWidthExcludeCharacters)
+                glyphStore.Get(fontPrefix, c);
+            for (int i = 0; i < 10; i++)
+                glyphStore.Get(fontPrefix, (char)('0' + i));
         }
 
         protected override TextBuilder CreateTextBuilder(ITexturedGlyphLookupStore store) => base.CreateTextBuilder(glyphStore);
@@ -46,25 +65,42 @@ namespace osu.Game.Skinning
             private readonly ISkin skin;
             private readonly Vector2? maxSize;
 
-            public LegacyGlyphStore(ISkin skin, Vector2? maxSize)
+            private readonly string fontName;
+
+            private readonly Dictionary<char, ITexturedCharacterGlyph?> cache = new Dictionary<char, ITexturedCharacterGlyph?>();
+
+            public LegacyGlyphStore(string fontName, ISkin skin, Vector2? maxSize)
             {
+                this.fontName = fontName;
                 this.skin = skin;
                 this.maxSize = maxSize;
             }
 
-            public ITexturedCharacterGlyph? Get(string fontName, char character)
+            public ITexturedCharacterGlyph? Get(string? fontName, char character)
             {
+                // We only service one font.
+                if (fontName != this.fontName)
+                    return null;
+
+                if (cache.TryGetValue(character, out var cached))
+                    return cached;
+
                 string lookup = getLookupName(character);
 
                 var texture = skin.GetTexture($"{fontName}-{lookup}");
 
-                if (texture == null)
-                    return null;
+                TexturedCharacterGlyph? glyph = null;
 
-                if (maxSize != null)
-                    texture = texture.WithMaximumSize(maxSize.Value);
+                if (texture != null)
+                {
+                    if (maxSize != null)
+                        texture = texture.WithMaximumSize(maxSize.Value);
 
-                return new TexturedCharacterGlyph(new CharacterGlyph(character, 0, 0, texture.Width, texture.Height, null), texture, 1f / texture.ScaleAdjust);
+                    glyph = new TexturedCharacterGlyph(new CharacterGlyph(character, 0, 0, texture.Width, texture.Height, null), texture, 1f / texture.ScaleAdjust);
+                }
+
+                cache[character] = glyph;
+                return glyph;
             }
 
             private static string getLookupName(char character)

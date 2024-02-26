@@ -5,6 +5,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Threading;
@@ -26,6 +27,7 @@ namespace osu.Game.Scoring
 {
     public class ScoreManager : ModelManager<ScoreInfo>, IModelImporter<ScoreInfo>
     {
+        private readonly Func<BeatmapManager> beatmaps;
         private readonly OsuConfigManager configManager;
         private readonly ScoreImporter scoreImporter;
         private readonly LegacyScoreExporter scoreExporter;
@@ -44,6 +46,7 @@ namespace osu.Game.Scoring
                             OsuConfigManager configManager = null)
             : base(storage, realm)
         {
+            this.beatmaps = beatmaps;
             this.configManager = configManager;
 
             scoreImporter = new ScoreImporter(rulesets, beatmaps, storage, realm, api)
@@ -150,7 +153,11 @@ namespace osu.Game.Scoring
 
         public Task Import(ImportTask[] imports, ImportParameters parameters = default) => scoreImporter.Import(imports, parameters);
 
-        public override bool IsAvailableLocally(ScoreInfo model) => Realm.Run(realm => realm.All<ScoreInfo>().Any(s => s.OnlineID == model.OnlineID));
+        public override bool IsAvailableLocally(ScoreInfo model)
+            => Realm.Run(realm => realm.All<ScoreInfo>()
+                                       // this basically inlines `ModelExtension.MatchesOnlineID(IScoreInfo, IScoreInfo)`,
+                                       // because that method can't be used here, as realm can't translate it to its query language.
+                                       .Any(s => s.OnlineID == model.OnlineID || s.LegacyOnlineID == model.LegacyOnlineID));
 
         public IEnumerable<string> HandledExtensions => scoreImporter.HandledExtensions;
 
@@ -167,7 +174,11 @@ namespace osu.Game.Scoring
         /// Populates the <see cref="ScoreInfo.MaximumStatistics"/> for a given <see cref="ScoreInfo"/>.
         /// </summary>
         /// <param name="score">The score to populate the statistics of.</param>
-        public void PopulateMaximumStatistics(ScoreInfo score) => scoreImporter.PopulateMaximumStatistics(score);
+        public void PopulateMaximumStatistics(ScoreInfo score)
+        {
+            Debug.Assert(score.BeatmapInfo != null);
+            LegacyScoreDecoder.PopulateMaximumStatistics(score, beatmaps().GetWorkingBeatmap(score.BeatmapInfo.Detach()));
+        }
 
         #region Implementation of IPresentImports<ScoreInfo>
 

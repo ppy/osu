@@ -4,6 +4,7 @@
 #nullable disable
 
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using JetBrains.Annotations;
 using osu.Framework.Allocation;
@@ -16,6 +17,7 @@ using osu.Game.Rulesets.Judgements;
 using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Objects.Drawables;
 using osu.Game.Rulesets.Osu.Judgements;
+using osu.Game.Rulesets.Osu.Scoring;
 using osu.Game.Rulesets.Osu.Skinning;
 using osu.Game.Rulesets.Osu.Skinning.Default;
 using osu.Game.Rulesets.Scoring;
@@ -45,12 +47,21 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
         private const float spinning_sample_initial_frequency = 1.0f;
         private const float spinning_sample_modulated_base_frequency = 0.5f;
 
+        private PausableSkinnableSound maxBonusSample;
+
         /// <summary>
         /// The amount of bonus score gained from spinning after the required number of spins, for display purposes.
         /// </summary>
-        public IBindable<double> GainedBonus => gainedBonus;
+        public double CurrentBonusScore => score_per_tick * Math.Clamp(completedFullSpins.Value - HitObject.SpinsRequiredForBonus, 0, HitObject.MaximumBonusSpins);
 
-        private readonly Bindable<double> gainedBonus = new BindableDouble();
+        /// <summary>
+        /// The maximum amount of bonus score which can be achieved from extra spins.
+        /// </summary>
+        public double MaximumBonusScore => score_per_tick * HitObject.MaximumBonusSpins;
+
+        public IBindable<int> CompletedFullSpins => completedFullSpins;
+
+        private readonly Bindable<int> completedFullSpins = new Bindable<int>();
 
         /// <summary>
         /// The number of spins per minute this spinner is spinning at, for display purposes.
@@ -99,8 +110,13 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
                 spinningSample = new PausableSkinnableSound
                 {
                     Volume = { Value = 0 },
+                    MinimumSampleVolume = MINIMUM_SAMPLE_VOLUME,
                     Looping = true,
                     Frequency = { Value = spinning_sample_initial_frequency }
+                },
+                maxBonusSample = new PausableSkinnableSound
+                {
+                    MinimumSampleVolume = MINIMUM_SAMPLE_VOLUME,
                 }
             });
 
@@ -120,6 +136,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
             base.OnFree();
 
             spinningSample.ClearSamples();
+            maxBonusSample.ClearSamples();
         }
 
         protected override void LoadSamples()
@@ -128,13 +145,15 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
 
             spinningSample.Samples = HitObject.CreateSpinningSamples().Cast<ISampleInfo>().ToArray();
             spinningSample.Frequency.Value = spinning_sample_initial_frequency;
+
+            maxBonusSample.Samples = new ISampleInfo[] { new SpinnerBonusMaxSampleInfo(HitObject.CreateHitSampleInfo()) };
         }
 
         private void updateSpinningSample(ValueChangedEvent<bool> tracking)
         {
             if (tracking.NewValue)
             {
-                if (!spinningSample.IsPlaying)
+                if (!spinningSample.RequestedPlaying)
                     spinningSample.Play();
 
                 spinningSample.VolumeTo(1, 300);
@@ -149,6 +168,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
         {
             base.StopAllSamples();
             spinningSample?.Stop();
+            maxBonusSample?.Stop();
         }
 
         protected override void AddNestedHitObject(DrawableHitObject hitObject)
@@ -218,7 +238,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
                     // these become implicitly hit.
                     return 1;
 
-                return Math.Clamp(Result.RateAdjustedRotation / 360 / HitObject.SpinsRequired, 0, 1);
+                return Math.Clamp(Result.TotalRotation / 360 / HitObject.SpinsRequired, 0, 1);
             }
         }
 
@@ -238,15 +258,16 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
             foreach (var tick in ticks.Where(t => !t.Result.HasResult))
                 tick.TriggerResult(false);
 
-            ApplyResult(r =>
+            ApplyResult(static (r, hitObject) =>
             {
-                if (Progress >= 1)
+                var spinner = (DrawableSpinner)hitObject;
+                if (spinner.Progress >= 1)
                     r.Type = HitResult.Great;
-                else if (Progress > .9)
+                else if (spinner.Progress > .9)
                     r.Type = HitResult.Ok;
-                else if (Progress > .75)
+                else if (spinner.Progress > .75)
                     r.Type = HitResult.Meh;
-                else if (Time.Current >= HitObject.EndTime)
+                else if (spinner.Time.Current >= spinner.HitObject.EndTime)
                     r.Type = r.Judgement.MinResult;
             });
         }
@@ -258,15 +279,46 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
             if (HandleUserInput)
             {
                 bool isValidSpinningTime = Time.Current >= HitObject.StartTime && Time.Current <= HitObject.EndTime;
-                bool correctButtonPressed = (OsuActionInputManager?.PressedActions.Any(x => x == OsuAction.LeftButton || x == OsuAction.RightButton) ?? false);
 
                 RotationTracker.Tracking = !Result.HasResult
-                                           && correctButtonPressed
+                                           && correctButtonPressed()
                                            && isValidSpinningTime;
             }
 
             if (spinningSample != null && spinnerFrequencyModulate)
                 spinningSample.Frequency.Value = spinning_sample_modulated_base_frequency + Progress;
+
+            // Ticks can theoretically be judged at any point in the spinner's duration.
+            // A tick must be alive to correctly play back samples,
+            // but for performance reasons, we only want to keep the next tick alive.
+            DrawableHitObject nextTick = null;
+
+            foreach (var nested in NestedHitObjects)
+            {
+                if (!nested.Judged)
+                {
+                    nextTick = nested;
+                    break;
+                }
+            }
+
+            // See default `LifetimeStart` as set in `DrawableSpinnerTick`.
+            if (nextTick?.LifetimeStart == double.MaxValue)
+                nextTick.LifetimeStart = HitObject.StartTime;
+        }
+
+        private bool correctButtonPressed()
+        {
+            if (OsuActionInputManager == null)
+                return false;
+
+            foreach (var action in OsuActionInputManager.PressedActions)
+            {
+                if (action == OsuAction.LeftButton || action == OsuAction.RightButton)
+                    return true;
+            }
+
+            return false;
         }
 
         protected override void UpdateAfterChildren()
@@ -279,43 +331,63 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
             // don't update after end time to avoid the rate display dropping during fade out.
             // this shouldn't be limited to StartTime as it causes weirdness with the underlying calculation, which is expecting updates during that period.
             if (Time.Current <= HitObject.EndTime)
-                spmCalculator.SetRotation(Result.RateAdjustedRotation);
+                spmCalculator.SetRotation(Result.TotalRotation);
 
             updateBonusScore();
         }
 
-        private static readonly int score_per_tick = new SpinnerBonusTick.OsuSpinnerBonusTickJudgement().MaxNumericResult;
-
-        private int completedFullSpins;
+        private static readonly int score_per_tick = new OsuScoreProcessor().GetBaseScoreForResult(new SpinnerBonusTick.OsuSpinnerBonusTickJudgement().MaxResult);
 
         private void updateBonusScore()
         {
             if (ticks.Count == 0)
                 return;
 
-            int spins = (int)(Result.RateAdjustedRotation / 360);
+            int spins = (int)(Result.TotalRotation / 360);
 
-            if (spins < completedFullSpins)
+            if (spins < completedFullSpins.Value)
             {
                 // rewinding, silently handle
-                completedFullSpins = spins;
+                completedFullSpins.Value = spins;
                 return;
             }
 
-            while (completedFullSpins != spins)
+            while (completedFullSpins.Value != spins)
             {
                 var tick = ticks.FirstOrDefault(t => !t.Result.HasResult);
 
                 // tick may be null if we've hit the spin limit.
-                if (tick != null)
+                if (tick == null)
                 {
+                    // we still want to play a sound. this will probably be a new sound in the future, but for now let's continue playing the bonus sound.
+                    // TODO: this doesn't concurrency. i can't figure out how to make it concurrency. samples are bad and need a refactor.
+                    maxBonusSample.Play();
+                }
+                else
                     tick.TriggerResult(true);
 
-                    if (tick is DrawableSpinnerBonusTick)
-                        gainedBonus.Value = score_per_tick * (spins - HitObject.SpinsRequiredForBonus);
-                }
+                completedFullSpins.Value++;
+            }
+        }
 
-                completedFullSpins++;
+        public class SpinnerBonusMaxSampleInfo : HitSampleInfo
+        {
+            public override IEnumerable<string> LookupNames
+            {
+                get
+                {
+                    foreach (string name in base.LookupNames)
+                        yield return name;
+
+                    foreach (string name in base.LookupNames)
+                        yield return name.Replace("-max", string.Empty);
+                }
+            }
+
+            public SpinnerBonusMaxSampleInfo(HitSampleInfo sampleInfo)
+                : base("spinnerbonus-max", sampleInfo.Bank, sampleInfo.Suffix, sampleInfo.Volume)
+
+            {
             }
         }
     }

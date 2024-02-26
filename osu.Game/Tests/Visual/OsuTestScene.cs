@@ -169,15 +169,15 @@ namespace osu.Game.Tests.Visual
 
             ChangeBackgroundColour(ColourInfo.GradientVertical(colours.GreyCarmine, colours.GreyCarmineDarker));
 
-            var parentBeatmap = Parent.Dependencies.Get<Bindable<WorkingBeatmap>>();
+            var parentBeatmap = Parent!.Dependencies.Get<Bindable<WorkingBeatmap>>();
             parentBeatmap.Value = Beatmap.Value;
             Beatmap.BindTo(parentBeatmap);
 
-            var parentRuleset = Parent.Dependencies.Get<Bindable<RulesetInfo>>();
+            var parentRuleset = Parent!.Dependencies.Get<Bindable<RulesetInfo>>();
             parentRuleset.Value = Ruleset.Value;
             Ruleset.BindTo(parentRuleset);
 
-            var parentMods = Parent.Dependencies.Get<Bindable<IReadOnlyList<Mod>>>();
+            var parentMods = Parent!.Dependencies.Get<Bindable<IReadOnlyList<Mod>>>();
             parentMods.Value = SelectedMods.Value;
             SelectedMods.BindTo(parentMods);
         }
@@ -431,6 +431,11 @@ namespace osu.Game.Tests.Visual
                 private readonly IFrameBasedClock referenceClock;
 
                 private bool running;
+
+                public override double Rate => base.Rate
+                                               // This is mainly to allow some tests to override the rate to zero
+                                               // and avoid interpolation.
+                                               * referenceClock.Rate;
 
                 public TrackVirtualManual(IFrameBasedClock referenceClock, string name = "virtual")
                     : base(name)

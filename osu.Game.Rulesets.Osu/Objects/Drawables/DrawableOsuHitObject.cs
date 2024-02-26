@@ -98,11 +98,16 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
         public virtual void Shake() { }
 
         /// <summary>
+        /// Causes this <see cref="DrawableOsuHitObject"/> to get hit, disregarding all conditions in implementations of <see cref="DrawableHitObject.CheckForResult"/>.
+        /// </summary>
+        public void HitForcefully() => ApplyMaxResult();
+
+        /// <summary>
         /// Causes this <see cref="DrawableOsuHitObject"/> to get missed, disregarding all conditions in implementations of <see cref="DrawableHitObject.CheckForResult"/>.
         /// </summary>
-        public void MissForcefully() => ApplyResult(r => r.Type = r.Judgement.MinResult);
+        public void MissForcefully() => ApplyMinResult();
 
-        private RectangleF parentScreenSpaceRectangle => ((DrawableOsuHitObject)ParentHitObject)?.parentScreenSpaceRectangle ?? Parent.ScreenSpaceDrawQuad.AABBFloat;
+        private RectangleF parentScreenSpaceRectangle => ((DrawableOsuHitObject)ParentHitObject)?.parentScreenSpaceRectangle ?? Parent!.ScreenSpaceDrawQuad.AABBFloat;
 
         /// <summary>
         /// Calculates the position of the given <paramref name="drawable"/> relative to the playfield area.
