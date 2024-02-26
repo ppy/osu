@@ -26,7 +26,7 @@ namespace osu.Game.Rulesets.Osu.Skinning.Legacy
             protected override Color4 ColourAt(float position)
             {
                 // https://github.com/peppy/osu-stable-reference/blob/3ea48705eb67172c430371dcfc8a16a002ed0d3d/osu!/Graphics/Renderers/MmSliderRendererGL.cs#L99
-                const float aa_width = 0.5f / 64f;
+                const float aa_width = 3f / 256f;
 
                 Color4 shadow = new Color4(0, 0, 0, 0.25f);
                 Color4 outerColour = AccentColour.Darken(0.1f);
