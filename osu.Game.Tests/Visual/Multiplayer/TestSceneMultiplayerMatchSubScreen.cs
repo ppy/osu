@@ -22,6 +22,7 @@ using osu.Game.Overlays;
 using osu.Game.Overlays.Dialog;
 using osu.Game.Overlays.Mods;
 using osu.Game.Rulesets;
+using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Osu;
 using osu.Game.Rulesets.Osu.Mods;
 using osu.Game.Rulesets.Taiko;
@@ -303,7 +304,6 @@ namespace osu.Game.Tests.Visual.Multiplayer
                     AllowedMods = new[]
                     {
                         new APIMod(new OsuModFlashlight()),
-                        new APIMod(new OsuModHardRock()),
                     }
                 });
             });
@@ -312,8 +312,14 @@ namespace osu.Game.Tests.Visual.Multiplayer
             AddUntilStep("wait for join", () => RoomJoined);
 
             ClickButtonWhenEnabled<RoomSubScreen.UserModSelectButton>();
-            AddAssert("mod select shows unranked", () => this.ChildrenOfType<RankingInformationDisplay>().Single().Ranked.Value == false);
-            AddAssert("mod select shows different multiplier", () => !this.ChildrenOfType<RankingInformationDisplay>().Single().ModMultiplier.IsDefault);
+            AddAssert("mod select shows unranked", () => screen.UserModsSelectOverlay.ChildrenOfType<RankingInformationDisplay>().Single().Ranked.Value == false);
+            AddAssert("score multiplier = 1.20", () => screen.UserModsSelectOverlay.ChildrenOfType<RankingInformationDisplay>().Single().ModMultiplier.Value, () => Is.EqualTo(1.2).Within(0.01));
+
+            AddStep("select flashlight", () => screen.UserModsSelectOverlay.ChildrenOfType<ModPanel>().Single(m => m.Mod is ModFlashlight).TriggerClick());
+            AddAssert("score multiplier = 1.35", () => screen.UserModsSelectOverlay.ChildrenOfType<RankingInformationDisplay>().Single().ModMultiplier.Value, () => Is.EqualTo(1.35).Within(0.01));
+
+            AddStep("change flashlight setting", () => ((OsuModFlashlight)screen.UserModsSelectOverlay.SelectedMods.Value.Single()).FollowDelay.Value = 1200);
+            AddAssert("score multiplier = 1.20", () => screen.UserModsSelectOverlay.ChildrenOfType<RankingInformationDisplay>().Single().ModMultiplier.Value, () => Is.EqualTo(1.2).Within(0.01));
         }
 
         private partial class TestMultiplayerMatchSubScreen : MultiplayerMatchSubScreen
