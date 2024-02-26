@@ -17,11 +17,14 @@ namespace osu.Game.Audio.Effects
         /// </summary>
         public const int MAX_LOWPASS_CUTOFF = 22049; // nyquist - 1hz
 
+        /// <summary>
+        /// Whether this filter is currently attached to the audio track and thus applying an adjustment.
+        /// </summary>
+        public bool IsAttached { get; private set; }
+
         private readonly AudioMixer mixer;
         private readonly BQFParameters filter;
         private readonly BQFType type;
-
-        private bool isAttached;
 
         private readonly Cached filterApplication = new Cached();
 
@@ -132,22 +135,22 @@ namespace osu.Game.Audio.Effects
 
         private void ensureAttached()
         {
-            if (isAttached)
+            if (IsAttached)
                 return;
 
             Debug.Assert(!mixer.Effects.Contains(filter));
             mixer.Effects.Add(filter);
-            isAttached = true;
+            IsAttached = true;
         }
 
         private void ensureDetached()
         {
-            if (!isAttached)
+            if (!IsAttached)
                 return;
 
             Debug.Assert(mixer.Effects.Contains(filter));
             mixer.Effects.Remove(filter);
-            isAttached = false;
+            IsAttached = false;
         }
 
         protected override void Dispose(bool isDisposing)
