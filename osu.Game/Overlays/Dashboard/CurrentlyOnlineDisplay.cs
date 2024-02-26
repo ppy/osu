@@ -131,9 +131,6 @@ namespace osu.Game.Overlays.Dashboard
                     {
                         int userId = kvp.Key;
 
-                        if (userId == api.LocalUser.Value.Id)
-                            continue;
-
                         users.GetUserAsync(userId).ContinueWith(task =>
                         {
                             APIUser user = task.GetResultSafely();

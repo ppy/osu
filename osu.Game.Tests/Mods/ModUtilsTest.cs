@@ -7,7 +7,9 @@ using Moq;
 using NUnit.Framework;
 using osu.Framework.Localisation;
 using osu.Game.Rulesets.Mods;
+using osu.Game.Rulesets.Osu;
 using osu.Game.Rulesets.Osu.Mods;
+using osu.Game.Rulesets.Taiko.Mods;
 using osu.Game.Utils;
 
 namespace osu.Game.Tests.Mods
@@ -310,6 +312,36 @@ namespace osu.Game.Tests.Mods
                 Assert.That(invalid?.Select(t => t.GetType()), Is.EquivalentTo(expectedInvalid));
         }
 
+        [Test]
+        public void TestModBelongsToRuleset()
+        {
+            Assert.That(ModUtils.CheckModsBelongToRuleset(new OsuRuleset(), Array.Empty<Mod>()));
+            Assert.That(ModUtils.CheckModsBelongToRuleset(new OsuRuleset(), new Mod[] { new OsuModDoubleTime() }));
+            Assert.That(ModUtils.CheckModsBelongToRuleset(new OsuRuleset(), new Mod[] { new OsuModDoubleTime(), new OsuModAccuracyChallenge() }));
+            Assert.That(ModUtils.CheckModsBelongToRuleset(new OsuRuleset(), new Mod[] { new OsuModDoubleTime(), new ModAccuracyChallenge() }), Is.False);
+            Assert.That(ModUtils.CheckModsBelongToRuleset(new OsuRuleset(), new Mod[] { new OsuModDoubleTime(), new TaikoModFlashlight() }), Is.False);
+        }
+
+        [Test]
+        public void TestFormatScoreMultiplier()
+        {
+            Assert.AreEqual(ModUtils.FormatScoreMultiplier(0.9999).ToString(), "0.99x");
+            Assert.AreEqual(ModUtils.FormatScoreMultiplier(1.0).ToString(), "1.00x");
+            Assert.AreEqual(ModUtils.FormatScoreMultiplier(1.0001).ToString(), "1.01x");
+
+            Assert.AreEqual(ModUtils.FormatScoreMultiplier(0.899999999999999).ToString(), "0.90x");
+            Assert.AreEqual(ModUtils.FormatScoreMultiplier(0.9).ToString(), "0.90x");
+            Assert.AreEqual(ModUtils.FormatScoreMultiplier(0.900000000000001).ToString(), "0.90x");
+
+            Assert.AreEqual(ModUtils.FormatScoreMultiplier(1.099999999999999).ToString(), "1.10x");
+            Assert.AreEqual(ModUtils.FormatScoreMultiplier(1.1).ToString(), "1.10x");
+            Assert.AreEqual(ModUtils.FormatScoreMultiplier(1.100000000000001).ToString(), "1.10x");
+
+            Assert.AreEqual(ModUtils.FormatScoreMultiplier(1.045).ToString(), "1.05x");
+            Assert.AreEqual(ModUtils.FormatScoreMultiplier(1.05).ToString(), "1.05x");
+            Assert.AreEqual(ModUtils.FormatScoreMultiplier(1.055).ToString(), "1.06x");
+        }
+
         public abstract class CustomMod1 : Mod, IModCompatibilitySpecification
         {
         }
@@ -337,6 +369,16 @@ namespace osu.Game.Tests.Mods
             public override double ScoreMultiplier => 1;
             public override bool HasImplementation => true;
             public override bool ValidForMultiplayerAsFreeMod => false;
+        }
+
+        public class EditableMod : Mod
+        {
+            public override string Name => string.Empty;
+            public override LocalisableString Description => string.Empty;
+            public override string Acronym => string.Empty;
+            public override double ScoreMultiplier => Multiplier;
+
+            public double Multiplier = 1;
         }
 
         public interface IModCompatibilitySpecification

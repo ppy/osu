@@ -38,6 +38,7 @@ using osu.Game.Screens.Play.HUD;
 using osu.Game.Screens.Ranking;
 using osu.Game.Skinning;
 using osu.Game.Users;
+using osu.Game.Utils;
 using osuTK.Graphics;
 
 namespace osu.Game.Screens.Play
@@ -212,6 +213,12 @@ namespace osu.Game.Screens.Play
 
             if (playableBeatmap == null)
                 return;
+
+            if (!ModUtils.CheckModsBelongToRuleset(ruleset, gameplayMods))
+            {
+                Logger.Log($@"Gameplay was started with a mod belonging to a ruleset different than '{ruleset.Description}'.", level: LogLevel.Important);
+                return;
+            }
 
             mouseWheelDisabled = config.GetBindable<bool>(OsuSetting.MouseDisableWheel);
 
@@ -461,12 +468,6 @@ namespace osu.Game.Screens.Play
                         OnRetry = () => Restart(),
                         OnQuit = () => PerformExit(true),
                     },
-                    new GameplayOffsetControl
-                    {
-                        Margin = new MarginPadding(20),
-                        Anchor = Anchor.CentreRight,
-                        Origin = Anchor.CentreRight,
-                    }
                 },
             };
 
@@ -475,9 +476,6 @@ namespace osu.Game.Screens.Play
                 skipIntroOverlay.Expire();
                 skipOutroOverlay.Expire();
             }
-
-            if (GameplayClockContainer is MasterGameplayClockContainer master)
-                HUDOverlay.PlayerSettingsOverlay.PlaybackSettings.UserPlaybackRate.BindTarget = master.UserPlaybackRate;
 
             return container;
         }
@@ -547,7 +545,7 @@ namespace osu.Game.Screens.Play
 
                 if (playable.HitObjects.Count == 0)
                 {
-                    Logger.Log("Beatmap contains no hit objects!", level: LogLevel.Error);
+                    Logger.Log("Beatmap contains no hit objects!", level: LogLevel.Important);
                     return null;
                 }
             }
@@ -735,7 +733,7 @@ namespace osu.Game.Screens.Play
             }
 
             // Only show the completion screen if the player hasn't failed
-            if (HealthProcessor.HasFailed)
+            if (GameplayState.HasFailed)
                 return;
 
             GameplayState.HasPassed = true;
@@ -800,8 +798,6 @@ namespace osu.Game.Screens.Play
                 if (!this.IsCurrentScreen())
                     // This player instance may already be in the process of exiting.
                     return;
-
-                Debug.Assert(ScoreProcessor.Rank.Value != ScoreRank.F);
 
                 this.Push(CreateResults(prepareScoreForDisplayTask.GetResultSafely()));
             }, Time.Current + delay, 50);
@@ -924,37 +920,44 @@ namespace osu.Game.Screens.Play
             if (!CheckModsAllowFailure())
                 return false;
 
-            Debug.Assert(!GameplayState.HasFailed);
-            Debug.Assert(!GameplayState.HasPassed);
-            Debug.Assert(!GameplayState.HasQuit);
+            if (Configuration.AllowFailAnimation)
+            {
+                Debug.Assert(!GameplayState.HasFailed);
+                Debug.Assert(!GameplayState.HasPassed);
+                Debug.Assert(!GameplayState.HasQuit);
 
-            GameplayState.HasFailed = true;
+                GameplayState.HasFailed = true;
 
-            updateGameplayState();
+                updateGameplayState();
 
-            // There is a chance that we could be in a paused state as the ruleset's internal clock (see FrameStabilityContainer)
-            // could process an extra frame after the GameplayClock is stopped.
-            // In such cases we want the fail state to precede a user triggered pause.
-            if (PauseOverlay.State.Value == Visibility.Visible)
-                PauseOverlay.Hide();
+                // There is a chance that we could be in a paused state as the ruleset's internal clock (see FrameStabilityContainer)
+                // could process an extra frame after the GameplayClock is stopped.
+                // In such cases we want the fail state to precede a user triggered pause.
+                if (PauseOverlay.State.Value == Visibility.Visible)
+                    PauseOverlay.Hide();
 
-            failAnimationContainer.Start();
+                failAnimationContainer.Start();
 
-            // Failures can be triggered either by a judgement, or by a mod.
-            //
-            // For the case of a judgement, due to ordering considerations, ScoreProcessor will not have received
-            // the final judgement which triggered the failure yet (see DrawableRuleset.NewResult handling above).
-            //
-            // A schedule here ensures that any lingering judgements from the current frame are applied before we
-            // finalise the score as "failed".
-            Schedule(() =>
+                // Failures can be triggered either by a judgement, or by a mod.
+                //
+                // For the case of a judgement, due to ordering considerations, ScoreProcessor will not have received
+                // the final judgement which triggered the failure yet (see DrawableRuleset.NewResult handling above).
+                //
+                // A schedule here ensures that any lingering judgements from the current frame are applied before we
+                // finalise the score as "failed".
+                Schedule(() =>
+                {
+                    ScoreProcessor.FailScore(Score.ScoreInfo);
+                    OnFail();
+
+                    if (GameplayState.Mods.OfType<IApplicableFailOverride>().Any(m => m.RestartOnFail))
+                        Restart(true);
+                });
+            }
+            else
             {
                 ScoreProcessor.FailScore(Score.ScoreInfo);
-                OnFail();
-
-                if (GameplayState.Mods.OfType<IApplicableFailOverride>().Any(m => m.RestartOnFail))
-                    Restart(true);
-            });
+            }
 
             return true;
         }
@@ -1073,7 +1076,7 @@ namespace osu.Game.Screens.Play
                 b.FadeColour(Color4.White, 250);
 
                 // bind component bindables.
-                b.IsBreakTime.BindTo(breakTracker.IsBreakTime);
+                ((IBindable<bool>)b.IsBreakTime).BindTo(breakTracker.IsBreakTime);
 
                 b.StoryboardReplacesBackground.BindTo(storyboardReplacesBackground);
 
@@ -1233,7 +1236,18 @@ namespace osu.Game.Screens.Play
 
             if (this.IsCurrentScreen())
             {
-                ApplyToBackground(b => b.IgnoreUserSettings.Value = true);
+                ApplyToBackground(b =>
+                {
+                    b.IgnoreUserSettings.Value = true;
+
+                    // May be null if the load never completed.
+                    if (breakTracker != null)
+                    {
+                        b.IsBreakTime.UnbindFrom(breakTracker.IsBreakTime);
+                        b.IsBreakTime.Value = false;
+                    }
+                });
+
                 storyboardReplacesBackground.Value = false;
             }
         }

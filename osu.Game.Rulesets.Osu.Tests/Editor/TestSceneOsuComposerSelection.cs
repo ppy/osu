@@ -124,6 +124,113 @@ namespace osu.Game.Rulesets.Osu.Tests.Editor
             AddAssert("selection preserved", () => EditorBeatmap.SelectedHitObjects.Count == 2);
         }
 
+        [Test]
+        public void TestControlClickAddsControlPointsIfSingleSliderSelected()
+        {
+            var firstSlider = new Slider
+            {
+                StartTime = 0,
+                Position = new Vector2(0, 0),
+                Path = new SliderPath
+                {
+                    ControlPoints =
+                    {
+                        new PathControlPoint(),
+                        new PathControlPoint(new Vector2(100))
+                    }
+                }
+            };
+            var secondSlider = new Slider
+            {
+                StartTime = 1000,
+                Position = new Vector2(200, 200),
+                Path = new SliderPath
+                {
+                    ControlPoints =
+                    {
+                        new PathControlPoint(),
+                        new PathControlPoint(new Vector2(100, -100))
+                    }
+                }
+            };
+
+            AddStep("add objects", () => EditorBeatmap.AddRange(new HitObject[] { firstSlider, secondSlider }));
+            AddStep("select first slider", () => EditorBeatmap.SelectedHitObjects.AddRange(new HitObject[] { secondSlider }));
+
+            AddStep("move mouse to middle of slider", () =>
+            {
+                var pos = blueprintContainer.SelectionBlueprints
+                                            .First(s => s.Item == secondSlider)
+                                            .ChildrenOfType<SliderBodyPiece>().First()
+                                            .ScreenSpaceDrawQuad.Centre;
+
+                InputManager.MoveMouseTo(pos);
+            });
+            AddStep("control-click left mouse", () =>
+            {
+                InputManager.PressKey(Key.ControlLeft);
+                InputManager.Click(MouseButton.Left);
+                InputManager.ReleaseKey(Key.ControlLeft);
+            });
+            AddAssert("selection preserved", () => EditorBeatmap.SelectedHitObjects.Count, () => Is.EqualTo(1));
+            AddAssert("slider has 3 anchors", () => secondSlider.Path.ControlPoints.Count, () => Is.EqualTo(3));
+        }
+
+        [Test]
+        public void TestControlClickDoesNotAddSliderControlPointsIfMultipleObjectsSelected()
+        {
+            var firstSlider = new Slider
+            {
+                StartTime = 0,
+                Position = new Vector2(0, 0),
+                Path = new SliderPath
+                {
+                    ControlPoints =
+                    {
+                        new PathControlPoint(),
+                        new PathControlPoint(new Vector2(100))
+                    }
+                }
+            };
+            var secondSlider = new Slider
+            {
+                StartTime = 1000,
+                Position = new Vector2(200, 200),
+                Path = new SliderPath
+                {
+                    ControlPoints =
+                    {
+                        new PathControlPoint(),
+                        new PathControlPoint(new Vector2(100, -100))
+                    }
+                }
+            };
+
+            AddStep("add objects", () => EditorBeatmap.AddRange(new HitObject[] { firstSlider, secondSlider }));
+            AddStep("select first slider", () => EditorBeatmap.SelectedHitObjects.AddRange(new HitObject[] { firstSlider, secondSlider }));
+
+            AddStep("move mouse to middle of slider", () =>
+            {
+                var pos = blueprintContainer.SelectionBlueprints
+                                            .First(s => s.Item == secondSlider)
+                                            .ChildrenOfType<SliderBodyPiece>().First()
+                                            .ScreenSpaceDrawQuad.Centre;
+
+                InputManager.MoveMouseTo(pos);
+            });
+            AddStep("control-click left mouse", () =>
+            {
+                InputManager.PressKey(Key.ControlLeft);
+                InputManager.Click(MouseButton.Left);
+                InputManager.ReleaseKey(Key.ControlLeft);
+            });
+            AddAssert("selection not preserved", () => EditorBeatmap.SelectedHitObjects.Count, () => Is.EqualTo(1));
+            AddAssert("second slider not selected",
+                () => blueprintContainer.SelectionBlueprints.First(s => s.Item == secondSlider).IsSelected,
+                () => Is.False);
+            AddAssert("slider still has 2 anchors", () => secondSlider.Path.ControlPoints.Count, () => Is.EqualTo(2));
+        }
+
         private ComposeBlueprintContainer blueprintContainer
             => Editor.ChildrenOfType<ComposeBlueprintContainer>().First();
 
