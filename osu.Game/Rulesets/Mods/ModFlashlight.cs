@@ -2,6 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
+using System.Diagnostics;
 using System.Runtime.InteropServices;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
@@ -13,6 +14,7 @@ using osu.Framework.Graphics.Shaders;
 using osu.Framework.Graphics.Shaders.Types;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Localisation;
+using osu.Framework.Utils;
 using osu.Game.Configuration;
 using osu.Game.Graphics;
 using osu.Game.Graphics.OpenGL.Vertices;
@@ -151,9 +153,10 @@ namespace osu.Game.Rulesets.Mods
                 if (GetPlayfieldScale != null)
                 {
                     Vector2 playfieldScale = GetPlayfieldScale();
-                    float rulesetScaleAvg = (playfieldScale.X + playfieldScale.Y) / 2f;
 
-                    size *= rulesetScaleAvg;
+                    Debug.Assert(Precision.AlmostEquals(Math.Abs(playfieldScale.X), Math.Abs(playfieldScale.Y)),
+                        @"Playfield has non-proportional scaling. Flashlight implementations should be revisited with regard to balance.");
+                    size *= Math.Abs(playfieldScale.X);
                 }
 
                 if (isBreakTime.Value)
