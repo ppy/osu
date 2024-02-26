@@ -2,7 +2,6 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
-using System.Diagnostics;
 using System.IO;
 using System.Runtime.InteropServices;
 using System.Runtime.Versioning;
@@ -108,14 +107,11 @@ namespace osu.Desktop.Windows
         {
             try
             {
-                using var classes = Registry.CurrentUser.OpenSubKey(SOFTWARE_CLASSES, true);
-                Debug.Assert(classes != null);
-
                 foreach (var association in file_associations)
-                    association.Uninstall(classes);
+                    association.Uninstall();
 
                 foreach (var association in uri_associations)
-                    association.Uninstall(classes);
+                    association.Uninstall();
 
                 NotifyShellUpdate();
             }
@@ -132,26 +128,20 @@ namespace osu.Desktop.Windows
         /// </summary>
         private static void updateAssociations()
         {
-            using var classes = Registry.CurrentUser.OpenSubKey(SOFTWARE_CLASSES, true);
-            Debug.Assert(classes != null);
-
             foreach (var association in file_associations)
-                association.Install(classes);
+                association.Install();
 
             foreach (var association in uri_associations)
-                association.Install(classes);
+                association.Install();
         }
 
         private static void updateDescriptions(LocalisationManager? localisation)
         {
-            using var classes = Registry.CurrentUser.OpenSubKey(SOFTWARE_CLASSES, true);
-            Debug.Assert(classes != null);
-
             foreach (var association in file_associations)
-                association.UpdateDescription(classes, getLocalisedString(association.Description));
+                association.UpdateDescription(getLocalisedString(association.Description));
 
             foreach (var association in uri_associations)
-                association.UpdateDescription(classes, getLocalisedString(association.Description));
+                association.UpdateDescription(getLocalisedString(association.Description));
 
             string getLocalisedString(LocalisableString s)
             {
@@ -192,8 +182,11 @@ namespace osu.Desktop.Windows
             /// <summary>
             /// Installs a file extenstion association in accordance with https://learn.microsoft.com/en-us/windows/win32/com/-progid--key
             /// </summary>
-            public void Install(RegistryKey classes)
+            public void Install()
             {
+                using var classes = Registry.CurrentUser.OpenSubKey(SOFTWARE_CLASSES, true);
+                if (classes == null) return;
+
                 // register a program id for the given extension
                 using (var programKey = classes.CreateSubKey(programId))
                 {
@@ -216,8 +209,11 @@ namespace osu.Desktop.Windows
                 }
             }
 
-            public void UpdateDescription(RegistryKey classes, string description)
+            public void UpdateDescription(string description)
             {
+                using var classes = Registry.CurrentUser.OpenSubKey(SOFTWARE_CLASSES, true);
+                if (classes == null) return;
+
                 using (var programKey = classes.OpenSubKey(programId, true))
                     programKey?.SetValue(null, description);
             }
@@ -225,8 +221,11 @@ namespace osu.Desktop.Windows
             /// <summary>
             /// Uninstalls the file extenstion association in accordance with https://learn.microsoft.com/en-us/windows/win32/shell/fa-file-types#deleting-registry-information-during-uninstallation
             /// </summary>
-            public void Uninstall(RegistryKey classes)
+            public void Uninstall()
             {
+                using var classes = Registry.CurrentUser.OpenSubKey(SOFTWARE_CLASSES, true);
+                if (classes == null) return;
+
                 using (var extensionKey = classes.OpenSubKey(Extension, true))
                 {
                     // clear our default association so that Explorer doesn't show the raw programId to users
@@ -253,8 +252,11 @@ namespace osu.Desktop.Windows
             /// <summary>
             /// Registers an URI protocol handler in accordance with https://learn.microsoft.com/en-us/previous-versions/windows/internet-explorer/ie-developer/platform-apis/aa767914(v=vs.85).
             /// </summary>
-            public void Install(RegistryKey classes)
+            public void Install()
             {
+                using var classes = Registry.CurrentUser.OpenSubKey(SOFTWARE_CLASSES, true);
+                if (classes == null) return;
+
                 using (var protocolKey = classes.CreateSubKey(Protocol))
                 {
                     protocolKey.SetValue(URL_PROTOCOL, string.Empty);
@@ -267,15 +269,19 @@ namespace osu.Desktop.Windows
                 }
             }
 
-            public void UpdateDescription(RegistryKey classes, string description)
+            public void UpdateDescription(string description)
             {
+                using var classes = Registry.CurrentUser.OpenSubKey(SOFTWARE_CLASSES, true);
+                if (classes == null) return;
+
                 using (var protocolKey = classes.OpenSubKey(Protocol, true))
                     protocolKey?.SetValue(null, $@"URL:{description}");
             }
 
-            public void Uninstall(RegistryKey classes)
+            public void Uninstall()
             {
-                classes.DeleteSubKeyTree(Protocol, throwOnMissingSubKey: false);
+                using var classes = Registry.CurrentUser.OpenSubKey(SOFTWARE_CLASSES, true);
+                classes?.DeleteSubKeyTree(Protocol, throwOnMissingSubKey: false);
             }
         }
     }
