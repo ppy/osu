@@ -132,7 +132,7 @@ namespace osu.Game.Rulesets.Edit
                 if (objTime >= editorClock.CurrentTime)
                     continue;
 
-                if (objTime > lastBefore?.StartTime)
+                if (lastBefore == null || objTime > lastBefore.StartTime)
                     lastBefore = entry.Value.HitObject;
             }
 
@@ -148,7 +148,7 @@ namespace osu.Game.Rulesets.Edit
                 if (objTime < editorClock.CurrentTime)
                     continue;
 
-                if (objTime < firstAfter?.StartTime)
+                if (firstAfter == null || objTime < firstAfter.StartTime)
                     firstAfter = entry.Value.HitObject;
             }
 

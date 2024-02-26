@@ -4,6 +4,7 @@
 using System.Linq;
 using System.Threading.Tasks;
 using osu.Framework.Allocation;
+using osu.Framework.Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Localisation;
 using osu.Framework.Logging;
@@ -52,36 +53,50 @@ namespace osu.Game.Overlays.Settings.Sections.Maintenance
             });
         }
 
-        private void deleteAllModPresets() =>
+        private bool deleteAllModPresets() =>
             realm.Write(r =>
             {
+                bool anyDeleted = false;
+
                 foreach (var preset in r.All<ModPreset>())
+                {
+                    anyDeleted |= !preset.DeletePending;
                     preset.DeletePending = true;
+                }
+
+                return anyDeleted;
             });
 
-        private void onAllModPresetsDeleted(Task deletionTask)
+        private void onAllModPresetsDeleted(Task<bool> deletionTask)
         {
             deleteAllButton.Enabled.Value = true;
 
             if (deletionTask.IsCompletedSuccessfully)
-                notificationOverlay?.Post(new ProgressCompletionNotification { Text = MaintenanceSettingsStrings.DeletedAllModPresets });
+                notificationOverlay?.Post(new ProgressCompletionNotification { Text = deletionTask.GetResultSafely() ? MaintenanceSettingsStrings.DeletedAllModPresets : MaintenanceSettingsStrings.NoModPresetsFoundToDelete });
             else if (deletionTask.IsFaulted)
                 Logger.Error(deletionTask.Exception, "Failed to delete all mod presets");
         }
 
-        private void undeleteModPresets() =>
+        private bool undeleteModPresets() =>
             realm.Write(r =>
             {
+                bool anyRestored = false;
+
                 foreach (var preset in r.All<ModPreset>().Where(preset => preset.DeletePending))
+                {
+                    anyRestored |= preset.DeletePending;
                     preset.DeletePending = false;
+                }
+
+                return anyRestored;
             });
 
-        private void onModPresetsUndeleted(Task undeletionTask)
+        private void onModPresetsUndeleted(Task<bool> undeletionTask)
         {
             undeleteButton.Enabled.Value = true;
 
             if (undeletionTask.IsCompletedSuccessfully)
-                notificationOverlay?.Post(new ProgressCompletionNotification { Text = MaintenanceSettingsStrings.RestoredAllDeletedModPresets });
+                notificationOverlay?.Post(new ProgressCompletionNotification { Text = undeletionTask.GetResultSafely() ? MaintenanceSettingsStrings.RestoredAllDeletedModPresets : MaintenanceSettingsStrings.NoModPresetsFoundToRestore });
             else if (undeletionTask.IsFaulted)
                 Logger.Error(undeletionTask.Exception, "Failed to restore mod presets");
         }
