@@ -25,6 +25,7 @@ using osu.Game.Input;
 using osu.Game.Localisation;
 using osu.Game.Overlays;
 using osu.Game.Overlays.Notifications;
+using osu.Game.Performance;
 using osu.Game.Screens.Menu;
 using osu.Game.Screens.Play.PlayerSettings;
 using osu.Game.Skinning;
@@ -140,6 +141,8 @@ namespace osu.Game.Screens.Play
 
         private bool quickRestart;
 
+        private IDisposable? highPerformanceSession;
+
         [Resolved]
         private INotificationOverlay? notificationOverlay { get; set; }
 
@@ -151,6 +154,9 @@ namespace osu.Game.Screens.Play
 
         [Resolved]
         private BatteryInfo? batteryInfo { get; set; }
+
+        [Resolved]
+        private HighPerformanceSessionManager? highPerformanceSessionManager { get; set; }
 
         public PlayerLoader(Func<Player> createPlayer)
         {
@@ -264,6 +270,9 @@ namespace osu.Game.Screens.Play
 
             Debug.Assert(CurrentPlayer != null);
 
+            highPerformanceSession?.Dispose();
+            highPerformanceSession = null;
+
             // prepare for a retry.
             CurrentPlayer = null;
             playerConsumed = false;
@@ -303,6 +312,9 @@ namespace osu.Game.Screens.Play
 
             BackgroundBrightnessReduction = false;
             Beatmap.Value.Track.RemoveAdjustment(AdjustableProperty.Volume, volumeAdjustment);
+
+            highPerformanceSession?.Dispose();
+            highPerformanceSession = null;
 
             return base.OnExiting(e);
         }
@@ -462,6 +474,10 @@ namespace osu.Game.Screens.Play
             // this value is reset via cancelLoad() to allow a second usage of the same PlayerLoader screen.
             if (scheduledPushPlayer != null)
                 return;
+
+            // Now that everything's been loaded, we can safely switch to a higher performance session without incurring too much overhead.
+            // Doing this prior to the game being pushed gives us a bit of time to stabilise into the high performance mode before gameplay starts.
+            highPerformanceSession ??= highPerformanceSessionManager?.BeginSession();
 
             scheduledPushPlayer = Scheduler.AddDelayed(() =>
             {
