@@ -136,10 +136,10 @@ namespace osu.Desktop.Windows
             Debug.Assert(classes != null);
 
             foreach (var association in file_associations)
-                association.Install(classes, EXE_PATH);
+                association.Install(classes);
 
             foreach (var association in uri_associations)
-                association.Install(classes, EXE_PATH);
+                association.Install(classes);
         }
 
         private static void updateDescriptions(LocalisationManager? localisation)
@@ -192,7 +192,7 @@ namespace osu.Desktop.Windows
             /// <summary>
             /// Installs a file extenstion association in accordance with https://learn.microsoft.com/en-us/windows/win32/com/-progid--key
             /// </summary>
-            public void Install(RegistryKey classes, string exePath)
+            public void Install(RegistryKey classes)
             {
                 // register a program id for the given extension
                 using (var programKey = classes.CreateSubKey(programId))
@@ -201,7 +201,7 @@ namespace osu.Desktop.Windows
                         defaultIconKey.SetValue(null, IconPath);
 
                     using (var openCommandKey = programKey.CreateSubKey(SHELL_OPEN_COMMAND))
-                        openCommandKey.SetValue(null, $@"""{exePath}"" ""%1""");
+                        openCommandKey.SetValue(null, $@"""{EXE_PATH}"" ""%1""");
                 }
 
                 using (var extensionKey = classes.CreateSubKey(Extension))
@@ -253,7 +253,7 @@ namespace osu.Desktop.Windows
             /// <summary>
             /// Registers an URI protocol handler in accordance with https://learn.microsoft.com/en-us/previous-versions/windows/internet-explorer/ie-developer/platform-apis/aa767914(v=vs.85).
             /// </summary>
-            public void Install(RegistryKey classes, string exePath)
+            public void Install(RegistryKey classes)
             {
                 using (var protocolKey = classes.CreateSubKey(Protocol))
                 {
@@ -263,7 +263,7 @@ namespace osu.Desktop.Windows
                         defaultIconKey.SetValue(null, IconPath);
 
                     using (var openCommandKey = protocolKey.CreateSubKey(SHELL_OPEN_COMMAND))
-                        openCommandKey.SetValue(null, $@"""{exePath}"" ""%1""");
+                        openCommandKey.SetValue(null, $@"""{EXE_PATH}"" ""%1""");
                 }
             }
 
