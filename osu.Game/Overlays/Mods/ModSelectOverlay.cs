@@ -43,6 +43,14 @@ namespace osu.Game.Overlays.Mods
         public Bindable<IReadOnlyList<Mod>> SelectedMods { get; private set; } = new Bindable<IReadOnlyList<Mod>>(Array.Empty<Mod>());
 
         /// <summary>
+        /// Contains a list of mods which <see cref="ModSelectOverlay"/> should read from to display effects on the selected beatmap.
+        /// </summary>
+        /// <remarks>
+        /// This is different from <see cref="SelectedMods"/> in screens like online-play rooms, where there are required mods activated from the playlist.
+        /// </remarks>
+        public Bindable<IReadOnlyList<Mod>> ActiveMods { get; private set; } = new Bindable<IReadOnlyList<Mod>>(Array.Empty<Mod>());
+
+        /// <summary>
         /// Contains a dictionary with the current <see cref="ModState"/> of all mods applicable for the current ruleset.
         /// </summary>
         /// <remarks>
@@ -313,22 +321,29 @@ namespace osu.Game.Overlays.Mods
             if (AllowCustomisation)
                 ((IBindable<IReadOnlyList<Mod>>)modSettingsArea.SelectedMods).BindTo(SelectedMods);
 
-            SelectedMods.BindValueChanged(_ =>
+            SelectedMods.BindValueChanged(mods =>
             {
-                UpdateOverlayInformation(SelectedMods.Value);
+                var newMods = ActiveMods.Value.Except(mods.OldValue).Concat(mods.NewValue).ToList();
+                ActiveMods.Value = newMods;
+
                 updateFromExternalSelection();
                 updateCustomisation();
+            }, true);
+
+            ActiveMods.BindValueChanged(_ =>
+            {
+                updateOverlayInformation();
 
                 modSettingChangeTracker?.Dispose();
 
                 if (AllowCustomisation)
                 {
-                    // Importantly, use SelectedMods.Value here (and not the ValueChanged NewValue) as the latter can
+                    // Importantly, use ActiveMods.Value here (and not the ValueChanged NewValue) as the latter can
                     // potentially be stale, due to complexities in the way change trackers work.
                     //
                     // See https://github.com/ppy/osu/pull/23284#issuecomment-1529056988
-                    modSettingChangeTracker = new ModSettingChangeTracker(SelectedMods.Value);
-                    modSettingChangeTracker.SettingChanged += _ => UpdateOverlayInformation(SelectedMods.Value);
+                    modSettingChangeTracker = new ModSettingChangeTracker(ActiveMods.Value);
+                    modSettingChangeTracker.SettingChanged += _ => updateOverlayInformation();
                 }
             }, true);
 
@@ -451,24 +466,24 @@ namespace osu.Game.Overlays.Mods
         }
 
         /// <summary>
-        /// Updates any information displayed on the overlay regarding the effects of the selected mods.
+        /// Updates any information displayed on the overlay regarding the effects of the active mods.
+        /// This reads from <see cref="ActiveMods"/> instead of <see cref="SelectedMods"/>.
         /// </summary>
-        /// <param name="mods">The list of mods to show effect from. This can be overriden to include effect of mods that are not part of the <see cref="SelectedMods"/> bindable (e.g. room mods in multiplayer/playlists).</param>
-        protected virtual void UpdateOverlayInformation(IReadOnlyList<Mod> mods)
+        private void updateOverlayInformation()
         {
             if (rankingInformationDisplay != null)
             {
                 double multiplier = 1.0;
 
-                foreach (var mod in mods)
+                foreach (var mod in ActiveMods.Value)
                     multiplier *= mod.ScoreMultiplier;
 
                 rankingInformationDisplay.ModMultiplier.Value = multiplier;
-                rankingInformationDisplay.Ranked.Value = mods.All(m => m.Ranked);
+                rankingInformationDisplay.Ranked.Value = ActiveMods.Value.All(m => m.Ranked);
             }
 
             if (beatmapAttributesDisplay != null)
-                beatmapAttributesDisplay.Mods.Value = mods;
+                beatmapAttributesDisplay.Mods.Value = ActiveMods.Value;
         }
 
         private void updateCustomisation()

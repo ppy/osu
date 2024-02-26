@@ -1,7 +1,6 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using osu.Framework.Allocation;
@@ -10,7 +9,6 @@ using osu.Game.Online.Rooms;
 using osu.Game.Overlays;
 using osu.Game.Overlays.Mods;
 using osu.Game.Rulesets;
-using osu.Game.Rulesets.Mods;
 
 namespace osu.Game.Screens.OnlinePlay.Match
 {
@@ -22,8 +20,6 @@ namespace osu.Game.Screens.OnlinePlay.Match
         [Resolved]
         private RulesetStore rulesets { get; set; } = null!;
 
-        private readonly List<Mod> roomMods = new List<Mod>();
-
         public RoomModSelectOverlay()
             : base(OverlayColourScheme.Plum)
         {
@@ -33,22 +29,17 @@ namespace osu.Game.Screens.OnlinePlay.Match
         {
             base.LoadComplete();
 
-            selectedItem.BindValueChanged(_ =>
+            selectedItem.BindValueChanged(v =>
             {
-                roomMods.Clear();
-
-                if (selectedItem.Value is PlaylistItem item)
+                if (v.NewValue is PlaylistItem item)
                 {
                     var rulesetInstance = rulesets.GetRuleset(item.RulesetID)?.CreateInstance();
                     Debug.Assert(rulesetInstance != null);
-                    roomMods.AddRange(item.RequiredMods.Select(m => m.ToMod(rulesetInstance)));
+                    ActiveMods.Value = item.RequiredMods.Select(m => m.ToMod(rulesetInstance)).Concat(SelectedMods.Value).ToList();
                 }
-
-                SelectedMods.TriggerChange();
-            });
+                else
+                    ActiveMods.Value = SelectedMods.Value;
+            }, true);
         }
-
-        protected override void UpdateOverlayInformation(IReadOnlyList<Mod> mods)
-            => base.UpdateOverlayInformation(roomMods.Concat(mods).ToList());
     }
 }
