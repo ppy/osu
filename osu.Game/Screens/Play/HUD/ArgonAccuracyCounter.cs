@@ -80,11 +80,15 @@ namespace osu.Game.Screens.Play.HUD
                                 ShowLabel = { BindTarget = ShowLabel },
                             }
                         },
-                        fractionPart = new ArgonCounterTextComponent(Anchor.TopLeft)
+                        new Container
                         {
-                            RequiredDisplayDigits = { Value = 2 },
-                            WireframeOpacity = { BindTarget = WireframeOpacity },
-                            Scale = new Vector2(0.5f),
+                            AutoSizeAxes = Axes.Both,
+                            Child = fractionPart = new ArgonCounterTextComponent(Anchor.TopRight)
+                            {
+                                RequiredDisplayDigits = { Value = 2 },
+                                WireframeOpacity = { BindTarget = WireframeOpacity },
+                                Scale = new Vector2(0.5f),
+                            }
                         },
                         percentText = new ArgonCounterTextComponent(Anchor.TopLeft)
                         {
