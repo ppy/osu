@@ -22,6 +22,8 @@ namespace osu.Game.Performance
         {
             originalGCMode = GCSettings.LatencyMode;
             GCSettings.LatencyMode = GCLatencyMode.LowLatency;
+
+            // Without doing this, the new GC mode won't kick in until the next GC, which could be at a more noticeable point in time.
             GC.Collect(0);
         }
 
@@ -29,6 +31,8 @@ namespace osu.Game.Performance
         {
             if (GCSettings.LatencyMode == GCLatencyMode.LowLatency)
                 GCSettings.LatencyMode = originalGCMode;
+
+            // No GC.Collect() as we were already collecting at a higher frequency in the old mode.
         }
     }
 }
