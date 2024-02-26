@@ -13,6 +13,9 @@ namespace osu.Game.Rulesets.Scoring
         /// <summary>
         /// Calculates the "unstable rate" for a sequence of <see cref="HitEvent"/>s.
         /// </summary>
+        /// <remarks>
+        /// Uses <a href="https://en.wikipedia.org/wiki/Algorithms_for_calculating_variance#Welford's_online_algorithm">Welford's online algorithm</a>.
+        /// </remarks>
         /// <returns>
         /// A non-null <see langword="double"/> value if unstable rate could be calculated,
         /// and <see langword="null"/> if unstable rate cannot be calculated due to <paramref name="hitEvents"/> being empty.
@@ -21,9 +24,28 @@ namespace osu.Game.Rulesets.Scoring
         {
             Debug.Assert(hitEvents.All(ev => ev.GameplayRate != null));
 
-            // Division by gameplay rate is to account for TimeOffset scaling with gameplay rate.
-            double[] timeOffsets = hitEvents.Where(affectsUnstableRate).Select(ev => ev.TimeOffset / ev.GameplayRate!.Value).ToArray();
-            return 10 * standardDeviation(timeOffsets);
+            int count = 0;
+            double mean = 0;
+            double sumOfSquares = 0;
+
+            foreach (var e in hitEvents)
+            {
+                if (!affectsUnstableRate(e))
+                    continue;
+
+                count++;
+
+                // Division by gameplay rate is to account for TimeOffset scaling with gameplay rate.
+                double currentValue = e.TimeOffset / e.GameplayRate!.Value;
+                double nextMean = mean + (currentValue - mean) / count;
+                sumOfSquares += (currentValue - mean) * (currentValue - nextMean);
+                mean = nextMean;
+            }
+
+            if (count == 0)
+                return null;
+
+            return 10.0 * Math.Sqrt(sumOfSquares / count);
         }
 
         /// <summary>
@@ -44,15 +66,5 @@ namespace osu.Game.Rulesets.Scoring
         }
 
         private static bool affectsUnstableRate(HitEvent e) => !(e.HitObject.HitWindows is HitWindows.EmptyHitWindows) && e.Result.IsHit();
-
-        private static double? standardDeviation(double[] timeOffsets)
-        {
-            if (timeOffsets.Length == 0)
-                return null;
-
-            double mean = timeOffsets.Average();
-            double squares = timeOffsets.Select(offset => Math.Pow(offset - mean, 2)).Sum();
-            return Math.Sqrt(squares / timeOffsets.Length);
-        }
     }
 }

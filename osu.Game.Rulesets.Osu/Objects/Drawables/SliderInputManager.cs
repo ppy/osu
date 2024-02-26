@@ -215,8 +215,6 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
             if (headCircleHitAction == null)
                 timeToAcceptAnyKeyAfter = null;
 
-            var actions = slider.OsuActionInputManager?.PressedActions;
-
             // if the head circle was hit with a specific key, tracking should only occur while that key is pressed.
             if (headCircleHitAction != null && timeToAcceptAnyKeyAfter == null)
             {
@@ -227,6 +225,20 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
                     timeToAcceptAnyKeyAfter = Time.Current;
             }
 
+            if (slider.OsuActionInputManager == null)
+                return;
+
+            lastPressedActions.Clear();
+            bool validTrackingAction = false;
+
+            foreach (OsuAction action in slider.OsuActionInputManager.PressedActions)
+            {
+                if (isValidTrackingAction(action))
+                    validTrackingAction = true;
+
+                lastPressedActions.Add(action);
+            }
+
             Tracking =
                 // even in an edge case where current time has exceeded the slider's time, we may not have finished judging.
                 // we don't want to potentially update from Tracking=true to Tracking=false at this point.
@@ -234,11 +246,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
                 // in valid position range
                 && isValidTrackingPosition
                 // valid action
-                && (actions?.Any(isValidTrackingAction) ?? false);
-
-            lastPressedActions.Clear();
-            if (actions != null)
-                lastPressedActions.AddRange(actions);
+                && validTrackingAction;
         }
 
         private OsuAction? getInitialHitAction() => slider.HeadCircle?.HitAction;

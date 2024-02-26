@@ -23,7 +23,6 @@ namespace osu.Game.Online.Metadata
         public override IBindable<bool> IsWatchingUserPresence => isWatchingUserPresence;
         private readonly BindableBool isWatchingUserPresence = new BindableBool();
 
-        // ReSharper disable once InconsistentlySynchronizedField
         public override IBindableDictionary<int, UserPresence> UserStates => userStates;
         private readonly BindableDictionary<int, UserPresence> userStates = new BindableDictionary<int, UserPresence>();
 
@@ -59,6 +58,7 @@ namespace osu.Game.Online.Metadata
                     // https://github.com/dotnet/aspnetcore/issues/15198
                     connection.On<BeatmapUpdates>(nameof(IMetadataClient.BeatmapSetsUpdated), ((IMetadataClient)this).BeatmapSetsUpdated);
                     connection.On<int, UserPresence?>(nameof(IMetadataClient.UserPresenceUpdated), ((IMetadataClient)this).UserPresenceUpdated);
+                    connection.On(nameof(IStatefulUserHubClient.DisconnectRequested), ((IMetadataClient)this).DisconnectRequested);
                 };
 
                 IsConnected.BindTo(connector.IsConnected);
@@ -192,7 +192,7 @@ namespace osu.Game.Online.Metadata
         {
             Schedule(() =>
             {
-                if (presence != null)
+                if (presence?.Status != null)
                     userStates[userId] = presence.Value;
                 else
                     userStates.Remove(userId);
@@ -232,7 +232,8 @@ namespace osu.Game.Online.Metadata
         public override async Task DisconnectRequested()
         {
             await base.DisconnectRequested().ConfigureAwait(false);
-            await EndWatchingUserPresence().ConfigureAwait(false);
+            if (connector != null)
+                await connector.Disconnect().ConfigureAwait(false);
         }
 
         protected override void Dispose(bool isDisposing)

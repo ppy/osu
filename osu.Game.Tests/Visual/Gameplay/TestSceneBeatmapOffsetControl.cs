@@ -12,6 +12,7 @@ using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Osu.Mods;
 using osu.Game.Scoring;
 using osu.Game.Screens.Play.PlayerSettings;
+using osu.Game.Tests.Resources;
 using osu.Game.Tests.Visual.Ranking;
 
 namespace osu.Game.Tests.Visual.Gameplay
@@ -44,7 +45,23 @@ namespace osu.Game.Tests.Visual.Gameplay
             {
                 offsetControl.ReferenceScore.Value = new ScoreInfo
                 {
-                    HitEvents = TestSceneHitEventTimingDistributionGraph.CreateDistributedHitEvents(0, 2)
+                    HitEvents = TestSceneHitEventTimingDistributionGraph.CreateDistributedHitEvents(0, 2),
+                    BeatmapInfo = Beatmap.Value.BeatmapInfo,
+                };
+            });
+
+            AddAssert("No calibration button", () => !offsetControl.ChildrenOfType<SettingsButton>().Any());
+        }
+
+        [Test]
+        public void TestScoreFromDifferentBeatmap()
+        {
+            AddStep("Set short reference score", () =>
+            {
+                offsetControl.ReferenceScore.Value = new ScoreInfo
+                {
+                    HitEvents = TestSceneHitEventTimingDistributionGraph.CreateDistributedHitEvents(10),
+                    BeatmapInfo = TestResources.CreateTestBeatmapSetInfo().Beatmaps.First(),
                 };
             });
 
@@ -59,7 +76,8 @@ namespace osu.Game.Tests.Visual.Gameplay
                 offsetControl.ReferenceScore.Value = new ScoreInfo
                 {
                     HitEvents = TestSceneHitEventTimingDistributionGraph.CreateDistributedHitEvents(10),
-                    Mods = new Mod[] { new OsuModRelax() }
+                    Mods = new Mod[] { new OsuModRelax() },
+                    BeatmapInfo = Beatmap.Value.BeatmapInfo,
                 };
             });
 
@@ -77,7 +95,8 @@ namespace osu.Game.Tests.Visual.Gameplay
             {
                 offsetControl.ReferenceScore.Value = new ScoreInfo
                 {
-                    HitEvents = TestSceneHitEventTimingDistributionGraph.CreateDistributedHitEvents(average_error)
+                    HitEvents = TestSceneHitEventTimingDistributionGraph.CreateDistributedHitEvents(average_error),
+                    BeatmapInfo = Beatmap.Value.BeatmapInfo,
                 };
             });
 
@@ -105,7 +124,8 @@ namespace osu.Game.Tests.Visual.Gameplay
             {
                 offsetControl.ReferenceScore.Value = new ScoreInfo
                 {
-                    HitEvents = TestSceneHitEventTimingDistributionGraph.CreateDistributedHitEvents(average_error)
+                    HitEvents = TestSceneHitEventTimingDistributionGraph.CreateDistributedHitEvents(average_error),
+                    BeatmapInfo = Beatmap.Value.BeatmapInfo,
                 };
             });
 
