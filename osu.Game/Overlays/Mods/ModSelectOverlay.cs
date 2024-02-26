@@ -468,12 +468,7 @@ namespace osu.Game.Overlays.Mods
             }
 
             if (beatmapAttributesDisplay != null)
-            {
-                if (!ReferenceEquals(beatmapAttributesDisplay.Mods.Value, mods))
-                    beatmapAttributesDisplay.Mods.Value = mods;
-                else
-                    beatmapAttributesDisplay.Mods.TriggerChange(); // mods list may be same but a mod setting has changed, trigger change in that case.
-            }
+                beatmapAttributesDisplay.Mods.Value = mods;
         }
 
         private void updateCustomisation()
