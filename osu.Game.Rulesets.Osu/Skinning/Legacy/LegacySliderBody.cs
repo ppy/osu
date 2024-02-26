@@ -27,7 +27,7 @@ namespace osu.Game.Rulesets.Osu.Skinning.Legacy
 
             protected new float CalculatedBorderPortion
                 // Roughly matches osu!stable's slider border portions.
-                => base.CalculatedBorderPortion * 0.84f;
+                => base.CalculatedBorderPortion * 0.77f;
 
             protected override Color4 ColourAt(float position)
             {
