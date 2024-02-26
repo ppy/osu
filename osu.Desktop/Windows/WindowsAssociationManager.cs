@@ -222,12 +222,21 @@ namespace osu.Desktop.Windows
                     programKey?.SetValue(null, description);
             }
 
+            /// <summary>
+            /// Uninstalls the file extenstion association in accordance with https://learn.microsoft.com/en-us/windows/win32/shell/fa-file-types#deleting-registry-information-during-uninstallation
+            /// </summary>
             public void Uninstall(RegistryKey classes)
             {
-                // importantly, we don't delete the default program entry because some other program could have taken it.
+                using (var extensionKey = classes.OpenSubKey(Extension, true))
+                {
+                    // clear our default association so that Explorer doesn't show the raw programId to users
+                    // the null/(Default) entry is used for both ProdID association and as a fallback friendly name, for legacy reasons
+                    if (extensionKey?.GetValue(null) is string s && s == programId)
+                        extensionKey.SetValue(null, string.Empty);
 
-                using (var extensionKey = classes.OpenSubKey($@"{Extension}\OpenWithProgIds", true))
-                    extensionKey?.DeleteValue(programId, throwOnMissingValue: false);
+                    using (var openWithKey = extensionKey?.CreateSubKey(@"OpenWithProgIds"))
+                        openWithKey?.DeleteValue(programId, throwOnMissingValue: false);
+                }
 
                 classes.DeleteSubKeyTree(programId, throwOnMissingSubKey: false);
             }
