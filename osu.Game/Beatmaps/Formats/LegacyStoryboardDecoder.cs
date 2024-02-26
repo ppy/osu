@@ -9,6 +9,7 @@ using osu.Framework.Graphics;
 using osu.Framework.Utils;
 using osu.Game.Beatmaps.Legacy;
 using osu.Game.IO;
+using osu.Game.Rulesets.Objects.Legacy;
 using osu.Game.Storyboards;
 using osuTK;
 using osuTK.Graphics;
@@ -75,6 +76,8 @@ namespace osu.Game.Beatmaps.Formats
             }
         }
 
+        private const char comma = ',';
+
         private void handleEvents(string line)
         {
             decodeVariables(ref line);
@@ -89,23 +92,24 @@ namespace osu.Game.Beatmaps.Formats
                     break;
             }
 
-            line = line.Substring(depth);
+            var span = line.AsSpan(depth);
 
-            string[] split = line.Split(',');
+            Span<Range> ranges = stackalloc Range[span.GetSplitCount(comma)];
+            span.Split(ranges, comma);
 
             if (depth == 0)
             {
                 storyboardSprite = null;
 
-                if (!Enum.TryParse(split[0], out LegacyEventType type))
-                    throw new InvalidDataException($@"Unknown event type: {split[0]}");
+                if (!Enum.TryParse(span.Slice(ranges[0]), out LegacyEventType type))
+                    throw new InvalidDataException($@"Unknown event type: {span.Slice(ranges[0])}");
 
                 switch (type)
                 {
                     case LegacyEventType.Video:
                     {
-                        int offset = Parsing.ParseInt(split[1]);
-                        string path = CleanFilename(split[2]);
+                        int offset = Parsing.ParseInt(span.Slice(ranges[1]));
+                        string path = CleanFilename(span.Slice(ranges[2]).ToString());
 
                         // See handling in LegacyBeatmapDecoder for the special case where a video type is used but
                         // the file extension is not a valid video.
@@ -121,11 +125,11 @@ namespace osu.Game.Beatmaps.Formats
 
                     case LegacyEventType.Sprite:
                     {
-                        string layer = parseLayer(split[1]);
-                        var origin = parseOrigin(split[2]);
-                        string path = CleanFilename(split[3]);
-                        float x = Parsing.ParseFloat(split[4], Parsing.MAX_COORDINATE_VALUE);
-                        float y = Parsing.ParseFloat(split[5], Parsing.MAX_COORDINATE_VALUE);
+                        string layer = parseLayer(span.Slice(ranges[1]));
+                        var origin = parseOrigin(span.Slice(ranges[2]));
+                        string path = CleanFilename(span.Slice(ranges[3]).ToString());
+                        float x = Parsing.ParseFloat(span.Slice(ranges[4]), Parsing.MAX_COORDINATE_VALUE);
+                        float y = Parsing.ParseFloat(span.Slice(ranges[5]), Parsing.MAX_COORDINATE_VALUE);
                         storyboardSprite = new StoryboardSprite(path, origin, new Vector2(x, y));
                         storyboard.GetLayer(layer).Add(storyboardSprite);
                         break;
@@ -133,19 +137,19 @@ namespace osu.Game.Beatmaps.Formats
 
                     case LegacyEventType.Animation:
                     {
-                        string layer = parseLayer(split[1]);
-                        var origin = parseOrigin(split[2]);
-                        string path = CleanFilename(split[3]);
-                        float x = Parsing.ParseFloat(split[4], Parsing.MAX_COORDINATE_VALUE);
-                        float y = Parsing.ParseFloat(split[5], Parsing.MAX_COORDINATE_VALUE);
-                        int frameCount = Parsing.ParseInt(split[6]);
-                        double frameDelay = Parsing.ParseDouble(split[7]);
+                        string layer = parseLayer(span.Slice(ranges[1]));
+                        var origin = parseOrigin(span.Slice(ranges[2]));
+                        string path = CleanFilename(span.Slice(ranges[3]).ToString());
+                        float x = Parsing.ParseFloat(span.Slice(ranges[4]), Parsing.MAX_COORDINATE_VALUE);
+                        float y = Parsing.ParseFloat(span.Slice(ranges[5]), Parsing.MAX_COORDINATE_VALUE);
+                        int frameCount = Parsing.ParseInt(span.Slice(ranges[6]));
+                        double frameDelay = Parsing.ParseDouble(span.Slice(ranges[7]));
 
                         if (FormatVersion < 6)
                             // this is random as hell but taken straight from osu-stable.
                             frameDelay = Math.Round(0.015 * frameDelay) * 1.186 * (1000 / 60f);
 
-                        var loopType = split.Length > 8 ? parseAnimationLoopType(split[8]) : AnimationLoopType.LoopForever;
+                        var loopType = ranges.Length > 8 ? parseAnimationLoopType(span.Slice(ranges[8])) : AnimationLoopType.LoopForever;
                         storyboardSprite = new StoryboardAnimation(path, origin, new Vector2(x, y), frameCount, frameDelay, loopType);
                         storyboard.GetLayer(layer).Add(storyboardSprite);
                         break;
@@ -153,10 +157,10 @@ namespace osu.Game.Beatmaps.Formats
 
                     case LegacyEventType.Sample:
                     {
-                        double time = Parsing.ParseDouble(split[1]);
-                        string layer = parseLayer(split[2]);
-                        string path = CleanFilename(split[3]);
-                        float volume = split.Length > 4 ? Parsing.ParseFloat(split[4]) : 100;
+                        double time = Parsing.ParseDouble(span.Slice(ranges[1]));
+                        string layer = parseLayer(span.Slice(ranges[2]));
+                        string path = CleanFilename(span.Slice(ranges[3]).ToString());
+                        float volume = ranges.Length > 4 ? Parsing.ParseFloat(span.Slice(ranges[4])) : 100;
                         storyboard.GetLayer(layer).Add(new StoryboardSampleInfo(path, time, (int)volume));
                         break;
                     }
@@ -167,150 +171,118 @@ namespace osu.Game.Beatmaps.Formats
                 if (depth < 2)
                     timelineGroup = storyboardSprite?.TimelineGroup;
 
-                string commandType = split[0];
+                var commandType = span.Slice(ranges[0]);
 
-                switch (commandType)
+                if (commandType.SequenceEqual("T"))
                 {
-                    case "T":
+                    double startTime = ranges.Length > 2 ? Parsing.ParseDouble(span.Slice(ranges[2])) : double.MinValue;
+                    double endTime = ranges.Length > 3 ? Parsing.ParseDouble(span.Slice(ranges[3])) : double.MaxValue;
+                    int groupNumber = ranges.Length > 4 ? Parsing.ParseInt(span.Slice(ranges[4])) : 0;
+                    timelineGroup = storyboardSprite?.AddTrigger(span.Slice(ranges[1]).ToString(), startTime, endTime, groupNumber);
+                }
+                else if (commandType.SequenceEqual("L"))
+                {
+                    double startTime = Parsing.ParseDouble(span.Slice(ranges[1]));
+                    int repeatCount = Parsing.ParseInt(span.Slice(ranges[2]));
+                    timelineGroup = storyboardSprite?.AddLoop(startTime, Math.Max(0, repeatCount - 1));
+                }
+                else
+                {
+                    if (ranges[3].Length() == 0)
+                        ranges[3] = ranges[2];
+
+                    var easing = (Easing)Parsing.ParseInt(span.Slice(ranges[1]));
+                    double startTime = Parsing.ParseDouble(span.Slice(ranges[2]));
+                    double endTime = Parsing.ParseDouble(span.Slice(ranges[3]));
+
+                    if (commandType.SequenceEqual("F"))
                     {
-                        string triggerName = split[1];
-                        double startTime = split.Length > 2 ? Parsing.ParseDouble(split[2]) : double.MinValue;
-                        double endTime = split.Length > 3 ? Parsing.ParseDouble(split[3]) : double.MaxValue;
-                        int groupNumber = split.Length > 4 ? Parsing.ParseInt(split[4]) : 0;
-                        timelineGroup = storyboardSprite?.AddTrigger(triggerName, startTime, endTime, groupNumber);
-                        break;
+                        float startValue = Parsing.ParseFloat(span.Slice(ranges[4]));
+                        float endValue = ranges.Length > 5 ? Parsing.ParseFloat(span.Slice(ranges[5])) : startValue;
+                        timelineGroup?.Alpha.Add(easing, startTime, endTime, startValue, endValue);
                     }
-
-                    case "L":
+                    else if (commandType.SequenceEqual("S"))
                     {
-                        double startTime = Parsing.ParseDouble(split[1]);
-                        int repeatCount = Parsing.ParseInt(split[2]);
-                        timelineGroup = storyboardSprite?.AddLoop(startTime, Math.Max(0, repeatCount - 1));
-                        break;
+                        float startValue = Parsing.ParseFloat(span.Slice(ranges[4]));
+                        float endValue = ranges.Length > 5 ? Parsing.ParseFloat(span.Slice(ranges[5])) : startValue;
+                        timelineGroup?.Scale.Add(easing, startTime, endTime, startValue, endValue);
                     }
-
-                    default:
+                    else if (commandType.SequenceEqual("V"))
                     {
-                        if (string.IsNullOrEmpty(split[3]))
-                            split[3] = split[2];
+                        float startX = Parsing.ParseFloat(span.Slice(ranges[4]));
+                        float startY = Parsing.ParseFloat(span.Slice(ranges[5]));
+                        float endX = ranges.Length > 6 ? Parsing.ParseFloat(span.Slice(ranges[6])) : startX;
+                        float endY = ranges.Length > 7 ? Parsing.ParseFloat(span.Slice(ranges[7])) : startY;
+                        timelineGroup?.VectorScale.Add(easing, startTime, endTime, new Vector2(startX, startY), new Vector2(endX, endY));
+                    }
+                    else if (commandType.SequenceEqual("R"))
+                    {
+                        float startValue = Parsing.ParseFloat(span.Slice(ranges[4]));
+                        float endValue = ranges.Length > 5 ? Parsing.ParseFloat(span.Slice(ranges[5])) : startValue;
+                        timelineGroup?.Rotation.Add(easing, startTime, endTime, MathUtils.RadiansToDegrees(startValue), MathUtils.RadiansToDegrees(endValue));
+                    }
+                    else if (commandType.SequenceEqual("M"))
+                    {
+                        float startX = Parsing.ParseFloat(span.Slice(ranges[4]));
+                        float startY = Parsing.ParseFloat(span.Slice(ranges[5]));
+                        float endX = ranges.Length > 6 ? Parsing.ParseFloat(span.Slice(ranges[6])) : startX;
+                        float endY = ranges.Length > 7 ? Parsing.ParseFloat(span.Slice(ranges[7])) : startY;
+                        timelineGroup?.X.Add(easing, startTime, endTime, startX, endX);
+                        timelineGroup?.Y.Add(easing, startTime, endTime, startY, endY);
+                    }
+                    else if (commandType.SequenceEqual("MX"))
+                    {
+                        float startValue = Parsing.ParseFloat(span.Slice(ranges[4]));
+                        float endValue = ranges.Length > 5 ? Parsing.ParseFloat(span.Slice(ranges[5])) : startValue;
+                        timelineGroup?.X.Add(easing, startTime, endTime, startValue, endValue);
+                    }
+                    else if (commandType.SequenceEqual("MY"))
+                    {
+                        float startValue = Parsing.ParseFloat(span.Slice(ranges[4]));
+                        float endValue = ranges.Length > 5 ? Parsing.ParseFloat(span.Slice(ranges[5])) : startValue;
+                        timelineGroup?.Y.Add(easing, startTime, endTime, startValue, endValue);
+                    }
+                    else if (commandType.SequenceEqual("C"))
+                    {
+                        float startRed = Parsing.ParseFloat(span.Slice(ranges[4]));
+                        float startGreen = Parsing.ParseFloat(span.Slice(ranges[5]));
+                        float startBlue = Parsing.ParseFloat(span.Slice(ranges[6]));
+                        float endRed = ranges.Length > 7 ? Parsing.ParseFloat(span.Slice(ranges[7])) : startRed;
+                        float endGreen = ranges.Length > 8 ? Parsing.ParseFloat(span.Slice(ranges[8])) : startGreen;
+                        float endBlue = ranges.Length > 9 ? Parsing.ParseFloat(span.Slice(ranges[9])) : startBlue;
+                        timelineGroup?.Colour.Add(easing, startTime, endTime,
+                            new Color4(startRed / 255f, startGreen / 255f, startBlue / 255f, 1),
+                            new Color4(endRed / 255f, endGreen / 255f, endBlue / 255f, 1));
+                    }
+                    else if (commandType.SequenceEqual("P"))
+                    {
+                        var type = span.Slice(ranges[4]);
 
-                        var easing = (Easing)Parsing.ParseInt(split[1]);
-                        double startTime = Parsing.ParseDouble(split[2]);
-                        double endTime = Parsing.ParseDouble(split[3]);
-
-                        switch (commandType)
+                        if (type.SequenceEqual(@"A"))
                         {
-                            case "F":
-                            {
-                                float startValue = Parsing.ParseFloat(split[4]);
-                                float endValue = split.Length > 5 ? Parsing.ParseFloat(split[5]) : startValue;
-                                timelineGroup?.Alpha.Add(easing, startTime, endTime, startValue, endValue);
-                                break;
-                            }
-
-                            case "S":
-                            {
-                                float startValue = Parsing.ParseFloat(split[4]);
-                                float endValue = split.Length > 5 ? Parsing.ParseFloat(split[5]) : startValue;
-                                timelineGroup?.Scale.Add(easing, startTime, endTime, startValue, endValue);
-                                break;
-                            }
-
-                            case "V":
-                            {
-                                float startX = Parsing.ParseFloat(split[4]);
-                                float startY = Parsing.ParseFloat(split[5]);
-                                float endX = split.Length > 6 ? Parsing.ParseFloat(split[6]) : startX;
-                                float endY = split.Length > 7 ? Parsing.ParseFloat(split[7]) : startY;
-                                timelineGroup?.VectorScale.Add(easing, startTime, endTime, new Vector2(startX, startY), new Vector2(endX, endY));
-                                break;
-                            }
-
-                            case "R":
-                            {
-                                float startValue = Parsing.ParseFloat(split[4]);
-                                float endValue = split.Length > 5 ? Parsing.ParseFloat(split[5]) : startValue;
-                                timelineGroup?.Rotation.Add(easing, startTime, endTime, MathUtils.RadiansToDegrees(startValue), MathUtils.RadiansToDegrees(endValue));
-                                break;
-                            }
-
-                            case "M":
-                            {
-                                float startX = Parsing.ParseFloat(split[4]);
-                                float startY = Parsing.ParseFloat(split[5]);
-                                float endX = split.Length > 6 ? Parsing.ParseFloat(split[6]) : startX;
-                                float endY = split.Length > 7 ? Parsing.ParseFloat(split[7]) : startY;
-                                timelineGroup?.X.Add(easing, startTime, endTime, startX, endX);
-                                timelineGroup?.Y.Add(easing, startTime, endTime, startY, endY);
-                                break;
-                            }
-
-                            case "MX":
-                            {
-                                float startValue = Parsing.ParseFloat(split[4]);
-                                float endValue = split.Length > 5 ? Parsing.ParseFloat(split[5]) : startValue;
-                                timelineGroup?.X.Add(easing, startTime, endTime, startValue, endValue);
-                                break;
-                            }
-
-                            case "MY":
-                            {
-                                float startValue = Parsing.ParseFloat(split[4]);
-                                float endValue = split.Length > 5 ? Parsing.ParseFloat(split[5]) : startValue;
-                                timelineGroup?.Y.Add(easing, startTime, endTime, startValue, endValue);
-                                break;
-                            }
-
-                            case "C":
-                            {
-                                float startRed = Parsing.ParseFloat(split[4]);
-                                float startGreen = Parsing.ParseFloat(split[5]);
-                                float startBlue = Parsing.ParseFloat(split[6]);
-                                float endRed = split.Length > 7 ? Parsing.ParseFloat(split[7]) : startRed;
-                                float endGreen = split.Length > 8 ? Parsing.ParseFloat(split[8]) : startGreen;
-                                float endBlue = split.Length > 9 ? Parsing.ParseFloat(split[9]) : startBlue;
-                                timelineGroup?.Colour.Add(easing, startTime, endTime,
-                                    new Color4(startRed / 255f, startGreen / 255f, startBlue / 255f, 1),
-                                    new Color4(endRed / 255f, endGreen / 255f, endBlue / 255f, 1));
-                                break;
-                            }
-
-                            case "P":
-                            {
-                                string type = split[4];
-
-                                switch (type)
-                                {
-                                    case "A":
-                                        timelineGroup?.BlendingParameters.Add(easing, startTime, endTime, BlendingParameters.Additive,
-                                            startTime == endTime ? BlendingParameters.Additive : BlendingParameters.Inherit);
-                                        break;
-
-                                    case "H":
-                                        timelineGroup?.FlipH.Add(easing, startTime, endTime, true, startTime == endTime);
-                                        break;
-
-                                    case "V":
-                                        timelineGroup?.FlipV.Add(easing, startTime, endTime, true, startTime == endTime);
-                                        break;
-                                }
-
-                                break;
-                            }
-
-                            default:
-                                throw new InvalidDataException($@"Unknown command type: {commandType}");
+                            timelineGroup?.BlendingParameters.Add(easing, startTime, endTime, BlendingParameters.Additive,
+                                startTime == endTime ? BlendingParameters.Additive : BlendingParameters.Inherit);
                         }
-
-                        break;
+                        else if (type.SequenceEqual(@"H"))
+                        {
+                            timelineGroup?.FlipH.Add(easing, startTime, endTime, true, startTime == endTime);
+                        }
+                        else if (type.SequenceEqual(@"V"))
+                        {
+                            timelineGroup?.FlipV.Add(easing, startTime, endTime, true, startTime == endTime);
+                        }
+                    }
+                    else
+                    {
+                        throw new InvalidDataException($@"Unknown command type: {commandType}");
                     }
                 }
             }
         }
 
-        private string parseLayer(string value) => Enum.Parse<LegacyStoryLayer>(value).ToString();
+        private string parseLayer(ReadOnlySpan<char> value) => Enum.Parse<LegacyStoryLayer>(value).ToString();
 
-        private Anchor parseOrigin(string value)
+        private Anchor parseOrigin(ReadOnlySpan<char> value)
         {
             var origin = Enum.Parse<LegacyOrigins>(value);
 
@@ -348,7 +320,7 @@ namespace osu.Game.Beatmaps.Formats
             }
         }
 
-        private AnimationLoopType parseAnimationLoopType(string value)
+        private AnimationLoopType parseAnimationLoopType(ReadOnlySpan<char> value)
         {
             var parsed = Enum.Parse<AnimationLoopType>(value);
             return Enum.IsDefined(parsed) ? parsed : AnimationLoopType.LoopForever;
