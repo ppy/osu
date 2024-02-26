@@ -25,13 +25,16 @@ namespace osu.Game.Rulesets.Osu.Skinning.Legacy
         {
             protected override Color4 ColourAt(float position)
             {
+                // https://github.com/peppy/osu-stable-reference/blob/3ea48705eb67172c430371dcfc8a16a002ed0d3d/osu!/Graphics/Renderers/MmSliderRendererGL.cs#L99
                 const float aa_width = 0.5f / 64f;
-                const float shadow_portion = 1 - (OsuLegacySkinTransformer.LEGACY_CIRCLE_RADIUS / OsuHitObject.OBJECT_RADIUS);
-                const float border_portion = 0.1875f;
 
                 Color4 shadow = new Color4(0, 0, 0, 0.25f);
                 Color4 outerColour = AccentColour.Darken(0.1f);
                 Color4 innerColour = lighten(AccentColour, 0.5f);
+
+                // https://github.com/peppy/osu-stable-reference/blob/3ea48705eb67172c430371dcfc8a16a002ed0d3d/osu!/Graphics/Renderers/MmSliderRendererGL.cs#L59-L70
+                const float shadow_portion = 1 - (OsuLegacySkinTransformer.LEGACY_CIRCLE_RADIUS / OsuHitObject.OBJECT_RADIUS);
+                const float border_portion = 0.1875f;
 
                 if (position <= shadow_portion - aa_width)
                     return LegacyUtils.InterpolateNonLinear(position, Color4.Black.Opacity(0f), shadow, 0, shadow_portion - aa_width);
