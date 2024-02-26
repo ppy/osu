@@ -200,9 +200,10 @@ namespace osu.Game.Screens.Play.HUD
 
             private void bind()
             {
-                ((IBindable<double>)circularProgress.Current).BindTo(Progress);
                 Progress.ValueChanged += progress =>
                 {
+                    circularProgress.Progress = progress.NewValue;
+
                     icon.Scale = new Vector2(1 + (float)progress.NewValue * 0.2f);
 
                     if (IsDangerousAction)
