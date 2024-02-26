@@ -108,7 +108,7 @@ namespace osu.Game.Rulesets.Osu.Skinning
                         case DrawableSliderTail:
                             // As above, use ParentObject for the correct slider end time
                             using (BeginAbsoluteSequence(ParentObject.HitStateUpdateTime))
-                                OnSliderBreak();
+                                OnSliderTailBreak();
                             break;
                         case DrawableSliderTick:
                         case DrawableSliderRepeat:
@@ -141,5 +141,7 @@ namespace osu.Game.Rulesets.Osu.Skinning
         protected abstract void OnSliderTick();
 
         protected abstract void OnSliderBreak();
+
+        protected virtual void OnSliderTailBreak() => this.FadeTo(0f);
     }
 }
