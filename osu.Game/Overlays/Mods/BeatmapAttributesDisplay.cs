@@ -13,6 +13,7 @@ using osu.Framework.Input.Events;
 using osu.Framework.Localisation;
 using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.Drawables;
+using osu.Game.Configuration;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Graphics.UserInterface;
@@ -42,6 +43,8 @@ namespace osu.Game.Overlays.Mods
         public Bindable<IReadOnlyList<Mod>> Mods { get; } = new Bindable<IReadOnlyList<Mod>>();
 
         public BindableBool Collapsed { get; } = new BindableBool(true);
+
+        private ModSettingChangeTracker? modSettingChangeTracker;
 
         [Resolved]
         private BeatmapDifficultyCache difficultyCache { get; set; } = null!;
@@ -97,7 +100,14 @@ namespace osu.Game.Overlays.Mods
         {
             base.LoadComplete();
 
-            Mods.BindValueChanged(_ => updateValues());
+            Mods.BindValueChanged(_ =>
+            {
+                modSettingChangeTracker?.Dispose();
+                modSettingChangeTracker = new ModSettingChangeTracker(Mods.Value);
+                modSettingChangeTracker.SettingChanged += _ => updateValues();
+                updateValues();
+            }, true);
+
             BeatmapInfo.BindValueChanged(_ => updateValues());
 
             Collapsed.BindValueChanged(_ =>
