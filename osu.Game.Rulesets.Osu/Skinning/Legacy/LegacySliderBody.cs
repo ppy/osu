@@ -26,7 +26,10 @@ namespace osu.Game.Rulesets.Osu.Skinning.Legacy
             protected override Color4 ColourAt(float position)
             {
                 // https://github.com/peppy/osu-stable-reference/blob/3ea48705eb67172c430371dcfc8a16a002ed0d3d/osu!/Graphics/Renderers/MmSliderRendererGL.cs#L99
-                const float aa_width = 3f / 256f;
+                // float aaWidth = Math.Min(Math.Max(0.5f / PathRadius, 3.0f / 256.0f), 1.0f / 16.0f);
+                // applying the aa_width constant from stable makes sliders blurry, especially on CS>5. set to zero for now.
+                // this might be related to SmoothPath applying AA internally, but disabling that does not seem to have much of an effect.
+                const float aa_width = 0f;
 
                 Color4 shadow = new Color4(0, 0, 0, 0.25f);
                 Color4 outerColour = AccentColour.Darken(0.1f);
