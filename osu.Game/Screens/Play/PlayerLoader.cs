@@ -156,7 +156,7 @@ namespace osu.Game.Screens.Play
         private BatteryInfo? batteryInfo { get; set; }
 
         [Resolved]
-        private HighPerformanceSessionManager? highPerformanceSessionManager { get; set; }
+        private IHighPerformanceSessionManager? highPerformanceSessionManager { get; set; }
 
         public PlayerLoader(Func<Player> createPlayer)
         {
