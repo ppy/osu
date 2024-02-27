@@ -15,27 +15,27 @@ namespace osu.Desktop.Windows
     [SupportedOSPlatform("windows")]
     public static class WindowsAssociationManager
     {
-        public const string SOFTWARE_CLASSES = @"Software\Classes";
+        private const string software_classes = @"Software\Classes";
 
         /// <summary>
         /// Sub key for setting the icon.
         /// https://learn.microsoft.com/en-us/windows/win32/com/defaulticon
         /// </summary>
-        public const string DEFAULT_ICON = @"DefaultIcon";
+        private const string default_icon = @"DefaultIcon";
 
         /// <summary>
         /// Sub key for setting the command line that the shell invokes.
         /// https://learn.microsoft.com/en-us/windows/win32/com/shell
         /// </summary>
-        public const string SHELL_OPEN_COMMAND = @"Shell\Open\Command";
+        internal const string SHELL_OPEN_COMMAND = @"Shell\Open\Command";
 
-        public static readonly string EXE_PATH = Path.ChangeExtension(typeof(WindowsAssociationManager).Assembly.Location, ".exe").Replace('/', '\\');
+        private static readonly string exe_path = Path.ChangeExtension(typeof(WindowsAssociationManager).Assembly.Location, ".exe").Replace('/', '\\');
 
         /// <summary>
         /// Program ID prefix used for file associations. Should be relatively short since the full program ID has a 39 character limit,
         /// see https://learn.microsoft.com/en-us/windows/win32/com/-progid--key.
         /// </summary>
-        public const string PROGRAM_ID_PREFIX = "osu.File";
+        private const string program_id_prefix = "osu.File";
 
         private static readonly FileAssociation[] file_associations =
         {
@@ -177,24 +177,24 @@ namespace osu.Desktop.Windows
 
         private record FileAssociation(string Extension, LocalisableString Description, string IconPath)
         {
-            private string programId => $@"{PROGRAM_ID_PREFIX}{Extension}";
+            private string programId => $@"{program_id_prefix}{Extension}";
 
             /// <summary>
             /// Installs a file extenstion association in accordance with https://learn.microsoft.com/en-us/windows/win32/com/-progid--key
             /// </summary>
             public void Install()
             {
-                using var classes = Registry.CurrentUser.OpenSubKey(SOFTWARE_CLASSES, true);
+                using var classes = Registry.CurrentUser.OpenSubKey(software_classes, true);
                 if (classes == null) return;
 
                 // register a program id for the given extension
                 using (var programKey = classes.CreateSubKey(programId))
                 {
-                    using (var defaultIconKey = programKey.CreateSubKey(DEFAULT_ICON))
+                    using (var defaultIconKey = programKey.CreateSubKey(default_icon))
                         defaultIconKey.SetValue(null, IconPath);
 
                     using (var openCommandKey = programKey.CreateSubKey(SHELL_OPEN_COMMAND))
-                        openCommandKey.SetValue(null, $@"""{EXE_PATH}"" ""%1""");
+                        openCommandKey.SetValue(null, $@"""{exe_path}"" ""%1""");
                 }
 
                 using (var extensionKey = classes.CreateSubKey(Extension))
@@ -211,7 +211,7 @@ namespace osu.Desktop.Windows
 
             public void UpdateDescription(string description)
             {
-                using var classes = Registry.CurrentUser.OpenSubKey(SOFTWARE_CLASSES, true);
+                using var classes = Registry.CurrentUser.OpenSubKey(software_classes, true);
                 if (classes == null) return;
 
                 using (var programKey = classes.OpenSubKey(programId, true))
@@ -223,7 +223,7 @@ namespace osu.Desktop.Windows
             /// </summary>
             public void Uninstall()
             {
-                using var classes = Registry.CurrentUser.OpenSubKey(SOFTWARE_CLASSES, true);
+                using var classes = Registry.CurrentUser.OpenSubKey(software_classes, true);
                 if (classes == null) return;
 
                 using (var extensionKey = classes.OpenSubKey(Extension, true))
@@ -254,24 +254,24 @@ namespace osu.Desktop.Windows
             /// </summary>
             public void Install()
             {
-                using var classes = Registry.CurrentUser.OpenSubKey(SOFTWARE_CLASSES, true);
+                using var classes = Registry.CurrentUser.OpenSubKey(software_classes, true);
                 if (classes == null) return;
 
                 using (var protocolKey = classes.CreateSubKey(Protocol))
                 {
                     protocolKey.SetValue(URL_PROTOCOL, string.Empty);
 
-                    using (var defaultIconKey = protocolKey.CreateSubKey(DEFAULT_ICON))
+                    using (var defaultIconKey = protocolKey.CreateSubKey(default_icon))
                         defaultIconKey.SetValue(null, IconPath);
 
                     using (var openCommandKey = protocolKey.CreateSubKey(SHELL_OPEN_COMMAND))
-                        openCommandKey.SetValue(null, $@"""{EXE_PATH}"" ""%1""");
+                        openCommandKey.SetValue(null, $@"""{exe_path}"" ""%1""");
                 }
             }
 
             public void UpdateDescription(string description)
             {
-                using var classes = Registry.CurrentUser.OpenSubKey(SOFTWARE_CLASSES, true);
+                using var classes = Registry.CurrentUser.OpenSubKey(software_classes, true);
                 if (classes == null) return;
 
                 using (var protocolKey = classes.OpenSubKey(Protocol, true))
@@ -280,7 +280,7 @@ namespace osu.Desktop.Windows
 
             public void Uninstall()
             {
-                using var classes = Registry.CurrentUser.OpenSubKey(SOFTWARE_CLASSES, true);
+                using var classes = Registry.CurrentUser.OpenSubKey(software_classes, true);
                 classes?.DeleteSubKeyTree(Protocol, throwOnMissingSubKey: false);
             }
         }
