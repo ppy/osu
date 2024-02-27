@@ -5,8 +5,19 @@ using System;
 
 namespace osu.Game.Performance
 {
+    /// <summary>
+    /// Allows creating a temporary "high performance" session, with the goal of optimising runtime
+    /// performance for gameplay purposes.
+    ///
+    /// On desktop platforms, this will set a low latency GC mode which collects more frequently to avoid
+    /// GC spikes.
+    /// </summary>
     public interface IHighPerformanceSessionManager
     {
+        /// <summary>
+        /// Start a new high performance session.
+        /// </summary>
+        /// <returns>An <see cref="IDisposable"/> which will end the session when disposed.</returns>
         IDisposable BeginSession();
     }
 }
