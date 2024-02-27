@@ -95,8 +95,10 @@ namespace osu.Desktop
             if (activity.Value != null)
             {
                 bool hideIdentifiableInformation = privacyMode.Value == DiscordRichPresenceMode.Limited;
+                bool hideInteractions = status.Value == UserStatus.DoNotDisturb && activity.Value is UserActivity.InLobby;
+
                 presence.State = truncate(activity.Value.GetStatus(hideIdentifiableInformation));
-                presence.Details = truncate(activity.Value.GetDetails(hideIdentifiableInformation) ?? string.Empty);
+                presence.Details = truncate(activity.Value.GetDetails(hideIdentifiableInformation || hideInteractions) ?? string.Empty);
 
                 if (getBeatmapID(activity.Value) is int beatmapId && beatmapId > 0)
                 {
