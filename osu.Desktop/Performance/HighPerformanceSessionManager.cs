@@ -4,12 +4,12 @@
 using System;
 using System.Runtime;
 using osu.Framework.Allocation;
-using osu.Framework.Graphics;
 using osu.Framework.Logging;
+using osu.Game.Performance;
 
-namespace osu.Game.Performance
+namespace osu.Desktop.Performance
 {
-    public partial class HighPerformanceSessionManager : Component
+    public class HighPerformanceSessionManager : IHighPerformanceSessionManager
     {
         private GCLatencyMode originalGCMode;
 
