@@ -14,11 +14,11 @@ namespace osu.Game.Performance
 
         public IDisposable BeginSession()
         {
-            EnableHighPerformanceSession();
-            return new InvokeOnDisposal<HighPerformanceSessionManager>(this, static m => m.DisableHighPerformanceSession());
+            enableHighPerformanceSession();
+            return new InvokeOnDisposal<HighPerformanceSessionManager>(this, static m => m.disableHighPerformanceSession());
         }
 
-        protected virtual void EnableHighPerformanceSession()
+        private void enableHighPerformanceSession()
         {
             originalGCMode = GCSettings.LatencyMode;
             GCSettings.LatencyMode = GCLatencyMode.LowLatency;
@@ -27,7 +27,7 @@ namespace osu.Game.Performance
             GC.Collect(0);
         }
 
-        protected virtual void DisableHighPerformanceSession()
+        private void disableHighPerformanceSession()
         {
             if (GCSettings.LatencyMode == GCLatencyMode.LowLatency)
                 GCSettings.LatencyMode = originalGCMode;

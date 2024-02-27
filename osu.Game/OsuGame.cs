@@ -792,8 +792,6 @@ namespace osu.Game
 
         protected virtual UpdateManager CreateUpdateManager() => new UpdateManager();
 
-        protected virtual HighPerformanceSessionManager CreateHighPerformanceSessionManager() => new HighPerformanceSessionManager();
-
         protected override Container CreateScalingContainer() => new ScalingContainer(ScalingMode.Everything);
 
         #region Beatmap progression
@@ -1088,7 +1086,7 @@ namespace osu.Game
             loadComponentSingleFile(new AccountCreationOverlay(), topMostOverlayContent.Add, true);
             loadComponentSingleFile<IDialogOverlay>(new DialogOverlay(), topMostOverlayContent.Add, true);
 
-            loadComponentSingleFile(CreateHighPerformanceSessionManager(), Add, true);
+            loadComponentSingleFile(new HighPerformanceSessionManager(), Add, true);
 
             loadComponentSingleFile(new BackgroundDataStoreProcessor(), Add);
 
