@@ -5,6 +5,7 @@ using System;
 using System.Runtime;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
+using osu.Framework.Logging;
 
 namespace osu.Game.Performance
 {
@@ -20,6 +21,8 @@ namespace osu.Game.Performance
 
         private void enableHighPerformanceSession()
         {
+            Logger.Log("Starting high performance session");
+
             originalGCMode = GCSettings.LatencyMode;
             GCSettings.LatencyMode = GCLatencyMode.LowLatency;
 
@@ -29,6 +32,8 @@ namespace osu.Game.Performance
 
         private void disableHighPerformanceSession()
         {
+            Logger.Log("Ending high performance session");
+
             if (GCSettings.LatencyMode == GCLatencyMode.LowLatency)
                 GCSettings.LatencyMode = originalGCMode;
 
