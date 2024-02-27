@@ -21,10 +21,7 @@ namespace osu.Game.Rulesets.Mania.Mods
         {
             var mbc = (ManiaBeatmapConverter)beatmapConverter;
 
-            if (mbc.IsForCurrentRuleset)
-                mbc.TargetColumnsSpecific = KeyCount;
-            else
-                mbc.TargetColumns = KeyCount;
+            mbc.TargetColumns = KeyCount;
         }
 
         public override Type[] IncompatibleMods => new[]

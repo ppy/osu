@@ -28,12 +28,11 @@ namespace osu.Game.Rulesets.Mania.Beatmaps
         private const int max_notes_for_density = 7;
 
         public int TargetColumns;
-        public int TargetColumnsSpecific;
-        private double shortestJack;
         public bool Dual;
         public readonly bool IsForCurrentRuleset;
 
         private readonly int originalTargetColumns;
+        private double shortestJack;
 
         // Internal for testing purposes
         internal LegacyRandom Random { get; private set; }
@@ -53,7 +52,6 @@ namespace osu.Game.Rulesets.Mania.Beatmaps
                 TargetColumns /= 2;
                 Dual = true;
             }
-            TargetColumnsSpecific = -1;
             originalTargetColumns = TargetColumns;
         }
 
@@ -94,11 +92,22 @@ namespace osu.Game.Rulesets.Mania.Beatmaps
             int seed = (int)MathF.Round(difficulty.DrainRate + difficulty.CircleSize) * 20 + (int)(difficulty.OverallDifficulty * 41.2) + (int)MathF.Round(difficulty.ApproachRate);
             Random = new LegacyRandom(seed);
 
-            var beatmap = base.ConvertBeatmap(original, cancellationToken);
+            if (IsForCurrentRuleset)
+            {
+                int KeyModColumns = TargetColumns;
+                TargetColumns = originalTargetColumns;
 
-            if (TargetColumnsSpecific != -1 && TargetColumnsSpecific != TargetColumns)
-                convertSpecific((ManiaBeatmap)beatmap);
-            return beatmap;
+                var beatmap = (ManiaBeatmap)base.ConvertBeatmap(original, cancellationToken);
+
+                TargetColumns = KeyModColumns;
+                convertSpecific(beatmap);
+
+                return beatmap;
+            }
+            else
+            {
+                return (ManiaBeatmap)base.ConvertBeatmap(original, cancellationToken);
+            }
         }
 
         protected override Beatmap<ManiaHitObject> CreateBeatmap()
@@ -236,7 +245,7 @@ namespace osu.Game.Rulesets.Mania.Beatmaps
         /// </summary>
         private void convertSpecific(ManiaBeatmap beatmap)
         {
-            while (TargetColumnsSpecific - beatmap.TotalColumns > 0)
+            while (TargetColumns - beatmap.TotalColumns > 0)
             {
                 insertColumn(beatmap);
 
@@ -245,10 +254,10 @@ namespace osu.Game.Rulesets.Mania.Beatmaps
                 beatmap.Stages.Add(new StageDefinition(columns + 1));
             }
 
-            if (TargetColumnsSpecific - beatmap.TotalColumns < 0)
+            if (TargetColumns - beatmap.TotalColumns < 0)
             {
                 getInfo(beatmap);
-                while (TargetColumnsSpecific - beatmap.TotalColumns < 0)
+                while (TargetColumns - beatmap.TotalColumns < 0)
                 {
                     reduceColumn(beatmap);
 
@@ -356,7 +365,7 @@ namespace osu.Game.Rulesets.Mania.Beatmaps
                                                     .ToList())
             {
                 if (group.Count() == 1) continue;
-                int newChordScale = (int)Math.Round(group.Count() / (double)beatmap.OriginalTotalColumns * TargetColumnsSpecific);
+                int newChordScale = (int)Math.Round(group.Count() / (double)beatmap.OriginalTotalColumns * TargetColumns);
 
                 if (newChordScale == 0) newChordScale = 1;
                 int noteToDel = group.Count() - newChordScale;
