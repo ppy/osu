@@ -341,12 +341,12 @@ namespace osu.Game.Overlays.Mods
                     column.SearchTerm = query.NewValue;
             }, true);
 
-            // Start scrolled slightly to the right to give the user a sense that
+            // Start scrolling from the end, to give the user a sense that
             // there is more horizontal content available.
             ScheduleAfterChildren(() =>
             {
-                columnScroll.ScrollTo(200, false);
-                columnScroll.ScrollToStart();
+                columnScroll.ScrollToEnd(false);
+                columnScroll.ScrollTo(0, true, 0.0055);
             });
         }
 
