@@ -81,6 +81,17 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
 
             foreach (var piece in DimmablePieces)
             {
+                // if the specified dimmable piece is a DHO, it is generally not safe to tack transforms onto it directly
+                // as they may be cleared via the `updateState()` DHO flow,
+                // so use `ApplyCustomUpdateState` instead. which does not have this pitfall.
+                if (piece is DrawableHitObject drawableObjectPiece)
+                    drawableObjectPiece.ApplyCustomUpdateState += (dho, _) => applyDim(dho);
+                else
+                    applyDim(piece);
+            }
+
+            void applyDim(Drawable piece)
+            {
                 piece.FadeColour(new Color4(195, 195, 195, 255));
                 using (piece.BeginDelayedSequence(InitialLifetimeOffset - OsuHitWindows.MISS_WINDOW))
                     piece.FadeColour(Color4.White, 100);
