@@ -6,6 +6,7 @@ using System.Linq;
 using osu.Game.Beatmaps;
 using osu.Game.Rulesets.Mania.Beatmaps;
 using osu.Game.Rulesets.Mods;
+
 namespace osu.Game.Rulesets.Mania.Mods
 {
     public abstract class ManiaKeyMod : Mod, IApplicableToBeatmapConverter
@@ -27,7 +28,7 @@ namespace osu.Game.Rulesets.Mania.Mods
         }
 
         public override Type[] IncompatibleMods => new[]
-                {
+        {
             typeof(ManiaModKey1),
             typeof(ManiaModKey2),
             typeof(ManiaModKey3),
