@@ -38,9 +38,9 @@ namespace osu.Game.Screens.Play
 
         public override bool ReceivePositionalInputAt(Vector2 screenSpacePos) => true;
 
-        public Action? OnResume;
-        public Action? OnRetry;
-        public Action? OnQuit;
+        public Action? OnResume { get; init; }
+        public Action? OnRetry { get; init; }
+        public Action? OnQuit { get; init; }
 
         /// <summary>
         /// Action that is invoked when <see cref="GlobalAction.Back"/> is triggered.
