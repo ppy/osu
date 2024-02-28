@@ -28,11 +28,11 @@ namespace osu.Game.Screens.Ranking.Statistics
         }
 
         [BackgroundDependencyLoader]
-        private void load(UserStatisticsWatcher? soloStatisticsWatcher)
+        private void load(UserStatisticsWatcher? userStatisticsWatcher)
         {
-            if (soloStatisticsWatcher != null)
+            if (userStatisticsWatcher != null)
             {
-                latestGlobalStatisticsUpdate = soloStatisticsWatcher.LatestUpdate.GetBoundCopy();
+                latestGlobalStatisticsUpdate = userStatisticsWatcher.LatestUpdate.GetBoundCopy();
                 latestGlobalStatisticsUpdate.BindValueChanged(update =>
                 {
                     if (update.NewValue?.Score.MatchesOnlineID(achievedScore) == true)
