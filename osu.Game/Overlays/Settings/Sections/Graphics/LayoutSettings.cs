@@ -30,6 +30,7 @@ namespace osu.Game.Overlays.Settings.Sections.Graphics
         protected override LocalisableString Header => GraphicsSettingsStrings.LayoutHeader;
 
         private FillFlowContainer<SettingsSlider<float>> scalingSettings = null!;
+        private SettingsSlider<float> dimSlider = null!;
 
         private readonly Bindable<Display> currentDisplay = new Bindable<Display>();
 
@@ -50,12 +51,15 @@ namespace osu.Game.Overlays.Settings.Sections.Graphics
         private SettingsDropdown<Size> resolutionDropdown = null!;
         private SettingsDropdown<Display> displayDropdown = null!;
         private SettingsDropdown<WindowMode> windowModeDropdown = null!;
+        private SettingsCheckbox minimiseOnFocusLossCheckbox = null!;
         private SettingsCheckbox safeAreaConsiderationsCheckbox = null!;
 
         private Bindable<float> scalingPositionX = null!;
         private Bindable<float> scalingPositionY = null!;
         private Bindable<float> scalingSizeX = null!;
         private Bindable<float> scalingSizeY = null!;
+
+        private Bindable<float> scalingBackgroundDim = null!;
 
         private const int transition_duration = 400;
 
@@ -70,6 +74,7 @@ namespace osu.Game.Overlays.Settings.Sections.Graphics
             scalingSizeY = osuConfig.GetBindable<float>(OsuSetting.ScalingSizeY);
             scalingPositionX = osuConfig.GetBindable<float>(OsuSetting.ScalingPositionX);
             scalingPositionY = osuConfig.GetBindable<float>(OsuSetting.ScalingPositionY);
+            scalingBackgroundDim = osuConfig.GetBindable<float>(OsuSetting.ScalingBackgroundDim);
 
             if (window != null)
             {
@@ -102,9 +107,15 @@ namespace osu.Game.Overlays.Settings.Sections.Graphics
                     ItemSource = resolutions,
                     Current = sizeFullscreen
                 },
+                minimiseOnFocusLossCheckbox = new SettingsCheckbox
+                {
+                    LabelText = GraphicsSettingsStrings.MinimiseOnFocusLoss,
+                    Current = config.GetBindable<bool>(FrameworkSetting.MinimiseOnFocusLossInFullscreen),
+                    Keywords = new[] { "alt-tab", "minimize", "focus", "hide" },
+                },
                 safeAreaConsiderationsCheckbox = new SettingsCheckbox
                 {
-                    LabelText = "Shrink game to avoid cameras and notches",
+                    LabelText = GraphicsSettingsStrings.ShrinkGameToSafeArea,
                     Current = osuConfig.GetBindable<bool>(OsuSetting.SafeAreaConsiderations),
                 },
                 new SettingsSlider<float, UIScaleSlider>
@@ -161,6 +172,13 @@ namespace osu.Game.Overlays.Settings.Sections.Graphics
                             KeyboardStep = 0.01f,
                             DisplayAsPercentage = true
                         },
+                        dimSlider = new SettingsSlider<float>
+                        {
+                            LabelText = GameplaySettingsStrings.BackgroundDim,
+                            Current = scalingBackgroundDim,
+                            KeyboardStep = 0.01f,
+                            DisplayAsPercentage = true,
+                        },
                     }
                 },
             };
@@ -182,16 +200,17 @@ namespace osu.Game.Overlays.Settings.Sections.Graphics
 
             currentDisplay.BindValueChanged(display => Schedule(() =>
             {
-                resolutions.RemoveRange(1, resolutions.Count - 1);
-
-                if (display.NewValue != null)
+                if (display.NewValue == null)
                 {
-                    resolutions.AddRange(display.NewValue.DisplayModes
-                                                .Where(m => m.Size.Width >= 800 && m.Size.Height >= 600)
-                                                .OrderByDescending(m => Math.Max(m.Size.Height, m.Size.Width))
-                                                .Select(m => m.Size)
-                                                .Distinct());
+                    resolutions.Clear();
+                    return;
                 }
+
+                resolutions.ReplaceRange(1, resolutions.Count - 1, display.NewValue.DisplayModes
+                                                                          .Where(m => m.Size.Width >= 800 && m.Size.Height >= 600)
+                                                                          .OrderByDescending(m => Math.Max(m.Size.Height, m.Size.Width))
+                                                                          .Select(m => m.Size)
+                                                                          .Distinct());
 
                 updateDisplaySettingsVisibility();
             }), true);
@@ -216,8 +235,15 @@ namespace osu.Game.Overlays.Settings.Sections.Graphics
                 scalingSettings.AutoSizeAxes = scalingMode.Value != ScalingMode.Off ? Axes.Y : Axes.None;
                 scalingSettings.ForEach(s =>
                 {
-                    s.TransferValueOnCommit = scalingMode.Value == ScalingMode.Everything;
-                    s.CanBeShown.Value = scalingMode.Value != ScalingMode.Off;
+                    if (s == dimSlider)
+                    {
+                        s.CanBeShown.Value = scalingMode.Value == ScalingMode.Everything || scalingMode.Value == ScalingMode.ExcludeOverlays;
+                    }
+                    else
+                    {
+                        s.TransferValueOnCommit = scalingMode.Value == ScalingMode.Everything;
+                        s.CanBeShown.Value = scalingMode.Value != ScalingMode.Off;
+                    }
                 });
             }
         }
@@ -226,7 +252,8 @@ namespace osu.Game.Overlays.Settings.Sections.Graphics
         {
             Scheduler.AddOnce(d =>
             {
-                displayDropdown.Items = d;
+                if (!displayDropdown.Items.SequenceEqual(d, DisplayListComparer.DEFAULT))
+                    displayDropdown.Items = d;
                 updateDisplaySettingsVisibility();
             }, displays);
         }
@@ -235,6 +262,7 @@ namespace osu.Game.Overlays.Settings.Sections.Graphics
         {
             resolutionDropdown.CanBeShown.Value = resolutions.Count > 1 && windowModeDropdown.Current.Value == WindowMode.Fullscreen;
             displayDropdown.CanBeShown.Value = displayDropdown.Items.Count() > 1;
+            minimiseOnFocusLossCheckbox.CanBeShown.Value = RuntimeInfo.IsDesktop && windowModeDropdown.Current.Value == WindowMode.Fullscreen;
             safeAreaConsiderationsCheckbox.CanBeShown.Value = host.Window?.SafeAreaPadding.Value.Total != Vector2.Zero;
         }
 
@@ -256,7 +284,7 @@ namespace osu.Game.Overlays.Settings.Sections.Graphics
                 return;
             }
 
-            if (host.Window is WindowsWindow)
+            if (host.Renderer is IWindowsRenderer)
             {
                 switch (fullscreenCapability.Value)
                 {
@@ -356,6 +384,44 @@ namespace osu.Game.Overlays.Settings.Sections.Graphics
 
                     return $"{item.Width}x{item.Height}";
                 }
+            }
+        }
+
+        /// <summary>
+        /// Contrary to <see cref="Display.Equals(osu.Framework.Platform.Display?)"/>, this comparer disregards the value of <see cref="Display.Bounds"/>.
+        /// We want to just show a list of displays, and for the purposes of settings we don't care about their bounds when it comes to the list.
+        /// However, <see cref="IWindow.DisplaysChanged"/> fires even if only the resolution of the current display was changed
+        /// (because it causes the bounds of all displays to also change).
+        /// We're not interested in those changes, so compare only the rest that we actually care about.
+        /// This helps to avoid a bindable/event feedback loop, in which a resolution change
+        /// would trigger a display "change", which would in turn reset resolution again.
+        /// </summary>
+        private class DisplayListComparer : IEqualityComparer<Display>
+        {
+            public static readonly DisplayListComparer DEFAULT = new DisplayListComparer();
+
+            public bool Equals(Display? x, Display? y)
+            {
+                if (ReferenceEquals(x, y)) return true;
+                if (ReferenceEquals(x, null)) return false;
+                if (ReferenceEquals(y, null)) return false;
+
+                return x.Index == y.Index
+                       && x.Name == y.Name
+                       && x.DisplayModes.SequenceEqual(y.DisplayModes);
+            }
+
+            public int GetHashCode(Display obj)
+            {
+                var hashCode = new HashCode();
+
+                hashCode.Add(obj.Index);
+                hashCode.Add(obj.Name);
+                hashCode.Add(obj.DisplayModes.Length);
+                foreach (var displayMode in obj.DisplayModes)
+                    hashCode.Add(displayMode);
+
+                return hashCode.ToHashCode();
             }
         }
     }

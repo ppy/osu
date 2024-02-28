@@ -102,8 +102,7 @@ namespace osu.Game.Screens.Menu
             for (int i = 0; i < temporalAmplitudes.Length; i++)
                 temporalAmplitudes[i] = 0;
 
-            if (beatSyncProvider.Clock != null)
-                addAmplitudesFromSource(beatSyncProvider);
+            addAmplitudesFromSource(beatSyncProvider);
 
             foreach (var source in amplitudeSources)
                 addAmplitudesFromSource(source);
@@ -190,7 +189,7 @@ namespace osu.Game.Screens.Menu
                 Source.frequencyAmplitudes.AsSpan().CopyTo(audioData);
             }
 
-            public override void Draw(IRenderer renderer)
+            protected override void Draw(IRenderer renderer)
             {
                 base.Draw(renderer);
 

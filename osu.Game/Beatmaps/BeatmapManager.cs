@@ -15,7 +15,6 @@ using osu.Framework.Audio.Track;
 using osu.Framework.Extensions;
 using osu.Framework.IO.Stores;
 using osu.Framework.Platform;
-using osu.Framework.Testing;
 using osu.Game.Beatmaps.Formats;
 using osu.Game.Database;
 using osu.Game.Extensions;
@@ -27,13 +26,13 @@ using osu.Game.Overlays.Notifications;
 using osu.Game.Rulesets;
 using osu.Game.Skinning;
 using osu.Game.Utils;
+using Realms;
 
 namespace osu.Game.Beatmaps
 {
     /// <summary>
     /// Handles general operations related to global beatmap management.
     /// </summary>
-    [ExcludeFromDynamicCompile]
     public class BeatmapManager : ModelManager<BeatmapSetInfo>, IModelImporter<BeatmapSetInfo>, IWorkingBeatmapCache
     {
         public ITrackStore BeatmapTrackStore { get; }
@@ -42,7 +41,11 @@ namespace osu.Game.Beatmaps
 
         private readonly WorkingBeatmapCache workingBeatmapCache;
 
-        public Action<(BeatmapSetInfo beatmapSet, bool isBatch)>? ProcessBeatmap { private get; set; }
+        private readonly BeatmapExporter beatmapExporter;
+
+        private readonly LegacyBeatmapExporter legacyBeatmapExporter;
+
+        public ProcessBeatmapDelegate? ProcessBeatmap { private get; set; }
 
         public override bool PauseImports
         {
@@ -72,10 +75,20 @@ namespace osu.Game.Beatmaps
             BeatmapTrackStore = audioManager.GetTrackStore(userResources);
 
             beatmapImporter = CreateBeatmapImporter(storage, realm);
-            beatmapImporter.ProcessBeatmap = args => ProcessBeatmap?.Invoke(args);
+            beatmapImporter.ProcessBeatmap = (beatmapSet, scope) => ProcessBeatmap?.Invoke(beatmapSet, scope);
             beatmapImporter.PostNotification = obj => PostNotification?.Invoke(obj);
 
             workingBeatmapCache = CreateWorkingBeatmapCache(audioManager, gameResources, userResources, defaultBeatmap, host);
+
+            beatmapExporter = new BeatmapExporter(storage)
+            {
+                PostNotification = obj => PostNotification?.Invoke(obj)
+            };
+
+            legacyBeatmapExporter = new LegacyBeatmapExporter(storage)
+            {
+                PostNotification = obj => PostNotification?.Invoke(obj)
+            };
         }
 
         protected virtual WorkingBeatmapCache CreateWorkingBeatmapCache(AudioManager audioManager, IResourceStore<byte[]> resources, IResourceStore<byte[]> storage, WorkingBeatmap? defaultBeatmap,
@@ -203,7 +216,7 @@ namespace osu.Game.Beatmaps
                 using (var transaction = r.BeginWrite())
                 {
                     if (!beatmapInfo.IsManaged)
-                        beatmapInfo = r.Find<BeatmapInfo>(beatmapInfo.ID);
+                        beatmapInfo = r.Find<BeatmapInfo>(beatmapInfo.ID)!;
 
                     beatmapInfo.Hidden = true;
                     transaction.Commit();
@@ -222,7 +235,7 @@ namespace osu.Game.Beatmaps
                 using (var transaction = r.BeginWrite())
                 {
                     if (!beatmapInfo.IsManaged)
-                        beatmapInfo = r.Find<BeatmapInfo>(beatmapInfo.ID);
+                        beatmapInfo = r.Find<BeatmapInfo>(beatmapInfo.ID)!;
 
                     beatmapInfo.Hidden = false;
                     transaction.Commit();
@@ -272,7 +285,7 @@ namespace osu.Game.Beatmaps
         /// </summary>
         /// <param name="query">The query.</param>
         /// <returns>The first result for the provided query, or null if no results were found.</returns>
-        public BeatmapInfo? QueryBeatmap(Expression<Func<BeatmapInfo, bool>> query) => Realm.Run(r => r.All<BeatmapInfo>().FirstOrDefault(query)?.Detach());
+        public BeatmapInfo? QueryBeatmap(Expression<Func<BeatmapInfo, bool>> query) => Realm.Run(r => r.All<BeatmapInfo>().Filter($"{nameof(BeatmapInfo.BeatmapSet)}.{nameof(BeatmapSetInfo.DeletePending)} == false").FirstOrDefault(query)?.Detach());
 
         /// <summary>
         /// A default representation of a WorkingBeatmap to use when no beatmap is available.
@@ -325,7 +338,7 @@ namespace osu.Game.Beatmaps
             Realm.Write(r =>
             {
                 if (!beatmapInfo.IsManaged)
-                    beatmapInfo = r.Find<BeatmapInfo>(beatmapInfo.ID);
+                    beatmapInfo = r.Find<BeatmapInfo>(beatmapInfo.ID)!;
 
                 Debug.Assert(beatmapInfo.BeatmapSet != null);
                 Debug.Assert(beatmapInfo.File != null);
@@ -334,6 +347,8 @@ namespace osu.Game.Beatmaps
 
                 DeleteFile(setInfo, beatmapInfo.File);
                 setInfo.Beatmaps.Remove(beatmapInfo);
+                r.Remove(beatmapInfo.Metadata);
+                r.Remove(beatmapInfo);
 
                 updateHashAndMarkDirty(setInfo);
                 workingBeatmapCache.Invalidate(setInfo);
@@ -346,13 +361,20 @@ namespace osu.Game.Beatmaps
         /// </summary>
         public void DeleteVideos(List<BeatmapSetInfo> items, bool silent = false)
         {
-            if (items.Count == 0) return;
+            const string no_videos_message = "No videos found to delete!";
+
+            if (items.Count == 0)
+            {
+                if (!silent)
+                    PostNotification?.Invoke(new ProgressCompletionNotification { Text = no_videos_message });
+                return;
+            }
 
             var notification = new ProgressNotification
             {
                 Progress = 0,
                 Text = $"Preparing to delete all {HumanisedModelName} videos...",
-                CompletionText = "No videos found to delete!",
+                CompletionText = no_videos_message,
                 State = ProgressNotificationState.Active,
             };
 
@@ -368,7 +390,7 @@ namespace osu.Game.Beatmaps
                     // user requested abort
                     return;
 
-                var video = b.Files.FirstOrDefault(f => OsuGameBase.VIDEO_EXTENSIONS.Any(ex => f.Filename.EndsWith(ex, StringComparison.Ordinal)));
+                var video = b.Files.FirstOrDefault(f => OsuGameBase.VIDEO_EXTENSIONS.Any(ex => f.Filename.EndsWith(ex, StringComparison.OrdinalIgnoreCase)));
 
                 if (video != null)
                 {
@@ -393,6 +415,10 @@ namespace osu.Game.Beatmaps
         public Task<Live<BeatmapSetInfo>?> ImportAsUpdate(ProgressNotification notification, ImportTask importTask, BeatmapSetInfo original) =>
             beatmapImporter.ImportAsUpdate(notification, importTask, original);
 
+        public Task Export(BeatmapSetInfo beatmap) => beatmapExporter.ExportAsync(beatmap.ToLive(Realm));
+
+        public Task ExportLegacy(BeatmapSetInfo beatmap) => legacyBeatmapExporter.ExportAsync(beatmap.ToLive(Realm));
+
         private void updateHashAndMarkDirty(BeatmapSetInfo setInfo)
         {
             setInfo.Hash = beatmapImporter.ComputeHash(setInfo);
@@ -415,8 +441,16 @@ namespace osu.Game.Beatmaps
             // All changes to metadata are made in the provided beatmapInfo, so this should be copied to the `IBeatmap` before encoding.
             beatmapContent.BeatmapInfo = beatmapInfo;
 
-            using (var stream = new MemoryStream())
+            // Since now this is a locally-modified beatmap, we also set all relevant flags to indicate this.
+            // Importantly, the `ResetOnlineInfo()` call must happen before encoding, as online ID is encoded into the `.osu` file,
+            // which influences the beatmap checksums.
+            beatmapInfo.LastLocalUpdate = DateTimeOffset.Now;
+            beatmapInfo.Status = BeatmapOnlineStatus.LocallyModified;
+            beatmapInfo.ResetOnlineInfo();
+
+            Realm.Write(r =>
             {
+                using var stream = new MemoryStream();
                 using (var sw = new StreamWriter(stream, Encoding.UTF8, 1024, true))
                     new LegacyBeatmapEncoder(beatmapContent, beatmapSkin).Encode(sw);
 
@@ -438,25 +472,24 @@ namespace osu.Game.Beatmaps
                 beatmapInfo.MD5Hash = stream.ComputeMD5Hash();
                 beatmapInfo.Hash = stream.ComputeSHA2Hash();
 
-                beatmapInfo.LastLocalUpdate = DateTimeOffset.Now;
-                beatmapInfo.Status = BeatmapOnlineStatus.LocallyModified;
-
                 AddFile(setInfo, stream, createBeatmapFilenameFromMetadata(beatmapInfo));
 
                 updateHashAndMarkDirty(setInfo);
 
-                Realm.Write(r =>
-                {
-                    var liveBeatmapSet = r.Find<BeatmapSetInfo>(setInfo.ID);
+                var liveBeatmapSet = r.Find<BeatmapSetInfo>(setInfo.ID)!;
 
-                    setInfo.CopyChangesToRealm(liveBeatmapSet);
+                setInfo.CopyChangesToRealm(liveBeatmapSet);
 
-                    if (transferCollections)
-                        beatmapInfo.TransferCollectionReferences(r, oldMd5Hash);
+                if (transferCollections)
+                    beatmapInfo.TransferCollectionReferences(r, oldMd5Hash);
 
-                    ProcessBeatmap?.Invoke((liveBeatmapSet, false));
-                });
-            }
+                liveBeatmapSet.Beatmaps.Single(b => b.ID == beatmapInfo.ID)
+                              .UpdateLocalScores(r);
+
+                // do not look up metadata.
+                // this is a locally-modified set now, so looking up metadata is busy work at best and harmful at worst.
+                ProcessBeatmap?.Invoke(liveBeatmapSet, MetadataLookupScope.None);
+            });
 
             Debug.Assert(beatmapInfo.BeatmapSet != null);
 
@@ -542,4 +575,11 @@ namespace osu.Game.Beatmaps
 
         public override string HumanisedModelName => "beatmap";
     }
+
+    /// <summary>
+    /// Delegate type for beatmap processing callbacks.
+    /// </summary>
+    /// <param name="beatmapSet">The beatmap set to be processed.</param>
+    /// <param name="lookupScope">The scope to use when looking up metadata.</param>
+    public delegate void ProcessBeatmapDelegate(BeatmapSetInfo beatmapSet, MetadataLookupScope lookupScope);
 }

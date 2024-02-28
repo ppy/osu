@@ -30,6 +30,7 @@ using osu.Game.Rulesets.Objects.Drawables;
 using osu.Game.Rulesets.Scoring;
 using osu.Game.Scoring;
 using osu.Game.Screens.Play;
+using osu.Game.Screens.Play.HUD;
 using osu.Game.Screens.Play.HUD.ClicksPerSecond;
 using osuTK;
 
@@ -69,6 +70,12 @@ namespace osu.Game.Rulesets.UI
         public override IAdjustableAudioComponent Audio => audioContainer;
 
         private readonly AudioContainer audioContainer = new AudioContainer { RelativeSizeAxes = Axes.Both };
+
+        /// <summary>
+        /// A container which encapsulates the <see cref="Playfield"/> and provides any adjustments to
+        /// ensure correct scale and position.
+        /// </summary>
+        public virtual PlayfieldAdjustmentContainer PlayfieldAdjustmentContainer { get; private set; }
 
         public override Container FrameStableComponents { get; } = new Container { RelativeSizeAxes = Axes.Both };
 
@@ -177,7 +184,7 @@ namespace osu.Game.Rulesets.UI
                     audioContainer.WithChild(KeyBindingInputManager
                         .WithChildren(new Drawable[]
                         {
-                            CreatePlayfieldAdjustmentContainer()
+                            PlayfieldAdjustmentContainer = CreatePlayfieldAdjustmentContainer()
                                 .WithChild(Playfield),
                             Overlays
                         })),
@@ -328,11 +335,11 @@ namespace osu.Game.Rulesets.UI
         /// <returns>The representing <see cref="DrawableHitObject{TObject}"/>.</returns>
         public abstract DrawableHitObject<TObject> CreateDrawableRepresentation(TObject h);
 
-        public void Attach(KeyCounterDisplay keyCounter) =>
-            (KeyBindingInputManager as ICanAttachHUDPieces)?.Attach(keyCounter);
+        public void Attach(InputCountController inputCountController) =>
+            (KeyBindingInputManager as ICanAttachHUDPieces)?.Attach(inputCountController);
 
-        public void Attach(ClicksPerSecondCalculator calculator) =>
-            (KeyBindingInputManager as ICanAttachHUDPieces)?.Attach(calculator);
+        public void Attach(ClicksPerSecondController controller) =>
+            (KeyBindingInputManager as ICanAttachHUDPieces)?.Attach(controller);
 
         /// <summary>
         /// Creates a key conversion input manager. An exception will be thrown if a valid <see cref="RulesetInputManager{T}"/> is not returned.

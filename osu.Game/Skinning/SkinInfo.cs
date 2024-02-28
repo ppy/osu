@@ -5,7 +5,6 @@ using System;
 using System.Collections.Generic;
 using JetBrains.Annotations;
 using Newtonsoft.Json;
-using osu.Framework.Testing;
 using osu.Game.Database;
 using osu.Game.IO;
 using osu.Game.Models;
@@ -13,10 +12,9 @@ using Realms;
 
 namespace osu.Game.Skinning
 {
-    [ExcludeFromDynamicCompile]
     [MapTo("Skin")]
     [JsonObject(MemberSerialization.OptIn)]
-    public class SkinInfo : RealmObject, IHasRealmFiles, IEquatable<SkinInfo>, IHasGuidPrimaryKey, ISoftDelete, IHasNamedFiles
+    public class SkinInfo : RealmObject, IHasRealmFiles, IEquatable<SkinInfo>, IHasGuidPrimaryKey, ISoftDelete
     {
         internal static readonly Guid TRIANGLES_SKIN = new Guid("2991CFD8-2140-469A-BCB9-2EC23FBCE4AD");
         internal static readonly Guid ARGON_SKIN = new Guid("CFFA69DE-B3E3-4DEE-8563-3C4F425C05D0");

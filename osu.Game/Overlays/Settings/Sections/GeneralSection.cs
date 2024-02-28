@@ -19,11 +19,11 @@ namespace osu.Game.Overlays.Settings.Sections
         [Resolved(CanBeNull = true)]
         private OsuGame? game { get; set; }
 
-        public override LocalisableString Header => GeneralSettingsStrings.GeneralSectionHeader;
+        public override LocalisableString Header => CommonStrings.General;
 
         public override Drawable CreateIcon() => new SpriteIcon
         {
-            Icon = FontAwesome.Solid.Cog
+            Icon = OsuIcon.Settings
         };
 
         [BackgroundDependencyLoader]
@@ -34,7 +34,7 @@ namespace osu.Game.Overlays.Settings.Sections
                 new SettingsButton
                 {
                     Text = GeneralSettingsStrings.RunSetupWizard,
-                    Keywords = new[] { @"first run", @"initial", @"getting started" },
+                    Keywords = new[] { @"first run", @"initial", @"getting started", @"import", @"tutorial", @"recommended beatmaps" },
                     TooltipText = FirstRunSetupOverlayStrings.FirstRunSetupDescription,
                     Action = () => firstRunSetupOverlay?.Show(),
                 },

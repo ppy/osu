@@ -19,6 +19,41 @@ namespace osu.Game.Localisation
         /// </summary>
         public static LocalisableString LocallyModifiedTooltip => new TranslatableString(getKey(@"locally_modified_tooltip"), @"Has been locally modified");
 
+        /// <summary>
+        /// "Manage collections"
+        /// </summary>
+        public static LocalisableString ManageCollections => new TranslatableString(getKey(@"manage_collections"), @"Manage collections");
+
+        /// <summary>
+        /// "For all difficulties"
+        /// </summary>
+        public static LocalisableString ForAllDifficulties => new TranslatableString(getKey(@"for_all_difficulties"), @"For all difficulties");
+
+        /// <summary>
+        /// "Delete beatmap"
+        /// </summary>
+        public static LocalisableString DeleteBeatmap => new TranslatableString(getKey(@"delete_beatmap"), @"Delete beatmap");
+
+        /// <summary>
+        /// "For selected difficulty"
+        /// </summary>
+        public static LocalisableString ForSelectedDifficulty => new TranslatableString(getKey(@"for_selected_difficulty"), @"For selected difficulty");
+
+        /// <summary>
+        /// "Mark as played"
+        /// </summary>
+        public static LocalisableString MarkAsPlayed => new TranslatableString(getKey(@"mark_as_played"), @"Mark as played");
+
+        /// <summary>
+        /// "Clear all local scores"
+        /// </summary>
+        public static LocalisableString ClearAllLocalScores => new TranslatableString(getKey(@"clear_all_local_scores"), @"Clear all local scores");
+
+        /// <summary>
+        /// "Edit beatmap"
+        /// </summary>
+        public static LocalisableString EditBeatmap => new TranslatableString(getKey(@"edit_beatmap"), @"Edit beatmap");
+
         private static string getKey(string key) => $@"{prefix}:{key}";
     }
 }

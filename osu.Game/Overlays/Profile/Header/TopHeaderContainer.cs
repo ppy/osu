@@ -11,6 +11,7 @@ using osu.Framework.Graphics.Effects;
 using osu.Framework.Graphics.Shapes;
 using osu.Game.Configuration;
 using osu.Game.Graphics;
+using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Online.API;
@@ -31,6 +32,9 @@ namespace osu.Game.Overlays.Profile.Header
         [Resolved]
         private IAPIProvider api { get; set; } = null!;
 
+        [Resolved]
+        private RankingsOverlay? rankingsOverlay { get; set; }
+
         private UserCoverBackground cover = null!;
         private SupporterIcon supporterTag = null!;
         private UpdateableAvatar avatar = null!;
@@ -38,9 +42,11 @@ namespace osu.Game.Overlays.Profile.Header
         private ExternalLinkButton openUserExternally = null!;
         private OsuSpriteText titleText = null!;
         private UpdateableFlag userFlag = null!;
+        private OsuHoverContainer userCountryContainer = null!;
         private OsuSpriteText userCountryText = null!;
         private GroupBadgeFlow groupBadgeFlow = null!;
         private ToggleCoverButton coverToggle = null!;
+        private PreviousUsernamesDisplay previousUsernamesDisplay = null!;
 
         private Bindable<bool> coverExpanded = null!;
 
@@ -59,7 +65,7 @@ namespace osu.Game.Overlays.Profile.Header
                 new Box
                 {
                     RelativeSizeAxes = Axes.Both,
-                    Colour = colourProvider.Background4,
+                    Colour = colourProvider.Background3,
                 },
                 new FillFlowContainer
                 {
@@ -83,7 +89,7 @@ namespace osu.Game.Overlays.Profile.Header
                                     Direction = FillDirection.Horizontal,
                                     Padding = new MarginPadding
                                     {
-                                        Left = UserProfileOverlay.CONTENT_X_MARGIN,
+                                        Left = WaveOverlayContainer.HORIZONTAL_PADDING,
                                         Vertical = vertical_padding
                                     },
                                     Height = content_height + 2 * vertical_padding,
@@ -138,6 +144,11 @@ namespace osu.Game.Overlays.Profile.Header
                                                             Anchor = Anchor.CentreLeft,
                                                             Origin = Anchor.CentreLeft,
                                                         },
+                                                        new Container
+                                                        {
+                                                            // Intentionally use a zero-size container, else the fill flow will adjust to (and cancel) the upwards animation.
+                                                            Child = previousUsernamesDisplay = new PreviousUsernamesDisplay(),
+                                                        }
                                                     }
                                                 },
                                                 titleText = new OsuSpriteText
@@ -156,13 +167,17 @@ namespace osu.Game.Overlays.Profile.Header
                                                             Size = new Vector2(28, 20),
                                                             ShowPlaceholderOnUnknown = false,
                                                         },
-                                                        userCountryText = new OsuSpriteText
+                                                        userCountryContainer = new OsuHoverContainer
                                                         {
-                                                            Font = OsuFont.GetFont(size: 14f, weight: FontWeight.Regular),
-                                                            Margin = new MarginPadding { Left = 5 },
-                                                            Origin = Anchor.CentreLeft,
+                                                            AutoSizeAxes = Axes.Both,
                                                             Anchor = Anchor.CentreLeft,
-                                                        }
+                                                            Origin = Anchor.CentreLeft,
+                                                            Margin = new MarginPadding { Left = 5 },
+                                                            Child = userCountryText = new OsuSpriteText
+                                                            {
+                                                                Font = OsuFont.GetFont(size: 14f, weight: FontWeight.Regular),
+                                                            },
+                                                        },
                                                     }
                                                 },
                                             }
@@ -202,10 +217,12 @@ namespace osu.Game.Overlays.Profile.Header
             openUserExternally.Link = $@"{api.WebsiteRootUrl}/users/{user?.Id ?? 0}";
             userFlag.CountryCode = user?.CountryCode ?? default;
             userCountryText.Text = (user?.CountryCode ?? default).GetDescription();
+            userCountryContainer.Action = () => rankingsOverlay?.ShowCountry(user?.CountryCode ?? default);
             supporterTag.SupportLevel = user?.SupportLevel ?? 0;
             titleText.Text = user?.Title ?? string.Empty;
             titleText.Colour = Color4Extensions.FromHex(user?.Colour ?? "fff");
             groupBadgeFlow.User.Value = user;
+            previousUsernamesDisplay.User.Value = user;
         }
 
         private void updateCoverState()
@@ -215,6 +232,14 @@ namespace osu.Game.Overlays.Profile.Header
             bool expanded = coverToggle.CoverExpanded.Value;
 
             cover.ResizeHeightTo(expanded ? 250 : 0, transition_duration, Easing.OutQuint);
+
+            // Without this a very tiny slither of the cover will be visible even with a size of zero.
+            // Integer masking woes, no doubt.
+            if (expanded)
+                cover.FadeIn(transition_duration, Easing.OutQuint);
+            else
+                cover.FadeOut(transition_duration, Easing.InQuint);
+
             avatar.ResizeTo(new Vector2(expanded ? 120 : content_height), transition_duration, Easing.OutQuint);
             avatar.TransformTo(nameof(avatar.CornerRadius), expanded ? 40f : 20f, transition_duration, Easing.OutQuint);
             flow.TransformTo(nameof(flow.Spacing), new Vector2(expanded ? 20f : 10f), transition_duration, Easing.OutQuint);

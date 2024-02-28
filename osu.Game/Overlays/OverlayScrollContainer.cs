@@ -31,7 +31,7 @@ namespace osu.Game.Overlays
         /// </summary>
         private const int button_scroll_position = 200;
 
-        protected ScrollBackButton Button;
+        public ScrollBackButton Button { get; private set; }
 
         private readonly Bindable<float?> lastScrollTarget = new Bindable<float?>();
 
@@ -184,6 +184,12 @@ namespace osu.Game.Overlays
             {
                 content.ScaleTo(1, 1000, Easing.OutElastic);
                 base.OnMouseUp(e);
+            }
+
+            protected override bool OnHover(HoverEvent e)
+            {
+                base.OnHover(e);
+                return true;
             }
         }
     }

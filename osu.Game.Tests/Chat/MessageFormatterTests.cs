@@ -32,8 +32,26 @@ namespace osu.Game.Tests.Chat
             Message result = MessageFormatter.FormatMessage(new Message { Content = "This is a gopher://really-old-protocol we don't support." });
 
             Assert.AreEqual(result.Content, result.DisplayContent);
-            Assert.AreEqual(1, result.Links.Count);
-            Assert.AreEqual("gopher://really-old-protocol", result.Links[0].Url);
+            Assert.AreEqual(0, result.Links.Count);
+        }
+
+        [Test]
+        public void TestFakeProtocolLink()
+        {
+            Message result = MessageFormatter.FormatMessage(new Message { Content = "This is a osunotarealprotocol://completely-made-up-protocol we don't support." });
+
+            Assert.AreEqual(result.Content, result.DisplayContent);
+            Assert.AreEqual(0, result.Links.Count);
+        }
+
+        [Test]
+        public void TestSupportedProtocolLinkParsing()
+        {
+            Message result = MessageFormatter.FormatMessage(new Message { Content = "forgotspacehttps://dev.ppy.sh joinmyosump://12345 jointheosu://chan/#english" });
+
+            Assert.AreEqual("https://dev.ppy.sh", result.Links[0].Url);
+            Assert.AreEqual("osump://12345", result.Links[1].Url);
+            Assert.AreEqual("osu://chan/#english", result.Links[2].Url);
         }
 
         [Test]
@@ -478,8 +496,8 @@ namespace osu.Game.Tests.Chat
                 Content = "This is a [http://www.simple-test.com simple test] with some [traps] and [[wiki links]]. Don't forget to visit https://osu.ppy.sh (now!)[http://google.com]\uD83D\uDE12"
             });
 
-            Assert.AreEqual("This is a simple test with some [traps] and wiki links. Don't forget to visit https://osu.ppy.sh now!\0\0\0", result.DisplayContent);
-            Assert.AreEqual(5, result.Links.Count);
+            Assert.AreEqual("This is a simple test with some [traps] and wiki links. Don't forget to visit https://osu.ppy.sh now![emoji]", result.DisplayContent);
+            Assert.AreEqual(4, result.Links.Count);
 
             Link f = result.Links.Find(l => l.Url == "https://dev.ppy.sh/wiki/wiki links");
             Assert.That(f, Is.Not.Null);
@@ -500,27 +518,22 @@ namespace osu.Game.Tests.Chat
             Assert.That(f, Is.Not.Null);
             Assert.AreEqual(78, f.Index);
             Assert.AreEqual(18, f.Length);
-
-            f = result.Links.Find(l => l.Url == "\uD83D\uDE12");
-            Assert.That(f, Is.Not.Null);
-            Assert.AreEqual(101, f.Index);
-            Assert.AreEqual(3, f.Length);
         }
 
         [Test]
         public void TestEmoji()
         {
-            Message result = MessageFormatter.FormatMessage(new Message { Content = "Hello world\uD83D\uDE12<--This is an emoji,There are more:\uD83D\uDE10\uD83D\uDE00,\uD83D\uDE20" });
-            Assert.AreEqual("Hello world\0\0\0<--This is an emoji,There are more:\0\0\0\0\0\0,\0\0\0", result.DisplayContent);
-            Assert.AreEqual(result.Links.Count, 4);
-            Assert.AreEqual(result.Links[0].Index, 11);
-            Assert.AreEqual(result.Links[1].Index, 49);
-            Assert.AreEqual(result.Links[2].Index, 52);
-            Assert.AreEqual(result.Links[3].Index, 56);
-            Assert.AreEqual(result.Links[0].Url, "\uD83D\uDE12");
-            Assert.AreEqual(result.Links[1].Url, "\uD83D\uDE10");
-            Assert.AreEqual(result.Links[2].Url, "\uD83D\uDE00");
-            Assert.AreEqual(result.Links[3].Url, "\uD83D\uDE20");
+            Message result = MessageFormatter.FormatMessage(new Message { Content = "Hello world\uD83D\uDE12<--This is an emoji,There are more emojis among us:\uD83D\uDE10\uD83D\uDE00,\uD83D\uDE20" });
+            Assert.AreEqual("Hello world[emoji]<--This is an emoji,There are more emojis among us:[emoji][emoji],[emoji]", result.DisplayContent);
+            Assert.AreEqual(result.Links.Count, 0);
+        }
+
+        [Test]
+        public void TestEmojiWithSuccessiveParens()
+        {
+            Message result = MessageFormatter.FormatMessage(new Message { Content = "\uD83D\uDE10(let's hope this doesn't accidentally turn into a link)" });
+            Assert.AreEqual("[emoji](let's hope this doesn't accidentally turn into a link)", result.DisplayContent);
+            Assert.AreEqual(result.Links.Count, 0);
         }
 
         [Test]

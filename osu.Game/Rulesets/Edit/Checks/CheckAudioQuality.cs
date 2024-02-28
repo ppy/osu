@@ -27,7 +27,7 @@ namespace osu.Game.Rulesets.Edit.Checks
 
         public IEnumerable<Issue> Run(BeatmapVerifierContext context)
         {
-            string? audioFile = context.Beatmap.Metadata?.AudioFile;
+            string audioFile = context.Beatmap.Metadata.AudioFile;
             if (string.IsNullOrEmpty(audioFile))
                 yield break;
 

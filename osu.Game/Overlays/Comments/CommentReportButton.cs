@@ -57,6 +57,11 @@ namespace osu.Game.Overlays.Comments
             link.AddLink(ReportStrings.CommentButton.ToLower(), this.ShowPopover);
         }
 
+        public Popover GetPopover() => new ReportCommentPopover(comment)
+        {
+            Action = report
+        };
+
         private void report(CommentReportReason reason, string comments)
         {
             var request = new CommentReportRequest(comment.Id, reason, comments);
@@ -83,10 +88,5 @@ namespace osu.Game.Overlays.Comments
 
             api.Queue(request);
         }
-
-        public Popover GetPopover() => new ReportCommentPopover(comment)
-        {
-            Action = report
-        };
     }
 }

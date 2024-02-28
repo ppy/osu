@@ -68,7 +68,10 @@ namespace osu.Game.Skinning
             MainHUDComponents,
 
             [Description("Song select")]
-            SongSelect
+            SongSelect,
+
+            [Description("Playfield")]
+            Playfield
         }
     }
 }

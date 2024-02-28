@@ -31,6 +31,11 @@ namespace osu.Game.Overlays.Settings.Sections.UserInterface
             {
                 new SettingsCheckbox
                 {
+                    LabelText = UserInterfaceStrings.ShowMenuTips,
+                    Current = config.GetBindable<bool>(OsuSetting.MenuTips)
+                },
+                new SettingsCheckbox
+                {
                     LabelText = UserInterfaceStrings.InterfaceVoices,
                     Current = config.GetBindable<bool>(OsuSetting.MenuVoice)
                 },

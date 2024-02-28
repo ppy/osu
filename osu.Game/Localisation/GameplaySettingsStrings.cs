@@ -20,11 +20,6 @@ namespace osu.Game.Localisation
         public static LocalisableString BeatmapHeader => new TranslatableString(getKey(@"beatmap_header"), @"Beatmap");
 
         /// <summary>
-        /// "General"
-        /// </summary>
-        public static LocalisableString GeneralHeader => new TranslatableString(getKey(@"general_header"), @"General");
-
-        /// <summary>
         /// "Audio"
         /// </summary>
         public static LocalisableString AudioHeader => new TranslatableString(getKey(@"audio"), @"Audio");
@@ -65,9 +60,14 @@ namespace osu.Game.Localisation
         public static LocalisableString HUDVisibilityMode => new TranslatableString(getKey(@"hud_visibility_mode"), @"HUD overlay visibility mode");
 
         /// <summary>
-        /// "Show health display even when you can't fail"
+        /// "Show health display even when you can&#39;t fail"
         /// </summary>
         public static LocalisableString ShowHealthDisplayWhenCantFail => new TranslatableString(getKey(@"show_health_display_when_cant_fail"), @"Show health display even when you can't fail");
+
+        /// <summary>
+        /// "Show replay settings overlay"
+        /// </summary>
+        public static LocalisableString ShowReplaySettingsOverlay => new TranslatableString(getKey(@"show_replay_settings_overlay"), @"Show replay settings overlay");
 
         /// <summary>
         /// "Fade playfield to red when health is low"
@@ -134,6 +134,6 @@ namespace osu.Game.Localisation
         /// </summary>
         public static LocalisableString ClassicScoreDisplay => new TranslatableString(getKey(@"classic_score_display"), @"Classic");
 
-        private static string getKey(string key) => $"{prefix}:{key}";
+        private static string getKey(string key) => $@"{prefix}:{key}";
     }
 }

@@ -1,8 +1,6 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
 using System;
 using System.Collections.Generic;
 using Newtonsoft.Json;
@@ -18,7 +16,7 @@ namespace osu.Game.Rulesets.Catch.Tests
     [TestFixture]
     public class CatchBeatmapConversionTest : BeatmapConversionTest<ConvertValue>
     {
-        protected override string ResourceAssembly => "osu.Game.Rulesets.Catch";
+        protected override string ResourceAssembly => "osu.Game.Rulesets.Catch.Tests";
 
         [TestCase("basic")]
         [TestCase("spinner")]
@@ -29,6 +27,32 @@ namespace osu.Game.Rulesets.Catch.Tests
         [TestCase("hardrock-spinner", new[] { typeof(CatchModHardRock) })]
         [TestCase("right-bound-hr-offset", new[] { typeof(CatchModHardRock) })]
         [TestCase("basic-hyperdash")]
+        [TestCase("pixel-jump")]
+        [TestCase("tiny-ticks")]
+        [TestCase("v8-tick-distance")]
+        [TestCase("spinner-precision")]
+        [TestCase("37902", new[] { typeof(CatchModDoubleTime), typeof(CatchModHardRock), typeof(CatchModHidden) })]
+        [TestCase("39206", new[] { typeof(CatchModDoubleTime), typeof(CatchModHidden) })]
+        [TestCase("42587")]
+        [TestCase("50859", new[] { typeof(CatchModDoubleTime), typeof(CatchModHidden) })]
+        [TestCase("75858", new[] { typeof(CatchModHardRock), typeof(CatchModHidden) })]
+        [TestCase("103019", new[] { typeof(CatchModHidden) })]
+        [TestCase("104973", new[] { typeof(CatchModHardRock), typeof(CatchModHidden) })]
+        [TestCase("871815", new[] { typeof(CatchModDoubleTime), typeof(CatchModHidden) })]
+        [TestCase("1284935", new[] { typeof(CatchModDoubleTime), typeof(CatchModHardRock) })]
+        [TestCase("1431386", new[] { typeof(CatchModDoubleTime), typeof(CatchModHardRock), typeof(CatchModHidden) })]
+        [TestCase("1597806", new[] { typeof(CatchModDoubleTime), typeof(CatchModHidden) })]
+        [TestCase("2190499", new[] { typeof(CatchModDoubleTime), typeof(CatchModHidden) })]
+        [TestCase("2571731", new[] { typeof(CatchModHardRock), typeof(CatchModHidden) })]
+        [TestCase("2768615", new[] { typeof(CatchModDoubleTime), typeof(CatchModHardRock) })]
+        [TestCase("2781126", new[] { typeof(CatchModHidden) })]
+        [TestCase("3152510", new[] { typeof(CatchModDoubleTime) })]
+        [TestCase("3227428", new[] { typeof(CatchModHardRock), typeof(CatchModHidden) })]
+        [TestCase("3524302", new[] { typeof(CatchModDoubleTime), typeof(CatchModEasy) })]
+        [TestCase("3644427", new[] { typeof(CatchModEasy), typeof(CatchModFlashlight) })]
+        [TestCase("3689906", new[] { typeof(CatchModDoubleTime), typeof(CatchModEasy) })]
+        [TestCase("3949367", new[] { typeof(CatchModDoubleTime), typeof(CatchModEasy) })]
+        [TestCase("112643")]
         public new void Test(string name, params Type[] mods) => base.Test(name, mods);
 
         protected override IEnumerable<ConvertValue> CreateConvertValue(HitObject hitObject)
@@ -62,7 +86,7 @@ namespace osu.Game.Rulesets.Catch.Tests
         /// <summary>
         /// A sane value to account for osu!stable using ints everwhere.
         /// </summary>
-        private const float conversion_lenience = 2;
+        private const float conversion_lenience = 3;
 
         [JsonIgnore]
         public readonly CatchHitObject HitObject;

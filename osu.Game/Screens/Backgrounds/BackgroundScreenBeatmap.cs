@@ -36,6 +36,9 @@ namespace osu.Game.Screens.Backgrounds
         /// </remarks>
         public readonly Bindable<bool> IgnoreUserSettings = new Bindable<bool>(true);
 
+        /// <summary>
+        /// Whether or not the storyboard loaded should completely hide the background behind it.
+        /// </summary>
         public readonly Bindable<bool> StoryboardReplacesBackground = new Bindable<bool>();
 
         /// <summary>
@@ -48,7 +51,7 @@ namespace osu.Game.Screens.Backgrounds
         /// </summary>
         public readonly Bindable<float> DimWhenUserSettingsIgnored = new Bindable<float>();
 
-        internal readonly IBindable<bool> IsBreakTime = new Bindable<bool>();
+        internal readonly Bindable<bool> IsBreakTime = new Bindable<bool>();
 
         private readonly DimmableBackground dimmable;
 
@@ -60,12 +63,11 @@ namespace osu.Game.Screens.Backgrounds
 
             InternalChild = dimmable = CreateFadeContainer();
 
+            dimmable.StoryboardReplacesBackground.BindTo(StoryboardReplacesBackground);
             dimmable.IgnoreUserSettings.BindTo(IgnoreUserSettings);
             dimmable.IsBreakTime.BindTo(IsBreakTime);
             dimmable.BlurAmount.BindTo(BlurAmount);
             dimmable.DimWhenUserSettingsIgnored.BindTo(DimWhenUserSettingsIgnored);
-
-            StoryboardReplacesBackground.BindTo(dimmable.StoryboardReplacesBackground);
         }
 
         [BackgroundDependencyLoader]
@@ -144,6 +146,8 @@ namespace osu.Game.Screens.Backgrounds
             /// </remarks>
             public readonly Bindable<float> BlurAmount = new BindableFloat();
 
+            public readonly Bindable<bool> StoryboardReplacesBackground = new Bindable<bool>();
+
             public Background Background
             {
                 get => background;
@@ -162,6 +166,8 @@ namespace osu.Game.Screens.Backgrounds
 
             public override void Add(Drawable drawable)
             {
+                ArgumentNullException.ThrowIfNull(drawable);
+
                 if (drawable is Background)
                     throw new InvalidOperationException($"Use {nameof(Background)} to set a background.");
 
@@ -187,11 +193,19 @@ namespace osu.Game.Screens.Backgrounds
 
                 userBlurLevel.ValueChanged += _ => UpdateVisuals();
                 BlurAmount.ValueChanged += _ => UpdateVisuals();
+                StoryboardReplacesBackground.ValueChanged += _ => UpdateVisuals();
             }
 
-            protected override bool ShowDimContent
-                // The background needs to be hidden in the case of it being replaced by the storyboard
-                => (!ShowStoryboard.Value && !IgnoreUserSettings.Value) || !StoryboardReplacesBackground.Value;
+            protected override float DimLevel
+            {
+                get
+                {
+                    if ((IgnoreUserSettings.Value || ShowStoryboard.Value) && StoryboardReplacesBackground.Value)
+                        return 1;
+
+                    return base.DimLevel;
+                }
+            }
 
             protected override void UpdateVisuals()
             {

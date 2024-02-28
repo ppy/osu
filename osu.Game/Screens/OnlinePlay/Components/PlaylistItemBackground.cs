@@ -27,7 +27,7 @@ namespace osu.Game.Screens.OnlinePlay.Components
             if (Beatmap?.BeatmapSet is IBeatmapSetOnlineInfo online)
                 texture = textures.Get(online.Covers.Cover);
 
-            Sprite.Texture = texture ?? beatmaps.DefaultBeatmap.Background;
+            Sprite.Texture = texture ?? beatmaps.DefaultBeatmap.GetBackground();
         }
 
         public override bool Equals(Background? other)

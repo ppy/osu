@@ -25,16 +25,14 @@ namespace osu.Game.Rulesets.UI
         public ReplayInputHandler? ReplayInputHandler { get; set; }
 
         /// <summary>
-        /// The number of frames (per parent frame) which can be run in an attempt to catch-up to real-time.
+        /// The number of CPU milliseconds to spend at most during seek catch-up.
         /// </summary>
-        public int MaxCatchUpFrames { get; set; } = 5;
+        private const double max_catchup_milliseconds = 10;
 
         /// <summary>
         /// Whether to enable frame-stable playback.
         /// </summary>
         internal bool FrameStablePlayback { get; set; } = true;
-
-        protected override bool RequiresChildrenUpdate => base.RequiresChildrenUpdate && state != PlaybackState.NotValid;
 
         private readonly Bindable<bool> isCatchingUp = new Bindable<bool>();
 
@@ -60,6 +58,8 @@ namespace osu.Game.Rulesets.UI
         /// This gets exposed to children as an <see cref="IGameplayClock"/>.
         /// </summary>
         private readonly FramedClock framedClock;
+
+        private readonly Stopwatch stopwatch = new Stopwatch();
 
         /// <summary>
         /// The current direction of playback to be exposed to frame stable children.
@@ -99,7 +99,7 @@ namespace osu.Game.Rulesets.UI
 
         public override bool UpdateSubTree()
         {
-            int loops = MaxCatchUpFrames;
+            stopwatch.Restart();
 
             do
             {
@@ -112,7 +112,7 @@ namespace osu.Game.Rulesets.UI
 
                 base.UpdateSubTree();
                 UpdateSubTreeMasking(this, ScreenSpaceDrawQuad.AABBFloat);
-            } while (state == PlaybackState.RequiresCatchUp && loops-- > 0);
+            } while (state == PlaybackState.RequiresCatchUp && stopwatch.ElapsedMilliseconds < max_catchup_milliseconds);
 
             return true;
         }
@@ -124,7 +124,7 @@ namespace osu.Game.Rulesets.UI
                 // if waiting on frames, run one update loop to determine if frames have arrived.
                 state = PlaybackState.Valid;
             }
-            else if (IsPaused.Value)
+            else if (IsPaused.Value && !hasReplayAttached)
             {
                 // time should not advance while paused, nor should anything run.
                 state = PlaybackState.NotValid;
@@ -171,6 +171,9 @@ namespace osu.Game.Rulesets.UI
             // The manual clock time has changed in the above code. The framed clock now needs to be updated
             // to ensure that the its time is valid for our children before input is processed
             framedClock.ProcessFrame();
+
+            if (framedClock.ElapsedFrameTime != 0)
+                IsRewinding = framedClock.ElapsedFrameTime < 0;
         }
 
         /// <summary>
@@ -247,6 +250,8 @@ namespace osu.Game.Rulesets.UI
 
         public IBindable<bool> IsPaused { get; } = new BindableBool();
 
+        public bool IsRewinding { get; private set; }
+
         public double CurrentTime => framedClock.CurrentTime;
 
         public double Rate => framedClock.Rate;
@@ -258,8 +263,6 @@ namespace osu.Game.Rulesets.UI
         public double ElapsedFrameTime => framedClock.ElapsedFrameTime;
 
         public double FramesPerSecond => framedClock.FramesPerSecond;
-
-        public FrameTimeInfo TimeInfo => framedClock.TimeInfo;
 
         public double StartTime => parentGameplayClock?.StartTime ?? 0;
 

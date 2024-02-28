@@ -43,6 +43,11 @@ namespace osu.Game.Rulesets.Osu.UI
                     LabelText = RulesetSettingsStrings.CursorTrail,
                     Current = config.GetBindable<bool>(OsuRulesetSetting.ShowCursorTrail)
                 },
+                new SettingsCheckbox
+                {
+                    LabelText = RulesetSettingsStrings.CursorRipples,
+                    Current = config.GetBindable<bool>(OsuRulesetSetting.ShowCursorRipples)
+                },
                 new SettingsEnumDropdown<PlayfieldBorderStyle>
                 {
                     LabelText = RulesetSettingsStrings.PlayfieldBorderStyle,

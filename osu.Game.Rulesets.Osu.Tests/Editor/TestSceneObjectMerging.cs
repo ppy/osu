@@ -34,12 +34,12 @@ namespace osu.Game.Rulesets.Osu.Tests.Editor
             });
 
             moveMouseToHitObject(1);
-            AddAssert("merge option available", () => selectionHandler.ContextMenuItems.Any(o => o.Text.Value == "Merge selection"));
+            AddAssert("merge option available", () => selectionHandler.ContextMenuItems?.Any(o => o.Text.Value == "Merge selection") == true);
 
             mergeSelection();
 
             AddAssert("slider created", () => circle1 is not null && circle2 is not null && sliderCreatedFor(
-                (pos: circle1.Position, pathType: PathType.Linear),
+                (pos: circle1.Position, pathType: PathType.LINEAR),
                 (pos: circle2.Position, pathType: null)));
 
             AddStep("undo", () => Editor.Undo());
@@ -73,11 +73,11 @@ namespace osu.Game.Rulesets.Osu.Tests.Editor
 
                 var controlPoints = slider.Path.ControlPoints;
                 (Vector2, PathType?)[] args = new (Vector2, PathType?)[controlPoints.Count + 2];
-                args[0] = (circle1.Position, PathType.Linear);
+                args[0] = (circle1.Position, PathType.LINEAR);
 
                 for (int i = 0; i < controlPoints.Count; i++)
                 {
-                    args[i + 1] = (controlPoints[i].Position + slider.Position, i == controlPoints.Count - 1 ? PathType.Linear : controlPoints[i].Type);
+                    args[i + 1] = (controlPoints[i].Position + slider.Position, i == controlPoints.Count - 1 ? PathType.LINEAR : controlPoints[i].Type);
                 }
 
                 args[^1] = (circle2.Position, null);
@@ -138,8 +138,7 @@ namespace osu.Game.Rulesets.Osu.Tests.Editor
                 var mergedSlider = (Slider)EditorBeatmap.SelectedHitObjects.First();
                 return slider1 is not null && mergedSlider.HeadCircle.Samples.SequenceEqual(slider1.HeadCircle.Samples)
                                            && mergedSlider.TailCircle.Samples.SequenceEqual(slider1.TailCircle.Samples)
-                                           && mergedSlider.Samples.SequenceEqual(slider1.Samples)
-                                           && mergedSlider.SampleControlPoint.IsRedundant(slider1.SampleControlPoint);
+                                           && mergedSlider.Samples.SequenceEqual(slider1.Samples);
             });
 
             AddAssert("slider end is at same completion for last slider", () =>
@@ -173,7 +172,7 @@ namespace osu.Game.Rulesets.Osu.Tests.Editor
             mergeSelection();
 
             AddAssert("slider created", () => circle1 is not null && circle2 is not null && sliderCreatedFor(
-                (pos: circle1.Position, pathType: PathType.Linear),
+                (pos: circle1.Position, pathType: PathType.LINEAR),
                 (pos: circle2.Position, pathType: null)));
 
             AddAssert("samples exist", sliderSampleExist);
@@ -199,7 +198,7 @@ namespace osu.Game.Rulesets.Osu.Tests.Editor
             });
 
             moveMouseToHitObject(1);
-            AddAssert("merge option not available", () => selectionHandler.ContextMenuItems.Length > 0 && selectionHandler.ContextMenuItems.All(o => o.Text.Value != "Merge selection"));
+            AddAssert("merge option not available", () => selectionHandler.ContextMenuItems?.Length > 0 && selectionHandler.ContextMenuItems.All(o => o.Text.Value != "Merge selection"));
             mergeSelection();
             AddAssert("circles not merged", () => circle1 is not null && circle2 is not null
                                                                       && EditorBeatmap.HitObjects.Contains(circle1) && EditorBeatmap.HitObjects.Contains(circle2));
@@ -223,12 +222,12 @@ namespace osu.Game.Rulesets.Osu.Tests.Editor
             });
 
             moveMouseToHitObject(1);
-            AddAssert("merge option available", () => selectionHandler.ContextMenuItems.Any(o => o.Text.Value == "Merge selection"));
+            AddAssert("merge option available", () => selectionHandler.ContextMenuItems?.Any(o => o.Text.Value == "Merge selection") == true);
 
             mergeSelection();
 
             AddAssert("slider created", () => circle1 is not null && circle2 is not null && sliderCreatedFor(
-                (pos: circle1.Position, pathType: PathType.Linear),
+                (pos: circle1.Position, pathType: PathType.LINEAR),
                 (pos: circle2.Position, pathType: null)));
         }
 

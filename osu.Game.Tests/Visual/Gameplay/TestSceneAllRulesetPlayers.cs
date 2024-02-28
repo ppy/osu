@@ -67,6 +67,11 @@ namespace osu.Game.Tests.Visual.Gameplay
 
         private Player loadPlayerFor(RulesetInfo rulesetInfo)
         {
+            // if a player screen is present already, we must exit that before loading another one,
+            // otherwise it'll crash on SpectatorClient.BeginPlaying being called while client is in "playing" state already.
+            if (Stack.CurrentScreen is Player)
+                Stack.Exit();
+
             Ruleset.Value = rulesetInfo;
             var ruleset = rulesetInfo.CreateInstance();
 

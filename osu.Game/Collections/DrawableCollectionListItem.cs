@@ -37,7 +37,13 @@ namespace osu.Game.Collections
         public DrawableCollectionListItem(Live<BeatmapCollection> item, bool isCreated)
             : base(item)
         {
-            ShowDragHandle.Value = item.IsManaged;
+            // For now we don't support rearranging and always use alphabetical sort.
+            // Change this to:
+            //
+            // ShowDragHandle.Value = item.IsManaged;
+            //
+            // if we want to support user sorting (but changes will need to be made to realm to persist).
+            ShowDragHandle.Value = false;
         }
 
         protected override Drawable CreateContent() => new ItemContent(Model);
@@ -85,7 +91,8 @@ namespace osu.Game.Collections
                             textBox = new ItemTextBox(collection)
                             {
                                 RelativeSizeAxes = Axes.X,
-                                Height = item_height
+                                Height = item_height,
+                                CommitOnFocusLost = true,
                             },
                         }
                     },
@@ -251,7 +258,7 @@ namespace osu.Game.Collections
                 return true;
             }
 
-            private void deleteCollection() => collection.PerformWrite(c => c.Realm.Remove(c));
+            private void deleteCollection() => collection.PerformWrite(c => c.Realm!.Remove(c));
         }
     }
 }

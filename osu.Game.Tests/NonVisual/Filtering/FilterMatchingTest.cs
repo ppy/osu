@@ -33,7 +33,7 @@ namespace osu.Game.Tests.NonVisual.Filtering
                 Artist = "The Artist",
                 ArtistUnicode = "check unicode too",
                 Title = "Title goes here",
-                TitleUnicode = "Title goes here",
+                TitleUnicode = "TitleUnicode goes here",
                 Author = { Username = "The Author" },
                 Source = "unit tests",
                 Tags = "look for tags too",
@@ -160,6 +160,34 @@ namespace osu.Game.Tests.NonVisual.Filtering
         }
 
         [Test]
+        [TestCase("\"artist\"", false)]
+        [TestCase("\"arti\"", true)]
+        [TestCase("\"artist title author\"", true)]
+        [TestCase("\"artist\" \"title\" \"author\"", false)]
+        [TestCase("\"an artist\"", true)]
+        [TestCase("\"tags too\"", false)]
+        [TestCase("\"tags to\"", true)]
+        [TestCase("\"version\"", false)]
+        [TestCase("\"an auteur\"", true)]
+        [TestCase("\"Artist\"!", true)]
+        [TestCase("\"The Artist\"!", false)]
+        [TestCase("\"the artist\"!", false)]
+        [TestCase("\"\\\"", true)] // nasty case, covers properly escaping user input in underlying regex.
+        public void TestCriteriaMatchingExactTerms(string terms, bool filtered)
+        {
+            var exampleBeatmapInfo = getExampleBeatmap();
+            var criteria = new FilterCriteria
+            {
+                Ruleset = new RulesetInfo { OnlineID = 6 },
+                AllowConvertedBeatmaps = true,
+                SearchText = terms
+            };
+            var carouselItem = new CarouselBeatmap(exampleBeatmapInfo);
+            carouselItem.Filter(criteria);
+            Assert.AreEqual(filtered, carouselItem.Filtered.Value);
+        }
+
+        [Test]
         [TestCase("", false)]
         [TestCase("The", false)]
         [TestCase("THE", false)]
@@ -181,6 +209,27 @@ namespace osu.Game.Tests.NonVisual.Filtering
 
         [Test]
         [TestCase("", false)]
+        [TestCase("Goes", false)]
+        [TestCase("GOES", false)]
+        [TestCase("goes", false)]
+        [TestCase("title goes", false)]
+        [TestCase("title goes AND then something else", true)]
+        [TestCase("titleunicode", false)]
+        [TestCase("unknown", true)]
+        public void TestCriteriaMatchingTitle(string titleName, bool filtered)
+        {
+            var exampleBeatmapInfo = getExampleBeatmap();
+            var criteria = new FilterCriteria
+            {
+                Title = new FilterCriteria.OptionalTextFilter { SearchTerm = titleName }
+            };
+            var carouselItem = new CarouselBeatmap(exampleBeatmapInfo);
+            carouselItem.Filter(criteria);
+            Assert.AreEqual(filtered, carouselItem.Filtered.Value);
+        }
+
+        [Test]
+        [TestCase("", false)]
         [TestCase("The", false)]
         [TestCase("THE", false)]
         [TestCase("artist", false)]
@@ -188,6 +237,9 @@ namespace osu.Game.Tests.NonVisual.Filtering
         [TestCase("the artist AND then something else", true)]
         [TestCase("unicode too", false)]
         [TestCase("unknown", true)]
+        [TestCase("\"Artist\"!", true)]
+        [TestCase("\"The Artist\"!", false)]
+        [TestCase("\"the artist\"!", false)]
         public void TestCriteriaMatchingArtist(string artistName, bool filtered)
         {
             var exampleBeatmapInfo = getExampleBeatmap();

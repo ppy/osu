@@ -1,17 +1,16 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
 using System;
 using System.Diagnostics;
 using System.Linq;
-using JetBrains.Annotations;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Layout;
+using osu.Framework.Logging;
+using osu.Framework.Threading;
 using osu.Framework.Utils;
 
 namespace osu.Game.Graphics.Containers
@@ -23,11 +22,35 @@ namespace osu.Game.Graphics.Containers
     public partial class SectionsContainer<T> : Container<T>
         where T : Drawable
     {
-        public Bindable<T> SelectedSection { get; } = new Bindable<T>();
+        public Bindable<T?> SelectedSection { get; } = new Bindable<T?>();
 
-        private T lastClickedSection;
+        private T? lastClickedSection;
 
-        public Drawable ExpandableHeader
+        protected override Container<T> Content => scrollContentContainer;
+
+        private readonly UserTrackingScrollContainer scrollContainer;
+        private readonly Container headerBackgroundContainer;
+        private readonly MarginPadding originalSectionsMargin;
+
+        private Drawable? fixedHeader;
+
+        private Drawable? footer;
+        private Drawable? headerBackground;
+
+        private FlowContainer<T> scrollContentContainer = null!;
+
+        private float? headerHeight, footerHeight;
+
+        private float? lastKnownScroll;
+
+        /// <summary>
+        /// The percentage of the container to consider the centre-point for deciding the active section (and scrolling to a requested section).
+        /// </summary>
+        private const float scroll_y_centre = 0.1f;
+
+        private Drawable? expandableHeader;
+
+        public Drawable? ExpandableHeader
         {
             get => expandableHeader;
             set
@@ -42,11 +65,12 @@ namespace osu.Game.Graphics.Containers
                 if (value == null) return;
 
                 AddInternal(expandableHeader);
+
                 lastKnownScroll = null;
             }
         }
 
-        public Drawable FixedHeader
+        public Drawable? FixedHeader
         {
             get => fixedHeader;
             set
@@ -63,7 +87,7 @@ namespace osu.Game.Graphics.Containers
             }
         }
 
-        public Drawable Footer
+        public Drawable? Footer
         {
             get => footer;
             set
@@ -75,16 +99,17 @@ namespace osu.Game.Graphics.Containers
 
                 footer = value;
 
-                if (value == null) return;
+                if (footer == null) return;
 
                 footer.Anchor |= Anchor.y2;
                 footer.Origin |= Anchor.y2;
+
                 scrollContainer.Add(footer);
                 lastKnownScroll = null;
             }
         }
 
-        public Drawable HeaderBackground
+        public Drawable? HeaderBackground
         {
             get => headerBackground;
             set
@@ -94,30 +119,13 @@ namespace osu.Game.Graphics.Containers
                 headerBackgroundContainer.Clear();
                 headerBackground = value;
 
-                if (value == null) return;
-
-                headerBackgroundContainer.Add(headerBackground);
-
-                lastKnownScroll = null;
+                if (headerBackground != null)
+                {
+                    headerBackgroundContainer.Add(headerBackground);
+                    lastKnownScroll = null;
+                }
             }
         }
-
-        protected override Container<T> Content => scrollContentContainer;
-
-        private readonly UserTrackingScrollContainer scrollContainer;
-        private readonly Container headerBackgroundContainer;
-        private readonly MarginPadding originalSectionsMargin;
-        private Drawable expandableHeader, fixedHeader, footer, headerBackground;
-        private FlowContainer<T> scrollContentContainer;
-
-        private float? headerHeight, footerHeight;
-
-        private float? lastKnownScroll;
-
-        /// <summary>
-        /// The percentage of the container to consider the centre-point for deciding the active section (and scrolling to a requested section).
-        /// </summary>
-        private const float scroll_y_centre = 0.1f;
 
         public SectionsContainer()
         {
@@ -150,31 +158,63 @@ namespace osu.Game.Graphics.Containers
             footerHeight = null;
         }
 
+        private ScheduledDelegate? scrollToTargetDelegate;
+
         public void ScrollTo(Drawable target)
         {
+            Logger.Log($"Scrolling to {target}..");
+
             lastKnownScroll = null;
 
-            // implementation similar to ScrollIntoView but a bit more nuanced.
-            float top = scrollContainer.GetChildPosInContent(target);
+            float scrollTarget = getScrollTargetForDrawable(target);
 
-            float bottomScrollExtent = scrollContainer.ScrollableExtent;
-            float scrollTarget = top - scrollContainer.DisplayableContent * scroll_y_centre;
-
-            if (scrollTarget > bottomScrollExtent)
+            if (scrollTarget > scrollContainer.ScrollableExtent)
                 scrollContainer.ScrollToEnd();
             else
                 scrollContainer.ScrollTo(scrollTarget);
 
             if (target is T section)
                 lastClickedSection = section;
+
+            // Content may load in as a scroll occurs, changing the scroll target we need to aim for.
+            // This scheduled operation ensures that we keep trying until actually arriving at the target.
+            scrollToTargetDelegate?.Cancel();
+            scrollToTargetDelegate = Scheduler.AddDelayed(() =>
+            {
+                if (scrollContainer.UserScrolling)
+                {
+                    Logger.Log("Scroll operation interrupted by user scroll");
+                    scrollToTargetDelegate?.Cancel();
+                    scrollToTargetDelegate = null;
+                    return;
+                }
+
+                if (Precision.AlmostEquals(scrollContainer.Current, scrollTarget, 1))
+                {
+                    Logger.Log($"Finished scrolling to {target}!");
+                    scrollToTargetDelegate?.Cancel();
+                    scrollToTargetDelegate = null;
+                    return;
+                }
+
+                if (!Precision.AlmostEquals(getScrollTargetForDrawable(target), scrollTarget, 1))
+                {
+                    Logger.Log($"Reattempting scroll to {target} due to change in position");
+                    ScrollTo(target);
+                }
+            }, 50, true);
+        }
+
+        private float getScrollTargetForDrawable(Drawable target)
+        {
+            // implementation similar to ScrollIntoView but a bit more nuanced.
+            return scrollContainer.GetChildPosInContent(target) - scrollContainer.DisplayableContent * scroll_y_centre;
         }
 
         public void ScrollToTop() => scrollContainer.ScrollTo(0);
 
-        [NotNull]
         protected virtual UserTrackingScrollContainer CreateScrollContainer() => new UserTrackingScrollContainer();
 
-        [NotNull]
         protected virtual FlowContainer<T> CreateScrollContentContainer() =>
             new FillFlowContainer<T>
             {

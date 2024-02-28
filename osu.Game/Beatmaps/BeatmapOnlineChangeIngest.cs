@@ -36,7 +36,7 @@ namespace osu.Game.Beatmaps
                     var matchingSet = r.All<BeatmapSetInfo>().FirstOrDefault(s => s.OnlineID == id);
 
                     if (matchingSet != null)
-                        beatmapUpdater.Queue(matchingSet.ToLive(realm), true);
+                        beatmapUpdater.Queue(matchingSet.ToLive(realm), MetadataLookupScope.OnlineFirst);
                 }
             });
         }

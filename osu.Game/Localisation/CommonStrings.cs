@@ -40,6 +40,11 @@ namespace osu.Game.Localisation
         public static LocalisableString Default => new TranslatableString(getKey(@"default"), @"Default");
 
         /// <summary>
+        /// "Export"
+        /// </summary>
+        public static LocalisableString Export => new TranslatableString(getKey(@"export"), @"Export");
+
+        /// <summary>
         /// "Width"
         /// </summary>
         public static LocalisableString Width => new TranslatableString(getKey(@"width"), @"Width");
@@ -155,9 +160,19 @@ namespace osu.Game.Localisation
         public static LocalisableString Exit => new TranslatableString(getKey(@"exit"), @"Exit");
 
         /// <summary>
+        /// "Caps lock is active"
+        /// </summary>
+        public static LocalisableString CapsLockIsActive => new TranslatableString(getKey(@"caps_lock_is_active"), @"Caps lock is active");
+
+        /// <summary>
         /// "Revert to default"
         /// </summary>
         public static LocalisableString RevertToDefault => new TranslatableString(getKey(@"revert_to_default"), @"Revert to default");
+
+        /// <summary>
+        /// "General"
+        /// </summary>
+        public static LocalisableString General => new TranslatableString(getKey(@"general"), @"General");
 
         private static string getKey(string key) => $@"{prefix}:{key}";
     }

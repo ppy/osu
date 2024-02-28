@@ -1,7 +1,5 @@
-// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
-
-#nullable disable
 
 using NUnit.Framework;
 using osu.Framework.Allocation;
@@ -19,6 +17,7 @@ namespace osu.Game.Tests.Visual.Gameplay
         [Cached]
         private ScoreProcessor scoreProcessor = new ScoreProcessor(new OsuRuleset());
 
+        protected override Drawable CreateArgonImplementation() => new ArgonAccuracyCounter();
         protected override Drawable CreateDefaultImplementation() => new DefaultAccuracyCounter();
         protected override Drawable CreateLegacyImplementation() => new LegacyAccuracyCounter();
 

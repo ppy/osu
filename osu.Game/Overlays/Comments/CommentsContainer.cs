@@ -99,10 +99,10 @@ namespace osu.Game.Overlays.Comments
                         {
                             RelativeSizeAxes = Axes.X,
                             AutoSizeAxes = Axes.Y,
-                            Padding = new MarginPadding { Horizontal = 50, Vertical = 20 },
+                            Padding = new MarginPadding { Horizontal = WaveOverlayContainer.HORIZONTAL_PADDING, Vertical = 20 },
                             Children = new Drawable[]
                             {
-                                avatar = new UpdateableAvatar(api.LocalUser.Value)
+                                avatar = new UpdateableAvatar(api.LocalUser.Value, isInteractive: false)
                                 {
                                     Size = new Vector2(50),
                                     CornerExponent = 2,
@@ -152,7 +152,7 @@ namespace osu.Game.Overlays.Comments
                                             ShowDeleted = { BindTarget = ShowDeleted },
                                             Margin = new MarginPadding
                                             {
-                                                Horizontal = 70,
+                                                Horizontal = WaveOverlayContainer.HORIZONTAL_PADDING,
                                                 Vertical = 10
                                             }
                                         },
@@ -301,7 +301,7 @@ namespace osu.Game.Overlays.Comments
 
             void addNewComment(Comment comment)
             {
-                var drawableComment = GetDrawableComment(comment);
+                var drawableComment = GetDrawableComment(comment, bundle.CommentableMeta);
 
                 if (comment.ParentId == null)
                 {
@@ -333,7 +333,7 @@ namespace osu.Game.Overlays.Comments
                 if (CommentDictionary.ContainsKey(comment.Id))
                     continue;
 
-                topLevelComments.Add(GetDrawableComment(comment));
+                topLevelComments.Add(GetDrawableComment(comment, bundle.CommentableMeta));
             }
 
             if (topLevelComments.Any())
@@ -351,12 +351,12 @@ namespace osu.Game.Overlays.Comments
             }
         }
 
-        public DrawableComment GetDrawableComment(Comment comment)
+        public DrawableComment GetDrawableComment(Comment comment, IReadOnlyList<CommentableMeta> meta)
         {
             if (CommentDictionary.TryGetValue(comment.Id, out var existing))
                 return existing;
 
-            return CommentDictionary[comment.Id] = new DrawableComment(comment)
+            return CommentDictionary[comment.Id] = new DrawableComment(comment, meta)
             {
                 ShowDeleted = { BindTarget = ShowDeleted },
                 Sort = { BindTarget = Sort },
@@ -393,7 +393,7 @@ namespace osu.Game.Overlays.Comments
                     {
                         Anchor = Anchor.CentreLeft,
                         Origin = Anchor.CentreLeft,
-                        Margin = new MarginPadding { Left = 50 },
+                        Margin = new MarginPadding { Left = WaveOverlayContainer.HORIZONTAL_PADDING },
                         Text = CommentsStrings.Empty
                     }
                 });
@@ -405,17 +405,16 @@ namespace osu.Game.Overlays.Comments
             [Resolved]
             private CommentsContainer commentsContainer { get; set; }
 
-            [Resolved]
-            private IAPIProvider api { get; set; }
-
             public Action<CommentBundle> OnPost;
 
             //TODO should match web, left empty due to no multiline support
             protected override LocalisableString FooterText => default;
 
-            protected override LocalisableString CommitButtonText => CommonStrings.ButtonsPost;
+            protected override LocalisableString GetButtonText(bool isLoggedIn) =>
+                isLoggedIn ? CommonStrings.ButtonsPost : CommentsStrings.GuestButtonNew;
 
-            protected override LocalisableString TextBoxPlaceholder => CommentsStrings.PlaceholderNew;
+            protected override LocalisableString GetPlaceholderText(bool isLoggedIn) =>
+                isLoggedIn ? CommentsStrings.PlaceholderNew : AuthorizationStrings.RequireLogin;
 
             protected override void OnCommit(string text)
             {
@@ -432,7 +431,7 @@ namespace osu.Game.Overlays.Comments
                     Current.Value = string.Empty;
                     OnPost?.Invoke(cb);
                 });
-                api.Queue(req);
+                API.Queue(req);
             }
         }
     }

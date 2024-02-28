@@ -46,7 +46,7 @@ namespace osu.Game.Screens.Play
         public bool HasPassed { get; set; }
 
         /// <summary>
-        /// Whether the user failed during gameplay.
+        /// Whether the user failed during gameplay. This is only set when the gameplay session has completed due to the fail.
         /// </summary>
         public bool HasFailed { get; set; }
 

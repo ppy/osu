@@ -98,7 +98,7 @@ namespace osu.Game.Rulesets.UI
 
             isDisposed = true;
 
-            if (ShaderManager.IsNotNull()) SampleStore.Dispose();
+            if (SampleStore.IsNotNull()) SampleStore.Dispose();
             if (TextureStore.IsNotNull()) TextureStore.Dispose();
             if (ShaderManager.IsNotNull()) ShaderManager.Dispose();
         }
@@ -186,7 +186,7 @@ namespace osu.Game.Rulesets.UI
                 this.fallback = fallback;
             }
 
-            public override Texture Get(string name, WrapMode wrapModeS, WrapMode wrapModeT)
+            public override Texture? Get(string name, WrapMode wrapModeS, WrapMode wrapModeT)
                 => primary.Get(name, wrapModeS, wrapModeT) ?? fallback.Get(name, wrapModeS, wrapModeT);
 
             protected override void Dispose(bool disposing)
@@ -206,18 +206,11 @@ namespace osu.Game.Rulesets.UI
                 this.parent = parent;
             }
 
-            public override IShader Load(string vertex, string fragment)
-            {
-                try
-                {
-                    return base.Load(vertex, fragment);
-                }
-                catch
-                {
-                    // Shader lookup is very non-standard. Rather than returning null on missing shaders, exceptions are thrown.
-                    return parent.Load(vertex, fragment);
-                }
-            }
+            public override IShader? GetCachedShader(string vertex, string fragment) => base.GetCachedShader(vertex, fragment) ?? parent.GetCachedShader(vertex, fragment);
+
+            public override IShaderPart? GetCachedShaderPart(string name) => base.GetCachedShaderPart(name) ?? parent.GetCachedShaderPart(name);
+
+            public override byte[]? GetRawData(string fileName) => base.GetRawData(fileName) ?? parent.GetRawData(fileName);
         }
     }
 }

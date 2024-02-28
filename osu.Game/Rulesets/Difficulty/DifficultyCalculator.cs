@@ -137,7 +137,7 @@ namespace osu.Game.Rulesets.Difficulty
 
             foreach (var combination in CreateDifficultyAdjustmentModCombinations())
             {
-                Mod classicMod = rulesetInstance.CreateAllMods().SingleOrDefault(m => m is ModClassic);
+                Mod classicMod = rulesetInstance.CreateMod<ModClassic>();
 
                 var finalCombination = ModUtils.FlattenMod(combination);
                 if (classicMod != null)

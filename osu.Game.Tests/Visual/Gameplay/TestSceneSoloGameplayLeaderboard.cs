@@ -16,13 +16,14 @@ using osu.Game.Rulesets.Scoring;
 using osu.Game.Scoring;
 using osu.Game.Screens.Play.HUD;
 using osu.Game.Screens.Select;
+using osu.Game.Tests.Gameplay;
 
 namespace osu.Game.Tests.Visual.Gameplay
 {
     public partial class TestSceneSoloGameplayLeaderboard : OsuTestScene
     {
-        [Cached]
-        private readonly ScoreProcessor scoreProcessor = new ScoreProcessor(new OsuRuleset());
+        [Cached(typeof(ScoreProcessor))]
+        private readonly ScoreProcessor scoreProcessor = TestGameplayState.Create(new OsuRuleset()).ScoreProcessor;
 
         private readonly BindableList<ScoreInfo> scores = new BindableList<ScoreInfo>();
 

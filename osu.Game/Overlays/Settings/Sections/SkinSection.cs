@@ -13,8 +13,8 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Localisation;
 using osu.Framework.Logging;
-using osu.Framework.Platform;
 using osu.Game.Database;
+using osu.Game.Graphics;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Localisation;
 using osu.Game.Overlays.SkinEditor;
@@ -32,7 +32,7 @@ namespace osu.Game.Overlays.Settings.Sections
 
         public override Drawable CreateIcon() => new SpriteIcon
         {
-            Icon = FontAwesome.Solid.PaintBrush
+            Icon = OsuIcon.SkinB
         };
 
         private static readonly Live<SkinInfo> random_skin_info = new SkinInfo
@@ -58,9 +58,11 @@ namespace osu.Game.Overlays.Settings.Sections
             {
                 skinDropdown = new SkinSettingsDropdown
                 {
+                    AlwaysShowSearchBar = true,
+                    AllowNonContiguousMatching = true,
                     LabelText = SkinSettingsStrings.CurrentSkin,
                     Current = skins.CurrentSkinInfo,
-                    Keywords = new[] { @"skins" }
+                    Keywords = new[] { @"skins" },
                 },
                 new SettingsButton
                 {
@@ -93,7 +95,7 @@ namespace osu.Game.Overlays.Settings.Sections
             });
         }
 
-        private void skinsChanged(IRealmCollection<SkinInfo> sender, ChangeSet changes, Exception error)
+        private void skinsChanged(IRealmCollection<SkinInfo> sender, ChangeSet changes)
         {
             // This can only mean that realm is recycling, else we would see the protected skins.
             // Because we are using `Live<>` in this class, we don't need to worry about this scenario too much.
@@ -139,9 +141,6 @@ namespace osu.Game.Overlays.Settings.Sections
             [Resolved]
             private SkinManager skins { get; set; }
 
-            [Resolved]
-            private Storage storage { get; set; }
-
             private Bindable<Skin> currentSkin;
 
             [BackgroundDependencyLoader]
@@ -163,7 +162,7 @@ namespace osu.Game.Overlays.Settings.Sections
             {
                 try
                 {
-                    currentSkin.Value.SkinInfo.PerformRead(s => new LegacySkinExporter(storage).Export(s));
+                    skins.ExportCurrentSkin();
                 }
                 catch (Exception e)
                 {

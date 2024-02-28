@@ -47,7 +47,7 @@ namespace osu.Game.Graphics.UserInterface
         private Sample sampleChecked;
         private Sample sampleUnchecked;
 
-        public OsuCheckbox(bool nubOnRight = true)
+        public OsuCheckbox(bool nubOnRight = true, float nubSize = Nub.DEFAULT_EXPANDED_SIZE)
         {
             AutoSizeAxes = Axes.Y;
             RelativeSizeAxes = Axes.X;
@@ -61,7 +61,7 @@ namespace osu.Game.Graphics.UserInterface
                     AutoSizeAxes = Axes.Y,
                     RelativeSizeAxes = Axes.X,
                 },
-                Nub = new Nub(),
+                Nub = new Nub(nubSize),
                 new HoverSounds()
             };
 
@@ -70,14 +70,14 @@ namespace osu.Game.Graphics.UserInterface
                 Nub.Anchor = Anchor.CentreRight;
                 Nub.Origin = Anchor.CentreRight;
                 Nub.Margin = new MarginPadding { Right = nub_padding };
-                LabelTextFlowContainer.Padding = new MarginPadding { Right = Nub.EXPANDED_SIZE + nub_padding * 2 };
+                LabelTextFlowContainer.Padding = new MarginPadding { Right = Nub.DEFAULT_EXPANDED_SIZE + nub_padding * 2 };
             }
             else
             {
                 Nub.Anchor = Anchor.CentreLeft;
                 Nub.Origin = Anchor.CentreLeft;
                 Nub.Margin = new MarginPadding { Left = nub_padding };
-                LabelTextFlowContainer.Padding = new MarginPadding { Left = Nub.EXPANDED_SIZE + nub_padding * 2 };
+                LabelTextFlowContainer.Padding = new MarginPadding { Left = Nub.DEFAULT_EXPANDED_SIZE + nub_padding * 2 };
             }
 
             Nub.Current.BindTo(Current);

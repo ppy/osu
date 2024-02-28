@@ -1,16 +1,14 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
-using osu.Game.Rulesets.Objects.Types;
 using System.Threading;
 using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.ControlPoints;
-using osu.Game.Beatmaps.Formats;
 using osu.Game.Rulesets.Judgements;
 using osu.Game.Rulesets.Objects;
+using osu.Game.Rulesets.Objects.Types;
 using osu.Game.Rulesets.Scoring;
+using osu.Game.Rulesets.Taiko.Beatmaps;
 using osuTK;
 
 namespace osu.Game.Rulesets.Taiko.Objects
@@ -51,9 +49,12 @@ namespace osu.Game.Rulesets.Taiko.Objects
             base.ApplyDefaultsToSelf(controlPointInfo, difficulty);
 
             TimingControlPoint timingPoint = controlPointInfo.TimingPointAt(StartTime);
+            EffectControlPoint effectPoint = controlPointInfo.EffectPointAt(StartTime);
 
-            double scoringDistance = base_distance * difficulty.SliderMultiplier * DifficultyControlPoint.SliderVelocity;
+            double scoringDistance = base_distance * (difficulty.SliderMultiplier * TaikoBeatmapConverter.VELOCITY_MULTIPLIER) * effectPoint.ScrollSpeed;
             Velocity = scoringDistance / timingPoint.BeatLength;
+
+            TickRate = difficulty.SliderTickRate == 3 ? 3 : 4;
 
             tickSpacing = timingPoint.BeatLength / TickRate;
         }
@@ -76,12 +77,13 @@ namespace osu.Game.Rulesets.Taiko.Objects
             {
                 cancellationToken.ThrowIfCancellationRequested();
 
-                AddNested(new DrumRollTick
+                AddNested(new DrumRollTick(this)
                 {
                     FirstTick = first,
                     TickSpacing = tickSpacing,
                     StartTime = t,
-                    IsStrong = IsStrong
+                    IsStrong = IsStrong,
+                    Samples = Samples
                 });
 
                 first = false;
@@ -92,12 +94,21 @@ namespace osu.Game.Rulesets.Taiko.Objects
 
         protected override HitWindows CreateHitWindows() => HitWindows.Empty;
 
-        protected override StrongNestedHitObject CreateStrongNestedHit(double startTime) => new StrongNestedHit { StartTime = startTime };
+        protected override StrongNestedHitObject CreateStrongNestedHit(double startTime) => new StrongNestedHit(this)
+        {
+            StartTime = startTime,
+            Samples = Samples
+        };
 
         public class StrongNestedHit : StrongNestedHitObject
         {
             // The strong hit of the drum roll doesn't actually provide any score.
             public override Judgement CreateJudgement() => new IgnoreJudgement();
+
+            public StrongNestedHit(TaikoHitObject parent)
+                : base(parent)
+            {
+            }
         }
 
         #region LegacyBeatmapEncoder
@@ -105,7 +116,7 @@ namespace osu.Game.Rulesets.Taiko.Objects
         double IHasDistance.Distance => Duration * Velocity;
 
         SliderPath IHasPath.Path
-            => new SliderPath(PathType.Linear, new[] { Vector2.Zero, new Vector2(1) }, ((IHasDistance)this).Distance / LegacyBeatmapEncoder.LEGACY_TAIKO_VELOCITY_MULTIPLIER);
+            => new SliderPath(PathType.LINEAR, new[] { Vector2.Zero, new Vector2(1) }, ((IHasDistance)this).Distance / TaikoBeatmapConverter.VELOCITY_MULTIPLIER);
 
         #endregion
     }

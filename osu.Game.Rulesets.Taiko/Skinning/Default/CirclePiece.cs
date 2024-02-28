@@ -32,7 +32,7 @@ namespace osu.Game.Rulesets.Taiko.Skinning.Default
 
         private const double pre_beat_transition_time = 80;
 
-        private const float flash_opacity = 0.3f;
+        private const float kiai_flash_opacity = 0.15f;
 
         [Resolved]
         private DrawableHitObject drawableHitObject { get; set; } = null!;
@@ -187,7 +187,7 @@ namespace osu.Game.Rulesets.Taiko.Skinning.Default
             if (drawableHitObject.State.Value == ArmedState.Idle)
             {
                 flashBox
-                    .FadeTo(flash_opacity)
+                    .FadeTo(kiai_flash_opacity)
                     .Then()
                     .FadeOut(timingPoint.BeatLength * 0.75, Easing.OutSine);
             }

@@ -39,7 +39,7 @@ namespace osu.Game.Tests.Beatmaps
 
         public override Stream? GetStream(string storagePath) => null;
 
-        protected override Texture? GetBackground() => null;
+        public override Texture? GetBackground() => null;
 
         protected override Track? GetBeatmapTrack() => null;
     }

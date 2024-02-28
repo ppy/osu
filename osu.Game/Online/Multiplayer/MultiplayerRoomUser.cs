@@ -29,7 +29,7 @@ namespace osu.Game.Online.Multiplayer
         /// The availability state of the current beatmap.
         /// </summary>
         [Key(2)]
-        public BeatmapAvailability BeatmapAvailability { get; set; } = BeatmapAvailability.LocallyAvailable();
+        public BeatmapAvailability BeatmapAvailability { get; set; } = BeatmapAvailability.Unknown();
 
         /// <summary>
         /// Any mods applicable only to the local user.

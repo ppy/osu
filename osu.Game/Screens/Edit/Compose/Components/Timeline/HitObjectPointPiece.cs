@@ -7,7 +7,6 @@ using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
-using osu.Game.Beatmaps.ControlPoints;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
 using osuTK.Graphics;
@@ -16,21 +15,14 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
 {
     public partial class HitObjectPointPiece : CircularContainer
     {
-        private readonly ControlPoint point;
-
         protected OsuSpriteText Label { get; private set; }
-
-        protected HitObjectPointPiece(ControlPoint point)
-        {
-            this.point = point;
-        }
 
         [BackgroundDependencyLoader]
         private void load(OsuColour colours)
         {
             AutoSizeAxes = Axes.Both;
 
-            Color4 colour = point.GetRepresentingColour(colours);
+            Color4 colour = GetRepresentingColour(colours);
 
             InternalChildren = new Drawable[]
             {
@@ -60,6 +52,11 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
                     }
                 },
             };
+        }
+
+        protected virtual Color4 GetRepresentingColour(OsuColour colours)
+        {
+            return colours.Yellow;
         }
     }
 }

@@ -22,7 +22,7 @@ using osuTK.Graphics;
 
 namespace osu.Game.Graphics.UserInterface
 {
-    public partial class OsuDropdown<T> : Dropdown<T>
+    public partial class OsuDropdown<T> : Dropdown<T>, IKeyBindingHandler<GlobalAction>
     {
         private const float corner_radius = 5;
 
@@ -30,9 +30,23 @@ namespace osu.Game.Graphics.UserInterface
 
         protected override DropdownMenu CreateMenu() => new OsuDropdownMenu();
 
+        public bool OnPressed(KeyBindingPressEvent<GlobalAction> e)
+        {
+            if (e.Repeat) return false;
+
+            if (e.Action == GlobalAction.Back)
+                return Back();
+
+            return false;
+        }
+
+        public void OnReleased(KeyBindingReleaseEvent<GlobalAction> e)
+        {
+        }
+
         #region OsuDropdownMenu
 
-        protected partial class OsuDropdownMenu : DropdownMenu, IKeyBindingHandler<GlobalAction>
+        protected partial class OsuDropdownMenu : DropdownMenu
         {
             public override bool HandleNonPositionalInput => State == MenuState.Open;
 
@@ -172,6 +186,8 @@ namespace osu.Game.Graphics.UserInterface
                     : base(item)
                 {
                     Foreground.Padding = new MarginPadding(2);
+                    Foreground.AutoSizeAxes = Axes.Y;
+                    Foreground.RelativeSizeAxes = Axes.X;
 
                     Masking = true;
                     CornerRadius = corner_radius;
@@ -233,11 +249,12 @@ namespace osu.Game.Graphics.UserInterface
                                 Origin = Anchor.CentreLeft,
                                 Anchor = Anchor.CentreLeft,
                             },
-                            Label = new OsuSpriteText
+                            Label = new TruncatingSpriteText
                             {
-                                X = 15,
+                                Padding = new MarginPadding { Left = 15 },
                                 Origin = Anchor.CentreLeft,
                                 Anchor = Anchor.CentreLeft,
+                                RelativeSizeAxes = Axes.X,
                             },
                         };
                     }
@@ -276,23 +293,6 @@ namespace osu.Game.Graphics.UserInterface
             }
 
             #endregion
-
-            public bool OnPressed(KeyBindingPressEvent<GlobalAction> e)
-            {
-                if (e.Repeat) return false;
-
-                if (e.Action == GlobalAction.Back)
-                {
-                    State = MenuState.Closed;
-                    return true;
-                }
-
-                return false;
-            }
-
-            public void OnReleased(KeyBindingReleaseEvent<GlobalAction> e)
-            {
-            }
         }
 
         #endregion
@@ -335,12 +335,11 @@ namespace osu.Game.Graphics.UserInterface
                     {
                         new Drawable[]
                         {
-                            Text = new OsuSpriteText
+                            Text = new TruncatingSpriteText
                             {
                                 Anchor = Anchor.CentreLeft,
                                 Origin = Anchor.CentreLeft,
                                 RelativeSizeAxes = Axes.X,
-                                Truncate = true,
                             },
                             Icon = new SpriteIcon
                             {
@@ -356,11 +355,81 @@ namespace osu.Game.Graphics.UserInterface
                 AddInternal(new HoverClickSounds());
             }
 
-            [BackgroundDependencyLoader(true)]
-            private void load(OverlayColourProvider? colourProvider, OsuColour colours)
+            [Resolved]
+            private OverlayColourProvider? colourProvider { get; set; }
+
+            [Resolved]
+            private OsuColour colours { get; set; } = null!;
+
+            protected override void LoadComplete()
             {
-                BackgroundColour = colourProvider?.Background5 ?? Color4.Black.Opacity(0.5f);
-                BackgroundColourHover = colourProvider?.Light4 ?? colours.PinkDarker;
+                base.LoadComplete();
+
+                SearchBar.State.ValueChanged += _ => updateColour();
+                Enabled.BindValueChanged(_ => updateColour());
+                updateColour();
+            }
+
+            protected override bool OnHover(HoverEvent e)
+            {
+                updateColour();
+                return false;
+            }
+
+            protected override void OnHoverLost(HoverLostEvent e)
+            {
+                updateColour();
+            }
+
+            private void updateColour()
+            {
+                bool hovered = Enabled.Value && IsHovered;
+                var hoveredColour = colourProvider?.Light4 ?? colours.PinkDarker;
+                var unhoveredColour = colourProvider?.Background5 ?? Color4.Black.Opacity(0.5f);
+
+                Colour = Color4.White;
+                Alpha = Enabled.Value ? 1 : 0.3f;
+
+                if (SearchBar.State.Value == Visibility.Visible)
+                {
+                    Icon.Colour = hovered ? hoveredColour.Lighten(0.5f) : Colour4.White;
+                    Background.Colour = unhoveredColour;
+                }
+                else
+                {
+                    Icon.Colour = Color4.White;
+                    Background.Colour = hovered ? hoveredColour : unhoveredColour;
+                }
+            }
+
+            protected override DropdownSearchBar CreateSearchBar() => new OsuDropdownSearchBar
+            {
+                Padding = new MarginPadding { Right = 26 },
+            };
+
+            private partial class OsuDropdownSearchBar : DropdownSearchBar
+            {
+                protected override void PopIn() => this.FadeIn();
+
+                protected override void PopOut() => this.FadeOut();
+
+                protected override TextBox CreateTextBox() => new DropdownSearchTextBox
+                {
+                    FontSize = OsuFont.Default.Size,
+                };
+
+                private partial class DropdownSearchTextBox : SearchTextBox
+                {
+                    public override bool OnPressed(KeyBindingPressEvent<GlobalAction> e)
+                    {
+                        if (e.Action == GlobalAction.Back)
+                            // this method is blocking Dropdown from receiving the back action, despite this text box residing in a separate input manager.
+                            // to fix this properly, a local global action container needs to be added as well, but for simplicity, just don't handle the back action here.
+                            return false;
+
+                        return base.OnPressed(e);
+                    }
+                }
             }
         }
     }

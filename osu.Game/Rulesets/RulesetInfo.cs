@@ -3,13 +3,11 @@
 
 using System;
 using JetBrains.Annotations;
-using osu.Framework.Testing;
 using osu.Game.Rulesets.Difficulty;
 using Realms;
 
 namespace osu.Game.Rulesets
 {
-    [ExcludeFromDynamicCompile]
     [MapTo("Ruleset")]
     public class RulesetInfo : RealmObject, IEquatable<RulesetInfo>, IComparable<RulesetInfo>, IRulesetInfo
     {

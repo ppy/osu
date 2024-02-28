@@ -1,10 +1,10 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using System;
 using System.Collections.Generic;
 using System.Linq;
 using osu.Framework.Allocation;
+using osu.Framework.Bindables;
 using osu.Framework.Extensions.ObjectExtensions;
 using osu.Framework.Graphics;
 using osu.Game.Extensions;
@@ -22,14 +22,16 @@ namespace osu.Game.Online.Solo
     /// </summary>
     public partial class SoloStatisticsWatcher : Component
     {
+        public IBindable<SoloStatisticsUpdate?> LatestUpdate => latestUpdate;
+        private readonly Bindable<SoloStatisticsUpdate?> latestUpdate = new Bindable<SoloStatisticsUpdate?>();
+
         [Resolved]
         private SpectatorClient spectatorClient { get; set; } = null!;
 
         [Resolved]
         private IAPIProvider api { get; set; } = null!;
 
-        private readonly Dictionary<long, StatisticsUpdateCallback> callbacks = new Dictionary<long, StatisticsUpdateCallback>();
-        private long? lastProcessedScoreId;
+        private readonly Dictionary<long, ScoreInfo> watchedScores = new Dictionary<long, ScoreInfo>();
 
         private Dictionary<string, UserStatistics>? latestStatistics;
 
@@ -45,9 +47,7 @@ namespace osu.Game.Online.Solo
         /// Registers for a user statistics update after the given <paramref name="score"/> has been processed server-side.
         /// </summary>
         /// <param name="score">The score to listen for the statistics update for.</param>
-        /// <param name="onUpdateReady">The callback to be invoked once the statistics update has been prepared.</param>
-        /// <returns>An <see cref="IDisposable"/> representing the subscription. Disposing it is equivalent to unsubscribing from future notifications.</returns>
-        public IDisposable RegisterForStatisticsUpdateAfter(ScoreInfo score, Action<SoloStatisticsUpdate> onUpdateReady)
+        public void RegisterForStatisticsUpdateAfter(ScoreInfo score)
         {
             Schedule(() =>
             {
@@ -57,24 +57,12 @@ namespace osu.Game.Online.Solo
                 if (!score.Ruleset.IsLegacyRuleset() || score.OnlineID <= 0)
                     return;
 
-                var callback = new StatisticsUpdateCallback(score, onUpdateReady);
-
-                if (lastProcessedScoreId == score.OnlineID)
-                {
-                    requestStatisticsUpdate(api.LocalUser.Value.Id, callback);
-                    return;
-                }
-
-                callbacks.Add(score.OnlineID, callback);
+                watchedScores.Add(score.OnlineID, score);
             });
-
-            return new InvokeOnDisposal(() => Schedule(() => callbacks.Remove(score.OnlineID)));
         }
 
         private void onUserChanged(APIUser? localUser) => Schedule(() =>
         {
-            callbacks.Clear();
-            lastProcessedScoreId = null;
             latestStatistics = null;
 
             if (localUser == null || localUser.OnlineID <= 1)
@@ -107,25 +95,24 @@ namespace osu.Game.Online.Solo
             if (userId != api.LocalUser.Value?.OnlineID)
                 return;
 
-            lastProcessedScoreId = scoreId;
-
-            if (!callbacks.TryGetValue(scoreId, out var callback))
+            if (!watchedScores.Remove(scoreId, out var scoreInfo))
                 return;
 
-            requestStatisticsUpdate(userId, callback);
-            callbacks.Remove(scoreId);
+            requestStatisticsUpdate(userId, scoreInfo);
         }
 
-        private void requestStatisticsUpdate(int userId, StatisticsUpdateCallback callback)
+        private void requestStatisticsUpdate(int userId, ScoreInfo scoreInfo)
         {
-            var request = new GetUserRequest(userId, callback.Score.Ruleset);
-            request.Success += user => Schedule(() => dispatchStatisticsUpdate(callback, user.Statistics));
+            var request = new GetUserRequest(userId, scoreInfo.Ruleset);
+            request.Success += user => Schedule(() => dispatchStatisticsUpdate(scoreInfo, user.Statistics));
             api.Queue(request);
         }
 
-        private void dispatchStatisticsUpdate(StatisticsUpdateCallback callback, UserStatistics updatedStatistics)
+        private void dispatchStatisticsUpdate(ScoreInfo scoreInfo, UserStatistics updatedStatistics)
         {
-            string rulesetName = callback.Score.Ruleset.ShortName;
+            string rulesetName = scoreInfo.Ruleset.ShortName;
+
+            api.UpdateStatistics(updatedStatistics);
 
             if (latestStatistics == null)
                 return;
@@ -133,9 +120,7 @@ namespace osu.Game.Online.Solo
             latestStatistics.TryGetValue(rulesetName, out UserStatistics? latestRulesetStatistics);
             latestRulesetStatistics ??= new UserStatistics();
 
-            var update = new SoloStatisticsUpdate(callback.Score, latestRulesetStatistics, updatedStatistics);
-            callback.OnUpdateReady.Invoke(update);
-
+            latestUpdate.Value = new SoloStatisticsUpdate(scoreInfo, latestRulesetStatistics, updatedStatistics);
             latestStatistics[rulesetName] = updatedStatistics;
         }
 
@@ -145,18 +130,6 @@ namespace osu.Game.Online.Solo
                 spectatorClient.OnUserScoreProcessed -= userScoreProcessed;
 
             base.Dispose(isDisposing);
-        }
-
-        private class StatisticsUpdateCallback
-        {
-            public ScoreInfo Score { get; }
-            public Action<SoloStatisticsUpdate> OnUpdateReady { get; }
-
-            public StatisticsUpdateCallback(ScoreInfo score, Action<SoloStatisticsUpdate> onUpdateReady)
-            {
-                Score = score;
-                OnUpdateReady = onUpdateReady;
-            }
         }
     }
 }

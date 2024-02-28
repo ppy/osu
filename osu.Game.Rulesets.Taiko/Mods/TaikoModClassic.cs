@@ -15,10 +15,7 @@ namespace osu.Game.Rulesets.Taiko.Mods
         public void ApplyToDrawableRuleset(DrawableRuleset<TaikoHitObject> drawableRuleset)
         {
             var drawableTaikoRuleset = (DrawableTaikoRuleset)drawableRuleset;
-            drawableTaikoRuleset.LockPlayfieldMaxAspect.Value = false;
-
-            var playfield = (TaikoPlayfield)drawableRuleset.Playfield;
-            playfield.ClassicHitTargetPosition.Value = true;
+            drawableTaikoRuleset.LockPlayfieldAspectRange.Value = false;
         }
 
         public void ApplyToDrawableHitObject(DrawableHitObject drawable)

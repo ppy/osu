@@ -43,7 +43,7 @@ namespace osu.Game.Rulesets.Osu.Tests.Editor
 
             AddStep("place first object", () => InputManager.Click(MouseButton.Left));
 
-            AddStep("move mouse slightly", () => InputManager.MoveMouseTo(playfield.ScreenSpaceDrawQuad.Centre + new Vector2(playfield.ScreenSpaceDrawQuad.Width * 0.02f, 0)));
+            AddStep("move mouse slightly", () => InputManager.MoveMouseTo(playfield.ScreenSpaceDrawQuad.Centre + new Vector2(playfield.ScreenSpaceDrawQuad.Width * 0.01f, 0)));
 
             AddStep("place second object", () => InputManager.Click(MouseButton.Left));
 
@@ -75,7 +75,7 @@ namespace osu.Game.Rulesets.Osu.Tests.Editor
 
             AddStep("enter circle placement mode", () => InputManager.Key(Key.Number2));
 
-            AddStep("move mouse slightly", () => InputManager.MoveMouseTo(playfield.ScreenSpaceDrawQuad.Centre + new Vector2(playfield.ScreenSpaceDrawQuad.Width * 0.235f, 0)));
+            AddStep("move mouse slightly", () => InputManager.MoveMouseTo(playfield.ScreenSpaceDrawQuad.Centre + new Vector2(playfield.ScreenSpaceDrawQuad.Width * 0.205f, 0)));
 
             AddStep("place second object", () => InputManager.Click(MouseButton.Left));
 
@@ -122,7 +122,7 @@ namespace osu.Game.Rulesets.Osu.Tests.Editor
 
             AddStep("begin drag", () => InputManager.PressButton(MouseButton.Left));
 
-            AddStep("move mouse slightly off centre", () => InputManager.MoveMouseTo(playfield.ScreenSpaceDrawQuad.Centre + new Vector2(playfield.ScreenSpaceDrawQuad.Width * 0.02f, 0)));
+            AddStep("move mouse slightly off centre", () => InputManager.MoveMouseTo(playfield.ScreenSpaceDrawQuad.Centre + new Vector2(playfield.ScreenSpaceDrawQuad.Width * 0.01f, 0)));
 
             AddAssert("object 3 snapped to 1", () =>
             {
@@ -134,7 +134,7 @@ namespace osu.Game.Rulesets.Osu.Tests.Editor
                 return Precision.AlmostEquals(first.EndPosition, third.Position);
             });
 
-            AddStep("move mouse slightly off centre", () => InputManager.MoveMouseTo(playfield.ScreenSpaceDrawQuad.Centre + new Vector2(playfield.ScreenSpaceDrawQuad.Width * -0.22f, playfield.ScreenSpaceDrawQuad.Width * 0.21f)));
+            AddStep("move mouse slightly off centre", () => InputManager.MoveMouseTo(playfield.ScreenSpaceDrawQuad.Centre + new Vector2(playfield.ScreenSpaceDrawQuad.Width * -0.21f, playfield.ScreenSpaceDrawQuad.Width * 0.205f)));
 
             AddAssert("object 2 snapped to 1", () =>
             {

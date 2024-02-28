@@ -7,6 +7,7 @@ using System.Linq;
 using osu.Framework.Bindables;
 using osu.Framework.Localisation;
 using osu.Game.Configuration;
+using osu.Game.Localisation.HUD;
 using osu.Game.Overlays.Settings;
 using osu.Game.Rulesets.Scoring;
 using osu.Game.Rulesets.Judgements;
@@ -30,6 +31,8 @@ namespace osu.Game.Rulesets.Mods
 
         public override bool RequiresConfiguration => false;
 
+        public override bool Ranked => true;
+
         public override string SettingDescription => base.SettingDescription.Replace(MinimumAccuracy.ToString(), MinimumAccuracy.Value.ToString("##%", NumberFormatInfo.InvariantInfo));
 
         [SettingSource("Minimum accuracy", "Trigger a failure if your accuracy goes below this value.", SettingControlType = typeof(SettingsPercentageSlider<double>))]
@@ -42,30 +45,44 @@ namespace osu.Game.Rulesets.Mods
             Value = 0.9,
         };
 
-        private ScoreProcessor scoreProcessor = null!;
+        [SettingSource("Accuracy mode", "The mode of accuracy that will trigger failure.")]
+        public Bindable<AccuracyMode> AccuracyJudgeMode { get; } = new Bindable<AccuracyMode>();
 
-        public void ApplyToScoreProcessor(ScoreProcessor scoreProcessor) => this.scoreProcessor = scoreProcessor;
+        private readonly Bindable<double> currentAccuracy = new Bindable<double>();
+
+        public void ApplyToScoreProcessor(ScoreProcessor scoreProcessor)
+        {
+            switch (AccuracyJudgeMode.Value)
+            {
+                case AccuracyMode.Standard:
+                    currentAccuracy.BindTo(scoreProcessor.Accuracy);
+                    break;
+
+                case AccuracyMode.MaximumAchievable:
+                    currentAccuracy.BindTo(scoreProcessor.MaximumAccuracy);
+                    break;
+            }
+
+            currentAccuracy.BindValueChanged(s =>
+            {
+                if (s.NewValue < MinimumAccuracy.Value)
+                {
+                    TriggerFailure();
+                }
+            });
+        }
 
         public ScoreRank AdjustRank(ScoreRank rank, double accuracy) => rank;
 
-        protected override bool FailCondition(HealthProcessor healthProcessor, JudgementResult result)
+        protected override bool FailCondition(HealthProcessor healthProcessor, JudgementResult result) => false;
+
+        public enum AccuracyMode
         {
-            if (!result.Type.AffectsAccuracy())
-                return false;
+            [LocalisableDescription(typeof(GameplayAccuracyCounterStrings), nameof(GameplayAccuracyCounterStrings.AccuracyDisplayModeMax))]
+            MaximumAchievable,
 
-            return getAccuracyWithImminentResultAdded(result) < MinimumAccuracy.Value;
-        }
-
-        private double getAccuracyWithImminentResultAdded(JudgementResult result)
-        {
-            var score = new ScoreInfo { Ruleset = scoreProcessor.Ruleset.RulesetInfo };
-
-            // This is super ugly, but if we don't do it this way we will not have the most recent result added to the accuracy value.
-            // Hopefully we can improve this in the future.
-            scoreProcessor.PopulateScore(score);
-            score.Statistics[result.Type]++;
-
-            return scoreProcessor.ComputeAccuracy(score);
+            [LocalisableDescription(typeof(GameplayAccuracyCounterStrings), nameof(GameplayAccuracyCounterStrings.AccuracyDisplayModeStandard))]
+            Standard,
         }
     }
 }

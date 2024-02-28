@@ -59,5 +59,10 @@ namespace osu.Game.Beatmaps
         int PassCount { get; }
 
         APIFailTimes? FailTimes { get; }
+
+        /// <summary>
+        /// The playable length in milliseconds of this beatmap.
+        /// </summary>
+        double HitLength { get; }
     }
 }
