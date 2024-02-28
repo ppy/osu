@@ -22,8 +22,5 @@ namespace osu.Game.Rulesets.Osu
         SpinnerBody,
         CursorSmoke,
         ApproachCircle,
-        HitMarkerLeft,
-        HitMarkerRight,
-        AimMarker
     }
 }
