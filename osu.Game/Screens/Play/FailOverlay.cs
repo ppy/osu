@@ -6,10 +6,8 @@
 using System;
 using System.Threading.Tasks;
 using osu.Game.Scoring;
-using osu.Game.Graphics;
 using osu.Game.Graphics.UserInterface;
 using osuTK;
-using osuTK.Graphics;
 using osu.Framework.Allocation;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
@@ -26,22 +24,9 @@ namespace osu.Game.Screens.Play
 
         public override LocalisableString Header => GameplayMenuOverlayStrings.FailedHeader;
 
-        private readonly bool showButtons;
-
-        public FailOverlay(bool showButtons = true)
-        {
-            this.showButtons = showButtons;
-        }
-
         [BackgroundDependencyLoader]
-        private void load(OsuColour colours)
+        private void load()
         {
-            if (showButtons)
-            {
-                AddButton(GameplayMenuOverlayStrings.Retry, colours.YellowDark, () => OnRetry?.Invoke());
-                AddButton(GameplayMenuOverlayStrings.Quit, new Color4(170, 27, 39, 255), () => OnQuit?.Invoke());
-            }
-
             // from #10339 maybe this is a better visual effect
             Add(new Container
             {

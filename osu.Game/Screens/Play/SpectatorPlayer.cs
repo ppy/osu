@@ -25,8 +25,6 @@ namespace osu.Game.Screens.Play
 
         private readonly Score score;
 
-        public override bool AllowBackButton => true;
-
         protected override bool CheckModsAllowFailure()
         {
             if (!allowFail)
