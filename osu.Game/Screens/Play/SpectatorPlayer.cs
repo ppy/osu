@@ -1,8 +1,8 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using System.Diagnostics;
 using osu.Framework.Allocation;
+using osu.Framework.Extensions.ObjectExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Screens;
 using osu.Game.Beatmaps;
@@ -97,7 +97,6 @@ namespace osu.Game.Screens.Play
             foreach (var frame in bundle.Frames)
             {
                 IConvertibleReplayFrame convertibleFrame = GameplayState.Ruleset.CreateConvertibleReplayFrame()!;
-                Debug.Assert(convertibleFrame != null);
                 convertibleFrame.FromLegacy(frame, GameplayState.Beatmap);
 
                 var convertedFrame = (ReplayFrame)convertibleFrame;
@@ -132,7 +131,8 @@ namespace osu.Game.Screens.Play
         {
             base.Dispose(isDisposing);
 
-            SpectatorClient.OnNewFrames -= userSentFrames;
+            if (SpectatorClient.IsNotNull())
+                SpectatorClient.OnNewFrames -= userSentFrames;
         }
     }
 }
