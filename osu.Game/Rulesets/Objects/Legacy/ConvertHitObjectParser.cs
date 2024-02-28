@@ -271,9 +271,9 @@ namespace osu.Game.Rulesets.Objects.Legacy
             var segments = ArrayPool<(PathType Type, int StartIndex)>.Shared.Rent(pointSplit.Length);
             int pointsCount = 0;
             int segmentsCount = 0;
+
             try
             {
-
                 foreach (string s in pointSplit)
                 {
                     if (char.IsLetter(s[0]))
