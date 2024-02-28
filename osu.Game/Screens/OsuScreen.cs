@@ -250,9 +250,12 @@ namespace osu.Game.Screens
         {
             logo.Action = null;
             logo.FadeOut(300, Easing.OutQuint);
-            logo.Anchor = Anchor.TopLeft;
+
             logo.Origin = Anchor.Centre;
+
+            logo.ChangeAnchor(Anchor.TopLeft);
             logo.RelativePositionAxes = Axes.Both;
+
             logo.Triangles = true;
             logo.Ripple = true;
         }

@@ -153,6 +153,8 @@ namespace osu.Game.Tests.Visual
 
             public new Bindable<IReadOnlyList<Mod>> SelectedMods => base.SelectedMods;
 
+            public new Storage Storage => base.Storage;
+
             public new SpectatorClient SpectatorClient => base.SpectatorClient;
 
             // if we don't apply these changes, when running under nUnit the version that gets populated is that of nUnit.
@@ -166,7 +168,7 @@ namespace osu.Game.Tests.Visual
             public TestOsuGame(Storage storage, IAPIProvider api, string[] args = null)
                 : base(args)
             {
-                Storage = storage;
+                base.Storage = storage;
                 API = api;
             }
 
@@ -178,6 +180,7 @@ namespace osu.Game.Tests.Visual
                 LocalConfig.SetValue(OsuSetting.ShowFirstRunSetup, false);
 
                 API.Login("Rhythm Champion", "osu!");
+                ((DummyAPIAccess)API).AuthenticateSecondFactor("abcdefgh");
 
                 Dependencies.Get<SessionStatics>().SetValue(Static.MutedAudioNotificationShownOnce, true);
 

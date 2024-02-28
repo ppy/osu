@@ -15,6 +15,7 @@ using osu.Framework.Graphics.Cursor;
 using osu.Framework.Input;
 using osu.Framework.Input.Bindings;
 using osu.Framework.Input.Events;
+using osu.Framework.Localisation;
 using osu.Framework.Utils;
 using osu.Game.Audio;
 using osu.Game.Beatmaps;
@@ -125,7 +126,7 @@ namespace osu.Game.Overlays.Mods
         private DeselectAllModsButton deselectAllModsButton = null!;
 
         private Container aboveColumnsContent = null!;
-        private ScoreMultiplierDisplay? multiplierDisplay;
+        private RankingInformationDisplay? rankingInformationDisplay;
         private BeatmapAttributesDisplay? beatmapAttributesDisplay;
 
         protected ShearedButton BackButton { get; private set; } = null!;
@@ -185,7 +186,7 @@ namespace osu.Game.Overlays.Mods
                 aboveColumnsContent = new Container
                 {
                     RelativeSizeAxes = Axes.X,
-                    Height = ScoreMultiplierDisplay.HEIGHT,
+                    Height = RankingInformationDisplay.HEIGHT,
                     Padding = new MarginPadding { Horizontal = 100 },
                     Child = SearchTextBox = new ShearedSearchTextBox
                     {
@@ -200,7 +201,7 @@ namespace osu.Game.Overlays.Mods
                     {
                         Padding = new MarginPadding
                         {
-                            Top = ScoreMultiplierDisplay.HEIGHT + PADDING,
+                            Top = RankingInformationDisplay.HEIGHT + PADDING,
                             Bottom = PADDING
                         },
                         RelativeSizeAxes = Axes.Both,
@@ -269,7 +270,7 @@ namespace osu.Game.Overlays.Mods
                     },
                     Children = new Drawable[]
                     {
-                        multiplierDisplay = new ScoreMultiplierDisplay
+                        rankingInformationDisplay = new RankingInformationDisplay
                         {
                             Anchor = Anchor.BottomRight,
                             Origin = Anchor.BottomRight
@@ -315,7 +316,7 @@ namespace osu.Game.Overlays.Mods
 
             SelectedMods.BindValueChanged(_ =>
             {
-                updateMultiplier();
+                updateRankingInformation();
                 updateFromExternalSelection();
                 updateCustomisation();
 
@@ -328,7 +329,7 @@ namespace osu.Game.Overlays.Mods
                     //
                     // See https://github.com/ppy/osu/pull/23284#issuecomment-1529056988
                     modSettingChangeTracker = new ModSettingChangeTracker(SelectedMods.Value);
-                    modSettingChangeTracker.SettingChanged += _ => updateMultiplier();
+                    modSettingChangeTracker.SettingChanged += _ => updateRankingInformation();
                 }
             }, true);
 
@@ -349,15 +350,18 @@ namespace osu.Game.Overlays.Mods
             });
         }
 
+        private static readonly LocalisableString input_search_placeholder = Resources.Localisation.Web.CommonStrings.InputSearch;
+        private static readonly LocalisableString tab_to_search_placeholder = ModSelectOverlayStrings.TabToSearch;
+
         protected override void Update()
         {
             base.Update();
 
-            SearchTextBox.PlaceholderText = SearchTextBox.HasFocus ? Resources.Localisation.Web.CommonStrings.InputSearch : ModSelectOverlayStrings.TabToSearch;
+            SearchTextBox.PlaceholderText = SearchTextBox.HasFocus ? input_search_placeholder : tab_to_search_placeholder;
 
             if (beatmapAttributesDisplay != null)
             {
-                float rightEdgeOfLastButton = footerButtonFlow.Last().ScreenSpaceDrawQuad.TopRight.X;
+                float rightEdgeOfLastButton = footerButtonFlow[^1].ScreenSpaceDrawQuad.TopRight.X;
 
                 // this is cheating a bit; the 640 value is hardcoded based on how wide the expanded panel _generally_ is.
                 // due to the transition applied, the raw screenspace quad of the panel cannot be used, as it will trigger an ugly feedback cycle of expanding and collapsing.
@@ -450,9 +454,9 @@ namespace osu.Game.Overlays.Mods
                 modState.ValidForSelection.Value = modState.Mod.Type != ModType.System && modState.Mod.HasImplementation && IsValidMod.Invoke(modState.Mod);
         }
 
-        private void updateMultiplier()
+        private void updateRankingInformation()
         {
-            if (multiplierDisplay == null)
+            if (rankingInformationDisplay == null)
                 return;
 
             double multiplier = 1.0;
@@ -460,7 +464,8 @@ namespace osu.Game.Overlays.Mods
             foreach (var mod in SelectedMods.Value)
                 multiplier *= mod.ScoreMultiplier;
 
-            multiplierDisplay.Current.Value = multiplier;
+            rankingInformationDisplay.ModMultiplier.Value = multiplier;
+            rankingInformationDisplay.Ranked.Value = SelectedMods.Value.All(m => m.Ranked);
         }
 
         private void updateCustomisation()

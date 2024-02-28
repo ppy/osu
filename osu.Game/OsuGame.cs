@@ -47,6 +47,7 @@ using osu.Game.Localisation;
 using osu.Game.Online;
 using osu.Game.Online.Chat;
 using osu.Game.Online.Rooms;
+using osu.Game.Online.Solo;
 using osu.Game.Overlays;
 using osu.Game.Overlays.BeatmapListing;
 using osu.Game.Overlays.Music;
@@ -54,7 +55,6 @@ using osu.Game.Overlays.Notifications;
 using osu.Game.Overlays.SkinEditor;
 using osu.Game.Overlays.Toolbar;
 using osu.Game.Overlays.Volume;
-using osu.Game.Performance;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Scoring;
 using osu.Game.Screens;
@@ -630,6 +630,12 @@ namespace osu.Game
 
             var detachedSet = databasedSet.PerformRead(s => s.Detach());
 
+            if (detachedSet.DeletePending)
+            {
+                Logger.Log("The requested beatmap has since been deleted.", LoggingTarget.Information);
+                return;
+            }
+
             PerformFromScreen(screen =>
             {
                 // Find beatmaps that match our predicate.
@@ -784,8 +790,6 @@ namespace osu.Game
         protected virtual Loader CreateLoader() => new Loader();
 
         protected virtual UpdateManager CreateUpdateManager() => new UpdateManager();
-
-        protected virtual HighPerformanceSession CreateHighPerformanceSession() => new HighPerformanceSession();
 
         protected override Container CreateScalingContainer() => new ScalingContainer(ScalingMode.Everything);
 
@@ -1015,6 +1019,7 @@ namespace osu.Game
                 ScreenStack.Push(CreateLoader().With(l => l.RelativeSizeAxes = Axes.Both));
             });
 
+            loadComponentSingleFile(new SoloStatisticsWatcher(), Add, true);
             loadComponentSingleFile(Toolbar = new Toolbar
             {
                 OnHome = delegate
@@ -1079,8 +1084,6 @@ namespace osu.Game
 
             loadComponentSingleFile(new AccountCreationOverlay(), topMostOverlayContent.Add, true);
             loadComponentSingleFile<IDialogOverlay>(new DialogOverlay(), topMostOverlayContent.Add, true);
-
-            loadComponentSingleFile(CreateHighPerformanceSession(), Add);
 
             loadComponentSingleFile(new BackgroundDataStoreProcessor(), Add);
 
