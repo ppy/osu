@@ -278,10 +278,10 @@ namespace osu.Game.Screens.Play
                         createGameplayComponents(Beatmap.Value)
                     }
                 },
-                FailOverlay = new FailOverlay(Configuration.AllowUserInteraction)
+                FailOverlay = new FailOverlay
                 {
                     SaveReplay = async () => await prepareAndImportScoreAsync(true).ConfigureAwait(false),
-                    OnRetry = () => Restart(),
+                    OnRetry = Configuration.AllowUserInteraction ? () => Restart() : null,
                     OnQuit = () => PerformExit(true),
                 },
                 new HotkeyExitOverlay
