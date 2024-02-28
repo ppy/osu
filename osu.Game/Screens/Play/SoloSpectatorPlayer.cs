@@ -50,8 +50,7 @@ namespace osu.Game.Screens.Play
         {
             base.Dispose(isDisposing);
 
-            if (SpectatorClient != null)
-                SpectatorClient.OnUserBeganPlaying -= userBeganPlaying;
+            SpectatorClient.OnUserBeganPlaying -= userBeganPlaying;
         }
     }
 }

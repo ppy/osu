@@ -1,8 +1,6 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
 using System;
 using System.Linq;
 using osu.Framework.Allocation;
@@ -23,7 +21,7 @@ namespace osu.Game.Screens.Play
 
         public override LocalisableString Header => GameplayMenuOverlayStrings.PausedHeader;
 
-        private SkinnableSound pauseLoop;
+        private SkinnableSound pauseLoop = null!;
 
         protected override Action BackAction => () =>
         {

@@ -1,8 +1,6 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
 using System.Linq;
 using NUnit.Framework;
 using osu.Framework.Allocation;
@@ -40,13 +38,13 @@ namespace osu.Game.Tests.Visual.Gameplay
         protected override bool UseOnlineAPI => true;
 
         [Resolved]
-        private OsuGameBase game { get; set; }
+        private OsuGameBase game { get; set; } = null!;
 
         private TestSpectatorClient spectatorClient => dependenciesScreen.SpectatorClient;
-        private DependenciesScreen dependenciesScreen;
-        private SoloSpectatorScreen spectatorScreen;
+        private DependenciesScreen dependenciesScreen = null!;
+        private SoloSpectatorScreen spectatorScreen = null!;
 
-        private BeatmapSetInfo importedBeatmap;
+        private BeatmapSetInfo importedBeatmap = null!;
         private int importedBeatmapId;
 
         [SetUpSteps]
@@ -189,7 +187,7 @@ namespace osu.Game.Tests.Visual.Gameplay
 
             waitForPlayerCurrent();
 
-            Player lastPlayer = null;
+            Player lastPlayer = null!;
             AddStep("store first player", () => lastPlayer = player);
 
             start();
@@ -282,7 +280,7 @@ namespace osu.Game.Tests.Visual.Gameplay
         [Test]
         public void TestFinalFrameInBundleHasHeader()
         {
-            FrameDataBundle lastBundle = null;
+            FrameDataBundle? lastBundle = null;
 
             AddStep("bind to client", () => spectatorClient.OnNewFrames += (_, bundle) => lastBundle = bundle);
 
@@ -291,8 +289,8 @@ namespace osu.Game.Tests.Visual.Gameplay
             finish();
 
             AddUntilStep("bundle received", () => lastBundle != null);
-            AddAssert("first frame does not have header", () => lastBundle.Frames[0].Header == null);
-            AddAssert("last frame has header", () => lastBundle.Frames[^1].Header != null);
+            AddAssert("first frame does not have header", () => lastBundle?.Frames[0].Header == null);
+            AddAssert("last frame has header", () => lastBundle?.Frames[^1].Header != null);
         }
 
         [Test]
@@ -387,7 +385,7 @@ namespace osu.Game.Tests.Visual.Gameplay
         }
 
         private OsuFramedReplayInputHandler replayHandler =>
-            (OsuFramedReplayInputHandler)Stack.ChildrenOfType<OsuInputManager>().First().ReplayInputHandler;
+            (OsuFramedReplayInputHandler)Stack.ChildrenOfType<OsuInputManager>().First().ReplayInputHandler!;
 
         private Player player => this.ChildrenOfType<Player>().Single();
 
