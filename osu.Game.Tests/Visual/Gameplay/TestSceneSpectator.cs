@@ -25,6 +25,7 @@ using osu.Game.Tests.Gameplay;
 using osu.Game.Tests.Visual.Multiplayer;
 using osu.Game.Tests.Visual.Spectator;
 using osuTK;
+using osuTK.Input;
 
 namespace osu.Game.Tests.Visual.Gameplay
 {
@@ -214,6 +215,9 @@ namespace osu.Game.Tests.Visual.Gameplay
             checkPaused(false); // Should continue playing until out of frames
             checkPaused(true); // And eventually stop after running out of frames and fail.
             // Todo: Should check for + display a failed message.
+
+            AddStep("exit player", () => InputManager.Key(Key.Escape));
+            AddAssert("player exited", () => Stack.CurrentScreen is SoloSpectatorScreen);
         }
 
         [Test]
