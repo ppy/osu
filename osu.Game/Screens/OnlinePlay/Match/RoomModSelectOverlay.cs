@@ -1,6 +1,7 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using osu.Framework.Allocation;
@@ -9,6 +10,7 @@ using osu.Game.Online.Rooms;
 using osu.Game.Overlays;
 using osu.Game.Overlays.Mods;
 using osu.Game.Rulesets;
+using osu.Game.Rulesets.Mods;
 
 namespace osu.Game.Screens.OnlinePlay.Match
 {
@@ -19,6 +21,8 @@ namespace osu.Game.Screens.OnlinePlay.Match
 
         [Resolved]
         private RulesetStore rulesets { get; set; } = null!;
+
+        private readonly List<Mod> roomRequiredMods = new List<Mod>();
 
         public RoomModSelectOverlay()
             : base(OverlayColourScheme.Plum)
@@ -31,15 +35,19 @@ namespace osu.Game.Screens.OnlinePlay.Match
 
             selectedItem.BindValueChanged(v =>
             {
+                roomRequiredMods.Clear();
+
                 if (v.NewValue is PlaylistItem item)
                 {
                     var rulesetInstance = rulesets.GetRuleset(item.RulesetID)?.CreateInstance();
                     Debug.Assert(rulesetInstance != null);
-                    ActiveMods.Value = item.RequiredMods.Select(m => m.ToMod(rulesetInstance)).Concat(SelectedMods.Value).ToList();
+                    roomRequiredMods.AddRange(item.RequiredMods.Select(m => m.ToMod(rulesetInstance)));
                 }
-                else
-                    ActiveMods.Value = SelectedMods.Value;
+
+                ActiveMods.Value = ComputeActiveMods();
             }, true);
         }
+
+        protected override IReadOnlyList<Mod> ComputeActiveMods() => roomRequiredMods.Concat(base.ComputeActiveMods()).ToList();
     }
 }
