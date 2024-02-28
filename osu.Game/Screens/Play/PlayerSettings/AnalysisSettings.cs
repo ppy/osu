@@ -10,7 +10,7 @@ namespace osu.Game.Screens.Play.PlayerSettings
     {
         protected DrawableRuleset DrawableRuleset;
 
-        public AnalysisSettings(DrawableRuleset drawableRuleset)
+        protected AnalysisSettings(DrawableRuleset drawableRuleset)
             : base("Analysis Settings")
         {
             DrawableRuleset = drawableRuleset;
