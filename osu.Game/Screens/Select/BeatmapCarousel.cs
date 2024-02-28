@@ -215,6 +215,12 @@ namespace osu.Game.Screens.Select
             InternalChild = new OsuContextMenuContainer
             {
                 RelativeSizeAxes = Axes.Both,
+                Padding = new MarginPadding
+                {
+                    // Avoid clash between scrollbar and osu! logo.
+                    Top = 10,
+                    Bottom = 100,
+                },
                 Children = new Drawable[]
                 {
                     setPool,
