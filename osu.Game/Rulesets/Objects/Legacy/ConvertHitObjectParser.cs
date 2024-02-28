@@ -302,7 +302,7 @@ namespace osu.Game.Rulesets.Objects.Legacy
                     controlPoints.AddRange(convertPoints(segments[i].Type, new ArraySegment<Vector2>(points, startIndex, endIndex - startIndex), endPoint));
                 }
 
-                return controlPoints.SelectMany(s => s).ToArray();
+                return mergePointsLists(controlPoints);
             }
             finally
             {
@@ -390,6 +390,25 @@ namespace osu.Game.Rulesets.Objects.Legacy
             static bool isLinear(Vector2 p0, Vector2 p1, Vector2 p2)
                 => Precision.AlmostEquals(0, (p1.Y - p0.Y) * (p2.X - p0.X)
                                           - (p1.X - p0.X) * (p2.Y - p0.Y));
+        }
+
+        private PathControlPoint[] mergePointsLists(List<ArraySegment<PathControlPoint>> controlPointList)
+        {
+            int totalCount = 0;
+
+            foreach (var arr in controlPointList)
+                totalCount += arr.Count;
+
+            var mergedArray = new PathControlPoint[totalCount];
+            int copyIndex = 0;
+
+            foreach (var arr in controlPointList)
+            {
+                arr.AsSpan().CopyTo(mergedArray.AsSpan(copyIndex));
+                copyIndex += arr.Count;
+            }
+
+            return mergedArray;
         }
 
         /// <summary>
