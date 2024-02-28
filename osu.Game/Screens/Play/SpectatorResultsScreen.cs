@@ -28,7 +28,7 @@ namespace osu.Game.Screens.Play
 
         private void userBeganPlaying(int userId, SpectatorState state)
         {
-            if (userId == Score.UserID)
+            if (userId == Score?.UserID)
             {
                 Schedule(() =>
                 {

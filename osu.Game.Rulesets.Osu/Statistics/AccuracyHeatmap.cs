@@ -191,7 +191,7 @@ namespace osu.Game.Rulesets.Osu.Statistics
 
                 for (int c = 0; c < points_per_dimension; c++)
                 {
-                    HitPointType pointType = Vector2.Distance(new Vector2(c, r), centre) <= innerRadius
+                    HitPointType pointType = Vector2.Distance(new Vector2(c + 0.5f, r + 0.5f), centre) <= innerRadius
                         ? HitPointType.Hit
                         : HitPointType.Miss;
 

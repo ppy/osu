@@ -420,7 +420,7 @@ namespace osu.Game.Tests.Visual.Playlists
             public new LoadingSpinner RightSpinner => base.RightSpinner;
             public new ScorePanelList ScorePanelList => base.ScorePanelList;
 
-            public TestResultsScreen(ScoreInfo score, int roomId, PlaylistItem playlistItem, bool allowRetry = true)
+            public TestResultsScreen([CanBeNull] ScoreInfo score, int roomId, PlaylistItem playlistItem, bool allowRetry = true)
                 : base(score, roomId, playlistItem, allowRetry)
             {
             }

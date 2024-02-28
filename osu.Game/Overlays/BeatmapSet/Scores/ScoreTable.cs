@@ -23,9 +23,9 @@ using osuTK.Graphics;
 using osu.Framework.Localisation;
 using osu.Framework.Extensions.LocalisationExtensions;
 using osu.Framework.Graphics.Cursor;
+using osu.Framework.Graphics.Sprites;
 using osu.Game.Resources.Localisation.Web;
 using osu.Game.Rulesets.Mods;
-using osu.Game.Scoring.Drawables;
 
 namespace osu.Game.Overlays.BeatmapSet.Scores
 {
@@ -180,10 +180,26 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
 
             if (showPerformancePoints)
             {
-                if (score.PP != null)
-                    content.Add(new StatisticText(score.PP, format: @"N0"));
+                if (!score.Ranked)
+                {
+                    content.Add(new SpriteTextWithTooltip
+                    {
+                        Text = "-",
+                        Font = OsuFont.GetFont(size: text_size),
+                        TooltipText = ScoresStrings.StatusNoPp
+                    });
+                }
+                else if (score.PP == null)
+                {
+                    content.Add(new SpriteIconWithTooltip
+                    {
+                        Icon = FontAwesome.Solid.Sync,
+                        Size = new Vector2(text_size),
+                        TooltipText = ScoresStrings.StatusProcessing,
+                    });
+                }
                 else
-                    content.Add(new UnprocessedPerformancePointsPlaceholder { Size = new Vector2(text_size) });
+                    content.Add(new StatisticText(score.PP, format: @"N0"));
             }
 
             content.Add(new ScoreboardTime(score.Date, text_size)

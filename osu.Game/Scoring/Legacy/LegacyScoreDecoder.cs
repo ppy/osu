@@ -180,7 +180,7 @@ namespace osu.Game.Scoring.Legacy
         /// </summary>
         /// <param name="score">The score to populate the statistics of.</param>
         /// <param name="workingBeatmap">The corresponding <see cref="WorkingBeatmap"/>.</param>
-        internal static void PopulateMaximumStatistics(ScoreInfo score, WorkingBeatmap workingBeatmap)
+        public static void PopulateMaximumStatistics(ScoreInfo score, WorkingBeatmap workingBeatmap)
         {
             Debug.Assert(score.BeatmapInfo != null);
 

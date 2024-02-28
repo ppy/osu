@@ -77,12 +77,19 @@ namespace osu.Game.Configuration
 
             SetDefault(OsuSetting.SavePassword, false).ValueChanged += enabled =>
             {
-                if (enabled.NewValue) SetValue(OsuSetting.SaveUsername, true);
+                if (enabled.NewValue)
+                    SetValue(OsuSetting.SaveUsername, true);
+                else
+                    GetBindable<string>(OsuSetting.Token).SetDefault();
             };
 
             SetDefault(OsuSetting.SaveUsername, true).ValueChanged += enabled =>
             {
-                if (!enabled.NewValue) SetValue(OsuSetting.SavePassword, false);
+                if (!enabled.NewValue)
+                {
+                    GetBindable<string>(OsuSetting.Username).SetDefault();
+                    SetValue(OsuSetting.SavePassword, false);
+                }
             };
 
             SetDefault(OsuSetting.ExternalLinkWarning, true);

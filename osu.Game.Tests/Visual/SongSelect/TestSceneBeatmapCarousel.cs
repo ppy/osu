@@ -629,7 +629,8 @@ namespace osu.Game.Tests.Visual.SongSelect
         {
             var sets = new List<BeatmapSetInfo>();
 
-            const string zzz_string = "zzzzz";
+            const string zzz_lowercase = "zzzzz";
+            const string zzz_uppercase = "ZZZZZ";
 
             AddStep("Populuate beatmap sets", () =>
             {
@@ -640,10 +641,16 @@ namespace osu.Game.Tests.Visual.SongSelect
                     var set = TestResources.CreateTestBeatmapSetInfo();
 
                     if (i == 4)
-                        set.Beatmaps.ForEach(b => b.Metadata.Artist = zzz_string);
+                        set.Beatmaps.ForEach(b => b.Metadata.Artist = zzz_uppercase);
+
+                    if (i == 8)
+                        set.Beatmaps.ForEach(b => b.Metadata.Artist = zzz_lowercase);
+
+                    if (i == 12)
+                        set.Beatmaps.ForEach(b => b.Metadata.Author.Username = zzz_uppercase);
 
                     if (i == 16)
-                        set.Beatmaps.ForEach(b => b.Metadata.Author.Username = zzz_string);
+                        set.Beatmaps.ForEach(b => b.Metadata.Author.Username = zzz_lowercase);
 
                     sets.Add(set);
                 }
@@ -652,9 +659,11 @@ namespace osu.Game.Tests.Visual.SongSelect
             loadBeatmaps(sets);
 
             AddStep("Sort by author", () => carousel.Filter(new FilterCriteria { Sort = SortMode.Author }, false));
-            AddAssert($"Check {zzz_string} is at bottom", () => carousel.BeatmapSets.Last().Metadata.Author.Username == zzz_string);
+            AddAssert($"Check {zzz_uppercase} is last", () => carousel.BeatmapSets.Last().Metadata.Author.Username == zzz_uppercase);
+            AddAssert($"Check {zzz_lowercase} is second last", () => carousel.BeatmapSets.SkipLast(1).Last().Metadata.Author.Username == zzz_lowercase);
             AddStep("Sort by artist", () => carousel.Filter(new FilterCriteria { Sort = SortMode.Artist }, false));
-            AddAssert($"Check {zzz_string} is at bottom", () => carousel.BeatmapSets.Last().Metadata.Artist == zzz_string);
+            AddAssert($"Check {zzz_uppercase} is last", () => carousel.BeatmapSets.Last().Metadata.Artist == zzz_uppercase);
+            AddAssert($"Check {zzz_lowercase} is second last", () => carousel.BeatmapSets.SkipLast(1).Last().Metadata.Artist == zzz_lowercase);
         }
 
         /// <summary>

@@ -140,7 +140,7 @@ jobs:
       GOOGLE_CREDS_FILE: ${{ steps.set-outputs.outputs.GOOGLE_CREDS_FILE }}
     steps:
       - name: Checkout diffcalc-sheet-generator
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
         with:
           path: ${{ env.EXECUTION_ID }}
           repository: 'smoogipoo/diffcalc-sheet-generator'
