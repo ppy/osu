@@ -266,30 +266,49 @@ namespace osu.Game.Rulesets.Objects.Legacy
             // This code takes on the responsibility of handling explicit segments of the path ("X" & "Y" from above). Implicit segments are handled by calls to convertPoints().
             string[] pointSplit = pointString.Split('|');
 
-            var controlPoints = new List<Memory<PathControlPoint>>();
-            int startIndex = 0;
-            int endIndex = 0;
-            bool first = true;
+            Span<Vector2> points = stackalloc Vector2[pointSplit.Length];
+            Span<(PathType Type, int StartIndex)> segments = stackalloc (PathType Type, int StartIndex)[pointSplit.Length];
+            int pointsCount = 0;
+            int segmentsCount = 0;
 
-            while (++endIndex < pointSplit.Length)
+            foreach (string s in pointSplit)
             {
-                // Keep incrementing endIndex while it's not the start of a new segment (indicated by having an alpha character at position 0).
-                if (!char.IsLetter(pointSplit[endIndex][0]))
-                    continue;
-
-                // Multi-segmented sliders DON'T contain the end point as part of the current segment as it's assumed to be the start of the next segment.
-                // The start of the next segment is the index after the type descriptor.
-                string endPoint = endIndex < pointSplit.Length - 1 ? pointSplit[endIndex + 1] : null;
-
-                controlPoints.AddRange(convertPoints(pointSplit.AsMemory().Slice(startIndex, endIndex - startIndex), endPoint, first, offset));
-                startIndex = endIndex;
-                first = false;
+                if (char.IsLetter(s[0]))
+                {
+                    // The start of a new segment(indicated by having an alpha character at position 0).
+                    var pathType = convertPathType(s);
+                    segments[segmentsCount++] = (pathType, pointsCount);
+                }
+                else
+                {
+                    points[pointsCount++] = readPoint(s, offset);
+                }
             }
 
-            if (endIndex > startIndex)
-                controlPoints.AddRange(convertPoints(pointSplit.AsMemory().Slice(startIndex, endIndex - startIndex), null, first, offset));
+            var controlPoints = new List<PathControlPoint>(pointsCount);
 
-            return mergePointsLists(controlPoints);
+            for (int i = 0; i < segmentsCount; i++)
+            {
+                int startIndex = segments[i].StartIndex;
+                int endIndex = i < segmentsCount - 1 ? segments[i + 1].StartIndex : pointsCount;
+                Vector2? endPoint = i < segmentsCount - 1 ? points[endIndex] : null;
+                controlPoints.AddRange(convertPoints(segments[i].Type, points[startIndex..endIndex], endPoint));
+            }
+
+            return controlPoints.ToArray();
+
+            static Vector2 readPoint(string value, Vector2 startPos)
+            {
+                string[] vertexSplit = value.Split(':');
+
+                Vector2 pos = new Vector2((int)Parsing.ParseDouble(vertexSplit[0], Parsing.MAX_COORDINATE_VALUE), (int)Parsing.ParseDouble(vertexSplit[1], Parsing.MAX_COORDINATE_VALUE)) - startPos;
+                return pos;
+            }
+        }
+
+        private IEnumerable<PathControlPoint> convertPoints(PathType type, ReadOnlySpan<Vector2> points, Vector2? endPoint)
+        {
+            throw new NotImplementedException();
         }
 
         /// <summary>
