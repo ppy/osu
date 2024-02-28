@@ -8,7 +8,7 @@ using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Game.Beatmaps;
 using osu.Game.Extensions;
-using osu.Game.Online.Solo;
+using osu.Game.Online;
 using osu.Game.Scoring;
 using osu.Game.Screens.Ranking.Statistics.User;
 

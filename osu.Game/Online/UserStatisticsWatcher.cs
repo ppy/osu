@@ -15,7 +15,7 @@ using osu.Game.Online.Spectator;
 using osu.Game.Scoring;
 using osu.Game.Users;
 
-namespace osu.Game.Online.Solo
+namespace osu.Game.Online
 {
     /// <summary>
     /// A persistent component that binds to the spectator server and API in order to deliver updates about the logged in user's gameplay statistics.

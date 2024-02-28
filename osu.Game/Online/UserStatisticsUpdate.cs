@@ -4,7 +4,7 @@
 using osu.Game.Scoring;
 using osu.Game.Users;
 
-namespace osu.Game.Online.Solo
+namespace osu.Game.Online
 {
     /// <summary>
     /// Contains data about the change in a user's profile statistics after completing a score.
