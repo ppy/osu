@@ -10,6 +10,7 @@ using osu.Framework.Screens;
 using osu.Framework.Testing;
 using osu.Game.Beatmaps;
 using osu.Game.Database;
+using osu.Game.Localisation;
 using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Online.Spectator;
 using osu.Game.Rulesets.Osu;
@@ -23,7 +24,6 @@ using osu.Game.Tests.Gameplay;
 using osu.Game.Tests.Visual.Multiplayer;
 using osu.Game.Tests.Visual.Spectator;
 using osuTK;
-using osuTK.Input;
 
 namespace osu.Game.Tests.Visual.Gameplay
 {
@@ -214,7 +214,9 @@ namespace osu.Game.Tests.Visual.Gameplay
             checkPaused(true); // And eventually stop after running out of frames and fail.
             // Todo: Should check for + display a failed message.
 
-            AddStep("exit player", () => InputManager.Key(Key.Escape));
+            AddAssert("fail overlay present", () => player.ChildrenOfType<FailOverlay>().Single().IsPresent);
+            AddAssert("overlay can only quit", () => player.ChildrenOfType<FailOverlay>().Single().Buttons.Single().Text == GameplayMenuOverlayStrings.Quit);
+            AddStep("press quit button", () => player.ChildrenOfType<FailOverlay>().Single().Buttons.Single().TriggerClick());
             AddAssert("player exited", () => Stack.CurrentScreen is SoloSpectatorScreen);
         }
 
