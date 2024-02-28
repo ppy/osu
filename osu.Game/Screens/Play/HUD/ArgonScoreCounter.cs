@@ -58,8 +58,10 @@ namespace osu.Game.Screens.Play.HUD
 
         private void updateWireframe()
         {
-            scoreText.RequiredDisplayDigits.Value =
-                Math.Max(RequiredDisplayDigits.Value, getDigitsRequiredForDisplayCount());
+            int digitsRequiredForDisplayCount = Math.Max(RequiredDisplayDigits.Value, getDigitsRequiredForDisplayCount());
+
+            if (digitsRequiredForDisplayCount != scoreText.WireframeTemplate.Length)
+                scoreText.WireframeTemplate = new string('#', Math.Max(RequiredDisplayDigits.Value, digitsRequiredForDisplayCount));
         }
 
         private int getDigitsRequiredForDisplayCount()
