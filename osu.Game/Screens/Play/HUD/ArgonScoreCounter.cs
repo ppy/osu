@@ -61,7 +61,7 @@ namespace osu.Game.Screens.Play.HUD
             int digitsRequiredForDisplayCount = Math.Max(RequiredDisplayDigits.Value, getDigitsRequiredForDisplayCount());
 
             if (digitsRequiredForDisplayCount != scoreText.WireframeTemplate.Length)
-                scoreText.WireframeTemplate = new string('#', Math.Max(RequiredDisplayDigits.Value, digitsRequiredForDisplayCount));
+                scoreText.WireframeTemplate = new string('#', digitsRequiredForDisplayCount);
         }
 
         private int getDigitsRequiredForDisplayCount()
