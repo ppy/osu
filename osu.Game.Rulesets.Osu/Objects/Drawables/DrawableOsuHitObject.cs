@@ -85,7 +85,12 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
                 // as they may be cleared via the `updateState()` DHO flow,
                 // so use `ApplyCustomUpdateState` instead. which does not have this pitfall.
                 if (piece is DrawableHitObject drawableObjectPiece)
-                    drawableObjectPiece.ApplyCustomUpdateState += (dho, _) => applyDim(dho);
+                {
+                    // this method can be called multiple times, and we don't want to subscribe to the event more than once,
+                    // so this is what it is going to have to be...
+                    drawableObjectPiece.ApplyCustomUpdateState -= applyDimToDrawableHitObject;
+                    drawableObjectPiece.ApplyCustomUpdateState += applyDimToDrawableHitObject;
+                }
                 else
                     applyDim(piece);
             }
@@ -96,6 +101,8 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
                 using (piece.BeginDelayedSequence(InitialLifetimeOffset - OsuHitWindows.MISS_WINDOW))
                     piece.FadeColour(Color4.White, 100);
             }
+
+            void applyDimToDrawableHitObject(DrawableHitObject dho, ArmedState _) => applyDim(dho);
         }
 
         protected sealed override double InitialLifetimeOffset => HitObject.TimePreempt;
