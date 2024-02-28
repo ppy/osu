@@ -127,7 +127,7 @@ namespace osu.Game.Graphics.Containers
         }
 
         protected virtual void ScrollFromMouseEvent(MouseEvent e) =>
-            ScrollTo(Clamp(ToLocalSpace(e.ScreenSpaceMousePosition)[ScrollDim] / DrawSize[ScrollDim]) * Content.DrawSize[ScrollDim], true, DistanceDecayOnRightMouseScrollbar);
+            ScrollTo(Clamp(ToLocalSpace(e.ScreenSpaceMousePosition)[ScrollDim] / DrawSize[ScrollDim] * Content.DrawSize[ScrollDim]), true, DistanceDecayOnRightMouseScrollbar);
 
         protected override ScrollbarContainer CreateScrollbar(Direction direction) => new OsuScrollbar(direction);
 
