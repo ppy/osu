@@ -36,7 +36,6 @@ namespace osu.Game.Rulesets.Osu.UI
         private readonly JudgementPooler<DrawableOsuJudgement> judgementPooler;
 
         public SmokeContainer Smoke { get; }
-
         public FollowPointRenderer FollowPoints { get; }
 
         public static readonly Vector2 BASE_SIZE = new Vector2(512, 384);

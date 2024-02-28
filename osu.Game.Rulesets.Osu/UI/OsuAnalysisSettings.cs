@@ -16,12 +16,13 @@ namespace osu.Game.Rulesets.Osu.UI
 
         private readonly PlayerCheckbox hitMarkerToggle;
         private readonly PlayerCheckbox aimMarkerToggle;
-        private readonly PlayerCheckbox hideCursorToggle;
         private readonly PlayerCheckbox aimLinesToggle;
 
         public OsuAnalysisSettings(DrawableRuleset drawableRuleset)
             : base(drawableRuleset)
         {
+            PlayerCheckbox hideCursorToggle;
+
             Children = new Drawable[]
             {
                 hitMarkerToggle = new PlayerCheckbox { LabelText = PlayerSettingsOverlayStrings.HitMarkers },
