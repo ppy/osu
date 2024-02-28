@@ -19,6 +19,7 @@ using osu.Game.Graphics.Sprites;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Rulesets;
 using osu.Game.Rulesets.Mods;
+using osu.Game.Utils;
 using osuTK;
 
 namespace osu.Game.Overlays.Mods
@@ -168,7 +169,7 @@ namespace osu.Game.Overlays.Mods
             foreach (var mod in mods.Value.OfType<IApplicableToRate>())
                 rate = mod.ApplyToRate(0, rate);
 
-            bpmDisplay.Current.Value = BeatmapInfo.Value.BPM * rate;
+            bpmDisplay.Current.Value = FormatUtils.RoundBPM(BeatmapInfo.Value.BPM, rate);
 
             BeatmapDifficulty originalDifficulty = new BeatmapDifficulty(BeatmapInfo.Value.Difficulty);
 
@@ -194,11 +195,11 @@ namespace osu.Game.Overlays.Mods
             RightContent.FadeTo(Collapsed.Value && !IsHovered ? 0 : 1, transition_duration, Easing.OutQuint);
         }
 
-        private partial class BPMDisplay : RollingCounter<double>
+        private partial class BPMDisplay : RollingCounter<int>
         {
             protected override double RollingDuration => 250;
 
-            protected override LocalisableString FormatCount(double count) => count.ToLocalisableString("0 BPM");
+            protected override LocalisableString FormatCount(int count) => count.ToLocalisableString("0 BPM");
 
             protected override OsuSpriteText CreateSpriteText() => new OsuSpriteText
             {

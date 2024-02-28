@@ -4,7 +4,6 @@
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
-using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Extensions;
@@ -124,12 +123,34 @@ namespace osu.Game.Rulesets.Edit
 
         private (HitObject before, HitObject after)? getObjectsOnEitherSideOfCurrentTime()
         {
-            HitObject? lastBefore = playfield.HitObjectContainer.AliveObjects.LastOrDefault(h => h.HitObject.StartTime < editorClock.CurrentTime)?.HitObject;
+            HitObject? lastBefore = null;
+
+            foreach (var entry in playfield.HitObjectContainer.AliveEntries)
+            {
+                double objTime = entry.Value.HitObject.StartTime;
+
+                if (objTime >= editorClock.CurrentTime)
+                    continue;
+
+                if (lastBefore == null || objTime > lastBefore.StartTime)
+                    lastBefore = entry.Value.HitObject;
+            }
 
             if (lastBefore == null)
                 return null;
 
-            HitObject? firstAfter = playfield.HitObjectContainer.AliveObjects.FirstOrDefault(h => h.HitObject.StartTime >= editorClock.CurrentTime)?.HitObject;
+            HitObject? firstAfter = null;
+
+            foreach (var entry in playfield.HitObjectContainer.AliveEntries)
+            {
+                double objTime = entry.Value.HitObject.StartTime;
+
+                if (objTime < editorClock.CurrentTime)
+                    continue;
+
+                if (firstAfter == null || objTime < firstAfter.StartTime)
+                    firstAfter = entry.Value.HitObject;
+            }
 
             if (firstAfter == null)
                 return null;

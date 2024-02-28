@@ -10,11 +10,11 @@ using osu.Game.Overlays;
 
 namespace osu.Game.Graphics.Containers.Markdown
 {
-    public partial class OsuMarkdownFencedCodeBlock : MarkdownFencedCodeBlock
+    public partial class OsuMarkdownCodeBlock : MarkdownCodeBlock
     {
         // TODO : change to monospace font for this component
-        public OsuMarkdownFencedCodeBlock(FencedCodeBlock fencedCodeBlock)
-            : base(fencedCodeBlock)
+        public OsuMarkdownCodeBlock(CodeBlock codeBlock)
+            : base(codeBlock)
         {
         }
 

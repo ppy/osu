@@ -64,6 +64,10 @@ namespace osu.Game.Screens.Menu
         private Sample? sampleHover;
         private SampleChannel? sampleChannel;
 
+        public override bool IsPresent => base.IsPresent
+                                          // Allow keyboard interaction based on state rather than waiting for delayed animations.
+                                          || state == ButtonState.Expanded;
+
         public override bool ReceivePositionalInputAt(Vector2 screenSpacePos) => box.ReceivePositionalInputAt(screenSpacePos);
 
         public MainMenuButton(LocalisableString text, string sampleName, IconUsage symbol, Color4 colour, Action? clickAction = null, float extraWidth = 0, params Key[] triggerKeys)
