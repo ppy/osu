@@ -11,7 +11,7 @@ using osu.Framework.Graphics.Sprites;
 using osu.Framework.Localisation;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
-using osu.Game.Online.Solo;
+using osu.Game.Online;
 using osu.Game.Users;
 using osuTK;
 

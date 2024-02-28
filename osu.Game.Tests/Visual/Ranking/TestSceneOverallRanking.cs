@@ -3,7 +3,7 @@
 
 using NUnit.Framework;
 using osu.Framework.Graphics;
-using osu.Game.Online.Solo;
+using osu.Game.Online;
 using osu.Game.Scoring;
 using osu.Game.Screens.Ranking.Statistics.User;
 using osu.Game.Users;
