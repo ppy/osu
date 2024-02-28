@@ -104,6 +104,8 @@ namespace osu.Game.Overlays.Mods
 
         protected virtual IReadOnlyList<Mod> ComputeNewModsFromSelection(IReadOnlyList<Mod> oldSelection, IReadOnlyList<Mod> newSelection) => newSelection;
 
+        protected virtual IReadOnlyList<Mod> ComputeActiveMods() => SelectedMods.Value;
+
         protected virtual IEnumerable<ShearedButton> CreateFooterButtons()
         {
             if (AllowCustomisation)
@@ -321,13 +323,12 @@ namespace osu.Game.Overlays.Mods
             if (AllowCustomisation)
                 ((IBindable<IReadOnlyList<Mod>>)modSettingsArea.SelectedMods).BindTo(SelectedMods);
 
-            SelectedMods.BindValueChanged(mods =>
+            SelectedMods.BindValueChanged(_ =>
             {
-                var newMods = ActiveMods.Value.Except(mods.OldValue).Concat(mods.NewValue).ToList();
-                ActiveMods.Value = newMods;
-
                 updateFromExternalSelection();
                 updateCustomisation();
+
+                ActiveMods.Value = ComputeActiveMods();
             }, true);
 
             ActiveMods.BindValueChanged(_ =>
