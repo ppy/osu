@@ -6,7 +6,6 @@ using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Game.Rulesets.Osu.Objects;
 using osu.Game.Skinning;
-using osu.Game.Rulesets.Osu.Skinning.Default;
 using osuTK;
 
 namespace osu.Game.Rulesets.Osu.Skinning.Legacy
@@ -169,23 +168,8 @@ namespace osu.Game.Rulesets.Osu.Skinning.Legacy
 
                         return null;
 
-                    case OsuSkinComponents.HitMarkerLeft:
-                        if (GetTexture(@"hitmarker-left") != null)
-                            return new HitMarker(OsuAction.LeftButton);
-
-                        return null;
-
-                    case OsuSkinComponents.HitMarkerRight:
-                        if (GetTexture(@"hitmarker-right") != null)
-                            return new HitMarker(OsuAction.RightButton);
-
-                        return null;
-
-                    case OsuSkinComponents.AimMarker:
-                        if (GetTexture(@"aimmarker") != null)
-                            return new HitMarker();
-
-                        return null;
+                    default:
+                        throw new UnsupportedSkinComponentException(lookup);
                 }
             }
 

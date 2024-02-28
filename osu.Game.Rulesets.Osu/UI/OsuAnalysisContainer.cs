@@ -14,7 +14,6 @@ using osu.Game.Rulesets.Objects.Pooling;
 using osu.Game.Rulesets.Osu.Replays;
 using osu.Game.Rulesets.Osu.Skinning.Default;
 using osu.Game.Rulesets.UI;
-using osu.Game.Skinning;
 using osuTK;
 using osuTK.Graphics;
 
@@ -26,40 +25,41 @@ namespace osu.Game.Rulesets.Osu.UI
         public Bindable<bool> AimMarkersEnabled = new BindableBool();
         public Bindable<bool> AimLinesEnabled = new BindableBool();
 
-        private HitMarkersContainer hitMarkersContainer;
-        private AimMarkersContainer aimMarkersContainer;
-        private AimLinesContainer aimLinesContainer;
+        protected HitMarkersContainer HitMarkers;
+        protected AimMarkersContainer AimMarkers;
+        protected AimLinesContainer AimLines;
 
         public OsuAnalysisContainer(Replay replay)
             : base(replay)
         {
             InternalChildren = new Drawable[]
             {
-                hitMarkersContainer = new HitMarkersContainer(),
-                aimMarkersContainer = new AimMarkersContainer() { Depth = float.MinValue },
-                aimLinesContainer = new AimLinesContainer() { Depth = float.MaxValue }
+                HitMarkers = new HitMarkersContainer(),
+                AimMarkers = new AimMarkersContainer { Depth = float.MinValue },
+                AimLines = new AimLinesContainer { Depth = float.MaxValue }
             };
 
-            HitMarkerEnabled.ValueChanged += e => hitMarkersContainer.FadeTo(e.NewValue ? 1 : 0);
-            AimMarkersEnabled.ValueChanged += e => aimMarkersContainer.FadeTo(e.NewValue ? 1 : 0);
-            AimLinesEnabled.ValueChanged += e => aimLinesContainer.FadeTo(e.NewValue ? 1 : 0);
+            HitMarkerEnabled.ValueChanged += e => HitMarkers.FadeTo(e.NewValue ? 1 : 0);
+            AimMarkersEnabled.ValueChanged += e => AimMarkers.FadeTo(e.NewValue ? 1 : 0);
+            AimLinesEnabled.ValueChanged += e => AimLines.FadeTo(e.NewValue ? 1 : 0);
         }
 
         [BackgroundDependencyLoader]
         private void load()
         {
-            hitMarkersContainer.Hide();
-            aimMarkersContainer.Hide();
-            aimLinesContainer.Hide();
+            HitMarkers.Hide();
+            AimMarkers.Hide();
+            AimLines.Hide();
 
             bool leftHeld = false;
             bool rightHeld = false;
+
             foreach (var frame in Replay.Frames)
             {
                 var osuFrame = (OsuReplayFrame)frame;
 
-                aimMarkersContainer.Add(new AimPointEntry(osuFrame.Time, osuFrame.Position));
-                aimLinesContainer.Add(new AimPointEntry(osuFrame.Time, osuFrame.Position));
+                AimMarkers.Add(new AimPointEntry(osuFrame.Time, osuFrame.Position));
+                AimLines.Add(new AimPointEntry(osuFrame.Time, osuFrame.Position));
 
                 bool leftButton = osuFrame.Actions.Contains(OsuAction.LeftButton);
                 bool rightButton = osuFrame.Actions.Contains(OsuAction.RightButton);
@@ -68,7 +68,7 @@ namespace osu.Game.Rulesets.Osu.UI
                     leftHeld = false;
                 else if (!leftHeld && leftButton)
                 {
-                    hitMarkersContainer.Add(new HitMarkerEntry(osuFrame.Time, osuFrame.Position, true));
+                    HitMarkers.Add(new HitMarkerEntry(osuFrame.Time, osuFrame.Position, true));
                     leftHeld = true;
                 }
 
@@ -76,42 +76,42 @@ namespace osu.Game.Rulesets.Osu.UI
                     rightHeld = false;
                 else if (!rightHeld && rightButton)
                 {
-                    hitMarkersContainer.Add(new HitMarkerEntry(osuFrame.Time, osuFrame.Position, false));
+                    HitMarkers.Add(new HitMarkerEntry(osuFrame.Time, osuFrame.Position, false));
                     rightHeld = true;
                 }
             }
         }
 
-        private partial class HitMarkersContainer : PooledDrawableWithLifetimeContainer<HitMarkerEntry, HitMarkerDrawable>
+        protected partial class HitMarkersContainer : PooledDrawableWithLifetimeContainer<HitMarkerEntry, HitMarkerDrawable>
         {
             private readonly HitMarkerPool leftPool;
             private readonly HitMarkerPool rightPool;
 
             public HitMarkersContainer()
             {
-                AddInternal(leftPool = new HitMarkerPool(OsuSkinComponents.HitMarkerLeft, OsuAction.LeftButton, 15));
-                AddInternal(rightPool = new HitMarkerPool(OsuSkinComponents.HitMarkerRight, OsuAction.RightButton, 15));
+                AddInternal(leftPool = new HitMarkerPool(OsuAction.LeftButton, 15));
+                AddInternal(rightPool = new HitMarkerPool(OsuAction.RightButton, 15));
             }
 
             protected override HitMarkerDrawable GetDrawable(HitMarkerEntry entry) => (entry.IsLeftMarker ? leftPool : rightPool).Get(d => d.Apply(entry));
         }
 
-        private partial class AimMarkersContainer : PooledDrawableWithLifetimeContainer<AimPointEntry, HitMarkerDrawable>
+        protected partial class AimMarkersContainer : PooledDrawableWithLifetimeContainer<AimPointEntry, HitMarkerDrawable>
         {
             private readonly HitMarkerPool pool;
 
             public AimMarkersContainer()
             {
-                AddInternal(pool = new HitMarkerPool(OsuSkinComponents.AimMarker, null, 80));
+                AddInternal(pool = new HitMarkerPool(null, 80));
             }
 
             protected override HitMarkerDrawable GetDrawable(AimPointEntry entry) => pool.Get(d => d.Apply(entry));
         }
 
-        private partial class AimLinesContainer : Path
+        protected partial class AimLinesContainer : Path
         {
-            private LifetimeEntryManager lifetimeManager = new LifetimeEntryManager();
-            private SortedSet<AimPointEntry> aliveEntries = new SortedSet<AimPointEntry>(new AimLinePointComparator());
+            private readonly LifetimeEntryManager lifetimeManager = new LifetimeEntryManager();
+            private readonly SortedSet<AimPointEntry> aliveEntries = new SortedSet<AimPointEntry>(new AimLinePointComparator());
 
             public AimLinesContainer()
             {
@@ -146,6 +146,7 @@ namespace osu.Game.Rulesets.Osu.UI
             private void updateVertices()
             {
                 ClearVertices();
+
                 foreach (var entry in aliveEntries)
                 {
                     AddVertex(entry.Position);
@@ -164,7 +165,7 @@ namespace osu.Game.Rulesets.Osu.UI
             }
         }
 
-        private partial class HitMarkerDrawable : PoolableDrawableWithLifetime<AimPointEntry>
+        protected partial class HitMarkerDrawable : PoolableDrawableWithLifetime<AimPointEntry>
         {
             /// <summary>
             /// This constructor only exists to meet the <c>new()</c> type constraint of <see cref="DrawablePool{T}"/>.
@@ -173,10 +174,10 @@ namespace osu.Game.Rulesets.Osu.UI
             {
             }
 
-            public HitMarkerDrawable(OsuSkinComponents component, OsuAction? action)
+            public HitMarkerDrawable(OsuAction? action)
             {
                 Origin = Anchor.Centre;
-                InternalChild = new SkinnableDrawable(new OsuSkinComponentLookup(component), _ => new DefaultHitMarker(action));
+                InternalChild = new HitMarker(action);
             }
 
             protected override void OnApply(AimPointEntry entry)
@@ -191,22 +192,20 @@ namespace osu.Game.Rulesets.Osu.UI
             }
         }
 
-        private partial class HitMarkerPool : DrawablePool<HitMarkerDrawable>
+        protected partial class HitMarkerPool : DrawablePool<HitMarkerDrawable>
         {
-            private readonly OsuSkinComponents component;
             private readonly OsuAction? action;
 
-            public HitMarkerPool(OsuSkinComponents component, OsuAction? action, int initialSize)
+            public HitMarkerPool(OsuAction? action, int initialSize)
                 : base(initialSize)
             {
-                this.component = component;
                 this.action = action;
             }
 
-            protected override HitMarkerDrawable CreateNewDrawable() => new HitMarkerDrawable(component, action);
+            protected override HitMarkerDrawable CreateNewDrawable() => new HitMarkerDrawable(action);
         }
 
-        private partial class AimPointEntry : LifetimeEntry
+        protected partial class AimPointEntry : LifetimeEntry
         {
             public Vector2 Position { get; }
 
@@ -218,7 +217,7 @@ namespace osu.Game.Rulesets.Osu.UI
             }
         }
 
-        private partial class HitMarkerEntry : AimPointEntry
+        protected partial class HitMarkerEntry : AimPointEntry
         {
             public bool IsLeftMarker { get; }
 
