@@ -27,7 +27,7 @@ namespace osu.Game.Overlays.Toolbar
         private Statistic<decimal> pp = null!;
 
         [BackgroundDependencyLoader]
-        private void load(UserStatisticsWatcher? soloStatisticsWatcher)
+        private void load(UserStatisticsWatcher? userStatisticsWatcher)
         {
             RelativeSizeAxes = Axes.Y;
             AutoSizeAxes = Axes.X;
@@ -47,8 +47,8 @@ namespace osu.Game.Overlays.Toolbar
                 }
             };
 
-            if (soloStatisticsWatcher != null)
-                ((IBindable<UserStatisticsUpdate?>)LatestUpdate).BindTo(soloStatisticsWatcher.LatestUpdate);
+            if (userStatisticsWatcher != null)
+                ((IBindable<UserStatisticsUpdate?>)LatestUpdate).BindTo(userStatisticsWatcher.LatestUpdate);
         }
 
         protected override void LoadComplete()

@@ -21,7 +21,7 @@ using osu.Game.Users;
 namespace osu.Game.Tests.Visual.Online
 {
     [HeadlessTest]
-    public partial class TestSceneSoloStatisticsWatcher : OsuTestScene
+    public partial class TestSceneUserStatisticsWatcher : OsuTestScene
     {
         protected override bool UseOnlineAPI => false;
 
