@@ -1,6 +1,7 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System;
 using NUnit.Framework;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
@@ -8,6 +9,7 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Timing;
+using osu.Framework.Utils;
 using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.Formats;
 using osu.Game.IO;
@@ -40,6 +42,18 @@ namespace osu.Game.Tests.Visual.Gameplay
         public void TestStoryboardMissingVideo()
         {
             AddStep("Load storyboard with missing video", () => loadStoryboard("storyboard_no_video.osu"));
+        }
+
+        [Test]
+        public void TestVideoSize()
+        {
+            AddStep("load storyboard with only video", () =>
+            {
+                // LegacyStoryboardDecoder doesn't parse WidescreenStoryboard, so it is set manually
+                loadStoryboard("storyboard_only_video.osu", s => s.BeatmapInfo.WidescreenStoryboard = false);
+            });
+
+            AddAssert("storyboard is correct width", () => Precision.AlmostEquals(storyboard?.Width ?? 0f, 480 * 16 / 9f));
         }
 
         [BackgroundDependencyLoader]
@@ -92,17 +106,15 @@ namespace osu.Game.Tests.Visual.Gameplay
             if (storyboard != null)
                 storyboardContainer.Remove(storyboard, true);
 
-            var decoupledClock = new DecoupleableInterpolatingFramedClock { IsCoupled = true };
-            storyboardContainer.Clock = decoupledClock;
+            storyboardContainer.Clock = new FramedClock(Beatmap.Value.Track);
 
             storyboard = toLoad.CreateDrawable(SelectedMods.Value);
             storyboard.Passing = false;
 
             storyboardContainer.Add(storyboard);
-            decoupledClock.ChangeSource(Beatmap.Value.Track);
         }
 
-        private void loadStoryboard(string filename)
+        private void loadStoryboard(string filename, Action<Storyboard>? setUpStoryboard = null)
         {
             Storyboard loaded;
 
@@ -112,6 +124,8 @@ namespace osu.Game.Tests.Visual.Gameplay
                 var decoder = new LegacyStoryboardDecoder();
                 loaded = decoder.Decode(bfr);
             }
+
+            setUpStoryboard?.Invoke(loaded);
 
             loadStoryboard(loaded);
         }

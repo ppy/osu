@@ -4,6 +4,7 @@
 using osu.Framework.Graphics;
 using osu.Framework.Input;
 using osu.Framework.Input.Events;
+using osu.Framework.Utils;
 using osu.Game.Rulesets.Catch.Edit.Blueprints.Components;
 using osu.Game.Rulesets.Catch.Objects;
 using osu.Game.Rulesets.Edit;
@@ -23,6 +24,8 @@ namespace osu.Game.Rulesets.Catch.Edit.Blueprints
         private int lastEditablePathId = -1;
 
         private InputManager inputManager = null!;
+
+        protected override bool IsValidForPlacement => Precision.DefinitelyBigger(HitObject.Duration, 0);
 
         public JuiceStreamPlacementBlueprint()
         {
@@ -70,7 +73,7 @@ namespace osu.Game.Rulesets.Catch.Edit.Blueprints
                             return true;
 
                         case MouseButton.Right:
-                            EndPlacement(HitObject.Duration > 0);
+                            EndPlacement(true);
                             return true;
                     }
 

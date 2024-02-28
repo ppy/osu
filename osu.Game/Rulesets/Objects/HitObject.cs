@@ -16,7 +16,6 @@ using osu.Framework.Lists;
 using osu.Game.Audio;
 using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.ControlPoints;
-using osu.Game.Beatmaps.Legacy;
 using osu.Game.Rulesets.Judgements;
 using osu.Game.Rulesets.Objects.Types;
 using osu.Game.Rulesets.Scoring;
@@ -39,6 +38,8 @@ namespace osu.Game.Rulesets.Objects
         /// <summary>
         /// Invoked after <see cref="ApplyDefaults"/> has completed on this <see cref="HitObject"/>.
         /// </summary>
+        // TODO: This has no implicit unbind flow. Currently, if a Playfield manages HitObjects it will leave a bound event on this and cause the
+        // playfield to remain in memory.
         public event Action<HitObject> DefaultsApplied;
 
         public readonly Bindable<double> StartTimeBindable = new BindableDouble();
@@ -77,9 +78,6 @@ namespace osu.Game.Rulesets.Objects
         /// </summary>
         public virtual IList<HitSampleInfo> AuxiliarySamples => ImmutableList<HitSampleInfo>.Empty;
 
-        public SampleControlPoint SampleControlPoint = SampleControlPoint.DEFAULT;
-        public DifficultyControlPoint DifficultyControlPoint = DifficultyControlPoint.DEFAULT;
-
         /// <summary>
         /// Whether this <see cref="HitObject"/> is in Kiai time.
         /// </summary>
@@ -105,24 +103,7 @@ namespace osu.Game.Rulesets.Objects
         /// <param name="cancellationToken">The cancellation token.</param>
         public void ApplyDefaults(ControlPointInfo controlPointInfo, IBeatmapDifficultyInfo difficulty, CancellationToken cancellationToken = default)
         {
-            var legacyInfo = controlPointInfo as LegacyControlPointInfo;
-
-            if (legacyInfo != null)
-                DifficultyControlPoint = (DifficultyControlPoint)legacyInfo.DifficultyPointAt(StartTime).DeepClone();
-            else if (ReferenceEquals(DifficultyControlPoint, DifficultyControlPoint.DEFAULT))
-                DifficultyControlPoint = new DifficultyControlPoint();
-
-            DifficultyControlPoint.Time = StartTime;
-
             ApplyDefaultsToSelf(controlPointInfo, difficulty);
-
-            // This is done here after ApplyDefaultsToSelf as we may require custom defaults to be applied to have an accurate end time.
-            if (legacyInfo != null)
-                SampleControlPoint = (SampleControlPoint)legacyInfo.SamplePointAt(this.GetEndTime() + control_point_leniency).DeepClone();
-            else if (ReferenceEquals(SampleControlPoint, SampleControlPoint.DEFAULT))
-                SampleControlPoint = new SampleControlPoint();
-
-            SampleControlPoint.Time = this.GetEndTime() + control_point_leniency;
 
             nestedHitObjects.Clear();
 
@@ -164,9 +145,6 @@ namespace osu.Game.Rulesets.Objects
 
                 foreach (var nested in nestedHitObjects)
                     nested.StartTime += offset;
-
-                DifficultyControlPoint.Time = time.NewValue;
-                SampleControlPoint.Time = this.GetEndTime() + control_point_leniency;
             }
         }
 
@@ -185,8 +163,19 @@ namespace osu.Game.Rulesets.Objects
         protected void AddNested(HitObject hitObject) => nestedHitObjects.Add(hitObject);
 
         /// <summary>
-        /// Creates the <see cref="Judgement"/> that represents the scoring information for this <see cref="HitObject"/>.
+        /// The <see cref="Judgement"/> that represents the scoring information for this <see cref="HitObject"/>.
         /// </summary>
+        [JsonIgnore]
+        public Judgement Judgement => judgement ??= CreateJudgement();
+
+        private Judgement judgement;
+
+        /// <summary>
+        /// Should be overridden to create a <see cref="Judgement"/> that represents the scoring information for this <see cref="HitObject"/>.
+        /// </summary>
+        /// <remarks>
+        /// For read access, use <see cref="Judgement"/> to avoid unnecessary allocations.
+        /// </remarks>
         [NotNull]
         public virtual Judgement CreateJudgement() => new Judgement();
 
@@ -221,6 +210,23 @@ namespace osu.Game.Rulesets.Objects
                 slidingSamples.Add(whistleSample.With("sliderwhistle"));
 
             return slidingSamples;
+        }
+
+        /// <summary>
+        /// Create a <see cref="HitSampleInfo"/> based on the sample settings of the first <see cref="HitSampleInfo.HIT_NORMAL"/> sample in <see cref="Samples"/>.
+        /// If no sample is available, sane default settings will be used instead.
+        /// </summary>
+        /// <remarks>
+        /// In the case an existing sample exists, all settings apart from the sample name will be inherited. This includes volume, bank and suffix.
+        /// </remarks>
+        /// <param name="sampleName">The name of the sample.</param>
+        /// <returns>A populated <see cref="HitSampleInfo"/>.</returns>
+        public HitSampleInfo CreateHitSampleInfo(string sampleName = HitSampleInfo.HIT_NORMAL)
+        {
+            if (Samples.FirstOrDefault(s => s.Name == HitSampleInfo.HIT_NORMAL) is HitSampleInfo existingSample)
+                return existingSample.With(newName: sampleName);
+
+            return new HitSampleInfo(sampleName);
         }
     }
 

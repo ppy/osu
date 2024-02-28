@@ -2,12 +2,16 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
+using System.Text;
 using NUnit.Framework;
 using osu.Framework.Allocation;
+using osu.Framework.Extensions.IEnumerableExtensions;
 using osu.Framework.Extensions.ObjectExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.UserInterface;
+using osu.Framework.Input;
 using osu.Framework.Testing;
 using osu.Game.Overlays;
 using osu.Game.Overlays.Settings;
@@ -93,7 +97,7 @@ namespace osu.Game.Tests.Visual.Gameplay
 
             AddStep("Begin drag top left", () =>
             {
-                InputManager.MoveMouseTo(box1.ScreenSpaceDrawQuad.TopLeft - new Vector2(box1.ScreenSpaceDrawQuad.Width / 4));
+                InputManager.MoveMouseTo(box1.ScreenSpaceDrawQuad.TopLeft - new Vector2(box1.ScreenSpaceDrawQuad.Width / 4, box1.ScreenSpaceDrawQuad.Height / 8));
                 InputManager.PressButton(MouseButton.Left);
             });
 
@@ -135,24 +139,27 @@ namespace osu.Game.Tests.Visual.Gameplay
         [Test]
         public void TestCyclicSelection()
         {
-            SkinBlueprint[] blueprints = null!;
+            List<SkinBlueprint> blueprints = new List<SkinBlueprint>();
 
-            AddStep("Add big black boxes", () =>
+            AddStep("clear list", () => blueprints.Clear());
+
+            for (int i = 0; i < 3; i++)
             {
-                InputManager.MoveMouseTo(skinEditor.ChildrenOfType<BigBlackBox>().First());
-                InputManager.Click(MouseButton.Left);
-                InputManager.Click(MouseButton.Left);
-                InputManager.Click(MouseButton.Left);
-            });
+                AddStep("Add big black box", () =>
+                {
+                    skinEditor.ChildrenOfType<SkinComponentToolbox.ToolboxComponentButton>().First(b => b.ChildrenOfType<BigBlackBox>().FirstOrDefault() != null).TriggerClick();
+                });
+
+                AddStep("store box", () =>
+                {
+                    // Add blueprints one-by-one so we have a stable order for testing reverse cyclic selection against.
+                    blueprints.Add(skinEditor.ChildrenOfType<SkinBlueprint>().Single(s => s.IsSelected));
+                });
+            }
 
             AddAssert("Three black boxes added", () => targetContainer.Components.OfType<BigBlackBox>().Count(), () => Is.EqualTo(3));
 
-            AddStep("Store black box blueprints", () =>
-            {
-                blueprints = skinEditor.ChildrenOfType<SkinBlueprint>().Where(b => b.Item is BigBlackBox).ToArray();
-            });
-
-            AddAssert("Selection is black box 1", () => skinEditor.SelectedComponents.Single(), () => Is.EqualTo(blueprints[0].Item));
+            AddAssert("Selection is last", () => skinEditor.SelectedComponents.Single(), () => Is.EqualTo(blueprints[2].Item));
 
             AddStep("move cursor to black box", () =>
             {
@@ -161,13 +168,13 @@ namespace osu.Game.Tests.Visual.Gameplay
             });
 
             AddStep("click on black box stack", () => InputManager.Click(MouseButton.Left));
-            AddAssert("Selection is black box 2", () => skinEditor.SelectedComponents.Single(), () => Is.EqualTo(blueprints[1].Item));
+            AddAssert("Selection is second last", () => skinEditor.SelectedComponents.Single(), () => Is.EqualTo(blueprints[1].Item));
 
             AddStep("click on black box stack", () => InputManager.Click(MouseButton.Left));
-            AddAssert("Selection is black box 3", () => skinEditor.SelectedComponents.Single(), () => Is.EqualTo(blueprints[2].Item));
+            AddAssert("Selection is last", () => skinEditor.SelectedComponents.Single(), () => Is.EqualTo(blueprints[0].Item));
 
             AddStep("click on black box stack", () => InputManager.Click(MouseButton.Left));
-            AddAssert("Selection is black box 1", () => skinEditor.SelectedComponents.Single(), () => Is.EqualTo(blueprints[0].Item));
+            AddAssert("Selection is first", () => skinEditor.SelectedComponents.Single(), () => Is.EqualTo(blueprints[2].Item));
 
             AddStep("select all boxes", () =>
             {
@@ -180,6 +187,66 @@ namespace osu.Game.Tests.Visual.Gameplay
             AddStep("click on black box stack", () => InputManager.Click(MouseButton.Left));
             AddStep("click on black box stack", () => InputManager.Click(MouseButton.Left));
             AddAssert("all boxes still selected", () => skinEditor.SelectedComponents, () => Has.Count.EqualTo(2));
+        }
+
+        [Test]
+        public void TestUndoEditHistory()
+        {
+            SkinComponentsContainer firstTarget = null!;
+            TestSkinEditorChangeHandler changeHandler = null!;
+            byte[] defaultState = null!;
+            IEnumerable<ISerialisableDrawable> testComponents = null!;
+
+            AddStep("Load necessary things", () =>
+            {
+                firstTarget = Player.ChildrenOfType<SkinComponentsContainer>().First();
+                changeHandler = new TestSkinEditorChangeHandler(firstTarget);
+
+                changeHandler.SaveState();
+                defaultState = changeHandler.GetCurrentState();
+
+                testComponents = new[]
+                {
+                    targetContainer.Components.First(),
+                    targetContainer.Components[targetContainer.Components.Count / 2],
+                    targetContainer.Components.Last()
+                };
+            });
+
+            AddStep("Press undo", () => InputManager.Keys(PlatformAction.Undo));
+            AddAssert("Nothing changed", () => defaultState.SequenceEqual(changeHandler.GetCurrentState()));
+
+            AddStep("Add components", () =>
+            {
+                InputManager.MoveMouseTo(skinEditor.ChildrenOfType<BigBlackBox>().First());
+                InputManager.Click(MouseButton.Left);
+                InputManager.Click(MouseButton.Left);
+                InputManager.Click(MouseButton.Left);
+            });
+            revertAndCheckUnchanged();
+
+            AddStep("Move components", () =>
+            {
+                changeHandler.BeginChange();
+                testComponents.ForEach(c => ((Drawable)c).Position += Vector2.One);
+                changeHandler.EndChange();
+            });
+            revertAndCheckUnchanged();
+
+            AddStep("Select components", () => skinEditor.SelectedComponents.AddRange(testComponents));
+            AddStep("Bring to front", () => skinEditor.BringSelectionToFront());
+            revertAndCheckUnchanged();
+
+            AddStep("Remove components", () => testComponents.ForEach(c => firstTarget.Remove(c, false)));
+            revertAndCheckUnchanged();
+
+            void revertAndCheckUnchanged()
+            {
+                AddStep("Revert changes", () => changeHandler.RestoreState(int.MinValue));
+                AddAssert("Current state is same as default",
+                    () => Encoding.UTF8.GetString(defaultState),
+                    () => Is.EqualTo(Encoding.UTF8.GetString(changeHandler.GetCurrentState())));
+            }
         }
 
         [TestCase(false)]
@@ -268,6 +335,58 @@ namespace osu.Game.Tests.Visual.Gameplay
             AddAssert("value is less than default", () => hitErrorMeter.JudgementLineThickness.Value < hitErrorMeter.JudgementLineThickness.Default);
         }
 
+        [Test]
+        public void TestCopyPaste()
+        {
+            AddStep("paste", () =>
+            {
+                InputManager.PressKey(Key.LControl);
+                InputManager.Key(Key.V);
+                InputManager.ReleaseKey(Key.LControl);
+            });
+            // no assertions. just make sure nothing crashes.
+
+            AddStep("select bar hit error blueprint", () =>
+            {
+                var blueprint = skinEditor.ChildrenOfType<SkinBlueprint>().First(b => b.Item is BarHitErrorMeter);
+                skinEditor.SelectedComponents.Clear();
+                skinEditor.SelectedComponents.Add(blueprint.Item);
+            });
+            AddStep("copy", () =>
+            {
+                InputManager.PressKey(Key.LControl);
+                InputManager.Key(Key.C);
+                InputManager.ReleaseKey(Key.LControl);
+            });
+            AddStep("paste", () =>
+            {
+                InputManager.PressKey(Key.LControl);
+                InputManager.Key(Key.V);
+                InputManager.ReleaseKey(Key.LControl);
+            });
+            AddAssert("three hit error meters present",
+                () => skinEditor.ChildrenOfType<SkinBlueprint>().Count(b => b.Item is BarHitErrorMeter),
+                () => Is.EqualTo(3));
+        }
+
         protected override Ruleset CreatePlayerRuleset() => new OsuRuleset();
+
+        private partial class TestSkinEditorChangeHandler : SkinEditorChangeHandler
+        {
+            public TestSkinEditorChangeHandler(Drawable targetScreen)
+                : base(targetScreen)
+            {
+            }
+
+            public byte[] GetCurrentState()
+            {
+                using var stream = new MemoryStream();
+
+                WriteCurrentStateToStream(stream);
+                byte[] newState = stream.ToArray();
+
+                return newState;
+            }
+        }
     }
 }

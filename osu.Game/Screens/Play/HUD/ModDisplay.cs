@@ -1,8 +1,6 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
 using System;
 using System.Collections.Generic;
 using osu.Framework.Bindables;
@@ -26,7 +24,7 @@ namespace osu.Game.Screens.Play.HUD
 
         public ExpansionMode ExpansionMode = ExpansionMode.ExpandOnHover;
 
-        private readonly BindableWithCurrent<IReadOnlyList<Mod>> current = new BindableWithCurrent<IReadOnlyList<Mod>>();
+        private readonly BindableWithCurrent<IReadOnlyList<Mod>> current = new BindableWithCurrent<IReadOnlyList<Mod>>(Array.Empty<Mod>());
 
         public Bindable<IReadOnlyList<Mod>> Current
         {
@@ -65,9 +63,7 @@ namespace osu.Game.Screens.Play.HUD
         {
             iconsContainer.Clear();
 
-            if (mods.NewValue == null) return;
-
-            foreach (Mod mod in mods.NewValue)
+            foreach (Mod mod in mods.NewValue.AsOrdered())
                 iconsContainer.Add(new ModIcon(mod) { Scale = new Vector2(0.6f) });
 
             appearTransform();

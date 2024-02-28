@@ -12,6 +12,7 @@ using osu.Framework.Bindables;
 using osu.Framework.Lists;
 using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Overlays.Chat;
+using osu.Game.Overlays.Chat.Listing;
 
 namespace osu.Game.Online.Chat
 {
@@ -85,6 +86,12 @@ namespace osu.Game.Online.Chat
 
         [JsonProperty(@"last_read_id")]
         public long? LastReadId;
+
+        /// <remarks>
+        /// Purposefully nullable for the sake of <see cref="ChannelListing.ChannelListingChannel"/>.
+        /// </remarks>
+        [JsonProperty(@"message_length_limit")]
+        public int? MessageLengthLimit;
 
         /// <summary>
         /// Signals if the current user joined this channel or not. Defaults to false.

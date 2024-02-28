@@ -1,13 +1,14 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System;
 using System.Collections.Generic;
-using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Timing;
+using osu.Game.Beatmaps;
 using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.UI;
 using osu.Game.Skinning;
@@ -52,9 +53,9 @@ namespace osu.Game.Screens.Play.HUD
             set
             {
                 objects = value;
-                FirstHitTime = objects.FirstOrDefault()?.StartTime ?? 0;
-                //TODO: this isn't always correct (consider mania where a non-last object may last for longer than the last in the list).
-                LastHitTime = objects.LastOrDefault()?.GetEndTime() ?? 0;
+
+                (FirstHitTime, LastHitTime) = BeatmapExtensions.CalculatePlayableBounds(objects);
+
                 UpdateObjects(objects);
             }
         }
@@ -70,7 +71,13 @@ namespace osu.Game.Screens.Play.HUD
 
         protected double LastHitTime { get; private set; }
 
+        /// <summary>
+        /// Called every update frame with current progress information.
+        /// </summary>
+        /// <param name="progress">Current (visual) progress through the beatmap (0..1).</param>
+        /// <param name="isIntro">If <c>true</c>, progress is (0..1) through the intro.</param>
         protected abstract void UpdateProgress(double progress, bool isIntro);
+
         protected virtual void UpdateObjects(IEnumerable<HitObject> objects) { }
 
         [BackgroundDependencyLoader]
@@ -96,7 +103,7 @@ namespace osu.Game.Screens.Play.HUD
             if (objects == null)
                 return;
 
-            double currentTime = FrameStableClock.CurrentTime;
+            double currentTime = Math.Min(FrameStableClock.CurrentTime, LastHitTime);
 
             bool isInIntro = currentTime < FirstHitTime;
 

@@ -1,8 +1,6 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
 using osu.Framework.Allocation;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
@@ -41,15 +39,15 @@ namespace osu.Game.Graphics.UserInterface
         }
 
         [Resolved]
-        private OsuColour colours { get; set; }
+        private OsuColour colours { get; set; } = null!;
 
         protected override Container<Drawable> Content => content;
 
         private readonly Container content;
         private readonly Box hover;
 
-        public OsuAnimatedButton()
-            : base(HoverSampleSet.Button)
+        public OsuAnimatedButton(HoverSampleSet sampleSet = HoverSampleSet.Button)
+            : base(sampleSet)
         {
             base.Content.Add(content = new Container
             {
@@ -111,6 +109,10 @@ namespace osu.Game.Graphics.UserInterface
 
         protected override bool OnClick(ClickEvent e)
         {
+            // Handle case where a click is triggered via TriggerClick().
+            if (!IsHovered)
+                hover.FadeOutFromOne(1600);
+
             hover.FlashColour(FlashColour, 800, Easing.OutQuint);
             return base.OnClick(e);
         }

@@ -20,6 +20,12 @@ namespace osu.Game.Skinning
     /// </summary>
     public partial class SkinnableSound : SkinReloadableDrawable, IAdjustableAudioComponent
     {
+        /// <summary>
+        /// The minimum allowable volume for <see cref="Samples"/>.
+        /// <see cref="Samples"/> that specify a lower <see cref="ISampleInfo.Volume"/> will be forcibly pulled up to this volume.
+        /// </summary>
+        public int MinimumSampleVolume { get; set; }
+
         public override bool RemoveWhenNotAlive => false;
         public override bool RemoveCompletedTransforms => false;
 
@@ -115,6 +121,8 @@ namespace osu.Game.Skinning
         /// </summary>
         public virtual void Play()
         {
+            FlushPendingSkinChanges();
+
             samplesContainer.ForEach(c =>
             {
                 if (PlayWhenZeroVolume || c.AggregateVolume.Value > 0)
@@ -154,7 +162,7 @@ namespace osu.Game.Skinning
             {
                 var sample = samplePool?.GetPooledSample(s) ?? new PoolableSkinnableSample(s);
                 sample.Looping = Looping;
-                sample.Volume.Value = s.Volume / 100.0;
+                sample.Volume.Value = Math.Max(s.Volume, MinimumSampleVolume) / 100.0;
 
                 samplesContainer.Add(sample);
             }
@@ -186,9 +194,33 @@ namespace osu.Game.Skinning
         /// <summary>
         /// Whether any samples are currently playing.
         /// </summary>
-        public bool IsPlaying => samplesContainer.Any(s => s.Playing);
+        public bool IsPlaying
+        {
+            get
+            {
+                foreach (PoolableSkinnableSample s in samplesContainer)
+                {
+                    if (s.Playing)
+                        return true;
+                }
 
-        public bool IsPlayed => samplesContainer.Any(s => s.Played);
+                return false;
+            }
+        }
+
+        public bool IsPlayed
+        {
+            get
+            {
+                foreach (PoolableSkinnableSample s in samplesContainer)
+                {
+                    if (s.Played)
+                        return true;
+                }
+
+                return false;
+            }
+        }
 
         public IBindable<double> AggregateVolume => samplesContainer.AggregateVolume;
 

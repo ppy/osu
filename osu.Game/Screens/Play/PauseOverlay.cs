@@ -9,9 +9,11 @@ using osu.Framework.Allocation;
 using osu.Framework.Audio;
 using osu.Framework.Graphics;
 using osu.Framework.Input.Events;
+using osu.Framework.Localisation;
 using osu.Game.Audio;
 using osu.Game.Graphics;
 using osu.Game.Input.Bindings;
+using osu.Game.Localisation;
 using osu.Game.Skinning;
 using osuTK.Graphics;
 
@@ -23,19 +25,24 @@ namespace osu.Game.Screens.Play
 
         public override bool IsPresent => base.IsPresent || pauseLoop.IsPlaying;
 
-        public override string Header => "paused";
-        public override string Description => "you're not going to do what i think you're going to do, are ya?";
+        public override LocalisableString Header => GameplayMenuOverlayStrings.PausedHeader;
 
         private SkinnableSound pauseLoop;
 
-        protected override Action BackAction => () => InternalButtons.First().TriggerClick();
+        protected override Action BackAction => () =>
+        {
+            if (Buttons.Any())
+                Buttons.First().TriggerClick();
+            else
+                OnResume?.Invoke();
+        };
 
         [BackgroundDependencyLoader]
         private void load(OsuColour colours)
         {
-            AddButton("Continue", colours.Green, () => OnResume?.Invoke());
-            AddButton("Retry", colours.YellowDark, () => OnRetry?.Invoke());
-            AddButton("Quit", new Color4(170, 27, 39, 255), () => OnQuit?.Invoke());
+            AddButton(GameplayMenuOverlayStrings.Continue, colours.Green, () => OnResume?.Invoke());
+            AddButton(GameplayMenuOverlayStrings.Retry, colours.YellowDark, () => OnRetry?.Invoke());
+            AddButton(GameplayMenuOverlayStrings.Quit, new Color4(170, 27, 39, 255), () => OnQuit?.Invoke());
 
             AddInternal(pauseLoop = new SkinnableSound(new SampleInfo("Gameplay/pause-loop"))
             {

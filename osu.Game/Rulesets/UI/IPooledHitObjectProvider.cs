@@ -1,9 +1,6 @@
-// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
-using JetBrains.Annotations;
 using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Objects.Drawables;
 
@@ -17,7 +14,6 @@ namespace osu.Game.Rulesets.UI
         /// <param name="hitObject">The <see cref="HitObject"/> to retrieve the <see cref="DrawableHitObject"/> representation of.</param>
         /// <param name="parent">The parenting <see cref="DrawableHitObject"/>, if any.</param>
         /// <returns>The <see cref="DrawableHitObject"/> representing <see cref="HitObject"/>, or <c>null</c> if no poolable representation exists.</returns>
-        [CanBeNull]
-        DrawableHitObject GetPooledDrawableRepresentation([NotNull] HitObject hitObject, [CanBeNull] DrawableHitObject parent);
+        DrawableHitObject? GetPooledDrawableRepresentation(HitObject hitObject, DrawableHitObject? parent);
     }
 }

@@ -2,13 +2,12 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
-using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Reflection;
 using System.Runtime.Versioning;
-using System.Threading.Tasks;
 using Microsoft.Win32;
+using osu.Desktop.Performance;
 using osu.Desktop.Security;
 using osu.Framework.Platform;
 using osu.Game;
@@ -17,9 +16,11 @@ using osu.Framework;
 using osu.Framework.Logging;
 using osu.Game.Updater;
 using osu.Desktop.Windows;
-using osu.Framework.Threading;
+using osu.Framework.Allocation;
 using osu.Game.IO;
 using osu.Game.IPC;
+using osu.Game.Online.Multiplayer;
+using osu.Game.Performance;
 using osu.Game.Utils;
 using SDL2;
 
@@ -29,6 +30,9 @@ namespace osu.Desktop
     {
         private OsuSchemeLinkIPCChannel? osuSchemeLinkIPCChannel;
         private ArchiveImportIPCChannel? archiveImportIPCChannel;
+
+        [Cached(typeof(IHighPerformanceSessionManager))]
+        private readonly HighPerformanceSessionManager highPerformanceSessionManager = new HighPerformanceSessionManager();
 
         public OsuGameDesktop(string[]? args = null)
             : base(args)
@@ -111,6 +115,25 @@ namespace osu.Desktop
             }
         }
 
+        public override bool RestartAppWhenExited()
+        {
+            switch (RuntimeInfo.OS)
+            {
+                case RuntimeInfo.Platform.Windows:
+                    Debug.Assert(OperatingSystem.IsWindows());
+
+                    // Of note, this is an async method in squirrel that adds an arbitrary delay before returning
+                    // likely to ensure the external process is in a good state.
+                    //
+                    // We're not waiting on that here, but the outro playing before the actual exit should be enough
+                    // to cover this.
+                    Squirrel.UpdateManager.RestartAppWhenExited().FireAndForget();
+                    return true;
+            }
+
+            return base.RestartAppWhenExited();
+        }
+
         protected override void LoadComplete()
         {
             base.LoadComplete();
@@ -130,59 +153,15 @@ namespace osu.Desktop
         {
             base.SetHost(host);
 
-            var desktopWindow = (SDL2DesktopWindow)host.Window;
-
             var iconStream = Assembly.GetExecutingAssembly().GetManifestResourceStream(GetType(), "lazer.ico");
             if (iconStream != null)
-                desktopWindow.SetIconFromStream(iconStream);
+                host.Window.SetIconFromStream(iconStream);
 
-            desktopWindow.CursorState |= CursorState.Hidden;
-            desktopWindow.Title = Name;
-            desktopWindow.DragDrop += f =>
-            {
-                // on macOS, URL associations are handled via SDL_DROPFILE events.
-                if (f.StartsWith(OSU_PROTOCOL, StringComparison.Ordinal))
-                {
-                    HandleLink(f);
-                    return;
-                }
-
-                fileDrop(new[] { f });
-            };
+            host.Window.CursorState |= CursorState.Hidden;
+            host.Window.Title = Name;
         }
 
         protected override BatteryInfo CreateBatteryInfo() => new SDL2BatteryInfo();
-
-        private readonly List<string> importableFiles = new List<string>();
-        private ScheduledDelegate? importSchedule;
-
-        private void fileDrop(string[] filePaths)
-        {
-            lock (importableFiles)
-            {
-                importableFiles.AddRange(filePaths);
-
-                Logger.Log($"Adding {filePaths.Length} files for import");
-
-                // File drag drop operations can potentially trigger hundreds or thousands of these calls on some platforms.
-                // In order to avoid spawning multiple import tasks for a single drop operation, debounce a touch.
-                importSchedule?.Cancel();
-                importSchedule = Scheduler.AddDelayed(handlePendingImports, 100);
-            }
-        }
-
-        private void handlePendingImports()
-        {
-            lock (importableFiles)
-            {
-                Logger.Log($"Handling batch import of {importableFiles.Count} files");
-
-                string[] paths = importableFiles.ToArray();
-                importableFiles.Clear();
-
-                Task.Factory.StartNew(() => Import(paths), TaskCreationOptions.LongRunning);
-            }
-        }
 
         protected override void Dispose(bool isDisposing)
         {

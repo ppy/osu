@@ -1,9 +1,8 @@
-// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
 using osu.Framework.Allocation;
+using osu.Framework.Extensions.ObjectExtensions;
 using osu.Framework.Screens;
 using osu.Game.Online.Spectator;
 using osu.Game.Scoring;
@@ -19,7 +18,7 @@ namespace osu.Game.Screens.Play
         }
 
         [Resolved]
-        private SpectatorClient spectatorClient { get; set; }
+        private SpectatorClient spectatorClient { get; set; } = null!;
 
         [BackgroundDependencyLoader]
         private void load()
@@ -29,7 +28,7 @@ namespace osu.Game.Screens.Play
 
         private void userBeganPlaying(int userId, SpectatorState state)
         {
-            if (userId == Score.UserID)
+            if (userId == Score?.UserID)
             {
                 Schedule(() =>
                 {
@@ -42,7 +41,7 @@ namespace osu.Game.Screens.Play
         {
             base.Dispose(isDisposing);
 
-            if (spectatorClient != null)
+            if (spectatorClient.IsNotNull())
                 spectatorClient.OnUserBeganPlaying -= userBeganPlaying;
         }
     }

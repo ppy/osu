@@ -3,10 +3,12 @@
 
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Game.Beatmaps;
+using osu.Game.Extensions;
 using osu.Game.Online.API;
 using osu.Game.Online.API.Requests;
 using osu.Game.Online.Solo;
@@ -29,10 +31,7 @@ namespace osu.Game.Screens.Ranking
         [Resolved]
         private RulesetStore rulesets { get; set; } = null!;
 
-        [Resolved]
-        private SoloStatisticsWatcher soloStatisticsWatcher { get; set; } = null!;
-
-        private IDisposable? statisticsSubscription;
+        private IBindable<SoloStatisticsUpdate?> latestUpdate = null!;
         private readonly Bindable<SoloStatisticsUpdate?> statisticsUpdate = new Bindable<SoloStatisticsUpdate?>();
 
         public SoloResultsScreen(ScoreInfo score, bool allowRetry)
@@ -40,16 +39,26 @@ namespace osu.Game.Screens.Ranking
         {
         }
 
-        protected override void LoadComplete()
+        [BackgroundDependencyLoader]
+        private void load(SoloStatisticsWatcher? soloStatisticsWatcher)
         {
-            base.LoadComplete();
+            if (ShowUserStatistics && soloStatisticsWatcher != null)
+            {
+                Debug.Assert(Score != null);
 
-            if (ShowUserStatistics)
-                statisticsSubscription = soloStatisticsWatcher.RegisterForStatisticsUpdateAfter(Score, update => statisticsUpdate.Value = update);
+                latestUpdate = soloStatisticsWatcher.LatestUpdate.GetBoundCopy();
+                latestUpdate.BindValueChanged(update =>
+                {
+                    if (update.NewValue?.Score.MatchesOnlineID(Score) == true)
+                        statisticsUpdate.Value = update.NewValue;
+                });
+            }
         }
 
         protected override StatisticsPanel CreateStatisticsPanel()
         {
+            Debug.Assert(Score != null);
+
             if (ShowUserStatistics)
             {
                 return new SoloStatisticsPanel(Score)
@@ -63,11 +72,13 @@ namespace osu.Game.Screens.Ranking
 
         protected override APIRequest? FetchScores(Action<IEnumerable<ScoreInfo>>? scoresCallback)
         {
-            if (Score.BeatmapInfo.OnlineID <= 0 || Score.BeatmapInfo.Status <= BeatmapOnlineStatus.Pending)
+            Debug.Assert(Score != null);
+
+            if (Score.BeatmapInfo!.OnlineID <= 0 || Score.BeatmapInfo.Status <= BeatmapOnlineStatus.Pending)
                 return null;
 
             getScoreRequest = new GetScoresRequest(Score.BeatmapInfo, Score.Ruleset);
-            getScoreRequest.Success += r => scoresCallback?.Invoke(r.Scores.Where(s => s.OnlineID != Score.OnlineID).Select(s => s.ToScoreInfo(rulesets, Beatmap.Value.BeatmapInfo)));
+            getScoreRequest.Success += r => scoresCallback?.Invoke(r.Scores.Where(s => !s.MatchesOnlineID(Score)).Select(s => s.ToScoreInfo(rulesets, Beatmap.Value.BeatmapInfo)));
             return getScoreRequest;
         }
 
@@ -76,7 +87,6 @@ namespace osu.Game.Screens.Ranking
             base.Dispose(isDisposing);
 
             getScoreRequest?.Cancel();
-            statisticsSubscription?.Dispose();
         }
     }
 }

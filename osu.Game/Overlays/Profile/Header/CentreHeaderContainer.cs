@@ -39,7 +39,7 @@ namespace osu.Game.Overlays.Profile.Header
                     RelativeSizeAxes = Axes.Y,
                     Direction = FillDirection.Horizontal,
                     Padding = new MarginPadding { Vertical = 10 },
-                    Margin = new MarginPadding { Left = UserProfileOverlay.CONTENT_X_MARGIN },
+                    Margin = new MarginPadding { Left = WaveOverlayContainer.HORIZONTAL_PADDING },
                     Spacing = new Vector2(10, 0),
                     Children = new Drawable[]
                     {
@@ -62,7 +62,7 @@ namespace osu.Game.Overlays.Profile.Header
                     Anchor = Anchor.CentreRight,
                     Origin = Anchor.CentreRight,
                     AutoSizeAxes = Axes.Both,
-                    Margin = new MarginPadding { Right = UserProfileOverlay.CONTENT_X_MARGIN },
+                    Margin = new MarginPadding { Right = WaveOverlayContainer.HORIZONTAL_PADDING },
                     Children = new Drawable[]
                     {
                         levelBadge = new LevelBadge
@@ -77,7 +77,7 @@ namespace osu.Game.Overlays.Profile.Header
                             Origin = Anchor.CentreRight,
                             Width = 200,
                             Height = 6,
-                            Margin = new MarginPadding { Right = 50 },
+                            Margin = new MarginPadding { Right = WaveOverlayContainer.HORIZONTAL_PADDING },
                             Child = new LevelProgressBar
                             {
                                 RelativeSizeAxes = Axes.Both,

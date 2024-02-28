@@ -10,6 +10,7 @@ using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Effects;
 using osu.Framework.Graphics.Shapes;
 using osu.Game.Overlays;
+using osu.Game.Rulesets.Edit;
 using osu.Game.Screens.Edit.Components;
 using osu.Game.Screens.Edit.Components.Timelines.Summary;
 using osuTK;
@@ -46,36 +47,31 @@ namespace osu.Game.Screens.Edit
                     RelativeSizeAxes = Axes.Both,
                     Colour = colourProvider.Background4,
                 },
-                new Container
+                new GridContainer
                 {
                     RelativeSizeAxes = Axes.Both,
-                    Child = new GridContainer
+                    ColumnDimensions = new[]
                     {
-                        RelativeSizeAxes = Axes.Both,
-                        ColumnDimensions = new[]
-                        {
-                            new Dimension(GridSizeMode.Absolute, 170),
-                            new Dimension(),
-                            new Dimension(GridSizeMode.Absolute, 220),
-                            new Dimension(GridSizeMode.Absolute, 120),
-                        },
-                        Content = new[]
-                        {
-                            new Drawable[]
-                            {
-                                new TimeInfoContainer { RelativeSizeAxes = Axes.Both },
-                                new SummaryTimeline { RelativeSizeAxes = Axes.Both },
-                                new PlaybackControl { RelativeSizeAxes = Axes.Both },
-                                TestGameplayButton = new TestGameplayButton
-                                {
-                                    RelativeSizeAxes = Axes.Both,
-                                    Padding = new MarginPadding { Left = 10 },
-                                    Size = new Vector2(1),
-                                    Action = editor.TestGameplay,
-                                }
-                            },
-                        }
+                        new Dimension(GridSizeMode.Absolute, 170),
+                        new Dimension(),
+                        new Dimension(GridSizeMode.Absolute, 220),
+                        new Dimension(GridSizeMode.Absolute, HitObjectComposer.TOOLBOX_CONTRACTED_SIZE_RIGHT),
                     },
+                    Content = new[]
+                    {
+                        new Drawable[]
+                        {
+                            new TimeInfoContainer { RelativeSizeAxes = Axes.Both },
+                            new SummaryTimeline { RelativeSizeAxes = Axes.Both },
+                            new PlaybackControl { RelativeSizeAxes = Axes.Both },
+                            TestGameplayButton = new TestGameplayButton
+                            {
+                                RelativeSizeAxes = Axes.Both,
+                                Size = new Vector2(1),
+                                Action = editor.TestGameplay,
+                            }
+                        },
+                    }
                 }
             };
         }

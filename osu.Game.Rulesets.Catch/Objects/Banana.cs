@@ -22,11 +22,11 @@ namespace osu.Game.Rulesets.Catch.Objects
 
         public override Judgement CreateJudgement() => new CatchBananaJudgement();
 
-        private static readonly List<HitSampleInfo> samples = new List<HitSampleInfo> { new BananaHitSampleInfo() };
+        private static readonly IList<HitSampleInfo> default_banana_samples = new List<HitSampleInfo> { new BananaHitSampleInfo() }.AsReadOnly();
 
         public Banana()
         {
-            Samples = samples;
+            Samples = default_banana_samples;
         }
 
         // override any external colour changes with banananana
@@ -47,18 +47,18 @@ namespace osu.Game.Rulesets.Catch.Objects
             }
         }
 
-        private class BananaHitSampleInfo : HitSampleInfo, IEquatable<BananaHitSampleInfo>
+        public class BananaHitSampleInfo : HitSampleInfo, IEquatable<BananaHitSampleInfo>
         {
             private static readonly string[] lookup_names = { "Gameplay/metronomelow", "Gameplay/catch-banana" };
 
             public override IEnumerable<string> LookupNames => lookup_names;
 
-            public BananaHitSampleInfo(int volume = 0)
+            public BananaHitSampleInfo(int volume = 100)
                 : base(string.Empty, volume: volume)
             {
             }
 
-            public sealed override HitSampleInfo With(Optional<string> newName = default, Optional<string?> newBank = default, Optional<string?> newSuffix = default, Optional<int> newVolume = default)
+            public sealed override HitSampleInfo With(Optional<string> newName = default, Optional<string> newBank = default, Optional<string?> newSuffix = default, Optional<int> newVolume = default)
                 => new BananaHitSampleInfo(newVolume.GetOr(Volume));
 
             public bool Equals(BananaHitSampleInfo? other)

@@ -7,6 +7,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
+using JetBrains.Annotations;
 using osu.Framework;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
@@ -15,6 +16,7 @@ using osuTK;
 using osuTK.Graphics;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Allocation;
+using osu.Framework.Layout;
 using osu.Framework.Threading;
 
 namespace osu.Game.Screens.Play
@@ -51,7 +53,7 @@ namespace osu.Game.Screens.Play
                 if (value == values) return;
 
                 values = value;
-                graphNeedsUpdate = true;
+                layout.Invalidate();
             }
         }
 
@@ -71,23 +73,25 @@ namespace osu.Game.Screens.Play
 
         private ScheduledDelegate scheduledCreate;
 
-        private bool graphNeedsUpdate;
+        private readonly LayoutValue layout = new LayoutValue(Invalidation.DrawSize | Invalidation.DrawInfo);
 
-        private Vector2 previousDrawSize;
+        public SquareGraph()
+        {
+            AddLayout(layout);
+        }
 
         protected override void Update()
         {
             base.Update();
 
-            if (graphNeedsUpdate || (values != null && DrawSize != previousDrawSize))
+            if (!layout.IsValid)
             {
                 columns?.FadeOut(500, Easing.OutQuint).Expire();
 
                 scheduledCreate?.Cancel();
                 scheduledCreate = Scheduler.AddDelayed(RecreateGraph, 500);
 
-                previousDrawSize = DrawSize;
-                graphNeedsUpdate = false;
+                layout.Validate();
             }
         }
 
@@ -187,6 +191,7 @@ namespace osu.Game.Screens.Play
             private const float padding = 2;
             public const float WIDTH = cube_size + padding;
 
+            [CanBeNull]
             public event Action<ColumnState> StateChanged;
 
             private readonly List<Box> drawableRows = new List<Box>();

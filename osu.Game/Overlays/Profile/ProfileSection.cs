@@ -67,7 +67,7 @@ namespace osu.Game.Overlays.Profile
                             AutoSizeAxes = Axes.Both,
                             Margin = new MarginPadding
                             {
-                                Horizontal = UserProfileOverlay.CONTENT_X_MARGIN - outer_gutter_width,
+                                Horizontal = WaveOverlayContainer.HORIZONTAL_PADDING - outer_gutter_width,
                                 Top = 20,
                                 Bottom = 20,
                             },
@@ -97,7 +97,7 @@ namespace osu.Game.Overlays.Profile
                             RelativeSizeAxes = Axes.X,
                             Padding = new MarginPadding
                             {
-                                Horizontal = UserProfileOverlay.CONTENT_X_MARGIN - outer_gutter_width,
+                                Horizontal = WaveOverlayContainer.HORIZONTAL_PADDING - outer_gutter_width,
                                 Bottom = 20
                             }
                         },

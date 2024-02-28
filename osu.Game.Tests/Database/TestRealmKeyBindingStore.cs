@@ -104,7 +104,7 @@ namespace osu.Game.Tests.Database
 
                 realm.Run(innerRealm =>
                 {
-                    var binding = innerRealm.ResolveReference(tsr);
+                    var binding = innerRealm.ResolveReference(tsr)!;
                     innerRealm.Write(() => binding.KeyCombination = new KeyCombination(InputKey.BackSpace));
                 });
 

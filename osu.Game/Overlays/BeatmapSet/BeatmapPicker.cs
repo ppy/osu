@@ -31,6 +31,7 @@ namespace osu.Game.Overlays.BeatmapSet
         private const float tile_spacing = 2;
 
         private readonly OsuSpriteText version, starRating, starRatingText;
+        private readonly LinkFlowContainer guestMapperContainer;
         private readonly FillFlowContainer starRatingContainer;
         private readonly Statistic plays, favourites;
 
@@ -87,6 +88,14 @@ namespace osu.Game.Overlays.BeatmapSet
                                     Anchor = Anchor.BottomLeft,
                                     Origin = Anchor.BottomLeft,
                                     Font = OsuFont.GetFont(size: 17, weight: FontWeight.Bold)
+                                },
+                                guestMapperContainer = new LinkFlowContainer(s =>
+                                    s.Font = OsuFont.GetFont(weight: FontWeight.Bold, size: 11))
+                                {
+                                    AutoSizeAxes = Axes.Both,
+                                    Anchor = Anchor.BottomLeft,
+                                    Origin = Anchor.BottomLeft,
+                                    Margin = new MarginPadding { Bottom = 1 },
                                 },
                                 starRatingContainer = new FillFlowContainer
                                 {
@@ -176,7 +185,7 @@ namespace osu.Game.Overlays.BeatmapSet
                                                                 OnHovered = beatmap =>
                                                                 {
                                                                     showBeatmap(beatmap);
-                                                                    starRating.Text = beatmap.StarRating.ToLocalisableString(@"0.##");
+                                                                    starRating.Text = beatmap.StarRating.ToLocalisableString(@"0.00");
                                                                     starRatingContainer.FadeIn(100);
                                                                 },
                                                                 OnClicked = beatmap => { Beatmap.Value = beatmap; },
@@ -198,8 +207,21 @@ namespace osu.Game.Overlays.BeatmapSet
             updateDifficultyButtons();
         }
 
-        private void showBeatmap(IBeatmapInfo? beatmapInfo)
+        private void showBeatmap(APIBeatmap? beatmapInfo)
         {
+            guestMapperContainer.Clear();
+
+            if (beatmapInfo?.AuthorID != BeatmapSet?.AuthorID)
+            {
+                APIUser? user = BeatmapSet?.RelatedUsers?.SingleOrDefault(u => u.OnlineID == beatmapInfo?.AuthorID);
+
+                if (user != null)
+                {
+                    guestMapperContainer.AddText("mapped by ");
+                    guestMapperContainer.AddUserLink(user);
+                }
+            }
+
             version.Text = beatmapInfo?.DifficultyName ?? string.Empty;
         }
 
@@ -275,7 +297,7 @@ namespace osu.Game.Overlays.BeatmapSet
                     },
                     icon = new DifficultyIcon(beatmapInfo, ruleset)
                     {
-                        ShowTooltip = false,
+                        TooltipType = DifficultyIconTooltipType.None,
                         Current = { Value = new StarDifficulty(beatmapInfo.StarRating, 0) },
                         Anchor = Anchor.Centre,
                         Origin = Anchor.Centre,

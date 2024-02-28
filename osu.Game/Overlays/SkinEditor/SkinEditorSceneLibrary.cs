@@ -1,10 +1,7 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using System.Collections.Generic;
-using System.Linq;
 using osu.Framework.Allocation;
-using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
@@ -14,12 +11,8 @@ using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Localisation;
-using osu.Game.Rulesets;
-using osu.Game.Rulesets.Mods;
 using osu.Game.Screens;
-using osu.Game.Screens.Play;
 using osu.Game.Screens.Select;
-using osu.Game.Utils;
 using osuTK;
 
 namespace osu.Game.Overlays.SkinEditor
@@ -36,10 +29,7 @@ namespace osu.Game.Overlays.SkinEditor
         private IPerformFromScreenRunner? performer { get; set; }
 
         [Resolved]
-        private IBindable<RulesetInfo> ruleset { get; set; } = null!;
-
-        [Resolved]
-        private Bindable<IReadOnlyList<Mod>> mods { get; set; } = null!;
+        private SkinEditorOverlay? skinEditorOverlay { get; set; }
 
         public SkinEditorSceneLibrary()
         {
@@ -96,24 +86,7 @@ namespace osu.Game.Overlays.SkinEditor
                                     Text = SkinEditorStrings.Gameplay,
                                     Anchor = Anchor.CentreLeft,
                                     Origin = Anchor.CentreLeft,
-                                    Action = () => performer?.PerformFromScreen(screen =>
-                                    {
-                                        if (screen is Player)
-                                            return;
-
-                                        var replayGeneratingMod = ruleset.Value.CreateInstance().GetAutoplayMod();
-
-                                        IReadOnlyList<Mod> usableMods = mods.Value;
-
-                                        if (replayGeneratingMod != null)
-                                            usableMods = usableMods.Append(replayGeneratingMod).ToArray();
-
-                                        if (!ModUtils.CheckCompatibleSet(usableMods, out var invalid))
-                                            mods.Value = mods.Value.Except(invalid).ToArray();
-
-                                        if (replayGeneratingMod != null)
-                                            screen.Push(new PlayerLoader(() => new ReplayPlayer((beatmap, mods) => replayGeneratingMod.CreateScoreFromReplayData(beatmap, mods))));
-                                    }, new[] { typeof(Player), typeof(SongSelect) })
+                                    Action = () => skinEditorOverlay?.PresentGameplay(),
                                 },
                             }
                         },
