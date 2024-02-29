@@ -71,16 +71,12 @@ namespace osu.Game.Rulesets.Osu.Skinning
                 else
                 {
                     if (tracking.NewValue)
+                    {
+                        toPressedState();
                         OnSliderEnd();
+                    }
                 }
             }
-        }
-
-        private bool isInTailLeniencyRegion()
-        {
-            Debug.Assert(ParentObject != null);
-
-            return Time.Current >= ParentObject.HitStateUpdateTime + SliderEventGenerator.TAIL_LENIENCY;
         }
 
         private void updateStateTransforms(DrawableHitObject drawableObject, ArmedState state)
@@ -137,6 +133,17 @@ namespace osu.Game.Rulesets.Osu.Skinning
                 ParentObject.ApplyCustomUpdateState -= updateStateTransforms;
             }
         }
+
+        private void toPressedState() => this.ScaleTo(FollowAreaScale).FadeTo(1f);
+
+        private bool isInTailLeniencyRegion()
+        {
+            Debug.Assert(ParentObject != null);
+
+            return Time.Current >= ParentObject.HitStateUpdateTime + SliderEventGenerator.TAIL_LENIENCY;
+        }
+
+        protected virtual float FollowAreaScale => DrawableSliderBall.FOLLOW_AREA;
 
         protected abstract void OnSliderPress();
 

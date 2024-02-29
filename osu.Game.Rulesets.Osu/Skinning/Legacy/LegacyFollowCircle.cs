@@ -20,15 +20,17 @@ namespace osu.Game.Rulesets.Osu.Skinning.Legacy
             InternalChild = animationContent;
         }
 
+        // Note that the scale adjust here is 2 instead of DrawableSliderBall.FOLLOW_AREA to match legacy behaviour.
+        // This means the actual tracking area for gameplay purposes is larger than the sprite (but skins may be accounting for this).
+        protected override float FollowAreaScale => 2f;
+
         protected override void OnSliderPress()
         {
             Debug.Assert(ParentObject != null);
 
             double remainingTime = Math.Max(0, ParentObject.HitStateUpdateTime - Time.Current);
 
-            // Note that the scale adjust here is 2 instead of DrawableSliderBall.FOLLOW_AREA to match legacy behaviour.
-            // This means the actual tracking area for gameplay purposes is larger than the sprite (but skins may be accounting for this).
-            this.ScaleTo(1f).ScaleTo(2f, Math.Min(180f, remainingTime), Easing.Out)
+            this.ScaleTo(1f).ScaleTo(FollowAreaScale, Math.Min(180f, remainingTime), Easing.Out)
                 .FadeTo(0).FadeTo(1f, Math.Min(60f, remainingTime));
         }
 
@@ -38,7 +40,7 @@ namespace osu.Game.Rulesets.Osu.Skinning.Legacy
 
         protected override void OnSliderEnd()
         {
-            this.ScaleTo(1.6f, 200, Easing.Out)
+            this.ScaleTo(FollowAreaScale * 0.8f, 200, Easing.Out)
                 .FadeOut(200, Easing.In);
         }
 
@@ -46,14 +48,14 @@ namespace osu.Game.Rulesets.Osu.Skinning.Legacy
         {
             if (Scale.X >= 2f)
             {
-                this.ScaleTo(2.2f)
-                    .ScaleTo(2f, 200);
+                this.ScaleTo(FollowAreaScale * 1.1f)
+                    .ScaleTo(FollowAreaScale, 200);
             }
         }
 
         protected override void OnSliderBreak()
         {
-            this.ScaleTo(4f, 100)
+            this.ScaleTo(FollowAreaScale * 2f, 100)
                 .FadeTo(0f, 100);
         }
     }
