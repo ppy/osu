@@ -86,10 +86,7 @@ namespace osu.Game.Rulesets.Osu.Skinning
                     switch (drawableObject)
                     {
                         case DrawableSliderTail:
-                            // Use ParentObject instead of drawableObject because slider tail's
-                            // HitStateUpdateTime is ~36ms before the actual slider end (aka slider
-                            // tail leniency)
-                            using (BeginAbsoluteSequence(ParentObject.HitStateUpdateTime))
+                            using (BeginAbsoluteSequence(drawableObject.HitStateUpdateTime))
                                 OnSliderEnd();
                             break;
 
@@ -106,7 +103,9 @@ namespace osu.Game.Rulesets.Osu.Skinning
                     switch (drawableObject)
                     {
                         case DrawableSliderTail:
-                            // As above, use ParentObject for the correct slider end time
+                            // Use ParentObject instead of drawableObject because slider tail's
+                            // HitStateUpdateTime is ~36ms before the actual slider end (aka slider
+                            // tail leniency)
                             using (BeginAbsoluteSequence(ParentObject.HitStateUpdateTime))
                                 OnSliderTailBreak();
                             break;
