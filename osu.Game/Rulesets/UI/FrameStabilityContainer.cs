@@ -9,6 +9,7 @@ using osu.Framework.Bindables;
 using osu.Framework.Development;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
+using osu.Framework.Logging;
 using osu.Framework.Timing;
 using osu.Game.Input.Handlers;
 using osu.Game.Screens.Play;
@@ -158,6 +159,7 @@ namespace osu.Game.Rulesets.UI
             // time should never go backwards". If it does, we stop running gameplay until it returns to normal.
             if (!hasReplayAttached && FrameStablePlayback && proposedTime > referenceClock.CurrentTime && !DebugUtils.IsNUnitRunning)
             {
+                Logger.Log($"Denying backwards seek during gameplay (reference: {referenceClock.CurrentTime:N2} stable: {proposedTime:N2})");
                 state = PlaybackState.NotValid;
                 return;
             }
