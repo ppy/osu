@@ -349,8 +349,9 @@ namespace osu.Game.Tests.Visual.Background
         private partial class FadeAccessibleResults : ResultsScreen
         {
             public FadeAccessibleResults(ScoreInfo score)
-                : base(score, true)
+                : base(score)
             {
+                AllowRetry = true;
             }
 
             protected override BackgroundScreen CreateBackground() => new FadeAccessibleBackground(Beatmap.Value);
