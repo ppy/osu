@@ -6,7 +6,6 @@ using System.Diagnostics;
 using osu.Framework.Allocation;
 using osu.Framework.Audio;
 using osu.Framework.Bindables;
-using osu.Framework.Development;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Logging;
@@ -25,6 +24,8 @@ namespace osu.Game.Rulesets.UI
     public sealed partial class FrameStabilityContainer : Container, IHasReplayHandler, IFrameStableClock
     {
         public ReplayInputHandler? ReplayInputHandler { get; set; }
+
+        public bool AllowBackwardsSeeks { get; set; }
 
         /// <summary>
         /// The number of CPU milliseconds to spend at most during seek catch-up.
@@ -157,7 +158,7 @@ namespace osu.Game.Rulesets.UI
             //
             // It basically says that "while we're running in frame stable mode, and don't have a replay attached,
             // time should never go backwards". If it does, we stop running gameplay until it returns to normal.
-            if (!hasReplayAttached && FrameStablePlayback && proposedTime > referenceClock.CurrentTime && !DebugUtils.IsNUnitRunning)
+            if (!hasReplayAttached && FrameStablePlayback && proposedTime > referenceClock.CurrentTime && !AllowBackwardsSeeks)
             {
                 Logger.Log($"Denying backwards seek during gameplay (reference: {referenceClock.CurrentTime:N2} stable: {proposedTime:N2})");
                 state = PlaybackState.NotValid;
