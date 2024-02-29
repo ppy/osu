@@ -131,6 +131,9 @@ namespace osu.Game.Tests.Visual.Gameplay
 
         private void createStabilityContainer(double gameplayStartTime = double.MinValue) => AddStep("create container", () =>
             mainContainer.Child = new FrameStabilityContainer(gameplayStartTime)
+                {
+                    AllowBackwardsSeeks = true,
+                }
                 .WithChild(consumer = new ClockConsumingChild()));
 
         private void seekManualTo(double time) => AddStep($"seek manual clock to {time}", () => manualClock.CurrentTime = time);
