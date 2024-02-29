@@ -6,6 +6,7 @@ using System.Diagnostics;
 using osu.Framework.Allocation;
 using osu.Framework.Audio;
 using osu.Framework.Bindables;
+using osu.Framework.Development;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Timing;
@@ -155,7 +156,7 @@ namespace osu.Game.Rulesets.UI
             //
             // It basically says that "while we're running in frame stable mode, and don't have a replay attached,
             // time should never go backwards". If it does, we stop running gameplay until it returns to normal.
-            if (!hasReplayAttached && FrameStablePlayback && proposedTime > referenceClock.CurrentTime)
+            if (!hasReplayAttached && FrameStablePlayback && proposedTime > referenceClock.CurrentTime && !DebugUtils.IsNUnitRunning)
             {
                 state = PlaybackState.NotValid;
                 return;
