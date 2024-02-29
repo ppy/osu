@@ -361,6 +361,7 @@ namespace osu.Game.Rulesets.Mania.Beatmaps
 
         private void reduceHitObjects(ManiaBeatmap beatmap)
         {
+            //hold notes treated as a separate chord to prevent their reduction
             foreach (var group in beatmap.HitObjects.GroupBy(x => new { x.StartTime, x.GetType().Name })
                                                     .ToList())
             {
@@ -396,13 +397,12 @@ namespace osu.Game.Rulesets.Mania.Beatmaps
             for (int i = 0; i < beatmap.HitObjects.Count(); i++)
             {
                 var obstructions = beatmap.HitObjects.FindAll(x => x.Column == beatmap.HitObjects[i].Column
-                                                 && x.GetEndTime() > beatmap.HitObjects[i].StartTime - shortestJack
-                                                 && x.StartTime < beatmap.HitObjects[i].StartTime + shortestJack);
+                                                              && isInRange(x, beatmap.HitObjects[i]));
                 //no obstruction
                 if (obstructions.Count() == 1)
                     continue;
 
-                int newColumn = moveNote(beatmap, beatmap.HitObjects[i], out var bestHNToShorten);
+                int newColumn = findFreePosition(beatmap, beatmap.HitObjects[i], out var bestHNToShorten);
 
                 //obstruction, possible move to closest space
                 if (newColumn != -1)
@@ -410,10 +410,18 @@ namespace osu.Game.Rulesets.Mania.Beatmaps
                     beatmap.HitObjects[i].Column = newColumn;
                     continue;
                 }
-                //only obstruction is HoldNote, all space is obstructed, possible to shorten HoldNote to fit
-                if (bestHNToShorten != null
-                    && obstructions.Count() == 2
-                    && obstructions.First().StartTime < beatmap.HitObjects[i].StartTime)
+                //only obstruction is HoldNote, all space is obstructed,
+                //possible to shorten HoldNote on current column to fit
+                if (obstructions.Count() == 2
+                    && obstructions.First().StartTime <= beatmap.HitObjects[i].StartTime - shortestJack
+                    && obstructions.First() is HoldNote hn)
+                {
+                    shortenHoldNote(beatmap, beatmap.HitObjects[i], hn);
+                    continue;
+                }
+                //obstruction, all space is obstructed,
+                //possible to shorten HoldNote on any other column to fit
+                if (bestHNToShorten != null)
                 {
                     beatmap.HitObjects[i].Column = bestHNToShorten.Column;
                     shortenHoldNote(beatmap, beatmap.HitObjects[i], bestHNToShorten);
@@ -427,22 +435,10 @@ namespace osu.Game.Rulesets.Mania.Beatmaps
 
         //TODO: info array about jacks in original map,
         //if too many jacks created were they shouldn't be try to move them apart
-        private int moveNote(ManiaBeatmap beatmap, ManiaHitObject hitObject, out HoldNote bestHNToShorten)
+        private int findFreePosition(ManiaBeatmap beatmap, ManiaHitObject hitObject, out HoldNote bestHNToShorten)
         {
-            bool HDFound = false;
+            bool HNFound = false;
             bestHNToShorten = null;
-            var findHoldNote = beatmap.HitObjects.Where(x => x.Column == hitObject.Column
-                                                  && x.StartTime <= hitObject.StartTime - shortestJack)
-                                           .LastOrDefault();
-            switch (findHoldNote)
-            {
-                case HoldNote hold:
-
-                    HDFound = true;
-                    bestHNToShorten = hold;
-                    break;
-            }
-
             for (int i = 0; ; i *= -1)
             {
                 //i = -1, 1, -2, 2, -3...
@@ -461,29 +457,36 @@ namespace osu.Game.Rulesets.Mania.Beatmaps
                     continue;
                 }
 
-                if (!HDFound)
+                var obstructions = beatmap.HitObjects.FindAll(x => x.Column == newColumn
+                                                              && isInRange(x, hitObject));
+                if (obstructions.Count() == 0)
+                    return newColumn;
+
+
+                if (!HNFound && obstructions.Count() == 1
+                    && obstructions.First().StartTime <= hitObject.StartTime - shortestJack)
                 {
-                    findHoldNote = beatmap.HitObjects.Where(x => x.Column == newColumn
-                                                      && x.StartTime <= hitObject.StartTime - shortestJack)
-                                               .LastOrDefault();
-                    switch (findHoldNote)
+                    switch (obstructions[0])
                     {
                         case HoldNote hold:
 
-                            HDFound = true;
+                            HNFound = true;
                             bestHNToShorten = hold;
                             break;
                     }
                 }
-
-                if (beatmap.HitObjects.FindIndex(x => x.Column == newColumn
-                                                 && x.GetEndTime() > hitObject.StartTime - shortestJack
-                                                 && x.StartTime < hitObject.StartTime + shortestJack) == -1)
-                {
-                    return newColumn;
-                }
             }
         }
+
+        /// <summary>
+        /// Retrun true if noteToCheck or it's tail end is in range of noteWithRange
+        /// </summary>
+        private bool isInRange(ManiaHitObject noteToCheck, ManiaHitObject noteWithRange)
+        {
+            return noteToCheck.GetEndTime() > noteWithRange.StartTime - shortestJack
+                   && noteToCheck.StartTime < noteWithRange.StartTime + shortestJack;
+        }
+
         private void shortenHoldNote(ManiaBeatmap beatmap, ManiaHitObject hitObject, HoldNote holdNote)
         {
             double shorterEnd = hitObject.StartTime - shortestJack;
