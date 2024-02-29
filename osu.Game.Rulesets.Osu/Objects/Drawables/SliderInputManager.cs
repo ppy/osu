@@ -27,8 +27,6 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
         [Resolved]
         private IGameplayClock? gameplayClock { get; set; }
 
-        private readonly Stack<(double time, bool tracking)> trackingHistory = new Stack<(double, bool)>();
-
         /// <summary>
         /// The point in time after which we can accept any key for tracking. Before this time, we may need to restrict tracking to the key used to hit the head circle.
         ///
@@ -219,6 +217,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
         {
             if (gameplayClock?.IsRewinding == true)
             {
+                var trackingHistory = slider.Result.TrackingHistory;
                 while (trackingHistory.TryPeek(out var historyEntry) && Time.Current < historyEntry.time)
                     trackingHistory.Pop();
 
@@ -271,7 +270,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
                 && validTrackingAction;
 
             if (wasTracking != Tracking)
-                trackingHistory.Push((Time.Current, Tracking));
+                slider.Result.TrackingHistory.Push((Time.Current, Tracking));
         }
 
         private OsuAction? getInitialHitAction() => slider.HeadCircle?.HitAction;
@@ -293,8 +292,6 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
         private void resetState(DrawableHitObject obj)
         {
             Tracking = false;
-            trackingHistory.Clear();
-            trackingHistory.Push((double.NegativeInfinity, false));
             timeToAcceptAnyKeyAfter = null;
             lastPressedActions.Clear();
             screenSpaceMousePosition = null;
