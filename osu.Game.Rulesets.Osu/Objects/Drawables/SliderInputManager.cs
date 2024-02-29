@@ -5,11 +5,13 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
+using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Input;
 using osu.Framework.Input.Events;
 using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Objects.Types;
+using osu.Game.Screens.Play;
 using osuTK;
 
 namespace osu.Game.Rulesets.Osu.Objects.Drawables
@@ -20,6 +22,11 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
         /// Whether the slider is currently being tracked.
         /// </summary>
         public bool Tracking { get; private set; }
+
+        [Resolved]
+        private IGameplayClock? gameplayClock { get; set; }
+
+        private readonly Stack<(double time, bool tracking)> trackingHistory = new Stack<(double, bool)>();
 
         /// <summary>
         /// The point in time after which we can accept any key for tracking. Before this time, we may need to restrict tracking to the key used to hit the head circle.
@@ -208,6 +215,19 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
         /// <param name="isValidTrackingPosition">Whether the current mouse position is valid to begin tracking.</param>
         private void updateTracking(bool isValidTrackingPosition)
         {
+            if (gameplayClock?.IsRewinding == true)
+            {
+                while (trackingHistory.TryPeek(out var historyEntry) && Time.Current < historyEntry.time)
+                    trackingHistory.Pop();
+
+                Debug.Assert(trackingHistory.Count > 0);
+
+                Tracking = trackingHistory.Peek().tracking;
+                return;
+            }
+
+            bool wasTracking = Tracking;
+
             // from the point at which the head circle is hit, this will be non-null.
             // it may be null if the head circle was missed.
             OsuAction? headCircleHitAction = getInitialHitAction();
@@ -247,6 +267,9 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
                 && isValidTrackingPosition
                 // valid action
                 && validTrackingAction;
+
+            if (wasTracking != Tracking)
+                trackingHistory.Push((Time.Current, Tracking));
         }
 
         private OsuAction? getInitialHitAction() => slider.HeadCircle?.HitAction;
