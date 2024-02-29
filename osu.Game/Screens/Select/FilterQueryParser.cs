@@ -402,19 +402,19 @@ namespace osu.Game.Screens.Select
                 // we'll want to flip the operator, such that `>5d` means "more than five days ago", as in "*before* five days ago",
                 // as intended by the user.
                 case Operator.Less:
-                    op = Operator.GreaterOrEqual;
-                    break;
-
-                case Operator.LessOrEqual:
                     op = Operator.Greater;
                     break;
 
+                case Operator.LessOrEqual:
+                    op = Operator.GreaterOrEqual;
+                    break;
+
                 case Operator.Greater:
-                    op = Operator.LessOrEqual;
+                    op = Operator.Less;
                     break;
 
                 case Operator.GreaterOrEqual:
-                    op = Operator.Less;
+                    op = Operator.LessOrEqual;
                     break;
             }
 
