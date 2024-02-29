@@ -61,19 +61,26 @@ namespace osu.Game.Rulesets.Osu.Skinning
 
             using (BeginAbsoluteSequence(Math.Max(Time.Current, ParentObject.HitObject?.StartTime ?? 0)))
             {
-                if (tracking.NewValue)
-                    OnSliderPress();
-                else
-                    OnSliderRelease();
-
-                // calling one of the above after OnSliderEnd() would result in a lack of a slider end animation
-                // thus, ensure OnSliderEnd() is called again if the tracking value changed after the first call
-                if (Time.Current >= ParentObject.HitStateUpdateTime + SliderEventGenerator.TAIL_LENIENCY)
+                if (!isInTailLeniencyRegion())
                 {
-                    FinishTransforms();
-                    OnSliderEnd();
+                    if (tracking.NewValue)
+                        OnSliderPress();
+                    else
+                        OnSliderRelease();
+                }
+                else
+                {
+                    if (tracking.NewValue)
+                        OnSliderEnd();
                 }
             }
+        }
+
+        private bool isInTailLeniencyRegion()
+        {
+            Debug.Assert(ParentObject != null);
+
+            return Time.Current >= ParentObject.HitStateUpdateTime + SliderEventGenerator.TAIL_LENIENCY;
         }
 
         private void updateStateTransforms(DrawableHitObject drawableObject, ArmedState state)
