@@ -265,49 +265,59 @@ namespace osu.Game.Rulesets.Objects.Legacy
         private PathControlPoint[] convertPathString(string pointString, Vector2 offset)
         {
             // This code takes on the responsibility of handling explicit segments of the path ("X" & "Y" from above). Implicit segments are handled by calls to convertPoints().
-            string[] pointSplit = pointString.Split('|');
+            string[] pointStringSplit = pointString.Split('|');
 
-            var points = ArrayPool<Vector2>.Shared.Rent(pointSplit.Length);
-            var segments = ArrayPool<(PathType Type, int StartIndex)>.Shared.Rent(pointSplit.Length);
-            int pointsCount = 0;
-            int segmentsCount = 0;
+            var pointsBuffer = ArrayPool<Vector2>.Shared.Rent(pointStringSplit.Length);
+            var segmentsBuffer = ArrayPool<(PathType Type, int StartIndex)>.Shared.Rent(pointStringSplit.Length);
+            int currentPointsIndex = 0;
+            int currentSegmentsIndex = 0;
 
             try
             {
-                foreach (string s in pointSplit)
+                foreach (string s in pointStringSplit)
                 {
                     if (char.IsLetter(s[0]))
                     {
                         // The start of a new segment(indicated by having an alpha character at position 0).
                         var pathType = convertPathType(s);
-                        segments[segmentsCount++] = (pathType, pointsCount);
+                        segmentsBuffer[currentSegmentsIndex++] = (pathType, currentPointsIndex);
 
                         // First segment is prepended by an extra zero point
-                        if (pointsCount == 0)
-                            points[pointsCount++] = Vector2.Zero;
+                        if (currentPointsIndex == 0)
+                            pointsBuffer[currentPointsIndex++] = Vector2.Zero;
                     }
                     else
                     {
-                        points[pointsCount++] = readPoint(s, offset);
+                        pointsBuffer[currentPointsIndex++] = readPoint(s, offset);
                     }
                 }
 
+                int pointsCount = currentPointsIndex;
+                int segmentsCount = currentSegmentsIndex;
                 var controlPoints = new List<ArraySegment<PathControlPoint>>(pointsCount);
+                var allPoints = new ArraySegment<Vector2>(pointsBuffer, 0, pointsCount);
 
                 for (int i = 0; i < segmentsCount; i++)
                 {
-                    int startIndex = segments[i].StartIndex;
-                    int endIndex = i < segmentsCount - 1 ? segments[i + 1].StartIndex : pointsCount;
-                    Vector2? endPoint = i < segmentsCount - 1 ? points[endIndex] : null;
-                    controlPoints.AddRange(convertPoints(segments[i].Type, new ArraySegment<Vector2>(points, startIndex, endIndex - startIndex), endPoint));
+                    if (i < segmentsCount - 1)
+                    {
+                        int startIndex = segmentsBuffer[i].StartIndex;
+                        int endIndex = segmentsBuffer[i + 1].StartIndex;
+                        controlPoints.AddRange(convertPoints(segmentsBuffer[i].Type, allPoints[startIndex..endIndex], pointsBuffer[endIndex]));
+                    }
+                    else
+                    {
+                        int startIndex = segmentsBuffer[i].StartIndex;
+                        controlPoints.AddRange(convertPoints(segmentsBuffer[i].Type, allPoints[startIndex..], null));
+                    }
                 }
 
                 return mergePointsLists(controlPoints);
             }
             finally
             {
-                ArrayPool<Vector2>.Shared.Return(points);
-                ArrayPool<(PathType Type, int StartIndex)>.Shared.Return(segments);
+                ArrayPool<Vector2>.Shared.Return(pointsBuffer);
+                ArrayPool<(PathType, int)>.Shared.Return(segmentsBuffer);
             }
 
             static Vector2 readPoint(string value, Vector2 startPos)
