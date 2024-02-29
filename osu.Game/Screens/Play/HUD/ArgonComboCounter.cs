@@ -68,7 +68,10 @@ namespace osu.Game.Screens.Play.HUD
 
         private void updateWireframe()
         {
-            text.RequiredDisplayDigits.Value = getDigitsRequiredForDisplayCount();
+            int digitsRequiredForDisplayCount = getDigitsRequiredForDisplayCount();
+
+            if (digitsRequiredForDisplayCount != text.WireframeTemplate.Length)
+                text.WireframeTemplate = new string('#', digitsRequiredForDisplayCount);
         }
 
         private int getDigitsRequiredForDisplayCount()

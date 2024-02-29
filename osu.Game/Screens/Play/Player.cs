@@ -278,10 +278,10 @@ namespace osu.Game.Screens.Play
                         createGameplayComponents(Beatmap.Value)
                     }
                 },
-                FailOverlay = new FailOverlay(Configuration.AllowUserInteraction)
+                FailOverlay = new FailOverlay
                 {
                     SaveReplay = async () => await prepareAndImportScoreAsync(true).ConfigureAwait(false),
-                    OnRetry = () => Restart(),
+                    OnRetry = Configuration.AllowUserInteraction ? () => Restart() : null,
                     OnQuit = () => PerformExit(true),
                 },
                 new HotkeyExitOverlay
@@ -1224,9 +1224,10 @@ namespace osu.Game.Screens.Play
         /// </summary>
         /// <param name="score">The <see cref="ScoreInfo"/> to be displayed in the results screen.</param>
         /// <returns>The <see cref="ResultsScreen"/>.</returns>
-        protected virtual ResultsScreen CreateResults(ScoreInfo score) => new SoloResultsScreen(score, true)
+        protected virtual ResultsScreen CreateResults(ScoreInfo score) => new SoloResultsScreen(score)
         {
-            ShowUserStatistics = true
+            AllowRetry = true,
+            ShowUserStatistics = true,
         };
 
         private void fadeOut(bool instant = false)
