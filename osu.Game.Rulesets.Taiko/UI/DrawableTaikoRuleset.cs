@@ -54,14 +54,14 @@ namespace osu.Game.Rulesets.Taiko.UI
         }
 
         [BackgroundDependencyLoader(true)]
-        private void load(GameplayState gameplayState)
+        private void load([CanBeNull] GameplayState gameplayState)
         {
             new BarLineGenerator<BarLine>(Beatmap).BarLines.ForEach(bar => Playfield.Add(bar));
 
-            var spriteElements = gameplayState.Storyboard.Layers.Where(l => l.Name != @"Overlay")
+            var spriteElements = gameplayState?.Storyboard.Layers.Where(l => l.Name != @"Overlay")
                                               .SelectMany(l => l.Elements)
                                               .OfType<StoryboardSprite>()
-                                              .DistinctBy(e => e.Path);
+                                              .DistinctBy(e => e.Path) ?? Enumerable.Empty<StoryboardSprite>();
 
             if (spriteElements.Count() < 10)
             {
