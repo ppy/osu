@@ -389,7 +389,7 @@ namespace osu.Game.Rulesets.Objects.Legacy
 
             static bool isLinear(Vector2 p0, Vector2 p1, Vector2 p2)
                 => Precision.AlmostEquals(0, (p1.Y - p0.Y) * (p2.X - p0.X)
-                                          - (p1.X - p0.X) * (p2.Y - p0.Y));
+                                             - (p1.X - p0.X) * (p2.Y - p0.Y));
         }
 
         private PathControlPoint[] mergePointsLists(List<ArraySegment<PathControlPoint>> controlPointList)
