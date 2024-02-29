@@ -10,6 +10,7 @@ using osu.Framework.Graphics;
 using osu.Framework.Input;
 using osu.Framework.Input.Events;
 using osu.Game.Rulesets.Objects;
+using osu.Game.Rulesets.Objects.Drawables;
 using osu.Game.Rulesets.Objects.Types;
 using osu.Game.Screens.Play;
 using osuTK;
@@ -56,6 +57,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
         public SliderInputManager(DrawableSlider slider)
         {
             this.slider = slider;
+            this.slider.HitObjectApplied += resetState;
         }
 
         /// <summary>
@@ -286,6 +288,23 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
                 return action == hitAction;
 
             return action == OsuAction.LeftButton || action == OsuAction.RightButton;
+        }
+
+        private void resetState(DrawableHitObject obj)
+        {
+            Tracking = false;
+            trackingHistory.Clear();
+            trackingHistory.Push((double.NegativeInfinity, false));
+            timeToAcceptAnyKeyAfter = null;
+            lastPressedActions.Clear();
+            screenSpaceMousePosition = null;
+        }
+
+        protected override void Dispose(bool isDisposing)
+        {
+            base.Dispose(isDisposing);
+
+            slider.HitObjectApplied -= resetState;
         }
     }
 }
