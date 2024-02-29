@@ -462,7 +462,6 @@ namespace osu.Game.Rulesets.Mania.Beatmaps
                 if (obstructions.Count() == 0)
                     return newColumn;
 
-
                 if (!HNFound && obstructions.Count() == 1
                     && obstructions.First().StartTime <= hitObject.StartTime - shortestJack)
                 {
