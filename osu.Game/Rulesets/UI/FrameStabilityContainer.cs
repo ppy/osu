@@ -150,6 +150,17 @@ namespace osu.Game.Rulesets.UI
                     state = PlaybackState.NotValid;
             }
 
+            // This is a hotfix for https://github.com/ppy/osu/issues/26879 while we figure how the hell time is seeking
+            // backwards by 11,850 ms for some users during gameplay.
+            //
+            // It basically says that "while we're running in frame stable mode, and don't have a replay attached,
+            // time should never go backwards". If it does, we stop running gameplay until it returns to normal.
+            if (!hasReplayAttached && FrameStablePlayback && proposedTime > referenceClock.CurrentTime)
+            {
+                state = PlaybackState.NotValid;
+                return;
+            }
+
             // if the proposed time is the same as the current time, assume that the clock will continue progressing in the same direction as previously.
             // this avoids spurious flips in direction from -1 to 1 during rewinds.
             if (state == PlaybackState.Valid && proposedTime != manualClock.CurrentTime)
