@@ -26,7 +26,7 @@ namespace osu.Game.Rulesets.Osu.Skinning
         [BackgroundDependencyLoader]
         private void load()
         {
-            ((DrawableSlider?)ParentObject)?.Tracking.BindValueChanged(tracking => onTrackingChange(tracking), true);
+            ((DrawableSlider?)ParentObject)?.Tracking.BindValueChanged(onTrackingChange, true);
         }
 
         protected override void LoadComplete()
@@ -112,6 +112,7 @@ namespace osu.Game.Rulesets.Osu.Skinning
                             using (BeginAbsoluteSequence(ParentObject.HitStateUpdateTime))
                                 OnSliderTailBreak();
                             break;
+
                         case DrawableSliderTick:
                         case DrawableSliderRepeat:
                             using (BeginAbsoluteSequence(drawableObject.HitStateUpdateTime))
