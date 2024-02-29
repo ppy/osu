@@ -63,16 +63,28 @@ namespace osu.Game.Screens.Ranking
 
         private bool lastFetchCompleted;
 
-        private readonly bool allowRetry;
-        private readonly bool allowWatchingReplay;
+        /// <summary>
+        /// Whether the user can retry the beatmap from the results screen.
+        /// </summary>
+        public bool AllowRetry { get; init; }
+
+        /// <summary>
+        /// Whether the user can watch the replay of the completed play from the results screen.
+        /// </summary>
+        public bool AllowWatchingReplay { get; init; } = true;
+
+        /// <summary>
+        /// Whether the user's personal statistics should be shown on the extended statistics panel
+        /// after clicking the score panel associated with the <see cref="ResultsScreen.Score"/> being presented.
+        /// Requires <see cref="Score"/> to be present.
+        /// </summary>
+        public bool ShowUserStatistics { get; init; }
 
         private Sample popInSample;
 
-        protected ResultsScreen([CanBeNull] ScoreInfo score, bool allowRetry, bool allowWatchingReplay = true)
+        protected ResultsScreen([CanBeNull] ScoreInfo score)
         {
             Score = score;
-            this.allowRetry = allowRetry;
-            this.allowWatchingReplay = allowWatchingReplay;
 
             SelectedScore.Value = score;
         }
@@ -100,7 +112,7 @@ namespace osu.Game.Screens.Ranking
                                 RelativeSizeAxes = Axes.Both,
                                 Children = new Drawable[]
                                 {
-                                    StatisticsPanel = CreateStatisticsPanel().With(panel =>
+                                    StatisticsPanel = createStatisticsPanel().With(panel =>
                                     {
                                         panel.RelativeSizeAxes = Axes.Both;
                                         panel.Score.BindTarget = SelectedScore;
@@ -162,7 +174,7 @@ namespace osu.Game.Screens.Ranking
                 ScorePanelList.AddScore(Score, shouldFlair);
             }
 
-            if (allowWatchingReplay)
+            if (AllowWatchingReplay)
             {
                 buttons.Add(new ReplayDownloadButton(SelectedScore.Value)
                 {
@@ -171,7 +183,7 @@ namespace osu.Game.Screens.Ranking
                 });
             }
 
-            if (player != null && allowRetry)
+            if (player != null && AllowRetry)
             {
                 buttons.Add(new RetryButton { Width = 300 });
 
@@ -238,7 +250,12 @@ namespace osu.Game.Screens.Ranking
         /// <summary>
         /// Creates the <see cref="Statistics.StatisticsPanel"/> to be used to display extended information about scores.
         /// </summary>
-        protected virtual StatisticsPanel CreateStatisticsPanel() => new StatisticsPanel();
+        private StatisticsPanel createStatisticsPanel()
+        {
+            return ShowUserStatistics && Score != null
+                ? new UserStatisticsPanel(Score)
+                : new StatisticsPanel();
+        }
 
         private void fetchScoresCallback(IEnumerable<ScoreInfo> scores) => Schedule(() =>
         {
