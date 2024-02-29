@@ -13,7 +13,7 @@ using osu.Framework.Threading;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Graphics.UserInterface;
-using osu.Game.Online.Solo;
+using osu.Game.Online;
 using osu.Game.Resources.Localisation.Web;
 using osuTK;
 
@@ -21,13 +21,13 @@ namespace osu.Game.Overlays.Toolbar
 {
     public partial class TransientUserStatisticsUpdateDisplay : CompositeDrawable
     {
-        public Bindable<SoloStatisticsUpdate?> LatestUpdate { get; } = new Bindable<SoloStatisticsUpdate?>();
+        public Bindable<UserStatisticsUpdate?> LatestUpdate { get; } = new Bindable<UserStatisticsUpdate?>();
 
         private Statistic<int> globalRank = null!;
         private Statistic<decimal> pp = null!;
 
         [BackgroundDependencyLoader]
-        private void load(SoloStatisticsWatcher? soloStatisticsWatcher)
+        private void load(UserStatisticsWatcher? userStatisticsWatcher)
         {
             RelativeSizeAxes = Axes.Y;
             AutoSizeAxes = Axes.X;
@@ -47,8 +47,8 @@ namespace osu.Game.Overlays.Toolbar
                 }
             };
 
-            if (soloStatisticsWatcher != null)
-                ((IBindable<SoloStatisticsUpdate?>)LatestUpdate).BindTo(soloStatisticsWatcher.LatestUpdate);
+            if (userStatisticsWatcher != null)
+                ((IBindable<UserStatisticsUpdate?>)LatestUpdate).BindTo(userStatisticsWatcher.LatestUpdate);
         }
 
         protected override void LoadComplete()

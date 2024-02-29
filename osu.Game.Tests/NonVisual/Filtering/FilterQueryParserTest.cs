@@ -538,7 +538,7 @@ namespace osu.Game.Tests.NonVisual.Filtering
             Assert.That(filterCriteria.LastPlayed.Max, Is.Not.Null);
             // the parser internally references `DateTimeOffset.Now`, so to not make things too annoying for tests, just assume some tolerance
             // (irrelevant in proportion to the actual filter proscribed).
-            Assert.That(filterCriteria.LastPlayed.Min, Is.EqualTo(DateTimeOffset.Now.AddYears(-1).AddMonths(-6)).Within(TimeSpan.FromSeconds(5)));
+            Assert.That(filterCriteria.LastPlayed.Min, Is.EqualTo(DateTimeOffset.Now.AddMonths(-6).AddYears(-1)).Within(TimeSpan.FromSeconds(5)));
             Assert.That(filterCriteria.LastPlayed.Max, Is.EqualTo(DateTimeOffset.Now.AddMonths(-3)).Within(TimeSpan.FromSeconds(5)));
         }
 
