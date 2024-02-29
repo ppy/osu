@@ -14,8 +14,10 @@ using osu.Framework.Graphics.Containers;
 using osu.Framework.Layout;
 using osu.Game.Audio;
 using osu.Game.Graphics.Containers;
+using osu.Game.Rulesets.Judgements;
 using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Objects.Drawables;
+using osu.Game.Rulesets.Osu.Judgements;
 using osu.Game.Rulesets.Osu.Skinning.Default;
 using osu.Game.Rulesets.Scoring;
 using osu.Game.Skinning;
@@ -26,6 +28,8 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
     public partial class DrawableSlider : DrawableOsuHitObject
     {
         public new Slider HitObject => (Slider)base.HitObject;
+
+        public new OsuSliderJudgementResult Result => (OsuSliderJudgementResult)base.Result;
 
         public DrawableSliderHead HeadCircle => headContainer.Child;
         public DrawableSliderTail TailCircle => tailContainer.Child;
@@ -133,6 +137,8 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
                     drawableHitObject.AccentColour.Value = colour.NewValue;
             }, true);
         }
+
+        protected override JudgementResult CreateResult(Judgement judgement) => new OsuSliderJudgementResult(HitObject, judgement);
 
         protected override void OnApply()
         {
