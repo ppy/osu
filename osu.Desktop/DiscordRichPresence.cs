@@ -200,7 +200,7 @@ namespace osu.Desktop
 
         private static readonly int ellipsis_length = Encoding.UTF8.GetByteCount(new[] { '…' });
 
-        private string truncate(string str)
+        private static string truncate(string str)
         {
             if (Encoding.UTF8.GetByteCount(str) <= 128)
                 return str;
@@ -239,7 +239,7 @@ namespace osu.Desktop
             return true;
         }
 
-        private int? getBeatmapID(UserActivity activity)
+        private static int? getBeatmapID(UserActivity activity)
         {
             switch (activity)
             {
