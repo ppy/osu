@@ -3,14 +3,19 @@
 
 using System;
 using System.Diagnostics;
+using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Audio;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
+using osu.Framework.Logging;
+using osu.Framework.Testing;
 using osu.Framework.Timing;
+using osu.Game.Beatmaps;
 using osu.Game.Input.Handlers;
 using osu.Game.Screens.Play;
+using osu.Game.Utils;
 
 namespace osu.Game.Rulesets.UI
 {
@@ -23,6 +28,9 @@ namespace osu.Game.Rulesets.UI
     public sealed partial class FrameStabilityContainer : Container, IHasReplayHandler, IFrameStableClock
     {
         public ReplayInputHandler? ReplayInputHandler { get; set; }
+
+        public bool AllowBackwardsSeeks { get; set; }
+        private double? lastBackwardsSeekLogTime;
 
         /// <summary>
         /// The number of CPU milliseconds to spend at most during seek catch-up.
@@ -148,6 +156,29 @@ namespace osu.Game.Rulesets.UI
 
                 if (!valid)
                     state = PlaybackState.NotValid;
+            }
+
+            // This is a hotfix for https://github.com/ppy/osu/issues/26879 while we figure how the hell time is seeking
+            // backwards by 11,850 ms for some users during gameplay.
+            //
+            // It basically says that "while we're running in frame stable mode, and don't have a replay attached,
+            // time should never go backwards". If it does, we stop running gameplay until it returns to normal.
+            if (!hasReplayAttached && FrameStablePlayback && proposedTime > referenceClock.CurrentTime && !AllowBackwardsSeeks)
+            {
+                if (lastBackwardsSeekLogTime == null || Math.Abs(Clock.CurrentTime - lastBackwardsSeekLogTime.Value) > 1000)
+                {
+                    lastBackwardsSeekLogTime = Clock.CurrentTime;
+
+                    string loggableContent = $"Denying backwards seek during gameplay (reference: {referenceClock.CurrentTime:N2} stable: {proposedTime:N2})";
+
+                    if (parentGameplayClock is GameplayClockContainer gcc)
+                        loggableContent += $"\n{gcc.ChildrenOfType<FramedBeatmapClock>().Single().GetSnapshot()}";
+
+                    Logger.Error(new SentryOnlyDiagnosticsException("backwards seek"), loggableContent);
+                }
+
+                state = PlaybackState.NotValid;
+                return;
             }
 
             // if the proposed time is the same as the current time, assume that the clock will continue progressing in the same direction as previously.
