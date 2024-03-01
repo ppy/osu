@@ -119,10 +119,10 @@ namespace osu.Game.Users
         }
 
         [MessagePackObject]
-        public class TestingBeatmap : InGame
+        public class TestingBeatmap : EditingBeatmap
         {
             public TestingBeatmap(IBeatmapInfo beatmapInfo, IRulesetInfo ruleset)
-                : base(beatmapInfo, ruleset)
+                : base(beatmapInfo)
             {
             }
 
