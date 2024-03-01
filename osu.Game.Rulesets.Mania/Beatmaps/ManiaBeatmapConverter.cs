@@ -33,7 +33,7 @@ namespace osu.Game.Rulesets.Mania.Beatmaps
 
         private readonly int originalTargetColumns;
         private double shortestJack;
-
+        private const double jack_mult = 1.5;
         // Internal for testing purposes
         internal LegacyRandom Random { get; private set; }
 
@@ -240,6 +240,7 @@ namespace osu.Game.Rulesets.Mania.Beatmaps
                     yield return obj;
             }
         }
+
         /// <summary>
         /// Conversion of osu!mania-specific beatmaps if KeyMod is active.
         /// </summary>
@@ -256,7 +257,7 @@ namespace osu.Game.Rulesets.Mania.Beatmaps
 
             if (TargetColumns - beatmap.TotalColumns < 0)
             {
-                getInfo(beatmap);
+                var jackMap = getInfo(beatmap);
                 while (TargetColumns - beatmap.TotalColumns < 0)
                 {
                     reduceColumn(beatmap);
@@ -266,11 +267,11 @@ namespace osu.Game.Rulesets.Mania.Beatmaps
                     beatmap.Stages.Add(new StageDefinition(columns - 1));
                 }
                 reduceHitObjects(beatmap);
-                fixHitobjects(beatmap);
+                fixHitObjects(beatmap);
+                spaceHitObjects(beatmap, jackMap);
             }
         }
 
-        //TODO: proper 1k upscale
         private void insertColumn(ManiaBeatmap beatmap)
         {
             double turnTiming = -1;
@@ -316,28 +317,48 @@ namespace osu.Game.Rulesets.Mania.Beatmaps
             }
         }
 
-        private void getInfo(ManiaBeatmap beatmap)
+        private List<double> getInfo(ManiaBeatmap beatmap)
         {
             //maximum one beat for easy maps
             double minJack = 60000 / beatmap.BeatmapInfo.BPM;
 
             if (beatmap.BeatmapInfo.BPM > 300)
                 minJack = 1000;
+            var grouped = beatmap.HitObjects.GroupBy(x => x.Column);
 
-            foreach (var group in beatmap.HitObjects.GroupBy(x => x.Column))
+            foreach (var group in grouped)
             {
                 double endPoint = -10000;
                 foreach (var hitObject in group)
                 {
-                    if (hitObject.StartTime - endPoint < minJack)
-                        minJack = hitObject.StartTime - endPoint;
+                    double jack = hitObject.StartTime - endPoint;
 
-                    if (minJack < 1) minJack = 1;
+                    if (jack < 1) jack = 1;
+
+                    if (jack < minJack)
+                        minJack = jack;
 
                     endPoint = hitObject.GetEndTime();
                 }
             }
             shortestJack = minJack;
+
+            double jackToAvoid = minJack * jack_mult;
+            var jackMap = new List<double>();
+            foreach (var group in grouped)
+            {
+                double endPoint = -10000;
+                foreach (var hitObject in group)
+                {
+                    double jack = hitObject.StartTime - endPoint;
+                    if (jack < jackToAvoid)
+                        jackMap.Add(hitObject.StartTime);
+
+                    endPoint = hitObject.GetEndTime();
+                }
+                shortestJack = minJack;
+            }
+            return jackMap;
         }
 
         private void reduceColumn(ManiaBeatmap beatmap)
@@ -392,17 +413,18 @@ namespace osu.Game.Rulesets.Mania.Beatmaps
             }
         }
 
-        private void fixHitobjects(ManiaBeatmap beatmap)
+        private void fixHitObjects(ManiaBeatmap beatmap)
         {
             for (int i = 0; i < beatmap.HitObjects.Count(); i++)
             {
                 var obstructions = beatmap.HitObjects.FindAll(x => x.Column == beatmap.HitObjects[i].Column
-                                                              && isInRange(x, beatmap.HitObjects[i]));
+                                                              && x.GetEndTime() > beatmap.HitObjects[i].StartTime - shortestJack
+                                                              && x.StartTime <= beatmap.HitObjects[i].StartTime);
                 //no obstruction
                 if (obstructions.Count() == 1)
                     continue;
 
-                int newColumn = findFreePosition(beatmap, beatmap.HitObjects[i], out var bestHNToShorten);
+                int newColumn = findFreePosition(beatmap, beatmap.HitObjects[i], shortestJack, out var bestHNToShorten);
 
                 //obstruction, possible move to closest space
                 if (newColumn != -1)
@@ -432,10 +454,36 @@ namespace osu.Game.Rulesets.Mania.Beatmaps
                 i--;
             }
         }
+        /// <summary>
+        /// try to space out all jacks shorter than shortestJacks * jack_mult if they weren't presented in original map
+        /// </summary>
+        private void spaceHitObjects(ManiaBeatmap beatmap, List<double> jackMap)
+        {
+            double jackToAvoid = shortestJack * jack_mult;
+            for (int i = 0; i < beatmap.HitObjects.Count(); i++)
+            {
+                var hitObject = beatmap.HitObjects[i];
+                if (jackMap.FirstOrDefault(x => x == beatmap.HitObjects[i].StartTime) != default)
+                    continue;
 
-        //TODO: info array about jacks in original map,
-        //if too many jacks created were they shouldn't be try to move them apart
-        private int findFreePosition(ManiaBeatmap beatmap, ManiaHitObject hitObject, out HoldNote bestHNToShorten)
+                var jack = beatmap.HitObjects.FirstOrDefault(x => x.Column == beatmap.HitObjects[i].Column
+                                                              && x.StartTime > beatmap.HitObjects[i].StartTime - jackToAvoid
+                                                              && x.StartTime < beatmap.HitObjects[i].StartTime);
+                //no obstruction
+                if (jack != null)
+                {
+                    int newColumn = findFreePosition(beatmap, beatmap.HitObjects[i], jackToAvoid, out var bestHNToShorten);
+
+                    if (newColumn != -1)
+                    {
+                        beatmap.HitObjects[i].Column = newColumn;
+                    }
+                }
+
+            }
+        }
+
+        private int findFreePosition(ManiaBeatmap beatmap, ManiaHitObject hitObject, double jackTime, out HoldNote bestHNToShorten)
         {
             bool HNFound = false;
             bestHNToShorten = null;
@@ -458,12 +506,14 @@ namespace osu.Game.Rulesets.Mania.Beatmaps
                 }
 
                 var obstructions = beatmap.HitObjects.FindAll(x => x.Column == newColumn
-                                                              && isInRange(x, hitObject));
+                                                              && x.GetEndTime() > hitObject.StartTime - jackTime
+                                                              && x.StartTime < hitObject.StartTime + jackTime);
                 if (obstructions.Count() == 0)
                     return newColumn;
 
+
                 if (!HNFound && obstructions.Count() == 1
-                    && obstructions.First().StartTime <= hitObject.StartTime - shortestJack)
+                    && obstructions.First().StartTime <= hitObject.StartTime - jackTime)
                 {
                     switch (obstructions[0])
                     {
@@ -475,15 +525,6 @@ namespace osu.Game.Rulesets.Mania.Beatmaps
                     }
                 }
             }
-        }
-
-        /// <summary>
-        /// Retrun true if noteToCheck or it's tail end is in range of noteWithRange
-        /// </summary>
-        private bool isInRange(ManiaHitObject noteToCheck, ManiaHitObject noteWithRange)
-        {
-            return noteToCheck.GetEndTime() > noteWithRange.StartTime - shortestJack
-                   && noteToCheck.StartTime < noteWithRange.StartTime + shortestJack;
         }
 
         private void shortenHoldNote(ManiaBeatmap beatmap, ManiaHitObject hitObject, HoldNote holdNote)
