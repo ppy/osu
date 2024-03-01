@@ -228,10 +228,16 @@ namespace osu.Game.Overlays.Dashboard.Friends
                         panel.Anchor = Anchor.TopCentre;
                         panel.Origin = Anchor.TopCentre;
                         panel.Width = 290;
+                        panel.Activity.BindTarget = user.Activity;
+                        panel.Status.BindTarget = user.Status;
                     });
 
                 case OverlayPanelDisplayStyle.List:
-                    return new UserListPanel(user);
+                    return new UserListPanel(user).With(panel =>
+                    {
+                        panel.Activity.BindTarget = user.Activity;
+                        panel.Status.BindTarget = user.Status;
+                    });
 
                 case OverlayPanelDisplayStyle.Brick:
                     return new UserBrickPanel(user);

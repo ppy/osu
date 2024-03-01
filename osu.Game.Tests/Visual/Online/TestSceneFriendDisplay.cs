@@ -54,6 +54,7 @@ namespace osu.Game.Tests.Visual.Online
                 Username = "flyte",
                 Id = 3103765,
                 IsOnline = true,
+                Activity = { Value = new UserActivity.InLobby() },
                 Statistics = new UserStatistics { GlobalRank = 1111 },
                 CountryCode = CountryCode.JP,
                 CoverUrl = "https://osu.ppy.sh/images/headers/profile-covers/c6.jpg"
