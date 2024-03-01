@@ -19,7 +19,6 @@ using osu.Game.Rulesets.Objects.Legacy;
 using osu.Game.Rulesets.Osu.Judgements;
 using osu.Game.Rulesets.Osu.Objects;
 using osu.Game.Rulesets.Osu.Statistics;
-using osu.Game.Rulesets.Scoring;
 using osu.Game.Screens.Play.HUD.HitErrorMeters;
 using osuTK;
 using osuTK.Graphics;
