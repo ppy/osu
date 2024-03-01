@@ -6,6 +6,7 @@ using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Sprites;
+using osu.Framework.Graphics.Textures;
 using osu.Framework.Input.Bindings;
 using osu.Framework.Input.Events;
 using osu.Game.Rulesets.Mania.UI;
@@ -49,14 +50,14 @@ namespace osu.Game.Rulesets.Mania.Skinning.Legacy
                     upSprite = new Sprite
                     {
                         Origin = Anchor.BottomCentre,
-                        Texture = skin.GetTexture(upImage),
+                        Texture = skin.GetTexture(upImage, WrapMode.ClampToEdge, WrapMode.ClampToEdge),
                         RelativeSizeAxes = Axes.X,
                         Width = 1
                     },
                     downSprite = new Sprite
                     {
                         Origin = Anchor.BottomCentre,
-                        Texture = skin.GetTexture(downImage),
+                        Texture = skin.GetTexture(downImage, WrapMode.ClampToEdge, WrapMode.ClampToEdge),
                         RelativeSizeAxes = Axes.X,
                         Width = 1,
                         Alpha = 0
