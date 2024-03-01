@@ -180,7 +180,7 @@ namespace osu.Desktop.Windows
             private string programId => $@"{program_id_prefix}{Extension}";
 
             /// <summary>
-            /// Installs a file extenstion association in accordance with https://learn.microsoft.com/en-us/windows/win32/com/-progid--key
+            /// Installs a file extension association in accordance with https://learn.microsoft.com/en-us/windows/win32/com/-progid--key
             /// </summary>
             public void Install()
             {
@@ -219,7 +219,7 @@ namespace osu.Desktop.Windows
             }
 
             /// <summary>
-            /// Uninstalls the file extenstion association in accordance with https://learn.microsoft.com/en-us/windows/win32/shell/fa-file-types#deleting-registry-information-during-uninstallation
+            /// Uninstalls the file extension association in accordance with https://learn.microsoft.com/en-us/windows/win32/shell/fa-file-types#deleting-registry-information-during-uninstallation
             /// </summary>
             public void Uninstall()
             {
