@@ -480,7 +480,6 @@ namespace osu.Game.Rulesets.Mania.Beatmaps
                         beatmap.HitObjects[i].Column = newColumn;
                     }
                 }
-
             }
         }
 
@@ -511,7 +510,6 @@ namespace osu.Game.Rulesets.Mania.Beatmaps
                                                               && x.StartTime < hitObject.StartTime + jackTime);
                 if (obstructions.Count() == 0)
                     return newColumn;
-
 
                 if (!HNFound && obstructions.Count() == 1
                     && obstructions.First().StartTime <= hitObject.StartTime - jackTime)
