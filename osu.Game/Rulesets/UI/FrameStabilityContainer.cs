@@ -15,6 +15,7 @@ using osu.Framework.Timing;
 using osu.Game.Beatmaps;
 using osu.Game.Input.Handlers;
 using osu.Game.Screens.Play;
+using osu.Game.Utils;
 
 namespace osu.Game.Rulesets.UI
 {
@@ -29,6 +30,7 @@ namespace osu.Game.Rulesets.UI
         public ReplayInputHandler? ReplayInputHandler { get; set; }
 
         public bool AllowBackwardsSeeks { get; set; }
+        private double? lastBackwardsSeekLogTime;
 
         /// <summary>
         /// The number of CPU milliseconds to spend at most during seek catch-up.
@@ -163,10 +165,17 @@ namespace osu.Game.Rulesets.UI
             // time should never go backwards". If it does, we stop running gameplay until it returns to normal.
             if (!hasReplayAttached && FrameStablePlayback && proposedTime > referenceClock.CurrentTime && !AllowBackwardsSeeks)
             {
-                Logger.Log($"Denying backwards seek during gameplay (reference: {referenceClock.CurrentTime:N2} stable: {proposedTime:N2})");
+                if (lastBackwardsSeekLogTime == null || Math.Abs(Clock.CurrentTime - lastBackwardsSeekLogTime.Value) > 1000)
+                {
+                    lastBackwardsSeekLogTime = Clock.CurrentTime;
 
-                if (parentGameplayClock is GameplayClockContainer gcc)
-                    Logger.Log($"{gcc.ChildrenOfType<FramedBeatmapClock>().Single().GetSnapshot()}");
+                    string loggableContent = $"Denying backwards seek during gameplay (reference: {referenceClock.CurrentTime:N2} stable: {proposedTime:N2})";
+
+                    if (parentGameplayClock is GameplayClockContainer gcc)
+                        loggableContent += $"\n{gcc.ChildrenOfType<FramedBeatmapClock>().Single().GetSnapshot()}";
+
+                    Logger.Error(new SentryOnlyDiagnosticsException("backwards seek"), loggableContent);
+                }
 
                 state = PlaybackState.NotValid;
                 return;
