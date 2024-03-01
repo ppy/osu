@@ -82,6 +82,10 @@ namespace osu.Desktop.Windows
             try
             {
                 updateAssociations();
+
+                // TODO: Remove once UpdateDescriptions() is called as specified in the xmldoc.
+                updateDescriptions(null); // always write default descriptions, in case of updating from an older version in which file associations were not implemented/installed
+
                 NotifyShellUpdate();
             }
             catch (Exception e)
