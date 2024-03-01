@@ -454,6 +454,7 @@ namespace osu.Game.Rulesets.Mania.Beatmaps
                 i--;
             }
         }
+
         /// <summary>
         /// try to space out all jacks shorter than shortestJacks * jack_mult if they weren't presented in original map
         /// </summary>
