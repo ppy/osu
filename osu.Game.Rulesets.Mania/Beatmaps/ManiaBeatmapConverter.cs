@@ -33,8 +33,7 @@ namespace osu.Game.Rulesets.Mania.Beatmaps
 
         private readonly int originalTargetColumns;
         private double shortestJack;
-        private double jackToAvoid;
-
+        private const double jack_mult = 1.5;
         // Internal for testing purposes
         internal LegacyRandom Random { get; private set; }
 
@@ -241,6 +240,7 @@ namespace osu.Game.Rulesets.Mania.Beatmaps
                     yield return obj;
             }
         }
+
         /// <summary>
         /// Conversion of osu!mania-specific beatmaps if KeyMod is active.
         /// </summary>
@@ -272,7 +272,6 @@ namespace osu.Game.Rulesets.Mania.Beatmaps
             }
         }
 
-        //TODO: proper 1k upscale
         private void insertColumn(ManiaBeatmap beatmap)
         {
             double turnTiming = -1;
@@ -344,7 +343,7 @@ namespace osu.Game.Rulesets.Mania.Beatmaps
             }
             shortestJack = minJack;
 
-            jackToAvoid = minJack * 1.5;
+            double jackToAvoid = minJack * jack_mult;
             var jackMap = new List<double>();
             foreach (var group in grouped)
             {
@@ -456,10 +455,11 @@ namespace osu.Game.Rulesets.Mania.Beatmaps
             }
         }
         /// <summary>
-        /// try to space all jacks shorter that jackToAvoid if they weren't presented in original map
+        /// try to space out all jacks shorter than shortestJacks * jack_mult if they weren't presented in original map
         /// </summary>
         private void spaceHitObjects(ManiaBeatmap beatmap, List<double> jackMap)
         {
+            double jackToAvoid = shortestJack * jack_mult;
             for (int i = 0; i < beatmap.HitObjects.Count(); i++)
             {
                 var hitObject = beatmap.HitObjects[i];
