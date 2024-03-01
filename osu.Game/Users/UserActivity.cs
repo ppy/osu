@@ -151,7 +151,11 @@ namespace osu.Game.Users
             public EditingBeatmap() { }
 
             public override string GetStatus(bool hideIdentifiableInformation = false) => @"Editing a beatmap";
-            public override string GetDetails(bool hideIdentifiableInformation = false) => BeatmapDisplayTitle;
+
+            public override string GetDetails(bool hideIdentifiableInformation = false) => hideIdentifiableInformation
+                // For now let's assume that showing the beatmap a user is editing could reveal unwanted information.
+                ? string.Empty
+                : BeatmapDisplayTitle;
         }
 
         [MessagePackObject]
