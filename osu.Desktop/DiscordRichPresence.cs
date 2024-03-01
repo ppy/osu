@@ -25,7 +25,6 @@ namespace osu.Desktop
     internal partial class DiscordRichPresence : Component
     {
         private const string client_id = "367827983903490050";
-        public const string DISCORD_PROTOCOL = $"discord-{client_id}://";
 
         private DiscordRpcClient client = null!;
 
@@ -69,11 +68,9 @@ namespace osu.Desktop
             client.OnReady += onReady;
             client.OnError += (_, e) => Logger.Log($"An error occurred with Discord RPC Client: {e.Code} {e.Message}", LoggingTarget.Network, LogLevel.Error);
 
-            // set up stuff for spectate/join
-            // first, we register a uri scheme for when osu! isn't running and a user clicks join/spectate
-            // the rpc library we use also happens to _require_ that we do this
+            // A URI scheme is required to support game invitations, as well as informing Discord of the game executable path to support launching the game when a user clicks on join/spectate.
             client.RegisterUriScheme();
-            client.Subscribe(EventType.Join); // we have to explicitly tell discord to send us join events.
+            client.Subscribe(EventType.Join);
             client.OnJoin += onJoin;
 
             config.BindWith(OsuSetting.DiscordRichPresence, privacyMode);
@@ -184,7 +181,7 @@ namespace osu.Desktop
 
         private void onJoin(object sender, JoinMessage args)
         {
-            game.Window?.Raise(); // users will expect to be brought back to osu! when joining a lobby from discord
+            game.Window?.Raise();
 
             if (!tryParseRoomSecret(args.Secret, out long roomId, out string? password))
                 Logger.Log("Failed to parse the room secret Discord gave us", LoggingTarget.Network, LogLevel.Error);
@@ -232,7 +229,6 @@ namespace osu.Desktop
             if (!long.TryParse(secret[..roomSecretSplitIndex], out roomId))
                 return false;
 
-            // just convert to string here, we're going to have to alloc it later anyways
             password = secret[(roomSecretSplitIndex + 1)..].ToString();
             if (password.Length == 0) password = null;
 
