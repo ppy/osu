@@ -121,7 +121,7 @@ namespace osu.Game.Users
         [MessagePackObject]
         public class TestingBeatmap : EditingBeatmap
         {
-            public TestingBeatmap(IBeatmapInfo beatmapInfo, IRulesetInfo ruleset)
+            public TestingBeatmap(IBeatmapInfo beatmapInfo)
                 : base(beatmapInfo)
             {
             }
