@@ -45,15 +45,7 @@ namespace osu.Game.Graphics.UserInterface
         protected override bool OnClick(ClickEvent e)
         {
             if (buttons.Contains(e.Button))
-            {
-                var channel = Enabled.Value ? sampleClick?.GetChannel() : sampleClickDisabled?.GetChannel();
-
-                if (channel != null)
-                {
-                    channel.Frequency.Value = 0.99 + RNG.NextDouble(0.02);
-                    channel.Play();
-                }
-            }
+                PlayClickSample();
 
             return base.OnClick(e);
         }
@@ -64,6 +56,17 @@ namespace osu.Game.Graphics.UserInterface
                 return;
 
             base.PlayHoverSample();
+        }
+
+        public void PlayClickSample()
+        {
+            var channel = Enabled.Value ? sampleClick?.GetChannel() : sampleClickDisabled?.GetChannel();
+
+            if (channel != null)
+            {
+                channel.Frequency.Value = 0.99 + RNG.NextDouble(0.02);
+                channel.Play();
+            }
         }
 
         [BackgroundDependencyLoader]

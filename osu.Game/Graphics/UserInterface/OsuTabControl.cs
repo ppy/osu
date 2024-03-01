@@ -98,6 +98,14 @@ namespace osu.Game.Graphics.UserInterface
                 strip.Width = Interpolation.ValueAt(Math.Clamp(Clock.ElapsedFrameTime, 0, 1000), strip.Width, StripWidth, 0, 500, Easing.OutQuint);
         }
 
+        public void SelectTabWithSound(T item)
+        {
+            Current.Value = item;
+
+            if (SelectedTab is OsuTabItem selectedTab)
+                selectedTab.TabSelectSounds.PlayClickSample();
+        }
+
         public partial class OsuTabItem : TabItem<T>, IHasAccentColour
         {
             protected readonly SpriteText Text;
@@ -150,6 +158,8 @@ namespace osu.Game.Graphics.UserInterface
                     AccentColour = colours.Blue;
             }
 
+            public HoverClickSounds TabSelectSounds { get; }
+
             public OsuTabItem(T value)
                 : base(value)
             {
@@ -196,7 +206,7 @@ namespace osu.Game.Graphics.UserInterface
                         Origin = Anchor.BottomLeft,
                         Anchor = Anchor.BottomLeft,
                     },
-                    new HoverClickSounds(HoverSampleSet.TabSelect)
+                    TabSelectSounds = new HoverClickSounds(HoverSampleSet.TabSelect)
                 };
             }
 

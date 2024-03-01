@@ -197,6 +197,8 @@ namespace osu.Game.Screens.Edit
         [Resolved(canBeNull: true)]
         private OnScreenDisplay onScreenDisplay { get; set; }
 
+        private EditorScreenSwitcherControl switcherControl;
+
         private Bindable<float> editorBackgroundDim;
         private Bindable<bool> editorHitMarkers;
         private Bindable<bool> editorAutoSeekOnPlacement;
@@ -372,7 +374,7 @@ namespace osu.Game.Screens.Edit
                                     }
                                 }
                             },
-                            new EditorScreenSwitcherControl
+                            switcherControl = new EditorScreenSwitcherControl
                             {
                                 Anchor = Anchor.BottomRight,
                                 Origin = Anchor.BottomRight,
@@ -662,23 +664,23 @@ namespace osu.Game.Screens.Edit
                     return true;
 
                 case GlobalAction.EditorComposeMode:
-                    Mode.Value = EditorScreenMode.Compose;
+                    switcherControl.SelectTabWithSound(EditorScreenMode.Compose);
                     return true;
 
                 case GlobalAction.EditorDesignMode:
-                    Mode.Value = EditorScreenMode.Design;
+                    switcherControl.SelectTabWithSound(EditorScreenMode.Design);
                     return true;
 
                 case GlobalAction.EditorTimingMode:
-                    Mode.Value = EditorScreenMode.Timing;
+                    switcherControl.SelectTabWithSound(EditorScreenMode.Timing);
                     return true;
 
                 case GlobalAction.EditorSetupMode:
-                    Mode.Value = EditorScreenMode.SongSetup;
+                    switcherControl.SelectTabWithSound(EditorScreenMode.SongSetup);
                     return true;
 
                 case GlobalAction.EditorVerifyMode:
-                    Mode.Value = EditorScreenMode.Verify;
+                    switcherControl.SelectTabWithSound(EditorScreenMode.Verify);
                     return true;
 
                 case GlobalAction.EditorTestGameplay:
