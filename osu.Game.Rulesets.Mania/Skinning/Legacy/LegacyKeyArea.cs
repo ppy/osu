@@ -50,6 +50,7 @@ namespace osu.Game.Rulesets.Mania.Skinning.Legacy
                     upSprite = new Sprite
                     {
                         Origin = Anchor.BottomCentre,
+                        // ClampToEdge is used to avoid gaps between keys, see: https://github.com/ppy/osu/issues/27431
                         Texture = skin.GetTexture(upImage, WrapMode.ClampToEdge, WrapMode.ClampToEdge),
                         RelativeSizeAxes = Axes.X,
                         Width = 1
@@ -57,6 +58,7 @@ namespace osu.Game.Rulesets.Mania.Skinning.Legacy
                     downSprite = new Sprite
                     {
                         Origin = Anchor.BottomCentre,
+                        // ClampToEdge is used to avoid gaps between keys, see: https://github.com/ppy/osu/issues/27431
                         Texture = skin.GetTexture(downImage, WrapMode.ClampToEdge, WrapMode.ClampToEdge),
                         RelativeSizeAxes = Axes.X,
                         Width = 1,
