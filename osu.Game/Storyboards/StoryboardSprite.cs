@@ -98,8 +98,6 @@ namespace osu.Game.Storyboards
 
         private delegate void DrawablePropertyInitializer<in T>(Drawable drawable, T value);
 
-        private delegate void DrawableTransformer<in T>(Drawable drawable, T value, double duration, Easing easing);
-
         public StoryboardSprite(string path, Anchor origin, Vector2 initialPosition)
         {
             Path = path;
@@ -132,27 +130,23 @@ namespace osu.Game.Storyboards
 
             List<IGeneratedCommand> generated = new List<IGeneratedCommand>();
 
-            generateCommands(generated, getCommands(g => g.X, triggeredGroups), (d, value) => d.X = value, (d, value, duration, easing) => d.MoveToX(value, duration, easing));
-            generateCommands(generated, getCommands(g => g.Y, triggeredGroups), (d, value) => d.Y = value, (d, value, duration, easing) => d.MoveToY(value, duration, easing));
-            generateCommands(generated, getCommands(g => g.Scale, triggeredGroups), (d, value) => d.Scale = new Vector2(value), (d, value, duration, easing) => d.ScaleTo(value, duration, easing));
-            generateCommands(generated, getCommands(g => g.Rotation, triggeredGroups), (d, value) => d.Rotation = value, (d, value, duration, easing) => d.RotateTo(value, duration, easing));
-            generateCommands(generated, getCommands(g => g.Colour, triggeredGroups), (d, value) => d.Colour = value, (d, value, duration, easing) => d.FadeColour(value, duration, easing));
-            generateCommands(generated, getCommands(g => g.Alpha, triggeredGroups), (d, value) => d.Alpha = value, (d, value, duration, easing) => d.FadeTo(value, duration, easing));
-            generateCommands(generated, getCommands(g => g.BlendingParameters, triggeredGroups), (d, value) => d.Blending = value, (d, value, duration, _) => d.TransformBlendingMode(value, duration),
-                false);
+            generateCommands(generated, getCommands(g => g.X, triggeredGroups), (d, value) => d.X = value);
+            generateCommands(generated, getCommands(g => g.Y, triggeredGroups), (d, value) => d.Y = value);
+            generateCommands(generated, getCommands(g => g.Scale, triggeredGroups), (d, value) => d.Scale = value);
+            generateCommands(generated, getCommands(g => g.Rotation, triggeredGroups), (d, value) => d.Rotation = value);
+            generateCommands(generated, getCommands(g => g.Colour, triggeredGroups), (d, value) => d.Colour = value);
+            generateCommands(generated, getCommands(g => g.Alpha, triggeredGroups), (d, value) => d.Alpha = value);
+            generateCommands(generated, getCommands(g => g.BlendingParameters, triggeredGroups), (d, value) => d.Blending = value, false);
 
             if (drawable is IVectorScalable vectorScalable)
             {
-                generateCommands(generated, getCommands(g => g.VectorScale, triggeredGroups), (_, value) => vectorScalable.VectorScale = value,
-                    (_, value, duration, easing) => vectorScalable.VectorScaleTo(value, duration, easing));
+                generateCommands(generated, getCommands(g => g.VectorScale, triggeredGroups), (_, value) => vectorScalable.VectorScale = value);
             }
 
             if (drawable is IFlippable flippable)
             {
-                generateCommands(generated, getCommands(g => g.FlipH, triggeredGroups), (_, value) => flippable.FlipH = value, (_, value, duration, _) => flippable.TransformFlipH(value, duration),
-                    false);
-                generateCommands(generated, getCommands(g => g.FlipV, triggeredGroups), (_, value) => flippable.FlipV = value, (_, value, duration, _) => flippable.TransformFlipV(value, duration),
-                    false);
+                generateCommands(generated, getCommands(g => g.FlipH, triggeredGroups), (_, value) => flippable.FlipH = value, false);
+                generateCommands(generated, getCommands(g => g.FlipV, triggeredGroups), (_, value) => flippable.FlipV = value, false);
             }
 
             foreach (var command in generated.OrderBy(g => g.StartTime))
@@ -160,7 +154,7 @@ namespace osu.Game.Storyboards
         }
 
         private void generateCommands<T>(List<IGeneratedCommand> resultList, IEnumerable<CommandTimeline<T>.TypedCommand> commands,
-                                         DrawablePropertyInitializer<T> initializeProperty, DrawableTransformer<T> transform, bool alwaysInitialize = true)
+                                         DrawablePropertyInitializer<T> initializeProperty, bool alwaysInitialize = true)
         {
             bool initialized = false;
 
@@ -175,7 +169,7 @@ namespace osu.Game.Storyboards
                     initialized = true;
                 }
 
-                resultList.Add(new GeneratedCommand<T>(command, initFunc, transform));
+                resultList.Add(new GeneratedCommand<T>(command, initFunc));
             }
         }
 
@@ -209,24 +203,59 @@ namespace osu.Game.Storyboards
             public double StartTime => command.StartTime;
 
             private readonly DrawablePropertyInitializer<T>? initializeProperty;
-            private readonly DrawableTransformer<T> transform;
             private readonly CommandTimeline<T>.TypedCommand command;
 
-            public GeneratedCommand(CommandTimeline<T>.TypedCommand command, DrawablePropertyInitializer<T>? initializeProperty, DrawableTransformer<T> transform)
+            public GeneratedCommand(CommandTimeline<T>.TypedCommand command, DrawablePropertyInitializer<T>? initializeProperty)
             {
                 this.command = command;
                 this.initializeProperty = initializeProperty;
-                this.transform = transform;
             }
 
             public void ApplyTo(Drawable drawable)
             {
                 initializeProperty?.Invoke(drawable, command.StartValue);
 
-                using (drawable.BeginAbsoluteSequence(command.StartTime))
+                switch (command.PropertyName)
                 {
-                    transform(drawable, command.StartValue, 0, Easing.None);
-                    transform(drawable, command.EndValue, command.Duration, command.Easing);
+                    case "VectorScale":
+                        using (drawable.BeginAbsoluteSequence(command.StartTime))
+                        {
+                            ((IVectorScalable)drawable).TransformTo(command.PropertyName, command.StartValue).Then().TransformTo(command.PropertyName, command.EndValue, command.Duration, command.Easing);
+                        }
+
+                        break;
+
+                    case "FlipH":
+                        using (drawable.BeginAbsoluteSequence(command.StartTime))
+                        {
+                            ((IFlippable)drawable).TransformTo(command.PropertyName, command.StartValue).Delay(command.Duration).TransformTo(command.PropertyName, command.EndValue);
+                        }
+
+                        break;
+
+                    case "FlipV":
+                        using (drawable.BeginAbsoluteSequence(command.StartTime))
+                        {
+                            ((IFlippable)drawable).TransformTo(command.PropertyName, command.StartValue).Delay(command.Duration).TransformTo(command.PropertyName, command.EndValue);
+                        }
+
+                        break;
+
+                    case "Blending":
+                        using (drawable.BeginAbsoluteSequence(command.StartTime))
+                        {
+                            drawable.TransformTo(command.PropertyName, command.StartValue).Delay(command.Duration).TransformTo(command.PropertyName, command.EndValue);
+                        }
+
+                        break;
+
+                    default:
+                        using (drawable.BeginAbsoluteSequence(command.StartTime))
+                        {
+                            drawable.TransformTo(command.PropertyName, command.StartValue).Then().TransformTo(command.PropertyName, command.EndValue, command.Duration, command.Easing);
+                        }
+
+                        break;
                 }
             }
         }
