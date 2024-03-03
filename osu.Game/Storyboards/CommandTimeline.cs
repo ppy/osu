@@ -63,6 +63,8 @@ namespace osu.Game.Storyboards
             public double EndTime { get; set; }
             public double Duration => EndTime - StartTime;
             public string PropertyName { get; set; }
+            public int LoopCount { get; set; }
+            public double Delay { get; set; }
 
             public T StartValue;
             public T EndValue;
