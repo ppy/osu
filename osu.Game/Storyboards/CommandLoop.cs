@@ -38,11 +38,21 @@ namespace osu.Game.Storyboards
 
         public override IEnumerable<CommandTimeline<T>.TypedCommand> GetCommands<T>(CommandTimelineSelector<T> timelineSelector, double offset = 0)
         {
-            for (int loop = 0; loop < TotalIterations; loop++)
+            double fullLoopDuration = CommandsEndTime - CommandsStartTime;
+
+            foreach (var command in timelineSelector(this).Commands)
             {
-                double loopOffset = LoopStartTime + loop * CommandsDuration;
-                foreach (var command in base.GetCommands(timelineSelector, offset + loopOffset))
-                    yield return command;
+                yield return new CommandTimeline<T>.TypedCommand
+                {
+                    Easing = command.Easing,
+                    StartTime = offset + LoopStartTime + command.StartTime,
+                    EndTime = offset + LoopStartTime + command.EndTime,
+                    StartValue = command.StartValue,
+                    EndValue = command.EndValue,
+                    PropertyName = command.PropertyName,
+                    LoopCount = TotalIterations,
+                    Delay = fullLoopDuration - command.EndTime + command.StartTime
+                };
             }
         }
 

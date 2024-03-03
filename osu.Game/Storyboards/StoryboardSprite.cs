@@ -218,41 +218,86 @@ namespace osu.Game.Storyboards
                 switch (command.PropertyName)
                 {
                     case "VectorScale":
-                        using (drawable.BeginAbsoluteSequence(command.StartTime))
+                        if (command.LoopCount == 0)
                         {
-                            ((IVectorScalable)drawable).TransformTo(command.PropertyName, command.StartValue).Then().TransformTo(command.PropertyName, command.EndValue, command.Duration, command.Easing);
+                            using (drawable.BeginAbsoluteSequence(command.StartTime))
+                            {
+                                ((IVectorScalable)drawable).TransformTo(command.PropertyName, command.StartValue).Then()
+                                                           .TransformTo(command.PropertyName, command.EndValue, command.Duration, command.Easing);
+                            }
+                        }
+                        else
+                        {
+                            using (drawable.BeginAbsoluteSequence(command.StartTime))
+                            {
+                                ((IVectorScalable)drawable).TransformTo(command.PropertyName, command.StartValue).Then()
+                                                           .TransformTo(command.PropertyName, command.EndValue, command.Duration, command.Easing)
+                                                           .Loop(command.Delay, command.LoopCount);
+                            }
                         }
 
                         break;
 
                     case "FlipH":
-                        using (drawable.BeginAbsoluteSequence(command.StartTime))
-                        {
-                            ((IFlippable)drawable).TransformTo(command.PropertyName, command.StartValue).Delay(command.Duration).TransformTo(command.PropertyName, command.EndValue);
-                        }
-
-                        break;
-
                     case "FlipV":
-                        using (drawable.BeginAbsoluteSequence(command.StartTime))
+                        if (command.LoopCount == 0)
                         {
-                            ((IFlippable)drawable).TransformTo(command.PropertyName, command.StartValue).Delay(command.Duration).TransformTo(command.PropertyName, command.EndValue);
+                            using (drawable.BeginAbsoluteSequence(command.StartTime))
+                            {
+                                ((IFlippable)drawable).TransformTo(command.PropertyName, command.StartValue).Delay(command.Duration)
+                                                      .TransformTo(command.PropertyName, command.EndValue);
+                            }
+                        }
+                        else
+                        {
+                            using (drawable.BeginAbsoluteSequence(command.StartTime))
+                            {
+                                ((IFlippable)drawable).TransformTo(command.PropertyName, command.StartValue).Delay(command.Duration)
+                                                      .TransformTo(command.PropertyName, command.EndValue)
+                                                      .Loop(command.Delay, command.LoopCount);
+                            }
                         }
 
                         break;
 
                     case "Blending":
-                        using (drawable.BeginAbsoluteSequence(command.StartTime))
+                        if (command.LoopCount == 0)
                         {
-                            drawable.TransformTo(command.PropertyName, command.StartValue).Delay(command.Duration).TransformTo(command.PropertyName, command.EndValue);
+                            using (drawable.BeginAbsoluteSequence(command.StartTime))
+                            {
+                                drawable.TransformTo(command.PropertyName, command.StartValue).Delay(command.Duration)
+                                        .TransformTo(command.PropertyName, command.EndValue);
+                            }
+                        }
+                        else
+                        {
+                            using (drawable.BeginAbsoluteSequence(command.StartTime))
+                            {
+                                drawable.TransformTo(command.PropertyName, command.StartValue).Delay(command.Duration)
+                                        .TransformTo(command.PropertyName, command.EndValue)
+                                        .Loop(command.Delay, command.LoopCount);
+                            }
                         }
 
                         break;
 
                     default:
-                        using (drawable.BeginAbsoluteSequence(command.StartTime))
+                        if (command.LoopCount == 0)
                         {
-                            drawable.TransformTo(command.PropertyName, command.StartValue).Then().TransformTo(command.PropertyName, command.EndValue, command.Duration, command.Easing);
+                            using (drawable.BeginAbsoluteSequence(command.StartTime))
+                            {
+                                drawable.TransformTo(command.PropertyName, command.StartValue).Then()
+                                        .TransformTo(command.PropertyName, command.EndValue, command.Duration, command.Easing);
+                            }
+                        }
+                        else
+                        {
+                            using (drawable.BeginAbsoluteSequence(command.StartTime))
+                            {
+                                drawable.TransformTo(command.PropertyName, command.StartValue).Then()
+                                        .TransformTo(command.PropertyName, command.EndValue, command.Duration, command.Easing)
+                                        .Loop(command.Delay, command.LoopCount);
+                            }
                         }
 
                         break;
