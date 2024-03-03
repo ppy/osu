@@ -73,9 +73,9 @@ namespace osu.Game.Tests.Visual.Gameplay
             var sprite = new StoryboardSprite("unknown", Anchor.TopLeft, Vector2.Zero);
 
             // these should be ignored as we have an alpha visibility blocker proceeding this command.
-            sprite.TimelineGroup.Scale.Add(Easing.None, loop_start_time, -18000, 0, 1);
+            sprite.TimelineGroup.Scale.Add(Easing.None, loop_start_time, -18000, Vector2.Zero, Vector2.One);
             var loopGroup = sprite.AddLoop(loop_start_time, 50);
-            loopGroup.Scale.Add(Easing.None, loop_start_time, -18000, 0, 1);
+            loopGroup.Scale.Add(Easing.None, loop_start_time, -18000, Vector2.Zero, Vector2.One);
 
             var target = addEventToLoop ? loopGroup : sprite.TimelineGroup;
             double loopRelativeOffset = addEventToLoop ? -loop_start_time : 0;
