@@ -137,6 +137,11 @@ namespace osu.Game.Tests.Visual.Online
                 @"top_ranks",
                 @"medals"
             },
+            RankHighest = new APIUser.UserRankHighest
+            {
+                Rank = 1,
+                UpdatedAt = DateTimeOffset.Now,
+            },
             Statistics = new UserStatistics
             {
                 IsRanked = true,
