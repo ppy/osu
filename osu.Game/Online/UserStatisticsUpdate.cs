@@ -4,12 +4,12 @@
 using osu.Game.Scoring;
 using osu.Game.Users;
 
-namespace osu.Game.Online.Solo
+namespace osu.Game.Online
 {
     /// <summary>
     /// Contains data about the change in a user's profile statistics after completing a score.
     /// </summary>
-    public class SoloStatisticsUpdate
+    public class UserStatisticsUpdate
     {
         /// <summary>
         /// The score set by the user that triggered the update.
@@ -27,12 +27,12 @@ namespace osu.Game.Online.Solo
         public UserStatistics After { get; }
 
         /// <summary>
-        /// Creates a new <see cref="SoloStatisticsUpdate"/>.
+        /// Creates a new <see cref="UserStatisticsUpdate"/>.
         /// </summary>
         /// <param name="score">The score set by the user that triggered the update.</param>
         /// <param name="before">The user's profile statistics prior to the score being set.</param>
         /// <param name="after">The user's profile statistics after the score was set.</param>
-        public SoloStatisticsUpdate(ScoreInfo score, UserStatistics before, UserStatistics after)
+        public UserStatisticsUpdate(ScoreInfo score, UserStatistics before, UserStatistics after)
         {
             Score = score;
             Before = before;

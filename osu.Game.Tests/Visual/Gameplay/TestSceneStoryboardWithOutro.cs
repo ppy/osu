@@ -31,6 +31,8 @@ namespace osu.Game.Tests.Visual.Gameplay
     {
         protected override bool HasCustomSteps => true;
 
+        protected override bool AllowBackwardsSeeks => true;
+
         protected new OutroPlayer Player => (OutroPlayer)base.Player;
 
         private double currentBeatmapDuration;

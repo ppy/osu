@@ -8,10 +8,10 @@ using NUnit.Framework;
 using osu.Framework.Allocation;
 using osu.Framework.Testing;
 using osu.Game.Models;
+using osu.Game.Online;
 using osu.Game.Online.API;
 using osu.Game.Online.API.Requests;
 using osu.Game.Online.API.Requests.Responses;
-using osu.Game.Online.Solo;
 using osu.Game.Online.Spectator;
 using osu.Game.Rulesets;
 using osu.Game.Rulesets.Osu;
@@ -21,11 +21,11 @@ using osu.Game.Users;
 namespace osu.Game.Tests.Visual.Online
 {
     [HeadlessTest]
-    public partial class TestSceneSoloStatisticsWatcher : OsuTestScene
+    public partial class TestSceneUserStatisticsWatcher : OsuTestScene
     {
         protected override bool UseOnlineAPI => false;
 
-        private SoloStatisticsWatcher watcher = null!;
+        private UserStatisticsWatcher watcher = null!;
 
         [Resolved]
         private SpectatorClient spectatorClient { get; set; } = null!;
@@ -34,8 +34,6 @@ namespace osu.Game.Tests.Visual.Online
 
         private Action<GetUsersRequest>? handleGetUsersRequest;
         private Action<GetUserRequest>? handleGetUserRequest;
-
-        private IDisposable? subscription;
 
         private readonly Dictionary<(int userId, string rulesetName), UserStatistics> serverSideStatistics = new Dictionary<(int userId, string rulesetName), UserStatistics>();
 
@@ -109,7 +107,7 @@ namespace osu.Game.Tests.Visual.Online
 
             AddStep("create watcher", () =>
             {
-                Child = watcher = new SoloStatisticsWatcher();
+                Child = watcher = new UserStatisticsWatcher();
             });
         }
 
@@ -125,7 +123,7 @@ namespace osu.Game.Tests.Visual.Online
 
             var ruleset = new OsuRuleset().RulesetInfo;
 
-            SoloStatisticsUpdate? update = null;
+            UserStatisticsUpdate? update = null;
             registerForUpdates(scoreId, ruleset, receivedUpdate => update = receivedUpdate);
 
             feignScoreProcessing(userId, ruleset, 5_000_000);
@@ -148,7 +146,7 @@ namespace osu.Game.Tests.Visual.Online
             // note ordering - in this test processing completes *before* the registration is added.
             feignScoreProcessing(userId, ruleset, 5_000_000);
 
-            SoloStatisticsUpdate? update = null;
+            UserStatisticsUpdate? update = null;
             registerForUpdates(scoreId, ruleset, receivedUpdate => update = receivedUpdate);
 
             AddStep("signal score processed", () => ((ISpectatorClient)spectatorClient).UserScoreProcessed(userId, scoreId));
@@ -166,7 +164,7 @@ namespace osu.Game.Tests.Visual.Online
             long scoreId = getScoreId();
             var ruleset = new OsuRuleset().RulesetInfo;
 
-            SoloStatisticsUpdate? update = null;
+            UserStatisticsUpdate? update = null;
             registerForUpdates(scoreId, ruleset, receivedUpdate => update = receivedUpdate);
 
             feignScoreProcessing(userId, ruleset, 5_000_000);
@@ -193,7 +191,7 @@ namespace osu.Game.Tests.Visual.Online
             long scoreId = getScoreId();
             var ruleset = new OsuRuleset().RulesetInfo;
 
-            SoloStatisticsUpdate? update = null;
+            UserStatisticsUpdate? update = null;
             registerForUpdates(scoreId, ruleset, receivedUpdate => update = receivedUpdate);
 
             feignScoreProcessing(userId, ruleset, 5_000_000);
@@ -214,7 +212,7 @@ namespace osu.Game.Tests.Visual.Online
             long scoreId = getScoreId();
             var ruleset = new OsuRuleset().RulesetInfo;
 
-            SoloStatisticsUpdate? update = null;
+            UserStatisticsUpdate? update = null;
             registerForUpdates(scoreId, ruleset, receivedUpdate => update = receivedUpdate);
 
             feignScoreProcessing(userId, ruleset, 5_000_000);
@@ -243,33 +241,13 @@ namespace osu.Game.Tests.Visual.Online
 
             feignScoreProcessing(userId, ruleset, 6_000_000);
 
-            SoloStatisticsUpdate? update = null;
+            UserStatisticsUpdate? update = null;
             registerForUpdates(secondScoreId, ruleset, receivedUpdate => update = receivedUpdate);
 
             AddStep("signal score processed", () => ((ISpectatorClient)spectatorClient).UserScoreProcessed(userId, secondScoreId));
             AddUntilStep("update received", () => update != null);
             AddAssert("values before are correct", () => update!.Before.TotalScore, () => Is.EqualTo(4_000_000));
             AddAssert("values after are correct", () => update!.After.TotalScore, () => Is.EqualTo(6_000_000));
-        }
-
-        [Test]
-        public void TestStatisticsUpdateNotFiredAfterSubscriptionDisposal()
-        {
-            int userId = getUserId();
-            setUpUser(userId);
-
-            long scoreId = getScoreId();
-            var ruleset = new OsuRuleset().RulesetInfo;
-
-            SoloStatisticsUpdate? update = null;
-            registerForUpdates(scoreId, ruleset, receivedUpdate => update = receivedUpdate);
-            AddStep("unsubscribe", () => subscription!.Dispose());
-
-            feignScoreProcessing(userId, ruleset, 5_000_000);
-
-            AddStep("signal score processed", () => ((ISpectatorClient)spectatorClient).UserScoreProcessed(userId, scoreId));
-            AddWaitStep("wait a bit", 5);
-            AddAssert("update not received", () => update == null);
         }
 
         [Test]
@@ -281,7 +259,7 @@ namespace osu.Game.Tests.Visual.Online
 
             var ruleset = new OsuRuleset().RulesetInfo;
 
-            SoloStatisticsUpdate? update = null;
+            UserStatisticsUpdate? update = null;
             registerForUpdates(scoreId, ruleset, receivedUpdate => update = receivedUpdate);
 
             feignScoreProcessing(userId, ruleset, 5_000_000);
@@ -311,14 +289,21 @@ namespace osu.Game.Tests.Visual.Online
             });
         }
 
-        private void registerForUpdates(long scoreId, RulesetInfo rulesetInfo, Action<SoloStatisticsUpdate> onUpdateReady) =>
-            AddStep("register for updates", () => subscription = watcher.RegisterForStatisticsUpdateAfter(
-                new ScoreInfo(Beatmap.Value.BeatmapInfo, new OsuRuleset().RulesetInfo, new RealmUser())
+        private void registerForUpdates(long scoreId, RulesetInfo rulesetInfo, Action<UserStatisticsUpdate> onUpdateReady) =>
+            AddStep("register for updates", () =>
+            {
+                watcher.RegisterForStatisticsUpdateAfter(
+                    new ScoreInfo(Beatmap.Value.BeatmapInfo, new OsuRuleset().RulesetInfo, new RealmUser())
+                    {
+                        Ruleset = rulesetInfo,
+                        OnlineID = scoreId
+                    });
+                watcher.LatestUpdate.BindValueChanged(update =>
                 {
-                    Ruleset = rulesetInfo,
-                    OnlineID = scoreId
-                },
-                onUpdateReady));
+                    if (update.NewValue?.Score.OnlineID == scoreId)
+                        onUpdateReady.Invoke(update.NewValue);
+                });
+            });
 
         private void feignScoreProcessing(int userId, RulesetInfo rulesetInfo, long newTotalScore)
             => AddStep("feign score processing", () => serverSideStatistics[(userId, rulesetInfo.ShortName)] = new UserStatistics { TotalScore = newTotalScore });
