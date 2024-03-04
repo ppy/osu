@@ -121,8 +121,9 @@ namespace osu.Game.Rulesets.Taiko.UI
                         new Container
                         {
                             Name = "Bar line content",
+                            Masking = true,
                             RelativeSizeAxes = Axes.Both,
-                            Padding = new MarginPadding { Left = hit_target_width / 2 + hit_target_offset }, // To avoid barline appearing before the beginning of playfield when trimmed
+                            Padding = new MarginPadding { Left = hit_target_width / 2 + hit_target_offset },
                             Children = new Drawable[]
                             {
                                 UnderlayElements = new Container
