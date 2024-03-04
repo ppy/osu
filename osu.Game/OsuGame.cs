@@ -1190,6 +1190,9 @@ namespace osu.Game
             {
                 if (entry.Level < LogLevel.Important || entry.Target > LoggingTarget.Database || entry.Target == null) return;
 
+                if (entry.Exception is SentryOnlyDiagnosticsException)
+                    return;
+
                 const int short_term_display_limit = 3;
 
                 if (recentLogCount < short_term_display_limit)
