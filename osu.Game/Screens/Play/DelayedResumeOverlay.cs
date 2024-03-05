@@ -33,7 +33,6 @@ namespace osu.Game.Screens.Play
         private double countdownStartTime;
 
         private Drawable content = null!;
-        private Drawable background = null!;
         private SpriteText countdown = null!;
 
         public DelayedResumeOverlay()
@@ -53,9 +52,9 @@ namespace osu.Game.Screens.Play
                 Masking = true,
                 BorderColour = colours.Yellow,
                 BorderThickness = 1,
-                Children = new[]
+                Children = new Drawable[]
                 {
-                    background = new Box
+                    new Box
                     {
                         Size = new Vector2(250, 40),
                         Colour = Color4.Black,
@@ -75,29 +74,14 @@ namespace osu.Game.Screens.Play
                                 AutoSizeAxes = Axes.Both,
                                 Spacing = new Vector2(5),
                                 Colour = colours.Yellow,
-                                Children = new Drawable[]
+                                Child = countdown = new OsuSpriteText
                                 {
-                                    // new Box
-                                    // {
-                                    //     Anchor = Anchor.Centre,
-                                    //     Origin = Anchor.Centre,
-                                    //     Size = new Vector2(40, 3)
-                                    // },
-                                    countdown = new OsuSpriteText
-                                    {
-                                        Anchor = Anchor.Centre,
-                                        Origin = Anchor.Centre,
-                                        UseFullGlyphHeight = false,
-                                        AlwaysPresent = true,
-                                        Font = OsuFont.Numeric.With(size: 20, fixedWidth: true)
-                                    },
-                                    // new Box
-                                    // {
-                                    //     Anchor = Anchor.Centre,
-                                    //     Origin = Anchor.Centre,
-                                    //     Size = new Vector2(40, 3)
-                                    // }
-                                }
+                                    Anchor = Anchor.Centre,
+                                    Origin = Anchor.Centre,
+                                    UseFullGlyphHeight = false,
+                                    AlwaysPresent = true,
+                                    Font = OsuFont.Numeric.With(size: 20, fixedWidth: true)
+                                },
                             }
                         }
                     }
