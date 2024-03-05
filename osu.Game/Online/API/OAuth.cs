@@ -39,8 +39,8 @@ namespace osu.Game.Online.API
 
         internal void AuthenticateWithLogin(string username, string password)
         {
-            ArgumentException.ThrowIfNullOrEmpty(username);
-            ArgumentException.ThrowIfNullOrEmpty(password);
+            if (string.IsNullOrEmpty(username)) throw new ArgumentException("Missing username.");
+            if (string.IsNullOrEmpty(password)) throw new ArgumentException("Missing password.");
 
             var accessTokenRequest = new AccessTokenRequestPassword(username, password)
             {
