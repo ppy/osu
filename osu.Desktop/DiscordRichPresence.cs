@@ -184,14 +184,14 @@ namespace osu.Desktop
             game.Window?.Raise();
 
             if (!tryParseRoomSecret(args.Secret, out long roomId, out string? password))
-                Logger.Log("Failed to parse the room secret Discord gave us", LoggingTarget.Network, LogLevel.Error);
+                Logger.Log("Could not parse room from Discord RPC Client", LoggingTarget.Network, LogLevel.Important);
 
             var request = new GetRoomRequest(roomId);
             request.Success += room => Schedule(() =>
             {
                 game.PresentMultiplayerMatch(room, password);
             });
-            request.Failure += _ => Logger.Log("Couldn't find the room Discord gave us", LoggingTarget.Network, LogLevel.Error);
+            request.Failure += _ => Logger.Log($"Could not find room {roomId} from Discord RPC Client", LoggingTarget.Network, LogLevel.Important);
             api.Queue(request);
         }
 
