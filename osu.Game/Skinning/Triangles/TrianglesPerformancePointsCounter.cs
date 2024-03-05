@@ -11,11 +11,12 @@ using osu.Framework.Localisation;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Resources.Localisation.Web;
+using osu.Game.Screens.Play.HUD;
 using osuTK;
 
-namespace osu.Game.Screens.Play.HUD
+namespace osu.Game.Skinning.Triangles
 {
-    public partial class DefaultPerformancePointsCounter : PerformancePointsCounter
+    public partial class TrianglesPerformancePointsCounter : PerformancePointsCounter
     {
         protected override bool IsRollingProportional => true;
 

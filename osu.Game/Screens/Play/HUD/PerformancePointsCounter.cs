@@ -27,7 +27,7 @@ using osu.Game.Skinning;
 
 namespace osu.Game.Screens.Play.HUD
 {
-    public partial class PerformancePointsCounter : RollingCounter<int>, ISerialisableDrawable
+    public abstract partial class PerformancePointsCounter : RollingCounter<int>, ISerialisableDrawable
     {
         public bool UsesFixedAnchor { get; set; }
 

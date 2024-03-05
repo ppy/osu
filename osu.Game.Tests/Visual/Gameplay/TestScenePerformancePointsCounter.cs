@@ -18,6 +18,7 @@ using osu.Game.Rulesets.Osu.Scoring;
 using osu.Game.Rulesets.Scoring;
 using osu.Game.Screens.Play;
 using osu.Game.Screens.Play.HUD;
+using osu.Game.Skinning.Triangles;
 using osu.Game.Tests.Gameplay;
 
 namespace osu.Game.Tests.Visual.Gameplay
@@ -32,7 +33,7 @@ namespace osu.Game.Tests.Visual.Gameplay
 
         private int iteration;
 
-        protected override Drawable CreateDefaultImplementation() => new DefaultPerformancePointsCounter();
+        protected override Drawable CreateDefaultImplementation() => new TrianglesPerformancePointsCounter();
         protected override Drawable CreateArgonImplementation() => new ArgonPerformancePointsCounter();
         protected override Drawable CreateLegacyImplementation() => Empty();
 
