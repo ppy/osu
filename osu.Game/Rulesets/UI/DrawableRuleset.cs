@@ -135,8 +135,7 @@ namespace osu.Game.Rulesets.UI
         protected DrawableRuleset(Ruleset ruleset, IBeatmap beatmap, IReadOnlyList<Mod> mods = null)
             : base(ruleset)
         {
-            if (beatmap == null)
-                throw new ArgumentNullException(nameof(beatmap), "Beatmap cannot be null.");
+            ArgumentNullException.ThrowIfNull(beatmap);
 
             if (!(beatmap is Beatmap<TObject> tBeatmap))
                 throw new ArgumentException($"{GetType()} expected the beatmap to contain hitobjects of type {typeof(TObject)}.", nameof(beatmap));
