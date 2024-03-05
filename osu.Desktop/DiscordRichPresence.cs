@@ -193,7 +193,7 @@ namespace osu.Desktop
 
             if (!tryParseRoomSecret(args.Secret, out long roomId, out string? password))
             {
-                Logger.Log("Could not parse room from Discord RPC Client", LoggingTarget.Network, LogLevel.Important);
+                Logger.Log("Could not join multiplayer room.", LoggingTarget.Network, LogLevel.Important);
                 return;
             }
 
