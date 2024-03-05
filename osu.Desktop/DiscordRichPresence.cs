@@ -5,6 +5,7 @@ using System;
 using System.Text;
 using DiscordRPC;
 using DiscordRPC.Message;
+using Newtonsoft.Json;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
@@ -147,7 +148,13 @@ namespace osu.Desktop
                         Size = room.Users.Count,
                     };
 
-                    presence.Secrets.JoinSecret = $"{room.RoomID}:{room.Settings.Password}";
+                    RoomSecret roomSecret = new RoomSecret
+                    {
+                        RoomID = room.RoomID,
+                        Password = room.Settings.Password,
+                    };
+
+                    presence.Secrets.JoinSecret = JsonConvert.SerializeObject(roomSecret);
                 }
                 else
                 {
@@ -182,9 +189,13 @@ namespace osu.Desktop
         private void onJoin(object sender, JoinMessage args)
         {
             game.Window?.Raise();
+            Logger.Log($"Received room secret from Discord RPC Client: {args.Secret}", LoggingTarget.Network, LogLevel.Debug);
 
             if (!tryParseRoomSecret(args.Secret, out long roomId, out string? password))
+            {
                 Logger.Log("Could not parse room from Discord RPC Client", LoggingTarget.Network, LogLevel.Important);
+                return;
+            }
 
             var request = new GetRoomRequest(roomId);
             request.Success += room => Schedule(() =>
@@ -216,21 +227,26 @@ namespace osu.Desktop
             });
         }
 
-        private static bool tryParseRoomSecret(ReadOnlySpan<char> secret, out long roomId, out string? password)
+        private static bool tryParseRoomSecret(string secretJson, out long roomId, out string? password)
         {
             roomId = 0;
             password = null;
 
-            int roomSecretSplitIndex = secret.IndexOf(':');
+            RoomSecret? roomSecret;
 
-            if (roomSecretSplitIndex == -1)
+            try
+            {
+                roomSecret = JsonConvert.DeserializeObject<RoomSecret>(secretJson);
+            }
+            catch
+            {
                 return false;
+            }
 
-            if (!long.TryParse(secret[..roomSecretSplitIndex], out roomId))
-                return false;
+            if (roomSecret == null) return false;
 
-            password = secret[(roomSecretSplitIndex + 1)..].ToString();
-            if (password.Length == 0) password = null;
+            roomId = roomSecret.RoomID;
+            password = roomSecret.Password;
 
             return true;
         }
@@ -253,6 +269,15 @@ namespace osu.Desktop
         {
             client.Dispose();
             base.Dispose(isDisposing);
+        }
+
+        private class RoomSecret
+        {
+            [JsonProperty(@"roomId", Required = Required.Always)]
+            public long RoomID { get; set; }
+
+            [JsonProperty(@"password", Required = Required.AllowNull)]
+            public string? Password { get; set; }
         }
     }
 }
