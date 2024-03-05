@@ -50,6 +50,7 @@ namespace osu.Game.Storyboards
                     StartValue = command.StartValue,
                     EndValue = command.EndValue,
                     PropertyName = command.PropertyName,
+                    IsParameterCommand = command.IsParameterCommand,
                     LoopCount = TotalIterations,
                     Delay = fullLoopDuration - command.EndTime + command.StartTime
                 };
