@@ -17,7 +17,7 @@ namespace osu.Game.Beatmaps.Formats
 {
     public class LegacyStoryboardDecoder : LegacyDecoder<Storyboard>
     {
-        private StoryboardSprite? storyboardSprite;
+        private StoryboardElementWithDuration? storyboardSprite;
         private CommandTimelineGroup? timelineGroup;
 
         private Storyboard storyboard = null!;

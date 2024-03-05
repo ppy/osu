@@ -25,6 +25,7 @@ namespace osu.Game.Storyboards
         public T EndValue { get; private set; }
 
         public string PropertyName { get; }
+        public bool IsParameterTimeline { get; set; }
 
         public CommandTimeline(string propertyName)
         {
@@ -38,7 +39,7 @@ namespace osu.Game.Storyboards
                 endTime = startTime;
             }
 
-            commands.Add(new TypedCommand { Easing = easing, StartTime = startTime, EndTime = endTime, StartValue = startValue, EndValue = endValue, PropertyName = PropertyName });
+            commands.Add(new TypedCommand { Easing = easing, StartTime = startTime, EndTime = endTime, StartValue = startValue, EndValue = endValue, PropertyName = PropertyName, IsParameterCommand = IsParameterTimeline });
 
             if (startTime < StartTime)
             {
@@ -65,6 +66,7 @@ namespace osu.Game.Storyboards
             public string PropertyName { get; set; }
             public int LoopCount { get; set; }
             public double Delay { get; set; }
+            public bool IsParameterCommand { get; set; }
 
             public T StartValue;
             public T EndValue;

@@ -22,9 +22,9 @@ namespace osu.Game.Storyboards
         public CommandTimeline<float> Rotation = new CommandTimeline<float>("Rotation");
         public CommandTimeline<ColourInfo> Colour = new CommandTimeline<ColourInfo>("Colour");
         public CommandTimeline<float> Alpha = new CommandTimeline<float>("Alpha");
-        public CommandTimeline<BlendingParameters> BlendingParameters = new CommandTimeline<BlendingParameters>("Blending");
-        public CommandTimeline<bool> FlipH = new CommandTimeline<bool>("FlipH");
-        public CommandTimeline<bool> FlipV = new CommandTimeline<bool>("FlipV");
+        public CommandTimeline<BlendingParameters> BlendingParameters = new CommandTimeline<BlendingParameters>("Blending") { IsParameterTimeline = true };
+        public CommandTimeline<bool> FlipH = new CommandTimeline<bool>("FlipH") { IsParameterTimeline = true };
+        public CommandTimeline<bool> FlipV = new CommandTimeline<bool>("FlipV") { IsParameterTimeline = true };
 
         private readonly ICommandTimeline[] timelines;
 
@@ -109,7 +109,8 @@ namespace osu.Game.Storyboards
                         EndTime = offset + command.EndTime,
                         StartValue = command.StartValue,
                         EndValue = command.EndValue,
-                        PropertyName = command.PropertyName
+                        PropertyName = command.PropertyName,
+                        IsParameterCommand = command.IsParameterCommand
                     });
             }
 
