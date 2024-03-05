@@ -222,38 +222,13 @@ namespace osu.Game.Storyboards
                 initializeProperty?.Invoke(drawable, command.StartValue);
 
                 using (drawable.BeginAbsoluteSequence(command.StartTime))
-                    transform(drawable);
-            }
+                {
+                    var sequence = command.IsParameterCommand
+                        ? drawable.TransformTo(command.PropertyName, command.StartValue).Delay(command.Duration).TransformTo(command.PropertyName, command.EndValue)
+                        : drawable.TransformTo(command.PropertyName, command.StartValue).Then().TransformTo(command.PropertyName, command.EndValue, command.Duration, command.Easing);
 
-            private void transform(TDrawable drawable)
-            {
-                if (command.IsParameterCommand)
-                {
-                    if (command.LoopCount == 0)
-                    {
-                        drawable.TransformTo(command.PropertyName, command.StartValue).Delay(command.Duration)
-                                .TransformTo(command.PropertyName, command.EndValue);
-                    }
-                    else
-                    {
-                        drawable.TransformTo(command.PropertyName, command.StartValue).Delay(command.Duration)
-                                .TransformTo(command.PropertyName, command.EndValue)
-                                .Loop(command.Delay, command.LoopCount);
-                    }
-                }
-                else
-                {
-                    if (command.LoopCount == 0)
-                    {
-                        drawable.TransformTo(command.PropertyName, command.StartValue).Then()
-                                .TransformTo(command.PropertyName, command.EndValue, command.Duration, command.Easing);
-                    }
-                    else
-                    {
-                        drawable.TransformTo(command.PropertyName, command.StartValue).Then()
-                                .TransformTo(command.PropertyName, command.EndValue, command.Duration, command.Easing)
-                                .Loop(command.Delay, command.LoopCount);
-                    }
+                    if (command.LoopCount > 0)
+                        sequence.Loop(command.Delay, command.LoopCount);
                 }
             }
         }
