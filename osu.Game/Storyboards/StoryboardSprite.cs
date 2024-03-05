@@ -17,5 +17,3 @@ namespace osu.Game.Storyboards
         public override DrawableStoryboardSprite CreateStoryboardDrawable() => new DrawableStoryboardSprite(this);
     }
 }
-
-
