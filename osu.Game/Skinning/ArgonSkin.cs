@@ -118,6 +118,7 @@ namespace osu.Game.Skinning
                                 var wedgePieces = container.OfType<ArgonWedgePiece>().ToArray();
                                 var score = container.OfType<ArgonScoreCounter>().FirstOrDefault();
                                 var accuracy = container.OfType<ArgonAccuracyCounter>().FirstOrDefault();
+                                var performancePoints = container.OfType<ArgonPerformancePointsCounter>().FirstOrDefault();
                                 var combo = container.OfType<ArgonComboCounter>().FirstOrDefault();
                                 var songProgress = container.OfType<ArgonSongProgress>().FirstOrDefault();
                                 var keyCounter = container.OfType<ArgonKeyCounterDisplay>().FirstOrDefault();
@@ -157,6 +158,13 @@ namespace osu.Game.Skinning
                                         accuracy.Position = new Vector2(-20, 20);
                                         accuracy.Anchor = Anchor.TopRight;
                                         accuracy.Origin = Anchor.TopRight;
+                                    }
+
+                                    if (performancePoints != null && accuracy != null)
+                                    {
+                                        performancePoints.Position = new Vector2(accuracy.X, accuracy.Y + accuracy.DrawHeight + 10);
+                                        performancePoints.Anchor = Anchor.TopRight;
+                                        performancePoints.Origin = Anchor.TopRight;
                                     }
 
                                     var hitError = container.OfType<HitErrorMeter>().FirstOrDefault();
@@ -224,6 +232,7 @@ namespace osu.Game.Skinning
                                         CornerRadius = { Value = 0.5f }
                                     },
                                     new ArgonAccuracyCounter(),
+                                    new ArgonPerformancePointsCounter(),
                                     new ArgonComboCounter
                                     {
                                         Scale = new Vector2(1.3f)
