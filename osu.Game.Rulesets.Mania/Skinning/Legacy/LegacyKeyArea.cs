@@ -47,19 +47,18 @@ namespace osu.Game.Rulesets.Mania.Skinning.Legacy
                 AutoSizeAxes = Axes.Y,
                 Children = new Drawable[]
                 {
+                    // Key images are placed side-to-side on the playfield, therefore ClampToEdge must be used to prevent any gaps between each key.
                     upSprite = new Sprite
                     {
                         Origin = Anchor.BottomCentre,
-                        // ClampToEdge is used to avoid gaps between keys, see: https://github.com/ppy/osu/issues/27431
-                        Texture = skin.GetTexture(upImage, WrapMode.ClampToEdge, WrapMode.ClampToEdge),
+                        Texture = skin.GetTexture(upImage, WrapMode.ClampToEdge, default),
                         RelativeSizeAxes = Axes.X,
                         Width = 1
                     },
                     downSprite = new Sprite
                     {
                         Origin = Anchor.BottomCentre,
-                        // ClampToEdge is used to avoid gaps between keys, see: https://github.com/ppy/osu/issues/27431
-                        Texture = skin.GetTexture(downImage, WrapMode.ClampToEdge, WrapMode.ClampToEdge),
+                        Texture = skin.GetTexture(downImage, WrapMode.ClampToEdge, default),
                         RelativeSizeAxes = Axes.X,
                         Width = 1,
                         Alpha = 0
