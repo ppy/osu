@@ -189,7 +189,7 @@ namespace osu.Game.Rulesets.UI
             double timeBehind = Math.Abs(proposedTime - referenceClock.CurrentTime);
 
             isCatchingUp.Value = timeBehind > 200;
-            waitingOnFrames.Value = state == PlaybackState.NotValid;
+            waitingOnFrames.Value = hasReplayAttached && state == PlaybackState.NotValid;
 
             manualClock.CurrentTime = proposedTime;
             manualClock.Rate = Math.Abs(referenceClock.Rate) * direction;
