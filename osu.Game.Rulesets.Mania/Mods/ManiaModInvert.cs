@@ -47,7 +47,6 @@ namespace osu.Game.Rulesets.Mania.Mods
                 List<(double startTime, IList<HitSampleInfo> samples, string type)> locations;
 
                 if (FullInvert.Value)
-                {
                     locations = column.OfType<Note>().Select(n => (startTime: n.StartTime, samples: n.Samples, type: "note"))
                         .Concat(column.OfType<HoldNote>().SelectMany(h => new[]
                         {
@@ -55,12 +54,10 @@ namespace osu.Game.Rulesets.Mania.Mods
                             (startTime: h.EndTime, samples: h.GetNodeSamples(1), type: "note")
                         }))
                         .OrderBy(h => h.startTime).ToList();
-                }
                 else
-                {
                     locations = column.Select(n => (startTime: n.StartTime, samples: n.Samples, type: "note"))
                         .OrderBy(h => h.startTime).ToList();
-                }
+
                 for (int i = 0; i < locations.Count - 1; i++)
                 {
                     if (locations[i].type == "release")
@@ -84,6 +81,7 @@ namespace osu.Game.Rulesets.Mania.Mods
                         NodeSamples = new List<IList<HitSampleInfo>> { locations[i].samples, Array.Empty<HitSampleInfo>() }
                     });
                 }
+
                 newObjects.AddRange(newColumnObjects);
             }
 
