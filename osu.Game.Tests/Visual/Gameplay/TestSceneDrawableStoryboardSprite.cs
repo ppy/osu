@@ -175,7 +175,8 @@ namespace osu.Game.Tests.Visual.Gameplay
             var layer = storyboard.GetLayer("Background");
 
             var sprite = new StoryboardSprite(lookupName, origin, initialPosition);
-            sprite.AddLoop(Time.Current, 100).Alpha.Add(Easing.None, 0, 10000, 1, 1);
+            var loop = sprite.AddLoopingGroup(Time.Current, 100);
+            loop.AddAlpha(0, 10000, 1, 1, Easing.None);
 
             layer.Elements.Clear();
             layer.Add(sprite);
