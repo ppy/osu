@@ -69,7 +69,7 @@ namespace osu.Game.Overlays.Settings
         {
             protected override bool AllowIme => false;
 
-            protected override bool CanAddCharacter(char character) => character.IsAsciiDigit();
+            protected override bool CanAddCharacter(char character) => char.IsAsciiDigit(character);
 
             public new void NotifyInputError() => base.NotifyInputError();
         }
