@@ -61,8 +61,10 @@ namespace osu.Game.Rulesets.Mania.Mods
                         NodeSamples = new List<IList<HitSampleInfo>> { locations[i].samples, Array.Empty<HitSampleInfo>() }
                     });
                 }
+
                 newObjects.AddRange(newColumnObjects);
             }
+
             maniaBeatmap.HitObjects = newObjects.OrderBy(h => h.StartTime).ToList();
 
             // No breaks
