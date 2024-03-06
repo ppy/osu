@@ -4,10 +4,12 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using osu.Framework.Bindables;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Localisation;
 using osu.Game.Audio;
 using osu.Game.Beatmaps;
+using osu.Game.Configuration;
 using osu.Game.Rulesets.Mania.Beatmaps;
 using osu.Game.Rulesets.Mania.Objects;
 using osu.Game.Rulesets.Mods;
@@ -29,6 +31,9 @@ namespace osu.Game.Rulesets.Mania.Mods
 
         public override Type[] IncompatibleMods => new[] { typeof(ManiaModHoldOff) };
 
+        [SettingSource("Invert Long Notes", "Invert long notes into nothing.")]
+        public BindableBool FullInvert { get; } = new BindableBool();
+
         public void ApplyToBeatmap(IBeatmap beatmap)
         {
             var maniaBeatmap = (ManiaBeatmap)beatmap;
@@ -39,19 +44,34 @@ namespace osu.Game.Rulesets.Mania.Mods
             {
                 var newColumnObjects = new List<ManiaHitObject>();
 
-                var locations = column.Select(n => (startTime: n.StartTime, samples: n.Samples))
-                                  .OrderBy(n => n.startTime).ToList();
+                List<(double startTime, IList<HitSampleInfo> samples, string type)> locations;
+
+                if (FullInvert.Value)
+                    locations = column.OfType<Note>().Select(n => (startTime: n.StartTime, samples: n.Samples, type: "note"))
+                        .Concat(column.OfType<HoldNote>().SelectMany(h => new[]
+                        {
+                            (startTime: h.StartTime, samples: h.GetNodeSamples(0), type: "release"),
+                            (startTime: h.EndTime, samples: h.GetNodeSamples(1), type: "note")
+                        }))
+                        .OrderBy(h => h.startTime).ToList();
+                else
+                    locations = column.Select(n => (startTime: n.StartTime, samples: n.Samples, type: "note"))
+                        .OrderBy(h => h.startTime).ToList();
 
                 for (int i = 0; i < locations.Count - 1; i++)
                 {
-                    // Full duration of the hold note.
-                    double duration = locations[i + 1].startTime - locations[i].startTime;
+                    if (locations[i].type == "release")
+                        continue;
 
                     // Beat length at the end of the hold note.
                     double beatLength = beatmap.ControlPointInfo.TimingPointAt(locations[i + 1].startTime).BeatLength;
 
-                    // Decrease the duration by at most a 1/4 beat to ensure there's no instantaneous notes.
-                    duration = Math.Max(duration / 2, duration - beatLength / 4);
+                    // Full duration of the hold note.
+                    double duration = locations[i + 1].startTime - locations[i].startTime;
+
+                    if (locations[i + 1].type != "release")
+                        // Decrease the duration by at most a 1/4 beat to ensure there's no instantaneous notes.
+                        duration = Math.Max(duration / 2, duration - beatLength / 4);
 
                     newColumnObjects.Add(new HoldNote
                     {
