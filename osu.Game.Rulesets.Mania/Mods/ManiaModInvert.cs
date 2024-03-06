@@ -63,7 +63,6 @@ namespace osu.Game.Rulesets.Mania.Mods
                 }
                 newObjects.AddRange(newColumnObjects);
             }
-
             maniaBeatmap.HitObjects = newObjects.OrderBy(h => h.StartTime).ToList();
 
             // No breaks
