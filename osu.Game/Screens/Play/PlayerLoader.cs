@@ -25,6 +25,7 @@ using osu.Game.Input;
 using osu.Game.Localisation;
 using osu.Game.Overlays;
 using osu.Game.Overlays.Notifications;
+using osu.Game.Performance;
 using osu.Game.Screens.Menu;
 using osu.Game.Screens.Play.PlayerSettings;
 using osu.Game.Skinning;
@@ -78,8 +79,8 @@ namespace osu.Game.Screens.Play
 
         private readonly BindableDouble volumeAdjustment = new BindableDouble(1);
 
-        private AudioFilter lowPassFilter = null!;
-        private AudioFilter highPassFilter = null!;
+        private AudioFilter? lowPassFilter;
+        private AudioFilter? highPassFilter;
 
         private SkinnableSound sampleRestart = null!;
 
@@ -140,6 +141,8 @@ namespace osu.Game.Screens.Play
 
         private bool quickRestart;
 
+        private IDisposable? highPerformanceSession;
+
         [Resolved]
         private INotificationOverlay? notificationOverlay { get; set; }
 
@@ -152,13 +155,16 @@ namespace osu.Game.Screens.Play
         [Resolved]
         private BatteryInfo? batteryInfo { get; set; }
 
+        [Resolved]
+        private IHighPerformanceSessionManager? highPerformanceSessionManager { get; set; }
+
         public PlayerLoader(Func<Player> createPlayer)
         {
             this.createPlayer = createPlayer;
         }
 
         [BackgroundDependencyLoader]
-        private void load(SessionStatics sessionStatics, AudioManager audio, OsuConfigManager config)
+        private void load(SessionStatics sessionStatics, OsuConfigManager config)
         {
             muteWarningShownOnce = sessionStatics.GetBindable<bool>(Static.MutedAudioNotificationShownOnce);
             batteryWarningShownOnce = sessionStatics.GetBindable<bool>(Static.LowBatteryNotificationShownOnce);
@@ -205,8 +211,6 @@ namespace osu.Game.Screens.Play
                     },
                 },
                 idleTracker = new IdleTracker(750),
-                lowPassFilter = new AudioFilter(audio.TrackMixer),
-                highPassFilter = new AudioFilter(audio.TrackMixer, BQFType.HighPass),
                 sampleRestart = new SkinnableSound(new SampleInfo(@"Gameplay/restart", @"pause-retry-click"))
             };
 
@@ -264,6 +268,9 @@ namespace osu.Game.Screens.Play
 
             Debug.Assert(CurrentPlayer != null);
 
+            highPerformanceSession?.Dispose();
+            highPerformanceSession = null;
+
             // prepare for a retry.
             CurrentPlayer = null;
             playerConsumed = false;
@@ -284,8 +291,9 @@ namespace osu.Game.Screens.Play
             // stop the track before removing adjustment to avoid a volume spike.
             Beatmap.Value.Track.Stop();
             Beatmap.Value.Track.RemoveAdjustment(AdjustableProperty.Volume, volumeAdjustment);
-            lowPassFilter.CutoffTo(AudioFilter.MAX_LOWPASS_CUTOFF);
-            highPassFilter.CutoffTo(0);
+
+            lowPassFilter?.RemoveAndDisposeImmediately();
+            highPassFilter?.RemoveAndDisposeImmediately();
         }
 
         public override bool OnExiting(ScreenExitEvent e)
@@ -303,6 +311,9 @@ namespace osu.Game.Screens.Play
 
             BackgroundBrightnessReduction = false;
             Beatmap.Value.Track.RemoveAdjustment(AdjustableProperty.Volume, volumeAdjustment);
+
+            highPerformanceSession?.Dispose();
+            highPerformanceSession = null;
 
             return base.OnExiting(e);
         }
@@ -425,6 +436,12 @@ namespace osu.Game.Screens.Play
             settingsScroll.FadeInFromZero(500, Easing.Out)
                           .MoveToX(0, 500, Easing.OutQuint);
 
+            AddRangeInternal(new[]
+            {
+                lowPassFilter = new AudioFilter(audioManager.TrackMixer),
+                highPassFilter = new AudioFilter(audioManager.TrackMixer, BQFType.HighPass),
+            });
+
             lowPassFilter.CutoffTo(1000, 650, Easing.OutQuint);
             highPassFilter.CutoffTo(300).Then().CutoffTo(0, 1250); // 1250 is to line up with the appearance of MetadataInfo (750 delay + 500 fade-in)
 
@@ -437,13 +454,23 @@ namespace osu.Game.Screens.Play
             content.StopTracking();
 
             content.ScaleTo(0.7f, CONTENT_OUT_DURATION * 2, Easing.OutQuint);
-            content.FadeOut(CONTENT_OUT_DURATION, Easing.OutQuint);
+            content.FadeOut(CONTENT_OUT_DURATION, Easing.OutQuint)
+                   // Safety for filter potentially getting stuck in applied state due to
+                   // transforms on `this` causing children to no longer be updated.
+                   .OnComplete(_ =>
+                   {
+                       highPassFilter?.RemoveAndDisposeImmediately();
+                       highPassFilter = null;
+
+                       lowPassFilter?.RemoveAndDisposeImmediately();
+                       lowPassFilter = null;
+                   });
 
             settingsScroll.FadeOut(CONTENT_OUT_DURATION, Easing.OutQuint)
                           .MoveToX(settingsScroll.DrawWidth, CONTENT_OUT_DURATION * 2, Easing.OutQuint);
 
-            lowPassFilter.CutoffTo(AudioFilter.MAX_LOWPASS_CUTOFF, CONTENT_OUT_DURATION);
-            highPassFilter.CutoffTo(0, CONTENT_OUT_DURATION);
+            lowPassFilter?.CutoffTo(AudioFilter.MAX_LOWPASS_CUTOFF, CONTENT_OUT_DURATION);
+            highPassFilter?.CutoffTo(0, CONTENT_OUT_DURATION);
         }
 
         private void pushWhenLoaded()
@@ -462,6 +489,10 @@ namespace osu.Game.Screens.Play
             // this value is reset via cancelLoad() to allow a second usage of the same PlayerLoader screen.
             if (scheduledPushPlayer != null)
                 return;
+
+            // Now that everything's been loaded, we can safely switch to a higher performance session without incurring too much overhead.
+            // Doing this prior to the game being pushed gives us a bit of time to stabilise into the high performance mode before gameplay starts.
+            highPerformanceSession ??= highPerformanceSessionManager?.BeginSession();
 
             scheduledPushPlayer = Scheduler.AddDelayed(() =>
             {
