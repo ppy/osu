@@ -216,7 +216,7 @@ namespace osu.Game.Tests.Visual.Gameplay
         {
             var storyboard = new Storyboard();
             var sprite = new StoryboardSprite("unknown", Anchor.TopLeft, Vector2.Zero);
-            sprite.TimelineGroup.Alpha.Add(Easing.None, 0, duration, 1, 0);
+            sprite.Group.AddAlpha(0, duration, 1, 0, Easing.None);
             storyboard.GetLayer("Background").Add(sprite);
             return storyboard;
         }

@@ -7,7 +7,7 @@ using osu.Game.Storyboards.Drawables;
 
 namespace osu.Game.Storyboards
 {
-    public class StoryboardAnimation : StoryboardElementWithDuration<DrawableStoryboardAnimation>
+    public class StoryboardAnimation : StoryboardSprite
     {
         public int FrameCount;
         public double FrameDelay;
@@ -21,7 +21,7 @@ namespace osu.Game.Storyboards
             LoopType = loopType;
         }
 
-        public override DrawableStoryboardAnimation CreateStoryboardDrawable() => new DrawableStoryboardAnimation(this);
+        public override Drawable CreateDrawable() => new DrawableStoryboardAnimation(this);
     }
 
     public enum AnimationLoopType
