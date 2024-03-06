@@ -366,7 +366,7 @@ namespace osu.Game.Screens.Edit.Timing
                     new CircularProgress
                     {
                         RelativeSizeAxes = Axes.Both,
-                        Current = { Value = 1f / light_count - angular_light_gap },
+                        Progress = 1f / light_count - angular_light_gap,
                         Colour = colourProvider.Background2,
                     },
                     fillContent = new Container
@@ -379,7 +379,7 @@ namespace osu.Game.Screens.Edit.Timing
                             new CircularProgress
                             {
                                 RelativeSizeAxes = Axes.Both,
-                                Current = { Value = 1f / light_count - angular_light_gap },
+                                Progress = 1f / light_count - angular_light_gap,
                                 Blending = BlendingParameters.Additive
                             },
                             // Please do not try and make sense of this.
@@ -388,7 +388,7 @@ namespace osu.Game.Screens.Edit.Timing
                             Glow = new CircularProgress
                             {
                                 RelativeSizeAxes = Axes.Both,
-                                Current = { Value = 1f / light_count - 0.01f },
+                                Progress = 1f / light_count - 0.01f,
                                 Blending = BlendingParameters.Additive
                             }.WithEffect(new GlowEffect
                             {
