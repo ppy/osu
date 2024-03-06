@@ -81,6 +81,19 @@ namespace osu.Game.Rulesets.UI
 
         public override IFrameStableClock FrameStableClock => frameStabilityContainer;
 
+        private bool allowBackwardsSeeks;
+
+        public override bool AllowBackwardsSeeks
+        {
+            get => allowBackwardsSeeks;
+            set
+            {
+                allowBackwardsSeeks = value;
+                if (frameStabilityContainer != null)
+                    frameStabilityContainer.AllowBackwardsSeeks = value;
+            }
+        }
+
         private bool frameStablePlayback = true;
 
         internal override bool FrameStablePlayback
@@ -178,6 +191,7 @@ namespace osu.Game.Rulesets.UI
             InternalChild = frameStabilityContainer = new FrameStabilityContainer(GameplayStartTime)
             {
                 FrameStablePlayback = FrameStablePlayback,
+                AllowBackwardsSeeks = AllowBackwardsSeeks,
                 Children = new Drawable[]
                 {
                     FrameStableComponents,
@@ -462,6 +476,12 @@ namespace osu.Game.Rulesets.UI
         /// Whether to enable frame-stable playback.
         /// </summary>
         internal abstract bool FrameStablePlayback { get; set; }
+
+        /// <summary>
+        /// When a replay is not attached, we usually block any backwards seeks.
+        /// This will bypass the check. Should only be used for tests.
+        /// </summary>
+        public abstract bool AllowBackwardsSeeks { get; set; }
 
         /// <summary>
         /// The mods which are to be applied.
