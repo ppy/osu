@@ -75,21 +75,21 @@ namespace osu.Game.Screens.Play.HUD
                             AutoSizeAxes = Axes.Both,
                             Child = wholePart = new ArgonCounterTextComponent(Anchor.TopRight, BeatmapsetsStrings.ShowScoreboardHeadersAccuracy.ToUpper())
                             {
-                                RequiredDisplayDigits = { Value = 3 },
                                 WireframeOpacity = { BindTarget = WireframeOpacity },
+                                WireframeTemplate = @"###",
                                 ShowLabel = { BindTarget = ShowLabel },
                             }
                         },
                         fractionPart = new ArgonCounterTextComponent(Anchor.TopLeft)
                         {
-                            RequiredDisplayDigits = { Value = 2 },
                             WireframeOpacity = { BindTarget = WireframeOpacity },
+                            WireframeTemplate = @".##",
                             Scale = new Vector2(0.5f),
                         },
                         percentText = new ArgonCounterTextComponent(Anchor.TopLeft)
                         {
                             Text = @"%",
-                            RequiredDisplayDigits = { Value = 1 },
+                            WireframeTemplate = @"#",
                             WireframeOpacity = { BindTarget = WireframeOpacity }
                         },
                     }
