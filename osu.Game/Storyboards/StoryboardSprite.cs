@@ -90,41 +90,8 @@ namespace osu.Game.Storyboards
                 // Ignore the whole setup if there are loops. In theory they can be handled here too, however the logic will be overly complex.
                 if (loops.Count == 0)
                 {
-                    // Here we are starting from maximum value and trying to minimise the end time on each step.
-                    // There are few solid guesses we can make using which sprite's end time can be minimised: alpha = 0, scale = 0, colour.a = 0.
-                    double[] deathTimes =
-                    {
-                        double.MaxValue, // alpha
-                        double.MaxValue, // colour alpha
-                        double.MaxValue, // scale
-                        double.MaxValue, // scale x
-                        double.MaxValue, // scale y
-                    };
-
-                    // The loops below are following the same pattern.
-                    // We could be using TimelineGroup.EndValue here, however it's possible to have multiple commands with 0 value in a row
-                    // so we are saving the earliest of them.
-                    foreach (var alphaCommand in TimelineGroup.Alpha.Commands)
-                    {
-                        deathTimes[0] = alphaCommand.EndValue == 0
-                            ? Math.Min(alphaCommand.EndTime, deathTimes[0]) // commands are ordered by the start time, however end time may vary. Save the earliest.
-                            : double.MaxValue; // If value isn't 0 (sprite becomes visible again), revert the saved state.
-                    }
-
-                    foreach (var colourCommand in TimelineGroup.Colour.Commands)
-                        deathTimes[1] = colourCommand.EndValue.A == 0 ? Math.Min(colourCommand.EndTime, deathTimes[1]) : double.MaxValue;
-
-                    foreach (var scaleCommand in TimelineGroup.Scale.Commands)
-                        deathTimes[2] = scaleCommand.EndValue == 0 ? Math.Min(scaleCommand.EndTime, deathTimes[2]) : double.MaxValue;
-
-                    foreach (var scaleCommand in TimelineGroup.VectorScale.Commands)
-                    {
-                        deathTimes[3] = scaleCommand.EndValue.X == 0 ? Math.Min(scaleCommand.EndTime, deathTimes[3]) : double.MaxValue;
-                        deathTimes[4] = scaleCommand.EndValue.Y == 0 ? Math.Min(scaleCommand.EndTime, deathTimes[4]) : double.MaxValue;
-                    }
-
                     // Take the minimum time of all the potential "death" reasons.
-                    latestEndTime = deathTimes.Min();
+                    latestEndTime = calculateOptimisedEndTime(TimelineGroup);
                 }
 
                 // If the logic above fails to find anything or discarded by the fact that there are loops present, latestEndTime will be double.MaxValue
@@ -236,6 +203,47 @@ namespace osu.Game.Storyboards
             }
 
             return commands;
+        }
+
+        private static double calculateOptimisedEndTime(CommandTimelineGroup timelineGroup)
+        {
+            // Here we are starting from maximum value and trying to minimise the end time on each step.
+            // There are few solid guesses we can make using which sprite's end time can be minimised: alpha = 0, scale = 0, colour.a = 0.
+            double[] deathTimes =
+            {
+                double.MaxValue, // alpha
+                double.MaxValue, // colour alpha
+                double.MaxValue, // scale
+                double.MaxValue, // scale x
+                double.MaxValue, // scale y
+            };
+
+            // The loops below are following the same pattern.
+            // We could be using TimelineGroup.EndValue here, however it's possible to have multiple commands with 0 value in a row
+            // so we are saving the earliest of them.
+            foreach (var alphaCommand in timelineGroup.Alpha.Commands)
+            {
+                if (alphaCommand.EndValue == 0)
+                    // commands are ordered by the start time, however end time may vary. Save the earliest.
+                    deathTimes[0] = Math.Min(alphaCommand.EndTime, deathTimes[0]);
+                else
+                    // If value isn't 0 (sprite becomes visible again), revert the saved state.
+                    deathTimes[0] = double.MaxValue;
+            }
+
+            foreach (var colourCommand in timelineGroup.Colour.Commands)
+                deathTimes[1] = colourCommand.EndValue.A == 0 ? Math.Min(colourCommand.EndTime, deathTimes[1]) : double.MaxValue;
+
+            foreach (var scaleCommand in timelineGroup.Scale.Commands)
+                deathTimes[2] = scaleCommand.EndValue == 0 ? Math.Min(scaleCommand.EndTime, deathTimes[2]) : double.MaxValue;
+
+            foreach (var scaleCommand in timelineGroup.VectorScale.Commands)
+            {
+                deathTimes[3] = scaleCommand.EndValue.X == 0 ? Math.Min(scaleCommand.EndTime, deathTimes[3]) : double.MaxValue;
+                deathTimes[4] = scaleCommand.EndValue.Y == 0 ? Math.Min(scaleCommand.EndTime, deathTimes[4]) : double.MaxValue;
+            }
+
+            return deathTimes.Min();
         }
 
         public override string ToString()
