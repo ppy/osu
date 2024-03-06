@@ -415,7 +415,7 @@ namespace osu.Game.Database
 
                     // Calculate how many times the longest combo the user has achieved in the play can repeat
                     // without exceeding the combo portion in score V1 as achieved by the player.
-                    // This it intentionally does not operate on object count and uses only score instead.
+                    // This intentionally does not operate on object count and uses only score instead.
                     double maximumOccurrencesOfLongestCombo = Math.Floor(comboPortionInScoreV1 / comboPortionFromLongestComboInScoreV1);
                     double comboPortionFromRepeatedLongestCombosInScoreV1 = maximumOccurrencesOfLongestCombo * comboPortionFromLongestComboInScoreV1;
 
