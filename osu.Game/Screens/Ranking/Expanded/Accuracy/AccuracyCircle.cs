@@ -152,7 +152,7 @@ namespace osu.Game.Screens.Ranking.Expanded.Accuracy
                     Colour = OsuColour.Gray(47),
                     Alpha = 0.5f,
                     InnerRadius = accuracy_circle_radius + 0.01f, // Extends a little bit into the circle
-                    Current = { Value = 1 },
+                    Progress = 1,
                 },
                 accuracyCircle = new CircularProgress
                 {
@@ -273,7 +273,7 @@ namespace osu.Game.Screens.Ranking.Expanded.Accuracy
                 if (targetAccuracy < 1 && targetAccuracy >= visual_alignment_offset)
                     targetAccuracy -= visual_alignment_offset;
 
-                accuracyCircle.FillTo(targetAccuracy, ACCURACY_TRANSFORM_DURATION, ACCURACY_TRANSFORM_EASING);
+                accuracyCircle.ProgressTo(targetAccuracy, ACCURACY_TRANSFORM_DURATION, ACCURACY_TRANSFORM_EASING);
 
                 if (withFlair)
                 {
@@ -364,7 +364,7 @@ namespace osu.Game.Screens.Ranking.Expanded.Accuracy
                                 .FadeOut(800, Easing.Out);
 
                             accuracyCircle
-                                .FillTo(accuracyS - GRADE_SPACING_PERCENTAGE / 2 - visual_alignment_offset, 70, Easing.OutQuint);
+                                .ProgressTo(accuracyS - GRADE_SPACING_PERCENTAGE / 2 - visual_alignment_offset, 70, Easing.OutQuint);
 
                             badges.Single(b => b.Rank == getRank(ScoreRank.S))
                                   .FadeOut(70, Easing.OutQuint);
