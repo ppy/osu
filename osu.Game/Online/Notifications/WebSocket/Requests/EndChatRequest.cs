@@ -3,7 +3,7 @@
 
 using Newtonsoft.Json;
 
-namespace osu.Game.Online.Notifications.WebSocket
+namespace osu.Game.Online.Notifications.WebSocket.Requests
 {
     /// <summary>
     /// A websocket message notifying the server that the client no longer wants to receive chat messages.
