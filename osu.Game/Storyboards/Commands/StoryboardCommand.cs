@@ -1,12 +1,13 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Transforms;
 
 namespace osu.Game.Storyboards.Commands
 {
-    public abstract class StoryboardCommand<T> : IStoryboardCommand
+    public abstract class StoryboardCommand<T> : IStoryboardCommand, IComparable<StoryboardCommand<T>>
     {
         public double StartTime { get; }
         public double EndTime { get; }
@@ -41,10 +42,14 @@ namespace osu.Game.Storyboards.Commands
         /// </summary>
         public abstract TransformSequence<Drawable> ApplyTransform(Drawable d);
 
-        public int CompareTo(IStoryboardCommand other)
+        public int CompareTo(StoryboardCommand<T>? other)
         {
+            if (other == null)
+                return 1;
+
             int result = StartTime.CompareTo(other.StartTime);
-            if (result != 0) return result;
+            if (result != 0)
+                return result;
 
             return EndTime.CompareTo(other.EndTime);
         }
