@@ -113,5 +113,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
 
             return currentStrain;
         }
+
+        public static double DifficultyToPerformance(double difficulty) => Math.Pow(difficulty, 2) * 25.0;
     }
 }

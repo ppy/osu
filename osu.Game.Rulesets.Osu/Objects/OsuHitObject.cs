@@ -49,6 +49,7 @@ namespace osu.Game.Rulesets.Osu.Objects
 
         public double TimePreempt = 600;
         public double TimeFadeIn = 400;
+        public double TimeFadeInRaw = 400;
 
         private HitObjectProperty<Vector2> position;
 
@@ -165,6 +166,7 @@ namespace osu.Game.Rulesets.Osu.Objects
             // Note that this doesn't exactly match the AR>10 visuals as they're classically known, but it feels good.
             // This adjustment is necessary for AR>10, otherwise TimePreempt can become smaller leading to hitcircles not fully fading in.
             TimeFadeIn = 400 * Math.Min(1, TimePreempt / PREEMPT_MIN);
+            TimeFadeInRaw = TimeFadeIn;
 
             Scale = LegacyRulesetExtensions.CalculateScaleFromCircleSize(difficulty.CircleSize, true);
         }

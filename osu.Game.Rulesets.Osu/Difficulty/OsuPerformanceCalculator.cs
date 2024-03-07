@@ -69,7 +69,13 @@ namespace osu.Game.Rulesets.Osu.Difficulty
 
             // Cognition
 
+            // Preferably this value should be used for capping low AR reading performance
+            // Because it should have lower cap (you can actually see)
+            // But it will make formula really weird and overcomplicated
             double potentialFlashlightValue = computeFlashlightValue(score, osuAttributes);
+
+            // Get HDFL value for capping reading performance
+            double potentialHiddenFlashlightValue = computeFlashlightValue(score, osuAttributes, true);
 
             double flashlightValue = potentialFlashlightValue;
             if (!score.Mods.Any(h => h is OsuModFlashlight))
@@ -91,7 +97,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
 
             double readingNonARValue = readingHDValue + readingSlidersValue;
             double cognitionValue = Math.Pow(Math.Pow(flashlightARValue, power) + Math.Pow(readingNonARValue, power), 1.0 / power);
-            cognitionValue = AdjustCognitionPerformance(cognitionValue, mechanicalValue, potentialFlashlightValue);
+            cognitionValue = AdjustCognitionPerformance(cognitionValue, mechanicalValue, potentialHiddenFlashlightValue);
 
             double accuracyValue = computeAccuracyValue(score, osuAttributes);
 
@@ -222,9 +228,9 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             return accuracyValue;
         }
 
-        private double computeFlashlightValue(ScoreInfo score, OsuDifficultyAttributes attributes)
+        private double computeFlashlightValue(ScoreInfo score, OsuDifficultyAttributes attributes, bool alwaysUseHD = false)
         {
-            double flashlightValue = Math.Pow(attributes.FlashlightDifficulty, 2.0) * 25.0;
+            double flashlightValue = Math.Pow(alwaysUseHD ? attributes.HiddenFlashlightDifficulty : attributes.FlashlightDifficulty, 2.0) * 25.0;
 
             // Penalize misses by assessing # of misses relative to the total # of objects. Default a 3% reduction for any # of misses.
             if (effectiveMissCount > 0)
@@ -246,7 +252,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
 
         public static double ComputePerfectFlashlightValue(double flashlightDifficulty, int objectsCount)
         {
-            double flashlightValue = Math.Pow(flashlightDifficulty, 2.0) * 25.0;
+            double flashlightValue = Flashlight.DifficultyToPerformance(flashlightDifficulty);
 
             flashlightValue *= 0.7 + 0.1 * Math.Min(1.0, objectsCount / 200.0) +
                                (objectsCount > 200 ? 0.2 * Math.Min(1.0, (objectsCount - 200) / 200.0) : 0.0);
@@ -341,8 +347,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
                 return 0.0;
 
             double rawReading = attributes.HiddenDifficulty;
-            //double readingValue = Math.Pow(rawReading, 2.0) * 25.0;
-            double readingValue = Math.Pow(rawReading, 2.0) * 25.0;
+            double readingValue = ReadingHidden.DifficultyToPerformance(attributes.HiddenDifficulty);
 
             // Penalize misses by assessing # of misses relative to the total # of objects. Default a 3% reduction for any # of misses.
             if (effectiveMissCount > 0)
@@ -386,7 +391,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
 
             // Avoid it being broken on millions of pp, ruins it being continious, but it will never happen on normal circumstances
             if (capPerformance > 10000 || cognitionPerformance > 10000) cognitionPerformance = Math.Min(capPerformance, cognitionPerformance);
-            else cognitionPerformance = 100 * softmin(capPerformance / 100, cognitionPerformance / 100, 100);
+            else cognitionPerformance = 1000 * softmin(capPerformance / 1000, cognitionPerformance / 1000, 100);
 
             return cognitionPerformance;
         }
