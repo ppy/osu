@@ -29,6 +29,16 @@ namespace osu.Game.Localisation.SkinComponents
         /// </summary>
         public static LocalisableString TemplateDescription => new TranslatableString(getKey(@"template_description"), @"Supports {{Label}} and {{Value}}, but also including arbitrary attributes like {{StarRating}} (see attribute list for supported values).");
 
+        /// <summary>
+        /// "Max Performance Point"
+        /// </summary>
+        public static LocalisableString MaxPerformancePoint => new TranslatableString(getKey(@"max_performance_point"), @"Max Performance Point");
+
+        /// <summary>
+        /// "Calculating..."
+        /// </summary>
+        public static LocalisableString PerformanceCalculating => new TranslatableString(getKey(@"performance_calculating"), @"Calculating...");
+
         private static string getKey(string key) => $"{prefix}:{key}";
     }
 }

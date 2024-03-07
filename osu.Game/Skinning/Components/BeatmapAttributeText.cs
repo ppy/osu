@@ -5,6 +5,8 @@ using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Linq;
+using System.Threading;
+using System.Threading.Tasks;
 using JetBrains.Annotations;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
@@ -20,6 +22,7 @@ using osu.Game.Graphics.Sprites;
 using osu.Game.Localisation;
 using osu.Game.Localisation.SkinComponents;
 using osu.Game.Resources.Localisation.Web;
+using osu.Game.Rulesets.Mods;
 
 namespace osu.Game.Skinning.Components
 {
@@ -34,6 +37,11 @@ namespace osu.Game.Skinning.Components
 
         [Resolved]
         private IBindable<WorkingBeatmap> beatmap { get; set; } = null!;
+
+        [Resolved]
+        private Bindable<IReadOnlyList<Mod>> currentMods { get; set; } = null!;
+
+        private CancellationTokenSource? ppCalculateCancellationToken;
 
         private readonly Dictionary<BeatmapAttribute, LocalisableString> valueDictionary = new Dictionary<BeatmapAttribute, LocalisableString>();
 
@@ -51,6 +59,7 @@ namespace osu.Game.Skinning.Components
             [BeatmapAttribute.Length] = ArtistStrings.TracklistLength.ToTitle(),
             [BeatmapAttribute.RankedStatus] = BeatmapDiscussionsStrings.IndexFormBeatmapsetStatusDefault,
             [BeatmapAttribute.BPM] = BeatmapsetsStrings.ShowStatsBpm,
+            [BeatmapAttribute.MaxPerformancePoint] = BeatmapAttributeTextStrings.MaxPerformancePoint,
         }.ToImmutableDictionary();
 
         private readonly OsuSpriteText text;
@@ -78,6 +87,7 @@ namespace osu.Game.Skinning.Components
             beatmap.BindValueChanged(b =>
             {
                 updateBeatmapContent(b.NewValue);
+                getMaxPP();
                 updateLabel();
             }, true);
         }
@@ -96,6 +106,7 @@ namespace osu.Game.Skinning.Components
             valueDictionary[BeatmapAttribute.Accuracy] = ((double)workingBeatmap.BeatmapInfo.Difficulty.OverallDifficulty).ToLocalisableString(@"F2");
             valueDictionary[BeatmapAttribute.ApproachRate] = ((double)workingBeatmap.BeatmapInfo.Difficulty.ApproachRate).ToLocalisableString(@"F2");
             valueDictionary[BeatmapAttribute.StarRating] = workingBeatmap.BeatmapInfo.StarRating.ToLocalisableString(@"F2");
+            valueDictionary[BeatmapAttribute.MaxPerformancePoint] = BeatmapAttributeTextStrings.PerformanceCalculating;
         }
 
         private void updateLabel()
@@ -120,6 +131,23 @@ namespace osu.Game.Skinning.Components
             text.Text = LocalisableString.Format(numberedTemplate, args);
         }
 
+        private void getMaxPP()
+        {
+            ppCalculateCancellationToken?.Cancel();
+            var performanceCalculator = beatmap.Value.BeatmapInfo.Ruleset.CreateInstance().CreatePerformanceCalculator();
+
+            if (performanceCalculator == null)
+                return;
+
+            ppCalculateCancellationToken = new CancellationTokenSource();
+            Task.Run(async () =>
+            {
+                var diffAttributes = await performanceCalculator.GetPerfectPerformanceAsync(beatmap.Value, currentMods.Value.ToArray(), ppCalculateCancellationToken.Token).ConfigureAwait(false);
+                valueDictionary[BeatmapAttribute.MaxPerformancePoint] = diffAttributes.Total.ToLocalisableString(@"F2");
+                Scheduler.Add(updateLabel);
+            }, ppCalculateCancellationToken.Token);
+        }
+
         protected override void SetFont(FontUsage font) => text.Font = font.With(size: 40);
     }
 
@@ -137,5 +165,6 @@ namespace osu.Game.Skinning.Components
         Length,
         RankedStatus,
         BPM,
+        MaxPerformancePoint,
     }
 }
