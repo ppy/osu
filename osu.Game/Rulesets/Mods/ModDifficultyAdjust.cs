@@ -39,7 +39,7 @@ namespace osu.Game.Rulesets.Mods
             Precision = 0.1f,
             MinValue = 0,
             MaxValue = 10,
-            ExtendedMaxValue = 11,
+            ExtendedMaxValue = 12.5f,
             ReadCurrentFromDifficulty = diff => diff.DrainRate,
         };
 
@@ -49,7 +49,7 @@ namespace osu.Game.Rulesets.Mods
             Precision = 0.1f,
             MinValue = 0,
             MaxValue = 10,
-            ExtendedMaxValue = 11,
+            ExtendedMaxValue = 12.5f,
             ReadCurrentFromDifficulty = diff => diff.OverallDifficulty,
         };
 
