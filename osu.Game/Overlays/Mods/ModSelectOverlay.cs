@@ -15,6 +15,7 @@ using osu.Framework.Graphics.Cursor;
 using osu.Framework.Input;
 using osu.Framework.Input.Bindings;
 using osu.Framework.Input.Events;
+using osu.Framework.Localisation;
 using osu.Framework.Utils;
 using osu.Game.Audio;
 using osu.Game.Beatmaps;
@@ -365,15 +366,18 @@ namespace osu.Game.Overlays.Mods
             });
         }
 
+        private static readonly LocalisableString input_search_placeholder = Resources.Localisation.Web.CommonStrings.InputSearch;
+        private static readonly LocalisableString tab_to_search_placeholder = ModSelectOverlayStrings.TabToSearch;
+
         protected override void Update()
         {
             base.Update();
 
-            SearchTextBox.PlaceholderText = SearchTextBox.HasFocus ? Resources.Localisation.Web.CommonStrings.InputSearch : ModSelectOverlayStrings.TabToSearch;
+            SearchTextBox.PlaceholderText = SearchTextBox.HasFocus ? input_search_placeholder : tab_to_search_placeholder;
 
             if (beatmapAttributesDisplay != null)
             {
-                float rightEdgeOfLastButton = footerButtonFlow.Last().ScreenSpaceDrawQuad.TopRight.X;
+                float rightEdgeOfLastButton = footerButtonFlow[^1].ScreenSpaceDrawQuad.TopRight.X;
 
                 // this is cheating a bit; the 640 value is hardcoded based on how wide the expanded panel _generally_ is.
                 // due to the transition applied, the raw screenspace quad of the panel cannot be used, as it will trigger an ugly feedback cycle of expanding and collapsing.
