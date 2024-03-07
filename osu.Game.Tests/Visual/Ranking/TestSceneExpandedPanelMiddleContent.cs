@@ -88,8 +88,21 @@ namespace osu.Game.Tests.Visual.Ranking
             AddAssert("play time not displayed", () => !this.ChildrenOfType<ExpandedPanelMiddleContent.PlayedOnText>().Any());
         }
 
-        private void showPanel(ScoreInfo score) =>
-            Child = new ExpandedPanelMiddleContentContainer(score);
+        [TestCase(false)]
+        [TestCase(true)]
+        public void TestFailedSDisplay(bool withFlair)
+        {
+            AddStep("show failed S score", () =>
+            {
+                var score = TestResources.CreateTestScoreInfo(createTestBeatmap(new RealmUser()));
+                score.Rank = ScoreRank.A;
+                score.Accuracy = 0.975;
+                showPanel(score, withFlair);
+            });
+        }
+
+        private void showPanel(ScoreInfo score, bool withFlair = false) =>
+            Child = new ExpandedPanelMiddleContentContainer(score, withFlair);
 
         private BeatmapInfo createTestBeatmap([NotNull] RealmUser author)
         {
@@ -107,7 +120,7 @@ namespace osu.Game.Tests.Visual.Ranking
 
         private partial class ExpandedPanelMiddleContentContainer : Container
         {
-            public ExpandedPanelMiddleContentContainer(ScoreInfo score)
+            public ExpandedPanelMiddleContentContainer(ScoreInfo score, bool withFlair)
             {
                 Anchor = Anchor.Centre;
                 Origin = Anchor.Centre;
@@ -119,7 +132,7 @@ namespace osu.Game.Tests.Visual.Ranking
                         RelativeSizeAxes = Axes.Both,
                         Colour = Color4Extensions.FromHex("#444"),
                     },
-                    new ExpandedPanelMiddleContent(score)
+                    new ExpandedPanelMiddleContent(score, withFlair)
                 };
             }
         }
