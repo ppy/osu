@@ -30,13 +30,13 @@ namespace osu.Game.Storyboards.Commands
         /// Returns the earliest start time of the commands added to this group.
         /// </summary>
         [JsonIgnore]
-        public double StartTime { get; private set; }
+        public double StartTime { get; private set; } = double.MaxValue;
 
         /// <summary>
         /// Returns the latest end time of the commands added to this group.
         /// </summary>
         [JsonIgnore]
-        public double EndTime { get; private set; }
+        public double EndTime { get; private set; } = double.MinValue;
 
         [JsonIgnore]
         public double Duration => EndTime - StartTime;
