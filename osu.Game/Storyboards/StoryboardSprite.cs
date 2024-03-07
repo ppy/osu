@@ -41,7 +41,7 @@ namespace osu.Game.Storyboards
                 foreach (var loop in loopGroups)
                 {
                     command = loop.Alpha.FirstOrDefault();
-                    if (command != null) alphaCommands.Add((command.StartTime + loop.LoopStartTime, command.StartValue == 0));
+                    if (command != null) alphaCommands.Add((command.StartTime, command.StartValue == 0));
                 }
 
                 if (alphaCommands.Count > 0)
@@ -120,8 +120,6 @@ namespace osu.Game.Storyboards
             return trigger;
         }
 
-        public override string ToString() => $"{Path}, {Origin}, {InitialPosition}";
-
         public void ApplyTransforms(Drawable drawable, IEnumerable<Tuple<StoryboardCommandGroup, double>>? triggeredGroups = null)
         {
             // For performance reasons, we need to apply the commands in order by start time. Not doing so will cause many functions to be interleaved, resulting in O(n^2) complexity.
@@ -139,6 +137,8 @@ namespace osu.Game.Storyboards
                     command.ApplyTransform(drawable);
             }
         }
+
+        public override string ToString() => $"{Path}, {Origin}, {InitialPosition}";
 
         // todo: need to revisit property initialisation. apparently it has to be done per first command of every affected property (transforms are supposed to do that already?).
         // private void generateCommands<T>(List<IGeneratedCommand> resultList, IEnumerable<StoryboardCommandList<T>.TypedCommand> commands,
