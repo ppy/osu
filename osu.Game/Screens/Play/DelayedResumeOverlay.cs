@@ -51,7 +51,7 @@ namespace osu.Game.Screens.Play
                 AutoSizeAxes = Axes.Both,
                 Masking = true,
                 BorderColour = colours.Yellow,
-                BorderThickness = 1,
+                BorderThickness = 2,
                 Children = new Drawable[]
                 {
                     new Box
