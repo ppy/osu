@@ -10,7 +10,7 @@ namespace osu.Game.Storyboards.Commands
 {
     public class StoryboardLoopingGroup : StoryboardCommandGroup
     {
-        public double LoopStartTime;
+        private readonly double loopStartTime;
 
         /// <summary>
         /// The total number of times this loop is played back. Always greater than zero.
@@ -26,45 +26,41 @@ namespace osu.Game.Storyboards.Commands
         {
             if (repeatCount < 0) throw new ArgumentException("Repeat count must be zero or above.", nameof(repeatCount));
 
-            LoopStartTime = startTime;
+            loopStartTime = startTime;
             TotalIterations = repeatCount + 1;
         }
 
         protected override void AddCommand<T>(ICollection<StoryboardCommand<T>> list, StoryboardCommand<T> command)
-        {
-            // todo: this is broke!
-            double fullLoopDuration = EndTime - StartTime;
-            double loopDelay = fullLoopDuration - command.EndTime + command.StartTime;
-            base.AddCommand(list, new StoryboardLoopingCommand<T>(command, LoopStartTime, TotalIterations, loopDelay));
-        }
+            => base.AddCommand(list, new StoryboardLoopingCommand<T>(command, this));
 
-        public override string ToString() => $"{LoopStartTime} x{TotalIterations}";
+        public override string ToString() => $"{loopStartTime} x{TotalIterations}";
 
         private class StoryboardLoopingCommand<T> : StoryboardCommand<T>
         {
             private readonly StoryboardCommand<T> command;
-            private readonly int loopCount;
-            private readonly double loopDelay;
+            private readonly StoryboardLoopingGroup loopingGroup;
 
-            public StoryboardLoopingCommand(StoryboardCommand<T> command, double loopStartTime, int loopCount, double loopDelay)
+            public StoryboardLoopingCommand(StoryboardCommand<T> command, StoryboardLoopingGroup loopingGroup)
                 // In an ideal world, we would multiply the command duration by TotalIterations in command end time.
                 // Unfortunately this would clash with how stable handled end times, and results in some storyboards playing outro
                 // sequences for minutes or hours.
-                : base(loopStartTime + command.StartTime, loopStartTime + command.EndTime, command.StartValue, command.EndValue, command.Easing)
+                : base(loopingGroup.loopStartTime + command.StartTime, loopingGroup.loopStartTime + command.EndTime, command.StartValue, command.EndValue, command.Easing)
             {
                 this.command = command;
-                this.loopCount = loopCount;
-                this.loopDelay = loopDelay;
+                this.loopingGroup = loopingGroup;
             }
 
-            public override void SetInitialValue(Drawable d) => command.SetInitialValue(d);
+            public override string PropertyName => command.PropertyName;
 
-            public override TransformSequence<Drawable> ApplyTransform(Drawable d)
+            public override void ApplyInitialValue(Drawable d) => command.ApplyInitialValue(d);
+
+            public override TransformSequence<Drawable> ApplyTransforms(Drawable d)
             {
-                if (loopCount == 0)
-                    return command.ApplyTransform(d);
+                if (loopingGroup.TotalIterations == 0)
+                    return command.ApplyTransforms(d);
 
-                return command.ApplyTransform(d).Loop(loopDelay, loopCount);
+                double loopingGroupDuration = loopingGroup.Duration;
+                return command.ApplyTransforms(d).Loop(loopingGroupDuration - Duration, loopingGroup.TotalIterations);
             }
         }
     }
