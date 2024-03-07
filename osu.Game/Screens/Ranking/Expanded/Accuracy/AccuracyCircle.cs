@@ -194,11 +194,11 @@ namespace osu.Game.Screens.Ranking.Expanded.Accuracy
                 rankText = new RankText(score.Rank)
             };
 
+            if (isFailedSDueToMisses)
+                AddInternal(failedSRankText = new RankText(ScoreRank.S));
+
             if (withFlair)
             {
-                if (isFailedSDueToMisses)
-                    AddInternal(failedSRankText = new RankText(ScoreRank.S));
-
                 var applauseSamples = new List<string> { applauseSampleName };
                 if (score.Rank >= ScoreRank.B)
                     // when rank is B or higher, play legacy applause sample on legacy skins.
@@ -326,24 +326,25 @@ namespace osu.Game.Screens.Ranking.Expanded.Accuracy
                 {
                     rankText.Appear();
 
-                    if (!withFlair) return;
-
-                    Schedule(() =>
-                    {
-                        isTicking = false;
-                        rankImpactSound.Play();
-                    });
-
-                    const double applause_pre_delay = 545f;
-                    const double applause_volume = 0.8f;
-
-                    using (BeginDelayedSequence(applause_pre_delay))
+                    if (withFlair)
                     {
                         Schedule(() =>
                         {
-                            rankApplauseSound.VolumeTo(applause_volume);
-                            rankApplauseSound.Play();
+                            isTicking = false;
+                            rankImpactSound.Play();
                         });
+
+                        const double applause_pre_delay = 545f;
+                        const double applause_volume = 0.8f;
+
+                        using (BeginDelayedSequence(applause_pre_delay))
+                        {
+                            Schedule(() =>
+                            {
+                                rankApplauseSound.VolumeTo(applause_volume);
+                                rankApplauseSound.Play();
+                            });
+                        }
                     }
                 }
 
