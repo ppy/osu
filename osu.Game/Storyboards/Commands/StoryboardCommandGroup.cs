@@ -104,6 +104,7 @@ namespace osu.Game.Storyboards.Commands
         protected virtual void AddCommand<T>(ICollection<StoryboardCommand<T>> list, StoryboardCommand<T> command)
         {
             list.Add(command);
+            HasCommands = true;
 
             if (command.StartTime < StartTime)
                 StartTime = command.StartTime;
