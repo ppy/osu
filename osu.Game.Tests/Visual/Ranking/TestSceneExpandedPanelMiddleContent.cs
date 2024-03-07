@@ -88,9 +88,8 @@ namespace osu.Game.Tests.Visual.Ranking
             AddAssert("play time not displayed", () => !this.ChildrenOfType<ExpandedPanelMiddleContent.PlayedOnText>().Any());
         }
 
-        [TestCase(false)]
-        [TestCase(true)]
-        public void TestFailedSDisplay(bool withFlair)
+        [Test]
+        public void TestFailedSDisplay([Values] bool withFlair)
         {
             AddStep("show failed S score", () =>
             {
