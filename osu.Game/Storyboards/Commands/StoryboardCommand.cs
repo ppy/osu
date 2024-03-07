@@ -32,15 +32,11 @@ namespace osu.Game.Storyboards.Commands
         public T StartValue;
         public T EndValue;
 
-        /// <summary>
-        /// Sets the value of the corresponding property in <see cref="Drawable"/> to the start value of this command.
-        /// </summary>
-        public abstract void SetInitialValue(Drawable d);
+        public abstract string PropertyName { get; }
 
-        /// <summary>
-        /// Transforms a corresponding property in <see cref="Drawable"/> that corresponds to this command group with the specified parameters.
-        /// </summary>
-        public abstract TransformSequence<Drawable> ApplyTransform(Drawable d);
+        public abstract void ApplyInitialValue(Drawable d);
+
+        public abstract TransformSequence<Drawable> ApplyTransforms(Drawable d);
 
         public int CompareTo(StoryboardCommand<T>? other)
         {

@@ -13,9 +13,11 @@ namespace osu.Game.Storyboards.Commands
         {
         }
 
-        public override void SetInitialValue(Drawable d) => d.Y = StartValue;
+        public override string PropertyName => nameof(Drawable.Y);
 
-        public override TransformSequence<Drawable> ApplyTransform(Drawable d)
+        public override void ApplyInitialValue(Drawable d) => d.Y = StartValue;
+
+        public override TransformSequence<Drawable> ApplyTransforms(Drawable d)
             => d.MoveToY(StartValue).Then().MoveToY(EndValue, Duration, Easing);
     }
 }

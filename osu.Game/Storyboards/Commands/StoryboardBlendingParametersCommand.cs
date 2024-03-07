@@ -13,9 +13,12 @@ namespace osu.Game.Storyboards.Commands
         {
         }
 
-        public override void SetInitialValue(Drawable d) => d.Blending = StartValue;
+        public override string PropertyName => nameof(Drawable.Blending);
 
-        public override TransformSequence<Drawable> ApplyTransform(Drawable d)
-            => d.TransformTo(nameof(d.Blending), StartValue).Delay(Duration).TransformTo(nameof(d.Blending), EndValue);
+        public override void ApplyInitialValue(Drawable d) => d.Blending = StartValue;
+
+        public override TransformSequence<Drawable> ApplyTransforms(Drawable d)
+            => d.TransformTo(nameof(d.Blending), StartValue).Delay(Duration)
+                .TransformTo(nameof(d.Blending), EndValue);
     }
 }

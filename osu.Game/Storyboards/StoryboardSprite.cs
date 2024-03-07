@@ -131,10 +131,18 @@ namespace osu.Game.Storyboards
             // if (triggeredGroups != null)
             //     commands = commands.Concat(triggeredGroups.SelectMany(tuple => tuple.Item1.GetAllCommands(tuple.Item2)));
 
+            HashSet<string> appliedProperties = new HashSet<string>();
+
             foreach (var command in commands.OrderBy(c => c.StartTime))
             {
+                if (!appliedProperties.Contains(command.PropertyName))
+                {
+                    command.ApplyInitialValue(drawable);
+                    appliedProperties.Add(command.PropertyName);
+                }
+
                 using (drawable.BeginAbsoluteSequence(command.StartTime))
-                    command.ApplyTransform(drawable);
+                    command.ApplyTransforms(drawable);
             }
         }
 

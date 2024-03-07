@@ -14,9 +14,11 @@ namespace osu.Game.Storyboards.Commands
         {
         }
 
-        public override void SetInitialValue(Drawable d) => d.Scale = new Vector2(StartValue);
+        public override string PropertyName => nameof(Drawable.Scale);
 
-        public override TransformSequence<Drawable> ApplyTransform(Drawable d)
+        public override void ApplyInitialValue(Drawable d) => d.Scale = new Vector2(StartValue);
+
+        public override TransformSequence<Drawable> ApplyTransforms(Drawable d)
             => d.ScaleTo(StartValue).Then().ScaleTo(EndValue, Duration, Easing);
     }
 }
