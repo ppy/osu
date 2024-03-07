@@ -19,10 +19,22 @@ namespace osu.Game.Storyboards.Commands
         double EndTime { get; }
 
         /// <summary>
+        /// The name of the <see cref="Drawable"/> property affected by this storyboard command.
+        /// Used to apply initial property values based on the list of commands given in <see cref="StoryboardSprite"/>.
+        /// </summary>
+        string PropertyName { get; }
+
+        /// <summary>
+        /// Sets the value of the corresponding property in <see cref="Drawable"/> to the start value of this command.
+        /// </summary>
+        /// <param name="d">The target drawable.</param>
+        void ApplyInitialValue(Drawable d);
+
+        /// <summary>
         /// Applies the transforms described by this storyboard command to the target drawable.
         /// </summary>
         /// <param name="d">The target drawable.</param>
         /// <returns>The sequence of transforms applied to the target drawable.</returns>
-        TransformSequence<Drawable> ApplyTransform(Drawable d);
+        TransformSequence<Drawable> ApplyTransforms(Drawable d);
     }
 }

@@ -13,7 +13,11 @@ namespace osu.Game.Storyboards.Commands
         {
         }
 
-        public override void SetInitialValue(Drawable d) => d.Alpha = StartValue;
-        public override TransformSequence<Drawable> ApplyTransform(Drawable d) => d.FadeTo(StartValue).Then().FadeTo(EndValue, Duration, Easing);
+        public override string PropertyName => nameof(Drawable.Alpha);
+
+        public override void ApplyInitialValue(Drawable d) => d.Alpha = StartValue;
+
+        public override TransformSequence<Drawable> ApplyTransforms(Drawable d)
+            => d.FadeTo(StartValue).Then().FadeTo(EndValue, Duration, Easing);
     }
 }
