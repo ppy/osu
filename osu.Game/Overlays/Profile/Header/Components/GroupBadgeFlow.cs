@@ -14,7 +14,7 @@ namespace osu.Game.Overlays.Profile.Header.Components
     {
         public readonly Bindable<APIUser?> User = new Bindable<APIUser?>();
 
-        public GroupBadgeFlow()
+        public GroupBadgeFlow(bool combineMultiple = false)
         {
             AutoSizeAxes = Axes.Both;
             Direction = FillDirection.Horizontal;
@@ -24,8 +24,22 @@ namespace osu.Game.Overlays.Profile.Header.Components
             {
                 Clear(true);
 
-                if (user.NewValue?.Groups != null)
-                    AddRange(user.NewValue.Groups.Select(g => new GroupBadge(g)));
+                var groups = user.NewValue?.Groups;
+
+                if (groups != null && groups.Length > 0)
+                {
+                    if (combineMultiple)
+                    {
+                        Add(new GroupBadge(groups[0]));
+
+                        if (groups.Length > 1)
+                            Add(new CombinedGroupBadge(groups.Skip(1).ToArray()));
+                    }
+                    else
+                    {
+                        AddRange(groups.Select(g => new GroupBadge(g)));
+                    }
+                }
             });
         }
     }
