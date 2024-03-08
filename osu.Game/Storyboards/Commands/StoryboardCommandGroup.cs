@@ -2,6 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System.Collections.Generic;
+using System.Linq;
 using Newtonsoft.Json;
 using osu.Framework.Graphics;
 using osu.Framework.Lists;
@@ -12,20 +13,45 @@ namespace osu.Game.Storyboards.Commands
 {
     public class StoryboardCommandGroup
     {
-        public SortedList<StoryboardCommand<float>> X = new SortedList<StoryboardCommand<float>>();
-        public SortedList<StoryboardCommand<float>> Y = new SortedList<StoryboardCommand<float>>();
-        public SortedList<StoryboardCommand<float>> Scale = new SortedList<StoryboardCommand<float>>();
-        public SortedList<StoryboardCommand<Vector2>> VectorScale = new SortedList<StoryboardCommand<Vector2>>();
-        public SortedList<StoryboardCommand<float>> Rotation = new SortedList<StoryboardCommand<float>>();
-        public SortedList<StoryboardCommand<Color4>> Colour = new SortedList<StoryboardCommand<Color4>>();
-        public SortedList<StoryboardCommand<float>> Alpha = new SortedList<StoryboardCommand<float>>();
-        public SortedList<StoryboardCommand<BlendingParameters>> BlendingParameters = new SortedList<StoryboardCommand<BlendingParameters>>();
-        public SortedList<StoryboardCommand<bool>> FlipH = new SortedList<StoryboardCommand<bool>>();
-        public SortedList<StoryboardCommand<bool>> FlipV = new SortedList<StoryboardCommand<bool>>();
+        private readonly SortedList<StoryboardCommand<float>> x = new SortedList<StoryboardCommand<float>>();
 
-        public IReadOnlyList<IStoryboardCommand> AllCommands => allCommands;
+        public IReadOnlyList<StoryboardCommand<float>> X => x;
 
-        private readonly List<IStoryboardCommand> allCommands = new List<IStoryboardCommand>();
+        private readonly SortedList<StoryboardCommand<float>> y = new SortedList<StoryboardCommand<float>>();
+
+        public IReadOnlyList<StoryboardCommand<float>> Y => y;
+
+        private readonly SortedList<StoryboardCommand<float>> scale = new SortedList<StoryboardCommand<float>>();
+
+        public IReadOnlyList<StoryboardCommand<float>> Scale => scale;
+
+        private readonly SortedList<StoryboardCommand<Vector2>> vectorScale = new SortedList<StoryboardCommand<Vector2>>();
+
+        public IReadOnlyList<StoryboardCommand<Vector2>> VectorScale => vectorScale;
+
+        private readonly SortedList<StoryboardCommand<float>> rotation = new SortedList<StoryboardCommand<float>>();
+
+        public IReadOnlyList<StoryboardCommand<float>> Rotation => rotation;
+
+        private readonly SortedList<StoryboardCommand<Color4>> colour = new SortedList<StoryboardCommand<Color4>>();
+
+        public IReadOnlyList<StoryboardCommand<Color4>> Colour => colour;
+
+        private readonly SortedList<StoryboardCommand<float>> alpha = new SortedList<StoryboardCommand<float>>();
+
+        public IReadOnlyList<StoryboardCommand<float>> Alpha => alpha;
+
+        private readonly SortedList<StoryboardCommand<BlendingParameters>> blendingParameters = new SortedList<StoryboardCommand<BlendingParameters>>();
+
+        public IReadOnlyList<StoryboardCommand<BlendingParameters>> BlendingParameters => blendingParameters;
+
+        private readonly SortedList<StoryboardCommand<bool>> flipH = new SortedList<StoryboardCommand<bool>>();
+
+        public IReadOnlyList<StoryboardCommand<bool>> FlipH => flipH;
+
+        private readonly SortedList<StoryboardCommand<bool>> flipV = new SortedList<StoryboardCommand<bool>>();
+
+        public IReadOnlyList<StoryboardCommand<bool>> FlipV => flipV;
 
         /// <summary>
         /// Returns the earliest start time of the commands added to this group.
@@ -45,35 +71,44 @@ namespace osu.Game.Storyboards.Commands
         [JsonIgnore]
         public bool HasCommands { get; private set; }
 
+        private readonly IReadOnlyList<IStoryboardCommand>[] lists;
+
+        public IEnumerable<IStoryboardCommand> AllCommands => lists.SelectMany(g => g);
+
+        public StoryboardCommandGroup()
+        {
+            lists = new IReadOnlyList<IStoryboardCommand>[] { X, Y, Scale, VectorScale, Rotation, Colour, Alpha, BlendingParameters, FlipH, FlipV };
+        }
+
         public void AddX(Easing easing, double startTime, double endTime, float startValue, float endValue)
-            => AddCommand(X, new StoryboardXCommand(easing, startTime, endTime, startValue, endValue));
+            => AddCommand(x, new StoryboardXCommand(easing, startTime, endTime, startValue, endValue));
 
         public void AddY(Easing easing, double startTime, double endTime, float startValue, float endValue)
-            => AddCommand(Y, new StoryboardYCommand(easing, startTime, endTime, startValue, endValue));
+            => AddCommand(y, new StoryboardYCommand(easing, startTime, endTime, startValue, endValue));
 
         public void AddScale(Easing easing, double startTime, double endTime, float startValue, float endValue)
-            => AddCommand(Scale, new StoryboardScaleCommand(easing, startTime, endTime, startValue, endValue));
+            => AddCommand(scale, new StoryboardScaleCommand(easing, startTime, endTime, startValue, endValue));
 
         public void AddVectorScale(Easing easing, double startTime, double endTime, Vector2 startValue, Vector2 endValue)
-            => AddCommand(VectorScale, new StoryboardVectorScaleCommand(easing, startTime, endTime, startValue, endValue));
+            => AddCommand(vectorScale, new StoryboardVectorScaleCommand(easing, startTime, endTime, startValue, endValue));
 
         public void AddRotation(Easing easing, double startTime, double endTime, float startValue, float endValue)
-            => AddCommand(Rotation, new StoryboardRotationCommand(easing, startTime, endTime, startValue, endValue));
+            => AddCommand(rotation, new StoryboardRotationCommand(easing, startTime, endTime, startValue, endValue));
 
         public void AddColour(Easing easing, double startTime, double endTime, Color4 startValue, Color4 endValue)
-            => AddCommand(Colour, new StoryboardColourCommand(easing, startTime, endTime, startValue, endValue));
+            => AddCommand(colour, new StoryboardColourCommand(easing, startTime, endTime, startValue, endValue));
 
         public void AddAlpha(Easing easing, double startTime, double endTime, float startValue, float endValue)
-            => AddCommand(Alpha, new StoryboardAlphaCommand(easing, startTime, endTime, startValue, endValue));
+            => AddCommand(alpha, new StoryboardAlphaCommand(easing, startTime, endTime, startValue, endValue));
 
         public void AddBlendingParameters(Easing easing, double startTime, double endTime, BlendingParameters startValue, BlendingParameters endValue)
-            => AddCommand(BlendingParameters, new StoryboardBlendingParametersCommand(easing, startTime, endTime, startValue, endValue));
+            => AddCommand(blendingParameters, new StoryboardBlendingParametersCommand(easing, startTime, endTime, startValue, endValue));
 
         public void AddFlipH(Easing easing, double startTime, double endTime, bool startValue, bool endValue)
-            => AddCommand(FlipH, new StoryboardFlipHCommand(easing, startTime, endTime, startValue, endValue));
+            => AddCommand(flipH, new StoryboardFlipHCommand(easing, startTime, endTime, startValue, endValue));
 
         public void AddFlipV(Easing easing, double startTime, double endTime, bool startValue, bool endValue)
-            => AddCommand(FlipV, new StoryboardFlipVCommand(easing, startTime, endTime, startValue, endValue));
+            => AddCommand(flipV, new StoryboardFlipVCommand(easing, startTime, endTime, startValue, endValue));
 
         /// <summary>
         /// Adds the given storyboard <paramref name="command"/> to the target <paramref name="list"/>.
@@ -83,7 +118,6 @@ namespace osu.Game.Storyboards.Commands
         protected virtual void AddCommand<T>(ICollection<StoryboardCommand<T>> list, StoryboardCommand<T> command)
         {
             list.Add(command);
-            allCommands.Add(command);
             HasCommands = true;
 
             if (command.StartTime < StartTime)
