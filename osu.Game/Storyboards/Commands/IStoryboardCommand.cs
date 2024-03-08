@@ -28,6 +28,9 @@ namespace osu.Game.Storyboards.Commands
         /// <summary>
         /// Sets the value of the corresponding property in <see cref="Drawable"/> to the start value of this command.
         /// </summary>
+        /// <remarks>
+        /// Parameter commands (e.g. <see cref="StoryboardFlipHCommand"/> / <see cref="StoryboardFlipVCommand"/> / <see cref="StoryboardBlendingParametersCommand"/>) only apply the start value if they have zero duration, i.e. take "permanent" effect regardless of time.
+        /// </remarks>
         /// <param name="d">The target drawable.</param>
         void ApplyInitialValue<TDrawable>(TDrawable d)
             where TDrawable : Drawable, IFlippable, IVectorScalable;
