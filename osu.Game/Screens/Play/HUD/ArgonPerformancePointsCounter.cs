@@ -9,10 +9,11 @@ using osu.Framework.Graphics.Sprites;
 using osu.Game.Configuration;
 using osu.Game.Localisation.SkinComponents;
 using osu.Game.Resources.Localisation.Web;
+using osu.Game.Skinning;
 
 namespace osu.Game.Screens.Play.HUD
 {
-    public partial class ArgonPerformancePointsCounter : PerformancePointsCounter
+    public partial class ArgonPerformancePointsCounter : PerformancePointsCounter, ISerialisableDrawable
     {
         private ArgonCounterTextComponent text = null!;
 
