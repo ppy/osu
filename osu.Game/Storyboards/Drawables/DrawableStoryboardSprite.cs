@@ -2,6 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
+using System.Diagnostics;
 using osu.Framework.Allocation;
 using osu.Framework.Extensions.ObjectExtensions;
 using osu.Framework.Graphics;
@@ -13,7 +14,7 @@ using osuTK;
 
 namespace osu.Game.Storyboards.Drawables
 {
-    public partial class DrawableStoryboardSprite : Sprite, IDrawableStoryboardElement
+    public partial class DrawableStoryboardSprite : Sprite, IFlippable, IVectorScalable
     {
         public StoryboardSprite Sprite { get; }
 
@@ -100,6 +101,9 @@ namespace osu.Game.Storyboards.Drawables
             }
             else
                 Texture = textureStore.Get(Sprite.Path);
+
+            if (Sprite.Path == "SB/textbox.png")
+                Debugger.Break();
 
             Sprite.ApplyTransforms(this);
         }

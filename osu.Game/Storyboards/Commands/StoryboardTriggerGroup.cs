@@ -3,7 +3,6 @@
 
 namespace osu.Game.Storyboards.Commands
 {
-    // todo: this is not implemented and has never been, keep that in mind.
     public class StoryboardTriggerGroup : StoryboardCommandGroup
     {
         public string TriggerName;

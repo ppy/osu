@@ -3,6 +3,7 @@
 
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Transforms;
+using osu.Game.Storyboards.Drawables;
 
 namespace osu.Game.Storyboards.Commands
 {
@@ -28,13 +29,15 @@ namespace osu.Game.Storyboards.Commands
         /// Sets the value of the corresponding property in <see cref="Drawable"/> to the start value of this command.
         /// </summary>
         /// <param name="d">The target drawable.</param>
-        void ApplyInitialValue(Drawable d);
+        void ApplyInitialValue<TDrawable>(TDrawable d)
+            where TDrawable : Drawable, IFlippable, IVectorScalable;
 
         /// <summary>
         /// Applies the transforms described by this storyboard command to the target drawable.
         /// </summary>
         /// <param name="d">The target drawable.</param>
         /// <returns>The sequence of transforms applied to the target drawable.</returns>
-        TransformSequence<Drawable> ApplyTransforms(Drawable d);
+        TransformSequence<TDrawable> ApplyTransforms<TDrawable>(TDrawable d)
+            where TDrawable : Drawable, IFlippable, IVectorScalable;
     }
 }

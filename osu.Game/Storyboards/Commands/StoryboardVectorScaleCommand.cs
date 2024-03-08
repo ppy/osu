@@ -15,12 +15,12 @@ namespace osu.Game.Storyboards.Commands
         {
         }
 
-        public override string PropertyName => nameof(IDrawableStoryboardElement.VectorScale);
+        public override string PropertyName => nameof(IVectorScalable.VectorScale);
 
-        public override void ApplyInitialValue(Drawable d) => ((IDrawableStoryboardElement)d).VectorScale = StartValue;
+        public override void ApplyInitialValue<TDrawable>(TDrawable d) => d.VectorScale = StartValue;
 
-        public override TransformSequence<Drawable> ApplyTransforms(Drawable d)
-            => d.TransformTo(nameof(IDrawableStoryboardElement.VectorScale), StartValue).Then()
-                .TransformTo(nameof(IDrawableStoryboardElement.VectorScale), EndValue, Duration, Easing);
+        public override TransformSequence<TDrawable> ApplyTransforms<TDrawable>(TDrawable d)
+            => d.TransformTo(nameof(d.VectorScale), StartValue).Then()
+                .TransformTo(nameof(d.VectorScale), EndValue, Duration, Easing);
     }
 }

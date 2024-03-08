@@ -14,12 +14,12 @@ namespace osu.Game.Storyboards.Commands
         {
         }
 
-        public override string PropertyName => nameof(IDrawableStoryboardElement.FlipV);
+        public override string PropertyName => nameof(IFlippable.FlipV);
 
-        public override void ApplyInitialValue(Drawable d) => ((IDrawableStoryboardElement)d).FlipV = StartValue;
+        public override void ApplyInitialValue<TDrawable>(TDrawable d) => d.FlipV = StartValue;
 
-        public override TransformSequence<Drawable> ApplyTransforms(Drawable d)
-            => d.TransformTo(nameof(IDrawableStoryboardElement.FlipV), StartValue).Delay(Duration)
-                .TransformTo(nameof(IDrawableStoryboardElement.FlipV), EndValue);
+        public override TransformSequence<TDrawable> ApplyTransforms<TDrawable>(TDrawable d)
+            => d.TransformTo(nameof(IFlippable.FlipV), StartValue).Delay(Duration)
+                .TransformTo(nameof(IFlippable.FlipV), EndValue);
     }
 }
