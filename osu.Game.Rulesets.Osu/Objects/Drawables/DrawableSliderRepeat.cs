@@ -79,6 +79,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
             base.OnApply();
 
             Position = HitObject.Position - DrawableSlider.Position;
+            hasRotation = false;
         }
 
         protected override void CheckForResult(bool userTriggered, double timeOffset) => DrawableSlider.SliderInputManager.TryJudgeNestedObject(this, timeOffset);
