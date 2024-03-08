@@ -102,9 +102,6 @@ namespace osu.Game.Storyboards.Drawables
             else
                 Texture = textureStore.Get(Sprite.Path);
 
-            if (Sprite.Path == "SB/textbox.png")
-                Debugger.Break();
-
             Sprite.ApplyTransforms(this);
         }
 
