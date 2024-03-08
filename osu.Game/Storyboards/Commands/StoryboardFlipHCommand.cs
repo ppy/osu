@@ -16,7 +16,11 @@ namespace osu.Game.Storyboards.Commands
 
         public override string PropertyName => nameof(IFlippable.FlipH);
 
-        public override void ApplyInitialValue<TDrawable>(TDrawable d) => d.FlipH = StartValue;
+        public override void ApplyInitialValue<TDrawable>(TDrawable d)
+        {
+            if (StartTime == EndTime)
+                d.FlipH = StartValue;
+        }
 
         public override TransformSequence<TDrawable> ApplyTransforms<TDrawable>(TDrawable d)
             => d.TransformTo(nameof(IFlippable.FlipH), StartValue).Delay(Duration)
