@@ -9,8 +9,8 @@ namespace osu.Game.Storyboards.Commands
 {
     public class StoryboardFlipHCommand : StoryboardCommand<bool>
     {
-        public StoryboardFlipHCommand(double startTime, double endTime, bool startValue, bool endValue, Easing easing)
-            : base(startTime, endTime, startValue, endValue, easing)
+        public StoryboardFlipHCommand(Easing easing, double startTime, double endTime, bool startValue, bool endValue)
+            : base(easing, startTime, endTime, startValue, endValue)
         {
         }
 

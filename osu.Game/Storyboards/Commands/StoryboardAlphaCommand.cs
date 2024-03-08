@@ -8,8 +8,8 @@ namespace osu.Game.Storyboards.Commands
 {
     public class StoryboardAlphaCommand : StoryboardCommand<float>
     {
-        public StoryboardAlphaCommand(double startTime, double endTime, float startValue, float endValue, Easing easing)
-            : base(startTime, endTime, startValue, endValue, easing)
+        public StoryboardAlphaCommand(Easing easing, double startTime, double endTime, float startValue, float endValue)
+            : base(easing, startTime, endTime, startValue, endValue)
         {
         }
 

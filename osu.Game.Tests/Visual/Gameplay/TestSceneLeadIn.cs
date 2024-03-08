@@ -47,7 +47,7 @@ namespace osu.Game.Tests.Visual.Gameplay
 
             var sprite = new StoryboardSprite("unknown", Anchor.TopLeft, Vector2.Zero);
 
-            sprite.Commands.AddAlpha(firstStoryboardEvent, firstStoryboardEvent + 500, 0, 1, Easing.None);
+            sprite.Commands.AddAlpha(Easing.None, firstStoryboardEvent, firstStoryboardEvent + 500, 0, 1);
 
             storyboard.GetLayer("Background").Add(sprite);
 
@@ -73,17 +73,17 @@ namespace osu.Game.Tests.Visual.Gameplay
             var sprite = new StoryboardSprite("unknown", Anchor.TopLeft, Vector2.Zero);
 
             // these should be ignored as we have an alpha visibility blocker proceeding this command.
-            sprite.Commands.AddScale(loop_start_time, -18000, 0, 1, Easing.None);
+            sprite.Commands.AddScale(Easing.None, loop_start_time, -18000, 0, 1);
             var loopGroup = sprite.AddLoopingGroup(loop_start_time, 50);
-            loopGroup.AddScale(loop_start_time, -18000, 0, 1, Easing.None);
+            loopGroup.AddScale(Easing.None, loop_start_time, -18000, 0, 1);
 
             var target = addEventToLoop ? loopGroup : sprite.Commands;
             double loopRelativeOffset = addEventToLoop ? -loop_start_time : 0;
-            target.AddAlpha(loopRelativeOffset + firstStoryboardEvent, loopRelativeOffset + firstStoryboardEvent + 500, 0, 1, Easing.None);
+            target.AddAlpha(Easing.None, loopRelativeOffset + firstStoryboardEvent, loopRelativeOffset + firstStoryboardEvent + 500, 0, 1);
 
             // these should be ignored due to being in the future.
-            sprite.Commands.AddAlpha(18000, 20000, 0, 1, Easing.None);
-            loopGroup.AddAlpha(38000, 40000, 0, 1, Easing.None);
+            sprite.Commands.AddAlpha(Easing.None, 18000, 20000, 0, 1);
+            loopGroup.AddAlpha(Easing.None, 38000, 40000, 0, 1);
 
             storyboard.GetLayer("Background").Add(sprite);
 

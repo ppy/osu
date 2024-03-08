@@ -9,8 +9,8 @@ namespace osu.Game.Storyboards.Commands
 {
     public class StoryboardScaleCommand : StoryboardCommand<float>
     {
-        public StoryboardScaleCommand(double startTime, double endTime, float startValue, float endValue, Easing easing)
-            : base(startTime, endTime, startValue, endValue, easing)
+        public StoryboardScaleCommand(Easing easing, double startTime, double endTime, float startValue, float endValue)
+            : base(easing, startTime, endTime, startValue, endValue)
         {
         }
 
