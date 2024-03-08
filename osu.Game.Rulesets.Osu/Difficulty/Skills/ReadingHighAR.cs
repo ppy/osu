@@ -95,7 +95,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
         private double currentStrain;
 
         private double skillMultiplier => 17;
-        private double defaultValueMultiplier => 50;
+        private double defaultValueMultiplier => 25;
 
         protected override double CalculateInitialStrain(double time, DifficultyHitObject current) => currentStrain * StrainDecay(time - current.Previous(0).StartTime);
 
@@ -103,10 +103,8 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
         {
             currentStrain *= StrainDecay(current.DeltaTime);
 
-            double aimDifficulty = AimEvaluator.EvaluateDifficultyOf(current, true);
-            double readingDifficulty = ReadingHighAREvaluator.EvaluateDifficultyOf(current, adjustHighAR);
-            aimDifficulty *= Math.Pow(readingDifficulty, 2);
-            aimDifficulty *= skillMultiplier;
+            double aimDifficulty = AimEvaluator.EvaluateDifficultyOf(current, true) * skillMultiplier;
+            aimDifficulty *= Math.Pow(ReadingHighAREvaluator.EvaluateDifficultyOf(current, adjustHighAR), 2);
 
             currentStrain += aimDifficulty;
 
@@ -116,11 +114,13 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
 
     public class HighARSpeedComponent : OsuStrainSkill
     {
-        private double skillMultiplier => 820;
+        private double skillMultiplier => 670;
         protected override double StrainDecayBase => 0.3;
 
         private double currentStrain;
         private double currentRhythm;
+
+        private double defaultValueMultiplier => 25;
 
         public HighARSpeedComponent(Mod[] mods)
             : base(mods)
@@ -131,17 +131,17 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
 
         protected override double StrainValueAt(DifficultyHitObject current)
         {
-            OsuDifficultyHitObject currODHO = (OsuDifficultyHitObject)current;
+            OsuDifficultyHitObject currObj = (OsuDifficultyHitObject)current;
 
-            currentStrain *= StrainDecay(currODHO.StrainTime);
+            currentStrain *= StrainDecay(currObj.StrainTime);
 
             double speedDifficulty = SpeedEvaluator.EvaluateDifficultyOf(current) * skillMultiplier;
             speedDifficulty *= Math.Pow(ReadingHighAREvaluator.EvaluateDifficultyOf(current, false), 2);
             currentStrain += speedDifficulty;
 
-            currentRhythm = currODHO.RhythmDifficulty;
+            currentRhythm = currObj.RhythmDifficulty;
             double totalStrain = currentStrain * currentRhythm;
-            return totalStrain;
+            return totalStrain + defaultValueMultiplier * ReadingHighAREvaluator.EvaluateDifficultyOf(current);
         }
     }
 }
