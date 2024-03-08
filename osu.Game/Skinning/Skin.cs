@@ -133,6 +133,11 @@ namespace osu.Game.Skinning
 
                     SkinLayoutInfo? layoutInfo = null;
 
+                    // handle namespace changes...
+                    jsonContent = jsonContent.Replace(@"osu.Game.Screens.Play.SongProgress", @"osu.Game.Screens.Play.HUD.DefaultSongProgress");
+                    jsonContent = jsonContent.Replace(@"osu.Game.Screens.Play.HUD.LegacyComboCounter", @"osu.Game.Skinning.LegacyComboCounter");
+                    jsonContent = jsonContent.Replace(@"osu.Game.Screens.Play.HUD.PerformancePointsCounter", @"osu.Game.Skinning.Triangles.TrianglesPerformancePointsCounter");
+
                     try
                     {
                         // First attempt to deserialise using the new SkinLayoutInfo format
@@ -150,11 +155,6 @@ namespace osu.Game.Skinning
                     // If deserialisation using SkinLayoutInfo fails, attempt to deserialise using the old naked list.
                     if (layoutInfo == null)
                     {
-                        // handle namespace changes...
-                        jsonContent = jsonContent.Replace(@"osu.Game.Screens.Play.SongProgress", @"osu.Game.Screens.Play.HUD.DefaultSongProgress");
-                        jsonContent = jsonContent.Replace(@"osu.Game.Screens.Play.HUD.LegacyComboCounter", @"osu.Game.Skinning.LegacyComboCounter");
-                        jsonContent = jsonContent.Replace(@"osu.Game.Screens.Play.HUD.PerformancePointsCounter", @"osu.Game.Skinning.Triangles.TrianglesPerformancePointsCounter");
-
                         var deserializedContent = JsonConvert.DeserializeObject<IEnumerable<SerialisedDrawableInfo>>(jsonContent);
 
                         if (deserializedContent == null)
