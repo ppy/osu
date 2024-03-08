@@ -103,12 +103,12 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
 
             var bins = createBins(maxDiff);
 
-            double lowerBoundEstimate = 0.5 * maxDiff;
+            const double lower_bound = 0;
             double upperBoundEstimate = 3.0 * maxDiff;
 
             double skill = Chandrupatla.FindRootExpand(
                 skill => fcProbabilityAtSkill(skill, bins) - fc_probability,
-                lowerBoundEstimate,
+                lower_bound,
                 upperBoundEstimate,
                 accuracy: 1e-4);
 
@@ -120,12 +120,12 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
             double maxDiff = difficulties.Max();
             if (maxDiff <= 1e-10) return 0;
 
-            double lowerBoundEstimate = 0.5 * maxDiff;
+            const double lower_bound = 0;
             double upperBoundEstimate = 3.0 * maxDiff;
 
             double skill = Chandrupatla.FindRootExpand(
                 skill => fcProbabilityAtSkill(skill) - fc_probability,
-                lowerBoundEstimate,
+                lower_bound,
                 upperBoundEstimate,
                 accuracy: 1e-4);
 
