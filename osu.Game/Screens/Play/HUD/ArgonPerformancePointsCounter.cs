@@ -6,7 +6,6 @@ using osu.Framework.Bindables;
 using osu.Framework.Extensions.LocalisationExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Sprites;
-using osu.Framework.Localisation;
 using osu.Game.Configuration;
 using osu.Game.Localisation.SkinComponents;
 using osu.Game.Resources.Localisation.Web;
@@ -14,11 +13,13 @@ using osu.Game.Skinning;
 
 namespace osu.Game.Screens.Play.HUD
 {
-    public partial class ArgonScoreCounter : GameplayScoreCounter, ISerialisableDrawable
+    public partial class ArgonPerformancePointsCounter : PerformancePointsCounter, ISerialisableDrawable
     {
-        private ArgonScoreTextComponent scoreText = null!;
+        private ArgonCounterTextComponent text = null!;
 
         protected override double RollingDuration => 250;
+
+        private const float alpha_when_invalid = 0.3f;
 
         [SettingSource("Wireframe opacity", "Controls the opacity of the wireframes behind the digits.")]
         public BindableFloat WireframeOpacity { get; } = new BindableFloat(0.25f)
@@ -31,22 +32,20 @@ namespace osu.Game.Screens.Play.HUD
         [SettingSource(typeof(SkinnableComponentStrings), nameof(SkinnableComponentStrings.ShowLabel), nameof(SkinnableComponentStrings.ShowLabelDescription))]
         public Bindable<bool> ShowLabel { get; } = new BindableBool(true);
 
-        public bool UsesFixedAnchor { get; set; }
-
-        protected override LocalisableString FormatCount(long count) => count.ToString();
-
-        protected override IHasText CreateText() => scoreText = new ArgonScoreTextComponent(Anchor.TopRight, BeatmapsetsStrings.ShowScoreboardHeadersScore.ToUpper())
+        public override bool IsValid
         {
-            WireframeOpacity = { BindTarget = WireframeOpacity },
-            ShowLabel = { BindTarget = ShowLabel },
-        };
+            get => base.IsValid;
+            set
+            {
+                if (value == IsValid)
+                    return;
 
-        public ArgonScoreCounter()
-        {
-            RequiredDisplayDigits.BindValueChanged(_ => updateWireframe());
+                base.IsValid = value;
+                text.FadeTo(value ? 1 : alpha_when_invalid, 1000, Easing.OutQuint);
+            }
         }
 
-        public override long DisplayedCount
+        public override int DisplayedCount
         {
             get => base.DisplayedCount;
             set
@@ -58,10 +57,10 @@ namespace osu.Game.Screens.Play.HUD
 
         private void updateWireframe()
         {
-            int digitsRequiredForDisplayCount = Math.Max(RequiredDisplayDigits.Value, getDigitsRequiredForDisplayCount());
+            int digitsRequiredForDisplayCount = Math.Max(3, getDigitsRequiredForDisplayCount());
 
-            if (digitsRequiredForDisplayCount != scoreText.WireframeTemplate.Length)
-                scoreText.WireframeTemplate = new string('#', digitsRequiredForDisplayCount);
+            if (digitsRequiredForDisplayCount != text.WireframeTemplate.Length)
+                text.WireframeTemplate = new string('#', digitsRequiredForDisplayCount);
         }
 
         private int getDigitsRequiredForDisplayCount()
@@ -73,12 +72,10 @@ namespace osu.Game.Screens.Play.HUD
             return digitsRequired;
         }
 
-        private partial class ArgonScoreTextComponent : ArgonCounterTextComponent
+        protected override IHasText CreateText() => text = new ArgonCounterTextComponent(Anchor.TopRight, BeatmapsetsStrings.ShowScoreboardHeaderspp.ToUpper())
         {
-            public ArgonScoreTextComponent(Anchor anchor, LocalisableString? label = null)
-                : base(anchor, label)
-            {
-            }
-        }
+            WireframeOpacity = { BindTarget = WireframeOpacity },
+            ShowLabel = { BindTarget = ShowLabel },
+        };
     }
 }
