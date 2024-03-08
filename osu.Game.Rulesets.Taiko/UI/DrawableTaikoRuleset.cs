@@ -72,7 +72,7 @@ namespace osu.Game.Rulesets.Taiko.UI
         protected virtual double ComputeTimeRange()
         {
             // Adjust when we're using constant algorithm to not be sluggish.
-            double multiplier = VisualisationMethod == ScrollVisualisationMethod.Overlapping ? 1 : 4 * Beatmap.Difficulty.SliderMultiplier;
+            double multiplier = VisualisationMethod == ScrollVisualisationMethod.Constant ? 4 * Beatmap.Difficulty.SliderMultiplier : 1;
             return PlayfieldAdjustmentContainer.ComputeTimeRange() / multiplier;
         }
 
