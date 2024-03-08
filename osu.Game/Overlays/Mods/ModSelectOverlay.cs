@@ -346,7 +346,7 @@ namespace osu.Game.Overlays.Mods
             ScheduleAfterChildren(() =>
             {
                 columnScroll.ScrollToEnd(false);
-                columnScroll.ScrollTo(0, true, 0.0055);
+                columnScroll.ScrollTo(0);
             });
         }
 
