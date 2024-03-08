@@ -1,6 +1,7 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System;
 using osu.Framework.Bindables;
 using osu.Framework.Extensions.LocalisationExtensions;
 using osu.Framework.Graphics;
@@ -55,7 +56,7 @@ namespace osu.Game.Screens.Play.HUD
 
         private void updateWireframe()
         {
-            int digitsRequiredForDisplayCount = getDigitsRequiredForDisplayCount();
+            int digitsRequiredForDisplayCount = Math.Max(3, getDigitsRequiredForDisplayCount());
 
             if (digitsRequiredForDisplayCount != text.WireframeTemplate.Length)
                 text.WireframeTemplate = new string('#', digitsRequiredForDisplayCount);
