@@ -44,6 +44,14 @@ namespace osu.Game.Overlays.Mods
         public Bindable<IReadOnlyList<Mod>> SelectedMods { get; private set; } = new Bindable<IReadOnlyList<Mod>>(Array.Empty<Mod>());
 
         /// <summary>
+        /// Contains a list of mods which <see cref="ModSelectOverlay"/> should read from to display effects on the selected beatmap.
+        /// </summary>
+        /// <remarks>
+        /// This is different from <see cref="SelectedMods"/> in screens like online-play rooms, where there are required mods activated from the playlist.
+        /// </remarks>
+        public Bindable<IReadOnlyList<Mod>> ActiveMods { get; private set; } = new Bindable<IReadOnlyList<Mod>>(Array.Empty<Mod>());
+
+        /// <summary>
         /// Contains a dictionary with the current <see cref="ModState"/> of all mods applicable for the current ruleset.
         /// </summary>
         /// <remarks>
@@ -96,6 +104,8 @@ namespace osu.Game.Overlays.Mods
         protected virtual ModColumn CreateModColumn(ModType modType) => new ModColumn(modType, false);
 
         protected virtual IReadOnlyList<Mod> ComputeNewModsFromSelection(IReadOnlyList<Mod> oldSelection, IReadOnlyList<Mod> newSelection) => newSelection;
+
+        protected virtual IReadOnlyList<Mod> ComputeActiveMods() => SelectedMods.Value;
 
         protected virtual IEnumerable<ShearedButton> CreateFooterButtons()
         {
@@ -279,7 +289,7 @@ namespace osu.Game.Overlays.Mods
                         {
                             Anchor = Anchor.BottomRight,
                             Origin = Anchor.BottomRight,
-                            BeatmapInfo = { Value = beatmap?.BeatmapInfo }
+                            BeatmapInfo = { Value = Beatmap?.BeatmapInfo },
                         },
                     }
                 });
@@ -316,20 +326,26 @@ namespace osu.Game.Overlays.Mods
 
             SelectedMods.BindValueChanged(_ =>
             {
-                updateRankingInformation();
                 updateFromExternalSelection();
                 updateCustomisation();
+
+                ActiveMods.Value = ComputeActiveMods();
+            }, true);
+
+            ActiveMods.BindValueChanged(_ =>
+            {
+                updateOverlayInformation();
 
                 modSettingChangeTracker?.Dispose();
 
                 if (AllowCustomisation)
                 {
-                    // Importantly, use SelectedMods.Value here (and not the ValueChanged NewValue) as the latter can
+                    // Importantly, use ActiveMods.Value here (and not the ValueChanged NewValue) as the latter can
                     // potentially be stale, due to complexities in the way change trackers work.
                     //
                     // See https://github.com/ppy/osu/pull/23284#issuecomment-1529056988
-                    modSettingChangeTracker = new ModSettingChangeTracker(SelectedMods.Value);
-                    modSettingChangeTracker.SettingChanged += _ => updateRankingInformation();
+                    modSettingChangeTracker = new ModSettingChangeTracker(ActiveMods.Value);
+                    modSettingChangeTracker.SettingChanged += _ => updateOverlayInformation();
                 }
             }, true);
 
@@ -341,12 +357,12 @@ namespace osu.Game.Overlays.Mods
                     column.SearchTerm = query.NewValue;
             }, true);
 
-            // Start scrolled slightly to the right to give the user a sense that
+            // Start scrolling from the end, to give the user a sense that
             // there is more horizontal content available.
             ScheduleAfterChildren(() =>
             {
-                columnScroll.ScrollTo(200, false);
-                columnScroll.ScrollToStart();
+                columnScroll.ScrollToEnd(false);
+                columnScroll.ScrollTo(0);
             });
         }
 
@@ -454,18 +470,25 @@ namespace osu.Game.Overlays.Mods
                 modState.ValidForSelection.Value = modState.Mod.Type != ModType.System && modState.Mod.HasImplementation && IsValidMod.Invoke(modState.Mod);
         }
 
-        private void updateRankingInformation()
+        /// <summary>
+        /// Updates any information displayed on the overlay regarding the effects of the active mods.
+        /// This reads from <see cref="ActiveMods"/> instead of <see cref="SelectedMods"/>.
+        /// </summary>
+        private void updateOverlayInformation()
         {
-            if (rankingInformationDisplay == null)
-                return;
+            if (rankingInformationDisplay != null)
+            {
+                double multiplier = 1.0;
 
-            double multiplier = 1.0;
+                foreach (var mod in ActiveMods.Value)
+                    multiplier *= mod.ScoreMultiplier;
 
-            foreach (var mod in SelectedMods.Value)
-                multiplier *= mod.ScoreMultiplier;
+                rankingInformationDisplay.ModMultiplier.Value = multiplier;
+                rankingInformationDisplay.Ranked.Value = ActiveMods.Value.All(m => m.Ranked);
+            }
 
-            rankingInformationDisplay.ModMultiplier.Value = multiplier;
-            rankingInformationDisplay.Ranked.Value = SelectedMods.Value.All(m => m.Ranked);
+            if (beatmapAttributesDisplay != null)
+                beatmapAttributesDisplay.Mods.Value = ActiveMods.Value;
         }
 
         private void updateCustomisation()

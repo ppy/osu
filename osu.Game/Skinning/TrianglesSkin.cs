@@ -14,6 +14,7 @@ using osu.Game.Extensions;
 using osu.Game.IO;
 using osu.Game.Screens.Play.HUD;
 using osu.Game.Screens.Play.HUD.HitErrorMeters;
+using osu.Game.Skinning.Triangles;
 using osuTK;
 using osuTK.Graphics;
 
@@ -167,7 +168,7 @@ namespace osu.Game.Skinning
                                     new DefaultKeyCounterDisplay(),
                                     new BarHitErrorMeter(),
                                     new BarHitErrorMeter(),
-                                    new PerformancePointsCounter()
+                                    new TrianglesPerformancePointsCounter()
                                 }
                             };
 
