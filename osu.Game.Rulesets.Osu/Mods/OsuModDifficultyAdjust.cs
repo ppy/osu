@@ -33,7 +33,7 @@ namespace osu.Game.Rulesets.Osu.Mods
             MinValue = 0,
             MaxValue = 10,
             ExtendedMinValue = -10,
-            ExtendedMaxValue = 11,
+            ExtendedMaxValue = 12.5f,
             ReadCurrentFromDifficulty = diff => diff.ApproachRate,
         };
 
