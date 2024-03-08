@@ -2,7 +2,6 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System.Collections.Generic;
-using System.Linq;
 using Newtonsoft.Json;
 using osu.Framework.Graphics;
 using osu.Framework.Lists;
@@ -13,18 +12,20 @@ namespace osu.Game.Storyboards.Commands
 {
     public class StoryboardCommandGroup
     {
-        public SortedList<StoryboardCommand<float>> X;
-        public SortedList<StoryboardCommand<float>> Y;
-        public SortedList<StoryboardCommand<float>> Scale;
-        public SortedList<StoryboardCommand<Vector2>> VectorScale;
-        public SortedList<StoryboardCommand<float>> Rotation;
-        public SortedList<StoryboardCommand<Color4>> Colour;
-        public SortedList<StoryboardCommand<float>> Alpha;
-        public SortedList<StoryboardCommand<BlendingParameters>> BlendingParameters;
-        public SortedList<StoryboardCommand<bool>> FlipH;
-        public SortedList<StoryboardCommand<bool>> FlipV;
+        public SortedList<StoryboardCommand<float>> X = new SortedList<StoryboardCommand<float>>();
+        public SortedList<StoryboardCommand<float>> Y = new SortedList<StoryboardCommand<float>>();
+        public SortedList<StoryboardCommand<float>> Scale = new SortedList<StoryboardCommand<float>>();
+        public SortedList<StoryboardCommand<Vector2>> VectorScale = new SortedList<StoryboardCommand<Vector2>>();
+        public SortedList<StoryboardCommand<float>> Rotation = new SortedList<StoryboardCommand<float>>();
+        public SortedList<StoryboardCommand<Color4>> Colour = new SortedList<StoryboardCommand<Color4>>();
+        public SortedList<StoryboardCommand<float>> Alpha = new SortedList<StoryboardCommand<float>>();
+        public SortedList<StoryboardCommand<BlendingParameters>> BlendingParameters = new SortedList<StoryboardCommand<BlendingParameters>>();
+        public SortedList<StoryboardCommand<bool>> FlipH = new SortedList<StoryboardCommand<bool>>();
+        public SortedList<StoryboardCommand<bool>> FlipV = new SortedList<StoryboardCommand<bool>>();
 
-        private readonly IReadOnlyList<IStoryboardCommand>[] lists;
+        public IReadOnlyList<IStoryboardCommand> AllCommands => allCommands;
+
+        private readonly List<IStoryboardCommand> allCommands = new List<IStoryboardCommand>();
 
         /// <summary>
         /// Returns the earliest start time of the commands added to this group.
@@ -43,28 +44,6 @@ namespace osu.Game.Storyboards.Commands
 
         [JsonIgnore]
         public bool HasCommands { get; private set; }
-
-        public StoryboardCommandGroup()
-        {
-            lists = new IReadOnlyList<IStoryboardCommand>[]
-            {
-                X = new SortedList<StoryboardCommand<float>>(),
-                Y = new SortedList<StoryboardCommand<float>>(),
-                Scale = new SortedList<StoryboardCommand<float>>(),
-                VectorScale = new SortedList<StoryboardCommand<Vector2>>(),
-                Rotation = new SortedList<StoryboardCommand<float>>(),
-                Colour = new SortedList<StoryboardCommand<Color4>>(),
-                Alpha = new SortedList<StoryboardCommand<float>>(),
-                BlendingParameters = new SortedList<StoryboardCommand<BlendingParameters>>(),
-                FlipH = new SortedList<StoryboardCommand<bool>>(),
-                FlipV = new SortedList<StoryboardCommand<bool>>()
-            };
-        }
-
-        /// <summary>
-        /// Returns all commands contained by this group unsorted.
-        /// </summary>
-        public virtual IEnumerable<IStoryboardCommand> GetAllCommands() => lists.SelectMany(l => l);
 
         public void AddX(double startTime, double endTime, float startValue, float endValue, Easing easing)
             => AddCommand(X, new StoryboardXCommand(startTime, endTime, startValue, endValue, easing));
@@ -104,6 +83,7 @@ namespace osu.Game.Storyboards.Commands
         protected virtual void AddCommand<T>(ICollection<StoryboardCommand<T>> list, StoryboardCommand<T> command)
         {
             list.Add(command);
+            allCommands.Add(command);
             HasCommands = true;
 
             if (command.StartTime < StartTime)

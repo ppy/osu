@@ -3,7 +3,6 @@
 
 using System;
 using System.Collections.Generic;
-using osu.Framework.Graphics;
 using osu.Framework.Graphics.Transforms;
 
 namespace osu.Game.Storyboards.Commands
@@ -52,9 +51,9 @@ namespace osu.Game.Storyboards.Commands
 
             public override string PropertyName => command.PropertyName;
 
-            public override void ApplyInitialValue(Drawable d) => command.ApplyInitialValue(d);
+            public override void ApplyInitialValue<TDrawable>(TDrawable d) => command.ApplyInitialValue(d);
 
-            public override TransformSequence<Drawable> ApplyTransforms(Drawable d)
+            public override TransformSequence<TDrawable> ApplyTransforms<TDrawable>(TDrawable d)
             {
                 if (loopingGroup.TotalIterations == 0)
                     return command.ApplyTransforms(d);

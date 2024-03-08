@@ -13,7 +13,7 @@ namespace osu.Game.Storyboards
 {
     public class StoryboardSprite : IStoryboardElementWithDuration
     {
-        private readonly List<StoryboardLoopingGroup> loopGroups = new List<StoryboardLoopingGroup>();
+        private readonly List<StoryboardLoopingGroup> loopingGroups = new List<StoryboardLoopingGroup>();
         private readonly List<StoryboardTriggerGroup> triggerGroups = new List<StoryboardTriggerGroup>();
 
         public string Path { get; }
@@ -22,7 +22,7 @@ namespace osu.Game.Storyboards
         public Anchor Origin;
         public Vector2 InitialPosition;
 
-        public readonly StoryboardCommandGroup Group = new StoryboardCommandGroup();
+        public readonly StoryboardCommandGroup Commands = new StoryboardCommandGroup();
 
         public double StartTime
         {
@@ -35,10 +35,10 @@ namespace osu.Game.Storyboards
                 // anything before that point can be ignored (the sprite is not visible after all).
                 var alphaCommands = new List<(double startTime, bool isZeroStartValue)>();
 
-                var command = Group.Alpha.FirstOrDefault();
+                var command = Commands.Alpha.FirstOrDefault();
                 if (command != null) alphaCommands.Add((command.StartTime, command.StartValue == 0));
 
-                foreach (var loop in loopGroups)
+                foreach (var loop in loopingGroups)
                 {
                     command = loop.Alpha.FirstOrDefault();
                     if (command != null) alphaCommands.Add((command.StartTime, command.StartValue == 0));
@@ -62,8 +62,8 @@ namespace osu.Game.Storyboards
             {
                 // If we got to this point, either no alpha commands were present, or the earliest had a non-zero start value.
                 // The sprite's StartTime will be determined by the earliest command, regardless of type.
-                double earliestStartTime = Group.StartTime;
-                foreach (var l in loopGroups)
+                double earliestStartTime = Commands.StartTime;
+                foreach (var l in loopingGroups)
                     earliestStartTime = Math.Min(earliestStartTime, l.StartTime);
                 return earliestStartTime;
             }
@@ -73,9 +73,9 @@ namespace osu.Game.Storyboards
         {
             get
             {
-                double latestEndTime = Group.EndTime;
+                double latestEndTime = Commands.EndTime;
 
-                foreach (var l in loopGroups)
+                foreach (var l in loopingGroups)
                     latestEndTime = Math.Max(latestEndTime, l.EndTime);
 
                 return latestEndTime;
@@ -86,16 +86,16 @@ namespace osu.Game.Storyboards
         {
             get
             {
-                double latestEndTime = Group.StartTime;
+                double latestEndTime = Commands.StartTime;
 
-                foreach (var l in loopGroups)
+                foreach (var l in loopingGroups)
                     latestEndTime = Math.Max(latestEndTime, l.StartTime + l.Duration * l.TotalIterations);
 
                 return latestEndTime;
             }
         }
 
-        public bool HasCommands => Group.HasCommands || loopGroups.Any(l => l.HasCommands);
+        public bool HasCommands => Commands.HasCommands || loopingGroups.Any(l => l.HasCommands);
 
         public StoryboardSprite(string path, Anchor origin, Vector2 initialPosition)
         {
@@ -109,7 +109,7 @@ namespace osu.Game.Storyboards
         public StoryboardLoopingGroup AddLoopingGroup(double loopStartTime, int repeatCount)
         {
             var loop = new StoryboardLoopingGroup(loopStartTime, repeatCount);
-            loopGroups.Add(loop);
+            loopingGroups.Add(loop);
             return loop;
         }
 
@@ -120,26 +120,20 @@ namespace osu.Game.Storyboards
             return trigger;
         }
 
-        public void ApplyTransforms(Drawable drawable, IEnumerable<Tuple<StoryboardCommandGroup, double>>? triggeredGroups = null)
+        public void ApplyTransforms<TDrawable>(TDrawable drawable)
+            where TDrawable : Drawable, IFlippable, IVectorScalable
         {
-            // For performance reasons, we need to apply the commands in order by start time. Not doing so will cause many functions to be interleaved, resulting in O(n^2) complexity.
-
-            var commands = Group.GetAllCommands();
-            commands = commands.Concat(loopGroups.SelectMany(l => l.GetAllCommands()));
-
-            // todo: triggers are not implemented yet.
-            // if (triggeredGroups != null)
-            //     commands = commands.Concat(triggeredGroups.SelectMany(tuple => tuple.Item1.GetAllCommands(tuple.Item2)));
-
             HashSet<string> appliedProperties = new HashSet<string>();
+
+            // For performance reasons, we need to apply the commands in chronological order.
+            // Not doing so will cause many functions to be interleaved, resulting in O(n^2) complexity.
+            IEnumerable<IStoryboardCommand> commands = Commands.AllCommands;
+            commands = commands.Concat(loopingGroups.SelectMany(l => l.AllCommands));
 
             foreach (var command in commands.OrderBy(c => c.StartTime))
             {
-                if (!appliedProperties.Contains(command.PropertyName))
-                {
+                if (appliedProperties.Add(command.PropertyName))
                     command.ApplyInitialValue(drawable);
-                    appliedProperties.Add(command.PropertyName);
-                }
 
                 using (drawable.BeginAbsoluteSequence(command.StartTime))
                     command.ApplyTransforms(drawable);
@@ -147,26 +141,5 @@ namespace osu.Game.Storyboards
         }
 
         public override string ToString() => $"{Path}, {Origin}, {InitialPosition}";
-
-        // todo: need to revisit property initialisation. apparently it has to be done per first command of every affected property (transforms are supposed to do that already?).
-        // private void generateCommands<T>(List<IGeneratedCommand> resultList, IEnumerable<StoryboardCommandList<T>.TypedCommand> commands,
-        //                                  DrawablePropertyInitializer<T> initializeProperty, DrawableTransform<T> transform, bool alwaysInitialize = true)
-        // {
-        //     bool initialized = false;
-        //
-        //     foreach (var command in commands)
-        //     {
-        //         DrawablePropertyInitializer<T>? initFunc = null;
-        //
-        //         if (!initialized)
-        //         {
-        //             if (alwaysInitialize || command.StartTime == command.EndTime)
-        //                 initFunc = initializeProperty;
-        //             initialized = true;
-        //         }
-        //
-        //         resultList.Add(new GeneratedCommand<T>(command, initFunc, transform));
-        //     }
-        // }
     }
 }

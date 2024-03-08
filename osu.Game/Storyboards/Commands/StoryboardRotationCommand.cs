@@ -15,9 +15,9 @@ namespace osu.Game.Storyboards.Commands
 
         public override string PropertyName => nameof(Drawable.Rotation);
 
-        public override void ApplyInitialValue(Drawable d) => d.Rotation = StartValue;
+        public override void ApplyInitialValue<TDrawable>(TDrawable d) => d.Rotation = StartValue;
 
-        public override TransformSequence<Drawable> ApplyTransforms(Drawable d)
+        public override TransformSequence<TDrawable> ApplyTransforms<TDrawable>(TDrawable d)
             => d.RotateTo(StartValue).Then().RotateTo(EndValue, Duration, Easing);
     }
 }

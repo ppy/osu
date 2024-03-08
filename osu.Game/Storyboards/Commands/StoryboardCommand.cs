@@ -4,6 +4,7 @@
 using System;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Transforms;
+using osu.Game.Storyboards.Drawables;
 
 namespace osu.Game.Storyboards.Commands
 {
@@ -11,6 +12,11 @@ namespace osu.Game.Storyboards.Commands
     {
         public double StartTime { get; }
         public double EndTime { get; }
+
+        public T StartValue { get; }
+        public T EndValue { get; }
+        public Easing Easing { get; }
+
         public double Duration => EndTime - StartTime;
 
         protected StoryboardCommand(double startTime, double endTime, T startValue, T endValue, Easing easing)
@@ -25,18 +31,13 @@ namespace osu.Game.Storyboards.Commands
             Easing = easing;
         }
 
-        public Easing Easing { get; set; }
-        public int LoopCount { get; set; }
-        public double Delay { get; set; }
-
-        public T StartValue;
-        public T EndValue;
-
         public abstract string PropertyName { get; }
 
-        public abstract void ApplyInitialValue(Drawable d);
+        public abstract void ApplyInitialValue<TDrawable>(TDrawable d)
+            where TDrawable : Drawable, IFlippable, IVectorScalable;
 
-        public abstract TransformSequence<Drawable> ApplyTransforms(Drawable d);
+        public abstract TransformSequence<TDrawable> ApplyTransforms<TDrawable>(TDrawable d)
+            where TDrawable : Drawable, IFlippable, IVectorScalable;
 
         public int CompareTo(StoryboardCommand<T>? other)
         {

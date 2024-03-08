@@ -2,14 +2,12 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using osu.Framework.Graphics;
-using osuTK;
 
 namespace osu.Game.Storyboards.Drawables
 {
-    public interface IDrawableStoryboardElement : IDrawable
+    public interface IFlippable : IDrawable
     {
         bool FlipH { get; set; }
         bool FlipV { get; set; }
-        Vector2 VectorScale { get; set; }
     }
 }
