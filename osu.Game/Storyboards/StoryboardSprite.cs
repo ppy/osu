@@ -195,4 +195,3 @@ namespace osu.Game.Storyboards
         public override string ToString() => $"{Path}, {Origin}, {InitialPosition}";
     }
 }
-
