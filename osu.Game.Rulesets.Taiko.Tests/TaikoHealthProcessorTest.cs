@@ -147,7 +147,7 @@ namespace osu.Game.Rulesets.Taiko.Tests
             {
                 HitObjects =
                 {
-                    new DrumRoll { Duration = 2000 }
+                    new Swell { Duration = 2000 }
                 }
             };
 
@@ -171,6 +171,86 @@ namespace osu.Game.Rulesets.Taiko.Tests
                 Assert.That(healthProcessor.Health.Value, Is.EqualTo(1));
                 Assert.That(healthProcessor.HasFailed, Is.False);
             });
+        }
+
+        [Test]
+        public void TestMissHitAndHitSwell()
+        {
+            var beatmap = new TaikoBeatmap
+            {
+                HitObjects =
+                {
+                    new Hit(),
+                    new Swell { Duration = 2000 }
+                }
+            };
+
+            foreach (var ho in beatmap.HitObjects)
+                ho.ApplyDefaults(beatmap.ControlPointInfo, beatmap.Difficulty);
+
+            var healthProcessor = new TaikoHealthProcessor();
+            healthProcessor.ApplyBeatmap(beatmap);
+
+            healthProcessor.ApplyResult(new JudgementResult(beatmap.HitObjects[0], new TaikoJudgement()) { Type = HitResult.Miss });
+
+            foreach (var nested in beatmap.HitObjects[1].NestedHitObjects)
+            {
+                var nestedJudgement = nested.CreateJudgement();
+                healthProcessor.ApplyResult(new JudgementResult(nested, nestedJudgement) { Type = nestedJudgement.MaxResult });
+            }
+
+            var judgement = beatmap.HitObjects[1].CreateJudgement();
+            healthProcessor.ApplyResult(new JudgementResult(beatmap.HitObjects[1], judgement) { Type = judgement.MaxResult });
+
+            Assert.Multiple(() =>
+            {
+                Assert.That(healthProcessor.Health.Value, Is.EqualTo(0));
+                Assert.That(healthProcessor.HasFailed, Is.True);
+            });
+        }
+
+        private static readonly object[][] test_cases =
+        [
+            // hitobject, fail expected after miss
+            [new Hit(), true],
+            [new Hit.StrongNestedHit(new Hit()), false],
+            [new DrumRollTick(new DrumRoll()), false],
+            [new DrumRollTick.StrongNestedHit(new DrumRollTick(new DrumRoll())), false],
+            [new DrumRoll(), false],
+            [new SwellTick(), false],
+            [new Swell(), false]
+        ];
+
+        [TestCaseSource(nameof(test_cases))]
+        public void TestFailAfterMinResult(TaikoHitObject hitObject, bool failExpected)
+        {
+            var healthProcessor = new TaikoHealthProcessor();
+            healthProcessor.ApplyBeatmap(new TaikoBeatmap
+            {
+                HitObjects = { hitObject }
+            });
+
+            var result = new JudgementResult(hitObject, hitObject.CreateJudgement());
+            result.Type = result.Judgement.MinResult;
+            healthProcessor.ApplyResult(result);
+
+            Assert.That(healthProcessor.HasFailed, Is.EqualTo(failExpected));
+        }
+
+        [TestCaseSource(nameof(test_cases))]
+        public void TestNoFailAfterMaxResult(TaikoHitObject hitObject, bool _)
+        {
+            var healthProcessor = new TaikoHealthProcessor();
+            healthProcessor.ApplyBeatmap(new TaikoBeatmap
+            {
+                HitObjects = { hitObject }
+            });
+
+            var result = new JudgementResult(hitObject, hitObject.CreateJudgement());
+            result.Type = result.Judgement.MaxResult;
+            healthProcessor.ApplyResult(result);
+
+            Assert.That(healthProcessor.HasFailed, Is.False);
         }
     }
 }

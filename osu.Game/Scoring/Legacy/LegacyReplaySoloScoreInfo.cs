@@ -42,8 +42,8 @@ namespace osu.Game.Scoring.Legacy
         {
             OnlineID = score.OnlineID,
             Mods = score.APIMods,
-            Statistics = score.Statistics.Where(kvp => kvp.Value != 0).ToDictionary(kvp => kvp.Key, kvp => kvp.Value),
-            MaximumStatistics = score.MaximumStatistics.Where(kvp => kvp.Value != 0).ToDictionary(kvp => kvp.Key, kvp => kvp.Value),
+            Statistics = score.Statistics.Where(kvp => kvp.Value != 0).ToDictionary(),
+            MaximumStatistics = score.MaximumStatistics.Where(kvp => kvp.Value != 0).ToDictionary(),
             ClientVersion = score.ClientVersion,
         };
     }

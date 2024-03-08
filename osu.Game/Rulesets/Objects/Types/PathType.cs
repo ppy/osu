@@ -40,8 +40,7 @@ namespace osu.Game.Rulesets.Objects.Types
 
         public static PathType BSpline(int degree)
         {
-            if (degree <= 0)
-                throw new ArgumentOutOfRangeException(nameof(degree), "The degree of a B-Spline path must be greater than zero.");
+            ArgumentOutOfRangeException.ThrowIfNegativeOrZero(degree);
 
             return new PathType { Type = SplineType.BSpline, Degree = degree };
         }
