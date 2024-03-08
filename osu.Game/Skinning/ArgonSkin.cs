@@ -232,7 +232,10 @@ namespace osu.Game.Skinning
                                         CornerRadius = { Value = 0.5f }
                                     },
                                     new ArgonAccuracyCounter(),
-                                    new ArgonPerformancePointsCounter(),
+                                    new ArgonPerformancePointsCounter
+                                    {
+                                        Scale = new Vector2(0.8f),
+                                    },
                                     new ArgonComboCounter
                                     {
                                         Scale = new Vector2(1.3f)
