@@ -19,7 +19,7 @@ namespace osu.Game.Storyboards.Commands
 
         public double Duration => EndTime - StartTime;
 
-        protected StoryboardCommand(double startTime, double endTime, T startValue, T endValue, Easing easing)
+        protected StoryboardCommand(Easing easing, double startTime, double endTime, T startValue, T endValue)
         {
             if (endTime < startTime)
                 endTime = startTime;

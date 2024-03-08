@@ -9,8 +9,8 @@ namespace osu.Game.Storyboards.Commands
 {
     public class StoryboardColourCommand : StoryboardCommand<Color4>
     {
-        public StoryboardColourCommand(double startTime, double endTime, Color4 startValue, Color4 endValue, Easing easing)
-            : base(startTime, endTime, startValue, endValue, easing)
+        public StoryboardColourCommand(Easing easing, double startTime, double endTime, Color4 startValue, Color4 endValue)
+            : base(easing, startTime, endTime, startValue, endValue)
         {
         }
 

@@ -43,7 +43,7 @@ namespace osu.Game.Storyboards.Commands
                 // In an ideal world, we would multiply the command duration by TotalIterations in command end time.
                 // Unfortunately this would clash with how stable handled end times, and results in some storyboards playing outro
                 // sequences for minutes or hours.
-                : base(loopingGroup.loopStartTime + command.StartTime, loopingGroup.loopStartTime + command.EndTime, command.StartValue, command.EndValue, command.Easing)
+                : base(command.Easing, loopingGroup.loopStartTime + command.StartTime, loopingGroup.loopStartTime + command.EndTime, command.StartValue, command.EndValue)
             {
                 this.command = command;
                 this.loopingGroup = loopingGroup;

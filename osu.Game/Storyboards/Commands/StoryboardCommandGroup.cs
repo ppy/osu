@@ -45,35 +45,35 @@ namespace osu.Game.Storyboards.Commands
         [JsonIgnore]
         public bool HasCommands { get; private set; }
 
-        public void AddX(double startTime, double endTime, float startValue, float endValue, Easing easing)
-            => AddCommand(X, new StoryboardXCommand(startTime, endTime, startValue, endValue, easing));
+        public void AddX(Easing easing, double startTime, double endTime, float startValue, float endValue)
+            => AddCommand(X, new StoryboardXCommand(easing, startTime, endTime, startValue, endValue));
 
-        public void AddY(double startTime, double endTime, float startValue, float endValue, Easing easing)
-            => AddCommand(Y, new StoryboardYCommand(startTime, endTime, startValue, endValue, easing));
+        public void AddY(Easing easing, double startTime, double endTime, float startValue, float endValue)
+            => AddCommand(Y, new StoryboardYCommand(easing, startTime, endTime, startValue, endValue));
 
-        public void AddScale(double startTime, double endTime, float startValue, float endValue, Easing easing)
-            => AddCommand(Scale, new StoryboardScaleCommand(startTime, endTime, startValue, endValue, easing));
+        public void AddScale(Easing easing, double startTime, double endTime, float startValue, float endValue)
+            => AddCommand(Scale, new StoryboardScaleCommand(easing, startTime, endTime, startValue, endValue));
 
-        public void AddVectorScale(double startTime, double endTime, Vector2 startValue, Vector2 endValue, Easing easing)
-            => AddCommand(VectorScale, new StoryboardVectorScaleCommand(startTime, endTime, startValue, endValue, easing));
+        public void AddVectorScale(Easing easing, double startTime, double endTime, Vector2 startValue, Vector2 endValue)
+            => AddCommand(VectorScale, new StoryboardVectorScaleCommand(easing, startTime, endTime, startValue, endValue));
 
-        public void AddRotation(double startTime, double endTime, float startValue, float endValue, Easing easing)
-            => AddCommand(Rotation, new StoryboardRotationCommand(startTime, endTime, startValue, endValue, easing));
+        public void AddRotation(Easing easing, double startTime, double endTime, float startValue, float endValue)
+            => AddCommand(Rotation, new StoryboardRotationCommand(easing, startTime, endTime, startValue, endValue));
 
-        public void AddColour(double startTime, double endTime, Color4 startValue, Color4 endValue, Easing easing)
-            => AddCommand(Colour, new StoryboardColourCommand(startTime, endTime, startValue, endValue, easing));
+        public void AddColour(Easing easing, double startTime, double endTime, Color4 startValue, Color4 endValue)
+            => AddCommand(Colour, new StoryboardColourCommand(easing, startTime, endTime, startValue, endValue));
 
-        public void AddAlpha(double startTime, double endTime, float startValue, float endValue, Easing easing)
-            => AddCommand(Alpha, new StoryboardAlphaCommand(startTime, endTime, startValue, endValue, easing));
+        public void AddAlpha(Easing easing, double startTime, double endTime, float startValue, float endValue)
+            => AddCommand(Alpha, new StoryboardAlphaCommand(easing, startTime, endTime, startValue, endValue));
 
-        public void AddBlendingParameters(double startTime, double endTime, BlendingParameters startValue, BlendingParameters endValue, Easing easing)
-            => AddCommand(BlendingParameters, new StoryboardBlendingParametersCommand(startTime, endTime, startValue, endValue, easing));
+        public void AddBlendingParameters(Easing easing, double startTime, double endTime, BlendingParameters startValue, BlendingParameters endValue)
+            => AddCommand(BlendingParameters, new StoryboardBlendingParametersCommand(easing, startTime, endTime, startValue, endValue));
 
-        public void AddFlipH(double startTime, double endTime, bool startValue, bool endValue, Easing easing)
-            => AddCommand(FlipH, new StoryboardFlipHCommand(startTime, endTime, startValue, endValue, easing));
+        public void AddFlipH(Easing easing, double startTime, double endTime, bool startValue, bool endValue)
+            => AddCommand(FlipH, new StoryboardFlipHCommand(easing, startTime, endTime, startValue, endValue));
 
-        public void AddFlipV(double startTime, double endTime, bool startValue, bool endValue, Easing easing)
-            => AddCommand(FlipV, new StoryboardFlipVCommand(startTime, endTime, startValue, endValue, easing));
+        public void AddFlipV(Easing easing, double startTime, double endTime, bool startValue, bool endValue)
+            => AddCommand(FlipV, new StoryboardFlipVCommand(easing, startTime, endTime, startValue, endValue));
 
         /// <summary>
         /// Adds the given storyboard <paramref name="command"/> to the target <paramref name="list"/>.
