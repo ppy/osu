@@ -4,7 +4,6 @@
 using NUnit.Framework;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
-using osu.Framework.Testing;
 using osu.Game.Rulesets.Osu;
 using osu.Game.Rulesets.Scoring;
 using osu.Game.Screens.Play.HUD;
@@ -21,10 +20,11 @@ namespace osu.Game.Tests.Visual.Gameplay
         protected override Drawable CreateDefaultImplementation() => new DefaultAccuracyCounter();
         protected override Drawable CreateLegacyImplementation() => new LegacyAccuracyCounter();
 
-        [SetUpSteps]
-        public void SetUpSteps()
+        public override void SetUpSteps()
         {
             AddStep("Set initial accuracy", () => scoreProcessor.Accuracy.Value = 1);
+
+            base.SetUpSteps();
         }
 
         [Test]

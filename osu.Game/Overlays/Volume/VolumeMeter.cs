@@ -235,7 +235,7 @@ namespace osu.Game.Overlays.Volume
 
             Bindable.BindValueChanged(volume => { this.TransformTo(nameof(DisplayVolume), volume.NewValue, 400, Easing.OutQuint); }, true);
 
-            bgProgress.Current.Value = 0.75f;
+            bgProgress.Progress = 0.75f;
         }
 
         private int? displayVolumeInt;
@@ -265,8 +265,8 @@ namespace osu.Game.Overlays.Volume
                     text.Text = intValue.ToString(CultureInfo.CurrentCulture);
                 }
 
-                volumeCircle.Current.Value = displayVolume * 0.75f;
-                volumeCircleGlow.Current.Value = displayVolume * 0.75f;
+                volumeCircle.Progress = displayVolume * 0.75f;
+                volumeCircleGlow.Progress = displayVolume * 0.75f;
 
                 if (intVolumeChanged && IsLoaded)
                     Scheduler.AddOnce(playTickSound);

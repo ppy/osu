@@ -8,7 +8,7 @@ using Newtonsoft.Json;
 using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Online.Chat;
 
-namespace osu.Game.Online.Notifications.WebSocket
+namespace osu.Game.Online.Notifications.WebSocket.Events
 {
     /// <summary>
     /// A websocket message sent from the server when new messages arrive.

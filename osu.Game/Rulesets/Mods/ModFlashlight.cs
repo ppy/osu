@@ -7,6 +7,7 @@ using System.Runtime.InteropServices;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
+using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Primitives;
 using osu.Framework.Graphics.Rendering;
 using osu.Framework.Graphics.Rendering.Vertices;
@@ -88,7 +89,13 @@ namespace osu.Game.Rulesets.Mods
             flashlight.Combo.BindTo(Combo);
             flashlight.GetPlayfieldScale = () => drawableRuleset.Playfield.Scale;
 
-            drawableRuleset.Overlays.Add(flashlight);
+            drawableRuleset.Overlays.Add(new Container
+            {
+                RelativeSizeAxes = Axes.Both,
+                // workaround for 1px gaps on the edges of the playfield which would sometimes show with "gameplay" screen scaling active.
+                Padding = new MarginPadding(-1),
+                Child = flashlight,
+            });
         }
 
         protected abstract Flashlight CreateFlashlight();
