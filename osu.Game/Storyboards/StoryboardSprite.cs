@@ -86,7 +86,7 @@ namespace osu.Game.Storyboards
         {
             get
             {
-                double latestEndTime = Commands.StartTime;
+                double latestEndTime = Commands.EndTime;
 
                 foreach (var l in loopingGroups)
                     latestEndTime = Math.Max(latestEndTime, l.StartTime + l.Duration * l.TotalIterations);
