@@ -5,6 +5,7 @@ using System;
 using osu.Game.Rulesets.Difficulty.Preprocessing;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Osu.Difficulty.Evaluators;
+using osu.Game.Rulesets.Osu.Difficulty.Utils;
 
 namespace osu.Game.Rulesets.Osu.Difficulty.Skills
 {
@@ -25,6 +26,14 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
 
         private double skillMultiplier => 125;
         private double strainDecayBase => 0.15;
+
+        protected override double HitProbability(double skill, double difficulty)
+        {
+            if (skill <= 0) return 0;
+            if (difficulty <= 0) return 1;
+
+            return SpecialFunctions.Erf(skill / (Math.Sqrt(2) * difficulty));
+        }
 
         private double strainDecay(double ms) => Math.Pow(strainDecayBase, ms / 1000);
 

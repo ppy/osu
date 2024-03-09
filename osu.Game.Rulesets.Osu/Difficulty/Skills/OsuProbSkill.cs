@@ -34,26 +34,22 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
             difficulties.Add(StrainValueAt(current));
         }
 
-        private static double hitProbability(double skill, double difficulty)
-        {
-            if (skill <= 0) return 0;
-            if (difficulty <= 0) return 1;
+        protected abstract double HitProbability(double skill, double difficulty);
 
-            return SpecialFunctions.Erf(skill / (Math.Sqrt(2) * difficulty));
-        }
-
-        private static double fcProbabilityAtSkill(double skill, IEnumerable<Bin> bins)
+        private double fcProbabilityAtSkill(double skill, IEnumerable<Bin> bins)
         {
             if (skill <= 0) return 0;
 
-            return bins.Aggregate(1.0, (current, bin) => current * bin.FcProbability(skill));
+            double totalHitProbability(Bin bin) => Math.Pow(HitProbability(skill, bin.Difficulty), bin.Count);
+
+            return bins.Aggregate(1.0, (current, bin) => current * totalHitProbability(bin));
         }
 
         private double fcProbabilityAtSkill(double skill)
         {
             if (skill <= 0) return 0;
 
-            return difficulties.Aggregate<double, double>(1, (current, d) => current * hitProbability(skill, d));
+            return difficulties.Aggregate<double, double>(1, (current, d) => current * HitProbability(skill, d));
         }
 
         /// <summary>
