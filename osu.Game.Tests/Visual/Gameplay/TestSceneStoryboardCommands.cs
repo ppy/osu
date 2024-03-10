@@ -87,6 +87,17 @@ namespace osu.Game.Tests.Visual.Gameplay
             }));
         }
 
+        [Test]
+        public void TestLoopManyTimes()
+        {
+            AddStep("create sprite", () => Child = createSprite(s =>
+            {
+                var loop = s.AddLoopingGroup(500, 10000);
+                loop.AddY(Easing.OutBounce, 0, 60, 100, 240);
+                loop.AddY(Easing.OutQuint, 80, 120, 240, 100);
+            }));
+        }
+
         protected override void Update()
         {
             base.Update();
