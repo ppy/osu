@@ -4,6 +4,7 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using NUnit.Framework;
@@ -13,6 +14,7 @@ using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.IO.Stores;
+using osu.Framework.Testing;
 using osu.Framework.Timing;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Rulesets.Mods;
@@ -33,7 +35,7 @@ namespace osu.Game.Tests.Visual.Gameplay
         };
 
         private readonly ManualClock manualClock = new ManualClock { Rate = 1, IsRunning = true };
-        private bool forward;
+        private int clockDirection;
 
         private const string lookup_name = "hitcircleoverlay";
         private const double clock_limit = 2500;
@@ -69,28 +71,75 @@ namespace osu.Game.Tests.Visual.Gameplay
             };
         }
 
-        [SetUp]
-        public void SetUp()
+        [SetUpSteps]
+        public void SetUpSteps()
         {
-            manualClock.CurrentTime = 0;
-            forward = true;
+            AddStep("start clock", () => clockDirection = 1);
+            AddStep("pause clock", () => clockDirection = 0);
+            AddStep("set clock = 0", () => manualClock.CurrentTime = 0);
         }
 
         [Test]
-        public void TestLoop()
+        public void TestNormalCommandPlayback()
         {
-            AddStep("create sprite", () => Child = createSprite(s =>
+            AddStep("create storyboard", () => Child = createStoryboard(s =>
             {
-                var loop = s.AddLoopingGroup(500, 10);
-                loop.AddY(Easing.OutBounce, 0, 600, 100, 240);
-                loop.AddY(Easing.OutQuint, 800, 1200, 240, 100);
+                s.Commands.AddY(Easing.OutBounce, 500, 900, 100, 240);
+                s.Commands.AddY(Easing.OutQuint, 1100, 1500, 240, 100);
             }));
+
+            assert(0, 100);
+            assert(500, 100);
+            assert(1000, 240);
+            assert(1500, 100);
+            assert(clock_limit, 100);
+            assert(1500, 100);
+            assert(1000, 240);
+            assert(500, 100);
+            assert(0, 100);
+
+            void assert(double time, double y)
+            {
+                AddStep($"set clock = {time}", () => manualClock.CurrentTime = time);
+                AddAssert($"sprite y = {y} at t = {time}", () => this.ChildrenOfType<DrawableStoryboardSprite>().Single().Y == y);
+            }
+        }
+
+        [Test]
+        public void TestLoopingCommandsPlayback()
+        {
+            AddStep("create storyboard", () => Child = createStoryboard(s =>
+            {
+                var loop = s.AddLoopingGroup(250, 1);
+                loop.AddY(Easing.OutBounce, 0, 400, 100, 240);
+                loop.AddY(Easing.OutQuint, 600, 1000, 240, 100);
+            }));
+
+            assert(0, 100);
+            assert(250, 100);
+            assert(850, 240);
+            assert(1250, 100);
+            assert(1850, 240);
+            assert(2250, 100);
+            assert(clock_limit, 100);
+            assert(2250, 100);
+            assert(1850, 240);
+            assert(1250, 100);
+            assert(850, 240);
+            assert(250, 100);
+            assert(0, 100);
+
+            void assert(double time, double y)
+            {
+                AddStep($"set clock = {time}", () => manualClock.CurrentTime = time);
+                AddAssert($"sprite y = {y} at t = {time}", () => this.ChildrenOfType<DrawableStoryboardSprite>().Single().Y == y);
+            }
         }
 
         [Test]
         public void TestLoopManyTimes()
         {
-            AddStep("create sprite", () => Child = createSprite(s =>
+            AddStep("create storyboard", () => Child = createStoryboard(s =>
             {
                 var loop = s.AddLoopingGroup(500, 10000);
                 loop.AddY(Easing.OutBounce, 0, 60, 100, 240);
@@ -98,19 +147,57 @@ namespace osu.Game.Tests.Visual.Gameplay
             }));
         }
 
+        [Test]
+        public void TestParameterTemporaryEffect()
+        {
+            AddStep("create storyboard", () => Child = createStoryboard(s =>
+            {
+                s.Commands.AddFlipV(Easing.None, 1000, 1500, true, false);
+            }));
+
+            AddAssert("sprite not flipped at t = 0", () => !this.ChildrenOfType<DrawableStoryboardSprite>().Single().FlipV);
+
+            AddStep("set clock = 1250", () => manualClock.CurrentTime = 1250);
+            AddAssert("sprite flipped at t = 1250", () => this.ChildrenOfType<DrawableStoryboardSprite>().Single().FlipV);
+
+            AddStep("set clock = 2000", () => manualClock.CurrentTime = 2000);
+            AddAssert("sprite not flipped at t = 2000", () => !this.ChildrenOfType<DrawableStoryboardSprite>().Single().FlipV);
+
+            AddStep("resume clock", () => clockDirection = 1);
+        }
+
+        [Test]
+        public void TestParameterPermanentEffect()
+        {
+            AddStep("create storyboard", () => Child = createStoryboard(s =>
+            {
+                s.Commands.AddFlipV(Easing.None, 1000, 1000, true, true);
+            }));
+
+            AddAssert("sprite flipped at t = 0", () => this.ChildrenOfType<DrawableStoryboardSprite>().Single().FlipV);
+
+            AddStep("set clock = 1250", () => manualClock.CurrentTime = 1250);
+            AddAssert("sprite flipped at t = 1250", () => this.ChildrenOfType<DrawableStoryboardSprite>().Single().FlipV);
+
+            AddStep("set clock = 2000", () => manualClock.CurrentTime = 2000);
+            AddAssert("sprite flipped at t = 2000", () => this.ChildrenOfType<DrawableStoryboardSprite>().Single().FlipV);
+
+            AddStep("resume clock", () => clockDirection = 1);
+        }
+
         protected override void Update()
         {
             base.Update();
 
             if (manualClock.CurrentTime > clock_limit || manualClock.CurrentTime < 0)
-                forward = !forward;
+                clockDirection = -clockDirection;
 
-            manualClock.CurrentTime += Time.Elapsed * (forward ? 1 : -1);
+            manualClock.CurrentTime += Time.Elapsed * clockDirection;
             timelineText.Text = $"Time: {manualClock.CurrentTime:0}ms";
             timelineMarker.X = (float)(manualClock.CurrentTime / clock_limit);
         }
 
-        private DrawableStoryboard createSprite(Action<StoryboardSprite>? addCommands = null)
+        private DrawableStoryboard createStoryboard(Action<StoryboardSprite>? addCommands = null)
         {
             var layer = storyboard.GetLayer("Background");
 
