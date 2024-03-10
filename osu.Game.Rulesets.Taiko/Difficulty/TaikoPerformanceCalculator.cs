@@ -136,7 +136,7 @@ namespace osu.Game.Rulesets.Taiko.Difficulty
 
                 double n = totalHits;
 
-                // Proportion of greats hit, ignoring misses.
+                // Proportion of greats hit.
                 double p = countGreat / n;
 
                 // We can be 99% confident that p is at least this value.
