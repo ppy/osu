@@ -9,7 +9,7 @@ using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Scoring;
 using osu.Game.Rulesets.Taiko.Objects;
 using osu.Game.Scoring;
-using MathNet.Numerics;
+using osu.Game.Utils;
 
 namespace osu.Game.Rulesets.Taiko.Difficulty
 {
