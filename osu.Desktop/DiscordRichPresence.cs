@@ -189,20 +189,14 @@ namespace osu.Desktop
         private void onJoin(object sender, JoinMessage args)
         {
             game.Window?.Raise();
-            Logger.Log($"Received room secret from Discord RPC Client: {args.Secret}", LoggingTarget.Network, LogLevel.Debug);
 
-            // Stable and Lazer share the same Discord client ID, meaning they can accept join requests from each other.
+            Logger.Log($"Received room secret from Discord RPC Client: \"{args.Secret}\"", LoggingTarget.Network, LogLevel.Debug);
+
+            // Stable and lazer share the same Discord client ID, meaning they can accept join requests from each other.
             // Since they aren't compatible in multi, see if stable's format is being used and log to avoid confusion.
-            // https://discord.com/channels/188630481301012481/188630652340404224/1214697229063946291
-            if (args.Secret[0] != '{')
+            if (args.Secret[0] != '{' || !tryParseRoomSecret(args.Secret, out long roomId, out string? password))
             {
-                Logger.Log("osu!stable rooms are not compatible with lazer.", LoggingTarget.Network, LogLevel.Important);
-                return;
-            }
-
-            if (!tryParseRoomSecret(args.Secret, out long roomId, out string? password))
-            {
-                Logger.Log("Could not join multiplayer room.", LoggingTarget.Network, LogLevel.Important);
+                Logger.Log("Could not join multiplayer room, invitation is invalid or incompatible.", LoggingTarget.Network, LogLevel.Important);
                 return;
             }
 
@@ -211,7 +205,7 @@ namespace osu.Desktop
             {
                 game.PresentMultiplayerMatch(room, password);
             });
-            request.Failure += _ => Logger.Log($"Could not find room {roomId} from Discord RPC Client", LoggingTarget.Network, LogLevel.Important);
+            request.Failure += _ => Logger.Log($"Could not join multiplayer room, room could not be found (room ID: {roomId}).", LoggingTarget.Network, LogLevel.Important);
             api.Queue(request);
         }
 
