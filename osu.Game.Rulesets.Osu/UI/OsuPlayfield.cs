@@ -9,6 +9,7 @@ using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
+using osu.Framework.Graphics.Primitives;
 using osu.Game.Beatmaps;
 using osu.Game.Rulesets.Judgements;
 using osu.Game.Rulesets.Objects;
@@ -34,6 +35,8 @@ namespace osu.Game.Rulesets.Osu.UI
         private readonly JudgementContainer<DrawableOsuJudgement> judgementLayer;
 
         private readonly JudgementPooler<DrawableOsuJudgement> judgementPooler;
+
+        public override bool UpdateSubTreeMasking(Drawable source, RectangleF maskingBounds) => false;
 
         public SmokeContainer Smoke { get; }
         public FollowPointRenderer FollowPoints { get; }
