@@ -129,12 +129,12 @@ namespace osu.Game.Rulesets.Taiko.Difficulty
 
             const double z = 2.32634787404; // 99% critical value for the normal distribution (one-tailed).
 
-            // The upper bound on deviation, calculated with the ratio of 300s to 100s, and the great hit window.
+            // The upper bound on deviation, calculated with the ratio of 300s to objects, and the great hit window.
             double? calcDeviationGreatWindow()
             {
                 if (countGreat == 0) return null;
 
-                double n = totalSuccessfulHits;
+                double n = totalHits;
 
                 // Proportion of greats hit, ignoring misses.
                 double p = countGreat / n;
@@ -146,7 +146,7 @@ namespace osu.Game.Rulesets.Taiko.Difficulty
                 return h300 / (Math.Sqrt(2) * SpecialFunctions.ErfInv(pLowerBound));
             }
 
-            // The upper bound on deviation, calculated with the ratio of 300s + 100s to misses, and the good hit window.
+            // The upper bound on deviation, calculated with the ratio of 300s + 100s to objects, and the good hit window.
             // This will return a lower value than the first method when the number of 100s is high, but the miss count is low.
             double? calcDeviationGoodWindow()
             {
