@@ -4,6 +4,7 @@
 #nullable disable
 
 using System;
+using JetBrains.Annotations;
 using osu.Framework;
 using osu.Framework.Allocation;
 using osu.Framework.Audio;
@@ -82,6 +83,7 @@ namespace osu.Game.Screens.Ranking
         private static readonly Color4 contracted_top_layer_colour = Color4Extensions.FromHex("#353535");
         private static readonly Color4 contracted_middle_layer_colour = Color4Extensions.FromHex("#353535");
 
+        [CanBeNull]
         public event Action<PanelState> StateChanged;
 
         /// <summary>

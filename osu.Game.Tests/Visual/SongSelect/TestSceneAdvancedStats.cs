@@ -14,7 +14,9 @@ using osu.Game.Beatmaps;
 using osu.Game.Graphics;
 using osu.Game.Resources.Localisation.Web;
 using osu.Game.Rulesets;
+using osu.Game.Rulesets.Mania;
 using osu.Game.Rulesets.Mods;
+using osu.Game.Rulesets.Osu;
 using osu.Game.Rulesets.Osu.Mods;
 using osu.Game.Screens.Select.Details;
 using osuTK.Graphics;
@@ -35,7 +37,7 @@ namespace osu.Game.Tests.Visual.SongSelect
         [SetUp]
         public void Setup() => Schedule(() => Child = advancedStats = new TestAdvancedStats
         {
-            Width = 500
+            Width = 500,
         });
 
         private BeatmapInfo exampleBeatmapInfo => new BeatmapInfo
@@ -66,22 +68,12 @@ namespace osu.Game.Tests.Visual.SongSelect
         }
 
         [Test]
-        public void TestManiaFirstBarText()
+        public void TestFirstBarText()
         {
-            AddStep("set beatmap", () => advancedStats.BeatmapInfo = new BeatmapInfo
-            {
-                Ruleset = rulesets.GetRuleset(3) ?? throw new InvalidOperationException("osu!mania ruleset not found"),
-                Difficulty = new BeatmapDifficulty
-                {
-                    CircleSize = 5,
-                    DrainRate = 4.3f,
-                    OverallDifficulty = 4.5f,
-                    ApproachRate = 3.1f
-                },
-                StarRating = 8
-            });
-
+            AddStep("set ruleset to mania", () => advancedStats.Ruleset.Value = new ManiaRuleset().RulesetInfo);
             AddAssert("first bar text is correct", () => advancedStats.ChildrenOfType<SpriteText>().First().Text == BeatmapsetsStrings.ShowStatsCsMania);
+            AddStep("set ruleset to osu", () => advancedStats.Ruleset.Value = new OsuRuleset().RulesetInfo);
+            AddAssert("first bar text is correct", () => advancedStats.ChildrenOfType<SpriteText>().First().Text == BeatmapsetsStrings.ShowStatsCs);
         }
 
         [Test]

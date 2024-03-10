@@ -92,7 +92,7 @@ namespace osu.Game.Overlays.Mods
                     {
                         Anchor = Anchor.TopCentre,
                         Origin = Anchor.TopCentre,
-                        Direction = FillDirection.Horizontal,
+                        RelativeSizeAxes = Axes.X,
                         AutoSizeAxes = Axes.Y,
                         Spacing = new Vector2(7),
                         Children = new Drawable[]
@@ -153,13 +153,13 @@ namespace osu.Game.Overlays.Mods
 
         private void useCurrentMods()
         {
-            saveableMods = selectedMods.Value.ToHashSet();
+            saveableMods = selectedMods.Value.Where(mod => mod.Type != ModType.System).ToHashSet();
             updateState();
         }
 
         private void updateState()
         {
-            scrollContent.ChildrenEnumerable = saveableMods.Select(mod => new ModPresetRow(mod));
+            scrollContent.ChildrenEnumerable = saveableMods.AsOrdered().Select(mod => new ModPresetRow(mod));
             useCurrentModsButton.Enabled.Value = checkSelectedModsDiffersFromSaved();
         }
 
@@ -168,7 +168,7 @@ namespace osu.Game.Overlays.Mods
             if (!selectedMods.Value.Any())
                 return false;
 
-            return !saveableMods.SetEquals(selectedMods.Value);
+            return !saveableMods.SetEquals(selectedMods.Value.Where(mod => mod.Type != ModType.System));
         }
 
         private void save()

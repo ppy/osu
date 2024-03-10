@@ -34,7 +34,7 @@ namespace osu.Game.Overlays.Mods
 
                 var hsv = new Colour4(value.R, value.G, value.B, 1f).ToHSV();
                 var trianglesColour = Colour4.FromHSV(hsv.X, hsv.Y + 0.2f, hsv.Z - 0.1f);
-                triangles.Colour = ColourInfo.GradientVertical(trianglesColour, trianglesColour.MultiplyAlpha(0f));
+                triangles.Colour = ColourInfo.GradientVertical(trianglesColour, value);
             }
         }
 
@@ -61,9 +61,11 @@ namespace osu.Game.Overlays.Mods
 
         private const float header_height = 42;
 
+        protected const float WIDTH = 320;
+
         protected ModSelectColumn()
         {
-            Width = 320;
+            Width = WIDTH;
             RelativeSizeAxes = Axes.Y;
             Shear = new Vector2(ShearedOverlayContainer.SHEAR, 0);
 
@@ -93,6 +95,7 @@ namespace osu.Game.Overlays.Mods
                                     Height = header_height,
                                     Shear = new Vector2(-ShearedOverlayContainer.SHEAR, 0),
                                     Velocity = 0.7f,
+                                    ClampAxes = Axes.Y
                                 },
                                 headerText = new OsuTextFlowContainer(t =>
                                 {

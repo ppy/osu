@@ -48,6 +48,8 @@ namespace osu.Game.Graphics.UserInterface
 
         public void KillFocus() => textBox.KillFocus();
 
+        public bool SelectAll() => textBox.SelectAll();
+
         public ShearedSearchTextBox()
         {
             Height = 42;
@@ -110,7 +112,7 @@ namespace osu.Game.Graphics.UserInterface
                 BackgroundFocused = colourProvider.Background4;
                 BackgroundUnfocused = colourProvider.Background4;
 
-                Placeholder.Font = OsuFont.GetFont(size: CalculatedTextSize, weight: FontWeight.SemiBold);
+                Placeholder.Font = OsuFont.GetFont(size: FontSize, weight: FontWeight.SemiBold);
                 PlaceholderText = CommonStrings.InputSearch;
 
                 CornerRadius = corner_radius;

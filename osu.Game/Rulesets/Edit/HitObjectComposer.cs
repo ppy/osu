@@ -76,7 +76,7 @@ namespace osu.Game.Rulesets.Edit
 
         protected readonly Container LayerBelowRuleset = new Container { RelativeSizeAxes = Axes.Both };
 
-        private InputManager inputManager;
+        protected InputManager InputManager { get; private set; }
 
         private EditorRadioButtonCollection toolboxCollection;
 
@@ -86,6 +86,8 @@ namespace osu.Game.Rulesets.Edit
 
         private IBindable<bool> hasTiming;
         private Bindable<bool> autoSeekOnPlacement;
+
+        protected DrawableRuleset<TObject> DrawableRuleset { get; private set; }
 
         protected HitObjectComposer(Ruleset ruleset)
             : base(ruleset)
@@ -104,7 +106,8 @@ namespace osu.Game.Rulesets.Edit
 
             try
             {
-                drawableRulesetWrapper = new DrawableEditorRulesetWrapper<TObject>(CreateDrawableRuleset(Ruleset, EditorBeatmap.PlayableBeatmap, new[] { Ruleset.GetAutoplayMod() }))
+                DrawableRuleset = CreateDrawableRuleset(Ruleset, EditorBeatmap.PlayableBeatmap, new[] { Ruleset.GetAutoplayMod() });
+                drawableRulesetWrapper = new DrawableEditorRulesetWrapper<TObject>(DrawableRuleset)
                 {
                     Clock = EditorClock,
                     ProcessCustomClock = false
@@ -116,9 +119,12 @@ namespace osu.Game.Rulesets.Edit
                 return;
             }
 
+            if (DrawableRuleset is IDrawableScrollingRuleset scrollingRuleset)
+                dependencies.CacheAs(scrollingRuleset.ScrollingInfo);
+
             dependencies.CacheAs(Playfield);
 
-            InternalChildren = new Drawable[]
+            InternalChildren = new[]
             {
                 PlayfieldContentContainer = new Container
                 {
@@ -198,7 +204,7 @@ namespace osu.Game.Rulesets.Edit
                             },
                         }
                     }
-                }
+                },
             };
 
             toolboxCollection.Items = CompositionTools
@@ -229,7 +235,7 @@ namespace osu.Game.Rulesets.Edit
         {
             base.LoadComplete();
 
-            inputManager = GetContainingInputManager();
+            InputManager = GetContainingInputManager();
 
             hasTiming = EditorBeatmap.HasTiming.GetBoundCopy();
             hasTiming.BindValueChanged(timing =>
@@ -267,7 +273,7 @@ namespace osu.Game.Rulesets.Edit
 
         public override IEnumerable<DrawableHitObject> HitObjects => drawableRulesetWrapper.Playfield.AllHitObjects;
 
-        public override bool CursorInPlacementArea => drawableRulesetWrapper.Playfield.ReceivePositionalInputAt(inputManager.CurrentState.Mouse.Position);
+        public override bool CursorInPlacementArea => drawableRulesetWrapper.Playfield.ReceivePositionalInputAt(InputManager.CurrentState.Mouse.Position);
 
         /// <summary>
         /// Defines all available composition tools, listed on the left side of the editor screen as button controls.
@@ -304,7 +310,7 @@ namespace osu.Game.Rulesets.Edit
         /// <param name="beatmap">The loaded beatmap.</param>
         /// <param name="mods">The mods to be applied.</param>
         /// <returns>An editor-relevant <see cref="DrawableRuleset{TObject}"/>.</returns>
-        protected virtual DrawableRuleset<TObject> CreateDrawableRuleset(Ruleset ruleset, IBeatmap beatmap, IReadOnlyList<Mod> mods = null)
+        protected virtual DrawableRuleset<TObject> CreateDrawableRuleset(Ruleset ruleset, IBeatmap beatmap, IReadOnlyList<Mod> mods)
             => (DrawableRuleset<TObject>)ruleset.CreateDrawableRulesetWith(beatmap, mods);
 
         #region Tool selection logic
@@ -520,7 +526,19 @@ namespace osu.Game.Rulesets.Edit
         /// </summary>
         public abstract bool CursorInPlacementArea { get; }
 
+        /// <summary>
+        /// Returns a string representing the current selection.
+        /// The inverse method to <see cref="SelectFromTimestamp"/>.
+        /// </summary>
         public virtual string ConvertSelectionToString() => string.Empty;
+
+        /// <summary>
+        /// Selects objects based on the supplied <paramref name="timestamp"/> and <paramref name="objectDescription"/>.
+        /// The inverse method to <see cref="ConvertSelectionToString"/>.
+        /// </summary>
+        /// <param name="timestamp">The time instant to seek to, in milliseconds.</param>
+        /// <param name="objectDescription">The ruleset-specific description of objects to select at the given timestamp.</param>
+        public virtual void SelectFromTimestamp(double timestamp, string objectDescription) { }
 
         #region IPositionSnapProvider
 

@@ -32,7 +32,7 @@ namespace osu.Game.Overlays.Profile.Header
                 new Box
                 {
                     RelativeSizeAxes = Axes.Both,
-                    Colour = colourProvider.Background5,
+                    Colour = colourProvider.Background4,
                 },
                 new Container // artificial shadow
                 {
@@ -50,7 +50,7 @@ namespace osu.Game.Overlays.Profile.Header
                     RelativeSizeAxes = Axes.X,
                     AutoSizeAxes = Axes.Y,
                     Spacing = new Vector2(10, 10),
-                    Padding = new MarginPadding { Horizontal = WaveOverlayContainer.HORIZONTAL_PADDING, Top = 10 },
+                    Padding = new MarginPadding { Horizontal = WaveOverlayContainer.HORIZONTAL_PADDING, Vertical = 10 },
                 }
             };
         }

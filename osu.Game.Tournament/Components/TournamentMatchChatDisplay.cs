@@ -92,9 +92,9 @@ namespace osu.Game.Tournament.Components
             {
                 if (info.CurrentMatch.Value is TournamentMatch match)
                 {
-                    if (match.Team1.Value.Players.Any(u => u.OnlineID == Message.Sender.OnlineID))
+                    if (match.Team1.Value?.Players.Any(u => u.OnlineID == Message.Sender.OnlineID) == true)
                         UsernameColour = TournamentGame.COLOUR_RED;
-                    else if (match.Team2.Value.Players.Any(u => u.OnlineID == Message.Sender.OnlineID))
+                    else if (match.Team2.Value?.Players.Any(u => u.OnlineID == Message.Sender.OnlineID) == true)
                         UsernameColour = TournamentGame.COLOUR_BLUE;
                 }
             }

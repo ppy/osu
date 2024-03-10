@@ -35,6 +35,7 @@ namespace osu.Game.Graphics.UserInterfaceV2
 
         public string Text
         {
+            get => Component.Text;
             set => Component.Text = value;
         }
 

@@ -75,7 +75,7 @@ namespace osu.Game.Screens.OnlinePlay.Match
         private BeatmapManager beatmapManager { get; set; }
 
         [Resolved]
-        private RulesetStore rulesets { get; set; }
+        protected RulesetStore Rulesets { get; private set; }
 
         [Resolved]
         private IAPIProvider api { get; set; } = null!;
@@ -241,7 +241,7 @@ namespace osu.Game.Screens.OnlinePlay.Match
                 }
             };
 
-            LoadComponent(UserModsSelectOverlay = new UserModSelectOverlay(OverlayColourScheme.Plum)
+            LoadComponent(UserModsSelectOverlay = new RoomModSelectOverlay
             {
                 SelectedMods = { BindTarget = UserMods },
                 IsValidMod = _ => false
@@ -371,8 +371,11 @@ namespace osu.Game.Screens.OnlinePlay.Match
                 return true;
 
             // if the dialog is already displayed, block exiting until the user explicitly makes a decision.
-            if (dialogOverlay.CurrentDialog is ConfirmDiscardChangesDialog)
+            if (dialogOverlay.CurrentDialog is ConfirmDiscardChangesDialog discardChangesDialog)
+            {
+                discardChangesDialog.Flash();
                 return false;
+            }
 
             dialogOverlay.Push(new ConfirmDiscardChangesDialog(() =>
             {
@@ -419,7 +422,7 @@ namespace osu.Game.Screens.OnlinePlay.Match
             if (selected == null)
                 return;
 
-            var rulesetInstance = rulesets.GetRuleset(SelectedItem.Value.RulesetID)?.CreateInstance();
+            var rulesetInstance = Rulesets.GetRuleset(SelectedItem.Value.RulesetID)?.CreateInstance();
             Debug.Assert(rulesetInstance != null);
             var allowedMods = SelectedItem.Value.AllowedMods.Select(m => m.ToMod(rulesetInstance));
 
@@ -452,7 +455,7 @@ namespace osu.Game.Screens.OnlinePlay.Match
             // Retrieve the corresponding local beatmap, since we can't directly use the playlist's beatmap info
             var localBeatmap = beatmap == null ? null : beatmapManager.QueryBeatmap(b => b.OnlineID == beatmap.OnlineID);
 
-            Beatmap.Value = beatmapManager.GetWorkingBeatmap(localBeatmap);
+            UserModsSelectOverlay.Beatmap = Beatmap.Value = beatmapManager.GetWorkingBeatmap(localBeatmap);
         }
 
         protected virtual void UpdateMods()
@@ -460,7 +463,7 @@ namespace osu.Game.Screens.OnlinePlay.Match
             if (SelectedItem.Value == null || !this.IsCurrentScreen())
                 return;
 
-            var rulesetInstance = rulesets.GetRuleset(SelectedItem.Value.RulesetID)?.CreateInstance();
+            var rulesetInstance = Rulesets.GetRuleset(SelectedItem.Value.RulesetID)?.CreateInstance();
             Debug.Assert(rulesetInstance != null);
             Mods.Value = UserMods.Value.Concat(SelectedItem.Value.RequiredMods.Select(m => m.ToMod(rulesetInstance))).ToList();
         }
@@ -470,7 +473,7 @@ namespace osu.Game.Screens.OnlinePlay.Match
             if (SelectedItem.Value == null || !this.IsCurrentScreen())
                 return;
 
-            Ruleset.Value = rulesets.GetRuleset(SelectedItem.Value.RulesetID);
+            Ruleset.Value = Rulesets.GetRuleset(SelectedItem.Value.RulesetID);
         }
 
         private void beginHandlingTrack()
@@ -506,7 +509,7 @@ namespace osu.Game.Screens.OnlinePlay.Match
 
         private void cancelTrackLooping()
         {
-            var track = Beatmap?.Value?.Track;
+            var track = Beatmap.Value?.Track;
 
             if (track != null)
                 track.Looping = false;

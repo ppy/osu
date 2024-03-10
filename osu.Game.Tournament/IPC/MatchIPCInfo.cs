@@ -10,11 +10,11 @@ namespace osu.Game.Tournament.IPC
 {
     public partial class MatchIPCInfo : Component
     {
-        public Bindable<TournamentBeatmap> Beatmap { get; } = new Bindable<TournamentBeatmap>();
+        public Bindable<TournamentBeatmap?> Beatmap { get; } = new Bindable<TournamentBeatmap?>();
         public Bindable<LegacyMods> Mods { get; } = new Bindable<LegacyMods>();
         public Bindable<TourneyState> State { get; } = new Bindable<TourneyState>();
         public Bindable<string> ChatChannel { get; } = new Bindable<string>();
-        public BindableInt Score1 { get; } = new BindableInt();
-        public BindableInt Score2 { get; } = new BindableInt();
+        public BindableLong Score1 { get; } = new BindableLong();
+        public BindableLong Score2 { get; } = new BindableLong();
     }
 }

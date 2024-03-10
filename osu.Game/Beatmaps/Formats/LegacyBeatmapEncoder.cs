@@ -1,15 +1,12 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
 using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Text;
-using JetBrains.Annotations;
 using osu.Game.Audio;
 using osu.Game.Beatmaps.ControlPoints;
 using osu.Game.Beatmaps.Legacy;
@@ -26,16 +23,9 @@ namespace osu.Game.Beatmaps.Formats
     {
         public const int FIRST_LAZER_VERSION = 128;
 
-        /// <summary>
-        /// osu! is generally slower than taiko, so a factor is added to increase
-        /// speed. This must be used everywhere slider length or beat length is used.
-        /// </summary>
-        public const float LEGACY_TAIKO_VELOCITY_MULTIPLIER = 1.4f;
-
         private readonly IBeatmap beatmap;
 
-        [CanBeNull]
-        private readonly ISkin skin;
+        private readonly ISkin? skin;
 
         private readonly int onlineRulesetID;
 
@@ -44,7 +34,7 @@ namespace osu.Game.Beatmaps.Formats
         /// </summary>
         /// <param name="beatmap">The beatmap to encode.</param>
         /// <param name="skin">The beatmap's skin, used for encoding combo colours.</param>
-        public LegacyBeatmapEncoder(IBeatmap beatmap, [CanBeNull] ISkin skin)
+        public LegacyBeatmapEncoder(IBeatmap beatmap, ISkin? skin)
         {
             this.beatmap = beatmap;
             this.skin = skin;
@@ -153,11 +143,7 @@ namespace osu.Game.Beatmaps.Formats
             writer.WriteLine(FormattableString.Invariant($"OverallDifficulty: {beatmap.Difficulty.OverallDifficulty}"));
             writer.WriteLine(FormattableString.Invariant($"ApproachRate: {beatmap.Difficulty.ApproachRate}"));
 
-            // Taiko adjusts the slider multiplier (see: LEGACY_TAIKO_VELOCITY_MULTIPLIER)
-            writer.WriteLine(onlineRulesetID == 1
-                ? FormattableString.Invariant($"SliderMultiplier: {beatmap.Difficulty.SliderMultiplier / LEGACY_TAIKO_VELOCITY_MULTIPLIER}")
-                : FormattableString.Invariant($"SliderMultiplier: {beatmap.Difficulty.SliderMultiplier}"));
-
+            writer.WriteLine(FormattableString.Invariant($"SliderMultiplier: {beatmap.Difficulty.SliderMultiplier}"));
             writer.WriteLine(FormattableString.Invariant($"SliderTickRate: {beatmap.Difficulty.SliderTickRate}"));
         }
 
@@ -180,8 +166,8 @@ namespace osu.Game.Beatmaps.Formats
 
             writer.WriteLine("[TimingPoints]");
 
-            SampleControlPoint lastRelevantSamplePoint = null;
-            DifficultyControlPoint lastRelevantDifficultyPoint = null;
+            SampleControlPoint? lastRelevantSamplePoint = null;
+            DifficultyControlPoint? lastRelevantDifficultyPoint = null;
 
             // In osu!taiko and osu!mania, a scroll speed is stored as "slider velocity" in legacy formats.
             // In that case, a scrolling speed change is a global effect and per-hit object difficulty control points are ignored.
@@ -273,7 +259,7 @@ namespace osu.Game.Beatmaps.Formats
                 foreach (var hitObject in hitObjects)
                 {
                     if (hitObject is IHasSliderVelocity hasSliderVelocity)
-                        yield return new DifficultyControlPoint { Time = hitObject.StartTime, SliderVelocity = hasSliderVelocity.SliderVelocity };
+                        yield return new DifficultyControlPoint { Time = hitObject.StartTime, SliderVelocity = hasSliderVelocity.SliderVelocityMultiplier };
                 }
             }
 
@@ -441,7 +427,7 @@ namespace osu.Game.Beatmaps.Formats
                     // Explicit segments have a new format in which the type is injected into the middle of the control point string.
                     // To preserve compatibility with osu-stable as much as possible, explicit segments with the same type are converted to use implicit segments by duplicating the control point.
                     // One exception are consecutive perfect curves, which aren't supported in osu!stable and can lead to decoding issues if encoded as implicit segments
-                    bool needsExplicitSegment = point.Type != lastType || point.Type == PathType.PerfectCurve;
+                    bool needsExplicitSegment = point.Type != lastType || point.Type == PathType.PERFECT_CURVE;
 
                     // Another exception to this is when the last two control points of the last segment were duplicated. This is not a scenario supported by osu!stable.
                     // Lazer does not add implicit segments for the last two control points of _any_ explicit segment, so an explicit segment is forced in order to maintain consistency with the decoder.
@@ -457,21 +443,21 @@ namespace osu.Game.Beatmaps.Formats
 
                     if (needsExplicitSegment)
                     {
-                        switch (point.Type)
+                        switch (point.Type?.Type)
                         {
-                            case PathType.Bezier:
-                                writer.Write("B|");
+                            case SplineType.BSpline:
+                                writer.Write(point.Type.Value.Degree > 0 ? $"B{point.Type.Value.Degree}|" : "B|");
                                 break;
 
-                            case PathType.Catmull:
+                            case SplineType.Catmull:
                                 writer.Write("C|");
                                 break;
 
-                            case PathType.PerfectCurve:
+                            case SplineType.PerfectCurve:
                                 writer.Write("P|");
                                 break;
 
-                            case PathType.Linear:
+                            case SplineType.Linear:
                                 writer.Write("L|");
                                 break;
                         }
@@ -585,7 +571,7 @@ namespace osu.Game.Beatmaps.Formats
             return type;
         }
 
-        private LegacySampleBank toLegacySampleBank(string sampleBank)
+        private LegacySampleBank toLegacySampleBank(string? sampleBank)
         {
             switch (sampleBank?.ToLowerInvariant())
             {
@@ -603,7 +589,7 @@ namespace osu.Game.Beatmaps.Formats
             }
         }
 
-        private int toLegacyCustomSampleBank(HitSampleInfo hitSampleInfo)
+        private int toLegacyCustomSampleBank(HitSampleInfo? hitSampleInfo)
         {
             if (hitSampleInfo is ConvertHitObjectParser.LegacyHitSampleInfo legacy)
                 return legacy.CustomSampleBank;

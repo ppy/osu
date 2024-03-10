@@ -5,6 +5,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Collections.Specialized;
 using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
@@ -50,6 +51,7 @@ namespace osu.Game.Screens.Edit.Compose.Components
 
             Beatmap.HitObjectAdded += AddBlueprintFor;
             Beatmap.HitObjectRemoved += RemoveBlueprintFor;
+            Beatmap.SelectedHitObjects.CollectionChanged += updateSelectionLifetime;
 
             if (Composer != null)
             {
@@ -144,6 +146,25 @@ namespace osu.Game.Screens.Edit.Compose.Components
             SelectedItems.AddRange(Beatmap.HitObjects.Except(SelectedItems).ToArray());
         }
 
+        /// <summary>
+        /// Ensures that newly-selected hitobjects are kept alive
+        /// and drops that keep-alive from newly-deselected objects.
+        /// </summary>
+        private void updateSelectionLifetime(object sender, NotifyCollectionChangedEventArgs e)
+        {
+            if (e.NewItems != null)
+            {
+                foreach (HitObject newSelection in e.NewItems)
+                    Composer.Playfield.SetKeepAlive(newSelection, true);
+            }
+
+            if (e.OldItems != null)
+            {
+                foreach (HitObject oldSelection in e.OldItems)
+                    Composer.Playfield.SetKeepAlive(oldSelection, false);
+            }
+        }
+
         protected override void OnBlueprintSelected(SelectionBlueprint<HitObject> blueprint)
         {
             base.OnBlueprintSelected(blueprint);
@@ -166,6 +187,7 @@ namespace osu.Game.Screens.Edit.Compose.Components
             {
                 Beatmap.HitObjectAdded -= AddBlueprintFor;
                 Beatmap.HitObjectRemoved -= RemoveBlueprintFor;
+                Beatmap.SelectedHitObjects.CollectionChanged -= updateSelectionLifetime;
             }
 
             usageEventBuffer?.Dispose();

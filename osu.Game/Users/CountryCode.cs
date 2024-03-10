@@ -8,12 +8,81 @@ using Newtonsoft.Json.Converters;
 
 namespace osu.Game.Users
 {
+    /// <summary>
+    /// Matches `osu_countries` database table.
+    /// </summary>
     [JsonConverter(typeof(StringEnumConverter))]
     [UsedImplicitly(ImplicitUseTargetFlags.WithMembers)]
     public enum CountryCode
     {
         [Description("Unknown")]
         Unknown = 0,
+
+        [Description("Anonymous Proxy")]
+        A1,
+
+        [Description("Satellite Provider")]
+        A2,
+
+        [Description("Andorra")]
+        AD,
+
+        [Description("United Arab Emirates")]
+        AE,
+
+        [Description("Afghanistan")]
+        AF,
+
+        [Description("Antigua and Barbuda")]
+        AG,
+
+        [Description("Anguilla")]
+        AI,
+
+        [Description("Albania")]
+        AL,
+
+        [Description("Armenia")]
+        AM,
+
+        [Description("Netherlands Antilles")]
+        AN,
+
+        [Description("Angola")]
+        AO,
+
+        [Description("Asia/Pacific Region")]
+        AP,
+
+        [Description("Antarctica")]
+        AQ,
+
+        [Description("Argentina")]
+        AR,
+
+        [Description("American Samoa")]
+        AS,
+
+        [Description("Austria")]
+        AT,
+
+        [Description("Australia")]
+        AU,
+
+        [Description("Aruba")]
+        AW,
+
+        [Description("Aland Islands")]
+        AX,
+
+        [Description("Azerbaijan")]
+        AZ,
+
+        [Description("Bosnia and Herzegovina")]
+        BA,
+
+        [Description("Barbados")]
+        BB,
 
         [Description("Bangladesh")]
         BD,
@@ -27,14 +96,14 @@ namespace osu.Game.Users
         [Description("Bulgaria")]
         BG,
 
-        [Description("Bosnia and Herzegovina")]
-        BA,
+        [Description("Bahrain")]
+        BH,
 
-        [Description("Barbados")]
-        BB,
+        [Description("Burundi")]
+        BI,
 
-        [Description("Wallis and Futuna")]
-        WF,
+        [Description("Benin")]
+        BJ,
 
         [Description("Saint Barthelemy")]
         BL,
@@ -48,31 +117,7 @@ namespace osu.Game.Users
         [Description("Bolivia")]
         BO,
 
-        [Description("Bahrain")]
-        BH,
-
-        [Description("Burundi")]
-        BI,
-
-        [Description("Benin")]
-        BJ,
-
-        [Description("Bhutan")]
-        BT,
-
-        [Description("Jamaica")]
-        JM,
-
-        [Description("Bouvet Island")]
-        BV,
-
-        [Description("Botswana")]
-        BW,
-
-        [Description("Samoa")]
-        WS,
-
-        [Description("Bonaire, Saint Eustatius and Saba")]
+        [Description("Caribbean Netherlands")]
         BQ,
 
         [Description("Brazil")]
@@ -81,8 +126,14 @@ namespace osu.Game.Users
         [Description("Bahamas")]
         BS,
 
-        [Description("Jersey")]
-        JE,
+        [Description("Bhutan")]
+        BT,
+
+        [Description("Bouvet Island")]
+        BV,
+
+        [Description("Botswana")]
+        BW,
 
         [Description("Belarus")]
         BY,
@@ -90,104 +141,191 @@ namespace osu.Game.Users
         [Description("Belize")]
         BZ,
 
-        [Description("Russia")]
-        RU,
+        [Description("Canada")]
+        CA,
 
-        [Description("Rwanda")]
-        RW,
+        [Description("Cocos (Keeling) Islands")]
+        CC,
 
-        [Description("Serbia")]
-        RS,
+        [Description("The Democratic Republic of the Congo")]
+        CD,
 
-        [Description("East Timor")]
-        TL,
+        [Description("Central African Republic")]
+        CF,
 
-        [Description("Reunion")]
-        RE,
+        [Description("Congo")]
+        CG,
 
-        [Description("Turkmenistan")]
-        TM,
+        [Description("Switzerland")]
+        CH,
 
-        [Description("Tajikistan")]
-        TJ,
+        [Description("Cote D'Ivoire")]
+        CI,
 
-        [Description("Romania")]
-        RO,
+        [Description("Cook Islands")]
+        CK,
 
-        [Description("Tokelau")]
-        TK,
+        [Description("Chile")]
+        CL,
 
-        [Description("Guinea-Bissau")]
-        GW,
+        [Description("Cameroon")]
+        CM,
 
-        [Description("Guam")]
-        GU,
+        [Description("China")]
+        CN,
 
-        [Description("Guatemala")]
-        GT,
+        [Description("Colombia")]
+        CO,
 
-        [Description("South Georgia and the South Sandwich Islands")]
-        GS,
+        [Description("Costa Rica")]
+        CR,
 
-        [Description("Greece")]
-        GR,
+        [Description("Cuba")]
+        CU,
 
-        [Description("Equatorial Guinea")]
-        GQ,
+        [Description("Cabo Verde")]
+        CV,
 
-        [Description("Guadeloupe")]
-        GP,
+        [Description("Curaçao")]
+        CW,
 
-        [Description("Japan")]
-        JP,
+        [Description("Christmas Island")]
+        CX,
 
-        [Description("Guyana")]
-        GY,
+        [Description("Cyprus")]
+        CY,
 
-        [Description("Guernsey")]
-        GG,
+        [Description("Czechia")]
+        CZ,
 
-        [Description("French Guiana")]
-        GF,
+        [Description("Germany")]
+        DE,
 
-        [Description("Georgia")]
-        GE,
+        [Description("Djibouti")]
+        DJ,
 
-        [Description("Grenada")]
-        GD,
+        [Description("Denmark")]
+        DK,
 
-        [Description("United Kingdom")]
-        GB,
+        [Description("Dominica")]
+        DM,
+
+        [Description("Dominican Republic")]
+        DO,
+
+        [Description("Algeria")]
+        DZ,
+
+        [Description("Ecuador")]
+        EC,
+
+        [Description("Estonia")]
+        EE,
+
+        [Description("Egypt")]
+        EG,
+
+        [Description("Western Sahara")]
+        EH,
+
+        [Description("Eritrea")]
+        ER,
+
+        [Description("Spain")]
+        ES,
+
+        [Description("Ethiopia")]
+        ET,
+
+        [Description("Europe")]
+        EU,
+
+        [Description("Finland")]
+        FI,
+
+        [Description("Fiji")]
+        FJ,
+
+        [Description("Falkland Islands (Malvinas)")]
+        FK,
+
+        [Description("Federated States of Micronesia")]
+        FM,
+
+        [Description("Faroe Islands")]
+        FO,
+
+        [Description("France")]
+        FR,
+
+        [Description("France, Metropolitan")]
+        FX,
 
         [Description("Gabon")]
         GA,
 
-        [Description("El Salvador")]
-        SV,
+        [Description("United Kingdom")]
+        GB,
 
-        [Description("Guinea")]
-        GN,
+        [Description("Grenada")]
+        GD,
 
-        [Description("Gambia")]
-        GM,
+        [Description("Georgia")]
+        GE,
 
-        [Description("Greenland")]
-        GL,
+        [Description("French Guiana")]
+        GF,
 
-        [Description("Gibraltar")]
-        GI,
+        [Description("Guernsey")]
+        GG,
 
         [Description("Ghana")]
         GH,
 
-        [Description("Oman")]
-        OM,
+        [Description("Gibraltar")]
+        GI,
 
-        [Description("Tunisia")]
-        TN,
+        [Description("Greenland")]
+        GL,
 
-        [Description("Jordan")]
-        JO,
+        [Description("Gambia")]
+        GM,
+
+        [Description("Guinea")]
+        GN,
+
+        [Description("Guadeloupe")]
+        GP,
+
+        [Description("Equatorial Guinea")]
+        GQ,
+
+        [Description("Greece")]
+        GR,
+
+        [Description("South Georgia and the South Sandwich Islands")]
+        GS,
+
+        [Description("Guatemala")]
+        GT,
+
+        [Description("Guam")]
+        GU,
+
+        [Description("Guinea-Bissau")]
+        GW,
+
+        [Description("Guyana")]
+        GY,
+
+        [Description("Hong Kong")]
+        HK,
+
+        [Description("Heard Island and McDonald Islands")]
+        HM,
+
+        [Description("Honduras")]
+        HN,
 
         [Description("Croatia")]
         HR,
@@ -198,122 +336,113 @@ namespace osu.Game.Users
         [Description("Hungary")]
         HU,
 
-        [Description("Hong Kong")]
-        HK,
+        [Description("Indonesia")]
+        ID,
 
-        [Description("Honduras")]
-        HN,
+        [Description("Ireland")]
+        IE,
 
-        [Description("Heard Island and McDonald Islands")]
-        HM,
+        [Description("Israel")]
+        IL,
 
-        [Description("Venezuela")]
-        VE,
+        [Description("Isle of Man")]
+        IM,
 
-        [Description("Puerto Rico")]
-        PR,
+        [Description("India")]
+        IN,
 
-        [Description("Palestinian Territory")]
-        PS,
-
-        [Description("Palau")]
-        PW,
-
-        [Description("Portugal")]
-        PT,
-
-        [Description("Svalbard and Jan Mayen")]
-        SJ,
-
-        [Description("Paraguay")]
-        PY,
+        [Description("British Indian Ocean Territory")]
+        IO,
 
         [Description("Iraq")]
         IQ,
 
-        [Description("Panama")]
-        PA,
+        [Description("Islamic Republic of Iran")]
+        IR,
 
-        [Description("French Polynesia")]
-        PF,
-
-        [Description("Papua New Guinea")]
-        PG,
-
-        [Description("Peru")]
-        PE,
-
-        [Description("Pakistan")]
-        PK,
-
-        [Description("Philippines")]
-        PH,
-
-        [Description("Pitcairn")]
-        PN,
-
-        [Description("Poland")]
-        PL,
-
-        [Description("Saint Pierre and Miquelon")]
-        PM,
-
-        [Description("Zambia")]
-        ZM,
-
-        [Description("Western Sahara")]
-        EH,
-
-        [Description("Estonia")]
-        EE,
-
-        [Description("Egypt")]
-        EG,
-
-        [Description("South Africa")]
-        ZA,
-
-        [Description("Ecuador")]
-        EC,
+        [Description("Iceland")]
+        IS,
 
         [Description("Italy")]
         IT,
 
-        [Description("Vietnam")]
-        VN,
+        [Description("Jersey")]
+        JE,
 
-        [Description("Solomon Islands")]
-        SB,
+        [Description("Jamaica")]
+        JM,
 
-        [Description("Ethiopia")]
-        ET,
+        [Description("Jordan")]
+        JO,
 
-        [Description("Somalia")]
-        SO,
+        [Description("Japan")]
+        JP,
 
-        [Description("Zimbabwe")]
-        ZW,
+        [Description("Kenya")]
+        KE,
 
-        [Description("Saudi Arabia")]
-        SA,
+        [Description("Kyrgyzstan")]
+        KG,
 
-        [Description("Spain")]
-        ES,
+        [Description("Cambodia")]
+        KH,
 
-        [Description("Eritrea")]
-        ER,
+        [Description("Kiribati")]
+        KI,
 
-        [Description("Montenegro")]
-        ME,
+        [Description("Comoros")]
+        KM,
 
-        [Description("Moldova")]
-        MD,
+        [Description("Saint Kitts and Nevis")]
+        KN,
 
-        [Description("Madagascar")]
-        MG,
+        [Description("Democratic People's Republic of Korea")]
+        KP,
 
-        [Description("Saint Martin")]
-        MF,
+        [Description("South Korea")]
+        KR,
+
+        [Description("Kuwait")]
+        KW,
+
+        [Description("Cayman Islands")]
+        KY,
+
+        [Description("Kazakhstan")]
+        KZ,
+
+        [Description("Lao People's Democratic Republic")]
+        LA,
+
+        [Description("Lebanon")]
+        LB,
+
+        [Description("Saint Lucia")]
+        LC,
+
+        [Description("Liechtenstein")]
+        LI,
+
+        [Description("Sri Lanka")]
+        LK,
+
+        [Description("Liberia")]
+        LR,
+
+        [Description("Lesotho")]
+        LS,
+
+        [Description("Lithuania")]
+        LT,
+
+        [Description("Luxembourg")]
+        LU,
+
+        [Description("Latvia")]
+        LV,
+
+        [Description("Libya")]
+        LY,
 
         [Description("Morocco")]
         MA,
@@ -321,20 +450,17 @@ namespace osu.Game.Users
         [Description("Monaco")]
         MC,
 
-        [Description("Uzbekistan")]
-        UZ,
+        [Description("Moldova")]
+        MD,
 
-        [Description("Myanmar")]
-        MM,
+        [Description("Montenegro")]
+        ME,
 
-        [Description("Mali")]
-        ML,
+        [Description("Saint Martin")]
+        MF,
 
-        [Description("Macao")]
-        MO,
-
-        [Description("Mongolia")]
-        MN,
+        [Description("Madagascar")]
+        MG,
 
         [Description("Marshall Islands")]
         MH,
@@ -342,86 +468,53 @@ namespace osu.Game.Users
         [Description("North Macedonia")]
         MK,
 
-        [Description("Mauritius")]
-        MU,
+        [Description("Mali")]
+        ML,
 
-        [Description("Malta")]
-        MT,
+        [Description("Myanmar")]
+        MM,
 
-        [Description("Malawi")]
-        MW,
+        [Description("Mongolia")]
+        MN,
 
-        [Description("Maldives")]
-        MV,
-
-        [Description("Martinique")]
-        MQ,
+        [Description("Macau")]
+        MO,
 
         [Description("Northern Mariana Islands")]
         MP,
 
-        [Description("Montserrat")]
-        MS,
+        [Description("Martinique")]
+        MQ,
 
         [Description("Mauritania")]
         MR,
 
-        [Description("Isle of Man")]
-        IM,
+        [Description("Montserrat")]
+        MS,
 
-        [Description("Uganda")]
-        UG,
+        [Description("Malta")]
+        MT,
 
-        [Description("Tanzania")]
-        TZ,
+        [Description("Mauritius")]
+        MU,
 
-        [Description("Malaysia")]
-        MY,
+        [Description("Maldives")]
+        MV,
+
+        [Description("Malawi")]
+        MW,
 
         [Description("Mexico")]
         MX,
 
-        [Description("Israel")]
-        IL,
+        [Description("Malaysia")]
+        MY,
 
-        [Description("France")]
-        FR,
-
-        [Description("British Indian Ocean Territory")]
-        IO,
-
-        [Description("Saint Helena")]
-        SH,
-
-        [Description("Finland")]
-        FI,
-
-        [Description("Fiji")]
-        FJ,
-
-        [Description("Falkland Islands")]
-        FK,
-
-        [Description("Micronesia")]
-        FM,
-
-        [Description("Faroe Islands")]
-        FO,
-
-        [Description("Nicaragua")]
-        NI,
-
-        [Description("Netherlands")]
-        NL,
-
-        [Description("Norway")]
-        NO,
+        [Description("Mozambique")]
+        MZ,
 
         [Description("Namibia")]
         NA,
-
-        [Description("Vanuatu")]
-        VU,
 
         [Description("New Caledonia")]
         NC,
@@ -435,8 +528,14 @@ namespace osu.Game.Users
         [Description("Nigeria")]
         NG,
 
-        [Description("New Zealand")]
-        NZ,
+        [Description("Nicaragua")]
+        NI,
+
+        [Description("Netherlands")]
+        NL,
+
+        [Description("Norway")]
+        NO,
 
         [Description("Nepal")]
         NP,
@@ -447,227 +546,140 @@ namespace osu.Game.Users
         [Description("Niue")]
         NU,
 
-        [Description("Cook Islands")]
-        CK,
+        [Description("New Zealand")]
+        NZ,
 
-        [Description("Kosovo")]
-        XK,
+        [Description("Other")]
+        O1,
 
-        [Description("Ivory Coast")]
-        CI,
+        [Description("Oman")]
+        OM,
 
-        [Description("Switzerland")]
-        CH,
+        [Description("Panama")]
+        PA,
 
-        [Description("Colombia")]
-        CO,
+        [Description("Peru")]
+        PE,
 
-        [Description("China")]
-        CN,
+        [Description("French Polynesia")]
+        PF,
 
-        [Description("Cameroon")]
-        CM,
+        [Description("Papua New Guinea")]
+        PG,
 
-        [Description("Chile")]
-        CL,
+        [Description("Philippines")]
+        PH,
 
-        [Description("Cocos Islands")]
-        CC,
+        [Description("Pakistan")]
+        PK,
 
-        [Description("Canada")]
-        CA,
+        [Description("Poland")]
+        PL,
 
-        [Description("Republic of the Congo")]
-        CG,
+        [Description("Saint Pierre and Miquelon")]
+        PM,
 
-        [Description("Central African Republic")]
-        CF,
+        [Description("Pitcairn")]
+        PN,
 
-        [Description("Democratic Republic of the Congo")]
-        CD,
+        [Description("Puerto Rico")]
+        PR,
 
-        [Description("Czech Republic")]
-        CZ,
+        [Description("State of Palestine")]
+        PS,
 
-        [Description("Cyprus")]
-        CY,
+        [Description("Portugal")]
+        PT,
 
-        [Description("Christmas Island")]
-        CX,
+        [Description("Palau")]
+        PW,
 
-        [Description("Costa Rica")]
-        CR,
+        [Description("Paraguay")]
+        PY,
 
-        [Description("Curacao")]
-        CW,
+        [Description("Qatar")]
+        QA,
 
-        [Description("Cabo Verde")]
-        CV,
+        [Description("Reunion")]
+        RE,
 
-        [Description("Cuba")]
-        CU,
+        [Description("Romania")]
+        RO,
 
-        [Description("Eswatini")]
-        SZ,
+        [Description("Serbia")]
+        RS,
 
-        [Description("Syria")]
-        SY,
+        [Description("Russian Federation")]
+        RU,
 
-        [Description("Sint Maarten")]
-        SX,
+        [Description("Rwanda")]
+        RW,
 
-        [Description("Kyrgyzstan")]
-        KG,
+        [Description("Saudi Arabia")]
+        SA,
 
-        [Description("Kenya")]
-        KE,
-
-        [Description("South Sudan")]
-        SS,
-
-        [Description("Suriname")]
-        SR,
-
-        [Description("Kiribati")]
-        KI,
-
-        [Description("Cambodia")]
-        KH,
-
-        [Description("Saint Kitts and Nevis")]
-        KN,
-
-        [Description("Comoros")]
-        KM,
-
-        [Description("Sao Tome and Principe")]
-        ST,
-
-        [Description("Slovakia")]
-        SK,
-
-        [Description("South Korea")]
-        KR,
-
-        [Description("Slovenia")]
-        SI,
-
-        [Description("North Korea")]
-        KP,
-
-        [Description("Kuwait")]
-        KW,
-
-        [Description("Senegal")]
-        SN,
-
-        [Description("San Marino")]
-        SM,
-
-        [Description("Sierra Leone")]
-        SL,
+        [Description("Solomon Islands")]
+        SB,
 
         [Description("Seychelles")]
         SC,
 
-        [Description("Kazakhstan")]
-        KZ,
-
-        [Description("Cayman Islands")]
-        KY,
-
-        [Description("Singapore")]
-        SG,
+        [Description("Sudan")]
+        SD,
 
         [Description("Sweden")]
         SE,
 
-        [Description("Sudan")]
-        SD,
+        [Description("Singapore")]
+        SG,
 
-        [Description("Dominican Republic")]
-        DO,
+        [Description("Saint Helena")]
+        SH,
 
-        [Description("Dominica")]
-        DM,
+        [Description("Slovenia")]
+        SI,
 
-        [Description("Djibouti")]
-        DJ,
+        [Description("Svalbard and Jan Mayen")]
+        SJ,
 
-        [Description("Denmark")]
-        DK,
+        [Description("Slovakia")]
+        SK,
 
-        [Description("British Virgin Islands")]
-        VG,
+        [Description("Sierra Leone")]
+        SL,
 
-        [Description("Germany")]
-        DE,
+        [Description("San Marino")]
+        SM,
 
-        [Description("Yemen")]
-        YE,
+        [Description("Senegal")]
+        SN,
 
-        [Description("Algeria")]
-        DZ,
+        [Description("Somalia")]
+        SO,
 
-        [Description("United States")]
-        US,
+        [Description("Suriname")]
+        SR,
 
-        [Description("Uruguay")]
-        UY,
+        [Description("Sao Tome and Principe")]
+        ST,
 
-        [Description("Mayotte")]
-        YT,
+        [Description("El Salvador")]
+        SV,
 
-        [Description("United States Minor Outlying Islands")]
-        UM,
+        [Description("Sint Maarten")]
+        SX,
 
-        [Description("Lebanon")]
-        LB,
+        [Description("Syrian Arab Republic")]
+        SY,
 
-        [Description("Saint Lucia")]
-        LC,
+        [Description("Eswatini")]
+        SZ,
 
-        [Description("Laos")]
-        LA,
+        [Description("Turks and Caicos Islands")]
+        TC,
 
-        [Description("Tuvalu")]
-        TV,
-
-        [Description("Taiwan")]
-        TW,
-
-        [Description("Trinidad and Tobago")]
-        TT,
-
-        [Description("Turkey")]
-        TR,
-
-        [Description("Sri Lanka")]
-        LK,
-
-        [Description("Liechtenstein")]
-        LI,
-
-        [Description("Latvia")]
-        LV,
-
-        [Description("Tonga")]
-        TO,
-
-        [Description("Lithuania")]
-        LT,
-
-        [Description("Luxembourg")]
-        LU,
-
-        [Description("Liberia")]
-        LR,
-
-        [Description("Lesotho")]
-        LS,
-
-        [Description("Thailand")]
-        TH,
+        [Description("Chad")]
+        TD,
 
         [Description("French Southern Territories")]
         TF,
@@ -675,94 +687,103 @@ namespace osu.Game.Users
         [Description("Togo")]
         TG,
 
-        [Description("Chad")]
-        TD,
+        [Description("Thailand")]
+        TH,
 
-        [Description("Turks and Caicos Islands")]
-        TC,
+        [Description("Tajikistan")]
+        TJ,
 
-        [Description("Libya")]
-        LY,
+        [Description("Tokelau")]
+        TK,
 
-        [Description("Vatican")]
+        [Description("Timor-Leste")]
+        TL,
+
+        [Description("Turkmenistan")]
+        TM,
+
+        [Description("Tunisia")]
+        TN,
+
+        [Description("Tonga")]
+        TO,
+
+        [Description("Türkiye")]
+        TR,
+
+        [Description("Trinidad and Tobago")]
+        TT,
+
+        [Description("Tuvalu")]
+        TV,
+
+        [Description("Taiwan")]
+        TW,
+
+        [Description("United Republic of Tanzania")]
+        TZ,
+
+        [Description("Ukraine")]
+        UA,
+
+        [Description("Uganda")]
+        UG,
+
+        [Description("United States Minor Outlying Islands")]
+        UM,
+
+        [Description("United States")]
+        US,
+
+        [Description("Uruguay")]
+        UY,
+
+        [Description("Uzbekistan")]
+        UZ,
+
+        [Description("Holy See (Vatican City State)")]
         VA,
 
         [Description("Saint Vincent and the Grenadines")]
         VC,
 
-        [Description("United Arab Emirates")]
-        AE,
+        [Description("Venezuela")]
+        VE,
 
-        [Description("Andorra")]
-        AD,
+        [Description("Virgin Islands, British")]
+        VG,
 
-        [Description("Antigua and Barbuda")]
-        AG,
-
-        [Description("Afghanistan")]
-        AF,
-
-        [Description("Anguilla")]
-        AI,
-
-        [Description("U.S. Virgin Islands")]
+        [Description("Virgin Islands, U.S.")]
         VI,
 
-        [Description("Iceland")]
-        IS,
+        [Description("Vietnam")]
+        VN,
 
-        [Description("Iran")]
-        IR,
+        [Description("Vanuatu")]
+        VU,
 
-        [Description("Armenia")]
-        AM,
+        [Description("Wallis and Futuna")]
+        WF,
 
-        [Description("Albania")]
-        AL,
+        [Description("Samoa")]
+        WS,
 
-        [Description("Angola")]
-        AO,
+        [Description("Kosovo")]
+        XK,
 
-        [Description("Antarctica")]
-        AQ,
+        [Description("Yemen")]
+        YE,
 
-        [Description("American Samoa")]
-        AS,
+        [Description("Mayotte")]
+        YT,
 
-        [Description("Argentina")]
-        AR,
+        [Description("South Africa")]
+        ZA,
 
-        [Description("Australia")]
-        AU,
+        [Description("Zambia")]
+        ZM,
 
-        [Description("Austria")]
-        AT,
-
-        [Description("Aruba")]
-        AW,
-
-        [Description("India")]
-        IN,
-
-        [Description("Aland Islands")]
-        AX,
-
-        [Description("Azerbaijan")]
-        AZ,
-
-        [Description("Ireland")]
-        IE,
-
-        [Description("Indonesia")]
-        ID,
-
-        [Description("Ukraine")]
-        UA,
-
-        [Description("Qatar")]
-        QA,
-
-        [Description("Mozambique")]
-        MZ,
+        [Description("Zimbabwe")]
+        ZW,
     }
 }

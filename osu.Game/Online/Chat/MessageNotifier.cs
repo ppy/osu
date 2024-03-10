@@ -182,8 +182,6 @@ namespace osu.Game.Online.Chat
             private readonly Message message;
             private readonly Channel channel;
 
-            public override bool IsImportant => false;
-
             [BackgroundDependencyLoader]
             private void load(OsuColour colours, ChatOverlay chatOverlay, INotificationOverlay notificationOverlay)
             {

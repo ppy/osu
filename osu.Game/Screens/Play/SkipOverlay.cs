@@ -4,6 +4,7 @@
 #nullable disable
 
 using System;
+using JetBrains.Annotations;
 using osu.Framework;
 using osu.Framework.Allocation;
 using osu.Framework.Audio;
@@ -211,6 +212,7 @@ namespace osu.Game.Screens.Play
 
         public partial class FadeContainer : Container, IStateful<Visibility>
         {
+            [CanBeNull]
             public event Action<Visibility> StateChanged;
 
             private Visibility state;

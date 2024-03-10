@@ -1,8 +1,6 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
 using JetBrains.Annotations;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
@@ -17,14 +15,14 @@ namespace osu.Game.Tournament.Components
 {
     public partial class DrawableTeamFlag : Container
     {
-        private readonly TournamentTeam team;
+        private readonly TournamentTeam? team;
 
         [UsedImplicitly]
-        private Bindable<string> flag;
+        private Bindable<string>? flag;
 
-        private Sprite flagSprite;
+        private Sprite? flagSprite;
 
-        public DrawableTeamFlag(TournamentTeam team)
+        public DrawableTeamFlag(TournamentTeam? team)
         {
             this.team = team;
         }

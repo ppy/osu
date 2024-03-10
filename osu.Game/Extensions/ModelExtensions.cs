@@ -114,8 +114,24 @@ namespace osu.Game.Extensions
         /// </summary>
         /// <param name="instance">The instance to compare.</param>
         /// <param name="other">The other instance to compare against.</param>
-        /// <returns>Whether online IDs match. If either instance is missing an online ID, this will return false.</returns>
-        public static bool MatchesOnlineID(this IScoreInfo? instance, IScoreInfo? other) => matchesOnlineID(instance, other);
+        /// <returns>
+        /// Whether online IDs match.
+        /// Both <see cref="IHasOnlineID{T}.OnlineID"/> and <see cref="IScoreInfo.LegacyOnlineID"/> are checked, in that order.
+        /// If either instance is missing an online ID, this will return false.
+        /// </returns>
+        public static bool MatchesOnlineID(this IScoreInfo? instance, IScoreInfo? other)
+        {
+            if (matchesOnlineID(instance, other))
+                return true;
+
+            if (instance == null || other == null)
+                return false;
+
+            if (instance.LegacyOnlineID < 0 || other.LegacyOnlineID < 0)
+                return false;
+
+            return instance.LegacyOnlineID.Equals(other.LegacyOnlineID);
+        }
 
         private static bool matchesOnlineID(this IHasOnlineID<long>? instance, IHasOnlineID<long>? other)
         {

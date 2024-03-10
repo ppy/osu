@@ -8,6 +8,7 @@ using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Sprites;
 using osu.Game.Configuration;
 using osu.Game.Graphics;
+using osu.Game.Localisation;
 using osu.Game.Overlays;
 using osu.Game.Overlays.Notifications;
 using osuTK;
@@ -92,7 +93,7 @@ namespace osu.Game.Updater
             public UpdateCompleteNotification(string version)
             {
                 this.version = version;
-                Text = $"You are now running osu! {version}.\nClick to see what's new!";
+                Text = NotificationsStrings.GameVersionAfterUpdate(version);
             }
 
             [BackgroundDependencyLoader]
@@ -114,7 +115,7 @@ namespace osu.Game.Updater
         {
             public UpdateApplicationCompleteNotification()
             {
-                Text = @"Update ready to install. Click to restart!";
+                Text = NotificationsStrings.UpdateReadyToInstall;
             }
         }
 
@@ -166,13 +167,13 @@ namespace osu.Game.Updater
             {
                 State = ProgressNotificationState.Active;
                 Progress = 0;
-                Text = @"Downloading update...";
+                Text = NotificationsStrings.DownloadingUpdate;
             }
 
             public void StartInstall()
             {
                 Progress = 0;
-                Text = @"Installing update...";
+                Text = NotificationsStrings.InstallingUpdate;
             }
 
             public void FailDownload()

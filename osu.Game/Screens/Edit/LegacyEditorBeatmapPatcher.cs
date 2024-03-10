@@ -114,7 +114,7 @@ namespace osu.Game.Screens.Edit
                     continue;
 
                 if (oldObject is IHasSliderVelocity oldWithVelocity && newObject is IHasSliderVelocity newWithVelocity)
-                    oldWithVelocity.SliderVelocity = newWithVelocity.SliderVelocity;
+                    oldWithVelocity.SliderVelocityMultiplier = newWithVelocity.SliderVelocityMultiplier;
 
                 oldObject.Samples = newObject.Samples;
 
@@ -123,6 +123,8 @@ namespace osu.Game.Screens.Edit
                     oldWithRepeats.NodeSamples.Clear();
                     oldWithRepeats.NodeSamples.AddRange(newWithRepeats.NodeSamples);
                 }
+
+                editorBeatmap.Update(oldObject);
             }
         }
 

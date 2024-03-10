@@ -31,8 +31,8 @@ namespace osu.Game.Rulesets.Edit.Checks
 
         public IEnumerable<Issue> Run(BeatmapVerifierContext context)
         {
-            var startTimes = context.Beatmap.HitObjects.Select(ho => ho.StartTime).OrderBy(x => x).ToList();
-            var endTimes = context.Beatmap.HitObjects.Select(ho => ho.GetEndTime()).OrderBy(x => x).ToList();
+            var startTimes = context.Beatmap.HitObjects.Select(ho => ho.StartTime).Order().ToList();
+            var endTimes = context.Beatmap.HitObjects.Select(ho => ho.GetEndTime()).Order().ToList();
 
             foreach (var breakPeriod in context.Beatmap.Breaks)
             {

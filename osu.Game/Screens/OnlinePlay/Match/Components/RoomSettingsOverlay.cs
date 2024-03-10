@@ -113,7 +113,7 @@ namespace osu.Game.Screens.OnlinePlay.Match.Components
 
         protected partial class Section : Container
         {
-            private readonly Container content;
+            private readonly ReverseChildIDFillFlowContainer<Drawable> content;
 
             protected override Container<Drawable> Content => content;
 
@@ -135,10 +135,11 @@ namespace osu.Game.Screens.OnlinePlay.Match.Components
                             Font = OsuFont.GetFont(weight: FontWeight.Bold, size: 12),
                             Text = title.ToUpperInvariant(),
                         },
-                        content = new Container
+                        content = new ReverseChildIDFillFlowContainer<Drawable>
                         {
                             AutoSizeAxes = Axes.Y,
                             RelativeSizeAxes = Axes.X,
+                            Direction = FillDirection.Vertical
                         },
                     },
                 };

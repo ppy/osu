@@ -2,6 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System.Collections.Generic;
+using System.Linq;
 using osu.Game.Beatmaps;
 using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Scoring;
@@ -21,11 +22,16 @@ namespace osu.Game.Rulesets.Mods
                 {
                     User = new APIUser
                     {
-                        Id = APIUser.SYSTEM_USER_ID,
+                        Id = replayData.User.OnlineID,
                         Username = replayData.User.Username,
+                        IsBot = replayData.User.IsBot,
                     }
                 }
             };
         }
+
+        public static IEnumerable<Mod> AsOrdered(this IEnumerable<Mod> mods) => mods
+                                                                                .OrderBy(m => m.Type)
+                                                                                .ThenBy(m => m.Acronym);
     }
 }
