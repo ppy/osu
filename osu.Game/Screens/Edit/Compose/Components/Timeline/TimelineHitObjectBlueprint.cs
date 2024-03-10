@@ -471,6 +471,12 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
         /// </summary>
         public partial class ExtendableCircle : CompositeDrawable
         {
+            public new ColourInfo Colour
+            {
+                get => Content.Colour;
+                set => Content.Colour = value;
+            }
+
             protected readonly Circle Content;
 
             public override bool ReceivePositionalInputAt(Vector2 screenSpacePos) => Content.ReceivePositionalInputAt(screenSpacePos);
