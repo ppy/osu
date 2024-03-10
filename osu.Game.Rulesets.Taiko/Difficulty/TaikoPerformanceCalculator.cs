@@ -36,7 +36,7 @@ namespace osu.Game.Rulesets.Taiko.Difficulty
             countOk = score.Statistics.GetValueOrDefault(HitResult.Ok);
             countMeh = score.Statistics.GetValueOrDefault(HitResult.Meh);
             countMiss = score.Statistics.GetValueOrDefault(HitResult.Miss);
-            estimatedUr = computeEstimatedUr(score, taikoAttributes);
+            estimatedUr = computeDeviationUpperBound(taikoAttributes) * 10;
 
             // The effectiveMissCount is calculated by gaining a ratio for totalSuccessfulHits and increasing the miss penalty for shorter object counts lower than 1000.
             if (totalSuccessfulHits > 0)
@@ -103,7 +103,7 @@ namespace osu.Game.Rulesets.Taiko.Difficulty
             if (attributes.GreatHitWindow <= 0 || estimatedUr == null)
                 return 0;
 
-            double accuracyValue = Math.Pow(65 / estimatedUr.Value, 1.1) * Math.Pow(attributes.StarRating, 0.4) * 100.0;
+            double accuracyValue = Math.Pow(70 / estimatedUr.Value, 1.1) * Math.Pow(attributes.StarRating, 0.4) * 100.0;
 
             double lengthBonus = Math.Min(1.15, Math.Pow(totalHits / 1500.0, 0.3));
 
@@ -115,10 +115,11 @@ namespace osu.Game.Rulesets.Taiko.Difficulty
         }
 
         /// <summary>
-        /// Calculates the tap deviation for a player using the OD, object count, and scores of 300s, 100s, and misses, with an assumed mean hit error of 0.
-        /// Consistency is ensured as identical SS scores on the same map and settings yield the same deviation.
+        /// Computes an upper bound on the player's tap deviation based on the OD, number of circles and sliders,
+        /// and the hit judgements, assuming the player's mean hit error is 0. The estimation is consistent in that
+        /// two SS scores on the same map with the same settings will always return the same deviation.
         /// </summary>
-        private double? computeEstimatedUr(ScoreInfo score, TaikoDifficultyAttributes attributes)
+        private double? computeDeviationUpperBound(TaikoDifficultyAttributes attributes)
         {
             if (totalSuccessfulHits == 0 || attributes.GreatHitWindow <= 0)
                 return null;
@@ -126,53 +127,51 @@ namespace osu.Game.Rulesets.Taiko.Difficulty
             double h300 = attributes.GreatHitWindow;
             double h100 = attributes.OkHitWindow;
 
-            // Determines the probability of a deviation leading to the score's hit evaluations. The curve's apex represents the most probable deviation.
-            double likelihoodGradient(double d)
+            const double z = 2.32634787404; // 99% critical value for the normal distribution (one-tailed).
+
+            // The upper bound on deviation, calculated with the ratio of 300s to 100s, and the great hit window.
+            double? calcDeviationGreatWindow()
             {
-                if (d <= 0)
-                    return 0;
+                if (countGreat == 0) return null;
 
-                double p300 = logDiff(0, logPcHit(h300, d));
-                double p100 = logDiff(logPcHit(h300, d), logPcHit(h100, d));
-                double p0 = logPcHit(h100, d);
+                double n = totalSuccessfulHits;
 
-                double gradient = Math.Exp(
-                    (countGreat * p300
-                     + (countOk + 0.5) * p100
-                     + countMiss * p0) / totalHits
-                );
+                // Proportion of greats hit, ignoring misses.
+                double p = countGreat / n;
 
-                return -gradient;
+                // We can be 99% confident that p is at least this value.
+                double pLowerBound = (n * p + z * z / 2) / (n + z * z) - z / (n + z * z) * Math.Sqrt(n * p * (1 - p) + z * z / 4);
+
+                // We can be 99% confident that the deviation is not higher than:
+                return h300 / (Math.Sqrt(2) * SpecialFunctions.ErfInv(pLowerBound));
             }
 
-            double deviation = FindMinimum.OfScalarFunction(likelihoodGradient, 30);
+            // The upper bound on deviation, calculated with the ratio of 300s + 100s to misses, and the good hit window.
+            // This will return a lower value than the first method when the number of 100s is high, but the miss count is low.
+            double? calcDeviationGoodWindow()
+            {
+                if (totalSuccessfulHits == 0) return null;
 
-            return deviation * 10;
+                double n = totalHits;
+
+                // Proportion of greats + goods hit.
+                double p = totalSuccessfulHits / n;
+
+                // We can be 99% confident that p is at least this value.
+                double pLowerBound = (n * p + z * z / 2) / (n + z * z) - z / (n + z * z) * Math.Sqrt(n * p * (1 - p) + z * z / 4);
+
+                // We can be 99% confident that the deviation is not higher than:
+                return h100 / (Math.Sqrt(2) * SpecialFunctions.ErfInv(pLowerBound));
+            }
+
+            if (calcDeviationGreatWindow() is null)
+                return calcDeviationGoodWindow();
+
+            return Math.Min(calcDeviationGreatWindow()!.Value, calcDeviationGoodWindow()!.Value);
         }
 
         private int totalHits => countGreat + countOk + countMeh + countMiss;
 
         private int totalSuccessfulHits => countGreat + countOk + countMeh;
-
-        private double logPcHit(double x, double deviation) => logErfcApprox(x / (deviation * Math.Sqrt(2)));
-
-        // Utilises a numerical approximation to extend the computation range of ln(erfc(x)).
-        private double logErfcApprox(double x) => x <= 5
-            ? Math.Log(SpecialFunctions.Erfc(x))
-            : -Math.Pow(x, 2) - Math.Log(x * Math.Sqrt(Math.PI)); // https://www.desmos.com/calculator/kdbxwxgf01
-
-        // Subtracts the base value of two logs, circumventing log rules that typically complicate subtraction of non-logarithmic values.
-        private double logDiff(double firstLog, double secondLog)
-        {
-            double maxVal = Math.Max(firstLog, secondLog);
-
-            // To avoid a NaN result, a check is performed to prevent subtraction of two negative infinity values.
-            if (double.IsNegativeInfinity(maxVal))
-            {
-                return maxVal;
-            }
-
-            return firstLog + SpecialFunctions.Log1p(-Math.Exp(-(firstLog - secondLog)));
-        }
     }
 }
