@@ -81,9 +81,9 @@ namespace osu.Game.Tests.Visual.Gameplay
         {
             AddStep("create sprite", () => Child = createSprite(s =>
             {
-                var loop = s.AddLoopingGroup(600, 10);
-                loop.AddY(Easing.OutBounce, 0, 500, 100, 240);
-                loop.AddY(Easing.OutQuint, 700, 1000, 240, 100);
+                var loop = s.AddLoopingGroup(500, 10);
+                loop.AddY(Easing.OutBounce, 0, 600, 100, 240);
+                loop.AddY(Easing.OutQuint, 800, 1200, 240, 100);
             }));
         }
 
