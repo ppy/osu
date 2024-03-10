@@ -23,7 +23,7 @@ namespace osu.Game.Tournament.Tests
         {
             public TournamentScalingContainer()
             {
-                TargetDrawSize = new Vector2(1920, 1080);
+                TargetDrawSize = new Vector2(1024, 768);
                 RelativeSizeAxes = Axes.Both;
             }
 

@@ -6,6 +6,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using JetBrains.Annotations;
 using osu.Framework.Allocation;
 using osu.Framework.Audio;
 using osu.Framework.Audio.Sample;
@@ -21,9 +22,13 @@ using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Input.Bindings;
+using osu.Game.Localisation;
 using osu.Game.Online.API;
+using osu.Game.Online.Placeholders;
+using osu.Game.Overlays;
 using osu.Game.Scoring;
 using osu.Game.Screens.Play;
+using osu.Game.Screens.Ranking.Expanded.Accuracy;
 using osu.Game.Screens.Ranking.Statistics;
 using osuTK;
 
@@ -38,11 +43,11 @@ namespace osu.Game.Screens.Ranking
 
         public override bool? AllowGlobalTrackControl => true;
 
-        // Temporary for now to stop dual transitions. Should respect the current toolbar mode, but there's no way to do so currently.
-        public override bool HideOverlaysOnEnter => true;
+        protected override OverlayActivation InitialOverlayActivationMode => OverlayActivation.UserTriggered;
 
         public readonly Bindable<ScoreInfo> SelectedScore = new Bindable<ScoreInfo>();
 
+        [CanBeNull]
         public readonly ScoreInfo Score;
 
         protected ScorePanelList ScorePanelList { get; private set; }
@@ -62,16 +67,28 @@ namespace osu.Game.Screens.Ranking
 
         private bool lastFetchCompleted;
 
-        private readonly bool allowRetry;
-        private readonly bool allowWatchingReplay;
+        /// <summary>
+        /// Whether the user can retry the beatmap from the results screen.
+        /// </summary>
+        public bool AllowRetry { get; init; }
+
+        /// <summary>
+        /// Whether the user can watch the replay of the completed play from the results screen.
+        /// </summary>
+        public bool AllowWatchingReplay { get; init; } = true;
+
+        /// <summary>
+        /// Whether the user's personal statistics should be shown on the extended statistics panel
+        /// after clicking the score panel associated with the <see cref="ResultsScreen.Score"/> being presented.
+        /// Requires <see cref="Score"/> to be present.
+        /// </summary>
+        public bool ShowUserStatistics { get; init; }
 
         private Sample popInSample;
 
-        protected ResultsScreen(ScoreInfo score, bool allowRetry, bool allowWatchingReplay = true)
+        protected ResultsScreen([CanBeNull] ScoreInfo score)
         {
             Score = score;
-            this.allowRetry = allowRetry;
-            this.allowWatchingReplay = allowWatchingReplay;
 
             SelectedScore.Value = score;
         }
@@ -99,7 +116,7 @@ namespace osu.Game.Screens.Ranking
                                 RelativeSizeAxes = Axes.Both,
                                 Children = new Drawable[]
                                 {
-                                    StatisticsPanel = CreateStatisticsPanel().With(panel =>
+                                    StatisticsPanel = createStatisticsPanel().With(panel =>
                                     {
                                         panel.RelativeSizeAxes = Axes.Both;
                                         panel.Score.BindTarget = SelectedScore;
@@ -156,12 +173,16 @@ namespace osu.Game.Screens.Ranking
             if (Score != null)
             {
                 // only show flair / animation when arriving after watching a play that isn't autoplay.
-                bool shouldFlair = player != null && Score.Mods.All(m => m.UserPlayable);
+                bool shouldFlair = player != null && !Score.User.IsBot;
 
                 ScorePanelList.AddScore(Score, shouldFlair);
+                // this is mostly for medal display.
+                // we don't want the medal animation to trample on the results screen animation, so we (ab)use `OverlayActivationMode`
+                // to give the results screen enough time to play the animation out before the medals can be shown.
+                Scheduler.AddDelayed(() => OverlayActivationMode.Value = OverlayActivation.All, shouldFlair ? AccuracyCircle.TOTAL_DURATION + 1000 : 0);
             }
 
-            if (allowWatchingReplay)
+            if (AllowWatchingReplay)
             {
                 buttons.Add(new ReplayDownloadButton(SelectedScore.Value)
                 {
@@ -170,7 +191,7 @@ namespace osu.Game.Screens.Ranking
                 });
             }
 
-            if (player != null && allowRetry)
+            if (player != null && AllowRetry)
             {
                 buttons.Add(new RetryButton { Width = 300 });
 
@@ -237,7 +258,12 @@ namespace osu.Game.Screens.Ranking
         /// <summary>
         /// Creates the <see cref="Statistics.StatisticsPanel"/> to be used to display extended information about scores.
         /// </summary>
-        protected virtual StatisticsPanel CreateStatisticsPanel() => new StatisticsPanel();
+        private StatisticsPanel createStatisticsPanel()
+        {
+            return ShowUserStatistics && Score != null
+                ? new UserStatisticsPanel(Score)
+                : new StatisticsPanel();
+        }
 
         private void fetchScoresCallback(IEnumerable<ScoreInfo> scores) => Schedule(() =>
         {
@@ -245,6 +271,12 @@ namespace osu.Game.Screens.Ranking
                 addScore(s);
 
             lastFetchCompleted = true;
+
+            if (ScorePanelList.IsEmpty)
+            {
+                // This can happen if for example a beatmap that is part of a playlist hasn't been played yet.
+                VerticalScrollContent.Add(new MessagePlaceholder(LeaderboardStrings.NoRecordsYet));
+            }
         });
 
         public override void OnEntering(ScreenTransitionEvent e)
@@ -266,6 +298,11 @@ namespace osu.Game.Screens.Ranking
         {
             if (base.OnExiting(e))
                 return true;
+
+            // This is a stop-gap safety against components holding references to gameplay after exiting the gameplay flow.
+            // Right now, HitEvents are only used up to the results screen. If this changes in the future we need to remove
+            // HitObject references from HitEvent.
+            Score?.HitEvents.Clear();
 
             this.FadeOut(100);
             return false;
@@ -329,7 +366,7 @@ namespace osu.Game.Screens.Ranking
                 ScorePanelList.Attach(detachedPanel);
 
                 // Move into its original location in the attached container first, then to the final location.
-                float origLocation = detachedPanel.Parent.ToLocalSpace(screenSpacePos).X;
+                float origLocation = detachedPanel.Parent!.ToLocalSpace(screenSpacePos).X;
                 detachedPanel.MoveToX(origLocation)
                              .Then()
                              .MoveToX(0, 250, Easing.OutElasticQuarter);

@@ -92,8 +92,8 @@ namespace osu.Game.Rulesets.Osu.Skinning.Legacy
             using (BeginAbsoluteSequence(spinner.StartTime - spinner.TimePreempt))
                 this.FadeOut();
 
-            using (BeginAbsoluteSequence(spinner.StartTime - spinner.TimeFadeIn / 2))
-                this.FadeInFromZero(spinner.TimeFadeIn / 2);
+            using (BeginAbsoluteSequence(spinner.StartTime - spinner.TimeFadeIn))
+                this.FadeInFromZero(spinner.TimeFadeIn);
         }
 
         protected override void Update()

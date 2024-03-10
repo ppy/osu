@@ -89,7 +89,7 @@ namespace osu.Game.Tests.Visual.Editing
         public void TestWidthUpdatesOnDrawSizeChanges()
         {
             AddStep("Shrink scroll container", () => scrollContainer.Width = 0.5f);
-            AddAssert("Scroll container width shrunk", () => scrollContainer.DrawWidth == scrollContainer.Parent.DrawWidth / 2);
+            AddAssert("Scroll container width shrunk", () => scrollContainer.DrawWidth == scrollContainer.Parent!.DrawWidth / 2);
             AddAssert("Inner container width matches scroll container", () => innerBox.DrawWidth == scrollContainer.DrawWidth);
         }
 

@@ -40,8 +40,14 @@ namespace osu.Game.Graphics.UserInterface
             AddInternal(hoverClickSounds = new HoverClickSounds());
 
             updateTextColour();
+        }
+
+        protected override void LoadComplete()
+        {
+            base.LoadComplete();
 
             Item.Action.BindDisabledChanged(_ => updateState(), true);
+            FinishTransforms();
         }
 
         private void updateTextColour()

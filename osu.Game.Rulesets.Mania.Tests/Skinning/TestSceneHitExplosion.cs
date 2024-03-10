@@ -39,7 +39,7 @@ namespace osu.Game.Rulesets.Mania.Tests.Skinning
                 {
                     c.Add(hitExplosionPools[poolIndex].Get(e =>
                     {
-                        e.Apply(new JudgementResult(new HitObject(), runCount % 6 == 0 ? new HoldNoteTickJudgement() : new ManiaJudgement()));
+                        e.Apply(new JudgementResult(new HitObject(), new ManiaJudgement()));
 
                         e.Anchor = Anchor.Centre;
                         e.Origin = Anchor.Centre;

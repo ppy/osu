@@ -6,7 +6,6 @@ using System.Collections.Generic;
 using Newtonsoft.Json;
 using osu.Game.Beatmaps;
 using osu.Game.Rulesets.Mods;
-using osu.Game.Rulesets.Scoring;
 
 namespace osu.Game.Rulesets.Difficulty
 {
@@ -27,9 +26,6 @@ namespace osu.Game.Rulesets.Difficulty
         protected const int ATTRIB_ID_FLASHLIGHT = 17;
         protected const int ATTRIB_ID_SLIDER_FACTOR = 19;
         protected const int ATTRIB_ID_SPEED_NOTE_COUNT = 21;
-        protected const int ATTRIB_ID_LEGACY_ACCURACY_SCORE = 23;
-        protected const int ATTRIB_ID_LEGACY_COMBO_SCORE = 25;
-        protected const int ATTRIB_ID_LEGACY_BONUS_SCORE_RATIO = 27;
         protected const int ATTRIB_ID_OK_HIT_WINDOW = 29;
 
         /// <summary>
@@ -48,22 +44,6 @@ namespace osu.Game.Rulesets.Difficulty
         /// </summary>
         [JsonProperty("max_combo", Order = -2)]
         public int MaxCombo { get; set; }
-
-        /// <summary>
-        /// The accuracy portion of the legacy (ScoreV1) total score.
-        /// </summary>
-        public int LegacyAccuracyScore { get; set; }
-
-        /// <summary>
-        /// The combo-multiplied portion of the legacy (ScoreV1) total score.
-        /// </summary>
-        public int LegacyComboScore { get; set; }
-
-        /// <summary>
-        /// A ratio of <c>new_bonus_score / old_bonus_score</c> for converting the bonus score of legacy scores to the new scoring.
-        /// This is made up of all judgements that would be <see cref="HitResult.SmallBonus"/> or <see cref="HitResult.LargeBonus"/>.
-        /// </summary>
-        public double LegacyBonusScoreRatio { get; set; }
 
         /// <summary>
         /// Creates new <see cref="DifficultyAttributes"/>.
@@ -92,9 +72,6 @@ namespace osu.Game.Rulesets.Difficulty
         public virtual IEnumerable<(int attributeId, object value)> ToDatabaseAttributes()
         {
             yield return (ATTRIB_ID_MAX_COMBO, MaxCombo);
-            yield return (ATTRIB_ID_LEGACY_ACCURACY_SCORE, LegacyAccuracyScore);
-            yield return (ATTRIB_ID_LEGACY_COMBO_SCORE, LegacyComboScore);
-            yield return (ATTRIB_ID_LEGACY_BONUS_SCORE_RATIO, LegacyBonusScoreRatio);
         }
 
         /// <summary>
@@ -105,9 +82,6 @@ namespace osu.Game.Rulesets.Difficulty
         public virtual void FromDatabaseAttributes(IReadOnlyDictionary<int, double> values, IBeatmapOnlineInfo onlineInfo)
         {
             MaxCombo = (int)values[ATTRIB_ID_MAX_COMBO];
-            LegacyAccuracyScore = (int)values[ATTRIB_ID_LEGACY_ACCURACY_SCORE];
-            LegacyComboScore = (int)values[ATTRIB_ID_LEGACY_COMBO_SCORE];
-            LegacyBonusScoreRatio = (int)values[ATTRIB_ID_LEGACY_BONUS_SCORE_RATIO];
         }
     }
 }

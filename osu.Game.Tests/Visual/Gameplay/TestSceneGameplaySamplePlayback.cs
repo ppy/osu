@@ -16,6 +16,8 @@ namespace osu.Game.Tests.Visual.Gameplay
 {
     public partial class TestSceneGameplaySamplePlayback : PlayerTestScene
     {
+        protected override bool AllowBackwardsSeeks => true;
+
         [Test]
         public void TestAllSamplesStopDuringSeek()
         {
