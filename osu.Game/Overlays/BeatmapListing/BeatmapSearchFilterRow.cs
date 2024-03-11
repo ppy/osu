@@ -6,10 +6,10 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.UserInterface;
 using osu.Game.Graphics;
-using osu.Game.Graphics.Sprites;
 using osuTK;
 using osu.Framework.Extensions.EnumExtensions;
 using osu.Framework.Localisation;
+using osu.Game.Graphics.Containers;
 
 namespace osu.Game.Overlays.BeatmapListing
 {
@@ -45,9 +45,10 @@ namespace osu.Game.Overlays.BeatmapListing
                 {
                     new[]
                     {
-                        new OsuSpriteText
+                        new OsuTextFlowContainer(t => t.Font = OsuFont.GetFont(size: 13))
                         {
-                            Font = OsuFont.GetFont(size: 13),
+                            RelativeSizeAxes = Axes.X,
+                            AutoSizeAxes = Axes.Y,
                             Text = header
                         },
                         filter = CreateFilter()
