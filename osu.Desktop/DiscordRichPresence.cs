@@ -142,9 +142,8 @@ namespace osu.Desktop
                         Privacy = string.IsNullOrEmpty(room.Settings.Password) ? Party.PrivacySetting.Public : Party.PrivacySetting.Private,
                         ID = room.RoomID.ToString(),
                         // technically lobbies can have infinite users, but Discord needs this to be set to something.
-                        // 1024 just happens to look nice.
-                        // https://discord.com/channels/188630481301012481/188630652340404224/1212967974793642034
-                        Max = 1024,
+                        // to make party display sensible, assign a powers of two above participants count (8 at minimum).
+                        Max = (int)Math.Max(8, Math.Pow(2, Math.Ceiling(Math.Log2(room.Users.Count)))),
                         Size = room.Users.Count,
                     };
 
