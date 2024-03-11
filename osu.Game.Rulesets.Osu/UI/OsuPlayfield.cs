@@ -3,6 +3,7 @@
 
 using System;
 using System.Diagnostics;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
@@ -79,11 +80,12 @@ namespace osu.Game.Rulesets.Osu.UI
             NewResult += onNewResult;
         }
 
-        private IHitPolicy hitPolicy = null!;
+        private IHitPolicy hitPolicy;
 
         public IHitPolicy HitPolicy
         {
             get => hitPolicy;
+            [MemberNotNull(nameof(hitPolicy))]
             set
             {
                 hitPolicy = value ?? throw new ArgumentNullException(nameof(value));
