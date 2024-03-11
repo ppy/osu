@@ -52,10 +52,8 @@ namespace osu.Game.Overlays.BeatmapListing
             [BackgroundDependencyLoader]
             private void load()
             {
-                Anchor = Anchor.BottomLeft;
-                Origin = Anchor.BottomLeft;
                 RelativeSizeAxes = Axes.X;
-                Height = 15;
+                AutoSizeAxes = Axes.Y;
                 Spacing = new Vector2(10, 0);
 
                 AddRange(GetValues().Select(CreateTabItem));
