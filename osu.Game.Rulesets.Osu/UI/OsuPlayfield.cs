@@ -34,6 +34,8 @@ namespace osu.Game.Rulesets.Osu.UI
 
         private readonly JudgementPooler<DrawableOsuJudgement> judgementPooler;
 
+        // For osu! gameplay, everything is always on screen.
+        // Skipping masking calculations improves performance in intense beatmaps (ie. https://osu.ppy.sh/beatmapsets/150945#osu/372245)
         public override bool UpdateSubTreeMasking(Drawable source, RectangleF maskingBounds) => false;
 
         public SmokeContainer Smoke { get; }
