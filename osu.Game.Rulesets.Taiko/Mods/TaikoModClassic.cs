@@ -17,6 +17,10 @@ namespace osu.Game.Rulesets.Taiko.Mods
 {
     public class TaikoModClassic : ModClassic, IApplicableToDrawableRuleset<TaikoHitObject>, IApplicableToDrawableHitObject
     {
+        private DrawableTaikoRuleset drawableTaikoRuleset = null!;
+
+        private TaikoPlayfieldAdjustmentContainer adjustmentContainer = null!;
+
         private IReadOnlyList<Mod> mods = Array.Empty<Mod>();
 
         private const float hd_base_fade_out_duration = 0.375f;
@@ -29,26 +33,45 @@ namespace osu.Game.Rulesets.Taiko.Mods
 
         private const float hidden_base_aspect = 4f / 3f;
 
+        /// <summary>
+        /// Time range at which notes start to become visible in milliseconds.
+        /// </summary>
+        private const double nm_fade_in_time_range = 10000d / 1.4d;
+
+        /// <summary>
+        /// Duration notes take to fade in in milliseconds.
+        /// </summary>
+        private const float nm_fade_in_duration = 400f;
+
+        /// <summary>
+        /// Whether note fading in is enabled.
+        /// </summary>
+        private bool fadeInEnabled = true;
+
         private readonly BindableFloat hiddenFadeOutDuration = new BindableFloat(hd_base_fade_out_duration);
 
         private readonly BindableFloat hiddenInitialAlpha = new BindableFloat(hd_base_initial_alpha);
 
         public void ApplyToDrawableRuleset(DrawableRuleset<TaikoHitObject> drawableRuleset)
         {
-            var drawableTaikoRuleset = (DrawableTaikoRuleset)drawableRuleset;
-            var adjustmentContainer = (TaikoPlayfieldAdjustmentContainer)drawableTaikoRuleset.PlayfieldAdjustmentContainer;
+            drawableTaikoRuleset = (DrawableTaikoRuleset)drawableRuleset;
+            adjustmentContainer = (TaikoPlayfieldAdjustmentContainer)drawableRuleset.PlayfieldAdjustmentContainer;
 
             // drawableRuleset.Mods should always be non-null here, but just in case.
             mods = drawableRuleset.Mods ?? mods;
 
-            adjustmentContainer.MaximumAspect = 22f / 9f;
+            // Disable uppper bound for playfield aspect ratio
+            // In stable, nomod time range is limited by fading notes in instead
+            adjustmentContainer.MaximumAspect = float.PositiveInfinity;
             adjustmentContainer.MinimumAspect = 5f / 4f;
-            adjustmentContainer.TrimOnOverflow = true;
 
             TaikoModHidden? hidden = mods.OfType<TaikoModHidden>().FirstOrDefault();
 
             if (mods.OfType<TaikoModHardRock>().Any())
             {
+                // Hardrock disables note fading in
+                fadeInEnabled = false;
+
                 // For hardrock, the playfield time range is clamped to within classicMaxTimeRange and the equivalent
                 // time range for a 16:10 aspect ratio.
                 adjustmentContainer.TrimOnOverflow = false;
@@ -67,39 +90,61 @@ namespace osu.Game.Rulesets.Taiko.Mods
                     hiddenInitialAlpha.BindTo(hidden.InitialAlpha);
                     hiddenFadeOutDuration.BindTo(hidden.FadeOutDuration);
                     drawableRuleset.OnUpdate += d => adjustHidden(
-                        d, hdhr_base_fade_out_duration, hdhr_base_initial_alpha, 16f / 9f, 0.8f);
+                        hdhr_base_fade_out_duration, hdhr_base_initial_alpha, 16f / 9f, 0.8f);
                 }
             }
             else if (hidden != null)
             {
+                // Hidden disables note fading in
+                fadeInEnabled = false;
+
                 // Stable limits the aspect ratio to 4:3
                 adjustmentContainer.MaximumAspect = hidden_base_aspect;
+
+                // Enable playfield trimming for hidden
+                adjustmentContainer.TrimOnOverflow = true;
 
                 // Enable aspect ratio adjustment for hidden (see adjustHidden)
                 hiddenInitialAlpha.BindTo(hidden.InitialAlpha);
                 hiddenFadeOutDuration.BindTo(hidden.FadeOutDuration);
                 drawableRuleset.OnUpdate += d => adjustHidden(
-                    d, hd_base_fade_out_duration, hd_base_initial_alpha, hidden_base_aspect);
+                    hd_base_fade_out_duration, hd_base_initial_alpha, hidden_base_aspect);
             }
         }
 
         public void ApplyToDrawableHitObject(DrawableHitObject drawable)
         {
             if (drawable is DrawableTaikoHitObject hit)
+            {
                 hit.SnapJudgementLocation = true;
+
+                if (fadeInEnabled)
+                {
+                    drawable.ApplyCustomUpdateState += fadeIn;
+                }
+            }
+        }
+
+        // Fade in notes with fixed duration.
+        private void fadeIn(DrawableHitObject o, ArmedState state)
+        {
+            double preempt = nm_fade_in_time_range / drawableTaikoRuleset.ControlPointAt(o.HitObject.StartTime).Multiplier;
+            double start = o.HitObject.StartTime - preempt;
+            o.Alpha = 0;
+
+            using (o.BeginAbsoluteSequence(start))
+            {
+                o.FadeInFromZero(nm_fade_in_duration);
+            }
         }
 
         // Adjust hidden initial alpha and fade out duration for different aspect ratios
         private void adjustHidden(
-            Drawable drawableRuleset,
             float baseFadeOutDuration,
             float baseInitialAlpha,
             float baseAspect,
             float adjustmentRatio = 1f)
         {
-            var drawableTaikoRuleset = (DrawableTaikoRuleset)drawableRuleset;
-            var adjustmentContainer = (TaikoPlayfieldAdjustmentContainer)drawableTaikoRuleset.PlayfieldAdjustmentContainer;
-
             float clampedAspect = adjustmentContainer.ClampedCurrentAspect;
 
             float fadeOutDurationAdjustment = clampedAspect / baseAspect - 1;
