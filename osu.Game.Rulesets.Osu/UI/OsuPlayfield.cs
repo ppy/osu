@@ -43,7 +43,7 @@ namespace osu.Game.Rulesets.Osu.UI
 
         public static readonly Vector2 BASE_SIZE = new Vector2(512, 384);
 
-        protected override GameplayCursorContainer CreateCursor() => new OsuCursorContainer();
+        protected override GameplayCursorContainer? CreateCursor() => new OsuCursorContainer();
 
         private readonly Container judgementAboveHitObjectLayer;
 
