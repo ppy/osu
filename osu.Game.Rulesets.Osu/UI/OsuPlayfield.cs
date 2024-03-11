@@ -1,8 +1,6 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
 using System;
 using System.Diagnostics;
 using System.Linq;
@@ -79,7 +77,7 @@ namespace osu.Game.Rulesets.Osu.UI
             NewResult += onNewResult;
         }
 
-        private IHitPolicy hitPolicy;
+        private IHitPolicy hitPolicy = null!;
 
         public IHitPolicy HitPolicy
         {
@@ -119,12 +117,12 @@ namespace osu.Game.Rulesets.Osu.UI
             judgementAboveHitObjectLayer.Add(judgement.ProxiedAboveHitObjectsContent);
         }
 
-        [BackgroundDependencyLoader(true)]
-        private void load(OsuRulesetConfigManager config, IBeatmap beatmap)
+        [BackgroundDependencyLoader]
+        private void load(OsuRulesetConfigManager? config, IBeatmap? beatmap)
         {
             config?.BindWith(OsuRulesetSetting.PlayfieldBorderStyle, playfieldBorder.PlayfieldBorderStyle);
 
-            var osuBeatmap = (OsuBeatmap)beatmap;
+            var osuBeatmap = (OsuBeatmap?)beatmap;
 
             RegisterPool<HitCircle, DrawableHitCircle>(20, 100);
 
