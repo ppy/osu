@@ -114,6 +114,8 @@ namespace osu.Desktop
                 return;
             }
 
+            Logger.Log("Updating Discord RPC", LoggingTarget.Network, LogLevel.Debug);
+
             if (activity.Value != null)
             {
                 bool hideIdentifiableInformation = privacyMode.Value == DiscordRichPresenceMode.Limited || status.Value == UserStatus.DoNotDisturb;
