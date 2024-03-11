@@ -8,7 +8,6 @@ using DiscordRPC.Message;
 using Newtonsoft.Json;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
-using osu.Framework.Extensions.ObjectExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Logging;
 using osu.Game;
@@ -91,8 +90,6 @@ namespace osu.Desktop
             status.BindValueChanged(_ => updateStatus());
             activity.BindValueChanged(_ => updateStatus());
             privacyMode.BindValueChanged(_ => updateStatus());
-
-            multiplayerClient.RoomUpdated += updateStatus;
 
             client.Initialize();
         }
@@ -274,9 +271,6 @@ namespace osu.Desktop
 
         protected override void Dispose(bool isDisposing)
         {
-            if (multiplayerClient.IsNotNull())
-                multiplayerClient.RoomUpdated -= updateStatus;
-
             client.Dispose();
             base.Dispose(isDisposing);
         }
