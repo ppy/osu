@@ -46,7 +46,7 @@ namespace osu.Game.IO.Archives
             archiveStream.Dispose();
         }
 
-        public override IEnumerable<string> Filenames => archive.Entries.Select(e => e.Key).ExcludeSystemFileNames();
+        public override IEnumerable<string> Filenames => archive.Entries.Where(e => !e.IsDirectory).Select(e => e.Key).ExcludeSystemFileNames();
 
         private class MemoryOwnerMemoryStream : Stream
         {
