@@ -105,14 +105,29 @@ namespace osu.Game.Localisation
         public static LocalisableString DeletedAllCollections => new TranslatableString(getKey(@"deleted_all_collections"), @"Deleted all collections!");
 
         /// <summary>
+        /// "No collections found to delete!"
+        /// </summary>
+        public static LocalisableString NoCollectionsFoundToDelete => new TranslatableString(getKey(@"no_collections_found_to_delete"), @"No collections found to delete!");
+
+        /// <summary>
         /// "Deleted all mod presets!"
         /// </summary>
         public static LocalisableString DeletedAllModPresets => new TranslatableString(getKey(@"deleted_all_mod_presets"), @"Deleted all mod presets!");
 
         /// <summary>
+        /// "No mod presets found to delete!"
+        /// </summary>
+        public static LocalisableString NoModPresetsFoundToDelete => new TranslatableString(getKey(@"no_mod_presets_found_to_delete"), @"No mod presets found to delete!");
+
+        /// <summary>
         /// "Restored all deleted mod presets!"
         /// </summary>
         public static LocalisableString RestoredAllDeletedModPresets => new TranslatableString(getKey(@"restored_all_deleted_mod_presets"), @"Restored all deleted mod presets!");
+
+        /// <summary>
+        /// "No mod presets found to restore!"
+        /// </summary>
+        public static LocalisableString NoModPresetsFoundToRestore => new TranslatableString(getKey(@"no_mod_presets_found_to_restore"), @"No mod presets found to restore!");
 
         /// <summary>
         /// "Please select your osu!stable install location"

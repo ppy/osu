@@ -73,7 +73,7 @@ namespace osu.Game.Skinning
 
         private TextureUpload convertToGrayscale(TextureUpload textureUpload)
         {
-            var image = Image.LoadPixelData(textureUpload.Data.ToArray(), textureUpload.Width, textureUpload.Height);
+            var image = Image.LoadPixelData(textureUpload.Data, textureUpload.Width, textureUpload.Height);
 
             // stable uses `0.299 * r + 0.587 * g + 0.114 * b`
             // (https://github.com/peppy/osu-stable-reference/blob/013c3010a9d495e3471a9c59518de17006f9ad89/osu!/Graphics/Textures/pTexture.cs#L138-L153)
