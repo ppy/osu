@@ -63,7 +63,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
             if (osuPrevObj?.BaseObject is Slider slider)
             {
                 // Take just slider heads into account because we're computing sliderjumps, not slideraim
-                double sliderStreamDifficulty = 0.08 * (1 + 0.5 * osuCurrObj.JumpDistance / osuCurrObj.StrainTime);
+                double sliderStreamDifficulty = 0.08 * Math.Max(1, Math.Sqrt(osuCurrObj.JumpDistance / slider.Radius));
 
                 // Punish too short sliders to prevent cheesing (cheesing is still possible, but it's very rare)
                 double sliderLength = 2 * slider.Velocity * slider.SpanDuration;
