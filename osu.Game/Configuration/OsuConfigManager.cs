@@ -75,7 +75,7 @@ namespace osu.Game.Configuration
 #pragma warning restore CS0618 // Type or member is obsolete
             SetDefault(OsuSetting.AutomaticallyDownloadMissingBeatmaps, false);
 
-            SetDefault(OsuSetting.SavePassword, false).ValueChanged += enabled =>
+            SetDefault(OsuSetting.SavePassword, true).ValueChanged += enabled =>
             {
                 if (enabled.NewValue)
                     SetValue(OsuSetting.SaveUsername, true);
