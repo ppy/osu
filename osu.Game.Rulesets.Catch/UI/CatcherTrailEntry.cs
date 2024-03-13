@@ -6,7 +6,7 @@ using osuTK;
 
 namespace osu.Game.Rulesets.Catch.UI
 {
-    public class CatcherTrailEntry : LifetimeEntry
+    public class CatcherTrailEntry : LifetimeEntry<CatcherTrailEntry>
     {
         public readonly CatcherAnimationState CatcherState;
 

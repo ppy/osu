@@ -20,7 +20,7 @@ namespace osu.Game.Rulesets.Objects.Pooling
     /// <typeparam name="TEntry">The type of entries managed by this container.</typeparam>
     /// <typeparam name="TDrawable">The type of drawables corresponding to the entries.</typeparam>
     public abstract partial class PooledDrawableWithLifetimeContainer<TEntry, TDrawable> : CompositeDrawable
-        where TEntry : LifetimeEntry
+        where TEntry : LifetimeEntry<TEntry>
         where TDrawable : Drawable
     {
         /// <summary>
@@ -40,8 +40,8 @@ namespace osu.Game.Rulesets.Objects.Pooling
         public readonly SlimReadOnlyDictionaryWrapper<TEntry, TDrawable> AliveEntries;
 
         /// <summary>
-        /// Whether to remove an entry when clock goes backward and crossed its <see cref="LifetimeEntry.LifetimeStart"/>.
-        /// Used when entries are dynamically added at its <see cref="LifetimeEntry.LifetimeStart"/> to prevent duplicated entries.
+        /// Whether to remove an entry when clock goes backward and crossed its <see cref="LifetimeEntry{T}.LifetimeStart"/>.
+        /// Used when entries are dynamically added at its <see cref="LifetimeEntry{T}.LifetimeStart"/> to prevent duplicated entries.
         /// </summary>
         protected virtual bool RemoveRewoundEntry => false;
 
@@ -58,7 +58,7 @@ namespace osu.Game.Rulesets.Objects.Pooling
         private readonly Dictionary<TEntry, TDrawable> aliveDrawableMap = new Dictionary<TEntry, TDrawable>();
         private readonly HashSet<TEntry> allEntries = new HashSet<TEntry>();
 
-        private readonly LifetimeEntryManager lifetimeManager = new LifetimeEntryManager();
+        private readonly LifetimeEntryManager<TEntry> lifetimeManager = new();
 
         protected PooledDrawableWithLifetimeContainer()
         {
@@ -102,9 +102,9 @@ namespace osu.Game.Rulesets.Objects.Pooling
         /// <returns>The <typeparamref name="TDrawable"/> corresponding to the entry.</returns>
         protected abstract TDrawable GetDrawable(TEntry entry);
 
-        private void entryBecameAlive(LifetimeEntry lifetimeEntry)
+        private void entryBecameAlive(TEntry lifetimeEntry)
         {
-            var entry = (TEntry)lifetimeEntry;
+            var entry = lifetimeEntry;
             Debug.Assert(!aliveDrawableMap.ContainsKey(entry));
 
             TDrawable drawable = GetDrawable(entry);
@@ -120,9 +120,9 @@ namespace osu.Game.Rulesets.Objects.Pooling
         /// </remarks>
         protected virtual void AddDrawable(TEntry entry, TDrawable drawable) => AddInternal(drawable);
 
-        private void entryBecameDead(LifetimeEntry lifetimeEntry)
+        private void entryBecameDead(TEntry lifetimeEntry)
         {
-            var entry = (TEntry)lifetimeEntry;
+            var entry = lifetimeEntry;
             Debug.Assert(aliveDrawableMap.ContainsKey(entry));
 
             TDrawable drawable = aliveDrawableMap[entry];
@@ -138,10 +138,10 @@ namespace osu.Game.Rulesets.Objects.Pooling
         /// </remarks>
         protected virtual void RemoveDrawable(TEntry entry, TDrawable drawable) => RemoveInternal(drawable, false);
 
-        private void entryCrossedBoundary(LifetimeEntry lifetimeEntry, LifetimeBoundaryKind kind, LifetimeBoundaryCrossingDirection direction)
+        private void entryCrossedBoundary(TEntry lifetimeEntry, LifetimeBoundaryKind kind, LifetimeBoundaryCrossingDirection direction)
         {
             if (RemoveRewoundEntry && kind == LifetimeBoundaryKind.Start && direction == LifetimeBoundaryCrossingDirection.Backward)
-                Remove((TEntry)lifetimeEntry);
+                Remove(lifetimeEntry);
         }
 
         /// <summary>

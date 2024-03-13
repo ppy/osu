@@ -13,7 +13,7 @@ namespace osu.Game.Rulesets.Objects
     /// <summary>
     /// A <see cref="LifetimeEntry"/> that stores the lifetime for a <see cref="HitObject"/>.
     /// </summary>
-    public class HitObjectLifetimeEntry : LifetimeEntry
+    public class HitObjectLifetimeEntry : LifetimeEntry<HitObjectLifetimeEntry>
     {
         /// <summary>
         /// The <see cref="HitObject"/>.
@@ -122,12 +122,12 @@ namespace osu.Game.Rulesets.Objects
         /// </summary>
         /// <remarks>
         /// This is only used as an optimisation to delay the initial application of the <see cref="HitObject"/> to a <see cref="DrawableHitObject"/>.
-        /// A more accurate <see cref="LifetimeEntry.LifetimeStart"/> should be set on the hit object application, for further optimisation.
+        /// A more accurate <see cref="LifetimeEntry{T}.LifetimeStart"/> should be set on the hit object application, for further optimisation.
         /// </remarks>
         protected virtual double InitialLifetimeOffset => 10000;
 
         /// <summary>
-        /// Set <see cref="LifetimeEntry.LifetimeStart"/> using <see cref="InitialLifetimeOffset"/>.
+        /// Set <see cref="LifetimeEntry{T}.LifetimeStart"/> using <see cref="InitialLifetimeOffset"/>.
         /// </summary>
         internal void SetInitialLifetime() => LifetimeStart = HitObject.StartTime - InitialLifetimeOffset;
 
