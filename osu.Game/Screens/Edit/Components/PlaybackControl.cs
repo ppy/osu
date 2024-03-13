@@ -16,6 +16,7 @@ using osu.Framework.Input.Events;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Graphics.UserInterface;
+using osu.Game.Localisation;
 using osu.Game.Overlays;
 using osuTK.Input;
 
@@ -47,7 +48,7 @@ namespace osu.Game.Screens.Edit.Components
                 new OsuSpriteText
                 {
                     Origin = Anchor.BottomLeft,
-                    Text = "Playback speed",
+                    Text = EditorStrings.PlaybackSpeed,
                     RelativePositionAxes = Axes.Y,
                     Y = 0.5f,
                     Padding = new MarginPadding { Left = 45 }
@@ -75,6 +76,9 @@ namespace osu.Game.Screens.Edit.Components
 
         protected override bool OnKeyDown(KeyDownEvent e)
         {
+            if (e.Repeat)
+                return false;
+
             switch (e.Key)
             {
                 case Key.Space:
@@ -93,11 +97,14 @@ namespace osu.Game.Screens.Edit.Components
                 editorClock.Start();
         }
 
+        private static readonly IconUsage play_icon = FontAwesome.Regular.PlayCircle;
+        private static readonly IconUsage pause_icon = FontAwesome.Regular.PauseCircle;
+
         protected override void Update()
         {
             base.Update();
 
-            playButton.Icon = editorClock.IsRunning ? FontAwesome.Regular.PauseCircle : FontAwesome.Regular.PlayCircle;
+            playButton.Icon = editorClock.IsRunning ? pause_icon : play_icon;
         }
 
         private partial class PlaybackTabControl : OsuTabControl<double>

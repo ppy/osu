@@ -17,9 +17,6 @@ namespace osu.Game.Overlays.Profile.Sections.Kudosu
     {
         private const int height = 25;
 
-        [Resolved]
-        private OsuColour colours { get; set; } = null!;
-
         private readonly APIKudosuHistory historyItem;
         private readonly LinkFlowContainer linkFlowContainer;
         private readonly DrawableDate date;
@@ -48,9 +45,9 @@ namespace osu.Game.Overlays.Profile.Sections.Kudosu
         }
 
         [BackgroundDependencyLoader]
-        private void load()
+        private void load(OverlayColourProvider colourProvider)
         {
-            date.Colour = colours.GreySeaFoamLighter;
+            date.Colour = colourProvider.Foreground1;
             var formattedSource = MessageFormatter.FormatText(getString(historyItem));
             linkFlowContainer.AddLinks(formattedSource.Text, formattedSource.Links);
         }

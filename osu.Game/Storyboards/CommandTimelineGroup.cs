@@ -1,9 +1,6 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
-using System;
 using osuTK;
 using osuTK.Graphics;
 using osu.Framework.Graphics;
@@ -48,32 +45,10 @@ namespace osu.Game.Storyboards
         }
 
         [JsonIgnore]
-        public double CommandsStartTime
-        {
-            get
-            {
-                double min = double.MaxValue;
-
-                for (int i = 0; i < timelines.Length; i++)
-                    min = Math.Min(min, timelines[i].StartTime);
-
-                return min;
-            }
-        }
+        public double CommandsStartTime => timelines.Min(static t => t.StartTime);
 
         [JsonIgnore]
-        public double CommandsEndTime
-        {
-            get
-            {
-                double max = double.MinValue;
-
-                for (int i = 0; i < timelines.Length; i++)
-                    max = Math.Max(max, timelines[i].EndTime);
-
-                return max;
-            }
-        }
+        public double CommandsEndTime => timelines.Max(static t => t.EndTime);
 
         [JsonIgnore]
         public double CommandsDuration => CommandsEndTime - CommandsStartTime;
@@ -85,22 +60,7 @@ namespace osu.Game.Storyboards
         public virtual double EndTime => CommandsEndTime;
 
         [JsonIgnore]
-        public double Duration => EndTime - StartTime;
-
-        [JsonIgnore]
-        public bool HasCommands
-        {
-            get
-            {
-                for (int i = 0; i < timelines.Length; i++)
-                {
-                    if (timelines[i].HasCommands)
-                        return true;
-                }
-
-                return false;
-            }
-        }
+        public bool HasCommands => timelines.Any(static t => t.HasCommands);
 
         public virtual IEnumerable<CommandTimeline<T>.TypedCommand> GetCommands<T>(CommandTimelineSelector<T> timelineSelector, double offset = 0)
         {

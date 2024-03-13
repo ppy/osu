@@ -135,12 +135,14 @@ namespace osu.Game.Overlays
         protected override bool OnHover(HoverEvent e)
         {
             updateFadeState();
+            updateExpandedState(true);
             return false;
         }
 
         protected override void OnHoverLost(HoverLostEvent e)
         {
             updateFadeState();
+            updateExpandedState(true);
             base.OnHoverLost(e);
         }
 
@@ -149,9 +151,12 @@ namespace osu.Game.Overlays
             base.Update();
 
             if (!headerTextVisibilityCache.IsValid)
+            {
                 // These toolbox grouped may be contracted to only show icons.
                 // For now, let's hide the header to avoid text truncation weirdness in such cases.
                 headerText.FadeTo(headerText.DrawWidth < DrawWidth ? 1 : 0, 150, Easing.OutQuint);
+                headerTextVisibilityCache.Validate();
+            }
         }
 
         protected override bool OnInvalidate(Invalidation invalidation, InvalidationSource source)
@@ -168,7 +173,7 @@ namespace osu.Game.Overlays
             // potentially continuing to get processed while content has changed to autosize.
             content.ClearTransforms();
 
-            if (Expanded.Value)
+            if (Expanded.Value || IsHovered)
             {
                 content.AutoSizeAxes = Axes.Y;
                 content.AutoSizeDuration = animate ? transition_duration : 0;

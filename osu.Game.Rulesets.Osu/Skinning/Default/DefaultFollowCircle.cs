@@ -59,9 +59,12 @@ namespace osu.Game.Rulesets.Osu.Skinning.Default
 
         protected override void OnSliderTick()
         {
-            this.ScaleTo(DrawableSliderBall.FOLLOW_AREA * 1.08f, 40, Easing.OutQuint)
-                .Then()
-                .ScaleTo(DrawableSliderBall.FOLLOW_AREA, 200f, Easing.OutQuint);
+            if (Scale.X >= DrawableSliderBall.FOLLOW_AREA * 0.98f)
+            {
+                this.ScaleTo(DrawableSliderBall.FOLLOW_AREA * 1.08f, 40, Easing.OutQuint)
+                    .Then()
+                    .ScaleTo(DrawableSliderBall.FOLLOW_AREA, 200f, Easing.OutQuint);
+            }
         }
 
         protected override void OnSliderBreak()

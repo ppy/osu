@@ -1,8 +1,6 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
 using System.Collections.Generic;
 using System.Linq;
 using osu.Framework.Graphics;
@@ -15,7 +13,7 @@ namespace osu.Game.Overlays.Settings.Sections.Input
     {
         protected override LocalisableString Header => BindingSettingsStrings.ShortcutAndGameplayBindings;
 
-        public override IEnumerable<LocalisableString> FilterTerms => base.FilterTerms.Concat(new LocalisableString[] { "keybindings" });
+        public override IEnumerable<LocalisableString> FilterTerms => base.FilterTerms.Concat(new LocalisableString[] { @"keybindings", @"controls", @"keyboard", @"keys" });
 
         public BindingSettings(KeyBindingPanel keyConfig)
         {

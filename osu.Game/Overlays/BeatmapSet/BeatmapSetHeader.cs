@@ -8,6 +8,8 @@ using osu.Framework.Bindables;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Effects;
+using osu.Framework.Localisation;
+using osu.Game.Graphics;
 using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Resources.Localisation.Web;
 using osu.Game.Rulesets;
@@ -16,7 +18,7 @@ using osuTK.Graphics;
 
 namespace osu.Game.Overlays.BeatmapSet
 {
-    public partial class BeatmapSetHeader : OverlayHeader
+    public partial class BeatmapSetHeader : TabControlOverlayHeader<BeatmapSetTabs>
     {
         public readonly Bindable<APIBeatmapSet> BeatmapSet = new Bindable<APIBeatmapSet>();
 
@@ -46,7 +48,7 @@ namespace osu.Game.Overlays.BeatmapSet
             BeatmapSet = { BindTarget = BeatmapSet }
         };
 
-        protected override Drawable CreateTitleContent() => RulesetSelector = new BeatmapRulesetSelector
+        protected override Drawable CreateTabControlContent() => RulesetSelector = new BeatmapRulesetSelector
         {
             Current = ruleset
         };
@@ -58,8 +60,14 @@ namespace osu.Game.Overlays.BeatmapSet
             public BeatmapHeaderTitle()
             {
                 Title = PageTitleStrings.MainBeatmapsetsControllerShow;
-                IconTexture = "Icons/Hexacons/beatmap";
+                Icon = OsuIcon.Beatmap;
             }
         }
+    }
+
+    public enum BeatmapSetTabs
+    {
+        [LocalisableDescription(typeof(LayoutStrings), nameof(LayoutStrings.HeaderBeatmapsetsShow))]
+        Info,
     }
 }

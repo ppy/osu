@@ -34,7 +34,7 @@ namespace osu.Game.Rulesets.Osu.Tests.Editor
             slider = new Slider
             {
                 Position = new Vector2(256, 192),
-                Path = new SliderPath(PathType.Bezier, new[]
+                Path = new SliderPath(PathType.BEZIER, new[]
                 {
                     Vector2.Zero,
                     new Vector2(150, 150),
@@ -187,7 +187,7 @@ namespace osu.Game.Rulesets.Osu.Tests.Editor
             AddStep($"move mouse to control point {index}", () =>
             {
                 Vector2 position = slider.Position + slider.Path.ControlPoints[index].Position;
-                InputManager.MoveMouseTo(drawableObject.Parent.ToScreenSpace(position));
+                InputManager.MoveMouseTo(drawableObject.Parent!.ToScreenSpace(position));
             });
         }
 
@@ -199,7 +199,7 @@ namespace osu.Game.Rulesets.Osu.Tests.Editor
             public new SliderBodyPiece BodyPiece => base.BodyPiece;
             public new TestSliderCircleOverlay HeadOverlay => (TestSliderCircleOverlay)base.HeadOverlay;
             public new TestSliderCircleOverlay TailOverlay => (TestSliderCircleOverlay)base.TailOverlay;
-            public new PathControlPointVisualiser ControlPointVisualiser => base.ControlPointVisualiser;
+            public new PathControlPointVisualiser<Slider> ControlPointVisualiser => base.ControlPointVisualiser;
 
             public TestSliderBlueprint(Slider slider)
                 : base(slider)

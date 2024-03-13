@@ -21,17 +21,19 @@ namespace osu.Game.Screens.Edit.Timing
     public partial class ControlPointTable : EditorTable
     {
         [Resolved]
-        private Bindable<ControlPointGroup> selectedGroup { get; set; } = null!;
+        private Bindable<ControlPointGroup?> selectedGroup { get; set; } = null!;
 
         [Resolved]
         private EditorClock clock { get; set; } = null!;
 
-        public const float TIMING_COLUMN_WIDTH = 230;
+        public const float TIMING_COLUMN_WIDTH = 300;
 
         public IEnumerable<ControlPointGroup> ControlGroups
         {
             set
             {
+                int selectedIndex = GetIndexForObject(selectedGroup.Value);
+
                 Content = null;
                 BackgroundFlow.Clear();
 
@@ -42,18 +44,28 @@ namespace osu.Game.Screens.Edit.Timing
                 {
                     BackgroundFlow.Add(new RowBackground(group)
                     {
-                        Action = () =>
+                        // schedule to give time for any modified focused text box to lose focus and commit changes (e.g. BPM / time signature textboxes) before switching to new point.
+                        Action = () => Schedule(() =>
                         {
-                            selectedGroup.Value = group;
+                            SetSelectedRow(group);
                             clock.SeekSmoothlyTo(group.Time);
-                        }
+                        })
                     });
                 }
 
                 Columns = createHeaders();
                 Content = value.Select(createContent).ToArray().ToRectangular();
 
-                updateSelectedGroup();
+                // Attempt to retain selection.
+                if (SetSelectedRow(selectedGroup.Value))
+                    return;
+
+                // Some operations completely obliterate references, so best-effort reselect based on index.
+                if (SetSelectedRow(GetObjectAtIndex(selectedIndex)))
+                    return;
+
+                // Selection could not be retained.
+                selectedGroup.Value = null;
             }
         }
 
@@ -61,10 +73,18 @@ namespace osu.Game.Screens.Edit.Timing
         {
             base.LoadComplete();
 
-            selectedGroup.BindValueChanged(_ => updateSelectedGroup(), true);
+            // Handle external selections.
+            selectedGroup.BindValueChanged(g => SetSelectedRow(g.NewValue), true);
         }
 
-        private void updateSelectedGroup() => SetSelectedRow(selectedGroup.Value);
+        protected override bool SetSelectedRow(object? item)
+        {
+            if (!base.SetSelectedRow(item))
+                return false;
+
+            selectedGroup.Value = item as ControlPointGroup;
+            return true;
+        }
 
         private TableColumn[] createHeaders()
         {

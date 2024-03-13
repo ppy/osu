@@ -4,25 +4,25 @@
 using JetBrains.Annotations;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
-using osu.Framework.Graphics.Containers;
+using osu.Framework.Graphics.Sprites;
 using osu.Game.Configuration;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
+using osu.Game.Localisation.SkinComponents;
 
 namespace osu.Game.Skinning.Components
 {
     [UsedImplicitly]
-    public partial class TextElement : Container, ISkinnableDrawable
+    public partial class TextElement : FontAdjustableSkinComponent
     {
-        public bool UsesFixedAnchor { get; set; }
-
-        [SettingSource("Text", "The text to be displayed.")]
+        [SettingSource(typeof(SkinnableComponentStrings), nameof(SkinnableComponentStrings.TextElementText), nameof(SkinnableComponentStrings.TextElementTextDescription))]
         public Bindable<string> Text { get; } = new Bindable<string>("Circles!");
+
+        private readonly OsuSpriteText text;
 
         public TextElement()
         {
             AutoSizeAxes = Axes.Both;
-            OsuSpriteText text;
             InternalChildren = new Drawable[]
             {
                 text = new OsuSpriteText
@@ -34,5 +34,7 @@ namespace osu.Game.Skinning.Components
             };
             text.Current.BindTo(Text);
         }
+
+        protected override void SetFont(FontUsage font) => text.Font = font.With(size: 40);
     }
 }

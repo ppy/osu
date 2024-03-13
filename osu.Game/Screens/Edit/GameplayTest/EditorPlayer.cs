@@ -7,6 +7,7 @@ using osu.Framework.Screens;
 using osu.Game.Beatmaps;
 using osu.Game.Overlays;
 using osu.Game.Screens.Play;
+using osu.Game.Users;
 
 namespace osu.Game.Screens.Edit.GameplayTest
 {
@@ -14,6 +15,8 @@ namespace osu.Game.Screens.Edit.GameplayTest
     {
         private readonly Editor editor;
         private readonly EditorState editorState;
+
+        protected override UserActivity InitialActivity => new UserActivity.TestingBeatmap(Beatmap.Value.BeatmapInfo);
 
         [Resolved]
         private MusicController musicController { get; set; } = null!;

@@ -1,10 +1,9 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
 using System;
 using osu.Framework.Input.Events;
+using osu.Framework.Utils;
 using osu.Game.Rulesets.Catch.Edit.Blueprints.Components;
 using osu.Game.Rulesets.Catch.Objects;
 using osu.Game.Rulesets.Edit;
@@ -18,6 +17,8 @@ namespace osu.Game.Rulesets.Catch.Edit.Blueprints
 
         private double placementStartTime;
         private double placementEndTime;
+
+        protected override bool IsValidForPlacement => Precision.DefinitelyBigger(HitObject.Duration, 0);
 
         public BananaShowerPlacementBlueprint()
         {
@@ -51,7 +52,7 @@ namespace osu.Game.Rulesets.Catch.Edit.Blueprints
                 case PlacementState.Active:
                     if (e.Button != MouseButton.Right) break;
 
-                    EndPlacement(HitObject.Duration > 0);
+                    EndPlacement(true);
                     return true;
             }
 

@@ -15,12 +15,15 @@ using osu.Game.Online.Rooms;
 using osu.Game.Online.Solo;
 using osu.Game.Rulesets;
 using osu.Game.Rulesets.Mania;
+using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Osu;
 using osu.Game.Rulesets.Osu.Judgements;
 using osu.Game.Rulesets.Scoring;
 using osu.Game.Rulesets.Taiko;
+using osu.Game.Rulesets.Taiko.Mods;
 using osu.Game.Scoring;
+using osu.Game.Screens.Play;
 using osu.Game.Screens.Ranking;
 using osu.Game.Tests.Beatmaps;
 
@@ -34,12 +37,19 @@ namespace osu.Game.Tests.Visual.Gameplay
 
         private Func<RulesetInfo, IBeatmap> createCustomBeatmap;
         private Func<Ruleset> createCustomRuleset;
+        private Func<Mod[]> createCustomMods;
 
         private DummyAPIAccess dummyAPI => (DummyAPIAccess)API;
 
         protected override bool HasCustomSteps => true;
 
-        protected override TestPlayer CreatePlayer(Ruleset ruleset) => new FakeImportingPlayer(false);
+        protected override TestPlayer CreatePlayer(Ruleset ruleset)
+        {
+            if (createCustomMods != null)
+                SelectedMods.Value = SelectedMods.Value.Concat(createCustomMods()).ToList();
+
+            return new FakeImportingPlayer(false);
+        }
 
         protected new FakeImportingPlayer Player => (FakeImportingPlayer)base.Player;
 
@@ -179,9 +189,9 @@ namespace osu.Game.Tests.Visual.Gameplay
             addFakeHit();
 
             AddUntilStep("wait for fail", () => Player.GameplayState.HasFailed);
-            AddStep("exit", () => Player.Exit());
 
-            AddAssert("ensure failing submission", () => Player.SubmittedScore?.ScoreInfo.Passed == false);
+            AddUntilStep("wait for submission", () => Player.SubmittedScore != null);
+            AddAssert("ensure failing submission", () => Player.SubmittedScore.ScoreInfo.Passed == false);
         }
 
         [Test]
@@ -209,7 +219,9 @@ namespace osu.Game.Tests.Visual.Gameplay
             addFakeHit();
 
             AddStep("exit", () => Player.Exit());
-            AddAssert("ensure failing submission", () => Player.SubmittedScore?.ScoreInfo.Passed == false);
+
+            AddUntilStep("wait for submission", () => Player.SubmittedScore != null);
+            AddAssert("ensure failing submission", () => Player.SubmittedScore.ScoreInfo.Passed == false);
         }
 
         [Test]
@@ -275,13 +287,28 @@ namespace osu.Game.Tests.Visual.Gameplay
             AddAssert("ensure no submission", () => Player.SubmittedScore == null);
         }
 
-        private void createPlayerTest(bool allowFail = false, Func<RulesetInfo, IBeatmap> createBeatmap = null, Func<Ruleset> createRuleset = null)
+        [Test]
+        public void TestNoSubmissionWithModsOfDifferentRuleset()
+        {
+            prepareTestAPI(true);
+
+            createPlayerTest(createRuleset: () => new OsuRuleset(), createMods: () => new Mod[] { new TaikoModHidden() });
+
+            AddUntilStep("wait for token request", () => Player.TokenCreationRequested);
+            AddAssert("gameplay not loaded", () => Player.DrawableRuleset == null);
+
+            AddStep("exit", () => Player.Exit());
+            AddAssert("ensure no submission", () => Player.SubmittedScore == null);
+        }
+
+        private void createPlayerTest(bool allowFail = false, Func<RulesetInfo, IBeatmap> createBeatmap = null, Func<Ruleset> createRuleset = null, Func<Mod[]> createMods = null)
         {
             CreateTest(() => AddStep("set up requirements", () =>
             {
                 this.allowFail = allowFail;
                 createCustomBeatmap = createBeatmap;
                 createCustomRuleset = createRuleset;
+                createCustomMods = createMods;
             }));
         }
 
@@ -356,6 +383,11 @@ namespace osu.Game.Tests.Visual.Gameplay
             {
                 AllowImportCompletion = new SemaphoreSlim(1);
             }
+
+            protected override GameplayClockContainer CreateGameplayClockContainer(WorkingBeatmap beatmap, double gameplayStart) => new MasterGameplayClockContainer(beatmap, gameplayStart)
+            {
+                ShouldValidatePlaybackRate = false,
+            };
 
             protected override async Task ImportScore(Score score)
             {

@@ -1,8 +1,6 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
 using System;
 using System.Diagnostics;
 using System.Linq;
@@ -13,6 +11,9 @@ using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Utils;
 using osu.Game.Beatmaps;
+using osu.Game.Graphics;
+using osu.Game.Graphics.Sprites;
+using osu.Game.Rulesets.Objects.Legacy;
 using osu.Game.Rulesets.Osu.Objects;
 using osu.Game.Scoring;
 using osuTK;
@@ -36,8 +37,8 @@ namespace osu.Game.Rulesets.Osu.Statistics
 
         private const float rotation = 45;
 
-        private BufferedContainer bufferedGrid;
-        private GridContainer pointGrid;
+        private BufferedContainer bufferedGrid = null!;
+        private GridContainer pointGrid = null!;
 
         private readonly ScoreInfo score;
         private readonly IBeatmap playableBeatmap;
@@ -58,6 +59,8 @@ namespace osu.Game.Rulesets.Osu.Statistics
         [BackgroundDependencyLoader]
         private void load()
         {
+            const float line_extension = 0.2f;
+
             InternalChild = new Container
             {
                 Anchor = Anchor.Centre,
@@ -66,76 +69,103 @@ namespace osu.Game.Rulesets.Osu.Statistics
                 FillMode = FillMode.Fit,
                 Children = new Drawable[]
                 {
-                    new CircularContainer
-                    {
-                        Anchor = Anchor.Centre,
-                        Origin = Anchor.Centre,
-                        RelativeSizeAxes = Axes.Both,
-                        Size = new Vector2(inner_portion),
-                        Masking = true,
-                        BorderThickness = line_thickness,
-                        BorderColour = Color4.White,
-                        Child = new Box
-                        {
-                            RelativeSizeAxes = Axes.Both,
-                            Colour = Color4Extensions.FromHex("#202624")
-                        }
-                    },
                     new Container
                     {
                         RelativeSizeAxes = Axes.Both,
                         Children = new Drawable[]
                         {
+                            new CircularContainer
+                            {
+                                Anchor = Anchor.Centre,
+                                Origin = Anchor.Centre,
+                                RelativeSizeAxes = Axes.Both,
+                                Size = new Vector2(inner_portion),
+                                Masking = true,
+                                BorderThickness = line_thickness,
+                                BorderColour = Color4.White,
+                                Child = new Box
+                                {
+                                    RelativeSizeAxes = Axes.Both,
+                                    Colour = Color4Extensions.FromHex("#202624")
+                                }
+                            },
                             new Container
                             {
                                 RelativeSizeAxes = Axes.Both,
                                 Padding = new MarginPadding(1),
+                                Anchor = Anchor.Centre,
+                                Origin = Anchor.Centre,
+                                Rotation = rotation,
                                 Child = new Container
                                 {
                                     RelativeSizeAxes = Axes.Both,
-                                    Masking = true,
                                     Children = new Drawable[]
                                     {
-                                        new Box
+                                        new Circle
                                         {
                                             Anchor = Anchor.Centre,
                                             Origin = Anchor.Centre,
-                                            EdgeSmoothness = new Vector2(1),
                                             RelativeSizeAxes = Axes.Y,
-                                            Height = 2, // We're rotating along a diagonal - we don't really care how big this is.
-                                            Width = line_thickness / 2,
+                                            Width = line_thickness,
+                                            Height = inner_portion + line_extension,
+                                            Rotation = -rotation * 2,
+                                            Alpha = 0.6f,
+                                        },
+                                        new Circle
+                                        {
+                                            Anchor = Anchor.Centre,
+                                            Origin = Anchor.Centre,
+                                            RelativeSizeAxes = Axes.Y,
+                                            Width = line_thickness,
+                                            Height = inner_portion + line_extension,
+                                        },
+                                        new OsuSpriteText
+                                        {
+                                            Text = "Overshoot",
+                                            Font = OsuFont.GetFont(size: 12),
+                                            Anchor = Anchor.Centre,
+                                            Origin = Anchor.BottomLeft,
+                                            Padding = new MarginPadding(2),
                                             Rotation = -rotation,
-                                            Alpha = 0.3f,
+                                            RelativePositionAxes = Axes.Both,
+                                            Y = -(inner_portion + line_extension) / 2,
                                         },
-                                        new Box
+                                        new OsuSpriteText
+                                        {
+                                            Text = "Undershoot",
+                                            Font = OsuFont.GetFont(size: 12),
+                                            Anchor = Anchor.Centre,
+                                            Origin = Anchor.TopRight,
+                                            Rotation = -rotation,
+                                            Padding = new MarginPadding(2),
+                                            RelativePositionAxes = Axes.Both,
+                                            Y = (inner_portion + line_extension) / 2,
+                                        },
+                                        new Circle
                                         {
                                             Anchor = Anchor.Centre,
-                                            Origin = Anchor.Centre,
-                                            EdgeSmoothness = new Vector2(1),
-                                            RelativeSizeAxes = Axes.Y,
-                                            Height = 2, // We're rotating along a diagonal - we don't really care how big this is.
-                                            Width = line_thickness / 2, // adjust for edgesmoothness
-                                            Rotation = rotation
+                                            Origin = Anchor.TopCentre,
+                                            RelativePositionAxes = Axes.Both,
+                                            Y = -(inner_portion + line_extension) / 2,
+                                            Margin = new MarginPadding(-line_thickness / 2),
+                                            Width = line_thickness,
+                                            Height = 10,
+                                            Rotation = 45,
                                         },
+                                        new Circle
+                                        {
+                                            Anchor = Anchor.Centre,
+                                            Origin = Anchor.TopCentre,
+                                            RelativePositionAxes = Axes.Both,
+                                            Y = -(inner_portion + line_extension) / 2,
+                                            Margin = new MarginPadding(-line_thickness / 2),
+                                            Width = line_thickness,
+                                            Height = 10,
+                                            Rotation = -45,
+                                        }
                                     }
                                 },
                             },
-                            new Box
-                            {
-                                Anchor = Anchor.TopRight,
-                                Origin = Anchor.TopRight,
-                                Width = 10,
-                                EdgeSmoothness = new Vector2(1),
-                                Height = line_thickness / 2, // adjust for edgesmoothness
-                            },
-                            new Box
-                            {
-                                Anchor = Anchor.TopRight,
-                                Origin = Anchor.TopRight,
-                                EdgeSmoothness = new Vector2(1),
-                                Width = line_thickness / 2, // adjust for edgesmoothness
-                                Height = 10,
-                            }
                         }
                     },
                     bufferedGrid = new BufferedContainer(cachedFrameBuffer: true)
@@ -161,7 +191,7 @@ namespace osu.Game.Rulesets.Osu.Statistics
 
                 for (int c = 0; c < points_per_dimension; c++)
                 {
-                    HitPointType pointType = Vector2.Distance(new Vector2(c, r), centre) <= innerRadius
+                    HitPointType pointType = Vector2.Distance(new Vector2(c + 0.5f, r + 0.5f), centre) <= innerRadius
                         ? HitPointType.Hit
                         : HitPointType.Miss;
 
@@ -179,8 +209,7 @@ namespace osu.Game.Rulesets.Osu.Statistics
             if (score.HitEvents.Count == 0)
                 return;
 
-            // Todo: This should probably not be done like this.
-            float radius = OsuHitObject.OBJECT_RADIUS * (1.0f - 0.7f * (playableBeatmap.Difficulty.CircleSize - 5) / 5) / 2;
+            float radius = OsuHitObject.OBJECT_RADIUS * LegacyRulesetExtensions.CalculateScaleFromCircleSize(playableBeatmap.Difficulty.CircleSize, true);
 
             foreach (var e in score.HitEvents.Where(e => e.HitObject is HitCircle && !(e.HitObject is SliderTailCircle)))
             {
@@ -217,7 +246,7 @@ namespace osu.Game.Rulesets.Osu.Statistics
             // Likewise sin(pi/2)=1 and sin(3pi/2)=-1, whereas we actually want these values to appear on the bottom/top respectively, so the y-coordinate also needs to be inverted.
             //
             // We also need to apply the anti-clockwise rotation.
-            double rotatedAngle = finalAngle - MathUtils.DegreesToRadians(rotation);
+            double rotatedAngle = finalAngle - float.DegreesToRadians(rotation);
             var rotatedCoordinate = -1 * new Vector2((float)Math.Cos(rotatedAngle), (float)Math.Sin(rotatedAngle));
 
             Vector2 localCentre = new Vector2(points_per_dimension - 1) / 2;

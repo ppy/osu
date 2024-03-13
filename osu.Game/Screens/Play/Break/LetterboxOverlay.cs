@@ -1,8 +1,6 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Colour;
 using osu.Framework.Graphics.Containers;
@@ -22,29 +20,21 @@ namespace osu.Game.Screens.Play.Break
             RelativeSizeAxes = Axes.Both;
             InternalChildren = new Drawable[]
             {
-                new Container
+                new Box
                 {
                     Anchor = Anchor.TopLeft,
                     Origin = Anchor.TopLeft,
                     RelativeSizeAxes = Axes.X,
                     Height = height,
-                    Child = new Box
-                    {
-                        RelativeSizeAxes = Axes.Both,
-                        Colour = ColourInfo.GradientVertical(Color4.Black, transparent_black),
-                    }
+                    Colour = ColourInfo.GradientVertical(Color4.Black, transparent_black),
                 },
-                new Container
+                new Box
                 {
                     Anchor = Anchor.BottomLeft,
                     Origin = Anchor.BottomLeft,
                     RelativeSizeAxes = Axes.X,
                     Height = height,
-                    Child = new Box
-                    {
-                        RelativeSizeAxes = Axes.Both,
-                        Colour = ColourInfo.GradientVertical(transparent_black, Color4.Black),
-                    }
+                    Colour = ColourInfo.GradientVertical(transparent_black, Color4.Black),
                 }
             };
         }

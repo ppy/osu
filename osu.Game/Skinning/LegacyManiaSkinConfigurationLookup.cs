@@ -30,6 +30,8 @@ namespace osu.Game.Skinning
             Lookup = lookup;
             ColumnIndex = columnIndex;
         }
+
+        public override string ToString() => $"[{nameof(LegacyManiaSkinConfigurationLookup)} lookup:{Lookup} col:{ColumnIndex} totalcols:{TotalColumns}]";
     }
 
     public enum LegacyManiaSkinConfigurationLookups
@@ -54,6 +56,7 @@ namespace osu.Game.Skinning
         HoldNoteBodyImage,
         HoldNoteLightImage,
         HoldNoteLightScale,
+        WidthForNoteHeightScale,
         ExplosionImage,
         ExplosionScale,
         ColumnLineColour,
@@ -71,5 +74,7 @@ namespace osu.Game.Skinning
         Hit50,
         Hit0,
         KeysUnderNotes,
+        NoteBodyStyle,
+        LightFramePerSecond
     }
 }

@@ -15,7 +15,6 @@ using osu.Framework.Graphics.Primitives;
 using osu.Framework.Allocation;
 using System.Collections.Generic;
 using osu.Framework.Graphics.Rendering;
-using osu.Framework.Graphics.Rendering.Vertices;
 using osu.Framework.Lists;
 using osu.Framework.Bindables;
 
@@ -30,12 +29,6 @@ namespace osu.Game.Graphics.Backgrounds
         /// sqrt(3) / 2
         /// </summary>
         private const float equilateral_triangle_ratio = 0.866f;
-
-        /// <summary>
-        /// How many screen-space pixels are smoothed over.
-        /// Same behavior as Sprite's EdgeSmoothness.
-        /// </summary>
-        private const float edge_smoothness = 1;
 
         private Color4 colourLight = Color4.White;
 
@@ -84,6 +77,12 @@ namespace osu.Game.Graphics.Backgrounds
         }
 
         /// <summary>
+        /// Controls on which <see cref="Axes"/> the portion of triangles that falls within this <see cref="Drawable"/>'s
+        /// shape is drawn to the screen. Default is Axes.Both.
+        /// </summary>
+        public Axes ClampAxes { get; set; } = Axes.Both;
+
+        /// <summary>
         /// Whether we should drop-off alpha values of triangles more quickly to improve
         /// the visual appearance of fading. This defaults to on as it is generally more
         /// aesthetically pleasing, but should be turned off in buffered containers.
@@ -115,7 +114,7 @@ namespace osu.Game.Graphics.Backgrounds
         private void load(IRenderer renderer, ShaderManager shaders)
         {
             texture = renderer.WhitePixel;
-            shader = shaders.Load(VertexShaderDescriptor.TEXTURE_2, FragmentShaderDescriptor.TEXTURE);
+            shader = shaders.Load(VertexShaderDescriptor.TEXTURE_2, "TriangleBorder");
         }
 
         protected override void LoadComplete()
@@ -252,15 +251,18 @@ namespace osu.Game.Graphics.Backgrounds
 
         private class TrianglesDrawNode : DrawNode
         {
+            private const float fill = 1f;
+
             protected new Triangles Source => (Triangles)base.Source;
 
             private IShader shader;
             private Texture texture;
+            private Axes clampAxes;
 
             private readonly List<TriangleParticle> parts = new List<TriangleParticle>();
-            private Vector2 size;
+            private readonly Vector2 triangleSize = new Vector2(1f, equilateral_triangle_ratio) * triangle_size;
 
-            private IVertexBatch<TexturedVertex2D> vertexBatch;
+            private Vector2 size;
 
             public TrianglesDrawNode(Triangles source)
                 : base(source)
@@ -274,55 +276,85 @@ namespace osu.Game.Graphics.Backgrounds
                 shader = Source.shader;
                 texture = Source.texture;
                 size = Source.DrawSize;
+                clampAxes = Source.ClampAxes;
 
                 parts.Clear();
                 parts.AddRange(Source.parts);
             }
 
-            public override void Draw(IRenderer renderer)
+            private IUniformBuffer<TriangleBorderData> borderDataBuffer;
+
+            protected override void Draw(IRenderer renderer)
             {
                 base.Draw(renderer);
 
-                if (Source.AimCount > 0 && (vertexBatch == null || vertexBatch.Size != Source.AimCount))
+                borderDataBuffer ??= renderer.CreateUniformBuffer<TriangleBorderData>();
+                borderDataBuffer.Data = borderDataBuffer.Data with
                 {
-                    vertexBatch?.Dispose();
-                    vertexBatch = renderer.CreateQuadBatch<TexturedVertex2D>(Source.AimCount, 1);
-                }
+                    Thickness = fill,
+                    // Due to triangles having various sizes we would need to set a different "TexelSize" value for each of them, which is insanely expensive, thus we should use one single value.
+                    // TexelSize computed for an average triangle (size 100) will result in big triangles becoming blurry, so we may just use 0 for all of them.
+                    TexelSize = 0
+                };
 
                 shader.Bind();
-
-                Vector2 localInflationAmount = edge_smoothness * DrawInfo.MatrixInverse.ExtractScale().Xy;
+                shader.BindUniformBlock(@"m_BorderData", borderDataBuffer);
 
                 foreach (TriangleParticle particle in parts)
                 {
-                    var offset = triangle_size * new Vector2(particle.Scale * 0.5f, particle.Scale * equilateral_triangle_ratio);
+                    Vector2 relativeSize = Vector2.Divide(triangleSize * particle.Scale, size);
 
-                    var triangle = new Triangle(
-                        Vector2Extensions.Transform(particle.Position * size, DrawInfo.Matrix),
-                        Vector2Extensions.Transform(particle.Position * size + offset, DrawInfo.Matrix),
-                        Vector2Extensions.Transform(particle.Position * size + new Vector2(-offset.X, offset.Y), DrawInfo.Matrix)
+                    Vector2 topLeft = particle.Position - new Vector2(relativeSize.X * 0.5f, 0f);
+
+                    Quad triangleQuad = getClampedQuad(clampAxes, topLeft, relativeSize);
+
+                    var drawQuad = new Quad(
+                        Vector2Extensions.Transform(triangleQuad.TopLeft * size, DrawInfo.Matrix),
+                        Vector2Extensions.Transform(triangleQuad.TopRight * size, DrawInfo.Matrix),
+                        Vector2Extensions.Transform(triangleQuad.BottomLeft * size, DrawInfo.Matrix),
+                        Vector2Extensions.Transform(triangleQuad.BottomRight * size, DrawInfo.Matrix)
                     );
 
                     ColourInfo colourInfo = DrawColourInfo.Colour;
                     colourInfo.ApplyChild(particle.Colour);
 
-                    renderer.DrawTriangle(
-                        texture,
-                        triangle,
-                        colourInfo,
-                        null,
-                        vertexBatch.AddAction,
-                        Vector2.Divide(localInflationAmount, new Vector2(2 * offset.X, offset.Y)));
+                    RectangleF textureCoords = new RectangleF(
+                        triangleQuad.TopLeft.X - topLeft.X,
+                        triangleQuad.TopLeft.Y - topLeft.Y,
+                        triangleQuad.Width,
+                        triangleQuad.Height
+                    ) / relativeSize;
+
+                    renderer.DrawQuad(texture, drawQuad, colourInfo, new RectangleF(0, 0, 1, 1), textureCoords: textureCoords);
                 }
 
                 shader.Unbind();
+            }
+
+            private static Quad getClampedQuad(Axes clampAxes, Vector2 topLeft, Vector2 size)
+            {
+                Vector2 clampedTopLeft = topLeft;
+
+                if (clampAxes == Axes.X || clampAxes == Axes.Both)
+                {
+                    clampedTopLeft.X = Math.Clamp(topLeft.X, 0f, 1f);
+                    size.X = Math.Clamp(topLeft.X + size.X, 0f, 1f) - clampedTopLeft.X;
+                }
+
+                if (clampAxes == Axes.Y || clampAxes == Axes.Both)
+                {
+                    clampedTopLeft.Y = Math.Clamp(topLeft.Y, 0f, 1f);
+                    size.Y = Math.Clamp(topLeft.Y + size.Y, 0f, 1f) - clampedTopLeft.Y;
+                }
+
+                return new Quad(clampedTopLeft.X, clampedTopLeft.Y, size.X, size.Y);
             }
 
             protected override void Dispose(bool isDisposing)
             {
                 base.Dispose(isDisposing);
 
-                vertexBatch?.Dispose();
+                borderDataBuffer?.Dispose();
             }
         }
 

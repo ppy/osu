@@ -1,13 +1,13 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
 using System.Linq;
 using NUnit.Framework;
+using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.ControlPoints;
+using osu.Game.Configuration;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Osu.Objects;
 using osu.Game.Rulesets.Osu.Objects.Drawables;
@@ -22,6 +22,9 @@ namespace osu.Game.Rulesets.Osu.Tests
     {
         private int depthIndex;
 
+        [Resolved]
+        private OsuConfigManager config { get; set; } = null!;
+
         [Test]
         public void TestHits()
         {
@@ -31,6 +34,7 @@ namespace osu.Game.Rulesets.Osu.Tests
             AddStep("Hit Big Stream", () => SetContents(_ => testStream(2, true)));
             AddStep("Hit Medium Stream", () => SetContents(_ => testStream(5, true)));
             AddStep("Hit Small Stream", () => SetContents(_ => testStream(7, true)));
+            AddStep("High combo index", () => SetContents(_ => testSingle(2, true, comboIndex: 15)));
         }
 
         [Test]
@@ -56,12 +60,19 @@ namespace osu.Game.Rulesets.Osu.Tests
             AddStep("Hit stream late", () => SetContents(_ => testStream(5, true, 150)));
         }
 
-        private Drawable testSingle(float circleSize, bool auto = false, double timeOffset = 0, Vector2? positionOffset = null)
+        [Test]
+        public void TestHitLighting()
+        {
+            AddToggleStep("toggle hit lighting", v => config.SetValue(OsuSetting.HitLighting, v));
+            AddStep("Hit Big Single", () => SetContents(_ => testSingle(2, true)));
+        }
+
+        private Drawable testSingle(float circleSize, bool auto = false, double timeOffset = 0, Vector2? positionOffset = null, int comboIndex = 0)
         {
             var playfield = new TestOsuPlayfield();
 
             for (double t = timeOffset; t < timeOffset + 60000; t += 2000)
-                playfield.Add(createSingle(circleSize, auto, t, positionOffset));
+                playfield.Add(createSingle(circleSize, auto, t, positionOffset, comboIndex: comboIndex));
 
             return playfield;
         }
@@ -74,14 +85,14 @@ namespace osu.Game.Rulesets.Osu.Tests
 
             for (int i = 0; i <= 1000; i += 100)
             {
-                playfield.Add(createSingle(circleSize, auto, i, pos, hitOffset));
+                playfield.Add(createSingle(circleSize, auto, i, pos, hitOffset, i / 100 - 1));
                 pos.X += 50;
             }
 
             return playfield;
         }
 
-        private TestDrawableHitCircle createSingle(float circleSize, bool auto, double timeOffset, Vector2? positionOffset, double hitOffset = 0)
+        private TestDrawableHitCircle createSingle(float circleSize, bool auto, double timeOffset, Vector2? positionOffset, double hitOffset = 0, int comboIndex = 0)
         {
             positionOffset ??= Vector2.Zero;
 
@@ -89,6 +100,7 @@ namespace osu.Game.Rulesets.Osu.Tests
             {
                 StartTime = Time.Current + 1000 + timeOffset,
                 Position = OsuPlayfield.BASE_SIZE / 4 + positionOffset.Value,
+                IndexInCurrentCombo = comboIndex,
             };
 
             circle.ApplyDefaults(new ControlPointInfo(), new BeatmapDifficulty { CircleSize = circleSize });
@@ -121,10 +133,10 @@ namespace osu.Game.Rulesets.Osu.Tests
 
             protected override void CheckForResult(bool userTriggered, double timeOffset)
             {
-                if (auto && !userTriggered && timeOffset > hitOffset && CheckHittable?.Invoke(this, Time.Current) != false)
+                if (auto && !userTriggered && timeOffset > hitOffset && CheckHittable?.Invoke(this, Time.Current, HitResult.Great) == ClickAction.Hit)
                 {
                     // force success
-                    ApplyResult(r => r.Type = HitResult.Great);
+                    ApplyResult(HitResult.Great);
                 }
                 else
                     base.CheckForResult(userTriggered, timeOffset);

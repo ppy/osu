@@ -1,7 +1,5 @@
-// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
-
-#nullable disable
 
 using NUnit.Framework;
 using osu.Framework.Allocation;
@@ -10,14 +8,16 @@ using osu.Game.Rulesets.Osu;
 using osu.Game.Rulesets.Scoring;
 using osu.Game.Screens.Play.HUD;
 using osu.Game.Skinning;
+using osu.Game.Tests.Gameplay;
 
 namespace osu.Game.Tests.Visual.Gameplay
 {
     public partial class TestSceneSkinnableScoreCounter : SkinnableHUDComponentTestScene
     {
-        [Cached]
-        private ScoreProcessor scoreProcessor = new ScoreProcessor(new OsuRuleset());
+        [Cached(typeof(ScoreProcessor))]
+        private ScoreProcessor scoreProcessor = TestGameplayState.Create(new OsuRuleset()).ScoreProcessor;
 
+        protected override Drawable CreateArgonImplementation() => new ArgonScoreCounter();
         protected override Drawable CreateDefaultImplementation() => new DefaultScoreCounter();
         protected override Drawable CreateLegacyImplementation() => new LegacyScoreCounter();
 

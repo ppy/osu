@@ -28,7 +28,7 @@ namespace osu.Game.Graphics.Containers
 
     public partial class OsuScrollContainer<T> : ScrollContainer<T> where T : Drawable
     {
-        public const float SCROLL_BAR_HEIGHT = 10;
+        public const float SCROLL_BAR_WIDTH = 10;
         public const float SCROLL_BAR_PADDING = 3;
 
         /// <summary>
@@ -43,9 +43,6 @@ namespace osu.Game.Graphics.Containers
         public double DistanceDecayOnRightMouseScrollbar = 0.02;
 
         private bool shouldPerformRightMouseScroll(MouseButtonEvent e) => RightMouseScrollbar && e.Button == MouseButton.Right;
-
-        private void scrollFromMouseEvent(MouseEvent e) =>
-            ScrollTo(Clamp(ToLocalSpace(e.ScreenSpaceMousePosition)[ScrollDim] / DrawSize[ScrollDim]) * Content.DrawSize[ScrollDim], true, DistanceDecayOnRightMouseScrollbar);
 
         private bool rightMouseDragging;
 
@@ -80,7 +77,7 @@ namespace osu.Game.Graphics.Containers
         {
             if (shouldPerformRightMouseScroll(e))
             {
-                scrollFromMouseEvent(e);
+                ScrollFromMouseEvent(e);
                 return true;
             }
 
@@ -91,7 +88,7 @@ namespace osu.Game.Graphics.Containers
         {
             if (rightMouseDragging)
             {
-                scrollFromMouseEvent(e);
+                ScrollFromMouseEvent(e);
                 return;
             }
 
@@ -129,6 +126,9 @@ namespace osu.Game.Graphics.Containers
             return base.OnScroll(e);
         }
 
+        protected virtual void ScrollFromMouseEvent(MouseEvent e) =>
+            ScrollTo(Clamp(ToLocalSpace(e.ScreenSpaceMousePosition)[ScrollDim] / DrawSize[ScrollDim] * Content.DrawSize[ScrollDim]), true, DistanceDecayOnRightMouseScrollbar);
+
         protected override ScrollbarContainer CreateScrollbar(Direction direction) => new OsuScrollbar(direction);
 
         protected partial class OsuScrollbar : ScrollbarContainer
@@ -139,6 +139,8 @@ namespace osu.Game.Graphics.Containers
 
             private readonly Box box;
 
+            protected override float MinimumDimSize => SCROLL_BAR_WIDTH * 3;
+
             public OsuScrollbar(Direction scrollDir)
                 : base(scrollDir)
             {
@@ -147,7 +149,7 @@ namespace osu.Game.Graphics.Containers
                 CornerRadius = 5;
 
                 // needs to be set initially for the ResizeTo to respect minimum size
-                Size = new Vector2(SCROLL_BAR_HEIGHT);
+                Size = new Vector2(SCROLL_BAR_WIDTH);
 
                 const float margin = 3;
 
@@ -173,11 +175,10 @@ namespace osu.Game.Graphics.Containers
 
             public override void ResizeTo(float val, int duration = 0, Easing easing = Easing.None)
             {
-                Vector2 size = new Vector2(SCROLL_BAR_HEIGHT)
+                this.ResizeTo(new Vector2(SCROLL_BAR_WIDTH)
                 {
                     [(int)ScrollDirection] = val
-                };
-                this.ResizeTo(size, duration, easing);
+                }, duration, easing);
             }
 
             protected override bool OnHover(HoverEvent e)

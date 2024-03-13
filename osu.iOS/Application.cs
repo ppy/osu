@@ -1,9 +1,7 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
-using UIKit;
+using osu.Framework.iOS;
 
 namespace osu.iOS
 {
@@ -11,7 +9,7 @@ namespace osu.iOS
     {
         public static void Main(string[] args)
         {
-            UIApplication.Main(args, null, typeof(AppDelegate));
+            GameApplication.Main(new OsuGameIOS());
         }
     }
 }

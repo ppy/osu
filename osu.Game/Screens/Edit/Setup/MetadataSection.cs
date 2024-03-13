@@ -1,8 +1,6 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
 using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics.UserInterface;
@@ -16,16 +14,16 @@ namespace osu.Game.Screens.Edit.Setup
 {
     public partial class MetadataSection : SetupSection
     {
-        protected LabelledTextBox ArtistTextBox;
-        protected LabelledTextBox RomanisedArtistTextBox;
+        protected LabelledTextBox ArtistTextBox = null!;
+        protected LabelledTextBox RomanisedArtistTextBox = null!;
 
-        protected LabelledTextBox TitleTextBox;
-        protected LabelledTextBox RomanisedTitleTextBox;
+        protected LabelledTextBox TitleTextBox = null!;
+        protected LabelledTextBox RomanisedTitleTextBox = null!;
 
-        private LabelledTextBox creatorTextBox;
-        private LabelledTextBox difficultyTextBox;
-        private LabelledTextBox sourceTextBox;
-        private LabelledTextBox tagsTextBox;
+        private LabelledTextBox creatorTextBox = null!;
+        private LabelledTextBox difficultyTextBox = null!;
+        private LabelledTextBox sourceTextBox = null!;
+        private LabelledTextBox tagsTextBox = null!;
 
         public override LocalisableString Title => EditorSetupStrings.MetadataHeader;
 

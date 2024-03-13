@@ -1,10 +1,7 @@
-﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
 using System;
-using JetBrains.Annotations;
 using osuTK;
 using osuTK.Graphics;
 using osu.Framework.Allocation;
@@ -23,16 +20,16 @@ namespace osu.Game.Graphics.UserInterface
     {
         public const float HEIGHT = 15;
 
-        public const float EXPANDED_SIZE = 50;
+        public const float DEFAULT_EXPANDED_SIZE = 50;
 
         private const float border_width = 3;
 
         private readonly Box fill;
         private readonly Container main;
 
-        public Nub()
+        public Nub(float expandedSize = DEFAULT_EXPANDED_SIZE)
         {
-            Size = new Vector2(EXPANDED_SIZE, HEIGHT);
+            Size = new Vector2(expandedSize, HEIGHT);
 
             InternalChildren = new[]
             {
@@ -58,7 +55,7 @@ namespace osu.Game.Graphics.UserInterface
         }
 
         [BackgroundDependencyLoader(true)]
-        private void load([CanBeNull] OverlayColourProvider colourProvider, OsuColour colours)
+        private void load(OverlayColourProvider? colourProvider, OsuColour colours)
         {
             AccentColour = colourProvider?.Highlight1 ?? colours.Pink;
             GlowingAccentColour = colourProvider?.Highlight1.Lighten(0.2f) ?? colours.PinkLighter;

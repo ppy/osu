@@ -9,6 +9,7 @@ using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Localisation;
 using osu.Game.Graphics;
+using osu.Game.Graphics.Backgrounds;
 using osu.Game.Graphics.Containers;
 using osuTK;
 using osuTK.Graphics;
@@ -27,7 +28,14 @@ namespace osu.Game.Overlays.Mods
         public Color4 AccentColour
         {
             get => headerBackground.Colour;
-            set => headerBackground.Colour = value;
+            set
+            {
+                headerBackground.Colour = value;
+
+                var hsv = new Colour4(value.R, value.G, value.B, 1f).ToHSV();
+                var trianglesColour = Colour4.FromHSV(hsv.X, hsv.Y + 0.2f, hsv.Z - 0.1f);
+                triangles.Colour = ColourInfo.GradientVertical(trianglesColour, value);
+            }
         }
 
         /// <summary>
@@ -35,21 +43,29 @@ namespace osu.Game.Overlays.Mods
         /// </summary>
         public readonly Bindable<bool> Active = new BindableBool(true);
 
+        public string SearchTerm
+        {
+            set => ItemsFlow.SearchTerm = value;
+        }
+
         protected override bool ReceivePositionalInputAtSubTree(Vector2 screenSpacePos) => base.ReceivePositionalInputAtSubTree(screenSpacePos) && Active.Value;
 
         protected readonly Container ControlContainer;
-        protected readonly FillFlowContainer ItemsFlow;
+        protected readonly ModSearchContainer ItemsFlow;
 
         private readonly TextFlowContainer headerText;
         private readonly Box headerBackground;
         private readonly Container contentContainer;
         private readonly Box contentBackground;
+        private readonly TrianglesV2 triangles;
 
         private const float header_height = 42;
 
+        protected const float WIDTH = 320;
+
         protected ModSelectColumn()
         {
-            Width = 320;
+            Width = WIDTH;
             RelativeSizeAxes = Axes.Y;
             Shear = new Vector2(ShearedOverlayContainer.SHEAR, 0);
 
@@ -72,6 +88,14 @@ namespace osu.Game.Overlays.Mods
                                 {
                                     RelativeSizeAxes = Axes.X,
                                     Height = header_height + ModSelectPanel.CORNER_RADIUS
+                                },
+                                triangles = new TrianglesV2
+                                {
+                                    RelativeSizeAxes = Axes.X,
+                                    Height = header_height,
+                                    Shear = new Vector2(-ShearedOverlayContainer.SHEAR, 0),
+                                    Velocity = 0.7f,
+                                    ClampAxes = Axes.Y
                                 },
                                 headerText = new OsuTextFlowContainer(t =>
                                 {
@@ -134,7 +158,7 @@ namespace osu.Game.Overlays.Mods
                                                     RelativeSizeAxes = Axes.Both,
                                                     ClampExtension = 100,
                                                     ScrollbarOverlapsContent = false,
-                                                    Child = ItemsFlow = new FillFlowContainer
+                                                    Child = ItemsFlow = new ModSearchContainer
                                                     {
                                                         RelativeSizeAxes = Axes.X,
                                                         AutoSizeAxes = Axes.Y,

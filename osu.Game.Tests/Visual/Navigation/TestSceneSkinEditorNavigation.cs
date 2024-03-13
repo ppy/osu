@@ -5,18 +5,25 @@
 
 using System.Linq;
 using NUnit.Framework;
+using osu.Framework.Allocation;
 using osu.Framework.Extensions;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.UserInterface;
+using osu.Framework.Input;
 using osu.Framework.Screens;
 using osu.Framework.Testing;
 using osu.Framework.Threading;
+using osu.Game.Online.API;
+using osu.Game.Beatmaps;
 using osu.Game.Overlays.Settings;
+using osu.Game.Overlays.SkinEditor;
 using osu.Game.Rulesets.Mods;
+using osu.Game.Rulesets.Osu;
 using osu.Game.Rulesets.Osu.Mods;
+using osu.Game.Screens.Edit.Components;
 using osu.Game.Screens.Play;
 using osu.Game.Screens.Play.HUD.HitErrorMeters;
-using osu.Game.Skinning.Editor;
+using osu.Game.Skinning;
 using osu.Game.Tests.Beatmaps.IO;
 using osuTK;
 using osuTK.Input;
@@ -30,10 +37,13 @@ namespace osu.Game.Tests.Visual.Navigation
         private SkinEditor skinEditor => Game.ChildrenOfType<SkinEditor>().FirstOrDefault();
 
         [Test]
-        public void TestEditComponentDuringGameplay()
+        public void TestEditComponentFromGameplayScene()
         {
             advanceToSongSelect();
             openSkinEditor();
+
+            AddStep("import beatmap", () => BeatmapImportHelper.LoadQuickOszIntoOsu(Game).WaitSafely());
+            AddUntilStep("wait for selected", () => !Game.Beatmap.IsDefault);
 
             switchToGameplayScene();
 
@@ -69,10 +79,36 @@ namespace osu.Game.Tests.Visual.Navigation
         }
 
         [Test]
+        public void TestMutateProtectedSkinDuringGameplay()
+        {
+            advanceToSongSelect();
+            AddStep("set default skin", () => Game.Dependencies.Get<SkinManager>().CurrentSkinInfo.SetDefault());
+
+            AddStep("import beatmap", () => BeatmapImportHelper.LoadQuickOszIntoOsu(Game).WaitSafely());
+            AddUntilStep("wait for selected", () => !Game.Beatmap.IsDefault);
+
+            AddStep("enable NF", () => Game.SelectedMods.Value = new[] { new OsuModNoFail() });
+            AddStep("enter gameplay", () => InputManager.Key(Key.Enter));
+
+            AddUntilStep("wait for player", () =>
+            {
+                DismissAnyNotifications();
+                return Game.ScreenStack.CurrentScreen is Player;
+            });
+
+            openSkinEditor();
+            AddUntilStep("current skin is mutable", () => !Game.Dependencies.Get<SkinManager>().CurrentSkin.Value.SkinInfo.Value.Protected);
+        }
+
+        [Test]
         public void TestComponentsDeselectedOnSkinEditorHide()
         {
             advanceToSongSelect();
             openSkinEditor();
+
+            AddStep("import beatmap", () => BeatmapImportHelper.LoadQuickOszIntoOsu(Game).WaitSafely());
+            AddUntilStep("wait for selected", () => !Game.Beatmap.IsDefault);
+
             switchToGameplayScene();
 
             AddUntilStep("wait for components", () => skinEditor.ChildrenOfType<SkinBlueprint>().Any());
@@ -137,6 +173,9 @@ namespace osu.Game.Tests.Visual.Navigation
             openSkinEditor();
             AddStep("select DT", () => Game.SelectedMods.Value = new Mod[] { new OsuModDoubleTime() });
 
+            AddStep("import beatmap", () => BeatmapImportHelper.LoadQuickOszIntoOsu(Game).WaitSafely());
+            AddUntilStep("wait for selected", () => !Game.Beatmap.IsDefault);
+
             switchToGameplayScene();
 
             AddAssert("DT still selected", () => ((Player)Game.ScreenStack.CurrentScreen).Mods.Value.Single() is OsuModDoubleTime);
@@ -147,7 +186,10 @@ namespace osu.Game.Tests.Visual.Navigation
         {
             advanceToSongSelect();
             openSkinEditor();
-            AddStep("select no fail and spun out", () => Game.SelectedMods.Value = new Mod[] { new OsuModNoFail(), new OsuModSpunOut() });
+            AddStep("select relax and spun out", () => Game.SelectedMods.Value = new Mod[] { new OsuModRelax(), new OsuModSpunOut() });
+
+            AddStep("import beatmap", () => BeatmapImportHelper.LoadQuickOszIntoOsu(Game).WaitSafely());
+            AddUntilStep("wait for selected", () => !Game.Beatmap.IsDefault);
 
             switchToGameplayScene();
 
@@ -161,6 +203,9 @@ namespace osu.Game.Tests.Visual.Navigation
             openSkinEditor();
             AddStep("select autoplay", () => Game.SelectedMods.Value = new Mod[] { new OsuModAutoplay() });
 
+            AddStep("import beatmap", () => BeatmapImportHelper.LoadQuickOszIntoOsu(Game).WaitSafely());
+            AddUntilStep("wait for selected", () => !Game.Beatmap.IsDefault);
+
             switchToGameplayScene();
 
             AddAssert("no mod selected", () => !((Player)Game.ScreenStack.CurrentScreen).Mods.Value.Any());
@@ -172,6 +217,9 @@ namespace osu.Game.Tests.Visual.Navigation
             advanceToSongSelect();
             openSkinEditor();
             AddStep("select cinema", () => Game.SelectedMods.Value = new Mod[] { new OsuModCinema() });
+
+            AddStep("import beatmap", () => BeatmapImportHelper.LoadQuickOszIntoOsu(Game).WaitSafely());
+            AddUntilStep("wait for selected", () => !Game.Beatmap.IsDefault);
 
             switchToGameplayScene();
 
@@ -186,6 +234,91 @@ namespace osu.Game.Tests.Visual.Navigation
 
             openSkinEditor();
             AddUntilStep("mod overlay closed", () => songSelect.ModSelectOverlay.State.Value == Visibility.Hidden);
+        }
+
+        [Test]
+        public void TestChangeToNonSkinnableScreen()
+        {
+            advanceToSongSelect();
+            openSkinEditor();
+            AddAssert("blueprint container present", () => skinEditor.ChildrenOfType<SkinBlueprintContainer>().Count(), () => Is.EqualTo(1));
+            AddAssert("placeholder not present", () => skinEditor.ChildrenOfType<NonSkinnableScreenPlaceholder>().Count(), () => Is.Zero);
+            AddAssert("editor sidebars not empty", () => skinEditor.ChildrenOfType<EditorSidebar>().SelectMany(sidebar => sidebar.Children).Count(), () => Is.GreaterThan(0));
+
+            AddStep("add skinnable component", () =>
+            {
+                skinEditor.ChildrenOfType<SkinComponentToolbox.ToolboxComponentButton>().First().TriggerClick();
+            });
+            AddUntilStep("newly added component selected", () => skinEditor.SelectedComponents, () => Has.Count.EqualTo(1));
+
+            AddStep("exit to main menu", () => Game.ScreenStack.CurrentScreen.Exit());
+            AddAssert("selection cleared", () => skinEditor.SelectedComponents, () => Has.Count.Zero);
+            AddAssert("blueprint container not present", () => skinEditor.ChildrenOfType<SkinBlueprintContainer>().Count(), () => Is.Zero);
+            AddAssert("placeholder present", () => skinEditor.ChildrenOfType<NonSkinnableScreenPlaceholder>().Count(), () => Is.EqualTo(1));
+            AddAssert("editor sidebars empty", () => skinEditor.ChildrenOfType<EditorSidebar>().SelectMany(sidebar => sidebar.Children).Count(), () => Is.Zero);
+
+            advanceToSongSelect();
+            AddAssert("blueprint container present", () => skinEditor.ChildrenOfType<SkinBlueprintContainer>().Count(), () => Is.EqualTo(1));
+            AddAssert("placeholder not present", () => skinEditor.ChildrenOfType<NonSkinnableScreenPlaceholder>().Count(), () => Is.Zero);
+            AddAssert("editor sidebars not empty", () => skinEditor.ChildrenOfType<EditorSidebar>().SelectMany(sidebar => sidebar.Children).Count(), () => Is.GreaterThan(0));
+        }
+
+        [Test]
+        public void TestOpenSkinEditorGameplaySceneOnBeatmapWithNoObjects()
+        {
+            AddStep("set dummy beatmap", () => Game.Beatmap.SetDefault());
+            advanceToSongSelect();
+
+            AddStep("create empty beatmap", () => Game.BeatmapManager.CreateNew(new OsuRuleset().RulesetInfo, new GuestUser()));
+            AddUntilStep("wait for selected", () => !Game.Beatmap.IsDefault);
+
+            openSkinEditor();
+            switchToGameplayScene();
+        }
+
+        [Test]
+        public void TestOpenSkinEditorGameplaySceneWhenDummyBeatmapActive()
+        {
+            AddStep("set dummy beatmap", () => Game.Beatmap.SetDefault());
+
+            openSkinEditor();
+        }
+
+        [TestCase(1)]
+        [TestCase(2)]
+        [TestCase(3)]
+        public void TestOpenSkinEditorGameplaySceneWhenDifferentRulesetActive(int rulesetId)
+        {
+            BeatmapSetInfo beatmapSet = null!;
+
+            AddStep("import beatmap", () => beatmapSet = BeatmapImportHelper.LoadQuickOszIntoOsu(Game).GetResultSafely());
+            AddStep($"select difficulty for ruleset w/ ID {rulesetId}", () =>
+            {
+                var beatmap = beatmapSet.Beatmaps.First(b => b.Ruleset.OnlineID == rulesetId);
+                Game.Beatmap.Value = Game.BeatmapManager.GetWorkingBeatmap(beatmap);
+            });
+
+            openSkinEditor();
+            switchToGameplayScene();
+        }
+
+        [Test]
+        public void TestRulesetInputDisabledWhenSkinEditorOpen()
+        {
+            advanceToSongSelect();
+            openSkinEditor();
+
+            AddStep("import beatmap", () => BeatmapImportHelper.LoadQuickOszIntoOsu(Game).WaitSafely());
+            AddUntilStep("wait for selected", () => !Game.Beatmap.IsDefault);
+
+            switchToGameplayScene();
+            AddUntilStep("nested input disabled", () => ((Player)Game.ScreenStack.CurrentScreen).ChildrenOfType<PassThroughInputManager>().All(manager => !manager.UseParentInput));
+
+            toggleSkinEditor();
+            AddUntilStep("nested input enabled", () => ((Player)Game.ScreenStack.CurrentScreen).ChildrenOfType<PassThroughInputManager>().Any(manager => manager.UseParentInput));
+
+            toggleSkinEditor();
+            AddUntilStep("nested input disabled", () => ((Player)Game.ScreenStack.CurrentScreen).ChildrenOfType<PassThroughInputManager>().All(manager => !manager.UseParentInput));
         }
 
         private void advanceToSongSelect()
@@ -214,12 +347,9 @@ namespace osu.Game.Tests.Visual.Navigation
 
         private void switchToGameplayScene()
         {
-            AddStep("import beatmap", () => BeatmapImportHelper.LoadQuickOszIntoOsu(Game).WaitSafely());
-            AddUntilStep("wait for selected", () => !Game.Beatmap.IsDefault);
-
             AddStep("Click gameplay scene button", () =>
             {
-                InputManager.MoveMouseTo(skinEditor.ChildrenOfType<SkinEditorSceneLibrary.SceneButton>().First(b => b.Text == "Gameplay"));
+                InputManager.MoveMouseTo(skinEditor.ChildrenOfType<SkinEditorSceneLibrary.SceneButton>().First(b => b.Text.ToString() == "Gameplay"));
                 InputManager.Click(MouseButton.Left);
             });
 

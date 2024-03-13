@@ -31,17 +31,24 @@ namespace osu.Game.Tests.Skins
         [Resolved]
         private SkinManager skins { get; set; } = null!;
 
-        private ISkin skin = null!;
-
-        [BackgroundDependencyLoader]
-        private void load()
+        [Test]
+        public void TestRetrieveOggSample()
         {
-            var imported = skins.Import(new ImportTask(TestResources.OpenResource("Archives/ogg-skin.osk"), "ogg-skin.osk")).GetResultSafely();
-            skin = imported.PerformRead(skinInfo => skins.GetSkin(skinInfo));
+            ISkin skin = null!;
+
+            AddStep("import skin", () => skin = importSkinFromArchives(@"ogg-skin.osk"));
+            AddAssert("sample is non-null", () => skin.GetSample(new SampleInfo(@"sample")) != null);
         }
 
         [Test]
-        public void TestRetrieveOggSample() => AddAssert("sample is non-null", () => skin.GetSample(new SampleInfo("sample")) != null);
+        public void TestRetrievalWithConflictingFilenames()
+        {
+            ISkin skin = null!;
+
+            AddStep("import skin", () => skin = importSkinFromArchives(@"conflicting-filenames-skin.osk"));
+            AddAssert("texture is non-null", () => skin.GetTexture(@"spinner-osu") != null);
+            AddAssert("sample is non-null", () => skin.GetSample(new SampleInfo(@"spinner-osu")) != null);
+        }
 
         [Test]
         public void TestSampleRetrievalOrder()
@@ -78,12 +85,18 @@ namespace osu.Game.Tests.Skins
             });
         }
 
+        private Skin importSkinFromArchives(string filename)
+        {
+            var imported = skins.Import(new ImportTask(TestResources.OpenResource($@"Archives/{filename}"), filename)).GetResultSafely();
+            return imported.PerformRead(skinInfo => skins.GetSkin(skinInfo));
+        }
+
         private class TestSkin : Skin
         {
             public const string SAMPLE_NAME = "test-sample";
 
-            public TestSkin(SkinInfo skin, IStorageResourceProvider? resources, IResourceStore<byte[]>? storage = null, string configurationFilename = "skin.ini")
-                : base(skin, resources, storage, configurationFilename)
+            public TestSkin(SkinInfo skin, IStorageResourceProvider? resources, IResourceStore<byte[]>? fallbackStore = null, string configurationFilename = "skin.ini")
+                : base(skin, resources, fallbackStore, configurationFilename)
             {
             }
 

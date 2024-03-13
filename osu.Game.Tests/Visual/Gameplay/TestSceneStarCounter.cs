@@ -1,10 +1,9 @@
-// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
-
-#nullable disable
 
 using NUnit.Framework;
 using osu.Framework.Graphics;
+using osu.Framework.Graphics.Containers;
 using osu.Framework.Utils;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Graphics.UserInterface;
@@ -16,39 +15,47 @@ namespace osu.Game.Tests.Visual.Gameplay
     public partial class TestSceneStarCounter : OsuTestScene
     {
         private readonly StarCounter starCounter;
+        private readonly StarCounter twentyStarCounter;
         private readonly OsuSpriteText starsLabel;
 
         public TestSceneStarCounter()
         {
-            starCounter = new StarCounter
+            Add(new FillFlowContainer
             {
-                Origin = Anchor.Centre,
+                AutoSizeAxes = Axes.Both,
                 Anchor = Anchor.Centre,
-            };
-
-            Add(starCounter);
-
-            starsLabel = new OsuSpriteText
-            {
                 Origin = Anchor.Centre,
-                Anchor = Anchor.Centre,
-                Scale = new Vector2(2),
-                Y = 50,
-            };
-
-            Add(starsLabel);
+                Direction = FillDirection.Vertical,
+                Spacing = new Vector2(20),
+                Children = new Drawable[]
+                {
+                    starCounter = new StarCounter(),
+                    twentyStarCounter = new StarCounter(20),
+                    starsLabel = new OsuSpriteText
+                    {
+                        Anchor = Anchor.TopCentre,
+                        Origin = Anchor.TopCentre,
+                        Scale = new Vector2(2),
+                    },
+                }
+            });
 
             setStars(5);
 
-            AddRepeatStep("random value", () => setStars(RNG.NextSingle() * (starCounter.StarCount + 1)), 10);
-            AddSliderStep("exact value", 0f, 10f, 5f, setStars);
-            AddStep("stop animation", () => starCounter.StopAnimation());
+            AddRepeatStep("random value", () => setStars(RNG.NextSingle() * (twentyStarCounter.StarCount + 1)), 10);
+            AddSliderStep("exact value", 0f, 20f, 5f, setStars);
+            AddStep("stop animation", () =>
+            {
+                starCounter.StopAnimation();
+                twentyStarCounter.StopAnimation();
+            });
             AddStep("reset", () => setStars(0));
         }
 
         private void setStars(float stars)
         {
             starCounter.Current = stars;
+            twentyStarCounter.Current = stars;
             starsLabel.Text = starCounter.Current.ToString("0.00");
         }
     }

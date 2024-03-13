@@ -53,6 +53,7 @@ namespace osu.Game.Rulesets.Catch.Objects.Drawables
             XOffsetBindable.UnbindFrom(HitObject.XOffsetBindable);
         }
 
+        [CanBeNull]
         public Func<CatchHitObject, bool> CheckPosition;
 
         protected override JudgementResult CreateResult(Judgement judgement) => new CatchJudgementResult(HitObject, judgement);
@@ -62,7 +63,12 @@ namespace osu.Game.Rulesets.Catch.Objects.Drawables
             if (CheckPosition == null) return;
 
             if (timeOffset >= 0 && Result != null)
-                ApplyResult(r => r.Type = CheckPosition.Invoke(HitObject) ? r.Judgement.MaxResult : r.Judgement.MinResult);
+            {
+                if (CheckPosition.Invoke(HitObject))
+                    ApplyMaxResult();
+                else
+                    ApplyMinResult();
+            }
         }
 
         protected override void UpdateHitStateTransforms(ArmedState state)

@@ -261,7 +261,7 @@ namespace osu.Game.Tests.Visual.UserInterface
         {
             AddStep($"Set {name} slider to {value}", () =>
                 this.ChildrenOfType<DifficultyAdjustSettingsControl>().First(c => c.LabelText == name)
-                    .ChildrenOfType<OsuSliderBar<float>>().First().Current.Value = value);
+                    .ChildrenOfType<RoundedSliderBar<float>>().First().Current.Value = value);
         }
 
         private void checkBindableAtValue(string name, float? expectedValue)
@@ -275,7 +275,7 @@ namespace osu.Game.Tests.Visual.UserInterface
         {
             AddAssert($"Slider {name} at {expectedValue}", () =>
                 this.ChildrenOfType<DifficultyAdjustSettingsControl>().First(c => c.LabelText == name)
-                    .ChildrenOfType<OsuSliderBar<float>>().First().Current.Value == expectedValue);
+                    .ChildrenOfType<RoundedSliderBar<float>>().First().Current.Value == expectedValue);
         }
 
         private void setBeatmapWithDifficultyParameters(float value)

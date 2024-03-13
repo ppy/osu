@@ -7,6 +7,7 @@ using osu.Framework.Graphics.Sprites;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Graphics.UserInterface;
+using osu.Game.Localisation;
 using osu.Game.Overlays;
 
 namespace osu.Game.Screens.Edit.Components.Timelines.Summary
@@ -30,7 +31,7 @@ namespace osu.Game.Screens.Edit.Components.Timelines.Summary
 
             Content.CornerRadius = 0;
 
-            Text = "Test!";
+            Text = EditorStrings.TestBeatmap;
         }
     }
 }

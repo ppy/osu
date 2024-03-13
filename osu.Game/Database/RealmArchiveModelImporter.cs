@@ -149,7 +149,7 @@ namespace osu.Game.Database
                     return imported;
                 }
 
-                notification.Text = $"{HumanisedModelName.Humanize(LetterCasing.Title)} import failed!";
+                notification.Text = $"{HumanisedModelName.Humanize(LetterCasing.Title)} import failed! Check logs for more information.";
                 notification.State = ProgressNotificationState.Cancelled;
             }
             else
@@ -201,8 +201,8 @@ namespace osu.Game.Database
             // TODO: Add a check to prevent files from storage to be deleted.
             try
             {
-                if (import != null && File.Exists(task.Path) && ShouldDeleteArchive(task.Path))
-                    File.Delete(task.Path);
+                if (import != null && ShouldDeleteArchive(task.Path))
+                    task.DeleteFile();
             }
             catch (Exception e)
             {
@@ -229,7 +229,7 @@ namespace osu.Game.Database
 
             try
             {
-                model = CreateModel(archive);
+                model = CreateModel(archive, parameters);
 
                 if (model == null)
                     return null;
@@ -261,7 +261,7 @@ namespace osu.Game.Database
         /// <param name="cancellationToken">An optional cancellation token.</param>
         public virtual Live<TModel>? ImportModel(TModel item, ArchiveReader? archive = null, ImportParameters parameters = default, CancellationToken cancellationToken = default) => Realm.Run(realm =>
         {
-            pauseIfNecessary(cancellationToken);
+            pauseIfNecessary(parameters, cancellationToken);
 
             TModel? existing;
 
@@ -279,7 +279,7 @@ namespace osu.Game.Database
                     // note that this should really be checking filesizes on disk (of existing files) for some degree of sanity.
                     // or alternatively doing a faster hash check. either of these require database changes and reprocessing of existing files.
                     if (CanSkipImport(existing, item) &&
-                        getFilenames(existing.Files).SequenceEqual(getShortenedFilenames(archive).Select(p => p.shortened).OrderBy(f => f)) &&
+                        getFilenames(existing.Files).SequenceEqual(getShortenedFilenames(archive).Select(p => p.shortened).Order()) &&
                         checkAllFilesExist(existing))
                     {
                         LogForModel(item, @$"Found existing (optimised) {HumanisedModelName} for {item} (ID {existing.ID}) – skipping import.");
@@ -437,7 +437,7 @@ namespace osu.Game.Database
         {
             MemoryStream hashable = new MemoryStream();
 
-            foreach (string? file in reader.Filenames.Where(f => HashableFileTypes.Any(ext => f.EndsWith(ext, StringComparison.OrdinalIgnoreCase))).OrderBy(f => f))
+            foreach (string? file in reader.Filenames.Where(f => HashableFileTypes.Any(ext => f.EndsWith(ext, StringComparison.OrdinalIgnoreCase))).Order())
             {
                 using (Stream s = reader.GetStream(file))
                     s.CopyTo(hashable);
@@ -474,8 +474,9 @@ namespace osu.Game.Database
         /// Actual expensive population should be done in <see cref="Populate"/>; this should just prepare for duplicate checking.
         /// </summary>
         /// <param name="archive">The archive to create the model for.</param>
+        /// <param name="parameters">Parameters to further configure the import process.</param>
         /// <returns>A model populated with minimal information. Returning a null will abort importing silently.</returns>
-        protected abstract TModel? CreateModel(ArchiveReader archive);
+        protected abstract TModel? CreateModel(ArchiveReader archive, ImportParameters parameters);
 
         /// <summary>
         /// Populate the provided model completely from the given archive.
@@ -559,9 +560,9 @@ namespace osu.Game.Database
         /// <returns>Whether to perform deletion.</returns>
         protected virtual bool ShouldDeleteArchive(string path) => false;
 
-        private void pauseIfNecessary(CancellationToken cancellationToken)
+        private void pauseIfNecessary(ImportParameters importParameters, CancellationToken cancellationToken)
         {
-            if (!PauseImports)
+            if (!PauseImports || importParameters.ImportImmediately)
                 return;
 
             Logger.Log($@"{GetType().Name} is being paused.");

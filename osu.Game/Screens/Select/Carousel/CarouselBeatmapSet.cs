@@ -7,6 +7,7 @@ using System.Linq;
 using osu.Framework.Extensions.IEnumerableExtensions;
 using osu.Game.Beatmaps;
 using osu.Game.Screens.Select.Filter;
+using osu.Game.Utils;
 
 namespace osu.Game.Screens.Select.Carousel
 {
@@ -45,7 +46,7 @@ namespace osu.Game.Screens.Select.Carousel
                       .ForEach(AddItem);
         }
 
-        protected override CarouselItem? GetNextToSelect()
+        public override CarouselItem? GetNextToSelect()
         {
             if (LastSelected == null || LastSelected.Filtered.Value)
             {
@@ -61,61 +62,106 @@ namespace osu.Game.Screens.Select.Carousel
             if (!(other is CarouselBeatmapSet otherSet))
                 return base.CompareTo(criteria, other);
 
+            int comparison;
+
             switch (criteria.Sort)
             {
                 default:
                 case SortMode.Artist:
-                    return string.Compare(BeatmapSet.Metadata.Artist, otherSet.BeatmapSet.Metadata.Artist, StringComparison.OrdinalIgnoreCase);
+                    comparison = OrdinalSortByCaseStringComparer.DEFAULT.Compare(BeatmapSet.Metadata.Artist, otherSet.BeatmapSet.Metadata.Artist);
+                    break;
 
                 case SortMode.Title:
-                    return string.Compare(BeatmapSet.Metadata.Title, otherSet.BeatmapSet.Metadata.Title, StringComparison.OrdinalIgnoreCase);
+                    comparison = OrdinalSortByCaseStringComparer.DEFAULT.Compare(BeatmapSet.Metadata.Title, otherSet.BeatmapSet.Metadata.Title);
+                    break;
 
                 case SortMode.Author:
-                    return string.Compare(BeatmapSet.Metadata.Author.Username, otherSet.BeatmapSet.Metadata.Author.Username, StringComparison.OrdinalIgnoreCase);
+                    comparison = OrdinalSortByCaseStringComparer.DEFAULT.Compare(BeatmapSet.Metadata.Author.Username, otherSet.BeatmapSet.Metadata.Author.Username);
+                    break;
 
                 case SortMode.Source:
-                    return string.Compare(BeatmapSet.Metadata.Source, otherSet.BeatmapSet.Metadata.Source, StringComparison.OrdinalIgnoreCase);
+                    comparison = OrdinalSortByCaseStringComparer.DEFAULT.Compare(BeatmapSet.Metadata.Source, otherSet.BeatmapSet.Metadata.Source);
+                    break;
 
                 case SortMode.DateAdded:
-                    return otherSet.BeatmapSet.DateAdded.CompareTo(BeatmapSet.DateAdded);
+                    comparison = otherSet.BeatmapSet.DateAdded.CompareTo(BeatmapSet.DateAdded);
+                    break;
 
                 case SortMode.DateRanked:
-                    // Beatmaps which have no ranked date should already be filtered away in this mode.
-                    if (BeatmapSet.DateRanked == null || otherSet.BeatmapSet.DateRanked == null)
-                        return 0;
-
-                    return otherSet.BeatmapSet.DateRanked.Value.CompareTo(BeatmapSet.DateRanked.Value);
+                    comparison = Nullable.Compare(otherSet.BeatmapSet.DateRanked, BeatmapSet.DateRanked);
+                    break;
 
                 case SortMode.LastPlayed:
-                    return -compareUsingAggregateMax(otherSet, b => (b.LastPlayed ?? DateTimeOffset.MinValue).ToUnixTimeSeconds());
+                    comparison = -compareUsingAggregateMax(otherSet, static b => (b.LastPlayed ?? DateTimeOffset.MinValue).ToUnixTimeSeconds());
+                    break;
 
                 case SortMode.BPM:
-                    return compareUsingAggregateMax(otherSet, b => b.BPM);
+                    comparison = compareUsingAggregateMax(otherSet, static b => b.BPM);
+                    break;
 
                 case SortMode.Length:
-                    return compareUsingAggregateMax(otherSet, b => b.Length);
+                    comparison = compareUsingAggregateMax(otherSet, static b => b.Length);
+                    break;
 
                 case SortMode.Difficulty:
-                    return compareUsingAggregateMax(otherSet, b => b.StarRating);
+                    comparison = compareUsingAggregateMax(otherSet, static b => b.StarRating);
+                    break;
 
                 case SortMode.DateSubmitted:
-                    // Beatmaps which have no submitted date should already be filtered away in this mode.
-                    if (BeatmapSet.DateSubmitted == null || otherSet.BeatmapSet.DateSubmitted == null)
-                        return 0;
-
-                    return otherSet.BeatmapSet.DateSubmitted.Value.CompareTo(BeatmapSet.DateSubmitted.Value);
+                    comparison = Nullable.Compare(otherSet.BeatmapSet.DateSubmitted, BeatmapSet.DateSubmitted);
+                    break;
             }
+
+            if (comparison != 0) return comparison;
+
+            // If the initial sort could not differentiate, attempt to use DateAdded to order sets in a stable fashion.
+            // The directionality of this matches the current SortMode.DateAdded, but we may want to reconsider if that becomes a user decision (ie. asc / desc).
+            comparison = otherSet.BeatmapSet.DateAdded.CompareTo(BeatmapSet.DateAdded);
+
+            if (comparison != 0) return comparison;
+
+            // If DateAdded fails to break the tie, fallback to our internal GUID for stability.
+            // This basically means it's a stable random sort.
+            return otherSet.BeatmapSet.ID.CompareTo(BeatmapSet.ID);
         }
 
         /// <summary>
         /// All beatmaps which are not filtered and valid for display.
         /// </summary>
-        protected IEnumerable<BeatmapInfo> ValidBeatmaps => Beatmaps.Where(b => !b.Filtered.Value || b.State.Value == CarouselItemState.Selected).Select(b => b.BeatmapInfo);
+        protected IEnumerable<BeatmapInfo> ValidBeatmaps
+        {
+            get
+            {
+                foreach (var item in Items) // iterating over Items directly to not allocate 2 enumerators
+                {
+                    if (item is CarouselBeatmap b && (!b.Filtered.Value || b.State.Value == CarouselItemState.Selected))
+                        yield return b.BeatmapInfo;
+                }
+            }
+        }
+
+        /// <summary>
+        /// Whether there are available beatmaps which are not filtered and valid for display.
+        /// Cheaper alternative to <see cref="ValidBeatmaps"/>.Any()
+        /// </summary>
+        public bool HasValidBeatmaps
+        {
+            get
+            {
+                foreach (var item in Items) // iterating over Items directly to not allocate 2 enumerators
+                {
+                    if (item is CarouselBeatmap b && (!b.Filtered.Value || b.State.Value == CarouselItemState.Selected))
+                        return true;
+                }
+
+                return false;
+            }
+        }
 
         private int compareUsingAggregateMax(CarouselBeatmapSet other, Func<BeatmapInfo, double> func)
         {
-            bool ourBeatmaps = ValidBeatmaps.Any();
-            bool otherBeatmaps = other.ValidBeatmaps.Any();
+            bool ourBeatmaps = HasValidBeatmaps;
+            bool otherBeatmaps = other.HasValidBeatmaps;
 
             if (!ourBeatmaps && !otherBeatmaps) return 0;
             if (!ourBeatmaps) return -1;
@@ -128,12 +174,7 @@ namespace osu.Game.Screens.Select.Carousel
         {
             base.Filter(criteria);
 
-            bool filtered = Items.All(i => i.Filtered.Value);
-
-            filtered |= criteria.Sort == SortMode.DateRanked && BeatmapSet.DateRanked == null;
-            filtered |= criteria.Sort == SortMode.DateSubmitted && BeatmapSet.DateSubmitted == null;
-
-            Filtered.Value = filtered;
+            Filtered.Value = Items.All(i => i.Filtered.Value);
         }
 
         public override string ToString() => BeatmapSet.ToString();

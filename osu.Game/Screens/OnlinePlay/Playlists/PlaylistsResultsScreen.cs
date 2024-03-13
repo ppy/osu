@@ -41,8 +41,8 @@ namespace osu.Game.Screens.OnlinePlay.Playlists
         [Resolved]
         private RulesetStore rulesets { get; set; }
 
-        public PlaylistsResultsScreen(ScoreInfo score, long roomId, PlaylistItem playlistItem, bool allowRetry, bool allowWatchingReplay = true)
-            : base(score, allowRetry, allowWatchingReplay)
+        public PlaylistsResultsScreen([CanBeNull] ScoreInfo score, long roomId, PlaylistItem playlistItem)
+            : base(score)
         {
             this.roomId = roomId;
             this.playlistItem = playlistItem;
@@ -182,7 +182,7 @@ namespace osu.Game.Screens.OnlinePlay.Playlists
         /// <param name="pivot">An optional pivot around which the scores were retrieved.</param>
         private void performSuccessCallback([NotNull] Action<IEnumerable<ScoreInfo>> callback, [NotNull] List<MultiplayerScore> scores, [CanBeNull] MultiplayerScores pivot = null) => Schedule(() =>
         {
-            var scoreInfos = scoreManager.OrderByTotalScore(scores.Select(s => s.CreateScoreInfo(scoreManager, rulesets, playlistItem, Beatmap.Value.BeatmapInfo))).ToArray();
+            var scoreInfos = scores.Select(s => s.CreateScoreInfo(scoreManager, rulesets, playlistItem, Beatmap.Value.BeatmapInfo)).OrderByTotalScore().ToArray();
 
             // Select a score if we don't already have one selected.
             // Note: This is done before the callback so that the panel list centres on the selected score before panels are added (eliminating initial scroll).

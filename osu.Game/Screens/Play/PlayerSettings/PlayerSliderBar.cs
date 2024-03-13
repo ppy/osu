@@ -1,7 +1,5 @@
-// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
-
-#nullable disable
 
 using System;
 using osu.Framework.Allocation;
@@ -15,11 +13,11 @@ namespace osu.Game.Screens.Play.PlayerSettings
     public partial class PlayerSliderBar<T> : SettingsSlider<T>
         where T : struct, IEquatable<T>, IComparable<T>, IConvertible
     {
-        public OsuSliderBar<T> Bar => (OsuSliderBar<T>)Control;
+        public RoundedSliderBar<T> Bar => (RoundedSliderBar<T>)Control;
 
         protected override Drawable CreateControl() => new SliderBar();
 
-        protected partial class SliderBar : OsuSliderBar<T>
+        protected partial class SliderBar : RoundedSliderBar<T>
         {
             public SliderBar()
             {

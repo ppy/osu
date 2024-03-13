@@ -18,7 +18,6 @@ using osu.Framework.Graphics.Rendering;
 using osu.Framework.Graphics.Textures;
 using osu.Framework.IO.Stores;
 using osu.Framework.Platform;
-using osu.Framework.Testing;
 using osu.Framework.Threading;
 using osu.Framework.Utils;
 using osu.Game.Audio;
@@ -36,7 +35,6 @@ namespace osu.Game.Skinning
     /// This is also exposed and cached as <see cref="ISkinSource"/> to allow for any component to potentially have skinning support.
     /// For gameplay components, see <see cref="RulesetSkinProvidingContainer"/> which adds extra legacy and toggle logic that may affect the lookup process.
     /// </remarks>
-    [ExcludeFromDynamicCompile]
     public class SkinManager : ModelManager<SkinInfo>, ISkinSource, IStorageResourceProvider, IModelImporter<SkinInfo>
     {
         /// <summary>
@@ -57,6 +55,8 @@ namespace osu.Game.Skinning
         public readonly Bindable<Live<SkinInfo>> CurrentSkinInfo = new Bindable<Live<SkinInfo>>(ArgonSkin.CreateInfo().ToLiveUnmanaged());
 
         private readonly SkinImporter skinImporter;
+
+        private readonly LegacySkinExporter skinExporter;
 
         private readonly IResourceStore<byte[]> userFiles;
 
@@ -120,6 +120,11 @@ namespace osu.Game.Skinning
 
                 SourceChanged?.Invoke();
             };
+
+            skinExporter = new LegacySkinExporter(storage)
+            {
+                PostNotification = obj => PostNotification?.Invoke(obj)
+            };
         }
 
         public void SelectRandomSkin()
@@ -177,7 +182,10 @@ namespace osu.Game.Skinning
                     Name = NamingUtils.GetNextBestName(existingSkinNames, $@"{s.Name} (modified)")
                 };
 
-                var result = skinImporter.ImportModel(skinInfo);
+                var result = skinImporter.ImportModel(skinInfo, parameters: new ImportParameters
+                {
+                    ImportImmediately = true // to avoid possible deadlocks when editing skin during gameplay.
+                });
 
                 if (result != null)
                 {
@@ -192,12 +200,16 @@ namespace osu.Game.Skinning
             });
         }
 
-        public void Save(Skin skin)
+        /// <summary>
+        /// Save a skin, serialising any changes to skin layouts to relevant JSON structures.
+        /// </summary>
+        /// <returns>Whether any change actually occurred.</returns>
+        public bool Save(Skin skin)
         {
             if (!skin.SkinInfo.IsManaged)
                 throw new InvalidOperationException($"Attempting to save a skin which is not yet tracked. Call {nameof(EnsureMutableSkin)} first.");
 
-            skinImporter.Save(skin);
+            return skinImporter.Save(skin);
         }
 
         /// <summary>
@@ -252,13 +264,22 @@ namespace osu.Game.Skinning
         private T lookupWithFallback<T>(Func<ISkin, T> lookupFunction)
             where T : class
         {
-            foreach (var source in AllSources)
+            try
             {
-                if (lookupFunction(source) is T skinSourced)
-                    return skinSourced;
-            }
+                Skin.LogLookupDebug(this, lookupFunction, Skin.LookupDebugType.Enter);
 
-            return null;
+                foreach (var source in AllSources)
+                {
+                    if (lookupFunction(source) is T skinSourced)
+                        return skinSourced;
+                }
+
+                return null;
+            }
+            finally
+            {
+                Skin.LogLookupDebug(this, lookupFunction, Skin.LookupDebugType.Exit);
+            }
         }
 
         #region IResourceStorageProvider
@@ -293,6 +314,10 @@ namespace osu.Game.Skinning
 
         public Task<Live<SkinInfo>> Import(ImportTask task, ImportParameters parameters = default, CancellationToken cancellationToken = default) =>
             skinImporter.Import(task, parameters, cancellationToken);
+
+        public Task ExportCurrentSkin() => ExportSkin(CurrentSkinInfo.Value);
+
+        public Task ExportSkin(Live<SkinInfo> skin) => skinExporter.ExportAsync(skin);
 
         #endregion
 

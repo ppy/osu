@@ -1,66 +1,23 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using System.Collections.Generic;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
-using osu.Framework.Extensions.LocalisationExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
-using osu.Framework.Localisation;
-using osu.Game.Graphics;
-using osu.Game.Graphics.Sprites;
-using osu.Game.Online.Leaderboards;
 using osu.Game.Overlays.Profile.Header.Components;
-using osu.Game.Resources.Localisation.Web;
-using osu.Game.Scoring;
-using osuTK;
 
 namespace osu.Game.Overlays.Profile.Header
 {
     public partial class DetailHeaderContainer : CompositeDrawable
     {
-        private readonly Dictionary<ScoreRank, ScoreRankInfo> scoreRankInfos = new Dictionary<ScoreRank, ScoreRankInfo>();
-        private OverlinedInfoContainer medalInfo = null!;
-        private OverlinedInfoContainer ppInfo = null!;
-        private OverlinedInfoContainer detailGlobalRank = null!;
-        private OverlinedInfoContainer detailCountryRank = null!;
-        private FillFlowContainer? fillFlow;
-        private RankGraph rankGraph = null!;
-
         public readonly Bindable<UserProfileData?> User = new Bindable<UserProfileData?>();
 
-        private bool expanded = true;
-
-        public bool Expanded
-        {
-            set
-            {
-                if (expanded == value) return;
-
-                expanded = value;
-
-                if (fillFlow == null) return;
-
-                fillFlow.ClearTransforms();
-
-                if (expanded)
-                    fillFlow.AutoSizeAxes = Axes.Y;
-                else
-                {
-                    fillFlow.AutoSizeAxes = Axes.None;
-                    fillFlow.ResizeHeightTo(0, 200, Easing.OutQuint);
-                }
-            }
-        }
-
         [BackgroundDependencyLoader]
-        private void load(OverlayColourProvider colourProvider, OsuColour colours)
+        private void load(OverlayColourProvider colourProvider)
         {
             AutoSizeAxes = Axes.Y;
-
-            User.ValueChanged += e => updateDisplay(e.NewValue);
 
             InternalChildren = new Drawable[]
             {
@@ -69,156 +26,47 @@ namespace osu.Game.Overlays.Profile.Header
                     RelativeSizeAxes = Axes.Both,
                     Colour = colourProvider.Background5,
                 },
-                fillFlow = new FillFlowContainer
+                new GridContainer
                 {
                     RelativeSizeAxes = Axes.X,
-                    AutoSizeAxes = expanded ? Axes.Y : Axes.None,
-                    AutoSizeDuration = 200,
-                    AutoSizeEasing = Easing.OutQuint,
-                    Masking = true,
-                    Padding = new MarginPadding { Horizontal = UserProfileOverlay.CONTENT_X_MARGIN, Vertical = 10 },
-                    Direction = FillDirection.Vertical,
-                    Spacing = new Vector2(0, 20),
-                    Children = new Drawable[]
-                    {
-                        new Container
-                        {
-                            RelativeSizeAxes = Axes.X,
-                            AutoSizeAxes = Axes.Y,
-                            Children = new Drawable[]
-                            {
-                                new FillFlowContainer
-                                {
-                                    AutoSizeAxes = Axes.Both,
-                                    Anchor = Anchor.CentreLeft,
-                                    Origin = Anchor.CentreLeft,
-                                    Direction = FillDirection.Horizontal,
-                                    Spacing = new Vector2(10, 0),
-                                    Children = new Drawable[]
-                                    {
-                                        new OverlinedTotalPlayTime
-                                        {
-                                            User = { BindTarget = User }
-                                        },
-                                        medalInfo = new OverlinedInfoContainer
-                                        {
-                                            Title = UsersStrings.ShowStatsMedals,
-                                            LineColour = colours.GreenLight,
-                                        },
-                                        ppInfo = new OverlinedInfoContainer
-                                        {
-                                            Title = "pp",
-                                            LineColour = colours.Red,
-                                        },
-                                    }
-                                },
-                                new FillFlowContainer
-                                {
-                                    AutoSizeAxes = Axes.Both,
-                                    Anchor = Anchor.CentreRight,
-                                    Origin = Anchor.CentreRight,
-                                    Direction = FillDirection.Horizontal,
-                                    Spacing = new Vector2(5),
-                                    Children = new[]
-                                    {
-                                        scoreRankInfos[ScoreRank.XH] = new ScoreRankInfo(ScoreRank.XH),
-                                        scoreRankInfos[ScoreRank.X] = new ScoreRankInfo(ScoreRank.X),
-                                        scoreRankInfos[ScoreRank.SH] = new ScoreRankInfo(ScoreRank.SH),
-                                        scoreRankInfos[ScoreRank.S] = new ScoreRankInfo(ScoreRank.S),
-                                        scoreRankInfos[ScoreRank.A] = new ScoreRankInfo(ScoreRank.A),
-                                    }
-                                }
-                            }
-                        },
-                        new Container
-                        {
-                            RelativeSizeAxes = Axes.X,
-                            AutoSizeAxes = Axes.Y,
-                            Padding = new MarginPadding { Right = 130 },
-                            Children = new Drawable[]
-                            {
-                                rankGraph = new RankGraph
-                                {
-                                    RelativeSizeAxes = Axes.Both,
-                                },
-                                new FillFlowContainer
-                                {
-                                    AutoSizeAxes = Axes.Y,
-                                    Width = 130,
-                                    Anchor = Anchor.TopRight,
-                                    Direction = FillDirection.Vertical,
-                                    Padding = new MarginPadding { Horizontal = 10 },
-                                    Spacing = new Vector2(0, 20),
-                                    Children = new Drawable[]
-                                    {
-                                        detailGlobalRank = new OverlinedInfoContainer(true, 110)
-                                        {
-                                            Title = UsersStrings.ShowRankGlobalSimple,
-                                            LineColour = colourProvider.Highlight1,
-                                        },
-                                        detailCountryRank = new OverlinedInfoContainer(false, 110)
-                                        {
-                                            Title = UsersStrings.ShowRankCountrySimple,
-                                            LineColour = colourProvider.Highlight1,
-                                        },
-                                    }
-                                }
-                            }
-                        },
-                    }
-                },
-            };
-        }
-
-        private void updateDisplay(UserProfileData? data)
-        {
-            var user = data?.User;
-
-            medalInfo.Content = user?.Achievements?.Length.ToString() ?? "0";
-            ppInfo.Content = user?.Statistics?.PP?.ToLocalisableString("#,##0") ?? (LocalisableString)"0";
-
-            foreach (var scoreRankInfo in scoreRankInfos)
-                scoreRankInfo.Value.RankCount = user?.Statistics?.GradesCount[scoreRankInfo.Key] ?? 0;
-
-            detailGlobalRank.Content = user?.Statistics?.GlobalRank?.ToLocalisableString("\\##,##0") ?? (LocalisableString)"-";
-            detailCountryRank.Content = user?.Statistics?.CountryRank?.ToLocalisableString("\\##,##0") ?? (LocalisableString)"-";
-
-            rankGraph.Statistics.Value = user?.Statistics;
-        }
-
-        private partial class ScoreRankInfo : CompositeDrawable
-        {
-            private readonly OsuSpriteText rankCount;
-
-            public int RankCount
-            {
-                set => rankCount.Text = value.ToLocalisableString("#,##0");
-            }
-
-            public ScoreRankInfo(ScoreRank rank)
-            {
-                AutoSizeAxes = Axes.Both;
-                InternalChild = new FillFlowContainer
-                {
                     AutoSizeAxes = Axes.Y,
-                    Width = 56,
-                    Direction = FillDirection.Vertical,
-                    Children = new Drawable[]
+                    Padding = new MarginPadding { Horizontal = WaveOverlayContainer.HORIZONTAL_PADDING, Vertical = 10 },
+                    RowDimensions = new[]
                     {
-                        new DrawableRank(rank)
+                        new Dimension(GridSizeMode.AutoSize),
+                    },
+                    ColumnDimensions = new[]
+                    {
+                        new Dimension(),
+                        new Dimension(GridSizeMode.AutoSize),
+                        new Dimension(GridSizeMode.AutoSize),
+                    },
+                    Content = new[]
+                    {
+                        new Drawable[]
                         {
-                            RelativeSizeAxes = Axes.X,
-                            Height = 30,
-                        },
-                        rankCount = new OsuSpriteText
-                        {
-                            Font = OsuFont.GetFont(size: 12, weight: FontWeight.Bold),
-                            Anchor = Anchor.TopCentre,
-                            Origin = Anchor.TopCentre
+                            new MainDetails
+                            {
+                                RelativeSizeAxes = Axes.X,
+                                User = { BindTarget = User }
+                            },
+                            new Box
+                            {
+                                RelativeSizeAxes = Axes.Y,
+                                Width = 2,
+                                Colour = colourProvider.Background6,
+                                Margin = new MarginPadding { Horizontal = 15 }
+                            },
+                            new ExtendedDetails
+                            {
+                                Anchor = Anchor.CentreLeft,
+                                Origin = Anchor.CentreLeft,
+                                User = { BindTarget = User }
+                            }
                         }
                     }
-                };
-            }
+                }
+            };
         }
     }
 }

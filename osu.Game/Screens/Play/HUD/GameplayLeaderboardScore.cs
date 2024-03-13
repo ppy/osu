@@ -1,18 +1,19 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
 using System;
-using JetBrains.Annotations;
+using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
+using osu.Game.Configuration;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
+using osu.Game.Online.API;
+using osu.Game.Rulesets.Scoring;
 using osu.Game.Users;
 using osu.Game.Users.Drawables;
 using osu.Game.Utils;
@@ -48,13 +49,20 @@ namespace osu.Game.Screens.Play.HUD
 
         public Bindable<bool> Expanded = new Bindable<bool>();
 
-        private OsuSpriteText positionText, scoreText, accuracyText, comboText, usernameText;
+        private OsuSpriteText positionText = null!, scoreText = null!, accuracyText = null!, comboText = null!, usernameText = null!;
 
         public BindableLong TotalScore { get; } = new BindableLong();
         public BindableDouble Accuracy { get; } = new BindableDouble(1);
         public BindableInt Combo { get; } = new BindableInt();
         public BindableBool HasQuit { get; } = new BindableBool();
         public Bindable<long> DisplayOrder { get; } = new Bindable<long>();
+
+        private Func<ScoringMode, long>? getDisplayScoreFunction;
+
+        public Func<ScoringMode, long> GetDisplayScore
+        {
+            set => getDisplayScoreFunction = value;
+        }
 
         public Color4? BackgroundColour { get; set; }
 
@@ -82,40 +90,45 @@ namespace osu.Game.Screens.Play.HUD
             }
         }
 
-        [CanBeNull]
-        public IUser User { get; }
+        public IUser? User { get; }
 
         /// <summary>
         /// Whether this score is the local user or a replay player (and should be focused / always visible).
         /// </summary>
         public readonly bool Tracked;
 
-        private Container mainFillContainer;
+        private Container mainFillContainer = null!;
 
-        private Box centralFill;
+        private Box centralFill = null!;
 
-        private Container backgroundPaddingAdjustContainer;
+        private Container backgroundPaddingAdjustContainer = null!;
 
-        private GridContainer gridContainer;
+        private GridContainer gridContainer = null!;
 
-        private Container scoreComponents;
+        private Container scoreComponents = null!;
+
+        private IBindable<ScoringMode> scoreDisplayMode = null!;
+
+        private bool isFriend;
 
         /// <summary>
         /// Creates a new <see cref="GameplayLeaderboardScore"/>.
         /// </summary>
         /// <param name="user">The score's player.</param>
         /// <param name="tracked">Whether the player is the local user or a replay player.</param>
-        public GameplayLeaderboardScore([CanBeNull] IUser user, bool tracked)
+        public GameplayLeaderboardScore(IUser? user, bool tracked)
         {
             User = user;
             Tracked = tracked;
 
             AutoSizeAxes = Axes.X;
             Height = PANEL_HEIGHT;
+
+            GetDisplayScore = _ => TotalScore.Value;
         }
 
         [BackgroundDependencyLoader]
-        private void load(OsuColour colours)
+        private void load(OsuColour colours, OsuConfigManager osuConfigManager, IAPIProvider api)
         {
             Container avatarContainer;
 
@@ -226,7 +239,7 @@ namespace osu.Game.Screens.Play.HUD
                                                             }
                                                         }
                                                     },
-                                                    usernameText = new OsuSpriteText
+                                                    usernameText = new TruncatingSpriteText
                                                     {
                                                         RelativeSizeAxes = Axes.X,
                                                         Width = 0.6f,
@@ -234,8 +247,7 @@ namespace osu.Game.Screens.Play.HUD
                                                         Origin = Anchor.CentreLeft,
                                                         Colour = Color4.White,
                                                         Font = OsuFont.Torus.With(size: 14, weight: FontWeight.SemiBold),
-                                                        Text = User?.Username,
-                                                        Truncate = true,
+                                                        Text = User?.Username ?? string.Empty,
                                                         Shadow = false,
                                                     }
                                                 }
@@ -286,7 +298,9 @@ namespace osu.Game.Screens.Play.HUD
 
             LoadComponentAsync(new DrawableAvatar(User), avatarContainer.Add);
 
-            TotalScore.BindValueChanged(v => scoreText.Text = v.NewValue.ToString("N0"), true);
+            scoreDisplayMode = osuConfigManager.GetBindable<ScoringMode>(OsuSetting.ScoreDisplayMode);
+            scoreDisplayMode.BindValueChanged(_ => updateScore());
+            TotalScore.BindValueChanged(_ => updateScore(), true);
 
             Accuracy.BindValueChanged(v =>
             {
@@ -301,6 +315,8 @@ namespace osu.Game.Screens.Play.HUD
             }, true);
 
             HasQuit.BindValueChanged(_ => updateState());
+
+            isFriend = User != null && api.Friends.Any(u => User.OnlineID == u.Id);
         }
 
         protected override void LoadComplete()
@@ -312,6 +328,8 @@ namespace osu.Game.Screens.Play.HUD
 
             FinishTransforms(true);
         }
+
+        private void updateScore() => scoreText.Text = (getDisplayScoreFunction?.Invoke(scoreDisplayMode.Value) ?? TotalScore.Value).ToString("N0");
 
         private void changeExpandedState(ValueChangedEvent<bool> expanded)
         {
@@ -376,6 +394,11 @@ namespace osu.Game.Screens.Play.HUD
                 widthExtension = true;
                 panelColour = BackgroundColour ?? Color4Extensions.FromHex("ffd966");
                 textColour = TextColour ?? Color4Extensions.FromHex("2e576b");
+            }
+            else if (isFriend)
+            {
+                panelColour = BackgroundColour ?? Color4Extensions.FromHex("ff549a");
+                textColour = TextColour ?? Color4.White;
             }
             else
             {

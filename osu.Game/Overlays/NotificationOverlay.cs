@@ -1,39 +1,54 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System;
+using System.Collections.Generic;
 using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Audio;
 using osu.Framework.Bindables;
+using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Extensions.IEnumerableExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
+using osu.Framework.Graphics.Effects;
 using osu.Framework.Graphics.Shapes;
+using osu.Framework.Graphics.Sprites;
 using osu.Framework.Localisation;
 using osu.Framework.Logging;
 using osu.Framework.Threading;
+using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
 using osu.Game.Overlays.Notifications;
 using osu.Game.Resources.Localisation.Web;
 using osuTK;
+using osuTK.Graphics;
 using NotificationsStrings = osu.Game.Localisation.NotificationsStrings;
 
 namespace osu.Game.Overlays
 {
     public partial class NotificationOverlay : OsuFocusedOverlayContainer, INamedOverlayComponent, INotificationOverlay
     {
-        public string IconTexture => "Icons/Hexacons/notification";
+        public IconUsage Icon => OsuIcon.Notification;
         public LocalisableString Title => NotificationsStrings.HeaderTitle;
         public LocalisableString Description => NotificationsStrings.HeaderDescription;
+
+        protected override double PopInOutSampleBalance => OsuGameBase.SFX_STEREO_STRENGTH;
 
         public const float WIDTH = 320;
 
         public const float TRANSITION_LENGTH = 600;
 
+        public IEnumerable<Notification> AllNotifications =>
+            IsLoaded ? toastTray.Notifications.Concat(sections.SelectMany(s => s.Notifications)) : Array.Empty<Notification>();
+
         private FlowContainer<NotificationSection> sections = null!;
 
         [Resolved]
         private AudioManager audio { get; set; } = null!;
+
+        [Resolved]
+        private OsuGame? game { get; set; }
 
         [Cached]
         private OverlayColourProvider colourProvider = new OverlayColourProvider(OverlayColourScheme.Purple);
@@ -72,6 +87,14 @@ namespace osu.Game.Overlays
                 mainContent = new Container
                 {
                     RelativeSizeAxes = Axes.Both,
+                    Masking = true,
+                    EdgeEffect = new EdgeEffectParameters
+                    {
+                        Colour = Color4.Black.Opacity(0),
+                        Type = EdgeEffectType.Shadow,
+                        Radius = 10,
+                        Hollow = true,
+                    },
                     Children = new Drawable[]
                     {
                         new Box
@@ -92,8 +115,9 @@ namespace osu.Game.Overlays
                                     RelativeSizeAxes = Axes.X,
                                     Children = new[]
                                     {
-                                        new NotificationSection(AccountsStrings.NotificationsTitle, new[] { typeof(SimpleNotification) }, "Clear All"),
-                                        new NotificationSection(@"Running Tasks", new[] { typeof(ProgressNotification) }, @"Cancel All"),
+                                        // The main section adds as a catch-all for notifications which don't group into other sections.
+                                        new NotificationSection(AccountsStrings.NotificationsTitle),
+                                        new NotificationSection(NotificationsStrings.RunningTasks, new[] { typeof(ProgressNotification) }),
                                     }
                                 }
                             }
@@ -107,7 +131,7 @@ namespace osu.Game.Overlays
 
         private void updateProcessingMode()
         {
-            bool enabled = OverlayActivationMode.Value == OverlayActivation.All || State.Value == Visibility.Visible;
+            bool enabled = OverlayActivationMode.Value != OverlayActivation.Disabled || State.Value == Visibility.Visible;
 
             notificationsEnabler?.Cancel();
 
@@ -153,12 +177,18 @@ namespace osu.Game.Overlays
 
             Logger.Log($"⚠️ {notification.Text}");
 
-            notification.Closed += notificationClosed;
+            notification.Closed += () => notificationClosed(notification);
 
             if (notification is IHasCompletionTarget hasCompletionTarget)
                 hasCompletionTarget.CompletionTarget = Post;
 
             playDebouncedSample(notification.PopInSampleName);
+
+            if (notification.IsImportant)
+            {
+                game?.Window?.Flash();
+                notification.Closed += () => game?.Window?.CancelFlash();
+            }
 
             if (State.Value == Visibility.Hidden)
             {
@@ -178,7 +208,8 @@ namespace osu.Game.Overlays
             var ourType = notification.GetType();
             int depth = notification.DisplayOnTop ? -runningDepth : runningDepth;
 
-            var section = sections.Children.First(s => s.AcceptedNotificationTypes.Any(accept => accept.IsAssignableFrom(ourType)));
+            var section = sections.Children.FirstOrDefault(s => s.AcceptedNotificationTypes?.Any(accept => accept.IsAssignableFrom(ourType)) == true)
+                          ?? sections.First();
 
             section.Add(notification, depth);
 
@@ -195,10 +226,9 @@ namespace osu.Game.Overlays
 
         protected override void PopIn()
         {
-            base.PopIn();
-
             this.MoveToX(0, TRANSITION_LENGTH, Easing.OutQuint);
-            mainContent.FadeTo(1, TRANSITION_LENGTH, Easing.OutQuint);
+            mainContent.FadeTo(1, TRANSITION_LENGTH / 2, Easing.OutQuint);
+            mainContent.FadeEdgeEffectTo(WaveContainer.SHADOW_OPACITY, WaveContainer.APPEAR_DURATION, Easing.Out);
 
             toastTray.FlushAllToasts();
         }
@@ -210,20 +240,24 @@ namespace osu.Game.Overlays
             markAllRead();
 
             this.MoveToX(WIDTH, TRANSITION_LENGTH, Easing.OutQuint);
-            mainContent.FadeTo(0, TRANSITION_LENGTH, Easing.OutQuint);
+            mainContent.FadeTo(0, TRANSITION_LENGTH / 2, Easing.OutQuint);
+            mainContent.FadeEdgeEffectTo(0, WaveContainer.DISAPPEAR_DURATION, Easing.In);
         }
 
-        private void notificationClosed() => Schedule(() =>
+        private void notificationClosed(Notification notification) => Schedule(() =>
         {
             updateCounts();
 
             // this debounce is currently shared between popin/popout sounds, which means one could potentially not play when the user is expecting it.
             // popout is constant across all notification types, and should therefore be handled using playback concurrency instead, but seems broken at the moment.
-            playDebouncedSample("UI/overlay-pop-out");
+            playDebouncedSample(notification.PopOutSampleName);
         });
 
         private void playDebouncedSample(string sampleName)
         {
+            if (string.IsNullOrEmpty(sampleName))
+                return;
+
             if (lastSamplePlayback == null || Time.Current - lastSamplePlayback > OsuGameBase.SAMPLE_DEBOUNCE_TIME)
             {
                 audio.Samples.Get(sampleName)?.Play();

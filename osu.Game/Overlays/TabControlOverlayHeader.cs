@@ -1,9 +1,6 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
-using JetBrains.Annotations;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Extensions;
@@ -62,10 +59,18 @@ namespace osu.Game.Overlays
                         RelativeSizeAxes = Axes.X,
                         AutoSizeAxes = Axes.Y,
                         Padding = new MarginPadding { Horizontal = ContentSidePadding },
-                        Child = TabControl = CreateTabControl().With(control =>
+                        Children = new[]
                         {
-                            control.Current = Current;
-                        })
+                            TabControl = CreateTabControl().With(control =>
+                            {
+                                control.Current = Current;
+                            }),
+                            CreateTabControlContent().With(content =>
+                            {
+                                content.Anchor = Anchor.CentreRight;
+                                content.Origin = Anchor.CentreRight;
+                            }),
+                        }
                     }
                 }
             });
@@ -77,8 +82,12 @@ namespace osu.Game.Overlays
             controlBackground.Colour = colourProvider.Dark4;
         }
 
-        [NotNull]
         protected virtual OsuTabControl<T> CreateTabControl() => new OverlayHeaderTabControl();
+
+        /// <summary>
+        /// Creates a <see cref="Drawable"/> on the opposite side of the <see cref="OsuTabControl{T}"/>. Used mostly to create <see cref="OverlayRulesetSelector"/>.
+        /// </summary>
+        protected virtual Drawable CreateTabControlContent() => Empty();
 
         public partial class OverlayHeaderTabControl : OverlayTabControl<T>
         {

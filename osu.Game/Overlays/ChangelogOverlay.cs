@@ -5,12 +5,14 @@
 
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Threading;
 using System.Threading.Tasks;
 using JetBrains.Annotations;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
+using osu.Framework.Graphics.Containers;
 using osu.Framework.Input.Events;
 using osu.Game.Input.Bindings;
 using osu.Game.Online.API.Requests;
@@ -22,8 +24,6 @@ namespace osu.Game.Overlays
 {
     public partial class ChangelogOverlay : OnlineOverlay<ChangelogHeader>
     {
-        public override bool IsPresent => base.IsPresent || Scheduler.HasPendingTasks;
-
         public readonly Bindable<APIChangelogBuild> Current = new Bindable<APIChangelogBuild>();
 
         private List<APIChangelogBuild> builds;
@@ -81,6 +81,8 @@ namespace osu.Game.Overlays
             ArgumentNullException.ThrowIfNull(updateStream);
             ArgumentNullException.ThrowIfNull(version);
 
+            Show();
+
             performAfterFetch(() =>
             {
                 var build = builds.Find(b => b.Version == version && b.UpdateStream.Name == updateStream)
@@ -89,8 +91,6 @@ namespace osu.Game.Overlays
                 if (build != null)
                     ShowBuild(build);
             });
-
-            Show();
         }
 
         public override bool OnPressed(KeyBindingPressEvent<GlobalAction> e)
@@ -127,11 +127,16 @@ namespace osu.Game.Overlays
 
         private Task initialFetchTask;
 
-        private void performAfterFetch(Action action) => Schedule(() =>
+        private void performAfterFetch(Action action)
         {
-            fetchListing()?.ContinueWith(_ =>
-                Schedule(action), TaskContinuationOptions.OnlyOnRanToCompletion);
-        });
+            Debug.Assert(State.Value == Visibility.Visible);
+
+            Schedule(() =>
+            {
+                fetchListing()?.ContinueWith(_ =>
+                    Schedule(action), TaskContinuationOptions.OnlyOnRanToCompletion);
+            });
+        }
 
         private Task fetchListing()
         {

@@ -1,14 +1,11 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
 using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using osu.Framework.Graphics;
-using osu.Framework.Utils;
 using osu.Game.Beatmaps.Legacy;
 using osu.Game.IO;
 using osu.Game.Storyboards;
@@ -19,10 +16,10 @@ namespace osu.Game.Beatmaps.Formats
 {
     public class LegacyStoryboardDecoder : LegacyDecoder<Storyboard>
     {
-        private StoryboardSprite storyboardSprite;
-        private CommandTimelineGroup timelineGroup;
+        private StoryboardSprite? storyboardSprite;
+        private CommandTimelineGroup? timelineGroup;
 
-        private Storyboard storyboard;
+        private Storyboard storyboard = null!;
 
         private readonly Dictionary<string, string> variables = new Dictionary<string, string>();
 
@@ -108,6 +105,14 @@ namespace osu.Game.Beatmaps.Formats
                     {
                         int offset = Parsing.ParseInt(split[1]);
                         string path = CleanFilename(split[2]);
+
+                        // See handling in LegacyBeatmapDecoder for the special case where a video type is used but
+                        // the file extension is not a valid video.
+                        //
+                        // This avoids potential weird crashes when ffmpeg attempts to parse an image file as a video
+                        // (see https://github.com/ppy/osu/issues/22829#issuecomment-1465552451).
+                        if (!OsuGameBase.VIDEO_EXTENSIONS.Contains(Path.GetExtension(path).ToLowerInvariant()))
+                            break;
 
                         storyboard.GetLayer("Video").Add(new StoryboardVideo(path, offset));
                         break;
@@ -224,7 +229,7 @@ namespace osu.Game.Beatmaps.Formats
                             {
                                 float startValue = Parsing.ParseFloat(split[4]);
                                 float endValue = split.Length > 5 ? Parsing.ParseFloat(split[5]) : startValue;
-                                timelineGroup?.Rotation.Add(easing, startTime, endTime, MathUtils.RadiansToDegrees(startValue), MathUtils.RadiansToDegrees(endValue));
+                                timelineGroup?.Rotation.Add(easing, startTime, endTime, float.RadiansToDegrees(startValue), float.RadiansToDegrees(endValue));
                                 break;
                             }
 
@@ -276,7 +281,8 @@ namespace osu.Game.Beatmaps.Formats
                                 switch (type)
                                 {
                                     case "A":
-                                        timelineGroup?.BlendingParameters.Add(easing, startTime, endTime, BlendingParameters.Additive, startTime == endTime ? BlendingParameters.Additive : BlendingParameters.Inherit);
+                                        timelineGroup?.BlendingParameters.Add(easing, startTime, endTime, BlendingParameters.Additive,
+                                            startTime == endTime ? BlendingParameters.Additive : BlendingParameters.Inherit);
                                         break;
 
                                     case "H":

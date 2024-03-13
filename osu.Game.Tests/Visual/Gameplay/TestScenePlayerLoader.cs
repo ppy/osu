@@ -13,7 +13,6 @@ using osu.Framework.Allocation;
 using osu.Framework.Audio;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
-using osu.Framework.Localisation;
 using osu.Framework.Screens;
 using osu.Framework.Testing;
 using osu.Framework.Utils;
@@ -46,6 +45,9 @@ namespace osu.Game.Tests.Visual.Gameplay
 
         [Resolved]
         private SessionStatics sessionStatics { get; set; }
+
+        [Resolved]
+        private OsuConfigManager config { get; set; }
 
         [Cached(typeof(INotificationOverlay))]
         private readonly NotificationOverlay notificationOverlay;
@@ -267,15 +269,23 @@ namespace osu.Game.Tests.Visual.Gameplay
         }
 
         [Test]
-        public void TestMutedNotificationMasterVolume()
+        public void TestMutedNotificationLowMusicVolume()
         {
-            addVolumeSteps("master volume", () => audioManager.Volume.Value = 0, () => audioManager.Volume.Value == 0.5);
+            addVolumeSteps("master and music volumes", () =>
+            {
+                audioManager.Volume.Value = 0.6;
+                audioManager.VolumeTrack.Value = 0.01;
+            }, () => Precision.AlmostEquals(audioManager.Volume.Value, 0.6) && Precision.AlmostEquals(audioManager.VolumeTrack.Value, 0.5));
         }
 
         [Test]
-        public void TestMutedNotificationTrackVolume()
+        public void TestMutedNotificationLowMasterVolume()
         {
-            addVolumeSteps("music volume", () => audioManager.VolumeTrack.Value = 0, () => audioManager.VolumeTrack.Value == 0.5);
+            addVolumeSteps("master and music volumes", () =>
+            {
+                audioManager.Volume.Value = 0.01;
+                audioManager.VolumeTrack.Value = 0.6;
+            }, () => Precision.AlmostEquals(audioManager.Volume.Value, 0.5) && Precision.AlmostEquals(audioManager.VolumeTrack.Value, 0.6));
         }
 
         [Test]
@@ -284,9 +294,10 @@ namespace osu.Game.Tests.Visual.Gameplay
             addVolumeSteps("mute button", () =>
             {
                 // Importantly, in the case the volume is muted but the user has a volume level set, it should be retained.
-                audioManager.VolumeTrack.Value = 0.5f;
+                audioManager.Volume.Value = 0.5;
+                audioManager.VolumeTrack.Value = 0.5;
                 volumeOverlay.IsMuted.Value = true;
-            }, () => !volumeOverlay.IsMuted.Value && audioManager.VolumeTrack.Value == 0.5f);
+            }, () => !volumeOverlay.IsMuted.Value && audioManager.Volume.Value == 0.5 && audioManager.VolumeTrack.Value == 0.5);
         }
 
         /// <remarks>
@@ -322,6 +333,7 @@ namespace osu.Game.Tests.Visual.Gameplay
             saveVolumes();
             setFullVolume();
 
+            AddStep("enable storyboards", () => config.SetValue(OsuSetting.ShowStoryboard, true));
             AddStep("change epilepsy warning", () => epilepsyWarning = warning);
             AddStep("load dummy beatmap", () => resetPlayer(false));
 
@@ -339,11 +351,29 @@ namespace osu.Game.Tests.Visual.Gameplay
         }
 
         [Test]
+        public void TestEpilepsyWarningWithDisabledStoryboard()
+        {
+            saveVolumes();
+            setFullVolume();
+
+            AddStep("disable storyboards", () => config.SetValue(OsuSetting.ShowStoryboard, false));
+            AddStep("change epilepsy warning", () => epilepsyWarning = true);
+            AddStep("load dummy beatmap", () => resetPlayer(false));
+
+            AddUntilStep("wait for current", () => loader.IsCurrentScreen());
+
+            AddUntilStep("epilepsy warning absent", () => getEpilepsyWarning() == null);
+
+            restoreVolumes();
+        }
+
+        [Test]
         public void TestEpilepsyWarningEarlyExit()
         {
             saveVolumes();
             setFullVolume();
 
+            AddStep("enable storyboards", () => config.SetValue(OsuSetting.ShowStoryboard, true));
             AddStep("set epilepsy warning", () => epilepsyWarning = true);
             AddStep("load dummy beatmap", () => resetPlayer(false));
 
@@ -514,9 +544,9 @@ namespace osu.Game.Tests.Visual.Gameplay
             AddStep("click notification", () => notification.TriggerClick());
         }
 
-        private EpilepsyWarning getEpilepsyWarning() => loader.ChildrenOfType<EpilepsyWarning>().SingleOrDefault();
+        private EpilepsyWarning getEpilepsyWarning() => loader.ChildrenOfType<EpilepsyWarning>().SingleOrDefault(w => w.IsAlive);
 
-        private LovedWarning getLovedWarning() => loader.ChildrenOfType<LovedWarning>().SingleOrDefault();
+        private LovedWarning getLovedWarning() => loader.ChildrenOfType<LovedWarning>().SingleOrDefault(w => w.IsAlive);
 
         private partial class TestPlayerLoader : PlayerLoader
         {
@@ -532,13 +562,8 @@ namespace osu.Game.Tests.Visual.Gameplay
             }
         }
 
-        private class TestMod : Mod, IApplicableToScoreProcessor
+        private class TestMod : OsuModDoubleTime, IApplicableToScoreProcessor
         {
-            public override string Name => string.Empty;
-            public override string Acronym => string.Empty;
-            public override double ScoreMultiplier => 1;
-            public override LocalisableString Description => string.Empty;
-
             public bool Applied { get; private set; }
 
             public void ApplyToScoreProcessor(ScoreProcessor scoreProcessor)

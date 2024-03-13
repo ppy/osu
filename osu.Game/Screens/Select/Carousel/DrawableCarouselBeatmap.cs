@@ -27,6 +27,7 @@ using osu.Game.Graphics.Sprites;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Overlays;
 using osu.Game.Resources.Localisation.Web;
+using osu.Game.Rulesets;
 using osuTK;
 using osuTK.Graphics;
 
@@ -47,14 +48,17 @@ namespace osu.Game.Screens.Select.Carousel
 
         private Sprite background = null!;
 
-        private Action<BeatmapInfo>? startRequested;
-        private Action<BeatmapInfo>? editRequested;
+        private MenuItem[]? mainMenuItems;
+
+        private Action<BeatmapInfo>? selectRequested;
         private Action<BeatmapInfo>? hideRequested;
 
         private Triangles triangles = null!;
 
         private StarCounter starCounter = null!;
         private DifficultyIcon difficultyIcon = null!;
+
+        private OsuSpriteText keyCountText = null!;
 
         [Resolved]
         private BeatmapSetOverlay? beatmapOverlay { get; set; }
@@ -67,6 +71,9 @@ namespace osu.Game.Screens.Select.Carousel
 
         [Resolved]
         private RealmAccess realm { get; set; } = null!;
+
+        [Resolved]
+        private IBindable<RulesetInfo> ruleset { get; set; } = null!;
 
         private IBindable<StarDifficulty?> starDifficultyBindable = null!;
         private CancellationTokenSource? starDifficultyCancellationSource;
@@ -84,9 +91,8 @@ namespace osu.Game.Screens.Select.Carousel
 
             if (songSelect != null)
             {
-                startRequested = b => songSelect.FinaliseSelection(b);
-                if (songSelect.AllowEditing)
-                    editRequested = songSelect.Edit;
+                mainMenuItems = songSelect.CreateForwardNavigationMenuItemsForBeatmap(() => beatmapInfo);
+                selectRequested = b => songSelect.FinaliseSelection(b);
             }
 
             if (manager != null)
@@ -116,7 +122,7 @@ namespace osu.Game.Screens.Select.Carousel
                     {
                         difficultyIcon = new DifficultyIcon(beatmapInfo)
                         {
-                            ShowTooltip = false,
+                            TooltipType = DifficultyIconTooltipType.None,
                             Scale = new Vector2(1.8f),
                         },
                         new FillFlowContainer
@@ -133,6 +139,13 @@ namespace osu.Game.Screens.Select.Carousel
                                     AutoSizeAxes = Axes.Both,
                                     Children = new[]
                                     {
+                                        keyCountText = new OsuSpriteText
+                                        {
+                                            Font = OsuFont.GetFont(size: 20),
+                                            Anchor = Anchor.BottomLeft,
+                                            Origin = Anchor.BottomLeft,
+                                            Alpha = 0,
+                                        },
                                         new OsuSpriteText
                                         {
                                             Text = beatmapInfo.DifficultyName,
@@ -167,6 +180,13 @@ namespace osu.Game.Screens.Select.Carousel
             };
         }
 
+        protected override void LoadComplete()
+        {
+            base.LoadComplete();
+
+            ruleset.BindValueChanged(_ => updateKeyCount());
+        }
+
         protected override void Selected()
         {
             base.Selected();
@@ -193,7 +213,7 @@ namespace osu.Game.Screens.Select.Carousel
         protected override bool OnClick(ClickEvent e)
         {
             if (Item?.State.Value == CarouselItemState.Selected)
-                startRequested?.Invoke(beatmapInfo);
+                selectRequested?.Invoke(beatmapInfo);
 
             return base.OnClick(e);
         }
@@ -216,9 +236,29 @@ namespace osu.Game.Screens.Select.Carousel
                     if (d.NewValue != null)
                         difficultyIcon.Current.Value = d.NewValue.Value;
                 }, true);
+
+                updateKeyCount();
             }
 
             base.ApplyState();
+        }
+
+        private void updateKeyCount()
+        {
+            if (Item?.State.Value == CarouselItemState.Collapsed)
+                return;
+
+            if (ruleset.Value.OnlineID == 3)
+            {
+                // Account for mania differences locally for now.
+                // Eventually this should be handled in a more modular way, allowing rulesets to add more information to the panel.
+                ILegacyRuleset legacyRuleset = (ILegacyRuleset)ruleset.Value.CreateInstance();
+
+                keyCountText.Alpha = 1;
+                keyCountText.Text = $"[{legacyRuleset.GetKeyCount(beatmapInfo)}K]";
+            }
+            else
+                keyCountText.Alpha = 0;
         }
 
         public MenuItem[] ContextMenuItems
@@ -227,16 +267,17 @@ namespace osu.Game.Screens.Select.Carousel
             {
                 List<MenuItem> items = new List<MenuItem>();
 
-                if (startRequested != null)
-                    items.Add(new OsuMenuItem("Play", MenuItemType.Highlighted, () => startRequested(beatmapInfo)));
-
-                if (editRequested != null)
-                    items.Add(new OsuMenuItem(CommonStrings.ButtonsEdit, MenuItemType.Standard, () => editRequested(beatmapInfo)));
+                if (mainMenuItems != null)
+                    items.AddRange(mainMenuItems);
 
                 if (beatmapInfo.OnlineID > 0 && beatmapOverlay != null)
                     items.Add(new OsuMenuItem("Details...", MenuItemType.Standard, () => beatmapOverlay.FetchAndShowBeatmap(beatmapInfo.OnlineID)));
 
-                var collectionItems = realm.Realm.All<BeatmapCollection>().AsEnumerable().Select(c => new CollectionToggleMenuItem(c.ToLive(realm), beatmapInfo)).Cast<OsuMenuItem>().ToList();
+                var collectionItems = realm.Realm.All<BeatmapCollection>()
+                                           .OrderBy(c => c.Name)
+                                           .AsEnumerable()
+                                           .Select(c => new CollectionToggleMenuItem(c.ToLive(realm), beatmapInfo)).Cast<OsuMenuItem>().ToList();
+
                 if (manageCollectionsDialog != null)
                     collectionItems.Add(new OsuMenuItem("Manage...", MenuItemType.Standard, manageCollectionsDialog.Show));
 

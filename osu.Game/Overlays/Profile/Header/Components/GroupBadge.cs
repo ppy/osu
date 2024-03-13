@@ -20,7 +20,7 @@ namespace osu.Game.Overlays.Profile.Header.Components
 {
     public partial class GroupBadge : Container, IHasTooltip
     {
-        public LocalisableString TooltipText { get; }
+        public LocalisableString TooltipText { get; private set; }
 
         public int TextSize { get; set; } = 12;
 
@@ -35,6 +35,11 @@ namespace osu.Game.Overlays.Profile.Header.Components
             CornerRadius = 8;
 
             TooltipText = group.Name;
+
+            if (group.IsProbationary)
+            {
+                Alpha = 0.6f;
+            }
         }
 
         [BackgroundDependencyLoader]
@@ -47,7 +52,11 @@ namespace osu.Game.Overlays.Profile.Header.Components
                 new Box
                 {
                     RelativeSizeAxes = Axes.Both,
-                    Colour = colourProvider?.Background6 ?? Colour4.Black
+                    Colour = colourProvider?.Background6 ?? Colour4.Black,
+                    // Normal badges background opacity is 75%, probationary is full opacity as the whole badge gets a bit transparent
+                    // Goal is to match osu-web so this is the most accurate it can be, its a bit scuffed but it is what it is
+                    // Source: https://github.com/ppy/osu-web/blob/master/resources/css/bem/user-group-badge.less#L50
+                    Alpha = group.IsProbationary ? 1 : 0.75f,
                 },
                 innerContainer = new FillFlowContainer
                 {
@@ -62,7 +71,7 @@ namespace osu.Game.Overlays.Profile.Header.Components
                         new OsuSpriteText
                         {
                             Text = group.ShortName,
-                            Colour = Color4Extensions.FromHex(group.Colour),
+                            Colour = Color4Extensions.FromHex(group.Colour ?? Colour4.White.ToHex()),
                             Shadow = false,
                             Font = OsuFont.GetFont(size: TextSize, weight: FontWeight.Bold, italics: true)
                         }
@@ -78,6 +87,11 @@ namespace osu.Game.Overlays.Profile.Header.Components
                             icon.Size = new Vector2(TextSize - 1);
                         })).ToList()
                 );
+
+                var badgeModesList = group.Playmodes.Select(p => rulesets.GetRuleset(p)?.Name).ToList();
+
+                string modesDisplay = string.Join(", ", badgeModesList);
+                TooltipText += $" ({modesDisplay})";
             }
         }
     }

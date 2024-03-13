@@ -1,8 +1,6 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
 using System;
 using System.Linq;
 using NUnit.Framework;
@@ -51,7 +49,7 @@ namespace osu.Game.Rulesets.Catch.Tests
 
             AddAssert("First note is hyperdash", () => Beatmap.Value.Beatmap.HitObjects[0] is Fruit f && f.HyperDash);
 
-            for (int i = 0; i < 9; i++)
+            for (int i = 0; i < 11; i++)
             {
                 int count = i + 1;
                 AddUntilStep($"wait for hyperdash #{count}", () => hyperDashCount >= count);
@@ -65,7 +63,11 @@ namespace osu.Game.Rulesets.Catch.Tests
                 BeatmapInfo =
                 {
                     Ruleset = ruleset,
-                    Difficulty = new BeatmapDifficulty { CircleSize = 3.6f }
+                    Difficulty = new BeatmapDifficulty
+                    {
+                        CircleSize = 3.6f,
+                        SliderMultiplier = 1,
+                    },
                 }
             };
 
@@ -102,12 +104,22 @@ namespace osu.Game.Rulesets.Catch.Tests
                 })
             }, 1);
 
+            createObjects(() => new Fruit { X = right_x }, count: 2, spacing: 0, spacingAfterGroup: 400);
+            createObjects(() => new TestJuiceStream(left_x)
+            {
+                Path = new SliderPath(new[]
+                {
+                    new PathControlPoint(Vector2.Zero),
+                    new PathControlPoint(new Vector2(0, 300))
+                })
+            }, count: 1, spacingAfterGroup: 150);
+            createObjects(() => new Fruit { X = left_x }, count: 1, spacing: 0, spacingAfterGroup: 400);
+            createObjects(() => new Fruit { X = right_x }, count: 2, spacing: 0);
+
             return beatmap;
 
-            void createObjects(Func<CatchHitObject> createObject, int count = 3)
+            void createObjects(Func<CatchHitObject> createObject, int count = 3, float spacing = 140, float spacingAfterGroup = 700)
             {
-                const float spacing = 140;
-
                 for (int i = 0; i < count; i++)
                 {
                     var hitObject = createObject();
@@ -115,7 +127,7 @@ namespace osu.Game.Rulesets.Catch.Tests
                     beatmap.HitObjects.Add(hitObject);
                 }
 
-                startTime += 700;
+                startTime += spacingAfterGroup;
             }
         }
 

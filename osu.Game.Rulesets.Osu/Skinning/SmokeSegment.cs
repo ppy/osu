@@ -4,7 +4,6 @@
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
-using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
@@ -228,10 +227,12 @@ namespace osu.Game.Rulesets.Osu.Skinning
                 int futurePointIndex = ~Source.SmokePoints.BinarySearch(new SmokePoint { Time = CurrentTime }, new SmokePoint.UpperBoundComparer());
 
                 points.Clear();
-                points.AddRange(Source.SmokePoints.Skip(firstVisiblePointIndex).Take(futurePointIndex - firstVisiblePointIndex));
+
+                for (int i = firstVisiblePointIndex; i < futurePointIndex; i++)
+                    points.Add(Source.SmokePoints[i]);
             }
 
-            public sealed override void Draw(IRenderer renderer)
+            protected sealed override void Draw(IRenderer renderer)
             {
                 base.Draw(renderer);
 
@@ -252,13 +253,14 @@ namespace osu.Game.Rulesets.Osu.Skinning
                 renderer.SetBlend(BlendingParameters.Additive);
                 renderer.PushLocalMatrix(DrawInfo.Matrix);
 
-                TextureShader.Bind();
+                BindTextureShader(renderer);
+
                 texture.Bind();
 
                 for (int i = 0; i < points.Count; i++)
-                    drawPointQuad(points[i], textureRect, i + firstVisiblePointIndex);
+                    drawPointQuad(renderer, points[i], textureRect, i + firstVisiblePointIndex);
 
-                TextureShader.Unbind();
+                UnbindTextureShader(renderer);
                 renderer.PopLocalMatrix();
             }
 
@@ -324,7 +326,7 @@ namespace osu.Game.Rulesets.Osu.Skinning
 
             private float getRotation(int index) => max_rotation * (StatelessRNG.NextSingle(rotationSeed, index) * 2 - 1);
 
-            private void drawPointQuad(SmokePoint point, RectangleF textureRect, int index)
+            private void drawPointQuad(IRenderer renderer, SmokePoint point, RectangleF textureRect, int index)
             {
                 Debug.Assert(quadBatch != null);
 
@@ -346,25 +348,25 @@ namespace osu.Game.Rulesets.Osu.Skinning
                 var localBotLeft = point.Position + ortho - dir;
                 var localBotRight = point.Position + ortho + dir;
 
-                quadBatch.Add(new TexturedVertex2D
+                quadBatch.Add(new TexturedVertex2D(renderer)
                 {
                     Position = localTopLeft,
                     TexturePosition = textureRect.TopLeft,
                     Colour = Color4Extensions.Multiply(ColourAtPosition(localTopLeft), colour),
                 });
-                quadBatch.Add(new TexturedVertex2D
+                quadBatch.Add(new TexturedVertex2D(renderer)
                 {
                     Position = localTopRight,
                     TexturePosition = textureRect.TopRight,
                     Colour = Color4Extensions.Multiply(ColourAtPosition(localTopRight), colour),
                 });
-                quadBatch.Add(new TexturedVertex2D
+                quadBatch.Add(new TexturedVertex2D(renderer)
                 {
                     Position = localBotRight,
                     TexturePosition = textureRect.BottomRight,
                     Colour = Color4Extensions.Multiply(ColourAtPosition(localBotRight), colour),
                 });
-                quadBatch.Add(new TexturedVertex2D
+                quadBatch.Add(new TexturedVertex2D(renderer)
                 {
                     Position = localBotLeft,
                     TexturePosition = textureRect.BottomLeft,

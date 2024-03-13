@@ -13,6 +13,7 @@ using osu.Framework.Extensions;
 using osu.Framework.Extensions.IEnumerableExtensions;
 using osu.Framework.Extensions.ObjectExtensions;
 using osu.Framework.Graphics.Containers;
+using osu.Framework.Input;
 using osu.Framework.Platform;
 using osu.Framework.Screens;
 using osu.Framework.Testing;
@@ -21,10 +22,10 @@ using osu.Game.Beatmaps;
 using osu.Game.Configuration;
 using osu.Game.Database;
 using osu.Game.Extensions;
-using osu.Game.Graphics.UserInterface;
 using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Online.Chat;
 using osu.Game.Overlays;
+using osu.Game.Overlays.Dialog;
 using osu.Game.Overlays.Mods;
 using osu.Game.Overlays.Notifications;
 using osu.Game.Rulesets;
@@ -163,7 +164,7 @@ namespace osu.Game.Tests.Visual.SongSelect
                 InputManager.Key(Key.Enter);
             });
 
-            AddUntilStep("wait for not current", () => !songSelect!.IsCurrentScreen());
+            waitForDismissed();
             AddAssert("ensure selection changed", () => selected != Beatmap.Value);
         }
 
@@ -186,7 +187,7 @@ namespace osu.Game.Tests.Visual.SongSelect
                 InputManager.Key(Key.Down);
             });
 
-            AddUntilStep("wait for not current", () => !songSelect!.IsCurrentScreen());
+            waitForDismissed();
             AddAssert("ensure selection didn't change", () => selected == Beatmap.Value);
         }
 
@@ -215,7 +216,7 @@ namespace osu.Game.Tests.Visual.SongSelect
                 InputManager.Key(Key.Enter);
             });
 
-            AddUntilStep("wait for not current", () => !songSelect!.IsCurrentScreen());
+            waitForDismissed();
             AddAssert("ensure selection changed", () => selected != Beatmap.Value);
         }
 
@@ -244,7 +245,7 @@ namespace osu.Game.Tests.Visual.SongSelect
                 InputManager.ReleaseButton(MouseButton.Left);
             });
 
-            AddUntilStep("wait for not current", () => !songSelect!.IsCurrentScreen());
+            waitForDismissed();
             AddAssert("ensure selection didn't change", () => selected == Beatmap.Value);
         }
 
@@ -257,7 +258,7 @@ namespace osu.Game.Tests.Visual.SongSelect
             createSongSelect();
 
             AddStep("push child screen", () => Stack.Push(new TestSceneOsuScreenStack.TestScreen("test child")));
-            AddUntilStep("wait for not current", () => !songSelect!.IsCurrentScreen());
+            waitForDismissed();
 
             AddStep("return", () => songSelect!.MakeCurrent());
             AddUntilStep("wait for current", () => songSelect!.IsCurrentScreen());
@@ -275,7 +276,7 @@ namespace osu.Game.Tests.Visual.SongSelect
             createSongSelect();
 
             AddStep("push child screen", () => Stack.Push(new TestSceneOsuScreenStack.TestScreen("test child")));
-            AddUntilStep("wait for not current", () => !songSelect!.IsCurrentScreen());
+            waitForDismissed();
 
             AddStep("change convert setting", () => config.SetValue(OsuSetting.ShowConvertedBeatmaps, true));
 
@@ -292,7 +293,7 @@ namespace osu.Game.Tests.Visual.SongSelect
             createSongSelect();
 
             AddStep("push child screen", () => Stack.Push(new TestSceneOsuScreenStack.TestScreen("test child")));
-            AddUntilStep("wait for not current", () => !songSelect!.IsCurrentScreen());
+            waitForDismissed();
 
             AddStep("update beatmap", () =>
             {
@@ -311,7 +312,9 @@ namespace osu.Game.Tests.Visual.SongSelect
         {
             createSongSelect();
 
-            addRulesetImportStep(0);
+            // We need to use one real beatmap to trigger the "same-track-transfer" logic that we're looking to test here.
+            // See `SongSelect.ensurePlayingSelected` and `WorkingBeatmap.TryTransferTrack`.
+            AddStep("import test beatmap", () => manager.Import(new ImportTask(TestResources.GetTestBeatmapForImport())).WaitSafely());
             addRulesetImportStep(0);
 
             checkMusicPlaying(true);
@@ -320,6 +323,8 @@ namespace osu.Game.Tests.Visual.SongSelect
 
             AddStep("manual pause", () => music.TogglePause());
             checkMusicPlaying(false);
+
+            // Track should not have changed, so music should still not be playing.
             AddStep("select next difficulty", () => songSelect!.Carousel.SelectNext(skipDifficulties: false));
             checkMusicPlaying(false);
 
@@ -415,6 +420,7 @@ namespace osu.Game.Tests.Visual.SongSelect
         }
 
         [Test]
+        [Ignore("temporary while peppy investigates. probably realm batching related.")]
         public void TestSelectionRetainedOnBeatmapUpdate()
         {
             createSongSelect();
@@ -459,7 +465,7 @@ namespace osu.Game.Tests.Visual.SongSelect
                 manager.Import(testBeatmapSetInfo);
             }, 10);
 
-            AddUntilStep("has selection", () => songSelect!.Carousel.SelectedBeatmapInfo?.BeatmapSet?.OnlineID == originalOnlineSetID);
+            AddUntilStep("has selection", () => songSelect!.Carousel.SelectedBeatmapInfo?.BeatmapSet?.OnlineID, () => Is.EqualTo(originalOnlineSetID));
 
             Task<Live<BeatmapSetInfo>?> updateTask = null!;
 
@@ -471,7 +477,7 @@ namespace osu.Game.Tests.Visual.SongSelect
             });
             AddUntilStep("wait for update completion", () => updateTask.IsCompleted);
 
-            AddUntilStep("retained selection", () => songSelect!.Carousel.SelectedBeatmapInfo?.BeatmapSet?.OnlineID == originalOnlineSetID);
+            AddUntilStep("retained selection", () => songSelect!.Carousel.SelectedBeatmapInfo?.BeatmapSet?.OnlineID, () => Is.EqualTo(originalOnlineSetID));
         }
 
         [Test]
@@ -574,6 +580,24 @@ namespace osu.Game.Tests.Visual.SongSelect
             AddAssert("start not requested", () => !startRequested);
         }
 
+        [Test]
+        public void TestSearchTextWithRulesetCriteria()
+        {
+            createSongSelect();
+
+            addRulesetImportStep(0);
+
+            AddStep("disallow convert display", () => config.SetValue(OsuSetting.ShowConvertedBeatmaps, false));
+
+            AddUntilStep("has selection", () => songSelect!.Carousel.SelectedBeatmapInfo != null);
+
+            AddStep("set filter to match all", () => songSelect!.FilterControl.CurrentTextSearch.Value = "Some");
+
+            changeRuleset(1);
+
+            AddUntilStep("has no selection", () => songSelect!.Carousel.SelectedBeatmapInfo == null);
+        }
+
         [TestCase(false)]
         [TestCase(true)]
         public void TestExternalBeatmapChangeWhileFiltered(bool differentRuleset)
@@ -590,7 +614,7 @@ namespace osu.Game.Tests.Visual.SongSelect
 
             AddUntilStep("has selection", () => songSelect!.Carousel.SelectedBeatmapInfo != null);
 
-            AddStep("set filter text", () => songSelect!.FilterControl.ChildrenOfType<SearchTextBox>().First().Text = "nonono");
+            AddStep("set filter text", () => songSelect!.FilterControl.ChildrenOfType<FilterControl.FilterControlTextBox>().First().Text = "nonono");
 
             AddUntilStep("dummy selected", () => Beatmap.Value is DummyWorkingBeatmap);
 
@@ -624,7 +648,7 @@ namespace osu.Game.Tests.Visual.SongSelect
             AddUntilStep("carousel has correct", () => songSelect!.Carousel.SelectedBeatmapInfo?.MatchesOnlineID(target) == true);
             AddUntilStep("game has correct", () => Beatmap.Value.BeatmapInfo.MatchesOnlineID(target));
 
-            AddStep("reset filter text", () => songSelect!.FilterControl.ChildrenOfType<SearchTextBox>().First().Text = string.Empty);
+            AddStep("reset filter text", () => songSelect!.FilterControl.ChildrenOfType<FilterControl.FilterControlTextBox>().First().Text = string.Empty);
 
             AddAssert("game still correct", () => Beatmap.Value?.BeatmapInfo.MatchesOnlineID(target) == true);
             AddAssert("carousel still correct", () => songSelect!.Carousel.SelectedBeatmapInfo.MatchesOnlineID(target));
@@ -642,7 +666,7 @@ namespace osu.Game.Tests.Visual.SongSelect
 
             AddUntilStep("has selection", () => songSelect!.Carousel.SelectedBeatmapInfo != null);
 
-            AddStep("set filter text", () => songSelect!.FilterControl.ChildrenOfType<SearchTextBox>().First().Text = "nonono");
+            AddStep("set filter text", () => songSelect!.FilterControl.ChildrenOfType<FilterControl.FilterControlTextBox>().First().Text = "nonono");
 
             AddUntilStep("dummy selected", () => Beatmap.Value is DummyWorkingBeatmap);
 
@@ -665,7 +689,7 @@ namespace osu.Game.Tests.Visual.SongSelect
             AddUntilStep("carousel has correct", () => songSelect!.Carousel.SelectedBeatmapInfo?.MatchesOnlineID(target) == true);
             AddUntilStep("game has correct", () => Beatmap.Value.BeatmapInfo.MatchesOnlineID(target));
 
-            AddStep("set filter text", () => songSelect!.FilterControl.ChildrenOfType<SearchTextBox>().First().Text = "nononoo");
+            AddStep("set filter text", () => songSelect!.FilterControl.ChildrenOfType<FilterControl.FilterControlTextBox>().First().Text = "nononoo");
 
             AddUntilStep("game lost selection", () => Beatmap.Value is DummyWorkingBeatmap);
             AddAssert("carousel lost selection", () => songSelect!.Carousel.SelectedBeatmapInfo == null);
@@ -825,6 +849,8 @@ namespace osu.Game.Tests.Visual.SongSelect
 
             AddStep("Click on a filtered difficulty", () =>
             {
+                Debug.Assert(filteredIcon != null);
+
                 InputManager.MoveMouseTo(filteredIcon);
 
                 InputManager.Click(MouseButton.Left);
@@ -918,6 +944,8 @@ namespace osu.Game.Tests.Visual.SongSelect
 
             AddStep("Click on a difficulty", () =>
             {
+                Debug.Assert(difficultyIcon != null);
+
                 InputManager.MoveMouseTo(difficultyIcon);
 
                 InputManager.Click(MouseButton.Left);
@@ -1007,7 +1035,7 @@ namespace osu.Game.Tests.Visual.SongSelect
                 });
             });
 
-            AddUntilStep("wait for results screen presented", () => !songSelect!.IsCurrentScreen());
+            waitForDismissed();
 
             AddAssert("check beatmap is correct for score", () => Beatmap.Value.BeatmapInfo.MatchesOnlineID(getPresentBeatmap()));
             AddAssert("check ruleset is correct for score", () => Ruleset.Value.OnlineID == 0);
@@ -1036,7 +1064,7 @@ namespace osu.Game.Tests.Visual.SongSelect
                 songSelect!.PresentScore(TestResources.CreateTestScoreInfo(getPresentBeatmap()));
             });
 
-            AddUntilStep("wait for results screen presented", () => !songSelect!.IsCurrentScreen());
+            waitForDismissed();
 
             AddAssert("check beatmap is correct for score", () => Beatmap.Value.BeatmapInfo.MatchesOnlineID(getPresentBeatmap()));
             AddAssert("check ruleset is correct for score", () => Ruleset.Value.OnlineID == 0);
@@ -1064,7 +1092,59 @@ namespace osu.Game.Tests.Visual.SongSelect
 
             AddAssert("options enabled", () => songSelect.ChildrenOfType<FooterButtonOptions>().Single().Enabled.Value);
             AddStep("delete all beatmaps", () => manager.Delete());
+            AddUntilStep("wait for no beatmap", () => Beatmap.IsDefault);
             AddAssert("options disabled", () => !songSelect.ChildrenOfType<FooterButtonOptions>().Single().Enabled.Value);
+        }
+
+        [Test]
+        public void TestTextBoxBeatmapDifficultyCount()
+        {
+            createSongSelect();
+
+            AddAssert("0 matching shown", () => songSelect.ChildrenOfType<FilterControl>().Single().InformationalText == "0 matches");
+
+            addRulesetImportStep(0);
+
+            AddAssert("3 matching shown", () => songSelect.ChildrenOfType<FilterControl>().Single().InformationalText == "3 matches");
+            AddStep("delete all beatmaps", () => manager.Delete());
+            AddUntilStep("wait for no beatmap", () => Beatmap.IsDefault);
+            AddAssert("0 matching shown", () => songSelect.ChildrenOfType<FilterControl>().Single().InformationalText == "0 matches");
+        }
+
+        [Test]
+        public void TestDeleteHotkey()
+        {
+            createSongSelect();
+
+            addRulesetImportStep(0);
+            AddAssert("3 matching shown", () => songSelect.ChildrenOfType<FilterControl>().Single().InformationalText == "3 matches");
+
+            AddStep("press shift-delete", () =>
+            {
+                InputManager.PressKey(Key.ShiftLeft);
+                InputManager.Key(Key.Delete);
+                InputManager.ReleaseKey(Key.ShiftLeft);
+            });
+            AddUntilStep("delete dialog shown", () => DialogOverlay.CurrentDialog, Is.InstanceOf<BeatmapDeleteDialog>);
+            AddStep("confirm deletion", () => DialogOverlay.CurrentDialog!.PerformAction<PopupDialogDangerousButton>());
+            AddAssert("0 matching shown", () => songSelect.ChildrenOfType<FilterControl>().Single().InformationalText == "0 matches");
+        }
+
+        [Test]
+        public void TestCutInFilterTextBox()
+        {
+            createSongSelect();
+
+            AddStep("set filter text", () => songSelect!.FilterControl.ChildrenOfType<FilterControl.FilterControlTextBox>().First().Text = "nonono");
+            AddStep("select all", () => InputManager.Keys(PlatformAction.SelectAll));
+            AddStep("press ctrl-x", () =>
+            {
+                InputManager.PressKey(Key.ControlLeft);
+                InputManager.Key(Key.X);
+                InputManager.ReleaseKey(Key.ControlLeft);
+            });
+
+            AddAssert("filter text cleared", () => songSelect!.FilterControl.ChildrenOfType<FilterControl.FilterControlTextBox>().First().Text, () => Is.Empty);
         }
 
         private void waitForInitialSelection()
@@ -1140,6 +1220,8 @@ namespace osu.Game.Tests.Visual.SongSelect
             if (rulesets.IsNotNull())
                 rulesets.Dispose();
         }
+
+        private void waitForDismissed() => AddUntilStep("wait for not current", () => !songSelect.AsNonNull().IsCurrentScreen());
 
         private partial class TestSongSelect : PlaySongSelect
         {

@@ -73,16 +73,6 @@ namespace osu.Game.Tests.Gameplay
         }
 
         [Test]
-        [FlakyTest]
-        /*
-         * Fail rate around 0.15%
-         *
-         * TearDown : osu.Framework.Testing.Drawables.Steps.AssertButton+TracedException : gameplay clock time = 2500
-         * --TearDown
-         *    at osu.Framework.Threading.ScheduledDelegate.RunTaskInternal()
-         *    at osu.Framework.Threading.Scheduler.Update()
-         *    at osu.Framework.Graphics.Drawable.UpdateSubTree()
-         */
         public void TestSeekPerformsInGameplayTime(
             [Values(1.0, 0.5, 2.0)] double clockRate,
             [Values(0.0, 200.0, -200.0)] double userOffset,
@@ -91,6 +81,9 @@ namespace osu.Game.Tests.Gameplay
         {
             ClockBackedTestWorkingBeatmap working = null;
             GameplayClockContainer gameplayClockContainer = null;
+
+            // ReSharper disable once NotAccessedVariable
+            BindableDouble trackAdjustment = null; // keeping a reference for track adjustment
 
             if (setAudioOffsetBeforeConstruction)
                 AddStep($"preset audio offset to {userOffset}", () => localConfig.SetValue(OsuSetting.AudioOffset, userOffset));
@@ -103,16 +96,38 @@ namespace osu.Game.Tests.Gameplay
                 gameplayClockContainer.Reset(startClock: !whileStopped);
             });
 
-            AddStep($"set clock rate to {clockRate}", () => working.Track.AddAdjustment(AdjustableProperty.Frequency, new BindableDouble(clockRate)));
+            AddStep($"set clock rate to {clockRate}", () => working.Track.AddAdjustment(AdjustableProperty.Frequency, trackAdjustment = new BindableDouble(clockRate)));
 
             if (!setAudioOffsetBeforeConstruction)
                 AddStep($"set audio offset to {userOffset}", () => localConfig.SetValue(OsuSetting.AudioOffset, userOffset));
 
             AddStep("seek to 2500", () => gameplayClockContainer.Seek(2500));
-            AddStep("gameplay clock time = 2500", () => Assert.AreEqual(gameplayClockContainer.CurrentTime, 2500, 10f));
+            AddAssert("gameplay clock time = 2500", () => gameplayClockContainer.CurrentTime, () => Is.EqualTo(2500).Within(10f));
 
             AddStep("seek to 10000", () => gameplayClockContainer.Seek(10000));
-            AddStep("gameplay clock time = 10000", () => Assert.AreEqual(gameplayClockContainer.CurrentTime, 10000, 10f));
+            AddAssert("gameplay clock time = 10000", () => gameplayClockContainer.CurrentTime, () => Is.EqualTo(10000).Within(10f));
+        }
+
+        [Test]
+        public void TestStopUsingBeatmapClock()
+        {
+            ClockBackedTestWorkingBeatmap working = null;
+            MasterGameplayClockContainer gameplayClockContainer = null;
+            BindableDouble frequencyAdjustment = new BindableDouble(2);
+
+            AddStep("create container", () =>
+            {
+                working = new ClockBackedTestWorkingBeatmap(new OsuRuleset().RulesetInfo, new FramedClock(new ManualClock()), Audio);
+                Child = gameplayClockContainer = new MasterGameplayClockContainer(working, 0);
+
+                gameplayClockContainer.Reset(startClock: true);
+            });
+
+            AddStep("apply frequency adjustment", () => gameplayClockContainer.AdjustmentsFromMods.AddAdjustment(AdjustableProperty.Frequency, frequencyAdjustment));
+            AddAssert("track frequency changed", () => working.Track.AggregateFrequency.Value, () => Is.EqualTo(2));
+
+            AddStep("stop using beatmap clock", () => gameplayClockContainer.StopUsingBeatmapClock());
+            AddAssert("frequency adjustment unapplied", () => working.Track.AggregateFrequency.Value, () => Is.EqualTo(1));
         }
 
         protected override void Dispose(bool isDisposing)

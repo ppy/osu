@@ -1,18 +1,19 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using System.ComponentModel;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
+using osu.Framework.Localisation;
 using osu.Game.Configuration;
 using osu.Game.Graphics.UserInterface;
+using osu.Game.Localisation.HUD;
 using osu.Game.Rulesets.Scoring;
 
 namespace osu.Game.Screens.Play.HUD
 {
     public abstract partial class GameplayAccuracyCounter : PercentageCounter
     {
-        [SettingSource("Accuracy display mode", "Which accuracy mode should be displayed.")]
+        [SettingSource(typeof(GameplayAccuracyCounterStrings), nameof(GameplayAccuracyCounterStrings.AccuracyDisplay), nameof(GameplayAccuracyCounterStrings.AccuracyDisplayDescription))]
         public Bindable<AccuracyDisplayMode> AccuracyDisplay { get; } = new Bindable<AccuracyDisplayMode>();
 
         [Resolved]
@@ -22,11 +23,11 @@ namespace osu.Game.Screens.Play.HUD
         {
             base.LoadComplete();
 
-            AccuracyDisplay.BindValueChanged(mod =>
+            AccuracyDisplay.BindValueChanged(mode =>
             {
                 Current.UnbindBindings();
 
-                switch (mod.NewValue)
+                switch (mode.NewValue)
                 {
                     case AccuracyDisplayMode.Standard:
                         Current.BindTo(scoreProcessor.Accuracy);
@@ -51,13 +52,13 @@ namespace osu.Game.Screens.Play.HUD
 
         public enum AccuracyDisplayMode
         {
-            [Description("Standard")]
+            [LocalisableDescription(typeof(GameplayAccuracyCounterStrings), nameof(GameplayAccuracyCounterStrings.AccuracyDisplayModeStandard))]
             Standard,
 
-            [Description("Maximum achievable")]
+            [LocalisableDescription(typeof(GameplayAccuracyCounterStrings), nameof(GameplayAccuracyCounterStrings.AccuracyDisplayModeMax))]
             MaximumAchievable,
 
-            [Description("Minimum achievable")]
+            [LocalisableDescription(typeof(GameplayAccuracyCounterStrings), nameof(GameplayAccuracyCounterStrings.AccuracyDisplayModeMin))]
             MinimumAchievable
         }
     }

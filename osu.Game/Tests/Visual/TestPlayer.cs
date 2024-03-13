@@ -8,6 +8,7 @@ using System.Collections.Generic;
 using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
+using osu.Framework.Screens;
 using osu.Game.Online.API;
 using osu.Game.Online.Rooms;
 using osu.Game.Online.Spectator;
@@ -60,7 +61,7 @@ namespace osu.Game.Tests.Visual
             PauseOnFocusLost = pauseOnFocusLost;
         }
 
-        protected override bool HandleTokenRetrievalFailure(Exception exception) => false;
+        protected override bool ShouldExitOnTokenRetrievalFailure(Exception exception) => false;
 
         protected override APIRequest<APIScoreToken> CreateTokenRequest()
         {
@@ -101,6 +102,19 @@ namespace osu.Game.Tests.Visual
                 return;
 
             ScoreProcessor.NewJudgement += r => Results.Add(r);
+        }
+
+        public override bool OnExiting(ScreenExitEvent e)
+        {
+            bool exiting = base.OnExiting(e);
+
+            // SubmittingPlayer performs EndPlaying on a fire-and-forget async task, which allows for the chance of BeginPlaying to be called before EndPlaying is called here.
+            // Until this is handled properly at game-side, ensure EndPlaying is called before exiting player.
+            // see: https://github.com/ppy/osu/issues/22220
+            if (LoadedBeatmapSuccessfully)
+                spectatorClient?.EndPlaying(GameplayState);
+
+            return exiting;
         }
 
         protected override void Dispose(bool isDisposing)

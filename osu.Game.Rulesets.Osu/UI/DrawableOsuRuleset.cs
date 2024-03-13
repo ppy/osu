@@ -26,6 +26,8 @@ namespace osu.Game.Rulesets.Osu.UI
     {
         protected new OsuRulesetConfigManager Config => (OsuRulesetConfigManager)base.Config;
 
+        public new OsuInputManager KeyBindingInputManager => (OsuInputManager)base.KeyBindingInputManager;
+
         public new OsuPlayfield Playfield => (OsuPlayfield)base.Playfield;
 
         public DrawableOsuRuleset(Ruleset ruleset, IBeatmap beatmap, IReadOnlyList<Mod> mods = null)

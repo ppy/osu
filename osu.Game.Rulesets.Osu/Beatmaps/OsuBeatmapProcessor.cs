@@ -1,12 +1,12 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
 using System;
+using System.Linq;
 using osu.Framework.Graphics;
 using osu.Game.Beatmaps;
 using osu.Game.Rulesets.Objects;
+using osu.Game.Rulesets.Objects.Types;
 using osu.Game.Rulesets.Osu.Objects;
 using osuTK;
 
@@ -19,6 +19,22 @@ namespace osu.Game.Rulesets.Osu.Beatmaps
         public OsuBeatmapProcessor(IBeatmap beatmap)
             : base(beatmap)
         {
+        }
+
+        public override void PreProcess()
+        {
+            IHasComboInformation? lastObj = null;
+
+            // For sanity, ensures that both the first hitobject and the first hitobject after a spinner start a new combo.
+            // This is normally enforced by the legacy decoder, but is not enforced by the editor.
+            foreach (var obj in Beatmap.HitObjects.OfType<IHasComboInformation>())
+            {
+                if (obj is not Spinner && (lastObj == null || lastObj is Spinner))
+                    obj.NewCombo = true;
+                lastObj = obj;
+            }
+
+            base.PreProcess();
         }
 
         public override void PostProcess()
@@ -42,9 +58,9 @@ namespace osu.Game.Rulesets.Osu.Beatmaps
 
         private void applyStacking(Beatmap<OsuHitObject> beatmap, int startIndex, int endIndex)
         {
-            if (startIndex > endIndex) throw new ArgumentOutOfRangeException(nameof(startIndex), $"{nameof(startIndex)} cannot be greater than {nameof(endIndex)}.");
-            if (startIndex < 0) throw new ArgumentOutOfRangeException(nameof(startIndex), $"{nameof(startIndex)} cannot be less than 0.");
-            if (endIndex < 0) throw new ArgumentOutOfRangeException(nameof(endIndex), $"{nameof(endIndex)} cannot be less than 0.");
+            ArgumentOutOfRangeException.ThrowIfGreaterThan(startIndex, endIndex);
+            ArgumentOutOfRangeException.ThrowIfNegative(startIndex);
+            ArgumentOutOfRangeException.ThrowIfNegative(endIndex);
 
             int extendedEndIndex = endIndex;
 
@@ -97,15 +113,15 @@ namespace osu.Game.Rulesets.Osu.Beatmaps
             {
                 int n = i;
                 /* We should check every note which has not yet got a stack.
-                    * Consider the case we have two interwound stacks and this will make sense.
-                    *
-                    * o <-1      o <-2
-                    *  o <-3      o <-4
-                    *
-                    * We first process starting from 4 and handle 2,
-                    * then we come backwards on the i loop iteration until we reach 3 and handle 1.
-                    * 2 and 1 will be ignored in the i loop because they already have a stack value.
-                    */
+                 * Consider the case we have two interwound stacks and this will make sense.
+                 *
+                 * o <-1      o <-2
+                 *  o <-3      o <-4
+                 *
+                 * We first process starting from 4 and handle 2,
+                 * then we come backwards on the i loop iteration until we reach 3 and handle 1.
+                 * 2 and 1 will be ignored in the i loop because they already have a stack value.
+                 */
 
                 OsuHitObject objectI = beatmap.HitObjects[i];
                 if (objectI.StackHeight != 0 || objectI is Spinner) continue;
@@ -113,9 +129,9 @@ namespace osu.Game.Rulesets.Osu.Beatmaps
                 double stackThreshold = objectI.TimePreempt * beatmap.BeatmapInfo.StackLeniency;
 
                 /* If this object is a hitcircle, then we enter this "special" case.
-                    * It either ends with a stack of hitcircles only, or a stack of hitcircles that are underneath a slider.
-                    * Any other case is handled by the "is Slider" code below this.
-                    */
+                 * It either ends with a stack of hitcircles only, or a stack of hitcircles that are underneath a slider.
+                 * Any other case is handled by the "is Slider" code below this.
+                 */
                 if (objectI is HitCircle)
                 {
                     while (--n >= 0)
@@ -137,10 +153,10 @@ namespace osu.Game.Rulesets.Osu.Beatmaps
                         }
 
                         /* This is a special case where hticircles are moved DOWN and RIGHT (negative stacking) if they are under the *last* slider in a stacked pattern.
-                            *    o==o <- slider is at original location
-                            *        o <- hitCircle has stack of -1
-                            *         o <- hitCircle has stack of -2
-                            */
+                         *    o==o <- slider is at original location
+                         *        o <- hitCircle has stack of -1
+                         *         o <- hitCircle has stack of -2
+                         */
                         if (objectN is Slider && Vector2Extensions.Distance(objectN.EndPosition, objectI.Position) < stack_distance)
                         {
                             int offset = objectI.StackHeight - objectN.StackHeight + 1;
@@ -171,8 +187,8 @@ namespace osu.Game.Rulesets.Osu.Beatmaps
                 else if (objectI is Slider)
                 {
                     /* We have hit the first slider in a possible stack.
-                        * From this point on, we ALWAYS stack positive regardless.
-                        */
+                     * From this point on, we ALWAYS stack positive regardless.
+                     */
                     while (--n >= startIndex)
                     {
                         OsuHitObject objectN = beatmap.HitObjects[n];
@@ -216,17 +232,24 @@ namespace osu.Game.Rulesets.Osu.Beatmaps
                         ? currSlider.Position + currSlider.Path.PositionAt(1)
                         : currHitObject.Position;
 
+                    // Note the use of `StartTime` in the code below doesn't match stable's use of `EndTime`.
+                    // This is because in the stable implementation, `UpdateCalculations` is not called on the inner-loop hitobject (j)
+                    // and therefore it does not have a correct `EndTime`, but instead the default of `EndTime = StartTime`.
+                    //
+                    // Effects of this can be seen on https://osu.ppy.sh/beatmapsets/243#osu/1146 at sliders around 86647 ms, where
+                    // if we use `EndTime` here it would result in unexpected stacking.
+
                     if (Vector2Extensions.Distance(beatmap.HitObjects[j].Position, currHitObject.Position) < stack_distance)
                     {
                         currHitObject.StackHeight++;
-                        startTime = beatmap.HitObjects[j].GetEndTime();
+                        startTime = beatmap.HitObjects[j].StartTime;
                     }
                     else if (Vector2Extensions.Distance(beatmap.HitObjects[j].Position, position2) < stack_distance)
                     {
                         // Case for sliders - bump notes down and right, rather than up and left.
                         sliderStack++;
                         beatmap.HitObjects[j].StackHeight -= sliderStack;
-                        startTime = beatmap.HitObjects[j].GetEndTime();
+                        startTime = beatmap.HitObjects[j].StartTime;
                     }
                 }
             }

@@ -1,7 +1,5 @@
-// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
-
-#nullable disable
 
 using System.Linq;
 using NUnit.Framework;
@@ -28,6 +26,21 @@ namespace osu.Game.Tests.Visual.Navigation
 
             AddStep("press P", () => InputManager.Key(Key.P));
             AddAssert("state is top level", () => buttons.State == ButtonSystemState.TopLevel);
+        }
+
+        [Test]
+        public void TestFastShortcutKeys()
+        {
+            AddAssert("state is initial", () => buttons.State == ButtonSystemState.Initial);
+
+            AddStep("press P three times", () =>
+            {
+                InputManager.Key(Key.P);
+                InputManager.Key(Key.P);
+                InputManager.Key(Key.P);
+            });
+
+            AddAssert("entered song select", () => Game.ScreenStack.CurrentScreen is PlaySongSelect);
         }
 
         [Test]

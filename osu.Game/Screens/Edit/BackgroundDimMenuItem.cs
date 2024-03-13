@@ -5,17 +5,18 @@ using System.Collections.Generic;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics.UserInterface;
 using osu.Game.Graphics.UserInterface;
+using osu.Game.Localisation;
 
 namespace osu.Game.Screens.Edit
 {
     internal class BackgroundDimMenuItem : MenuItem
     {
-        private readonly Bindable<float> backgroudDim;
+        private readonly Bindable<float> backgroundDim;
 
         private readonly Dictionary<float, TernaryStateRadioMenuItem> menuItemLookup = new Dictionary<float, TernaryStateRadioMenuItem>();
 
-        public BackgroundDimMenuItem(Bindable<float> backgroudDim)
-            : base("Background dim")
+        public BackgroundDimMenuItem(Bindable<float> backgroundDim)
+            : base(GameplaySettingsStrings.BackgroundDim)
         {
             Items = new[]
             {
@@ -25,8 +26,8 @@ namespace osu.Game.Screens.Edit
                 createMenuItem(0.75f),
             };
 
-            this.backgroudDim = backgroudDim;
-            backgroudDim.BindValueChanged(dim =>
+            this.backgroundDim = backgroundDim;
+            backgroundDim.BindValueChanged(dim =>
             {
                 foreach (var kvp in menuItemLookup)
                     kvp.Value.State.Value = kvp.Key == dim.NewValue ? TernaryState.True : TernaryState.False;
@@ -40,6 +41,6 @@ namespace osu.Game.Screens.Edit
             return item;
         }
 
-        private void updateOpacity(float dim) => backgroudDim.Value = dim;
+        private void updateOpacity(float dim) => backgroundDim.Value = dim;
     }
 }

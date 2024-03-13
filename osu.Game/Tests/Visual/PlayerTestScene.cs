@@ -7,10 +7,12 @@ using System;
 using System.Linq;
 using JetBrains.Annotations;
 using osu.Framework.Allocation;
+using osu.Framework.Logging;
 using osu.Framework.Testing;
 using osu.Game.Configuration;
 using osu.Game.Rulesets;
 using osu.Game.Rulesets.Mods;
+using osu.Game.Screens.Play;
 
 namespace osu.Game.Tests.Visual
 {
@@ -24,6 +26,24 @@ namespace osu.Game.Tests.Visual
         protected TestPlayer Player;
 
         protected OsuConfigManager LocalConfig;
+
+        private double lastReportedTime;
+
+        protected override void Update()
+        {
+            base.Update();
+
+            if (Player?.GameplayClockContainer != null)
+            {
+                int roundedTime = (int)Player.GameplayClockContainer.CurrentTime / 1000;
+
+                if (roundedTime != lastReportedTime)
+                {
+                    lastReportedTime = roundedTime;
+                    Logger.Log($"⏱️ Gameplay clock reached {lastReportedTime * 1000:N0} ms");
+                }
+            }
+        }
 
         [BackgroundDependencyLoader]
         private void load()
@@ -50,9 +70,19 @@ namespace osu.Game.Tests.Visual
 
             AddStep($"Load player for {CreatePlayerRuleset().Description}", LoadPlayer);
             AddUntilStep("player loaded", () => Player.IsLoaded && Player.Alpha == 1);
+
+            if (AllowBackwardsSeeks)
+            {
+                AddStep("allow backwards seeking", () =>
+                {
+                    Player.DrawableRuleset.AllowBackwardsSeeks = AllowBackwardsSeeks;
+                });
+            }
         }
 
         protected virtual bool AllowFail => false;
+
+        protected virtual bool AllowBackwardsSeeks => false;
 
         protected virtual bool Autoplay => false;
 
@@ -60,6 +90,11 @@ namespace osu.Game.Tests.Visual
 
         protected void LoadPlayer(Mod[] mods)
         {
+            // if a player screen is present already, we must exit that before loading another one,
+            // otherwise it'll crash on SpectatorClient.BeginPlaying being called while client is in "playing" state already.
+            if (Stack.CurrentScreen is Player)
+                Stack.Exit();
+
             var ruleset = CreatePlayerRuleset();
             Ruleset.Value = ruleset.RulesetInfo;
 
@@ -101,6 +136,6 @@ namespace osu.Game.Tests.Visual
 
         protected sealed override Ruleset CreateRuleset() => CreatePlayerRuleset();
 
-        protected virtual TestPlayer CreatePlayer(Ruleset ruleset) => new TestPlayer(false, false);
+        protected virtual TestPlayer CreatePlayer(Ruleset ruleset) => new TestPlayer(false, false, AllowBackwardsSeeks);
     }
 }

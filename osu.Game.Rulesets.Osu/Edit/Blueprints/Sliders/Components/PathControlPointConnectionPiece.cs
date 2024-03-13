@@ -8,34 +8,36 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Lines;
 using osu.Game.Rulesets.Objects;
+using osu.Game.Rulesets.Objects.Types;
 using osu.Game.Rulesets.Osu.Objects;
 using osuTK;
 
 namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders.Components
 {
     /// <summary>
-    /// A visualisation of the line between two <see cref="PathControlPointPiece"/>s.
+    /// A visualisation of the line between two <see cref="PathControlPointPiece{T}"/>s.
     /// </summary>
-    public partial class PathControlPointConnectionPiece : CompositeDrawable
+    /// <typeparam name="T">The type of <see cref="OsuHitObject"/> which this <see cref="PathControlPointConnectionPiece{T}"/> visualises.</typeparam>
+    public partial class PathControlPointConnectionPiece<T> : CompositeDrawable where T : OsuHitObject, IHasPath
     {
         public readonly PathControlPoint ControlPoint;
 
         private readonly Path path;
-        private readonly Slider slider;
+        private readonly T hitObject;
         public int ControlPointIndex { get; set; }
 
-        private IBindable<Vector2> sliderPosition;
+        private IBindable<Vector2> hitObjectPosition;
         private IBindable<int> pathVersion;
 
-        public PathControlPointConnectionPiece(Slider slider, int controlPointIndex)
+        public PathControlPointConnectionPiece(T hitObject, int controlPointIndex)
         {
-            this.slider = slider;
+            this.hitObject = hitObject;
             ControlPointIndex = controlPointIndex;
 
             Origin = Anchor.Centre;
             AutoSizeAxes = Axes.Both;
 
-            ControlPoint = slider.Path.ControlPoints[controlPointIndex];
+            ControlPoint = hitObject.Path.ControlPoints[controlPointIndex];
 
             InternalChild = path = new SmoothPath
             {
@@ -48,11 +50,11 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders.Components
         {
             base.LoadComplete();
 
-            sliderPosition = slider.PositionBindable.GetBoundCopy();
-            sliderPosition.BindValueChanged(_ => updateConnectingPath());
+            hitObjectPosition = hitObject.PositionBindable.GetBoundCopy();
+            hitObjectPosition.BindValueChanged(_ => Scheduler.AddOnce(updateConnectingPath));
 
-            pathVersion = slider.Path.Version.GetBoundCopy();
-            pathVersion.BindValueChanged(_ => updateConnectingPath());
+            pathVersion = hitObject.Path.Version.GetBoundCopy();
+            pathVersion.BindValueChanged(_ => Scheduler.AddOnce(updateConnectingPath));
 
             updateConnectingPath();
         }
@@ -62,16 +64,16 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders.Components
         /// </summary>
         private void updateConnectingPath()
         {
-            Position = slider.StackedPosition + ControlPoint.Position;
+            Position = hitObject.StackedPosition + ControlPoint.Position;
 
             path.ClearVertices();
 
             int nextIndex = ControlPointIndex + 1;
-            if (nextIndex == 0 || nextIndex >= slider.Path.ControlPoints.Count)
+            if (nextIndex == 0 || nextIndex >= hitObject.Path.ControlPoints.Count)
                 return;
 
             path.AddVertex(Vector2.Zero);
-            path.AddVertex(slider.Path.ControlPoints[nextIndex].Position - ControlPoint.Position);
+            path.AddVertex(hitObject.Path.ControlPoints[nextIndex].Position - ControlPoint.Position);
 
             path.OriginPosition = path.PositionInBoundingBox(Vector2.Zero);
         }

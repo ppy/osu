@@ -11,9 +11,12 @@ using System.Linq;
 using JetBrains.Annotations;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
+using osu.Framework.Extensions.ListExtensions;
+using osu.Framework.Extensions.ObjectExtensions;
 using osu.Framework.Extensions.TypeExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Primitives;
+using osu.Framework.Lists;
 using osu.Framework.Threading;
 using osu.Framework.Utils;
 using osu.Game.Audio;
@@ -24,13 +27,14 @@ using osu.Game.Rulesets.Objects.Pooling;
 using osu.Game.Rulesets.Objects.Types;
 using osu.Game.Rulesets.Scoring;
 using osu.Game.Rulesets.UI;
+using osu.Game.Screens.Play;
 using osu.Game.Skinning;
 using osuTK.Graphics;
 
 namespace osu.Game.Rulesets.Objects.Drawables
 {
     [Cached(typeof(DrawableHitObject))]
-    public abstract partial class DrawableHitObject : PoolableDrawableWithLifetime<HitObjectLifetimeEntry>
+    public abstract partial class DrawableHitObject : PoolableDrawableWithLifetime<HitObjectLifetimeEntry>, IAnimationTimeReference
     {
         /// <summary>
         /// Invoked after this <see cref="DrawableHitObject"/>'s applied <see cref="HitObject"/> has had its defaults applied.
@@ -63,7 +67,7 @@ namespace osu.Game.Rulesets.Objects.Drawables
         public virtual IEnumerable<HitSampleInfo> GetSamples() => HitObject.Samples;
 
         private readonly List<DrawableHitObject> nestedHitObjects = new List<DrawableHitObject>();
-        public IReadOnlyList<DrawableHitObject> NestedHitObjects => nestedHitObjects;
+        public SlimReadOnlyListWrapper<DrawableHitObject> NestedHitObjects => nestedHitObjects.AsSlimReadOnly();
 
         /// <summary>
         /// Whether this object should handle any user input events.
@@ -82,6 +86,9 @@ namespace osu.Game.Rulesets.Objects.Drawables
         /// <summary>
         /// Invoked by this or a nested <see cref="DrawableHitObject"/> prior to a <see cref="JudgementResult"/> being reverted.
         /// </summary>
+        /// <remarks>
+        /// This is only invoked if this <see cref="DrawableHitObject"/> is alive when the result is reverted.
+        /// </remarks>
         public event Action<DrawableHitObject, JudgementResult> OnRevertResult;
 
         /// <summary>
@@ -95,9 +102,9 @@ namespace osu.Game.Rulesets.Objects.Drawables
         public virtual bool DisplayResult => true;
 
         /// <summary>
-        /// Whether this <see cref="DrawableHitObject"/> and all of its nested <see cref="DrawableHitObject"/>s have been judged.
+        /// The scoring result of this <see cref="DrawableHitObject"/>.
         /// </summary>
-        public bool AllJudged => Judged && NestedHitObjects.All(h => h.AllJudged);
+        public JudgementResult Result => Entry?.Result;
 
         /// <summary>
         /// Whether this <see cref="DrawableHitObject"/> has been hit. This occurs if <see cref="Result"/> is hit.
@@ -109,12 +116,12 @@ namespace osu.Game.Rulesets.Objects.Drawables
         /// Whether this <see cref="DrawableHitObject"/> has been judged.
         /// Note: This does NOT include nested hitobjects.
         /// </summary>
-        public bool Judged => Result?.HasResult ?? true;
+        public bool Judged => Entry?.Judged ?? false;
 
         /// <summary>
-        /// The scoring result of this <see cref="DrawableHitObject"/>.
+        /// Whether this <see cref="DrawableHitObject"/> and all of its nested <see cref="DrawableHitObject"/>s have been judged.
         /// </summary>
-        public JudgementResult Result => Entry?.Result;
+        public bool AllJudged => Entry?.AllJudged ?? false;
 
         /// <summary>
         /// The relative X position of this hit object for sample playback balance adjustment.
@@ -135,7 +142,7 @@ namespace osu.Game.Rulesets.Objects.Drawables
 
         protected override bool RequiresChildrenUpdate => true;
 
-        public override bool IsPresent => base.IsPresent || (State.Value == ArmedState.Idle && Clock?.CurrentTime >= LifetimeStart);
+        public override bool IsPresent => base.IsPresent || (State.Value == ArmedState.Idle && Clock.IsNotNull() && Clock.CurrentTime >= LifetimeStart);
 
         private readonly Bindable<ArmedState> state = new Bindable<ArmedState>();
 
@@ -154,6 +161,26 @@ namespace osu.Game.Rulesets.Objects.Drawables
         /// Whether the initialization logic in <see cref="Playfield" /> has applied.
         /// </summary>
         internal bool IsInitialized;
+
+        /// <summary>
+        /// The minimum allowable volume for sample playback.
+        /// <see cref="Samples"/> quieter than that will be forcibly played at this volume instead.
+        /// </summary>
+        /// <remarks>
+        /// <para>
+        /// Drawable hitobjects adding their own custom samples, or other sample playback sources
+        /// (i.e. <see cref="GameplaySampleTriggerSource"/>) must enforce this themselves.
+        /// </para>
+        /// <para>
+        /// This sample volume floor is present in stable, although it is set at 8% rather than 5%.
+        /// See: https://github.com/peppy/osu-stable-reference/blob/3ea48705eb67172c430371dcfc8a16a002ed0d3d/osu!/Audio/AudioEngine.cs#L1070,
+        /// https://github.com/peppy/osu-stable-reference/blob/3ea48705eb67172c430371dcfc8a16a002ed0d3d/osu!/Audio/AudioEngine.cs#L1404-L1405.
+        /// The reason why it is 5% here is that the 8% cap was enforced in a silent manner
+        /// (i.e. the minimum selectable volume in the editor was 5%, but it would be played at 8% anyways),
+        /// which is confusing and arbitrary, so we're just doing 5% here at the cost of sacrificing strict parity.
+        /// </para>
+        /// </remarks>
+        public const int MINIMUM_SAMPLE_VOLUME = 5;
 
         /// <summary>
         /// Creates a new <see cref="DrawableHitObject"/>.
@@ -177,7 +204,10 @@ namespace osu.Game.Rulesets.Objects.Drawables
             comboColourBrightness.BindTo(gameplaySettings.ComboColourNormalisationAmount);
 
             // Explicit non-virtual function call in case a DrawableHitObject overrides AddInternal.
-            base.AddInternal(Samples = new PausableSkinnableSound());
+            base.AddInternal(Samples = new PausableSkinnableSound
+            {
+                MinimumSampleVolume = MINIMUM_SAMPLE_VOLUME
+            });
 
             CurrentSkin = skinSource;
             CurrentSkin.SourceChanged += skinSourceChanged;
@@ -215,12 +245,16 @@ namespace osu.Game.Rulesets.Objects.Drawables
 
         protected sealed override void OnApply(HitObjectLifetimeEntry entry)
         {
+            Debug.Assert(Entry != null);
+
             // LifetimeStart is already computed using HitObjectLifetimeEntry's InitialLifetimeOffset.
             // We override this with DHO's InitialLifetimeOffset for a non-pooled DHO.
             if (entry is SyntheticHitObjectEntry)
                 LifetimeStart = HitObject.StartTime - InitialLifetimeOffset;
 
             ensureEntryHasResult();
+
+            entry.RevertResult += onRevertResult;
 
             foreach (var h in HitObject.NestedHitObjects)
             {
@@ -234,7 +268,7 @@ namespace osu.Game.Rulesets.Objects.Drawables
                     OnNestedDrawableCreated?.Invoke(drawableNested);
 
                 drawableNested.OnNewResult += onNewResult;
-                drawableNested.OnRevertResult += onRevertResult;
+                drawableNested.OnRevertResult += onNestedRevertResult;
                 drawableNested.ApplyCustomUpdateState += onApplyCustomUpdateState;
 
                 // This is only necessary for non-pooled DHOs. For pooled DHOs, this is handled inside GetPooledDrawableRepresentation().
@@ -242,11 +276,16 @@ namespace osu.Game.Rulesets.Objects.Drawables
                 drawableNested.ParentHitObject = this;
 
                 nestedHitObjects.Add(drawableNested);
+
+                // assume that synthetic entries are not pooled and therefore need to be managed from within the DHO.
+                // this is important for the correctness of value of flags such as `AllJudged`.
+                if (drawableNested.Entry is SyntheticHitObjectEntry syntheticNestedEntry)
+                    Entry.NestedEntries.Add(syntheticNestedEntry);
+
                 AddNestedHitObject(drawableNested);
             }
 
             StartTimeBindable.BindTo(HitObject.StartTimeBindable);
-            StartTimeBindable.BindValueChanged(onStartTimeChanged);
 
             if (HitObject is IHasComboInformation combo)
             {
@@ -285,6 +324,8 @@ namespace osu.Game.Rulesets.Objects.Drawables
 
         protected sealed override void OnFree(HitObjectLifetimeEntry entry)
         {
+            Debug.Assert(Entry != null);
+
             StartTimeBindable.UnbindFrom(HitObject.StartTimeBindable);
 
             if (HitObject is IHasComboInformation combo)
@@ -295,28 +336,30 @@ namespace osu.Game.Rulesets.Objects.Drawables
 
             samplesBindable.UnbindFrom(HitObject.SamplesBindable);
 
-            // Changes in start time trigger state updates. When a new hitobject is applied, OnApply() automatically performs a state update anyway.
-            StartTimeBindable.ValueChanged -= onStartTimeChanged;
-
             // When a new hitobject is applied, the samples will be cleared before re-populating.
             // In order to stop this needless update, the event is unbound and re-bound as late as possible in Apply().
             samplesBindable.CollectionChanged -= onSamplesChanged;
 
             // Release the samples for other hitobjects to use.
-            if (Samples != null)
-                Samples.Samples = null;
+            Samples?.ClearSamples();
 
             foreach (var obj in nestedHitObjects)
             {
                 obj.OnNewResult -= onNewResult;
-                obj.OnRevertResult -= onRevertResult;
+                obj.OnRevertResult -= onNestedRevertResult;
                 obj.ApplyCustomUpdateState -= onApplyCustomUpdateState;
             }
 
             nestedHitObjects.Clear();
+            // clean up synthetic entries manually added in `Apply()`.
+            Entry.NestedEntries.RemoveAll(nestedEntry => nestedEntry is SyntheticHitObjectEntry);
             ClearNestedHitObjects();
 
+            // Changes to `HitObject` properties trigger default application, which triggers `State` updates.
+            // When a new hitobject is applied, `OnApply()` automatically performs a state update.
             HitObject.DefaultsApplied -= onDefaultsApplied;
+
+            entry.RevertResult -= onRevertResult;
 
             OnFree();
 
@@ -351,22 +394,20 @@ namespace osu.Game.Rulesets.Objects.Drawables
             if (samples.Length <= 0)
                 return;
 
-            if (HitObject.SampleControlPoint == null)
-            {
-                throw new InvalidOperationException($"{nameof(HitObject)}s must always have an attached {nameof(HitObject.SampleControlPoint)}."
-                                                    + $" This is an indication that {nameof(HitObject.ApplyDefaults)} has not been invoked on {this}.");
-            }
-
-            Samples.Samples = samples.Select(s => HitObject.SampleControlPoint.ApplyTo(s)).Cast<ISampleInfo>().ToArray();
+            Samples.Samples = samples.Cast<ISampleInfo>().ToArray();
         }
 
         private void onSamplesChanged(object sender, NotifyCollectionChangedEventArgs e) => LoadSamples();
 
-        private void onStartTimeChanged(ValueChangedEvent<double> startTime) => updateState(State.Value, true);
-
         private void onNewResult(DrawableHitObject drawableHitObject, JudgementResult result) => OnNewResult?.Invoke(drawableHitObject, result);
 
-        private void onRevertResult(DrawableHitObject drawableHitObject, JudgementResult result) => OnRevertResult?.Invoke(drawableHitObject, result);
+        private void onRevertResult()
+        {
+            updateState(ArmedState.Idle);
+            OnRevertResult?.Invoke(this, Result);
+        }
+
+        private void onNestedRevertResult(DrawableHitObject drawableHitObject, JudgementResult result) => OnRevertResult?.Invoke(drawableHitObject, result);
 
         private void onApplyCustomUpdateState(DrawableHitObject drawableHitObject, ArmedState state) => ApplyCustomUpdateState?.Invoke(drawableHitObject, state);
 
@@ -374,6 +415,15 @@ namespace osu.Game.Rulesets.Objects.Drawables
         {
             Debug.Assert(Entry != null);
             Apply(Entry);
+
+            // Applied defaults indicate a change in hit object state.
+            // We need to update the judgement result time to the new end time
+            // and update state to ensure the hit object fades out at the correct time.
+            if (Result is not null)
+            {
+                Result.TimeOffset = 0;
+                updateState(State.Value, true);
+            }
 
             DefaultsApplied?.Invoke(this);
         }
@@ -419,11 +469,13 @@ namespace osu.Game.Rulesets.Objects.Drawables
 
             LifetimeEnd = double.MaxValue;
 
-            double transformTime = HitObject.StartTime - InitialLifetimeOffset;
-
             clearExistingStateTransforms();
 
-            using (BeginAbsoluteSequence(transformTime))
+            double initialTransformsTime = HitObject.StartTime - InitialLifetimeOffset;
+
+            AnimationStartTime.Value = initialTransformsTime;
+
+            using (BeginAbsoluteSequence(initialTransformsTime))
                 UpdateInitialTransforms();
 
             using (BeginAbsoluteSequence(StateUpdateTime))
@@ -550,7 +602,9 @@ namespace osu.Game.Rulesets.Objects.Drawables
             float balanceAdjustAmount = positionalHitsoundsLevel.Value * 2;
             double returnedValue = balanceAdjustAmount * (position - 0.5f);
 
-            return returnedValue;
+            // Rounded to reduce the overhead of audio adjustments (which are currently bindable heavy).
+            // Balance is very hard to perceive in small increments anyways.
+            return Math.Round(returnedValue, 2);
         }
 
         /// <summary>
@@ -577,26 +631,6 @@ namespace osu.Game.Rulesets.Objects.Drawables
         }
 
         #endregion
-
-        protected override void Update()
-        {
-            base.Update();
-
-            if (Result != null && Result.HasResult)
-            {
-                double endTime = HitObject.GetEndTime();
-
-                if (Result.TimeOffset + endTime > Time.Current)
-                {
-                    OnRevertResult?.Invoke(this, Result);
-
-                    Result.TimeOffset = 0;
-                    Result.Type = HitResult.None;
-
-                    updateState(ArmedState.Idle);
-                }
-            }
-        }
 
         public override bool UpdateSubTreeMasking(Drawable source, RectangleF maskingBounds) => false;
 
@@ -651,32 +685,36 @@ namespace osu.Game.Rulesets.Objects.Drawables
             UpdateResult(false);
         }
 
-        /// <summary>
-        /// The maximum offset from the end time of <see cref="HitObject"/> at which this <see cref="DrawableHitObject"/> can be judged.
-        /// The time offset of <see cref="Result"/> will be clamped to this value during <see cref="ApplyResult"/>.
-        /// <para>
-        /// Defaults to the miss window of <see cref="HitObject"/>.
-        /// </para>
-        /// </summary>
-        /// <remarks>
-        /// This does not affect the time offset provided to invocations of <see cref="CheckForResult"/>.
-        /// </remarks>
-        public virtual double MaximumJudgementOffset => HitObject.HitWindows?.WindowFor(HitResult.Miss) ?? 0;
+        protected void ApplyMaxResult() => ApplyResult((r, _) => r.Type = r.Judgement.MaxResult);
+        protected void ApplyMinResult() => ApplyResult((r, _) => r.Type = r.Judgement.MinResult);
+
+        protected void ApplyResult(HitResult type) => ApplyResult(static (result, state) => result.Type = state, type);
+
+        [Obsolete("Use overload with state, preferrably with static delegates to avoid allocation overhead.")] // Can be removed 2024-07-26
+        protected void ApplyResult(Action<JudgementResult> application) => ApplyResult((r, _) => application(r), this);
+
+        protected void ApplyResult(Action<JudgementResult, DrawableHitObject> application) => ApplyResult(application, this);
 
         /// <summary>
         /// Applies the <see cref="Result"/> of this <see cref="DrawableHitObject"/>, notifying responders such as
         /// the <see cref="ScoreProcessor"/> of the <see cref="JudgementResult"/>.
         /// </summary>
-        /// <param name="application">The callback that applies changes to the <see cref="JudgementResult"/>.</param>
-        protected void ApplyResult(Action<JudgementResult> application)
+        /// <param name="application">The callback that applies changes to the <see cref="JudgementResult"/>. Using a `static` delegate is recommended to avoid allocation overhead.</param>
+        /// <param name="state">
+        /// Use this parameter to pass any data that <paramref name="application"/> requires
+        /// to apply a result, so that it can remain a `static` delegate and thus not allocate.
+        /// </param>
+        protected void ApplyResult<T>(Action<JudgementResult, T> application, T state)
         {
             if (Result.HasResult)
                 throw new InvalidOperationException("Cannot apply result on a hitobject that already has a result.");
 
-            application?.Invoke(Result);
+            application?.Invoke(Result, state);
 
             if (!Result.HasResult)
                 throw new InvalidOperationException($"{GetType().ReadableName()} applied a {nameof(JudgementResult)} but did not update {nameof(JudgementResult.Type)}.");
+
+            HitResultExtensions.ValidateHitResultPair(Result.Judgement.MaxResult, Result.Judgement.MinResult);
 
             if (!Result.Type.IsValidHitResult(Result.Judgement.MinResult, Result.Judgement.MaxResult))
             {
@@ -684,7 +722,8 @@ namespace osu.Game.Rulesets.Objects.Drawables
                     $"{GetType().ReadableName()} applied an invalid hit result (was: {Result.Type}, expected: [{Result.Judgement.MinResult} ... {Result.Judgement.MaxResult}]).");
             }
 
-            Result.TimeOffset = Math.Min(MaximumJudgementOffset, Time.Current - HitObject.GetEndTime());
+            Result.RawTime = Time.Current;
+            Result.GameplayRate = (Clock as IGameplayClock)?.GetTrueGameplayRate() ?? Clock.Rate;
 
             if (Result.HasResult)
                 updateState(Result.IsHit ? ArmedState.Hit : ArmedState.Miss);
@@ -700,7 +739,7 @@ namespace osu.Game.Rulesets.Objects.Drawables
         protected bool UpdateResult(bool userTriggered)
         {
             // It's possible for input to get into a bad state when rewinding gameplay, so results should not be processed
-            if (Time.Elapsed < 0)
+            if ((Clock as IGameplayClock)?.IsRewinding == true)
                 return false;
 
             if (Judged)
@@ -715,7 +754,7 @@ namespace osu.Game.Rulesets.Objects.Drawables
         /// Checks if a scoring result has occurred for this <see cref="DrawableHitObject"/>.
         /// </summary>
         /// <remarks>
-        /// If a scoring result has occurred, this method must invoke <see cref="ApplyResult"/> to update the result and notify responders.
+        /// If a scoring result has occurred, this method must invoke <see cref="ApplyResult{T}"/> to update the result and notify responders.
         /// </remarks>
         /// <param name="userTriggered">Whether the user triggered this check.</param>
         /// <param name="timeOffset">The offset from the end time of the <see cref="HitObject"/> at which this check occurred.
@@ -733,7 +772,7 @@ namespace osu.Game.Rulesets.Objects.Drawables
         private void ensureEntryHasResult()
         {
             Debug.Assert(Entry != null);
-            Entry.Result ??= CreateResult(HitObject.CreateJudgement())
+            Entry.Result ??= CreateResult(HitObject.Judgement)
                              ?? throw new InvalidOperationException($"{GetType().ReadableName()} must provide a {nameof(JudgementResult)} through {nameof(CreateResult)}.");
         }
 
@@ -746,7 +785,16 @@ namespace osu.Game.Rulesets.Objects.Drawables
 
             if (CurrentSkin != null)
                 CurrentSkin.SourceChanged -= skinSourceChanged;
+
+            // Safeties against shooting in foot in cases where these are bound by external entities (like playfield) that don't clean up.
+            OnNestedDrawableCreated = null;
+            OnNewResult = null;
+            OnRevertResult = null;
+            DefaultsApplied = null;
+            HitObjectApplied = null;
         }
+
+        public Bindable<double> AnimationStartTime { get; } = new BindableDouble();
     }
 
     public abstract partial class DrawableHitObject<TObject> : DrawableHitObject

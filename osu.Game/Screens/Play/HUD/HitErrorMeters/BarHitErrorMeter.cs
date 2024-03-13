@@ -12,10 +12,12 @@ using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Pooling;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.Sprites;
+using osu.Framework.Localisation;
 using osu.Game.Configuration;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.Sprites;
+using osu.Game.Localisation.HUD;
 using osu.Game.Rulesets.Judgements;
 using osu.Game.Rulesets.Scoring;
 using osuTK;
@@ -25,7 +27,7 @@ namespace osu.Game.Screens.Play.HUD.HitErrorMeters
     [Cached]
     public partial class BarHitErrorMeter : HitErrorMeter
     {
-        [SettingSource("Judgement line thickness", "How thick the individual lines should be.")]
+        [SettingSource(typeof(BarHitErrorMeterStrings), nameof(BarHitErrorMeterStrings.JudgementLineThickness), nameof(BarHitErrorMeterStrings.JudgementLineThicknessDescription))]
         public BindableNumber<float> JudgementLineThickness { get; } = new BindableNumber<float>(4)
         {
             MinValue = 1,
@@ -33,16 +35,16 @@ namespace osu.Game.Screens.Play.HUD.HitErrorMeters
             Precision = 0.1f,
         };
 
-        [SettingSource("Show colour bars")]
+        [SettingSource(typeof(BarHitErrorMeterStrings), nameof(BarHitErrorMeterStrings.ColourBarVisibility))]
         public Bindable<bool> ColourBarVisibility { get; } = new Bindable<bool>(true);
 
-        [SettingSource("Show moving average arrow", "Whether an arrow should move beneath the bar showing the average error.")]
+        [SettingSource(typeof(BarHitErrorMeterStrings), nameof(BarHitErrorMeterStrings.ShowMovingAverage), nameof(BarHitErrorMeterStrings.ShowMovingAverageDescription))]
         public Bindable<bool> ShowMovingAverage { get; } = new BindableBool(true);
 
-        [SettingSource("Centre marker style", "How to signify the centre of the display")]
+        [SettingSource(typeof(BarHitErrorMeterStrings), nameof(BarHitErrorMeterStrings.CentreMarkerStyle), nameof(BarHitErrorMeterStrings.CentreMarkerStyleDescription))]
         public Bindable<CentreMarkerStyles> CentreMarkerStyle { get; } = new Bindable<CentreMarkerStyles>(CentreMarkerStyles.Circle);
 
-        [SettingSource("Label style", "How to show early/late extremities")]
+        [SettingSource(typeof(BarHitErrorMeterStrings), nameof(BarHitErrorMeterStrings.LabelStyle), nameof(BarHitErrorMeterStrings.LabelStyleDescription))]
         public Bindable<LabelStyles> LabelStyle { get; } = new Bindable<LabelStyles>(LabelStyles.Icons);
 
         private const int judgement_line_width = 14;
@@ -483,19 +485,36 @@ namespace osu.Game.Screens.Play.HUD.HitErrorMeters
             }
         }
 
-        public override void Clear() => judgementsContainer.Clear();
+        public override void Clear()
+        {
+            foreach (var j in judgementsContainer)
+            {
+                j.ClearTransforms();
+                j.Expire();
+            }
+        }
 
         public enum CentreMarkerStyles
         {
+            [LocalisableDescription(typeof(BarHitErrorMeterStrings), nameof(BarHitErrorMeterStrings.CentreMarkerStylesNone))]
             None,
+
+            [LocalisableDescription(typeof(BarHitErrorMeterStrings), nameof(BarHitErrorMeterStrings.CentreMarkerStylesCircle))]
             Circle,
+
+            [LocalisableDescription(typeof(BarHitErrorMeterStrings), nameof(BarHitErrorMeterStrings.CentreMarkerStylesLine))]
             Line
         }
 
         public enum LabelStyles
         {
+            [LocalisableDescription(typeof(BarHitErrorMeterStrings), nameof(BarHitErrorMeterStrings.LabelStylesNone))]
             None,
+
+            [LocalisableDescription(typeof(BarHitErrorMeterStrings), nameof(BarHitErrorMeterStrings.LabelStylesIcons))]
             Icons,
+
+            [LocalisableDescription(typeof(BarHitErrorMeterStrings), nameof(BarHitErrorMeterStrings.LabelStylesText))]
             Text
         }
     }

@@ -1,12 +1,9 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using JetBrains.Annotations;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
@@ -39,7 +36,7 @@ namespace osu.Game.Rulesets.Catch.Edit
         private readonly List<Vector2[]> verticalLineVertices = new List<Vector2[]>();
 
         [Resolved]
-        private Playfield playfield { get; set; }
+        private Playfield playfield { get; set; } = null!;
 
         private ScrollingHitObjectContainer hitObjectContainer => (ScrollingHitObjectContainer)playfield.HitObjectContainer;
 
@@ -106,8 +103,7 @@ namespace osu.Game.Rulesets.Catch.Edit
             }
         }
 
-        [CanBeNull]
-        public SnapResult GetSnappedPosition(Vector2 screenSpacePosition)
+        public SnapResult? GetSnappedPosition(Vector2 screenSpacePosition)
         {
             double time = hitObjectContainer.TimeAtScreenSpacePosition(screenSpacePosition);
 

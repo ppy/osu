@@ -17,6 +17,11 @@ namespace osu.Game.Beatmaps.ControlPoints
         public readonly Bindable<TimeSignature> TimeSignatureBindable = new Bindable<TimeSignature>(TimeSignature.SimpleQuadruple);
 
         /// <summary>
+        /// Whether the first bar line of this control point is ignored.
+        /// </summary>
+        public readonly BindableBool OmitFirstBarLineBindable = new BindableBool();
+
+        /// <summary>
         /// Default length of a beat in milliseconds. Used whenever there is no beatmap or track playing.
         /// </summary>
         private const double default_beat_length = 60000.0 / 60.0;
@@ -30,6 +35,7 @@ namespace osu.Game.Beatmaps.ControlPoints
                 Value = default_beat_length,
                 Disabled = true
             },
+            OmitFirstBarLineBindable = { Disabled = true },
             TimeSignatureBindable = { Disabled = true }
         };
 
@@ -40,6 +46,15 @@ namespace osu.Game.Beatmaps.ControlPoints
         {
             get => TimeSignatureBindable.Value;
             set => TimeSignatureBindable.Value = value;
+        }
+
+        /// <summary>
+        /// Whether the first bar line of this control point is ignored.
+        /// </summary>
+        public bool OmitFirstBarLine
+        {
+            get => OmitFirstBarLineBindable.Value;
+            set => OmitFirstBarLineBindable.Value = value;
         }
 
         public const double DEFAULT_BEAT_LENGTH = 1000;
@@ -73,6 +88,7 @@ namespace osu.Game.Beatmaps.ControlPoints
         public override void CopyFrom(ControlPoint other)
         {
             TimeSignature = ((TimingControlPoint)other).TimeSignature;
+            OmitFirstBarLine = ((TimingControlPoint)other).OmitFirstBarLine;
             BeatLength = ((TimingControlPoint)other).BeatLength;
 
             base.CopyFrom(other);
@@ -85,8 +101,9 @@ namespace osu.Game.Beatmaps.ControlPoints
         public bool Equals(TimingControlPoint? other)
             => base.Equals(other)
                && TimeSignature.Equals(other.TimeSignature)
+               && OmitFirstBarLine == other.OmitFirstBarLine
                && BeatLength.Equals(other.BeatLength);
 
-        public override int GetHashCode() => HashCode.Combine(base.GetHashCode(), TimeSignature, BeatLength);
+        public override int GetHashCode() => HashCode.Combine(base.GetHashCode(), TimeSignature, BeatLength, OmitFirstBarLine);
     }
 }

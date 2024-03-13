@@ -20,6 +20,7 @@ using osu.Game.Audio;
 using osu.Game.Beatmaps;
 using osu.Game.Configuration;
 using osu.Game.Database;
+using osu.Game.Localisation;
 using osu.Game.Online.API;
 using osu.Game.Overlays;
 using osu.Game.Overlays.Notifications;
@@ -93,6 +94,8 @@ namespace osu.Game.Screens.Menu
         {
             Colour = Color4.Black
         };
+
+        public override bool? AllowGlobalTrackControl => false;
 
         protected IntroScreen([CanBeNull] Func<MainMenu> createNextScreen = null)
         {
@@ -201,7 +204,7 @@ namespace osu.Game.Screens.Menu
                 {
                     notifications.Post(new SimpleErrorNotification
                     {
-                        Text = "osu! doesn't seem to be able to play audio correctly.\n\nPlease try changing your audio device to a working setting."
+                        Text = NotificationsStrings.AudioPlaybackIssue
                     });
                 }
             }, 5000);
