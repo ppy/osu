@@ -4,22 +4,30 @@
 #nullable disable
 
 using osu.Framework.Allocation;
+using osu.Framework.Extensions;
+using osu.Framework.Extensions.LocalisationExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Sprites;
+using osu.Game.Beatmaps;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
 using osu.Game.Screens.Backgrounds;
 using osuTK;
+using osu.Game.Localisation;
 
 namespace osu.Game.Screens.Play
 {
-    public partial class LovedWarning : VisibilityContainer
+    public partial class BeatmapStatusWarning : VisibilityContainer
     {
+        private readonly BeatmapOnlineStatus onlineStatus;
+
         public const double FADE_DURATION = 250;
 
-        public LovedWarning()
+        public BeatmapStatusWarning(BeatmapOnlineStatus onlineStatus)
         {
+            this.onlineStatus = onlineStatus;
+
             RelativeSizeAxes = Axes.Both;
             Alpha = 0f;
         }
@@ -69,14 +77,24 @@ namespace osu.Game.Screens.Play
                             Origin = Anchor.Centre,
                         }.With(tfc =>
                         {
-                            tfc.AddText("This map is in loved state.", s =>
+                            tfc.AddText(PlayerLoaderStrings.ThisMapIsInState(onlineStatus.GetLocalisableDescription().ToLower()), s =>
                             {
                                 s.Font = s.Font.With(weight: FontWeight.Bold);
                             });
                             tfc.NewParagraph();
-                            tfc.AddText("No performance points will be awarded.");
+                            tfc.AddText(PlayerLoaderStrings.NoPerformancePointsAwarded);
                             tfc.NewParagraph();
-                            tfc.AddText("Leaderboards may be reset by the beatmap creator.");
+
+                            switch (onlineStatus)
+                            {
+                                case BeatmapOnlineStatus.Qualified:
+                                    tfc.AddText(PlayerLoaderStrings.LeaderboardsWillBeResetOnRank);
+                                    break;
+
+                                case BeatmapOnlineStatus.Loved:
+                                    tfc.AddText(PlayerLoaderStrings.LeaderboardsMayBeReset);
+                                    break;
+                            }
                         }),
                     }
                 }

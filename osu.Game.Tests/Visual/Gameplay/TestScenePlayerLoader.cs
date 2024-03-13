@@ -38,7 +38,7 @@ namespace osu.Game.Tests.Visual.Gameplay
         private TestPlayer player;
 
         private bool epilepsyWarning;
-        private BeatmapOnlineStatus lovedWarning;
+        private BeatmapOnlineStatus beatmapOnlineStatus;
 
         [Resolved]
         private AudioManager audioManager { get; set; }
@@ -123,8 +123,8 @@ namespace osu.Game.Tests.Visual.Gameplay
             // Turn on epilepsy warning to test warning display (TestEpilepsyWarning).
             workingBeatmap.BeatmapInfo.EpilepsyWarning = epilepsyWarning;
 
-            // Turn on loved warning to test warning display (TestLovedWarning).
-            workingBeatmap.BeatmapInfo.Status = lovedWarning;
+            // Set appropriate status to test warning display (BeatmapStatusWarning).
+            workingBeatmap.BeatmapInfo.Status = beatmapOnlineStatus;
 
             Beatmap.Value = workingBeatmap;
 
@@ -390,22 +390,23 @@ namespace osu.Game.Tests.Visual.Gameplay
             restoreVolumes();
         }
 
-        [TestCase(true)]
-        [TestCase(false)]
-        public void TestLovedWarning(bool warning)
+        [TestCase(BeatmapOnlineStatus.Loved, true)]
+        [TestCase(BeatmapOnlineStatus.Qualified, true)]
+        [TestCase(BeatmapOnlineStatus.Graveyard, false)]
+        public void TestStatusWarning(BeatmapOnlineStatus status, bool expectWarning)
         {
             saveVolumes();
             setFullVolume();
 
             AddStep("reset epilepsy warning", () => epilepsyWarning = false);
-            AddStep("change loved warning", () => lovedWarning = warning ? BeatmapOnlineStatus.Loved : BeatmapOnlineStatus.Graveyard);
+            AddStep("change beatmap status", () => beatmapOnlineStatus = status);
             AddStep("load dummy beatmap", () => resetPlayer(false));
 
             AddUntilStep("wait for current", () => loader.IsCurrentScreen());
 
-            AddAssert($"loved warning {(warning ? "present" : "absent")}", () => (getLovedWarning() != null) == warning);
+            AddAssert($"status warning {(expectWarning ? "present" : "absent")}", () => (getStatusWarning() != null) == expectWarning);
 
-            if (warning)
+            if (expectWarning)
             {
                 AddUntilStep("sound volume decreased", () => Beatmap.Value.Track.AggregateVolume.Value == 0.25);
                 AddUntilStep("sound volume restored", () => Beatmap.Value.Track.AggregateVolume.Value == 1);
@@ -415,39 +416,38 @@ namespace osu.Game.Tests.Visual.Gameplay
         }
 
         [Test]
-        public void TestLovedWarningEarlyExit()
+        public void TestStatusWarningEarlyExit()
         {
             saveVolumes();
             setFullVolume();
 
-            AddStep("set loved warning", () => lovedWarning = BeatmapOnlineStatus.Loved);
+            AddStep("set loved warning", () => beatmapOnlineStatus = BeatmapOnlineStatus.Loved);
             AddStep("load dummy beatmap", () => resetPlayer(false));
 
             AddUntilStep("wait for current", () => loader.IsCurrentScreen());
 
-            AddUntilStep("wait for loved warning", () => getLovedWarning().Alpha > 0);
-            AddUntilStep("warning is shown", () => getLovedWarning().State.Value == Visibility.Visible);
+            AddUntilStep("wait for loved warning", () => getStatusWarning().Alpha > 0);
+            AddUntilStep("warning is shown", () => getStatusWarning().State.Value == Visibility.Visible);
 
             AddStep("exit early", () => loader.Exit());
 
-            AddUntilStep("warning is hidden", () => getLovedWarning().State.Value == Visibility.Hidden);
+            AddUntilStep("warning is hidden", () => getStatusWarning().State.Value == Visibility.Hidden);
             AddUntilStep("sound volume restored", () => Beatmap.Value.Track.AggregateVolume.Value == 1);
 
             restoreVolumes();
         }
 
-        [TestCase(true, true)]
-        [TestCase(false, false)]
-        public void TestLovedAndEpilepsyWarning(bool epilepsyWarningTestCase, bool lovedWarningTestCase)
+        [Test]
+        public void TestCombinedWarnings([Values(BeatmapOnlineStatus.Qualified, BeatmapOnlineStatus.Loved)] BeatmapOnlineStatus status)
         {
-            AddStep("set epilepsy warning", () => epilepsyWarning = epilepsyWarningTestCase);
-            AddStep("change loved warning", () => lovedWarning = lovedWarningTestCase ? BeatmapOnlineStatus.Loved : BeatmapOnlineStatus.Graveyard);
+            AddStep("set epilepsy warning", () => epilepsyWarning = true);
+            AddStep("set beatmap status", () => beatmapOnlineStatus = status);
             AddStep("load dummy beatmap", () => resetPlayer(false));
 
             AddUntilStep("wait for current", () => loader.IsCurrentScreen());
 
-            AddAssert($"epilepsy warning {(epilepsyWarningTestCase ? "present" : "absent")}", () => (getEpilepsyWarning() != null) == epilepsyWarningTestCase);
-            AddAssert($"loved warning {(lovedWarningTestCase ? "present" : "absent")}", () => (getLovedWarning() != null) == lovedWarningTestCase);
+            AddAssert("epilepsy warning present", () => getEpilepsyWarning() != null);
+            AddAssert("status warning present", () => getStatusWarning() != null);
         }
 
         [TestCase(true, 1.0, false)] // on battery, above cutoff --> no warning
@@ -546,7 +546,7 @@ namespace osu.Game.Tests.Visual.Gameplay
 
         private EpilepsyWarning getEpilepsyWarning() => loader.ChildrenOfType<EpilepsyWarning>().SingleOrDefault(w => w.IsAlive);
 
-        private LovedWarning getLovedWarning() => loader.ChildrenOfType<LovedWarning>().SingleOrDefault(w => w.IsAlive);
+        private BeatmapStatusWarning getStatusWarning() => loader.ChildrenOfType<BeatmapStatusWarning>().SingleOrDefault(w => w.IsAlive);
 
         private partial class TestPlayerLoader : PlayerLoader
         {

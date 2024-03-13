@@ -140,7 +140,7 @@ namespace osu.Game.Screens.Play
 
         private EpilepsyWarning? epilepsyWarning;
 
-        private LovedWarning? lovedWarning;
+        private BeatmapStatusWarning? statusWarning;
 
         private bool quickRestart;
 
@@ -226,9 +226,11 @@ namespace osu.Game.Screens.Play
                 });
             }
 
-            if (Beatmap.Value.BeatmapInfo.Status == BeatmapOnlineStatus.Loved)
+            var beatmapStatus = Beatmap.Value.BeatmapInfo.Status;
+
+            if (beatmapStatus == BeatmapOnlineStatus.Loved || beatmapStatus == BeatmapOnlineStatus.Qualified)
             {
-                AddInternal(lovedWarning = new LovedWarning
+                AddInternal(statusWarning = new BeatmapStatusWarning(beatmapStatus)
                 {
                     Anchor = Anchor.Centre,
                     Origin = Anchor.Centre
@@ -315,7 +317,7 @@ namespace osu.Game.Screens.Play
 
             // If the load sequence was interrupted, the epilepsy warning may already be displayed (or in the process of being displayed).
             epilepsyWarning?.Hide();
-            lovedWarning?.Hide();
+            statusWarning?.Hide();
 
             // Ensure the screen doesn't expire until all the outwards fade operations have completed.
             this.Delay(CONTENT_OUT_DURATION).FadeOut();
@@ -518,7 +520,7 @@ namespace osu.Game.Screens.Play
 
                 // only show if warnings if they have been created (i.e. the beatmap needs it)
                 // and this is not a restart of the map (the warnings expire after first load).
-                if (epilepsyWarning?.IsAlive == true || lovedWarning?.IsAlive == true)
+                if (epilepsyWarning?.IsAlive == true || statusWarning?.IsAlive == true)
                 {
                     pushSequence
                         .Delay(CONTENT_OUT_DURATION)
@@ -542,23 +544,23 @@ namespace osu.Game.Screens.Play
                         .Delay(EpilepsyWarning.FADE_DURATION);
                 }
 
-                if (lovedWarning?.IsAlive == true)
+                if (statusWarning?.IsAlive == true)
                 {
                     const double loved_display_length = 3000;
 
                     pushSequence
                         .Delay(CONTENT_OUT_DURATION)
-                        .Schedule(() => lovedWarning.State.Value = Visibility.Visible)
+                        .Schedule(() => statusWarning.State.Value = Visibility.Visible)
                         .Delay(loved_display_length)
                         .Schedule(() =>
                         {
-                            lovedWarning.Hide();
-                            lovedWarning.Expire();
+                            statusWarning.Hide();
+                            statusWarning.Expire();
                         })
-                        .Delay(LovedWarning.FADE_DURATION);
+                        .Delay(BeatmapStatusWarning.FADE_DURATION);
                 }
 
-                if (epilepsyWarning?.IsAlive == false || lovedWarning?.IsAlive == false)
+                if (epilepsyWarning?.IsAlive == false || statusWarning?.IsAlive == false)
                 {
                     // This goes hand-in-hand with the restoration of low pass filter in contentOut().
                     this.TransformBindableTo(volumeAdjustment, 0, CONTENT_OUT_DURATION, Easing.OutCubic);
