@@ -80,6 +80,7 @@ namespace osu.Game.Screens.Play
                             tfc.AddText(PlayerLoaderStrings.ThisMapIsInState(onlineStatus.GetLocalisableDescription().ToLower()), s =>
                             {
                                 s.Font = s.Font.With(weight: FontWeight.Bold);
+                                s.Colour = colours.Yellow;
                             });
                             tfc.NewParagraph();
                             tfc.AddText(PlayerLoaderStrings.NoPerformancePointsAwarded);

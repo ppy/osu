@@ -12,7 +12,7 @@ namespace osu.Game.Localisation
         /// <summary>
         /// "This map is in {0} state."
         /// </summary>
-        public static LocalisableString ThisMapIsInState(LocalisableString arg0) => new TranslatableString(getKey(@"this_map_is_in_state"), @"This map is in {0} state.", arg0);
+        public static LocalisableString ThisMapIsInState(LocalisableString arg0) => new TranslatableString(getKey(@"this_map_is_in_state"), @"This beatmap is in {0} state.", arg0);
 
         /// <summary>
         /// "No performance points will be awarded."
