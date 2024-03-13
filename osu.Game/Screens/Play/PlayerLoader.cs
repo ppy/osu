@@ -520,7 +520,9 @@ namespace osu.Game.Screens.Play
                 // and this is not a restart of the map (the warnings expire after first load).
                 if (epilepsyWarning?.IsAlive == true || lovedWarning?.IsAlive == true)
                 {
-                    pushSequence.TransformBindableTo(volumeAdjustment, 0.25, EpilepsyWarning.FADE_DURATION, Easing.OutQuint);
+                    pushSequence
+                        .Delay(CONTENT_OUT_DURATION)
+                        .TransformBindableTo(volumeAdjustment, 0.25, EpilepsyWarning.FADE_DURATION, Easing.OutQuint);
                 }
 
                 // note the late check of storyboard enable as the user may have just changed it
@@ -530,7 +532,6 @@ namespace osu.Game.Screens.Play
                     const double epilepsy_display_length = 3000;
 
                     pushSequence
-                        .Delay(CONTENT_OUT_DURATION)
                         .Schedule(() => epilepsyWarning.State.Value = Visibility.Visible)
                         .Delay(epilepsy_display_length)
                         .Schedule(() =>
