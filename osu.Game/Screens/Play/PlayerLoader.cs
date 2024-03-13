@@ -41,6 +41,7 @@ namespace osu.Game.Screens.Play
     {
         protected const float BACKGROUND_BLUR = 15;
 
+        public const double WARNING_FADE_DURATION = 250;
         protected const double CONTENT_OUT_DURATION = 300;
 
         protected virtual double PlayerPushDelay => 1800;
@@ -250,12 +251,6 @@ namespace osu.Game.Screens.Play
         public override void OnEntering(ScreenTransitionEvent e)
         {
             base.OnEntering(e);
-
-            ApplyToBackground(b =>
-            {
-                if (epilepsyWarning != null)
-                    epilepsyWarning.DimmableBackground = b;
-            });
 
             Beatmap.Value.Track.AddAdjustment(AdjustableProperty.Volume, volumeAdjustment);
 
@@ -524,7 +519,8 @@ namespace osu.Game.Screens.Play
                 {
                     pushSequence
                         .Delay(CONTENT_OUT_DURATION)
-                        .TransformBindableTo(volumeAdjustment, 0.25, EpilepsyWarning.FADE_DURATION, Easing.OutQuint);
+                        .TransformBindableTo(volumeAdjustment, 0.25, WARNING_FADE_DURATION, Easing.OutQuint);
+                    ApplyToBackground(b => b.FadeColour(OsuColour.Gray(0.5f), WARNING_FADE_DURATION, Easing.OutQuint));
                 }
 
                 // note the late check of storyboard enable as the user may have just changed it
@@ -541,7 +537,7 @@ namespace osu.Game.Screens.Play
                             epilepsyWarning.Hide();
                             epilepsyWarning.Expire();
                         })
-                        .Delay(EpilepsyWarning.FADE_DURATION);
+                        .Delay(WARNING_FADE_DURATION);
                 }
 
                 if (statusWarning?.IsAlive == true)
@@ -549,7 +545,6 @@ namespace osu.Game.Screens.Play
                     const double loved_display_length = 3000;
 
                     pushSequence
-                        .Delay(CONTENT_OUT_DURATION)
                         .Schedule(() => statusWarning.State.Value = Visibility.Visible)
                         .Delay(loved_display_length)
                         .Schedule(() =>
@@ -557,7 +552,7 @@ namespace osu.Game.Screens.Play
                             statusWarning.Hide();
                             statusWarning.Expire();
                         })
-                        .Delay(BeatmapStatusWarning.FADE_DURATION);
+                        .Delay(WARNING_FADE_DURATION);
                 }
 
                 if (epilepsyWarning?.IsAlive == false || statusWarning?.IsAlive == false)
@@ -565,6 +560,7 @@ namespace osu.Game.Screens.Play
                     // This goes hand-in-hand with the restoration of low pass filter in contentOut().
                     this.TransformBindableTo(volumeAdjustment, 0, CONTENT_OUT_DURATION, Easing.OutCubic);
                     epilepsyWarning?.Expire();
+                    statusWarning?.Expire();
                 }
 
                 pushSequence.Schedule(() =>
