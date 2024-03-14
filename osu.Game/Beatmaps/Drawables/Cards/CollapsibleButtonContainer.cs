@@ -169,6 +169,8 @@ namespace osu.Game.Beatmaps.Drawables.Cards
             float mainAreaWidth = Width - buttonAreaWidth;
 
             mainArea.ResizeWidthTo(mainAreaWidth, BeatmapCard.TRANSITION_DURATION, Easing.OutQuint);
+
+            // By limiting the width we avoid this box showing up as an outline around the drawables that are on top of it.
             background.ResizeWidthTo(buttonAreaWidth + BeatmapCard.CORNER_RADIUS, BeatmapCard.TRANSITION_DURATION, Easing.OutQuint);
 
             background.FadeColour(downloadTracker.State.Value == DownloadState.LocallyAvailable ? colours.Lime0 : colourProvider.Background3, BeatmapCard.TRANSITION_DURATION, Easing.OutQuint);
