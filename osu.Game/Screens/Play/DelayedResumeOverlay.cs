@@ -32,9 +32,6 @@ namespace osu.Game.Screens.Play
 
         protected override LocalisableString Message => string.Empty;
 
-        [Resolved]
-        private OsuColour colours { get; set; } = null!;
-
         private ScheduledDelegate? scheduledResume;
         private int countdownCount = 3;
         private double countdownStartTime;
@@ -143,7 +140,7 @@ namespace osu.Game.Screens.Play
             double amountTimePassed = Math.Min(countdown_time, Time.Current - countdownStartTime) / countdown_time;
             int newCount = 3 - (int)Math.Floor(amountTimePassed * 3);
 
-            countdownProgress.Current.Value = amountTimePassed;
+            countdownProgress.Progress = amountTimePassed;
             countdownText.Text = Math.Max(1, newCount).ToString();
             countdownProgress.InnerRadius = progress_stroke_width / progress_size / countdownProgress.Scale.X;
 
