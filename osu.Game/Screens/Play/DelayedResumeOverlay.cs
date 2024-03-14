@@ -131,6 +131,25 @@ namespace osu.Game.Screens.Play
             }, countdown_time);
         }
 
+        protected override void PopOut()
+        {
+            this.Delay(300).FadeOut();
+
+            outerContent.FadeOut();
+            countdownBackground.FadeOut();
+            countdownText.FadeOut();
+
+            if (countdownComplete)
+            {
+                countdownProgress.ScaleTo(2f, 300, Easing.OutQuint);
+                countdownProgress.FadeOut(100, Easing.Out);
+            }
+            else
+                countdownProgress.FadeOut();
+
+            scheduledResume?.Cancel();
+        }
+
         protected override void Update()
         {
             base.Update();
@@ -153,25 +172,6 @@ namespace osu.Game.Screens.Play
             }
 
             countdownCount = newCount;
-        }
-
-        protected override void PopOut()
-        {
-            this.Delay(300).FadeOut();
-
-            outerContent.FadeOut();
-            countdownBackground.FadeOut();
-            countdownText.FadeOut();
-
-            if (countdownComplete)
-            {
-                countdownProgress.ScaleTo(2f, 300, Easing.OutQuint);
-                countdownProgress.FadeOut(100, Easing.Out);
-            }
-            else
-                countdownProgress.FadeOut();
-
-            scheduledResume?.Cancel();
         }
     }
 }
