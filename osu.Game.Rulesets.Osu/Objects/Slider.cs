@@ -252,18 +252,25 @@ namespace osu.Game.Rulesets.Osu.Objects
 
         protected void UpdateNestedSamples()
         {
-            var firstSample = Samples.FirstOrDefault(s => s.Name == HitSampleInfo.HIT_NORMAL)
-                              ?? Samples.FirstOrDefault(); // TODO: remove this when guaranteed sort is present for samples (https://github.com/ppy/osu/issues/1933)
-            var sampleList = new List<HitSampleInfo>();
+            // TODO: remove this when guaranteed sort is present for samples (https://github.com/ppy/osu/issues/1933)
+            HitSampleInfo tickSample = (Samples.FirstOrDefault(s => s.Name == HitSampleInfo.HIT_NORMAL) ?? Samples.FirstOrDefault())?.With("slidertick");
 
-            if (firstSample != null)
-                sampleList.Add(firstSample.With("slidertick"));
+            foreach (var nested in NestedHitObjects)
+            {
+                switch (nested)
+                {
+                    case SliderTick tick:
+                        tick.SamplesBindable.Clear();
 
-            foreach (var tick in NestedHitObjects.OfType<SliderTick>())
-                tick.Samples = sampleList;
+                        if (tickSample != null)
+                            tick.SamplesBindable.Add(tickSample);
+                        break;
 
-            foreach (var repeat in NestedHitObjects.OfType<SliderRepeat>())
-                repeat.Samples = this.GetNodeSamples(repeat.RepeatIndex + 1);
+                    case SliderRepeat repeat:
+                        repeat.Samples = this.GetNodeSamples(repeat.RepeatIndex + 1);
+                        break;
+                }
+            }
 
             if (HeadCircle != null)
                 HeadCircle.Samples = this.GetNodeSamples(0);

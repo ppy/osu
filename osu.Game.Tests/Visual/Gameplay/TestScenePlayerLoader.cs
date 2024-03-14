@@ -264,15 +264,23 @@ namespace osu.Game.Tests.Visual.Gameplay
         }
 
         [Test]
-        public void TestMutedNotificationMasterVolume()
+        public void TestMutedNotificationLowMusicVolume()
         {
-            addVolumeSteps("master volume", () => audioManager.Volume.Value = 0, () => audioManager.Volume.Value == 0.5);
+            addVolumeSteps("master and music volumes", () =>
+            {
+                audioManager.Volume.Value = 0.6;
+                audioManager.VolumeTrack.Value = 0.01;
+            }, () => Precision.AlmostEquals(audioManager.Volume.Value, 0.6) && Precision.AlmostEquals(audioManager.VolumeTrack.Value, 0.5));
         }
 
         [Test]
-        public void TestMutedNotificationTrackVolume()
+        public void TestMutedNotificationLowMasterVolume()
         {
-            addVolumeSteps("music volume", () => audioManager.VolumeTrack.Value = 0, () => audioManager.VolumeTrack.Value == 0.5);
+            addVolumeSteps("master and music volumes", () =>
+            {
+                audioManager.Volume.Value = 0.01;
+                audioManager.VolumeTrack.Value = 0.6;
+            }, () => Precision.AlmostEquals(audioManager.Volume.Value, 0.5) && Precision.AlmostEquals(audioManager.VolumeTrack.Value, 0.6));
         }
 
         [Test]
@@ -281,9 +289,10 @@ namespace osu.Game.Tests.Visual.Gameplay
             addVolumeSteps("mute button", () =>
             {
                 // Importantly, in the case the volume is muted but the user has a volume level set, it should be retained.
-                audioManager.VolumeTrack.Value = 0.5f;
+                audioManager.Volume.Value = 0.5;
+                audioManager.VolumeTrack.Value = 0.5;
                 volumeOverlay.IsMuted.Value = true;
-            }, () => !volumeOverlay.IsMuted.Value && audioManager.VolumeTrack.Value == 0.5f);
+            }, () => !volumeOverlay.IsMuted.Value && audioManager.Volume.Value == 0.5 && audioManager.VolumeTrack.Value == 0.5);
         }
 
         /// <remarks>

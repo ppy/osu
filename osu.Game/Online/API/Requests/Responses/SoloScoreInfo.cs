@@ -115,6 +115,9 @@ namespace osu.Game.Online.API.Requests.Responses
         [JsonProperty("has_replay")]
         public bool HasReplay { get; set; }
 
+        [JsonProperty("ranked")]
+        public bool Ranked { get; set; }
+
         // These properties are calculated or not relevant to any external usage.
         public bool ShouldSerializeID() => false;
         public bool ShouldSerializeUser() => false;
@@ -213,6 +216,7 @@ namespace osu.Game.Online.API.Requests.Responses
                 HasOnlineReplay = HasReplay,
                 Mods = mods,
                 PP = PP,
+                Ranked = Ranked,
             };
 
             if (beatmap is BeatmapInfo realmBeatmap)
@@ -241,8 +245,8 @@ namespace osu.Game.Online.API.Requests.Responses
             RulesetID = score.RulesetID,
             Passed = score.Passed,
             Mods = score.APIMods,
-            Statistics = score.Statistics.Where(kvp => kvp.Value != 0).ToDictionary(kvp => kvp.Key, kvp => kvp.Value),
-            MaximumStatistics = score.MaximumStatistics.Where(kvp => kvp.Value != 0).ToDictionary(kvp => kvp.Key, kvp => kvp.Value),
+            Statistics = score.Statistics.Where(kvp => kvp.Value != 0).ToDictionary(),
+            MaximumStatistics = score.MaximumStatistics.Where(kvp => kvp.Value != 0).ToDictionary(),
         };
     }
 }

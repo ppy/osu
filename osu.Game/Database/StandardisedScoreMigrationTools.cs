@@ -365,6 +365,17 @@ namespace osu.Game.Database
                             + bonusProportion) * modMultiplier);
                     }
 
+                    // see similar check above.
+                    // if there is no legacy combo score, all combo conversion operations below
+                    // are either pointless or wildly wrong.
+                    if (maximumLegacyComboScore + maximumLegacyBonusScore == 0)
+                    {
+                        return (long)Math.Round((
+                            500000 * comboProportion // as above, zero if mods result in zero multiplier, one otherwise
+                            + 500000 * Math.Pow(score.Accuracy, 5)
+                            + bonusProportion) * modMultiplier);
+                    }
+
                     // Assumptions:
                     // - sliders and slider ticks are uniformly distributed in the beatmap, and thus can be ignored without losing much precision.
                     //   We thus consider a map of hit-circles only, which gives objectCount == maximumCombo.
@@ -404,7 +415,7 @@ namespace osu.Game.Database
 
                     // Calculate how many times the longest combo the user has achieved in the play can repeat
                     // without exceeding the combo portion in score V1 as achieved by the player.
-                    // This is a pessimistic estimate; it intentionally does not operate on object count and uses only score instead.
+                    // This intentionally does not operate on object count and uses only score instead.
                     double maximumOccurrencesOfLongestCombo = Math.Floor(comboPortionInScoreV1 / comboPortionFromLongestComboInScoreV1);
                     double comboPortionFromRepeatedLongestCombosInScoreV1 = maximumOccurrencesOfLongestCombo * comboPortionFromLongestComboInScoreV1;
 
@@ -415,13 +426,12 @@ namespace osu.Game.Database
                     // ...and then based on that raw combo length, we calculate how much this last combo is worth in standardised score.
                     double remainingComboPortionInStandardisedScore = Math.Pow(remainingCombo, 1 + ScoreProcessor.COMBO_EXPONENT);
 
-                    double lowerEstimateOfComboPortionInStandardisedScore
+                    double scoreBasedEstimateOfComboPortionInStandardisedScore
                         = maximumOccurrencesOfLongestCombo * comboPortionFromLongestComboInStandardisedScore
                           + remainingComboPortionInStandardisedScore;
 
                     // Compute approximate upper estimate new score for that play.
                     // This time, divide the remaining combo among remaining objects equally to achieve longest possible combo lengths.
-                    // There is no rigorous proof that doing this will yield a correct upper bound, but it seems to work out in practice.
                     remainingComboPortionInScoreV1 = comboPortionInScoreV1 - comboPortionFromLongestComboInScoreV1;
                     double remainingCountOfObjectsGivingCombo = maximumLegacyCombo - score.MaxCombo - score.Statistics.GetValueOrDefault(HitResult.Miss);
                     // Because we assumed all combos were equal, `remainingComboPortionInScoreV1`
@@ -438,7 +448,17 @@ namespace osu.Game.Database
                     // we can skip adding the 1 and just multiply by x ^ 0.5.
                     remainingComboPortionInStandardisedScore = remainingCountOfObjectsGivingCombo * Math.Pow(lengthOfRemainingCombos, ScoreProcessor.COMBO_EXPONENT);
 
-                    double upperEstimateOfComboPortionInStandardisedScore = comboPortionFromLongestComboInStandardisedScore + remainingComboPortionInStandardisedScore;
+                    double objectCountBasedEstimateOfComboPortionInStandardisedScore = comboPortionFromLongestComboInStandardisedScore + remainingComboPortionInStandardisedScore;
+
+                    // Enforce some invariants on both of the estimates.
+                    // In rare cases they can produce invalid results.
+                    scoreBasedEstimateOfComboPortionInStandardisedScore =
+                        Math.Clamp(scoreBasedEstimateOfComboPortionInStandardisedScore, 0, maximumAchievableComboPortionInStandardisedScore);
+                    objectCountBasedEstimateOfComboPortionInStandardisedScore =
+                        Math.Clamp(objectCountBasedEstimateOfComboPortionInStandardisedScore, 0, maximumAchievableComboPortionInStandardisedScore);
+
+                    double lowerEstimateOfComboPortionInStandardisedScore = Math.Min(scoreBasedEstimateOfComboPortionInStandardisedScore, objectCountBasedEstimateOfComboPortionInStandardisedScore);
+                    double upperEstimateOfComboPortionInStandardisedScore = Math.Max(scoreBasedEstimateOfComboPortionInStandardisedScore, objectCountBasedEstimateOfComboPortionInStandardisedScore);
 
                     // Approximate by combining lower and upper estimates.
                     // As the lower-estimate is very pessimistic, we use a 30/70 ratio

@@ -286,7 +286,7 @@ namespace osu.Game.Screens.Select
                                                                 AutoSizeAxes = Axes.Y,
                                                                 Anchor = Anchor.Centre,
                                                                 Origin = Anchor.Centre,
-                                                                Padding = new MarginPadding(10)
+                                                                Padding = new MarginPadding(10),
                                                             },
                                                         }
                                                     },
@@ -584,6 +584,11 @@ namespace osu.Game.Screens.Select
 
                 beatmapInfoPrevious = beatmap;
             }
+
+            // we can't run this in the debounced run due to the selected mods bindable not being debounced,
+            // since mods could be updated to the new ruleset instances while the decoupled bindable is held behind,
+            // therefore resulting in performing difficulty calculation with invalid states.
+            advancedStats.Ruleset.Value = ruleset;
 
             void run()
             {

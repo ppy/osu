@@ -141,7 +141,7 @@ namespace osu.Game.Rulesets.Scoring
 
             void increaseHp(HitObject hitObject)
             {
-                double amount = GetHealthIncreaseFor(hitObject, hitObject.CreateJudgement().MaxResult);
+                double amount = GetHealthIncreaseFor(hitObject, hitObject.Judgement.MaxResult);
                 currentHpUncapped += amount;
                 currentHp = Math.Max(0, Math.Min(1, currentHp + amount));
             }

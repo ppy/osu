@@ -457,6 +457,33 @@ namespace osu.Game.Rulesets.Osu.Tests
             assertMidSliderJudgementFail();
         }
 
+        [Test]
+        public void TestRewindHandling()
+        {
+            performTest(new List<ReplayFrame>
+            {
+                new OsuReplayFrame { Position = new Vector2(0), Actions = { OsuAction.LeftButton }, Time = time_slider_start },
+                new OsuReplayFrame { Position = new Vector2(175, 0), Actions = { OsuAction.LeftButton }, Time = 3250 },
+                new OsuReplayFrame { Position = new Vector2(175, 0), Actions = { OsuAction.LeftButton }, Time = time_slider_end },
+            }, new Slider
+            {
+                StartTime = time_slider_start,
+                Position = new Vector2(0, 0),
+                Path = new SliderPath(PathType.PERFECT_CURVE, new[]
+                {
+                    Vector2.Zero,
+                    new Vector2(250, 0),
+                }, 250),
+            });
+
+            AddUntilStep("wait for completion", () => currentPlayer.ScoreProcessor.HasCompleted.Value);
+            AddAssert("no miss judgements recorded", () => judgementResults.All(r => r.Type.IsHit()));
+
+            AddStep("rewind to middle of slider", () => currentPlayer.Seek(time_during_slide_4));
+            AddUntilStep("wait for completion", () => currentPlayer.ScoreProcessor.HasCompleted.Value);
+            AddAssert("no miss judgements recorded", () => judgementResults.All(r => r.Type.IsHit()));
+        }
+
         private void assertAllMaxJudgements()
         {
             AddAssert("All judgements max", () =>

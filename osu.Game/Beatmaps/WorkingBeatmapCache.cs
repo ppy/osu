@@ -9,6 +9,7 @@ using System.Linq;
 using JetBrains.Annotations;
 using osu.Framework.Audio;
 using osu.Framework.Audio.Track;
+using osu.Framework.Extensions;
 using osu.Framework.Graphics.Rendering;
 using osu.Framework.Graphics.Rendering.Dummy;
 using osu.Framework.Graphics.Textures;
@@ -143,13 +144,17 @@ namespace osu.Game.Beatmaps
                 {
                     string fileStorePath = BeatmapSetInfo.GetPathForFile(BeatmapInfo.Path);
 
-                    // TODO: check validity of file
-
                     var stream = GetStream(fileStorePath);
 
                     if (stream == null)
                     {
                         Logger.Log($"Beatmap failed to load (file {BeatmapInfo.Path} not found on disk at expected location {fileStorePath}).", level: LogLevel.Error);
+                        return null;
+                    }
+
+                    if (stream.ComputeMD5Hash() != BeatmapInfo.MD5Hash)
+                    {
+                        Logger.Log($"Beatmap failed to load (file {BeatmapInfo.Path} does not have the expected hash).", level: LogLevel.Error);
                         return null;
                     }
 
