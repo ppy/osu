@@ -47,6 +47,9 @@ namespace osu.Game.Screens.Edit
             });
         }
 
+        // We can avoid potentially thousands of objects being added to the input sub-tree since input is being handled only by the BackgroundFlow anyway.
+        protected override bool ShouldBeConsideredForInput(Drawable child) => child is not GridContainer && base.ShouldBeConsideredForInput(child);
+
         protected int GetIndexForObject(object? item)
         {
             for (int i = 0; i < BackgroundFlow.Count; i++)
