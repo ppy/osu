@@ -142,7 +142,7 @@ namespace osu.Game.Screens.Play
             if (countdownComplete)
             {
                 countdownProgress.ScaleTo(2f, 300, Easing.OutQuint);
-                countdownProgress.FadeOut(100, Easing.Out);
+                countdownProgress.FadeOut(300, Easing.OutQuint);
             }
             else
                 countdownProgress.FadeOut();
