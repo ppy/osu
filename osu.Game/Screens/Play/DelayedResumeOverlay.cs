@@ -32,7 +32,7 @@ namespace osu.Game.Screens.Play
         protected override LocalisableString Message => string.Empty;
 
         private ScheduledDelegate? scheduledResume;
-        private int countdownCount = 3;
+        private int? countdownCount;
         private double countdownStartTime;
         private bool countdownComplete;
 
@@ -120,7 +120,7 @@ namespace osu.Game.Screens.Play
             countdownProgress.FadeIn().ScaleTo(1);
 
             countdownComplete = false;
-            countdownCount = 3;
+            countdownCount = null;
             countdownStartTime = Time.Current;
 
             scheduledResume?.Cancel();
@@ -143,11 +143,11 @@ namespace osu.Game.Screens.Play
             int newCount = 3 - (int)Math.Floor(amountTimePassed * 3);
 
             countdownProgress.Progress = amountTimePassed;
-            countdownText.Text = Math.Max(1, newCount).ToString();
             countdownProgress.InnerRadius = progress_stroke_width / progress_size / countdownProgress.Scale.X;
 
             if (countdownCount != newCount && newCount > 0)
             {
+                countdownText.Text = Math.Max(1, newCount).ToString();
                 countdownText.ScaleTo(0.25f).Then().ScaleTo(1, 200, Easing.OutQuint);
                 outerContent.Delay(25).Then().ScaleTo(1.05f, 100).Then().ScaleTo(1f, 200, Easing.Out);
             }
