@@ -2,8 +2,6 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using osu.Framework.Allocation;
-using osu.Framework.Extensions;
-using osu.Framework.Extensions.LocalisationExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Sprites;
@@ -58,22 +56,29 @@ namespace osu.Game.Screens.Play
                             Origin = Anchor.Centre,
                         }.With(tfc =>
                         {
-                            tfc.AddText(PlayerLoaderStrings.ThisMapIsInState(onlineStatus.GetLocalisableDescription().ToLower()), s =>
-                            {
-                                s.Font = s.Font.With(weight: FontWeight.Bold);
-                                s.Colour = colours.Yellow;
-                            });
-                            tfc.NewParagraph();
-                            tfc.AddText(PlayerLoaderStrings.NoPerformancePointsAwarded);
-                            tfc.NewParagraph();
-
                             switch (onlineStatus)
                             {
                                 case BeatmapOnlineStatus.Qualified:
+                                    tfc.AddText(PlayerLoaderStrings.QualifiedBeatmapDisclaimer, s =>
+                                    {
+                                        s.Font = s.Font.With(weight: FontWeight.Bold);
+                                        s.Colour = colours.Yellow;
+                                    });
+                                    tfc.NewParagraph();
+                                    tfc.AddText(PlayerLoaderStrings.NoPerformancePointsAwarded);
+                                    tfc.NewParagraph();
                                     tfc.AddText(PlayerLoaderStrings.LeaderboardsWillBeResetOnRank);
                                     break;
 
                                 case BeatmapOnlineStatus.Loved:
+                                    tfc.AddText(PlayerLoaderStrings.LovedBeatmapDisclaimer, s =>
+                                    {
+                                        s.Font = s.Font.With(weight: FontWeight.Bold);
+                                        s.Colour = colours.Yellow;
+                                    });
+                                    tfc.NewParagraph();
+                                    tfc.AddText(PlayerLoaderStrings.NoPerformancePointsAwarded);
+                                    tfc.NewParagraph();
                                     tfc.AddText(PlayerLoaderStrings.LeaderboardsMayBeReset);
                                     break;
                             }

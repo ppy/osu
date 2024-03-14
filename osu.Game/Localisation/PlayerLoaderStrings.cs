@@ -10,9 +10,14 @@ namespace osu.Game.Localisation
         private const string prefix = @"osu.Game.Resources.Localisation.PlayerLoader";
 
         /// <summary>
-        /// "This map is in {0} state."
+        /// "This beatmap is loved."
         /// </summary>
-        public static LocalisableString ThisMapIsInState(LocalisableString arg0) => new TranslatableString(getKey(@"this_map_is_in_state"), @"This beatmap is in {0} state.", arg0);
+        public static LocalisableString LovedBeatmapDisclaimer => new TranslatableString(getKey(@"loved_beatmap_disclaimer"), @"This beatmap is loved.");
+
+        /// <summary>
+        /// "This beatmap is qualified."
+        /// </summary>
+        public static LocalisableString QualifiedBeatmapDisclaimer => new TranslatableString(getKey(@"qualified_beatmap_disclaimer"), @"This beatmap is qualified.");
 
         /// <summary>
         /// "No performance points will be awarded."
