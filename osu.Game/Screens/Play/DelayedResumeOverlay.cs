@@ -112,7 +112,7 @@ namespace osu.Game.Screens.Play
             // The transition effects.
             outerContent.FadeIn().ScaleTo(Vector2.Zero).Then().ScaleTo(Vector2.One, 200, Easing.OutQuint);
             innerContent.FadeIn().ScaleTo(Vector2.Zero).Then().ScaleTo(Vector2.One, 400, Easing.OutElasticHalf);
-            countdownComponents.FadeOut().Then().Delay(50).FadeTo(1, 100);
+            countdownComponents.FadeOut().Delay(50).FadeTo(1, 100);
 
             // Reset states for various components.
             countdownBackground.FadeIn();
@@ -166,7 +166,7 @@ namespace osu.Game.Screens.Play
             if (countdownComplete)
             {
                 countdownProgress.ScaleTo(2f, 300, Easing.OutQuint);
-                countdownProgress.Delay(200).FadeOut(100, Easing.Out);
+                countdownProgress.FadeOut(100, Easing.Out);
             }
             else
                 countdownProgress.FadeOut();
