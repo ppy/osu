@@ -3,7 +3,6 @@
 
 using System;
 using osu.Framework.Allocation;
-using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
@@ -13,8 +12,8 @@ using osu.Framework.Localisation;
 using osu.Framework.Threading;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
+using osu.Game.Overlays;
 using osuTK;
-using osuTK.Graphics;
 
 namespace osu.Game.Screens.Play
 {
@@ -54,12 +53,15 @@ namespace osu.Game.Screens.Play
         [BackgroundDependencyLoader]
         private void load()
         {
+            // todo: this shouldn't define its own colour provider, but nothing in Player screen does, so let's do that for now.
+            var colourProvider = new OverlayColourProvider(OverlayColourScheme.Blue);
+
             Add(outerContent = new Circle
             {
                 Anchor = Anchor.Centre,
                 Origin = Anchor.Centre,
                 Size = new Vector2(outer_size),
-                Colour = Color4.Black.Opacity(0.25f)
+                Colour = colourProvider.Background6,
             });
 
             Add(innerContent = new Container
@@ -74,7 +76,7 @@ namespace osu.Game.Screens.Play
                         Anchor = Anchor.Centre,
                         Origin = Anchor.Centre,
                         Size = new Vector2(inner_size),
-                        Colour = Color4.Black.Opacity(0.25f)
+                        Colour = colourProvider.Background4,
                     },
                     countdownComponents = new Container
                     {
