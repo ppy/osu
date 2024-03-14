@@ -3,10 +3,12 @@
 
 using System;
 using osu.Framework.Allocation;
+using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.Sprites;
+using osu.Framework.Graphics.UserInterface;
 using osu.Framework.Localisation;
 using osu.Framework.Threading;
 using osu.Game.Graphics;
@@ -21,7 +23,12 @@ namespace osu.Game.Screens.Play
     /// </summary>
     public partial class DelayedResumeOverlay : ResumeOverlay
     {
-        private const double countdown_time = 800;
+        private const float outer_size = 200;
+        private const float inner_size = 150;
+        private const float progress_stroke_width = 7;
+        private const float progress_size = inner_size + progress_stroke_width / 2f;
+
+        private const double countdown_time = 3000;
 
         protected override LocalisableString Message => string.Empty;
 
@@ -31,9 +38,15 @@ namespace osu.Game.Screens.Play
         private ScheduledDelegate? scheduledResume;
         private int countdownCount = 3;
         private double countdownStartTime;
+        private bool countdownComplete;
 
-        private Drawable content = null!;
-        private SpriteText countdown = null!;
+        private Drawable outerContent = null!;
+        private Container innerContent = null!;
+
+        private Container countdownComponents = null!;
+        private Drawable countdownBackground = null!;
+        private SpriteText countdownText = null!;
+        private CircularProgress countdownProgress = null!;
 
         public DelayedResumeOverlay()
         {
@@ -44,44 +57,48 @@ namespace osu.Game.Screens.Play
         [BackgroundDependencyLoader]
         private void load()
         {
-            Add(content = new CircularContainer
+            Add(outerContent = new Circle
             {
                 Anchor = Anchor.Centre,
                 Origin = Anchor.Centre,
-                AutoSizeAxes = Axes.Both,
-                Masking = true,
-                BorderColour = colours.Yellow,
-                BorderThickness = 2,
-                Children = new Drawable[]
+                Size = new Vector2(outer_size),
+                Colour = Color4.Black.Opacity(0.25f)
+            });
+
+            Add(innerContent = new Container
+            {
+                Anchor = Anchor.Centre,
+                Origin = Anchor.Centre,
+                RelativeSizeAxes = Axes.Both,
+                Children = new[]
                 {
-                    new Box
-                    {
-                        Size = new Vector2(250, 40),
-                        Colour = Color4.Black,
-                        Alpha = 0.8f
-                    },
-                    new Container
+                    countdownBackground = new Circle
                     {
                         Anchor = Anchor.Centre,
                         Origin = Anchor.Centre,
-                        AutoSizeAxes = Axes.Both,
+                        Size = new Vector2(inner_size),
+                        Colour = Color4.Black.Opacity(0.25f)
+                    },
+                    countdownComponents = new Container
+                    {
+                        RelativeSizeAxes = Axes.Both,
                         Children = new Drawable[]
                         {
-                            new FillFlowContainer
+                            countdownProgress = new CircularProgress
                             {
                                 Anchor = Anchor.Centre,
                                 Origin = Anchor.Centre,
-                                AutoSizeAxes = Axes.Both,
-                                Spacing = new Vector2(5),
-                                Colour = colours.Yellow,
-                                Child = countdown = new OsuSpriteText
-                                {
-                                    Anchor = Anchor.Centre,
-                                    Origin = Anchor.Centre,
-                                    UseFullGlyphHeight = false,
-                                    AlwaysPresent = true,
-                                    Font = OsuFont.Numeric.With(size: 20, fixedWidth: true)
-                                },
+                                Size = new Vector2(progress_size),
+                                InnerRadius = progress_stroke_width / progress_size,
+                                RoundedCaps = true
+                            },
+                            countdownText = new OsuSpriteText
+                            {
+                                Anchor = Anchor.Centre,
+                                Origin = Anchor.Centre,
+                                UseFullGlyphHeight = false,
+                                AlwaysPresent = true,
+                                Font = OsuFont.Torus.With(size: 70, weight: FontWeight.Light)
                             }
                         }
                     }
@@ -93,14 +110,26 @@ namespace osu.Game.Screens.Play
         {
             this.FadeIn();
 
-            content.FadeInFromZero(150, Easing.OutQuint);
-            content.ScaleTo(new Vector2(1.5f, 1)).Then().ScaleTo(1, 150, Easing.OutElasticQuarter);
+            // The transition effects.
+            outerContent.FadeIn().ScaleTo(Vector2.Zero).Then().ScaleTo(Vector2.One, 200, Easing.OutQuint);
+            innerContent.FadeIn().ScaleTo(Vector2.Zero).Then().ScaleTo(Vector2.One, 400, Easing.OutElasticHalf);
+            countdownComponents.FadeOut().Then().Delay(50).FadeTo(1, 100);
 
+            // Reset states for various components.
+            countdownBackground.FadeIn();
+            countdownText.FadeIn();
+            countdownProgress.FadeIn().ScaleTo(1);
+
+            countdownComplete = false;
             countdownCount = 3;
             countdownStartTime = Time.Current;
 
             scheduledResume?.Cancel();
-            scheduledResume = Scheduler.AddDelayed(Resume, countdown_time);
+            scheduledResume = Scheduler.AddDelayed(() =>
+            {
+                countdownComplete = true;
+                Resume();
+            }, countdown_time);
         }
 
         protected override void Update()
@@ -114,20 +143,14 @@ namespace osu.Game.Screens.Play
             double amountTimePassed = Math.Min(countdown_time, Time.Current - countdownStartTime) / countdown_time;
             int newCount = 3 - (int)Math.Floor(amountTimePassed * 3);
 
-            if (newCount > 0)
-            {
-                countdown.Alpha = 1;
-                countdown.Text = newCount.ToString();
-            }
-            else
-                countdown.Alpha = 0;
+            countdownProgress.Current.Value = amountTimePassed;
+            countdownText.Text = Math.Max(1, newCount).ToString();
+            countdownProgress.InnerRadius = progress_stroke_width / progress_size / countdownProgress.Scale.X;
 
-            if (newCount != countdownCount)
+            if (countdownCount != newCount && newCount > 0)
             {
-                if (newCount == 0)
-                    content.ScaleTo(new Vector2(1.5f, 1), 150, Easing.OutQuint);
-                else
-                    content.ScaleTo(new Vector2(1.05f, 1), 50, Easing.OutQuint).Then().ScaleTo(1, 50, Easing.Out);
+                countdownText.ScaleTo(0.25f).Then().ScaleTo(1, 200, Easing.OutQuint);
+                outerContent.Delay(25).Then().ScaleTo(1.05f, 100).Then().ScaleTo(1f, 200, Easing.Out);
             }
 
             countdownCount = newCount;
@@ -135,9 +158,19 @@ namespace osu.Game.Screens.Play
 
         protected override void PopOut()
         {
-            this.Delay(150).FadeOut();
+            this.Delay(300).FadeOut();
 
-            content.FadeOut(150, Easing.OutQuint);
+            outerContent.FadeOut();
+            countdownBackground.FadeOut();
+            countdownText.FadeOut();
+
+            if (countdownComplete)
+            {
+                countdownProgress.ScaleTo(2f, 300, Easing.OutQuint);
+                countdownProgress.Delay(200).FadeOut(100, Easing.Out);
+            }
+            else
+                countdownProgress.FadeOut();
 
             scheduledResume?.Cancel();
         }
