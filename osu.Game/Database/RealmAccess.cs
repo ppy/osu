@@ -489,8 +489,7 @@ namespace osu.Game.Database
         /// <param name="action">The work to run.</param>
         public Task WriteAsync(Action<Realm> action)
         {
-            if (isDisposed)
-                throw new ObjectDisposedException(nameof(RealmAccess));
+            ObjectDisposedException.ThrowIf(isDisposed, this);
 
             // Required to ensure the write is tracked and accounted for before disposal.
             // Can potentially be avoided if we have a need to do so in the future.
@@ -675,8 +674,7 @@ namespace osu.Game.Database
 
         private Realm getRealmInstance()
         {
-            if (isDisposed)
-                throw new ObjectDisposedException(nameof(RealmAccess));
+            ObjectDisposedException.ThrowIf(isDisposed, this);
 
             bool tookSemaphoreLock = false;
 
@@ -1189,8 +1187,7 @@ namespace osu.Game.Database
             if (!ThreadSafety.IsUpdateThread)
                 throw new InvalidOperationException(@$"{nameof(BlockAllOperations)} must be called from the update thread.");
 
-            if (isDisposed)
-                throw new ObjectDisposedException(nameof(RealmAccess));
+            ObjectDisposedException.ThrowIf(isDisposed, this);
 
             SynchronizationContext? syncContext = null;
 

@@ -79,6 +79,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
             base.OnApply();
 
             Position = HitObject.Position - DrawableSlider.Position;
+            hasRotation = false;
         }
 
         protected override void CheckForResult(bool userTriggered, double timeOffset) => DrawableSlider.SliderInputManager.TryJudgeNestedObject(this, timeOffset);
@@ -146,7 +147,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
                 break;
             }
 
-            float aimRotation = MathUtils.RadiansToDegrees(MathF.Atan2(aimRotationVector.Y - Position.Y, aimRotationVector.X - Position.X));
+            float aimRotation = float.RadiansToDegrees(MathF.Atan2(aimRotationVector.Y - Position.Y, aimRotationVector.X - Position.X));
             while (Math.Abs(aimRotation - Arrow.Rotation) > 180)
                 aimRotation += aimRotation < Arrow.Rotation ? 360 : -360;
 

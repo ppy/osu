@@ -67,8 +67,25 @@ namespace osu.Game.Overlays.Mods
         private IModHotkeyHandler hotkeyHandler = null!;
 
         private Task? latestLoadTask;
-        private ICollection<ModPanel>? latestLoadedPanels;
-        internal bool ItemsLoaded => latestLoadTask?.IsCompleted == true && latestLoadedPanels?.All(panel => panel.Parent != null) == true;
+        private ModPanel[]? latestLoadedPanels;
+        internal bool ItemsLoaded => latestLoadTask?.IsCompleted == true && allPanelsLoaded;
+
+        private bool allPanelsLoaded
+        {
+            get
+            {
+                if (latestLoadedPanels == null)
+                    return false;
+
+                foreach (var panel in latestLoadedPanels)
+                {
+                    if (panel.Parent == null)
+                        return false;
+                }
+
+                return true;
+            }
+        }
 
         public override bool IsPresent => base.IsPresent || Scheduler.HasPendingTasks;
 
