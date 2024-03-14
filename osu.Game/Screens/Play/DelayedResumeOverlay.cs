@@ -22,12 +22,15 @@ namespace osu.Game.Screens.Play
     /// </summary>
     public partial class DelayedResumeOverlay : ResumeOverlay
     {
+        // todo: this shouldn't define its own colour provider, but nothing in Player screen does, so let's do that for now.
+        private readonly OverlayColourProvider colourProvider = new OverlayColourProvider(OverlayColourScheme.Blue);
+
         private const float outer_size = 200;
         private const float inner_size = 150;
         private const float progress_stroke_width = 7;
         private const float progress_size = inner_size + progress_stroke_width / 2f;
 
-        private const double countdown_time = 3000;
+        private const double countdown_time = 2000;
 
         protected override LocalisableString Message => string.Empty;
 
@@ -53,9 +56,6 @@ namespace osu.Game.Screens.Play
         [BackgroundDependencyLoader]
         private void load()
         {
-            // todo: this shouldn't define its own colour provider, but nothing in Player screen does, so let's do that for now.
-            var colourProvider = new OverlayColourProvider(OverlayColourScheme.Blue);
-
             Add(outerContent = new Circle
             {
                 Anchor = Anchor.Centre,
@@ -169,6 +169,8 @@ namespace osu.Game.Screens.Play
                 countdownText.Text = Math.Max(1, newCount).ToString();
                 countdownText.ScaleTo(0.25f).Then().ScaleTo(1, 200, Easing.OutQuint);
                 outerContent.Delay(25).Then().ScaleTo(1.05f, 100).Then().ScaleTo(1f, 200, Easing.Out);
+
+                countdownBackground.FlashColour(colourProvider.Background3, 400, Easing.Out);
             }
 
             countdownCount = newCount;
