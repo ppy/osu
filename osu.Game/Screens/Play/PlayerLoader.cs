@@ -71,6 +71,7 @@ namespace osu.Game.Screens.Play
 
         protected Task? DisposalTask { get; private set; }
 
+        private FillFlowContainer disclaimers = null!;
         private OsuScrollContainer settingsScroll = null!;
 
         private Bindable<bool> showStoryboards = null!;
@@ -137,7 +138,7 @@ namespace osu.Game.Screens.Play
 
         private ScheduledDelegate? scheduledPushPlayer;
 
-        private EpilepsyWarning? epilepsyWarning;
+        private PlayerLoaderDisclaimer? epilepsyWarning;
 
         private bool quickRestart;
 
@@ -188,6 +189,16 @@ namespace osu.Game.Screens.Play
                         Origin = Anchor.Centre,
                     },
                 }),
+                disclaimers = new FillFlowContainer
+                {
+                    Anchor = Anchor.TopLeft,
+                    Origin = Anchor.TopLeft,
+                    RelativeSizeAxes = Axes.Y,
+                    AutoSizeAxes = Axes.X,
+                    Direction = FillDirection.Vertical,
+                    Padding = new MarginPadding(padding),
+                    Spacing = new Vector2(padding),
+                },
                 settingsScroll = new OsuScrollContainer
                 {
                     Anchor = Anchor.TopRight,
@@ -216,11 +227,7 @@ namespace osu.Game.Screens.Play
 
             if (Beatmap.Value.BeatmapInfo.EpilepsyWarning)
             {
-                AddInternal(epilepsyWarning = new EpilepsyWarning
-                {
-                    Anchor = Anchor.Centre,
-                    Origin = Anchor.Centre,
-                });
+                disclaimers.Add(epilepsyWarning = new PlayerLoaderDisclaimer("This beatmap contains scenes with rapidly flashing colours", "Please take caution if you are affected by epilepsy."));
             }
         }
 
@@ -229,6 +236,9 @@ namespace osu.Game.Screens.Play
             base.LoadComplete();
 
             inputManager = GetContainingInputManager();
+
+            showStoryboards.BindValueChanged(val => epilepsyWarning?.FadeTo(val.NewValue ? 1 : 0, 250, Easing.OutQuint), true);
+            epilepsyWarning?.FinishTransforms(true);
         }
 
         #region Screen handling
@@ -237,15 +247,10 @@ namespace osu.Game.Screens.Play
         {
             base.OnEntering(e);
 
-            ApplyToBackground(b =>
-            {
-                if (epilepsyWarning != null)
-                    epilepsyWarning.DimmableBackground = b;
-            });
-
             Beatmap.Value.Track.AddAdjustment(AdjustableProperty.Volume, volumeAdjustment);
 
-            // Start off-screen.
+            // Start side content off-screen.
+            disclaimers.MoveToX(-disclaimers.DrawWidth);
             settingsScroll.MoveToX(settingsScroll.DrawWidth);
 
             content.ScaleTo(0.7f);
@@ -300,9 +305,6 @@ namespace osu.Game.Screens.Play
         {
             cancelLoad();
             ContentOut();
-
-            // If the load sequence was interrupted, the epilepsy warning may already be displayed (or in the process of being displayed).
-            epilepsyWarning?.Hide();
 
             // Ensure the screen doesn't expire until all the outwards fade operations have completed.
             this.Delay(CONTENT_OUT_DURATION).FadeOut();
@@ -433,6 +435,8 @@ namespace osu.Game.Screens.Play
             content.FadeInFromZero(500, Easing.OutQuint);
             content.ScaleTo(1, 650, Easing.OutQuint).Then().Schedule(prepareNewPlayer);
 
+            disclaimers.FadeInFromZero(500, Easing.Out)
+                       .MoveToX(0, 500, Easing.OutQuint);
             settingsScroll.FadeInFromZero(500, Easing.Out)
                           .MoveToX(0, 500, Easing.OutQuint);
 
@@ -466,6 +470,8 @@ namespace osu.Game.Screens.Play
                        lowPassFilter = null;
                    });
 
+            disclaimers.FadeOut(CONTENT_OUT_DURATION, Easing.Out)
+                       .MoveToX(-disclaimers.DrawWidth, CONTENT_OUT_DURATION * 2, Easing.OutQuint);
             settingsScroll.FadeOut(CONTENT_OUT_DURATION, Easing.OutQuint)
                           .MoveToX(settingsScroll.DrawWidth, CONTENT_OUT_DURATION * 2, Easing.OutQuint);
 
@@ -503,33 +509,8 @@ namespace osu.Game.Screens.Play
 
                 TransformSequence<PlayerLoader> pushSequence = this.Delay(0);
 
-                // only show if the warning was created (i.e. the beatmap needs it)
-                // and this is not a restart of the map (the warning expires after first load).
-                //
-                // note the late check of storyboard enable as the user may have just changed it
-                // from the settings on the loader screen.
-                if (epilepsyWarning?.IsAlive == true && showStoryboards.Value)
-                {
-                    const double epilepsy_display_length = 3000;
-
-                    pushSequence
-                        .Delay(CONTENT_OUT_DURATION)
-                        .Schedule(() => epilepsyWarning.State.Value = Visibility.Visible)
-                        .TransformBindableTo(volumeAdjustment, 0.25, EpilepsyWarning.FADE_DURATION, Easing.OutQuint)
-                        .Delay(epilepsy_display_length)
-                        .Schedule(() =>
-                        {
-                            epilepsyWarning.Hide();
-                            epilepsyWarning.Expire();
-                        })
-                        .Delay(EpilepsyWarning.FADE_DURATION);
-                }
-                else
-                {
-                    // This goes hand-in-hand with the restoration of low pass filter in contentOut().
-                    this.TransformBindableTo(volumeAdjustment, 0, CONTENT_OUT_DURATION, Easing.OutCubic);
-                    epilepsyWarning?.Expire();
-                }
+                // This goes hand-in-hand with the restoration of low pass filter in contentOut().
+                this.TransformBindableTo(volumeAdjustment, 0, CONTENT_OUT_DURATION, Easing.OutCubic);
 
                 pushSequence.Schedule(() =>
                 {
