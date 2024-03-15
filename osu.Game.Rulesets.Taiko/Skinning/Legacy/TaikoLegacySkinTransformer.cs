@@ -65,8 +65,16 @@ namespace osu.Game.Rulesets.Taiko.Skinning.Legacy
                     case TaikoSkinComponents.DrumRollTick:
                         return this.GetAnimation("sliderscorepoint", false, false);
 
-                    case TaikoSkinComponents.Swell:
-                        // todo: support taiko legacy swell (https://github.com/ppy/osu/issues/13601).
+                    case TaikoSkinComponents.SwellBody:
+                        if (GetTexture("spinner-circle") != null)
+                            return new LegacySwell();
+
+                        return null;
+
+                    case TaikoSkinComponents.SwellCirclePiece:
+                        if (GetTexture("spinner-circle") != null)
+                            return new LegacySwellCirclePiece();
+
                         return null;
 
                     case TaikoSkinComponents.HitTarget:
