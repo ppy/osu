@@ -200,7 +200,7 @@ namespace osu.Game.Screens.Play
                     AutoSizeEasing = Easing.OutQuint,
                     Direction = FillDirection.Vertical,
                     Padding = new MarginPadding(padding),
-                    Spacing = new Vector2(padding),
+                    Spacing = new Vector2(20),
                 },
                 settingsScroll = new OsuScrollContainer
                 {
@@ -269,9 +269,12 @@ namespace osu.Game.Screens.Play
 
             content.ScaleTo(0.7f);
 
-            contentIn();
+            const double metadata_delay = 750;
 
-            MetadataInfo.Delay(750).FadeIn(500, Easing.OutQuint);
+            contentIn();
+            MetadataInfo.Delay(metadata_delay).FadeIn(500, Easing.OutQuint);
+            disclaimers.Delay(metadata_delay).FadeInFromZero(500, Easing.Out)
+                       .MoveToX(0, 500, Easing.OutQuint);
 
             // after an initial delay, start the debounced load check.
             // this will continue to execute even after resuming back on restart.
@@ -449,8 +452,6 @@ namespace osu.Game.Screens.Play
             content.FadeInFromZero(500, Easing.OutQuint);
             content.ScaleTo(1, 650, Easing.OutQuint).Then().Schedule(prepareNewPlayer);
 
-            disclaimers.FadeInFromZero(500, Easing.Out)
-                       .MoveToX(0, 500, Easing.OutQuint);
             settingsScroll.FadeInFromZero(500, Easing.Out)
                           .MoveToX(0, 500, Easing.OutQuint);
 
