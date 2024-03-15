@@ -37,8 +37,8 @@ namespace osu.Game.Tests.Visual.Gameplay
         private TestPlayerLoader loader;
         private TestPlayer player;
 
-        private bool epilepsyWarning;
-        private BeatmapOnlineStatus onlineStatus;
+        private bool? epilepsyWarning;
+        private BeatmapOnlineStatus? onlineStatus;
 
         [Resolved]
         private AudioManager audioManager { get; set; }
@@ -83,7 +83,12 @@ namespace osu.Game.Tests.Visual.Gameplay
         }
 
         [SetUp]
-        public void Setup() => Schedule(() => player = null);
+        public void Setup() => Schedule(() =>
+        {
+            player = null;
+            epilepsyWarning = null;
+            onlineStatus = null;
+        });
 
         [SetUpSteps]
         public override void SetUpSteps()
@@ -121,8 +126,8 @@ namespace osu.Game.Tests.Visual.Gameplay
             workingBeatmap.BeatmapInfo.AudioLeadIn = 60000;
 
             // Set up data for testing disclaimer display.
-            workingBeatmap.BeatmapInfo.EpilepsyWarning = epilepsyWarning;
-            workingBeatmap.BeatmapInfo.Status = onlineStatus;
+            workingBeatmap.BeatmapInfo.EpilepsyWarning = epilepsyWarning ?? false;
+            workingBeatmap.BeatmapInfo.Status = onlineStatus ?? BeatmapOnlineStatus.Ranked;
 
             Beatmap.Value = workingBeatmap;
 
