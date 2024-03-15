@@ -194,8 +194,10 @@ namespace osu.Game.Screens.Play
                 {
                     Anchor = Anchor.TopLeft,
                     Origin = Anchor.TopLeft,
-                    RelativeSizeAxes = Axes.Y,
-                    AutoSizeAxes = Axes.X,
+                    Width = SettingsToolboxGroup.CONTAINER_WIDTH + padding * 2,
+                    AutoSizeAxes = Axes.Y,
+                    AutoSizeDuration = 250,
+                    AutoSizeEasing = Easing.OutQuint,
                     Direction = FillDirection.Vertical,
                     Padding = new MarginPadding(padding),
                     Spacing = new Vector2(padding),
