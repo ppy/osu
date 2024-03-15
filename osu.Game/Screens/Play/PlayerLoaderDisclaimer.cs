@@ -5,6 +5,7 @@ using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
+using osu.Framework.Input.Events;
 using osu.Framework.Localisation;
 using osu.Game.Graphics;
 using osu.Game.Overlays;
@@ -79,5 +80,8 @@ namespace osu.Game.Screens.Play
                 }
             };
         }
+
+        // handle hover so that users can hover the disclaimer to delay load if they want to read it.
+        protected override bool OnHover(HoverEvent e) => true;
     }
 }
