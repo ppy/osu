@@ -43,7 +43,7 @@ namespace osu.Game.Screens.Play
 
         protected const double CONTENT_OUT_DURATION = 300;
 
-        protected virtual double PlayerPushDelay => 1800;
+        protected virtual double PlayerPushDelay => 1800 + disclaimers.Count * 500;
 
         public override bool HideOverlaysOnEnter => hideOverlays;
 
