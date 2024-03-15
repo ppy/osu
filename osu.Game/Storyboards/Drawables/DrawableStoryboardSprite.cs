@@ -78,6 +78,9 @@ namespace osu.Game.Storyboards.Drawables
         private ISkinSource skin { get; set; } = null!;
 
         [Resolved]
+        private SkinManager skins { get; set; } = null!;
+
+        [Resolved]
         private TextureStore textureStore { get; set; } = null!;
 
         public DrawableStoryboardSprite(StoryboardSprite sprite)
@@ -106,7 +109,10 @@ namespace osu.Game.Storyboards.Drawables
 
         private void skinSourceChanged()
         {
-            Texture = skin.GetTexture(Sprite.Path) ?? textureStore.Get(Sprite.Path);
+            Texture = skin.GetTexture(Sprite.Path)
+                      // osu!classic is the default skin for storyboards. explicitly fall back to the osu!classic skin in case the skin provider does not provide osu!classic as a source (i.e. user does not have legacy skin selected).
+                      ?? skins.DefaultClassicSkin.GetTexture(Sprite.Path)
+                      ?? textureStore.Get(Sprite.Path);
 
             // Setting texture will only update the size if it's zero.
             // So let's force an explicit update.

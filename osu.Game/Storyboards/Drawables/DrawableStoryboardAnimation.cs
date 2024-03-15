@@ -92,6 +92,9 @@ namespace osu.Game.Storyboards.Drawables
         private ISkinSource skin { get; set; }
 
         [Resolved]
+        private SkinManager skins { get; set; }
+
+        [Resolved]
         private IBeatSyncProvider beatSyncProvider { get; set; }
 
         [Resolved]
@@ -130,6 +133,10 @@ namespace osu.Game.Storyboards.Drawables
             // When reading from a skin, we match stables weird behaviour where `FrameCount` is ignored
             // and resources are retrieved until the end of the animation.
             var skinTextures = skin.GetTextures(Path.ChangeExtension(Animation.Path, null), default, default, true, string.Empty, null, out _);
+
+            if (skinTextures.Length == 0)
+                  // osu!classic is the default skin for storyboards. explicitly fall back to the osu!classic skin in case the skin provider does not provide osu!classic as a source (i.e. user does not have legacy skin selected).
+                skinTextures = skins.DefaultClassicSkin.GetTextures(Path.ChangeExtension(Animation.Path, null), default, default, true, string.Empty, null, out _);
 
             if (skinTextures.Length > 0)
             {
