@@ -334,13 +334,7 @@ namespace osu.Game.Tests.Visual.Gameplay
 
             AddUntilStep("wait for current", () => loader.IsCurrentScreen());
 
-            AddAssert($"epilepsy warning {(warning ? "present" : "absent")}", () => (getWarning() != null) == warning);
-
-            if (warning)
-            {
-                AddUntilStep("sound volume decreased", () => Beatmap.Value.Track.AggregateVolume.Value == 0.25);
-                AddUntilStep("sound volume restored", () => Beatmap.Value.Track.AggregateVolume.Value == 1);
-            }
+            AddAssert($"epilepsy warning {(warning ? "present" : "absent")}", () => this.ChildrenOfType<PlayerLoaderDisclaimer>().Count(), () => Is.EqualTo(warning ? 1 : 0));
 
             restoreVolumes();
         }
@@ -357,30 +351,7 @@ namespace osu.Game.Tests.Visual.Gameplay
 
             AddUntilStep("wait for current", () => loader.IsCurrentScreen());
 
-            AddUntilStep("epilepsy warning absent", () => getWarning() == null);
-
-            restoreVolumes();
-        }
-
-        [Test]
-        public void TestEpilepsyWarningEarlyExit()
-        {
-            saveVolumes();
-            setFullVolume();
-
-            AddStep("enable storyboards", () => config.SetValue(OsuSetting.ShowStoryboard, true));
-            AddStep("set epilepsy warning", () => epilepsyWarning = true);
-            AddStep("load dummy beatmap", () => resetPlayer(false));
-
-            AddUntilStep("wait for current", () => loader.IsCurrentScreen());
-
-            AddUntilStep("wait for epilepsy warning", () => getWarning().Alpha > 0);
-            AddUntilStep("warning is shown", () => getWarning().State.Value == Visibility.Visible);
-
-            AddStep("exit early", () => loader.Exit());
-
-            AddUntilStep("warning is hidden", () => getWarning().State.Value == Visibility.Hidden);
-            AddUntilStep("sound volume restored", () => Beatmap.Value.Track.AggregateVolume.Value == 1);
+            AddUntilStep("epilepsy warning absent", () => this.ChildrenOfType<PlayerLoaderDisclaimer>().Single().Alpha, () => Is.Zero);
 
             restoreVolumes();
         }
@@ -478,8 +449,6 @@ namespace osu.Game.Tests.Visual.Gameplay
             AddStep("open notification overlay", () => notificationOverlay.Show());
             AddStep("click notification", () => notification.TriggerClick());
         }
-
-        private EpilepsyWarning getWarning() => loader.ChildrenOfType<EpilepsyWarning>().SingleOrDefault(w => w.IsAlive);
 
         private partial class TestPlayerLoader : PlayerLoader
         {
