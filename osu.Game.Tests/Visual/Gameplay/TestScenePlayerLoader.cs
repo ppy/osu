@@ -16,6 +16,7 @@ using osu.Framework.Graphics.Containers;
 using osu.Framework.Screens;
 using osu.Framework.Testing;
 using osu.Framework.Utils;
+using osu.Game.Beatmaps;
 using osu.Game.Configuration;
 using osu.Game.Overlays;
 using osu.Game.Overlays.Notifications;
@@ -37,6 +38,7 @@ namespace osu.Game.Tests.Visual.Gameplay
         private TestPlayer player;
 
         private bool epilepsyWarning;
+        private BeatmapOnlineStatus onlineStatus;
 
         [Resolved]
         private AudioManager audioManager { get; set; }
@@ -118,8 +120,9 @@ namespace osu.Game.Tests.Visual.Gameplay
             // Add intro time to test quick retry skipping (TestQuickRetry).
             workingBeatmap.BeatmapInfo.AudioLeadIn = 60000;
 
-            // Turn on epilepsy warning to test warning display (TestEpilepsyWarning).
+            // Set up data for testing disclaimer display.
             workingBeatmap.BeatmapInfo.EpilepsyWarning = epilepsyWarning;
+            workingBeatmap.BeatmapInfo.Status = onlineStatus;
 
             Beatmap.Value = workingBeatmap;
 
@@ -352,6 +355,44 @@ namespace osu.Game.Tests.Visual.Gameplay
             AddUntilStep("wait for current", () => loader.IsCurrentScreen());
 
             AddUntilStep("epilepsy warning absent", () => this.ChildrenOfType<PlayerLoaderDisclaimer>().Single().Alpha, () => Is.Zero);
+
+            restoreVolumes();
+        }
+
+        [TestCase(BeatmapOnlineStatus.Loved, 1)]
+        [TestCase(BeatmapOnlineStatus.Qualified, 1)]
+        [TestCase(BeatmapOnlineStatus.Graveyard, 0)]
+        public void TestStatusWarning(BeatmapOnlineStatus status, int expectedDisclaimerCount)
+        {
+            saveVolumes();
+            setFullVolume();
+
+            AddStep("enable storyboards", () => config.SetValue(OsuSetting.ShowStoryboard, true));
+            AddStep("disable epilepsy warning", () => epilepsyWarning = false);
+            AddStep("set beatmap status", () => onlineStatus = status);
+            AddStep("load dummy beatmap", () => resetPlayer(false));
+
+            AddUntilStep("wait for current", () => loader.IsCurrentScreen());
+
+            AddAssert($"disclaimer count is {expectedDisclaimerCount}", () => this.ChildrenOfType<PlayerLoaderDisclaimer>().Count(), () => Is.EqualTo(expectedDisclaimerCount));
+
+            restoreVolumes();
+        }
+
+        [Test]
+        public void TestCombinedWarnings()
+        {
+            saveVolumes();
+            setFullVolume();
+
+            AddStep("enable storyboards", () => config.SetValue(OsuSetting.ShowStoryboard, true));
+            AddStep("disable epilepsy warning", () => epilepsyWarning = true);
+            AddStep("set beatmap status", () => onlineStatus = BeatmapOnlineStatus.Loved);
+            AddStep("load dummy beatmap", () => resetPlayer(false));
+
+            AddUntilStep("wait for current", () => loader.IsCurrentScreen());
+
+            AddAssert($"disclaimer count is 2", () => this.ChildrenOfType<PlayerLoaderDisclaimer>().Count(), () => Is.EqualTo(2));
 
             restoreVolumes();
         }
