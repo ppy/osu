@@ -228,17 +228,17 @@ namespace osu.Game.Screens.Play
 
             if (Beatmap.Value.BeatmapInfo.EpilepsyWarning)
             {
-                disclaimers.Add(epilepsyWarning = new PlayerLoaderDisclaimer("This beatmap contains scenes with rapidly flashing colours", "Please take caution if you are affected by epilepsy."));
+                disclaimers.Add(epilepsyWarning = new PlayerLoaderDisclaimer(PlayerLoaderStrings.EpilepsyWarningTitle, PlayerLoaderStrings.EpilepsyWarningContent));
             }
 
             switch (Beatmap.Value.BeatmapInfo.Status)
             {
                 case BeatmapOnlineStatus.Loved:
-                    disclaimers.Add(new PlayerLoaderDisclaimer("This beatmap is loved", "No performance points will be awarded.\nLeaderboards may be reset by the beatmap creator."));
+                    disclaimers.Add(new PlayerLoaderDisclaimer(PlayerLoaderStrings.LovedBeatmapDisclaimerTitle, PlayerLoaderStrings.LovedBeatmapDisclaimerContent));
                     break;
 
                 case BeatmapOnlineStatus.Qualified:
-                    disclaimers.Add(new PlayerLoaderDisclaimer("This beatmap is qualified", "No performance points will be awarded.\nLeaderboards will be reset when the beatmap is ranked."));
+                    disclaimers.Add(new PlayerLoaderDisclaimer(PlayerLoaderStrings.QualifiedBeatmapDisclaimerTitle, PlayerLoaderStrings.QualifiedBeatmapDisclaimerContent));
                     break;
             }
         }
