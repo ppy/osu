@@ -24,40 +24,56 @@ namespace osu.Game.Screens.Play
         }
 
         [BackgroundDependencyLoader]
-        private void load(OsuColour colours)
+        private void load(OsuColour colours, OverlayColourProvider colourProvider)
         {
-            Width = SettingsToolboxGroup.CONTAINER_WIDTH;
+            RelativeSizeAxes = Axes.X;
             AutoSizeAxes = Axes.Y;
+            Masking = true;
+            CornerRadius = 5;
 
             InternalChildren = new Drawable[]
             {
-                new Circle
+                new Box
                 {
-                    Width = 7,
-                    Height = 15,
-                    Margin = new MarginPadding { Top = 2 },
-                    Colour = colours.Orange1,
+                    RelativeSizeAxes = Axes.Both,
+                    Colour = colourProvider.Background4,
                 },
-                new FillFlowContainer
+                new Container
                 {
                     RelativeSizeAxes = Axes.X,
                     AutoSizeAxes = Axes.Y,
-                    Padding = new MarginPadding { Left = 12 },
-                    Direction = FillDirection.Vertical,
-                    Spacing = new Vector2(0, 2),
-                    Children = new[]
+                    Padding = new MarginPadding(10),
+                    Children = new Drawable[]
                     {
-                        new TextFlowContainer(t => t.Font = OsuFont.GetFont(weight: FontWeight.Bold, size: 17))
+                        new Circle
                         {
-                            RelativeSizeAxes = Axes.X,
-                            AutoSizeAxes = Axes.Y,
-                            Text = title,
+                            Width = 7,
+                            Height = 15,
+                            Margin = new MarginPadding { Top = 2 },
+                            Colour = colours.Orange1,
                         },
-                        new TextFlowContainer(t => t.Font = OsuFont.GetFont(size: 16))
+                        new FillFlowContainer
                         {
                             RelativeSizeAxes = Axes.X,
                             AutoSizeAxes = Axes.Y,
-                            Text = content,
+                            Padding = new MarginPadding { Left = 12 },
+                            Direction = FillDirection.Vertical,
+                            Spacing = new Vector2(0, 2),
+                            Children = new[]
+                            {
+                                new TextFlowContainer(t => t.Font = OsuFont.GetFont(weight: FontWeight.Bold, size: 17))
+                                {
+                                    RelativeSizeAxes = Axes.X,
+                                    AutoSizeAxes = Axes.Y,
+                                    Text = title,
+                                },
+                                new TextFlowContainer(t => t.Font = OsuFont.GetFont(size: 16))
+                                {
+                                    RelativeSizeAxes = Axes.X,
+                                    AutoSizeAxes = Axes.Y,
+                                    Text = content,
+                                }
+                            }
                         }
                     }
                 }
