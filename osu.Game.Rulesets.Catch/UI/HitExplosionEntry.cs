@@ -4,6 +4,7 @@
 using osu.Framework.Graphics.Performance;
 using osu.Game.Rulesets.Catch.Objects;
 using osu.Game.Rulesets.Judgements;
+
 using osuTK.Graphics;
 
 namespace osu.Game.Rulesets.Catch.UI

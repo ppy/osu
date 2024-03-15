@@ -3,6 +3,7 @@
 
 using System;
 using System.Collections.Generic;
+
 using osu.Framework.Bindables;
 using osu.Framework.Graphics.Performance;
 using osu.Game.Rulesets.Judgements;
@@ -11,7 +12,7 @@ using osu.Game.Rulesets.Objects.Drawables;
 namespace osu.Game.Rulesets.Objects
 {
     /// <summary>
-    /// A <see cref="LifetimeEntry"/> that stores the lifetime for a <see cref="HitObject"/>.
+    /// A <see cref="LifetimeEntry{T}"/> that stores the lifetime for a <see cref="HitObject"/>.
     /// </summary>
     public class HitObjectLifetimeEntry : LifetimeEntry<HitObjectLifetimeEntry>
     {

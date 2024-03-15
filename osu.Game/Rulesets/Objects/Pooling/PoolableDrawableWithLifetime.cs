@@ -3,6 +3,7 @@
 
 using System;
 using System.Diagnostics;
+
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Performance;
 using osu.Framework.Graphics.Pooling;
@@ -12,7 +13,7 @@ namespace osu.Game.Rulesets.Objects.Pooling
     /// <summary>
     /// A <see cref="PoolableDrawable"/> that is controlled by <see cref="Entry"/> to implement drawable pooling and replay rewinding.
     /// </summary>
-    /// <typeparam name="TEntry">The <see cref="LifetimeEntry"/> type storing state and controlling this drawable.</typeparam>
+    /// <typeparam name="TEntry">The <see cref="LifetimeEntry{T}"/> type storing state and controlling this drawable.</typeparam>
     public abstract partial class PoolableDrawableWithLifetime<TEntry> : PoolableDrawable where TEntry : LifetimeEntry<TEntry>
     {
         private TEntry? entry;

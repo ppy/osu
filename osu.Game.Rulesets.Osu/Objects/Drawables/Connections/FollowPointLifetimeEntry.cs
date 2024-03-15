@@ -3,9 +3,11 @@
 
 using System;
 using System.Diagnostics;
+
 using osu.Framework.Bindables;
 using osu.Framework.Graphics.Performance;
 using osu.Game.Rulesets.Objects;
+
 using osuTK;
 
 namespace osu.Game.Rulesets.Osu.Objects.Drawables.Connections
