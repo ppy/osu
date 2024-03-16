@@ -18,6 +18,8 @@ namespace osu.Game.Screens.Play
         private readonly LocalisableString title;
         private readonly LocalisableString content;
 
+        private Box background = null!;
+
         public PlayerLoaderDisclaimer(LocalisableString title, LocalisableString content)
         {
             this.title = title;
@@ -34,10 +36,11 @@ namespace osu.Game.Screens.Play
 
             InternalChildren = new Drawable[]
             {
-                new Box
+                background = new Box
                 {
                     RelativeSizeAxes = Axes.Both,
                     Colour = colourProvider.Background4,
+                    Alpha = 0.1f,
                 },
                 new Container
                 {
@@ -81,7 +84,24 @@ namespace osu.Game.Screens.Play
             };
         }
 
-        // handle hover so that users can hover the disclaimer to delay load if they want to read it.
-        protected override bool OnHover(HoverEvent e) => true;
+        protected override bool OnHover(HoverEvent e)
+        {
+            updateFadeState();
+
+            // handle hover so that users can hover the disclaimer to delay load if they want to read it.
+            return true;
+        }
+
+        protected override void OnHoverLost(HoverLostEvent e)
+        {
+            updateFadeState();
+            base.OnHoverLost(e);
+        }
+
+        private void updateFadeState()
+        {
+            // Matches SettingsToolboxGroup
+            background.FadeTo(IsHovered ? 1 : 0.1f, (float)500, Easing.OutQuint);
+        }
     }
 }
