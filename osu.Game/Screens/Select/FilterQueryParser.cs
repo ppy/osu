@@ -69,7 +69,7 @@ namespace osu.Game.Screens.Select
                     return TryUpdateCriteriaRange(ref criteria.BeatDivisor, op, value, tryParseInt);
 
                 case "status":
-                    return TryUpdateCriteriaRange(ref criteria.OnlineStatus, op, value, tryParseEnum);
+                    return TryUpdateArrayRange(ref criteria.OnlineStatus, op, value, tryParseEnum);
 
                 case "creator":
                 case "author":
@@ -299,6 +299,33 @@ namespace osu.Game.Screens.Select
         public static bool TryUpdateCriteriaRange<T>(ref FilterCriteria.OptionalRange<T> range, Operator op, string val, TryParseFunction<T> parseFunction)
             where T : struct
             => parseFunction.Invoke(val, out var converted) && tryUpdateCriteriaRange(ref range, op, converted);
+
+        /// <summary>
+        /// Attempts to parse a keyword filter of type <typeparamref name="T"/>,
+        /// from the specified <paramref name="op"/> and <paramref name="val"/>.
+        /// If <paramref name="val"/> can be parsed into <typeparamref name="T"/> using <paramref name="parseFunction"/>, the function returns <c>true</c>
+        /// and the resulting range constraint is stored into the <paramref name="range"/>'s expected values.
+        /// </summary>
+        /// <param name="range">The <see cref="FilterCriteria.OptionalArray{T}"/> to store the parsed data into, if successful.</param>
+        /// <param name="op">The operator for the keyword filter. Currently, only <see cref="Operator.Equal"/> can be used.</param>
+        /// <param name="val">The value of the keyword filter.</param>
+        /// <param name="parseFunction">Function used to determine if <paramref name="val"/> can be converted to type <typeparamref name="T"/>.</param>
+        public static bool TryUpdateArrayRange<T>(ref FilterCriteria.OptionalArray<T> range, Operator op, string val, TryParseFunction<T> parseFunction)
+            where T : struct
+            => parseFunction.Invoke(val, out var converted) && tryUpdateArrayRange(ref range, op, converted);
+
+        private static bool tryUpdateArrayRange<T>(ref FilterCriteria.OptionalArray<T> range, Operator op, T value)
+            where T : struct
+        {
+            if (op != Operator.Equal)
+                return false;
+
+            range.Values ??= Array.Empty<T>();
+
+            range.Values = range.Values.Append(value).ToArray();
+
+            return true;
+        }
 
         private static bool tryUpdateCriteriaRange<T>(ref FilterCriteria.OptionalRange<T> range, Operator op, T value)
             where T : struct
