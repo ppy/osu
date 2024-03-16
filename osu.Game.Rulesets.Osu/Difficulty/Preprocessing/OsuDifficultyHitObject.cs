@@ -377,7 +377,13 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Preprocessing
 
             IList<HitObject> nestedObjects = slider.NestedHitObjects;
 
-            SliderTick? lastRealTick = slider.NestedHitObjects.OfType<SliderTick>().LastOrDefault();
+            SliderTick? lastRealTick = null;
+
+            foreach (var hitobject in slider.NestedHitObjects)
+            {
+                if (hitobject is SliderTick tick)
+                    lastRealTick = tick;
+            }
 
             if (lastRealTick?.StartTime > trackingEndTime)
             {

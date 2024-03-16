@@ -33,8 +33,6 @@ namespace osu.Game.Overlays.BeatmapListing
         private void load()
         {
             AutoSizeAxes = Axes.Both;
-            Anchor = Anchor.BottomLeft;
-            Origin = Anchor.BottomLeft;
             AddRangeInternal(new Drawable[]
             {
                 text = new OsuSpriteText
