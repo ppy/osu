@@ -89,7 +89,11 @@ namespace osu.Game.Tests.Visual.Background
             setupUserSettings();
             AddStep("Start player loader", () => songSelect.Push(playerLoader = new TestPlayerLoader(player = new LoadBlockingTestPlayer { BlockLoad = true })));
             AddUntilStep("Wait for Player Loader to load", () => playerLoader?.IsLoaded ?? false);
-            AddAssert("Background retained from song select", () => songSelect.IsBackgroundCurrent());
+            AddAssert("Background retained from song select", () =>
+            {
+                InputManager.MoveMouseTo(playerLoader);
+                return songSelect.IsBackgroundCurrent();
+            });
 
             AddUntilStep("Screen is dimmed and blur applied", () =>
             {
