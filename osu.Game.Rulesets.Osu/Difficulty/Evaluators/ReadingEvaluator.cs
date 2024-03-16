@@ -18,7 +18,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
 
         private const double overlap_multiplier = 0.8;
 
-        public static double EvaluateDenstityOf(DifficultyHitObject current)
+        public static double EvaluateDenstityOf(DifficultyHitObject current, bool applyDistanceNerf = true)
         {
             var currObj = (OsuDifficultyHitObject)current;
             double density = 0;
@@ -35,7 +35,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
                 double loopDifficulty = currObj.OpacityAt(loopObj.BaseObject.StartTime, false);
 
                 // Small distances means objects may be cheesed, so it doesn't matter whether they are arranged confusingly.
-                loopDifficulty *= logistic((loopObj.MinimumJumpDistance - 60) / 10);
+                if (applyDistanceNerf) loopDifficulty *= (logistic((loopObj.MinimumJumpDistance - 60) / 10) + 0.2) / 1.2;
 
                 // Reduce density bonus for this object if they're too apart in time
                 // Nerf starts on 1500ms and reaches maximum (*=0) on 3000ms
@@ -46,6 +46,21 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
                 {
                     prevObj0 = loopObj;
                     continue;
+                }
+
+                // Only if next object is slower, representing break from many notes in a row
+                if (loopObj.StrainTime > prevObj0.StrainTime)
+                {
+                    // Get rhythm similarity: 1 on same rhythms, 0.5 on 1/4 to 1/2
+                    double rhythmSimilarity = 1 - getRhythmDifference(loopObj.StrainTime, prevObj0.StrainTime);
+
+                    // Make differentiation going from 1/4 to 1/2 and bigger difference
+                    // To 1/3 to 1/2 and smaller difference
+                    rhythmSimilarity = Math.Clamp(rhythmSimilarity, 0.5, 0.75);
+                    rhythmSimilarity = 4 * (rhythmSimilarity - 0.5);
+
+                    // Reduce density for this objects if rhythms are different
+                    loopDifficulty *= rhythmSimilarity;
                 }
 
                 density += loopDifficulty;
@@ -133,14 +148,12 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
             double pastObjectDifficultyInfluence = EvaluateDenstityOf(current);
             double screenOverlapDifficulty = CalculateOverlapDifficultyOf(currObj);
 
-            double difficulty = Math.Pow(4 * Math.Log(Math.Max(1, pastObjectDifficultyInfluence)), 2.3);
+            double difficulty = Math.Pow(4 * Math.Log(Math.Max(1, pastObjectDifficultyInfluence)), 2.5);
 
-            screenOverlapDifficulty = Math.Max(0, screenOverlapDifficulty - 0.5); // make overlap value =1 cost significantly less
+            screenOverlapDifficulty = Math.Max(0, screenOverlapDifficulty - 0.75); // make overlap value =1 cost significantly less
 
             double overlapBonus = overlap_multiplier * screenOverlapDifficulty * difficulty;
             difficulty += overlapBonus;
-
-            //difficulty *= 1 + overlap_multiplier * screenOverlapDifficulty;
 
             return difficulty;
         }
@@ -256,6 +269,35 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
         }
 
         private static double getRhythmDifference(double t1, double t2) => 1 - Math.Min(t1, t2) / Math.Max(t1, t2);
+        private static double logistic(double x) => 1 / (1 + Math.Exp(-x));
+    }
+
+    public static class ReadingHiddenEvaluator
+    {
+        public static double EvaluateDifficultyOf(DifficultyHitObject current)
+        {
+            var currObj = (OsuDifficultyHitObject)current;
+
+            double density = ReadingEvaluator.EvaluateDenstityOf(current, false);
+
+            // Consider that density matters only starting from 3rd note on the screen
+            double densityFactor = Math.Max(0, density - 1) / 4;
+
+            // This is kinda wrong cuz it returns value bigger than preempt
+            // double timeSpentInvisible = getDurationSpentInvisible(currObj) / 1000 / currObj.ClockRate;
+
+            // The closer timeSpentInvisible is to 0 -> the less difference there are between NM and HD
+            // So we will reduce base according to this
+            // It will be 0.354 on AR11 value
+            double invisibilityFactor = logistic(currObj.Preempt / 120 - 4);
+
+            double hdDifficulty = invisibilityFactor + densityFactor;
+
+            // Scale by inpredictability slightly
+            hdDifficulty *= 0.95 + 0.15 * ReadingEvaluator.EvaluateInpredictabilityOf(current); // Max multiplier is 1.1
+
+            return hdDifficulty;
+        }
         private static double logistic(double x) => 1 / (1 + Math.Exp(-x));
     }
 }

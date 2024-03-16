@@ -16,9 +16,8 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
     public class ReadingLowAR : GraphSkill
     {
         private readonly List<double> difficulties = new List<double>();
-        private double skillMultiplier => 1.3;
+        private double skillMultiplier => 1.1;
         private double aimComponentMultiplier => 0.7;
-        //private double skillMultiplier => 2;
 
         public ReadingLowAR(Mod[] mods)
             : base(mods)
@@ -85,7 +84,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
             return difficulty;
         }
 
-        public static double DifficultyToPerformance(double difficulty) => Math.Pow(difficulty, 3) * 10.0;
+        public static double DifficultyToPerformance(double difficulty) => Math.Pow(difficulty, 4) * 6.0;
     }
 
     public class ReadingHidden : OsuStrainSkill
