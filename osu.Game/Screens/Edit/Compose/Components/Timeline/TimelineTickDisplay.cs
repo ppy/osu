@@ -165,7 +165,7 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
 
             // save a few drawables beyond the currently used for edge cases.
             while (drawableIndex < Math.Min(usedDrawables + 16, Count))
-                Children[drawableIndex++].Hide();
+                Children[drawableIndex++].Alpha = 0;
 
             // expire any excess
             while (drawableIndex < Count)
@@ -182,7 +182,7 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
                     point = Children[drawableIndex];
 
                 drawableIndex++;
-                point.Show();
+                point.Alpha = 1;
 
                 return point;
             }
