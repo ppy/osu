@@ -72,8 +72,10 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
             }
 
             // Add remaining ones
-            foreach (var group in controlPointGroups)
+            for (int i = 0; i < controlPointGroups.Count; i++)
             {
+                var group = controlPointGroups[i];
+
                 if (!shouldBeVisible(group))
                     continue;
 
