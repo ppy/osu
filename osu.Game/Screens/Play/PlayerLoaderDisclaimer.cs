@@ -101,7 +101,7 @@ namespace osu.Game.Screens.Play
         private void updateFadeState()
         {
             // Matches SettingsToolboxGroup
-            background.FadeTo(IsHovered ? 1 : 0.1f, (float)500, Easing.OutQuint);
+            background.FadeTo(IsHovered ? 1 : 0.1f, 500, Easing.OutQuint);
         }
     }
 }
