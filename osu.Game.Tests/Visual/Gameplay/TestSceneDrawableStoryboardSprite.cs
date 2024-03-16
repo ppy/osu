@@ -10,6 +10,7 @@ using NUnit.Framework;
 using osu.Framework.Allocation;
 using osu.Framework.Extensions.IEnumerableExtensions;
 using osu.Framework.Graphics;
+using osu.Framework.Graphics.Animations;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.IO.Stores;
 using osu.Framework.Testing;
@@ -31,6 +32,7 @@ namespace osu.Game.Tests.Visual.Gameplay
         private TestStoryboard storyboard { get; set; } = new TestStoryboard();
 
         private IEnumerable<DrawableStoryboardSprite> sprites => this.ChildrenOfType<DrawableStoryboardSprite>();
+        private IEnumerable<DrawableStoryboardAnimation> animations => this.ChildrenOfType<DrawableStoryboardAnimation>();
 
         private const string lookup_name = "hitcircleoverlay";
 
@@ -60,9 +62,8 @@ namespace osu.Game.Tests.Visual.Gameplay
 
             AddStep("create sprites", () => SetContents(_ => createSprite(lookup_name, Anchor.TopLeft, Vector2.Zero)));
 
-            // Only checking for at least one sprite that succeeded, as not all skins in this test provide the hitcircleoverlay texture.
             AddAssert("sprite found texture", () =>
-                sprites.Any(sprite => sprite.ChildrenOfType<Sprite>().All(s => s.Texture != null)));
+                sprites.All(sprite => sprite.ChildrenOfType<Sprite>().All(s => s.Texture != null)));
 
             assertStoryboardSourced();
         }
@@ -78,9 +79,8 @@ namespace osu.Game.Tests.Visual.Gameplay
 
             AddStep("create sprites", () => SetContents(_ => createSprite(lookup_name, Anchor.TopLeft, Vector2.Zero)));
 
-            // Only checking for at least one sprite that succeeded, as not all skins in this test provide the hitcircleoverlay texture.
-            AddAssert("sprite found texture", () =>
-                sprites.Any(sprite => sprite.ChildrenOfType<Sprite>().All(s => s.Texture != null)));
+            AddAssert("all sprites found texture", () =>
+                sprites.All(sprite => sprite.ChildrenOfType<Sprite>().All(s => s.Texture != null)));
 
             assertSkinSourced();
         }
@@ -96,11 +96,15 @@ namespace osu.Game.Tests.Visual.Gameplay
 
             AddStep("create sprites", () => SetContents(_ => createSprite(lookup_name, Anchor.TopLeft, Vector2.Zero)));
 
-            // Only checking for at least one sprite that succeeded, as not all skins in this test provide the hitcircleoverlay texture.
-            AddAssert("sprite found texture", () =>
-                sprites.Any(sprite => sprite.ChildrenOfType<Sprite>().All(s => s.Texture != null)));
+            AddAssert("all sprites found texture", () =>
+                sprites.All(sprite => sprite.ChildrenOfType<Sprite>().All(s => s.Texture != null)));
 
             assertSkinSourced();
+
+            AddStep("create animations", () => SetContents(_ => createAnimation(@"pippidonclear", Anchor.TopLeft, Vector2.Zero, 30)));
+
+            AddAssert("all animations found texture", () =>
+                animations.All(animation => animation.ChildrenOfType<TextureAnimation>().All(s => s.FrameCount > 0 && s.CurrentFrame != null)));
         }
 
         [Test]
@@ -179,6 +183,19 @@ namespace osu.Game.Tests.Visual.Gameplay
 
             layer.Elements.Clear();
             layer.Add(sprite);
+
+            return storyboard.CreateDrawable().With(s => s.RelativeSizeAxes = Axes.Both);
+        }
+
+        private DrawableStoryboard createAnimation(string lookupName, Anchor origin, Vector2 initialPosition, int frameCount)
+        {
+            var layer = storyboard.GetLayer("Background");
+
+            var animation = new StoryboardAnimation(lookupName, origin, initialPosition, frameCount, 0, AnimationLoopType.LoopForever);
+            animation.AddLoop(Time.Current, 100).Alpha.Add(Easing.None, 0, 10000, 1, 1);
+
+            layer.Elements.Clear();
+            layer.Add(animation);
 
             return storyboard.CreateDrawable().With(s => s.RelativeSizeAxes = Axes.Both);
         }
