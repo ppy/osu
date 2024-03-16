@@ -126,7 +126,13 @@ namespace osu.Game.Screens.Select
 
             public T[]? Values;
 
-            public bool Equals(OptionalArray<T> other) => Values?.SequenceEqual(other.Values ?? Array.Empty<T>()) ?? false;
+            public bool Equals(OptionalArray<T> other)
+            {
+                if (Values is null && other.Values is null)
+                    return true;
+
+                return Values?.SequenceEqual(other.Values ?? Array.Empty<T>()) ?? false;
+            }
         }
 
         public struct OptionalRange<T> : IEquatable<OptionalRange<T>>
