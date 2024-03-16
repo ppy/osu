@@ -34,7 +34,7 @@ namespace osu.Game.Screens.Select
         public OptionalRange<double> Length;
         public OptionalRange<double> BPM;
         public OptionalRange<int> BeatDivisor;
-        public OptionalRange<BeatmapOnlineStatus> OnlineStatus;
+        public OptionalArray<BeatmapOnlineStatus> OnlineStatus;
         public OptionalRange<DateTimeOffset> LastPlayed;
         public OptionalTextFilter Creator;
         public OptionalTextFilter Artist;
@@ -113,6 +113,21 @@ namespace osu.Game.Screens.Select
         public IEnumerable<string>? CollectionBeatmapMD5Hashes { get; set; }
 
         public IRulesetFilterCriteria? RulesetCriteria { get; set; }
+
+        public struct OptionalArray<T> : IEquatable<OptionalArray<T>>
+            where T : struct
+        {
+            public bool HasFilter => Values?.Length > 0;
+
+            public bool IsInRange(T value)
+            {
+                return Values?.Contains(value) ?? false;
+            }
+
+            public T[]? Values;
+
+            public bool Equals(OptionalArray<T> other) => Values?.SequenceEqual(other.Values ?? Array.Empty<T>()) ?? false;
+        }
 
         public struct OptionalRange<T> : IEquatable<OptionalRange<T>>
             where T : struct
