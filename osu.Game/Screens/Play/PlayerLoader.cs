@@ -269,12 +269,10 @@ namespace osu.Game.Screens.Play
 
             content.ScaleTo(0.7f);
 
-            const double metadata_delay = 750;
+            const double metadata_delay = 500;
 
-            contentIn();
             MetadataInfo.Delay(metadata_delay).FadeIn(500, Easing.OutQuint);
-            disclaimers.Delay(metadata_delay).FadeInFromZero(500, Easing.Out)
-                       .MoveToX(0, 500, Easing.OutQuint);
+            contentIn(metadata_delay + 250);
 
             // after an initial delay, start the debounced load check.
             // this will continue to execute even after resuming back on restart.
@@ -352,7 +350,7 @@ namespace osu.Game.Screens.Play
             {
                 if (this.IsCurrentScreen())
                     content.StartTracking(logo, resuming ? 0 : 500, Easing.InOutExpo);
-            }, resuming ? 0 : 500);
+            }, resuming ? 0 : 250);
         }
 
         protected override void LogoExiting(OsuLogo logo)
@@ -445,15 +443,21 @@ namespace osu.Game.Screens.Play
             this.MakeCurrent();
         }
 
-        private void contentIn()
+        private void contentIn(double delayBeforeSideDisplays = 0)
         {
             MetadataInfo.Loading = true;
 
             content.FadeInFromZero(500, Easing.OutQuint);
             content.ScaleTo(1, 650, Easing.OutQuint).Then().Schedule(prepareNewPlayer);
 
-            settingsScroll.FadeInFromZero(500, Easing.Out)
-                          .MoveToX(0, 500, Easing.OutQuint);
+            using (BeginDelayedSequence(delayBeforeSideDisplays))
+            {
+                settingsScroll.FadeInFromZero(500, Easing.Out)
+                              .MoveToX(0, 500, Easing.OutQuint);
+
+                disclaimers.FadeInFromZero(500, Easing.Out)
+                           .MoveToX(0, 500, Easing.OutQuint);
+            }
 
             AddRangeInternal(new[]
             {
