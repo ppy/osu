@@ -10,6 +10,7 @@ using JetBrains.Annotations;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Input.Events;
+using osu.Game.Graphics;
 using osu.Game.Rulesets.Objects.Drawables;
 using osu.Game.Rulesets.Scoring;
 using osu.Game.Rulesets.Taiko.Skinning.Default;
@@ -63,6 +64,15 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
         {
             updateActionsFromType();
             base.RecreatePieces();
+
+            if (MainPiece.Drawable is not IHasAccentColour drawableHasColor) return;
+
+            AccentColour.Value = drawableHasColor.AccentColour;
+
+            AccentColour.BindValueChanged(c =>
+            {
+                drawableHasColor.AccentColour = c.NewValue;
+            });
         }
 
         protected override void OnFree()
