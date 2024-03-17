@@ -16,7 +16,7 @@ namespace osu.Desktop.Security
     /// <summary>
     /// Checks if the game is running with windows compatibility optimizations which could cause issues. Displays a warning notification if so.
     /// </summary>
-    public partial class CompatibilityModeChecker : Drawable
+    public partial class CompatibilityModeChecker : Component
     {
         [Resolved]
         private INotificationOverlay notifications { get; set; } = null!;
