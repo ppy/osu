@@ -22,16 +22,19 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
         {
             var currObj = (OsuDifficultyHitObject)current;
             double density = 0;
-            double densityAnglesNerf = -2; // we have threshold of 2, so 2 or same angles won't be punished
+            double densityAnglesNerf = -2.5; // we have threshold of 2.5
 
             OsuDifficultyHitObject? prevObj0 = null;
             OsuDifficultyHitObject? prevObj1 = null;
             OsuDifficultyHitObject? prevObj2 = null;
 
-            double prevConstantAngle = 0;
+            double prevConstantAngle = 1;
 
             foreach (var loopObj in retrievePastVisibleObjects(currObj).Reverse())
             {
+                if (loopObj.Index < 1)
+                    continue; // Don't look on the first object of the map
+
                 double loopDifficulty = currObj.OpacityAt(loopObj.BaseObject.StartTime, false);
 
                 // Small distances means objects may be cheesed, so it doesn't matter whether they are arranged confusingly.
@@ -43,10 +46,13 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
                 loopDifficulty *= getTimeNerfFactor(timeBetweenCurrAndLoopObj);
 
                 if (prevObj0.IsNull())
-                {
-                    prevObj0 = loopObj;
-                    continue;
-                }
+                    prevObj0 = (OsuDifficultyHitObject)loopObj.Previous(0);
+
+                if (prevObj1.IsNull())
+                    prevObj1 = (OsuDifficultyHitObject?)loopObj.Previous(1);
+
+                if (prevObj2.IsNull())
+                    prevObj2 = (OsuDifficultyHitObject?)loopObj.Previous(2);
 
                 // Only if next object is slower, representing break from many notes in a row
                 if (loopObj.StrainTime > prevObj0.StrainTime)
@@ -67,35 +73,42 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
 
                 // Angles nerf
 
-                if (loopObj.Angle.IsNotNull() && prevObj0.Angle.IsNotNull())
+                if (loopObj.Angle.IsNotNull() && prevObj0.IsNotNull() && prevObj0.Angle.IsNotNull())
                 {
                     double angleDifference = Math.Abs(prevObj0.Angle.Value - loopObj.Angle.Value);
+
+                    // assume worst-case if no angles
+                    double angleDifference1 = 0;
+                    double angleDifference2 = 0;
 
                     // Nerf alternating angles case
                     if (prevObj1.IsNotNull() && prevObj2.IsNotNull() && prevObj1.Angle.IsNotNull() && prevObj2.Angle.IsNotNull())
                     {
                         // Normalized difference
-                        double angleDifference1 = Math.Abs(prevObj1.Angle.Value - loopObj.Angle.Value) / Math.PI;
-                        double angleDifference2 = Math.Abs(prevObj2.Angle.Value - prevObj0.Angle.Value) / Math.PI;
+                        angleDifference1 = Math.Abs(prevObj1.Angle.Value - loopObj.Angle.Value) / Math.PI;
+                        angleDifference2 = Math.Abs(prevObj2.Angle.Value - prevObj0.Angle.Value) / Math.PI;
+                    }
 
-                        // Will be close to 1 if angleDifference1 and angleDifference2 was both close to 0
-                        double alternatingFactor = Math.Pow((1 - angleDifference1) * (1 - angleDifference2), 2);
+                    // Will be close to 1 if angleDifference1 and angleDifference2 was both close to 0
+                    double alternatingFactor = Math.Pow((1 - angleDifference1) * (1 - angleDifference2), 2);
 
-                        // Be sure to nerf only same rhythms
-                        double rhythmFactor = 1 - getRhythmDifference(loopObj.StrainTime, prevObj0.StrainTime); // 0 on different rhythm, 1 on same rhythm
+                    // Be sure to nerf only same rhythms
+                    double rhythmFactor = 1 - getRhythmDifference(loopObj.StrainTime, prevObj0.StrainTime); // 0 on different rhythm, 1 on same rhythm
+
+                    if (prevObj1.IsNotNull())
                         rhythmFactor *= 1 - getRhythmDifference(prevObj0.StrainTime, prevObj1.StrainTime);
+                    if (prevObj1.IsNotNull() && prevObj2.IsNotNull())
                         rhythmFactor *= 1 - getRhythmDifference(prevObj1.StrainTime, prevObj2.StrainTime);
 
-                        double acuteAngleFactor = 1 - Math.Min(loopObj.Angle.Value, prevObj0.Angle.Value) / Math.PI;
+                    double acuteAngleFactor = 1 - Math.Min(loopObj.Angle.Value, prevObj0.Angle.Value) / Math.PI;
 
-                        double prevAngleAdjust = Math.Max(angleDifference - angleDifference1, 0);
+                    double prevAngleAdjust = Math.Max(angleDifference - angleDifference1, 0);
 
-                        prevAngleAdjust *= alternatingFactor; // Nerf if alternating
-                        prevAngleAdjust *= rhythmFactor; // Nerf if same rhythms
-                        prevAngleAdjust *= acuteAngleFactor;
+                    prevAngleAdjust *= alternatingFactor; // Nerf if alternating
+                    prevAngleAdjust *= rhythmFactor; // Nerf if same rhythms
+                    prevAngleAdjust *= acuteAngleFactor;
 
-                        angleDifference -= prevAngleAdjust;
-                    }
+                    angleDifference -= prevAngleAdjust;
 
                     // Reduce angles nerf if objects are too apart in time
                     // Angle nerf is starting being reduced from 200ms (150BPM jump) and it reduced to 0 on 2000ms
@@ -109,6 +122,10 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
 
                     densityAnglesNerf += Math.Min(currentAngleNerf, loopDifficulty);
                     prevConstantAngle = currConstantAngle;
+                }
+                else // Assume worst-case if no angles
+                {
+                    densityAnglesNerf += loopDifficulty;
                 }
 
                 prevObj2 = prevObj1;
