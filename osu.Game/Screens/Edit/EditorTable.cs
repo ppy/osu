@@ -72,6 +72,7 @@ namespace osu.Game.Screens.Edit
         // We can avoid potentially thousands of objects being added to the input sub-tree since input is being handled only by the BackgroundFlow anyway.
         protected override bool ShouldBeConsideredForInput(Drawable child) => child is not GridContainer && base.ShouldBeConsideredForInput(child);
 
+        // We want to receive input for background even if it's bigger than this container.
         public override bool ReceivePositionalInputAt(Vector2 screenSpacePos) => background.ReceivePositionalInputAt(screenSpacePos);
 
         protected int GetIndexForItem(T? item)

@@ -19,6 +19,9 @@ using osuTK.Graphics;
 
 namespace osu.Game.Screens.Edit
 {
+    /// <summary>
+    /// A <see cref="Container{T}"/> which mimics behavior of a vertical <see cref="FillFlowContainer"/> full of clickable items in an efficient way.
+    /// </summary>
     public partial class EditorTableBackground : Container<EditorTableBackgroundRow>
     {
         public Action<int>? Selected;
@@ -38,6 +41,8 @@ namespace osu.Game.Screens.Edit
             }
         }
 
+        private readonly Bindable<int> hoveredIndexBindable = new Bindable<int>(-1);
+
         private readonly HoverSampleSet sampleSet;
         private Bindable<double?> lastHoverPlaybackTime = null!;
 
@@ -52,13 +57,146 @@ namespace osu.Game.Screens.Edit
         [BackgroundDependencyLoader]
         private void load(AudioManager audio, SessionStatics statics)
         {
+            // see HoverSampleDebounceComponent
             lastHoverPlaybackTime = statics.GetBindable<double?>(Static.LastHoverSoundPlaybackTime);
 
+            // see HoverSounds
             sampleHover = audio.Samples.Get($@"UI/{sampleSet.GetDescription()}-hover")
                           ?? audio.Samples.Get($@"UI/{HoverSampleSet.Default.GetDescription()}-hover");
 
+            // see HoverClickSounds
             sampleClick = audio.Samples.Get($@"UI/{sampleSet.GetDescription()}-select")
                           ?? audio.Samples.Get($@"UI/{HoverSampleSet.Default.GetDescription()}-select");
+        }
+
+        protected override void LoadComplete()
+        {
+            base.LoadComplete();
+            hoveredIndexBindable.BindValueChanged(i => onHoveredChanged(i.NewValue));
+        }
+
+        protected override void Update()
+        {
+            base.Update();
+
+            if (IsHovered)
+                hoveredIndexBindable.Value = getItemIndexAtMousePosition();
+        }
+
+        protected override bool OnHover(HoverEvent e) => true;
+
+        protected override void OnHoverLost(HoverLostEvent e)
+        {
+            base.OnHoverLost(e);
+            hoveredIndexBindable.Value = -1;
+        }
+
+        private void onHoveredChanged(int hoveredIndex)
+        {
+            EditorTableBackgroundRow? newHovered = null;
+
+            foreach (var child in this)
+            {
+                if (child.Index == hoveredIndex)
+                {
+                    newHovered = child;
+                }
+                else
+                {
+                    if (child.State == RowState.Hovered)
+                        child.State = RowState.None;
+                }
+            }
+
+            if (hoveredIndex == -1)
+                return;
+
+            if (newHovered != null)
+            {
+                if (newHovered.State == RowState.None)
+                    newHovered.State = RowState.Hovered;
+            }
+            else
+                Add(new EditorTableBackgroundRow(hoveredIndex));
+
+            playHoverSample();
+        }
+
+        public EditorTableBackgroundRow Select(int itemIndex)
+        {
+            if (itemIndex < 0 || itemIndex >= rowCount)
+                throw new ArgumentOutOfRangeException(@$"Can't select item at index {itemIndex} when item count is {rowCount}.");
+
+            EditorTableBackgroundRow? existingAtIndex = getItemAtIndex(itemIndex);
+
+            if (existingAtIndex == null)
+            {
+                Deselect();
+
+                var toAdd = new EditorTableBackgroundRow(itemIndex)
+                {
+                    State = RowState.Selected
+                };
+
+                Add(toAdd);
+                return toAdd;
+            }
+
+            foreach (var child in this)
+            {
+                if (child.Index == itemIndex)
+                    child.State = RowState.Selected;
+                else
+                    child.State = child.Index == hoveredIndexBindable.Value ? RowState.Hovered : RowState.None;
+            }
+
+            return existingAtIndex;
+        }
+
+        public void Deselect()
+        {
+            foreach (var child in this)
+            {
+                if (child.State == RowState.Selected)
+                    child.State = child.Index == hoveredIndexBindable.Value ? RowState.Hovered : RowState.None;
+            }
+        }
+
+        protected override bool OnClick(ClickEvent e)
+        {
+            base.OnClick(e);
+            int index = getItemIndexAtMousePosition();
+
+            if (index != -1)
+            {
+                Select(index);
+                playClickSample();
+                Selected?.Invoke(index);
+            }
+
+            return true;
+        }
+
+        private int getItemIndexAtMousePosition()
+        {
+            float y = ToLocalSpace(GetContainingInputManager().CurrentState.Mouse.Position).Y;
+
+            int index = (int)(y / ROW_HEIGHT);
+            if (index >= 0 && index < RowCount)
+                return index;
+
+            return -1;
+        }
+
+        private EditorTableBackgroundRow? getItemAtIndex(int index)
+        {
+            foreach (var child in this)
+            {
+                if (child.Index == index)
+                    return child;
+            }
+
+            return null;
         }
 
         private void playHoverSample()
@@ -86,136 +224,6 @@ namespace osu.Game.Screens.Edit
 
             channel.Frequency.Value = 0.99 + RNG.NextDouble(0.02);
             channel.Play();
-        }
-
-        protected override void Update()
-        {
-            base.Update();
-
-            if (!IsHovered)
-            {
-                for (int i = Children.Count - 1; i >= 0; i--)
-                {
-                    var child = Children[i];
-                    if (child.State != RowState.Selected)
-                        child.State = RowState.None;
-                }
-
-                return;
-            }
-
-            updateWhenHovered();
-        }
-
-        protected override bool OnHover(HoverEvent e) => true;
-
-        private void updateWhenHovered()
-        {
-            float y = ToLocalSpace(GetContainingInputManager().CurrentState.Mouse.Position).Y;
-
-            EditorTableBackgroundRow? existingAtY = null;
-
-            foreach (var child in this)
-            {
-                if (child.Y <= y && child.Y + child.Height > y)
-                {
-                    existingAtY = child;
-                }
-                else
-                {
-                    if (child.State != RowState.Selected)
-                        child.State = RowState.None;
-                }
-            }
-
-            if (existingAtY != null)
-            {
-                if (existingAtY.State == RowState.None)
-                {
-                    existingAtY.State = RowState.Hovered;
-                    playHoverSample();
-                }
-            }
-            else
-            {
-                int newItemIndex = getItemIndexAt(y);
-
-                if (newItemIndex != -1)
-                {
-                    Add(new EditorTableBackgroundRow(newItemIndex)
-                    {
-                        Y = newItemIndex * ROW_HEIGHT
-                    });
-
-                    playHoverSample();
-                }
-            }
-        }
-
-        public EditorTableBackgroundRow Select(int itemIndex)
-        {
-            EditorTableBackgroundRow? existingIndexRepresentation = null;
-
-            foreach (var child in this)
-            {
-                if (child.State == RowState.Selected)
-                    child.State = RowState.None;
-
-                if (child.Index == itemIndex)
-                {
-                    existingIndexRepresentation = child;
-                    break;
-                }
-            }
-
-            if (existingIndexRepresentation != null)
-            {
-                existingIndexRepresentation.State = RowState.Selected;
-                return existingIndexRepresentation;
-            }
-
-            var toAdd = new EditorTableBackgroundRow(itemIndex)
-            {
-                Y = itemIndex * ROW_HEIGHT,
-                State = RowState.Selected
-            };
-
-            Add(toAdd);
-            return toAdd;
-        }
-
-        public void Deselect()
-        {
-            foreach (var child in this)
-            {
-                if (child.State == RowState.Selected)
-                    child.State = RowState.None;
-            }
-        }
-
-        protected override bool OnClick(ClickEvent e)
-        {
-            base.OnClick(e);
-            float y = ToLocalSpace(GetContainingInputManager().CurrentState.Mouse.Position).Y;
-            int index = getItemIndexAt(y);
-
-            if (index != -1)
-            {
-                Select(index);
-                playClickSample();
-                Selected?.Invoke(index);
-            }
-
-            return true;
-        }
-
-        private int getItemIndexAt(float y)
-        {
-            int index = (int)(y / ROW_HEIGHT);
-            if (index >= 0 && index < RowCount)
-                return index;
-
-            return -1;
         }
     }
 
@@ -262,8 +270,10 @@ namespace osu.Game.Screens.Edit
         {
             RelativeSizeAxes = Axes.X;
             Height = EditorTableBackground.ROW_HEIGHT;
+            Y = Index * Height;
             Masking = true;
             CornerRadius = 3;
+            Alpha = 0.0001f; // Make alpha slightly bigger to allow playing FadeIn transforms without being immediately removed from the tree.
             InternalChild = new Box
             {
                 RelativeSizeAxes = Axes.Both
