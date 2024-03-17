@@ -43,7 +43,6 @@ namespace osu.Game.Rulesets.Edit
 
             // Events
             new CheckBreaks()
-
         };
 
         public IEnumerable<Issue> Run(BeatmapVerifierContext context)
