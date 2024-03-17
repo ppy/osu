@@ -14,7 +14,7 @@ using static osu.Game.Tests.Visual.OsuTestScene.ClockBackedTestWorkingBeatmap;
 
 namespace osu.Game.Tests.Editing.Checks
 {
-    public class CheckUnusedAudioTest
+    public class CheckUnusedAudioAtEndTest
     {
         private CheckUnusedAudioAtEnd check = null!;
 
