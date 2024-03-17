@@ -8,6 +8,8 @@ using System.Linq;
 using osuTK;
 using osuTK.Graphics;
 using osu.Framework.Allocation;
+using osu.Framework.Audio;
+using osu.Framework.Audio.Sample;
 using osu.Framework.Bindables;
 using osu.Framework.Extensions;
 using osu.Framework.Extensions.Color4Extensions;
@@ -44,6 +46,8 @@ namespace osu.Game.Graphics.UserInterface
 
         private readonly Box strip;
 
+        private Sample sampleTabSelect;
+
         protected override Dropdown<T> CreateDropdown() => new OsuTabDropdown<T>();
 
         protected override TabItem<T> CreateTabItem(T value) => new OsuTabItem(value);
@@ -77,10 +81,12 @@ namespace osu.Game.Graphics.UserInterface
         }
 
         [BackgroundDependencyLoader]
-        private void load(OsuColour colours)
+        private void load(OsuColour colours, AudioManager audio)
         {
             if (accentColour == default)
                 AccentColour = colours.Blue;
+
+            sampleTabSelect = audio.Samples.Get(@"UI/tabselect-select");
         }
 
         public Color4 StripColour
@@ -96,6 +102,12 @@ namespace osu.Game.Graphics.UserInterface
             // dont bother calculating if the strip is invisible
             if (strip.Colour.MaxAlpha > 0)
                 strip.Width = Interpolation.ValueAt(Math.Clamp(Clock.ElapsedFrameTime, 0, 1000), strip.Width, StripWidth, 0, 500, Easing.OutQuint);
+        }
+
+        protected override void OnUserTabSelectionChanged(TabItem<T> item)
+        {
+            base.OnUserTabSelectionChanged(item);
+            sampleTabSelect.Play();
         }
 
         public partial class OsuTabItem : TabItem<T>, IHasAccentColour
@@ -196,7 +208,7 @@ namespace osu.Game.Graphics.UserInterface
                         Origin = Anchor.BottomLeft,
                         Anchor = Anchor.BottomLeft,
                     },
-                    new HoverClickSounds(HoverSampleSet.TabSelect)
+                    new HoverSounds(HoverSampleSet.TabSelect)
                 };
             }
 
