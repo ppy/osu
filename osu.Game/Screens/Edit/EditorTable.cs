@@ -10,6 +10,7 @@ using osu.Framework.Graphics.Containers;
 using osu.Framework.Localisation;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
+using osuTK;
 
 namespace osu.Game.Screens.Edit
 {
@@ -48,12 +49,17 @@ namespace osu.Game.Screens.Edit
             Padding = new MarginPadding { Horizontal = horizontal_inset };
             RowSize = new Dimension(GridSizeMode.Absolute, EditorTableBackground.ROW_HEIGHT);
 
-            AddInternal(background = new EditorTableBackground
+            AddInternal(new Container
             {
-                RelativeSizeAxes = Axes.Both,
+                AutoSizeAxes = Axes.Y,
+                RelativeSizeAxes = Axes.X,
+                Y = EditorTableBackground.ROW_HEIGHT,
                 Depth = 1f,
                 Padding = new MarginPadding { Horizontal = -horizontal_inset },
-                Margin = new MarginPadding { Top = EditorTableBackground.ROW_HEIGHT }
+                Child = background = new EditorTableBackground
+                {
+                    RelativeSizeAxes = Axes.X
+                }
             });
 
             background.Selected += index => OnItemSelected(items[index]);
@@ -64,7 +70,9 @@ namespace osu.Game.Screens.Edit
         }
 
         // We can avoid potentially thousands of objects being added to the input sub-tree since input is being handled only by the BackgroundFlow anyway.
-        protected override bool ShouldBeConsideredForInput(Drawable child) => child is EditorTableBackground && base.ShouldBeConsideredForInput(child);
+        protected override bool ShouldBeConsideredForInput(Drawable child) => child is not GridContainer && base.ShouldBeConsideredForInput(child);
+
+        public override bool ReceivePositionalInputAt(Vector2 screenSpacePos) => background.ReceivePositionalInputAt(screenSpacePos);
 
         protected int GetIndexForItem(T? item)
         {

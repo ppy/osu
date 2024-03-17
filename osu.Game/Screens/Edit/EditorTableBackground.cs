@@ -18,7 +18,17 @@ namespace osu.Game.Screens.Edit
 
         public const float ROW_HEIGHT = 25;
 
-        public int RowCount { get; set; }
+        private int rowCount;
+
+        public int RowCount
+        {
+            get => rowCount;
+            set
+            {
+                rowCount = value;
+                Height = rowCount * ROW_HEIGHT;
+            }
+        }
 
         protected override void Update()
         {
