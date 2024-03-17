@@ -36,12 +36,14 @@ namespace osu.Game.Rulesets.Edit
             new CheckConcurrentObjects(),
             new CheckZeroLengthObjects(),
             new CheckDrainLength(),
+            new CheckUnusedAudioAtEnd(),
 
             // Timing
             new CheckPreviewTime(),
 
             // Events
             new CheckBreaks()
+
         };
 
         public IEnumerable<Issue> Run(BeatmapVerifierContext context)
