@@ -29,7 +29,6 @@ namespace osu.Game.Rulesets.Edit.Checks
             {
                 yield return new IssueTemplateUnusedAudioAtEnd(this).Create();
             }
-
         }
 
         private double calculatePercentage(double mappedLenght, double trackLenght)
