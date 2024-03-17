@@ -121,6 +121,15 @@ namespace osu.Game.Screens.Edit
             return toAdd;
         }
 
+        public void Deselect()
+        {
+            foreach (var child in this)
+            {
+                if (child.State == RowState.Selected)
+                    child.State = RowState.None;
+            }
+        }
+
         protected override bool OnClick(ClickEvent e)
         {
             base.OnClick(e);

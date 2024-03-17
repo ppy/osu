@@ -99,6 +99,9 @@ namespace osu.Game.Screens.Edit
                 }
             }
 
+            if (!foundSelection)
+                background.Deselect();
+
             return foundSelection;
         }
 
