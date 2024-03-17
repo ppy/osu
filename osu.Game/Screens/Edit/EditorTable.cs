@@ -2,33 +2,43 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
+using System.Collections.Generic;
 using System.Diagnostics;
-using osu.Framework.Allocation;
 using osu.Framework.Extensions.LocalisationExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
-using osu.Framework.Graphics.Shapes;
-using osu.Framework.Input.Events;
 using osu.Framework.Localisation;
 using osu.Game.Graphics;
-using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.Sprites;
-using osu.Game.Overlays;
-using osuTK.Graphics;
 
 namespace osu.Game.Screens.Edit
 {
-    public abstract partial class EditorTable : TableContainer
+    public abstract partial class EditorTable<T> : TableContainer
+        where T : class
     {
-        public event Action<Drawable>? OnRowSelected;
+        public event Action<EditorTableBackgroundRow>? OnRowSelected;
 
         private const float horizontal_inset = 20;
 
-        protected const float ROW_HEIGHT = 25;
-
         public const int TEXT_SIZE = 14;
 
-        protected readonly FillFlowContainer<RowBackground> BackgroundFlow;
+        private readonly List<T> items = new List<T>();
+
+        public IEnumerable<T> Items
+        {
+            set => SetNewItems(value);
+        }
+
+        protected virtual void SetNewItems(IEnumerable<T> newItems)
+        {
+            Content = null;
+            items.Clear();
+            items.AddRange(newItems);
+
+            background.RowCount = items.Count;
+        }
+
+        private readonly EditorTableBackground background;
 
         protected EditorTable()
         {
@@ -36,43 +46,47 @@ namespace osu.Game.Screens.Edit
             AutoSizeAxes = Axes.Y;
 
             Padding = new MarginPadding { Horizontal = horizontal_inset };
-            RowSize = new Dimension(GridSizeMode.Absolute, ROW_HEIGHT);
+            RowSize = new Dimension(GridSizeMode.Absolute, EditorTableBackground.ROW_HEIGHT);
 
-            AddInternal(BackgroundFlow = new FillFlowContainer<RowBackground>
+            AddInternal(background = new EditorTableBackground
             {
                 RelativeSizeAxes = Axes.Both,
                 Depth = 1f,
                 Padding = new MarginPadding { Horizontal = -horizontal_inset },
-                Margin = new MarginPadding { Top = ROW_HEIGHT }
+                Margin = new MarginPadding { Top = EditorTableBackground.ROW_HEIGHT }
             });
+
+            background.Selected += index => OnItemSelected(items[index]);
+        }
+
+        protected virtual void OnItemSelected(T item)
+        {
         }
 
         // We can avoid potentially thousands of objects being added to the input sub-tree since input is being handled only by the BackgroundFlow anyway.
-        protected override bool ShouldBeConsideredForInput(Drawable child) => child is not GridContainer && base.ShouldBeConsideredForInput(child);
+        protected override bool ShouldBeConsideredForInput(Drawable child) => child is EditorTableBackground && base.ShouldBeConsideredForInput(child);
 
-        protected int GetIndexForObject(object? item)
+        protected int GetIndexForItem(T? item)
         {
-            for (int i = 0; i < BackgroundFlow.Count; i++)
+            for (int i = 0; i < items.Count; i++)
             {
-                if (BackgroundFlow[i].Item == item)
+                if (items[i] == item)
                     return i;
             }
 
             return -1;
         }
 
-        protected virtual bool SetSelectedRow(object? item)
+        protected virtual bool SetSelectedRow(T? item)
         {
             bool foundSelection = false;
 
-            foreach (var b in BackgroundFlow)
+            for (int i = 0; i < items.Count; i++)
             {
-                b.Selected = ReferenceEquals(b.Item, item);
-
-                if (b.Selected)
+                if (ReferenceEquals(items[i], item))
                 {
                     Debug.Assert(!foundSelection);
-                    OnRowSelected?.Invoke(b);
+                    OnRowSelected?.Invoke(background.Select(i));
                     foundSelection = true;
                 }
             }
@@ -80,12 +94,12 @@ namespace osu.Game.Screens.Edit
             return foundSelection;
         }
 
-        protected object? GetObjectAtIndex(int index)
+        protected T? GetItemAtIndex(int index)
         {
-            if (index < 0 || index > BackgroundFlow.Count - 1)
+            if (index < 0 || index > items.Count - 1)
                 return null;
 
-            return BackgroundFlow[index].Item;
+            return items[index];
         }
 
         protected override Drawable CreateHeader(int index, TableColumn? column) => new HeaderText(column?.Header ?? default);
@@ -96,92 +110,6 @@ namespace osu.Game.Screens.Edit
             {
                 Text = text.ToUpper();
                 Font = OsuFont.GetFont(size: 12, weight: FontWeight.Bold);
-            }
-        }
-
-        public partial class RowBackground : OsuClickableContainer
-        {
-            public readonly object Item;
-
-            private const int fade_duration = 100;
-
-            private readonly Box hoveredBackground;
-
-            public RowBackground(object item)
-            {
-                Item = item;
-
-                RelativeSizeAxes = Axes.X;
-                Height = 25;
-
-                AlwaysPresent = true;
-
-                CornerRadius = 3;
-                Masking = true;
-
-                Children = new Drawable[]
-                {
-                    hoveredBackground = new Box
-                    {
-                        RelativeSizeAxes = Axes.Both,
-                        Alpha = 0,
-                    },
-                };
-            }
-
-            private Color4 colourHover;
-            private Color4 colourSelected;
-
-            [BackgroundDependencyLoader]
-            private void load(OverlayColourProvider colours)
-            {
-                colourHover = colours.Background1;
-                colourSelected = colours.Colour3;
-            }
-
-            protected override void LoadComplete()
-            {
-                base.LoadComplete();
-
-                updateState();
-                FinishTransforms(true);
-            }
-
-            private bool selected;
-
-            public bool Selected
-            {
-                get => selected;
-                set
-                {
-                    if (value == selected)
-                        return;
-
-                    selected = value;
-                    updateState();
-                }
-            }
-
-            protected override bool OnHover(HoverEvent e)
-            {
-                updateState();
-                return base.OnHover(e);
-            }
-
-            protected override void OnHoverLost(HoverLostEvent e)
-            {
-                updateState();
-                base.OnHoverLost(e);
-            }
-
-            private void updateState()
-            {
-                hoveredBackground.FadeColour(selected ? colourSelected : colourHover, 450, Easing.OutQuint);
-
-                if (selected || IsHovered)
-                    hoveredBackground.FadeIn(fade_duration, Easing.OutQuint);
-                else
-                    hoveredBackground.FadeOut(fade_duration, Easing.OutQuint);
             }
         }
     }

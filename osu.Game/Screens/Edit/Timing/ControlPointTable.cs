@@ -18,7 +18,7 @@ using osuTK;
 
 namespace osu.Game.Screens.Edit.Timing
 {
-    public partial class ControlPointTable : EditorTable
+    public partial class ControlPointTable : EditorTable<ControlPointGroup>
     {
         [Resolved]
         private Bindable<ControlPointGroup?> selectedGroup { get; set; } = null!;
@@ -28,45 +28,35 @@ namespace osu.Game.Screens.Edit.Timing
 
         public const float TIMING_COLUMN_WIDTH = 300;
 
-        public IEnumerable<ControlPointGroup> ControlGroups
+        protected override void SetNewItems(IEnumerable<ControlPointGroup> newItems)
         {
-            set
+            int selectedIndex = GetIndexForItem(selectedGroup.Value);
+
+            base.SetNewItems(newItems);
+
+            Columns = createHeaders();
+            Content = newItems.Select(createContent).ToArray().ToRectangular();
+
+            // Attempt to retain selection.
+            if (SetSelectedRow(selectedGroup.Value))
+                return;
+
+            // Some operations completely obliterate references, so best-effort reselect based on index.
+            if (SetSelectedRow(GetItemAtIndex(selectedIndex)))
+                return;
+
+            // Selection could not be retained.
+            selectedGroup.Value = null;
+        }
+
+        protected override void OnItemSelected(ControlPointGroup group)
+        {
+            // schedule to give time for any modified focused text box to lose focus and commit changes (e.g. BPM / time signature textboxes) before switching to new point.
+            Schedule(() =>
             {
-                int selectedIndex = GetIndexForObject(selectedGroup.Value);
-
-                Content = null;
-                BackgroundFlow.Clear();
-
-                if (!value.Any())
-                    return;
-
-                foreach (var group in value)
-                {
-                    BackgroundFlow.Add(new RowBackground(group)
-                    {
-                        // schedule to give time for any modified focused text box to lose focus and commit changes (e.g. BPM / time signature textboxes) before switching to new point.
-                        Action = () => Schedule(() =>
-                        {
-                            SetSelectedRow(group);
-                            clock.SeekSmoothlyTo(group.Time);
-                        })
-                    });
-                }
-
-                Columns = createHeaders();
-                Content = value.Select(createContent).ToArray().ToRectangular();
-
-                // Attempt to retain selection.
-                if (SetSelectedRow(selectedGroup.Value))
-                    return;
-
-                // Some operations completely obliterate references, so best-effort reselect based on index.
-                if (SetSelectedRow(GetObjectAtIndex(selectedIndex)))
-                    return;
-
-                // Selection could not be retained.
-                selectedGroup.Value = null;
-            }
+                SetSelectedRow(group);
+                clock.SeekSmoothlyTo(group.Time);
+            });
         }
 
         protected override void LoadComplete()
@@ -77,12 +67,12 @@ namespace osu.Game.Screens.Edit.Timing
             selectedGroup.BindValueChanged(g => SetSelectedRow(g.NewValue), true);
         }
 
-        protected override bool SetSelectedRow(object? item)
+        protected override bool SetSelectedRow(ControlPointGroup? item)
         {
             if (!base.SetSelectedRow(item))
                 return false;
 
-            selectedGroup.Value = item as ControlPointGroup;
+            selectedGroup.Value = item;
             return true;
         }
 

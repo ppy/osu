@@ -113,7 +113,7 @@ namespace osu.Game.Screens.Edit.Timing
                 // We really should be handling the `CollectionChanged` event properly.
                 Scheduler.AddOnce(() =>
                 {
-                    table.ControlGroups = controlPointGroups;
+                    table.Items = controlPointGroups;
                     changeHandler?.SaveState();
                 });
             }, true);

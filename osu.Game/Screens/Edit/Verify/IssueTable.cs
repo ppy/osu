@@ -16,7 +16,7 @@ using osu.Game.Rulesets.Edit.Checks.Components;
 
 namespace osu.Game.Screens.Edit.Verify
 {
-    public partial class IssueTable : EditorTable
+    public partial class IssueTable : EditorTable<Issue>
     {
         private Bindable<Issue> selectedIssue = null!;
 
@@ -32,42 +32,29 @@ namespace osu.Game.Screens.Edit.Verify
         [Resolved]
         private Editor editor { get; set; } = null!;
 
-        public IEnumerable<Issue> Issues
+        protected override void SetNewItems(IEnumerable<Issue> newItems)
         {
-            set
+            base.SetNewItems(newItems);
+
+            Columns = createHeaders();
+            Content = newItems.Select((g, i) => createContent(i, g)).ToArray().ToRectangular();
+        }
+
+        protected override void OnItemSelected(Issue item)
+        {
+            selectedIssue.Value = item;
+
+            if (item.Time != null)
             {
-                Content = null;
-                BackgroundFlow.Clear();
-
-                if (!value.Any())
-                    return;
-
-                foreach (var issue in value)
-                {
-                    BackgroundFlow.Add(new RowBackground(issue)
-                    {
-                        Action = () =>
-                        {
-                            selectedIssue.Value = issue;
-
-                            if (issue.Time != null)
-                            {
-                                clock.Seek(issue.Time.Value);
-                                editor.OnPressed(new KeyBindingPressEvent<GlobalAction>(GetContainingInputManager().CurrentState, GlobalAction.EditorComposeMode));
-                            }
-
-                            if (!issue.HitObjects.Any())
-                                return;
-
-                            editorBeatmap.SelectedHitObjects.Clear();
-                            editorBeatmap.SelectedHitObjects.AddRange(issue.HitObjects);
-                        },
-                    });
-                }
-
-                Columns = createHeaders();
-                Content = value.Select((g, i) => createContent(i, g)).ToArray().ToRectangular();
+                clock.Seek(item.Time.Value);
+                editor.OnPressed(new KeyBindingPressEvent<GlobalAction>(GetContainingInputManager().CurrentState, GlobalAction.EditorComposeMode));
             }
+
+            if (!item.HitObjects.Any())
+                return;
+
+            editorBeatmap.SelectedHitObjects.Clear();
+            editorBeatmap.SelectedHitObjects.AddRange(item.HitObjects);
         }
 
         protected override void LoadComplete()
