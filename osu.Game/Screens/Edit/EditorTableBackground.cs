@@ -3,10 +3,17 @@
 
 using System;
 using osu.Framework.Allocation;
+using osu.Framework.Audio;
+using osu.Framework.Audio.Sample;
+using osu.Framework.Bindables;
+using osu.Framework.Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Input.Events;
+using osu.Framework.Utils;
+using osu.Game.Configuration;
+using osu.Game.Graphics.UserInterface;
 using osu.Game.Overlays;
 using osuTK.Graphics;
 
@@ -27,7 +34,58 @@ namespace osu.Game.Screens.Edit
             {
                 rowCount = value;
                 Height = rowCount * ROW_HEIGHT;
+                Deselect();
             }
+        }
+
+        private readonly HoverSampleSet sampleSet;
+        private Bindable<double?> lastHoverPlaybackTime = null!;
+
+        public EditorTableBackground(HoverSampleSet sampleSet = HoverSampleSet.Default)
+        {
+            this.sampleSet = sampleSet;
+        }
+
+        private Sample? sampleHover;
+        private Sample? sampleClick;
+
+        [BackgroundDependencyLoader]
+        private void load(AudioManager audio, SessionStatics statics)
+        {
+            lastHoverPlaybackTime = statics.GetBindable<double?>(Static.LastHoverSoundPlaybackTime);
+
+            sampleHover = audio.Samples.Get($@"UI/{sampleSet.GetDescription()}-hover")
+                          ?? audio.Samples.Get($@"UI/{HoverSampleSet.Default.GetDescription()}-hover");
+
+            sampleClick = audio.Samples.Get($@"UI/{sampleSet.GetDescription()}-select")
+                          ?? audio.Samples.Get($@"UI/{HoverSampleSet.Default.GetDescription()}-select");
+        }
+
+        private void playHoverSample()
+        {
+            if (sampleHover == null)
+                return;
+
+            bool enoughTimePassedSinceLastPlayback = !lastHoverPlaybackTime.Value.HasValue || Time.Current - lastHoverPlaybackTime.Value >= OsuGameBase.SAMPLE_DEBOUNCE_TIME;
+
+            if (!enoughTimePassedSinceLastPlayback)
+                return;
+
+            sampleHover.Frequency.Value = 0.98 + RNG.NextDouble(0.04);
+            sampleHover.Play();
+
+            lastHoverPlaybackTime.Value = Time.Current;
+        }
+
+        private void playClickSample()
+        {
+            var channel = sampleClick?.GetChannel();
+
+            if (channel == null)
+                return;
+
+            channel.Frequency.Value = 0.99 + RNG.NextDouble(0.02);
+            channel.Play();
         }
 
         protected override void Update()
@@ -72,8 +130,11 @@ namespace osu.Game.Screens.Edit
 
             if (existingAtY != null)
             {
-                if (existingAtY.State != RowState.Selected)
+                if (existingAtY.State == RowState.None)
+                {
                     existingAtY.State = RowState.Hovered;
+                    playHoverSample();
+                }
             }
             else
             {
@@ -85,6 +146,8 @@ namespace osu.Game.Screens.Edit
                     {
                         Y = newItemIndex * ROW_HEIGHT
                     });
+
+                    playHoverSample();
                 }
             }
         }
@@ -139,6 +202,7 @@ namespace osu.Game.Screens.Edit
             if (index != -1)
             {
                 Select(index);
+                playClickSample();
                 Selected?.Invoke(index);
             }
 
