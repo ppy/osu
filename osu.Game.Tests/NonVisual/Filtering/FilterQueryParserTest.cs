@@ -256,8 +256,7 @@ namespace osu.Game.Tests.NonVisual.Filtering
             const string query = "status=r";
             var filterCriteria = new FilterCriteria();
             FilterQueryParser.ApplyQueries(filterCriteria, query);
-            Assert.IsNotNull(filterCriteria.OnlineStatus.Values);
-            Assert.IsNotEmpty(filterCriteria.OnlineStatus.Values!);
+            Assert.IsNotEmpty(filterCriteria.OnlineStatus.Values);
             Assert.Contains(BeatmapOnlineStatus.Ranked, filterCriteria.OnlineStatus.Values);
         }
 
@@ -269,7 +268,7 @@ namespace osu.Game.Tests.NonVisual.Filtering
             FilterQueryParser.ApplyQueries(filterCriteria, query);
             Assert.AreEqual("I want the pp", filterCriteria.SearchText.Trim());
             Assert.AreEqual(4, filterCriteria.SearchTerms.Length);
-            Assert.IsNotNull(filterCriteria.OnlineStatus.Values);
+            Assert.IsNotEmpty(filterCriteria.OnlineStatus.Values);
             Assert.Contains(BeatmapOnlineStatus.Ranked, filterCriteria.OnlineStatus.Values);
         }
 
@@ -279,8 +278,21 @@ namespace osu.Game.Tests.NonVisual.Filtering
             const string query = "status=ranked status=loved";
             var filterCriteria = new FilterCriteria();
             FilterQueryParser.ApplyQueries(filterCriteria, query);
-            Assert.IsNotNull(filterCriteria.OnlineStatus.Values);
+            Assert.IsNotEmpty(filterCriteria.OnlineStatus.Values);
             Assert.Contains(BeatmapOnlineStatus.Ranked, filterCriteria.OnlineStatus.Values);
+            Assert.Contains(BeatmapOnlineStatus.Loved, filterCriteria.OnlineStatus.Values);
+        }
+
+        [Test]
+        public void TestApplyRangeStatusMatches()
+        {
+            const string query = "status>=r";
+            var filterCriteria = new FilterCriteria();
+            FilterQueryParser.ApplyQueries(filterCriteria, query);
+            Assert.IsNotEmpty(filterCriteria.OnlineStatus.Values);
+            Assert.Contains(BeatmapOnlineStatus.Ranked, filterCriteria.OnlineStatus.Values);
+            Assert.Contains(BeatmapOnlineStatus.Approved, filterCriteria.OnlineStatus.Values);
+            Assert.Contains(BeatmapOnlineStatus.Qualified, filterCriteria.OnlineStatus.Values);
             Assert.Contains(BeatmapOnlineStatus.Loved, filterCriteria.OnlineStatus.Values);
         }
 
