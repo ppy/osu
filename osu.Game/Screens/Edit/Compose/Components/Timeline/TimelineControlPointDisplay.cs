@@ -63,12 +63,10 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
         private void recreateDrawableGroups()
         {
             // Remove groups outside the visible range
-            for (int i = Count - 1; i >= 0; i--)
+            foreach (var drawableGroup in this)
             {
-                var g = Children[i];
-
-                if (!shouldBeVisible(g.Group))
-                    g.Expire();
+                if (!shouldBeVisible(drawableGroup.Group))
+                    drawableGroup.Expire();
             }
 
             // Add remaining ones
