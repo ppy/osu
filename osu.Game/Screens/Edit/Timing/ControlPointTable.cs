@@ -28,7 +28,7 @@ namespace osu.Game.Screens.Edit.Timing
 
         public const float TIMING_COLUMN_WIDTH = 300;
 
-        protected override void SetNewItems(IEnumerable<ControlPointGroup> newItems)
+        public override void SetNewItems(IEnumerable<ControlPointGroup> newItems)
         {
             int selectedIndex = GetIndexForItem(selectedGroup.Value);
 

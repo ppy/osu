@@ -32,7 +32,7 @@ namespace osu.Game.Screens.Edit.Verify
         [Resolved]
         private Editor editor { get; set; } = null!;
 
-        protected override void SetNewItems(IEnumerable<Issue> newItems)
+        public override void SetNewItems(IEnumerable<Issue> newItems)
         {
             base.SetNewItems(newItems);
 

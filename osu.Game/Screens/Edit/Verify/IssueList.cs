@@ -101,9 +101,9 @@ namespace osu.Game.Screens.Edit.Verify
 
             issues = filter(issues);
 
-            table.Items = issues
-                          .OrderBy(issue => issue.Template.Type)
-                          .ThenBy(issue => issue.Check.Metadata.Category);
+            table.SetNewItems(issues
+                              .OrderBy(issue => issue.Template.Type)
+                              .ThenBy(issue => issue.Check.Metadata.Category));
         }
 
         private IEnumerable<Issue> filter(IEnumerable<Issue> issues)

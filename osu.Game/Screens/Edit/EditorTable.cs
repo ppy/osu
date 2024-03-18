@@ -25,12 +25,7 @@ namespace osu.Game.Screens.Edit
 
         private readonly List<T> items = new List<T>();
 
-        public IEnumerable<T> Items
-        {
-            set => SetNewItems(value);
-        }
-
-        protected virtual void SetNewItems(IEnumerable<T> newItems)
+        public virtual void SetNewItems(IEnumerable<T> newItems)
         {
             Content = null;
             items.Clear();
