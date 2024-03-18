@@ -27,15 +27,15 @@ namespace osu.Desktop.Windows
         [BackgroundDependencyLoader]
         private void load()
         {
-            if (checkCompatibilityMode())
+            if (CheckCompatibilityMode())
                 notifications.Post(new CompatibilityModeNotification());
         }
 
-        public bool checkCompatibilityMode()
+        public static bool CheckCompatibilityMode()
         {
             using var layers = Registry.CurrentUser.OpenSubKey(@"Software\Microsoft\Windows NT\CurrentVersion\AppCompatFlags\Layers");
 
-            var exePath = Assembly.GetExecutingAssembly().Location;
+            string exePath = Assembly.GetExecutingAssembly().Location;
 
             return layers != null && layers.GetValueNames().Any(name => name.Equals(exePath, StringComparison.OrdinalIgnoreCase));
         }

@@ -52,8 +52,7 @@ namespace osu.Desktop
                 // See https://www.mongodb.com/docs/realm/sdk/dotnet/compatibility/
                 if (windowsVersion.Major < 6 || (windowsVersion.Major == 6 && windowsVersion.Minor <= 2))
                 {
-                    bool isInCompatibilityMode = new CompatibilityModeChecker()
-                        .checkCompatibilityMode();
+                    bool isInCompatibilityMode = CompatibilityModeChecker.CheckCompatibilityMode();
 
                     if (isInCompatibilityMode)
                     {
