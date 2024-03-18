@@ -15,7 +15,7 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
     public partial class TimelineControlPointDisplay : TimelinePart<TimelineControlPointGroup>
     {
         [Resolved]
-        private Timeline? timeline { get; set; }
+        private Timeline timeline { get; set; } = null!;
 
         /// <summary>
         /// The visible time/position range of the timeline.
@@ -42,7 +42,7 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
         {
             base.Update();
 
-            if (timeline == null || DrawWidth <= 0) return;
+            if (DrawWidth <= 0) return;
 
             (float, float) newRange = (
                 (ToLocalSpace(timeline.ScreenSpaceDrawQuad.TopLeft).X - TopPointPiece.WIDTH) / DrawWidth * Content.RelativeChildSize.X,
