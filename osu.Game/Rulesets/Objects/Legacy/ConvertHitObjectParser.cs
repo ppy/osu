@@ -303,16 +303,16 @@ namespace osu.Game.Rulesets.Objects.Legacy
                     {
                         int startIndex = segmentsBuffer[i].StartIndex;
                         int endIndex = segmentsBuffer[i + 1].StartIndex;
-                        controlPoints.AddRange(convertPoints(segmentsBuffer[i].Type, allPoints[startIndex..endIndex], pointsBuffer[endIndex]));
+                        controlPoints.AddRange(convertPoints(segmentsBuffer[i].Type, allPoints.Slice(startIndex, endIndex - startIndex), pointsBuffer[endIndex]));
                     }
                     else
                     {
                         int startIndex = segmentsBuffer[i].StartIndex;
-                        controlPoints.AddRange(convertPoints(segmentsBuffer[i].Type, allPoints[startIndex..], null));
+                        controlPoints.AddRange(convertPoints(segmentsBuffer[i].Type, allPoints.Slice(startIndex), null));
                     }
                 }
 
-                return mergePointsLists(controlPoints);
+                return mergeControlPointsLists(controlPoints);
             }
             finally
             {
@@ -402,7 +402,7 @@ namespace osu.Game.Rulesets.Objects.Legacy
                                              - (p1.X - p0.X) * (p2.Y - p0.Y));
         }
 
-        private PathControlPoint[] mergePointsLists(List<ArraySegment<PathControlPoint>> controlPointList)
+        private PathControlPoint[] mergeControlPointsLists(List<ArraySegment<PathControlPoint>> controlPointList)
         {
             int totalCount = 0;
 
