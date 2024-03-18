@@ -11,7 +11,7 @@ using osu.Game.Graphics;
 using osu.Game.Overlays;
 using osu.Game.Overlays.Notifications;
 
-namespace osu.Desktop.Security
+namespace osu.Desktop.Windows
 {
     /// <summary>
     /// Checks if the game is running with windows compatibility optimizations which could cause issues. Displays a warning notification if so.
