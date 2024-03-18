@@ -3,6 +3,7 @@
 
 using System;
 using System.Linq;
+using System.Reflection;
 using System.Runtime.Versioning;
 using Microsoft.Win32;
 using osu.Framework.Allocation;
@@ -34,7 +35,9 @@ namespace osu.Desktop.Windows
         {
             using var layers = Registry.CurrentUser.OpenSubKey(@"Software\Microsoft\Windows NT\CurrentVersion\AppCompatFlags\Layers");
 
-            return layers != null && layers.GetValueNames().Any(name => name.EndsWith("osu!.exe", StringComparison.OrdinalIgnoreCase));
+            var exePath = Assembly.GetExecutingAssembly().Location;
+
+            return layers != null && layers.GetValueNames().Any(name => name.Equals(exePath, StringComparison.OrdinalIgnoreCase));
         }
 
         private partial class CompatibilityModeNotification : SimpleNotification
