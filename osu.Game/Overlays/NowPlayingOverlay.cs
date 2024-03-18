@@ -33,6 +33,7 @@ namespace osu.Game.Overlays
         public LocalisableString Title => NowPlayingStrings.HeaderTitle;
         public LocalisableString Description => NowPlayingStrings.HeaderDescription;
 
+        private const float player_width = 400;
         private const float player_height = 130;
         private const float transition_length = 800;
         private const float progress_height = 10;
@@ -70,7 +71,7 @@ namespace osu.Game.Overlays
 
         public NowPlayingOverlay()
         {
-            Width = 400;
+            Width = player_width;
             Margin = new MarginPadding(margin);
         }
 
@@ -319,15 +320,15 @@ namespace osu.Game.Overlays
                     switch (direction)
                     {
                         case TrackChangeDirection.Next:
-                            newBackground.Position = new Vector2(400, 0);
+                            newBackground.Position = new Vector2(player_width, 0);
                             newBackground.MoveToX(0, 500, Easing.OutCubic);
-                            background.MoveToX(-400, 500, Easing.OutCubic);
+                            background.MoveToX(-player_width, 500, Easing.OutCubic);
                             break;
 
                         case TrackChangeDirection.Prev:
-                            newBackground.Position = new Vector2(-400, 0);
+                            newBackground.Position = new Vector2(-player_width, 0);
                             newBackground.MoveToX(0, 500, Easing.OutCubic);
-                            background.MoveToX(400, 500, Easing.OutCubic);
+                            background.MoveToX(player_width, 500, Easing.OutCubic);
                             break;
                     }
 
