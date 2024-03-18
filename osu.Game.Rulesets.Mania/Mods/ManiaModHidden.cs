@@ -7,6 +7,7 @@ using osu.Framework.Allocation;
 using osu.Framework.Localisation;
 using osu.Game.Rulesets.Mania.UI;
 using osu.Framework.Bindables;
+using osu.Framework.Extensions.ObjectExtensions;
 using osu.Framework.Graphics;
 using osu.Game.Rulesets.Mania.Skinning;
 using osu.Game.Rulesets.Mods;
@@ -100,6 +101,14 @@ namespace osu.Game.Rulesets.Mania.Mods
                     return base.GetHeight(coverage);
 
                 return base.GetHeight(coverage) * reference_playfield_height / availablePlayfieldHeight;
+            }
+
+            protected override void Dispose(bool isDisposing)
+            {
+                base.Dispose(isDisposing);
+
+                if (skin.IsNotNull())
+                    skin.SourceChanged -= onSkinChanged;
             }
         }
     }
