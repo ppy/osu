@@ -69,7 +69,7 @@ namespace osu.Game.Screens.Select
                     return TryUpdateCriteriaRange(ref criteria.BeatDivisor, op, value, tryParseInt);
 
                 case "status":
-                    return TryUpdateArrayRange(ref criteria.OnlineStatus, op, value, tryParseEnum);
+                    return TryUpdateSetRange(ref criteria.OnlineStatus, op, value, tryParseEnum);
 
                 case "creator":
                 case "author":
@@ -306,23 +306,55 @@ namespace osu.Game.Screens.Select
         /// If <paramref name="val"/> can be parsed into <typeparamref name="T"/> using <paramref name="parseFunction"/>, the function returns <c>true</c>
         /// and the resulting range constraint is stored into the <paramref name="range"/>'s expected values.
         /// </summary>
-        /// <param name="range">The <see cref="FilterCriteria.OptionalArray{T}"/> to store the parsed data into, if successful.</param>
+        /// <param name="range">The <see cref="FilterCriteria.OptionalSet{T}"/> to store the parsed data into, if successful.</param>
         /// <param name="op">The operator for the keyword filter. Currently, only <see cref="Operator.Equal"/> can be used.</param>
         /// <param name="val">The value of the keyword filter.</param>
         /// <param name="parseFunction">Function used to determine if <paramref name="val"/> can be converted to type <typeparamref name="T"/>.</param>
-        public static bool TryUpdateArrayRange<T>(ref FilterCriteria.OptionalArray<T> range, Operator op, string val, TryParseFunction<T> parseFunction)
+        public static bool TryUpdateSetRange<T>(ref FilterCriteria.OptionalSet<T> range, Operator op, string val, TryParseFunction<T> parseFunction)
             where T : struct
-            => parseFunction.Invoke(val, out var converted) && tryUpdateArrayRange(ref range, op, converted);
+            => parseFunction.Invoke(val, out var converted) && tryUpdateSetRange(ref range, op, converted);
 
-        private static bool tryUpdateArrayRange<T>(ref FilterCriteria.OptionalArray<T> range, Operator op, T value)
+        private static bool tryUpdateSetRange<T>(ref FilterCriteria.OptionalSet<T> range, Operator op, T value)
             where T : struct
         {
-            if (op != Operator.Equal)
-                return false;
+            var enumValues = (T[])Enum.GetValues(typeof(T));
 
-            range.Values ??= Array.Empty<T>();
+            foreach (var enumValue in enumValues)
+            {
+                switch (op)
+                {
+                    case Operator.Less:
+                        if (Comparer<T>.Default.Compare(enumValue, value) < 0)
+                            range.Values.Add(enumValue);
 
-            range.Values = range.Values.Append(value).ToArray();
+                        break;
+
+                    case Operator.LessOrEqual:
+                        if (Comparer<T>.Default.Compare(enumValue, value) <= 0)
+                            range.Values.Add(enumValue);
+
+                        break;
+
+                    case Operator.Equal:
+                        range.Values.Add(value);
+                        break;
+
+                    case Operator.GreaterOrEqual:
+                        if (Comparer<T>.Default.Compare(enumValue, value) >= 0)
+                            range.Values.Add(enumValue);
+
+                        break;
+
+                    case Operator.Greater:
+                        if (Comparer<T>.Default.Compare(enumValue, value) > 0)
+                            range.Values.Add(enumValue);
+
+                        break;
+
+                    default:
+                        return false;
+                }
+            }
 
             return true;
         }
