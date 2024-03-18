@@ -274,10 +274,12 @@ namespace osu.Game.Tests.NonVisual.Filtering
             Assert.IsTrue(filterCriteria.OnlineStatus.IsUpperInclusive);
         }
 
-        [Test]
-        public void TestApplyCreatorQueries()
+        [TestCase("creator")]
+        [TestCase("author")]
+        [TestCase("mapper")]
+        public void TestApplyCreatorQueries(string keyword)
         {
-            const string query = "beatmap specifically by creator=my_fav";
+            string query = $"beatmap specifically by {keyword}=my_fav";
             var filterCriteria = new FilterCriteria();
             FilterQueryParser.ApplyQueries(filterCriteria, query);
             Assert.AreEqual("beatmap specifically by", filterCriteria.SearchText.Trim());
@@ -451,6 +453,112 @@ namespace osu.Game.Tests.NonVisual.Filtering
 
                 return false;
             }
+        }
+
+        private static readonly object[] correct_date_query_examples =
+        {
+            new object[] { "600" },
+            new object[] { "0.5s" },
+            new object[] { "120m" },
+            new object[] { "48h120s" },
+            new object[] { "10y24M" },
+            new object[] { "10y60d120s" },
+            new object[] { "0y0M2d" },
+            new object[] { "1y1M2d" }
+        };
+
+        [Test]
+        [TestCaseSource(nameof(correct_date_query_examples))]
+        public void TestValidDateQueries(string dateQuery)
+        {
+            string query = $"played<{dateQuery} time";
+            var filterCriteria = new FilterCriteria();
+            FilterQueryParser.ApplyQueries(filterCriteria, query);
+            Assert.AreEqual(true, filterCriteria.LastPlayed.HasFilter);
+        }
+
+        private static readonly object[] incorrect_date_query_examples =
+        {
+            new object[] { ".5s" },
+            new object[] { "7m27" },
+            new object[] { "7m7m7m" },
+            new object[] { "5s6m" },
+            new object[] { "7d7y" },
+            new object[] { "0:3:6" },
+            new object[] { "0:3:" },
+            new object[] { "\"three days\"" },
+            new object[] { "0.1y0.1M2d" },
+            new object[] { "0.99y0.99M2d" },
+            new object[] { string.Empty }
+        };
+
+        [Test]
+        [TestCaseSource(nameof(incorrect_date_query_examples))]
+        public void TestInvalidDateQueries(string dateQuery)
+        {
+            string query = $"played<{dateQuery} time";
+            var filterCriteria = new FilterCriteria();
+            FilterQueryParser.ApplyQueries(filterCriteria, query);
+            Assert.AreEqual(false, filterCriteria.LastPlayed.HasFilter);
+        }
+
+        [Test]
+        public void TestGreaterDateQuery()
+        {
+            const string query = "played>50";
+            var filterCriteria = new FilterCriteria();
+            FilterQueryParser.ApplyQueries(filterCriteria, query);
+            Assert.That(filterCriteria.LastPlayed.Max, Is.Not.Null);
+            Assert.That(filterCriteria.LastPlayed.Min, Is.Null);
+            // the parser internally references `DateTimeOffset.Now`, so to not make things too annoying for tests, just assume some tolerance
+            // (irrelevant in proportion to the actual filter proscribed).
+            Assert.That(filterCriteria.LastPlayed.Max, Is.EqualTo(DateTimeOffset.Now.AddDays(-50)).Within(TimeSpan.FromSeconds(5)));
+        }
+
+        [Test]
+        public void TestLowerDateQuery()
+        {
+            const string query = "played<50";
+            var filterCriteria = new FilterCriteria();
+            FilterQueryParser.ApplyQueries(filterCriteria, query);
+            Assert.That(filterCriteria.LastPlayed.Max, Is.Null);
+            Assert.That(filterCriteria.LastPlayed.Min, Is.Not.Null);
+            // the parser internally references `DateTimeOffset.Now`, so to not make things too annoying for tests, just assume some tolerance
+            // (irrelevant in proportion to the actual filter proscribed).
+            Assert.That(filterCriteria.LastPlayed.Min, Is.EqualTo(DateTimeOffset.Now.AddDays(-50)).Within(TimeSpan.FromSeconds(5)));
+        }
+
+        [Test]
+        public void TestBothSidesDateQuery()
+        {
+            const string query = "played>3M played<1y6M";
+            var filterCriteria = new FilterCriteria();
+            FilterQueryParser.ApplyQueries(filterCriteria, query);
+            Assert.That(filterCriteria.LastPlayed.Min, Is.Not.Null);
+            Assert.That(filterCriteria.LastPlayed.Max, Is.Not.Null);
+            // the parser internally references `DateTimeOffset.Now`, so to not make things too annoying for tests, just assume some tolerance
+            // (irrelevant in proportion to the actual filter proscribed).
+            Assert.That(filterCriteria.LastPlayed.Min, Is.EqualTo(DateTimeOffset.Now.AddMonths(-6).AddYears(-1)).Within(TimeSpan.FromSeconds(5)));
+            Assert.That(filterCriteria.LastPlayed.Max, Is.EqualTo(DateTimeOffset.Now.AddMonths(-3)).Within(TimeSpan.FromSeconds(5)));
+        }
+
+        [Test]
+        public void TestEqualDateQuery()
+        {
+            const string query = "played=50";
+            var filterCriteria = new FilterCriteria();
+            FilterQueryParser.ApplyQueries(filterCriteria, query);
+            Assert.AreEqual(false, filterCriteria.LastPlayed.HasFilter);
+        }
+
+        [Test]
+        public void TestOutOfRangeDateQuery()
+        {
+            const string query = "played<10000y";
+            var filterCriteria = new FilterCriteria();
+            FilterQueryParser.ApplyQueries(filterCriteria, query);
+            Assert.AreEqual(true, filterCriteria.LastPlayed.HasFilter);
+            Assert.AreEqual(DateTimeOffset.MinValue.AddMilliseconds(1), filterCriteria.LastPlayed.Min);
         }
     }
 }

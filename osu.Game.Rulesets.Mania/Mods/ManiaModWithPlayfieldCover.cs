@@ -6,7 +6,6 @@ using System.Linq;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
-using osu.Game.Configuration;
 using osu.Game.Rulesets.Mania.Objects;
 using osu.Game.Rulesets.Mania.UI;
 using osu.Game.Rulesets.Mods;
@@ -15,7 +14,7 @@ using osu.Game.Rulesets.UI;
 
 namespace osu.Game.Rulesets.Mania.Mods
 {
-    public abstract class ManiaModPlayfieldCover : ModHidden, IApplicableToDrawableRuleset<ManiaHitObject>
+    public abstract class ManiaModWithPlayfieldCover : ModHidden, IApplicableToDrawableRuleset<ManiaHitObject>
     {
         public override Type[] IncompatibleMods => new[] { typeof(ModFlashlight<ManiaHitObject>) };
 
@@ -24,7 +23,9 @@ namespace osu.Game.Rulesets.Mania.Mods
         /// </summary>
         protected abstract CoverExpandDirection ExpandDirection { get; }
 
-        [SettingSource("Coverage", "The proportion of playfield height that notes will be hidden for.")]
+        /// <summary>
+        /// The relative area that should be completely covered. This does not include the fade.
+        /// </summary>
         public abstract BindableNumber<float> Coverage { get; }
 
         public virtual void ApplyToDrawableRuleset(DrawableRuleset<ManiaHitObject> drawableRuleset)
@@ -37,14 +38,16 @@ namespace osu.Game.Rulesets.Mania.Mods
                 Container hocParent = (Container)hoc.Parent!;
 
                 hocParent.Remove(hoc, false);
-                hocParent.Add(new PlayfieldCoveringWrapper(hoc).With(c =>
+                hocParent.Add(CreateCover(hoc).With(c =>
                 {
                     c.RelativeSizeAxes = Axes.Both;
                     c.Direction = ExpandDirection;
-                    c.Coverage = Coverage.Value;
+                    c.Coverage.BindTo(Coverage);
                 }));
             }
         }
+
+        protected virtual PlayfieldCoveringWrapper CreateCover(Drawable content) => new PlayfieldCoveringWrapper(content);
 
         protected override void ApplyIncreasedVisibilityState(DrawableHitObject hitObject, ArmedState state)
         {

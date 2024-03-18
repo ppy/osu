@@ -11,6 +11,7 @@ using osu.Framework.Input.Events;
 using osu.Game.Rulesets.Osu.Configuration;
 using osu.Game.Rulesets.Osu.Objects;
 using osu.Game.Rulesets.Osu.Skinning.Default;
+using osu.Game.Screens.Play;
 using osu.Game.Skinning;
 using osuTK;
 
@@ -39,6 +40,9 @@ namespace osu.Game.Rulesets.Osu.UI.Cursor
 
         public bool OnPressed(KeyBindingPressEvent<OsuAction> e)
         {
+            if ((Clock as IGameplayClock)?.IsRewinding == true)
+                return false;
+
             if (showRipples.Value)
             {
                 AddInternal(ripplePool.Get(r =>

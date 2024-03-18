@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.Linq;
 using NUnit.Framework;
 using osu.Framework.Testing;
+using osu.Framework.Utils;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Osu.Beatmaps;
@@ -31,6 +32,27 @@ namespace osu.Game.Rulesets.Osu.Tests.Mods
 
         [Test]
         public void TestComboBasedSize([Values] bool comboBasedSize) => CreateModTest(new ModTestData { Mod = new OsuModFlashlight { ComboBasedSize = { Value = comboBasedSize } }, PassCondition = () => true });
+
+        [Test]
+        public void TestPlayfieldBasedSize()
+        {
+            ModFlashlight mod = new OsuModFlashlight();
+            CreateModTest(new ModTestData
+            {
+                Mod = mod,
+                PassCondition = () =>
+                {
+                    var flashlightOverlay = Player.DrawableRuleset.Overlays
+                                                  .ChildrenOfType<ModFlashlight<OsuHitObject>.Flashlight>()
+                                                  .First();
+
+                    return Precision.AlmostEquals(mod.DefaultFlashlightSize * .5f, flashlightOverlay.GetSize());
+                }
+            });
+
+            AddStep("adjust playfield scale", () =>
+                Player.DrawableRuleset.Playfield.Scale = new Vector2(.5f));
+        }
 
         [Test]
         public void TestSliderDimsOnlyAfterStartTime()
