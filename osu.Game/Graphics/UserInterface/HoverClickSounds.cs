@@ -42,18 +42,20 @@ namespace osu.Game.Graphics.UserInterface
             this.buttons = buttons ?? new[] { MouseButton.Left };
         }
 
+        [BackgroundDependencyLoader]
+        private void load(AudioManager audio)
+        {
+            sampleClick = audio.Samples.Get($@"UI/{SampleSet.GetDescription()}-select")
+                          ?? audio.Samples.Get($@"UI/{HoverSampleSet.Default.GetDescription()}-select");
+
+            sampleClickDisabled = audio.Samples.Get($@"UI/{SampleSet.GetDescription()}-select-disabled")
+                                  ?? audio.Samples.Get($@"UI/{HoverSampleSet.Default.GetDescription()}-select-disabled");
+        }
+
         protected override bool OnClick(ClickEvent e)
         {
             if (buttons.Contains(e.Button))
-            {
-                var channel = Enabled.Value ? sampleClick?.GetChannel() : sampleClickDisabled?.GetChannel();
-
-                if (channel != null)
-                {
-                    channel.Frequency.Value = 0.99 + RNG.NextDouble(0.02);
-                    channel.Play();
-                }
-            }
+                PlayAsClick(Enabled.Value ? sampleClick : sampleClickDisabled);
 
             return base.OnClick(e);
         }
@@ -66,14 +68,15 @@ namespace osu.Game.Graphics.UserInterface
             base.PlayHoverSample();
         }
 
-        [BackgroundDependencyLoader]
-        private void load(AudioManager audio)
+        public static void PlayAsClick(Sample sample)
         {
-            sampleClick = audio.Samples.Get($@"UI/{SampleSet.GetDescription()}-select")
-                          ?? audio.Samples.Get($@"UI/{HoverSampleSet.Default.GetDescription()}-select");
+            var channel = sample?.GetChannel();
 
-            sampleClickDisabled = audio.Samples.Get($@"UI/{SampleSet.GetDescription()}-select-disabled")
-                                  ?? audio.Samples.Get($@"UI/{HoverSampleSet.Default.GetDescription()}-select-disabled");
+            if (channel != null)
+            {
+                channel.Frequency.Value = 0.99 + RNG.NextDouble(0.02);
+                channel.Play();
+            }
         }
     }
 }
