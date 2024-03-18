@@ -6,6 +6,7 @@
 using NUnit.Framework;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
+using osu.Game.Beatmaps;
 using osu.Game.Overlays;
 using osu.Game.Rulesets.Osu;
 
@@ -22,8 +23,6 @@ namespace osu.Game.Tests.Visual.UserInterface
         [BackgroundDependencyLoader]
         private void load()
         {
-            Beatmap.Value = CreateWorkingBeatmap(new OsuRuleset().RulesetInfo);
-
             nowPlayingOverlay = new NowPlayingOverlay
             {
                 Origin = Anchor.Centre,
@@ -37,9 +36,26 @@ namespace osu.Game.Tests.Visual.UserInterface
         [Test]
         public void TestShowHideDisable()
         {
+            AddStep(@"set beatmap", () => Beatmap.Value = CreateWorkingBeatmap(new OsuRuleset().RulesetInfo));
             AddStep(@"show", () => nowPlayingOverlay.Show());
             AddToggleStep(@"toggle beatmap lock", state => Beatmap.Disabled = state);
             AddStep(@"hide", () => nowPlayingOverlay.Hide());
+        }
+
+        [Test]
+        public void TestLongMetadata()
+        {
+            AddStep(@"set beatmap", () => Beatmap.Value = CreateWorkingBeatmap(new Beatmap
+            {
+                Metadata =
+                {
+                    Artist = "very very very very very very very very very very very long artist",
+                    ArtistUnicode = "very very very very very very very very very very very long artist",
+                    Title = "very very very very very very very very very very very long title",
+                    TitleUnicode = "very very very very very very very very very very very long title",
+                }
+            }));
+            AddStep(@"show", () => nowPlayingOverlay.Show());
         }
     }
 }
