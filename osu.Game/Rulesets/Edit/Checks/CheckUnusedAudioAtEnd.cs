@@ -27,18 +27,19 @@ namespace osu.Game.Rulesets.Edit.Checks
 
             if (mappedPercentage < 80)
             {
-                yield return new IssueTemplateUnusedAudioAtEnd(this).Create();
+                double percentageLeft = Math.Abs(mappedPercentage - 100);
+                yield return new IssueTemplateUnusedAudioAtEnd(this).Create(percentageLeft);
             }
         }
 
         public class IssueTemplateUnusedAudioAtEnd : IssueTemplate
         {
             public IssueTemplateUnusedAudioAtEnd(ICheck check)
-                : base(check, IssueType.Problem, "There is more than 20% unused audio at the end.")
+                : base(check, IssueType.Warning, "Currently there is {0}% unused audio at the end. Ensure the outro significantly contributes to the song, otherwise cut the outro.")
             {
             }
 
-            public Issue Create() => new Issue(this);
+            public Issue Create(double percentageLeft) => new Issue(this, percentageLeft);
         }
     }
 }
