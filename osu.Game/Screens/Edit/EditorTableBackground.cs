@@ -22,6 +22,9 @@ namespace osu.Game.Screens.Edit
     /// <summary>
     /// A <see cref="Container{T}"/> which mimics behavior of a vertical <see cref="FillFlowContainer"/> full of clickable items in an efficient way.
     /// </summary>
+    /// <remarks>
+    /// This component assumes that clickable items have transparent background while in idle state.
+    /// </remarks>
     public partial class EditorTableBackground : Container<EditorTableBackgroundRow>
     {
         public Action<int>? Selected;
