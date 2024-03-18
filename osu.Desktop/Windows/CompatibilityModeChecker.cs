@@ -30,7 +30,7 @@ namespace osu.Desktop.Windows
                 notifications.Post(new CompatibilityModeNotification());
         }
 
-        private bool checkCompatibilityMode()
+        public bool checkCompatibilityMode()
         {
             using var layers = Registry.CurrentUser.OpenSubKey(@"Software\Microsoft\Windows NT\CurrentVersion\AppCompatFlags\Layers");
 

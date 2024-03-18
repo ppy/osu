@@ -52,11 +52,24 @@ namespace osu.Desktop
                 // See https://www.mongodb.com/docs/realm/sdk/dotnet/compatibility/
                 if (windowsVersion.Major < 6 || (windowsVersion.Major == 6 && windowsVersion.Minor <= 2))
                 {
-                    SDL.SDL_ShowSimpleMessageBox(SDL.SDL_MessageBoxFlags.SDL_MESSAGEBOX_ERROR,
-                        "Your operating system is too old to run osu!",
-                        "This version of osu! requires at least Windows 8.1 to run.\n"
-                        + "Please upgrade your operating system or consider using an older version of osu!.\n\n"
-                        + "If you are running a newer version of windows, please check you don't have \"Compatibility mode\" turned on for osu!", IntPtr.Zero);
+                    bool isInCompatibilityMode = new CompatibilityModeChecker()
+                        .checkCompatibilityMode();
+
+                    if (isInCompatibilityMode)
+                    {
+                        SDL.SDL_ShowSimpleMessageBox(SDL.SDL_MessageBoxFlags.SDL_MESSAGEBOX_ERROR,
+                            "osu! is running in compatibility mode",
+                            "osu! is running in compatibility mode. This may cause issues with the game. Please ensure osu! is not set to run in compatibility mode.", IntPtr.Zero);
+                    }
+                    else
+                    {
+                        SDL.SDL_ShowSimpleMessageBox(SDL.SDL_MessageBoxFlags.SDL_MESSAGEBOX_ERROR,
+                            "Your operating system is too old to run osu!",
+                            "This version of osu! requires at least Windows 8.1 to run.\n"
+                            + "Please upgrade your operating system or consider using an older version of osu!.\n\n"
+                            + "If you are running a newer version of windows, please check you don't have \"Compatibility mode\" turned on for osu!", IntPtr.Zero);
+                    }
+
                     return;
                 }
 
