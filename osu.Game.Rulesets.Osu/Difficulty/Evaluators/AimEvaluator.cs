@@ -5,6 +5,7 @@ using System;
 using osu.Game.Rulesets.Difficulty.Preprocessing;
 using osu.Game.Rulesets.Osu.Difficulty.Preprocessing;
 using osu.Game.Rulesets.Osu.Objects;
+using osuTK;
 
 namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
 {
@@ -12,8 +13,9 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
     {
         private const double wide_angle_multiplier = 1.5;
         private const double acute_angle_multiplier = 1.95;
-        private const double slider_multiplier = 2;
         private const double velocity_change_multiplier = 0.75;
+
+        private const double slider_aim_multiplier = 2.0;
         private const double slider_jump_multiplier = 0.08;
 
         /// <summary>
@@ -37,21 +39,8 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
             // Calculate the velocity to the current hitobject, which starts with a base distance / time assuming the last object is a hitcircle.
             double currVelocity = osuCurrObj.JumpDistance / osuCurrObj.StrainTime;
 
-            // But if the last object is a slider, then we extend the travel velocity through the slider into the current object.
-            if (osuLastObj.BaseObject is Slider && withSliderTravelDistance)
-            {
-                double movementVelocity = osuCurrObj.MinimumJumpDistance / osuCurrObj.MinimumJumpTime; // calculate the movement velocity from slider end to current object
-                currVelocity = Math.Max(currVelocity, movementVelocity); // take the larger total combined velocity.
-            }
-
             // As above, do the same for the previous hitobject.
             double prevVelocity = osuLastObj.JumpDistance / osuLastObj.StrainTime;
-
-            if (osuLastLastObj.BaseObject is Slider && withSliderTravelDistance)
-            {
-                double movementVelocity = osuLastObj.MinimumJumpDistance / osuLastObj.MinimumJumpTime;
-                prevVelocity = Math.Max(prevVelocity, movementVelocity);
-            }
 
             double wideAngleBonus = 0;
             double acuteAngleBonus = 0;
@@ -59,6 +48,13 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
             double velocityChangeBonus = 0;
 
             double aimStrain = currVelocity; // Start strain with regular velocity.
+
+            // But if the last object is a slider, then we extend the travel velocity through the slider into the current object.
+            if (osuLastObj.BaseObject is Slider && withSliderTravelDistance)
+            {
+                double movementVelocity = osuCurrObj.MinimumJumpDistance / osuCurrObj.MinimumJumpTime; // calculate the movement velocity from slider end to current object
+                aimStrain = Math.Max(currVelocity, movementVelocity); // take the larger velocity.
+            }
 
             if (Math.Max(osuCurrObj.StrainTime, osuLastObj.StrainTime) < 1.25 * Math.Min(osuCurrObj.StrainTime, osuLastObj.StrainTime)) // If rhythms are the same.
             {
@@ -115,45 +111,76 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
             aimStrain = aimStrainWithBonuses;
 
             double sliderJumpBonus = 0;
-            if (osuLastObj.BaseObject is Slider slider)
             {
-                // Take just slider heads into account because we're computing sliderjumps, not slideraim
-                sliderJumpBonus = slider_jump_multiplier * osuCurrObj.JumpDistance / osuCurrObj.StrainTime;
-
-                // Add angle and velocity bonuses
-                sliderJumpBonus *= angleVelocityBonus;
-
-                // Reward more if sliders and circles are alternating (actually it's still lower than several sliders in a row)
-                if (osuLastLastObj?.BaseObject is HitCircle)
+                if (osuLastObj.BaseObject is Slider slider)
                 {
-                    double alternatingBonus = slider_jump_multiplier * osuLastObj.JumpDistance / osuLastObj.StrainTime;
+                    // Take just slider heads into account because we're computing sliderjumps, not slideraim
+                    sliderJumpBonus = slider_jump_multiplier * osuCurrObj.JumpDistance / osuCurrObj.StrainTime;
 
-                    if (osuLastObj.StrainTime > osuLastLastObj.StrainTime)
-                        alternatingBonus *= Math.Pow(Math.Min(osuCurrObj.StrainTime, osuLastObj.StrainTime) / Math.Max(osuCurrObj.StrainTime, osuLastObj.StrainTime), 2);
+                    // Reward more if sliders and circles are alternating (actually it's still lower than several sliders in a row)
+                    if (osuLastLastObj?.BaseObject is HitCircle)
+                    {
+                        double alternatingBonus = slider_jump_multiplier * osuLastObj.JumpDistance / osuLastObj.StrainTime;
 
-                    sliderJumpBonus += alternatingBonus;
+                        if (osuLastObj.StrainTime > osuLastLastObj.StrainTime)
+                            alternatingBonus *= Math.Pow(Math.Min(osuCurrObj.StrainTime, osuLastObj.StrainTime) / Math.Max(osuCurrObj.StrainTime, osuLastObj.StrainTime), 2);
+
+                        sliderJumpBonus += alternatingBonus;
+                    }
+
+                    // Add angle and velocity bonuses
+                    sliderJumpBonus *= angleVelocityBonus;
+
+                    // If slider was slower than notes before - punish it
+                    if (osuCurrObj.StrainTime > osuLastObj.StrainTime)
+                        sliderJumpBonus *= Math.Pow(Math.Min(osuCurrObj.StrainTime, osuLastObj.StrainTime) / Math.Max(osuCurrObj.StrainTime, osuLastObj.StrainTime), 2);
+
+                    // Punish too short sliders to prevent cheesing (cheesing is still possible, but it's very rare)
+                    double sliderLength = slider.Velocity * slider.SpanDuration;
+                    if (sliderLength < slider.Radius)
+                        sliderJumpBonus *= sliderLength / slider.Radius;
                 }
-
-                // If slider was slower than notes before - punish it
-                if (osuCurrObj.StrainTime > osuLastObj.StrainTime)
-                    sliderJumpBonus *= Math.Pow(Math.Min(osuCurrObj.StrainTime, osuLastObj.StrainTime) / Math.Max(osuCurrObj.StrainTime, osuLastObj.StrainTime), 2);
-
-                // Punish too short sliders to prevent cheesing (cheesing is still possible, but it's very rare)
-                double sliderLength = slider.Velocity * slider.SpanDuration;
-                if (sliderLength < slider.Radius)
-                    sliderJumpBonus *= sliderLength / slider.Radius;
             }
+
             aimStrain += sliderJumpBonus;
 
-            if (osuLastObj.BaseObject is Slider)
+            // Add in additional slider velocity bonus.
             {
-                // Reward sliders based on velocity.
-                sliderBonus = osuLastObj.TravelDistance / osuLastObj.TravelTime;
+
+                if (osuLastObj.BaseObject is Slider slider)
+                {
+                    // Reward sliders based on velocity.
+                    sliderBonus = osuLastObj.TravelDistance / osuLastObj.TravelTime;
+
+                    // Bandaid to prevent abuse where aiming difficulty in same direction is added twice
+                    double jumpPathSliderNerf = 1.0;
+
+                    // If both of the angles are very wide
+                    double sliderBodyReversedAngle = calcAngleBetweenPoints(slider.StackedPosition, (Vector2)slider.LazyEndPosition!, slider.StackedEndPosition);
+                    double sliderJumpReversedAngle = calcAngleBetweenPoints((Vector2)slider.LazyEndPosition, slider.StackedEndPosition, ((OsuHitObject)osuCurrObj.BaseObject).StackedPosition);
+                    jumpPathSliderNerf *= Math.Pow(calcAcuteAngleBonus(2 * (sliderBodyReversedAngle + sliderJumpReversedAngle)), 2);
+
+                    // If velocities are the same
+                    double sliderJumpVelocity = osuCurrObj.MinimumJumpDistance / osuCurrObj.MinimumJumpTime;
+                    double adjustedSliderBodyVelocity = 1.5 * (slider.LazyTravelDistance + slider.Radius) / slider.LazyTravelTime; // Adjusting to account for stopping
+
+                    if (adjustedSliderBodyVelocity > 0)
+                    {
+                        double velocityDifference = Math.Min(adjustedSliderBodyVelocity, sliderJumpVelocity) / Math.Max(adjustedSliderBodyVelocity, sliderJumpVelocity);
+                        jumpPathSliderNerf *= Math.Pow(velocityDifference, 2);
+                    }
+
+                    // If duration is half of the jump or lower
+                    if (slider.Duration * 2 > osuCurrObj.StrainTime)
+                        jumpPathSliderNerf *= 1 - (slider.Duration * 2 - osuCurrObj.StrainTime) / osuCurrObj.StrainTime;
+
+                    // Apply nerf to a slider-aim value
+                    sliderBonus *= (1 - jumpPathSliderNerf * 0.9);
+                }
             }
 
-            // Add in additional slider velocity bonus.
             if (withSliderTravelDistance)
-                aimStrain += sliderBonus * slider_multiplier;
+                aimStrain += sliderBonus * slider_aim_multiplier;
 
             return aimStrain;
         }
@@ -161,5 +188,16 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
         private static double calcWideAngleBonus(double angle) => Math.Pow(Math.Sin(3.0 / 4 * (Math.Min(5.0 / 6 * Math.PI, Math.Max(Math.PI / 6, angle)) - Math.PI / 6)), 2);
 
         private static double calcAcuteAngleBonus(double angle) => 1 - calcWideAngleBonus(angle);
+
+        private static double calcAngleBetweenPoints(Vector2 p1, Vector2 p2, Vector2 p3)
+        {
+            Vector2 v1 = p2 - p1;
+            Vector2 v2 = p3 - p2;
+
+            float dot = Vector2.Dot(v1, v2);
+            float det = v1.X * v2.Y - v1.Y * v2.X;
+
+            return Math.Abs(Math.Atan2(det, dot));
+        }
     }
 }
