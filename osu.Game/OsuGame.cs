@@ -1083,6 +1083,7 @@ namespace osu.Game
 
             loadComponentSingleFile(new AccountCreationOverlay(), topMostOverlayContent.Add, true);
             loadComponentSingleFile<IDialogOverlay>(new DialogOverlay(), topMostOverlayContent.Add, true);
+            loadComponentSingleFile(new MedalOverlay(), topMostOverlayContent.Add);
 
             loadComponentSingleFile(new BackgroundDataStoreProcessor(), Add);
 
@@ -1189,6 +1190,9 @@ namespace osu.Game
             Logger.NewEntry += entry =>
             {
                 if (entry.Level < LogLevel.Important || entry.Target > LoggingTarget.Database || entry.Target == null) return;
+
+                if (entry.Exception is SentryOnlyDiagnosticsException)
+                    return;
 
                 const int short_term_display_limit = 3;
 
