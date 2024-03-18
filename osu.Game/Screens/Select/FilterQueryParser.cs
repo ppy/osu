@@ -307,7 +307,7 @@ namespace osu.Game.Screens.Select
         /// and the resulting range constraint is stored into the <paramref name="range"/>'s expected values.
         /// </summary>
         /// <param name="range">The <see cref="FilterCriteria.OptionalSet{T}"/> to store the parsed data into, if successful.</param>
-        /// <param name="op">The operator for the keyword filter. Currently, only <see cref="Operator.Equal"/> can be used.</param>
+        /// <param name="op">The operator for the keyword filter.</param>
         /// <param name="val">The value of the keyword filter.</param>
         /// <param name="parseFunction">Function used to determine if <paramref name="val"/> can be converted to type <typeparamref name="T"/>.</param>
         public static bool TryUpdateSetRange<T>(ref FilterCriteria.OptionalSet<T> range, Operator op, string val, TryParseFunction<T> parseFunction)
