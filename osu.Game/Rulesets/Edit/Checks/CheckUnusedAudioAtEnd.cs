@@ -23,17 +23,12 @@ namespace osu.Game.Rulesets.Edit.Checks
             double mappedLength = context.Beatmap.HitObjects.Last().GetEndTime();
             double trackLength = context.WorkingBeatmap.Track.Length;
 
-            double mappedPercentage = calculatePercentage(mappedLength, trackLength);
+            double mappedPercentage = Math.Round(mappedLength / trackLength * 100);
 
             if (mappedPercentage < 80)
             {
                 yield return new IssueTemplateUnusedAudioAtEnd(this).Create();
             }
-        }
-
-        private double calculatePercentage(double mappedLenght, double trackLenght)
-        {
-            return Math.Round(mappedLenght / trackLenght * 100);
         }
 
         public class IssueTemplateUnusedAudioAtEnd : IssueTemplate
