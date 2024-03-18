@@ -5,6 +5,7 @@ using System;
 using System.Collections.Generic;
 using osu.Game.Beatmaps;
 using osu.Game.Rulesets.Edit.Checks.Components;
+using osu.Game.Storyboards;
 
 namespace osu.Game.Rulesets.Edit.Checks
 {
@@ -15,6 +16,7 @@ namespace osu.Game.Rulesets.Edit.Checks
         public IEnumerable<IssueTemplate> PossibleTemplates => new IssueTemplate[]
         {
             new IssueTemplateUnusedAudioAtEnd(this),
+            new IssueTemplateUnusedAudioAtEndStoryboardOrVideo(this),
         };
 
         public IEnumerable<Issue> Run(BeatmapVerifierContext context)
@@ -27,14 +29,47 @@ namespace osu.Game.Rulesets.Edit.Checks
             if (mappedPercentage < 80)
             {
                 double percentageLeft = Math.Abs(mappedPercentage - 100);
-                yield return new IssueTemplateUnusedAudioAtEnd(this).Create(percentageLeft);
+
+                bool storyboardIsPresent = isAnyStoryboardElementPresent(context.WorkingBeatmap.Storyboard);
+
+                if (storyboardIsPresent)
+                {
+                    yield return new IssueTemplateUnusedAudioAtEndStoryboardOrVideo(this).Create(percentageLeft);
+                }
+                else
+                {
+                    yield return new IssueTemplateUnusedAudioAtEnd(this).Create(percentageLeft);
+                }
             }
+        }
+
+        private bool isAnyStoryboardElementPresent(Storyboard storyboard)
+        {
+            foreach (var layer in storyboard.Layers)
+            {
+                foreach (var _ in layer.Elements)
+                {
+                    return true;
+                }
+            }
+
+            return false;
         }
 
         public class IssueTemplateUnusedAudioAtEnd : IssueTemplate
         {
             public IssueTemplateUnusedAudioAtEnd(ICheck check)
                 : base(check, IssueType.Warning, "Currently there is {0}% unused audio at the end. Ensure the outro significantly contributes to the song, otherwise cut the outro.")
+            {
+            }
+
+            public Issue Create(double percentageLeft) => new Issue(this, percentageLeft);
+        }
+
+        public class IssueTemplateUnusedAudioAtEndStoryboardOrVideo : IssueTemplate
+        {
+            public IssueTemplateUnusedAudioAtEndStoryboardOrVideo(ICheck check)
+                : base(check, IssueType.Warning, "Currently there is {0}% unused audio at the end. Ensure the outro significantly contributes to the song, or is being occupied by the video or storyboard, otherwise cut the outro.")
             {
             }
 

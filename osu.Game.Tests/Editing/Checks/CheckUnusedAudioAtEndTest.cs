@@ -4,12 +4,15 @@
 using System.Linq;
 using Moq;
 using NUnit.Framework;
+using osu.Framework.Graphics;
 using osu.Framework.Timing;
 using osu.Game.Beatmaps;
 using osu.Game.Rulesets.Edit;
 using osu.Game.Rulesets.Edit.Checks;
 using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Osu.Objects;
+using osu.Game.Storyboards;
+using osuTK;
 using static osu.Game.Tests.Visual.OsuTestScene.ClockBackedTestWorkingBeatmap;
 
 namespace osu.Game.Tests.Editing.Checks
@@ -47,7 +50,7 @@ namespace osu.Game.Tests.Editing.Checks
                 },
                 BeatmapInfo = new BeatmapInfo
                 {
-                    Metadata = new BeatmapMetadata { AudioFile = "abc123.jpg" }
+                    Metadata = new BeatmapMetadata { AudioFile = "abc123.jpg" },
                 }
             };
         }
@@ -63,6 +66,42 @@ namespace osu.Game.Tests.Editing.Checks
         }
 
         [Test]
+        public void TestAudioNotFullyUsedWithVideo()
+        {
+            var storyboard = new Storyboard();
+
+            var video = new StoryboardVideo("abc123.mp4", 0);
+
+            storyboard.GetLayer("Video").Add(video);
+
+            var mockWorkingBeatmap = getMockWorkingBeatmap(beatmapNotFullyMapped, storyboard);
+
+            var context = getContext(beatmapNotFullyMapped, mockWorkingBeatmap);
+            var issues = check.Run(context).ToList();
+
+            Assert.That(issues, Has.Count.EqualTo(1));
+            Assert.That(issues.Single().Template is CheckUnusedAudioAtEnd.IssueTemplateUnusedAudioAtEndStoryboardOrVideo);
+        }
+
+        [Test]
+        public void TestAudioNotFullyUsedWithStoryboardElement()
+        {
+            var storyboard = new Storyboard();
+
+            var sprite = new StoryboardSprite("unknown", Anchor.TopLeft, Vector2.Zero);
+
+            storyboard.GetLayer("Background").Add(sprite);
+
+            var mockWorkingBeatmap = getMockWorkingBeatmap(beatmapNotFullyMapped, storyboard);
+
+            var context = getContext(beatmapNotFullyMapped, mockWorkingBeatmap);
+            var issues = check.Run(context).ToList();
+
+            Assert.That(issues, Has.Count.EqualTo(1));
+            Assert.That(issues.Single().Template is CheckUnusedAudioAtEnd.IssueTemplateUnusedAudioAtEndStoryboardOrVideo);
+        }
+
+        [Test]
         public void TestAudioFullyUsed()
         {
             var context = getContext(beatmapFullyMapped);
@@ -73,16 +112,22 @@ namespace osu.Game.Tests.Editing.Checks
 
         private BeatmapVerifierContext getContext(IBeatmap beatmap)
         {
-            return new BeatmapVerifierContext(beatmap, getMockWorkingBeatmap(beatmap).Object);
+            return new BeatmapVerifierContext(beatmap, getMockWorkingBeatmap(beatmap, new Storyboard()).Object);
         }
 
-        private Mock<IWorkingBeatmap> getMockWorkingBeatmap(IBeatmap beatmap)
+        private BeatmapVerifierContext getContext(IBeatmap beatmap, Mock<IWorkingBeatmap> workingBeatmap)
+        {
+            return new BeatmapVerifierContext(beatmap, workingBeatmap.Object);
+        }
+
+        private Mock<IWorkingBeatmap> getMockWorkingBeatmap(IBeatmap beatmap, Storyboard storyboard)
         {
             var mockTrack = new TrackVirtualStore(new FramedClock()).GetVirtual(10000, "virtual");
 
             var mockWorkingBeatmap = new Mock<IWorkingBeatmap>();
             mockWorkingBeatmap.SetupGet(w => w.Beatmap).Returns(beatmap);
             mockWorkingBeatmap.SetupGet(w => w.Track).Returns(mockTrack);
+            mockWorkingBeatmap.SetupGet(w => w.Storyboard).Returns(storyboard);
 
             return mockWorkingBeatmap;
         }
