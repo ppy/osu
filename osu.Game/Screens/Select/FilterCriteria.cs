@@ -35,6 +35,7 @@ namespace osu.Game.Screens.Select
         public OptionalRange<double> BPM;
         public OptionalRange<int> BeatDivisor;
         public OptionalRange<BeatmapOnlineStatus> OnlineStatus;
+        public OptionalRange<DateTimeOffset> LastPlayed;
         public OptionalTextFilter Creator;
         public OptionalTextFilter Artist;
         public OptionalTextFilter Title;

@@ -86,9 +86,13 @@ namespace osu.Game.Beatmaps.Drawables.Cards
             Dimmed.BindValueChanged(_ => updateState());
 
             playButton.Playing.BindValueChanged(_ => updateState(), true);
-            ((IBindable<double>)progress.Current).BindTo(playButton.Progress);
-
             FinishTransforms(true);
+        }
+
+        protected override void Update()
+        {
+            base.Update();
+            progress.Progress = playButton.Progress.Value;
         }
 
         private void updateState()
