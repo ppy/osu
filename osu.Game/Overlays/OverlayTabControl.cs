@@ -101,7 +101,7 @@ namespace osu.Game.Overlays
                         ExpandedSize = 5f,
                         CollapsedSize = 0
                     },
-                    new HoverClickSounds(HoverSampleSet.TabSelect)
+                    new HoverSounds(HoverSampleSet.TabSelect)
                 };
             }
 
