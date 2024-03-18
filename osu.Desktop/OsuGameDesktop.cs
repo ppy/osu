@@ -145,7 +145,7 @@ namespace osu.Desktop
 
             LoadComponentAsync(new ElevatedPrivilegesChecker(), Add);
 
-            if (RuntimeInfo.OS == RuntimeInfo.Platform.Windows)
+            if (OperatingSystem.IsWindows())
                 LoadComponentAsync(new CompatibilityModeChecker(), Add);
 
             osuSchemeLinkIPCChannel = new OsuSchemeLinkIPCChannel(Host, this);

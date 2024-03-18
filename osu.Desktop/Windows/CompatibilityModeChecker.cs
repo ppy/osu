@@ -3,6 +3,7 @@
 
 using System;
 using System.Linq;
+using System.Runtime.Versioning;
 using Microsoft.Win32;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
@@ -16,6 +17,7 @@ namespace osu.Desktop.Windows
     /// <summary>
     /// Checks if the game is running with windows compatibility optimizations which could cause issues. Displays a warning notification if so.
     /// </summary>
+    [SupportedOSPlatform("windows")]
     public partial class CompatibilityModeChecker : Component
     {
         [Resolved]
@@ -30,9 +32,6 @@ namespace osu.Desktop.Windows
 
         private bool checkCompatibilityMode()
         {
-            if (!OperatingSystem.IsWindows())
-                return false;
-
             using var layers = Registry.CurrentUser.OpenSubKey(@"Software\Microsoft\Windows NT\CurrentVersion\AppCompatFlags\Layers");
 
             return layers != null && layers.GetValueNames().Any(name => name.EndsWith("osu!.exe", StringComparison.OrdinalIgnoreCase));
