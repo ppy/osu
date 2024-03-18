@@ -4,10 +4,11 @@
 using osu.Framework.Bindables;
 using osu.Framework.Graphics.UserInterface;
 using osu.Framework.Input.Events;
+using osu.Game.Graphics.UserInterface;
 
 namespace osu.Game.Screens.OnlinePlay.Components
 {
-    public abstract partial class DisableableTabControl<T> : TabControl<T>
+    public abstract partial class DisableableTabControl<T> : OsuTabControl<T>
     {
         public readonly BindableBool Enabled = new BindableBool(true);
 

@@ -78,7 +78,7 @@ namespace osu.Game.Screens.OnlinePlay.Match.Components
                             },
                         },
                     },
-                    new HoverClickSounds(),
+                    new HoverSounds(),
                 };
             }
 

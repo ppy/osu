@@ -12,6 +12,7 @@ using osu.Framework.Graphics.UserInterface;
 using osu.Framework.Input.Events;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
+using osu.Game.Graphics.UserInterface;
 using osu.Game.Online.Rooms;
 using osu.Game.Screens.OnlinePlay.Components;
 using osuTK;
@@ -75,6 +76,7 @@ namespace osu.Game.Screens.OnlinePlay.Match.Components
                         Font = OsuFont.GetFont(weight: FontWeight.Bold),
                         Text = value.GetDescription(),
                     },
+                    new HoverSounds(),
                 };
             }
 

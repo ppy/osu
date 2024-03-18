@@ -9,10 +9,11 @@ using System.Collections.Generic;
 using System.Linq;
 using osu.Framework.Graphics.UserInterface;
 using JetBrains.Annotations;
+using osu.Game.Graphics.UserInterface;
 
 namespace osu.Game.Overlays
 {
-    public abstract partial class OverlayStreamControl<T> : TabControl<T>
+    public abstract partial class OverlayStreamControl<T> : OsuTabControl<T>
     {
         protected OverlayStreamControl()
         {
