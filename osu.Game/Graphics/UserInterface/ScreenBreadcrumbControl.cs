@@ -24,11 +24,13 @@ namespace osu.Game.Graphics.UserInterface
                 onPushed(null, stack.CurrentScreen);
         }
 
-        protected override void SelectTab(TabItem<IScreen> tab)
+        protected override bool UpdateTabSelection(TabItem<IScreen> tab)
         {
             // override base method to prevent current item from being changed on click.
             // depend on screen push/exit to change current item instead.
+            var lastTab = SelectedTab;
             tab.Value.MakeCurrent();
+            return tab != lastTab;
         }
 
         private void onPushed(IScreen lastScreen, IScreen newScreen)

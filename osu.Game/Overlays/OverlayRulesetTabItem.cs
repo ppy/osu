@@ -59,7 +59,7 @@ namespace osu.Game.Overlays
                         Icon = value.CreateInstance().CreateIcon(),
                     },
                 },
-                new HoverClickSounds()
+                new HoverSounds()
             });
 
             Enabled.Value = true;

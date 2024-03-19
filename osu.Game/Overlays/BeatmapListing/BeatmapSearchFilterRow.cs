@@ -6,10 +6,10 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.UserInterface;
 using osu.Game.Graphics;
-using osuTK;
 using osu.Framework.Extensions.EnumExtensions;
 using osu.Framework.Localisation;
 using osu.Game.Graphics.Containers;
+using osu.Game.Graphics.UserInterface;
 
 namespace osu.Game.Overlays.BeatmapListing
 {
@@ -62,14 +62,14 @@ namespace osu.Game.Overlays.BeatmapListing
 
         protected virtual Drawable CreateFilter() => new BeatmapSearchFilter();
 
-        protected partial class BeatmapSearchFilter : TabControl<T>
+        protected partial class BeatmapSearchFilter : OsuTabControl<T>
         {
+            protected override bool AddEnumEntriesAutomatically => false;
+
             public BeatmapSearchFilter()
             {
                 RelativeSizeAxes = Axes.X;
                 AutoSizeAxes = Axes.Y;
-
-                TabContainer.Spacing = new Vector2(10, 0);
 
                 if (typeof(T).IsEnum)
                 {

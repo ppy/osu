@@ -40,7 +40,7 @@ namespace osu.Game.Overlays.BeatmapListing
                     Font = OsuFont.GetFont(size: 13, weight: FontWeight.Regular),
                     Text = LabelFor(Value)
                 },
-                new HoverClickSounds(HoverSampleSet.TabSelect)
+                new HoverSounds(HoverSampleSet.TabSelect)
             });
 
             Enabled.Value = true;

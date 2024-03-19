@@ -87,7 +87,7 @@ namespace osu.Game.Overlays
                     CollapsedSize = 2,
                     Expanded = true
                 },
-                new HoverClickSounds()
+                new HoverSounds()
             });
 
             SelectedItem.BindValueChanged(_ => updateState(), true);

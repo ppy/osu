@@ -79,7 +79,7 @@ namespace osu.Game.Overlays.BeatmapListing
                             Icon = getIconForCardSize(Value)
                         }
                     },
-                    new HoverClickSounds(HoverSampleSet.TabSelect)
+                    new HoverSounds(HoverSampleSet.TabSelect)
                 };
             }
 

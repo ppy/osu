@@ -78,7 +78,7 @@ namespace osu.Game.Overlays
                         RelativeSizeAxes = Axes.Both,
                         FillMode = FillMode.Fit
                     },
-                    new HoverClickSounds()
+                    new HoverSounds()
                 });
             }
 
