@@ -18,7 +18,7 @@ using osuTK;
 namespace osu.Game.Screens.Play
 {
     /// <summary>
-    /// Simple <see cref="ResumeOverlay"/> that resumes after 800ms.
+    /// Simple <see cref="ResumeOverlay"/> that resumes after a short delay.
     /// </summary>
     public partial class DelayedResumeOverlay : ResumeOverlay
     {
