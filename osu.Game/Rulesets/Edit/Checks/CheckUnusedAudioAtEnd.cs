@@ -3,6 +3,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using osu.Game.Beatmaps;
 using osu.Game.Rulesets.Edit.Checks.Components;
 using osu.Game.Storyboards;
@@ -21,7 +22,7 @@ namespace osu.Game.Rulesets.Edit.Checks
 
         public IEnumerable<Issue> Run(BeatmapVerifierContext context)
         {
-            double mappedLength = context.Beatmap.GetLastObjectTime();
+            double mappedLength = context.Beatmap.HitObjects.Any() ? context.Beatmap.GetLastObjectTime() : 0;
             double trackLength = context.WorkingBeatmap.Track.Length;
 
             double mappedPercentage = Math.Round(mappedLength / trackLength * 100);
