@@ -27,11 +27,6 @@ namespace osu.Game.Scoring.Legacy
 {
     public abstract class LegacyScoreDecoder
     {
-        /// <summary>
-        /// The decoded "IsPerfect" value. This isn't used by osu!lazer.
-        /// </summary>
-        public bool DecodedPerfectValue { get; private set; }
-
         private IBeatmap currentBeatmap;
         private Ruleset currentRuleset;
 
@@ -87,7 +82,7 @@ namespace osu.Game.Scoring.Legacy
                 scoreInfo.MaxCombo = sr.ReadUInt16();
 
                 /* score.Perfect = */
-                DecodedPerfectValue = sr.ReadBoolean();
+                sr.ReadBoolean();
 
                 scoreInfo.Mods = currentRuleset.ConvertFromLegacyMods((LegacyMods)sr.ReadInt32()).ToArray();
 
