@@ -117,8 +117,6 @@ namespace osu.Desktop
                 return;
             }
 
-            Logger.Log("Updating Discord RPC", LoggingTarget.Network, LogLevel.Debug);
-
             bool hideIdentifiableInformation = privacyMode.Value == DiscordRichPresenceMode.Limited || status.Value == UserStatus.DoNotDisturb;
 
             if (activity.Value != null)
@@ -180,6 +178,8 @@ namespace osu.Desktop
                 presence.Secrets.JoinSecret = null;
                 usersCurrentlyInLobby = 0;
             }
+
+            Logger.Log($"Updating Discord RPC presence with activity status: {presence.State}, details: {presence.Details}", LoggingTarget.Network, LogLevel.Debug);
 
             // update user information
             if (privacyMode.Value == DiscordRichPresenceMode.Limited)
