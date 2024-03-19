@@ -69,7 +69,7 @@ namespace osu.Game.Screens.Select
                     return TryUpdateCriteriaRange(ref criteria.BeatDivisor, op, value, tryParseInt);
 
                 case "status":
-                    return TryUpdateSetRange(ref criteria.OnlineStatus, op, value, tryParseEnum);
+                    return TryUpdateCriteriaSet(ref criteria.OnlineStatus, op, value, tryParseEnum);
 
                 case "creator":
                 case "author":
@@ -310,11 +310,11 @@ namespace osu.Game.Screens.Select
         /// <param name="op">The operator for the keyword filter.</param>
         /// <param name="val">The value of the keyword filter.</param>
         /// <param name="parseFunction">Function used to determine if <paramref name="val"/> can be converted to type <typeparamref name="T"/>.</param>
-        public static bool TryUpdateSetRange<T>(ref FilterCriteria.OptionalSet<T> range, Operator op, string val, TryParseFunction<T> parseFunction)
+        public static bool TryUpdateCriteriaSet<T>(ref FilterCriteria.OptionalSet<T> range, Operator op, string val, TryParseFunction<T> parseFunction)
             where T : struct
-            => parseFunction.Invoke(val, out var converted) && tryUpdateSetRange(ref range, op, converted);
+            => parseFunction.Invoke(val, out var converted) && tryUpdateCriteriaSet(ref range, op, converted);
 
-        private static bool tryUpdateSetRange<T>(ref FilterCriteria.OptionalSet<T> range, Operator op, T value)
+        private static bool tryUpdateCriteriaSet<T>(ref FilterCriteria.OptionalSet<T> range, Operator op, T value)
             where T : struct
         {
             var enumValues = (T[])Enum.GetValues(typeof(T));
