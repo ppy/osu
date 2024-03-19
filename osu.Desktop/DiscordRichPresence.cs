@@ -53,7 +53,7 @@ namespace osu.Desktop
 
         private readonly Bindable<DiscordRichPresenceMode> privacyMode = new Bindable<DiscordRichPresenceMode>();
 
-        private int usersCurrentlyInLobby = 0;
+        private int usersCurrentlyInLobby;
 
         private readonly RichPresence presence = new RichPresence
         {
