@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.IO;
 using NUnit.Framework;
 using osu.Game.Beatmaps.Formats;
+using osu.Game.IO.Legacy;
 using osu.Game.Rulesets.Catch;
 using osu.Game.Rulesets.Osu;
 using osu.Game.Rulesets.Scoring;
@@ -34,7 +35,7 @@ namespace osu.Game.Tests.Beatmaps.Formats
             };
 
             var score = new Score { ScoreInfo = scoreInfo };
-            var decodedAfterEncode = encodeThenDecode(LegacyBeatmapDecoder.LATEST_VERSION, score, beatmap, out _);
+            var decodedAfterEncode = encodeThenDecode(LegacyBeatmapDecoder.LATEST_VERSION, score, beatmap);
 
             Assert.That(decodedAfterEncode.ScoreInfo.GetCountMiss(), Is.EqualTo(missCount + largeTickMissCount));
         }
@@ -61,12 +62,35 @@ namespace osu.Game.Tests.Beatmaps.Formats
             scoreInfo.Combo = 1;
             scoreInfo.MaxCombo = 1;
 
-            encodeThenDecode(LegacyBeatmapDecoder.LATEST_VERSION, new Score { ScoreInfo = scoreInfo }, beatmap, out var decoder);
+            using (var ms = new MemoryStream())
+            {
+                new LegacyScoreEncoder(new Score { ScoreInfo = scoreInfo }, beatmap).Encode(ms, true);
 
-            Assert.That(decoder.DecodedPerfectValue, Is.False);
+                ms.Seek(0, SeekOrigin.Begin);
+
+                using (var sr = new SerializationReader(ms))
+                {
+                    sr.ReadByte(); // ruleset id
+                    sr.ReadInt32(); // version
+                    sr.ReadString(); // beatmap hash
+                    sr.ReadString(); // username
+                    sr.ReadString(); // score hash
+                    sr.ReadInt16(); // count300
+                    sr.ReadInt16(); // count100
+                    sr.ReadInt16(); // count50
+                    sr.ReadInt16(); // countGeki
+                    sr.ReadInt16(); // countKatu
+                    sr.ReadInt16(); // countMiss
+                    sr.ReadInt32(); // total score
+                    sr.ReadInt16(); // max combo
+                    bool isPerfect = sr.ReadBoolean(); // full combo
+
+                    Assert.That(isPerfect, Is.False);
+                }
+            }
         }
 
-        private static Score encodeThenDecode(int beatmapVersion, Score score, TestBeatmap beatmap, out LegacyScoreDecoderTest.TestLegacyScoreDecoder decoder)
+        private static Score encodeThenDecode(int beatmapVersion, Score score, TestBeatmap beatmap)
         {
             var encodeStream = new MemoryStream();
 
@@ -75,7 +99,7 @@ namespace osu.Game.Tests.Beatmaps.Formats
 
             var decodeStream = new MemoryStream(encodeStream.GetBuffer());
 
-            decoder = new LegacyScoreDecoderTest.TestLegacyScoreDecoder(beatmapVersion);
+            var decoder = new LegacyScoreDecoderTest.TestLegacyScoreDecoder(beatmapVersion);
             var decodedAfterEncode = decoder.Parse(decodeStream);
             return decodedAfterEncode;
         }
