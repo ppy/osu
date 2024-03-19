@@ -6,6 +6,7 @@ using System.IO;
 using NUnit.Framework;
 using osu.Game.Beatmaps.Formats;
 using osu.Game.Rulesets.Catch;
+using osu.Game.Rulesets.Osu;
 using osu.Game.Rulesets.Scoring;
 using osu.Game.Scoring;
 using osu.Game.Scoring.Legacy;
@@ -21,9 +22,9 @@ namespace osu.Game.Tests.Beatmaps.Formats
         public void CatchMergesFruitAndDropletMisses(int missCount, int largeTickMissCount)
         {
             var ruleset = new CatchRuleset().RulesetInfo;
-
             var scoreInfo = TestResources.CreateTestScoreInfo(ruleset);
             var beatmap = new TestBeatmap(ruleset);
+
             scoreInfo.Statistics = new Dictionary<HitResult, int>
             {
                 [HitResult.Great] = 50,
@@ -31,14 +32,41 @@ namespace osu.Game.Tests.Beatmaps.Formats
                 [HitResult.Miss] = missCount,
                 [HitResult.LargeTickMiss] = largeTickMissCount
             };
-            var score = new Score { ScoreInfo = scoreInfo };
 
-            var decodedAfterEncode = encodeThenDecode(LegacyBeatmapDecoder.LATEST_VERSION, score, beatmap);
+            var score = new Score { ScoreInfo = scoreInfo };
+            var decodedAfterEncode = encodeThenDecode(LegacyBeatmapDecoder.LATEST_VERSION, score, beatmap, out _);
 
             Assert.That(decodedAfterEncode.ScoreInfo.GetCountMiss(), Is.EqualTo(missCount + largeTickMissCount));
         }
 
-        private static Score encodeThenDecode(int beatmapVersion, Score score, TestBeatmap beatmap)
+        [Test]
+        public void ScoreWithMissIsNotPerfect()
+        {
+            var ruleset = new OsuRuleset().RulesetInfo;
+            var scoreInfo = TestResources.CreateTestScoreInfo(ruleset);
+            var beatmap = new TestBeatmap(ruleset);
+
+            scoreInfo.Statistics = new Dictionary<HitResult, int>
+            {
+                [HitResult.Great] = 2,
+                [HitResult.Miss] = 1,
+            };
+
+            scoreInfo.MaximumStatistics = new Dictionary<HitResult, int>
+            {
+                [HitResult.Great] = 3
+            };
+
+            // Hit -> Miss -> Hit
+            scoreInfo.Combo = 1;
+            scoreInfo.MaxCombo = 1;
+
+            encodeThenDecode(LegacyBeatmapDecoder.LATEST_VERSION, new Score { ScoreInfo = scoreInfo }, beatmap, out var decoder);
+
+            Assert.That(decoder.DecodedPerfectValue, Is.False);
+        }
+
+        private static Score encodeThenDecode(int beatmapVersion, Score score, TestBeatmap beatmap, out LegacyScoreDecoderTest.TestLegacyScoreDecoder decoder)
         {
             var encodeStream = new MemoryStream();
 
@@ -47,7 +75,7 @@ namespace osu.Game.Tests.Beatmaps.Formats
 
             var decodeStream = new MemoryStream(encodeStream.GetBuffer());
 
-            var decoder = new LegacyScoreDecoderTest.TestLegacyScoreDecoder(beatmapVersion);
+            decoder = new LegacyScoreDecoderTest.TestLegacyScoreDecoder(beatmapVersion);
             var decodedAfterEncode = decoder.Parse(decodeStream);
             return decodedAfterEncode;
         }
