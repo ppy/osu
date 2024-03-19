@@ -19,6 +19,7 @@ using osu.Game.Online.API;
 using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Online.Multiplayer;
 using osu.Game.Online.Rooms;
+using osu.Game.Overlays;
 using osu.Game.Rulesets;
 using osu.Game.Users;
 using LogLevel = osu.Framework.Logging.LogLevel;
@@ -41,6 +42,8 @@ namespace osu.Desktop
 
         [Resolved]
         private OsuGame game { get; set; } = null!;
+
+        private LoginOverlay? login { get; set; }
 
         [Resolved]
         private MultiplayerClient multiplayerClient { get; set; } = null!;
@@ -65,6 +68,8 @@ namespace osu.Desktop
         [BackgroundDependencyLoader]
         private void load(OsuConfigManager config)
         {
+            login = game.Dependencies.Get<LoginOverlay>();
+
             client = new DiscordRpcClient(client_id)
             {
                 SkipIdenticalPresence = false // handles better on discord IPC loss, see updateStatus call in onReady.
@@ -202,6 +207,12 @@ namespace osu.Desktop
         private void onJoin(object sender, JoinMessage args)
         {
             game.Window?.Raise();
+
+            if (!api.IsLoggedIn)
+            {
+                Schedule(() => login?.Show());
+                return;
+            }
 
             Logger.Log($"Received room secret from Discord RPC Client: \"{args.Secret}\"", LoggingTarget.Network, LogLevel.Debug);
 
