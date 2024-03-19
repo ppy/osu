@@ -97,11 +97,13 @@ namespace osu.Desktop
         private void onReady(object _, ReadyMessage __)
         {
             Logger.Log("Discord RPC Client ready.", LoggingTarget.Network, LogLevel.Debug);
-            updateStatus();
+            Schedule(updateStatus);
         }
 
         private void updateStatus()
         {
+            Debug.Assert(ThreadSafety.IsUpdateThread);
+
             if (!client.IsInitialized)
                 return;
 
