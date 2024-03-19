@@ -43,7 +43,7 @@ namespace osu.Game.Rulesets.Osu.Tests.Mods
                 PassCondition = () =>
                 {
                     var flashlightOverlay = Player.DrawableRuleset.Overlays
-                                                  .OfType<ModFlashlight<OsuHitObject>.Flashlight>()
+                                                  .ChildrenOfType<ModFlashlight<OsuHitObject>.Flashlight>()
                                                   .First();
 
                     return Precision.AlmostEquals(mod.DefaultFlashlightSize * .5f, flashlightOverlay.GetSize());

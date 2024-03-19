@@ -91,11 +91,11 @@ namespace osu.Game.Rulesets.Osu.Tests
 
                 var skinnable = firstObject.ApproachCircle;
 
-                if (skin == null && skinnable?.Drawable is DefaultApproachCircle)
+                if (skin == null && skinnable.Drawable is DefaultApproachCircle)
                     // check for default skin provider
                     return true;
 
-                var text = skinnable?.Drawable as SpriteText;
+                var text = skinnable.Drawable as SpriteText;
 
                 return text?.Text == skin;
             });
