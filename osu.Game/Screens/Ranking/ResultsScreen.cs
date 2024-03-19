@@ -25,8 +25,10 @@ using osu.Game.Input.Bindings;
 using osu.Game.Localisation;
 using osu.Game.Online.API;
 using osu.Game.Online.Placeholders;
+using osu.Game.Overlays;
 using osu.Game.Scoring;
 using osu.Game.Screens.Play;
+using osu.Game.Screens.Ranking.Expanded.Accuracy;
 using osu.Game.Screens.Ranking.Statistics;
 using osuTK;
 
@@ -40,6 +42,8 @@ namespace osu.Game.Screens.Ranking
         public override bool DisallowExternalBeatmapRulesetChanges => true;
 
         public override bool? AllowGlobalTrackControl => true;
+
+        protected override OverlayActivation InitialOverlayActivationMode => OverlayActivation.UserTriggered;
 
         public readonly Bindable<ScoreInfo> SelectedScore = new Bindable<ScoreInfo>();
 
@@ -172,6 +176,10 @@ namespace osu.Game.Screens.Ranking
                 bool shouldFlair = player != null && !Score.User.IsBot;
 
                 ScorePanelList.AddScore(Score, shouldFlair);
+                // this is mostly for medal display.
+                // we don't want the medal animation to trample on the results screen animation, so we (ab)use `OverlayActivationMode`
+                // to give the results screen enough time to play the animation out before the medals can be shown.
+                Scheduler.AddDelayed(() => OverlayActivationMode.Value = OverlayActivation.All, shouldFlair ? AccuracyCircle.TOTAL_DURATION + 1000 : 0);
             }
 
             if (AllowWatchingReplay)

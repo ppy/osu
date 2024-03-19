@@ -45,9 +45,10 @@ namespace osu.Game.Scoring.Legacy
         /// </description></item>
         /// <item><description>30000013: All local scores will use lazer definitions of ranks for consistency. Recalculates the rank of all scores.</description></item>
         /// <item><description>30000014: Fix edge cases in conversion for osu! scores on selected beatmaps. Reconvert all scores.</description></item>
+        /// <item><description>30000015: Fix osu! standardised score estimation algorithm violating basic invariants. Reconvert all scores.</description></item>
         /// </list>
         /// </remarks>
-        public const int LATEST_VERSION = 30000014;
+        public const int LATEST_VERSION = 30000015;
 
         /// <summary>
         /// The first stable-compatible YYYYMMDD format version given to lazer usage of replays.
@@ -92,7 +93,7 @@ namespace osu.Game.Scoring.Legacy
                 sw.Write((ushort)(score.ScoreInfo.GetCountMiss() ?? 0));
                 sw.Write((int)(score.ScoreInfo.TotalScore));
                 sw.Write((ushort)score.ScoreInfo.MaxCombo);
-                sw.Write(score.ScoreInfo.Combo == score.ScoreInfo.MaxCombo);
+                sw.Write(score.ScoreInfo.MaxCombo == score.ScoreInfo.GetMaximumAchievableCombo());
                 sw.Write((int)score.ScoreInfo.Ruleset.CreateInstance().ConvertToLegacyMods(score.ScoreInfo.Mods));
 
                 sw.Write(getHpGraphFormatted());

@@ -32,6 +32,11 @@ namespace osu.Game.Screens.Ranking.Expanded.Accuracy
     public partial class AccuracyCircle : CompositeDrawable
     {
         /// <summary>
+        /// The total duration of the animation.
+        /// </summary>
+        public const double TOTAL_DURATION = APPEAR_DURATION + ACCURACY_TRANSFORM_DELAY + ACCURACY_TRANSFORM_DURATION;
+
+        /// <summary>
         /// Duration for the transforms causing this component to appear.
         /// </summary>
         public const double APPEAR_DURATION = 200;
@@ -147,7 +152,7 @@ namespace osu.Game.Screens.Ranking.Expanded.Accuracy
                     Colour = OsuColour.Gray(47),
                     Alpha = 0.5f,
                     InnerRadius = accuracy_circle_radius + 0.01f, // Extends a little bit into the circle
-                    Current = { Value = 1 },
+                    Progress = 1,
                 },
                 accuracyCircle = new CircularProgress
                 {
@@ -189,11 +194,11 @@ namespace osu.Game.Screens.Ranking.Expanded.Accuracy
                 rankText = new RankText(score.Rank)
             };
 
+            if (isFailedSDueToMisses)
+                AddInternal(failedSRankText = new RankText(ScoreRank.S));
+
             if (withFlair)
             {
-                if (isFailedSDueToMisses)
-                    AddInternal(failedSRankText = new RankText(ScoreRank.S));
-
                 var applauseSamples = new List<string> { applauseSampleName };
                 if (score.Rank >= ScoreRank.B)
                     // when rank is B or higher, play legacy applause sample on legacy skins.
@@ -268,7 +273,7 @@ namespace osu.Game.Screens.Ranking.Expanded.Accuracy
                 if (targetAccuracy < 1 && targetAccuracy >= visual_alignment_offset)
                     targetAccuracy -= visual_alignment_offset;
 
-                accuracyCircle.FillTo(targetAccuracy, ACCURACY_TRANSFORM_DURATION, ACCURACY_TRANSFORM_EASING);
+                accuracyCircle.ProgressTo(targetAccuracy, ACCURACY_TRANSFORM_DURATION, ACCURACY_TRANSFORM_EASING);
 
                 if (withFlair)
                 {
@@ -321,24 +326,25 @@ namespace osu.Game.Screens.Ranking.Expanded.Accuracy
                 {
                     rankText.Appear();
 
-                    if (!withFlair) return;
-
-                    Schedule(() =>
-                    {
-                        isTicking = false;
-                        rankImpactSound.Play();
-                    });
-
-                    const double applause_pre_delay = 545f;
-                    const double applause_volume = 0.8f;
-
-                    using (BeginDelayedSequence(applause_pre_delay))
+                    if (withFlair)
                     {
                         Schedule(() =>
                         {
-                            rankApplauseSound.VolumeTo(applause_volume);
-                            rankApplauseSound.Play();
+                            isTicking = false;
+                            rankImpactSound.Play();
                         });
+
+                        const double applause_pre_delay = 545f;
+                        const double applause_volume = 0.8f;
+
+                        using (BeginDelayedSequence(applause_pre_delay))
+                        {
+                            Schedule(() =>
+                            {
+                                rankApplauseSound.VolumeTo(applause_volume);
+                                rankApplauseSound.Play();
+                            });
+                        }
                     }
                 }
 
@@ -359,7 +365,7 @@ namespace osu.Game.Screens.Ranking.Expanded.Accuracy
                                 .FadeOut(800, Easing.Out);
 
                             accuracyCircle
-                                .FillTo(accuracyS - GRADE_SPACING_PERCENTAGE / 2 - visual_alignment_offset, 70, Easing.OutQuint);
+                                .ProgressTo(accuracyS - GRADE_SPACING_PERCENTAGE / 2 - visual_alignment_offset, 70, Easing.OutQuint);
 
                             badges.Single(b => b.Rank == getRank(ScoreRank.S))
                                   .FadeOut(70, Easing.OutQuint);
