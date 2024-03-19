@@ -56,6 +56,16 @@ namespace osu.Game.Tests.Editing.Checks
         }
 
         [Test]
+        public void TestEmptyBeatmap()
+        {
+            var context = getContext(new Beatmap<HitObject>());
+            var issues = check.Run(context).ToList();
+
+            Assert.That(issues, Has.Count.EqualTo(1));
+            Assert.That(issues.Single().Template is CheckUnusedAudioAtEnd.IssueTemplateUnusedAudioAtEnd);
+        }
+
+        [Test]
         public void TestAudioNotFullyUsed()
         {
             var context = getContext(beatmapNotFullyMapped);
