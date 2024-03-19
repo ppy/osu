@@ -2,12 +2,14 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
+using System.Diagnostics;
 using System.Text;
 using DiscordRPC;
 using DiscordRPC.Message;
 using Newtonsoft.Json;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
+using osu.Framework.Development;
 using osu.Framework.Graphics;
 using osu.Framework.Logging;
 using osu.Game;
@@ -47,6 +49,8 @@ namespace osu.Desktop
         private readonly IBindable<UserActivity> activity = new Bindable<UserActivity>();
 
         private readonly Bindable<DiscordRichPresenceMode> privacyMode = new Bindable<DiscordRichPresenceMode>();
+
+        private int usersCurrentlyInLobby = 0;
 
         private readonly RichPresence presence = new RichPresence
         {
@@ -115,10 +119,10 @@ namespace osu.Desktop
 
             Logger.Log("Updating Discord RPC", LoggingTarget.Network, LogLevel.Debug);
 
+            bool hideIdentifiableInformation = privacyMode.Value == DiscordRichPresenceMode.Limited || status.Value == UserStatus.DoNotDisturb;
+
             if (activity.Value != null)
             {
-                bool hideIdentifiableInformation = privacyMode.Value == DiscordRichPresenceMode.Limited || status.Value == UserStatus.DoNotDisturb;
-
                 presence.State = truncate(activity.Value.GetStatus(hideIdentifiableInformation));
                 presence.Details = truncate(activity.Value.GetDetails(hideIdentifiableInformation) ?? string.Empty);
 
@@ -137,38 +141,44 @@ namespace osu.Desktop
                 {
                     presence.Buttons = null;
                 }
-
-                if (!hideIdentifiableInformation && multiplayerClient.Room != null)
-                {
-                    MultiplayerRoom room = multiplayerClient.Room;
-                    presence.Party = new Party
-                    {
-                        Privacy = string.IsNullOrEmpty(room.Settings.Password) ? Party.PrivacySetting.Public : Party.PrivacySetting.Private,
-                        ID = room.RoomID.ToString(),
-                        // technically lobbies can have infinite users, but Discord needs this to be set to something.
-                        // to make party display sensible, assign a powers of two above participants count (8 at minimum).
-                        Max = (int)Math.Max(8, Math.Pow(2, Math.Ceiling(Math.Log2(room.Users.Count)))),
-                        Size = room.Users.Count,
-                    };
-
-                    RoomSecret roomSecret = new RoomSecret
-                    {
-                        RoomID = room.RoomID,
-                        Password = room.Settings.Password,
-                    };
-
-                    presence.Secrets.JoinSecret = JsonConvert.SerializeObject(roomSecret);
-                }
-                else
-                {
-                    presence.Party = null;
-                    presence.Secrets.JoinSecret = null;
-                }
             }
             else
             {
                 presence.State = "Idle";
                 presence.Details = string.Empty;
+            }
+
+            if (!hideIdentifiableInformation && multiplayerClient.Room != null)
+            {
+                MultiplayerRoom room = multiplayerClient.Room;
+
+                if (room.Users.Count == usersCurrentlyInLobby)
+                    return;
+
+                presence.Party = new Party
+                {
+                    Privacy = string.IsNullOrEmpty(room.Settings.Password) ? Party.PrivacySetting.Public : Party.PrivacySetting.Private,
+                    ID = room.RoomID.ToString(),
+                    // technically lobbies can have infinite users, but Discord needs this to be set to something.
+                    // to make party display sensible, assign a powers of two above participants count (8 at minimum).
+                    Max = (int)Math.Max(8, Math.Pow(2, Math.Ceiling(Math.Log2(room.Users.Count)))),
+                    Size = room.Users.Count,
+                };
+
+                RoomSecret roomSecret = new RoomSecret
+                {
+                    RoomID = room.RoomID,
+                    Password = room.Settings.Password,
+                };
+
+                presence.Secrets.JoinSecret = JsonConvert.SerializeObject(roomSecret);
+                usersCurrentlyInLobby = room.Users.Count;
+            }
+            else
+            {
+                presence.Party = null;
+                presence.Secrets.JoinSecret = null;
+                usersCurrentlyInLobby = 0;
             }
 
             // update user information
