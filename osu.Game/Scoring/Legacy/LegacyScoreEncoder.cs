@@ -93,7 +93,7 @@ namespace osu.Game.Scoring.Legacy
                 sw.Write((ushort)(score.ScoreInfo.GetCountMiss() ?? 0));
                 sw.Write((int)(score.ScoreInfo.TotalScore));
                 sw.Write((ushort)score.ScoreInfo.MaxCombo);
-                sw.Write(score.ScoreInfo.Combo == score.ScoreInfo.MaxCombo);
+                sw.Write(score.ScoreInfo.Combo == score.ScoreInfo.GetMaximumAchievableCombo());
                 sw.Write((int)score.ScoreInfo.Ruleset.CreateInstance().ConvertToLegacyMods(score.ScoreInfo.Mods));
 
                 sw.Write(getHpGraphFormatted());
