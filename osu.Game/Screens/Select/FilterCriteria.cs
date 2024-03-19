@@ -119,21 +119,15 @@ namespace osu.Game.Screens.Select
         {
             public bool HasFilter => Values.Count > 0;
 
-            public bool IsInRange(T value)
-            {
-                return Values.Contains(value);
-            }
+            public bool IsInRange(T value) => Values.Contains(value);
 
-            public SortedSet<T> Values = new SortedSet<T>();
+            public HashSet<T> Values = new HashSet<T>();
 
             public OptionalSet()
             {
             }
 
-            public bool Equals(OptionalSet<T> other)
-            {
-                return Values.SetEquals(other.Values);
-            }
+            public bool Equals(OptionalSet<T> other) => Values.SetEquals(other.Values);
         }
 
         public struct OptionalRange<T> : IEquatable<OptionalRange<T>>
