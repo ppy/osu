@@ -311,44 +311,38 @@ namespace osu.Game.Screens.Select
         /// <param name="val">The value of the keyword filter.</param>
         /// <param name="parseFunction">Function used to determine if <paramref name="val"/> can be converted to type <typeparamref name="T"/>.</param>
         public static bool TryUpdateCriteriaSet<T>(ref FilterCriteria.OptionalSet<T> range, Operator op, string val, TryParseFunction<T> parseFunction)
-            where T : struct
+            where T : struct, Enum
             => parseFunction.Invoke(val, out var converted) && tryUpdateCriteriaSet(ref range, op, converted);
 
-        private static bool tryUpdateCriteriaSet<T>(ref FilterCriteria.OptionalSet<T> range, Operator op, T value)
-            where T : struct
+        private static bool tryUpdateCriteriaSet<T>(ref FilterCriteria.OptionalSet<T> range, Operator op, T pivotValue)
+            where T : struct, Enum
         {
-            var enumValues = (T[])Enum.GetValues(typeof(T));
+            var allDefinedValues = Enum.GetValues<T>();
 
-            foreach (var enumValue in enumValues)
+            foreach (var val in allDefinedValues)
             {
+                int compareResult = Comparer<T>.Default.Compare(val, pivotValue);
+
                 switch (op)
                 {
                     case Operator.Less:
-                        if (Comparer<T>.Default.Compare(enumValue, value) < 0)
-                            range.Values.Add(enumValue);
-
+                        if (compareResult < 0) range.Values.Add(val);
                         break;
 
                     case Operator.LessOrEqual:
-                        if (Comparer<T>.Default.Compare(enumValue, value) <= 0)
-                            range.Values.Add(enumValue);
-
+                        if (compareResult <= 0) range.Values.Add(val);
                         break;
 
                     case Operator.Equal:
-                        range.Values.Add(value);
+                        if (compareResult == 0) range.Values.Add(val);
                         break;
 
                     case Operator.GreaterOrEqual:
-                        if (Comparer<T>.Default.Compare(enumValue, value) >= 0)
-                            range.Values.Add(enumValue);
-
+                        if (compareResult >= 0) range.Values.Add(val);
                         break;
 
                     case Operator.Greater:
-                        if (Comparer<T>.Default.Compare(enumValue, value) > 0)
-                            range.Values.Add(enumValue);
-
+                        if (compareResult > 0) range.Values.Add(val);
                         break;
 
                     default:
