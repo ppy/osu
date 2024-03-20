@@ -43,6 +43,7 @@ namespace osu.Desktop
         [Resolved]
         private OsuGame game { get; set; } = null!;
 
+        [Resolved]
         private LoginOverlay? login { get; set; }
 
         [Resolved]
@@ -66,8 +67,6 @@ namespace osu.Desktop
         [BackgroundDependencyLoader]
         private void load(OsuConfigManager config)
         {
-            login = game.Dependencies.Get<LoginOverlay>();
-
             client = new DiscordRpcClient(client_id)
             {
                 // SkipIdenticalPresence allows us to fire SetPresence at any point and leave it to the underlying implementation
