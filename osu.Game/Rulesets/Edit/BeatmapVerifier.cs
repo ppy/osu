@@ -41,7 +41,10 @@ namespace osu.Game.Rulesets.Edit
             new CheckPreviewTime(),
 
             // Events
-            new CheckBreaks()
+            new CheckBreaks(),
+
+            // Settings
+            new CheckAbnormalDifficultySettings(),
         };
 
         public IEnumerable<Issue> Run(BeatmapVerifierContext context)
