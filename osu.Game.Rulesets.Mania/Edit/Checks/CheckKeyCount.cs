@@ -14,7 +14,6 @@ namespace osu.Game.Rulesets.Mania.Edit.Checks
         public IEnumerable<IssueTemplate> PossibleTemplates => new IssueTemplate[]
         {
             new IssueTemplateKeycountTooLow(this),
-            new IssueTemplateKeycountNonStandard(this),
         };
 
         public IEnumerable<Issue> Run(BeatmapVerifierContext context)
@@ -25,27 +24,12 @@ namespace osu.Game.Rulesets.Mania.Edit.Checks
             {
                 yield return new IssueTemplateKeycountTooLow(this).Create(diff.CircleSize);
             }
-
-            if (diff.CircleSize > 10)
-            {
-                yield return new IssueTemplateKeycountNonStandard(this).Create(diff.CircleSize);
-            }
         }
 
         public class IssueTemplateKeycountTooLow : IssueTemplate
         {
             public IssueTemplateKeycountTooLow(ICheck check)
                 : base(check, IssueType.Problem, "Key count is {0} and must be 4 or higher.")
-            {
-            }
-
-            public Issue Create(float current) => new Issue(this, current);
-        }
-
-        public class IssueTemplateKeycountNonStandard : IssueTemplate
-        {
-            public IssueTemplateKeycountNonStandard(ICheck check)
-                : base(check, IssueType.Warning, "Key count {0} is higher than 10.")
             {
             }
 
