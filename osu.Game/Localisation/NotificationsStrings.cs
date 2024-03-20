@@ -126,6 +126,11 @@ Click to see what's new!", version);
         public static LocalisableString UpdateReadyToInstall => new TranslatableString(getKey(@"update_ready_to_install"), @"Update ready to install. Click to restart!");
 
         /// <summary>
+        /// "This is not an official build of the game and scores will not be submitted."
+        /// </summary>
+        public static LocalisableString NotOfficialBuild => new TranslatableString(getKey(@"not_official_build"), @"This is not an official build of the game and scores will not be submitted.");
+
+        /// <summary>
         /// "Downloading update..."
         /// </summary>
         public static LocalisableString DownloadingUpdate => new TranslatableString(getKey(@"downloading_update"), @"Downloading update...");
