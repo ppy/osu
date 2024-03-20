@@ -2,16 +2,16 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
-using System.Diagnostics;
 using System.Text;
 using DiscordRPC;
 using DiscordRPC.Message;
 using Newtonsoft.Json;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
-using osu.Framework.Development;
+using osu.Framework.Extensions.ObjectExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Logging;
+using osu.Framework.Threading;
 using osu.Game;
 using osu.Game.Configuration;
 using osu.Game.Extensions;
@@ -53,8 +53,6 @@ namespace osu.Desktop
 
         private readonly Bindable<DiscordRichPresenceMode> privacyMode = new Bindable<DiscordRichPresenceMode>();
 
-        private int usersCurrentlyInLobby;
-
         private readonly RichPresence presence = new RichPresence
         {
             Assets = new Assets { LargeImageKey = "osu_logo_lazer" },
@@ -72,7 +70,9 @@ namespace osu.Desktop
 
             client = new DiscordRpcClient(client_id)
             {
-                SkipIdenticalPresence = false // handles better on discord IPC loss, see updateStatus call in onReady.
+                // SkipIdenticalPresence allows us to fire SetPresence at any point and leave it to the underlying implementation
+                // to check whether a difference has actually occurred before sending a command to Discord (with a minor caveat that's handled in onReady).
+                SkipIdenticalPresence = true
             };
 
             client.OnReady += onReady;
@@ -95,10 +95,11 @@ namespace osu.Desktop
                 activity.BindTo(u.NewValue.Activity);
             }, true);
 
-            ruleset.BindValueChanged(_ => updateStatus());
-            status.BindValueChanged(_ => updateStatus());
-            activity.BindValueChanged(_ => updateStatus());
-            privacyMode.BindValueChanged(_ => updateStatus());
+            ruleset.BindValueChanged(_ => updatePresence());
+            status.BindValueChanged(_ => updatePresence());
+            activity.BindValueChanged(_ => updatePresence());
+            privacyMode.BindValueChanged(_ => updatePresence());
+            multiplayerClient.RoomUpdated += onRoomUpdated;
 
             client.Initialize();
         }
@@ -106,24 +107,44 @@ namespace osu.Desktop
         private void onReady(object _, ReadyMessage __)
         {
             Logger.Log("Discord RPC Client ready.", LoggingTarget.Network, LogLevel.Debug);
-            Schedule(updateStatus);
+
+            // when RPC is lost and reconnected, we have to clear presence state for updatePresence to work (see DiscordRpcClient.SkipIdenticalPresence).
+            if (client.CurrentPresence != null)
+                client.SetPresence(null);
+
+            updatePresence();
         }
 
-        private void updateStatus()
+        private void onRoomUpdated() => updatePresence();
+
+        private ScheduledDelegate? presenceUpdateDelegate;
+
+        private void updatePresence()
         {
-            Debug.Assert(ThreadSafety.IsUpdateThread);
-
-            if (!client.IsInitialized)
-                return;
-
-            if (status.Value == UserStatus.Offline || privacyMode.Value == DiscordRichPresenceMode.Off)
+            presenceUpdateDelegate?.Cancel();
+            presenceUpdateDelegate = Scheduler.AddDelayed(() =>
             {
-                client.ClearPresence();
-                return;
-            }
+                if (!client.IsInitialized)
+                    return;
 
-            bool hideIdentifiableInformation = privacyMode.Value == DiscordRichPresenceMode.Limited || status.Value == UserStatus.DoNotDisturb;
+                if (status.Value == UserStatus.Offline || privacyMode.Value == DiscordRichPresenceMode.Off)
+                {
+                    client.ClearPresence();
+                    return;
+                }
 
+                bool hideIdentifiableInformation = privacyMode.Value == DiscordRichPresenceMode.Limited || status.Value == UserStatus.DoNotDisturb;
+
+                updatePresenceStatus(hideIdentifiableInformation);
+                updatePresenceParty(hideIdentifiableInformation);
+                updatePresenceAssets();
+
+                client.SetPresence(presence);
+            }, 200);
+        }
+
+        private void updatePresenceStatus(bool hideIdentifiableInformation)
+        {
             if (activity.Value != null)
             {
                 presence.State = truncate(activity.Value.GetStatus(hideIdentifiableInformation));
@@ -150,13 +171,13 @@ namespace osu.Desktop
                 presence.State = "Idle";
                 presence.Details = string.Empty;
             }
+        }
 
+        private void updatePresenceParty(bool hideIdentifiableInformation)
+        {
             if (!hideIdentifiableInformation && multiplayerClient.Room != null)
             {
                 MultiplayerRoom room = multiplayerClient.Room;
-
-                if (room.Users.Count == usersCurrentlyInLobby)
-                    return;
 
                 presence.Party = new Party
                 {
@@ -175,17 +196,16 @@ namespace osu.Desktop
                 };
 
                 presence.Secrets.JoinSecret = JsonConvert.SerializeObject(roomSecret);
-                usersCurrentlyInLobby = room.Users.Count;
             }
             else
             {
                 presence.Party = null;
                 presence.Secrets.JoinSecret = null;
-                usersCurrentlyInLobby = 0;
             }
+        }
 
-            Logger.Log($"Updating Discord RPC presence with activity status: {presence.State}, details: {presence.Details}", LoggingTarget.Network, LogLevel.Debug);
-
+        private void updatePresenceAssets()
+        {
             // update user information
             if (privacyMode.Value == DiscordRichPresenceMode.Limited)
                 presence.Assets.LargeImageText = string.Empty;
@@ -200,17 +220,15 @@ namespace osu.Desktop
             // update ruleset
             presence.Assets.SmallImageKey = ruleset.Value.IsLegacyRuleset() ? $"mode_{ruleset.Value.OnlineID}" : "mode_custom";
             presence.Assets.SmallImageText = ruleset.Value.Name;
-
-            client.SetPresence(presence);
         }
 
-        private void onJoin(object sender, JoinMessage args)
+        private void onJoin(object sender, JoinMessage args) => Scheduler.AddOnce(() =>
         {
             game.Window?.Raise();
 
             if (!api.IsLoggedIn)
             {
-                Schedule(() => login?.Show());
+                login?.Show();
                 return;
             }
 
@@ -231,7 +249,7 @@ namespace osu.Desktop
             });
             request.Failure += _ => Logger.Log($"Could not join multiplayer room, room could not be found (room ID: {roomId}).", LoggingTarget.Network, LogLevel.Important);
             api.Queue(request);
-        }
+        });
 
         private static readonly int ellipsis_length = Encoding.UTF8.GetByteCount(new[] { '…' });
 
@@ -294,6 +312,9 @@ namespace osu.Desktop
 
         protected override void Dispose(bool isDisposing)
         {
+            if (multiplayerClient.IsNotNull())
+                multiplayerClient.RoomUpdated -= onRoomUpdated;
+
             client.Dispose();
             base.Dispose(isDisposing);
         }
