@@ -32,6 +32,10 @@ namespace osu.Game.Rulesets.Catch.Scoring
             if (result.Type == HitResult.SmallTickMiss)
                 return false;
 
+            // on stable, banana showers don't exist as concrete objects themselves, so they can't cause a fail.
+            if (result.HitObject is BananaShower)
+                return false;
+
             return base.CheckDefaultFailCondition(result);
         }
 
