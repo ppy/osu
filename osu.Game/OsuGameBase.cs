@@ -351,11 +351,6 @@ namespace osu.Game
             RegisterImportHandler(ScoreManager);
             RegisterImportHandler(SkinManager);
 
-            // drop track volume game-wide to leave some head-room for UI effects / samples.
-            // this means that for the time being, gameplay sample playback is louder relative to the audio track, compared to stable.
-            // we may want to revisit this if users notice or complain about the difference (consider this a bit of a trial).
-            Audio.Tracks.AddAdjustment(AdjustableProperty.Volume, globalTrackVolumeAdjust);
-
             Beatmap = new NonNullableBindable<WorkingBeatmap>(defaultBeatmap);
 
             dependencies.CacheAs<IBindable<WorkingBeatmap>>(Beatmap);
