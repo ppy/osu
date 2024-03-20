@@ -4,7 +4,6 @@
 using System.Collections.Generic;
 using osu.Game.Rulesets.Edit.Checks.Components;
 
-
 namespace osu.Game.Rulesets.Edit.Checks
 {
     public class CheckAbnormalDifficultySettings : ICheck
@@ -20,6 +19,7 @@ namespace osu.Game.Rulesets.Edit.Checks
         public IEnumerable<Issue> Run(BeatmapVerifierContext context)
         {
             var diff = context.Beatmap.Difficulty;
+            string ruleset = context.Beatmap.BeatmapInfo.Ruleset.ShortName;
 
             if (hasMoreThanOneDecimalPlace(diff.ApproachRate))
                 yield return new IssueTemplateMoreThanOneDecimal(this).Create("Approach rate", diff.ApproachRate);
@@ -38,7 +38,7 @@ namespace osu.Game.Rulesets.Edit.Checks
             if (hasMoreThanOneDecimalPlace(diff.CircleSize))
                 yield return new IssueTemplateMoreThanOneDecimal(this).Create("Circle size", diff.CircleSize);
 
-            if (isOutOfRange(diff.CircleSize))
+            if (ruleset != "mania" && isOutOfRange(diff.CircleSize))
                 yield return new IssueTemplateOutOfRange(this).Create("Circle size", diff.CircleSize);
 
 
