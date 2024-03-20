@@ -32,10 +32,7 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
 
             controlPointGroups.UnbindAll();
             controlPointGroups.BindTo(beatmap.ControlPointInfo.Groups);
-            controlPointGroups.BindCollectionChanged((_, _) =>
-            {
-                invalidateGroups();
-            }, true);
+            controlPointGroups.BindCollectionChanged((_, _) => groupCache.Invalidate(), true);
         }
 
         protected override void Update()
@@ -51,19 +48,20 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
             if (visibleRange != newRange)
             {
                 visibleRange = newRange;
-                invalidateGroups();
+                groupCache.Invalidate();
             }
 
             if (!groupCache.IsValid)
+            {
                 recreateDrawableGroups();
+                groupCache.Validate();
+            }
         }
-
-        private void invalidateGroups() => groupCache.Invalidate();
 
         private void recreateDrawableGroups()
         {
             // Remove groups outside the visible range
-            foreach (var drawableGroup in this)
+            foreach (TimelineControlPointGroup drawableGroup in this)
             {
                 if (!shouldBeVisible(drawableGroup.Group))
                     drawableGroup.Expire();
@@ -93,8 +91,6 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
 
                 Add(new TimelineControlPointGroup(group));
             }
-
-            groupCache.Validate();
         }
 
         private bool shouldBeVisible(ControlPointGroup group) => group.Time >= visibleRange.min && group.Time <= visibleRange.max;
