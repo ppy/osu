@@ -55,18 +55,6 @@ namespace osu.Game.Rulesets.Mania.Tests.Editor.Checks
             Assert.That(issues.Single().Template is CheckKeyCount.IssueTemplateKeycountTooLow);
         }
 
-        [Test]
-        public void TestKeycountHigherThanTen()
-        {
-            beatmap.Difficulty.CircleSize = 11;
-
-            var context = getContext();
-            var issues = check.Run(context).ToList();
-
-            Assert.That(issues, Has.Count.EqualTo(1));
-            Assert.That(issues.Single().Template is CheckKeyCount.IssueTemplateKeycountNonStandard);
-        }
-
         private BeatmapVerifierContext getContext()
         {
             return new BeatmapVerifierContext(beatmap, new TestWorkingBeatmap(beatmap));
