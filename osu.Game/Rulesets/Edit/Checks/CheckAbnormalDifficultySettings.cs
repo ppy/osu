@@ -27,20 +27,17 @@ namespace osu.Game.Rulesets.Edit.Checks
             if (isOutOfRange(diff.ApproachRate))
                 yield return new IssueTemplateOutOfRange(this).Create("Approach rate", diff.ApproachRate);
 
-
             if (hasMoreThanOneDecimalPlace(diff.OverallDifficulty))
                 yield return new IssueTemplateMoreThanOneDecimal(this).Create("Overall difficulty", diff.OverallDifficulty);
 
             if (isOutOfRange(diff.OverallDifficulty))
                 yield return new IssueTemplateOutOfRange(this).Create("Overall difficulty", diff.OverallDifficulty);
 
-
             if (hasMoreThanOneDecimalPlace(diff.CircleSize))
                 yield return new IssueTemplateMoreThanOneDecimal(this).Create("Circle size", diff.CircleSize);
 
             if (ruleset != "mania" && isOutOfRange(diff.CircleSize))
                 yield return new IssueTemplateOutOfRange(this).Create("Circle size", diff.CircleSize);
-
 
             if (hasMoreThanOneDecimalPlace(diff.DrainRate))
                 yield return new IssueTemplateMoreThanOneDecimal(this).Create("Drain rate", diff.DrainRate);
