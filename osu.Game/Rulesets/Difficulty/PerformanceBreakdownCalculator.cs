@@ -8,6 +8,7 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using JetBrains.Annotations;
+using osu.Framework.Extensions.ObjectExtensions;
 using osu.Game.Beatmaps;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Objects;
@@ -20,26 +21,34 @@ namespace osu.Game.Rulesets.Difficulty
     {
         private readonly IBeatmap playableBeatmap;
         private readonly BeatmapDifficultyCache difficultyCache;
-        private readonly ScorePerformanceCache performanceCache;
 
-        public PerformanceBreakdownCalculator(IBeatmap playableBeatmap, BeatmapDifficultyCache difficultyCache, ScorePerformanceCache performanceCache)
+        public PerformanceBreakdownCalculator(IBeatmap playableBeatmap, BeatmapDifficultyCache difficultyCache)
         {
             this.playableBeatmap = playableBeatmap;
             this.difficultyCache = difficultyCache;
-            this.performanceCache = performanceCache;
         }
 
         [ItemCanBeNull]
         public async Task<PerformanceBreakdown> CalculateAsync(ScoreInfo score, CancellationToken cancellationToken = default)
         {
+            var attributes = await difficultyCache.GetDifficultyAsync(score.BeatmapInfo!, score.Ruleset, score.Mods, cancellationToken).ConfigureAwait(false);
+
+            var performanceCalculator = score.Ruleset.CreateInstance().CreatePerformanceCalculator();
+
+            // Performance calculation requires the beatmap and ruleset to be locally available. If not, return a default value.
+            if (attributes?.Attributes == null || performanceCalculator == null)
+                return null;
+
+            cancellationToken.ThrowIfCancellationRequested();
+
             PerformanceAttributes[] performanceArray = await Task.WhenAll(
                 // compute actual performance
-                performanceCache.CalculatePerformanceAsync(score, cancellationToken),
+                performanceCalculator.CalculateAsync(score, attributes.Value.Attributes, cancellationToken),
                 // compute performance for perfect play
                 getPerfectPerformance(score, cancellationToken)
             ).ConfigureAwait(false);
 
-            return new PerformanceBreakdown { Performance = performanceArray[0], PerfectPerformance = performanceArray[1] };
+            return new PerformanceBreakdown(performanceArray[0] ?? new PerformanceAttributes(), performanceArray[1] ?? new PerformanceAttributes());
         }
 
         [ItemCanBeNull]
@@ -87,8 +96,12 @@ namespace osu.Game.Rulesets.Difficulty
                     cancellationToken
                 ).ConfigureAwait(false);
 
-                // ScorePerformanceCache is not used to avoid caching multiple copies of essentially identical perfect performance attributes
-                return difficulty == null ? null : ruleset.CreatePerformanceCalculator()?.Calculate(perfectPlay, difficulty.Value.Attributes);
+                var performanceCalculator = ruleset.CreatePerformanceCalculator();
+
+                if (performanceCalculator == null || difficulty == null)
+                    return null;
+
+                return await performanceCalculator.CalculateAsync(perfectPlay, difficulty.Value.Attributes.AsNonNull(), cancellationToken).ConfigureAwait(false);
             }, cancellationToken);
         }
 
@@ -100,9 +113,9 @@ namespace osu.Game.Rulesets.Difficulty
         private IEnumerable<HitResult> getPerfectHitResults(HitObject hitObject)
         {
             foreach (HitObject nested in hitObject.NestedHitObjects)
-                yield return nested.CreateJudgement().MaxResult;
+                yield return nested.Judgement.MaxResult;
 
-            yield return hitObject.CreateJudgement().MaxResult;
+            yield return hitObject.Judgement.MaxResult;
         }
     }
 }

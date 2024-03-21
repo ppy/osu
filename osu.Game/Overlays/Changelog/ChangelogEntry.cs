@@ -1,7 +1,5 @@
-// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
-
-#nullable disable
 
 using System;
 using System.Diagnostics;
@@ -14,6 +12,7 @@ using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Sprites;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
+using osu.Game.Online;
 using osu.Game.Online.API.Requests.Responses;
 using osuTK;
 using osuTK.Graphics;
@@ -26,10 +25,13 @@ namespace osu.Game.Overlays.Changelog
         private readonly APIChangelogEntry entry;
 
         [Resolved]
-        private OsuColour colours { get; set; }
+        private OsuColour colours { get; set; } = null!;
 
         [Resolved]
-        private OverlayColourProvider colourProvider { get; set; }
+        private OverlayColourProvider colourProvider { get; set; } = null!;
+
+        [Resolved]
+        private ILinkHandler? linkHandler { get; set; }
 
         private FontUsage fontLarge;
         private FontUsage fontMedium;
@@ -88,11 +90,21 @@ namespace osu.Game.Overlays.Changelog
                 }
             };
 
-            title.AddText(entry.Title, t =>
+            if (string.IsNullOrEmpty(entry.Url))
             {
-                t.Font = fontLarge;
-                t.Colour = entryColour;
-            });
+                title.AddText(entry.Title, t =>
+                {
+                    t.Font = fontLarge;
+                    t.Colour = entryColour;
+                });
+            }
+            else
+            {
+                title.AddLink(entry.Title, () => linkHandler?.HandleLink(entry.Url), entry.Url, t =>
+                {
+                    t.Font = fontLarge;
+                });
+            }
 
             if (!string.IsNullOrEmpty(entry.Repository) && !string.IsNullOrEmpty(entry.GithubUrl))
                 addRepositoryReference(title, entryColour);

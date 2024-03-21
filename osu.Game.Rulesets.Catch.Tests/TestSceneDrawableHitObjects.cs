@@ -126,7 +126,7 @@ namespace osu.Game.Rulesets.Catch.Tests
             {
                 X = xCoords,
                 StartTime = playfieldTime + 1000,
-                Path = new SliderPath(PathType.Linear, new[]
+                Path = new SliderPath(PathType.LINEAR, new[]
                 {
                     Vector2.Zero,
                     new Vector2(0, 200)

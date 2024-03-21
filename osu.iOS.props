@@ -2,12 +2,19 @@
   <PropertyGroup>
     <CodesignKey>iPhone Developer</CodesignKey>
     <NullabilityInfoContextSupport>true</NullabilityInfoContextSupport>
-    <!-- Workaround for an upstream issue which Realm suffers from (https://github.com/dotnet/runtime/issues/69410). -->
-    <UseInterpreter>true</UseInterpreter>
     <!-- MT7091 occurs when referencing a .framework bundle that consists of a static library.
          It only warns about not copying the library to the app bundle to save space,
          so there's nothing to be worried about. -->
     <NoWarn>$(NoWarn);MT7091</NoWarn>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)' == 'Debug'">
+    <!-- On debug configurations, we use Mono interpreter for faster compilation. -->
+    <UseInterpreter>true</UseInterpreter>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)' == 'Release'">
+    <!-- On release configurations, we use AOT compiler for optimal performance, along with Mono Interpreter as a fallback for libraries such as AutoMapper. -->
+    <UseInterpreter>false</UseInterpreter>
+    <MtouchInterpreter>-all</MtouchInterpreter>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Platform)' == 'iPhone'">
     <RuntimeIdentifier>ios-arm64</RuntimeIdentifier>
@@ -16,6 +23,6 @@
     <RuntimeIdentifier>iossimulator-x64</RuntimeIdentifier>
   </PropertyGroup>
   <ItemGroup>
-    <PackageReference Include="ppy.osu.Framework.iOS" Version="2023.620.0" />
+    <PackageReference Include="ppy.osu.Framework.iOS" Version="2024.306.0" />
   </ItemGroup>
 </Project>

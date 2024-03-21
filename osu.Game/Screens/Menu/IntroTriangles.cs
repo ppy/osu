@@ -36,7 +36,6 @@ namespace osu.Game.Screens.Menu
 
         private Sample welcome;
 
-        private DecoupleableInterpolatingFramedClock decoupledClock;
         private TrianglesIntroSequence intro;
 
         public IntroTriangles([CanBeNull] Func<MainMenu> createNextScreen = null)
@@ -59,18 +58,12 @@ namespace osu.Game.Screens.Menu
             {
                 PrepareMenuLoad();
 
-                decoupledClock = new DecoupleableInterpolatingFramedClock
-                {
-                    IsCoupled = false
-                };
-
-                if (UsingThemedIntro)
-                    decoupledClock.ChangeSource(Track);
+                var decouplingClock = new DecouplingFramedClock(UsingThemedIntro ? Track : null);
 
                 LoadComponentAsync(intro = new TrianglesIntroSequence(logo, () => FadeInBackground())
                 {
                     RelativeSizeAxes = Axes.Both,
-                    Clock = decoupledClock,
+                    Clock = new InterpolatingFramedClock(decouplingClock),
                     LoadMenu = LoadMenu
                 }, _ =>
                 {
@@ -94,7 +87,7 @@ namespace osu.Game.Screens.Menu
                         StartTrack();
 
                     // no-op for the case of themed intro, no harm in calling for both scenarios as a safety measure.
-                    decoupledClock.Start();
+                    decouplingClock.Start();
                 });
             }
         }

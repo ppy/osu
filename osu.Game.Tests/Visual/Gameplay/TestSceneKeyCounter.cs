@@ -1,11 +1,11 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
 using System.Linq;
 using NUnit.Framework;
+using osu.Framework.Allocation;
 using osu.Framework.Graphics;
+using osu.Framework.Graphics.Containers;
 using osu.Framework.Utils;
 using osu.Game.Screens.Play;
 using osu.Game.Screens.Play.HUD;
@@ -17,65 +17,122 @@ namespace osu.Game.Tests.Visual.Gameplay
     [TestFixture]
     public partial class TestSceneKeyCounter : OsuManualInputManagerTestScene
     {
+        [Cached]
+        private readonly InputCountController controller;
+
         public TestSceneKeyCounter()
         {
-            KeyCounterDisplay defaultDisplay = new DefaultKeyCounterDisplay
+            Children = new Drawable[]
             {
-                Origin = Anchor.Centre,
-                Anchor = Anchor.Centre,
-                Position = new Vector2(0, 72.7f)
+                controller = new InputCountController(),
+                new FillFlowContainer
+                {
+                    Anchor = Anchor.Centre,
+                    Origin = Anchor.Centre,
+                    RelativeSizeAxes = Axes.Both,
+                    Direction = FillDirection.Vertical,
+                    Spacing = new Vector2(20),
+                    Children = new Drawable[]
+                    {
+                        new DefaultKeyCounterDisplay
+                        {
+                            Origin = Anchor.Centre,
+                            Anchor = Anchor.Centre,
+                        },
+                        new DefaultKeyCounterDisplay
+                        {
+                            Origin = Anchor.Centre,
+                            Anchor = Anchor.Centre,
+                            Scale = new Vector2(1, -1)
+                        },
+                        new ArgonKeyCounterDisplay
+                        {
+                            Origin = Anchor.Centre,
+                            Anchor = Anchor.Centre,
+                        },
+                        new ArgonKeyCounterDisplay
+                        {
+                            Origin = Anchor.Centre,
+                            Anchor = Anchor.Centre,
+                            Scale = new Vector2(1, -1)
+                        },
+                        new FillFlowContainer
+                        {
+                            AutoSizeAxes = Axes.Both,
+                            Direction = FillDirection.Horizontal,
+                            Origin = Anchor.Centre,
+                            Anchor = Anchor.Centre,
+                            Spacing = new Vector2(20),
+                            Children = new Drawable[]
+                            {
+                                new DefaultKeyCounterDisplay
+                                {
+                                    Origin = Anchor.Centre,
+                                    Anchor = Anchor.Centre,
+                                    Rotation = -90,
+                                },
+                                new DefaultKeyCounterDisplay
+                                {
+                                    Origin = Anchor.Centre,
+                                    Anchor = Anchor.Centre,
+                                    Rotation = 90,
+                                },
+                                new ArgonKeyCounterDisplay
+                                {
+                                    Origin = Anchor.Centre,
+                                    Anchor = Anchor.Centre,
+                                    Rotation = -90,
+                                },
+                                new ArgonKeyCounterDisplay
+                                {
+                                    Origin = Anchor.Centre,
+                                    Anchor = Anchor.Centre,
+                                    Rotation = 90,
+                                },
+                            }
+                        },
+                    }
+                }
             };
 
-            KeyCounterDisplay argonDisplay = new ArgonKeyCounterDisplay
-            {
-                Origin = Anchor.Centre,
-                Anchor = Anchor.Centre,
-                Position = new Vector2(0, -72.7f)
-            };
-
-            defaultDisplay.AddRange(new InputTrigger[]
+            var inputTriggers = new InputTrigger[]
             {
                 new KeyCounterKeyboardTrigger(Key.X),
                 new KeyCounterKeyboardTrigger(Key.X),
                 new KeyCounterMouseTrigger(MouseButton.Left),
                 new KeyCounterMouseTrigger(MouseButton.Right),
-            });
+            };
 
-            argonDisplay.AddRange(new InputTrigger[]
-            {
-                new KeyCounterKeyboardTrigger(Key.X),
-                new KeyCounterKeyboardTrigger(Key.X),
-                new KeyCounterMouseTrigger(MouseButton.Left),
-                new KeyCounterMouseTrigger(MouseButton.Right),
-            });
-
-            var testCounter = (DefaultKeyCounter)defaultDisplay.Counters.First();
+            AddRange(inputTriggers);
+            controller.AddRange(inputTriggers);
 
             AddStep("Add random", () =>
             {
                 Key key = (Key)((int)Key.A + RNG.Next(26));
-                defaultDisplay.Add(new KeyCounterKeyboardTrigger(key));
-                argonDisplay.Add(new KeyCounterKeyboardTrigger(key));
+                var trigger = new KeyCounterKeyboardTrigger(key);
+                Add(trigger);
+                controller.Add(trigger);
             });
 
-            Key testKey = ((KeyCounterKeyboardTrigger)defaultDisplay.Counters.First().Trigger).Key;
+            InputTrigger testTrigger = controller.Triggers.First();
+            Key testKey = ((KeyCounterKeyboardTrigger)testTrigger).Key;
 
             addPressKeyStep();
-            AddAssert($"Check {testKey} counter after keypress", () => testCounter.CountPresses.Value == 1);
+            AddAssert($"Check {testKey} counter after keypress", () => testTrigger.ActivationCount.Value == 1);
             addPressKeyStep();
-            AddAssert($"Check {testKey} counter after keypress", () => testCounter.CountPresses.Value == 2);
-            AddStep("Disable counting", () =>
+            AddAssert($"Check {testKey} counter after keypress", () => testTrigger.ActivationCount.Value == 2);
+            AddStep("Disable counting", () => controller.IsCounting.Value = false);
+            addPressKeyStep();
+            AddAssert($"Check {testKey} count has not changed", () => testTrigger.ActivationCount.Value == 2);
+            AddStep("Enable counting", () => controller.IsCounting.Value = true);
+            addPressKeyStep(100);
+            addPressKeyStep(1000);
+
+            void addPressKeyStep(int repeat = 1) => AddStep($"Press {testKey} key {repeat} times", () =>
             {
-                argonDisplay.IsCounting.Value = false;
-                defaultDisplay.IsCounting.Value = false;
+                for (int i = 0; i < repeat; i++)
+                    InputManager.Key(testKey);
             });
-            addPressKeyStep();
-            AddAssert($"Check {testKey} count has not changed", () => testCounter.CountPresses.Value == 2);
-
-            Add(defaultDisplay);
-            Add(argonDisplay);
-
-            void addPressKeyStep() => AddStep($"Press {testKey} key", () => InputManager.Key(testKey));
         }
     }
 }

@@ -13,7 +13,7 @@ namespace osu.Game.Scoring
         /// <summary>
         /// A user-presentable display title representing this score.
         /// </summary>
-        public static string GetDisplayTitle(this IScoreInfo scoreInfo) => $"{scoreInfo.User.Username} playing {scoreInfo.Beatmap.GetDisplayTitle()}";
+        public static string GetDisplayTitle(this IScoreInfo scoreInfo) => $"{scoreInfo.User.Username} playing {scoreInfo.Beatmap?.GetDisplayTitle() ?? "unknown"}";
 
         /// <summary>
         /// Orders an array of <see cref="ScoreInfo"/>s by total score.

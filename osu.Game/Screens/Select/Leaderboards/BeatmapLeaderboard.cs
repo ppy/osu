@@ -193,7 +193,7 @@ namespace osu.Game.Screens.Select.Leaderboards
                                           + $" AND {nameof(ScoreInfo.DeletePending)} == false"
                     , beatmapInfo.ID, ruleset.Value.ShortName), localScoresChanged);
 
-            void localScoresChanged(IRealmCollection<ScoreInfo> sender, ChangeSet? changes, Exception exception)
+            void localScoresChanged(IRealmCollection<ScoreInfo> sender, ChangeSet? changes)
             {
                 if (cancellationToken.IsCancellationRequested)
                     return;

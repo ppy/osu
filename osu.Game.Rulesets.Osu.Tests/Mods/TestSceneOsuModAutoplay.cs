@@ -51,8 +51,9 @@ namespace osu.Game.Rulesets.Osu.Tests.Mods
                 FinalRate = { Value = 1.3 }
             });
 
-        [Test]
-        public void TestPerfectScoreOnShortSliderWithRepeat()
+        [TestCase(6.25f)]
+        [TestCase(20)]
+        public void TestPerfectScoreOnShortSliderWithRepeat(float pathLength)
         {
             AddStep("set score to standardised", () => LocalConfig.SetValue(OsuSetting.ScoreDisplayMode, ScoringMode.Standardised));
 
@@ -70,10 +71,10 @@ namespace osu.Game.Rulesets.Osu.Tests.Mods
                             Path = new SliderPath(new[]
                             {
                                 new PathControlPoint(),
-                                new PathControlPoint(new Vector2(0, 6.25f))
+                                new PathControlPoint(new Vector2(0, pathLength))
                             }),
                             RepeatCount = 1,
-                            SliderVelocity = 10
+                            SliderVelocityMultiplier = 10
                         }
                     }
                 },

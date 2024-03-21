@@ -119,11 +119,11 @@ namespace osu.Game.Graphics.Containers
                 headerBackgroundContainer.Clear();
                 headerBackground = value;
 
-                if (value == null) return;
-
-                headerBackgroundContainer.Add(headerBackground);
-
-                lastKnownScroll = null;
+                if (headerBackground != null)
+                {
+                    headerBackgroundContainer.Add(headerBackground);
+                    lastKnownScroll = null;
+                }
             }
         }
 

@@ -30,7 +30,7 @@ namespace osu.Game.Skinning.Components
         public Bindable<BeatmapAttribute> Attribute { get; } = new Bindable<BeatmapAttribute>(BeatmapAttribute.StarRating);
 
         [SettingSource(typeof(BeatmapAttributeTextStrings), nameof(BeatmapAttributeTextStrings.Template), nameof(BeatmapAttributeTextStrings.TemplateDescription))]
-        public Bindable<string> Template { get; set; } = new Bindable<string>("{Label}: {Value}");
+        public Bindable<string> Template { get; } = new Bindable<string>("{Label}: {Value}");
 
         [Resolved]
         private IBindable<WorkingBeatmap> beatmap { get; set; } = null!;

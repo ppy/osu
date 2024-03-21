@@ -5,6 +5,7 @@
 
 using System;
 using System.Linq;
+using JetBrains.Annotations;
 using osu.Framework;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
@@ -32,7 +33,7 @@ namespace osu.Game.Rulesets.Edit
         /// </summary>
         public event Action<SelectionBlueprint<T>> Deselected;
 
-        public override bool HandlePositionalInput => ShouldBeAlive;
+        public override bool HandlePositionalInput => IsSelectable;
         public override bool RemoveWhenNotAlive => false;
 
         protected SelectionBlueprint(T item)
@@ -51,6 +52,7 @@ namespace osu.Game.Rulesets.Edit
 
         private SelectionState state;
 
+        [CanBeNull]
         public event Action<SelectionState> StateChanged;
 
         public SelectionState State
@@ -124,6 +126,11 @@ namespace osu.Game.Rulesets.Edit
         /// The <see cref="MenuItem"/>s to be displayed in the context menu for this <see cref="HitObjectSelectionBlueprint"/>.
         /// </summary>
         public virtual MenuItem[] ContextMenuItems => Array.Empty<MenuItem>();
+
+        /// <summary>
+        /// Whether the <see cref="SelectionBlueprint{T}"/> can be currently selected via a click or a drag box.
+        /// </summary>
+        public virtual bool IsSelectable => ShouldBeAlive && IsPresent;
 
         /// <summary>
         /// The screen-space main point that causes this <see cref="HitObjectSelectionBlueprint"/> to be selected via a drag.

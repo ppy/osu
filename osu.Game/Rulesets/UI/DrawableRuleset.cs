@@ -71,9 +71,28 @@ namespace osu.Game.Rulesets.UI
 
         private readonly AudioContainer audioContainer = new AudioContainer { RelativeSizeAxes = Axes.Both };
 
+        /// <summary>
+        /// A container which encapsulates the <see cref="Playfield"/> and provides any adjustments to
+        /// ensure correct scale and position.
+        /// </summary>
+        public virtual PlayfieldAdjustmentContainer PlayfieldAdjustmentContainer { get; private set; }
+
         public override Container FrameStableComponents { get; } = new Container { RelativeSizeAxes = Axes.Both };
 
         public override IFrameStableClock FrameStableClock => frameStabilityContainer;
+
+        private bool allowBackwardsSeeks;
+
+        public override bool AllowBackwardsSeeks
+        {
+            get => allowBackwardsSeeks;
+            set
+            {
+                allowBackwardsSeeks = value;
+                if (frameStabilityContainer != null)
+                    frameStabilityContainer.AllowBackwardsSeeks = value;
+            }
+        }
 
         private bool frameStablePlayback = true;
 
@@ -116,8 +135,7 @@ namespace osu.Game.Rulesets.UI
         protected DrawableRuleset(Ruleset ruleset, IBeatmap beatmap, IReadOnlyList<Mod> mods = null)
             : base(ruleset)
         {
-            if (beatmap == null)
-                throw new ArgumentNullException(nameof(beatmap), "Beatmap cannot be null.");
+            ArgumentNullException.ThrowIfNull(beatmap);
 
             if (!(beatmap is Beatmap<TObject> tBeatmap))
                 throw new ArgumentException($"{GetType()} expected the beatmap to contain hitobjects of type {typeof(TObject)}.", nameof(beatmap));
@@ -172,13 +190,14 @@ namespace osu.Game.Rulesets.UI
             InternalChild = frameStabilityContainer = new FrameStabilityContainer(GameplayStartTime)
             {
                 FrameStablePlayback = FrameStablePlayback,
+                AllowBackwardsSeeks = AllowBackwardsSeeks,
                 Children = new Drawable[]
                 {
                     FrameStableComponents,
                     audioContainer.WithChild(KeyBindingInputManager
                         .WithChildren(new Drawable[]
                         {
-                            CreatePlayfieldAdjustmentContainer()
+                            PlayfieldAdjustmentContainer = CreatePlayfieldAdjustmentContainer()
                                 .WithChild(Playfield),
                             Overlays
                         })),
@@ -221,7 +240,7 @@ namespace osu.Game.Rulesets.UI
 
         public override void RequestResume(Action continueResume)
         {
-            if (ResumeOverlay != null && UseResumeOverlay && (Cursor == null || (Cursor.LastFrameState == Visibility.Visible && Contains(Cursor.ActiveCursor.ScreenSpaceDrawQuad.Centre))))
+            if (ResumeOverlay != null && UseResumeOverlay)
             {
                 ResumeOverlay.GameplayCursor = Cursor;
                 ResumeOverlay.ResumeAction = continueResume;
@@ -329,11 +348,11 @@ namespace osu.Game.Rulesets.UI
         /// <returns>The representing <see cref="DrawableHitObject{TObject}"/>.</returns>
         public abstract DrawableHitObject<TObject> CreateDrawableRepresentation(TObject h);
 
-        public void Attach(KeyCounterDisplay keyCounter) =>
-            (KeyBindingInputManager as ICanAttachHUDPieces)?.Attach(keyCounter);
+        public void Attach(InputCountController inputCountController) =>
+            (KeyBindingInputManager as ICanAttachHUDPieces)?.Attach(inputCountController);
 
-        public void Attach(ClicksPerSecondCalculator calculator) =>
-            (KeyBindingInputManager as ICanAttachHUDPieces)?.Attach(calculator);
+        public void Attach(ClicksPerSecondController controller) =>
+            (KeyBindingInputManager as ICanAttachHUDPieces)?.Attach(controller);
 
         /// <summary>
         /// Creates a key conversion input manager. An exception will be thrown if a valid <see cref="RulesetInputManager{T}"/> is not returned.
@@ -456,6 +475,12 @@ namespace osu.Game.Rulesets.UI
         /// Whether to enable frame-stable playback.
         /// </summary>
         internal abstract bool FrameStablePlayback { get; set; }
+
+        /// <summary>
+        /// When a replay is not attached, we usually block any backwards seeks.
+        /// This will bypass the check. Should only be used for tests.
+        /// </summary>
+        public abstract bool AllowBackwardsSeeks { get; set; }
 
         /// <summary>
         /// The mods which are to be applied.

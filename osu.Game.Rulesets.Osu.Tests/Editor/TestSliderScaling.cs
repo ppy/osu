@@ -43,7 +43,7 @@ namespace osu.Game.Rulesets.Osu.Tests.Editor
 
                 PathControlPoint[] points =
                 {
-                    new PathControlPoint(new Vector2(0), PathType.Linear),
+                    new PathControlPoint(new Vector2(0), PathType.LINEAR),
                     new PathControlPoint(new Vector2(100, 0)),
                 };
 

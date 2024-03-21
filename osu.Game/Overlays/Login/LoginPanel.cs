@@ -1,14 +1,13 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
 using System;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Extensions.LocalisationExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
+using osu.Framework.Graphics.Primitives;
 using osu.Framework.Input.Events;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
@@ -16,33 +15,33 @@ using osu.Game.Graphics.Sprites;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Localisation;
 using osu.Game.Online.API;
+using osu.Game.Overlays.Settings;
 using osu.Game.Users;
 using osuTK;
-using RectangleF = osu.Framework.Graphics.Primitives.RectangleF;
-using Container = osu.Framework.Graphics.Containers.Container;
 
 namespace osu.Game.Overlays.Login
 {
-    public partial class LoginPanel : FillFlowContainer
+    public partial class LoginPanel : Container
     {
         private bool bounding = true;
-        private LoginForm form;
+
+        private Drawable? form;
 
         [Resolved]
-        private OsuColour colours { get; set; }
+        private OsuColour colours { get; set; } = null!;
 
-        private UserGridPanel panel;
-        private UserDropdown dropdown;
+        private UserDropdown dropdown = null!;
 
         /// <summary>
         /// Called to request a hide of a parent displaying this container.
         /// </summary>
-        public Action RequestHide;
+        public Action? RequestHide;
 
         private readonly IBindable<APIState> apiState = new Bindable<APIState>();
+        private readonly Bindable<UserStatus?> userStatus = new Bindable<UserStatus?>();
 
         [Resolved]
-        private IAPIProvider api { get; set; }
+        private IAPIProvider api { get; set; } = null!;
 
         public override RectangleF BoundingBox => bounding ? base.BoundingBox : RectangleF.Empty;
 
@@ -60,8 +59,6 @@ namespace osu.Game.Overlays.Login
         {
             RelativeSizeAxes = Axes.X;
             AutoSizeAxes = Axes.Y;
-            Direction = FillDirection.Vertical;
-            Spacing = new Vector2(0f, 5f);
         }
 
         [BackgroundDependencyLoader]
@@ -78,41 +75,43 @@ namespace osu.Game.Overlays.Login
             switch (state.NewValue)
             {
                 case APIState.Offline:
-                    Children = new Drawable[]
+                    Child = form = new LoginForm
                     {
-                        new OsuSpriteText
-                        {
-                            Text = LoginPanelStrings.Account.ToUpper(),
-                            Margin = new MarginPadding { Bottom = 5 },
-                            Font = OsuFont.GetFont(weight: FontWeight.Bold),
-                        },
-                        form = new LoginForm
-                        {
-                            RequestHide = RequestHide
-                        }
+                        RequestHide = RequestHide
                     };
+                    break;
+
+                case APIState.RequiresSecondFactorAuth:
+                    Child = form = new SecondFactorAuthForm();
                     break;
 
                 case APIState.Failing:
                 case APIState.Connecting:
                     LinkFlowContainer linkFlow;
 
-                    Children = new Drawable[]
+                    Child = new FillFlowContainer
                     {
-                        new LoadingSpinner
+                        RelativeSizeAxes = Axes.X,
+                        AutoSizeAxes = Axes.Y,
+                        Padding = new MarginPadding { Horizontal = SettingsPanel.CONTENT_MARGINS },
+                        Direction = FillDirection.Vertical,
+                        Spacing = new Vector2(0f, SettingsSection.ITEM_SPACING),
+                        Children = new Drawable[]
                         {
-                            State = { Value = Visibility.Visible },
-                            Anchor = Anchor.TopCentre,
-                            Origin = Anchor.TopCentre,
-                        },
-                        linkFlow = new LinkFlowContainer
-                        {
-                            Anchor = Anchor.TopCentre,
-                            Origin = Anchor.TopCentre,
-                            TextAnchor = Anchor.TopCentre,
-                            AutoSizeAxes = Axes.Both,
-                            Text = state.NewValue == APIState.Failing ? ToolbarStrings.AttemptingToReconnect : ToolbarStrings.Connecting,
-                            Margin = new MarginPadding { Top = 10, Bottom = 10 },
+                            new LoadingSpinner
+                            {
+                                State = { Value = Visibility.Visible },
+                                Anchor = Anchor.TopCentre,
+                                Origin = Anchor.TopCentre,
+                            },
+                            linkFlow = new LinkFlowContainer
+                            {
+                                Anchor = Anchor.TopCentre,
+                                Origin = Anchor.TopCentre,
+                                TextAnchor = Anchor.TopCentre,
+                                AutoSizeAxes = Axes.Both,
+                                Text = state.NewValue == APIState.Failing ? ToolbarStrings.AttemptingToReconnect : ToolbarStrings.Connecting,
+                            },
                         },
                     };
 
@@ -120,62 +119,50 @@ namespace osu.Game.Overlays.Login
                     break;
 
                 case APIState.Online:
-                    Children = new Drawable[]
+                    Child = new FillFlowContainer
                     {
-                        new FillFlowContainer
+                        RelativeSizeAxes = Axes.X,
+                        AutoSizeAxes = Axes.Y,
+                        Padding = new MarginPadding { Horizontal = SettingsPanel.CONTENT_MARGINS },
+                        Direction = FillDirection.Vertical,
+                        Spacing = new Vector2(0f, SettingsSection.ITEM_SPACING),
+                        Children = new Drawable[]
                         {
-                            RelativeSizeAxes = Axes.X,
-                            AutoSizeAxes = Axes.Y,
-                            Padding = new MarginPadding { Left = 20, Right = 20 },
-                            Direction = FillDirection.Vertical,
-                            Spacing = new Vector2(0f, 10f),
-                            Children = new Drawable[]
+                            new OsuSpriteText
                             {
-                                new Container
-                                {
-                                    RelativeSizeAxes = Axes.X,
-                                    AutoSizeAxes = Axes.Y,
-                                    Children = new[]
-                                    {
-                                        new OsuSpriteText
-                                        {
-                                            Anchor = Anchor.Centre,
-                                            Origin = Anchor.Centre,
-                                            Text = LoginPanelStrings.SignedIn,
-                                            Font = OsuFont.GetFont(size: 18, weight: FontWeight.Bold),
-                                            Margin = new MarginPadding { Top = 5, Bottom = 5 },
-                                        },
-                                    },
-                                },
-                                panel = new UserGridPanel(api.LocalUser.Value)
-                                {
-                                    RelativeSizeAxes = Axes.X,
-                                    Action = RequestHide
-                                },
-                                dropdown = new UserDropdown { RelativeSizeAxes = Axes.X },
+                                Anchor = Anchor.TopCentre,
+                                Origin = Anchor.TopCentre,
+                                Text = LoginPanelStrings.SignedIn,
+                                Font = OsuFont.GetFont(size: 18, weight: FontWeight.Bold),
                             },
+                            new UserRankPanel(api.LocalUser.Value)
+                            {
+                                RelativeSizeAxes = Axes.X,
+                                Action = RequestHide
+                            },
+                            dropdown = new UserDropdown { RelativeSizeAxes = Axes.X },
                         },
                     };
 
-                    panel.Status.BindTo(api.LocalUser.Value.Status);
-                    panel.Activity.BindTo(api.LocalUser.Value.Activity);
+                    userStatus.BindTo(api.LocalUser.Value.Status);
+                    userStatus.BindValueChanged(e => updateDropdownCurrent(e.NewValue), true);
 
                     dropdown.Current.BindValueChanged(action =>
                     {
                         switch (action.NewValue)
                         {
                             case UserAction.Online:
-                                api.LocalUser.Value.Status.Value = new UserStatusOnline();
+                                api.LocalUser.Value.Status.Value = UserStatus.Online;
                                 dropdown.StatusColour = colours.Green;
                                 break;
 
                             case UserAction.DoNotDisturb:
-                                api.LocalUser.Value.Status.Value = new UserStatusDoNotDisturb();
+                                api.LocalUser.Value.Status.Value = UserStatus.DoNotDisturb;
                                 dropdown.StatusColour = colours.Red;
                                 break;
 
                             case UserAction.AppearOffline:
-                                api.LocalUser.Value.Status.Value = new UserStatusOffline();
+                                api.LocalUser.Value.Status.Value = UserStatus.Offline;
                                 dropdown.StatusColour = colours.Gray7;
                                 break;
 
@@ -190,6 +177,24 @@ namespace osu.Game.Overlays.Login
             if (form != null)
                 ScheduleAfterChildren(() => GetContainingInputManager()?.ChangeFocus(form));
         });
+
+        private void updateDropdownCurrent(UserStatus? status)
+        {
+            switch (status)
+            {
+                case UserStatus.Online:
+                    dropdown.Current.Value = UserAction.Online;
+                    break;
+
+                case UserStatus.DoNotDisturb:
+                    dropdown.Current.Value = UserAction.DoNotDisturb;
+                    break;
+
+                case UserStatus.Offline:
+                    dropdown.Current.Value = UserAction.AppearOffline;
+                    break;
+            }
+        }
 
         public override bool AcceptsFocus => true;
 

@@ -39,7 +39,8 @@ namespace osu.Game.Online
             var scoreInfo = new ScoreInfo
             {
                 ID = TrackedItem.ID,
-                OnlineID = TrackedItem.OnlineID
+                OnlineID = TrackedItem.OnlineID,
+                LegacyOnlineID = TrackedItem.LegacyOnlineID
             };
 
             Downloader.DownloadBegan += downloadBegan;
@@ -47,8 +48,9 @@ namespace osu.Game.Online
 
             realmSubscription = realm.RegisterForNotifications(r => r.All<ScoreInfo>().Where(s =>
                 ((s.OnlineID > 0 && s.OnlineID == TrackedItem.OnlineID)
+                 || (s.LegacyOnlineID > 0 && s.LegacyOnlineID == TrackedItem.LegacyOnlineID)
                  || (!string.IsNullOrEmpty(s.Hash) && s.Hash == TrackedItem.Hash))
-                && !s.DeletePending), (items, _, _) =>
+                && !s.DeletePending), (items, _) =>
             {
                 if (items.Any())
                     Schedule(() => UpdateState(DownloadState.LocallyAvailable));

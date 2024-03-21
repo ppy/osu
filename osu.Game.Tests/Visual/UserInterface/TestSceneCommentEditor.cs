@@ -11,6 +11,7 @@ using osu.Framework.Graphics.UserInterface;
 using osu.Framework.Localisation;
 using osu.Framework.Testing;
 using osu.Game.Graphics.UserInterface;
+using osu.Game.Online.API;
 using osu.Game.Overlays;
 using osu.Game.Overlays.Comments;
 using osuTK;
@@ -25,6 +26,7 @@ namespace osu.Game.Tests.Visual.UserInterface
 
         private TestCommentEditor commentEditor = null!;
         private TestCancellableCommentEditor cancellableCommentEditor = null!;
+        private DummyAPIAccess dummyAPI => (DummyAPIAccess)API;
 
         [SetUp]
         public void SetUp() => Schedule(() =>
@@ -97,11 +99,46 @@ namespace osu.Game.Tests.Visual.UserInterface
         }
 
         [Test]
+        public void TestLoggingInAndOut()
+        {
+            void assertLoggedInState()
+            {
+                AddAssert("commit button visible", () => commentEditor.ButtonsContainer[0].Alpha == 1);
+                AddAssert("login button hidden", () => commentEditor.ButtonsContainer[1].Alpha == 0);
+                AddAssert("text box editable", () => !commentEditor.TextBox.ReadOnly);
+            }
+
+            void assertLoggedOutState()
+            {
+                AddAssert("commit button hidden", () => commentEditor.ButtonsContainer[0].Alpha == 0);
+                AddAssert("login button visible", () => commentEditor.ButtonsContainer[1].Alpha == 1);
+                AddAssert("text box readonly", () => commentEditor.TextBox.ReadOnly);
+            }
+
+            // there's also the case of starting logged out, but more annoying to test.
+
+            // starting logged in
+            assertLoggedInState();
+
+            // moving from logged in -> logged out
+            AddStep("log out", () => dummyAPI.Logout());
+            assertLoggedOutState();
+
+            // moving from logged out -> logged in
+            AddStep("log back in", () =>
+            {
+                dummyAPI.Login("username", "password");
+                dummyAPI.AuthenticateSecondFactor("abcdefgh");
+            });
+            assertLoggedInState();
+        }
+
+        [Test]
         public void TestCancelAction()
         {
             AddStep("click cancel button", () =>
             {
-                InputManager.MoveMouseTo(cancellableCommentEditor.ButtonsContainer[1]);
+                InputManager.MoveMouseTo(cancellableCommentEditor.ButtonsContainer[2]);
                 InputManager.Click(MouseButton.Left);
             });
 
@@ -112,6 +149,7 @@ namespace osu.Game.Tests.Visual.UserInterface
         {
             public new Bindable<string> Current => base.Current;
             public new FillFlowContainer ButtonsContainer => base.ButtonsContainer;
+            public new TextBox TextBox => base.TextBox;
 
             public string CommittedText { get; private set; } = string.Empty;
 
@@ -125,8 +163,12 @@ namespace osu.Game.Tests.Visual.UserInterface
             }
 
             protected override LocalisableString FooterText => @"Footer text. And it is pretty long. Cool.";
-            protected override LocalisableString CommitButtonText => @"Commit";
-            protected override LocalisableString TextBoxPlaceholder => @"This text box is empty";
+
+            protected override LocalisableString GetButtonText(bool isLoggedIn) =>
+                isLoggedIn ? @"Commit" : "You're logged out!";
+
+            protected override LocalisableString GetPlaceholderText(bool isLoggedIn) =>
+                isLoggedIn ? @"This text box is empty" : "Still empty, but now you can't type in it.";
         }
 
         private partial class TestCancellableCommentEditor : CancellableCommentEditor
@@ -146,8 +188,8 @@ namespace osu.Game.Tests.Visual.UserInterface
             {
             }
 
-            protected override LocalisableString CommitButtonText => @"Save";
-            protected override LocalisableString TextBoxPlaceholder => @"Multiline textboxes soon";
+            protected override LocalisableString GetButtonText(bool isLoggedIn) => @"Save";
+            protected override LocalisableString GetPlaceholderText(bool isLoggedIn) => @"Multiline textboxes soon";
         }
     }
 }

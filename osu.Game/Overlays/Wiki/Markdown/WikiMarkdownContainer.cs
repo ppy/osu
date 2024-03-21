@@ -1,7 +1,5 @@
-// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
-
-#nullable disable
 
 using System.Linq;
 using Markdig.Extensions.CustomContainers;
@@ -9,7 +7,6 @@ using Markdig.Extensions.Yaml;
 using Markdig.Syntax;
 using Markdig.Syntax.Inlines;
 using osu.Framework.Graphics.Containers;
-using osu.Framework.Graphics.Containers.Markdown;
 using osu.Game.Graphics.Containers.Markdown;
 
 namespace osu.Game.Overlays.Wiki.Markdown
@@ -55,7 +52,7 @@ namespace osu.Game.Overlays.Wiki.Markdown
             base.AddMarkdownComponent(markdownObject, container, level);
         }
 
-        public override MarkdownTextFlowContainer CreateTextFlow() => new WikiMarkdownTextFlowContainer();
+        public override OsuMarkdownTextFlowContainer CreateTextFlow() => new WikiMarkdownTextFlowContainer();
 
         private partial class WikiMarkdownTextFlowContainer : OsuMarkdownTextFlowContainer
         {

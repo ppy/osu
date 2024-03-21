@@ -1,8 +1,6 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
 using osuTK;
 using osuTK.Graphics;
 using osuTK.Input;
@@ -25,7 +23,7 @@ namespace osu.Game.Graphics.UserInterface
         protected override Drawable GetDrawableCharacter(char c) => new FallingDownContainer
         {
             AutoSizeAxes = Axes.Both,
-            Child = new PasswordMaskChar(CalculatedTextSize),
+            Child = new PasswordMaskChar(FontSize),
         };
 
         protected override bool AllowUniqueCharacterSamples => false;
@@ -39,7 +37,7 @@ namespace osu.Game.Graphics.UserInterface
         private readonly CapsWarning warning;
 
         [Resolved]
-        private GameHost host { get; set; }
+        private GameHost host { get; set; } = null!;
 
         public OsuPasswordTextBox()
         {

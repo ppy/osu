@@ -26,9 +26,6 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
     {
         protected override bool PauseOnFocusLost => false;
 
-        // Disallow fails in multiplayer for now.
-        protected override bool CheckModsAllowFailure() => false;
-
         protected override UserActivity InitialActivity => new UserActivity.InMultiplayerGame(Beatmap.Value.BeatmapInfo, Ruleset.Value);
 
         [Resolved]
@@ -55,6 +52,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
             {
                 AllowPause = false,
                 AllowRestart = false,
+                AllowFailAnimation = false,
                 AllowSkipping = room.AutoSkip.Value,
                 AutomaticallySkipIntro = room.AutoSkip.Value,
                 AlwaysShowLeaderboard = true,
@@ -68,6 +66,8 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
         {
             if (!LoadedBeatmapSuccessfully)
                 return;
+
+            ScoreProcessor.ApplyNewJudgementsWhenFailed = true;
 
             LoadComponentAsync(new GameplayChatDisplay(Room)
             {
@@ -148,6 +148,9 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
                 loadingDisplay.Show();
                 client.ChangeState(MultiplayerUserState.ReadyForGameplay);
             }
+
+            // This will pause the clock, pending the gameplay started callback from the server.
+            GameplayClockContainer.Reset();
         }
 
         private void failAndBail(string message = null)
@@ -197,7 +200,13 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
 
             return multiplayerLeaderboard.TeamScores.Count == 2
                 ? new MultiplayerTeamResultsScreen(score, Room.RoomID.Value.Value, PlaylistItem, multiplayerLeaderboard.TeamScores)
-                : new MultiplayerResultsScreen(score, Room.RoomID.Value.Value, PlaylistItem);
+                {
+                    ShowUserStatistics = true,
+                }
+                : new MultiplayerResultsScreen(score, Room.RoomID.Value.Value, PlaylistItem)
+                {
+                    ShowUserStatistics = true
+                };
         }
 
         protected override void Dispose(bool isDisposing)

@@ -1,7 +1,5 @@
-// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
-
-#nullable disable
 
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
@@ -49,6 +47,8 @@ namespace osu.Game.Graphics.UserInterface
         public void TakeFocus() => textBox.TakeFocus();
 
         public void KillFocus() => textBox.KillFocus();
+
+        public bool SelectAll() => textBox.SelectAll();
 
         public ShearedSearchTextBox()
         {
@@ -112,7 +112,7 @@ namespace osu.Game.Graphics.UserInterface
                 BackgroundFocused = colourProvider.Background4;
                 BackgroundUnfocused = colourProvider.Background4;
 
-                Placeholder.Font = OsuFont.GetFont(size: CalculatedTextSize, weight: FontWeight.SemiBold);
+                Placeholder.Font = OsuFont.GetFont(size: FontSize, weight: FontWeight.SemiBold);
                 PlaceholderText = CommonStrings.InputSearch;
 
                 CornerRadius = corner_radius;

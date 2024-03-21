@@ -73,6 +73,8 @@ namespace osu.Game.Screens.Edit.Components.Timelines.Summary.Parts
         {
             public MarkerVisualisation()
             {
+                const float box_height = 4;
+
                 Anchor = Anchor.CentreLeft;
                 Origin = Anchor.Centre;
                 RelativePositionAxes = Axes.X;
@@ -80,32 +82,46 @@ namespace osu.Game.Screens.Edit.Components.Timelines.Summary.Parts
                 AutoSizeAxes = Axes.X;
                 InternalChildren = new Drawable[]
                 {
+                    new Box
+                    {
+                        Anchor = Anchor.TopCentre,
+                        Origin = Anchor.TopCentre,
+                        Size = new Vector2(14, box_height),
+                    },
                     new Triangle
                     {
                         Anchor = Anchor.TopCentre,
                         Origin = Anchor.BottomCentre,
                         Scale = new Vector2(1, -1),
                         Size = new Vector2(10, 5),
+                        Y = box_height,
                     },
                     new Triangle
                     {
                         Anchor = Anchor.BottomCentre,
                         Origin = Anchor.BottomCentre,
-                        Size = new Vector2(10, 5)
+                        Size = new Vector2(10, 5),
+                        Y = -box_height,
+                    },
+                    new Box
+                    {
+                        Anchor = Anchor.BottomCentre,
+                        Origin = Anchor.BottomCentre,
+                        Size = new Vector2(14, box_height),
                     },
                     new Box
                     {
                         Anchor = Anchor.Centre,
                         Origin = Anchor.Centre,
                         RelativeSizeAxes = Axes.Y,
-                        Width = 2,
+                        Width = 1.4f,
                         EdgeSmoothness = new Vector2(1, 0)
                     }
                 };
             }
 
             [BackgroundDependencyLoader]
-            private void load(OsuColour colours) => Colour = colours.Red;
+            private void load(OsuColour colours) => Colour = colours.Red1;
         }
     }
 }

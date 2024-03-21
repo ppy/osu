@@ -37,7 +37,7 @@ namespace osu.Game.Screens.Ranking
                 if (State.Value == DownloadState.LocallyAvailable)
                     return ReplayAvailability.Local;
 
-                if (Score.Value?.HasReplay == true)
+                if (Score.Value?.HasOnlineReplay == true)
                     return ReplayAvailability.Online;
 
                 return ReplayAvailability.NotAvailable;
@@ -83,6 +83,10 @@ namespace osu.Game.Screens.Ranking
 
             Score.BindValueChanged(score =>
             {
+                // An export may be pending from the last score.
+                // Reset this to meet user expectations (a new score which has just been switched to shouldn't export)
+                State.ValueChanged -= exportWhenReady;
+
                 downloadTracker?.RemoveAndDisposeImmediately();
 
                 if (score.NewValue != null)
@@ -107,6 +111,9 @@ namespace osu.Game.Screens.Ranking
 
         public bool OnPressed(KeyBindingPressEvent<GlobalAction> e)
         {
+            if (e.Repeat)
+                return false;
+
             switch (e.Action)
             {
                 case GlobalAction.SaveReplay:
@@ -114,11 +121,17 @@ namespace osu.Game.Screens.Ranking
                     return true;
 
                 case GlobalAction.ExportReplay:
-                    State.BindValueChanged(exportWhenReady, true);
-
-                    // start the import via button
-                    if (State.Value != DownloadState.LocallyAvailable)
+                    if (State.Value == DownloadState.LocallyAvailable)
+                    {
+                        State.BindValueChanged(exportWhenReady, true);
+                    }
+                    else
+                    {
+                        // A download needs to be performed before we can export this replay.
                         button.TriggerClick();
+                        if (button.Enabled.Value)
+                            State.BindValueChanged(exportWhenReady, true);
+                    }
 
                     return true;
             }

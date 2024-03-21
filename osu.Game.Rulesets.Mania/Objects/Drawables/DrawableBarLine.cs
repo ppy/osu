@@ -1,9 +1,11 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using osu.Framework.Allocation;
+using osu.Framework.Bindables;
 using osu.Framework.Graphics;
-using osu.Framework.Graphics.Shapes;
-using osuTK;
+using osu.Game.Rulesets.Mania.Skinning.Default;
+using osu.Game.Skinning;
 
 namespace osu.Game.Rulesets.Mania.Objects.Drawables
 {
@@ -13,45 +15,41 @@ namespace osu.Game.Rulesets.Mania.Objects.Drawables
     /// </summary>
     public partial class DrawableBarLine : DrawableManiaHitObject<BarLine>
     {
+        public readonly Bindable<bool> Major = new Bindable<bool>();
+
+        public DrawableBarLine()
+            : this(null!)
+        {
+        }
+
         public DrawableBarLine(BarLine barLine)
             : base(barLine)
         {
             RelativeSizeAxes = Axes.X;
-            Height = barLine.Major ? 1.7f : 1.2f;
+        }
 
-            AddInternal(new Box
+        [BackgroundDependencyLoader]
+        private void load()
+        {
+            AddInternal(new SkinnableDrawable(new ManiaSkinComponentLookup(ManiaSkinComponents.BarLine), _ => new DefaultBarLine())
             {
-                Name = "Bar line",
-                Anchor = Anchor.BottomCentre,
-                Origin = Anchor.BottomCentre,
-                RelativeSizeAxes = Axes.Both,
-                Alpha = barLine.Major ? 0.5f : 0.2f
+                Anchor = Anchor.Centre,
+                Origin = Anchor.Centre,
             });
 
-            if (barLine.Major)
-            {
-                Vector2 size = new Vector2(22, 6);
-                const float line_offset = 4;
+            Major.BindValueChanged(major => Height = major.NewValue ? 1.7f : 1.2f, true);
+        }
 
-                AddInternal(new Circle
-                {
-                    Name = "Left line",
-                    Anchor = Anchor.CentreLeft,
-                    Origin = Anchor.CentreRight,
+        protected override void OnApply()
+        {
+            base.OnApply();
+            Major.BindTo(HitObject.MajorBindable);
+        }
 
-                    Size = size,
-                    X = -line_offset,
-                });
-
-                AddInternal(new Circle
-                {
-                    Name = "Right line",
-                    Anchor = Anchor.CentreRight,
-                    Origin = Anchor.CentreLeft,
-                    Size = size,
-                    X = line_offset,
-                });
-            }
+        protected override void OnFree()
+        {
+            base.OnFree();
+            Major.UnbindFrom(HitObject.MajorBindable);
         }
 
         protected override void UpdateStartTimeStateTransforms() => this.FadeOut(150);

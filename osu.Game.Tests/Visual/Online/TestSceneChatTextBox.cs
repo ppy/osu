@@ -3,11 +3,13 @@
 
 #nullable disable
 
+using System.Linq;
 using NUnit.Framework;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
+using osu.Framework.Testing;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Online.API.Requests.Responses;
@@ -18,7 +20,7 @@ using osu.Game.Overlays.Chat;
 namespace osu.Game.Tests.Visual.Online
 {
     [TestFixture]
-    public partial class TestSceneChatTextBox : OsuTestScene
+    public partial class TestSceneChatTextBox : OsuManualInputManagerTestScene
     {
         [Cached]
         private readonly OverlayColourProvider colourProvider = new OverlayColourProvider(OverlayColourScheme.Pink);
@@ -29,6 +31,8 @@ namespace osu.Game.Tests.Visual.Online
         private OsuSpriteText commitText;
         private OsuSpriteText searchText;
         private ChatTextBar bar;
+
+        private ChatTextBox textBox => bar.ChildrenOfType<ChatTextBox>().Single();
 
         [SetUp]
         public void SetUp()
@@ -113,6 +117,36 @@ namespace osu.Game.Tests.Visual.Online
 
             AddStep("Chat Mode Channel", () => bar.ShowSearch.Value = false);
             AddStep("Chat Mode Search", () => bar.ShowSearch.Value = true);
+        }
+
+        [Test]
+        public void TestLengthLimit()
+        {
+            var firstChannel = new Channel
+            {
+                Name = "#test1",
+                Type = ChannelType.Public,
+                Id = 4567,
+                MessageLengthLimit = 20
+            };
+            var secondChannel = new Channel
+            {
+                Name = "#test2",
+                Type = ChannelType.Public,
+                Id = 5678,
+                MessageLengthLimit = 5
+            };
+
+            AddStep("switch to channel with 20 char length limit", () => currentChannel.Value = firstChannel);
+            AddStep("type a message", () => textBox.Current.Value = "abcdefgh");
+
+            AddStep("switch to channel with 5 char length limit", () => currentChannel.Value = secondChannel);
+            AddAssert("text box empty", () => textBox.Current.Value, () => Is.Empty);
+            AddStep("type too much", () => textBox.Current.Value = "123456");
+            AddAssert("text box has 5 chars", () => textBox.Current.Value, () => Has.Length.EqualTo(5));
+
+            AddStep("switch back to channel with 20 char length limit", () => currentChannel.Value = firstChannel);
+            AddAssert("unsent message preserved without truncation", () => textBox.Current.Value, () => Is.EqualTo("abcdefgh"));
         }
 
         private static Channel createPublicChannel(string name)

@@ -170,7 +170,16 @@ namespace osu.Game.Tests.Visual.Gameplay
             ManualClock clock = null;
 
             var beatmap = new Beatmap();
-            beatmap.HitObjects.Add(new TestHitObjectWithNested { Duration = 40 });
+            beatmap.HitObjects.Add(new TestHitObjectWithNested
+            {
+                Duration = 40,
+                NestedObjects = new HitObject[]
+                {
+                    new PooledNestedHitObject { StartTime = 10 },
+                    new PooledNestedHitObject { StartTime = 20 },
+                    new PooledNestedHitObject { StartTime = 30 }
+                }
+            });
 
             createTest(beatmap, 10, () => new FramedClock(clock = new ManualClock()));
 
@@ -209,6 +218,49 @@ namespace osu.Game.Tests.Visual.Gameplay
             AddAssert("object judged", () => playfield.JudgedObjects.Count == 1);
         }
 
+        [Test]
+        public void TestPooledObjectWithNonPooledNesteds()
+        {
+            ManualClock clock = null;
+            TestHitObjectWithNested hitObjectWithNested;
+
+            var beatmap = new Beatmap();
+            beatmap.HitObjects.Add(hitObjectWithNested = new TestHitObjectWithNested
+            {
+                Duration = 40,
+                NestedObjects = new HitObject[]
+                {
+                    new PooledNestedHitObject { StartTime = 10 },
+                    new NonPooledNestedHitObject { StartTime = 20 },
+                    new NonPooledNestedHitObject { StartTime = 30 }
+                }
+            });
+
+            createTest(beatmap, 10, () => new FramedClock(clock = new ManualClock()));
+
+            AddAssert("hitobject entry has all nesteds", () => playfield.HitObjectContainer.Entries.Single().NestedEntries, () => Has.Count.EqualTo(3));
+
+            AddStep("skip to middle of object", () => clock.CurrentTime = (hitObjectWithNested.StartTime + hitObjectWithNested.GetEndTime()) / 2);
+            AddAssert("2 objects judged", () => playfield.JudgedObjects.Count, () => Is.EqualTo(2));
+            AddAssert("entry not all judged", () => playfield.HitObjectContainer.Entries.Single().AllJudged, () => Is.False);
+
+            AddStep("skip to before end of object", () => clock.CurrentTime = hitObjectWithNested.GetEndTime() - 1);
+            AddAssert("3 objects judged", () => playfield.JudgedObjects.Count, () => Is.EqualTo(3));
+            AddAssert("entry not all judged", () => playfield.HitObjectContainer.Entries.Single().AllJudged, () => Is.False);
+
+            AddStep("removing object doesn't crash", () => playfield.Remove(hitObjectWithNested));
+            AddStep("clear judged", () => playfield.JudgedObjects.Clear());
+
+            AddStep("add object back", () => playfield.Add(hitObjectWithNested));
+            AddAssert("entry not all judged", () => playfield.HitObjectContainer.Entries.Single().AllJudged, () => Is.False);
+
+            AddStep("skip to long past object", () => clock.CurrentTime = 100_000);
+            // the parent entry should still be linked to nested entries of pooled objects that are managed externally
+            // but not contain synthetic entries that were created for the non-pooled objects.
+            AddAssert("entry still has non-synthetic nested entries", () => playfield.HitObjectContainer.Entries.Single().NestedEntries, () => Has.Count.EqualTo(1));
+            AddAssert("entry all judged", () => playfield.HitObjectContainer.Entries.Single().AllJudged, () => Is.True);
+        }
+
         private void createTest(IBeatmap beatmap, int poolSize, Func<IFrameBasedClock> createClock = null)
         {
             AddStep("create test", () =>
@@ -217,6 +269,7 @@ namespace osu.Game.Tests.Visual.Gameplay
 
                 drawableRuleset = (TestDrawablePoolingRuleset)ruleset.CreateDrawableRulesetWith(CreateWorkingBeatmap(beatmap).GetPlayableBeatmap(ruleset.RulesetInfo));
                 drawableRuleset.FrameStablePlayback = true;
+                drawableRuleset.AllowBackwardsSeeks = true;
                 drawableRuleset.PoolSize = poolSize;
 
                 Child = new Container
@@ -289,7 +342,7 @@ namespace osu.Game.Tests.Visual.Gameplay
                 RegisterPool<TestHitObject, DrawableTestHitObject>(poolSize);
                 RegisterPool<TestKilledHitObject, DrawableTestKilledHitObject>(poolSize);
                 RegisterPool<TestHitObjectWithNested, DrawableTestHitObjectWithNested>(poolSize);
-                RegisterPool<NestedHitObject, DrawableNestedHitObject>(poolSize);
+                RegisterPool<PooledNestedHitObject, DrawableNestedHitObject>(poolSize);
             }
 
             protected override HitObjectLifetimeEntry CreateLifetimeEntry(HitObject hitObject) => new TestHitObjectLifetimeEntry(hitObject);
@@ -379,7 +432,7 @@ namespace osu.Game.Tests.Visual.Gameplay
             protected override void CheckForResult(bool userTriggered, double timeOffset)
             {
                 if (timeOffset > HitObject.Duration)
-                    ApplyResult(r => r.Type = r.Judgement.MaxResult);
+                    ApplyMaxResult();
             }
 
             protected override void UpdateHitStateTransforms(ArmedState state)
@@ -416,22 +469,28 @@ namespace osu.Game.Tests.Visual.Gameplay
             public override void OnKilled()
             {
                 base.OnKilled();
-                ApplyResult(r => r.Type = r.Judgement.MinResult);
+                ApplyMinResult();
             }
         }
 
         private class TestHitObjectWithNested : TestHitObject
         {
+            public IEnumerable<HitObject> NestedObjects { get; init; } = Array.Empty<HitObject>();
+
             protected override void CreateNestedHitObjects(CancellationToken cancellationToken)
             {
                 base.CreateNestedHitObjects(cancellationToken);
 
-                for (int i = 0; i < 3; ++i)
-                    AddNested(new NestedHitObject { StartTime = (float)Duration * (i + 1) / 4 });
+                foreach (var ho in NestedObjects)
+                    AddNested(ho);
             }
         }
 
-        private class NestedHitObject : ConvertHitObject
+        private class PooledNestedHitObject : ConvertHitObject
+        {
+        }
+
+        private class NonPooledNestedHitObject : ConvertHitObject
         {
         }
 
@@ -482,33 +541,41 @@ namespace osu.Game.Tests.Visual.Gameplay
                 nestedContainer.Clear(false);
             }
 
+            protected override DrawableHitObject CreateNestedHitObject(HitObject hitObject)
+                => hitObject is NonPooledNestedHitObject nonPooled ? new DrawableNestedHitObject(nonPooled) : null;
+
             protected override void CheckForResult(bool userTriggered, double timeOffset)
             {
                 base.CheckForResult(userTriggered, timeOffset);
                 if (timeOffset >= 0)
-                    ApplyResult(r => r.Type = r.Judgement.MaxResult);
+                    ApplyMaxResult();
             }
         }
 
-        private partial class DrawableNestedHitObject : DrawableHitObject<NestedHitObject>
+        private partial class DrawableNestedHitObject : DrawableHitObject
         {
             public DrawableNestedHitObject()
-                : this(null)
             {
             }
 
-            public DrawableNestedHitObject(NestedHitObject hitObject)
+            public DrawableNestedHitObject(PooledNestedHitObject hitObject)
                 : base(hitObject)
             {
-                Size = new Vector2(15);
-                Colour = Colour4.White;
-                RelativePositionAxes = Axes.Both;
-                Origin = Anchor.Centre;
+            }
+
+            public DrawableNestedHitObject(NonPooledNestedHitObject hitObject)
+                : base(hitObject)
+            {
             }
 
             [BackgroundDependencyLoader]
             private void load()
             {
+                Size = new Vector2(15);
+                Colour = Colour4.White;
+                RelativePositionAxes = Axes.Both;
+                Origin = Anchor.Centre;
+
                 AddInternal(new Circle
                 {
                     RelativeSizeAxes = Axes.Both,
@@ -530,7 +597,7 @@ namespace osu.Game.Tests.Visual.Gameplay
             {
                 base.CheckForResult(userTriggered, timeOffset);
                 if (timeOffset >= 0)
-                    ApplyResult(r => r.Type = r.Judgement.MaxResult);
+                    ApplyMaxResult();
             }
         }
 

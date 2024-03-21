@@ -23,6 +23,9 @@ namespace osu.Game.Collections
 
         private AudioFilter lowPassFilter = null!;
 
+        protected override string PopInSampleName => @"UI/overlay-big-pop-in";
+        protected override string PopOutSampleName => @"UI/overlay-big-pop-out";
+
         public ManageCollectionsDialog()
         {
             Anchor = Anchor.Centre;
@@ -111,6 +114,11 @@ namespace osu.Game.Collections
                 lowPassFilter = new AudioFilter(audio.TrackMixer)
             };
         }
+
+        public override bool IsPresent => base.IsPresent
+                                          // Safety for low pass filter potentially getting stuck in applied state due to
+                                          // transforms on `this` causing children to no longer be updated.
+                                          || lowPassFilter.IsAttached;
 
         protected override void PopIn()
         {

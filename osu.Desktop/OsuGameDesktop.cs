@@ -7,6 +7,7 @@ using System.IO;
 using System.Reflection;
 using System.Runtime.Versioning;
 using Microsoft.Win32;
+using osu.Desktop.Performance;
 using osu.Desktop.Security;
 using osu.Framework.Platform;
 using osu.Game;
@@ -15,8 +16,11 @@ using osu.Framework;
 using osu.Framework.Logging;
 using osu.Game.Updater;
 using osu.Desktop.Windows;
+using osu.Framework.Allocation;
 using osu.Game.IO;
 using osu.Game.IPC;
+using osu.Game.Online.Multiplayer;
+using osu.Game.Performance;
 using osu.Game.Utils;
 using SDL2;
 
@@ -26,6 +30,9 @@ namespace osu.Desktop
     {
         private OsuSchemeLinkIPCChannel? osuSchemeLinkIPCChannel;
         private ArchiveImportIPCChannel? archiveImportIPCChannel;
+
+        [Cached(typeof(IHighPerformanceSessionManager))]
+        private readonly HighPerformanceSessionManager highPerformanceSessionManager = new HighPerformanceSessionManager();
 
         public OsuGameDesktop(string[]? args = null)
             : base(args)
@@ -85,8 +92,8 @@ namespace osu.Desktop
         [SupportedOSPlatform("windows")]
         private string? getStableInstallPathFromRegistry()
         {
-            using (RegistryKey? key = Registry.ClassesRoot.OpenSubKey("osu"))
-                return key?.OpenSubKey(@"shell\open\command")?.GetValue(string.Empty)?.ToString()?.Split('"')[1].Replace("osu!.exe", "");
+            using (RegistryKey? key = Registry.ClassesRoot.OpenSubKey("osu!"))
+                return key?.OpenSubKey(WindowsAssociationManager.SHELL_OPEN_COMMAND)?.GetValue(string.Empty)?.ToString()?.Split('"')[1].Replace("osu!.exe", "");
         }
 
         protected override UpdateManager CreateUpdateManager()
@@ -108,6 +115,25 @@ namespace osu.Desktop
             }
         }
 
+        public override bool RestartAppWhenExited()
+        {
+            switch (RuntimeInfo.OS)
+            {
+                case RuntimeInfo.Platform.Windows:
+                    Debug.Assert(OperatingSystem.IsWindows());
+
+                    // Of note, this is an async method in squirrel that adds an arbitrary delay before returning
+                    // likely to ensure the external process is in a good state.
+                    //
+                    // We're not waiting on that here, but the outro playing before the actual exit should be enough
+                    // to cover this.
+                    Squirrel.UpdateManager.RestartAppWhenExited().FireAndForget();
+                    return true;
+            }
+
+            return base.RestartAppWhenExited();
+        }
+
         protected override void LoadComplete()
         {
             base.LoadComplete();
@@ -127,14 +153,12 @@ namespace osu.Desktop
         {
             base.SetHost(host);
 
-            var desktopWindow = (SDL2DesktopWindow)host.Window;
-
             var iconStream = Assembly.GetExecutingAssembly().GetManifestResourceStream(GetType(), "lazer.ico");
             if (iconStream != null)
-                desktopWindow.SetIconFromStream(iconStream);
+                host.Window.SetIconFromStream(iconStream);
 
-            desktopWindow.CursorState |= CursorState.Hidden;
-            desktopWindow.Title = Name;
+            host.Window.CursorState |= CursorState.Hidden;
+            host.Window.Title = Name;
         }
 
         protected override BatteryInfo CreateBatteryInfo() => new SDL2BatteryInfo();

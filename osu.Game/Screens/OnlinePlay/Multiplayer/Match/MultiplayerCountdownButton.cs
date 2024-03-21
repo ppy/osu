@@ -17,6 +17,7 @@ using osu.Framework.Graphics.UserInterface;
 using osu.Game.Graphics;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Graphics.UserInterfaceV2;
+using osu.Game.Localisation;
 using osu.Game.Online.Multiplayer;
 using osuTK;
 
@@ -56,7 +57,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Match
 
             base.Action = this.ShowPopover;
 
-            TooltipText = "Countdown settings";
+            TooltipText = MultiplayerMatchStrings.CountdownSettings;
         }
 
         [BackgroundDependencyLoader]
@@ -112,7 +113,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Match
                 flow.Add(new RoundedButton
                 {
                     RelativeSizeAxes = Axes.X,
-                    Text = $"Start match in {duration.Humanize()}",
+                    Text = MultiplayerMatchStrings.StartMatchWithCountdown(duration.Humanize()),
                     BackgroundColour = colours.Green,
                     Action = () =>
                     {
@@ -127,7 +128,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Match
                 flow.Add(new RoundedButton
                 {
                     RelativeSizeAxes = Axes.X,
-                    Text = "Stop countdown",
+                    Text = MultiplayerMatchStrings.StopCountdown,
                     BackgroundColour = colours.Red,
                     Action = () =>
                     {

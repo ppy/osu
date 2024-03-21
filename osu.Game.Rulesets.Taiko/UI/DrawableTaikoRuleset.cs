@@ -5,6 +5,8 @@
 
 using System;
 using System.Collections.Generic;
+using System.Linq;
+using JetBrains.Annotations;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
@@ -22,7 +24,9 @@ using osu.Game.Rulesets.Timing;
 using osu.Game.Rulesets.UI;
 using osu.Game.Rulesets.UI.Scrolling;
 using osu.Game.Scoring;
+using osu.Game.Screens.Play;
 using osu.Game.Skinning;
+using osu.Game.Storyboards;
 using osuTK;
 
 namespace osu.Game.Rulesets.Taiko.UI
@@ -35,28 +39,38 @@ namespace osu.Game.Rulesets.Taiko.UI
 
         public new TaikoInputManager KeyBindingInputManager => (TaikoInputManager)base.KeyBindingInputManager;
 
-        protected override ScrollVisualisationMethod VisualisationMethod => ScrollVisualisationMethod.Overlapping;
+        protected new TaikoPlayfieldAdjustmentContainer PlayfieldAdjustmentContainer => (TaikoPlayfieldAdjustmentContainer)base.PlayfieldAdjustmentContainer;
 
         protected override bool UserScrollSpeedAdjustment => false;
 
+        [CanBeNull]
         private SkinnableDrawable scroller;
 
         public DrawableTaikoRuleset(Ruleset ruleset, IBeatmap beatmap, IReadOnlyList<Mod> mods = null)
             : base(ruleset, beatmap, mods)
         {
             Direction.Value = ScrollingDirection.Left;
+            VisualisationMethod = ScrollVisualisationMethod.Overlapping;
         }
 
-        [BackgroundDependencyLoader]
-        private void load()
+        [BackgroundDependencyLoader(true)]
+        private void load([CanBeNull] GameplayState gameplayState)
         {
             new BarLineGenerator<BarLine>(Beatmap).BarLines.ForEach(bar => Playfield.Add(bar));
 
-            FrameStableComponents.Add(scroller = new SkinnableDrawable(new TaikoSkinComponentLookup(TaikoSkinComponents.Scroller), _ => Empty())
+            var spriteElements = gameplayState?.Storyboard.Layers.Where(l => l.Name != @"Overlay")
+                                              .SelectMany(l => l.Elements)
+                                              .OfType<StoryboardSprite>()
+                                              .DistinctBy(e => e.Path) ?? Enumerable.Empty<StoryboardSprite>();
+
+            if (spriteElements.Count() < 10)
             {
-                RelativeSizeAxes = Axes.X,
-                Depth = float.MaxValue
-            });
+                FrameStableComponents.Add(scroller = new SkinnableDrawable(new TaikoSkinComponentLookup(TaikoSkinComponents.Scroller), _ => Empty())
+                {
+                    RelativeSizeAxes = Axes.X,
+                    Depth = float.MaxValue,
+                });
+            }
 
             KeyBindingInputManager.Add(new DrumTouchInputArea());
         }
@@ -65,23 +79,19 @@ namespace osu.Game.Rulesets.Taiko.UI
         {
             base.Update();
 
-            // Taiko scrolls at a constant 100px per 1000ms. More notes become visible as the playfield is lengthened.
-            const float scroll_rate = 10;
-
-            // Since the time range will depend on a positional value, it is referenced to the x480 pixel space.
-            // Width is used because it defines how many notes fit on the playfield.
-            // We clamp the ratio to the maximum aspect ratio to keep scroll speed consistent on widths lower than the default.
-            float ratio = Math.Max(DrawSize.X / 768f, TaikoPlayfieldAdjustmentContainer.MAXIMUM_ASPECT);
-
-            TimeRange.Value = (Playfield.HitObjectContainer.DrawWidth / ratio) * scroll_rate;
+            TimeRange.Value = ComputeTimeRange();
         }
+
+        protected virtual double ComputeTimeRange() => PlayfieldAdjustmentContainer.ComputeTimeRange();
 
         protected override void UpdateAfterChildren()
         {
             base.UpdateAfterChildren();
 
             var playfieldScreen = Playfield.ScreenSpaceDrawQuad;
-            scroller.Height = ToLocalSpace(playfieldScreen.TopLeft + new Vector2(0, playfieldScreen.Height / 20)).Y;
+
+            if (scroller != null)
+                scroller.Height = ToLocalSpace(playfieldScreen.TopLeft + new Vector2(0, playfieldScreen.Height / 20)).Y;
         }
 
         public MultiplierControlPoint ControlPointAt(double time)
@@ -106,5 +116,7 @@ namespace osu.Game.Rulesets.Taiko.UI
         protected override ReplayInputHandler CreateReplayInputHandler(Replay replay) => new TaikoFramedReplayInputHandler(replay);
 
         protected override ReplayRecorder CreateReplayRecorder(Score score) => new TaikoReplayRecorder(score);
+
+        protected override ResumeOverlay CreateResumeOverlay() => new DelayedResumeOverlay();
     }
 }

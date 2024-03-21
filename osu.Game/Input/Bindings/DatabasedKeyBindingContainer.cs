@@ -51,7 +51,7 @@ namespace osu.Game.Input.Bindings
 
         protected override void LoadComplete()
         {
-            realmSubscription = realm.RegisterForNotifications(queryRealmKeyBindings, (sender, _, _) =>
+            realmSubscription = realm.RegisterForNotifications(queryRealmKeyBindings, (sender, _) =>
             {
                 // The first fire of this is a bit redundant as this is being called in base.LoadComplete,
                 // but this is safest in case the subscription is restored after a context recycle.

@@ -1,7 +1,5 @@
-// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
-
-#nullable disable
 
 using Markdig.Syntax.Inlines;
 using osu.Framework.Allocation;
@@ -16,7 +14,7 @@ namespace osu.Game.Overlays.Wiki.Markdown
     public partial class WikiMarkdownImageBlock : FillFlowContainer
     {
         [Resolved]
-        private IMarkdownTextFlowComponent parentFlowComponent { get; set; }
+        private IMarkdownTextFlowComponent parentFlowComponent { get; set; } = null!;
 
         private readonly LinkInline linkInline;
 
@@ -83,10 +81,10 @@ namespace osu.Game.Overlays.Wiki.Markdown
                     {
                         base.Update();
 
-                        if (Width > Parent.DrawWidth)
+                        if (Width > Parent!.DrawWidth)
                         {
                             float ratio = Height / Width;
-                            Width = Parent.DrawWidth;
+                            Width = Parent!.DrawWidth;
                             Height = ratio * Width;
                         }
                     }

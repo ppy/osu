@@ -1,8 +1,6 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
 using System;
 using osu.Game.Beatmaps.Timing;
 using osu.Game.Rulesets.Objects;
@@ -26,8 +24,7 @@ namespace osu.Game.Beatmaps
             {
                 difficulty = value;
 
-                if (beatmapInfo != null)
-                    beatmapInfo.Difficulty = difficulty.Clone();
+                beatmapInfo.Difficulty = difficulty.Clone();
             }
         }
 
@@ -40,8 +37,7 @@ namespace osu.Game.Beatmaps
             {
                 beatmapInfo = value;
 
-                if (beatmapInfo?.Difficulty != null)
-                    Difficulty = beatmapInfo.Difficulty.Clone();
+                Difficulty = beatmapInfo.Difficulty.Clone();
             }
         }
 
@@ -119,12 +115,11 @@ namespace osu.Game.Beatmaps
         IBeatmap IBeatmap.Clone() => Clone();
 
         public Beatmap<T> Clone() => (Beatmap<T>)MemberwiseClone();
+
+        public override string ToString() => BeatmapInfo.ToString();
     }
 
     public class Beatmap : Beatmap<HitObject>
     {
-        public new Beatmap Clone() => (Beatmap)base.Clone();
-
-        public override string ToString() => BeatmapInfo?.ToString() ?? base.ToString();
     }
 }

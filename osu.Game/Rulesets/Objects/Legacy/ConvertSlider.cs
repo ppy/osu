@@ -13,7 +13,7 @@ using osu.Game.Beatmaps.ControlPoints;
 
 namespace osu.Game.Rulesets.Objects.Legacy
 {
-    internal abstract class ConvertSlider : ConvertHitObject, IHasPathWithRepeats, IHasLegacyLastTickOffset, IHasSliderVelocity
+    internal abstract class ConvertSlider : ConvertHitObject, IHasPathWithRepeats, IHasSliderVelocity
     {
         /// <summary>
         /// Scoring distance with a speed-adjusted beat length of 1 second.
@@ -23,11 +23,12 @@ namespace osu.Game.Rulesets.Objects.Legacy
         /// <summary>
         /// <see cref="ConvertSlider"/>s don't need a curve since they're converted to ruleset-specific hitobjects.
         /// </summary>
-        public SliderPath Path { get; set; }
+        public SliderPath Path { get; set; } = null!;
 
         public double Distance => Path.Distance;
 
-        public IList<IList<HitSampleInfo>> NodeSamples { get; set; }
+        public IList<IList<HitSampleInfo>> NodeSamples { get; set; } = null!;
+
         public int RepeatCount { get; set; }
 
         [JsonIgnore]
@@ -41,12 +42,12 @@ namespace osu.Game.Rulesets.Objects.Legacy
 
         public double Velocity = 1;
 
-        public BindableNumber<double> SliderVelocityBindable { get; } = new BindableDouble(1);
+        public BindableNumber<double> SliderVelocityMultiplierBindable { get; } = new BindableDouble(1);
 
-        public double SliderVelocity
+        public double SliderVelocityMultiplier
         {
-            get => SliderVelocityBindable.Value;
-            set => SliderVelocityBindable.Value = value;
+            get => SliderVelocityMultiplierBindable.Value;
+            set => SliderVelocityMultiplierBindable.Value = value;
         }
 
         protected override void ApplyDefaultsToSelf(ControlPointInfo controlPointInfo, IBeatmapDifficultyInfo difficulty)
@@ -55,11 +56,9 @@ namespace osu.Game.Rulesets.Objects.Legacy
 
             TimingControlPoint timingPoint = controlPointInfo.TimingPointAt(StartTime);
 
-            double scoringDistance = base_scoring_distance * difficulty.SliderMultiplier * SliderVelocity;
+            double scoringDistance = base_scoring_distance * difficulty.SliderMultiplier * SliderVelocityMultiplier;
 
             Velocity = scoringDistance / timingPoint.BeatLength;
         }
-
-        public double LegacyLastTickOffset => 36;
     }
 }

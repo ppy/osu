@@ -72,9 +72,13 @@ namespace osu.Game.Tests.Visual.Editing
                     AddUntilStep("wait for dialog", () => DialogOverlay.CurrentDialog != null);
                     AddStep("confirm", () => InputManager.Key(Key.Number1));
 
-                    AddAssert($"difficulty {i} is deleted", () => Beatmap.Value.BeatmapSetInfo.Beatmaps.Select(b => b.ID), () => Does.Not.Contain(deletedDifficultyID));
-                    AddAssert("count decreased by one", () => Beatmap.Value.BeatmapSetInfo.Beatmaps.Count, () => Is.EqualTo(countBeforeDeletion - 1));
+                    AddAssert($"difficulty {i} is unattached from set",
+                        () => Beatmap.Value.BeatmapSetInfo.Beatmaps.Select(b => b.ID), () => Does.Not.Contain(deletedDifficultyID));
+                    AddAssert("beatmap set difficulty count decreased by one",
+                        () => Beatmap.Value.BeatmapSetInfo.Beatmaps.Count, () => Is.EqualTo(countBeforeDeletion - 1));
                     AddAssert("set hash changed", () => Beatmap.Value.BeatmapSetInfo.Hash, () => Is.Not.EqualTo(beatmapSetHashBefore));
+                    AddAssert($"difficulty {i} is deleted from realm",
+                        () => Realm.Run(r => r.Find<BeatmapInfo>(deletedDifficultyID)), () => Is.Null);
                 }
             }
         }

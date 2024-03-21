@@ -1,8 +1,6 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
 using osu.Game.Beatmaps;
 using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Objects.Types;
@@ -12,15 +10,25 @@ using System.Collections.Generic;
 using System.Linq;
 using osu.Framework.Utils;
 using System.Threading;
-using JetBrains.Annotations;
 using osu.Game.Audio;
 using osu.Game.Beatmaps.ControlPoints;
-using osu.Game.Beatmaps.Formats;
+using osu.Game.Rulesets.Objects.Legacy;
 
 namespace osu.Game.Rulesets.Taiko.Beatmaps
 {
     internal class TaikoBeatmapConverter : BeatmapConverter<TaikoHitObject>
     {
+        /// <summary>
+        /// A speed multiplier applied globally to osu!taiko.
+        /// </summary>
+        /// <remarks>
+        /// osu! is generally slower than taiko, so a factor was historically added to increase speed for converts.
+        /// This must be used everywhere slider length or beat length is used in taiko.
+        ///
+        /// Of note, this has never been exposed to the end user, and is considered a hidden internal multiplier.
+        /// </remarks>
+        public const float VELOCITY_MULTIPLIER = 1.4f;
+
         /// <summary>
         /// Because swells are easier in taiko than spinners are in osu!,
         /// legacy taiko multiplies a factor when converting the number of required hits.
@@ -31,11 +39,6 @@ namespace osu.Game.Rulesets.Taiko.Beatmaps
         /// Base osu! slider scoring distance.
         /// </summary>
         private const float osu_base_scoring_distance = 100;
-
-        /// <summary>
-        /// Drum roll distance that results in a duration of 1 speed-adjusted beat length.
-        /// </summary>
-        private const float taiko_base_distance = 100;
 
         private readonly bool isForCurrentRuleset;
 
@@ -49,12 +52,6 @@ namespace osu.Game.Rulesets.Taiko.Beatmaps
 
         protected override Beatmap<TaikoHitObject> ConvertBeatmap(IBeatmap original, CancellationToken cancellationToken)
         {
-            if (!(original.Difficulty is TaikoMultiplierAppliedDifficulty))
-            {
-                // Rewrite the beatmap info to add the slider velocity multiplier
-                original.Difficulty = new TaikoMultiplierAppliedDifficulty(original.Difficulty);
-            }
-
             Beatmap<TaikoHitObject> converted = base.ConvertBeatmap(original, cancellationToken);
 
             if (original.BeatmapInfo.Ruleset.OnlineID == 0)
@@ -66,7 +63,7 @@ namespace osu.Game.Rulesets.Taiko.Beatmaps
                 {
                     if (hitObject is not IHasSliderVelocity hasSliderVelocity) continue;
 
-                    double nextScrollSpeed = hasSliderVelocity.SliderVelocity;
+                    double nextScrollSpeed = hasSliderVelocity.SliderVelocityMultiplier;
                     EffectControlPoint currentEffectPoint = converted.ControlPointInfo.EffectPointAt(hitObject.StartTime);
 
                     if (!Precision.AlmostEquals(lastScrollSpeed, nextScrollSpeed, acceptableDifference: currentEffectPoint.ScrollSpeedBindable.Precision))
@@ -110,9 +107,9 @@ namespace osu.Game.Rulesets.Taiko.Beatmaps
 
             switch (obj)
             {
-                case IHasDistance distanceData:
+                case IHasPath pathData:
                 {
-                    if (shouldConvertSliderToHits(obj, beatmap, distanceData, out int taikoDuration, out double tickSpacing))
+                    if (shouldConvertSliderToHits(obj, beatmap, pathData, out int taikoDuration, out double tickSpacing))
                     {
                         IList<IList<HitSampleInfo>> allSamples = obj is IHasPathWithRepeats curveData ? curveData.NodeSamples : new List<IList<HitSampleInfo>>(new[] { samples });
 
@@ -141,7 +138,6 @@ namespace osu.Game.Rulesets.Taiko.Beatmaps
                             StartTime = obj.StartTime,
                             Samples = obj.Samples,
                             Duration = taikoDuration,
-                            SliderVelocity = obj is IHasSliderVelocity velocityData ? velocityData.SliderVelocity : 1
                         };
                     }
 
@@ -176,7 +172,7 @@ namespace osu.Game.Rulesets.Taiko.Beatmaps
             }
         }
 
-        private bool shouldConvertSliderToHits(HitObject obj, IBeatmap beatmap, IHasDistance distanceData, out int taikoDuration, out double tickSpacing)
+        private bool shouldConvertSliderToHits(HitObject obj, IBeatmap beatmap, IHasPath pathData, out int taikoDuration, out double tickSpacing)
         {
             // DO NOT CHANGE OR REFACTOR ANYTHING IN HERE WITHOUT TESTING AGAINST _ALL_ BEATMAPS.
             // Some of these calculations look redundant, but they are not - extremely small floating point errors are introduced to maintain 1:1 compatibility with stable.
@@ -184,19 +180,22 @@ namespace osu.Game.Rulesets.Taiko.Beatmaps
 
             // The true distance, accounting for any repeats. This ends up being the drum roll distance later
             int spans = (obj as IHasRepeats)?.SpanCount() ?? 1;
-            double distance = distanceData.Distance * spans * LegacyBeatmapEncoder.LEGACY_TAIKO_VELOCITY_MULTIPLIER;
+            double distance = pathData.Path.ExpectedDistance.Value ?? 0;
+
+            // Do not combine the following two lines!
+            distance *= VELOCITY_MULTIPLIER;
+            distance *= spans;
 
             TimingControlPoint timingPoint = beatmap.ControlPointInfo.TimingPointAt(obj.StartTime);
 
             double beatLength;
-            if (obj.LegacyBpmMultiplier.HasValue)
-                beatLength = timingPoint.BeatLength * obj.LegacyBpmMultiplier.Value;
-            else if (obj is IHasSliderVelocity hasSliderVelocity)
-                beatLength = timingPoint.BeatLength / hasSliderVelocity.SliderVelocity;
+
+            if (obj is IHasSliderVelocity hasSliderVelocity)
+                beatLength = LegacyRulesetExtensions.GetPrecisionAdjustedBeatLength(hasSliderVelocity, timingPoint, TaikoRuleset.SHORT_NAME);
             else
                 beatLength = timingPoint.BeatLength;
 
-            double sliderScoringPointDistance = osu_base_scoring_distance * beatmap.Difficulty.SliderMultiplier / beatmap.Difficulty.SliderTickRate;
+            double sliderScoringPointDistance = osu_base_scoring_distance * (beatmap.Difficulty.SliderMultiplier * VELOCITY_MULTIPLIER) / beatmap.Difficulty.SliderTickRate;
 
             // The velocity and duration of the taiko hit object - calculated as the velocity of a drum roll.
             double taikoVelocity = sliderScoringPointDistance * beatmap.Difficulty.SliderTickRate;
@@ -222,41 +221,5 @@ namespace osu.Game.Rulesets.Taiko.Beatmaps
         }
 
         protected override Beatmap<TaikoHitObject> CreateBeatmap() => new TaikoBeatmap();
-
-        // Important to note that this is subclassing a realm object.
-        // Realm doesn't allow this, but for now this can work since we aren't (in theory?) persisting this to the database.
-        // It is only used during beatmap conversion and processing.
-        internal class TaikoMultiplierAppliedDifficulty : BeatmapDifficulty
-        {
-            public TaikoMultiplierAppliedDifficulty(IBeatmapDifficultyInfo difficulty)
-            {
-                CopyFrom(difficulty);
-            }
-
-            [UsedImplicitly]
-            public TaikoMultiplierAppliedDifficulty()
-            {
-            }
-
-            #region Overrides of BeatmapDifficulty
-
-            public override BeatmapDifficulty Clone() => new TaikoMultiplierAppliedDifficulty(this);
-
-            public override void CopyTo(BeatmapDifficulty other)
-            {
-                base.CopyTo(other);
-                if (!(other is TaikoMultiplierAppliedDifficulty))
-                    other.SliderMultiplier /= LegacyBeatmapEncoder.LEGACY_TAIKO_VELOCITY_MULTIPLIER;
-            }
-
-            public override void CopyFrom(IBeatmapDifficultyInfo other)
-            {
-                base.CopyFrom(other);
-                if (!(other is TaikoMultiplierAppliedDifficulty))
-                    SliderMultiplier *= LegacyBeatmapEncoder.LEGACY_TAIKO_VELOCITY_MULTIPLIER;
-            }
-
-            #endregion
-        }
     }
 }

@@ -77,6 +77,20 @@ namespace osu.Game.Tests.Visual.SongSelect
         }
 
         [Test]
+        public void TestCollectionsCleared()
+        {
+            AddStep("add collection", () => writeAndRefresh(r => r.Add(new BeatmapCollection(name: "1"))));
+            AddStep("add collection", () => writeAndRefresh(r => r.Add(new BeatmapCollection(name: "2"))));
+            AddStep("add collection", () => writeAndRefresh(r => r.Add(new BeatmapCollection(name: "3"))));
+
+            AddAssert("check count 5", () => control.ChildrenOfType<CollectionDropdown>().Single().ChildrenOfType<Menu.DrawableMenuItem>().Count(), () => Is.EqualTo(5));
+
+            AddStep("delete all collections", () => writeAndRefresh(r => r.RemoveAll<BeatmapCollection>()));
+
+            AddAssert("check count 2", () => control.ChildrenOfType<CollectionDropdown>().Single().ChildrenOfType<Menu.DrawableMenuItem>().Count(), () => Is.EqualTo(2));
+        }
+
+        [Test]
         public void TestCollectionRemovedFromDropdown()
         {
             BeatmapCollection first = null!;
@@ -192,7 +206,7 @@ namespace osu.Game.Tests.Visual.SongSelect
 
             AddStep("select collection", () =>
             {
-                InputManager.MoveMouseTo(getCollectionDropdownItems().ElementAt(1));
+                InputManager.MoveMouseTo(getCollectionDropdownItemAt(1));
                 InputManager.Click(MouseButton.Left);
             });
 
@@ -206,11 +220,12 @@ namespace osu.Game.Tests.Visual.SongSelect
 
             AddStep("click manage collections filter", () =>
             {
-                InputManager.MoveMouseTo(getCollectionDropdownItems().Last());
+                int lastItemIndex = control.ChildrenOfType<CollectionDropdown>().Single().Items.Count() - 1;
+                InputManager.MoveMouseTo(getCollectionDropdownItemAt(lastItemIndex));
                 InputManager.Click(MouseButton.Left);
             });
 
-            AddAssert("collection filter still selected", () => control.CreateCriteria().CollectionBeatmapMD5Hashes.Any());
+            AddAssert("collection filter still selected", () => control.CreateCriteria().CollectionBeatmapMD5Hashes?.Any() == true);
 
             AddAssert("filter request not fired", () => !received);
         }
@@ -232,10 +247,10 @@ namespace osu.Game.Tests.Visual.SongSelect
         private void assertCollectionDropdownContains(string collectionName, bool shouldContain = true) =>
             AddUntilStep($"collection dropdown {(shouldContain ? "contains" : "does not contain")} '{collectionName}'",
                 // A bit of a roundabout way of going about this, see: https://github.com/ppy/osu-framework/issues/3871 + https://github.com/ppy/osu-framework/issues/3872
-                () => shouldContain == (getCollectionDropdownItems().Any(i => i.ChildrenOfType<CompositeDrawable>().OfType<IHasText>().First().Text == collectionName)));
+                () => shouldContain == control.ChildrenOfType<Menu.DrawableMenuItem>().Any(i => i.ChildrenOfType<CompositeDrawable>().OfType<IHasText>().First().Text == collectionName));
 
         private IconButton getAddOrRemoveButton(int index)
-            => getCollectionDropdownItems().ElementAt(index).ChildrenOfType<IconButton>().Single();
+            => getCollectionDropdownItemAt(index).ChildrenOfType<IconButton>().Single();
 
         private void addExpandHeaderStep() => AddStep("expand header", () =>
         {
@@ -249,7 +264,11 @@ namespace osu.Game.Tests.Visual.SongSelect
             InputManager.Click(MouseButton.Left);
         });
 
-        private IEnumerable<Dropdown<CollectionFilterMenuItem>.DropdownMenu.DrawableDropdownMenuItem> getCollectionDropdownItems()
-            => control.ChildrenOfType<CollectionDropdown>().Single().ChildrenOfType<Dropdown<CollectionFilterMenuItem>.DropdownMenu.DrawableDropdownMenuItem>();
+        private Menu.DrawableMenuItem getCollectionDropdownItemAt(int index)
+        {
+            // todo: we should be able to use Items, but apparently that's not guaranteed to be ordered... see: https://github.com/ppy/osu-framework/pull/6079
+            CollectionFilterMenuItem item = control.ChildrenOfType<CollectionDropdown>().Single().ItemSource.ElementAt(index);
+            return control.ChildrenOfType<Menu.DrawableMenuItem>().Single(i => i.Item.Text.Value == item.CollectionName);
+        }
     }
 }

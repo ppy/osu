@@ -10,6 +10,6 @@ namespace osu.Game.Rulesets.Edit.Checks
     {
         protected override CheckCategory Category => CheckCategory.Audio;
         protected override string TypeOfFile => "audio";
-        protected override string? GetFilename(IBeatmap beatmap) => beatmap.Metadata?.AudioFile;
+        protected override string GetFilename(IBeatmap beatmap) => beatmap.Metadata.AudioFile;
     }
 }

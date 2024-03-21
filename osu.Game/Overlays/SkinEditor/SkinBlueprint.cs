@@ -136,9 +136,10 @@ namespace osu.Game.Overlays.SkinEditor
         {
             base.Update();
 
+            Vector2 scale = drawable.DrawInfo.MatrixInverse.ExtractScale().Xy;
             drawableQuad = drawable.ToScreenSpace(
                 drawable.DrawRectangle
-                        .Inflate(SkinSelectionHandler.INFLATE_SIZE));
+                        .Inflate(SkinSelectionHandler.INFLATE_SIZE * scale));
 
             var localSpaceQuad = ToLocalSpace(drawableQuad);
 
@@ -202,7 +203,7 @@ namespace osu.Game.Overlays.SkinEditor
             if (drawable.Parent == null)
                 return;
 
-            var newAnchor = drawable.Parent.ToSpaceOfOtherDrawable(drawable.AnchorPosition, this);
+            var newAnchor = drawable.Parent!.ToSpaceOfOtherDrawable(drawable.AnchorPosition, this);
             anchorPosition = tweenPosition(anchorPosition ?? newAnchor, newAnchor);
             anchorBox.Position = anchorPosition.Value;
 
