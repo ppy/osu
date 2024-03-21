@@ -2,6 +2,8 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
+using System.Linq;
+using osu.Framework.Bindables;
 using osu.Framework.Caching;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Animations;
@@ -12,7 +14,7 @@ namespace osu.Game.Skinning
     /// <summary>
     /// A drawable which can be skinned via an <see cref="ISkinSource"/>.
     /// </summary>
-    public partial class SkinnableDrawable : SkinReloadableDrawable
+    public partial class SkinnableDrawable : SkinReloadableDrawable, ISerialisableDrawableContainer
     {
         /// <summary>
         /// The displayed component.
@@ -31,8 +33,11 @@ namespace osu.Game.Skinning
             set => base.AutoSizeAxes = value;
         }
 
+        public IBindableList<ISerialisableDrawable> Components => components;
+
         protected readonly ISkinComponentLookup ComponentLookup;
 
+        private readonly BindableList<ISerialisableDrawable> components = new BindableList<ISerialisableDrawable>();
         private readonly ConfineMode confineMode;
 
         /// <summary>
@@ -73,31 +78,7 @@ namespace osu.Game.Skinning
         /// </summary>
         protected virtual bool ApplySizeRestrictionsToDefault => false;
 
-        protected override void SkinChanged(ISkinSource skin)
-        {
-            var retrieved = skin.GetDrawableComponent(ComponentLookup);
-
-            if (retrieved == null)
-            {
-                Drawable = CreateDefault(ComponentLookup);
-                isDefault = true;
-            }
-            else
-            {
-                Drawable = retrieved;
-                isDefault = false;
-            }
-
-            scaling.Invalidate();
-
-            if (CentreComponent)
-            {
-                Drawable.Origin = Anchor.Centre;
-                Drawable.Anchor = Anchor.Centre;
-            }
-
-            InternalChild = Drawable;
-        }
+        protected override void SkinChanged(ISkinSource skin) => Reload();
 
         protected override void Update()
         {
@@ -125,6 +106,42 @@ namespace osu.Game.Skinning
                 }
             }
         }
+
+        public void Reload() => reload(CurrentSkin.GetDrawableComponent(ComponentLookup));
+
+        private void reload(Drawable? newComponent)
+        {
+            if (newComponent == null)
+            {
+                Drawable = CreateDefault(ComponentLookup);
+                isDefault = true;
+            }
+            else
+            {
+                Drawable = newComponent;
+                isDefault = false;
+            }
+
+            scaling.Invalidate();
+
+            if (CentreComponent)
+            {
+                Drawable.Origin = Anchor.Centre;
+                Drawable.Anchor = Anchor.Centre;
+            }
+
+            components.Clear();
+            if (Drawable is ISerialisableDrawable serialisable)
+                components.Add(serialisable);
+
+            InternalChild = Drawable;
+        }
+
+        public void Reload(SerialisedDrawableInfo[] skinnableInfo) => reload(skinnableInfo.FirstOrDefault()?.CreateInstance());
+
+        public void Add(ISerialisableDrawable drawable) => throw new NotSupportedException();
+
+        public void Remove(ISerialisableDrawable component, bool disposeImmediately) => throw new NotSupportedException();
     }
 
     public enum ConfineMode
