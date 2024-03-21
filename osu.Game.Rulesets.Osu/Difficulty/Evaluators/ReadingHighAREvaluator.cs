@@ -123,7 +123,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
         // https://www.desmos.com/calculator/hbj7swzlth
         public static double GetDifficulty(double preempt)
         {
-            double value = Math.Pow(3.5, 3 - 0.01 * preempt); // 1 for 300ms, 0.25 for 400ms, 0.0625 for 500ms
+            double value = Math.Pow(4, 3 - 0.01 * preempt); // 1 for 300ms, 0.25 for 400ms, 0.0625 for 500ms
             value = softmin(value, 2, 1.7); // use softmin to achieve full-memory cap, 2 times more than AR11 (300ms)
             return value;
         }

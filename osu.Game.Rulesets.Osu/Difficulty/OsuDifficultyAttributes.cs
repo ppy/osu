@@ -130,12 +130,6 @@ namespace osu.Game.Rulesets.Osu.Difficulty
 
             yield return (ATTRIB_ID_SLIDER_FACTOR, SliderFactor);
             yield return (ATTRIB_ID_SPEED_NOTE_COUNT, SpeedNoteCount);
-            yield return (ATTRIB_ID_READING_LOW_AR, ReadingDifficultyLowAR);
-            yield return (ATTRIB_ID_READING_HIGH_AR, ReadingDifficultyHighAR);
-            yield return (ATTRIB_ID_READING_SLIDERS, ReadingDifficultySliders);
-
-            if (ShouldSerializeHiddenDifficulty())
-                yield return (ATTRIB_ID_READING_HIDDEN, HiddenDifficulty);
         }
 
         public override void FromDatabaseAttributes(IReadOnlyDictionary<int, double> values, IBeatmapOnlineInfo onlineInfo)
@@ -150,10 +144,6 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             SliderFactor = values[ATTRIB_ID_SLIDER_FACTOR];
             SpeedNoteCount = values[ATTRIB_ID_SPEED_NOTE_COUNT];
 
-            ReadingDifficultyLowAR = values[ATTRIB_ID_READING_LOW_AR];
-            ReadingDifficultyHighAR = values[ATTRIB_ID_READING_HIGH_AR];
-            ReadingDifficultySliders = values[ATTRIB_ID_READING_SLIDERS];
-            HiddenDifficulty = values.GetValueOrDefault(ATTRIB_ID_READING_HIDDEN);
             FlashlightDifficulty = values.GetValueOrDefault(ATTRIB_ID_FLASHLIGHT);
 
             DrainRate = onlineInfo.DrainRate;

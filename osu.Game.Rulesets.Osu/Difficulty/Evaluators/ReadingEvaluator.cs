@@ -16,9 +16,9 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
     {
         private const double reading_window_size = 3000;
 
-        private const double overlap_multiplier = 0.8;
+        private const double overlap_multiplier = 2;
 
-        public static double EvaluateDenstityOf(DifficultyHitObject current, bool applyDistanceNerf = true)
+        public static double EvaluateDensityOf(DifficultyHitObject current, bool applyDistanceNerf = true)
         {
             var currObj = (OsuDifficultyHitObject)current;
             double density = 0;
@@ -100,13 +100,13 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
                     if (prevObj1.IsNotNull() && prevObj2.IsNotNull())
                         rhythmFactor *= 1 - getRhythmDifference(prevObj1.StrainTime, prevObj2.StrainTime);
 
-                    double acuteAngleFactor = 1 - Math.Min(loopObj.Angle.Value, prevObj0.Angle.Value) / Math.PI;
+                    // double acuteAngleFactor = 1 - Math.Min(loopObj.Angle.Value, prevObj0.Angle.Value) / Math.PI;
 
                     double prevAngleAdjust = Math.Max(angleDifference - angleDifference1, 0);
 
                     prevAngleAdjust *= alternatingFactor; // Nerf if alternating
                     prevAngleAdjust *= rhythmFactor; // Nerf if same rhythms
-                    prevAngleAdjust *= acuteAngleFactor;
+                    // prevAngleAdjust *= acuteAngleFactor; // no longer needed?
 
                     angleDifference -= prevAngleAdjust;
 
@@ -138,8 +138,9 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
             return density;
         }
 
-        public static double CalculateOverlapDifficultyOf(OsuDifficultyHitObject currObj)
+        public static double EvaluateOverlapDifficultyOf(DifficultyHitObject current)
         {
+            var currObj = (OsuDifficultyHitObject)current;
             double screenOverlapDifficulty = 0;
 
             foreach (var loopObj in retrievePastVisibleObjects(currObj))
@@ -153,26 +154,29 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
                 screenOverlapDifficulty += lastOverlapness;
             }
 
-            return screenOverlapDifficulty;
+            return overlap_multiplier * Math.Max(0, screenOverlapDifficulty - 0.7);
         }
         public static double EvaluateDifficultyOf(DifficultyHitObject current)
         {
             if (current.BaseObject is Spinner || current.Index == 0)
                 return 0;
 
-            var currObj = (OsuDifficultyHitObject)current;
+            double difficulty = Math.Pow(4 * Math.Log(Math.Max(1, EvaluateDensityOf(current))), 2.5);
 
-            double pastObjectDifficultyInfluence = EvaluateDenstityOf(current);
-            double screenOverlapDifficulty = CalculateOverlapDifficultyOf(currObj);
-
-            double difficulty = Math.Pow(4 * Math.Log(Math.Max(1, pastObjectDifficultyInfluence)), 2.5);
-
-            screenOverlapDifficulty = Math.Max(0, screenOverlapDifficulty - 0.75); // make overlap value =1 cost significantly less
-
-            double overlapBonus = overlap_multiplier * screenOverlapDifficulty * difficulty;
+            double overlapBonus = EvaluateOverlapDifficultyOf(current) * difficulty;
             difficulty += overlapBonus;
 
             return difficulty;
+        }
+
+        public static double EvaluateAimingDensityFactorOf(DifficultyHitObject current)
+        {
+            double difficulty = EvaluateDensityOf(current);
+
+            double overlapBonus = EvaluateOverlapDifficultyOf(current) * difficulty;
+            difficulty += overlapBonus;
+
+            return Math.Max(0, Math.Pow(difficulty, 1.5) - 1);
         }
 
         // Returns value from 0 to 1, where 0 is very predictable and 1 is very unpredictable
@@ -295,7 +299,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
         {
             var currObj = (OsuDifficultyHitObject)current;
 
-            double density = ReadingEvaluator.EvaluateDenstityOf(current, false);
+            double density = ReadingEvaluator.EvaluateDensityOf(current, false);
 
             // Consider that density matters only starting from 3rd note on the screen
             double densityFactor = Math.Max(0, density - 1) / 4;

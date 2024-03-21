@@ -173,8 +173,9 @@ namespace osu.Game.Rulesets.Osu.Difficulty
                 new HiddenFlashlight(mods),
             };
 
-            if (mods.Any(h => h is OsuModFlashlight))
-                skills.Add(new Flashlight(mods));
+            // Why adding flashlight one more time????
+            //if (mods.Any(h => h is OsuModFlashlight))
+            //    skills.Add(new Flashlight(mods));
 
             return skills.ToArray();
         }

@@ -31,12 +31,12 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
 
         public override void Process(DifficultyHitObject current)
         {
-            double densityFactor = Math.Max(0, Math.Pow(ReadingEvaluator.EvaluateDenstityOf(current), 1.5) - 1);
-            // double density = Math.Max(0, ReadingEvaluator.EvaluateDenstityOf(current));
-            currentDensityAimStrain *= strainDecay(current.DeltaTime);
-            currentDensityAimStrain += densityFactor * AimEvaluator.EvaluateDifficultyOf(current, false) * aimComponentMultiplier;
-
             double densityReadingDifficulty = ReadingEvaluator.EvaluateDifficultyOf(current);
+            double densityAimingFactor = ReadingEvaluator.EvaluateAimingDensityFactorOf(current);
+
+            currentDensityAimStrain *= strainDecay(current.DeltaTime);
+            currentDensityAimStrain += densityAimingFactor * AimEvaluator.EvaluateDifficultyOf(current, false) * aimComponentMultiplier;
+
             double totalDensityDifficulty = (currentDensityAimStrain + densityReadingDifficulty) * skillMultiplier;
 
             difficulties.Add(totalDensityDifficulty);
