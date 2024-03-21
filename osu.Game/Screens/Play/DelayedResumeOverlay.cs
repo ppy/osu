@@ -3,6 +3,8 @@
 
 using System;
 using osu.Framework.Allocation;
+using osu.Framework.Audio;
+using osu.Framework.Audio.Sample;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
@@ -47,6 +49,8 @@ namespace osu.Game.Screens.Play
         private SpriteText countdownText = null!;
         private CircularProgress countdownProgress = null!;
 
+        private Sample? sampleCountdown;
+
         public DelayedResumeOverlay()
         {
             Anchor = Anchor.Centre;
@@ -54,7 +58,7 @@ namespace osu.Game.Screens.Play
         }
 
         [BackgroundDependencyLoader]
-        private void load()
+        private void load(AudioManager audio)
         {
             Add(outerContent = new Circle
             {
@@ -103,6 +107,8 @@ namespace osu.Game.Screens.Play
                     }
                 }
             });
+
+            sampleCountdown = audio.Samples.Get(@"Gameplay/resume-countdown");
         }
 
         protected override void PopIn()
@@ -164,13 +170,24 @@ namespace osu.Game.Screens.Play
             countdownProgress.Progress = amountTimePassed;
             countdownProgress.InnerRadius = progress_stroke_width / progress_size / countdownProgress.Scale.X;
 
-            if (countdownCount != newCount && newCount > 0)
+            if (countdownCount != newCount)
             {
-                countdownText.Text = Math.Max(1, newCount).ToString();
-                countdownText.ScaleTo(0.25f).Then().ScaleTo(1, 200, Easing.OutQuint);
-                outerContent.Delay(25).Then().ScaleTo(1.05f, 100).Then().ScaleTo(1f, 200, Easing.Out);
+                if (newCount > 0)
+                {
+                    countdownText.Text = Math.Max(1, newCount).ToString();
+                    countdownText.ScaleTo(0.25f).Then().ScaleTo(1, 200, Easing.OutQuint);
+                    outerContent.Delay(25).Then().ScaleTo(1.05f, 100).Then().ScaleTo(1f, 200, Easing.Out);
 
-                countdownBackground.FlashColour(colourProvider.Background3, 400, Easing.Out);
+                    countdownBackground.FlashColour(colourProvider.Background3, 400, Easing.Out);
+                }
+
+                var chan = sampleCountdown?.GetChannel();
+
+                if (chan != null)
+                {
+                    chan.Frequency.Value = newCount == 0 ? 0.5f : 1;
+                    chan.Play();
+                }
             }
 
             countdownCount = newCount;
