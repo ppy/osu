@@ -26,6 +26,7 @@ using osu.Game.Rulesets.Objects.Drawables;
 using osu.Game.Rulesets.UI;
 using osu.Game.Rulesets.UI.Scrolling;
 using osu.Game.Scoring;
+using osu.Game.Screens.Play;
 using osu.Game.Skinning;
 
 namespace osu.Game.Rulesets.Mania.UI
@@ -163,6 +164,8 @@ namespace osu.Game.Rulesets.Mania.UI
         protected override ReplayInputHandler CreateReplayInputHandler(Replay replay) => new ManiaFramedReplayInputHandler(replay);
 
         protected override ReplayRecorder CreateReplayRecorder(Score score) => new ManiaReplayRecorder(score);
+
+        protected override ResumeOverlay CreateResumeOverlay() => new DelayedResumeOverlay();
 
         protected override void Dispose(bool isDisposing)
         {
