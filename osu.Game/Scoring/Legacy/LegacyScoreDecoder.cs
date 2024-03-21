@@ -21,6 +21,7 @@ using osu.Game.Rulesets;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Replays;
 using osu.Game.Rulesets.Scoring;
+using osuTK;
 using SharpCompress.Compressors.LZMA;
 
 namespace osu.Game.Scoring.Legacy
@@ -240,15 +241,7 @@ namespace osu.Game.Scoring.Legacy
         private void readLegacyReplay(Replay replay, StreamReader reader)
         {
             float lastTime = beatmapOffset;
-            bool negativeFrameEncounted = false;
-            ReplayFrame currentFrame = null;
-
-            // the negative time amount that must be "paid back" by positive frames before we start including frames again.
-            // When a negative frame occurs in a replay, all future frames are skipped until the sum total of their times
-            // is equal to or greater than the time of that negative frame.
-            // This value will be negative if we are in a time deficit, ie we have a negative frame that must be paid back.
-            // Otherwise it will be 0.
-            float timeDeficit = 0;
+            var legacyFrames = new List<LegacyReplayFrame>();
 
             string[] frames = reader.ReadToEnd().Split(',');
 
@@ -271,40 +264,44 @@ namespace osu.Game.Scoring.Legacy
 
                 lastTime += diff;
 
-                if (i < 2 && mouseX == 256 && mouseY == -500)
-                    // at the start of the replay, stable places two replay frames, at time 0 and SkipBoundary - 1, respectively.
-                    // both frames use a position of (256, -500).
-                    // ignore these frames as they serve no real purpose (and can even mislead ruleset-specific handlers - see mania)
-                    continue;
-
-                // negative frames are only counted towards the deficit after the very beginning of the replay.
-                // When the two skip frames are present (see directly above), the third frame will have a large
-                // negative time roughly equal to SkipBoundary. This shouldn't be counted towards the deficit, otherwise
-                // any replay data before the skip would be, well, skipped.
-                //
-                // On testing against stable, it appears that stable ignores the negative time of only the first
-                // negative frame of the first three replay frames, regardless of if the skip frames are present.
-                // Hence the condition here.
-                // But there is a possibility this is incorrect and may need to be revisited later.
-                if (i > 2 || negativeFrameEncounted)
-                {
-                    timeDeficit += diff;
-                    timeDeficit = Math.Min(0, timeDeficit);
-                }
-
-                if (diff < 0)
-                    negativeFrameEncounted = true;
-
-                // still paying back the deficit from a negative frame. Skip this frame.
-                if (timeDeficit < 0)
-                    continue;
-
-                currentFrame = convertFrame(new LegacyReplayFrame(lastTime,
+                legacyFrames.Add(new LegacyReplayFrame(lastTime,
                     mouseX,
                     mouseY,
-                    (ReplayButtonState)Parsing.ParseInt(split[3])), currentFrame);
+                    (ReplayButtonState)Parsing.ParseInt(split[3])));
+            }
 
-                replay.Frames.Add(currentFrame);
+            // https://github.com/peppy/osu-stable-reference/blob/e53980dd76857ee899f66ce519ba1597e7874f28/osu!/GameModes/Play/ReplayWatcher.cs#L62-L67
+            if (legacyFrames.Count >= 2 && legacyFrames[1].Time < legacyFrames[0].Time)
+            {
+                legacyFrames[1].Time = legacyFrames[0].Time;
+                legacyFrames[0].Time = 0;
+            }
+
+            // https://github.com/peppy/osu-stable-reference/blob/e53980dd76857ee899f66ce519ba1597e7874f28/osu!/GameModes/Play/ReplayWatcher.cs#L69-L71
+            if (legacyFrames.Count >= 3 && legacyFrames[0].Time > legacyFrames[2].Time)
+                legacyFrames[0].Time = legacyFrames[1].Time = legacyFrames[2].Time;
+
+            // at the start of the replay, stable places two replay frames, at time 0 and SkipBoundary - 1, respectively.
+            // both frames use a position of (256, -500).
+            // ignore these frames as they serve no real purpose (and can even mislead ruleset-specific handlers - see mania)
+            if (legacyFrames.Count >= 2 && legacyFrames[1].Position == new Vector2(256, -500))
+                legacyFrames.RemoveAt(1);
+
+            if (legacyFrames.Count >= 1 && legacyFrames[0].Position == new Vector2(256, -500))
+                legacyFrames.RemoveAt(0);
+
+            ReplayFrame currentFrame = null;
+
+            foreach (var legacyFrame in legacyFrames)
+            {
+                // never allow backwards time traversal in relation to the current frame.
+                // this handles frames with negative delta.
+                // this doesn't match stable 100% as stable will do something similar to adding an interpolated "intermediate frame"
+                // at the point wherein time flow changes from backwards to forwards, but it'll do for now.
+                if (currentFrame != null && legacyFrame.Time < currentFrame.Time)
+                    continue;
+
+                replay.Frames.Add(currentFrame = convertFrame(legacyFrame, currentFrame));
             }
         }
 
