@@ -1,7 +1,5 @@
-// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
-
-#nullable disable
 
 using System;
 using osu.Framework.Allocation;
@@ -19,7 +17,7 @@ namespace osu.Game.Screens.Edit.Compose.Components
     public abstract partial class CircularDistanceSnapGrid : DistanceSnapGrid
     {
         [Resolved]
-        private EditorClock editorClock { get; set; }
+        private EditorClock editorClock { get; set; } = null!;
 
         protected CircularDistanceSnapGrid(HitObject referenceObject, Vector2 startPosition, double startTime, double? endTime = null)
             : base(referenceObject, startPosition, startTime, endTime)
@@ -127,10 +125,10 @@ namespace osu.Game.Screens.Edit.Compose.Components
         private partial class Ring : CircularProgress
         {
             [Resolved]
-            private IDistanceSnapProvider snapProvider { get; set; }
+            private IDistanceSnapProvider snapProvider { get; set; } = null!;
 
-            [Resolved(canBeNull: true)]
-            private EditorClock editorClock { get; set; }
+            [Resolved]
+            private EditorClock? editorClock { get; set; }
 
             private readonly HitObject referenceObject;
 
@@ -142,7 +140,7 @@ namespace osu.Game.Screens.Edit.Compose.Components
 
                 Colour = this.baseColour = baseColour;
 
-                Current.Value = 1;
+                Progress = 1;
             }
 
             protected override void Update()

@@ -6,7 +6,6 @@ using NUnit.Framework;
 using osu.Game.Beatmaps;
 using osu.Game.Rulesets.Mania.Mods;
 using osu.Game.Tests.Visual;
-using System.Collections.Generic;
 using osu.Game.Rulesets.Mania.Objects;
 using osu.Game.Beatmaps.ControlPoints;
 using osu.Game.Rulesets.Mania.Beatmaps;
@@ -25,21 +24,6 @@ namespace osu.Game.Rulesets.Mania.Tests.Mods
         }
 
         [Test]
-        public void TestCorrectNoteValues()
-        {
-            var testBeatmap = createRawBeatmap();
-            var noteValues = new List<double>(testBeatmap.HitObjects.OfType<HoldNote>().Count());
-
-            foreach (HoldNote h in testBeatmap.HitObjects.OfType<HoldNote>())
-            {
-                noteValues.Add(ManiaModHoldOff.GetNoteDurationInBeatLength(h, testBeatmap));
-            }
-
-            noteValues.Sort();
-            Assert.AreEqual(noteValues, new List<double> { 0.125, 0.250, 0.500, 1.000, 2.000 });
-        }
-
-        [Test]
         public void TestCorrectObjectCount()
         {
             // Ensure that the mod produces the expected number of objects when applied.
@@ -47,25 +31,8 @@ namespace osu.Game.Rulesets.Mania.Tests.Mods
             var rawBeatmap = createRawBeatmap();
             var testBeatmap = createModdedBeatmap();
 
-            // Calculate expected number of objects
-            int expectedObjectCount = 0;
-
-            foreach (ManiaHitObject h in rawBeatmap.HitObjects)
-            {
-                // Both notes and hold notes account for at least one object
-                expectedObjectCount++;
-
-                if (h.GetType() == typeof(HoldNote))
-                {
-                    double noteValue = ManiaModHoldOff.GetNoteDurationInBeatLength((HoldNote)h, rawBeatmap);
-
-                    if (noteValue >= ManiaModHoldOff.END_NOTE_ALLOW_THRESHOLD)
-                    {
-                        // Should generate an end note if it's longer than the minimum note value
-                        expectedObjectCount++;
-                    }
-                }
-            }
+            // Both notes and hold notes account for at least one object
+            int expectedObjectCount = rawBeatmap.HitObjects.Count;
 
             Assert.That(testBeatmap.HitObjects.Count == expectedObjectCount);
         }

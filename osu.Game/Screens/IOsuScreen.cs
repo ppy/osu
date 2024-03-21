@@ -1,7 +1,5 @@
-// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
-
-#nullable disable
 
 using osu.Framework.Bindables;
 using osu.Framework.Screens;
@@ -69,7 +67,13 @@ namespace osu.Game.Screens
         /// Whether mod track adjustments should be applied on entering this screen.
         /// A <see langword="null"/> value means that the parent screen's value of this setting will be used.
         /// </summary>
-        bool? AllowTrackAdjustments { get; }
+        bool? ApplyModTrackAdjustments { get; }
+
+        /// <summary>
+        /// Whether control of the global track should be allowed via the music controller / now playing overlay.
+        /// A <see langword="null"/> value means that the parent screen's value of this setting will be used.
+        /// </summary>
+        bool? AllowGlobalTrackControl { get; }
 
         /// <summary>
         /// Invoked when the back button has been pressed to close any overlays before exiting this <see cref="IOsuScreen"/>.

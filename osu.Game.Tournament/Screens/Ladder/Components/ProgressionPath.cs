@@ -1,7 +1,5 @@
-// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
-
-#nullable disable
 
 using System.Linq;
 using osu.Framework.Graphics;
@@ -62,8 +60,9 @@ namespace osu.Game.Tournament.Screens.Ladder.Components
 
             var topLeft = new Vector2(minX, minY);
 
-            Position = Parent.ToLocalSpace(topLeft);
-            Vertices = points.Select(p => Parent.ToLocalSpace(p) - Parent.ToLocalSpace(topLeft)).ToList();
+            OriginPosition = new Vector2(PathRadius);
+            Position = Parent!.ToLocalSpace(topLeft);
+            Vertices = points.Select(p => Parent!.ToLocalSpace(p) - Parent!.ToLocalSpace(topLeft)).ToList();
         }
     }
 }

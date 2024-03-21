@@ -1,10 +1,7 @@
-// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
 using System;
-using JetBrains.Annotations;
 using osu.Framework.Allocation;
 using osu.Game.Scoring;
 using osu.Game.Screens.Menu;
@@ -17,7 +14,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Spectate
     /// </summary>
     public partial class MultiSpectatorPlayerLoader : SpectatorPlayerLoader
     {
-        public MultiSpectatorPlayerLoader([NotNull] Score score, [NotNull] Func<MultiSpectatorPlayer> createPlayer)
+        public MultiSpectatorPlayerLoader(Score score, Func<MultiSpectatorPlayer> createPlayer)
             : base(score, createPlayer)
         {
         }

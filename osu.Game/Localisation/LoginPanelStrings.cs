@@ -25,6 +25,11 @@ namespace osu.Game.Localisation
         public static LocalisableString SignedIn => new TranslatableString(getKey(@"signed_in"), @"Signed in");
 
         /// <summary>
+        /// "Sign out"
+        /// </summary>
+        public static LocalisableString SignOut => new TranslatableString(getKey(@"sign_out"), @"Sign out");
+
+        /// <summary>
         /// "Account"
         /// </summary>
         public static LocalisableString Account => new TranslatableString(getKey(@"account"), @"Account");

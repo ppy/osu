@@ -2,6 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
+using System.Collections.Generic;
 using osu.Framework.Bindables;
 using osu.Framework.Extensions.ObjectExtensions;
 using osu.Framework.Extensions.TypeExtensions;
@@ -138,30 +139,17 @@ namespace osu.Game.Rulesets.Scoring
         }
 
         /// <summary>
-        /// Creates the <see cref="JudgementResult"/> that represents the scoring result for a <see cref="HitObject"/>.
-        /// </summary>
-        /// <param name="hitObject">The <see cref="HitObject"/> which was judged.</param>
-        /// <param name="judgement">The <see cref="Judgement"/> that provides the scoring information.</param>
-        protected virtual JudgementResult CreateResult(HitObject hitObject, Judgement judgement) => new JudgementResult(hitObject, judgement);
-
-        /// <summary>
         /// Simulates an autoplay of the <see cref="IBeatmap"/> to determine scoring values.
         /// </summary>
         /// <remarks>This provided temporarily. DO NOT USE.</remarks>
         /// <param name="beatmap">The <see cref="IBeatmap"/> to simulate.</param>
-        protected virtual void SimulateAutoplay(IBeatmap beatmap)
+        protected void SimulateAutoplay(IBeatmap beatmap)
         {
             IsSimulating = true;
 
-            foreach (var obj in beatmap.HitObjects)
-                simulate(obj);
-
-            void simulate(HitObject obj)
+            foreach (var obj in EnumerateHitObjects(beatmap))
             {
-                foreach (var nested in obj.NestedHitObjects)
-                    simulate(nested);
-
-                var judgement = obj.CreateJudgement();
+                var judgement = obj.Judgement;
 
                 var result = CreateResult(obj, judgement);
                 if (result == null)
@@ -174,6 +162,43 @@ namespace osu.Game.Rulesets.Scoring
             IsSimulating = false;
         }
 
+        /// <summary>
+        /// Enumerates all <see cref="HitObject"/>s in the given <paramref name="beatmap"/> in the order in which they are to be judged.
+        /// Used in <see cref="SimulateAutoplay"/>.
+        /// </summary>
+        /// <remarks>
+        /// In Score V2, the score awarded for each object includes a component based on the combo value after the judgement of that object.
+        /// This means that the score is dependent on the order of evaluation of judgements.
+        /// This method is provided so that rulesets can specify custom ordering that is correct for them and matches processing order during actual gameplay.
+        /// </remarks>
+        protected virtual IEnumerable<HitObject> EnumerateHitObjects(IBeatmap beatmap)
+            => enumerateRecursively(beatmap.HitObjects);
+
+        private IEnumerable<HitObject> enumerateRecursively(IEnumerable<HitObject> hitObjects)
+        {
+            foreach (var hitObject in hitObjects)
+            {
+                foreach (var nested in enumerateRecursively(hitObject.NestedHitObjects))
+                    yield return nested;
+
+                yield return hitObject;
+            }
+        }
+
+        /// <summary>
+        /// Creates the <see cref="JudgementResult"/> that represents the scoring result for a <see cref="HitObject"/>.
+        /// </summary>
+        /// <param name="hitObject">The <see cref="HitObject"/> which was judged.</param>
+        /// <param name="judgement">The <see cref="Judgement"/> that provides the scoring information.</param>
+        protected virtual JudgementResult CreateResult(HitObject hitObject, Judgement judgement) => new JudgementResult(hitObject, judgement);
+
+        /// <summary>
+        /// Gets a simulated <see cref="HitResult"/> for a judgement. Used during <see cref="SimulateAutoplay"/> to simulate a "perfect" play.
+        /// </summary>
+        /// <param name="judgement">The judgement to simulate a <see cref="HitResult"/> for.</param>
+        /// <returns>The simulated <see cref="HitResult"/> for the judgement.</returns>
+        protected virtual HitResult GetSimulatedHitResult(Judgement judgement) => judgement.MaxResult;
+
         protected override void Update()
         {
             base.Update();
@@ -184,12 +209,5 @@ namespace osu.Game.Rulesets.Scoring
                     // Last applied result is guaranteed to be non-null when JudgedHits > 0.
                     || lastAppliedResult.AsNonNull().TimeAbsolute < Clock.CurrentTime);
         }
-
-        /// <summary>
-        /// Gets a simulated <see cref="HitResult"/> for a judgement. Used during <see cref="SimulateAutoplay"/> to simulate a "perfect" play.
-        /// </summary>
-        /// <param name="judgement">The judgement to simulate a <see cref="HitResult"/> for.</param>
-        /// <returns>The simulated <see cref="HitResult"/> for the judgement.</returns>
-        protected virtual HitResult GetSimulatedHitResult(Judgement judgement) => judgement.MaxResult;
     }
 }

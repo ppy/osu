@@ -1,8 +1,6 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Localisation;
@@ -42,6 +40,12 @@ namespace osu.Game.Overlays.Settings.Sections.UserInterface
                     LabelText = UserInterfaceStrings.ModSelectHotkeyStyle,
                     Current = config.GetBindable<ModSelectHotkeyStyle>(OsuSetting.ModSelectHotkeyStyle),
                     ClassicDefault = ModSelectHotkeyStyle.Classic
+                },
+                new SettingsCheckbox
+                {
+                    LabelText = UserInterfaceStrings.ModSelectTextSearchStartsActive,
+                    Current = config.GetBindable<bool>(OsuSetting.ModSelectTextSearchStartsActive),
+                    ClassicDefault = false
                 },
                 new SettingsCheckbox
                 {

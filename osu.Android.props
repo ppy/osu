@@ -8,13 +8,9 @@
     <!-- NullabilityInfoContextSupport is disabled by default for Android -->
     <NullabilityInfoContextSupport>true</NullabilityInfoContextSupport>
     <EmbedAssembliesIntoApk>true</EmbedAssembliesIntoApk>
-    <AndroidManifestMerger>manifestmerger.jar</AndroidManifestMerger>
   </PropertyGroup>
   <ItemGroup>
-    <PackageReference Include="ppy.osu.Framework.Android" Version="2023.620.0" />
-  </ItemGroup>
-  <ItemGroup>
-    <AndroidManifestOverlay Include="$(MSBuildThisFileDirectory)osu.Android\Properties\AndroidManifestOverlay.xml" />
+    <PackageReference Include="ppy.osu.Framework.Android" Version="2024.306.0" />
   </ItemGroup>
   <PropertyGroup>
     <!-- Fody does not handle Android build well, and warns when unchanged.

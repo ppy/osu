@@ -6,7 +6,6 @@ using osu.Game.Rulesets.Catch.Objects;
 using osu.Game.Rulesets.Edit;
 using osu.Game.Rulesets.UI;
 using osu.Game.Rulesets.UI.Scrolling;
-using osuTK;
 
 namespace osu.Game.Rulesets.Catch.Edit.Blueprints
 {
@@ -24,7 +23,5 @@ namespace osu.Game.Rulesets.Catch.Edit.Blueprints
             : base(new THitObject())
         {
         }
-
-        public override bool ReceivePositionalInputAt(Vector2 screenSpacePos) => true;
     }
 }

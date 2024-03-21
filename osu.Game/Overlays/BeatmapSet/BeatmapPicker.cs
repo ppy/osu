@@ -185,7 +185,7 @@ namespace osu.Game.Overlays.BeatmapSet
                                                                 OnHovered = beatmap =>
                                                                 {
                                                                     showBeatmap(beatmap);
-                                                                    starRating.Text = beatmap.StarRating.ToLocalisableString(@"0.##");
+                                                                    starRating.Text = beatmap.StarRating.ToLocalisableString(@"0.00");
                                                                     starRatingContainer.FadeIn(100);
                                                                 },
                                                                 OnClicked = beatmap => { Beatmap.Value = beatmap; },
@@ -297,7 +297,7 @@ namespace osu.Game.Overlays.BeatmapSet
                     },
                     icon = new DifficultyIcon(beatmapInfo, ruleset)
                     {
-                        ShowTooltip = false,
+                        TooltipType = DifficultyIconTooltipType.None,
                         Current = { Value = new StarDifficulty(beatmapInfo.StarRating, 0) },
                         Anchor = Anchor.Centre,
                         Origin = Anchor.Centre,

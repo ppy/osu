@@ -33,8 +33,7 @@ namespace osu.Game.Screens.Ranking.Statistics
         /// <param name="items">The <see cref="SimpleStatisticItem"/>s to display in this row.</param>
         public SimpleStatisticTable(int columnCount, [ItemNotNull] IEnumerable<SimpleStatisticItem> items)
         {
-            if (columnCount < 1)
-                throw new ArgumentOutOfRangeException(nameof(columnCount));
+            ArgumentOutOfRangeException.ThrowIfNegativeOrZero(columnCount);
 
             this.columnCount = columnCount;
             this.items = items.ToArray();
@@ -98,12 +97,11 @@ namespace osu.Game.Screens.Ranking.Statistics
             Direction = FillDirection.Vertical
         };
 
-        private partial class Spacer : CompositeDrawable
+        public partial class Spacer : CompositeDrawable
         {
             public Spacer()
             {
                 RelativeSizeAxes = Axes.Both;
-                Padding = new MarginPadding { Vertical = 4 };
 
                 InternalChild = new CircularContainer
                 {

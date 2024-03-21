@@ -19,11 +19,16 @@ namespace osu.Game.Skinning
         public override bool HandleNonPositionalInput => false;
         public override bool HandlePositionalInput => false;
 
+        public LegacySongProgress()
+        {
+            // User shouldn't be able to adjust width/height of this as `CircularProgress` doesn't
+            // handle stretched cases well.
+            AutoSizeAxes = Axes.Both;
+        }
+
         [BackgroundDependencyLoader]
         private void load()
         {
-            Size = new Vector2(33);
-
             InternalChildren = new Drawable[]
             {
                 new Container
@@ -39,7 +44,7 @@ namespace osu.Game.Skinning
                 },
                 new CircularContainer
                 {
-                    RelativeSizeAxes = Axes.Both,
+                    Size = new Vector2(33),
                     Masking = true,
                     BorderColour = Colour4.White,
                     BorderThickness = 2,
@@ -67,14 +72,14 @@ namespace osu.Game.Skinning
                 circularProgress.Scale = new Vector2(-1, 1);
                 circularProgress.Anchor = Anchor.TopRight;
                 circularProgress.Colour = new Colour4(199, 255, 47, 153);
-                circularProgress.Current.Value = 1 - progress;
+                circularProgress.Progress = 1 - progress;
             }
             else
             {
                 circularProgress.Scale = new Vector2(1);
                 circularProgress.Anchor = Anchor.TopLeft;
                 circularProgress.Colour = new Colour4(255, 255, 255, 153);
-                circularProgress.Current.Value = progress;
+                circularProgress.Progress = progress;
             }
         }
     }

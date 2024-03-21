@@ -30,13 +30,13 @@ namespace osu.Game.Screens.Play
 
         private readonly Bindable<DownloadState> state = new Bindable<DownloadState>();
 
-        private readonly Func<Task<ScoreInfo>> importFailedScore;
+        private readonly Func<Task<ScoreInfo>>? importFailedScore;
 
         private ScoreInfo? importedScore;
 
         private DownloadButton button = null!;
 
-        public SaveFailedScoreButton(Func<Task<ScoreInfo>> importFailedScore)
+        public SaveFailedScoreButton(Func<Task<ScoreInfo>>? importFailedScore)
         {
             Size = new Vector2(50, 30);
 
@@ -60,11 +60,16 @@ namespace osu.Game.Screens.Play
 
                         case DownloadState.NotDownloaded:
                             state.Value = DownloadState.Importing;
-                            Task.Run(importFailedScore).ContinueWith(t =>
+
+                            if (importFailedScore != null)
                             {
-                                importedScore = realm.Run(r => r.Find<ScoreInfo>(t.GetResultSafely().ID)?.Detach());
-                                Schedule(() => state.Value = importedScore != null ? DownloadState.LocallyAvailable : DownloadState.NotDownloaded);
-                            }).FireAndForget();
+                                Task.Run(importFailedScore).ContinueWith(t =>
+                                {
+                                    importedScore = realm.Run(r => r.Find<ScoreInfo>(t.GetResultSafely().ID)?.Detach());
+                                    Schedule(() => state.Value = importedScore != null ? DownloadState.LocallyAvailable : DownloadState.NotDownloaded);
+                                }).FireAndForget();
+                            }
+
                             break;
                     }
                 }
@@ -102,6 +107,9 @@ namespace osu.Game.Screens.Play
 
         public bool OnPressed(KeyBindingPressEvent<GlobalAction> e)
         {
+            if (e.Repeat)
+                return false;
+
             switch (e.Action)
             {
                 case GlobalAction.SaveReplay:

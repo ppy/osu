@@ -24,6 +24,12 @@ namespace osu.Game.Audio
         public const string BANK_SOFT = @"soft";
         public const string BANK_DRUM = @"drum";
 
+        // new sample used exclusively by taiko for now.
+        public const string HIT_FLOURISH = "hitflourish";
+
+        // new bank used exclusively by taiko for now.
+        public const string BANK_STRONG = @"strong";
+
         /// <summary>
         /// All valid sample addition constants.
         /// </summary>
@@ -74,6 +80,8 @@ namespace osu.Game.Audio
                     yield return $"Gameplay/{Bank}-{Name}{Suffix}";
 
                 yield return $"Gameplay/{Bank}-{Name}";
+
+                yield return $"Gameplay/{Name}";
             }
         }
 
