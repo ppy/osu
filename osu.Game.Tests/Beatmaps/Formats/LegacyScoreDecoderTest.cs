@@ -31,6 +31,7 @@ using osu.Game.Rulesets.Taiko;
 using osu.Game.Scoring;
 using osu.Game.Scoring.Legacy;
 using osu.Game.Tests.Resources;
+using osuTK;
 
 namespace osu.Game.Tests.Beatmaps.Formats
 {
@@ -176,6 +177,94 @@ namespace osu.Game.Tests.Beatmaps.Formats
 
             Assert.That(decodedAfterEncode.Replay.Frames[0].Time, Is.EqualTo(first_frame_time));
             Assert.That(decodedAfterEncode.Replay.Frames[1].Time, Is.EqualTo(second_frame_time));
+        }
+
+        [Test]
+        public void TestNegativeFrameSkipped()
+        {
+            var ruleset = new OsuRuleset().RulesetInfo;
+            var scoreInfo = TestResources.CreateTestScoreInfo(ruleset);
+            var beatmap = new TestBeatmap(ruleset);
+
+            var score = new Score
+            {
+                ScoreInfo = scoreInfo,
+                Replay = new Replay
+                {
+                    Frames = new List<ReplayFrame>
+                    {
+                        new OsuReplayFrame(0, new Vector2()),
+                        new OsuReplayFrame(1000, OsuPlayfield.BASE_SIZE),
+                        new OsuReplayFrame(500, OsuPlayfield.BASE_SIZE / 2),
+                        new OsuReplayFrame(2000, OsuPlayfield.BASE_SIZE),
+                    }
+                }
+            };
+
+            var decodedAfterEncode = encodeThenDecode(LegacyScoreEncoder.LATEST_VERSION, score, beatmap);
+
+            Assert.That(decodedAfterEncode.Replay.Frames, Has.Count.EqualTo(3));
+            Assert.That(decodedAfterEncode.Replay.Frames[0].Time, Is.EqualTo(0));
+            Assert.That(decodedAfterEncode.Replay.Frames[1].Time, Is.EqualTo(1000));
+            Assert.That(decodedAfterEncode.Replay.Frames[2].Time, Is.EqualTo(2000));
+        }
+
+        [Test]
+        public void FirstTwoFramesSwappedIfInWrongOrder()
+        {
+            var ruleset = new OsuRuleset().RulesetInfo;
+            var scoreInfo = TestResources.CreateTestScoreInfo(ruleset);
+            var beatmap = new TestBeatmap(ruleset);
+
+            var score = new Score
+            {
+                ScoreInfo = scoreInfo,
+                Replay = new Replay
+                {
+                    Frames = new List<ReplayFrame>
+                    {
+                        new OsuReplayFrame(100, new Vector2()),
+                        new OsuReplayFrame(50, OsuPlayfield.BASE_SIZE / 2),
+                        new OsuReplayFrame(1000, OsuPlayfield.BASE_SIZE),
+                    }
+                }
+            };
+
+            var decodedAfterEncode = encodeThenDecode(LegacyScoreEncoder.LATEST_VERSION, score, beatmap);
+
+            Assert.That(decodedAfterEncode.Replay.Frames, Has.Count.EqualTo(3));
+            Assert.That(decodedAfterEncode.Replay.Frames[0].Time, Is.EqualTo(0));
+            Assert.That(decodedAfterEncode.Replay.Frames[1].Time, Is.EqualTo(100));
+            Assert.That(decodedAfterEncode.Replay.Frames[2].Time, Is.EqualTo(1000));
+        }
+
+        [Test]
+        public void FirstTwoFramesPulledTowardThirdIfTheyAreAfterIt()
+        {
+            var ruleset = new OsuRuleset().RulesetInfo;
+            var scoreInfo = TestResources.CreateTestScoreInfo(ruleset);
+            var beatmap = new TestBeatmap(ruleset);
+
+            var score = new Score
+            {
+                ScoreInfo = scoreInfo,
+                Replay = new Replay
+                {
+                    Frames = new List<ReplayFrame>
+                    {
+                        new OsuReplayFrame(0, new Vector2()),
+                        new OsuReplayFrame(500, OsuPlayfield.BASE_SIZE / 2),
+                        new OsuReplayFrame(-1500, OsuPlayfield.BASE_SIZE),
+                    }
+                }
+            };
+
+            var decodedAfterEncode = encodeThenDecode(LegacyScoreEncoder.LATEST_VERSION, score, beatmap);
+
+            Assert.That(decodedAfterEncode.Replay.Frames, Has.Count.EqualTo(3));
+            Assert.That(decodedAfterEncode.Replay.Frames[0].Time, Is.EqualTo(-1500));
+            Assert.That(decodedAfterEncode.Replay.Frames[1].Time, Is.EqualTo(-1500));
+            Assert.That(decodedAfterEncode.Replay.Frames[2].Time, Is.EqualTo(-1500));
         }
 
         [Test]
