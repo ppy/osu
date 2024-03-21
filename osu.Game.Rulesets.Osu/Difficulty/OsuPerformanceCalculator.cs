@@ -221,9 +221,15 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             if (score.Mods.Any(m => m is OsuModBlinds))
                 accuracyValue *= 1.14;
 
-            // It's stupid so i removed it, it's better just to increase FL coef
-            //if (score.Mods.Any(m => m is OsuModFlashlight))
-            //    accuracyValue *= 1.02;
+            if (score.Mods.Any(m => m is OsuModFlashlight))
+                accuracyValue *= 1.02;
+
+            // Visual indication bonus
+            double visualIndicationBonus = 1.0 + 0.1 * logistic((8.0 - attributes.ApproachRate) / 6);
+
+            accuracyValue *= visualIndicationBonus;
+            if (score.Mods.Any(h => h is OsuModHidden))
+                accuracyValue *= visualIndicationBonus;
 
             return accuracyValue;
         }
@@ -397,5 +403,6 @@ namespace osu.Game.Rulesets.Osu.Difficulty
         }
 
         private static double softmin(double a, double b, double power = Math.E) => a * b / Math.Log(Math.Pow(power, a) + Math.Pow(power, b), power);
+        private static double logistic(double x) => 1 / (1 + Math.Exp(-x));
     }
 }

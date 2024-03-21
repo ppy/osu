@@ -16,7 +16,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
     public class ReadingLowAR : GraphSkill
     {
         private readonly List<double> difficulties = new List<double>();
-        private double skillMultiplier => 1.1;
+        private double skillMultiplier => 1.08;
         private double aimComponentMultiplier => 0.7;
 
         public ReadingLowAR(Mod[] mods)
@@ -95,7 +95,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
         }
 
         private double currentStrain;
-        private double skillMultiplier => 5;
+        private double skillMultiplier => 4.9;
 
         protected override double CalculateInitialStrain(double time, DifficultyHitObject current) => currentStrain * StrainDecay(time - current.Previous(0).StartTime);
 
