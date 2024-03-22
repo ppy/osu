@@ -21,6 +21,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
         private int countOk;
         private int countMeh;
         private int countMiss;
+        private int countLargeTickMiss;
         private int countSliderEndsDropped;
 
         private double effectiveMissCount;
@@ -40,10 +41,10 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             countOk = score.Statistics.GetValueOrDefault(HitResult.Ok);
             countMeh = score.Statistics.GetValueOrDefault(HitResult.Meh);
             countMiss = score.Statistics.GetValueOrDefault(HitResult.Miss);
+            countLargeTickMiss = score.Statistics.GetValueOrDefault(HitResult.LargeTickMiss);
             countSliderEndsDropped = score.Statistics.GetValueOrDefault(HitResult.SmallTickMiss);
-
             if (!score.Mods.Any(h => h is OsuModClassic cl && cl.NoSliderHeadAccuracy.Value))
-                effectiveMissCount = countMiss;
+                effectiveMissCount = countMiss + countLargeTickMiss;
             else
                 effectiveMissCount = calculateEffectiveMissCount(osuAttributes);
 
