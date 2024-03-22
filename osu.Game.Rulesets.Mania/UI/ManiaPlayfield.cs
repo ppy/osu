@@ -7,13 +7,16 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics.Primitives;
 using osu.Game.Rulesets.Mania.Beatmaps;
 using osu.Game.Rulesets.Mania.Objects;
+using osu.Game.Rulesets.Mania.Skinning.Default;
 using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Objects.Drawables;
 using osu.Game.Rulesets.UI.Scrolling;
+using osu.Game.Skinning;
 using osuTK;
 
 namespace osu.Game.Rulesets.Mania.UI
@@ -24,6 +27,8 @@ namespace osu.Game.Rulesets.Mania.UI
         public IReadOnlyList<Stage> Stages => stages;
 
         private readonly List<Stage> stages = new List<Stage>();
+
+        public Drawable StageContainer { get; private set; }
 
         public override Quad SkinnableComponentScreenSpaceDrawQuad
         {
@@ -60,10 +65,26 @@ namespace osu.Game.Rulesets.Mania.UI
                 throw new ArgumentException("Can't have zero or fewer stages.");
 
             GridContainer playfieldGrid;
-            AddInternal(playfieldGrid = new GridContainer
+
+            AddInternal(StageContainer = new Container
             {
-                RelativeSizeAxes = Axes.Both,
-                Content = new[] { new Drawable[stageDefinitions.Count] }
+                RelativeSizeAxes = Axes.Y,
+                AutoSizeAxes = Axes.X,
+                RelativePositionAxes = Axes.X,
+                Children = new Drawable[]
+                {
+                    playfieldGrid = new GridContainer
+                    {
+                        RelativeSizeAxes = Axes.Y,
+                        AutoSizeAxes = Axes.X,
+                        Content = new[] { new Drawable[stageDefinitions.Count] },
+                        ColumnDimensions = Enumerable.Range(0, stageDefinitions.Count).Select(_ => new Dimension(GridSizeMode.AutoSize)).ToArray()
+                    },
+                    new SkinnableDrawable(new ManiaSkinComponentLookup(ManiaSkinComponents.Stage), _ => new DefaultStageConfiguration())
+                    {
+                        RelativeSizeAxes = Axes.Both
+                    }
+                }
             });
 
             var normalColumnAction = ManiaAction.Key1;

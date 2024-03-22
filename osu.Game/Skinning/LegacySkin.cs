@@ -152,6 +152,9 @@ namespace osu.Game.Skinning
                     Debug.Assert(maniaLookup.ColumnIndex != null);
                     return SkinUtils.As<TValue>(new Bindable<float>(existing.ColumnSpacing[maniaLookup.ColumnIndex.Value]));
 
+                case LegacyManiaSkinConfigurationLookups.ColumnStart:
+                    return SkinUtils.As<TValue>(new Bindable<float>(existing.ColumnStart));
+
                 case LegacyManiaSkinConfigurationLookups.HitPosition:
                     return SkinUtils.As<TValue>(new Bindable<float>(existing.HitPosition));
 

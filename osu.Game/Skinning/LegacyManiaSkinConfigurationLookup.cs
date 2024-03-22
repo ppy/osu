@@ -38,6 +38,7 @@ namespace osu.Game.Skinning
     {
         ColumnWidth,
         ColumnSpacing,
+        ColumnStart,
         LightImage,
         LeftLineWidth,
         RightLineWidth,
