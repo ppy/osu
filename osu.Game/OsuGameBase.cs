@@ -678,11 +678,13 @@ namespace osu.Game
         /// <summary>
         /// Allows a maximum of one unhandled exception, per second of execution.
         /// </summary>
-        private bool onExceptionThrown(Exception _)
+        private bool onExceptionThrown(Exception ex)
         {
             bool continueExecution = Interlocked.Decrement(ref allowableExceptions) >= 0;
 
             Logger.Log($"Unhandled exception has been {(continueExecution ? $"allowed with {allowableExceptions} more allowable exceptions" : "denied")} .");
+
+            RulesetStore.TryDisableCustomRulesetsCausing(ex);
 
             // restore the stock of allowable exceptions after a short delay.
             Task.Delay(1000).ContinueWith(_ => Interlocked.Increment(ref allowableExceptions));
