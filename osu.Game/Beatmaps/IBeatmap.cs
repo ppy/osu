@@ -1,6 +1,7 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using osu.Game.Beatmaps.ControlPoints;
@@ -129,6 +130,7 @@ namespace osu.Game.Beatmaps
         ///
         /// It's not super efficient so calls should be kept to a minimum.
         /// </remarks>
+        /// <exception cref="InvalidOperationException">If <paramref name="beatmap"/> has no objects.</exception>
         public static double GetLastObjectTime(this IBeatmap beatmap) => beatmap.HitObjects.Max(h => h.GetEndTime());
 
         #region Helper methods
