@@ -27,12 +27,28 @@ namespace osu.Game.Screens.Edit
                 beatmapSkin.BeatmapSkinChanged += TriggerSourceChanged;
         }
 
+        protected override BeatmapSkinProvidingContainer CreateBeatmapSkinProvidingContainer(ISkin beatmapSkin)
+        {
+            return new EditorBeatmapSkinProvidingContainer(GetRulesetTransformedSkin(beatmapSkin));
+        }
+
         protected override void Dispose(bool isDisposing)
         {
             base.Dispose(isDisposing);
 
             if (beatmapSkin != null)
                 beatmapSkin.BeatmapSkinChanged -= TriggerSourceChanged;
+        }
+
+        public partial class EditorBeatmapSkinProvidingContainer : BeatmapSkinProvidingContainer
+        {
+            public EditorBeatmapSkinProvidingContainer(ISkin skin)
+                : base(skin)
+            {
+            }
+
+            // In the editor, beatmap colours should always be used, regardless of user setting.
+            protected override bool AllowColourLookup => true;
         }
     }
 }
