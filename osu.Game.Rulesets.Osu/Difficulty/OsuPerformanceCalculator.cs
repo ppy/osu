@@ -23,6 +23,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
         private int countMiss;
 
         private double effectiveMissCount;
+        private int amountHitObjectsWithAccuracy;
 
         public OsuPerformanceCalculator()
             : base(new OsuRuleset())
@@ -39,7 +40,16 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             countMeh = score.Statistics.GetValueOrDefault(HitResult.Meh);
             countMiss = score.Statistics.GetValueOrDefault(HitResult.Miss);
             effectiveMissCount = calculateEffectiveMissCount(osuAttributes);
-            accuracy = calculateEffectiveAccuracy(countGreat, countOk, countMeh, countMiss, totalHits);
+
+            amountHitObjectsWithAccuracy = osuAttributes.HitCircleCount;
+            // Potential merge with #27063
+            //if (!score.Mods.Any(h => h is OsuModClassic cl && cl.NoSliderHeadAccuracy.Value))
+            //    amountHitObjectsWithAccuracy += osuAttributes.SliderCount;
+
+            if (amountHitObjectsWithAccuracy > 0)
+                accuracy = calculateEffectiveAccuracy(countGreat - (totalHits - amountHitObjectsWithAccuracy), countOk, countMeh, countMiss, amountHitObjectsWithAccuracy);
+            else
+                accuracy = 0;
 
             double multiplier = PERFORMANCE_BASE_MULTIPLIER;
 
@@ -190,22 +200,13 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             if (score.Mods.Any(h => h is OsuModRelax))
                 return 0.0;
 
-            // This percentage only considers HitCircles of any value - in this part of the calculation we focus on hitting the timing hit window.
-            double betterAccuracyPercentage;
-            int amountHitObjectsWithAccuracy = attributes.HitCircleCount;
-
-            if (amountHitObjectsWithAccuracy > 0)
-                betterAccuracyPercentage = calculateEffectiveAccuracy(countGreat - (totalHits - amountHitObjectsWithAccuracy), countOk, countMeh, countMiss, amountHitObjectsWithAccuracy);
-            else
-                betterAccuracyPercentage = 0;
-
             // It is possible to reach a negative accuracy with this formula. Cap it at zero - zero points.
-            if (betterAccuracyPercentage < 0)
-                betterAccuracyPercentage = 0;
+            if (accuracy < 0)
+                accuracy = 0;
 
             // Lots of arbitrary values from testing.
             // Considering to use derivation from perfect accuracy in a probabilistic manner - assume normal distribution.
-            double accuracyValue = Math.Pow(1.52163, attributes.OverallDifficulty) * Math.Pow(betterAccuracyPercentage, 24) * 2.83;
+            double accuracyValue = Math.Pow(1.52163, attributes.OverallDifficulty) * Math.Pow(accuracy, 24) * 2.83;
 
             // Bonus for many hitcircles - it's harder to keep good accuracy up for longer.
             accuracyValue *= Math.Min(1.15, Math.Pow(amountHitObjectsWithAccuracy / 1000.0, 0.3));
