@@ -5,17 +5,15 @@ using System.Collections.Generic;
 using System.Linq;
 using osu.Game.Rulesets.Edit;
 using osu.Game.Rulesets.Edit.Checks.Components;
-using osu.Game.Rulesets.Mania.Edit.Checks;
+using osu.Game.Rulesets.Taiko.Edit.Checks;
 
-namespace osu.Game.Rulesets.Mania.Edit
+namespace osu.Game.Rulesets.Taiko.Edit
 {
-    public class ManiaBeatmapVerifier : IBeatmapVerifier
+    public class TaikoBeatmapVerifier : IBeatmapVerifier
     {
         private readonly List<ICheck> checks = new List<ICheck>
         {
-            // Settings
-            new CheckKeyCount(),
-            new CheckManiaAbnormalDifficultySettings(),
+            new CheckTaikoAbnormalDifficultySettings(),
         };
 
         public IEnumerable<Issue> Run(BeatmapVerifierContext context)
