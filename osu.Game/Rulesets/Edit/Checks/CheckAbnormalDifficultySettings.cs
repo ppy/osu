@@ -6,9 +6,9 @@ using osu.Game.Rulesets.Edit.Checks.Components;
 
 namespace osu.Game.Rulesets.Edit.Checks
 {
-    public class CheckAbnormalDifficultySettings : ICheck
+    public abstract class CheckAbnormalDifficultySettings : ICheck
     {
-        public CheckMetadata Metadata => new CheckMetadata(CheckCategory.Settings, "Abnormal difficulty settings");
+        public abstract CheckMetadata Metadata { get; }
 
         public IEnumerable<IssueTemplate> PossibleTemplates => new IssueTemplate[]
         {
@@ -16,42 +16,17 @@ namespace osu.Game.Rulesets.Edit.Checks
             new IssueTemplateOutOfRange(this),
         };
 
-        public IEnumerable<Issue> Run(BeatmapVerifierContext context)
-        {
-            var diff = context.Beatmap.Difficulty;
-            string ruleset = context.Beatmap.BeatmapInfo.Ruleset.ShortName;
+        public abstract IEnumerable<Issue> Run(BeatmapVerifierContext context);
 
-            if (hasMoreThanOneDecimalPlace(diff.ApproachRate))
-                yield return new IssueTemplateMoreThanOneDecimal(this).Create("Approach rate", diff.ApproachRate);
-
-            if (isOutOfRange(diff.ApproachRate))
-                yield return new IssueTemplateOutOfRange(this).Create("Approach rate", diff.ApproachRate);
-
-            if (hasMoreThanOneDecimalPlace(diff.OverallDifficulty))
-                yield return new IssueTemplateMoreThanOneDecimal(this).Create("Overall difficulty", diff.OverallDifficulty);
-
-            if (isOutOfRange(diff.OverallDifficulty))
-                yield return new IssueTemplateOutOfRange(this).Create("Overall difficulty", diff.OverallDifficulty);
-
-            if (hasMoreThanOneDecimalPlace(diff.CircleSize))
-                yield return new IssueTemplateMoreThanOneDecimal(this).Create("Circle size", diff.CircleSize);
-
-            if (ruleset != "mania" && isOutOfRange(diff.CircleSize))
-                yield return new IssueTemplateOutOfRange(this).Create("Circle size", diff.CircleSize);
-
-            if (hasMoreThanOneDecimalPlace(diff.DrainRate))
-                yield return new IssueTemplateMoreThanOneDecimal(this).Create("Drain rate", diff.DrainRate);
-
-            if (isOutOfRange(diff.DrainRate))
-                yield return new IssueTemplateOutOfRange(this).Create("Drain rate", diff.DrainRate);
-        }
-
-        private bool isOutOfRange(float setting)
+        /// <summary>
+        /// If the setting is out of the boundaries set by the editor (0 - 10)
+        /// </summary>
+        protected bool OutOfRange(float setting)
         {
             return setting < 0f || setting > 10f;
         }
 
-        private bool hasMoreThanOneDecimalPlace(float setting)
+        protected bool HasMoreThanOneDecimalPlace(float setting)
         {
             return float.Round(setting, 1) != setting;
         }
