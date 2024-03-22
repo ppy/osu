@@ -14,6 +14,7 @@ using osu.Framework.Graphics.Textures;
 using osu.Framework.Testing;
 using osu.Game.Audio;
 using osu.Game.Configuration;
+using osu.Game.Rulesets;
 using osu.Game.Rulesets.Osu;
 using osu.Game.Skinning;
 using osu.Game.Tests.Beatmaps;
@@ -112,6 +113,13 @@ namespace osu.Game.Tests.Skins
         private class TestSkinComponentLookup : ISkinComponentLookup
         {
             public string LookupName => string.Empty;
+
+            bool IEquatable<ISkinComponentLookup>.Equals(ISkinComponentLookup other)
+                => other is TestSkinComponentLookup lookup && LookupName == lookup.LookupName;
+
+            object ISkinComponentLookup.Target => LookupName;
+
+            RulesetInfo ISkinComponentLookup.Ruleset => null;
         }
     }
 }

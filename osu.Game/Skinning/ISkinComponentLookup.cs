@@ -1,6 +1,9 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System;
+using osu.Game.Rulesets;
+
 namespace osu.Game.Skinning
 {
     /// <summary>
@@ -15,7 +18,10 @@ namespace osu.Game.Skinning
     /// More commonly, a ruleset could make use of <see cref="GameplaySkinComponentLookup{T}"/> to do a simple lookup based on
     /// a provided enum.
     /// </remarks>
-    public interface ISkinComponentLookup
+    public interface ISkinComponentLookup : IEquatable<ISkinComponentLookup>
     {
+        object Target { get; }
+
+        RulesetInfo? Ruleset { get; }
     }
 }

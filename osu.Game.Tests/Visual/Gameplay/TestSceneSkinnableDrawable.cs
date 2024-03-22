@@ -18,6 +18,7 @@ using osu.Framework.Graphics.Textures;
 using osu.Game.Audio;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
+using osu.Game.Rulesets;
 using osu.Game.Skinning;
 using osuTK;
 using osuTK.Graphics;
@@ -347,6 +348,13 @@ namespace osu.Game.Tests.Visual.Gameplay
             public string ComponentGroup => string.Empty;
 
             public string LookupName { get; }
+
+            bool IEquatable<ISkinComponentLookup>.Equals(ISkinComponentLookup other)
+                => other is TestSkinComponentLookup lookup && ComponentGroup == lookup.ComponentGroup && LookupName == lookup.LookupName;
+
+            object ISkinComponentLookup.Target => LookupName;
+
+            RulesetInfo ISkinComponentLookup.Ruleset => null;
         }
     }
 }

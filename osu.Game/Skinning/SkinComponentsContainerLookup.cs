@@ -73,5 +73,12 @@ namespace osu.Game.Skinning
             [Description("Playfield")]
             Playfield
         }
+
+        bool IEquatable<ISkinComponentLookup>.Equals(ISkinComponentLookup? other)
+            => other is SkinComponentsContainerLookup lookup && Equals(lookup);
+
+        object ISkinComponentLookup.Target => Target;
+
+        RulesetInfo? ISkinComponentLookup.Ruleset => Ruleset;
     }
 }

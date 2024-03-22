@@ -74,7 +74,7 @@ namespace osu.Game.Overlays.SkinEditor
         [Cached]
         private readonly OverlayColourProvider colourProvider = new OverlayColourProvider(OverlayColourScheme.Blue);
 
-        private readonly Bindable<SkinComponentsContainerLookup?> selectedTarget = new Bindable<SkinComponentsContainerLookup?>();
+        private readonly Bindable<ISkinComponentLookup?> selectedTarget = new Bindable<ISkinComponentLookup?>();
 
         private bool hasBegunMutating;
 
@@ -322,12 +322,12 @@ namespace osu.Game.Overlays.SkinEditor
             {
                 selectedTarget.Default = getFirstTarget()?.Lookup;
 
-                if (!availableTargets.Any(t => t.Lookup.Equals(selectedTarget.Value)))
+                if (!availableTargets.Any(t => EqualityComparer<object>.Default.Equals(t.Lookup, selectedTarget.Value)))
                     selectedTarget.SetDefault();
             }
         }
 
-        private void targetChanged(ValueChangedEvent<SkinComponentsContainerLookup?> target)
+        private void targetChanged(ValueChangedEvent<ISkinComponentLookup?> target)
         {
             foreach (var toolbox in componentsSidebar.OfType<SkinComponentToolbox>())
                 toolbox.Expire();
@@ -345,7 +345,7 @@ namespace osu.Game.Overlays.SkinEditor
                 return;
             }
 
-            changeHandler = new SkinEditorChangeHandler(skinComponentsContainer);
+            changeHandler = new SkinEditorChangeHandler((Drawable)skinComponentsContainer);
             changeHandler.CanUndo.BindValueChanged(v => undoMenuItem.Action.Disabled = !v.NewValue, true);
             changeHandler.CanRedo.BindValueChanged(v => redoMenuItem.Action.Disabled = !v.NewValue, true);
 
@@ -357,7 +357,7 @@ namespace osu.Game.Overlays.SkinEditor
                 {
                     Children = new Drawable[]
                     {
-                        new SettingsDropdown<SkinComponentsContainerLookup?>
+                        new SettingsDropdown<ISkinComponentLookup?>
                         {
                             Items = availableTargets.Select(t => t.Lookup).Distinct(),
                             Current = selectedTarget,
@@ -416,7 +416,7 @@ namespace osu.Game.Overlays.SkinEditor
             var targetContainer = getTarget(selectedTarget.Value);
 
             if (targetContainer != null)
-                changeHandler = new SkinEditorChangeHandler(targetContainer);
+                changeHandler = new SkinEditorChangeHandler((Drawable)targetContainer);
             hasBegunMutating = true;
         }
 
@@ -465,18 +465,21 @@ namespace osu.Game.Overlays.SkinEditor
                 settingsSidebar.Add(new SkinSettingsToolbox(component));
         }
 
-        private IEnumerable<SkinComponentsContainer> availableTargets => targetScreen.ChildrenOfType<SkinComponentsContainer>();
+        private IEnumerable<ISerialisableDrawableContainer> availableTargets => targetScreen.ChildrenOfType<ISerialisableDrawableContainer>();
 
-        private SkinComponentsContainer? getFirstTarget() => availableTargets.FirstOrDefault();
+        private ISerialisableDrawableContainer? getFirstTarget() => availableTargets.FirstOrDefault();
 
-        private SkinComponentsContainer? getTarget(SkinComponentsContainerLookup? target)
+        private ISerialisableDrawableContainer? getTarget(ISkinComponentLookup? target)
         {
-            return availableTargets.FirstOrDefault(c => c.Lookup.Equals(target));
+            if (target is not ISkinComponentLookup lookup)
+                return null;
+
+            return availableTargets.FirstOrDefault(c => c.Lookup.Equals(lookup));
         }
 
         private void revert()
         {
-            SkinComponentsContainer[] targetContainers = availableTargets.ToArray();
+            ISerialisableDrawableContainer[] targetContainers = availableTargets.ToArray();
 
             foreach (var t in targetContainers)
             {
@@ -544,7 +547,7 @@ namespace osu.Game.Overlays.SkinEditor
             if (targetScreen?.IsLoaded != true)
                 return;
 
-            SkinComponentsContainer[] targetContainers = availableTargets.ToArray();
+            ISerialisableDrawableContainer[] targetContainers = availableTargets.ToArray();
 
             if (!targetContainers.All(c => c.ComponentsLoaded))
                 return;

@@ -24,10 +24,7 @@ namespace osu.Game.Skinning
     {
         private Container? content;
 
-        /// <summary>
-        /// The lookup criteria which will be used to retrieve components from the active skin.
-        /// </summary>
-        public SkinComponentsContainerLookup Lookup { get; }
+        public ISkinComponentLookup Lookup { get; }
 
         public IBindableList<ISerialisableDrawable> Components => components;
 

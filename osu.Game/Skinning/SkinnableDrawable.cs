@@ -35,7 +35,9 @@ namespace osu.Game.Skinning
 
         public IBindableList<ISerialisableDrawable> Components => components;
 
-        protected readonly ISkinComponentLookup ComponentLookup;
+        public bool ComponentsLoaded { get; private set; }
+
+        public ISkinComponentLookup Lookup { get; }
 
         private readonly BindableList<ISerialisableDrawable> components = new BindableList<ISerialisableDrawable>();
         private readonly ConfineMode confineMode;
@@ -54,7 +56,7 @@ namespace osu.Game.Skinning
 
         protected SkinnableDrawable(ISkinComponentLookup lookup, ConfineMode confineMode = ConfineMode.NoScaling)
         {
-            ComponentLookup = lookup;
+            Lookup = lookup;
             this.confineMode = confineMode;
 
             RelativeSizeAxes = Axes.Both;
@@ -107,13 +109,13 @@ namespace osu.Game.Skinning
             }
         }
 
-        public void Reload() => reload(CurrentSkin.GetDrawableComponent(ComponentLookup));
+        public void Reload() => reload(CurrentSkin.GetDrawableComponent(Lookup));
 
         private void reload(Drawable? newComponent)
         {
             if (newComponent == null)
             {
-                Drawable = CreateDefault(ComponentLookup);
+                Drawable = CreateDefault(Lookup);
                 isDefault = true;
             }
             else
@@ -135,6 +137,8 @@ namespace osu.Game.Skinning
                 components.Add(serialisable);
 
             InternalChild = Drawable;
+
+            ComponentsLoaded = true;
         }
 
         public void Reload(SerialisedDrawableInfo[] skinnableInfo) => reload(skinnableInfo.FirstOrDefault()?.CreateInstance());

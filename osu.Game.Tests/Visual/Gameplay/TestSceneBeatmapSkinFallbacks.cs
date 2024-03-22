@@ -55,7 +55,10 @@ namespace osu.Game.Tests.Visual.Gameplay
 
         protected bool AssertComponentsFromExpectedSource(SkinComponentsContainerLookup.TargetArea target, ISkin expectedSource)
         {
-            var targetContainer = Player.ChildrenOfType<SkinComponentsContainer>().First(s => s.Lookup.Target == target);
+            var targetContainer = Player.ChildrenOfType<SkinComponentsContainer>()
+                                        .Where(s => s.Lookup.Target is SkinComponentsContainerLookup.TargetArea)
+                                        .First(s => (SkinComponentsContainerLookup.TargetArea)s.Lookup.Target == target);
+
             var actualComponentsContainer = targetContainer.ChildrenOfType<Container>().SingleOrDefault(c => c.Parent == targetContainer);
 
             if (actualComponentsContainer == null)

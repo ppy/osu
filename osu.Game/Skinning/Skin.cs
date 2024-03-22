@@ -40,10 +40,10 @@ namespace osu.Game.Skinning
 
         public SkinConfiguration Configuration { get; set; }
 
-        public IDictionary<SkinComponentsContainerLookup.TargetArea, SkinLayoutInfo> LayoutInfos => layoutInfos;
+        public IDictionary<object, SkinLayoutInfo> LayoutInfos => layoutInfos;
 
-        private readonly Dictionary<SkinComponentsContainerLookup.TargetArea, SkinLayoutInfo> layoutInfos =
-            new Dictionary<SkinComponentsContainerLookup.TargetArea, SkinLayoutInfo>();
+        private readonly Dictionary<object, SkinLayoutInfo> layoutInfos =
+            new Dictionary<object, SkinLayoutInfo>();
 
         public abstract ISample? GetSample(ISampleInfo sampleInfo);
 
@@ -188,7 +188,7 @@ namespace osu.Game.Skinning
         /// Remove all stored customisations for the provided target.
         /// </summary>
         /// <param name="targetContainer">The target container to reset.</param>
-        public void ResetDrawableTarget(SkinComponentsContainer targetContainer)
+        public void ResetDrawableTarget(ISerialisableDrawableContainer targetContainer)
         {
             LayoutInfos.Remove(targetContainer.Lookup.Target);
         }
@@ -197,12 +197,12 @@ namespace osu.Game.Skinning
         /// Update serialised information for the provided target.
         /// </summary>
         /// <param name="targetContainer">The target container to serialise to this skin.</param>
-        public void UpdateDrawableTarget(SkinComponentsContainer targetContainer)
+        public void UpdateDrawableTarget(ISerialisableDrawableContainer targetContainer)
         {
             if (!LayoutInfos.TryGetValue(targetContainer.Lookup.Target, out var layoutInfo))
                 layoutInfos[targetContainer.Lookup.Target] = layoutInfo = new SkinLayoutInfo();
 
-            layoutInfo.Update(targetContainer.Lookup.Ruleset, ((ISerialisableDrawableContainer)targetContainer).CreateSerialisedInfo().ToArray());
+            layoutInfo.Update(targetContainer.Lookup.Ruleset, targetContainer.CreateSerialisedInfo().ToArray());
         }
 
         public virtual Drawable? GetDrawableComponent(ISkinComponentLookup lookup)

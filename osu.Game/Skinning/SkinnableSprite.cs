@@ -14,6 +14,7 @@ using osu.Game.Configuration;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Localisation.SkinComponents;
 using osu.Game.Overlays.Settings;
+using osu.Game.Rulesets;
 using osuTK;
 
 namespace osu.Game.Skinning
@@ -28,7 +29,8 @@ namespace osu.Game.Skinning
         [Resolved]
         private TextureStore textures { get; set; } = null!;
 
-        [SettingSource(typeof(SkinnableComponentStrings), nameof(SkinnableComponentStrings.SpriteName), nameof(SkinnableComponentStrings.SpriteNameDescription), SettingControlType = typeof(SpriteSelectorControl))]
+        [SettingSource(typeof(SkinnableComponentStrings), nameof(SkinnableComponentStrings.SpriteName), nameof(SkinnableComponentStrings.SpriteNameDescription),
+            SettingControlType = typeof(SpriteSelectorControl))]
         public Bindable<string> SpriteName { get; } = new Bindable<string>(string.Empty);
 
         [Resolved]
@@ -48,7 +50,7 @@ namespace osu.Game.Skinning
 
             SpriteName.BindValueChanged(name =>
             {
-                ((SpriteComponentLookup)ComponentLookup).LookupName = name.NewValue ?? string.Empty;
+                ((SpriteComponentLookup)Lookup).LookupName = name.NewValue ?? string.Empty;
                 if (IsLoaded)
                     SkinChanged(CurrentSkin);
             });
@@ -80,6 +82,13 @@ namespace osu.Game.Skinning
                 LookupName = textureName;
                 MaxSize = maxSize;
             }
+
+            bool IEquatable<ISkinComponentLookup>.Equals(ISkinComponentLookup? other)
+                => other is SpriteComponentLookup lookup && LookupName == lookup.LookupName && MaxSize == lookup.MaxSize;
+
+            object ISkinComponentLookup.Target => LookupName;
+
+            RulesetInfo? ISkinComponentLookup.Ruleset => null;
         }
 
         public partial class SpriteSelectorControl : SettingsDropdown<string>
