@@ -36,6 +36,7 @@ namespace osu.Game.Rulesets.Edit
             new CheckConcurrentObjects(),
             new CheckZeroLengthObjects(),
             new CheckDrainLength(),
+            new CheckUnusedAudioAtEnd(),
 
             // Timing
             new CheckPreviewTime(),
