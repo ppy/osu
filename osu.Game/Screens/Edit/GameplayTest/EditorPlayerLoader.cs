@@ -4,6 +4,7 @@
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Screens;
+using osu.Game.Beatmaps;
 using osu.Game.Screens.Menu;
 using osu.Game.Screens.Play;
 
@@ -14,8 +15,8 @@ namespace osu.Game.Screens.Edit.GameplayTest
         [Resolved]
         private OsuLogo osuLogo { get; set; } = null!;
 
-        public EditorPlayerLoader(Editor editor)
-            : base(() => new EditorPlayer(editor))
+        public EditorPlayerLoader(Editor editor, IBeatmap playableBeatmap)
+            : base(() => new EditorPlayer(editor, playableBeatmap))
         {
         }
 

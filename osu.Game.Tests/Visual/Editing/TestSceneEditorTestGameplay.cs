@@ -127,6 +127,24 @@ namespace osu.Game.Tests.Visual.Editing
         }
 
         [Test]
+        public void TestGameplayTestAtEndOfBeatmap()
+        {
+            AddStep("seek to last 2 seconds", () => EditorClock.Seek(importedBeatmapSet.MaxLength - 2000));
+            AddStep("click test gameplay button", () =>
+            {
+                var button = Editor.ChildrenOfType<TestGameplayButton>().Single();
+
+                InputManager.MoveMouseTo(button);
+                InputManager.Click(MouseButton.Left);
+            });
+
+            AddUntilStep("player pushed", () => Stack.CurrentScreen is EditorPlayer);
+
+            AddWaitStep("wait some", 5);
+            AddAssert("current screen is editor", () => Stack.CurrentScreen is Editor);
+        }
+
+        [Test]
         public void TestCancelGameplayTestWithUnsavedChanges()
         {
             AddStep("delete all but first object", () => EditorBeatmap.RemoveRange(EditorBeatmap.HitObjects.Skip(1).ToList()));
