@@ -465,7 +465,8 @@ namespace osu.Game.Overlays.SkinEditor
                 settingsSidebar.Add(new SkinSettingsToolbox(component));
         }
 
-        private IEnumerable<ISerialisableDrawableContainer> availableTargets => targetScreen.ChildrenOfType<ISerialisableDrawableContainer>();
+        private IEnumerable<ISerialisableDrawableContainer> availableTargets => targetScreen.ChildrenOfType<ISerialisableDrawableContainer>()
+                                                                                            .Where(c => (c as ISerialisableDrawable)?.IsEditable ?? true);
 
         private ISerialisableDrawableContainer? getFirstTarget() => availableTargets.FirstOrDefault();
 

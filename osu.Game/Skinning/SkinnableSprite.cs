@@ -72,6 +72,8 @@ namespace osu.Game.Skinning
 
         public bool UsesFixedAnchor { get; set; }
 
+        public bool IsEditable => false;
+
         internal class SpriteComponentLookup : ISkinComponentLookup
         {
             public string LookupName { get; set; }
