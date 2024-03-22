@@ -12,8 +12,6 @@ namespace osu.Game.Rulesets.Osu
         {
         }
 
-        protected override string RulesetPrefix => OsuRuleset.SHORT_NAME;
-
-        protected override string ComponentName => Component.ToString().ToLowerInvariant();
+        public override RulesetInfo Ruleset => new OsuRuleset().RulesetInfo;
     }
 }

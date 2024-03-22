@@ -27,18 +27,14 @@ namespace osu.Game.Skinning
             Component = component;
         }
 
-        protected virtual string RulesetPrefix => string.Empty;
-
-        protected virtual string ComponentName => Component.ToString();
-
         public virtual RulesetInfo? Ruleset => null;
 
         public override string ToString()
         {
             if (Ruleset == null)
-                return ComponentName;
+                return Component.ToString();
 
-            return $"{ComponentName} (\"{Ruleset.Name}\" only)";
+            return $"{Component.ToString()} (\"{Ruleset.Name}\" only)";
         }
 
         public bool Equals(GameplaySkinComponentLookup<T>? other)

@@ -12,8 +12,6 @@ namespace osu.Game.Rulesets.Taiko
         {
         }
 
-        protected override string RulesetPrefix => TaikoRuleset.SHORT_NAME;
-
-        protected override string ComponentName => Component.ToString().ToLowerInvariant();
+        public override RulesetInfo Ruleset => new TaikoRuleset().RulesetInfo;
     }
 }

@@ -12,8 +12,6 @@ namespace osu.Game.Rulesets.Catch
         {
         }
 
-        protected override string RulesetPrefix => "catch"; // todo: use CatchRuleset.SHORT_NAME;
-
-        protected override string ComponentName => Component.ToString().ToLowerInvariant();
+        public override RulesetInfo Ruleset => new CatchRuleset().RulesetInfo;
     }
 }
