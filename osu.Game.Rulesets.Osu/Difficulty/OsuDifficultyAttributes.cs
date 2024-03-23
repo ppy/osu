@@ -161,9 +161,6 @@ namespace osu.Game.Rulesets.Osu.Difficulty
         [UsedImplicitly]
         public bool ShouldSerializeFlashlightDifficulty() => Mods.Any(m => m is ModFlashlight);
 
-        [UsedImplicitly]
-        public bool ShouldSerializeHiddenDifficulty() => Mods.Any(m => m is ModHidden);
-
         #endregion
     }
 }
