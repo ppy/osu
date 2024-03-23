@@ -160,7 +160,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Preprocessing
                 instantOverlapness = Math.Min(1, instantOverlapness * angleFactor); // wide angles are more predictable
 
                 currentOverlapness *= (1 - instantOverlapness) * 2; // wide angles will have close-to-zero buff
-                currentOverlapness *= loopObj.OpacityAt(BaseObject.StartTime, false);
+                currentOverlapness *= OpacityAt(loopObj.BaseObject.StartTime, false);
 
                 if (currentOverlapness > 0)
                 {
