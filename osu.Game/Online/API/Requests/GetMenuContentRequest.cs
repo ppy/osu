@@ -5,9 +5,9 @@ using osu.Game.Online.API.Requests.Responses;
 
 namespace osu.Game.Online.API.Requests
 {
-    public class GetSystemTitleRequest : OsuJsonWebRequest<APISystemTitle>
+    public class GetMenuContentRequest : OsuJsonWebRequest<APIMenuContent>
     {
-        public GetSystemTitleRequest()
+        public GetMenuContentRequest()
             : base(@"https://assets.ppy.sh/lazer-status.json")
         {
         }
