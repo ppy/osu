@@ -2,6 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
+using System.Linq;
 using Newtonsoft.Json;
 
 namespace osu.Game.Online.API.Requests.Responses
@@ -14,14 +15,12 @@ namespace osu.Game.Online.API.Requests.Responses
         [JsonProperty(@"images")]
         public APIMenuImage[] Images { get; init; } = Array.Empty<APIMenuImage>();
 
-        public DateTimeOffset LastUpdated { get; init; }
-
         public bool Equals(APIMenuContent? other)
         {
             if (ReferenceEquals(null, other)) return false;
             if (ReferenceEquals(this, other)) return true;
 
-            return LastUpdated.Equals(other.LastUpdated);
+            return Images.SequenceEqual(other.Images);
         }
 
         public override bool Equals(object? obj)
@@ -36,7 +35,12 @@ namespace osu.Game.Online.API.Requests.Responses
 
         public override int GetHashCode()
         {
-            return LastUpdated.GetHashCode();
+            var hash = new HashCode();
+
+            foreach (var image in Images)
+                hash.Add(image.GetHashCode());
+
+            return hash.ToHashCode();
         }
     }
 }

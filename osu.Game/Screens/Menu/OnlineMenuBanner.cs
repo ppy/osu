@@ -78,7 +78,7 @@ namespace osu.Game.Screens.Menu
         {
             base.LoadComplete();
 
-            Current.BindValueChanged(_ => loadNewImage(), true);
+            Current.BindValueChanged(_ => loadNewImages(), true);
 
             checkForUpdates();
         }
@@ -102,7 +102,7 @@ namespace osu.Game.Screens.Menu
                 });
         }
 
-        private void loadNewImage()
+        private void loadNewImages()
         {
             cancellationTokenSource?.Cancel();
             cancellationTokenSource = null;
@@ -131,19 +131,19 @@ namespace osu.Game.Screens.Menu
 
             public MenuImage(APIMenuImage image)
             {
+                AutoSizeAxes = Axes.Both;
+
                 Image = image;
             }
 
             [BackgroundDependencyLoader]
-            private void load(LargeTextureStore textureStore, OsuGame game)
+            private void load(LargeTextureStore textureStore, OsuGame? game)
             {
                 Texture? texture = textureStore.Get(Image.Image);
                 if (texture != null && Image.Image.Contains(@"@2x"))
                     texture.ScaleAdjust *= 2;
 
-                AutoSizeAxes = Axes.Both;
-
-                InternalChildren = new Drawable[]
+                Children = new Drawable[]
                 {
                     new Sprite { Texture = texture },
                     flash = new Sprite
@@ -155,7 +155,9 @@ namespace osu.Game.Screens.Menu
 
                 Action = () =>
                 {
-                    Flash();
+                    flash.FadeInFromZero(50)
+                         .Then()
+                         .FadeOut(500, Easing.OutQuint);
 
                     // Delay slightly to allow animation to play out.
                     openUrlAction?.Cancel();
@@ -173,15 +175,6 @@ namespace osu.Game.Screens.Menu
 
                 this.FadeInFromZero(500, Easing.OutQuint);
                 flash.FadeOutFromOne(4000, Easing.OutQuint);
-            }
-
-            public Drawable Flash()
-            {
-                flash.FadeInFromZero(50)
-                     .Then()
-                     .FadeOut(500, Easing.OutQuint);
-
-                return this;
             }
         }
     }
