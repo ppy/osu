@@ -150,9 +150,6 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Preprocessing
 
             OsuDifficultyHitObject prevObject = this;
 
-            bool log = false;
-            if (log) Console.WriteLine($"Checking for object {hitObject.StartTime}");
-
             foreach (var loopObj in retrieveCurrentVisibleObjects(this))
             {
                 double currentOverlapness = calculateOverlapness(this, loopObj); // overlapness with this object
@@ -162,11 +159,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Preprocessing
                 if (loopObj.Angle != null) angleFactor += (-Math.Cos((double)loopObj.Angle) + 1) / 2; // =2 for wide angles, =1 for acute angles
                 instantOverlapness = Math.Min(1, instantOverlapness * angleFactor); // wide angles are more predictable
 
-                if (log) Console.WriteLine($"Base overlapness - {currentOverlapness}");
-
                 currentOverlapness *= (1 - instantOverlapness) * 2; // wide angles will have close-to-zero buff
-
-                if (log) Console.WriteLine($"Adjusted overlapness - {currentOverlapness}");
 
                 if (currentOverlapness > 0)
                 {
@@ -175,8 +168,6 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Preprocessing
 
                     currentOverlapness *= differenceActuation(difference);
 
-                    if (log) Console.WriteLine($"Overlapness [{prevTimeWithoutOverlap} -> {timeWithoutOverlap}], difference {difference}, actuation {differenceActuation(difference)}, result {currentOverlapness}");
-
                     prevTimeWithoutOverlap = timeWithoutOverlap;
                     timeWithoutOverlap = 0;
                 }
@@ -184,18 +175,12 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Preprocessing
                 else
                 {
                     timeWithoutOverlap += prevObject.DeltaTime;
-
-                    if (log) Console.WriteLine($"No overlapness, adding {prevObject.DeltaTime}, result {timeWithoutOverlap}");
                 }
 
                 totalOverlapnessDifficulty += currentOverlapness;
                 OverlapObjects.Add(new OverlapObject(loopObj, totalOverlapnessDifficulty));
                 prevObject = loopObj;
-
-                if (log) Console.WriteLine($"Added object with difficulty {totalOverlapnessDifficulty}\n");
             }
-
-            if (log) Console.WriteLine("\n");
         }
 
         private static double differenceActuation(double difference)

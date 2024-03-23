@@ -19,12 +19,9 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
         {
             aimComponent = new HighARAimComponent(mods);
             speedComponent = new HighARSpeedComponent(mods);
-
-            aimComponentNoAdjust = new HighARAimComponent(mods, false);
         }
 
         private HighARAimComponent aimComponent;
-        private HighARAimComponent aimComponentNoAdjust;
         private HighARSpeedComponent speedComponent;
 
         private readonly List<double> difficulties = new List<double>();
@@ -34,8 +31,6 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
         {
             aimComponent.Process(current);
             speedComponent.Process(current);
-
-            aimComponentNoAdjust.Process(current);
 
             if (current.BaseObject is not Spinner)
                 objectsCount++;
