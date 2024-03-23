@@ -225,7 +225,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
                 accuracyValue *= 1.02;
 
             // Visual indication bonus
-            double visualIndicationBonus = 1.0 + 0.1 * logistic((8.0 - attributes.ApproachRate) / 6);
+            double visualIndicationBonus = 1.0 + 0.1 * logistic(8.0 - attributes.ApproachRate);
 
             accuracyValue *= visualIndicationBonus;
             if (score.Mods.Any(h => h is OsuModHidden))

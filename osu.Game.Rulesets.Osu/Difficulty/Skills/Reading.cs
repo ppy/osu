@@ -83,8 +83,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
 
             return difficulty;
         }
-
-        public static double DifficultyToPerformance(double difficulty) => Math.Pow(difficulty, 4) * 6.0;
+        public static double DifficultyToPerformance(double difficulty) => difficulty < 1 ? difficulty * 6.0 : Math.Pow(difficulty, 4) * 6.0;
     }
 
     public class ReadingHidden : OsuStrainSkill
