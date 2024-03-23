@@ -2,6 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using osu.Framework.Allocation;
@@ -18,42 +19,28 @@ using osu.Game.Online.API.Requests.Responses;
 
 namespace osu.Game.Screens.Menu
 {
-    public partial class SystemTitle : VisibilityContainer
+    public partial class OnlineMenuBanner : VisibilityContainer
     {
-        internal Bindable<APISystemTitle?> Current { get; } = new Bindable<APISystemTitle?>();
+        internal Bindable<APIMenuContent> Current { get; } = new Bindable<APIMenuContent>(new APIMenuContent());
 
         private const float transition_duration = 500;
 
         private Container content = null!;
         private CancellationTokenSource? cancellationTokenSource;
-        private SystemTitleImage? currentImage;
-
-        private ScheduledDelegate? openUrlAction;
+        private MenuImage? currentImage;
 
         [BackgroundDependencyLoader]
-        private void load(OsuGame? game)
+        private void load()
         {
             AutoSizeAxes = Axes.Both;
             AutoSizeDuration = transition_duration;
             AutoSizeEasing = Easing.OutQuint;
 
-            InternalChild = content = new OsuClickableContainer
+            InternalChild = content = new Container
             {
                 Anchor = Anchor.Centre,
                 Origin = Anchor.Centre,
                 AutoSizeAxes = Axes.Both,
-                Action = () =>
-                {
-                    currentImage?.Flash();
-
-                    // Delay slightly to allow animation to play out.
-                    openUrlAction?.Cancel();
-                    openUrlAction = Scheduler.AddDelayed(() =>
-                    {
-                        if (!string.IsNullOrEmpty(Current.Value?.Url))
-                            game?.HandleLink(Current.Value.Url);
-                    }, 250);
-                }
             };
         }
 
@@ -98,7 +85,7 @@ namespace osu.Game.Screens.Menu
 
         private void checkForUpdates()
         {
-            var request = new GetSystemTitleRequest();
+            var request = new GetMenuContentRequest();
             Task.Run(() => request.Perform())
                 .ContinueWith(r =>
                 {
@@ -121,12 +108,12 @@ namespace osu.Game.Screens.Menu
             cancellationTokenSource = null;
             currentImage?.FadeOut(500, Easing.OutQuint).Expire();
 
-            if (string.IsNullOrEmpty(Current.Value?.Image))
+            if (Current.Value.Images.Length == 0)
                 return;
 
-            LoadComponentAsync(new SystemTitleImage(Current.Value), loaded =>
+            LoadComponentAsync(new MenuImage(Current.Value.Images.First()), loaded =>
             {
-                if (!loaded.SystemTitle.Equals(Current.Value))
+                if (!loaded.Image.Equals(Current.Value.Images.First()))
                     loaded.Dispose();
 
                 content.Add(currentImage = loaded);
@@ -134,22 +121,24 @@ namespace osu.Game.Screens.Menu
         }
 
         [LongRunningLoad]
-        private partial class SystemTitleImage : CompositeDrawable
+        private partial class MenuImage : OsuClickableContainer
         {
-            public readonly APISystemTitle SystemTitle;
+            public readonly APIMenuImage Image;
 
             private Sprite flash = null!;
 
-            public SystemTitleImage(APISystemTitle systemTitle)
+            private ScheduledDelegate? openUrlAction;
+
+            public MenuImage(APIMenuImage image)
             {
-                SystemTitle = systemTitle;
+                Image = image;
             }
 
             [BackgroundDependencyLoader]
-            private void load(LargeTextureStore textureStore)
+            private void load(LargeTextureStore textureStore, OsuGame game)
             {
-                Texture? texture = textureStore.Get(SystemTitle.Image);
-                if (texture != null && SystemTitle.Image.Contains(@"@2x"))
+                Texture? texture = textureStore.Get(Image.Image);
+                if (texture != null && Image.Image.Contains(@"@2x"))
                     texture.ScaleAdjust *= 2;
 
                 AutoSizeAxes = Axes.Both;
@@ -162,6 +151,19 @@ namespace osu.Game.Screens.Menu
                         Texture = texture,
                         Blending = BlendingParameters.Additive,
                     },
+                };
+
+                Action = () =>
+                {
+                    Flash();
+
+                    // Delay slightly to allow animation to play out.
+                    openUrlAction?.Cancel();
+                    openUrlAction = Scheduler.AddDelayed(() =>
+                    {
+                        if (!string.IsNullOrEmpty(Image.Url))
+                            game?.HandleLink(Image.Url);
+                    }, 250);
                 };
             }
 
