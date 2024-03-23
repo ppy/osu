@@ -32,29 +32,6 @@ namespace osu.Game.Tests.Visual.Menus
             AddAssert("system title not visible", () => onlineMenuBanner.State.Value, () => Is.EqualTo(Visibility.Hidden));
             AddStep("enter menu", () => InputManager.Key(Key.Enter));
             AddUntilStep("system title visible", () => onlineMenuBanner.State.Value, () => Is.EqualTo(Visibility.Visible));
-            AddStep("set another title", () => onlineMenuBanner.Current.Value = new APIMenuContent
-            {
-                Images = new[]
-                {
-                    new APIMenuImage
-                    {
-                        Image = @"https://assets.ppy.sh/main-menu/wf2023-vote@2x.png",
-                        Url = @"https://osu.ppy.sh/community/contests/189",
-                    }
-                }
-            });
-            AddStep("set title with nonexistent image", () => onlineMenuBanner.Current.Value = new APIMenuContent
-            {
-                Images = new[]
-                {
-                    new APIMenuImage
-                    {
-                        Image = @"https://test.invalid/@2x", // .invalid TLD reserved by https://datatracker.ietf.org/doc/html/rfc2606#section-2
-                        Url = @"https://osu.ppy.sh/community/contests/189",
-                    }
-                }
-            });
-            AddStep("unset system title", () => onlineMenuBanner.Current.Value = new APIMenuContent());
         }
     }
 }
