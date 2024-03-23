@@ -28,7 +28,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
             OsuDifficultyHitObject? prevObj1 = null;
             OsuDifficultyHitObject? prevObj2 = null;
 
-            double prevConstantAngle = 1;
+            double prevAngleNerf = 1;
 
             foreach (var loopObj in retrievePastVisibleObjects(currObj).Reverse())
             {
@@ -77,6 +77,12 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
                 {
                     double angleDifference = Math.Abs(prevObj0.Angle.Value - loopObj.Angle.Value);
 
+                    // Assume that very low spacing difference means that angles don't matter
+                    if (prevObj0.LazyJumpDistance < OsuDifficultyHitObject.NORMALISED_RADIUS)
+                        angleDifference *= Math.Pow(prevObj0.LazyJumpDistance / OsuDifficultyHitObject.NORMALISED_RADIUS, 2);
+                    if (loopObj.LazyJumpDistance < OsuDifficultyHitObject.NORMALISED_RADIUS)
+                        angleDifference *= Math.Pow(loopObj.LazyJumpDistance / OsuDifficultyHitObject.NORMALISED_RADIUS, 2);
+
                     // assume worst-case if no angles
                     double angleDifference1 = 0;
                     double angleDifference2 = 0;
@@ -115,13 +121,13 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
                     double longIntervalFactor = Math.Clamp(1 - (loopObj.StrainTime - 200) / (2000 - 200), 0, 1);
 
                     // Current angle nerf. Angle difference less than 15 degrees is considered the same
-                    double currConstantAngle = Math.Cos(4 * Math.Min(Math.PI / 12, angleDifference)) * longIntervalFactor;
+                    double currAngleNerf = Math.Cos(4 * Math.Min(Math.PI / 12, angleDifference)) * longIntervalFactor;
 
                     // Apply the nerf only when it's repeated
-                    double currentAngleNerf = Math.Min(currConstantAngle, prevConstantAngle);
+                    double angleNerf = Math.Min(currAngleNerf, prevAngleNerf);
 
-                    densityAnglesNerf += Math.Min(currentAngleNerf, loopDifficulty);
-                    prevConstantAngle = currConstantAngle;
+                    densityAnglesNerf += Math.Min(angleNerf, loopDifficulty);
+                    prevAngleNerf = currAngleNerf;
                 }
                 else // Assume worst-case if no angles
                 {
