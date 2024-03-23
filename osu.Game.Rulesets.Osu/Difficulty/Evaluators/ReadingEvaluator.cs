@@ -148,7 +148,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
                 double lastOverlapness = 0;
                 foreach (var overlapObj in loopObj.OverlapObjects)
                 {
-                    if (overlapObj.HitObject.StartTime + overlapObj.HitObject.Preempt > currObj.StartTime) break;
+                    if (overlapObj.HitObject.StartTime + overlapObj.HitObject.Preempt >= currObj.StartTime) break;
                     lastOverlapness = overlapObj.Overlapness;
                 }
                 screenOverlapDifficulty += lastOverlapness;
