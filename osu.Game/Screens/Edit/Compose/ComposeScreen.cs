@@ -31,8 +31,6 @@ namespace osu.Game.Screens.Edit.Compose
         [Resolved]
         private IGameplaySettings globalGameplaySettings { get; set; }
 
-        private Bindable<string> clipboard { get; set; }
-
         private HitObjectComposer composer;
 
         public ComposeScreen()
@@ -80,9 +78,8 @@ namespace osu.Game.Screens.Edit.Compose
         }
 
         [BackgroundDependencyLoader]
-        private void load(EditorClipboard clipboard)
+        private void load()
         {
-            this.clipboard = clipboard.Content.GetBoundCopy();
         }
 
         protected override void LoadComplete()
@@ -94,7 +91,6 @@ namespace osu.Game.Screens.Edit.Compose
                 return;
 
             EditorBeatmap.SelectedHitObjects.BindCollectionChanged((_, _) => updateClipboardActionAvailability());
-            clipboard.BindValueChanged(_ => updateClipboardActionAvailability());
             composer.OnLoadComplete += _ => updateClipboardActionAvailability();
             updateClipboardActionAvailability();
         }
@@ -116,18 +112,31 @@ namespace osu.Game.Screens.Edit.Compose
             // regardless of whether anything was even selected at all.
             // UX-wise this is generally strange and unexpected, but make it work anyways to preserve muscle memory.
             // note that this means that `getTimestamp()` must handle no-selection case, too.
-            hostClipboard.SetText(getTimestamp());
-
             if (CanCopy.Value)
-                clipboard.Value = new ClipboardContent(EditorBeatmap).Serialize();
+            {
+                hostClipboard.SetData(
+                    new ClipboardTextEntry(getTimestamp()),
+                    new ClipboardCustomEntry("osu/hitobjects",
+                        new ClipboardContent(EditorBeatmap).Serialize()
+                    )
+                );
+            }
+            else
+            {
+                hostClipboard.SetText(getTimestamp());
+            }
+
+            updateClipboardActionAvailability();
         }
 
         public override void Paste()
         {
-            if (!CanPaste.Value)
-                return;
+            string clipboardContent = hostClipboard.GetCustom("osu/hitobjects");
 
-            var objects = clipboard.Value.Deserialize<ClipboardContent>().HitObjects;
+            var objects = clipboardContent?.Deserialize<ClipboardContent>().HitObjects;
+
+            if (objects == null)
+                return;
 
             Debug.Assert(objects.Any());
 
@@ -149,7 +158,7 @@ namespace osu.Game.Screens.Edit.Compose
         private void updateClipboardActionAvailability()
         {
             CanCut.Value = CanCopy.Value = EditorBeatmap.SelectedHitObjects.Any();
-            CanPaste.Value = composer.IsLoaded && !string.IsNullOrEmpty(clipboard.Value);
+            CanPaste.Value = composer.IsLoaded && !string.IsNullOrEmpty(hostClipboard.GetCustom("osu/hitobjects"));
         }
 
         private string getTimestamp()
