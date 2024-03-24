@@ -211,9 +211,9 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
         public static double EvaluateInpredictabilityOf(DifficultyHitObject current)
         {
             // make the sum equal to 1
-            const double velocity_change_part = 0.25;
-            const double angle_change_part = 0.45;
-            const double rhythm_change_part = 0.3;
+            const double velocity_change_part = 0.8;
+            const double angle_change_part = 0.1;
+            const double rhythm_change_part = 0.1;
 
             if (current.BaseObject is Spinner || current.Index == 0 || current.Previous(0).BaseObject is Spinner)
                 return 0;
@@ -348,5 +348,39 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
             return hdDifficulty;
         }
         private static double logistic(double x) => 1 / (1 + Math.Exp(-x));
+    }
+
+    public static class ReadingHighAREvaluator
+    {
+        public static double EvaluateDifficultyOf(DifficultyHitObject current, bool applyAdjust = false)
+        {
+            var currObj = (OsuDifficultyHitObject)current;
+
+            double result = GetDifficulty(currObj.Preempt);
+
+            if (applyAdjust)
+            {
+                double inpredictability = ReadingEvaluator.EvaluateInpredictabilityOf(current);
+
+                // follow lines make high AR easier, so apply nerf if object isn't new combo
+                inpredictability *= 1 + 0.1 * (800 - currObj.FollowLineTime) / 800;
+
+                result *= 0.98 + 0.6 * inpredictability;
+            }
+
+            return result;
+        }
+
+        // High AR curve
+        // https://www.desmos.com/calculator/srzbeumngi
+        public static double GetDifficulty(double preempt)
+        {
+            // Get preempt in seconds
+            preempt /= 1000;
+            if (preempt < 0.375) // We have stop in the point of AR10.5, the value here = 0.396875, derivative = -10.5833, 
+                return 0.63 * Math.Pow(8 - 20 * preempt, 2.0 / 3); // This function is matching live high AR bonus
+            else
+                return Math.Exp(9.07583 - 80.0 * preempt / 3);
+        }
     }
 }

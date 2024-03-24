@@ -83,7 +83,6 @@ namespace osu.Game.Rulesets.Osu.Difficulty
 
             double lowARValue = computeReadingLowARValue(score, osuAttributes);
             double readingHDValue = computeReadingHiddenValue(score, osuAttributes);
-            double readingSlidersValue = 0;
 
             double highARValue = computeReadingHighARValue(score, osuAttributes);
 
@@ -95,8 +94,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             double flPower = OsuDifficultyCalculator.FL_SUM_POWER;
             double flashlightARValue = Math.Pow(Math.Pow(flashlightValue, flPower) + Math.Pow(readingARValue, flPower), 1.0 / flPower);
 
-            double readingNonARValue = readingHDValue + readingSlidersValue;
-            double cognitionValue = Math.Pow(Math.Pow(flashlightARValue, power) + Math.Pow(readingNonARValue, power), 1.0 / power);
+            double cognitionValue = flashlightARValue + readingHDValue;
             cognitionValue = AdjustCognitionPerformance(cognitionValue, mechanicalValue, potentialHiddenFlashlightValue);
 
             double accuracyValue = computeAccuracyValue(score, osuAttributes);
@@ -104,9 +102,9 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             double totalValue =
                 Math.Pow(
                     Math.Pow(mechanicalValue, power) +
-                    Math.Pow(cognitionValue, power) +
                     Math.Pow(accuracyValue, power), 1.0 / power
                 ) * multiplier;
+            totalValue += cognitionValue * multiplier;
 
             return new OsuPerformanceAttributes
             {

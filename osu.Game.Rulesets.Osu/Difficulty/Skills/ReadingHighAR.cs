@@ -73,8 +73,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
             double adjustedDifficulty = OsuStrainSkill.PerformanceToDifficulty(totalPerformance);
             double difficultyValue = Math.Pow(adjustedDifficulty / OsuDifficultyCalculator.DIFFICULTY_MULTIPLIER, 2.0);
 
-            // have the same value as difficultyValue at 500pp point
-            return 75 * Math.Sqrt(difficultyValue);
+            return 54 * Math.Sqrt(difficultyValue);
         }
     }
 
@@ -89,7 +88,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
         private bool adjustHighAR;
         private double currentStrain;
 
-        private double skillMultiplier => 17;
+        private double skillMultiplier => 6.85;
         private double defaultValueMultiplier => 25;
 
         protected override double CalculateInitialStrain(double time, DifficultyHitObject current) => currentStrain * StrainDecay(time - current.Previous(0).StartTime);
@@ -109,7 +108,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
 
     public class HighARSpeedComponent : OsuStrainSkill
     {
-        private double skillMultiplier => 670;
+        private double skillMultiplier => 400;
         protected override double StrainDecayBase => 0.3;
 
         private double currentStrain;
