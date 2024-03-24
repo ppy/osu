@@ -77,11 +77,6 @@ namespace osu.Game.Screens.Edit.Compose
             return new EditorSkinProvidingContainer(EditorBeatmap).WithChild(content);
         }
 
-        [BackgroundDependencyLoader]
-        private void load()
-        {
-        }
-
         protected override void LoadComplete()
         {
             base.LoadComplete();
