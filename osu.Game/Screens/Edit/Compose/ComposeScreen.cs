@@ -133,10 +133,8 @@ namespace osu.Game.Screens.Edit.Compose
 
             var objects = clipboardContent?.Deserialize<ClipboardContent>().HitObjects;
 
-            if (objects == null)
+            if (objects == null || objects.Count == 0)
                 return;
-
-            Debug.Assert(objects.Any());
 
             double timeOffset = clock.CurrentTime - objects.Min(o => o.StartTime);
 
