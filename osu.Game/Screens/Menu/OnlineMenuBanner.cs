@@ -28,6 +28,10 @@ namespace osu.Game.Screens.Menu
         private Container content = null!;
         private CancellationTokenSource? cancellationTokenSource;
 
+        private int displayIndex = -1;
+
+        private ScheduledDelegate? nextDisplay;
+
         [BackgroundDependencyLoader]
         private void load()
         {
@@ -77,16 +81,16 @@ namespace osu.Game.Screens.Menu
 
         private void loadNewImages()
         {
+            nextDisplay?.Cancel();
+
             cancellationTokenSource?.Cancel();
             cancellationTokenSource = null;
 
             var newContent = Current.Value;
 
-            foreach (var i in content)
-            {
-                i.FadeOutFromOne(100, Easing.OutQuint)
-                 .Expire();
-            }
+            // A better fade out would be nice, but the menu content changes *very* rarely
+            // so let's keep things simple for now.
+            content.Clear(true);
 
             if (newContent.Images.Length == 0)
                 return;
@@ -96,10 +100,32 @@ namespace osu.Game.Screens.Menu
                 if (!newContent.Equals(Current.Value))
                     return;
 
+                // start hidden
+                foreach (var image in loaded)
+                    image.Hide();
+
                 content.AddRange(loaded);
 
-                loaded.First().Show();
+                displayIndex = -1;
+                showNext();
             }, (cancellationTokenSource ??= new CancellationTokenSource()).Token);
+        }
+
+        private void showNext()
+        {
+            nextDisplay?.Cancel();
+
+            bool previousShowing = displayIndex >= 0;
+            if (previousShowing)
+                content[displayIndex % content.Count].FadeOut(400, Easing.OutQuint);
+
+            displayIndex++;
+
+            using (BeginDelayedSequence(previousShowing ? 300 : 0))
+                content[displayIndex % content.Count].Show();
+
+            if (content.Count > 1)
+                nextDisplay = Scheduler.AddDelayed(showNext, 12000);
         }
 
         [LongRunningLoad]
