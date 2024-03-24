@@ -107,17 +107,20 @@ namespace osu.Game.Screens.Edit.Compose
             // regardless of whether anything was even selected at all.
             // UX-wise this is generally strange and unexpected, but make it work anyways to preserve muscle memory.
             // note that this means that `getTimestamp()` must handle no-selection case, too.
+            var clipboardData = new ClipboardData
+            {
+                Text = getTimestamp()
+            };
+
             if (CanCopy.Value)
             {
-                hostClipboard.SetData(
-                    new ClipboardTextEntry(getTimestamp()),
-                    new ClipboardCustomEntry(ClipboardContent.CLIPBOARD_FORMAT, new ClipboardContent(EditorBeatmap).Serialize())
+                clipboardData.AddCustom(
+                    ClipboardContent.CLIPBOARD_FORMAT,
+                    new ClipboardContent(EditorBeatmap).Serialize()
                 );
             }
-            else
-            {
-                hostClipboard.SetText(getTimestamp());
-            }
+
+            hostClipboard.SetData(clipboardData);
 
             updateClipboardActionAvailability();
         }
