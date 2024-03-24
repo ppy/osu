@@ -79,6 +79,15 @@ namespace osu.Game.Utils
         }
 
         /// <summary>
+        /// Given a scale multiplier, an origin, and a position,
+        /// will return the scaled position in screen space coordinates.
+        /// </summary>
+        public static Vector2 GetScaledPosition(Vector2 scale, Vector2 origin, Vector2 position)
+        {
+            return origin + (position - origin) * scale;
+        }
+
+        /// <summary>
         /// Returns a quad surrounding the provided points.
         /// </summary>
         /// <param name="points">The points to calculate a quad for.</param>
