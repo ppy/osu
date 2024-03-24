@@ -120,11 +120,33 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
                     // Angle nerf is starting being reduced from 200ms (150BPM jump) and it reduced to 0 on 2000ms
                     double longIntervalFactor = Math.Clamp(1 - (loopObj.StrainTime - 200) / (2000 - 200), 0, 1);
 
-                    // Current angle nerf. Angle difference less than 15 degrees is considered the same
-                    double currAngleNerf = Math.Cos(4 * Math.Min(Math.PI / 12, angleDifference)) * longIntervalFactor;
+                    // Bandaid to fix Rubik's Cube +EZ
+                    double wideness = 0;
+                    if (loopObj.Angle.Value > Math.PI * 0.5)
+                    {
+                        // Goes from 0 to 1 as angle increasing from 90 degrees to 180
+                        wideness = (loopObj.Angle.Value / Math.PI - 0.5) * 2;
+
+                        // Transform into quadratic scaling
+                        wideness = 1 - Math.Pow(1 - wideness, 2);
+                    }
+
+                    // Angle difference will be considered as 2 times lower if angle is wide
+                    angleDifference /= 1 + wideness;
+
+                    // Current angle nerf. Angle difference more than 15 degrees gets no penalty
+                    double adjustedAngleDifference = Math.Min(Math.PI / 12, angleDifference);
+
+                    // WARNING - this thing always gives at least 0.5 angle nerf, this is a bug, but removing it completely ruins everything
+                    // Theoretically - this issue is fixable by changing multipliers everywhere,
+                    // but this is not needed because this bug have no drawbacks outside of algorithm not working as intended
+                    double currAngleNerf = Math.Cos(Math.Min(Math.PI / 2, 4 * adjustedAngleDifference));
 
                     // Apply the nerf only when it's repeated
                     double angleNerf = Math.Min(currAngleNerf, prevAngleNerf);
+
+                    // But only for sharp angles
+                    angleNerf += wideness * (currAngleNerf - angleNerf);
 
                     densityAnglesNerf += Math.Min(angleNerf, loopDifficulty);
                     prevAngleNerf = currAngleNerf;
