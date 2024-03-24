@@ -27,7 +27,6 @@ namespace osu.Game.Screens.Menu
 
         private Container content = null!;
         private CancellationTokenSource? cancellationTokenSource;
-        private MenuImage? currentImage;
 
         [BackgroundDependencyLoader]
         private void load()
@@ -47,32 +46,6 @@ namespace osu.Game.Screens.Menu
         protected override void PopIn() => content.FadeInFromZero(transition_duration, Easing.OutQuint);
 
         protected override void PopOut() => content.FadeOut(transition_duration, Easing.OutQuint);
-
-        protected override bool OnHover(HoverEvent e)
-        {
-            content.ScaleTo(1.05f, 2000, Easing.OutQuint);
-            return base.OnHover(e);
-        }
-
-        protected override void OnHoverLost(HoverLostEvent e)
-        {
-            content.ScaleTo(1f, 500, Easing.OutQuint);
-            base.OnHoverLost(e);
-        }
-
-        protected override bool OnMouseDown(MouseDownEvent e)
-        {
-            content.ScaleTo(0.95f, 500, Easing.OutQuint);
-            return base.OnMouseDown(e);
-        }
-
-        protected override void OnMouseUp(MouseUpEvent e)
-        {
-            content
-                .ScaleTo(0.95f)
-                .ScaleTo(1, 500, Easing.OutElastic);
-            base.OnMouseUp(e);
-        }
 
         protected override void LoadComplete()
         {
@@ -106,17 +79,26 @@ namespace osu.Game.Screens.Menu
         {
             cancellationTokenSource?.Cancel();
             cancellationTokenSource = null;
-            currentImage?.FadeOut(500, Easing.OutQuint).Expire();
 
-            if (Current.Value.Images.Length == 0)
+            var newContent = Current.Value;
+
+            foreach (var i in content)
+            {
+                i.FadeOutFromOne(100, Easing.OutQuint)
+                 .Expire();
+            }
+
+            if (newContent.Images.Length == 0)
                 return;
 
-            LoadComponentAsync(new MenuImage(Current.Value.Images.First()), loaded =>
+            LoadComponentsAsync(newContent.Images.Select(i => new MenuImage(i)), loaded =>
             {
-                if (!loaded.Image.Equals(Current.Value.Images.First()))
-                    loaded.Dispose();
+                if (!newContent.Equals(Current.Value))
+                    return;
 
-                content.Add(currentImage = loaded);
+                content.AddRange(loaded);
+
+                loaded.First().Show();
             }, (cancellationTokenSource ??= new CancellationTokenSource()).Token);
         }
 
@@ -132,6 +114,8 @@ namespace osu.Game.Screens.Menu
             public MenuImage(APIMenuImage image)
             {
                 AutoSizeAxes = Axes.Both;
+                Anchor = Anchor.BottomCentre;
+                Origin = Anchor.BottomCentre;
 
                 Image = image;
             }
@@ -169,12 +153,36 @@ namespace osu.Game.Screens.Menu
                 };
             }
 
-            protected override void LoadComplete()
+            public override void Show()
             {
-                base.LoadComplete();
-
                 this.FadeInFromZero(500, Easing.OutQuint);
                 flash.FadeOutFromOne(4000, Easing.OutQuint);
+            }
+
+            protected override bool OnHover(HoverEvent e)
+            {
+                this.ScaleTo(1.05f, 2000, Easing.OutQuint);
+                return true;
+            }
+
+            protected override void OnHoverLost(HoverLostEvent e)
+            {
+                this.ScaleTo(1f, 500, Easing.OutQuint);
+                base.OnHoverLost(e);
+            }
+
+            protected override bool OnMouseDown(MouseDownEvent e)
+            {
+                this.ScaleTo(0.95f, 500, Easing.OutQuint);
+                return true;
+            }
+
+            protected override void OnMouseUp(MouseUpEvent e)
+            {
+                this
+                    .ScaleTo(0.95f)
+                    .ScaleTo(1, 500, Easing.OutElastic);
+                base.OnMouseUp(e);
             }
         }
     }
