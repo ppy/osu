@@ -116,9 +116,7 @@ namespace osu.Game.Screens.Edit.Compose
             {
                 hostClipboard.SetData(
                     new ClipboardTextEntry(getTimestamp()),
-                    new ClipboardCustomEntry("osu/hitobjects",
-                        new ClipboardContent(EditorBeatmap).Serialize()
-                    )
+                    new ClipboardCustomEntry(ClipboardContent.CLIPBOARD_FORMAT, new ClipboardContent(EditorBeatmap).Serialize())
                 );
             }
             else
@@ -131,7 +129,7 @@ namespace osu.Game.Screens.Edit.Compose
 
         public override void Paste()
         {
-            string clipboardContent = hostClipboard.GetCustom("osu/hitobjects");
+            string clipboardContent = hostClipboard.GetCustom(ClipboardContent.CLIPBOARD_FORMAT);
 
             var objects = clipboardContent?.Deserialize<ClipboardContent>().HitObjects;
 
