@@ -112,6 +112,5 @@ namespace osu.Game.Rulesets.Edit.Checks
 
             public Issue Create(string filename, string errorReason) => new Issue(this, filename, errorReason);
         }
-
     }
 }
