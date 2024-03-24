@@ -127,8 +127,8 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
                         // Goes from 0 to 1 as angle increasing from 90 degrees to 180
                         wideness = (loopObj.Angle.Value / Math.PI - 0.5) * 2;
 
-                        // Transform into quadratic scaling
-                        wideness = 1 - Math.Pow(1 - wideness, 2);
+                        // Transform into cubic scaling
+                        wideness = 1 - Math.Pow(1 - wideness, 3);
                     }
 
                     // Angle difference will be considered as 2 times lower if angle is wide

@@ -45,7 +45,6 @@ namespace osu.Game.Rulesets.Osu.Difficulty
 
             double readingLowARRating = Math.Sqrt(skills[4].DifficultyValue()) * DIFFICULTY_MULTIPLIER;
             double readingHighARRating = Math.Sqrt(skills[5].DifficultyValue()) * DIFFICULTY_MULTIPLIER;
-            double readingSlidersRating = 0;
             double hiddenRating = Math.Sqrt(skills[6].DifficultyValue()) * DIFFICULTY_MULTIPLIER;
             double hiddenFlashlightRating = Math.Sqrt(skills[7].DifficultyValue()) * DIFFICULTY_MULTIPLIER;
 
@@ -74,16 +73,13 @@ namespace osu.Game.Rulesets.Osu.Difficulty
 
             double baseReadingLowARPerformance = ReadingLowAR.DifficultyToPerformance(readingLowARRating);
             double baseReadingHighARPerformance = OsuStrainSkill.DifficultyToPerformance(readingHighARRating);
-            double baseReadingARPerformance = Math.Pow(Math.Pow(baseReadingLowARPerformance, SUM_POWER) + Math.Pow(baseReadingHighARPerformance, SUM_POWER), 1.0 / SUM_POWER);
+            double baseReadingARPerformance = baseReadingLowARPerformance + baseReadingHighARPerformance;
 
             double baseFlashlightARPerformance = Math.Pow(Math.Pow(baseFlashlightPerformance, FL_SUM_POWER) + Math.Pow(baseReadingARPerformance, FL_SUM_POWER), 1.0 / FL_SUM_POWER);
 
             double baseReadingHiddenPerformance = 0;
             if (mods.Any(h => h is OsuModHidden))
                 baseReadingHiddenPerformance = ReadingHidden.DifficultyToPerformance(hiddenRating);
-
-            double baseReadingSliderPerformance = 0;
-            double baseReadingNonARPerformance = baseReadingHiddenPerformance + baseReadingSliderPerformance;
 
             double preempt = IBeatmapDifficultyInfo.DifficultyRange(beatmap.Difficulty.ApproachRate, 1800, 1200, 450) / clockRate;
 
@@ -94,20 +90,14 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             int sliderCount = beatmap.HitObjects.Count(h => h is Slider);
             int spinnerCount = beatmap.HitObjects.Count(h => h is Spinner);
 
-            // Limit cognition by full memorisation difficulty
-            double cognitionPerformance = Math.Pow(Math.Pow(baseFlashlightARPerformance, SUM_POWER) + Math.Pow(baseReadingNonARPerformance, SUM_POWER), 1.0 / SUM_POWER);
+            double cognitionPerformance = baseFlashlightARPerformance + baseReadingHiddenPerformance;
             double mechanicalPerformance = Math.Pow(Math.Pow(baseAimPerformance, SUM_POWER) + Math.Pow(baseSpeedPerformance, SUM_POWER), 1.0 / SUM_POWER);
 
+            // Limit cognition by full memorisation difficulty
             double maxHiddenFlashlightPerformance = OsuPerformanceCalculator.ComputePerfectFlashlightValue(hiddenFlashlightRating, hitCirclesCount + sliderCount);
-
             cognitionPerformance = OsuPerformanceCalculator.AdjustCognitionPerformance(cognitionPerformance, mechanicalPerformance, maxHiddenFlashlightPerformance);
 
-            double basePerformance =
-                Math.Pow(
-                    Math.Pow(mechanicalPerformance, SUM_POWER) +
-                    Math.Pow(cognitionPerformance, SUM_POWER)
-                    , 1.0 / SUM_POWER
-                );
+            double basePerformance = mechanicalPerformance + cognitionPerformance;
 
             double starRating = basePerformance > 0.00001
                 ? Math.Cbrt(OsuPerformanceCalculator.PERFORMANCE_BASE_MULTIPLIER) * 0.027 * (Math.Cbrt(100000 / Math.Pow(2, 1 / 1.1) * basePerformance) + 4)
@@ -127,7 +117,6 @@ namespace osu.Game.Rulesets.Osu.Difficulty
                 SpeedNoteCount = speedNotes,
                 ReadingDifficultyLowAR = readingLowARRating,
                 ReadingDifficultyHighAR = readingHighARRating,
-                ReadingDifficultySliders = readingSlidersRating,
                 HiddenDifficulty = hiddenRating,
                 FlashlightDifficulty = flashlightRating,
                 HiddenFlashlightDifficulty = hiddenFlashlightRating,
