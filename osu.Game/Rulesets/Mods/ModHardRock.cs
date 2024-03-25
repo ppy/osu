@@ -17,7 +17,7 @@ namespace osu.Game.Rulesets.Mods
         public override ModType Type => ModType.DifficultyIncrease;
         public override LocalisableString Description => "Everything just got a bit harder...";
         public override Type[] IncompatibleMods => new[] { typeof(ModEasy), typeof(ModDifficultyAdjust) };
-        public override bool Ranked => UsesDefaultConfiguration;
+        public override bool EligibleForPP => UsesDefaultConfiguration;
 
         protected const float ADJUST_RATIO = 1.4f;
 

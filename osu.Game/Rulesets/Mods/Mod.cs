@@ -171,7 +171,7 @@ namespace osu.Game.Rulesets.Mods
         /// Whether scores with this mod active can give performance points.
         /// </summary>
         [JsonIgnore]
-        public virtual bool Ranked => false;
+        public virtual bool EligibleForPP => false;
 
         /// <summary>
         /// The mods this mod cannot be enabled with.

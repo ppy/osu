@@ -31,7 +31,7 @@ namespace osu.Game.Rulesets.Mods
 
         public override bool RequiresConfiguration => false;
 
-        public override bool Ranked => true;
+        public override bool EligibleForPP => true;
 
         public override string SettingDescription => base.SettingDescription.Replace(MinimumAccuracy.ToString(), MinimumAccuracy.Value.ToString("##%", NumberFormatInfo.InvariantInfo));
 

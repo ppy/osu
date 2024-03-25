@@ -136,7 +136,7 @@ namespace osu.Game.Screens.Select
             else
                 modDisplay.FadeOut();
 
-            bool anyUnrankedMods = Current.Value?.Any(m => !m.Ranked) == true;
+            bool anyUnrankedMods = Current.Value?.Any(m => !m.EligibleForPP) == true;
             UnrankedBadge.FadeTo(anyUnrankedMods ? 1 : 0);
         });
     }

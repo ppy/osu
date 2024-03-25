@@ -31,7 +31,7 @@ namespace osu.Game.Rulesets.Osu.Mods
 
         public override double ScoreMultiplier => UsesDefaultConfiguration ? 1.12 : 1;
         public override Type[] IncompatibleMods => new[] { typeof(OsuModFlashlight) };
-        public override bool Ranked => true;
+        public override bool EligibleForPP => true;
 
         private DrawableOsuBlinds blinds = null!;
 

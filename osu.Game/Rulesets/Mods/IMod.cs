@@ -69,7 +69,7 @@ namespace osu.Game.Rulesets.Mods
         /// <summary>
         /// Whether scores with this mod active can give performance points.
         /// </summary>
-        bool Ranked { get; }
+        bool EligibleForPP { get; }
 
         /// <summary>
         /// Create a fresh <see cref="Mod"/> instance based on this mod.

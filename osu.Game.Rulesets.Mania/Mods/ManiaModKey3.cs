@@ -11,6 +11,6 @@ namespace osu.Game.Rulesets.Mania.Mods
         public override string Name => "Three Keys";
         public override string Acronym => "3K";
         public override LocalisableString Description => @"Play with three keys.";
-        public override bool Ranked => false;
+        public override bool EligibleForPP => false;
     }
 }

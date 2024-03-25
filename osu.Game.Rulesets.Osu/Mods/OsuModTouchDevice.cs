@@ -10,6 +10,6 @@ namespace osu.Game.Rulesets.Osu.Mods
     public class OsuModTouchDevice : ModTouchDevice
     {
         public override Type[] IncompatibleMods => base.IncompatibleMods.Concat(new[] { typeof(OsuModAutopilot) }).ToArray();
-        public override bool Ranked => UsesDefaultConfiguration;
+        public override bool EligibleForPP => UsesDefaultConfiguration;
     }
 }
