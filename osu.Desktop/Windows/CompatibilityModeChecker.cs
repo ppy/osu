@@ -10,6 +10,7 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Logging;
 using osu.Game.Graphics;
+using osu.Game.Localisation;
 using osu.Game.Overlays;
 using osu.Game.Overlays.Notifications;
 
@@ -61,7 +62,7 @@ namespace osu.Desktop.Windows
 
             public CompatibilityModeNotification()
             {
-                Text = "osu! is running in compatibility mode. This may cause issues with the game. Please ensure osu! is not set to run in compatibility mode.";
+                Text = WindowsCompatibilityModeCheckerStrings.NotificationText;
             }
 
             [BackgroundDependencyLoader]
