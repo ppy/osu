@@ -30,8 +30,6 @@ namespace osu.Game.Overlays.Mods
 
         public Bindable<bool> Ranked { get; } = new BindableBool(true);
 
-        private readonly BindableWithCurrent<double> current = new BindableWithCurrent<double>();
-
         private const float transition_duration = 200;
 
         private RollingCounter<double> counter = null!;
