@@ -94,10 +94,10 @@ namespace osu.Desktop
                 activity.BindTo(u.NewValue.Activity);
             }, true);
 
-            ruleset.BindValueChanged(_ => updatePresence());
-            status.BindValueChanged(_ => updatePresence());
-            activity.BindValueChanged(_ => updatePresence());
-            privacyMode.BindValueChanged(_ => updatePresence());
+            ruleset.BindValueChanged(_ => schedulePresenceUpdate());
+            status.BindValueChanged(_ => schedulePresenceUpdate());
+            activity.BindValueChanged(_ => schedulePresenceUpdate());
+            privacyMode.BindValueChanged(_ => schedulePresenceUpdate());
             multiplayerClient.RoomUpdated += onRoomUpdated;
 
             client.Initialize();
@@ -111,14 +111,14 @@ namespace osu.Desktop
             if (client.CurrentPresence != null)
                 client.SetPresence(null);
 
-            updatePresence();
+            schedulePresenceUpdate();
         }
 
-        private void onRoomUpdated() => updatePresence();
+        private void onRoomUpdated() => schedulePresenceUpdate();
 
         private ScheduledDelegate? presenceUpdateDelegate;
 
-        private void updatePresence()
+        private void schedulePresenceUpdate()
         {
             presenceUpdateDelegate?.Cancel();
             presenceUpdateDelegate = Scheduler.AddDelayed(() =>
