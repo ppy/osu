@@ -270,7 +270,6 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Preprocessing
             slider.LazyEndPosition = slider.StackedPosition + slider.Path.PositionAt(endTimeMin); // temporary lazy end position until a real result can be derived.
 
             Vector2 currCursorPosition = slider.StackedPosition;
-
             double scalingFactor = NORMALISED_RADIUS / slider.Radius; // lazySliderDistance is coded to be sensitive to scaling, this makes the maths easier with the thresholds being used.
 
             for (int i = 1; i < nestedObjects.Count; i++)
@@ -295,6 +294,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Preprocessing
                         currMovement = lazyMovement;
 
                     currMovementLength = scalingFactor * currMovement.Length;
+
                 }
                 else if (currMovementObj is SliderRepeat)
                 {
