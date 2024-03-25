@@ -75,7 +75,7 @@ namespace osu.Desktop
             };
 
             client.OnReady += onReady;
-            client.OnError += (_, e) => Logger.Log($"An error occurred with Discord RPC Client: {e.Code} {e.Message}", LoggingTarget.Network, LogLevel.Error);
+            client.OnError += (_, e) => Logger.Log($"An error occurred with Discord RPC Client: {e.Message} ({e.Code})", LoggingTarget.Network, LogLevel.Error);
 
             // A URI scheme is required to support game invitations, as well as informing Discord of the game executable path to support launching the game when a user clicks on join/spectate.
             client.RegisterUriScheme();
