@@ -130,10 +130,9 @@ namespace osu.Game.Skinning
                         break;
 
                     case "LongNoteTailOrigin":
-                        if (string.Equals(pair.Value, "Top", StringComparison.Ordinal))
-                            currentConfig.HoldNoteTailOrigin = Anchor.TopCentre;
-                        else
-                            currentConfig.HoldNoteTailOrigin = Anchor.BottomCentre;
+                        currentConfig.HoldNoteTailOrigin = string.Equals(pair.Value, "Top", StringComparison.Ordinal)
+                            ? Anchor.TopCentre
+                            : Anchor.BottomCentre;
                         break;
 
                     case string when pair.Key.StartsWith("Colour", StringComparison.Ordinal):

@@ -249,16 +249,9 @@ namespace osu.Game.Rulesets.Mania.Objects.Drawables
 
             // Update the anchor of the tail piece, taking into account the scrolling direction
             if (Direction.Value == ScrollingDirection.Up)
-            {
-                if (tailOrigin.Value == Anchor.TopCentre)
-                    Tail.Origin = Anchor.BottomCentre;
-                else
-                    Tail.Origin = Anchor.TopCentre;
-            }
+                Tail.Origin = tailOrigin.Value == Anchor.TopCentre ? Anchor.BottomCentre : Anchor.TopCentre;
             else
-            {
                 Tail.Origin = tailOrigin.Value;
-            }
 
             if (Time.Current >= HitObject.StartTime)
             {
