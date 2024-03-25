@@ -21,7 +21,9 @@ namespace osu.Game.Screens.Menu
 {
     public partial class OnlineMenuBanner : VisibilityContainer
     {
-        public double DelayBetweenRotation = 7500;
+        public double DelayBetweenRotation { get; set; } = 7500;
+
+        public bool FetchOnlineContent { get; set; } = true;
 
         internal Bindable<APIMenuContent> Current { get; } = new Bindable<APIMenuContent>(new APIMenuContent());
 
@@ -64,6 +66,9 @@ namespace osu.Game.Screens.Menu
 
         private void checkForUpdates()
         {
+            if (!FetchOnlineContent)
+                return;
+
             var request = new GetMenuContentRequest();
             Task.Run(() => request.Perform())
                 .ContinueWith(r =>
