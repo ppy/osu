@@ -338,12 +338,12 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
             // The closer timeSpentInvisible is to 0 -> the less difference there are between NM and HD
             // So we will reduce base according to this
             // It will be 0.354 on AR11 value
-            double invisibilityFactor = logistic(currObj.Preempt / 120 - 4);
+            double invisibilityFactor = logistic(currObj.Preempt / 160 - 4);
 
             double hdDifficulty = invisibilityFactor + densityFactor;
 
             // Scale by inpredictability slightly
-            hdDifficulty *= 0.95 + 0.15 * ReadingEvaluator.EvaluateInpredictabilityOf(current); // Max multiplier is 1.1
+            hdDifficulty *= 0.96 + 0.1 * ReadingEvaluator.EvaluateInpredictabilityOf(current); // Max multiplier is 1.1
 
             return hdDifficulty;
         }
@@ -377,10 +377,15 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
         {
             // Get preempt in seconds
             preempt /= 1000;
+            double value;
+
             if (preempt < 0.375) // We have stop in the point of AR10.5, the value here = 0.396875, derivative = -10.5833, 
-                return 0.63 * Math.Pow(8 - 20 * preempt, 2.0 / 3); // This function is matching live high AR bonus
+                value = 0.63 * Math.Pow(8 - 20 * preempt, 2.0 / 3); // This function is matching live high AR bonus
             else
-                return Math.Exp(9.07583 - 80.0 * preempt / 3);
+                value = Math.Exp(9.07583 - 80.0 * preempt / 3);
+
+            // EDIT: looks like AR11 getting a bit overnerfed in comparison to other ARs, so i will increase the difference
+            return Math.Pow(value, 1.4);
         }
     }
 }

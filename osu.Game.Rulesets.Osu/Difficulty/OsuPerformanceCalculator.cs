@@ -86,9 +86,8 @@ namespace osu.Game.Rulesets.Osu.Difficulty
 
             double highARValue = computeReadingHighARValue(score, osuAttributes);
 
-            double readingARValue = Math.Pow(
-                    Math.Pow(lowARValue, power) +
-                    Math.Pow(highARValue, power), 1.0 / power);
+            // Take only max to reduce pp inflation
+            double readingARValue = Math.Max(lowARValue, highARValue);
 
             // Reduce AR reading bonus if FL is present
             double flPower = OsuDifficultyCalculator.FL_SUM_POWER;
@@ -291,10 +290,6 @@ namespace osu.Game.Rulesets.Osu.Difficulty
         {
             double highARValue = OsuStrainSkill.DifficultyToPerformance(attributes.ReadingDifficultyHighAR);
 
-            // Second half of length bonus, to match mechanical skills SR scaling
-            double lengthBonus = CalculateDefaultLengthBonus(totalHits);
-            highARValue *= lengthBonus;
-
             // Penalize misses by assessing # of misses relative to the total # of objects. Default a 3% reduction for any # of misses.
             if (effectiveMissCount > 0)
                 highARValue *= 0.97 * Math.Pow(1 - Math.Pow(effectiveMissCount / totalHits, 0.775), effectiveMissCount);
@@ -351,20 +346,20 @@ namespace osu.Game.Rulesets.Osu.Difficulty
                 return 0.0;
 
             double rawReading = attributes.HiddenDifficulty;
-            double readingValue = ReadingHidden.DifficultyToPerformance(attributes.HiddenDifficulty);
+            double hiddenValue = ReadingHidden.DifficultyToPerformance(attributes.HiddenDifficulty);
 
             // Penalize misses by assessing # of misses relative to the total # of objects. Default a 3% reduction for any # of misses.
             if (effectiveMissCount > 0)
-                readingValue *= 0.97 * Math.Pow(1 - Math.Pow(effectiveMissCount / totalHits, 0.775), Math.Pow(effectiveMissCount, .875));
+                hiddenValue *= 0.97 * Math.Pow(1 - Math.Pow(effectiveMissCount / totalHits, 0.775), Math.Pow(effectiveMissCount, .875));
 
-            readingValue *= getComboScalingFactor(attributes);
+            hiddenValue *= getComboScalingFactor(attributes);
 
             // Scale the reading value with accuracy _harshly_. Additional note: it would have it's own curve in Statistical Accuracy rework.
-            readingValue *= accuracy * accuracy;
+            hiddenValue *= accuracy * accuracy;
             // It is important to also consider accuracy difficulty when doing that.
-            readingValue *= 0.98 + Math.Pow(attributes.OverallDifficulty, 2) / 2500;
+            hiddenValue *= 0.98 + Math.Pow(attributes.OverallDifficulty, 2) / 2500;
 
-            return readingValue;
+            return hiddenValue;
         }
 
         private double calculateEffectiveMissCount(OsuDifficultyAttributes attributes)

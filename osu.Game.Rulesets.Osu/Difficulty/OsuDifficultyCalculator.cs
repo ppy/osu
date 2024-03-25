@@ -72,8 +72,8 @@ namespace osu.Game.Rulesets.Osu.Difficulty
                 baseFlashlightPerformance = Flashlight.DifficultyToPerformance(flashlightRating);
 
             double baseReadingLowARPerformance = ReadingLowAR.DifficultyToPerformance(readingLowARRating);
-            double baseReadingHighARPerformance = OsuStrainSkill.DifficultyToPerformance(readingHighARRating);
-            double baseReadingARPerformance = baseReadingLowARPerformance + baseReadingHighARPerformance;
+            double baseReadingHighARPerformance = OsuStrainSkill.DifficultyToPerformance(readingHighARRating) * 0.5; // WARNING, this is purely visual change to reduce SR inflation on high-end
+            double baseReadingARPerformance = Math.Max(baseReadingLowARPerformance, baseReadingHighARPerformance);
 
             double baseFlashlightARPerformance = Math.Pow(Math.Pow(baseFlashlightPerformance, FL_SUM_POWER) + Math.Pow(baseReadingARPerformance, FL_SUM_POWER), 1.0 / FL_SUM_POWER);
 
