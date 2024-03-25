@@ -127,14 +127,15 @@ namespace osu.Game.Screens.Menu
             {
                 int previousIndex = displayIndex;
 
-                if (displayIndex == -1)
-                    displayIndex = 0;
-
                 // To handle expiration simply, arrange all images in best-next order.
                 // Fade in the first valid one, then handle fading out the last if required.
                 var currentRotation = content
-                                      .Skip(displayIndex + 1)
-                                      .Concat(content.Take(displayIndex + 1));
+                                      .Skip(Math.Max(0, previousIndex) + 1)
+                                      .Concat(content.Take(Math.Max(0, previousIndex) + 1));
+
+                // After the loop, displayIndex will be the new valid index or -1 if
+                // none valid.
+                displayIndex = -1;
 
                 foreach (var image in currentRotation)
                 {
