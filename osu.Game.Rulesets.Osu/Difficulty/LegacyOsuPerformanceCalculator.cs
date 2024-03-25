@@ -1,5 +1,7 @@
-﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
+
+#nullable disable
 
 using System;
 using System.Collections.Generic;
@@ -11,33 +13,21 @@ using osu.Game.Scoring;
 
 namespace osu.Game.Rulesets.Osu.Difficulty
 {
-    public class OsuPerformanceCalculator : PerformanceCalculator
+    public static class LegacyOsuPerformanceCalculator
     {
         public const double PERFORMANCE_BASE_MULTIPLIER = 1.14; // This is being adjusted to keep the final pp value scaled around what it used to be when changing things.
 
-        private double accuracy;
-        private int scoreMaxCombo;
-        private int countGreat;
-        private int countOk;
-        private int countMeh;
-        private int countMiss;
+        private static double accuracy;
+        private static int scoreMaxCombo;
+        private static int countGreat;
+        private static int countOk;
+        private static int countMeh;
+        private static int countMiss;
 
-        private int sliderDrops;
-        private int sliderBreaks;
+        private static double effectiveMissCount;
 
-        private double effectiveMissCount;
-
-        public OsuPerformanceCalculator()
-            : base(new OsuRuleset())
+        public static PerformanceAttributes CreatePerformanceAttributes(ScoreInfo score, DifficultyAttributes attributes)
         {
-        }
-
-        protected override PerformanceAttributes CreatePerformanceAttributes(ScoreInfo score, DifficultyAttributes attributes)
-        {
-            // Use stable-compatible performance calculator for CL scores
-            if (score.Mods.Any(m => m is OsuModClassic))
-                return LegacyOsuPerformanceCalculator.CreatePerformanceAttributes(score, attributes);
-
             var osuAttributes = (OsuDifficultyAttributes)attributes;
 
             accuracy = score.Accuracy;
@@ -46,11 +36,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             countOk = score.Statistics.GetValueOrDefault(HitResult.Ok);
             countMeh = score.Statistics.GetValueOrDefault(HitResult.Meh);
             countMiss = score.Statistics.GetValueOrDefault(HitResult.Miss);
-
-            sliderDrops = score.Statistics.GetValueOrDefault(HitResult.SmallTickMiss);
-            sliderBreaks = score.Statistics.GetValueOrDefault(HitResult.LargeTickMiss);
-
-            effectiveMissCount = countMiss + sliderBreaks;
+            effectiveMissCount = calculateEffectiveMissCount(osuAttributes);
 
             double multiplier = PERFORMANCE_BASE_MULTIPLIER;
 
@@ -59,18 +45,6 @@ namespace osu.Game.Rulesets.Osu.Difficulty
 
             if (score.Mods.Any(m => m is OsuModSpunOut) && totalHits > 0)
                 multiplier *= 1.0 - Math.Pow((double)osuAttributes.SpinnerCount / totalHits, 0.85);
-
-            if (score.Mods.Any(h => h is OsuModRelax))
-            {
-                // https://www.desmos.com/calculator/bc9eybdthb
-                // we use OD13.3 as maximum since it's the value at which great hitwidow becomes 0
-                // this is well beyond currently maximum achievable OD which is 12.17 (DTx2 + DA with OD11)
-                double okMultiplier = Math.Max(0.0, osuAttributes.OverallDifficulty > 0.0 ? 1 - Math.Pow(osuAttributes.OverallDifficulty / 13.33, 1.8) : 1.0);
-                double mehMultiplier = Math.Max(0.0, osuAttributes.OverallDifficulty > 0.0 ? 1 - Math.Pow(osuAttributes.OverallDifficulty / 13.33, 5) : 1.0);
-
-                // As we're adding Oks and Mehs to an approximated number of combo breaks the result can be higher than total hits in specific scenarios (which breaks some calculations) so we need to clamp it.
-                effectiveMissCount = Math.Min(effectiveMissCount + countOk * okMultiplier + countMeh * mehMultiplier, totalHits);
-            }
 
             double aimValue = computeAimValue(score, osuAttributes);
             double speedValue = computeSpeedValue(score, osuAttributes);
@@ -95,7 +69,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             };
         }
 
-        private double computeAimValue(ScoreInfo score, OsuDifficultyAttributes attributes)
+        private static double computeAimValue(ScoreInfo score, OsuDifficultyAttributes attributes)
         {
             double aimValue = Math.Pow(5.0 * Math.Max(1.0, attributes.AimDifficulty / 0.0675) - 4.0, 3.0) / 100000.0;
 
@@ -115,14 +89,9 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             else if (attributes.ApproachRate < 8.0)
                 approachRateFactor = 0.05 * (8.0 - attributes.ApproachRate);
 
-            if (score.Mods.Any(h => h is OsuModRelax))
-                approachRateFactor = 0.0;
-
             aimValue *= 1.0 + approachRateFactor * lengthBonus; // Buff for longer maps with high AR.
 
-            if (score.Mods.Any(m => m is OsuModBlinds))
-                aimValue *= 1.3 + (totalHits * (0.0016 / (1 + 2 * effectiveMissCount)) * Math.Pow(accuracy, 16)) * (1 - 0.003 * attributes.DrainRate * attributes.DrainRate);
-            else if (score.Mods.Any(h => h is OsuModHidden))
+            if (score.Mods.Any(h => h is OsuModHidden))
             {
                 // We want to give more reward for lower AR when it comes to aim and HD. This nerfs high AR and buffs lower AR.
                 aimValue *= 1.0 + 0.04 * (12.0 - attributes.ApproachRate);
@@ -133,7 +102,8 @@ namespace osu.Game.Rulesets.Osu.Difficulty
 
             if (attributes.SliderCount > 0)
             {
-                double sliderNerfFactor = (1 - attributes.SliderFactor) * Math.Pow(1 - sliderDrops / estimateDifficultSliders, 3) + attributes.SliderFactor;
+                double estimateSliderEndsDropped = Math.Clamp(Math.Min(countOk + countMeh + countMiss, attributes.MaxCombo - scoreMaxCombo), 0, estimateDifficultSliders);
+                double sliderNerfFactor = (1 - attributes.SliderFactor) * Math.Pow(1 - estimateSliderEndsDropped / estimateDifficultSliders, 3) + attributes.SliderFactor;
                 aimValue *= sliderNerfFactor;
             }
 
@@ -144,11 +114,8 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             return aimValue;
         }
 
-        private double computeSpeedValue(ScoreInfo score, OsuDifficultyAttributes attributes)
+        private static double computeSpeedValue(ScoreInfo score, OsuDifficultyAttributes attributes)
         {
-            if (score.Mods.Any(h => h is OsuModRelax))
-                return 0.0;
-
             double speedValue = Math.Pow(5.0 * Math.Max(1.0, attributes.SpeedDifficulty / 0.0675) - 4.0, 3.0) / 100000.0;
 
             double lengthBonus = 0.95 + 0.4 * Math.Min(1.0, totalHits / 2000.0) +
@@ -167,12 +134,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
 
             speedValue *= 1.0 + approachRateFactor * lengthBonus; // Buff for longer maps with high AR.
 
-            if (score.Mods.Any(m => m is OsuModBlinds))
-            {
-                // Increasing the speed value by object count for Blinds isn't ideal, so the minimum buff is given.
-                speedValue *= 1.12;
-            }
-            else if (score.Mods.Any(m => m is OsuModHidden))
+            if (score.Mods.Any(m => m is OsuModHidden))
             {
                 // We want to give more reward for lower AR when it comes to aim and HD. This nerfs high AR and buffs lower AR.
                 speedValue *= 1.0 + 0.04 * (12.0 - attributes.ApproachRate);
@@ -194,14 +156,11 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             return speedValue;
         }
 
-        private double computeAccuracyValue(ScoreInfo score, OsuDifficultyAttributes attributes)
+        private static double computeAccuracyValue(ScoreInfo score, OsuDifficultyAttributes attributes)
         {
-            if (score.Mods.Any(h => h is OsuModRelax))
-                return 0.0;
-
             // This percentage only considers HitCircles of any value - in this part of the calculation we focus on hitting the timing hit window.
             double betterAccuracyPercentage;
-            int amountHitObjectsWithAccuracy = attributes.HitCircleCount + attributes.SliderCount;
+            int amountHitObjectsWithAccuracy = attributes.HitCircleCount;
 
             if (amountHitObjectsWithAccuracy > 0)
                 betterAccuracyPercentage = ((countGreat - (totalHits - amountHitObjectsWithAccuracy)) * 6 + countOk * 2 + countMeh) / (double)(amountHitObjectsWithAccuracy * 6);
@@ -219,10 +178,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             // Bonus for many hitcircles - it's harder to keep good accuracy up for longer.
             accuracyValue *= Math.Min(1.15, Math.Pow(amountHitObjectsWithAccuracy / 1000.0, 0.3));
 
-            // Increasing the accuracy value by object count for Blinds isn't ideal, so the minimum buff is given.
-            if (score.Mods.Any(m => m is OsuModBlinds))
-                accuracyValue *= 1.14;
-            else if (score.Mods.Any(m => m is OsuModHidden))
+            if (score.Mods.Any(m => m is OsuModHidden))
                 accuracyValue *= 1.08;
 
             if (score.Mods.Any(m => m is OsuModFlashlight))
@@ -231,7 +187,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             return accuracyValue;
         }
 
-        private double computeFlashlightValue(ScoreInfo score, OsuDifficultyAttributes attributes)
+        private static double computeFlashlightValue(ScoreInfo score, OsuDifficultyAttributes attributes)
         {
             if (!score.Mods.Any(h => h is OsuModFlashlight))
                 return 0.0;
@@ -256,7 +212,25 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             return flashlightValue;
         }
 
-        private double getComboScalingFactor(OsuDifficultyAttributes attributes) => attributes.MaxCombo <= 0 ? 1.0 : Math.Min(Math.Pow(scoreMaxCombo, 0.8) / Math.Pow(attributes.MaxCombo, 0.8), 1.0);
-        private int totalHits => countGreat + countOk + countMeh + countMiss;
+        private static double calculateEffectiveMissCount(OsuDifficultyAttributes attributes)
+        {
+            // Guess the number of misses + slider breaks from combo
+            double comboBasedMissCount = 0.0;
+
+            if (attributes.SliderCount > 0)
+            {
+                double fullComboThreshold = attributes.MaxCombo - 0.1 * attributes.SliderCount;
+                if (scoreMaxCombo < fullComboThreshold)
+                    comboBasedMissCount = fullComboThreshold / Math.Max(1.0, scoreMaxCombo);
+            }
+
+            // Clamp miss count to maximum amount of possible breaks
+            comboBasedMissCount = Math.Min(comboBasedMissCount, countOk + countMeh + countMiss);
+
+            return Math.Max(countMiss, comboBasedMissCount);
+        }
+
+        private static double getComboScalingFactor(OsuDifficultyAttributes attributes) => attributes.MaxCombo <= 0 ? 1.0 : Math.Min(Math.Pow(scoreMaxCombo, 0.8) / Math.Pow(attributes.MaxCombo, 0.8), 1.0);
+        private static int totalHits => countGreat + countOk + countMeh + countMiss;
     }
 }
