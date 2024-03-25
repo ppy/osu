@@ -191,6 +191,9 @@ namespace osu.Desktop
                 };
 
                 presence.Secrets.JoinSecret = JsonConvert.SerializeObject(roomSecret);
+                // discord cannot handle both secrets and buttons at the same time, so we need to choose something.
+                // the multiplayer room seems more important.
+                presence.Buttons = null;
             }
             else
             {
