@@ -21,6 +21,8 @@ namespace osu.Game.Screens.Menu
 {
     public partial class OnlineMenuBanner : VisibilityContainer
     {
+        public double DelayBetweenRotation = 7500;
+
         internal Bindable<APIMenuContent> Current { get; } = new Bindable<APIMenuContent>(new APIMenuContent());
 
         private const float transition_duration = 500;
@@ -115,21 +117,29 @@ namespace osu.Game.Screens.Menu
         {
             nextDisplay?.Cancel();
 
-            bool previousShowing = displayIndex >= 0;
-            if (previousShowing)
-                content[displayIndex % content.Count].FadeOut(400, Easing.OutQuint);
+            // If the user is hovering a banner, don't rotate yet.
+            bool anyHovered = content.Any(i => i.IsHovered);
 
-            displayIndex++;
+            if (!anyHovered)
+            {
+                bool previousShowing = displayIndex >= 0;
+                if (previousShowing)
+                    content[displayIndex % content.Count].FadeOut(400, Easing.OutQuint);
 
-            using (BeginDelayedSequence(previousShowing ? 300 : 0))
-                content[displayIndex % content.Count].Show();
+                displayIndex++;
+
+                using (BeginDelayedSequence(previousShowing ? 300 : 0))
+                    content[displayIndex % content.Count].Show();
+            }
 
             if (content.Count > 1)
-                nextDisplay = Scheduler.AddDelayed(showNext, 12000);
+            {
+                nextDisplay = Scheduler.AddDelayed(showNext, DelayBetweenRotation);
+            }
         }
 
         [LongRunningLoad]
-        private partial class MenuImage : OsuClickableContainer
+        public partial class MenuImage : OsuClickableContainer
         {
             public readonly APIMenuImage Image;
 
