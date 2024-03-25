@@ -71,10 +71,10 @@ namespace osu.Game.Tests.Visual.UserInterface
         [Test]
         public void TestUnrankedBadge()
         {
-            AddStep(@"Add unranked mod", () => changeMods(new[] { new OsuModDeflate() }));
-            AddAssert("Unranked badge shown", () => footerButtonMods.UnrankedBadge.Alpha == 1);
+            AddStep(@"Add mod ineligible for pp", () => changeMods(new[] { new OsuModDeflate() }));
+            AddAssert("Not eligible for pp badge shown", () => footerButtonMods.NotEligibleForPPBadge.Alpha == 1);
             AddStep(@"Clear selected mod", () => changeMods(Array.Empty<Mod>()));
-            AddAssert("Unranked badge not shown", () => footerButtonMods.UnrankedBadge.Alpha == 0);
+            AddAssert("Not eligible for pp badge not shown", () => footerButtonMods.NotEligibleForPPBadge.Alpha == 0);
         }
 
         private void changeMods(IReadOnlyList<Mod> mods)
@@ -93,7 +93,7 @@ namespace osu.Game.Tests.Visual.UserInterface
         private partial class TestFooterButtonMods : FooterButtonMods
         {
             public new OsuSpriteText MultiplierText => base.MultiplierText;
-            public new Drawable UnrankedBadge => base.UnrankedBadge;
+            public new Drawable NotEligibleForPPBadge => base.NotEligibleForPPBadge;
         }
     }
 }

@@ -33,7 +33,7 @@ namespace osu.Game.Screens.Select
         }
 
         protected OsuSpriteText MultiplierText { get; private set; } = null!;
-        protected Container UnrankedBadge { get; private set; } = null!;
+        protected Container NotEligibleForPPBadge { get; private set; } = null!;
 
         private readonly ModDisplay modDisplay;
 
@@ -73,7 +73,7 @@ namespace osu.Game.Screens.Select
                     Origin = Anchor.Centre,
                     Font = OsuFont.GetFont(weight: FontWeight.Bold),
                 },
-                UnrankedBadge = new Container
+                NotEligibleForPPBadge = new Container
                 {
                     Anchor = Anchor.Centre,
                     Origin = Anchor.Centre,
@@ -136,8 +136,8 @@ namespace osu.Game.Screens.Select
             else
                 modDisplay.FadeOut();
 
-            bool anyUnrankedMods = Current.Value?.Any(m => !m.EligibleForPP) == true;
-            UnrankedBadge.FadeTo(anyUnrankedMods ? 1 : 0);
+            bool notEligibleForPP = Current.Value?.Any(m => !m.EligibleForPP) == true;
+            NotEligibleForPPBadge.FadeTo(notEligibleForPP ? 1 : 0);
         });
     }
 }
