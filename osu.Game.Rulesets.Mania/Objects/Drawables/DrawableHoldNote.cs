@@ -247,7 +247,7 @@ namespace osu.Game.Rulesets.Mania.Objects.Drawables
             else
                 bodyPiece.Height += Tail.Height / 2;
 
-            // Update the anchor of the tail piece, taking into account the scrolling direction
+            // Update the origin of the tail piece, taking into account the scrolling direction
             if (Direction.Value == ScrollingDirection.Up)
                 Tail.Origin = tailOrigin.Value == Anchor.TopCentre ? Anchor.BottomCentre : Anchor.TopCentre;
             else
