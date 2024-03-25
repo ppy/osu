@@ -8,6 +8,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Globalization;
 using System.Linq;
+using osu.Framework.Graphics;
 using osu.Game.Beatmaps.Formats;
 
 namespace osu.Game.Skinning
@@ -126,6 +127,13 @@ namespace osu.Game.Skinning
                     case "LightFramePerSecond":
                         int lightFramePerSecond = int.Parse(pair.Value, CultureInfo.InvariantCulture);
                         currentConfig.LightFramePerSecond = lightFramePerSecond > 0 ? lightFramePerSecond : 24;
+                        break;
+
+                    case "LongNoteTailOrigin":
+                        if (string.Equals(pair.Value, "Top", StringComparison.Ordinal))
+                            currentConfig.HoldNoteTailOrigin = Anchor.TopCentre;
+                        else
+                            currentConfig.HoldNoteTailOrigin = Anchor.BottomCentre;
                         break;
 
                     case string when pair.Key.StartsWith("Colour", StringComparison.Ordinal):

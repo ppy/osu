@@ -4,6 +4,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using osu.Framework.Graphics;
 using osu.Game.Beatmaps.Formats;
 using osuTK.Graphics;
 
@@ -43,6 +44,7 @@ namespace osu.Game.Skinning
         public bool ShowJudgementLine = true;
         public bool KeysUnderNotes;
         public int LightFramePerSecond = 60;
+        public Anchor HoldNoteTailOrigin = Anchor.BottomCentre;
 
         public LegacyNoteBodyStyle? NoteBodyStyle;
 
