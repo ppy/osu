@@ -58,9 +58,8 @@ namespace osu.Desktop
                     {
                         SDL.SDL_ShowSimpleMessageBox(SDL.SDL_MessageBoxFlags.SDL_MESSAGEBOX_ERROR,
                             "osu! is running in compatibility mode",
-                            "osu! is running in compatibility mode. This may cause issues with the game. Please ensure osu! is not set to run in compatibility mode.", IntPtr.Zero);
-
-                        CompatibilityModeChecker.LogCompatibilityFlags();
+                            "osu! is running in compatibility mode. This may cause issues with the game. Please ensure osu! is not set to run in compatibility mode.\n\n"
+                            + "Debug information: " + CompatibilityModeChecker.GetCompatibilityFlags(), IntPtr.Zero);
                     }
                     else
                     {

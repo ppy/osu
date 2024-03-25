@@ -50,10 +50,18 @@ namespace osu.Desktop.Windows
         /// </summary>
         public static void LogCompatibilityFlags()
         {
+            Logger.Log($"Compatibility flags for {Environment.ProcessPath}: {GetCompatibilityFlags()}");
+        }
+
+        /// <summary>
+        /// Get the compatibility flags for the current process if they exist
+        /// </summary>
+        /// <returns>The compatibility flags</returns>
+        public static string GetCompatibilityFlags()
+        {
             using var layers = Registry.CurrentUser.OpenSubKey(@"Software\Microsoft\Windows NT\CurrentVersion\AppCompatFlags\Layers");
 
-            if (layers?.GetValue(Environment.ProcessPath) is string flags)
-                Logger.Log($"Compatibility flags for {Environment.ProcessPath}: {flags}");
+            return layers?.GetValue(Environment.ProcessPath) as string ?? string.Empty;
         }
 
         private partial class CompatibilityModeNotification : SimpleNotification
