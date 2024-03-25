@@ -164,25 +164,32 @@ namespace osu.Game.Rulesets
 
         internal void TryDisableCustomRulesetsCausing(Exception exception)
         {
-            var stackTrace = new StackTrace(exception);
-
-            foreach (var frame in stackTrace.GetFrames())
+            try
             {
-                var declaringAssembly = frame.GetMethod()?.DeclaringType?.Assembly;
-                if (declaringAssembly == null)
-                    continue;
+                var stackTrace = new StackTrace(exception);
 
-                if (UserRulesetAssemblies.Contains(declaringAssembly))
+                foreach (var frame in stackTrace.GetFrames())
                 {
-                    string sourceLocation = declaringAssembly.Location;
-                    string destinationLocation = Path.ChangeExtension(sourceLocation, @".dll.broken");
+                    var declaringAssembly = frame.GetMethod()?.DeclaringType?.Assembly;
+                    if (declaringAssembly == null)
+                        continue;
 
-                    if (File.Exists(sourceLocation))
+                    if (UserRulesetAssemblies.Contains(declaringAssembly))
                     {
-                        Logger.Log($"Unhandled exception traced back to custom ruleset {Path.GetFileNameWithoutExtension(sourceLocation)}. Marking as broken.");
-                        File.Move(sourceLocation, destinationLocation);
+                        string sourceLocation = declaringAssembly.Location;
+                        string destinationLocation = Path.ChangeExtension(sourceLocation, @".dll.broken");
+
+                        if (File.Exists(sourceLocation))
+                        {
+                            Logger.Log($"Unhandled exception traced back to custom ruleset {Path.GetFileNameWithoutExtension(sourceLocation)}. Marking as broken.");
+                            File.Move(sourceLocation, destinationLocation);
+                        }
                     }
                 }
+            }
+            catch (Exception ex)
+            {
+                Logger.Log($"Attempt to trace back crash to custom ruleset failed: {ex}");
             }
         }
     }
