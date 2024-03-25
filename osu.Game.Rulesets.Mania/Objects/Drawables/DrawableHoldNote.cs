@@ -32,7 +32,7 @@ namespace osu.Game.Rulesets.Mania.Objects.Drawables
 
         public IBindable<bool> IsHitting => isHitting;
 
-        private IBindable<Anchor> tailOrigin = new Bindable<Anchor>(Anchor.BottomCentre);
+        private IBindable<Anchor> tailOrigin;
         private readonly Bindable<bool> isHitting = new Bindable<bool>();
 
         public DrawableHoldNoteHead Head => headContainer.Child;
@@ -275,11 +275,10 @@ namespace osu.Game.Rulesets.Mania.Objects.Drawables
         protected override void ApplySkin(ISkinSource skin, bool allowFallback)
         {
             base.ApplySkin(skin, allowFallback);
-            var newTailOrigin = skin.GetConfig<ManiaSkinConfigurationLookup, Anchor>(
+            var skinTailOrigin = skin.GetConfig<ManiaSkinConfigurationLookup, Anchor>(
                 new ManiaSkinConfigurationLookup(LegacyManiaSkinConfigurationLookups.HoldNoteTailOrigin)
             );
-            if (newTailOrigin != null)
-                tailOrigin = newTailOrigin;
+            tailOrigin = skinTailOrigin ?? new Bindable<Anchor>(Anchor.BottomCentre);
         }
 
         protected override void CheckForResult(bool userTriggered, double timeOffset)
