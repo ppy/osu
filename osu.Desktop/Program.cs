@@ -69,6 +69,8 @@ namespace osu.Desktop
                             + "If you are running a newer version of windows, please check you don't have \"Compatibility mode\" turned on for osu!", IntPtr.Zero);
                     }
 
+                    CompatibilityModeChecker.LogCompatibilityFlags();
+
                     return;
                 }
 

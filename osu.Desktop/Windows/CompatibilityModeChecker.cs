@@ -3,12 +3,12 @@
 
 using System;
 using System.Linq;
-using System.Reflection;
 using System.Runtime.Versioning;
 using Microsoft.Win32;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Sprites;
+using osu.Framework.Logging;
 using osu.Game.Graphics;
 using osu.Game.Overlays;
 using osu.Game.Overlays.Notifications;
@@ -27,17 +27,32 @@ namespace osu.Desktop.Windows
         [BackgroundDependencyLoader]
         private void load()
         {
-            if (CheckCompatibilityMode())
-                notifications.Post(new CompatibilityModeNotification());
+            if (!CheckCompatibilityMode()) return;
+
+            notifications.Post(new CompatibilityModeNotification());
+            LogCompatibilityFlags();
         }
 
+        /// <summary>
+        /// Check if the game is running with windows compatibility optimizations
+        /// </summary>
+        /// <returns></returns>
         public static bool CheckCompatibilityMode()
         {
             using var layers = Registry.CurrentUser.OpenSubKey(@"Software\Microsoft\Windows NT\CurrentVersion\AppCompatFlags\Layers");
 
-            string exePath = Assembly.GetExecutingAssembly().Location;
+            return layers != null && layers.GetValueNames().Any(name => name.Equals(Environment.ProcessPath, StringComparison.OrdinalIgnoreCase));
+        }
 
-            return layers != null && layers.GetValueNames().Any(name => name.Equals(exePath, StringComparison.OrdinalIgnoreCase));
+        /// <summary>
+        /// Log the compatibility flags for the current process if they exist
+        /// </summary>
+        public static void LogCompatibilityFlags()
+        {
+            using var layers = Registry.CurrentUser.OpenSubKey(@"Software\Microsoft\Windows NT\CurrentVersion\AppCompatFlags\Layers");
+
+            if (layers?.GetValue(Environment.ProcessPath) is string flags)
+                Logger.Log($"Compatibility flags for {Environment.ProcessPath}: {flags}", LoggingTarget.Information);
         }
 
         private partial class CompatibilityModeNotification : SimpleNotification
