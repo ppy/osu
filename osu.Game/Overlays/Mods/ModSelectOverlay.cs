@@ -484,7 +484,7 @@ namespace osu.Game.Overlays.Mods
                     multiplier *= mod.ScoreMultiplier;
 
                 rankingInformationDisplay.ModMultiplier.Value = multiplier;
-                rankingInformationDisplay.Ranked.Value = ActiveMods.Value.All(m => m.EligibleForPP);
+                rankingInformationDisplay.EligibleForPP.Value = ActiveMods.Value.All(m => m.EligibleForPP);
             }
 
             if (beatmapAttributesDisplay != null)

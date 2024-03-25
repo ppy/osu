@@ -50,24 +50,24 @@ namespace osu.Game.Localisation
         public static LocalisableString ScoreMultiplier => new TranslatableString(getKey(@"score_multiplier"), @"Score Multiplier");
 
         /// <summary>
-        /// "Ranked"
+        /// "Eligible for pp"
         /// </summary>
-        public static LocalisableString Ranked => new TranslatableString(getKey(@"ranked"), @"Ranked");
+        public static LocalisableString EligibleForPP => new TranslatableString(getKey(@"eligible_for_pp"), @"Eligible for pp");
 
         /// <summary>
         /// "Performance points can be granted for the active mods."
         /// </summary>
-        public static LocalisableString RankedExplanation => new TranslatableString(getKey(@"ranked_explanation"), @"Performance points can be granted for the active mods.");
+        public static LocalisableString EligibleForPPExplanation => new TranslatableString(getKey(@"eligible_for_pp_explanation"), @"Performance points can be granted for the active mods.");
 
         /// <summary>
-        /// "Unranked"
+        /// "Not eligible for pp"
         /// </summary>
-        public static LocalisableString Unranked => new TranslatableString(getKey(@"unranked"), @"Unranked");
+        public static LocalisableString NotEligibleForPP => new TranslatableString(getKey(@"not_eligible_for_pp"), @"Not eligible for pp");
 
         /// <summary>
         /// "Performance points will not be granted due to active mods."
         /// </summary>
-        public static LocalisableString UnrankedExplanation => new TranslatableString(getKey(@"unranked_explanation"), @"Performance points will not be granted due to active mods.");
+        public static LocalisableString NotEligibleForPPExplanation => new TranslatableString(getKey(@"not_eligible_for_pp_explanation"), @"Performance points will not be granted due to active mods.");
 
         private static string getKey(string key) => $@"{prefix}:{key}";
     }

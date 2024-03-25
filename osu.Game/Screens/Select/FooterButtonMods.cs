@@ -94,7 +94,7 @@ namespace osu.Game.Screens.Select
                             Colour = colours.Gray2,
                             Padding = new MarginPadding(5),
                             UseFullGlyphHeight = false,
-                            Text = ModSelectOverlayStrings.Unranked.ToLower()
+                            Text = ModSelectOverlayStrings.NotEligibleForPP.ToLower()
                         }
                     }
                 },

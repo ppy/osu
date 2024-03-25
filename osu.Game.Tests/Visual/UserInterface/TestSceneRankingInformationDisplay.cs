@@ -27,7 +27,7 @@ namespace osu.Game.Tests.Visual.UserInterface
                 Origin = Anchor.Centre
             });
 
-            AddToggleStep("toggle ranked", ranked => onlinePropertiesDisplay.Ranked.Value = ranked);
+            AddToggleStep("toggle pp eligibility", ranked => onlinePropertiesDisplay.EligibleForPP.Value = ranked);
 
             AddStep("set multiplier below 1", () => onlinePropertiesDisplay.ModMultiplier.Value = 0.5);
             AddStep("set multiplier to 1", () => onlinePropertiesDisplay.ModMultiplier.Value = 1);

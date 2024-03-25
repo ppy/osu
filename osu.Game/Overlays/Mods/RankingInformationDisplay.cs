@@ -28,14 +28,14 @@ namespace osu.Game.Overlays.Mods
 
         public Bindable<double> ModMultiplier = new BindableDouble(1);
 
-        public Bindable<bool> Ranked { get; } = new BindableBool(true);
+        public Bindable<bool> EligibleForPP { get; } = new BindableBool(true);
 
         private const float transition_duration = 200;
 
         private RollingCounter<double> counter = null!;
 
         private Box flashLayer = null!;
-        private TextWithTooltip rankedText = null!;
+        private TextWithTooltip eligibleForPPText = null!;
 
         [Resolved]
         private OsuColour colours { get; set; } = null!;
@@ -68,12 +68,12 @@ namespace osu.Game.Overlays.Mods
             {
                 new Container
                 {
-                    Width = 50,
+                    Width = 90,
                     RelativeSizeAxes = Axes.Y,
                     Margin = new MarginPadding(10),
                     Anchor = Anchor.Centre,
                     Origin = Anchor.Centre,
-                    Child = rankedText = new TextWithTooltip
+                    Child = eligibleForPPText = new TextWithTooltip
                     {
                         Anchor = Anchor.Centre,
                         Origin = Anchor.Centre,
@@ -132,22 +132,22 @@ namespace osu.Game.Overlays.Mods
             // due to `Current.Value` having a nonstandard default value of 1.
             counter.SetCountWithoutRolling(ModMultiplier.Value);
 
-            Ranked.BindValueChanged(e =>
+            EligibleForPP.BindValueChanged(e =>
             {
                 flash();
 
                 if (e.NewValue)
                 {
-                    rankedText.Text = ModSelectOverlayStrings.Ranked;
-                    rankedText.TooltipText = ModSelectOverlayStrings.RankedExplanation;
-                    rankedText.FadeColour(Colour4.White, transition_duration, Easing.OutQuint);
+                    eligibleForPPText.Text = ModSelectOverlayStrings.EligibleForPP;
+                    eligibleForPPText.TooltipText = ModSelectOverlayStrings.EligibleForPPExplanation;
+                    eligibleForPPText.FadeColour(Colour4.White, transition_duration, Easing.OutQuint);
                     FrontBackground.FadeColour(ColourProvider.Background3, transition_duration, Easing.OutQuint);
                 }
                 else
                 {
-                    rankedText.Text = ModSelectOverlayStrings.Unranked;
-                    rankedText.TooltipText = ModSelectOverlayStrings.UnrankedExplanation;
-                    rankedText.FadeColour(ColourProvider.Background5, transition_duration, Easing.OutQuint);
+                    eligibleForPPText.Text = ModSelectOverlayStrings.NotEligibleForPP;
+                    eligibleForPPText.TooltipText = ModSelectOverlayStrings.NotEligibleForPPExplanation;
+                    eligibleForPPText.FadeColour(ColourProvider.Background5, transition_duration, Easing.OutQuint);
                     FrontBackground.FadeColour(colours.Orange1, transition_duration, Easing.OutQuint);
                 }
             }, true);

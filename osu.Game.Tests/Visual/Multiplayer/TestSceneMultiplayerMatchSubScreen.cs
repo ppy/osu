@@ -312,7 +312,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
             AddUntilStep("wait for join", () => RoomJoined);
 
             ClickButtonWhenEnabled<RoomSubScreen.UserModSelectButton>();
-            AddAssert("mod select shows unranked", () => screen.UserModsSelectOverlay.ChildrenOfType<RankingInformationDisplay>().Single().Ranked.Value == false);
+            AddAssert("mod select shows ineligible for pp", () => screen.UserModsSelectOverlay.ChildrenOfType<RankingInformationDisplay>().Single().EligibleForPP.Value == false);
             AddAssert("score multiplier = 1.20", () => screen.UserModsSelectOverlay.ChildrenOfType<RankingInformationDisplay>().Single().ModMultiplier.Value, () => Is.EqualTo(1.2).Within(0.01));
 
             AddStep("select flashlight", () => screen.UserModsSelectOverlay.ChildrenOfType<ModPanel>().Single(m => m.Mod is ModFlashlight).TriggerClick());
