@@ -144,7 +144,41 @@ namespace osu.Game.Tests.Visual.Menus
         }
 
         [Test]
-        public void TestExpiry()
+        public void TestFutureSingle()
+        {
+            AddStep("set image with time constraints", () => onlineMenuBanner.Current.Value = new APIMenuContent
+            {
+                Images = new[]
+                {
+                    new APIMenuImage
+                    {
+                        Image = @"https://assets.ppy.sh/main-menu/project-loved-2@2x.png",
+                        Url = @"https://osu.ppy.sh/home/news/2023-12-21-project-loved-december-2023",
+                        Begins = DateTimeOffset.Now.AddSeconds(2),
+                        Expires = DateTimeOffset.Now.AddSeconds(5),
+                    },
+                },
+            });
+
+            AddUntilStep("wait for no image shown", () => !onlineMenuBanner.ChildrenOfType<OnlineMenuBanner.MenuImage>().Any(i => i.IsPresent));
+
+            AddUntilStep("wait for one image shown", () =>
+            {
+                var images = onlineMenuBanner.ChildrenOfType<OnlineMenuBanner.MenuImage>();
+
+                if (images.Count() != 1)
+                    return false;
+
+                var image = images.Single();
+
+                return image.IsPresent && image.Image.Url == "https://osu.ppy.sh/home/news/2023-12-21-project-loved-december-2023";
+            });
+
+            AddUntilStep("wait for no image shown", () => !onlineMenuBanner.ChildrenOfType<OnlineMenuBanner.MenuImage>().Any(i => i.IsPresent));
+        }
+
+        [Test]
+        public void TestExpiryMultiple()
         {
             AddStep("set multiple images, second expiring soon", () => onlineMenuBanner.Current.Value = new APIMenuContent
             {
