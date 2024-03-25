@@ -29,7 +29,7 @@ namespace osu.Game.Screens.Menu
 
         private const float transition_duration = 500;
 
-        private Container content = null!;
+        private Container<MenuImage> content = null!;
         private CancellationTokenSource? cancellationTokenSource;
 
         private int displayIndex = -1;
@@ -43,7 +43,7 @@ namespace osu.Game.Screens.Menu
             AutoSizeDuration = transition_duration;
             AutoSizeEasing = Easing.OutQuint;
 
-            InternalChild = content = new Container
+            InternalChild = content = new Container<MenuImage>
             {
                 Anchor = Anchor.Centre,
                 Origin = Anchor.Centre,
@@ -59,8 +59,7 @@ namespace osu.Game.Screens.Menu
         {
             base.LoadComplete();
 
-            Current.BindValueChanged(_ => loadNewImages(), true);
-
+            Current.BindValueChanged(loadNewImages, true);
             checkForUpdates();
         }
 
@@ -86,25 +85,24 @@ namespace osu.Game.Screens.Menu
                 });
         }
 
-        private void loadNewImages()
+        /// <summary>
+        /// Takes <see cref="Current"/> and materialises and displays drawables for all valid images to be displayed.
+        /// </summary>
+        /// <param name="images"></param>
+        private void loadNewImages(ValueChangedEvent<APIMenuContent> images)
         {
             nextDisplay?.Cancel();
 
             cancellationTokenSource?.Cancel();
             cancellationTokenSource = null;
 
-            var newContent = Current.Value;
-
             // A better fade out would be nice, but the menu content changes *very* rarely
             // so let's keep things simple for now.
             content.Clear(true);
 
-            if (newContent.Images.Length == 0)
-                return;
-
-            LoadComponentsAsync(newContent.Images.Select(i => new MenuImage(i)), loaded =>
+            LoadComponentsAsync(images.NewValue.Images.Select(i => new MenuImage(i)), loaded =>
             {
-                if (!newContent.Equals(Current.Value))
+                if (!images.NewValue.Equals(Current.Value))
                     return;
 
                 // start hidden
@@ -127,20 +125,38 @@ namespace osu.Game.Screens.Menu
 
             if (!anyHovered)
             {
-                bool previousShowing = displayIndex >= 0;
-                if (previousShowing)
-                    content[displayIndex % content.Count].FadeOut(400, Easing.OutQuint);
+                int previousIndex = displayIndex;
 
-                displayIndex++;
+                if (displayIndex == -1)
+                    displayIndex = 0;
 
-                using (BeginDelayedSequence(previousShowing ? 300 : 0))
-                    content[displayIndex % content.Count].Show();
+                // To handle expiration simply, arrange all images in best-next order.
+                // Fade in the first valid one, then handle fading out the last if required.
+                var currentRotation = content
+                                      .Skip(displayIndex + 1)
+                                      .Concat(content.Take(displayIndex + 1));
+
+                foreach (var image in currentRotation)
+                {
+                    if (!image.Image.IsCurrent) continue;
+
+                    using (BeginDelayedSequence(previousIndex >= 0 ? 300 : 0))
+                    {
+                        displayIndex = content.IndexOf(image);
+
+                        if (displayIndex != previousIndex)
+                            image.Show();
+
+                        break;
+                    }
+                }
+
+                if (previousIndex >= 0 && previousIndex != displayIndex)
+                    content[previousIndex].FadeOut(400, Easing.OutQuint);
             }
 
-            if (content.Count > 1)
-            {
-                nextDisplay = Scheduler.AddDelayed(showNext, DelayBetweenRotation);
-            }
+            // Re-scheduling this method will both handle rotation and re-checking for expiration dates.
+            nextDisplay = Scheduler.AddDelayed(showNext, DelayBetweenRotation);
         }
 
         [LongRunningLoad]
