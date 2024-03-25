@@ -25,15 +25,6 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
 
         private readonly Container nonProxiedContent;
 
-        /// <summary>
-        /// Whether the location of the hit should be snapped to the hit target before animating.
-        /// </summary>
-        /// <remarks>
-        /// This is how osu-stable worked, but notably is not how TnT works.
-        /// Not snapping results in less visual feedback on hit accuracy.
-        /// </remarks>
-        public bool SnapJudgementLocation { get; set; }
-
         protected DrawableTaikoHitObject([CanBeNull] TaikoHitObject hitObject)
             : base(hitObject)
         {
