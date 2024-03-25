@@ -11,6 +11,7 @@ using osu.Framework.Graphics.Containers;
 using osu.Framework.Input.Bindings;
 using osu.Framework.Input.Events;
 using osu.Game.Audio;
+using osu.Game.Rulesets.Mania.Skinning;
 using osu.Game.Rulesets.Mania.Skinning.Default;
 using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Objects.Drawables;
@@ -31,6 +32,7 @@ namespace osu.Game.Rulesets.Mania.Objects.Drawables
 
         public IBindable<bool> IsHitting => isHitting;
 
+        private IBindable<Anchor> tailOrigin = new Bindable<Anchor>(Anchor.BottomCentre);
         private readonly Bindable<bool> isHitting = new Bindable<bool>();
 
         public DrawableHoldNoteHead Head => headContainer.Child;
@@ -239,7 +241,24 @@ namespace osu.Game.Rulesets.Mania.Objects.Drawables
             // Position and resize the body to lie half-way under the head and the tail notes.
             // The rationale for this is account for heads/tails with corner radius.
             bodyPiece.Y = (Direction.Value == ScrollingDirection.Up ? 1 : -1) * Head.Height / 2;
-            bodyPiece.Height = DrawHeight - Head.Height / 2 + Tail.Height / 2;
+            bodyPiece.Height = DrawHeight - Head.Height / 2;
+            if (tailOrigin.Value == Anchor.TopCentre)
+                bodyPiece.Height -= Tail.Height / 2;
+            else
+                bodyPiece.Height += Tail.Height / 2;
+
+            // Update the anchor of the tail piece, taking into account the scrolling direction
+            if (Direction.Value == ScrollingDirection.Up)
+            {
+                if (tailOrigin.Value == Anchor.TopCentre)
+                    Tail.Origin = Anchor.BottomCentre;
+                else
+                    Tail.Origin = Anchor.TopCentre;
+            }
+            else
+            {
+                Tail.Origin = tailOrigin.Value;
+            }
 
             if (Time.Current >= HitObject.StartTime)
             {
@@ -258,6 +277,16 @@ namespace osu.Game.Rulesets.Mania.Objects.Drawables
             }
             else
                 sizingContainer.Height = 1;
+        }
+
+        protected override void ApplySkin(ISkinSource skin, bool allowFallback)
+        {
+            base.ApplySkin(skin, allowFallback);
+            var newTailOrigin = skin.GetConfig<ManiaSkinConfigurationLookup, Anchor>(
+                new ManiaSkinConfigurationLookup(LegacyManiaSkinConfigurationLookups.HoldNoteTailOrigin)
+            );
+            if (newTailOrigin != null)
+                tailOrigin = newTailOrigin;
         }
 
         protected override void CheckForResult(bool userTriggered, double timeOffset)
