@@ -37,7 +37,7 @@ namespace osu.Desktop.Windows
         /// <summary>
         /// Check if the game is running with windows compatibility optimizations
         /// </summary>
-        /// <returns></returns>
+        /// <returns>Whether compatibility mode flags are detected or not</returns>
         public static bool CheckCompatibilityMode()
         {
             using var layers = Registry.CurrentUser.OpenSubKey(@"Software\Microsoft\Windows NT\CurrentVersion\AppCompatFlags\Layers");
