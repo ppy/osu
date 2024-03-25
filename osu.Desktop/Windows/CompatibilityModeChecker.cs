@@ -53,7 +53,7 @@ namespace osu.Desktop.Windows
             using var layers = Registry.CurrentUser.OpenSubKey(@"Software\Microsoft\Windows NT\CurrentVersion\AppCompatFlags\Layers");
 
             if (layers?.GetValue(Environment.ProcessPath) is string flags)
-                Logger.Log($"Compatibility flags for {Environment.ProcessPath}: {flags}", LoggingTarget.Information);
+                Logger.Log($"Compatibility flags for {Environment.ProcessPath}: {flags}");
         }
 
         private partial class CompatibilityModeNotification : SimpleNotification
