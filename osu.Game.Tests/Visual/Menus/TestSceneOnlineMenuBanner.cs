@@ -1,6 +1,7 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System;
 using System.Linq;
 using NUnit.Framework;
 using osu.Framework.Graphics;
@@ -139,6 +140,65 @@ namespace osu.Game.Tests.Visual.Menus
                     return false;
 
                 return !images.First().IsPresent && images.Last().IsPresent;
+            });
+        }
+
+        [Test]
+        public void TestExpiry()
+        {
+            AddStep("set multiple images, second expiring soon", () => onlineMenuBanner.Current.Value = new APIMenuContent
+            {
+                Images = new[]
+                {
+                    new APIMenuImage
+                    {
+                        Image = @"https://assets.ppy.sh/main-menu/project-loved-2@2x.png",
+                        Url = @"https://osu.ppy.sh/home/news/2023-12-21-project-loved-december-2023",
+                    },
+                    new APIMenuImage
+                    {
+                        Image = @"https://assets.ppy.sh/main-menu/wf2023-vote@2x.png",
+                        Url = @"https://osu.ppy.sh/community/contests/189",
+                        Expires = DateTimeOffset.Now.AddSeconds(2),
+                    }
+                },
+            });
+
+            AddUntilStep("wait for first image shown", () =>
+            {
+                var images = onlineMenuBanner.ChildrenOfType<OnlineMenuBanner.MenuImage>();
+
+                if (images.Count() != 2)
+                    return false;
+
+                return images.First().IsPresent && !images.Last().IsPresent;
+            });
+
+            AddUntilStep("wait for second image shown", () =>
+            {
+                var images = onlineMenuBanner.ChildrenOfType<OnlineMenuBanner.MenuImage>();
+
+                if (images.Count() != 2)
+                    return false;
+
+                return !images.First().IsPresent && images.Last().IsPresent;
+            });
+
+            AddUntilStep("wait for expiry", () =>
+            {
+                return onlineMenuBanner
+                       .ChildrenOfType<OnlineMenuBanner.MenuImage>()
+                       .Any(i => !i.Image.IsCurrent);
+            });
+
+            AddUntilStep("wait for first image shown", () =>
+            {
+                var images = onlineMenuBanner.ChildrenOfType<OnlineMenuBanner.MenuImage>();
+
+                if (images.Count() != 2)
+                    return false;
+
+                return images.First().IsPresent && !images.Last().IsPresent;
             });
         }
     }

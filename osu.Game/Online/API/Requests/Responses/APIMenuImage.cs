@@ -20,6 +20,10 @@ namespace osu.Game.Online.API.Requests.Responses
         [JsonProperty(@"url")]
         public string Url { get; init; } = string.Empty;
 
+        public bool IsCurrent =>
+            (Begins == null || Begins < DateTimeOffset.UtcNow) &&
+            (Expires == null || Expires > DateTimeOffset.UtcNow);
+
         /// <summary>
         /// The time at which this item should begin displaying. If <c>null</c>, will display immediately.
         /// </summary>
