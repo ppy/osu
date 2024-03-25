@@ -18,7 +18,9 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
         {
         }
 
-        private const double fc_probability = 0.02;
+        /// The skill level returned from this class will have FcProbability chance of hitting every note correctly.
+        /// A higher value rewards short, high difficulty sections, whereas a lower value rewards consistent, lower difficulty.
+        protected abstract double FcProbability { get; }
 
         private const int bin_count = 32;
 
@@ -103,7 +105,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
             double upperBoundEstimate = 3.0 * maxDiff;
 
             double skill = Chandrupatla.FindRootExpand(
-                skill => fcProbabilityAtSkill(skill, bins) - fc_probability,
+                skill => fcProbabilityAtSkill(skill, bins) - FcProbability,
                 lower_bound,
                 upperBoundEstimate,
                 accuracy: 1e-4);
@@ -120,7 +122,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
             double upperBoundEstimate = 3.0 * maxDiff;
 
             double skill = Chandrupatla.FindRootExpand(
-                skill => fcProbabilityAtSkill(skill) - fc_probability,
+                skill => fcProbabilityAtSkill(skill) - FcProbability,
                 lower_bound,
                 upperBoundEstimate,
                 accuracy: 1e-4);
