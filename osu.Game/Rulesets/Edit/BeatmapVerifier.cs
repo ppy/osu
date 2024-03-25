@@ -18,6 +18,7 @@ namespace osu.Game.Rulesets.Edit
             // Resources
             new CheckBackgroundPresence(),
             new CheckBackgroundQuality(),
+            new CheckVideoResolution(),
 
             // Audio
             new CheckAudioPresence(),
