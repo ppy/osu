@@ -25,7 +25,6 @@ namespace osu.Game.Screens.Play.HUD
         private readonly OsuSpriteText labelText;
 
         public IBindable<float> WireframeOpacity { get; } = new BindableFloat();
-        public Bindable<int> RequiredDisplayDigits { get; } = new BindableInt();
         public Bindable<bool> ShowLabel { get; } = new BindableBool();
 
         public Container NumberContainer { get; private set; }
@@ -35,6 +34,18 @@ namespace osu.Game.Screens.Play.HUD
             get => textPart.Text;
             set => textPart.Text = value;
         }
+
+        /// <summary>
+        /// The template for the wireframe displayed behind the <see cref="Text"/>.
+        /// Any character other than a dot is interpreted to mean a full segmented display "wireframe".
+        /// </summary>
+        public string WireframeTemplate
+        {
+            get => wireframeTemplate;
+            set => wireframesPart.Text = wireframeTemplate = value;
+        }
+
+        private string wireframeTemplate = string.Empty;
 
         public ArgonCounterTextComponent(Anchor anchor, LocalisableString? label = null)
         {
@@ -69,8 +80,6 @@ namespace osu.Game.Screens.Play.HUD
                     }
                 }
             };
-
-            RequiredDisplayDigits.BindValueChanged(digits => wireframesPart.Text = new string('#', digits.NewValue));
         }
 
         private string textLookup(char c)

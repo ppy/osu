@@ -16,7 +16,7 @@ namespace osu.Game.Screens.Edit.GameplayTest
         private readonly Editor editor;
         private readonly EditorState editorState;
 
-        protected override UserActivity InitialActivity => new UserActivity.TestingBeatmap(Beatmap.Value.BeatmapInfo, Ruleset.Value);
+        protected override UserActivity InitialActivity => new UserActivity.TestingBeatmap(Beatmap.Value.BeatmapInfo);
 
         [Resolved]
         private MusicController musicController { get; set; } = null!;

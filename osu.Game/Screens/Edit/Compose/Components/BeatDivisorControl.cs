@@ -86,35 +86,31 @@ namespace osu.Game.Screens.Edit.Compose.Components
                                         RelativeSizeAxes = Axes.Both,
                                         Colour = colourProvider.Background3
                                     },
-                                    new Container
+                                    new GridContainer
                                     {
                                         RelativeSizeAxes = Axes.Both,
-                                        Child = new GridContainer
+                                        Content = new[]
                                         {
-                                            RelativeSizeAxes = Axes.Both,
-                                            Content = new[]
+                                            new Drawable[]
                                             {
-                                                new Drawable[]
+                                                new ChevronButton
                                                 {
-                                                    new ChevronButton
-                                                    {
-                                                        Icon = FontAwesome.Solid.ChevronLeft,
-                                                        Action = beatDivisor.SelectPrevious
-                                                    },
-                                                    new DivisorDisplay { BeatDivisor = { BindTarget = beatDivisor } },
-                                                    new ChevronButton
-                                                    {
-                                                        Icon = FontAwesome.Solid.ChevronRight,
-                                                        Action = beatDivisor.SelectNext
-                                                    }
+                                                    Icon = FontAwesome.Solid.ChevronLeft,
+                                                    Action = beatDivisor.SelectPrevious
                                                 },
+                                                new DivisorDisplay { BeatDivisor = { BindTarget = beatDivisor } },
+                                                new ChevronButton
+                                                {
+                                                    Icon = FontAwesome.Solid.ChevronRight,
+                                                    Action = beatDivisor.SelectNext
+                                                }
                                             },
-                                            ColumnDimensions = new[]
-                                            {
-                                                new Dimension(GridSizeMode.Absolute, 20),
-                                                new Dimension(),
-                                                new Dimension(GridSizeMode.Absolute, 20)
-                                            }
+                                        },
+                                        ColumnDimensions = new[]
+                                        {
+                                            new Dimension(GridSizeMode.Absolute, 20),
+                                            new Dimension(),
+                                            new Dimension(GridSizeMode.Absolute, 20)
                                         }
                                     }
                                 }
@@ -122,42 +118,31 @@ namespace osu.Game.Screens.Edit.Compose.Components
                         },
                         new Drawable[]
                         {
-                            new Container
+                            new GridContainer
                             {
                                 RelativeSizeAxes = Axes.Both,
-                                Children = new Drawable[]
+                                Content = new[]
                                 {
-                                    new Container
+                                    new Drawable[]
                                     {
-                                        RelativeSizeAxes = Axes.Both,
-                                        Child = new GridContainer
+                                        new ChevronButton
                                         {
-                                            RelativeSizeAxes = Axes.Both,
-                                            Content = new[]
-                                            {
-                                                new Drawable[]
-                                                {
-                                                    new ChevronButton
-                                                    {
-                                                        Icon = FontAwesome.Solid.ChevronLeft,
-                                                        Action = () => cycleDivisorType(-1)
-                                                    },
-                                                    new DivisorTypeText { BeatDivisor = { BindTarget = beatDivisor } },
-                                                    new ChevronButton
-                                                    {
-                                                        Icon = FontAwesome.Solid.ChevronRight,
-                                                        Action = () => cycleDivisorType(1)
-                                                    }
-                                                },
-                                            },
-                                            ColumnDimensions = new[]
-                                            {
-                                                new Dimension(GridSizeMode.Absolute, 20),
-                                                new Dimension(),
-                                                new Dimension(GridSizeMode.Absolute, 20)
-                                            }
+                                            Icon = FontAwesome.Solid.ChevronLeft,
+                                            Action = () => cycleDivisorType(-1)
+                                        },
+                                        new DivisorTypeText { BeatDivisor = { BindTarget = beatDivisor } },
+                                        new ChevronButton
+                                        {
+                                            Icon = FontAwesome.Solid.ChevronRight,
+                                            Action = () => cycleDivisorType(1)
                                         }
-                                    }
+                                    },
+                                },
+                                ColumnDimensions = new[]
+                                {
+                                    new Dimension(GridSizeMode.Absolute, 20),
+                                    new Dimension(),
+                                    new Dimension(GridSizeMode.Absolute, 20)
                                 }
                             }
                         },
