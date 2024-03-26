@@ -96,7 +96,7 @@ namespace osu.Game.Tests.Visual.Menus
                 }
             });
 
-            AddUntilStep("wait for no image shown", () => onlineMenuBanner.ChildrenOfType<OnlineMenuBanner.MenuImage>().Single().Size, () => Is.EqualTo(Vector2.Zero));
+            AddUntilStep("wait for no image shown", () => onlineMenuBanner.ChildrenOfType<OnlineMenuBanner.MenuImage>().SingleOrDefault()?.Size, () => Is.EqualTo(Vector2.Zero));
 
             AddStep("unset system title", () => onlineMenuBanner.Current.Value = new APIMenuContent());
 
