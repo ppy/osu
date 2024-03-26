@@ -114,10 +114,7 @@ namespace osu.Game.Screens.Edit.Compose
 
             if (CanCopy.Value)
             {
-                clipboardData.AddCustom(
-                    ClipboardContent.CLIPBOARD_FORMAT,
-                    new ClipboardContent(EditorBeatmap).Serialize()
-                );
+                clipboardData.CustomFormatValues[ClipboardContent.CLIPBOARD_FORMAT] = new ClipboardContent(EditorBeatmap).Serialize();
             }
 
             hostClipboard.SetData(clipboardData);
