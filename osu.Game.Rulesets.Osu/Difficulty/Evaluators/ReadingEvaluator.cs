@@ -192,7 +192,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
             if (current.BaseObject is Spinner || current.Index == 0)
                 return 0;
 
-            double difficulty = Math.Pow(4 * Math.Log(Math.Max(1, EvaluateDensityOf(current))), 2.5);
+            double difficulty = Math.Pow(4 * Math.Log(Math.Max(1, ((OsuDifficultyHitObject)current).Density)), 2.5);
 
             double overlapBonus = EvaluateOverlapDifficultyOf(current) * difficulty;
             difficulty += overlapBonus;
@@ -202,7 +202,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
 
         public static double EvaluateAimingDensityFactorOf(DifficultyHitObject current)
         {
-            double difficulty = EvaluateDensityOf(current);
+            double difficulty = ((OsuDifficultyHitObject)current).Density;
 
             double overlapBonus = EvaluateOverlapDifficultyOf(current) * difficulty;
             difficulty += overlapBonus * 0.1; // Overlaps should affect aiming part much less
@@ -330,10 +330,8 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
         {
             var currObj = (OsuDifficultyHitObject)current;
 
-            double density = ReadingEvaluator.EvaluateDensityOf(current, false);
-
             // Consider that density matters only starting from 3rd note on the screen
-            double densityFactor = Math.Max(0, density - 1) / 4;
+            double densityFactor = Math.Max(0, currObj.Density - 1) / 4;
 
             // This is kinda wrong cuz it returns value bigger than preempt
             // double timeSpentInvisible = getDurationSpentInvisible(currObj) / 1000 / currObj.ClockRate;

@@ -91,6 +91,11 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Preprocessing
         public double RhythmDifficulty { get; private set; }
 
         /// <summary>
+        /// Density of the object for given preempt. Saved for optimization, density calculation is expensive.
+        /// </summary>
+        public double Density { get; private set; }
+
+        /// <summary>
         /// Objects that was visible after the note was hit together with cumulative overlapping difficulty. Saved for optimization to avoid O(x^4) time complexity.
         /// </summary>
         public IList<OverlapObject> OverlapObjects { get; private set; }
@@ -140,8 +145,13 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Preprocessing
             setDistances(clockRate);
 
             RhythmDifficulty = RhythmEvaluator.EvaluateDifficultyOf(this);
+            Density = ReadingEvaluator.EvaluateDensityOf(this);
+            OverlapObjects = getOverlapObjects();
+        }
 
-            OverlapObjects = new List<OverlapObject>();
+        private List<OverlapObject> getOverlapObjects()
+        {
+            List<OverlapObject> overlapObjects = new List<OverlapObject>();
 
             double totalOverlapnessDifficulty = 0;
             double currentTime = DeltaTime;
@@ -204,9 +214,11 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Preprocessing
                 }
 
                 totalOverlapnessDifficulty += currentOverlapness;
-                OverlapObjects.Add(new OverlapObject(loopObj, totalOverlapnessDifficulty));
+                overlapObjects.Add(new OverlapObject(loopObj, totalOverlapnessDifficulty));
                 prevObject = loopObj;
             }
+
+            return overlapObjects;
         }
 
         private static double getSimilarity(double timeA, double timeB)
