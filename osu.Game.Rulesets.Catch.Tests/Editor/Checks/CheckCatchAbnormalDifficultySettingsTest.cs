@@ -17,7 +17,7 @@ namespace osu.Game.Rulesets.Catch.Tests.Editor.Checks
     {
         private CheckCatchAbnormalDifficultySettings check = null!;
 
-        private IBeatmap beatmap = new Beatmap<HitObject>();
+        private readonly IBeatmap beatmap = new Beatmap<HitObject>();
 
         [SetUp]
         public void Setup()
@@ -25,7 +25,7 @@ namespace osu.Game.Rulesets.Catch.Tests.Editor.Checks
             check = new CheckCatchAbnormalDifficultySettings();
 
             beatmap.BeatmapInfo.Ruleset = new CatchRuleset().RulesetInfo;
-            beatmap.Difficulty = new BeatmapDifficulty()
+            beatmap.Difficulty = new BeatmapDifficulty
             {
                 ApproachRate = 5,
                 CircleSize = 5,

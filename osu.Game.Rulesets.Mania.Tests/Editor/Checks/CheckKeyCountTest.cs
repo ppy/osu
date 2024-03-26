@@ -23,7 +23,7 @@ namespace osu.Game.Rulesets.Mania.Tests.Editor.Checks
         {
             check = new CheckKeyCount();
 
-            beatmap = new Beatmap<HitObject>()
+            beatmap = new Beatmap<HitObject>
             {
                 BeatmapInfo = new BeatmapInfo
                 {

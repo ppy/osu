@@ -17,14 +17,14 @@ namespace osu.Game.Rulesets.Osu.Tests.Editor.Checks
     {
         private CheckOsuAbnormalDifficultySettings check = null!;
 
-        private IBeatmap beatmap = new Beatmap<HitObject>();
+        private readonly IBeatmap beatmap = new Beatmap<HitObject>();
 
         [SetUp]
         public void Setup()
         {
             check = new CheckOsuAbnormalDifficultySettings();
 
-            beatmap.Difficulty = new BeatmapDifficulty()
+            beatmap.Difficulty = new BeatmapDifficulty
             {
                 ApproachRate = 5,
                 CircleSize = 5,
