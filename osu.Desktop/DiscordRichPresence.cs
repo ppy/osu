@@ -75,7 +75,7 @@ namespace osu.Desktop
             };
 
             client.OnReady += onReady;
-            client.OnError += (_, e) => Logger.Log($"An error occurred with Discord RPC Client: {e.Code} {e.Message}", LoggingTarget.Network, LogLevel.Error);
+            client.OnError += (_, e) => Logger.Log($"An error occurred with Discord RPC Client: {e.Message} ({e.Code})", LoggingTarget.Network, LogLevel.Error);
 
             // A URI scheme is required to support game invitations, as well as informing Discord of the game executable path to support launching the game when a user clicks on join/spectate.
             client.RegisterUriScheme();
@@ -94,10 +94,10 @@ namespace osu.Desktop
                 activity.BindTo(u.NewValue.Activity);
             }, true);
 
-            ruleset.BindValueChanged(_ => updatePresence());
-            status.BindValueChanged(_ => updatePresence());
-            activity.BindValueChanged(_ => updatePresence());
-            privacyMode.BindValueChanged(_ => updatePresence());
+            ruleset.BindValueChanged(_ => schedulePresenceUpdate());
+            status.BindValueChanged(_ => schedulePresenceUpdate());
+            activity.BindValueChanged(_ => schedulePresenceUpdate());
+            privacyMode.BindValueChanged(_ => schedulePresenceUpdate());
             multiplayerClient.RoomUpdated += onRoomUpdated;
 
             client.Initialize();
@@ -111,14 +111,14 @@ namespace osu.Desktop
             if (client.CurrentPresence != null)
                 client.SetPresence(null);
 
-            updatePresence();
+            schedulePresenceUpdate();
         }
 
-        private void onRoomUpdated() => updatePresence();
+        private void onRoomUpdated() => schedulePresenceUpdate();
 
         private ScheduledDelegate? presenceUpdateDelegate;
 
-        private void updatePresence()
+        private void schedulePresenceUpdate()
         {
             presenceUpdateDelegate?.Cancel();
             presenceUpdateDelegate = Scheduler.AddDelayed(() =>
@@ -134,16 +134,14 @@ namespace osu.Desktop
 
                 bool hideIdentifiableInformation = privacyMode.Value == DiscordRichPresenceMode.Limited || status.Value == UserStatus.DoNotDisturb;
 
-                updatePresenceStatus(hideIdentifiableInformation);
-                updatePresenceParty(hideIdentifiableInformation);
-                updatePresenceAssets();
-
+                updatePresence(hideIdentifiableInformation);
                 client.SetPresence(presence);
             }, 200);
         }
 
-        private void updatePresenceStatus(bool hideIdentifiableInformation)
+        private void updatePresence(bool hideIdentifiableInformation)
         {
+            // user activity
             if (activity.Value != null)
             {
                 presence.State = truncate(activity.Value.GetStatus(hideIdentifiableInformation));
@@ -170,10 +168,8 @@ namespace osu.Desktop
                 presence.State = "Idle";
                 presence.Details = string.Empty;
             }
-        }
 
-        private void updatePresenceParty(bool hideIdentifiableInformation)
-        {
+            // user party
             if (!hideIdentifiableInformation && multiplayerClient.Room != null)
             {
                 MultiplayerRoom room = multiplayerClient.Room;
@@ -195,17 +191,18 @@ namespace osu.Desktop
                 };
 
                 presence.Secrets.JoinSecret = JsonConvert.SerializeObject(roomSecret);
+                // discord cannot handle both secrets and buttons at the same time, so we need to choose something.
+                // the multiplayer room seems more important.
+                presence.Buttons = null;
             }
             else
             {
                 presence.Party = null;
                 presence.Secrets.JoinSecret = null;
             }
-        }
 
-        private void updatePresenceAssets()
-        {
-            // update user information
+            // game images:
+            // large image tooltip
             if (privacyMode.Value == DiscordRichPresenceMode.Limited)
                 presence.Assets.LargeImageText = string.Empty;
             else
@@ -216,7 +213,7 @@ namespace osu.Desktop
                     presence.Assets.LargeImageText = $"{user.Value.Username}" + (user.Value.Statistics?.GlobalRank > 0 ? $" (rank #{user.Value.Statistics.GlobalRank:N0})" : string.Empty);
             }
 
-            // update ruleset
+            // small image
             presence.Assets.SmallImageKey = ruleset.Value.IsLegacyRuleset() ? $"mode_{ruleset.Value.OnlineID}" : "mode_custom";
             presence.Assets.SmallImageText = ruleset.Value.Name;
         }
