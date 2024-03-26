@@ -182,7 +182,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
                 screenOverlapDifficulty += lastOverlapness;
 
                 // This is a correct way to do this (paired with changing >= to <=), but somehow it get's more broken
-                //screenOverlapDifficulty = Math.Max(screenOverlapDifficulty, lastOverlapness);
+                // screenOverlapDifficulty = Math.Max(screenOverlapDifficulty, lastOverlapness);
             }
 
             return overlap_multiplier * Math.Max(0, screenOverlapDifficulty - 0.7);
@@ -330,8 +330,10 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
         {
             var currObj = (OsuDifficultyHitObject)current;
 
+            double density = ReadingEvaluator.EvaluateDensityOf(current, false);
+
             // Consider that density matters only starting from 3rd note on the screen
-            double densityFactor = Math.Max(0, currObj.Density - 1) / 4;
+            double densityFactor = Math.Max(0, density - 1) / 4;
 
             // This is kinda wrong cuz it returns value bigger than preempt
             // double timeSpentInvisible = getDurationSpentInvisible(currObj) / 1000 / currObj.ClockRate;

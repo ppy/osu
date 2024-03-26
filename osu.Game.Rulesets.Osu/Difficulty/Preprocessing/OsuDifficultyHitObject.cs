@@ -146,6 +146,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Preprocessing
 
             RhythmDifficulty = RhythmEvaluator.EvaluateDifficultyOf(this);
             Density = ReadingEvaluator.EvaluateDensityOf(this);
+
             OverlapObjects = getOverlapObjects();
         }
 
@@ -156,6 +157,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Preprocessing
             double totalOverlapnessDifficulty = 0;
             double currentTime = DeltaTime;
             List<double> historicTimes = new List<double>();
+            List<double> historicAngles = new List<double>();
 
             OsuDifficultyHitObject prevObject = this;
 
@@ -164,12 +166,21 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Preprocessing
                 // Overlapness with this object
                 double currentOverlapness = calculateOverlapness(this, loopObj);
 
+                if (prevObject.Angle.IsNull())
+                {
+                    currentTime += prevObject.DeltaTime;
+                    continue;
+                }
+
+                // Previous angle because order is reversed;
+                double angle = (double)prevObject.Angle;
+
                 // Overlapness between current and prev to make streams have 0 buff
                 double instantOverlapness = 0.5 + calculateOverlapness(prevObject, loopObj);
 
                 // Nerf overlaps on wide angles
                 double angleFactor = 1;
-                if (prevObject.Angle != null) angleFactor += (-Math.Cos((double)prevObject.Angle) + 1) / 2; // =2 for wide angles, =1 for acute angles
+                angleFactor += (-Math.Cos(angle) + 1) / 2; // =2 for wide angles, =1 for acute angles
                 instantOverlapness = Math.Min(1, instantOverlapness * angleFactor); // wide angles are more predictable
 
                 currentOverlapness *= (1 - instantOverlapness) * 2; // wide angles will have close-to-zero buff
@@ -192,10 +203,14 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Preprocessing
                             cumulativeTimeWithoutCurrent += historicTimes[j];
 
                             // Check how similar cumulative times are
-                            currentMinOverlapness = Math.Min(currentMinOverlapness, currentOverlapness * getSimilarity(cumulativeTimeWithCurrent, cumulativeTimeWithoutCurrent));
+                            double potentialMinOverlapness = currentOverlapness * getSimilarity(cumulativeTimeWithCurrent, cumulativeTimeWithoutCurrent);
+                            potentialMinOverlapness *= getAngleDifference(angle, historicAngles[j]);
+                            currentMinOverlapness = Math.Min(currentMinOverlapness, potentialMinOverlapness);
 
                             // Check how similar current time with cumulative time
-                            currentMinOverlapness = Math.Min(currentMinOverlapness, currentOverlapness * getSimilarity(currentTime, cumulativeTimeWithoutCurrent));
+                            potentialMinOverlapness = currentOverlapness * getSimilarity(currentTime, cumulativeTimeWithoutCurrent);
+                            potentialMinOverlapness *= getAngleDifference(angle, historicAngles[j]);
+                            currentMinOverlapness = Math.Min(currentMinOverlapness, potentialMinOverlapness);
 
                             // Starting from this point - we will never have better match, so stop searching
                             if (cumulativeTimeWithoutCurrent >= cumulativeTimeWithCurrent)
@@ -205,7 +220,10 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Preprocessing
                     }
 
                     currentOverlapness = currentMinOverlapness;
+
                     historicTimes.Add(currentTime);
+                    historicAngles.Add(angle);
+
                     currentTime = prevObject.DeltaTime;
                 }
                 else
@@ -230,6 +248,15 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Preprocessing
             if (similarity > 0.9) return 0.0;
 
             return (Math.Cos((similarity - 0.75) * Math.PI / 0.15) + 1) / 2; // drops from 1 to 0 as similarity increase from 0.75 to 0.9
+        }
+
+        private static double getAngleDifference(double angle1, double angle2)
+        {
+            double difference = Math.Abs(angle1 - angle2);
+            double threeshold = Math.PI / 12;
+
+            if (difference > threeshold) return 1;
+            return difference / threeshold;
         }
 
         private static double calculateOverlapness(OsuDifficultyHitObject odho1, OsuDifficultyHitObject odho2)

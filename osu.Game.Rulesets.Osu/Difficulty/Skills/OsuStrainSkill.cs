@@ -7,7 +7,6 @@ using osu.Game.Rulesets.Difficulty.Skills;
 using osu.Game.Rulesets.Mods;
 using System.Linq;
 using osu.Framework.Utils;
-using System.Xml.Linq;
 
 namespace osu.Game.Rulesets.Osu.Difficulty.Skills
 {
