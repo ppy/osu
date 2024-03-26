@@ -130,8 +130,8 @@ namespace osu.Game.Screens.Menu
                 // To handle expiration simply, arrange all images in best-next order.
                 // Fade in the first valid one, then handle fading out the last if required.
                 var currentRotation = content
-                                      .Skip(Math.Max(0, previousIndex) + 1)
-                                      .Concat(content.Take(Math.Max(0, previousIndex) + 1));
+                                      .Skip(previousIndex + 1)
+                                      .Concat(content.Take(previousIndex + 1));
 
                 // After the loop, displayIndex will be the new valid index or -1 if
                 // none valid.
