@@ -65,6 +65,8 @@ namespace osu.Game.Rulesets.Mania
 
         public override HitObjectComposer CreateHitObjectComposer() => new ManiaHitObjectComposer(this);
 
+        public override IBeatmapVerifier CreateBeatmapVerifier() => new ManiaBeatmapVerifier();
+
         public override ISkin? CreateSkinTransformer(ISkin skin, IBeatmap beatmap)
         {
             switch (skin)
