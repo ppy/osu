@@ -163,6 +163,54 @@ namespace osu.Game.Rulesets.Osu.Tests.Editor
             checkControlPointSelected(1, false);
         }
 
+        [Test]
+        public void TestDragSliderTail()
+        {
+            AddStep("move mouse to slider tail", () =>
+            {
+                Vector2 position = slider.EndPosition + new Vector2(10, 0);
+                InputManager.MoveMouseTo(drawableObject.Parent!.ToScreenSpace(position));
+            });
+            AddStep("shift + drag", () =>
+            {
+                InputManager.PressKey(Key.ShiftLeft);
+                InputManager.PressButton(MouseButton.Left);
+            });
+            moveMouseToControlPoint(1);
+            AddStep("release", () =>
+            {
+                InputManager.ReleaseButton(MouseButton.Left);
+                InputManager.ReleaseKey(Key.ShiftLeft);
+            });
+
+            AddAssert("expected distance halved",
+                () => Precision.AlmostEquals(slider.Path.Distance, 172.2, 0.1));
+
+            AddStep("move mouse to slider tail", () =>
+            {
+                Vector2 position = slider.EndPosition + new Vector2(10, 0);
+                InputManager.MoveMouseTo(drawableObject.Parent!.ToScreenSpace(position));
+            });
+            AddStep("shift + drag", () =>
+            {
+                InputManager.PressKey(Key.ShiftLeft);
+                InputManager.PressButton(MouseButton.Left);
+            });
+            AddStep("move mouse beyond last control point", () =>
+            {
+                Vector2 position = slider.Position + slider.Path.ControlPoints[2].Position + new Vector2(50, 0);
+                InputManager.MoveMouseTo(drawableObject.Parent!.ToScreenSpace(position));
+            });
+            AddStep("release", () =>
+            {
+                InputManager.ReleaseButton(MouseButton.Left);
+                InputManager.ReleaseKey(Key.ShiftLeft);
+            });
+
+            AddAssert("expected distance is calculated distance",
+                () => Precision.AlmostEquals(slider.Path.Distance, slider.Path.CalculatedDistance, 0.1));
+        }
+
         private void moveHitObject()
         {
             AddStep("move hitobject", () =>
@@ -179,7 +227,7 @@ namespace osu.Game.Rulesets.Osu.Tests.Editor
                 () => Precision.AlmostEquals(blueprint.HeadOverlay.CirclePiece.ScreenSpaceDrawQuad.Centre, drawableObject.HeadCircle.ScreenSpaceDrawQuad.Centre));
 
             AddAssert("tail positioned correctly",
-                () => Precision.AlmostEquals(blueprint.TailOverlay.CirclePiece.ScreenSpaceDrawQuad.Centre, drawableObject.TailCircle.ScreenSpaceDrawQuad.Centre));
+                () => Precision.AlmostEquals(blueprint.TailPiece.CirclePiece.ScreenSpaceDrawQuad.Centre, drawableObject.TailCircle.ScreenSpaceDrawQuad.Centre));
         }
 
         private void moveMouseToControlPoint(int index)
@@ -198,7 +246,7 @@ namespace osu.Game.Rulesets.Osu.Tests.Editor
         {
             public new SliderBodyPiece BodyPiece => base.BodyPiece;
             public new TestSliderCircleOverlay HeadOverlay => (TestSliderCircleOverlay)base.HeadOverlay;
-            public new TestSliderCircleOverlay TailOverlay => (TestSliderCircleOverlay)base.TailOverlay;
+            public new TestSliderTailPiece TailPiece => (TestSliderTailPiece)base.TailPiece;
             public new PathControlPointVisualiser<Slider> ControlPointVisualiser => base.ControlPointVisualiser;
 
             public TestSliderBlueprint(Slider slider)
@@ -207,6 +255,7 @@ namespace osu.Game.Rulesets.Osu.Tests.Editor
             }
 
             protected override SliderCircleOverlay CreateCircleOverlay(Slider slider, SliderPosition position) => new TestSliderCircleOverlay(slider, position);
+            protected override SliderTailPiece CreateTailPiece(Slider slider, SliderPosition position) => new TestSliderTailPiece(slider, position);
         }
 
         private partial class TestSliderCircleOverlay : SliderCircleOverlay
@@ -214,6 +263,16 @@ namespace osu.Game.Rulesets.Osu.Tests.Editor
             public new HitCirclePiece CirclePiece => base.CirclePiece;
 
             public TestSliderCircleOverlay(Slider slider, SliderPosition position)
+                : base(slider, position)
+            {
+            }
+        }
+
+        private partial class TestSliderTailPiece : SliderTailPiece
+        {
+            public new HitCirclePiece CirclePiece => base.CirclePiece;
+
+            public TestSliderTailPiece(Slider slider, SliderPosition position)
                 : base(slider, position)
             {
             }

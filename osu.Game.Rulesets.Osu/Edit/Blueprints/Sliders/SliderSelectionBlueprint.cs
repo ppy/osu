@@ -34,7 +34,7 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders
 
         protected SliderBodyPiece BodyPiece { get; private set; }
         protected SliderCircleOverlay HeadOverlay { get; private set; }
-        protected SliderCircleOverlay TailOverlay { get; private set; }
+        protected SliderTailPiece TailPiece { get; private set; }
 
         [CanBeNull]
         protected PathControlPointVisualiser<Slider> ControlPointVisualiser { get; private set; }
@@ -72,7 +72,7 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders
             {
                 BodyPiece = new SliderBodyPiece(),
                 HeadOverlay = CreateCircleOverlay(HitObject, SliderPosition.Start),
-                TailOverlay = CreateCircleOverlay(HitObject, SliderPosition.End),
+                TailPiece = CreateTailPiece(HitObject, SliderPosition.End),
             };
         }
 
@@ -434,5 +434,6 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders
         }
 
         protected virtual SliderCircleOverlay CreateCircleOverlay(Slider slider, SliderPosition position) => new SliderCircleOverlay(slider, position);
+        protected virtual SliderTailPiece CreateTailPiece(Slider slider, SliderPosition position) => new SliderTailPiece(slider, position);
     }
 }
