@@ -34,6 +34,8 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
         /// </summary>
         protected virtual double DifficultyMultiplier => DEFAULT_DIFFICULTY_MULTIPLIER;
 
+        protected List<double> objectStrains = new List<double>();
+
         protected OsuStrainSkill(Mod[] mods)
             : base(mods)
         {
@@ -66,6 +68,17 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
             }
 
             return difficulty * DifficultyMultiplier;
+        }
+
+        /// <summary>
+        /// Returns the number of strains weighted against the top strain.
+        /// The result is scaled by clock rate as it affects the total number of strains.
+        /// </summary>
+        public double CountDifficultStrains()
+        {
+            double topStrain = objectStrains.Max();
+
+            return objectStrains.Sum(s => Math.Pow(s / topStrain, 4));
         }
     }
 }

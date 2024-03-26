@@ -6,7 +6,6 @@ using osu.Game.Rulesets.Difficulty.Preprocessing;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Osu.Difficulty.Evaluators;
 using osu.Game.Rulesets.Osu.Difficulty.Preprocessing;
-using System.Collections.Generic;
 using System.Linq;
 
 namespace osu.Game.Rulesets.Osu.Difficulty.Skills
@@ -24,8 +23,6 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
 
         protected override int ReducedSectionCount => 5;
         protected override double DifficultyMultiplier => 1.04;
-
-        private readonly List<double> objectStrains = new List<double>();
 
         public Speed(Mod[] mods)
             : base(mods)
