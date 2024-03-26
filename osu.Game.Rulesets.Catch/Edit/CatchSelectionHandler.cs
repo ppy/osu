@@ -81,11 +81,12 @@ namespace osu.Game.Rulesets.Catch.Edit
             double selectionStartTime = SelectedItems.Min(h => h.StartTime);
             double selectionEndTime = SelectedItems.Max(h => h.GetEndTime());
 
-            var newComboPlaces = hitObjects
+            var newComboOrder = hitObjects
                 .OfType<CatchHitObject>()
-                .Where(h => h.NewCombo)
-                .Select(obj => obj.StartTime)
+                .Select(obj => obj.NewCombo)
                 .ToList();
+
+            newComboOrder.Reverse();
 
             foreach (var h in hitObjects)
             {
@@ -100,18 +101,11 @@ namespace osu.Game.Rulesets.Catch.Edit
                 }
             }
 
-            foreach (var h in hitObjects)
+            int i = 0;
+            foreach (bool newCombo in newComboOrder)
             {
-                if (h is CatchHitObject obj) obj.NewCombo = false;
-            }
-
-            foreach (double place in newComboPlaces)
-            {
-                hitObjects
-                    .OfType<CatchHitObject>()
-                    .Where(obj => obj.StartTime == place)
-                    .ToList()
-                    .ForEach(obj => obj.NewCombo = true);
+                hitObjects.OfType<CatchHitObject>().ToList()[i].NewCombo = newCombo;
+                i++;
             }
 
             return true;

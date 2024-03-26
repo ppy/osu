@@ -85,11 +85,12 @@ namespace osu.Game.Rulesets.Osu.Edit
 
             bool moreThanOneObject = hitObjects.Count > 1;
 
-            var newComboPlaces = hitObjects
+            var newComboOrder = hitObjects
                 .OfType<OsuHitObject>()
-                .Where(h => h.NewCombo)
-                .Select(obj => obj.StartTime)
+                .Select(obj => obj.NewCombo)
                 .ToList();
+
+            newComboOrder.Reverse();
 
             foreach (var h in hitObjects)
             {
@@ -103,18 +104,11 @@ namespace osu.Game.Rulesets.Osu.Edit
                 }
             }
 
-            foreach (var h in hitObjects)
+            int i = 0;
+            foreach (bool newCombo in newComboOrder)
             {
-                if (h is OsuHitObject obj) obj.NewCombo = false;
-            }
-
-            foreach (double place in newComboPlaces)
-            {
-                hitObjects
-                    .OfType<OsuHitObject>()
-                    .Where(obj => obj.StartTime == place)
-                    .ToList()
-                    .ForEach(obj => obj.NewCombo = true);
+                hitObjects.OfType<OsuHitObject>().ToList()[i].NewCombo = newCombo;
+                i++;
             }
 
             return true;
