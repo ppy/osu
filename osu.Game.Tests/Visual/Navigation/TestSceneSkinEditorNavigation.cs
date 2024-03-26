@@ -9,6 +9,7 @@ using osu.Framework.Allocation;
 using osu.Framework.Extensions;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.UserInterface;
+using osu.Framework.Input;
 using osu.Framework.Screens;
 using osu.Framework.Testing;
 using osu.Framework.Threading;
@@ -299,6 +300,25 @@ namespace osu.Game.Tests.Visual.Navigation
 
             openSkinEditor();
             switchToGameplayScene();
+        }
+
+        [Test]
+        public void TestRulesetInputDisabledWhenSkinEditorOpen()
+        {
+            advanceToSongSelect();
+            openSkinEditor();
+
+            AddStep("import beatmap", () => BeatmapImportHelper.LoadQuickOszIntoOsu(Game).WaitSafely());
+            AddUntilStep("wait for selected", () => !Game.Beatmap.IsDefault);
+
+            switchToGameplayScene();
+            AddUntilStep("nested input disabled", () => ((Player)Game.ScreenStack.CurrentScreen).ChildrenOfType<PassThroughInputManager>().All(manager => !manager.UseParentInput));
+
+            toggleSkinEditor();
+            AddUntilStep("nested input enabled", () => ((Player)Game.ScreenStack.CurrentScreen).ChildrenOfType<PassThroughInputManager>().Any(manager => manager.UseParentInput));
+
+            toggleSkinEditor();
+            AddUntilStep("nested input disabled", () => ((Player)Game.ScreenStack.CurrentScreen).ChildrenOfType<PassThroughInputManager>().All(manager => !manager.UseParentInput));
         }
 
         private void advanceToSongSelect()

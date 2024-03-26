@@ -81,10 +81,28 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
 
             foreach (var piece in DimmablePieces)
             {
+                // if the specified dimmable piece is a DHO, it is generally not safe to tack transforms onto it directly
+                // as they may be cleared via the `updateState()` DHO flow,
+                // so use `ApplyCustomUpdateState` instead. which does not have this pitfall.
+                if (piece is DrawableHitObject drawableObjectPiece)
+                {
+                    // this method can be called multiple times, and we don't want to subscribe to the event more than once,
+                    // so this is what it is going to have to be...
+                    drawableObjectPiece.ApplyCustomUpdateState -= applyDimToDrawableHitObject;
+                    drawableObjectPiece.ApplyCustomUpdateState += applyDimToDrawableHitObject;
+                }
+                else
+                    applyDim(piece);
+            }
+
+            void applyDim(Drawable piece)
+            {
                 piece.FadeColour(new Color4(195, 195, 195, 255));
                 using (piece.BeginDelayedSequence(InitialLifetimeOffset - OsuHitWindows.MISS_WINDOW))
                     piece.FadeColour(Color4.White, 100);
             }
+
+            void applyDimToDrawableHitObject(DrawableHitObject dho, ArmedState _) => applyDim(dho);
         }
 
         protected sealed override double InitialLifetimeOffset => HitObject.TimePreempt;
@@ -100,12 +118,12 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
         /// <summary>
         /// Causes this <see cref="DrawableOsuHitObject"/> to get hit, disregarding all conditions in implementations of <see cref="DrawableHitObject.CheckForResult"/>.
         /// </summary>
-        public void HitForcefully() => ApplyResult(r => r.Type = r.Judgement.MaxResult);
+        public void HitForcefully() => ApplyMaxResult();
 
         /// <summary>
         /// Causes this <see cref="DrawableOsuHitObject"/> to get missed, disregarding all conditions in implementations of <see cref="DrawableHitObject.CheckForResult"/>.
         /// </summary>
-        public void MissForcefully() => ApplyResult(r => r.Type = r.Judgement.MinResult);
+        public void MissForcefully() => ApplyMinResult();
 
         private RectangleF parentScreenSpaceRectangle => ((DrawableOsuHitObject)ParentHitObject)?.parentScreenSpaceRectangle ?? Parent!.ScreenSpaceDrawQuad.AABBFloat;
 

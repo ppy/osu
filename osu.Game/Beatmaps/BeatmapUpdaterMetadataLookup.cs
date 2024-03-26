@@ -1,62 +1,33 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
 using System;
+using System.Collections.Generic;
 using System.Diagnostics;
-using System.IO;
 using System.Linq;
-using System.Threading.Tasks;
-using Microsoft.Data.Sqlite;
-using osu.Framework.Development;
-using osu.Framework.IO.Network;
 using osu.Framework.Logging;
 using osu.Framework.Platform;
-using osu.Game.Database;
 using osu.Game.Online.API;
-using osu.Game.Online.API.Requests;
-using SharpCompress.Compressors;
-using SharpCompress.Compressors.BZip2;
-using SQLitePCL;
 
 namespace osu.Game.Beatmaps
 {
     /// <summary>
     /// A component which handles population of online IDs for beatmaps using a two part lookup procedure.
     /// </summary>
-    /// <remarks>
-    /// On creating the component, a copy of a database containing metadata for a large subset of beatmaps (stored to <see cref="cache_database_name"/>) will be downloaded if not already present locally.
-    /// This will always be checked before doing a second online query to get required metadata.
-    /// </remarks>
     public class BeatmapUpdaterMetadataLookup : IDisposable
     {
-        private readonly IAPIProvider api;
-        private readonly Storage storage;
-
-        private FileWebRequest cacheDownloadRequest;
-
-        private const string cache_database_name = "online.db";
+        private readonly IOnlineBeatmapMetadataSource apiMetadataSource;
+        private readonly IOnlineBeatmapMetadataSource localCachedMetadataSource;
 
         public BeatmapUpdaterMetadataLookup(IAPIProvider api, Storage storage)
+            : this(new APIBeatmapMetadataSource(api), new LocalCachedBeatmapMetadataSource(storage))
         {
-            try
-            {
-                // required to initialise native SQLite libraries on some platforms.
-                Batteries_V2.Init();
-                raw.sqlite3_config(2 /*SQLITE_CONFIG_MULTITHREAD*/);
-            }
-            catch
-            {
-                // may fail if platform not supported.
-            }
+        }
 
-            this.api = api;
-            this.storage = storage;
-
-            // avoid downloading / using cache for unit tests.
-            if (!DebugUtils.IsNUnitRunning && !storage.Exists(cache_database_name))
-                prepareLocalCache();
+        internal BeatmapUpdaterMetadataLookup(IOnlineBeatmapMetadataSource apiMetadataSource, IOnlineBeatmapMetadataSource localCachedMetadataSource)
+        {
+            this.apiMetadataSource = apiMetadataSource;
+            this.localCachedMetadataSource = localCachedMetadataSource;
         }
 
         /// <summary>
@@ -69,205 +40,102 @@ namespace osu.Game.Beatmaps
         /// <param name="preferOnlineFetch">Whether metadata from an online source should be preferred. If <c>true</c>, the local cache will be skipped to ensure the freshest data state possible.</param>
         public void Update(BeatmapSetInfo beatmapSet, bool preferOnlineFetch)
         {
-            foreach (var b in beatmapSet.Beatmaps)
-                lookup(beatmapSet, b, preferOnlineFetch);
-        }
+            var lookupResults = new List<OnlineBeatmapMetadata?>();
 
-        private void lookup(BeatmapSetInfo set, BeatmapInfo beatmapInfo, bool preferOnlineFetch)
-        {
-            bool apiAvailable = api?.State.Value == APIState.Online;
-
-            bool useLocalCache = !apiAvailable || !preferOnlineFetch;
-
-            if (useLocalCache && checkLocalCache(set, beatmapInfo))
-                return;
-
-            if (!apiAvailable)
-                return;
-
-            var req = new GetBeatmapRequest(beatmapInfo);
-
-            try
+            foreach (var beatmapInfo in beatmapSet.Beatmaps)
             {
-                // intentionally blocking to limit web request concurrency
-                api.Perform(req);
+                if (!tryLookup(beatmapInfo, preferOnlineFetch, out var res))
+                    continue;
 
-                if (req.CompletionState == APIRequestCompletionState.Failed)
+                if (res == null || shouldDiscardLookupResult(res, beatmapInfo))
                 {
-                    logForModel(set, $"Online retrieval failed for {beatmapInfo}");
                     beatmapInfo.ResetOnlineInfo();
-                    return;
+                    lookupResults.Add(null); // mark lookup failure
+                    continue;
                 }
 
-                var res = req.Response;
+                lookupResults.Add(res);
 
-                if (res != null)
+                beatmapInfo.OnlineID = res.BeatmapID;
+                beatmapInfo.OnlineMD5Hash = res.MD5Hash;
+                beatmapInfo.LastOnlineUpdate = res.LastUpdated;
+
+                Debug.Assert(beatmapInfo.BeatmapSet != null);
+                beatmapInfo.BeatmapSet.OnlineID = res.BeatmapSetID;
+
+                // Some metadata should only be applied if there's no local changes.
+                if (beatmapInfo.MatchesOnlineVersion)
                 {
-                    beatmapInfo.OnlineID = res.OnlineID;
-                    beatmapInfo.OnlineMD5Hash = res.MD5Hash;
-                    beatmapInfo.LastOnlineUpdate = res.LastUpdated;
-
-                    Debug.Assert(beatmapInfo.BeatmapSet != null);
-                    beatmapInfo.BeatmapSet.OnlineID = res.OnlineBeatmapSetID;
-
-                    // Some metadata should only be applied if there's no local changes.
-                    if (shouldSaveOnlineMetadata(beatmapInfo))
-                    {
-                        beatmapInfo.Status = res.Status;
-                        beatmapInfo.Metadata.Author.OnlineID = res.AuthorID;
-                    }
-
-                    if (beatmapInfo.BeatmapSet.Beatmaps.All(shouldSaveOnlineMetadata))
-                    {
-                        beatmapInfo.BeatmapSet.Status = res.BeatmapSet?.Status ?? BeatmapOnlineStatus.None;
-                        beatmapInfo.BeatmapSet.DateRanked = res.BeatmapSet?.Ranked;
-                        beatmapInfo.BeatmapSet.DateSubmitted = res.BeatmapSet?.Submitted;
-                    }
-
-                    logForModel(set, $"Online retrieval mapped {beatmapInfo} to {res.OnlineBeatmapSetID} / {res.OnlineID}.");
+                    beatmapInfo.Status = res.BeatmapStatus;
+                    beatmapInfo.Metadata.Author.OnlineID = res.AuthorID;
                 }
             }
-            catch (Exception e)
+
+            if (beatmapSet.Beatmaps.All(b => b.MatchesOnlineVersion)
+                && lookupResults.All(r => r != null)
+                && lookupResults.Select(r => r!.BeatmapSetID).Distinct().Count() == 1)
             {
-                logForModel(set, $"Online retrieval failed for {beatmapInfo} ({e.Message})");
-                beatmapInfo.ResetOnlineInfo();
+                var representative = lookupResults.First()!;
+
+                beatmapSet.Status = representative.BeatmapSetStatus ?? BeatmapOnlineStatus.None;
+                beatmapSet.DateRanked = representative.DateRanked;
+                beatmapSet.DateSubmitted = representative.DateSubmitted;
             }
         }
 
-        private void prepareLocalCache()
+        private bool shouldDiscardLookupResult(OnlineBeatmapMetadata result, BeatmapInfo beatmapInfo)
         {
-            string cacheFilePath = storage.GetFullPath(cache_database_name);
-            string compressedCacheFilePath = $"{cacheFilePath}.bz2";
-
-            cacheDownloadRequest = new FileWebRequest(compressedCacheFilePath, $"https://assets.ppy.sh/client-resources/{cache_database_name}.bz2?{DateTimeOffset.UtcNow:yyyyMMdd}");
-
-            cacheDownloadRequest.Failed += ex =>
+            if (beatmapInfo.OnlineID > 0 && result.BeatmapID != beatmapInfo.OnlineID)
             {
-                File.Delete(compressedCacheFilePath);
-                File.Delete(cacheFilePath);
-
-                Logger.Log($"{nameof(BeatmapUpdaterMetadataLookup)}'s online cache download failed: {ex}", LoggingTarget.Database);
-            };
-
-            cacheDownloadRequest.Finished += () =>
-            {
-                try
-                {
-                    using (var stream = File.OpenRead(cacheDownloadRequest.Filename))
-                    using (var outStream = File.OpenWrite(cacheFilePath))
-                    using (var bz2 = new BZip2Stream(stream, CompressionMode.Decompress, false))
-                        bz2.CopyTo(outStream);
-
-                    // set to null on completion to allow lookups to begin using the new source
-                    cacheDownloadRequest = null;
-                }
-                catch (Exception ex)
-                {
-                    Logger.Log($"{nameof(BeatmapUpdaterMetadataLookup)}'s online cache extraction failed: {ex}", LoggingTarget.Database);
-                    File.Delete(cacheFilePath);
-                }
-                finally
-                {
-                    File.Delete(compressedCacheFilePath);
-                }
-            };
-
-            Task.Run(async () =>
-            {
-                try
-                {
-                    await cacheDownloadRequest.PerformAsync().ConfigureAwait(false);
-                }
-                catch
-                {
-                    // Prevent throwing unobserved exceptions, as they will be logged from the network request to the log file anyway.
-                }
-            });
-        }
-
-        private bool checkLocalCache(BeatmapSetInfo set, BeatmapInfo beatmapInfo)
-        {
-            // download is in progress (or was, and failed).
-            if (cacheDownloadRequest != null)
-                return false;
-
-            // database is unavailable.
-            if (!storage.Exists(cache_database_name))
-                return false;
-
-            if (string.IsNullOrEmpty(beatmapInfo.MD5Hash)
-                && string.IsNullOrEmpty(beatmapInfo.Path)
-                && beatmapInfo.OnlineID <= 0)
-                return false;
-
-            try
-            {
-                using (var db = new SqliteConnection(string.Concat("Data Source=", storage.GetFullPath($@"{"online.db"}", true))))
-                {
-                    db.Open();
-
-                    using (var cmd = db.CreateCommand())
-                    {
-                        cmd.CommandText =
-                            "SELECT beatmapset_id, beatmap_id, approved, user_id, checksum, last_update FROM osu_beatmaps WHERE checksum = @MD5Hash OR beatmap_id = @OnlineID OR filename = @Path";
-
-                        cmd.Parameters.Add(new SqliteParameter("@MD5Hash", beatmapInfo.MD5Hash));
-                        cmd.Parameters.Add(new SqliteParameter("@OnlineID", beatmapInfo.OnlineID));
-                        cmd.Parameters.Add(new SqliteParameter("@Path", beatmapInfo.Path));
-
-                        using (var reader = cmd.ExecuteReader())
-                        {
-                            if (reader.Read())
-                            {
-                                var status = (BeatmapOnlineStatus)reader.GetByte(2);
-
-                                // Some metadata should only be applied if there's no local changes.
-                                if (shouldSaveOnlineMetadata(beatmapInfo))
-                                {
-                                    beatmapInfo.Status = status;
-                                    beatmapInfo.Metadata.Author.OnlineID = reader.GetInt32(3);
-                                }
-
-                                // TODO: DateSubmitted and DateRanked are not provided by local cache.
-                                beatmapInfo.OnlineID = reader.GetInt32(1);
-                                beatmapInfo.OnlineMD5Hash = reader.GetString(4);
-                                beatmapInfo.LastOnlineUpdate = reader.GetDateTimeOffset(5);
-
-                                Debug.Assert(beatmapInfo.BeatmapSet != null);
-                                beatmapInfo.BeatmapSet.OnlineID = reader.GetInt32(0);
-
-                                if (beatmapInfo.BeatmapSet.Beatmaps.All(shouldSaveOnlineMetadata))
-                                {
-                                    beatmapInfo.BeatmapSet.Status = status;
-                                }
-
-                                logForModel(set, $"Cached local retrieval for {beatmapInfo}.");
-                                return true;
-                            }
-                        }
-                    }
-                }
+                Logger.Log($"Discarding metadata lookup result due to mismatching online ID (expected: {beatmapInfo.OnlineID} actual: {result.BeatmapID})", LoggingTarget.Database);
+                return true;
             }
-            catch (Exception ex)
+
+            if (beatmapInfo.OnlineID == -1 && result.MD5Hash != beatmapInfo.MD5Hash)
             {
-                logForModel(set, $"Cached local retrieval for {beatmapInfo} failed with {ex}.");
+                Logger.Log($"Discarding metadata lookup result due to mismatching hash (expected: {beatmapInfo.MD5Hash} actual: {result.MD5Hash})", LoggingTarget.Database);
+                return true;
             }
 
             return false;
         }
 
-        private void logForModel(BeatmapSetInfo set, string message) =>
-            RealmArchiveModelImporter<BeatmapSetInfo>.LogForModel(set, $"[{nameof(BeatmapUpdaterMetadataLookup)}] {message}");
-
         /// <summary>
-        /// Check whether the provided beatmap is in a state where online "ranked" status metadata should be saved against it.
-        /// Handles the case where a user may have locally modified a beatmap in the editor and expects the local status to stick.
+        /// Attempts to retrieve the <see cref="OnlineBeatmapMetadata"/> for the given <paramref name="beatmapInfo"/>.
         /// </summary>
-        private static bool shouldSaveOnlineMetadata(BeatmapInfo beatmapInfo) => beatmapInfo.MatchesOnlineVersion || beatmapInfo.Status != BeatmapOnlineStatus.LocallyModified;
+        /// <param name="beatmapInfo">The beatmap to perform the online lookup for.</param>
+        /// <param name="preferOnlineFetch">Whether online sources should be preferred for the lookup.</param>
+        /// <param name="result">The result of the lookup. Can be <see langword="null"/> if no matching beatmap was found (or the lookup failed).</param>
+        /// <returns>
+        /// <see langword="true"/> if any of the metadata sources were available and returned a valid <paramref name="result"/>.
+        /// <see langword="false"/> if none of the metadata sources were available, or if there was insufficient data to return a valid <paramref name="result"/>.
+        /// </returns>
+        /// <remarks>
+        /// There are two cases wherein this method will return <see langword="false"/>:
+        /// <list type="bullet">
+        /// <item>If neither the local cache or the API are available to query.</item>
+        /// <item>If the API is not available to query, and a positive match was not made in the local cache.</item>
+        /// </list>
+        /// In either case, the online ID read from the .osu file will be preserved, which may not necessarily be what we want.
+        /// TODO: reconsider this if/when a better flow for queueing online retrieval is implemented.
+        /// </remarks>
+        private bool tryLookup(BeatmapInfo beatmapInfo, bool preferOnlineFetch, out OnlineBeatmapMetadata? result)
+        {
+            bool useLocalCache = !apiMetadataSource.Available || !preferOnlineFetch;
+            if (useLocalCache && localCachedMetadataSource.TryLookup(beatmapInfo, out result))
+                return true;
+
+            if (apiMetadataSource.TryLookup(beatmapInfo, out result))
+                return true;
+
+            result = null;
+            return false;
+        }
 
         public void Dispose()
         {
-            cacheDownloadRequest?.Dispose();
+            apiMetadataSource.Dispose();
+            localCachedMetadataSource.Dispose();
         }
     }
 }

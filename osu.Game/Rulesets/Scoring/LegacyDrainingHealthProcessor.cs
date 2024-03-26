@@ -108,6 +108,9 @@ namespace osu.Game.Rulesets.Scoring
                     increaseHp(h);
                 }
 
+                if (topLevelObjectCount == 0)
+                    return testDrop;
+
                 if (!fail && currentHp < lowestHpEnd)
                 {
                     fail = true;
@@ -141,7 +144,7 @@ namespace osu.Game.Rulesets.Scoring
 
             void increaseHp(HitObject hitObject)
             {
-                double amount = GetHealthIncreaseFor(hitObject, hitObject.CreateJudgement().MaxResult);
+                double amount = GetHealthIncreaseFor(hitObject, hitObject.Judgement.MaxResult);
                 currentHpUncapped += amount;
                 currentHp = Math.Max(0, Math.Min(1, currentHp + amount));
             }

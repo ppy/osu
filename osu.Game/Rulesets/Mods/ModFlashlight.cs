@@ -2,10 +2,12 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
+using System.Diagnostics;
 using System.Runtime.InteropServices;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
+using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Primitives;
 using osu.Framework.Graphics.Rendering;
 using osu.Framework.Graphics.Rendering.Vertices;
@@ -13,6 +15,7 @@ using osu.Framework.Graphics.Shaders;
 using osu.Framework.Graphics.Shaders.Types;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Localisation;
+using osu.Framework.Utils;
 using osu.Game.Configuration;
 using osu.Game.Graphics;
 using osu.Game.Graphics.OpenGL.Vertices;
@@ -33,6 +36,7 @@ namespace osu.Game.Rulesets.Mods
         public override IconUsage? Icon => OsuIcon.ModFlashlight;
         public override ModType Type => ModType.DifficultyIncrease;
         public override LocalisableString Description => "Restricted view area.";
+        public override bool Ranked => UsesDefaultConfiguration;
 
         [SettingSource("Flashlight size", "Multiplier applied to the default flashlight size.")]
         public abstract BindableFloat SizeMultiplier { get; }
@@ -83,8 +87,15 @@ namespace osu.Game.Rulesets.Mods
             flashlight.Depth = float.MinValue;
 
             flashlight.Combo.BindTo(Combo);
+            flashlight.GetPlayfieldScale = () => drawableRuleset.Playfield.Scale;
 
-            drawableRuleset.Overlays.Add(flashlight);
+            drawableRuleset.Overlays.Add(new Container
+            {
+                RelativeSizeAxes = Axes.Both,
+                // workaround for 1px gaps on the edges of the playfield which would sometimes show with "gameplay" screen scaling active.
+                Padding = new MarginPadding(-1),
+                Child = flashlight,
+            });
         }
 
         protected abstract Flashlight CreateFlashlight();
@@ -98,6 +109,8 @@ namespace osu.Game.Rulesets.Mods
             protected override DrawNode CreateDrawNode() => new FlashlightDrawNode(this);
 
             public override bool RemoveCompletedTransforms => false;
+
+            internal Func<Vector2>? GetPlayfieldScale;
 
             private readonly float defaultFlashlightSize;
             private readonly float sizeMultiplier;
@@ -138,9 +151,18 @@ namespace osu.Game.Rulesets.Mods
 
             protected abstract string FragmentShader { get; }
 
-            protected float GetSize()
+            public float GetSize()
             {
                 float size = defaultFlashlightSize * sizeMultiplier;
+
+                if (GetPlayfieldScale != null)
+                {
+                    Vector2 playfieldScale = GetPlayfieldScale();
+
+                    Debug.Assert(Precision.AlmostEquals(Math.Abs(playfieldScale.X), Math.Abs(playfieldScale.Y)),
+                        @"Playfield has non-proportional scaling. Flashlight implementations should be revisited with regard to balance.");
+                    size *= Math.Abs(playfieldScale.X);
+                }
 
                 if (isBreakTime.Value)
                     size *= 2.5f;
