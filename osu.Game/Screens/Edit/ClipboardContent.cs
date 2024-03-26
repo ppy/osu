@@ -16,7 +16,7 @@ namespace osu.Game.Screens.Edit
         [JsonConverter(typeof(TypedListConverter<HitObject>))]
         public IList<HitObject> HitObjects;
 
-        public const string CLIPBOARD_FORMAT = "osu/hitobjects";
+        public const string CLIPBOARD_FORMAT = "application/x-osu-hitobjects";
 
         public ClipboardContent()
         {
