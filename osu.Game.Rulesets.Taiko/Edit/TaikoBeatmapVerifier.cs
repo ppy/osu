@@ -3,18 +3,17 @@
 
 using System.Collections.Generic;
 using System.Linq;
-using osu.Game.Rulesets.Catch.Edit.Checks;
 using osu.Game.Rulesets.Edit;
 using osu.Game.Rulesets.Edit.Checks.Components;
+using osu.Game.Rulesets.Taiko.Edit.Checks;
 
-namespace osu.Game.Rulesets.Catch.Edit
+namespace osu.Game.Rulesets.Taiko.Edit
 {
-    public class CatchBeatmapVerifier : IBeatmapVerifier
+    public class TaikoBeatmapVerifier : IBeatmapVerifier
     {
         private readonly List<ICheck> checks = new List<ICheck>
         {
-            new CheckBananaShowerGap(),
-            new CheckCatchAbnormalDifficultySettings(),
+            new CheckTaikoAbnormalDifficultySettings(),
         };
 
         public IEnumerable<Issue> Run(BeatmapVerifierContext context)
