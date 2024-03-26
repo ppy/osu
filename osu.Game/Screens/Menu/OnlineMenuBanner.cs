@@ -120,8 +120,8 @@ namespace osu.Game.Screens.Menu
         {
             nextDisplay?.Cancel();
 
-            // If the user is hovering a banner, don't rotate yet.
-            bool anyHovered = content.Any(i => i.IsHovered);
+            // If the user is interacting with a banner, don't rotate yet.
+            bool anyHovered = content.Any(i => i.IsHovered || i.IsDragged);
 
             if (!anyHovered)
             {
@@ -242,6 +242,8 @@ namespace osu.Game.Screens.Menu
                     .ScaleTo(1, 500, Easing.OutElastic);
                 base.OnMouseUp(e);
             }
+
+            protected override bool OnDragStart(DragStartEvent e) => true;
         }
     }
 }
