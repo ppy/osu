@@ -13,6 +13,7 @@ using osu.Framework.Input.Events;
 using osu.Game.Database;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
+using osu.Game.Graphics.Sprites;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Overlays;
 using osuTK;
@@ -25,7 +26,7 @@ namespace osu.Game.Collections
     /// </summary>
     public partial class DrawableCollectionListItem : OsuRearrangeableListItem<Live<BeatmapCollection>>
     {
-        private const float item_height = 35;
+        private const float item_height = 45;
         private const float button_width = item_height * 0.75f;
 
         /// <summary>
@@ -87,13 +88,11 @@ namespace osu.Game.Collections
                         Padding = new MarginPadding { Right = collection.IsManaged ? button_width : 0 },
                         Children = new Drawable[]
                         {
-                            textBox = new ItemTextBox
+                            textBox = new ItemTextBox(collection)
                             {
-                                RelativeSizeAxes = Axes.Both,
-                                Size = Vector2.One,
-                                CornerRadius = item_height / 2,
+                                RelativeSizeAxes = Axes.X,
+                                Height = item_height,
                                 CommitOnFocusLost = true,
-                                PlaceholderText = collection.IsManaged ? string.Empty : "Create a new collection"
                             },
                         }
                     },
@@ -124,11 +123,67 @@ namespace osu.Game.Collections
         {
             protected override float LeftRightPadding => item_height / 2;
 
+            private const float count_text_size = 12;
+
+            [Resolved]
+            private RealmAccess realm { get; set; } = null!;
+
+            private readonly Live<BeatmapCollection> collection;
+
+            private OsuSpriteText countText = null!;
+
+            private IDisposable? itemCountSubscription;
+
+            public ItemTextBox(Live<BeatmapCollection> collection)
+            {
+                this.collection = collection;
+
+                CornerRadius = item_height / 2;
+            }
+
             [BackgroundDependencyLoader]
             private void load(OsuColour colours)
             {
                 BackgroundUnfocused = colours.GreySeaFoamDarker.Darken(0.5f);
                 BackgroundFocused = colours.GreySeaFoam;
+
+                if (collection.IsManaged)
+                {
+                    TextContainer.Height *= (Height - count_text_size) / Height;
+                    TextContainer.Margin = new MarginPadding { Bottom = count_text_size };
+
+                    TextContainer.Add(countText = new OsuSpriteText
+                    {
+                        Anchor = Anchor.BottomLeft,
+                        Origin = Anchor.TopLeft,
+                        Depth = float.MinValue,
+                        Font = OsuFont.Default.With(size: count_text_size, weight: FontWeight.SemiBold),
+                        Margin = new MarginPadding { Top = 2, Left = 2 },
+                        Colour = colours.Yellow
+                    });
+
+                    itemCountSubscription = realm.SubscribeToPropertyChanged(r => r.Find<BeatmapCollection>(collection.ID), c => c.BeatmapMD5Hashes, _ =>
+                        Scheduler.AddOnce(() =>
+                        {
+                            int count = collection.PerformRead(c => c.BeatmapMD5Hashes.Count);
+
+                            countText.Text = count == 1
+                                // Intentionally not localised until we have proper support for this (see https://github.com/ppy/osu-framework/pull/4918
+                                // but also in this case we want support for formatting a number within a string).
+                                ? $"{count:#,0} beatmap"
+                                : $"{count:#,0} beatmaps";
+                        }));
+                }
+                else
+                {
+                    PlaceholderText = "Create a new collection";
+                }
+            }
+
+            protected override void Dispose(bool isDisposing)
+            {
+                base.Dispose(isDisposing);
+                itemCountSubscription?.Dispose();
             }
         }
 
