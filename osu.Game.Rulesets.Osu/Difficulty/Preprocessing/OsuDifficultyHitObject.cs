@@ -32,6 +32,11 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Preprocessing
         public readonly double StrainTime;
 
         /// <summary>
+        /// Normalised distance from the start position of the previous <see cref="OsuDifficultyHitObject"/> to the start position of this <see cref="OsuDifficultyHitObject"/>.
+        /// </summary>
+        public double JumpDistance { get; private set; }
+
+        /// <summary>
         /// Normalised distance from the "lazy" end position of the previous <see cref="OsuDifficultyHitObject"/> to the start position of this <see cref="OsuDifficultyHitObject"/>.
         /// <para>
         /// The "lazy" end position is the position at which the cursor ends up if the previous hitobject is followed with as minimal movement as possible (i.e. on the edge of slider follow circles).
@@ -158,6 +163,8 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Preprocessing
                 float smallCircleBonus = Math.Min(30 - (float)BaseObject.Radius, 5) / 50;
                 scalingFactor *= 1 + smallCircleBonus;
             }
+
+            JumpDistance = (lastObject.StackedPosition - BaseObject.StackedPosition).Length * scalingFactor;
 
             Vector2 lastCursorPosition = getEndCursorPosition(lastObject);
 
