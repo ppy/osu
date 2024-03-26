@@ -70,7 +70,8 @@ namespace osu.Desktop
             // NVIDIA profiles are based on the executable name of a process.
             // Lazer and stable share the same executable name.
             // Stable sets this setting to "Off", which may not be what we want, so let's force it back to the default "Auto" on startup.
-            NVAPI.ThreadedOptimisations = NvThreadControlSetting.OGL_THREAD_CONTROL_DEFAULT;
+            if (OperatingSystem.IsWindows())
+                NVAPI.ThreadedOptimisations = NvThreadControlSetting.OGL_THREAD_CONTROL_DEFAULT;
 
             // Back up the cwd before DesktopGameHost changes it
             string cwd = Environment.CurrentDirectory;
