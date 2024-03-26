@@ -53,6 +53,18 @@ namespace osu.Game.Rulesets.Taiko.Tests.Editor.Checks
         }
 
         [Test]
+        public void TestDrainRateTwoDecimals()
+        {
+            beatmap.Difficulty.DrainRate = 5.55f;
+
+            var context = getContext();
+            var issues = check.Run(context).ToList();
+
+            Assert.That(issues, Has.Count.EqualTo(1));
+            Assert.That(issues.Single().Template is CheckAbnormalDifficultySettings.IssueTemplateMoreThanOneDecimal);
+        }
+
+        [Test]
         public void TestOverallDifficultyUnder()
         {
             beatmap.Difficulty.OverallDifficulty = -10;
@@ -68,6 +80,30 @@ namespace osu.Game.Rulesets.Taiko.Tests.Editor.Checks
         public void TestOverallDifficultyOver()
         {
             beatmap.Difficulty.OverallDifficulty = 20;
+
+            var context = getContext();
+            var issues = check.Run(context).ToList();
+
+            Assert.That(issues, Has.Count.EqualTo(1));
+            Assert.That(issues.Single().Template is CheckAbnormalDifficultySettings.IssueTemplateOutOfRange);
+        }
+
+        [Test]
+        public void TestDrainRateUnder()
+        {
+            beatmap.Difficulty.DrainRate = -10;
+
+            var context = getContext();
+            var issues = check.Run(context).ToList();
+
+            Assert.That(issues, Has.Count.EqualTo(1));
+            Assert.That(issues.Single().Template is CheckAbnormalDifficultySettings.IssueTemplateOutOfRange);
+        }
+
+        [Test]
+        public void TestDrainRateOver()
+        {
+            beatmap.Difficulty.DrainRate = 20;
 
             var context = getContext();
             var issues = check.Run(context).ToList();
