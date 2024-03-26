@@ -273,12 +273,21 @@ namespace osu.Game.Tests.NonVisual.Filtering
         }
 
         [Test]
-        public void TestApplyStatusMatches()
+        public void TestApplyMultipleEqualityStatusQueries()
         {
             const string query = "status=ranked status=loved";
             var filterCriteria = new FilterCriteria();
             FilterQueryParser.ApplyQueries(filterCriteria, query);
-            Assert.IsNotEmpty(filterCriteria.OnlineStatus.Values);
+            Assert.That(filterCriteria.OnlineStatus.Values, Is.Empty);
+        }
+
+        [Test]
+        public void TestApplyEqualStatusQueryWithMultipleValues()
+        {
+            const string query = "status=ranked,loved";
+            var filterCriteria = new FilterCriteria();
+            FilterQueryParser.ApplyQueries(filterCriteria, query);
+            Assert.That(filterCriteria.OnlineStatus.Values, Is.Not.Empty);
             Assert.That(filterCriteria.OnlineStatus.Values, Contains.Item(BeatmapOnlineStatus.Ranked));
             Assert.That(filterCriteria.OnlineStatus.Values, Contains.Item(BeatmapOnlineStatus.Loved));
         }
@@ -289,10 +298,40 @@ namespace osu.Game.Tests.NonVisual.Filtering
             const string query = "status>=r";
             var filterCriteria = new FilterCriteria();
             FilterQueryParser.ApplyQueries(filterCriteria, query);
-            Assert.IsNotEmpty(filterCriteria.OnlineStatus.Values);
+            Assert.That(filterCriteria.OnlineStatus.Values, Has.Count.EqualTo(4));
             Assert.That(filterCriteria.OnlineStatus.Values, Contains.Item(BeatmapOnlineStatus.Ranked));
             Assert.That(filterCriteria.OnlineStatus.Values, Contains.Item(BeatmapOnlineStatus.Approved));
             Assert.That(filterCriteria.OnlineStatus.Values, Contains.Item(BeatmapOnlineStatus.Qualified));
+            Assert.That(filterCriteria.OnlineStatus.Values, Contains.Item(BeatmapOnlineStatus.Loved));
+        }
+
+        [Test]
+        public void TestApplyRangeStatusWithMultipleMatchesQuery()
+        {
+            const string query = "status>=r,l";
+            var filterCriteria = new FilterCriteria();
+            FilterQueryParser.ApplyQueries(filterCriteria, query);
+            Assert.That(filterCriteria.OnlineStatus.Values, Is.EquivalentTo(Enum.GetValues<BeatmapOnlineStatus>()));
+        }
+
+        [Test]
+        public void TestApplyTwoRangeStatusQuery()
+        {
+            const string query = "status>r status<l";
+            var filterCriteria = new FilterCriteria();
+            FilterQueryParser.ApplyQueries(filterCriteria, query);
+            Assert.That(filterCriteria.OnlineStatus.Values, Has.Count.EqualTo(2));
+            Assert.That(filterCriteria.OnlineStatus.Values, Contains.Item(BeatmapOnlineStatus.Approved));
+            Assert.That(filterCriteria.OnlineStatus.Values, Contains.Item(BeatmapOnlineStatus.Qualified));
+        }
+
+        [Test]
+        public void TestApplyRangeAndEqualStatusQuery()
+        {
+            const string query = "status>r status=loved";
+            var filterCriteria = new FilterCriteria();
+            FilterQueryParser.ApplyQueries(filterCriteria, query);
+            Assert.That(filterCriteria.OnlineStatus.Values, Is.Not.Empty);
             Assert.That(filterCriteria.OnlineStatus.Values, Contains.Item(BeatmapOnlineStatus.Loved));
         }
 
