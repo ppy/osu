@@ -16,7 +16,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
     {
         private const double reading_window_size = 3000;
 
-        private const double overlap_multiplier = 2;
+        private const double overlap_multiplier = 3.5;
 
         public static double EvaluateDensityOf(DifficultyHitObject current, bool applyDistanceNerf = true)
         {
@@ -180,6 +180,9 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
                     lastOverlapness = overlapObj.Overlapness;
                 }
                 screenOverlapDifficulty += lastOverlapness;
+
+                // This is a correct way to do this (paired with changing >= to <=), but somehow it get's more broken
+                //screenOverlapDifficulty = Math.Max(screenOverlapDifficulty, lastOverlapness);
             }
 
             return overlap_multiplier * Math.Max(0, screenOverlapDifficulty - 0.7);
@@ -202,7 +205,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
             double difficulty = EvaluateDensityOf(current);
 
             double overlapBonus = EvaluateOverlapDifficultyOf(current) * difficulty;
-            difficulty += overlapBonus;
+            difficulty += overlapBonus * 0.1; // Overlaps should affect aiming part much less
 
             return Math.Max(0, Math.Pow(difficulty, 1.5) - 1);
         }

@@ -144,38 +144,63 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Preprocessing
             OverlapObjects = new List<OverlapObject>();
 
             double totalOverlapnessDifficulty = 0;
-
-            double prevTimeWithoutOverlap = 0;
-            double timeWithoutOverlap = 0;
+            double currentTime = DeltaTime;
+            List<double> historicTimes = new List<double>();
 
             OsuDifficultyHitObject prevObject = this;
 
             foreach (var loopObj in retrieveCurrentVisibleObjects(this))
             {
-                double currentOverlapness = calculateOverlapness(this, loopObj); // overlapness with this object
-                double instantOverlapness = 0.5 + calculateOverlapness(prevObject, loopObj); // overlapness between current and prev to make streams have 0 buff
+                // Overlapness with this object
+                double currentOverlapness = calculateOverlapness(this, loopObj);
 
+                // Overlapness between current and prev to make streams have 0 buff
+                double instantOverlapness = 0.5 + calculateOverlapness(prevObject, loopObj);
+
+                // Nerf overlaps on wide angles
                 double angleFactor = 1;
-                if (loopObj.Angle != null) angleFactor += (-Math.Cos((double)loopObj.Angle) + 1) / 2; // =2 for wide angles, =1 for acute angles
+                if (prevObject.Angle != null) angleFactor += (-Math.Cos((double)prevObject.Angle) + 1) / 2; // =2 for wide angles, =1 for acute angles
                 instantOverlapness = Math.Min(1, instantOverlapness * angleFactor); // wide angles are more predictable
 
                 currentOverlapness *= (1 - instantOverlapness) * 2; // wide angles will have close-to-zero buff
                 currentOverlapness *= OpacityAt(loopObj.BaseObject.StartTime, false);
 
+                // Control overlap repetitivness
                 if (currentOverlapness > 0)
                 {
-                    double difference = Math.Min(timeWithoutOverlap, prevTimeWithoutOverlap) / Math.Max(timeWithoutOverlap, prevTimeWithoutOverlap);
-                    if (Math.Max(timeWithoutOverlap, prevTimeWithoutOverlap) == 0) difference = 0;
+                    double currentMinOverlapness = currentOverlapness;
+                    double cumulativeTimeWithCurrent = currentTime;
 
-                    currentOverlapness *= differenceActuation(difference);
+                    // For every cumulative time with current
+                    for (int i = historicTimes.Count - 1; i >= 0; i--)
+                    {
+                        double cumulativeTimeWithoutCurrent = 0;
 
-                    prevTimeWithoutOverlap = timeWithoutOverlap;
-                    timeWithoutOverlap = 0;
+                        // Get every possible cumulative time without current
+                        for (int j = i; j >= 0; j--)
+                        {
+                            cumulativeTimeWithoutCurrent += historicTimes[j];
+
+                            // Check how similar cumulative times are
+                            currentMinOverlapness = Math.Min(currentMinOverlapness, currentOverlapness * getSimilarity(cumulativeTimeWithCurrent, cumulativeTimeWithoutCurrent));
+
+                            // Check how similar current time with cumulative time
+                            currentMinOverlapness = Math.Min(currentMinOverlapness, currentOverlapness * getSimilarity(currentTime, cumulativeTimeWithoutCurrent));
+
+                            // Starting from this point - we will never have better match, so stop searching
+                            if (cumulativeTimeWithoutCurrent >= cumulativeTimeWithCurrent)
+                                break;
+                        }
+                        cumulativeTimeWithCurrent += historicTimes[i];
+                    }
+
+                    currentOverlapness = currentMinOverlapness;
+                    historicTimes.Add(currentTime);
+                    currentTime = prevObject.DeltaTime;
                 }
-
                 else
                 {
-                    timeWithoutOverlap += prevObject.DeltaTime;
+                    currentTime += prevObject.DeltaTime;
                 }
 
                 totalOverlapnessDifficulty += currentOverlapness;
@@ -184,17 +209,20 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Preprocessing
             }
         }
 
-        private static double differenceActuation(double difference)
+        private static double getSimilarity(double timeA, double timeB)
         {
-            if (difference < 0.75) return 1.0;
-            if (difference > 0.9) return 0.0;
+            double similarity = Math.Min(timeA, timeB) / Math.Max(timeA, timeB);
+            if (Math.Max(timeA, timeB) == 0) similarity = 1;
 
-            return (Math.Cos((difference - 0.75) * Math.PI / 0.15) + 1) / 2; // drops from 1 to 0 as difference increase from 0.75 to 0.9
+            if (similarity < 0.75) return 1.0;
+            if (similarity > 0.9) return 0.0;
+
+            return (Math.Cos((similarity - 0.75) * Math.PI / 0.15) + 1) / 2; // drops from 1 to 0 as similarity increase from 0.75 to 0.9
         }
 
         private static double calculateOverlapness(OsuDifficultyHitObject odho1, OsuDifficultyHitObject odho2)
         {
-            const double area_coef = 0.8;
+            const double area_coef = 0.85;
 
             OsuHitObject o1 = odho1.BaseObject, o2 = odho2.BaseObject;
 
