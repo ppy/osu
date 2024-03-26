@@ -21,6 +21,12 @@ namespace osu.Game.Rulesets.Taiko.Edit.Checks
 
             if (OutOfRange(diff.OverallDifficulty))
                 yield return new IssueTemplateOutOfRange(this).Create("Overall difficulty", diff.OverallDifficulty);
+
+            if (HasMoreThanOneDecimalPlace(diff.DrainRate))
+                yield return new IssueTemplateMoreThanOneDecimal(this).Create("Drain rate", diff.DrainRate);
+
+            if (OutOfRange(diff.DrainRate))
+                yield return new IssueTemplateOutOfRange(this).Create("Drain rate", diff.DrainRate);
         }
     }
 }
