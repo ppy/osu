@@ -256,8 +256,8 @@ namespace osu.Game.Tests.NonVisual.Filtering
             const string query = "status=r";
             var filterCriteria = new FilterCriteria();
             FilterQueryParser.ApplyQueries(filterCriteria, query);
-            Assert.AreEqual(BeatmapOnlineStatus.Ranked, filterCriteria.OnlineStatus.Min);
-            Assert.AreEqual(BeatmapOnlineStatus.Ranked, filterCriteria.OnlineStatus.Max);
+            Assert.IsNotEmpty(filterCriteria.OnlineStatus.Values);
+            Assert.That(filterCriteria.OnlineStatus.Values, Contains.Item(BeatmapOnlineStatus.Ranked));
         }
 
         [Test]
@@ -268,10 +268,71 @@ namespace osu.Game.Tests.NonVisual.Filtering
             FilterQueryParser.ApplyQueries(filterCriteria, query);
             Assert.AreEqual("I want the pp", filterCriteria.SearchText.Trim());
             Assert.AreEqual(4, filterCriteria.SearchTerms.Length);
-            Assert.AreEqual(BeatmapOnlineStatus.Ranked, filterCriteria.OnlineStatus.Min);
-            Assert.IsTrue(filterCriteria.OnlineStatus.IsLowerInclusive);
-            Assert.AreEqual(BeatmapOnlineStatus.Ranked, filterCriteria.OnlineStatus.Max);
-            Assert.IsTrue(filterCriteria.OnlineStatus.IsUpperInclusive);
+            Assert.IsNotEmpty(filterCriteria.OnlineStatus.Values);
+            Assert.That(filterCriteria.OnlineStatus.Values, Contains.Item(BeatmapOnlineStatus.Ranked));
+        }
+
+        [Test]
+        public void TestApplyMultipleEqualityStatusQueries()
+        {
+            const string query = "status=ranked status=loved";
+            var filterCriteria = new FilterCriteria();
+            FilterQueryParser.ApplyQueries(filterCriteria, query);
+            Assert.That(filterCriteria.OnlineStatus.Values, Is.Empty);
+        }
+
+        [Test]
+        public void TestApplyEqualStatusQueryWithMultipleValues()
+        {
+            const string query = "status=ranked,loved";
+            var filterCriteria = new FilterCriteria();
+            FilterQueryParser.ApplyQueries(filterCriteria, query);
+            Assert.That(filterCriteria.OnlineStatus.Values, Is.Not.Empty);
+            Assert.That(filterCriteria.OnlineStatus.Values, Contains.Item(BeatmapOnlineStatus.Ranked));
+            Assert.That(filterCriteria.OnlineStatus.Values, Contains.Item(BeatmapOnlineStatus.Loved));
+        }
+
+        [Test]
+        public void TestApplyRangeStatusMatches()
+        {
+            const string query = "status>=r";
+            var filterCriteria = new FilterCriteria();
+            FilterQueryParser.ApplyQueries(filterCriteria, query);
+            Assert.That(filterCriteria.OnlineStatus.Values, Has.Count.EqualTo(4));
+            Assert.That(filterCriteria.OnlineStatus.Values, Contains.Item(BeatmapOnlineStatus.Ranked));
+            Assert.That(filterCriteria.OnlineStatus.Values, Contains.Item(BeatmapOnlineStatus.Approved));
+            Assert.That(filterCriteria.OnlineStatus.Values, Contains.Item(BeatmapOnlineStatus.Qualified));
+            Assert.That(filterCriteria.OnlineStatus.Values, Contains.Item(BeatmapOnlineStatus.Loved));
+        }
+
+        [Test]
+        public void TestApplyRangeStatusWithMultipleMatchesQuery()
+        {
+            const string query = "status>=r,l";
+            var filterCriteria = new FilterCriteria();
+            FilterQueryParser.ApplyQueries(filterCriteria, query);
+            Assert.That(filterCriteria.OnlineStatus.Values, Is.EquivalentTo(Enum.GetValues<BeatmapOnlineStatus>()));
+        }
+
+        [Test]
+        public void TestApplyTwoRangeStatusQuery()
+        {
+            const string query = "status>r status<l";
+            var filterCriteria = new FilterCriteria();
+            FilterQueryParser.ApplyQueries(filterCriteria, query);
+            Assert.That(filterCriteria.OnlineStatus.Values, Has.Count.EqualTo(2));
+            Assert.That(filterCriteria.OnlineStatus.Values, Contains.Item(BeatmapOnlineStatus.Approved));
+            Assert.That(filterCriteria.OnlineStatus.Values, Contains.Item(BeatmapOnlineStatus.Qualified));
+        }
+
+        [Test]
+        public void TestApplyRangeAndEqualStatusQuery()
+        {
+            const string query = "status>r status=loved";
+            var filterCriteria = new FilterCriteria();
+            FilterQueryParser.ApplyQueries(filterCriteria, query);
+            Assert.That(filterCriteria.OnlineStatus.Values, Is.Not.Empty);
+            Assert.That(filterCriteria.OnlineStatus.Values, Contains.Item(BeatmapOnlineStatus.Loved));
         }
 
         [TestCase("creator")]
