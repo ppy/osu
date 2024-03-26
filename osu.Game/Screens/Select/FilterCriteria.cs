@@ -114,17 +114,18 @@ namespace osu.Game.Screens.Select
 
         public IRulesetFilterCriteria? RulesetCriteria { get; set; }
 
-        public struct OptionalSet<T> : IEquatable<OptionalSet<T>>
-            where T : struct
+        public readonly struct OptionalSet<T> : IEquatable<OptionalSet<T>>
+            where T : struct, Enum
         {
-            public bool HasFilter => Values.Count > 0;
+            public bool HasFilter => true;
 
             public bool IsInRange(T value) => Values.Contains(value);
 
-            public HashSet<T> Values = new HashSet<T>();
+            public HashSet<T> Values { get; }
 
             public OptionalSet()
             {
+                Values = Enum.GetValues<T>().ToHashSet();
             }
 
             public bool Equals(OptionalSet<T> other) => Values.SetEquals(other.Values);
