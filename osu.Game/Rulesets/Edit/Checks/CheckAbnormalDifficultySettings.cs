@@ -2,6 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using osu.Game.Rulesets.Edit.Checks.Components;
 
 namespace osu.Game.Rulesets.Edit.Checks
@@ -21,14 +22,18 @@ namespace osu.Game.Rulesets.Edit.Checks
         /// <summary>
         /// If the setting is out of the boundaries set by the editor (0 - 10)
         /// </summary>
-        protected bool OutOfRange(float setting)
+        protected bool OutOfRange(string setting, float value, [NotNullWhen(true)] out Issue? issue)
         {
-            return setting < 0f || setting > 10f;
+            bool hasIssue = value < 0f || value > 10f;
+            issue = hasIssue ? new IssueTemplateOutOfRange(this).Create(setting, value) : null;
+            return hasIssue;
         }
 
-        protected bool HasMoreThanOneDecimalPlace(float setting)
+        protected bool HasMoreThanOneDecimalPlace(string setting, float value, [NotNullWhen(true)] out Issue? issue)
         {
-            return float.Round(setting, 1) != setting;
+            bool hasIssue = float.Round(value, 1) != value;
+            issue = hasIssue ? new IssueTemplateMoreThanOneDecimal(this).Create(setting, value) : null;
+            return hasIssue;
         }
 
         public class IssueTemplateMoreThanOneDecimal : IssueTemplate
