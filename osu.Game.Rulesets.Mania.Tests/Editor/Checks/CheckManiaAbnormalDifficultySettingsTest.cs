@@ -17,7 +17,7 @@ namespace osu.Game.Rulesets.Mania.Tests.Editor.Checks
     {
         private CheckManiaAbnormalDifficultySettings check = null!;
 
-        private IBeatmap beatmap = new Beatmap<HitObject>();
+        private readonly IBeatmap beatmap = new Beatmap<HitObject>();
 
         [SetUp]
         public void Setup()
@@ -25,7 +25,7 @@ namespace osu.Game.Rulesets.Mania.Tests.Editor.Checks
             check = new CheckManiaAbnormalDifficultySettings();
 
             beatmap.BeatmapInfo.Ruleset = new ManiaRuleset().RulesetInfo;
-            beatmap.Difficulty = new BeatmapDifficulty()
+            beatmap.Difficulty = new BeatmapDifficulty
             {
                 OverallDifficulty = 5,
                 DrainRate = 5,

@@ -17,7 +17,7 @@ namespace osu.Game.Rulesets.Taiko.Tests.Editor.Checks
     {
         private CheckTaikoAbnormalDifficultySettings check = null!;
 
-        private IBeatmap beatmap = new Beatmap<HitObject>();
+        private readonly IBeatmap beatmap = new Beatmap<HitObject>();
 
         [SetUp]
         public void Setup()
@@ -25,7 +25,7 @@ namespace osu.Game.Rulesets.Taiko.Tests.Editor.Checks
             check = new CheckTaikoAbnormalDifficultySettings();
 
             beatmap.BeatmapInfo.Ruleset = new TaikoRuleset().RulesetInfo;
-            beatmap.Difficulty = new BeatmapDifficulty()
+            beatmap.Difficulty = new BeatmapDifficulty
             {
                 OverallDifficulty = 5,
             };
