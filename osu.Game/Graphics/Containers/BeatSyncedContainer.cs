@@ -97,7 +97,8 @@ namespace osu.Game.Graphics.Containers
                 // This means that the amount of early adjustment is adjusted in line with audio track rate changes.
                 // But other cases like the osu! logo at the main menu won't correctly have this rate information.
                 // We can adjust here to ensure the applied early activation always matches expectations.
-                early *= BeatSyncSource.Clock.Rate / Clock.Rate;
+                if (Clock.Rate > 0)
+                    early *= BeatSyncSource.Clock.Rate / Clock.Rate;
 
                 currentTrackTime = BeatSyncSource.Clock.CurrentTime + early;
 
