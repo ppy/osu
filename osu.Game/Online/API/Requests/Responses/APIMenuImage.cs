@@ -28,34 +28,27 @@ namespace osu.Game.Online.API.Requests.Responses
         /// The time at which this item should begin displaying. If <c>null</c>, will display immediately.
         /// </summary>
         [JsonProperty(@"begins")]
-        public DateTimeOffset? Begins { get; set; }
+        public DateTimeOffset? Begins { get; init; }
 
         /// <summary>
         /// The time at which this item should stop displaying. If <c>null</c>, will display indefinitely.
         /// </summary>
         [JsonProperty(@"expires")]
-        public DateTimeOffset? Expires { get; set; }
+        public DateTimeOffset? Expires { get; init; }
 
         public bool Equals(APIMenuImage? other)
         {
             if (ReferenceEquals(null, other)) return false;
             if (ReferenceEquals(this, other)) return true;
 
-            return Image == other.Image && Url == other.Url;
+            return Image == other.Image && Url == other.Url && Begins == other.Begins && Expires == other.Expires;
         }
 
-        public override bool Equals(object? obj)
-        {
-            if (ReferenceEquals(null, obj)) return false;
-            if (ReferenceEquals(this, obj)) return true;
-            if (obj.GetType() != GetType()) return false;
-
-            return Equals((APIMenuImage)obj);
-        }
+        public override bool Equals(object? other) => other is APIMenuImage content && Equals(content);
 
         public override int GetHashCode()
         {
-            return HashCode.Combine(Image, Url);
+            return HashCode.Combine(Image, Url, Begins, Expires);
         }
     }
 }
