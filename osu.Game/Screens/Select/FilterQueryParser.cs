@@ -69,7 +69,7 @@ namespace osu.Game.Screens.Select
                     return TryUpdateCriteriaRange(ref criteria.BeatDivisor, op, value, tryParseInt);
 
                 case "status":
-                    return TryUpdateCriteriaSet(ref criteria.OnlineStatus, op, value, tryParseEnum);
+                    return TryUpdateCriteriaSet(ref criteria.OnlineStatus, op, value);
 
                 case "creator":
                 case "author":
@@ -302,54 +302,70 @@ namespace osu.Game.Screens.Select
 
         /// <summary>
         /// Attempts to parse a keyword filter of type <typeparamref name="T"/>,
-        /// from the specified <paramref name="op"/> and <paramref name="val"/>.
-        /// If <paramref name="val"/> can be parsed into <typeparamref name="T"/> using <paramref name="parseFunction"/>, the function returns <c>true</c>
+        /// from the specified <paramref name="op"/> and <paramref name="filterValue"/>.
+        /// If <paramref name="filterValue"/> can be parsed successfully, the function returns <c>true</c>
         /// and the resulting range constraint is stored into the <paramref name="range"/>'s expected values.
         /// </summary>
         /// <param name="range">The <see cref="FilterCriteria.OptionalSet{T}"/> to store the parsed data into, if successful.</param>
         /// <param name="op">The operator for the keyword filter.</param>
-        /// <param name="val">The value of the keyword filter.</param>
-        /// <param name="parseFunction">Function used to determine if <paramref name="val"/> can be converted to type <typeparamref name="T"/>.</param>
-        public static bool TryUpdateCriteriaSet<T>(ref FilterCriteria.OptionalSet<T> range, Operator op, string val, TryParseFunction<T> parseFunction)
-            where T : struct, Enum
-            => parseFunction.Invoke(val, out var converted) && tryUpdateCriteriaSet(ref range, op, converted);
-
-        private static bool tryUpdateCriteriaSet<T>(ref FilterCriteria.OptionalSet<T> range, Operator op, T pivotValue)
+        /// <param name="filterValue">The value of the keyword filter.</param>
+        public static bool TryUpdateCriteriaSet<T>(ref FilterCriteria.OptionalSet<T> range, Operator op, string filterValue)
             where T : struct, Enum
         {
-            var allDefinedValues = Enum.GetValues<T>();
+            var matchingValues = new HashSet<T>();
 
-            foreach (var val in allDefinedValues)
+            if (op == Operator.Equal && filterValue.Contains(','))
             {
-                int compareResult = Comparer<T>.Default.Compare(val, pivotValue);
+                string[] splitValues = filterValue.Split(',', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
 
-                switch (op)
+                foreach (string splitValue in splitValues)
                 {
-                    case Operator.Less:
-                        if (compareResult < 0) range.Values.Add(val);
-                        break;
-
-                    case Operator.LessOrEqual:
-                        if (compareResult <= 0) range.Values.Add(val);
-                        break;
-
-                    case Operator.Equal:
-                        if (compareResult == 0) range.Values.Add(val);
-                        break;
-
-                    case Operator.GreaterOrEqual:
-                        if (compareResult >= 0) range.Values.Add(val);
-                        break;
-
-                    case Operator.Greater:
-                        if (compareResult > 0) range.Values.Add(val);
-                        break;
-
-                    default:
+                    if (!tryParseEnum<T>(splitValue, out var parsedValue))
                         return false;
+
+                    matchingValues.Add(parsedValue);
+                }
+            }
+            else
+            {
+                if (!tryParseEnum<T>(filterValue, out var pivotValue))
+                    return false;
+
+                var allDefinedValues = Enum.GetValues<T>();
+
+                foreach (var val in allDefinedValues)
+                {
+                    int compareResult = Comparer<T>.Default.Compare(val, pivotValue);
+
+                    switch (op)
+                    {
+                        case Operator.Less:
+                            if (compareResult < 0) matchingValues.Add(val);
+                            break;
+
+                        case Operator.LessOrEqual:
+                            if (compareResult <= 0) matchingValues.Add(val);
+                            break;
+
+                        case Operator.Equal:
+                            if (compareResult == 0) matchingValues.Add(val);
+                            break;
+
+                        case Operator.GreaterOrEqual:
+                            if (compareResult >= 0) matchingValues.Add(val);
+                            break;
+
+                        case Operator.Greater:
+                            if (compareResult > 0) matchingValues.Add(val);
+                            break;
+
+                        default:
+                            return false;
+                    }
                 }
             }
 
+            range.Values.IntersectWith(matchingValues);
             return true;
         }
 
