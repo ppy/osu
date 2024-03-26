@@ -15,30 +15,31 @@ namespace osu.Game.Rulesets.Osu.Edit.Checks
         public override IEnumerable<Issue> Run(BeatmapVerifierContext context)
         {
             var diff = context.Beatmap.Difficulty;
+            Issue? issue;
 
-            if (HasMoreThanOneDecimalPlace(diff.ApproachRate))
-                yield return new IssueTemplateMoreThanOneDecimal(this).Create("Approach rate", diff.ApproachRate);
+            if (HasMoreThanOneDecimalPlace("Approach rate", diff.ApproachRate, out issue))
+                yield return issue;
 
-            if (OutOfRange(diff.ApproachRate))
-                yield return new IssueTemplateOutOfRange(this).Create("Approach rate", diff.ApproachRate);
+            if (OutOfRange("Approach rate", diff.ApproachRate, out issue))
+                yield return issue;
 
-            if (HasMoreThanOneDecimalPlace(diff.OverallDifficulty))
-                yield return new IssueTemplateMoreThanOneDecimal(this).Create("Overall difficulty", diff.OverallDifficulty);
+            if (HasMoreThanOneDecimalPlace("Overall difficulty", diff.OverallDifficulty, out issue))
+                yield return issue;
 
-            if (OutOfRange(diff.OverallDifficulty))
-                yield return new IssueTemplateOutOfRange(this).Create("Overall difficulty", diff.OverallDifficulty);
+            if (OutOfRange("Overall difficulty", diff.OverallDifficulty, out issue))
+                yield return issue;
 
-            if (HasMoreThanOneDecimalPlace(diff.CircleSize))
-                yield return new IssueTemplateMoreThanOneDecimal(this).Create("Circle size", diff.CircleSize);
+            if (HasMoreThanOneDecimalPlace("Circle size", diff.CircleSize, out issue))
+                yield return issue;
 
-            if (OutOfRange(diff.CircleSize))
-                yield return new IssueTemplateOutOfRange(this).Create("Circle size", diff.CircleSize);
+            if (OutOfRange("Circle size", diff.CircleSize, out issue))
+                yield return issue;
 
-            if (HasMoreThanOneDecimalPlace(diff.DrainRate))
-                yield return new IssueTemplateMoreThanOneDecimal(this).Create("Drain rate", diff.DrainRate);
+            if (HasMoreThanOneDecimalPlace("Drain rate", diff.DrainRate, out issue))
+                yield return issue;
 
-            if (OutOfRange(diff.DrainRate))
-                yield return new IssueTemplateOutOfRange(this).Create("Drain rate", diff.DrainRate);
+            if (OutOfRange("Drain rate", diff.DrainRate, out issue))
+                yield return issue;
         }
     }
 }

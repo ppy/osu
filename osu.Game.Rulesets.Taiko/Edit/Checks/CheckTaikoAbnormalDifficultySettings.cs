@@ -15,18 +15,19 @@ namespace osu.Game.Rulesets.Taiko.Edit.Checks
         public override IEnumerable<Issue> Run(BeatmapVerifierContext context)
         {
             var diff = context.Beatmap.Difficulty;
+            Issue? issue;
 
-            if (HasMoreThanOneDecimalPlace(diff.OverallDifficulty))
-                yield return new IssueTemplateMoreThanOneDecimal(this).Create("Overall difficulty", diff.OverallDifficulty);
+            if (HasMoreThanOneDecimalPlace("Overall difficulty", diff.OverallDifficulty, out issue))
+                yield return issue;
 
-            if (OutOfRange(diff.OverallDifficulty))
-                yield return new IssueTemplateOutOfRange(this).Create("Overall difficulty", diff.OverallDifficulty);
+            if (OutOfRange("Overall difficulty", diff.OverallDifficulty, out issue))
+                yield return issue;
 
-            if (HasMoreThanOneDecimalPlace(diff.DrainRate))
-                yield return new IssueTemplateMoreThanOneDecimal(this).Create("Drain rate", diff.DrainRate);
+            if (HasMoreThanOneDecimalPlace("Drain rate", diff.DrainRate, out issue))
+                yield return issue;
 
-            if (OutOfRange(diff.DrainRate))
-                yield return new IssueTemplateOutOfRange(this).Create("Drain rate", diff.DrainRate);
+            if (OutOfRange("Drain rate", diff.DrainRate, out issue))
+                yield return issue;
         }
     }
 }
