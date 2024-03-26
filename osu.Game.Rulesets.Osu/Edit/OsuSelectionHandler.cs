@@ -78,19 +78,17 @@ namespace osu.Game.Rulesets.Osu.Edit
 
         public override bool HandleReverse()
         {
-            var hitObjects = EditorBeatmap.SelectedHitObjects;
+            var hitObjects = EditorBeatmap.SelectedHitObjects
+                .OfType<OsuHitObject>()
+                .OrderBy(obj => obj.StartTime)
+                .ToList();
 
             double endTime = hitObjects.Max(h => h.GetEndTime());
             double startTime = hitObjects.Min(h => h.StartTime);
 
             bool moreThanOneObject = hitObjects.Count > 1;
 
-            var newComboOrder = hitObjects
-                .OfType<OsuHitObject>()
-                .Select(obj => obj.NewCombo)
-                .ToList();
-
-            newComboOrder.Reverse();
+            var newComboOrder = hitObjects.Select(obj => obj.NewCombo).ToList();
 
             foreach (var h in hitObjects)
             {
@@ -104,10 +102,13 @@ namespace osu.Game.Rulesets.Osu.Edit
                 }
             }
 
+            // re-order objects again after flipping their times
+            hitObjects = [.. hitObjects.OrderBy(obj => obj.StartTime)];
+
             int i = 0;
             foreach (bool newCombo in newComboOrder)
             {
-                hitObjects.OfType<OsuHitObject>().ToList()[i].NewCombo = newCombo;
+                hitObjects[i].NewCombo = newCombo;
                 i++;
             }
 
