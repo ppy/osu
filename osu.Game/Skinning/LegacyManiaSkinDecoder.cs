@@ -129,10 +129,11 @@ namespace osu.Game.Skinning
                         currentConfig.LightFramePerSecond = lightFramePerSecond > 0 ? lightFramePerSecond : 24;
                         break;
 
-                    case "LongNoteTailOrigin":
-                        currentConfig.HoldNoteTailOrigin = string.Equals(pair.Value, "Top", StringComparison.Ordinal)
-                            ? Anchor.TopCentre
-                            : Anchor.BottomCentre;
+                    case "HoldNoteTailOrigin":
+                        if (Enum.TryParse<HoldNoteTailOrigin>(pair.Value, out var tailOrigin))
+                            currentConfig.HoldNoteTailOrigin = tailOrigin == HoldNoteTailOrigin.Top
+                                ? Anchor.TopCentre
+                                : Anchor.BottomCentre;
                         break;
 
                     case string when pair.Key.StartsWith("Colour", StringComparison.Ordinal):
