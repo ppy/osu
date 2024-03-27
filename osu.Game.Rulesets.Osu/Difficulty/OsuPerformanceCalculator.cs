@@ -21,6 +21,8 @@ namespace osu.Game.Rulesets.Osu.Difficulty
         private int countOk;
         private int countMeh;
         private int countMiss;
+        private int countLargeTickMiss;
+        private int countSliderEndsDropped;
 
         private double effectiveMissCount;
 
@@ -39,7 +41,12 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             countOk = score.Statistics.GetValueOrDefault(HitResult.Ok);
             countMeh = score.Statistics.GetValueOrDefault(HitResult.Meh);
             countMiss = score.Statistics.GetValueOrDefault(HitResult.Miss);
-            effectiveMissCount = calculateEffectiveMissCount(osuAttributes);
+            countLargeTickMiss = score.Statistics.GetValueOrDefault(HitResult.LargeTickMiss);
+            countSliderEndsDropped = score.Statistics.GetValueOrDefault(HitResult.SmallTickMiss);
+            if (!score.Mods.Any(h => h is OsuModClassic cl && cl.NoSliderHeadAccuracy.Value))
+                effectiveMissCount = countMiss + countLargeTickMiss;
+            else
+                effectiveMissCount = calculateEffectiveMissCount(osuAttributes);
 
             double multiplier = PERFORMANCE_BASE_MULTIPLIER;
 
@@ -122,8 +129,14 @@ namespace osu.Game.Rulesets.Osu.Difficulty
 
             if (attributes.SliderCount > 0)
             {
-                double estimateSliderEndsDropped = Math.Clamp(Math.Min(countOk + countMeh + countMiss, attributes.MaxCombo - scoreMaxCombo), 0, estimateDifficultSliders);
-                double sliderNerfFactor = (1 - attributes.SliderFactor) * Math.Pow(1 - estimateSliderEndsDropped / estimateDifficultSliders, 3) + attributes.SliderFactor;
+                double estimateSliderEndsDropped;
+                if (score.IsLegacyScore)
+                    estimateSliderEndsDropped = Math.Clamp(Math.Min(countOk + countMeh + countMiss, attributes.MaxCombo - scoreMaxCombo), 0, estimateDifficultSliders);
+                else
+                    estimateSliderEndsDropped = countSliderEndsDropped;
+
+                double sliderNerfFactor = 0;
+                sliderNerfFactor = (1 - attributes.SliderFactor) * Math.Pow(1 - estimateSliderEndsDropped / estimateDifficultSliders, 3) + attributes.SliderFactor;
                 aimValue *= sliderNerfFactor;
             }
 
